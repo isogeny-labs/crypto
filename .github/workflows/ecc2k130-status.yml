@@ -4,8 +4,7 @@
 name: ECC2K-130 status pages
 
 on:
-  # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
+  # Validate matching site changes on PRs; publish only from main or schedule.
   schedule:
     # Every 10 minutes. scripts/rho_status/render.py sizes history.json from
     # this interval, and test_rho_status.py pins the two together.
@@ -16,6 +15,29 @@ on:
         description: "Read the original rho-dp endpoint and secret reference; do not publish Pages"
         type: boolean
         default: false
+  pull_request:
+    paths:
+      - ".github/workflows/ecc2k130-status.yml"
+      - "scripts/rho_status/**"
+      - "scripts/site/**"
+      - "docs/ecc2k130-status/**"
+      - "docs/site/**"
+      - "docs/index-calculus-scoreboard.html"
+      - "docs/ic-current-state.html"
+      - "docs/browser/**"
+      - "docs/backend-leaderboard/**"
+      - "scripts/build_lab_browser.py"
+      - "docs/ic/progress-timeline.json"
+      - "docs/ic-leaderboard.html"
+      - "docs/ic-leaderboard/**"
+      - "docs/ic-measurement.html"
+      - "scripts/rho_gpu_emulate.mjs"
+      - "docs/algorithm-lab.html"
+      - "docs/algorithm-lab/**"
+      - "docs/performance-gains.html"
+      - "docs/performance-gains/**"
+      - "ecc2k130/LAMBDA-PROJECTIVE.md"
+      - "ecc2k130/aws/README.md"
   push:
     branches: [main]
     paths:
@@ -48,8 +70,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   # PRs get their own group so they never cancel each other. Scheduled,
@@ -67,6 +87,26 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
       - name: Configure source AWS identity
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -94,6 +134,26 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
       - name: Offline snapshot tests
         run: python3 scripts/rho_status/test_rho_status.py
       - name: DP34 telemetry snapshot tests
@@ -128,6 +188,26 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
 
       # The test job's steps, in the same order: a failure here stops the
       # run before anything is deployed, as `needs: test` used to.

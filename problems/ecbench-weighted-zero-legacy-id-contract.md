@@ -61,7 +61,23 @@ blocker. Recheck when the comparison contract or test changes.
 
 ## Resolution and history
 
+2026-10-27: the trace-line implementation's whole-library attempt reproduced
+the same unresolved compatibility area on base
+`c8a37174b026362993b8c3becb75d520c5bc1d81`. The current assertion is now the
+opposite of the historical one: `zero.legacy_comparison_id.is_none()` at
+`compare.rs:2448` fails. Preserve the older receipt above; it describes that
+older source, not the current symptom. The trace-line change does not alter
+`compare.rs`, and an exact rerun after restoring its tracked session fixture
+still fails. See
+`research/trace_c1_2lp_20261027/validation/fixture-rechecks.log`.
+The compatibility contract and whole-library gate remain open.
+
 Unresolved. Discovered during the 2026-10-25 relocation gate. The separate
 missing bounds-session fixture was materialized and its focused test passed;
 it is not evidence of this compatibility defect. No library repair or test
 suppression is included in the relocation PR.
+
+
+### 2026-10-27 repair update
+
+The current main baseline c8a37174 has the opposite mismatch from the historical baseline above: its implementation returns a legacy ID for explicit zero weight while its existing regression test requires no legacy ID. The CI repair preserves the current test contract: explicit pricing includes `pricing_weight` in its comparison identity, even at zero; only `None` carries a legacy unweighted ID. No historical comparison is edited. See `docs/ci-repair-20261027.md`; focused/final verification is still required before resolving this record.

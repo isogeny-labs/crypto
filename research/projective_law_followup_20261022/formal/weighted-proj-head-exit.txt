@@ -1,0 +1,20 @@
+status: no Lean theorem verified
+toolchain: leanprover/lean4:v4.34.1
+mathlib_revision: d13f23b723b8a846827a245b89c10fc7d3f11612
+working_directory: research/projective_law_followup_20261022/formal
+attempt_1_command: timeout 180s lake env lean Common22WeightedProjHead.lean
+attempt_1_exit_code: 124
+attempt_1_stdout_stderr_bytes: 0
+attempt_1_stdout_stderr_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+attempt_2_command: LEAN_PATH="$PWD/.lake/build/lib/lean:$PWD/.lake/packages/mathlib/.lake/build/lib/lean" timeout 120s lean Common22WeightedProjHead.lean
+attempt_2_exit_code: 1
+attempt_2_diagnostic: unknown module prefix 'Batteries'
+attempt_2_stdout_stderr_sha256: de88b6146ade5cf8782c6ad094baecdfdaea08c46dd0c243894857c92632607a
+attempt_2_stdout_stderr_file: weighted-proj-head-build.log
+attempt_3_command: proj_lean_path="$PWD/.lake/build/lib/lean"; for package_dir in .lake/packages/*; do proj_lean_path="$proj_lean_path:$PWD/$package_dir/.lake/build/lib/lean"; done; LEAN_PATH="$proj_lean_path" timeout 120s lean Common22WeightedProjHead.lean
+attempt_3_exit_code: 124
+attempt_3_stdout_stderr_bytes: 0
+attempt_3_stdout_stderr_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+attempt_3_terminal_observation: lean process entered D state with wchan rpc_wait_bit_killabl; no compiler diagnostic; process and timeout are now terminal
+unchecked_source_file: weighted-proj-head-unchecked-lean.txt
+unchecked_source_sha256: 31fab311c280f646b5fab040e1ba9871b491ac5a223cbf45e3a10077ec9b38f5

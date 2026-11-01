@@ -4,9 +4,11 @@
 #
 # For every Lean target in the repository:
 #   * a Lake project (a directory with lakefile.toml / lakefile.lean): `lake build`,
-#     then audit every module the project itself built;
+#     explicitly build every tracked Lean source, then audit every built module;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
 #     against the core library, then audit that module.
+# One frozen historical failed source is checked as an expected-failure target
+# by exact source hash and diagnostic; see tools/lean/README.md.
 # The audit (AuditAxioms.lean, next to this script) fails any theorem whose transitive
 # axioms go beyond propext / Classical.choice / Quot.sound: `sorry`,
 # `native_decide` and user axioms all fail. A target with no theorems fails too.
@@ -28,6 +30,13 @@ here=$(cd "$(dirname "$0")" && pwd)
 root=$(git rev-parse --show-toplevel) || exit 3
 audit="$here/AuditAxioms.lean"
 trusted="${LEAN_GATE_TRUSTED:-$root/tools/lean/trusted-native.txt}"
+# This retained first attempt is a negative control, not a claimed proof.
+# Keep the exact source and expected diagnostic pinned so changing either one
+# cannot silently turn an unrelated build failure into a passing target.
+archived_failed='research/isogeny_world_frontier_20261016/replay-optimization-v1/implementation-01/Newton.failed.lean'
+archived_failed_sha256='b439d1edbe04798a56012688254ea7bd120494e4fd10856f4bdc0c07796e9d1c'
+# shellcheck disable=SC2016 # The Lean diagnostic contains literal backticks.
+archived_failed_error='error(lean.unknownIdentifier): Unknown constant `Int.mul_two`'
 trust_args=()
 [ -f "$trusted" ] && trust_args=(--trusted "$trusted")
 out=""
@@ -45,7 +54,8 @@ done
 discover() {
   cd "$root" || exit 3
   # Lake projects: every lakefile outside build output and vendored packages.
-  git ls-files -- '*lakefile.toml' '*lakefile.lean' | xargs -r -n1 dirname | sort -u
+  git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -v '^tools/lean/selftest/' \
+    | xargs -r -n1 dirname | sort -u
   # Standalone files: tracked .lean files with no lakefile in any parent directory.
   git ls-files -- '*.lean' | grep -vE '^tools/(lean|selftest)/' | while read -r f; do
     d=$(dirname "$f")
@@ -60,18 +70,69 @@ if [ ${#targets[@]} -eq 0 ]; then mapfile -t targets < <(discover); fi
 if [ $list -eq 1 ]; then printf '%s\n' "${targets[@]}"; exit 0; fi
 [ ${#targets[@]} -gt 0 ] || { echo "no Lean targets found" >&2; exit 3; }
 command -v lake > /dev/null || { echo "lake not on PATH (install elan)" >&2; exit 3; }
+command -v python3 > /dev/null || { echo "python3 not on PATH (target path normalization)" >&2; exit 3; }
 
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
 fail=0
-summary=()
 
 run_target() {
-  local t=$1 slug log status
+  local t slug log status
+  if ! t=$(python3 - "$root" "$1" <<'PY'
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1]).resolve()
+target = (root / sys.argv[2]).resolve(strict=True)
+if not target.is_relative_to(root):
+    raise SystemExit("proof target escapes the repository")
+print(target.relative_to(root).as_posix())
+PY
+  ); then
+    echo "FAIL_target_path $1" >&2
+    return 1
+  fi
   slug=$(echo "$t" | tr '/.' '__')
   log="$scratch/$slug"
   mkdir -p "$log"
   status=PASS
+  if [ "$t" = "$archived_failed" ]; then
+    local actual_sha256 pinned rc errors
+    actual_sha256=$(sha256sum "$root/$t" 2>/dev/null | cut -d ' ' -f 1)
+    if [ "$actual_sha256" != "$archived_failed_sha256" ]; then
+      status=FAIL_archive_digest
+      printf 'expected sha256 %s\nactual sha256   %s\n' \
+        "$archived_failed_sha256" "$actual_sha256" > "$log/build.log"
+    else
+      pinned=$(cat "$root/tools/lean/lean-toolchain" 2>/dev/null || true)
+      if [ -z "$pinned" ] || ! command -v timeout >/dev/null; then
+        status=INFRA_archive_toolchain
+        echo 'pinned Lean toolchain or timeout unavailable' > "$log/build.log"
+      else
+        (cd "$(dirname "$root/$t")" && ELAN_TOOLCHAIN="$pinned" timeout 180 \
+          lean -o "$log/negative.olean" "$root/$t") > "$log/build.log" 2>&1
+        rc=$?
+        errors=$(grep -c ' error(' "$log/build.log" || true)
+        if [ "$rc" -eq 124 ]; then
+          status=INFRA_archive_timeout
+        elif [ "$rc" -ne 1 ] || [ "$errors" -ne 1 ] || \
+          ! grep -Fq "$archived_failed_error" "$log/build.log"; then
+          status=FAIL_archive_diagnostic
+        else
+          status=PASS_expected_failure
+        fi
+      fi
+    fi
+    echo "$status" > "$log/status"
+    if [ -n "$out" ]; then
+      mkdir -p "$out/$slug"
+      cp "$log/build.log" "$log/status" "$out/$slug/"
+    fi
+    printf '%-22s %4s thm %3s trusted  %s\n' "$status" 0 0 "$t"
+    if [ "$status" = PASS_expected_failure ]; then return 0; fi
+    head -5 "$log/build.log" | sed 's/^/    /'
+    case "$status" in INFRA_*) return 3 ;; *) return 1 ;; esac
+  fi
   if [ -d "$root/$t" ]; then
     # Lake project. Mathlib projects fetch Mathlib's prebuilt cache first; a
     # failed fetch is an infrastructure error, never evidence about a proof.
@@ -89,13 +150,39 @@ run_target() {
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
     else
-      local mods
-      mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
-        | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
-      if [ -z "$mods" ]; then
-        status=FAIL_no_modules
-      elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
-        status=FAIL_audit
+      local f module
+      local -a sources=() mods=()
+      # A default target may omit an entire tracked module. The +Module
+      # syntax works in both supported Lake versions; an unregistered source
+      # fails closed rather than silently escaping the axiom audit.
+      while IFS= read -r -d '' f; do
+        case "$f" in
+          *.lean) ;;
+          *) continue ;;
+        esac
+        module=$f
+        [ "$t" = . ] || module=${f#"$t"/}
+        case "$module" in
+          lakefile.lean|AxiomAudit.lean|*/AxiomAudit.lean) continue ;;
+        esac
+        module=${module%.lean}
+        # Quote path components as Lean identifiers: a tracked directory can
+        # contain a hyphen, which Lake otherwise parses as target syntax.
+        module=${module//\//».«}
+        sources+=("+«$module»")
+      done < <(cd "$root" && git ls-files -z -- "$t")
+      if [ ${#sources[@]} -eq 0 ]; then
+        status=FAIL_no_sources
+      elif ! (cd "$root/$t" && lake build "${sources[@]}") > "$log/source-build.log" 2>&1; then
+        status=FAIL_source_build
+      else
+        mapfile -t mods < <(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
+          | sed 's|^\./|«|; s|\.olean$|»|; s|/|».«|g' | sort)
+        if [ ${#mods[@]} -eq 0 ]; then
+          status=FAIL_no_modules
+        elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" "${mods[@]}") > "$log/audit.log" 2>&1; then
+          status=FAIL_audit
+        fi
       fi
     fi
   else
@@ -113,7 +200,7 @@ run_target() {
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"
   fi
   # `sorry` that elaborated without being used by a theorem still warns at build time.
-  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log"; then
+  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log" "$log/source-build.log" 2>/dev/null; then
     status=FAIL_sorry_warning
   fi
   echo "$status" > "$log/status"
@@ -124,7 +211,7 @@ run_target() {
   tr=$(grep -o '[0-9]* trusted' "$log/audit.log" 2>/dev/null | grep -o '[0-9]*' || echo 0)
   printf '%-22s %4s thm %3s trusted  %s\n' "$status" "${n:-0}" "${tr:-0}" "$t"
   if [ "$status" != PASS ]; then
-    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" 2>/dev/null | head -5 | sed 's/^/    /'
+    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" "$log/source-build.log" 2>/dev/null | head -5 | sed 's/^/    /'
     return 1
   fi
 }

@@ -11,12 +11,12 @@
   "source_artifacts": [
     {
       "path": "docs/curves/registry.json",
-      "sha256": "46d4060fafd718639043582a6ae8ebb5ee4f05423b7bd4a846aebe14f7486efd",
+      "sha256": "595b71600e1f471a2792d89666a8378ddbbeddc7a1425a808d16dfcbced76bb7",
       "role": "exact ICV1/EC1 input registry",
       "freshness": {
         "status": "supported",
         "scope": "the exact input registry for all 15,791 assessed map rows",
-        "rationale": "The digest is computed from the current file and every membership is joined through its model hash.",
+        "rationale": "The digest binds the catalog_commit snapshot and every membership is joined through its model hash; later live-catalog additions are outside this assessment.",
         "evidence_refs": [
           "docs/curves/registry.json"
         ]
@@ -50,7 +50,7 @@
     },
     {
       "path": "docs/curves/cover-transfer-assessment.schema.json",
-      "sha256": "4ab7679502a6c7c9c76dd139037ab74d8cf15aacd3711e42323c9c1c6bf9983c",
+      "sha256": "131e4867835bcc5cb465645d398acad5f14f8f2320f97b52b6dd95ab0cb6cc7c",
       "role": "machine-readable v2 ledger contract",
       "freshness": {
         "status": "supported",
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "52384ecfb2d3e6a56febce0b465f7cb944c6097ab16b59de81b2c4a912aa1eaf",
+      "sha256": "8635f6c7adb221fb25f4958491808b513863906ee424f7f016066ad126cc7755",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,7 +128,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "0e99ca0fd9eaee74d6b5214b47b725afcbe9c45d9b88be8efe742540e2d28191",
+      "sha256": "87f28d033fba5f8ec906bd04f1b3b68dc9a24ebd03d1582dfb7e7159ce548328",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -169,12 +169,12 @@
     },
     {
       "path": "src/binary_ecc/cover_transfer.rs",
-      "sha256": "6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896",
-      "role": "bounded binary pullback, pushforward, composition, and exact fixed-GF(8) arbitrary-class norm implementation",
+      "sha256": "61bd3ce55913a98ec07914e287393890f23b672d9867138756bb12eb29ab57f0",
+      "role": "general binary pullback, arbitrary-class norm, image/Prym projector, and composition implementation",
       "freshness": {
         "status": "supported",
-        "scope": "the binary cubic profile's typed point-class domain and the separate non-catalog fixed-GF(8), a=1, b=3, d=7 all-class fixture",
-        "rationale": "The digest pins the exact current transfer API, the positive 486-class fixed-fixture norm, and the structured arbitrary-Jacobian unsupported boundary for every other field/model. The fixture target has order 6 with six fibers of size 81, so degree 3 is not coprime to the full target order and no full-group injectivity claim follows.",
+        "scope": "the binary cubic profile's arbitrary reduced Mumford classes of degree at most three, including nonsplit support, plus the independent fixed-GF(8), a=1, b=3, d=7 all-class presentation",
+        "rationale": "The digest pins the exact current transfer API, its residue-field norm for every checked binary cubic cover, the image/Prym projector, and the exhaustive 486-class comparison with the independent fixed-fixture presentation. The fixture target has order 6 with six fibers of size 81, so degree 3 is not coprime to the full target order and no full-group injectivity claim follows.",
         "evidence_refs": [
           "src/binary_ecc/cover_transfer.rs"
         ]
@@ -182,7 +182,7 @@
     },
     {
       "path": "src/binary_ecc/hyperelliptic.rs",
-      "sha256": "435ed5ad5b67c51ee8d73735498bd35fe45890f35225bccc932c6873971ecdfd",
+      "sha256": "63aad374765a37cd096210a70ddde378d269c46ee6de41d6089ac5b92e074a5e",
       "role": "one-infinity binary Jacobian implementation",
       "freshness": {
         "status": "supported",
@@ -208,7 +208,7 @@
     },
     {
       "path": "Cargo.toml",
-      "sha256": "02dbfc609a2d8140350b6d484c86b204f7e589f5d3f845d268cf7820492f6b23",
+      "sha256": "84d25b3715bc7476271955f5a20d2b1508d847c16382bd951f0e4bcc1c533c0c",
       "role": "exact implementation-version dependency: Cargo.toml",
       "freshness": {
         "status": "supported",
@@ -221,7 +221,7 @@
     },
     {
       "path": "Cargo.lock",
-      "sha256": "c2c0049f265e78432b79c5fe14a7ce6668cd44c3816012256dfcd7b40e5f4f6d",
+      "sha256": "cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6",
       "role": "exact implementation-version dependency: Cargo.lock",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "9ea1c8df23822895fa956cdbb1252432111830221ee6e15a9a2b448119a51c2c",
+      "sha256": "f8dad0c1a0fa591f71da34589e8bc30ea9493b5c6825a62b5281e86168ce658c",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -247,7 +247,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "3363cc60d45d0a3085d90d706aabbf941961de7b3c6c4ad330c5805b3d3ec9bd",
+      "sha256": "de2c6cb85cb16bba4313e75097fe3959b3b1088c3f5dbe6d7d952bf346ba9aae",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -260,7 +260,7 @@
     },
     {
       "path": "src/lib.rs",
-      "sha256": "439b325406413cb870a09a1e22d9e033ceb19144613d5e13d098432c72b974e8",
+      "sha256": "07b85a605c639ec6926150c642f038f5291e33fd15395acb2ac3a2db649e826e",
       "role": "exact implementation-version dependency: src/lib.rs",
       "freshness": {
         "status": "supported",
@@ -273,7 +273,7 @@
     },
     {
       "path": "src/binary_ecc/mod.rs",
-      "sha256": "675e38fc43ba81c829c9991d1f3982bc3b459b7b704b14e0916e1c9bee6096a9",
+      "sha256": "0445603245fff38deee53365fa7fb1fd25ce9f710ad88bb90e03ebb5214d0ef8",
       "role": "exact implementation-version dependency: src/binary_ecc/mod.rs",
       "freshness": {
         "status": "supported",
@@ -286,7 +286,7 @@
     },
     {
       "path": "src/binary_ecc/f2m.rs",
-      "sha256": "34cdc7cccfe6b4e543e3ba3f9ea122b0cfa326ba6893c31e9e0683df4b3b8d77",
+      "sha256": "0ed5e86328772e6e711f9805e0317d99c75fbe7233591a8a1e0592243a530873",
       "role": "exact implementation-version dependency: src/binary_ecc/f2m.rs",
       "freshness": {
         "status": "supported",
@@ -312,7 +312,7 @@
     },
     {
       "path": "src/binary_ecc/curve.rs",
-      "sha256": "ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62",
+      "sha256": "936e2061e4c51ee91b7afef8e3ef4fdb2b82fa5b48b988d9001cc958f05310e9",
       "role": "exact implementation-version dependency: src/binary_ecc/curve.rs",
       "freshness": {
         "status": "supported",
@@ -325,7 +325,7 @@
     },
     {
       "path": "src/cryptanalysis/mod.rs",
-      "sha256": "d828db44794307da653a23a456e2bb52d1cea9e67116727967d42f63e5ec8e28",
+      "sha256": "298406fe4545ee17cc97e446356bd46e27f058a6fa9ce9b75305268f9c93cd77",
       "role": "exact implementation-version dependency: src/cryptanalysis/mod.rs",
       "freshness": {
         "status": "supported",
@@ -351,7 +351,7 @@
     },
     {
       "path": "src/hash/mod.rs",
-      "sha256": "ff1d0fc4b98999d9fd9c1f4c1c974d59f4e5dfca8893359ad423bd261e91aaa7",
+      "sha256": "f8a5233555a58728ef87e58b8c98a351c7ad798428378c483ddf6d0618b1b7b4",
       "role": "exact implementation-version dependency: src/hash/mod.rs",
       "freshness": {
         "status": "supported",
@@ -448,17 +448,18 @@
       "freshness": {
         "status": "refuted",
         "scope": "claim that this inventory is current for the 15,791-row registry",
-        "rationale": "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "rationale": "At source_commit it pins an older registry and omits assessment slugs. This historical finding does not describe the refreshed live inventory; modeled routes remain distinct from exact HC1/CV1 subgroup certificates.",
         "evidence_refs": [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md"
         ],
         "obligation_id": "refresh_formula_inventory"
-      }
+      },
+      "source_commit": "0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5"
     },
     {
       "path": "docs/curves/JACOBIAN_TRANSFERS.md",
-      "sha256": "783b799ba36e5543f08b65cc92526336928d20002bdd52de13dd852d4531b0b4",
+      "sha256": "391ee84b5e13cf1118abea5fc13eab3f11a70f19ecc9f367f993a87fa54d29d2",
       "role": "legacy formula-screen documentation pinned for the stale-inventory finding",
       "freshness": {
         "status": "supported",
@@ -471,7 +472,7 @@
     },
     {
       "path": "docs/curves/COVERS.md",
-      "sha256": "18fb8fdaa9b85dd3501bdad38bd0aef5f1f6626dd361b1942f932e39d9f2f79e",
+      "sha256": "2a3349a79518ec4fd2c54599cde9fa3ec2105b31b88f8c0a76b6300955db906f",
       "role": "catalog geometry contract and proof boundary",
       "freshness": {
         "status": "supported",
@@ -484,7 +485,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "11ec473c831fceb2d54f9c9b775b12e0c61202284e0d1864d7db42704196fefa",
+      "sha256": "dd3abdd298ef01d466a7f75623cf53f88705e9a10fb55c3b803fa9030fb4d320",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",
@@ -523,7 +524,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/lean/README.md",
-      "sha256": "d6f79fe6701a95f6fb81a835768aec594097261dfc434efd7ca4bb6774ff9abc",
+      "sha256": "859789a7a0eaf151cbff0c5352d06adbb783e971656d71a66aa30b8773f2dbf0",
       "role": "Lean package execution boundary and non-implication record",
       "freshness": {
         "status": "supported",
@@ -536,7 +537,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "46189cb93ee773bca24a6c6cb49a632144bff59a71472383a172e18152e0be32",
+      "sha256": "ad72ec2e6e52091fc6443c08e5fc1fc589b05983d76cd6c2189c42554de39f1f",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -548,8 +549,21 @@
       }
     },
     {
+      "path": "scripts/catalog_snapshot.mjs",
+      "sha256": "3eede268f12e1092dcea14ad90ae6e9d91fba6ebd97173a09d6022f48bbb2fde",
+      "role": "exact dated-catalog input selector; Git failures never fall back to live inputs",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "scripts/catalog_snapshot.mjs"
+        ]
+      }
+    },
+    {
       "path": "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
-      "sha256": "e8177fb2983522f9978ee388d405ae60ffe9d16a8e9fee997fa89bce2c63bfce",
+      "sha256": "13684bca3d83dcc46a1b700de8e75563e7b97c647bd334a65d5a2ebebaf4fddb",
       "role": "PDF coverage-marker metadata normalization source",
       "freshness": {
         "status": "supported",
@@ -562,7 +576,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "8df51cc443a4eeb5e7c4311f96ce34bfe6349cf9e6f112b41391af48edb14507",
+      "sha256": "cd7f68549bd1c18e92fcfdb484ab203a142137a2c4d83a41f3fc0e056b3e1d29",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -601,7 +615,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-      "sha256": "9b941169f30617d17f2dc389fcaca0cd519d32990abc9a1ecacf8ce8e3716f29",
+      "sha256": "ca786ebdb2af1390590e0c3914726c863fdae8cc5774d3b4b20feb39313114ff",
       "role": "rendered assessment diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -614,7 +628,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-      "sha256": "13141baf1ddcfa514886043b24127e5fe7d891c7107e5777851a1d4fc54c63f4",
+      "sha256": "ef9706f9eed85056d3d76477652e8d90e01ac9671e0fc3b6d524b13937208b2a",
       "role": "rendered assessment diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -640,7 +654,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-      "sha256": "110d9596fa1f9c5d2a7ef283f87e1434193a707707e4eee40c5c2b38fa8481d5",
+      "sha256": "3e1a0615b696f604b262d9a47284cf1bb8d3faf93a259ebb0c01242bac67448c",
       "role": "rendered typed transfer-context diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -653,7 +667,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
-      "sha256": "7bf90207aaf6b66750bea022d4bf27d5ffe1dfcee19e9ecd050862e10ec1fc81",
+      "sha256": "8e1b4f6ab3b2310046cfc1719953df4d8f13f8acd0617b544ce64e179ea41aff",
       "role": "rendered typed transfer-context diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -666,7 +680,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "1f6cde8011714af43814bd28aca117e048f3d6cf3f58eba9c444712328cbed8e",
+      "sha256": "ab2d8b7a9c002e9ce124e22bc2c04f4b96129f88091b65b3ab0dddb67af3efc1",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",
@@ -774,14 +788,15 @@
       "evidence_refs": [],
       "obligation_id": "independent_map_oracle"
     },
-    "map.binary-arbitrary-pushforward.refuted": {
-      "status": "refuted",
-      "scope": "Claim that the current implementation accepts and norms an arbitrary reduced class in Jac(H) for any of the 165 catalog binary covers.",
-      "rationale": "The public entry point supports one exact fixed-GF(8) fixture, which is not a catalog row, and returns Unsupported(ArbitraryJacobianPushforward) for the catalog profiles. This refutes a catalog implementation claim, not mathematical existence of a norm.",
+    "map.binary-arbitrary-pushforward.supported": {
+      "status": "supported",
+      "scope": "Arbitrary reduced Mumford classes of degree at most three for every catalog binary cubic cover, including irreducible degree-two and degree-three support.",
+      "rationale": "The public entry point factors the support over the base field, evaluates nonsplit points in the corresponding residue field, traces Frobenius orbits to the elliptic target, and cross-checks all 486 classes of the independent fixed-GF(8) presentation.",
       "evidence_refs": [
-        "src/binary_ecc/cover_transfer.rs#pushforward_arbitrary_jacobian_class"
-      ],
-      "obligation_id": "general_binary_norm"
+        "src/binary_ecc/cover_transfer.rs#pushforward_arbitrary_jacobian_class",
+        "src/binary_ecc/cover_transfer.rs#image_endomorphism_certificate",
+        "src/binary_ecc/cover_transfer.rs#torsion_projector_certificate"
+      ]
     },
     "map.prime-construction.supported": {
       "status": "supported",
@@ -859,7 +874,7 @@
     "map.binary-pipeline.refuted": {
       "status": "refuted",
       "scope": "Claim that the binary implementation provides a general Jac(H)-to-E norm and end-to-end logarithm transfer.",
-      "rationale": "Catalog rows expose only point-divisor and typed-fiber pushforward domains; the separate exact fixed-GF(8) arbitrary-class fixture does not generalize to them, and no solver consumes these catalog-cover classes.",
+      "rationale": "The catalog binary covers now expose a general arbitrary-class norm, but no relation collector, linear algebra, or individual-log solver consumes the projected classes; therefore an end-to-end transfer pipeline is still absent.",
       "evidence_refs": [
         "src/binary_ecc/cover_transfer.rs#pushforward_arbitrary_jacobian_class",
         "research/hyperelliptic_cover_infrastructure_20261006/README.md"
@@ -971,7 +986,7 @@
     "subgroup.binary-inverse-recovery.supported": {
       "status": "supported",
       "scope": "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 142 linked binary triples.",
-      "rationale": "The batch certificate checks the modular inverse and exact point equality for each catalog value r; this is bounded typed-domain recovery, not a general Jacobian norm.",
+      "rationale": "The batch certificate checks the modular inverse and exact point equality for each catalog value r on the typed pull-push domain; the general arbitrary-class norm is certified separately.",
       "evidence_refs": [
         "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"
       ]
@@ -993,7 +1008,7 @@
     "subgroup.arbitrary-recovery.unknown": {
       "status": "unknown",
       "scope": "Operational recovery from an arbitrary class produced by a Jacobian algorithm.",
-      "rationale": "There is no catalog-general norm or solver connected to these cover sources that produces such a result. The separate bounded odd-prime one-infinity solver library is outside this transfer path.",
+      "rationale": "A catalog-general norm now exists for the binary cubic family, but no solver is connected to these cover sources to produce and recover an arbitrary relation result. The separate bounded odd-prime one-infinity solver library is outside this transfer path.",
       "evidence_refs": [],
       "obligation_id": "full_solver"
     },
@@ -1002,7 +1017,7 @@
       "scope": "The subgroup generated by EC1N7Ce0hb6d297a2ca08's exact point over F_2^7.",
       "rationale": "The fixture checks a nonidentity G with [29]G=O; primality of 29 proves exact source order 29.",
       "evidence_refs": [
-        "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+        "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
         "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer"
       ]
     },
@@ -1011,7 +1026,7 @@
       "scope": "The checked pullback image of EC1N7Ce0hb6d297a2ca08's generator.",
       "rationale": "The image is nonidentity and is killed by the prime 29, hence its exact order is 29.",
       "evidence_refs": [
-        "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary"
+        "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector"
       ]
     },
     "map.f2m7-geometry.supported": {
@@ -1051,14 +1066,14 @@
         "pullback_point_classes": "map.binary-pullback.supported",
         "independent_pullback_homomorphism_oracle": "map.independent-oracle.unknown",
         "pushforward_point_divisors": "map.binary-typed-pushforward.supported",
-        "arbitrary_jacobian_pushforward": "map.binary-arbitrary-pushforward.refuted",
+        "arbitrary_jacobian_pushforward": "map.binary-arbitrary-pushforward.supported",
         "composition_on_typed_domain": "map.binary-composition.supported",
         "alternate_target_model_map": "map.direct-target.not-applicable",
         "field_extension_or_descent": "map.same-field.not-applicable",
         "computational_advantage": "map.advantage.unknown"
       },
       "full_transfer_pipeline": "map.binary-pipeline.refuted",
-      "boundary": "Supported as a same-field genus-three cover with checked one-infinity arithmetic and bounded rational-point-class transfer. Not a general Jacobian norm or solver."
+      "boundary": "Supported as a same-field genus-three cover with checked one-infinity arithmetic, arbitrary-class norm, and image/Prym projector. Not an end-to-end discrete-log solver."
     },
     "map.odd-prime-quadratic.direct": {
       "kind": "map_base",
@@ -406837,7 +406852,7 @@
       },
       "evidence_additions": [
         "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
-        "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary"
+        "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector"
       ],
       "boundary": "Exact order-29 evidence upgrades only this triple's numeric source- and image-order claims; arbitrary Jacobian recovery remains unknown."
     },
@@ -407100,7 +407115,7 @@
       "assessment": {
         "status": "unknown",
         "scope": "current cryptanalysis mirror or integration of the exact fixed-GF(8) arbitrary-class norm",
-        "rationale": "The retained parity receipt binds the earlier cover_transfer.rs digest 67b94112f70becf100ccc2cc7e0b3bc057e5663a4019b63fe966de9e62fd5069, not the current crypto source digest 6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896. No current-tip cryptanalysis mirror receipt is attached.",
+        "rationale": "The retained parity receipt binds the earlier cover_transfer.rs digest 67b94112f70becf100ccc2cc7e0b3bc057e5663a4019b63fe966de9e62fd5069, not the current crypto source digest 61bd3ce55913a98ec07914e287393890f23b672d9867138756bb12eb29ab57f0. No current-tip cryptanalysis mirror receipt is attached.",
         "evidence_refs": [
           "src/binary_ecc/cover_transfer.rs",
           "research/cover_transfer_assessment_20261013/release_replay.txt"
@@ -407134,18 +407149,13 @@
   "exploration_boundary": [
     "No search for production targets, private keys, or discrete logarithms was performed.",
     "All 15,791 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
-    "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
+    "The 165 catalog binary maps now have arbitrary-class norms and image/Prym projectors in the current source, including nonsplit support; catalog-wide independent-oracle replay and an end-to-end solver remain open.",
     "The 15,626 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
     "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
     "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
     "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths."
   ],
   "open_obligations": [
-    {
-      "id": "general_binary_norm",
-      "description": "Implement and independently verify a catalog-applicable pushforward/norm on arbitrary binary Jacobian classes; the separate exact fixed-GF(8) fixture is not a catalog row and does not close this obligation.",
-      "status": "unknown"
-    },
     {
       "id": "current_fixed_f8_cryptanalysis_mirror",
       "description": "Mirror or integrate the exact fixed-GF(8) arbitrary-class norm into cryptanalysis and attach a current-source parity, test, and CI receipt.",

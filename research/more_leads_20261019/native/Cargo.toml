@@ -1,0 +1,29 @@
+[package]
+name = "pencil-relation-gate"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[lib]
+path = "lib.rs"
+
+[[bin]]
+name = "target-labelled-pencil"
+path = "target_labelled_pencil.rs"
+
+[[bin]]
+name = "source-rho-controls"
+path = "source_rho_controls.rs"
+
+[[bin]]
+name = "two-point-controls"
+path = "two_point_controls.rs"
+
+[[bin]]
+name = "paired-price-controls"
+path = "paired_price_controls.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

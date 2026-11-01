@@ -1,0 +1,7 @@
+schema_version,step,object,pinned_api_or_obligation,status,evidence
+1,weighted_polynomial_grading,MvPolynomial (Fin 3) K,MvPolynomial.weightedGradedAlgebra,available,Mathlib/RingTheory/MvPolynomial/WeightedHomogeneous.lean
+1,homogeneous_relation_ideal,"Ideal.span {Y²-X⁵Z-a3X³Z³-a2X²Z⁴-a1XZ⁵-a0Z⁶}",Ideal.homogeneous_span,available_but_instance_unchecked,Mathlib/RingTheory/GradedAlgebra/Homogeneous/Ideal.lean
+1,graded_quotient,"A = weighted polynomial ring / relation ideal",GradedRing on quotient images of weighted components,open_no_constructor_found,weighted-proj-head-exit.txt
+1,Proj_affine_open,"D_+(Z) in Proj A",Proj.basicOpenIsoSpec,available_conditional_on_graded_quotient,Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Basic.lean
+1,dehomogenization,"(A[Z⁻¹])₀ ≃ K[x,y]/(y²-f(x))",explicit ring equivalence and equation transport,open_no_instance_or_theorem_found,WEIGHTED_PROJ_HEAD.md
+1,compiler_attempt,Common22WeightedProjHead.lean,pinned Lean source,unverified_timeout,weighted-proj-head-exit.txt

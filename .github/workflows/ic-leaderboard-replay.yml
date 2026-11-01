@@ -1,38 +1,126 @@
 name: ic-leaderboard-replay
 
-# Daily replay of every session the IC leaderboard cites, against docs/ic/validation/replay-plan.json
+# Replay of every session the IC leaderboard cites, against docs/ic/validation/replay-plan.json
 # (docs/VALIDATION_GATE.md, "Keeping the board rigorous and current").  Unlike audit-runs-daily, which draws a
 # nonce sample of all sessions, this lane is the fixed list the board depends on, and it compares each outcome
 # with what the plan says: new drift, healed drift and a cited session missing from the plan all fail.  A hosted
 # runner is a shared VM; the replay checks counts and answers, never wall time.
 
 on:
-  schedule:
-    - cron: '23 6 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/ic/**'
+      - 'scripts/ic_audit/**'
+      - '.github/workflows/ic-leaderboard-replay.yml'
   workflow_dispatch:
+    inputs:
+      runner:
+        description: Runner for this manual correctness replay (counts and answers only)
+        type: choice
+        options: [configured, github-hosted]
+        default: configured
 
 permissions:
   contents: read
 
 concurrency:
-  group: ic-leaderboard-replay-${{ github.ref }}
+  group: ic-leaderboard-replay-${{ github.ref }}${{ github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && '-hosted' || '' }}
   cancel-in-progress: true
 
 jobs:
-  replay:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+  prepare:
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo build --release --bin ecbench
+      - name: Replay gate rejects missing inputs and invalid receipts
+        run: |
+          bash scripts/ic_audit/test_replay_checks.sh
+          bash scripts/ic_audit/test_replay_partitions.sh
+      - name: Pull only frozen inputs read by the native replay
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: bash scripts/ic_audit/pull_replay_inputs.sh
       - name: The plan covers every complete session the board cites
         run: bash scripts/ic_audit/check_plan_coverage.sh
-      - name: Replay the plan
-        run: bash scripts/ic_audit/replay_plan.sh ./target/release/ecbench "$RUNNER_TEMP/ic-replay"
+      - run: cargo build --release --bin ecbench
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ic-replay-native
+          path: target/release/ecbench
+          if-no-files-found: error
+          retention-days: 7
+
+  replay:
+    needs: prepare
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        partition: [0, 1, 2, 3]
+        session-group: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ic-replay-native
+          path: ${{ runner.temp }}/ic-native
+      - run: chmod +x "$RUNNER_TEMP/ic-native/ecbench"
+      - name: Pull only frozen inputs read by the native replay
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: bash scripts/ic_audit/pull_replay_inputs.sh
+      - name: Replay one disjoint partition of every session
+        env:
+          REPLAY_PARTITION: ${{ matrix.partition }}
+          REPLAY_GROUP_INDEX: ${{ matrix.session-group }}
+          REPLAY_GROUP_COUNT: '8'
+        run: bash scripts/ic_audit/replay_partition.sh "$RUNNER_TEMP/ic-native/ecbench" "$RUNNER_TEMP/ic-replay/$REPLAY_PARTITION" "$REPLAY_PARTITION" 4
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ic-leaderboard-replay-receipts
+          name: ic-replay-partition-${{ matrix.partition }}-group-${{ matrix.session-group }}
           path: ${{ runner.temp }}/ic-replay
+          if-no-files-found: error
+          retention-days: 7
+
+  complete-replay:
+    needs: [prepare, replay]
+    if: ${{ !cancelled() && needs.prepare.result == 'success' }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ic-replay-native
+          path: ${{ runner.temp }}/ic-native
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ic-replay-partition-*
+          path: ${{ runner.temp }}/ic-replay
+          merge-multiple: true
+      - name: Pull the same frozen inputs for the final hash binding
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: bash scripts/ic_audit/pull_replay_inputs.sh
+      - name: Require every native sequence exactly once and enforce drift expectations
+        run: bash scripts/ic_audit/check_replay_partitions.sh "$RUNNER_TEMP/ic-native/ecbench" "$RUNNER_TEMP/ic-replay" 4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ic-leaderboard-replay-coverage
+          path: ${{ runner.temp }}/ic-replay/checked
+          if-no-files-found: error
+          retention-days: 7

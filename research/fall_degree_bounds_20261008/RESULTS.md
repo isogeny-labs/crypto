@@ -1,5 +1,17 @@
 # Results: fall-degree experiments E1, E1b, E2 (`m = 2`)
 
+**Latest E12c preservation update (2026-10-28):** the additional `4:28:7`,
+`N=84` Spot attempt retained **one of four requested completed draw records**
+before reclaim (exit 143). Its window is uncertified, with null degree-result
+fields: this is **inconclusive**, not a `d_F >= 5` measurement. See the appended
+interrupted-continuation section and [report](e12/interrupted-c-20261028/README.md).
+
+**Latest continuation (2026-10-28):** E12b cell `3:24:7` completed four draws,
+`≥5, 4, ≥5, 4`. Amendment 15's frozen lower-median rule gives **4**, hence
+the registered reading **“mixed.”** See the appended completed-continuation
+section and [report](e12/completed-20261028/README.md). Earlier dated sections
+below retain their historical state.
+
 Scored on 2026-10-08 by `score.py` (output in `score-output.txt`), from
 the committed JSONL in `runs/` and `exp/`, against `PREREGISTRATION.md`
 and its Amendment 1. E3, E4 and E5 have not run.
@@ -313,3 +325,230 @@ it rises with `N` while the Semaev systems stay at 4.
   - `N ≈ 100`, which needs a sparse closure engine rather than more RAM;
   - and, more informative than raw `N`, larger `m` at fixed `n`, since HKYY's growth is
     in `m`.
+
+---
+
+# Results: E9 (N = 58–60) and E10 (the balanced diagonal `mℓ = n`), 2026-10-27
+
+Registered in Amendment 10 before any draw.
+- **Engine:** `hky_par` at source commit `5296ce8a7438`. Each instance built it from an S3
+  `git archive`; the binary sha256 was `533f182b…` on all three.
+- **Hosts:** `ephemeral` Spot, lab account, us-east-1. m7a.8xlarge for job A, m7a.4xlarge
+  for jobs B and C. No Spot interruption.
+- **Gates 0–3:** passed on every instance.
+- **Records:** `e9/run-r3/`, `e10/run-r3-B/`, `e10/run-r3-C/`.
+- **Report:** [reports/run-20261027T0517Z/](reports/run-20261027T0517Z/) (`report.pdf`, graph).
+
+## Headline
+
+**The first `d_F > 4` in this study.** On the `m = 3` diagonal, every draw of (21, 7),
+(24, 8) and (27, 9) has a degree-4 closure that stops without 1. The closure reaches 47–95%
+of the degree-≤4 space, so these draws are recorded as `d_F ≥ 5`.
+
+Every other cell up to `N = 60` reads `d_F ≤ 4`. That includes:
+- the `m = 4` diagonal to (20, 5);
+- the `m = 5` point (15, 3);
+- the `m = 6` point (12, 2);
+- the E9 cell (6, 10, 3).
+
+| exp. | cell m:n:ℓ | `N` | `d_F` per draw |
+|:--|:--|--:|:--|
+| E9 | 6:10:3 | 58 | 4 3 4 4 |
+| E9 | 5:15:3 | 60 | 4 4 4 4 |
+| E10 | 4:12:3 | 36 | 4 4 4 4 |
+| E10 | 4:16:4 | 48 | 4 4 4 4 |
+| E10 | 4:20:5 | 60 | 4 4 4 4 |
+| E10 | 6:12:2 | 60 | 3 3 4 4 |
+| E10 | **3:21:7** | 42 | **≥5 ≥5 ≥5 ≥5** |
+| E10 | **3:24:8** | 48 | **≥5 ≥5 ≥5 ≥5** |
+| E10 | **3:27:9** | 54 | **≥5 ≥5 ≥5 ≥5** |
+
+## Registered readings (Amendment 10)
+
+- **E9:** **"`d_F` bounded"**. Every large-host draw has `d_F ≤ 4`. Pooled with E7,
+  every draw with `m ≥ 5`, up to `N = 60`, is `≤ 4`.
+- **E10, `m = 3` diagonal:** **"`d_F` grows on the diagonal"**. With E6 (18, 6), the
+  medians read 4, then ≥5, ≥5, ≥5.
+- **E10, `m = 4`, `5`, `6` diagonals:** **"flat"**.
+- **Cross-`m` at fixed `N`:** **"not rising"** at `N = 48` (`m = 3`: ≥5, `m = 4`: 4) and
+  at `N = 60` (4, 4, 3). At `N = 48` the order is the opposite of "rises with `m`".
+
+**Lean.** `lean/FallDegree/Verdict.lean` (`registered_scoring`) now has 282 rows, adding
+E9 as kind 6 and E10 as kind 7. It states the readings above. Its kernel build runs in
+job E12b, because there is no Lean toolchain on the authoring host. Its status is recorded
+below when that job finishes.
+- **Disclosure:** the Amendment 10 rules were transcribed into `Rule.lean` after the
+  E9/E10 data had been read. The prose rules were not changed.
+
+## What this does and does not show
+
+- **Observed pattern, not registered:** the censored draws are exactly the draws with
+  `ℓ ≥ 7`. All of them have `m = 3`. Every draw with `ℓ ≤ 6`, at any `m` and any `N ≤ 60`,
+  has `d_F ≤ 4`.
+  - So growth tracks the factor-base dimension per summand, not `N` or `m`.
+  - That fits the HKYY conditional, which needs `d_F` to grow along `n' = n^{2/3}`.
+  - The data cannot yet separate an `ℓ` effect from an `n` effect at `m = 3`, or from an
+    `m = 3`-only effect. Amendment 11 (E12b, E12c) tests both.
+- **`≥ 5` is a censored value.** The exact `d_F` (5, 6 or 7?) is not measured. E12a runs
+  the degree-5 closure on two of the (3, 21, 7) draws.
+- **It is not a statement about the first fall degree assumption.** Kousidis–Wiemers
+  measured a first fall degree of 7 at `m = 3` (`m² − m + 1`). A last fall degree of
+  `≥ 5` there is consistent with that and refutes nothing.
+- **Independent checks of (3, 21, 7):**
+  - The E11 subagent's run on its own host and build read `d_F ≥ 5` on the same four
+    draws. Two solution counters agree on 0 solutions (`e11/scaling/`).
+  - That run uses the same closure code.
+  - The separately written round-based engine `hky_crosscheck` is running on draw 0
+    (`e10/crosscheck/`). Its result is added here when it finishes.
+- **Toy size only.** No exponent and no security claim.
+
+## E11: restricted-closure engine (exploratory, not registered)
+
+See `e11/ENGINE.md`.
+- **Soundness:** a degree-4 closure restricted to a monomial subset is a subspace of
+  `V_{F,4}`. Reaching 1 in it therefore certifies `d_F ≤ 4`; it can never certify
+  `d_F ≥ 5`.
+- **Validation:** 0 soundness violations on 124 draws. Policy `w1x` certified all 90
+  committed draws with dense `d_F = 4`, using 11–64% of the dense columns.
+- **N ≈ 100 numbers:** projections only.
+- **Use:** E12c applies it to (4, 28, 7), `N = 84`.
+
+## E12 (Amendment 11): interim state, 2026-10-27 20:40 UTC
+
+No E12 part has a registered reading yet. This section records what is fixed so far (updated 2026-10-27 22:10 UTC with E12b r2).
+
+**Lean (E12b, job r1).** The `FallDegree` package builds with `lake build`
+(`e12/run-b1/out/lean/status`: `exit=0`; `lake.log`: "Build completed successfully
+(5 jobs)"). Built modules: `Rule`, `Data`, `Verdict`. The 282-row `registered_scoring` table
+from Amendment 10 therefore type-checks in the kernel.
+
+**E12a and E12c: not completed.** Both jobs were Spot-reclaimed twice:
+- r1: SIGTERM before any draw.
+- r2 (`e12/launch2.card.yaml`): gates passed, then SIGTERM. `run-a2` was killed at
+  16:03 UTC after it started 3:21:7. `run-c2` was killed at 16:07 UTC after it started 4:28:7.
+  Neither wrote a draw (`E_3-21-7.jsonl` and `W_4-28-7.jsonl` are empty).
+
+Amendment 11 allows one relaunch per interruption, and both jobs have used it. Under its
+rules they are **not completed**, with no data, and have **no reading**. A third attempt needs
+a new amendment before launch.
+
+**E12b: both attempts reclaimed at 3:24:7.** The first attempt (r1, `run-b1`) and the one
+Amendment-11 relaunch (r2, `run-b2`; job `20261027-181036-fd-e12b-ell-20261027-r2-409f97`,
+m7i.4xlarge Spot, archive commit `371035216942`) both passed gates 0–3. Both finished 3:30:4,
+3:27:5 and 3:24:6, and draw 0 of 3:24:7. Both were then SIGTERM'd by a Spot reclaim, r2 at
+19:06 UTC. r2 reproduces r1 exactly on every non-timing field (13/13 draws: `d_F`,
+per-degree dimensions and rounds, `v_basis`, `x_r`, solution count). The relaunch budget is
+spent.
+
+| cell (m:n:ℓ) | N | status | `d_F` per draw (r2) | median |
+|:--|--:|:--|:--|:--|
+| 3:30:4 | 42 | completed | 4 4 4 4 | 4 |
+| 3:27:5 | 42 | completed | 4 4 4 4 | 4 |
+| 3:24:6 | 42 | completed | 4 4 4 4 | 4 |
+| 3:24:7 | 45 | **not completed** (1 of 4 draws) | ≥5 | — |
+
+Against the Amendment 11 rules:
+- **"`n`-driven" is excluded.** It needs 3:30:4 and 3:27:5 at median `≥ 5`; both are 4.
+- **"Consistent with H_ℓ"** needs the three `ℓ ≤ 6` cells at median `≤ 4`, which holds, and
+  3:24:7 at median `≥ 5`. 3:24:7 is not completed, with one finished draw, which is censored
+  at `≥ 5`. Amendment 11 says a cell that does not complete is reported "with whatever
+  finished". It does not say whether one draw gives a median. **The reading is therefore
+  left open** between "consistent with H_ℓ (on one 3:24:7 draw)" and "mixed". It is decided
+  only by a registered amendment or a completed 3:24:7 cell, not here.
+
+The Lean build passed again on r2 (`run-b2/out/lean/status`: `exit=0`).
+
+**Report:** `reports/run-20261027T1811Z/`. It contains `report.pdf`, `report.html` and the graph `e12b_r2_fall_degree.svg`/`.png`, made by `plot_e12b.py` from the r2 records.
+
+**Cross-check (`hky_crosscheck`, 3:21:7 draw 0).** Both local attempts were lost to container
+restarts (`e10/crosscheck/attempt{1,2}_lost_on_container_restart.*`). Attempt 2 ran about
+2 hours without finishing on the 4-core authoring host. It has no result.
+
+## E12b (Amendment 15): completed continuation, 2026-10-28
+
+The additional authorized Spot attempt
+`20261028-031317-fd-e12b-spot-20261028-r3-24148b` completed cell `(3,24,7)`,
+`N=45`, seed `20261012`, four draws, degree cap 4, exit 0. The frozen source is
+`371035216942660c4615dfbb88d85a14afaf5c16` and protocol commit is
+`020f03193c46d975935a065c966c81941cbdbf6d`. All original gates and the additional
+draw-0 identity gate are recorded as passing. Raw rows, hashes, read-only record
+verification and the final S3 archive reference are in
+[`e12/completed-20261028/`](e12/completed-20261028/README.md).
+
+| Cell (m:n:ℓ) | N | Data retained for registered reading | Recorded `d_F` | Lower median |
+|:--|--:|:--|:--|--:|
+| 3:30:4 | 42 | carried forward from r2 | 4, 4, 4, 4 | 4 |
+| 3:27:5 | 42 | carried forward from r2 | 4, 4, 4, 4 | 4 |
+| 3:24:6 | 42 | carried forward from r2 | 4, 4, 4, 4 | 4 |
+| 3:24:7 | 45 | completed Amendment-15 attempt | ≥5, 4, ≥5, 4 | **4** |
+
+**Mechanical registered reading: “mixed.”** Amendments 12/15 specify the second
+smallest of four values, with a censored result scored as `cap + 1` only for
+this statistic. `[5,4,5,4]` sorts to `[4,4,5,5]`; two of four score at least 5,
+where the rule requires at least three. The old partial draw 0 is used as an
+identity reference and is not counted again. This resolves the missing-cell
+reading under the frozen rule; it is not a hypothesis promotion or an
+asymptotic conclusion.
+
+The record audit checked the archive checksum, frozen protocol and identities,
+carried-forward rows, draw-0 non-timing equality, and gate records against their
+references. It did not independently execute the closure algorithm or establish
+unsatisfiability/saturation. Both `≥5` rows remain censored; their exact degrees
+are unknown. The prior 282-row Lean table excludes these four new rows. No new
+Lean proof or independent implementation validation is claimed.
+
+The [PDF](e12/completed-20261028/report.pdf) and censoring-aware
+[graph](e12/completed-20261028/draws.svg) describe this completed attempt. At the
+time of that report, E12a and E12c were separate ongoing attempts. Both have now
+ended after Spot reclaim; their terminal records follow below. This E12b section
+adds no results for them.
+
+## E12c interrupted additional attempt, 2026-10-28
+
+The Amendment-13 attempt at `(m,n,ell)=(4,28,7)`, `N=84`, retained **one of four
+requested completed draw records** before Spot reclaim. Draw 0 records zero
+solutions, `window.w1x.certified=false`, `d_f_window=null` and `d_f_le3=null`.
+These are producer-reported labels. A failed restricted window is inconclusive
+and cannot establish `d_F >= 5`; there is no exact degree or lower-bound claim.
+The frozen E12c positive reading requires at least two completed degree-4
+certifications; this attempt has none and supplies **no reading**.
+
+Job `20261028-021036-fd-e12c-20261028-r3-914d46` records a Spot notice at
+07:21:44 UTC, exit **143**, final output upload, then shutdown. The terminal
+receipt reports `interrupted`; output status remains `gate_passed`, without the
+wrapper's final `done`. Three requested completed records are missing. This is
+not an overall completion or a resumable solver-memory checkpoint.
+
+The original and canonical S3 archives passed download/hash verification. The
+archive contains 24 regular `out/` files plus `host.txt` and `rusage.txt`; all
+24 separately downloaded final outputs match the archive. Archive SHA-256:
+`fa4edf72399ec45b293b783d8582d9a26406c1670a3612a75b6110dd1e824f09`.
+The raw 775-byte row, original terminal/snapshot receipts, canonical PUT/GET
+readback, full identities, [report](e12/interrupted-c-20261028/README.md),
+[completion diagram](e12/interrupted-c-20261028/flow.svg) and
+[PDF](e12/interrupted-c-20261028/report.pdf) are preserved together.
+
+Gate logs were inspected; no solution recount, closure replay, formal independent
+experiment review or Lean proof was performed. Earlier reports remain historical
+records. Existing degree plots and unrestricted `fall_degree.*` metrics exclude
+this null window result because it is not a censored unrestricted degree. E12a
+and the general first-/last-fall-degree questions remain separate unfinished work.
+
+## E12a interrupted additional attempt, 2026-10-28
+
+The Amendment-13/14 attempt at `(m,n,ell)=(3,21,7)`, `N=42`, degree cap 5,
+ended after Spot reclaim with **zero of two requested completed target records**.
+Job `20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f` records a Spot notice at
+12:03:18 UTC, command exit **143**, and terminal status `interrupted` at
+12:04:22 UTC. The saved target JSONL and error file are empty; output status
+remains `gate_passed`. The attempt supplies **no registered degree-5 reading**
+and establishes neither an exact degree nor a lower bound.
+
+The [terminal preservation packet](e12/terminal-a-20261028/README.md) retains
+the receipts, final output snapshot, producer gate records, hashes and canonical
+S3 PUT/GET evidence. Its 14,706-byte canonical bundle has SHA-256
+`3030d78c8e0a21bbd9c774294b338586cb58a136565e4fd35c5da4678bd09ba9`.
+These are verified output files, not a solver-memory checkpoint. No closure
+replay, independent algorithm validation, retry or deadline extension accompanies
+this preservation. Earlier still-running records are historical; the requested
+E12a degree determination and the general first-/last-fall questions remain open.

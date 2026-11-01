@@ -1,0 +1,184 @@
+{
+  "schema": "lean-formalization-verification/v1",
+  "verification_date": "2026-10-29",
+  "verification_completed_utc": "2026-10-29T15:46:25.339Z",
+  "request": "Complete exact ordinary first/last pair (4,5) under the original hypotheses",
+  "request_complete": true,
+  "verified_scope": "Uniform exact first fall four under the ordinary homogeneous-top/Koszul convention and exact last fall five for the actual six-input inverse-guarded three-abscissa prime-field polynomial model",
+  "central_declaration": "GuardedExactPair.exact_pair_prime",
+  "source": "GuardedExactPair.lean",
+  "hypotheses": [
+    "p prime and p>3",
+    "a,b,c pairwise distinct",
+    "4*alpha^3+27*beta^2 != 0",
+    "Y^2=r^3+alpha*r+beta",
+    "Every base abscissa has a rational affine ordinate lift",
+    "No assignment of the five field variables satisfies all six original polynomial generators"
+  ],
+  "conclusions": [
+    "Exact first-fall value 4 with attainment and minimality",
+    "Witness lift is nonzero and has degree at most 3",
+    "Constructed actual filtered-closure degree-five refutation",
+    "Unit ideal follows from the constructed derivation",
+    "Exact last-fall value 5 with attainment and minimality"
+  ],
+  "no_circular_premises": [
+    "No degree-five refutation premise",
+    "No unit-ideal premise",
+    "No resultant-nonzero premise",
+    "No presumed normalization or closure cap premise"
+  ],
+  "remaining_for_requested_exact_pair": [],
+  "outside_scope": [
+    "Growing factor-base formalizations",
+    "Characteristic-two formalizations",
+    "Boolean/Weil-descent formalizations",
+    "Numerical standard-curve fixture primality/provenance/UNSAT certification",
+    "E12 closure certification",
+    "Group-law equivalence with signed point decompositions"
+  ],
+  "lean": "4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "official_toolchain_archive_sha256": "47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "lake_manifest_sha256": "49b851f1a1e45f01dd18ea709e3e3dafd3328e46576fe6fc1642aeaa38db0c56",
+  "lakefile_sha256": "263f4f523e2f1a63af36e311b3fea1f68f2903ec9aaa16b58e328a088d4bcf64",
+  "source_manifest": "source.sha256",
+  "source_manifest_sha256": "5f900533361360d9b8e49184807fc2cc4c17a0087945401f8dbcc63e06c65bea",
+  "base_revision": "91902d0ca3ec365cf346e5b36aa0ece894c2af2f",
+  "build": {
+    "command": "lake build",
+    "exit_code": 0,
+    "jobs": 1690,
+    "log": "build.log",
+    "log_sha256": "25000fd43c03fe8e51b0448fdcfe0693b5ae7e350dc53b50c0197c3e05349ba3"
+  },
+  "axiom_audit": {
+    "command": "lake env lean --run ../../../tools/lean/AuditAxioms.lean -- CubicArithmetic CubicNormalization GridArithmetic GridClosure AffineGrid StagedResultant GuardedReduction RationalFibers GuardedFibers GuardedLastFall GuardedTops WeightedFirstFall GuardedExactPair",
+    "exit_code": 0,
+    "audited_theorem_declarations": 231,
+    "new_named_theorems": 156,
+    "generated_equations_included": true,
+    "failing": 0,
+    "compiler_trusted": 0,
+    "allowed_foundations": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "auditor_sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "log": "audit.log",
+    "log_sha256": "273cdf27baf3755c660c5b97d8f130a5df75e2825bcf045592c7a19bfa42aa67",
+    "note": "Audits all non-internal theorem declarations in the thirteen new modules and collects their axioms transitively, including dependencies."
+  },
+  "fresh_kernel_replays": [
+    {
+      "module": "CubicArithmetic",
+      "command": "lake env leanchecker --fresh --verbose CubicArithmetic",
+      "exit_code": 0,
+      "log": "CubicArithmetic.fresh.log",
+      "status_file": "CubicArithmetic.fresh.exit",
+      "log_sha256": "715ff0c084ff22882896acbfc4457ec1324adcdf1e009405f1b6e402fbc71a38"
+    },
+    {
+      "module": "CubicNormalization",
+      "command": "lake env leanchecker --fresh --verbose CubicNormalization",
+      "exit_code": 0,
+      "log": "CubicNormalization.fresh.log",
+      "status_file": "CubicNormalization.fresh.exit",
+      "log_sha256": "321ec3dc4beec82199ca883bbfe0e6a3e6b32fbc8efc36fdb4b39cb153b25c64"
+    },
+    {
+      "module": "GridArithmetic",
+      "command": "lake env leanchecker --fresh --verbose GridArithmetic",
+      "exit_code": 0,
+      "log": "GridArithmetic.fresh.log",
+      "status_file": "GridArithmetic.fresh.exit",
+      "log_sha256": "43209c5464f2ecc26c59ea8b9d8f573570499ec798e1ac1308c47d003fc44419"
+    },
+    {
+      "module": "GridClosure",
+      "command": "lake env leanchecker --fresh --verbose GridClosure",
+      "exit_code": 0,
+      "log": "GridClosure.fresh.log",
+      "status_file": "GridClosure.fresh.exit",
+      "log_sha256": "d35daef248dee1c46b198e7921c3ea5731586aca4dbc760ef9894a14b22530e7"
+    },
+    {
+      "module": "AffineGrid",
+      "command": "lake env leanchecker --fresh --verbose AffineGrid",
+      "exit_code": 0,
+      "log": "AffineGrid.fresh.log",
+      "status_file": "AffineGrid.fresh.exit",
+      "log_sha256": "0e8d4869535f4b240e773f919ce4b128c28f1a1e89356baf508b6e7f1769ec4a"
+    },
+    {
+      "module": "StagedResultant",
+      "command": "lake env leanchecker --fresh --verbose StagedResultant",
+      "exit_code": 0,
+      "log": "StagedResultant.fresh.log",
+      "status_file": "StagedResultant.fresh.exit",
+      "log_sha256": "2f8668d735df4cb4a0d892c6e101f4c9b60dd4168f42563fb3cb21c61db40dde"
+    },
+    {
+      "module": "GuardedReduction",
+      "command": "lake env leanchecker --fresh --verbose GuardedReduction",
+      "exit_code": 0,
+      "log": "GuardedReduction.fresh.log",
+      "status_file": "GuardedReduction.fresh.exit",
+      "log_sha256": "938f8ba9dd9475a53aa149b6146a68c2116c0013fa5bdcb213705a22ea547bc3"
+    },
+    {
+      "module": "RationalFibers",
+      "command": "lake env leanchecker --fresh --verbose RationalFibers",
+      "exit_code": 0,
+      "log": "RationalFibers.fresh.log",
+      "status_file": "RationalFibers.fresh.exit",
+      "log_sha256": "4eaeaf53f7c080e97592bd9332bd6365aad9eb49f4b16b5bf19d7d19dfc080d0"
+    },
+    {
+      "module": "GuardedFibers",
+      "command": "lake env leanchecker --fresh --verbose GuardedFibers",
+      "exit_code": 0,
+      "log": "GuardedFibers.fresh.log",
+      "status_file": "GuardedFibers.fresh.exit",
+      "log_sha256": "79163d642833128413b161238b03d47bbc020388e39c99e927f928da93ce44bf"
+    },
+    {
+      "module": "GuardedLastFall",
+      "command": "lake env leanchecker --fresh --verbose GuardedLastFall",
+      "exit_code": 0,
+      "log": "GuardedLastFall.fresh.log",
+      "status_file": "GuardedLastFall.fresh.exit",
+      "log_sha256": "b8b6cf1e3db8d2978a0e8a65a9d626b3d11f23901015a9f1a8d8a6f93f13581e"
+    },
+    {
+      "module": "GuardedTops",
+      "command": "lake env leanchecker --fresh --verbose GuardedTops",
+      "exit_code": 0,
+      "log": "GuardedTops.fresh.log",
+      "status_file": "GuardedTops.fresh.exit",
+      "log_sha256": "0b5d6d43037bfdc43e25634c3f3c674d16ceb1adae709ed83178d46effee4cf0"
+    },
+    {
+      "module": "WeightedFirstFall",
+      "command": "lake env leanchecker --fresh --verbose WeightedFirstFall",
+      "exit_code": 0,
+      "log": "WeightedFirstFall.fresh.log",
+      "status_file": "WeightedFirstFall.fresh.exit",
+      "log_sha256": "0b581a51212d22533ccd97dca64eebee8caaf726b37d6c8d18df834e930a2378"
+    },
+    {
+      "module": "GuardedExactPair",
+      "command": "lake env leanchecker --fresh --verbose GuardedExactPair",
+      "exit_code": 0,
+      "log": "GuardedExactPair.fresh.log",
+      "status_file": "GuardedExactPair.fresh.exit",
+      "log_sha256": "1354e5b70135d67767d20e4dc5e8d2535e34782644a32da7bb032074abeb87a7"
+    }
+  ],
+  "development_library_receipt": "library-tests.json",
+  "frozen_evidence": "Old identity, prime-bit and partial-exact-pair sources/receipts and all numerical fixtures remain byte-for-byte unchanged by this proof work.",
+  "scientific_experiment": false,
+  "performance_claim": false
+}

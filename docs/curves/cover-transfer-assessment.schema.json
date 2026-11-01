@@ -322,8 +322,27 @@
         },
         "freshness": {
           "$ref": "#/$defs/resultTemplate"
+        },
+        "source_commit": {
+          "$ref": "#/$defs/gitCommit"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "source_commit"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "const": "docs/curves/jacobian-transfers.json"
+              }
+            }
+          }
+        }
+      ]
     },
     "claimContract": {
       "type": "object",

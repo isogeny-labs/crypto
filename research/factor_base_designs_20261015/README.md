@@ -367,6 +367,44 @@ EC2 `r7i.8xlarge` (256 GiB), run one after the other, with
 R256-A0 memory-bound near 6100 s, R256-A11 a timeout at 14 400 s near 90 GB.
 Amendment 13 stays registered, with no rows. No R256 row exists yet.
 
+### Amendment 15: registered (checkpointed R256 run)
+
+Amendment 14's first attempts produced no row: two failed builds and a Spot
+reclaim that destroyed about 73 min of R256-A0. Amendment 15 adds checkpoint and
+resume to the F4 engine (`F4Options::checkpointing`, off by default), a
+`--checkpoint-every` flag to the study binary, a persistent Spot request that
+replaces a reclaimed host and resumes from S3, and a self-test that must pass
+before any cell runs. It changes no cell, seed, rule or prediction; see
+PREREGISTRATION.md, Amendment 15. Evidence that a resumed system gives the
+uninterrupted row: `tests/f4_checkpoint_resume.rs` and, on the host,
+`scripts/selftest_checkpoint.sh` (its output goes to the run's report).
+
+### Amendments 14 and 15: results (2026-10-27)
+
+The two `m = 4` cells ran on one 256 GiB EC2 host (rows `runs/R256-*`, report
+`reports/run-20261027T1318Z/REPORT.pdf`, analysis `runs/analysis-amendment14.txt`).
+R256-A0 (A0, `t = 4`): both systems completed (D = 7, 3.235e13 counted operations,
+121 GB), so A0 at `m = 4` has three cells: κ = 9.477, σ = 0.5, cost-unfavourable.
+R1: A11 survives at `t = 4`. R256-A11 (A11, `t = 5`): both systems hit the 14 400 s
+budget (D = 6 reached, 9e13 operations so far, 223 and 217 GB), not measurable
+within 4 h; the three-cell verdict stands (κ = 14.886, cost-unfavourable).
+Amendment 14's prediction for A0 (memory-bound) did not hold; for A11 the timeout held
+and the 90 GB peak did not. The run needed the checkpointing of Amendment 15; the
+report records what it did and what it did not (four of the seven A0 segments were
+lost because no checkpoint existed yet). No improvement over any baseline.
+
+### Amendment 16: snapshots inside a step (tooling)
+
+After the R256 run lost four of seven A0 segments to reclaims before any
+checkpoint existed, the F4 engine can snapshot a step's dense row reduction
+(`F4Options::checkpointing_in_step`, `run --checkpoint-in-step-every`; wide
+arithmetic only). Tested for exact equality of every counted field against the
+uninterrupted run (`tests/f4_checkpoint_resume.rs`) and gated on the host by the
+self-test. Validated at the scale of A0 m = 4, t = 4 by run V16
+(`reports/run-20261027T1710Z/REPORT.pdf`): killed once inside a step and resumed,
+the row equals R256-A0 target 0 in every counted field; snapshots of 20 to 44 GB
+wrote in 27 to 48 s; +18 % F4 time. See PREREGISTRATION.md, Amendment 16.
+
 ### Close-out of the prime-field slope line (2026-10-19)
 
 Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,

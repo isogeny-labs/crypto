@@ -2,6 +2,7 @@ name: pqc-assay
 
 on:
   push:
+    branches: [main]
     paths:
       - 'src/pqc/fast/ml_dsa.rs'
       - 'src/pqc/ml_dsa.rs'
@@ -11,6 +12,7 @@ on:
       - '.github/workflows/pqc-assay.yml'
       - '.gitmodules'
   pull_request:
+    branches: [main]
     paths:
       - 'src/pqc/fast/ml_dsa.rs'
       - 'src/pqc/ml_dsa.rs'

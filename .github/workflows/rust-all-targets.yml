@@ -9,8 +9,10 @@ name: Rust all targets compile
 # compiles, so a field added in src is checked against every caller in the
 # tree. It runs on any Rust change and takes the cargo cache with it.
 on:
-  # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  merge_group:
   push:
     branches: [main]
   workflow_dispatch:
@@ -20,7 +22,8 @@ concurrency:
 
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
@@ -43,6 +46,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -62,8 +66,8 @@ jobs:
 
   check:
     needs: scope
-    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
       contents: read
@@ -78,7 +82,9 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
+            /tools/factor-base/
             /tools/volcano-cli/
             /isogeny_algos/
             /Cargo.lock

@@ -45,6 +45,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            tools/factor-base
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -74,6 +75,7 @@ jobs:
           path: historical-pdp
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            tools/factor-base
             Cargo.toml
             src
             examples/n37_four_policy_pdp.rs

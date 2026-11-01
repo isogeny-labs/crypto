@@ -14,6 +14,13 @@ every finished piece of work, after every decision, and whenever we switch
 tasks. Preserve previous entries. Record concrete facts from commands and
 logs; distinguish verified results from plans or assumptions.
 
+Keep the log current *always*, not only at handoff: it is the session's working
+memory. Before choosing the next step in any task, read the newest entries in
+today's log (and the previous day's when the session spans a date change) and
+let them decide the next action; if work already done is missing from the log,
+write that entry before doing anything else. Never start a new measurement,
+experiment or code change without the previous one recorded and reviewed.
+
 Every entry has four headings:
 
 - What was done (commands, files, features)
@@ -27,6 +34,20 @@ Keep entries about this project; do not copy private global logs or chat transcr
 <!-- END SHARED SESSION LOG -->
 
 # Agent instructions
+
+## Research progress and communication
+
+Owner instruction, 2026-10-30. Lead with what was derived, implemented,
+improved, or checked, and report it at that scope. A completed component is
+progress. State a material remaining dependency once, with the next technical
+step, and continue authorized work.
+
+Do not append an overall ECDLP verdict or a rho comparison to routine results,
+reports, or handoffs. Use those comparisons for an explicitly scoped evaluation,
+a required comparison table, or a specific factual correction. Exact checks,
+assumptions, measured costs, and actual failures provide the necessary context.
+This rule replaces older instructions that discount component progress or
+require routine overall-goal disclaimers.
 
 ## Literature first
 
@@ -48,6 +69,12 @@ implementing, running experiments, or making recommendations.
 
 ## Standing workflow rules (from the owner)
 
+- **Run experiments on EKS Spot by default** (owner, 2026-10-25). For an
+  authorized x86 CPU experiment or crypto benchmark, read and use
+  [isolab-eks](.agents/skills/isolab-eks/SKILL.md), then submit and verify it;
+  do not merely give the user commands to run. This applies to Claude, Codex,
+  OpenCode and their experiment agents. Authentication and routing are in
+  §9a. Honor an explicitly requested backend, workload and budget.
 - **Always commit finished work and open or update a PR.** Landed rungs,
   ledger promotions, evidence directories, and code changes land as commits
   on a feature branch. If the branch already has an open PR, extend that
@@ -72,11 +99,11 @@ implementing, running experiments, or making recommendations.
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
   and fix failures first.
-- **Claim hygiene** (see `docs/ic/boundary_targets.json`): public synthetic
-  / known-answer fixtures only; fail-closed evidence; no key-recovery,
-  asymptotic sub-rho, or deployed-curve-security claims; multi-target and
-  amortized results stay secondary; ledger rows promote only with complete
-  measurement fields and independent replay.
+- **Evidence scope** (see `docs/ic/boundary_targets.json`): use public synthetic
+  / known-answer fixtures and describe the domain and behavior actually checked.
+  Support recovery, complexity, and security conclusions with evidence for the
+  particular claim. Multi-target and amortized results stay secondary; ledger
+  rows promote only with complete measurement fields and independent replay.
 - **Beat the fastest external tool, and show it** (owner's rule,
   2026-10-16; details in §15): our implementations should be faster than
   every other implementation of the same computation. Every speed result
@@ -122,11 +149,10 @@ implementing, running experiments, or making recommendations.
 Owner's rule, 2026-10-15. It replaces any earlier wording that treats only
 beating rho, or only an "advance", as success.
 
-The long-term goal is an index calculus that beats Pollard rho. That will
-not come from one breakthrough. It comes from many measured improvements,
-each building on the last, until the gap closes. So **the success criterion
-is a verified, measured improvement over the current index-calculus
-baseline. Every such improvement is a success and is reported as one.**
+Verified, measured improvements accumulate toward the long-term index-calculus
+objective. **Each improvement over the named baseline is a success at the
+scope measured and is reported as one.** Constructions, identities, and
+descriptive investigations report their own technical outcomes and next steps.
 
 - **Baseline.** For each curve and size, the baseline is the best current
   verified index-calculus pipeline, frozen with its protocol, receipts and
@@ -146,17 +172,52 @@ baseline. Every such improvement is a success and is reported as one.**
 - **Ratchet.** Each landed improvement becomes the new baseline. Record it
   with its delta, so progress is cumulative and visible across the
   sequence.
-- **Distance to rho.** Report the gap to the matched rho on every row,
-  and to precomputation rho (Bernstein–Lange) where setup is excluded. The
-  gap is the distance remaining, not a pass/fail gate. Not beating rho
-  never makes an improvement a failure. A claim to *beat* rho still needs
-  every reference rule: an end-to-end cold `S` below the matched rho's,
-  robust at growing `n`, independently replayed.
+- **Comparison scope.** Include matched rho and precomputation references
+  where the pipeline comparison or frozen protocol calls for them. Component
+  work uses the matched reference for that component. A claim to beat rho uses
+  the complete accounting, growing-size checks, and independent replay for
+  that comparison.
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
+## Tracks of index calculus
+
+Owner's rule, 2026-10-29 (`research/prime_ic_program_20261029/DECISIONS.md`
+R1, Option C as amended for D2). It refines the 2026-10-24 criterion
+(`docs/ic/SWEEPER.md`, "Tracks").
+
+Index-calculus pipelines are reported in two tracks. Each track has its own
+baseline and its own ratchet under the success criterion above.
+
+- **Algebraic.** Relations come from a solver applied to a system that
+  contains both the summation polynomial and the factor-base constraint, for
+  example ⟨S_{m+1}, F_V⟩ handed to msolve or F4, Weil descent over a subspace
+  base, or a PKM tower system. This is the headline track.
+- **Generic decomposition.** Relations come from enumerating the base,
+  computing group sums or differences, and testing them against the base or a
+  table of precomputed sums: `subtract`, `rootfind-*`, `mitm`, pair tables,
+  and large primes on a pair table. Such an oracle runs identically on a
+  random base. Label this track "generic decomposition" and document the
+  applicable generic-group bounds with their assumptions in its method
+  description. Improvements in this track count against its own baseline.
+
+Arms of the two tracks may be ranked against each other on the same
+instances, in the same unit and across the §5a band. A gain in one track
+never ratchets the other track's baseline. Include matched rho in tables whose
+protocol calls for that comparison. Per-oracle classification:
+`research/prime_ic_program_20261029/ruling/classification.json`, column C.
+
 ## Pointers
 
+- **Shared conventions with `crypto-autoresearcher`, `cryptanalysis` and
+  `crypto-lean`:** object storage (one bucket, `setec-astronomy-artifacts`,
+  region `us-east-2`), the validation vocabulary, curve identity, the skill
+  surface and the shared-code parity list are stated once in
+  `crypto-autoresearcher:docs/lab-contract.md`. That file wins on a shared
+  convention; this file wins on anything specific to this repository.
+  `s3://setec-astronomy-artifacts` is the only writable bucket; the legacy
+  buckets (`s3://crypto-autoresearcher/**`, `ecc2k130-*`, `aburan28-n83-tier1-*`,
+  `cairn-swarm-*`) are read-only.
 - **What has already been tried against ECDLP, here and in the sibling
   repositories:** the lead atlas in aburan28/crypto-autoresearcher,
   `knowledge/leads/ecdlp/` (`python3 tools/lead_atlas.py --brief`, printed by
@@ -164,6 +225,9 @@ baseline. Every such improvement is a success and is reported as one.**
   leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
   result that lands here updates the lead it advances in the same PR or the
   next atlas review (skill `lead-atlas` there).
+- **Curve facts, by query instead of by file scan:** the curve database
+  ecdb (MCP server `ecdb` in `.mcp.json`, or HTTP). See "Querying the curve
+  database (ecdb)" below and [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md).
 - Boundary ledger (machine): `docs/ic/boundary_targets.json`
 - Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
 - Autolab runner: `research/sat_factor_base_review_20260908/autolab/`
@@ -199,8 +263,6 @@ commands, and interpretation limits.
   profile, without the 18 largest `research/` archives. In a sparse checkout
   (`docs/sparse-checkout.md`) a path `git ls-files` lists is materialized with
   `scripts/sparse-checkout.sh add --path`, never reported missing.
-
-# AGENTS.md
 
 ## Preserve scope and report evidence
 
@@ -408,6 +470,9 @@ resume the effort are checked into S3**, and kept current while it runs.
 
 A checkpoint is a safety net, not the record: the spec, protocol and results
 still land in a PR under the rules above.
+Switching runtimes when a budget runs out (Claude Code ↔ Codex):
+[docs/runtime-relay.md](docs/runtime-relay.md); on a pending `.resume/HANDOFF.md`, run
+`python3 scripts/relay.py accept` first.
 
 ## Research searches must leave visual reports
 
@@ -475,8 +540,8 @@ and `aburan28/ml-cryptanalysis`:
   category) and the PDF.
 - Claims follow the repository's evidence rules: every number cites a
   committed artefact in this repository or a sibling (prefix the path with
-  `crypto:`, `cryptanalysis:` or `crypto-autoresearcher:`); a stage
-  diagnostic is never reported as a speedup; every end-to-end row has
+  `crypto:`, `cryptanalysis:` or `crypto-autoresearcher:`); a component
+  speedup names the measured component and interval; every end-to-end row has
   verified answers; each change is classed as advance, engineering,
   relabelling or accounting. A draft is not submitted, posted or cleared for
   either until its README says so, and its README names the novelty audit
@@ -490,7 +555,9 @@ and `aburan28/ml-cryptanalysis`:
 revised mathematical result, include a faithful Lean 4 theorem and checked
 proof whenever formalization is feasible. Treat the formalization attempt as
 part of the requested work, and prioritize the central theorem and its
-dependencies. Keep the readable mathematical proof in the report.
+dependencies. Keep the readable mathematical proof in the report. The shared
+library and gate live in `aburan28/crypto-lean`; pin its revision with the
+toolchain, and treat a gate change as a dependency change.
 
 - Maintain a proof map from each report theorem, proposition, lemma or
   corollary to its Lean declaration, exact hypotheses and verification status.
@@ -738,24 +805,24 @@ a downstream claim cannot silently treat them as accepted evidence.
 
 For performance changes, the existing frozen-suite, full-cost, matched-rho,
 and scoreboard requirements in sections 1–8 still apply. A PR that reports
-only a stage measurement must label it a stage diagnostic and leave
-end-to-end cost and speedup unset. Open or update the PR as part of the
-iteration and stop there; the merge automation of the default workflow above
-merges it once its evidence, review, and CI gates are satisfied.
+only a stage measurement reports that stage's cost or speedup, with its
+matched interval, and leaves unmeasured end-to-end fields unset. Open or update
+the PR as part of the iteration and stop there; the merge automation of the
+default workflow above merges it once its evidence, review, and CI gates are
+satisfied.
 
 ## The rule: boundary, table, ratio
 
-Any thread that claims to improve an attack must express its progress as
-a **ratio to a boundary**, reported in a **single table** whose rows are
-variants and whose columns are one unit.  A thread that cannot state its
-boundary has not started; a thread whose ratio to the boundary is flat
-has not progressed, however much its constants moved.
+For a quantitative performance comparison, report candidate and matched
+reference costs in the same unit, with their ratio and correctness checks.
+Include a proved lower bound when it informs that comparison. Recognize
+constant-factor, component, construction, and whole-pipeline improvements at
+their respective scopes; a flat ratio to a lower bound does not erase them.
 
 ### 1. State the boundary before measuring
 
-A **boundary** is a quantity that the method under study cannot cross,
-derived rather than measured.  It comes in two kinds, and a thread
-normally has one of each:
+A comparison can use a proved lower bound and a measured reference. They
+answer different questions:
 
 - A **floor**: a lower bound from a counting or generic-group argument.
   Example from `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md`: a generic algorithm's
@@ -768,9 +835,10 @@ normally has one of each:
   For the discrete logarithm that is Pollard rho, run on the same group,
   with the same operation accounting.
 
-Write both into the note *before* optimising, with the formula for the
-floor and the measured value of the reference.  A boundary chosen after
-the fact is not a boundary.
+Name the reference and any applicable floor before measuring the comparison.
+State the floor's assumptions and use the reference for the actual component
+or pipeline being measured. A new construction can proceed while its cost
+analysis is being developed.
 
 ### 2. Report one table, one unit
 
@@ -789,26 +857,19 @@ linear algebra, and any work an oracle does per call.  Convert foreign
 units with a measured conversion factor and record it, for instance the
 63 field multiplications per curve addition measured on `F_{p³}`.
 
-**End-to-end speed is the measure of speed.**  `S` is defined over the
-*whole* method, cold, from setup to the recovered logarithm; a number
-that prices only one phase — the relation search, the decomposition
-oracle, a single solver call, the linear algebra — is a stage
-diagnostic, never a speed.  "Faster than rho" means the method's `S`
-column, with every phase inside it, sits below rho's, robustly, at
-growing `n` — nothing less earns the phrase.  Quoting a phase crossover
-as a method crossover is the §5 mistake, and the residual-walk thread is
-the worked case: its relation phase crosses rho near `2^{96}` in
-isolation while the whole method never does, because the linear algebra
-it left out decides the exponent (§11.6–11.7).  Equivalently, the only
-admissible speed ratio is §8's
-`speedup = baseline_total_operations / candidate_total_operations`;
-a ratio taken over any smaller slice of the pipeline is labelled a stage
-diagnostic and may not be reported as a speedup.
+**Name the measured interval.** For a cold end-to-end comparison, `S` covers
+setup through the recovered logarithm and the ratio is
+`speedup = baseline_total_operations / candidate_total_operations`.
+For a component comparison, use the same component interval in both arms and
+report the ratio as that component's speedup. A relation search, decomposition
+oracle, solver, or linear-algebra improvement is a valid scoped result.
+Leave unmeasured pipeline costs unset. An explicit comparison against rho
+includes the full method at growing sizes under the reference rules.
 
 The table must carry a **ratio column** against each boundary, and a
 correctness column.  A row without a verified answer is not a result.
 
-### 3. Progress is the ratio, not the constant
+### 3. Describe what improved
 
 Classify every change, in the note, as one of:
 
@@ -848,10 +909,10 @@ relations.
 
 ### 5. Separate the phases, and price all of them
 
-An exponent claim covers the whole method or it is not an exponent
-claim.  Price each phase against the boundary separately and say which
-one dominates, at what size.  Fit exponents over at least four sizes and
-report the fit next to the prediction.
+State whether an exponent describes a component or the whole method. For a
+whole-method claim, account for every phase and identify which dominates at
+each size. Fit empirical exponents over at least four sizes and report the fit
+next to the prediction; distinguish a derived bound from a fitted exponent.
 
 This is where the residual-walk thread went wrong once and had to be
 corrected: three rounds priced the relation phase, quoted a crossover
@@ -1067,7 +1128,7 @@ system shape, solving degree, Macaulay and SAT figures), which the
 `ecbench` database exposes as the `ic_yield` view. It is how a reader
 gets from a number on the scoreboard to the curve, algorithm and
 evidence behind it, and how a candidate combination is informed: a
-yield is a stage diagnostic, and only a whole-pipeline `S` decides speed.
+yield describes a stage, while whole-pipeline `S` compares complete solves.
 
 - **Generated, never edited.** `docs/browser/data.json` is written by
   `python3 scripts/build_lab_browser.py` from committed files only (the
@@ -1091,6 +1152,52 @@ yield is a stage diagnostic, and only a whole-pipeline `S` decides speed.
   candidate on a curve the registry does not hold is shown as
   "not in the registry", never dropped or silently mapped; registering
   the curve (§11) is the fix.
+
+#### 7d. Dashboard coverage is a pre-merge contract
+
+The leaderboard, scoreboard, progress timeline and lab browser are one
+published research index. **Every PR that changes a curve, frozen IC/rho
+result, factor base, recipe, phase cost, validation status or reference must
+update all affected views in that PR.** A new study that does not qualify for
+the priced tables still needs a clearly labelled diagnostic or a documented
+exclusion. Reviewers check the dashboard diff against the frozen source,
+including losses, superseded figures and unresolved identities, before merge.
+
+- **All named curves remain findable.** The ICV1 slugs in the registry,
+  leaderboard roster and lab browser must agree exactly. The priced subset
+  is counted separately; absence of a measured whole-pipeline cost is shown
+  as unpriced, never inferred from a stage diagnostic. A new curve or result
+  must not silently fall out of search because another generated index is
+  stale.
+- **Every priced row is auditable.** Keep its ICV1 curve, exact regime and
+  target count, measured factor-base size and recipe, FB1 linkage status,
+  frozen source, validation status, phase costs, matched-rho quality, unit,
+  and the previous figure when superseded. Show counted totals as `2^x`
+  operations only when those totals are in the frozen record. Show IC/rho
+  with `1.0×` as parity; do not mix cold one-target and batch references or
+  timing and counted-operation units. A missing exact FB1 identity remains
+  explicitly unreconciled, even when a base size is known.
+- **Progress is append-only evidence.** Every new numeric comparison gets a
+  source-backed point in `docs/ic/progress-timeline.json` with merge date,
+  class, reference quality and anchor. Corrections retain the old point and
+  mark the new one `accounting`. Update the scoreboard's embedded chart and
+  point table from the canonical timeline in the same PR.
+- **Check before merge.** Run `node scripts/check_ic_dashboard_coverage.mjs`
+  and the leaderboard and browser `--check` commands on complete inputs.
+  The coverage check enforces registry/roster/browser equality, source
+  digests, required row fields and timeline metadata; the generators enforce
+  exact outputs. The `ic-leaderboard` workflow runs this on matching PRs,
+  not only after a push to `main`. A missing frozen or artifact-store input
+  is a failed check to repair or report, not a reason to call the page current.
+- **Publish and verify.** After merge, confirm the Pages workflow succeeded
+  and the public `/scoreboard/ic-leaderboard.html` and `/browser/` reflect
+  the merged source. A local preview or open PR does not establish that.
+
+The architecture and coverage limits are recorded in
+[`docs/ic/DASHBOARD_COVERAGE.md`](docs/ic/DASHBOARD_COVERAGE.md). Frozen
+files and replay receipts are the source of truth. The existing `ecbench`
+SQLite database is a rebuildable query index. Do not make a mutable hosted
+database, including RDS, the sole source for a published result.
 
 ### 8. Use the frozen benchmark to establish end-to-end speedups
 
@@ -1227,10 +1334,53 @@ existing EC2 key-pair name **`meow34`** when launching the instance.
   accessible, report that access blocker and continue with non-SSH work where
   possible.
 
-### 9a. Experiments that do not run locally go through `ephemeral`
+### 9a. Experiments default to Iso Lab on EKS Spot
 
-When an experiment, benchmark or build is to run in the cloud rather than on
-the local machine, run it with the ephemeral runner
+Use [isolab-eks](.agents/skills/isolab-eks/SKILL.md) for supported x86 CPU
+experiments and benchmarks. Freeze the requested spec, source/image identity,
+resources, deadline and acceptance criteria, submit the job, and retain its
+receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
+region `us-east-2`, account `104186811093`. Karpenter starts Spot workers;
+`cpu-spot` serves ordinary work and `cpu-l2-spot` serves native L2 benchmarks.
+Keep the combined 64-vCPU worker cap and the shared 96-vCPU account quota.
+
+- **Use existing authentication.** Verify the caller with
+  `aws sts get-caller-identity` and check the required permissions using
+  [ACCESS.md](taskq/deploy/eks-karpenter/ACCESS.md). Keep a working AWS
+  role/profile; do not request new keys or SSO setup merely because an agent
+  session is new. Never embed credentials in cards, requests or artifacts.
+- **Submit from the agent.** Use an installed EKS MCP connection, or the
+  portable `remote/validate-request` and `remote/launch-remote` clients under
+  `taskq/deploy/eks-karpenter/`. CodeBuild supplies the private cluster route
+  for remote callers. Missing local kubectl or MCP does not require a backend
+  change. Long launches run in the background with their request/build identity
+  retained; reconcile an ambiguous submission before retrying.
+- **Build identity is required.** Use the requested spec and an image built
+  from its tested commit. The main-only GitHub workflow is usable only after
+  its reviewed implementation and matching OIDC trust are available. A source
+  label on the deployed fixture does not build that source. Report a missing
+  image/build route instead of running a different experiment.
+- **Earn the result.** Require native L2, replay and A/A admission for an L2
+  benchmark, and download and verify S3 payload hashes. A successful pod is
+  not enough. Preserve failures and keep all original measurement thresholds.
+- **Resume explicitly.** Requested resumability uses CRIU plus EBS snapshots
+  through `isolab.eks.resumable/v1`, with compatible workers and a fresh
+  measurement epoch after interruption. Ordinary request-v1 is non-resumable.
+  Report unsupported workloads or restore compatibility before launching them.
+- **Preserve other requirements.** An explicit local, GPU, ARM, bare-metal or
+  L3 request retains its requested environment and gates. Do not silently route
+  an unsupported workload to a different backend. Local builds, unit tests,
+  static checks and analysis of existing results remain development work.
+
+Claude's experiment director freezes the EKS client commands and environment in
+the existing task-card format; the mechanical executor runs that card unchanged.
+Codex and OpenCode use the same submission contract. Agent instructions select
+the path; they do not create experiments without a user task or scheduled job.
+
+### 9b. Explicit ephemeral experiments and cloud builds
+
+Use the ephemeral runner for an explicitly selected ephemeral experiment, or
+for a standalone cloud build outside the EKS image-building workflow
 ([`taskq/deploy/ephemeral/`](taskq/deploy/ephemeral/README.md)). Do not
 launch EC2 instances by hand for it. `conductor/deploy/aws/launch.py`, in the
 Conductor repository, starts the Conductor control plane, not experiments.
@@ -1294,7 +1444,9 @@ conditions both sides ran under.  Before changing code for speed:
   is a different algorithm, not a speedup.
 - **Isolate every timed run: pin it, reserve its core, and record the
   conditions.  This is mandatory for any wall-clock or native-time number.**
-  Run the benchmark through `tools/isolated_bench.py`: `run` for a single
+  EKS experiments use the native isolation and admission in §9a; the submitting
+  machine's lock does not isolate the remote pod. For an explicitly selected
+  local or ephemeral run, use `tools/isolated_bench.py`: `run` for a single
   command it pins itself, `reserve` for a harness that pins its own children
   (such as the tournament evaluator's `--cpu`). The tool does the following:
   - It takes an exclusive lock, so only one benchmark runs at a time.
@@ -1456,10 +1608,11 @@ artifact policy does not select. Every blob committed
 stays in every future clone. The `large-files` workflow
 (`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
 except generated text that git delta-compresses well (`docs/browser/data.json`,
-`docs/curves/*.json`). A PR that must commit one anyway carries the
-`large-file-ok` label, added by the owner or a reviewer. Do not pre-compress
-text files to get under the limit: compressed blobs do not delta, so each
-revision costs its full size again.
+`docs/curves/*.json`) and the reviewed paths in
+`.github/large-files-allowed.txt`. A PR that must commit another one anyway
+carries the `large-file-ok` label, added by the owner or a reviewer. Do not
+pre-compress text files to get under the limit: compressed blobs do not delta,
+so each revision costs its full size again.
 
 ### 13a. Raw run trees land as one archive
 
@@ -1635,9 +1788,75 @@ verify` replays them.
 The user guide, including S3 storage, is
 [docs/isogeny-walk/README.md](docs/isogeny-walk/README.md).
 
-# Agent rules for IC measurements
+## Querying the curve database (ecdb)
 
-## Primary comparison uses one target
+ecdb is a Postgres catalogue on RDS (us-west-2). It holds:
+
+- every curve in the registry, the walk outputs and the trait catalogue,
+  with their Jacobians, isogenies, covers, transfer prices and computed
+  polynomials;
+- this repository's measured results: the IC leaderboard and its recipes,
+  the progress timeline, the boundary ledger, the `benchmarks/` index, and
+  every ecbench session with its runs;
+- the curve records and measured datasets of cryptanalysis,
+  crypto-autoresearcher, cryptanalysis-rl and ml-cryptanalysis.
+
+Agents reach it through the MCP server `ecdb` in `.mcp.json`, over HTTP, or
+with `scripts/ecdb.sh`. The guide is [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md);
+read it before the first query.
+
+- **Look up before computing.** Query ecdb before writing code or scanning
+  `docs/curves/*.json` for a curve fact. This covers trace, order, cofactor,
+  CM discriminant, End(E), embedding degree, twist, l-torsion, volcano level,
+  isogeny neighbours, covers, transfer price, division or modular
+  polynomials, and GLV data. Resolve curve names there too; on an ambiguous
+  name (409), choose a candidate explicitly.
+- **Token.** Export it before the runtime starts:
+
+  ```sh
+  export ECDB_TOKEN=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id ecdb/api --query SecretString --output text | jq -r .read_token)
+  ```
+
+  Never print, commit or log it. Without AWS access to `ecdb/api`, say so and
+  fall back to the repository files.
+- **Cite the source, not the query.** ecdb is imported from this
+  repository's files at the commit `GET /v1/meta` names. A PR, report or
+  leaderboard row cites the repository file, certificate or run, not an ecdb
+  query.
+- **Keep statuses.** Report every value with its `fact_status`. Unknown is
+  `null`, never 0. `probable` is not `proved`.
+- **Transfer prices are leads.** `dlp_transfer.ratio_log2` is a formula
+  estimate. It is not a measured speedup, and it never enters the IC
+  leaderboard or `benchmarks/` (§5a and "The rule: boundary, table, ratio").
+- **Measured rows are copies.** Leaderboard, progress, boundary, benchmark,
+  ecbench and sibling-dataset rows are the producers' frozen records with
+  their units:
+  - compare a ratio only within its leaderboard family, ecbench session or
+    dataset;
+  - rank arms only across the §5a band;
+  - keep `unvalidated (pre-gate)` rows out of any claim.
+
+  Querying them is not a measurement. A new result still goes through its
+  run, the validation gate and the generators of the files ecdb copies.
+- **Relations are not routes.** A twist, isomorphism or model-change row
+  does not transport a logarithm. Only a kernel-certified `isogeny` row does
+  (the typed curve-link rules above).
+- **Writes are claims.** `ecdb_record_evidence` and `POST /v1/isogenies`
+  need the write token. They record what a run or certificate in a PR
+  supports, with its artifact hash and true status. Correct imported data in
+  the source file, then redeploy (`ecdb/deploy/README.md`). Never patch rows.
+- **Keep it current.** A PR that changes a file ecdb imports says so in its
+  body. That covers the registry, `traits.json`, `covers.json`,
+  `jacobian-transfers.json`, the certificates, the imported walk outputs,
+  `docs/ic/leaderboard.json`, `progress-timeline.json`,
+  `boundary_targets.json`, `benchmarks/` and ecbench sessions.
+  `scripts/ecdb.sh check` lists the files that differ from ecdb's copy. After
+  merge, redeploy with `ecdb/deploy/build-lambda.sh` and
+  `ecdb/deploy/deploy-aws.sh`.
+
+## IC measurement rules
+
+### Primary comparison uses one target
 
 The default elliptic-curve index-calculus (IC) question is the cost to solve
 one previously unseen public target. Every primary comparison run must use
@@ -1687,12 +1906,12 @@ Its launch interface now permits one target per run only.
 <!-- conductor:begin -->
 Before making code changes, obtain or attach to a Conductor task. Run
 `conductor check --summary "…" --scope path:…` first — if someone already holds
-those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`
+those files, it will tell you who and what to do about it. Read `docs/CONDUCTOR.md`
 and the active task card. Report scope expansion before editing outside the reserved paths.
 Do not publish chat transcripts or secrets as task metadata.
 <!-- conductor:end -->
 
-## Progress metrics (daily lab report)
+### Progress metrics (daily lab report)
 
 `tools/progress_metrics.py` exports this repo's progress KPIs as JSONL for the lab-wide daily
 report (`/Volumes/SSD990-2/progress-metrics`). It reads committed state at `origin/<default>` and

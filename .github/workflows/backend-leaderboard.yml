@@ -14,15 +14,17 @@ permissions:
 
 jobs:
   current:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|backend-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|backend-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           filter: blob:none
+          fetch-depth: 0
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /.gitignore
+            /.artifacts/
             /tools/backend-leaderboard/
             /src/cryptanalysis/ecbench/band.rs
             /src/cryptanalysis/ecbench/canonical.rs
@@ -32,6 +34,92 @@ jobs:
             /docs/ic/calibration.json
             /docs/backend-leaderboard/
             /docs/ecbench/BACKEND_REPRODUCTION.md
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2
+      - name: Retain the hydrated frozen report for manual diagnosis
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-frozen-report-${{ github.sha }}
+          path: |
+            docs/backend-leaderboard/leaderboard.json
+            docs/backend-leaderboard/.artifacts.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+      - name: Materialize the manifest's sealed inputs
+        run: |
+          jq -r '.sessions[] | "/" + .dir + "/", (select(.replay_receipt != null) | "/" + .replay_receipt)' docs/backend-leaderboard/manifest.json > /tmp/backend-sources.txt
+          jq -r '.files | keys[] | "/" + .' docs/backend-leaderboard/reproduction.lock.json >> /tmp/backend-sources.txt
+          git sparse-checkout add --stdin < /tmp/backend-sources.txt
+      - name: Pull manifest and frozen evidence inputs
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          # Restore both the selected sessions and every frozen source input.
+          mapfile -t session_dirs < <(jq -r '.sessions[].dir' docs/backend-leaderboard/manifest.json)
+          mapfile -t frozen_files < <(jq -r '.files | keys[]' docs/backend-leaderboard/reproduction.lock.json)
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${session_dirs[@]}" "${frozen_files[@]}"
+      - name: Pull the exact frozen replay fixture for manual diagnosis
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          printf '%s\n' '/research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/' | git sparse-checkout add --stdin
+          if ! command -v aws >/dev/null; then
+            export ARTIFACTS_AWS="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            test -x "$ARTIFACTS_AWS"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 1 research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/records.jsonl
+      - name: Retain the manifest-verified replay fixture for manual diagnosis
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rootfind-frozen-records-${{ github.sha }}
+          path: |
+            research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/records.jsonl
+            research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/.artifacts.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.99.1'
@@ -39,18 +127,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: tools/backend-leaderboard
-      - name: Materialize the manifest's sealed inputs
-        run: |
-          jq -r '.sessions[] | "/" + .dir + "/", (select(.replay_receipt != null) | "/" + .replay_receipt)' docs/backend-leaderboard/manifest.json > /tmp/backend-sources.txt
-          git sparse-checkout add --stdin < /tmp/backend-sources.txt
       - name: Format, admission tests and lint
         run: |
           cargo +1.99.1 fmt --manifest-path tools/backend-leaderboard/Cargo.toml --check
           cargo +1.99.1 test --locked --manifest-path tools/backend-leaderboard/Cargo.toml
           cargo +1.99.1 clippy --locked --manifest-path tools/backend-leaderboard/Cargo.toml --all-targets -- -D warnings
-      - name: All generated views match their sealed sources
-        run: |
-          cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- --check
-          lock_sha=$(sha256sum docs/backend-leaderboard/reproduction.lock.json | cut -d ' ' -f 1)
-          cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- reproduce --expected-lock-sha256 "$lock_sha" > /tmp/backend-reproduction.json
-          cat /tmp/backend-reproduction.json
+      - name: Frozen report matches its reviewed source snapshot and sealed outputs
+        run: cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- verify-frozen-report

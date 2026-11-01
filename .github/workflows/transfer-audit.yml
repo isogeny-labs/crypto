@@ -11,6 +11,7 @@ on:
   # (hyperelliptic_ic_bench, hyperelliptic_index_calculus, prime_hyperelliptic),
   # which only `suite --measure-ic` runs and `check` skips.
   pull_request:
+    branches: [main]
     paths:
       - 'src/bin/transfer_audit.rs'
       - 'src/bin/transfer_audit/**'
@@ -73,8 +74,10 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /Cargo.toml
+            /tools/factor-base/
             /tools/volcano-cli/
             /isogeny_algos/
             /Cargo.lock

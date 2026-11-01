@@ -8,17 +8,21 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
-| `crypto-eks-linux` | 4 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
-| `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
+| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 7 |
+| `crypto-eks-highmem` | 14 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 | `crypto-eks-xmem` | 14 CPU, 440 GiB plus Docker sidecar | 480 GiB runner (x2iedn/x2iezn.4xlarge, 512 GiB) | 1 |
 | `crypto-eks-xmem1t` | 30 CPU, 900 GiB plus Docker sidecar | 960 GiB runner (x2iedn/x2iezn.8xlarge, 1 TiB) | 1 |
+| `crypto-isolab-build` | 1.5 CPU, 12 GiB | 16 GiB runner | 1 |
+| `crypto-isolab` | Iso Lab publisher with Docker sidecar | See `isolab-values.yaml` | 1 |
 
-The base NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
-aggregate provisioning at 128 vCPUs and 1 TiB. An additional R-family pool
-admits 16-vCPU nodes and caps at 32 vCPUs and 256 GiB. The pool names and the
+The base NodePool admits x86-64 M/R instances with 8 or 16 vCPUs and caps
+aggregate provisioning at 16 vCPUs and 128 GiB. An additional R-family pool
+admits 16-vCPU nodes and caps at 16 vCPUs and 128 GiB. A separate
+`gha-gates` R-family Spot pool reserves one 16-vCPU / 128-GiB node for
+the high-memory gate runner through `gha.dev/pool=gates`. The pool names and the
 `gha.dev/pool=on-demand` scheduling label are legacy; the Karpenter
 `karpenter.sh/capacity-type=spot` requirement controls the actual EC2 capacity.
-Both ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
+All ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
 removes its ephemeral runner pods and Karpenter removes empty runner nodes after
 five minutes. The managed system node group has a two-node floor for the ARC and
 cluster controllers. NodePool limits are upper bounds, not spending limits or
@@ -33,9 +37,10 @@ one process and the dense degree-5 Weil-descent closure about 768 GB. It admits
 only Spot x2iedn and x2iezn nodes with 16 or 32 vCPUs and carries its own
 `gha.dev/pool=xmem` taint, so only the two xmem scale sets land there. Its limit
 is 32 vCPUs and 1100 GiB, which is one 1 TiB node or two 512 GiB nodes. The
-runner pools then total at most 64 vCPUs (16 + 16 + 32). Together with the Iso
-Lab pools that total must stay inside the 96-vCPU regional Spot quota, and
-Karpenter fails to launch a node when it would not.
+runner NodePool caps then total 80 vCPUs (16 + 16 + 16 + 32). These are upper
+bounds, not a concurrent allocation: the account also runs the harness and Iso
+Lab worker pools under a 96-vCPU regional Spot quota. Karpenter leaves a
+runner pending when quota or capacity is unavailable.
 The two scale sets differ only in their request, so the request decides the
 node size. Spot prices for these families were not checked when the pool was
 written. Read them before dispatching a long job. Every runner pod template sets
@@ -134,7 +139,8 @@ moved; their last smoke run passed on 2026-10-20. To bring them up for
    `ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh`.
    The value files already name `https://github.com/isogeny-labs/crypto`.
 2. Re-run `deploy.sh` (idempotent) and confirm
-   `kubectl -n arc-runners get autoscalingrunnersets` lists all four sets.
+   `kubectl -n arc-runners get autoscalingrunnersets` lists all six sets,
+   including `crypto-isolab-build` and `crypto-isolab` for the Iso Lab workflow.
 3. Dispatch `eks-arc-smoke.yml` with `pool=linux` and `pool=highmem`; confirm
    the job log names an `arc-runners` pod and `kubectl get nodeclaims` shows a
    Spot node during the run.

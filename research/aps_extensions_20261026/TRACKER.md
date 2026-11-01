@@ -71,3 +71,22 @@ and its eventual PR to the relevant `LEAD-ICE-prime-field-semaev-solving-degree`
 closures; they are not general impossibility results about solver presentation.
 The sibling repository is read-only in this PR, so its next atlas review is
 explicitly still owed.
+
+## Four-lead follow-up (2026-10-28)
+
+The [follow-up study](../aps_followup_20261028/README.md) tracks the requested
+implementation of (1) informative-relation streaming and early termination,
+(2) membership-domain root extraction plus deadline-aware rational factoring,
+(3) a two-parameter line-divisor presentation, and (4) pruning horizontal
+orbit components only after checking propagated labels. Exhaustive controls
+and point-oracle equality remain acceptance gates; lower complete cost is
+still unmeasured. This follow-up does not close APS-V1 through APS-V4.
+
+The formerly pending full-library run from the original implementation has
+now finished: 4,835 passed, 0 failed, 120 ignored. Its log SHA-256 is
+`6dddc82f8bc16a8e1571943e7f431238f4e5e14de1e312e3b877c7380408e08b`.
+This was that original implementation snapshot, not a fresh current-main
+or hosted-CI run; see the [completion receipt on PR #2614](https://github.com/isogeny-labs/crypto/pull/2614#issuecomment-6446563321).
+The PR merged as `e3adf96bdc4498a97d7227981eab97a7d3dd71af`. Historical
+validation files stay unchanged. Current follow-up validation is recorded
+in its own study.

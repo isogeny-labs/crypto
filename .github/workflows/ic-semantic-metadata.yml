@@ -2,7 +2,7 @@ name: ic-semantic-metadata
 
 on:
   # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
+  # This runs when the matching change reaches main, or on demand.
   push:
     branches: [main]
     paths:
@@ -11,8 +11,6 @@ on:
       - docs/curves/registry.json
       - .github/workflows/ic-semantic-metadata.yml
   workflow_dispatch:
-  schedule:
-    - cron: '17 5 * * *'
 
 permissions:
   contents: read
@@ -68,3 +66,27 @@ jobs:
           done
       - name: Validate committed metadata and upstream mirror
         run: python docs/curves/ic/validate_semantics.py --peer cryptanalysis-peer
+      # Source (cryptanalysis curves.yaml) -> mirror (docs/curves/ic) -> the
+      # registry the site reads. A stale registry is drift even when the mirror
+      # matches, so it is checked on the same run.
+      - name: Registry is current
+        id: registry
+        run: python3 scripts/build_curve_registry.py --check
+      - name: Rebuild stale registry for diagnosis
+        id: registry-diagnostic
+        if: failure() && steps.registry.outcome == 'failure'
+        run: |
+          python3 scripts/build_curve_registry.py
+          git rev-parse HEAD > canonical-registry-source-commit.txt
+          git diff --stat -- docs/curves/registry.json src/cryptanalysis/curve_aliases.json
+      - name: Retain exact complete-checkout registry candidate
+        if: always() && steps.registry-diagnostic.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-registry-${{ github.sha }}
+          path: |
+            docs/curves/registry.json
+            src/cryptanalysis/curve_aliases.json
+            canonical-registry-source-commit.txt
+          if-no-files-found: error
+          retention-days: 7

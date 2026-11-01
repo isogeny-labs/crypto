@@ -1,0 +1,142 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,hyperref,booktabs,graphicx}
+\title{Symbolic signed-graph reduction for pencil relations}
+\author{Mathematical implementation and development checks}
+\date{29 October 2026 (UTC)}
+\begin{document}\maketitle
+\noindent The existing pencil cohort has 543 verified candidate targets out of
+1,260. This packet adds a native algebraic component, with no new cohort or
+performance measurement. Its candidate/rho cost ratio is unknown.
+\section*{Algebraic interface}
+An input row is $\sum a_iX_i+\sum b_jS_j=0$ over a prime field. At most two
+large-variable terms survive canonicalization; the $S_j$ remain symbolic.
+The forest stores $X_i=s_iX_{\mathrm{parent}(i)}+u_i(S)$ and uses union by size.
+Root substitution leaves zero, one or two free roots. Zero emits a constraint,
+one anchors a root, and two join components by an invertible pivot.
+An unbalanced signed cycle anchors its root; it does not immediately yield
+an additional relation involving only small variables.
+\section*{Recorded development checks}
+The Rust suite compares the emitted small-row space with independent dense
+row reduction after every prefix: 40 prefixes, 128 deterministic streams and
+five prime fields (2, 3, 5, 7 and 101), totaling 25,600 checks.
+Additional cases cover signed cycles, duplicate terms, rejected inputs,
+composites and a prime near the 64-bit limit. The test log is retained.
+The four Lean declarations cover pivot equivalence, substitution, balanced
+cycles and unbalanced cycles. Their direct compiler result and axiom report
+are retained separately. They do not formalize the full forest invariant or
+prove correspondence with Rust.
+The retained residual basis is now also compared with the independent reference
+at all 25,600 prefixes. Fourteen default library tests pass. Explicit working and retained
+coefficient caps leave the basis unchanged on rejection; callers must stop or
+retain that rejected row. Original residual diagnostics count failed attempts; the separate semantic
+and allocation observations described below extend their coverage. These are
+coefficient limits, not process-memory guarantees or a complete cost model.
+The composed adapter binds both stages to one field and fixed column
+partition, rejects three-large-variable rows explicitly, and retains an
+unincorporated constraint on terminal cap. Its row space is also checked
+at all 25,600 prefixes. The optional producer now connects this adapter to
+the existing geometric checks and matched control. Producer tests check
+signed coefficient parity, rejection of constant-only inconsistencies and
+phase attribution of symbolic events. Setup is a separate recorded phase.
+Semantic arithmetic counts include inversion multiplications and distinguish
+primality powers from inversions. Direct pivot lookup replaces full basis
+scans; no performance measurement is inferred. Residual diagnostics overlap
+this ledger and must not be double-charged.
+The producer has not run a cohort. Its new schemas explicitly mark costs
+incomplete and ratios null; a frozen partition and full accounting remain open.
+Allocation observations now cover cold setup, phases, the whole candidate
+envelope and rho. A grow/shrink regression checks payload preservation and
+requested-layout accounting. These bytes are not RSS or internal copying;
+rho's absolute peak includes still-live candidate and shared input state.
+The outer envelope includes between-phase work without losing peaks when
+inner phases reset. No runtime or memory comparison has been measured.
+Sparse maps now record API calls, ordered comparisons, yielded entries and
+cloned entries. Exact iterator size hints and numeric ordering are preserved;
+JSON serialization is unmetered. These are semantic events, not all CPU work.
+Counts depend on the recorded standard-library version. The current suite has
+14 default library tests and 28 passing producer-feature tests, including eight solver tests. One shared-clock test is ignored.
+The producer now verifies field, native arithmetic and symbolic phase sums,
+and retains interval overhead separately. Scalar inverse instrumentation was
+asymmetric: pencil counts inner multiplications; the reference records one
+inverse. A native normalization removes pencil inverse multiplications for a
+common atomic scalar-I model, tested against both actual inverse implementations.
+The model remains a draft with unfrozen weights; no historical ratio is revised.
+The shared per-target API now separates arithmetic from archive input,
+known-answer checks and rho pairing. Version 2 repeats cold setup per target
+and charges target validity. Its allocation baseline changes because setup
+temporaries drop before rho. Missing allocation observers produce nulls.
+The root ecbench method is registered with an explicit serialization-only
+kernel dependency. Root validation and prerequisite rechecks are recorded below; cohort execution remains open.
+\section*{Online timing integration}
+These are implementation observations for public synthetic mathematical
+instances, not performance measurements. The root harness uses the existing
+exclusive phase clock. Target-blind curve, base and empty-solver setup precede
+target validation. Query/control owns the intervals between named stages;
+the five exported phase times must sum exactly to the online window.
+A regression checks this partition and setup exclusion. Additional independent
+adapter verification remains outside online and is charged in cold group counts.
+The matched reference opens at target transfer or the first nonzero target
+multiple. The original interface retains a no-op hook. A regression checks one
+hook invocation and unchanged answers, operation counts and phase counts in
+plain, negation and transferred modes. The root zero-coefficient and replay-digest regressions have passed within
+the full-library run. That run recorded 5,146 passes, seven failures and
+123 ignored tests. Six failures required omitted tracked fixtures; the other
+reported a test-lock conflict. After materialization, all eight selected tests
+passed in a serial recheck of the same compiled binary. Both logs are retained.
+The root adapter hashes the deterministic ledger into four exact SHA-256
+words for replay. Clock and allocation observations are explicitly excluded;
+these digest words are identifiers, not charged operation counts. Full native
+pricing and root allocator observations remain unavailable. Instrumentation
+overhead is included in clocks. The standalone CLI does not create a phase
+session and therefore does not export these online times. No qualified host
+measurement, new cohort outcome or revised ratio is reported here.
+\begin{center}\includegraphics[width=\linewidth]{timing-boundaries.pdf}\end{center}
+\section*{Shared boundary and input preparation}
+A new enclosing method-call clock covers dispatch, cold setup, in-child
+verification and report construction for both methods. Workload preparation,
+serialization and the independent parent audit remain outside this clock.
+The parent audit has a separate observation and does not inherit child L2
+qualification. Existing timers retain their original meanings.
+
+The final affected-module suite recorded 287 passes, zero failures and one
+ignored test. An earlier full-library suite recorded 5,154 passes, one GPU
+lock failure and 123 ignored tests; the same compiled test passed on serial
+recheck. The paired-record exporter has 12 passing development tests.
+
+Native plan validation reproduced all 1,260 archived target identities,
+coordinates and first measured algorithm seeds. The prepared three-arm design
+has one warmup and five measured streams: 22,680 planned calls, comprising
+18,900 measured calls and 3,780 warmups. Planning performed zero solver calls.
+The fixed small-base denominator is 8, with no selection from these data.
+
+The exporter retains missing whole workloads and separates cold and online
+observations. Its operational A/A criterion requires all five
+$T_{\mathrm{rho\_AA}}/T_{\mathrm{rho}}$ values in $[0.90,1.10]$, independently
+for each clock. This tolerance is not a confidence interval. Ratios remain
+unqualified pending protocol, isolation and independent evidence review.
+No new cohort costs or security conclusions follow from this packet.
+
+\section*{Next integration gates}
+\begin{tabular}{p{0.61\linewidth}p{0.28\linewidth}}\toprule
+Requirement & Status\\\midrule
+Prime-field row kernel and independent prefix tests & Implemented and tested\\
+Forest-state induction and Rust correspondence & Open\\
+Geometric producer wiring & Compile-tested only\\
+Fixed small-base selection and admission accounting & Open\\
+Full symbolic-vector, memory and residual elimination costs & Unmeasured\\
+Remaining 717 frozen candidate targets & No new results\\
+End-to-end cost against matched rho & Unknown\\\bottomrule
+\end{tabular}
+\section*{Sources and limitations}
+The graph construction follows the mathematical distinction between full
+relations and cycles leaving a large prime in Gaudry, Theriault and Thome,
+\href{https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf}{double large prime
+variation}, sections 2.3 and 3.1 (2005 version). Its genus-at-least-three
+complexity result is not asserted for this genus-2 pencil stream. Existing
+repository graph and large-prime eliminators informed the implementation.
+The editable graph is \texttt{reduction.svg}; the machine-readable check
+table is \texttt{checks.csv}. All results are development checks; no runtime,
+memory improvement or full-cohort completion is inferred from them.
+\begin{center}\includegraphics[width=\linewidth]{reduction.pdf}\end{center}
+\end{document}

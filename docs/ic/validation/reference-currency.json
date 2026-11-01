@@ -7,13 +7,14 @@
    "rho_paths": [
     "src/cryptanalysis/koblitz_strong_rho.rs"
    ],
-   "assessment": "Rule v3 priced rho as built (32 lanes). 13 commits changed the standing strong rho afterwards; research/ecbench_rho_optimized_20261014 measured the largest, 0.8046x solve instructions (a 1.25x faster rho), so Table A's x reference is against a slower rho than the standing one. The step-cost gap to the canonical step is in research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json (xref_canonical_step); the lane sweep in research/leaderboard_rigor_20261021/rho_lanes/ shows it is not a lane-count effect. No re-measurement of Table A at the current rho exists yet.",
+   "assessment": "Rule v3 priced rho as built (32 lanes). 13 commits changed the standing strong rho afterwards; research/ecbench_rho_optimized_20261014 measured the largest, 0.8046x solve instructions (a 1.25x faster rho), so Table A's x reference is against a slower rho than the standing one. The step-cost gap to the canonical step is in research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json (xref_canonical_step); the lane sweep in research/leaderboard_rigor_20261021/rho_lanes/ shows it is not a lane-count effect. No re-measurement of Table A at the current rho exists yet. 2026-10-28 (ecbench accounting v2, PR #2465): koblitz_strong_rho.rs gained the rho.signed_frobenius_strong_v2 path (StrongRho::solve_accounted, fixed-base jump table, r-scaled lanes) beside the frozen one. The frozen rho.signed_frobenius_strong this table uses is count-identical to main's binary: 504 of 504 matched records equal on every count field, and committed strong-rho sessions replay exactly (research/ecbench_accounting_v2_20261023/analysis/cross_binary.json, REPORT.typ). The table's reference is unchanged by it.",
    "evidence": [
     "research/ecbench_rho_optimized_20261014/RESULT.json",
-    "research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json"
+    "research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json",
+    "research/ecbench_accounting_v2_20261023/analysis/cross_binary.json"
    ],
    "assessed_blobs": {
-    "src/cryptanalysis/koblitz_strong_rho.rs": "d7ea6788834ad3ebb0f11419ab748139cb04d3e5"
+    "src/cryptanalysis/koblitz_strong_rho.rs": "31ae53808133fe07b62b0954941b7df0b3a702a2"
    }
   },
   "C": {
@@ -21,13 +22,14 @@
    "rho_paths": [
     "src/cryptanalysis/koblitz_strong_rho.rs"
    ],
-   "assessment": "Table C's rho S is S20's (2026-09-26) batch rho priced at the canonical step. The standing strong rho has changed since (see Table A); S20's counts were re-verified equal at n = 41 only. No re-measurement of Table C's reference at the current rho exists yet.",
+   "assessment": "Table C's rho S is S20's (2026-09-26) batch rho priced at the canonical step. The standing strong rho has changed since (see Table A); S20's counts were re-verified equal at n = 41 only. No re-measurement of Table C's reference at the current rho exists yet. 2026-10-28 (ecbench accounting v2, PR #2465): koblitz_strong_rho.rs gained the rho.signed_frobenius_strong_v2 path (StrongRho::solve_accounted, fixed-base jump table, r-scaled lanes) beside the frozen one. The frozen rho.signed_frobenius_strong this table uses is count-identical to main's binary: 504 of 504 matched records equal on every count field, and committed strong-rho sessions replay exactly (research/ecbench_accounting_v2_20261023/analysis/cross_binary.json, REPORT.typ). The table's reference is unchanged by it.",
    "evidence": [
     "research/ic_descent_20260930/analysis-isolated.json",
-    "research/ecbench_rho_optimized_20261014/RESULT.json"
+    "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "research/ecbench_accounting_v2_20261023/analysis/cross_binary.json"
    ],
    "assessed_blobs": {
-    "src/cryptanalysis/koblitz_strong_rho.rs": "d7ea6788834ad3ebb0f11419ab748139cb04d3e5"
+    "src/cryptanalysis/koblitz_strong_rho.rs": "31ae53808133fe07b62b0954941b7df0b3a702a2"
    }
   }
  }

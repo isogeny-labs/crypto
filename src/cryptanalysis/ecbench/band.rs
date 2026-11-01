@@ -162,6 +162,16 @@ pub struct BandRow {
     /// Mean priced `S` over verified runs at each weight, `None` when any
     /// verified run has no priced cost there.
     pub mean_s: Vec<Option<f64>>,
+    /// `Σ (G − C)` over the verified runs: the charged GAE with any
+    /// calibration-priced native work taken out. With `native_sum`,
+    /// `Σ priced_gae(w) = charged_sum + w · native_sum` exactly, so a
+    /// verdict can be re-checked in integers (`None` with no verified run).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub charged_sum: Option<f64>,
+    /// `Σ (U + n_C)` over the verified runs; `None` when a run names an
+    /// unpriced counter without a count.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub native_sum: Option<u64>,
     /// Unpriced counters that carry no count on some run.
     pub uncounted: Vec<String>,
 }
@@ -217,6 +227,14 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
             .collect();
         uncounted.sort();
         uncounted.dedup();
+        let (mut charged, mut native, mut native_ok) = (0.0f64, 0u64, true);
+        for r in &ok {
+            let (u, missing) = unpriced_total(r);
+            let (c, n_c) = calibrated_native(r)?;
+            charged += r.cost.total_gae.unwrap_or(0.0) - c;
+            native += u + n_c;
+            native_ok &= !missing;
+        }
         rows.push(BandRow {
             curve: curve.clone(),
             log2_r: (rs[0].workload.curve.r as f64).log2(),
@@ -224,6 +242,8 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
             runs: rs.len() as u64,
             verified: ok.len() as u64,
             mean_s,
+            charged_sum: (!ok.is_empty()).then_some(charged),
+            native_sum: (!ok.is_empty() && native_ok).then_some(native),
             uncounted,
         });
     }
@@ -303,4 +323,30 @@ pub fn markdown(rep: &BandReport) -> String {
         s.push_str(&format!(" {u} |\n"));
     }
     s
+}
+
+// The read-only backend-leaderboard tool compiles this file without the runner
+// or the repository-root session data (its build sets `ecbench_reader`).
+#[cfg(all(test, not(ecbench_reader)))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn exact_sums_reproduce_the_band_means() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ic_planner_validation_20261020/sessions/r24");
+        let records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let weights = [0.0, 0.1, 1.0];
+        let report = band(&records, &weights).unwrap();
+        for row in &report.rows {
+            let (c, n) = (row.charged_sum.unwrap(), row.native_sum.unwrap());
+            assert_eq!(c.fract(), 0.0, "{}: integral charged GAE", row.arm);
+            let sqrt_r = 2f64.powf(row.log2_r / 2.0);
+            for (k, &w) in weights.iter().enumerate() {
+                let from_sums = (c + w * n as f64) / (row.verified as f64 * sqrt_r);
+                let mean = row.mean_s[k].unwrap();
+                assert!((from_sums / mean - 1.0).abs() < 1e-9, "{} w = {w}", row.arm);
+            }
+        }
+    }
 }

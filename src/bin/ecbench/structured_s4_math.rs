@@ -1,7 +1,7 @@
 // Ported from the tested native pursuit instrument at d67f6085; finite controls in that study.
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::koblitz_groebner::{FieldStructure, SymElement};
-use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolPoly, Mask};
 use crypto_lib::cryptanalysis::semaev_decomp::Gf2;
 use num_bigint::BigUint;
 use rand::{rngs::StdRng, Rng, SeedableRng};
@@ -204,7 +204,7 @@ pub(super) fn symmetric_values(gf: &Gf2, xs: [u64; 3]) -> [u64; 3] {
         gf.mul(gf.mul(xs[0], xs[1]), xs[2]),
     ]
 }
-pub(super) fn decode(ps: &[Vec<u64>], assignment: u64) -> [u64; 3] {
+pub(super) fn decode(ps: &[Vec<u64>], assignment: Mask) -> [u64; 3] {
     let mut offset = 0;
     std::array::from_fn(|i| {
         let mut x = 0;
@@ -260,4 +260,17 @@ pub(super) fn split(gf: &Gf2, domain: &[u64], es: [u64; 3], tests: &mut u64) -> 
     roots.sort_unstable();
     assert_eq!(symmetric_values(gf, roots), es);
     Some(roots)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn decode_preserves_the_top_assignment_bit() {
+        let bits = Mask::BITS as usize;
+        let ps = vec![vec![0; bits - 1], vec![7], vec![]];
+        assert_eq!(decode(&ps, (1 as Mask) << (bits - 1)), [0, 7, 0]);
+        assert_eq!(decode(&ps, 0), [0, 0, 0]);
+    }
 }

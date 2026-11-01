@@ -1,0 +1,19 @@
+{
+  "schema": "pencil-continuation-operational-guard-draft/v1",
+  "preparation_lower_bound_unix": 1793325950,
+  "preparation_lower_bound_utc": "2026-10-30T02:05:50Z",
+  "outer_deadline_unix": 1793336750,
+  "outer_deadline_utc": "2026-10-30T05:05:50Z",
+  "internal_guard_unix": 1793330900,
+  "internal_guard_utc": "2026-10-30T03:28:20Z",
+  "reserve_seconds": 900,
+  "arithmetic_lhs": 1793336750,
+  "arithmetic_passes": true,
+  "source": "Retained first-gate absolute-deadline-correction.json; must be independently re-reviewed against actual unchanged controller/runtime",
+  "resource_authorization_sha256": "fef73c695ec6b3783268db8d52ad1f00b0bd1b612d8aed412ca44854e705ccb1",
+  "request_sha256": "19929f222a46d13f02fa50738e31ef7c86e3a0854c4f2041a58f9f6c05c46e28",
+  "launch_authorized": false,
+  "jobs_submitted": 0,
+  "review_basis": "Four bounded kube calls at 180s timeout plus5s kill-after, plus60s termination grace:800s; reserve900s. Fresh120s subtraction retained as unused slack. Pending independent operational review.",
+  "supersedes_draft_only": "operational-guard-draft.json"
+}

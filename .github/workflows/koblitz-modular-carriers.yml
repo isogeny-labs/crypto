@@ -1,16 +1,6 @@
 name: Koblitz modular carrier replay
 on:
-  pull_request:
-    paths:
-      - 'research/koblitz_modular_ic_20261018/**'
-      - 'src/cryptanalysis/curve_construction/weil.rs'
-      - 'src/cryptanalysis/curve_construction/modular.rs'
-      - 'src/cryptanalysis/curve_construction/gf2k.rs'
-      - 'src/cryptanalysis/curve_construction/lpoly.rs'
-      - 'src/binary_ecc/**'
-      - 'src/cryptanalysis/identity_certificate.rs'
-      - 'src/hash/sha256.rs'
-      - '.github/workflows/koblitz-modular-carriers.yml'
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -24,6 +14,26 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/koblitz_modular_ic_20261018
       - uses: dtolnay/rust-toolchain@stable
       - name: Native tests and exact evidence replay
         shell: bash
@@ -207,7 +217,18 @@ jobs:
           # Validation logs are published in the artifact store; see round21/RELEASE.md.
           # Replay uses the committed raw archive; the complete Lean gate below is retained.
           "$round/REPLAY.sh"
-          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-sources "$round"
+          git fetch --no-tags origin 69f67409f5fe6b525c23b000edea047dd38fcf83
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 69f67409f5fe6b525c23b000edea047dd38fcf83
+      - name: Replay round 22 complete augmentation recovery and coupled source bindings
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/22
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+          source_revision=$(jq -r .source_revision "$round/ledger.json")
+          git fetch --no-tags origin "$source_revision"
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" "$source_revision"
       - name: Install pinned Lean
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none

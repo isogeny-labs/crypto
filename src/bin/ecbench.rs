@@ -35,6 +35,8 @@
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
+#[path = "ecbench/pkm_tower.rs"]
+mod pkm_tower;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -63,6 +65,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Check pinned diagnostic metadata without launching work.
+    DiagnosticPreflight {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        request_sha256: String,
+    },
     /// Push, pull and index large files (factor bases, tables) in the object store.
     Store(crypto_lib::store::cli::StoreArgs),
     /// Run the existing CUDA ECC binary as a separately labelled GPU stage.
@@ -238,6 +247,9 @@ enum Cmd {
     },
     /// Run a session.
     Run {
+        /// Explicit diagnostic launch provenance (producer activation pending).
+        #[arg(long)]
+        diagnostic_launch: Option<PathBuf>,
         /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
@@ -306,17 +318,29 @@ enum Cmd {
         #[arg(long)]
         prefix: PathBuf,
     },
-    /// Audit a session from its own files.
+    /// Audit a session from its own files.  Exits 1 when the audit finds a
+    /// problem (and 2 when it cannot be run at all), so a failed audit
+    /// fails whatever calls it; a receipt is printed either way.
     Verify {
         /// The session directory (`session.json`, `records.jsonl`, …).
         #[arg(long)]
         dir: String,
-        /// Re-execute this many measured runs and require identical counts.
+        /// Re-execute this many measured runs, drawn at random from the
+        /// deterministic ones, and require identical counts.
         #[arg(long, default_value_t = 0)]
         replay: usize,
         /// Re-execute every measured deterministic run.
         #[arg(long)]
         replay_all: bool,
+        /// The auditor's randomness for the `--replay N` draw (default: a
+        /// seed from the operating system's entropy).  Recorded in the
+        /// receipt; the same seed on the same session draws the same runs.
+        #[arg(long)]
+        replay_seed: Option<u64>,
+        /// Also re-execute the run with this sequence number (repeatable),
+        /// beside any sample.
+        #[arg(long = "replay-seq")]
+        replay_seq: Vec<u64>,
         /// Accept a session marked `interrupted`: every integrity check
         /// still applies, but not "every planned execution recorded".
         #[arg(long)]
@@ -324,8 +348,9 @@ enum Cmd {
         /// Write the receipt here (it is also printed).
         #[arg(long)]
         out: Option<PathBuf>,
-        /// Exit 1 when the audit finds a problem (isolab's verify contract).
-        #[arg(long)]
+        /// Accepted for compatibility and ignored: a failed audit always
+        /// exits 1.
+        #[arg(long, hide = true)]
         exit_code: bool,
     },
     /// Compare arm B against arm A.
@@ -796,6 +821,7 @@ pub fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
     // `pdp3_koblitz`); registered before any run, child or replay.
     crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(binary_plugins());
+    crypto_lib::cryptanalysis::ecbench::methods::register_prime_plugins(pkm_tower::plugins());
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {
@@ -865,6 +891,18 @@ fn emit_claim(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::DiagnosticPreflight {
+            request,
+            request_sha256,
+        } => {
+            let path = request.to_str().ok_or("request path must be UTF-8")?;
+            print_json(
+                &crypto_lib::cryptanalysis::ecbench::diagnostic_file_adapter::check_file(
+                    path,
+                    &request_sha256,
+                )?,
+            )?;
+        }
         Cmd::Store(args) => crypto_lib::store::cli::run(&args)?,
         Cmd::Work {
             sessions,
@@ -1221,6 +1259,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Run {
+            diagnostic_launch,
             spec: path,
             out,
             cpus,
@@ -1243,6 +1282,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 req = isolation::CpuRequest::None;
             }
             let opts = runner::RunOptions {
+                diagnostic_launch: diagnostic_launch
+                    .as_deref()
+                    .map(crypto_lib::cryptanalysis::ecbench::diagnostic_launch::DiagnosticLaunch::load)
+                    .transpose()?,
                 cpus: req,
                 lock_path: lock,
                 wait_for_lock: wait,
@@ -1324,19 +1367,25 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             dir,
             replay,
             replay_all,
+            replay_seed,
+            replay_seq,
             allow_interrupted,
             out,
-            exit_code,
+            exit_code: _,
         } => {
             let dir = PathBuf::from(isolab::expand_env(&dir)?);
-            let rep = audit::audit_with(
+            let rep = audit::audit_opts(
                 &dir,
-                if replay_all {
-                    audit::REPLAY_ALL
-                } else {
-                    replay
+                &audit::AuditOptions {
+                    replay: if replay_all {
+                        audit::REPLAY_ALL
+                    } else {
+                        replay
+                    },
+                    replay_seed,
+                    replay_seqs: replay_seq,
+                    allow_interrupted,
                 },
-                allow_interrupted,
             )?;
             let text = serde_json::to_string_pretty(&rep).map_err(|e| e.to_string())? + "\n";
             if let Some(o) = out {
@@ -1344,6 +1393,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 eprintln!("receipt sha256 {}", canonical::sha256_hex(text.as_bytes()));
             }
             print!("{text}");
+            for w in &rep.warnings {
+                eprintln!("warning: {w}");
+            }
+            if let Some(seed) = rep.replay_seed {
+                eprintln!(
+                    "replay seed {seed} ({} eligible runs)",
+                    rep.replay_candidates.unwrap_or(0)
+                );
+            }
             eprintln!(
                 "audit {}: {} records, {} verified, {} replays reproduced, {} problems",
                 if rep.ok { "OK" } else { "FAILED" },
@@ -1352,6 +1410,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rep.replays.iter().filter(|r| r.reproduced).count(),
                 rep.problems.len()
             );
+            for problem in rep.problems.iter().take(20) {
+                eprintln!("problem: {problem}");
+            }
             if rep.records_bound == Some(false) && rep.interruption.is_some() {
                 eprintln!(
                     "warning: interruption {}: records_bound false (no records hash binds \
@@ -1359,8 +1420,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     rep.interruption.as_deref().unwrap_or("")
                 );
             }
-            if exit_code && !rep.ok {
-                return Ok(ExitCode::from(1));
+            if rep.exit_status() != 0 {
+                return Ok(ExitCode::from(rep.exit_status()));
             }
         }
         Cmd::GpuStage {
@@ -1721,7 +1782,22 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     .map(|p| crypto_lib::store::resolve_path(p))
                     .collect::<Result<_, _>>()?;
                 let refs: Vec<&Path> = resolved.iter().map(|p| p.as_path()).collect();
-                print!("{}", db::sql(&refs)?);
+                let batch = db::sql_batch(&refs);
+                print!("{}", batch.sql);
+                // A refused path (tampered, unreadable, not ecbench) loads
+                // nothing and does not stop the rest; the exit status says
+                // the load was not complete.
+                for (path, why) in &batch.refused {
+                    eprintln!("db sql: skipped {}: {why}", path.display());
+                }
+                if !batch.refused.is_empty() {
+                    eprintln!(
+                        "db sql: {} of {} paths were skipped; the SQL above omits them",
+                        batch.refused.len(),
+                        refs.len()
+                    );
+                    return Ok(ExitCode::from(1));
+                }
             }
         },
         Cmd::IsolabJob {
@@ -2145,6 +2221,8 @@ fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
     let w = &p.workloads[ex.workload];
     Ok(record::ChildInput {
         schema: record::CHILD_INPUT_SCHEMA.into(),
+        diagnostics: None,
+        diagnostic_lifecycle: None,
         curve: workload::CurveSpec::explicit(p.instance(ex.workload))
             .unwrap_or_else(|| w.curve_spec.clone()),
         target_seed: w.target_seed,
@@ -2299,8 +2377,8 @@ fn band_cmd(
 }
 
 fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
-    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |");
-    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|");
+    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |");
+    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|");
     for d in dirs {
         let s = runner::read_session(d)?;
         let recs = runner::read_records(d)?;
@@ -2419,8 +2497,26 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         _ => "",
                     }
                 );
+                // Fixed set-up above a tenth of S, or r below the calibrated
+                // range (README §7, "The strong reference"), over the
+                // verified runs the mean S is taken from.
+                let flags = any
+                    .map(|r| {
+                        let runs: Vec<(&[methods::PhaseRecord], f64)> = mine
+                            .iter()
+                            .filter(|r| r.counts())
+                            .filter_map(|r| Some((r.phases.as_slice(), r.cost.total_gae?)))
+                            .collect();
+                        methods::pooled_row_flags(
+                            &r.workload.curve.family,
+                            (r.workload.curve.r as f64).log2(),
+                            &arm.method.family,
+                            &runs,
+                        )
+                    })
+                    .unwrap_or_default();
                 println!(
-                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                     s.session_id,
                     arm.name,
                     arm.method.id,
@@ -2455,6 +2551,11 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         .map(|(k, v)| format!("{k}×{v}"))
                         .collect::<Vec<_>>()
                         .join(" "),
+                    if flags.is_empty() {
+                        "–".to_string()
+                    } else {
+                        flags.join("; ")
+                    },
                 );
             }
         }

@@ -1,0 +1,43 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "2e49056e465330b5b7aee8e58ed9319ea40f564c54b3d02e1cfa1b1ff4d4a500"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "fa23c847b169b531d83c5e735bf174475b4392042a4a1a777c165797482e0153"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/postgb_linear_stage_20261026/PROTOCOL_AMENDMENT_3.md: the matched reference is rho_e_neg (negation-map rho, look-ahead against fruitless 2-cycles) in the same jv_cover process, S of each arm over the mean S of its rho_neg runs",
+  "unit": "group additions per sqrt(l): the IC's counted F_p multiplications over the measured cost of one E-addition, rho's counted group operations (a doubling counts one)",
+  "binary_or_process": "jv_cover a49184b0c25ae27538f083999459ca9c4cc88abf4f9c99cc06b007253b5feb85 (cards R3-D1, R3-D2): the IC solve and rho_e_neg in one process, on the same instance, rho after the IC clock",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 408.25,
+    "rho": 0.821
+   },
+   "0.1": {
+    "ic": 408.25,
+    "rho": 1.374
+   },
+   "1": {
+    "ic": 408.25,
+    "rho": 6.352
+   }
+  },
+  "order_holds_across_band": true,
+  "note": "Pooled over the 4 DLP instances (p = 53, 101; seeds 1, 2), fast arm, 16 rho_neg runs. j(E) is neither 0 nor 1728 and lies in neither F_{p^2} nor F_{p^3} on every instance (validator check), so +-1 are the only automorphisms and no subfield Frobenius acts: the negation map is the strongest rho. rho_neg's unpriced work (canonicalisations, partition hashes, table lookups/inserts) is bounded from its emitted counts at 5*steps to 3*steps + 4*group_ops; the band uses the upper bound. The IC emits no unpriced counter, so its figure at w > 0 is a lower bound and can only widen the gap. Rho is cheaper on every instance at every weight (IC/rho 257-1310 at w = 0, 33-244 at w = 1). 4 rho_neg runs per instance are noisy (means 0.55-1.40)."
+ },
+ "validation": {
+  "report": "validation_report.yaml",
+  "notes": "VALIDATION_NOTES.md",
+  "tool": "vtool/ (standalone Rust crate)",
+  "snapshot": "6f356f71ef"
+ }
+}

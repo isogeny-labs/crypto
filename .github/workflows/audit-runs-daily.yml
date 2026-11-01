@@ -12,13 +12,9 @@ name: audit-runs-daily
 # replay checks counts and answers, never wall time.  The exhaustive weekly lane
 # stays in ecbench.yml.
 #
-# If this cannot run (no runner budget, a binary that will not build on a hosted
-# runner), the scheduled-task alternative in .claude/skills/audit-runs/SKILL.md
-# runs the same script.
+# This replay remains available on demand through workflow_dispatch.
 
 on:
-  schedule:
-    - cron: '41 5 * * *'
   workflow_dispatch:
     inputs:
       sample:

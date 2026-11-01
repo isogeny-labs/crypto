@@ -1,0 +1,53 @@
+{
+  "schema": "pencil-infrastructure-authorization/v1",
+  "id": "reviewed-first-gate-infrastructure-20261029",
+  "authority": "explicit_user_approval",
+  "question_item_id": [
+    "request_user_input_async",
+    "call_9923900bc777410b80b32ae8a2f7d55c",
+    1
+  ],
+  "approved_actions": [
+    "Publish the reviewed controller ZIP and replacement runtime as versioned objects, download and verify their exact hashes",
+    "Update the controller using only immutable package source key and version after review of the change set",
+    "Publish the pinned runtime image"
+  ],
+  "artifact_bindings": {
+    "controller_zip_sha256": "0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a",
+    "replacement_runtime_sha256": "72b227c00c3e3781b5b351aae133ffd2ece5c43313a4476b19c6d322bbffdaec",
+    "source_revision": "9230fe5745184572424724708903a0efe4bf0b52"
+  },
+  "constraints": {
+    "iam_permissions_expansion": false,
+    "rbac_expansion": false,
+    "controller_update_fields": [
+      "package source key",
+      "package source version"
+    ],
+    "additional_approval_for_exact_listed_actions_required": false,
+    "experiment_scope_or_budget_change": false
+  },
+  "separate_trust_subject_authorization": {
+    "question_item_id": [
+      "request_user_input_async",
+      "call_9923900bc777410b80b32ae8a2f7d55c",
+      0
+    ],
+    "action": "Correct the reviewed GitHub OIDC trust subject only",
+    "receipt": {
+      "path": "../../validation/publisher_trust_20261029/receipt.json",
+      "sha256": "b98edaa8ed29b23601fbbe6f6da35546d779f7480c5018b87552502938da814a"
+    },
+    "observed_status": "Applied and live readback verified; permissions policy and RBAC unchanged",
+    "oidc_workflow_execution_verified": false
+  },
+  "execution_evidence_status": {
+    "controller_publication": "pending receipt",
+    "runtime_publication": "pending receipt",
+    "controller_change_set_review_and_update": "pending receipt",
+    "pinned_image_digest": "pending receipt",
+    "experiment_admission": "pending"
+  },
+  "protocol_status": "draft; no freeze or experiment launch performed by this authorization-record update",
+  "transcript_included": false
+}

@@ -46,7 +46,13 @@ STORE_INDEX = "store/index.json"
 STORE_CONFIG = "store/config.json"
 STORE_SCHEMA = "crypto.store-index/v1"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
-ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*")
+ECBENCH_SESSIONS_GLOBS = (
+    "research/ecbench_*/sessions/*",
+    "research/isogeny_conductor_gap_*/sessions/*",
+    "research/fiber_ic_scaling_*/sessions/*",
+    "research/n83_genus3_image_solver_*/sessions/*",
+    "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*",
+)
 IC1_SCAN_GLOBS = (
     "docs/ic/**/*.json",
     "docs/ic/**/*.md",
@@ -356,7 +362,8 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
             field = {"characteristic": "p", "p": str(p), "bits": (int_or_none(p) or 0).bit_length(), "degree": 1, "modulus": None}
         elif family == "extension":
             # GF(p^k) = GF(p)[t]/(t^k + low(t)): bits are the field's, p^k's.
-            p, k = params.get("p"), int_or_none(params.get("k"))
+            # 47 fixture rows spell the degree "degree", not "k".
+            p, k = params.get("p"), int_or_none(params.get("k", params.get("degree")))
             field = {"characteristic": "p", "p": str(p), "bits": ((int_or_none(p) or 0) ** (k or 0)).bit_length(), "degree": k, "modulus": params.get("modulus")}
         else:
             degree = params.get("n") or params.get("m")
@@ -368,7 +375,7 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
         a = params.get("a") if params.get("a") is not None else model.get("a")
         b = params.get("b") if params.get("b") is not None else model.get("b")
         # An extension coefficient is its list over 1, t, ..., t^(k-1).
-        a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+        a, b = ("[" + ", ".join(map(str, v)) + "]" if isinstance(v, list) else v for v in (a, b))
         rep = (c.get("representations") or [None])[0]
         subgroup = rep["curve"] if rep else {}
         r = subgroup.get("subgroup_order")
@@ -670,7 +677,13 @@ def candidate_identities(source: RepositoryInputs) -> list[dict]:
     found = defaultdict(lambda: {"count": 0, "files": Counter()})
     for pattern in IC1_SCAN_GLOBS:
         for path in source.glob_files(pattern):
-            if source.size(path) > MAX_SCAN_BYTES:
+            # The canonical leaderboard is required input even after it grows
+            # beyond the cap for incidental text files. Otherwise published
+            # IC1 identities disappear from search without a source change.
+            # The core leaderboard is already a required, fully parsed input
+            # to build(). Its growth must not hide IDs named only there. Keep
+            # the bound for the general research-note/candidate scan.
+            if path != LEADERBOARD and source.size(path) > MAX_SCAN_BYTES:
                 continue
             text = source.read_text(path, errors="replace")
             for ident in IC1_FULL_RE.findall(text):
@@ -704,20 +717,20 @@ def attach_covers(
     report: dict,
     source: RepositoryInputs | None = None,
 ) -> set[str]:
-    """Join the current, complete native-verified cover catalog."""
-    if (
-        report.get("schema_version") != "curve-covers/v1"
-        or report.get("registry_sha256") != sha256_file(REGISTRY, source)
-    ):
-        raise ValueError("cover report schema or registry digest is stale")
+    """Join source-bound cover findings; leave newer registry curves unassessed."""
+    if (report.get("schema_version") != "curve-covers/v1" or
+            not re.fullmatch(r"[a-f0-9]{64}", report.get("registry_sha256", ""))):
+        raise ValueError("cover report schema or source digest is invalid")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
     current_slugs = {c["slug"] for c in curves}
-    if len(by_slug) != len(findings) or set(by_slug) != current_slugs:
-        raise ValueError("cover report must have exactly one finding per catalog model")
+    if len(by_slug) != len(findings) or not set(by_slug).issubset(current_slugs):
+        raise ValueError("cover report has duplicate or unknown catalog models")
+    if report["registry_sha256"] == sha256_file(REGISTRY, source) and set(by_slug) != current_slugs:
+        raise ValueError("current cover report must have one finding per catalog model")
     for curve in curves:
-        finding = by_slug[curve["slug"]]
-        if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
+        finding = by_slug.get(curve["slug"])
+        if finding and finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
     return set(by_slug)

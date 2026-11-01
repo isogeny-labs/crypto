@@ -1,5 +1,7 @@
 //! Explicit Tate11 / oriented7 incidence circuits and diamond twist, with direct torsion controls.
 use crate::round04::Field;
+#[path = "geometry22.rs"]
+pub(crate) mod geometry22;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{

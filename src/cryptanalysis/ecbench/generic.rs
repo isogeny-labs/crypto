@@ -25,9 +25,16 @@ pub struct GenericOutcome {
     pub recovered: Option<u64>,
     pub setup: GroupOps,
     pub search: GroupOps,
-    /// The part of `search` spent re-placing a kangaroo after a same-kind
-    /// collision (zero for every other method).
+    /// Kangaroo re-placements after a same-kind collision.  What they cost
+    /// is charged one of two ways, chosen by [`kangaroo_with`]: in `search`
+    /// (frozen `kangaroo.vow`; this field is then only the part of `search`
+    /// spent re-placing, informational and not added again) or in this
+    /// ledger alone (`restarts_apart`, `kangaroo.vow_v2`, reported as its own
+    /// `restarts` phase).  Zero for every other method.
     pub restarts: GroupOps,
+    /// The final `[d]G = Q` check of [`verify_candidate`]; zero for the
+    /// ids that do not run it.
+    pub verification: GroupOps,
     /// Native work the group-operation unit does not charge, and the
     /// shape of the run (`baby_steps`, `giant_steps`, `restarts`, …).
     pub counters: BTreeMap<String, u64>,
@@ -44,6 +51,26 @@ impl GenericOutcome {
         } else {
             self.counters.insert(name.to_string(), by);
         }
+    }
+}
+
+/// Charge the check `[d]G = Q` of the candidate a solve returned to
+/// `out.verification`, one scalar multiplication (`≈ 1.5·log₂ r` additions,
+/// counted exactly), and book it in `verification_checks`; a candidate that
+/// fails is booked in `failed_candidates` and kept for the runner to
+/// grade.  A solve with no candidate (exhausted) pays nothing.  This is the
+/// rule of every `_v2` method: rho and index calculus have always paid it
+/// for the answer they return, BSGS, the kangaroo and the claw had not.
+pub fn verify_candidate<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    out: &mut GenericOutcome,
+) {
+    let Some(d) = out.recovered else { return };
+    out.count("verification_checks", 1);
+    if g.mul(&mut out.verification, gen, d) != target {
+        out.count("failed_candidates", 1);
     }
 }
 
@@ -258,6 +285,24 @@ pub fn kangaroo<G: CountedGroup>(
     seed: u64,
     max_steps: u64,
 ) -> GenericOutcome {
+    kangaroo_with(g, gen, target, r, seed, max_steps, false)
+}
+
+/// [`kangaroo`], with the scalar multiplications of a restart charged to
+/// `out.restarts` alone when `restarts_apart` (the `_v2` phase attribution:
+/// a restart is neither jump-table set-up nor a jump, so it has its own
+/// ledger).  Without it a restart is charged to `out.search`, as frozen
+/// `kangaroo.vow` has done since 2026-10-18, and `out.restarts` only tallies
+/// the part of `search` it was.  The walk is the same either way.
+pub fn kangaroo_with<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    restarts_apart: bool,
+) -> GenericOutcome {
     let mut out = GenericOutcome::default();
     let shape = KangarooShape::of(r);
     out.count("jump_count", shape.jumps as u64);
@@ -282,24 +327,33 @@ pub fn kangaroo<G: CountedGroup>(
         rng = mix(rng);
         rng
     };
-    // The two initial placements are set-up; a placement after a same-kind
-    // collision is part of the search that produced the collision, and is
-    // charged there, so the `setup` / `search` split reflects where the
-    // work happened (the total is the same either way).
+    // The two initial placements are set-up.  A placement after a same-kind
+    // collision is part of the search that produced the collision: frozen
+    // `kangaroo.vow` charges it to `search` (before 2026-10-18 to `setup`;
+    // the total is the same) and tallies it in `out.restarts` for `detail`;
+    // `restarts_apart` (`kangaroo.vow_v2`) charges it to `out.restarts`
+    // alone, which that id reports as its own phase.
     let start = |kind: u8, out: &mut GenericOutcome, off: u64, restart: bool| -> (G::Elt, u64) {
         out.count("starts", 1);
-        let ledger = if restart {
-            &mut out.search
-        } else {
-            &mut out.setup
-        };
-        if kind == 0 {
+        let mut ops = GroupOps::default();
+        let point = if kind == 0 {
             let d = addmod(r / 2, off, r);
-            (g.mul(ledger, gen, d), d)
+            (g.mul(&mut ops, gen, d), d)
         } else {
-            let z = g.mul(ledger, gen, off);
-            (g.add(ledger, target, z), off)
+            let z = g.mul(&mut ops, gen, off);
+            (g.add(&mut ops, target, z), off)
+        };
+        if !restart {
+            out.setup.merge(ops);
+        } else if restarts_apart {
+            out.restarts.merge(ops);
+        } else {
+            out.search.merge(ops);
+            out.restarts.adds += ops.adds;
+            out.restarts.doubles += ops.doubles;
+            out.restarts.scalar_mults += ops.scalar_mults;
         }
+        point
     };
     let mut roo = [start(0, &mut out, 0, false), start(1, &mut out, 0, false)];
     let mut steps = 0u64;
@@ -328,11 +382,7 @@ pub fn kangaroo<G: CountedGroup>(
                 Some(_) => {
                     out.count("same_kind_collisions", 1);
                     let off = next() % r.max(2);
-                    let before = out.search;
                     roo[kind as usize] = start(kind, &mut out, off, true);
-                    out.restarts.adds += out.search.adds - before.adds;
-                    out.restarts.doubles += out.search.doubles - before.doubles;
-                    out.restarts.scalar_mults += out.search.scalar_mults - before.scalar_mults;
                 }
                 None => {
                     table.insert(g.key(&np), (kind, nd));
@@ -439,6 +489,37 @@ mod tests {
             assert_eq!(
                 out.setup, plain.1.setup,
                 "seed {seed}: a restart leaked into setup"
+            );
+        }
+    }
+
+    /// The `_v2` placement: the same walk, a re-placement charged to
+    /// `restarts` alone, so `search` holds jumps only, and `search +
+    /// restarts` is the frozen id's `search`.
+    #[test]
+    fn a_kangaroo_restart_is_its_own_ledger_when_kept_apart() {
+        let inst = find_prime_order_curve(11, 0);
+        assert_eq!(inst.r, 1553, "the pinned control curve moved");
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        for seed in 0..32u64 {
+            let cap = 64 * inst.r;
+            let frozen = kangaroo(g, gen, gen, inst.r, seed, cap);
+            let apart = kangaroo_with(g, gen, gen, inst.r, seed, cap, true);
+            assert_eq!(apart.recovered, Some(1), "seed {seed}");
+            assert_eq!(apart.counters, frozen.counters, "the same walk");
+            assert!(apart.counters["same_kind_collisions"] >= 1, "seed {seed}");
+            assert!(apart.restarts.scalar_mults >= 1, "seed {seed}");
+            assert_eq!(apart.setup, frozen.setup, "seed {seed}");
+            assert_eq!(
+                apart.search.gae() + apart.restarts.gae(),
+                frozen.search.gae(),
+                "seed {seed}"
+            );
+            assert_eq!(
+                apart.setup.gae() + apart.search.gae() + apart.restarts.gae(),
+                frozen.setup.gae() + frozen.search.gae(),
+                "the total does not move"
             );
         }
     }

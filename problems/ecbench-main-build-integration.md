@@ -55,3 +55,8 @@ open. Recheck when the root integration changes.
 path removes this build dependency from leaderboard generation, while root
 validation remains unresolved. No cryptographic implementation was repaired or
 reverted in this change.
+
+
+### 2026-10-27 repair update
+
+On current main c8a37174 the library compiles, but all-target compilation fails on a duplicate import in the N83 export adapter and a missing closing brace in the ecbench integration test. Both have been repaired on the CI repair branch; all-target and wide-vars checks pass locally. The original whole-library/replay acceptance condition is still open pending final test results and CI. See `docs/ci-repair-20261027.md`; no historical build failure above was rewritten.

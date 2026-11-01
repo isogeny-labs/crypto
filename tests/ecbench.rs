@@ -56,6 +56,98 @@ fn lock(dir: &Path) -> String {
 }
 
 #[test]
+fn known_log_public_targets_are_verified_replayed_and_counted_by_phase() {
+    let dir = scratch("known-log-public");
+    let spec = dir.join("spec.json");
+    let doc = serde_json::json!({
+        "schema":"ecbench.spec/v1", "label":"known-log public target replay",
+        "workloads":{
+            "curves":[{"kind":"prime_search","bits":12,"seed":59297},
+                {"kind":"koblitz","a":0,"n":13}],
+            "targets_per_curve":2,"target_seed":20261021,"target_kind":"public"},
+        "arms":[
+            {"name":"rho","role":"reference","method":{"id":"rho.negation"}},
+            {"name":"known","role":"candidate","method":{"id":"ic.known_log_mitm2_v1",
+                "params":{"size":"4","base_seed":"31","max_pair_work":"20","max_trials":"100000"}}},
+            {"name":"known-aa","role":"control","method":{"id":"ic.known_log_mitm2_v1",
+                "params":{"size":"4","base_seed":"31","max_pair_work":"20","max_trials":"100000"}}}
+        ],
+        "measurement":{"rounds":1,"warmup":0,"seed":17,
+            "isolation_required":"L0","timeout_seconds":60}
+    });
+    std::fs::write(&spec, serde_json::to_vec_pretty(&doc).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+    let records = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut candidate_count = 0;
+    for line in records.lines() {
+        let record: Value = serde_json::from_str(line).unwrap();
+        assert!(record["workload"]["planted"].is_null());
+        assert_eq!(record["outcome"]["status"], "verified");
+        if record["method"]["id"] != "ic.known_log_mitm2_v1" {
+            continue;
+        }
+        candidate_count += 1;
+        assert_eq!(record["counters"]["matrix_rows"], 0);
+        assert_eq!(record["counters"]["matrix_work"], 0);
+        assert_eq!(record["counters"]["target_equation_rank"], 1);
+        assert_eq!(record["counters"]["useful_target_relations"], 1);
+        assert_eq!(record["counters"]["pair_attempts"], 20);
+        let phases = record["phases"].as_array().unwrap();
+        let total: f64 = phases.iter().map(|p| p["gae"].as_f64().unwrap()).sum();
+        assert_eq!(Some(total), record["cost"]["total_gae"].as_f64());
+        assert_eq!(phases[0]["scalar_mults"], 4);
+        assert!(record["cost"]["unpriced"].as_array().unwrap().len() > 1);
+        let online = &record["online"];
+        assert_eq!(online["phases_ns"].as_object().unwrap().len(), 5);
+        let sum: u64 = online["phases_ns"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v.as_u64().unwrap())
+            .sum();
+        assert_eq!(Some(sum), online["wall_ns"].as_u64());
+    }
+    assert_eq!(candidate_count, 8);
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay failed: {err}\n{stdout}");
+    let receipt: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(receipt["ok"], true);
+    let (ok, stdout, err) = ecbench(&[
+        "compare",
+        "--dir",
+        out.to_str().unwrap(),
+        "--a",
+        "known",
+        "--b",
+        "known-aa",
+        "--json",
+    ]);
+    assert!(ok, "A/A comparison failed: {err}");
+    let comparison: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(comparison["ops"]["ratio_b_over_a"], 1.0);
+    assert_eq!(comparison["ops"]["ci95"], serde_json::json!([1.0, 1.0]));
+}
+
+#[test]
 fn a_session_runs_verifies_compares_and_loads() {
     let dir = scratch("session");
     let spec = dir.join("spec.json");
@@ -248,6 +340,263 @@ fn a_factor_base_dump_carries_its_points() {
         .as_str()
         .unwrap()
         .starts_with("FB1h"));
+}
+
+#[test]
+fn explicit_binary_basis_dump_matches_the_run_and_replays() {
+    // A non-prefix subspace: ignoring `basis` would include bit 4 instead of
+    // bit 5. Use a tiny public synthetic curve; this checks wiring, not cost.
+    const CURVE: &str = r#"{"kind":"koblitz","a":1,"n":7}"#;
+    const BASIS: &str = "0x1;0x2;0x4;0x8;0x20";
+    let recipe = format!("binary-subspace:dimension=5,basis={BASIS}");
+    let (ok, stdout, err) = ecbench(&["fb", "--curve", CURVE, "--factor-base", &recipe]);
+    assert!(ok, "dump failed: {err}");
+    let dump: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(dump["factor_base"]["params"]["basis"], BASIS);
+    assert_eq!(dump["factor_base"]["dimension"], 5);
+    assert!(dump["factor_base"]["columns"].as_u64().unwrap() > 0);
+    let xs: Vec<u64> = dump["points"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|p| {
+            u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap()
+        })
+        .collect();
+    assert!(xs.iter().all(|&x| x != 0 && x & !0x2f == 0));
+    assert!(
+        xs.iter().any(|&x| x & 0x20 != 0),
+        "must use the supplied subspace"
+    );
+
+    let (ok, stdout, err) = ecbench(&[
+        "fb",
+        "--curve",
+        CURVE,
+        "--factor-base",
+        "binary-subspace:dimension=5",
+    ]);
+    assert!(ok, "prefix dump failed: {err}");
+    let prefix: Value = serde_json::from_str(&stdout).unwrap();
+    assert_ne!(
+        dump["factor_base"]["points_sha256"],
+        prefix["factor_base"]["points_sha256"]
+    );
+
+    let dir = scratch("explicit-basis");
+    let spec = serde_json::json!({
+        "schema": "ecbench.spec/v1",
+        "label": "explicit basis regression",
+        "workloads": {
+            "curves": [serde_json::from_str::<Value>(CURVE).unwrap()],
+            "targets_per_curve": 2, "target_seed": 7
+        },
+        "arms": [
+            {"name": "reference", "role": "reference", "method": {"id": "bsgs.negation"}},
+            {"name": "explicit", "role": "candidate", "method": {
+                "id": "ic.pipeline_counted",
+                "params": {"factor_base": recipe, "oracle": "mitm:m=2", "max_trials": "2000"}
+            }}
+        ],
+        "measurement": {"rounds": 1, "warmup": 0, "seed": 3,
+            "isolation_required": "L0", "timeout_seconds": 60}
+    });
+    let spec_path = dir.join("spec.json");
+    std::fs::write(&spec_path, serde_json::to_string_pretty(&spec).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec_path.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+    let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(records.len(), 4);
+    assert!(records.iter().all(|r| r["outcome"]["status"] == "verified"));
+    let candidates: Vec<_> = records
+        .iter()
+        .filter(|r| r["method"]["family"] == "ic")
+        .collect();
+    assert_eq!(candidates.len(), 2);
+    for record in candidates {
+        assert_eq!(record["factor_base"], dump["factor_base"]);
+    }
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay failed: {err}\n{stdout}");
+    let audit: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(audit["ok"], true);
+    let replays = audit["replays"].as_array().unwrap();
+    assert_eq!(replays.len(), 4);
+    assert!(replays.iter().all(|r| r["reproduced"] == true));
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+#[test]
+fn explicit_binary_basis_cli_rejects_invalid_recipes() {
+    for recipe in [
+        "binary-subspace:dimension=3,basis=1;2;3",
+        "binary-subspace:dimension=3,basis=1;2",
+        "binary-subspace:dimension=3,basis=1;2;128",
+        "binary-subspace:dimension=3,basis=1;2;0",
+        "binary-subspace:dimension=3,basis=1;2;",
+        "binary-subspace:dimension=3,basis=1,2,4",
+        "binary-subspace:dimension=3,basis=1;2;4,select=strict4e",
+        "binary-subspace:dimension=4294967299,basis=1;2;4",
+    ] {
+        let (ok, _, err) = ecbench(&[
+            "fb",
+            "--curve",
+            r#"{"kind":"koblitz","a":1,"n":7}"#,
+            "--factor-base",
+            recipe,
+        ]);
+        assert!(!ok, "accepted invalid recipe: {recipe}");
+        assert!(!err.trim().is_empty(), "missing diagnostic: {recipe}");
+    }
+}
+
+#[test]
+fn explicit_x_lists_preserve_inventory_identity_and_replay() {
+    for (label, curve, source) in [
+        (
+            "prime",
+            r#"{"kind":"prime_search","bits":12,"seed":59297}"#,
+            "prime-abscissa:size=12",
+        ),
+        (
+            "binary",
+            r#"{"kind":"koblitz","a":1,"n":7}"#,
+            "binary-subspace:dimension=5",
+        ),
+    ] {
+        let (ok, stdout, err) = ecbench(&["fb", "--curve", curve, "--factor-base", source]);
+        assert!(ok, "source dump: {err}");
+        let source: Value = serde_json::from_str(&stdout).unwrap();
+        let xs: std::collections::BTreeSet<_> = source["points"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| {
+                u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap()
+            })
+            .collect();
+        // Reverse ordering makes silently sorting/replacing the column list visible.
+        let xs: Vec<_> = xs.into_iter().rev().collect();
+        let list = xs
+            .iter()
+            .map(|x| format!("0x{x:x}"))
+            .collect::<Vec<_>>()
+            .join(";");
+        let recipe = format!("explicit-x:xs={list}");
+        let (ok, stdout, err) = ecbench(&["fb", "--curve", curve, "--factor-base", &recipe]);
+        assert!(ok, "explicit dump: {err}");
+        let dump: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(dump["factor_base"]["params"]["xs"], list);
+        assert!(dump["factor_base"]["dimension"].is_null());
+        assert_eq!(
+            dump["factor_base"]["columns"].as_u64(),
+            Some(xs.len() as u64)
+        );
+        let inventory = |doc: &Value| -> std::collections::BTreeSet<(String, String)> {
+            doc["points"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| {
+                    (
+                        p["x"].as_str().unwrap().to_owned(),
+                        p["y"].as_str().unwrap().to_owned(),
+                    )
+                })
+                .collect()
+        };
+        assert_eq!(inventory(&dump), inventory(&source));
+        for p in dump["points"].as_array().unwrap() {
+            let x =
+                u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap();
+            assert_eq!(x, xs[p["col"].as_u64().unwrap() as usize]);
+        }
+        for bad in [
+            "explicit-x",
+            "explicit-x:xs=",
+            "explicit-x:xs=1;0x1",
+            "explicit-x:xs=18446744073709551615",
+            "explicit-x:xs=1,size=1",
+        ] {
+            let (ok, _, _) = ecbench(&["fb", "--curve", curve, "--factor-base", bad]);
+            assert!(!ok, "accepted {bad}");
+        }
+        let dir = scratch(&format!("explicit-xs-{label}"));
+        let spec = serde_json::json!({
+            "schema":"ecbench.spec/v1","label":"explicit x list replay",
+            "workloads":{"curves":[serde_json::from_str::<Value>(curve).unwrap()],
+                "targets_per_curve":2,"target_seed":7},
+            "arms":[
+                {"name":"reference","role":"reference","method":{"id":"bsgs.negation"}},
+                {"name":"explicit","role":"candidate","method":{"id":"ic.pipeline_counted",
+                    "params":{"factor_base":recipe,"oracle":"mitm:m=2","max_trials":"20000"}}}],
+            "measurement":{"rounds":1,"warmup":0,"seed":3,"isolation_required":"L0","timeout_seconds":60}
+        });
+        let spec_path = dir.join("spec.json");
+        std::fs::write(&spec_path, serde_json::to_vec_pretty(&spec).unwrap()).unwrap();
+        let out = dir.join("session");
+        let (ok, _, err) = ecbench(&[
+            "run",
+            "--spec",
+            spec_path.to_str().unwrap(),
+            "--out",
+            out.to_str().unwrap(),
+            "--cpus",
+            "none",
+            "--lock",
+            &lock(&dir),
+            "--quiet",
+        ]);
+        assert!(ok, "{label} run: {err}");
+        let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|l| serde_json::from_str(l).unwrap())
+            .collect();
+        assert_eq!(records.len(), 4);
+        for record in &records {
+            assert_eq!(record["outcome"]["status"], "verified");
+            if record["method"]["family"] == "ic" {
+                assert_eq!(record["factor_base"], dump["factor_base"]);
+            }
+        }
+        let (ok, stdout, err) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(ok, "{label} replay: {err}\n{stdout}");
+        let audit: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(audit["ok"], true);
+        let replay = audit["replays"].as_array().unwrap();
+        assert_eq!(replay.len(), 4);
+        assert!(replay.iter().all(|r| r["reproduced"] == true));
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 }
 
 #[test]
@@ -1212,10 +1561,11 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
     // because it would change the search without changing the method's
     // identity.  `linear_harvest` puts it in the identity instead.  Omitted
     // it changes nothing; `default` spells out what omission means; `off`
-    // is the engine before #1862.  Same targets, same base: every arm
-    // verifies and finds the same relations, `off` and `default` differ in
-    // counted word XORs (the harvest changes the splitting tree), and the
-    // parameter is refused where it would be ignored or is not understood.
+    // is the engine before #1862. Same targets, same base: every arm verifies
+    // and finds the same relations. The narrowed default rank gate leaves this
+    // below-threshold workload unchanged; explicit `every` demonstrates that
+    // the method parameter changes the splitting tree. The parameter is
+    // refused where it would be ignored or is not understood.
     let dir = scratch("pdp3-harvest");
     let arm = |name: &str, oracle: &str| {
         format!(
@@ -1231,12 +1581,13 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
       "label": "pdp3-koblitz linear_harvest test",
       "workloads": {{"curves": [{{"kind": "koblitz", "a": 0, "n": 13}}],
                     "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"}},
-      "arms": [{}, {}, {}, {}, {}, {}],
+      "arms": [{}, {}, {}, {}, {}, {}, {}],
       "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 600}}
     }}"#,
         arm("omitted", base),
         arm("default", &format!("{base},linear_harvest=default")),
         arm("off", &format!("{base},linear_harvest=off")),
+        arm("every", &format!("{base},linear_harvest=every")),
         arm(
             "bad-root",
             "pdp3-koblitz:m=2,engine=rootfind,linear_harvest=off"
@@ -1284,13 +1635,18 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
         ops["omitted"], ops["default"],
         "spelling out the default must not change a count"
     );
+    assert_eq!(
+        ops["default"], ops["off"],
+        "the default rank gate must leave this below-threshold workload unchanged"
+    );
     assert_eq!(found["omitted"], found["off"], "same relations either way");
     assert_ne!(
-        ops["off"], ops["default"],
-        "the harvest must change the splitting tree on this workload"
+        ops["off"], ops["every"],
+        "the explicit harvest parameter must change the splitting tree"
     );
     assert_ne!(method_ids["omitted"], method_ids["off"]);
     assert_ne!(method_ids["omitted"], method_ids["default"]);
+    assert_ne!(method_ids["off"], method_ids["every"]);
 }
 
 #[test]
@@ -1415,6 +1771,74 @@ fn pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len() {
             "{w}: full rootfind has no scan window"
         );
     }
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay: {err}");
+}
+
+#[test]
+fn pkm_tower_runs_every_engine_on_a_prime_curve() {
+    // The prime-field PKM tower plug-in on a prime-order curve with
+    // 2^5 | p − 1 (p = 257): every engine verifies; signature F5 decides
+    // every node as F4 does, so the two walk one tree; F6 closes nodes
+    // with group additions; `enum` uses no solver at all.
+    let dir = scratch("pkm-tower");
+    let arm = |name: &str, engine: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "prime-tower:t=5,seed=1",
+              "oracle": "pkm-tower:m=2,t=5,seed=1,engine={engine},degree=20,cap=4"}}}}}}"#
+        )
+    };
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pkm-tower test",
+      "workloads": {{"curves": [{{"kind": "prime_search", "bits": 9, "seed": 17}}],
+                    "targets_per_curve": 1, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 300}}
+    }}"#,
+        arm("f4", "f4"),
+        arm("f5", "sig-f5"),
+        arm("f6", "f6"),
+        arm("enum", "enum"),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut by_arm: std::collections::BTreeMap<String, Value> = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        by_arm.insert(r["arm"].as_str().unwrap().to_string(), r);
+    }
+    assert_eq!(by_arm.len(), 4);
+    let extra = |a: &str, k: &str| by_arm[a]["solver"]["extra"][k].as_u64().unwrap();
+    for k in ["nodes", "refuted", "leaves"] {
+        assert_eq!(
+            extra("f4", k),
+            extra("f5", k),
+            "F4 and signature F5 diverged at {k}"
+        );
+    }
+    for key in ["targets_tried", "relations_found"] {
+        assert_eq!(by_arm["f4"]["counters"][key], by_arm["f5"]["counters"][key]);
+    }
+    assert!(by_arm["f4"]["solver"]["ops"].as_u64().unwrap() > 0);
+    assert!(
+        extra("f6", "geometric_group_additions") > 0,
+        "F6 charged no geometry"
+    );
+    assert_eq!(extra("f4", "geometric_group_additions"), 0);
+    assert_eq!(by_arm["enum"]["solver"]["ops"].as_u64(), Some(0));
     let (ok, _, err) = ecbench(&[
         "verify",
         "--dir",
@@ -1816,6 +2240,569 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         .unwrap()
         .iter()
         .any(|r| r.as_str().unwrap().contains("replay-all")));
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// A public value standing in for a beacon: a 40-digit lowercase hex string,
+/// the shape of the git commit id the documentation names.  Injected on the
+/// command line, so nothing here touches the network.
+const TEST_BEACON: &str = "0123456789abcdef0123456789abcdef01234567";
+
+/// The epoch `docs/bounds/README.md` §3.4 documents, computed here from its
+/// parts rather than by `challenge::epoch_from`: the SHA-256-derived value
+/// of the law `ecbench.challenge.epoch` over the challenge's nonce, the hex
+/// digits of the commitment id after its `ECCM1h` prefix (twelve, read as a
+/// number) and the first 16 hex digits of the SHA-256 of the beacon text.
+fn documented_epoch(nonce: u64, commitment_id: &str, beacon: &str) -> u64 {
+    use crypto_lib::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex};
+    let hex = |h: &str| u64::from_str_radix(&h[..h.len().min(16)], 16).unwrap();
+    let cid = commitment_id.strip_prefix("ECCM1h").unwrap();
+    derive_u64(
+        "ecbench.challenge.epoch",
+        &[nonce, hex(cid), hex(&sha256_hex(beacon.as_bytes()))],
+    )
+}
+
+/// Verdict procedure 2 end to end (README §3.4, §6): commit, take a beacon,
+/// spec, run, judge.  The commitment is written with a fixed timestamp
+/// through the library, so its id, the derived epoch, the targets and the
+/// counts are the same on every run; the beacon is injected with `--beacon`.
+/// The CLI's own `challenge commit` (stamped with the wall clock) is
+/// exercised separately, on the epoch it derives.
+#[test]
+fn challenge_verdict_procedure_2_derives_the_epoch_from_commitment_and_beacon() {
+    use crypto_lib::cryptanalysis::ecbench::challenge::{self, Challenge};
+    use crypto_lib::cryptanalysis::ecbench::methods::MethodSpec;
+
+    let dir = scratch("proc2");
+    let s = |p: &Path| p.to_str().unwrap().to_string();
+
+    // The incumbent's committed bound.  An admissible procedure-2 verdict
+    // needs the drift check, so the challenge names a fitted, audited
+    // rho.plain bound and the verdict is given `--bounds`.  The record is a
+    // fixture, not fitted here: a fitted bound's id hashes the session it
+    // came from (wall-clock dependent), the challenge id hashes the bound id,
+    // the commitment id hashes the challenge id and the epoch derives from
+    // the commitment, so a bound fitted in the test would move the epoch, the
+    // targets and the counts on every run.  The fixture is the record that
+    // `ecbench bound fit --arm rho-plain` writes for the session
+    // `BOUNDS_SPEC` describes (four prime sizes, rho.plain, 32 verified
+    // runs); regenerate it with that command if the bound schema moves.
+    let records = dir.join("records");
+    std::fs::create_dir_all(&records).unwrap();
+    let bound_record = records.join("rho-plain.json");
+    std::fs::copy(
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/ecbench/procedure-2/rho-plain-bound.json"),
+        &bound_record,
+    )
+    .unwrap();
+    let incumbent_bound = read_json(&bound_record)["bound_id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+
+    let draft = dir.join("draft.json");
+    std::fs::write(
+        &draft,
+        format!(
+            r#"{{
+  "label": "test: procedure 2 against rho.plain",
+  "domain": {{"problem": "ecdlp.single_target", "family": "prime", "target_kind": "planted",
+             "unit": "ecbench.gae", "tier": "toy",
+             "envelope": {{"targets": 1, "precomputation": "none", "threads": 1}}}},
+  "incumbent": {{"bound_id": "{incumbent_bound}", "method": {{"id": "rho.plain"}}}},
+  "workloads": {{"curves": [{{"kind": "prime_search", "bits": 12, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 14, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 16, "seed": 59297}},
+                           {{"kind": "prime_search", "bits": 18, "seed": 59297}}],
+                "targets_per_curve": 4, "nonce": 11}},
+  "measurement": {{"rounds": 2, "warmup": 0, "isolation_required": "L0", "timeout_seconds": 60}},
+  "acceptance": {{"min_runs_per_size": 8}}
+}}"#
+        ),
+    )
+    .unwrap();
+    let chpath = dir.join("challenge.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "seal",
+        "--draft",
+        &s(&draft),
+        "--out",
+        &s(&chpath),
+    ]);
+    assert!(ok, "challenge seal: {err}");
+    let ch = Challenge::read(&chpath).unwrap();
+    let nonce = ch.workloads.nonce;
+    assert_eq!(nonce, 11);
+
+    // 1. The commitment, sealed at a fixed time in the past.
+    let candidate_json = r#"{"id":"bsgs.negation"}"#;
+    let candidate: MethodSpec = serde_json::from_str(candidate_json).unwrap();
+    let (cm, text) =
+        challenge::commit(&ch, &candidate, "test commitment", 1_700_000_000_000).expect("commit");
+    let cmpath = dir.join("commitment.json");
+    std::fs::write(&cmpath, text).unwrap();
+    assert!(
+        cm.commitment_id.starts_with("ECCM1h"),
+        "{}",
+        cm.commitment_id
+    );
+
+    // 2. The epoch is the documented function of the nonce, the commitment
+    // and the beacon, and is not an input anyone chose.
+    let epoch = documented_epoch(nonce, &cm.commitment_id, TEST_BEACON);
+    assert_eq!(
+        challenge::epoch_from(&ch, &cm, TEST_BEACON).unwrap(),
+        epoch,
+        "epoch_from disagrees with the documented derivation"
+    );
+    let other_beacon = "fedcba9876543210fedcba9876543210fedcba98";
+    let other_epoch = documented_epoch(nonce, &cm.commitment_id, other_beacon);
+    assert_ne!(epoch, other_epoch, "the beacon must move the epoch");
+    // Pinned: with the fixture bound and the fixed commitment time every id
+    // and the epoch are the same on every run.  A change to the epoch law or
+    // to how a commitment or challenge is sealed moves them, and so
+    // re-derives every procedure-2 verdict ever committed: bump the
+    // procedure instead of editing these.
+    assert_eq!(ch.challenge_id, "ECCH1h2fb886fd1dca");
+    assert_eq!(cm.commitment_id, "ECCM1h6b270060cf95");
+    assert_eq!(epoch, 9746311172139217237);
+
+    // 3. The spec, through the CLI, with the beacon injected.
+    let spec_path = dir.join("spec.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&spec_path),
+    ]);
+    assert!(ok, "challenge spec (procedure 2): {err}");
+    assert!(
+        err.contains(&format!("epoch {epoch}:")),
+        "the CLI reports the derived epoch: {err}"
+    );
+    let spec = read_json(&spec_path);
+    let description = spec["description"].as_str().unwrap();
+    assert!(
+        description.contains(&format!(
+            "Epoch {epoch} derived from commitment {} and beacon {TEST_BEACON} (procedure 2).",
+            cm.commitment_id
+        )),
+        "{description}"
+    );
+    // The seeds derive from the nonce and that epoch, as for any challenge.
+    {
+        use crypto_lib::cryptanalysis::ecbench::canonical::derive_u64;
+        assert_eq!(
+            spec["workloads"]["target_seed"].as_u64().unwrap(),
+            derive_u64("ecbench.challenge.target_seed", &[nonce, epoch])
+        );
+        assert_eq!(
+            spec["measurement"]["seed"].as_u64().unwrap(),
+            derive_u64("ecbench.challenge.algorithm_seed", &[nonce, epoch])
+        );
+    }
+    let arms: Vec<&str> = spec["arms"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|a| a["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(arms, vec!["incumbent", "candidate", "incumbent-aa"]);
+    // The same inputs give the same spec byte for byte; another beacon
+    // gives another one.
+    let again = dir.join("spec-again.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&again),
+    ]);
+    assert!(ok, "challenge spec again: {err}");
+    assert_eq!(
+        std::fs::read_to_string(&again).unwrap(),
+        std::fs::read_to_string(&spec_path).unwrap()
+    );
+    let other = dir.join("spec-other-beacon.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        other_beacon,
+        "--out",
+        &s(&other),
+    ]);
+    assert!(ok, "challenge spec, other beacon: {err}");
+    assert!(err.contains(&format!("epoch {other_epoch}:")), "{err}");
+    assert_ne!(
+        std::fs::read_to_string(&other).unwrap(),
+        std::fs::read_to_string(&spec_path).unwrap()
+    );
+
+    // 4. Refusals before anything runs.
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        "cafe",
+    ]);
+    assert!(
+        !ok && err.contains("at least 16 lowercase hex digits"),
+        "{err}"
+    );
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        r#"{"id":"rho.negation"}"#,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+    ]);
+    assert!(!ok && err.contains("the commitment names"), "{err}");
+    let (_, future_text) = challenge::commit(&ch, &candidate, "future", u64::MAX / 2).unwrap();
+    let future = dir.join("future.json");
+    std::fs::write(&future, future_text).unwrap();
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&future),
+        "--beacon",
+        TEST_BEACON,
+    ]);
+    assert!(!ok && err.contains("in the future"), "{err}");
+    // Procedure 2 and a chosen epoch do not mix.
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--legacy-epoch",
+        "1",
+    ]);
+    assert!(
+        !ok,
+        "a commitment with --legacy-epoch must be refused: {err}"
+    );
+
+    // 5. The CLI's own commitment (wall-clock stamped, so its id differs on
+    // every run) derives the documented epoch too.
+    let cli_cm = dir.join("cli-commitment.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "commit",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--note",
+        "cli",
+        "--out",
+        &s(&cli_cm),
+    ]);
+    assert!(ok, "challenge commit: {err}");
+    let cli_commitment = challenge::Commitment::read(&cli_cm).unwrap();
+    let cli_epoch = documented_epoch(nonce, &cli_commitment.commitment_id, TEST_BEACON);
+    let cli_spec = dir.join("cli-spec.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        candidate_json,
+        "--commitment",
+        &s(&cli_cm),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&cli_spec),
+    ]);
+    assert!(ok, "challenge spec from the CLI commitment: {err}");
+    assert!(err.contains(&format!("epoch {cli_epoch}:")), "{err}");
+
+    // 6. Run the session and judge it.
+    let session = dir.join("s");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec_path),
+        "--out",
+        &s(&session),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run: {err}");
+    let verdict_path = dir.join("verdict.json");
+    let bound_path = dir.join("bound.json");
+    let verdict_args = |extra: &[&str]| -> (bool, String) {
+        let mut a: Vec<String> = [
+            "challenge",
+            "verdict",
+            "--challenge",
+            &s(&chpath),
+            "--dir",
+            &s(&session),
+            "--replay-all",
+            "--bounds",
+            &s(&records),
+            "--root",
+            &s(&dir),
+        ]
+        .iter()
+        .map(|x| x.to_string())
+        .collect();
+        a.extend(extra.iter().map(|x| x.to_string()));
+        let refs: Vec<&str> = a.iter().map(String::as_str).collect();
+        let (ok, _, err) = ecbench(&refs);
+        (ok, err)
+    };
+    let (ok, err) = verdict_args(&[
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&verdict_path),
+        "--bound-out",
+        &s(&bound_path),
+        "--exit-code",
+    ]);
+    assert!(ok, "verdict (procedure 2): {err}");
+    let v = read_json(&verdict_path);
+    assert_eq!(v["schema"], "ecbench.verdict/v1");
+    assert_eq!(v["procedure"], 2);
+    assert_eq!(v["epoch"].as_u64().unwrap(), epoch);
+    assert_eq!(v["commitment"]["commitment_id"], cm.commitment_id);
+    assert_eq!(v["commitment"]["committed_unix_ms"], 1_700_000_000_000u64);
+    assert_eq!(v["commitment"]["beacon"], TEST_BEACON);
+    assert_eq!(v["resamples"], 2000);
+    assert_eq!(v["multiplicity"]["method"], "holm");
+    assert_eq!(v["session"]["spec_matches"], true);
+    assert_eq!(v["audit"]["ok"], true);
+    assert_eq!(v["audit"]["replay_all"], true);
+    assert_eq!(v["audit"]["replays"], v["audit"]["replays_reproduced"]);
+    assert_eq!(v["axes"][0]["axis"], "ops");
+    assert_eq!(v["axes"][0]["pairs"], 32);
+    assert_eq!(v["control"]["ratio"], 1.0);
+    assert_eq!(v["candidate"]["method"], "bsgs.negation");
+    assert_eq!(v["incumbent"]["method"], "rho.plain");
+    // The outcome is a function of counted work, so it is the same on every
+    // run.  BSGS with the negation map counts fewer group operations than
+    // plain rho (ratio below 1) but holds a table that rho does not: the
+    // memory axis is clearly worse (its Holm-adjusted test passes), the ops
+    // axis is a bounded comparison that does not separate, so the verdict is
+    // `regresses`, not an advance and not a trade.
+    assert_eq!(v["outcome"], "regresses", "{}", v["statement"]);
+    assert_eq!(v["advances_on"], serde_json::json!([]));
+    assert_eq!(v["regresses_on"], serde_json::json!(["memory"]));
+    assert_eq!(v["level_moved"], Value::Null);
+    assert_eq!(v["reasons"], serde_json::json!([]));
+    assert_eq!(
+        v["multiplicity"],
+        serde_json::json!({"method": "holm", "alpha": 0.05, "family": ["memory", "ops"]})
+    );
+    let axis = |name: &str| {
+        v["axes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|a| a["axis"] == name)
+            .unwrap_or_else(|| panic!("no axis {name}"))
+    };
+    assert!(
+        axis("ops")["ratio_candidate_over_incumbent"]
+            .as_f64()
+            .unwrap()
+            < 1.0
+    );
+    assert_eq!(axis("memory")["verdict"], "worse");
+    assert!(
+        axis("memory")["p_value"].as_f64().unwrap()
+            < axis("memory")["holm_threshold"].as_f64().unwrap()
+    );
+    assert_eq!(v["incumbent_drift"]["recorded_bound_id"], incumbent_bound);
+    assert_eq!(v["incumbent_drift"]["outside"], false);
+    assert!(v["statement"].as_str().unwrap().starts_with("regresses"));
+    assert!(!bound_path.exists(), "a regression writes no bound");
+
+    // Judging the same session under another beacon is judging it against
+    // somebody else's spec: inadmissible, exit 1, the ratio still reported.
+    let wrong = dir.join("verdict-wrong-beacon.json");
+    let (ok, err) = verdict_args(&[
+        "--commitment",
+        &s(&cmpath),
+        "--beacon",
+        other_beacon,
+        "--out",
+        &s(&wrong),
+        "--exit-code",
+    ]);
+    assert!(!ok, "{err}");
+    let w = read_json(&wrong);
+    assert_eq!(w["outcome"], "inadmissible");
+    assert_eq!(w["epoch"].as_u64().unwrap(), other_epoch);
+    assert_eq!(w["session"]["spec_matches"], false);
+    assert!(w["reasons"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|r| r.as_str().unwrap().contains("not the challenge's spec")));
+    // Without the drift check (`--bounds`) a verdict is not admissible.
+    let no_bounds = dir.join("verdict-no-bounds.json");
+    let mut a = vec![
+        "challenge".to_string(),
+        "verdict".into(),
+        "--challenge".into(),
+        s(&chpath),
+        "--dir".into(),
+        s(&session),
+        "--replay-all".into(),
+        "--root".into(),
+        s(&dir),
+        "--commitment".into(),
+        s(&cmpath),
+        "--beacon".into(),
+        TEST_BEACON.into(),
+        "--out".into(),
+        s(&no_bounds),
+        "--exit-code".into(),
+    ];
+    let refs: Vec<&str> = a.iter().map(String::as_str).collect();
+    let (ok, _, err) = ecbench(&refs);
+    assert!(!ok, "{err}");
+    let nb = read_json(&no_bounds);
+    assert_eq!(nb["outcome"], "inadmissible");
+    assert!(nb["statement"]
+        .as_str()
+        .unwrap()
+        .contains("incumbent drift check was not run"));
+    // Procedure 2 never takes a chosen epoch: no commitment, no verdict.
+    a.truncate(9);
+    a.extend(["--epoch".to_string(), epoch.to_string()]);
+    let refs: Vec<&str> = a.iter().map(String::as_str).collect();
+    let (ok, _, err) = ecbench(&refs);
+    assert!(
+        !ok && err.contains("procedure 2 derives the epoch"),
+        "{err}"
+    );
+
+    // 7. A candidate that is the incumbent: its own commitment, hence its
+    // own epoch, and the paired ratio is exactly 1.
+    let same_json = r#"{"id":"rho.plain"}"#;
+    let same: MethodSpec = serde_json::from_str(same_json).unwrap();
+    let (cm2, text2) =
+        challenge::commit(&ch, &same, "the incumbent itself", 1_700_000_001_000).expect("commit");
+    let cm2path = dir.join("commitment2.json");
+    std::fs::write(&cm2path, text2).unwrap();
+    let epoch2 = documented_epoch(nonce, &cm2.commitment_id, TEST_BEACON);
+    assert_ne!(epoch2, epoch, "another commitment, another epoch");
+    let spec2 = dir.join("spec2.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "spec",
+        "--challenge",
+        &s(&chpath),
+        "--candidate",
+        same_json,
+        "--commitment",
+        &s(&cm2path),
+        "--beacon",
+        TEST_BEACON,
+        "--out",
+        &s(&spec2),
+    ]);
+    assert!(ok, "challenge spec 2: {err}");
+    assert!(err.contains(&format!("epoch {epoch2}:")), "{err}");
+    let session2 = dir.join("s2");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        &s(&spec2),
+        "--out",
+        &s(&session2),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run 2: {err}");
+    let verdict2 = dir.join("verdict2.json");
+    let (ok, _, err) = ecbench(&[
+        "challenge",
+        "verdict",
+        "--challenge",
+        &s(&chpath),
+        "--dir",
+        &s(&session2),
+        "--commitment",
+        &s(&cm2path),
+        "--beacon",
+        TEST_BEACON,
+        "--replay-all",
+        "--bounds",
+        &s(&records),
+        "--root",
+        &s(&dir),
+        "--out",
+        &s(&verdict2),
+        "--exit-code",
+    ]);
+    assert!(ok, "verdict 2: {err}");
+    let v2 = read_json(&verdict2);
+    assert_eq!(v2["procedure"], 2);
+    assert_eq!(v2["epoch"].as_u64().unwrap(), epoch2);
+    assert_eq!(v2["commitment"]["commitment_id"], cm2.commitment_id);
+    assert_eq!(v2["outcome"], "matches", "{}", v2["statement"]);
+    assert_eq!(v2["axes"][0]["ratio_candidate_over_incumbent"], 1.0);
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -2499,6 +3486,8 @@ fn jacobians_and_transfers_verify_and_replay() {
         ]);
         assert!(ok, "{family} replay: {err}");
     }
+}
+
 /// `ecbench work` on committed records is frozen byte for byte: the
 /// snapshot in `tests/fixtures/ecbench/work-v1/expected.jsonl` was written
 /// by the binary before `bitop/v2` existed, and `--unit bitop/v1` is the

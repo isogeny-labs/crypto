@@ -112,10 +112,17 @@ pub fn run<C: SymCurve, R: Rng>(
     rng: &mut R,
 ) -> PlantedReport {
     let t0 = std::time::Instant::now();
-    let r = c.order().expect("planted run needs the subgroup order").clone();
+    let r = c
+        .order()
+        .expect("planted run needs the subgroup order")
+        .clone();
     // Known logs and their points.
-    let fk: Vec<BigUint> = (0..nf).map(|_| rng.gen_biguint_range(&BigUint::one(), &r)).collect();
-    let lk: Vec<BigUint> = (0..nl).map(|_| rng.gen_biguint_range(&BigUint::one(), &r)).collect();
+    let fk: Vec<BigUint> = (0..nf)
+        .map(|_| rng.gen_biguint_range(&BigUint::one(), &r))
+        .collect();
+    let lk: Vec<BigUint> = (0..nl)
+        .map(|_| rng.gen_biguint_range(&BigUint::one(), &r))
+        .collect();
     let fpts: Vec<Pt<C::E>> = fk.iter().map(|k| c.mul(g, k).unwrap()).collect();
     let lpts: Vec<Pt<C::E>> = lk.iter().map(|k| c.mul(g, k).unwrap()).collect();
     let d = rng.gen_biguint_range(&BigUint::one(), &r);
@@ -124,18 +131,39 @@ pub fn run<C: SymCurve, R: Rng>(
     let mut graph = LpGraph::new(r.clone());
     let mut fulls: Vec<FullRelation> = Vec::new();
     let mut generated = 0u64;
-    let sgn = |rng: &mut R| -> i8 { if rng.gen() { 1 } else { -1 } };
+    let sgn = |rng: &mut R| -> i8 {
+        if rng.gen() {
+            1
+        } else {
+            -1
+        }
+    };
     // Collect until the system can determine d (nf + 1 unknowns), with a
     // margin, or the budget runs out.
     while generated < max_relations && fulls.len() < nf + 8 {
         generated += 1;
         let u: f64 = rng.gen();
         let (fb, lp): (Vec<(u32, i8)>, Vec<(LpId, i8)>) = if u < mix.two_lp {
-            (vec![], vec![(rng.gen_range(0..nl as u64), sgn(rng)), (rng.gen_range(0..nl as u64), sgn(rng))])
+            (
+                vec![],
+                vec![
+                    (rng.gen_range(0..nl as u64), sgn(rng)),
+                    (rng.gen_range(0..nl as u64), sgn(rng)),
+                ],
+            )
         } else if u < mix.two_lp + mix.one_lp {
-            (vec![(rng.gen_range(0..nf as u32), sgn(rng))], vec![(rng.gen_range(0..nl as u64), sgn(rng))])
+            (
+                vec![(rng.gen_range(0..nf as u32), sgn(rng))],
+                vec![(rng.gen_range(0..nl as u64), sgn(rng))],
+            )
         } else {
-            (vec![(rng.gen_range(0..nf as u32), sgn(rng)), (rng.gen_range(0..nf as u32), sgn(rng))], vec![])
+            (
+                vec![
+                    (rng.gen_range(0..nf as u32), sgn(rng)),
+                    (rng.gen_range(0..nf as u32), sgn(rng)),
+                ],
+                vec![],
+            )
         };
         // The relation point in the group, and its (a, b) from the logs.
         let mut log = BigUint::zero();
@@ -153,7 +181,11 @@ pub fn run<C: SymCurve, R: Rng>(
         // Group check of the planted relation itself: [a]G + [b]Q = Σ ±X.
         let lhs = combo(c, &[(g, &a), (&q, &b)]);
         let refs: Vec<(&Pt<C::E>, &BigUint)> = terms.iter().map(|(p, k)| (p, k)).collect();
-        assert_eq!(lhs, combo(c, &refs), "planted relation is false in the group");
+        assert_eq!(
+            lhs,
+            combo(c, &refs),
+            "planted relation is false in the group"
+        );
         if let Some(full) = graph.add(Relation { a, b, fb, lp }) {
             fulls.push(full);
         }
@@ -164,8 +196,11 @@ pub fn run<C: SymCurve, R: Rng>(
     for full in &fulls {
         assert!(graph.replay(full));
         let lhs = combo(c, &[(g, &full.a), (&q, &full.b)]);
-        let refs: Vec<(&Pt<C::E>, &BigUint)> =
-            full.fb.iter().map(|(i, k)| (&fpts[*i as usize], k)).collect();
+        let refs: Vec<(&Pt<C::E>, &BigUint)> = full
+            .fb
+            .iter()
+            .map(|(i, k)| (&fpts[*i as usize], k))
+            .collect();
         if lhs == combo(c, &refs) {
             checked += 1;
         }
@@ -212,7 +247,10 @@ mod tests {
     fn check(rep: &PlantedReport) {
         assert!(rep.recovered, "{rep:?}");
         assert_eq!(rep.group_checks_passed, rep.full_relations, "{rep:?}");
-        assert!(rep.graph.full_from_cycles > 0, "no relation came through a cycle: {rep:?}");
+        assert!(
+            rep.graph.full_from_cycles > 0,
+            "no relation came through a cycle: {rep:?}"
+        );
         assert!(rep.r_bits >= 130);
     }
 
@@ -220,7 +258,10 @@ mod tests {
     fn planted_double_large_prime_recovers_d_on_ecc2_131() {
         let (c, g, _) = BinaryW::ecc2_131();
         let mut rng = StdRng::seed_from_u64(21);
-        let mix = Mix { one_lp: 0.4, two_lp: 0.4 };
+        let mix = Mix {
+            one_lp: 0.4,
+            two_lp: 0.4,
+        };
         check(&run(&c, &g, 12, 24, mix, 4000, &mut rng));
     }
 
@@ -228,7 +269,10 @@ mod tests {
     fn planted_double_large_prime_recovers_d_on_eccp_131() {
         let (c, g, _) = PrimeW::eccp_131();
         let mut rng = StdRng::seed_from_u64(22);
-        let mix = Mix { one_lp: 0.4, two_lp: 0.4 };
+        let mix = Mix {
+            one_lp: 0.4,
+            two_lp: 0.4,
+        };
         check(&run(&c, &g, 12, 24, mix, 4000, &mut rng));
     }
 }

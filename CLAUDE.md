@@ -26,6 +26,16 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+Run authorized x86 CPU experiments and crypto benchmarks through
+[`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
+(owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
+submit from the agent, and verify source/image identity and S3 hashes. L2
+benchmarks require native L2/replay/A/A admission. Requested resume uses the
+separate CRIU/EBS contract. The
+experiment director freezes this route in the task card; the executor runs it
+unchanged. Preserve explicitly requested environments and keep local development
+checks local. Loading instructions alone does not authorize an experiment.
+
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
 makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
@@ -40,6 +50,11 @@ breakthrough. Report each row's gap to the matched rho as the distance
 remaining, not as a pass/fail gate. Relabelling and accounting changes are
 not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
 iterative improvement of the index-calculus baseline".
+
+Look up curve facts in the curve database before computing them or
+scanning `docs/curves/*.json`: MCP server `ecdb` (export `ECDB_TOKEN` from
+secret `ecdb/api` first). Rules and the guide: AGENTS.md, "Querying the curve
+database (ecdb)", and [`ecdb/docs/AGENTS.md`](ecdb/docs/AGENTS.md).
 
 Before surveying for ECDLP leads or proposing one, read the lead atlas in the
 sibling crypto-autoresearcher checkout (`knowledge/leads/ecdlp/`,
