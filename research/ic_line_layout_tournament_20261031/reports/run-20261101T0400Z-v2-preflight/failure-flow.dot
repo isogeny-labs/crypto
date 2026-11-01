@@ -1,0 +1,53 @@
+digraph tournament_v2_preflight {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    pad="0.25",
+    nodesep="0.55",
+    ranksep="0.8",
+    fontname="DejaVu Sans",
+    label="Relation-solving tournament v2 · frozen staged execution",
+    labelloc="t",
+    fontsize=20
+  ];
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="DejaVu Sans",
+    fontsize=12,
+    penwidth=1.5,
+    margin="0.18,0.12"
+  ];
+  edge [fontname="DejaVu Sans", fontsize=10, penwidth=1.5, color="#475569"];
+
+  frozen [
+    label="Protocol v2 merged\nfixed source · fixed seeds · fixed gates",
+    fillcolor="#dbeafe",
+    color="#2563eb"
+  ];
+  contracts [
+    label="Qualification contracts + build\nPASS\nsource and artifact bound",
+    fillcolor="#dcfce7",
+    color="#16a34a"
+  ];
+  failed [
+    label="Single L2 qualification\nTERMINAL FAILURE\nresult 23 · wrapper 26\nno Pod UID · no results URI",
+    fillcolor="#fee2e2",
+    color="#dc2626"
+  ];
+  stopped [
+    label="Frozen stop rule applied\nscientific jobs attempted: 0 / 2\nretries: 0",
+    fillcolor="#fef3c7",
+    color="#d97706"
+  ];
+  claim [
+    label="No performance rows\nno analyzer export\nE2E speedup NOT ESTABLISHED",
+    fillcolor="#f1f5f9",
+    color="#475569"
+  ];
+
+  frozen -> contracts [label="dispatch exactly once"];
+  contracts -> failed [label="launch fixed request"];
+  failed -> stopped [label="accepted L2 = false"];
+  stopped -> claim [label="preserve evidence boundary"];
+}
