@@ -1,12 +1,22 @@
 {
   "schema": "prime-shared-coefficient.experiment-matrix/v1",
   "created": "2026-10-31",
+  "updated": "2026-11-01",
   "lead": {
     "id": "shared-coefficient-solver-tournament",
     "rank_in_parent_review": 2,
     "class": "open_unexamined_solver_mechanism",
     "parent": "research/prime_ic_lead_review_20261031/lead-matrix.json",
     "claim_scope": "solver discriminator first; no asymptotic or ECDLP speedup claim"
+  },
+  "parent_protocol_alignment": {
+    "status": "e1_retained_performance_draft_superseded_before_data",
+    "authoritative_protocol": "research/prime_ic_lead_review_20261031/PROTOCOL.md",
+    "fixed_arity": 3,
+    "natural_query_exponent_gate": "corrected upper interval e < 0.5",
+    "reusable_setup_exponent_gate": "corrected upper interval a < 1.5",
+    "retired_design": "variable arity m3/m5/m7/m9 with 0.85/0.95 screening thresholds",
+    "study_rows_observed_before_correction": 0
   },
   "stages": [
     {
@@ -37,7 +47,7 @@
     {
       "id": "E1",
       "title": "backend representation equivalence",
-      "status": "next",
+      "status": "sat_and_msolve_subgates_frozen_unrun_cvc5_proof_ineligible",
       "affected_performance_data": false,
       "arms": [
         "canonical evaluator",
@@ -50,28 +60,39 @@
       "pass": "all enumerable projected model sets equal; every model replays; every accepted UNSAT certificate verifies; mutations fail",
       "fail": "block benchmarking and report backend/target mismatch",
       "open_obligations": [
-        "CNF lowering",
-        "CNF-XOR lowering",
-        "model projection",
-        "proof production and independent checking",
-        "pinned solver hashes"
-      ]
+        "execute frozen CaDiCaL/CNF and CryptoMiniSat/CNF-XOR panel",
+        "execute frozen msolve F17 base-field projected-model cross-check",
+        "retain independently checked UNSAT coverage; msolve and cvc5 cannot supply it"
+      ],
+      "frozen_protocols": [
+        "E1_PROTOCOL.md",
+        "E1_COMPARATOR_PROTOCOL.md",
+        "e1-comparator-freeze.json",
+        "e1-comparator-inputs.sha256"
+      ],
+      "cvc5_disposition": {
+        "mandatory": false,
+        "scope": "optional SAT-model cross-check only",
+        "reason": "version 1.4.2 requires trusted finite-field proof rewrites and cannot emit supported Alethe finite-field terms"
+      }
     },
     {
       "id": "E2",
-      "title": "disjoint scratch preflight and freeze",
+      "title": "parent-protocol integration and prospective freeze",
       "status": "blocked",
-      "sample": "24 scratch instances: 2 rungs x 3 classes x 4 instances",
       "outputs": [
-        "frozen field/curve cells and protocol-derived seeds",
-        "common timeout and memory limit",
-        "detector and isolation receipt",
-        "power receipt",
-        "analysis and binary hashes"
+        "decision whether this IR is equivalent to the parent fixed-m3 semantic object or a separate candidate",
+        "complete projected-model equivalence on every enumerable shared cell if equivalence is claimed",
+        "production typed fixed-m3 IR and source-bound Fp trail theory",
+        "independent explanation and admitted-theory proof checker",
+        "reconciled cold/setup/online/certificate instruction ledger",
+        "frozen resource, power, seed, analysis and checkpoint receipts"
       ],
       "blockers": [
         "E1",
-        "solver binaries",
+        "semantic-object integration decision",
+        "durable checkpoint gate",
+        "proof-bearing UNSAT coverage",
         "perf access",
         "authorized isolated runner",
         "power analysis"
@@ -79,40 +100,47 @@
     },
     {
       "id": "E3",
-      "title": "held-out exact-enumeration/F4/CDCL/XOR/QF_FF tournament",
-      "status": "draft_unfrozen",
+      "title": "fixed-m3 complete-cost CDCL(T)/Fp screen",
+      "status": "not_admitted_parent_hardened_draft",
+      "fixed_arity": 3,
       "rungs": [
-        "m3-t3",
-        "m5-t4",
-        "m7-t5",
-        "m9-t6"
+        "s6",
+        "s7",
+        "s8",
+        "s9",
+        "s10",
+        "s11",
+        "s12",
+        "s13",
+        "s14"
       ],
+      "regression_coordinate": "actual log2(p)/3 after prime rounding",
       "target_classes": [
         "natural",
         "planted",
         "exact-unsat"
       ],
       "instances_per_class_rung": 8,
-      "semantic_instances": 96,
-      "warmups": 1,
-      "measured_replicates": 3,
+      "semantic_instances": 216,
       "candidate_arms": [
-        "cdcl-cnf",
-        "xor-cnf",
-        "qf-ff"
+        "cdcl-t-fp"
       ],
       "baselines": [
         "enum-ref",
         "f4-base"
       ],
       "controls": [
-        "cdcl-aa",
+        "cdcl-t-aa",
         "planted-positive",
-        "support-and-model-matched-null"
+        "support-and-model-matched-null",
+        "qf-ff-sat-model-diagnostic",
+        "pure-cnf-encoding-cost"
       ],
-      "advance": "all correctness gates; four natural rungs; corrected upper slope CI <= 0.85 on largest three; below F4 instructions on largest two common rungs outside A/A",
-      "not_advance": "corrected lower slope CI >= 0.95 for three consecutive rungs, or every SAT bundle censors before F4 on both largest common rungs",
-      "otherwise": "inconclusive"
+      "population_rule": "natural rows alone estimate e; planted and exact-unsat are separately reported controls",
+      "advance": "complete verified natural panel and all controls; reconciled ledgers; frozen power; upper intervals e < 0.5 and a < 1.5 outside A/A spread",
+      "not_advance": "on the same complete valid powered panel, a lower interval has e >= 0.5 or a >= 1.5",
+      "otherwise": "inconclusive, including any natural timeout, OOM, unknown, unproved UNSAT, missing rung or failed control",
+      "this_representation_entry": "requires E2 prospective amendment; E1 equivalence alone does not admit it"
     },
     {
       "id": "E4",
@@ -140,12 +168,13 @@
     }
   ],
   "current_environment": {
-    "msolve": "absent",
-    "cvc5": "absent",
-    "cadical": "absent",
-    "cryptominisat": "absent",
+    "msolve": "pinned local development build; no study input run",
+    "cvc5": "pinned local development build; proof-ineligible for finite-field UNSAT",
+    "cadical": "pinned local development build; no study input run",
+    "cryptominisat": "pinned local development build; no study input run",
     "perf": "absent",
-    "aws_identity": "absent",
+    "checkpoint_authorization": "absent",
+    "isolated_custom_toolchain_image": "absent",
     "scientific_run_authorized_or_started": false
   }
 }

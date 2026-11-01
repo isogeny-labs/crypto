@@ -8,6 +8,11 @@ use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
 
+pub mod boolean;
+pub mod e1;
+pub mod e1_msolve;
+pub mod msolve;
+
 pub const IR_SCHEMA: &str = "prime-shared-coefficient.ir/v1";
 const CONSTRUCTION: &str = "odd-arity-selected-chart-remainder-tower";
 const MAX_ARITY: usize = 255;
