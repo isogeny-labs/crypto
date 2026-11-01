@@ -41,6 +41,8 @@ for x,f in zip(xi,labels):
  ax.text(x+.18,int(kernel_by_family[f]['square_dimension'])+.3,kernel_by_family[f]['square_dimension'],ha='center',fontsize=9)
 ax.set_xticks(xi,['Mixed (all76 columns)','Cubic (all324 columns)']);ax.set_ylabel('Dimension / column count');ax.set_title('Full combinations versus individual zero outputs')
 ax.set_ylim(0,max(int(r['square_dimension']) for r in kernel_rows)*1.3+2);ax.legend(frameon=False,fontsize=8);fig.tight_layout();fig.savefig(h/'kernels62.svg');plt.close(fig)
+diagram='<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="155" viewBox="0 0 1000 155"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#205984"/></marker></defs><g fill="none" stroke="#205984" stroke-width="2" marker-end="url(#arrow)"><path d="M145,76 L190,38"/><path d="M145,76 L190,114"/><path d="M355,38 L405,76"/><path d="M355,114 L405,76"/><path d="M575,76 H625"/><path d="M800,76 H845"/></g><g fill="#eef5fa" stroke="#205984" stroke-width="1.5"><rect x="5" y="48" width="140" height="55" rx="6"/><rect x="190" y="10" width="165" height="55" rx="6"/><rect x="190" y="86" width="165" height="55" rx="6"/><rect x="405" y="48" width="170" height="55" rx="6"/><rect x="625" y="48" width="175" height="55" rx="6"/><rect x="845" y="48" width="150" height="55" rx="6"/></g><g font-family="sans-serif" font-size="15" text-anchor="middle" fill="#17384c"><text x="75" y="71">Actual R61 field</text><text x="75" y="91">degree 32</text><text x="272" y="33">Squared-basis inverse</text><text x="272" y="53">32 by 32</text><text x="272" y="109">Generator formula</text><text x="272" y="129">pair arithmetic</text><text x="490" y="71">435 source identities</text><text x="490" y="91">870 roots compared</text><text x="712" y="71">Complete binary kernels</text><text x="712" y="91">76 / 324 inputs</text><text x="920" y="71">Explicit root bases</text><text x="920" y="91">dimensions 10 / 128</text></g></svg>'
+(h/'pipeline62.svg').write_text(diagram+'\n')
 status=collections.Counter(r['status'] for r in result['runs'])
 table=[]
 for r in result['runs']:
@@ -74,6 +76,9 @@ divisors and global differential regularity are separate obligations.
 Wall times are native receipt intervals, not controlled performance comparisons.
 Lean compile and audit intervals were not recorded by the proof driver.
 
+#image("pipeline62.svg", width: 100%)
+Source identities, complete kernels and roots are separately checked stages.
+
 #pagebreak()
 = Complete square subspaces and generator route
 #image("kernels62.svg", width: 100%)
@@ -84,7 +89,8 @@ The independent Rust checker replays both full binary matrices and kernels.
 
 == Direct generator route and proof scope
 For a grouped characteristic-two source polynomial,
-$ P(t)=a^2+u b^2+t c^2+u t d^2 $, put $q=c^2+u d^2$.
+$ P(t)=a^2+u b^2+t c^2+u t d^2 $.
+Put $q=c^2+u d^2$.
 With $P(t)=0$ and a checked nonzero derivative/inverse,
 $ t=((a c+u b d)/q)^2+u((a d+b c)/q)^2. $
 The direct route uses pair arithmetic rather than reading the squared-basis
@@ -131,6 +137,10 @@ CPU0, -j1 -M4096, unlimited virtual address space. No timing claim.
 Sources: R61/SQUARE-DECOMPOSITION61.md; R52/CM.md;
 #link("https://www.singular.uni-kl.de/index.php/singular.pdf")[Singular manual].
 '''
+for old,new in [('all32','all 32'),('all435','all 435'),('all76mixed','all 76 mixed'),('324cubic','324 cubic'),('complete435','complete 435'),('13920','13,920'),('compares870','compares 870'),('Lean4.34.1','Lean 4.34.1'),('degree7','degree 7'),('degree16','degree 16'),('degree112','degree 112'),('full61','full 61'),('Hecke/order11','Hecke/order-11'),('limits:1200','limits: 1200'),('Lean:1200','Lean: 1200'),('4GiB','4 GiB'),('seconds,4','seconds, 4'),('all76','all 76')]:
+ text=text.replace(old,new)
 (h/'report.typ').write_text(text.rstrip()+'\n')
+for name in ['cohort62.svg','kernels62.svg','pipeline62.svg']:
+ path=h/name;path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
 typst.compile(str(h/'report.typ'),output=str(h/'report.pdf'))
 print(json.dumps({'attempts':len(result['runs']),'status':dict(status),'cohort':data}))

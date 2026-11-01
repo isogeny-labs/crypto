@@ -23,3 +23,5 @@ Native matrix62-01,split62-02,check62-01,direct62-01 discharge their named
 finite symbolic identities over the retained source. They do not formalize
 normalization,proper polarizations,global differential regularity,quotient
 saturation,selected factor action or arbitrary reverse-divisor evaluation.
+
+Accepted square-lean62-03:compile0/audit0,all12authored claims,0 failing and0 trusted-native declarations. Failed01/02 retained; compile has two redundant-tactic warnings and shared audit tool a String.mk deprecation.

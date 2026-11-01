@@ -4,6 +4,9 @@ The degree32 source now has a checked full square operator and two exact
 routes to decompositions f=g²+u h². All435 retained functions pass; the
 direct generator route matches both matrix-produced roots in870 comparisons.
 A fresh whole-source replay also checks every input,identity and operator.
+Complete F2 square kernels have dimensions10(mixed76) and128(cubic324);
+all138 serialized source roots are checked. See HALF-POLE-LEAD62.md for
+the resulting controlled-pole construction and its geometric premises.
 
 - [Mathematical account](CM.md) and [terminal results](results.json).
 - [Formal scope](PROOF_MAP.md) and [Lean source](lean/Square62.lean).

@@ -1,6 +1,7 @@
 # Continue the full construction after R62
 
-1. Finish the complete normal-order and infinity bridge for the level77
+1. Use HALF-POLE-LEAD62.md to transport actual involution/descent on the
+   new10/128 root spaces and certify their complete poles. Finish the complete normal-order and infinity bridge for the level77
    source. Bind the retained32-dimensional normal algebra and trace-dual
    basis to the actual R61 F2(u) source, checking every product and coordinate
    change. Trace duality for an unproved/nonmaximal order is insufficient.
