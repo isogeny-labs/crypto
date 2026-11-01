@@ -49,3 +49,14 @@ process was retained, not restarted. Validation outcomes are recorded below.
 Reference basis: residual-filter/README.md (exact x rejection and affine
 equations), oracle-filter/README.md (Bloom reference), and the completed round23
 protocol and report. No new arithmetic, novelty or speedup claim is made.
+
+## Frozen validation
+
+Protocol hash: a6522d1d780ff9991aee96f386d1fe5234de77a9d31275b8681ee08b1186b321.
+48 pinned candidate library tests pass. Native protocol validation passes after
+freeze. Native suite reports 14 passed and one ignored historical parity test;
+two profile-only tests return without work for this ordinary panel, leaving
+12 applicable checks. Strict native Clippy, formatting, shell syntax and all
+five executable identity checks pass. Native exporter rebuilt for round24.
+No study timing rows were generated. An observation of the native log before
+metadata copying completed found no log yet; the same process later passed.
