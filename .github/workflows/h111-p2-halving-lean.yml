@@ -1,0 +1,35 @@
+name: H111 p2 halving Lean proof
+
+on:
+  pull_request:
+    paths:
+      - 'research/p2_halving_carry_20261101/**'
+      - '.github/workflows/h111-p2-halving-lean.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/p2_halving_carry_20261101/
+            /tools/lean/
+            /.github/workflows/h111-p2-halving-lean.yml
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build and audit H111
+        run: tools/lean/proof-gate.sh --out receipts research/p2_halving_carry_20261101
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: h111-lean-receipt
+          path: receipts/

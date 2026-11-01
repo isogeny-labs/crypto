@@ -13,6 +13,16 @@ Stable scientific digest:
 383eb1faf53a4fe17088780cb71528df3f20913abdc022c4348f411c26ce4fd5
 ```
 
+## Formal build
+
+The actual Lean source is `H111P2HalvingCarry.lean` in this directory; the
+`formal/` path in the frozen result report is a path error. The adjacent Lake
+project pins Lean v4.34.1 and Mathlib at
+`d13f23b723b8a846827a245b89c10fc7d3f11612`. From the repository root,
+run `tools/lean/proof-gate.sh research/p2_halving_carry_20261101` to build the
+source and audit its transitive theorem axioms. The targeted pull request
+workflow runs that same command and retains its receipt.
+
 ## Reproduce
 
 ```bash
