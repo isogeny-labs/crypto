@@ -156,6 +156,25 @@ class CampaignSubmitTests(unittest.TestCase):
             self.assertEqual(tampered.returncode, 2)
             self.assertIn("budget bytes differ", tampered.stderr)
 
+    def test_rehashed_non_native_plan_is_rejected_before_local_pass(self):
+        for field, value in (("seed", "invalid-native-u64"),
+                             ("seed", -1), ("seed", 1 << 64), ("seed", True),
+                             ("split_rule", "invalid-native-split"),
+                             ("factor_base_size", 1), ("degree_bound", 33)):
+            with self.subTest(field=field, value=value), tempfile.TemporaryDirectory() as name:
+                root = pathlib.Path(name)
+                paths = admitted_fixture(root)
+                plan = json.loads((root / "plan.json").read_text())
+                plan[field] = value
+                plan_file_sha = write(root / "plan.json", plan)
+                admission = json.loads((root / "admission.json").read_text())
+                admission["plan_file_sha256"] = plan_file_sha
+                write(root / "admission.json", admission)
+                result = subprocess.run([sys.executable, str(HERE / "ml_dataset_campaign_submit.py"),
+                                         "--dry-run", *paths], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("plan ", result.stderr)
+
     def test_submit_not_supported_even_with_self_consistent_fixture(self):
         with tempfile.TemporaryDirectory() as name:
             root = pathlib.Path(name)

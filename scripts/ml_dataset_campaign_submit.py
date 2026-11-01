@@ -23,6 +23,8 @@ import ml_dataset_full_protocol_check as protocol_check  # noqa: E402
 PLAN_FIELDS = ("schema", "field_sizes", "arities", "families", "solvers",
                "curve_seeds", "generators", "keys", "seed", "factor_base_size",
                "degree_bound", "work_limit", "twists", "protocol_sha256", "split_rule")
+U64_MAX = (1 << 64) - 1
+U32_MAX = (1 << 32) - 1
 
 
 def need(condition: bool, reason: str) -> None:
@@ -36,9 +38,50 @@ def checked_file(path: str) -> tuple[dict, str]:
     return value, digest
 
 
+def validate_native_plan(plan: dict) -> None:
+    """Mirror the typed DatasetPlan fields and natural-plan validation bounds."""
+    need(set(plan) == set(PLAN_FIELDS), "plan fields differ from native DatasetPlan")
+    need(plan["schema"] == "crypto.ml-dataset.plan/v1" and plan["twists"] is True,
+         "plan must be natural with paired twists")
+    need(plan["split_rule"] == "curve-twist-component-sha256-v1",
+         "plan split_rule differs from native rule")
+    for key, maximum in (("seed", U64_MAX), ("curve_seeds", U64_MAX),
+                         ("generators", U64_MAX), ("keys", U64_MAX),
+                         ("factor_base_size", U64_MAX), ("degree_bound", U32_MAX),
+                         ("work_limit", U64_MAX)):
+        value = plan[key]
+        need(type(value) is int and 0 <= value <= maximum,
+             f"plan {key} is not a native unsigned integer")
+    for key in ("curve_seeds", "generators", "keys", "work_limit"):
+        need(plan[key] > 0, f"plan {key} must be positive")
+    need(2 <= plan["factor_base_size"] <= 4096 and 1 <= plan["degree_bound"] <= 32,
+         "plan factor base or degree outside native bounds")
+    for key, minimum, maximum in (("field_sizes", 3, 61), ("arities", 2, 15)):
+        values = plan[key]
+        need(isinstance(values, list) and values and
+             all(type(x) is int and minimum <= x <= maximum for x in values) and
+             len(values) == len(set(values)), f"plan {key} violates native axis bounds")
+    for key, allowed in (("families", {"koblitz", "binary", "prime"}),
+                         ("solvers", {"enumerate", "pdp", "bsgs", "sat", "weil",
+                                      "weil-descent", "f4", "f5", "f6", "root", "pkm",
+                                      "double-large-prime"})):
+        values = plan[key]
+        need(isinstance(values, list) and values and
+             all(isinstance(x, str) and x in allowed for x in values) and
+             len(values) == len(set(values)), f"plan {key} violates native axis bounds")
+    need(isinstance(plan["protocol_sha256"], str) and
+         protocol_check.SHA256.fullmatch(plan["protocol_sha256"]),
+         "plan protocol_sha256 is not a native digest")
+    cells = 2
+    for value in (len(plan["field_sizes"]), len(plan["arities"]), len(plan["families"]),
+                  len(plan["solvers"]), plan["curve_seeds"], plan["generators"], plan["keys"]):
+        cells *= value
+        need(cells <= U64_MAX, "plan cell count overflows native u64")
+
+
 def native_plan_binding_sha256(plan: dict) -> str:
     """Mirror DatasetPlan::binding_sha256's typed serde field order."""
-    need(set(plan) == set(PLAN_FIELDS), "plan fields differ from native DatasetPlan")
+    validate_native_plan(plan)
     ordered = {key: plan[key] for key in PLAN_FIELDS}
     return hashlib.sha256(launch.canonical(ordered)).hexdigest()
 
