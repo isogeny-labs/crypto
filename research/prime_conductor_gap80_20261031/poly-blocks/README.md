@@ -49,6 +49,11 @@ One block holds at most 65,536 roots; a context file holds at most 64 points.
 the artifact pointer commit establishes completion, not its creation-time
 manifest. To hydrate after migration, from the repository root:
 
+Upload/full-byte readback completed in migration commit `80c8c992d`,
+artifact-autofix run `41258219926`. The committed artifact pointer matches
+the locally validated product digest in `checks.json`; `storage-receipt.json`
+records that outcome separately from the creation-time manifest.
+
 ```sh
 python3 tools/artifacts/artifacts.py pull research/prime_conductor_gap80_20261031/poly-blocks
 ```
