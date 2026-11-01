@@ -1,0 +1,41 @@
+name: N83 projector Lean proof
+
+on:
+  pull_request:
+    paths:
+      - 'research/n83_jacobian_projector_20261031/**'
+      - '.github/workflows/n83-projector-lean.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/n83_jacobian_projector_20261031/
+            /research/ghs_cover_decomposition_20261025/
+            /research/ghs_generalized_20261024/lean/
+            /tools/lean/
+            /.github/workflows/n83-projector-lean.yml
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build and audit N83 projector
+        run: tools/lean/proof-gate.sh --out receipts research/n83_jacobian_projector_20261031
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: n83-projector-lean-receipt
+          path: receipts/

@@ -2423,6 +2423,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     let id = full_price::base_of(&m.id)
         .or(wordram_price::base_of(&m.id))
         .unwrap_or(m.id.as_str());
+    three_leads_applicable(m, inst, curve)?;
     hyper_ic_variant_guard(m, inst, curve)?;
     if id == "rho.multitarget_pooled" {
         let batch = param_u64(m, "batch")?;
@@ -2548,6 +2549,23 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     }
 }
 
+fn three_leads_applicable(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+) -> Result<(), String> {
+    if !m.id.contains(".three_leads_") {
+        return Ok(());
+    }
+    let Instance::ThreeLeads(study) = inst else {
+        return Err(format!(
+            "three-leads methods require a frozen three_leads curve fixture; {} is {}",
+            curve.slug, curve.family
+        ));
+    };
+    super::three_leads::applicable(m, study)
+}
+
 /// What `solve_ext` runs on a GLS or subfield curve: the generic methods,
 /// and the endomorphism-orbit rho of the instance's own family.  Anything
 /// else is the refusal `solve_ext` raises on every execution.
@@ -2627,9 +2645,7 @@ pub fn solve_measured(
 ) -> Result<SolveReport, String> {
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
-    if m.id.contains(".three_leads_") && !matches!(inst, Instance::ThreeLeads(_)) {
-        return Err("three-leads methods require a frozen three_leads curve fixture".into());
-    }
+    three_leads_applicable(m, inst, curve)?;
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -9132,6 +9148,39 @@ mod accounting_tests {
         )
         .unwrap_err();
         assert!(err.contains("no gls_fp2 implementation"), "{err}");
+    }
+
+    #[test]
+    fn plan_checks_three_leads_variant_families_before_execution() {
+        let scholten = json!({
+            "kind": "three_leads", "p": 739, "n": 2, "modulus": 1,
+            "a": 493102, "b": 193650, "group_order": 546352, "r": 34147,
+            "gx": 433246, "gy": 59741, "family": "scholten", "parameter": 0
+        });
+        let subfield = json!({
+            "kind": "three_leads", "p": 2, "n": 6, "modulus": 67,
+            "a": 3, "b": 3, "group_order": 56, "r": 7,
+            "gx": 1, "gy": 58, "family": "subfield", "parameter": 3
+        });
+        let params = json!({
+            "trial_cap": "2000", "oracle": "subtract",
+            "random_base": "0", "base_seed": "17"
+        });
+        for id in [
+            "ic.three_leads_decomposition_v1",
+            "ic.three_leads_decomposition_v2",
+        ] {
+            let err = plan_arm(scholten.clone(), id, params.clone()).unwrap_err();
+            assert!(err.contains("subfield or tower fixture"), "{id}: {err}");
+            plan_arm(subfield.clone(), id, params.clone()).unwrap();
+        }
+        let err = plan_arm(
+            json!({"kind": "prime_search", "bits": 12, "seed": 5}),
+            "rho.three_leads_plain_v1",
+            json!({"trial_cap": "2000"}),
+        )
+        .unwrap_err();
+        assert!(err.contains("frozen three_leads curve fixture"), "{err}");
     }
 
     #[test]

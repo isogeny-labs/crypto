@@ -72,8 +72,8 @@ class FullProtocolCheckTest(unittest.TestCase):
 
     def test_admission_requires_source_analysis_image_grant_budget(self):
         errors = checker.validate(draft(), admit=True)
-        for field in ("instrument.commit", "analysis_plan.script.sha256", "admission.image",
-                      "admission.worker_grant", "admission.budget", "freeze.status"):
+        for field in ("instrument.commit", "analysis_plan.script.sha256", "wave_admission.image",
+                      "wave_admission.worker_grant", "wave_admission.budget", "freeze.status"):
             self.assertTrue(any(field in x for x in errors), field)
 
 

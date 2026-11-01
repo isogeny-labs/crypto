@@ -86,6 +86,7 @@ pub mod koblitz_descent;
 pub mod legacy;
 pub mod methods;
 pub mod negation_strong;
+pub mod optimization;
 pub mod plane_quartic;
 pub mod prime_orbit;
 pub mod record;
