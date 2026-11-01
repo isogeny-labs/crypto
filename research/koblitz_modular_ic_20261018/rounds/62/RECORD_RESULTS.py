@@ -44,9 +44,9 @@ for d in sorted((h/'runs').iterdir()):
  row['artifacts']=[{'path':str(p.relative_to(h)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in sorted(d.iterdir()) if p.is_file()]
  rows.append(row)
 accepted={r['attempt']:r for r in rows if r['status']=='accepted'}
-required=['matrix62-01','split62-02','check62-01','direct62-01','square-lean62-02']
+required=['matrix62-01','split62-02','check62-01','direct62-01','kernel62-01','square-lean62-03']
 assert all(n in accepted for n in required),(required,list(accepted))
-result={'schema':'koblitz.results/v1','round':62,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':accepted['square-lean62-02']['audited_declarations'],'protocol_metadata_disclosure':'Historical versions immutable; v4 repairs ideal-comparison syntax, v5 freezes independent435 replay and direct formula before their data'}
+result={'schema':'koblitz.results/v1','round':62,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':accepted['square-lean62-03']['audited_declarations'],'protocol_metadata_disclosure':'Historical versions immutable; v4 repairs ideal-comparison syntax, v5 freezes independent435 replay and direct formula before their data'}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 protocols=[]
 for row in rows:

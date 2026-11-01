@@ -62,3 +62,15 @@ or timing comparison. Reuse rational coefficient splitter, independently
 construct generator pairs and all monomial pairs; no squared-basis matrix
 or its inverse is read by DIRECT62. Check all source/cache donor hashes.
 Fresh attempts check62-01 then direct62-01, one math job at a time.
+
+## Complete F2 square-kernel freeze
+KERNEL62 consumes accepted435f/g/h, rebinds all324cubic/76mixed inputs.
+For each32source monomial clear all rational coefficient denominators across
+the complete family using checked nonzero polynomial common multiples.
+Every cleared polynomial is reconstructed in all u monomials, one F2 row
+per degree/source monomial. Kernel entries must be0or1: this is not a
+F2(u)-kernel. Check M K=0,rankM+dimK=columns,rankK=dimK; verify every
+kernel combination has full-source odd partzero and g²=f. Reject changed
+kernel column and each changed root; save complete matrices/roots.
+Run all76mixed and324cubic in one fresh kernel62-01, same limits, no
+filtering on zero columns/cost. No predicted kernel dimension is assumed.

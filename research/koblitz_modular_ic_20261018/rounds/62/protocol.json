@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R62-COMPLETE435-AND-GENERATOR",
-  "version": 5,
+  "version": 6,
   "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
   "claims": [
     {
@@ -18,6 +18,11 @@
       "id": "generator435",
       "class": "exact_computation",
       "statement": "Primitive generator derivative formula and pair arithmetic independently match both matrix-produced roots for all435 source functions"
+    },
+    {
+      "id": "square_kernel",
+      "class": "exact_computation",
+      "statement": "Complete F2 odd-part kernels on all76mixed and324cubic functions,with checked denominator clearing,binary row reconstruction,rank/kernel dimension and every whole-source square root"
     }
   ],
   "arms": {
@@ -79,10 +84,13 @@
     "changed-root rejection",
     "435 actual source rebindings and435 whole-source identities in each independent replay",
     "32 generated basis pairs and870 direct/matrix root comparisons",
-    "actual derivative inverse and source generator formula"
+    "actual derivative inverse and source generator formula",
+    "F2 odd ranks and complete square-kernel dimensions for76mixed/324cubic",
+    "all denominator clearing and binary row reconstructions",
+    "every full-source square root and changed-kernel/root negative controls"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh check62-01 CHECK62.sing CHECK62_ALL_CHECKS_PASS; then DIRECT62.sing in a fresh direct62-01 attempt",
+    "launcher": "REPLAY_CAS.sh check62-01 CHECK62.sing CHECK62_ALL_CHECKS_PASS; then DIRECT62.sing in a fresh direct62-01 attempt; then REPLAY_CAS.sh kernel62-01 KERNEL62.sing KERNEL62_ALL_CHECKS_PASS",
     "backend": "original manually authorized local Singular",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
@@ -116,6 +124,6 @@
   "validation_note": "canonical protocol tools/schema absent in selected index; manual contract/source byte verification only",
   "amendment": {
     "before_affected_data": true,
-    "reason": "Freeze full-source independent435 replay and direct primitive-generator formula before their first native execution; split62-02 terminal accepted unchanged"
+    "reason": "Freeze complete F2 square-kernel calculation beyond individual zero columns; all76/324 functions retained, no coefficientfield kernel substitution"
   }
 }

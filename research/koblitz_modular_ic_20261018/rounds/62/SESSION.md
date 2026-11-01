@@ -139,3 +139,47 @@ degree112 source and selected991action, global geometry/all original lanes.
 ### Errors
 First Lean compile rejected on two API/tactic issues; no theorem accepted
 from that failed artifact. Original failed01 data stay immutable.
+
+## 2026-11-01T23:19:44.109200+00:00 — independent replay and generator route accepted
+
+### What was done
+check62-01 native0/exactmarker/noerrors;all435actualsourcebindings and
+identities,32squaredcolumns,bothinverseproducts,negativecontrolspass.
+direct62-01 native0/exactmarker/noerrors;actualsourcegrouping/derivative
+inverse/generatorformula,32generatedpairs,435identities/870rootcomparisons
+and10012scalarparitysplitspass. Native UTC23:16:41–23:18:08.
+Square-lean62-02 launched serially after direct terminal; no outcome yet.
+
+### Decisions made
+Reuse actual generator construction for larger112 source;991is selected
+factor action,not fielddegree. Complete normal-order/globalgeometry remains
+main construction task. Prepare records before reports/custody/publication.
+
+### Open threads
+Lean02terminal/audit,metadata/report/custody/regularPR;degree112operator
+and complete61globaldifferentials plus all original active research lanes.
+
+### Errors
+No native error in check01/direct01. Matrix and direct scalar parity helper
+is shared,so independence is claimed for generator/evaluation route only.
+
+## 2026-11-01T23:24:15.206845+00:00 — full square-kernel lead and proof-import repair
+
+### What was done
+Extracted all17zero-odd serialized identities without new algebra. Mixed
+individual zeros only indices1/45; complete F2 combinations untested.
+Prepared full76/324 odd-map kernel,exact denominator/binary row/source
+root checks and negative controls;freeze before first data.
+Lean02 terminal1,missing explicit Ring tactic import in generator proof;
+added import,all12claims unchanged, fresh03 planned.
+
+### Decisions made
+Compute full F2 kernels,not coefficientfield kernels or just zero columns.
+Preserve all source columns and caps; keep original geometry/scaling scope.
+
+### Open threads
+Freeze/execute kernel01 and Lean03 serially;records/report/custody/PR;
+normality/global61differentials and larger112operator/alloriginal lanes.
+
+### Errors
+Lean02 artifact rejected;no audit. Explicit Ring import omitted,nowfixed.

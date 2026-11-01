@@ -19,3 +19,5 @@ claims: exact pair addition, multiplication, inversion, and the direct
 generator formula under explicit characteristic2/nonzero derivative and
 grouped-polynomial hypotheses. No source separability/geometry is inferred.
 Fresh square-lean62-02 compiles and audits all twelve declarations together.
+
+Lean02 rejected: generator proof uses ring tactic without explicit import. Add pinned Mathlib.Tactic.Ring, preserve all12 statements; fresh square-lean62-03.
