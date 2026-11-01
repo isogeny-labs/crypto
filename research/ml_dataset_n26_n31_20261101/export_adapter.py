@@ -36,11 +36,13 @@ def rows_from_coverage(path):
         seen.add(key)
         verified = (c["status"] == "verified" and c["artifact_hashes_verified"]
                     and c["recorded_labels"]["known_answer_verified"])
+        status = "succeeded" if verified else (c["status"] if c["status"] in
+                  ("timeout", "failed", "cancelled", "infra_error", "interrupted") else "failed")
         rows.append({"run_id": c["attempt"].replace("/", "-"),
                      "arm": "native-enumerate-" + axes["family"],
                      "instance_id": str(instance), "seed": 20261101,
                      "replicate": 0, "warmup": False,
-                     "status": "succeeded" if verified else "failed",
+                     "status": status,
                      "verification": "verified" if verified else "not_run",
                      "tier": "none", "replay_pass": int(verified),
                      "native_status": c["status"],
