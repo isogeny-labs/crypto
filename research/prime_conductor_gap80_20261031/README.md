@@ -93,6 +93,12 @@ contexts under Sage, Python-FLINT and the optimized native backend. Those
 
 ## Acceptance status and next construction
 
+The [S3 root-chunk storage fixture](s3-chunks/README.md) adds a bounded native
+producer and independent PARI validation of 4,096 roots. Its object-store
+upload uses the trusted artifact workflow's full-byte readback. This prepares
+root data without the full vector allocation; external-memory polynomial
+processing and complete point evaluation remain separate implementation work.
+
 The follow-up [measurement protocol](MEASUREMENT_PROTOCOL.md) and
 [exact native eligibility audit](measurement-readiness.json) identify the
 current launch blockers: the earlier codomain constructor has a 64-bit degree
