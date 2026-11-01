@@ -1,0 +1,60 @@
+import DivisorArrayCopy
+set_option autoImplicit false
+namespace DivisorArrayCopy
+open ScaleTrim MonicRemainder MonicZeroTest
+
+def SafeCopy : Nat → List UInt64 → Array UInt64 → Prop
+ | _,[],_ => True
+ | i,a::as,out => i<out.size ∧ SafeCopy (i+1) as (out.setIfInBounds i a)
+
+theorem copy_safe (i : Nat) (xs : List UInt64) (out : Array UInt64)
+ (h : i+xs.length≤out.size) : SafeCopy i xs out := by
+ induction xs generalizing i out with
+ | nil => trivial
+ | cons a as ih =>
+  constructor
+  · simp only [List.length_cons] at h;omega
+  · apply ih
+    simp only [Array.size_setIfInBounds]
+    simp only [List.length_cons] at h
+    omega
+
+theorem construction_copy_safe (u v : List UInt64) (h : shape u v) :
+ SafeCopy 0 u #[0,0,0] ∧ SafeCopy 0 v #[0,0] := by
+ rcases h with ⟨h0,h1,h2⟩
+ constructor <;> apply copy_safe <;> simp <;> omega
+
+theorem vp_roundtrip (u v : List UInt64) (h : shape u v) (hv : Normal v) : vp (raw u v)=v := by
+ rcases bounded_lists u v h with ⟨a,rfl,rfl⟩ | ⟨a,b,rfl,hv0⟩ | ⟨a,b,c,rfl,hv0⟩
+ · simp [raw,identity,copyPrefix,vp,Array.setIfInBounds,trimFuel]
+ · rcases hv0 with rfl | ⟨x,rfl⟩ <;>
+    simp_all [Normal,raw,identity,copyPrefix,vp,Array.setIfInBounds,trimFuel]
+ · rcases hv0 with rfl | ⟨x,rfl⟩ | ⟨x,y,rfl⟩ <;>
+    simp_all [Normal,raw,identity,copyPrefix,vp,Array.setIfInBounds,trimFuel]
+
+def Stored.canonical (p : UInt64) (d : Stored) : Prop := Canon p d.u.toList ∧ Canon p d.v.toList
+
+theorem raw_canonical (p : UInt64) (u v : List UInt64) (hp : 0<p.toNat)
+ (h : shape u v) (hu : Canon p u) (hv : Canon p v) : (raw u v).canonical p := by
+ rcases bounded_lists u v h with ⟨a,rfl,rfl⟩ | ⟨a,b,rfl,hv0⟩ | ⟨a,b,c,rfl,hv0⟩
+ · simp_all [Stored.canonical,Canon,raw,identity,copyPrefix,Array.setIfInBounds]
+ · rcases hv0 with rfl | ⟨x,rfl⟩ <;>
+    simp_all [Stored.canonical,Canon,raw,identity,copyPrefix,Array.setIfInBounds]
+ · rcases hv0 with rfl | ⟨x,rfl⟩ | ⟨x,y,rfl⟩ <;>
+    simp_all [Stored.canonical,Canon,raw,identity,copyPrefix,Array.setIfInBounds]
+
+theorem construct_valid (p : UInt64) (u v : List UInt64) [Fact p.toNat.Prime]
+ (f : Polynomial (ZMod p.toNat))
+ (hp : 0<p.toNat) (h : shape u v) (hu : Canon p u) (hv : Canon p v) (hvn : Normal v)
+ (hvalid : MumfordValidity.Valid f (wordsPoly p u) (wordsPoly p v)) :
+ ∃ d, construct u v=some d ∧ d.degree≤2 ∧ d.u.size=3 ∧ d.v.size=2 ∧
+ d.canonical p ∧ up d=u ∧ vp d=v ∧
+ wordsPoly p (up d)=wordsPoly p u ∧ wordsPoly p (vp d)=wordsPoly p v ∧
+ MumfordValidity.Valid f (wordsPoly p (up d)) (wordsPoly p (vp d)) := by
+ obtain ⟨_,hd,hus,hvs,hup⟩ := raw_shape u v h
+ have hvp := vp_roundtrip u v h hvn
+ refine ⟨raw u v,from_success u v h,hd,hus,hvs,raw_canonical p u v hp h hu hv,hup,hvp,?_,?_,?_⟩
+ · rw [hup]
+ · rw [hvp]
+ · rw [hup,hvp];exact hvalid
+end DivisorArrayCopy
