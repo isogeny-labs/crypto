@@ -1,0 +1,13 @@
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayAccess.lean:47:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  GetElem Type (Polynomial ?m.6) ?m.3 ?m.4
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayAccess.lean:47:6: error: failed to prove index is valid, possible solutions:
+  - Use `have`-expressions to prove the index is valid
+  - Use `a[i]!` notation instead, runtime check is performed, and 'Panic' error message is produced if index is not valid
+  - Use `a[i]?` notation instead, result is an `Option` type
+  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid
+p : UInt64
+u v : List UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+⊢ ?m.4 (ZMod p.toNat) Polynomial.X

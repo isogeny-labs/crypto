@@ -1,0 +1,21 @@
+{
+  "label": "version",
+  "argv": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin:/bin",
+    "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+    "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+    "/usr/bin/docker",
+    "--host",
+    "unix:///var/run/docker.sock",
+    "version",
+    "--format",
+    "{{json .}}"
+  ],
+  "exit": 0,
+  "timeout_seconds": 15,
+  "observed_at": "2026-11-01T20:12:55.424724+00:00"
+}
