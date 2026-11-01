@@ -86,10 +86,10 @@ into a speed claim.
   checkpoint upload identity. EKS submission is not attempted without the
   mandatory resumable-output gate.
 - The trusted artifact workflow has uploaded, independently downloaded, and
-  replayed **34** earlier campaign payloads, replacing them with hash-bound
-  manifests. Three older post-merge diagnostic payloads remain local. The
-  three new prime-orbit payloads are staged for the same trusted migration in
-  this change. Artifact delivery does not promote L0 evidence.
+  replayed **37** campaign payloads, including all three new prime-orbit
+  sessions, replacing them with hash-bound manifests. Three older post-merge
+  diagnostic payloads remain local. Artifact delivery does not promote L0
+  evidence.
 
 The current admitted roster receipt is
 [`execution/full-development-audit-79.json`](execution/full-development-audit-79.json).

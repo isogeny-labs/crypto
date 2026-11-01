@@ -10,12 +10,11 @@ before queue submission. Therefore no EKS job was submitted, and local wall
 timing is recorded as descriptive rather than substituted for EKS L2 evidence.
 
 The trusted repository workflow has now uploaded, independently downloaded,
-and replayed the 34 earlier campaign payloads, replacing them with hash-bound
-artifact manifests. Three older post-merge diagnostics remain local because
-they were never admitted to that migration. The three new prime-orbit session
-payloads are staged for the same trusted workflow in this change. This runtime
-still has no direct artifact/checkpoint identity, and artifact delivery never
-substitutes for the missing L2 promotion evidence.
+and replayed 37 campaign payloads, including all three new prime-orbit
+sessions, replacing them with hash-bound artifact manifests. Three older
+post-merge diagnostics remain local because they were never admitted to that
+migration. This runtime still has no direct artifact/checkpoint identity, and
+artifact delivery never substitutes for the missing L2 promotion evidence.
 
 The all-method roster blocker is resolved. `full-development-audit-79.json` admits
 114 development specs covering all 79 current methods and all 24 nested

@@ -22,10 +22,10 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
   session exposed cross-record cache charging (13/16 replays); it is retained
   as a failed negative control. After resetting the cache once per independent
   pipeline invocation, the corrected session passed 16/16.
-- The trusted artifact workflow remotely hydrated and replayed 34 earlier
-  payloads. Three older post-merge diagnostics remain local, and the three new
-  prime-orbit payloads are staged for trusted migration with this change.
-  Receipts bind every payload hash; artifact delivery cannot promote L0 data.
+- The trusted artifact workflow remotely hydrated and replayed 37 campaign
+  payloads, including all three new prime-orbit sessions. Three older
+  post-merge diagnostics remain local. Receipts bind every payload hash;
+  artifact delivery cannot promote L0 data.
 
 Every timing here is L0 and descriptive. The completion and nested panels use
 one target, one warm-up, and four measured rounds. Deterministic work can select
