@@ -6,3 +6,5 @@ Pinned Lean4.34.1/mathlibd13f23b723b8a846827a245b89c10fc7d3f11612;existing proof
 Before the first compile, make positive integer ramification explicit as e≥1 via Int.add_one_le_iff before linarith; no data yet and no theorem change.
 
 Amendment before attempt02: attempt01 compile failed because CharP was not imported; explicitly import Mathlib.Algebra.CharP.Defs. Preserve failed copiedsource/log. Add three separately preregistered implications before their data: target four-cycle trace cancellation fromF²q=-q; multiplicity2 bound forces positive ramificatione=1; two disjoint degree4 fibers within20points give degree4k,k1..10 coprime11. These are conditional on actual geometric/map premises,not existence proofs. Seven authored claims are required in the separate audit.
+
+Attempt02 was rejected: norm_num left ten closed Nat.Coprime goals unsolved. Before attempt03, use kernel-checked decide on the same ten interval cases. No native_decide,oracle,axiom or theorem change. Preserve attempt02 source/log.

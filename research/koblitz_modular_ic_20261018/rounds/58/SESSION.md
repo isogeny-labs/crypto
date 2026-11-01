@@ -81,3 +81,17 @@ Fiber20check,Lean02,report/custody/delivery;nextactualF32targetrelationcompileru
 
 ### Errors
 Leanmissingimportonly;all4nativeattemptsacceptedsofar.
+
+## 2026-11-01T05:44:54.045546+00:00 — complete finite support accepted; degree-unit proof repair
+
+### What was done
+fiber58-01accepted all4F2degree20components,20F32degree4points,all5coefficientconjugates,all20actualFrob32²=sigmasourceactions,all10conditionaldegreeBezoutcertificates andwrong-signnegativecontrols. PoleLean02compiledsixotherstatementsbutlefttenclosedCoprimegoalsunsolved;module/auditnotaccepted.
+
+### Decisions made
+Use kernel-checkeddecide on the same tenfinitecases beforefreshPole03;no native_decide. NativeintegerBezoutcertificatesalreadyallpass. PreservefirsttwofailedLeanattempts and every rawinput.
+
+### Open threads
+Pole03compile/audit,results/report/custody/PRupdate. Futuretargetrelationcompilerandoriginalscopespersist.
+
+### Errors
+norm_num didnotnormalizeNat.Coprime;finitecaseproofrepaironly.

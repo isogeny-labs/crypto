@@ -63,6 +63,6 @@ theorem double_bound_unramified (e : ℤ) (he : 0 < e) (hbound : 2 * e ≤ 2) :
 theorem support_degree_coprime_eleven (k : ℕ) (hk : 0 < k)
     (hbound : k + k ≤ 20) : Nat.Coprime (4 * k) 11 := by
   have hle : k ≤ 10 := by nlinarith
-  interval_cases k <;> norm_num at *
+  interval_cases k <;> decide
 
 end Pole58
