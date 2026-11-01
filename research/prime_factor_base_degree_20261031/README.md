@@ -1,5 +1,16 @@
 # Prime-field factor bases: certificates and a secant degree reduction
 
+## Boolean ordinate offsets, 2026-11-01
+
+The [new offset-base search](pencil_search_20261101/README.md) removes the
+complete-splitting requirement and keeps both summands' Boolean labels
+variable. Lean proves exact group semantics and canonical degree2k+3,
+counting all2k selectors. The new F17 base has eight columns/sixteen signed
+points, with canonical degree7 versus same-base dense9. Exact single-bit
+projection is also proved. Actual affine degree, yield and solving work
+remain unmeasured; the report exposes the variable/column tax and prospective
+matched controls. Earlier sealed records and measured graphs are unchanged.
+
 ## Concrete semantic/degree theorem, 2026-10-31
 
 The [concrete F17 continuation](fixture_bridge_20261031/README.md) now joins
