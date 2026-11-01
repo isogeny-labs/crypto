@@ -76,6 +76,13 @@ SOURCES = {
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
     "frontier_establishment": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
+    "pfdr_other_families": "research/pfdr_other_families_20261101/results/analysis-main.json",
+    "pfdr_other_families_readme": "research/pfdr_other_families_20261101/README.md",
+    "n83_fourbyte_pair_plain_fp2": "research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json",
+    "n83_fourbyte_pair_fp2_plain": "research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json",
+    "n83_fourbyte_pair_readme": "research/n83_fourbyte_pair_20261027/README.md",
+    "n83_image_closed_degree2": "research/n83_image_closed_degree2_20261101/ASSESSMENT.json",
+    "n83_image_closed_degree2_readme": "research/n83_image_closed_degree2_20261101/README.md",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "f4_fp_ic_effect": "research/f4_fp_ic_effect_20261018/summary.json",
@@ -1722,6 +1729,163 @@ def build(allow_unvalidated: bool = False) -> dict:
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
+    pfdr = load(SOURCES["pfdr_other_families"])
+    pfdr_readme = (REPO / SOURCES["pfdr_other_families_readme"]).read_text()
+    pfdr_lines = [line for line in pfdr.get("lines", []) if line.get("kind") == "struct"]
+    expected_pfdr_labels = {
+        f"structured|theta={theta:.2f}|d={d}"
+        for theta in (0.30, 0.35) for d in (1, 2, 3)
+    }
+    if (pfdr.get("experiment") != "EXP-PFDR-2d36f9-R2-FAM"
+            or pfdr.get("outcome") != "O-SUB-BE"
+            or pfdr.get("reading") != "O-SUB-BE"
+            or pfdr.get("break_even_met") is not False
+            or pfdr.get("selftest_pass") is not True
+            or set(pfdr.get("valid_lines", [])) != expected_pfdr_labels
+            or pfdr.get("alive_lines") != []
+            or pfdr.get("failed_infrastructure") != []
+            or len(pfdr_lines) != 6
+            or {line.get("label") for line in pfdr_lines} != expected_pfdr_labels
+            or any(line.get("class") != "SUB-BE" or line.get("valid") is not True
+                   or [rung.get("bits") for rung in line.get("kappa_by_rung", [])]
+                   != [16, 20, 24, 28, 32]
+                   for line in pfdr_lines)
+            or any(pfdr.get("controls", {}).get(key, {}).get("pass") is not True
+                   for key in ("C3", "C4", "C5", "C6"))
+            or "19,887 jobs" not in pfdr_readme):
+        raise SystemExit("review the PFDR structured-family result before updating the leaderboard")
+    pfdr_family_names = {1: "Dickson", 2: "geometric progression", 3: "quadratic progression"}
+    pfdr_diagnostic = {
+        "source": SOURCES["pfdr_other_families"],
+        "readme": SOURCES["pfdr_other_families_readme"],
+        "experiment": pfdr["experiment"],
+        "reading": pfdr["reading"],
+        "class": "structural factor-base diagnostic; no E2E IC price and no rho comparison",
+        "jobs": 19_887,
+        "cells": len(pfdr["cells"]),
+        "bits": [16, 20, 24, 28, 32],
+        "break_even_slope": 1 / 3,
+        "selftest_pass": pfdr["selftest_pass"],
+        "controls_pass": all(pfdr["controls"][key]["pass"] for key in ("C3", "C4", "C5", "C6")),
+        "calibration": {
+            "n": pfdr["calibration"]["n"],
+            "mean": pfdr["calibration"]["mean"],
+            "sd": pfdr["calibration"]["sd"],
+        },
+        "lines": [{
+            "family": pfdr_family_names[line["d"]],
+            "theta": line["theta"],
+            "delta_hat": line["delta_hat"],
+            "ci95": line["ci95"],
+            "class": line["class"],
+        } for line in sorted(pfdr_lines, key=lambda line: (line["d"], line["theta"]))],
+        "slope_range": [min(line["delta_hat"] for line in pfdr_lines),
+                        max(line["delta_hat"] for line in pfdr_lines)],
+        "largest_upper_ci95": max(line["ci95"][1] for line in pfdr_lines),
+        "online_speedup": None,
+        "fully_priced_cold_speedup": None,
+    }
+    n83_pair_docs = [load(SOURCES[key]) for key in
+                     ("n83_fourbyte_pair_plain_fp2", "n83_fourbyte_pair_fp2_plain")]
+    n83_pair_readme = (REPO / SOURCES["n83_fourbyte_pair_readme"]).read_text()
+    expected_orders = [("plain", "fp2"), ("fp2", "plain")]
+    for pair, order in zip(n83_pair_docs, expected_orders):
+        arms = pair.get("arms", [])
+        if (pair.get("schema") != "n83.fourbyte-paired-k1107-replay/v1"
+                or pair.get("status") != "PASS_PAIRED_FULL_REPLAY"
+                or pair.get("host_tier") != "shared_local_diagnostic"
+                or len(arms) != 2
+                or tuple(arm.get("layout") for arm in arms) != order
+                or any(arm.get("status") != "PASS_INDEPENDENT_FULL_REPLAY"
+                       or not arm.get("checks")
+                       or not all(arm["checks"].values()) for arm in arms)
+                or len({arm.get("base_hash") for arm in arms}) != 1):
+            raise SystemExit("review the N83 four-byte paired replay before updating the leaderboard")
+        by_layout = {arm["layout"]: arm for arm in arms}
+        if (not math.isclose(pair["plain_over_fp2_index_build"],
+                             by_layout["plain"]["index_build_ms"] / by_layout["fp2"]["index_build_ms"],
+                             rel_tol=1e-12)
+                or not math.isclose(pair["plain_over_fp2_process_wall"],
+                                    by_layout["plain"]["process_wall_seconds"]
+                                    / by_layout["fp2"]["process_wall_seconds"], rel_tol=1e-12)):
+            raise SystemExit("N83 four-byte paired replay ratios do not rederive")
+    if ("PASS_PAIRED_FULL_REPLAY" not in n83_pair_readme
+            or "shared" not in n83_pair_readme
+            or "does not justify selecting the FP2" not in n83_pair_readme
+            or "layout for K5500" not in n83_pair_readme):
+        raise SystemExit("review the N83 four-byte paired study limits before updating the leaderboard")
+    n83_root_index_diagnostic = {
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "sources": [SOURCES["n83_fourbyte_pair_plain_fp2"],
+                    SOURCES["n83_fourbyte_pair_fp2_plain"]],
+        "readme": SOURCES["n83_fourbyte_pair_readme"],
+        "class": "alternating shared-host full-process diagnostic; no Tier 1 or matched-rho promotion",
+        "base_columns": 1_107,
+        "pairs": [{
+            "order": [arm["layout"] for arm in pair["arms"]],
+            "plain_over_fp2_index_build": pair["plain_over_fp2_index_build"],
+            "plain_over_fp2_process_wall": pair["plain_over_fp2_process_wall"],
+            "arms": [{
+                "layout": arm["layout"],
+                "index_build_ms": arm["index_build_ms"],
+                "process_wall_seconds": arm["process_wall_seconds"],
+                "online_ms": arm["online_ms"],
+                "peak_rss_bytes": arm["peak_rss_bytes"],
+                "root_fp2_bytes": arm["root_fp2_bytes"],
+                "status": arm["status"],
+            } for arm in pair["arms"]],
+        } for pair in n83_pair_docs],
+        "plain_over_fp2_index_build_range": [
+            min(pair["plain_over_fp2_index_build"] for pair in n83_pair_docs),
+            max(pair["plain_over_fp2_index_build"] for pair in n83_pair_docs),
+        ],
+        "plain_over_fp2_process_wall_range": [
+            min(pair["plain_over_fp2_process_wall"] for pair in n83_pair_docs),
+            max(pair["plain_over_fp2_process_wall"] for pair in n83_pair_docs),
+        ],
+        "candidate_id": None,
+        "matched_rho_speedup": None,
+        "tier1_speedup": None,
+    }
+    n83_image = load(SOURCES["n83_image_closed_degree2"])
+    n83_image_readme = (REPO / SOURCES["n83_image_closed_degree2_readme"]).read_text()
+    relation = n83_image.get("projected_relation", {})
+    image_cost = n83_image.get("complete_cost", {})
+    if (n83_image.get("schema") != "crypto.transfer-assessment/v3"
+            or n83_image.get("case_id") != "n83-image-closed-degree-two-fiber"
+            or n83_image.get("status") != "rejected_by_structural_and_cost_gates"
+            or relation.get("identity") != "[3]P=P+[2]P"
+            or relation.get("new_information") is not False
+            or relation.get("useful_relation_probability") != 0
+            or relation.get("independent_rank_per_identity") != 0
+            or any(image_cost.get(key) is not False for key in
+                   ("finite_crossover_against_strong_source_rho", "collector_admitted",
+                    "eks_timing_admitted", "speedup_claim"))
+            or len(n83_image.get("controls", [])) != 5
+            or "scoped rejection" not in n83_image_readme
+            or "No result in this directory establishes a discrete-log speedup" not in n83_image_readme):
+        raise SystemExit("review the N83 degree-two image-calculus assessment before updating the leaderboard")
+    n83_image_diagnostic = {
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "source": SOURCES["n83_image_closed_degree2"],
+        "readme": SOURCES["n83_image_closed_degree2_readme"],
+        "case_id": n83_image["case_id"],
+        "status": n83_image["status"],
+        "class": "structural transfer rejection; collector and timing stopped before performance measurement",
+        "map": n83_image["transformation"]["map"],
+        "fiber_support_degrees": [1, 2],
+        "projected_identity": relation["identity"],
+        "useful_relation_probability": relation["useful_relation_probability"],
+        "independent_rank_per_identity": relation["independent_rank_per_identity"],
+        "source_rho_exponent": image_cost["source_rho_exponent"],
+        "ambient_collection_exponent": image_cost["ordinary_ambient_genus3_collection_exponent"],
+        "ambient_gap_bits": image_cost["ordinary_ambient_gap_bits"],
+        "controls": n83_image["controls"],
+        "open_obligations": n83_image["open_obligations"],
+        "collector_admitted": image_cost["collector_admitted"],
+        "timing_admitted": image_cost["eks_timing_admitted"],
+        "speedup_claim": image_cost["speedup_claim"],
+    }
     rank_columns = load(SOURCES["n37_rank_columns"])
     if (rank_columns["status"] != "independently_replayed_l0_bounded_diagnostic"
             or rank_columns["selection"]["decision"] != "COUNTED_ENGINEERING_LEAD"
@@ -1953,6 +2117,9 @@ def build(allow_unvalidated: bool = False) -> dict:
         "f6_small_cold_diagnostic": small_cold_diagnostic,
         "f6_ecbench_ladder_diagnostic": ladder_diagnostic,
         "f4_f5_f6_cross_family_diagnostic": cross_diagnostic,
+        "pfdr_other_families_diagnostic": pfdr_diagnostic,
+        "n83_root_index_diagnostic": n83_root_index_diagnostic,
+        "n83_image_closed_degree2_diagnostic": n83_image_diagnostic,
         "latest_frontier_audit": frontier_audit,
         "n83_tier1_cold_holdout": {
             "source": SOURCES["n83_tier1_cold_holdout"],
@@ -2656,6 +2823,58 @@ def markdown(doc: dict) -> str:
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
     L.append("")
+    p = doc["pfdr_other_families_diagnostic"]
+    L += ["## Structured factor-base growth screen, outside tables A–C", "",
+          f"The preregistered `{p['experiment']}` census ran {p['jobs']:,} deterministic local jobs "
+          f"across {p['cells']} cells and five sizes ({p['bits'][0]}–{p['bits'][-1]} bits). It asks whether "
+          "the coincidence multiplier κ for Dickson, geometric-progression, or quadratic-progression "
+          f"x-bases grows with N fast enough to reach the frozen break-even slope δ* = {p['break_even_slope']:.3f}. "
+          "It does not price a complete index-calculus pipeline and has no matched rho arm.", "",
+          f"All six structured lines are valid and read `{p['reading']}`. Their five-rung slopes range from "
+          f"{p['slope_range'][0]:.4f} to {p['slope_range'][1]:.4f}; the largest upper 95% limit is "
+          f"{p['largest_upper_ci95']:.4f}, far below 1/3. Self-test and controls C3–C6 pass; the null "
+          f"calibration is n={p['calibration']['n']}, mean {p['calibration']['mean']:.2f}, "
+          f"sd {p['calibration']['sd']:.2f}.", "",
+          "| family | θ | slope of log2 κ on log2 N | 95% interval | reading |",
+          "|:--|--:|--:|:--|:--|"]
+    for row in p["lines"]:
+        L.append(f"| {row['family']} | {row['theta']:.2f} | {row['delta_hat']:.4f} | "
+                 f"[{row['ci95'][0]:.4f}, {row['ci95'][1]:.4f}] | `{row['class']}` |")
+    L += ["", "This is negative structural evidence, not a performance promotion: no ranked row moves and "
+          "rho is not being inferred from an unpriced component. "
+          f"Read the [analysis](../../{p['source']}) and [study limits](../../{p['readme']}).", ""]
+    n83 = doc["n83_root_index_diagnostic"]
+    L += ["## N83 four-byte root-index loop, outside tables A–C", "",
+          "The plain four-byte ID31 root index and its packed two-bit fingerprint (FP2) variant ran "
+          f"in both alternating orders on the same K{n83['base_columns']} base and public point. "
+          "Every arm completed the full process, recovered the same scalar, and passed independent "
+          "replay. Ratios below are plain / FP2, so values above 1 favor FP2.", "",
+          "| order | plain / FP2 index build | plain / FP2 whole process | plain wall (s) | FP2 wall (s) |",
+          "|:--|--:|--:|--:|--:|"]
+    for pair in n83["pairs"]:
+        arms = {arm["layout"]: arm for arm in pair["arms"]}
+        L.append(f"| {' → '.join(pair['order'])} | {pair['plain_over_fp2_index_build']:.3f}× | "
+                 f"{pair['plain_over_fp2_process_wall']:.3f}× | "
+                 f"{arms['plain']['process_wall_seconds']:.3f} | {arms['fp2']['process_wall_seconds']:.3f} |")
+    L += ["", f"The observed index-build range is {n83['plain_over_fp2_index_build_range'][0]:.3f}–"
+          f"{n83['plain_over_fp2_index_build_range'][1]:.3f}× and the whole-process range is "
+          f"{n83['plain_over_fp2_process_wall_range'][0]:.3f}–"
+          f"{n83['plain_over_fp2_process_wall_range'][1]:.3f}×. The host was shared and its load varied "
+          "substantially; two pairs do not select the K5500 layout. This is a correctness-backed "
+          "optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. "
+          f"Read the [study and limits](../../{n83['readme']}).", ""]
+    image = doc["n83_image_closed_degree2_diagnostic"]
+    L += ["## N83 degree-two image calculus, outside tables A–C", "",
+          f"The exact `{image['case_id']}` transfer audit is `{image['status']}`. Generic odd-degree "
+          f"fibers of `{image['map']}` split into closed support degrees 1+2, but their projected "
+          f"labels give only `{image['projected_identity']}`. Useful relation probability and independent "
+          f"rank per identity are both {image['useful_relation_probability']}; the collector and timing "
+          "stages therefore stop under the frozen protocol.", "",
+          f"The ordinary ambient genus-three scale is `{image['ambient_collection_exponent']}`, about "
+          f"{image['ambient_gap_bits']} bits above `{image['source_rho_exponent']}`. This is a scoped "
+          "structural rejection, not zero-cost attack data: no wall time or speedup was measured, and no "
+          "ranked row moves. A compact growing-degree or adaptive target-local router remains open. "
+          f"Read the [assessment](../../{image['source']}) and [scope](../../{image['readme']}).", ""]
     pb = doc["prime_base_size_component"]
     L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
           "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
@@ -3576,6 +3795,79 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td><code>{esc(c["curve"])}</code></td><td class="n">{c["log2_r"]:.2f}</td><td>K16 / K8</td>'
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
     P.append('</tbody></table></section>')
+
+    p = doc["pfdr_other_families_diagnostic"]
+    P.append('<section class="card" id="pfdr-other-families"><h2>Structured factor-base growth screen, '
+             'outside the priced tables</h2>'
+             f'<p>The preregistered <code>{esc(p["experiment"])}</code> census ran {p["jobs"]:,} '
+             f'deterministic local jobs across {p["cells"]} cells and five sizes '
+             f'({p["bits"][0]}–{p["bits"][-1]} bits). It tests whether the coincidence multiplier κ '
+             'for Dickson, geometric-progression, or quadratic-progression x-bases grows with N fast '
+             f'enough to reach the frozen break-even slope δ* = {p["break_even_slope"]:.3f}. It does '
+             'not price a complete index-calculus pipeline and has no matched rho arm.</p>'
+             f'<p>All six structured lines are valid and read <code>{esc(p["reading"])}</code>. Their '
+             f'five-rung slopes range from {p["slope_range"][0]:.4f} to {p["slope_range"][1]:.4f}; '
+             f'the largest upper 95% limit is {p["largest_upper_ci95"]:.4f}, far below 1/3. Self-test '
+             f'and controls C3–C6 pass; the null calibration is n={p["calibration"]["n"]}, mean '
+             f'{p["calibration"]["mean"]:.2f}, sd {p["calibration"]["sd"]:.2f}.</p>'
+             '<div class="scroll"><table><thead><tr><th>Family</th><th class="n">θ</th>'
+             '<th class="n">Slope of log₂ κ on log₂ N</th><th>95% interval</th><th>Reading</th>'
+             '</tr></thead><tbody>')
+    for row in p["lines"]:
+        P.append(f'<tr><td>{esc(row["family"])}</td><td class="n">{row["theta"]:.2f}</td>'
+                 f'<td class="n">{row["delta_hat"]:.4f}</td>'
+                 f'<td>[{row["ci95"][0]:.4f}, {row["ci95"][1]:.4f}]</td>'
+                 f'<td><code>{esc(row["class"])}</code></td></tr>')
+    P.append('</tbody></table></div><p>This is negative structural evidence, not a performance '
+             'promotion: no ranked row moves and rho is not inferred from an unpriced component. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["source"])}">Analysis</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["readme"])}">study limits</a>.'
+             '</p></section>')
+
+    n83 = doc["n83_root_index_diagnostic"]
+    P.append('<section class="card" id="n83-root-index"><h2>N83 four-byte root-index loop, '
+             'outside the priced tables</h2><p>The plain four-byte ID31 root index and its packed '
+             f'two-bit fingerprint (FP2) variant ran in both alternating orders on the same K{n83["base_columns"]} '
+             'base and public point. Every arm completed the full process, recovered the same scalar, '
+             'and passed independent replay. Ratios are plain / FP2, so values above 1 favor FP2.</p>'
+             '<div class="scroll"><table><thead><tr><th>Order</th><th class="n">Plain / FP2 index build</th>'
+             '<th class="n">Plain / FP2 whole process</th><th class="n">Plain wall (s)</th>'
+             '<th class="n">FP2 wall (s)</th></tr></thead><tbody>')
+    for pair in n83["pairs"]:
+        arms = {arm["layout"]: arm for arm in pair["arms"]}
+        P.append(f'<tr><td>{esc(" → ".join(pair["order"]))}</td>'
+                 f'<td class="n">{pair["plain_over_fp2_index_build"]:.3f}×</td>'
+                 f'<td class="n">{pair["plain_over_fp2_process_wall"]:.3f}×</td>'
+                 f'<td class="n">{arms["plain"]["process_wall_seconds"]:.3f}</td>'
+                 f'<td class="n">{arms["fp2"]["process_wall_seconds"]:.3f}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>The observed index-build range is {n83["plain_over_fp2_index_build_range"][0]:.3f}–'
+             f'{n83["plain_over_fp2_index_build_range"][1]:.3f}× and the whole-process range is '
+             f'{n83["plain_over_fp2_process_wall_range"][0]:.3f}–'
+             f'{n83["plain_over_fp2_process_wall_range"][1]:.3f}×. The host was shared and its load '
+             'varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed '
+             'optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(n83["readme"])}">Study and limits</a>.'
+             '</p></section>')
+
+    image = doc["n83_image_closed_degree2_diagnostic"]
+    P.append('<section class="card" id="n83-image-degree2"><h2>N83 degree-two image calculus, '
+             'outside the priced tables</h2>'
+             f'<p>The exact <code>{esc(image["case_id"])}</code> transfer audit is '
+             f'<code>{esc(image["status"])}</code>. Generic odd-degree fibers of '
+             f'<code>{esc(image["map"])}</code> split into closed support degrees 1+2, but their '
+             f'projected labels give only <code>{esc(image["projected_identity"])}</code>. Useful '
+             f'relation probability and independent rank per identity are both '
+             f'{image["useful_relation_probability"]}; the collector and timing stages stop under '
+             'the frozen protocol.</p>'
+             f'<p>The ordinary ambient genus-three scale is <code>{esc(image["ambient_collection_exponent"])}</code>, '
+             f'{esc(image["ambient_gap_bits"])} bits above <code>{esc(image["source_rho_exponent"])}</code>. '
+             'This is a scoped structural rejection, not zero-cost attack data: no wall time or speedup '
+             'was measured, and no ranked row moves. A compact growing-degree or adaptive target-local '
+             'router remains open. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(image["source"])}">Assessment</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(image["readme"])}">scope</a>.'
+             '</p></section>')
 
     pb = doc["prime_base_size_component"]
     P.append('<section class="card" id="prime-base-size"><h2>Prime-field baseline · factor-base size and oracle '
