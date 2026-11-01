@@ -3,8 +3,14 @@
 Audit, 2026-11-01, of finding F1 in
 `benchmarks/20261101-ic-residual-dp-eq/validator-report.json` (PR #3119). No
 measurement was run; this re-reads committed bands and hydrated raw records.
-**Nothing under `src/` or any committed session record was changed.** The
-decision on how to price bytes is the owner's (item 2 below).
+
+**Status (2026-11-01): the owner chose option B and it is implemented.**
+`src/cryptanalysis/ecbench/band.rs` now lists the byte counters
+(`NON_OPERATION_COUNTERS`) but does not price them; the audit in the sections
+below was written before that decision and describes the rule as it stood.
+No emitter, committed session record or `sessions/` file was changed. The
+four affected studies carry a dated README note and the re-run bands and
+weighted comparisons in their `analysis/exbytes/` ([results](#result-of-option-b)).
 
 ## Verdict
 
@@ -113,6 +119,39 @@ from "unresolved" to "residual arm cheaper at every w" on means; the paired
 rather than inferred from this table. Frozen evidence is not rewritten; each
 README gets a dated note.
 
+## Result of option B
+
+`band.rs`: `unpriced_counts` still lists every counter; `unpriced_total`,
+`priced_gae` and the "uncounted" blocker use `priced_counts` (the list minus
+`NON_OPERATION_COUNTERS`); `exempt_counts` and the band JSON's
+`exempt_mean_counts` / `exempt_counters` report the byte counters beside the
+price. `compare`, `bounds`, `challenge` and `ecbench band` all price through
+those functions, so the rule is in one place. Tests: `cargo test --lib
+ecbench::band` (3 pass, two new). `scripts/regen_exbytes.py` re-ran, with the
+same arms, weights and seeds, `ecbench band` on every session and every
+committed weighted comparison of the four studies into each study's
+`analysis/exbytes/` (`CHANGES.md` lists old and new verdicts):
+
+| study | weighted comparisons re-run | unresolved → resolved | still unresolved | direction changed |
+|:--|--:|--:|--:|--:|
+| `ic_prime_residual_lp_20261026` | 24 | 24 | 0 | 0 |
+| `ic_planner_exhaustive_20261026` | 136 | 36 | 12 | 0 |
+| `ic_planner_weight_rule_binkob_20261026` | 6 | 2 | 4 | 0 |
+| `ic_koblitz_descent_routing_20261026` | 0 (none committed) | | | |
+
+Band rows of arms that name no byte counter are identical to the committed
+ones (checked row by row: no changed row lacks a byte counter); in
+`ic_prime_residual_lp` the 12 `plan` and `rho` rows did not move. The paired verdicts agree with the mean-based estimate above (36 of 50
+residual-vs-plan comparisons were unresolved). The w = 0 results and the
+leaderboard row (2.59x) are unchanged.
+
+Not done: `docs/backend-leaderboard` embeds records that name the
+factor-base counter and is built by a separate tool, which compiles `band.rs`
+and only ignores the new fields; it was not rebuilt. `ic_residual_scale_20261101`
+(PR #3119) is not on `main`; when it lands its band must be regenerated with
+this binary. No graph or PDF (`research-visuals`): no benchmark or
+leaderboard row lands.
+
 ## Reproduce
 
 ```bash
@@ -121,7 +160,9 @@ python3 tools/artifacts/artifacts.py pull research/ic_prime_residual_lp_20261026
 python3 -I research/ic_byte_counter_pricing_20261101/scripts/byte_share.py \
   research/ic_prime_residual_lp_20261026 research/ic_planner_exhaustive_20261026 \
   --out research/ic_byte_counter_pricing_20261101/analysis
+cargo build --bin ecbench   # the audit script reads the committed bands, as published
+python3 -I research/ic_byte_counter_pricing_20261101/scripts/regen_exbytes.py target/debug/ecbench \
+  research/ic_prime_residual_lp_20261026 research/ic_planner_exhaustive_20261026 \
+  research/ic_planner_weight_rule_binkob_20261026 research/ic_koblitz_descent_routing_20261026
 ```
 
-Not produced: a graph or PDF (`research-visuals`), because no result lands
-in `benchmarks/` or the leaderboard; add them with item 3.
