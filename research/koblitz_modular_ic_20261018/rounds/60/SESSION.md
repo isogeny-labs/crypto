@@ -53,3 +53,17 @@ Checker,threeLeanclaims,report/custody/continuationPR. Completecubicspace and818
 
 ### Errors
 Only initial indexed++failure rejected sofar;no accepted producer repeated.
+
+## 2026-11-01T18:00:07.224217+00:00 — source-row checker complete; differential lead recorded
+
+### What was done
+check60-01 accepted all404source-row reconstructions/leftinverses,complete mixed/fixed splittings,oddparticular and regular injection,changedrowrejection. Nativeexit0/PASS/noerrors,raw driverarchive terminal. Three authoredLeanclaims live in infinity-lean60-01 under originalcap. NewregularPR3200created/attached,onoriginalbase,autoMergeNull;PR3062externalmerge preserved.
+
+### Decisions made
+Add a pole-independent proposed Cartier/logarithmic-differential filter alongside completecubic818search. Read authorprimarypreprint section3.3 and retainedR51differential-actionwarning. No claim of sourceCartiermatrix or factor/actionyet. R60report includes proposeddiagram and sourceobligations.
+
+### Open threads
+Leanterminalresults,exactrecords/report/custody and finalPR update;thenR61cubicambient andholodifferentialbasis/separatingdu obligations. All larger/reverse/polarization/saturation/sourceleads preserved.
+
+### Errors
+One metadata Python string-assembly syntaxerror fixed using a separate Typst include;no math/data affected. Initialnative indexedincrementfailure remains excluded. Noacceptedmathproducer repeated.
