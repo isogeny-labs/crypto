@@ -636,7 +636,7 @@ pub fn identity_check(
         tries += 1;
         let x = E4([
             0,
-            if forced % 2 == 0 {
+            if forced.is_multiple_of(2) {
                 rng.gen_range(0..inst.core.p)
             } else {
                 0

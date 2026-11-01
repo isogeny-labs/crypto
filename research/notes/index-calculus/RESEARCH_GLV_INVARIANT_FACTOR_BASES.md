@@ -3829,3 +3829,94 @@ rho by the pooled ratio — a reference correction.  If G2.142's `1` GAE ratio s
 reference is the cheap order-24 walk at `0` and `0.1` GAE and unresolved at `1` GAE against the cheap order-6
 walk; the deciding counters are the `11` comparisons a minimum of twelve needs, which no representative equal
 to E29's can avoid.
+
+### 9.39 E34 measured: the cheap order-24 walk is the matched rho on E18's `j = 0` curves at every weight of the band (pooled); E18's `ψ` rows move `1.13`–`1.63×` further from rho — a reference correction
+
+*2026-11-01.*  Code and binary `bd0118f39` (`experiments/38_twist24_cheap_rep/binary_commit.txt`, sha256 recorded):
+`src/cryptanalysis/twist24_rep.rs` (new module; E29's functions untouched), `examples/e34_cheap_rep.rs`
+(`identity.{json,log}`, `stage_r_p*.{json,log}`, `negative_walks.{json,log}`); tables `examples/e34_tables.rs` →
+`tables.md`, `summary.json`.  Report `research/e34_twist24_cheap_rep_20261031/`.  Route: isolab-eks unreachable
+from this container (no `aws`, no `kubectl`), so local, serial, one core; operation counts only, no wall-time claim.
+All runs together took under a minute of CPU.  E33's uncommitted solver edits were in the worktree when the
+binary was built (no walk path); the E29 replay below is the check.
+
+**Identity.**  (a) The counted copies of E29's walks reproduce **all `512`** E29 Stage R records (8 curves × 2 orders ×
+16 seeds × 2 arithmetics; §9.38 said `256`, the count per arithmetic) in every field.  (b) Every one of the `24`
+(resp. `6`) class members of `200` random points of `⟨G⟩` plus `8` forced `x₀ = 0` points per curve gets E29's
+representative and multiplier from both cheap order-24 representatives (`39,936` members) and the cheap order-6 one
+(`9,984`), `0` mismatches, `rep = [m]P` on every scalar check.  No curve has a point with `x = 0` (`b₀t³` is not a
+square), so that case is untested by points (the code keeps E29's first-candidate rule).  (c) All `768` cheap walks
+equal their built walk per seed in steps, group operations, cycle escapes, recovered log, correctness and the
+digest of every representative visited; digests also agree across the two arithmetics.  **Negative controls:**
+the omitted-candidate representative mismatches `416/4,992` members per curve, the wrong-ordinate one `4,992/4,992`
+(and fails every scalar check); the omitted-candidate walk's digest differs from E29's on `16/16` seeds at
+`p = 241` (all `16` still recover the log: an inconsistent class map is still a valid walk, so a digest, not
+correctness, is the detector).  **Positive control:** E29's order-6 representative costs exactly `8.000`.
+
+**Per step** (schoolbook, `p = 541`–`1069`; Karatsuba in `tables.md`):
+
+| arm | rep `F_p` mults / call | mults / step | native ops / step | of which `cmp` | `neg` | `modn` | `hash` | `table` |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| order 6, E29 | `8.00` | `109.1`–`111.2` | `16.77` | `3.10` | `4.13` | `5.55` | `2.00` | `2.00` |
+| order 6, cheap | `4.00` | `105.0`–`107.1` | `15.22` | `4.65` | `2.06` | `4.52` | `2.00` | `2.00` |
+| order 24, E29 | `86`–`92` | `191.0`–`199.4` | `65.25` | `16.52` | `4.13` | `40.61` | `2.00` | `2.00` |
+| order 24, cheap | `15.17` | `117.2`–`120.2` | `25.82` | `13.95` | `3.35` | `4.52` | `2.00` | `2.00` |
+| order 24, cheap mul-lean | `10.17` | `112.1`–`115.1` | `30.96` | `13.95` | `8.50` | `4.52` | `2.00` | `2.00` |
+
+The cheap representative needs `13.5` comparisons a call (`11` for the minimum of twelve, one zero test, `≈ 1.5` for
+the sign).  E29's walk as built also spent `40.6` mod-`n` operations a step on its multipliers (`pow_mod` per
+candidate), which no earlier pricing counted; with every operation priced, E29's order-24 walk loses to the
+order-6 walk at **every** weight (`0.962`, `0.562`, `0.453`, schoolbook), so §9.33's crossing at `1` GAE was an
+artefact of the one-op-per-step convention.
+
+**The band** (pooled, order 6 / order 24, `> 1`: order 24 cheaper; every emitted operation at `w·97`):
+
+| order 6 / order 24 | arithmetic | 0 GAE | 0.1 GAE | 1 GAE | pooled order holds | curves: order 24 / unresolved |
+|:--|:--|--:|--:|--:|:--|:--|
+| E29 / E29 | schoolbook | `0.962` | `0.562` | `0.453` | yes (order 6) | `0` / `0` (order 6 on all 8) |
+| E29 / cheap | schoolbook | `1.563` | `1.254` | `1.126` | **yes** | `7` / `1` (`p = 769`) |
+| E29 / cheap | Karatsuba | `1.544` | `1.232` | `1.122` | **yes** | `7` / `1` |
+| cheap / cheap | schoolbook | `1.505` | `1.167` | `1.026` | **yes** | `3` / `5` |
+| cheap / cheap | Karatsuba | `1.476` | `1.140` | `1.021` | **yes** | `3` / `5` |
+| cheap / mul-lean | schoolbook | `1.572` | `1.042` | `0.864` | no | — |
+
+With the Karatsuba arithmetic's own GAE (`79`) the cheap/cheap row is `1.476`, `1.160`, `1.025`; under the
+validator's one-op-per-step convention every cheap order-24 row is `1.48`–`1.66` at every weight.  The mul-lean
+variant is cheapest at `0` GAE and loses its lead by `0.1` (its six negations); the strongest order-24 walk is the
+mul-lean one at `0` GAE and the op-lean one at `0.1` and `1`, the strongest order-6 walk the cheap one throughout.
+Per curve against the cheap order-6 walk, the cheap order-24 walk is cheaper at every weight on `p = 601, 997,
+1069`; on the other five it is cheaper at `0` (`1.16`–`1.86`) and the order changes at `0.1` (`p = 769`) or `1` GAE
+(`0.78`–`0.99`): there the ranking is unresolved.  The per-curve spread is the step count of `16` walks (steps
+ratio `1.29`–`2.10` per curve, `1.701` pooled), not the representative.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.134 | `0` mismatches on `49,920` members; both controls caught on all eight curves | **holds** (the `x = 0` case has no point to test) |
+| G2.135 | `512/512` E29 records identical; E29's functions untouched (the unit test `e34_built_arms_reproduce_e29_walks` is written but not run: see below) | **holds** (registered count `256` was per arithmetic) |
+| G2.136 | `768/768` | **holds** |
+| G2.137 | `16/16` | **holds** |
+| G2.138 | `8.00`; `4.00`; `86`–`92`; `15.16`–`15.18`; `10.17`–`10.18`; equal in both arithmetics | **holds** |
+| G2.139 | `1.072`–`1.086` (schoolbook), `1.086`–`1.100` (Karatsuba) | **holds** |
+| G2.140 | `16.77`; `15.22`; `65.25`–`65.29`; `25.81`–`25.87` (`cmp` `13.52`–`13.59` a call) | **holds** |
+| G2.141 | `1.563 / 1.254 / 1.126` (S), `1.544 / 1.232 / 1.122` (K); `7/8` curves | **holds** |
+| G2.142 | `1.505 / 1.167 / 1.026` (S), `1.476 / 1.140 / 1.021` (K) | **holds**: above `1` at every weight, pooled, by `2 %` at `1` GAE |
+| G2.143 | see below | derived |
+
+**Consequence for E18.**  E18's `ψ` arm was measured against E29's order-6 walk.  The strongest walk now costs
+`1.632×` (`0` GAE), `1.254×` (`0.1`) and `1.126×` (`1` GAE) less than that walk, pooled, schoolbook (Karatsuba
+`1.627`, `1.232`, `1.122`): **every E18 `ψ`-arm distance to rho lengthens by that factor, and the modelled handover
+(§9.3, `2^{146.0}`) moves later by `4·log₂` of it, `2.83` / `1.31` / `0.68` bits (Karatsuba `2.81` / `1.20` / `0.66`).**  Of this, the order-6 walk's own
+cheaper representative is `1.035`–`1.039×` at `0` GAE; the rest is the order-24 action.  This is a **reference
+correction, not an improvement**: no index-calculus cost changed, the rho reference got stronger.  §9.33's "lower
+bounds at `1` GAE" now has a value.
+
+**Unit tests.**  `twist24_rep::tests` (built arms = E29's walks with E29's functions; cheap walks = built walks; cheap
+representatives = E29's, both controls caught) are written but could not be run: the crate's test build fails on
+E33's committed test in `src/cryptanalysis/klein_v4.rs` (`2095`–`2122`, a 13-element tuple comparison, `E0369`).
+The same assertions hold on the full Stage R records above.  Clippy (no warning in E34's files; one `is_multiple_of` rewrite after the runs, behaviour-identical) and rustfmt pass.
+
+**What it says.**  The order-24 action is the stronger rho on E18's `j = 0` curves once its class representative is
+built as the coordinate-wise structure allows: `15` multiplications instead of `86`–`92`, so a step costs `7–10 %`
+more than an order-6 step instead of `80 %`, against `1.70×` fewer steps.  That holds pooled at every weight of the
+band with every operation of both walks emitted.  The margin at `1` GAE is thin (`2 %` over the cheap order-6 walk)
+and rests on the `11` comparisons that a minimum of twelve needs.  No representative equal to E29's avoids them.
