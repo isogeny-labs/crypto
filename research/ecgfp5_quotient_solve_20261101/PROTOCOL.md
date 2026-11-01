@@ -262,3 +262,50 @@ resolved). An arm stopped by the wall cap has spent more than 1.25 × W0 and is 
 **no improvement**, with its CPU; one stopped by the RSS cap is not_measured. If W0's F4 did
 not finish, a weighted arm that finishes is an improvement over W0's lower bound, reported as
 such.
+
+## 12. Amendment A3 (2026-11-01T02:20Z): signature-based arms, before any of them runs at m = 5
+
+**Request.** Owner, 2026-11-01: "try F5 or a signature-based solver instead".
+
+**Why it can matter here** (*recorded*, `results/m5_p4111_planted/quot.log`): msolve's F4
+reduces most selected pairs to zero, 2,140 of 2,700 at degree 24 and 2,064 of 2,500 at
+degree 27. For a regular sequence, F5's signature criteria discard every reduction to zero
+(Faugère 2002; Eder and Faugère, "A survey on signature-based algorithms for computing Gröbner
+bases", J. Symb. Comput. 2017, HAL hal-00974810; that id is the one found by search, the text itself was not read here), and the system shows the regular behaviour
+of §11 (no degree falls). msolve 0.6.5 has no F5. The only signature-based implementation
+installable here is Singular 4.3.2's `sba` (Ubuntu `1:4.3.2-p10+ds-1.1build1`), a
+one-pair-at-a-time signature algorithm without F4-style linear algebra, single-threaded.
+So the arms compare **F5's pruning in Singular** against **F4 without pruning in msolve**,
+two implementations at once; a loss does not show that F5 cannot help, and a win cannot be
+split between the algorithm and the implementation without a Singular `std` arm, which is
+not run at m = 5 (§12 limits).
+
+**Dev check** (*recorded*, `dev/m3_sba_p4111/`): on the 4111 planted m = 3 systems `sba`
+returns vdim 16 (quot) and 64 (sym_u) in all three tested modes, as msolve does; on raw_u
+it stops with "exponent bound is 65535".
+
+**Arms** (m = 5, p = 4111, the baseline cell's `quot.ms`, converted by `ms2sing.sh`,
+grevlex `dp`, same variable order, `option(redSB)`):
+
+| arm | call | signature order | rewrite order |
+|---|---|---|---|
+| F5a | `sba(i, 0, 1)` (Singular's default) | induced Schreyer, non-incremental | JSC 2011 (doi 10.1016/j.jsc.2011.05.004) |
+| F5b | `sba(i, 1, 0)` | position over term, incremental (classical F5) | JSC 2010 (doi 10.1016/j.jsc.2010.06.019) |
+
+**Run** by `run_probes.sh drive`, which replaces `run_weighted.sh drive` (stopped at 02:15Z
+while still waiting; it had run nothing, its empty log is under
+`results/_superseded_driver_20261101T0215Z/`). Order: baseline check, F5a, F5b, then the A2
+arms W1, W3, W2 unchanged, then `run_cells.sh m5 262231` and `m5 33554371`. Caps: 12 GiB RSS;
+wall = 1.25 × W0's F4 CPU seconds + 60 (single-threaded, so wall ≈ CPU), or 4 h if W0's F4
+did not finish.
+
+**Criterion** (frozen, as in §11 but on CPU): an `sba` arm is a measured improvement only if
+it completes, returns vdim equal to W0's D, and its CPU is below W0's F4 CPU by a factor
+≥ 1.5. Stopped by the wall cap: no improvement (it has spent more than 1.25 × W0's CPU).
+Stopped by the RSS cap: not_measured. Reported per arm: completion, CPU, max RSS, vdim,
+basis size, Singular's syz and rewrite criterion counts.
+
+**Prediction** (*predicted*): both `sba` arms are stopped by the cap (Singular's sba is
+reported to need much more time than F4 implementations on large dense systems; its manual
+advises `std`/`slimgb` when memory grows), so no improvement is measured; a positive result
+would need a signature-based F4 (matrix-F5, GVW/F4-style) that this host lacks.
