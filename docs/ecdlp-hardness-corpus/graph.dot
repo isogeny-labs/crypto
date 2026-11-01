@@ -20,6 +20,15 @@ digraph ecdlp_claims {
     "DEF-XEDNI-CALCULUS" [label="DEF-XEDNI-CALCULUS\\nXedni calculus lifting attack", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
     "DEF-GAP-DH" [label="DEF-GAP-DH\\nGap Diffie-Hellman setting", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
     "RED-SCHNORR-ROM" [label="RED-SCHNORR-ROM\\nSchnorr-to-DL random-oracle reduction", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
+    "DEF-MULTIDIMENSIONAL-DLP" [label="DEF-MULTIDIMENSIONAL-DLP\\nRepresentation and product DLP", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-LOW-HAMMING-DLP" [label="DEF-LOW-HAMMING-DLP\\nLow-Hamming-weight DLP", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-SUBEXPONENTIAL-L" [label="DEF-SUBEXPONENTIAL-L\\nSubexponential L notation\\nL_N(alpha,c)=exp((c+o(1))(log N)^alpha(log log N)^(1-alpha))", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-FIXED-CDH" [label="DEF-FIXED-CDH\\nFixed-base Diffie-Hellman", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "THEOREM-CDH-SELF-CORRECTION" [label="THEOREM-CDH-SELF-CORRECTION\\nCDH success amplification", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
+    "RED-DEN-BOER-FIXED-CDH" [label="RED-DEN-BOER-FIXED-CDH\\nden Boer DLP-to-Fixed-CDH reduction\\ngroup cost = O(sqrt(l) log(r)^2/log(l)); oracle queries = O(log(r)log log(r))", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
+    "RED-MAURER-AUXILIARY-CURVE" [label="RED-MAURER-AUXILIARY-CURVE\\nMaurer auxiliary-curve reduction\\noracle queries = O(log(r)^2 log log(r))", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
+    "RED-DLP-LEAST-SIGNIFICANT-BIT" [label="RED-DLP-LEAST-SIGNIFICANT-BIT\\nLeast-significant DLP bit is as hard as DLP", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
+    "RED-ISOGENY-DLP-TRANSPORT" [label="RED-ISOGENY-DLP-TRANSPORT\\nEfficient isogeny transports ECDLP", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
   }
   subgraph cluster_bounds {
     label="Rigorous model bounds and structural theorems"; color="#cad5df"; style="rounded";
@@ -46,6 +55,10 @@ digraph ecdlp_claims {
     "THEOREM-XEDNI-FINITE-CORE" [label="THEOREM-XEDNI-FINITE-CORE\\nKernel-checked finite xedni core\\nPr[fixed useful relation]=(q-1)/q^2; uniform hazard O(1/p) => E[T]=Omega(p)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THEOREM-XEDNI-FF-DENSITY" [label="THEOREM-XEDNI-FF-DENSITY\\nExact codimension-three function-field lift density\\nP_lift(p)=(1-2/p+p^-3)/(2p^3)=Theta(p^-3)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "FACT-S3-ROOTS-ARE-GROUP-LAW" [label="FACT-S3-ROOTS-ARE-GROUP-LAW\\nS3 rootfinding collapses to group subtraction\\nS3(x_R,x_F,X)=(x_R-x_F)^2 (X-x(R-F))(X-x(R+F))", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "LB-GENERIC-REPRESENTATION" [label="LB-GENERIC-REPRESENTATION\\nGeneric representation lower bound\\nT = Omega(s^(l/2)/log(s)^(c/2))", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THEOREM-CDH-RANDOM-SELF-REDUCTION" [label="THEOREM-CDH-RANDOM-SELF-REDUCTION\\nCDH random self-reducibility", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THEOREM-PAIRING-BILINEAR-NONDEGENERATE" [label="THEOREM-PAIRING-BILINEAR-NONDEGENERATE\\nPairing bilinearity and nondegeneracy", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "FACT-PAIRING-FRIENDLY-TWO-DLPS" [label="FACT-PAIRING-FRIENDLY-TWO-DLPS\\nPairing-friendly security is two-sided", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -72,6 +85,11 @@ digraph ecdlp_claims {
     "ESTIMATE-QUANTUM-CAT-2023" [label="ESTIMATE-QUANTUM-CAT-2023\\n2023 repetition-cat physical estimate\\n126133 cat qubits; 9 h; mean 19 photons/cat under stated assumptions", fillcolor="#fce8d8", color="#b45309", style="rounded,filled"];
     "ESTIMATE-QUANTUM-IONQ-2026" [label="ESTIMATE-QUANTUM-IONQ-2026\\n2026 trapped-ion secp256k1 preprint estimate\\n~1450 logical qubits; 40e6 Toffoli; 19397 physical qubits; 25.7 d; estimated success 63%", fillcolor="#fce8d8", color="#b45309", style="rounded,filled"];
     "BOUNDARY-INVALID-CURVE" [label="BOUNDARY-INVALID-CURVE\\nInvalid-curve and small-subgroup boundary", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
+    "ALG-COPPERSMITH-LOW-HAMMING" [label="ALG-COPPERSMITH-LOW-HAMMING\\nCoppersmith low-weight meet-in-the-middle\\nE[T] = O(sqrt(w) * binom(n/2,w/2)); S = O(binom(n/2,w/2))", fillcolor="#fce8d8", color="#b45309", style="rounded,filled"];
+    "THEOREM-RHO-THREE-PARTITION" [label="THEOREM-RHO-THREE-PARTITION\\nRigorous three-partition rho bound\\nT = O_epsilon(sqrt(r) log(r)^3)", fillcolor="#fce8d8", color="#b45309", style="rounded,filled"];
+    "ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL" [label="ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL\\nGaudry-Schost two-dimensional walk\\nE[T] = (2.43+o(1)) N", fillcolor="#fce8d8", color="#b45309", style="rounded,filled,dashed"];
+    "ALG-STATIC-DH-AUXILIARY-POWERS" [label="ALG-STATIC-DH-AUXILIARY-POWERS\\nStatic-DH auxiliary-power attack\\nT = O((sqrt((r-1)/d)+sqrt(d))log(r)); Q = d", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
+    "RED-PAIRING-CO-DDH" [label="RED-PAIRING-CO-DDH\\nPairing decision reduction", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
   }
   subgraph cluster_evidence {
     label="Measured and heuristic evidence"; color="#cad5df"; style="rounded";
@@ -84,6 +102,7 @@ digraph ecdlp_claims {
     "HEUR-FIRST-FALL-DEGREE" [label="HEUR-FIRST-FALL-DEGREE\\nFirst-fall/regularity degree heuristic", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
     "HEUR-RELATION-RANK" [label="HEUR-RELATION-RANK\\nRelation independence/rank heuristic\\nR >= B + margin", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
     "HEUR-SYMMETRY-PDP-SPEEDUP" [label="HEUR-SYMMETRY-PDP-SPEEDUP\\nInvariant-coordinate PDP speedup", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
+    "HEUR-WAGNER-FOUR-SUM" [label="HEUR-WAGNER-FOUR-SUM\\nWagner four-sum cube-root heuristic\\nT,S = soft-O(2^(n/3))", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
   }
   subgraph cluster_open {
     label="Open proof and attack surfaces"; color="#cad5df"; style="rounded";
@@ -218,4 +237,30 @@ digraph ecdlp_claims {
   "GAP-XEDNI-END-TO-END" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-XEDNI-END-TO-END" -> "DEF-XEDNI-CALCULUS" [label="leaves_open", color="#66788a", style="dashed"];
   "THEOREM-XEDNI-FINITE-CORE" -> "GAP-XEDNI-END-TO-END" [label="leaves_open", color="#66788a", style="dashed"];
+  "LB-GENERIC-REPRESENTATION" -> "DEF-MULTIDIMENSIONAL-DLP" [label="lower_bounds", color="#66788a", style="solid"];
+  "DEF-MULTIDIMENSIONAL-DLP" -> "PROB-ECDLP" [label="qualifies", color="#66788a", style="dashed"];
+  "ALG-COPPERSMITH-LOW-HAMMING" -> "DEF-LOW-HAMMING-DLP" [label="upper_bounds", color="#66788a", style="solid"];
+  "DEF-LOW-HAMMING-DLP" -> "PROB-ECDLP" [label="qualifies", color="#66788a", style="dashed"];
+  "HEUR-WAGNER-FOUR-SUM" -> "GAP-COORDINATE-ALGEBRAIC" [label="instantiates", color="#66788a", style="solid"];
+  "THEOREM-RHO-THREE-PARTITION" -> "ALG-POLLARD-RHO" [label="qualifies", color="#66788a", style="dashed"];
+  "ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL" -> "ALG-KANGAROO-INTERVAL" [label="qualifies", color="#66788a", style="dashed"];
+  "DEF-SUBEXPONENTIAL-L" -> "ATTACK-DIEM-EXTENSION" [label="defines", color="#66788a", style="solid"];
+  "DEF-FIXED-CDH" -> "PROB-CDH" [label="qualifies", color="#66788a", style="dashed"];
+  "THEOREM-CDH-RANDOM-SELF-REDUCTION" -> "PROB-CDH" [label="qualifies", color="#66788a", style="dashed"];
+  "THEOREM-CDH-RANDOM-SELF-REDUCTION" -> "THEOREM-CDH-SELF-CORRECTION" [label="enables", color="#66788a", style="solid"];
+  "THEOREM-CDH-SELF-CORRECTION" -> "DEF-FIXED-CDH" [label="qualifies", color="#66788a", style="dashed"];
+  "RED-DEN-BOER-FIXED-CDH" -> "DEF-FIXED-CDH" [label="reduces_to", color="#66788a", style="solid"];
+  "RED-DEN-BOER-FIXED-CDH" -> "PROB-ECDLP" [label="conditions", color="#66788a", style="solid"];
+  "RED-MAURER-AUXILIARY-CURVE" -> "DEF-FIXED-CDH" [label="reduces_to", color="#66788a", style="solid"];
+  "RED-MAURER-AUXILIARY-CURVE" -> "PROB-ECDLP" [label="conditions", color="#66788a", style="solid"];
+  "ALG-STATIC-DH-AUXILIARY-POWERS" -> "PROB-CDH" [label="qualifies", color="#66788a", style="dashed"];
+  "RED-DLP-LEAST-SIGNIFICANT-BIT" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
+  "RED-ISOGENY-DLP-TRANSPORT" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
+  "RED-ISOGENY-DLP-TRANSPORT" -> "THEOREM-JMV-ISOGENY-REDUCTION" [label="enables", color="#66788a", style="solid"];
+  "THEOREM-PAIRING-BILINEAR-NONDEGENERATE" -> "ATTACK-MOV-PAIRING" [label="enables", color="#66788a", style="solid"];
+  "THEOREM-PAIRING-BILINEAR-NONDEGENERATE" -> "RED-PAIRING-CO-DDH" [label="enables", color="#66788a", style="solid"];
+  "RED-PAIRING-CO-DDH" -> "PROB-DDH" [label="attacks_when", color="#66788a", style="solid"];
+  "RED-PAIRING-CO-DDH" -> "DEF-GAP-DH" [label="enables", color="#66788a", style="solid"];
+  "FACT-PAIRING-FRIENDLY-TWO-DLPS" -> "ATTACK-MOV-PAIRING" [label="conditions", color="#66788a", style="solid"];
+  "FACT-PAIRING-FRIENDLY-TWO-DLPS" -> "FACT-FIELD-DLP-AFTER-PAIRING" [label="qualifies", color="#66788a", style="dashed"];
 }
