@@ -359,6 +359,14 @@ pub(super) fn solve_with_bound_event_sink_context(
     }
     let mut result = solve_with_context(config, case, context);
     if let Ok(data) = &mut result {
+        if data.outcome["strategy"] == DYNAMIC_M4_STRATEGY {
+            live_event(&json!({"kind":"solver_return","outcome":data.outcome,"error":null}))?;
+            LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(EventSink::Bound(s)) => s.finish().map_err(|e| e.to_string()),
+                _ => Err("bound capture sink disappeared".into()),
+            })?;
+            return result;
+        }
         if retains_canonical_artifacts(data) {
             flush_prime_chain_payloads(data);
             if data.outcome.get("live_persistence_errors").is_none() {
@@ -621,12 +629,12 @@ pub(super) fn solve_with_context(
         "bsgs" => bsgs(config, case, &group, &target)?,
         "sat" => sat_solve(config, &group, &points, &target)?,
         "f4" if matches!(group, Group::Prime(_)) => {
-            let result = prime_f4(config, &group, &points, &target, context)?;
+            let result = prime_f4(config, case, &group, &points, &target, context)?;
             if let Some(input) = result
                 .artifacts
                 .iter()
                 .find(|a| a.path == "prime-f4-input.json")
-                .filter(|_| config.m > 2)
+                .filter(|_| config.m > 2 && result.outcome["strategy"] != DYNAMIC_M4_STRATEGY)
             {
                 verify_prime_f4_chain_input(
                     &case.public_instance,
@@ -2310,6 +2318,7 @@ fn prime_f4_chain(
 
 fn prime_f4(
     config: &CaseConfig,
+    case: &CaseData,
     group: &Group,
     domain: &[Element],
     target: &Element,
@@ -2317,6 +2326,12 @@ fn prime_f4(
 ) -> Result<SolverData, String> {
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;
+    if config.m == 4
+        && context.is_some()
+        && matches!(group, Group::Prime(curve) if curve.p.to_u64().is_some_and(|p| p >= 1u64 << 32))
+    {
+        return prime_f4_wide_dynamic_m4(config, case, context.expect("checked above"));
+    }
     if config.m == 3
         && context.is_some()
         && matches!(group, Group::Prime(curve) if curve.p.to_u64().is_some_and(|p| p >= 1u64 << 32))
@@ -3093,12 +3108,14 @@ pub(super) fn verify_prime_root_artifact(
 pub(super) enum WidePrimeReplay {
     Ordinary,
     CensoredM3Prefix,
+    VerifiedDynamic,
 }
 /// Semantic wide-prime replay, independent of native basis derivation.
 // Original-input construction is separate from profile dispatch. The versioned
 // solver identifier is deliberately NOT yet accepted by production plan/CLI.
 #[allow(dead_code)]
 const DYNAMIC_PROFILE: &str = "f4-wide-dynamic-v1";
+const DYNAMIC_M4_STRATEGY: &str = "prime-f4-fp64-affine-chain-m4-bounded/v1";
 #[allow(dead_code)]
 struct DynamicOriginal {
     p: u64,
@@ -3129,6 +3146,109 @@ impl DynamicOriginal {
         }
     }
 }
+/// First activated higher-arity profile. The native reducer and original
+/// signed-group traversal have separate bounded receipts. A positive witness
+/// is useful even when the native or full-domain search remains incomplete.
+fn prime_f4_wide_dynamic_m4(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: &super::execution::SolverExecutionContext,
+) -> Result<SolverData, String> {
+    use prime_f4_wide_dynamic as d;
+    let original = dynamic_original(
+        config,
+        case,
+        context.launch.memory_bytes,
+        context.launch.trace_bytes,
+    )?;
+    let points: Vec<_> = original
+        .domain
+        .iter()
+        .map(|p| d::AffinePoint { x: p.x, y: p.y })
+        .collect();
+    let target = d::AffinePoint {
+        x: original.target.x,
+        y: original.target.y,
+    };
+    let mut forward = |event: &d::PhaseEvent, buffer: &mut super::capture::TypedEventBuffer| {
+        live_typed_event(
+            super::capture::TypedEventKind::WidePrimeDynamic,
+            event,
+            buffer,
+        )
+        .map_err(|_| ())
+    };
+    let mut prepared = d::prepare_original(
+        original.p,
+        d::Parameters {
+            m: original.m,
+            a: original.a,
+            b: original.b,
+            target_x: original.target.x,
+            codes: &original.codes,
+        },
+        target,
+        &points,
+        d::AttemptLimits {
+            work_limit: config.work_limit,
+            memory_bytes: context.launch.memory_bytes,
+            trace_bytes: context.launch.trace_bytes,
+            degree_bound: config.degree_bound,
+            original_deadline: context.deadline,
+        },
+        d::EventPersistence::BoundCapture,
+        &mut forward,
+    )
+    .map_err(|e| format!("wide m4 original preparation stopped: {:?}", e.stop))?;
+    let mut publisher = d::BoundWitnessPublisher::default();
+    d::prepare_step4(&mut prepared, &mut publisher)
+        .map_err(|e| format!("wide m4 witness admission stopped: {e:?}"))?;
+    let mut phase = d::invoke_original(prepared, &mut forward)
+        .map_err(|e| format!("wide m4 native F4 stopped: {:?}", e.stop))?;
+    let linear = d::extract_reported_linear(&mut phase);
+    d::retain_linear(&mut phase, &linear)
+        .map_err(|e| format!("wide m4 linear retention stopped: {e:?}"))?;
+    let group = d::run_group_step4(&mut phase, Some(&linear), &mut forward, &mut publisher);
+    if group.certificate_durably_persisted {
+        d::confirm_step4_witness(&mut phase.prepared, &mut publisher)
+            .map_err(|e| format!("wide m4 witness confirmation stopped: {e:?}"))?;
+    }
+    d::retain_step4_terminal(&mut phase)
+        .map_err(|e| format!("wide m4 terminal retention stopped: {e:?}"))?;
+    d::visit_step4_retained_artifacts(&phase.prepared, |path, role, encoding, bytes| {
+        if path == "pdp-witness.json" {
+            Ok(()) // Dedicated publication above is the only witness commit.
+        } else {
+            live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+        }
+    })
+    .map_err(|_| "wide m4 retained artifact publication stopped".to_string())?;
+    let artifacts = d::take_step4_artifacts(&mut phase.prepared)
+        .map_err(|e| format!("wide m4 artifact transfer stopped: {e:?}"))?;
+    let mut data = SolverData {
+        outcome: outcome("partial", "Bounded native wide-prime F4 and signed-group traversal retained; completion is replay-gated"),
+        artifacts,
+    };
+    data.outcome["strategy"] = json!(DYNAMIC_M4_STRATEGY);
+    data.outcome["native_backend_invoked"] = json!(phase.report.native_backend_invoked);
+    data.outcome["native_statistics_complete"] = json!(phase.report.native_statistics_complete);
+    data.outcome["algebra_completed"] = json!(phase.report.native_statistics_complete);
+    data.outcome["pdp_witness_verified"] =
+        json!(group.pdp_witness_verified && group.certificate_durably_persisted);
+    data.outcome["certificate_durably_persisted"] = json!(group.certificate_durably_persisted);
+    data.outcome["group_domain_complete"] = json!(group.group_domain_complete);
+    data.outcome["exhaustive_no_decomposition"] = json!(false);
+    data.outcome["counters"] = json!({
+        "native_reserved_work": phase.report.reserved.work,
+        "native_reserved_bytes": phase.report.reserved.bytes,
+        "group_tuples_reserved": group.tuples_reserved,
+        "group_additions_reserved": group.additions_reserved,
+        "group_additions_performed": group.additions_performed,
+        "group_checking_work_reserved": group.checking_reserved_work,
+        "units": "backend tariffs and group additions; no machine instruction attribution"
+    });
+    Ok(data)
+}
 /// The parent must first authenticate config and execution limits against the
 /// original run. This independently validates/reconstructs public mathematical
 /// inputs; it never consults private_witness or any solver-produced input file.
@@ -3140,11 +3260,11 @@ fn dynamic_original(
     trace_bytes: u64,
 ) -> Result<DynamicOriginal, String> {
     use prime_f4_wide_dynamic_replay::Point as ReplayPoint;
-    if config.solver != DYNAMIC_PROFILE
+    if config.solver != DYNAMIC_PROFILE && !(config.solver == "f4" && config.m == 4)
         || config.family != "prime"
         || !(33..=61).contains(&config.n)
         || !(4..=15).contains(&config.m)
-        || config.degree_bound != 12
+        || !(1..=12).contains(&config.degree_bound)
         || config.work_limit == 0
         || memory_bytes == 0
         || trace_bytes == 0
@@ -3310,9 +3430,60 @@ pub(super) fn verify_prime_f4_wide(
 ) -> Result<WidePrimeReplay, String> {
     let disposition = prime_f4_wide_m3::verify(dir, config, outcome, artifacts)?;
     if disposition == WidePrimeReplay::Ordinary {
+        if verify_prime_f4_dynamic_m4(dir, config, outcome, artifacts)? {
+            return Ok(WidePrimeReplay::VerifiedDynamic);
+        }
         prime_f4_wide::verify(dir, config, outcome, artifacts)?;
     }
     Ok(disposition)
+}
+
+fn verify_prime_f4_dynamic_m4(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<bool, String> {
+    let reserved = artifacts.iter().any(|a| {
+        a.path.starts_with("prime-f4-wide-dynamic-")
+            || a.role.starts_with("restricted-wide-prime-dynamic-")
+    });
+    if !reserved && outcome["strategy"] != DYNAMIC_M4_STRATEGY {
+        return Ok(false);
+    }
+    if config.family != "prime"
+        || config.solver != "f4"
+        || config.m != 4
+        || !(33..=61).contains(&config.n)
+    {
+        return Err("dynamic m4 artifact/config mismatch".into());
+    }
+    let launch = super::execution::load(dir)?
+        .ok_or("dynamic m4 replay lacks original worker execution context")?;
+    let case = CaseData {
+        public_instance: super::read_json(&dir.join("public.json"))?,
+        factor_base: super::read_json(&dir.join("factor-base.json"))?,
+        private_witness: Value::Null,
+    };
+    let original = dynamic_original(config, &case, launch.memory_bytes, launch.trace_bytes)?;
+    let capture_limits = super::capture::capture_limits(launch.trace_bytes / (1024 * 1024))?;
+    let verified = prime_f4_wide_dynamic_replay::verify_files(
+        dir,
+        &original.expected(),
+        artifacts,
+        &launch.binding,
+        &capture_limits,
+        prime_f4_wide_dynamic_replay::ReplayLimits {
+            work: 10_000_000_000,
+            allocation_bytes: 128 * 1024 * 1024,
+            deadline: Instant::now() + Duration::from_secs(30),
+        },
+    )?;
+    if outcome["strategy"] != DYNAMIC_M4_STRATEGY {
+        return Err("dynamic m4 strategy mismatch".into());
+    }
+    verify_dynamic_claims(outcome, &verified)?;
+    Ok(true)
 }
 
 fn wide_begin_failure(
@@ -3939,6 +4110,84 @@ mod tests {
             degree_bound: 4,
             work_limit: 1000,
             solver: solver.into(),
+        }
+    }
+
+    #[test]
+    fn supervised_wide_prime_m4_uses_native_backend_on_both_twists() {
+        use super::super::execution::{LaunchContext, SolverExecutionContext};
+        for (n, twist) in [(47, false), (47, true), (61, false), (61, true)] {
+            let mut cfg = config("prime", "f4");
+            cfg.n = n;
+            cfg.m = 4;
+            cfg.twist = twist;
+            cfg.factor_base_size = 2;
+            cfg.degree_bound = 3;
+            cfg.work_limit = 50_000;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let binding = AttemptBinding {
+                schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+                run_sha256: "1".repeat(64),
+                plan_sha256: "2".repeat(64),
+                protocol_sha256: "3".repeat(64),
+                config_sha256: "4".repeat(64),
+                source_commit: "5".repeat(40),
+                binary_sha256: "6".repeat(64),
+                cell_index: n as u64 + u64::from(twist),
+                attempt_sha256: "7".repeat(64),
+            };
+            let launch = LaunchContext {
+                schema: "crypto.ml-dataset.execution-context/v1".into(),
+                binding: binding.clone(),
+                boot_id: "00000000-0000-0000-0000-000000000000".into(),
+                start_monotonic_ns: 1,
+                deadline_monotonic_ns: 30_000_000_001,
+                seconds_per_case: 30,
+                memory_bytes: 512 * 1024 * 1024,
+                trace_bytes: 64 * 1024 * 1024,
+            };
+            let context = SolverExecutionContext {
+                launch,
+                deadline: Instant::now() + Duration::from_secs(30),
+            };
+            let root = std::env::temp_dir().join(format!(
+                "prime-wide-m4-{}-{}-{n}-{twist}",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            struct Cleanup(PathBuf);
+            impl Drop for Cleanup {
+                fn drop(&mut self) {
+                    let _ = fs::remove_dir_all(&self.0);
+                }
+            }
+            let _cleanup = Cleanup(root.clone());
+            let data = solve_with_bound_event_sink_context(
+                &cfg,
+                &case,
+                &root.join("capture"),
+                binding,
+                super::super::capture::capture_limits(64).unwrap(),
+                Some(&context),
+            )
+            .unwrap();
+            assert_eq!(data.outcome["strategy"], DYNAMIC_M4_STRATEGY);
+            assert_eq!(data.outcome["native_backend_invoked"], true);
+            assert_eq!(data.outcome["solver_completed"], false);
+            assert!(data.outcome["first_fall_degree"].is_null());
+            assert!(data.outcome["last_fall_degree"].is_null());
+            assert!(data
+                .artifacts
+                .iter()
+                .any(|a| a.path == "prime-f4-input.json"));
+            assert!(data
+                .artifacts
+                .iter()
+                .any(|a| a.path == "prime-f4-wide-dynamic-result.json"));
         }
     }
 
