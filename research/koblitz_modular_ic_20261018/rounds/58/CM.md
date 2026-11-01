@@ -66,7 +66,7 @@ explicit preimages for EVERY fixed function in this space.
 ApplyQ to the embedded four old fixed-modulo-trace columns. Allfour
 source identities sigma(h)+h=f_old/A pass. Addinglambda/A changes trace
 by1 and is rejected as the original preimage. CHECK58 independently
-replays all ranks/kernel/contraction/inclusion products,100 source
+replays ranks,kernel recovery,the trace identity andinclusion products,100 source
 reconstructions,100 divisions andfour actual preimage identities.
 
 ## Complete finite support and conditional map constraints
@@ -100,10 +100,32 @@ binary coefficient extraction, four-cycle trace cancellation, ramification1
 under a double bound and the degree-unit implication. PROOF_MAP.md names
 the actual geometry/map premises. Read results.json for terminal compile/audit
 counts and every failure. The first Lean attempt lacked an explicit CharP
-import and is retained; no theorem is accepted from source text alone.
+import; the second left closed Coprime goals unsolved. Both are retained.
+The repaired finite cases use kernel-checked decide; no theorem is accepted
+from source text alone.
 
 Reviewed R27 complete RR/cusps,R43/R50 actual product packet,R54 finite
 Frobenius/sign family,R55/R56 complete zero quotient/poles,R57 complete
 restriction and trace functions. Primary reference:
 [Stacks RR and duality](https://stacks.math.columbia.edu/tag/0B5B).
 No novelty claim is made for linear algebra,RR or finite-field factorization.
+
+## New contained map test: eighteen stable-support patterns
+
+The alloweddegree filter leaves18 F2-stable O/T patterns on thefour
+originaldegree20components:12 ordered single-component pairs (degree20)
+and6 complementary two/two partitions (degree40). This cohort is smaller
+than all F32point subsets and will be labelled as such,without replacing
+the broader map search. For each pattern, div(x)=2T-2O is a degreezero
+principal-divisor question. In100-space, f=A²x must vanishorder4 atT
+andorder2 outsideO/T. These are COMPLETE linear local conditions.
+Constructing normalB/A^4,dimension320, supplies all pointjets. A nonzero
+solution is unique up toscalar by propercurve constant-field facts.
+
+For each surviving x0, enumerate all31 nonzero F32scalars and bothordinary
+signs. The Artin-Schreier equation t²+t=x+a+1/x² is F2-linear on the500
+binarycoefficients of completeL(2P),withNt=1 imposed. This avoids starting
+with a500-variable quadratic solve for this specifically bounded cohort.
+The generalF32-support quadratic compiler remains a separate retained lane.
+Final whole-source identities,allfivecoefficientconjugates andintended11action
+remain acceptance checks. This is the next experiment,not an executed map.

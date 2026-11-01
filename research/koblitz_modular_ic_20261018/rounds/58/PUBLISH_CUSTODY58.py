@@ -22,7 +22,7 @@ meta.update(fresh_download_verified=True,state='immutable object published;fresh
 
 SHA256 `{digest}`; {meta['bytes']} bytes, {meta['regular_files']} regular files.
 Scientific source `{meta['source_revision']}`; {meta['source_pins']} source pins.
-All terminal workflows,including the rejected initial Lean attempt,
+All terminal workflows,including all rejected Lean attempts,
 are retained. All executed source/protocol/driver pins match historical Git.
 The compiled Lean object and full audit are included; seven authored claims give seven audited declarations,zero failing/trusted.
 
