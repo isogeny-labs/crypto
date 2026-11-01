@@ -2933,12 +2933,12 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, binary_root, false)?;
     }
     let censored_m3_prefix = wide_prime_replay == solvers::WidePrimeReplay::CensoredM3Prefix;
-    let verified_dynamic_m4 = wide_prime_replay == solvers::WidePrimeReplay::VerifiedDynamic;
+    let verified_dynamic = wide_prime_replay == solvers::WidePrimeReplay::VerifiedDynamic;
     let prime_chain_declared = !censored_m3_prefix
-        && !verified_dynamic_m4
+        && !verified_dynamic
         && manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
     let prime_chain_input_expected = !censored_m3_prefix
-        && !verified_dynamic_m4
+        && !verified_dynamic
         && manifest.config.family == "prime"
         && manifest.config.solver == "f4"
         && (3..=15).contains(&manifest.config.m)
