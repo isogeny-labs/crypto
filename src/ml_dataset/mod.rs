@@ -4195,6 +4195,10 @@ mod tests {
         let dir = fixture.0.join("cells/000000000000");
         fs::create_dir_all(&dir).unwrap();
         let config = plan.cell(0).unwrap();
+        // `bound` wrote the original natural plan. This test constructs a
+        // different planted run, so replace only its test-local root binding.
+        fs::remove_file(fixture.0.join("plan.json")).unwrap();
+        fs::remove_file(fixture.0.join("run.json")).unwrap();
         for root in [&fixture.0, &dir] {
             storage::write_json(root, "plan.json", "plan", &plan).unwrap();
             storage::write_json(root, "run.json", "run", &binding).unwrap();
