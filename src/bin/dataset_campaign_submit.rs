@@ -453,13 +453,26 @@ fn admitted_guard(admitted: &Value, reviewed: &Value, approval: &AccessApproval)
     {
         return Err("admitted Job labels or annotations differ".into());
     }
+    let job_uid = admitted["metadata"]["uid"]
+        .as_str()
+        .filter(|uid| !uid.is_empty());
+    if job_uid.is_some() && admitted["spec"].get("selector").is_none() {
+        return Err("live Job lacks controller-UID selector".into());
+    }
     if let Some(selector) = admitted["spec"].get("selector") {
+        let uid = job_uid.ok_or("selector present without observed Job UID")?;
         exact_keys(selector, "", &["matchLabels"])?;
         let labels = selector["matchLabels"]
             .as_object()
             .ok_or("admitted Job selector lacks labels")?;
         if labels.is_empty() {
             return Err("empty admitted Job selector".into());
+        }
+        if !["batch.kubernetes.io/controller-uid", "controller-uid"]
+            .iter()
+            .any(|key| labels.get(*key).and_then(Value::as_str) == Some(uid))
+        {
+            return Err("admitted Job selector lacks matching controller UID".into());
         }
         for (key, value) in labels {
             match key.as_str() {
@@ -487,6 +500,14 @@ fn admitted_guard(admitted: &Value, reviewed: &Value, approval: &AccessApproval)
     let observed_labels = template_meta["labels"]
         .as_object()
         .ok_or("admitted Pod labels missing")?;
+    if let Some(uid) = job_uid {
+        if !["batch.kubernetes.io/controller-uid", "controller-uid"]
+            .iter()
+            .any(|key| observed_labels.get(*key).and_then(Value::as_str) == Some(uid))
+        {
+            return Err("admitted Pod template lacks matching controller UID".into());
+        }
+    }
     for (key, expected) in approved_labels.into_iter().flatten() {
         if observed_labels.get(key) != Some(expected) {
             return Err("admitted Pod template label differs".into());
@@ -1334,6 +1355,20 @@ mod tests {
         assert!(admitted_guard(&sidecar, &job, &approval)
             .unwrap_err()
             .contains("sidecar"));
+        let mut selector_without_uid = job.clone();
+        selector_without_uid["metadata"]["uid"] = json!("uid-1");
+        selector_without_uid["spec"]["selector"] =
+            json!({"matchLabels":{"batch.kubernetes.io/job-name":"test"}});
+        selector_without_uid["spec"]["template"]["metadata"]["labels"] =
+            json!({"batch.kubernetes.io/job-name":"test"});
+        assert!(admitted_guard(&selector_without_uid, &job, &approval)
+            .unwrap_err()
+            .contains("controller UID"));
+        selector_without_uid["spec"]["selector"]["matchLabels"]
+            ["batch.kubernetes.io/controller-uid"] = json!("uid-1");
+        selector_without_uid["spec"]["template"]["metadata"]["labels"]
+            ["batch.kubernetes.io/controller-uid"] = json!("uid-1");
+        assert!(admitted_guard(&selector_without_uid, &job, &approval).is_ok());
         job["spec"]["template"]["spec"]["volumes"][0]["hostPath"] = json!({"path":"/"});
         assert!(job_guard(&job, &approval, &reservation)
             .unwrap_err()
