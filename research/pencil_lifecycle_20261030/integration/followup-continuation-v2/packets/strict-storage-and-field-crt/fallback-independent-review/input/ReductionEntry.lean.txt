@@ -1,0 +1,32 @@
+import ReductionRun
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem reduction_exists (p : UInt64) [Fact p.toNat.Prime] (f u v : List UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hf : Canon p f) (hu : Canon p u) (hv : Canon p v) (hun : Normal u) (hune : u≠[])
+ (hfd : (wordsPoly p f).natDegree=5) (hu4 : (wordsPoly p u).natDegree≤4)
+ (hvalid : wordsPoly p u ∣ wordsPoly p f-(wordsPoly p v)^2) :
+ ∃ v0 a b, FallbackGeometry.remainder p v (monic p u)=some v0 ∧
+ Run p f (monic p u) v0 a b ∧ Canon p a ∧ Canon p b ∧
+ a≠[] ∧ a.length≤3 ∧ b.length≤2 ∧
+ MumfordValidity.Valid (wordsPoly p f) (wordsPoly p a) (wordsPoly p b) := by
+ have hus := monic_shape p u hp hb hu hun hune
+ have hum := normalization_valid p u (wordsPoly p f) (wordsPoly p v) hp hb hu hun hune (by simpa [pow_two] using hvalid)
+ obtain ⟨v0,hv0,hvc,hvn,hvs,hvd⟩ := FallbackGeometry.remainder_total p v (monic p u) hp hb hv hus.1 hus.2.1 hum.1.ne_zero
+ have hres := FallbackGeometry.remainder_valid _ _ _ _ hum.2.1 hvd
+ obtain ⟨a,b,hr,hac,hbc,hae,hal,hbl,hval⟩ := initialized_run p f (monic p u) v0 hp hb hf hus.1 hvc hus.2.1 hvn hus.2.2.2.1 hvs hfd (by rw [hum.2.2]; exact hu4) (by simpa [pow_two] using hres)
+ exact ⟨v0,a,b,hv0,hr,hac,hbc,hae,hal,hbl,hval⟩
+
+-- The exact composition identity bounds incoming U without using a timing model.
+theorem composed_degree {K : Type*} [Field K] (a b d u : K[X])
+ (ha : a≠0) (hb : b≠0) (hda : a.natDegree≤2) (hdb : b.natDegree≤2)
+ (heq : a*b=u*(d*d)) : u≠0 ∧ u.natDegree≤4 := by
+ have hab : a*b≠0 := mul_ne_zero ha hb
+ have hu : u≠0 := by intro hz; apply hab; simp [heq,hz]
+ have hd : d*d≠0 := by intro hz; apply hab; simp [heq,hz]
+ have hdeg : a.natDegree+b.natDegree=u.natDegree+(d*d).natDegree := by
+   rw [←natDegree_mul ha hb,heq,natDegree_mul hu hd]
+ exact ⟨hu,by omega⟩
+end ReductionWord

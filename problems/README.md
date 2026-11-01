@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Release suite JV isogeny-walk budget](release-suite-jv-isogeny-walk-budget.md) | investigating | complete release-library validation | diagnose the unchanged case and complete focused/full checks without weakening assertions |
+| [Symmetric PKM complete cost and cold DLP qualification](symmetric-pkm-complete-cost.md) | open | G1–G6 complete-cost improvement decision | checkpoint/artifact access, qualified native panels/counters, external reference and ideal/curve/cost proof bridges |
 | [Whole-book finite-field formalization](finite-field-handbook-formalization.md) | investigating | complete extraction, truth validation and Lean coverage of the supplied handbook | semantic coverage including unnumbered claims; faithful per-claim proofs and corrections; current conjecture status and independent fidelity review |
 | [Prime-IC line-layout EKS payload failure cause](ic-line-layout-eks-failure-cause.md) | investigating | the frozen fp20 line-layout tournament's required end-to-end performance decision | fixed-identity, hash-verified classification of both private launcher/payload receipts, followed by a scoped repair only if the evidence attributes one |
 | [Genus-3 image destination calculus and common-cost calibration](genus3-image-destination-calculus-and-common-cost-missing.md) | open | claiming that the executed n=83 genus-3 transfer weakens the DLP or yields a net speedup | complete non-generic solver over the exact image plus common-unit accounting, or paired L2+ complete-cost wall evidence on two hosts |
