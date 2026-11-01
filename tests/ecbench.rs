@@ -1298,8 +1298,9 @@ fn copy_dir(from: &Path, to: &Path) {
 
 #[test]
 fn pdp3_koblitz_f4_and_f6_verify_on_one_query_stream() {
-    // #1333's inherited-F4 and F6-IC decomposers inside ic.pipeline on the
-    // E_0 m = 13 curve: every run verifies; both arms, being exact solvers
+    // #1333's inherited-F4, F6-IC and pair-index F6-IC decomposers inside
+    // ic.pipeline on the E_0 m = 13 curve: every run verifies; all arms,
+    // being exact solvers
     // on the same base and seed, issue the same queries and find the same
     // relations; F6-IC's gate additions are charged and the solver's word
     // XORs are counted but left out of S, which is therefore a lower bound.
@@ -1315,7 +1316,10 @@ fn pdp3_koblitz_f4_and_f6_verify_on_one_query_stream() {
           "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192"}}},
         {"name": "ic-f6", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
           "factor_base": "koblitz-standard-subspace:dimension=5",
-          "oracle": "pdp3-koblitz:m=3,engine=f6-ic,degree=3,node_budget=8192"}}}
+          "oracle": "pdp3-koblitz:m=3,engine=f6-ic,degree=3,node_budget=8192"}}},
+        {"name": "ic-f6-pair", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=3,engine=f6-ic-pair,degree=3,node_budget=8192"}}}
       ],
       "measurement": {"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 120}
     }"#;
@@ -1335,7 +1339,7 @@ fn pdp3_koblitz_f4_and_f6_verify_on_one_query_stream() {
         let extra = &r["solver"]["extra"];
         let geometry = extra["geometric_group_additions"].as_u64().unwrap();
         assert_eq!(extra["geometric_fallbacks"], 0, "{line}");
-        if r["arm"] == "ic-f6" {
+        if r["arm"].as_str().unwrap().starts_with("ic-f6") {
             assert!(geometry > 0, "F6-IC charged no geometry: {line}");
         } else {
             assert_eq!(geometry, 0, "{line}");
@@ -1346,12 +1350,14 @@ fn pdp3_koblitz_f4_and_f6_verify_on_one_query_stream() {
     }
     assert_eq!(by_workload.len(), 2);
     for (w, rs) in by_workload {
-        assert_eq!(rs.len(), 2, "{w}");
+        assert_eq!(rs.len(), 3, "{w}");
         for key in ["targets_tried", "relations_found", "matrix_rank"] {
-            assert_eq!(
-                rs[0]["counters"][key], rs[1]["counters"][key],
-                "{w}: the arms' query streams diverged at {key}"
-            );
+            for candidate in &rs[1..] {
+                assert_eq!(
+                    rs[0]["counters"][key], candidate["counters"][key],
+                    "{w}: the arms' query streams diverged at {key}"
+                );
+            }
         }
     }
     let (ok, _, err) = ecbench(&[

@@ -139,11 +139,15 @@ subgroup, target law, advice scope, and unit:
 | E2E finite-size | complete cold one-target candidate/reference/A/A shards | a frontier point in that exact domain |
 | scaling | at least four sizes, same law and implementation | qualified trend; still no cryptographic extrapolation without a validated model |
 
-The current nine-spec draft covers only a subset of these cells and plans
-4,704 process executions. It is therefore a planning artifact, not the closed
-campaign. It must be split into one-hour candidate/reference/A-A shards and
-expanded with random-binary, j=0, j=1728, generator-orbit, wide F_((2^m)^4),
-and specialized-domain panels before prospective freeze.
+The original nine-spec draft covers only a subset of these cells and plans
+4,704 process executions, so it remains planning history rather than a queue
+submission. The replacement in `specs/shards/` contains 92 bounded
+candidate/reference/A-A specs and 13,888 planned processes. It adds the
+random-binary, j=0, j=1728, generator-orbit, wide F_((2^m)^4), large-prime-v2
+and specialized-domain panels, and the exact binary validates every expansion.
+`SHARDS.md` records the remaining target-law and preregistration limits; the
+replacement is still draft until runtime preflight, analysis hashing,
+checkpoint upload and prospective freeze.
 
 ## Current status
 
