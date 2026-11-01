@@ -1,3 +1,5 @@
+> **Pricing note**: the w > 0 figures here (fused/baseline 0.91-1.30) price the baseline's table bytes as operations (see `../ic_residual_dp_eq_20261101/README.md`); w = 0 is unaffected.
+
 # Fused residual step (targets=residual-fused): result
 
 Protocol: [PROTOCOL.md](PROTOCOL.md) (frozen before data; Amendment 1: local L0 run, counted units only).

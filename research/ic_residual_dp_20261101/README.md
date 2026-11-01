@@ -1,3 +1,5 @@
+> **Also**: the w > 0 figures were further inflated by the byte-counter pricing described in `../ic_residual_dp_eq_20261101/README.md`.
+
 > **SUPERSEDED for w > 0.** The per-step DP test was not priced when this ran (`dp_tests` is not in the band's priced list), so the w = 0.1 and w = 1 figures below understate priced work; w = 0 is unaffected. Corrected rerun: [`../ic_residual_dp_eq_20261101`](../ic_residual_dp_eq_20261101/README.md).
 
 # Fused residual step + distinguished points: result
