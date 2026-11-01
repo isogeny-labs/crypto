@@ -253,6 +253,9 @@ pub struct PlanArgs {
     pub degree_bound: u32,
     #[arg(long, default_value_t = 100000)]
     pub work_limit: u64,
+    /// Restricted construction population. Planted targets retain their draw log and logs only in the witness.
+    #[arg(long, default_value = "natural", value_parser = ["natural", "planted-pdp-v1"])]
+    pub population: String,
     /// SHA-256 of the committed experiment.protocol/v1 file. Required to generate.
     #[arg(long)]
     pub protocol_sha256: Option<String>,
@@ -313,7 +316,13 @@ pub struct DatasetPlan {
     pub split_rule: String,
 }
 
+const NATURAL_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/v1";
+const PLANTED_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/planted-pdp-v1";
+
 impl DatasetPlan {
+    fn planted(&self) -> bool {
+        self.schema == PLANTED_PLAN_SCHEMA
+    }
     /// Existing run/grant identity: compact serialization of this typed plan
     /// in struct field order, not generic canonical JSON or the saved file bytes.
     fn binding_sha256(&self) -> Result<String, String> {
@@ -323,8 +332,12 @@ impl DatasetPlan {
     }
 
     pub fn validate(&self) -> Result<(), String> {
-        if self.schema != "crypto.ml-dataset.plan/v1" || !self.twists {
-            return Err("expected plan/v1 with paired twists".into());
+        if !matches!(
+            self.schema.as_str(),
+            NATURAL_PLAN_SCHEMA | PLANTED_PLAN_SCHEMA
+        ) || !self.twists
+        {
+            return Err("expected natural or planted PDP plan with paired twists".into());
         }
         if self.field_sizes.is_empty()
             || self.field_sizes.iter().any(|n| !(3..=61).contains(n))
@@ -358,6 +371,25 @@ impl DatasetPlan {
                 || axis.iter().collect::<BTreeSet<_>>().len() != axis.len()
             {
                 return Err("empty, duplicate or unknown family/solver axis".into());
+            }
+        }
+        if self.planted() {
+            if self
+                .solvers
+                .iter()
+                .any(|solver| solver == "double-large-prime")
+            {
+                return Err(
+                    "planted PDP double-large-prime requires restricted factor-base replay".into(),
+                );
+            }
+            if self.families.iter().any(|family| family == "prime")
+                && self.field_sizes.iter().any(|n| *n >= 33)
+                && self.solvers.iter().any(|solver| solver == "f4")
+            {
+                return Err(
+                    "planted PDP wide-prime F4 requires restricted factor-base replay".into(),
+                );
             }
         }
         if self.field_sizes.iter().collect::<BTreeSet<_>>().len() != self.field_sizes.len()
@@ -938,7 +970,12 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
         DatasetCommand::Plan(a) => {
             let plan = DatasetPlan {
-                schema: "crypto.ml-dataset.plan/v1".into(),
+                schema: match a.population.as_str() {
+                    "natural" => NATURAL_PLAN_SCHEMA,
+                    "planted-pdp-v1" => PLANTED_PLAN_SCHEMA,
+                    _ => return Err("unknown dataset population".into()),
+                }
+                .into(),
                 field_sizes: numbers(&a.n)?,
                 arities: numbers(&a.m)?.into_iter().map(|m| m as usize).collect(),
                 families: a.families.split(',').map(str::to_owned).collect(),
@@ -970,7 +1007,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             println!(
                 "{}",
                 json!({"plan":a.out,"sha256":artifact.sha256,"plan_sha256":plan.binding_sha256()?,"planned_cells":plan.cell_count()?,
-                "generated_cells":0,"twists_included":true})
+                "generated_cells":0,"twists_included":true,"population":a.population})
             );
         }
         DatasetCommand::Generate(a) => generate(a)?,
@@ -1257,6 +1294,7 @@ fn verify_capture_context(dir: &Path, artifacts: &[Artifact]) -> Result<(), Stri
 
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
+    let (plan, _, _) = bound_run(&out)?;
     let mut registry = Vec::<Artifact>::new();
     let capture_context = admit_capture_context(&out)?;
     let execution_context = execution::admit(&out)?;
@@ -1271,13 +1309,21 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let mut factor_base_verified = false;
     let result = (|| {
         let case = telemetry::measured(&out, &mut registry, "curve-construction", || {
-            curves::generate(config)
+            if plan.planted() {
+                curves::generate_planted(config)
+            } else {
+                curves::generate(config)
+            }
         })?;
         telemetry::measured(&out, &mut registry, "known-answer-replay", || {
             curves::verify(&case.public_instance, &case.private_witness)
         })?;
         telemetry::measured(&out, &mut registry, "factor-base-replay", || {
-            curves::verify_factor_base(&case.public_instance, &case.factor_base)
+            if plan.planted() {
+                curves::verify_planted(config, &case)
+            } else {
+                curves::verify_factor_base(&case.public_instance, &case.factor_base)
+            }
         })?;
         registry.push(storage::write_json(
             &out,
@@ -2658,6 +2704,13 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     if manifest.outcome["factor_base_verified"] == true && !complete_factor_base {
         return Err("factor-base label lacks required artifacts".into());
     }
+    if plan.planted()
+        && (manifest.outcome["known_answer_verified"] == true
+            || manifest.outcome["factor_base_verified"] == true)
+        && !(complete_known_answer && complete_factor_base)
+    {
+        return Err("planted label lacks restricted construction replay inputs".into());
+    }
     if manifest.outcome["scalar_recovered_without_witness"] == true
         && !manifest
             .artifacts
@@ -2674,7 +2727,16 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("PDP label lacks its group replay certificate".into());
     }
-    if replay && complete_known_answer {
+    if replay && plan.planted() && complete_known_answer && complete_factor_base {
+        curves::verify_planted(
+            &manifest.config,
+            &types::CaseData {
+                public_instance: read_json(&dir.join("public.json"))?,
+                private_witness: read_json(&dir.join("witness.json"))?,
+                factor_base: read_json(&dir.join("factor-base.json"))?,
+            },
+        )?;
+    } else if replay && complete_known_answer && !plan.planted() {
         curves::verify(
             &read_json(&dir.join("public.json"))?,
             &read_json(&dir.join("witness.json"))?,
@@ -2683,7 +2745,9 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     if replay && complete_factor_base {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
-        curves::verify_factor_base(&public, &base)?;
+        if !plan.planted() {
+            curves::verify_factor_base(&public, &base)?;
+        }
         if has("prime-f4-input.json") && !censored_m3_prefix {
             let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
             // The m=2 reference uses the same filename with a legacy schema.
@@ -3817,6 +3881,83 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+
+    #[test]
+    fn planted_plan_binds_population_without_changing_natural_plan_bytes() {
+        let natural = plan();
+        assert_eq!(natural.schema, NATURAL_PLAN_SCHEMA);
+        natural.validate().unwrap();
+        let natural_bytes = serde_json::to_vec(&natural).unwrap();
+        assert!(std::str::from_utf8(&natural_bytes)
+            .unwrap()
+            .contains("plan/v1"));
+        let mut planted = natural.clone();
+        planted.schema = PLANTED_PLAN_SCHEMA.into();
+        planted.validate().unwrap();
+        assert_eq!(planted.cell(0).unwrap(), natural.cell(0).unwrap());
+        assert_ne!(
+            planted.binding_sha256().unwrap(),
+            natural.binding_sha256().unwrap()
+        );
+    }
+
+    #[test]
+    fn planted_plan_rejects_natural_only_factor_base_replay_paths() {
+        let mut planted = plan();
+        planted.schema = PLANTED_PLAN_SCHEMA.into();
+        planted.solvers = vec!["double-large-prime".into()];
+        assert!(planted
+            .validate()
+            .unwrap_err()
+            .contains("restricted factor-base replay"));
+
+        planted.solvers = vec!["f4".into()];
+        planted.families = vec!["prime".into()];
+        planted.field_sizes = vec![47];
+        assert!(planted.validate().unwrap_err().contains("wide-prime F4"));
+
+        planted.field_sizes = vec![23];
+        planted.validate().unwrap();
+        planted.schema = NATURAL_PLAN_SCHEMA.into();
+        planted.field_sizes = vec![47];
+        planted.validate().unwrap();
+    }
+
+    #[test]
+    fn planted_worker_keeps_construction_private_and_replays_it() {
+        let fixture = TempRun::new();
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.schema = PLANTED_PLAN_SCHEMA.into();
+        plan.factor_base_size = 4;
+        plan.solvers = vec!["enumerate".into()];
+        plan.work_limit = 20_000;
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        let dir = fixture.0.join("cells/000000000000");
+        fs::create_dir_all(&dir).unwrap();
+        let config = plan.cell(0).unwrap();
+        for root in [&fixture.0, &dir] {
+            storage::write_json(root, "plan.json", "plan", &plan).unwrap();
+            storage::write_json(root, "run.json", "run", &binding).unwrap();
+            storage::write_bytes(root, "protocol.json", "protocol", "json", &protocol).unwrap();
+        }
+        storage::write_json(&dir, "config.json", "config", &config).unwrap();
+        worker(&config, &dir).unwrap();
+        let public: Value = read_json(&dir.join("public.json")).unwrap();
+        let witness: Value = read_json(&dir.join("witness.json")).unwrap();
+        let base: Value = read_json(&dir.join("factor-base.json")).unwrap();
+        assert!(public.get("population").is_none());
+        assert!(public.get("construction_trace").is_none());
+        assert_eq!(base["rule"], "planted-known-log-subgroup/v1");
+        let case = types::CaseData {
+            public_instance: public,
+            private_witness: witness.clone(),
+            factor_base: base,
+        };
+        curves::verify_planted(&config, &case).unwrap();
+        let mut wrong = case;
+        wrong.private_witness["planted_construction"]["base_logs"][0] = json!("0");
+        assert!(curves::verify_planted(&config, &wrong).is_err());
     }
 
     #[test]

@@ -501,6 +501,7 @@ Curves of higher genus and the transfers are described in
 | `rho.quartic_v2`, `rho.cubic_v2` | as `rho.*` under the `_v2` walk (Brent cycle detection, charged lost-walk and distinguished-point table counters), plus the same class set-up scalar multiplication, charged in the total in its own `automorphism_setup` phase instead of the frozen ids' `setup` | as `rho.*`; the `_v2` ids also count the distinguished-point table queries and inserts |
 | `rho.negation_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | as the matching first-rule id under the `_v2` accounting (the Accounting v2 paragraph below); the strong id's jump table, lanes and start multiples are charged and its candidate checks are a `verification` phase | as the first-rule id; the `_v2` walk also counts the distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
+| `jacobian_image.rho3`, `jacobian_image.bsgs` | none until a versioned conversion to source-curve GAE is certified | construction of the same-field degree-three genus-3 cover, both point-class pullbacks, Cantor additions/doublings/scalar multiplications, rho walk/restarts/collisions, BSGS table inserts/lookups; cold solve wall includes the entire route |
 | `rho.negation_strong` | every `F_q` multiplication on the tower's counter (`Gf2q::muls`): the jump table and start points (`setup`), every step with its share of the batched inversion, the start additions, the escape doublings and unbatched additions (`search`), each canonicalisation at one `F_q` multiplication (`canonicalisation`: four `F_q` additions and a comparison, no multiplication, so one is an upper bound), the candidate checks (`check`); each phase's GAE is its multiplications over the curve's `fq_muls_per_add`, the divisor `solve_ic_f2m4` prices IC with | partition hashes, distinguished-point tests, table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
 | `rho.multitarget_pooled` | the whole batch of `L = batch` targets: the shared jump table (full-size multiples of `G`), each target's `G + Q_i` and start stride, every walk start and step, look-ahead and escapes, and the internal `[d]G = Q_i` check of every recovered log; phases `setup`, `search`, `internal_verification` | canonicalisations; distinguished-point table inserts and probes |
@@ -598,6 +599,18 @@ pricing from the reported group-addition equivalents. Solver conflicts and
 other work without a pinned conversion stay visible as unpriced counters;
 the recorded `S` is therefore a lower bound on the complete pipeline cost.
 
+The `jacobian_image.*` adapters are transfer diagnostics, not source-curve
+speedup rows. They reconstruct `binary_cubic_pullback_v1`, pull the generator
+and unseen target into its exact cyclic Jacobian image, solve there without
+receiving the planted logarithm, verify the collision in `Jac(H)`, and return
+the candidate for the runner's independent source-curve replay. Their native
+phase counters are meaningful within that destination. Their `total_gae` is
+deliberately zero and their records are lower bounds because one genus-3
+Cantor operation is not one elliptic-curve addition. Use cold wall and the
+resource vector to identify implementation bottlenecks; promote a net-cost
+claim only after supplying a pinned conversion or a matched end-to-end wall
+comparison that clears the A/A and isolation gates.
+
 The standing strong-rho implementation applies paired normal-basis maps and
 paired coefficient reductions during signed-Frobenius canonicalization. The
 [2026-10-14 optimization study](../../research/ecbench_rho_optimized_20261014/README.md)
@@ -657,6 +670,20 @@ unpinned work keeps the reported `S` a lower bound. The
 probe but adds canonicalisation, Frobenius-map, lookup, entry and
 representative counts to `oracle_setup`. Use `mitm-frobenius:m=3` on the
 same base as its accounting control.
+
+`cm-multiplier:size=K,norm=N[,endo=I][,mult=M]` and
+`binary-multiplier:size=K,mult=M` expose the generator-relative multiplier
+bases to the complete `ic.pipeline`.  Each seed is one linear-algebra column;
+known endomorphism or integer multiples of that seed are signed table points
+carrying their known coefficient on the same column.  Thus they test a
+specialised two-sum signed-graph batching effect: the relation table sees many
+vertices while the matrix needs only one unknown per seed.  Construction is
+inside the cold measurement and its group operations are charged.  Use
+`norm=0,mult=1` (prime) or `mult=1` (binary) as the same-seed control, and a
+coordinate-defined base such as `prime-abscissa`, `glv-orbit`, or
+`binary-subspace` as the matched conventional control.  This is a generic
+decomposition tradeoff, not evidence that a generator-specific coordinate or
+extension-field subset changes ECDLP's asymptotic exponent.
 
 `mitm-fiber:fiber=closed|lifts|blind`, `mitm-frobenius-fiber:fiber=closed|lifts|blind`
 and `descent-algebraic-fiber:fiber=combined|lifts|blind` (with a `solver`) are
@@ -1155,9 +1182,15 @@ method does not take).
   ratio [1.025, 1.075]. The v1 headline, the median of per-pair wall
   ratios, is a different estimand from the ops ratio (biased about +6 % for
   a deterministic arm against a random one) and stays only as
-  `median_ratio`. The ratio of total wall times (`total_wall_ratio`, with
-  `total_wall_ci95`) is the secondary "end-to-end wall" and keeps the work
-  variance. When an arm's GAE is a lower bound (unpriced work,
+  `median_ratio`. The historical ratio of summed solve intervals remains
+  `total_wall_ratio` (with `total_wall_ci95`) for schema compatibility and
+  keeps the work variance. It is not a complete cold end-to-end interval.
+  `method_call_wall_ratio` includes per-call setup, solve, in-child
+  verification and report completion; `process_wall_ratio` is the broadest
+  fork-to-reap figure and also includes workload reconstruction and process
+  overhead. Both carry linearised pair-clustered and target-clustered paired-
+  bootstrap 95% intervals and are gated by the same L2 and five-pair rules. When an arm's
+  GAE is a lower bound (unpriced work,
   `ns_per_gae_upper_bound_arms`), its ns per GAE is an upper bound on its
   cost per operation, and the verdict says so.
 - **The noise test corrects for bias.** The A/A pair is the pair of arms

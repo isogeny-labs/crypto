@@ -35,10 +35,10 @@
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
+#[path = "ecbench/pkm_tower.rs"]
+mod pkm_tower;
 #[path = "ecbench/ps6_charge.rs"]
 mod ps6_charge;
-#[path = "ecbench/ps6_kernel.rs"]
-mod ps6_kernel;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -803,9 +803,7 @@ enum DbCmd {
 
 /// Every plug-in this binary links: `pdp3_koblitz`'s, then
 /// `pdp_split_oracle`'s (the `pdp-split` oracle and the `koblitz-closure`
-/// base), then `structured_s4`'s, then `ps6_charge`'s (the PS-6
-/// `semaev-s4-baseline` and `semaev-s4-grouplaw` oracles).  Names do not overlap, so the order only
-/// fixes lookup.
+/// base), then `ps6_charge`'s PS-6 oracles. Names do not overlap, so the order only fixes lookup.
 fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
     crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
         base: |name, instance| {
@@ -826,6 +824,7 @@ pub fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
     // `pdp3_koblitz`); registered before any run, child or replay.
     crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(binary_plugins());
+    crypto_lib::cryptanalysis::ecbench::methods::register_prime_plugins(pkm_tower::plugins());
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {

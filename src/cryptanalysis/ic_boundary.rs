@@ -6069,6 +6069,224 @@ fn slot_of(key: u64, mask: usize) -> usize {
     (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 20) as usize & mask
 }
 
+// ── Cache-line tables with exposed addresses ──────────────────────
+//
+// The relation guard and the pair index are probed once per relation
+// trial.  Hash maps hide their slot addresses, so a batched lane cannot
+// request the future probes without performing the probes themselves.
+// These opt-in tables put each key's home in one 64-byte line whose
+// address is a pure function of the key.  There are no deletions: a
+// lookup may stop at the first line with an empty slot.
+
+#[derive(Clone, Copy, Default)]
+#[repr(C, align(64))]
+struct GuardLine([u64; 8]);
+
+#[derive(Clone, Copy, Default)]
+#[repr(C, align(64))]
+struct PairLine {
+    keys: [u64; 4],
+    witnesses: [u64; 4],
+}
+
+fn cache_lines_for(keys: usize, slots_per_line: usize) -> usize {
+    (keys.saturating_mul(4) / 3 / slots_per_line + 1).next_power_of_two()
+}
+
+#[inline(always)]
+#[allow(unused_unsafe)]
+fn prefetch_cache_line<T>(lines: &[T], index: usize) {
+    #[cfg(target_arch = "x86_64")]
+    {
+        use core::arch::x86_64::{_mm_prefetch, _MM_HINT_T0};
+        let ptr = lines.as_ptr().wrapping_add(index).cast::<i8>();
+        // SAFETY: PREFETCHT0 is an advisory instruction and the pointer is
+        // to an allocated element.  SSE is part of the x86-64 baseline.
+        unsafe { _mm_prefetch::<_MM_HINT_T0>(ptr) };
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        std::hint::black_box(&lines[index]);
+    }
+}
+
+struct GuardLineSet {
+    lines: Vec<GuardLine>,
+    mask: usize,
+    len: usize,
+    has_zero: bool,
+}
+
+impl GuardLineSet {
+    fn with_capacity(keys: usize) -> Self {
+        let line_count = cache_lines_for(keys, 8);
+        Self {
+            lines: vec![GuardLine::default(); line_count],
+            mask: line_count - 1,
+            len: 0,
+            has_zero: false,
+        }
+    }
+
+    #[inline]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0xC2B2_AE3D_27D4_EB4F) >> 32) as usize & self.mask
+    }
+
+    #[inline]
+    fn prefetch(&self, key: u64) {
+        prefetch_cache_line(&self.lines, self.home(key));
+    }
+
+    /// Insert `key`; return `true` when it was already present.
+    #[inline]
+    fn insert(&mut self, key: u64) -> bool {
+        if key == 0 {
+            return std::mem::replace(&mut self.has_zero, true);
+        }
+        let mut line_index = self.home(key);
+        loop {
+            let line = &mut self.lines[line_index].0;
+            if let Some(slot) = line.iter_mut().find(|slot| **slot == key || **slot == 0) {
+                if *slot == key {
+                    return true;
+                }
+                *slot = key;
+                break;
+            }
+            line_index = (line_index + 1) & self.mask;
+        }
+        self.len += 1;
+        if self.len * 4 > self.lines.len() * 8 * 3 {
+            self.grow();
+        }
+        false
+    }
+
+    fn grow(&mut self) {
+        let line_count = self.lines.len() * 2;
+        let old = std::mem::replace(&mut self.lines, vec![GuardLine::default(); line_count]);
+        self.mask = line_count - 1;
+        for line in old {
+            for key in line.0.into_iter().filter(|key| *key != 0) {
+                let mut line_index = self.home(key);
+                'place: loop {
+                    for slot in &mut self.lines[line_index].0 {
+                        if *slot == 0 {
+                            *slot = key;
+                            break 'place;
+                        }
+                    }
+                    line_index = (line_index + 1) & self.mask;
+                }
+            }
+        }
+    }
+}
+
+trait RelationGuard {
+    const PREFETCH: bool;
+
+    fn insert_duplicate(&mut self, key: u64) -> bool;
+
+    fn prefetch(&self, key: u64);
+}
+
+impl RelationGuard for FastMap<()> {
+    const PREFETCH: bool = false;
+
+    #[inline]
+    fn insert_duplicate(&mut self, key: u64) -> bool {
+        self.insert(key, ()).is_some()
+    }
+
+    #[inline]
+    fn prefetch(&self, _key: u64) {}
+}
+
+impl RelationGuard for GuardLineSet {
+    const PREFETCH: bool = true;
+
+    #[inline]
+    fn insert_duplicate(&mut self, key: u64) -> bool {
+        self.insert(key)
+    }
+
+    #[inline]
+    fn prefetch(&self, key: u64) {
+        GuardLineSet::prefetch(self, key);
+    }
+}
+
+struct PairLineIndex {
+    lines: Vec<PairLine>,
+    occupied: Vec<u8>,
+    mask: usize,
+    len: usize,
+}
+
+impl PairLineIndex {
+    fn with_capacity(keys: usize) -> Self {
+        let line_count = cache_lines_for(keys, 4);
+        Self {
+            lines: vec![PairLine::default(); line_count],
+            occupied: vec![0; line_count],
+            mask: line_count - 1,
+            len: 0,
+        }
+    }
+
+    #[inline]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 32) as usize & self.mask
+    }
+
+    #[inline]
+    fn prefetch(&self, key: u64) {
+        prefetch_cache_line(&self.lines, self.home(key));
+    }
+
+    fn insert_if_absent(&mut self, key: u64, i: u32, j: u32) -> bool {
+        let witness = u64::from(i) << 32 | u64::from(j);
+        let mut line_index = self.home(key);
+        loop {
+            let bits = self.occupied[line_index];
+            for slot in 0..4 {
+                if bits & (1 << slot) != 0 && self.lines[line_index].keys[slot] == key {
+                    return false;
+                }
+            }
+            if bits != 0x0f {
+                let slot = bits.trailing_ones() as usize;
+                self.lines[line_index].keys[slot] = key;
+                self.lines[line_index].witnesses[slot] = witness;
+                self.occupied[line_index] |= 1 << slot;
+                self.len += 1;
+                return true;
+            }
+            line_index = (line_index + 1) & self.mask;
+        }
+    }
+
+    #[inline]
+    fn get(&self, key: u64) -> Option<(u32, u32)> {
+        let mut line_index = self.home(key);
+        loop {
+            let bits = self.occupied[line_index];
+            for slot in 0..4 {
+                if bits & (1 << slot) != 0 && self.lines[line_index].keys[slot] == key {
+                    let witness = self.lines[line_index].witnesses[slot];
+                    return Some(((witness >> 32) as u32, witness as u32));
+                }
+            }
+            if bits != 0x0f {
+                return None;
+            }
+            line_index = (line_index + 1) & self.mask;
+        }
+    }
+}
+
 /// A table of all pair sums of a base, keyed by the sum's abscissa so
 /// `S` and `−S` share one entry; the probe checks which it found.
 pub struct PairTable {
@@ -6081,6 +6299,9 @@ pub struct PairTable {
     /// The packed form of the cache-blocked layout, when keys fit 32 bits
     /// and indices 16 ([`PackedPairTable`]); `parts` is then empty.
     packed: Option<PackedPairTable>,
+    /// Opt-in cache-line representation.  All other representations are
+    /// empty when this is present.
+    lines: Option<PairLineIndex>,
     /// `full` (every `i ≤ j`) or `negation_folded` (one pair per orbit
     /// under negation).
     pub kind: &'static str,
@@ -6131,6 +6352,7 @@ impl PairTable {
             parts: Vec::new(),
             part_shift: 0,
             packed: None,
+            lines: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -6176,6 +6398,49 @@ impl PairTable {
             parts: Vec::new(),
             part_shift: 0,
             packed: None,
+            lines: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+        }
+    }
+
+    /// The same negation-folded table and emission order as
+    /// [`Self::build_negation_folded`], stored in cache-line buckets.
+    /// The first witness emitted for each key wins in both layouts.
+    pub fn build_negation_folded_lines<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut lines = PairLineIndex::with_capacity(a * a + 1);
+        let mut attempts = 0u64;
+        for ai in 0..a {
+            let i = groups[ai][0];
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    let sum = g.add(&mut ops, fb.points[i], fb.points[j]);
+                    if g.is_identity(&sum) {
+                        continue;
+                    }
+                    lines.insert_if_absent(g.key(&sum) >> 1, i as u32, j as u32);
+                    attempts += 1;
+                }
+            }
+        }
+        Self {
+            kind: "negation_folded",
+            entries: lines.len as u64,
+            map: fast_map(0),
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: Some(lines),
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -6207,6 +6472,38 @@ impl PairTable {
             parts: Vec::new(),
             part_shift: 0,
             packed: None,
+            lines: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+        })
+    }
+
+    /// The batched prime-field builder with the same sums and witnesses
+    /// as [`Self::build_negation_folded_prime_batch`], stored in the
+    /// cache-line representation.
+    pub fn build_negation_folded_prime_batch_lines(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+    ) -> Result<Self, String> {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let a = fb.abscissa_list.len();
+        let mut attempts = 0u64;
+        let mut lines = PairLineIndex::with_capacity(a.pow(2) + 1);
+        for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
+            lines.insert_if_absent(key, i, j);
+            attempts += 1;
+        })?;
+        Ok(Self {
+            kind: "negation_folded_prime_batch",
+            entries: lines.len as u64,
+            map: fast_map(0),
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: Some(lines),
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -6250,6 +6547,7 @@ impl PairTable {
                 parts: Vec::new(),
                 part_shift: 0,
                 packed: Some(packed),
+                lines: None,
                 build_ops: ops,
                 build_wall_ns: start.elapsed().as_nanos() as u64,
                 insert_attempts,
@@ -6317,6 +6615,7 @@ impl PairTable {
             parts,
             part_shift,
             packed: None,
+            lines: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -6326,7 +6625,9 @@ impl PairTable {
 
     /// The witness stored under a key, in whichever layout the table has.
     fn get(&self, key: u64) -> Option<(u32, u32)> {
-        if let Some(packed) = &self.packed {
+        if let Some(lines) = &self.lines {
+            lines.get(key)
+        } else if let Some(packed) = &self.packed {
             packed.get(key)
         } else if self.parts.is_empty() {
             self.map.get(&key).copied()
@@ -6334,6 +6635,14 @@ impl PairTable {
             self.parts[table_part(key, self.part_shift)]
                 .get(&key)
                 .copied()
+        }
+    }
+
+    /// Request the cache line that [`Self::probe`] will read.  This is an
+    /// advisory no-op for every incumbent representation.
+    pub fn prefetch<G: CountedGroup>(&self, g: &G, target: &G::Elt) {
+        if let Some(lines) = &self.lines {
+            lines.prefetch(g.key(target) >> 1);
         }
     }
 
@@ -7754,6 +8063,70 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     )
 }
 
+/// [`collect_and_solve_relations`] with opt-in cache-line tables.  `touch`
+/// requests the oracle line for a future lane target, and `line_guard`
+/// selects the equivalent cache-line relation guard.  Neither changes a
+/// decision or a counted operation.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    line_guard: bool,
+) -> PipelineOutcome {
+    let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
+    if line_guard {
+        collect_and_solve_relations_scaled_touching(
+            g,
+            generator,
+            target,
+            r,
+            h,
+            fb,
+            seed,
+            max_trials,
+            targets,
+            pool_mode,
+            matrix,
+            completion,
+            None,
+            oracle,
+            touch,
+            GuardLineSet::with_capacity(capacity),
+        )
+    } else {
+        collect_and_solve_relations_scaled_touching(
+            g,
+            generator,
+            target,
+            r,
+            h,
+            fb,
+            seed,
+            max_trials,
+            targets,
+            pool_mode,
+            matrix,
+            completion,
+            None,
+            oracle,
+            touch,
+            fast_map(capacity),
+        )
+    }
+}
+
 /// [`collect_and_solve_relations`] with the [`CoeffScale`] hook on every
 /// place a coefficient `a` is drawn: random targets, walk starts, jumps and
 /// pool offsets, prime-walk lanes, strides and their renewal step.  `None`
@@ -7772,8 +8145,51 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     pool_mode: RestartPool,
     matrix: &mut L,
     completion: CompletionRule,
+    scale: Option<&mut CoeffScale>,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+) -> PipelineOutcome {
+    collect_and_solve_relations_scaled_touching(
+        g,
+        generator,
+        target,
+        r,
+        h,
+        fb,
+        seed,
+        max_trials,
+        targets,
+        pool_mode,
+        matrix,
+        completion,
+        scale,
+        oracle,
+        |_| {},
+        fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn collect_and_solve_relations_scaled_touching<
+    G: CountedGroup,
+    L: RelationSolver + ?Sized,
+    R: RelationGuard,
+>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
     mut scale: Option<&mut CoeffScale>,
     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    mut seen: R,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -7864,7 +8280,6 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     let mut walk_fresh = true;
     let segment_cap = ((r as f64).sqrt() * 4.0) as u64 + 65_536;
     let mut segment_steps = 0u64;
-    let mut seen: FastMap<()> = fast_map(if guarded { 1 << 12 } else { 0 });
     let (mut walk_steps, mut walk_restarts, mut repeats_skipped, mut guard_probes, mut walk_jumps) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
     let lane_config = match targets {
@@ -8042,6 +8457,12 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     lane_prepared += 1;
                 }
             }
+            if R::PREFETCH {
+                for &(_, point, _, _) in &lane_queue {
+                    seen.prefetch(g.key(&point));
+                    touch(&point);
+                }
+            }
             lane_rounds += 1;
         }
         // Exclusive phase marks (no-ops without an `ic_measurement`
@@ -8198,7 +8619,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         // pin the logarithm by collision rather than by relation.
         if guarded && !defer_guard {
             guard_probes += 1;
-            if seen.insert(g.key(&point), ()).is_some() {
+            if seen.insert_duplicate(g.key(&point)) {
                 repeats_skipped += 1;
                 if let Some(index) = lane_id {
                     lanes[index].fresh = true;
@@ -8220,7 +8641,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         // targets and the skipped repeat neither renews nor enters a row.
         if defer_guard {
             guard_probes += 1;
-            if seen.insert(g.key(&point), ()).is_some() {
+            if seen.insert_duplicate(g.key(&point)) {
                 repeats_skipped += 1;
                 continue;
             }
@@ -12420,6 +12841,137 @@ mod tests {
                 let s = curve.add(&mut ops, fb.points[w[0]], fb.points[w[1]]);
                 assert_eq!(s, q);
             }
+        }
+    }
+
+    #[test]
+    fn cache_line_guard_matches_map_across_growth_and_repeats() {
+        let mut rng = StdRng::seed_from_u64(20261031);
+        for capacity in [0usize, 1, 7, 1 << 12] {
+            let mut map: FastMap<()> = fast_map(capacity);
+            let mut lines = GuardLineSet::with_capacity(capacity);
+            for step in 0..50_000u64 {
+                let key = if step % 3 == 0 {
+                    rng.gen_range(0..4096u64)
+                } else {
+                    rng.gen::<u64>()
+                };
+                assert_eq!(
+                    lines.insert(key),
+                    map.insert(key, ()).is_some(),
+                    "capacity {capacity}, step {step}, key {key}"
+                );
+            }
+            assert_eq!(lines.len + usize::from(lines.has_zero), map.len());
+        }
+    }
+
+    #[test]
+    fn cache_line_pair_table_matches_map_table() {
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 96);
+        let map = PairTable::build_negation_folded(&inst.curve, &fb);
+        let lines = PairTable::build_negation_folded_lines(&inst.curve, &fb);
+        assert!(map.lines.is_none() && lines.lines.is_some());
+        assert_eq!(lines.kind, map.kind);
+        assert_eq!(lines.entries, map.entries);
+        assert_eq!(lines.insert_attempts, map.insert_attempts);
+        assert_eq!(lines.index_lookups, map.index_lookups);
+        assert_eq!(lines.build_ops, map.build_ops);
+        for key in 0..=inst.curve.p + 1 {
+            assert_eq!(lines.get(key), map.get(key), "key {key}");
+        }
+    }
+
+    #[test]
+    fn cache_line_prime_batch_table_matches_map_table() {
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 96);
+        let map = PairTable::build_negation_folded_prime_batch(&inst.curve, &fb).unwrap();
+        let lines = PairTable::build_negation_folded_prime_batch_lines(&inst.curve, &fb).unwrap();
+        assert_eq!(lines.kind, map.kind);
+        assert_eq!(lines.entries, map.entries);
+        assert_eq!(lines.insert_attempts, map.insert_attempts);
+        assert_eq!(lines.index_lookups, map.index_lookups);
+        assert_eq!(lines.build_ops, map.build_ops);
+        for key in 0..=inst.curve.p + 1 {
+            assert_eq!(lines.get(key), map.get(key), "key {key}");
+        }
+    }
+
+    #[test]
+    fn cache_line_layout_keeps_the_relation_stream_unchanged() {
+        let inst = prime_instance_for(20, 59297);
+        let curve = &inst.curve;
+        let generator = inst.generator_point();
+        let mut setup = GroupOps::default();
+        let target = curve.mul(&mut setup, generator, 4321);
+        let fb = prime_factor_base(&inst, 64);
+        let map = PairTable::build_negation_folded(curve, &fb);
+        let lines = PairTable::build_negation_folded_lines(curve, &fb);
+        for (label, source) in [
+            ("walk", TargetSource::Walk),
+            (
+                "lanes-16",
+                TargetSource::WalkPrimeLanes {
+                    lanes: 16,
+                    batched: true,
+                },
+            ),
+        ] {
+            let run = |table: &PairTable, line_guard: bool| {
+                let mut stream = Vec::new();
+                let mut matrix = IncrementalGauss::new(fb.columns + 1, inst.r);
+                let outcome = collect_and_solve_relations_touching(
+                    curve,
+                    generator,
+                    target,
+                    inst.r,
+                    inst.cofactor,
+                    &fb,
+                    20261031,
+                    1 << 22,
+                    source,
+                    RestartPool::Lazy,
+                    &mut matrix,
+                    CompletionRule::TargetPinned,
+                    |ops, counters, point, a, b| {
+                        stream.push((point, a, b));
+                        decompose_mitm(curve, &fb, table, 2, ops, counters, point)
+                            .map(|summands| vec![Relation::Summands(summands)])
+                            .unwrap_or_default()
+                    },
+                    |point| table.prefetch(curve, point),
+                    line_guard,
+                );
+                (stream, outcome)
+            };
+            let (map_stream, map_outcome) = run(&map, false);
+            let (line_stream, line_outcome) = run(&lines, true);
+            assert_eq!(map_stream, line_stream, "{label}");
+            assert_eq!(map_outcome.recovered, line_outcome.recovered, "{label}");
+            assert_eq!(map_outcome.verified, line_outcome.verified, "{label}");
+            assert_eq!(map_outcome.trials, line_outcome.trials, "{label}");
+            assert_eq!(
+                map_outcome.relations_found, line_outcome.relations_found,
+                "{label}"
+            );
+            assert_eq!(
+                map_outcome.relations.native, line_outcome.relations.native,
+                "{label}"
+            );
+            assert_eq!(
+                map_outcome.relations.work_native, line_outcome.relations.work_native,
+                "{label}"
+            );
+            assert_eq!(
+                map_outcome.relations.group_ops, line_outcome.relations.group_ops,
+                "{label}"
+            );
+            assert_eq!(
+                map_outcome.counters.lookups, line_outcome.counters.lookups,
+                "{label}"
+            );
         }
     }
 
