@@ -1,0 +1,103 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R62-SQUARE-MATRIX",
+  "version": 1,
+  "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
+  "claims": [
+    {
+      "id": "square32",
+      "class": "exact_computation",
+      "statement": "Actual canonical32 squared-basis matrix over F2(u),both inverse products,all32 whole-source column bindings"
+    }
+  ],
+  "arms": {
+    "reference": "accepted R61 actual degree32 source field and324/76 functions",
+    "candidate": "complete canonical squared-basis operator overF2(u)",
+    "positive": [
+      "all32standard monomials and source reconstructions",
+      "bothinverseproducts"
+    ],
+    "negative": [
+      "changedmatrix entry must break actual inverse"
+    ],
+    "baseline": {
+      "not_applicable_reason": "exact field identities, no timing comparison"
+    },
+    "A_A": {
+      "not_applicable_reason": "deterministic complete identities"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "sourcefield",
+      "all32monomials",
+      "4GiB/1200s",
+      "oneSingular/FLINTthread",
+      "one mathjob",
+      "seed62"
+    ],
+    "measured": [
+      "binaryhash",
+      "nativeUTC",
+      "exit/errors"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "complete predeclared identities",
+    "seeds": [
+      62
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exact identity checks"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "not applicable"
+  },
+  "metrics": [
+    "source degree",
+    "32 standard/squared column bindings",
+    "bothinverseproducts",
+    "coefficientfieldonly",
+    "changedmatrixrejection"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh matrix62-01 MATRIX62.sing MATRIX62_ALL_CHECKS_PASS",
+    "backend": "original manually authorized local Singular",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 62,
+    "CPU_affinity": "not pinned; one native thread",
+    "queue": "one mathematical job atonce",
+    "source_gate": "sixcopiedfiles matchGit;all donor hashes",
+    "checkpoint": "existing source/S3gate,immutable raw inputs/log/exit/binary and tar"
+  },
+  "stopping": {
+    "accept": "exit0/exactmarker/no whitespace-question-mark errors/all asserted products",
+    "failure": "retain all failures/caps/partials;freeze repairs before fresh data"
+  },
+  "analysis": {
+    "kind": "exact generic function-field normalforms and coefficientfield matrix products",
+    "comparative": false,
+    "precision": "whole-source rational identities, no series truncation"
+  },
+  "literature": [
+    {
+      "source": "R61SQUARE-DECOMPOSITION61,DIFFERENTIAL-DESIGN61 andactualFIELD61",
+      "use": "source-specific complete operator and control obligations"
+    },
+    {
+      "url": "https://www.singular.uni-kl.de/index.php/singular.pdf",
+      "use": "native coef data and field arithmetic reference; existing RR_PID50 verifies parameter numerator/denominator APIs"
+    }
+  ],
+  "scope": "square-field operator only; full holomorphic space/Cartier/unit divisors/11-action separate",
+  "validation_note": "canonical protocol tools/schema absent in selected index; manual contract/source byte verification only"
+}

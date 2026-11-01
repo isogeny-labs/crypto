@@ -28,3 +28,13 @@ Six-column/full-source identities are exact computation,not statistical
 sampling. No warmups/timed comparisons/A-A/power claim. UTC only custody.
 Canonical protocol schema/checker unavailable in selected repository index;
 manual exact contract/bytechecks are not called schema validation.
+
+## Stage2 full435 decomposition freeze
+Matrix62-01acceptedsource32/allstandardmonomials/32squarebindings/both
+inverseproducts/changedmatrixcontrol. Cachedoperatorhashpinnedbeforedata.
+SPLIT62checksall32basis,threeinputs1,u,u²,andall324cubic/76mixedvalues:435
+fullsourceidentities,13920coefficientandpolynomialparityidentities. Native
+coefenumerateseverytermofN*Dwithfullreconstruction;actualrationalcoefficient
+identityandwholefieldidentityrequired. Controlu=>g0/h1,u²=>gu/h0,1=>g1/h0;
+changedrootfails. Saveeveryf/g/h,andcomplete435rowtable. No shrinking or
+filtering on costs/zerooddoutput;retainfailuresandfreezerepairs. Samecaps.

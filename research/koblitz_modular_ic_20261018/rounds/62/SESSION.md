@@ -18,3 +18,22 @@ all original transfer/reverse/polarization/saturation lanes.
 
 ### Errors
 NoR62native data taken. Canonical schema tool absent; manual source gate.
+
+## 2026-11-01T22:55:52.548262+00:00 — source squared-basis matrix accepted
+
+### What was done
+matrix62-01terminalPASS/native0/noerrors. Source degree32,all32standard
+monomials/squaredcolumns,2inverseproducts,coefficientfieldonly andchanged
+matrixnegativecontrol. Full matrix cache retained,not recomputed.
+
+### Decisions made
+Freeze full435decomposition and13920coefficientchecks;all400retained
+functions included. Ring parity reconstruction and exactsourceidentity
+required. Relevant Lean field/cyclic5 statements next,sourcegeometry separate.
+
+### Open threads
+SPLIT62nativeafterfreeze;Lean/whole-sourcechecker;normalfieldbinding/global
+holomorphicregularity andunitdivisors/T-character/11action/alloriginalscope.
+
+### Errors
+NoMatrix62nativeerror. Stage2 API/ring conversions notyetexecuted.

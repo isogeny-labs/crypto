@@ -1,24 +1,25 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R62-SQUARE-MATRIX",
-  "version": 1,
+  "id": "KOBLITZ-R62-FULL435-DECOMPOSITION",
+  "version": 2,
   "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
   "claims": [
     {
-      "id": "square32",
+      "id": "split435",
       "class": "exact_computation",
-      "statement": "Actual canonical32 squared-basis matrix over F2(u),both inverse products,all32 whole-source column bindings"
+      "statement": "Complete cached operator gives435 actual whole-source square decompositions and13920 rational coefficient parity checks"
     }
   ],
   "arms": {
     "reference": "accepted R61 actual degree32 source field and324/76 functions",
-    "candidate": "complete canonical squared-basis operator overF2(u)",
+    "candidate": "cached squared basis plus complete rational numerator-denominator parity split",
     "positive": [
-      "all32standard monomials and source reconstructions",
-      "bothinverseproducts"
+      "all32basis source reconstructions",
+      "controls1/u/u\u00b2 interpreted as three named inputs1,u,u\u00b2",
+      "all324cubic/76mixed whole-source identities"
     ],
     "negative": [
-      "changedmatrix entry must break actual inverse"
+      "changed root breaks whole-source identity for parameter control"
     ],
     "baseline": {
       "not_applicable_reason": "exact field identities, no timing comparison"
@@ -61,14 +62,14 @@
     "power": "not applicable"
   },
   "metrics": [
-    "source degree",
-    "32 standard/squared column bindings",
-    "bothinverseproducts",
-    "coefficientfieldonly",
-    "changedmatrixrejection"
+    "435 whole-source identities",
+    "13920 rational coefficient and polynomial parity checks",
+    "zero-odd component counts",
+    "actual1/u/u\u00b2 control roots",
+    "changed-root rejection"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh matrix62-01 MATRIX62.sing MATRIX62_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh split62-01 SPLIT62.sing SPLIT62_ALL_CHECKS_PASS",
     "backend": "original manually authorized local Singular",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
@@ -98,6 +99,10 @@
       "use": "native coef data and field arithmetic reference; existing RR_PID50 verifies parameter numerator/denominator APIs"
     }
   ],
-  "scope": "square-field operator only; full holomorphic space/Cartier/unit divisors/11-action separate",
-  "validation_note": "canonical protocol tools/schema absent in selected index; manual contract/source byte verification only"
+  "scope": "source function decomposition only; zero odd is an operator output, global divisors/Cartier and nonsquare-u geometric interpretation separately justified",
+  "validation_note": "canonical protocol tools/schema absent in selected index; manual contract/source byte verification only",
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "matrix62-01accepted all32 standard/squared bindings,both inverses;freeze full435 split source and cached operator hash"
+  }
 }
