@@ -81,3 +81,17 @@ Lean result,checker,trace-quotient representatives and report/custody.
 
 ### Errors
 No field error; previous2 native failures retained.
+
+## 2026-11-01T04:58:14.060830+00:00 — Lean membership elaboration repair
+
+### What was done
+restriction-lean57-01 terminal compile.exit1; row-change proof needed explicit kernel-membership unfolding. Other authored statements had no reported errors. Raw source/log retained. Started independent native checker after Lean terminal.
+
+### Decisions made
+Add explicit change C u=0; preserve theorem/premises and freeze before attempt02. Actual source24 basis accepted.
+
+### Open threads
+Checker,Lean02,actual4 fixed-mod-trace classes,report/custody.
+
+### Errors
+Lean simp produced equality while goal remained kernel membership; elaboration repair only. No audited proof claimed yet.

@@ -39,6 +39,7 @@ theorem row_change_kernel (C : U →ₗ[F] W) (P Q : W →ₗ[F] W)
   · intro hu
     have hzero : P (C u) = 0 := hu
     have he := congrArg Q hzero
+    change C u = 0
     simpa only [hQP, map_zero] using he
   · intro hu
     have hzero : C u = 0 := hu
