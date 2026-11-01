@@ -1,0 +1,39 @@
+import PegcdWordLoop
+set_option autoImplicit false
+namespace PegcdWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest PencilWordRefinement
+
+def scaleRaw (p s : UInt64) (xs : List UInt64) := xs.map (fun x => (x*s)%p)
+def scale (p s : UInt64) (xs : List UInt64) :=
+ let out := scaleRaw p s xs
+ trimFuel out.length out
+
+theorem scale_raw_correct (p s : UInt64) (xs : List UInt64)
+ (hp : 0 < p.toNat) (hb : p.toNat < 2^31) (hs : s.toNat < p.toNat) (hx : Canon p xs) :
+ Canon p (scaleRaw p s xs) ∧
+ wordsPoly p (scaleRaw p s xs) = C (s.toNat : ZMod p.toNat)*wordsPoly p xs := by
+ induction xs with
+ | nil => simp [scaleRaw,Canon,wordsPoly,listPoly]
+ | cons x xs ih =>
+   have hxc := hx x (by simp)
+   have hcan := uint64_mul_canonical p x s hp
+   have hdec := uint64_mul_decode p x s hb hxc hs
+   have ht := ih (by intro a ha; exact hx a (by simp [ha]))
+   constructor
+   · intro a ha
+     simp only [scaleRaw,List.map_cons,List.mem_cons] at ha
+     rcases ha with rfl | ha
+     · exact hcan
+     · exact ht.1 a ha
+   · simp only [scaleRaw,List.map_cons,wordsPoly,listPoly]
+     change C _ + X*wordsPoly p (scaleRaw p s xs) = C _*(C _+X*wordsPoly p xs)
+     rw [ht.2,hdec,map_mul]
+     ring
+
+theorem scale_correct (p s : UInt64) (xs : List UInt64)
+ (hp : 0 < p.toNat) (hb : p.toNat < 2^31) (hs : s.toNat < p.toNat) (hx : Canon p xs) :
+ Canon p (scale p s xs) ∧ Normal (scale p s xs) ∧
+ wordsPoly p (scale p s xs)=C (s.toNat : ZMod p.toNat)*wordsPoly p xs := by
+ have h := scale_raw_correct p s xs hp hb hs hx
+ exact ⟨trim_good p _ _ h.1,trim_finished _ _ le_rfl,by simpa [scale,trim_preserves] using h.2⟩
+end PegcdWord
