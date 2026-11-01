@@ -53,3 +53,17 @@ Lean,include4sourcepreimages,Qcontraction,checker,report/custody.
 
 ### Errors
 None in two completednativeattempts.
+
+## 2026-11-01T05:31:45.101544+00:00 — full trace contraction and four actual preimages accepted
+
+### What was done
+include58-01accepted:rank24normalizedinclusion,all24actualsourceidentities,equivariance;full100Jordaninverse,50image/50preimagebasis,QwithNQ+QN=I,Q²=0;all4oldfixedquotientclassesnowhaveactualtracepreimagesinL2P,all4wholefieldidentitiespass;changed-preimagecontrolrejected. StartedfirstLeancompileonlyafterincludeterminal.
+
+### Decisions made
+Freezeindependentchecker. Retain genericR57complete_kernel asformal implicationforN²=0,NQ+QN=I,withK=N,R=Q,H=Q;no redundantdimension-specificcompile.
+
+### Open threads
+Leanandchecker,report/custody,modularrelationsearchusingcomplete100basisandactualtraceoperator;larger3P180-spaceasnextcontrolledpolebound. Alloriginaltarget/action/saturation/polarization/reverse/112/991lanespersist.
+
+### Errors
+NoR58mathematicalfailurein3acceptednativeattempts.

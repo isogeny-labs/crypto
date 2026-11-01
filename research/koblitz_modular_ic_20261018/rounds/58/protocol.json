@@ -1,38 +1,27 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R58-TRACE-CONTRACTION-INCLUSION",
+  "id": "KOBLITZ-R58-COMPLETE-CHECK",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "inclusion",
+      "id": "complete-replay",
       "class": "exact_computation",
-      "statement": "Full normalized24-to100 injection,E,S compatibility,all24 actual source identities."
-    },
-    {
-      "id": "trace-contraction",
-      "class": "exact_computation",
-      "statement": "Complete100-space N admits binaryQ withNQ+QN=I,Q\u00b2=0;allfixedfunctions have explicit trace preimages."
-    },
-    {
-      "id": "old-four",
-      "class": "exact_computation",
-      "statement": "Four oldfixed-mod-trace representatives have actual trace preimages inL(2P),verifiedbywhole-source equations."
+      "statement": "Independent replay of all ranks/kernel/recovery/actualsource/division/inclusion/contraction/traceidentity products."
     }
   ],
   "arms": {
     "reference": "R57 full descent/cusp bridge and R50 actual196-product packet",
     "baseline": "complete68-section degree128 space and24-section degree80 restriction",
-    "candidate": "Complete trace contraction and source-bound normalized inclusion",
+    "candidate": "Full saved-certificate replay",
     "positive": [
-      "24 inclusion jet bindings andsource equations",
-      "inclusion rank24 andactualequivariance",
-      "50 trace image columns and50 lifts",
-      "full100x100 Jordaninverse",
-      "NQ+QN=I andQ\u00b2=0",
-      "all4 actualoldclass traceidentities"
+      "all196/96/100 ranks andcompletekernelproducts",
+      "all100 actualfieldreconstructions",
+      "all100 divisionproducts",
+      "fullQcontraction andJordaninverse",
+      "24 inclusionproducts and4actualtracepreimagebindings"
     ],
     "negative": [
-      "addlambda/A to tracepreimage changestraceby1 andmustfail originalidentity"
+      "corruptedkernelentryinactualnonzeroconstraintrow"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact calculation, no noisy comparison"
@@ -74,13 +63,14 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "inclusionrank24",
-    "100-space contractionproducts",
-    "all4 actualsource tracepreimages",
-    "24 actual inclusionidentities"
+    "fullmatrixproducts/ranks",
+    "100 source and100divisionproducts",
+    "24 inclusionrank",
+    "4actualtraceproducts",
+    "corruptedkernelrejected"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh include58-01 INCLUDE58.sing INCLUDE58_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh check58-01 CHECK58.sing CHECK58_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -116,9 +106,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 4,
+  "version": 5,
   "amendment": {
     "before_affected_data": true,
-    "reason": "field58-01 accepted all100 source/division/sigma identities; freeze normalized24-to100 inclusion,fulltrace contraction and4 actual preimages"
+    "reason": "include58-01 accepted completeQ contraction,24 actualinclusionidentities and4actualtracepreimages;freeze independentchecker"
   }
 }
