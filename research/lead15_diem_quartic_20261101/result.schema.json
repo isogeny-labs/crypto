@@ -1,0 +1,408 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/lead15.diem-quartic.v1.schema.json",
+  "title": "LEAD-15 Diem-Thome prospective JSONL record",
+  "oneOf": [
+    { "$ref": "#/$defs/run_start" },
+    { "$ref": "#/$defs/instance" },
+    { "$ref": "#/$defs/harvest" },
+    { "$ref": "#/$defs/run_end" }
+  ],
+  "$defs": {
+    "uint": { "type": "integer", "minimum": 0 },
+    "positive_uint": { "type": "integer", "minimum": 1 },
+    "nonnegative_number": { "type": "number", "minimum": 0 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "git_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "image_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "coefficient": { "type": "integer", "minimum": 0, "maximum": 4194300 },
+    "k": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": { "$ref": "#/$defs/coefficient" }
+    },
+    "k4": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": { "$ref": "#/$defs/k" }
+    },
+    "mobius": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "array", "minItems": 2, "maxItems": 2,
+        "items": { "$ref": "#/$defs/k" }
+      }
+    },
+    "common": {
+      "type": "object",
+      "required": [
+        "schema", "record", "protocol_id", "q", "commit", "protocol_sha256",
+        "binary_sha256", "image_digest"
+      ],
+      "properties": {
+        "schema": { "const": "lead15.diem-quartic/v1" },
+        "record": { "enum": ["run_start", "instance", "harvest", "run_end"] },
+        "protocol_id": { "const": "LEAD15-DT-E5-20261101" },
+        "q": { "enum": [257, 2053, 32771, 4194301] },
+        "commit": { "$ref": "#/$defs/git_sha" },
+        "protocol_sha256": { "$ref": "#/$defs/sha256" },
+        "binary_sha256": { "$ref": "#/$defs/sha256" },
+        "image_digest": { "$ref": "#/$defs/image_digest" }
+      }
+    },
+    "runtime_provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "isolation", "cpu_model", "available_parallelism", "kubernetes_node",
+        "kubernetes_job", "kubernetes_job_uid", "kubernetes_pod", "kubernetes_pod_uid"
+      ],
+      "properties": {
+        "isolation": { "const": "none" },
+        "cpu_model": { "type": ["string", "null"] },
+        "available_parallelism": { "type": ["integer", "null"], "minimum": 1 },
+        "kubernetes_node": { "type": ["string", "null"] },
+        "kubernetes_job": { "type": ["string", "null"] },
+        "kubernetes_job_uid": { "type": ["string", "null"] },
+        "kubernetes_pod": { "type": ["string", "null"] },
+        "kubernetes_pod_uid": { "type": ["string", "null"] }
+      }
+    },
+    "run_start": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "type": "object",
+          "required": ["curves", "base_seed", "max_candidates", "retain_factor", "runtime_provenance"],
+          "properties": {
+            "record": { "const": "run_start" },
+            "curves": { "const": 6 },
+            "base_seed": { "const": 20261023 },
+            "max_candidates": { "const": 200000 },
+            "retain_factor": { "const": 8 },
+            "runtime_provenance": { "$ref": "#/$defs/runtime_provenance" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "field_modulus": {
+      "type": "object", "additionalProperties": false,
+      "required": ["x3_a", "constant_b"],
+      "properties": {
+        "x3_a": { "$ref": "#/$defs/coefficient" },
+        "constant_b": { "$ref": "#/$defs/coefficient" }
+      }
+    },
+    "rejects": {
+      "type": "object", "additionalProperties": false,
+      "required": ["no_common_cover", "quartic_core", "order_or_cofactor"],
+      "properties": {
+        "no_common_cover": { "$ref": "#/$defs/uint" },
+        "quartic_core": { "$ref": "#/$defs/uint" },
+        "order_or_cofactor": { "$ref": "#/$defs/uint" }
+      }
+    },
+    "builder_rejects": {
+      "type": "object", "additionalProperties": false,
+      "required": ["no_common_cover", "quartic_core", "order_or_cofactor", "duplicate_quartic_streams"],
+      "properties": {
+        "no_common_cover": { "$ref": "#/$defs/uint" },
+        "quartic_core": { "$ref": "#/$defs/uint" },
+        "order_or_cofactor": { "$ref": "#/$defs/uint" },
+        "duplicate_quartic_streams": { "$ref": "#/$defs/uint" }
+      }
+    },
+    "builder_cost": {
+      "type": "object", "additionalProperties": false,
+      "required": ["native_weight_gae", "gae_price", "native_band_cost", "emitted_total"],
+      "properties": {
+        "native_weight_gae": { "enum": [0, 0.1, 1] },
+        "gae_price": { "$ref": "#/$defs/nonnegative_number" },
+        "native_band_cost": { "$ref": "#/$defs/nonnegative_number" },
+        "emitted_total": { "$ref": "#/$defs/nonnegative_number" }
+      }
+    },
+    "builder_setup": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "streams_attempted", "candidates_total", "rejects_total", "fq_mul", "fq_inv",
+        "fq_sqrt", "hash_lookups", "hash_inserts", "rng_draws", "sort_items",
+        "primality_modular_ops", "fq_arithmetic", "lookup_cost", "native_counter_count",
+        "inversion_price", "sqrt_price", "cost_receipts"
+      ],
+      "properties": {
+        "streams_attempted": { "$ref": "#/$defs/positive_uint" },
+        "candidates_total": { "$ref": "#/$defs/positive_uint" },
+        "rejects_total": { "$ref": "#/$defs/builder_rejects" },
+        "fq_mul": { "$ref": "#/$defs/uint" },
+        "fq_inv": { "$ref": "#/$defs/uint" },
+        "fq_sqrt": { "$ref": "#/$defs/uint" },
+        "hash_lookups": { "$ref": "#/$defs/uint" },
+        "hash_inserts": { "$ref": "#/$defs/uint" },
+        "rng_draws": { "$ref": "#/$defs/uint" },
+        "sort_items": { "$ref": "#/$defs/uint" },
+        "primality_modular_ops": { "$ref": "#/$defs/uint" },
+        "fq_arithmetic": { "$ref": "#/$defs/nonnegative_number" },
+        "lookup_cost": { "$ref": "#/$defs/nonnegative_number" },
+        "native_counter_count": { "$ref": "#/$defs/uint" },
+        "inversion_price": { "$ref": "#/$defs/positive_uint" },
+        "sqrt_price": { "$ref": "#/$defs/positive_uint" },
+        "cost_receipts": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "prefixItems": [
+            { "allOf": [{ "$ref": "#/$defs/builder_cost" }, { "properties": { "native_weight_gae": { "const": 0 } } }] },
+            { "allOf": [{ "$ref": "#/$defs/builder_cost" }, { "properties": { "native_weight_gae": { "const": 0.1 } } }] },
+            { "allOf": [{ "$ref": "#/$defs/builder_cost" }, { "properties": { "native_weight_gae": { "const": 1 } } }] }
+          ],
+          "items": false
+        }
+      }
+    },
+    "m2_certificate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["z", "target_ordered"],
+      "properties": {
+        "z": { "$ref": "#/$defs/k" },
+        "target_ordered": { "$ref": "#/$defs/k4" }
+      }
+    },
+    "m3_certificate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["a", "b", "r", "r_q", "source_ordered"],
+      "properties": {
+        "a": { "$ref": "#/$defs/coefficient" },
+        "b": { "$ref": "#/$defs/coefficient" },
+        "r": { "$ref": "#/$defs/k" },
+        "r_q": { "$ref": "#/$defs/k" },
+        "source_ordered": { "$ref": "#/$defs/k4" }
+      }
+    },
+    "common_branch_certificate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cross_ratio", "mobius", "verified_all_four_points"],
+      "properties": {
+        "cross_ratio": { "$ref": "#/$defs/k" },
+        "mobius": { "$ref": "#/$defs/mobius" },
+        "verified_all_four_points": { "const": true }
+      }
+    },
+    "instance": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "type": "object",
+          "required": [
+            "curve_index", "stream_retry", "seed", "field_modulus", "ub", "uc", "quartic",
+            "order_decimal", "cofactor", "ell", "trace", "candidate_count", "rejects",
+            "builder_setup", "m2_certificate", "m3_certificate", "common_branch_certificate"
+          ],
+          "properties": {
+            "record": { "const": "instance" },
+            "curve_index": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "stream_retry": { "$ref": "#/$defs/uint" },
+            "seed": { "$ref": "#/$defs/uint" },
+            "field_modulus": { "$ref": "#/$defs/field_modulus" },
+            "ub": { "$ref": "#/$defs/k" },
+            "uc": { "$ref": "#/$defs/k" },
+            "quartic": {
+              "type": "array", "minItems": 15, "maxItems": 15,
+              "items": { "$ref": "#/$defs/coefficient" }
+            },
+            "order_decimal": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+            "cofactor": { "const": 4 },
+            "ell": { "type": "integer", "minimum": 3 },
+            "trace": { "type": "string", "pattern": "^-?[0-9]+$" },
+            "candidate_count": { "$ref": "#/$defs/positive_uint" },
+            "rejects": { "$ref": "#/$defs/rejects" },
+            "builder_setup": { "$ref": "#/$defs/builder_setup" },
+            "m2_certificate": { "$ref": "#/$defs/m2_certificate" },
+            "m3_certificate": { "$ref": "#/$defs/m3_certificate" },
+            "common_branch_certificate": { "$ref": "#/$defs/common_branch_certificate" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "yield": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "raw_full", "raw_fp", "raw_pp", "unique_full", "unique_fp", "unique_pp",
+        "raw_fp_per_pair", "raw_pp_per_pair", "unique_fp_per_pair", "unique_pp_per_pair"
+      ],
+      "properties": {
+        "raw_full": { "$ref": "#/$defs/uint" },
+        "raw_fp": { "$ref": "#/$defs/uint" },
+        "raw_pp": { "$ref": "#/$defs/uint" },
+        "unique_full": { "$ref": "#/$defs/uint" },
+        "unique_fp": { "$ref": "#/$defs/uint" },
+        "unique_pp": { "$ref": "#/$defs/uint" },
+        "raw_fp_per_pair": { "type": "number", "minimum": 0, "maximum": 1 },
+        "raw_pp_per_pair": { "type": "number", "minimum": 0, "maximum": 1 },
+        "unique_fp_per_pair": { "type": "number", "minimum": 0, "maximum": 1 },
+        "unique_pp_per_pair": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "large_prime_graph": {
+      "type": "object", "additionalProperties": false,
+      "required": ["vertices", "edges", "giant_fraction", "cycle_count", "usable_cycles_including_full"],
+      "properties": {
+        "vertices": { "$ref": "#/$defs/uint" },
+        "edges": { "$ref": "#/$defs/uint" },
+        "giant_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+        "cycle_count": { "$ref": "#/$defs/uint" },
+        "usable_cycles_including_full": { "$ref": "#/$defs/uint" }
+      }
+    },
+    "selection_sge": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "retained_tree_edges", "retained_extra_edges", "materialized_tree_edges",
+        "materialized_full_rows", "materialized_rows", "materialized_dependency_dimension",
+        "rows_after_lp_sge", "total_row_weight_after_lp_sge", "mean_row_weight_after_lp_sge",
+        "max_row_weight_after_lp_sge", "mean_pivot_weight_after_rank_sge"
+      ],
+      "properties": {
+        "retained_tree_edges": { "$ref": "#/$defs/uint" },
+        "retained_extra_edges": { "$ref": "#/$defs/uint" },
+        "materialized_tree_edges": { "$ref": "#/$defs/uint" },
+        "materialized_full_rows": { "$ref": "#/$defs/uint" },
+        "materialized_rows": { "$ref": "#/$defs/uint" },
+        "materialized_dependency_dimension": { "$ref": "#/$defs/uint" },
+        "rows_after_lp_sge": { "$ref": "#/$defs/uint" },
+        "total_row_weight_after_lp_sge": { "$ref": "#/$defs/uint" },
+        "mean_row_weight_after_lp_sge": { "$ref": "#/$defs/nonnegative_number" },
+        "max_row_weight_after_lp_sge": { "$ref": "#/$defs/uint" },
+        "mean_pivot_weight_after_rank_sge": { "$ref": "#/$defs/nonnegative_number" }
+      }
+    },
+    "linear_algebra": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rank", "nullity"],
+      "properties": {
+        "rank": { "$ref": "#/$defs/uint" },
+        "nullity": { "$ref": "#/$defs/uint" }
+      }
+    },
+    "attack_cost": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "fq_arithmetic", "lookup_cost", "mod_ell_cost", "native_counter_count",
+        "native_band_cost", "attack_total", "verification_cost_excluded", "inversion_price",
+        "sqrt_price", "mod_ell_price", "native_weight_gae", "gae_price"
+      ],
+      "properties": {
+        "fq_arithmetic": { "$ref": "#/$defs/nonnegative_number" },
+        "lookup_cost": { "$ref": "#/$defs/nonnegative_number" },
+        "mod_ell_cost": { "$ref": "#/$defs/nonnegative_number" },
+        "native_counter_count": { "$ref": "#/$defs/uint" },
+        "native_band_cost": { "$ref": "#/$defs/nonnegative_number" },
+        "attack_total": { "$ref": "#/$defs/nonnegative_number" },
+        "verification_cost_excluded": { "$ref": "#/$defs/nonnegative_number" },
+        "inversion_price": { "$ref": "#/$defs/positive_uint" },
+        "sqrt_price": { "$ref": "#/$defs/positive_uint" },
+        "mod_ell_price": { "enum": [1, 9] },
+        "native_weight_gae": { "enum": [0, 0.1, 1] },
+        "gae_price": { "$ref": "#/$defs/nonnegative_number" }
+      }
+    },
+    "references": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "rho_same_instance_relation_only", "rho_formula", "matched_hyperelliptic_2p15",
+        "matched_hyper_formula", "quartic_projected_2p15", "quartic_projection_formula",
+        "k4_threshold"
+      ],
+      "properties": {
+        "rho_same_instance_relation_only": { "$ref": "#/$defs/nonnegative_number" },
+        "rho_formula": { "const": "sqrt(pi*ell/2)*74.5 FqM; no native-band counters available, so lower-bound reference only" },
+        "matched_hyperelliptic_2p15": { "$ref": "#/$defs/nonnegative_number" },
+        "matched_hyper_formula": { "const": "9.967e10*(2^15/2^22)^1.408; q-matched round-4 aggregate extrapolation, not rerun on this exact E" },
+        "quartic_projected_2p15": { "$ref": "#/$defs/nonnegative_number" },
+        "quartic_projection_formula": { "const": "7.3e6+0.53e6*w, w=measured mean row weight after LP SGE" },
+        "k4_threshold": { "$ref": "#/$defs/nonnegative_number" }
+      }
+    },
+    "counters": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "lines", "split", "rel_full", "rel_fp", "rel_pp", "duplicates", "verified",
+        "verify_failed", "hash_lookups", "hash_inserts", "rng_draws", "uf_ops",
+        "root_calls", "normalizations", "fq_mul_collect", "fq_inv_collect",
+        "fq_sqrt_collect", "fq_mul_fb", "fq_inv_fb", "fq_sqrt_fb", "fq_mul_verify",
+        "fq_inv_verify", "fq_sqrt_verify", "lp_sge_ops", "lp_sge_entries",
+        "rank_sge_ops", "rank_inversions", "rank_entries", "sort_items"
+      ],
+      "properties": {
+        "lines": { "$ref": "#/$defs/uint" }, "split": { "$ref": "#/$defs/uint" },
+        "rel_full": { "$ref": "#/$defs/uint" }, "rel_fp": { "$ref": "#/$defs/uint" },
+        "rel_pp": { "$ref": "#/$defs/uint" }, "duplicates": { "$ref": "#/$defs/uint" },
+        "verified": { "$ref": "#/$defs/uint" }, "verify_failed": { "$ref": "#/$defs/uint" },
+        "hash_lookups": { "$ref": "#/$defs/uint" }, "hash_inserts": { "$ref": "#/$defs/uint" },
+        "rng_draws": { "$ref": "#/$defs/uint" }, "uf_ops": { "$ref": "#/$defs/uint" },
+        "root_calls": { "$ref": "#/$defs/uint" }, "normalizations": { "$ref": "#/$defs/uint" },
+        "fq_mul_collect": { "$ref": "#/$defs/uint" }, "fq_inv_collect": { "$ref": "#/$defs/uint" },
+        "fq_sqrt_collect": { "$ref": "#/$defs/uint" }, "fq_mul_fb": { "$ref": "#/$defs/uint" },
+        "fq_inv_fb": { "$ref": "#/$defs/uint" }, "fq_sqrt_fb": { "$ref": "#/$defs/uint" },
+        "fq_mul_verify": { "$ref": "#/$defs/uint" }, "fq_inv_verify": { "$ref": "#/$defs/uint" },
+        "fq_sqrt_verify": { "$ref": "#/$defs/uint" }, "lp_sge_ops": { "$ref": "#/$defs/uint" },
+        "lp_sge_entries": { "$ref": "#/$defs/uint" }, "rank_sge_ops": { "$ref": "#/$defs/uint" },
+        "rank_inversions": { "$ref": "#/$defs/uint" }, "rank_entries": { "$ref": "#/$defs/uint" },
+        "sort_items": { "$ref": "#/$defs/uint" }
+      }
+    },
+    "harvest": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "type": "object",
+          "required": [
+            "curve_index", "seed", "ell", "n_factor_base", "pairs", "yield",
+            "large_prime_graph", "selection_sge", "linear_algebra", "cost_receipts",
+            "references", "counters"
+          ],
+          "properties": {
+            "record": { "const": "harvest" },
+            "curve_index": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "seed": { "$ref": "#/$defs/uint" },
+            "ell": { "type": "integer", "minimum": 3 },
+            "n_factor_base": { "$ref": "#/$defs/positive_uint" },
+            "pairs": { "$ref": "#/$defs/positive_uint" },
+            "yield": { "$ref": "#/$defs/yield" },
+            "large_prime_graph": { "$ref": "#/$defs/large_prime_graph" },
+            "selection_sge": { "$ref": "#/$defs/selection_sge" },
+            "linear_algebra": { "$ref": "#/$defs/linear_algebra" },
+            "cost_receipts": {
+              "type": "array", "minItems": 6, "maxItems": 6,
+              "prefixItems": [
+                { "allOf": [{ "$ref": "#/$defs/attack_cost" }, { "properties": { "mod_ell_price": { "const": 1 }, "native_weight_gae": { "const": 0 } } }] },
+                { "allOf": [{ "$ref": "#/$defs/attack_cost" }, { "properties": { "mod_ell_price": { "const": 1 }, "native_weight_gae": { "const": 0.1 } } }] },
+                { "allOf": [{ "$ref": "#/$defs/attack_cost" }, { "properties": { "mod_ell_price": { "const": 1 }, "native_weight_gae": { "const": 1 } } }] },
+                { "allOf": [{ "$ref": "#/$defs/attack_cost" }, { "properties": { "mod_ell_price": { "const": 9 }, "native_weight_gae": { "const": 0 } } }] },
+                { "allOf": [{ "$ref": "#/$defs/attack_cost" }, { "properties": { "mod_ell_price": { "const": 9 }, "native_weight_gae": { "const": 0.1 } } }] },
+                { "allOf": [{ "$ref": "#/$defs/attack_cost" }, { "properties": { "mod_ell_price": { "const": 9 }, "native_weight_gae": { "const": 1 } } }] }
+              ],
+              "items": false
+            },
+            "references": { "$ref": "#/$defs/references" },
+            "counters": { "$ref": "#/$defs/counters" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "run_end": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "type": "object",
+          "required": ["instances", "harvests", "complete"],
+          "properties": {
+            "record": { "const": "run_end" },
+            "instances": { "const": 6 },
+            "harvests": { "const": 6 },
+            "complete": { "const": true }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

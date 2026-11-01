@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/lead15.source-manifest.v1.schema.json",
+  "title": "LEAD-15 frozen source and launch-contract manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "protocol_id", "instrument_commit", "freeze_commit",
+    "protocol_sha256", "protocol_file_sha256", "binary_sha256", "build_info_sha256",
+    "build_info_schema_sha256",
+    "analysis_source_sha256", "library_source_sha256", "worker_source_sha256",
+    "collector_source_sha256", "k4_reference_sha256", "result_schema_sha256",
+    "source_manifest_schema_sha256", "completion_receipt_schema_sha256",
+    "request_schema_sha256", "binary_path_in_image", "worker_path_in_image",
+    "build_info_path_in_image", "image_uri", "image_digest", "launch_tool", "isolation",
+    "threads_per_cell", "scientific_environment", "scientific_deadline_seconds",
+    "outer_job_deadline_seconds", "termination_grace_seconds", "retries",
+    "requested_resources", "jobs", "durable_output_prefix", "checkpoint_receipt",
+    "frozen_at"
+  ],
+  "properties": {
+    "schema": { "const": "lead15.source-manifest/v1" },
+    "status": { "enum": ["draft", "frozen"] },
+    "protocol_id": { "const": "LEAD15-DT-E5-20261101" },
+    "instrument_commit": { "$ref": "#/$defs/nullable_git_sha" },
+    "freeze_commit": { "$ref": "#/$defs/nullable_git_sha" },
+    "protocol_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "protocol_file_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "binary_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "build_info_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "build_info_schema_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "analysis_source_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "library_source_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "worker_source_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "collector_source_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "k4_reference_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "result_schema_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "source_manifest_schema_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "completion_receipt_schema_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "request_schema_sha256": { "$ref": "#/$defs/nullable_sha256" },
+    "binary_path_in_image": { "const": "/opt/lead15/lead15_diem_quartic" },
+    "worker_path_in_image": { "const": "/opt/lead15/lead15-worker" },
+    "build_info_path_in_image": { "const": "/opt/lead15/build-info.json" },
+    "image_uri": {
+      "type": ["string", "null"],
+      "pattern": "^[^\\s@]+@sha256:[0-9a-f]{64}$"
+    },
+    "image_digest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "launch_tool": { "const": "isolab_k8s_run" },
+    "isolation": { "const": "none" },
+    "threads_per_cell": { "const": 1 },
+    "scientific_environment": {
+      "const": { "RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1" }
+    },
+    "scientific_deadline_seconds": { "const": 3600 },
+    "outer_job_deadline_seconds": { "const": 7200 },
+    "termination_grace_seconds": { "const": 60 },
+    "retries": { "const": 0 },
+    "requested_resources": {
+      "const": { "cpu": 4, "memory_gib": 16, "spot": true }
+    },
+    "jobs": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "prefixItems": [
+        { "$ref": "#/$defs/q257" }, { "$ref": "#/$defs/q2053" },
+        { "$ref": "#/$defs/q32771" }, { "$ref": "#/$defs/q4194301" }
+      ],
+      "items": false
+    },
+    "durable_output_prefix": {
+      "type": ["string", "null"],
+      "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/$"
+    },
+    "checkpoint_receipt": { "$ref": "#/$defs/checkpoint_receipt" },
+    "frozen_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "allOf": [{
+    "if": { "required": ["status"], "properties": { "status": { "const": "frozen" } } },
+    "then": { "properties": {
+      "instrument_commit": { "$ref": "#/$defs/git_sha" },
+      "freeze_commit": { "$ref": "#/$defs/git_sha" },
+      "protocol_sha256": { "$ref": "#/$defs/sha256" },
+      "protocol_file_sha256": { "$ref": "#/$defs/sha256" },
+      "binary_sha256": { "$ref": "#/$defs/sha256" },
+      "build_info_sha256": { "$ref": "#/$defs/sha256" },
+      "build_info_schema_sha256": { "$ref": "#/$defs/sha256" },
+      "analysis_source_sha256": { "$ref": "#/$defs/sha256" },
+      "library_source_sha256": { "$ref": "#/$defs/sha256" },
+      "worker_source_sha256": { "$ref": "#/$defs/sha256" },
+      "collector_source_sha256": { "$ref": "#/$defs/sha256" },
+      "k4_reference_sha256": { "$ref": "#/$defs/sha256" },
+      "result_schema_sha256": { "$ref": "#/$defs/sha256" },
+      "source_manifest_schema_sha256": { "$ref": "#/$defs/sha256" },
+      "completion_receipt_schema_sha256": { "$ref": "#/$defs/sha256" },
+      "request_schema_sha256": { "$ref": "#/$defs/sha256" },
+      "image_uri": { "type": "string", "pattern": "^[^\\s@]+@sha256:[0-9a-f]{64}$" },
+      "image_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+      "durable_output_prefix": { "const": "s3://isolab-results-104186811093-us-east-2/runs/" },
+      "checkpoint_receipt": { "$ref": "#/$defs/frozen_checkpoint_receipt" },
+      "frozen_at": { "type": "string", "format": "date-time" },
+      "jobs": { "prefixItems": [
+        { "allOf": [{ "$ref": "#/$defs/q257" }, { "$ref": "#/$defs/frozen_job" }] },
+        { "allOf": [{ "$ref": "#/$defs/q2053" }, { "$ref": "#/$defs/frozen_job" }] },
+        { "allOf": [{ "$ref": "#/$defs/q32771" }, { "$ref": "#/$defs/frozen_job" }] },
+        { "allOf": [{ "$ref": "#/$defs/q4194301" }, { "$ref": "#/$defs/frozen_job" }] }
+      ] }
+    } }
+  }],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "nullable_sha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+    "git_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "nullable_git_sha": { "anyOf": [{ "$ref": "#/$defs/git_sha" }, { "type": "null" }] },
+    "checkpoint_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["s3_uri", "sha256", "bytes", "version_id", "readback_verified"],
+      "properties": {
+        "s3_uri": { "type": ["string", "null"] },
+        "sha256": { "$ref": "#/$defs/nullable_sha256" },
+        "bytes": { "type": ["integer", "null"], "minimum": 1 },
+        "version_id": { "type": ["string", "null"] },
+        "readback_verified": { "type": ["boolean", "null"] }
+      }
+    },
+    "frozen_checkpoint_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["s3_uri", "sha256", "bytes", "version_id", "readback_verified"],
+      "properties": {
+        "s3_uri": { "type": "string", "pattern": "^s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "version_id": { "type": "string", "minLength": 1 },
+        "readback_verified": { "const": true }
+      }
+    },
+    "job": {
+      "type": "object", "additionalProperties": false,
+      "required": ["q", "job_name", "argv_template", "request_artifact_s3_uri", "results_prefix"],
+      "properties": {
+        "q": { "type": "integer" },
+        "job_name": { "type": ["string", "null"] },
+        "argv_template": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "minItems": 8, "maxItems": 8, "items": { "type": "string" } }
+          ]
+        },
+        "request_artifact_s3_uri": { "type": ["string", "null"] },
+        "results_prefix": { "type": ["string", "null"] }
+      }
+    },
+    "frozen_job": {
+      "type": "object",
+      "properties": {
+        "job_name": { "type": "string", "pattern": "^lead15-dt-e5-q(257|2053|32771|4194301)-[0-9a-f]{8,12}$" },
+        "argv_template": {
+          "type": "array", "minItems": 8, "maxItems": 8,
+          "prefixItems": [
+            { "const": "/opt/lead15/lead15-worker" },
+            { "pattern": "^(257|2053|32771|4194301)$" },
+            { "const": "${SOURCE_MANIFEST_SHA256}" },
+            { "$ref": "#/$defs/git_sha" }, { "$ref": "#/$defs/sha256" },
+            { "$ref": "#/$defs/sha256" },
+            { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+            { "const": "3600" }
+          ],
+          "items": false
+        },
+        "request_artifact_s3_uri": { "type": "string", "pattern": "^s3://setec-astronomy-artifacts/lead15-diem-quartic-20261101/requests/" },
+        "results_prefix": { "type": "string", "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/lead15-dt-e5-q(257|2053|32771|4194301)-[0-9a-f]{8,12}/$" }
+      }
+    },
+    "q257": { "allOf": [{ "$ref": "#/$defs/job" }, { "properties": { "q": { "const": 257 } } }] },
+    "q2053": { "allOf": [{ "$ref": "#/$defs/job" }, { "properties": { "q": { "const": 2053 } } }] },
+    "q32771": { "allOf": [{ "$ref": "#/$defs/job" }, { "properties": { "q": { "const": 32771 } } }] },
+    "q4194301": { "allOf": [{ "$ref": "#/$defs/job" }, { "properties": { "q": { "const": 4194301 } } }] }
+  }
+}

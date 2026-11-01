@@ -1,0 +1,590 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "LEAD15-DT-E5-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/lead15_diem_quartic_20261101",
+  "authors": [
+    "Codex LEAD-15 owner"
+  ],
+  "links": {
+    "evaluator": "research/pdp_strategy_evaluation_20261031/cards/e5.md",
+    "lead": "research/pdp_literature_leads_20261022/leads/LEAD-15.md",
+    "narrative_protocol": "research/lead15_diem_quartic_20261101/PROTOCOL.md",
+    "result_schema": "research/lead15_diem_quartic_20261101/result.schema.json",
+    "source_manifest": "research/lead15_diem_quartic_20261101/source-manifest.json",
+    "source_manifest_schema": "research/lead15_diem_quartic_20261101/source-manifest.schema.json",
+    "completion_receipt_schema": "research/lead15_diem_quartic_20261101/completion-receipt.schema.json",
+    "isolab_request_schema": "research/lead15_diem_quartic_20261101/isolab-request.schema.json",
+    "build_info_schema": "research/lead15_diem_quartic_20261101/build-info.schema.json",
+    "image_recipe": "research/lead15_diem_quartic_20261101/lead15-image.Dockerfile",
+    "worker_wrapper": "research/lead15_diem_quartic_20261101/lead15-worker.sh",
+    "completion_collector": "research/lead15_diem_quartic_20261101/lead15-collect.sh",
+    "lineage_contract": "research/lead15_diem_quartic_20261101/LINEAGE.md",
+    "lineage_schema_tests": "research/lead15_diem_quartic_20261101/lineage-contract-tests.sh",
+    "collector_adversarial_tests": "research/lead15_diem_quartic_20261101/collector-adversarial-tests.sh",
+    "result_schema_tests": "research/lead15_diem_quartic_20261101/result-schema-tests.sh",
+    "k4_reference": "research/lead15_diem_quartic_20261101/k4-reference.json"
+  },
+  "question": "On exact-cofactor-4 E/F_(q^3) instances with certified common m=2 plane-quartic and m=3 hyperelliptic genus-3 covers, does the full Diem-Thome line harvest have adequate PP yield, cycles, rank/nullity and post-SGE sparsity to survive evaluator e5 gates K1-K4?",
+  "claims": [
+    {
+      "id": "C-structure",
+      "text": "Every included curve has a verified common-branch m=2/m=3 certificate, prime ell and exact cofactor four.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-e5",
+      "text": "The measured four-size, six-curve full harvest survives or fires K1-K4 exactly as preregistered.",
+      "class": "comparative",
+      "decided_by": [
+        "C-gates"
+      ],
+      "if_supported": "advance the common-cover plane-quartic relation family to an end-to-end follow-on; no deployed-curve claim",
+      "if_not_supported": "record the exact failed gate as a new row or reject the family at the measured scale"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-yield",
+      "statement": "The practical Diem-Thome PP graph produces a giant component and enough usable relations at N=ceil(2.83 sqrt(q+1)).",
+      "mechanism": "Split residual intersections create two-large-prime graph edges; cycles eliminate the large primes without class-group walks.",
+      "predictions": [
+        {
+          "id": "P-K1K2",
+          "metric": "unique_pp_per_pair",
+          "direction": "higher",
+          "minimum_effect": "each size mean unique PP/pair >= 0.20 and every curve usable_cycles >= N+2",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "data_seen": [
+              {
+                "path": "research/pdp_literature_leads_20261022/leads/LEAD-15.md",
+                "measured": "historical desk q=257 PP/FP ranges only; not the prospective streams"
+              },
+              {
+                "path": "Diem-Thome 2008 full text",
+                "measured": "published q approximately 2^31 matrix and heuristic graph evidence"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    },
+    {
+      "id": "H-rank-weight",
+      "statement": "Cycle-selected FB rows have nullity one and a mean weight low enough for e5's K4 projection.",
+      "mechanism": "The factor base spans the ell-part while sparse LP elimination avoids the published 352-nonzero constant at the measured scales.",
+      "predictions": [
+        {
+          "id": "P-K3K4",
+          "metric": "nullity",
+          "direction": "lower",
+          "minimum_effect": "nullity=1 on every curve and q=32771 mean projected cost <= 0.6 matched round-4 incumbent",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "data_seen": [
+              {
+                "path": "research/pdp_strategy_evaluation_20261031/cards/e5.md",
+                "measured": "published DT weight correction and evaluator projection; no prospective streams"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "dt-common-cover",
+      "role": "candidate",
+      "description": "Full two-large-prime Diem-Thome line harvest on prospectively built common-cover plane quartics.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--example",
+            "lead15_diem_quartic"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "curves_per_size": "6",
+          "max_candidates": "200000",
+          "retain_factor": "8"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "q": [
+          257,
+          2053,
+          32771,
+          4194301
+        ],
+        "curves_per_q": 6,
+        "factor_base": "least N with 10000*N^2 >= 283^2*(q+1), sampled uniformly without replacement from affine C(F_q) points with W2 != 0",
+        "pairs": "all unordered FB pairs in lexicographic order"
+      }
+    },
+    {
+      "id": "matched-formula-references",
+      "role": "baseline",
+      "description": "Derived per-instance analytic rho lower bound and q-matched round-4 hyperelliptic aggregate extrapolation; no reference binary is executed.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "rho": "sqrt(pi*ell/2)*74.5",
+          "hyper": "9.967e10*(2^15/2^22)^1.408"
+        },
+        "env": {},
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "row_kind": "analysis-only derived reference fields paired to each evidenced attempted candidate row; planned remains 24 and missing or zero-attempt rows are never synthesized",
+        "rho_status": "lower-bound relation-only because native counters are unavailable",
+        "hyper_status": "q-matched evaluator aggregate projection; no hyperelliptic binary is rerun on each exact prospective E"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "primary outcomes are deterministic exact counts for a frozen curve/seed, not noisy timings; repeating the identical arm adds no A/A information"
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "historical q=5/q=7 branch witnesses and arithmetic unit tests are preflight correctness checks, not a target-population arm"
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "the study estimates exact relation/graph/matrix outcomes and has no sampled null population"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "q",
+        "levels": [
+          257,
+          2053,
+          32771,
+          4194301
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve_stream",
+        "treatment": "randomized",
+        "value": "indices 0..5 from base seed 20261023",
+        "how": "fixed SplitMix64 derivation in examples/lead15_diem_quartic.rs; first admissible distinct curve"
+      },
+      {
+        "name": "cofactor",
+        "treatment": "fixed",
+        "value": 4,
+        "how": "exact inclusion filter; ell must be prime"
+      },
+      {
+        "name": "cover_type",
+        "treatment": "fixed",
+        "value": "certified m2 and m3 common branch divisor",
+        "how": "cross-ratio, trace-zero solve and verified Mobius certificate"
+      },
+      {
+        "name": "pair_order",
+        "treatment": "fixed",
+        "value": "lexicographic",
+        "how": "every unordered pair, no early stop"
+      },
+      {
+        "name": "retention_cap",
+        "treatment": "fixed",
+        "value": "8N+1024 full/non-tree relations plus every forest edge",
+        "how": "bounded-memory materialization; graph counts still use all pairs"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "one process per size cell"
+      },
+      {
+        "name": "method",
+        "treatment": "crossed",
+        "value": [
+          "dt-common-cover",
+          "matched-formula-references"
+        ],
+        "how": "up to 24 durable authenticated candidate identities emit one attempted row each, with deterministic formula-reference fields attached in analysis; planned remains 24 and absent identities or zero-attempt cells never become fictional run rows"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-gates",
+        "arms": [
+          "dt-common-cover",
+          "matched-formula-references"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": "deterministic counted experiment",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "there is one measured arm; the four size cells launch concurrently and each visits its six deterministic streams in index order",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [
+        20261023
+      ],
+      "nonce": null,
+      "note": "the committed native lead15_diem_quartic driver derives each stream from frozen spec seed 20261023 by seed_for(q, curve_index, duplicate_retry); every derived seed and retry is recorded and no scientific-failure resampling is allowed"
+    },
+    "instance_sampling": {
+      "rule": "first admissible exact-cofactor-4 common-cover curve within 200000 candidates on each of six independent streams per q; deterministic retry stream only for a duplicate quartic",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "not masked: exact q and curve index are required for structural validation; all rules are frozen before observations",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 24,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 4,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "e5 prescribes six curves at each of four fixed sizes and deterministic kill thresholds, not a null-hypothesis test; no inferential p-value is claimed"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": 150,
+      "threads": 1,
+      "estimated_total_seconds": 3600,
+      "measured_on": "UNVALIDATED evaluator-e5 desk estimate (<1 CPU-hour total for the four-size run); 3600 seconds is a conservative planning ceiling, not an observation or performance claim, and is independent of each cell's 3600-second terminal censor"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "unique_pp_per_pair",
+        "name": "unique PP yield",
+        "unit": "accepted unique PP relations / all FB pairs",
+        "kind": "counted",
+        "definition": "unique two-large-prime sections after duplicate suppression divided by N(N-1)/2",
+        "source": "results/q-*/records.jsonl yield.unique_pp_per_pair",
+        "aggregation": "mean",
+        "resolution": "1/pairs",
+        "uncertainty": "range"
+      },
+      {
+        "id": "usable_cycles",
+        "name": "usable cycles",
+        "unit": "relations",
+        "kind": "counted",
+        "definition": "accepted Full + E - V + B in the complete parity LP graph",
+        "source": "results/q-*/records.jsonl large_prime_graph.usable_cycles_including_full",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "nullity",
+        "name": "exact matrix nullity",
+        "unit": "dimension over F_ell",
+        "kind": "counted",
+        "definition": "N minus exact sparse rank of cycle-selected FB-only rows",
+        "source": "results/q-*/records.jsonl linear_algebra.nullity",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "post_lp_sge_weight",
+        "name": "post-LP-SGE row weight",
+        "unit": "nonzeros / FB-only row",
+        "kind": "counted",
+        "definition": "arithmetic mean nonzero coefficients including target column immediately after cycle selection and LP SGE",
+        "source": "results/q-*/records.jsonl selection_sge.mean_row_weight_after_lp_sge",
+        "aggregation": "mean",
+        "resolution": "1/rows",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "complete_cost",
+        "name": "complete relation plus linear-algebra cost",
+        "unit": "F_q multiplication equivalents",
+        "kind": "counted",
+        "definition": "field arithmetic plus fixed lookup price plus exact emitted Montgomery multiplication/addition/subtraction counts at M_ell in {1,9} plus native counters at {0,0.1,1} GAE; verification separately excluded",
+        "source": "results/q-*/records.jsonl cost_receipts",
+        "aggregation": "distribution",
+        "resolution": "1 M_q",
+        "uncertainty": "range"
+      },
+      {
+        "id": "giant_fraction",
+        "name": "largest LP component fraction",
+        "unit": "large-prime vertices / all large-prime vertices",
+        "kind": "counted",
+        "definition": "largest union-find component size excluding sink divided by all observed LP vertices",
+        "source": "results/q-*/records.jsonl large_prime_graph.giant_fraction",
+        "aggregation": "per_row",
+        "resolution": "1/vertices",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "builder_setup_cost",
+        "name": "instance-builder setup cost",
+        "unit": "F_q multiplication equivalents",
+        "kind": "counted",
+        "definition": "separately reported deterministic canonical field-construction, primality modular, field, hash, sort and RNG counts and native band; excluded from the attack projection",
+        "source": "results/q-*/records.jsonl builder_setup.cost_receipts",
+        "aggregation": "distribution",
+        "resolution": "1 M_q",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "all FB pairs",
+      "raw and unique Full/FP/PP",
+      "graph vertices/edges/E-V+B/giant fraction",
+      "LP-SGE and rank-SGE modular ops",
+      "rank/nullity and row weights",
+      "Fq mul/inv/sqrt",
+      "hash lookup/insert, RNG, union-find, root-call, normalization, sparse-entry, rank-entry and sort-item work",
+      "builder canonical field construction and primality modular work"
+    ],
+    "record": [
+      "commit",
+      "protocol_sha256",
+      "binary_sha256",
+      "image_digest",
+      "cpu_model",
+      "logical CPU count as provenance",
+      "memory bytes as provenance",
+      "kernel as provenance",
+      "threads",
+      "node name",
+      "locally hashed exact request bytes and read-back S3 head/version",
+      "locally hashed raw Kubernetes Job and Pod bytes",
+      "locally hashed status, complete result listing, object-head, worker, and payload bytes",
+      "Job UID",
+      "Pod UID",
+      "Pod restart count",
+      "payload S3 URI/SHA-256/bytes/ETag/version ID",
+      "source-manifest identity"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "requested_cpus": 4,
+      "requested_memory_gib": 16,
+      "requested_spot": true,
+      "semantics": "resource requests only, not a hardware class, affinity, isolation, or delivered-capacity claim",
+      "route": "isolab_k8s_run custom job with digest-pinned image, exact wrapper argv, retries=0 and durable S3 upload to the injected isolab-results prefix",
+      "actual_cpu_node_job_pod": "recorded as provenance only; no instance type or clock metric is frozen",
+      "cells": "four q-size jobs concurrently if quota permits"
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 7200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: build six admissible distinct curves and visit all N(N-1)/2 pairs for every curve at all four q values, then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "candidate search stops at the first admissible curve in each fixed stream or at 200000 candidates; exhaustion is missing data, never a seed replacement",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "the wrapper's 3600-second native-child deadline is a terminal censored/incomplete cell outcome inside one 7200-second outer Job with retries=0 and no replacement; it is neither algorithmic failure nor zero cost",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "wrong pair count, line-verification failure, common-branch failure, non-prime ell, cofactor other than four, duplicate included quartic, retention-cap materialization below N+2 when the complete graph has at least N+2 usable relations, arithmetic panic, missing run_end, schema failure, missing or invalid commit/protocol/binary/image identity, or source/protocol/binary/image mismatch invalidates the affected cell",
+    "a deadline or infrastructure interruption is preserved as partial evidence and is terminal unless the original immutable Job itself later completes; no replacement Job or measurement retry is admitted",
+    "a deadline is censored/incomplete and may not be described as algorithmic failure or zero cost"
+  ],
+  "decision_rule": {
+    "text": "Kill K1 if any q-size six-curve mean unique_PP/pairs is below 0.20; kill K2 if any curve has usable_cycles < N+2; kill K3 if any curve has nullity != 1; kill K4 if at q=32771, 7.3e6+0.53e6*mean(w) exceeds the frozen canonical decimal 64530357.539066718 = 32265178769533359/500000000, derived pre-data from 0.6*9.967e10*(2^15/2^22)^1.408. Advance only if all gates survive and all 24 cells and required artifacts validate.",
+    "comparison_ids": [
+      "C-gates"
+    ],
+    "threshold": "K1 exact 1/5; K2 N+2; K3 nullity exactly 1; K4 exact frozen rational 32265178769533359/500000000 M_q",
+    "statistic": "per-size exact integer comparison for K1, per-curve exact values for K2/K3, and q=32771 exact reduced-rational six-curve arithmetic mean w with integer cross-products for K4",
+    "interval": "none: deterministic exact-count gates; report six-curve ranges descriptively",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "PP yield margin over 0.20, cycle margin over N+2, nullity difference from one, and projected-cost ratio to matched incumbent",
+    "verdict_vocabulary": [
+      "advance",
+      "new_row_or_reject",
+      "invalid_or_incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../examples/lead15_diem_quartic.rs",
+      "sha256": null
+    },
+    "inputs": [
+      "source-manifest.json",
+      "evidence/q-257/completion-receipt.json and every receipt-relative lineage artifact",
+      "evidence/q-2053/completion-receipt.json and every receipt-relative lineage artifact",
+      "evidence/q-32771/completion-receipt.json and every receipt-relative lineage artifact",
+      "evidence/q-4194301/completion-receipt.json and every receipt-relative lineage artifact"
+    ],
+    "outputs": [
+      "results/analysis.json",
+      "results/k-gates.json",
+      "results/export.json",
+      "REPORT.md",
+      "reports/lead15-flow.svg",
+      "REPORT.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "PP and FP yield by q with K1 line",
+      "usable cycles/N and nullity by curve",
+      "post-SGE weight and K4 projected-cost threshold",
+      "complete-cost bands with lower-bound rho clearly distinguished"
+    ],
+    "report_dir": "research/lead15_diem_quartic_20261101/reports"
+  },
+  "inadmissible": [
+    "observing any target generator, factor-base, relation, graph, rank, weight or cost value before freeze commit and S3 pre-run receipt",
+    "changing q, N, seed law, candidate cap, curve count, retention cap, pricing, matched references or K rules after observations",
+    "substituting a smaller diagnostic for q=4194301 or inferring a full-cell result from partial pairs",
+    "using raw PP where K1 requires accepted unique PP, deleting failed streams, or combining the unfinished 2026-10-18 quartic run",
+    "presenting a projection as measurement, wall time as headline, or the native-counter-missing rho model as a complete-cost reference",
+    "replacing or retrying a cell that reaches the frozen 3600-second scientific deadline, or treating that censored cell as algorithmic failure or zero cost"
+  ],
+  "literature": [
+    {
+      "ref": "https://web.archive.org/web/20220101000000id_/https://hal.inria.fr/inria-00107290/document",
+      "provenance": "retrieved",
+      "claim": "Diem-Thome practical two-large-prime relation graph, heuristic Assumption 12, published q approximately 2^31 matrix and row-weight evidence",
+      "verified_by": "LEAD-15 owner, 2026-11-01"
+    },
+    {
+      "ref": "https://jtnb.centre-mersenne.org/item/10.5802/jtnb.815.pdf",
+      "provenance": "retrieved",
+      "claim": "rigorous expected O-tilde(q) plane-curve algorithm and its different, noncompetitive constants",
+      "verified_by": "LEAD-15 owner, 2026-11-01"
+    },
+    {
+      "ref": "https://eprint.iacr.org/2005/276.pdf",
+      "provenance": "retrieved",
+      "claim": "explicit non-hyperelliptic genus-3 group arithmetic cost context",
+      "verified_by": "LEAD-15 owner, 2026-11-01"
+    },
+    {
+      "ref": "research/pdp_strategy_evaluation_20261031/cards/e5.md",
+      "provenance": "internal",
+      "claim": "four-size/six-curve workload, corrected weight baseline, projection and K1-K4",
+      "verified_by": "LEAD-15 owner, 2026-11-01"
+    },
+    {
+      "ref": "research/ghs_cubic_hyperelliptic_genus3_20261013/README.md",
+      "provenance": "internal",
+      "claim": "m=3 r=5 branch construction and historical q=5/q=7 witnesses",
+      "verified_by": "LEAD-15 owner, 2026-11-01"
+    },
+    {
+      "ref": "research/ic_improve4_20261015/01-genus3-relations/results/run/analysis.md",
+      "provenance": "internal",
+      "claim": "round-4 hyperelliptic incumbent 9.967e10 at 2^22 and fitted slope 1.408",
+      "verified_by": "LEAD-15 owner, 2026-11-01"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "lead15_launch_contract": {
+      "scientific_child_deadline_seconds": 3600,
+      "outer_job_deadline_seconds": 7200,
+      "termination_grace_seconds": 60,
+      "deadline_semantics": "the tracked wrapper starts one native child with a 3600-second timeout after Pod start; Kubernetes activeDeadlineSeconds=7200 bounds provisioning plus wrapper execution and leaves upload/receipt slack",
+      "retry_semantics": "max_attempts=1 and Kubernetes backoffLimit=0 permit no replacement or retry; infrastructure_only is the canonical protocol-schema retry category, not permission for a second attempt"
+    }
+  }
+}

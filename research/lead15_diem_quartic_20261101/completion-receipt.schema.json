@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/lead15.completion-receipt.v1.schema.json",
+  "title": "LEAD-15 locally verified immutable Job completion receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "protocol_id", "q", "source_manifest_sha256", "collector_sha256",
+    "request_sha256", "request_artifact", "image_uri", "image_digest", "argv",
+    "requested_resources", "scientific_environment", "scientific_deadline_seconds",
+    "outer_job_deadline_seconds", "termination_grace_seconds", "retries", "attempts",
+    "pod_restarts", "job", "pod", "terminal_class", "deadline_reached", "exit_code",
+    "payload", "resource_provenance", "lineage_artifacts", "started_at", "finished_at",
+    "collected_at"
+  ],
+  "properties": {
+    "schema": { "const": "lead15.completion-receipt/v1" },
+    "protocol_id": { "const": "LEAD15-DT-E5-20261101" },
+    "q": { "enum": [257, 2053, 32771, 4194301] },
+    "source_manifest_sha256": { "$ref": "#/$defs/sha256" },
+    "collector_sha256": { "$ref": "#/$defs/sha256" },
+    "request_sha256": { "$ref": "#/$defs/sha256" },
+    "request_artifact": { "$ref": "#/$defs/remote_file" },
+    "image_uri": { "type": "string", "pattern": "^[^\\s@]+@sha256:[0-9a-f]{64}$" },
+    "image_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "argv": {
+      "type": "array", "minItems": 8, "maxItems": 8,
+      "prefixItems": [
+        { "const": "/opt/lead15/lead15-worker" },
+        { "pattern": "^(257|2053|32771|4194301)$" },
+        { "$ref": "#/$defs/sha256" }, { "$ref": "#/$defs/git_sha" },
+        { "$ref": "#/$defs/sha256" }, { "$ref": "#/$defs/sha256" },
+        { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        { "const": "3600" }
+      ],
+      "items": false
+    },
+    "requested_resources": { "const": { "cpu": 4, "memory_gib": 16, "spot": true } },
+    "scientific_environment": { "const": { "RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1" } },
+    "scientific_deadline_seconds": { "const": 3600 },
+    "outer_job_deadline_seconds": { "const": 7200 },
+    "termination_grace_seconds": { "const": 60 },
+    "retries": { "const": 0 },
+    "attempts": { "type": "integer", "minimum": 0, "maximum": 1 },
+    "pod_restarts": { "type": ["integer", "null"], "minimum": 0, "maximum": 0 },
+    "job": { "$ref": "#/$defs/object_identity" },
+    "pod": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["name", "uid", "node_name"],
+          "properties": {
+            "name": { "$ref": "#/$defs/nonempty" },
+            "uid": { "$ref": "#/$defs/nonempty" },
+            "node_name": { "anyOf": [{ "$ref": "#/$defs/nonempty" }, { "type": "null" }] }
+          }
+        }
+      ]
+    },
+    "terminal_class": {
+      "enum": ["completed", "deadline", "scientific_failure", "infrastructure_failure"]
+    },
+    "deadline_reached": { "type": "boolean" },
+    "exit_code": { "type": ["integer", "null"], "minimum": 0, "maximum": 255 },
+    "payload": { "$ref": "#/$defs/payload" },
+    "resource_provenance": {
+      "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/resource_provenance" }]
+    },
+    "lineage_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request", "request_head", "submission", "job", "pod", "status", "results",
+        "object_heads", "payload", "worker_start", "worker_exit", "worker_upload",
+        "runtime_provenance", "build_info", "sha256sums"
+      ],
+      "properties": {
+        "request": { "$ref": "#/$defs/local_file" },
+        "request_head": { "$ref": "#/$defs/local_file" },
+        "submission": { "$ref": "#/$defs/local_file" },
+        "job": { "$ref": "#/$defs/local_file" },
+        "pod": { "$ref": "#/$defs/optional_local_file" },
+        "status": { "$ref": "#/$defs/local_file" },
+        "results": { "$ref": "#/$defs/local_file" },
+        "object_heads": { "$ref": "#/$defs/local_file" },
+        "payload": { "$ref": "#/$defs/optional_local_file" },
+        "worker_start": { "$ref": "#/$defs/optional_local_file" },
+        "worker_exit": { "$ref": "#/$defs/optional_local_file" },
+        "worker_upload": { "$ref": "#/$defs/optional_local_file" },
+        "runtime_provenance": { "$ref": "#/$defs/optional_local_file" },
+        "build_info": { "$ref": "#/$defs/optional_local_file" },
+        "sha256sums": { "$ref": "#/$defs/optional_local_file" }
+      }
+    },
+    "started_at": { "$ref": "#/$defs/nullable_timestamp" },
+    "finished_at": { "$ref": "#/$defs/nullable_timestamp" },
+    "collected_at": { "$ref": "#/$defs/timestamp" }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["terminal_class"], "properties": { "terminal_class": { "const": "completed" } } },
+      "then": {
+        "properties": {
+          "attempts": { "const": 1 }, "pod_restarts": { "const": 0 },
+          "pod": { "type": "object", "properties": { "node_name": { "$ref": "#/$defs/nonempty" } } },
+          "deadline_reached": { "const": false },
+          "exit_code": { "const": 0 },
+          "payload": { "properties": {
+            "present": { "const": true }, "uploaded": { "const": true },
+            "readback_verified": { "const": true }, "final_newline": { "const": true }
+          } },
+          "resource_provenance": { "type": "object" }
+        }
+      }
+    },
+    {
+      "if": { "required": ["terminal_class"], "properties": { "terminal_class": { "const": "deadline" } } },
+      "then": { "properties": {
+        "deadline_reached": { "const": true },
+        "exit_code": { "enum": [124, 137] }
+      } }
+    },
+    {
+      "if": { "required": ["terminal_class"], "properties": { "terminal_class": { "const": "scientific_failure" } } },
+      "then": {
+        "properties": {
+          "deadline_reached": { "const": false },
+          "exit_code": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "payload": { "required": ["present"], "properties": { "present": { "const": true } } } }
+      },
+      "then": {
+        "properties": {
+          "payload": { "properties": {
+            "s3_uri": { "type": "string" }, "sha256": { "$ref": "#/$defs/sha256" },
+            "etag": { "type": "string", "minLength": 2 },
+            "version_id": { "type": "string", "minLength": 1 },
+            "readback_verified": { "const": true }
+          } },
+          "lineage_artifacts": { "properties": { "payload": { "$ref": "#/$defs/local_file" } } }
+        }
+      },
+      "else": {
+        "properties": {
+          "payload": { "properties": {
+            "s3_uri": { "type": "null" }, "sha256": { "type": "null" },
+            "bytes": { "const": 0 }, "etag": { "type": "null" },
+            "version_id": { "type": "null" }, "uploaded": { "const": false },
+            "readback_verified": { "const": false }, "final_newline": { "const": false }
+          } },
+          "lineage_artifacts": { "properties": { "payload": { "type": "null" } } }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "git_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "nonempty": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "nullable_timestamp": {
+      "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }]
+    },
+    "object_identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "uid"],
+      "properties": { "name": { "$ref": "#/$defs/nonempty" }, "uid": { "$ref": "#/$defs/nonempty" } }
+    },
+    "local_file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "bytes"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "optional_local_file": {
+      "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/local_file" }]
+    },
+    "remote_file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "bytes", "s3_uri", "etag", "version_id", "readback_verified"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "s3_uri": { "type": "string", "pattern": "^s3://" },
+        "etag": { "type": "string", "minLength": 2 },
+        "version_id": { "type": "string", "minLength": 1 },
+        "readback_verified": { "const": true }
+      }
+    },
+    "payload": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "present", "s3_uri", "sha256", "bytes", "etag", "version_id", "uploaded",
+        "readback_verified", "final_newline"
+      ],
+      "properties": {
+        "present": { "type": "boolean" },
+        "s3_uri": { "type": ["string", "null"], "pattern": "^s3://isolab-results-104186811093-us-east-2/runs/" },
+        "sha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "etag": { "type": ["string", "null"] },
+        "version_id": { "type": ["string", "null"] },
+        "uploaded": { "type": "boolean" },
+        "readback_verified": { "type": "boolean" },
+        "final_newline": { "type": "boolean" }
+      }
+    },
+    "resource_provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cpu_model", "logical_cpus", "memory_bytes", "kernel", "node_name"],
+      "properties": {
+        "cpu_model": { "$ref": "#/$defs/nonempty" },
+        "logical_cpus": { "type": "integer", "minimum": 1 },
+        "memory_bytes": { "type": "integer", "minimum": 1 },
+        "kernel": { "$ref": "#/$defs/nonempty" },
+        "node_name": { "$ref": "#/$defs/nonempty" }
+      }
+    }
+  }
+}

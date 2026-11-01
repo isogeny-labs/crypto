@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/lead15.build-info.v1.schema.json",
+  "title": "LEAD-15 immutable native image build identity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "source_revision", "cargo_lock_sha256", "rustc_verbose",
+    "target_triple", "base_image_uri", "image_recipe_sha256", "build_command",
+    "lead15_binary_sha256", "lead15_worker_sha256", "binary_path", "worker_path"
+  ],
+  "properties": {
+    "schema": { "const": "lead15.build-info/v1" },
+    "source_revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "cargo_lock_sha256": { "$ref": "#/$defs/sha256" },
+    "rustc_verbose": { "type": "string", "minLength": 1 },
+    "target_triple": { "const": "x86_64-unknown-linux-gnu" },
+    "base_image_uri": { "type": "string", "pattern": "^[^\\s@]+@sha256:[0-9a-f]{64}$" },
+    "image_recipe_sha256": { "$ref": "#/$defs/sha256" },
+    "build_command": {
+      "const": ["cargo", "build", "--locked", "--release", "--example", "lead15_diem_quartic"]
+    },
+    "lead15_binary_sha256": { "$ref": "#/$defs/sha256" },
+    "lead15_worker_sha256": { "$ref": "#/$defs/sha256" },
+    "binary_path": { "const": "/opt/lead15/lead15_diem_quartic" },
+    "worker_path": { "const": "/opt/lead15/lead15-worker" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

@@ -21,7 +21,7 @@
 //! by the caller at the measured multiplication equivalent.
 
 use std::cell::Cell;
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 use std::hash::{BuildHasherDefault, Hasher};
 
 // ---------------------------------------------------------------------------
@@ -32,13 +32,26 @@ use std::hash::{BuildHasherDefault, Hasher};
 #[derive(Clone, Debug)]
 pub struct SplitMix64(pub u64);
 
+const SPLITMIX64_GAMMA: u64 = 0x9E37_79B9_7F4A_7C15;
+const SPLITMIX64_GAMMA_INV: u64 = 0xF1DE_83E1_9937_733D;
+
+/// Exact number of `next_u64` calls between two SplitMix states. The gamma is
+/// odd, so it is invertible modulo `2^64`; every experiment here makes far
+/// fewer than `2^64` draws between observations.
+#[inline]
+fn splitmix_draws_between(before: u64, after: u64) -> u64 {
+    after
+        .wrapping_sub(before)
+        .wrapping_mul(SPLITMIX64_GAMMA_INV)
+}
+
 impl SplitMix64 {
     pub fn new(seed: u64) -> Self {
         SplitMix64(seed)
     }
     #[inline]
     pub fn next_u64(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        self.0 = self.0.wrapping_add(SPLITMIX64_GAMMA);
         let mut z = self.0;
         z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
         z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
@@ -173,55 +186,114 @@ impl Fq {
         }
         t.rem_euclid(self.p as i64) as u64
     }
-    /// Square root for `p = 3 (mod 4)`: `a^((p+1)/4)`, checked (one exponentiation).
+    /// Square root in an odd prime field, using the short exponent when `p = 3 (mod 4)`
+    /// and Tonelli--Shanks otherwise. The returned root is checked; one root request is
+    /// recorded independently of the multiplications used by the implementation.
     pub fn sqrt(&self, a: u64) -> Option<u64> {
         self.sqrts.set(self.sqrts.get() + 1);
-        if a == 0 {
-            return Some(0);
-        }
-        let r = self.pow(a, (self.p + 1) / 4);
-        if self.mul(r, r) == a {
-            Some(r)
-        } else {
-            None
-        }
+        let muls_before = self.muls.get();
+        let result = (|| {
+            if a == 0 {
+                return Some(0);
+            }
+            if self.pow(a, (self.p - 1) / 2) != 1 {
+                return None;
+            }
+            let r = if self.p % 4 == 3 {
+                self.pow(a, (self.p + 1) / 4)
+            } else {
+                let mut d = self.p - 1;
+                let mut s = 0u32;
+                while d % 2 == 0 {
+                    d /= 2;
+                    s += 1;
+                }
+                let mut z = 2;
+                while self.pow(z, (self.p - 1) / 2) != self.p - 1 {
+                    z += 1;
+                }
+                let mut c = self.pow(z, d);
+                let mut x = self.pow(a, (d + 1) / 2);
+                let mut t = self.pow(a, d);
+                let mut m = s;
+                while t != 1 {
+                    let mut i = 1u32;
+                    let mut t2 = self.mul(t, t);
+                    while i < m && t2 != 1 {
+                        t2 = self.mul(t2, t2);
+                        i += 1;
+                    }
+                    if i == m {
+                        return None;
+                    }
+                    let b = self.pow(c, 1u64 << (m - i - 1));
+                    x = self.mul(x, b);
+                    let b2 = self.mul(b, b);
+                    t = self.mul(t, b2);
+                    c = b2;
+                    m = i;
+                }
+                x
+            };
+            (self.mul(r, r) == a).then_some(r)
+        })();
+        // Square-root requests are priced separately by the experiment protocol.
+        self.muls.set(muls_before);
+        result
     }
     pub fn counts(&self) -> (u64, u64) {
         (self.muls.get(), self.invs.get())
     }
+
+    pub fn counts_full(&self) -> (u64, u64, u64) {
+        (self.muls.get(), self.invs.get(), self.sqrts.get())
+    }
 }
 
-/// Miller-Rabin, deterministic for `n < 2^64`.
-pub fn is_prime_u64(n: u64) -> bool {
+#[inline]
+fn prime_modmul(n: u64, a: u64, b: u64, modular_ops: &mut u64) -> u64 {
+    *modular_ops = (*modular_ops).saturating_add(1);
+    ((a as u128 * b as u128) % n as u128) as u64
+}
+
+/// Miller-Rabin, deterministic for `n < 2^64`. `modular_ops` counts every trial
+/// division, parity reduction, base reduction, and modular multiplication performed by
+/// this exact implementation. It is a native setup counter, not attack arithmetic.
+fn is_prime_u64_counted(n: u64, modular_ops: &mut u64) -> bool {
     if n < 2 {
         return false;
     }
     for &p in &[2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+        *modular_ops = (*modular_ops).saturating_add(1);
         if n.is_multiple_of(p) {
             return n == p;
         }
     }
     let (mut d, mut s) = (n - 1, 0);
-    while d % 2 == 0 {
+    loop {
+        *modular_ops = (*modular_ops).saturating_add(1);
+        if d % 2 != 0 {
+            break;
+        }
         d /= 2;
         s += 1;
     }
-    let mulm = |a: u64, b: u64| ((a as u128 * b as u128) % n as u128) as u64;
     'w: for &a in &[2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
         let mut x = 1u64;
+        *modular_ops = (*modular_ops).saturating_add(1);
         let (mut b, mut e) = (a % n, d);
         while e > 0 {
             if e & 1 == 1 {
-                x = mulm(x, b);
+                x = prime_modmul(n, x, b, modular_ops);
             }
-            b = mulm(b, b);
+            b = prime_modmul(n, b, b, modular_ops);
             e >>= 1;
         }
         if x == 1 || x == n - 1 {
             continue;
         }
         for _ in 0..s - 1 {
-            x = mulm(x, x);
+            x = prime_modmul(n, x, x, modular_ops);
             if x == n - 1 {
                 continue 'w;
             }
@@ -229,6 +301,12 @@ pub fn is_prime_u64(n: u64) -> bool {
         return false;
     }
     true
+}
+
+/// Miller-Rabin, deterministic for `n < 2^64`.
+pub fn is_prime_u64(n: u64) -> bool {
+    let mut ignored_modular_ops = 0u64;
+    is_prime_u64_counted(n, &mut ignored_modular_ops)
 }
 
 /// Smallest prime `>= 2^k` that is `3 (mod 4)` (the frozen `q_k`).
@@ -256,7 +334,7 @@ pub fn isqrt_u128(n: u128) -> u128 {
     x
 }
 
-/// Montgomery arithmetic modulo an odd `n < 2^63` (the group order `ell`).
+/// Montgomery arithmetic modulo any odd `1 < n < 2^64` (the group order `ell`).
 #[derive(Clone, Copy, Debug)]
 pub struct Mont {
     pub n: u64,
@@ -267,7 +345,7 @@ pub struct Mont {
 
 impl Mont {
     pub fn new(n: u64) -> Mont {
-        assert!(n % 2 == 1 && n < (1u64 << 63));
+        assert!(n > 1 && n % 2 == 1);
         let mut inv = n;
         for _ in 0..6 {
             inv = inv.wrapping_mul(2u64.wrapping_sub(n.wrapping_mul(inv)));
@@ -285,11 +363,12 @@ impl Mont {
     #[inline]
     fn redc(&self, t: u128) -> u64 {
         let m = (t as u64).wrapping_mul(self.ninv);
-        let u = ((t + m as u128 * self.n as u128) >> 64) as u64;
-        if u >= self.n {
-            u - self.n
+        let (sum, carry) = t.overflowing_add(m as u128 * self.n as u128);
+        let u = (sum >> 64) + ((carry as u128) << 64);
+        if u >= self.n as u128 {
+            (u - self.n as u128) as u64
         } else {
-            u
+            u as u64
         }
     }
     #[inline]
@@ -298,9 +377,9 @@ impl Mont {
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
-        let s = a + b;
-        if s >= self.n {
-            s - self.n
+        let (s, carry) = a.overflowing_add(b);
+        if carry || s >= self.n {
+            s.wrapping_sub(self.n)
         } else {
             s
         }
@@ -310,7 +389,7 @@ impl Mont {
         if a >= b {
             a - b
         } else {
-            a + self.n - b
+            self.n - (b - a)
         }
     }
     #[inline]
@@ -548,14 +627,30 @@ pub struct Kf {
     pub gq2: K,
 }
 
+#[derive(Clone, Copy, Debug, Default)]
+struct KfSetupStats {
+    fq_muls: u64,
+    fq_invs: u64,
+    fq_sqrts: u64,
+}
+
 impl Kf {
     /// `(a, b)` lexicographically first with `x^3 + a x + b` irreducible over `F_q`.
     pub fn new(q: u64) -> Kf {
+        Self::new_counted(q).0
+    }
+
+    /// Construct the same canonical extension while retaining its setup arithmetic.
+    /// The direct irreducibility scan performs three base-field multiplications per
+    /// tested `x`; Frobenius setup then uses the ordinary counted `Kf` arithmetic.
+    fn new_counted(q: u64) -> (Kf, KfSetupStats) {
         let f = Fq::new(q);
+        let mut scan_muls = 0u64;
         let (mut aa, mut bb) = (0u64, 1u64);
         loop {
             let mut irreducible = true;
             for x in 0..q {
+                scan_muls = scan_muls.saturating_add(3);
                 let v = (x * x % q * x + aa * x + bb) % q;
                 if v == 0 {
                     irreducible = false;
@@ -581,10 +676,30 @@ impl Kf {
         let g: K = [0, 1, 0];
         kf.gq = kf.pow(g, q as u128);
         kf.gq2 = kf.mul(&kf.gq, &kf.gq); // (g^2)^q = (g^q)^2
-                                         // Frobenius images must be the other roots: gq = g^q, gq2 = g^(q^2); reset counters
+        let (setup_muls, setup_invs, setup_sqrts) = kf.f.counts_full();
+        let setup = KfSetupStats {
+            fq_muls: scan_muls.saturating_add(setup_muls),
+            fq_invs: setup_invs,
+            fq_sqrts: setup_sqrts,
+        };
+        // Frobenius images must be the other roots: gq = g^q, gq2 = g^(q^2).
+        // Reset counters so callers see only post-construction work.
         kf.f.muls.set(0);
         kf.f.invs.set(0);
-        kf
+        kf.f.sqrts.set(0);
+        (kf, setup)
+    }
+
+    /// Copy immutable field/Frobenius data into an independent zero-counter context.
+    /// This avoids repeating the canonical irreducibility scan for every candidate.
+    fn fresh_counter_context(&self) -> Kf {
+        Kf {
+            f: Fq::new(self.q()),
+            a: self.a,
+            b: self.b,
+            gq: self.gq,
+            gq2: self.gq2,
+        }
     }
     pub fn q(&self) -> u64 {
         self.f.p
@@ -683,14 +798,60 @@ impl Kf {
     pub fn in_fq(&self, x: &K) -> bool {
         x[1] == 0 && x[2] == 0
     }
-    /// Square root in `K` (`q^3 = 3 mod 4`): `x^((q^3+1)/4)`, checked.
+    /// Absolute trace `K -> F_q`, embedded in `K`.
+    pub fn trace(&self, x: &K) -> K {
+        let xq = self.frob(x);
+        self.add(&self.add(x, &xq), &self.frob(&xq))
+    }
+
+    /// Square root in `K`, with Tonelli--Shanks for the general odd-order case.
     pub fn sqrt(&self, x: &K) -> Option<K> {
         if self.is_zero(x) {
             return Some(self.zero());
         }
         let q = self.q() as u128;
-        let e = (q * q * q + 1) / 4;
-        let r = self.pow(*x, e);
+        let order = q * q * q;
+        if self.pow(*x, (order - 1) / 2) != self.one() {
+            return None;
+        }
+        let r = if order % 4 == 3 {
+            self.pow(*x, (order + 1) / 4)
+        } else {
+            let mut d = order - 1;
+            let mut s = 0u32;
+            while d % 2 == 0 {
+                d /= 2;
+                s += 1;
+            }
+            // A base-field nonsquare remains a nonsquare in an odd-degree extension.
+            let mut z0 = 2u64;
+            while self.f.pow(z0, (self.q() - 1) / 2) != self.q() - 1 {
+                z0 += 1;
+            }
+            let z = self.from_fq(z0);
+            let mut c = self.pow(z, d);
+            let mut r = self.pow(*x, (d + 1) / 2);
+            let mut t = self.pow(*x, d);
+            let mut m = s;
+            while t != self.one() {
+                let mut i = 1u32;
+                let mut t2 = self.mul(&t, &t);
+                while i < m && t2 != self.one() {
+                    t2 = self.mul(&t2, &t2);
+                    i += 1;
+                }
+                if i == m {
+                    return None;
+                }
+                let b = self.pow(c, 1u128 << (m - i - 1));
+                r = self.mul(&r, &b);
+                let b2 = self.mul(&b, &b);
+                t = self.mul(&t, &b2);
+                c = b2;
+                m = i;
+            }
+            r
+        };
         if self.mul(&r, &r) == *x {
             Some(r)
         } else {
@@ -703,16 +864,17 @@ impl Kf {
     }
 }
 
-/// Normalised key of a rational projective point `(x, y, z)` with first non-zero
-/// coordinate 1. Valid for `q < 2^22`.
+/// Collision-free key of a normalised rational projective point `(x, y, z)`.
+/// The tag records which coordinate is the first non-zero one; coordinates occupy
+/// disjoint 64-bit limbs, so this remains injective for every supported `u64` field.
 #[inline]
-pub fn pt_key(p: &[u64; 3]) -> u64 {
+pub fn pt_key(p: &[u64; 3]) -> u128 {
     if p[0] == 1 {
-        (p[1] << 22) | p[2]
+        (p[1] as u128) << 64 | p[2] as u128
     } else if p[1] == 1 {
-        (1u64 << 60) | p[2]
+        (1u128 << 127) | p[2] as u128
     } else {
-        2u64 << 60
+        3u128 << 126
     }
 }
 
@@ -733,6 +895,214 @@ pub fn normalize_pt(f: &Fq, p: &[u64; 3]) -> [u64; 3] {
         assert!(p[2] != 0);
         [0, 0, 1]
     }
+}
+
+// ---------------------------------------------------------------------------
+// Common m=2 / m=3 branch certificates used by the prospective LEAD-15 study
+// ---------------------------------------------------------------------------
+
+/// A replayable certificate that the four branch points used by the plane-quartic
+/// `m=2` construction are projectively equivalent to an `m=3, r=5` branch set
+/// `{a,b,r,r^q}` with `a,b in F_q`. `mobius` maps `source_ordered[i]` to
+/// `target_ordered[i]` for all four indices.
+#[derive(Clone, Debug)]
+pub struct CommonCoverWitness {
+    pub a: u64,
+    pub b: u64,
+    pub r: K,
+    pub rq: K,
+    pub source_ordered: [K; 4],
+    pub target_ordered: [K; 4],
+    pub z: K,
+    pub cross_ratio: K,
+    /// Matrix `[[A,B],[C,D]]` for `(A*x+B)/(C*x+D)`.
+    pub mobius: [[K; 2]; 2],
+}
+
+fn k_div(kf: &Kf, x: &K, y: &K) -> Option<K> {
+    if kf.is_zero(y) {
+        None
+    } else {
+        Some(kf.mul(x, &kf.inv(y)))
+    }
+}
+
+/// Cross-ratio convention
+/// `(t0-t2)(t1-t3) / ((t0-t3)(t1-t2))`.
+fn branch_cross_ratio(kf: &Kf, t: &[K; 4]) -> Option<K> {
+    let num = kf.mul(&kf.sub(&t[0], &t[2]), &kf.sub(&t[1], &t[3]));
+    let den = kf.mul(&kf.sub(&t[0], &t[3]), &kf.sub(&t[1], &t[2]));
+    k_div(kf, &num, &den)
+}
+
+fn solve_fq_3x3(kf: &Kf, mut a: [[u64; 4]; 3]) -> Option<K> {
+    let f = &kf.f;
+    let mut pivots = [usize::MAX; 3];
+    let mut row = 0usize;
+    for col in 0..3 {
+        let Some(p) = (row..3).find(|&r| a[r][col] != 0) else {
+            continue;
+        };
+        a.swap(row, p);
+        let inv = f.inv(a[row][col]);
+        for c in col..=3 {
+            a[row][c] = f.mul(a[row][c], inv);
+        }
+        for r in 0..3 {
+            if r == row || a[r][col] == 0 {
+                continue;
+            }
+            let m = a[r][col];
+            for c in col..=3 {
+                a[r][c] = f.sub(a[r][c], f.mul(m, a[row][c]));
+            }
+        }
+        pivots[row] = col;
+        row += 1;
+        if row == 3 {
+            break;
+        }
+    }
+    for rr in row..3 {
+        if a[rr][0] == 0 && a[rr][1] == 0 && a[rr][2] == 0 && a[rr][3] != 0 {
+            return None;
+        }
+    }
+    let mut x = [0u64; 3];
+    for rr in 0..row {
+        x[pivots[rr]] = a[rr][3];
+    }
+    Some(x)
+}
+
+/// Solve `z-z^(q^2)=s`. The image of this linearized map is exactly the
+/// trace-zero plane; Gaussian elimination also gives an independent replay check.
+fn solve_z_minus_frob2(kf: &Kf, s: &K) -> Option<K> {
+    if !kf.is_zero(&kf.trace(s)) {
+        return None;
+    }
+    let mut aug = [[0u64; 4]; 3];
+    for col in 0..3 {
+        let mut e = [0u64; 3];
+        e[col] = 1;
+        let eq = kf.frob(&kf.frob(&e));
+        let image = kf.sub(&e, &eq);
+        for row in 0..3 {
+            aug[row][col] = image[row];
+        }
+    }
+    for row in 0..3 {
+        aug[row][3] = s[row];
+    }
+    let z = solve_fq_3x3(kf, aug)?;
+    let check = kf.sub(&z, &kf.frob(&kf.frob(&z)));
+    (check == *s).then_some(z)
+}
+
+fn mobius_from_three(kf: &Kf, src: &[K; 4], dst: &[K; 4]) -> Option<[[K; 2]; 2]> {
+    // M_t(x)=((x-t0)(t1-t2))/((x-t2)(t1-t0)) sends t0,t1,t2 to 0,1,infinity.
+    let matrix_to_01i = |t: &[K; 4]| {
+        let a = kf.sub(&t[1], &t[2]);
+        let b = kf.neg(&kf.mul(&t[0], &a));
+        let c = kf.sub(&t[1], &t[0]);
+        let d = kf.neg(&kf.mul(&t[2], &c));
+        [[a, b], [c, d]]
+    };
+    let s = matrix_to_01i(src);
+    let v = matrix_to_01i(dst);
+    let vinv = [[v[1][1], kf.neg(&v[0][1])], [kf.neg(&v[1][0]), v[0][0]]];
+    let mut out = [[[0u64; 3]; 2]; 2];
+    for i in 0..2 {
+        for j in 0..2 {
+            out[i][j] = kf.add(
+                &kf.mul(&vinv[i][0], &s[0][j]),
+                &kf.mul(&vinv[i][1], &s[1][j]),
+            );
+        }
+    }
+    let det = kf.sub(
+        &kf.mul(&out[0][0], &out[1][1]),
+        &kf.mul(&out[0][1], &out[1][0]),
+    );
+    (!kf.is_zero(&det)).then_some(out)
+}
+
+fn mobius_apply(kf: &Kf, m: &[[K; 2]; 2], x: &K) -> Option<K> {
+    let num = kf.add(&kf.mul(&m[0][0], x), &m[0][1]);
+    let den = kf.add(&kf.mul(&m[1][0], x), &m[1][1]);
+    k_div(kf, &num, &den)
+}
+
+/// Construct and verify a common-cover witness from an `m=3` branch tuple.
+/// All 24 source orderings and both square-root signs are tried deterministically.
+pub fn common_cover_witness(kf: &Kf, a: u64, b: u64, r: K) -> Option<CommonCoverWitness> {
+    if a == b || kf.in_fq(&r) {
+        return None;
+    }
+    let rq = kf.frob(&r);
+    let base = [kf.from_fq(a), kf.from_fq(b), r, rq];
+    if (0..4).any(|i| ((i + 1)..4).any(|j| base[i] == base[j])) {
+        return None;
+    }
+    for i0 in 0..4 {
+        for i1 in 0..4 {
+            for i2 in 0..4 {
+                for i3 in 0..4 {
+                    if i0 == i1
+                        || i0 == i2
+                        || i0 == i3
+                        || i1 == i2
+                        || i1 == i3
+                        || i2 == i3
+                    {
+                        continue;
+                    }
+                    let src = [base[i0], base[i1], base[i2], base[i3]];
+                    let lam = branch_cross_ratio(kf, &src)?;
+                    let lm1 = kf.sub(&lam, &kf.one());
+                    let s2 = match k_div(kf, &lam, &lm1) {
+                        Some(x) => x,
+                        None => continue,
+                    };
+                    let Some(s0) = kf.sqrt(&s2) else {
+                        continue;
+                    };
+                    for s in [s0, kf.neg(&s0)] {
+                        let Some(z) = solve_z_minus_frob2(kf, &s) else {
+                            continue;
+                        };
+                        let zq2 = kf.frob(&kf.frob(&z));
+                        let dst = [
+                            z,
+                            kf.add(&z, &kf.one()),
+                            zq2,
+                            kf.add(&zq2, &kf.one()),
+                        ];
+                        if branch_cross_ratio(kf, &dst) != Some(lam) {
+                            continue;
+                        }
+                        let Some(mobius) = mobius_from_three(kf, &src, &dst) else {
+                            continue;
+                        };
+                        if (0..4).all(|i| mobius_apply(kf, &mobius, &src[i]) == Some(dst[i])) {
+                            return Some(CommonCoverWitness {
+                                a,
+                                b,
+                                r,
+                                rq,
+                                source_ordered: src,
+                                target_ordered: dst,
+                                z,
+                                cross_ratio: lam,
+                                mobius,
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
 }
 
 // ---------------------------------------------------------------------------
@@ -867,7 +1237,7 @@ pub struct Inst {
     ws: K,     // s
     walpha: K, // alpha
     wshift: K, // a2/3
-    pub order: u64,
+    pub order: u128,
     pub h: u64,
     pub ell: u64,
     pub trace: i128,
@@ -1222,9 +1592,33 @@ fn build_core(kf: &Kf, ub: &K, uc: &K) -> Result<Core, Reject> {
     })
 }
 
+/// Replay the common-cover certificate and the resulting quartic model from
+/// its compact `m=3` inputs. Analysis code uses this instead of trusting the
+/// producer's `verified_all_four_points` flag or serialized quartic.
+pub fn replay_common_cover_model(
+    kf: &Kf,
+    a: u64,
+    b: u64,
+    r: K,
+) -> Result<(CommonCoverWitness, K, K, [u64; 15]), String> {
+    let witness = common_cover_witness(kf, a, b, r)
+        .ok_or_else(|| "common-cover witness does not replay".to_string())?;
+    let one = kf.one();
+    let z1 = kf.add(&witness.z, &one);
+    let ub = kf.neg(&kf.add(&witness.z, &z1));
+    let uc = kf.mul(&witness.z, &z1);
+    let core = build_core(kf, &ub, &uc)
+        .map_err(|reject| format!("common-cover quartic replay rejected: {reject:?}"))?;
+    Ok((witness, ub, uc, core.quartic))
+}
+
 /// `#E0(K)` by baby-step giant-step on the Hasse interval, using several random points
 /// until the intersection of the candidate sets is a single multiple.
-fn bsgs_order(inst: &Inst, rng: &mut SplitMix64) -> Option<u64> {
+fn bsgs_order(
+    inst: &Inst,
+    rng: &mut SplitMix64,
+    mut build_stats: Option<&mut ProspectiveBuildStats>,
+) -> Option<u128> {
     let qq = inst.q as u128;
     let big = qq * qq * qq;
     let r = isqrt_u128(big);
@@ -1240,7 +1634,16 @@ fn bsgs_order(inst: &Inst, rng: &mut SplitMix64) -> Option<u64> {
         let mut cur = p;
         for j in 1..=s as u32 {
             if let Some((x, y)) = &cur {
-                table.entry(*x).or_insert((j, *y));
+                use std::collections::hash_map::Entry;
+                if let Some(stats) = build_stats.as_deref_mut() {
+                    stats.hash_lookups += 1;
+                }
+                if let Entry::Vacant(v) = table.entry(*x) {
+                    v.insert((j, *y));
+                    if let Some(stats) = build_stats.as_deref_mut() {
+                        stats.hash_inserts += 1;
+                    }
+                }
             } else {
                 // jP = O : order j
                 let m: u128 = j as u128;
@@ -1256,6 +1659,9 @@ fn bsgs_order(inst: &Inst, rng: &mut SplitMix64) -> Option<u64> {
             match &t {
                 None => found.push(m),
                 Some((x, y)) => {
+                    if let Some(stats) = build_stats.as_deref_mut() {
+                        stats.hash_lookups += 1;
+                    }
                     if let Some((j, yj)) = table.get(x) {
                         if y == yj {
                             // T = jP => (m - j) P = O
@@ -1270,6 +1676,9 @@ fn bsgs_order(inst: &Inst, rng: &mut SplitMix64) -> Option<u64> {
             m += s;
         }
         found.retain(|&c| c >= lo && c <= hi && inst.e_mul(&p, c).is_none());
+        if let Some(stats) = build_stats.as_deref_mut() {
+            stats.sort_items = stats.sort_items.saturating_add(found.len() as u64);
+        }
         found.sort_unstable();
         found.dedup();
         let new = match cands.take() {
@@ -1277,11 +1686,7 @@ fn bsgs_order(inst: &Inst, rng: &mut SplitMix64) -> Option<u64> {
             Some(prev) => prev.into_iter().filter(|c| found.contains(c)).collect(),
         };
         if new.len() == 1 {
-            let n = new[0];
-            if n < (1u128 << 64) {
-                return Some(n as u64);
-            }
-            return None;
+            return Some(new[0]);
         }
         if new.is_empty() {
             return None;
@@ -1340,7 +1745,7 @@ pub fn gen_instance(k: u32, idx: u32) -> Inst {
             rejects: rej,
         };
         let mut orng = SplitMix64::new(0x4F52_4445_0000_0000u64 ^ (q << 8) ^ cand);
-        let n = match bsgs_order(&inst, &mut orng) {
+        let n = match bsgs_order(&inst, &mut orng, None) {
             Some(n) => n,
             None => {
                 rej[5] += 1;
@@ -1349,14 +1754,16 @@ pub fn gen_instance(k: u32, idx: u32) -> Inst {
         };
         let mut chosen = None;
         for h in 1..=16u64 {
-            if n % h == 0 {
-                let l = n / h;
-                if is_prime_u64(l)
-                    && l < (1u64 << 63)
-                    && (l as u128) * (l as u128) > (q as u128).pow(5)
-                {
-                    chosen = Some((h, l));
-                    break;
+            if n % h as u128 == 0 {
+                let lw = n / h as u128;
+                if lw <= u64::MAX as u128 {
+                    let l = lw as u64;
+                    if is_prime_u64(l)
+                        && (l as u128) * (l as u128) > (q as u128).pow(5)
+                    {
+                        chosen = Some((h, l));
+                        break;
+                    }
                 }
             }
         }
@@ -1377,6 +1784,157 @@ pub fn gen_instance(k: u32, idx: u32) -> Inst {
         inst.kf.f.invs.set(0);
         return inst;
     }
+}
+
+/// Prospective common-cover builder diagnostics. These counters are construction
+/// evidence only and are excluded from the attack cost.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct ProspectiveBuildStats {
+    pub candidates: u64,
+    pub no_common_cover: u64,
+    pub core_rejects: u64,
+    pub order_rejects: u64,
+    pub fq_muls: u64,
+    pub fq_invs: u64,
+    pub fq_sqrts: u64,
+    pub hash_lookups: u64,
+    pub hash_inserts: u64,
+    pub rng_draws: u64,
+    pub sort_items: u64,
+    pub primality_modular_ops: u64,
+}
+
+/// Deterministically search for an instance satisfying evaluator e5's structural
+/// inclusion rule: a prime-order subgroup of exact cofactor four and an explicit
+/// common `m=2`/`m=3` branch certificate. No target-size fallback is implicit.
+pub fn gen_prospective_instance(
+    q: u64,
+    idx: u32,
+    seed: u64,
+    max_candidates: u64,
+) -> Result<(Inst, CommonCoverWitness, ProspectiveBuildStats), String> {
+    let mut stats = ProspectiveBuildStats::default();
+    if !is_prime_u64_counted(q, &mut stats.primality_modular_ops) || q >= (1 << 31) {
+        return Err(format!("q={q} is not a supported odd prime"));
+    }
+    let (kf, setup) = Kf::new_counted(q);
+    stats.fq_muls = stats.fq_muls.saturating_add(setup.fq_muls);
+    stats.fq_invs = stats.fq_invs.saturating_add(setup.fq_invs);
+    stats.fq_sqrts = stats.fq_sqrts.saturating_add(setup.fq_sqrts);
+    // `seed_for` in the prospective driver already binds the curve index. Mixing the
+    // same term here would cancel it under XOR and collapse the six frozen streams.
+    let mut rng = SplitMix64::new(seed);
+    let rng_start = rng.0;
+    while stats.candidates < max_candidates {
+        stats.candidates += 1;
+        let a = rng.below(q);
+        let mut b = rng.below(q - 1);
+        if b >= a {
+            b += 1;
+        }
+        let mut r = kf.rand(&mut rng);
+        while kf.in_fq(&r) {
+            r = kf.rand(&mut rng);
+        }
+        let Some(witness) = common_cover_witness(&kf, a, b, r) else {
+            stats.no_common_cover += 1;
+            continue;
+        };
+        let one = kf.one();
+        let z1 = kf.add(&witness.z, &one);
+        let ub = kf.neg(&kf.add(&witness.z, &z1));
+        let uc = kf.mul(&witness.z, &z1);
+        let core = match build_core(&kf, &ub, &uc) {
+            Ok(core) => core,
+            Err(_) => {
+                stats.core_rejects += 1;
+                continue;
+            }
+        };
+        let mut inst = Inst {
+            q,
+            kf: kf.fresh_counter_context(),
+            k: q.ilog2(),
+            idx,
+            ub,
+            uc,
+            quartic: core.quartic,
+            omi: core.omi,
+            rmat: core.rmat,
+            ea: core.ea,
+            eb: core.eb,
+            wb: core.wb,
+            ws: core.ws,
+            walpha: core.walpha,
+            wshift: core.wshift,
+            order: 0,
+            h: 0,
+            ell: 0,
+            trace: 0,
+            candidates: stats.candidates,
+            rejects: [
+                stats.no_common_cover,
+                stats.core_rejects,
+                0,
+                0,
+                0,
+                stats.order_rejects,
+            ],
+        };
+        let mut orng = SplitMix64::new(
+            seed ^ 0x4F52_4445_5052_4F53 ^ stats.candidates.rotate_left(23),
+        );
+        let order_rng_start = orng.0;
+        let order = bsgs_order(&inst, &mut orng, Some(&mut stats));
+        stats.rng_draws = stats
+            .rng_draws
+            .saturating_add(splitmix_draws_between(order_rng_start, orng.0));
+        let (om, oi, os) = inst.kf.f.counts_full();
+        stats.fq_muls = stats.fq_muls.saturating_add(om);
+        stats.fq_invs = stats.fq_invs.saturating_add(oi);
+        stats.fq_sqrts = stats.fq_sqrts.saturating_add(os);
+        let Some(n) = order else {
+            stats.order_rejects += 1;
+            continue;
+        };
+        if n % 4 != 0 || n / 4 > u64::MAX as u128 {
+            stats.order_rejects += 1;
+            continue;
+        }
+        let ell = (n / 4) as u64;
+        if !is_prime_u64_counted(ell, &mut stats.primality_modular_ops)
+            || (ell as u128) * (ell as u128) <= (q as u128).pow(5)
+        {
+            stats.order_rejects += 1;
+            continue;
+        }
+        inst.order = n;
+        inst.h = 4;
+        inst.ell = ell;
+        inst.trace = (q as i128).pow(3) + 1 - n as i128;
+        inst.rejects = [
+            stats.no_common_cover,
+            stats.core_rejects,
+            0,
+            0,
+            0,
+            stats.order_rejects,
+        ];
+        let (cm, ci, cs) = kf.f.counts_full();
+        stats.fq_muls = stats.fq_muls.saturating_add(cm);
+        stats.fq_invs = stats.fq_invs.saturating_add(ci);
+        stats.fq_sqrts = stats.fq_sqrts.saturating_add(cs);
+        stats.rng_draws = stats
+            .rng_draws
+            .saturating_add(splitmix_draws_between(rng_start, rng.0));
+        inst.kf.f.muls.set(0);
+        inst.kf.f.invs.set(0);
+        inst.kf.f.sqrts.set(0);
+        return Ok((inst, witness, stats));
+    }
+    Err(format!(
+        "no admissible common-cover cofactor-4 instance in {max_candidates} candidates"
+    ))
 }
 
 // ---------------------------------------------------------------------------
@@ -1688,12 +2246,17 @@ pub fn verify_line(
     if fpoly.len() != prod.len() || fpoly.len() + deg_drop != 5 {
         return false;
     }
-    // proportionality: fpoly[i] * prod[0] == fpoly[0] * prod[i]
+    // Proportionality against a non-zero coefficient. The constant coefficient is
+    // necessarily zero because `p1` is one of the four roots, so using index zero would
+    // make every comparison vacuous and fail to check residual-root multiplicity.
     if fpoly.is_empty() {
         return false;
     }
+    let Some(pivot) = prod.iter().position(|&c| c != 0) else {
+        return false;
+    };
     for i in 0..fpoly.len() {
-        if f.mul(fpoly[i], prod[0]) != f.mul(fpoly[0], prod[i]) {
+        if f.mul(fpoly[i], prod[pivot]) != f.mul(fpoly[pivot], prod[i]) {
             return false;
         }
     }
@@ -1833,13 +2396,20 @@ pub struct IcCounters {
     pub norm_calls: u64,
     pub fq_mul_collect: u64,
     pub fq_inv_collect: u64,
+    pub fq_sqrt_collect: u64,
     pub fq_mul_verify: u64,
     pub fq_inv_verify: u64,
+    pub fq_sqrt_verify: u64,
     pub fq_mul_fb: u64,
     pub fq_inv_fb: u64,
+    pub fq_sqrt_fb: u64,
     // linear-algebra phase (mod-ell operations and bookkeeping)
     pub elim_ops: u64,
     pub elim_entries: u64,
+    pub rank_ops: u64,
+    pub rank_inversions: u64,
+    pub rank_entries: u64,
+    pub sort_items: u64,
     pub wied_ops: u64,
     pub bm_ops: u64,
     pub matvecs: u64,
@@ -1853,6 +2423,8 @@ pub struct LpGraph {
     parity: Vec<u8>,
     sink: Vec<bool>,
     odd: Vec<bool>,
+    size: Vec<u64>,
+    largest: u64,
     pub edges: u64,
     pub verts: u64,
     pub bip: i64,
@@ -1866,6 +2438,8 @@ impl Default for LpGraph {
             parity: vec![0],
             sink: vec![true],
             odd: vec![false],
+            size: vec![0],
+            largest: 0,
             edges: 0,
             verts: 0,
             bip: 0,
@@ -1906,11 +2480,13 @@ impl LpGraph {
             self.parity.push(0);
             self.sink.push(false);
             self.odd.push(false);
+            self.size.push(1);
             self.verts += 1;
             self.bip += 1;
+            self.largest = self.largest.max(1);
         }
     }
-    pub fn add_edge(&mut self, a: u32, b: u32) {
+    pub fn add_edge_kind(&mut self, a: u32, b: u32) -> LpEdgeKind {
         self.ensure(a.max(b));
         self.edges += 1;
         let (ra, pa) = self.find(a);
@@ -1919,6 +2495,9 @@ impl LpGraph {
             if pa == pb && !self.odd[ra as usize] {
                 self.bip -= self.is_b(ra);
                 self.odd[ra as usize] = true;
+                LpEdgeKind::OddWitness
+            } else {
+                LpEdgeKind::Yield
             }
         } else {
             self.bip -= self.is_b(ra) + self.is_b(rb);
@@ -1926,13 +2505,35 @@ impl LpGraph {
             self.parity[rb as usize] = pa ^ pb ^ 1;
             self.sink[ra as usize] |= self.sink[rb as usize];
             self.odd[ra as usize] |= self.odd[rb as usize];
+            let rb_size = self.size[rb as usize];
+            self.size[ra as usize] += rb_size;
+            self.largest = self.largest.max(self.size[ra as usize]);
             self.bip += self.is_b(ra);
+            LpEdgeKind::Tree
         }
+    }
+    pub fn add_edge(&mut self, a: u32, b: u32) {
+        let _ = self.add_edge_kind(a, b);
     }
     /// Number of FB-only relations the large-prime part can yield: `E - V + B`.
     pub fn yield_count(&self) -> i64 {
         self.edges as i64 - self.verts as i64 + self.bip
     }
+
+    pub fn giant_fraction(&self) -> f64 {
+        if self.verts == 0 {
+            0.0
+        } else {
+            self.largest as f64 / self.verts as f64
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LpEdgeKind {
+    Tree,
+    OddWitness,
+    Yield,
 }
 
 /// Build the factor base for an arm. FULL: all rational points (sorted by key). Reduced:
@@ -1954,7 +2555,7 @@ pub fn build_fb(
         pts = pts.iter().map(|p| normalize_pt(f, p)).collect();
         pts.sort_by_key(pt_key);
     } else {
-        let mut seen: FxSet<u64> = FxSet::default();
+        let mut seen: FxSet<u128> = FxSet::default();
         pts = Vec::with_capacity(size);
         while pts.len() < size {
             let p = sample_point(f, g, rng);
@@ -1972,14 +2573,28 @@ pub fn build_fb(
 }
 
 fn line_key(pts: &[[u64; 3]; 4]) -> u64 {
-    let mut k: Vec<u64> = pts.iter().map(pt_key).collect();
+    let mut k: Vec<u128> = pts.iter().map(pt_key).collect();
     k.sort_unstable();
     let mut h = 0x9E37_79B9_7F4A_7C15u64;
     for x in k {
-        h = (h.rotate_left(7) ^ x).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        h = (h.rotate_left(7) ^ x as u64).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        h = (h.rotate_left(7) ^ (x >> 64) as u64).wrapping_mul(0xBF58_476D_1CE4_E5B9);
         h ^= h >> 29;
     }
     h
+}
+
+/// Exact packed key for a projective line through two distinct points. Prospective e5
+/// fields are all below `2^22`, so three normalized coefficients occupy 66 bits.
+fn prospective_line_key(f: &Fq, p: &[u64; 3], q: &[u64; 3]) -> u128 {
+    assert!(f.p < (1 << 22));
+    let l = [
+        f.sub(f.mul(p[1], q[2]), f.mul(p[2], q[1])),
+        f.sub(f.mul(p[2], q[0]), f.mul(p[0], q[2])),
+        f.sub(f.mul(p[0], q[1]), f.mul(p[1], q[0])),
+    ];
+    let l = normalize_pt(f, &l);
+    ((l[0] as u128) << 44) | ((l[1] as u128) << 22) | l[2] as u128
 }
 
 /// Resumable relation collector (one arm, one factor base).
@@ -1988,8 +2603,8 @@ pub struct Collector<'a> {
     pub arm: Arm,
     pub kappa: f64,
     pub fb: Vec<FbPt>,
-    fb_index: FxMap<u64, u32>,
-    lp_map: FxMap<u64, u32>,
+    fb_index: FxMap<u128, u32>,
+    lp_map: FxMap<u128, u32>,
     pub lp_pts: Vec<[u64; 3]>,
     pub graph: LpGraph,
     pub rels: Vec<Rel>,
@@ -2008,13 +2623,14 @@ impl<'a> Collector<'a> {
         let f = inst.f();
         let mut rng = SplitMix64::new(seed);
         let mut ctr = IcCounters::default();
-        let (m0, i0) = f.counts();
+        let (m0, i0, s0) = f.counts_full();
         let fb = build_fb(inst, arm, kappa, &mut rng, &mut ctr);
-        let (m1, i1) = f.counts();
+        let (m1, i1, s1) = f.counts_full();
         ctr.fq_mul_fb = m1 - m0;
         ctr.fq_inv_fb = i1 - i0;
+        ctr.fq_sqrt_fb = s1 - s0;
         let nfb = fb.len() as u64;
-        let mut fb_index: FxMap<u64, u32> = FxMap::default();
+        let mut fb_index: FxMap<u128, u32> = FxMap::default();
         for (i, p) in fb.iter().enumerate() {
             fb_index.insert(pt_key(&p.c), i as u32);
             ctr.hash_inserts += 1;
@@ -2087,13 +2703,14 @@ impl<'a> Collector<'a> {
             self.next_idx += 1;
             self.ctr.lines += 1;
             let (i, j) = pair_of_index(pidx, nfb as u64);
-            let (mb, ib) = f.counts();
+            let (mb, ib, sb) = f.counts_full();
             let mut vm = 0u64;
             let mut vi = 0u64;
             self.process_line(i, j, &g, &mut vm, &mut vi);
-            let (ma, ia) = f.counts();
+            let (ma, ia, sa) = f.counts_full();
             self.ctr.fq_mul_collect += (ma - mb) - vm;
             self.ctr.fq_inv_collect += (ia - ib) - vi;
+            self.ctr.fq_sqrt_collect += sa - sb;
         }
     }
 
@@ -2114,7 +2731,7 @@ impl<'a> Collector<'a> {
             pts4[2 + k] = normalize_pt(f, &r);
         }
         let mut fbs: Vec<(u32, i32)> = vec![];
-        let mut lps: Vec<(u64, i32, [u64; 3])> = vec![];
+        let mut lps: Vec<(u128, i32, [u64; 3])> = vec![];
         let add_fb = |idx: u32, fbs: &mut Vec<(u32, i32)>| {
             if let Some(e) = fbs.iter_mut().find(|e| e.0 == idx) {
                 e.1 += 1;
@@ -2202,6 +2819,708 @@ impl<'a> Collector<'a> {
 }
 
 // ---------------------------------------------------------------------------
+// Evaluator e5: bounded-memory prospective full harvest
+// ---------------------------------------------------------------------------
+
+#[derive(Clone, Debug)]
+struct CompactRel {
+    fb_id: [u32; 4],
+    fb_cf: [u8; 4],
+    nfb: u8,
+    lp_id: [u32; 2],
+    lp_cf: [u8; 2],
+    nlp: u8,
+    line: (u32, u32),
+}
+
+impl CompactRel {
+    fn to_rel(&self) -> Rel {
+        Rel {
+            fb: (0..self.nfb as usize)
+                .map(|i| (self.fb_id[i], self.fb_cf[i] as i32))
+                .collect(),
+            lp: (0..self.nlp as usize)
+                .map(|i| (self.lp_id[i], self.lp_cf[i] as i32))
+                .collect(),
+            line: self.line,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+struct StoredEdge {
+    a: u32,
+    b: u32,
+    rel: CompactRel,
+}
+
+/// Return the forest edges needed to certify every retained non-tree relation.
+///
+/// A path for each non-tree edge in isolation is insufficient over an odd field:
+/// an odd component can acquire a new dependency when a later *tree* edge joins it
+/// to the sink (or joins it to another odd component).  For each final forest
+/// component we therefore connect every retained-extra endpoint to one common
+/// anchor, using the sink as the anchor whenever it belongs to that component.
+/// The selected forest plus the retained extras then has exactly the dependency
+/// dimension attributed to that retained subgraph by `E - V + B`.
+fn dependency_forest_support(
+    tree: &[StoredEdge],
+    extras: &[StoredEdge],
+    nverts: usize,
+) -> Vec<u32> {
+    if extras.is_empty() {
+        return vec![];
+    }
+
+    let mut degree = vec![0u32; nverts];
+    for e in tree {
+        degree[e.a as usize] += 1;
+        degree[e.b as usize] += 1;
+    }
+    let mut off = vec![0usize; nverts + 1];
+    for v in 0..nverts {
+        off[v + 1] = off[v] + degree[v] as usize;
+    }
+    let mut cursor = off[..nverts].to_vec();
+    let mut adj_v = vec![0u32; tree.len() * 2];
+    let mut adj_e = vec![0u32; tree.len() * 2];
+    for (eid, e) in tree.iter().enumerate() {
+        for (a, b) in [(e.a, e.b), (e.b, e.a)] {
+            let p = cursor[a as usize];
+            adj_v[p] = b;
+            adj_e[p] = eid as u32;
+            cursor[a as usize] += 1;
+        }
+    }
+
+    // Root the sink component at vertex zero; every other forest component is
+    // rooted at its least numbered vertex by this traversal order.
+    let mut parent = vec![u32::MAX; nverts];
+    let mut parent_edge = vec![u32::MAX; nverts];
+    let mut depth = vec![0u32; nverts];
+    let mut component_root = vec![u32::MAX; nverts];
+    let mut queue = VecDeque::new();
+    for root in 0..nverts {
+        if parent[root] != u32::MAX {
+            continue;
+        }
+        parent[root] = root as u32;
+        component_root[root] = root as u32;
+        queue.push_back(root as u32);
+        while let Some(v) = queue.pop_front() {
+            for p in off[v as usize]..off[v as usize + 1] {
+                let w = adj_v[p];
+                if parent[w as usize] == u32::MAX {
+                    parent[w as usize] = v;
+                    parent_edge[w as usize] = adj_e[p];
+                    depth[w as usize] = depth[v as usize] + 1;
+                    component_root[w as usize] = root as u32;
+                    queue.push_back(w);
+                }
+            }
+        }
+    }
+
+    let add_path = |mut a: u32,
+                    mut b: u32,
+                    support: &mut FxSet<u32>| {
+        while depth[a as usize] > depth[b as usize] {
+            support.insert(parent_edge[a as usize]);
+            a = parent[a as usize];
+        }
+        while depth[b as usize] > depth[a as usize] {
+            support.insert(parent_edge[b as usize]);
+            b = parent[b as usize];
+        }
+        while a != b {
+            support.insert(parent_edge[a as usize]);
+            support.insert(parent_edge[b as usize]);
+            a = parent[a as usize];
+            b = parent[b as usize];
+        }
+    };
+
+    let mut anchors: FxMap<u32, u32> = FxMap::default();
+    let mut support: FxSet<u32> = FxSet::default();
+    for e in extras {
+        for terminal in [e.a, e.b] {
+            let root = component_root[terminal as usize];
+            // Because traversal begins at zero, root zero is exactly the final
+            // component containing the factor-base sink.
+            let anchor = *anchors
+                .entry(root)
+                .or_insert(if root == 0 { 0 } else { terminal });
+            add_path(anchor, terminal, &mut support);
+        }
+    }
+    let mut support_ids: Vec<u32> = support.into_iter().collect();
+    support_ids.sort_unstable();
+    support_ids
+}
+
+/// Independently compute the dependency dimension of a materialized LP
+/// certificate from its selected edge set.  This intentionally does not reuse
+/// `LpGraph`: a plain bipartite-component traversal catches any mismatch between
+/// the streaming union-find claim and the relations retained for elimination.
+fn materialized_dependency_dimension(
+    tree: &[StoredEdge],
+    support_ids: &[u32],
+    extras: &[StoredEdge],
+    nverts: usize,
+) -> i64 {
+    let edge_count = support_ids.len() + extras.len();
+    if edge_count == 0 {
+        return 0;
+    }
+    let mut degree = vec![0usize; nverts];
+    for (a, b) in support_ids
+        .iter()
+        .map(|&id| (tree[id as usize].a, tree[id as usize].b))
+        .chain(extras.iter().map(|edge| (edge.a, edge.b)))
+    {
+        degree[a as usize] += 1;
+        degree[b as usize] += 1;
+    }
+    let mut off = vec![0usize; nverts + 1];
+    for v in 0..nverts {
+        off[v + 1] = off[v] + degree[v];
+    }
+    let mut cursor = off[..nverts].to_vec();
+    let mut adjacent = vec![0u32; 2 * edge_count];
+    for (a, b) in support_ids
+        .iter()
+        .map(|&id| (tree[id as usize].a, tree[id as usize].b))
+        .chain(extras.iter().map(|edge| (edge.a, edge.b)))
+    {
+        adjacent[cursor[a as usize]] = b;
+        cursor[a as usize] += 1;
+        adjacent[cursor[b as usize]] = a;
+        cursor[b as usize] += 1;
+    }
+
+    let lp_vertices = degree.iter().skip(1).filter(|&&d| d != 0).count();
+    let mut color = vec![u8::MAX; nverts];
+    let mut bipartite_without_sink = 0i64;
+    let mut queue = VecDeque::new();
+    for root in 0..nverts {
+        if degree[root] == 0 || color[root] != u8::MAX {
+            continue;
+        }
+        color[root] = 0;
+        queue.push_back(root as u32);
+        let mut bipartite = true;
+        let mut has_sink = root == 0;
+        while let Some(v) = queue.pop_front() {
+            for &w in &adjacent[off[v as usize]..off[v as usize + 1]] {
+                has_sink |= w == 0;
+                if color[w as usize] == u8::MAX {
+                    color[w as usize] = color[v as usize] ^ 1;
+                    queue.push_back(w);
+                } else if color[w as usize] == color[v as usize] {
+                    bipartite = false;
+                }
+            }
+        }
+        if bipartite && !has_sink {
+            bipartite_without_sink += 1;
+        }
+    }
+    edge_count as i64 - lp_vertices as i64 + bipartite_without_sink
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct ProspectiveHarvestOutcome {
+    pub q: u64,
+    pub ell: u64,
+    pub nfb: usize,
+    pub pairs: u64,
+    /// Raw classifications before duplicate suppression.
+    pub raw_full: u64,
+    pub raw_fp: u64,
+    pub raw_pp: u64,
+    /// Accepted unique classifications (`FP` = one large prime, `PP` = two).
+    pub full: u64,
+    pub fp: u64,
+    pub pp: u64,
+    pub giant_fraction: f64,
+    pub graph_vertices: u64,
+    pub graph_edges: u64,
+    pub cycle_count: i64,
+    pub usable_cycles: i64,
+    pub retained_tree_edges: usize,
+    pub retained_extra_edges: usize,
+    pub materialized_tree_edges: usize,
+    pub materialized_full_rows: usize,
+    pub materialized_rows: usize,
+    /// LP dependency dimension independently recomputed from the retained
+    /// certificate, rather than copied from the streaming graph.
+    pub materialized_dependency_dimension: usize,
+    pub rows_after_lp_sge: usize,
+    pub total_row_weight_after_lp_sge: usize,
+    pub mean_row_weight_after_lp_sge: f64,
+    pub max_row_weight_after_lp_sge: usize,
+    pub rank: usize,
+    pub nullity: usize,
+    pub mean_pivot_weight_after_rank_sge: f64,
+    pub counters: IcCounters,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct ProspectiveCostReceipt {
+    pub fq_arithmetic: f64,
+    pub lookup_cost: f64,
+    pub mod_ell_cost: f64,
+    pub native_counter_count: u64,
+    pub native_band_cost: f64,
+    pub attack_total: f64,
+    pub verification_cost_excluded: f64,
+    pub inversion_price: u64,
+    pub sqrt_price: u64,
+    pub mod_ell_price: f64,
+    pub native_weight_gae: f64,
+    pub gae_price: f64,
+}
+
+impl ProspectiveHarvestOutcome {
+    /// Complete LEAD-15 cost receipt. Lookups retain the preregistered `4 M_q`
+    /// price. Hashing/insertion, RNG, and union-find traversal are the emitted native
+    /// counters priced at the repository-required 0/0.1/1 GAE band. One explicit
+    /// plane-quartic group addition is `163 M_q + 2 I_q` at this q.
+    pub fn complete_cost(&self, mod_ell_price: f64, native_weight_gae: f64) -> ProspectiveCostReceipt {
+        let logq = 64 - self.q.leading_zeros() as u64;
+        let inversion_price = logq;
+        let sqrt_price = (1.5 * (self.q as f64).log2()).ceil() as u64;
+        let c = &self.counters;
+        let fq_arithmetic = (c.fq_mul_collect + c.fq_mul_fb) as f64
+            + inversion_price as f64 * (c.fq_inv_collect + c.fq_inv_fb) as f64
+            + sqrt_price as f64 * (c.fq_sqrt_collect + c.fq_sqrt_fb) as f64;
+        let lookup_cost = 4.0 * c.hash_lookups as f64;
+        let mod_ell_cost = mod_ell_price * (c.elim_ops + c.rank_ops) as f64;
+        let native_counter_count = c
+            .hash_lookups
+            .saturating_add(c.hash_inserts)
+            .saturating_add(c.rng_draws)
+            .saturating_add(c.uf_ops)
+            .saturating_add(c.root_calls)
+            .saturating_add(c.norm_calls)
+            .saturating_add(c.elim_entries)
+            .saturating_add(c.rank_entries)
+            .saturating_add(c.sort_items);
+        let gae_price = 163.0 + 2.0 * inversion_price as f64;
+        let native_band_cost = native_weight_gae * gae_price * native_counter_count as f64;
+        let verification_cost_excluded = c.fq_mul_verify as f64
+            + inversion_price as f64 * c.fq_inv_verify as f64
+            + sqrt_price as f64 * c.fq_sqrt_verify as f64;
+        ProspectiveCostReceipt {
+            fq_arithmetic,
+            lookup_cost,
+            mod_ell_cost,
+            native_counter_count,
+            native_band_cost,
+            attack_total: fq_arithmetic + lookup_cost + mod_ell_cost + native_band_cost,
+            verification_cost_excluded,
+            inversion_price,
+            sqrt_price,
+            mod_ell_price,
+            native_weight_gae,
+            gae_price,
+        }
+    }
+}
+
+/// Exact frozen factor-base size `ceil(2.83*sqrt(q+1))`, evaluated with integers.
+pub fn prospective_factor_base_size(q: u64) -> usize {
+    let rhs = 80_089u128 * (q as u128 + 1); // 283^2 * (q+1)
+    let mut n = ((2.83 * ((q + 1) as f64).sqrt()).ceil() as u128).max(1);
+    while 10_000 * n * n < rhs {
+        n += 1;
+    }
+    while n > 1 && 10_000 * (n - 1) * (n - 1) >= rhs {
+        n -= 1;
+    }
+    n as usize
+}
+
+fn build_prospective_fb(
+    inst: &Inst,
+    n: usize,
+    seed: u64,
+    ctr: &mut IcCounters,
+) -> Vec<FbPt> {
+    let f = inst.f();
+    let mut rng = SplitMix64::new(seed);
+    let mut seen: FxSet<u128> = FxSet::default();
+    let mut pts = Vec::with_capacity(n);
+    while pts.len() < n {
+        let rng_before = rng.0;
+        let p = normalize_pt(f, &sample_point(f, &inst.quartic, &mut rng));
+        ctr.rng_draws = ctr
+            .rng_draws
+            .saturating_add(splitmix_draws_between(rng_before, rng.0));
+        ctr.hash_lookups += 1;
+        if seen.insert(pt_key(&p)) {
+            ctr.hash_inserts += 1;
+            pts.push(p);
+        }
+    }
+    pts.into_iter()
+        .map(|p| make_fb_pt(f, &inst.quartic, p))
+        .collect()
+}
+
+fn compact_relation(
+    fbs: &[(u32, i32)],
+    lps: &[(u32, i32)],
+    line: (u32, u32),
+) -> CompactRel {
+    assert!(fbs.len() <= 4 && lps.len() <= 2);
+    let mut r = CompactRel {
+        fb_id: [0; 4],
+        fb_cf: [0; 4],
+        nfb: fbs.len() as u8,
+        lp_id: [0; 2],
+        lp_cf: [0; 2],
+        nlp: lps.len() as u8,
+        line,
+    };
+    for (i, &(id, cf)) in fbs.iter().enumerate() {
+        r.fb_id[i] = id;
+        r.fb_cf[i] = cf as u8;
+    }
+    for (i, &(id, cf)) in lps.iter().enumerate() {
+        r.lp_id[i] = id;
+        r.lp_cf[i] = cf as u8;
+    }
+    r
+}
+
+fn exact_sparse_rank(
+    mont: &Mont,
+    rows: &[SRow],
+    ncols: usize,
+    ops: &mut u64,
+    inversions: &mut u64,
+    entries: &mut u64,
+) -> (usize, f64) {
+    let mut pivots: Vec<Option<SRow>> = vec![None; ncols];
+    let mut pivot_weight = 0usize;
+    let mut rank = 0usize;
+    for input in rows {
+        *entries = (*entries).saturating_add(input.len() as u64);
+        let mut row = input.clone();
+        loop {
+            let Some(&(col, cf)) = row.first() else {
+                break;
+            };
+            if col as usize >= ncols {
+                panic!("FB-only rank row contains column {col} >= {ncols}");
+            }
+            if let Some(pivot) = &pivots[col as usize] {
+                *entries = (*entries).saturating_add((row.len() + pivot.len()) as u64);
+                row = axpy_sub(mont, &row, cf, pivot, ops);
+                continue;
+            }
+            let inv = mont.inv(cf);
+            *inversions += 1;
+            *ops += mont_inv_mul_ops(mont.n) + row.len() as u64;
+            for e in &mut row {
+                e.1 = mont.mul(e.1, inv);
+            }
+            pivot_weight += row.len();
+            rank += 1;
+            pivots[col as usize] = Some(row);
+            break;
+        }
+        if rank == ncols {
+            break;
+        }
+    }
+    let mean = if rank == 0 {
+        0.0
+    } else {
+        pivot_weight as f64 / rank as f64
+    };
+    (rank, mean)
+}
+
+/// Full prospective harvest over every unordered factor-base pair. Storage is bounded by
+/// a spanning forest plus `retain_factor*N+1024` non-tree/full relations; all pairs still
+/// contribute to yield, giant-component, operation, and graph counters.
+pub fn prospective_full_harvest(
+    inst: &Inst,
+    seed: u64,
+    retain_factor: usize,
+    deadline: Option<std::time::Instant>,
+) -> Result<ProspectiveHarvestOutcome, String> {
+    let f = inst.f();
+    let nfb = prospective_factor_base_size(inst.q);
+    let pairs = nfb as u64 * (nfb as u64 - 1) / 2;
+    let retain_cap = retain_factor
+        .checked_mul(nfb)
+        .and_then(|x| x.checked_add(1024))
+        .ok_or_else(|| "relation retention cap overflow".to_string())?;
+    let mut ctr = IcCounters::default();
+    let (m0, i0, s0) = f.counts_full();
+    let fb = build_prospective_fb(inst, nfb, seed ^ 0x4642_2D45_352D_5052, &mut ctr);
+    let (m1, i1, s1) = f.counts_full();
+    ctr.fq_mul_fb = m1 - m0;
+    ctr.fq_inv_fb = i1 - i0;
+    ctr.fq_sqrt_fb = s1 - s0;
+    let mut fb_index: FxMap<u128, u32> = FxMap::default();
+    for (i, p) in fb.iter().enumerate() {
+        fb_index.insert(pt_key(&p.c), i as u32);
+        ctr.hash_inserts += 1;
+    }
+    let mut lp_map: FxMap<u128, u32> = FxMap::default();
+    let mut next_lp = 1u32;
+    let mut seen: FxSet<u128> = FxSet::default();
+    let mut graph = LpGraph::new();
+    let mut tree: Vec<StoredEdge> = vec![];
+    let mut extras: Vec<StoredEdge> = Vec::with_capacity(retain_cap);
+    let mut full_rows: Vec<CompactRel> = Vec::with_capacity(retain_cap.min(nfb * 2));
+    let (mut raw_full, mut raw_fp, mut raw_pp) = (0u64, 0u64, 0u64);
+
+    for i in 0..nfb {
+        for j in (i + 1)..nfb {
+            ctr.lines += 1;
+            if ctr.lines.is_multiple_of(4096) {
+                if let Some(d) = deadline {
+                    if std::time::Instant::now() > d {
+                        return Err(format!("deadline after {} of {pairs} pairs", ctr.lines));
+                    }
+                }
+            }
+            let (mb, ib, sb) = f.counts_full();
+            let c = line_coeffs(f, &fb[i], &fb[j]);
+            ctr.root_calls += 1;
+            let Some(roots) = residual_roots(f, c) else {
+                let (ma, ia, sa) = f.counts_full();
+                ctr.fq_mul_collect += ma - mb;
+                ctr.fq_inv_collect += ia - ib;
+                ctr.fq_sqrt_collect += sa - sb;
+                continue;
+            };
+            ctr.split += 1;
+            let (p1, p2) = (fb[i].c, fb[j].c);
+            let mut pts4 = [p1, p2, [0u64; 3], [0u64; 3]];
+            for (k, &(l, m)) in roots.iter().enumerate() {
+                pts4[2 + k] = normalize_pt(f, &comb(f, l, m, &p1, &p2));
+                ctr.norm_calls += 1;
+            }
+            let mut fbs: Vec<(u32, i32)> = vec![(i as u32, 1), (j as u32, 1)];
+            let add_fb = |id: u32, out: &mut Vec<(u32, i32)>| {
+                if let Some(e) = out.iter_mut().find(|e| e.0 == id) {
+                    e.1 += 1;
+                } else {
+                    out.push((id, 1));
+                }
+            };
+            let mut lp_raw: Vec<(u128, i32)> = vec![];
+            for p in &pts4[2..] {
+                let key = pt_key(p);
+                ctr.hash_lookups += 1;
+                if let Some(&id) = fb_index.get(&key) {
+                    add_fb(id, &mut fbs);
+                } else if let Some(e) = lp_raw.iter_mut().find(|e| e.0 == key) {
+                    e.1 += 1;
+                } else {
+                    lp_raw.push((key, 1));
+                }
+            }
+            match lp_raw.len() {
+                0 => raw_full += 1,
+                1 => raw_fp += 1,
+                2 => raw_pp += 1,
+                _ => unreachable!(),
+            }
+            let lk = prospective_line_key(f, &p1, &p2);
+            ctr.hash_lookups += 1;
+            if seen.contains(&lk) {
+                ctr.dups += 1;
+                let (ma, ia, sa) = f.counts_full();
+                ctr.fq_mul_collect += ma - mb;
+                ctr.fq_inv_collect += ia - ib;
+                ctr.fq_sqrt_collect += sa - sb;
+                continue;
+            }
+            let (mv0, iv0, sv0) = f.counts_full();
+            let good = verify_line(f, &inst.quartic, &p1, &p2, &pts4);
+            let (mv1, iv1, sv1) = f.counts_full();
+            ctr.fq_mul_verify += mv1 - mv0;
+            ctr.fq_inv_verify += iv1 - iv0;
+            ctr.fq_sqrt_verify += sv1 - sv0;
+            ctr.verified += 1;
+            if !good {
+                return Err(format!("independent line verification failed at pair ({i},{j})"));
+            }
+            seen.insert(lk);
+            ctr.hash_inserts += 1;
+            let mut lps: Vec<(u32, i32)> = vec![];
+            for &(key, cf) in &lp_raw {
+                ctr.hash_lookups += 1;
+                let id = if let Some(&id) = lp_map.get(&key) {
+                    id
+                } else {
+                    let id = next_lp;
+                    next_lp = next_lp
+                        .checked_add(1)
+                        .ok_or_else(|| "large-prime id overflow".to_string())?;
+                    lp_map.insert(key, id);
+                    ctr.hash_inserts += 1;
+                    id
+                };
+                lps.push((id, cf));
+            }
+            let compact = compact_relation(&fbs, &lps, (i as u32, j as u32));
+            match lps.len() {
+                0 => {
+                    ctr.rel_full += 1;
+                    if full_rows.len() + extras.len() < retain_cap {
+                        full_rows.push(compact);
+                    }
+                }
+                1 | 2 => {
+                    let (a, b) = if lps.len() == 1 {
+                        ctr.rel_slp += 1;
+                        (lps[0].0, 0)
+                    } else {
+                        ctr.rel_dlp += 1;
+                        (lps[0].0, lps[1].0)
+                    };
+                    let edge = StoredEdge { a, b, rel: compact };
+                    match graph.add_edge_kind(a, b) {
+                        LpEdgeKind::Tree => tree.push(edge),
+                        LpEdgeKind::OddWitness | LpEdgeKind::Yield => {
+                            if full_rows.len() + extras.len() < retain_cap {
+                                extras.push(edge);
+                            }
+                        }
+                    }
+                }
+                _ => unreachable!(),
+            }
+            let (ma, ia, sa) = f.counts_full();
+            ctr.fq_mul_collect += (ma - mb) - (mv1 - mv0);
+            ctr.fq_inv_collect += (ia - ib) - (iv1 - iv0);
+            ctr.fq_sqrt_collect += (sa - sb) - (sv1 - sv0);
+        }
+    }
+    ctr.uf_ops = graph.ops + graph.edges;
+    if ctr.lines != pairs {
+        return Err(format!("pair accounting mismatch: {} != {pairs}", ctr.lines));
+    }
+    drop(fb_index);
+    drop(lp_map);
+    drop(seen);
+    drop(fb);
+
+    // Collect a connected forest certificate for every retained non-tree edge.
+    // Connecting all retained endpoints within each final component (and to the
+    // sink when present) is necessary: per-edge paths alone miss dependencies
+    // created when an odd component later joins the sink or another odd component.
+    let nverts = next_lp as usize;
+    let support_ids = dependency_forest_support(&tree, &extras, nverts);
+    let materialized_dependency_dimension =
+        materialized_dependency_dimension(&tree, &support_ids, &extras, nverts);
+    if materialized_dependency_dimension < 0
+        || materialized_dependency_dimension > graph.yield_count()
+    {
+        return Err(format!(
+            "materialized LP certificate has impossible dependency dimension {materialized_dependency_dimension}; full streaming graph claimed {}",
+            graph.yield_count()
+        ));
+    }
+    ctr.sort_items = ctr.sort_items.saturating_add(support_ids.len() as u64);
+    let mut rels: Vec<Rel> = Vec::with_capacity(full_rows.len() + support_ids.len() + extras.len());
+    rels.extend(full_rows.iter().map(CompactRel::to_rel));
+    rels.extend(support_ids.iter().map(|&e| tree[e as usize].rel.to_rel()));
+    rels.extend(extras.iter().map(|e| e.rel.to_rel()));
+    let materialized_rows = rels.len();
+    ctr.sort_items = ctr.sort_items.saturating_add(
+        rels.iter()
+            .map(|r| 1u64 + r.fb.len() as u64 + r.lp.len() as u64)
+            .sum::<u64>(),
+    );
+    let mont = Mont::new(inst.ell);
+    let rows0 = build_rows(&mont, nfb, &rels);
+    let mut lp_ops = 0u64;
+    let mut lp_entries = 0u64;
+    let rows = eliminate_lp_counted(
+        &mont,
+        nfb,
+        rows0,
+        &mut lp_ops,
+        &mut lp_entries,
+        &mut ctr.sort_items,
+    );
+    ctr.elim_ops += lp_ops;
+    ctr.elim_entries += lp_entries;
+    let cycle_count = graph.yield_count();
+    let usable_cycles = ctr.rel_full as i64 + cycle_count;
+    let materialized_usable =
+        full_rows.len() as i64 + materialized_dependency_dimension;
+    if rows.len() as i64 != materialized_usable {
+        return Err(format!(
+            "materialized LP certificate should yield {materialized_usable} FB-only rows, but exact elimination produced {}",
+            rows.len()
+        ));
+    }
+    if usable_cycles >= nfb as i64 + 2 && rows.len() < nfb + 2 {
+        return Err(format!(
+            "retention cap materialized only {} FB-only rows although the full graph has {usable_cycles} usable relations (required {})",
+            rows.len(),
+            nfb + 2
+        ));
+    }
+    let total_weight: usize = rows.iter().map(Vec::len).sum();
+    let mean_weight = if rows.is_empty() {
+        0.0
+    } else {
+        total_weight as f64 / rows.len() as f64
+    };
+    let max_weight = rows.iter().map(Vec::len).max().unwrap_or(0);
+    let (rank, mean_pivot_weight) = exact_sparse_rank(
+        &mont,
+        &rows,
+        nfb,
+        &mut ctr.rank_ops,
+        &mut ctr.rank_inversions,
+        &mut ctr.rank_entries,
+    );
+    Ok(ProspectiveHarvestOutcome {
+        q: inst.q,
+        ell: inst.ell,
+        nfb,
+        pairs,
+        raw_full,
+        raw_fp,
+        raw_pp,
+        full: ctr.rel_full,
+        fp: ctr.rel_slp,
+        pp: ctr.rel_dlp,
+        giant_fraction: graph.giant_fraction(),
+        graph_vertices: graph.verts,
+        graph_edges: graph.edges,
+        cycle_count,
+        usable_cycles,
+        retained_tree_edges: tree.len(),
+        retained_extra_edges: extras.len(),
+        materialized_tree_edges: support_ids.len(),
+        materialized_full_rows: full_rows.len(),
+        materialized_rows,
+        materialized_dependency_dimension: materialized_dependency_dimension as usize,
+        rows_after_lp_sge: rows.len(),
+        total_row_weight_after_lp_sge: total_weight,
+        mean_row_weight_after_lp_sge: mean_weight,
+        max_row_weight_after_lp_sge: max_weight,
+        rank,
+        nullity: nfb.saturating_sub(rank),
+        mean_pivot_weight_after_rank_sge: mean_pivot_weight,
+        counters: ctr,
+    })
+}
+
+// ---------------------------------------------------------------------------
 // 4. sparse structured elimination and Wiedemann mod ell
 // ---------------------------------------------------------------------------
 
@@ -2228,7 +3547,8 @@ pub fn build_rows(mont: &Mont, nfb: usize, rels: &[Rel]) -> Vec<SRow> {
         .collect()
 }
 
-/// `a - f * b` for sparse rows, counting one mod-ell operation per entry of `b`.
+/// `a - f * b` for sparse rows, counting a multiplication and an addition/subtraction
+/// for every touched entry of `b`.
 fn axpy_sub(mont: &Mont, a: &SRow, f: u64, b: &SRow, ops: &mut u64) -> SRow {
     let mut out = Vec::with_capacity(a.len() + b.len());
     let (mut i, mut j) = (0, 0);
@@ -2237,11 +3557,11 @@ fn axpy_sub(mont: &Mont, a: &SRow, f: u64, b: &SRow, ops: &mut u64) -> SRow {
             out.push(a[i]);
             i += 1;
         } else if i >= a.len() || b[j].0 < a[i].0 {
-            *ops += 1;
+            *ops += 2;
             out.push((b[j].0, mont.neg(mont.mul(f, b[j].1))));
             j += 1;
         } else {
-            *ops += 1;
+            *ops += 2;
             let v = mont.sub(a[i].1, mont.mul(f, b[j].1));
             if v != 0 {
                 out.push((a[i].0, v));
@@ -2251,6 +3571,13 @@ fn axpy_sub(mont: &Mont, a: &SRow, f: u64, b: &SRow, ops: &mut u64) -> SRow {
         }
     }
     out
+}
+
+/// Exact Montgomery multiplications performed by `Mont::pow(a, n-2)`.
+#[inline]
+fn mont_inv_mul_ops(n: u64) -> u64 {
+    let e = n - 2;
+    (64 - e.leading_zeros()) as u64 + e.count_ones() as u64
 }
 
 fn row_coef(row: &SRow, c: u32) -> u64 {
@@ -2270,6 +3597,25 @@ pub fn eliminate_lp(
     rows_in: Vec<SRow>,
     ops: &mut u64,
     entries: &mut u64,
+) -> Vec<SRow> {
+    let mut ignored_sort_items = 0u64;
+    eliminate_lp_counted(
+        mont,
+        nfb,
+        rows_in,
+        ops,
+        entries,
+        &mut ignored_sort_items,
+    )
+}
+
+fn eliminate_lp_counted(
+    mont: &Mont,
+    nfb: usize,
+    rows_in: Vec<SRow>,
+    ops: &mut u64,
+    entries: &mut u64,
+    sort_items: &mut u64,
 ) -> Vec<SRow> {
     use std::cmp::Reverse;
     let mut rows: Vec<Option<SRow>> = rows_in.into_iter().map(Some).collect();
@@ -2306,7 +3652,7 @@ pub fn eliminate_lp(
         }
         let pc = row_coef(&prow, c);
         let inv = mont.inv(pc);
-        *ops += 128; // Fermat inversion: ~ 2 log2(ell) multiplications
+        *ops += mont_inv_mul_ops(mont.n);
         for e in prow.iter_mut() {
             e.1 = mont.mul(e.1, inv);
         }
@@ -2315,6 +3661,7 @@ pub fn eliminate_lp(
             .get(&c)
             .map(|s| s.iter().cloned().collect())
             .unwrap_or_default();
+        *sort_items = (*sort_items).saturating_add(others.len() as u64);
         others.sort_unstable();
         for r in others {
             let row = rows[r as usize].take().unwrap();
@@ -3126,7 +4473,7 @@ impl IcCell {
             + rinv * (self.ctr.fq_inv_collect + self.ctr.fq_inv_fb) as f64
     }
     pub fn lops(&self) -> u64 {
-        self.ctr.elim_ops + self.ctr.wied_ops + self.ctr.bm_ops
+        self.ctr.elim_ops + self.ctr.rank_ops + self.ctr.wied_ops + self.ctr.bm_ops
     }
     pub fn to_json(&self) -> String {
         let c = &self.ctr;
@@ -3155,12 +4502,17 @@ impl IcCell {
             .n("verify_failed", c.verify_failed);
         j.n("fq_mul_collect", c.fq_mul_collect)
             .n("fq_inv_collect", c.fq_inv_collect)
+            .n("fq_sqrt_collect", c.fq_sqrt_collect)
             .n("fq_mul_fb", c.fq_mul_fb)
-            .n("fq_inv_fb", c.fq_inv_fb);
+            .n("fq_inv_fb", c.fq_inv_fb)
+            .n("fq_sqrt_fb", c.fq_sqrt_fb);
         j.n("fq_mul_verify", c.fq_mul_verify)
-            .n("fq_inv_verify", c.fq_inv_verify);
+            .n("fq_inv_verify", c.fq_inv_verify)
+            .n("fq_sqrt_verify", c.fq_sqrt_verify);
         j.n("elim_ops", c.elim_ops)
             .n("elim_entries", c.elim_entries)
+            .n("rank_ops", c.rank_ops)
+            .n("rank_inversions", c.rank_inversions)
             .n("wied_ops", c.wied_ops)
             .n("bm_ops", c.bm_ops)
             .n("matvecs", c.matvecs);
@@ -3438,6 +4790,199 @@ pub fn rho_json(inst: &Inst, run: u32, o: &RhoOut, rinv: f64) -> String {
 mod tests {
     use super::*;
 
+    fn stored_edge(a: u32, b: u32) -> StoredEdge {
+        StoredEdge {
+            a,
+            b,
+            rel: CompactRel {
+                fb_id: [0; 4],
+                fb_cf: [0; 4],
+                nfb: 0,
+                lp_id: [a, b],
+                lp_cf: [1, 1],
+                nlp: if b == 0 { 1 } else { 2 },
+                line: (a, b),
+            },
+        }
+    }
+
+    fn incidence_dependency_dimension(edges: &[(u32, u32)], lp_vertices: usize) -> usize {
+        let p = 5u64;
+        let mut matrix = vec![vec![0u64; lp_vertices]; edges.len()];
+        for (row, &(a, b)) in edges.iter().enumerate() {
+            for v in [a, b] {
+                if v != 0 {
+                    matrix[row][v as usize - 1] =
+                        (matrix[row][v as usize - 1] + 1) % p;
+                }
+            }
+        }
+        let mut rank = 0usize;
+        for col in 0..lp_vertices {
+            let Some(pivot) = (rank..matrix.len()).find(|&r| matrix[r][col] != 0) else {
+                continue;
+            };
+            matrix.swap(rank, pivot);
+            let inv = (1..p)
+                .find(|&x| x * matrix[rank][col] % p == 1)
+                .unwrap();
+            for c in col..lp_vertices {
+                matrix[rank][c] = matrix[rank][c] * inv % p;
+            }
+            let pivot_row = matrix[rank].clone();
+            for row in 0..matrix.len() {
+                if row == rank || matrix[row][col] == 0 {
+                    continue;
+                }
+                let factor = matrix[row][col];
+                for c in col..lp_vertices {
+                    matrix[row][c] =
+                        (matrix[row][c] + p - factor * pivot_row[c] % p) % p;
+                }
+            }
+            rank += 1;
+        }
+        edges.len() - rank
+    }
+
+    fn assert_materialized_dependency_dimension(sequence: &[(u32, u32)]) {
+        let mut graph = LpGraph::new();
+        let mut tree = vec![];
+        let mut extras = vec![];
+        for &(a, b) in sequence {
+            let edge = stored_edge(a, b);
+            match graph.add_edge_kind(a, b) {
+                LpEdgeKind::Tree => tree.push(edge),
+                LpEdgeKind::OddWitness | LpEdgeKind::Yield => extras.push(edge),
+            }
+        }
+        let support = dependency_forest_support(&tree, &extras, 4);
+        let selected: Vec<(u32, u32)> = support
+            .iter()
+            .map(|&id| (tree[id as usize].a, tree[id as usize].b))
+            .chain(extras.iter().map(|e| (e.a, e.b)))
+            .collect();
+        assert_eq!(
+            incidence_dependency_dimension(&selected, 3),
+            graph.yield_count() as usize,
+            "sequence={sequence:?}, support={support:?}, selected={selected:?}"
+        );
+        assert_eq!(
+            materialized_dependency_dimension(&tree, &support, &extras, 4),
+            graph.yield_count(),
+            "independent component traversal disagrees for sequence={sequence:?}"
+        );
+    }
+
+    fn permute_edge_subsets(
+        available: &[(u32, u32)],
+        chosen: &mut Vec<(u32, u32)>,
+        used: &mut [bool],
+        check: &mut impl FnMut(&[(u32, u32)]),
+    ) {
+        // `LpGraph::ensure` allocates contiguous IDs. Restrict the exhaustive
+        // comparison to sequences in which all three allocated LP vertices
+        // actually occur, matching the production ID allocator.
+        let seen = chosen.iter().fold(0u8, |mask, &(a, b)| {
+            let mut mask = mask;
+            if a != 0 {
+                mask |= 1 << (a - 1);
+            }
+            if b != 0 {
+                mask |= 1 << (b - 1);
+            }
+            mask
+        });
+        if seen == 0b111 {
+            check(chosen);
+        }
+        for i in 0..available.len() {
+            if used[i] {
+                continue;
+            }
+            used[i] = true;
+            chosen.push(available[i]);
+            permute_edge_subsets(available, chosen, used, check);
+            chosen.pop();
+            used[i] = false;
+        }
+    }
+
+    #[test]
+    fn dependency_certificate_retains_late_sink_join() {
+        let sequence = [(1, 2), (2, 3), (3, 1), (1, 0)];
+        assert_materialized_dependency_dimension(&sequence);
+
+        let mut graph = LpGraph::new();
+        let mut tree = vec![];
+        let mut extras = vec![];
+        for (a, b) in sequence {
+            let edge = stored_edge(a, b);
+            match graph.add_edge_kind(a, b) {
+                LpEdgeKind::Tree => tree.push(edge),
+                LpEdgeKind::OddWitness | LpEdgeKind::Yield => extras.push(edge),
+            }
+        }
+        assert_eq!(graph.yield_count(), 1);
+        // The third tree edge is the late sink join; the old per-extra path
+        // algorithm returned only [0,1].
+        assert_eq!(dependency_forest_support(&tree, &extras, 4), vec![0, 1, 2]);
+    }
+
+    #[test]
+    fn dependency_certificate_matches_all_small_graph_orders() {
+        let available = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)];
+        let mut checked = 0usize;
+        permute_edge_subsets(
+            &available,
+            &mut vec![],
+            &mut [false; 6],
+            &mut |sequence| {
+                assert_materialized_dependency_dimension(sequence);
+                checked += 1;
+            },
+        );
+        assert!(checked > 1_000, "exhaustive order census unexpectedly small: {checked}");
+    }
+
+    #[test]
+    fn dependency_certificate_matches_small_multigraph_streams() {
+        fn recurse(
+            available: &[(u32, u32)],
+            sequence: &mut Vec<(u32, u32)>,
+            depth: usize,
+            checked: &mut usize,
+        ) {
+            let seen = sequence.iter().fold(0u8, |mask, &(a, b)| {
+                let mut mask = mask;
+                if a != 0 {
+                    mask |=(1u8) << (a - 1);
+                }
+                if b != 0 {
+                    mask |=(1u8) << (b - 1);
+                }
+                mask
+            });
+            if seen == 0b111 {
+                assert_materialized_dependency_dimension(sequence);
+                *checked += 1;
+            }
+            if depth == 0 {
+                return;
+            }
+            for &edge in available {
+                sequence.push(edge);
+                recurse(available, sequence, depth - 1, checked);
+                sequence.pop();
+            }
+        }
+
+        let available = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)];
+        let mut checked = 0usize;
+        recurse(&available, &mut vec![], 6, &mut checked);
+        assert!(checked > 40_000, "multigraph stream census unexpectedly small: {checked}");
+    }
+
     #[test]
     fn kfast_matches_kf() {
         let q = q_of_k(9);
@@ -3480,10 +5025,155 @@ mod tests {
         assert_eq!(l, 2);
     }
 
+    #[test]
+    fn general_square_roots_and_wide_montgomery() {
+        let f = Fq::new(257);
+        for x in 0..257u64 {
+            let y = f.mul(x, x);
+            let r = f.sqrt(y).expect("every explicit square has a root");
+            assert_eq!(f.mul(r, r), y);
+        }
+        // Largest prime below 2^64: exercises carry-aware REDC/addition.
+        let n = 18_446_744_073_709_551_557u64;
+        let m = Mont::new(n);
+        for (a, b) in [(n - 1, n - 2), (1 << 63, (1 << 63) + 17), (123, 456)] {
+            let got = m.from(m.mul(m.to(a), m.to(b)));
+            let want = ((a as u128 * b as u128) % n as u128) as u64;
+            assert_eq!(got, want);
+            assert_eq!(m.from(m.add(m.to(a), m.to(b))), ((a as u128 + b as u128) % n as u128) as u64);
+        }
+    }
+
+    #[test]
+    fn historical_common_cover_witnesses() {
+        // q=5 uses the same x^3+x+1 basis and r0=g as the recorded 2026-10-14
+        // hyperelliptic-cover instance (order 124 = 4*31).
+        let k5 = Kf::new(5);
+        assert_eq!((k5.a, k5.b), (1, 1));
+        let w5 = common_cover_witness(&k5, 0, 1, [0, 1, 0])
+            .expect("recorded q=5 both-cover branch has an m=2 witness");
+        assert!(w5.target_ordered.iter().enumerate().all(|(i, x)| {
+            mobius_apply(&k5, &w5.mobius, &w5.source_ordered[i]) == Some(*x)
+        }));
+
+        // The q=7 basis differs from the historical census basis, so replay the
+        // same finite structural census: find one non-rational orbit for {0,1,r,r^q}.
+        let k7 = Kf::new(7);
+        let mut found = None;
+        'outer: for c0 in 0..7 {
+            for c1 in 0..7 {
+                for c2 in 0..7 {
+                    let r = [c0, c1, c2];
+                    if !k7.in_fq(&r) {
+                        if let Some(w) = common_cover_witness(&k7, 0, 1, r) {
+                            found = Some(w);
+                            break 'outer;
+                        }
+                    }
+                }
+            }
+        }
+        assert!(found.is_some(), "historical q=7 both-cover supply must replay");
+    }
+
+    #[test]
+    fn toy_prospective_full_harvest_accounts_every_pair() {
+        // q=11 is below every target size and was already in the repository's
+        // historical cover studies. It is large enough that the frozen N is <= q+1.
+        let q = 11u64;
+        let kf = Kf::new(q);
+        let mut selected = None;
+        'search: for a in 0..q {
+            for b in 0..q {
+                if a == b {
+                    continue;
+                }
+                for x0 in 0..q {
+                    for x1 in 0..q {
+                        for x2 in 0..q {
+                            let r = [x0, x1, x2];
+                            let Some(w) = common_cover_witness(&kf, a, b, r) else {
+                                continue;
+                            };
+                            let z1 = kf.add(&w.z, &kf.one());
+                            let ub = kf.neg(&kf.add(&w.z, &z1));
+                            let uc = kf.mul(&w.z, &z1);
+                            if let Ok(core) = build_core(&kf, &ub, &uc) {
+                                selected = Some((ub, uc, core));
+                                break 'search;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let (ub, uc, core) = selected.expect("q=11 common-cover quartic smoke supply");
+        let inst = Inst {
+            q,
+            kf: Kf::new(q),
+            k: q.ilog2(),
+            idx: 0,
+            ub,
+            uc,
+            quartic: core.quartic,
+            omi: core.omi,
+            rmat: core.rmat,
+            ea: core.ea,
+            eb: core.eb,
+            wb: core.wb,
+            ws: core.ws,
+            walpha: core.walpha,
+            wshift: core.wshift,
+            order: 31,
+            h: 1,
+            ell: 31,
+            trace: 0,
+            candidates: 1,
+            rejects: [0; 6],
+        };
+        // Regression for independent multiplicity verification: replacing one of two
+        // distinct residual roots by a duplicate on-curve point must not be accepted.
+        let rational = enumerate_points(inst.f(), &inst.quartic);
+        let mut multiplicity_checked = false;
+        'lines: for i in 0..rational.len() {
+            for j in (i + 1)..rational.len() {
+                let a = make_fb_pt(inst.f(), &inst.quartic, rational[i]);
+                let b = make_fb_pt(inst.f(), &inst.quartic, rational[j]);
+                let Some(roots) = residual_roots(inst.f(), line_coeffs(inst.f(), &a, &b)) else {
+                    continue;
+                };
+                let r0 = normalize_pt(
+                    inst.f(),
+                    &comb(inst.f(), roots[0].0, roots[0].1, &a.c, &b.c),
+                );
+                let r1 = normalize_pt(
+                    inst.f(),
+                    &comb(inst.f(), roots[1].0, roots[1].1, &a.c, &b.c),
+                );
+                let correct = [a.c, b.c, r0, r1];
+                if r0 == r1 || (0..4).any(|u| ((u + 1)..4).any(|v| correct[u] == correct[v])) {
+                    continue;
+                }
+                assert!(verify_line(inst.f(), &inst.quartic, &a.c, &b.c, &correct));
+                let wrong = [a.c, b.c, r0, r0];
+                assert!(!verify_line(inst.f(), &inst.quartic, &a.c, &b.c, &wrong));
+                multiplicity_checked = true;
+                break 'lines;
+            }
+        }
+        assert!(multiplicity_checked, "q=11 toy needs one four-distinct-point line");
+        let out = prospective_full_harvest(&inst, 20261023, 8, None).unwrap();
+        assert_eq!(out.nfb, prospective_factor_base_size(q));
+        assert_eq!(out.pairs, out.nfb as u64 * (out.nfb as u64 - 1) / 2);
+        assert_eq!(out.counters.lines, out.pairs);
+        assert_eq!(out.counters.verify_failed, 0);
+        assert_eq!(out.raw_full + out.raw_fp + out.raw_pp, out.counters.split);
+    }
+
     fn check_instance(k: u32, idx: u32) -> Inst {
         let inst = gen_instance(k, idx);
         assert!(is_prime_u64(inst.ell));
-        assert_eq!(inst.order, inst.h * inst.ell);
+        assert_eq!(inst.order, inst.h as u128 * inst.ell as u128);
         let f = inst.f();
         let pts = enumerate_points(f, &inst.quartic);
         assert_eq!(pts.len() as u64, inst.q + 1);

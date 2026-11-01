@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/lead15.isolab-request.v1.schema.json",
+  "title": "LEAD-15 exact isolab_k8s_run request bytes",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "tool", "source_manifest_sha256", "arguments"],
+  "properties": {
+    "schema": { "const": "lead15.isolab-request/v1" },
+    "tool": { "const": "isolab_k8s_run" },
+    "source_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "arguments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["job_name", "command", "image", "cpu", "memory", "seconds", "retries"],
+      "properties": {
+        "job_name": {
+          "type": "string",
+          "pattern": "^lead15-dt-e5-q(257|2053|32771|4194301)-[0-9a-f]{8,12}$",
+          "maxLength": 55
+        },
+        "command": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "prefixItems": [
+            { "const": "/opt/lead15/lead15-worker" },
+            { "pattern": "^(257|2053|32771|4194301)$" },
+            { "pattern": "^[0-9a-f]{64}$" },
+            { "pattern": "^[0-9a-f]{40}$" },
+            { "pattern": "^[0-9a-f]{64}$" },
+            { "pattern": "^[0-9a-f]{64}$" },
+            { "pattern": "^sha256:[0-9a-f]{64}$" },
+            { "const": "3600" }
+          ],
+          "items": false
+        },
+        "image": {
+          "type": "string",
+          "pattern": "^[^\\s@]+@sha256:[0-9a-f]{64}$"
+        },
+        "cpu": { "const": 4 },
+        "memory": { "const": "16Gi" },
+        "seconds": { "const": 7200 },
+        "retries": { "const": 0 }
+      }
+    }
+  }
+}
