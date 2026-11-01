@@ -41,6 +41,8 @@ mod pdp_split_oracle;
 mod pkm_tower;
 #[path = "ecbench/ps6_charge.rs"]
 mod ps6_charge;
+#[path = "ecbench/ps6_kernel.rs"]
+mod ps6_kernel;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
