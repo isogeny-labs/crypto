@@ -37,3 +37,17 @@ lattice/saturation. NEXT.md retains all original integral level77 factor/
 coupled divisors,arbitrary reverse classes/larger112/991 sources and controls.
 The broad user-authorized goal remains active; all original per-job caps,
 mathematical languages and managed-job ownership rules persist.
+
+## Additional proposed cyclic-character filter (not executed)
+After constructing the complete holomorphic space, bind the actual source
+T-action and F2 descent. On the sigma-fixed space, first verify the retained
+T^5=sigma relation becomes T^5=I. Form N5=I+T+T²+T³+T⁴ and P=I+N5 over F2;
+check N5²=N5,P²=P,N5*P=0 and commutation with the actual Cartier operator.
+Use the P block as a proposed nontrivial cyclic5-character filter, then
+certify its polynomial/Hecke system and intended11-action. Do not assume
+that a cyclic character alone identifies the desired modular factor.
+The full joint Cartier/sigma nonzero AS control does NOT guarantee that
+this primitive block is nonzero; its zero outcome would need a distinct
+interpretation. Freeze these source/operator/controls before future data.
+This is next-round design metadata, not an additional R61 native result or
+one of its six authored Lean claims.
