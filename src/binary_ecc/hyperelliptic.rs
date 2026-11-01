@@ -935,6 +935,266 @@ impl MumfordDivisor {
 
 // ── HCDLP solvers ────────────────────────────────────────────────────
 
+/// High-level Jacobian operations performed by a toy HCDLP solver.
+///
+/// These are native Jacobian group operations, not elliptic-curve
+/// group-addition equivalents. A caller comparing different groups must keep
+/// the missing conversion visible rather than treating one Cantor addition as
+/// one elliptic addition.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HcdlpGroupOps {
+    pub additions: u64,
+    pub doublings: u64,
+    pub scalar_multiplications: u64,
+}
+
+impl HcdlpGroupOps {
+    pub fn operations(self) -> u64 {
+        self.additions.saturating_add(self.doublings)
+    }
+}
+
+/// Replayable outcome of a counted toy HCDLP solve.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct HcdlpSolveOutcome {
+    pub recovered: Option<BigUint>,
+    pub exhausted: bool,
+    pub setup: HcdlpGroupOps,
+    pub search: HcdlpGroupOps,
+    pub verification: HcdlpGroupOps,
+    pub table_inserts: u64,
+    pub table_lookups: u64,
+    pub walk_steps: u64,
+    pub restarts: u64,
+    pub collisions: u64,
+}
+
+fn counted_scalar_mul(
+    point: &MumfordDivisor,
+    scalar: &BigUint,
+    curve: &HyperellipticCurve,
+    ops: &mut HcdlpGroupOps,
+) -> Result<MumfordDivisor, HyperellipticError> {
+    curve.validate()?;
+    point.validate_on_valid_curve(curve)?;
+    ops.scalar_multiplications = ops.scalar_multiplications.saturating_add(1);
+    let mut result = MumfordDivisor::identity(curve.m);
+    for bit in (0..scalar.bits()).rev() {
+        result = result.try_add_on_valid_curve(&result, curve)?;
+        ops.doublings = ops.doublings.saturating_add(1);
+        if scalar.bit(bit) {
+            result = result.try_add_on_valid_curve(point, curve)?;
+            ops.additions = ops.additions.saturating_add(1);
+        }
+    }
+    Ok(result)
+}
+
+/// Counted textbook BSGS on the exact cyclic Jacobian subgroup containing
+/// `p` and `q`.
+///
+/// `bound` is an exclusive scalar bound. The implementation never receives a
+/// planted logarithm and independently verifies a collision in the
+/// destination group before returning it.
+pub fn hcdlp_bsgs_counted(
+    p: &MumfordDivisor,
+    q: &MumfordDivisor,
+    bound: &BigUint,
+    curve: &HyperellipticCurve,
+) -> Result<HcdlpSolveOutcome, HyperellipticError> {
+    use std::collections::HashMap;
+
+    curve.validate()?;
+    p.validate_on_valid_curve(curve)?;
+    q.validate_on_valid_curve(curve)?;
+    let mut out = HcdlpSolveOutcome::default();
+    if bound.is_zero() {
+        out.exhausted = true;
+        return Ok(out);
+    }
+
+    let mut m = bound.sqrt();
+    if &m * &m < *bound {
+        m += BigUint::one();
+    }
+    let mut table: HashMap<(Vec<u8>, Vec<u8>), BigUint> = HashMap::new();
+    let mut acc = MumfordDivisor::identity(curve.m);
+    let mut i = BigUint::zero();
+    while i < m {
+        table.entry(divisor_key(&acc)).or_insert_with(|| i.clone());
+        out.table_inserts = out.table_inserts.saturating_add(1);
+        i += BigUint::one();
+        if i < m {
+            acc = acc.try_add_on_valid_curve(p, curve)?;
+            out.setup.additions = out.setup.additions.saturating_add(1);
+        }
+    }
+
+    let gamma = counted_scalar_mul(p, &m, curve, &mut out.setup)?;
+    let neg_gamma = gamma.try_neg(curve)?;
+    let mut giant = q.clone();
+    let mut j = BigUint::zero();
+    while j < m {
+        out.table_lookups = out.table_lookups.saturating_add(1);
+        if let Some(i_value) = table.get(&divisor_key(&giant)) {
+            let scalar = &j * &m + i_value;
+            if &scalar < bound {
+                let replay = counted_scalar_mul(p, &scalar, curve, &mut out.verification)?;
+                if replay == *q {
+                    out.recovered = Some(scalar);
+                    return Ok(out);
+                }
+            }
+        }
+        j += BigUint::one();
+        if j < m {
+            giant = giant.try_add_on_valid_curve(&neg_gamma, curve)?;
+            out.search.additions = out.search.additions.saturating_add(1);
+        }
+    }
+    out.exhausted = true;
+    Ok(out)
+}
+
+fn hcdlp_splitmix64(state: &mut u64) -> u64 {
+    *state = state.wrapping_add(0x9e37_79b9_7f4a_7c15);
+    let mut z = *state;
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^ (z >> 31)
+}
+
+fn divisor_hash(divisor: &MumfordDivisor) -> u64 {
+    let (u, v) = divisor_key(divisor);
+    let mut hash = 0xcbf2_9ce4_8422_2325u64;
+    for bytes in [u, v] {
+        for byte in bytes {
+            hash ^= u64::from(byte);
+            hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+        }
+        hash ^= 0xff;
+        hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+    hash
+}
+
+/// Counted deterministic three-partition Pollard rho on the cyclic Jacobian
+/// image subgroup.
+///
+/// The seed selects only walk starts and partitions. It is independent of the
+/// unknown scalar. A degenerate collision starts a new deterministic walk
+/// until `max_restarts` is exhausted.
+pub fn hcdlp_pollard_rho_counted(
+    p: &MumfordDivisor,
+    q: &MumfordDivisor,
+    order: &BigUint,
+    curve: &HyperellipticCurve,
+    seed: u64,
+    max_steps: u64,
+    max_restarts: u64,
+) -> Result<HcdlpSolveOutcome, HyperellipticError> {
+    use crate::utils::mod_inverse;
+
+    curve.validate()?;
+    p.validate_on_valid_curve(curve)?;
+    q.validate_on_valid_curve(curve)?;
+    let mut out = HcdlpSolveOutcome::default();
+    if order.is_zero() || max_steps == 0 || max_restarts == 0 {
+        out.exhausted = true;
+        return Ok(out);
+    }
+
+    let step = |d: &MumfordDivisor,
+                a: &BigUint,
+                b: &BigUint,
+                salt: u64,
+                ops: &mut HcdlpGroupOps|
+     -> Result<(MumfordDivisor, BigUint, BigUint), HyperellipticError> {
+        match (divisor_hash(d) ^ salt) % 3 {
+            0 => {
+                ops.additions = ops.additions.saturating_add(1);
+                Ok((
+                    d.try_add_on_valid_curve(p, curve)?,
+                    (a + 1u32) % order,
+                    b.clone(),
+                ))
+            }
+            1 => {
+                ops.doublings = ops.doublings.saturating_add(1);
+                Ok((
+                    d.try_add_on_valid_curve(d, curve)?,
+                    (a * 2u32) % order,
+                    (b * 2u32) % order,
+                ))
+            }
+            _ => {
+                ops.additions = ops.additions.saturating_add(1);
+                Ok((
+                    d.try_add_on_valid_curve(q, curve)?,
+                    a.clone(),
+                    (b + 1u32) % order,
+                ))
+            }
+        }
+    };
+
+    let mut rng = seed;
+    for restart in 0..max_restarts {
+        out.restarts = restart;
+        let a0 = BigUint::from(hcdlp_splitmix64(&mut rng)) % order;
+        let b0 = BigUint::from(hcdlp_splitmix64(&mut rng)) % order;
+        let ap = counted_scalar_mul(p, &a0, curve, &mut out.setup)?;
+        let bq = counted_scalar_mul(q, &b0, curve, &mut out.setup)?;
+        let start = ap.try_add_on_valid_curve(&bq, curve)?;
+        out.setup.additions = out.setup.additions.saturating_add(1);
+        let salt = hcdlp_splitmix64(&mut rng);
+
+        let mut slow = start.clone();
+        let mut slow_a = a0.clone();
+        let mut slow_b = b0.clone();
+        let mut fast = start;
+        let mut fast_a = a0;
+        let mut fast_b = b0;
+        for _ in 0..max_steps {
+            (slow, slow_a, slow_b) = step(&slow, &slow_a, &slow_b, salt, &mut out.search)?;
+            (fast, fast_a, fast_b) = step(&fast, &fast_a, &fast_b, salt, &mut out.search)?;
+            (fast, fast_a, fast_b) = step(&fast, &fast_a, &fast_b, salt, &mut out.search)?;
+            out.walk_steps = out.walk_steps.saturating_add(3);
+            if slow != fast {
+                continue;
+            }
+            out.collisions = out.collisions.saturating_add(1);
+            let numerator = if slow_a >= fast_a {
+                &slow_a - &fast_a
+            } else {
+                order + &slow_a - &fast_a
+            };
+            let denominator = if fast_b >= slow_b {
+                &fast_b - &slow_b
+            } else {
+                order + &fast_b - &slow_b
+            };
+            let Some(inverse) = (!denominator.is_zero())
+                .then(|| mod_inverse(&denominator, order))
+                .flatten()
+            else {
+                break;
+            };
+            let candidate = (numerator * inverse) % order;
+            let replay = counted_scalar_mul(p, &candidate, curve, &mut out.verification)?;
+            if replay == *q {
+                out.recovered = Some(candidate);
+                out.restarts = restart;
+                return Ok(out);
+            }
+            break;
+        }
+    }
+    out.restarts = max_restarts;
+    out.exhausted = true;
+    Ok(out)
+}
+
 /// **Baby-step / Giant-step** for `Q = [k]·P` on `Jac(C)`.  Returns
 /// `Some(k)` with `0 ≤ k < bound` if a solution exists, else `None`.
 ///

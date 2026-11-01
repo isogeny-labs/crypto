@@ -1,0 +1,23 @@
+import Doubling
+open Polynomial WeightedDoubling
+-- Nonunit z=2,w=3, affine (1,1), f=X^5.
+example : let c := output (0:ℚ) 0 0 0 4 96 2 3
+ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ (X^2+C (c.q/c.z^2)*X+C (c.r/c.z^4)) ∣
+ curve 0 0 0 0-(C (c.s/(c.z^3*c.w))*X+C (c.t/(c.z^5*c.w)))^2 := by
+ apply weighted_preserves <;> norm_num [value]
+example : let c := output (0:ℚ) 0 0 0 4 96 2 3
+ c.z=2 ∧ c.w=192 ∧ c.q/c.z^2 = -2 ∧
+ c.s/(c.z^3*c.w)=5/2 ∧ c.t/(c.z^5*c.w)= -3/2 := by norm_num [output]
+-- Derivative zero does not invalidate doubling: f=X^5+1, affine(0,1).
+example : deriv (0:ℚ) 0 0 0 = 0 := by norm_num [deriv]
+example : let c := output (1:ℚ) 0 0 0 0 96 2 3
+ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ (X^2+C (c.q/c.z^2)*X+C (c.r/c.z^4)) ∣
+ curve 1 0 0 0-(C (c.s/(c.z^3*c.w))*X+C (c.t/(c.z^5*c.w)))^2 := by
+ apply weighted_preserves <;> norm_num [value]
+example : Add11Distinct.classify (4*(2:ℚ)^2) (96*(2^5*3)) (4*2^2) (96*(2^5*3)) = .doubling := by
+ apply self_guard <;> norm_num
+example : Add11Distinct.classify (4*(2:ℚ)^2) (0*(2^5*3)) (4*2^2) (0*(2^5*3)) = .inverse := by
+ exact zero_y_inverse 4 2 3
+example : (output (0:ℚ) 0 0 0 4 0 2 3).w=0 := by norm_num [output]

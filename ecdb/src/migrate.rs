@@ -27,6 +27,8 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "views_functions_roles",
         sql: include_str!("../migrations/0008_views_functions_roles.sql"),
     },
+    Migration { version: 9, name: "measurements", sql: include_str!("../migrations/0009_measurements.sql") },
+    Migration { version: 10, name: "volcano_key", sql: include_str!("../migrations/0010_volcano_key.sql") },
 ];
 
 pub fn schema_version() -> i32 {
