@@ -118,7 +118,7 @@ Rules for the token:
 | `ecdb_isogeny_class` | one isogeny class over F_q (any dimension) by label `g.q.a1_..._ag` or id | `GET /v1/isogeny-classes/{label}` |
 | `ecdb_transfers` | transfer routes across all curves, by route kind, verdict, target and minimum ratio | `GET /v1/transfers` |
 | `ecdb_polynomials` | `modular` (Phi_l, l = 2..19), `class` (H_D, class number one) or `summation` (Semaev S_2, S_3) | `GET /v1/*-polynomials` |
-| `ecdb_results` | `leaderboard` (filters `family`, `regime`, `validation`; `recipes=true`), `progress` (`series`), `boundary` (`regime`, `stage`), `benchmarks` (`listed`, `q`) | `GET /v1/ic/*`, `GET /v1/benchmarks` |
+| `ecdb_results` | `leaderboard` (filters `family`, `regime`, `validation`; `recipes=true`), `progress` (`series`), `boundary` (`regime`, `stage`), `benchmarks` (`listed`, `q`), `claims` (IC tool-program claims; `rule_version`, `curve`, `candidate_id`, `validation_status`; `summary=true`), `designs` (factor-base design grids) | `GET /v1/ic/*`, `GET /v1/benchmarks`, `GET /v1/factor-base-designs` |
 | `ecdb_ecbench` | a page of ecbench sessions (filters `method`, `curve`, `label`, `path`); with `session_id`, its per-arm summaries and comparisons | `GET /v1/ecbench/sessions[/{id}]` |
 | `ecdb_factor_bases` | factor bases of the IC work: a page filtered by `curve`, `family`, `scheme`, `min_columns`, `max_columns`, `solved` (sorted by `results`, `best_s`, `columns`, `key`). With `key` (FB1h…, FBS1h…, archive digest, PS1 label, cited digest), the base with its aliases, FBM1 configurations and results by source. Add `results=true` for its results, or `points=true` for its points | `GET /v1/factor-bases[/{key}[/results]]` |
 | `ecdb_sql` | one read-only SELECT over schema `ec` (15 s timeout, 5,000 rows) | `POST /v1/sql` |
@@ -211,6 +211,16 @@ own rules:
   - `best_s_solved` is the minimum over all solved runs of that base: a best
     case, not an arm summary. Compare arms with `v_ecbench_arm` and the §5a
     band.
+- **IC tool-program claims.**
+  - `online_speedup` leaves out the IC reusable set-up. Quote
+    `cold_ratio_ic_over_rho`, which includes it, as the distance remaining
+    to rho.
+  - The claims are single-target wall times on one container: not
+    leaderboard rows, and not validated under the gate.
+- **Design grids.** `factor_base_design` counts tuples, not results.
+  - Its members are specs that were mostly never run: `disposition_counts`
+    says why.
+  - Use `/v1/factor-bases?design=<study>` to list the members.
 - **Sibling measurements.** `measurement` keeps each producer's metric and
   unit:
   - ml-cryptanalysis S of plain and automorphism-class rho, with SEM and
