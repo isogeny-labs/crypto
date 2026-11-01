@@ -45,14 +45,12 @@ trap 'owner_signal TERM 143' TERM
 trap 'owner_signal INT 130' INT
 cp /opt/isolab/build-info.json "$ISOLAB_OUTPUT_DIR/build-info.json"
 sha256sum /usr/local/bin/ecbench > "$ISOLAB_OUTPUT_DIR/binary.sha256"
-# Validate build identity before any warmup or measured execution.
 jq -e --arg source "${2:?expected source revision}" --arg binary "${3:?expected binary hash}" \
   '.source_revision==$source and .ecbench_sha256==$binary' \
   "$ISOLAB_OUTPUT_DIR/build-info.json" >/dev/null || exit 44
 [[ $(cut -d' ' -f1 "$ISOLAB_OUTPUT_DIR/binary.sha256") == "$3" ]] || exit 44
 printf '%s\n' "$1" > "$ISOLAB_OUTPUT_DIR/input-spec.json"
 spec="$ISOLAB_OUTPUT_DIR/input-spec.json"
-# Explicit optional transport; absent arguments preserve the historical command.
 diagnostic_args=()
 if [[ $# != 3 ]]; then
   [[ $# == 9 && "$4" == --diagnostic-launch && "$5" == /opt/isolab/diagnostic-input/fresh-launch.json \
@@ -62,7 +60,6 @@ if [[ $# != 3 ]]; then
   [[ $(wc -c < "$5") -le 65536 ]] || exit 45
   [[ $(sha256sum "$5" | cut -d' ' -f1) == "$7" ]] || exit 45
   [[ $(sha256sum "$spec" | cut -d' ' -f1) == "$9" ]] || exit 45
-  # Copy exact bytes only for custody; pass the immutable kubelet-prepared mount.
   cp -- "$5" "$ISOLAB_OUTPUT_DIR/diagnostic-launch.json"
   sha256sum "$ISOLAB_OUTPUT_DIR/diagnostic-launch.json" > "$ISOLAB_OUTPUT_DIR/diagnostic-launch.sha256"
   diagnostic_args=(--diagnostic-launch "$5")

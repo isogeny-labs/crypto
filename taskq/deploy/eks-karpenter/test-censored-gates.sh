@@ -4,6 +4,9 @@ here=$(cd "$(dirname "$0")" && pwd)
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
+# The MCP carries this as one bounded argv item.
+[[ $(wc -c < "$here/run-ecbench") -le 8192 ]]
+
 # A clean audit may contain valid right-censored outcomes; verified_records is
 # a status count, not an integrity count.
 jq -n '{ok:true,regraded:true,records_bound:true,records:364,verified_records:308,
