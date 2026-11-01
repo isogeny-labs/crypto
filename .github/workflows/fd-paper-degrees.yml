@@ -1,0 +1,95 @@
+name: Fall-degree paper data (EKS high-memory)
+# Runs the frozen protocols FD-BINARY-CLOSURE-EXT and FD-F4-STEP-DEGREE
+# (research/fd_paper_data_request_20261029/protocols/) on the
+# crypto-eks-highmem ARC runner (Karpenter Spot node, 16 CPU, 120 GiB pod),
+# the route dreg-a3-eks-highmem.yml uses for Weil-descent closures.
+#
+#   stage=calibrate   every recorded m=2 instance, closure D=3..4: must
+#                     reproduce lfdclose2's recorded last fall degree
+#   stage=closure-d4  new draws (R n=41..51, P n=37..51) and planted controls
+#   stage=closure-d5  the 8 certified n=33..37 instances, closure at D=5
+#                     (checkpointed; re-dispatch resumes from the results branch)
+#   stage=f4          F4 step degree on the recorded instances and P n=34..48
+#
+# Finished instance records are pushed to RESULTS_BRANCH every SYNC_SECONDS
+# and on SIGTERM, and a re-dispatch restores them first, so a Spot loss costs
+# only the instances in flight (closure-d5 keeps its checkpoint generations).
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: calibrate, closure-d4, closure-d5 or f4
+        type: choice
+        options: [calibrate, closure-d4, closure-d5, f4]
+        default: calibrate
+permissions:
+  contents: write
+concurrency:
+  group: fd-paper-degrees-${{ inputs.stage }}
+  cancel-in-progress: false
+env:
+  RESULTS_BRANCH: results/fd-paper-degrees-20261030
+  D: research/fd_paper_data_request_20261029
+  SYNC_SECONDS: "600"
+jobs:
+  run:
+    if: github.ref == 'refs/heads/main'
+    runs-on: crypto-eks-highmem
+    timeout-minutes: 2880
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - name: Host and toolchain
+        run: |
+          set -euo pipefail
+          printf 'runner=%s commit=%s\n' "$RUNNER_NAME" "$GITHUB_SHA"
+          test "$(uname -m)" = x86_64
+          printf 'memory_bytes=%s nproc=%s\n' "$(cat /sys/fs/cgroup/memory.max)" "$(nproc)"
+          if [ ! -x /usr/bin/time ] || ! command -v pkill >/dev/null; then
+            sudo apt-get update -q && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends time procps
+          fi
+          rustc --version; cargo --version
+      - name: Check the frozen protocols
+        run: |
+          set -euo pipefail
+          for p in fd-binary-closure-ext fd-f4-step-degree; do
+            grep -q '"status": "frozen"' "$D/protocols/$p/protocol.json"
+          done
+          test -s "$D/seeds.tsv"
+      - name: Build fd_m2_degrees (release)
+        run: cargo build --locked --release --example fd_m2_degrees
+      - name: Restore finished records from the results branch
+        run: |
+          set -euo pipefail
+          if git fetch origin "$RESULTS_BRANCH" 2>/dev/null; then
+            git checkout "origin/$RESULTS_BRANCH" -- "$D/runs" 2>/dev/null || true
+            git reset -q
+          fi
+          mkdir -p "$D/runs"
+          echo "eks: ${{ inputs.stage }} run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT} runner ${RUNNER_NAME} commit ${GITHUB_SHA}" >> "$D/runs/queue.log"
+      - name: Run the stage
+        run: |
+          set -euo pipefail
+          sync() { "$D/sync-results.sh" "$RESULTS_BRANCH" "fd-paper ${{ inputs.stage }} ($1) from EKS run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}" || true; }
+          sid="$RUNNER_TEMP/fd.sid"
+          setsid -w bash -c 'echo $$ > "$0"; exec "$@"' "$sid" \
+            "$D/run.sh" target/release/examples/fd_m2_degrees "${{ inputs.stage }}" &
+          m=$!
+          trap 'pkill -TERM -s "$(cat "$sid")" || true; wait "$m" || true; sync stopped; exit 143' TERM INT
+          while kill -0 "$m" 2>/dev/null; do
+            sleep "$SYNC_SECONDS" & wait $! || true
+            sync periodic
+          done
+          wait "$m"
+      - name: Push records to the results branch
+        if: always()
+        run: '"$D/sync-results.sh" "$RESULTS_BRANCH" "fd-paper ${{ inputs.stage }} (final) from EKS run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}"'
+      - name: Upload records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fd-paper-${{ inputs.stage }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.D }}/runs/
+          retention-days: 90
+          if-no-files-found: warn
