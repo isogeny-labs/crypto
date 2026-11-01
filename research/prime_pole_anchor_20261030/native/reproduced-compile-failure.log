@@ -1,0 +1,8 @@
+research/prime_pole_anchor_20261030/native/check.cpp: In function ‘unsigned int mul(unsigned int, unsigned int, unsigned int)’:
+research/prime_pole_anchor_20261030/native/check.cpp:15:65: error: ‘uint64_t’ was not declared in this scope
+   15 | unsigned mul(unsigned a,unsigned b,unsigned m){return unsigned((uint64_t(a)*b)%m);}
+      |                                                                 ^~~~~~~~
+research/prime_pole_anchor_20261030/native/check.cpp:5:1: note: ‘uint64_t’ is defined in header ‘<cstdint>’; this is probably fixable by adding ‘#include <cstdint>’
+    4 | #include <vector>
+  +++ |+#include <cstdint>
+    5 | using Q=mpq_class;
