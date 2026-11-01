@@ -72,11 +72,14 @@ The native tool in [`native`](native/) emits:
 - strict canonical JSON (`prime-shared-coefficient.ir/v1`);
 - msolve prime-field polynomial input;
 - cvc5 `QF_FF` input;
+- ordinary CNF and CNF-XOR from one deterministic functional Boolean circuit;
 - the exhaustive E0 F17 census.
 
-CNF and CNF-XOR lowering are intentionally not improvised here. They are an E1
-gate: their projected model sets and checked UNSAT proofs must agree with the
-canonical evaluator before any performance row is admissible.
+The Boolean lowering and a fail-closed external-solver runner are implemented
+and frozen in [E1_PROTOCOL.md](E1_PROTOCOL.md). The fixed study panel has not
+yet run. Its CaDiCaL/CNF and CryptoMiniSat/CNF-XOR projected model sets and
+checked UNSAT proofs must agree with the exact oracle before any performance
+row is admissible; msolve and cvc5 remain separate open E1 arms.
 
 ## Experiments
 
@@ -86,7 +89,7 @@ status is in [experiment-matrix.json](experiment-matrix.json).
 | Stage | Question | Current status | Decisive output |
 |---|---|---|---|
 | E0 | Is the canonical predicate internally and independently correct on tiny complete domains? | complete | exact set equality, legacy conformance, mutation rejection |
-| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | next | exhaustive backend equivalence and checked UNSAT certificates |
+| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT subgate frozen, not run; msolve/cvc5 open | exhaustive backend equivalence and checked UNSAT certificates |
 | E2 | Are the detector, limits and planned sample powered on disjoint scratch instances? | blocked | frozen binaries, limits, seed list and power receipt |
 | E3 | Does a SAT bundle have lower complete-work growth than enumeration and F4? | draft | held-out four-rung tournament with A/A, planted and matched-null controls |
 | E4 | Does an advancing bundle improve a complete relation-collection pipeline? | conditional | verified relations, matrix rank/log replay and end-to-end cost |
@@ -149,6 +152,8 @@ cargo run --release --locked -- e0-panel
 cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 json
 cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 msolve
 cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 qf-ff
+cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 cnf
+cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 cnf-xor
 ```
 
 See [VALIDATION.md](VALIDATION.md) for the exact checks and environment

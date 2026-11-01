@@ -37,7 +37,7 @@
     {
       "id": "E1",
       "title": "backend representation equivalence",
-      "status": "next",
+      "status": "sat_subgate_frozen_unrun_msolve_cvc5_open",
       "affected_performance_data": false,
       "arms": [
         "canonical evaluator",
@@ -50,11 +50,9 @@
       "pass": "all enumerable projected model sets equal; every model replays; every accepted UNSAT certificate verifies; mutations fail",
       "fail": "block benchmarking and report backend/target mismatch",
       "open_obligations": [
-        "CNF lowering",
-        "CNF-XOR lowering",
-        "model projection",
-        "proof production and independent checking",
-        "pinned solver hashes"
+        "execute frozen CaDiCaL/CNF and CryptoMiniSat/CNF-XOR panel",
+        "msolve projected-model equivalence",
+        "cvc5 QF_FF projected-model equivalence"
       ]
     },
     {

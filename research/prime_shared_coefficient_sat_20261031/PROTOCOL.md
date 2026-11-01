@@ -1,8 +1,10 @@
 # Staged protocol: shared-coefficient SAT/F4 discriminator
 
-Status: **E0 complete; E1--E5 draft and unfrozen**. This document was written
-before any affected SAT, XOR, QF_FF or F4 output. The E0 toy correctness result
-was already visible and is not used as performance evidence.
+Status: **E0 complete; the E1 SAT subgate is frozen but unrun; E1 msolve/cvc5
+and E2--E5 remain draft**. This document was written before any affected SAT,
+XOR, QF_FF or F4 study output. The E0 toy correctness result was already
+visible and is not used as performance evidence. The exact SAT subgate freeze
+is [E1_PROTOCOL.md](E1_PROTOCOL.md).
 
 ## Question and scope
 
@@ -59,10 +61,15 @@ round trip, deterministic exporter tests.
 Fixed result: 18 targets, 6 SAT, 12 UNSAT, 6 models in each implementation,
 18 exact set matches. No timing was collected. See `results/e0-panel.json`.
 
-## Stage E1: representation-equivalence gate (next)
+## Stage E1: representation-equivalence gate (SAT subgate frozen, unrun)
 
 Implement parsimonious finite-field arithmetic lowerings from the canonical IR
 to CNF and CNF-XOR. Do not benchmark until this gate passes.
+
+The shared functional circuit, strict exporters, projected-model runner and
+proof-mutation controls are now implemented. The CaDiCaL/CNF and
+CryptoMiniSat/CNF-XOR panel is frozen separately; msolve and cvc5 remain open,
+so a SAT-subgate pass will not by itself complete E1.
 
 Fixed tiny panel:
 
