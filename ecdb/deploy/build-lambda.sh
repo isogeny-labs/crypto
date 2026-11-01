@@ -5,6 +5,12 @@
 #
 #   ecdb/deploy/build-lambda.sh [out.zip]       (from anywhere in the checkout)
 #
+# Also packs the directory-tree inputs (`ecdb pack`): benchmarks/ and the
+# sibling checkouts' files (../cryptanalysis, ../crypto-autoresearcher,
+# ../cryptanalysis-rl, ../ml-cryptanalysis) go into the zip; the ecbench
+# sessions (about 70 MB gzipped, over Lambda's direct-upload limit) go to
+# <out>.ecbench/ as ~2 MB parts that deploy-aws.sh sends one per invocation.
+#
 # Needs: rustup target x86_64-unknown-linux-musl, musl-gcc (musl-tools), zip or python3.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -21,7 +27,7 @@ install -m 0755 "$here/bootstrap" "$pkg/bootstrap"
 curl -fsS -o "$pkg/rds-ca.pem" https://truststore.pki.rds.amazonaws.com/us-west-2/us-west-2-bundle.pem
 git -C "$repo" rev-parse HEAD > "$pkg/SOURCE_COMMIT"
 
-# The inputs `ecdb import all` reads (src/import/*.rs); read_json takes <file>.gz.
+# The inputs `ecdb import all` reads (src/import/*.rs); read_bytes takes <file>.gz.
 inputs=(
   docs/curves/registry.json docs/curves/traits.json docs/curves/covers.json
   docs/curves/jacobian-transfers.json docs/curves/level-certificates.json docs/curves/jacobian-certificates.json
@@ -31,11 +37,19 @@ inputs=(
   research/prime61_isogeny_20261016/one-hop-l13/isogeny_routes.json
   research/prime61_isogeny_20261016/one-hop-l61/isogeny_routes.json
   docs/ic/fixtures/current_head_prime_route_20261024/isogeny_routes.json
+  src/cryptanalysis/curve_traits/modular_polynomials.txt
+  docs/ic/leaderboard.json docs/ic/progress-timeline.json docs/ic/boundary_targets.json
 )
 for f in "${inputs[@]}"; do
   mkdir -p "$pkg/data/$(dirname "$f")"
   gzip -9 -n -c "$repo/$f" > "$pkg/data/$f.gz"
 done
+
+"$pkg/ecdb" pack --repo-root "$repo" --out "$pkg/data" > "$pkg/pack-report.json"
+parts="${out%.zip}.ecbench"
+rm -rf "$parts"; mkdir -p "$parts"
+mv "$pkg"/data/ecdb-pack/ecbench-*.jsonl.gz "$parts"/
+echo "ecbench parts: $(ls "$parts" | wc -l) in $parts"
 
 mkdir -p "$(dirname "$out")"
 rm -f "$out"

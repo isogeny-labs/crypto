@@ -1781,6 +1781,74 @@ fn pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len() {
     assert!(ok, "replay: {err}");
 }
 
+#[test]
+fn pkm_tower_runs_every_engine_on_a_prime_curve() {
+    // The prime-field PKM tower plug-in on a prime-order curve with
+    // 2^5 | p − 1 (p = 257): every engine verifies; signature F5 decides
+    // every node as F4 does, so the two walk one tree; F6 closes nodes
+    // with group additions; `enum` uses no solver at all.
+    let dir = scratch("pkm-tower");
+    let arm = |name: &str, engine: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "prime-tower:t=5,seed=1",
+              "oracle": "pkm-tower:m=2,t=5,seed=1,engine={engine},degree=20,cap=4"}}}}}}"#
+        )
+    };
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pkm-tower test",
+      "workloads": {{"curves": [{{"kind": "prime_search", "bits": 9, "seed": 17}}],
+                    "targets_per_curve": 1, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 300}}
+    }}"#,
+        arm("f4", "f4"),
+        arm("f5", "sig-f5"),
+        arm("f6", "f6"),
+        arm("enum", "enum"),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut by_arm: std::collections::BTreeMap<String, Value> = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        by_arm.insert(r["arm"].as_str().unwrap().to_string(), r);
+    }
+    assert_eq!(by_arm.len(), 4);
+    let extra = |a: &str, k: &str| by_arm[a]["solver"]["extra"][k].as_u64().unwrap();
+    for k in ["nodes", "refuted", "leaves"] {
+        assert_eq!(
+            extra("f4", k),
+            extra("f5", k),
+            "F4 and signature F5 diverged at {k}"
+        );
+    }
+    for key in ["targets_tried", "relations_found"] {
+        assert_eq!(by_arm["f4"]["counters"][key], by_arm["f5"]["counters"][key]);
+    }
+    assert!(by_arm["f4"]["solver"]["ops"].as_u64().unwrap() > 0);
+    assert!(
+        extra("f6", "geometric_group_additions") > 0,
+        "F6 charged no geometry"
+    );
+    assert_eq!(extra("f4", "geometric_group_additions"), 0);
+    assert_eq!(by_arm["enum"]["solver"]["ops"].as_u64(), Some(0));
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay: {err}");
+}
+
 const BOUNDS_SPEC: &str = r#"{
   "schema": "ecbench.spec/v1",
   "label": "bounds integration test: four sizes",

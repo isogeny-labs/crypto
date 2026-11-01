@@ -1,0 +1,9 @@
+# Minimal integration delta for review
+
+Do not modify sealed supervisor v3 yet. After gate review/build bindings exist:
+
+1. Add gate_source_sha256, gate_binary_path, gate_binary_sha256 and gate_review_sha256 to admission bindings. Verify file bytes, regular-file/no-symlink identity and0755 mode; directory ancestors must be traversable. Q0 checks include this fixture identity, never running the gate.
+2. Keep stopped Q0 entrypoint unchanged. For active Q1/Q2/Q3, create with entrypoint /qualification/exec-gate, args exactly [case, generated ownership nonce], and one additional read-only bind of the qualified static gate. Require source/target noalias paths and exact read-only inventory; gate is not in the image/published artifacts. Gate path is executable, unlike noexec tmpfs.
+3. Parse exactly the first stdout line as gate receipt and verify all fixed fields and ownership nonce. Preserve that receipt independently. Feed only the remaining stdout to the existing exact Q1 report comparison. Negative Q2/Q3 still require their original payload exit2/125 and error text, plus the valid gate receipt; gate failure126/127 is qualification failure.
+4. Remove opportunistic after-start PID sampling as the mechanism for satisfying this amended requirement. Record both actual pre-exec gate observation and requested Docker settings. Set a new field effective_before_tested_exec_observed=true only after all three receipts and intended payload exits validate. Keep effective_before_container_start_proved=false permanently. Complete software qualification only under the explicitly amended boundary and all other checks; never translate it into scientific admission.
+5. Retain source hash, gate binary/ELF receipt, mounted fixture hash before/after, exact invocation and all cleanup receipts. The unchanged one-container/300second/20second caps apply. No controller/IAM/runtime image or campaign change.

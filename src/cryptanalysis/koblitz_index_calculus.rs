@@ -9252,8 +9252,17 @@ pub fn sat_decompose_chained_s3_any_m(
         target,
         m,
         limits,
-        frobenius_orbits,
-        order_first_pair,
+        ChainS3Options {
+            frobenius_orbits,
+            order: if order_first_pair {
+                ChainS3Order::FirstPair
+            } else {
+                ChainS3Order::Unordered
+            },
+            patterns: ChainS3Patterns::All,
+            tables: ChainS3Tables::default(),
+            wall_budget: None,
+        },
     )
 }
 
@@ -9281,8 +9290,208 @@ fn sat_decompose_chained_s3_with_domain(
         target,
         m,
         limits,
+        ChainS3Options {
+            frobenius_orbits,
+            order: if order_first_pair {
+                ChainS3Order::FirstPair
+            } else {
+                ChainS3Order::Unordered
+            },
+            patterns: ChainS3Patterns::All,
+            tables: ChainS3Tables::default(),
+            wall_budget: None,
+        },
+    )
+}
+
+/// Which summand permutations a chained-S3 search keeps.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ChainS3Order {
+    /// Every ordered tuple: the `m!` reorderings of one decomposition are
+    /// all searched.
+    Unordered,
+    /// `x_1 <= x_2` only ([`ChainedS3Encoding::order_first_pair`]).
+    FirstPair,
+    /// `x_1 <= ... <= x_m` ([`ChainedS3Encoding::order_all_summands`]).
+    /// Every identity pattern is still searched, so a refutation keeps its
+    /// meaning: no decomposition in any order.
+    AllSummands,
+}
+
+/// Which intermediate-identity patterns a chained-S3 search covers.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ChainS3Patterns {
+    /// All `2^(m-2)` patterns: a refutation means no decomposition at all.
+    All,
+    /// Only the pattern whose partial sums are all affine. A partial sum is
+    /// the identity exactly when the summands contain a zero-sum
+    /// sub-multiset, so this is complete for decompositions with no
+    /// zero-sum sub-multiset, and a refutation means only that none of
+    /// those exists. The others split into a shorter decomposition plus a
+    /// target-free relation among base points.
+    AffineOnly,
+}
+
+/// [`sat_decompose_chained_s3_any_m`] with the summand-order arm chosen
+/// explicitly, for `m` in `2..=9`, over every identity pattern.
+pub fn sat_decompose_chained_s3_ordered(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    frobenius_orbits: bool,
+    order: ChainS3Order,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_patterns(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
         frobenius_orbits,
-        order_first_pair,
+        order,
+        ChainS3Patterns::All,
+    )
+}
+
+/// Root-finder tables a chained-S3 search hands the SAT solver as exact
+/// domains of its intermediate x-coordinates (`0` disables a side).
+///
+/// `y_k`, the x-coordinate of the partial sum after summand `k + 1`, is the
+/// x-coordinate of a signed sum of `k + 1` base points; it is also that of
+/// `R` minus a signed sum of the remaining `m - k - 1`. `front` constrains
+/// every `y_k` with `k + 1 <= front` by the first set and `back` every `y_k`
+/// with `m - k - 1 <= back` by the second; a step reached by both gets their
+/// intersection. Both sets contain every value a decomposition can produce
+/// (the base is closed under negation, and the chain may take either sign
+/// at each link), so no decomposition in any order or pattern is lost. A
+/// table larger than `max_points` leaves its step unconstrained.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ChainS3Tables {
+    pub front: usize,
+    pub back: usize,
+    pub max_points: usize,
+}
+
+/// Everything a chained-S3 search can vary besides its limits.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ChainS3Options {
+    pub frobenius_orbits: bool,
+    pub order: ChainS3Order,
+    pub patterns: ChainS3Patterns,
+    pub tables: ChainS3Tables,
+    /// Wall-clock cap on the whole query (tables and every pattern's
+    /// solve); reaching it leaves the query undecided, never refuted.
+    pub wall_budget: Option<std::time::Duration>,
+}
+
+/// The chained-S3 decomposer for `m` in `2..=9` with every option explicit.
+pub fn sat_decompose_chained_s3_with(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    options: ChainS3Options,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    if !(2..=9).contains(&m) {
+        return (
+            None,
+            ChainS3Stats {
+                exhausted: true,
+                ..ChainS3Stats::default()
+            },
+        );
+    }
+    sat_decompose_chained_s3_checked(kc, fb, target, m, limits, options)
+}
+
+/// Every distinct point that is a sum of `k >= 1` points of `points`
+/// (repetition allowed), or `None` once a layer exceeds `cap`.
+fn chain_s3_sum_layer(
+    kc: &KoblitzCurve,
+    points: &[BinaryPoint],
+    k: usize,
+    cap: usize,
+) -> Option<Vec<BinaryPoint>> {
+    let mut seen: HashSet<(BigUint, BigUint)> = HashSet::new();
+    let mut layer: Vec<BinaryPoint> = Vec::new();
+    for p in points {
+        if seen.insert(point_key(p)) {
+            layer.push(p.clone());
+        }
+    }
+    if layer.len() > cap {
+        return None;
+    }
+    for _ in 1..k {
+        let mut next_seen: HashSet<(BigUint, BigUint)> = HashSet::new();
+        let mut next = Vec::new();
+        for a in &layer {
+            for p in points {
+                let q = kc.add(a, p);
+                if next_seen.insert(point_key(&q)) {
+                    next.push(q);
+                    if next.len() > cap {
+                        return None;
+                    }
+                }
+            }
+        }
+        layer = next;
+    }
+    Some(layer)
+}
+
+/// The x-codes of the affine points of a layer, sorted and distinct.
+fn chain_s3_codes<'a>(points: impl Iterator<Item = &'a BinaryPoint>) -> Vec<BigUint> {
+    let mut codes: Vec<BigUint> = points
+        .filter_map(|p| match p {
+            BinaryPoint::Affine { x, .. } => Some(x.to_biguint()),
+            BinaryPoint::Infinity => None,
+        })
+        .collect();
+    codes.sort_unstable();
+    codes.dedup();
+    codes
+}
+
+/// [`sat_decompose_chained_s3_ordered`] with the pattern coverage chosen
+/// explicitly; see [`ChainS3Patterns`] for what a refutation then means.
+#[allow(clippy::too_many_arguments)]
+pub fn sat_decompose_chained_s3_patterns(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    frobenius_orbits: bool,
+    order: ChainS3Order,
+    patterns: ChainS3Patterns,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    if !(2..=9).contains(&m) {
+        return (
+            None,
+            ChainS3Stats {
+                exhausted: true,
+                ..ChainS3Stats::default()
+            },
+        );
+    }
+    sat_decompose_chained_s3_checked(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        ChainS3Options {
+            frobenius_orbits,
+            order,
+            patterns,
+            tables: ChainS3Tables::default(),
+            wall_budget: None,
+        },
     )
 }
 
@@ -9292,9 +9501,16 @@ fn sat_decompose_chained_s3_checked(
     target: &BinaryPoint,
     m: usize,
     limits: ChainS3Limits,
-    frobenius_orbits: bool,
-    order_first_pair: bool,
+    options: ChainS3Options,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
+    let ChainS3Options {
+        frobenius_orbits,
+        order,
+        patterns,
+        tables,
+        wall_budget,
+    } = options;
+    let deadline = wall_budget.map(|budget| std::time::Instant::now() + budget);
     use crate::cryptanalysis::binary_semaev_chain_sat::{
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
     };
@@ -9380,7 +9596,48 @@ fn sat_decompose_chained_s3_checked(
         BinaryPoint::Affine { x, .. } => Some(x),
         BinaryPoint::Infinity => None,
     };
-    for identity_mask in 0..(1u32 << (m - 2)) {
+    // Root-finder tables for the intermediate x-coordinates, built once per
+    // query: front sets depend only on the base, back sets on the target.
+    let mut intermediate_codes: Vec<Option<Vec<BigUint>>> = vec![None; m.saturating_sub(1)];
+    if (tables.front > 0 || tables.back > 0) && m >= 3 {
+        let mut signed: Vec<BinaryPoint> = Vec::with_capacity(2 * fb.points.len());
+        for p in &fb.points {
+            signed.push(p.clone());
+            signed.push(point_neg(p));
+        }
+        for (step, slot) in intermediate_codes.iter_mut().enumerate().skip(1) {
+            let mut codes: Option<Vec<BigUint>> = None;
+            if step < tables.front {
+                if let Some(layer) = chain_s3_sum_layer(kc, &signed, step + 1, tables.max_points) {
+                    codes = Some(chain_s3_codes(layer.iter()));
+                }
+            }
+            let j = m - step - 1;
+            if j <= tables.back {
+                if let (Some(layer), BinaryPoint::Affine { .. }) = (
+                    chain_s3_sum_layer(kc, &signed, j, tables.max_points),
+                    target,
+                ) {
+                    let shifted: Vec<BinaryPoint> =
+                        layer.iter().map(|s| kc.add(target, s)).collect();
+                    let back = chain_s3_codes(shifted.iter());
+                    codes = Some(match codes {
+                        Some(front) => front
+                            .into_iter()
+                            .filter(|c| back.binary_search(c).is_ok())
+                            .collect(),
+                        None => back,
+                    });
+                }
+            }
+            *slot = codes;
+        }
+    }
+    let masks = match patterns {
+        ChainS3Patterns::All => 1u32 << (m - 2),
+        ChainS3Patterns::AffineOnly => 1,
+    };
+    for identity_mask in 0..masks {
         if stats.conflicts >= limits.conflict_budget {
             stats.exhausted = true;
             return (None, stats);
@@ -9417,9 +9674,27 @@ fn sat_decompose_chained_s3_checked(
             stats.exhausted = true;
             return (None, stats);
         }
-        if order_first_pair && enc.order_first_pair(limits.max_variables).is_err() {
+        let ordered = match order {
+            ChainS3Order::Unordered => Ok(()),
+            ChainS3Order::FirstPair => enc.order_first_pair(limits.max_variables),
+            ChainS3Order::AllSummands => enc.order_all_summands(limits.max_variables),
+        };
+        if ordered.is_err() {
             stats.exhausted = true;
             return (None, stats);
+        }
+        for (step, codes) in intermediate_codes.iter().enumerate().skip(1) {
+            let Some(codes) = codes else { continue };
+            if (identity_mask & (1 << (step - 1))) != 0 {
+                continue;
+            }
+            if enc
+                .constrain_intermediate(step, codes, limits.max_domain_clauses)
+                .is_err()
+            {
+                stats.exhausted = true;
+                return (None, stats);
+            }
         }
         stats.patterns_attempted += 1;
         stats.peak_variables = stats.peak_variables.max(enc.solver.n_vars());
@@ -9427,6 +9702,11 @@ fn sat_decompose_chained_s3_checked(
         stats.peak_xors = stats.peak_xors.max(enc.solver.n_xors());
         let earlier_conflicts = stats.conflicts;
         enc.solver.conflict_budget = limits.conflict_budget - earlier_conflicts;
+        enc.solver.deadline = deadline;
+        if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+            stats.exhausted = true;
+            return (None, stats);
+        }
         loop {
             stats.solver_calls += 1;
             let outcome = enc.solver.solve();
@@ -22934,5 +23214,79 @@ mod wide_field_structure_tests {
             SatDecompositionOptions::default(),
         );
         assert!(points.is_none() && !stats.refuted);
+    }
+}
+
+#[cfg(test)]
+mod chain_s3_tables_tests {
+    use super::*;
+
+    fn union_base(kc: &KoblitzCurve) -> FrobeniusFactorBase {
+        let basis: Vec<F2mElement> = (0..2)
+            .map(|i| F2mElement::from_bit_positions(&[i], kc.n))
+            .collect();
+        build_frobenius_union_factor_base(kc, &basis).expect("union base")
+    }
+
+    fn options(tables: ChainS3Tables) -> ChainS3Options {
+        ChainS3Options {
+            frobenius_orbits: false,
+            order: ChainS3Order::AllSummands,
+            patterns: ChainS3Patterns::All,
+            tables,
+            wall_budget: None,
+        }
+    }
+
+    const LIMITS: ChainS3Limits = ChainS3Limits {
+        max_variables: 4_000_000,
+        max_domain_clauses: 50_000_000,
+        max_models: 64,
+        conflict_budget: 400_000,
+    };
+
+    /// The tables are exact domains: a planted three-summand target keeps a
+    /// group-verified witness with full ordering and both table sides on.
+    #[test]
+    fn n83_tables_keep_a_planted_three_summand_witness() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let picks = [3usize, 40, 97];
+        let target = picks
+            .iter()
+            .fold(BinaryPoint::Infinity, |acc, &i| kc.add(&acc, &fb.points[i]));
+        let tables = ChainS3Tables {
+            front: 2,
+            back: 1,
+            max_points: 300_000,
+        };
+        let (found, stats) =
+            sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
+        let found = found.unwrap_or_else(|| panic!("planted witness lost: {stats:?}"));
+        let sum = found
+            .iter()
+            .fold(BinaryPoint::Infinity, |acc, &i| kc.add(&acc, &fb.points[i]));
+        assert_eq!(sum, target);
+    }
+
+    /// A step whose front and back tables do not meet is refuted at the root,
+    /// and a refutation is reported only after every identity pattern.
+    #[test]
+    fn n83_disjoint_tables_refute_without_search() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let target = kc.mul(kc.generator(), &BigUint::from(0x5eed_83u64));
+        let tables = ChainS3Tables {
+            front: 2,
+            back: 1,
+            max_points: 300_000,
+        };
+        let (found, stats) =
+            sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
+        assert!(
+            found.is_none() && stats.refuted && !stats.exhausted,
+            "{stats:?}"
+        );
+        assert_eq!(stats.patterns_attempted, 2);
     }
 }

@@ -1,0 +1,10 @@
+PencilWordRefinement.word_classifier_decode (p s₁ t₁ s₂ t₂ : UInt64) [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat)
+  (hbound : p.toNat < 2 ^ 31) (hs₁ : s₁.toNat < p.toNat) (ht₁ : t₁.toNat < p.toNat) (hs₂ : s₂.toNat < p.toNat)
+  (ht₂ : t₂.toNat < p.toNat) :
+  PencilWordRefinement.classifyWord p s₁ t₁ s₂ t₂ =
+    ProjectiveLawRuntime.classifySameU22 ↑s₁.toNat ↑t₁.toNat ↑s₂.toNat ↑t₂.toNat
+'PencilWordRefinement.classifier_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.wordNeg_value' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.wordSub_value' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.word_classifier_to_nat' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.word_classifier_decode' depends on axioms: [propext, Classical.choice, Quot.sound]

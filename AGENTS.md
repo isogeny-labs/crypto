@@ -14,6 +14,13 @@ every finished piece of work, after every decision, and whenever we switch
 tasks. Preserve previous entries. Record concrete facts from commands and
 logs; distinguish verified results from plans or assumptions.
 
+Keep the log current *always*, not only at handoff: it is the session's working
+memory. Before choosing the next step in any task, read the newest entries in
+today's log (and the previous day's when the session spans a date change) and
+let them decide the next action; if work already done is missing from the log,
+write that entry before doing anything else. Never start a new measurement,
+experiment or code change without the previous one recorded and reviewed.
+
 Every entry has four headings:
 
 - What was done (commands, files, features)
@@ -218,6 +225,9 @@ protocol calls for that comparison. Per-oracle classification:
   leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
   result that lands here updates the lead it advances in the same PR or the
   next atlas review (skill `lead-atlas` there).
+- **Curve facts, by query instead of by file scan:** the curve database
+  ecdb (MCP server `ecdb` in `.mcp.json`, or HTTP). See "Querying the curve
+  database (ecdb)" below and [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md).
 - Boundary ledger (machine): `docs/ic/boundary_targets.json`
 - Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
 - Autolab runner: `research/sat_factor_base_review_20260908/autolab/`
@@ -460,6 +470,9 @@ resume the effort are checked into S3**, and kept current while it runs.
 
 A checkpoint is a safety net, not the record: the spec, protocol and results
 still land in a PR under the rules above.
+Switching runtimes when a budget runs out (Claude Code ↔ Codex):
+[docs/runtime-relay.md](docs/runtime-relay.md); on a pending `.resume/HANDOFF.md`, run
+`python3 scripts/relay.py accept` first.
 
 ## Research searches must leave visual reports
 
@@ -1774,6 +1787,72 @@ it emits these records and kernel-certified `IW1` routes, and `isogeny_walk
 verify` replays them.
 The user guide, including S3 storage, is
 [docs/isogeny-walk/README.md](docs/isogeny-walk/README.md).
+
+## Querying the curve database (ecdb)
+
+ecdb is a Postgres catalogue on RDS (us-west-2). It holds:
+
+- every curve in the registry, the walk outputs and the trait catalogue,
+  with their Jacobians, isogenies, covers, transfer prices and computed
+  polynomials;
+- this repository's measured results: the IC leaderboard and its recipes,
+  the progress timeline, the boundary ledger, the `benchmarks/` index, and
+  every ecbench session with its runs;
+- the curve records and measured datasets of cryptanalysis,
+  crypto-autoresearcher, cryptanalysis-rl and ml-cryptanalysis.
+
+Agents reach it through the MCP server `ecdb` in `.mcp.json`, over HTTP, or
+with `scripts/ecdb.sh`. The guide is [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md);
+read it before the first query.
+
+- **Look up before computing.** Query ecdb before writing code or scanning
+  `docs/curves/*.json` for a curve fact. This covers trace, order, cofactor,
+  CM discriminant, End(E), embedding degree, twist, l-torsion, volcano level,
+  isogeny neighbours, covers, transfer price, division or modular
+  polynomials, and GLV data. Resolve curve names there too; on an ambiguous
+  name (409), choose a candidate explicitly.
+- **Token.** Export it before the runtime starts:
+
+  ```sh
+  export ECDB_TOKEN=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id ecdb/api --query SecretString --output text | jq -r .read_token)
+  ```
+
+  Never print, commit or log it. Without AWS access to `ecdb/api`, say so and
+  fall back to the repository files.
+- **Cite the source, not the query.** ecdb is imported from this
+  repository's files at the commit `GET /v1/meta` names. A PR, report or
+  leaderboard row cites the repository file, certificate or run, not an ecdb
+  query.
+- **Keep statuses.** Report every value with its `fact_status`. Unknown is
+  `null`, never 0. `probable` is not `proved`.
+- **Transfer prices are leads.** `dlp_transfer.ratio_log2` is a formula
+  estimate. It is not a measured speedup, and it never enters the IC
+  leaderboard or `benchmarks/` (§5a and "The rule: boundary, table, ratio").
+- **Measured rows are copies.** Leaderboard, progress, boundary, benchmark,
+  ecbench and sibling-dataset rows are the producers' frozen records with
+  their units:
+  - compare a ratio only within its leaderboard family, ecbench session or
+    dataset;
+  - rank arms only across the §5a band;
+  - keep `unvalidated (pre-gate)` rows out of any claim.
+
+  Querying them is not a measurement. A new result still goes through its
+  run, the validation gate and the generators of the files ecdb copies.
+- **Relations are not routes.** A twist, isomorphism or model-change row
+  does not transport a logarithm. Only a kernel-certified `isogeny` row does
+  (the typed curve-link rules above).
+- **Writes are claims.** `ecdb_record_evidence` and `POST /v1/isogenies`
+  need the write token. They record what a run or certificate in a PR
+  supports, with its artifact hash and true status. Correct imported data in
+  the source file, then redeploy (`ecdb/deploy/README.md`). Never patch rows.
+- **Keep it current.** A PR that changes a file ecdb imports says so in its
+  body. That covers the registry, `traits.json`, `covers.json`,
+  `jacobian-transfers.json`, the certificates, the imported walk outputs,
+  `docs/ic/leaderboard.json`, `progress-timeline.json`,
+  `boundary_targets.json`, `benchmarks/` and ecbench sessions.
+  `scripts/ecdb.sh check` lists the files that differ from ecdb's copy. After
+  merge, redeploy with `ecdb/deploy/build-lambda.sh` and
+  `ecdb/deploy/deploy-aws.sh`.
 
 ## IC measurement rules
 
