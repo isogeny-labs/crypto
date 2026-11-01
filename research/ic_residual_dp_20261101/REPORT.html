@@ -2,7 +2,7 @@
 <style>body{font:13px/1.45 Helvetica,Arial,sans-serif;max-width:900px;margin:24px auto;color:#111}h1{font-size:20px}h2{font-size:15px;margin-top:22px}
 table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #ccc;padding:3px 8px;text-align:right}td:first-child,td:nth-child(2),th:first-child,th:nth-child(2){text-align:left}
 .ok{background:#e6f4ea}.no{background:#fdecea}code{background:#f3f3f3;padding:0 3px}</style>
-<h1>Residual collector: one addition per step, and distinguished points</h1>
+<h1>Residual collector: one addition per step, and distinguished points</h1><div style="background:#fff4d6;border:1px solid #e0b84a;padding:8px;margin:10px 0"><b>SUPERSEDED (w &gt; 0 figures).</b> The per-step distinguished-point test of <code>residual-fused-dp</code> was not in the priced counters when this study ran, so the w = 0.1 and w = 1 results and the distances to rho below understate priced work. The w = 0 figures are unaffected. Corrected, priced rerun: <code>research/ic_residual_dp_eq_20261101</code>.</div>
 <p><b>What was implemented.</b> Two target modes in <code>src/cryptanalysis/ic_framework/residual.rs</code>, both leaving the baseline path (<code>targets=residual</code>) unchanged:
 <code>residual-fused</code> takes one group addition per walk step from a precomputed table of <i>J<sub>j</sub> − P<sub>i</sub></i> (16·|F| setup additions, counted);
 <code>residual-fused-dp</code> adds distinguished points: one DP test per step (counted native op, the analogue of rho's per-step canonicalisation), and only residuals in a 2<sup>−b</sup> fraction
