@@ -1,0 +1,574 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "JV-FULLROUTE-CORRECTED-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/jv_sieve_validation_20261101",
+  "authors": [
+    "prospective Joux-Vitse validation lane"
+  ],
+  "links": {
+    "human_protocol": "research/jv_sieve_validation_20261101/PROTOCOL.md",
+    "historical_run": "research/jv_sieve_strong_rho_20261019",
+    "historical_review": "research/jv_sieve_strong_rho_20261019/review-20261020",
+    "prior_full_route_accounting": "research/ic_acct1_cover_bitop_20261021",
+    "validation_gate": "docs/VALIDATION_GATE.md"
+  },
+  "question": "At p = 1009, 1511, and 1823, is the complete Joux-Vitse route from a non-weak challenge curve below corrected-hash, strongest-available, equal-advice Pollard rho in bitop/v1 and throughout the 0/0.1/1 GAE native-work band?",
+  "claims": [
+    {
+      "id": "JV-below-rho-by-prime",
+      "text": "For each requested prime separately, the complete charged route including the isogeny walk, F4, linear algebra, and verification is below the corrected strong/equal-advice rho throughout the preregistered price band.",
+      "class": "comparative",
+      "decided_by": [
+        "C-main"
+      ],
+      "if_supported": "Report below_strong_rho only at primes whose controls pass and whose four CI upper bounds are below one.",
+      "if_not_supported": "Report above_strong_rho, unresolved, or withheld exactly as the frozen rule determines."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-JV-gap",
+      "statement": "On the special full-rational-2-torsion extension-field class, the implemented genus-3 cover route remains cheaper than generic rho after complete route accounting.",
+      "mechanism": "Joux-Vitse/Diem index calculus exploits the weak cover class; rho cannot exploit additional automorphisms beyond negation on these challenge curves.",
+      "predictions": [
+        {
+          "id": "P-ratio",
+          "metric": "ic_over_r3",
+          "direction": "lower",
+          "minimum_effect": "Every native and price-band 95% upper bound is below 1 at a supported prime.",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "data_seen": [
+              {
+                "path": "research/ic_acct1_cover_bitop_20261021",
+                "measured": "Historical full-route seeds 1..4 at p=1009 and 1511"
+              },
+              {
+                "path": "research/jv_sieve_strong_rho_v2_20261020",
+                "measured": "Historical weak-curve-only seeds 17..32"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          }
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "ic",
+      "role": "candidate",
+      "description": "Complete challenge-to-weak-class Joux-Vitse route, including charged walk, transport, cover, sieve, descent/F4, linear algebra, and scalar verification.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "jv_cover_ic_vs_rho_bitops"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "arm": "ic",
+          "moves": "8",
+          "jobs": "1"
+        },
+        "env": {
+          "JV_SIEVE_ROUND_THREADS": "4",
+          "F4_FP_THREAD_OPS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "primes": [1009, 1511, 1823],
+        "seeds": [33, 34, 35, 36, 37, 38, 39, 40],
+        "moves": 8,
+        "jumps": [3, 5, 7],
+        "walk_cap": "3*p^2",
+        "trace_scope": "cold per run"
+      }
+    },
+    {
+      "id": "rho_r3",
+      "role": "reference",
+      "description": "Corrected-hash strong rho on the identical challenge curve: negation, cycle handling, batch-16 inversion, run index 0, no retained attack-specific advice.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "jv_cover_ic_vs_rho_bitops"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "arm": "rho",
+          "rho": "R3",
+          "runs": "0",
+          "moves": "8",
+          "jobs": "1"
+        },
+        "env": {},
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "negation": true,
+        "batch": 16,
+        "r": 256,
+        "dp_bits": {
+          "1009": 14,
+          "1511": 15,
+          "1823": 15
+        }
+      },
+      "same_instrument_as": "ic"
+    },
+    {
+      "id": "rho_r3_aa",
+      "role": "control_aa",
+      "description": "Same strong-rho arm and instances with independent run index 1 for the null A/A comparison.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "jv_cover_ic_vs_rho_bitops"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "arm": "rho",
+          "rho": "R3",
+          "runs": "1",
+          "moves": "8",
+          "jobs": "1"
+        },
+        "env": {},
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "run_index": 1
+      },
+      "same_instrument_as": "rho_r3"
+    },
+    {
+      "id": "rho_r0",
+      "role": "control_positive",
+      "description": "Unfolded, unbatched rho on the identical challenge for the theory-anchored positive control.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "jv_cover_ic_vs_rho_bitops"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "arm": "rho",
+          "rho": "R0",
+          "runs": "0",
+          "moves": "8",
+          "jobs": "1"
+        },
+        "env": {},
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "negation": false,
+        "batch": 1,
+        "r": 256
+      },
+      "same_instrument_as": "rho_r3"
+    },
+    {
+      "id": "ic_aa",
+      "role": "control_aa",
+      "description": "Exact separate-process repeat of IC seed 33 at each prime.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "jv_cover_ic_vs_rho_bitops"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "arm": "ic",
+          "moves": "8",
+          "jobs": "1"
+        },
+        "env": {
+          "JV_SIEVE_ROUND_THREADS": "4",
+          "F4_FP_THREAD_OPS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "seed": 33,
+        "repeat": 2
+      },
+      "same_instrument_as": "ic"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-rho-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "rho_r0",
+      "expected_detection": "At every prime, R0 mean steps/sqrt(l) is in [0.90,1.70] and R3 mean steps/sqrt(l) is in [0.55,1.30].",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No synthetic negative population is meaningful for an algorithm-cost comparison; the prospectively bounded R3 A/A comparison is the null control."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "prime",
+        "levels": [1009, 1511, 1823]
+      },
+      {
+        "name": "instance_seed",
+        "levels": [33, 34, 35, 36, 37, 38, 39, 40]
+      }
+    ],
+    "factors": [
+      {
+        "name": "algorithm",
+        "treatment": "crossed",
+        "value": ["ic", "rho_r3", "rho_r0"],
+        "how": "Every algorithm receives the same challenge tuple at every prime/seed."
+      },
+      {
+        "name": "rho_run_index",
+        "treatment": "fixed",
+        "value": [0, 1],
+        "how": "Run 0 is the reference and run 1 is frozen as A/A before data."
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": ["first", "repeat"],
+        "how": "IC seed 33 is repeated in a separate process for the exact A/A check."
+      },
+      {
+        "name": "native_price_weight_gae",
+        "treatment": "crossed",
+        "value": [0, 0.1, 1],
+        "how": "Every recorded row is repriced at all three frozen weights."
+      },
+      {
+        "name": "wall_time",
+        "treatment": "measured",
+        "value": "diagnostic only",
+        "how": "Concurrent scheduling is not controlled tightly enough for a clock claim."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-main",
+        "arms": ["ic", "rho_r3"],
+        "differs_in": ["algorithm"],
+        "design": "one_factor",
+        "reason": "Same public challenge, target, source binary, primitive unit, and retained advice; only the algorithm differs.",
+        "threshold": "All four paired-bootstrap upper bounds below 1."
+      },
+      {
+        "id": "C-rho-aa",
+        "arms": ["rho_r3_aa", "rho_r3"],
+        "differs_in": ["rho_run_index"],
+        "design": "aa",
+        "reason": "Independent rho randomness on identical instances.",
+        "threshold": "Point in [0.50,2.00] and CI contains 1."
+      },
+      {
+        "id": "C-ic-aa",
+        "arms": ["ic_aa", "ic"],
+        "differs_in": ["process_repeat"],
+        "design": "aa",
+        "reason": "Deterministic counter reproducibility.",
+        "threshold": "All non-wall fields bit-identical."
+      },
+      {
+        "id": "C-r0-theory",
+        "arms": ["rho_r0"],
+        "differs_in": [],
+        "design": "absolute",
+        "reason": "Theory-anchored positive control.",
+        "threshold": "Mean steps/sqrt(l) in [0.90,1.70]."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "from": "special weak extension-field class",
+        "to": "random or standard prime curves",
+        "status": "not licensed"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Fixed IC,R3-0,R0,R3-1 order per seed; four one-thread attempts run concurrently and wall time is not a claim.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [33, 34, 35, 36, 37, 38, 39, 40],
+      "nonce": null,
+      "note": "Disjoint from historical seeds 1..32 and fixed before the study."
+    },
+    "instance_sampling": {
+      "rule": "Exactly the three requested primes crossed with seeds 33..40; no replacement after a failure.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "The deterministic public algorithms and expected order-of-magnitude gap make masking uninformative; all rules and code are frozen prospectively.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 24,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Eight paired instances per prime are not powered for a narrow equivalence claim, but pre-existing full-route evidence places the ratio orders of magnitude below one; the study is powered only to discriminate that preregistered threshold, and otherwise reports unresolved."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 600,
+      "per_sample_seconds": 1800,
+      "threads": 4,
+      "estimated_total_seconds": 14400,
+      "measured_on": "Historical p=1009/1511 full-route runs on a shared four-core host; p=1823 extrapolated by subgroup size."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "ic_over_r3",
+        "name": "complete-route IC over strong rho",
+        "unit": "ratio of bitop/v1 counts",
+        "kind": "derived",
+        "definition": "At each prime, ratio of mean counted attack bitops from the first charged attack operation through scalar verification; instance construction and wall time excluded.",
+        "source": "runs/p<P>/analysis.json comparison.bitop_v1",
+        "formula": "mean(IC bitops)/mean(R3 run0 bitops), paired bootstrap by seed",
+        "aggregation": "paired_ratio",
+        "resolution": null,
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "native_band",
+        "name": "native-work price band",
+        "unit": "ratio at GAE weight",
+        "kind": "derived",
+        "definition": "Same paired ratio after both arms' word/hash work is repriced at 0, 0.1, and 1 GAE per operation.",
+        "source": "runs/p<P>/analysis.json comparison.gae_band",
+        "formula": "mean(bitops-native_bitops+w*GAE*native_ops)_IC / same_R3",
+        "aggregation": "paired_ratio",
+        "resolution": null,
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "phase_counts",
+        "name": "per-phase primitive totals",
+        "unit": "bitop/v1",
+        "kind": "counted",
+        "definition": "Actual walk, transport, model, factor-base, relations, descent/F4, linear-algebra, verification, and rho primitive counts.",
+        "source": "raw/*.jsonl phases",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "1 primitive",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "wall_diagnostic",
+        "name": "diagnostic wall time",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Concurrent-run elapsed time, recorded for operations only and never used for a verdict.",
+        "source": "raw/*.jsonl wall_ms",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "implementation timer resolution",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "bitop/v1 field_*, modr_*, word_op, hash_probe, rng_words by phase",
+      "rho raw hash/dp/table/cycle/restart counts",
+      "attempt exit status and raw artifact SHA-256"
+    ],
+    "record": [
+      "source commit",
+      "producer and analysis binary SHA-256",
+      "protocol SHA-256",
+      "kernel and CPU model",
+      "memory and process concurrency",
+      "all raw/stdout/stderr/status artifacts",
+      "correctness and scalar verification",
+      "diagnostic wall time"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "GitHub Actions jv-isogeny-walk workflow routed to crypto-eks-highmem or crypto-eks-linux",
+    "placement": {
+      "prime_panels": 3,
+      "concurrent_compute_processes_per_panel": 4,
+      "threads_per_attempt": 1,
+      "wall_time_claim": false
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 21600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Execute exactly the 33 preregistered attempts per prime and never replace a scientific failure.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "A missing, malformed, incorrect, capped, or failed attempt withholds that prime; partial artifacts remain in the attempt census.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "At each prime, below_strong_rho requires every control and attempt to pass and the upper 95% bound to be below one for native bitop/v1 and all three GAE weights. Above requires all four lower bounds above one. Otherwise report unresolved; any failed/missing control or attempt is withheld.",
+    "comparison_ids": ["C-main"],
+    "threshold": "1.0 for each of four IC/R3 intervals, plus the frozen control windows",
+    "statistic": "Paired ratio of means by seed with 10,000-resample percentile bootstrap CI95.",
+    "interval": "Paired percentile bootstrap CI95, fixed deterministic seeds derived from 20261101 and prime/metric tags.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "IC/R3 counted-work ratio at native bitop/v1 and each GAE weight.",
+    "verdict_vocabulary": [
+      "below_strong_rho",
+      "above_strong_rho",
+      "unresolved",
+      "withheld"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "examples/jv_validation_analyse.rs",
+      "sha256": "4a63371293151bda9fb1715b3afde5bb23a1cf0a42c981865c61ec2b996c21c4"
+    },
+    "inputs": [
+      "research/jv_sieve_validation_20261101/runs/p<P>/attempts.json",
+      "research/jv_sieve_validation_20261101/runs/p<P>/raw/*.jsonl"
+    ],
+    "outputs": [
+      "research/jv_sieve_validation_20261101/runs/p<P>/analysis.json",
+      "research/jv_sieve_validation_20261101/export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "invalidation_rules": [
+    "Any change to primes, seeds, moves, arms, corrected-hash identities, operation accounting, control windows, bootstrap, or decision thresholds after a study datum invalidates the prospective claim.",
+    "A missing or failed attempt cannot be dropped or replaced; it withholds the prime.",
+    "A foreign hook, unclassified attack modulus, unattributed attack bitop, missing charged walk, or absent descent/linear-algebra addition/multiplication invalidates the row.",
+    "Leaderboard promotion requires a complete validation-gate/v1 record with independent replay and recomputation."
+  ],
+  "inadmissible": [
+    "Generalising this special-class result to random, prime-order, or standardised curves.",
+    "Using diagnostic wall time as a headline metric.",
+    "Dropping failures, changing seeds, or moving a tolerance after launch.",
+    "Omitting the attack's isogeny walk, F4 additions, linear-algebra operations, corrected rho hashes, or scalar verification.",
+    "Calling producer output validated before independent replay and recomputation pass."
+  ],
+  "extensions": {
+    "attempts_per_prime": 33,
+    "rho_aa_replicate": "run index 1 for every seed",
+    "ic_aa_replicate": "seed 33 repeated once in a separate process",
+    "replay_script": {
+      "path": "research/jv_sieve_validation_20261101/replay_panel.sh",
+      "sha256": "ac1e6e9b3ffb6430942a92b68cb38148bd5d9d70d499727e809a76e2498afbc5"
+    },
+    "validator_script": {
+      "path": "examples/jv_validation_verify.rs",
+      "sha256": "46147a8c8bfe189be798dcfa7bddfd053a1a36eec53d89b1e262ab7e75efab60"
+    }
+  },
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}
