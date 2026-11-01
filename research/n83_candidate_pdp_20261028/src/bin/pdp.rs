@@ -331,6 +331,54 @@ fn base_record(raw: &[u8], pt: (u128, u128), coordinate_bit: Option<usize>) -> b
     }
     lo < (raw.len() - 32) / 20 && read(lo) == pt
 }
+type RemoteShard = (String, String, u64);
+fn remote_shard_index(bases: &Path) -> BTreeMap<String, RemoteShard> {
+    let path = bases.join("s3-file-index.json");
+    if !path.exists() {
+        return BTreeMap::new();
+    }
+    let index: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    index["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|entry| {
+            let path = entry["path"].as_str()?;
+            let uri = entry
+                .get("snapshot_key")
+                .or_else(|| entry.get("s3_uri"))?
+                .as_str()?;
+            let sha = entry["sha256"].as_str()?;
+            let bytes = entry["bytes"].as_u64()?;
+            Some((path.to_string(), (uri.to_string(), sha.to_string(), bytes)))
+        })
+        .collect()
+}
+fn read_base_shard(
+    bases: &Path,
+    index: &BTreeMap<String, RemoteShard>,
+    family: &str,
+    file: &str,
+) -> Vec<u8> {
+    let path = bases.join(family).join(file);
+    if path.exists() {
+        return fs::read(path).unwrap();
+    }
+    let relative = format!("data/{family}/{file}");
+    let (uri, expected_sha, expected_bytes) = index
+        .get(&relative)
+        .unwrap_or_else(|| panic!("missing local base shard and S3 index entry: {relative}"));
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    let status = Command::new("aws")
+        .args(["s3", "cp", uri, path.to_str().unwrap(), "--only-show-errors"])
+        .status()
+        .unwrap();
+    assert!(status.success(), "failed to fetch immutable factor-base shard {uri}");
+    let bytes = fs::read(path).unwrap();
+    assert_eq!(bytes.len() as u64, *expected_bytes, "factor-base shard size mismatch");
+    assert_eq!(hash(&bytes), *expected_sha, "factor-base shard SHA-256 mismatch");
+    bytes
+}
 fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> {
     let coordinate_bit = if arm == "baseline" {
         None
@@ -361,6 +409,7 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
         assert_eq!(index["coordinate_bit_positions"][26], bit);
     }
     let mut manifests = BTreeMap::new();
+    let shard_index = remote_shard_index(bases);
     for (family, baseline_expected) in [
         (
             "koblitz",
@@ -399,6 +448,10 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
         );
     }
     fs::write(root.join("factor-base-index.json"), index_bytes).unwrap();
+    let source_index = bases.join("s3-file-index.json");
+    if source_index.exists() {
+        fs::copy(source_index, root.join("source-s3-file-index.json")).unwrap();
+    }
     let (p, cert) = prime();
     save(
         &root.join("prime-certificate.json"),
@@ -469,8 +522,12 @@ fn generate(root: &Path, bases: &Path, matched: &Path, arm: &str) -> Vec<Value> 
             for &pt in &pts {
                 let part = selector(pt.0, coordinate_bit) >> 20;
                 let cert = &manifest["shards"][part];
-                let bytes =
-                    fs::read(bases.join(family).join(cert["file"].as_str().unwrap())).unwrap();
+                let bytes = read_base_shard(
+                    bases,
+                    &shard_index,
+                    family,
+                    cert["file"].as_str().unwrap(),
+                );
                 assert_eq!(hash(&bytes), cert["sha256"].as_str().unwrap());
                 let raw = zstd::stream::decode_all(bytes.as_slice()).unwrap();
                 assert_eq!(
@@ -942,6 +999,22 @@ mod tests {
 #[cfg(test)]
 mod candidate_tests {
     use super::*;
+    #[test]
+    fn remote_shard_index_binds_immutable_object_and_digest() {
+        let root = std::env::temp_dir().join(format!("pdp-s3-index-test-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        fs::write(
+            root.join("s3-file-index.json"),
+            r#"{"files":[{"path":"data/prime/part-0001.bin.zst","snapshot_key":"s3://bucket/key","sha256":"abc","bytes":42}]}"#,
+        )
+        .unwrap();
+        let index = remote_shard_index(&root);
+        assert_eq!(
+            index.get("data/prime/part-0001.bin.zst"),
+            Some(&("s3://bucket/key".to_string(), "abc".to_string(), 42))
+        );
+        fs::remove_dir_all(root).unwrap();
+    }
     #[test]
     fn coordinate_map_and_lift_lookup() {
         for bit in 27..=40 {
