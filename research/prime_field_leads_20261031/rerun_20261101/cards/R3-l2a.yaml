@@ -1,18 +1,18 @@
 schema: crypto.autoresearch.mechanical-task-card.v1
-card_id: CARD-primeleads-rerun-20261101-R3
+card_id: CARD-primeleads-rerun-20261101-R3-v2
 experiment_id: prime_field_leads_20261031_rerun_20261101
 author_role: experiment-director
 executor_role: executor-mechanical
 kind: frozen_command
-commit: 122535fb333ab778b49ca54937774d370766bd5f
-receipt: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3/receipt.json
+commit: bc7b2d085be55353f7520b485a45132ea588be66
+receipt: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3-v2/receipt.json
 binds:
 - path: research/prime_field_leads_20261031/rerun_20261101/run_stage.sh
-  sha256: e90113660e7f13d4b04ccba8948759c74019ea01136d5c625f5fd90c524e7297
+  sha256: 8075791332b655cd6f114ad3d5e0cb7f5621f66ce88a949473f76373b6345fdf
 - path: research/prime_field_leads_20261031/rerun_20261101/RERUN_PLAN.md
-  sha256: 887c8ab7cc32ce37c0f015b4a527f3900535f57f2e53a65839a8b4a7d96d0527
+  sha256: 3f60f9637cb0759fdf014d04bb999cd3bf17474ee513865e2abff2c0630bab0c
 - path: research/prime_field_leads_20261031/rerun_20261101/binaries.sha256
-  sha256: 1980b3b19c0c9a8bcef0e019e8f9d7ee276303c8f1e325bd9e3dcf08720ac17a
+  sha256: 1d000893c23cbd500dd7e15773a233a74d331299aac0e24735470734fefa42d2
 - path: research/prime_field_leads_20261031/rerun_20261101/msolve_version.txt
   sha256: 28f7c8d0e9a3362e1b7a0f02d4f514b7e644849ba7d501e67af6a51de2c580e4
 - path: research/prime_field_leads_20261031/L2a_slope_e_m3/src/l2a.rs
@@ -20,7 +20,7 @@ binds:
 - path: research/prime_field_leads_20261031/L2a_slope_e_m3/src/stats.rs
   sha256: 34667302d05cfbfe62cf4245842c6ad1db012204181c0daaa84c28968eaedbbc
 must_not_exist:
-- research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3
+- research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3-v2
 commands:
 - id: l2a
   argv:
@@ -29,8 +29,8 @@ commands:
   timeout_seconds: 21600
   success_exit_codes:
   - 0
-  stdout: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3/l2a.stdout
-  stderr: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3/l2a.stderr
+  stdout: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3-v2/l2a.stdout
+  stderr: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3-v2/l2a.stderr
   outputs:
   - research/prime_field_leads_20261031/rerun_20261101/L2a/run.log
 - id: l2a-fit
@@ -40,8 +40,8 @@ commands:
   timeout_seconds: 600
   success_exit_codes:
   - 0
-  stdout: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3/l2a-fit.stdout
-  stderr: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3/l2a-fit.stderr
+  stdout: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3-v2/l2a-fit.stdout
+  stderr: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R3-v2/l2a-fit.stderr
   outputs:
   - research/prime_field_leads_20261031/rerun_20261101/L2a/fit.log
 bus_address: executor-mechanical-primeleads-r3
