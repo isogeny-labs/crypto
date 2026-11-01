@@ -207,3 +207,58 @@ msolve 0.6.5 (Ubuntu `0.6.5-1build2`) exits with SIGSEGV for every tested prime 
    unchanged prime). The remaining m = 3 cells run with `run_cells.sh m3 262231 33554371`.
 
 Nothing else changes: arms, seeds, caps, units, criteria and predictions are as in §2–§7.
+
+## 11. Amendment A2 (2026-11-01T02:05Z): weighted-order probes, before any weighted m = 5 run
+
+**Request.** Owner, 2026-11-01: "try weighted ordering to lower the F4 cost".
+
+**Prior work** (*recorded*, read in full: Faugère, Safey El Din, Verron, "On the complexity
+of computing Gröbner bases for weighted homogeneous systems", arXiv 1412.7547, J. Symb.
+Comput. 2016). Prop. 10: grevlex F4 on hom_W(F), the system after X_i → X_i^{w_i}, performs
+exactly the reductions of W-grevlex F4 on F, so msolve needs no weighted order. §5.2: for an
+affine system the gain comes from a W whose highest-W-degree components form a regular
+sequence, avoiding degree falls; order the variables by decreasing weight. §6.2, Table 3:
+the n = 5 Edwards decomposition system symmetrized by the 2-torsion ⋊ S_5 action (deg I =
+65,536, our D), W = (2,2,2,2,1), F4 in Magma 56,105 s → 6,044 s (×9.3), F5 in FGb ×6.9; the
+standard grading there had non-regular top components and many degree falls.
+
+**What is already known here** (*recorded*, `results/m5_p4111_planted/quot.log`, read at
+02:00Z while the cell runs): standard grevlex F4 on our quotient system has **no degree fall**
+from degree 8 to 26, and its selected pairs peaked at degree 25 (2,800, then 2,720). The m = 3
+system's Bézout bound is attained (D = 16). *Derived*: for W1 = (2,2,2,2,2,1) on
+(s_1..s_5, w), the highest-W components of all six equations do not involve w (A_8 has W-degree
+16 > 15 for w·B_7, and Q_2 has W-degree 4 > 2 for w²), so they are not a regular sequence; for
+W2 = (1,2,3,4,5,5) every highest component is divisible by s_5^7.
+
+**Prediction** (*predicted*): no weighted arm completes F4 with less CPU than the standard one;
+W2 shows degree falls (as at m = 3, `dev/m3_weighted_p4111/`: D multiplied by Π w_i exactly,
+6 degree falls for W2, none for W1).
+
+**Arms** (m = 5, p = 4111, the baseline cell's own `quot.ms`, sha256 recorded per arm):
+
+| arm | weights on (s1, s2, s3, s4, s5, w) | msolve variable order | D after substitution |
+|---|---|---|--:|
+| W0 | standard (the §7 cell) | s1 > … > s5 > w | 2^16 |
+| W1 | (2, 2, 2, 2, 2, 1), the FSV/FGHR analogue | s1 > … > s5 > w | 2^21 |
+| W3 | (1, 1, 1, 1, 1, 2) | w > s1 > … > s5 | 2^17 |
+| W2 | (1, 2, 3, 4, 5, 5), t-degree weights | s5 > w > s4 > s3 > s2 > s1 | 2^16 · 600 |
+
+Run with `msolve -g 1 -v 2 -t 4` (F4 only, leading ideal printed), `OMP_WAIT_POLICY=PASSIVE`,
+12 GiB RSS cap, wall cap 1.25 × W0's F4 elapsed time + 60 s (4 h if W0's F4 did not finish), in
+the order W1, W3, W2, by `run_weighted.sh drive`, which then resumes the two remaining §7 cells
+(`run_cells.sh m5 262231`, `m5 33554371`). The chain driver of §7 was detached at 02:00Z for
+this (the 4111 solve itself kept running); the driver runs that cell's frozen check unchanged.
+`bin/qsolve-w` is built from the same `src/qsolve.rs` plus the `weight` subcommand;
+`bin/qsolve`, which the §7 cells use, is not rebuilt.
+
+**Measured per arm**: completion, F4 CPU (user + sys), F4 elapsed, max RSS, highest F4 degree,
+number of degree falls (a round whose degree is below an earlier round's), and D after
+substitution (must equal D_W0 · Π w_i).
+
+**Criterion** (frozen): a weighted arm is a **measured improvement** only if its F4 completes
+and its F4 CPU is below W0's by a factor ≥ 1.5 (the round times of the same F4 at the same
+degree differ by up to 20 % between the dev run and the 4111 cell, so smaller ratios are not
+resolved). An arm stopped by the wall cap has spent more than 1.25 × W0 and is recorded as
+**no improvement**, with its CPU; one stopped by the RSS cap is not_measured. If W0's F4 did
+not finish, a weighted arm that finishes is an improvement over W0's lower bound, reported as
+such.

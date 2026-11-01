@@ -1287,6 +1287,58 @@ fn orbits(args: &[String]) {
     );
 }
 
+/// Weighted variant of an msolve system by the substitution X_i -> X_i^{w_i}
+/// (Faugere, Safey El Din, Verron, arXiv 1412.7547, Prop. 10: grevlex F4 on hom_W(F) performs
+/// exactly the reductions of W-grevlex F4 on F). `--order` lists the variables in the order
+/// msolve should see them (first = largest).
+fn weight(args: &[String]) {
+    let input = fs::read_to_string(arg(args, "--in", "")).unwrap();
+    let wts: Vec<u32> = arg(args, "--weights", "").split(',').map(|x| x.parse().unwrap()).collect();
+    let mut lines = input.lines();
+    let vars: Vec<String> = lines.next().unwrap().split(',').map(|s| s.trim().to_string()).collect();
+    let pline = lines.next().unwrap().trim().to_string();
+    assert_eq!(wts.len(), vars.len(), "one weight per variable");
+    let order: Vec<String> = {
+        let o = arg(args, "--order", "");
+        if o.is_empty() { vars.clone() } else { o.split(',').map(|s| s.to_string()).collect() }
+    };
+    let mut sorted = order.clone();
+    sorted.sort();
+    let mut vs = vars.clone();
+    vs.sort();
+    assert_eq!(sorted, vs, "--order must permute the variables");
+    let w_of: BTreeMap<String, u32> = vars.iter().cloned().zip(wts.iter().copied()).collect();
+    let body: String = lines.collect::<Vec<_>>().join("\n");
+    let mut polys_out = Vec::new();
+    for poly in body.split(",\n") {
+        let poly = poly.trim().trim_end_matches(',');
+        let mut terms_out = Vec::new();
+        for term in poly.split('+') {
+            let mut parts = term.trim().split('*');
+            let coef = parts.next().unwrap().to_string();
+            let mut ex: BTreeMap<String, u32> = BTreeMap::new();
+            for f in parts {
+                let (v, e) = match f.split_once('^') {
+                    Some((v, e)) => (v.to_string(), e.parse::<u32>().unwrap()),
+                    None => (f.to_string(), 1),
+                };
+                *ex.entry(v.clone()).or_insert(0) += e * w_of[&v];
+            }
+            let mut t = coef;
+            for v in &order {
+                if let Some(&e) = ex.get(v) {
+                    if e == 1 { t.push_str(&format!("*{v}")); } else if e > 1 { t.push_str(&format!("*{v}^{e}")); }
+                }
+            }
+            terms_out.push(t);
+        }
+        polys_out.push(terms_out.join("+"));
+    }
+    let out = format!("{}\n{}\n{}\n", order.join(","), pline, polys_out.join(",\n"));
+    fs::write(arg(args, "--out", ""), out).unwrap();
+    eprintln!("weighted system: weights {:?} on {:?}, msolve order {:?}", wts, vars, order);
+}
+
 // ---------------------------------------------------------------- measured runner
 #[repr(C)]
 struct Timeval {
@@ -1377,6 +1429,7 @@ fn main() {
         Some("generate") => generate(&args[2..]),
         Some("check") => check(&args[2..]),
         Some("orbits") => orbits(&args[2..]),
+        Some("weight") => weight(&args[2..]),
         Some("run") => run(&args[2..]),
         _ => {
             eprintln!("usage: qsolve generate --m 3|5 --p P --seed S --target planted|random [--arms a,b] --out DIR\n       qsolve check --msolve-out FILE [--planted FILE]\n       qsolve run [--rss-cap-gib G] [--record FILE] -- cmd ...");
