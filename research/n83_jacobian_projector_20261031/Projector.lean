@@ -1,4 +1,6 @@
 import CoverProjection
+import Init.Grind.Module.Basic
+import Mathlib.Tactic.Ring
 
 /-!
 # Image-endomorphism and Prym-factor identities for the binary cubic cover
@@ -14,6 +16,7 @@ set_option autoImplicit false
 namespace N83JacobianProjector
 
 open GhsSubgroupTransfer
+open Lean.Grind
 
 variable {E J : Type} [IntModule E] [IntModule J]
 
