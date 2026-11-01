@@ -23,6 +23,11 @@
 //! contents and contains no value of this host, so `cmp` against the committed
 //! replay output is a regression test.
 //!
+//! Receipts of the CryptoMiniSat follow-up (schema `phase_paired_cms/receipt/v1`,
+//! PROTOCOL_ADDENDUM_2.md) are replayed by the same checks plus the pinned binary,
+//! the CPU cap, the stage rule, the controls and the decision rule; `--native`
+//! names the native receipts for the side-by-side tables.
+//!
 //! usage: phase_paired_replay RECEIPTS.jsonl OUT.json [--manifest M] [--sealed S]
 
 use crypto_lib::binary_ecc::curve::{point_add, point_neg, BinaryCurve, BinaryPoint};
@@ -485,6 +490,9 @@ struct Replayed {
     rows: Vec<AttRow>,
     first_hit: BTreeMap<Key, BTreeMap<usize, (u64, u64, u64)>>,
     targets: Vec<(String, String)>,
+    /// Per target (manifest order): decomposable in arm A's search space.
+    a_decomposable: Vec<bool>,
+    world: World,
 }
 
 fn ratio(num: u64, den: usize) -> Value {
@@ -530,6 +538,11 @@ fn replay_full(
         ));
     }
     let budget = header.u("conflict_budget");
+    let cms = header.s("schema") == CMS_SCHEMA;
+    // CryptoMiniSat tests its conflict limit at restart granularity (it reported
+    // 5,002 conflicts under a limit of 5,000): one part in a thousand is allowed.
+    let slack = if cms { budget / 1000 } else { 0 };
+    let maxtime_cpu = header.v["maxtime_cpu_s"].as_f64().unwrap_or(0.0);
     let forms: Vec<String> = header.v["forms"]
         .as_array()
         .map(|a| {
@@ -689,11 +702,14 @@ fn replay_full(
             conflicts: a.u("conflicts"),
             cpu_ns: a.u("total_cpu_ns"),
         });
-        if a.u("conflicts") > budget {
+        if a.u("conflicts") > budget + slack {
             defects.push(format!(
                 "{tag}: {} conflicts exceed the budget {budget}",
                 a.u("conflicts")
             ));
+        }
+        if cms {
+            cms_attempt_checks(a, st, maxtime_cpu, &tag, &mut defects);
         }
         let decomposable = if arm_b { cb[ti] > 0 } else { ca[ti] > 0 };
         match st {
@@ -817,6 +833,8 @@ fn replay_full(
             .iter()
             .map(|t| (t.0.clone(), t.1.clone()))
             .collect(),
+        a_decomposable: ca.iter().map(|c| *c > 0).collect(),
+        world: w,
     })
 }
 
@@ -1217,16 +1235,656 @@ fn svg_chart(rp: &Replayed) -> String {
     s
 }
 
+// ---------------------------------------------------------------------------
+// CryptoMiniSat follow-up (PROTOCOL_ADDENDUM_2.md): receipts of the pinned
+// external solver, the stage rule, the cap, the controls and the decision rule,
+// all recomputed from the files alone.
+// ---------------------------------------------------------------------------
+
+const CMS_SCHEMA: &str = "phase_paired_cms/receipt/v1";
+const CMS_CONTROLS_SCHEMA: &str = "phase_paired_cms/controls/v1";
+const CMS_BINARY_SHA: &str = "8e1e539976b1fa8bff2b1e30df5c200c9a03ee343c634eadc0152e1b6cecd8f7";
+/// Decision rule thresholds (seconds of CPU, median over the eight arm A
+/// refutations of one repetition), fixed before any measurement.
+const RULE_SOLVER_MAX_S: f64 = 45.0;
+const RULE_ENCODING_MIN_S: f64 = 80.0;
+const RULE_ONE_REP_SOLVER_MAX_S: f64 = 30.0;
+const RULE_ONE_REP_ENCODING_MIN_S: f64 = 120.0;
+/// Legacy (CryptoMiniSat 5.16.0 through pycryptosat, one trial): arm A UNSAT
+/// CPU seconds, `subgroup_xor`, from `paired_n13.jsonl` of crypto PR #2583.
+const LEGACY_A_REFUTATION_S: [(&str, f64); 8] = [
+    ("a0", 8.3442),
+    ("a1", 23.4089),
+    ("a2", 20.5688),
+    ("a3", 14.9519),
+    ("c0", 44.0095),
+    ("c1", 29.2503),
+    ("c2", 28.0098),
+    ("c3", 24.2291),
+];
+const LEGACY_B_OVER_A_CPU: f64 = 1.61;
+
+/// The stage rule of the producer (`rep_mode`), restated here.
+fn rep_mode(
+    rep: u64,
+    remaining: f64,
+    guard: f64,
+    full_cost: Option<f64>,
+    a_cost: Option<f64>,
+) -> &'static str {
+    if rep == 1 {
+        return "full";
+    }
+    match (full_cost, a_cost) {
+        (Some(f), _) if remaining >= guard * f => "full",
+        (_, Some(a)) if remaining >= guard * a => "armA",
+        _ => "none",
+    }
+}
+
+fn cms_attempt_checks(a: &Rec, st: &str, maxtime: f64, tag: &str, defects: &mut Vec<String>) {
+    if a.s("solver") != "cryptominisat5" {
+        defects.push(format!("{tag}: solver is not cryptominisat5"));
+    }
+    let c = &a.v["cms"];
+    let calls = c["calls"].as_array().cloned().unwrap_or_default();
+    if calls.is_empty() {
+        defects.push(format!("{tag}: no child process call recorded"));
+        return;
+    }
+    if !c["error"].is_null() {
+        defects.push(format!("{tag}: an instrument error is recorded"));
+    }
+    if a.u("solver_calls") != calls.len() as u64 {
+        defects.push(format!(
+            "{tag}: solver_calls differs from the recorded calls"
+        ));
+    }
+    let child = c["child_cpu_ns"].as_u64().unwrap_or(0);
+    let sum: u64 = calls
+        .iter()
+        .map(|x| x["child_cpu_ns"].as_u64().unwrap_or(0))
+        .sum();
+    if child != sum || child > a.u("total_cpu_ns") || child != a.u("solve_cpu_ns") {
+        defects.push(format!("{tag}: child CPU does not add up"));
+    }
+    if calls
+        .iter()
+        .any(|x| x["killed_at_wall_backstop"] == true || !x["signal"].is_null())
+    {
+        defects.push(format!("{tag}: a child was killed or died on a signal"));
+    }
+    let last = calls.last().unwrap();
+    let want = match st {
+        "verified" => Some((10, "SATISFIABLE")),
+        "unsat" => Some((20, "UNSATISFIABLE")),
+        "budget" | "deadline" => Some((15, "INDETERMINATE")),
+        _ => None,
+    };
+    if let Some((exit, line)) = want {
+        if last["exit_code"].as_i64() != Some(exit) || last["status_line"].as_str() != Some(line) {
+            defects.push(format!(
+                "{tag}: status {st} but the last child ended with exit {} and `{}`",
+                last["exit_code"], last["status_line"]
+            ));
+        }
+    }
+    if st == "deadline" && (child as f64 / 1e9) < 0.95 * maxtime {
+        defects.push(format!(
+            "{tag}: deadline status with {:.1} s of child CPU, below the {maxtime} s backstop",
+            child as f64 / 1e9
+        ));
+    }
+}
+
+/// The checks that only make sense for CryptoMiniSat receipts, and the
+/// decision rule. Extends `rp.json` and its defect list.
+fn cms_audit(rp: &mut Replayed, receipts_text: &str, controls_text: Option<&str>) {
+    let recs: Vec<Value> = receipts_text
+        .lines()
+        .filter(|l| !l.trim().is_empty())
+        .map(|l| serde_json::from_str(l).unwrap_or(Value::Null))
+        .collect();
+    let mut defects: Vec<String> = Vec::new();
+    let header = recs.iter().find(|r| r["type"] == "header").unwrap().clone();
+    if header["cms_binary_sha256"] != CMS_BINARY_SHA {
+        defects.push("header binary hash is not the pinned one".into());
+    }
+    let (cap, prior, controls_hdr) = (
+        header["cpu_cap_s"].as_f64().unwrap_or(0.0),
+        header["cpu_prior_s"].as_f64().unwrap_or(0.0),
+        header["controls_cpu_s"].as_f64().unwrap_or(0.0),
+    );
+    let guard = header["stage_guard"].as_f64().unwrap_or(1.1);
+    let maxtime = header["maxtime_cpu_s"].as_f64().unwrap_or(0.0);
+    let secs = |r: &Value| -> f64 {
+        if r["type"] != "attempt" || r["status"] == "skipped" {
+            0.0
+        } else {
+            r["total_cpu_ns"].as_u64().unwrap_or(0) as f64 / 1e9
+        }
+    };
+
+    // Controls file.
+    let mut controls = json!(null);
+    if let Some(text) = controls_text {
+        let crecs: Vec<Value> = text
+            .lines()
+            .filter(|l| !l.trim().is_empty())
+            .map(|l| serde_json::from_str(l).unwrap_or(Value::Null))
+            .collect();
+        let count = |t: &str, pass: bool| {
+            crecs
+                .iter()
+                .filter(|r| r["type"] == t && (r["pass"] == true) == pass)
+                .count()
+        };
+        let controls_cpu: f64 = crecs
+            .iter()
+            .map(|r| {
+                r["total_cpu_ns"]
+                    .as_u64()
+                    .or_else(|| r["cpu_ns"].as_u64())
+                    .unwrap_or(0) as f64
+                    / 1e9
+            })
+            .sum();
+        for h in crecs.iter().filter(|r| r["type"] == "header") {
+            if h["schema"] != CMS_CONTROLS_SCHEMA || h["cms_binary_sha256"] != CMS_BINARY_SHA {
+                defects.push("controls header: wrong schema or binary hash".into());
+            }
+        }
+        let (st_ok, st_bad) = (count("selftest", true), count("selftest", false));
+        let (fi_ok, fi_bad) = (count("fidelity", true), count("fidelity", false));
+        if st_bad > 0 || fi_bad > 0 || st_ok == 0 || fi_ok == 0 {
+            defects.push(format!(
+                "controls: selftest {st_ok} pass / {st_bad} fail, fidelity {fi_ok} pass / {fi_bad} fail"
+            ));
+        }
+        let mut positive = 0;
+        let mut deterministic = None;
+        for p in crecs.iter().filter(|r| r["type"] == "positive_control") {
+            let rec = Rec { v: p.clone() };
+            let tid = rec.s("target_id").to_string();
+            let Some(t) = rp.world.targets.iter().find(|t| t.0 == tid) else {
+                defects.push(format!("positive control: unknown target {tid}"));
+                continue;
+            };
+            if rec.s("status") != "verified" {
+                defects.push(format!(
+                    "positive control {tid}: status {}",
+                    rec.s("status")
+                ));
+                continue;
+            }
+            match check_verified(&rp.world, &rec, rec.s("arm") == "B", t.2) {
+                Ok(_) => positive += 1,
+                Err(e) => defects.push(format!("positive control {tid}: {e}")),
+            }
+            if let Some(d) = p["same_seed_rerun_identical"].as_bool() {
+                deterministic = Some(d);
+            }
+        }
+        if positive == 0 {
+            defects.push("controls: no verified positive control".into());
+        }
+        if deterministic != Some(true) {
+            defects.push("controls: the same-seed rerun was not shown to be identical".into());
+        }
+        if (controls_cpu - controls_hdr).abs() > 0.01 {
+            defects.push(format!(
+                "controls CPU {controls_cpu:.3} s differs from the header's {controls_hdr:.3} s"
+            ));
+        }
+        controls = json!({"selftest_pass": st_ok, "selftest_fail": st_bad,
+            "fidelity_pass": fi_ok, "fidelity_fail": fi_bad,
+            "positive_controls_verified": positive, "same_seed_rerun_identical": deterministic,
+            "cpu_s": format!("{controls_cpu:.3}")});
+    }
+
+    // Cap accounting and the stage rule, in receipt order.
+    let attempts_cpu: f64 = recs.iter().map(&secs).sum();
+    let total = prior + controls_hdr + attempts_cpu;
+    if total > cap {
+        defects.push(format!(
+            "total solver CPU {total:.1} s exceeds the cap {cap} s"
+        ));
+    }
+    let mut spent = prior + controls_hdr;
+    let mut so_far: Vec<&Value> = Vec::new();
+    let mut stages: Vec<Value> = Vec::new();
+    let mut modes: BTreeMap<u64, String> = BTreeMap::new();
+    let mut first_cap_skip_checked = false;
+    let mut cap_latched = false;
+    for r in &recs {
+        match r["type"].as_str() {
+            Some("stage") => {
+                let rep = r["rep"].as_u64().unwrap_or(0);
+                let cost = |rr: u64, arm: Option<&str>| -> (f64, usize) {
+                    let rows: Vec<&&Value> = so_far
+                        .iter()
+                        .filter(|x| {
+                            x["type"] == "attempt"
+                                && x["status"] != "skipped"
+                                && x["rep"] == rr
+                                && arm.is_none_or(|a| x["arm"] == a)
+                        })
+                        .collect();
+                    (rows.iter().map(|x| secs(x)).sum(), rows.len())
+                };
+                let nt = rp.targets.len();
+                let mx = |v: Vec<f64>| {
+                    v.into_iter()
+                        .fold(None::<f64>, |m, x| Some(m.map_or(x, |y| y.max(x))))
+                };
+                let fc = mx((1..rep)
+                    .filter(|k| cost(*k, None).1 == 2 * nt)
+                    .map(|k| cost(k, None).0)
+                    .collect());
+                let ac = mx((1..rep)
+                    .filter(|k| cost(*k, Some("A")).1 == nt)
+                    .map(|k| cost(k, Some("A")).0)
+                    .collect());
+                let remaining = cap - spent;
+                let want = rep_mode(rep, remaining, guard, fc, ac);
+                // After a cap stop every later repetition is `none` by the latch.
+                if r["mode"] != want && !(cap_latched && r["mode"] == "none") {
+                    defects.push(format!(
+                        "stage rule: repetition {rep} ran as `{}` but the rule gives `{want}` (remaining {remaining:.1} s)",
+                        r["mode"]
+                    ));
+                }
+                if (r["remaining_cpu_s"].as_f64().unwrap_or(f64::NAN) - remaining).abs() > 0.01 {
+                    defects.push(format!(
+                        "stage rule: repetition {rep} recorded remaining {} s, receipts give {remaining:.3} s",
+                        r["remaining_cpu_s"]
+                    ));
+                }
+                modes.insert(rep, r["mode"].as_str().unwrap_or("").to_string());
+                stages.push(json!({"rep": rep, "mode": r["mode"], "remaining_cpu_s": format!("{remaining:.1}")}));
+            }
+            Some("attempt") => {
+                let rep = r["rep"].as_u64().unwrap_or(0);
+                let mode = modes.get(&rep).map(String::as_str).unwrap_or("");
+                if mode.is_empty() {
+                    defects.push(format!("repetition {rep}: attempt before any stage record"));
+                }
+                if r["status"] == "skipped" {
+                    let reason = r["reason"].as_str().unwrap_or("");
+                    if reason.starts_with("cpu cap") {
+                        cap_latched = true;
+                        if !first_cap_skip_checked {
+                            let arms = if mode == "armA" { 1.0 } else { 2.0 };
+                            let worst = arms * (maxtime * 1.05 + 3.0);
+                            if spent + worst <= cap {
+                                defects.push(format!(
+                                    "cap stop at {spent:.1} s was not needed ({worst:.0} s fits under {cap} s)"
+                                ));
+                            }
+                            first_cap_skip_checked = true;
+                        }
+                    } else if reason.starts_with("stage rule: arm A only") {
+                        if mode != "armA" || r["arm"] != "B" {
+                            defects.push(format!(
+                                "repetition {rep}: skip reason does not match mode {mode}"
+                            ));
+                        }
+                    } else if reason.starts_with("stage rule") {
+                        if mode != "none" {
+                            defects.push(format!("repetition {rep}: skipped in mode {mode}"));
+                        }
+                    } else {
+                        defects.push(format!("repetition {rep}: unexplained skip `{reason}`"));
+                    }
+                } else if mode == "none" || (mode == "armA" && r["arm"] == "B") {
+                    defects.push(format!(
+                        "repetition {rep}: ran an attempt the stage rule excludes"
+                    ));
+                }
+                spent += secs(r);
+            }
+            _ => {}
+        }
+        so_far.push(r);
+    }
+
+    let rule = cms_rule(rp);
+    rp.json["schema"] = json!("phase_paired_cms/replay/v1");
+    rp.json["cms"] = json!({
+        "binary_sha256": header["cms_binary_sha256"], "tag": header["cms_tag"],
+        "commit": header["cms_commit"], "cadical_commit": header["cadical_commit"],
+        "cadiback_commit": header["cadiback_commit"], "conflict_budget": header["conflict_budget"],
+        "maxtime_cpu_s": header["maxtime_cpu_s"],
+        "cap": {"cap_s": cap, "prior_s": format!("{prior:.3}"), "controls_s": format!("{controls_hdr:.3}"),
+                "attempts_s": format!("{attempts_cpu:.3}"), "total_s": format!("{total:.3}")},
+        "stages": stages, "controls": controls, "decision_rule": rule,
+    });
+    if let Some(d) = rp.json["defects"].as_array_mut() {
+        d.extend(defects.into_iter().map(Value::from));
+    }
+}
+
+/// The preregistered decision rule on the arm A refutations.
+fn cms_rule(rp: &Replayed) -> Value {
+    let nt = rp.a_decomposable.iter().filter(|d| !**d).count();
+    let reps: BTreeSet<u64> = rp.rows.iter().map(|r| r.rep).collect();
+    let mut per_rep = Vec::new();
+    let mut classes: Vec<(u64, &'static str, f64)> = Vec::new();
+    for rep in reps {
+        let rows: Vec<&AttRow> = rp
+            .rows
+            .iter()
+            .filter(|r| r.rep == rep && r.arm == "A" && !rp.a_decomposable[r.target])
+            .collect();
+        if rows.is_empty() {
+            continue;
+        }
+        let t: Vec<f64> = rows.iter().map(|r| r.cpu_ns as f64 / 1e9).collect();
+        let med = median(&mut t.clone());
+        let unknown = rows.iter().filter(|r| r.status != "unsat").count();
+        let complete = rows.len() == nt;
+        let class = if !complete {
+            "incomplete"
+        } else if med <= RULE_SOLVER_MAX_S && unknown == 0 {
+            "S"
+        } else if med >= RULE_ENCODING_MIN_S {
+            "E"
+        } else {
+            "M"
+        };
+        if complete {
+            classes.push((rep, class, med));
+        }
+        per_rep.push(json!({
+            "rep": rep, "attempts": rows.len(), "complete": complete,
+            "median_cpu_s": format!("{med:.2}"),
+            "min_cpu_s": format!("{:.2}", t.iter().cloned().fold(f64::INFINITY, f64::min)),
+            "max_cpu_s": format!("{:.2}", t.iter().cloned().fold(f64::NEG_INFINITY, f64::max)),
+            "mean_cpu_s": format!("{:.2}", t.iter().sum::<f64>() / t.len() as f64),
+            "not_unsat": unknown, "class": class,
+        }));
+    }
+    let verdict = match classes.len() {
+        0 => "NO VERDICT: no repetition completed its eight arm A refutations".to_string(),
+        1 => {
+            let (_, c, m) = classes[0];
+            if c == "S" && m <= RULE_ONE_REP_SOLVER_MAX_S {
+                "SOLVER (provisional: one complete repetition, no noise floor)".into()
+            } else if c == "E" && m >= RULE_ONE_REP_ENCODING_MIN_S {
+                "ENCODING (provisional: one complete repetition, no noise floor)".into()
+            } else {
+                "INCONCLUSIVE (one complete repetition, no noise floor, outside the single-repetition margins)".into()
+            }
+        }
+        _ => {
+            let s = classes.iter().filter(|c| c.1 == "S").count();
+            let e = classes.iter().filter(|c| c.1 == "E").count();
+            if s == classes.len() {
+                "SOLVER".into()
+            } else if e == classes.len() {
+                "ENCODING".into()
+            } else if s > 0 && e > 0 {
+                "INCONCLUSIVE (repetitions fall on both sides of the band: noise dominates)".into()
+            } else {
+                "INTERMEDIATE (neither anchor: the design cannot separate solver from encoding)"
+                    .into()
+            }
+        }
+    };
+    json!({"thresholds_s": {"solver_max": RULE_SOLVER_MAX_S, "encoding_min": RULE_ENCODING_MIN_S,
+                            "one_rep_solver_max": RULE_ONE_REP_SOLVER_MAX_S,
+                            "one_rep_encoding_min": RULE_ONE_REP_ENCODING_MIN_S},
+           "per_repetition": per_rep, "complete_repetitions": classes.len(), "verdict": verdict})
+}
+
+fn replay_any(
+    manifest_text: &str,
+    receipts_text: &str,
+    sealed: Option<&str>,
+    controls: Option<&str>,
+) -> Result<Replayed, String> {
+    let mut rp = replay_full(manifest_text, receipts_text, sealed)?;
+    let is_cms = receipts_text
+        .lines()
+        .next()
+        .is_some_and(|l| serde_json::from_str::<Value>(l).is_ok_and(|v| v["schema"] == CMS_SCHEMA));
+    if is_cms {
+        cms_audit(&mut rp, receipts_text, controls);
+    }
+    Ok(rp)
+}
+
+fn median_of<'a>(rows: impl Iterator<Item = &'a AttRow>) -> Option<f64> {
+    let mut v: Vec<f64> = rows.map(|r| r.cpu_ns as f64 / 1e9).collect();
+    (!v.is_empty()).then(|| median(&mut v))
+}
+
+/// Tables for the CryptoMiniSat study, next to the native study's numbers and
+/// the legacy anchors. Everything comes from replayed receipts.
+fn cms_tables_md(cms: &Replayed, native: Option<&Replayed>) -> String {
+    let rule = &cms.json["cms"]["decision_rule"];
+    let mut md = String::new();
+    md.push_str("### Verdict under the preregistered rule (PROTOCOL_ADDENDUM_2.md)\n\n");
+    md.push_str(&format!(
+        "Thresholds on the per-repetition median CPU of the eight arm A refutations: solver if at or below {RULE_SOLVER_MAX_S} s with all eight UNSAT, encoding if at or above {RULE_ENCODING_MIN_S} s, intermediate between.\n\n"
+    ));
+    md.push_str("| rep | complete | median CPU s | min | max | mean | not UNSAT (of 8) | class |\n|---|---|---|---|---|---|---|---|\n");
+    for r in rule["per_repetition"].as_array().unwrap() {
+        md.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {} | {} | {} |\n",
+            r["rep"],
+            r["complete"],
+            r["median_cpu_s"].as_str().unwrap(),
+            r["min_cpu_s"].as_str().unwrap(),
+            r["max_cpu_s"].as_str().unwrap(),
+            r["mean_cpu_s"].as_str().unwrap(),
+            r["not_unsat"],
+            r["class"].as_str().unwrap()
+        ));
+    }
+    md.push_str(&format!(
+        "\n**Verdict: {}** ({} complete repetition(s)).\n\n",
+        rule["verdict"].as_str().unwrap(),
+        rule["complete_repetitions"]
+    ));
+
+    md.push_str("### Arm A refutations, CPU seconds per target\n\n");
+    let lm = {
+        let mut v: Vec<f64> = LEGACY_A_REFUTATION_S.iter().map(|x| x.1).collect();
+        median(&mut v)
+    };
+    md.push_str("Legacy: CryptoMiniSat 5.16.0 via pycryptosat on the legacy Python encoding, one trial. Native: the crate's `sat::Solver` on this study's encoding. CMS: the pinned binary on this study's encoding exported with `to_dimacs_xor`. Status other than `unsat` is marked; a budget or deadline value is a lower bound.\n\n");
+    md.push_str("| target | legacy | native rep 1 | native rep 2 | native rep 3 | CMS rep 1 | CMS rep 2 | CMS rep 3 |\n|---|---|---|---|---|---|---|---|\n");
+    let cell = |rp: Option<&Replayed>, rep: u64, ti: usize| -> String {
+        let Some(rp) = rp else { return "-".into() };
+        match rp
+            .rows
+            .iter()
+            .find(|r| r.rep == rep && r.arm == "A" && r.target == ti)
+        {
+            None => "-".into(),
+            Some(r) => {
+                let mark = if r.status == "unsat" {
+                    String::new()
+                } else {
+                    format!(" ({})", r.status)
+                };
+                format!("{:.1}{mark}", r.cpu_ns as f64 / 1e9)
+            }
+        }
+    };
+    for (ti, (tid, _)) in cms.targets.iter().enumerate() {
+        if cms.a_decomposable[ti] {
+            continue;
+        }
+        let legacy = LEGACY_A_REFUTATION_S
+            .iter()
+            .find(|x| x.0 == tid)
+            .map_or("-".into(), |x| format!("{:.1}", x.1));
+        md.push_str(&format!(
+            "| {tid} | {legacy} | {} | {} | {} | {} | {} | {} |\n",
+            cell(native, 1, ti),
+            cell(native, 2, ti),
+            cell(native, 3, ti),
+            cell(Some(cms), 1, ti),
+            cell(Some(cms), 2, ti),
+            cell(Some(cms), 3, ti)
+        ));
+    }
+    let med = |rp: Option<&Replayed>, rep: Option<u64>| -> String {
+        rp.and_then(|rp| {
+            median_of(rp.rows.iter().filter(|r| {
+                r.arm == "A" && !rp.a_decomposable[r.target] && rep.is_none_or(|x| r.rep == x)
+            }))
+        })
+        .map_or("-".into(), |v| format!("{v:.1}"))
+    };
+    md.push_str(&format!(
+        "| median | {lm:.1} | {} | {} | {} | {} | {} | {} |\n",
+        med(native, Some(1)),
+        med(native, Some(2)),
+        med(native, Some(3)),
+        med(Some(cms), Some(1)),
+        med(Some(cms), Some(2)),
+        med(Some(cms), Some(3))
+    ));
+
+    md.push_str("\n### Paired comparison per repetition, every attempt charged\n\n");
+    md.push_str("Cost per newly independent verified relation, B over A. Legacy B/A CPU: 1.61 (one trial).\n\n");
+    md.push_str("| rep | CMS conflicts B/A | CMS CPU B/A | native conflicts B/A | native CPU B/A | CMS arm A CPU s | CMS arm B CPU s | CMS unknown (budget/deadline) A, B |\n|---|---|---|---|---|---|---|---|\n");
+    let ratio_of = |rp: &Replayed, rep: u64| -> Option<(f64, f64)> {
+        let a = rp
+            .scopes
+            .get(&(rep, "subgroup_xor".to_string(), "A".to_string()))?;
+        let b = rp
+            .scopes
+            .get(&(rep, "subgroup_xor".to_string(), "B".to_string()))?;
+        if a.rank == 0 || b.rank == 0 {
+            return None;
+        }
+        let (ca, ta) = costs(a);
+        let (cb, tb) = costs(b);
+        Some((cb / ca, tb / ta))
+    };
+    let reps: BTreeSet<u64> = cms.scopes.keys().map(|k| k.0).collect();
+    for rep in reps {
+        let get = |arm: &str| {
+            cms.scopes
+                .get(&(rep, "subgroup_xor".to_string(), arm.to_string()))
+        };
+        let f = |o: Option<(f64, f64)>, i: usize| {
+            o.map_or("-".to_string(), |x| {
+                format!("{:.3}", if i == 0 { x.0 } else { x.1 })
+            })
+        };
+        let (c, n) = (ratio_of(cms, rep), native.and_then(|n| ratio_of(n, rep)));
+        let secs =
+            |s: Option<&Sc>| s.map_or("-".into(), |s| format!("{:.1}", s.cpu_ns as f64 / 1e9));
+        let unk = |s: Option<&Sc>| s.map_or(0, |s| s.budget + s.deadline);
+        md.push_str(&format!(
+            "| {rep} | {} | {} | {} | {} | {} | {} | {}, {} |\n",
+            f(c, 0),
+            f(c, 1),
+            f(n, 0),
+            f(n, 1),
+            secs(get("A")),
+            secs(get("B")),
+            unk(get("A")),
+            unk(get("B"))
+        ));
+    }
+    md.push_str(&format!(
+        "\nDirection on CPU per new relation (B/A above 1 is the legacy direction: {LEGACY_B_OVER_A_CPU}): read the CMS column above; a repetition with arm B skipped has no ratio.\n"
+    ));
+
+    md.push_str("\n### Full tables, same renderer as the native study\n\nThe block headed \"Decision rule (PROTOCOL.md)\" below applies the native study's H1 rule to this solver's data. It is exploratory here: the preregistered rule of this follow-up is the verdict at the top.\n\n");
+    md.push_str(&tables_md(cms, 5));
+    md
+}
+
+/// Strip plot, log scale: arm A refutation CPU seconds per target for the
+/// legacy study, the native solver and CryptoMiniSat, with the two thresholds.
+fn cms_svg(cms: &Replayed, native: Option<&Replayed>) -> String {
+    let (w, h) = (900.0f64, 330.0f64);
+    let (x0, x1) = (150.0f64, 860.0f64);
+    let (lo, hi) = (3.0f64.ln(), 400.0f64.ln());
+    let px = |v: f64| x0 + (v.clamp(3.0, 400.0).ln() - lo) / (hi - lo) * (x1 - x0);
+    let mut s = String::new();
+    s.push_str(&format!("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {h}\" width=\"{w}\" height=\"{h}\" role=\"img\" aria-labelledby=\"t d\" font-family=\"sans-serif\" font-size=\"12\">\n"));
+    s.push_str(
+        "<title id=\"t\">Arm A refutation CPU per target: legacy, native, CryptoMiniSat</title>\n",
+    );
+    s.push_str("<desc id=\"d\">One dot per arm A UNSAT attempt on a log CPU-seconds axis; vertical lines mark the preregistered 45 s and 80 s thresholds. n = 13 stage diagnostic.</desc>\n");
+    s.push_str("<style>\nsvg{--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--grid:#e3e2de;--a:#2a78d6;--b:#eb6834;--c:#3a8f5b}\n@media (prefers-color-scheme: dark){svg{--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--grid:#3a3935;--a:#3987e5;--b:#d95926;--c:#4fb07a}}\n.bg{fill:var(--surface)}.ink{fill:var(--ink)}.ink2{fill:var(--ink2)}.gl{stroke:var(--grid);stroke-width:1}.th{stroke:var(--ink2);stroke-width:1;stroke-dasharray:4 3}.da{fill:var(--a)}.db{fill:var(--b)}.dc{fill:var(--c)}\n</style>\n");
+    s.push_str(&format!(
+        "<rect class=\"bg\" width=\"{w}\" height=\"{h}\"/>\n"
+    ));
+    s.push_str("<text class=\"ink\" x=\"24\" y=\"28\" font-size=\"16\" font-weight=\"bold\">Arm A refutations: CPU seconds per UNSAT attempt</text>\n");
+    s.push_str("<text class=\"ink2\" x=\"24\" y=\"48\">Same eight targets (a0 to a3, c0 to c3). Log axis. Unfinished attempts (budget or deadline) are drawn at the CPU they used.</text>\n");
+    for t in [5.0, 10.0, 20.0, 50.0, 100.0, 200.0, 400.0] {
+        let x = px(t);
+        s.push_str(&format!("<line class=\"gl\" x1=\"{x:.1}\" y1=\"70\" x2=\"{x:.1}\" y2=\"250\"/><text class=\"ink2\" x=\"{x:.1}\" y=\"268\" text-anchor=\"middle\">{t:.0}</text>\n"));
+    }
+    for (v, lab) in [(RULE_SOLVER_MAX_S, "45 s"), (RULE_ENCODING_MIN_S, "80 s")] {
+        let x = px(v);
+        s.push_str(&format!("<line class=\"th\" x1=\"{x:.1}\" y1=\"70\" x2=\"{x:.1}\" y2=\"250\"/><text class=\"ink2\" x=\"{x:.1}\" y=\"66\" text-anchor=\"middle\">{lab}</text>\n"));
+    }
+    s.push_str("<text class=\"ink2\" x=\"505\" y=\"290\" text-anchor=\"middle\">CPU seconds per attempt (log scale)</text>\n");
+    let ys = [105.0f64, 160.0, 215.0];
+    let mut rows: Vec<(&str, &str, Vec<f64>)> = Vec::new();
+    rows.push((
+        "Legacy (CMS via Python)",
+        "da",
+        LEGACY_A_REFUTATION_S.iter().map(|x| x.1).collect(),
+    ));
+    if let Some(n) = native {
+        rows.push((
+            "Native sat::Solver",
+            "db",
+            n.rows
+                .iter()
+                .filter(|r| r.arm == "A" && !n.a_decomposable[r.target])
+                .map(|r| r.cpu_ns as f64 / 1e9)
+                .collect(),
+        ));
+    }
+    rows.push((
+        "CryptoMiniSat 5.16.0",
+        "dc",
+        cms.rows
+            .iter()
+            .filter(|r| r.arm == "A" && !cms.a_decomposable[r.target])
+            .map(|r| r.cpu_ns as f64 / 1e9)
+            .collect(),
+    ));
+    for (i, (label, class, vals)) in rows.iter().enumerate() {
+        let y = ys[i];
+        s.push_str(&format!(
+            "<text class=\"ink\" x=\"24\" y=\"{:.0}\">{label}</text>\n",
+            y + 4.0
+        ));
+        for (k, v) in vals.iter().enumerate() {
+            let jitter = (k % 3) as f64 * 7.0 - 7.0;
+            s.push_str(&format!("<circle class=\"{class}\" cx=\"{:.1}\" cy=\"{:.1}\" r=\"4.5\" fill-opacity=\"0.8\"/>\n", px(*v), y + jitter));
+        }
+    }
+    s.push_str("<text class=\"ink2\" x=\"24\" y=\"314\">Scope: stage diagnostic on a toy field, one solver build, 8 refutations per repetition. No S, no ratio to rho, no ECDLP speedup.</text>\n");
+    s.push_str("</svg>\n");
+    s
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.len() < 2 {
-        eprintln!("usage: phase_paired_replay RECEIPTS.jsonl OUT.json [--manifest M] [--sealed S] [--tables T.md] [--svg F.svg]");
+        eprintln!("usage: phase_paired_replay RECEIPTS.jsonl OUT.json [--manifest M] [--sealed S] [--tables T.md] [--svg F.svg]\n       CryptoMiniSat receipts also take [--controls C.jsonl] [--native NATIVE_RECEIPTS.jsonl]");
         std::process::exit(64);
     }
     let mut manifest = DEFAULT_MANIFEST.to_string();
     let mut sealed = None;
     let mut tables = None;
     let mut svg = None;
+    let mut controls = None;
+    let mut native = None;
     let mut i = 2;
     while i + 1 < args.len() {
         match args[i].as_str() {
@@ -1234,6 +1892,8 @@ fn main() {
             "--sealed" => sealed = Some(args[i + 1].clone()),
             "--tables" => tables = Some(args[i + 1].clone()),
             "--svg" => svg = Some(args[i + 1].clone()),
+            "--controls" => controls = Some(args[i + 1].clone()),
+            "--native" => native = Some(args[i + 1].clone()),
             _ => {}
         }
         i += 2;
@@ -1245,9 +1905,18 @@ fn main() {
     }
     let rtext = fs::read_to_string(&args[0]).expect("receipts");
     let stext = sealed.map(|p| fs::read_to_string(p).expect("sealed"));
-    let rp = replay_full(&mtext, &rtext, stext.as_deref()).unwrap_or_else(|e| {
+    let ctext = controls.map(|p| fs::read_to_string(p).expect("controls"));
+    let rp = replay_any(&mtext, &rtext, stext.as_deref(), ctext.as_deref()).unwrap_or_else(|e| {
         eprintln!("replay failed: {e}");
         std::process::exit(3);
+    });
+    let is_cms = rp.json["schema"] == "phase_paired_cms/replay/v1";
+    let native_rp = native.map(|p| {
+        let nt = fs::read_to_string(p).expect("native receipts");
+        replay_full(&mtext, &nt, stext.as_deref()).unwrap_or_else(|e| {
+            eprintln!("native replay failed: {e}");
+            std::process::exit(3);
+        })
     });
     let out = &rp.json;
     let defects = out["defects"].as_array().map(|d| d.len()).unwrap_or(1);
@@ -1262,10 +1931,20 @@ fn main() {
     if defects == 0 {
         // Tables and chart are rendered from verified receipts only.
         if let Some(p) = tables {
-            fs::write(p, tables_md(&rp, 5)).expect("write tables");
+            let md = if is_cms {
+                cms_tables_md(&rp, native_rp.as_ref())
+            } else {
+                tables_md(&rp, 5)
+            };
+            fs::write(p, md).expect("write tables");
         }
         if let Some(p) = svg {
-            fs::write(p, svg_chart(&rp)).expect("write svg");
+            let s = if is_cms {
+                cms_svg(&rp, native_rp.as_ref())
+            } else {
+                svg_chart(&rp)
+            };
+            fs::write(p, s).expect("write svg");
         }
     }
     std::process::exit(if defects == 0 { 0 } else { 2 });
@@ -1579,5 +2258,255 @@ mod tests {
         assert!(!rk.insert(&[2, 5, 6, 8, 10]), "2*row1 + row2 is dependent");
         assert!(rk.insert(&[0, 0, 1, 0, 0]));
         assert_eq!(rk.rows.len(), 3);
+    }
+
+    // ---- CryptoMiniSat follow-up (PROTOCOL_ADDENDUM_2.md) ----
+
+    /// CryptoMiniSat receipts whose statuses are the exhaustive truth: arm A
+    /// refutations cost `a_secs[rep - 1]` seconds of child CPU, every other
+    /// attempt one second. Stage records follow the preregistered rule.
+    fn cms_synthetic(w: &World, a_secs: &[f64]) -> Vec<Value> {
+        let ca = w.decomposition_counts(false);
+        let cb = w.decomposition_counts(true);
+        let cap = 3600.0;
+        let mut lines = vec![json!({"type": "header", "schema": CMS_SCHEMA,
+            "manifest_sha256": w.sha, "conflict_budget": 3_000_000u64, "forms": ["subgroup_xor"],
+            "maxtime_cpu_s": 120.0, "cpu_cap_s": cap, "cpu_prior_s": 0.0, "controls_cpu_s": 0.0,
+            "stage_guard": 1.1, "cms_binary_sha256": CMS_BINARY_SHA, "cms_tag": "release/v5.16.0",
+            "cms_commit": "x", "cadical_commit": "y", "cadiback_commit": "z"})];
+        let sched = schedule(w, &["subgroup_xor".to_string()], a_secs.len() as u64);
+        let mut spent = 0.0;
+        let mut seq = 0;
+        let mut rep_cost: Vec<f64> = Vec::new();
+        for (rep, form, pair, pos, arm, tid) in sched {
+            if pair == 0 && pos == 0 {
+                let remaining: f64 = cap - spent;
+                let full = rep_cost
+                    .iter()
+                    .cloned()
+                    .fold(None::<f64>, |m, x| Some(m.map_or(x, |y| y.max(x))));
+                let a_of = |r: u64| -> Option<f64> {
+                    // arm A cost of repetition r: 8 refutations plus 4 one-second relations
+                    (r < rep).then(|| 8.0 * a_secs[r as usize - 1] + 4.0)
+                };
+                let ac = (1..rep)
+                    .filter_map(a_of)
+                    .fold(None::<f64>, |m, x| Some(m.map_or(x, |y| y.max(x))));
+                let mode = rep_mode(rep, remaining, 1.1, full, ac);
+                lines.push(json!({"type": "stage", "rep": rep, "mode": mode,
+                                  "remaining_cpu_s": (remaining * 1000.0).round() / 1000.0}));
+                assert_eq!(mode, "full", "synthetic receipts assume roomy repetitions");
+            }
+            let ti = pair;
+            let arm_b = arm == "B";
+            let dec = if arm_b { cb[ti] > 0 } else { ca[ti] > 0 };
+            let t = w.targets[ti].2;
+            let secs = if !arm_b && !dec {
+                a_secs[rep as usize - 1]
+            } else {
+                1.0
+            };
+            let child = (secs * 1e9) as u64;
+            let (status, exit, line) = if dec {
+                ("verified", 10, "SATISFIABLE")
+            } else {
+                ("unsat", 20, "UNSATISFIABLE")
+            };
+            let mut v = json!({"type": "attempt", "seq": seq, "rep": rep, "form": form,
+                "pair": pair, "position": pos, "arm": arm, "phases": arm_b, "set": w.targets[ti].1,
+                "target_id": tid, "target": [format!("{:#x}", t.0), format!("{:#x}", t.1)],
+                "status": status, "solver": "cryptominisat5", "solver_calls": 1,
+                "conflicts": 10, "decisions": 20, "propagations": 30, "word_ops": 0,
+                "rejected_tuples": 0, "solve_cpu_ns": child, "total_cpu_ns": child + 1_000_000,
+                "total_wall_ns": child + 2_000_000,
+                "cms": {"child_cpu_ns": child, "error": null, "calls": [
+                    {"exit_code": exit, "status_line": line, "child_cpu_ns": child,
+                     "killed_at_wall_backstop": false, "signal": null}]}});
+            if dec {
+                let pts = planted(w, ti, arm_b).expect("exhaustive says decomposable");
+                v["found_points"] = json!(pts
+                    .iter()
+                    .map(|p| [format!("{:#x}", p.0), format!("{:#x}", p.1)])
+                    .collect::<Vec<_>>());
+                v["solver_summands"] = json!(pts
+                    .iter()
+                    .map(|p| {
+                        let (j, k) = w.orbit[&p.0];
+                        json!({"v": format!("{:#x}", w.reps[j].0), "k": k})
+                    })
+                    .collect::<Vec<_>>());
+            }
+            spent += secs + 0.001;
+            seq += 1;
+            lines.push(v);
+            if pair == w.targets.len() - 1 && pos == 1 {
+                rep_cost.push(8.0 * a_secs[rep as usize - 1] + 4.0 + 12.0);
+            }
+        }
+        lines
+    }
+
+    fn join(v: &[Value]) -> String {
+        v.iter()
+            .map(|l| l.to_string())
+            .collect::<Vec<_>>()
+            .join("\n")
+            + "\n"
+    }
+
+    fn cms_verdict_of(a_secs: &[f64]) -> (String, usize) {
+        let w = World::from_manifest(&manifest_text()).unwrap();
+        let lines = cms_synthetic(&w, a_secs);
+        let rp = replay_any(&manifest_text(), &join(&lines), None, None).unwrap();
+        (
+            rp.json["cms"]["decision_rule"]["verdict"]
+                .as_str()
+                .unwrap()
+                .to_string(),
+            rp.json["defects"].as_array().unwrap().len(),
+        )
+    }
+
+    #[test]
+    fn cms_decision_rule_classifies_the_preregistered_cases() {
+        let (v, d) = cms_verdict_of(&[20.0]);
+        assert_eq!(d, 0);
+        assert!(v.starts_with("SOLVER (provisional"), "{v}");
+        assert!(cms_verdict_of(&[40.0])
+            .0
+            .starts_with("INCONCLUSIVE (one complete"));
+        assert!(cms_verdict_of(&[130.0])
+            .0
+            .starts_with("ENCODING (provisional"));
+        assert!(cms_verdict_of(&[100.0])
+            .0
+            .starts_with("INCONCLUSIVE (one complete"));
+        assert_eq!(cms_verdict_of(&[20.0, 44.0]), ("SOLVER".to_string(), 0));
+        assert_eq!(cms_verdict_of(&[90.0, 200.0]), ("ENCODING".to_string(), 0));
+        assert!(cms_verdict_of(&[60.0, 70.0]).0.starts_with("INTERMEDIATE"));
+        assert!(cms_verdict_of(&[20.0, 100.0])
+            .0
+            .starts_with("INCONCLUSIVE (repetitions"));
+        // Just under 45 s (the receipts add a millisecond of parent CPU) is solver, 45.2 s is not.
+        assert_eq!(cms_verdict_of(&[44.99, 44.99]).0, "SOLVER");
+        assert!(cms_verdict_of(&[45.2, 45.2]).0.starts_with("INTERMEDIATE"));
+        assert_eq!(cms_verdict_of(&[80.0, 80.0]).0, "ENCODING");
+    }
+
+    #[test]
+    fn cms_unfinished_refutation_blocks_the_solver_verdict() {
+        let w = World::from_manifest(&manifest_text()).unwrap();
+        let mut lines = cms_synthetic(&w, &[20.0, 20.0]);
+        // One arm A refutation in repetition 2 ends at the deadline: it is unknown.
+        let mut done = false;
+        for l in lines.iter_mut() {
+            if !done
+                && l["type"] == "attempt"
+                && l["rep"] == 2
+                && l["arm"] == "A"
+                && l["status"] == "unsat"
+            {
+                l["status"] = json!("deadline");
+                l["cms"]["calls"][0]["exit_code"] = json!(15);
+                l["cms"]["calls"][0]["status_line"] = json!("INDETERMINATE");
+                let child = 120_000_000_000u64;
+                l["cms"]["child_cpu_ns"] = json!(child);
+                l["cms"]["calls"][0]["child_cpu_ns"] = json!(child);
+                l["solve_cpu_ns"] = json!(child);
+                l["total_cpu_ns"] = json!(child + 1_000_000);
+                done = true;
+            }
+        }
+        let rp = replay_any(&manifest_text(), &join(&lines), None, None).unwrap();
+        assert_eq!(
+            rp.json["defects"].as_array().unwrap().len(),
+            0,
+            "{}",
+            rp.json["defects"]
+        );
+        let v = rp.json["cms"]["decision_rule"]["verdict"].as_str().unwrap();
+        assert!(
+            v.starts_with("INTERMEDIATE") || v.starts_with("INCONCLUSIVE"),
+            "{v}"
+        );
+    }
+
+    #[test]
+    fn cms_audit_rejects_what_the_protocol_forbids() {
+        let w = World::from_manifest(&manifest_text()).unwrap();
+        let base = cms_synthetic(&w, &[20.0, 20.0]);
+        let defects = |f: &dyn Fn(&mut Vec<Value>)| -> Vec<String> {
+            let mut l = base.clone();
+            f(&mut l);
+            let rp = replay_any(&manifest_text(), &join(&l), None, None).unwrap();
+            rp.json["defects"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|d| d.to_string())
+                .collect()
+        };
+        assert!(defects(&|_| {}).is_empty());
+        // 1. a different binary
+        assert!(!defects(&|l| l[0]["cms_binary_sha256"] = json!("0".repeat(64))).is_empty());
+        // 2. the cap exceeded
+        assert!(!defects(&|l| l[0]["cpu_cap_s"] = json!(100.0)).is_empty());
+        // 3. a stage record that does not follow the rule
+        assert!(!defects(&|l| {
+            let s = l
+                .iter_mut()
+                .filter(|x| x["type"] == "stage")
+                .nth(1)
+                .unwrap();
+            s["mode"] = json!("none");
+        })
+        .is_empty());
+        // 4. a recorded remaining allowance that the receipts do not give
+        assert!(!defects(&|l| {
+            let s = l
+                .iter_mut()
+                .filter(|x| x["type"] == "stage")
+                .nth(1)
+                .unwrap();
+            s["remaining_cpu_s"] = json!(5.0);
+        })
+        .is_empty());
+        // 5. an UNSAT that carries the SAT exit code
+        assert!(!defects(&|l| {
+            let a = l.iter_mut().find(|x| x["status"] == "unsat").unwrap();
+            a["cms"]["calls"][0]["exit_code"] = json!(10);
+        })
+        .is_empty());
+        // 6. a deadline below the CPU backstop
+        assert!(!defects(&|l| {
+            let a = l.iter_mut().find(|x| x["status"] == "unsat").unwrap();
+            a["status"] = json!("deadline");
+            a["cms"]["calls"][0]["exit_code"] = json!(15);
+            a["cms"]["calls"][0]["status_line"] = json!("INDETERMINATE");
+        })
+        .is_empty());
+        // 7. child CPU that does not add up
+        assert!(!defects(&|l| {
+            let a = l.iter_mut().find(|x| x["type"] == "attempt").unwrap();
+            a["cms"]["child_cpu_ns"] = json!(5u64);
+        })
+        .is_empty());
+        // 8. an instrument error recorded
+        assert!(!defects(&|l| {
+            let a = l.iter_mut().find(|x| x["type"] == "attempt").unwrap();
+            a["cms"]["error"] = json!("model does not satisfy the exported instance");
+        })
+        .is_empty());
+        // 9. a false UNSAT on a decomposable target (the exhaustive check wins)
+        assert!(!defects(&|l| {
+            let a = l
+                .iter_mut()
+                .find(|x| x["status"] == "verified" && x["arm"] == "B")
+                .unwrap();
+            a["status"] = json!("unsat");
+            a["cms"]["calls"][0]["exit_code"] = json!(20);
+            a["cms"]["calls"][0]["status_line"] = json!("UNSATISFIABLE");
+        })
+        .is_empty());
     }
 }
