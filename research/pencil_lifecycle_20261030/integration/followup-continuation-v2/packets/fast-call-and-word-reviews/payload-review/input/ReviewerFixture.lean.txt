@@ -1,0 +1,17 @@
+import FastPayloadControls
+set_option autoImplicit false
+open Polynomial FastPrelude FastPayload FastPreludeControls
+namespace ReviewerFixture
+ theorem sample_batch_values :
+ FastBatch.ni 17 (normWord 17 sample) (s1Word 17 sample)=9 ∧
+ FastBatch.si 17 (normWord 17 sample) (s1Word 17 sample)=16 ∧
+ leadRatio 17 sample=15 := by decide
+ theorem small_values : normWord 17 small=1 ∧ s1Word 17 small=16 ∧
+ s0Word 17 small=0 ∧ slope0 17 small=0 ∧ slope1 17 small=16 ∧ inverseLead 17 small=16 := by decide
+ theorem explicit_small_residual :
+ ((X:(ZMod (17:UInt64).toNat)[X])^5-X^4-X^3+1)-(1-X^3)^2 =
+ (X^2*(X^2+1))*(-X^2+X) := by ring
+end ReviewerFixture
+#print axioms ReviewerFixture.sample_batch_values
+#print axioms ReviewerFixture.small_values
+#print axioms ReviewerFixture.explicit_small_residual
