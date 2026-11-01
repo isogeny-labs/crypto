@@ -82,3 +82,14 @@ l->l+A sourceinvolutions. A changedcubiccoefficientmustproduce a nonzero
 whole-source residual. Exactrationalfunctionnormalforms,nofinitefiberfit.
 Outputall324/76fieldfunctiondefinitions for futurefixed/trace/cohort/maps.
 Noacceptedproducerrepeated. Samecaps/onejob/seed61.
+
+## Stage4 complete76 source fixed/trace complex
+FIELD61accepted324actualcubic/76mixedfunctions and76actualinvolutions.
+FreezecompleteN=sigma+I kernel/recovery/homotopy,derivefixed/trace ranks,
+thencheck38/38fromhigh-degreeetalegeometry. FullJordanbasis/twoinverse
+products,QwithNQ+QN=I76,Q²=0,actualoneandoddparticular. Verifyall38
+sourcefixedfunctions andall38sourcepreimageidentities inwholedegree32field,
+actualtrace(odd)=1. Checkalllocal272/regular770profileimaginarycoefficients
+zero. Exportfullmatrices andactualfixed/preimagefunctions. Changedsource
+controls alreadyinCUBIC/FIELDdonors;no newnull claiminthisstage. Samecaps.
+ALL818supportpatterns are next,notassumedfromdimensions.

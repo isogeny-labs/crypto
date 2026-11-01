@@ -1,12 +1,12 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R61-CUBIC-FIELD",
+  "id": "KOBLITZ-R61-FIXED-TRACE",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "field",
+      "id": "fixed-trace",
       "class": "exact_computation",
-      "statement": "All324actualcubicfunctions,76complete mixedfunctions and76whole-sourceinvolution identities in the actual degree32field"
+      "statement": "Completefixed/trace76complex,actual38fixedsourcefunctions/all38preimages,oddparticular,fullcontraction andsourceprofiles"
     }
   ],
   "arms": {
@@ -14,15 +14,16 @@
     "baseline": {
       "not_applicable_reason": "exactidentityreconstruction,no timingcomparison"
     },
-    "candidate": "R61complete324cubic/76mixedkernel actualfieldfunctions",
+    "candidate": "actual76source-functioninvolutioncomplex",
     "positive": [
-      "degree32sourcefield",
-      "exactactualconstant1reconstruction",
-      "all76sourceinvolutionidentities"
+      "completekernel/recovery/Jordan/contraction",
+      "actual38tracepreimages",
+      "actualconstant1/oddparticular",
+      "whole-sourcefixedidentities"
     ],
-    "negative": [
-      "changedcubiccoefficienthasnonzeroactualsourceimage"
-    ],
+    "negative": {
+      "not_applicable_reason": "This stageconstructsandcheckscomplete sourceoperators;changedcubic/sourceinvolution controls passed in the donor stages."
+    },
     "A_A": {
       "not_applicable_reason": "fixedexactidentities,no statisticalmetric"
     }
@@ -60,14 +61,14 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "sourcefielddegree32",
-    "actualcubicfunctions324",
-    "mixedsourcefunctions76",
-    "actualinvolutionchecks76",
-    "constant1/changedcoefficientcontrols"
+    "fixed/trace dimensions",
+    "fullkernel/Jordan/contractionproducts",
+    "38actualfixed and38actualpreimageidentities",
+    "oddactualtrace1",
+    "fixedlocal/regularimaginaryzero"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh field61-01 FIELD61.sing FIELD61_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh fix61-01 FIX61.sing FIX61_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -107,9 +108,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 6,
+  "version": 7,
   "amendment": {
     "before_affected_data": true,
-    "reason": "cubic61-02acceptedcomplete324ambient/76mixed/all6480bounds;freezeactualfieldbindingstagewithcorrectedauxiliarymetadata"
+    "reason": "FIELD61acceptedall324/76actualsourcefunctions/involutions;freeze completefixed/trace stage"
   }
 }

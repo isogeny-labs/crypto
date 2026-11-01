@@ -67,3 +67,17 @@ FIELD61,fixed/trace/all818cohort,6scalableLeanclaims;complete61holodifferentials
 
 ### Errors
 Firstcubic01indexingfailure retained/rejected. Canonicalprotocoltool/schema/docs absent both selectedGitindex/disk;manualbytecontractcheckingnotcalledschema-validation. CorrectedcopiedauxiliaryJSONmetadatawithoutscientificthresholdchanges orreruns.
+
+## 2026-11-01T19:03:34.938319+00:00 — actual76functionfieldbindings accepted
+
+### What was done
+field61-01accepteddegree32source,all324actualcubicfunctions,76mixedfunctionsand76whole-sourceinvolutions,constant1/changedcoefficientcontrols. Native0/PASS/noerrors. CUBIC02full76space remainsaccepted;rawsunchanged.
+
+### Decisions made
+Freezecomplete76tracecomplex andall38fixed/preimages/actualoddsourcefunctions; deriveandcheck38/38,thenall818cohort. AddedproposedglobalcuspidalunitlatticefromactualF2normnu/Ttranslates/baseMillerunits,withgeneratedsubgroupvsfullsaturationexplicit.
+
+### Open threads
+FIX61,all818/checker,6Leanclaims/report/custody;complete61holodifferentials/Cartier andsourceunitlattices;alloriginalgoals.
+
+### Errors
+NoFIELD61errors. NativeCUBIC01indexingfailure onlyR61failuretodate;protocolauxiliarymetadatarepairdisclosedwithoutpastbytechanges.

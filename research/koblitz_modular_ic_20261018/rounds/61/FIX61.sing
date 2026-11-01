@@ -1,0 +1,41 @@
+LIB "linalg.lib";
+proc require61(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump61(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){require61(A[i,j]==1,"FIX61_BINARY_MATRIX_ENTRY");write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../cubic61-02/cubic-space61.sing"));
+matrix N61=sigmaMixed61+unitmat(76);matrix F61=matrix(syz(module(N61)));int fixed61=ncols(F61);int trace61=mat_rk(N61);
+require61(fixed61==76-trace61 && mat_rk(F61)==fixed61,"FIX61_COMPLETE_FIXED_DIMENSION");
+matrix R61=transpose(lift(module(transpose(F61)),module(unitmat(fixed61))));
+matrix H61=transpose(lift(module(transpose(N61)),module(transpose(unitmat(76)+F61*R61))));
+require61(N61*F61==matrix(0,76,fixed61) && R61*F61==unitmat(fixed61) && F61*R61+H61*N61==unitmat(76),"FIX61_COMPLETE_FIXED_SPLITTING");
+require61(fixed61==38 && trace61==38,"FIX61_HIGH_DEGREE_TRACE_ACYCLICITY");
+matrix preimages61=lift(module(N61),module(F61));require61(N61*preimages61==F61,"FIX61_ALL_FIXED_TRACE_PREIMAGES");
+matrix J61=concat(F61,preimages61);matrix Jinv61=lift(module(J61),module(unitmat(76)));
+require61(J61*Jinv61==unitmat(76) && Jinv61*J61==unitmat(76),"FIX61_COMPLETE_JORDAN_BASIS");
+matrix first61[38][76];int i61;int j61;
+for(i61=1;i61<=38;i61++){for(j61=1;j61<=76;j61++){first61[i61,j61]=Jinv61[i61,j61];}}
+matrix Q61=preimages61*first61;
+require61(N61*Q61+Q61*N61==unitmat(76) && Q61*Q61==matrix(0,76,76),"FIX61_ACTUAL_TRACE_CONTRACTION");
+matrix one38=R61*oneMixed61;require61(F61*one38==oneMixed61,"FIX61_FIXED_CONSTANT_CONTROL");
+matrix odd61=Q61*oneMixed61;require61(N61*odd61==oneMixed61,"FIX61_ODD_PARTICULAR");
+matrix fixedProfiles61=profiles61*F61;matrix fixedRegular61=regular61*F61;
+for(i61=2;i61<=272;i61=i61+2){for(j61=1;j61<=38;j61++){require61(fixedProfiles61[i61,j61]==0,"FIX61_FIXED_LOCAL_IMAGINARY_ZERO");}}
+for(i61=2;i61<=770;i61=i61+2){for(j61=1;j61<=38;j61++){require61(fixedRegular61[i61,j61]==0,"FIX61_FIXED_REGULAR_IMAGINARY_ZERO");}}
+link matout61="ASCII:w fixed-space61.sing";open(matout61);write(matout61,"ring fixedSpace61=2,(w),dp;short=0;");
+dump61(matout61,"N61",N61);dump61(matout61,"F61",F61);dump61(matout61,"R61",R61);dump61(matout61,"H61",H61);dump61(matout61,"preimages61",preimages61);dump61(matout61,"J61",J61);dump61(matout61,"Jinv61",Jinv61);dump61(matout61,"Q61",Q61);dump61(matout61,"one38",one38);dump61(matout61,"odd61",odd61);dump61(matout61,"fixedProfiles61",fixedProfiles61);dump61(matout61,"fixedRegular61",fixedRegular61);close(matout61);
+execute(read("../field61-01/field-space61.sing"));ideal fixedGB61=std(sourceIdeal61);
+map fixedCoefficients61=cubicSpace61,0;matrix FC61=fixedCoefficients61(F61);matrix PC61=fixedCoefficients61(preimages61);matrix OC61=fixedCoefficients61(odd61);
+ideal fixedFunctions61;ideal preimageFunctions61;poly val61;poly pv61;poly residual61;poly oddField61;
+for(j61=1;j61<=38;j61++){
+ val61=0;pv61=0;for(i61=1;i61<=76;i61++){val61=val61+FC61[i61,j61]*completeValues61[i61];pv61=pv61+PC61[i61,j61]*completeValues61[i61];}
+ fixedFunctions61[j61]=reduce(val61,fixedGB61);preimageFunctions61[j61]=reduce(pv61,fixedGB61);
+ residual61=subst(fixedFunctions61[j61],l,l+actualA61)+fixedFunctions61[j61];require61(reduce(residual61,fixedGB61)==0,"FIX61_ALL_ACTUAL_FIXED_SOURCE_IDENTITIES");
+ residual61=subst(preimageFunctions61[j61],l,l+actualA61)+preimageFunctions61[j61]+fixedFunctions61[j61];require61(reduce(residual61,fixedGB61)==0,"FIX61_ALL_ACTUAL_PREIMAGE_SOURCE_IDENTITIES");
+}
+for(i61=1;i61<=76;i61++){oddField61=oddField61+OC61[i61,1]*completeValues61[i61];}oddField61=reduce(oddField61,fixedGB61);
+require61(reduce(subst(oddField61,l,l+actualA61)+oddField61+1,fixedGB61)==0,"FIX61_ACTUAL_ODD_TRACE_ONE");
+link fieldout61="ASCII:w fixed-field61.sing";open(fieldout61);write(fieldout61,"ring fixedField61=(2,u),(l,v),dp;short=0;ideal sourceIdeal61;");
+for(i61=1;i61<=size(sourceIdeal61);i61++){write(fieldout61,"sourceIdeal61["+string(i61)+"]="+string(sourceIdeal61[i61])+";");}
+write(fieldout61,"poly actualA61="+string(actualA61)+";poly oddField61="+string(oddField61)+";ideal fixedFunctions61;ideal preimageFunctions61;");
+for(i61=1;i61<=38;i61++){write(fieldout61,"fixedFunctions61["+string(i61)+"]="+string(fixedFunctions61[i61])+";preimageFunctions61["+string(i61)+"]="+string(preimageFunctions61[i61])+";");}close(fieldout61);
+print("FIX61_RESULT mixed_dimension=76 fixed_dimension="+string(fixed61)+" trace_rank="+string(trace61)+" actual_fixed_source_checks=38 actual_preimage_source_checks=38 odd_trace_one=1 complete_trace_contraction=1 local_and_regular_imaginary_zero=1");
+print("FIX61_ALL_CHECKS_PASS");quit;
