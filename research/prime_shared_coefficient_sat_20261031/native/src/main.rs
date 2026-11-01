@@ -1,5 +1,6 @@
 use prime_shared_coeff_ir::{
-    boolean::BooleanEncoding, build_ir, e0_f17_panel, e1::run_e1_sat_panel, InstanceSpec,
+    boolean::BooleanEncoding, build_ir, e0_f17_panel, e1::run_e1_sat_panel,
+    e1_msolve::run_e1_msolve_panel, InstanceSpec,
 };
 use std::path::Path;
 use std::process::ExitCode;
@@ -72,9 +73,25 @@ fn run() -> Result<(), String> {
             );
             Ok(())
         }
+        Some("e1-msolve-panel") if args.len() == 4 => {
+            let report = run_e1_msolve_panel(
+                Path::new(&args[1]),
+                Path::new(&args[2]),
+                &args[3],
+            )?;
+            println!(
+                "{}: {}/{} exact target matches; {}/{} fixed controls",
+                report.verdict,
+                report.exact_target_matches,
+                report.expected_target_matches,
+                report.fixed_control_matches,
+                report.expected_fixed_control_matches
+            );
+            Ok(())
+        }
         _ => {
             Err(
-                "usage: prime-shared-coeff-ir emit ... | prime-shared-coeff-ir e0-panel | prime-shared-coeff-ir e1-sat-panel CADICAL LRAT_TRIM CRYPTOMINISAT CAKE_XLRUP OUTPUT_DIR SOURCE_REVISION"
+                "usage: prime-shared-coeff-ir emit ... | prime-shared-coeff-ir e0-panel | prime-shared-coeff-ir e1-sat-panel CADICAL LRAT_TRIM CRYPTOMINISAT CAKE_XLRUP OUTPUT_DIR SOURCE_REVISION | prime-shared-coeff-ir e1-msolve-panel MSOLVE OUTPUT_DIR SOURCE_REVISION"
                     .to_owned(),
             )
         }
