@@ -631,6 +631,8 @@ pub enum Targets {
     ResidualFusedDp,
     /// Negation-equivariant walk on a large step set with distinguished points.
     ResidualFusedEq,
+    /// `ResidualFusedEq` whose restarts cost one addition (previous start plus a jump).
+    ResidualFusedEqChain,
     /// `R ← R + S` for one drawn `S = [s]G + [t]Q`: one addition per
     /// target, with no jump table to set up.  See `TargetSource::Stride`.
     Stride,
@@ -661,6 +663,7 @@ impl Targets {
             Targets::ResidualFused => "residual-fused",
             Targets::ResidualFusedDp => "residual-fused-dp",
             Targets::ResidualFusedEq => "residual-fused-eq",
+            Targets::ResidualFusedEqChain => "residual-fused-eq-chain",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
             Targets::StrideGenerator => "stride-generator",
@@ -683,12 +686,13 @@ impl Targets {
             "residual-fused" => Ok(Targets::ResidualFused),
             "residual-fused-dp" => Ok(Targets::ResidualFusedDp),
             "residual-fused-eq" => Ok(Targets::ResidualFusedEq),
+            "residual-fused-eq-chain" => Ok(Targets::ResidualFusedEqChain),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
             "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, residual-fused-dp, residual-fused-eq, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }
