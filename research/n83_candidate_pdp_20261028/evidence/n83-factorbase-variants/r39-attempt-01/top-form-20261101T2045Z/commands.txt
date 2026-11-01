@@ -1,0 +1,6 @@
+sha256sum -c protocol-binding.sha256
+bash -n run-spike39-topform.sh
+python3 -m py_compile stage_r39_bases_from_s3.py
+bash run-spike39-topform.sh
+
+Frozen candidate arm: spike39, all three families, m=2..9, natural and planted targets. Outer timeout 86400 seconds; 8 GiB virtual-memory cap; one computation thread; max_attempts=1 per candidate. Every top certificate is replayed by a fresh process. Generated outputs are synced to the unique candidate S3 prefix during execution and on exit.
