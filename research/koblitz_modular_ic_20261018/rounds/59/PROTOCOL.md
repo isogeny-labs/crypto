@@ -10,3 +10,6 @@ Acceptanceexit0,exactmarker,noquestion-markerrors;preserveallfailed/cappedrawcop
 
 ## Stage2 exact binary quotient/cohort
 data02accepted;freeze standaloneRustRUST-PROTOCOL beforebuild/data. Sourceoperatorsand100numeratorsaretheacceptednativepacket. All18casesmandatory;principal0/1resultsreportedwithouttargetcountfilter. Completekernelcertificatesandglobalregularpositivecontrolrequired. Exact640/320productsandpointlabelledJordan/old160-columnreplayprecedecohortinterpretation.
+
+## Stage3 fresh exact checker
+After acceptedcohort59-01,copyimmutablebinary/data/certificate into freshcheckerraw. Recomputeproductswithrow-dot-columnparityratherthanproducercolumn-XOR;check640/320identity/sourceoperators/pointJordanbasis/CRTpolynomials,old160columns,finite100injectionandall18completekernelcertificates. Wrongcokernelprojectionmustfail. No producer rerun or newbuild. This is certificate validation,not an independent scientific review.

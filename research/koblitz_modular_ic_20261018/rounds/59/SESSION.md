@@ -39,3 +39,17 @@ Rustproducer/checker,all18resultinterpretation;AS31scalars/bothsignsifprincipalp
 
 ### Errors
 Noacceptedproducerrepeated;onlyinitialmissinglibraryfailure.
+
+## 2026-11-01T06:49:00.461527+00:00 — complete stable-support cohort excluded
+
+### What was done
+cohort59-01accepted:640presentation/320cokernel/fullE-G-Hrecovery,fourpoint-labelled80dimlength4Jordanblocks,old160columnreplay,finiteRRrank100,positiveglobalregularrank99withA²kernel. ALL18stableO/Tmatricesrank100,kernel0;no principalxpatterns. Rustbuild0/native0,rawcertificatesandall18rows retained.
+
+### Decisions made
+Freezeexactchecker. For thiscohortno31scalar/ASbranchesremainbecauseeveryxdivisorspaceiszero. PreservebroaderF32supports andnormalinfinitypolelead. Newcompleteinfinitycohort:fourdegree2pointswith2Dpolecaps56,8,14,2;balancedramificationstatesfromcaps28,4,7,1 give404patterns,notfinitePcohort. t0mustbeQ(1)inL2D,notlambda/AwhichliesL2P.
+
+### Open threads
+Checker,Lean,report/custody;thenfullinfinity404andsharedAS249test,broaderF32support/500-bitcompiler/originalscopes.
+
+### Errors
+InitialCASmissinglibraryretained/rejected;noRustfailureorcohortdownscale.

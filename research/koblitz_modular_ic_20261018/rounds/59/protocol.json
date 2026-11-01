@@ -1,27 +1,12 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R59-FULL-320-18-COHORT",
+  "id": "KOBLITZ-R59-CERTIFICATE-CHECK",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "A4-quotient",
+      "id": "check",
       "class": "exact_computation",
-      "statement": "Full640binarypresentationA4rank320/cokernel320,completeE/G/Hrecovery;normalA4pointjetscertifiedbyfour80-blockJordanbases."
-    },
-    {
-      "id": "old-replay",
-      "class": "exact_computation",
-      "statement": "Inducedw=nu/b andcanonical80basisreproduceall160oldR55evaluationcolumns."
-    },
-    {
-      "id": "cohort",
-      "class": "exact_computation",
-      "statement": "All18stableO/Tpatterns evaluatedwithfullkernelcertificates;positiveglobalregularcontrolrank99/knownA\u00b2 andnegative1/A\u00b2."
-    },
-    {
-      "id": "map",
-      "class": "out_of_scope",
-      "statement": "Principalxdivisoriscandidateonly;all31F32scalars/bothsigns/ASsourceidentities/intended11action remainrequiredifanypatternsurvives."
+      "statement": "Fresh exactcheckerreplays640/320products,pointJordan/sourceoperators/oldcolumns/100evaluationinjection/all18kernelcertificateswithrowdotparity."
     }
   ],
   "arms": {
@@ -88,7 +73,7 @@
     "principal/excludedpatterncounts"
   ],
   "execution": {
-    "launcher": "REPLAY_RUST.sh cohort59-01",
+    "launcher": "REPLAY_CHECK.sh checkcohort59-01",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -128,9 +113,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 3,
+  "version": 4,
   "amendment": {
     "before_affected_data": true,
-    "reason": "data59-02accepted fullsourceassembly;freeze binary640/320cokernel,pointCRT andall18stablepatterns"
+    "reason": "cohort59-01accepted320quotient/all18rank100/regularpositive99;freeze separatecheckerwithrowdotimplementation"
   }
 }
