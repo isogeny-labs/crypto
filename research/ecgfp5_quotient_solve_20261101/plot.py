@@ -17,7 +17,8 @@ COL = {4111: "#0072B2", 262231: "#009E73", 33554371: "#D55E00", "dev": "#777777"
 ARMS = ["raw_x", "sym_x", "raw_u", "sym_u", "quot"]
 PRED = {"raw_x": 384, "sym_x": 64, "raw_u": 384, "sym_u": 64, "quot": 16}
 
-fig, ax = plt.subplots(1, 3, figsize=(15.5, 4.8), gridspec_kw={"width_ratios": [1.0, 1.25, 1.25]})
+fig, axs = plt.subplots(2, 2, figsize=(13.5, 9.6))
+ax = axs.ravel()
 
 # (a) m = 3 ideal degrees against the prediction
 a = ax[0]
@@ -50,6 +51,8 @@ for c in cells:
     cum, ys, ds = 0.0, [], []
     for r in rounds:
         cum += r["cpu_s"]
+        if cum <= 0:
+            continue
         ys.append(math.log2(cum * CLOCK))
         ds.append(r["deg"])
     key = c["p"] if c["p"] in COL and not c["cell"].startswith("dev") else "dev"
@@ -81,6 +84,27 @@ c_.set_xlabel("wall time (h), 4 threads")
 c_.set_ylabel("RSS (GiB)")
 c_.set_title("(c) m = 5 quotient: resident memory", fontsize=10)
 c_.legend(fontsize=7.5, frameon=False, loc="upper left", bbox_to_anchor=(0.0, 0.92))
+# (d) probe arms at p = 4111 against W0's F4
+d_ = ax[3]
+W0 = A.get("W0_f4_cpu_s")
+rows = [("W0  grevlex F4 (msolve)", W0, "complete")]
+for r in A["probes"]["weighted"]:
+    rows.append((f"{r['arm']}  W = {r['weights']} (msolve)", r["f4_cpu_s"], r["stop"]))
+for r in A["probes"]["sba"]:
+    rows.append((f"{r['arm']}  {r['call']} (Singular)", r["cpu_s"], r["stop"]))
+lab = {"complete": "complete", "wall_cap": "stopped at cap", "owner_stop": "stopped by owner", "rss_cap": "stopped at RSS cap"}
+for i, (name, cpu, st) in enumerate(rows):
+    done = st == "complete"
+    d_.barh(i, cpu, color="#0072B2" if done else "white", edgecolor="#0072B2", hatch=None if done else "//", lw=1.2)
+    d_.text(cpu * 1.01, i, f"{cpu:,.0f} s  {lab.get(st, st)}" + ("" if done else " (lower bound)"), va="center", fontsize=7.5)
+d_.axvline(W0, color="#555555", ls="-", lw=1)
+d_.axvline(W0 / 1.5, color="#009E73", ls=":", lw=1.6)
+d_.text(W0 / 1.5, len(rows) - 0.45, "improvement bar: W0 / 1.5", fontsize=7.5, color="#007A55", ha="center")
+d_.set_yticks(range(len(rows)), [r[0] for r in rows], fontsize=8)
+d_.invert_yaxis()
+d_.set_xlim(0, max(r[1] for r in rows) * 1.45)
+d_.set_xlabel("CPU seconds (user + sys) to a Gröbner basis, m = 5, p = 4111")
+d_.set_title("(d) weighted orders (A2) and signature-based F5 (A3) against W0", fontsize=10)
 for x in ax:
     for s in ("top", "right"):
         x.spines[s].set_visible(False)

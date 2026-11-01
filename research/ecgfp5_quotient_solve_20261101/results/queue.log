@@ -9,3 +9,11 @@ queue start 2026-11-01T07:57:00Z
 "signal": 9 "killed_by_rss_cap": false "killed_by_wall_cap": true "wall_seconds": 12996.568 "user_seconds": 12839.985 "maxrss_kib": 6364496
 == F5b sba(i, 1, 0) cap=12996s
 "signal": null "killed_by_rss_cap": false "killed_by_wall_cap": false "wall_seconds": 9175.292 "user_seconds": 9032.420 "maxrss_kib": 9368464
+== W1 W=2,2,2,2,2,1 order=s1,s2,s3,s4,s5,w cap=3903s
+Dimension of quotient: 2097152
+"signal": null "killed_by_rss_cap": false "killed_by_wall_cap": false "wall_seconds": 3709.547 "user_seconds": 11983.627 "maxrss_kib": 4905280
+== W3 W=1,1,1,1,1,2 order=w,s1,s2,s3,s4,s5 cap=3903s
+"signal": 9 "killed_by_rss_cap": false "killed_by_wall_cap": true "wall_seconds": 3903.530 "user_seconds": 13497.207 "maxrss_kib": 9503424
+== W2 W=1,2,3,4,5,5 order=s5,w,s4,s3,s2,s1 cap=3903s
+"signal": 9 "killed_by_rss_cap": false "killed_by_wall_cap": true "wall_seconds": 3903.641 "user_seconds": 10645.226 "maxrss_kib": 10314068
+queue finished 2026-11-01T23:32:55Z
