@@ -2,9 +2,9 @@
 
 - **Status:** open
 - **Kind:** missing construction/proof; scoped obstructions to the unchanged packing template
-- **Affected work:** [prime-field research continuation](../research/prime_tensor_variants_20261030/README.md), [concrete verifier](../research/prime_tensor_variants_20261030/reviews/compact-scalar.md), [heavy-predicate analysis](../research/prime_tensor_variants_20261030/reviews/heavy-predicates.md)
+- **Affected work:** [prime-field research continuation](../research/prime_tensor_variants_20261030/README.md), [concrete verifier](../research/prime_tensor_variants_20261030/reviews/compact-scalar.md), [heavy-predicate analysis](../research/prime_tensor_variants_20261030/reviews/heavy-predicates.md), [H109 torsion-derivative experiment](../research/torsion_division_derivative_20261031/README.md)
 - **Next action owner:** prime-field algorithm research; no unattended job scheduled
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-01
 
 ## Problem
 
@@ -40,6 +40,7 @@ variant into the existing hashed reduction does not satisfy novelty.
 - **Correction retained:** a proposed general code-occupancy barrier was false
   without extra structural premises. Repeated-slot counterexamples prevent
   using it to rule out all correlated packet constructions.
+- **H109 scoped null:** the invariant torsion derivative identity passed all 9,096 checks, but complete enumeration found 0/28 exact constant-size phase formulas (8,832 tuples); 32 matched controls also had no exact formula. Result SHA-256: `940123c44c6194b247fab3596a9ed2e331ee7e01b2fb8830fc7e8465e354993a`. This closes only H109's frozen family and does not resolve this problem.
 - **Missing capability:** a constructible exact splitting or weighted-extension
   routine with a proved closed recursive representation. General contraction
   formalization and complete native implementation audit are separate gaps.
@@ -95,4 +96,7 @@ This is a conditional sufficiency calculation, not the missing construction.
 Unresolved. On 2026-10-30, the ternary continuation supplied the scoped window,
 variance, indivisibility and sparse-packet analyses and named the missing
 constructible operation. Publishing or merging that continuation does not
-resolve this problem or the original research goal.
+resolve this problem or the original research goal. On 2026-11-01, H109
+validated its torsion-local derivative identity but found no exact formula in
+its complete frozen constant-size family; that scoped null also leaves this
+problem unresolved.
