@@ -1,0 +1,172 @@
+{
+  "schema": "formal.review/v1",
+  "reviewed_commit": "e62d035ab852be5bbfd27bbe8f11c8f6bfe25f2e",
+  "machine_status": "passed",
+  "fidelity": "faithful_scoped",
+  "outcome": "validated_scoped",
+  "main_declarations": 10,
+  "producer_controls": 7,
+  "producer_readbacks": 17,
+  "reviewer_controls": 3,
+  "reviewer_readbacks": 3,
+  "expected_false_exit": 1,
+  "inventory_negative_controls": 3,
+  "unexpected_failures": [],
+  "claims": [
+    {
+      "name": "DivisorArrayCopy.from_success",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.bounded_lists",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.raw_shape",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.copy_safe",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.construction_copy_safe",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.vp_roundtrip",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.raw_canonical",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.construct_valid",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.shape_of_normalized_valid",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayCopy.normalized_valid_construct",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayControls.identity_exact",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayControls.degree_one_padding",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayControls.degree_two_short_ordinate",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayControls.empty_ordinate",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayControls.bad_shapes_rejected",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayControls.unnormalized_v_not_equal",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "name": "DivisorArrayControls.full_fast_to_stored",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    }
+  ],
+  "review_attestation": {
+    "reviewer": "/root/array_independent_review",
+    "non_author": true,
+    "joints_owned": [
+      "constructor/copy bounds",
+      "accessor roundtrips",
+      "canonical padding",
+      "validity shape adapter"
+    ],
+    "sources_read": [
+      "input/*.lean",
+      "metadata/native.rs:795-801,943-964",
+      "metadata/current-main-native.rs",
+      "metadata/review-plan.md",
+      "metadata/REPORT.md",
+      "metadata/current-main-dated-session-log.md",
+      "/var/tmp/pencil-mumford-validity-20261031-v1/Validity.lean:34-36",
+      "/var/tmp/pencil-monic-remainder-zero-test-20261031-v1/Normalized.lean:6",
+      "/var/tmp/fast-call-independent-dcDVDCQH/run.sh",
+      "/var/tmp/fast-call-independent-dcDVDCQH/audit.rs",
+      "repository AGENTS.md",
+      "review-evidence/SKILL.md",
+      "review-evidence/references/lean-review.md",
+      "metadata/refreshed-main-native.rs",
+      "metadata/refreshed-main-session-log.md:newest entries and pencil matches",
+      "metadata/refreshed-main-rules.diff"
+    ],
+    "sibling_reports_accessed": false,
+    "blind_rederivation": false,
+    "inherited_context": true,
+    "verdict": "holds"
+  },
+  "cache_boundary": "fresh targets; reused hash-bound helpers; deeper unions verified against retained inventory during review; no independent binary rechecker",
+  "scope_exclusions": [
+    "native panic",
+    "physical copy_from_slice",
+    "usize/compiler",
+    "allocation/counters",
+    "Picard classes",
+    "whole dispatch",
+    "measurements"
+  ],
+  "main_reconciliation": {
+    "initial_local_tracking_ref": "27b3b8403914c2483bfbc0605300c5e68785e91b",
+    "initial_ref_stale": true,
+    "reason": "narrow remote fetch configuration identified by coordinator",
+    "refreshed_main": "66aeee272c250868d059f1cd27165e9805641048",
+    "native_source_byte_identical": true,
+    "target_packet_diff_empty": true,
+    "new_replay_required": false,
+    "rules_delta": "always-current session logs; byte counters; ecdb scope; no proof acceptance predicate change",
+    "checked_at": "2026-11-01T20:29:12.717571+00:00"
+  }
+}

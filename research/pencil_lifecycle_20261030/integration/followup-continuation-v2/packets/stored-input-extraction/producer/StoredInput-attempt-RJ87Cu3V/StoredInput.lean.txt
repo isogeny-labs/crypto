@@ -1,0 +1,57 @@
+import DivisorArrayValidity
+set_option autoImplicit false
+namespace StoredInput
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy
+
+def WellFormed (p : UInt64) (f : Polynomial (ZMod p.toNat)) (d : Stored) : Prop :=
+ d.degree≤2 ∧ d.u.size=3 ∧ d.v.size=2 ∧ d.canonical p ∧
+ d.u.toList[d.degree]?=some 1 ∧
+ wordsPoly p (up d) ∣ f-(wordsPoly p (vp d))^2
+
+theorem lists_three_two (d : Stored) (hu : d.u.size=3) (hv : d.v.size=2) :
+ ∃ a b c x y : UInt64, d.u.toList=[a,b,c] ∧ d.v.toList=[x,y] := by
+ have hu' : d.u.toList.length=3 := by simpa using hu
+ have hv' : d.v.toList.length=2 := by simpa using hv
+ cases eu : d.u.toList with
+ | nil => simp [eu] at hu'
+ | cons a us =>
+  cases us with
+  | nil => simp [eu] at hu'
+  | cons b us =>
+   cases us with
+   | nil => simp [eu] at hu'
+   | cons c us =>
+    have he : us=[] := by simp only [eu,List.length_cons] at hu'; cases us <;> simp_all
+    subst us
+    cases ev : d.v.toList with
+    | nil => simp [ev] at hv'
+    | cons x vs =>
+     cases vs with
+     | nil => simp [ev] at hv'
+     | cons y vs =>
+      have he : vs=[] := by simp only [ev,List.length_cons] at hv';cases vs <;> simp_all
+      subst vs
+      exact ⟨a,b,c,x,y,rfl,rfl⟩
+
+theorem accessor_shape (p : UInt64) (f : Polynomial (ZMod p.toNat)) (d : Stored)
+ (hw : WellFormed p f d) :
+ (up d).length=d.degree+1 ∧ (up d).getLast?=some 1 ∧
+ Normal (up d) ∧ Normal (vp d) ∧ (vp d).length≤d.degree ∧
+ Canon p (up d) ∧ Canon p (vp d) := by
+ rcases hw with ⟨hd,hu,hv,hc,hl,hr⟩
+ obtain ⟨a,b,c,x,y,eu,ev⟩:=lists_three_two d hu hv
+ have degrees : d.degree=0 ∨ d.degree=1 ∨ d.degree=2 := by omega
+ have huc : Canon p d.u.toList := hc.1
+ have hvc : Canon p d.v.toList := hc.2
+ have htake : Canon p (d.v.toList.take d.degree) := by
+  intro z hz;exact hvc z (List.mem_of_mem_take hz)
+ have hvpc : Canon p (vp d) := trim_good p _ _ htake
+ have hvpn : Normal (vp d) := trim_finished _ _ le_rfl
+ have hvpl : (vp d).length≤d.degree :=
+  le_trans (trim_length _ _) (List.length_take_le _ _)
+ rcases degrees with h | h | h <;>
+  simp only [h,eu,List.getElem?_cons_zero,List.getElem?_cons_succ] at hl
+ all_goals
+  subst_vars
+  simp_all [up,Normal,Canon]
+end StoredInput
