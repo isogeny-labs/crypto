@@ -934,8 +934,9 @@ def main() -> int:
     for m in missing:
         print("unresolved:", m, file=sys.stderr)
     amap = cid.alias_map_text(doc)
+    index = cid.registry_index_text(text)
     if args.check:
-        stale = [p for p, t in ((OUT, text), (cid.ALIAS_MAP, amap))
+        stale = [p for p, t in ((OUT, text), (cid.ALIAS_MAP, amap), (cid.REGISTRY_INDEX, index))
                  if not p.exists() or p.read_text() != t]
         for p in stale:
             print(f"{p.relative_to(REPO)} is stale; run scripts/build_curve_registry.py",
@@ -946,8 +947,9 @@ def main() -> int:
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(text)
         cid.ALIAS_MAP.write_text(amap)
+        cid.REGISTRY_INDEX.write_text(index)
         print(f"wrote {OUT.relative_to(REPO)}: {len(doc['curves'])} curves, "
-              f"and {cid.ALIAS_MAP.relative_to(REPO)}")
+              f"{cid.ALIAS_MAP.relative_to(REPO)} and {cid.REGISTRY_INDEX.relative_to(REPO)}")
     return 1 if missing else 0
 
 

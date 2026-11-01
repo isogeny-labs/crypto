@@ -1,0 +1,24 @@
+/var/tmp/pencil-fast-polynomial-calls-20261101-v1/FastCallInputs.lean:36:1: error: unsolved goals
+case refine_7
+p : UInt64
+w : Inputs
+inst✝ : Fact (Nat.Prime p.toNat)
+hp : 2 < p.toNat
+hb : p.toNat < 2 ^ 31
+hn : normWord p w ≠ 0
+hs : s1Word p w ≠ 0
+hqa : w.qa.toNat < p.toNat
+hra : w.ra.toNat < p.toNat
+hsa : w.sa.toNat < p.toNat
+hta : w.ta.toNat < p.toNat
+hqb : w.qb.toNat < p.toNat
+hrb : w.rb.toNat < p.toNat
+hsb : w.sb.toNat < p.toNat
+htb : w.tb.toNat < p.toNat
+hww : Inputs.canonical p w
+h0 : (slope0 p w).toNat < p.toNat
+h1 : (slope1 p w).toNat < p.toNat
+left✝ : ↑(slope0 p w).toNat = s0Field p w / normField p w
+right✝ : ↑(slope1 p w).toNat = s1Field p w / normField p w
+hva : Canon p [w.ta, w.sa]
+⊢ X * ↑(slope1 p w).toNat = ↑(slope1 p w).toNat * X

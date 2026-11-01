@@ -1,0 +1,11 @@
+# Prospective word-source review plan
+
+Written before dispatch. Archival task T-1287. Immutable inputs: this packet at its publication commit, word-batch-inversion at 5937d99b29e5027d99b7fda1be35569e44f01836, and the exact pinned helpers in their binding receipts. Prior: coordinator inspection finds the construction plausible; no independent fidelity or fresh reviewer machine verdict yet.
+
+Joint C, proposed owner strict_storage_reviewer: literal batch product and generated inverse. Independently check native dispatch, exact UInt64/u128 operation order, product nonzero proof, canonical bounds, modpow-generator source bridge, and ni/si orientation. Attack noncanonical inputs, composite modulus, zero guards and the overflow threshold. Fresh isolated module replay, named axiom audit and false/checker controls. Do not substitute an assumed inverse witness.
+
+Joint D, proposed owner quintic_fidelity_review: coefficient operation tree and payload endpoint. Check each input index, ordinate sign, arithmetic order, p=3 domain, nonzero-guard timing, S0 evaluation boundary, slope assembly and inverse_lead minus sign. Work the actual p17 fixture from source definitions and verify residual hypotheses; test zero slope and missing minus. Replay modules/controls/readbacks on exact inputs, preserving failed attempts and unchanged bindings. Verify endpoint derives quotient existence and does not assume its intended source correspondence.
+
+Reviewers authored neither assigned component. Historical context is inherited, so reports must not claim blind derivation or mutually blind history. Do not read sibling new reports. Record sources_read, owned joints, independent source-fidelity verdict and machine status separately, missing bridges and dependency-cache trust. No official scientific transition or performance inference. A separate isolated blind derivation is not included in this plan.
+
+Use review-evidence Lean route; inspect current main separately without altering producer snapshots. No repository edits or scientific/cloud/timing execution. Return raw receipts, complete attestations, source-linked report and JSON in separate private paths for a subsequent reserved PDF/SVG archive.
