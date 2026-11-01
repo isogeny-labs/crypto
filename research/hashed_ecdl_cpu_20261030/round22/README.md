@@ -1,6 +1,7 @@
 # Round22 complete CPU stage diagnostic panel
 
-Prepared, not executed. No launch is authorized by this directory.
+Frozen and native-validated, not executed. No launch is authorized by this directory.
+Protocol hash: 88c80abe26f704055292a5b8bfade5baa91a7f86167f4f4a5222d1817fafc1de.
 The question is which instrumented stages contribute to complete recovery cost,
 with ordinary controls exposing profiler overhead. This is descriptive L0
 candidate-selection work, not isolated tenfold acceptance.
@@ -69,5 +70,10 @@ and retrieved provenance before native validation. No affected data existed.
 
 The source review and prior evidence are listed in protocol literature:
 stage-profile/README.md, ReductionStats/solve_reduction and round21 summaries.
-No new arithmetic or novelty claim is made. Next: complete the freeze, then
-obtain explicit bounded run admission before creating any job.
+No new arithmetic or novelty claim is made. Next: obtain explicit bounded run
+admission before creating any job. No input upload or job submission occurred.
+
+The integration head 972d0d2fed4d incorporates the earlier registry-policy repair.
+Its root check and Clippy jobs subsequently failed on mismatched delimiters in
+examples/koblitz_orbit_dlp_fast.rs. The standalone CPU and native-panel builds
+pass; that unrelated integration failure is not represented as a passing gate.

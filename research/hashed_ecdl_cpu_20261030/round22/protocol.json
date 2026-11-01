@@ -343,11 +343,11 @@
     "timeout_seconds": 300
   },
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "commit": "f8c5b197a0243eb4201e0f0fb74a598957911135",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-11-01T19:25:11Z",
+    "protocol_sha256": "88c80abe26f704055292a5b8bfade5baa91a7f86167f4f4a5222d1817fafc1de",
+    "status": "frozen"
   },
   "inadmissible": [
     "Certified speedup from L0 clocks",
@@ -386,9 +386,9 @@
       "verified_by": "Official Vec and slice partition_point contracts reviewed during pivot-directory implementation; independent tree-based reference checks exact dependency coefficients."
     },
     {
-      "ref": "research/hashed_ecdl_cpu_20261030/stage-profile/README.md",
-      "provenance": "retrieved",
       "claim": "Reduction/other includes target generation, relation checking, linear work and internal replay. Existing stage clocks separate these without changing query/certificate content.",
+      "provenance": "retrieved",
+      "ref": "research/hashed_ecdl_cpu_20261030/stage-profile/README.md",
       "verified_by": "Source review of ReductionStats and solve_reduction; 46 tests include profiled/ordinary parity. Round21 raw stage summaries motivate this descriptive experiment."
     }
   ],
@@ -507,92 +507,92 @@
         "unit": "milliseconds"
       },
       {
+        "aggregation": "median",
+        "definition": "Profiled solve interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
         "id": "stage_solve_ms",
+        "kind": "timed",
         "name": "profiled solve",
-        "kind": "timed",
-        "unit": "milliseconds",
-        "aggregation": "median",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV solve",
-        "definition": "Profiled solve interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       },
       {
+        "aggregation": "median",
+        "definition": "Profiled bases interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
         "id": "stage_bases_ms",
+        "kind": "timed",
         "name": "profiled bases",
-        "kind": "timed",
-        "unit": "milliseconds",
-        "aggregation": "median",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV bases",
-        "definition": "Profiled bases interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       },
       {
+        "aggregation": "median",
+        "definition": "Profiled targets interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
         "id": "stage_targets_ms",
+        "kind": "timed",
         "name": "profiled targets",
-        "kind": "timed",
-        "unit": "milliseconds",
-        "aggregation": "median",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV targets",
-        "definition": "Profiled targets interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       },
       {
+        "aggregation": "median",
+        "definition": "Profiled oracle interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
         "id": "stage_oracle_ms",
+        "kind": "timed",
         "name": "profiled oracle",
-        "kind": "timed",
-        "unit": "milliseconds",
-        "aggregation": "median",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV oracle",
-        "definition": "Profiled oracle interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       },
       {
+        "aggregation": "median",
+        "definition": "Profiled linear interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
         "id": "stage_linear_ms",
+        "kind": "timed",
         "name": "profiled linear",
-        "kind": "timed",
-        "unit": "milliseconds",
-        "aggregation": "median",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV linear",
-        "definition": "Profiled linear interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       },
       {
+        "aggregation": "median",
+        "definition": "Profiled internal_replay interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
         "id": "stage_internal_replay_ms",
+        "kind": "timed",
         "name": "profiled internal_replay",
-        "kind": "timed",
-        "unit": "milliseconds",
-        "aggregation": "median",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV internal_replay",
-        "definition": "Profiled internal_replay interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       },
       {
+        "aggregation": "median",
+        "definition": "Profiled external_replay interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
         "id": "stage_external_replay_ms",
-        "name": "profiled external_replay",
         "kind": "timed",
-        "unit": "milliseconds",
-        "aggregation": "median",
+        "name": "profiled external_replay",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV external_replay",
-        "definition": "Profiled external_replay interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       },
       {
-        "id": "stage_complete_ms",
-        "name": "profiled complete",
-        "kind": "timed",
-        "unit": "milliseconds",
         "aggregation": "median",
+        "definition": "Profiled complete interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z.",
+        "id": "stage_complete_ms",
+        "kind": "timed",
+        "name": "profiled complete",
         "resolution": "Rust Instant; instrumented L0 diagnostics",
-        "uncertainty": "range",
         "source": "stages CSV complete",
-        "definition": "Profiled complete interval accumulated across trials; extra clock overhead, not a complete partition. Available only in y/z."
+        "uncertainty": "range",
+        "unit": "milliseconds"
       }
     ]
   },
