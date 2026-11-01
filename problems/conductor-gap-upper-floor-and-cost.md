@@ -129,6 +129,15 @@ contiguous FLINT polynomial/tree routines to external-memory processing;
 that schedule and the full point evaluator remain open. Only the small
 storage fixture is prepared, not the full multi-terabyte root window.
 
+The [native polynomial-block stage](../research/prime_conductor_gap80_20261031/poly-blocks/README.md)
+now prepares and evaluates bounded products, accumulating six reciprocal
+power sums over supplied blocks. The 4,096-root prefix agrees with direct
+inversion at 32 source and 32 actual giant contexts (384 values), with
+independent PARI context checks, split-block consistency and nine negative
+controls. This checks the first native processing primitive for stored
+blocks; full baby/giant coverage, codomain moments, complete point images
+and feasible total-work accounting remain open.
+
 ### Historical 60-bit-prime instance imported on 2026-10-31
 
 The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)
