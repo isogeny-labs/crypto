@@ -34,8 +34,8 @@ The null changes only the global wiring of interior ports while preserving the v
 
 1. **Implemented:** a canonical, versioned network IR with stable edge/port ordering, interface order, pins, predicate semantics, and provenance.
 2. **Implemented on tiny controls:** exact IR round trip and all five E0 mutations. See [`E0_IMPLEMENTATION.md`](E0_IMPLEMENTATION.md).
-3. **Next:** add a `tensor-census` binary that materializes the boundary tensor for a frozen cut law and computes fraction-free integer ranks.
-4. **Then:** run only scratch preflight fixtures disjoint from the declared ladder; fill binary, analysis, runtime, memory, and power fields.
+3. **Implemented 2026-11-01:** the exact `tensor-census` core materializes the boundary tensor for an explicit canonical vertex cut and computes fraction-free integer ranks. See [`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md).
+4. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 5. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
@@ -70,6 +70,8 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`protocol.draft.json`](protocol.draft.json) — draft `experiment.protocol/v1` record.
 - [`experiment-matrix.json`](experiment-matrix.json) — machine-readable experiment cards and dependencies.
 - [`E0_IMPLEMENTATION.md`](E0_IMPLEMENTATION.md) — canonical-IR format, controls, evidence boundary, and open obligations.
+- [`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md) — exact boundary contraction/rank core, local controls and remaining generator gates.
+- [`SEARCH_20261101.md`](SEARCH_20261101.md) — reconciliation of the requested separator, small-root and special-prime leads.
 - [`REPORT.md`](REPORT.md) — visual decision brief.
 - `report.pdf` — rendered report after validation.
 - [`VALIDATION.md`](VALIDATION.md) — generated-artifact and protocol checks.

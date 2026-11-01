@@ -673,6 +673,20 @@ probe but adds canonicalisation, Frobenius-map, lookup, entry and
 representative counts to `oracle_setup`. Use `mitm-frobenius:m=3` on the
 same base as its accounting control.
 
+`cm-multiplier:size=K,norm=N[,endo=I][,mult=M]` and
+`binary-multiplier:size=K,mult=M` expose the generator-relative multiplier
+bases to the complete `ic.pipeline`.  Each seed is one linear-algebra column;
+known endomorphism or integer multiples of that seed are signed table points
+carrying their known coefficient on the same column.  Thus they test a
+specialised two-sum signed-graph batching effect: the relation table sees many
+vertices while the matrix needs only one unknown per seed.  Construction is
+inside the cold measurement and its group operations are charged.  Use
+`norm=0,mult=1` (prime) or `mult=1` (binary) as the same-seed control, and a
+coordinate-defined base such as `prime-abscissa`, `glv-orbit`, or
+`binary-subspace` as the matched conventional control.  This is a generic
+decomposition tradeoff, not evidence that a generator-specific coordinate or
+extension-field subset changes ECDLP's asymptotic exponent.
+
 `mitm-fiber:fiber=closed|lifts|blind`, `mitm-frobenius-fiber:fiber=closed|lifts|blind`
 and `descent-algebraic-fiber:fiber=combined|lifts|blind` (with a `solver`) are
 the cofactor-fiber-aware oracles of `ic_framework::fiber`
@@ -1139,9 +1153,15 @@ method does not take).
   ratio [1.025, 1.075]. The v1 headline, the median of per-pair wall
   ratios, is a different estimand from the ops ratio (biased about +6 % for
   a deterministic arm against a random one) and stays only as
-  `median_ratio`. The ratio of total wall times (`total_wall_ratio`, with
-  `total_wall_ci95`) is the secondary "end-to-end wall" and keeps the work
-  variance. When an arm's GAE is a lower bound (unpriced work,
+  `median_ratio`. The historical ratio of summed solve intervals remains
+  `total_wall_ratio` (with `total_wall_ci95`) for schema compatibility and
+  keeps the work variance. It is not a complete cold end-to-end interval.
+  `method_call_wall_ratio` includes per-call setup, solve, in-child
+  verification and report completion; `process_wall_ratio` is the broadest
+  fork-to-reap figure and also includes workload reconstruction and process
+  overhead. Both carry linearised pair-clustered and target-clustered paired-
+  bootstrap 95% intervals and are gated by the same L2 and five-pair rules. When an arm's
+  GAE is a lower bound (unpriced work,
   `ns_per_gae_upper_bound_arms`), its ns per GAE is an upper bound on its
   cost per operation, and the verdict says so.
 - **The noise test corrects for bias.** The A/A pair is the pair of arms
