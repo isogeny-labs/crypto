@@ -93,3 +93,49 @@ SPLIT02then8Leanclaims/fullsourcechecker/reports;alloriginallanesremain.
 ### Errors
 I used unsupported Singular ideal equality. Repaired syntax before fresh
 fullcohortdata;noaccepted matrix producer repeated.
+
+## 2026-11-01T23:09:56.174436+00:00 — complete435 repaired run accepted
+
+### What was done
+split62-02 terminal native0,exact PASS marker,no native question-mark errors.
+All435 whole-source identities and13920 coefficient parity checks pass;
+17 zero odd outputs,all1/u/u²controls and changed-root negative pass.
+Native UTC23:07:20–23:09:04. Eight-claim Lean attempt started after terminal.
+Prepared independent full435 replay and source derivative-generator route,
+including all870 root comparisons; not yet executed. User-requested GitHub
+check-in verified9795e5e479ee388235f481ce9d893a9a8071dbd2 remotely.
+
+### Decisions made
+Keep failed01/accepted02distinct. Freeze donor hash,complete source and
+protocol before replay/direct data. Generator route targets larger112/991
+without full square matrix inversion; first use complete degree32 control.
+
+### Open threads
+Compile/audit8Leanclaims;execute CHECK62/DIRECT62 after freeze and current
+proof terminal. Complete normality/global differential geometry,unit
+saturation/actualT/Hecke/order11action and all original lanes remain active.
+
+### Errors
+Wrong skill path on initial lookup corrected to installed plugin path.
+No native error in split02. Prior ideal comparison failure retained.
+
+## 2026-11-01T23:14:00.327101+00:00 — proof compile failure and source freeze
+
+### What was done
+First8claimcompile terminal1: unavailable pow_eq_zero and noncomm_ring
+left numeral-cast goal5smul1=5. Audit not run. Preserved logs/source.
+Repaired with pinned eq_zero_of_pow_eq_zero and explicit norm_num import.
+Added four exact pair/generator claims, now12; all are unproved until fresh
+compile/audit. Full435 independent checker/direct source frozen together.
+
+### Decisions made
+Run independent source checker, direct generator route, then fresh12claim
+Lean job serially. Preserve caps and full cohort, no accepted producer rerun.
+
+### Open threads
+Fresh CHECK62/DIRECT62/Lean02; records and inspected report; larger marked23
+degree112 source and selected991action, global geometry/all original lanes.
+
+### Errors
+First Lean compile rejected on two API/tactic issues; no theorem accepted
+from that failed artifact. Original failed01 data stay immutable.

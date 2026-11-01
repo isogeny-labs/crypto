@@ -1,13 +1,23 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R62-FULL435-DECOMPOSITION",
-  "version": 4,
+  "id": "KOBLITZ-R62-COMPLETE435-AND-GENERATOR",
+  "version": 5,
   "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
   "claims": [
     {
       "id": "split435",
       "class": "exact_computation",
       "statement": "Complete cached operator gives435 actual whole-source square decompositions and13920 rational coefficient parity checks"
+    },
+    {
+      "id": "replay435",
+      "class": "exact_computation",
+      "statement": "Fresh replay binds every saved input and decomposition to actual R61 source and rechecks all32 squared columns and both inverses"
+    },
+    {
+      "id": "generator435",
+      "class": "exact_computation",
+      "statement": "Primitive generator derivative formula and pair arithmetic independently match both matrix-produced roots for all435 source functions"
     }
   ],
   "arms": {
@@ -66,10 +76,13 @@
     "13920 rational coefficient and polynomial parity checks",
     "zero-odd component counts",
     "actual1/u/u\u00b2 control roots",
-    "changed-root rejection"
+    "changed-root rejection",
+    "435 actual source rebindings and435 whole-source identities in each independent replay",
+    "32 generated basis pairs and870 direct/matrix root comparisons",
+    "actual derivative inverse and source generator formula"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh split62-02 SPLIT62.sing SPLIT62_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh check62-01 CHECK62.sing CHECK62_ALL_CHECKS_PASS; then DIRECT62.sing in a fresh direct62-01 attempt",
     "backend": "original manually authorized local Singular",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
@@ -103,6 +116,6 @@
   "validation_note": "canonical protocol tools/schema absent in selected index; manual contract/source byte verification only",
   "amendment": {
     "before_affected_data": true,
-    "reason": "split62-01 rejected unsupported ideal equality and late PASS; compare complete source equation count and every polynomial exactly, same435/13920scope/cache/caps"
+    "reason": "Freeze full-source independent435 replay and direct primitive-generator formula before their first native execution; split62-02 terminal accepted unchanged"
   }
 }

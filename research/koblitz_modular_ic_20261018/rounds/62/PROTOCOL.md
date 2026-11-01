@@ -47,3 +47,18 @@ SPLIT01unsupportedideal==idealcomparisonisnativeerror;latePASSandall
 numbersrejected. Comparefullgeneratorcountandeverycachedsourcepolynomial
 exactlybeforeSPLIT02. All435functions/13920coefficientchecks/controls/caps
 unchanged;cachedMATRIX62accepted,noreproducerun.
+
+## Independent replay and direct generator freeze
+split62-02 accepted all435 identities/13920 rational parity checks,17 zero
+odd outputs; both roots and all zero slots retained. CHECK62 reloads saved
+payloads, binds every input to actual R61 functions and rechecks all435
+identities/32 squared columns/both inverse products and negative controls.
+DIRECT62 uses the source derivative formula in GENERATOR-LEAD62.md, actual
+v pair, complete lambda polynomial grouping, nonzero derivative with checked
+inverse, all32 generated basis pairs, all435 whole-source identities and BOTH
+roots compared to matrix output (870 comparisons). Full cohort and original
+limits retained. This is source-field computation, no global geometry claim
+or timing comparison. Reuse rational coefficient splitter, independently
+construct generator pairs and all monomial pairs; no squared-basis matrix
+or its inverse is read by DIRECT62. Check all source/cache donor hashes.
+Fresh attempts check62-01 then direct62-01, one math job at a time.
