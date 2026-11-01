@@ -19,7 +19,7 @@ for a in ax:a.grid(axis='y',alpha=.15)
 fig.savefig(h/'infinity60.svg',metadata={'Date':None});plt.close(fig)
 p=h/'infinity60.svg';p.write_text('\n'.join(x.rstrip() for x in p.read_text().splitlines())+'\n')
 (h/'plot-data60.json').write_text(json.dumps({'sources':['mixed60-02/native.log','cohort60-01/cohort60.tsv','check60-01/native.log'],'dimensions':dict(zip(labels,vals)),'degree_counts':dict(sorted(counts.items())),'degree_counts_kind':'derived histogram of404 recorded rows','excluded':404,'principal':0,'regular_control_dimension':1,'uncertainty':'exact exhaustive matrices, no statistical intervals'},indent=2)+'\n')
-attempts='\n'.join('['+x['attempt']+'],['+x['status']+'],' for x in r['runs'])
+attempts='\n'.join('['+x['attempt']+'],['+x['status']+'],['+(str(int(x['native_wall_seconds']))+' s' if x['kind']=='Singular' else 'not recorded')+'],' for x in r['runs'])
 source='''#set page(paper:"a4",margin:16mm)
 #set text(size:10pt)
 = R60: complete infinity-pole space and404 exclusions
@@ -67,12 +67,24 @@ nonstable F32 finite-support fibers remain available construction spaces.
 
 #pagebreak()
 = Exact checks, formal bounds and the cubic enlargement
-#table(columns:(2fr,1fr),[Attempt],[Outcome],
+#table(columns:(2fr,1fr,1fr),[Attempt],[Outcome],[Native wall],
 ATTEMPTS
 )
+Native wall is timestamp-derived, includes this invocation only and is not
+a performance comparison. Host: migrated Spot workspace, Linux/x86_64;
+actual source revisions, native binary hashes and UTC are retained per run.
+Commands: REPLAY_CAS.sh with mixed60-01/02,cohort60-01,check60-01 and
+the corresponding MIXED60/COHORT60/CHECK60 input and exact marker;
+REPLAY_LEAN.sh with infinity-lean60-01/02/03. Seed60, one native job/thread,
+4GiB virtual and1200seconds each; Lean -j1 -M4096, separate1200second
+compile/audit and no VM cap. No warmups or statistical sampling.
+
 The first native attempt used an unsupported indexed intvec increment.
 All four chart bodies failed; its late PASS was rejected and all reported
-numbers excluded. The repair was frozen before mixed60-02. No accepted
+numbers excluded. The repair was frozen before mixed60-02. Two Lean attempts also failed:
+first an absent Mathlib Omega module, then missing absolute-value notation
+and recursive enumeration depth. Fresh repairs use core Omega, explicit
+integer intervals and symbolic finite cardinality identities. No accepted
 producer was repeated to publish or validate custody.
 
 == Fresh certificate invocation
@@ -87,7 +99,7 @@ independent scientific review or projective-saturation proof.
 == Three Lean implications
 Infinity60.balanced_first_bound proves the sharper absolute e0 bound.
 balanced_degree_bound proves d=2 sum positive(e) is at most24.
-nonzero_minor_patterns proves the full404 count with kernel decide.
+nonzero_minor_patterns proves the full404 count by symbolic cardinalities.
 Lean4.34.1/mathlib d13f23b723b8a846827a245b89c10fc7d3f11612,
 -j1 -M4096, separate1200second compile/audit limits, no VM cap.
 Three authored declarations compile and audit; zero failing or trusted

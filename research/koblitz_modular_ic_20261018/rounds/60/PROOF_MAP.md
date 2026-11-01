@@ -11,6 +11,6 @@
 lean/Infinity60.lean authors three declarations. Compile and axiom audit use
 Lean4.34.1/mathlibd13f23b723b8a846827a245b89c10fc7d3f11612,
 -j1 -M4096, separate1200second limits without a VM cap. Final terminal
-outcomes belong to results.json and raw logs. Kernel decide is allowed;
+outcomes belong to results.json and raw logs. The final count uses symbolic erase/univ/product/Fin cardinal identities;
 native_decide, sorry and new axioms are excluded. This does not formalize
 source normalization, curve morphisms, local DVRs or target11action.
