@@ -38,22 +38,24 @@ in pullback notation:
 Both zero and pole degree are80;deg pi^*(Qi)=16. This uses the retained
 normal-source/function-field bridge and standard normalization/pullback facts;
 it is not a claim to an explicit proper embedding or an independently checked
-full infinity integral basis. Splitting the pullbacks into named closed points
-requires the subsequent complete local factor/ramification calculation.
+full infinity integral basis. Check56-01now splits those pullbacks into the fourdegree2closedpoints
+R07,R01,R17,R11,with ramification7,1,7,1. See CM.md for the completed
+localfactor argument and full divisor coefficients.
 
 The first native Newton data gives another checked pole bound. For T=lambda,
 s=h4T has residual roots a,a² atQ0,while atQ1all16roots have valuation3.
 Hence every extension valuation gives ord(lambda)=-4e overQ0 and -e overQ1.
 In particular lambda has the same pole divisor as A. The ratio lambda/A is
-regular and nonzero at infinity,with residue in F4. Rechecking that lambda is
-a unit at all four finite Azeros would prove it has exactly simple poles
-there. That unit check is a proposed next certificate,not yet asserted here.
+regular and nonzero at infinity,with residue in F4. Unit56-01now checks fullBezout products showing lambda andb are
+units on the entiredegree80zeroquotient. Thus lambda/A has exactlysimple
+poles at allfourfinitezeros and no infinitypole.
 
 This suggests an actual prescribed RR space: L((A)_infinity),and equivalently
 A^-1 L((A)_infinity)=L((A)_zero). Complete source valuations at the infinity
 branches can turn this into finite linear constraints on the normal RR basis,
-replacing earlier coefficient-box spaces. Full cover branch factors and source
-basis leading coefficients are still needed to implement that complete space.
+replacing earlier coefficient-box spaces. Full cover branch factors and rationaluniformizers are now checked. Source
+basis leading coefficients and exactambientdivisor matching remain necessary
+to implement that complete space.
 
 Sources:retained R52/R53actual source and R55quotient;Stacks04GM Hensel,
 Stacks0C1B valuation/ramification setup;GarrettNewton polygons for separable

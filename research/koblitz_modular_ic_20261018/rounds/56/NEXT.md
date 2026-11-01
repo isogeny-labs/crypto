@@ -1,42 +1,43 @@
-# R56 continuation: branch geometry into actual RR spaces and modular maps
+# R56 continuation: actual RR spaces and source-bound modular maps
 
-1. Finish the frozen REFINE56calculation after the existing Lean audit is
-   terminal. It checks both F4residues at bothbaseinfinitybranches,original
-   polynomial reconstruction,trackedprecision and coefficientdescent. Do not
-   infer fullbranches from the first repeated faces alone. Apply the reviewed
-   full-denominator Newton theorem only when edge-length premises pass;retain
-   unresolvedclusters/precisioncaps. Split 4*pi*Q0+pi*Q1 into actualclosedpoints.
-2. If tame full-denominator factors appear,construct actual uniformizers and
-   Hensel/Puiseux jets from simple residual roots,then evaluate all32normalRR
-   basis functions and actualnu,including cancellation-sensitive leadingterms.
-   Preserve complete residuefields and ramification accounting. An elementary
-   type match alone still does not identify completed subrings.
-3. Build the complete prescribed space L((A)_infinity),equivalently the space
-   with poles at the now-certified four finite Azeros after divisionbyA.
-   Lambda and A have matching infinitypoles. Check lambda is a unit on the
-   degree80zero scheme;then lambda/A has exactly simple poles at thosepoints.
-   Compute the full RRspace by branch valuation constraints,not another small
-   coefficient box. Search source-bound modular maps/correspondences there.
-4. Use the entire degree80evaluator for finite quotient-map controls,allkernel
-   parameters,denominatorunits and coefficientconjugates. AtQ1,b has a zero:
-   include that boundary in reverse evaluation/denominator bookkeeping.
-   Finish compressed generic target checks via Frobenius/syzygies;actual
-   degree8/128level11map,F2descent,intended11action remain actualacceptancegates.
-5. Preserve properpolarization,separateincidencequotientsaturation,node187,
-   arbitraryreverseclasses,larger112/991normalization/action,and n3Klein plus
-   samefieldn5regressioncontrols. The Adivisor calculation is a specific
-   completed component,not a substitute for those independent constructions.
+Completed R56:allfourinfinityclosedpoints/residuefields,ramification7/1,
+fullAdivisor,actualrationaluniformizers andlambda/A simplepoles at the four
+finitezeros. Sixworkflows terminal,5accepted/1rejected;fourLeanimplications
+compile/audit0. Do not repeat acceptedproducers for metadata or custody.
 
-The retained R50 source already has genus61 and complete68-section L(D0),
-D0=7D_A+D_B of degree128. Match those exact R27 cusp labels/divisors to the
-new infinityclosedpoints before reusing that ambientspace. If D_Anew≤D0,
-use complete L(D0) and impose the exact local vanishing constraints for
-D0-D_Anew(degree48),rather than guessing polynomialcoefficientdegreebounds.
-Verify that inclusion from actualdivisors;do not assume D0=4(z)_infinity.
-The full finite branchlocus could independently reconstruct genus61 by
-Riemann-Hurwitz and certify the specific modular diamond quotient model.
-This is a model-validation task,not a new genus or noveltyclaim.
+1. Match the retained complete68-section L(D0),D0=7D_A+D_B,degree128,
+   to actual R27cusp labels and the newinfinitypoints. R50identifies z=1/u,
+   V=z²v,so the newbasechart(h,W)=(u,v) has A/Bpoints overu=0. Verify the
+   exact divisors and inclusion (A)_infinity≤D0;do not assumeD0=4(z)_infinity.
+   Once matched,the difference hasdegree48. Impose every localconstraint
+   inside the complete68-section ambientspace to obtain the complete
+   L((A)_infinity),equivalently L(P1+...+P4)afterdivisionbyA. This replaces
+   coefficientbox searches with actualpolegeometry and a finite linear system.
+2. Construct source-bound Hensel/Puiseuxjets at each checkedbranch. Explicit
+   F2uniformizers are alpha0²/h³,alpha1²/h³ at the ramifiedpoints andh at
+   unramifiedpoints,residueF4. Evaluate all32normalbasis functions,all68RR
+   sections andactualnu with sufficient certifiedprecision;retain cancellations,
+   residues and coefficientdescent. Use actualvaluationconstraints for the
+   fullRRspace and for completedsubring/index/conductor checks. Orders7/11
+   alone do not prove a monomial-image or saturation statement.
+3. Use the entire degree80evaluator andactualpoles for finite quotient-map
+   controls,allkernelparameters,denominatorunits andcoefficientconjugates.
+   Lambda/A is now an exactprescribed-pole function. An explicitglobalBezout
+   identity for(A,lambda)can be recovered from the R55G/Hmatrices and global
+   f_Aannihilator if needed for chart equations,without coefficient search.
+4. Finish compressed generic target identities through Frobenius/syzygies,
+   actualdegree8/128level11map,F2descent and intended11action. Sharedresidual
+   Heckesystems make actualfactoraction essential. AtQ1,b has a zero;include
+   its boundarypoints in reverse-divisor/denominator bookkeeping.
+5. Preserve properpolarization,separateincidencesaturation,node187coupled
+   divisors,arbitraryreverseclasses,larger112/991normalization/action,and
+   n3Klein/samefieldn5regressioncontrols. Adivisor is a completedcomponent;
+   these independent constructions remain active.
 
-Same original manual limits/owners,one mathematical jobatonce. No newEKS,
-Diem/freezerrestart,newclaim,delegation,merge/automergechange. R27-R55sealed;
-freeze each affected source before data,execute immutable copieddrivers.
+The retainedsource alreadyhasgenus61. A fullfinitebranchlocus calculation
+could independently reproduce it byRiemann-Hurwitz and certify the exact
+modular diamondquotient model;this is modelvalidation,not a newgenusclaim.
+Same originalmanual limits/owners,one mathjobatonce. No newEKS,Diem/freezer,
+newclaim,delegation,PRmerge/automergechange. R27-R55scienceheldbyimmutable
+historicalcommits;R56sealsafterreport. Freeze affectedsourcebeforedata and
+execute immutablecopieddrivers.

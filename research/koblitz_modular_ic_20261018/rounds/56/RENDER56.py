@@ -105,7 +105,7 @@ exactly simple poles at the four Pi and no poles at infinity.
 Multiplicities and Newton vertices are exact native records; degree bars are
 labelled derived products with residue degree 2. No sampling uncertainty.
 
-Multiplication by A identifies L(P1+...+P4) with L((A)_infinity). Next match
+Multiplication by A identifies L(P1+...+P4) with L(the pole divisor of A). Next match
 the retained complete 68-section ambient RR divisor to these actual points,
 then impose all local constraints to construct the full prescribed space.
 #pagebreak()
