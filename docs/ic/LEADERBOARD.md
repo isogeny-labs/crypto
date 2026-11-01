@@ -116,6 +116,24 @@ The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point
 
 Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
+## Component improvement: orbit-layout table and generator-orbit base (2026-10-22, engineering)
+
+Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` names a hit's Frobenius images by index and adds each orbit's own pairs once per rotation class (the same relations as the lazy table on 960/960 run pairs); `generator_orbit=1` makes column 0 the orbit of G, whose logarithm is known, and `stride-generator` draws targets Q + [k]G with no scalar multiplication. ecbench.gae, paired by target, cluster-bootstrap 95% CI; above 1 the second-named arm is cheaper. Band: mean S with native work at w = 0 / 0.1 / 1 GAE (AGENTS.md §5a).
+
+| curve | log₂ r | c | lazy ÷ layout | lazy ÷ gen-layout (net) | gen-layout ÷ rho-frob | band S gen-layout | band S rho-frob |
+|:--|--:|--:|:--|:--|:--|:--|:--|
+| `icv1-f2m13-t181-515ee569` | 11.0 | 1 | 1.080 [1.078, 1.081] | **3.178 [2.772, 3.612]** | 0.739 [0.629, 0.866] | 1.406 / 1.536 / 2.706 | 1.987 / 1.987 / 1.987 |
+| `icv1-f2m29-tm40309-30c52b96` | 15.4 | 1 | 1.093 [1.091, 1.096] | **3.200 [2.948, 3.447]** | 0.366 [0.241, 0.523] | 0.546 / 0.611 / 1.196 | 1.569 / 1.569 / 1.569 |
+| `icv1-f2m17-tm101-00378d4e` | 16.0 | 1 | 1.032 [1.028, 1.036] | **1.274 [1.012, 1.670]** | 1.591 [1.115, 2.189] | 1.845 / 2.142 / 4.810 | 1.240 / 1.240 / 1.240 |
+| `icv1-f2m19-t797-b6cf2467` | 17.0 | 2 | 1.067 [1.064, 1.070] | **1.717 [1.532, 1.903]** | 1.154 [0.888, 1.468] | 1.081 / 1.081 / 1.081 | 0.937 / 0.937 / 0.937 |
+| `icv1-f2m31-tm90707-c95f16f5` | 20.5 | 2 | 1.052 [1.048, 1.057] | **1.916 [1.622, 2.285]** | 1.154 [0.878, 1.502] | 0.559 / 0.632 / 1.286 | 0.512 / 0.512 / 0.512 |
+| `icv1-f2m23-t5197-69e76b73` | 21.0 | 3 | 1.041 [1.038, 1.044] | **1.553 [1.362, 1.764]** | 1.934 [1.414, 2.475] | 0.838 / 0.945 / 1.908 | 0.443 / 0.443 / 0.443 |
+| `icv1-f2m37-tm534059-32aad96b` | 27.8 | 8 | 1.021 [1.018, 1.023] | **1.261 [1.071, 1.511]** | 3.886 [3.165, 4.790] | 0.772 / 0.892 / 1.965 | 0.211 / 0.211 / 0.211 |
+
+[Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
+
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: VALIDATION.json is missing.
+
 ## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
 
 Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that the member-index set-up is gone? One cell of five: it is cheaper at n17 a1 and dearer at the other four, so the frozen counts stay the better choice on four of five curves. The n17 gain is a tuning result on these seeds and needs fresh seeds before it is a rule. It moves no row of tables A–C. ecbench.gae, paired by target, cluster-bootstrap 95% CI; 95 % intervals; below 1 the numerator is cheaper.
@@ -362,7 +380,7 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 
 [Report](../../research/prime_base_oracle_tuning_20261029/README.pdf) · [study](../../research/prime_base_oracle_tuning_20261029/).
 
-Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 ## Linear-algebra engine, outside tables A–C
 
@@ -477,6 +495,17 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
 
+## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC
+
+Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations. Both builds recorded `solved=true` and `correct=true` for every DLP row (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z); the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+
+| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 53 | 1 | 31 | 4734 | 936.9 | 5.05 | 4297 | 850 |
+| 53 | 2 | 33 | 2121 | 425.2 | 4.99 | 1843 | 370 |
+| 101 | 1 | 53 | 1455 | 287.5 | 5.06 | 981 | 194 |
+| 101 | 2 | 50 | 2370 | 466.4 | 5.08 | 1897 | 373 |
+
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
 Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) subgroup. Class: advance (restricted to the GHS-weak family). Baseline for the improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.
@@ -526,7 +555,7 @@ Component speed-up, class engineering: the dense linear stage against sparse FGL
 
 ## Linear stage after F4 across Gröbner-basis corpora
 
-Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications (sparse ÷ fast 0.77–2.14×) are reported, not ranked. It moves no row of tables A–C. validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)
+Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications (sparse ÷ fast 0.77–2.14×) are reported, not ranked. It moves no row of tables A–C. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 | family | systems | δ | sparse ms | fast ms | **sparse ÷ fast** [95%] | dense ÷ fast | portable fast | host A | counted sparse ÷ fast |
 |:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|
@@ -770,7 +799,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `a2cae1753ab25dd1…`
+- `docs/ic/progress-timeline.json` — sha256 `6c62c182babfb64b…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
@@ -792,8 +821,12 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
+- `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json` — sha256 `bca0162f22f19c74…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json` — sha256 `114f27cd5a3eb091…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
+- `research/ecbench_generator_orbit_20261022/figures/summary.json` — sha256 `c4f567d49a2875e7…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/ecbench_lazy_columns2_20261018/figures/ratios.json` — sha256 `e97bc0f02c39695a…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
@@ -842,7 +875,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
+- `docs/curves/registry.json` — sha256 `6dce2c6f17bb1b3b…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

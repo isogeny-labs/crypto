@@ -9,7 +9,9 @@
 //! * [`counted_fp`]: `F_p` on `u64` words, generic over an
 //!   [`counted_fp::OpCounter`].  [`counted_fp::PrimeField::new`] counts
 //!   nothing (a zero-sized counter, free); [`counted_fp::PrimeField::counted`]
-//!   counts multiplications `M` and inversions `I`.
+//!   counts multiplications `M` and inversions `I`;
+//!   [`counted_fp::PrimeField::counted_with_adds`] also counts additions
+//!   (opt-in; `M`, `W`, `I` unchanged).
 //!   NTT products count word multiplications `W` separately (converted at
 //!   one `M` each, see [`ntt`]).
 //! * [`poly`]: Karatsuba or NTT multiplication (chosen per field by
@@ -49,7 +51,9 @@ pub mod velu;
 #[cfg(test)]
 mod tests;
 
-pub use counted_fp::{NoCount, OpCounter, OpCounts, OpTally, PolyMul, PrimeField};
+pub use counted_fp::{
+    AddTally, CompleteTally, NoCount, OpCounter, OpCounts, OpTally, PolyMul, PrimeField,
+};
 pub use montgomery::{MontgomeryCurve, XZ};
 pub use small_degree::{ShortWeierstrass, SmallIsogeny, WPoint};
 pub use sqrt_velu::{sqrt_velu, SqrtVeluShape};
