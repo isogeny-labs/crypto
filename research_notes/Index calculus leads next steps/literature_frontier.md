@@ -58,17 +58,34 @@ For F_{q^n} with n ≥ 2 fixed and q growing, IC (Gaudry/Diem) beats rho, with p
 ## Q3. Lifting and xedni
 
 ### Takeaway
-Xedni calculus and characteristic-zero lifting are considered dead. Jacobson-Koblitz-Silverman-Stein-Teske (2000) showed the attack is "virtually certain to fail" asymptotically, because of bounded heights / an absolute bound on the coefficients of relations among lifted points. I found no new results revisiting the height obstruction.
+The original prime-field xedni construction is strongly negative, but the scope
+matters. Jacobson-Koblitz-Silverman-Stein-Teske (2000) prove a `C_0/p`
+success-probability bound under Lang's canonical-height conjecture and their
+explicit discriminant/height assumption, then find prohibitively low useful-lift
+rates experimentally. That theorem does not directly analyse extension-field
+point lifts. A 2002 IEICE report by Jun Kogure explicitly treats xedni in
+characteristic two and is indexed with Koblitz curves; its full text was not
+available in the sources checked here, so its construction and conclusion remain
+a primary-source gate.
 
 ### Cited Findings
-- Jacobson-Koblitz-Silverman-Stein-Teske, "Analysis of the xedni calculus attack", DCC 20 (2000) 41-64: asymptotically the algorithm is virtually certain to fail, because of an absolute bound on the size of the coefficients of a relation satisfied by the lifted points. Even for small p, experiments show the odds against a suitable lift are prohibitively high. — [xedni.pdf](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf); [DOI](https://www.doi.org/10.1023/A:1008312401197); [Waterloo CORR 1999-05](https://uwaterloo.ca/combinatorics-and-optimization/sites/default/files/uploads/documents/1999_05.pdf)
+- Jacobson-Koblitz-Silverman-Stein-Teske, "Analysis of the xedni calculus attack", DCC 20 (2000) 41-64: full paper read, including the original algorithm in section 3, conditional Theorem 4.1 and its assumptions, experiments in section 5, and conclusion. The theorem derives the bounded relation coefficients and `C_0/p` success bound under its stated assumptions; the experiments find that useful dependencies are already prohibitively rare at tiny parameters. — [xedni.pdf](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf); [DOI](https://www.doi.org/10.1023/A:1008312401197); [Waterloo CORR 1999-06 first page](https://uwaterloo.ca/combinatorics-and-optimization/sites/default/files/uploads/documents/1999_06.pdf)
+- Kogure, "xedni calculus法について(標数2の場合)", IEICE Technical Report ISEC2002-10, 102(71), 57-60 (2002): bibliographic metadata and subject tags verified; the title identifies the characteristic-two case and CiNii indexes Koblitz curves. Full text was not obtained, so no substantive claim is attributed to it. — [CiNii](https://cir.nii.ac.jp/crid/1520853833621034368); NDL bibliographic ID 6188214
 - Mahalanobis-Mallick (arXiv 1703.07544, 2017): a Las Vegas ECDLP algorithm, non-generic but not xedni, which says xedni "was found to be no better than exhaustive search". A related ePrint (2018/134) and a 2020 follow-up (arXiv 2005.05039) introduce an "initial minors" conjecture for reducing to linear algebra. — [arXiv 1703.07544](https://arxiv.org/pdf/1703.07544); [ePrint 2018/134](https://eprint.iacr.org/2018/134.pdf); [arXiv 2005.05039](https://arxiv.org/pdf/2005.05039)
 - A popular-press blog walkthrough of xedni exists (LeetArxiv Substack). It is non-scholarly. — [Substack](https://leetarxiv.substack.com/p/analysis-of-the-xedni-calculus-attack)
 
 ### Inferences
-- Lifting is the most firmly closed direction. Any revival would have to defeat the height-growth obstruction, for example via p-adic or non-archimedean lifts rather than lifts to Q. I did not find this proposed in the literature.
+- Repeating the original prime-field lift is not indicated: a variant must say
+  which JKSST assumption or bounded-coefficient mechanism changes. For general
+  `F_{2^m}` point coordinates, a number-field residue lift has residue degree
+  `m`, hence global degree at least `m`; even when a Koblitz curve equation
+  descends to `F_2`, its ECDLP points generally do not. This exact structural
+  floor is implemented and visualized in
+  `cryptanalysis:research/xedni_cross_field_20261101/`.
 
 ### Gaps
+- Obtain and read Kogure ISEC2002-10 before specifying or funding a
+  characteristic-two/Koblitz xedni implementation.
 - Mahdavi-Shafiee lifting work: not found in my searches.
 - [unverified-recall] Silverman-Suzuki and Huang-Kueh-Tan on "lifting and ECDLP" (ANTS 2000) treat lifting obstructions for E(Q) of rank. Not verified this session.
 
