@@ -5,6 +5,31 @@ name: ICB aimed 2LP compile and focused gates (high-memory)
 # and prints the provider planner's draft receipt. It never invokes ecbench,
 # any provider, or any freeze/checkpoint/image/launch path.
 on:
+  # One-shot branch trigger: the job also requires the push's parent to be the
+  # audited pre-trigger commit, so later source pushes cannot execute it.
+  push:
+    branches:
+      - codex/large-prime
+    paths:
+      - .github/workflows/icb-aimed-2lp-compile.yml
+      - .github/docker/arc-runner/Dockerfile
+      - Cargo.toml
+      - Cargo.lock
+      - benchmarks/20261101-icb-aimed-large-prime/**
+      - docs/ecbench/README.md
+      - docs/session-logs/2026-11-01.md
+      - examples/ecbench_aimed2lp_analyze.rs
+      - examples/ecbench_aimed2lp_preflight.rs
+      - research/icb_aimed_large_prime_n53_n61_20261101/**
+      - src/cryptanalysis/ecbench/compare.rs
+      - src/cryptanalysis/ecbench/koblitz_descent.rs
+      - src/cryptanalysis/ecbench/methods.rs
+      - src/cryptanalysis/ic_framework/large_prime.rs
+      - src/cryptanalysis/koblitz_index_calculus.rs
+      - src/ml_dataset/mod.rs
+      - taskq/deploy/eks-karpenter/arc/README.md
+      - taskq/deploy/eks-karpenter/arc/highmem-values.yaml
+      - taskq/deploy/eks-karpenter/run-ecbench
   workflow_dispatch:
     inputs:
       expected_commit:
@@ -30,16 +55,18 @@ env:
 
 jobs:
   compile-gates:
-    if: ${{ github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/large-prime' }}
+    if: ${{ github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/large-prime' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.before == '73a35d4c4801193a306eddaf54ec5bbf1bee4c3f')) }}
     runs-on: crypto-eks-highmem
     timeout-minutes: 240
     env:
-      EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+      EXPECTED_COMMIT: ${{ github.event_name == 'push' && github.sha || inputs.expected_commit }}
+      EVENT_BEFORE: ${{ github.event.before }}
+      TRIGGER_PARENT_COMMIT: 73a35d4c4801193a306eddaf54ec5bbf1bee4c3f
     steps:
       - name: Check out the exact unfrozen source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          fetch-depth: 1
+          fetch-depth: 2
           persist-credentials: false
 
       - name: Assert draft state and initialize evidence
@@ -62,6 +89,19 @@ jobs:
           [[ "$EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
           test "$EXPECTED_COMMIT" = "$GITHUB_SHA"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          case "$GITHUB_EVENT_NAME" in
+            push)
+              test "$EVENT_BEFORE" = "$TRIGGER_PARENT_COMMIT"
+              test "$(git rev-parse HEAD^)" = "$TRIGGER_PARENT_COMMIT"
+              ;;
+            workflow_dispatch)
+              test -n "$EXPECTED_COMMIT"
+              ;;
+            *)
+              printf 'unauthorized event: %s\n' "$GITHUB_EVENT_NAME" >&2
+              exit 1
+              ;;
+          esac
           test -z "$(git status --porcelain --untracked-files=all)"
 
           assert_empty_or_absent() {
