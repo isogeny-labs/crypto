@@ -1,0 +1,85 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Post-merge prime PKM tower engine diagnostic",
+  "description": "Development-only execution of the newly merged prime-tower F4, signature-F5, F6 geometric-closure and enumeration engines on one public target, with a matched negation-rho reference and A/A control.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202611019517,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-negation-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "rho-negation-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "pkm-enum",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=enum,degree=20,cap=4"
+        }
+      }
+    },
+    {
+      "name": "pkm-f4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=f4,degree=20,cap=4"
+        }
+      }
+    },
+    {
+      "name": "pkm-signature-f5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=sig-f5,degree=20,cap=4"
+        }
+      }
+    },
+    {
+      "name": "pkm-f6",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=f6,degree=20,cap=4"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611019617,
+    "isolation_required": "L0",
+    "timeout_seconds": 60
+  }
+}
