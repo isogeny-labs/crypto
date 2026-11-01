@@ -33,6 +33,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-27 | [Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md) | 2.59× | matched | S |
 | 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 | 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
+| 2026-11-01 | [Prime-orbit relation collector, affine eight-orbit candidate vs negation rho, generic 14-bit toy curve](https://github.com/isogeny-labs/crypto/blob/main/research/ecbench_e2e_frontier_20261031/REPORT.md#late-main-79th-method-reconciliation) | 5.42× | matched | counted GAE lower-bound diagnostic |
 
 ## Native candidate tournament, round 0026 (separate Ir unit)
 
@@ -132,7 +133,7 @@ Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` n
 
 [Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
 
-Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study directory: replay certificate, validator report, §5a-banded rho-frob reference).
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file.
 
 ## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
 
@@ -363,6 +364,40 @@ The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 con
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | ic-k16-control | 0/80 | — | — | — | A/A control |
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | K16 / K8 | — | — | — | — | unknown (0 verified pairs) |
 
+## Structured factor-base growth screen, outside tables A–C
+
+The preregistered `EXP-PFDR-2d36f9-R2-FAM` census ran 19,887 deterministic local jobs across 30 cells and five sizes (16–32 bits). It asks whether the coincidence multiplier κ for Dickson, geometric-progression, or quadratic-progression x-bases grows with N fast enough to reach the frozen break-even slope δ* = 0.333. It does not price a complete index-calculus pipeline and has no matched rho arm.
+
+All six structured lines are valid and read `O-SUB-BE`. Their five-rung slopes range from -0.0047 to 0.0068; the largest upper 95% limit is 0.0147, far below 1/3. Self-test and controls C3–C6 pass; the null calibration is n=10, mean 0.22, sd 0.88.
+
+| family | θ | slope of log2 κ on log2 N | 95% interval | reading |
+|:--|--:|--:|:--|:--|
+| Dickson | 0.30 | -0.0047 | [-0.0130, 0.0041] | `SUB-BE` |
+| Dickson | 0.35 | -0.0014 | [-0.0088, 0.0070] | `SUB-BE` |
+| geometric progression | 0.30 | 0.0054 | [-0.0031, 0.0136] | `SUB-BE` |
+| geometric progression | 0.35 | 0.0024 | [-0.0049, 0.0098] | `SUB-BE` |
+| quadratic progression | 0.30 | 0.0066 | [-0.0017, 0.0147] | `SUB-BE` |
+| quadratic progression | 0.35 | 0.0068 | [-0.0004, 0.0144] | `SUB-BE` |
+
+This is negative structural evidence, not a performance promotion: no ranked row moves and rho is not being inferred from an unpriced component. Read the [analysis](../../research/pfdr_other_families_20261101/results/analysis-main.json) and [study limits](../../research/pfdr_other_families_20261101/README.md).
+
+## N83 four-byte root-index loop, outside tables A–C
+
+The plain four-byte ID31 root index and its packed two-bit fingerprint (FP2) variant ran in both alternating orders on the same K1107 base and public point. Every arm completed the full process, recovered the same scalar, and passed independent replay. Ratios below are plain / FP2, so values above 1 favor FP2.
+
+| order | plain / FP2 index build | plain / FP2 whole process | plain wall (s) | FP2 wall (s) |
+|:--|--:|--:|--:|--:|
+| plain → fp2 | 1.001× | 1.017× | 154.066 | 151.435 |
+| fp2 → plain | 1.493× | 1.294× | 250.171 | 193.284 |
+
+The observed index-build range is 1.001–1.493× and the whole-process range is 1.017–1.294×. The host was shared and its load varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. Read the [study and limits](../../research/n83_fourbyte_pair_20261027/README.md).
+
+## N83 degree-two image calculus, outside tables A–C
+
+The exact `n83-image-closed-degree-two-fiber` transfer audit is `rejected_by_structural_and_cost_gates`. Generic odd-degree fibers of `phi(u,v)=(u^3,uv+1)` split into closed support degrees 1+2, but their projected labels give only `[3]P=P+[2]P`. Useful relation probability and independent rank per identity are both 0; the collector and timing stages therefore stop under the frozen protocol.
+
+The ordinary ambient genus-three scale is `(4/3)*83`, about approximately 70.17 bits above `0.5*log2(r)`. This is a scoped structural rejection, not zero-cost attack data: no wall time or speedup was measured, and no ranked row moves. A compact growing-degree or adaptive target-local router remains open. Read the [assessment](../../research/n83_image_closed_degree2_20261101/ASSESSMENT.json) and [scope](../../research/n83_image_closed_degree2_20261101/README.md).
+
 ## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)
 
 Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle (`mitm:negation_folded=1`) at every size; only N changed. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.
@@ -494,6 +529,17 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 |---:|---:|---|
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
+
+## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC
+
+Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations. Both builds recorded `solved=true` and `correct=true` for every DLP row (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z); the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+
+| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 53 | 1 | 31 | 4734 | 936.9 | 5.05 | 4297 | 850 |
+| 53 | 2 | 33 | 2121 | 425.2 | 4.99 | 1843 | 370 |
+| 101 | 1 | 53 | 1455 | 287.5 | 5.06 | 981 | 194 |
+| 101 | 2 | 50 | 2370 | 466.4 | 5.08 | 1897 | 373 |
 
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
@@ -788,7 +834,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `c28c21260d1bc66f…`
+- `docs/ic/progress-timeline.json` — sha256 `fd19ac4eea242e74…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
@@ -808,8 +854,18 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json` — sha256 `69ca54385c62a50e…`
 - `research/f4_f5_f6_cross_family_20261011/ANALYSIS.json` — sha256 `143247c6b81d3539…`
 - `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
+- `research/pfdr_other_families_20261101/results/analysis-main.json` — sha256 `2ccae7f1ac7a97a8…`
+- `research/pfdr_other_families_20261101/README.md` — sha256 `2697b3eb35f65e6d…`
+- `research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json` — sha256 `dacd097373ef436c…`
+- `research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json` — sha256 `62960a9ec213b858…`
+- `research/n83_fourbyte_pair_20261027/README.md` — sha256 `51e6392e1c20509d…`
+- `research/n83_image_closed_degree2_20261101/ASSESSMENT.json` — sha256 `4064a29534615349…`
+- `research/n83_image_closed_degree2_20261101/README.md` — sha256 `6de3fa411f8c52d1…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
+- `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json` — sha256 `bca0162f22f19c74…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json` — sha256 `114f27cd5a3eb091…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/ecbench_generator_orbit_20261022/figures/summary.json` — sha256 `c4f567d49a2875e7…`
@@ -861,7 +917,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
+- `docs/curves/registry.json` — sha256 `6dce2c6f17bb1b3b…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

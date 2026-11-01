@@ -1,0 +1,52 @@
+{
+  "command": [
+    "python3",
+    "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/gate.py"
+  ],
+  "exit": 0,
+  "stdout": "Find 0\nControls 0\nReadback 0\n/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57\n",
+  "stderr": "",
+  "receipt": {
+    "modules": [
+      {
+        "module": "Find",
+        "command": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M4096",
+          "-o",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57/snapshot/Find.olean",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57/snapshot/Find.lean"
+        ],
+        "native_exit": 0
+      },
+      {
+        "module": "Controls",
+        "command": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M4096",
+          "-o",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57/snapshot/Controls.olean",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57/snapshot/Controls.lean"
+        ],
+        "native_exit": 0
+      },
+      {
+        "module": "Readback",
+        "command": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M4096",
+          "-o",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57/snapshot/Readback.olean",
+          "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57/snapshot/Readback.lean"
+        ],
+        "native_exit": 0
+      }
+    ],
+    "gate_exit": 0,
+    "bindings_unchanged": true,
+    "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57"
+  }
+}

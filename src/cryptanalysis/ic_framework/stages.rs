@@ -261,6 +261,17 @@ pub trait DecompositionOracle<G: CountedGroup> {
         point: G::Elt,
     ) -> Option<Vec<usize>>;
 
+    /// Request data that a future decomposition of `point` will read.
+    /// The default is a no-op and the hook may not decide or count.
+    fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
+
+    /// Select the cache-line relation guard.  Both representations return
+    /// identical membership answers; the default preserves every recorded
+    /// run's hash-map path.
+    fn line_guard(&self) -> bool {
+        false
+    }
+
     /// **The large-prime seam.**  Decompose `point = [a]G + [b]Q`, or
     /// store what partially decomposed and hand back whatever complete
     /// relations the stored partials now merge into.  The default is
@@ -612,6 +623,14 @@ pub enum Targets {
     /// every step and relations come from collisions of the residuals;
     /// the oracle is not consulted.  See `ic_framework::residual`.
     Residual,
+    /// `Residual` with the jump and the base-point subtraction fused into one
+    /// group addition per step (`16 * |F|` precomputed sums, counted at setup).
+    /// See `ic_framework::residual::collect_residual_fused_and_solve`.
+    ResidualFused,
+    /// Fused step with distinguished-point storage and probing.
+    ResidualFusedDp,
+    /// Negation-equivariant walk on a large step set with distinguished points.
+    ResidualFusedEq,
     /// `R ← R + S` for one drawn `S = [s]G + [t]Q`: one addition per
     /// target, with no jump table to set up.  See `TargetSource::Stride`.
     Stride,
@@ -639,6 +658,9 @@ impl Targets {
             Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
             Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
             Targets::Residual => "residual",
+            Targets::ResidualFused => "residual-fused",
+            Targets::ResidualFusedDp => "residual-fused-dp",
+            Targets::ResidualFusedEq => "residual-fused-eq",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
             Targets::StrideGenerator => "stride-generator",
@@ -658,12 +680,15 @@ impl Targets {
             "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
             "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
             "residual" => Ok(Targets::Residual),
+            "residual-fused" => Ok(Targets::ResidualFused),
+            "residual-fused-dp" => Ok(Targets::ResidualFusedDp),
+            "residual-fused-eq" => Ok(Targets::ResidualFusedEq),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
             "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, residual-fused-dp, residual-fused-eq, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }

@@ -1,0 +1,35 @@
+import ZeroTest
+set_option autoImplicit false
+namespace CZeroInterpolation
+open Polynomial
+variable {K : Type*} [Field K]
+def support (q r : K) : K[X] := X^2+C q*X+C r
+def ordinate (s t : K) : K[X] := C s*X+C t
+def bnum (q1 r1 q2 r2 : K) : K := (q1-q2)*(q2*r1-q1*r2)-(r1-r2)^2
+def anum (q1 r1 s1 t1 q2 r2 s2 t2 : K) : K :=
+ (q1-q2)*((t1-t2)*q2-(s1-s2)*r2)-(r1-r2)*(t1-t2)
+def cnum (q1 r1 s1 t1 q2 r2 s2 t2 : K) : K :=
+ (q1-q2)*(t1-t2)-(r1-r2)*(s1-s2)
+theorem numerator_q (q1 r1 s1 t1 q2 r2 s2 t2 : K) :
+ anum q1 r1 s1 t1 q2 r2 s2 t2*(q1-q2)-bnum q1 r1 q2 r2*(s1-s2)=
+ ((q1-q2)*q2-(r1-r2))*cnum q1 r1 s1 t1 q2 r2 s2 t2 := by
+ unfold anum bnum cnum;ring
+theorem numerator_r (q1 r1 s1 t1 q2 r2 s2 t2 : K) :
+ anum q1 r1 s1 t1 q2 r2 s2 t2*(r1-r2)-bnum q1 r1 q2 r2*(t1-t2)=
+ (q1-q2)*r2*cnum q1 r1 s1 t1 q2 r2 s2 t2 := by
+ unfold anum bnum cnum;ring
+theorem interpolation_coefficients (q1 r1 s1 t1 q2 r2 s2 t2 : K)
+ (hb:bnum q1 r1 q2 r2≠0) (hc:cnum q1 r1 s1 t1 q2 r2 s2 t2=0) :
+ (anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2)*(q1-q2)=s1-s2 ∧
+ (anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2)*(r1-r2)=t1-t2 := by
+ have hq:=numerator_q q1 r1 s1 t1 q2 r2 s2 t2
+ have hr:=numerator_r q1 r1 s1 t1 q2 r2 s2 t2
+ rw [hc,mul_zero] at hq hr
+ constructor
+ · apply (eq_div_iff hb).mp
+   field_simp
+   linear_combination hq
+ · apply (eq_div_iff hb).mp
+   field_simp
+   linear_combination hr
+end CZeroInterpolation

@@ -1,0 +1,27 @@
+{
+  "schema": "ecbench.current-head-replay-summary/v1",
+  "generated_utc": "2026-11-01T05:04:23Z",
+  "source_revision": "907d68631e79b2b7892383f13a22652fe66efeea",
+  "auditor_binary_sha256": "e91c0ec79774af70c3b6af6aaac7b209e8edcdc0e42b1d18e1a92a14af065f65",
+  "auditor_hardware_class_id": "ECBHW1h7373da65e433",
+  "auditor_env_class_id": "ECBENV3h0bb9eb2ab583",
+  "inventory_identical": true,
+  "all_coverage_audit_identical": true,
+  "sessions": 35,
+  "records": 1005,
+  "verified_records": 952,
+  "replay_candidates": 782,
+  "replays": 782,
+  "reproduced": 782,
+  "problems": 0,
+  "excluded_negative_controls": [
+    {
+      "session": "smoke-three-leads",
+      "reason": "pre-fix Scholten/decomposition mismatch; the current planner correctly refuses this invalid session before replay"
+    },
+    {
+      "session": "post-merge-pdp3-pair",
+      "reason": "pre-fix cross-record pair-index cache charging; retained to prove the auditor detects accounting drift"
+    }
+  ]
+}

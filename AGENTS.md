@@ -950,6 +950,15 @@ Every cross-method comparison and every ranking must:
 - **Never compare a calibrated cost on one side with an uncalibrated one
   on the other.** If a calibration exists for only some arms or sizes,
   use the band alone.
+- **The band prices operations, not bytes** (owner, 2026-11-01). A
+  memory-size counter (`residual_table_bytes_uncharged`,
+  `factor_base_vec_bytes_floor_uncharged`, `native_table_bytes_uncharged`)
+  is still listed with its count for every arm, but is not charged `w` and
+  cannot block a ranking. The list is `NON_OPERATION_COUNTERS` in
+  `src/cryptanalysis/ecbench/band.rs`, by name, so committed records replay
+  unchanged. A new byte-valued counter is added there; do not name a byte
+  count `*_uncharged` without doing so. The audit and the re-run studies are
+  in `research/ic_byte_counter_pricing_20261101/`.
 
 This applies to `ecbench compare` read-outs, tables, frontier syntheses,
 ledger rows, papers and PR descriptions. A ratio produced before this rule
@@ -1342,7 +1351,15 @@ resources, deadline and acceptance criteria, submit the job, and retain its
 receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
 region `us-east-2`, account `104186811093`. Karpenter starts Spot workers;
 `cpu-spot` serves ordinary work and `cpu-l2-spot` serves native L2 benchmarks.
-Keep the combined 64-vCPU worker cap and the shared 96-vCPU account quota.
+Follow the owner cost ceilings in [COST_CONTROLS.md](taskq/deploy/eks-karpenter/COST_CONTROLS.md):
+24 worker vCPUs / 160 GiB total, with no automatic quota or cap increases.
+Before any EKS/IsoLab build or run, commit and push the exact experiment code,
+protocol, configuration and launch command to GitHub; retain the publication
+check receipt. Publish outcomes, including failures, in the same experiment PR.
+Record a finite dollar ceiling, CPU/RAM, original deadline and total retry
+allowance before spending; charge build, idle, failed and interrupted attempts.
+Queue work that cannot fit. Never bypass a budget stop through another pool,
+account, region, provider or a renamed retry.
 
 - **Use existing authentication.** Verify the caller with
   `aws sts get-caller-identity` and check the required permissions using

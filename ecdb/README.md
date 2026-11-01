@@ -58,6 +58,15 @@ curl -s -X POST localhost:8080/v1/sql -H 'content-type: application/json' \
   `boundary_targets.json` and the `benchmarks/` index.
 - `ecbench` loads every ecbench session under the checkout: about 1,100
   sessions and 543k runs, in 8 minutes.
+- `generated PATH...` loads the JSONL that `sage/generate.sage` writes:
+  - the census of every curve over F_p (p < 2^10) and over GF(2^m) (m ≤ 10);
+  - random and CM prime-field curves at 32–256 bits, with their twists;
+  - BN, BLS and KSS pairing curves;
+  - random genus-2 Jacobians.
+
+  Every record is re-verified first (ICV1, Hasse, [N]P = O, [r]G = O,
+  Miller–Rabin, embedding degree, genus-2 L-polynomials). See
+  [`sage/README.md`](sage/README.md).
 - `ecdb pack --out DIR` writes what the Lambda package carries instead of
   those directory trees (`deploy/build-lambda.sh`).
 - `lmfdb-av-fq <file>` loads an LMFDB `av_fq_isog` JSON export (isogeny
@@ -95,9 +104,11 @@ record it refused, with the reason.
 | `GET /v1/polynomials/{sha256}` | the content-addressed polynomial store |
 | `GET /v1/modular-polynomials?level=&coefficients=` | Phi_l over Z, l = 2..19 |
 | `GET /v1/class-polynomials`, `GET /v1/summation-polynomials` | H_D for class number one; Semaev S_2, S_3 |
+| `GET /v1/factor-bases`, `GET /v1/factor-bases/{key}`, `GET /v1/factor-bases/{key}/results?points=` | factor bases of the IC work (FB1, FBM1, archive and FBS1 spec ids) with their sizes, aliases, measurement configurations, results and points |
 | `POST /v1/sql` | one read-only query |
+| `GET /v1/export`, `GET /v1/export/{table}?offset=&limit=` | bulk export for mirrors: the manifest (tables, copyable columns, primary keys, exact row counts), then gzipped COPY-text pages in primary-key order, at most 4 MiB each (413 asks for a smaller `limit`) |
 | `POST /v1/evidence`, `POST /v1/isogenies` | token-gated agent writes |
-| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): eleven tools over the routes above |
+| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): twelve tools over the routes above |
 
 Integers beyond 2^53 come back as decimal strings. Unknown values are
 `null` with a status, never 0. An ambiguous name returns 409 with the
@@ -117,6 +128,13 @@ candidates.
 | `ECDB_SQL_TIMEOUT_MS`, `ECDB_SQL_MAX_ROWS` | 15000, 5000 | limits of `POST /v1/sql` |
 | `ECDB_MIGRATE_ON_START` | false | run pending migrations before serving |
 | `ECDB_POOL_SIZE` | 16 | connections per pool |
+
+## Local mirror (NAS)
+
+[`deploy/nas/`](deploy/nas/README.md) runs Postgres and the API with docker
+compose on a LAN host. `ecdb sync` copies the deployed catalogue into it
+through `/v1/export`. `ecdb bootstrap` applies the migrations and creates the
+`ecdb_api` login (and `ecdb_api_writer` when `ECDB_WRITER_PASSWORD` is set).
 
 ## Deploying on RDS
 
