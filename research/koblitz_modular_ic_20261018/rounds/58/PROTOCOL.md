@@ -1,0 +1,13 @@
+# R58 doubled-pole construction, frozen before data
+
+Continue original user-authorized manual local exact algebra: seed58,4GiB virtual,1200seconds per native invocation,one Singular/FLINT thread,one mathematical job at a time. No new EKS/Diem/freezer/Conductor claim/delegation/merge/retarget/auto-merge change. R27-R57 science sealed. All donor bytes pinned.
+
+The full L(2P) has degree160 on the retained proper genus61 source, so RR predicts100 sections (160>120). Complete ambient2D0 has degree256 and196 sections. Start with the retained196 actual products of descended68 sections; verify all20 cusp bounds and rank196 in257 F4 jets. If this gate fails, preserve it and complete from all2346 pairs before proceeding; count alone is insufficient.
+
+Use actual descended G_i=sigma(f_i)+a*(f_i+sigma(f_i)) in F4 charts, with a²+a+1=0 and old sigma(f_i) reconstructed from the complete68 matrix. Generate sigma(G_i)=f_i+a*(f_i+sigma(f_i)) and check coefficient Frobenius conjugation. MULTIPLY these actual G_i; do not apply linear descent directly to the old product. The R50 actual packet uses precisely these product pairs. Binary extraction uses imag(q)=q²+q,real(q)=q+a*imag(q), each required0/1.
+
+At selected Q0 e1/e7 old j0 charts, impose all6 coefficients -14..-9 and42 coefficients -98..-57. Each F4 coefficient gives two binary rows,96total. Both residue orientations are checked by coefficient conjugation. All20 charts and3920 product bounds are mandatory. All required coefficients must be below rigorously propagated absolute precision;257 F4 regular-cusp jets certify independence. Reconstruct actual196 involution from these jets, verify squareI,constant binary entries and stability of complete restriction kernel.
+
+Compute full96x196 matrix C and K,R,H with C K=0,R K=I,K R+H C=I. Record actual rank/dimension; dimension different from100 triggers a geometric consistency audit rather than discarding contrary data. Reconstruct1,A²,b² from independent jets;firsttwo must be in the kernel and actualb² must have nonzero restricted image. Keep all matrices and negative-control outcomes. Actual field bindings/division byA²,trace functions,Lean local pole implication and independent checker are subsequent separately frozen stages.
+
+Acceptance: exit0,exact marker,no whitespace-question-mark native errors,all specified checks. Preserve every error/cap/partial;repair under a new frozen attempt. No accepted producer rerun for publication. A/A,statistical power,blinding and randomization are inapplicable to fixed exhaustive exact identities;timings are custody diagnostics only. Reviewed retained sources and Stacks RR before choosing this construction.
