@@ -16,7 +16,7 @@
   },
   "arms": [
     {
-      "description": "Twelve n26\u201331 size/twist cells for koblitz",
+      "description": "Twelve n26–31 size/twist cells for koblitz",
       "id": "native-enumerate-koblitz",
       "instrument": {
         "binary_sha256": "c42ca1898aa11ae9cae29f190aabb90f10ee4fc3391eb5f9497fa6da2eeb2569",
@@ -67,7 +67,7 @@
       "role": "candidate"
     },
     {
-      "description": "Twelve n26\u201331 size/twist cells for binary",
+      "description": "Twelve n26–31 size/twist cells for binary",
       "id": "native-enumerate-binary",
       "instrument": {
         "binary_sha256": "c42ca1898aa11ae9cae29f190aabb90f10ee4fc3391eb5f9497fa6da2eeb2569",
@@ -118,7 +118,7 @@
       "role": "candidate"
     },
     {
-      "description": "Twelve n26\u201331 size/twist cells for prime",
+      "description": "Twelve n26–31 size/twist cells for prime",
       "id": "native-enumerate-prime",
       "instrument": {
         "binary_sha256": "c42ca1898aa11ae9cae29f190aabb90f10ee4fc3391eb5f9497fa6da2eeb2569",
@@ -248,11 +248,11 @@
     "timeout_seconds": 1500
   },
   "freeze": {
-    "commit": null,
-    "filed_before_affected_data": false,
-    "frozen_at": null,
-    "protocol_sha256": null,
-    "status": "draft"
+    "status": "frozen",
+    "protocol_sha256": "ec6363c6ccdc41b2a6fc8a30844f27f3b5acf443bcfaa0cc65e9196b3b8e97a7",
+    "commit": "2b595a72e7df5e383ba208cb7c084c0679fccebe",
+    "frozen_at": "2026-11-01T23:25:34Z",
+    "filed_before_affected_data": true
   },
   "hypotheses": [],
   "inadmissible": [
@@ -337,7 +337,7 @@
     ]
   },
   "protocol_id": "ML-N26-N31-CROSS-FAMILY-20261101",
-  "question": "Does the native dataset CLI retain and independently replay the full 36-cell n26\u201331 m2 enumerate panel across Koblitz, ordinary binary, prime and paired twists?",
+  "question": "Does the native dataset CLI retain and independently replay the full 36-cell n26–31 m2 enumerate panel across Koblitz, ordinary binary, prime and paired twists?",
   "randomization": {
     "arm_order": "fixed",
     "arm_order_reason": "Fixed full matrix; arm order is not compared",
