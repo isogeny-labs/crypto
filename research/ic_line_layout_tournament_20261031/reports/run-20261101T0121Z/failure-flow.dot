@@ -1,0 +1,19 @@
+digraph failure_flow {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.55"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10,
+        color="#334155", fillcolor="#f8fafc", margin="0.12,0.08"];
+  edge [color="#64748b", penwidth=1.4, arrowsize=0.7, fontname="DejaVu Sans", fontsize=9];
+
+  source [label="Exact merged source\nb4d751706e…", fillcolor="#dbeafe"];
+  build [label="Contracts + build\n2 / 2 passed", fillcolor="#dcfce7"];
+  jobs [label="Two preregistered\nEKS Jobs", fillcolor="#e0e7ff"];
+  failed [label="Terminal state: failed\nremote result 23", fillcolor="#fee2e2", color="#b91c1c"];
+  public [label="Public receipt\nno Pod UID / result URI", fillcolor="#fef3c7"];
+  diagnose [label="Fixed-target private read\nidentity + SHA-256 checks", fillcolor="#f3e8ff"];
+  summary [label="Allowlisted diagnosis only\nno raw records or stderr", fillcolor="#f3e8ff"];
+  decision [label="Evidence-attributed repair\nor new evidence version", fillcolor="#f8fafc"];
+
+  source -> build -> jobs -> failed -> public -> diagnose -> summary -> decision;
+  jobs -> failed [label="2 / 2"];
+  diagnose -> jobs [label="no retry", style=dashed, arrowhead=none, constraint=false];
+}

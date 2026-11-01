@@ -562,6 +562,7 @@ another's success condition. The doc explains both.
 | `zk::polynomial`      | Polynomial arithmetic over a field              |
 | `zk::kzg`             | KZG polynomial commitments                      |
 | `zk::bulletproofs`    | Bulletproofs range proofs                       |
+| `zk::groth16`         | Groth16 zk-SNARK skeleton: R1CS/QAP layers only; **`verify` is non-functional** (the pairing rejects honest proofs too) |
 | `zk::groth16`         | Groth16 zk-SNARK skeleton                       |
 | `zk::plonk`           | PLONK polynomial IOP: **educational, unaudited, not zero-knowledge, not succinct** (polynomials sent in the clear in place of KZG commitments). `verify` checks each sent evaluation against its polynomial and the gate, copy-constraint and `Z(1) = 1` identity at `ζ` |
 | `zk::stark` / `stark_v2` | STARK-style proof skeletons: **educational, unaudited, not zero-knowledge, no grinding, no stated security level; must not back a research claim**. `stark_v2` is DEEP-ALI: coset LDE, composition polynomial, an out-of-domain sample `z` (the AIR checked at `z`) and degree-bounded FRI on the DEEP quotient; its conjectured soundness (Reed–Solomon proximity conjecture, random-oracle Fiat–Shamir) is `ε ≲ β^(−q) + ε_field + ε_hash`, capped at 128 bits by SHA-256 Merkle commitments, over the BLS12-381 scalar field. `stark` is a spot-check argument, not a STARK (see the module docs) |

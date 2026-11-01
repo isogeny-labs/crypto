@@ -129,3 +129,113 @@ was generated.
 | Runtime/power preflight | Not started |
 | E1 measurements | None |
 | Breakthrough or speedup claim | Not established |
+
+## 2026-11-01 exact boundary-census implementation
+
+Scope: native E1 arithmetic instrument and lead-reconciliation report; no
+affected E1 data.
+
+### Native validation
+
+Rust 1.78.0 focused release validation passed:
+
+```text
+cargo fmt --manifest-path crates/hashed-ecdl-tensor/Cargo.toml -- --check
+cargo test --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --locked --release census --lib
+cargo check --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --locked --release --bin tensor-census
+```
+
+The focused suite passed 4/4 tests. Its randomized property control compared
+1,152 deterministic rectangular integer matrices with independent rational
+Gaussian elimination. Exact rank-one, rank-two and rank-four controls, a
+canonical equality-network contraction, pin rejection and cap exhaustion also
+passed.
+
+The complete standalone crate suite then passed under Rust 1.78.0: 117 tests,
+0 failures, including 67 library tests, every binary/integration suite and
+doc-tests. The existing `structured` integration suite took 181.08 seconds;
+no timeout or retry was hidden.
+
+Current stable Rust 1.99.1 passed:
+
+```text
+cargo clippy --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --locked --all-targets -- -D warnings
+```
+
+Rust 1.78 all-target Clippy stopped on the pre-existing `format_collect`
+diagnostic at `panel_driver.rs:238`; no suppression or unrelated edit was
+made. The current-stable gate is the same toolchain class used for the prior
+E0 all-target lint receipt.
+
+Source SHA-256 values before the final commit were:
+
+```text
+9d13c2e1d240190a0be0340fbe6b2bbd83588b05f035731f8c6fbe63b2f34a82  crates/hashed-ecdl-tensor/src/census.rs
+215f1255bded298c136388fc7fef311a1aa4cbfee6086e50abd8c4f37e3eed68  crates/hashed-ecdl-tensor/src/bin/tensor-census.rs
+```
+
+These identify the locally checked source files, not a frozen experiment
+binary or image. The protocol's binary/image fields remain unset.
+
+### Report and visual validation
+
+Graphviz rendered `figures/lead-reconciliation.dot` to SVG. Typst 0.15.0
+rendered `search-20261101.typ` to a one-page tagged A4 PDF. `pdftotext`
+recovered the outcome, evidence table, implementation checks, requirement
+status and sources. The page was rendered to PNG and visually inspected at
+original detail: the graph, tables, labels and footer are legible and not
+clipped.
+
+```text
+e199fac3776beff0cc8901bda25f5b2f7ae44522f72977b5b4bc02352a7ac698  figures/lead-reconciliation.svg
+5d4afe4aff86d8239f6d40a39c6b92fb079639974519a80d8cd7ec506a558d54  search-20261101.pdf
+```
+
+This is a search/implementation report, not a performance result, so no
+`benchmarks/` copy or canonical numeric dashboard point applies.
+
+### Repository-level library gate
+
+The required root command was run under stable Rust 1.99.1:
+
+```text
+cargo +stable test --locked --release --lib
+```
+
+It exited 101 after 1,774.74 seconds: 5,817 passed, 9 failed and 128 were
+ignored. None of the failures is in `hashed-ecdl-tensor` or the files changed
+by this slice.
+
+Six failures were caused by the sparse checkout omitting tracked fixtures:
+five `cryptanalysis::certicom_dlp::device_tests` stopped at
+`tracked gpu/certicom source must be materialized`, and
+`committed_version_1_bounds_re_derive_under_their_recorded_version` could not
+open its tracked session JSON. After materializing exactly `gpu/certicom` and
+`research/ecbench_bounds_challenges_20261006`, their targeted reruns passed
+6/6 and 1/1 respectively.
+
+Two diagnostic publication tests failed at clock setup because this execution
+host lacks both `/proc/self/ns/time` and `/proc/self/timens_offsets`. An exact
+four-test namespace rerun passed the two independent controls and reproduced
+these two host-limited failures.
+
+The remaining unrelated failure reproduced in isolation:
+
+```text
+cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline
+assertion failed: left 13130, right 3757
+```
+
+Its exact rerun exited 101 after 157.07 seconds with 0 passed and 1 failed.
+The broad root gate is therefore reported as failed, not passed. The complete
+changed-crate suite and final focused source gates above pass.
+
+### Remaining evidence gates
+
+No production semantic cut, matched natural/null pair, rank ladder or timing
+was generated. The E1 protocol remains draft. The production cut generator,
+rewired-null constructor, fresh-process A/A runner, disjoint preflight, power
+record, final ladder, source commit and image digest remain open.
