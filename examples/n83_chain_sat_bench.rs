@@ -66,6 +66,8 @@ fn main() {
             for part in parts {
                 if part == "affine" {
                     options.patterns = ChainS3Patterns::AffineOnly;
+                } else if part == "indexed" {
+                    options.tables.indexed = true;
                 } else if part == "rebuild" {
                     options.tables.rebuild = true;
                 } else if let Some(depth) = part.strip_prefix("meet") {
@@ -78,6 +80,7 @@ fn main() {
                         max_points: 300_000,
                         meet: options.tables.meet,
                         rebuild: options.tables.rebuild,
+                        indexed: options.tables.indexed,
                     };
                 } else {
                     panic!("unknown arm modifier {part}");
@@ -114,7 +117,19 @@ fn main() {
     let mut warmed = std::collections::BTreeSet::new();
     for (_, options) in &arms {
         let d = options.tables.meet;
-        if d >= 2 && m > d && m - d <= d && warmed.insert(d) {
+        let depths: Vec<usize> = if options.tables.indexed && options.tables.rebuild {
+            (2..=d).collect()
+        } else {
+            vec![d]
+        };
+        for d in depths {
+            if !(d >= 2
+                && m > options.tables.meet
+                && m - options.tables.meet <= options.tables.meet)
+                || !warmed.insert(d)
+            {
+                continue;
+            }
             let start = Instant::now();
             let front = chain_s3_meet_front(&kc, &fb, d);
             println!(
