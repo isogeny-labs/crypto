@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+# Read and summarize one already-terminal failed run without exposing raw records.
+set -euo pipefail
+[[ $# == 7 ]] || {
+  echo 'Usage: diagnose-failed-run JOB LAUNCHER REQUEST_SHA SOURCE_SHA BINARY_SHA WORKFLOW_RUN OUT.json' >&2
+  exit 2
+}
+
+job=$1 launcher=$2 request_sha=$3 source_sha=$4 binary_sha=$5 workflow_run=$6 output=$7
+: "${ISOLAB_BUCKET:?}"
+aws_bin=${AWS_BIN:-aws}
+[[ "$job" =~ ^gh-[0-9]+-[1-9][0-9]*$ ]]
+[[ "$launcher" =~ ^[a-f0-9-]{36}$ ]]
+[[ "$request_sha" =~ ^[a-f0-9]{64}$ ]]
+[[ "$source_sha" =~ ^[a-f0-9]{40}$ ]]
+[[ "$binary_sha" =~ ^[a-f0-9]{64}$ ]]
+[[ "$workflow_run" =~ ^[0-9]+$ ]]
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+launcher_dir="$tmp/launcher"
+mkdir -p "$launcher_dir"
+launcher_prefix="runs/$job/launcher/$launcher"
+for required in result.json request.json status.json objects.json; do
+  "$aws_bin" s3 cp "s3://$ISOLAB_BUCKET/$launcher_prefix/$required" \
+    "$launcher_dir/$required" --only-show-errors
+  [[ -s "$launcher_dir/$required" ]] || {
+    printf 'Missing launcher receipt: %s\n' "$required" >&2
+    exit 3
+  }
+done
+
+jq -e --arg job "$job" --arg launcher "$launcher" --arg request "$request_sha" \
+  --arg source "$source_sha" --arg binary "$binary_sha" \
+  '.schema=="isolab.eks.result/v1" and .state=="failed" and .exit_code==23
+   and .job_name==$job and .launcher==("isolab-experiment-launcher:"+$launcher)
+   and .request_sha256==$request and .pod_uid=="" and .results_uri==""
+   and .build.source_revision==$source and .build.ecbench_sha256==$binary' \
+  "$launcher_dir/result.json" >/dev/null
+jq -e --arg job "$job" --arg source "$source_sha" \
+  --arg binary "$binary_sha" \
+  '.job.job_name==$job and .job.build.source_revision==$source
+   and .job.build.ecbench_sha256==$binary
+   and .provenance.source_revision==$source' "$launcher_dir/request.json" >/dev/null
+[[ $(sha256sum "$launcher_dir/request.json" | cut -d ' ' -f1) == "$request_sha" ]] || {
+  echo 'Normalized request hash mismatch' >&2
+  exit 3
+}
+job_uid=$(jq -r .job_uid "$launcher_dir/result.json")
+jq -e --arg job "$job" --arg job_uid "$job_uid" '
+  .job.job_name==$job and .job.uid==$job_uid and .job.state=="failed"
+  and all(.pods[]?; (.uid|test("^[a-f0-9-]{36}$")))
+' "$launcher_dir/status.json" >/dev/null
+jq -e '(.objects|type)=="array" and all(.objects[]; (.Key|type)=="string")' \
+  "$launcher_dir/objects.json" >/dev/null
+
+mapfile -t pods < <(
+  {
+    jq -r --arg job "$job" '
+      .objects[].Key
+      | capture("^runs/"+$job+"/(?<pod>[a-f0-9-]{36})/[^/]+$").pod
+    ' "$launcher_dir/objects.json"
+    jq -r '.pods[]?.uid | select(test("^[a-f0-9-]{36}$"))' "$launcher_dir/status.json"
+  } | sort -u
+)
+
+classify_exit() {
+  case "$1" in
+    0) printf 'unexpected_success_exit\n' ;;
+    41) printf 'native_audit_gate\n' ;;
+    42) printf 'l2_isolation_gate\n' ;;
+    43) printf 'aa_control_gate\n' ;;
+    44) printf 'build_identity_gate\n' ;;
+    45) printf 'diagnostic_input_gate\n' ;;
+    46) printf 'owner_binary_gate\n' ;;
+    47) printf 'owner_receipt_gate\n' ;;
+    90) printf 'artifact_hash_collection\n' ;;
+    91) printf 'artifact_upload\n' ;;
+    null) printf 'missing_job_exit\n' ;;
+    *) printf 'payload_execution\n' ;;
+  esac
+}
+
+download_if_present() {
+  local pod=$1 name=$2 destination=$3 key
+  key="runs/$job/$pod/$name"
+  if ! jq -e --arg key "$key" 'any(.objects[]; .Key==$key)' "$launcher_dir/objects.json" >/dev/null; then
+    return 1
+  fi
+  if "$aws_bin" s3 cp "s3://$ISOLAB_BUCKET/$key" "$destination" --only-show-errors; then
+    return 0
+  fi
+  return 2
+}
+
+verify_download() {
+  local manifest=$1 file=$2 name=$3 expected actual
+  expected=$(awk -v wanted="$name" '$2==wanted {print $1}' "$manifest")
+  [[ "$expected" =~ ^[a-f0-9]{64}$ ]] || {
+    printf 'Manifest does not bind %s\n' "$name" >&2
+    exit 4
+  }
+  actual=$(sha256sum "$file" | cut -d ' ' -f1)
+  [[ "$actual" == "$expected" ]] || {
+    printf 'Hash mismatch for %s\n' "$name" >&2
+    exit 4
+  }
+}
+
+write_status_summary() {
+  local pod=$1 status_exit=$2 artifact_access=$3 summary=$4 classification
+  classification=$(classify_exit "$status_exit")
+  if [[ "$status_exit" == null ]]; then
+    case "$artifact_access" in
+      manifest_not_listed) classification=incomplete_artifact_upload ;;
+      payload_read_unavailable) classification=artifact_read_unavailable ;;
+    esac
+  fi
+  jq -n --arg pod "$pod" --arg class "$classification" --argjson exit "$status_exit" \
+    --arg artifact_access "$artifact_access" \
+    '{pod_uid:$pod,classification:$class,exit_code:$exit,
+      exit_source:(if $exit==null then null else "kubernetes_status" end),
+      artifact_access:$artifact_access,manifest_verified:false,l2:null,audit:null,control:null,
+      owner_checks:{run:false,replay:false},
+      private_stderr:{run_sha256:null,audit_sha256:null,content_published:false}}' > "$summary"
+}
+
+pod_summaries=()
+for pod in "${pods[@]}"; do
+  pod_dir="$tmp/pod-$pod"
+  mkdir -p "$pod_dir"
+  summary="$tmp/summary-$pod.json"
+  status_exit=$(jq -r --arg pod "$pod" '
+    [.pods[] | select(.uid==$pod) | .status.containerStatuses[]?.state.terminated.exitCode
+      | select(type=="number")][0] // "null"
+  ' "$launcher_dir/status.json")
+  manifest_status=0
+  download_if_present "$pod" SHA256SUMS "$pod_dir/SHA256SUMS" || manifest_status=$?
+  if [[ "$manifest_status" != 0 ]]; then
+    if [[ "$manifest_status" == 1 ]]; then
+      artifact_access=manifest_not_listed
+    else
+      artifact_access=payload_read_unavailable
+    fi
+    write_status_summary "$pod" "$status_exit" "$artifact_access" "$summary"
+    pod_summaries+=("$summary")
+    continue
+  fi
+
+  names=(job-exit.json build-info.json binary.sha256 input-spec.json l2-gate.json audit.json
+    control-comparison.json run.stderr audit.stderr owner-run-check.json owner-replay-check.json)
+  payload_read_failed=0
+  for name in "${names[@]}"; do
+    object_status=0
+    download_if_present "$pod" "$name" "$pod_dir/$name" || object_status=$?
+    case "$object_status" in
+      0) verify_download "$pod_dir/SHA256SUMS" "$pod_dir/$name" "$name" ;;
+      1) ;;
+      2) payload_read_failed=1; break ;;
+    esac
+  done
+  if [[ "$payload_read_failed" == 1 ]]; then
+    write_status_summary "$pod" "$status_exit" payload_read_unavailable "$summary"
+    pod_summaries+=("$summary")
+    continue
+  fi
+
+  if [[ -s "$pod_dir/build-info.json" ]]; then
+    jq -e --arg source "$source_sha" --arg binary "$binary_sha" \
+      '.source_revision==$source and .ecbench_sha256==$binary' "$pod_dir/build-info.json" >/dev/null
+  fi
+
+  if [[ -s "$pod_dir/job-exit.json" ]]; then
+    jq -e --arg job "$job" --arg pod "$pod" \
+      '.job_name==$job and .pod_uid==$pod and (.exit_code|type)=="number"' \
+      "$pod_dir/job-exit.json" >/dev/null
+    exit_code=$(jq -r .exit_code "$pod_dir/job-exit.json")
+    [[ "$status_exit" == null || "$status_exit" == "$exit_code" ]] || {
+      printf 'Status and retained exit mismatch for %s\n' "$pod" >&2
+      exit 4
+    }
+    exit_source=hash_verified_job_exit
+  else
+    exit_code=$status_exit
+    if [[ "$status_exit" == null ]]; then exit_source=null; else exit_source=kubernetes_status; fi
+  fi
+  classification=$(classify_exit "$exit_code")
+
+  if [[ -s "$pod_dir/l2-gate.json" ]]; then
+    jq '{accepted,executions,below_l2:(.below_l2|length),invalid_outcomes:(.invalid_outcomes|length),grades}' \
+      "$pod_dir/l2-gate.json" > "$pod_dir/l2-summary.json"
+  else
+    printf 'null\n' > "$pod_dir/l2-summary.json"
+  fi
+  if [[ -s "$pod_dir/audit.json" ]]; then
+    jq '{ok,regraded,records_bound,records,verified_records,
+      replay_count:(.replays|length),reproduced:( [.replays[]?|select(.reproduced==true)]|length),
+      problem_count:(.problems|length)}' "$pod_dir/audit.json" > "$pod_dir/audit-summary.json"
+  else
+    printf 'null\n' > "$pod_dir/audit-summary.json"
+  fi
+  if [[ -s "$pod_dir/control-comparison.json" ]]; then
+    jq '{wall:{status:.wall.status,pairs:.wall.pairs,
+      pairs_below_level:.wall.pairs_below_level,aa_pairs:.wall.aa_pairs,
+      aa_ci95_present:(.wall.aa_ci95!=null)}}' \
+      "$pod_dir/control-comparison.json" > "$pod_dir/control-summary.json"
+  else
+    printf 'null\n' > "$pod_dir/control-summary.json"
+  fi
+  jq -n --arg pod "$pod" --arg class "$classification" --argjson exit "$exit_code" \
+    --arg exit_source "$exit_source" \
+    --slurpfile l2 "$pod_dir/l2-summary.json" --slurpfile audit "$pod_dir/audit-summary.json" \
+    --slurpfile control "$pod_dir/control-summary.json" \
+    --arg run_stderr_sha "$(if [[ -s "$pod_dir/run.stderr" ]]; then sha256sum "$pod_dir/run.stderr" | cut -d ' ' -f1; fi)" \
+    --arg audit_stderr_sha "$(if [[ -s "$pod_dir/audit.stderr" ]]; then sha256sum "$pod_dir/audit.stderr" | cut -d ' ' -f1; fi)" \
+    --argjson owner_run_check "$( [[ -s "$pod_dir/owner-run-check.json" ]] && echo true || echo false )" \
+    --argjson owner_replay_check "$( [[ -s "$pod_dir/owner-replay-check.json" ]] && echo true || echo false )" \
+    '{pod_uid:$pod,classification:$class,exit_code:$exit,
+      exit_source:(if $exit_source=="null" then null else $exit_source end),
+      artifact_access:"selected_objects_hash_verified",manifest_verified:true,
+      l2:$l2[0],audit:$audit[0],control:$control[0],
+      owner_checks:{run:$owner_run_check,replay:$owner_replay_check},
+      private_stderr:{run_sha256:(if $run_stderr_sha=="" then null else $run_stderr_sha end),
+        audit_sha256:(if $audit_stderr_sha=="" then null else $audit_stderr_sha end),
+        content_published:false}}' > "$summary"
+  pod_summaries+=("$summary")
+done
+
+mkdir -p "$(dirname "$output")"
+jq -n --arg job "$job" --arg launcher "$launcher" --arg request "$request_sha" \
+  --arg source "$source_sha" --arg binary "$binary_sha" --argjson workflow "$workflow_run" \
+  --arg job_uid "$job_uid" \
+  --argjson object_count "$(jq '.objects|length' "$launcher_dir/objects.json")" \
+  --slurpfile pods <(if ((${#pod_summaries[@]})); then jq -s . "${pod_summaries[@]}"; else printf '[]\n'; fi) \
+  '{schema:"isolab.eks.failed-diagnosis/v1",workflow_run:$workflow,job_name:$job,
+    job_uid:$job_uid,launcher_id:$launcher,request_sha256:$request,
+    source_revision:$source,ecbench_sha256:$binary,launcher_state:"failed",
+    remote_result_exit_code:23,object_count:$object_count,pods:$pods[0],
+    scope:"allowlisted failure metadata only; raw records, timing values and stderr remain private",
+    experiment_retry:false}' > "$output"
+jq -e '.experiment_retry==false and .launcher_state=="failed"' "$output" >/dev/null
