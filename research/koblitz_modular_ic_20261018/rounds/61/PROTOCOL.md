@@ -61,3 +61,24 @@ beforecubic61-02. Sameall324products/385jets/20charts/caps,nodownscale.
 
 Beforefresh02 also compare all196retainedR43quadraticpairs withR58pairs58
 exactly, so cubicsecondindices refer to the same sourcequadraticselection.
+
+## Auxiliary metadata correction, version5 (after cubic02 started)
+HistoricalJSONcarriedquotient-eraarms andno-seriestruncationannotation.
+Theirclaim/metric/launcherblocksandthefrozenMarkdown/native sourcealready
+specifiedtheactual trace/cubiccalculationand385jetprecisiongates. Rawversions
+remainunchanged. Version5correctsonlyauxiliaryannotations;itdoesnotchange
+source,thresholds,cohort,caps,stoppingoracceptedidentitycriteria. No performance
+resultisassignedtolegacyarms. R60sealedJSONhasthesameinheritedannotation
+issue;R60nativefullsource/exactkernels/report remainat their stated scope.
+Canonicalprotocoltool/schema/docs are absent from thecurrentselected Git
+index anddisk;manual contract/byteverification is not schema validation.
+Allnewaffected stages use correctedblocks frozenbeforetheirdata.
+
+## Stage3 actual whole-source76section identities
+cubic61-02 accepted rank324/385F4jets/all6480bounds/all248constraints,
+complete76kernelandactualinvolution. Freeze FIELD61:actualdegree32source,
+all324descendedcubicproducts,all76mixedfunctions,constant1andall76actual
+l->l+A sourceinvolutions. A changedcubiccoefficientmustproduce a nonzero
+whole-source residual. Exactrationalfunctionnormalforms,nofinitefiberfit.
+Outputall324/76fieldfunctiondefinitions for futurefixed/trace/cohort/maps.
+Noacceptedproducerrepeated. Samecaps/onejob/seed61.

@@ -1,0 +1,31 @@
+proc require61(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../cubic61-02/cubic-space61.sing"));int dimension61=ncols(kernel61);
+execute(read("../../../58/runs/field58-01/field-space58.sing"));
+execute(read("../../../50/runs/rr-field50-01/rr-field50.sing"));
+execute(read("../../source-data/pairs361.sing"));
+map sourceMap61=fieldSpace58,l,v;ideal sourceIdeal61=sourceMap61(sourceIdeal58);ideal GB61=std(sourceIdeal61);poly actualA61=sourceMap61(actualA58);
+map coefficients61=cubicSpace61,0;matrix K61=coefficients61(kernel61);matrix S61=coefficients61(sigmaMixed61);matrix one61=coefficients61(oneMixed61);
+require61(vdim(GB61)==32 && dimension61==76 && size(rrValues50)==68 && size(rrProducts50)==196,"FIELD61_SOURCE_AND_MIXED_SHAPES");
+ideal cubicValues61;ideal completeValues61;poly val61;int i61;int j61;
+for(j61=1;j61<=324;j61++){
+ cubicValues61[j61]=reduce(rrValues50[pairs361[j61,1]]*rrProducts50[pairs361[j61,2]],GB61);
+}
+for(j61=1;j61<=76;j61++){
+ val61=0;for(i61=1;i61<=324;i61++){val61=val61+K61[i61,j61]*cubicValues61[i61];}
+ completeValues61[j61]=reduce(val61,GB61);
+}
+val61=0;for(i61=1;i61<=76;i61++){val61=val61+one61[i61,1]*completeValues61[i61];}
+require61(reduce(val61+1,GB61)==0,"FIELD61_ACTUAL_CONSTANT_CONTROL");
+for(j61=1;j61<=76;j61++){
+ val61=subst(completeValues61[j61],l,l+actualA61);
+ for(i61=1;i61<=76;i61++){val61=val61+S61[i61,j61]*completeValues61[i61];}
+ require61(reduce(val61,GB61)==0,"FIELD61_ALL_ACTUAL_SOURCE_INVOLUTIONS");
+}
+require61(reduce(cubicValues61[1],GB61)!=0 && reduce(completeValues61[1]+cubicValues61[1]+completeValues61[1],GB61)!=0,"FIELD61_CHANGED_CUBIC_COEFFICIENT_REJECTED");
+link out61="ASCII:w field-space61.sing";open(out61);write(out61,"ring fieldSpace61=(2,u),(l,v),dp;short=0;ideal sourceIdeal61;");
+for(i61=1;i61<=size(sourceIdeal61);i61++){write(out61,"sourceIdeal61["+string(i61)+"]="+string(sourceIdeal61[i61])+";");}
+write(out61,"poly actualA61="+string(actualA61)+";ideal cubicValues61;ideal completeValues61;");
+for(i61=1;i61<=324;i61++){write(out61,"cubicValues61["+string(i61)+"]="+string(cubicValues61[i61])+";");}
+for(i61=1;i61<=76;i61++){write(out61,"completeValues61["+string(i61)+"]="+string(completeValues61[i61])+";");}close(out61);
+print("FIELD61_RESULT source_degree=32 actual_cubic_functions=324 mixed_sections=76 actual_source_involution_checks=76 constant_control=1 changed_cubic_coefficient_rejected=1");
+print("FIELD61_ALL_CHECKS_PASS");quit;

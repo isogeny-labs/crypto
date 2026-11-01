@@ -1,6 +1,7 @@
 import Mathlib.Data.Finset.Card
 import Mathlib.Data.Fintype.Prod
 import Mathlib.Algebra.Group.Commute.Basic
+import Mathlib.Algebra.Module.Submodule.Range
 import Lean.Elab.Tactic.Omega
 
 namespace Scaling61
@@ -41,5 +42,17 @@ theorem coefficient_inverse_square {R : Type*} [Monoid R] (x : R)
   calc
     (x^16)^2=x^32 := by rw [← pow_mul]
     _=x := h
+
+/-- A nonzero Cartier-compatible functional obstructs surjectivity of C-I.
+The AS/Serre geometry producing the functional is an external premise. -/
+theorem eigenfunctional_blocks_surjectivity {K V : Type*} [CommRing K]
+    [AddCommGroup V] [Module K V] (C : V →ₗ[K] V) (ell : V →ₗ[K] K)
+    (h : ∀ v, ell (C v) = ell v) (w : V) (hw : ell w ≠ 0) :
+    ¬ Function.Surjective (fun v => C v - v) := by
+  intro hs
+  obtain ⟨v, hv⟩ := hs w
+  have hz : ell w = 0 := by
+    rw [← hv, map_sub, h, sub_self]
+  exact hw hz
 
 end Scaling61

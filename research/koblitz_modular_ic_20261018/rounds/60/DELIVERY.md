@@ -25,3 +25,11 @@ beforeanyretry. Itcomputesactualnormal32traceGram/inverse/dual sourcebinding.
 Nextcompletecubic324/76mixed/818 andcanonical61form/Cartier305binary
 jointkernel;alloriginalfactor/action/saturation/polarization/reverse/larger
 sourcespersist. NEXT.md andTRACE-DUAL-NEXT.md recordexactobligations.
+
+## Auxiliary metadata annotation correction
+R61PROTOCOL-METADATA61.md discloses inheritedquotient-arm andprecision
+annotations inhistoricalJSON. R60frozenMarkdown/source explicitlynamesactual
+mixed36/404cohort andabsoluteLaurentprecision;all39bytepinsand112archive
+filesareunchanged. No performance/comparativeclaim usedthoselegacylabels.
+Futurestagescorrecttheannotationsbeforeaffecteddata;sealedscienceisnotedited.
+FinaldeliveryPR3207externallymergedat62d61cc31;all6CIchecksSUCCESSonthathead.

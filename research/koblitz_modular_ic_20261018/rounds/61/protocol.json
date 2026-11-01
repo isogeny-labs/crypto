@@ -1,32 +1,30 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R61-COMPLETE-CUBIC",
+  "id": "KOBLITZ-R61-CUBIC-FIELD",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "cubic",
+      "id": "field",
       "class": "exact_computation",
-      "statement": "Actual324cubicambient complete by385F4jets andall20sourcechartbounds,thenfull248row mixedrestriction with RRpredicted76"
+      "statement": "All324actualcubicfunctions,76complete mixedfunctions and76whole-sourceinvolution identities in the actual degree32field"
     }
   ],
   "arms": {
-    "reference": "R55normalA andsourceannihilator;R52normalbasis/table/nu;R58complete100functions",
-    "baseline": "reducedB/A80sourcequotient",
-    "candidate": "640/320normalA4quotientwithcomplete18-patternprincipaldivisortest",
+    "reference": "R50acceptedactual68descendedfunctions/196quadratics andR58degree32sourceIdeal",
+    "baseline": {
+      "not_applicable_reason": "exactidentityreconstruction,no timingcomparison"
+    },
+    "candidate": "R61complete324cubic/76mixedkernel actualfieldfunctions",
     "positive": [
-      "allE M4=0,E G=I320,M4H+GE=I640",
-      "fourpoint-labelled80-dimensionalnilpotentJordanblocks",
-      "full100-columnfiniteevaluationleftinverse",
-      "all160oldCRTcolumnsrecovered",
-      "globallyregularxspacepositivekernelA\u00b2dimension1",
-      "all18completeC K/R K/K R+H Cproducts"
+      "degree32sourcefield",
+      "exactactualconstant1reconstruction",
+      "all76sourceinvolutionidentities"
     ],
     "negative": [
-      "knownx=1/A\u00b2failsglobalregularconditions",
-      "changedcokernelprojectionfailsinverseproduct"
+      "changedcubiccoefficienthasnonzeroactualsourceimage"
     ],
     "A_A": {
-      "not_applicable_reason": "fixedexactproducts,no noisycomparison"
+      "not_applicable_reason": "fixedexactidentities,no statisticalmetric"
     }
   },
   "variables": {
@@ -62,15 +60,14 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "6480actualcubicbounds",
-    "1360coefficientconjugations",
-    "770binaryjets/rank324/leftinverse",
-    "248constraintrows/mixeddimension76",
-    "restrictedsourceinvolution",
-    "constant1/changedinvolutioncontrols"
+    "sourcefielddegree32",
+    "actualcubicfunctions324",
+    "mixedsourcefunctions76",
+    "actualinvolutionchecks76",
+    "constant1/changedcoefficientcontrols"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh cubic61-02 CUBIC61.sing CUBIC61_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh field61-01 FIELD61.sing FIELD61_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -95,9 +92,9 @@
     "scope": "cubic/mixedsource spaceonly;818patterns/fixedtrace/sourcefield/Cartier and11action next"
   },
   "analysis": {
-    "kind": "exactpolynomialmatrix/rationalcoefficienttransportandbinarypresentation",
+    "kind": "exactrationalfunctionfieldpolynomialnormalforms",
     "comparative": false,
-    "precision": "exact,no seriestruncationinthisstage"
+    "precision": "whole-source identities; no series truncation in FIELD stage"
   },
   "literature": [
     {
@@ -110,9 +107,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 4,
+  "version": 6,
   "amendment": {
     "before_affected_data": true,
-    "reason": "repair reversed R43section/quadratic pairindices;retainall324/385/20scope;explicitR43/R58quadraticindexbinding"
+    "reason": "cubic61-02acceptedcomplete324ambient/76mixed/all6480bounds;freezeactualfieldbindingstagewithcorrectedauxiliarymetadata"
   }
 }
