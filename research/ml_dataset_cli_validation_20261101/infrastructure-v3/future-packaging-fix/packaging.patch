@@ -1,0 +1,135 @@
+--- a/driver.v3.py
++++ b/driver.v3.py
+@@ -742,9 +742,8 @@
+         save(fixture/"policy-analysis.json",policy_analysis)
+         save(fixture / "analysis.json", analysis)
+         write_phase_rows(fixture,state,analysis,policy_analysis)
+-        runner.command("experiment-export", [*state["validator_argv_prefix"], state["checker"], "from-rows", fixture/"functional-rows.jsonl",
+-            "--protocol",protocol,"--out",fixture/"experiment.export.json","--export-id","koblitz-m3-cli-functional-smoke"],120)
+-        bind_success_case_metadata(fixture)
++        runner.command("experiment-export", [*state["validator_argv_prefix"], Path(__file__).resolve(),
++            "package-success-export", "--fixture", fixture],120)
+         runner.command("experiment-export-check", [*state["validator_argv_prefix"], state["checker"], "check-export",fixture/"experiment.export.json",
+             "--protocol",protocol,"--verify-files"],120)
+         inventory(fixture, "inventory.json")
+@@ -1283,7 +1282,7 @@
+         "flow":{"planned":len(runs),"attempted":len(runs),"completed":sum(row["outcome_class"]=="completed" for row in runs),"not_completed":sum(row["outcome_class"]=="not_completed" for row in runs),"interrupted":0,"resumed":0,"excluded":[{"rule":key,"run_ids":values} for key,values in sorted(exclusions.items())]},
+         "files":files,"analysis":{"script":script,"blinded":False,"blinding_key_sha256":None,"outputs":[diagnostic_file(fixture,sidecar_path,"summary")],"unmasked_at":None},"notes":[{"kind":"observation","by":"failure adapter","text":"Canonical flow.planned counts represented terminal attempt rows under the pinned checker. Actual frozen workload is46, bound in failure-flow.json and backend_record. Unknown/unattempted cases have no invented attempt, status or measurements. The official checker will report shortfall where rows are missing. A failed row is outcome_class completed under the pinned checker, not a verified solver result."}],"reviews_dir":"reviews","backend_record":sidecar}
+     save(fixture/"failure.experiment.export.json",export)
+-    save(fixture/"failure-export-status.json",{"status":"written_not_yet_officially_checked","represented_rows":len(runs),"planned_software_cells":46,"cleanup_settled":settled,"no_dataset_commands":True})
++    save(fixture/"failure-export-status.json",{"status":"written_not_yet_officially_checked","represented_rows":len(runs),"planned_software_cells":46,"cleanup_settled":settled,**dataset_command_inventory(fixture,state)})
+     return export
+ 
+ def validate_failure_export(fixture):
+@@ -1373,10 +1372,76 @@
+         used.add(fid);counts[target]+=1
+     require(used==set(by_feature) and all(counts.values()),"missing native per-cell group prefix channel")
+ 
+-def bind_success_case_metadata(fixture):
++def dataset_command_inventory(fixture,state):
++    # Count actual recorded argv, including unsuccessful or unfinished commands.
++    # Missing/malformed argv cannot establish absence.
++    dataset=[];unknown=[]
++    for directory in sorted((fixture/"commands").iterdir()):
++        if not directory.is_dir():
++            unknown.append(directory.name);continue
++        try:
++            argv=load(directory/"argv.json")
++            require(isinstance(argv,list) and argv and all(isinstance(x,str) for x in argv),"malformed argv")
++        except Exception:
++            unknown.append(directory.name);continue
++        if len(argv)>=2 and argv[1]=="dataset":
++            dataset.append(directory.name)
++    return {"no_dataset_commands":not dataset if not unknown else None,
++        "dataset_command_count":len(dataset),"dataset_command_directories":dataset,
++        "command_inventory_complete":not unknown,"unknown_command_directories":unknown}
++
++
++def pinned_export_checker(state):
++    import importlib.util,importlib.metadata
++    require(importlib.metadata.version("jsonschema")=="4.26.0","wrong validator dependency")
++    checker=Path(state["checker"]);source=load(checker.parent.parent/"SOURCE.json")
++    require(source["commit"]=="37e193bf8b3e673e0942709794f44d28e6ab66fb" and sha(checker)==state["checker_sha256"],"checker pin changed")
++    for rel,digest in source["sha256"].items():require(sha(checker.parent.parent/rel)==digest,"checker source/schema changed")
++    spec=importlib.util.spec_from_file_location("pinned_success_export_checker",checker)
++    tool=importlib.util.module_from_spec(spec);spec.loader.exec_module(tool)
++    return tool
++
++
++def bind_export_instruments(value,protocol,state):
++    require(len(value["arms"])==len(protocol["arms"]),"export arm count changed")
++    pinned={a["id"]:a for a in protocol["arms"]}
++    require(len(pinned)==len(protocol["arms"]) and {a["id"] for a in value["arms"]}==set(pinned),"export arm identities changed")
++    for arm in value["arms"]:
++        frozen=pinned[arm["id"]]
++        require(arm["role"]==frozen["role"],"export arm role changed")
++        for field,state_field in [("commit","source_commit"),("binary_sha256","binary_sha256")]:
++            expected=frozen["instrument"][field]
++            require(expected and expected==state[state_field],"frozen instrument differs from prepared execution")
++            require(arm.get(field) in (None,expected),"converter instrument conflict")
++            arm[field]=expected
++
++
++def package_success_export(fixture):
++    require(not (fixture/"execution-failed.json").exists(),"failed attempt cannot be packaged as successful")
++    state=load(fixture/"prepared.json");protocol=load(fixture/"protocol.json")
++    require(sha(fixture/"protocol.json")==state["protocol_file_sha256"],"protocol changed before packaging")
++    require(sha(Path(__file__))==state["driver_sha256"],"packaging driver changed")
++    require(not (fixture/"experiment.export.json").exists(),"success export already exists")
++    tool=pinned_export_checker(state)
++    # The pinned CLI accepts no instrument/script metadata and validates its
++    # null skeleton immediately. Reuse its unchanged conversion function, bind
++    # authenticated metadata in memory, then validate once before final write.
++    value=tool.from_rows(fixture/"functional-rows.jsonl",protocol,"protocol.json",
++        "koblitz-m3-cli-functional-smoke",{})
++    save(fixture/"experiment.export.unbound.json",value)
++    bind_export_instruments(value,protocol,state)
++    value=bind_success_case_metadata(fixture,value)
++    require(value["analysis"]["script"]["sha256"]==protocol["analysis_plan"]["script"]["sha256"],"frozen analysis script mismatch")
++    findings=tool.schema_errors(protocol,"experiment.protocol/v1")+tool.schema_errors(value,"experiment.export/v1")
++    if not findings:findings=tool.lint_export(value,protocol,fixture,True)
++    require(not findings,"packaged export validation failed: "+repr(findings))
++    save(fixture/"experiment.export.json",value)
++    return {"accepted":True,"findings":[],"export_sha256":sha(fixture/"experiment.export.json")}
++
++
++def bind_success_case_metadata(fixture, value):
+     cases=[{key:value for key,value in c.items() if key!="root"} for c in failure_schedule(fixture)]
+     path=fixture/"software-cases.json";save(path,{"schema":"crypto.ml-dataset.software-cases/v1","cases":cases,"planned":46,"scientific_corpus_rows":0})
+-    output=fixture/"experiment.export.json";value=load(output)
+     require(len(value["runs"])==92 and {r["instance_id"] for r in value["runs"]}=={c["id"] for c in cases},"canonical success export lost exact schedule")
+     state=load(fixture/"prepared.json");mapping={case["id"]:case for case in failure_schedule(fixture)}
+     require({(r["arm"],r["instance_id"]) for r in value["runs"]}=={(arm,key) for arm in PHASE_ARMS for key in mapping},"canonical phase rectangle changed")
+@@ -1396,14 +1461,8 @@
+     value["analysis"]["script"]=diagnostic_file(fixture,script,"analysis")
+     value["backend_record"]={"software_cases":cases,"functional_validation_only":True,"planned_dataset_cells":46,"planned_validation_observations":92,"additional_solver_runs":0}
+     value["files"].append(diagnostic_file(fixture,path,"receipt"))
+-    # Preserve the canonical converter output before attaching phase evidence.
+-    raw=fixture/"experiment.export.unbound.json"
+-    with raw.open("xb") as target:
+-        target.write(output.read_bytes());target.flush();os.fsync(target.fileno())
+-    value["files"].append(diagnostic_file(fixture,raw,"raw"))
+-    staged=fixture/"experiment.export.bound.tmp.json";save(staged,value)
+-    require(sha(output)==sha(raw),"canonical export changed during evidence binding")
+-    os.replace(staged,output)
++    value["files"].append(diagnostic_file(fixture,fixture/"experiment.export.unbound.json","raw"))
++    return value
+ 
+ 
+ def restored_verify_report(report):
+@@ -1461,11 +1520,15 @@
+         a.add_argument("--"+name, required=True)
+     a = sub.add_parser("analyze")
+     a.add_argument("--fixture", required=True)
++    a = sub.add_parser("package-success-export")
++    a.add_argument("--fixture", required=True)
+     a = sub.add_parser("check-failure-export")
+     a.add_argument("--fixture", required=True)
+     args = p.parse_args()
+     if args.mode == "prepare": prepare(args)
+     elif args.mode == "execute": execute(args)
++    elif args.mode == "package-success-export":
++        print(json.dumps(package_success_export(Path(args.fixture)),indent=2))
+     elif args.mode == "check-failure-export":
+         print(json.dumps(validate_failure_export(Path(args.fixture)),indent=2))
+     else:

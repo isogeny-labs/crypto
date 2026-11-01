@@ -1,0 +1,36 @@
+--- a/driver.proposed.py
++++ b/driver.proposed.py
+@@ -1045,8 +1045,14 @@
+     require(path.resolve().is_relative_to(fixture.resolve()),"diagnostic artifact escapes fixture")
+     return {"path":str(path.relative_to(fixture)),"sha256":sha(path),"bytes":path.stat().st_size,"kind":kind}
+ 
++def exact_command_directories(fixture, name):
++    # Runner names are a numeric sequence followed by the complete command label.
++    # A suffix glob also matches policy-* labels and is not an identity lookup.
++    return sorted(p for p in (fixture/"commands").iterdir()
++                  if re.fullmatch(r"[0-9]+-"+re.escape(name),p.name))
++
+ def diagnostic_command(fixture,state,name,argv):
+-    matches=list((fixture/"commands").glob("*-"+name))
++    matches=exact_command_directories(fixture,name)
+     if not matches: return None
+     require(len(matches)==1,"duplicate diagnostic command")
+     path=matches[0];row=diagnostic_json(path/"receipt.json")
+@@ -1135,7 +1141,7 @@
+                 pre_argv=expected_cli_argv(state,fixture)["preflight"] if case["panel"]=="native" else policy_commands(state,fixture,panel)["preflight"]
+                 pre=diagnostic_command(fixture,state,pre_name,pre_argv)
+                 require(pre is not None and type(pre["exit_code"]) is int and pre["exit_code"]==0,"preflight missing or failed")
+-                pre_dir=next((fixture/"commands").glob("*-"+pre_name));preflight=diagnostic_json(pre_dir/"stdout")
++                pre_dir=next(iter(exact_command_directories(fixture,pre_name)));preflight=diagnostic_json(pre_dir/"stdout")
+                 require(preflight["plan_sha256"]==binding["plan_sha256"] and preflight["plan_file_sha256"]==sha(case["root"]/"plan.json") and preflight["protocol_file_sha256"]==state["protocol_file_sha256"] and preflight["source_commit"]==state["source_commit"] and preflight["binary_sha256"]==state["binary_sha256"],"preflight plan/instrument substitution")
+                 require(attempt["schema"]=="crypto.ml-dataset.attempt/v1" and attempt["cell_index"]==case["index"] and attempt["plan_sha256"]==binding["plan_sha256"] and attempt["status"]=="attempt_started","invalid attempt marker")
+                 observation["state"]="attempted_unverified"
+@@ -1336,7 +1342,7 @@
+     argv=expected_cli_argv(state,fixture)["verify"] if panel is None else policy_commands(state,fixture,panel)["verify"]
+     evidence=[]
+     def checked(name,argv):
+-        paths=list((fixture/"commands").glob("*-"+name));require(len(paths)==1,"missing/duplicate phase replay receipt")
++        paths=exact_command_directories(fixture,name);require(len(paths)==1,"missing/duplicate phase replay receipt")
+         path=paths[0];checked_receipt(path,argv,state)
+         for leaf in ["receipt.json","argv.json","argv.nul","stdout","stderr"]:evidence.append(diagnostic_file(fixture,path/leaf,"receipt"))
+         return json_output(path)
