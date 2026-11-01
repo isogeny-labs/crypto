@@ -76,6 +76,8 @@ SOURCES = {
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
     "frontier_establishment": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
+    "pfdr_other_families": "research/pfdr_other_families_20261101/results/analysis-main.json",
+    "pfdr_other_families_readme": "research/pfdr_other_families_20261101/README.md",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "f4_fp_ic_effect": "research/f4_fp_ic_effect_20261018/summary.json",
@@ -1722,6 +1724,62 @@ def build(allow_unvalidated: bool = False) -> dict:
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
+    pfdr = load(SOURCES["pfdr_other_families"])
+    pfdr_readme = (REPO / SOURCES["pfdr_other_families_readme"]).read_text()
+    pfdr_lines = [line for line in pfdr.get("lines", []) if line.get("kind") == "struct"]
+    expected_pfdr_labels = {
+        f"structured|theta={theta:.2f}|d={d}"
+        for theta in (0.30, 0.35) for d in (1, 2, 3)
+    }
+    if (pfdr.get("experiment") != "EXP-PFDR-2d36f9-R2-FAM"
+            or pfdr.get("outcome") != "O-SUB-BE"
+            or pfdr.get("reading") != "O-SUB-BE"
+            or pfdr.get("break_even_met") is not False
+            or pfdr.get("selftest_pass") is not True
+            or set(pfdr.get("valid_lines", [])) != expected_pfdr_labels
+            or pfdr.get("alive_lines") != []
+            or pfdr.get("failed_infrastructure") != []
+            or len(pfdr_lines) != 6
+            or {line.get("label") for line in pfdr_lines} != expected_pfdr_labels
+            or any(line.get("class") != "SUB-BE" or line.get("valid") is not True
+                   or [rung.get("bits") for rung in line.get("kappa_by_rung", [])]
+                   != [16, 20, 24, 28, 32]
+                   for line in pfdr_lines)
+            or any(pfdr.get("controls", {}).get(key, {}).get("pass") is not True
+                   for key in ("C3", "C4", "C5", "C6"))
+            or "19,887 jobs" not in pfdr_readme):
+        raise SystemExit("review the PFDR structured-family result before updating the leaderboard")
+    pfdr_family_names = {1: "Dickson", 2: "geometric progression", 3: "quadratic progression"}
+    pfdr_diagnostic = {
+        "source": SOURCES["pfdr_other_families"],
+        "readme": SOURCES["pfdr_other_families_readme"],
+        "experiment": pfdr["experiment"],
+        "reading": pfdr["reading"],
+        "class": "structural factor-base diagnostic; no E2E IC price and no rho comparison",
+        "jobs": 19_887,
+        "cells": len(pfdr["cells"]),
+        "bits": [16, 20, 24, 28, 32],
+        "break_even_slope": 1 / 3,
+        "selftest_pass": pfdr["selftest_pass"],
+        "controls_pass": all(pfdr["controls"][key]["pass"] for key in ("C3", "C4", "C5", "C6")),
+        "calibration": {
+            "n": pfdr["calibration"]["n"],
+            "mean": pfdr["calibration"]["mean"],
+            "sd": pfdr["calibration"]["sd"],
+        },
+        "lines": [{
+            "family": pfdr_family_names[line["d"]],
+            "theta": line["theta"],
+            "delta_hat": line["delta_hat"],
+            "ci95": line["ci95"],
+            "class": line["class"],
+        } for line in sorted(pfdr_lines, key=lambda line: (line["d"], line["theta"]))],
+        "slope_range": [min(line["delta_hat"] for line in pfdr_lines),
+                        max(line["delta_hat"] for line in pfdr_lines)],
+        "largest_upper_ci95": max(line["ci95"][1] for line in pfdr_lines),
+        "online_speedup": None,
+        "fully_priced_cold_speedup": None,
+    }
     rank_columns = load(SOURCES["n37_rank_columns"])
     if (rank_columns["status"] != "independently_replayed_l0_bounded_diagnostic"
             or rank_columns["selection"]["decision"] != "COUNTED_ENGINEERING_LEAD"
@@ -1953,6 +2011,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "f6_small_cold_diagnostic": small_cold_diagnostic,
         "f6_ecbench_ladder_diagnostic": ladder_diagnostic,
         "f4_f5_f6_cross_family_diagnostic": cross_diagnostic,
+        "pfdr_other_families_diagnostic": pfdr_diagnostic,
         "latest_frontier_audit": frontier_audit,
         "n83_tier1_cold_holdout": {
             "source": SOURCES["n83_tier1_cold_holdout"],
@@ -2656,6 +2715,26 @@ def markdown(doc: dict) -> str:
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
     L.append("")
+    p = doc["pfdr_other_families_diagnostic"]
+    L += ["## Structured factor-base growth screen, outside tables A–C", "",
+          f"The preregistered `{p['experiment']}` census ran {p['jobs']:,} deterministic local jobs "
+          f"across {p['cells']} cells and five sizes ({p['bits'][0]}–{p['bits'][-1]} bits). It asks whether "
+          "the coincidence multiplier κ for Dickson, geometric-progression, or quadratic-progression "
+          f"x-bases grows with N fast enough to reach the frozen break-even slope δ* = {p['break_even_slope']:.3f}. "
+          "It does not price a complete index-calculus pipeline and has no matched rho arm.", "",
+          f"All six structured lines are valid and read `{p['reading']}`. Their five-rung slopes range from "
+          f"{p['slope_range'][0]:.4f} to {p['slope_range'][1]:.4f}; the largest upper 95% limit is "
+          f"{p['largest_upper_ci95']:.4f}, far below 1/3. Self-test and controls C3–C6 pass; the null "
+          f"calibration is n={p['calibration']['n']}, mean {p['calibration']['mean']:.2f}, "
+          f"sd {p['calibration']['sd']:.2f}.", "",
+          "| family | θ | slope of log2 κ on log2 N | 95% interval | reading |",
+          "|:--|--:|--:|:--|:--|"]
+    for row in p["lines"]:
+        L.append(f"| {row['family']} | {row['theta']:.2f} | {row['delta_hat']:.4f} | "
+                 f"[{row['ci95'][0]:.4f}, {row['ci95'][1]:.4f}] | `{row['class']}` |")
+    L += ["", "This is negative structural evidence, not a performance promotion: no ranked row moves and "
+          "rho is not being inferred from an unpriced component. "
+          f"Read the [analysis](../../{p['source']}) and [study limits](../../{p['readme']}).", ""]
     pb = doc["prime_base_size_component"]
     L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
           "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
@@ -3576,6 +3655,34 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td><code>{esc(c["curve"])}</code></td><td class="n">{c["log2_r"]:.2f}</td><td>K16 / K8</td>'
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
     P.append('</tbody></table></section>')
+
+    p = doc["pfdr_other_families_diagnostic"]
+    P.append('<section class="card" id="pfdr-other-families"><h2>Structured factor-base growth screen, '
+             'outside the priced tables</h2>'
+             f'<p>The preregistered <code>{esc(p["experiment"])}</code> census ran {p["jobs"]:,} '
+             f'deterministic local jobs across {p["cells"]} cells and five sizes '
+             f'({p["bits"][0]}–{p["bits"][-1]} bits). It tests whether the coincidence multiplier κ '
+             'for Dickson, geometric-progression, or quadratic-progression x-bases grows with N fast '
+             f'enough to reach the frozen break-even slope δ* = {p["break_even_slope"]:.3f}. It does '
+             'not price a complete index-calculus pipeline and has no matched rho arm.</p>'
+             f'<p>All six structured lines are valid and read <code>{esc(p["reading"])}</code>. Their '
+             f'five-rung slopes range from {p["slope_range"][0]:.4f} to {p["slope_range"][1]:.4f}; '
+             f'the largest upper 95% limit is {p["largest_upper_ci95"]:.4f}, far below 1/3. Self-test '
+             f'and controls C3–C6 pass; the null calibration is n={p["calibration"]["n"]}, mean '
+             f'{p["calibration"]["mean"]:.2f}, sd {p["calibration"]["sd"]:.2f}.</p>'
+             '<div class="scroll"><table><thead><tr><th>Family</th><th class="n">θ</th>'
+             '<th class="n">Slope of log₂ κ on log₂ N</th><th>95% interval</th><th>Reading</th>'
+             '</tr></thead><tbody>')
+    for row in p["lines"]:
+        P.append(f'<tr><td>{esc(row["family"])}</td><td class="n">{row["theta"]:.2f}</td>'
+                 f'<td class="n">{row["delta_hat"]:.4f}</td>'
+                 f'<td>[{row["ci95"][0]:.4f}, {row["ci95"][1]:.4f}]</td>'
+                 f'<td><code>{esc(row["class"])}</code></td></tr>')
+    P.append('</tbody></table></div><p>This is negative structural evidence, not a performance '
+             'promotion: no ranked row moves and rho is not inferred from an unpriced component. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["source"])}">Analysis</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["readme"])}">study limits</a>.'
+             '</p></section>')
 
     pb = doc["prime_base_size_component"]
     P.append('<section class="card" id="prime-base-size"><h2>Prime-field baseline · factor-base size and oracle '

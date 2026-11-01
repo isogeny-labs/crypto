@@ -102,6 +102,14 @@
    "path": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
    "sha256": "fb5759832dd0f80a8b1139633c5fe9ea7d7838715bc07947422fd9f5abf93c25"
   },
+  "pfdr_other_families": {
+   "path": "research/pfdr_other_families_20261101/results/analysis-main.json",
+   "sha256": "2ccae7f1ac7a97a867e75f45a42b7dd1e46cd5596331b6f18acc5fa67d2bd290"
+  },
+  "pfdr_other_families_readme": {
+   "path": "research/pfdr_other_families_20261101/README.md",
+   "sha256": "2697b3eb35f65e6dbbe84ea90c9e2f759f04a4044a45cb4929b60a0dfe06dd1b"
+  },
   "n41_n53_counted": {
    "path": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
    "sha256": "fe55908f837840eeee173cfeae463368bb272e3c65ef03fa2b66efeead769331"
@@ -13837,6 +13845,99 @@
     "reproduced": 72
    }
   },
+  "online_speedup": null,
+  "fully_priced_cold_speedup": null
+ },
+ "pfdr_other_families_diagnostic": {
+  "source": "research/pfdr_other_families_20261101/results/analysis-main.json",
+  "readme": "research/pfdr_other_families_20261101/README.md",
+  "experiment": "EXP-PFDR-2d36f9-R2-FAM",
+  "reading": "O-SUB-BE",
+  "class": "structural factor-base diagnostic; no E2E IC price and no rho comparison",
+  "jobs": 19887,
+  "cells": 30,
+  "bits": [
+   16,
+   20,
+   24,
+   28,
+   32
+  ],
+  "break_even_slope": 0.333333333333,
+  "selftest_pass": true,
+  "controls_pass": true,
+  "calibration": {
+   "n": 10,
+   "mean": 0.219333485239,
+   "sd": 0.878828385903
+  },
+  "lines": [
+   {
+    "family": "Dickson",
+    "theta": 0.3,
+    "delta_hat": -0.00466659603686,
+    "ci95": [
+     -0.0129528975933,
+     0.00408327353472
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "Dickson",
+    "theta": 0.35,
+    "delta_hat": -0.00141822161319,
+    "ci95": [
+     -0.00880823997916,
+     0.00696710218431
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "geometric progression",
+    "theta": 0.3,
+    "delta_hat": 0.00544335757492,
+    "ci95": [
+     -0.00311651852005,
+     0.01359729243
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "geometric progression",
+    "theta": 0.35,
+    "delta_hat": 0.00239130826292,
+    "ci95": [
+     -0.00485870688162,
+     0.00981977205979
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "quadratic progression",
+    "theta": 0.3,
+    "delta_hat": 0.00657434733789,
+    "ci95": [
+     -0.00167487289919,
+     0.0146885602679
+    ],
+    "class": "SUB-BE"
+   },
+   {
+    "family": "quadratic progression",
+    "theta": 0.35,
+    "delta_hat": 0.00682881687581,
+    "ci95": [
+     -0.000377391773355,
+     0.0144128470591
+    ],
+    "class": "SUB-BE"
+   }
+  ],
+  "slope_range": [
+   -0.00466659603686,
+   0.00682881687581
+  ],
+  "largest_upper_ci95": 0.0146885602679,
   "online_speedup": null,
   "fully_priced_cold_speedup": null
  },

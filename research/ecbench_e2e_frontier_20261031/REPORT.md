@@ -63,7 +63,13 @@ clear:
    grows from $N=32$ to $N=45$ and costs 0.836, 0.817, and 0.746 of the
    incumbent at native-operation prices $w=0,0.1,1$. It still costs 7.95,
    8.24, and 9.62 times matched `rho.negation`. The result was reproduced on a
-   second L2 EKS host, but covers one curve and gives no exponent.
+   second L2 EKS host, but covers one curve and gives no exponent. A later
+   19,887-job structural screen of Dickson, geometric-progression, and
+   quadratic-progression bases found no useful growth in the coincidence
+   multiplier: six five-rung slopes lie between -0.0047 and 0.0068, with the
+   largest upper 95% limit 0.0147 versus the frozen 1/3 break-even slope. That
+   narrows the factor-base search, but it prices neither E2E IC nor rho and
+   therefore moves no ranked row.
 4. **F5 and F6 improve local solver work without improving E2E ECDLP cost on
    the historical experiment binary.** F5
    uses 0.641–0.647 of matrix F4's word work at degree 13. F6 uses roughly
@@ -156,6 +162,15 @@ b=6 and is censored at larger sizes. Clause retention moves a large setup into
 advice, and the proposed ring-linear propagator was not run. The surviving
 exponent questions are PKM at m>=4 and the contractor exponent; none of these
 rows is an ECBench speed claim.
+
+The subsequent PFDR structured-base census adds 19,887 deterministic jobs on
+Dickson, geometric-progression, and quadratic-progression x-bases over
+16--32 bits. All six family/theta lines pass the self-test and C3--C6 controls,
+and all read `O-SUB-BE`: their fitted log2(kappa)-on-log2(N) slopes range from
+-0.0047 to 0.0068, with no `ALIVE` line. This is strong negative structural
+evidence against those base families in the tested envelope. It is not an
+ECBench session, does not price a complete IC pipeline, and has no matched rho
+arm, so the ranked leaderboard remains unchanged.
 
 R7.4 provides a separate binary-Edwards structural control. It proves that
 symmetrising by rational 2-power torsion gives the same algebraic system after
@@ -368,6 +383,30 @@ pipeline because the improved relation probability pays back the larger base
 and table over that finite envelope. At 24 and 28 bits the decision changes
 with the native-operation price, so those candidates do not dominate the
 incumbent.
+
+## Structured factor-base growth screen
+
+The preregistered PFDR census tests a different question from the low-x size
+sweep: whether structured x-base families make the coincidence multiplier
+$\kappa$ grow with problem size fast enough to reach the frozen break-even
+slope $\delta^*=1/3$. It ran 19,887 deterministic local jobs across 30 cells,
+with five rungs from 16 to 32 bits. The null calibration and planted-growth
+controls detect the slopes they are designed to detect; all blocking controls
+C3--C6 pass.
+
+| structured x-base | theta | fitted slope | 95% interval | reading |
+|:--|--:|--:|:--|:--|
+| Dickson | 0.30 | -0.0047 | [-0.0130, 0.0041] | SUB-BE |
+| Dickson | 0.35 | -0.0014 | [-0.0088, 0.0070] | SUB-BE |
+| geometric progression | 0.30 | 0.0054 | [-0.0031, 0.0136] | SUB-BE |
+| geometric progression | 0.35 | 0.0024 | [-0.0049, 0.0098] | SUB-BE |
+| quadratic progression | 0.30 | 0.0066 | [-0.0017, 0.0147] | SUB-BE |
+| quadratic progression | 0.35 | 0.0068 | [-0.0004, 0.0144] | SUB-BE |
+
+This closes a tested-family branch, not the factor-base problem. It does not
+cover the absent FAM-1 MITM engine, a proper-subgroup arm, sizes above 32 bits,
+or any E2E cost. The original study is
+[source-linked here](../pfdr_other_families_20261101/README.md).
 
 ## Root finding: useful algorithm, wrong asymptotic label if overclaimed
 
@@ -604,6 +643,7 @@ For the new campaign:
 | Bottleneck | Evidence now | Why it holds the frontier | Required next gate |
 |:--|:--|:--|:--|
 | Relation probability / trials | prime and binary IC gaps grow across several ladders | solver improvements do not change the probability of a useful decomposition | algebraic factor-base constraint inside the system; four-size E2E sweep |
+| Structured factor-base yield | six PFDR lines over three families and 16--32 bits have slope -0.0047 to 0.0068; largest upper 95% limit 0.0147 versus 1/3 | the tested structures do not make useful coincidences grow fast enough | test a new mechanism or integrate the base constraint into a fully priced E2E solver; do not extend these families by default |
 | Factor-base and pair-table setup | 98.7–99.6% of central cold Koblitz rows; $O(|F|^2)$ pair materialization | online-only improvements disappear when one target pays setup | cold primary result; equal-advice online secondary result |
 | F6 closure additions | historical binary: 64.6–1,352.6× inherited F4 in lower-bound S; current replay 72/144 overall | local word-XOR savings are overwhelmed by exact group work, while current counts need remeasurement | price closure and solver in one common unit; rerun current source; change closure algorithm, not label |
 | Matrix F4/F5 scale | m=19 matrix arms time out at 1,800 s | symbolic preprocessing and matrix construction explode before useful scaling | memory/degree receipts and retained timeout curve |
@@ -703,17 +743,20 @@ and image digest
 \nolinkurl{sha256:b8c20f9c151360b78f505360e8d47068c4068f00a8f6faa7ebd3086fa0a791c6}.
 That run was publication-only; it submitted no experiment.
 
-Execution remains blocked. `scripts/checkpoint.sh gate` is mandatory, but this
-workspace has no checkpoint upload token, token file, AWS CLI, or AWS identity;
-its current GitHub token also fails authentication and no direct Iso Lab tool
-is installed. The analysis driver is already hash-bound; exact-image runtime
-preflight and the prospective protocol freeze remain open. The exact state is in
+Paid execution remains blocked. `scripts/checkpoint.sh gate` is mandatory, but
+this workspace has no checkpoint upload token, token file, AWS CLI, or AWS
+identity. Repository authentication now succeeds for the authorized account,
+but no direct Iso Lab tool is installed and GitHub access alone cannot satisfy
+the checkpoint or execution-authority gates. The analysis driver is already
+hash-bound; exact-image runtime preflight and the prospective protocol freeze
+remain open. The exact state is in
 [execution/BLOCKER.md](execution/BLOCKER.md). Local wall timing is not silently
 substituted.
 
 Before the first warmup, the executor must:
 
-1. restore an authorized GitHub/AWS/Iso Lab submission identity;
+1. provision an authorized AWS/Iso Lab submission identity while retaining the
+   working repository identity;
 2. run exact-image preflight for each arm class and preserve the bound analysis script;
 3. provision checkpoint transport and pass `scripts/checkpoint.sh gate`;
 4. freeze and merge these exact 92 spec IDs to `main`;
@@ -734,7 +777,9 @@ The performance frontier is now explicit:
 - **Prime engineering:** P20 $N=45$ is the validated factor-base baseline,
   still roughly 8–10× rho. The newer orbit collector's best toy configuration
   is affine/eight-orbit, but remains 4.20–5.79× matched rho across its three
-  L0 prime-shape checks.
+  L0 prime-shape checks. The PFDR screen also rejects useful coincidence-growth
+  evidence for Dickson, geometric, and quadratic x-bases through 32 bits; it is
+  structural evidence, not an E2E comparison.
 - **Algebraic solvers:** F5 and F6 win component metrics; inherited F4 wins the
   tested common E2E lower-bound comparison; rho wins the ECDLP comparison.
 - **SAT/WDSAT/FES:** implemented or historically explored, but not yet on one
@@ -770,6 +815,7 @@ sources are:
 - [F4/F5/F6 result](../f4_f5_f6_cross_family_20261011/RESULT.md);
 - [rho optimization](../ecbench_rho_optimized_20261014/README.md);
 - [prime factor-base second-host replay](../prime_base_oracle_tuning_20261029/second-host/README.md);
+- [PFDR structured-factor-base screen](../pfdr_other_families_20261101/README.md);
 - [GPU explicit-relations result](../explicit_relations_e2e_20261030/RESULTS.md);
 - [literature and prior-evidence ledger](LITERATURE.md);
 - [live coverage](COVERAGE.md), [closed roster](IMPLEMENTATIONS.md), and
