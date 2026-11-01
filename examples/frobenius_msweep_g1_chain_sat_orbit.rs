@@ -43,7 +43,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::time::Instant;
 
-const MASTER_SEED: u64 = 2026_1027_01;
+const MASTER_SEED: u64 = 2_026_102_701;
 
 // ---------------------------------------------------------------- randomness
 
@@ -991,7 +991,10 @@ fn paired(x: &[&Row], y: &[&Row], name: &str, price: f64, seed: u64) -> Value {
         let (a, b) = (metric(r, name, price), metric(q, name, price));
         let (cx, cy) = (r.verdict == "censored", q.verdict == "censored");
         let ok = !cx && !cy && r.agree && q.agree;
-        if !ok || !(a > 0.0) || !(b > 0.0) {
+        if !ok
+            || a.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+            || b.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+        {
             match (cx, cy) {
                 (true, false) => d_x_only += 1,
                 (false, true) => d_y_only += 1,
