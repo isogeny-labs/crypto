@@ -1,18 +1,31 @@
 # H111: first-layer p² halving carry
 
-This draft freezes a falsifiable transfer experiment before implementation.
+## Result
 
-For a public target `Q=[k]G` in a prime-order subgroup, form the unique group half
-`H=[(r+1)/2]Q`, lift `H,Q` with the coordinate-fixed Hensel section, and measure
-the reduction-kernel carry
-`C₂(Q)=[2]s₀(H)-s₀(Q)`.  The frozen candidate family asks whether one of 24
-constant public predicates of its formal coordinate gives the parity of `k`.
+The typed carry exists and all 9,096 lift/kernel/formal/torsion checks passed,
+but none of the 24 frozen public predicates was exact on any of 28 rows.
+Best canonical accuracy was 0.526427–0.657658 (median 0.561422), overlapping
+random-section and symmetry-matched-label controls.  No decoder ran.
 
-The experiment covers 28 curve/generator rows and 9,096 nonzero targets, with
-random-section, matched-label, coordinate-isomorphism, torsion-section, and
-generic-algorithm controls.  An exact predicate must support complete
-repeated-halving reconstruction, EC verification, a uniform proof, Lean
-interfaces, and total cost accounting before any algorithmic claim is promoted.
+Stable scientific digest:
 
-Status: protocol frozen; measurement not run.  External novelty and any
-subexponential claim are not established.
+```
+383eb1faf53a4fe17088780cb71528df3f20913abdc022c4348f411c26ce4fd5
+```
+
+## Reproduce
+
+```bash
+python3 p2_halving_carry_lab.py --output p2-halving-carry.json
+python3 h111_reference_verify.py p2-halving-carry.json
+```
+
+The canonical runner uses the bundled H110 first-layer arithmetic module.  The
+reference verifier does not import the H111 runner and independently recomputes
+every carry, control word, predicate score, and digest.  The Lean artifact
+proves the carry/kernel, torsion-zero, conditional reconstruction, EC
+verification, and cost interfaces; it does not assume the empirically rejected
+exact-predicate premise.
+
+This is a scoped null for the preregistered 24-predicate family.  External
+novelty and a generic subexponential claim are not established.
