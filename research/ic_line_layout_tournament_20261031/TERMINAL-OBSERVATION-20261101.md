@@ -2,6 +2,11 @@
 
 Status: **inconclusive; no end-to-end ECDLP speedup is established**.
 
+The source-linked failed-run report, flow diagram and PDF live under
+[`reports/run-20261101T0121Z/`](reports/run-20261101T0121Z/REPORT.md). The named
+obstruction and its exit criteria are tracked in
+[`problems/ic-line-layout-eks-failure-cause.md`](../../problems/ic-line-layout-eks-failure-cause.md).
+
 The implementation and frozen protocol merged through PR #3116 at merge commit
 `b4d751706eb2244314ebc9b84ba9545485ba4ac7`. The two preregistered, concurrent
 EKS sessions were dispatched against that exact commit. Both passed their
@@ -52,6 +57,13 @@ prefixes. If the evidence identifies an implementation-caused failure, repair
 it without weakening the L2, replay, exact-operation, A/A or confidence-bound
 requirements. Any further performance trial requires a new frozen evidence
 version and preregistration; it cannot retroactively complete this one.
+
+The reviewed follow-up is `.github/workflows/isolab-failure-diagnosis.yml`.
+It is fixed to the two recorded identities, verifies request and artifact hashes,
+and retains only allowlisted failure metadata. It cannot submit or retry a Job,
+and raw measurements and stderr remain private. Its current status is
+implemented but not run; the terminal observation above remains unchanged until
+the workflow returns authenticated classifications.
 
 The relation-yield pruning instrumentation merged separately through PR #3091.
 That instrumentation and this line-layout implementation are engineering

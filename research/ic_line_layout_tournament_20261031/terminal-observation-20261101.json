@@ -58,6 +58,22 @@
     "additional_trials_authorized": false,
     "outcome": "The preregistered evidence version is inconclusive; no retry or alternate candidate was launched after observing failure."
   },
+  "diagnostic_retrieval": {
+    "workflow": ".github/workflows/isolab-failure-diagnosis.yml",
+    "status": "implemented_not_run",
+    "fixed_workflow_runs": [
+      41260778029,
+      41260778856
+    ],
+    "experiment_retry": false,
+    "raw_measurements_published": false,
+    "required_checks": [
+      "launcher request/result identity",
+      "source and native binary identity",
+      "per-file SHA256SUMS",
+      "allowlisted diagnosis only"
+    ]
+  },
   "excluded_local_diagnostic": {
     "admitted": false,
     "reason": "The workspace lacks PSI evidence and every execution graded L0; --allow-busy was used only to exercise deterministic correctness.",
