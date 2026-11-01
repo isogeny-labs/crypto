@@ -53,7 +53,7 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
 use crypto_lib::cryptanalysis::semaev_decomp::SubspaceOracle;
 
-use crate::ps6_kernel::{base_with_torsion, degenerate_target, Kernel, Work};
+use super::ps6_kernel::{base_with_torsion, degenerate_target, Kernel, Work};
 
 /// Unit string of the kernel's count.  It is not `word XORs`, so the runner
 /// leaves it out of `S` and lists it unpriced.
