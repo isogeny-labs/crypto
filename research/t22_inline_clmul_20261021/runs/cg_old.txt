@@ -1,0 +1,11 @@
+PROF states=2000 probes=584000 hits=0 relations=0 index_states=116800 scan_s=3.869124 ns_per_probe=6625.213
+==2500== Collected : 2631645913
+Profile data file '/home/user/crypto/research/t22_inline_clmul_20261021/runs/cg_old.out' (creator: callgrind-3.22.0)
+Profiled target:  /home/user/wt/t22/old_bin construct:73:1:40 /home/user/crypto/research/t22_inline_clmul_20261021/runs/empty.txt 1 /dev/null (PID 2500, part 1)
+824,984,169 (31.35%)  ???:koblitz_orbit_dlp_fast::wide::build_index128_impl [/home/user/wt/t22/old_bin]
+424,430,512 (16.13%)  ???:koblitz_orbit_dlp_fast::wide::extract128 [/home/user/wt/t22/old_bin]
+424,113,115 (16.12%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::reduce_fold [/home/user/wt/t22/old_bin]
+252,196,000 ( 9.58%)  ???:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve [/home/user/wt/t22/old_bin]
+244,321,476 ( 9.28%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold [/home/user/wt/t22/old_bin]
+215,966,184 ( 8.21%)  ???:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64 [/home/user/wt/t22/old_bin]
+ 73,403,980 ( 2.79%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr [/home/user/wt/t22/old_bin]

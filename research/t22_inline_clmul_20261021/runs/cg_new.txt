@@ -1,0 +1,10 @@
+PROF states=2000 probes=584000 hits=0 relations=0 index_states=116800 scan_s=2.218504 ns_per_probe=3798.808
+==2514== Collected : 2232444483
+Profile data file '/home/user/crypto/research/t22_inline_clmul_20261021/runs/cg_new.out' (creator: callgrind-3.22.0)
+Profiled target:  /home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast construct:73:1:40 /home/user/crypto/research/t22_inline_clmul_20261021/runs/empty.txt 1 /dev/null (PID 2514, part 1)
+824,984,169 (36.95%)  ???:koblitz_orbit_dlp_fast::wide::build_index128_impl [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]
+439,599,429 (19.69%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]
+424,430,512 (19.01%)  ???:koblitz_orbit_dlp_fast::wide::extract128 [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]
+252,196,000 (11.30%)  ???:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]
+ 73,403,980 ( 3.29%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]
+ 45,610,240 ( 2.04%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::reduce_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]

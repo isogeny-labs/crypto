@@ -1,0 +1,118 @@
+{
+ "schema": "crypto.sixsum_s4_resolvent_summary/v1",
+ "class": "engineering; stage diagnostic (kernel B2 quartic root finder)",
+ "claim_scope": "n=41 Koblitz K_0, K=10 and 20, seed 20261012, 32 verified relations per cell, shared host (load ~2). No end-to-end S, no rho comparison, no key-recovery claim.",
+ "before": "2026-10-12 verdict: one S4 root solve 20-60 S3 (Berlekamp split), B2 1-8x more S3-work than the 4-sum",
+ "sources": [
+  "raw_resolvent_20261018/n41_k10_k20_split.json",
+  "raw_resolvent_20261018/n41_k10_k20_resolvent.json"
+ ],
+ "solver_cost_n41": {
+  "from_resolvent_run": {
+   "ns_s3_crate": 372.60808333333335,
+   "ns_s3_table": 186.87254166666668,
+   "ns_s4_build": 32.46666666666667,
+   "ns_roots_split": 10150.762,
+   "ns_roots_resolvent": 649.4076666666666,
+   "resolvent_in_s3_wall": 1.742870580952238,
+   "split_in_s3_wall": 27.242463204747974,
+   "resolvent_in_s3_ops": 2.2510876367157553,
+   "split_in_s3_ops": 26.492614367111578,
+   "ops_roots_split": {
+    "mul": 1710,
+    "sqr": 395,
+    "inv": 7,
+    "half_trace": 0,
+    "trace": 0,
+    "sqrt": 0
+   },
+   "ops_roots_resolvent": {
+    "mul": 70,
+    "sqr": 49,
+    "inv": 2,
+    "half_trace": 3,
+    "trace": 4,
+    "sqrt": 1
+   },
+   "resolvent_fallbacks": 0,
+   "solvers_disagree": 0,
+   "quartics": 3000
+  },
+  "from_split_run": {
+   "ns_s3_crate": 353.5685,
+   "ns_s3_table": 179.42970833333334,
+   "ns_s4_build": 30.156666666666666,
+   "ns_roots_split": 9542.169333333333,
+   "ns_roots_resolvent": 611.0846666666666,
+   "resolvent_in_s3_wall": 1.7283345848588512,
+   "split_in_s3_wall": 26.988177208471157,
+   "resolvent_in_s3_ops": 2.187920257634359,
+   "split_in_s3_ops": 26.498974041888175,
+   "ops_roots_split": {
+    "mul": 1710,
+    "sqr": 395,
+    "inv": 7,
+    "half_trace": 0,
+    "trace": 0,
+    "sqrt": 0
+   },
+   "ops_roots_resolvent": {
+    "mul": 70,
+    "sqr": 49,
+    "inv": 2,
+    "half_trace": 3,
+    "trace": 4,
+    "sqrt": 1
+   },
+   "resolvent_fallbacks": 0,
+   "solvers_disagree": 0,
+   "quartics": 3000
+  }
+ },
+ "cells": [
+  {
+   "columns": 10,
+   "wall_s_per_relation": {
+    "4sum": 2.37265885778125,
+    "b2_split": 3.89447233934375,
+    "b2_resolvent": 0.34983480890625
+   },
+   "s3_solves_per_relation_4sum": 5215058.71875,
+   "s4_solves_per_relation_b2": 370988.75,
+   "s4_solves_per_relation_b2_split_run": 370988.75,
+   "s3_equivalents_per_relation_wall": {
+    "4sum": 5215058.71875,
+    "b2_split": 10043952.607012503,
+    "b2_resolvent": 678910.9466369601
+   },
+   "relations": {
+    "4sum": 32,
+    "b2_split": 32,
+    "b2_resolvent": 32
+   },
+   "s4_fallbacks": 0
+  },
+  {
+   "columns": 20,
+   "wall_s_per_relation": {
+    "4sum": 0.47486092284375,
+    "b2_split": 1.34079327596875,
+    "b2_resolvent": 0.12794599871875
+   },
+   "s3_solves_per_relation_4sum": 1009433.5625,
+   "s4_solves_per_relation_b2": 132122.0625,
+   "s4_solves_per_relation_b2_split_run": 132122.0625,
+   "s3_equivalents_per_relation_wall": {
+    "4sum": 1009433.5625,
+    "b2_split": 3577002.629030513,
+    "b2_resolvent": 241783.9207348002
+   },
+   "relations": {
+    "4sum": 32,
+    "b2_split": 32,
+    "b2_resolvent": 32
+   },
+   "s4_fallbacks": 0
+  }
+ ]
+}

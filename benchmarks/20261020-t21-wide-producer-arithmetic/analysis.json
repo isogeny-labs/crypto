@@ -1,0 +1,177 @@
+{
+  "stage_A_scan": {
+    "A_A_ctl2_over_ctl_is_in_arms_as": "ctl2 entry",
+    "arms": {
+      "algebra": {
+        "ns_per_probe_all": [
+          242.255,
+          264.871,
+          249.88,
+          224.732,
+          265.043,
+          276.087,
+          274.98
+        ],
+        "ns_per_probe_median": 264.871,
+        "ratio_to_ctl": {
+          "hi": 1.1934999435758993,
+          "lo": 0.9395191002520844,
+          "mean_of_round_ratios": 1.0254583890536801,
+          "point": 1.0486659619366614
+        },
+        "speedup_ci": [
+          0.8378718452251072,
+          1.0643743163195807
+        ],
+        "speedup_vs_ctl": 0.9535925035205817
+      },
+      "all": {
+        "ns_per_probe_all": [
+          242.149,
+          243.072,
+          243.666,
+          235.875,
+          275.912,
+          263.392,
+          234.563
+        ],
+        "ns_per_probe_median": 243.072,
+        "ratio_to_ctl": {
+          "hi": 1.1432043680934731,
+          "lo": 0.9333341247136192,
+          "mean_of_round_ratios": 0.989647957663787,
+          "point": 0.9623602912356134
+        },
+        "speedup_ci": [
+          0.8747342364232777,
+          1.0714276629570747
+        ],
+        "speedup_vs_ctl": 1.0391118680884677
+      },
+      "ctl2": {
+        "ns_per_probe_all": [
+          265.081,
+          232.622,
+          237.542,
+          229.547,
+          240.93,
+          249.372,
+          250.212
+        ],
+        "ns_per_probe_median": 240.93,
+        "ratio_to_ctl": {
+          "hi": 1.0823531454266098,
+          "lo": 0.9209870971062519,
+          "mean_of_round_ratios": 0.9675068136729931,
+          "point": 0.9538797762284276
+        },
+        "speedup_ci": [
+          0.9239128691272475,
+          1.085791541642665
+        ],
+        "speedup_vs_ctl": 1.048350143195119
+      },
+      "sparse": {
+        "ns_per_probe_all": [
+          238.356,
+          262.859,
+          278.616,
+          244.466,
+          245.571,
+          246.906,
+          241.779
+        ],
+        "ns_per_probe_median": 245.571,
+        "ratio_to_ctl": {
+          "hi": 1.140890979956423,
+          "lo": 0.9480938530153189,
+          "mean_of_round_ratios": 1.0023167922180185,
+          "point": 0.9722542254106635
+        },
+        "speedup_ci": [
+          0.8765079377156576,
+          1.0547478995034074
+        ],
+        "speedup_vs_ctl": 1.0285375716187988
+      }
+    },
+    "complete": true,
+    "ctl_ns_per_probe_median": 252.579,
+    "gate": {
+      "algebra_clears": false,
+      "all_clears": false,
+      "end_to_end_stage_runs": false,
+      "rule": "a cut clears only if the median ratio to ctl <= 1/1.2 (0.8333) and the bootstrap upper bound <= 0.90",
+      "sparse_clears": false
+    },
+    "outputs_identical_probes_hits_across_all_runs": true
+  },
+  "stage_C_callgrind": {
+    "algebra": {
+      "collected_ir": 2718726031,
+      "lines": [
+        "824,984,169 (30.34%)  ???:koblitz_orbit_dlp_fast::wide::build_index128_impl [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "454,923,640 (16.73%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::reduce_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "424,430,512 (15.61%)  ???:koblitz_orbit_dlp_fast::wide::extract128 [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "252,196,000 ( 9.28%)  ???:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "224,602,740 ( 8.26%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "158,030,222 ( 5.81%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]"
+      ]
+    },
+    "all": {
+      "collected_ir": 2690355944,
+      "lines": [
+        "824,984,169 (30.66%)  ???:koblitz_orbit_dlp_fast::wide::build_index128_impl [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "545,218,103 (20.27%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::reduce_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "424,430,512 (15.78%)  ???:koblitz_orbit_dlp_fast::wide::extract128 [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "252,196,000 ( 9.37%)  ???:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "225,113,539 ( 8.37%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "158,030,222 ( 5.87%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]"
+      ]
+    },
+    "ctl": {
+      "collected_ir": 2631640823,
+      "lines": [
+        "824,984,169 (31.35%)  ???:koblitz_orbit_dlp_fast::wide::build_index128_impl [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "424,430,512 (16.13%)  ???:koblitz_orbit_dlp_fast::wide::extract128 [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "424,113,115 (16.12%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::reduce_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "252,196,000 ( 9.58%)  ???:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "244,321,476 ( 9.28%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "73,403,980 ( 2.79%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]"
+      ]
+    },
+    "sparse": {
+      "collected_ir": 2605735927,
+      "lines": [
+        "824,984,169 (31.66%)  ???:koblitz_orbit_dlp_fast::wide::build_index128_impl [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "508,245,473 (19.50%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::reduce_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "424,430,512 (16.29%)  ???:koblitz_orbit_dlp_fast::wide::extract128 [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "252,196,000 ( 9.68%)  ???:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "244,832,275 ( 9.40%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]",
+        "73,403,980 ( 2.82%)  ???:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr [/home/user/crypto/target/release/examples/koblitz_orbit_dlp_fast]"
+      ]
+    }
+  },
+  "stage_P_process_start": {
+    "new_over_old": {
+      "hi": 0.03100967501860581,
+      "lo": 0.02259159545826993,
+      "point": 0.02398369109005876
+    },
+    "new_real_s": [
+      0.193,
+      0.234,
+      0.197,
+      0.2,
+      0.25
+    ],
+    "old_real_s": [
+      8.543,
+      8.689,
+      8.339,
+      8.149,
+      8.062
+    ],
+    "saved_s_median": 8.139000000000001
+  }
+}
