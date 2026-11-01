@@ -42,6 +42,9 @@ fn point_bucket(mut key: u64, mask: usize) -> usize {
 }
 struct Suffix {
     slots: Vec<(u64, usize)>,
+    // A set bit only admits the exact lookup; it never establishes membership.
+    // Low compressed-point bits avoid computing the full hash on clear misses.
+    occupied: Vec<u64>,
     rows: usize,
     unique: usize,
 }
@@ -50,6 +53,7 @@ impl Suffix {
         if points.is_empty() {
             return Ok(Self {
                 slots: vec![],
+                occupied: vec![],
                 rows: 0,
                 unique: 0,
             });
@@ -64,14 +68,23 @@ impl Suffix {
             .try_reserve_exact(size)
             .map_err(|_| Error::Limit("CPU suffix index allocation"))?;
         slots.resize(size, (u64::MAX, 0));
+        let words = size.div_ceil(64);
+        let mut occupied = Vec::new();
+        occupied
+            .try_reserve_exact(words)
+            .map_err(|_| Error::Limit("CPU suffix filter allocation"))?;
+        occupied.resize(words, 0);
         let mut out = Self {
             slots,
+            occupied,
             rows: points.len(),
             unique: 0,
         };
         // Tuple order is lexicographic: retain the first ID on duplicate sums.
         for (id, point) in points.into_iter().enumerate() {
             let key = point_key(point);
+            let bit = (key as usize) & (size - 1);
+            out.occupied[bit / 64] |= 1u64 << (bit % 64);
             let mut i = point_bucket(key, size - 1);
             loop {
                 let entry = &mut out.slots[i];
@@ -94,6 +107,10 @@ impl Suffix {
         }
         let key = point_key(point);
         let mask = self.slots.len() - 1;
+        let bit = (key as usize) & mask;
+        if self.occupied[bit / 64] & (1u64 << (bit % 64)) == 0 {
+            return None;
+        }
         let mut i = point_bucket(key, mask);
         loop {
             let (stored, id) = self.slots[i];
@@ -190,7 +207,8 @@ impl CachedMitm {
         self.stats.built_rows += total as u64;
         self.stats.peak_table_bytes = self.stats.peak_table_bytes.max(
             prefix.capacity() * std::mem::size_of::<Point>()
-                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>(),
+                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>()
+                + suffix.occupied.capacity() * std::mem::size_of::<u64>(),
         );
         self.prepared = Some(Prepared {
             curve: curve_key(curve),
@@ -470,6 +488,26 @@ mod tests {
             .iter()
             .any(|&point| !buckets.insert(point_bucket(point_key(point), index.slots.len() - 1))));
         assert_eq!(index.find(None), Some(0));
+    }
+
+    #[test]
+    fn suffix_filter_collisions_never_accept_absent_points() {
+        let (c, p) = fixture();
+        let points: Vec<_> = (0..199).map(|k| c.mul(p, k).unwrap()).collect();
+        // Exercise short bitmaps, word boundaries, duplicate first witnesses,
+        // identity, and saturation (every lookup passes the filter).
+        for size in [1, 2, 31, 32, 33, 63, 64, 65, 150] {
+            let mut input = points[..size].to_vec();
+            input.extend_from_slice(&points[..size]);
+            let mut index = Suffix::new(input.clone()).unwrap();
+            for &point in &points {
+                assert_eq!(index.find(point), input.iter().position(|&x| x == point));
+            }
+            index.occupied.fill(u64::MAX);
+            for &point in &points {
+                assert_eq!(index.find(point), input.iter().position(|&x| x == point));
+            }
+        }
     }
 
     #[test]
