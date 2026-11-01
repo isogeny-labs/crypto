@@ -150,6 +150,8 @@ enum ImportWhat {
     Ecbench,
     /// Curve records, dataset curves and measurements of the sibling checkouts (src/import/siblings.rs).
     Siblings,
+    /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
+    Generated { paths: Vec<String> },
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
     LmfdbAvFq {
         path: PathBuf,
@@ -220,6 +222,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Results => import::run(&ctx, Selection::Results, None).await?,
                 ImportWhat::Ecbench => import::run(&ctx, Selection::Ecbench, None).await?,
                 ImportWhat::Siblings => import::run(&ctx, Selection::Siblings, None).await?,
+                ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };
             print(&reports)?;

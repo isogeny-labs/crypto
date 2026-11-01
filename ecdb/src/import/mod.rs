@@ -14,6 +14,7 @@ pub mod covers;
 pub mod derive;
 pub mod ecbench;
 pub mod enrich;
+pub mod generated;
 pub mod lmfdb;
 pub mod pack;
 pub mod registry;
