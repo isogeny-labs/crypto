@@ -297,6 +297,23 @@ every record re-verified by `ecdb import generated` before insertion (deployed c
 
 No record was refused. The full run in a 4-CPU container took under an hour; ecdb then held 222,481 curves and 485,769 isogenies (2.25 GB).
 
+**ℓ-volcanoes** (`ecdb import volcanoes`, `src/import/volcano.rs`) are derived from the complete census graphs for ℓ = 2, 3, 5.
+
+- **Rule.** The depth is v_ℓ(v), where t² − 4p = v² D_K. A curve's level is the depth minus its distance to the floor; the floor curves are those with exactly one rational ℓ-isogeny.
+- **Checks.** Before any write, each class must pass:
+  - the out-degrees match the theory;
+  - no curve is farther from the floor than the depth;
+  - the level sizes satisfy n_k = n₀(ℓ − (D_K/ℓ))ℓ^{k−1}. The D_K = −3, −4 classes are exempt, because automorphisms change the counts.
+
+  Every class passed. The 8 classes over F₅ at ℓ = 5 were skipped, since there is no volcano when ℓ = p.
+
+| Table | Rows |
+|:--|:--|
+| `isogeny_volcano` / `volcano_vertex` | 81,583 / 85,057 / 88,659 components for ℓ = 2 / 3 / 5. 8,228 / 3,144 / 946 of them have depth > 0, with maximum depth 5 / 3 / 2. Every census curve is a vertex. |
+| `endomorphism_level` | 470,490 census levels, plus 1,045 crater levels of other curves where ℓ ∤ v |
+| `isogeny.direction` | 468,785 census edges: 330,769 horizontal, 68,293 ascending, 69,723 descending. Outside D_K = −3, −4, ascending equals descending (60,687 each), as duality requires. |
+| `endomorphism_ring` | 149,593 census curves whose v is {2, 3, 5}-smooth, so f_E = ∏ ℓ^level is determined. 90,799 of them are maximal. |
+
 These tables exist and still wait for a producer:
 
 - `geometric_invariant` (Igusa invariants of the cover curves);

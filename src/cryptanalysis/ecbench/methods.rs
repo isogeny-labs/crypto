@@ -69,10 +69,10 @@ use crate::cryptanalysis::ic_framework::fiber::{
     FiberDescentOracle, FiberFrobeniusMitmOracle, FiberMitmOracle,
 };
 use crate::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, CompactOrbitScanBase, CyclotomicBase, DescentAlgebraicOracle,
-    FrobeniusMitmOracle, GlvOrbitBase, KSumOracle, KoblitzOrbitBase, MitmOracle, OnbWeightBase,
-    PrimeAbscissaBase, PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle,
-    SubtractOracle,
+    BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
+    CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KSumOracle,
+    KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
+    PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -206,7 +206,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
         },
         ParamDecl {
             name: "oracle",
@@ -5590,6 +5590,7 @@ fn prime_base_for<'a>(
         "prime-abscissa" => Box::new(PrimeAbscissaBase { instance: inst }),
         "prime-projected-abscissa" => Box::new(PrimeProjectedAbscissaBase { instance: inst }),
         "glv-orbit" => Box::new(GlvOrbitBase { instance: inst }),
+        "cm-multiplier" => Box::new(CmMultiplierBase { instance: inst }),
         "prime-kummer" => Box::new(PrimeKummerBase { instance: inst }),
         "prime-isogeny" => Box::new(PrimeIsogenyBase { instance: inst }),
         "cm-scalar-orbit" => Box::new(CmOrbitBase { instance: inst }),
@@ -6301,6 +6302,7 @@ fn binary_base_for<'a>(
             },
         ),
         "binary-subspace" => Box::new(BinarySubspaceBase { instance: inst }),
+        "binary-multiplier" => Box::new(BinaryMultiplierBase { instance: inst }),
         "koblitz-orbit" => Box::new(KoblitzOrbitBase { instance: inst }),
         "compact-orbit-scan" => Box::new(CompactOrbitScanBase { instance: inst }),
         "cyclotomic" => Box::new(CyclotomicBase { instance: inst }),
@@ -7010,6 +7012,7 @@ pub fn dump_factor_base(
             let explicit = crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase;
             let projected = PrimeProjectedAbscissaBase { instance: i };
             let orbit = GlvOrbitBase { instance: i };
+            let multiplier = CmMultiplierBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
             let plugin_base = prime_plugins().and_then(|p| (p.base)(name.as_str(), i));
@@ -7018,6 +7021,7 @@ pub fn dump_factor_base(
                 "prime-abscissa" => &abscissa,
                 "prime-projected-abscissa" => &projected,
                 "glv-orbit" => &orbit,
+                "cm-multiplier" => &multiplier,
                 "prime-kummer" => &kummer,
                 "prime-isogeny" => &isogeny,
                 other => match plugin_base.as_deref() {
@@ -7059,6 +7063,7 @@ pub fn dump_factor_base(
         Instance::Binary(i) => {
             let g = BinaryGroup(&i.fast);
             let subspace = BinarySubspaceBase { instance: i };
+            let multiplier = BinaryMultiplierBase { instance: i };
             let explicit = crate::cryptanalysis::ic_framework::explicit_base::BinaryExplicitXBase {
                 instance: i,
             };
@@ -7070,6 +7075,7 @@ pub fn dump_factor_base(
             let base: &dyn FactorBaseBuilder<BinaryGroup> = match name.as_str() {
                 "explicit-x" => &explicit,
                 "binary-subspace" => &subspace,
+                "binary-multiplier" => &multiplier,
                 "koblitz-orbit" => &orbit,
                 "compact-orbit-scan" => &compact,
                 "cyclotomic" => &cyclotomic,
@@ -8635,6 +8641,16 @@ mod accounting_rules_tests {
     fn the_inventory_describes_the_base_the_run_used() {
         let cases: Vec<(CurveSpec, ResolvedMethod)> = vec![
             (
+                j0(),
+                method(
+                    "ic.pipeline",
+                    &[
+                        ("factor_base", "cm-multiplier:size=4,norm=4"),
+                        ("oracle", "mitm:negation_folded=1"),
+                    ],
+                ),
+            ),
+            (
                 CurveSpec::PrimeSearch {
                     bits: 16,
                     seed: 59297,
@@ -8643,6 +8659,16 @@ mod accounting_rules_tests {
                     "ic.pipeline",
                     &[
                         ("factor_base", "prime-abscissa:size=32"),
+                        ("oracle", "mitm:negation_folded=1"),
+                    ],
+                ),
+            ),
+            (
+                CurveSpec::Koblitz { a: 1, n: 17 },
+                method(
+                    "ic.pipeline",
+                    &[
+                        ("factor_base", "binary-multiplier:size=4,mult=4"),
                         ("oracle", "mitm:negation_folded=1"),
                     ],
                 ),
