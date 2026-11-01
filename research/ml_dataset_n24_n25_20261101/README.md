@@ -15,3 +15,7 @@ Pre-data file SHA-256: protocol `00b56f3bca568dfa4bdfb2a4d7d4972d7b90f255f0f001f
 ## Protocol admission correction before data
 
 The native `dataset preflight` accepted v1 and recorded 12 planned, zero generated cells, but the independently fetched official `experiment_protocol.py validate` checker rejected v1 with 48 schema findings (exit 1). Its full output is [retained here](official-protocol-v1-check.log). The v1 freeze and bound plan are immutable pre-data evidence; no `dataset generate` command has run. A v2 protocol in the official schema and a new bound plan are required before generation.
+
+## Official v2 admission
+
+The versioned [v2 protocol](protocol-v2.json) and [v2 plan](plan-v2.json) preserve the 12-cell matrix and caps. The [official checker receipt](official-protocol-v2-check.log) reports zero findings, and the [native preflight receipt](preflight-v2.json) reports 12 planned and zero generated cells with clean source and binary provenance. These exact v2 files, rather than v1, bind any later generate invocation. Protocol v2 file SHA-256 is `f740120e8b185fbe1612cf2d88f5cbbb1efc3f0676b0341dbb228ee5700dd114`; plan v2 file SHA-256 is `dfb7ec2fdbc387724bae6fdb5a0c56657b2d09944726ed4808598ed5bcfa47de`; the official frozen canonical-body SHA-256 is `4b3650e18187860993b45926900c9ed26714d6188cef0b3c6119243a70e9cc0c`. No generation preceded this amendment.
