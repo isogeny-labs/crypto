@@ -9,11 +9,12 @@ digraph failure_flow {
   jobs [label="Two preregistered\nEKS Jobs", fillcolor="#e0e7ff"];
   failed [label="Terminal state: failed\nremote result 23", fillcolor="#fee2e2", color="#b91c1c"];
   public [label="Public receipt\nno Pod UID / result URI", fillcolor="#fef3c7"];
-  diagnose [label="Fixed-target private read\nidentity + SHA-256 checks", fillcolor="#f3e8ff"];
-  summary [label="Allowlisted diagnosis only\nno raw records or stderr", fillcolor="#f3e8ff"];
-  decision [label="Evidence-attributed repair\nor new evidence version", fillcolor="#f8fafc"];
+  diagnose [label="Fixed-target read\nlauncher identity + status", fillcolor="#f3e8ff"];
+  summary [label="Both Pods: exit 42\nL2 isolation gate", fillcolor="#fef3c7"];
+  boundary [label="Payload read unavailable\nmanifest not verified", fillcolor="#fee2e2", color="#b91c1c"];
+  decision [label="Manifest-bound L2 detail\nor new evidence version", fillcolor="#f8fafc"];
 
-  source -> build -> jobs -> failed -> public -> diagnose -> summary -> decision;
+  source -> build -> jobs -> failed -> public -> diagnose -> summary -> boundary -> decision;
   jobs -> failed [label="2 / 2"];
   diagnose -> jobs [label="no retry", style=dashed, arrowhead=none, constraint=false];
 }
