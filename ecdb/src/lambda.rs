@@ -33,6 +33,11 @@ enum Action {
         #[serde(default)]
         walk_files: Option<Vec<String>>,
     },
+    /// Import one part of a pack too large for the package, sent in the
+    /// event as base64 of the gzipped part (`ecdb pack` writes the parts;
+    /// deploy-aws.sh sends them): `ecbench`, or `generated` (Sage output,
+    /// ecdb/deploy/load-generated.sh).
+    ImportPack { name: String, data: String },
 }
 
 struct Admin {
@@ -134,6 +139,25 @@ async fn handle(admin: &Admin, payload: Value) -> Result<Value> {
             let started = std::time::Instant::now();
             let reports = import::run(&ctx, what, walk_files).await?;
             Ok(json!({ "seconds": started.elapsed().as_secs(), "reports": reports }))
+        }
+        Action::ImportPack { name, data } => {
+            if name != import::ecbench::PACK && name != import::generated::PACK {
+                return Err(anyhow!("unknown pack {name}"));
+            }
+            let gz = base64::Engine::decode(&base64::engine::general_purpose::STANDARD, data.trim())?;
+            let ctx = Ctx {
+                client: &client,
+                repo_root: admin.repo_root.clone(),
+                repository: admin.repository.clone(),
+                git_commit: admin.commit.clone(),
+            };
+            let started = std::time::Instant::now();
+            let report = if name == import::generated::PACK {
+                import::generated::import_part(&ctx, &gz).await?
+            } else {
+                import::ecbench::import_part(&ctx, &gz).await?
+            };
+            Ok(json!({ "seconds": started.elapsed().as_secs(), "reports": [report] }))
         }
     }
 }

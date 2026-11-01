@@ -18,6 +18,7 @@ use tokio_postgres::types::ToSql;
 mod catalog;
 mod curves;
 mod mcp;
+mod results;
 mod sql;
 mod write;
 
@@ -195,6 +196,13 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/curves/{reference}/relations", get(curves::relations))
         .route("/v1/curves/{reference}/endomorphisms", get(curves::endomorphisms))
         .route("/v1/curves/{reference}/division-polynomials", get(curves::division_polynomials))
+        .route("/v1/curves/{reference}/measurements", get(results::curve_measurements))
+        .route("/v1/ic/leaderboard", get(results::leaderboard))
+        .route("/v1/ic/progress", get(results::progress))
+        .route("/v1/ic/boundary", get(results::boundary))
+        .route("/v1/benchmarks", get(results::benchmarks))
+        .route("/v1/ecbench/sessions", get(results::sessions))
+        .route("/v1/ecbench/sessions/{id}", get(results::session))
         .route("/v1/isogenies/{id}", get(catalog::isogeny))
         .route("/v1/isogeny-classes", get(catalog::classes))
         .route("/v1/isogeny-classes/{label}", get(catalog::class))

@@ -11,8 +11,10 @@
   "links": {
     "manifest": "execution/manifest.json",
     "coverage": "coverage.json",
+    "implementations": "IMPLEMENTATIONS.md",
     "literature": "LITERATURE.md",
-    "blocker": "execution/BLOCKER.md"
+    "blocker": "execution/BLOCKER.md",
+    "publication": "execution/publication.json"
   },
   "question": "What is the cold one-target E2E performance frontier of every current applicable ECBench candidate, relative to the strongest accounting-correct rho in the same domain, and which costs or evidence gaps prevent promotion?",
   "claims": [
@@ -47,7 +49,7 @@
   "hypotheses": [
     {
       "id": "H1",
-      "statement": "The current cold one-target IC candidates remain above matched rho on the four prime and four Koblitz cells.",
+      "statement": "The current cold one-target IC candidates remain above matched rho on the four prime and the medium/scaling Koblitz cells; the one-column generator-orbit fixed-setup panel is a separately classified engineering crossover.",
       "mechanism": "relation probability, factor-base/setup work, and algebraic closure dominate the constant-factor backend gains",
       "predictions": [
         {
@@ -81,7 +83,7 @@
       "description": "rho.negation_v2 in every prime spec",
       "instrument": {
         "repo": "crypto",
-        "commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
         "build": [
           [
             "cargo",
@@ -91,7 +93,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+        "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -110,7 +112,7 @@
       "description": "current factor-base, root-finding, BSGS and kangaroo prime arms",
       "instrument": {
         "repo": "crypto",
-        "commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
         "build": [
           [
             "cargo",
@@ -120,7 +122,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+        "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -137,10 +139,10 @@
     {
       "id": "koblitz-rho-v2",
       "role": "reference",
-      "description": "rho.signed_frobenius_strong_v2 in every Koblitz spec",
+      "description": "rho.signed_frobenius_strong_v2 plus a preregistered strong-escape comparison in every Koblitz frontier cell",
       "instrument": {
         "repo": "crypto",
-        "commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
         "build": [
           [
             "cargo",
@@ -150,7 +152,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+        "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -160,7 +162,8 @@
       },
       "parameters": {
         "method": "rho.signed_frobenius_strong_v2",
-        "specs": "koblitz-n13,n19,n23,n31"
+        "additional_reference": "rho.signed_frobenius_strong_escape",
+        "specs": "draft koblitz-n13,n19,n23,n31; final shards pending"
       },
       "same_instrument_as": "prime-rho-v2"
     },
@@ -170,7 +173,7 @@
       "description": "root finding, inherited F4, F6-IC and pair-claw Koblitz arms",
       "instrument": {
         "repo": "crypto",
-        "commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
         "build": [
           [
             "cargo",
@@ -180,7 +183,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+        "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -200,7 +203,7 @@
       "description": "all 11 live nested algebraic solver backends on one matched E2E cell",
       "instrument": {
         "repo": "crypto",
-        "commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
         "build": [
           [
             "cargo",
@@ -210,7 +213,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+        "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -229,7 +232,7 @@
       "description": "identical applicable rho method under a second arm name in every spec",
       "instrument": {
         "repo": "crypto",
-        "commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+        "commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
         "build": [
           [
             "cargo",
@@ -239,7 +242,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+        "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -482,7 +485,7 @@
       "spot": true
     },
     "measurement_class": "measurement",
-    "timeout_seconds": 86400,
+    "timeout_seconds": 3600,
     "checkpoint": {
       "policy": "none",
       "interval_seconds": null,
@@ -500,7 +503,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "fixed design: nine specs, eight targets, one warmup and six measured rounds; retain all outcomes",
+      "rule": "draft design: candidate/reference/A-A shards, eight targets, one warmup and six measured rounds; exact shard roster must be fixed before freeze",
       "kind": "fixed_n",
       "preregistered": true
     },
