@@ -1,0 +1,82 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "F_((2^10)^4) specialized IC/rho frontier, target block 2/2",
+  "description": "Two-word-field Gaudry-D4 pipeline with dense and Wiedemann linear algebra against the counted strong negation-map rho; legacy negation rho is retained for continuity. This harness path uses planted known-answer targets because public hash-to-subgroup exhausts its fixed 10,000-attempt bound on these torsion fixtures; the solver does not receive the scalar. This prospectively selected target block has four public targets, one warmup and six balanced measured rounds. Per-child censoring is fixed so the sum of child timeout ceilings is at most 2400s inside the 3,600-second EKS deadline; timeouts are retained and never retried.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_torsion",
+        "m": 10,
+        "seed": 1,
+        "max_cofactor": 16
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 202610440101,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "rho-neg-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "32",
+          "dp_bits": "auto"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "32",
+          "dp_bits": "auto"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-legacy",
+      "role": "baseline",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-dense",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "bin-t-line",
+          "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "5000000"
+        }
+      }
+    },
+    {
+      "name": "ic-wiedemann",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "bin-t-line",
+          "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "5000000",
+          "linalg": "wiedemann"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610450101,
+    "isolation_required": "L2",
+    "timeout_seconds": 17
+  }
+}

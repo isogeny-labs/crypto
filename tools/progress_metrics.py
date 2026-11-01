@@ -40,6 +40,7 @@ import atexit
 import datetime as dt
 import json
 import os
+import posixpath
 import subprocess
 import sys
 from pathlib import Path
@@ -703,6 +704,61 @@ def explicit_gpu_profile(ref, since):
                  source=f"{path}@{revision}")
 
 
+def explicit_gpu_fullcache(ref, since):
+    """Read both committed strata; retain preflight failures separately."""
+    study = "research/explicit_relations_fullcache_20261101"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for path in ls(ref, study):
+        directory, _, name = path.rpartition("/")
+        version = directory.rsplit("/", 1)[-1]
+        if not version.startswith("results-v") or not version[9:].isdigit():
+            continue
+        if name not in ("failure.json", "export-small.json", "export.json"):
+            continue
+        record = json.loads(show(ref, path))
+        date = record.get("created", record.get("observed_at", ""))[:10]
+        if len(date) != 10 or date < since:
+            continue
+        prefix = f"gpu.explicit_relations.fullcache.{version[8:]}"
+        if name == "failure.json":
+            if record.get("kind") != "preflight_failure" or record.get("attempted_recovery_cells") != 0:
+                raise ValueError(f"invalid GPU preflight record: {path}")
+            samples = [("preflight_failures", 1, "retained preflight failure; zero recovery attempts")]
+        else:
+            runs = record.get("runs", [])
+            attempted = sum(r.get("attempts", 0) >= 1 for r in runs)
+            if attempted != record.get("flow", {}).get("attempted"):
+                raise ValueError(f"inconsistent GPU full-cache coverage: {path}")
+            protocol_path = posixpath.normpath(f"{directory}/{record['protocol']['path']}")
+            protocol = json.loads(show(ref, protocol_path))
+            sample = protocol["sample_size"]
+            planned = len(protocol["arms"]) * sample["instances"] * (
+                sample["replicates"] + sample.get("warmups", 0))
+            if attempted > planned:
+                raise ValueError(f"GPU full-cache attempts exceed protocol: {path}")
+            prefix += ".small" if name == "export-small.json" else ".large"
+            samples = [
+                ("planned", planned, "protocol-planned executions"),
+                ("attempted", attempted, "recorded complete-recovery executions"),
+                ("verified_recoveries", sum(r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified" for r in runs),
+                 "fresh CPU-replayed recoveries"),
+                ("timeouts", sum(r.get("status") == "timeout" for r in runs),
+                 "retained solve timeouts"),
+                ("failed", sum(r.get("status") == "failed" for r in runs),
+                 "retained failed or resource-limited executions"),
+                ("interrupted", sum(r.get("status") == "interrupted" for r in runs),
+                 "retained interrupted executions; no complete clock"),
+                ("not_attempted", planned - attempted,
+                 "planned cells not started after infrastructure stop"),
+            ]
+        for suffix, value, label in samples:
+            emit(f"{prefix}.{suffix}", value, date=date,
+                 problem="gpu-generic-decomposition", unit="count", better="neutral",
+                 label=f"Full-cache {version}: {label}; fixed bounded panel, L0",
+                 source=f"{path}@{revision}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -736,6 +792,7 @@ def main():
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
                           "gpu.explicit_relations.affine")
     explicit_gpu_profile(a.ref, a.since)
+    explicit_gpu_fullcache(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
