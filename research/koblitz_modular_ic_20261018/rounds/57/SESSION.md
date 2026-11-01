@@ -67,3 +67,17 @@ Field stage,4 Lean implications,fresh checker,report and custody.
 
 ### Errors
 space57-01 reserved-name failure retained; no accepted producer repeated.
+
+## 2026-11-01T04:55:30.615693+00:00 — actual24-function basis accepted
+
+### What was done
+field57-01 accepted: source degree32,24 actual sections,24 divided functions,explicit generic inverseA,4 control source identities,changed divided function rejected. Lean compile/audit launched serially after field terminal.
+
+### Decisions made
+Freeze independent checker; identify the four fixed-modulo-trace directions next from rank10 on24-space, then bind them to functions. No inference that numerical4 equals a geometric identification.
+
+### Open threads
+Lean result,checker,trace-quotient representatives and report/custody.
+
+### Errors
+No field error; previous2 native failures retained.

@@ -19,3 +19,6 @@ Compute the native constant binary kernel K, left inverse R and homotopy H with 
 ## Stage3 field binding, frozen after stage2 and before field data
 
 Stage2 measured rank44, dimension24, sigma+I rank10, all1360 ambient bounds and all kernel/row/recovery products. Bind all24 columns to actual R50 rrValues in F2(u)[lambda,v], using the transformed complete R52 source equations and checking degree32. Verify control vectors yield precisely1,A,descendedlambda,b; reconstruct1,A,lambda from the24 basis. Check explicit inverseA=u*((1+u)*v+u+u^3+u^4)/(u^5+u^3+1) in the whole source field. Export all24 actual functions and all24 divided functions with exact A-products. Change one divided function by1 as negative control. Given divA=P-D, division identifies full L(D) and L(P), not only a subspace. This does not imply a target map; its function-field identities and intended order11 action remain next tasks.
+
+## Stage4 independent saved-certificate checker
+After accepted field57-01, replay full matrix products/ranks, all24 source bindings and24 A-division identities from saved data. Corrupt a genuine kernel entry in a nonzero constraint row as negative control. No accepted producer is rerun. Freeze this stage before data.

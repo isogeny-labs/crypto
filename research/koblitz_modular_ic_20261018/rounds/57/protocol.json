@@ -1,17 +1,12 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R57-RR-FIELD",
+  "id": "KOBLITZ-R57-INDEPENDENT-CHECK",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "actual-functions",
+      "id": "certificate-replay",
       "class": "exact_computation",
-      "statement": "Bind every24 kernel section to actual descended R50 degree32 source functions; check all four control identities and exact inverseA."
-    },
-    {
-      "id": "divided-space",
-      "class": "theorem",
-      "statement": "Given complete L(D) and divA=P-D, division byA maps it isomorphically onto complete L(P). Native checks every section product."
+      "statement": "Independently replay all saved kernel, recovery, row, involution, rank, control and actual field-binding products."
     }
   ],
   "arms": {
@@ -19,13 +14,12 @@
     "baseline": "retained degree128 complete ambient space",
     "candidate": "Complete24-dimensional source-bound basis and its quotient byA",
     "positive": [
-      "actual source degree32",
-      "4 original-control vector reconstructions in descended source",
-      "all24 A times divided-section identities",
-      "3 positive controls reconstructed from24 basis"
+      "all saved complete splitting/row inverse products",
+      "all24 source function reconstructions",
+      "all24 divided-section identities"
     ],
     "negative": [
-      "changed divided section by1 must fail product identity"
+      "corrupted kernel column rejected"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact algebra, no statistical comparison"
@@ -71,7 +65,7 @@
     "changed section rejection"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh field57-01 FIELD57.sing FIELD57_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh check57-01 CHECK57.sing CHECK57_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -106,10 +100,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 5,
+  "version": 6,
   "amendment": {
     "before_affected_data": true,
-    "reason": "stage2 accepted rank44/dimension24; freeze actual descended source-field binding",
-    "stage2": "space57-02 accepted"
+    "reason": "field57-01 accepted24 actual/divided functions; independent certificate replay without rerunning producer"
   }
 }
