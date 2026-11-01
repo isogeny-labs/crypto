@@ -3836,7 +3836,7 @@ save, so B falls to `0.19×` A.  Maintaining the counts incrementally (B′) kee
 the work, which is still behind A and E25 at `0.1` and `1` GAE.  A counted estimate (B″), with `O(1)` work
 per row update, gives up `22.5`–`22.7 %` of B's saving in mean `C` (worse pivots).  With its `1.27·10⁴` selection
 operations counted, it is ahead of A at `0` GAE (`1.54`–`1.56×`) and at `0.1` GAE (`1.046`–`1.048×`).  At
-`1` GAE it is behind A (`0.947`–`0.948`) and E25 (`0.980`–`0.997`): at that weight its selection
+`1` GAE it is behind A (`0.946`–`0.948`) and E25 (`0.980`–`0.997`): at that weight its selection
 operations cost `1.2·10⁶` multiplications per call, more than the `2.30`–`2.33·10⁵` it saves against A's mean `C`.  **No pivot rule
 tested here ranks ahead of A across the band; A remains the ranked solver.**  B″ is a measured
 improvement of the baseline at `0` and `0.1` GAE only.  Under the §5a rule it is not ranked, and it is
@@ -3847,11 +3847,11 @@ multiplications at `1` GAE).  No pivot rule removes them; a smaller matrix would
 validation gate, the leaderboard and `benchmarks/`.
 
 
-**Erratum (2026-11-01, from the independent validator's recompute of `stage_a.json` and the end-to-end records).** Thirteen printed figures in this section disagreed with the raw records and are corrected in place above; no verdict or rank changes (G2.124–G2.130, G2.132, G2.133 hold; G2.131 is falsified against E25 at `1` GAE; no variant is ranked).
+**Erratum (2026-11-01, from the independent validator's recompute of `stage_a.json` and the end-to-end records).** Fourteen printed figures in this section disagreed with the raw records and are corrected in place above; no verdict or rank changes (G2.124–G2.130, G2.132, G2.133 hold; G2.131 is falsified against E25 at `1` GAE; no variant is ranked).
 
 1. Transcription: B′'s count updates were printed `2.92`–`2.98·10⁵`; the records give `288,884.5`–`294,201.3`, i.e. `2.89`–`2.94·10⁵` (`stage_a.log`, p = 101 seed 1: `289,121`).
 2. Truncated means, now rounded: B's comparisons minimum `3,680.79` → `3,681`; B′ and B″ initial counts `505.85`–`506.74` → `506`–`507`; B″ comparisons minimum `4,069.53` → `4,070`; B″ total maximum `12,803.90` → `12,804`; `C` median B″/B maximum `1.22156` → `1.222`.
-3. Double rounding (four places, then three), now rounded once: `S_A/S_B` at `1` GAE maximum `0.152475` → `0.152`; `S_E25/S_B′` at `0.1` GAE minimum `0.678485` → `0.678`; `S_E25/S_B″` at `1` GAE minimum `0.980463` → `0.980`.
+3. Double rounding (four places, then three), now rounded once: `S_A/S_B` at `1` GAE maximum `0.152475` → `0.152`; `S_E25/S_B′` at `0.1` GAE minimum `0.678485` → `0.678`; `S_E25/S_B″` at `1` GAE minimum `0.980463` → `0.980`. The prose summary's `S_A/S_B″` at `1` GAE (`0.946478`–`0.947987`) was printed `0.947`–`0.948` (rounded twice); now `0.946`–`0.948`.
 
 ### 9.38 E34 pre-registration: a cheaper order-24 class representative, and which walk is the matched rho on E18's `j = 0` curves across the §5a band
 
