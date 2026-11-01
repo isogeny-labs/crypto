@@ -2327,10 +2327,11 @@ fn prime_f4(
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;
     if config.m == 4
-        && context.is_some()
         && matches!(group, Group::Prime(curve) if curve.p.to_u64().is_some_and(|p| p >= 1u64 << 32))
     {
-        return prime_f4_wide_dynamic_m4(config, case, context.expect("checked above"));
+        if let Some(context) = context {
+            return prime_f4_wide_dynamic_m4(config, case, context);
+        }
     }
     if config.m == 3
         && context.is_some()
