@@ -45,7 +45,7 @@ pass. Controls 1,A,lambda belong; actual b is excluded in six rows.
 
 == Actual finite-pole functions
 All 24 sections are bound to source functions over F2(u), with full source
-degree 32. Every divided function satisfies A*(f/A)=f. Since div(A)=P-D,
+degree 32. Every divided function satisfies A × (f/A)=f. Since div(A)=P-D,
 where P is the sum of four reduced degree-20 points, division by A identifies
 the complete spaces L(D) and L(P). The generic inverse of A and four
 actual descended-coordinate controls pass. CHECK57 independently replays
@@ -66,8 +66,9 @@ Lambda has trace A; consequently lambda/A has trace 1 in L(P).
 #table(columns:3,inset:4pt,[Attempt],[Terminal status],[Native wall diagnostic],
 RUNROWS
 )
-Native wall is the difference of retained UTC timestamps, rounded to seconds;
-it includes the native invocation only and is not a comparative benchmark.
+Native wall is the difference of retained UTC timestamps at one-second
+resolution; zero means same-second endpoints. It covers the native invocation
+only and is not a comparative benchmark.
 CPU time and Lean compile/audit wall intervals were not recorded.
 
 Four rejected attempts are preserved: match57-01 used unsupported whole-ideal
