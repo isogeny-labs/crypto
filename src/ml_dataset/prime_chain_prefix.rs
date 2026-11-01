@@ -556,6 +556,35 @@ pub(super) fn replay(
                     }
                     Err(error) => return Err(error.message()),
                 };
+                let native_basis_len = basis.len();
+                // New traced visitors explicitly distinguish the native
+                // returned subset from the actual recursively used generators.
+                // Legacy streams retain their old admission and unknown suffix.
+                let basis = if let Some(value) = event.get("generating_set") {
+                    let preserved = match polys(value, frame.active.len(), p, false) {
+                        Ok(polynomials) => polynomials,
+                        Err(PolynomialError::SizeCap(message)) => {
+                            reason = Some(message.into());
+                            break;
+                        }
+                        Err(error) => return Err(error.message()),
+                    };
+                    let mut expected = basis;
+                    for f in &frame.system {
+                        if !f.is_empty() && !expected.contains(f) {
+                            expected.push(f.clone());
+                        }
+                    }
+                    if !equivalent_rows(&preserved, &expected) {
+                        return Err(
+                            "preserved generating set differs from native rows and incoming system"
+                                .into(),
+                        );
+                    }
+                    preserved
+                } else {
+                    basis
+                };
                 let audit = prefix_algebra::equivalent(
                     &frame.system,
                     &basis,
@@ -579,8 +608,11 @@ pub(super) fn replay(
                             active: &frame.active,
                             bindings: &frame.bindings,
                             sources: &frame.system,
-                            basis: &basis,
-                            proofs: &certificate.right_from_left,
+                            // The appended constraints support traversal, but
+                            // are not retained native output training targets.
+                            // The contract above guarantees the native prefix.
+                            basis: &basis[..native_basis_len],
+                            proofs: &certificate.right_from_left[..native_basis_len],
                             p,
                             sequence: events,
                             node_id: frame.id,
@@ -867,6 +899,10 @@ mod tests {
         // Scale an output basis row while leaving the pre-native system fixed.
         // Both nodes certify the same ideal, but their output labels differ.
         let mut changed = rows[..2].to_vec();
+        changed[1]["event"]
+            .as_object_mut()
+            .unwrap()
+            .remove("generating_set");
         for term in changed[1]["event"]["report"]["basis"][0]
             .as_array_mut()
             .unwrap()
@@ -929,6 +965,10 @@ mod tests {
     #[test]
     fn unproved_native_basis_is_restricted_unknown_not_a_false_degree_label() {
         let (input, mut rows) = fixture(false);
+        rows[1]["event"]
+            .as_object_mut()
+            .unwrap()
+            .remove("generating_set");
         rows[1]["event"]["report"]["basis"] = json!([[[[0, 0, 0, 0], 1]]]);
         let (features, report) = run(&input, &rows).unwrap();
         assert!(features.is_empty());
@@ -1074,5 +1114,133 @@ mod tests {
             run(&bad_input, &rows).unwrap_err(),
             "invalid prefix polynomial"
         );
+    }
+    // Retained failures remain failures: these are the original first two
+    // events, not regenerated substitutes for the frozen campaign.
+    fn retained_generator_fixtures() -> Vec<Value> {
+        serde_json::from_str(include_str!(
+            "../../research/ml_dataset_cli_generator_preservation_20261101/fixtures/root-systems.json"
+        )).unwrap()
+    }
+
+    #[test]
+    fn preserved_generators_retained_legacy_roots_remain_unknown() {
+        let fixtures = retained_generator_fixtures();
+        assert_eq!(fixtures.len(), 4);
+        for fixture in fixtures {
+            let rows = fixture["root_events"].as_array().unwrap();
+            assert!(rows[1]["event"].get("generating_set").is_none());
+            let (features, summary) = run(&fixture["input"], rows).unwrap();
+            assert!(features.is_empty());
+            assert_eq!(summary["admission_status"], "bounded_unknown_suffix");
+            assert_eq!(summary["ideal_equality_certified_nodes"], 0);
+        }
+    }
+
+    #[test]
+    fn preserved_generators_retained_inputs_certify_and_specialize_same_rows() {
+        for fixture in retained_generator_fixtures() {
+            let input = &fixture["input"];
+            let n = input["n_vars"].as_u64().unwrap() as usize;
+            let p = input["modulus"].as_str().unwrap().parse().unwrap();
+            let equations = polys(&input["polynomials"], n, p, true)
+                .unwrap_or_else(|e| panic!("{}", e.message()));
+            let domains: Vec<Option<Vec<u64>>> =
+                serde_json::from_value(input["domains"].clone()).unwrap();
+            let mut opts = f4_fp::F4Options::new(Ordering::Grevlex, 3)
+                .with_budget(std::time::Duration::from_millis(5000));
+            opts.max_pairs_per_step = Some(256);
+            let mut events = Vec::new();
+            let report = f4_fp::solve_visit_traced(
+                &equations,
+                n,
+                p,
+                &opts,
+                &domains,
+                |_| false,
+                |event| {
+                    let value = serde_json::to_value(event).unwrap();
+                    let stop = value["kind"] == "system" && value["node_id"] != 0;
+                    events.push(value);
+                    if stop {
+                        Err("focused test stops at first specialized child".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+            )
+            .unwrap();
+            assert!(report.trace_stopped);
+            let rows: Vec<Value> = events.into_iter().enumerate().map(|(i,event)|
+                json!({"schema":"ml-dataset.prime-f4-chain-event/v1","sequence":i+1,"event":event})
+            ).collect();
+            assert_eq!(
+                rows[1]["event"]["report"]["basis"],
+                fixture["root_events"][1]["event"]["report"]["basis"]
+            );
+            let kept = polys(&rows[1]["event"]["generating_set"], n, p, false)
+                .unwrap_or_else(|e| panic!("{}", e.message()));
+            assert!(equations.iter().all(|f| kept.contains(f)));
+            let (features, summary) = run(input, &rows).unwrap();
+            assert_eq!(features.len(), 1);
+            assert_eq!(summary["ideal_equality_certified_nodes"], 1);
+            assert!(
+                summary["algebraic_consequences"]["counts"]["admitted_nonzero_rows"]
+                    .as_u64()
+                    .unwrap()
+                    > 0
+            );
+            assert_eq!(summary["admission_status"], "retained_prefix_checked");
+            // Algebraic provenance indexes only the unchanged raw native
+            // report, never appended incoming constraints.
+            let bytes = rows
+                .iter()
+                .map(|row| format!("{row}\n"))
+                .collect::<String>();
+            let mut native_target_indices = Vec::new();
+            replay(
+                input,
+                &json!({"verified_public_input":true}),
+                std::io::Cursor::new(bytes),
+                |_, record| {
+                    if record["kind"] == "polynomial_consequence" {
+                        native_target_indices.push(record["source_basis_row"].as_u64().unwrap());
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
+            let raw_len = rows[1]["event"]["report"]["basis"]
+                .as_array()
+                .unwrap()
+                .len();
+            assert!(kept.len() > raw_len);
+            assert_eq!(
+                native_target_indices,
+                (0..raw_len as u64).collect::<Vec<_>>()
+            );
+            // Independently checked child specialization must bind the same
+            // enlarged generators, including the deferred quartic constraints.
+            let mut bad_child = rows.clone();
+            bad_child.last_mut().unwrap()["event"]["polynomials"] = json!([]);
+            assert!(run(input, &bad_child).is_err());
+            // Neither a missing input nor a changed coefficient can be silently
+            // substituted for the explicit native-plus-input contract.
+            let mut missing = rows.clone();
+            missing[1]["event"]["generating_set"]
+                .as_array_mut()
+                .unwrap()
+                .pop();
+            assert!(run(input, &missing).is_err());
+            let mut changed = rows.clone();
+            let c = changed[1]["event"]["generating_set"][0][0][1]
+                .as_u64()
+                .unwrap();
+            changed[1]["event"]["generating_set"][0][0][1] = json!(if c == 1 { 2 } else { 1 });
+            assert!(run(input, &changed).is_err());
+            let mut mismatched = rows.clone();
+            mismatched[1]["event"]["report"]["basis"] = json!([]);
+            assert!(run(input, &mismatched).is_err());
+        }
     }
 }

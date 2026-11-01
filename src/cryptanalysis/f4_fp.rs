@@ -4744,6 +4744,10 @@ pub enum VisitEvent<'a> {
         node_id: usize,
         report: &'a F4Report,
         trace: &'a F4Trace,
+        /// Actual generating set used for branch selection and specialization.
+        /// Includes missing incoming generators; the raw native report above
+        /// remains unchanged and may describe a truncated relaxed system.
+        generating_set: &'a [Poly],
     },
     Branch {
         node_id: usize,
@@ -4886,11 +4890,26 @@ where
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        // An alive-only native basis can retire an input before its deferred
+        // pair is processed. Preserve the exact incoming generators in the
+        // opt-in traced traversal instead of claiming equality for that subset.
+        // This adds no pair processing and does not change any solver limit.
+        let preserved = trace.as_ref().map(|_| {
+            let mut generators = r.basis.clone();
+            for f in input {
+                if !f.is_empty() && !generators.contains(f) {
+                    generators.push(f.clone());
+                }
+            }
+            generators
+        });
+        let generating_set = preserved.as_deref().unwrap_or(&r.basis);
         if let Some(trace) = &trace {
             if !self.emit(VisitEvent::NativeResult {
                 node_id,
                 report: &r,
                 trace,
+                generating_set,
             }) {
                 return VisitEnd::TraceStopped;
             }
@@ -4902,7 +4921,7 @@ where
             return VisitEnd::Complete;
         }
         let mut best: Option<(usize, Vec<u64>)> = None;
-        for g in &r.basis {
+        for g in generating_set {
             let vars: HashSet<_> = g
                 .iter()
                 .flat_map(|(e, _)| {
@@ -4999,8 +5018,7 @@ where
                 return VisitEnd::TimedOut;
             }
             self.assignment[original] = value;
-            let sub: Vec<_> = r
-                .basis
+            let sub: Vec<_> = generating_set
                 .iter()
                 .map(|g| {
                     normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
