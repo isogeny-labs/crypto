@@ -9,3 +9,6 @@ The combined model has 480 systems, 340 finite interval-midpoint proxy labels an
 `DATASET-INDEX.json` lists every file by relative path, role, byte length, SHA-256 and custody source. The 144 ignored `system.sing` payloads are bound by per-directory `.artifacts.json` manifests; `tools/artifacts/artifacts.py verify --remote` reported `144 hydrated, 0 not pulled, 0 problems`. Tracked metadata, summaries, certificates, model rows and predictions are in Git. Four Python bytecode files are classified as reproducible local caches and are not scientific inputs or outputs. No files were removed.
 
 The rendered ten-base report remains at `research/n83_candidate_pdp_20261028/reports/run-20261101T1848Z-ten-base-model/report.md` with its PDF, SVG and plotted data. The next useful measurement for factor-base ranking is a separately frozen exact FFD/LFD study on the retained PDP systems; the current model does not answer that question.
+
+
+The tracked attempt-08 data and ten-base report were archived to S3 from Git commit `8111a5c6e7b9`; the archive readback was byte-identical and SHA-256 verified. See `S3-CUSTODY.json` for its immutable S3 URI, digest, contents, the separately stored 144 system payload references, and the r38/r39 fixed factor-base S3 prefixes.
