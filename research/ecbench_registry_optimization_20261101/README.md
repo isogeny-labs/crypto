@@ -25,13 +25,21 @@ into a speed claim.
   solvers**, **9/9 PDP3 engines**, and **4/4 PKM tower engines**. The remaining
   six registry entries are external CM wrappers and require a real hash-bound
   backend.
-- The latest `main` added the PDP3 pair-index F6 closure and the four PKM tower
-  engines. Both new panels verify; the current binary reproduces all 40
-  measured runs. The first pair-index replay also exposed and retained an
-  accounting-cache regression; resetting the cache at the independent-run
-  boundary makes the corrected session reproduce 16/16. The earlier
-  33-session current-head receipts remain under
-  [`execution/current-head-replay/`](execution/current-head-replay/).
+- Exact merged-head replay at source `d955159129` and release-binary SHA-256
+  `146c4892...d35eb` reproduces all **782/782** eligible measured runs across
+  all 35 admitted sessions. Its receipts and aggregate are under
+  [`execution/current-merged-head-replay/`](execution/current-merged-head-replay/);
+  the earlier 33-session replay is retained separately.
+- The pair-index F6 and four PKM tower panels verify. The first pair-index
+  replay also exposed and retained an accounting-cache regression; resetting
+  the cache at the independent-run boundary makes the corrected session
+  reproduce 16/16.
+- Newer `main` also contains a standalone N83 chained-S3 meet-in-the-middle
+  lookup. Its separate 50-record experiment reports zero soundness flags and
+  successful public-target lookup refutations through `m = 8`, but it is not
+  an ECBench-selectable method or nested engine and is therefore not counted
+  in the 78+24 claim. Wiring and pricing that decomposition stage end to end is
+  an explicit coverage gap, not an assumed result.
 - No leaderboard row changes. These are one-target/four-round development
   diagnostics, not L2 confirmatory holdouts.
 - Confirmatory execution is blocked because this managed runtime has no ready
@@ -61,8 +69,8 @@ ecbench optimize inventory
 ecbench optimize inventory --json
 
 ecbench optimize audit \
-  --development specs/development/*.json \
-  --holdout specs/holdout/*.json \
+  --development ../ecbench_e2e_frontier_20261031/specs/shards/*.json \
+                specs/development/*.json \
   --require-all
 ```
 
@@ -70,6 +78,11 @@ ecbench optimize audit \
 an explicit policy row for every method and a unit test compares the two sets
 for exact equality. Registering a new method without choosing its search,
 accounting and claim scopes fails closed.
+
+This boundary is exhaustive for implementations exposed through ECBench, not
+for every research example in the repository. A standalone example must be
+wired into the registry (or into an explicitly audited nested-engine list)
+before it can inherit the all-implementations coverage statement.
 
 `audit` validates method parameters through the normal registry resolver and
 checks:

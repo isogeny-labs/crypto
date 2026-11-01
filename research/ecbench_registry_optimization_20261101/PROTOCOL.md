@@ -12,6 +12,15 @@ registry and the binary-linked PDP3 and prime PKM tower engines. At the current
 source state, that is 78 top-level methods, 11 system solvers, nine PDP3
 engines, and four PKM tower engines.
 
+“Complete” means complete over that executable ECBench boundary. Standalone
+research binaries, examples, and library-only experimental options are not
+silently counted. They require an explicit registry or nested-inventory entry,
+matched reference arm, complete pricing, and replay path before this protocol
+can claim coverage. In particular, the newly merged N83 chained-S3
+meet-in-the-middle lookup currently has separate decomposition-stage evidence
+but no ECBench arm; it remains a named integration and end-to-end measurement
+gap.
+
 The question for each compatible method/domain cell is:
 
 > Can a prospectively selected configuration or implementation reduce complete

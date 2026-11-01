@@ -25,6 +25,13 @@ solvers, all nine PDP3 engines, and all four PKM tower engines.
 The six external CM registry methods remain blocked on a real backend path and
 SHA-256 identity; placeholder bindings were never executed.
 
+The repository also now contains an N83 chained-S3 meet-in-the-middle lookup
+with separate decomposition-stage measurements. It is not selectable through
+ECBench, so the 78+24 audit does not and must not imply coverage. An admitted
+frontier comparison still requires an ECBench arm, matched rho/reference,
+complete reusable-versus-online pricing, deterministic replay, and a disjoint
+L2 holdout.
+
 New paid execution remains gated on a durable checkpoint identity and a fresh,
 disjoint confirmatory roster passing:
 

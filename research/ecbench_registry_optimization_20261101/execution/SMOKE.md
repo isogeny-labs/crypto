@@ -13,9 +13,11 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
 - 11/11 system solvers, 9/9 PDP3 engines, and 4/4 PKM tower engines executed.
 - The campaign-structure audit separately admits 111 specs with 78/78 methods
   and 24/24 nested algorithms.
-- A post-merge audit with current `main` reproduced the same 742/742 eligible
-  runs across all 33 admitted sessions with zero problems. Its binary-bound
-  receipts and summary are in [`current-head-replay/`](current-head-replay/).
+- The latest merged-head audit reproduced 782/782 eligible runs across all 35
+  admitted sessions with zero problems, using source `d955159129` and release
+  binary SHA-256 `146c4892...d35eb`. Its binary-bound receipts and summary are
+  in [`current-merged-head-replay/`](current-merged-head-replay/). The earlier
+  33-session receipts remain under [`current-head-replay/`](current-head-replay/).
 - The new PKM panel passed 24/24 measured replays. The first PDP3 pair-index
   session exposed cross-record cache charging (13/16 replays); it is retained
   as a failed negative control. After resetting the cache once per independent
@@ -84,6 +86,14 @@ refused the 18-unknown/17-equation system; Buchberger hit the common cap.
 
 ## Other retained bottlenecks
 
+- The newly merged N83 chained-S3 meet-in-the-middle lookup is a standalone
+  decomposition experiment, not an ECBench arm. Its separate 50-record study
+  reports zero soundness flags and refutes 3/3 public targets with zero SAT
+  conflicts for `m = 5..8`; the `m = 9` query arm caps after a 958.8-second
+  one-time lookup build. Planted/control arms do not establish an ECDLP gain,
+  and no rho comparison, symmetric pricing, or L2 holdout exists. It is
+  recorded as an integration/measurement gap rather than added to the 78+24
+  coverage total.
 - Both dense and Wiedemann F_((2^10)^4) pipeline arms timed out in all five
   attempts at 17 seconds; both rho controls completed.
 - The random-binary PDP3 matrix-F4 arm timed out twice; matrix F5 completed.
