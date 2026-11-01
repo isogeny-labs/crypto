@@ -93,7 +93,79 @@ pub fn binary_coordinates(point: &BinaryPoint) -> Option<Coordinates> {
 pub fn names() -> Vec<&'static str> {
     let mut v = vec!["ecc2k-130", "ecc2k-95", "eccp-131"];
     v.extend(secg_names());
+    v.extend([
+        "brainpoolp192r1",
+        "brainpoolp224r1",
+        "brainpoolp256r1",
+        "brainpoolp320r1",
+        "brainpoolp384r1",
+        "brainpoolp512r1",
+        "frp256v1",
+        "sm2p256v1",
+        "gost-cryptopro-a",
+        "gost-cryptopro-b",
+        "gost-cryptopro-c",
+        "gost-tc26-256-a",
+        "gost-tc26-512-a",
+        "gost-tc26-512-b",
+    ]);
     v
+}
+
+/// Resolve a built-in prime-field curve name, including common standards
+/// aliases, for structural reporting by `ic prime-orbit`.
+pub fn prime_curve(name: &str) -> Option<CurveParams> {
+    Some(match name.to_ascii_lowercase().as_str() {
+        "eccp-131" | "eccp131" => CurveParams::eccp131(),
+        "secp160k1" => CurveParams::secp160k1(),
+        "secp192k1" => CurveParams::secp192k1(),
+        "secp224k1" => CurveParams::secp224k1(),
+        "secp256k1" => CurveParams::secp256k1(),
+        "secp112r1" => CurveParams::secp112r1(),
+        "secp112r2" => CurveParams::secp112r2(),
+        "secp128r1" => CurveParams::secp128r1(),
+        "secp128r2" => CurveParams::secp128r2(),
+        "secp160r1" => CurveParams::secp160r1(),
+        "secp160r2" => CurveParams::secp160r2(),
+        "p192" | "p-192" | "secp192r1" | "prime192v1" | "nist-p192" => CurveParams::p192(),
+        "p224" | "p-224" | "secp224r1" => CurveParams::p224(),
+        "p256" | "p-256" | "secp256r1" | "prime256v1" => CurveParams::p256(),
+        "p384" | "p-384" | "secp384r1" => CurveParams::p384(),
+        "p521" | "p-521" | "secp521r1" => CurveParams::p521(),
+        "brainpoolp192r1" => CurveParams::brainpool_p192r1(),
+        "brainpoolp224r1" => CurveParams::brainpool_p224r1(),
+        "brainpoolp256r1" => CurveParams::brainpool_p256r1(),
+        "brainpoolp320r1" => CurveParams::brainpool_p320r1(),
+        "brainpoolp384r1" => CurveParams::brainpool_p384r1(),
+        "brainpoolp512r1" => CurveParams::brainpool_p512r1(),
+        "frp256v1" => CurveParams::frp256v1(),
+        "sm2" | "sm2p256v1" => CurveParams::sm2(),
+        "gost-cryptopro-a" => CurveParams::gost_cryptopro_a(),
+        "gost-cryptopro-b" => CurveParams::gost_cryptopro_b(),
+        "gost-cryptopro-c" => CurveParams::gost_cryptopro_c(),
+        "gost-tc26-256-a" => CurveParams::gost_tc26_256_a(),
+        "gost-tc26-512-a" => CurveParams::gost_tc26_512_a(),
+        "gost-tc26-512-b" => CurveParams::gost_tc26_512_b(),
+        _ => return None,
+    })
+}
+
+fn prime_parameters(c: &CurveParams) -> Parameters {
+    Parameters {
+        schema_version: 1,
+        name: c.name.into(),
+        field: Field::Prime { modulus: hex(&c.p) },
+        a: hex(&c.a),
+        b: hex(&c.b),
+        subgroup_order: hex(&c.n),
+        cofactor: c.h.to_string(),
+        generator: Some(Coordinates {
+            x: hex(&c.gx),
+            y: hex(&c.gy),
+        }),
+        point: None,
+        fixture: None,
+    }
 }
 /// A SECG curve from the standards database as inspection parameters.
 fn secg_parameters(name: &str) -> Option<Parameters> {
@@ -249,6 +321,7 @@ pub fn named(name: &str) -> Result<Parameters, String> {
         }
         _ => {
             return secg_parameters(name)
+                .or_else(|| prime_curve(name).as_ref().map(prime_parameters))
                 .ok_or_else(|| format!("unknown curve {name:?}; use ic list"))
         }
     };

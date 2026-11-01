@@ -58,6 +58,29 @@
     "additional_trials_authorized": false,
     "outcome": "The preregistered evidence version is inconclusive; no retry or alternate candidate was launched after observing failure."
   },
+  "diagnostic_retrieval": {
+    "workflow": ".github/workflows/isolab-failure-diagnosis.yml",
+    "status": "first_read_failed_fix_pending",
+    "workflow_run": 41266993333,
+    "workflow_source_merge": "0b915934de7f57b814507bfe32208175b4fd3a94",
+    "workflow_conclusion": "failure",
+    "diagnosis_artifacts_published": false,
+    "observed_access_boundary": "The main-branch OIDC role read the four fixed launcher receipts but payload-object reads returned 403 for both trials.",
+    "reader_fault": "A failed payload copy was incorrectly treated as success, leading to verification of a nonexistent SHA256SUMS file.",
+    "corrective_scope": "Distinguish not-listed, read-unavailable and hash-verified payload states; fall back only to identity-checked Kubernetes status.",
+    "fixed_workflow_runs": [
+      41260778029,
+      41260778856
+    ],
+    "experiment_retry": false,
+    "raw_measurements_published": false,
+    "required_checks": [
+      "launcher request/result identity",
+      "source and native binary identity",
+      "per-file SHA256SUMS when payload objects are readable",
+      "allowlisted diagnosis only"
+    ]
+  },
   "excluded_local_diagnostic": {
     "admitted": false,
     "reason": "The workspace lacks PSI evidence and every execution graded L0; --allow-busy was used only to exercise deterministic correctness.",
