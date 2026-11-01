@@ -21,3 +21,22 @@ Route: AGENTS.md §9a sends x86 experiments to Iso Lab on EKS Spot, and Amendmen
 system at 112 GiB. The session that wrote this had 4 vCPUs, 15 GB and no AWS access, so any row it produces is
 off-route and is reported separately. `run_cells.sh` is route-independent: `BIN`, `BUDGET`, `DENSE`, `VMEM_KB`
 and `THREADS` are environment overrides.
+
+## Routing the cap-6 cells (2026-11-01): blocked by the integration, not launched
+
+The owner asked for `run_cells.sh T 6 0` and `T 6 1` on Iso Lab. None of the paths in
+`.claude/skills/isolab-eks` carries this workload as it stands:
+
+- `isolab.eks.request/v1` and `isolab-experiment.yml` take an `ecbench.spec/v1` and cap `seconds` at 3,600
+  (`taskq/deploy/eks-karpenter/contracts/request.schema.json`). These cells are a custom native binary
+  (`pkm_tower_pilot`), 86,400 s per system, 112 GiB.
+- `isolab_k8s_run` (argv plus a digest-pinned image) is the custom-command path. Its stdio MCP binary lives on the
+  lab host, not in the container that wrote this, which also has no `aws` CLI. No workflow builds an image holding
+  `pkm_tower_pilot`.
+- Spot can interrupt a 24 h job; the non-resumable path would restart it. A resumable run needs
+  `isolab.eks.resumable/v1` and a recovery image, which is a separate request.
+
+Needed from the owner or the lab host: (1) the route (`isolab_k8s_run` on the lab host, or an extension of the
+request schema or workflow), (2) a digest-pinned image with `pkm_tower_pilot` built from a pinned commit, (3) whether
+the run is resumable. `run_cells.sh` is route-independent (`BIN`, `BUDGET=86400`, `DENSE`, `VMEM_KB`, `THREADS`).
+`DENSE` for a 112 GiB request is 2.79·10¹⁰ (27,900,000,000; the largest multiple of 10⁸ with `4·C <= 112 GiB - 8 GiB`, Amendment 7 A).
