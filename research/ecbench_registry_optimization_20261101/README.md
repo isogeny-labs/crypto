@@ -40,6 +40,12 @@ into a speed claim.
   an ECBench-selectable method or nested engine and is therefore not counted
   in the 78+24 claim. Wiring and pricing that decomposition stage end to end is
   an explicit coverage gap, not an assumed result.
+- The same reconciliation registered a distinct `chained-x` decomposition
+  oracle in `ic bench`. A matched Koblitz n=13 diagnostic now covers all three
+  engines at `m = 2, 3` and inherited F4 at `m = 4`: inherited F4 remains
+  24.71x, 144.09x, and 794.37x matched rho, respectively. Both `m = 4`
+  matrix-engine cells censored. This is end-to-end IC-framework evidence, but
+  it still lacks an ECBench spec/receipt and is not part of 78+24.
 - No leaderboard row changes. These are one-target/four-round development
   diagnostics, not L2 confirmatory holdouts.
 - Confirmatory execution is blocked because this managed runtime has no ready
@@ -57,6 +63,8 @@ The earlier [`execution/development-audit.json`](execution/development-audit.jso
 is retained as the pre-expansion negative control. The execution totals,
 bottlenecks, and diagnostic comparisons are in
 [`execution/SMOKE.md`](execution/SMOKE.md).
+The separate chained-x addendum is
+[`execution/chained-x-post-main-20261101/SUMMARY.json`](execution/chained-x-post-main-20261101/SUMMARY.json).
 The comprehensive cross-campaign frontier, algorithm history, and bottleneck
 report remains
 [`../ecbench_e2e_frontier_20261031/REPORT.pdf`](../ecbench_e2e_frontier_20261031/REPORT.pdf);

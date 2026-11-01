@@ -32,6 +32,12 @@ frontier comparison still requires an ECBench arm, matched rho/reference,
 complete reusable-versus-online pricing, deterministic replay, and a disjoint
 L2 holdout.
 
+Separately, `ic bench` now exposes the chained-x oracle. The local matched toy
+grid is complete for seven of nine cells and rho-led everywhere; both m=4
+matrix cells censored. It is blocked from broad sweeps by missing effective
+wall-budget plumbing (`--solver-budget-seconds` is ignored for this oracle),
+and from the ECBench frontier by the missing spec/session/replay integration.
+
 New paid execution remains gated on a durable checkpoint identity and a fresh,
 disjoint confirmatory roster passing:
 

@@ -86,6 +86,17 @@ refused the 18-unknown/17-equation system; Buchberger hit the common cap.
 
 ## Other retained bottlenecks
 
+- The distinct `ic bench` chained-x oracle was measured after it appeared on
+  current `main`. On Koblitz a=0, n=13 with a fixed dimension-6 subspace base,
+  four repeats, and matched rho, inherited F4 is the best completed engine but
+  remains 24.71x rho at m=2, 144.09x at m=3, and 794.37x at m=4. At m=3,
+  matrix F5 cuts matrix F4's mean complete S to 0.6276x, but is still
+  16,296.76x rho. Both m=4 matrix engines censored under a five-minute outer
+  watchdog at node_budget=256; the default matrix-F4 arm had already produced
+  no report after 18 minutes. `--solver-budget-seconds` is not wired to this
+  oracle, so budget enforcement is a sweep-safety bottleneck. The hash-bound
+  compact record is
+  [`chained-x-post-main-20261101/SUMMARY.json`](chained-x-post-main-20261101/SUMMARY.json).
 - The newly merged N83 chained-S3 meet-in-the-middle lookup is a standalone
   decomposition experiment, not an ECBench arm. Its separate 50-record study
   reports zero soundness flags and refutes 3/3 public targets with zero SAT

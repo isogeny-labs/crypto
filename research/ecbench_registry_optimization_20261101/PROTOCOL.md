@@ -21,6 +21,11 @@ meet-in-the-middle lookup currently has separate decomposition-stage evidence
 but no ECBench arm; it remains a named integration and end-to-end measurement
 gap.
 
+The `ic bench` chained-x oracle is a different implementation. It now has a
+matched one-curve L0 diagnostic, but no ECBench spec, session receipt, replay
+contract, scaling ladder, or confirmatory holdout. It therefore remains outside
+the complete ECBench roster even though its IC-framework rows are end to end.
+
 The question for each compatible method/domain cell is:
 
 > Can a prospectively selected configuration or implementation reduce complete
