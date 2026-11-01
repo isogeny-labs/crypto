@@ -46,9 +46,9 @@ int main() {
           unsigned long long got[3];
           cuda_check(cudaMemcpy(got, data(result), sizeof(got), cudaMemcpyDeviceToHost));
           if (got[0] != expected || got[2] > count ||
-              (expected == UINT64_MAX && got[2] != count))
+              (expected == UINT64_MAX && got[2] != count) ||
+              (expected != UINT64_MAX && got[2] <= expected))
             throw std::runtime_error("full-cache witness/coverage mismatch");
-
         }
         ++cases;
         expected == UINT64_MAX ? ++misses : ++hits;
