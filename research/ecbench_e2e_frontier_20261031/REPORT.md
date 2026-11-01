@@ -50,6 +50,11 @@ clear:
    The late-main prime-orbit relation collector is also rho-led in its new
    count-first cross-checks: its tuned affine arm costs 5.42× negation rho on
    the generic shape, 4.20× cubic rho on j=0, and 5.79× quartic rho on j=1728.
+   A late N83 root-index loop also completed two alternating K1107
+   plain-four-byte/FP2 full-process pairs. FP2 was ahead in both observed
+   whole-process ratios (plain/FP2 1.017 and 1.294), but the shared host load
+   varied sharply and the K5500 Tier-1 comparison remains unmeasured; this is
+   an unranked implementation diagnostic, not a new Koblitz frontier row.
 2. **One restricted curve family is IC-led.** The plane-quartic attack on the
    special GHS-weak family $E_0/\mathbb F_{q^3}$, with
    $\#E_0(\mathbb F_{q^3})=4\ell$, is below matched rho in its own cold,
@@ -96,7 +101,7 @@ mandatory checkpoint gate has no upload credential. The replacement workload
 is now split into 92 one-hour-safe planning shards and all 92 pass the exact
 binary's planner. The deterministic analysis driver is hash-bound and passes
 its check-only gate, but exact-image runtime preflight, prospective freeze, and
-a current submission identity are still missing.
+a current paid-execution identity are still missing.
 Consequently, there is no fresh 2026-10-31 wall-time leaderboard.
 
 A follow-up executable establishment audit passes 19/19 artifact-consistency
@@ -490,6 +495,25 @@ The factor-base symmetry lesson is asymmetric:
 - orbit naming, canonicalization, and retained advice must be charged to both
   arms consistently.
 
+### N83 four-byte root-index loop
+
+The newest N83 implementation loop compares the plain four-byte ID31 root
+index with a packed two-bit fingerprint sidecar (FP2), using the same public
+point, binary, K1107 base, and independently replayed scalar. Both alternating
+orders pass `PASS_PAIRED_FULL_REPLAY`:
+
+| order | plain / FP2 index build | plain / FP2 whole process | plain wall | FP2 wall |
+|:--|--:|--:|--:|--:|
+| plain then FP2 | 1.001× | 1.017× | 154.066 s | 151.435 s |
+| FP2 then plain | 1.493× | 1.294× | 250.171 s | 193.284 s |
+
+The code path is therefore correctness-backed and FP2 was faster in both full
+pairs, but this is not a selection result. The shared macOS host reported
+large load changes between orders, two pairs are too few for a stable effect,
+and FP2 adds a side array. At the projected K5500 split it still saves 2.25 GiB
+against the five-byte layout but adds 0.75 GiB against plain four-byte ID31.
+Peak RSS, full K5500 work, and a same-point Tier-1 IC/rho panel remain open.
+
 # The restricted GHS-weak exception
 
 The repository's only clear IC-led elliptic-curve domain is the special
@@ -604,6 +628,24 @@ Their native counter definitions differ, so no report should divide one by
 another and call the quotient a speedup. The common comparison starts at the
 same ECDLP target and ends only after the recovered scalar verifies.
 
+## Tensor-contraction rank boundary
+
+The hashed-ECDLP tensor branch now has a rigorous architecture-level boundary,
+not a performance promotion. `tensor-census` schema v2 emits an exact nonzero
+minor for the canonical and selected balanced flattenings; the verifier
+reconstructs the boundary matrix and recomputes the determinant independently
+with fraction-free Bareiss elimination. A 1,152-matrix deterministic control
+agrees with rational Gaussian elimination and rejects a changed determinant.
+
+Lean proves that a nonzero $k\times k$ minor gives rank at least $k$, and that
+an exact linear separator factoring the matrix through $d$ coordinates has
+rank at most $d$. Thus the finite certificate forces $k\le d$ for that exact
+linear-message architecture. The asymptotic work theorem is explicitly
+conditional: no uniform exponential-rank lemma is yet proved for the
+production hashed prime-field family, and no production E1 certificate exists.
+The result rules out no nonlinear, randomized, approximate, alternate-encoding,
+or separator-avoiding algorithm and changes no ECBench row.
+
 # Rho comparison: current optimized boundary
 
 The optimized `rho.signed_frobenius_strong` path preserves the exact walk,
@@ -645,6 +687,8 @@ For the new campaign:
 | Relation probability / trials | prime and binary IC gaps grow across several ladders | solver improvements do not change the probability of a useful decomposition | algebraic factor-base constraint inside the system; four-size E2E sweep |
 | Structured factor-base yield | six PFDR lines over three families and 16--32 bits have slope -0.0047 to 0.0068; largest upper 95% limit 0.0147 versus 1/3 | the tested structures do not make useful coincidences grow fast enough | test a new mechanism or integrate the base constraint into a fully priced E2E solver; do not extend these families by default |
 | Factor-base and pair-table setup | 98.7–99.6% of central cold Koblitz rows; $O(|F|^2)$ pair materialization | online-only improvements disappear when one target pays setup | cold primary result; equal-advice online secondary result |
+| N83 root-index layout | two independently replayed K1107 pairs favor FP2 by 1.017× and 1.294× whole-process, but shared-host load changes sharply | the fingerprint trades reconstruction work for side-array memory; K1107 does not predict K5500 peak RSS or cost | larger-memory K5500 paired Tier-1 run with matched rho, fixed order policy, and peak-RSS receipt |
+| Tensor contraction separator | exact finite nonzero-minor certificates and the linear-separator implication are proved; production family lemma absent | finite architecture bounds do not establish the rank growth or cover other algorithms | generate a production semantic cut and prove a uniform family lower bound before making an asymptotic claim |
 | F6 closure additions | historical binary: 64.6–1,352.6× inherited F4 in lower-bound S; current replay 72/144 overall | local word-XOR savings are overwhelmed by exact group work, while current counts need remeasurement | price closure and solver in one common unit; rerun current source; change closure algorithm, not label |
 | Matrix F4/F5 scale | m=19 matrix arms time out at 1,800 s | symbolic preprocessing and matrix construction explode before useful scaling | memory/degree receipts and retained timeout curve |
 | Solver-counter mismatch | XORs, conflicts, vector steps, multiply-adds | cross-solver ratios lack semantic equality | E2E wall or complete common pricing; native counters remain diagnostics |
@@ -785,6 +829,13 @@ The performance frontier is now explicit:
 - **SAT/WDSAT/FES:** implemented or historically explored, but not yet on one
   common, validated E2E frontier; WDSAT also carries a retained correctness
   failure in an old path.
+- **Koblitz implementation loop:** the four-byte FP2 N83 root index passes two
+  alternating full K1107 replays and is faster in both observed pairs, but
+  remains unselected until a stable K5500 Tier-1 comparison prices its added
+  side-array memory and includes matched rho.
+- **Tensor contraction:** finite linear-separator rank certificates and their
+  proof bridge are established; the production-family rank-growth lemma is
+  still open, so no ECDLP or leaderboard claim follows.
 - **Root finding:** valuable generic decomposition machinery, not evidence for
   an algebraic sub-square-root attack.
 - **Rho:** instruction-level optimization is real and verified; isolated native
@@ -799,7 +850,9 @@ The highest-value next work is therefore:
 3. attack relation yield and cold setup before further optimizing stages that
    are already a small share;
 4. integrate the GPU relation engine with a matched ECBench reference;
-5. preserve the GHS-weak win as a separate domain rather than using it to
+5. run the paired N83 four-byte/FP2 K5500 Tier-1 memory and E2E gate;
+6. prove or falsify the production tensor-family rank-growth obligation;
+7. preserve the GHS-weak win as a separate domain rather than using it to
    headline generic curves.
 
 # Reproduction and evidence index
@@ -816,6 +869,8 @@ sources are:
 - [rho optimization](../ecbench_rho_optimized_20261014/README.md);
 - [prime factor-base second-host replay](../prime_base_oracle_tuning_20261029/second-host/README.md);
 - [PFDR structured-factor-base screen](../pfdr_other_families_20261101/README.md);
+- [N83 four-byte paired root-index replay](../n83_fourbyte_pair_20261027/README.md);
+- [rigorous tensor boundary-rank report](../tensor_boolean_breakthrough_20261031/BOUNDS_REPORT.md);
 - [GPU explicit-relations result](../explicit_relations_e2e_20261030/RESULTS.md);
 - [literature and prior-evidence ledger](LITERATURE.md);
 - [live coverage](COVERAGE.md), [closed roster](IMPLEMENTATIONS.md), and

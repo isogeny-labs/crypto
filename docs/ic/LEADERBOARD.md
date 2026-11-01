@@ -381,6 +381,17 @@ All six structured lines are valid and read `O-SUB-BE`. Their five-rung slopes r
 
 This is negative structural evidence, not a performance promotion: no ranked row moves and rho is not being inferred from an unpriced component. Read the [analysis](../../research/pfdr_other_families_20261101/results/analysis-main.json) and [study limits](../../research/pfdr_other_families_20261101/README.md).
 
+## N83 four-byte root-index loop, outside tables A–C
+
+The plain four-byte ID31 root index and its packed two-bit fingerprint (FP2) variant ran in both alternating orders on the same K1107 base and public point. Every arm completed the full process, recovered the same scalar, and passed independent replay. Ratios below are plain / FP2, so values above 1 favor FP2.
+
+| order | plain / FP2 index build | plain / FP2 whole process | plain wall (s) | FP2 wall (s) |
+|:--|--:|--:|--:|--:|
+| plain → fp2 | 1.001× | 1.017× | 154.066 | 151.435 |
+| fp2 → plain | 1.493× | 1.294× | 250.171 | 193.284 |
+
+The observed index-build range is 1.001–1.493× and the whole-process range is 1.017–1.294×. The host was shared and its load varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. Read the [study and limits](../../research/n83_fourbyte_pair_20261027/README.md).
+
 ## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)
 
 Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle (`mitm:negation_folded=1`) at every size; only N changed. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.
@@ -839,6 +850,9 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
 - `research/pfdr_other_families_20261101/results/analysis-main.json` — sha256 `2ccae7f1ac7a97a8…`
 - `research/pfdr_other_families_20261101/README.md` — sha256 `2697b3eb35f65e6d…`
+- `research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json` — sha256 `dacd097373ef436c…`
+- `research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json` — sha256 `62960a9ec213b858…`
+- `research/n83_fourbyte_pair_20261027/README.md` — sha256 `51e6392e1c20509d…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`

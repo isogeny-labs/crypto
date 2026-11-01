@@ -78,6 +78,9 @@ SOURCES = {
     "frontier_establishment": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
     "pfdr_other_families": "research/pfdr_other_families_20261101/results/analysis-main.json",
     "pfdr_other_families_readme": "research/pfdr_other_families_20261101/README.md",
+    "n83_fourbyte_pair_plain_fp2": "research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json",
+    "n83_fourbyte_pair_fp2_plain": "research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json",
+    "n83_fourbyte_pair_readme": "research/n83_fourbyte_pair_20261027/README.md",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "f4_fp_ic_effect": "research/f4_fp_ic_effect_20261018/summary.json",
@@ -1780,6 +1783,68 @@ def build(allow_unvalidated: bool = False) -> dict:
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
+    n83_pair_docs = [load(SOURCES[key]) for key in
+                     ("n83_fourbyte_pair_plain_fp2", "n83_fourbyte_pair_fp2_plain")]
+    n83_pair_readme = (REPO / SOURCES["n83_fourbyte_pair_readme"]).read_text()
+    expected_orders = [("plain", "fp2"), ("fp2", "plain")]
+    for pair, order in zip(n83_pair_docs, expected_orders):
+        arms = pair.get("arms", [])
+        if (pair.get("schema") != "n83.fourbyte-paired-k1107-replay/v1"
+                or pair.get("status") != "PASS_PAIRED_FULL_REPLAY"
+                or pair.get("host_tier") != "shared_local_diagnostic"
+                or len(arms) != 2
+                or tuple(arm.get("layout") for arm in arms) != order
+                or any(arm.get("status") != "PASS_INDEPENDENT_FULL_REPLAY"
+                       or not arm.get("checks")
+                       or not all(arm["checks"].values()) for arm in arms)
+                or len({arm.get("base_hash") for arm in arms}) != 1):
+            raise SystemExit("review the N83 four-byte paired replay before updating the leaderboard")
+        by_layout = {arm["layout"]: arm for arm in arms}
+        if (not math.isclose(pair["plain_over_fp2_index_build"],
+                             by_layout["plain"]["index_build_ms"] / by_layout["fp2"]["index_build_ms"],
+                             rel_tol=1e-12)
+                or not math.isclose(pair["plain_over_fp2_process_wall"],
+                                    by_layout["plain"]["process_wall_seconds"]
+                                    / by_layout["fp2"]["process_wall_seconds"], rel_tol=1e-12)):
+            raise SystemExit("N83 four-byte paired replay ratios do not rederive")
+    if ("PASS_PAIRED_FULL_REPLAY" not in n83_pair_readme
+            or "shared" not in n83_pair_readme
+            or "does not justify selecting the FP2" not in n83_pair_readme
+            or "layout for K5500" not in n83_pair_readme):
+        raise SystemExit("review the N83 four-byte paired study limits before updating the leaderboard")
+    n83_root_index_diagnostic = {
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "sources": [SOURCES["n83_fourbyte_pair_plain_fp2"],
+                    SOURCES["n83_fourbyte_pair_fp2_plain"]],
+        "readme": SOURCES["n83_fourbyte_pair_readme"],
+        "class": "alternating shared-host full-process diagnostic; no Tier 1 or matched-rho promotion",
+        "base_columns": 1_107,
+        "pairs": [{
+            "order": [arm["layout"] for arm in pair["arms"]],
+            "plain_over_fp2_index_build": pair["plain_over_fp2_index_build"],
+            "plain_over_fp2_process_wall": pair["plain_over_fp2_process_wall"],
+            "arms": [{
+                "layout": arm["layout"],
+                "index_build_ms": arm["index_build_ms"],
+                "process_wall_seconds": arm["process_wall_seconds"],
+                "online_ms": arm["online_ms"],
+                "peak_rss_bytes": arm["peak_rss_bytes"],
+                "root_fp2_bytes": arm["root_fp2_bytes"],
+                "status": arm["status"],
+            } for arm in pair["arms"]],
+        } for pair in n83_pair_docs],
+        "plain_over_fp2_index_build_range": [
+            min(pair["plain_over_fp2_index_build"] for pair in n83_pair_docs),
+            max(pair["plain_over_fp2_index_build"] for pair in n83_pair_docs),
+        ],
+        "plain_over_fp2_process_wall_range": [
+            min(pair["plain_over_fp2_process_wall"] for pair in n83_pair_docs),
+            max(pair["plain_over_fp2_process_wall"] for pair in n83_pair_docs),
+        ],
+        "candidate_id": None,
+        "matched_rho_speedup": None,
+        "tier1_speedup": None,
+    }
     rank_columns = load(SOURCES["n37_rank_columns"])
     if (rank_columns["status"] != "independently_replayed_l0_bounded_diagnostic"
             or rank_columns["selection"]["decision"] != "COUNTED_ENGINEERING_LEAD"
@@ -2012,6 +2077,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "f6_ecbench_ladder_diagnostic": ladder_diagnostic,
         "f4_f5_f6_cross_family_diagnostic": cross_diagnostic,
         "pfdr_other_families_diagnostic": pfdr_diagnostic,
+        "n83_root_index_diagnostic": n83_root_index_diagnostic,
         "latest_frontier_audit": frontier_audit,
         "n83_tier1_cold_holdout": {
             "source": SOURCES["n83_tier1_cold_holdout"],
@@ -2735,6 +2801,26 @@ def markdown(doc: dict) -> str:
     L += ["", "This is negative structural evidence, not a performance promotion: no ranked row moves and "
           "rho is not being inferred from an unpriced component. "
           f"Read the [analysis](../../{p['source']}) and [study limits](../../{p['readme']}).", ""]
+    n83 = doc["n83_root_index_diagnostic"]
+    L += ["## N83 four-byte root-index loop, outside tables A–C", "",
+          "The plain four-byte ID31 root index and its packed two-bit fingerprint (FP2) variant ran "
+          f"in both alternating orders on the same K{n83['base_columns']} base and public point. "
+          "Every arm completed the full process, recovered the same scalar, and passed independent "
+          "replay. Ratios below are plain / FP2, so values above 1 favor FP2.", "",
+          "| order | plain / FP2 index build | plain / FP2 whole process | plain wall (s) | FP2 wall (s) |",
+          "|:--|--:|--:|--:|--:|"]
+    for pair in n83["pairs"]:
+        arms = {arm["layout"]: arm for arm in pair["arms"]}
+        L.append(f"| {' → '.join(pair['order'])} | {pair['plain_over_fp2_index_build']:.3f}× | "
+                 f"{pair['plain_over_fp2_process_wall']:.3f}× | "
+                 f"{arms['plain']['process_wall_seconds']:.3f} | {arms['fp2']['process_wall_seconds']:.3f} |")
+    L += ["", f"The observed index-build range is {n83['plain_over_fp2_index_build_range'][0]:.3f}–"
+          f"{n83['plain_over_fp2_index_build_range'][1]:.3f}× and the whole-process range is "
+          f"{n83['plain_over_fp2_process_wall_range'][0]:.3f}–"
+          f"{n83['plain_over_fp2_process_wall_range'][1]:.3f}×. The host was shared and its load varied "
+          "substantially; two pairs do not select the K5500 layout. This is a correctness-backed "
+          "optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. "
+          f"Read the [study and limits](../../{n83['readme']}).", ""]
     pb = doc["prime_base_size_component"]
     L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
           "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
@@ -3682,6 +3768,32 @@ def page(doc: dict, standalone: bool) -> str:
              'promotion: no ranked row moves and rho is not inferred from an unpriced component. '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["source"])}">Analysis</a> · '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["readme"])}">study limits</a>.'
+             '</p></section>')
+
+    n83 = doc["n83_root_index_diagnostic"]
+    P.append('<section class="card" id="n83-root-index"><h2>N83 four-byte root-index loop, '
+             'outside the priced tables</h2><p>The plain four-byte ID31 root index and its packed '
+             f'two-bit fingerprint (FP2) variant ran in both alternating orders on the same K{n83["base_columns"]} '
+             'base and public point. Every arm completed the full process, recovered the same scalar, '
+             'and passed independent replay. Ratios are plain / FP2, so values above 1 favor FP2.</p>'
+             '<div class="scroll"><table><thead><tr><th>Order</th><th class="n">Plain / FP2 index build</th>'
+             '<th class="n">Plain / FP2 whole process</th><th class="n">Plain wall (s)</th>'
+             '<th class="n">FP2 wall (s)</th></tr></thead><tbody>')
+    for pair in n83["pairs"]:
+        arms = {arm["layout"]: arm for arm in pair["arms"]}
+        P.append(f'<tr><td>{esc(" → ".join(pair["order"]))}</td>'
+                 f'<td class="n">{pair["plain_over_fp2_index_build"]:.3f}×</td>'
+                 f'<td class="n">{pair["plain_over_fp2_process_wall"]:.3f}×</td>'
+                 f'<td class="n">{arms["plain"]["process_wall_seconds"]:.3f}</td>'
+                 f'<td class="n">{arms["fp2"]["process_wall_seconds"]:.3f}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>The observed index-build range is {n83["plain_over_fp2_index_build_range"][0]:.3f}–'
+             f'{n83["plain_over_fp2_index_build_range"][1]:.3f}× and the whole-process range is '
+             f'{n83["plain_over_fp2_process_wall_range"][0]:.3f}–'
+             f'{n83["plain_over_fp2_process_wall_range"][1]:.3f}×. The host was shared and its load '
+             'varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed '
+             'optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(n83["readme"])}">Study and limits</a>.'
              '</p></section>')
 
     pb = doc["prime_base_size_component"]
