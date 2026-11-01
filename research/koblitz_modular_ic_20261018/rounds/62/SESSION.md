@@ -57,3 +57,22 @@ regularity andalloriginalresearchlanes.
 ### Errors
 I omitted the new-round raw-ignore file before a broad add. Corrected index
 and future archive flow; no raw file deleted or accepted calculation repeated.
+
+## 2026-11-01T23:00:50.425203+00:00 — relevant formal field/projector statements frozen
+
+### What was done
+Prepared8Square62Leanclaims with rationalclearing/uniqueness/squarecriterion
+and cyclic5norm/projector/orthogonality/controlboundary in noncommRing.
+Separate pinned proofdriver copied; no proof job overlaps liveSPLIT62.
+
+### Decisions made
+Keep nonsquare-u/sourcefield/separating-coordinate premises explicit; native
+matrix/source identities distinct. Full-nonzero control does not assert a
+nonzero primitive cyclic block. ActualT/Cartier/Hecke/11tests still required.
+
+### Open threads
+SPLIT62live;afterterminal compile/audit8claims,thenfullsource replay/global
+normality/infinity binding andoriginal researchscope.
+
+### Errors
+Proof source notyetcompiled. No additional mathematicaldata taken.
