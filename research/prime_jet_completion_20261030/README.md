@@ -125,3 +125,7 @@ every retained node. Controls must include H=0 (the original kernel), the
 flattening control above, and rejection of an invalid even-denominator
 inverse. Freeze the coefficient/denominator budget before searching. These
 are proposed next inputs, not reported experiments or scheduled jobs.
+
+## Evidence-linked report and deferred search
+
+The existing four-size finite control and its scope are summarized in [the review follow-up report](reports/review-followup-20261101/REPORT.md), with a source SVG and PDF. The separate bounded rank-directed search is tracked in [XP-20261101-rank-directed-jet-completion](../../backlog/XP-20261101-rank-directed-jet-completion/README.md); that card remains draft, unfunded, and unscheduled pending a runner, frozen protocol, independent verifier, and resource estimate.
