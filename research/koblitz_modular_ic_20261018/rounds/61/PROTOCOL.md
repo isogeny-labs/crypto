@@ -58,3 +58,6 @@ causingout-of-range missinglistentries andnativeerrors. Itwasstoppedafter
 knownerrors;SingularhandledTERMwithexit0,butnomarker/errorsmeansrejected.
 Preserveallpartialbytes. Correctpairorderandnativeboundschecksarefrozen
 beforecubic61-02. Sameall324products/385jets/20charts/caps,nodownscale.
+
+Beforefresh02 also compare all196retainedR43quadraticpairs withR58pairs58
+exactly, so cubicsecondindices refer to the same sourcequadraticselection.
