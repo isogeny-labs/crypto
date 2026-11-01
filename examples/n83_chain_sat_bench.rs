@@ -18,7 +18,9 @@
 //! no zero-sum sub-multiset) and `+t<F>.<B>` (root-finder tables of
 //! intermediate x-coordinates, [`ChainS3Tables`] with front depth `F`, back
 //! depth `B`, at most 300,000 points per table) and `+meet<D>` (the
-//! meet-in-the-middle lookup of [`ChainS3Tables::meet`] at depth `D`). One
+//! meet-in-the-middle lookup of [`ChainS3Tables::meet`] at depth `D`), and
+//! `+rebuild` (rebuild a witness from the lookup hits first,
+//! [`ChainS3Tables::rebuild`]). One
 //! JSON line per (target, arm); every query-independent lookup set is built
 //! before the first query and reported on its own `warmup` line, so query
 //! seconds hold only per-query work.
@@ -64,6 +66,8 @@ fn main() {
             for part in parts {
                 if part == "affine" {
                     options.patterns = ChainS3Patterns::AffineOnly;
+                } else if part == "rebuild" {
+                    options.tables.rebuild = true;
                 } else if let Some(depth) = part.strip_prefix("meet") {
                     options.tables.meet = depth.parse().expect("meet depth");
                 } else if let Some(depths) = part.strip_prefix('t') {
@@ -73,6 +77,7 @@ fn main() {
                         back: b.parse().expect("back depth"),
                         max_points: 300_000,
                         meet: options.tables.meet,
+                        rebuild: options.tables.rebuild,
                     };
                 } else {
                     panic!("unknown arm modifier {part}");
@@ -164,6 +169,7 @@ fn main() {
                     "peak_clauses": stats.peak_clauses, "peak_xors": stats.peak_xors,
                     "patterns_refuted_by_lookup": stats.patterns_refuted_by_lookup,
                     "meet_domain": stats.meet_domain,
+                    "witness_by_lookup": stats.witness_by_lookup,
                     "seed": seed,
                 })
             );

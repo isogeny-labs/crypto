@@ -88,6 +88,7 @@ pub mod methods;
 pub mod negation_strong;
 pub mod optimization;
 pub mod plane_quartic;
+pub mod prime_orbit;
 pub mod record;
 pub mod resources;
 pub mod runner;

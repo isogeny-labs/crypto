@@ -20,6 +20,11 @@
 //!
 //! A record that names an unpriced counter without a count has no priced
 //! cost above `w = 0`; it stays a lower bound and cannot be ranked.
+//!
+//! `U` counts operations.  The memory-size counters of
+//! [`NON_OPERATION_COUNTERS`] (table bytes) are listed with the unpriced
+//! counters but are not in `U`, so they neither add to the price nor block a
+//! ranking; a band row reports their mean count beside the price.
 
 use std::collections::BTreeMap;
 
@@ -63,10 +68,55 @@ pub fn unpriced_counts(r: &Record) -> BTreeMap<String, Option<u64>> {
     out
 }
 
+/// Unpriced counters that count bytes of memory, not operations (owner,
+/// 2026-11-01, option B of `research/ic_byte_counter_pricing_20261101`).
+///
+/// The band charges `w` GAE per *operation*.  A byte count is a space
+/// measure: at `w = 1` it would charge one GAE per byte, and for the residual
+/// collector's table that was 83-99% of the arm's priced `S` (17-58x the
+/// matched rho at 2^24..2^37, against 2.6-4.8x without it).  The time spent
+/// on the table is already counted by its probes (`lookups`) and inserts.
+/// These names are therefore kept in `cost.unpriced` and listed by
+/// [`unpriced_counts`], but are not part of the price ([`unpriced_total`],
+/// [`priced_gae`]) and cannot block a ranking; [`exempt_counts`] reports
+/// them as their own column.  The classification is by name, so it applies
+/// to committed records and replays unchanged.  `work.rs` already classes
+/// `native_table_bytes_uncharged` as shape for the same reason.
+///
+/// `factor_base_vec_bytes_floor_uncharged` is priced separately, as one word
+/// store per eight bytes, by the `*_full` methods (`full_price.rs`); a
+/// record that charged it there does not list it as unpriced.
+pub const NON_OPERATION_COUNTERS: &[&str] = &[
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged",
+];
+
+/// Whether `name` is a memory-size counter that the band does not price.
+pub fn is_non_operation(name: &str) -> bool {
+    NON_OPERATION_COUNTERS.contains(&name)
+}
+
+/// The unpriced counters of `r` that the band charges per operation: every
+/// entry of [`unpriced_counts`] except [`NON_OPERATION_COUNTERS`].
+pub fn priced_counts(r: &Record) -> BTreeMap<String, Option<u64>> {
+    let mut counts = unpriced_counts(r);
+    counts.retain(|name, _| !is_non_operation(name));
+    counts
+}
+
+/// The memory-size counters of `r` that the band lists but does not price.
+pub fn exempt_counts(r: &Record) -> BTreeMap<String, Option<u64>> {
+    let mut counts = unpriced_counts(r);
+    counts.retain(|name, _| is_non_operation(name));
+    counts
+}
+
 /// Total unpriced operations of `r` (counted ones only) and whether any
-/// unpriced counter has no count.
+/// unpriced operation counter has no count.  Memory-size counters
+/// ([`NON_OPERATION_COUNTERS`]) are not operations and are left out.
 pub fn unpriced_total(r: &Record) -> (u64, bool) {
-    let counts = unpriced_counts(r);
+    let counts = priced_counts(r);
     let missing = counts.values().any(Option::is_none);
     (counts.values().flatten().sum(), missing)
 }
@@ -174,6 +224,10 @@ pub struct BandRow {
     pub native_sum: Option<u64>,
     /// Unpriced counters that carry no count on some run.
     pub uncounted: Vec<String>,
+    /// Mean count per verified run of each memory-size counter
+    /// ([`NON_OPERATION_COUNTERS`]) the arm names: listed, not priced.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub exempt_mean_counts: BTreeMap<String, f64>,
 }
 
 /// The verdict for a pair of arms on one curve.
@@ -189,6 +243,9 @@ pub struct BandRank {
 pub struct BandReport {
     pub schema: String,
     pub weights: Vec<f64>,
+    /// The counters this report lists but does not price
+    /// ([`NON_OPERATION_COUNTERS`]); a band file states its own rule.
+    pub exempt_counters: Vec<String>,
     pub rows: Vec<BandRow>,
     pub ranks: Vec<BandRank>,
 }
@@ -219,7 +276,7 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
         let mut uncounted: Vec<String> = rs
             .iter()
             .flat_map(|r| {
-                unpriced_counts(r)
+                priced_counts(r)
                     .into_iter()
                     .filter(|(_, v)| v.is_none())
                     .map(|(k, _)| k)
@@ -235,6 +292,15 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
             native += u + n_c;
             native_ok &= !missing;
         }
+        let mut exempt_mean_counts: BTreeMap<String, f64> = BTreeMap::new();
+        for r in &ok {
+            for (name, n) in exempt_counts(r) {
+                *exempt_mean_counts.entry(name).or_insert(0.0) += n.unwrap_or(0) as f64;
+            }
+        }
+        for v in exempt_mean_counts.values_mut() {
+            *v /= ok.len() as f64;
+        }
         rows.push(BandRow {
             curve: curve.clone(),
             log2_r: (rs[0].workload.curve.r as f64).log2(),
@@ -245,6 +311,7 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
             charged_sum: (!ok.is_empty()).then_some(charged),
             native_sum: (!ok.is_empty() && native_ok).then_some(native),
             uncounted,
+            exempt_mean_counts,
         });
     }
     rows.sort_by(|a, b| {
@@ -288,6 +355,7 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
     Ok(BandReport {
         schema: "ecbench.band/v1".into(),
         weights: weights.to_vec(),
+        exempt_counters: NON_OPERATION_COUNTERS.iter().map(|s| s.to_string()).collect(),
         rows,
         ranks,
     })
@@ -348,5 +416,56 @@ mod tests {
                 assert!((from_sums / mean - 1.0).abs() < 1e-9, "{} w = {w}", row.arm);
             }
         }
+    }
+
+    /// A byte count in `cost.unpriced` is listed but neither priced nor a
+    /// blocker, even when it carries no count; an operation counter is
+    /// priced, and one without a count still blocks.
+    #[test]
+    fn memory_size_counters_are_listed_but_not_priced() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ic_planner_validation_20261020/sessions/r24");
+        let records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let base = records
+            .iter()
+            .find(|r| r.counts() && r.cost.total_gae.is_some())
+            .unwrap();
+        let (u0, missing0) = unpriced_total(base);
+        let g0 = priced_gae(base, 1.0).unwrap().unwrap();
+
+        let mut r = base.clone();
+        let name = "residual_table_bytes_uncharged";
+        r.cost.unpriced.push(name.to_string());
+        r.counters.insert(name.to_string(), 1_000_000);
+        assert_eq!(unpriced_counts(&r)[name], Some(1_000_000), "still listed");
+        assert_eq!(exempt_counts(&r)[name], Some(1_000_000));
+        assert!(!priced_counts(&r).contains_key(name));
+        assert_eq!(unpriced_total(&r), (u0, missing0), "not in U");
+        assert_eq!(priced_gae(&r, 1.0).unwrap().unwrap(), g0, "not in the price");
+
+        // Named without a count: an exempt counter does not block ranking.
+        r.counters.remove(name);
+        assert_eq!(unpriced_counts(&r)[name], None);
+        assert_eq!(unpriced_total(&r), (u0, missing0));
+        assert_eq!(priced_gae(&r, 1.0).unwrap().unwrap(), g0);
+
+        // An operation counter of the same size is priced at w.
+        let mut r = base.clone();
+        r.cost.unpriced.push("test_probes_uncharged".to_string());
+        r.counters
+            .insert("test_probes_uncharged".to_string(), 1_000_000);
+        assert_eq!(unpriced_total(&r).0, u0 + 1_000_000);
+        let g1 = priced_gae(&r, 1.0).unwrap().unwrap();
+        assert!((g1 - g0 - 1_000_000.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn the_exempt_list_names_only_byte_counters() {
+        for n in NON_OPERATION_COUNTERS {
+            assert!(n.contains("bytes") && n.ends_with("_uncharged"), "{n}");
+            assert!(is_non_operation(n));
+        }
+        assert!(!is_non_operation("hash_probes_uncharged"));
+        assert!(!is_non_operation("residual_table_entries"));
     }
 }
