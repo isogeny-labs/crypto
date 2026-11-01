@@ -1,0 +1,12 @@
+Oct 24 19:30:45 ip-172-31-3-58.us-east-2.compute.internal systemd[1]: Started twist-zero-native-gate-v5.service - /usr/bin/python3 tools/isolated_bench.py busy -- /bin/bash -x research/twist_index_calculus_20261020/zero_fiber_collector/run-native-gate.sh research/twist_index_calculus_20261020/zero_fiber_collector/runs/native-gate-v5 /home/ec2-user/scratch/twist-zero-fiber-target-v1.
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: + set -Eeuo pipefail
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: + trap 'printf "native gate stopped at line %s with exit %s\n" "$LINENO" "$?" >&2' ERR
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: + zero_out=research/twist_index_calculus_20261020/zero_fiber_collector/runs/native-gate-v5
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: + zero_target=/home/ec2-user/scratch/twist-zero-fiber-target-v1
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: + zero_study=research/twist_index_calculus_20261020/zero_fiber_collector
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: + zero_native=research/twist_index_calculus_20261020/endomorphism_image_base/native
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: + test '!' -e research/twist_index_calculus_20261020/zero_fiber_collector/runs/native-gate-v5
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: ++ printf 'native gate stopped at line %s with exit %s\n' 9 1
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal python3[2856316]: native gate stopped at line 9 with exit 1
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal systemd[1]: twist-zero-native-gate-v5.service: Main process exited, code=exited, status=1/FAILURE
+Oct 24 19:30:55 ip-172-31-3-58.us-east-2.compute.internal systemd[1]: twist-zero-native-gate-v5.service: Failed with result 'exit-code'.
