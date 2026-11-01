@@ -407,6 +407,26 @@ def alias_map_text(registry: dict) -> str:
     return json.dumps(doc, indent=0, ensure_ascii=False) + "\n"
 
 
+REGISTRY_INDEX = REPO / "src" / "cryptanalysis" / "ecbench" / "registry_index.tsv"
+
+
+def registry_index_text(registry_text: str) -> str:
+    """The registry index `crypto::cryptanalysis::ecbench::workload` compiles
+    in: every `"slug": "<slug>"` pair of the registry *text*, its first
+    occurrence in document order, sorted by slug, as one `<slug>\t<offset>`
+    line, the offset being the byte offset in the UTF-8 text of the opening
+    quote of the value.  A measured child cuts its curve's entry out of the
+    20 MB document at that offset instead of scanning the document to it.
+    Derived from the text, not the parsed document, because the offsets are
+    into the text; written beside the registry by build_curve_registry.py,
+    and check_curve_names.py fails when the two disagree."""
+    data = registry_text.encode("utf-8")
+    first: dict[bytes, int] = {}
+    for m in re.finditer(rb'"slug"\s*:\s*"([^"\\]*)"', data):
+        first.setdefault(m.group(1), m.start(1) - 1)
+    return "".join(f"{slug.decode()}\t{at}\n" for slug, at in sorted(first.items()))
+
+
 def load_registry(path: Path = REGISTRY) -> dict:
     return json.loads(path.read_text())
 

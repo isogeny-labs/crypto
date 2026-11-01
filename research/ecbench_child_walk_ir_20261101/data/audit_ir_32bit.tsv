@@ -3,5 +3,7 @@ baseline main 8a208fa570	b661f953d79dccd8	0	rho-neg	rho.negation	242782512	31726
 B: A + walk (ic_boundary)	0eff84e84d22b1a6	0	rho-neg	rho.negation	39232509	30093469	69591262	34156	881.06	marker run Collected 69617226
 baseline main 8a208fa570	b661f953d79dccd8	1	inc	ic.pipeline N=1024			1147910545	1446809		whole process only: --combine-dumps=yes --callgrind-out-file=/dev/null (a dump part per relation marker)
 B: A + walk (ic_boundary)	0eff84e84d22b1a6	1	inc	ic.pipeline N=1024			944194507	1446809		whole process only, as above
-C: B + registry index (workload, build.rs)	80f5ecb7079f01e2	0	rho-neg	rho.negation	2475446	30092508	32838412	34156	881.03	marker run Collected 32853939
-C: B + registry index (workload, build.rs)	80f5ecb7079f01e2	1	inc	ic.pipeline N=1024			907443128	1446809		whole process only, as above
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	0	rho-neg	rho.negation	243219672	31727893	275220629	34156	928.91	marker run Collected 275240510
+C: B + registry index (main 5ac38ef4e9)	6f9518ed5046cada	0	rho-neg	rho.negation	2218763	30093073	32594966	34156	881.05	marker run Collected 32595931
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	1	inc	ic.pipeline N=1024			1157017508	1446809		whole process only, as above
+C: B + registry index (main 5ac38ef4e9)	6f9518ed5046cada	1	inc	ic.pipeline N=1024			916254791	1446809		whole process only, as above

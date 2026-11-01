@@ -33,13 +33,18 @@ Three changes, measured as steps from the same baseline:
   negation class instead of two `mulmod(·, r − 1, r)`. Every value is the
   one the old code computed.
 - **C.** `registry_entry` (`ecbench::workload`) finds a curve's entry in
-  `docs/curves/registry.json` (20.8 MB, 20,817 entries, not sorted by slug)
-  through `REGISTRY_INDEX`, a table `build.rs` generates from the same
-  document at build time (every `"slug": "…"` pair's first occurrence,
-  sorted, with the byte offset of its value), and cuts the entry out at
-  that offset; the slug scan and the full parse stay as the fallback and
+  `docs/curves/registry.json` (20.8 MB, 20,848 entries, not sorted by slug)
+  through `registry_index.tsv`, an index written beside the registry by
+  `scripts/build_curve_registry.py` (every `"slug": "…"` pair's first
+  occurrence, sorted, with the byte offset of its value; `registry_index_text`
+  in `scripts/curve_id.py`), binary-searched as text and the entry cut out
+  at that offset; the slug scan and the full parse stay as the fallback and
   the entry is still checked to carry the slug, so every answer is the one
-  the full parse gives. Under B the 32-bit child still spent 37.0M of its
+  the full parse gives. `check_curve_names.py` and the unit test fail when
+  the index is stale, as for the alias table. (A `build.rs` generating the
+  index was tried first: it makes Cargo list every file of the package to
+  fingerprint the build script, which CI's partial clones fail; the arm C
+  rows were re-measured with the committed index.) Under B the 32-bit child still spent 37.0M of its
   39.2M pre-solve instructions in that scan (`str::find` from
   `Instance::facts`), because its curve's entry sits deep in the document;
   the 20-bit curve's entry is near the start, which is why the 20-bit
@@ -52,7 +57,8 @@ Three changes, measured as steps from the same baseline:
 | baseline | `main` 8a208fa570 (2026-10-31) | b8775974f8d8d876 (rebuilt for the 32-bit rows: see below) |
 | A | baseline + `curve_id.rs` | e6a5053058cd1b0b |
 | B | A + `ic_boundary.rs` | 0eff84e84d22b1a6 |
-| C | B + `workload.rs`, `build.rs` | 80f5ecb7079f01e2 |
+| baseline′ | `main` 5ac38ef4e9 (2026-11-01, the PR's base after merging `main`) | 9dd9e01b6b6b18a2 |
+| C | baseline′ + the three source files of A and B + `registry_index.tsv` | 6f9518ed5046cada |
 
 Inputs: the planned executions of two reduced copies of the frozen 20-bit
 holdout spec of `research/prime_base_oracle_tuning_20261029`
@@ -62,7 +68,11 @@ targets, one round; `inputs/spec-p32-profile.json`: `rho-neg` and `inc` at
 `audit-ir` and `profile-input` export are in `inputs/`. Sessions
 ECBS1haae438ff6051 (20-bit, 36 records) and ECBS1h8f9347fe1d3e (32-bit, 4
 records) were run with the baseline binary, L0 (`--cpus none`), and are
-replayed by every binary.
+replayed by every binary. A and B are read against the baseline; C, built
+after `main` was merged into the branch, against baseline′ (the same
+`main`): between the two bases the `ic.pipeline` solves grew 1.7% at 20
+bits for both arms (upstream changes to the IC code), which is why C's IC
+solve counts sit above B's.
 
 ## Instructions, 20-bit inputs (`audit-ir`; `data/audit_ir_20bit.tsv`)
 
@@ -71,13 +81,16 @@ replayed by every binary.
 | `rho.negation` (seq 0) | baseline | 206,896,333 | 1,295,567 | 1,706 | 759.4 |
 | | A | 3,341,048 | 1,296,509 | 1,706 | 760.0 |
 | | B | 3,331,282 | **1,222,380** | 1,706 | **716.5** |
-| | C | **2,437,871** | 1,222,603 | 1,706 | 716.7 |
+| | baseline′ | 207,188,998 | 1,296,397 | 1,706 | 759.9 |
+| | C | **2,178,485** | 1,223,171 | 1,706 | 717.0 |
 | `ic.pipeline` N=32 (seq 1) | baseline | 206,928,755 | 14,889,758 | 14,101 | 1,055.9 |
 | | A | 3,371,805 | 14,885,744 | 14,101 | 1,055.6 |
 | | B | 3,362,189 | 14,887,062 | 14,101 | 1,055.7 |
-| | C | **2,470,003** | 14,888,160 | 14,101 | 1,055.8 |
+| | baseline′ | 207,239,335 | 15,142,243 | 14,101 | 1,073.8 |
+| | C | **2,210,879** | 15,144,442 | 14,101 | 1,074.0 |
 | `ic.pipeline` N=45 (seq 2) | baseline | 206,920,193 | 10,123,197 | 10,632 | 952.1 |
-| | C | **2,459,162** | 10,113,927 | 10,632 | 951.3 |
+| | baseline′ | 207,250,032 | 10,275,946 | 10,632 | 966.5 |
+| | C | **2,203,539** | 10,267,606 | 10,632 | 965.7 |
 
 - A takes 98.4% of the pre-solve instructions out of every child
   (206.9M → 3.3M). The 3.3M that remain are the registry entry search, the
@@ -90,12 +103,13 @@ replayed by every binary.
   `TunedWalker`, and is unchanged. The 20-bit rho solve is 1,706 GAE, so its
   set-up (56 additions, 76 doublings) and verification are a visible share
   of the per-GAE figure; the 32-bit row below is the steady state.
-- C takes a further 0.9M out of every 20-bit child's pre-solve count
-  (3.3M → 2.4M): the scan to the 20-bit curve's entry near the start of
-  the registry. What remains is process start and the loader (0.6M), the
-  argument parser (0.5M, `clap`), the entry's own parse, the ICV1 identity
-  and the alias-table binary searches. The solve counts move by at most
-  0.1% between B and C (the name lookups a solve makes).
+- C takes a further 1.2M out of every 20-bit child's pre-solve count
+  (B 3.3M → 2.2M; against baseline′, 207.2M → 2.2M): the scan to the
+  20-bit curve's entry near the start of the registry. What remains is
+  process start and the loader (0.6M), the argument parser (0.5M, `clap`),
+  the entry's own parse, the ICV1 identity and the alias-table binary
+  searches. The solve counts move by at most 0.1% between baseline′ and C
+  (the name lookups a solve makes).
 
 ## Instructions, 32-bit inputs (`data/audit_ir_32bit.tsv`)
 
@@ -115,10 +129,12 @@ across the binaries; only wall-clock, scheduler and placement fields differ.
 |:--|:--|--:|--:|--:|--:|--:|
 | `rho.negation` (seq 0) | baseline | 274,792,709 | 242,782,512 | 31,726,911 | 34,156 | 928.9 |
 | | B | 69,591,262 | 39,232,509 | **30,093,469** | 34,156 | **881.1** |
-| | C | **32,838,412** | **2,475,446** | 30,092,508 | 34,156 | 881.0 |
+| | baseline′ | 275,220,629 | 243,219,672 | 31,727,893 | 34,156 | 928.9 |
+| | C | **32,594,966** | **2,218,763** | 30,093,073 | 34,156 | 881.1 |
 | `ic.pipeline` N=1024 (seq 1) | baseline | 1,147,910,545 | — | — | 1,446,809 | — |
 | | B | 944,194,507 | — | — | 1,446,809 | — |
-| | C | **907,443,128** | — | — | 1,446,809 | — |
+| | baseline′ | 1,157,017,508 | — | — | 1,446,809 | — |
+| | C | **916,254,791** | — | — | 1,446,809 | — |
 
 - The parse is the same constant per child at 32 bits: 203.5M Ir before
   the rho child's solve marker (242.8M → 39.2M; the 20-bit difference is
@@ -129,17 +145,20 @@ across the binaries; only wall-clock, scheduler and placement fields differ.
 - Of the 39.2M that remained before the 32-bit rho child's solve marker
   under B, 37.0M were the registry scan (`callgrind_annotate`: one
   `str::find` from `Instance::facts`); C cuts the entry out at the indexed
-  offset and leaves 2.5M, the same floor as the 20-bit children's 2.4M.
-  The IC child loses the same 36.8M (944.2M → 907.4M).
+  offset and leaves 2.2M, the same floor as the 20-bit children's 2.2M.
+  Against baseline′ the rho child's pre-solve count falls by 241.0M (the
+  203.5M parse and the 37.5M scan) and the IC child's whole process by
+  240.8M (1,157.0M → 916.3M).
 - `rho.negation` solve: 31.73M → 30.09M Ir for 34,156 GAE, 928.9 → 881.1
   Ir/GAE (−5.1%). The saving is in the walker's bookkeeping, which is a
   smaller share of a 32-bit step than of a 20-bit one (the extended-Euclid
   inversion runs more steps on 32-bit operands), hence 5.1% here against
   5.7% at 20 bits.
-- Whole process, the three changes together: 274.8M → 32.8M for the
-  32-bit rho child (−88.0%) and 1,147.9M → 907.4M for the IC child
-  (−20.9%); at 20 bits, where the solves are 1.2M and 14.9M, the child's
-  count goes from 208.2M to 3.7M (rho) and from 221.8M to 17.4M (IC N=32).
+- Whole process, the three changes together, baseline′ → C: 275.2M →
+  32.6M for the 32-bit rho child (−88.2%) and 1,157.0M → 916.3M for the
+  IC child (−20.8%); at 20 bits, where the solves are 1.2M and 15.1M, the
+  child's count goes from 208.5M to 3.4M (rho) and from 222.4M to 17.4M
+  (IC N=32).
 
 Run report with the command lines, host and completed runs:
 `reports/run-20261101T0130Z/REPORT.pdf`.

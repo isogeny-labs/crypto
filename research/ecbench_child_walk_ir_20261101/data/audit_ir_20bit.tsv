@@ -6,6 +6,9 @@ A: warm fix (curve_id)	e6a5053058cd1b0b	0	rho-neg	rho.negation	3341048	1296509	1
 A: warm fix (curve_id)	e6a5053058cd1b0b	1	inc	ic.pipeline N=32	3371805	14885744	14101	1055.65
 B: A + walk (ic_boundary)	0eff84e84d22b1a6	0	rho-neg	rho.negation	3331282	1222380	1706	716.52
 B: A + walk (ic_boundary)	0eff84e84d22b1a6	1	inc	ic.pipeline N=32	3362189	14887062	14101	1055.75
-C: B + registry index (workload, build.rs)	80f5ecb7079f01e2	0	rho-neg	rho.negation	2437871	1222603	1706	716.65
-C: B + registry index (workload, build.rs)	80f5ecb7079f01e2	1	inc	ic.pipeline N=32	2470003	14888160	14101	1055.82
-C: B + registry index (workload, build.rs)	80f5ecb7079f01e2	2	sel	ic.pipeline N=45	2459162	10113927	10632	951.27
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	0	rho-neg	rho.negation	207188998	1296397	1706	759.90
+C: B + registry index (main 5ac38ef4e9)	6f9518ed5046cada	0	rho-neg	rho.negation	2178485	1223171	1706	716.98
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	1	inc	ic.pipeline N=32	207239335	15142243	14101	1073.84
+C: B + registry index (main 5ac38ef4e9)	6f9518ed5046cada	1	inc	ic.pipeline N=32	2210879	15144442	14101	1074.00
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	2	sel	ic.pipeline N=45	207250032	10275946	10632	966.51
+C: B + registry index (main 5ac38ef4e9)	6f9518ed5046cada	2	sel	ic.pipeline N=45	2203539	10267606	10632	965.73

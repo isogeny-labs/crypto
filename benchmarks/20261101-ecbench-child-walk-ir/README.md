@@ -10,12 +10,13 @@ the run report is its `reports/run-20261101T0130Z/`.
   instructions before the solve marker per 20-bit child, instructions per
   GAE inside the solve (20- and 32-bit), the 20-bit child wall medians, and
   the whole-process 32-bit counts, for the baseline (`main` 8a208fa570) and
-  the three steps A, B, C.
+  the three steps A, B, C (C against the baseline rebuilt on the merged `main`).
 
-Headline (Callgrind Ir, deterministic): a 32-bit `rho.negation` child
-274.8M → 32.8M instructions (−88%), a 32-bit `ic.pipeline` child 1,147.9M →
-907.4M (−21%), a 20-bit rho child 208.2M → 3.7M; the `rho.negation` solve
-itself 928.9 → 881.0 Ir/GAE at 32 bits (−5.1%). Every record of both
+Headline (Callgrind Ir, deterministic, each arm against the `main` it was
+built on): a 32-bit `rho.negation` child 275.2M → 32.6M instructions
+(−88%), a 32-bit `ic.pipeline` child 1,157.0M → 916.3M (−21%), a 20-bit
+rho child 208.5M → 3.4M; the `rho.negation` solve itself 928.9 → 881.1
+Ir/GAE at 32 bits (−5.1%). Every record of both
 scratch sessions replays identically under every binary, so no counted
 cost, `S` or leaderboard row changes. Engineering.
 

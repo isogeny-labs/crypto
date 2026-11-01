@@ -26,8 +26,8 @@ def rows(name):
         return list(csv.DictReader(f, delimiter="\t"))
 
 
-COLOUR = {"baseline main 8a208fa570": "#555555", "A: warm fix (curve_id)": "#9ecae1", "B: A + walk (ic_boundary)": "#2f6db3", "C: B + registry index (workload, build.rs)": "#0b2e5c"}
-SHORT = {"baseline main 8a208fa570": "baseline (main)", "A: warm fix (curve_id)": "A: alias table", "B: A + walk (ic_boundary)": "B: A + walk", "C: B + registry index (workload, build.rs)": "C: B + registry index"}
+COLOUR = {"baseline main 8a208fa570": "#555555", "A: warm fix (curve_id)": "#9ecae1", "B: A + walk (ic_boundary)": "#2f6db3", "baseline main 5ac38ef4e9": "#9a9a9a", "C: B + registry index (main 5ac38ef4e9)": "#0b2e5c"}
+SHORT = {"baseline main 8a208fa570": "baseline (main)", "A: warm fix (curve_id)": "A: alias table", "B: A + walk (ic_boundary)": "B: A + walk", "baseline main 5ac38ef4e9": "baseline\u2032 (main 5ac38ef4e9)", "C: B + registry index (main 5ac38ef4e9)": "C: B + registry index"}
 
 fig, axes = plt.subplots(1, 4, figsize=(15.2, 3.9))
 
@@ -48,8 +48,8 @@ ax.set_xticks(range(len(seqs)))
 ax.set_xticklabels([t for _, t in seqs], fontsize=7.5)
 ax.set_ylabel("Callgrind Ir before the solve marker (log)", fontsize=7.5)
 ax.set_title("Per child, outside the solve (20-bit inputs)", fontsize=8.5)
-ax.legend(fontsize=6.5, frameon=False, loc="upper right")
-ax.set_ylim(1e6, 1e10)
+ax.legend(fontsize=6.3, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2)
+ax.set_ylim(1e6, 2e9)
 ax.tick_params(labelsize=7)
 
 # 2. Ir per GAE inside the solve, 20-bit and 32-bit, both methods.
@@ -64,9 +64,10 @@ for i, a in enumerate(arms):
     ax.bar(xs, vals, width=w, color=COLOUR[a], label=SHORT[a])
     for x, v in zip(xs, vals):
         if v:
-            ax.text(x, v + 15, f"{v:.0f}", ha="center", fontsize=5.6)
+            ax.text(x, v + 12, f"{v:.0f}", ha="center", va="bottom", fontsize=5.6, rotation=90)
 ax.set_xticks(range(len(cells)))
 ax.set_xticklabels([c[0] for c in cells], fontsize=7, rotation=12)
+ax.set_ylim(0, 1350)
 ax.set_ylabel("Callgrind Ir per GAE inside the solve", fontsize=7.5)
 ax.set_title("Per counted group operation (solve only)", fontsize=8.5)
 ax.tick_params(labelsize=7)
