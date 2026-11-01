@@ -1,5 +1,7 @@
 //! Phase-scoped native PMU and process counters. Missing counters remain missing.
 pub(crate) mod checked;
+#[cfg(target_os = "linux")]
+pub(crate) mod whole_worker;
 use serde_json::{json, Value};
 use std::path::Path;
 use std::time::Instant;
