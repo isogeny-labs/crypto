@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""One-shot dataset Job submission behind the full protocol admission gate.
+"""Offline consistency audit for a proposed full-campaign dataset Job.
 
-Dry-run is offline. Submission needs explicit, byte-bound grant/budget and native
-reservation records. A failed create is ambiguous: the intent is retained and
-this command never retries. Reconcile the named Job before any further action.
+This program never submits or activates a Job. A local receipt and its hash are
+not proof of IAM access, ledger debit, Kubernetes identity, or deployment safety.
 """
 
 from __future__ import annotations
@@ -12,17 +11,18 @@ import argparse
 import datetime as dt
 import hashlib
 import json
-import os
 import pathlib
-import subprocess
 import sys
-import tempfile
 
 import ml_dataset_launch_reconcile as launch
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import ml_dataset_full_protocol_check as protocol_check  # noqa: E402
+
+PLAN_FIELDS = ("schema", "field_sizes", "arities", "families", "solvers",
+               "curve_seeds", "generators", "keys", "seed", "factor_base_size",
+               "degree_bound", "work_limit", "twists", "protocol_sha256", "split_rule")
 
 
 def need(condition: bool, reason: str) -> None:
@@ -36,28 +36,49 @@ def checked_file(path: str) -> tuple[dict, str]:
     return value, digest
 
 
+def native_plan_binding_sha256(plan: dict) -> str:
+    """Mirror DatasetPlan::binding_sha256's typed serde field order."""
+    need(set(plan) == set(PLAN_FIELDS), "plan fields differ from native DatasetPlan")
+    ordered = {key: plan[key] for key in PLAN_FIELDS}
+    return hashlib.sha256(launch.canonical(ordered)).hexdigest()
+
+
+def protocol_body_sha256(protocol: dict) -> str:
+    """Canonical sorted-key body hash used by the native freeze check."""
+    body = {key: value for key, value in protocol.items() if key != "freeze"}
+    data = json.dumps(body, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=False, allow_nan=False).encode()
+    return hashlib.sha256(data).hexdigest()
+
+
 def admitted_inputs(args: argparse.Namespace) -> dict:
     # This is deliberately the first gate. The draft is refused before reading
     # other inputs or calling any external process, even for --dry-run.
     protocol, protocol_file_sha = checked_file(args.protocol)
-    errors = protocol_check.validate(protocol, admit=True)
+    admission, _ = checked_file(args.admission) if args.admission else ({}, "")
+    errors = protocol_check.validate(protocol, admit=True, admission=admission)
     need(not errors, "full protocol admission refused: " + "; ".join(errors))
+    need(protocol_body_sha256(protocol) == protocol["freeze"]["protocol_sha256"],
+         "frozen protocol body hash differs")
+    need(admission["protocol_file_sha256"] == protocol_file_sha,
+         "wave admission differs from exact protocol file bytes")
 
     for field in ("plan", "worker_grant", "budget", "reservation", "job"):
         need(bool(getattr(args, field)), f"--{field.replace('_', '-')} required after admission")
-    admission = protocol["execution"]["admission"]
     plan, plan_sha = checked_file(args.plan)
     grant, grant_sha = checked_file(args.worker_grant)
     budget, budget_sha = checked_file(args.budget)
     reservation, _ = checked_file(args.reservation)
     job, job_sha = checked_file(args.job)
-    need(plan_sha == admission["plan_sha256"], "plan bytes differ from admitted SHA256")
+    need(plan_sha == admission["plan_file_sha256"], "plan bytes differ from admitted SHA256")
+    plan_binding_sha = native_plan_binding_sha256(plan)
+    need(plan_binding_sha == admission["plan_sha256"], "native plan binding differs from admission")
     need(grant_sha == admission["worker_grant"]["sha256"], "worker grant bytes differ from admitted SHA256")
     need(budget_sha == admission["budget"]["sha256"], "budget bytes differ from admitted SHA256")
     need(job_sha == admission.get("job_sha256"), "Job bytes differ from admitted SHA256")
     need(plan.get("schema") == "crypto.ml-dataset.plan/v1", "wrong full plan schema")
-    need(plan.get("protocol_sha256") == protocol["freeze"]["protocol_sha256"],
-         "plan protocol binding differs from frozen protocol")
+    need(plan.get("protocol_sha256") == protocol_file_sha,
+         "plan protocol binding differs from exact protocol file")
     params = next(x["parameters"] for x in protocol["arms"] if x["id"] == "dataset")
     for plan_key, protocol_key in (("families", "families"), ("field_sizes", "n"),
                                    ("arities", "m"), ("solvers", "solvers")):
@@ -72,8 +93,8 @@ def admitted_inputs(args: argparse.Namespace) -> dict:
     instrument = next(x["instrument"] for x in protocol["arms"] if x["id"] == "dataset")
     for key, expected in (("source_commit", instrument["commit"]),
                           ("binary_sha256", instrument["binary_sha256"]),
-                          ("plan_sha256", plan_sha),
-                          ("protocol_sha256", protocol["freeze"]["protocol_sha256"])):
+                          ("plan_sha256", plan_binding_sha),
+                          ("protocol_sha256", protocol_file_sha)):
         need(binding[key] == expected, f"reservation {key} differs from admission")
     need(request["launch_id"] == admission["wave_id"], "wave ID differs from reservation")
     need(request["target"]["namespace"] == "isolab", "unexpected Job namespace")
@@ -91,6 +112,7 @@ def admitted_inputs(args: argparse.Namespace) -> dict:
     need((meta.get("annotations") or {}).get("dataset.isolabs.dev/reservation-sha256") == reservation_sha,
          "Job reservation annotation differs")
     spec = job.get("spec") or {}
+    need(spec.get("suspend") is True, "proposed Job must remain suspended")
     need(spec.get("backoffLimit") == 0 and spec.get("parallelism") == 1 and
          spec.get("completions") == 1, "Job retries or parallelism are not admitted")
     need(type(spec.get("activeDeadlineSeconds")) is int and
@@ -104,6 +126,9 @@ def admitted_inputs(args: argparse.Namespace) -> dict:
          "Job does not start reviewed dataset worker")
     need(pod.get("restartPolicy") == "Never" and pod.get("automountServiceAccountToken") is False,
          "Job worker retry or token policy differs")
+    need(not any(key in pod for key in ("hostNetwork", "hostPID", "hostIPC",
+                                       "initContainers", "ephemeralContainers")),
+         "proposed Job contains unreviewed pod execution fields")
     # This is the pre-Job worker-access grant, not the native budget WorkerGrant
     # (which is minted only after the Job/Pod owner UIDs have been observed).
     need(grant.get("schema") == "crypto.ml-dataset.worker-access-admission/v1" and
@@ -119,66 +144,25 @@ def admitted_inputs(args: argparse.Namespace) -> dict:
          budget.get("cap_usd") == admission["budget"]["cap_usd"],
          "budget receipt is not approved for admitted wave and region")
     return {"schema": "crypto.ml-dataset.campaign-submit-preflight/v1",
-            "protocol_file_sha256": protocol_file_sha, "plan_sha256": plan_sha,
+            "protocol_file_sha256": protocol_file_sha, "plan_file_sha256": plan_sha,
+            "plan_sha256": plan_binding_sha,
             "worker_grant_sha256": grant_sha, "budget_sha256": budget_sha,
             "reservation_sha256": reservation_sha, "job_sha256": job_sha,
             "wave_id": admission["wave_id"], "job_name": target["job_name"],
             "namespace": target["namespace"]}
 
 
-def exclusive_json(path: pathlib.Path, value: dict) -> None:
-    data = json.dumps(value, sort_keys=True, separators=(",", ":")).encode() + b"\n"
-    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
-    with os.fdopen(fd, "wb") as out:
-        out.write(data)
-        out.flush()
-        os.fsync(out.fileno())
-    parent = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
-    try:
-        os.fsync(parent)
-    finally:
-        os.close(parent)
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--dry-run", action="store_true")
-    mode.add_argument("--submit", action="store_true")
-    for name in ("protocol", "plan", "worker-grant", "budget", "reservation", "job",
-                 "intent", "kubeconfig", "context"):
+    parser.add_argument("--dry-run", action="store_true", required=True)
+    for name in ("protocol", "admission", "plan", "worker-grant", "budget", "reservation", "job"):
         parser.add_argument("--" + name, required=name == "protocol")
-    parser.add_argument("--kubectl", default="kubectl")
     args = parser.parse_args(argv)
     try:
         receipt = admitted_inputs(args)
-        if args.dry_run:
-            print(json.dumps({**receipt, "status": "admitted_offline_dry_run", "cloud_requests": 0},
-                             sort_keys=True))
-            return 0
-        need(bool(args.intent and args.kubeconfig and args.context),
-             "--submit requires --intent, --kubeconfig and --context")
-        need(pathlib.Path(args.kubeconfig).is_file(), "kubeconfig missing")
-        # Bind the exact checked bytes to create; never give kubectl a mutable
-        # caller path. An exclusive durable intent prevents blind resubmission.
-        _, job_bytes_sha = checked_file(args.job)
-        need(job_bytes_sha == receipt["job_sha256"], "Job changed after preflight")
-        exclusive_json(pathlib.Path(args.intent), {**receipt, "status": "create_attempt_started",
-                                                   "created_at": dt.datetime.now(dt.timezone.utc).isoformat()})
-        with tempfile.TemporaryDirectory(prefix="dataset-submit-") as temp:
-            job_bytes = pathlib.Path(args.job).read_bytes()
-            need(hashlib.sha256(job_bytes).hexdigest() == receipt["job_sha256"],
-                 "Job changed after intent; reconcile intent before retry")
-            manifest = pathlib.Path(temp, "job.json")
-            manifest.write_bytes(job_bytes)
-            result = subprocess.run([args.kubectl, "--kubeconfig", args.kubeconfig,
-                                     "--context", args.context, "create", "-f", str(manifest)],
-                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                                    check=False)
-        exclusive_json(pathlib.Path(args.intent + ".result.json"),
-                       {**receipt, "create_exit_code": result.returncode,
-                        "status": "create_returned_reconcile_job_uid"})
-        return 0 if result.returncode == 0 else 3
+        print(json.dumps({**receipt, "status": "local_consistency_only",
+                          "cloud_requests": 0, "launch_authorized": False}, sort_keys=True))
+        return 0
     except (OSError, ValueError, TypeError, KeyError, IndexError) as exc:
         print(f"dataset submission refused: {exc}", file=sys.stderr)
         return 2
