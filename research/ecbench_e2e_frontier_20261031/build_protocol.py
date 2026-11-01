@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the canonical umbrella protocol for the nine ECBench jobs."""
+"""Build the draft umbrella protocol for the ECBench frontier refresh."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-COMMIT = "48c8a4767d2d1eed6a7b379f74410bc729239380"
-BINARY = "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b"
+COMMIT = "ff7ad61cfed11908fb79de9dd485b696d0ada779"
+BINARY = "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d"
 
 
 def instrument() -> dict:
@@ -43,9 +43,13 @@ def protocol() -> dict:
         {
             "id": "koblitz-rho-v2",
             "role": "reference",
-            "description": "rho.signed_frobenius_strong_v2 in every Koblitz spec",
+            "description": "rho.signed_frobenius_strong_v2 plus a preregistered strong-escape comparison in every Koblitz frontier cell",
             "instrument": instrument(),
-            "parameters": {"method": "rho.signed_frobenius_strong_v2", "specs": "koblitz-n13,n19,n23,n31"},
+            "parameters": {
+                "method": "rho.signed_frobenius_strong_v2",
+                "additional_reference": "rho.signed_frobenius_strong_escape",
+                "specs": "draft koblitz-n13,n19,n23,n31; final shards pending",
+            },
             "same_instrument_as": "prime-rho-v2",
         },
         {
@@ -84,8 +88,10 @@ def protocol() -> dict:
         "links": {
             "manifest": "execution/manifest.json",
             "coverage": "coverage.json",
+            "implementations": "IMPLEMENTATIONS.md",
             "literature": "LITERATURE.md",
             "blocker": "execution/BLOCKER.md",
+            "publication": "execution/publication.json",
         },
         "question": (
             "What is the cold one-target E2E performance frontier of every current applicable ECBench candidate, "
@@ -118,7 +124,7 @@ def protocol() -> dict:
         "hypotheses": [
             {
                 "id": "H1",
-                "statement": "The current cold one-target IC candidates remain above matched rho on the four prime and four Koblitz cells.",
+                "statement": "The current cold one-target IC candidates remain above matched rho on the four prime and the medium/scaling Koblitz cells; the one-column generator-orbit fixed-setup panel is a separately classified engineering crossover.",
                 "mechanism": "relation probability, factor-base/setup work, and algebraic closure dominate the constant-factor backend gains",
                 "predictions": [
                     {
@@ -266,7 +272,7 @@ def protocol() -> dict:
             "queue": "cpu-l2-spot",
             "placement": {"instance_type": "c8a.2xlarge", "cpus": 4, "spot": True},
             "measurement_class": "measurement",
-            "timeout_seconds": 86400,
+            "timeout_seconds": 3600,
             "checkpoint": {
                 "policy": "none",
                 "interval_seconds": None,
@@ -277,7 +283,7 @@ def protocol() -> dict:
             "retries": {"infrastructure_only": True, "max_attempts": 1},
         },
         "stopping_rules": [
-            {"rule": "fixed design: nine specs, eight targets, one warmup and six measured rounds; retain all outcomes", "kind": "fixed_n", "preregistered": True},
+            {"rule": "draft design: candidate/reference/A-A shards, eight targets, one warmup and six measured rounds; exact shard roster must be fixed before freeze", "kind": "fixed_n", "preregistered": True},
             {"rule": "a per-execution timeout is a censored row, never a zero-cost row and never silently retried", "kind": "budget", "preregistered": True},
             {"rule": "stop without rank promotion if no authenticated EKS route or trusted image digest is available", "kind": "invalidation", "preregistered": True},
         ],

@@ -19,7 +19,7 @@ cargo build --release
 export DATABASE_URL='postgres://postgres@localhost:5432/ecdb' ECDB_PG_TLS=disable
 
 ./target/release/ecdb migrate                      # schema ec, eight migrations
-./target/release/ecdb import --repo-root .. all    # registry, walks, traits, covers, transfers, certificates, derived, enrich
+./target/release/ecdb import --repo-root .. all    # registry ... enrich, siblings, results, ecbench
 ./target/release/ecdb serve                        # http://0.0.0.0:8080
 
 curl -s localhost:8080/v1/meta
@@ -45,6 +45,30 @@ curl -s -X POST localhost:8080/v1/sql -H 'content-type: application/json' \
   - twist, isomorphism and model-change relations;
   - cyclic group structures where gcd(n, q - 1) decides them;
   - p-ranks and Hasse invariants.
+- `siblings` reads the sibling checkouts beside this one (`../cryptanalysis`,
+  `../crypto-autoresearcher`, `../cryptanalysis-rl`, `../ml-cryptanalysis`;
+  the file list is in `src/import/siblings.rs`):
+  - it keeps their curve and factor-base records in
+    `external_curve_record`;
+  - it links a record only through an exact EC1, curve_uid, ICV1 slug or
+    unique standard name;
+  - it imports prime-field dataset curves under their computed ICV1 slugs,
+    with their measurements.
+- `results` loads `docs/ic/leaderboard.json`, `progress-timeline.json`,
+  `boundary_targets.json` and the `benchmarks/` index.
+- `ecbench` loads every ecbench session under the checkout: about 1,100
+  sessions and 543k runs, in 8 minutes.
+- `generated PATH...` loads the JSONL that `sage/generate.sage` writes:
+  - the census of every curve over F_p (p < 2^10) and over GF(2^m) (m ≤ 10);
+  - random and CM prime-field curves at 32–256 bits, with their twists;
+  - BN, BLS and KSS pairing curves;
+  - random genus-2 Jacobians.
+
+  Every record is re-verified first (ICV1, Hasse, [N]P = O, [r]G = O,
+  Miller–Rabin, embedding degree, genus-2 L-polynomials). See
+  [`sage/README.md`](sage/README.md).
+- `ecdb pack --out DIR` writes what the Lambda package carries instead of
+  those directory trees (`deploy/build-lambda.sh`).
 - `lmfdb-av-fq <file>` loads an LMFDB `av_fq_isog` JSON export (isogeny
   classes of abelian varieties over finite fields, any dimension). Each label
   is recomputed from its Weil polynomial and must match.
@@ -68,6 +92,11 @@ record it refused, with the reason.
 | `GET /v1/curves/{ref}/relations` | quadratic twists, isomorphisms and model changes to other curves |
 | `GET /v1/curves/{ref}/endomorphisms` | Frobenius, GLV (with eigenvalue) and subfield-tau endomorphisms, GLV decomposition lattices |
 | `GET /v1/curves/{ref}/division-polynomials` | psi_2..psi_5 in x, ascending coefficients over the curve's field |
+| `GET /v1/curves/{ref}/measurements` | the curve's IC leaderboard rows and recipes, ecbench arm summaries, sibling-dataset measurements and sibling-repository records |
+| `GET /v1/ic/leaderboard?family=&regime=&validation=&recipes=` | the IC leaderboard: families with units and references, priced rows |
+| `GET /v1/ic/progress?series=`, `GET /v1/ic/boundary?regime=&stage=` | the progress timeline; the boundary ledger |
+| `GET /v1/benchmarks?listed=&q=` | the `benchmarks/` index with each entry's `VALIDATION.json` |
+| `GET /v1/ecbench/sessions`, `GET /v1/ecbench/sessions/{id}` | ecbench sessions; one session with per-arm summaries and comparisons |
 | `GET /v1/isogenies/{id}` | one isogeny |
 | `GET /v1/isogeny-classes`, `GET /v1/isogeny-classes/{label}` | isogeny classes over F_q by Weil polynomial, any dimension |
 | `GET /v1/fields`, `GET /v1/fields/{id}` | field representations |
@@ -77,7 +106,7 @@ record it refused, with the reason.
 | `GET /v1/class-polynomials`, `GET /v1/summation-polynomials` | H_D for class number one; Semaev S_2, S_3 |
 | `POST /v1/sql` | one read-only query |
 | `POST /v1/evidence`, `POST /v1/isogenies` | token-gated agent writes |
-| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): nine tools over the routes above |
+| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): eleven tools over the routes above |
 
 Integers beyond 2^53 come back as decimal strings. Unknown values are
 `null` with a status, never 0. An ambiguous name returns 409 with the
