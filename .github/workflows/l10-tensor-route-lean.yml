@@ -1,0 +1,40 @@
+name: L10 tensor route Lean proof
+
+on:
+  pull_request:
+    paths:
+      - 'research/ic_prime_eth_leads_20261031/lean/**'
+      - 'research/ic_prime_eth_leads_20261031/leads/L10/**'
+      - '.github/workflows/l10-tensor-route-lean.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/ic_prime_eth_leads_20261031/lean/
+            /research/ic_prime_eth_leads_20261031/leads/L10/
+            /tools/lean/
+            /.github/workflows/l10-tensor-route-lean.yml
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build and audit both tensor route sources
+        run: |
+          tools/lean/proof-gate.sh --out receipts \
+            research/ic_prime_eth_leads_20261031/lean \
+            research/ic_prime_eth_leads_20261031/leads/L10
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l10-tensor-route-lean-receipts
+          path: receipts/
