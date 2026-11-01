@@ -48,6 +48,10 @@ trap finish EXIT
 [[ "$(sha256sum "$BIN/pdp" | cut -d' ' -f1)" == "$EXPECTED_PDP" ]]
 [[ "$(sha256sum "$BIN/top" | cut -d' ' -f1)" == "$EXPECTED_TOP" ]]
 printf '%s  %s\n' f7325211302b4ca21f98ea9a7022d2dcc023b29ea2fad9329867e90b75a01c82 "$MATCHED" | sha256sum -c -
+aws s3 ls "$DEST" --recursive > "$HERE/pre-run-s3-list.txt"
+[[ ! -s "$HERE/pre-run-s3-list.txt" ]] || { echo 'candidate output prefix is not empty; refusing duplicate run' >&2; exit 3; }
+ps -eo pid=,args= | awk '($2 ~ /pdp$/ && $3 == "generate") || ($2 ~ /top$/ && ($3 == "single" || $3 == "single-replay"))' > "$HERE/pre-run-processes.txt"
+[[ ! -s "$HERE/pre-run-processes.txt" ]] || { echo 'candidate PDP/top process already active; refusing duplicate run' >&2; exit 4; }
 
 mkdir -p "$BASE_LOCAL/data"
 cp "$BASE_RECOVERY/restored/data/index.json" "$BASE_LOCAL/data/index.json"
