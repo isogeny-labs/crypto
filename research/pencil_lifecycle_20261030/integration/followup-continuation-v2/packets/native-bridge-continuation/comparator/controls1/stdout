@@ -1,0 +1,20 @@
+/var/tmp/pencil-projective-comparator-20261101-v1/ComparatorControls.lean:11:61: error: Tactic `decide` failed for proposition
+  ¬∀ (i j : Fin 4),
+      ((if i = 0 then 1 else 0) * if j = 1 then 1 else 0) = (if j = 0 then 1 else 0) * if i = 1 then 1 else 0
+because its `Decidable` instance
+  instDecidableNot
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decidable_of_decidable_of_iff`, `decidable_of_iff`, `instDecidableEqRat`, `instDecidableNot`, `Int.decEq`, `Int.instDecidableEq`, `Nat.decidableBallLT`, `Nat.decidableForallFin`, and `instDecidableEqRat.decEq`, reduction got stuck at the `Decidable` instance
+  match ((if ⟨0, ⋯⟩ = 0 then 1 else 0).mul (if ⟨0, ⋯⟩ = 1 then 1 else 0)).num,
+    ((if ⟨0, ⋯⟩ = 0 then 1 else 0).mul (if ⟨0, ⋯⟩ = 1 then 1 else 0)).num with
+  | Int.ofNat a, Int.ofNat b =>
+    match decEq a b with
+    | isTrue h => isTrue ⋯
+    | isFalse h => isFalse ⋯
+  | Int.ofNat a, Int.negSucc a_1 => isFalse ⋯
+  | Int.negSucc a, Int.ofNat a_1 => isFalse ⋯
+  | Int.negSucc a, Int.negSucc b =>
+    match decEq a b with
+    | isTrue h => isTrue ⋯
+    | isFalse h => isFalse ⋯

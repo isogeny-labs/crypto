@@ -1,0 +1,10 @@
+/var/tmp/pencil-signed-graph-algebra-20261101-v1/GraphAlgebra.lean:50:2: error: unknown tactic
+/var/tmp/pencil-signed-graph-algebra-20261101-v1/GraphAlgebra.lean:47:46: error: unsolved goals
+K : Type u_1
+inst✝ : CommRing K
+pu pv : Potential K
+su sv u v ru rv a b k : K
+hu : u = eval pu ru k
+hv : v = eval pv rv k
+he : su * (pu.s * ru + pu.a + pu.b * k) + sv * (pv.s * rv + pv.a + pv.b * k) = a + b * k
+⊢ su * pu.s * ru + sv * pv.s * rv = a - su * pu.a - sv * pv.a + (b - su * pu.b - sv * pv.b) * k

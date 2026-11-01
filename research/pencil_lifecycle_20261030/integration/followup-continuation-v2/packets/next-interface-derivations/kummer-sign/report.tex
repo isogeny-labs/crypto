@@ -1,0 +1,13 @@
+\documentclass[11pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\usepackage{amsmath}\begin{document}
+\title{Ordinary Kummer sign recovery: next interface}\author{Source-bound written derivation}\date{1 November 2026}\maketitle
+\paragraph{Derived component.} Under the ordinary chart identity, the source delta-lift loop has at most two distinct candidates, related by simultaneous negation. Its present assertion allows four. This sharper bound is algebraic; no historical counter is changed.
+Let $u=X^2+a_1X+a_0$, $v=b_0+b_1X$ and $f\bmod u=R_0+R_1X$. Validity gives
+\[b_0^2-a_0b_1^2=R_0,\qquad 2b_0b_1-a_1b_1^2=R_1.\]
+The native decoded chart intends to supply $S=b_1^2$. If $S\ne0$, the two roots $\pm t$ force $b_0=(R_1+a_1S)/(2b_1)$, yielding opposite pairs. If $S=0$, then $b_1=0$ and $b_0^2=R_0$; again there are at most two opposite pairs. This works over any field of characteristic not2, with no $a_0\ne0$ or squarefree-$u$ requirement for this local argument.
+\paragraph{Orientation datum.} The ordered pair $\pi(D),\pi(D+G)$ fixes the sign when the relevant quotient fibers are $\{D,-D\}$ and $2G\ne0$. Both opposite signs passing the neighbour test would force either $2D=0$ (identical candidates) or $2G=0$. The chart identity supplying $u,S$, complete neighbour-chart fibers and primitive correctness remain concrete obligations.
+\paragraph{Relation interface.} For distinct split roots, signed recovery supplies $y_i=v(x_i)$ and the graph equation
+\[s_0L(x_0)+s_1L(x_1)=aG+bQ.\]
+Replacing $D$ by $-D$ requires negating labels as well as node signs. The adjacent pair or two candidate signs supply one relation, not two independent rows. Native deduplication uses $\min(D,-D)$; discarded duplicates still incur recovery work.
+\paragraph{Repair distinction.} $M^2=cI$ proves nonzero preservation with bounded row-fold arithmetic. The additional geometric equation $L_T\pi(P)=\pi(P+T)$ and $2T=0$ explains why applying the repair twice returns the intended sum. Even identity matrices satisfy the square-scalar condition, so it cannot identify a designated nonzero torsion translation by itself.
+\paragraph{Evidence.} Three native source files match published5cd0a45205. Eleven fixed native algebra assertions passed, including wrong independent sign, two-torsion-anchor ambiguity and wrong graph orientation. No curves were computed. This is a written derivation awaiting independent review, not a new Lean theorem or measurement. Detailed equations, source lines and missing obligations accompany this PDF.
+\end{document}
