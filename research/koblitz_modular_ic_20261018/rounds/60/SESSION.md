@@ -67,3 +67,17 @@ Leanterminalresults,exactrecords/report/custody and finalPR update;thenR61cubica
 
 ### Errors
 One metadata Python string-assembly syntaxerror fixed using a separate Typst include;no math/data affected. Initialnative indexedincrementfailure remains excluded. Noacceptedmathproducer repeated.
+
+## 2026-11-01T18:01:30.866571+00:00 — Lean import repair after terminal failure
+
+### What was done
+infinity-lean60-01 compileexit1;Mathlib.Tactic.Omega.olean is absent. The core Lean.Elab.Tactic.Omega.olean exists in the pinnedtoolchain. Rawfailure retained;no audit attempted.
+
+### Decisions made
+Use the existing coreOmega import,freezebeforefresh02 under identicalcaps. No new build/toolchain/dependency or accepted producer repeat.
+
+### Open threads
+Lean02,bothfailedattemptrecords,report/custody/finalPR;then cubic818andcompleteCartier-sourceconstruction.
+
+### Errors
+Missingmathlibmoduleimport,not disproved bound or mathematicalnull. Metadatarecorder followsfresh02 only after acceptance.

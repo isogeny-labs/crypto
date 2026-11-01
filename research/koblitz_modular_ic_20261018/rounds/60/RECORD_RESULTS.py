@@ -35,8 +35,8 @@ for d in sorted((h/'runs').iterdir()):
   pins.append({'attempt':d.name,'artifact':local,'revision':rev,'git_source':path,'sha256':hashlib.sha256(actual).hexdigest()})
  rows.append(row)
 accepted={r['attempt']:r for r in rows if r['status']=='accepted'}
-assert all(n in accepted for n in ['mixed60-02','cohort60-01','check60-01','infinity-lean60-01'])
-result={'schema':'koblitz.results/v1','round':60,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':sorted(accepted['infinity-lean60-01']['audited_declarations'])}
+assert all(n in accepted for n in ['mixed60-02','cohort60-01','check60-01','infinity-lean60-02'])
+result={'schema':'koblitz.results/v1','round':60,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':sorted(accepted['infinity-lean60-02']['audited_declarations'])}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 protocols=[]
 for row in rows:

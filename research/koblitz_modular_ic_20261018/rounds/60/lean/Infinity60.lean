@@ -1,6 +1,6 @@
 import Mathlib.Data.Finset.Card
 import Mathlib.Data.Fintype.Prod
-import Mathlib.Tactic.Omega
+import Lean.Elab.Tactic.Omega
 
 namespace Infinity60
 
