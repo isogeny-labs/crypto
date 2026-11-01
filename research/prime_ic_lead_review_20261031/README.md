@@ -4,10 +4,14 @@
 
 **Repository revision reviewed:** `2c03791383f4bb4ce200e84bdef4309065c61e7f`
 
-**Status:** literature and repository assessment complete; no scientific run was
-started; one controlled SAT-screen protocol is drafted but deliberately not
-frozen until its native generator, solver identities, power check and preflight
-cost are available.
+**Correction audit base:** `c5d13654`
+
+**Status:** corrected after review; no scientific run was started. The arity
+and solver-model correction is recorded in
+[`DEC-20261031-cd6460.md`](DEC-20261031-cd6460.md). One controlled
+arity-three CDCL(T)/finite-field screen is drafted but deliberately not frozen
+until its native generator, theory-propagator source, solver identities, power
+check and preflight cost are available.
 
 ## Result
 
@@ -27,18 +31,23 @@ solver is the right engine**. The source explicitly preserves an
 `O(mb)`-edge tensor network because a conventional circuit-to-CNF reduction
 loses the required size bound.
 
-The best experiment for the narrower “off-the-shelf SAT solvers are the lead”
-hypothesis is therefore not another direct Semaev bit-blast. It is a matched
-solver tournament on the **shared divisor-coefficient / quotient-remainder
-predicate**, with exact enumeration, F4, CDCL, CNF-XOR and finite-field SMT on
-the same selected chart. That representation is the most relevant open local
-candidate that has not already received a decisive SAT screen.
+The best experiment for the narrower practical-solver hypothesis is therefore
+not another direct Semaev bit-blast and not ordinary CNF. It is a matched
+arity-three tournament on a **one-hot, disjoint-window, chained-`S3`
+predicate**, using hybrid CDCL(T) with an `F_p` theory or cvc5 `QF_FF`, with
+exact enumeration and F4 as controls. Pure CNF is only an encoding-cost
+control: although the quotient ring `F_p[z]/(z^2-z)` avoids carries, a general
+field multiplication still costs `Theta(log^2 p)` Boolean gates when
+bit-blasted.
 
-The established algebraic fallback and control is the **PKM rational-map tower
-at arity `m >= 4`**. It is more mature, but current data are adverse: measured
-F4 solving degrees at `m = 4`, `N = 8,12,16` are `6,7,7`, while the complete
-cost model requires degree at most `4` at `m = 4` to reach rho. The decisive
-`N = 20` last-fall/solver cell remains resource-censored.
+The arity gate is structural. If a point-decomposition query at factor-base
+scale `s=log2(p)/m` costs `2^(e s)`, relation collection costs
+`p^((e+1)/m)` up to polynomial factors and can beat rho only if
+`e < m/2 - 1`. At `m=2` this is impossible; exact pair enumeration is already
+optimal up to polynomial factors. Every theorem and completed measurement in
+the newer split-graph factor-base study is at `m=2`, so none is an
+exponent-changing result. The first relevant fixed arity is `m=3`, with the
+strict gate `e<0.5`.
 
 ### Ranked portfolio
 
@@ -48,8 +57,8 @@ prime-field relation oracle, not by implementation convenience.
 | rank | lead | present evidence | next discriminating action |
 |---:|---|---|---|
 | 1 | Hashed factor bases + compact Boolean tensor contraction | Conditional end-to-end theorem chain; native implementation and bounded controls exist; no independent general proof/code audit or practical recursive run | Audit the theorem-to-code bridge lemma by lemma; separately execute the already frozen 84-case finite panel |
-| 2 | Shared divisor coefficients + quotient/remainder membership, solved by SAT/XOR/SMT/F4 | Exact selected-chart witnesses at tiny size; no unknown-solve scaling; literal norm-to-BTN translation is too large for the tensor theorem | Run the controlled representation/solver tournament in [PROTOCOL.md](PROTOCOL.md) after completing and freezing [protocol.draft.json](protocol.draft.json) |
-| 3 | PKM tower generalized root finding, `m >= 4` | Published prime-field construction; extensive local F4/last-fall evidence; `m <= 3` cannot beat rho in the recorded complete-cost model | Complete the registered `m = 4, N = 20` closure and encode the identical systems for SAT as a solver-control arm |
+| 2 | Arity-three one-hot chained `S3`, solved by CDCL(T)/`F_p` or `QF_FF` | Rationality is free under the guarded disjoint-window argument; no measured PDP exponent; pure CNF has a `Theta(log^2 p)` multiplication expansion | Freeze the `m=3`, `s=6..14` exponent screen in [PROTOCOL.md](PROTOCOL.md), retaining enumeration and curve-free-null controls |
+| 3 | PKM tower generalized root finding, `m >= 4` | Published prime-field construction and extensive F4/last-fall evidence; the correct generic gate is `e < m/2-1`, not “`m<=3` is impossible” | Keep as a distinct algebraic control; complete the registered `m=4, N=20` closure without using it to validate the arity-three solver claim |
 | 4 | Target-parametric learned-clause / tensor-message reuse | A plausible relation-collection amortization mechanism; no controlled prime-field evidence | Compare cold one-target, reset, and target-assumption reuse while preserving target-independent state provenance |
 | 5 | Special-`j`, Solinas-prime and chart-aware Boolean encodings | Sparse formulas and cheaper modular reduction are plausible constant improvements; no exponent-changing evidence | Factorial control: special versus generic curve and prime, with the same order, chart, predicate and solver |
 
@@ -63,7 +72,7 @@ Editable source: [lead-funnel.dot](figures/lead-funnel.dot), vector rendering:
 | requested item | status | evidence |
 |---|---|---|
 | Identify the best prime-field index-calculus lead | **complete as a scoped assessment** | Primary-source pins below; ranked portfolio above; machine-readable [lead-matrix.json](lead-matrix.json) |
-| Test the suspicion that SAT solvers are the lead | **partially complete** | The hypothesis is split into tensor/#SAT and ordinary CDCL; prior direct-SAT evidence is reviewed; a controlled new screen is designed but not run |
+| Test the suspicion that SAT solvers are the lead | **partially complete** | The hypothesis is split into tensor/#SAT, hybrid CDCL(T)/`F_p`, and pure-CNF controls; prior direct-SAT evidence is reviewed; a corrected arity-three screen is designed but not run |
 | Review prior work in `isogeny-labs/crypto` | **complete for the load-bearing prime-field paths listed below** | Current `main`, latest session log, prime IC program, SAT/SMT reports, PKM/fall-degree work, one-shot coefficient work, tensor implementation/audits and the cross-repository lead atlas |
 | Identify multiple candidates | **complete** | Five ranked leads plus explicit deprioritized/closed routes |
 | Devise experiments that can support or falsify the hypotheses | **complete at protocol-design scope** | Five experiment cards below; one `experiment.protocol/v1` draft; existing frozen protocols and amendments reused rather than duplicated |
@@ -77,11 +86,12 @@ This review keeps three questions separate.
    the hypotheses used by the ECDLP reduction, and does the implementation
    realize those hypotheses with the claimed bit cost?
 2. **Representation question:** can the decomposition predicate remain compact
-   enough that a solver receives structure rather than an expanded
-   `O(b^2 log b)` verification circuit?
-3. **Practical solver question:** on that same predicate, do CDCL, XOR, SMT or
-   F4 prune enough work to change the observed growth, with complete
-   correctness and cost accounting?
+   enough that a solver receives field constraints through an `F_p` theory,
+   rather than a pure-CNF expansion with `Theta(log^2 p)` gates per general
+   multiplication?
+3. **Practical solver question:** on that same predicate, do CDCL(T), `QF_FF`
+   or F4 reduce the fitted PDP exponent below the strict arity-three threshold
+   `e=0.5`, with complete correctness and cost accounting?
 
 A positive answer to question 3 would not prove question 1. A failure of one
 CNF encoding would not refute question 1. This distinction is the main reason
@@ -139,14 +149,15 @@ measurement.
 | Naive prime Semaev Gröbner systems | Atlas row `LEAD-ICE-prime-field-semaev-solving-degree`; local reference-arm work measures rapidly growing cold solve cost | Closed as the headline formulation; retain as a correctness/reference arm |
 | Direct QF_BV and QF_FF SMT | [`prime_field_smt_20261005`](../prime_field_smt_20261005/RESULT.md): coordinate and `S3` encodings all returned `unknown` at 120 s on a 20-bit case while native lookup found a witness | Do not repeat unchanged |
 | Direct Z3 Semaev bit-blast and LQ-CDCL | [`sat_smt_prime_ic_design_20261030`](../sat_smt_prime_ic_design_20261030/DESIGN.md): small probes show no clean scaling; `m=3` times out; the proposed linearized-quotient method is a lattice call in disguise and its analytic lane remains above rho | Useful negative design evidence, not a universal theorem about every compact Boolean predicate |
-| Binary-field SAT/XOR and WDSat | [`RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md`](../notes/index-calculus/RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md) and [`pdp_ml_sat_ceiling_20261027`](../pdp_ml_sat_ceiling_20261027/README.md): conflict counts track enumeration for the tested binary representation | Strong warning against assuming CDCL magic; not a prime-field shared-coefficient test |
-| PKM tower bases | Published construction plus [`prime_fall_degree_20261027`](../prime_fall_degree_20261027/PREREGISTRATION.md) and the [relaunch](../prime_ic_program_20261029/fall_degree_relaunch/README.md) | Live algebraic lane only at `m>=4`; current degree/memory data are adverse and the decisive cell is blocked |
+| Binary-field SAT/XOR and WDSat | [`RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md`](../notes/index-calculus/RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md) and [`pdp_ml_sat_ceiling_20261027`](../pdp_ml_sat_ceiling_20261027/README.md): conflict counts track enumeration for the tested binary representation | Strong warning against assuming CDCL magic; not the prime-field CDCL(T)/`F_p` experiment |
+| PKM tower bases | Published construction plus [`prime_fall_degree_20261027`](../prime_fall_degree_20261027/PREREGISTRATION.md) and the [relaunch](../prime_ic_program_20261029/fall_degree_relaunch/README.md) | Existing exponent evidence is concentrated at `m>=4`; `m=3` is structurally relevant only if a solver reaches `e<0.5`, which these rows do not show |
 | Digit presentations / first-fall heuristics | Atlas row `LEAD-ICP-digit-presentation-solving-degree`; curve-free null reproduces the apparent fall | Do not use first fall alone as a solver prediction |
 | Convex one-block Coppersmith small roots | [`smallroot_optimal_reach_20261026`](../smallroot_optimal_reach_20261026/README.md) and atlas row `LEAD-ICP-coppersmith-smallroot-semaev` | Closed only for the stated one-block convex construction; no current constructive joint-system advantage |
 | Simple low-degree algebraic factor-base locus | Atlas row `LEAD-ICP-algebraic-membership-factor-base`; a univariate locus containing `B` distinct abscissas has degree at least `B` | Closed for simple loci, not for auxiliary-variable circuits such as PKM |
 | Isogeny-transported bases and relation yield | Atlas row `LEAD-ICP-isogeny-transported-relation-yield`; measured yield conservation | No relation excess; transport may alter constants/presentation only |
 | Structured coincidence / small-coordinate bases | [`prime_ic_zero_filter_20261030`](../prime_ic_zero_filter_20261030/README.md) and atlas coincidence rows | Exact zero predicates have high rank; no measured relation excess |
 | Shared coefficient / remainder circuits | [`prime_one_shot_20261029`](../prime_one_shot_20261029/README.md) and its [continuation](../prime_one_shot_20261029/continuation/README.md) | Correct tiny witnesses and an exact toy solver exist; unknown-solve scaling remains untested |
+| Split-graph/secant factor bases | [`prime_factor_base_degree_20261031`](../prime_factor_base_degree_20261031/README.md): written/Lean-supported top-ideal results and a completed F4 component panel | Retain the degree and rational-lift results at their stated scope; every accepted theorem and measurement is `m=2`, so the route is exponent-irrelevant under the cost bridge |
 | Hashed-factor-base tensor route | [`hashed_ecdl_leads_20261030`](../hashed_ecdl_leads_20261030/README.md), [bridge map](../hashed_ecdl_leads_20261030/BRIDGE.md), native crate and audits | Highest asymptotic upside; conditional theorem and general implementation audit remain open |
 | Special `j=0/1728` and special primes | Atlas rows `LEAD-ICP-xline-symmetry-special-j` and `LEAD-STR-special-j-ic-semaev` | Worth a controlled constant-factor screen, but no basis yet for exponent priority |
 
@@ -171,8 +182,29 @@ variables to yield the claimed subexponential ECDLP bound. Thus the working
 hypothesis should be:
 
 > Preserve a compact Boolean relation predicate and test exact
-> contraction/#SAT engines; use CDCL/XOR/SMT as empirical arms, not as a
-> substitute theorem.
+> contraction/#SAT engines; for the practical prime-field screen use
+> CDCL(T)/`F_p` or `QF_FF`, with pure CNF only as an encoding-cost control,
+> not as a substitute theorem.
+
+## Arity and solver correction
+
+![The rho-crossover PDP exponent by arity](figures/arity-cost-bridge.svg)
+
+The red line is the strict cost-bridge threshold `e=m/2-1`; the blue line is
+the exact enumeration exponent `e=m-1`. The graph is derived, not measured.
+Its data are in
+[`arity-cost-bridge.csv`](figures/arity-cost-bridge.csv). It exposes the
+original review's decisive mistake: arity two cannot cross rho at any
+nonnegative query exponent. Arity three is the first discriminating cell and
+requires a directly fitted slope below `0.5`.
+
+The corrected hybrid representation uses three disjoint one-hot windows and
+chains `S3` through the quadratic lambda lift; it does not expand `S4`. The
+disjoint-window three-summand argument makes every guarded model rational.
+Arity at least four instead retains and charges explicit rationality circuits.
+The rational-lift identity, its discriminant `16t^2 f(x)`, and forbidden-word
+clauses are stated with their exceptional cases in the
+[correction record](DEC-20261031-cd6460.md).
 
 ## Quantitative evidence currently constraining the algebraic fallback
 
@@ -223,56 +255,66 @@ between a source hypothesis and the reduction/implementation.
 the load-bearing lemmas) plus a checked code-correspondence argument. Passing a
 finite panel alone is recorded as bounded validation only.
 
-### B. Discriminate practical SAT/XOR/SMT on the shared-coefficient predicate
+### B. Measure the arity-three PDP exponent with hybrid finite-field SAT
 
 The detailed design is [PROTOCOL.md](PROTOCOL.md), with a schema-checked draft
 record in [protocol.draft.json](protocol.draft.json).
 
-**Fixed semantic object.** The selected distinct-abscissa chart for odd
-`m=3,5,7,9`, using the norm identity and quotient/remainder membership tower,
-with all `F_p` rationality, squarefreeness, coprimality, root extraction and
-group replay conditions charged. Every arm receives the same instance before
-representation-specific compilation.
+**Fixed semantic object.** Use `m=3` throughout. Each summand has a disjoint
+one-hot window of rational factor-base points. Chain two `S3` constraints
+through the quadratic lambda lift and do not expand `S4`. The nonzero-
+displacement chart, exactly-one constraints, forbidden-word clauses and
+independent group replay are identical across arms. The guarded
+three-summand/disjoint-window argument supplies rationality without an extra
+rationality circuit; any exceptional chart is explicit rather than divided
+away.
 
-**Arms.** Exact enumeration, msolve/F4, CNF+CaDiCaL, CNF-XOR+CryptoMiniSat and
-cvc5 QF_FF; an A/A rerun, planted positive controls and support/model-count
+**Arms.** Canonical exact two-window enumeration; msolve/F4; CaDiCaL with an
+external `F_p` theory propagator and checked explanation clauses; cvc5
+`QF_FF`; and a pure-CNF bit-blast as an encoding-cost control only. Retain a
+byte-identical A/A rerun, planted positive controls and support/model-count
 matched curve-free nulls.
 
-**Cells.** Four preregistered diagonal cells `(m,t)=(3,3),(5,4),(7,5),(9,6)`;
-natural, planted and exact-UNSAT targets; held-out protocol-derived seeds.
-Smaller cells provide exact model-set equality. No result may silently drop the
-larger censored cells.
+**Cells.** Every integer `s=6,...,14` at fixed `m=3`, with natural, planted and
+exact-UNSAT targets and held-out protocol-derived seeds. Here
+`s=log2(p)/3` up to the recorded prime-rounding error. A later continuation may
+extend through `s=27` (approximately 40--80-bit fields), but it cannot be used
+to rewrite the first ladder after data. Exact model-set equality is required
+where enumeration completes; all larger attempted/censored cells remain in the
+export.
 
-**Primary measurements.** Verified model set/status, retired instructions over
-the complete cold solve-and-verify interval, peak RSS, and solver-native
-counters. SAT work is additionally reported under propagation weights
-`0,0.1,1`; F4 reports solving degree, rows, columns and multiply-adds. Wall time
-is secondary and requires L2 isolation.
+**Primary measurements.** Verified model set/status, complete counted work from
+instance compilation through solve and replay, peak RSS, and solver-native
+counters. The CDCL(T) ledger separately records Boolean decisions/conflicts,
+theory calls, field operations, propagated literals and explanation clauses;
+none may be omitted from the total. F4 reports solving degree, rows, columns
+and multiply-adds. Wall time is secondary and requires L2 isolation.
 
-**Advance gate.** On all four correctness-valid cells, one predeclared SAT
-family must complete; across the three largest cells the upper 95% interval of
-its log-work slope relative to exact candidate-space size must be at most
-`0.85`, and its complete instruction count must be below F4 on the two largest
-jointly completed cells after Holm correction and outside A/A spread.
+**Advance gate.** Fit `log2(complete counted work)` directly against `s`. A
+predeclared hybrid bundle advances only if it is correct on every attempted
+cell, its Holm-corrected upper 95% slope interval is **strictly below `0.5`**,
+and the finding lies outside A/A spread. Enumeration remains the `e=2`
+reference and correctness control, not the normalization axis.
 
-**Do-not-advance gate.** The lower 95% slope interval is at least `0.95` on
-three consecutive cells, or every SAT family is censored before F4 on the two
-largest jointly attempted cells. Other censoring is **inconclusive**, not a
-negative result.
+**Do-not-advance gate.** The bundle is not advanced if its corrected lower 95%
+slope interval is at least `0.5` over the preregistered ladder. Failure to
+identify the slope because of censoring, failed theory explanations, missing
+counters or insufficient power is **inconclusive**, not a negative result.
 
 This gate decides whether to invest in that solver/representation family. It
 does not prove or disprove a universal SAT or ECDLP complexity statement.
 
-### C. Put SAT on the identical PKM `m=4` systems
+### C. Put the same hybrid solver on identical PKM `m=4` systems
 
-**Question.** Can a Boolean solver exploit the PKM tower's sparse local
-constraints before F4 reaches the measured degree/memory wall?
+**Question.** Can a hybrid Boolean/`F_p` solver exploit the PKM tower's sparse
+local constraints before F4 reaches the measured degree/memory wall?
 
 Use the exact Kummer systems and target identities from the registered
 fall-degree study, not regenerated lookalikes. Cross `N=12,16,20` with natural
 targets, planted decompositions, exact-UNSAT instances and the existing
 shape-matched curve-free null. Export one canonical polynomial IR, then compile
-it to F4, QF_FF, CNF and CNF-XOR.
+it to F4, `QF_FF` and CDCL(T); retain pure CNF only as an explicitly charged
+encoding-cost control.
 
 **Controls:** exact census at the smallest cell; planted witness through every
 backend; A/A variable permutation; same field equations and term/variable
@@ -313,7 +355,8 @@ curve:
 - prime: Solinas/pseudo-Mersenne versus generic prime of the same bit length;
 - curve: `j=0`, `j=1728`, and generic `j` with matched subgroup size/cofactor;
 - representation: affine/projective and selected chart;
-- solver: the same frozen CNF/XOR backend.
+- solver: the same frozen hybrid CDCL(T)/`F_p` backend; pure CNF is a labelled
+  encoding-cost control.
 
 Measure clause/edge count, propagation/conflict counts, field-reduction
 operations, peak RSS and verified complete solve. A special case is promoted
@@ -331,9 +374,12 @@ engineering result.
 - The existing 84-case hashed-ECDL panel is prepared but not run; its frozen
   protocol remains
   [`hashed_ecdl_speed_20261029/PROTOCOL.md`](../hashed_ecdl_speed_20261029/PROTOCOL.md).
-- The new SAT draft intentionally leaves commit, binary/image hashes, analysis
-  script hash, power and runtime preflight unset. It must not be frozen or run
-  until those fields are real.
+- The new SAT draft intentionally leaves the exact external-propagator source
+  binding, commit, binary/image hashes, explanation checker, analysis script
+  hash, power and runtime preflight unset. It must not be frozen or run until
+  those fields are real. Current `main` has the native
+  `solve_with_lazy_clauses` callback, not a source-identified CaDiCaL
+  `ExternalPropagator`; the two are not silently equated.
 - No leaderboard, boundary ledger or benchmark graph changes: this review adds
   no admitted performance row or new mathematical identity.
 
