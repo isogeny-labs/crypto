@@ -77,7 +77,7 @@
     "changed numerator rejection"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh match57-01 MATCH57.sing MATCH57_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh match57-02 MATCH57.sing MATCH57_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -112,5 +112,10 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 1
+  "version": 2,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "attempt01 rejected unsupported ideal==ideal; compare68 indexed polynomials",
+    "previous_attempt": "match57-01 retained; late PASS excluded"
+  }
 }

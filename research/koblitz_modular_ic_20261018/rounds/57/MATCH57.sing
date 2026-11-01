@@ -3,7 +3,8 @@ execute(read("../../../56/runs/check56-01/closed-poles56.sing"));
 execute(read("../../source-data/r27-basis-functions.sing"));
 execute(read("../../source-data/rr-literals57.sing"));
 map basisMap57=rrBasis27,N,L,V,U;ideal originalFromArtifact57=basisMap57(basisNumerators);
-require57(size(original57)==68 && size(descended57)==68 && originalFromArtifact57==original57,"MATCH57_ALL_68_ORIGINAL_BASIS_NUMERATORS");
+require57(size(original57)==68 && size(descended57)==68 && size(originalFromArtifact57)==68,"MATCH57_ALL_68_ORIGINAL_BASIS_SIZES");
+int binding57;for(binding57=1;binding57<=68;binding57++){require57(originalFromArtifact57[binding57]==original57[binding57],"MATCH57_INDEXED_ORIGINAL_BASIS_NUMERATOR");}
 ring descent57=(2,a),(N,L,V,U),dp;minpoly=a^2+a+1;short=0;
 map literalMap57=rrLiteral57,N,L,V,U;ideal original57=literalMap57(original57);ideal descended57=literalMap57(descended57);
 poly E57=V^2+V+U^3+U;ideal baseGB57=std(ideal(E57));

@@ -11,3 +11,17 @@ Execute stage1, then complete restriction kernel, full function-field basis and 
 
 ### Errors
 No prior R57 attempt. Shared log conflict respected. CI migration pending is not a scientific failure.
+
+## 2026-11-01T04:47:43.547890+00:00 — stage1 repair
+
+### What was done
+Attempt match57-01 exited0 but was rejected by native error gate: unsupported ideal equality. Raw copied sources/log/exit retained.
+
+### Decisions made
+Replace whole-ideal comparison with68 indexed exact polynomial comparisons; freeze repair before attempt02. Do not accept late marker.
+
+### Open threads
+Run corrected stage1, then complete-space constraints.
+
+### Errors
+Singular ideal==ideal unsupported; no mathematical null inferred.
