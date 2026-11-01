@@ -325,10 +325,6 @@ impl Aff {
     fn add(self, o: Aff, r: u64) -> Aff {
         Aff((self.0 + o.0) % r, (self.1 + o.1) % r)
     }
-    fn scale(self, k: i64, r: u64) -> Aff {
-        let k = red(k, r);
-        Aff(mulmod(self.0, k, r), mulmod(self.1, k, r))
-    }
     fn mulu(self, k: u64, r: u64) -> Aff {
         Aff(mulmod(self.0, k, r), mulmod(self.1, k, r))
     }
