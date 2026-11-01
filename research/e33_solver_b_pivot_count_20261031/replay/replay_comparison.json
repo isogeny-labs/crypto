@@ -1,0 +1,748 @@
+{
+ "schema": "e33-replay-comparison/v1",
+ "tool": "research/e33_solver_b_pivot_count_20261031/validate_e33.rs all",
+ "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form), strings and booleans exactly; keys ending in _ms, 'ms' and keys containing 'wall' are wall-clock and listed, not compared; a key present on one side only is a mismatch",
+ "stage_a_replayed": true,
+ "e2e_replayed": [
+  "chain-sparsest-counted p101s1",
+  "chain-sparsest-counted p149s2",
+  "chain-sparsest-counted p269s2",
+  "chain-sparsest-counted p397s1",
+  "chain-sparsest-inc p101s1",
+  "chain-sparsest-inc p149s2",
+  "chain-sparsest-inc p269s2",
+  "chain-sparsest-inc p397s1",
+  "chain-sparsest-est p101s1",
+  "chain-sparsest-est p149s2",
+  "chain-sparsest-est p269s2",
+  "chain-sparsest-est p397s1"
+ ],
+ "runs_total": 13,
+ "runs_identical": 13,
+ "fields_compared": 506150,
+ "fields_identical": 506150,
+ "all_identical": true,
+ "runs": [
+  {
+   "run": "stage_a",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/stage_a.json",
+    "sha256": "7bc6e00bd69f353a6d07c345e86ef50c33e6ea9a95535476b8bfd20bbe87d3d8"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/stage_a.json.sha256",
+    "sha256": "7bc6e00bd69f353a6d07c345e86ef50c33e6ea9a95535476b8bfd20bbe87d3d8"
+   },
+   "fields_compared": 491510,
+   "fields_identical": 491510,
+   "byte_identical": true,
+   "identical": true,
+   "note": "replay output byte-identical to the committed record (sha256 equal); the 2.7 MB copy is not duplicated in the repository"
+  },
+  {
+   "run": "chain-sparsest-counted p101s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p101s1.json",
+    "sha256": "f1966eb74cf6ae36391ec3edfcb0f3420bbba5a07a6f398ad22c4dd6faab9209"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p101s1.json",
+    "sha256": "8aa6b9aa836de212bd58b9c389f6d0413380fc9772473fe5262a4cc7209bfe07"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 187486.16967600113,
+     "replay": 272903.1115779977
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 75363.7722,
+     "replay": 114080.938398
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 121285.77750900057,
+     "replay": 125847.7659310005
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 50587.687142999996,
+     "replay": 52512.130874
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p149s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s2.json",
+    "sha256": "c2dc68e5a8fae94c0eb7b3efc469d55390211ef476bc27a372c8c099608f9b48"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p149s2.json",
+    "sha256": "1e2b82bc94710862f0d5b1916d4ac9d1ff5075514c4657f9f3422859eba9d360"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 370004.0667630039,
+     "replay": 376924.6780249976
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 153833.49226600002,
+     "replay": 155729.021101
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 206066.08831300013,
+     "replay": 210134.50524100088
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 85636.431558,
+     "replay": 87189.40354500001
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p269s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p269s2.json",
+    "sha256": "41af6a5c46eac03eb78113e795a5967f3d9ec59b1de1b1979312a19d7f717eeb"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p269s2.json",
+    "sha256": "1ff3b404d4a3fc46edde4cee0200846c2298e4766de5871b92c417860992815c"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 162569.37262500008,
+     "replay": 186275.0745219994
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 68114.704713,
+     "replay": 77919.40309899999
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 91219.85899199962,
+     "replay": 98732.71924700012
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 38391.51374,
+     "replay": 41106.482436
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p397s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p397s1.json",
+    "sha256": "a98563811f5d254592b15900804ffe9b22f6c09170b60820006c71709c848deb"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p397s1.json",
+    "sha256": "e710bbf2b57675dd35a0b1dd70e0db453109b0770991ef71593d77e6f0b73199"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 382034.72403700376,
+     "replay": 344845.7252410023
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 145336.660521,
+     "replay": 138151.942067
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 201121.0316979992,
+     "replay": 198797.24168900057
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 77901.33242,
+     "replay": 80215.22519699999
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p101s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s1.json",
+    "sha256": "602cd53b2beb8a7f726668e5204e8518798e5e816bfd8149aa7aa9ffa7d2d6d7"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p101s1.json",
+    "sha256": "96fdaaaff1843fc1691d09ca2842f422721e23e9282066ad2938288f901fd8fd"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 194678.8307809995,
+     "replay": 232031.5408890011
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 82203.47492899999,
+     "replay": 98603.794681
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 107006.86605799981,
+     "replay": 105958.91937599982
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 44527.402985,
+     "replay": 46901.696753000004
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p149s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s2.json",
+    "sha256": "a7e2709d317e95db35f2eecda77449366e9c9a17c921df856fd5522c6e662501"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p149s2.json",
+    "sha256": "f455d9b67ae3f0e53d1c85d38de97b921dfd6e3f374c196694470a33bbf85aa6"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 353925.1872609991,
+     "replay": 340108.12632299704
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 148205.90151,
+     "replay": 142647.78600400002
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 141023.78385499914,
+     "replay": 191848.62012399966
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 57244.784003,
+     "replay": 80821.67619700001
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p269s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p269s2.json",
+    "sha256": "9f35eb49877a9261d884e10871741d52328f84ddeb77f9a6ccf441602c8ec877"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p269s2.json",
+    "sha256": "4d13b464feecf556239d7ac23097d7d4a4a08dc8d6646e250e776cc067231f2d"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 93775.7740620005,
+     "replay": 178663.86907900122
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 36954.711637,
+     "replay": 75369.546519
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 50968.694267000035,
+     "replay": 87836.17123100048
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 20545.414287,
+     "replay": 37495.97369100001
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p397s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p397s1.json",
+    "sha256": "e4311b0835b2470ffc14f8a04bb1b28aece87016a9382a348e0685d1a80428a6"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p397s1.json",
+    "sha256": "ae2e452750bd6412eec83549aadea6227405f4074652bc29900c4802d4e502ae"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 198778.3131899997,
+     "replay": 331507.4853360005
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 73033.400899,
+     "replay": 133508.06227000002
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 114280.54222599973,
+     "replay": 194902.86013499988
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 42245.984859000004,
+     "replay": 78682.945802
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p101s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s1.json",
+    "sha256": "1c23431757de050aa7c884a8e78b1f1def80c079ed1421dfddadcae60128a013"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p101s1.json",
+    "sha256": "04e6672f15759af402a1cee4bb880c1c9d78e11c96c8744a8fd886b6c034b063"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 140865.55306399975,
+     "replay": 189493.06872899953
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 58090.603845,
+     "replay": 89197.090855
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 66405.93508200001,
+     "replay": 99301.37265599982
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 27153.873014999997,
+     "replay": 46584.627484000004
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p149s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s2.json",
+    "sha256": "453ca86e0cc69ed7c2216b11cb8c667f6baf23923f3b08d22409a36ae04bfab7"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p149s2.json",
+    "sha256": "6ea0f82aa59a4de8cbc64209f1c555fd066ff687e9789ba2bc639db434a3a3a9"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 191487.3430720001,
+     "replay": 287712.88140300306
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 79012.33625499999,
+     "replay": 133025.84569000002
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 100549.64288500002,
+     "replay": 146468.981241001
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 41545.526477,
+     "replay": 70966.93708799999
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p269s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p269s2.json",
+    "sha256": "87115d63e443a62d512bdc5759e31ab6dc23c5faaa62b7623c53f78d95fde3c8"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p269s2.json",
+    "sha256": "c61718a6d214f27261e87ba5e22b8ccee418fa7ca73fbb22ebd89300ed536157"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 99672.92060199971,
+     "replay": 168407.17592499967
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 40263.215121,
+     "replay": 71960.931843
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 49947.04119300007,
+     "replay": 82839.52047700007
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 20402.267301,
+     "replay": 35559.470142000006
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p397s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p397s1.json",
+    "sha256": "ddd7c37a71d7a14c61c0dfd2faa73f37e50bc7c931ad6c0a81eb9ed28a06ff95"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p397s1.json",
+    "sha256": "e29d7cd4318aa5a290b7792ec8c88998e839f08f338f5593a463cb01c385287f"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 204943.35927899985,
+     "replay": 333624.8190299982
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 76565.405104,
+     "replay": 134057.254311
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 121671.50056400015,
+     "replay": 187261.5273730001
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 45598.424394,
+     "replay": 76381.293265
+    }
+   ],
+   "identical": true
+  }
+ ],
+ "existing_solver_identity": [
+  {
+   "config": "macaulay",
+   "p": 269,
+   "seed": 2,
+   "old": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/old_macaulay_p269s2.json",
+    "sha256": "43de9a2d6aebd56cbbf558994f66e1f0f9ecde0d907d501b50e7a4ab4d5a7450"
+   },
+   "new": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/new_macaulay_p269s2.json",
+    "sha256": "655fff5b650ef081e0a6b3c0d372e264d439923118de7c49f566d15a3677c78e"
+   },
+   "leaves_compared": 1202,
+   "leaves_identical": 1202,
+   "mismatches": [],
+   "only_old": [],
+   "only_new": [],
+   "timing_listed": 4,
+   "e33_fields_in_new": 0,
+   "identical": true,
+   "new_vs_stored_record": {
+    "path": "experiments/30_gls_v4/p269s2.json",
+    "leaves_compared": 816,
+    "leaves_identical": 616,
+    "mismatches_generic": [
+     "$[*].ratio",
+     "$[*].rho[*].fp_muls",
+     "$[*].rho[*].group_ops",
+     "$[*].rho_matched_muls",
+     "$[*].rho_negation_muls",
+     "$[*].rho_unfolded_muls"
+    ],
+    "only_in_stored": [],
+    "only_in_new": [
+     "$[*].folded.recovered",
+     "$[*].rho[*].recovered",
+     "$[*].rho[*].verify_fp_muls",
+     "$[*].rho[*].verify_group_ops",
+     "$[*].rho[*].visit_digest"
+    ],
+    "identical": false
+   }
+  },
+  {
+   "config": "chain",
+   "p": 269,
+   "seed": 2,
+   "old": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/old_chain_p269s2.json",
+    "sha256": "3460ab7ccceeb597eae06f369f8e6f0360ee8d38fb141ab9877d695adc27072b"
+   },
+   "new": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/new_chain_p269s2.json",
+    "sha256": "fb1f3301e8f80be29f10496228b510e38c95befb1d2e2426134e28549cb76403"
+   },
+   "leaves_compared": 1206,
+   "leaves_identical": 1206,
+   "mismatches": [],
+   "only_old": [],
+   "only_new": [],
+   "timing_listed": 4,
+   "e33_fields_in_new": 0,
+   "identical": true,
+   "new_vs_stored_record": {
+    "path": "experiments/31_solve_cost/e2e_chain_p269s2.json",
+    "leaves_compared": 820,
+    "leaves_identical": 620,
+    "mismatches_generic": [
+     "$[*].ratio",
+     "$[*].rho[*].fp_muls",
+     "$[*].rho[*].group_ops",
+     "$[*].rho_matched_muls",
+     "$[*].rho_negation_muls",
+     "$[*].rho_unfolded_muls"
+    ],
+    "only_in_stored": [],
+    "only_in_new": [
+     "$[*].folded.recovered",
+     "$[*].rho[*].recovered",
+     "$[*].rho[*].verify_fp_muls",
+     "$[*].rho[*].verify_group_ops",
+     "$[*].rho[*].visit_digest"
+    ],
+    "identical": false
+   }
+  },
+  {
+   "config": "chain-sparsest",
+   "p": 269,
+   "seed": 2,
+   "old": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/old_chain-sparsest_p269s2.json",
+    "sha256": "02775780fc717babf4ba96262988038eb7578f0bb48570096b1f4acc0f8ca4fb"
+   },
+   "new": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/new_chain-sparsest_p269s2.json",
+    "sha256": "39cbfe05b69b85e58eb04ef573ce973d598da570f10445b2d80c5258ba5f96f3"
+   },
+   "leaves_compared": 1206,
+   "leaves_identical": 1206,
+   "mismatches": [],
+   "only_old": [],
+   "only_new": [],
+   "timing_listed": 4,
+   "e33_fields_in_new": 0,
+   "identical": true,
+   "new_vs_stored_record": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p269s2.json",
+    "leaves_compared": 820,
+    "leaves_identical": 620,
+    "mismatches_generic": [
+     "$[*].ratio",
+     "$[*].rho[*].fp_muls",
+     "$[*].rho[*].group_ops",
+     "$[*].rho_matched_muls",
+     "$[*].rho_negation_muls",
+     "$[*].rho_unfolded_muls"
+    ],
+    "only_in_stored": [],
+    "only_in_new": [
+     "$[*].folded.recovered",
+     "$[*].rho[*].recovered",
+     "$[*].rho[*].verify_fp_muls",
+     "$[*].rho[*].verify_group_ops",
+     "$[*].rho[*].visit_digest"
+    ],
+    "identical": false
+   }
+  },
+  {
+   "config": "chain-karatsuba",
+   "p": 269,
+   "seed": 2,
+   "old": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/old_chain-karatsuba_p269s2.json",
+    "sha256": "9aa63d470f0d8c01a86fd5d50f6738bc8aaf40f6297e25420d6d0e6f807e594c"
+   },
+   "new": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/identity/new_chain-karatsuba_p269s2.json",
+    "sha256": "6e4eebdf9653c698b718931a347994e73426f7377ca09287d53eeae6d4ee67e6"
+   },
+   "leaves_compared": 1210,
+   "leaves_identical": 1210,
+   "mismatches": [],
+   "only_old": [],
+   "only_new": [],
+   "timing_listed": 4,
+   "e33_fields_in_new": 0,
+   "identical": true,
+   "new_vs_stored_record": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+    "leaves_compared": 1210,
+    "leaves_identical": 1210,
+    "mismatches_generic": [],
+    "only_in_stored": [],
+    "only_in_new": [],
+    "identical": true
+   }
+  }
+ ],
+ "existing_solver_identity_holds": true,
+ "negative_controls": [
+  {
+   "path": "research/e33_solver_b_pivot_count_20261031/replay/controls/controls_p197s1.json",
+   "sha256": "e810c35b8b23a95198b84f03e3b32c60c06cb0390043167855e22980b4a6fc80",
+   "p": 197,
+   "seed": 1,
+   "nonce_rng": 63443550502854940,
+   "calls": 32,
+   "contested": 32,
+   "positive_checks_hold": true,
+   "negative_controls_detected": true,
+   "b_initial_multiple_of_448_and_inc_compares_equal": true,
+   "nc1_second_best_digest_changed": 32,
+   "nc1_output_same": 32,
+   "nc1_phase_counts_changed": 32,
+   "nc1_echelon_muls_changed": 32,
+   "nc2_off_by_one_flagged": 32,
+   "nc3_nonempty_first_stream": 0,
+   "nc3_changed_first_stream": 0,
+   "nc3_stream_targets_drawn": 28608,
+   "nc3_stream_nonempty": 16,
+   "nc3_stream_changed_b_counted": 16,
+   "nc3_stream_changed_b2": 16,
+   "nc3_holds": true,
+   "est_digest_eq_b_counted": 0
+  },
+  {
+   "path": "research/e33_solver_b_pivot_count_20261031/replay/controls/controls_p269s1.json",
+   "sha256": "3dd85424961c347f9fa17b6615675abe8be49fde5189218232621d1807240412",
+   "p": 269,
+   "seed": 1,
+   "nonce_rng": 1122919708851447696,
+   "calls": 32,
+   "contested": 32,
+   "positive_checks_hold": true,
+   "negative_controls_detected": true,
+   "b_initial_multiple_of_448_and_inc_compares_equal": true,
+   "nc1_second_best_digest_changed": 32,
+   "nc1_output_same": 32,
+   "nc1_phase_counts_changed": 25,
+   "nc1_echelon_muls_changed": 25,
+   "nc2_off_by_one_flagged": 32,
+   "nc3_nonempty_first_stream": 0,
+   "nc3_changed_first_stream": 0,
+   "nc3_stream_targets_drawn": 35777,
+   "nc3_stream_nonempty": 16,
+   "nc3_stream_changed_b_counted": 16,
+   "nc3_stream_changed_b2": 16,
+   "nc3_holds": true,
+   "est_digest_eq_b_counted": 0
+  }
+ ],
+ "negative_controls_hold": true,
+ "negative_controls_totals": {
+  "calls": 64,
+  "contested": 64,
+  "nc1_second_best_digest_changed": 64,
+  "nc1_output_same": 64,
+  "nc1_phase_counts_changed": 57,
+  "nc2_off_by_one_flagged": 64,
+  "nc3_nonempty": 32,
+  "nc3_changed": 32
+ }
+}

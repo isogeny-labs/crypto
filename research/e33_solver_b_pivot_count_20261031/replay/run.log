@@ -1,0 +1,53 @@
+2026-11-01T21:14:08Z start taskset -c 2 /dev/shm/e33val/bin/e33val_controls --p 269 --seed 1 --calls 32 --nonce 1122919708851447696
+2026-11-01T21:14:09Z end rc=0
+2026-11-01T21:14:09Z start taskset -c 2 /dev/shm/e33val/bin/e33val_controls --p 197 --seed 1 --calls 32 --nonce 63443550502854940
+2026-11-01T21:14:10Z end rc=0
+2026-11-01T21:14:10Z start taskset -c 2 /dev/shm/e33val/bin/e33_stage_a --sizes 101,149,197,269,397 --seeds 1,2 --targets 1000 --json /dev/shm/e33val/out/stage_a.json.part
+2026-11-01T21:19:53Z end rc=0
+2026-11-01T21:19:53Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls_pre --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver macaulay --json research/e33_solver_b_pivot_count_20261031/replay/identity/old_macaulay_p269s2.json.part
+2026-11-01T21:21:42Z end rc=0
+2026-11-01T21:21:42Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver macaulay --json research/e33_solver_b_pivot_count_20261031/replay/identity/new_macaulay_p269s2.json.part
+2026-11-01T21:23:29Z end rc=0
+2026-11-01T21:23:29Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls_pre --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain --json research/e33_solver_b_pivot_count_20261031/replay/identity/old_chain_p269s2.json.part
+2026-11-01T21:25:12Z end rc=0
+2026-11-01T21:25:12Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain --json research/e33_solver_b_pivot_count_20261031/replay/identity/new_chain_p269s2.json.part
+2026-11-01T21:27:00Z end rc=0
+2026-11-01T21:27:00Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls_pre --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest --json research/e33_solver_b_pivot_count_20261031/replay/identity/old_chain-sparsest_p269s2.json.part
+2026-11-01T21:28:54Z end rc=0
+2026-11-01T21:28:54Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest --json research/e33_solver_b_pivot_count_20261031/replay/identity/new_chain-sparsest_p269s2.json.part
+2026-11-01T21:30:47Z end rc=0
+2026-11-01T21:30:47Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls_pre --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/identity/old_chain-karatsuba_p269s2.json.part
+2026-11-01T21:32:29Z end rc=0
+2026-11-01T21:32:29Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/identity/new_chain-karatsuba_p269s2.json.part
+2026-11-01T21:34:15Z end rc=0
+2026-11-01T21:34:15Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 101 --first-seed 1 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-counted --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p101s1.json.part
+2026-11-01T21:37:01Z end rc=0
+2026-11-01T21:37:01Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 101 --first-seed 1 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-inc --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p101s1.json.part
+2026-11-01T21:39:27Z end rc=0
+2026-11-01T21:39:27Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 101 --first-seed 1 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-est --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p101s1.json.part
+2026-11-01T21:41:43Z end rc=0
+2026-11-01T21:41:43Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-counted --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p269s2.json.part
+2026-11-01T21:43:42Z end rc=0
+2026-11-01T21:43:42Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-inc --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p269s2.json.part
+2026-11-01T21:45:34Z end rc=0
+2026-11-01T21:45:34Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 269 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-est --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p269s2.json.part
+2026-11-01T21:47:22Z end rc=0
+2026-11-01T21:47:22Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 149 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-counted --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p149s2.json.part
+2026-11-01T21:51:25Z end rc=0
+2026-11-01T21:51:25Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 149 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-inc --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p149s2.json.part
+2026-11-01T21:55:08Z end rc=0
+2026-11-01T21:55:08Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 149 --first-seed 2 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-est --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p149s2.json.part
+2026-11-01T21:58:32Z end rc=0
+2026-11-01T21:58:32Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 397 --first-seed 1 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-counted --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p397s1.json.part
+2026-11-01T22:02:11Z end rc=0
+2026-11-01T22:02:11Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 397 --first-seed 1 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-inc --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p397s1.json.part
+2026-11-01T22:05:43Z end rc=0
+2026-11-01T22:05:43Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 397 --first-seed 1 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-est --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p397s1.json.part
+2026-11-01T22:09:13Z end rc=0
+2026-11-01T22:09:13Z stop requested
+2026-11-01T22:19:43Z resume after the e33val_controls rebuild (NC3 stream); controls rerun, then end to end in nonce order
+2026-11-01T22:19:43Z start taskset -c 2 /dev/shm/e33val/bin/e33val_controls --p 269 --seed 1 --calls 32 --nonce 1122919708851447696 --nc3 16
+2026-11-01T22:22:20Z end rc=0
+2026-11-01T22:22:20Z start taskset -c 2 /dev/shm/e33val/bin/e33val_controls --p 197 --seed 1 --calls 32 --nonce 63443550502854940 --nc3 16
+2026-11-01T22:24:24Z end rc=0
+2026-11-01T22:24:24Z start taskset -c 2 /dev/shm/e33val/bin/quartic_pipeline_gls --sizes 197 --first-seed 1 --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver chain-sparsest-counted --karatsuba --json research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p197s1.json.part

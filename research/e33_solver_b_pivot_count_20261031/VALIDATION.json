@@ -1,0 +1,36 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "9660ad371a0362b46f4ec14586b882f00b18c5ef105e121da829cb501e9a25ff"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "91b9bb267f82ef6e5b259ece5c1e295eb3d73d66b8bff644ada42667a69e96bf"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "Named by the protocol (§9.35, committed 27663cc4d7 before any E33 code): the matched rho is E27's walk (iii) without the [d]G check (experiments/32_walk_karatsuba, rho_e27 and walk_steps), recomputed here from stage_w.json: on each of E25's ten GLS curves the <±psi> walk (class {±P, ±psi P}), 16 walks, Karatsuba F_p4 products with the norm inversions of a 16-walk pool batched by Montgomery's trick, set-up included; E27's validated reference (research/e27_walk_20261030/VALIDATION.json: strongest available, Aut(E) = {±1} and psi the only Frobenius-type endomorphism over F_p4). Band (AGENTS.md §5a): S(g) = F_p multiplications + g*97*native operations, one native operation per Macaulay entry examined, per pivot-selection operation (initial count read, key comparison, count update) and per walk step; g = 0, 0.1, 1; GAE = 97 F_p multiplications (E25's affine addition). gae_band: medians over the ten curves of arm B for solver B counted (chain-sparsest-counted, the E33 subject). B' medians: ic 1.031147e10 / 1.453192e11 / 1.360389e12; B'' medians: ic 1.231163e10 / 6.627109e10 / 5.519061e11 at 0 / 0.1 / 1 GAE, same rho. Rho is below every one of the 60 IC rows (B, B', B'' x ten curves x two arms) at every weight (validator-report.json, orders_across_band), so the order rho < IC holds across the band. No variant is ranked against solver A or E25 (each order flips inside the band); E33 claims no improvement across the band and adds no leaderboard row.",
+  "unit": "F_p multiplications, both arms counted by the same Fp4 counters of one build: an F_p4 product 13 (Karatsuba) on both sides; the solve's F_p multiplications counted directly; walk set-up included, the walk's [d]G = Q check excluded (E25's convention); native operations priced at g*97 per operation",
+  "binary_or_process": "The IC side runs in quartic_pipeline_gls of the recorded commit c443138920 (--solver chain-sparsest-counted | chain-sparsest-inc | chain-sparsest-est --karatsuba, one process per (p, seed), arm A then arm B), which also runs the pipeline's own <±psi>, negation and unfolded walks on the same instance and counters; walk (iii) is E27's e27_walk record (binary af2504ef1). E33 changed no walk or arithmetic code (its diff touches the pivot-selection echelon, the solver dispatch and new record fields only), its records' 48 pipeline walks per arm equal E27's pipeline walks, and E27's validator established that the pipeline's walks equal e27_walk's walk (ii) and that (iii) differs from (ii) only by the price of the recorded F_p inversions; same_binary_or_process is asserted on that basis, as for E27. The validator's fresh build of c443138920 reproduces the sampled records on every non-timing leaf.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 10311469759.5,
+    "rho": 693398.21875
+   },
+   "0.1": {
+    "ic": 360544376349.85004,
+    "rho": 744678.1781250001
+   },
+   "1": {
+    "ic": 3512640535663,
+    "rho": 1206197.8125
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

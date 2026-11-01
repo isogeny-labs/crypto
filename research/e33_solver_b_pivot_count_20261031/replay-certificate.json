@@ -1,0 +1,829 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "date": "2026-11-01",
+ "row": "E33 (GLV note §9.35/§9.37): Stage A (10 curves x 1,000 calls x 7 solvers) and the end-to-end runs of solver B counted, B' and B'' (E27's pipeline with --karatsuba); evidence directory research/e33_solver_b_pivot_count_20261031",
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E33: fresh build from an export of the recorded binary commit in a fresh target directory, fresh runs on a nonce-drawn sample, own comparison (validate_e33.rs), own negative-control program (replay/e33val_controls.rs)",
+ "recorded_binary": "c4431389209ae4a8d83bc916bbb233eb4a8438cb (experiments/37_solver_b_pivot_count/binary_commit.txt)",
+ "build": {
+  "recorded_binary_commit": "c4431389209ae4a8d83bc916bbb233eb4a8438cb",
+  "pre_e33_commit": "bd0118f393537a2e610336e5d45f5426a6a0fa83 (the code commit's parent; E33's diff against it: examples/e33_stage_a.rs, examples/e33_tables.rs, examples/quartic_pipeline_gls.rs, run_e2e.sh, src/cryptanalysis/{gaudry_quartic,klein_v4,quartic_folds}.rs)",
+  "source": "git archive of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, benches/, every explicit [[bin]]/[[example]] path of Cargo.toml, the six path dependencies (crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, isogeny_algos, research/pencil_large_prime_20261029) and the 78 include_str!/include_bytes! targets present at the commit. /dev/shm/e33val/tree: 4,317 files, each equal to its c443138920 blob (git hash-object); /dev/shm/e33val/tree_pre: 4,315 files, each equal to its bd0118f39 blob. One validator-owned file was added to tree/examples for the build: e33val_controls.rs (= replay/e33val_controls.rs); it is not part of the recorded commit and no recorded binary depends on it.",
+  "target_dir": "/dev/shm/e33val/target: a fresh, empty target directory on tmpfs, both trees built into it in turn (dependencies compiled once, crypto_lib once per tree). Not /home/user/crypto/target as the task suggested: the root filesystem had about 600 MB free and the crypto_lib rlib alone is about 380 MB, which would have taken it below the 300 MB floor. Nothing was reused from the producer's target/ directory; its binaries were not run.",
+  "commands": [
+   "cd /dev/shm/e33val/tree && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/e33val/target CARGO_INCREMENTAL=0 CARGO_PROFILE_RELEASE_DEBUG=0 cargo build --release --offline -j 2 --example e33_stage_a --example quartic_pipeline_gls --example e33val_controls",
+   "cd /dev/shm/e33val/tree_pre && touch src/cryptanalysis/{gaudry_quartic,klein_v4,quartic_folds}.rs examples/quartic_pipeline_gls.rs && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/e33val/target CARGO_INCREMENTAL=0 cargo build --release --offline -j 2 --example quartic_pipeline_gls",
+   "cd /dev/shm/e33val/tree && touch src/cryptanalysis/{gaudry_quartic,klein_v4,quartic_folds}.rs examples/{quartic_pipeline_gls,e33_stage_a}.rs && (same command as the first, with examples/e33val_controls.rs extended by the NC3 stream)"
+  ],
+  "build_logs": [
+   "build 1 (c443138920): lock acquired 2026-11-01T20:44:06Z     Finished `release` profile [optimized] target(s) in 18m 32s exit=0 at 2026-11-01T21:02:39Z ",
+   "build 2 (bd0118f39): lock acquired 2026-11-01T21:02:58Z     Finished `release` profile [optimized] target(s) in 0.98s exit=0 at 2026-11-01T21:02:59Z attempt 1 (above) finished in 0.98 s without compiling: cargo judged the artifacts fresh because the four replaced files had mtimes older than build 1's outputs and the -C metadata hash of a path package does not depend on its directory; the four files were touched and the build rerun. queued 2026-11-01T21:03:42Z lock acquired 2026-11-01T21:03:42Z     Finished `release` profile [optimized] target(s) in 10m 08s exit=0 at 2026-11-01T21:13:51Z ",
+   "build 3 (c443138920 again): rebuild of c443138920 with the extended e33val_controls (NC3 stream); E33's four changed files touched so cargo rebuilds crypto_lib over the pre-E33 artifacts. queued 2026-11-01T22:09:36Z lock acquired 2026-11-01T22:09:36Z     Finished `release` profile [optimized] target(s) in 9m 54s exit=0 at 2026-11-01T22:19:31Z "
+  ],
+  "pre_e33_build_note": "The first pre-E33 attempt finished in 0.98 s without compiling: the -C metadata hash of a path package does not depend on its directory and the four replaced files were older than build 1's outputs, so cargo judged build 1's artifacts fresh. Caught because nothing compiled; the four files were touched and the build rerun (10 min). The resulting binary differs from E33's (sha256 23b22013…) and contains none of E33's solver names (strings chain-sparsest-counted absent), and its macaulay/chain/chain-sparsest records equal E33's build's while emitting no E33 field. Build 3 rebuilt c443138920 over it; its e33_stage_a and quartic_pipeline_gls are byte-identical to build 1's.",
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+  "binaries": [
+   {
+    "name": "e33_stage_a",
+    "sha256": "68b7297d721866eff3a512bd55e5648db3a9650f6c177fe78e8ddf47505acde2",
+    "bytes": 5587184,
+    "producer_pinned_sha256": "68b7297d721866eff3a512bd55e5648db3a9650f6c177fe78e8ddf47505acde2",
+    "equals_pinned": true
+   },
+   {
+    "name": "quartic_pipeline_gls",
+    "sha256": "621ac63fa94b9f005de64183d3cc17f2adf23fd362a8bafd7d61e29956cecaa0",
+    "bytes": 5836560,
+    "producer_pinned_sha256": "621ac63fa94b9f005de64183d3cc17f2adf23fd362a8bafd7d61e29956cecaa0",
+    "equals_pinned": true
+   },
+   {
+    "name": "e33val_controls (build 3, with the NC3 stream; used for replay/controls)",
+    "sha256": "52ed449808d4c14fabff43847c0f5289a087f30b4ce44443942eb6e2de7cad2e",
+    "bytes": 5542520,
+    "producer_pinned_sha256": null,
+    "equals_pinned": false
+   },
+   {
+    "name": "e33val_controls (build 1, first version; its first-stream output is reproduced field for field by build 3's)",
+    "sha256": "efe6b449a18cbfa8d47e3c4734083d332c88f202f43b2e1ab476e068aa01b716",
+    "bytes": 5535656,
+    "producer_pinned_sha256": null,
+    "equals_pinned": false
+   },
+   {
+    "name": "quartic_pipeline_gls (pre-E33, bd0118f39)",
+    "sha256": "23b220137af15eb4a644485cc77734c5a980017f87330bb1167741cdea551b36",
+    "bytes": 5824688,
+    "producer_pinned_sha256": null,
+    "equals_pinned": false
+   }
+  ],
+  "binary_identity_note": "The fresh builds of e33_stage_a and quartic_pipeline_gls are byte-identical to the producer's pinned binaries (experiments/37_solver_b_pivot_count/binary_sha256.txt): the build is reproducible, and the replay used the validator's own build, never the producer's files. Equality of the replayed records is the replay criterion in any case.",
+  "host": "Intel Xeon @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, shared with two other validators, not isolab-eks (unreachable from it). Operation counts only.",
+  "run_environment": "every run alone on one core (taskset -c 2); Stage A RAYON_NUM_THREADS=1 as recorded, end to end and identity RAYON_NUM_THREADS=4 (fixes the target stream, §9.19) on that one core"
+ },
+ "build_record": {
+  "path": "replay/build.json",
+  "sha256": "e4e34913c4ddf01dc98ff863cdc83234cf2c4a75ae1543c3185e207b366192b8"
+ },
+ "sample": {
+  "nonce": {
+   "path": "replay/nonce.json",
+   "sha256": "fd368f1526e670c228bed1b742d67836f1d3e7bd4842d686a4a02b161cf380c3"
+  },
+  "draw": {
+   "path": "replay/sample.json",
+   "sha256": "99412e777aeb60091491109ae92111ee2255fa4209386b9c53aea825c2734eaa"
+  },
+  "rule": "key(label) = sha256('<nonce>:<label>'), curves sorted by key ascending (replay/draw_sample.sh); end to end: the first four curves of e2e_order for all three solvers, then further curves in that order as time allowed; existing-solver identity: the first curve of identity_order_excluding_p101s2; controls: the first two curves of controls_order with their controls_rng seeds"
+ },
+ "comparison": {
+  "path": "replay/replay_comparison.json",
+  "sha256": "6678cb75025628d8c44bd83d60bbb132c2c2785ec3dbff9014e735e644314ee4",
+  "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form), strings and booleans exactly; keys ending in _ms, 'ms' and keys containing 'wall' are wall-clock and listed, not compared; a key present on one side only is a mismatch"
+ },
+ "runs_total": 13,
+ "runs_matched": 13,
+ "fields_compared": 506150,
+ "fields_identical": 506150,
+ "coverage": "Stage A replayed in full (10 curves x 1,000 calls x 7 solvers, every solver); end to end 12 of the 30 recorded runs (the sample in replay/sample.json); existing-solver identity of the pre-E33 build (bd0118f39) and E33's build on 4 configurations; negative controls on validator-drawn calls",
+ "existing_solver_identity": {
+  "holds": true,
+  "detail": "old_* and new_* outputs under replay/identity: every leaf equal (wall-clock aside) and no E33 field in the new build's records; the new records against the stored E25/E31/E27 records of the same configuration are listed in replay_comparison.json"
+ },
+ "negative_controls": {
+  "holds": true,
+  "totals": {
+   "calls": 64,
+   "contested": 64,
+   "nc1_second_best_digest_changed": 64,
+   "nc1_output_same": 64,
+   "nc1_phase_counts_changed": 57,
+   "nc2_off_by_one_flagged": 64,
+   "nc3_nonempty": 32,
+   "nc3_changed": 32
+  },
+  "program": {
+   "path": "replay/e33val_controls.rs",
+   "sha256": "b4b32f38ee69f803b9aea6e7e3fb7015591d173c9566ec3fa9a66ab041c9e754"
+  }
+ },
+ "scalar_verification": "Every replayed end-to-end arm reports folded.solved and folded.correct (the binary sets correct only when the Wiedemann logarithm equals the planted d and [x]G = Q holds), and all 48 pipeline walks of the arm are correct with the same logarithm: two independent algorithms agree; the validator report checks that logarithm against E27's walk (iii) on all 60 committed arm records.",
+ "validator_report_status": "pass",
+ "runs": [
+  {
+   "run": "stage_a",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/stage_a.json",
+    "sha256": "7bc6e00bd69f353a6d07c345e86ef50c33e6ea9a95535476b8bfd20bbe87d3d8"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/stage_a.json.sha256",
+    "sha256": "7bc6e00bd69f353a6d07c345e86ef50c33e6ea9a95535476b8bfd20bbe87d3d8"
+   },
+   "fields_compared": 491510,
+   "fields_identical": 491510,
+   "matched": true,
+   "byte_identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p101s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p101s1.json",
+    "sha256": "f1966eb74cf6ae36391ec3edfcb0f3420bbba5a07a6f398ad22c4dd6faab9209"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p101s1.json",
+    "sha256": "8aa6b9aa836de212bd58b9c389f6d0413380fc9772473fe5262a4cc7209bfe07"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 14798608704,
+     "macaulay_entries": 7446468736,
+     "pivot_selection_ops": 43061430588
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 7558639450,
+     "macaulay_entries": 3832401664,
+     "pivot_selection_ops": 22207437056
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 187486.16967600113,
+     "replay": 272903.1115779977
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 75363.7722,
+     "replay": 114080.938398
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 121285.77750900057,
+     "replay": 125847.7659310005
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 50587.687142999996,
+     "replay": 52512.130874
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-counted p149s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s2.json",
+    "sha256": "c2dc68e5a8fae94c0eb7b3efc469d55390211ef476bc27a372c8c099608f9b48"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p149s2.json",
+    "sha256": "1e2b82bc94710862f0d5b1916d4ac9d1ff5075514c4657f9f3422859eba9d360"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 21481490408,
+     "macaulay_entries": 10888461696,
+     "pivot_selection_ops": 63756731604
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 12154593992,
+     "macaulay_entries": 6146620032,
+     "pivot_selection_ops": 35964754426
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 370004.0667630039,
+     "replay": 376924.6780249976
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 153833.49226600002,
+     "replay": 155729.021101
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 206066.08831300013,
+     "replay": 210134.50524100088
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 85636.431558,
+     "replay": 87189.40354500001
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-counted p269s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p269s2.json",
+    "sha256": "41af6a5c46eac03eb78113e795a5967f3d9ec59b1de1b1979312a19d7f717eeb"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p269s2.json",
+    "sha256": "1ff3b404d4a3fc46edde4cee0200846c2298e4766de5871b92c417860992815c"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 10614339896,
+     "macaulay_entries": 5425916160,
+     "pivot_selection_ops": 32206186779
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 5246950193,
+     "macaulay_entries": 2681474880,
+     "pivot_selection_ops": 15915306407
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 162569.37262500008,
+     "replay": 186275.0745219994
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 68114.704713,
+     "replay": 77919.40309899999
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 91219.85899199962,
+     "replay": 98732.71924700012
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 38391.51374,
+     "replay": 41106.482436
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-counted p397s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p397s1.json",
+    "sha256": "a98563811f5d254592b15900804ffe9b22f6c09170b60820006c71709c848deb"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p397s1.json",
+    "sha256": "e710bbf2b57675dd35a0b1dd70e0db453109b0770991ef71593d77e6f0b73199"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 15079211870,
+     "macaulay_entries": 7572761280,
+     "pivot_selection_ops": 45118275160
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 8728384767,
+     "macaulay_entries": 4394191872,
+     "pivot_selection_ops": 26196080789
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 382034.72403700376,
+     "replay": 344845.7252410023
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 145336.660521,
+     "replay": 138151.942067
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 201121.0316979992,
+     "replay": 198797.24168900057
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 77901.33242,
+     "replay": 80215.22519699999
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-inc p101s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s1.json",
+    "sha256": "602cd53b2beb8a7f726668e5204e8518798e5e816bfd8149aa7aa9ffa7d2d6d7"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p101s1.json",
+    "sha256": "96fdaaaff1843fc1691d09ca2842f422721e23e9282066ad2938288f901fd8fd"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 14798608704,
+     "macaulay_entries": 7446468736,
+     "pivot_selection_ops": 12034857416
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 7558639450,
+     "macaulay_entries": 3832401664,
+     "pivot_selection_ops": 6206844157
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 194678.8307809995,
+     "replay": 232031.5408890011
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 82203.47492899999,
+     "replay": 98603.794681
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 107006.86605799981,
+     "replay": 105958.91937599982
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 44527.402985,
+     "replay": 46901.696753000004
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-inc p149s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s2.json",
+    "sha256": "a7e2709d317e95db35f2eecda77449366e9c9a17c921df856fd5522c6e662501"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p149s2.json",
+    "sha256": "f455d9b67ae3f0e53d1c85d38de97b921dfd6e3f374c196694470a33bbf85aa6"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 21481490408,
+     "macaulay_entries": 10888461696,
+     "pivot_selection_ops": 17894958238
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 12154593992,
+     "macaulay_entries": 6146620032,
+     "pivot_selection_ops": 10094268971
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 353925.1872609991,
+     "replay": 340108.12632299704
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 148205.90151,
+     "replay": 142647.78600400002
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 141023.78385499914,
+     "replay": 191848.62012399966
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 57244.784003,
+     "replay": 80821.67619700001
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-inc p269s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p269s2.json",
+    "sha256": "9f35eb49877a9261d884e10871741d52328f84ddeb77f9a6ccf441602c8ec877"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p269s2.json",
+    "sha256": "4d13b464feecf556239d7ac23097d7d4a4a08dc8d6646e250e776cc067231f2d"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 10614339896,
+     "macaulay_entries": 5425916160,
+     "pivot_selection_ops": 9077959596
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 5246950193,
+     "macaulay_entries": 2681474880,
+     "pivot_selection_ops": 4485969779
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 93775.7740620005,
+     "replay": 178663.86907900122
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 36954.711637,
+     "replay": 75369.546519
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 50968.694267000035,
+     "replay": 87836.17123100048
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 20545.414287,
+     "replay": 37495.97369100001
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-inc p397s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p397s1.json",
+    "sha256": "e4311b0835b2470ffc14f8a04bb1b28aece87016a9382a348e0685d1a80428a6"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p397s1.json",
+    "sha256": "ae2e452750bd6412eec83549aadea6227405f4074652bc29900c4802d4e502ae"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 15079211870,
+     "macaulay_entries": 7572761280,
+     "pivot_selection_ops": 12739310193
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 8728384767,
+     "macaulay_entries": 4394191872,
+     "pivot_selection_ops": 7396651716
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 198778.3131899997,
+     "replay": 331507.4853360005
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 73033.400899,
+     "replay": 133508.06227000002
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 114280.54222599973,
+     "replay": 194902.86013499988
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 42245.984859000004,
+     "replay": 78682.945802
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-est p101s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s1.json",
+    "sha256": "1c23431757de050aa7c884a8e78b1f1def80c079ed1421dfddadcae60128a013"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p101s1.json",
+    "sha256": "04e6672f15759af402a1cee4bb880c1c9d78e11c96c8744a8fd886b6c034b063"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 17536717487,
+     "macaulay_entries": 7446468736,
+     "pivot_selection_ops": 521012285
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 8970748676,
+     "macaulay_entries": 3832401664,
+     "pivot_selection_ops": 268705161
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 140865.55306399975,
+     "replay": 189493.06872899953
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 58090.603845,
+     "replay": 89197.090855
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 66405.93508200001,
+     "replay": 99301.37265599982
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 27153.873014999997,
+     "replay": 46584.627484000004
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-est p149s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s2.json",
+    "sha256": "453ca86e0cc69ed7c2216b11cb8c667f6baf23923f3b08d22409a36ae04bfab7"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p149s2.json",
+    "sha256": "6ea0f82aa59a4de8cbc64209f1c555fd066ff687e9789ba2bc639db434a3a3a9"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 25566142985,
+     "macaulay_entries": 10888461696,
+     "pivot_selection_ops": 771846161
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 14458614519,
+     "macaulay_entries": 6146620032,
+     "pivot_selection_ops": 435397034
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 191487.3430720001,
+     "replay": 287712.88140300306
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 79012.33625499999,
+     "replay": 133025.84569000002
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 100549.64288500002,
+     "replay": 146468.981241001
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 41545.526477,
+     "replay": 70966.93708799999
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-est p269s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p269s2.json",
+    "sha256": "87115d63e443a62d512bdc5759e31ab6dc23c5faaa62b7623c53f78d95fde3c8"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p269s2.json",
+    "sha256": "c61718a6d214f27261e87ba5e22b8ccee418fa7ca73fbb22ebd89300ed536157"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 12691450348,
+     "macaulay_entries": 5425916160,
+     "pivot_selection_ops": 390093712
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 6273361166,
+     "macaulay_entries": 2681474880,
+     "pivot_selection_ops": 192769890
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 99672.92060199971,
+     "replay": 168407.17592499967
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 40263.215121,
+     "replay": 71960.931843
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 49947.04119300007,
+     "replay": 82839.52047700007
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 20402.267301,
+     "replay": 35559.470142000006
+    }
+   ]
+  },
+  {
+   "run": "chain-sparsest-est p397s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p397s1.json",
+    "sha256": "ddd7c37a71d7a14c61c0dfd2faa73f37e50bc7c931ad6c0a81eb9ed28a06ff95"
+   },
+   "replay_output": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p397s1.json",
+    "sha256": "e29d7cd4318aa5a290b7792ec8c88998e839f08f338f5593a463cb01c385287f"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 17997831164,
+     "macaulay_entries": 7572761280,
+     "pivot_selection_ops": 546596293
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "all_48_walks_correct_with_that_logarithm": true,
+     "total_muls": 10423015311,
+     "macaulay_entries": 4394191872,
+     "pivot_selection_ops": 317360887
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 204943.35927899985,
+     "replay": 333624.8190299982
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 76565.405104,
+     "replay": 134057.254311
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 121671.50056400015,
+     "replay": 187261.5273730001
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 45598.424394,
+     "replay": 76381.293265
+    }
+   ]
+  }
+ ]
+}
