@@ -2138,12 +2138,17 @@ impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
 /// that makes a two-summand search `O(1)` a target instead of `O(|F|)`.
 pub struct MitmOracle {
     m: u32,
+    lines: bool,
     table: Option<PairTable>,
 }
 
 impl MitmOracle {
     pub fn new(m: u32) -> Self {
-        Self { m, table: None }
+        Self {
+            m,
+            lines: false,
+            table: None,
+        }
     }
 }
 
@@ -2168,10 +2173,16 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[(
-            "negation_folded",
-            "1 to build only one of each ±pair, halving the table's additions",
-        )]
+        &[
+            (
+                "negation_folded",
+                "1 to build only one of each ±pair, halving the table's additions",
+            ),
+            (
+                "layout",
+                "map (default) or lines (cache-line pair index and relation guard)",
+            ),
+        ]
     }
 
     fn prepare(
@@ -2181,7 +2192,17 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<(), String> {
-        let table = if params.flag("negation_folded") {
+        self.lines = match params.get("layout") {
+            None | Some("map") => false,
+            Some("lines") => true,
+            Some(other) => return Err(format!("unknown layout `{other}`; use map or lines")),
+        };
+        if self.lines && !params.flag("negation_folded") {
+            return Err("layout=lines requires negation_folded=1".into());
+        }
+        let table = if self.lines {
+            PairTable::build_negation_folded_lines(ctx.group, fb)
+        } else if params.flag("negation_folded") {
             PairTable::build_negation_folded(ctx.group, fb)
         } else {
             PairTable::build(ctx.group, fb)
@@ -2211,6 +2232,16 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
     ) -> Option<Vec<usize>> {
         let table = self.table.as_ref()?;
         decompose_mitm(ctx.group, fb, table, self.m, ops, counters, point)
+    }
+
+    fn touch(&self, ctx: &InstanceCtx<G>, point: &G::Elt) {
+        if let Some(table) = &self.table {
+            table.prefetch(ctx.group, point);
+        }
+    }
+
+    fn line_guard(&self) -> bool {
+        self.lines
     }
 }
 
@@ -2290,6 +2321,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
 /// cache-sized pieces ([`PairTable::build_negation_folded_prime_blocked`]).
 pub struct PrimeBatchMitmOracle {
     blocked: bool,
+    lines: bool,
     table: Option<PairTable>,
 }
 
@@ -2297,6 +2329,7 @@ impl PrimeBatchMitmOracle {
     pub fn new() -> Self {
         Self {
             blocked: false,
+            lines: false,
             table: None,
         }
     }
@@ -2304,6 +2337,7 @@ impl PrimeBatchMitmOracle {
     pub fn blocked() -> Self {
         Self {
             blocked: true,
+            lines: false,
             table: None,
         }
     }
@@ -2344,7 +2378,17 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[("m", "must be 2")]
+        if self.blocked {
+            &[("m", "must be 2")]
+        } else {
+            &[
+                ("m", "must be 2"),
+                (
+                    "layout",
+                    "map (default) or lines (cache-line pair index and relation guard)",
+                ),
+            ]
+        }
     }
 
     fn prepare(
@@ -2354,11 +2398,20 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<(), String> {
-        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m") {
+        let allowed = |key: &String| key == "m" || (!self.blocked && key == "layout");
+        if params.u64_or("m", 2)? != 2 || !params.0.keys().all(allowed) {
             return Err(format!("{} accepts only m=2", self.name_str()));
         }
+        self.lines = match params.get("layout") {
+            None | Some("map") => false,
+            Some("lines") if !self.blocked => true,
+            Some("lines") => return Err("mitm-prime-blocked does not accept layout=lines".into()),
+            Some(other) => return Err(format!("unknown layout `{other}`; use map or lines")),
+        };
         let table = if self.blocked {
             PairTable::build_negation_folded_prime_blocked(ctx.group, fb)?
+        } else if self.lines {
+            PairTable::build_negation_folded_prime_batch_lines(ctx.group, fb)?
         } else {
             PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
         };
@@ -2385,6 +2438,16 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
         decompose_mitm(ctx.group, fb, self.table.as_ref()?, 2, ops, counters, point)
+    }
+
+    fn touch(&self, ctx: &InstanceCtx<PrimeCurve>, point: &PrimePoint) {
+        if let Some(table) = &self.table {
+            table.prefetch(ctx.group, point);
+        }
+    }
+
+    fn line_guard(&self) -> bool {
+        self.lines
     }
 }
 
