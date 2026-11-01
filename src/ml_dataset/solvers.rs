@@ -3158,6 +3158,16 @@ impl DynamicOriginal {
         }
     }
 }
+fn classify_wide_linear_retention(
+    result: Result<(), prime_f4_wide_dynamic::Stop>,
+) -> Result<bool, String> {
+    match result {
+        Ok(()) => Ok(true),
+        Err(prime_f4_wide_dynamic::Stop::WorkLimit) => Ok(false),
+        Err(e) => Err(format!("wide dynamic linear retention stopped: {e:?}")),
+    }
+}
+
 /// First activated higher-arity profile. The native reducer and original
 /// signed-group traversal have separate bounded receipts. A positive witness
 /// is useful even when the native or full-domain search remains incomplete.
@@ -3218,9 +3228,13 @@ fn prime_f4_wide_dynamic(
     let mut phase = d::invoke_original(prepared, &mut forward)
         .map_err(|e| format!("wide dynamic native F4 stopped: {:?}", e.stop))?;
     let linear = d::extract_reported_linear(&mut phase);
-    d::retain_linear(&mut phase, &linear)
-        .map_err(|e| format!("wide dynamic linear retention stopped: {e:?}"))?;
-    let group = d::run_group_step4(&mut phase, Some(&linear), &mut forward, &mut publisher);
+    let linear_retained = classify_wide_linear_retention(d::retain_linear(&mut phase, &linear))?;
+    let group = d::run_group_step4(
+        &mut phase,
+        linear_retained.then_some(&linear),
+        &mut forward,
+        &mut publisher,
+    );
     if group.certificate_durably_persisted {
         d::confirm_step4_witness(&mut phase.prepared, &mut publisher)
             .map_err(|e| format!("wide dynamic witness confirmation stopped: {e:?}"))?;
@@ -3246,6 +3260,12 @@ fn prime_f4_wide_dynamic(
     data.outcome["native_backend_invoked"] = json!(phase.report.native_backend_invoked);
     data.outcome["native_statistics_complete"] = json!(phase.report.native_statistics_complete);
     data.outcome["algebra_completed"] = json!(phase.report.native_statistics_complete);
+    data.outcome["linear_artifact_retained"] = json!(linear_retained);
+    data.outcome["linear_retention_stop"] = if linear_retained {
+        Value::Null
+    } else {
+        json!("work_limit")
+    };
     data.outcome["pdp_witness_verified"] =
         json!(group.pdp_witness_verified && group.certificate_durably_persisted);
     data.outcome["certificate_durably_persisted"] = json!(group.certificate_durably_persisted);
@@ -4129,6 +4149,7 @@ mod tests {
     #[test]
     fn supervised_wide_prime_m4_m5_m15_uses_native_backend_on_both_twists() {
         use super::super::execution::{LaunchContext, SolverExecutionContext};
+        let mut saw_bounded_linear_retention = false;
         for m in [4, 5, 15] {
             for (n, twist) in [(47, false), (47, true), (61, false), (61, true)] {
                 let mut cfg = config("prime", "f4");
@@ -4202,7 +4223,31 @@ mod tests {
                     .artifacts
                     .iter()
                     .any(|a| a.path == "prime-f4-wide-dynamic-result.json"));
+                if data.outcome["linear_retention_stop"] == "work_limit" {
+                    assert_eq!(data.outcome["linear_artifact_retained"], false);
+                    assert!(data
+                        .artifacts
+                        .iter()
+                        .any(|a| a.path == "prime-f4-wide-dynamic-result.json"));
+                    saw_bounded_linear_retention = true;
+                }
             }
+        }
+        assert!(saw_bounded_linear_retention);
+    }
+
+    #[test]
+    fn wide_linear_retention_only_censors_work_limit() {
+        use super::prime_f4_wide_dynamic::Stop;
+        assert_eq!(super::classify_wide_linear_retention(Ok(())), Ok(true));
+        assert_eq!(
+            super::classify_wide_linear_retention(Err(Stop::WorkLimit)),
+            Ok(false)
+        );
+        for stop in [Stop::Deadline, Stop::StorageLimit, Stop::InvalidInput] {
+            assert!(super::classify_wide_linear_retention(Err(stop))
+                .unwrap_err()
+                .contains(&format!("{stop:?}")));
         }
     }
 
