@@ -17,8 +17,13 @@
 //! pattern, [`ChainS3Patterns::AffineOnly`]: complete for decompositions with
 //! no zero-sum sub-multiset) and `+t<F>.<B>` (root-finder tables of
 //! intermediate x-coordinates, [`ChainS3Tables`] with front depth `F`, back
-//! depth `B`, at most 300,000 points per table). One JSON line per
-//! (target, arm).
+//! depth `B`, at most 300,000 points per table) and `+meet<D>` (the
+//! meet-in-the-middle lookup of [`ChainS3Tables::meet`] at depth `D`), and
+//! `+rebuild` (rebuild a witness from the lookup hits first,
+//! [`ChainS3Tables::rebuild`]). One
+//! JSON line per (target, arm); every query-independent lookup set is built
+//! before the first query and reported on its own `warmup` line, so query
+//! seconds hold only per-query work.
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::*;
 use num_bigint::BigUint;
@@ -61,12 +66,18 @@ fn main() {
             for part in parts {
                 if part == "affine" {
                     options.patterns = ChainS3Patterns::AffineOnly;
+                } else if part == "rebuild" {
+                    options.tables.rebuild = true;
+                } else if let Some(depth) = part.strip_prefix("meet") {
+                    options.tables.meet = depth.parse().expect("meet depth");
                 } else if let Some(depths) = part.strip_prefix('t') {
                     let (f, b) = depths.split_once('.').expect("t<F>.<B>");
                     options.tables = ChainS3Tables {
                         front: f.parse().expect("front depth"),
                         back: b.parse().expect("back depth"),
                         max_points: 300_000,
+                        meet: options.tables.meet,
+                        rebuild: options.tables.rebuild,
                     };
                 } else {
                     panic!("unknown arm modifier {part}");
@@ -99,6 +110,24 @@ fn main() {
             kc.add(&acc, &fb.points[rng.gen_range(0..fb.points.len())])
         });
         targets.push(("planted", p));
+    }
+    let mut warmed = std::collections::BTreeSet::new();
+    for (_, options) in &arms {
+        let d = options.tables.meet;
+        if d >= 2 && m > d && m - d <= d && warmed.insert(d) {
+            let start = Instant::now();
+            let front = chain_s3_meet_front(&kc, &fb, d);
+            println!(
+                "{}",
+                json!({
+                    "schema": "n83-chain-sat-bench/v1", "record": "warmup",
+                    "curve": kc.label(), "m": m, "union_dim": dim,
+                    "base_points": fb.points.len(), "meet_depth": d,
+                    "front_fingerprints": front.len(),
+                    "seconds": start.elapsed().as_secs_f64(), "seed": seed,
+                })
+            );
+        }
     }
     for (t, (kind, target)) in targets.iter().enumerate() {
         for j in 0..arms.len() {
@@ -138,6 +167,9 @@ fn main() {
                     "invalid_models": stats.invalid_models,
                     "peak_variables": stats.peak_variables,
                     "peak_clauses": stats.peak_clauses, "peak_xors": stats.peak_xors,
+                    "patterns_refuted_by_lookup": stats.patterns_refuted_by_lookup,
+                    "meet_domain": stats.meet_domain,
+                    "witness_by_lookup": stats.witness_by_lookup,
                     "seed": seed,
                 })
             );

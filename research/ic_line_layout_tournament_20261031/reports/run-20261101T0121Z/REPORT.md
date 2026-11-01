@@ -21,9 +21,10 @@ at [`failure-flow.svg`](failure-flow.svg).
   authenticated session directory or comparison.
 - **Zero outcome-driven retries — verified complete.** Exactly the two frozen
   trials ran and both failures are retained.
-- **Privacy-preserving diagnosis — implemented but not yet run.** The fixed
-  workflow emits only allowlisted failure metadata and hash-verifies every
-  downloaded payload object that has a retained manifest.
+- **Privacy-preserving diagnosis — complete at status-evidence level.** The
+  first read exposed a payload-access and copy-status failure. Corrected run
+  41267915424 classified both failed Pods at the L2 gate without publishing raw
+  data. The payload manifests remain unverified and exact L2 predicates absent.
 
 ## Observed execution
 
@@ -32,10 +33,11 @@ Both workflows passed their contract and credential-free build jobs. EKS Jobs
 `failed`, remote-result exit 23 and GitHub wrapper exit 26. The public receipts
 contain Job UIDs but empty successful Pod UID and results URI fields.
 
-The public evidence does not distinguish payload execution, native audit, L2,
-A/A, owner instrumentation or infrastructure failure. The private launcher
-prefixes retain `status.json`, `objects.json`, logs and any uploaded payload
-artifacts. Raw records and stderr remain private.
+The original public evidence did not distinguish payload execution, native
+audit, L2, A/A, owner instrumentation or infrastructure failure. Corrected
+read-only diagnosis now locates both failures at the L2 isolation gate using
+identity-checked Kubernetes status. Raw records, timing values and stderr
+remain private.
 
 ## Excluded local diagnostic
 
@@ -55,6 +57,37 @@ request hash, downloads only allowlisted diagnostic objects, checks each object
 against the retained `SHA256SUMS`, and publishes a compact classification. It
 does not run the binary, submit or retry a Job, print raw logs, or upload raw
 measurements.
+
+The first merged dispatch, workflow run 41266993333, authenticated successfully
+and read the four launcher receipts for both trials. Payload-object reads were
+forbidden by the existing role. The reader incorrectly treated that copy failure
+as success and then attempted to verify a nonexistent manifest; both matrix jobs
+failed and uploaded nothing. The correction records the payload access state and
+uses only identity-checked Kubernetes status when payload objects are unreadable.
+It does not widen IAM permissions or elevate that status evidence to a
+hash-verified payload receipt.
+
+The corrected source merged at
+`15b58954b965a44b24a80f8b493e945d91076803`. Its single dispatch, workflow run
+41267915424, completed both fixed matrix jobs. Each retained launcher prefix
+contains 19 objects and one failed Pod. Both Pods exited 42 with classification
+`l2_isolation_gate`:
+
+- **Frozen workflow 41260778029:** Pod
+  `458712fd-1251-4d62-b943-b35f44a51e44`; retained artifact
+  [`diagnosis/41260778029.json`](diagnosis/41260778029.json); payload read
+  unavailable and manifest not verified.
+- **Frozen workflow 41260778856:** Pod
+  `bfe971ea-45d0-4f50-a851-8afbd61f61f6`; retained artifact
+  [`diagnosis/41260778856.json`](diagnosis/41260778856.json); payload read
+  unavailable and manifest not verified.
+
+The records contain no below-L2 detail: `l2`, `audit` and `control` are null,
+owner run/replay checks are false, and private stderr hashes and content are
+absent. They establish the terminal gate at status-evidence level only. Exact
+predicate attribution requires narrowly authorized, manifest-bound access to
+the retained `l2-gate.json`; no candidate change or scientific retry follows
+from these records.
 
 ## Sources checked
 

@@ -22,12 +22,13 @@ result URI was returned by either launcher.
 
 The public workflow logs bind both runs to native binary SHA-256
 `0784fe47212d64dd2ee81510d3c28d2f604782086500135a3114c61738f854b7`
-and the exact merge commit. Detailed Kubernetes status, pod logs and object
-inventory remain in each private launcher prefix. They were not available in
-this workspace, and the public receipt does not identify the payload exit code.
-Consequently, the failure cannot be assigned to the candidate, isolation gate,
-owner instrumentation, A/A gate or infrastructure from the public receipt
-alone. No repair is justified without that evidence.
+and the exact merge commit. The public receipt alone did not identify the
+payload exit code. The later fixed-target diagnosis read the identity-checked
+Kubernetes status and object inventory, but not the payload artifacts: both
+runs had 19 retained objects and one failed Pod, and both Pods exited 42 at the
+`l2_isolation_gate`. This locates each failure before owner replay, A/A and
+timed comparison. It does not expose the exact failed L2 predicate, and it does
+not justify changing the candidate.
 
 ## Excluded diagnostic
 
@@ -51,19 +52,45 @@ candidate or threshold change was launched after observing the failures. This
 preserves the preregistered stopping rule: the current evidence version is
 inconclusive.
 
-An authorized lab operator must inspect `status.json`, `logs.json`,
-`objects.json`, and any uploaded job artifacts under the two private launcher
-prefixes. If the evidence identifies an implementation-caused failure, repair
-it without weakening the L2, replay, exact-operation, A/A or confidence-bound
-requirements. Any further performance trial requires a new frozen evidence
-version and preregistration; it cannot retroactively complete this one.
+An authorized lab operator must provide narrowly scoped access to the retained
+`SHA256SUMS` and `l2-gate.json`, or independently qualify the L2 infrastructure
+under a new evidence version. The exact L2 predicate must be hash-verified
+before a specific infrastructure repair is claimed. The L2, replay,
+exact-operation, A/A and confidence-bound requirements remain unchanged. Any
+further performance trial requires a new frozen evidence version and
+preregistration; it cannot retroactively complete this one.
 
 The reviewed follow-up is `.github/workflows/isolab-failure-diagnosis.yml`.
-It is fixed to the two recorded identities, verifies request and artifact hashes,
-and retains only allowlisted failure metadata. It cannot submit or retry a Job,
-and raw measurements and stderr remain private. Its current status is
-implemented but not run; the terminal observation above remains unchanged until
-the workflow returns authenticated classifications.
+It is fixed to the two recorded identities, verifies request and accessible
+artifact hashes, and retains only allowlisted failure metadata. It cannot submit
+or retry a Job, and raw measurements and stderr remain private.
+
+Its first dispatch, [run 41266993333](https://github.com/isogeny-labs/crypto/actions/runs/41266993333)
+on merge commit `0b915934de7f57b814507bfe32208175b4fd3a94`, authenticated
+successfully and read the four fixed launcher receipts. Both payload-prefix
+reads returned 403. A reader defect then treated the failed manifest copy as
+success and attempted to verify a nonexistent file, so both matrix jobs failed
+and no diagnosis artifact was uploaded. The follow-up correction distinguishes
+not-listed, read-unavailable and hash-verified payload states, and reports only
+an identity-checked Kubernetes status classification when payload reads are
+unavailable. No experiment retry or broader IAM grant is introduced.
+
+The corrected workflow source merged at
+`15b58954b965a44b24a80f8b493e945d91076803`. Its single dispatch,
+[run 41267915424](https://github.com/isogeny-labs/crypto/actions/runs/41267915424),
+completed both fixed matrix jobs and uploaded allowlisted artifacts
+`13068226703` and `13067928403`. The byte-exact retained diagnoses are:
+
+| Frozen workflow | Pod UID | Objects | Classification | Exit evidence | Payload evidence |
+|---|---|---:|---|---|---|
+| 41260778029 | `458712fd-1251-4d62-b943-b35f44a51e44` | 19 | `l2_isolation_gate`, exit 42 | identity-checked Kubernetes status | read unavailable; manifest not verified |
+| 41260778856 | `bfe971ea-45d0-4f50-a851-8afbd61f61f6` | 19 | `l2_isolation_gate`, exit 42 | identity-checked Kubernetes status | read unavailable; manifest not verified |
+
+See [`diagnosis/41260778029.json`](reports/run-20261101T0121Z/diagnosis/41260778029.json)
+and [`diagnosis/41260778856.json`](reports/run-20261101T0121Z/diagnosis/41260778856.json).
+Both records retain null L2 detail, null audit/control fields, no private stderr,
+no timing values and `experiment_retry: false`. They establish the terminal
+gate only at status-evidence level, not a hash-verified below-L2 cause.
 
 The relation-yield pruning instrumentation merged separately through PR #3091.
 That instrumentation and this line-layout implementation are engineering
