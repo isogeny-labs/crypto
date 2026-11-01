@@ -616,6 +616,8 @@ pub enum Targets {
     /// group addition per step (`16 * |F|` precomputed sums, counted at setup).
     /// See `ic_framework::residual::collect_residual_fused_and_solve`.
     ResidualFused,
+    /// Fused step with distinguished-point storage and probing.
+    ResidualFusedDp,
     /// `R ← R + S` for one drawn `S = [s]G + [t]Q`: one addition per
     /// target, with no jump table to set up.  See `TargetSource::Stride`.
     Stride,
@@ -644,6 +646,7 @@ impl Targets {
             Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
             Targets::Residual => "residual",
             Targets::ResidualFused => "residual-fused",
+            Targets::ResidualFusedDp => "residual-fused-dp",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
             Targets::StrideGenerator => "stride-generator",
@@ -664,12 +667,13 @@ impl Targets {
             "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
             "residual" => Ok(Targets::Residual),
             "residual-fused" => Ok(Targets::ResidualFused),
+            "residual-fused-dp" => Ok(Targets::ResidualFusedDp),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
             "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, residual-fused-dp, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }

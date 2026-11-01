@@ -80,7 +80,7 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
     max_trials: u64,
     matrix: &mut L,
 ) -> PipelineOutcome {
-    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, false)
+    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, 0)
 }
 
 /// The same collector with the jump and the base-point subtraction fused
@@ -108,7 +108,24 @@ pub fn collect_residual_fused_and_solve<G: CountedGroup, L: RelationSolver + ?Si
     max_trials: u64,
     matrix: &mut L,
 ) -> PipelineOutcome {
-    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, true)
+    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, 1)
+}
+
+/// Fused step plus distinguished points (`residual-fused-dp`): see `mode == 3`
+/// in [`collect_residual_core`].
+#[allow(clippy::too_many_arguments)]
+pub fn collect_residual_fused_dp_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    matrix: &mut L,
+) -> PipelineOutcome {
+    collect_residual_core(g, generator, target, r, h, fb, seed, max_trials, matrix, 3)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -122,8 +139,22 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
     seed: u64,
     max_trials: u64,
     matrix: &mut L,
-    fused: bool,
+    mode: u8,
 ) -> PipelineOutcome {
+    // mode 0: baseline (two additions per step); 1: fused; 3: fused + distinguished points.
+    let fused = mode != 0;
+    // mode 3: fused + distinguished points.  Only residuals whose x-key hashes into
+    // a 2^-dp_bits fraction are tested against F, probed and stored; every step still
+    // pays one distinguished-point test (counted as `dp_tests`, the analogue of rho's
+    // canonicalisation per step).  dp_bits = floor(log2(r)/2) - 9, so a collision is
+    // detected about 2^dp_bits steps late, a few hundred steps against ~sqrt(r).
+    let dp_bits: u32 = if mode == 3 {
+        ((63 - r.max(2).leading_zeros()) / 2).saturating_sub(9)
+    } else {
+        0
+    };
+    let walk_cap: u64 = 40u64 << dp_bits;
+    let (mut dp_tests, mut f_checks, mut walk_len, mut walks_capped) = (0u64, 0u64, 0u64, 0u64);
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_5349_4455_414C);
     let mut rel = PhaseCost::default();
     let mut la = PhaseCost::default();
@@ -227,6 +258,7 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
             let bq = g.mul(&mut rel.group_ops, target, b);
             point = g.add(&mut rel.group_ops, ag, bq);
             row.iter_mut().for_each(|c| *c = 0);
+            walk_len = 0;
             fresh = false;
             restarts += 1;
         } else if fused {
@@ -283,6 +315,19 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
             }
             fresh = true;
             continue;
+        }
+        if dp_bits > 0 {
+            dp_tests += 1;
+            walk_len += 1;
+            let kd = mix((g.key(&point) >> 1) ^ 0x5DEE_CE66_D1CE_4E5B);
+            if (kd >> (64 - dp_bits)) != 0 {
+                if walk_len > walk_cap {
+                    walks_capped += 1;
+                    fresh = true;
+                }
+                continue;
+            }
+            f_checks += 1;
         }
         // A residual in ±F is a complete decomposition.
         if let Some(k) = fb.index_of_key(g.key(&point)) {
@@ -377,7 +422,12 @@ fn collect_residual_core<G: CountedGroup, L: RelationSolver + ?Sized>(
         "residual_table_bytes_uncharged",
         (table.len() * (16 + 8 * d_col)) as u64,
     );
-    rel.count("lookups", table_probes + trials);
+    rel.count("lookups", table_probes + if dp_bits > 0 { f_checks } else { trials });
+    if dp_bits > 0 {
+        rel.count("dp_tests", dp_tests);
+        rel.count("dp_bits", dp_bits as u64);
+        rel.count("walks_capped", walks_capped);
+    }
     rel.count("walk_restarts", restarts);
     rel.count("walk_jumps", jump_count as u64);
     if fused {
