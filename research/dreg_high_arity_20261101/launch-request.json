@@ -1,0 +1,159 @@
+{
+  "schema": "dreg.high-arity-prelaunch/v1",
+  "study": "DREG-HIGH-ARITY-20261101",
+  "status": "blocked",
+  "authorizes_spending": false,
+  "backend": "ephemeral",
+  "execution_ref": "refs/heads/codex/ecdlp-live-leads-reconciliation-20261101",
+  "required_aws_account": "104186811093",
+  "observed_aws_account": "590183823895",
+  "created_at": "2026-11-01T22:25:17Z",
+  "absolute_deadline_utc": "2026-12-01T00:00:00Z",
+  "budget": {
+    "currency": "USD",
+    "campaign_ceiling": 20.0,
+    "charged_usd": null,
+    "reserved_usd": null,
+    "headroom_verified_at": null,
+    "headroom_status": "unknown_or_exhausted",
+    "charge_categories": [
+      "builds",
+      "queue_and_idle_worker_time",
+      "successful_attempts",
+      "failed_attempts",
+      "interrupted_attempts",
+      "spot_restarts",
+      "checkpoint_storage",
+      "artifact_storage",
+      "data_transfer"
+    ],
+    "stop_rule": "Do not submit when charged plus reserved plus prospective cost would exceed USD 20.00, or when either account-budget or lane-ledger headroom is unknown; retries never reset the ledger."
+  },
+  "resources": {
+    "maximum_worker_vcpus": 16,
+    "maximum_worker_memory_bytes": 68719476736,
+    "maximum_concurrency": 1,
+    "scientific_process_threads": 4,
+    "scientific_process_address_space_bytes": 32000000000,
+    "process_timeout_seconds": 86400,
+    "termination_grace_seconds": 60
+  },
+  "attempt_budget": {
+    "logical_closure_subprocesses": 19,
+    "maximum_attempts_per_subprocess": 4,
+    "maximum_total_closure_attempts": 76,
+    "maximum_total_retry_attempts": 57,
+    "maximum_build_attempts": 1,
+    "maximum_generator_attempts": 3,
+    "automatic_backend_retries": 0
+  },
+  "environment": {
+    "F4_F2_MAX_ROWS": "50000000",
+    "F4_F2_MAX_COLS": "50000000",
+    "RAYON_NUM_THREADS": "4",
+    "DREG_CKPT_SECONDS": "300"
+  },
+  "commands": {
+    "build": [
+      "cargo",
+      "build",
+      "--release",
+      "--locked",
+      "--example",
+      "dreg_ladder",
+      "--example",
+      "dreg_closure",
+      "--example",
+      "dreg_high_arity_analyze",
+      "--example",
+      "dreg_high_arity_report"
+    ],
+    "generators": [
+      [
+        "research/dreg_high_arity_20261101/run.sh",
+        "target/release/examples/dreg_ladder",
+        "target/release/examples/dreg_closure",
+        "target/release/examples/dreg_high_arity_analyze",
+        "target/release/examples/dreg_high_arity_report",
+        "gen-m5-n11-l2"
+      ],
+      [
+        "research/dreg_high_arity_20261101/run.sh",
+        "target/release/examples/dreg_ladder",
+        "target/release/examples/dreg_closure",
+        "target/release/examples/dreg_high_arity_analyze",
+        "target/release/examples/dreg_high_arity_report",
+        "gen-m5-n13-l3"
+      ],
+      [
+        "research/dreg_high_arity_20261101/run.sh",
+        "target/release/examples/dreg_ladder",
+        "target/release/examples/dreg_closure",
+        "target/release/examples/dreg_high_arity_analyze",
+        "target/release/examples/dreg_high_arity_report",
+        "gen-m6-n11-l2"
+      ]
+    ],
+    "audit": [
+      "research/dreg_high_arity_20261101/run.sh",
+      "target/release/examples/dreg_ladder",
+      "target/release/examples/dreg_closure",
+      "target/release/examples/dreg_high_arity_analyze",
+      "target/release/examples/dreg_high_arity_report",
+      "audit-draws"
+    ],
+    "analyze": [
+      "research/dreg_high_arity_20261101/run.sh",
+      "target/release/examples/dreg_ladder",
+      "target/release/examples/dreg_closure",
+      "target/release/examples/dreg_high_arity_analyze",
+      "target/release/examples/dreg_high_arity_report",
+      "analyze"
+    ],
+    "closure_draw_commands": [],
+    "backend_submission": null
+  },
+  "github_custody": {
+    "repository": "isogeny-labs/crypto",
+    "check_command": [
+      "python3",
+      "taskq/deploy/eks-karpenter/check-experiment-git",
+      "--repository",
+      "isogeny-labs/crypto",
+      "--path",
+      "research/dreg_high_arity_20261101/protocol.json",
+      "--path",
+      "research/dreg_high_arity_20261101/run.sh",
+      "--path",
+      "research/dreg_high_arity_20261101/launch-request.json",
+      "--path",
+      "research/dreg_high_arity_20261101/sources.sha256",
+      "--path",
+      "research/dreg_high_arity_20261101/binary.sha256",
+      "--path",
+      "examples/dreg_ladder.rs",
+      "--path",
+      "examples/dreg_closure.rs",
+      "--path",
+      "examples/dreg_high_arity_analyze.rs",
+      "--path",
+      "examples/dreg_high_arity_report.rs"
+    ],
+    "publication_receipt": null,
+    "source_commit": null,
+    "protocol_sha256": null
+  },
+  "blockers": [
+    "The current AWS identity is account 590183823895, not required account 104186811093, and /ephemeral/config is unavailable.",
+    "The 2026-11-01 AWS budget inspection reports both USD 25 daily thresholds already exceeded; current account and lane headroom has not been re-established.",
+    "The exact draw-specific closure logical names cannot be filed until the three preregistered generator streams are replay-audited, committed, and pushed.",
+    "The exact backend submission command, source commit, frozen protocol hash, and GitHub publication-check receipt are not yet filed."
+  ],
+  "unblock_requirements": [
+    "Use the required account through existing authorized credentials and recover the deployed ephemeral configuration; do not substitute another account, region, pool, or provider.",
+    "Record account-budget and lane-ledger telemetry proving enough unreserved headroom inside the USD 20.00 campaign ceiling.",
+    "After draw generation, replace closure_draw_commands with the exact 19 ordered commands and commit and push the replay-audited draw inputs and custody sidecars.",
+    "Record the exact backend submission command and immutable request identity.",
+    "Fill source_commit and protocol_sha256, run the listed GitHub custody check against the pushed HEAD, retain its receipt, and bind that receipt to the image and request before any build or job."
+  ]
+}

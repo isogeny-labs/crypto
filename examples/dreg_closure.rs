@@ -1,10 +1,11 @@
 //! XL against MutantXL closure on committed refutation-degree draws.
 //!
-//! Every refutation degree the ladder studies record is XL's: the first
-//! degree whose plain Macaulay row space contains `1`.  This replays the
-//! committed unsatisfiable draws (same subspace basis, same `x(R)`, same
-//! field) and scans each degree twice, plain and saturated under
-//! MutantXL's fixed-degree step ([`closure_refutation_scan`]).
+//! The ladder's resolution degree can mean either that the plain Macaulay row
+//! space contains `1` or that every occurring variable is pinned; its
+//! `refuted` flag distinguishes the two.  This replays the committed
+//! unsatisfiable draws (same subspace basis, same `x(R)`, same field) and
+//! scans each degree twice, plain and saturated under MutantXL's fixed-degree
+//! step ([`closure_refutation_scan`]).
 //!
 //! ```sh
 //! cargo run --release --example dreg_closure -- --max-cols 70000 \
@@ -12,9 +13,9 @@
 //! ```
 //!
 //! One JSON line per unsatisfiable draw on stdout.  The scan runs from
-//! degree 3 up to the draw's committed XL degree (its resolved degree, or
-//! the degree its `≥D` bound was measured to), stops early once the closure
-//! refutes, and builds no degree whose matrix could have more than
+//! degree 3 up to the draw's committed resolution degree (or the degree its
+//! `≥D` bound was measured to), stops early once the closure refutes, and
+//! builds no degree whose matrix could have more than
 //! `--max-cols` columns (`C(N,≤D)`): the dense basis costs about the cube
 //! of that.  Degrees not built are unmeasured, never refutations.
 //!
@@ -59,11 +60,16 @@ fn monomials_up_to(n_vars: u64, d: u32) -> f64 {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct CommittedXlPlan {
-    /// A resolved degree or the first degree not covered by an `at_least`
-    /// lower bound.  `None` means the ladder stopped on a resource cap and
-    /// established no XL-degree identity.
+    /// An exact resolution degree or the first degree not covered by an
+    /// `at_least` lower bound.  `None` means the ladder stopped on a resource
+    /// cap and established no degree identity.
     degree: Option<u32>,
+    /// The committed record resolved exactly at `degree`, rather than merely
+    /// establishing a lower bound through the degrees below it.
     resolved: bool,
+    /// Exact resolution was by the constant `1` (an XL refutation), rather
+    /// than by pinning every occurring variable.
+    xl_refuted: bool,
     ceiling: u32,
 }
 
@@ -76,16 +82,17 @@ fn committed_xl_plan(outcome: &Value, to: Option<u32>) -> Result<CommittedXlPlan
     let kind = outcome["kind"]
         .as_str()
         .ok_or_else(|| "committed outcome has no kind".to_string())?;
-    let (degree, resolved) = match kind {
-        "resolved" => (
-            Some(
-                outcome["degree"]
-                    .as_u64()
-                    .ok_or_else(|| "resolved outcome has no degree".to_string())?
-                    as u32,
-            ),
-            true,
-        ),
+    let (degree, resolved, xl_refuted) = match kind {
+        "resolved" => {
+            let degree = outcome["degree"]
+                .as_u64()
+                .ok_or_else(|| "resolved outcome has no degree".to_string())?
+                as u32;
+            let refuted = outcome["refuted"]
+                .as_bool()
+                .ok_or_else(|| "resolved outcome has no Boolean refuted flag".to_string())?;
+            (Some(degree), true, refuted)
+        }
         "at_least" => (
             Some(
                 outcome["degree"]
@@ -94,8 +101,9 @@ fn committed_xl_plan(outcome: &Value, to: Option<u32>) -> Result<CommittedXlPlan
                     as u32,
             ),
             false,
+            false,
         ),
-        "caps_hit" => (None, false),
+        "caps_hit" => (None, false, false),
         _ => return Err(format!("unsupported unsatisfiable outcome kind {kind:?}")),
     };
     let ceiling = match (to, kind, degree) {
@@ -110,8 +118,20 @@ fn committed_xl_plan(outcome: &Value, to: Option<u32>) -> Result<CommittedXlPlan
     Ok(CommittedXlPlan {
         degree,
         resolved,
+        xl_refuted,
         ceiling,
     })
+}
+
+const CHECKPOINT_INVALID_EXIT: i32 = 125;
+
+fn checkpoint_error(context: &str, error: &std::io::Error) -> String {
+    format!("checkpoint invalid during {context}: {error}")
+}
+
+fn exit_checkpoint_error(context: &str, error: &std::io::Error) -> ! {
+    eprintln!("{}", checkpoint_error(context, error));
+    std::process::exit(CHECKPOINT_INVALID_EXIT)
 }
 
 fn degree_json(d: &ClosureDegree) -> String {
@@ -178,9 +198,9 @@ fn scan_range(
     let Some(store) = store else {
         return closure_refutation_scan(sys, n_vars, d_min, d_max);
     };
-    match closure_refutation_scan_checkpointed(sys, n_vars, d_min, d_max, store)
-        .expect("checkpointed scan")
-    {
+    let end = closure_refutation_scan_checkpointed(sys, n_vars, d_min, d_max, store)
+        .unwrap_or_else(|error| exit_checkpoint_error("scan or restore", &error));
+    match end {
         ScanEnd::Done(v) => v,
         ScanEnd::Interrupted => std::process::exit(143),
     }
@@ -194,8 +214,8 @@ fn main() {
             .and_then(|i| args.get(i + 1))
             .cloned()
     };
-    let mut store = flag("--checkpoint-dir")
-        .map(|d| {
+    let mut store = match flag("--checkpoint-dir") {
+        Some(d) => {
             let secs = std::env::var("DREG_CKPT_SECONDS")
                 .ok()
                 .and_then(|s| s.parse().ok());
@@ -203,9 +223,11 @@ fn main() {
                 std::path::Path::new(&d),
                 std::time::Duration::from_secs(secs.unwrap_or(900)),
             )
-        })
-        .map(|r| r.expect("--checkpoint-dir"))
-        .or_else(|| Store::from_env().expect("DREG_CKPT_DIR"));
+            .map(Some)
+        }
+        None => Store::from_env(),
+    }
+    .unwrap_or_else(|error| exit_checkpoint_error("store open", &error));
     if let Some(store) = store.as_mut() {
         Store::install_signal_handlers();
         let env_num = |name: &str| std::env::var(name).ok().and_then(|s| s.parse().ok());
@@ -369,10 +391,12 @@ fn main() {
                 );
                 continue;
             }
-            // A resolved outcome fixes the XL degree; `at_least D` covers
-            // degrees below D.  `caps_hit` fixes no degree at all, but its
-            // exact-zero solution count still permits a fresh explicit
-            // `--to D` scan without an XL identity assertion.
+            // A resolved outcome fixes the resolution degree, but only a
+            // true `refuted` flag fixes an XL constant-1 refutation.  A false
+            // flag means every occurring variable was pinned at that degree.
+            // `at_least D` covers degrees below D.  `caps_hit` fixes no degree
+            // at all, but its exact-zero solution count still permits a fresh
+            // explicit `--to D` scan without an XL identity assertion.
             let committed = committed_xl_plan(&v["outcome"], to)
                 .unwrap_or_else(|e| panic!("{file} draw {}: {e}", v["draw"]));
             let top = (3..=committed.ceiling)
@@ -385,14 +409,22 @@ fn main() {
                 let Some(step) = one.into_iter().next() else {
                     break;
                 };
-                // XL identity: the plain basis refutes exactly at the
-                // committed degree, never below it.  Past a `≥D` bound the
-                // committed record says nothing, and XL is a new reading.
+                // XL identity: below an exact resolution degree the plain
+                // basis did not refute.  At that degree it refuted iff the
+                // committed `refuted` flag is true; a true refutation persists
+                // at later degrees.  A pinning-only resolution says nothing
+                // about XL after its exact degree.  Past a `≥D` bound the
+                // committed record likewise says nothing.
                 if let Some(committed_degree) = committed.degree {
-                    if fixes.is_empty() && (d < committed_degree || committed.resolved) {
+                    let identity_applies = if committed.resolved {
+                        d <= committed_degree || committed.xl_refuted
+                    } else {
+                        d < committed_degree
+                    };
+                    if fixes.is_empty() && identity_applies {
                         assert_eq!(
                             step.xl_refuted,
-                            committed.resolved && d >= committed_degree,
+                            committed.xl_refuted && d >= committed_degree,
                             "{file} draw {}: XL at degree {d} disagrees with the committed outcome",
                             v["draw"]
                         );
@@ -448,28 +480,59 @@ mod tests {
             CommittedXlPlan {
                 degree: None,
                 resolved: false,
+                xl_refuted: false,
                 ceiling: 4,
             }
         );
     }
 
     #[test]
-    fn resolved_and_lower_bound_identities_are_preserved() {
+    fn resolved_refutation_and_pinning_identities_are_distinct() {
         assert_eq!(
-            committed_xl_plan(&json!({"kind": "resolved", "degree": 4}), None).unwrap(),
+            committed_xl_plan(
+                &json!({"kind": "resolved", "degree": 4, "refuted": true}),
+                None
+            )
+            .unwrap(),
             CommittedXlPlan {
                 degree: Some(4),
                 resolved: true,
+                xl_refuted: true,
                 ceiling: 4,
             }
         );
+        assert_eq!(
+            committed_xl_plan(
+                &json!({"kind": "resolved", "degree": 4, "refuted": false}),
+                None
+            )
+            .unwrap(),
+            CommittedXlPlan {
+                degree: Some(4),
+                resolved: true,
+                xl_refuted: false,
+                ceiling: 4,
+            }
+        );
+        assert!(committed_xl_plan(&json!({"kind": "resolved", "degree": 4}), None).is_err());
         assert_eq!(
             committed_xl_plan(&json!({"kind": "at_least", "degree": 4}), None).unwrap(),
             CommittedXlPlan {
                 degree: Some(4),
                 resolved: false,
+                xl_refuted: false,
                 ceiling: 3,
             }
         );
+    }
+
+    #[test]
+    fn checkpoint_errors_have_a_stable_nonpanic_contract() {
+        let error = std::io::Error::new(std::io::ErrorKind::InvalidData, "wrong system");
+        assert_eq!(
+            checkpoint_error("scan or restore", &error),
+            "checkpoint invalid during scan or restore: wrong system"
+        );
+        assert_eq!(CHECKPOINT_INVALID_EXIT, 125);
     }
 }
