@@ -25,3 +25,17 @@ Run corrected stage1, then complete-space constraints.
 
 ### Errors
 Singular ideal==ideal unsupported; no mathematical null inferred.
+
+## 2026-11-01T04:49:38.883697+00:00 — stage1 accepted, stage2 freeze
+
+### What was done
+match57-02 accepted: all68 source bindings/descent identities,20 base/b/c charts,degree128/80 and48 binary conditions. No native error.
+
+### Decisions made
+Freeze full48x68 coefficient restriction, complete splitting, controls and sigma restriction. Choose explicit a^2 twist isomorphism for row change. Actual rank/dimension is an outcome, not a gate.
+
+### Open threads
+Complete kernel, full descended field functions, Lean implications, report/custody.
+
+### Errors
+Attempt01 retained/rejected; no accepted producer repeated.

@@ -1,36 +1,44 @@
 {
   "schema": "experiment.protocol/v1",
-  "id": "KOBLITZ-R57-RR-MATCH",
+  "id": "KOBLITZ-R57-RR-SPACE",
   "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
   "claims": [
     {
-      "id": "descent",
+      "id": "kernel",
       "class": "exact_computation",
-      "statement": "All 68 retained original numerators equal their R27 artifact and all 68 descended numerators satisfy the full F4 twist identity."
+      "statement": "All68 original sections meet ambient bounds on20 charts; restriction to degree80 is complete48-row matrix, with exact complete kernel splitting."
     },
     {
-      "id": "divisor",
+      "id": "descent-kernel",
       "class": "exact_computation",
-      "statement": "All20 original cusp charts bind the ambient degree128 divisor and actual degree80 pole divisor, giving48 binary conditions."
+      "statement": "Invertible48x48 row change identifies ordinary coefficient kernel with descended coefficient kernel."
     },
     {
-      "id": "complete-space",
+      "id": "geometry",
+      "class": "theorem",
+      "statement": "Given the retained complete ambient RR space and stage1 complete pole geometry, the restriction kernel represents full L((A)_infinity). These geometric premises are not re-proved by linear algebra."
+    },
+    {
+      "id": "map",
       "class": "out_of_scope",
-      "statement": "Kernel computation and actual function-field basis require a subsequent frozen stage; no dimension assumed."
+      "statement": "No modular-factor map or nonzero level11 action follows from this space alone."
     }
   ],
   "arms": {
     "reference": "R27 original complete68 basis, R43 descended literals, R56 closed pole table",
     "baseline": "retained degree128 complete ambient space",
-    "candidate": "exact descent and cusp matching for degree80 restriction",
+    "candidate": "All48 removed coefficients at e1/e7 Q0 and sigma partners, all68 sections",
     "positive": [
-      "all68 original artifact comparisons",
-      "all68 full polynomial descent identities",
-      "all20 base and actual b,c identities",
-      "R56 four-point binding"
+      "1360 ambient pole-bound checks",
+      "129-jet rank68",
+      "reconstruct1,A,lambda,b",
+      "1,A,lambda in kernel",
+      "two-sided row isomorphism",
+      "C K=0, R K=I, K R+H C=I",
+      "actual sigma stability"
     ],
     "negative": [
-      "last descended numerator changed by1 must fail equality"
+      "actual b has nonzero restricted image"
     ],
     "A_A": {
       "not_applicable_reason": "fixed exhaustive exact algebra, no statistical comparison"
@@ -69,15 +77,16 @@
     "power": "notapplicable"
   },
   "metrics": [
-    "68 literal equalities",
-    "68 global descent residuals",
-    "20 base and b,c residuals",
-    "ambient and target divisor degrees",
-    "48 coefficient conditions",
-    "changed numerator rejection"
+    "actual constraint rank and kernel dimension without target value",
+    "1360 ambient bound checks",
+    "all48 row-change products",
+    "68-column independence",
+    "all complete-splitting entries",
+    "positive and negative control outcomes",
+    "actual restricted sigma nilpotent rank"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh match57-02 MATCH57.sing MATCH57_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh space57-01 SPACE57.sing SPACE57_ALL_CHECKS_PASS",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
     "threads": 1,
@@ -99,7 +108,7 @@
   "analysis": {
     "kind": "exact polynomial reduction and rigorous Laurent valuation",
     "comparative": false,
-    "precision": "retained absolute precision propagated by original native Laurent helper; zero residual requires positive precision"
+    "precision": "Original absolute-precision Laurent helper; each needed coefficient must be below tracked precision, ambient bounds require positive precision; 129 independent O-jets certify control reconstruction. No zero truncation is an infinite valuation."
   },
   "literature": [
     {
@@ -112,10 +121,10 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 2,
+  "version": 3,
   "amendment": {
     "before_affected_data": true,
-    "reason": "attempt01 rejected unsupported ideal==ideal; compare68 indexed polynomials",
-    "previous_attempt": "match57-01 retained; late PASS excluded"
+    "reason": "stage1 accepted; freeze complete restriction-space stage2 before its data",
+    "stage1": "match57-02 accepted; match57-01 rejected"
   }
 }
