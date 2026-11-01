@@ -123,6 +123,15 @@ impl Suffix {
             i = (i + 1) & mask;
         }
     }
+    fn may_contain_x(&self, x: u64) -> bool {
+        if self.slots.is_empty() {
+            return false;
+        }
+        // Both possible parity keys occupy adjacent bits in the same word:
+        // slots has power-of-two size >=2, hence bit is even and <=62 mod64.
+        let bit = ((2 * x) as usize) & (self.slots.len() - 1);
+        self.occupied[bit / 64] & (3u64 << (bit % 64)) != 0
+    }
 }
 
 /// An exact CPU oracle retaining both tuple-sum tables across targets.
@@ -286,9 +295,14 @@ impl DecompositionOracle for CachedMitm {
         while start < p.prefix.len() {
             let end = start + batch.min(p.prefix.len() - start);
             let points = &p.prefix[start..end];
-            self.stats.query_inversions += self.scratch.subtract(curve, target, points);
+            self.stats.query_inversions +=
+                self.scratch
+                    .subtract_filtered(curve, target, points, Some(&p.suffix));
             for (offset, residual) in self.scratch.output.iter().enumerate() {
                 self.stats.probed_rows += 1;
+                if self.scratch.rejected[offset] {
+                    continue;
+                }
                 if let Some(id) = p.suffix.find(*residual) {
                     let mut tuple = vec![None; bases.len()];
                     decode(&bases[..p.split], start + offset, &mut tuple[..p.split]);
@@ -347,15 +361,28 @@ struct Scratch {
     denominators: Vec<u64>,
     numerators: Vec<u64>,
     output: Vec<Point>,
+    // A rejected output slot is not a point and must never reach exact lookup.
+    rejected: Vec<bool>,
 }
 impl Scratch {
     // Montgomery batch inversion, with identities/inverses handled explicitly.
     // The same affine equations as the checked CPU reference, one inversion
     // for every batch containing at least one ordinary addition or doubling.
     fn subtract(&mut self, curve: &Curve, target: Point, points: &[Point]) -> u64 {
+        self.subtract_filtered(curve, target, points, None)
+    }
+    fn subtract_filtered(
+        &mut self,
+        curve: &Curve,
+        target: Point,
+        points: &[Point],
+        suffix: Option<&Suffix>,
+    ) -> u64 {
         let p = curve.modulus();
         self.output.clear();
         self.output.extend_from_slice(points);
+        self.rejected.clear();
+        self.rejected.resize(points.len(), false);
         let Some((x, y)) = target else {
             for point in &mut self.output {
                 *point = point.map(|(x, y)| (x, sub(0, y, p)));
@@ -422,6 +449,12 @@ impl Scratch {
             let slope = mul(self.numerators[i], iz);
             let xx = points[i].unwrap().0;
             let nx = sub(sub(mul(slope, slope), x, p), xx, p);
+            // Finish the inverse recurrence first, even for a rejected row.
+            // If neither y parity can be present, skip y's multiply/subtracts.
+            if suffix.is_some_and(|index| !index.may_contain_x(nx)) {
+                self.rejected[i] = true;
+                continue;
+            }
             self.output[i] = Some((nx, sub(mul(slope, sub(x, nx, p)), y, p)));
         }
         1
@@ -569,6 +602,62 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn filtered_residuals_match_affine_reference_and_reuse() {
+        let mut rejected = 0;
+        for (p, a, b, r, generator, count) in [
+            (211, 0, 7, 199, Some((3, 33)), 199),
+            (65521, 65518, 3, 65563, Some((0, 64894)), 32),
+            (
+                68719476731,
+                68719476728,
+                33,
+                68719022539,
+                Some((2, 51741851039)),
+                32,
+            ),
+        ] {
+            let curve = Curve::with_order_witness(p, a, b, r, generator).unwrap();
+            let points: Vec<_> = (0..count)
+                .map(|k| curve.mul(generator, k).unwrap())
+                .collect();
+            let mut scratch = Scratch::default();
+            for input in [
+                vec![],
+                points.iter().step_by(7).copied().collect(),
+                points.clone(),
+            ] {
+                let suffix = Suffix::new(input.clone()).unwrap();
+                for &target in &points {
+                    scratch.subtract_filtered(&curve, target, &points, Some(&suffix));
+                    for (i, &point) in points.iter().enumerate() {
+                        let neg = point.map(|(x, y)| (x, (p - y) % p));
+                        let expected = curve.add(target, neg).unwrap();
+                        if scratch.rejected[i] {
+                            rejected += 1;
+                            assert!(expected.is_some());
+                            assert!(!input.contains(&expected));
+                        } else {
+                            assert_eq!(scratch.output[i], expected);
+                            assert_eq!(
+                                suffix.find(expected),
+                                input.iter().position(|&q| q == expected)
+                            );
+                        }
+                    }
+                }
+                // Reusing the same storage for identity and unfiltered setup
+                // must clear every reject flag, including after empty indexes.
+                scratch.subtract(&curve, None, &points);
+                assert!(scratch.rejected.iter().all(|&v| !v));
+                for (i, &point) in points.iter().enumerate() {
+                    assert_eq!(scratch.output[i], point.map(|(x, y)| (x, (p - y) % p)));
+                }
+            }
+        }
+        assert!(rejected > 0);
     }
 
     #[test]
