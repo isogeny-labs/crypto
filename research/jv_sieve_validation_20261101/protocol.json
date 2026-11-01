@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "JV-FULLROUTE-CORRECTED-20261101",
-  "version": 2,
+  "version": 3,
   "created": "2026-11-01",
   "repository": "crypto",
   "study_dir": "research/jv_sieve_validation_20261101",
@@ -13,6 +13,10 @@
     "version_1_protocol": "research/jv_sieve_validation_20261101/protocol-v1.json",
     "version_1_infrastructure_attempt": "research/jv_sieve_validation_20261101/v1-infrastructure-incomplete.json",
     "version_1_job_log": "research/jv_sieve_validation_20261101/v1-run-41345698056.log",
+    "version_2_protocol": "research/jv_sieve_validation_20261101/protocol-v2.json",
+    "version_2_gate_failure": "research/jv_sieve_validation_20261101/v2-gate-failure.json",
+    "version_2_job_log": "research/jv_sieve_validation_20261101/v2-run-41353962971.log",
+    "version_3_gate_predicate_audit": "research/jv_sieve_validation_20261101/V3-GATE-PREDICATE-AUDIT.md",
     "historical_run": "research/jv_sieve_strong_rho_20261019",
     "historical_review": "research/jv_sieve_strong_rho_20261019/review-20261020",
     "prior_full_route_accounting": "research/ic_acct1_cover_bitop_20261021",
@@ -563,7 +567,7 @@
         }
       ],
       "prerequisite_parallel": true,
-      "reuse_version_1_gate_results": false,
+      "reuse_prior_gate_results": false,
       "prime_panels": 3,
       "prime_panel_runner": "crypto-eks-highmem",
       "prime_panel_timeout_seconds": 21600,
@@ -664,6 +668,30 @@
         "lines": 984
       }
     },
+    "version_2_gate_failure_evidence": {
+      "protocol": {
+        "path": "research/jv_sieve_validation_20261101/protocol-v2.json",
+        "sha256": "14ffb6a750c344e5d155842c84ad12c9c88a7609ff61ace213b1c88211f4b0b2"
+      },
+      "receipt": {
+        "path": "research/jv_sieve_validation_20261101/v2-gate-failure.json",
+        "sha256": "08595ae93404c69c91c1a4c7fa2e6834ddf3048ea2b2993679faa9fb0202ca9f"
+      },
+      "job_log": {
+        "path": "research/jv_sieve_validation_20261101/v2-run-41353962971.log",
+        "sha256": "2b1465614126bc18b91fcf42a2143ad715e4ab676097b470cfdb3782850e860d",
+        "bytes": 257716,
+        "lines": 2027
+      },
+      "static_audit": {
+        "path": "research/jv_sieve_validation_20261101/V3-GATE-PREDICATE-AUDIT.md",
+        "sha256": "96ece3697cb1f1fea72ac1d6395cd72a278148fbb3948b410c39d43119154fe3"
+      },
+      "proposed_test_source": {
+        "path": "src/cryptanalysis/jv_isogeny_walk.rs",
+        "sha256": "272835772484f2e81ec4e9fd5728c9be9c109f5173034723478e101573b4fe3c"
+      }
+    },
     "attempts_per_prime": 33,
     "rho_aa_replicate": "run index 1 for every seed",
     "ic_aa_replicate": "seed 33 repeated once in a separate process",
@@ -707,13 +735,31 @@
         "execution.queue",
         "execution.placement"
       ]
+    },
+    {
+      "id": "AMD-JV-LA-GATE-PREDICATE-20261101",
+      "filed": "2026-11-01",
+      "filed_before_affected_data": true,
+      "reason": "This amendment is explicitly gate-result-informed. Version 2 run 41353962971 exposed a contradictory prerequisite predicate after completing the counted p=101 route: LinearAlgebra was required to contain F_p field work even though the frozen counter specification assigns its Wiedemann and Berlekamp-Massey operations to modr_* at subgroup modulus l. Both other version 2 gates passed, but no requested-prime panel began, all 99 target attempts remained unstarted, and the run emitted no artifacts. The correction is filed after the version 2 gate failure and before every version 3 gate or panel datum.",
+      "changes": [
+        "Preserve the exact frozen version 2 protocol, complete run log, failure receipt, and independent static audit; report versions 1, 2, and 3 together.",
+        "Change only the ignored counted p=101 prerequisite predicate: retain field-work requirements for field phases, add Transport, and remove LinearAlgebra from that field-only loop.",
+        "Require LinearAlgebra to contain nonzero ModrAdd, ModrMul, ModrInv, and WordOp; retain route correctness, two-run determinism, relation WordOp/HashProbe, descent FieldInv, and total IC work checks.",
+        "Require zero foreign-thread work, zero operations at an unclassified attack modulus, and zero unattributed attack work, matching the already frozen invalidation rules.",
+        "Run all three version 3 prerequisite jobs fresh and in parallel at the exact version 3 frozen commit; do not reuse either green version 2 prerequisite.",
+        "Leave every production path, scientific arm, prime, seed, metric, producer, analysis, price, tolerance, stopping rule, decision rule, panel budget, and independent validation requirement unchanged."
+      ],
+      "supersedes_fields": [
+        "version",
+        "execution.placement.reuse_version_1_gate_results"
+      ]
     }
   ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "7d95957e04cc24980e9d948c222b8bbe9fe1835e193236906e245ef1f9b556dc",
-    "commit": "966dd342d824df06b6a9ac7336d03b0bfe92954a",
-    "frozen_at": "2026-11-01T21:48:31Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }

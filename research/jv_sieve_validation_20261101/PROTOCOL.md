@@ -1,11 +1,12 @@
 # Prospective protocol: corrected full-route Joux–Vitse validation
 
 Version 1 was frozen on 2026-11-01 before the first datum of this study. The
-machine-readable version 2 record is [`protocol.json`](protocol.json), and the
-exact frozen version 1 bytes remain in [`protocol-v1.json`](protocol-v1.json).
-This protocol supersedes neither the 2026-10-19 historical run nor the
-2026-10-23 unexecuted weak-curve-only protocol; it is a new prospective
-measurement.
+machine-readable version 3 record is [`protocol.json`](protocol.json), and the
+exact frozen version 1 and version 2 bytes remain in
+[`protocol-v1.json`](protocol-v1.json) and
+[`protocol-v2.json`](protocol-v2.json). This protocol supersedes neither the
+2026-10-19 historical run nor the 2026-10-23 unexecuted weak-curve-only
+protocol; it is a new prospective measurement.
 
 ## Version 2 administrative amendment
 
@@ -31,6 +32,41 @@ Every scientific arm, prime, seed, producer, metric, tolerance, stopping rule,
 decision rule, 21600-second panel budget, and independent validation obligation
 is unchanged. Version 1 and its incomplete attempt remain reportable alongside
 version 2; this amendment is filed before every datum it affects.
+
+## Version 3 gate-result-informed amendment
+
+Frozen version 2 run
+[`41353962971`](https://github.com/isogeny-labs/crypto/actions/runs/41353962971)
+stopped in the counted p=101 prerequisite after the complete counted route ran.
+The assertion `LinearAlgebra has no field work` applied the generic
+`field_ops()>0` predicate to a phase whose frozen counter specification assigns
+Wiedemann and Berlekamp–Massey work to `modr_*` at subgroup modulus `ℓ`.
+The recovery and corrected-rho/tools prerequisites passed, but the requested-
+prime panel and validation jobs were skipped. The run emitted no artifacts:
+all 99 p=1009, p=1511, and p=1823 attempts remained unstarted, so version 2
+observed no requested-prime datum. The exact failure receipt is
+[`v2-gate-failure.json`](v2-gate-failure.json); the exact 257716-byte log is
+[`v2-run-41353962971.log`](v2-run-41353962971.log), SHA-256
+`2b1465614126bc18b91fcf42a2143ad715e4ab676097b470cfdb3782850e860d`.
+
+Version 3 is explicitly gate-result-informed, not an administrative or
+pre-observation amendment. The independent static justification is retained in
+[`V3-GATE-PREDICATE-AUDIT.md`](V3-GATE-PREDICATE-AUDIT.md). It changes only the
+ignored counted p=101 gate predicate: `Transport` joins the field-work phases;
+`LinearAlgebra` leaves that field-only loop and instead must contain nonzero
+`ModrAdd`, `ModrMul`, `ModrInv`, and `WordOp`. The gate additionally requires
+zero foreign-thread, unclassified attack-modulus, and unattributed attack work
+while retaining its route, determinism, relations, descent, and total-work
+checks.
+
+All three version 3 prerequisites run fresh and in parallel at the exact
+version 3 frozen commit. Neither green version 2 prerequisite is reused, and
+all three must pass before any requested-prime panel starts. No production
+path, scientific arm, prime, seed, producer, metric, price, tolerance, stopping
+rule, decision rule, 21600-second panel budget, or independent validation
+obligation changes. Versions 1 and 2 and their terminal evidence remain
+reportable alongside version 3. This amendment is filed after the version 2
+gate failure and before every version 3 gate or panel datum it affects.
 
 ## Question and scope
 

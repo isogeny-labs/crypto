@@ -2942,28 +2942,46 @@ mod tests {
                 jv_bitops::claim();
                 jv_bitops::set_moduli(101, super::super::jv_cover::generate_spec(101, 1).l);
                 let before = jv_bitops::snapshot();
+                let other_before = jv_bitops::snapshot_other();
                 let r = run_end_to_end_with(101, 1, 8, &[3, 5, 7], 3, 1.3, 1.25, Some(64), false);
-                (r, jv_bitops::snapshot().since(&before))
+                let other_after = jv_bitops::snapshot_other();
+                let other: [u64; jv_bitops::PHASES] = core::array::from_fn(|i| {
+                    other_after[i].wrapping_sub(other_before[i])
+                });
+                (r, jv_bitops::snapshot().since(&before), other)
             })
         };
         jv_bitops::enable(true);
-        let (a, ta) = run(0xA11CE);
-        let (b, tb) = run(0xB0B);
+        let (a, ta, oa) = run(0xA11CE);
+        let (b, tb, ob) = run(0xB0B);
         // a cold trace scope per run: the same counts both times
         assert_eq!(ta, tb);
+        assert_eq!(oa, ob);
         assert_eq!(
             (a.walk_muls, a.transport_muls, a.model_muls, a.route_muls),
             (b.walk_muls, b.transport_muls, b.model_muls, b.route_muls)
         );
         assert!(a.route_correct && a.verified_on_challenge, "{a:?}");
+        assert_eq!(
+            jv_bitops::foreign(),
+            0,
+            "counted work escaped the owner thread"
+        );
+        let other_ic: u64 = Phase::IC.iter().map(|&ph| oa[ph as usize]).sum();
+        assert_eq!(other_ic, 0, "unclassified attack modulus work: {oa:?}");
+        assert!(
+            ta.phase(Phase::Unattributed).is_zero(),
+            "unattributed attack work: {:?}",
+            ta.phase(Phase::Unattributed)
+        );
         for ph in [
             Phase::Instance,
             Phase::Walk,
+            Phase::Transport,
             Phase::Model,
             Phase::FactorBase,
             Phase::Relations,
             Phase::Descent,
-            Phase::LinearAlgebra,
             Phase::Verification,
         ] {
             assert!(ta.phase(ph).field_ops() > 0, "{ph:?} has no field work");
@@ -2972,7 +2990,14 @@ mod tests {
         // linear algebra modulo ℓ
         assert!(ta.phase(Phase::Relations).get(Kind::WordOp) > 0);
         assert!(ta.phase(Phase::Relations).get(Kind::HashProbe) > 0);
-        assert!(ta.phase(Phase::LinearAlgebra).get(Kind::ModrMul) > 0);
+        let la = ta.phase(Phase::LinearAlgebra);
+        assert!(
+            la.get(Kind::ModrAdd) > 0
+                && la.get(Kind::ModrMul) > 0
+                && la.get(Kind::ModrInv) > 0
+                && la.get(Kind::WordOp) > 0,
+            "LinearAlgebra has no mod-r work: {la:?}"
+        );
         assert!(ta.phase(Phase::Descent).get(Kind::FieldInv) > 0);
         // the legacy product count is a lower bound of the counted products
         let ic = ta.sum(&Phase::IC);
