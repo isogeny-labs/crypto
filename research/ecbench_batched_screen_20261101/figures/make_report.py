@@ -86,7 +86,7 @@ The extra solve attempts of the small batches are cheap in the counted unit, and
 - Executed by `tools/task_card.py run` on `CARD-ecbench-batched-screen-20261101-1` (63 commands, exit 0, no retries); the director's assessment (`cards/card-1.assessment.md`) is `executed_as_specified`.
 - `audits/<cell>.verify.txt`: `ecbench verify --replay-all` on each session, 1600 records verified and 1280 replays reproduced, 0 problems. The ecbench binary is `447a6d3c4842…` in all four sessions.
 - `summary.json` is made by `figures/make_summary.py` from the verified records and the saved comparisons; this report is made from it by `figures/make_report.py`. `comparisons/` holds each arm's comparison text.
-- *The four `sessions/<cell>/records.jsonl` files (17 MB each) are not in this change.* This repository keeps data that large in the artifact store, and the session that ran this has no access to it. By the checkpoint script's rules (each under 25 MB, 70.8 MB in all, under its 300 MB cap) they are in the branch's S3 resume checkpoint as untracked files, which I could not read back from this session; they are pushed to the store with `python3 tools/artifacts/artifacts.py push research/ecbench_batched_screen_20261101/sessions`, which needs AWS credentials; until then `summary.json`, the audits and the comparisons are the committed record.
+- The four `sessions/<cell>/records.jsonl` files (17 MB each) are in the artifact store, with an `.artifacts.json` manifest per cell; `python3 tools/artifacts/artifacts.py pull research/ecbench_batched_screen_20261101/sessions` hydrates them. Run on them, `figures/make_summary.py` reproduces `figures/summary.json` byte for byte.
 '''
 open(f"{ROOT}/REPORT.typ", "w").write(doc)
 print("wrote REPORT.typ", len(doc), "chars")
