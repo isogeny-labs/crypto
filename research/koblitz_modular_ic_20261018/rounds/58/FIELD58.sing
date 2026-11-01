@@ -1,0 +1,43 @@
+proc require58(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../space58-01/complete-space58.sing"));int dimension58=ncols(kernel58);
+execute(read("../../../57/runs/field57-01/field-space57.sing"));
+ideal savedIdeal58=sourceIdeal57;poly savedA58=actualA57;poly savedInverse58=inverseA57;
+execute(read("../../../50/runs/rr-field50-01/rr-field50.sing"));
+execute(read("../../source-data/pairs58.sing"));
+map sourceMap58=fieldSpace57,l,v;ideal sourceIdeal58=sourceMap58(savedIdeal58);ideal GB58=std(sourceIdeal58);
+poly actualA58=sourceMap58(savedA58);poly inverseA58=sourceMap58(savedInverse58);
+require58(vdim(GB58)==32 && dimension58==100 && size(rrProducts50)==196,"FIELD58_SOURCE_AND_FULL_SPACE_DIMENSIONS");
+map coefficients58=completeSpace58,0;matrix columns58=coefficients58(kernel58);matrix controlColumns58=coefficients58(controlColumns58);matrix small58=coefficients58(smallControls58);matrix actualSigma58=coefficients58(sigmaRestricted58);
+int i58;int j58;int k58;poly val58;poly residual58;
+for(j58=1;j58<=196;j58++){
+ require58(reduce(rrValues50[pairs58[j58,1]]*rrValues50[pairs58[j58,2]]+rrProducts50[j58],GB58)==0,"FIELD58_ALL196_ACTUAL_QUADRATIC_BINDINGS");
+}
+poly b58=((1+u)*v+1)*((1+u)*v+1+u^3)/u^7;
+ideal controls58=1,actualA58^2,b58^2;
+for(j58=1;j58<=3;j58++){
+ val58=0;for(i58=1;i58<=196;i58++){val58=val58+controlColumns58[i58,j58]*rrProducts50[i58];}
+ require58(reduce(val58+controls58[j58],GB58)==0,"FIELD58_ALL_THREE_ACTUAL_CONTROLS");
+}
+require58(reduce(actualA58^2*inverseA58^2+1,GB58)==0,"FIELD58_SQUARED_DENOMINATOR_INVERSE");
+ideal completeValues58;ideal dividedValues58;
+for(j58=1;j58<=100;j58++){
+ val58=0;for(i58=1;i58<=196;i58++){val58=val58+columns58[i58,j58]*rrProducts50[i58];}
+ completeValues58[j58]=reduce(val58,GB58);dividedValues58[j58]=reduce(val58*inverseA58^2,GB58);
+ require58(reduce(actualA58^2*dividedValues58[j58]+completeValues58[j58],GB58)==0,"FIELD58_ALL100_DIVIDED_PRODUCTS");
+}
+for(j58=1;j58<=2;j58++){
+ val58=0;for(i58=1;i58<=100;i58++){val58=val58+small58[i58,j58]*completeValues58[i58];}
+ require58(reduce(val58+controls58[j58],GB58)==0,"FIELD58_KERNEL_CONTROLS");
+}
+for(j58=1;j58<=100;j58++){
+ val58=subst(completeValues58[j58],l,l+actualA58);
+ for(i58=1;i58<=100;i58++){val58=val58+actualSigma58[i58,j58]*completeValues58[i58];}
+ require58(reduce(val58,GB58)==0,"FIELD58_ALL100_ACTUAL_SOURCE_INVOLUTION_IDENTITIES");
+}
+require58(reduce(actualA58^2*(dividedValues58[1]+1)+completeValues58[1],GB58)!=0,"FIELD58_CHANGED_DIVIDED_SECTION_REJECTED");
+link out58="ASCII:w field-space58.sing";open(out58);write(out58,"ring fieldSpace58=(2,u),(l,v),dp;short=0;ideal sourceIdeal58;");
+for(i58=1;i58<=size(sourceIdeal58);i58++){write(out58,"sourceIdeal58["+string(i58)+"]="+string(sourceIdeal58[i58])+";");}
+write(out58,"poly actualA58="+string(actualA58)+";poly inverseA58="+string(inverseA58)+";ideal completeValues58;ideal dividedValues58;");
+for(j58=1;j58<=100;j58++){write(out58,"completeValues58["+string(j58)+"]="+string(completeValues58[j58])+";dividedValues58["+string(j58)+"]="+string(dividedValues58[j58])+";");}close(out58);
+print("FIELD58_RESULT source_degree=32 actual_quadratic_bindings=196 complete_sections=100 divided_sections=100 division_products=100 actual_source_involution_checks=100 controls=3 changed_section_rejected=1");
+print("FIELD58_ALL_CHECKS_PASS");quit;

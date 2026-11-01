@@ -1,0 +1,122 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R57-FIXED-MOD-TRACE",
+  "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
+  "claims": [
+    {
+      "id": "trace-quotient",
+      "class": "exact_computation",
+      "statement": "Explicit14-dimensional fixed space splits into10 trace directions and4 quotient representatives with full span/recovery products."
+    },
+    {
+      "id": "actual-action",
+      "class": "exact_computation",
+      "statement": "All24 source functions satisfy actual sigma substitution lambda->lambda+A;4 fixed functions and10 trace preimages match their columns."
+    },
+    {
+      "id": "target",
+      "class": "out_of_scope",
+      "statement": "These4 directions are not identified with the intended modular factor; test target identities and order11 action next."
+    }
+  ],
+  "arms": {
+    "reference": "R27 original complete68 basis, R43 descended literals, R56 closed pole table",
+    "baseline": "retained degree128 complete ambient space",
+    "candidate": "Actual fixed space modulo trace image and source-bound representatives",
+    "positive": [
+      "N^2=0 rank10",
+      "14-dimensional fixed kernel and complete14-column splitting",
+      "4 quotient representatives and10 trace preimages",
+      "all24 actual sigma source identities",
+      "registered lambda trace=A",
+      "constant1 trace membership is an outcome"
+    ],
+    "negative": [
+      "addlambda to actual trace preimage; resulting trace differs by nonzeroA"
+    ],
+    "A_A": {
+      "not_applicable_reason": "fixed exhaustive exact algebra, no statistical comparison"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "all donor bytes",
+      "Singular/FLINT one thread",
+      "4GiB virtual/1200s",
+      "seed57",
+      "complete68 sections and20 charts"
+    ],
+    "measured": [
+      "binary digest",
+      "start/end UTC",
+      "exit status"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "exhaustive prescribed polynomial identities",
+    "seeds": [
+      57
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exactpredeclaredproducts"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "notapplicable"
+  },
+  "metrics": [
+    "fixed14 trace10 quotient4",
+    "24 actual substitution identities",
+    "4 actual fixed functions",
+    "10 actual trace preimages",
+    "constant1/A trace membership"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh trace57-02 TRACE57.sing TRACE57_ALL_CHECKS_PASS",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 57,
+    "queue": "one mathematical job atonce",
+    "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
+    "source_gate": "sixexecutedfiles matchGit;all donor hashes",
+    "backend": "existing user-authorized manual local exact algebra; no EKS submission"
+  },
+  "stopping": {
+    "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
+    "failure": "retain errors/caps/partials;freeze repairbeforefreshattempt",
+    "no_duplicate": "reconcilelivehandlebeforeretry"
+  },
+  "decision": {
+    "accept": "every prescribed exact identity and degree holds; exit0, marker and no question-mark errors",
+    "failure": "preserve failed attempt; no mathematical null inferred from syntax or precision errors"
+  },
+  "analysis": {
+    "kind": "exact polynomial reduction and rigorous Laurent valuation",
+    "comparative": false,
+    "precision": "Original absolute-precision Laurent helper; each needed coefficient must be below tracked precision, ambient bounds require positive precision; 129 independent O-jets certify control reconstruction. No zero truncation is an infinite valuation."
+  },
+  "literature": [
+    {
+      "source": "R27 RR27-EXPORT/LAURENT27/CUSP27, R43 descent literals, R50 RR_FIELD, R56 CM and closed-poles56",
+      "use": "original complete ambient basis, actual coordinate transition and complete poles"
+    },
+    {
+      "url": "https://stacks.math.columbia.edu/tag/0B5B",
+      "use": "RR on proper normal curves; pole restriction inside an already complete ambient space"
+    }
+  ],
+  "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
+  "version": 8,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "trace57-01 rejected trimmed vector shapes and live matrix source ring mismatch; use full24-row control matrices and actual completeSpace57 ring",
+    "prior_attempt": "retain every partial; no trace flags or late result accepted"
+  }
+}

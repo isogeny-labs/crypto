@@ -1,0 +1,428 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 56,
+  "runs": [
+    {
+      "attempt": "check56-01",
+      "source_revision": "73a7714af5e1be446cced611c1c7cc83a06ef5cc",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHECK56_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "LOCALCHECK56 case=1 base=0 positive_factor_degrees=1,7 ramified_root_value=4/7 alpha_order=11 uniformizer_order=1",
+        "LOCALCHECK56 case=2 base=0 positive_factor_degrees=1,7 ramified_root_value=4/7 alpha_order=11 uniformizer_order=1",
+        "LOCALCHECK56 case=3 base=1 positive_factor_degrees=1,7 ramified_root_value=4/7 alpha_order=11 uniformizer_order=1",
+        "LOCALCHECK56 case=4 base=1 positive_factor_degrees=1,7 ramified_root_value=4/7 alpha_order=11 uniformizer_order=1",
+        "CHECK56_RESULT local_charts=4 residue_degree=2 ramification=7,1,7,1 A_poles=28,4,7,1 zero_degree=80 pole_degree=80 rational_uniformizers=2"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T19:05:47Z",
+      "finished_utc": "2026-10-31T19:05:47Z",
+      "native_wall_seconds": 0.0
+    },
+    {
+      "attempt": "infinity-lean56-01",
+      "source_revision": "e2f5b71b80bde6571f5b564b121c07a89301b30a",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": [
+        "Infinity56.chart_order",
+        "Infinity56.full_denominator",
+        "Infinity56.jet_preserves_order",
+        "Infinity56.pullback_pole"
+      ],
+      "authored_claims": [
+        "Infinity56.chart_order",
+        "Infinity56.full_denominator",
+        "Infinity56.jet_preserves_order",
+        "Infinity56.pullback_pole"
+      ],
+      "generated_equation_declarations": [],
+      "status": "accepted"
+    },
+    {
+      "attempt": "infinity56-01",
+      "source_revision": "7fdcdf0ddf57567d9ead167aaca960f4ed361ad4",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "INFINITY56_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 14,
+      "first_errors": [
+        "   ? `polynomials56` is not defined",
+        "   ? error occurred in or before input.sing line 108: `poly zero56=jetMap56(polynomials56[1]);poly one56=jetMap56(polynomials56[2]);`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `polynomials56` is not defined",
+        "   ? error occurred in or before input.sing line 108: `poly zero56=jetMap56(polynomials56[1]);poly one56=jetMap56(polynomials56[2]);`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `zero56` is not defined",
+        "   ? error occurred in or before input.sing line 109: `=polygon56(subst(zero56,s,s+a),\"zero\");list oneFaces56=polygon56(one56,\"one\");`"
+      ],
+      "native_results": [
+        "BASE56 branch=0 R=-3 b=-7 c=-4 A=-4 Delta=-37",
+        "BASE56 branch=1 R=2 b=1 c=-1 A=-1 Delta=-1"
+      ],
+      "point_results": [],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-10-31T18:21:52Z",
+      "finished_utc": "2026-10-31T18:21:53Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "infinity56-02",
+      "source_revision": "49493689ef58d7c7a63dee0d2cae525e37c97412",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "INFINITY56_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "BASE56 branch=0 R=-3 b=-7 c=-4 A=-4 Delta=-37",
+        "BASE56 branch=1 R=2 b=1 c=-1 A=-1 Delta=-1",
+        "NEWTON56 label=zero left=0 right=8 root_value=1/1 residual=s^8+(a)",
+        "NEWTON56 label=zero left=8 right=16 root_value=0/1 residual=s^8+1",
+        "NEWTON56 label=one left=0 right=16 root_value=3/1 residual=s^16+s^8+1",
+        "INFINITY56_RESULT jet_precision=128 base_branches=2 A_poles=4,1 source_degree=16 zero_edges=2 one_edges=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T18:23:40Z",
+      "finished_utc": "2026-10-31T18:23:41Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "refine56-01",
+      "source_revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "REFINE56_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "NEWTON56 label=b0c0step0 left=0 right=8 root_value=1/1 residual=s^8+(a)",
+        "NEWTON56 label=b0c0step0 left=8 right=16 root_value=0/1 residual=s^8+1",
+        "NEWTON56 label=b0c0step1 left=0 right=1 root_value=2/1 residual=s+(a+1)",
+        "NEWTON56 label=b0c0step1 left=1 right=8 root_value=4/7 residual=s+1",
+        "NEWTON56 label=b0c0step1 left=8 right=16 root_value=-1/1 residual=s^8+1",
+        "REFINEMENT56_RESOLVED branch=0 conjugate=0 step=1 scale=1 precision=120",
+        "REFINEMENT56_RESULT branch=0 conjugate=0 resolved=1 steps=1 remaining_precision=120",
+        "NEWTON56 label=b0c1step0 left=0 right=8 root_value=1/1 residual=s^8+(a+1)",
+        "NEWTON56 label=b0c1step0 left=8 right=16 root_value=0/1 residual=s^8+1",
+        "NEWTON56 label=b0c1step1 left=0 right=1 root_value=2/1 residual=s+(a)",
+        "NEWTON56 label=b0c1step1 left=1 right=8 root_value=4/7 residual=s+1",
+        "NEWTON56 label=b0c1step1 left=8 right=16 root_value=-1/1 residual=s^8+1",
+        "REFINEMENT56_RESOLVED branch=0 conjugate=1 step=1 scale=1 precision=120",
+        "REFINEMENT56_RESULT branch=0 conjugate=1 resolved=1 steps=1 remaining_precision=120",
+        "NEWTON56 label=b1c0step0 left=0 right=8 root_value=1/1 residual=s^8+(a+1)",
+        "NEWTON56 label=b1c0step0 left=8 right=16 root_value=0/1 residual=s^8+1",
+        "NEWTON56 label=b1c0step1 left=0 right=1 root_value=1/1 residual=s+(a)",
+        "NEWTON56 label=b1c0step1 left=1 right=8 root_value=4/7 residual=s+1",
+        "NEWTON56 label=b1c0step1 left=8 right=16 root_value=-1/1 residual=s^8+1",
+        "REFINEMENT56_RESOLVED branch=1 conjugate=0 step=1 scale=4 precision=72",
+        "REFINEMENT56_RESULT branch=1 conjugate=0 resolved=1 steps=1 remaining_precision=72",
+        "NEWTON56 label=b1c1step0 left=0 right=8 root_value=1/1 residual=s^8+(a)",
+        "NEWTON56 label=b1c1step0 left=8 right=16 root_value=0/1 residual=s^8+1",
+        "NEWTON56 label=b1c1step1 left=0 right=1 root_value=1/1 residual=s+(a+1)",
+        "NEWTON56 label=b1c1step1 left=1 right=8 root_value=4/7 residual=s+1",
+        "NEWTON56 label=b1c1step1 left=8 right=16 root_value=-1/1 residual=s^8+1",
+        "REFINEMENT56_RESOLVED branch=1 conjugate=1 step=1 scale=4 precision=72",
+        "REFINEMENT56_RESULT branch=1 conjugate=1 resolved=1 steps=1 remaining_precision=72",
+        "REFINE56_RESULT zero_resolved=1 one_resolved=1 residue_conjugates=2 local_coefficient_descent=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T18:40:19Z",
+      "finished_utc": "2026-10-31T18:40:20Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "unit56-01",
+      "source_revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "UNIT56_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "UNIT56_RESULT affine_zero_degree=80 lambda_unit=1 b_unit=1 actual_border_relation=1 full_Bezout_products=2 changed_inverse_rejected=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T18:42:04Z",
+      "finished_utc": "2026-10-31T18:42:05Z",
+      "native_wall_seconds": 1.0
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "check56-01",
+      "artifact": "input.sing",
+      "revision": "73a7714af5e1be446cced611c1c7cc83a06ef5cc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/CHECK56.sing",
+      "sha256": "dfd3cabc9e13854818bdbb44624394174f39fcb6196ca619fb5acd1ab33b44d7"
+    },
+    {
+      "attempt": "check56-01",
+      "artifact": "driver.sh",
+      "revision": "73a7714af5e1be446cced611c1c7cc83a06ef5cc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/NATIVE_DRIVER.sh",
+      "sha256": "4e07134e6a0a6138d1ffffc550254cfb95abf6672f07ef72ca4f7be980bb5c73"
+    },
+    {
+      "attempt": "check56-01",
+      "artifact": "launcher.sh",
+      "revision": "73a7714af5e1be446cced611c1c7cc83a06ef5cc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "check56-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "73a7714af5e1be446cced611c1c7cc83a06ef5cc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/PROTOCOL.md",
+      "sha256": "15c83d497250eba3e6737ae56af3b8d8337e51bbb1471d36f13379cb8fbb244a"
+    },
+    {
+      "attempt": "check56-01",
+      "artifact": "protocol.json",
+      "revision": "73a7714af5e1be446cced611c1c7cc83a06ef5cc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/protocol.json",
+      "sha256": "5a80d3af236279ce94136431fc12b0c4234d1864affb6fce588e6eed5793ae39"
+    },
+    {
+      "attempt": "check56-01",
+      "artifact": "donors.json",
+      "revision": "73a7714af5e1be446cced611c1c7cc83a06ef5cc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/donors.json",
+      "sha256": "67239bfa6325bcdaaf6bee5d170f8a61237fc62161e45b1e297599827449174c"
+    },
+    {
+      "attempt": "infinity-lean56-01",
+      "artifact": "driver.sh",
+      "revision": "e2f5b71b80bde6571f5b564b121c07a89301b30a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/LEAN_DRIVER.sh",
+      "sha256": "4ea22e8974be6aca87338f6b2496da9f342ed59fd575d4610f0bd2126c1377ec"
+    },
+    {
+      "attempt": "infinity-lean56-01",
+      "artifact": "launcher.sh",
+      "revision": "e2f5b71b80bde6571f5b564b121c07a89301b30a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/REPLAY_LEAN.sh",
+      "sha256": "9a0971ddb637bce12f10e371a8f327d70bd941a81ed280ed3347ac87d92f29ee"
+    },
+    {
+      "attempt": "infinity-lean56-01",
+      "artifact": "Infinity56.lean",
+      "revision": "e2f5b71b80bde6571f5b564b121c07a89301b30a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/lean/Infinity56.lean",
+      "sha256": "262ed13de5e748eb3168c09d0fdc126699982301996e4daed5c5d4e98848f509"
+    },
+    {
+      "attempt": "infinity-lean56-01",
+      "artifact": "LEAN-PROTOCOL.md",
+      "revision": "e2f5b71b80bde6571f5b564b121c07a89301b30a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/LEAN-PROTOCOL.md",
+      "sha256": "b1b4b439a129718b48db7de6d2027bd8498a2eb5287911c61b5c14b58aacf6c8"
+    },
+    {
+      "attempt": "infinity-lean56-01",
+      "artifact": "AuditAxioms.lean",
+      "revision": "e2f5b71b80bde6571f5b564b121c07a89301b30a",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "infinity56-01",
+      "artifact": "input.sing",
+      "revision": "7fdcdf0ddf57567d9ead167aaca960f4ed361ad4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/INFINITY56.sing",
+      "sha256": "a8f26cfab191326aa7007261e6a3a56642d5a0ae25bb24dae7de9e69731a8777"
+    },
+    {
+      "attempt": "infinity56-01",
+      "artifact": "driver.sh",
+      "revision": "7fdcdf0ddf57567d9ead167aaca960f4ed361ad4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/NATIVE_DRIVER.sh",
+      "sha256": "4e07134e6a0a6138d1ffffc550254cfb95abf6672f07ef72ca4f7be980bb5c73"
+    },
+    {
+      "attempt": "infinity56-01",
+      "artifact": "launcher.sh",
+      "revision": "7fdcdf0ddf57567d9ead167aaca960f4ed361ad4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "infinity56-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "7fdcdf0ddf57567d9ead167aaca960f4ed361ad4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/PROTOCOL.md",
+      "sha256": "f6a9f198255be6b0a9f6980b756faa7d3b7f47236a800e377514ff7c9430d4be"
+    },
+    {
+      "attempt": "infinity56-01",
+      "artifact": "protocol.json",
+      "revision": "7fdcdf0ddf57567d9ead167aaca960f4ed361ad4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/protocol.json",
+      "sha256": "0f8b409c47b4f5ee409b26488d785f9d831ba7e8615ec575ff40b2b0c5f6616c"
+    },
+    {
+      "attempt": "infinity56-01",
+      "artifact": "donors.json",
+      "revision": "7fdcdf0ddf57567d9ead167aaca960f4ed361ad4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/donors.json",
+      "sha256": "5761b4c8aee150bdea92a104f4b18c7dc303958e494c2179c468dab1d9e6d2d5"
+    },
+    {
+      "attempt": "infinity56-02",
+      "artifact": "input.sing",
+      "revision": "49493689ef58d7c7a63dee0d2cae525e37c97412",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/INFINITY56.sing",
+      "sha256": "670bd9f4403f2f895f1360401aaadd2a09b3869a25f8bb679327c69002415bb8"
+    },
+    {
+      "attempt": "infinity56-02",
+      "artifact": "driver.sh",
+      "revision": "49493689ef58d7c7a63dee0d2cae525e37c97412",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/NATIVE_DRIVER.sh",
+      "sha256": "4e07134e6a0a6138d1ffffc550254cfb95abf6672f07ef72ca4f7be980bb5c73"
+    },
+    {
+      "attempt": "infinity56-02",
+      "artifact": "launcher.sh",
+      "revision": "49493689ef58d7c7a63dee0d2cae525e37c97412",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "infinity56-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "49493689ef58d7c7a63dee0d2cae525e37c97412",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/PROTOCOL.md",
+      "sha256": "5e2d7575b0009e18a50676217f8edb86dbfb1d424624abf1c412d61d801ff234"
+    },
+    {
+      "attempt": "infinity56-02",
+      "artifact": "protocol.json",
+      "revision": "49493689ef58d7c7a63dee0d2cae525e37c97412",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/protocol.json",
+      "sha256": "5a80d3af236279ce94136431fc12b0c4234d1864affb6fce588e6eed5793ae39"
+    },
+    {
+      "attempt": "infinity56-02",
+      "artifact": "donors.json",
+      "revision": "49493689ef58d7c7a63dee0d2cae525e37c97412",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/donors.json",
+      "sha256": "5761b4c8aee150bdea92a104f4b18c7dc303958e494c2179c468dab1d9e6d2d5"
+    },
+    {
+      "attempt": "refine56-01",
+      "artifact": "input.sing",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/REFINE56.sing",
+      "sha256": "20960e0df30b57c7714f795bf9783ca401d2aad40fa668023d127c5fc1d518a7"
+    },
+    {
+      "attempt": "refine56-01",
+      "artifact": "driver.sh",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/NATIVE_DRIVER.sh",
+      "sha256": "4e07134e6a0a6138d1ffffc550254cfb95abf6672f07ef72ca4f7be980bb5c73"
+    },
+    {
+      "attempt": "refine56-01",
+      "artifact": "launcher.sh",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "refine56-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/PROTOCOL.md",
+      "sha256": "6242039ebd280409cd3979366638f8be73c764b1398decd650312bb3c54dd1e5"
+    },
+    {
+      "attempt": "refine56-01",
+      "artifact": "protocol.json",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/protocol.json",
+      "sha256": "5a80d3af236279ce94136431fc12b0c4234d1864affb6fce588e6eed5793ae39"
+    },
+    {
+      "attempt": "refine56-01",
+      "artifact": "donors.json",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/donors.json",
+      "sha256": "00ebf639d7d162a5fa731a295f53a6a1f2bbe3f8d715b1e37531b8057a441569"
+    },
+    {
+      "attempt": "unit56-01",
+      "artifact": "input.sing",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/UNIT56.sing",
+      "sha256": "001282c8608400a1398dbad74b25f9084b63b662550ca0dbb6bcd092199f3331"
+    },
+    {
+      "attempt": "unit56-01",
+      "artifact": "driver.sh",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/NATIVE_DRIVER.sh",
+      "sha256": "4e07134e6a0a6138d1ffffc550254cfb95abf6672f07ef72ca4f7be980bb5c73"
+    },
+    {
+      "attempt": "unit56-01",
+      "artifact": "launcher.sh",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "unit56-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/PROTOCOL.md",
+      "sha256": "6242039ebd280409cd3979366638f8be73c764b1398decd650312bb3c54dd1e5"
+    },
+    {
+      "attempt": "unit56-01",
+      "artifact": "protocol.json",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/protocol.json",
+      "sha256": "5a80d3af236279ce94136431fc12b0c4234d1864affb6fce588e6eed5793ae39"
+    },
+    {
+      "attempt": "unit56-01",
+      "artifact": "donors.json",
+      "revision": "d0f5e039e65675863d01994b5c117e9e44e0e155",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/56/donors.json",
+      "sha256": "00ebf639d7d162a5fa731a295f53a6a1f2bbe3f8d715b1e37531b8057a441569"
+    }
+  ],
+  "authored_proved_claims": [
+    "Infinity56.chart_order",
+    "Infinity56.full_denominator",
+    "Infinity56.jet_preserves_order",
+    "Infinity56.pullback_pole"
+  ],
+  "audited_declarations": [
+    "Infinity56.chart_order",
+    "Infinity56.full_denominator",
+    "Infinity56.jet_preserves_order",
+    "Infinity56.pullback_pole"
+  ]
+}
