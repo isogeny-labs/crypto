@@ -3,6 +3,7 @@ proc require61(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 execute(read("../cubic61-02/cubic-space61.sing"));
 execute(read("../fix61-02/fixed-space61.sing"));
 execute(read("../cohort61-01/cohort-certificates61.sing"));
+print("CHECK61_INPUTS_LOADED");
 matrix ambC61=imap(cubicSpace61,cubicC61);matrix ambK61=imap(cubicSpace61,kernel61);matrix ambR61=imap(cubicSpace61,recovery61);matrix ambH61=imap(cubicSpace61,homotopy61);
 matrix ambProfiles61=imap(cubicSpace61,cubicProfiles61);matrix ambJets61=imap(cubicSpace61,cubicJets61);matrix ambLeft61=imap(cubicSpace61,ambientLeft61);matrix ambSigma61=imap(cubicSpace61,sigmaAmbient61);matrix mixSigma61=imap(cubicSpace61,sigmaMixed61);
 matrix fixF61=imap(fixedSpace61,F61);matrix fixN61=imap(fixedSpace61,N61);matrix fixR61=imap(fixedSpace61,R61);matrix fixH61=imap(fixedSpace61,H61);matrix fixQ61=imap(fixedSpace61,Q61);matrix fixPre61=imap(fixedSpace61,preimages61);matrix fixOdd61=imap(fixedSpace61,odd61);matrix mixOne61=imap(cubicSpace61,oneMixed61);
@@ -13,22 +14,26 @@ require61(fixN61*fixF61==matrix(0,76,38) && fixR61*fixF61==unitmat(38) && fixF61
 require61(fixN61*fixQ61+fixQ61*fixN61==unitmat(76) && fixQ61*fixQ61==matrix(0,76,76) && fixN61*fixPre61==fixF61 && fixN61*fixOdd61==mixOne61,"CHECK61_FULL_TRACE_CONTRACTION");
 require61(fixed7661==fixF61 && fixedOne61==imap(fixedSpace61,one38),"CHECK61_FIXED_SOURCE_BASIS");
 matrix ambientFixed61=ambK61*fixF61;
+module ambientRows61=module(transpose(ambProfiles61));
+require61(transpose(matrix(ambientRows61,324,272))==ambProfiles61,"CHECK61_ALL_NATIVE_ROW_VECTOR_BINDINGS");
+module selectedRows61;
 require61(ambProfiles61*ambientFixed61==imap(fixedSpace61,fixedProfiles61),"CHECK61_ALL_FIXED_PROFILES");
 require61(ambJets61*ambientFixed61==imap(fixedSpace61,fixedRegular61),"CHECK61_ALL_FIXED_REGULAR_JETS");
+print("CHECK61_SPACES_CHECKED");
 int e061;int e161;int e261;int e361;int p61;int ord61;int src61;int row61;int j61;int count61=0;int dim61;int principal61=0;int excluded61=0;intvec e61;
 intvec caps61=34,12,20,2;intvec offsets61=0,136,184,264;
 matrix bound61[136][324];matrix calculated61[136][38];matrix actual61[136][38];matrix H61[38][136];matrix K61[38][1];matrix R61[1][38];
 for(e161=-6;e161<=6;e161++){for(e261=-10;e261<=10;e261++){for(e361=-1;e361<=1;e361++){
  e061=-e161-e261-e361;e61=e061,e161,e261,e361;
- bound61=matrix(0,136,324);row61=0;
+ selectedRows61=module(0);row61=0;
  for(p61=1;p61<=4;p61++){for(ord61=-caps61[p61];ord61<2*e61[p61];ord61++){
   src61=offsets61[p61]+2*(ord61+caps61[p61])+1;
-  for(j61=1;j61<=324;j61++){bound61[row61+1,j61]=ambProfiles61[src61,j61];bound61[row61+2,j61]=ambProfiles61[src61+1,j61];}row61=row61+2;
+  selectedRows61[row61+1]=ambientRows61[src61];selectedRows61[row61+2]=ambientRows61[src61+1];row61=row61+2;
  }}
- require61(row61==136,"CHECK61_ALL_LOCAL_ROWS");calculated61=bound61*ambientFixed61;
+ require61(row61==136,"CHECK61_ALL_LOCAL_ROWS");bound61=transpose(matrix(selectedRows61,324,136));require61(nrows(bound61)==136 && ncols(bound61)==324,"CHECK61_SELECTED_AMBIENT_ROW_DIMENSIONS");calculated61=bound61*ambientFixed61;
  if(e061==0 && e161==0 && e261==0 && e361==0){require61(calculated61==control61 && mat_rk(control61)==37 && control61*fixedOne61==matrix(0,136,1) && mat_rk(controlK61)==1,"CHECK61_GLOBAL_REGULAR_CONTROL");}
  else{
-  count61++;execute("actual61=Ccase"+string(count61)+";H61=Hcase"+string(count61)+";");
+  count61++;if(count61/100*100==count61){print("CHECK61_PROGRESS case="+string(count61));}execute("actual61=Ccase"+string(count61)+";H61=Hcase"+string(count61)+";");
   require61(actual61==calculated61,"CHECK61_INDEPENDENT_AMBIENT_ROW_RECONSTRUCTION");dim61=38-mat_rk(actual61);
   if(dim61==0){require61(H61*actual61==unitmat(38),"CHECK61_EXCLUSION_CERTIFICATE");excluded61++;}
   else{require61(dim61==1,"CHECK61_DIMENSION_BOUND");execute("K61=Kcase"+string(count61)+";R61=Rcase"+string(count61)+";");require61(actual61*K61==matrix(0,136,1) && R61*K61==unitmat(1) && K61*R61+H61*actual61==unitmat(38),"CHECK61_COMPLETE_PRINCIPAL_CERTIFICATE");principal61++;}

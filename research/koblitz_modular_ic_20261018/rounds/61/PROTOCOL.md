@@ -105,3 +105,11 @@ Version10removes inheritedRustcompilerfields/CPU0annotation. Actualnative
 driveroneSingular/FLINTthread isnotCPU-pinned;separateLeandriverpinsCPU0.
 Alloriginalmathematicalsource/caps/seed/cohort/checksunchanged. Historical
 rawcopiesimmutable;no timingcomparisonisclaimed.
+
+### Checker02 native row-vector copy repair
+CHECK01manuallystoppedforavoidableper-cellinterpretercost;no resultaccepted,
+notatimeoutclaim. Preserveallrawandstopreceipt. Fresh02formsall272
+ambientrowsasmodulevectorsandchecksthefullmatrixreconstruction. Select
+all136rowsbywhole-vectorcopy,thenmultiplytheactual136x324matrixbythe
+mixed/fixedinclusionasbefore. All818casecomparisons/certificates,controls,
+source dimensions and originalcapsunchanged. Progressmarkersareobservational.

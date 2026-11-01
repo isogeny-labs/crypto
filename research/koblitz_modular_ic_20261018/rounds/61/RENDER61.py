@@ -81,7 +81,11 @@ indices, produced native errors and was stopped. Its exit0 does not make
 its output acceptable. The repair was frozen before fresh02. The first
 fixed-space launch was interrupted at the checkpoint gate during migration,
 before native start; all saved inputs are retained. Fresh02 used unchanged
-mathematical source. No accepted producer was repeated for publication.
+mathematical source. The first checker was manually stopped after an
+avoidable per-cell interpreter loop was identified; it has no accepted
+result and is not labelled a timeout. Fresh02 uses native row-vector copies,
+checks all272 row bindings and retains all818 pre-projection products.
+No accepted producer was repeated for publication.
 Historical auxiliary protocol metadata defects and prospective repairs are
 disclosed in PROTOCOL-METADATA61.md; raw versions remain immutable.
 

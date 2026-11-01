@@ -151,3 +151,31 @@ Leanaxiomauditstilllive;CHECK61waits.
 
 ### Errors
 Auxiliarycopiedexecutionmetadata mismatch; correctedfuturecontractwithoutrewritingraw orrerunningproducers.
+
+## 2026-11-01T19:38:30.559478+00:00 — six formal claims audited
+
+### What was done
+Scaling61compile0/audit0;all6authoredtheoremslisted,0failing0trusted. coefficient_inverse_squareusesnoaxioms;othersstandardfoundationsonly. Launchedfreshcheck61-01afterLeanhandle86457terminal.
+
+### Decisions made
+ReuseR59Jets59.left_inverse_basechangeforbinarycertificatecoefficientextensions;noduplicateLeanclaim. Proposed32square-basisoperator remainsunexecuted.
+
+### Open threads
+CHECK61full818ambient-rowreconstruction,thenresults/export/report/custody/delivery.
+
+### Errors
+Onlyharmlesscompilerunnecessarysimpa/auditorString.mkdeprecationwarnings. No prooffailure.
+
+## 2026-11-01T19:47:49.678828+00:00 — checker resource stop and vector-copy repair
+
+### What was done
+VerifiedownedSingularPID1911427/cwdruns/check61-01andstoppedSIGTERMafteravoidableper-cellinterpreterrowcopiesidentified. DriverterminalFAIL/native0/missingmarker; no resultaccepted. Stopreceipt retained.
+
+### Decisions made
+FreezeCHECK02whole-module-vectorrowcopieswithfull272rowbindingcontrol,all818136x324pre-projectionproducts/certificatesandunchangedcaps. Notlabelledatimeoutoramathematicalnull.
+
+### Open threads
+FreshCHECK02thenrecords/report/custody;all6Leanclaimsalreadyaudited0failing0trusted.
+
+### Errors
+Inefficientfirstcheckerimplementationmanuallystopped;sourcecopyrepairbeforefreshdata,allrawpreserved.

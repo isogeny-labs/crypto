@@ -16,7 +16,7 @@ for d in sorted((h/'runs').iterdir()):
    code=int((d/'exit.txt').read_text());log=(d/'native.log').read_text();errors=[s for s in log.splitlines() if re.match(r'^\s*\?',s)]
    row.update(kind='Singular',native_exit=code,marker=markers[0],marker_present=markers[0] in log.splitlines(),error_count=len(errors),first_errors=errors[:8],native_results=[s for s in log.splitlines() if re.match(r'^[A-Z0-9_]+_RESULT ',s)])
    row['status']='accepted' if code==0 and not errors and row['marker_present'] else 'rejected'
-   row['outcome']='time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
+   row['outcome']='manual_resource_stop' if d.name=='check61-01' else 'time_cap' if code==124 else 'native_error' if errors else 'completed' if row['status']=='accepted' else 'missing_marker'
    start=(d/'started-utc.txt').read_text().strip();finish=(d/'finished-utc.txt').read_text().strip();row.update(started_utc=start,finished_utc=finish,native_wall_seconds=(datetime.fromisoformat(finish.replace('Z','+00:00'))-datetime.fromisoformat(start.replace('Z','+00:00'))).total_seconds())
   candidates=[]
   for p in h.glob('*.sing'):
@@ -33,14 +33,15 @@ for d in sorted((h/'runs').iterdir()):
  for local,source in mapping.items():
   path=str(h.relative_to(repo)/source) if source else 'tools/lean/AuditAxioms.lean';old=subprocess.check_output(['git','show',rev+':'+path],cwd=repo);actual=(d/local).read_bytes();assert old==actual,(d.name,local)
   pins.append({'attempt':d.name,'artifact':local,'revision':rev,'git_source':path,'sha256':hashlib.sha256(actual).hexdigest()})
+ row['artifacts']=[{'path':str(p.relative_to(h)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in sorted(d.iterdir()) if p.is_file()]
  rows.append(row)
 accepted={r['attempt']:r for r in rows if r['status']=='accepted'}
-required=['trace61-01','cubic61-02','field61-01','fix61-02','cohort61-01','check61-01','scaling-lean61-01']
+required=['trace61-01','cubic61-02','field61-01','fix61-02','cohort61-01','check61-02','scaling-lean61-01']
 assert all(n in accepted for n in required),(required,list(accepted))
 result={'schema':'koblitz.results/v1','round':61,'runs':rows,'input_pins':pins,'authored_proved_claims':sorted(authored),'audited_declarations':accepted['scaling-lean61-01']['audited_declarations'],'protocol_metadata_disclosure':'PROTOCOL-METADATA61.md; historical versions immutable'}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 protocols=[]
 for row in rows:
  d=h/'runs'/row['attempt'];name='LEAN-PROTOCOL.md' if row['kind']=='Lean' else 'protocol.json';p=d/name;protocols.append({'attempt':d.name,'path':str(p.relative_to(h)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'frozen_revision':row['source_revision']})
-export={'schema':'experiment.export/v1','experiment_id':'KOBLITZ-R61','claim_class':'exact_computation','protocols':protocols,'results':{'path':'results.json','sha256':hashlib.sha256((h/'results.json').read_bytes()).hexdigest()},'flow':{s:sum(r['status']==s for r in rows) for s in ['accepted','rejected','interrupted']},'canonical_schema_validation':'unavailable in selected Git index and disk; manual source-byte and exact contract checks only','protocol_metadata_disclosure':'PROTOCOL-METADATA61.md; v5 descriptive repair, v6+ before affected data','notes':'Native exact certificates and six abstract Lean claims have distinct scope; proper-source/RR/normalization premises retained. Global holomorphic forms, Cartier matrix and order11 action remain construction tasks.'}
+export={'schema':'experiment.export/v1','experiment_id':'KOBLITZ-R61','claim_class':'exact_computation','protocols':protocols,'raw_archive':'runs.tar.xz; content address in .artifacts.json after custody publication','results':{'path':'results.json','sha256':hashlib.sha256((h/'results.json').read_bytes()).hexdigest()},'flow':{s:sum(r['status']==s for r in rows) for s in ['accepted','rejected','interrupted']},'canonical_schema_validation':'unavailable in selected Git index and disk; manual source-byte and exact contract checks only','protocol_metadata_disclosure':'PROTOCOL-METADATA61.md; v5 descriptive repair, v6+ before affected data','notes':'Native exact certificates and six abstract Lean claims have distinct scope; proper-source/RR/normalization premises retained. Global holomorphic forms, Cartier matrix and order11 action remain construction tasks.'}
 (h/'export.json').write_text(json.dumps(export,indent=2)+'\n');print(json.dumps({'workflows':len(rows),**export['flow'],'historical_byte_pins':len(pins),'authored_claims':len(authored)}))

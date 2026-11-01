@@ -34,3 +34,10 @@ Compilation and axiom status are determined only by the retained compile
 and audit receipts. No native_decide, sorry or additional axiom is permitted.
 The affine trace-dual lattice is separate from global holomorphic forms,
 source Cartier columns, actual maps, descent and intended order11 action.
+
+## Reused coefficient-basechange certificate theorem
+R59sealedJets59.left_inverse_basechange proves H*C=I persists under any
+unital semiring homomorphism. It applies to each saved binary left-inverse
+product when coefficients are extended. This reuses the accepted R59proof;
+it does not require another duplicate theorem. Geometric identification of
+a changed divisor support is not supplied by coefficient basechange.
