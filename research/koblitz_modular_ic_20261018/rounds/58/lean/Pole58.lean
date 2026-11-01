@@ -1,0 +1,41 @@
+import Mathlib.RingTheory.Valuation.Basic
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.LinearCombination
+
+namespace Pole58
+
+/-- The exact local equation x*unit=s² transfers its order to x.
+The actual local parameter and unit premises come from the curve geometry. -/
+theorem local_unit_double_zero {K Γ : Type*} [Field K]
+    [LinearOrderedAddCommGroupWithTop Γ] (v : AddValuation K Γ)
+    (x s u : K) (heq : x * u = s ^ 2) (hu : v u = 0) :
+    v x = 2 • v s := by
+  have h := congrArg v heq
+  simpa only [v.map_mul, v.map_pow, hu, add_zero] using h
+
+/-- A pulled-back double pole at positive ramification cannot meet a
+simple-pole bound. Surjectivity and valuation compatibility are premises. -/
+theorem no_simple_pole (e sourceOrder : ℤ) (he : 0 < e)
+    (hpull : sourceOrder = -(2 * e)) (hbound : -1 ≤ sourceOrder) : False := by
+  rw [hpull] at hbound
+  linarith
+
+/-- Imaginary coefficient extraction in a characteristic-two quadratic
+constant extension; x,y are the binary coefficients. -/
+theorem imaginary_coefficient {K : Type*} [Field K] [CharP K 2]
+    (a x y : K) (ha : a ^ 2 + a + 1 = 0)
+    (hx : x ^ 2 = x) (hy : y ^ 2 = y) :
+    (x + a * y) ^ 2 + (x + a * y) = y := by
+  have htwo : (2 : K) = 0 := CharP.cast_eq_zero K 2
+  linear_combination hx + a^2 * hy + y * ha + (a*x*y+x-y) * htwo
+
+/-- The real coefficient is recovered after the imaginary coefficient. -/
+theorem real_coefficient {K : Type*} [Field K] [CharP K 2]
+    (a x y : K) (ha : a ^ 2 + a + 1 = 0)
+    (hx : x ^ 2 = x) (hy : y ^ 2 = y) :
+    (x + a * y) + a * ((x + a * y) ^ 2 + (x + a * y)) = x := by
+  rw [imaginary_coefficient a x y ha hx hy]
+  have htwo : (2 : K) = 0 := CharP.cast_eq_zero K 2
+  linear_combination (a*y) * htwo
+
+end Pole58

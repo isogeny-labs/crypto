@@ -1,0 +1,4 @@
+# R58 pole and coefficient implications
+Freeze before data. Four authored claims: local-unit equation transfers double-zero order; positive-ramification double pole contradicts simple bound; characteristic-two imaginary coefficient extraction; real coefficient extraction. No new axioms,sorry,native_decide or trusted declarations. Actual curve local parameter/unit/surjectivity and valuation compatibility remain supplied geometry; actual coefficient arrays remain native evidence. R57 complete-kernel implications already apply dimension-independently and are not recompiled merely for larger sizes.
+
+Pinned Lean4.34.1/mathlibd13f23b723b8a846827a245b89c10fc7d3f11612;existing proof-cache roots,-j1 -M4096,separate1200second compile/audit,no virtual cap. One mathematical job at a time. Immutable copied sources/driver/auditor and exit receipts. Preserve every failed attempt;freeze repairs before retry.
