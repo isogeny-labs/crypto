@@ -18,3 +18,12 @@ anddocs/experiment-protocol.md are absent both fromcurrentselectedGitindex
 anddisk. Exactmanualcontract/flow/byteverification therefore doesnotclaim
 canonicalschema-validation. Allnative errors/caps/partials andhistorical
 protocolcopiesstayintheirrawarchives;reportedresultsreferenceactualchecks.
+
+## Native execution annotation, version10 before CHECK61
+Inspection found historicalR61JSONexecution also retained Rustcompiler/timeout
+fields andCPU_affinity0. Actual frozenNATIVE_DRIVER.sh invokesSingular with
+oneSingular/FLINTthread andnoCPUaffinitypin. Lean separatelypinsCPU0,as
+itsownfrozen driver/protocolstate. Version10removesunrelatedcompilerfields
+anddescribestheactualSingular affinitybeforeCHECK61data. Historicalcopies
+remainimmutable; no mathematicalsource/cap/seed/cohort/thresholdchanged and
+no comparativeclockclaimreliesonthisannotation.

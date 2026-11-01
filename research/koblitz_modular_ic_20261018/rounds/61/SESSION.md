@@ -137,3 +137,17 @@ Leanaxiomaudit,CHECK61,records/report/custody. Completeholomorphic61space/Cartie
 
 ### Errors
 Compileronlywarnedunnecessarysimpa;no prooferror. Auditnotyetcomplete.
+
+## 2026-11-01T19:36:00.735307+00:00 — native execution annotation
+
+### What was done
+Found inheritedRustcompilerfields/CPU0annotation inR61nativeJSON; actualSingulardriverone thread isnotCPU-pinned. Correctedv10beforeCHECK61data anddisclosedimmutablehistoricalcopies; recordedcurrenthostmetadata only.
+
+### Decisions made
+Preserveallnativebytes/caps/seed/cohort/acceptancechecks; no comparativeclockclaim. LeanaffinityCPU0unchanged.
+
+### Open threads
+Leanaxiomauditstilllive;CHECK61waits.
+
+### Errors
+Auxiliarycopiedexecutionmetadata mismatch; correctedfuturecontractwithoutrewritingraw orrerunningproducers.

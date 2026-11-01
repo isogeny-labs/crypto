@@ -99,3 +99,9 @@ FIX61fresh02acceptedcomplete38fixed/38trace/fullcontraction andactualsourceident
 
 ## Stage6 fresh ambient-profile certificate check
 All818producer cases rank38/kernel0 withleftinverse; regularcontrolrank37/kernel1. Freezeallcasecertificates. Reconstructevery136x38matrixbyselectingrowsfromactual272x324ambientprofiles BEFORE multiplying324x76mixed and76x38fixedinclusions. CompareeverymatrixandfullH C=I38. Checkcompleteambientinjection,mixed/fixedsplittings,actualsigma,NQ+QN=I76,Q2=0,allpreimages,oddparticular,allfixedprofile/regularbindings andglobalregularcontrol. Changedlastrowmustfailcomparison. Nativeexactproducts,no independent scientific verdict or projectivesaturationclaim. Samefull818/caps/thread/seed61.
+
+### Execution metadata annotation before CHECK61
+Version10removes inheritedRustcompilerfields/CPU0annotation. Actualnative
+driveroneSingular/FLINTthread isnotCPU-pinned;separateLeandriverpinsCPU0.
+Alloriginalmathematicalsource/caps/seed/cohort/checksunchanged. Historical
+rawcopiesimmutable;no timingcomparisonisclaimed.

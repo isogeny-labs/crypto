@@ -76,10 +76,7 @@
     "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
     "source_gate": "sixexecutedfiles matchGit;all donor hashes",
     "backend": "original manually authorized local exact Singular",
-    "compiler_timeout_seconds": 1200,
-    "run_timeout_seconds": 1200,
-    "compiler": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
-    "CPU_affinity": "0"
+    "CPU_affinity": "Singular is not CPU-pinned; one Singular/FLINT thread. The separate Lean driver pins CPU0."
   },
   "stopping": {
     "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
@@ -107,9 +104,9 @@
     }
   ],
   "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
-  "version": 9,
+  "version": 10,
   "amendment": {
     "before_affected_data": true,
-    "reason": "all818producer matrices fullrank38/zerokernel; freeze separate ambient source-row reconstruction checker and exact source donor"
+    "reason": "Remove inherited Rust compiler/affinity metadata before CHECK61; actual frozen native driver remains unchanged, one thread, no timing comparison"
   }
 }
