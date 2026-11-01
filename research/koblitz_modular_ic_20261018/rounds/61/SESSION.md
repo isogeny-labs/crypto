@@ -109,3 +109,17 @@ All818,independentchecker,sixLeanclaims/report/custody andoriginalallleads.
 
 ### Errors
 No fresh02nativeerrors. Old01checkpointinterruptionretained.
+
+## 2026-11-01T19:22:23.397955+00:00 — all818 support certificates
+
+### What was done
+cohort61-01terminalacceptedexit0/exactPASS/noerrors. All818rank38/kernel0withleftinverse. Globalregularcontrolrank37/kernel1containsactual1. All136rows,bothtraceparities,degreesthrough34including22retained.
+
+### Decisions made
+No principalxsurvives this cohort, hence no scalar/ASbranch is entered here. Freeze fresh complete324ambient row reconstruction andfullcertificatechecker.
+
+### Open threads
+FreshCHECK61,sixScaling61Leanclaims,results/report/custody;completeholomorphic61/Cartier/sourceunitlattice andalloriginalleads.
+
+### Errors
+No cohortnativeerrors. Historicalfailed/interruptedattemptsretained.
