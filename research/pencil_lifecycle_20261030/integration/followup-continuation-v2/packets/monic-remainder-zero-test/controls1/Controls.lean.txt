@@ -1,0 +1,17 @@
+import ZeroTest
+set_option autoImplicit false
+namespace MonicZeroControls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem divisible_accepts : checkedPrem 17 [16,1] [16,0,1] 3=some [] := by decide
+theorem nondivisible_rejects : checkedPrem 17 [16,1] [1,0,1] 3=some [2] := by decide
+theorem initial_zeros_normalized : checkedPrem 17 [16,1] [16,0,1,0,0] 5=some [] := by decide
+theorem zero_polynomial_accepts : checkedPrem 17 [16,1] [0,0,0] 3=some [] := by decide
+theorem nonmonic_rejected : checkedPrem 17 [1,2] [1,2] 2=none := by decide
+theorem insufficient_fuel_distinct : checkedPrem 17 [16,1] [16,0,1] 1=none := by decide
+theorem untrimmed_zero_not_normal : ¬Normal [0,0] := by decide
+theorem noncanonical_zero_counterexample :
+ Normal [17] ∧ wordsPoly 17 [17]=0 ∧ ([17] : List UInt64)≠[] := by
+ refine ⟨by decide,?_,by decide⟩
+ norm_num [wordsPoly,listPoly]
+end MonicZeroControls

@@ -1,0 +1,163 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1190",
+  "kind": "polynomial_remainder_trace_invariant",
+  "main_declarations": 7,
+  "control_declarations": 8,
+  "checks": {
+    "trace3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "RemainderTrace.cancel_identity",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTrace.run_identity",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTrace.cancel_dvd_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTrace.run_dvd_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTrace.zero_remainder_dvd",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTrace.zero_remainder_witness",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTrace.residual_sound",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.complete_division",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.quotient_fixture",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.partial_division",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.empty_trace",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.repeated_slot_sum",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.repeated_slot_not_last",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.divisible_but_nonterminal",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderTraceControls.zero_divisor_trace",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "failed_attempts": [
+    "trace1",
+    "trace2",
+    "controls1"
+  ],
+  "assumptions": [
+    "field K",
+    "arbitrary finite cancellation trace"
+  ],
+  "native_word_list_correspondence": "pending",
+  "native_quotient_correspondence": "not claimed; sum versus overwrite distinguished",
+  "termination": "not proved",
+  "independent_source_fidelity_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "pdf_inspection": "one page readable and unclipped",
+  "upstream_compiled_dependencies": "retained trust boundary"
+}
