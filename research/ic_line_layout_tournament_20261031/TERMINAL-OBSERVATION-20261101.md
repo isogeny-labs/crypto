@@ -59,11 +59,19 @@ requirements. Any further performance trial requires a new frozen evidence
 version and preregistration; it cannot retroactively complete this one.
 
 The reviewed follow-up is `.github/workflows/isolab-failure-diagnosis.yml`.
-It is fixed to the two recorded identities, verifies request and artifact hashes,
-and retains only allowlisted failure metadata. It cannot submit or retry a Job,
-and raw measurements and stderr remain private. Its current status is
-implemented but not run; the terminal observation above remains unchanged until
-the workflow returns authenticated classifications.
+It is fixed to the two recorded identities, verifies request and accessible
+artifact hashes, and retains only allowlisted failure metadata. It cannot submit
+or retry a Job, and raw measurements and stderr remain private.
+
+Its first dispatch, [run 41266993333](https://github.com/isogeny-labs/crypto/actions/runs/41266993333)
+on merge commit `0b915934de7f57b814507bfe32208175b4fd3a94`, authenticated
+successfully and read the four fixed launcher receipts. Both payload-prefix
+reads returned 403. A reader defect then treated the failed manifest copy as
+success and attempted to verify a nonexistent file, so both matrix jobs failed
+and no diagnosis artifact was uploaded. The follow-up correction distinguishes
+not-listed, read-unavailable and hash-verified payload states, and reports only
+an identity-checked Kubernetes status classification when payload reads are
+unavailable. No experiment retry or broader IAM grant is introduced.
 
 The relation-yield pruning instrumentation merged separately through PR #3091.
 That instrumentation and this line-layout implementation are engineering

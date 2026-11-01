@@ -21,9 +21,9 @@ at [`failure-flow.svg`](failure-flow.svg).
   authenticated session directory or comparison.
 - **Zero outcome-driven retries — verified complete.** Exactly the two frozen
   trials ran and both failures are retained.
-- **Privacy-preserving diagnosis — implemented but not yet run.** The fixed
-  workflow emits only allowlisted failure metadata and hash-verifies every
-  downloaded payload object that has a retained manifest.
+- **Privacy-preserving diagnosis — first read failed; correction pending.** Run
+  41266993333 read the fixed launcher receipts but received 403 for payload
+  objects. A copy-status bug prevented a diagnosis artifact; no raw data leaked.
 
 ## Observed execution
 
@@ -55,6 +55,15 @@ request hash, downloads only allowlisted diagnostic objects, checks each object
 against the retained `SHA256SUMS`, and publishes a compact classification. It
 does not run the binary, submit or retry a Job, print raw logs, or upload raw
 measurements.
+
+The first merged dispatch, workflow run 41266993333, authenticated successfully
+and read the four launcher receipts for both trials. Payload-object reads were
+forbidden by the existing role. The reader incorrectly treated that copy failure
+as success and then attempted to verify a nonexistent manifest; both matrix jobs
+failed and uploaded nothing. The correction records the payload access state and
+uses only identity-checked Kubernetes status when payload objects are unreadable.
+It does not widen IAM permissions or elevate that status evidence to a
+hash-verified payload receipt.
 
 ## Sources checked
 

@@ -55,7 +55,7 @@ PATH="$tmp/bin:$PATH" FAKE_S3_ROOT="$tmp/s3" ISOLAB_BUCKET="$bucket" \
 jq -e --arg pod "$pod" '
   .schema=="isolab.eks.failed-diagnosis/v1" and .experiment_retry==false
   and .pods==[{pod_uid:$pod,classification:"l2_isolation_gate",exit_code:42,
-    exit_source:"hash_verified_job_exit",manifest_verified:true,
+    exit_source:"hash_verified_job_exit",artifact_access:"selected_objects_hash_verified",manifest_verified:true,
     l2:{accepted:false,executions:2,below_l2:1,invalid_outcomes:0,grades:[{level:"L1",count:2}]},
     audit:null,control:{wall:{status:"rejected",pairs:5,pairs_below_level:1,aa_pairs:5,aa_ci95_present:true}},
     owner_checks:{run:false,replay:false},
@@ -72,9 +72,25 @@ jq -n --arg job "$job" '{next_token:null,objects:[],results_uri:("s3://fixture/r
 PATH="$tmp/bin:$PATH" FAKE_S3_ROOT="$tmp/s3" ISOLAB_BUCKET="$bucket" \
   "$here/diagnose-failed-run" "$job" "$launcher" "$request" "$source" "$binary" 41260778856 "$tmp/status-only.json"
 jq -e --arg pod "$pod" '.pods==[{pod_uid:$pod,classification:"l2_isolation_gate",exit_code:42,
-  exit_source:"kubernetes_status",manifest_verified:false,l2:null,audit:null,control:null,
+  exit_source:"kubernetes_status",artifact_access:"manifest_not_listed",manifest_verified:false,
+  l2:null,audit:null,control:null,
   owner_checks:{run:false,replay:false},
   private_stderr:{run_sha256:null,audit_sha256:null,content_published:false}}]' "$tmp/status-only.json" >/dev/null
+
+# A listed payload that this identity cannot read still returns the identity-
+# checked Kubernetes classification and records the narrower evidence source.
+jq -n --arg job "$job" --arg pod "$pod" '{next_token:null,objects:[
+  {Key:("runs/"+$job+"/"+$pod+"/SHA256SUMS")},
+  {Key:("runs/"+$job+"/"+$pod+"/job-exit.json")}],results_uri:("s3://fixture/runs/"+$job+"/")}' \
+  > "$launcher_dir/objects.json"
+PATH="$tmp/bin:$PATH" FAKE_S3_ROOT="$tmp/s3" ISOLAB_BUCKET="$bucket" \
+  "$here/diagnose-failed-run" "$job" "$launcher" "$request" "$source" "$binary" 41260778856 \
+  "$tmp/read-unavailable.json" 2> "$tmp/read-unavailable.stderr"
+jq -e --arg pod "$pod" '.pods==[{pod_uid:$pod,classification:"l2_isolation_gate",exit_code:42,
+  exit_source:"kubernetes_status",artifact_access:"payload_read_unavailable",manifest_verified:false,
+  l2:null,audit:null,control:null,owner_checks:{run:false,replay:false},
+  private_stderr:{run_sha256:null,audit_sha256:null,content_published:false}}]' \
+  "$tmp/read-unavailable.json" >/dev/null
 
 if PATH="$tmp/bin:$PATH" FAKE_S3_ROOT="$tmp/s3" ISOLAB_BUCKET="$bucket" \
   "$here/diagnose-failed-run" "$job" "$launcher" "$(printf 'f%.0s' {1..64})" "$source" "$binary" 41260778856 "$tmp/bad.json" >/dev/null 2>&1; then
