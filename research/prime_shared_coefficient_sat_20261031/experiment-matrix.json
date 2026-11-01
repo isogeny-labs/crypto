@@ -1,0 +1,149 @@
+{
+  "schema": "prime-shared-coefficient.experiment-matrix/v1",
+  "created": "2026-10-31",
+  "lead": {
+    "id": "shared-coefficient-solver-tournament",
+    "rank_in_parent_review": 2,
+    "class": "open_unexamined_solver_mechanism",
+    "parent": "research/prime_ic_lead_review_20261031/lead-matrix.json",
+    "claim_scope": "solver discriminator first; no asymptotic or ECDLP speedup claim"
+  },
+  "stages": [
+    {
+      "id": "E0",
+      "title": "canonical IR and exhaustive toy oracle",
+      "status": "complete",
+      "affected_performance_data": false,
+      "inputs": [
+        "F17 m3/m5/m7 t4 legacy witnesses",
+        "all 18 affine F17 targets at m3 t3 c1"
+      ],
+      "controls": [
+        "independent group-law and interpolation oracle",
+        "a0 mutation per legacy fixture",
+        "malformed schema/spec/assignment rejection",
+        "canonical round trip and deterministic exporters"
+      ],
+      "metrics": [
+        "exact projected coefficient-model-set equality",
+        "equation and variable counts"
+      ],
+      "result": "18/18 exact target-set matches; 6 SAT, 12 UNSAT, 6 models per implementation; no timing",
+      "artifacts": [
+        "results/e0-panel.json",
+        "native/src/lib.rs"
+      ]
+    },
+    {
+      "id": "E1",
+      "title": "backend representation equivalence",
+      "status": "sat_subgate_frozen_unrun_msolve_cvc5_open",
+      "affected_performance_data": false,
+      "arms": [
+        "canonical evaluator",
+        "exact enumeration",
+        "msolve",
+        "cvc5 QF_FF",
+        "CaDiCaL CNF",
+        "CryptoMiniSat CNF-XOR"
+      ],
+      "pass": "all enumerable projected model sets equal; every model replays; every accepted UNSAT certificate verifies; mutations fail",
+      "fail": "block benchmarking and report backend/target mismatch",
+      "open_obligations": [
+        "execute frozen CaDiCaL/CNF and CryptoMiniSat/CNF-XOR panel",
+        "msolve projected-model equivalence",
+        "cvc5 QF_FF projected-model equivalence"
+      ]
+    },
+    {
+      "id": "E2",
+      "title": "disjoint scratch preflight and freeze",
+      "status": "blocked",
+      "sample": "24 scratch instances: 2 rungs x 3 classes x 4 instances",
+      "outputs": [
+        "frozen field/curve cells and protocol-derived seeds",
+        "common timeout and memory limit",
+        "detector and isolation receipt",
+        "power receipt",
+        "analysis and binary hashes"
+      ],
+      "blockers": [
+        "E1",
+        "solver binaries",
+        "perf access",
+        "authorized isolated runner",
+        "power analysis"
+      ]
+    },
+    {
+      "id": "E3",
+      "title": "held-out exact-enumeration/F4/CDCL/XOR/QF_FF tournament",
+      "status": "draft_unfrozen",
+      "rungs": [
+        "m3-t3",
+        "m5-t4",
+        "m7-t5",
+        "m9-t6"
+      ],
+      "target_classes": [
+        "natural",
+        "planted",
+        "exact-unsat"
+      ],
+      "instances_per_class_rung": 8,
+      "semantic_instances": 96,
+      "warmups": 1,
+      "measured_replicates": 3,
+      "candidate_arms": [
+        "cdcl-cnf",
+        "xor-cnf",
+        "qf-ff"
+      ],
+      "baselines": [
+        "enum-ref",
+        "f4-base"
+      ],
+      "controls": [
+        "cdcl-aa",
+        "planted-positive",
+        "support-and-model-matched-null"
+      ],
+      "advance": "all correctness gates; four natural rungs; corrected upper slope CI <= 0.85 on largest three; below F4 instructions on largest two common rungs outside A/A",
+      "not_advance": "corrected lower slope CI >= 0.95 for three consecutive rungs, or every SAT bundle censors before F4 on both largest common rungs",
+      "otherwise": "inconclusive"
+    },
+    {
+      "id": "E4",
+      "title": "complete relation collection and logarithm replay",
+      "status": "conditional",
+      "entry": "one E3 bundle is sat_screen_advanced",
+      "required_costs": [
+        "factor base",
+        "IR/export setup",
+        "all relation attempts",
+        "extraction and verification",
+        "deduplication",
+        "matrix build and solve",
+        "individual logarithm",
+        "memory and precision"
+      ],
+      "required_certificate": "independent scalar replay of recovered logarithms"
+    },
+    {
+      "id": "E5",
+      "title": "family theorem",
+      "status": "conditional",
+      "entry": "repeatable E3 and E4 signal",
+      "output": "proved family invariant and complete asymptotic cost model"
+    }
+  ],
+  "current_environment": {
+    "msolve": "absent",
+    "cvc5": "absent",
+    "cadical": "absent",
+    "cryptominisat": "absent",
+    "perf": "absent",
+    "aws_identity": "absent",
+    "scientific_run_authorized_or_started": false
+  }
+}
