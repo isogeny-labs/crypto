@@ -1,8 +1,9 @@
 # Validation receipt
 
 This receipt covers the 2026-10-31 literature/repository assessment, the
-subsequent arity/solver-model correction, and the rendered report. It is not an
-experiment export and contains no new solver or ECDLP measurement.
+subsequent arity/solver-model correction, the 2026-11-01 protocol hardening and
+the rendered report. It is not an experiment export and contains no new solver
+or ECDLP measurement.
 
 ## Starting identities
 
@@ -12,6 +13,10 @@ experiment export and contains no new solver or ECDLP measurement.
 - Branch: `codex/prime-ic-lead-review-20261031`.
 - Correction base: `c5d13654`; correction branch:
   `codex/prime-ic-arity-correction-20261031`.
+- Hardening base: `7b19d771dca0131a986c7e60d397b4f5c7229d51`; hardening branch:
+  `codex/prime-ic-protocol-hardening-20261101`.
+- Owner development evidence: `cryptanalysis#1347`, merge commit
+  `3c769002f0f68d63a5055f6f3e24a9500393180e`.
 
 ## Coordination check
 
@@ -71,10 +76,11 @@ partial analysis, experiments and conclusion.
   source-identified CaDiCaL `ExternalPropagator` implementation was found on
   current `main`; binding the reviewer-referenced loop remains a freeze
   blocker rather than an assumed implementation fact.
-- Searches of the current tree and recent public pull-request metadata found no
-  original `DEC-20261031-cd6460` object. The checked-in file with that name is
-  explicitly a repository-side correction record, not a fabricated edit to a
-  missing source object.
+- The cross-repository ledger audit found the provenance error: immutable
+  `DEC-20261031-cd6460` is the checker-defect decision, while
+  `DEC-20261031-b51282` is the arity correction. The old local filename is now
+  a compatibility notice; current analysis lives in `PDP_ARITY_CORRECTION.md`
+  and the 2026-11-01 hardening is additive as `DEC-20261101-26f1fa`.
 
 ## Lead-atlas review
 
@@ -115,6 +121,25 @@ temporary directory and rerun. The corrected protocol ID is
 `0 finding(s)`. The record remains `freeze.status: draft`. No `freeze` command
 and no affected data collection occurred.
 
+On 2026-11-01, protocol version 2 was validated with the current in-workspace
+validator:
+
+```sh
+python3 ../crypto-autoresearcher/tools/experiment_protocol.py validate \
+  research/prime_ic_lead_review_20261031/protocol.draft.json
+```
+
+Observed result:
+
+```text
+OK: experiment.protocol/v1 research/prime_ic_lead_review_20261031/protocol.draft.json (0 finding(s))
+```
+
+Version 2 adds the setup exponent, complete natural-panel rule, separate
+control populations, exact one-hot sizing/admission gate, scoped schoolbook
+cost, signed point semantics, QF_FF proof eligibility, compact range encoding
+and corrected additive decision identity. It is still an unfrozen draft.
+
 ## Figure and PDF rendering
 
 Commands:
@@ -122,6 +147,9 @@ Commands:
 ```sh
 dot -Tsvg figures/lead-funnel.dot -o figures/lead-funnel.svg
 dot -Tpng -Gdpi=48 figures/lead-funnel.dot -o figures/lead-funnel.png
+dot -Tsvg figures/protocol-gates.dot -o figures/protocol-gates.svg
+inkscape figures/protocol-gates.svg --export-type=pdf \
+  --export-filename=figures/protocol-gates.pdf
 XDG_CONFIG_HOME=/tmp/prime-ic-correction-inkscape \
 XDG_CACHE_HOME=/tmp/prime-ic-correction-font-cache \
 inkscape figures/arity-cost-bridge.svg --export-type=png \
@@ -139,11 +167,10 @@ pdftoppm -png -r 105 report.pdf /tmp/prime-ic-final-page
 
 Graphviz and Pandoc returned exit 0. Inkscape returned exit 0 with harmless
 font-map/recent-manager warnings after writable XDG scratch paths were
-supplied. The corrected `report.pdf` has five letter-size pages. All five
-rendered pages were opened; the figures, source pins, corrected cost bridge,
-experiment gates and dependencies are legible and no text crosses a page
-boundary. Its final SHA-256 is
-`29aea1c26d2a4df40fb34c54ff8fc278be8d0abdcbef5cab28a08c2e840f7a15`.
+supplied. The hardened `report.pdf` has five letter-size pages. Its text was
+extracted and the newly affected rendered pages were opened; the cost bridge,
+hardening diagram and decision text are legible. Its 2026-11-01 SHA-256 is
+`3d1eb286a6c4dc768c9f3d0864fecb03323393358d2511a77a978b85cb979b29`.
 
 ## Scientific execution status
 
@@ -164,7 +191,8 @@ The required broad Rust check was attempted after staging the report:
 cargo test --release --lib
 ```
 
-Outcome, both originally and after the correction: exit 127,
+Outcome originally, after the correction, and again after the 2026-11-01
+hardening: exit 127,
 `/bin/bash: line 1: cargo: command not found`. No Rust source or build manifest
 changed in this correction. JSON/schema, cost-bridge, artifact-hash, render and
 PDF checks above completed; the unavailable Cargo toolchain remains a

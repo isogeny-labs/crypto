@@ -7,12 +7,17 @@
     "correction_base": "c5d13654"
   },
   "correction": {
-    "decision": "DEC-20261031-cd6460",
-    "record": "research/prime_ic_lead_review_20261031/DEC-20261031-cd6460.md",
-    "cost_bridge": "e < m/2 - 1",
+    "decisions": [
+      "DEC-20261031-b51282",
+      "DEC-20261101-26f1fa"
+    ],
+    "record": "research/prime_ic_lead_review_20261031/PDP_ARITY_CORRECTION.md",
+    "provenance_note": "DEC-20261031-cd6460 is an unrelated checker-defect decision",
+    "cost_bridge": "a < m/2 and e < m/2 - 1",
     "first_relevant_fixed_arity": 3,
     "m3_strict_exponent_gate": 0.5,
-    "solver_model": "hybrid CDCL(T) with F_p theory; pure CNF is an encoding-cost control"
+    "m3_strict_setup_gate": 1.5,
+    "solver_model": "proof-eligible hybrid CDCL(T) with F_p theory; QF_FF is diagnostic at the inspected source; pure CNF is a scoped encoding-cost control"
   },
   "atlas": {
     "repository": "crypto-autoresearcher",
@@ -78,18 +83,21 @@
       "claim_scope": "fixed-arity-three PDP exponent measurement; no complexity bound",
       "current_evidence": [
         "the cost bridge requires e<0.5 at m=3 and makes m=2 structurally irrelevant",
+        "the complete bridge also requires reusable setup exponent a<1.5",
         "the guarded disjoint-window argument gives rationality at m=3",
         "the rational lambda lift has discriminant 16 t^2 f(x)",
+        "cryptanalysis#1347 merges a passing native small-field development oracle and exact one-hot sizing",
         "no measured arity-three PDP exponent exists"
       ],
       "open_obligations": [
-        "native one-hot chained-S3 IR and hybrid solver exporters",
+        "production typed chained-S3 IR and hybrid solver exporters beyond the development fixture",
         "exact CaDiCaL external-propagator source binding and explanation checker",
-        "exceptional-chart and forbidden-word accounting",
-        "complete-work exponent on s=6..14 against enumeration and the curve-free null",
+        "exceptional-chart, signed-lift and compact range accounting",
+        "natural-only complete-panel query and setup exponents on s=6..14 against enumeration and the curve-free null",
+        "a compact-selector equivalence/resource amendment before any s=15..27 continuation",
         "complete relation extraction and group replay"
       ],
-      "next_experiment": "frozen m=3, s=6..14 exact-enumeration/F4/CDCL(T)/QF_FF tournament on held-out cells",
+      "next_experiment": "implement and exhaustively check the source-bound F_p trail theory and explanation/proof replay, then freeze the m=3, s=6..14 complete-natural-panel screen",
       "ordinary_cdcl_equivalent": false
     },
     {
