@@ -91,6 +91,63 @@ torsion certificate complete this particular upper construction. Complete
 common pricing, other upper floors and the stated CM proof bridges remain open
 independently. All completed large-gap ECDLP timing comparisons remain 53-bit.
 
+### Separate 80-bit-prime source/kernel and native helper, 2026-10-31
+
+The [gap80 native study](../research/prime_conductor_gap80_20261031/README.md)
+preserves prime `729845429276318409687041`, a 202-bit field-prime certificate,
+native source/kernel checks and independent PARI verification. Its native
+log-norm helper shares the trace functional and reciprocal; historical
+microbenchmarks and partial-tile clocks remain unadmitted diagnostics with
+their pinning/overlap exclusions intact. Complete small fixtures and the
+80-bit kernel's 128-root tile checks at 32 scalar contexts are retained.
+
+This instance still needs its explicit quotient equation, complete
+non-kernel images and transported subgroup verification before matched
+endpoint measurements. At block 4,096 the current bounded method requires
+10,875,544,558,802,641 rectangular tiles and 722,432,689,208 leftover roots.
+Completing a native construction/evaluation path with recorded total costs
+would unblock that instance. Partial sums, source/kernel certificates and
+the helper improvement do not discharge this exit condition or establish
+largest-known crossing status. The older upper instances remain distinct.
+
+The follow-up [measurement protocol](../research/prime_conductor_gap80_20261031/MEASUREMENT_PROTOCOL.md)
+records an exact native eligibility audit of the existing constructor. Its
+degree parser is 64-bit; after widening it, the baby-root slots alone would
+require 3,417,239,656,272 bytes, before limbs and polynomial trees. This exceeds
+the current 128-GiB lab cap. That constructor is also codomain-only. These
+are specific implementation/resource blockers, not a failed timed run or a
+universal lower bound. The explicit 80-bit construction, point evaluation
+and paired ECDLP times remain missing, rather than inferred from a smaller
+fixture or assigned zero.
+
+The [S3 root-chunk fixture](../research/prime_conductor_gap80_20261031/s3-chunks/README.md)
+adds bounded native preparation of 4,096 baby roots and independent PARI
+verification of every coordinate, with deterministic offset restart and
+immutable object hashes. This removes the need to allocate a full root
+vector during that preparation stage. It does not convert the existing
+contiguous FLINT polynomial/tree routines to external-memory processing;
+that schedule and the full point evaluator remain open. Only the small
+storage fixture is prepared, not the full multi-terabyte root window.
+
+The [native polynomial-block stage](../research/prime_conductor_gap80_20261031/poly-blocks/README.md)
+now prepares and evaluates bounded products, accumulating six reciprocal
+power sums over supplied blocks. The 4,096-root prefix agrees with direct
+inversion at 32 source and 32 actual giant contexts (384 values), with
+independent PARI context checks, split-block consistency and nine negative
+controls. This checks the first native processing primitive for stored
+blocks; full baby/giant coverage, codomain moments, complete point images
+and feasible total-work accounting remain open.
+
+The [complete native control runner](../research/prime_conductor_gap80_20261031/complete-pipeline/README.md)
+now wires canonical coverage, codomain moments, full point evaluation and
+paired known-answer recovery on complete ordinary-curve fixtures. PARI
+matches both codomains and 42 evaluated inputs; 34 paired targets recover
+on both endpoints (q=3 and q=37). Six negative coverage controls pass.
+These are software controls, not certified conductor-gap records or timing
+measurements. The 80-bit prefix gate refuses assembly. Durable S3-manifest
+coverage/resumption, complete target data and feasible total-work execution
+remain prerequisites to the requested endpoint measurements.
+
 ### Historical 60-bit-prime instance imported on 2026-10-31
 
 The [archived gap60 study](../research/prime_conductor_gap60_20261031/README.md)

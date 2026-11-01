@@ -1,0 +1,85 @@
+✖ [3044/3045] Building FiniteFieldHandbook (15s)
+warning: FiniteFieldHandbook.lean: imports `Mathlib.FieldTheory.Finite.Trace` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FiniteFieldHandbook.lean: imports `Mathlib.FieldTheory.Finite.Polynomial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FiniteFieldHandbook.lean: imports `Mathlib.FieldTheory.Galois.NormalBasis` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FiniteFieldHandbook.lean: imports `Mathlib.RingTheory.LittleWedderburn` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FiniteFieldHandbook.lean: imports `Mathlib.RingTheory.Norm.Transitivity` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FiniteFieldHandbook.lean: imports `Mathlib.LinearAlgebra.Lagrange` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/Cli/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/batteries/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/Qq/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/aesop/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/importGraph/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/plausible/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/packages/mathlib/.lake/build/lib/lean:/Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/lib/lean /Users/adamburan/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/FiniteFieldHandbook.lean -o /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/lib/lean/FiniteFieldHandbook.olean -i /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/lib/lean/FiniteFieldHandbook.ilean -c /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/ir/FiniteFieldHandbook.c --setup /Volumes/SSD990-2/.codex/worktrees/c1d6/crypto/knowledge/finite-fields/lean/.lake/build/ir/FiniteFieldHandbook.setup.json --json
+error: FiniteFieldHandbook.lean:84:63: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 2
+where
+ b := ↑(Fintype.card K)
+error: FiniteFieldHandbook.lean:98:2: Type mismatch
+  FiniteField.roots_X_pow_card_sub_X
+has type
+  ∀ (K : Type ?u.23) [inst : Field K] [inst_1 : Fintype K], (X ^ Fintype.card K - X).roots = Finset.univ.val
+but is expected to have type
+  (X ^ Fintype.card K - X).roots = Finset.univ.val
+error: FiniteFieldHandbook.lean:102:38: Application type mismatch: The argument
+  K
+has type
+  Type u_1
+of sort `Type (u_1 + 1)` but is expected to have type
+  ℕ
+of sort `Type` in the application
+  @FiniteField.splits_X_pow_card_sub_X K
+error: FiniteFieldHandbook.lean:108:43: failed to synthesize instance of type class
+  Fintype Kˣ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+warning: FiniteFieldHandbook.lean:126:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.permutation_iff_injective`:
+  [Field K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: FiniteFieldHandbook.lean:164:2: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: FiniteFieldHandbook.lean:174:2: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp [Algebra.smul_def]
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+error: FiniteFieldHandbook.lean:224:2: Function expected at
+  Algebra.norm_norm
+but this term has type
+  (Algebra.norm ?m.32) ((Algebra.norm ?m.33) ?m.44) = (Algebra.norm ?m.32) ?m.44
+
+Note: Expected a function because this term is being applied to the argument
+  a
+error: FiniteFieldHandbook.lean:230:8: Unknown constant `IsGalois.exists_linearIndependent_algEquiv_apply`
+warning: FiniteFieldHandbook.lean:243:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.galois_group_cyclic`:
+  [Fintype K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: FiniteFieldHandbook.lean:252:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.linearized_add`:
+  [Finite L]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Finite L] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: FiniteFieldHandbook.lean:259:0: automatically included section variable(s) unused in theorem `FiniteFieldHandbook.linearized_smul`:
+  [Finite L]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Finite L] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+error: FiniteFieldHandbook.lean:280:2: Function expected at
+  FiniteField.nonempty_algHom_iff_finrank_dvd
+but this term has type
+  Nonempty (?m.19 →ₐ[?m.18] ?m.20) ↔ Module.finrank ?m.18 ?m.19 ∣ Module.finrank ?m.18 ?m.20
+
+Note: Expected a function because this term is being applied to the argument
+  F
+Some required targets logged failures:
+- FiniteFieldHandbook
+error: build failed

@@ -2,7 +2,7 @@
 title: "The ECBench ECDLP Performance Frontier"
 subtitle: "End-to-end boundary, implementation census, bottlenecks, and the next isolated campaign"
 author: "ECBench frontier audit"
-date: "31 October 2026"
+date: "1 November 2026"
 lang: en-US
 geometry: margin=0.72in
 fontsize: 10pt
@@ -17,12 +17,13 @@ header-includes:
     ```{=latex}
     \usepackage{booktabs}
     \usepackage{longtable}
+    \usepackage{xurl}
     \usepackage{microtype}
     \usepackage{fancyhdr}
     \pagestyle{fancy}
     \fancyhf{}
     \lhead{ECBench ECDLP frontier}
-    \rhead{2026-10-31}
+    \rhead{2026-11-01}
     \cfoot{\thepage}
     ```
 ---
@@ -36,13 +37,16 @@ several frontiers indexed by curve family, target law, advice model, accounting
 unit, and evidence class. Once those domains are kept separate, the boundary is
 clear:
 
-1. **Generic prime, random-binary, and Koblitz elliptic curves remain
-   rho-led.** No admitted cold, one-target index-calculus result is below its
-   strongest applicable matched generic reference. The closest current
-   repository markers are 2.28× rho for inherited F4 on one tiny random-binary
-   cell, 2.59× for the prime residual collector at 36 bits, and 3.43× on the
-   admitted Koblitz ladder. These are different studies and units, so they are
-   boundary markers, not entries in one sortable table.
+1. **Generic prime, random-binary, and medium/scaling Koblitz elliptic curves
+   remain rho-led.** No admitted cold, one-target index-calculus result in
+   those panels is below its strongest applicable matched generic reference.
+   The closest current repository markers are 2.28× rho for inherited F4 on
+   one tiny random-binary cell, 2.59× for the prime residual collector at 36
+   bits, and 3.43× on the admitted Koblitz ladder. These are different studies
+   and units, so they are boundary markers, not entries in one sortable table.
+   A separate n=29 one-column generator-orbit panel does cross below rho-frob,
+   but at one column it is a fixed-setup Frobenius-folded BSGS; the gap grows
+   with r, so it is not a uniform-target or asymptotic IC crossing.
 2. **One restricted curve family is IC-led.** The plane-quartic attack on the
    special GHS-weak family $E_0/\mathbb F_{q^3}$, with
    $\#E_0(\mathbb F_{q^3})=4\ell$, is below matched rho in its own cold,
@@ -75,11 +79,16 @@ clear:
 
 ![Boundary markers. A ratio is meaningful only inside its row's exact domain and unit.](figures/boundary-map.png){width=100%}
 
-This report is an evidence synthesis at source commit
-`48c8a4767d2d1eed6a7b379f74410bc729239380`. It does not present blocked jobs
-as measurements. The exact current-source EKS campaign is prepared, but no
-authenticated AWS/Iso Lab route is available in this workspace; consequently,
-there is no fresh 2026-10-31 wall-time leaderboard.
+This report synthesizes versioned evidence; each performance row remains bound
+to the source and binary that produced it. The October snapshot executable audit is at
+source `ff7ad61cfed11908fb79de9dd485b696d0ada779`. It does not present blocked
+jobs as measurements. The exact current-source image is published, but the
+mandatory checkpoint gate has no upload credential. The replacement workload
+is now split into 92 one-hour-safe planning shards and all 92 pass the exact
+binary's planner. The deterministic analysis driver is hash-bound and passes
+its check-only gate, but exact-image runtime preflight, prospective freeze, and
+a current submission identity are still missing.
+Consequently, there is no fresh 2026-10-31 wall-time leaderboard.
 
 A follow-up executable establishment audit passes 19/19 artifact-consistency
 checks. It recomputes the decisive ratios, verifies all 30 retained Callgrind
@@ -88,13 +97,79 @@ retains a new F4/F5/F6 compatibility failure (72/144 rows reproduce). A pass
 means the versioned evidence statements agree; it does not turn the draft EKS
 campaign into data.
 
+# 1 November current-source addendum
+
+The live registry has grown since the pinned October snapshot. The current
+release binary at source `907d68631e79` has **78 top-level method IDs** plus
+**24 explicitly audited nested engines**: 11 system solvers, nine PDP3
+engines, and four prime PKM tower engines. A fail-closed optimization audit
+admits 111 development specs with 78/78 methods and 24/24 nested algorithms;
+fresh local sessions exercised all 72 runnable native methods and every nested
+engine. The remaining six top-level entries are external CM wrappers without
+a real hash-bound backend.
+
+The exact release binary SHA-256 is
+`e91c0ec79774af70c3b6af6aaac7b209e8edcdc0e42b1d18e1a92a14af065f65`.
+Across 35 admitted L0 sessions it audited 1,005 records, 952 verified outcomes,
+and reproduced all 782 eligible deterministic measured runs with zero
+problems. These are diagnostic development sessions, not L2 holdouts, so no
+leaderboard row changes.
+
+The fresh, current-source performance boundary is:
+
+- Koblitz n=29 generator-orbit IC is the only new holdout candidate, at 0.4405
+  [0.363, 0.534] of signed-Frobenius rho in its one-target, full-price L0 cell.
+  This remains a fixed-setup candidate, not a family-level or leaderboard win.
+- Pair-index F6 reduces inherited-F6 work to 0.2792 [0.246, 0.317], yet remains
+  139.30 [85.48, 227.02] times strong rho end to end. The prime PKM F4, F5,
+  F6, and enumeration engines remain 4.62--5.03 times negation rho. The best
+  matched n=17 system solver is wide FES/Gray-code at 4.28 times strong rho;
+  SAT-CDCL, Crossbred, exhaustive, F4 variants, F5, F6, and all root-finding
+  variants remain rho-led in their measured cells.
+- The separate `ic bench` chained-x diagnostic is also rho-led: inherited F4
+  costs 24.71, 144.09, and 794.37 times rho at m=2, 3, and 4. Matrix F5 cuts
+  matrix F4 work at m=3 to 0.6276, but still costs 16,296.76 times rho; both
+  m=4 matrix arms censor because this oracle ignores the solver wall budget.
+
+Mainline also now contains a distinct end-to-end GHS study, outside ECBench.
+It measured 30 applicable toy instances at N=12..28 and verified IC, rho, and
+BSGS on all 600 planted logs. Every measured instance remains generic-led:
+the best IC/best-generic ratio is 1.91 [1.72, 2.11], and the best IC/rho ratio
+is 1.60 [1.25, 2.12]. The genus-4 n=4 fit crosses near N=32 [31, 33], but that
+is extrapolated one step beyond the measured range. This does not invalidate
+the older `E_0/F_(q^3)` result in its exact restricted family and accounting
+domain; it does show that the historical exception cannot be generalized to
+the new GHS roster. The new GHS study has no ECBench replay certificate and is
+not leaderboard evidence.
+
+Two later mainline packages extend the negative/control side of the frontier.
+The skeptic-reviewed evaluation of 12 prime-field IC leads reports no exponent
+movement. Sparse, dense, and Bochum-style factor bases match size-matched
+random nulls within about 0.0003--0.005 at the tested sizes. A characteristic-2
+SAT gadget has conflict slope about 2.58 against the 0.5 m=3 ladder bar and is
+3 times slower in CPU at its largest cell. Per-adder multiplier encoding is
+0.78 [0.67, 0.92] of schoolbook conflicts at one b=9 prime, but reverses at
+b=6 and is censored at larger sizes. Clause retention moves a large setup into
+advice, and the proposed ring-linear propagator was not run. The surviving
+exponent questions are PKM at m>=4 and the contractor exponent; none of these
+rows is an ECBench speed claim.
+
+R7.4 provides a separate binary-Edwards structural control. It proves that
+symmetrising by rational 2-power torsion gives the same algebraic system after
+an F2-linear substitution and checks 11 identity families on 46 toy curves
+with zero exceptions. The pair-table quotient sweep returns exactly the same
+relations with 1/mu lookups in all 268,000 checks. Its toy finite-size yield
+can lie on either side of parity depending on whether c or c+1 columns are
+charged and trends toward the null at n=13,14. No Groebner/F4 oracle or matched
+end-to-end rho run was performed, so this is not a new performance row.
+
 ## Boundary by domain
 
 | Domain | Current finite boundary | Leader | Evidence reading |
 |:--|:--|:--|:--|
 | Prime-field generic ECDLP | closest recent IC marker 2.59× matched rho; P20 validated base row 7.95–9.62× | generic algorithms | rho remains lower; BSGS can beat rho on several toy bitop cells |
 | Random-binary generic ECDLP | inherited F4 2.28× rho on the tiny m=19 diagnostic; admitted ladder 10.6–38.2× | generic algorithms | no IC win |
-| Koblitz generic ECDLP | admitted cold one-target IC 3.43–11.5× matched rho | signed-Frobenius generic walk | no IC win |
+| Koblitz generic ECDLP | admitted medium/scaling cold IC 3.43–11.5× matched rho; separate n=29 one-column fixed-setup ratio 0.366 [0.241, 0.523] | signed-Frobenius generic walk on the scaling object | no uniform-target/scaling IC win; fixed-setup BSGS engineering crossover retained separately |
 | Special GHS-weak $E_0/\mathbb F_{q^3}$ | B0 0.735× at q=4051; N4-v2 DL 0.00523× negation rho at q=2,097,091 | plane-quartic IC | restricted-family IC win |
 | Hyperelliptic Jacobians | genus-4 toy row 0.114× rho in bitop/v1 | Jacobian IC | not an elliptic-curve result |
 | Standard cryptographic curves / ECC2K-130 | no complete break or scaling evidence | generic security boundary | unresolved by experiment; no claim of a break |
@@ -165,7 +240,8 @@ The refreshed ranking requires all of the following:
 The full rules and machine-readable design are in [PROTOCOL.md](PROTOCOL.md)
 and [protocol.json](protocol.json). The protocol validator reports zero
 findings, but the document remains `draft` until the exact current-source ECR
-digest is bound and committed before execution.
+identity, closed roster, and one-hour shard list are committed and frozen
+before execution. The image digest itself is already published and recorded.
 
 # Implementation census
 
@@ -188,9 +264,11 @@ pipeline.
 Every ID and backend has an explicit disposition in [COVERAGE.md](COVERAGE.md)
 and [coverage.json](coverage.json): 13 current-primary methods, 10 diagnostic
 methods, 21 legacy controls, 6 pricing-sensitivity methods, and 24
-domain-specialized methods. “Legacy” does not mean incorrect, and “blocked”
-does not mean slow; it records why the method is not in the fresh primary
-campaign.
+domain-specialized methods. [IMPLEMENTATIONS.md](IMPLEMENTATIONS.md) closes the
+additional factor-base, oracle, solver-engine, relation-matrix, target-source,
+and symmetry axes hidden behind those IDs. “Legacy” does not mean incorrect,
+and “blocked” does not mean slow; it records why the method is not in the fresh
+primary campaign.
 
 The exact native registry is preserved in [method-registry.json](method-registry.json).
 This prevents “all implementations” from silently meaning only the arms that
@@ -209,7 +287,7 @@ from 10.1× to 69.7× through 28 bits.
 
 ![Prime finite-size ladder. BSGS is included so the rho reference is not mistaken for the absolute finite-size leader.](figures/prime-bitop-ladder.png){width=100%}
 
-This is why the prepared campaign includes `bsgs.negation_v2` and
+This is why the draft campaign includes `bsgs.negation_v2` and
 `kangaroo.vow_v2` beside `rho.negation_v2`. Rho remains the asymptotic generic
 reference; it is not assumed to win every tiny finite instance.
 
@@ -297,6 +375,16 @@ for roughly 98.7–99.6% of the cold IC pipeline on the central rows, so an
 online-only view can look attractive while the primary cold object remains
 rho-led.
 
+The fixed-setup generator-orbit panel is a real but narrower exception. At
+n=29 and one factor-base column, `mitm-frobenius-layout-counted` with
+`stride-generator` has S=0.546/0.611/1.196 across the pricing band, versus
+1.569 for rho-frob, and a paired ratio 0.366 [0.241, 0.523]. The same study
+shows why this is not the Koblitz ECDLP frontier: at one column the construction
+is Frobenius-folded BSGS, it uses a known generator-orbit column and a different
+target source, and its advantage comes from rho's fixed setup at log2(r)=15.4;
+the gap grows with r. It is retained as an engineering frontier rather than
+pooled with the medium/scaling uniform-target ladder.
+
 The correct Koblitz reference uses signed Frobenius and negation. The canonical
 medium-tier counted boundary is 1.089× its floor, with interval
 [0.927, 1.261], across six sizes and 144 runs. Pair-claw is a useful
@@ -367,6 +455,8 @@ work on the same tree. Inherited F4 is roughly 199–222× cheaper than matrix F
 on the m=13 systems. F6 further reduces word work and relation wall time, but
 performs exact factor-base point additions for its closure, which dominate the
 common priced pipeline.
+
+\newpage
 
 ![Backend-local savings and whole-pipeline cost move in opposite directions.](figures/solver-tradeoff.png){width=100%}
 
@@ -449,7 +539,9 @@ deterministic rows. The old L0 wall ratio is not promoted.
 For the new campaign:
 
 - prime uses `rho.negation_v2` and a byte-identical A/A arm;
-- Koblitz uses `rho.signed_frobenius_strong_v2`, also with A/A;
+- Koblitz carries both `rho.signed_frobenius_strong_v2` and
+  `rho.signed_frobenius_strong_escape`, with the former duplicated for A/A and
+  the reference-selection rule frozen before data;
 - BSGS and kangaroo are measured on prime cells to reveal finite-size leaders;
 - every symmetry available to an IC arm is audited for the reference;
 - setup, distinguished-point policy, table state, restarts, and verification
@@ -511,52 +603,80 @@ solver program, not a demonstrated break. Claims about standard curves remain
 bounded by generic algorithms and external cryptanalytic knowledge, not by
 extrapolating toy ECBench fits.
 
-# Prepared fresh campaign
+# Fresh campaign status
 
-The prepared campaign contains nine independent L2 jobs. Each has eight
-targets, one warmup, six measured rounds with balanced arm order, replay-all,
-failure retention, and the three-point pricing band.
+The original nine exact-build specs remain preserved as the broad planning
+draft: 4,704 processes, several per-child timeouts equal to the entire
+one-hour queue deadline, and missing domains. They will not be submitted.
 
-| Spec | Domain/size | Principal candidate arms | Plan ID |
-|:--|:--|:--|:--|
-| `prime-p20.json` | prime 20 | rho-v2, N45/N32 pair IC, rootfind m2/m3, BSGS, kangaroo, A/A | `ECS1h3320a6f156a5` |
-| `prime-p24.json` | prime 24 | rho-v2, N162/N115 pair IC, rootfind m2/m3, BSGS, kangaroo, A/A | `ECS1h8d2f84ff0bd1` |
-| `prime-p28.json` | prime 28 | rho-v2, N407/N288 pair IC, rootfind m2/m3, BSGS, kangaroo, A/A | `ECS1h280a82a43148` |
-| `prime-p32.json` | prime 32 | rho-v2, N1024 pair IC, rootfind m2/m3, BSGS, kangaroo, A/A | `ECS1h483e365694a1` |
-| `koblitz-n13.json` | Koblitz 13 | strong/signed/negation rho, rootfind, inherited F4, F6, claw, A/A | `ECS1h5134645433fe` |
-| `koblitz-n19.json` | Koblitz 19 | same | `ECS1h729b865269f9` |
-| `koblitz-n23.json` | Koblitz 23 | same | `ECS1h1a916886cdf0` |
-| `koblitz-n31.json` | Koblitz 31 | same; work limits/timeouts retained | `ECS1h0ac2f6395870` |
-| `solver-backends-k17.json` | binary solver cell 17 | all 11 nested backends, strong rho, A/A | `ECS1h052a2276d7a5` |
+The replacement contains 92 candidate/reference/A/A specs. Two four-target
+blocks give eight prospectively selected targets per comparison cell; each has
+one warmup and six measured rounds in balanced alternating order. A shard with
+$a$ arms uses child timeout
+$\lfloor2400/(4\cdot7\cdot a)\rfloor$ seconds. The resulting range is 12–28
+seconds, and the largest sum of timeout ceilings is 2,380 seconds. At least
+1,220 seconds of the EKS deadline therefore remains for deterministic workload
+construction, Karpenter provisioning, setup, audit, and upload.
 
-All specs pass `ecbench plan --json`. They are listed in
-[execution/manifest.json](execution/manifest.json). The locally built release
-binary has SHA-256
-`91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b`.
+| Panel | Jobs | Planned processes | Target law |
+|:--|--:|--:|:--|
+| Prime 20/24/28/32, IC and generic algorithms | 16 | 2,632 | public |
+| Koblitz 13/19/23/31, rho/rootfinding/F4/F6/claw | 32 | 5,152 | public |
+| Random binary 13/19/23/31, matrix F4/F5 and inherited F4/F6 | 16 | 1,792 | public |
+| Eleven nested algebraic solver backends | 12 | 1,960 | public |
+| j=0 and j=1728 symmetry | 4 | 672 | public |
+| n=29 generator-orbit fixed-setup engineering | 2 | 392 | public |
+| F_((2^m)^4), specialized m=10/12/15 and wide m=16 | 8 | 1,008 | planted known-answer |
+| Binary n=11 double-large-prime v2 | 2 | 280 | public |
 
-Execution is intentionally blocked. This workspace has no AWS identity, no
-AWS CLI, no callable Iso Lab connector, and an invalid GitHub token. The only
-available pinned EKS image contains an older source revision, so using it would
-not measure this report's commit. The exact blocker is in
+The exact pinned executable accepts all 92 specs, expands 13,888 processes,
+and reports zero planning failures. The closed roster check covers all 13
+top-level methods classified `current_primary` and all 11 nested solver
+backends. Exact spec IDs and file hashes are retained in
+[execution/shard-preflight-plans.json](execution/shard-preflight-plans.json),
+and [SHARDS.md](SHARDS.md) gives the complete reference rules.
+
+The extension-field target law is a disclosed limitation. Each
+`f2m4_torsion` fixture exhausted the harness's fixed 10,000-attempt public
+hash-to-subgroup constructor. Those eight specs therefore use planted
+known-answer targets, with the scalar hidden from every solver. They can
+compare implementations on matched targets but cannot enter the public-target
+frontier. The wide m=16 arm is also expected to censor under the short queue
+cap; historical executions took hours.
+
+Trusted publication run 41241104247 built the exact static x86-64 binary,
+SHA-256
+\nolinkurl{924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d},
+and image digest
+\nolinkurl{sha256:b8c20f9c151360b78f505360e8d47068c4068f00a8f6faa7ebd3086fa0a791c6}.
+That run was publication-only; it submitted no experiment.
+
+Execution remains blocked. `scripts/checkpoint.sh gate` is mandatory, but this
+workspace has no checkpoint upload token, token file, AWS CLI, or AWS identity;
+its current GitHub token also fails authentication and no direct Iso Lab tool
+is installed. The analysis driver is already hash-bound; exact-image runtime
+preflight and the prospective protocol freeze remain open. The exact state is in
 [execution/BLOCKER.md](execution/BLOCKER.md). Local wall timing is not silently
 substituted.
 
 Before the first warmup, the executor must:
 
-1. build the exact commit into the trusted static runtime image;
-2. bind the immutable ECR digest and binary SHA-256 in the protocol;
-3. validate and commit the frozen identity amendment;
-4. run each size as a fresh job, without CRIU-restored timed rows;
-5. upload raw records, host capsule, replay receipt, A/A analysis, and hashes;
-6. retain every timeout, failure, and unattempted cell;
-7. regenerate the Pareto tables and this report from the new records.
+1. restore an authorized GitHub/AWS/Iso Lab submission identity;
+2. run exact-image preflight for each arm class and preserve the bound analysis script;
+3. provision checkpoint transport and pass `scripts/checkpoint.sh gate`;
+4. freeze and merge these exact 92 spec IDs to `main`;
+5. reconcile existing receipts and submit each paid shard exactly once;
+6. upload raw records, host capsule, replay receipt, A/A analysis, and hashes;
+7. retain every timeout, failure, and unattempted cell;
+8. regenerate the Pareto tables and this report from admitted records only.
 
 # Conclusions and research priorities
 
 The performance frontier is now explicit:
 
-- **Generic ECC:** rho/BSGS/kangaroo remain the leaders; no generic IC crossing
-  is admitted.
+- **Generic ECC:** rho/BSGS/kangaroo remain the medium/scaling leaders; the
+  n=29 one-column generator-orbit fixed-setup BSGS crossover is separate and
+  does not establish a generic IC crossing.
 - **Restricted GHS-weak ECC:** plane-quartic IC is the leader and must remain
   labelled as a special-family result.
 - **Prime engineering:** P20 $N=45$ is the validated factor-base baseline,
@@ -573,7 +693,9 @@ The performance frontier is now explicit:
 
 The highest-value next work is therefore:
 
-1. bind the exact image, freeze the prepared protocol, and execute its L2 campaign;
+1. provision checkpoint/submission transport, finish runtime preflight,
+   merge the closed shard protocol with its bound analysis driver, and execute its L2
+   campaign;
 2. implement the missing prime factor-base-constrained algebraic arm;
 3. attack relation yield and cold setup before further optimizing stages that
    are already a small share;
@@ -596,8 +718,9 @@ sources are:
 - [prime factor-base second-host replay](../prime_base_oracle_tuning_20261029/second-host/README.md);
 - [GPU explicit-relations result](../explicit_relations_e2e_20261030/RESULTS.md);
 - [literature and prior-evidence ledger](LITERATURE.md);
-- [live implementation coverage](COVERAGE.md);
-- [campaign protocol](PROTOCOL.md).
+- [live coverage](COVERAGE.md), [closed roster](IMPLEMENTATIONS.md), and
+  [queue-safe shards](SHARDS.md);
+- [campaign protocol](PROTOCOL.md) and [pre-data analysis driver](analyze_shards.py);
 - [executable establishment certificate](establishment/README.md).
 
 Primary mathematical references used to set the boundary include Shoup's
