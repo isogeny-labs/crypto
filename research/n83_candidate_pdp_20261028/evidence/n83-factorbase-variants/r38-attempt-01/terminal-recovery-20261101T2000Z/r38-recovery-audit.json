@@ -1,0 +1,91 @@
+{
+  "schema": "n83.factor-base-recovery-audit/v1",
+  "run_id": "n83-fb-variants-r38-20261031-r1",
+  "candidate_id": "spike38",
+  "source_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+  "protocol_sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2",
+  "producer_index_files": 786,
+  "noncompressed_restored_and_hash_verified": 402,
+  "compressed_shards": 384,
+  "family_results": {
+    "koblitz": {
+      "shards": 128,
+      "candidate_count": 134217728,
+      "range_start": 0,
+      "range_end": 134217728,
+      "contiguous": true,
+      "liftable_x": 67108676,
+      "point_count": 134217351,
+      "compressed_bytes": 1363190128,
+      "shard_manifest_matches_index": true,
+      "all_candidate_receipts_verified": true,
+      "coordinate_bit": 38,
+      "reused_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "binary": {
+      "shards": 128,
+      "candidate_count": 134217728,
+      "range_start": 0,
+      "range_end": 134217728,
+      "contiguous": true,
+      "liftable_x": 67107861,
+      "point_count": 134215721,
+      "compressed_bytes": 1363171001,
+      "shard_manifest_matches_index": true,
+      "all_candidate_receipts_verified": true,
+      "coordinate_bit": 38,
+      "reused_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "prime": {
+      "shards": 128,
+      "candidate_count": 134217728,
+      "range_start": 0,
+      "range_end": 134217728,
+      "contiguous": true,
+      "liftable_x": 67112378,
+      "point_count": 134224756,
+      "compressed_bytes": 1849639794,
+      "shard_manifest_matches_index": true,
+      "all_candidate_receipts_verified": true,
+      "coordinate_bit": 38,
+      "reused_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  },
+  "metadata_inconsistencies": [
+    {
+      "path": "restored/FORMAT.json",
+      "observed_candidate_id": "spike40",
+      "observed_moved_bit": "moved coordinate bit, must40",
+      "conflict": "This format descriptor is stale for r38; all three family manifests, data/index.json, and sampled N83FB02 shard headers agree on candidate_id spike38 and moved bit 38. Original file preserved unchanged."
+    }
+  ],
+  "errors": [],
+  "valid": true
+}
