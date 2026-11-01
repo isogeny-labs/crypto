@@ -1,0 +1,180 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1186",
+  "kind": "normalization_polynomial_multiplicity",
+  "main_declarations": 8,
+  "control_declarations": 8,
+  "checks": {
+    "multiplicity2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "residual1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "NormalizationMultiplicity.dvd_forward",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicity.dvd_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicity.power_compatible",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicity.power_dvd_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicity.linear_factor",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicity.linear_power_dvd_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicity.exact_multiplicity_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicity.residual_power_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.double_root",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.transported_double",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.not_simple",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.wrong_root",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.zero_all_powers",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.zero_no_exact",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.exponent_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "NormalizationMultiplicityControls.zero_scale_collapses",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "failed_attempts": [
+    "multiplicity1"
+  ],
+  "assumptions": [
+    "arbitrary field",
+    "a nonzero for divisibility equivalence",
+    "n,m,k arbitrary natural numbers"
+  ],
+  "exact_multiplicity_definition": "(X-C r)^k divides f and (X-C r)^(k+1) does not divide f",
+  "independent_source_fidelity_review": "pending",
+  "local_curve_valuation_correspondence": "not yet established",
+  "geometric_class_transport": "pending local valuations, infinity, principal divisors",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "pdf_inspection": "one page, readable and unclipped",
+  "upstream_compiled_dependencies": "retained trust boundary",
+  "sources": [
+    "prior inverse/support packet",
+    "canonical source-map.json",
+    "pinned Mathlib Algebra/Polynomial/AlgebraMap.lean lines359-366 and674-676"
+  ]
+}

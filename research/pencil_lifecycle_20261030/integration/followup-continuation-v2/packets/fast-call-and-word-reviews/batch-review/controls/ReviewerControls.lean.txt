@@ -1,0 +1,17 @@
+import FastBatchInverse
+set_option autoImplicit false
+namespace BatchReviewer
+ theorem smallest_allowed_prime : FastBatch.product 3 2 2=1 ∧ FastBatch.both 3 2 2=1 ∧ FastBatch.ni 3 2 2=2 ∧ FastBatch.si 3 2 2=2 := by decide
+ theorem below_bound_fits : FastBatch.product 2147483647 2147483646 2147483646=1 ∧ (2147483646*2147483646:Nat)<2^64 := by decide
+ theorem canonical_overflow_above_bound :
+ (4294967296:UInt64).toNat<(4294967297:UInt64).toNat ∧
+ FastBatch.product 4294967297 4294967296 4294967296=0 ∧
+ (4294967296*4294967296:Nat)%4294967297=1 := by decide
+#print axioms BatchReviewer.smallest_allowed_prime
+#print axioms BatchReviewer.below_bound_fits
+#print axioms BatchReviewer.canonical_overflow_above_bound
+#print axioms WideModPow.wideMul_value
+#print axioms WideModPow.modpow_decode
+#print axioms WideModPow.generator_product
+#print axioms WideModPow.generator_decode
+end BatchReviewer

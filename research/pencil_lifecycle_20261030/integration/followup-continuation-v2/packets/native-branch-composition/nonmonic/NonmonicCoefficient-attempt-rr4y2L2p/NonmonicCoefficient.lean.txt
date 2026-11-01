@@ -1,0 +1,31 @@
+import DivisionInterface
+import Inversion
+set_option autoImplicit false
+namespace NonmonicDivision
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest PencilWordRefinement WordCoefficient WideModPow
+def il (p a:UInt64) : UInt64 := if a=1 then 1 else inverseGenerator p a
+def coefficient (p a t:UInt64) : UInt64 := if il p a=1 then t else (t*il p a)%p
+theorem il_correct (p a:UInt64) [Fact p.toNat.Prime] (hp:1<p.toNat)
+ (ha:a.toNat<p.toNat) (hn:a≠0) :
+ (il p a).toNat<p.toNat ∧ ((il p a).toNat:ZMod p.toNat)=(a.toNat:ZMod p.toNat)⁻¹ := by
+ unfold il
+ split_ifs with h
+ · subst a; simpa using hp
+ · exact ⟨(generator_product p a hp ha hn).1,generator_decode p a hp ha hn⟩
+theorem coefficient_correct (p a t:UInt64) [Fact p.toNat.Prime] (hp:1<p.toNat)
+ (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0) (ht:t.toNat<p.toNat) :
+ (coefficient p a t).toNat<p.toNat ∧
+ ((coefficient p a t).toNat:ZMod p.toNat)=(t.toNat:ZMod p.toNat)*(a.toNat:ZMod p.toNat)⁻¹ := by
+ have hi:=il_correct p a hp ha hn
+ unfold coefficient
+ split_ifs with h
+ · refine ⟨ht,?_⟩
+   have he:(a.toNat:ZMod p.toNat)⁻¹=1 := by rw [←hi.2,h]; rfl
+   simp [he]
+ · exact ⟨uint64_mul_canonical p t (il p a) (by omega),by rw [uint64_mul_decode p t (il p a) hb ht hi.1,hi.2]⟩
+theorem coefficient_cancel (p a t:UInt64) [Fact p.toNat.Prime] (hp:1<p.toNat)
+ (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0) (ht:t.toNat<p.toNat) :
+ ((coefficient p a t).toNat:ZMod p.toNat)*(a.toNat:ZMod p.toNat)=(t.toNat:ZMod p.toNat) := by
+ rw [(coefficient_correct p a t hp hb ha hn ht).2,mul_assoc,
+ inv_mul_cancel₀ (canonical_word_nonzero p a (by omega) ha hn),mul_one]
+end NonmonicDivision
