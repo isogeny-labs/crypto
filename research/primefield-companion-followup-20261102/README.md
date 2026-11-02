@@ -188,3 +188,7 @@ Seven Python files parse; four complete AST substitution audits cover driver, se
 ### Zero-coordinate deletion
 
 `companion-zero-delete/` removes a proved-zero prefix using weighted symmetry. The restricted operator has dimension n-j and width w+2 before compression, constructed with one transpose query and the retained first nonzero column. A nonzero prefix RHS instead gives an immediate normalized witness and leaves the full rank unknown. Compact zero-padding frames preserve both primal and dual lifts; final root checks remain. Three declared-substitution AST audits pass; six Python sources parse; report inspected. Numerical/corruption/heap/performance trials zero. Repeated compression/selection, copies and width growth remain charged. Source `d6a7316b2818bb633e3aa6ebd7c2aa94e5ed29ec`.
+
+### Selected columns through checked compression
+
+`companion-selected-reuse/` restricts cached pivot columns after deletion and independently checks compression factor identities before rebinding them to the new operator. Derived repeated-search query reduction is one for the first-diagonal branch, two for secondary-diagonal/pair branches; checker products/reductions and copies remain separate costs. Driver preserves pivot choices and root checks. Two static AST audits pass; five Python files parse; report inspected. Numerical/corruption/heap/performance trials zero. Source `d072d3cb829735f2ccd03fa43e6c0104d649d4ad`.
