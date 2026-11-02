@@ -1072,6 +1072,13 @@ fn cmd_measure(a: &Args) {
             fams.insert(r.idx, cand_family(&b, &m0, &borrowed, derive(seed, &[0xE0E0, n as u64, r.idx as u64])));
         }
     }
+    if arms.iter().any(|x| x == "nbadapt") {
+        // control: random dense b (right null), g = b; must behave like the floor curves
+        for r in &nullc {
+            let b = parse_hex(&r.b_hex, n);
+            fams.insert(r.idx, cand_family(&b, &m0, &borrowed, 0));
+        }
+    }
     let mut seq = 0usize;
     for &k in &ks {
         for att in first_attempt..first_attempt + attempts {
@@ -1101,6 +1108,11 @@ fn cmd_measure(a: &Args) {
                         }
                         _ => {}
                     }
+                }
+            }
+            if arms.iter().any(|x| x == "nbadapt") {
+                for r in &nullc {
+                    jobs.push(("nbadapt".into(), r.clone(), 0)); // family index 0 is g = b
                 }
             }
             if arms.iter().any(|x| x == "null") {
@@ -1150,19 +1162,19 @@ fn cmd_measure(a: &Args) {
                         let me = measure_instance(m, &basis, &xr, &bb, &mm, None, &opts);
                         ("stdv", me, words(&basis), hex(&xr))
                     }
-                    "badapt" | "bsparse" => {
+                    "badapt" | "bsparse" | "nbadapt" => {
                         // modulus M_g = minpoly of g; V = span(1,g,..,g^(k-1)) is the standard V in that presentation; b, x_R mapped
                         let cd = &fams[&c.idx][pres];
                         let (bb, xr) = (cd.pres.apply(&b), cd.pres.apply(&xr_rand));
                         let basis = std_subspace(n, k);
                         let me = measure_instance(m, &basis, &xr, &bb, &cd.pres.irr, None, &opts);
-                        let nm: &'static str = if arm == "badapt" { "badapt" } else { "bsparse" };
+                        let nm: &'static str = match arm.as_str() { "badapt" => "badapt", "nbadapt" => "nbadapt", _ => "bsparse" };
                         extra = format!(",\"gname\":\"{}\",\"b_w\":{},\"b_deg\":{},\"sel\":{},\"mg_w\":{}", cd.name, cd.bw, cd.bdeg, cd.sel as i32, cd.pres.irr.low_terms.len() + 1);
                         (nm, me, words(&basis), hex(&xr))
                     }
                     _ => unreachable!(),
                 };
-                let line = jline(name, &c, n, m, k, att, match name { "stdv" => "std", "badapt" | "bsparse" => "gpow", _ => "rand" }, pres, seq, &me, &vw, &xrs, &extra);
+                let line = jline(name, &c, n, m, k, att, match name { "stdv" => "std", "badapt" | "bsparse" | "nbadapt" => "gpow", _ => "rand" }, pres, seq, &me, &vw, &xrs, &extra);
                 seq += 1;
                 writeln!(f, "{line}").unwrap();
                 f.flush().unwrap();
@@ -1297,7 +1309,7 @@ fn cmd_analyze(a: &Args) {
         let mut fam: std::collections::BTreeMap<K, Vec<&serde_json::Value>> = Default::default();
         for r in &rows {
             let arm = r["arm"].as_str().unwrap();
-            if arm == "stdv" || arm == "badapt" || arm == "bsparse" {
+            if arm == "stdv" || arm == "badapt" || arm == "bsparse" || arm == "nbadapt" {
                 fam.entry((r["k"].as_i64().unwrap(), arm.to_string(), r["label"].as_str().unwrap().to_string(), r["attempt"].as_i64().unwrap())).or_default().push(r);
             }
         }
@@ -1307,12 +1319,13 @@ fn cmd_analyze(a: &Args) {
                 let tm = |r: &serde_json::Value| r["build_s"].as_f64().unwrap() + r["dreg_s"].as_f64().unwrap();
                 let dmin = v.iter().map(|r| r["dreg"].as_i64().unwrap()).min().unwrap();
                 let tmin = v.iter().map(|r| tm(r)).fold(f64::INFINITY, f64::min);
+                let dsm = v.iter().map(|r| r["dreg_s"].as_f64().unwrap()).fold(f64::INFINITY, f64::min);
                 let tat = v.iter().filter(|r| r["dreg"].as_i64().unwrap() == dmin).map(|r| tm(r)).fold(f64::INFINITY, f64::min);
                 let sel = v.iter().find(|r| r.get("sel").and_then(|x| x.as_i64()) == Some(1));
                 let sel_s = sel.map_or("-".to_string(), |r| format!("({},{})", r["b_w"], r["b_deg"]));
                 let mw = v.iter().min_by(|a, b| tm(a).partial_cmp(&tm(b)).unwrap()).and_then(|r| r.get("mg_w")).map_or("-".to_string(), |x| x.to_string());
                 let hit = v.iter().filter(|r| r["dreg"].as_i64().unwrap() == dmin).count();
-                println!("k={k} {:>8} {lab:<6} att={att} dreg_min={dmin} ({hit}/{} pres reach it) t_at_dreg_min={tat:.3}s t_min={tmin:.3}s sel(w,deg)={sel_s} modw@tmin={mw}", code(arm, 0), v.len());
+                println!("k={k} {:>8} {lab:<6} att={att} dreg_min={dmin} ({hit}/{} pres reach it) t_at_dreg_min={tat:.3}s t_min={tmin:.3}s dreg_s_min={dsm:.3}s sel(w,deg)={sel_s} modw@tmin={mw}", code(arm, 0), v.len());
             }
         }
     }

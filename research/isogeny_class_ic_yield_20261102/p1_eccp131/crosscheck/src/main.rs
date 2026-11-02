@@ -584,14 +584,32 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
     let eo = engine::run(polys, n, k_for_engine, &lim);
     let eng_cpu = engine::thread_cpu_s() - cpu0;
 
-    // ---- f4_fp: basis (dimension, degrees) and solutions
+    // ---- the repository's F4 engines.  f4_fp panics for p >= 2^32 (Barrett reduction), so it is the primary
+    // reference below 2^32 only; f4_prime_dynamic (Fp64Arithmetic, p <= 2^61 - 1, bounded) runs at every prime and is
+    // the primary reference above 2^32.  Where both run they are compared with each other as well.
     let f4in: Vec<f4_fp::Poly> = polys.iter().map(|q| to_f4(q, n, modulus)).collect();
-    let opts = F4Options::new(FOrd::Grevlex, o.f4_maxdeg).with_budget(Duration::from_secs_f64(o.f4_budget)).capturing_run_log();
-    let t0 = Instant::now();
-    let rep = f4_fp::f4(&f4in, n, modulus, &opts);
-    let f4_ms = t0.elapsed().as_secs_f64() * 1e3;
-    let log = f4_fp::take_run_log();
-    let f4_complete = !rep.timed_out && rep.pairs_above_bound == 0;
+    let budget = Duration::from_secs_f64(o.f4_budget);
+    let backends: Vec<u8> = if modulus < (1u64 << 32) { vec![0] } else { vec![1] };
+    struct Ref {
+        backend: u8,
+        res: Option<F4Res>,
+        sols: Option<BTreeSet<Vec<u64>>>,
+        runs: usize,
+        solve_ms: f64,
+    }
+    let mut refs: Vec<Ref> = Vec::new();
+    for &b in &backends {
+        let res = run_f4(b, &f4in, n, modulus, budget, o.f4_maxdeg, true);
+        let mut runs = 0usize;
+        let ts = Instant::now();
+        let sols = solve_big(b, &f4in, n, modulus, budget, o.f4_maxdeg, &mut runs).map(|v| v.into_iter().collect::<BTreeSet<_>>());
+        refs.push(Ref { backend: b, res, sols, runs, solve_ms: ts.elapsed().as_secs_f64() * 1e3 });
+    }
+    let name_of = |b: u8| if b == 0 { "f4_fp" } else { "f4_prime_dynamic" };
+    let prim = &refs[0];
+    let rep = prim.res.clone().unwrap_or_else(F4Res::failed);
+    let f4_ms = rep.ms;
+    let f4_complete = prim.res.is_some() && rep.timed_out == false && rep.pairs_above_bound == 0;
     let f4_dim: Option<usize> = if !f4_complete {
         None
     } else if rep.inconsistent {
@@ -600,18 +618,13 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
         f4_std(&rep.basis, n).map(|x| x.0)
     };
     let f4_std_by_deg = if f4_complete && !rep.inconsistent { f4_std(&rep.basis, n).map(|x| x.1) } else { None };
-    // F_p solutions with the repository's F4 and root finder: `f4_fp::solve` finds univariate roots by scanning
-    // 0..p and `solve_visit` refuses p >= 2^32, so for large p the substitution tree is run here
-    // (`solve_big`: f4_fp::f4 per node, glv_invariant_base::poly_roots_fp_counted_until for roots).  For small p the
-    // repository's own `f4_fp::solve` is run as well and must agree.
-    let sopts = F4Options::new(FOrd::Grevlex, o.f4_maxdeg).with_budget(Duration::from_secs_f64(o.f4_budget));
-    let ts = Instant::now();
-    let mut runs = 0usize;
-    let big = solve_big(&f4in, n, modulus, &sopts, &mut runs);
-    let solve_ms = ts.elapsed().as_secs_f64() * 1e3;
-    let f4_sols: Option<BTreeSet<Vec<u64>>> = big.as_ref().map(|v| v.iter().cloned().collect());
+    let f4_sols: Option<BTreeSet<Vec<u64>>> = prim.sols.clone();
+    let runs = prim.runs;
+    let solve_ms = prim.solve_ms;
     let mut legacy = "not_run";
     if modulus <= (1u64 << 22) {
+        // the repository's own substitution solver (scans 0..p for roots), small primes only
+        let sopts = F4Options::new(FOrd::Grevlex, o.f4_maxdeg).with_budget(budget);
         let lrep = f4_fp::solve(&f4in, n, modulus, &sopts);
         let lsols: Option<BTreeSet<Vec<u64>>> = match &lrep.verdict {
             Verdict::Solutions(v) => Some(v.iter().cloned().collect()),
@@ -627,11 +640,53 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
             _ => "undetermined",
         };
     }
+    // the two F4 engines against each other
+    let mut f4_pair = "single_backend";
+    if refs.len() == 2 {
+        let (a, b) = (&refs[0], &refs[1]);
+        let dim_of = |r: &Ref| -> Option<usize> {
+            let res = r.res.as_ref()?;
+            if res.timed_out || res.pairs_above_bound > 0 {
+                return None;
+            }
+            if res.inconsistent {
+                Some(0)
+            } else {
+                f4_std(&res.basis, n).map(|x| x.0)
+            }
+        };
+        let (da, db) = (dim_of(a), dim_of(b));
+        let incons = (a.res.as_ref().map(|r| r.inconsistent), b.res.as_ref().map(|r| r.inconsistent));
+        f4_pair = "agree";
+        if da.is_some() && db.is_some() && da != db {
+            failures.push(format!("the two F4 engines disagree on the quotient dimension: {} {:?} vs {} {:?}", name_of(a.backend), da, name_of(b.backend), db));
+            f4_pair = "DIM_DISAGREE";
+        }
+        if let (Some(x), Some(y)) = incons {
+            if da.is_some() && db.is_some() && x != y {
+                failures.push("the two F4 engines disagree on inconsistency".into());
+                f4_pair = "INCONSISTENCY_DISAGREE";
+            }
+        }
+        if let (Some(x), Some(y)) = (&a.sols, &b.sols) {
+            if x != y {
+                failures.push("the two F4 engines give different solution sets".into());
+                f4_pair = "SOLUTION_DISAGREE";
+            }
+        } else {
+            notes.push("second F4 engine undetermined".into());
+            if f4_pair == "agree" {
+                f4_pair = "partial";
+            }
+        }
+    }
     let srep_verdict = match &f4_sols {
         Some(s) if s.is_empty() => "inconsistent",
         Some(_) => "solutions",
         None => "undetermined",
     };
+    let primary_name = name_of(prim.backend);
+    let log_step_degrees = rep.step_degrees.clone();
 
     // ---- 1. solution sets
     let mut sol_status = "not_compared";
@@ -662,6 +717,21 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
     }
 
     // ---- 2. dimensions
+    // counts that need no F4: enumeration against the closure count K and the engine's staircase count
+    if let Some(t) = &truth {
+        if cfg.m == 2 && t.len() != k_closure {
+            failures.push(format!("m = 2: {} rational solutions by enumeration != K {} (count_solutions)", t.len(), k_closure));
+        }
+        if t.len() > k_closure {
+            failures.push(format!("{} rational solutions > K {}", t.len(), k_closure));
+        }
+        if cfg.m == 3 && t.len() < k_closure {
+            notes.push(format!("m = 3: {} of the K = {} closure solutions are F_p-rational (the rest have w in F_p^2)", t.len(), k_closure));
+        }
+    }
+    if eo.status == "solved" && inst.kind != Kind::Ladder && eo.nstd_final != k_closure && !(k_closure == 0 && eo.inconsistent) {
+        failures.push(format!("engine n_std {} != K {}", eo.nstd_final, k_closure));
+    }
     if let Some(d) = f4_dim {
         if inst.kind != Kind::Ladder && d != k_closure {
             failures.push(format!("quotient dimension {d} (F4) != K {k_closure} (count_solutions): ideal not radical or K wrong"));
@@ -689,7 +759,7 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
     // relation (CROSSCHECK.md, section B) is D_engine >= F4's top learning step; an engine D below it is
     // reported as UNEXPECTED_ORDER (a note, since nothing proves it impossible).
     let f4_deg = if rep.inconsistent { rep.solving_degree } else { rep.solving_degree_max };
-    let f4_top = rep.solving_degree_max.max(rep.solving_degree);
+    let f4_top = if prim.backend == 0 { rep.solving_degree_max.max(rep.solving_degree) } else { rep.degree_reached };
     let rel = match eo.d_solve {
         Some(d) if eo.status == "solved" && f4_complete => {
             if d >= f4_top {
@@ -798,7 +868,7 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
                "solving_degree": rep.solving_degree, "solving_degree_max": rep.solving_degree_max, "degree_reached": rep.degree_reached,
                "steps": rep.steps, "max_rows": rep.max_rows, "max_cols": rep.max_cols, "ms": f4_ms, "solve_ms": solve_ms,
                "solve": {"verdict": srep_verdict, "f4_runs": runs, "legacy_f4_fp_solve": legacy},
-               "step_degrees": log.steps.iter().map(|s| s.degree).collect::<Vec<_>>(),
+               "step_degrees": log_step_degrees, "primary_backend": primary_name, "f4_pair": f4_pair,
                "basis_size": rep.basis.len(),
                "basis_lead_degrees": rep.basis.iter().map(|g| g.first().map(|t| t.0.iter().sum::<u32>()).unwrap_or(0)).collect::<Vec<_>>()},
         "degree_relation_engine_vs_f4": rel,
@@ -892,20 +962,130 @@ fn main() {
     }
 }
 
-/// Substitution tree over F_p built from the repository's F4 and root finder.  None: undetermined (timeout, or a
-/// node without a univariate element, which cannot happen for a zero-dimensional ideal in a degrevlex basis).
-fn solve_big(input: &[f4_fp::Poly], n: usize, p: u64, opts: &F4Options, runs: &mut usize) -> Option<Vec<Vec<u64>>> {
+/// Result of one F4 run, in f4_fp's polynomial format whichever engine ran.
+#[derive(Clone)]
+struct F4Res {
+    inconsistent: bool,
+    solving_degree: u32,
+    solving_degree_max: u32,
+    degree_reached: u32,
+    steps: usize,
+    max_rows: usize,
+    max_cols: usize,
+    basis: Vec<f4_fp::Poly>,
+    timed_out: bool,
+    pairs_above_bound: usize,
+    step_degrees: Vec<u32>,
+    ms: f64,
+}
+
+impl F4Res {
+    fn failed() -> F4Res {
+        F4Res {
+            inconsistent: false,
+            solving_degree: 0,
+            solving_degree_max: 0,
+            degree_reached: 0,
+            steps: 0,
+            max_rows: 0,
+            max_cols: 0,
+            basis: vec![],
+            timed_out: true,
+            pairs_above_bound: 0,
+            step_degrees: vec![],
+            ms: 0.0,
+        }
+    }
+}
+
+/// backend 0: f4_fp::f4 (p < 2^32); backend 1: f4_prime_dynamic::run (p <= 2^61 - 1, bounded).
+fn run_f4(backend: u8, input: &[f4_fp::Poly], n: usize, p: u64, budget: Duration, maxdeg: u32, log: bool) -> Option<F4Res> {
+    let t0 = Instant::now();
+    if backend == 0 {
+        let mut opts = F4Options::new(FOrd::Grevlex, maxdeg).with_budget(budget);
+        if log {
+            opts = opts.capturing_run_log();
+        }
+        let r = f4_fp::f4(input, n, p, &opts);
+        let lg = if log { f4_fp::take_run_log() } else { Default::default() };
+        return Some(F4Res {
+            inconsistent: r.inconsistent,
+            solving_degree: r.solving_degree,
+            solving_degree_max: r.solving_degree_max,
+            degree_reached: r.degree_reached,
+            steps: r.steps,
+            max_rows: r.max_rows,
+            max_cols: r.max_cols,
+            basis: r.basis,
+            timed_out: r.timed_out,
+            pairs_above_bound: r.pairs_above_bound,
+            step_degrees: lg.steps.iter().map(|s| s.degree).collect(),
+            ms: t0.elapsed().as_secs_f64() * 1e3,
+        });
+    }
+    use crypto::cryptanalysis::f4_tower_generic::dynamic as dynf4; // src/cryptanalysis/f4_prime_dynamic.rs, mounted by f4_tower_generic.rs
+    use crypto::cryptanalysis::fp_backend::Fp64Arithmetic;
+    let deadline = Instant::now() + budget;
+    let setup = Fp64Arithmetic::try_new(p, 1 << 40, 1 << 30, deadline, &mut |_| Ok(())).ok()?;
+    let mut inp = Vec::new();
+    for f in input {
+        let mut terms = Vec::new();
+        for (e, c) in f {
+            let ex: Vec<u16> = e.iter().map(|&x| x as u16).collect();
+            terms.push(dynf4::CanonicalTerm { mono: dynf4::Mono28::new(&ex, n)?, coefficient: *c });
+        }
+        inp.push(dynf4::InputPolynomial { terms });
+    }
+    let limits = dynf4::Limits { max_pair_degree: maxdeg.min(12), ..Default::default() };
+    let rep = dynf4::run(&setup.field, n as u8, &inp, &limits, deadline, &mut |_| Ok(()));
+    let complete = matches!(rep.stop, dynf4::Stop::Complete | dynf4::Stop::UnitDerived);
+    if std::env::var("XC_DEBUG").is_ok() {
+        eprintln!("f4_prime_dynamic stop {:?} basis {} steps {} pending {}", rep.stop, rep.basis.len(), rep.completed_steps, rep.pairs_pending);
+    }
+    let inconsistent = rep.stop == dynf4::Stop::UnitDerived
+        || rep.basis.iter().any(|g| g.terms.len() == 1 && g.terms[0].mono.degree() == 0);
+    let basis: Vec<f4_fp::Poly> = rep
+        .basis
+        .iter()
+        .map(|g| g.terms.iter().map(|t| (t.mono.exponents(n).unwrap().iter().map(|&x| x as u32).collect::<Vec<u32>>(), t.coefficient)).collect())
+        .collect();
+    Some(F4Res {
+        inconsistent,
+        solving_degree: 0,
+        solving_degree_max: 0,
+        degree_reached: rep.maximum_processed_row_degree,
+        steps: rep.completed_steps,
+        max_rows: rep.maximum_rows_admitted,
+        max_cols: rep.maximum_columns_admitted,
+        basis,
+        timed_out: !complete,
+        pairs_above_bound: 0,
+        step_degrees: vec![],
+        ms: t0.elapsed().as_secs_f64() * 1e3,
+    })
+}
+
+/// Substitution tree over F_p built from the repository's F4 (either engine) and root finder.  None: undetermined
+/// (timeout, or a node without a univariate element, which cannot happen for a zero-dimensional ideal in a
+/// degrevlex basis).
+fn solve_big(backend: u8, input: &[f4_fp::Poly], n: usize, p: u64, budget: Duration, maxdeg: u32, runs: &mut usize) -> Option<Vec<Vec<u64>>> {
+    let deadline = Instant::now() + budget;
+    solve_rec(backend, input, n, p, deadline, maxdeg, runs)
+}
+
+fn solve_rec(backend: u8, input: &[f4_fp::Poly], n: usize, p: u64, deadline: Instant, maxdeg: u32, runs: &mut usize) -> Option<Vec<Vec<u64>>> {
     if n == 0 {
         let bad = input.iter().any(|f| f.iter().any(|(_, c)| *c % p != 0));
         return Some(if bad { vec![] } else { vec![vec![]] });
     }
-    let r = f4_fp::f4(input, n, p, opts);
+    let left = deadline.saturating_duration_since(Instant::now());
+    let r = run_f4(backend, input, n, p, left, maxdeg, false)?;
     *runs += 1;
-    if r.timed_out {
-        return None;
-    }
     if r.inconsistent {
         return Some(vec![]);
+    }
+    if r.timed_out || r.pairs_above_bound > 0 {
+        return None;
     }
     let mut best: Option<(usize, Vec<u64>)> = None;
     for g in &r.basis {
@@ -920,7 +1100,7 @@ fn solve_big(input: &[f4_fp::Poly], n: usize, p: u64, opts: &F4Options, runs: &m
             coeffs[e[i] as usize] = *c;
         }
         let mut muls = 0u64;
-        let roots = crypto::cryptanalysis::glv_invariant_base::poly_roots_fp_counted_until(&coeffs, p, 0x5031, &mut muls, opts.deadline)?;
+        let roots = crypto::cryptanalysis::glv_invariant_base::poly_roots_fp_counted_until(&coeffs, p, 0x5031, &mut muls, Some(deadline))?;
         if best.as_ref().map_or(true, |(_, rs)| roots.len() < rs.len()) {
             best = Some((i, roots));
         }
@@ -944,7 +1124,7 @@ fn solve_big(input: &[f4_fp::Poly], n: usize, p: u64, opts: &F4Options, runs: &m
             })
             .filter(|g| !g.is_empty())
             .collect();
-        for mut s in solve_big(&sub, n - 1, p, opts, runs)? {
+        for mut s in solve_rec(backend, &sub, n - 1, p, deadline, maxdeg, runs)? {
             s.insert(var, a);
             sols.push(s);
         }
