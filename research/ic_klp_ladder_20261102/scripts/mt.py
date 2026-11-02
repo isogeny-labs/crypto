@@ -181,7 +181,8 @@ if __name__ == "__main__":
     p, a, b, r, G = curve
     print(json.dumps({"p": p, "r": r, "sqrt_r": math.isqrt(r)}), flush=True)
     res = {}
-    for T in (1, 2, 4, 8, 16, 32, 64):
+    Ts = tuple(int(x) for x in sys.argv[4].split(',')) if len(sys.argv) > 4 else (1, 2, 4, 8, 16, 32, 64)
+    for T in Ts:
         for B in (0, 1):
             tot = []; fail = 0
             for s in range(trials):

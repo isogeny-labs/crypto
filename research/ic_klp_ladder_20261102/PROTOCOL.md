@@ -53,3 +53,10 @@ The large-prime histogram widens to 0, 1, 2, 3, >=4. A unit test checks recovery
 New arms in `examples/klp_cubic.rs`, same instances, seeds, rho reference and measures as Amendment 2:
 arity 4 with no large primes (full base), and arity 4 with max_large_primes = 4 at |F|^(2/3) and |F|^(3/4).
 p in {61, 103, 151}, 8 instances each, max_residuals 2e6. Every answer checked.
+
+## Amendment 4 (2026-11-02, before any data under it): batch parity with tighter intervals
+Owner: "reach parity with rho". Single-target parity is not reachable without relabelling (a known-log factor-base point turns the
+collector into rho itself, which section 6 does not count). Parity is tested where Amendment 1 found it: the batch.
+`scripts/mt.py` (unchanged except an optional comma list of T), 22 bits (same curve as Amendment 1), T in {64, 128, 256}, 32 trials per cell, seed offset 900000.
+Claim P (frozen): parity holds at T if the 95% interval of the B=1 / B=0 per-target cost ratio (delta method from the two means' standard errors) contains 1 and lies inside [0.9, 1.1].
+Reference: B=0 at the same T (multi-target rho). The ratio of B=0 at T to single-target B=0 (Amendment 1, T=1) is also reported.
