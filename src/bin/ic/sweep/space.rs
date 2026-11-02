@@ -460,10 +460,9 @@ fn tower_height(t_frac: f64, scale: u32) -> i64 {
 /// tower quotient ring) on PKM's auxiliary-curve base, against Semaev's
 /// naive small-abscissa base written in bits on the same oracle and engine.
 ///
-/// - `prime-isogeny`: `V = x(R' + <Q>)`, `Q` of order `2^t` on an auxiliary
-///   curve `E'/F_p`, the zeros of `t` Vélu 2-isogeny x-maps.  `aux` chooses
-///   `E'`: `ordinary` (a seeded search, charged to the factor-base phase) or
-///   `supersingular` (`#E' = p + 1`, no search; refused for `p ≡ 1 mod 12`).
+/// - `prime-isogeny`: `V = x(R' + <Q>)`, `Q` of order `2^t` on an ordinary
+///   auxiliary curve `E'/F_p` from a seeded search (charged to the
+///   factor-base phase), the zeros of `t` Vélu 2-isogeny x-maps.
 /// - `prime-abscissa-bits`: every abscissa in `[1, 2^t)`, membership as `t`
 ///   bits `b_j² = b_j`.  The naive arm, so the search can prefer it.
 ///
@@ -471,6 +470,12 @@ fn tower_height(t_frac: f64, scale: u32) -> i64 {
 /// multiplications (grid)`), so a rung on it could not be ranked against the
 /// baseline; run it as a separate control.  The aux-search seed is fixed at
 /// 0: a seed is not a design choice, and searching it would select luck.
+/// A supersingular `E'` (`aux=supersingular`, no search) is not offered: its
+/// 2-Sylow has order `2^{v₂(p+1)}`, and on the primes `ic bench` draws that
+/// is usually below `2^t`, so most trials would be refused and the refusals
+/// would poison the sampler's model of the other parameters (a development
+/// smoke on 2026-11-02 saw `v₂(p + 1) = 2` at both rungs).  `ic bench` runs
+/// it directly.
 /// `prime-kummer` is not offered: `ic bench` draws `p` without `2^t | p − 1`,
 /// so it would be refused on most rungs.
 fn prime_algebraic_space(inst: &InstanceKind) -> Space {
@@ -488,12 +493,6 @@ fn prime_algebraic_space(inst: &InstanceKind) -> Space {
             false,
             "tower height t = round(t_frac · bits), clamped to [2, 12]; |V| = 2^t",
         ),
-        Param::cat(
-            "aux",
-            &["ordinary", "supersingular"],
-            "auxiliary curve E': searched ordinary, or supersingular with no search",
-        )
-        .when("base", &["prime-isogeny"]),
         Param::cat(
             "mode",
             &["chain", "full"],
@@ -1112,16 +1111,12 @@ mod tests {
         sample(&mut a, "m", json!("3"));
         sample(&mut a, "base", json!("prime-isogeny"));
         sample(&mut a, "t_frac", json!(0.25));
-        sample(&mut a, "aux", json!("supersingular"));
         sample(&mut a, "mode", json!("chain"));
         sample(&mut a, "degree", json!(10));
         sample(&mut a, "linalg", json!("incremental-gauss"));
         sample(&mut a, "targets", json!("walk"));
         let cfg = space.build(&a, 16).unwrap();
-        assert_eq!(
-            cfg.factor_base,
-            "prime-isogeny:t=4,seed=0,aux=supersingular"
-        );
+        assert_eq!(cfg.factor_base, "prime-isogeny:t=4,seed=0,aux=ordinary");
         assert_eq!(cfg.oracle, "pkm-semaev:m=3,engine=f4,degree=10,mode=chain");
         assert_eq!(cfg.regime, "prime");
         assert_eq!(cfg.solver, None);
@@ -1129,7 +1124,6 @@ mod tests {
         // The naive arm: the base is exactly the interval the oracle writes in bits.
         sample(&mut a, "m", json!("2"));
         a.remove("mode");
-        a.remove("aux");
         sample(&mut a, "base", json!("prime-abscissa-bits"));
         let cfg = space.build(&a, 16).unwrap();
         assert_eq!(cfg.factor_base, "prime-abscissa:below=16");

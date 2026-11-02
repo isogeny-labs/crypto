@@ -184,8 +184,7 @@ gets faster, or give each trial a long `--timeout-seconds`.
 
 | parameter | values | meaning |
 |:--|:--|:--|
-| `base` | `prime-isogeny`, `prime-abscissa-bits` | `V = x(R' + ⟨Q⟩)`, `Q` of order `2^t` on an auxiliary curve `E'/F_p`, the zeros of `t` Vélu 2-isogeny x-maps; or the naive interval `[1, 2^t)` written in `t` bits |
-| `aux` | `ordinary`, `supersingular` | `E'` from a seeded search (charged to the factor-base phase), or supersingular with `#E' = p + 1` and no search (refused for `p ≡ 1 mod 12`) |
+| `base` | `prime-isogeny`, `prime-abscissa-bits` | `V = x(R' + ⟨Q⟩)`, `Q` of order `2^t` on an ordinary auxiliary curve `E'/F_p` from a seeded search (charged to the factor-base phase), the zeros of `t` Vélu 2-isogeny x-maps; or the naive interval `[1, 2^t)` written in `t` bits |
 | `t_frac` | 0.2–0.6 | `t = round(t_frac · bits)`, clamped to `[2, 12]` |
 | `m`, `mode` | 2, 3; `chain`, `full` | summands; S3 chain or S4 at `m = 3` |
 | `degree` | 6–16 | F4 degree bound; an undecided system is decided on the counted grid |
@@ -206,6 +205,11 @@ provisional until the msolve reference arm
   ranked. Run it as a separate control.
 - The auxiliary-search seed is fixed at 0, because a seed is not a design
   choice and searching it would select luck.
+- A supersingular `E'` (`aux=supersingular`, `#E' = p + 1`, no search) is not
+  offered. Its 2-Sylow has order `2^{v₂(p+1)}`, which on the primes `ic bench`
+  draws is usually below `2^t`, so most trials would be refused. A
+  development smoke saw `v₂(p + 1) = 2` at both rungs. Run it with `ic bench`
+  directly on a prime with large `v₂(p + 1)`.
 - `prime-kummer` is not offered. `ic bench` draws `p` without `2^t | p − 1`,
   so most rungs would refuse it. It is available to `ic bench` directly.
 
