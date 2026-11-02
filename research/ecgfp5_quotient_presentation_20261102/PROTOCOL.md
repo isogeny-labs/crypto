@@ -100,4 +100,65 @@ starts. Changes after that point are amendments (§9) and never edit this text.
 
 ## 9. Amendments
 
-None yet.
+### A1 (2026-11-02, after the four frozen arms; committed and pushed before any A1 cell)
+
+**What the frozen arms showed** (`analysis.md`).
+- U1's F4 CPU is 4,729 against A0's 12,744: A0/U1 = 2.69×. That is an F4 improvement at
+  p = 4111 under §5, with the generator gate passed.
+- U1's whole solve is `not_measured`, because hnfsolve exited 3.
+  - In grevlex the quadric s5 − w² has leading monomial w², so every standard monomial has
+    w-degree ≤ 1.
+  - That gives t = 32,768 chains of length ≤ 2, and the BNS22 stability check fails on
+    32,767 heads.
+  - Dev runs confirm this is structural: U1 also fails at m = 3 (`dev/`), while W0's m = 3
+    system passes.
+- V1 and V2 are within ±2 % of A0: no improvement, as predicted.
+
+**A1 arms.** All use the same host, caps (12 GiB, 14,400 s wall) and binaries.
+
+| cell | system | run |
+|---|---|---|
+| U3_p | U1 with w := w′ − c·s1 (`src/shear_w.py`, seed 1, c from SHA-256), renamed w | whole solve, bw pipeline exactly as U1 |
+| A0_p | W0 `quot.ms` at p | F4 only (`-g 1`) |
+| U1F_p | U1 generator at p, seed 1 | F4 only (`-g 1`) |
+| U2_4111 | U1 with s5 := w² substituted and the quadric dropped (`src/subst_s5.py`): s1..s4, w, degree 16 | F4 only (`-g 1`) |
+| U1P_4111 | U1 | whole solve by W0's finish: `msolve -P 1`, then `qsolve check --planted` |
+
+- **Why the shear.** It is an invertible linear change of coordinates, so it gives the same
+  points and the same D. The quadric's leading monomial becomes s1², so w is no longer killed
+  at degree 2.
+- **Dev check at m = 3, p = 4111 and 262231.** stab_fail = 0, D = 16, planted recovered by
+  `bwfinish` (`dev/m3_*_u3`).
+- **Fresh generation.** U3 at p ≠ 4111 regenerates the u-ring system with `qsolve generate`, and
+  its generator checks are part of the gate.
+
+**Order** (`run_a1.sh`). U3_4111, A0_262231, U1F_262231, A0_33554371, U1F_33554371, U2_4111,
+U1P_4111. If U3_4111 passes its whole-solve bar, U3_262231 and U3_33554371 then follow.
+
+**Gates.** As §4. For U3: shear exit 0 (the mapped planted point satisfies the system),
+elim_degree = D = 65,536, `stab_fail=0`, planted recovered. For U1P: `check.json` has
+elim_degree = 65,536, `planted_root_of_eliminant` and `planted_coordinates_recovered`.
+
+**Decision rules.**
+- **F4 stage improvement of the u ring.** U1F F4 ≤ A0 F4 / 1.5 at each of 262231 and 33554371,
+  measured in-session, as well as at 4111 (already measured). It is reported as a stage
+  improvement: it moves no whole-solve c by itself.
+- **Whole-solve improvement** for U3 or U1P at a prime: c ≤ bw baseline / 1.5, i.e. 11,275,
+  12,549 and 15,011 CPU-s at 4111, 262231 and 33554371.
+  - c = msolve process CPU + hnfsolve CPU + bwfinish `total_cpu_s` (U3), or msolve process
+    CPU (U1P).
+  - It is a **pipeline improvement and ratchets the baseline** only if it holds at all three
+    primes with every gate passed.
+- An arm that hits a cap stop is `not_measured` and is never extrapolated.
+
+**Predictions** (made before any A1 cell).
+- U3: F4 between U1's and A0's (6,000–10,000 CPU-s at 4111), and c of 10,000–15,000. Whether
+  it clears 11,275 is uncertain.
+- A0/U1F ≥ 1.5 at both larger primes, and about 2.7×.
+- U2: F4 above U1's 4,729, because the degree-16 equations raise the degree of regularity.
+- U1P: msolve's change of order handles t = 32,768 dense columns against W0's 4,920, so it is
+  predicted to cost more than W0's 31,004. A cap stop is likely.
+
+**What may not be said** (adds to §8).
+- An F4 stage improvement is not a pipeline improvement.
+- A U3 or U1P pass at one prime is a screen.
