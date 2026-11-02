@@ -16,3 +16,16 @@ Curve p36 (`p = 68719476731, a = -3, b = 33, r = 68719022539`). Arms: `rho` (rho
 - D (descriptive): per-target cost S(batch)/L against single-target rho S, at w = 0, 0.1, 1.
 - All records verified (the runner checks the record's target; companions and log P0 checked inside the run); audits OK; else void.
 No threshold is tuned after data.
+
+## Amendment 1 (2026-11-02, before any valid data): dispatch fix, rerun from the start
+Attempt 1 (kept unmodified in `aborted-attempt1/`, 74 records) crashed on every `ic.residual_batch` record (panic "no entry found for key" at
+the IC pipeline's parameter lookup): the new method's dispatch arm sat after the generic `ic` family arm, so it never ran. The rho and pooled
+arms verified. Fix, code only: the arm moved ahead of the family arm, and the method's family set to `rho` (its solve is one rho-style batch phase,
+so the rho online-window mapping describes it; the id and summary still name the index-calculus column). Design, seeds, claims and rule unchanged; rerun from the start.
+
+## Amendment 2 (2026-11-02, before any valid data): start-point fix, rerun from the start
+Attempt 2 (kept unmodified in `aborted-attempt2/`) ran but every `ic.residual_batch` record was exhausted with log P0 never solved:
+with one stride, walk w's point was a multiple of [t_b]Q + P0, so every equation had the same Q : P0 coefficient ratio and the two-equation
+solve was always singular. Fix, code only (`ic_residual_batch_with`): starts alternate between the precomputed `stride` and `stride + P0`
+(still one addition a walk), so the P0 coefficient grows at half the rate of the Q coefficient and equations are independent.
+Design, seeds, claims and rule unchanged; rerun from the start.

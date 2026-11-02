@@ -568,7 +568,9 @@ pub fn registry() -> &'static [MethodDecl] {
         },
         MethodDecl {
             id: "ic.residual_batch",
-            family: "ic",
+            // A rho-style batch solve (one online phase, the rho walker), so
+            // the rho family's online window and pricing describe it.
+            family: "rho",
             summary: "the residual collector's structure in the Kuhn–Struik batch of rho.multitarget_pooled: the same targets, walker, table and charging, plus one base point P0 of unknown logarithm in every relation (an index-calculus column, B = 1); the first target needs two independent equations (d_1 and log P0), later ones one collision; log P0 and every d_i checked; S is the whole batch's operations over √r",
             entry: "ic_boundary::ic_residual_batch_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::PrimeOnly,
@@ -2938,6 +2940,9 @@ fn solve_inner(
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
+        (Instance::Prime(i), _) if m.id == "ic.residual_batch" => {
+            solve_residual_batch(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Prime(i), _) if m.id == super::aps::ID => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
@@ -3193,9 +3198,6 @@ fn solve_inner(
         )),
         (Instance::Prime(i), _) if m.id == "rho.multitarget_pooled" => {
             solve_pooled(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
-        }
-        (Instance::Prime(i), _) if m.id == "ic.residual_batch" => {
-            solve_residual_batch(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) => solve_generic(
             m,

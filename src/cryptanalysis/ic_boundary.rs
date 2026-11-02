@@ -2962,8 +2962,9 @@ pub fn rho_batch_with<G: CountedGroup, C: RhoClasses<G>>(
 /// Identical to [`rho_batch_with`] (jumps in `G` only, one shared
 /// distinguished-point table, targets in sequence, the same tuned walker
 /// on `classes`) except for the starts: walk `w` of target `i` starts at
-/// `[s_w]G + X_w` with `X_w = [u_w]Q_i + [w]P0`, the stride advanced by
-/// the precomputed `stride + P0` (one addition a walk, as in rho).  The
+/// `[s_w]G + X_w` with `X_w = [u_w]Q_i + [c_w]P0`, advanced alternately by
+/// the precomputed `stride` and `stride + P0` (one addition a walk, as in
+/// rho; `c_w ≈ w/2` against `u_w = w·t_b`, so the equations are independent).  The
 /// walker carries one coefficient `β` on `X_w`, so a distinguished point is
 /// `[a]G + [β u_w]Q_i + [β w]P0` and a collision is one linear equation in
 /// `d_i` and `log P0`.  Until `log P0` is known (the first target) two
@@ -3017,6 +3018,10 @@ pub fn ic_residual_batch_with<G: CountedGroup, C: RhoClasses<G>>(
             tb = rng.gen_range(1..r.max(2));
             stride = joint_mul(g, &mut ops, generator, q, gq, ta, tb);
         }
+        // Two strides, alternated: `stride` and `stride + P0`.  With one
+        // stride every X_w would be a multiple of `[tb]Q + P0`, every
+        // equation would have the same Q : P0 ratio, and the two-equation
+        // solve would always be singular.
         let step = g.add(&mut ops, stride, base_point);
         target_setup.merge(ops);
         let (mut sx, mut sa, mut sb, mut sc) = (step, ta % r, tb % r, 1u64 % r);
@@ -3029,10 +3034,14 @@ pub fn ic_residual_batch_with<G: CountedGroup, C: RhoClasses<G>>(
         while tally.walk_ops() < max_steps && walks < max_steps {
             walks += 1;
             if walks > 1 {
-                sx = g.add(&mut ops, sx, step);
+                if walks % 2 == 0 {
+                    sx = g.add(&mut ops, sx, stride);
+                } else {
+                    sx = g.add(&mut ops, sx, step);
+                    sc = addmod(sc, 1, r);
+                }
                 sa = addmod(sa, ta, r);
                 sb = addmod(sb, tb, r);
-                sc = addmod(sc, 1, r);
                 start_adds += 1;
             }
             if g.is_identity(&sx) {
