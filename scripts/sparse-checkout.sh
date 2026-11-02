@@ -92,7 +92,9 @@ candidates() {
 }
 
 # Directories of the Cargo targets ([[bin]], [[bench]], ...) declared by path
-# in Cargo.toml: a target's sibling modules live beside it.
+# in Cargo.toml: a target's sibling modules live beside it. Both profiles use
+# them: a harness checkout had lost two [[bin]] sources under heavy research/
+# directories, which broke `cargo test` and `cargo clippy --tests`.
 cargo_targets() {
   [ -f Cargo.toml ] || return 0
   sed -nE 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' Cargo.toml |
@@ -141,7 +143,7 @@ cargo_path_deps() {
 referenced() {
   local tracked=$1 cand keep='^research/'
   [ "$PROFILE" = minimal ] && keep='/'
-  { candidates; if [ "$PROFILE" = minimal ]; then cargo_targets; fi; } |
+  { candidates; cargo_targets; } |
     sed -E 's/[.,:;]+$//' | grep -- "$keep" | grep -vE '^[^/]+/?$' | sort -u |
     while IFS= read -r cand; do
       if grep -qxF -- "$cand" "$tracked"; then
