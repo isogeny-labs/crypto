@@ -189,8 +189,8 @@ n=43 k=4 under load).
   m=2: 0.00-0.05 s for k=3,4,5,8 (Dreg 2,2,2,3).
   planted (positive control, `--solve`): k=3 at dmax 9 about 1 s (Dreg 10 capshit or 7, planted_ok and planted_found 1), k=4 at dmax 8
   15.7 s (`atleast` 9, planted_ok 1, solve 0.04 s).
-- n=131, random V: k=3 0.004 s; k=4 2.6-2.9 s (Dreg 7, 1703 x 2423); k=5 10 s at dmax 7 (`atleast`), > 9 min at dmax 9 (killed
-  at the 15 min limit, no answer); k=6 > 660 s.
+- n=131, random V: k=3 0.004 s; k=4 2.6-2.9 s (Dreg 7, 1703 x 2423); k=5 10 s at dmax 7 (`atleast` 8), no answer at dmax 8 in 11 min and at dmax 9 in 15 min
+  (both killed); k=6 > 660 s.
 - n=131, standard V: k=5 0.07 s; k=6 0.2 s (E0, Dreg 6) and 18-21 s (floor, Dreg 7); k=7 capshit ~1 s.
 - n=131, b-adapted (`badapt`, g = b): k=3 0.013 s, k=4 0.054 s, k=5 0.18-0.22 s, k=6 0.5-0.7 s, Dreg 6 at k=3..6 for all of
   A000, A010, B000, B010 and the borrowed E0 presentations. `bsparse` k=6 family of one floor curve: 4 presentations at
