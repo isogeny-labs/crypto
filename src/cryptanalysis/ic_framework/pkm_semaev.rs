@@ -1236,7 +1236,7 @@ mod tests {
         let mut hits = 0;
         // Random targets, plus planted ones so both verdicts occur.
         for k in 0..40u64 {
-            let target = if k % 4 == 0 {
+            let target = if k.is_multiple_of(4) {
                 let idx: Vec<usize> = (0..3).map(|_| rng.gen_range(0..fb.points.len())).collect();
                 sum(curve, &fb, &idx)
             } else {
@@ -1295,7 +1295,7 @@ mod tests {
         let g = inst.generator_point();
         let mut hits = 0;
         for k in 0..32u64 {
-            let target = if k % 3 == 0 {
+            let target = if k.is_multiple_of(3) {
                 let idx: Vec<usize> = (0..2).map(|_| rng.gen_range(0..fb.points.len())).collect();
                 sum(curve, fb, &idx)
             } else {
@@ -1412,6 +1412,132 @@ mod tests {
         assert!(narrow
             .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
             .is_err());
+    }
+
+    /// `m = 3` on a membership form: the chained and the full presentation
+    /// and the grid all give the exact decomposability verdict of
+    /// `decomposable_points(.., 3, ..)`, and every relation sums to the target.
+    fn agrees_with_grid_m3(
+        inst: &PrimeInstance,
+        fb: &FactorBase<PrimePoint>,
+        make: &dyn Fn() -> PkmSemaevOracle,
+        label: &str,
+        extra: &str,
+    ) {
+        let curve = &inst.curve;
+        let decomposable = decomposable_points(curve, fb, 3, &mut GroupOps::default());
+        let prep = |spec: &str| {
+            let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+            let mut o = make();
+            o.prepare(&ctx(inst), fb, &params, &mut GroupOps::default())
+                .unwrap_or_else(|e| panic!("{label}: prepare: {e}"));
+            o
+        };
+        let mut chain = prep(&format!("m=3,mode=chain,crosscheck=1{extra}"));
+        let mut full = prep(&format!("m=3,mode=full,crosscheck=1{extra}"));
+        let mut grid = prep("m=3,engine=exhaustive");
+        let mut rng = StdRng::seed_from_u64(31);
+        let g = inst.generator_point();
+        let mut hits = 0;
+        for k in 0..32u64 {
+            let target = if k.is_multiple_of(3) {
+                let idx: Vec<usize> = (0..3).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                sum(curve, fb, &idx)
+            } else {
+                curve.mul(&mut GroupOps::default(), g, rng.gen_range(1..inst.r))
+            };
+            if target.infinity {
+                continue;
+            }
+            let run = |o: &mut PkmSemaevOracle| {
+                let got = o.decompose(
+                    &ctx(inst),
+                    fb,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    target,
+                );
+                if let Some(idx) = &got {
+                    assert_eq!(idx.len(), 3, "{label}");
+                    assert_eq!(
+                        sum(curve, fb, idx),
+                        target,
+                        "{label}: relation sums to the target"
+                    );
+                }
+                got.is_some()
+            };
+            let (a, b, c) = (run(&mut chain), run(&mut full), run(&mut grid));
+            assert_eq!(a, c, "{label}: chain F4 against the grid, target {k}");
+            assert_eq!(b, c, "{label}: full F4 against the grid, target {k}");
+            assert_eq!(
+                c,
+                decomposable.contains(&curve.key(&target)),
+                "{label}: target {k}"
+            );
+            hits += usize::from(c);
+        }
+        assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+        for o in [&chain, &full] {
+            let n = o.relation_counters();
+            assert_eq!(
+                n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
+                0,
+                "{label}"
+            );
+            let tot = o.solver_totals().unwrap();
+            // A tiny Boolean system can be decided by the preprocessing alone
+            // (zero elimination multiply-adds), so only the calls are required.
+            assert!(
+                tot.calls > 0,
+                "{label}: F4 calls (calls {}, ops {})",
+                tot.calls,
+                tot.ops
+            );
+        }
+    }
+
+    /// `m = 3` on PKM's isogeny tower, both presentations.
+    #[test]
+    fn isogeny_tower_m3_agrees_with_grid() {
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        let inst = instance();
+        let t = 3;
+        let b = PrimeIsogenyBase { instance: &inst };
+        let mut params = Params::default();
+        params.set("t", t.to_string());
+        let fb = b
+            .build(&ctx(&inst), &params, &mut GroupOps::default())
+            .expect("isogeny base");
+        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+        let (v, c) = (tower.v.clone(), tower.c);
+        agrees_with_grid_m3(
+            &inst,
+            &fb,
+            &|| PkmSemaevOracle::new_isogeny(3, t, v.clone(), steps.clone(), c),
+            "isogeny m=3",
+            "",
+        );
+    }
+
+    /// `m = 3` on the bit form, with and without hybrid guessing.
+    #[test]
+    fn bit_interval_m3_agrees_with_grid() {
+        use crate::cryptanalysis::ic_boundary::prime_factor_base;
+        let inst = instance();
+        let fb = prime_factor_base(&inst, 4);
+        let max = *fb.abscissa_list.iter().max().unwrap();
+        let t = 64 - max.leading_zeros();
+        for extra in ["", ",guess=1", ",guess=2"] {
+            agrees_with_grid_m3(
+                &inst,
+                &fb,
+                &|| PkmSemaevOracle::new_bits(3, t, 0),
+                &format!("bits m=3{extra}"),
+                extra,
+            );
+        }
     }
 
     /// A prime-order curve `y² = x³ + x + b` over a prime near 1000, found

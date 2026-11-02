@@ -75,3 +75,10 @@ tower would need to be chosen compatibly with the involution, which is open.
 ## Resolution and history
 
 - 2026-11-02: opened from ratchet round 1, Part 4. Unresolved.
+- 2026-11-02 (later): the missing capability is provided. `pkm-semaev` now takes the
+  isogeny tower and a bit-interval membership (#3284), with hybrid guessing (#3287).
+  Measured at k = 20, m = 2 (`research/curve25519_algebraic_ladder_20261102/README.md`):
+  both run beyond t = 2 and verify end to end. The best measured configuration
+  (bits t = 3, guess = 2) costs S = 2.5·10⁶ at w = 0.1, against 8.4 for the generic
+  baseline. The obstruction for this track is now cost, not existence. Status stays
+  `open` until a cost-competitive configuration exists or is ruled out.
