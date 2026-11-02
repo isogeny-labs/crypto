@@ -148,7 +148,7 @@ same unit, and a gain in one never ratchets the other.
 
 | track (2026-10-29) | spaces | counted? |
 |:--|:--|:--|
-| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`) | yes, within a scope; the headline track |
+| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`), `prime-algebraic` (`pkm-semaev` F4, baseline the naive interval; see below) | yes, within a scope; the headline track |
 | `generic` | `koblitz-table`, `prime-table`, `prime-rootfind` (`rootfind-subtract`) | yes, as generic decomposition (bounded by √r; cannot beat rho), never as algebraic progress |
 
 The `rootfind-*` oracles are generic. At m = 2, `rootfind-subtract` computes
@@ -162,6 +162,55 @@ against the algebraic track. Until a build session adds `Track::Generic` and
 retires `Track::Unclassified`, read the sweeper's `table` and `unclassified`
 output as the generic track.
 
+## The prime algebraic space: auxiliary-curve factor bases
+
+`prime-algebraic` searches Petit–Kosters–Messeng's auxiliary-curve factor
+base on the algebraic track. Every trial runs `pkm-semaev`: S_{m+1} together
+with the base's membership written as low-degree equations, solved by F4 over
+the tower quotient ring, with F4's `F_p` multiply-adds counted as native work
+and priced across the §5a band.
+
+```bash
+ic sweep spaces --space prime-algebraic
+ic sweep run --space prime-algebraic --rungs 14,16,18,20 --target-log2r 24 \
+    --trials 40 --workers 2 --store runs/prime-algebraic.jsonl
+```
+
+| parameter | values | meaning |
+|:--|:--|:--|
+| `base` | `prime-isogeny`, `prime-abscissa-bits` | `V = x(R' + ⟨Q⟩)`, `Q` of order `2^t` on an auxiliary curve `E'/F_p`, the zeros of `t` Vélu 2-isogeny x-maps; or the naive interval `[1, 2^t)` written in `t` bits |
+| `aux` | `ordinary`, `supersingular` | `E'` from a seeded search (charged to the factor-base phase), or supersingular with `#E' = p + 1` and no search (refused for `p ≡ 1 mod 12`) |
+| `t_frac` | 0.2–0.6 | `t = round(t_frac · bits)`, clamped to `[2, 12]` |
+| `m`, `mode` | 2, 3; `chain`, `full` | summands; S3 chain or S4 at `m = 3` |
+| `degree` | 6–16 | F4 degree bound; an undecided system is decided on the counted grid |
+
+**Baseline.** Semaev's naive small-abscissa system on the same oracle and
+engine: `prime-abscissa:below=2^t` (every abscissa in `[1, 2^t)` carrying a
+point) with `pkm-semaev:m=2,bits=t`, `t = ⌈bits/2⌉`. The candidate and the
+incumbent differ only in the factor base and its membership equations, which
+is the question: does the auxiliary curve's tower buy anything over a plain
+interval? The baseline cannot beat rho (atlas `KR-IC-401ebf`); it is
+provisional until the msolve reference arm
+(`research/prime_ic_program_20261029/reference_arm`) exists.
+
+**What is not offered, and why.**
+
+- `engine=exhaustive` counts `F_p multiplications (grid)`, a different unit
+  from F4's `F_p multiply-adds (elimination only)`, so a rung on it cannot be
+  ranked. Run it as a separate control.
+- The auxiliary-search seed is fixed at 0, because a seed is not a design
+  choice and searching it would select luck.
+- `prime-kummer` is not offered. `ic bench` draws `p` without `2^t | p − 1`,
+  so most rungs would refuse it. It is available to `ic bench` directly.
+
+**What earlier measurements predict.** The isogeny base's relation yield
+matches a random base, and its presentation costs more than `μ_{2^t}`
+(`research/isogeny_vs_mu_factor_base_20261102`). F4's solving degree has grown
+with the tower at every measured `m` (lead
+`LEAD-ICP-pkm-tower-algebraic-oracle`). A configuration whose cost ratio to
+the naive interval falls with size would contradict those measurements.
+Confirm it with a frozen protocol before reporting it as an improvement.
+
 ## Scale-relative knobs
 
 A configuration tuned at one size must say something at the next. Base sizes
@@ -174,8 +223,10 @@ ratios, so the search space is the same on every rung. Absolute caps
 - **Sizes.** `ic bench` stops at n ≤ 63 (binary) and p < 2^62 (prime), and
   at `m ≤ 3`. The a = 0, n = 83 target is reached only by projection from
   rungs below 63. Widening the framework is the next phase of the plan.
-- **No algebraic prime space.** The framework has no algebraic prime oracle;
-  `prime-table` is reference only.
+- **The prime algebraic space is small and its baseline provisional.**
+  `prime-algebraic` (below) caps the tower at `t ≤ 12`, so the baseline's
+  `t = ⌈bits/2⌉` tracks size only to 24-bit rungs, and its baseline is not the
+  owner-approved msolve reference arm, which is not implemented.
 - **`m ≥ 4`.** `descent-algebraic` is `m ∈ {2, 3}`.
 - **Baselines.** Provisional, and not published index calculus. The algebraic
   baseline is inherited F4 on the S3 descent (`m = 2`) at `d = ⌊(n+1)/3⌋`: the
