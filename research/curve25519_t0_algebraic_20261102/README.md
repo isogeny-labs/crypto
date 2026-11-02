@@ -138,3 +138,21 @@ the multiply-adds agree to 0.2 percent; the cause was not investigated.
 6. One curve, one seed per t, no spread. Not measured: the (w, D) degree-1 presentation, m = 3 cost
    in the runs, other windows, G between 0 and 3, wall times.
 7. The full t0size scan (162 KB) was not kept; the selection rule and chosen rows are in the protocol.
+
+## Coordinator review (main session, 2026-11-02)
+
+- **What was refuted, and what was not.** The w-form tested here writes each
+  summand's w in bits and uses the symmetrised polynomial N of degree 2 per
+  variable. For that form, the expectation of a lower degree at m = 2 is
+  falsified in all six primary pairs: degree, terms and F4 multiply-adds per
+  target are equal to within 0.2%. The STRUCTURE.md factor 2^(m−1) belongs to a
+  different presentation ((w, D) with D² = w² − 4d), which was not built because
+  D is not a bit-tower variable. That presentation is still open, not refuted.
+- **Per relation, the w-form is worse here.** At comparable column counts its
+  `coverage_exact` is lower (ratios 0.33, 0.81, 0.58), so per-relation cost is
+  1.2–3× higher. The X arm, matched on w-class count, is 5.7–23× higher. The
+  T_0-closed base that gave 2× on the generic track gives nothing to the
+  algebraic oracle in these cells.
+- **Why the F4 cost is identical.** Both forms put the same bit tower and the
+  same S₃-shaped polynomial (degree 2 per summand, total degree 4) into F4, so
+  F4 sees the same shape. What changes is only which points the bits name.
