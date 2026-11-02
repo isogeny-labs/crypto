@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ECCP131-REPRESENTATION-FILTER-20261102",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-02",
   "repository": "crypto",
   "study_dir": "research/eccp131_representation_filter_20261102",
@@ -502,12 +502,12 @@
     "timed_primary_justification": null
   },
   "execution": {
-    "backend": "isolab-k8s",
-    "queue": "isolab",
+    "backend": "ephemeral",
+    "queue": "github-hosted",
     "placement": {
-      "instance_type": "c8a.2xlarge",
+      "instance_type": "ubuntu-24.04 hosted runner; exact type recorded at runtime",
       "cpus": 4,
-      "spot": true
+      "spot": false
     },
     "measurement_class": "measurement",
     "timeout_seconds": 1800,
@@ -615,12 +615,31 @@
       "verified_by": "Codex literature pass, 2026-11-02"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1-GITHUB-COUNTED",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "The mandatory S3 checkpoint gate rejected the executor's account 590183823895. Use the repository's existing scoped CHECKPOINT_UPLOAD_TOKEN in a GitHub-hosted push workflow for exact counted evidence only; retain the preferred L2 EKS timing run as blocked until budget headroom exists.",
+      "changes": [
+        "Execution backend changes from Iso Lab EKS to one ubuntu-24.04 GitHub-hosted counted-only run.",
+        "The workflow must push and gate an S3 source/protocol checkpoint before building or generating data.",
+        "Rust is pinned to 1.99.1; actual native binary SHA-256 and host facts are recorded in the artifact.",
+        "All GitHub-hosted wall and CPU clocks are invalid for performance claims; exact counts and correctness checks remain the deciding evidence."
+      ],
+      "supersedes_fields": [
+        "execution.backend",
+        "execution.queue",
+        "execution.placement",
+        "execution.checkpoint"
+      ]
+    }
+  ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "33905d2c9136535447bbd120f84c64a5c170378a919a24664dafd811ed355b1b",
-    "commit": "b65ba79ac7ac201139f98127868ea962ba644fac",
-    "frozen_at": "2026-11-02T17:46:10Z",
+    "protocol_sha256": "515916e18e17e5d858c9df9de081f9d13c47e08ab10faddfe1a09ebfb8d6b0ef",
+    "commit": "3fe55ae891d5bfa55913939ed2909734401cc8b8",
+    "frozen_at": "2026-11-02T17:49:41Z",
     "filed_before_affected_data": true
   }
 }

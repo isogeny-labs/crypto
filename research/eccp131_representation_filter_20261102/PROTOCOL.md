@@ -80,8 +80,10 @@ coordinate predicates.
   target candidates per arity.
 - Fixed-N stopping; no favourable-seed reruns.
 
-The preferred execution backend is Iso Lab EKS Spot. New cloud execution is
-excluded while the USD 25 daily cost gate has unknown or exhausted headroom.
-Local runs are development evidence with invalid clocks; counted results and
-exact checks remain usable. The frozen cloud workload is not reduced to fit.
+The preferred timing backend is Iso Lab EKS Spot. New EKS execution is excluded
+while the USD 25 daily cost gate has unknown or exhausted headroom. Amendment
+A1 prospectively selects one GitHub-hosted counted-only run because that route
+can use the repository's scoped S3 checkpoint token. Its exact counts and
+correctness checks are usable, but every clock is invalid for a performance
+claim. The frozen EKS workload is not reduced to fit.
 
