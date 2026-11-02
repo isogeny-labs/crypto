@@ -1,7 +1,7 @@
 # Protocol: dynamic constant-time audit of the `crypto` crate — 2026-11-02
 
-Status: **draft — not yet frozen.** It is frozen (and this line updated) after the controls dry run on scratch output
-(§8), before any data is taken.
+Status: **frozen before data** at the commit that changes this line (recorded in the PR). The controls dry run on
+scratch output (§8) preceded freezing.
 
 ## 1. Question
 
@@ -83,10 +83,23 @@ a dudect-style clock study on an isolated host is listed as follow-up and needs 
 Changing targets, classes, sizes, seeds, Valgrind options or the decision rule after seeing data. Any change is a
 dated amendment below, saying whether it preceded the data it affects; both versions are reported.
 
-## 8. Dry run (before freezing)
+## 8. Dry run (before freezing, scratch output: the two controls and `x25519` only)
 
-The controls and one target were run on scratch output to check that the client requests reach Valgrind and that the
-analyzer parses its output. Findings are recorded in the amendments below, if any changed the design.
+1. The first positive control (`if secret & 1 { 64 iterations of constant work }` plus a secret-indexed table read)
+   produced one taint site (the table index) and **no** Ir variation. The optimizer had compiled the branch to a
+   conditional move: Memcheck does not report a conditional move on undefined data, and the instruction count does
+   not change. Under §4 the Ir instrument would have been invalid. **Changed**: the positive control now runs a
+   secret-dependent trip count (0–7 iterations, body pinned with `black_box`). It then gave 2 taint sites
+   (conditional jump `main.rs:125`, secret-indexed load `main.rs:128`) and Ir from 69 to 122 across classes.
+   Consequence for reading targets: **cmov-based selection is invisible to both instruments**. That is consistent
+   with cmov being data-independent on current x86 cores, but it also means these instruments cannot see leakage
+   that a compiler introduces only as cmov.
+2. Negative control: no taint site; Ir constant within each class. The `aa` class reads 506 against 508 for the
+   other classes, a constant 2-instruction offset from the harness's clone path at the toggle boundary. The decision
+   rule tests `aa` only for internal determinism (16/16 identical) and compares `random ∪ short ∪ lowhw` among
+   themselves, so the offset does not affect any verdict.
+3. `x25519` (the only target in the dry run): no taint site, no Ir variation. Its result is reported from the frozen
+   run, not from this dry run.
 
 ## Amendments
 

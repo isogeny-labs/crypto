@@ -118,11 +118,12 @@ fn secret_bytes(target: &str, class: &str, rng: &mut StdRng, ctx: &Ctx) -> Vec<u
 
 #[inline(never)]
 fn ctrl_pos_branch(s: &[u8], table: &[u64; 256]) -> u64 {
+    // Secret-dependent trip count (0..=7 iterations): a conditional jump on the secret and a secret-dependent
+    // instruction count that the optimizer cannot turn into a conditional move (black_box pins the loop body).
+    // A plain `if bit { constant work }` was compiled to cmov in the dry run (PROTOCOL.md §8).
     let mut acc = 0u64;
-    if s[31] & 1 == 1 {
-        for i in 0..64u64 {
-            acc = acc.wrapping_mul(6364136223846793005).wrapping_add(i);
-        }
+    for i in 0..(s[31] & 7) as u64 {
+        acc = black_box(acc.wrapping_mul(6364136223846793005).wrapping_add(i));
     }
     acc ^ table[s[0] as usize]
 }
