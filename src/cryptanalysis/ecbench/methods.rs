@@ -5745,19 +5745,52 @@ fn solve_ic_prime(
     // the tower from the `prime-kummer` spec and runs on no other base.
     let mut pkm = match or_name.as_str() {
         "pkm-semaev" => {
-            if fb_name != "prime-kummer" {
-                return Err(format!(
-                    "oracle `pkm-semaev` needs the prime-kummer base, whose tower it solves on, not `{fb_name}`"
-                ));
-            }
-            let t = spec.factor_base_params.u64("t")? as u32;
-            let g = spec.factor_base_params.u64_or("g", 1)?;
+            use crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
             let budget = (spec.solver_budget_seconds > 0)
                 .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
-            Some(
-                crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::new(ms, t, g)
-                    .with_budget(budget),
-            )
+            let oracle = match fb_name.as_str() {
+                "prime-kummer" => {
+                    let t = spec.factor_base_params.u64("t")? as u32;
+                    let g = spec.factor_base_params.u64_or("g", 1)?;
+                    PkmSemaevOracle::new(ms, t, g)
+                }
+                // PKM's isogeny form: the oracle solves on the same tower the
+                // base was built from, rebuilt deterministically from
+                // (p, t, seed, aux).  The rebuild is not charged: the base's
+                // build, already on the factor-base ledger, is the same work.
+                "prime-isogeny" => {
+                    use crate::cryptanalysis::ic_framework::prime_tower::{
+                        isogeny_tower, supersingular_tower, AuxKind,
+                    };
+                    let p = inst.curve.p;
+                    let t = spec.factor_base_params.u64("t")? as u32;
+                    let seed = spec.factor_base_params.u64_or("seed", 0)?;
+                    let kind =
+                        AuxKind::parse(spec.factor_base_params.get("aux").unwrap_or("ordinary"), p)?;
+                    let mut scratch = crate::cryptanalysis::ic_boundary::GroupOps::default();
+                    let tower = if kind == AuxKind::Ordinary {
+                        isogeny_tower(p, t, seed, &mut scratch)?
+                    } else {
+                        supersingular_tower(p, t, seed, kind, &mut scratch)?
+                    };
+                    let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+                    PkmSemaevOracle::new_isogeny(ms, t, tower.v.clone(), steps, tower.c)
+                }
+                // An interval base written in bits: `bits=T` on the oracle,
+                // `lo` (default 0) its left end; every base abscissa must lie
+                // in [lo, lo + 2^T).
+                _ if spec.oracle_params.get("bits").is_some() => {
+                    let t = spec.oracle_params.u64("bits")? as u32;
+                    let lo = spec.oracle_params.u64_or("lo", 0)?;
+                    PkmSemaevOracle::new_bits(ms, t, lo)
+                }
+                _ => {
+                    return Err(format!(
+                        "oracle `pkm-semaev` solves on prime-kummer or prime-isogeny, or on any base with                          `bits=T` (an interval [lo, lo + 2^T) written in bits), not `{fb_name}`"
+                    ))
+                }
+            };
+            Some(oracle.with_budget(budget))
         }
         _ => None,
     };

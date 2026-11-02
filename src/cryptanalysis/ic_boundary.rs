@@ -99,7 +99,7 @@
 //! Koblitz subgroup, and the point of the exercise is to have a concrete
 //! boundary to iterate against rather than an opinion.
 
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{BTreeMap, HashMap};
 use std::hash::{BuildHasherDefault, Hasher};
 use std::time::Instant;
 
@@ -911,19 +911,32 @@ fn invmod_u64(a: u64, m: u64) -> Option<u64> {
 /// same extended Euclid, step for step.
 #[inline]
 fn invmod_u32(a: u32, m: u32) -> Option<u32> {
+    // The loop of `invmod_u64` unrolled by two: instead of swapping the
+    // remainder and coefficient pairs every step (and flipping the sign
+    // flag), the two halves update one pair each and trade roles, and the
+    // parity of the step count, which is the sign, is which half stops.
+    // The same quotients and remainders in the same order, so the same
+    // inverse; a third of the instructions of the swapping loop.
     let (mut r0, mut r1) = (m, a);
     let (mut t0, mut t1) = (0u32, 1u32);
-    let mut neg0 = true;
-    while r1 != 0 {
+    let (gcd, t, neg) = loop {
+        if r1 == 0 {
+            break (r0, t0, true);
+        }
         let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 + q * t1);
-        neg0 = !neg0;
-    }
-    if r0 != 1 {
+        r0 -= q * r1;
+        t0 += q * t1;
+        if r0 == 0 {
+            break (r1, t1, false);
+        }
+        let q = r1 / r0;
+        r1 -= q * r0;
+        t1 += q * t0;
+    };
+    if gcd != 1 {
         return None;
     }
-    Some(if neg0 { (m - t0) % m } else { t0 % m })
+    Some(if neg { (m - t) % m } else { t % m })
 }
 
 // ── Incremental Gauss–Jordan over Z/rZ ─────────────────────────────
@@ -2162,13 +2175,13 @@ struct TunedWalker<'a, G: CountedGroup, C: RhoClasses<G>> {
     window: usize,
     /// Brent detection on ([`WalkPolicy::brent`]).
     brent: bool,
-    /// `(key, point, a, b)` of the walk's most recent points, oldest first.
-    recent: VecDeque<(u64, G::Elt, u64, u64)>,
-    /// The keys of `recent` in a ring (`recent_next` is where the next one
-    /// goes), scanned every step without a branch per key; `recent` is
-    /// read only when the ring holds the key (a cycle, rare).  The two
-    /// hold the same set of keys at every step.
+    /// The walk's last `window` points in a ring: their keys, scanned
+    /// every step without a branch per key, and beside them `(point, a,
+    /// b)`, read only when a key repeats (a cycle, rare).  `recent_next`
+    /// is the slot the next point takes, which once the ring is full is
+    /// also the oldest point's.
     recent_keys: Vec<u64>,
+    recent_states: Vec<(G::Elt, u64, u64)>,
     recent_next: usize,
 }
 
@@ -2191,8 +2204,8 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             look_ahead: walk.look_ahead && !classes.trivial(),
             window: walk.cycle_window,
             brent: false,
-            recent: VecDeque::with_capacity(walk.cycle_window + 1),
             recent_keys: Vec::with_capacity(walk.cycle_window),
+            recent_states: Vec::with_capacity(walk.cycle_window),
             recent_next: 0,
         }
     }
@@ -2220,33 +2233,46 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
     /// Forget the recent points (a new walk, or a cycle left).
     #[inline]
     fn forget_recent(&mut self) {
-        self.recent.clear();
         self.recent_keys.clear();
+        self.recent_states.clear();
         self.recent_next = 0;
     }
 
     /// Remember a point among the last `window`, dropping the oldest.
     #[inline]
     fn remember(&mut self, entry: (u64, G::Elt, u64, u64)) {
+        let (key, x, a, b) = entry;
         if self.recent_keys.len() < self.window {
-            self.recent_keys.push(entry.0);
+            self.recent_keys.push(key);
+            self.recent_states.push((x, a, b));
         } else {
-            self.recent_keys[self.recent_next] = entry.0;
+            self.recent_keys[self.recent_next] = key;
+            self.recent_states[self.recent_next] = (x, a, b);
         }
         self.recent_next = if self.recent_next + 1 == self.window {
             0
         } else {
             self.recent_next + 1
         };
-        self.recent.push_back(entry);
-        if self.recent.len() > self.window {
-            self.recent.pop_front();
-        }
+    }
+
+    /// The `i`-th recent point, oldest first.
+    #[inline]
+    fn recent_entry(&self, i: usize) -> (u64, G::Elt, u64, u64) {
+        let len = self.recent_keys.len();
+        let oldest = if len < self.window {
+            0
+        } else {
+            self.recent_next
+        };
+        let slot = (oldest + i) % self.window;
+        let (x, a, b) = self.recent_states[slot];
+        (self.recent_keys[slot], x, a, b)
     }
 
     /// Where `key` stands among the recent points, oldest first: the
     /// ring answers "not there" for every key at once (the common case),
-    /// and the deque gives the position only on a hit.
+    /// and the ring is read in age order only on a hit.
     #[inline]
     fn recent_position(&self, key: u64) -> Option<usize> {
         let hit = self
@@ -2256,7 +2282,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         if !hit {
             return None;
         }
-        self.recent.iter().position(|e| e.0 == key)
+        (0..self.recent_keys.len()).find(|&i| self.recent_entry(i).0 == key)
     }
 
     /// One walk from `[a]G + [b]Q = start`, until a distinguished point
@@ -2351,18 +2377,15 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             if self.window > 0 {
                 if let Some(pos) = self.recent_position(key) {
                     // The cycle is the `c` most recent points.
-                    let c = self.recent.len() - pos;
+                    let c = self.recent_keys.len() - pos;
                     match c {
                         2 => tally.cycles_2 += 1,
                         4 => tally.cycles_4 += 1,
                         _ => tally.cycles_other += 1,
                     }
                     // Leave it from the member with the smallest key.
-                    let (min_key, mp, ma, mb) = self
-                        .recent
-                        .iter()
-                        .skip(pos)
-                        .copied()
+                    let (min_key, mp, ma, mb) = (pos..self.recent_keys.len())
+                        .map(|i| self.recent_entry(i))
                         .min_by_key(|e| e.0)
                         .expect("a cycle has members");
                     if last_escape == Some(min_key) {
