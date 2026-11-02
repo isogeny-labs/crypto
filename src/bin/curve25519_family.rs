@@ -1434,7 +1434,26 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 /// or the isogeny form at height t.  Reports F4 calls, multiply-adds, the
 /// solving degree, undecided systems and hits; a hit is a relation the
 /// oracle returned, re-checked here by summing the points.
+#[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
+    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full")
+}
+
+/// `f4cost` with the number of summands `m` (2 or 3) and the presentation
+/// `mode` (`full` or `chain`; `chain` needs `m = 3`).  `m = 2, full` is the
+/// original measurement, byte for byte in its spec.
+#[allow(clippy::too_many_arguments)]
+fn f4cost_m(
+    k: u32,
+    form: &str,
+    t: u32,
+    guess: u32,
+    targets: u64,
+    seed: u64,
+    cap_s: u64,
+    nsum: u32,
+    mode: &str,
+) -> Value {
     use crypto_lib::cryptanalysis::ic_boundary::{
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
     };
@@ -1475,7 +1494,7 @@ fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s
                 .count();
             let fb = prime_factor_base(&inst, n);
             assert!(fb.abscissa_list.iter().all(|&x| x < span));
-            (fb, PkmSemaevOracle::new_bits(2, t, 0))
+            (fb, PkmSemaevOracle::new_bits(nsum, t, 0))
         }
         "isogeny" => {
             let mut params = Params::default();
@@ -1487,15 +1506,15 @@ fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s
             let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
             (
                 fb,
-                PkmSemaevOracle::new_isogeny(2, t, tower.v.clone(), steps, tower.c),
+                PkmSemaevOracle::new_isogeny(nsum, t, tower.v.clone(), steps, tower.c),
             )
         }
         o => panic!("form is bits or isogeny, not {o}"),
     };
     let spec = if guess > 0 {
-        format!("pkm-semaev:m=2,mode=full,guess={guess}")
+        format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
     } else {
-        "pkm-semaev:m=2,mode=full".to_string()
+        format!("pkm-semaev:m={nsum},mode={mode}")
     };
     let (_, params) = Params::parse_spec(&spec).unwrap();
     oracle
@@ -1532,8 +1551,40 @@ fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s
     let tot = oracle.solver_totals().unwrap_or_default();
     let native = oracle.relation_counters();
     let per_target = tot.ops as f64 / done.max(1) as f64;
+    // Exact coverage of the base at this m: the fraction of the subgroup that
+    // is a sum of m base points (the hit rate an ideal oracle would see).
+    let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
+        &inst.curve,
+        &fb,
+        nsum,
+        &mut GroupOps::default(),
+    );
+    // Targets are subgroup points: count the covered points of order | r
+    // (the factor base may carry cofactor components).
+    let covered = all
+        .iter()
+        .filter(|&&key| {
+            use crypto_lib::cryptanalysis::ic_boundary::PrimePoint;
+            if key == 0 {
+                return false;
+            }
+            let x = (key >> 1) - 1;
+            let y = sqrtm(m.weier.rhs(x), m.p).expect("covered point is on the curve");
+            let q = PrimePoint {
+                x,
+                y,
+                infinity: false,
+            };
+            inst.curve.mul(&mut GroupOps::default(), q, m.r).infinity
+        })
+        .count();
+    let coverage = covered as f64 / m.r as f64;
     json!({
+        "coverage_exact": coverage, "covered_points": covered, "covered_points_all_cosets": all.len(),
+        "muladds_per_relation_at_exact_coverage": if coverage > 0.0 { Some(per_target / coverage) } else { None },
         "k": k, "form": form, "t": t, "guess": guess, "columns": fb.columns,
+        "m": nsum, "mode": mode,
+        "muladds_per_relation": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
         "targets_done": done, "targets_requested": targets, "capped": done < targets,
         "wall_s": started.elapsed().as_secs_f64(),
         "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
@@ -1701,9 +1752,13 @@ fn main() {
             let n: u64 = args[6].parse().unwrap();
             let seed: u64 = args[7].parse().unwrap();
             let cap: u64 = args.get(8).map_or(600, |v| v.parse().unwrap());
+            // Optional: <m> <mode> (default 2 full, the original measurement).
+            let nsum: u32 = args.get(9).map_or(2, |v| v.parse().unwrap());
+            let mode = args.get(10).map_or("full", String::as_str);
             println!(
                 "{}",
-                serde_json::to_string(&f4cost(k, &args[3], t, g, n, seed, cap)).unwrap()
+                serde_json::to_string(&f4cost_m(k, &args[3], t, g, n, seed, cap, nsum, mode))
+                    .unwrap()
             );
         }
         "summarise" => {
