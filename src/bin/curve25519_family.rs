@@ -1461,7 +1461,7 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 /// oracle returned, re-checked here by summing the points.
 #[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
-    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full", false)
+    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full", false, None)
 }
 
 /// `f4cost` with the number of summands `m` (2 or 3) and the presentation
@@ -1479,6 +1479,7 @@ fn f4cost_m(
     nsum: u32,
     mode: &str,
     lifts: bool,
+    max_nnz: Option<u64>,
 ) -> Value {
     use crypto_lib::cryptanalysis::ic_boundary::{
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
@@ -1522,6 +1523,17 @@ fn f4cost_m(
             assert!(fb.abscissa_list.iter().all(|&x| x < span));
             (fb, PkmSemaevOracle::new_bits(nsum, t, 0))
         }
+        "edwards-bits" => {
+            // Every point whose Edwards y is in [0, 2^t) ∖ {1}; the shift
+            // x_W(T₀) = A/3 is derived by the oracle from the curve and
+            // checked here against the miniature's own.
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::{
+                edwards_factor_base, edwards_shift,
+            };
+            assert_eq!(edwards_shift(&inst.curve).unwrap(), m.shift);
+            let fb = edwards_factor_base(&inst, t, m.shift);
+            (fb, PkmSemaevOracle::new_edwards_bits(2, t))
+        }
         "isogeny" => {
             let mut params = Params::default();
             params.set("t", t.to_string());
@@ -1535,7 +1547,7 @@ fn f4cost_m(
                 PkmSemaevOracle::new_isogeny(nsum, t, tower.v.clone(), steps, tower.c),
             )
         }
-        o => panic!("form is bits or isogeny, not {o}"),
+        o => panic!("form is bits, edwards-bits or isogeny, not {o}"),
     };
     let mut spec = if guess > 0 {
         format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
@@ -1544,6 +1556,9 @@ fn f4cost_m(
     };
     if lifts {
         spec.push_str(",lifts=1");
+    }
+    if let Some(n) = max_nnz {
+        spec.push_str(&format!(",max_nnz={n}"));
     }
     let (_, params) = Params::parse_spec(&spec).unwrap();
     let mut setup_ops = GroupOps::default();
@@ -1635,8 +1650,10 @@ fn f4cost_m(
         "muladds_per_hit": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
         "setup_group_ops": setup_ops.adds + setup_ops.doubles,
         "setup_native": oracle.setup_native(),
+        "poly_terms_per_specialisation": native.get("pkm_system_terms").copied().unwrap_or(0) as f64
+            / native.get("pkm_system_specialisations").copied().unwrap_or(1).max(1) as f64,
         "hits": hits, "hits_verified": verified,
-        "hit_rate": hits as f64 / done.max(1) as f64,
+        "hit_rate": hits as f64 / done.max(1) as f64, "max_nnz_cap": max_nnz,
         "native": native,
     })
 }
@@ -1791,7 +1808,7 @@ fn main() {
             );
         }
         "f4cost" => {
-            // f4cost <k> <bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1]
+            // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz]
             let k: u32 = args[2].parse().unwrap();
             let t: u32 = args[4].parse().unwrap();
             let g: u32 = args[5].parse().unwrap();
@@ -1802,10 +1819,11 @@ fn main() {
             let nsum: u32 = args.get(9).map_or(2, |v| v.parse().unwrap());
             let mode = args.get(10).map_or("full", String::as_str);
             let lifts = args.get(11).is_some_and(|v| v == "1");
+            let max_nnz: Option<u64> = args.get(12).map(|v| v.parse().unwrap());
             println!(
                 "{}",
                 serde_json::to_string(&f4cost_m(
-                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts
+                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts, max_nnz
                 ))
                 .unwrap()
             );
