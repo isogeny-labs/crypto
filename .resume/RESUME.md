@@ -43,6 +43,8 @@ ECC2K-130: conductor 263*146505763881528721, ecdb curve id 22.
 4. Report + graphs + PDF (research-visuals), PR ready for review.
 
 ## Runs in flight
+- PR: isogeny-labs/crypto#3306 (open, ready). Owner instruction 2026-11-02: enable auto-merge ONLY after P2 lands
+  (cells c32B-m2, c28B-m2 and the curve-80 follow-up saved, report rebuilt, PR body updated). Then enable_pr_auto_merge (MERGE).
 Detached queues (logs in /tmp/claude-0/-home-user/fafe457a-a14a-53c5-a937-e53817fc07eb/scratchpad/queue_*.log; card
 outputs in each worktree's cards/<id>.launch.log + receipt; copy finished outputs into main and commit):
 - P2 queue in /home/user/crypto-p2run (pin b2d892912): cells c28B-m3 (running), c24B-m3, c32B-m3, c32B-m2, c28B-m2.
