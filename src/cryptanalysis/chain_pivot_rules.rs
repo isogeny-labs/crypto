@@ -3,7 +3,8 @@
 //! (§9.44) adds negative controls aimed at rows the normal forms read and a
 //! read probe; the rules themselves are E36's, unchanged.  E38 (§9.46) adds
 //! probe records of the pivot set, the border targets and the updates, and
-//! two structure-preserving F controls (`bump_update`, `bump_pivot`).
+//! two structure-preserving F controls (`bump_update`, `bump_pivot`).  E39
+//! (§9.48) adds `bump_post`: a pivot row altered after its last use.
 //!
 //! Additive.  `echelon_by_lead_with` and E33's `echelon_by_lead_counted`
 //! are unchanged; the echelon below performs the same elimination (the same
@@ -88,6 +89,10 @@ pub struct RuleCheck {
     /// E38 C_F^mid-b (the registered fallback): at this column the pivot
     /// row's last-column entry is moved by one before its normalisation.
     pub bump_pivot: Option<u32>,
+    /// E39 C_F^post (§9.48; any rule, used on F): at this column, after the
+    /// bucket's updates (the pivot row's last use in the echelon), the pivot
+    /// row's last-column entry is moved by one.
+    pub bump_post: Option<u32>,
 }
 
 /// E37 (§9.44) read probe: what the normal-form stage reads.  Off unless
@@ -458,6 +463,11 @@ pub(crate) fn echelon_by_rule(
                     zero_ids.push(r);
                 }
             }
+        }
+        if check.bump_post == Some(c as u32) && c + 1 < ncols {
+            // E39 C_F^post: the pivot row is never used again by the echelon.
+            piv[ncols - 1] = ((u32::from(piv[ncols - 1]) + 1) % p) as u16;
+            note_corrupt();
         }
         rows[pr] = piv;
         pivot_row[c] = pr as u32;
