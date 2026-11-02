@@ -60,3 +60,9 @@ collector into rho itself, which section 6 does not count). Parity is tested whe
 `scripts/mt.py` (unchanged except an optional comma list of T), 22 bits (same curve as Amendment 1), T in {64, 128, 256}, 32 trials per cell, seed offset 900000.
 Claim P (frozen): parity holds at T if the 95% interval of the B=1 / B=0 per-target cost ratio (delta method from the two means' standard errors) contains 1 and lies inside [0.9, 1.1].
 Reference: B=0 at the same T (multi-target rho). The ratio of B=0 at T to single-target B=0 (Amendment 1, T=1) is also reported.
+
+## Amendment 5 (2026-11-02, after Amendment 4's data, before any replication data): replication of the T = 256 cell
+Amendment 4 found B=1/B=0 = 0.935 [0.898, 0.971] at T = 256 (rule P fails low: B=1 cheaper). Replication, unchanged code and curve:
+T = 256, 32 trials, fresh seed offset 1300000. Reading frozen now: if the replication interval contains 1, the Amendment 4 cell is treated as a
+chance deviation (one of three cells); if it again lies below 1, the B=1 advantage is reported as replicated and unexplained (candidate cause:
+the two arms use different step sets, J vs J - P0), with no claim of beating rho until a step-set-matched control is run.
