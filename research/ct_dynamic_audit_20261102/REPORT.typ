@@ -36,13 +36,13 @@ The positive control was detected by both instruments (2 taint sites; Ir 69–12
   [scalar_mul_secret, secp256k1], [3 (+1 harness)], [same pattern (secp256k1_point.rs:103, ct_bignum.rs:96, field.rs:23)],
   [scalar_mul_secret, SM2 (generic)], [1 (+1 harness)], [*point.rs:390: `if bit { … } else { … }` in `Point::scalar_mul_ct`*: the ladder swap branches on every secret bit. The 2026-10-22 fix equalised the work, not the control flow],
   [mod_inverse_prime_ct (ECDSA k⁻¹)], [5 (+1 harness)], [zero test (utils/mod.rs:94) and BigUint arithmetic inside `mod_pow_ct` (mod.rs:63, 68–70)],
-  [mod_inverse (SM2 (1+d)⁻¹)], [7 (+1 harness)], [extended Euclid `mod_inverse_bigint` (mod.rs:132–161), as the 2026-10-08 audit ranked],
+  [mod_inverse (SM2 (1+d)⁻¹)], [6 (+2 harness)], [extended Euclid `mod_inverse_bigint` (mod.rs:132–161), as the 2026-10-08 audit ranked; the second harness site is `call` (main.rs:161), the harness's own `(1 + d) mod n`],
   [ed25519_sign], [7], [*double-and-add on the secret scalar* (ed25519.rs:190, 192) plus scalar encoding and signing arithmetic (ed25519.rs:295, 311, 364, 368)],
   [ecdsa::sign (P-256)], [19], [scalar arithmetic in `sign_hash` (ecdsa.rs:52–86), `bits2int`, blinding (`ct.rs:83`), and the conversion sites above],
   [sm2::sign], [11], [`sign` (sm2.rs:150–158), `mod_inverse` (mod.rs:132–161)],
 )
 
-"+1 harness" is `main.rs:145`, the harness's own `BigUint::from_bytes_be(secret)`: any caller of these APIs, which
+"+1 harness" is `main.rs:145`, the harness's own `BigUint::from_bytes_be(secret)` (for `mod_inverse` also `main.rs:161`, the harness computing `(1 + d) mod n`): any caller of these APIs, which
 take secrets as `BigUint`, executes that normalisation. It is an API-boundary site, not a library line.
 
 == Results: instruction count per call
@@ -84,6 +84,13 @@ output lines missing. Its own diagnosis: `run` prints a command's outputs in the
 missing and every digest matches. *The main session treats the relay as verbatim for this reason* (a tool ordering
 artifact affecting any card with two or more declared outputs, reported upstream as a `task_card.py` defect), and
 leaves the assessment file unchanged.
+
+== Correction (2026-11-02, before merge)
+
+The first version of the taint table gave `mod_inverse` as "7 (+1 harness)". The 8 sites split as 6 in the
+library and 2 in the harness: `call` (main.rs:161) is the harness's own `(1 + d) mod n`. The isogeny-labs/prototype
+side-channel tool classifies sites mechanically and exposed the miscount. No other row changes; the recorded data
+(`results/summary.json`) is unchanged.
 
 == Scope and limits
 
