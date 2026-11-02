@@ -2,7 +2,7 @@
 
 Outcome: SUPPORTS, narrowly and CONDITIONAL ON PREMISE P. P is unproved, ASSUMED at m=4 (and at m=3 for l>=2),
 certified at small p only for m=2 (l<=3) and at m=3 only in the trivial l=1 case (sum k = 1); one m=3 l=1 cell
-(p=13, seed 0) fails P and is undiagnosed. The m=2 point-count rule (#V > 4·Mmax) does NOT transfer to m=3.
+(p=13, seed 0) fails P on its F_13-point set only (L3: point-set artifact, not on V(F_169)). The m=2 point-count rule (#V > 4·Mmax) does NOT transfer to m=3.
 [Repair item 4; the original first sentence, superseded, read: "Outcome: SUPPORTS, at accounting level and
 conditional."] Given P: inside class C (defined below), no auxiliary-polynomial
 support of any shape, at any l, reaches 0.169 at m=4. The ceiling there is 1/32 = 0.03125, which is 5.4x short.
@@ -84,7 +84,7 @@ m=3 (S4):
 - l=1 box4: equal at p = 11 and 17; above at p = 5, 7 and 13 (seed 0).
 - The p=13 cell (gain 3 against 1, with p > Mmax) is where the pre-registered falsifier fired.
 - Follow-up, post hoc (raw/armA_m3_extra.json): two other p=13 curves (npts 253) and p = 19, 23, 29 are all equal.
-  So the p=13 excess is isolated to that one curve, and its cause was not diagnosed.
+  So the p=13 excess is isolated to that one curve. [L3 diagnosis, post hoc but pre-registered in experiments/L3-audit-items/PROTOCOL.md: exhaustive enumeration of all 181 points of V(F_13) gives kernel dim 3 (sampling is not the cause). Over F_169, on 300 random points of V, only a 1-dim subspace (f) of that kernel vanishes. So the two extra elements vanish on the F_13-points only: the 181 F_13-points fail to impose independent conditions on the 125-dim box4 space. It is a point-set artifact of the same kind as the m=2 Riemann-Roch excess, and not a degree-4 divisor of the surface. The pre-registered reducibility hypothesis (C1b) was not confirmed; irreducibility of f over F_13 was not checked directly because PARI/sympy do not factor multivariate polynomials over F_p. Why this curve and not the other p=13 curves is still unexplained.]
 - Note that l=1 with Σk = 1 is a near-minimal check.
 - l=2: only p=5 ran, an artifact (1213 against 126). Saturating p (around 29 or more) was NOT run: the p=5 cell took
   about 9 CPU-minutes, and the 600 s guard skipped the rest.
@@ -93,7 +93,7 @@ m=4: not run, as pre-registered. The l=1 box has 6561 columns and its reach is 0
 
 So premise P is certified at m=2 (l ≤ 3, p in the saturated regime) and at m=3, l=1. The l=1 case is trivial:
 Σk = 1, and the only element is f itself, so P's content (j ≥ 2) is untested at m=3. One m=3 l=1 cell (p=13, seed 0)
-fails and is undiagnosed. P is ASSUMED at m=3 l ≥ 2 and at m=4, and it is unproved.
+fails; L3 traced it to an F_13 point-set artifact (see above), not a failure of P on the surface. P is ASSUMED at m=3 l ≥ 2 and at m=4, and it is unproved.
 
 ## B: exact search over supports (p = 2^31 − 1, the real specialised S3/S4, not a generic stand-in)
 - B0 calibration, exact Dinkelbach plus DP over staircases. It reproduces the audit: 0.141287 (l=5),
@@ -111,7 +111,7 @@ fails and is undiagnosed. P is ASSUMED at m=3 l ≥ 2 and at m=4, and it is unpr
 - B3 m=3: boxes have ρ_D = Σk ratio exactly (0.01440 at l=2). No other shapes were run at m=3.
 - Prediction B2 held: no counterexample was found. But the search is LOW-POWER: the post-hoc SA from random starts
   never even got back to the known staircase optimum (best gap −0.0008).
-- This is weak evidence for downset-optimality at l ≤ 5 inside [0, 2l+4]^2, not a proof.
+- This is weak evidence for downset-optimality at l ≤ 5 inside [0, 2l+4]^2, not a proof. [L3: the pre-registered SA started AT the staircase optimum, so its 0.0 gap holds by construction and is not evidence. Only the post-hoc random-start SA is a search, and it never reached the optimum. l=8 (pre-registered) was not run. Read B2 as no evidence either way beyond l=3,5 family enumeration.]
 
 ## Class C covered by the converse
 - One polynomial f and one modulus p^l.
@@ -128,7 +128,7 @@ fails and is undiagnosed. P is ASSUMED at m=3 l ≥ 2 and at m=4, and it is unpr
 - Auxiliary polynomials that use instance-specific information.
 - Several moduli or ideals beyond U, e.g. several congruences sharing a root.
 - Changes of variables that change the archimedean geometry: unravelled linearisation, invariants whose bounds are
-  not induced from x. For e-variables with e_i ≤ X^i the weighted bound is also 1/32, but P in Z[e] is unverified.
+  not induced from x. [L3: withdrawn, never computed: "For e-variables with e_i ≤ X^i the weighted bound is also 1/32".] The e-variable case is not covered.
 - Non-lattice methods.
 - Small p.
 - m=4 optimality of 1/80 (only the 1/32 ceiling is shown).
@@ -146,7 +146,7 @@ fails and is undiagnosed. P is ASSUMED at m=3 l ≥ 2 and at m=4, and it is unpr
 - armA m2hp was killed by its 1200 s timeout at seed 2, p=37. Its JSON was rebuilt from the log, with point counts
   recomputed.
 
-CPU: about 60 min in total, at most 3 processes.
+CPU: about 70 min in total (RESULTS cpu_seconds_approx sums to 4192 s; the earlier "about 60 min" was wrong). At most 3 processes, with OMP/OPENBLAS threads set to 3, above the 2-thread rule. Entries are approximate; timed-out steps (m=3 l=2 beyond p=5, 600 s guard) are not marked in RESULTS.
 
 ## Next step
 - Run m=3, l=2 sectional at p ≥ 29, using C/M4RI-style elimination over Z/p^l, to certify P beyond l=1.
@@ -172,3 +172,12 @@ Original numbers have not been deleted; superseded text is marked inline.
    undiagnosed. Stated that the m=2 point-count rule does not transfer to m=3.
 Items 5-8 (B2 disclosure and power, CPU and threads, the e-variable claim, diag.out labels, m2hp completeness,
 __pycache__) are NOT addressed in this repair. They remain open as listed in AUDIT.md.
+
+## Closure of audit items (L3, 2026-11-01)
+- Item 5 (B2 disclosure: SA started at optimum, l=8 not run, "weak evidence"): done (inline note in B2).
+- Item 6 (budget/threads): done for wording. CPU corrected to ~70 min (4192 s). The 3-thread overrun is disclosed. n3lib.py default lowered to 2 threads for future runs; recorded runs used 3. Timeout entries are described in the README, not marked in RESULTS.json: partially.
+- Item 7 (e-variable 1/32 sentence): done (withdrawn).
+- Item 8 (provenance): done. diag.out (p, seed) labels were identified by recomputing the curves: m2hp seed 1 p=41, and seed 0 p=47. They are in raw/diag.out.LABELS. The m2hp grid statement is corrected and __pycache__ is removed.
+- m=3 p=13 seed-0 failure of P: partially. It is diagnosed as an F_13 point-set artifact: exhaustive kernel dim 3, but only f survives on V(F_169). Artifacts are in experiments/L3-audit-items/ (raw_n3_p13_diag.json, raw_n3_p13_fp2.out). Not done: an irreducibility proof for f, and why this curve differs from the other p=13 curves.
+- CPU-figure inconsistency: done (see item 6).
+- Headline "SUPPORTS": not changed. It is already qualified as conditional. P at m=4 remains assumed and unproved.

@@ -21,7 +21,8 @@
  "induced_bounds": {
   "arm_Y_FGHR_base_|Y_i|<X": "|s_k|<=C(4,k)X^(2k) (k=1,2,3), |t|<=X^4: weights (2,4,6,4) are correct here",
   "arm_X_Weierstrass_|x_i|<X": "even flips are x->c^2/x, which does not preserve the box; measured log_p|lift(s1,s2,s3,t)| = 0.998-0.9997 (3 seeds, |x|<=2^16, p~2^4096): invariants are full size, so D4 reach = 0 and the valid symmetrisation is S4 e(x)",
-  "arm_X_fiat_model_falsifier": "l=1 D4 lattice with fiat bounds at X=3, small-x plant: v1 vanished 0/3 (the MP-lattices-4 model fails, as predicted)"
+  "arm_X_fiat_model_falsifier": "l=1 D4 lattice with fiat bounds at X=3, small-x plant: v1 vanished 0/3 (the MP-lattices-4 model fails, as predicted)",
+  "arm_X_fiat_model_falsifier_L3": "NON-DISCRIMINATING (X=3 vs |x|<=2^16, 3 seeds not 8); only log_p 0.998-0.9997 is valid"
  },
  "theory_reach_l1_dim105": {
   "asymptotic": "1/1680 = 5.95e-4",
@@ -81,7 +82,7 @@
   "Ybox_equals_xbox_l1_lit2026": 0.005253,
   "D4_l2": "not_run (budget)",
   "Ybox_comparison": "RETRACTED (repair item 2): 0.005253 is lit2026 JM-extended x-box at dim ~2.3M, not a same-code G(Y) closure; Y-box=x-box was assumed",
-  "note_superseded": "D4 box [4,4,4,8] reproduces MP-lattices-4's 5.95e-4 exactly; D4 l=1 exceeds Y-box l=1 (0.005253) from dim ~3.2k; still rising with box, l=1 only, constants C(4,k) dropped as in lit2026"
+  "note_superseded": "RETRACTED (L3): D4 box [4,4,4,8] reproduces MP-lattices-4's 5.95e-4 exactly; D4 l=1 exceeds Y-box l=1 (0.005253) from dim ~3.2k; still rising with box, l=1 only, constants C(4,k) dropped as in lit2026"
  },
  "fplll_l1": {
   "p_bits_used": [
@@ -227,5 +228,17 @@
   "root_recovery": "not attempted; this tests the HG vanishing criterion only",
   "Ybox": "retracted, G(Y) closure not run",
   "cpu_minutes_repair": 12
+ },
+ "l3_closure": {
+  "date": "2026-11-01",
+  "items_done": [
+   6,
+   7
+  ],
+  "items_partial": [
+   5,
+   8
+  ],
+  "v1_gap_bits": 37
  }
 }

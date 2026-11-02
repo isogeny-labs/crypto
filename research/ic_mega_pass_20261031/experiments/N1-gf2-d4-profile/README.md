@@ -110,3 +110,12 @@ its F_2-rank-n tensor structure alone, which contradicts the mega pass's "relabe
 Before believing it: (1) an independent N=32 closure (d=4) on one C1 and one A instance; (2) n=33 for A, where the
 treatise certifies d_F>=5 on named instances, as the positive control; (3) d=5 closure on a stalled C1 instance.
 Nothing here concerns d_F growth for A, n=131, or any deployed curve.
+
+## Closure of audit items (L3, 2026-11-01)
+- Item 5 (validation artifacts): done. Saved items:
+  - crosscheck/l3_validation.py -> crosscheck/l3_validation.json: festest rerun 30/30 ok, and brute-force nsol at n=19 (all 2^20 points, seeds 0..5, every recorded arm) 36/36 with 0 mismatches.
+  - crosscheck/l3_pyclosure_n19.py -> crosscheck/l3_pyclosure_n19.json: independent Python closure (MP-comm_alg-1 tensor_closure) at n=19, d=4. A s=0 gives 6194/1349/0 and B s=1 gives 3819/399/0, both identical to the C binary raw.
+  - Statement: closure validation against prior code covers d=4 only to n=17 (validation.jsonl), plus these n=19 spot checks. Nothing independent exists at n>=21 for d=4, and in particular nothing at N=32 (n=31).
+- Item 6 (CPU accounting): done. CPU figures are the gf2close child clock() only. They exclude Python instance generation, random_matched, rank_s and the static mode's Python side, and wall exceeds cpu (n=31: 2111 s cpu vs 2884 s wall). Total child CPU n=19..31 is 3,795 s (about 1.05 CPU-h), within the 3 CPU-h budget. The cost rule was manual. Under the next-n reading it never fired. Under the all-remaining-n reading it would have fired after n=19, and it was not applied.
+- n>=27 re-analysis: done (independent recount, crosscheck/l3_validation.json recount_n27_31). It reproduces the Addendum table exactly: n=27 all arms as before; n=29 D1 7/8 (one D1 record already at low_4=2536); n=31 A 9/9 and C1/C2/D1 0/8, with C1/C2 stalled at low_4=2821 on every record and D1 at 2821-2839; B/RM low_4 = n(N+1) (783, 899, 1023). The n=31 stall remains unverified by any independent N=32 closure. That check is blocked: msolve did not finish in 600 s, and the pure-Python closure at N=32 was not attempted (est. >1 CPU-h).
+- Re-audit item 3 (n=33/35 omission reasons): partially. The reasons are re-read as "not attempted; cost unmeasured". The generator-cannot-reproduce-T33a/R35a reason is unverified.

@@ -392,7 +392,7 @@
   "diag": 200,
   "check_threshold": 700
  },
- "outcome": "supports, narrowly and CONDITIONAL ON P: the m=4 ceiling 1/32 holds only if P holds. P is unproved and assumed at m=4 (and m=3 l>=2); certified at small p for m=2 l<=3, and at m=3 only in the trivial l=1 case; the m=3 p=13 seed-0 failure is undiagnosed; the m=2 point-count rule does not transfer to m=3 (accounting; no security claim)",
+ "outcome": "supports, narrowly and CONDITIONAL ON P: the m=4 ceiling 1/32 holds only if P holds. P is unproved and assumed at m=4 (and m=3 l>=2); certified at small p for m=2 l<=3, and at m=3 only in the trivial l=1 case; the m=3 p=13 seed-0 excess is an F_13 point-set artifact (L3: exhaustive kernel dim 3, only f vanishes on V(F_169) sample); the m=2 point-count rule does not transfer to m=3 (accounting; no security claim)",
  "outcome_superseded": "supports (accounting, conditional on P; P certified m=2 l<=3, m=3 l=1; assumed m=3 l>=2 and m=4)",
  "repair": {
   "date": "2026-11-01",
@@ -408,5 +408,12 @@
    7,
    8
   ]
+ },
+ "l3_closure": {
+  "date": "2026-11-01",
+  "cpu_seconds_corrected_total": 4192,
+  "threads_used_in_recorded_runs": 3,
+  "p13_diag": "experiments/L3-audit-items/raw_n3_p13_diag.json",
+  "e_variable_claim": "withdrawn"
  }
 }

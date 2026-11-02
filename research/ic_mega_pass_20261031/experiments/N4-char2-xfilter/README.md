@@ -32,15 +32,15 @@ plus calibration overlap (see amendment 3). The machine was heavily loaded (load
   - The max excess on REAL is at or below the NULL-1sym family max:
     - n=13: 0.0439 vs 0.0441-0.0446 (random1), 0.0424 vs 0.043, 0.0776 vs 0.079-0.081 (h=4), 0.0747 vs 0.079 (Koblitz).
     - n=15: 0.0221 vs 0.0220-0.0221, 0.0216 vs 0.022, 0.0408 vs 0.041 (h=4).
-    - n=17 (random1, all 131071 functionals): 0.01091 vs 0.01091 (1 null replicate).
-  - REAL/null-max ratio 0.93-1.00. No functional stands out. The K2 floor is E~0.05 at n=13,15.
+    - n=17 (random1, all 131071 functionals): 0.010871 (REAL) vs 0.010886 (null) (1 null replicate). [L3: was "0.01091 vs 0.01091".]
+  - REAL/null-max ratio 0.93-1.00 (the 0.932 cell is Koblitz, unmatched null; non-Koblitz 0.957-1.000). No functional stands out. The K2 floor is E~0.05 at n=13,15.
 - Arm B, climber, j in {2, j_{1/4}, j_{1/3}}, 53 <P> cells over n=13..23 and all curve types:
   - REAL E / NULL-1sym E: median 0.999, range 0.95-1.11. [SUPERSEDED as evidence: "REAL never exceeds max(NULL-1sym, PRF) by more than E*" holds by construction, see Repair item 1.]
   - The PRF (SHA-stand-in) null max is >= REAL in almost every cell.
-  - At fixed theta=1/4, E falls with l: about 0.10-0.24 (n=13), 0.048 (17), 0.022 (19), 0.011 (21), 0.007 (n=23, M=32).
+  - At fixed theta=1/4, E falls with l: about 0.103-0.187 (n=13; L3: was "0.10-0.24", 0.239 is a theta=1/3 cell), 0.048 (17), 0.022 (19), 0.011 (21), 0.007 (n=23, M=32).
     [SUPERSEDED, claim withdrawn: "This decay matches the Weil-type heuristic E ~ M^2 sqrt(h/l) and the null equally."]
     E is dominated by the marginal bucket-imbalance floor, which NULL-1sym shares (see Repair item 2).
-  - At theta=1/3: 0.16-0.24 (n=13), 0.074-0.077 (17), 0.048-0.050 (19, M=64), 0.031 (21, M=64). It also falls.
+  - At theta=1/3: 0.16-0.24 (n=13), 0.0715-0.0770 for h=2 and 0.1364 for h=4 (17; L3: was "0.074-0.077"), 0.048-0.050 (19, M=64), 0.031 (21, M=64). It also falls. [L3: j = floor(theta*log2 l), so M drifts and theta_eff runs ~0.20-0.25 across n (e.g. n=21 M=16, n=23 M=32 vs l^{1/4}~45); the cross-n trends compare unequal theta_eff.]
 - Arm C (E(F_{2^n}), random1, j_{1/4}, n=13..19): REAL tracks NULL-1sym. The climber did not draw the trace functional, which is the only known exact gain there.
 - Observation: REAL and NULL-1sym climbers usually end on the same masks with E equal to 3-4 digits.
   The statistic at these sizes is dominated by the bucket-size (marginal) floor, which NULL-1sym preserves. The structure term is below resolution.
@@ -54,7 +54,7 @@ Scope of the negative:
 - (c) l <= 2^22. This cannot say "bounded" asymptotically.
 - (d) XOR combiner only. Other combining rules f are not tested.
 - (e) Level 1 of a Wagner tree only.
-The obstruction this is consistent with is the Weil/Bombieri bound on additive character sums Tr(beta*(x(R)+x(K-R))) on E. [SUPERSEDED: "This gives E <~ c M^2 sqrt(h/l), so it is bounded for M <= l^{1/4}." The constant c is unspecified and the data do not test this bound; observed E is the marginal floor.]
+[L3: "consistent with" withdrawn as vacuous; no bound is tested here.] A possibly relevant obstruction is the Weil/Bombieri bound on additive character sums Tr(beta*(x(R)+x(K-R))) on E. [SUPERSEDED: "This gives E <~ c M^2 sqrt(h/l), so it is bounded for M <= l^{1/4}." The constant c is unspecified and the data do not test this bound; observed E is the marginal floor.]
 It is not a proof for M ~ l^{1/3}, and the Artin-Schreier-degenerate cases (only Tr on <P> was observed) are not classified beyond the j=1 scan.
 
 ## Not run / cut (reasons)
@@ -64,7 +64,7 @@ It is not a proof for M ~ l^{1/3}, and the Artin-Schreier-degenerate cases (only
 - A real SHA-256 null: replaced by a keyed splitmix64 PRF for speed (declared in PROTOCOL).
 ## Next step
 To give the j>=2 arm power, replace random climbing with an exhaustive or structured search over 2-dim subspaces at n=13 (~2^24 subspaces, needs C).
-Or derive the Weil bound for the XOR single-bucket rate explicitly. Then the theta<=1/4 regime is a theorem and only theta>1/4 needs measurement.
+Or derive the Weil bound for the XOR single-bucket rate explicitly. With an explicit constant and the actual E-vs-M scaling this could bound the theta<=1/4 regime; that is not established here. [L3: was "Then the theta<=1/4 regime is a theorem".]
 
 ## Repair (2026-11-01, after AUDIT.md; PROTOCOL.md Amendment 4 written before the re-run)
 Scope: audit must_fix items 1-4, as the user asked ("1-4"). Item 5 (README number slips: n=17 Arm A 0.010871 vs 0.010886;
@@ -97,3 +97,14 @@ RESULTS.json gains a "repair" block; summary.cells_exceeding_floor is marked as 
    "Detected" there mostly means exceeding the PRF K1 max. K2 ran only at n=13 and 15, and it compared against the unplanted data's null
    family, so it mostly tests the marginal change. Arm A n=17 has no K2 calibration. The climber had zero power against a planted tuple at every dose.
 No security claim. Not a bound.
+
+## Closure of audit items (L3, 2026-11-01)
+- Item 5a (0.010871 vs 0.010886): done (README line 35; value grep-confirmed in raw/armA_n17_random1_a1.json).
+- Item 5b (theta=1/4 n=13 range 0.103-0.187): done.
+- Item 5c (theta=1/3 n=17: 0.0715, 0.0744, 0.0770, h=4 0.1364): done.
+- Item 5d (theta_eff drift 0.20-0.25): done (note added at the theta=1/3 line).
+- Re-audit residual, line 57 "consistent with" Weil: done (withdrawn).
+- Re-audit residual, line 67 "a theorem": done (softened).
+- Re-audit residual, Arm A ratio 0.93 includes Koblitz: done (flagged inline).
+- RESULTS.json summary ratio ranges still include Koblitz cells: partially (already marked superseded; not rewritten, to keep the generated file unchanged).
+- Next-step items (Frobenius-orbit-preserving null; exhaustive 2-dim subspace search at n=13): not audit items; not done.

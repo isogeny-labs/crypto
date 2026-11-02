@@ -1,5 +1,5 @@
 import sys, itertools, random, os
-os.environ.setdefault("OMP_NUM_THREADS","3"); os.environ.setdefault("OPENBLAS_NUM_THREADS","3")
+os.environ.setdefault("OMP_NUM_THREADS","2"); os.environ.setdefault("OPENBLAS_NUM_THREADS","2")  # L3: was "3" (all recorded runs used 3)
 import numpy as np
 import importlib.util as _u
 _sp=_u.spec_from_file_location("lat2common","/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/experiments/MP-lattices-2/common.py"); _m=_u.module_from_spec(_sp); _sp.loader.exec_module(_m)
