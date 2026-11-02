@@ -1163,8 +1163,10 @@ fn build_echelon(
             PivotRule::SparsestIncremental | PivotRule::SparsestEstimate,
             _
         )
-    );
+    ) || matches!(pivot, Pivot::Rule(r, _) if r.needs_inputs());
     let mut row_nnz: Vec<u32> = Vec::new();
+    // E36: each row's equation (S and H order rows by equation).
+    let mut row_eq: Vec<u32> = Vec::new();
     let mut inherit_ops = 0u64;
     for (i, comp) in comps.iter().enumerate() {
         let comp_nnz = if inherit {
@@ -1202,6 +1204,7 @@ fn build_echelon(
             rows.push(row);
             if inherit {
                 row_nnz.push(comp_nnz);
+                row_eq.push(i as u32);
                 inherit_ops += 1;
             }
         }
@@ -1231,6 +1234,25 @@ fn build_echelon(
             st.pivot_update_ops += w.update;
             st.lead_scan_reads += w.lead_scan;
             st.pivot_count_mismatches += w.count_mismatches;
+            st.pivot_digest = w.digest;
+            ech
+        }
+        Pivot::Rule(rule, check) => {
+            let mut w = PivotWork::default();
+            let ech = super::chain_pivot_rules::echelon_by_rule(
+                rows,
+                p as u32,
+                &mut ech_muls,
+                rule,
+                &row_eq,
+                &row_nnz,
+                check,
+                &mut w,
+            );
+            st.pivot_init_ops += w.init + inherit_ops;
+            st.pivot_compare_ops += w.compare;
+            st.pivot_update_ops += w.update;
+            st.lead_scan_reads += w.lead_scan;
             st.pivot_digest = w.digest;
             ech
         }
@@ -1426,6 +1448,16 @@ pub enum V4Solver {
     ChainSparsestInc,
     /// E33 B″: sparsest by inherited counts and the Markowitz fill bound.
     ChainSparsestEst,
+    /// E36 (§9.41) F: the first row in arrival order.
+    ChainFifo,
+    /// E36 S: rows ordered once per call by their equation's count.
+    ChainStatic,
+    /// E36 H: F where a never-updated row is present, else S.
+    ChainFifoStatic,
+    /// E36 K: B″'s estimate over the first two rows in arrival order.
+    ChainEstK2,
+    /// E36 L (negative control): the last row in arrival order.
+    ChainLifo,
 }
 
 /// The echelon's pivot rule in the chain solve: E31's (uncounted) or E33's
@@ -1434,6 +1466,11 @@ pub enum V4Solver {
 pub enum Pivot {
     Uncounted { sparsest: bool },
     Counted(PivotRule, PivotCheck),
+    /// E36: an arrival-order rule ([`super::chain_pivot_rules`]).
+    Rule(
+        super::chain_pivot_rules::ArrivalRule,
+        super::chain_pivot_rules::RuleCheck,
+    ),
 }
 
 impl V4Solver {
@@ -1446,6 +1483,11 @@ impl V4Solver {
             "chain-sparsest-counted" => Some(V4Solver::ChainSparsestCounted),
             "chain-sparsest-inc" => Some(V4Solver::ChainSparsestInc),
             "chain-sparsest-est" => Some(V4Solver::ChainSparsestEst),
+            "chain-fifo" => Some(V4Solver::ChainFifo),
+            "chain-static" => Some(V4Solver::ChainStatic),
+            "chain-fifo-static" => Some(V4Solver::ChainFifoStatic),
+            "chain-est-k2" => Some(V4Solver::ChainEstK2),
+            "chain-lifo" => Some(V4Solver::ChainLifo),
             _ => None,
         }
     }
@@ -1458,6 +1500,11 @@ impl V4Solver {
             V4Solver::ChainSparsestCounted => "chain-sparsest-counted",
             V4Solver::ChainSparsestInc => "chain-sparsest-inc",
             V4Solver::ChainSparsestEst => "chain-sparsest-est",
+            V4Solver::ChainFifo => "chain-fifo",
+            V4Solver::ChainStatic => "chain-static",
+            V4Solver::ChainFifoStatic => "chain-fifo-static",
+            V4Solver::ChainEstK2 => "chain-est-k2",
+            V4Solver::ChainLifo => "chain-lifo",
         }
     }
     /// E33: the solver emits its pivot-selection work.
@@ -1468,12 +1515,19 @@ impl V4Solver {
                 | V4Solver::ChainSparsestCounted
                 | V4Solver::ChainSparsestInc
                 | V4Solver::ChainSparsestEst
+                | V4Solver::ChainFifo
+                | V4Solver::ChainStatic
+                | V4Solver::ChainFifoStatic
+                | V4Solver::ChainEstK2
+                | V4Solver::ChainLifo
         )
     }
     /// The chain solve's pivot rule for this solver (`Macaulay` has none
     /// and maps to E31 A's).
     pub fn pivot(self) -> Pivot {
+        use super::chain_pivot_rules::{ArrivalRule, RuleCheck};
         let counted = |rule| Pivot::Counted(rule, PivotCheck::default());
+        let rule = |r| Pivot::Rule(r, RuleCheck::default());
         match self {
             V4Solver::Macaulay | V4Solver::Chain => Pivot::Uncounted { sparsest: false },
             V4Solver::ChainSparsest => Pivot::Uncounted { sparsest: true },
@@ -1481,6 +1535,11 @@ impl V4Solver {
             V4Solver::ChainSparsestCounted => counted(PivotRule::SparsestRecount),
             V4Solver::ChainSparsestInc => counted(PivotRule::SparsestIncremental),
             V4Solver::ChainSparsestEst => counted(PivotRule::SparsestEstimate),
+            V4Solver::ChainFifo => rule(ArrivalRule::Fifo),
+            V4Solver::ChainStatic => rule(ArrivalRule::Static),
+            V4Solver::ChainFifoStatic => rule(ArrivalRule::FifoStatic),
+            V4Solver::ChainEstK2 => rule(ArrivalRule::EstimateK2),
+            V4Solver::ChainLifo => rule(ArrivalRule::Lifo),
         }
     }
 }
@@ -2020,7 +2079,12 @@ pub fn solve_v4(
         V4Solver::ChainCounted
         | V4Solver::ChainSparsestCounted
         | V4Solver::ChainSparsestInc
-        | V4Solver::ChainSparsestEst => {
+        | V4Solver::ChainSparsestEst
+        | V4Solver::ChainFifo
+        | V4Solver::ChainStatic
+        | V4Solver::ChainFifoStatic
+        | V4Solver::ChainEstK2
+        | V4Solver::ChainLifo => {
             let (s, d, info) =
                 solve_weighted_chain_with(comps, MACAULAY_BOUND, p, rng, st, solver.pivot());
             (s, d, info.fell_back)
