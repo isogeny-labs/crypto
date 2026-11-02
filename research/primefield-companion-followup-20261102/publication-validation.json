@@ -20,5 +20,15 @@
     "problems": 0
   },
   "numerical_trials_for_publication": 0,
-  "repository_rust_suite": "not run at this follow-up head; predecessor failures are historical, not current checks"
+  "repository_rust_suite": {
+    "command": "cargo test --offline --release --lib -j 2",
+    "timeout_seconds": 180,
+    "exit_code": 124,
+    "status": "capped_during_compilation",
+    "test_results_produced": false,
+    "log_sha256": "d901a72f48b90f1e1138d8b278a76226ca9a0e9b027b31f771094a1c4a58dd27",
+    "tested_commit": "7c21d0752221e4dc520cd37551d9c1c6fd20a307"
+  },
+  "protocol_validation_findings": 0,
+  "diff_check": "One preserved space-only context line in historical companion-trace-codec/integration.patch"
 }

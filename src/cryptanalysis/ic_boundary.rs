@@ -99,7 +99,7 @@
 //! Koblitz subgroup, and the point of the exercise is to have a concrete
 //! boundary to iterate against rather than an opinion.
 
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{BTreeMap, HashMap};
 use std::hash::{BuildHasherDefault, Hasher};
 use std::time::Instant;
 
@@ -911,19 +911,32 @@ fn invmod_u64(a: u64, m: u64) -> Option<u64> {
 /// same extended Euclid, step for step.
 #[inline]
 fn invmod_u32(a: u32, m: u32) -> Option<u32> {
+    // The loop of `invmod_u64` unrolled by two: instead of swapping the
+    // remainder and coefficient pairs every step (and flipping the sign
+    // flag), the two halves update one pair each and trade roles, and the
+    // parity of the step count, which is the sign, is which half stops.
+    // The same quotients and remainders in the same order, so the same
+    // inverse; a third of the instructions of the swapping loop.
     let (mut r0, mut r1) = (m, a);
     let (mut t0, mut t1) = (0u32, 1u32);
-    let mut neg0 = true;
-    while r1 != 0 {
+    let (gcd, t, neg) = loop {
+        if r1 == 0 {
+            break (r0, t0, true);
+        }
         let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 + q * t1);
-        neg0 = !neg0;
-    }
-    if r0 != 1 {
+        r0 -= q * r1;
+        t0 += q * t1;
+        if r0 == 0 {
+            break (r1, t1, false);
+        }
+        let q = r1 / r0;
+        r1 -= q * r0;
+        t1 += q * t0;
+    };
+    if gcd != 1 {
         return None;
     }
-    Some(if neg0 { (m - t0) % m } else { t0 % m })
+    Some(if neg { (m - t) % m } else { t % m })
 }
 
 // ── Incremental Gauss–Jordan over Z/rZ ─────────────────────────────
@@ -2162,13 +2175,13 @@ struct TunedWalker<'a, G: CountedGroup, C: RhoClasses<G>> {
     window: usize,
     /// Brent detection on ([`WalkPolicy::brent`]).
     brent: bool,
-    /// `(key, point, a, b)` of the walk's most recent points, oldest first.
-    recent: VecDeque<(u64, G::Elt, u64, u64)>,
-    /// The keys of `recent` in a ring (`recent_next` is where the next one
-    /// goes), scanned every step without a branch per key; `recent` is
-    /// read only when the ring holds the key (a cycle, rare).  The two
-    /// hold the same set of keys at every step.
+    /// The walk's last `window` points in a ring: their keys, scanned
+    /// every step without a branch per key, and beside them `(point, a,
+    /// b)`, read only when a key repeats (a cycle, rare).  `recent_next`
+    /// is the slot the next point takes, which once the ring is full is
+    /// also the oldest point's.
     recent_keys: Vec<u64>,
+    recent_states: Vec<(G::Elt, u64, u64)>,
     recent_next: usize,
 }
 
@@ -2191,8 +2204,8 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             look_ahead: walk.look_ahead && !classes.trivial(),
             window: walk.cycle_window,
             brent: false,
-            recent: VecDeque::with_capacity(walk.cycle_window + 1),
             recent_keys: Vec::with_capacity(walk.cycle_window),
+            recent_states: Vec::with_capacity(walk.cycle_window),
             recent_next: 0,
         }
     }
@@ -2220,33 +2233,46 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
     /// Forget the recent points (a new walk, or a cycle left).
     #[inline]
     fn forget_recent(&mut self) {
-        self.recent.clear();
         self.recent_keys.clear();
+        self.recent_states.clear();
         self.recent_next = 0;
     }
 
     /// Remember a point among the last `window`, dropping the oldest.
     #[inline]
     fn remember(&mut self, entry: (u64, G::Elt, u64, u64)) {
+        let (key, x, a, b) = entry;
         if self.recent_keys.len() < self.window {
-            self.recent_keys.push(entry.0);
+            self.recent_keys.push(key);
+            self.recent_states.push((x, a, b));
         } else {
-            self.recent_keys[self.recent_next] = entry.0;
+            self.recent_keys[self.recent_next] = key;
+            self.recent_states[self.recent_next] = (x, a, b);
         }
         self.recent_next = if self.recent_next + 1 == self.window {
             0
         } else {
             self.recent_next + 1
         };
-        self.recent.push_back(entry);
-        if self.recent.len() > self.window {
-            self.recent.pop_front();
-        }
+    }
+
+    /// The `i`-th recent point, oldest first.
+    #[inline]
+    fn recent_entry(&self, i: usize) -> (u64, G::Elt, u64, u64) {
+        let len = self.recent_keys.len();
+        let oldest = if len < self.window {
+            0
+        } else {
+            self.recent_next
+        };
+        let slot = (oldest + i) % self.window;
+        let (x, a, b) = self.recent_states[slot];
+        (self.recent_keys[slot], x, a, b)
     }
 
     /// Where `key` stands among the recent points, oldest first: the
     /// ring answers "not there" for every key at once (the common case),
-    /// and the deque gives the position only on a hit.
+    /// and the ring is read in age order only on a hit.
     #[inline]
     fn recent_position(&self, key: u64) -> Option<usize> {
         let hit = self
@@ -2256,7 +2282,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         if !hit {
             return None;
         }
-        self.recent.iter().position(|e| e.0 == key)
+        (0..self.recent_keys.len()).find(|&i| self.recent_entry(i).0 == key)
     }
 
     /// One walk from `[a]G + [b]Q = start`, until a distinguished point
@@ -2351,18 +2377,15 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             if self.window > 0 {
                 if let Some(pos) = self.recent_position(key) {
                     // The cycle is the `c` most recent points.
-                    let c = self.recent.len() - pos;
+                    let c = self.recent_keys.len() - pos;
                     match c {
                         2 => tally.cycles_2 += 1,
                         4 => tally.cycles_4 += 1,
                         _ => tally.cycles_other += 1,
                     }
                     // Leave it from the member with the smallest key.
-                    let (min_key, mp, ma, mb) = self
-                        .recent
-                        .iter()
-                        .skip(pos)
-                        .copied()
+                    let (min_key, mp, ma, mb) = (pos..self.recent_keys.len())
+                        .map(|i| self.recent_entry(i))
                         .min_by_key(|e| e.0)
                         .expect("a cycle has members");
                     if last_escape == Some(min_key) {
@@ -2915,6 +2938,235 @@ pub fn rho_batch_with<G: CountedGroup, C: RhoClasses<G>>(
     RhoBatchResult {
         method: format!(
             "batch (targets in sequence, one distinguished-point table, jumps in G) {}",
+            classes.method()
+        ),
+        automorphisms: classes.automorphisms(),
+        targets: targets.len(),
+        setup_ops: setup,
+        group_ops: total,
+        gae,
+        s_per_target: gae / (k * sqrt_r),
+        s_walk_per_target: tally_all.walk_ops() as f64 / (k * sqrt_r),
+        expected_single: generic_floor_ops(r as f64, classes.automorphisms() as f64),
+        all_verified: !per_target.is_empty() && per_target.iter().all(|t| t.verified),
+        per_target,
+        wall_ns: start.elapsed().as_nanos() as u64,
+        counters,
+    }
+}
+
+/// The residual collector's structure in the Kuhn–Struik batch of
+/// [`rho_batch_with`]: every relation also carries the logarithm of one
+/// base point `P0` that nobody knows (an index-calculus column, `B = 1`).
+///
+/// Identical to [`rho_batch_with`] (jumps in `G` only, one shared
+/// distinguished-point table, targets in sequence, the same tuned walker
+/// on `classes`) except for the starts: walk `w` of target `i` starts at
+/// `[s_w]G + X_w` with `X_w = [u_w]Q_i + [c_w]P0`, advanced alternately by
+/// the precomputed `stride` and `stride + P0` (one addition a walk, as in
+/// rho; `c_w ≈ w/2` against `u_w = w·t_b`, so the equations are independent).  The
+/// walker carries one coefficient `β` on `X_w`, so a distinguished point is
+/// `[a]G + [β u_w]Q_i + [β w]P0` and a collision is one linear equation in
+/// `d_i` and `log P0`.  Until `log P0` is known (the first target) two
+/// independent equations are needed; afterwards one collision solves a
+/// target, as in rho.  `log P0` and every recovered `d_i` are checked
+/// (`[x]G` against the point, charged as verification).
+#[allow(clippy::too_many_arguments)]
+pub fn ic_residual_batch_with<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    base_point: G::Elt,
+    targets: &[G::Elt],
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    walk: RhoWalk,
+) -> RhoBatchResult {
+    let start = Instant::now();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let shape = WalkShape::of(r, walk);
+    let mut setup = GroupOps::default();
+    let jumps: Vec<(G::Elt, u64, u64)> = (0..shape.jumps)
+        .map(|_| {
+            let c = rng.gen_range(1..r.max(2));
+            (g.mul(&mut setup, generator, c), c % r, 0)
+        })
+        .collect();
+    let mut walker = TunedWalker::new(g, classes, r, jumps, &shape, walk);
+    // Distinguished point -> (a, Q coefficient, P0 coefficient, target).
+    let mut table: FastMap<(u64, u64, u64, u32)> = fast_map(1024);
+    let mut logs: Vec<Option<u64>> = Vec::with_capacity(targets.len());
+    let mut base_log: Option<u64> = None;
+    let mut base_solved_at: u64 = 0;
+    let mut per_target = Vec::with_capacity(targets.len());
+    let mut total = setup;
+    let mut tally_all = WalkTally::default();
+    let (mut start_adds_all, mut useless_all, mut verification_all) = (0u64, 0u64, 0u64);
+    let mut target_setup = GroupOps::default();
+    let mut pair_solves = 0u64;
+
+    for (i, &q) in targets.iter().enumerate() {
+        let t0 = Instant::now();
+        let mut ops = GroupOps::default();
+        let mut tally = WalkTally::default();
+        let gq = g.add(&mut ops, generator, q);
+        let (mut ta, mut tb) = (rng.gen_range(1..r.max(2)), rng.gen_range(1..r.max(2)));
+        let mut stride = joint_mul(g, &mut ops, generator, q, gq, ta, tb);
+        while g.is_identity(&stride) {
+            ta = rng.gen_range(1..r.max(2));
+            tb = rng.gen_range(1..r.max(2));
+            stride = joint_mul(g, &mut ops, generator, q, gq, ta, tb);
+        }
+        // Two strides, alternated: `stride` and `stride + P0`.  With one
+        // stride every X_w would be a multiple of `[tb]Q + P0`, every
+        // equation would have the same Q : P0 ratio, and the two-equation
+        // solve would always be singular.
+        let step = g.add(&mut ops, stride, base_point);
+        target_setup.merge(ops);
+        let (mut sx, mut sa, mut sb, mut sc) = (step, ta % r, tb % r, 1u64 % r);
+        let (mut walks, mut dps, mut start_adds) = (0u64, 0u64, 0u64);
+        let (mut useless, mut verification_ops) = (0u64, 0u64);
+        let mut recovered = None;
+        let mut solved_by = "none";
+        // An own equation kept while `log P0` is unknown: (c_d, c_p, rhs).
+        let mut pending: Option<(u64, u64, u64)> = None;
+        while tally.walk_ops() < max_steps && walks < max_steps {
+            walks += 1;
+            if walks > 1 {
+                if walks % 2 == 0 {
+                    sx = g.add(&mut ops, sx, stride);
+                } else {
+                    sx = g.add(&mut ops, sx, step);
+                    sc = addmod(sc, 1, r);
+                }
+                sa = addmod(sa, ta, r);
+                sb = addmod(sb, tb, r);
+                start_adds += 1;
+            }
+            if g.is_identity(&sx) {
+                continue;
+            }
+            let WalkEnd::Distinguished(x, a, beta) =
+                walker.walk(&mut ops, &mut tally, sx, sa, 1, max_steps)
+            else {
+                continue;
+            };
+            dps += 1;
+            let (bq, bp) = (mulmod(beta, sb, r), mulmod(beta, sc, r));
+            let key = g.key(&x);
+            let Some(&(a2, bq2, bp2, j)) = table.get(&key) else {
+                table.insert(key, (a, bq, bp, i as u32));
+                continue;
+            };
+            // a + bq d_i + bp p = a2 + bq2 d_j + bp2 p
+            let mut candidate: Option<(u64, Option<u64>, &'static str)> = None;
+            if j as usize == i {
+                let (cd, cp, rhs) = (submod(bq, bq2, r), submod(bp, bp2, r), submod(a2, a, r));
+                if let Some(p) = base_log {
+                    let e = submod(rhs, mulmod(cp, p, r), r);
+                    candidate = invmod(cd, r).map(|inv| (mulmod(e, inv, r), None, "own"));
+                } else if let Some((cd1, cp1, e1)) = pending {
+                    let det = submod(mulmod(cd1, cp, r), mulmod(cd, cp1, r), r);
+                    if let Some(inv) = invmod(det, r) {
+                        let d = mulmod(submod(mulmod(e1, cp, r), mulmod(rhs, cp1, r), r), inv, r);
+                        let p = mulmod(submod(mulmod(cd1, rhs, r), mulmod(cd, e1, r), r), inv, r);
+                        candidate = Some((d, Some(p), "own_pair"));
+                    }
+                    pending = Some((cd, cp, rhs));
+                } else {
+                    pending = Some((cd, cp, rhs));
+                }
+            } else if let (Some(dj), Some(p)) = (logs[j as usize], base_log) {
+                let e = submod(
+                    addmod(addmod(a2, mulmod(bq2, dj, r), r), mulmod(bp2, p, r), r),
+                    addmod(a, mulmod(bp, p, r), r),
+                    r,
+                );
+                candidate = invmod(bq, r).map(|inv| (mulmod(e, inv, r), None, "earlier"));
+            }
+            if let Some((d, p_new, how)) = candidate {
+                let before = ops.gae();
+                let ok_p = match p_new {
+                    Some(p) => g.mul(&mut ops, generator, p) == base_point,
+                    None => true,
+                };
+                let ok_d = ok_p && g.mul(&mut ops, generator, d) == q;
+                verification_ops += (ops.gae() - before) as u64;
+                if ok_d {
+                    if let Some(p) = p_new {
+                        base_log = Some(p);
+                        base_solved_at = i as u64 + 1;
+                        pair_solves += 1;
+                    }
+                    recovered = Some(d);
+                    solved_by = how;
+                    break;
+                }
+            }
+            useless += 1;
+        }
+        logs.push(recovered);
+        total.merge(ops);
+        tally_all.merge(&tally);
+        start_adds_all += start_adds;
+        useless_all += useless;
+        verification_all += verification_ops;
+        per_target.push(RhoBatchTarget {
+            group_ops: ops,
+            gae: ops.gae(),
+            steps: tally.steps,
+            walks,
+            distinguished_points: dps,
+            solved_by,
+            recovered,
+            verified: recovered.is_some(),
+            wall_ns: t0.elapsed().as_nanos() as u64,
+        });
+    }
+    let k = targets.len().max(1) as f64;
+    let sqrt_r = (r as f64).sqrt();
+    let gae = total.gae();
+    let mut counters = tuned_counters(
+        &shape,
+        setup,
+        start_adds_all,
+        &tally_all,
+        verification_all,
+        useless_all,
+    );
+    for (name, v) in [
+        ("targets", targets.len() as u64),
+        ("target_setup_additions", target_setup.adds),
+        ("target_setup_doublings", target_setup.doubles),
+        ("base_point_columns", 1),
+        ("base_point_log_solved_at_target", base_solved_at),
+        ("two_equation_solves", pair_solves),
+        (
+            "solved_on_own_trail",
+            per_target
+                .iter()
+                .filter(|t| t.solved_by == "own" || t.solved_by == "own_pair")
+                .count() as u64,
+        ),
+        (
+            "solved_on_an_earlier_trail",
+            per_target
+                .iter()
+                .filter(|t| t.solved_by == "earlier")
+                .count() as u64,
+        ),
+        (
+            "unsolved",
+            per_target.iter().filter(|t| t.recovered.is_none()).count() as u64,
+        ),
+        ("distinguished_points_stored", table.len() as u64),
+    ] {
+        counters.insert(name.to_string(), v);
+    }
+    RhoBatchResult {
+        method: format!(
+            "residual batch (one unknown base point P0 in every relation; targets in sequence, one distinguished-point table, jumps in G) {}",
             classes.method()
         ),
         automorphisms: classes.automorphisms(),
@@ -11936,6 +12188,42 @@ mod tests {
             online < plain / 10.0,
             "online {online:.0} against plain {plain:.0}"
         );
+    }
+
+    /// `ic_residual_batch_with` recovers all sixteen planted logs and the
+    /// base point's (on the first target, from two equations).
+    #[test]
+    fn residual_batch_recovers_every_target_and_the_base_point() {
+        let r = 1_000_000_007u64;
+        let grp = Cyclic(r);
+        let gen = 5u64;
+        let classes = NegationClasses { r };
+        for seed in 0..4u64 {
+            let planted: Vec<u64> = (0..16u64)
+                .map(|i| 1 + mix(seed * 64 + i + 7000) % (r - 1))
+                .collect();
+            let targets: Vec<u64> = planted.iter().map(|&d| mulmod(gen, d, r)).collect();
+            let base_log = 1 + mix(seed ^ 0xBA5E) % (r - 1);
+            let base = mulmod(gen, base_log, r);
+            let res = ic_residual_batch_with(
+                &grp,
+                &classes,
+                gen,
+                base,
+                &targets,
+                r,
+                200 + seed,
+                1 << 32,
+                RhoWalk::negation(),
+            );
+            for (t, &d) in res.per_target.iter().zip(&planted) {
+                assert_eq!(t.recovered, Some(d), "{t:?}");
+            }
+            assert_eq!(res.per_target[0].solved_by, "own_pair");
+            assert_eq!(res.counters["base_point_log_solved_at_target"], 1);
+            assert!(res.all_verified);
+            assert_batch_closes(&res);
+        }
     }
 
     /// The batch law on a group where the walk is the only cost: sixteen
