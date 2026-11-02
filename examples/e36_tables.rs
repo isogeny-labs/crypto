@@ -278,12 +278,20 @@ fn main() {
                 }
             }
             let ca = f(&r["per"]["chain"], "c_mean") / f(&r["per"][*x], "c_mean");
+            // B″ (E33's reference) has no σ1–σ3 values here.
+            let sg = |k: &str, g: usize| {
+                if *x == "chain-sparsest-est" {
+                    "—".to_string()
+                } else {
+                    format!("{:.4}", rat(k, g))
+                }
+            };
             writeln!(
                 md,
-                "| {} | {} | {x} | {ca:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} |",
+                "| {} | {} | {x} | {ca:.4} | {:.4} | {:.4} | {:.4} | {} | {} | {} | {} | {} | {} | {:.4} | {:.4} | {:.4} |",
                 r["p"], r["seed"], rat("s_mean", 0), rat("s_mean", 1), rat("s_mean", 2),
-                rat("s_sigma1", 1), rat("s_sigma1", 2), rat("s_sigma2", 1), rat("s_sigma2", 2),
-                rat("s_sigma3", 1), rat("s_sigma3", 2), e25(0), e25(1), e25(2)
+                sg("s_sigma1", 1), sg("s_sigma1", 2), sg("s_sigma2", 1), sg("s_sigma2", 2),
+                sg("s_sigma3", 1), sg("s_sigma3", 2), e25(0), e25(1), e25(2)
             )
             .unwrap();
         }
@@ -291,7 +299,13 @@ fn main() {
         if RULES.contains(x) && *x != "chain-lifo" && ahead[0][1] == n {
             carried.push(x);
         }
-        stage_ranks.push(json!({"solver": x, "curves_ahead_of_a": ahead, "curves_ahead_of_e25": ahead_e25, "curves": n}));
+        // B″ has no σ values here: only its primary row is meaningful.
+        let ahead_v: Vec<Value> = ahead
+            .iter()
+            .enumerate()
+            .map(|(i, a)| if *x == "chain-sparsest-est" && i > 0 { Value::Null } else { json!(a) })
+            .collect();
+        stage_ranks.push(json!({"solver": x, "curves_ahead_of_a": ahead_v, "curves_ahead_of_e25": ahead_e25, "curves": n}));
     }
     writeln!(md, "\nCurves (of 10) where X is ahead of A, `[0, 0.1, 1]` GAE, primary / σ1 / σ2 / σ3, and of E25 (primary):\n").unwrap();
     for s in &stage_ranks {

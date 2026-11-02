@@ -16,7 +16,7 @@ for solver in "$@"; do
     for s in 1 2; do
       f=$out/e2e_${solver}_karatsuba_p${p}s${s}.json
       [ -s "$f" ] && continue
-      taskset -c 0,1 "$bin" --sizes "$p" --first-seed "$s" --seeds 1 \
+      taskset -c 2,3 "$bin" --sizes "$p" --first-seed "$s" --seeds 1 \
         --rho-runs 16 --max-residuals 5000000 --solver "$solver" --karatsuba --json "$f.part" \
         >>"$out/e2e_${solver}.log" 2>&1 && mv "$f.part" "$f"
     done
