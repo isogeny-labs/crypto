@@ -124,7 +124,25 @@ def bounded(cmd, env, timeout=60):
     return wrapped, proc, round(time.time() - start, 3)
 
 
+def s3_copy(source, target):
+    subprocess.run(["aws", "s3", "cp", str(source), target, "--only-show-errors", "--region", "us-east-2"], check=True)
+
+
 def run(out, candidates, preflight, selected):
+    metadata_root = f"{S3_ROOT}/_metadata"
+    metadata_files = [
+        PROTOCOL,
+        out / "preflight.json",
+        out / "source-index.json",
+        out / "script-binding.json",
+        Path(__file__).resolve(),
+        Path(__file__).resolve().with_name("analyze_run.py"),
+        Path(__file__).resolve().with_name("README.md"),
+        Path(__file__).resolve().with_name("FILE_LAYOUT.json"),
+    ]
+    for path in metadata_files:
+        relative = path.relative_to(REPO) if path.is_relative_to(REPO) else Path("protocol-pdp-factorbase-v2.json")
+        s3_copy(path, f"{metadata_root}/{relative.as_posix()}")
     rows = []
     for candidate, row, source in selected:
         case = row["id"]
@@ -175,6 +193,7 @@ def run(out, candidates, preflight, selected):
                 record["status"] = "replay_failed"
         attempt = case_dir / "attempt.json"
         attempt.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+        s3_copy(attempt, f"{candidate_s3}/attempts/{case}.json")
         rows.append(record)
         print(json.dumps({"candidate_id": candidate, "id": case, "status": record["status"], "returncode": proc.returncode, "elapsed_seconds": elapsed}, separators=(",", ":")), flush=True)
     summary = {
@@ -191,6 +210,7 @@ def run(out, candidates, preflight, selected):
         "scope": "First-fall certificates or explicit incomplete outcomes for the 144 available spike35--spike37 systems only. LFD, top-form Dreg, affine solving degree and candidate ranking remain unclaimed.",
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+    s3_copy(out / "summary.json", f"{S3_ROOT}/_metadata/attempt-01/summary.json")
     return summary
 
 
@@ -216,6 +236,9 @@ def main():
             raise RuntimeError("execution cohort differs from frozen preflight")
         if preflight["dataset_index_sha256"] != sha256(DATASET_INDEX) or preflight["fall_binary_sha256"] != sha256(BIN):
             raise RuntimeError("frozen source or instrument changed")
+        binding = json.loads((args.out / "script-binding.json").read_text())
+        if binding["runner_sha256"] != sha256(Path(__file__)) or binding["analysis_sha256"] != sha256(Path(__file__).with_name("analyze_run.py")):
+            raise RuntimeError("runner or analysis source differs from pre-data binding")
         if (args.out / "cases").exists() or (args.out / "summary.json").exists():
             raise RuntimeError("output data already exist; use a fresh attempt directory")
         if sha256(args.out / "source-index.json") != hashlib.sha256(json.dumps(source_checks, indent=2, sort_keys=True).encode() + b"\n").hexdigest():

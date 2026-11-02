@@ -24,6 +24,11 @@
       "contents": "One row per PDP system with candidate, family, m, target kind, original system byte count and SHA-256, and canonical input-row SHA-256."
     },
     {
+      "path": "attempt-01/script-binding.json",
+      "role": "pre-data runner and analysis source binding",
+      "contents": "SHA-256 identities of run_first_fall.py and analyze_run.py, recorded before any first-fall computation."
+    },
+    {
       "path": "attempt-01/cases/<candidate>/<system-id>/attempt.json",
       "role": "raw per-case execution and replay record",
       "contents": "Exact command argv, return code, elapsed time, stdout/stderr, source hashes, certificate hash and fields, S3 certificate key, and fresh-process replay outcome. Failed and timed-out attempts are retained."
