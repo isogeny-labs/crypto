@@ -1125,7 +1125,7 @@ pub fn lift_back_v4(
 /// The Macaulay matrix at weighted degree `d`, triangularised and in
 /// forward echelon, built by exactly the operations (and counts) of
 /// `solve_at`'s first half.
-struct Built {
+pub(crate) struct Built {
     cols: Vec<[u8; 4]>,
     col_index: HashMap<[u8; 4], usize>,
     comps: Vec<HashMap<[u8; 4], u64>>,
@@ -1135,7 +1135,7 @@ struct Built {
     std_index: Vec<u32>,
 }
 
-fn build_echelon(
+pub(crate) fn build_echelon(
     comps: &[HashMap<[u8; 4], u64>],
     d: u16,
     p: u64,
@@ -1164,6 +1164,8 @@ fn build_echelon(
             _
         )
     ) || matches!(pivot, Pivot::Rule(r, _) if r.needs_inputs());
+    // E35: the learner (B′'s elimination) inherits the counts too.
+    let inherit = inherit || matches!(pivot, Pivot::Learn);
     let mut row_nnz: Vec<u32> = Vec::new();
     // E36: each row's equation (S and H order rows by equation).
     let mut row_eq: Vec<u32> = Vec::new();
@@ -1247,6 +1249,39 @@ fn build_echelon(
                 &row_eq,
                 &row_nnz,
                 check,
+                &mut w,
+            );
+            st.pivot_init_ops += w.init + inherit_ops;
+            st.pivot_compare_ops += w.compare;
+            st.pivot_update_ops += w.update;
+            st.lead_scan_reads += w.lead_scan;
+            st.pivot_digest = w.digest;
+            ech
+        }
+        Pivot::Trace(trace, unchecked) => {
+            let mut w = super::chain_trace::ReplayWork::default();
+            let ech = super::chain_trace::echelon_replay(
+                rows,
+                p as u32,
+                &mut ech_muls,
+                trace,
+                unchecked,
+                &mut w,
+            );
+            st.pivot_init_ops += w.shape_checks + w.lookups;
+            st.pivot_compare_ops += w.tests;
+            st.lead_scan_reads += w.lead_scan;
+            st.pivot_digest = w.digest;
+            super::chain_trace::note_replay(&w);
+            ech
+        }
+        Pivot::Learn => {
+            let mut w = PivotWork::default();
+            let ech = super::chain_trace::echelon_learn(
+                rows,
+                p as u32,
+                &mut ech_muls,
+                row_nnz,
                 &mut w,
             );
             st.pivot_init_ops += w.init + inherit_ops;
@@ -1448,6 +1483,9 @@ pub enum V4Solver {
     ChainSparsestInc,
     /// E33 B″: sparsest by inherited counts and the Markowitz fill bound.
     ChainSparsestEst,
+    /// E35 (§9.40) T: B's pivot schedule, learned per curve and replayed
+    /// with a counted check ([`super::chain_trace`]).
+    ChainSparsestTrace,
     /// E36 (§9.41) F: the first row in arrival order.
     ChainFifo,
     /// E36 S: rows ordered once per call by their equation's count.
@@ -1466,6 +1504,11 @@ pub enum V4Solver {
 pub enum Pivot {
     Uncounted { sparsest: bool },
     Counted(PivotRule, PivotCheck),
+    /// E35: replay a learned trace; `true` skips the checks (the positive
+    /// control's diagnostic only).
+    Trace(&'static super::chain_trace::PivotTrace, bool),
+    /// E35: B′'s elimination, recording its choices for a trace.
+    Learn,
     /// E36: an arrival-order rule ([`super::chain_pivot_rules`]).
     Rule(
         super::chain_pivot_rules::ArrivalRule,
@@ -1483,6 +1526,7 @@ impl V4Solver {
             "chain-sparsest-counted" => Some(V4Solver::ChainSparsestCounted),
             "chain-sparsest-inc" => Some(V4Solver::ChainSparsestInc),
             "chain-sparsest-est" => Some(V4Solver::ChainSparsestEst),
+            "chain-sparsest-trace" => Some(V4Solver::ChainSparsestTrace),
             "chain-fifo" => Some(V4Solver::ChainFifo),
             "chain-static" => Some(V4Solver::ChainStatic),
             "chain-fifo-static" => Some(V4Solver::ChainFifoStatic),
@@ -1500,6 +1544,7 @@ impl V4Solver {
             V4Solver::ChainSparsestCounted => "chain-sparsest-counted",
             V4Solver::ChainSparsestInc => "chain-sparsest-inc",
             V4Solver::ChainSparsestEst => "chain-sparsest-est",
+            V4Solver::ChainSparsestTrace => "chain-sparsest-trace",
             V4Solver::ChainFifo => "chain-fifo",
             V4Solver::ChainStatic => "chain-static",
             V4Solver::ChainFifoStatic => "chain-fifo-static",
@@ -1515,6 +1560,7 @@ impl V4Solver {
                 | V4Solver::ChainSparsestCounted
                 | V4Solver::ChainSparsestInc
                 | V4Solver::ChainSparsestEst
+                | V4Solver::ChainSparsestTrace
                 | V4Solver::ChainFifo
                 | V4Solver::ChainStatic
                 | V4Solver::ChainFifoStatic
@@ -1535,6 +1581,11 @@ impl V4Solver {
             V4Solver::ChainSparsestCounted => counted(PivotRule::SparsestRecount),
             V4Solver::ChainSparsestInc => counted(PivotRule::SparsestIncremental),
             V4Solver::ChainSparsestEst => counted(PivotRule::SparsestEstimate),
+            V4Solver::ChainSparsestTrace => Pivot::Trace(
+                super::chain_trace::current()
+                    .expect("chain-sparsest-trace: no trace installed (chain_trace::install)"),
+                false,
+            ),
             V4Solver::ChainFifo => rule(ArrivalRule::Fifo),
             V4Solver::ChainStatic => rule(ArrivalRule::Static),
             V4Solver::ChainFifoStatic => rule(ArrivalRule::FifoStatic),
@@ -2064,6 +2115,11 @@ pub fn solve_v4(
             let (s, d) =
                 solve_weighted_traced(comps, MACAULAY_BOUND, p, rng, st, true, false, None, None);
             (s, d, false)
+        }
+        V4Solver::ChainSparsestTrace => {
+            let (s, d, info) =
+                solve_weighted_chain_with(comps, MACAULAY_BOUND, p, rng, st, solver.pivot());
+            (s, d, info.fell_back)
         }
         V4Solver::Chain | V4Solver::ChainSparsest => {
             let (s, d, info) = solve_weighted_chain(

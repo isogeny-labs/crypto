@@ -2163,6 +2163,11 @@ pub struct K4PipelineReport {
     pub pivot_selection_ops: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lead_scan_reads: Option<u64>,
+    /// E35 (§9.40): the trace solver's learning, itemised (already added to
+    /// `total_muls`, `macaulay_entries`, `pivot_selection*` and
+    /// `lead_scan_reads`), and its replay diagnostics; absent otherwise.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trace_learning: Option<super::chain_trace::TraceLearning>,
 }
 
 /// One target's trip through the solve, priced by its own counters.
@@ -2599,6 +2604,7 @@ fn collect_and_solve(
         pivot_selection: counted.then_some([pivot[0], pivot[1], pivot[2]]),
         pivot_selection_ops: counted.then_some(pivot[0] + pivot[1] + pivot[2]),
         lead_scan_reads: counted.then_some(pivot[3]),
+        trace_learning: None,
     })
 }
 
@@ -3530,7 +3536,14 @@ pub fn run_k4_gls_pipeline_with(
         }
         c.f.muls() as f64 / 64.0
     };
-    collect_and_solve(
+    // E35 (§9.40): the trace solver learns and installs this curve and
+    // arm's pivot trace first, from a stream of its own (charged below).
+    let learned = if solver == super::klein_v4::V4Solver::ChainSparsestTrace {
+        Some(super::chain_trace::learn_and_install(&ki, &pre, seed)?)
+    } else {
+        None
+    };
+    let rep = collect_and_solve(
         &inst,
         &fb,
         seed,
@@ -3552,7 +3565,11 @@ pub fn run_k4_gls_pipeline_with(
             solver: (solver != super::klein_v4::V4Solver::Macaulay).then(|| solver.name()),
         },
         &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed, solver),
-    )
+    )?;
+    Ok(match learned {
+        Some(l) => super::chain_trace::charge(rep, l),
+        None => rep,
+    })
 }
 
 #[cfg(test)]
