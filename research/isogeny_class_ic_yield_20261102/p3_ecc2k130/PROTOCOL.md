@@ -304,8 +304,10 @@ What changes.
 - **Sharding (scheduling only).** V, x_R, the null b, the planted draws and the b-sparse family are derived from
   (n, m, k, attempt, curve) and the seed, never from the job list, so a shard produces the same instances as the one-line command.
   Attempt shards use `--first-attempt` with `--attempts 1`: P3a main k=4, P3a controls k=4, P3b random-V k=5 (shards s0 =
-  attempt 0, s1 = attempt 1). Curve shards use `--select`: P3b standard V (s0 = curve indices 0..131 = E0 and orbit A, s1 = 132..262 =
-  orbit B). Only the within-attempt interleaving order and the `seq` counter differ between a shard and the one-line command. The
+  attempt 0, s1 = attempt 1). Curve shards use `--select`: P3b standard V, six commands in two cards (`b-stdv-s0` runs curve indices
+  0..43 as `s0a`, 44..87 as `s0b`, 88..131 as `s0c`, which is E0 and orbit A; `b-stdv-s1` runs 132..174 as `s1a`, 175..218 as `s1b`,
+  219..262 as `s1c`, which is orbit B); a `--select` list is split in three because the task-card lint rejects an argv token longer
+  than 255 characters. Only the within-attempt interleaving order and the `seq` counter differ between a shard and the one-line command. The
   iso and A/A identity checks of `analyze` compare rows of the same (k, attempt, curve) key, and every control shard carries its
   own `main` rows, so the checks are valid per shard. Pooling for analysis is concatenation of the shard files in the card order
   below (analysis step, main session).
@@ -338,11 +340,11 @@ cards of different lanes are independent.
 | A11 | b-main-k5-s1 | P3b random-V main k=5, dmax 7, attempt 1 | p3b_main_k5.s1.jsonl | 2700 | 10800 |
 | B1 | b-ctrl | P3b controls, CTRL131, k=3,4,5, 2 attempts, null 8, dmax 7, --solve | p3b_ctrl.jsonl | 900 | 3600 |
 | B2 | b-main-k34 | P3b random-V main k=3,4, 2 attempts, dmax 9 | p3b_main_k34.jsonl | 1440 | 5760 |
-| B3, B4 | b-stdv-s0, b-stdv-s1 | P3b standard V, 3 presentations, k=3..6, 1 attempt, dmax 9, curves 0..131 / 132..262 | p3b_stdv.s0.jsonl, .s1.jsonl | 7740 each | 30960 each |
+| B3, B4 | b-stdv-s0, b-stdv-s1 | P3b standard V, 3 presentations, k=3..6, 1 attempt, dmax 9, curves 0..131 / 132..262, three commands per card (a, b, c) | p3b_stdv.s0a.jsonl, s0b, s0c / s1a, s1b, s1c | 2580 per command, 7740 per card | 10320 per command |
 | B5 | b-main-k5-s0 | P3b random-V main k=5, dmax 7, attempt 0 | p3b_main_k5.s0.jsonl | 2700 | 10800 |
 
 Lane A about 18,700 s (5.2 h) of CPU, lane B about 20,500 s (5.7 h), 10.9 CPU-hours in all; wall time on the loaded host is longer.
-Pool in the order of the table for each file family (`p3a_ctrl_k4`, `p3a_main_k4`, `p3b_main_k5`, `p3b_stdv`: s0 then s1). The C2
+Pool in the order of the table for each file family (`p3a_ctrl_k4`, `p3a_main_k4`, `p3b_main_k5`: s0 then s1; `p3b_stdv`: s0a, s0b, s0c, s1a, s1b, s1c). The C2
 family minima read the pooled `p3b_stdv`, `p3b_badapt`, `p3b_bsparse` (n=131) and `p3a_ctrl_k3`, `p3a_ctrl_k4` (n=43).
 
 Hashes (sha256).
