@@ -1,0 +1,72 @@
+LIB "linalg.lib";
+proc require62(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../61/runs/field61-01/field-space61.sing"));
+execute(read("../matrix62-01/square-matrix62.sing"));
+require62(size(cachedIdeal62)==size(sourceIdeal61),"SPLIT62_SOURCE_GENERATOR_COUNT");
+int sourceIndex62;for(sourceIndex62=1;sourceIndex62<=size(sourceIdeal61);sourceIndex62++){require62(cachedIdeal62[sourceIndex62]==sourceIdeal61[sourceIndex62],"SPLIT62_ACTUAL_SOURCE_CACHE_BINDING");}
+ideal GB62=std(sourceIdeal61);require62(vdim(GB62)==32,"SPLIT62_SOURCE_DEGREE");
+require62(square62*inverse62==unitmat(32) && inverse62*square62==unitmat(32),"SPLIT62_CACHED_INVERSE_PRODUCTS");
+def sourceRing62=basering;
+ring parityRing62=2,(u),dp;short=0;
+setring sourceRing62;
+proc splitCoefficient62(number c){
+ string ns=string(numerator(c));string ds=string(denominator(c));
+ setring parityRing62;
+ execute("poly numerator62="+ns+";poly denominator62="+ds+";");
+ require62(denominator62!=0,"SPLIT62_NONZERO_RATIONAL_DENOMINATOR");
+ poly p=numerator62*denominator62;poly even=0;poly odd=0;poly rebuilt=0;int j;int exponent;
+ if(p!=0){
+  matrix parts=coef(p,u);
+  for(j=1;j<=ncols(parts);j++){
+   exponent=deg(parts[1,j]);require62(parts[1,j]==u^exponent && parts[2,j]==1,"SPLIT62_BINARY_MONOMIAL_COEFFICIENT");
+   rebuilt=rebuilt+parts[1,j]*parts[2,j];
+   if(exponent%2==0){even=even+u^(exponent div 2);}else{odd=odd+u^((exponent-1) div 2);}
+  }
+ }
+ require62(rebuilt==p && even^2+u*odd^2==p,"SPLIT62_COMPLETE_POLYNOMIAL_PARITY_IDENTITY");
+ string es=string(even);string os=string(odd);ds=string(denominator62);
+ setring sourceRing62;
+ number e;number o;execute("e=("+es+")/("+ds+");o=("+os+")/("+ds+");");
+ require62(e^2+u*o^2==c,"SPLIT62_RATIONAL_COEFFICIENT_IDENTITY");
+ list ans=e,o;return(ans);
+}
+proc coordinates62(poly f){
+ poly p=reduce(f,GB62);poly original=p;poly rebuilt=0;matrix C[32][1];intvec ex;int pos;number a;
+ while(p!=0){ex=leadexp(p);require62(ex[1]<16 && ex[2]<2,"SPLIT62_CANONICAL_EXPONENTS");pos=1+ex[1]+16*ex[2];a=leadcoef(p);C[pos,1]=C[pos,1]+a;rebuilt=rebuilt+a*squareBasis62[pos];p=p-lead(p);}
+ require62(rebuilt==original,"SPLIT62_COMPLETE_COORDINATE_BINDING");return(C);
+}
+int count62=0;int zeroOdd62=0;int coefficientChecks62=0;int i62;int j62;
+link output62="ASCII:w split-functions62.sing";open(output62);
+write(output62,"// Whole-source square decompositions in retained FIELD61; source ideal binding follows.");
+write(output62,"ideal splitIdeal62;list inputs62;list evenParts62;list oddParts62;");
+for(i62=1;i62<=size(sourceIdeal61);i62++){write(output62,"splitIdeal62["+string(i62)+"]="+string(sourceIdeal61[i62])+";");}
+link table62="ASCII:w split62.tsv";open(table62);write(table62,"id|family|index|zero_odd|source_identity");
+proc decompose62(poly f,string family,int index){
+ matrix coords=coordinates62(f);matrix a=inverse62*coords;poly g=0;poly h=0;int i;list roots;
+ for(i=1;i<=32;i++){
+  require62(a[i,1]==leadcoef(a[i,1]),"SPLIT62_COEFFICIENT_FIELD_ONLY");
+  roots=splitCoefficient62(leadcoef(a[i,1]));coefficientChecks62=coefficientChecks62+1;
+  g=g+roots[1]*squareBasis62[i];h=h+roots[2]*squareBasis62[i];
+ }
+ g=reduce(g,GB62);h=reduce(h,GB62);
+ require62(reduce(g^2+u*h^2+f,GB62)==0,"SPLIT62_WHOLE_SOURCE_DECOMPOSITION");
+ count62=count62+1;int z=(h==0);if(z){zeroOdd62=zeroOdd62+1;}
+ write(output62,"inputs62["+string(count62)+"]="+string(reduce(f,GB62))+";evenParts62["+string(count62)+"]="+string(g)+";oddParts62["+string(count62)+"]="+string(h)+";");
+ write(table62,string(count62)+"|"+family+"|"+string(index)+"|"+string(z)+"|1");
+ if(family=="control"){
+  if(index==1){require62(g==1 && h==0,"SPLIT62_CONSTANT_SQUARE_CONTROL");}
+  if(index==2){require62(g==0 && h==1,"SPLIT62_PARAMETER_ODD_CONTROL");require62(reduce((g+1)^2+u*h^2+f,GB62)!=0,"SPLIT62_CHANGED_ROOT_REJECTED");}
+  if(index==3){require62(g==u && h==0,"SPLIT62_PARAMETER_SQUARE_CONTROL");}
+ }
+ print("SPLIT62_PROGRESS id="+string(count62)+" family="+family+" index="+string(index)+" zero_odd="+string(z));
+ return(1);
+}
+for(j62=1;j62<=32;j62++){decompose62(squareBasis62[j62],"basis",j62);}
+decompose62(1,"control",1);decompose62(u,"control",2);decompose62(u^2,"control",3);
+require62(size(cubicValues61)==324 && size(completeValues61)==76,"SPLIT62_COMPLETE_RETAINED_COHORT");
+for(j62=1;j62<=324;j62++){decompose62(cubicValues61[j62],"cubic",j62);}
+for(j62=1;j62<=76;j62++){decompose62(completeValues61[j62],"mixed",j62);}
+require62(count62==435 && coefficientChecks62==13920,"SPLIT62_ALL435_AND13920_COEFFICIENTS");
+close(output62);close(table62);
+print("SPLIT62_RESULT functions=435 basis_functions=32 controls=3 cubic_functions=324 mixed_functions=76 rational_coefficient_checks="+string(coefficientChecks62)+" whole_source_identities=435 zero_odd="+string(zeroOdd62)+" parameter_odd_control=1 changed_root_rejected=1");
+print("SPLIT62_ALL_CHECKS_PASS");quit;

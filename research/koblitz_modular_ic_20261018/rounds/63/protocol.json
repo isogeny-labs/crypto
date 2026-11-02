@@ -1,0 +1,115 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R63-DEGREE112-GENERATOR",
+  "version": 3,
+  "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
+  "claims": [
+    {
+      "id": "gen112",
+      "class": "exact_computation",
+      "statement": "Direct generator construction on actual marked23 degree112 source verifies all112 standard monomial pairs and all124 complete source-function decompositions"
+    },
+    {
+      "id": "replay112",
+      "class": "exact_computation",
+      "statement": "Fresh actual-source replay checks both full generator/derivative bundles and all124 saved function decompositions without recomputing inverses"
+    }
+  ],
+  "arms": {
+    "reference": "accepted R51 structured source and R52 field argument, R62 complete435 direct/matrix control and abstract generator formula",
+    "candidate": "direct derivative generator pairs in degree7 base followed by degree16 extension",
+    "positive": [
+      "all112 standard monomials and generated pairs",
+      "actual degree7 base equation binding",
+      "actual degree16 lambda equation and monic linear nu",
+      "two checked derivative inverses",
+      "exact1/x/x\u00b2 controls"
+    ],
+    "negative": [
+      "changed root for parameter x rejected"
+    ],
+    "baseline": {
+      "not_applicable_reason": "exact identities, no performance comparison"
+    },
+    "A_A": {
+      "not_applicable_reason": "deterministic complete identities"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "exactsource/donors",
+      "112basis+3controls+9named=124",
+      "1200seconds/4GiB",
+      "oneSingular/FLINTthread",
+      "one mathematical job"
+    ],
+    "measured": [
+      "exit/errors",
+      "all source identities",
+      "native UTC",
+      "binary/source hashes"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "complete deterministic identities",
+    "seeds": [
+      63
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "complete exact identities"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "not applicable"
+  },
+  "metrics": [
+    "source degree112 and112 standard monomials",
+    "112 generated square pairs",
+    "124 whole-source decompositions",
+    "two generator and derivative inverse certificates",
+    "exact controls and changed-root rejection",
+    "actual scalar parity checks; no fixed prediction"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh check112-01 CHECK112.sing CHECK112_ALL_CHECKS_PASS",
+    "backend": "original manually authorized local Singular",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 63,
+    "CPU_affinity": "not pinned",
+    "queue": "one mathematical job at a time; R62 terminal custody first",
+    "source_gate": "copied source/protocol/driver bytes matchGit; all donor hashes",
+    "checkpoint": "existing checkpoint gate; immutable raw files"
+  },
+  "stopping": {
+    "accept": "exit0/exactmarker/no whitespace-question-mark errors and allassertions",
+    "failure": "retain caps/errors/partials; no smaller replacement; fresh source freeze before repairs"
+  },
+  "analysis": {
+    "kind": "exact generic source normal forms and rational coefficient parity",
+    "comparative": false
+  },
+  "scope": "field operator, not normalization/selected991 action/polarization or a transfer",
+  "literature": [
+    {
+      "source": "R51/BASE23-STRUCT-PROTOCOL.md;R52/CM.md;R62/GENERATOR-LEAD62.md and audited generator formula",
+      "use": "actual source and complete field/generator hypotheses"
+    },
+    {
+      "url": "https://www.singular.uni-kl.de/index.php/singular.pdf",
+      "use": "native field/coefficient/linalg operations, established R62 APIs"
+    }
+  ],
+  "validation_note": "canonical schema/checker absent selectedindex; manual contract/source checks only",
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "Freeze actual-source replay and all accepted generator payload hashes before first checker data; generator112-01 terminal accepted unchanged"
+  }
+}
