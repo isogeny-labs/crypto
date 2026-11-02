@@ -39,3 +39,12 @@ the cross-ring map. The fresh script maps the source module first and then
 casts its image to a matrix. All 32 columns, rank, inverse products and
 negative controls retain their original acceptance requirements. The first
 attempt's partial values are diagnostic only.
+
+## Version 3 basis orientation repair
+`bridge64-02` reached the mapped source equations and first three basis
+functions but rejected a zero fourth function. The matrix `H` had been
+read by columns. The retained compact PID identity `H*sourceLift=D*I`
+defines its **rows** as normal-order basis coordinates in the power basis.
+The fresh script checks this identity after `z=1/u`, then maps each of all
+32 rows. No failed attempt's partial function is accepted; rank, inverse
+products, source equations and both negatives remain mandatory.

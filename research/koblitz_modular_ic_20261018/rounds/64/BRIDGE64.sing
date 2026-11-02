@@ -18,12 +18,14 @@ require64(oldCoefficient64(oldZ64)==1/u,"BRIDGE64_COEFFICIENT_INVERSION");
 matrix H64=matrix(oldCoefficient64(basis51));
 poly D64=oldCoefficient64(commonDenominator51);
 require64(nrows(H64)==32 && ncols(H64)==32 && D64!=0,"BRIDGE64_COMPACT_PID_BASIS_SHAPE");
+matrix powerLift64=oldCoefficient64(sourceLift51);
+require64(H64*powerLift64==D64*unitmat(32),"BRIDGE64_ROW_ORIENTATION_SOURCE_IDENTITY");
 matrix imageColumns64[32][32];list imageFunctions64;
 int i64;int j64;int k64;intvec exponent64;poly image64;poly remainder64;poly term64;int row64;
 for(j64=1;j64<=32;j64++){
  image64=0;
  for(k64=1;k64<=32;k64++){
-  if(H64[k64,j64]!=0){image64=image64+H64[k64,j64]*l^((k64-1)%16)*(v/u^2)^((k64-1) div 16);}
+  if(H64[j64,k64]!=0){image64=image64+H64[j64,k64]*l^((k64-1)%16)*(v/u^2)^((k64-1) div 16);}
  }
  image64=reduce(image64/D64,actualGB64);
  imageFunctions64[j64]=image64;remainder64=image64;

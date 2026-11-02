@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R64-AFFINE-SOURCE-BRIDGE",
-  "version": 2,
+  "version": 3,
   "goal": "bind the rank32 compact PID order to the actual Koblitz degree32 function field before normalization",
   "claims": [
     {
@@ -28,7 +28,7 @@
   "sample_size": {"instances": 1, "replicates": 1, "warmups": 0, "power": "not applicable"},
   "metrics": ["actual field degree32", "both mapped source equations", "all32 mapped basis functions", "image rank32", "both inverse products", "two changed-input rejections"],
   "execution": {
-    "launcher": "REPLAY_CAS.sh bridge64-02 BRIDGE64.sing BRIDGE64_ALL_CHECKS_PASS",
+    "launcher": "REPLAY_CAS.sh bridge64-03 BRIDGE64.sing BRIDGE64_ALL_CHECKS_PASS",
     "backend": "original manually authorized local Singular",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
@@ -49,6 +49,6 @@
   "validation_note": "canonical schema/checker unavailable in selected index; manual contract and source-byte checks only",
   "amendment": {
     "before_affected_data": true,
-    "reason": "bridge64-01 rejected despite a late marker: Singular cannot resolve source-ring basis51 when matrix-cast occurs before cross-ring mapping. Apply the map to basis51 first, then cast the image to a matrix. Preserve all source/rank/negative checks for fresh attempt02."
+    "reason": "bridge64-01 rejected for cross-ring matrix-cast syntax. bridge64-02 mapped the source equations but rejected a zero fourth image because H was incorrectly read by columns. The retained H*powerLift=D I identity fixes H rows as the normal-order basis coordinates. Check that identity after coefficient inversion, read all32 rows, and preserve every source/rank/negative gate for fresh attempt03."
   }
 }
