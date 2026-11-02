@@ -91,7 +91,7 @@ budget (see section 10). The correctness of S3 is checked in the run: for plante
 point sum is computed with elliptic-curve arithmetic and the planted assignment is asserted to
 zero every equation.
 
-**Solver.** The repository's `f4_fp` is limited to `p < 2^63`, so it cannot run at `p ~ 2^131`. The
+**Solver (disclosure, per the coordinator's note).** No honest 131-bit F_p Groebner/Dreg formulation exists in the repository: `f4_fp`, `pkm_tower_pilot` and `prime_tower` stop at p < 2^63, and the prime `ic.pipeline` has no F4 stage (pair-table MITM at m = 2|3). The formulation below is the repository's own PKM system (tower + S3) written down at 131 bits with a **new** engine; it is not repo code and not what the repo's prime IC does per attempt. Measuring the repo's `ecbench run` method `ic.pipeline` (prime_explicit, prime-abscissa, `mitm:m=2|3`) on the 28 curves is a different instrument, **not done here** (open item; the p2 builder's `p2tool` pattern applies). The repository's `f4_fp` is limited to `p < 2^63`, so it cannot run at `p ~ 2^131`. The
 engine here (`rust/src/engine.rs`, `fp.rs`) is an incremental **Macaulay-matrix (XL-style) sparse
 echelon** over a 3x64-bit Montgomery `F_p`: for degree D = 2, 3, ... it adds the rows `mu * f_i` with
 `deg(mu f_i) = D`, reduces each against the echelon rows held (degrevlex, leading column = largest
@@ -254,7 +254,7 @@ configurations.
   priced into any yield or solve cost.
 * The 27 neighbour slugs are not yet in `docs/curves/registry.json` (AGENTS.md §11: register
   before citing; `python3 scripts/build_curve_registry.py`).
-* The three construction scripts are Python (PARI via cypari2: no Rust SEA / modular-polynomial
+* The three construction scripts are Python (a Rust port driving libpari by dlopen, as `p2_prime_analogues/p2tool/src/pari.rs` does, is an open item; the frozen outputs `neighbours.json`, `tower.json`, `targets.json` are what the run consumes) (PARI via cypari2: no Rust SEA / modular-polynomial
   isogeny code exists here); they build and verify inputs only. Measurement, analysis and all
   result tables are Rust, per AGENTS.md "no Python".
 
