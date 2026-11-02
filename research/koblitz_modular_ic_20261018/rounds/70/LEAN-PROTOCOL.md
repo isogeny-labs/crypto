@@ -24,3 +24,16 @@ field-generic, which is stronger than the binary application; the set
 proof applies the recorded inclusion to the element. Preserve the first
 raw compile failure. Fresh `frobenius-lean70-02` uses the same pinned
 toolchain and separately audited compile result.
+
+## Version 3 direct normalization implication
+
+The accepted native zero-kernel result identifies `V6` with the old
+order. Add definitions of the actual square-preimage chain and prove
+inductively that any square-closed set inside `V0` remains inside every
+step. A six-step equality `V6=O`, together with the trace-dual
+containment of the integral closure, therefore proves `O` is its
+integral closure. This avoids needing a formalization of the full
+Singh--Swanson fixed-point theorem for this particular endpoint.
+The native `V6=O`, source-field/order identities, and trace-dual
+containment are explicit premises; Lean does not verify their CAS
+payloads. Fresh `frobenius-lean70-03` is frozen before compilation.

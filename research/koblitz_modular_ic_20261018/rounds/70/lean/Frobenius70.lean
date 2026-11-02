@@ -50,4 +50,35 @@ theorem stable_sandwich_eq_closure {K : Type*} [Monoid K]
   · intro hx
     exact hCW hx
 
+/-- One descending step retains precisely elements whose square stays inside. -/
+def squarePreimage {K : Type*} [Monoid K] (V : Set K) : Set K :=
+  {x | x ∈ V ∧ x ^ 2 ∈ V}
+
+/-- The finite chain used by the complete native quotient calculations. -/
+def descend {K : Type*} [Monoid K] : ℕ → Set K → Set K
+  | 0, V => V
+  | n + 1, V => squarePreimage (descend n V)
+
+/-- A square-closed integral closure stays in every descending lattice. -/
+theorem closure_subset_descend {K : Type*} [Monoid K]
+    (C V : Set K) (hCV : C ⊆ V) (hsq : ∀ x ∈ C, x ^ 2 ∈ C) :
+    ∀ n, C ⊆ descend n V := by
+  intro n
+  induction n with
+  | zero => simpa [descend] using hCV
+  | succ n ih =>
+      intro x hx
+      exact ⟨ih hx, ih (hsq x hx)⟩
+
+/-- If the sixth exact step is the order, trace-dual containment proves normality. -/
+theorem closure_eq_order_of_six_steps {K : Type*} [Monoid K]
+    (O C V₀ : Set K) (hOC : O ⊆ C) (hCV : C ⊆ V₀)
+    (hsq : ∀ x ∈ C, x ^ 2 ∈ C) (hV6 : descend 6 V₀ = O) :
+    C = O := by
+  apply Set.Subset.antisymm
+  · intro x hx
+    have h : x ∈ descend 6 V₀ := (closure_subset_descend C V₀ hCV hsq 6) hx
+    simpa [hV6] using h
+  · exact hOC
+
 end Frobenius70
