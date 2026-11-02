@@ -169,3 +169,23 @@ Amendment 1 cofactor effect); this does not change any ordering above.
   native uncharged work (system specialisation, grid reading) is listed in the
   `native` field of each JSON line, not priced.
 - Executed on the agent host, sequentially, not on EKS (see Measurement).
+
+## Coordinator review (main session, 2026-11-02)
+
+- **Per-relation figures are modelled, not observed.** PR(λ) and PR(cov) divide
+  measured F4 work per target by a frozen yield (λ or `coverage_exact`). The grid
+  observed 30 hits in 2,700 targets in total, all verified. That count matches
+  coverage and cannot itself rank cells.
+- **The fall in F4 cost is not moved into uncharged work.** The uncharged native
+  counters (`pkm_system_fp_mults_uncharged`, `pkm_grid_fp_mults_uncharged`) are
+  below 0.05% of the charged F4 multiply-adds per target in every cell (largest
+  share: isogeny t = 6, G = 4, 288 vs 7.1e5 per target). Pricing them at
+  w = 0 / 0.1 / 1 does not change any ordering in this README.
+- **What deep guessing approaches.** As G → t each branch system covers a
+  sub-tower of 2^(t−G) elements, so the oracle tends towards enumeration of the
+  base. The measured best cell (isogeny t = 6, G = 4) is 78× below the previous
+  algebraic best in F4 multiply-adds per modelled relation. That is the
+  improvement this lead measures. It is **not** compared with the generic
+  pair-table baseline (`../curve25519_ic_baseline_20261102`) in a common unit, so
+  no distance to rho is claimed. Converting multiply-adds to counted GAE and
+  running both through ecbench is the next step.
