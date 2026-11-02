@@ -298,7 +298,7 @@ Corpus 2026-11-01: 539 claims, 329 on the frontier, 3 resting on a refuted claim
 | 277 | `CEX-RP-JKSST-PROBABILITY` Finite-field relation probability: composite modulus, fixed probability not O(1/p), usefulness not automatic | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
 | 278 | `CEX-SP-SEMAEV15-T2-TRACE` Trace identity gives d_ff = 2 < d_F4 = 4 on Semaev's t = 2 rows | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-SP-T2-TRACE-CHECK |
 | 279 | `FACT-XT-ANOMALOUS-ONLY-L-EQ-P` Only l = p torsion leaks through E(Z/p^2) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 280 | `GAP-FAKE-GAP-INSIDE-BOUNDED` Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1 | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | RT-FAKE-GAP-INSIDE |
+| 280 | `GAP-FAKE-GAP-INSIDE-BOUNDED` Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-FAKE-GAP-INSIDE |
 | 281 | `LB-GG-AHP-GEOMETRIC` AHP: GGM bounds via geometric-search reductions (with preprocessing) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
 | 282 | `LB-GG-CDG-AI-GGM` CDG: auxiliary-input GGM bounds via presampling | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
 | 283 | `LB-GG-NECHAEV-DETERMINISTIC` Nechaev: deterministic generic DLP needs Omega(sqrt r) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |

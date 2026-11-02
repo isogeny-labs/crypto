@@ -90,8 +90,9 @@ So the gap is `k − 1`, unbounded; checked k = 2..8 by both implementations.
 
 - `papers/ic-negative-results/lean/IcNegative/InsideGap.lean` states three things in core
   Lean with `decide +kernel`: the field-equation fall at 4 in two variables; no fall below
-  4 from the field equations alone; and the same fall inside witness A's system. It is
-  pending the repository proof gate.
+  4 from the field equations alone; and the same fall inside witness A's system. The
+  repository proof gate passed it (run 41484047855: target PASS, 44 theorems, 4 of them
+  new, 0 trusted).
 - The step "zero multipliers on further generators leave the fall intact" is argued, not
   formalised.
 - The four-variable witnesses are native only (two implementations), since the Lean

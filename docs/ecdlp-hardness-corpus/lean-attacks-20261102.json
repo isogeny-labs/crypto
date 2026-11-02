@@ -159,7 +159,7 @@
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
       "statement": "With the field equations inside the generating set, for n >= 2 variables and every system F over F_2, d_F(F ∪ S_fe) <= 4, because Y^2 (X^2 + X) + X^2 (Y^2 + Y) = X Y^2 + X^2 Y is a fall at degree 4 made of field equations alone; since d'_F >= 1, d_F(inside) - d'_F <= 3. The bound 3 is attained at n = 4. For n = 1, {X^k, X^k + 1} has d_F(inside) = k and d'_F = 1, so the gap is unbounded.",
-      "scope": "Settles the question posed 2026-11-02 (inside fake-to-true gap). The n >= 2 bound is a one-line hand proof whose key identity is kernel-checked in two variables (pending the gate); d_F(S_fe) = 4 checked for n = 2..8 (Rust) and n = 2..5 (independent Python). It also shows that inside-placement d_F under the equality reading never exceeds 4: the 'trivial' field-equation falls that Ding-Hodges and Petit-Quisquater exclude.",
+      "scope": "Settles the question posed 2026-11-02 (inside fake-to-true gap). The n >= 2 bound is a one-line hand proof whose key identity is kernel-checked in two variables (proof gate run 41484047855); d_F(S_fe) = 4 checked for n = 2..8 (Rust) and n = 2..5 (independent Python). It also shows that inside-placement d_F under the equality reading never exceeds 4: the 'trivial' field-equation falls that Ding-Hodges and Petit-Quisquater exclude.",
       "assumptions": [],
       "source_refs": [
         "S-LEAN-ATTACKS-20261102",
@@ -174,7 +174,7 @@
       "formula": "n >= 2: d_F(inside) <= 4, gap <= 3",
       "evidence_class": "theorem",
       "formal": {
-        "state": "lean_written_unchecked",
+        "state": "kernel_checked",
         "artifacts": [
           {
             "path": "papers/ic-negative-results/lean/IcNegative/InsideGap.lean",
@@ -189,7 +189,7 @@
             "decl": "true_first_fall_inside"
           }
         ],
-        "notes": "Lean: the field-equation fall at 4 in two variables, alone and padded with witness A; that zero multipliers on further generators keep the fall is argued."
+        "notes": "Lean: the field-equation fall at 4 in two variables, alone and padded with witness A; that zero multipliers on further generators keep the fall is argued. lean-proof-gate run 41484047855 (commit 1dec4ed48): papers/ic-negative-results/lean PASS, 44 theorems (4 from InsideGap), 0 trusted."
       }
     },
     {
@@ -290,13 +290,13 @@
       "label": "Bound or break the inside fake-to-true gap",
       "status": "working",
       "priority": 3,
-      "objective": "Settled 2026-11-02: gap <= 3 for n >= 2 (tight at n = 4), unbounded for n = 1 (research/inside_gap_n4_20261102). Remaining: the proof gate on InsideGap.lean, and a 4-variable Lean encoding if the n = 4 gap-3 witness is to be kernel-checked.",
+      "objective": "Settled 2026-11-02: gap <= 3 for n >= 2 (tight at n = 4), unbounded for n = 1 (research/inside_gap_n4_20261102). InsideGap.lean passed the proof gate (run 41484047855). Remaining: a 4-variable Lean encoding if the n = 4 gap-3 witness is to be kernel-checked.",
       "depends_on": [
         "GAP-FAKE-GAP-INSIDE-BOUNDED",
         "CEX-FAKE-GAP-INSIDE-YZ"
       ],
       "acceptance": "A proof reviewed independently, or a witness family checked by two implementations (Lean where it fits the encoding).",
-      "next_step": "Dispatch lean-proof-gate on the branch carrying InsideGap.lean and record the run.",
+      "next_step": "Optional: a 4-variable Lean encoding to kernel-check the gap-3 witness {XYW+XY+W, XZW+XW+1}.",
       "source_refs": [
         "S-LEAN-ATTACKS-20261102"
       ]
