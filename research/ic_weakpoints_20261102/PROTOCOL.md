@@ -37,3 +37,13 @@ Seeds: base 20261102, per-(experiment, p, index) derived (`field::derive`).
 
 Scope: toy sizes (group <= 2^28), exact computation on one 4-core container; not an ecbench session,
 not a leaderboard row, not admitted by the validation gate. A derived crossover is a model output.
+
+## Amendment 1 (2026-11-02, after the frozen arms, before any follow-up data)
+Observed in the frozen arms: pooled (p >= 251) full-relation yield at phi = 1/2 is 0.85x its exact
+hypergeometric expectation, 95% CI [0.73, 0.97], while one-large-prime yield is 1.04x [0.96, 1.11].
+The counts at phi = 1/4, 1/8 are nested subsets of phi = 1/2, so this is one ~2.3 sigma deviation.
+Follow-up arm Y2, fresh seed base 20261103 (independent curves and targets):
+`yield --p 251 --curves 4 --targets 6000 --seed 20261103` and the same at p = 509.
+Decision rule: the deficit is real if the pooled Y2 full ratio at phi = 1/2 has a 95% CI excluding 1
+in the same direction; otherwise the frozen-arm deviation is recorded as noise. Y and Y2 are reported
+separately, then pooled.

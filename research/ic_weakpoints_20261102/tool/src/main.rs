@@ -9,6 +9,7 @@
 mod curve;
 mod field;
 mod poly;
+mod summarize;
 
 use curve::*;
 use field::*;
@@ -29,6 +30,7 @@ fn main() {
         Some("yield") => yield_cmd(&args),
         Some("pipeline") => pipeline(&args),
         Some("selftest") => selftest(),
+        Some("summarize") => summarize::run(args.get(2).map(|s| s.as_str()).unwrap_or("data")),
         _ => eprintln!("usage: ic-weakpoints algebra|yield|pipeline|selftest ..."),
     }
 }
@@ -392,6 +394,7 @@ fn yield_cmd(args: &[String]) {
     let curves = arg(args, "--curves", 2);
     let targets = arg(args, "--targets", 500);
     let seed = arg(args, "--seed", 20261102);
+    let tail = arg(args, "--tail", u64::MAX);
     let phis = [1.0f64, 0.5, 0.25, 0.125];
     for ci in 0..curves {
         let mut rng = Rng(derive(seed, "yield", p, ci));
@@ -408,6 +411,13 @@ fn yield_cmd(args: &[String]) {
             let (dec, adds) = decompose3(&c, &fb, &r, &mut rng);
             adds_total += adds;
             counts.push(dec.len() as u64);
+            if dec.len() as u64 >= tail {
+                let (x, _) = r.unwrap();
+                let xs: std::collections::BTreeSet<usize> = dec.iter().flat_map(|d| d.iter().map(|z| z.0)).collect();
+                let rep = dec.iter().filter(|d| d[0].0 == d[1].0 || d[1].0 == d[2].0).count();
+                let o = point_order(&c, &r, nord);
+                println!("{{\"exp\":\"tail\",\"p\":{},\"curve\":{},\"target\":{},\"count\":{},\"xR\":{:?},\"xR_in_Fp\":{},\"order_R\":{},\"distinct_x_used\":{},\"with_repeated_point\":{}}}", p, ci, counts.len() - 1, dec.len(), &x[..3], f.in_base(&x), o, xs.len(), rep);
+            }
             for (pi, &phi) in phis.iter().enumerate() {
                 let cut = ((phi * nfb as f64).ceil() as usize).max(1);
                 let inside = |d: &Decomp| d.iter().filter(|&&(i, _)| i < cut).count();
