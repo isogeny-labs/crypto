@@ -1,0 +1,14 @@
+# AUDIT MP-lattices-6 (2026-10-31)
+verdict: partially_valid; corrected outcome: supports (narrow: accounting only, m=2 monomial-downset family, k(s) = min(l, min_i s_i//d)).
+reran: run.py (52 s) and m4_closed.py: RESULTS.json and RESULTS_closedform.json reproduce exactly (runtime field aside).
+Code vs protocol: matches (delta=sum k/sum deg, simplex/box+t/weighted/hillclimb/sym orbit). Closed forms (box (M+1-dj)^m; sym C(M-dj+m,m); den via s->M-s symmetry) are correct and agree with brute force at m=2.
+Issues:
+1. Hill-climb arm is a failed search, not evidence. Exact optimum over all 2D staircases (Dinkelbach + DP, my rerun, L=(2,2)): l=5 0.14129 vs box 0.13636; l=10 0.15267/0.15079; l=20 0.15923/0.15854; l=30 0.16158/0.16120; l=40 0.16280/0.16255; l=80 0.16469/0.16460. So at finite l a non-box downset BEATS the box; README "no improvement over the box" is false. Gap shrinks faster than 1/l (3.8e-4, 2.5e-4, 8.9e-5 at l=30,40,80), consistent with the same 1/6 limit, but this was not demonstrated by the submitted code (start at box, single-cell moves, local optimum).
+2. Controls are weak/partly tautological: univariate and bivariate-linear controls are trivial by symmetry; box m=2,3,4 targets are the JM formula 1/(m(m+1)2^(m-2)) which the metric reproduces by construction (same lead monomial, same k). They validate the arithmetic, not the metric's relevance.
+3. Null arm is not a test (stated by construction); metric ignores f except lead monomial, so cannot detect any S_3-specific structure. Correctly disclosed.
+4. Triangularity/validity of non-box shapes (monomials of x^(s-kL) f^k stay inside S) is assumed, not checked. Simplex/weighted shapes score lower anyway, so does not change the conclusion.
+5. m=4 symmetric-orbit lattice is x-variable multisets with x-degrees, NOT e-variables with weighted bounds (e_i <= X^i) and S_5's e-variable lead monomial; so it does not test lever 3 (D4-symmetrised S_5). README discloses this; the sentence "Symmetrisation changes only the finite-l bias" applies to the proxy only. Lever 3 remains unrun.
+6. m=4 only box and sym proxy tried (no weighted/non-box shapes at m=4, no downset optimisation); "sup over shapes at m=4" is not established. m=4 tuple extrapolation in run.py (0.0101/0.0104) is biased, superseded by closed form (disclosed).
+7. Decision rule only constrains m=2; the m=4 primary deliverable has no pre-registered criterion. The squarefree sanity check not run (disclosed). Seed 0 fine; no selection issues; no field/subgroup issues (no arithmetic mod p performed).
+Overclaim: "no gain over box" (item 1); "No route" is fine as accounting. Needed-vs-reach 13.5x is arithmetic (0.169/0.0125).
+Net: the SUPPORTS outcome is consistent with RESULTS.json and my exact m=2 optimisation limit trend, but the hill-climb evidence is invalid and the support is for "box is asymptotically optimal among m=2 downsets" only heuristically.

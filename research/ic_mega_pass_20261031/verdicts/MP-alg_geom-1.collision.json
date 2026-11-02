@@ -1,0 +1,18 @@
+{
+ "idea_id": "MP-alg_geom-1",
+ "skeptic_lens": "prior-art and closure collision",
+ "verdict": "survives_with_fix",
+ "confidence": 0.6,
+ "reason": "No published or closed treatment of Rabinowitsch saturation by (x1+x2)x1x2 on the descended S_3 system was found (3 extended searches plus a corpus grep). The programme names singular loci / semi-normality as an untouched GAP with no card. The closure 'first fall degree is a constant of the presentation' does not cover a changed ideal. Weak point: with field equations the ideal is zero-dimensional and radical. For a generic target no solution has x1=x2 or x_i=0, since that needs xR=x(2P) for P in V, probability about 2^l/2^n. So I:D^inf = I and (B) is I plus a new variable t plus a degree-4 generator. Prediction (B)<=(A)-1 is nearly impossible by construction, and the experiment as designed tests only that padding. The result is likely accounting or a relabelling of the presentation. The nongenericity route (B*D^2<<N) is not opened.",
+ "fix": "Do not run (A) vs (B) on generic targets. (1) Add a control arm: I plus a new variable plus a random degree-4 generator, to separate the padding effect from saturation. (2) Use planted-diagonal targets (xR=x(2P), P in V) and 2-torsion targets, where I:D^inf is a strict subideal, and report the F4 degree drop only there. (3) Report solution counts to show the diagonal is empty for generic targets. (4) Re-state as an ideal-level claim: compare d_F / closure certificates of I and I:D^inf via the Betti or closure route, not by F4 max degree. This ties it to the semi-normality / Betti GAP.",
+ "collisions": [
+  "MAP_closed / BRIEF s2 'First fall degree is a constant of the presentation' (d_ff=2, d_F<=k+2, certified >=5 at n=33-45; d_F depends on presentation, not ideal). Partial: it covers raw presentations, not saturation.",
+  "KN-OPEN-8f3d27, -3c8f51, -d218ec: open d_F growth in n. The idea is a sub-lever of these. KN-OPEN-3c8f51 'Semaev's diagonal' degree-4 Macaulay refutation of unsatisfiable m=2 descents is adjacent, and possibly the same phenomenon.",
+  "Corpus GAP 'Semi-normality (Yokoyama), singular loci, Betti/syzygy tables of Semaev ideal': named untouched, no card. Nearest cards: THM_SEMAEV_FALL1, KN-OPEN-d6ad3f, deferred IDEA-098/152. KR-IC-401ebf / 5931ee / 0d2021 mention Yokoyama only for F_p.",
+  "ECDLP-IDEA-111 (radical ladder ideal with saturated denominators) and ECDLP-IDEA-159 (non-diagonal conormal-polar source blowup): they use saturation or blowup of the source incidence, closed for different hypotheses (target-uniform quotient; prime-field incidence). Not the binary descended d_F.",
+  "KR-IC-889857, KR-IC-f5c584, KR-IC-139da0 (forecloses: first fall degree assumption, trace equation linear polynomial, low first fall degree of Weil descent): refute d_ff-based claims, do not address saturation.",
+  "LEAD-ICP-xline-symmetry-special-j: summation-system rank drops on special loci. Different locus (special j, not the x1=x2 diagonal).",
+  "Literature: Kosters-Yeo arXiv:1503.08001; Kousidis-Wiemers first fall degree arXiv:1906.05594; Petit-Quisquater 2012; Solov'ev 2026 GitHub preprint (weil-descent-s3-dreg, unverified: d_reg 3 for n<=16, 4 for 17-36, 5 for 37-52, roughly linear growth). Those concern d_reg of the unsaturated system. Rabinowitsch generalised: Wang et al. 'Generalized Rabinowitsch Trick'; msolve paper arXiv:2202.13387 (saturation / regularity in general, no ECDLP). None treats the diagonal for Semaev."
+ ],
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-alg_geom-1.collision.json"
+}
