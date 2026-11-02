@@ -18,7 +18,7 @@ The strict positive gate passes all original-16384 twist/F4/F5 cases with a chec
 
 ## Validation and durable evidence
 
-Focused release validation: 53 passed, zero failed, source and compile-time fixture hashes unchanged. Log SHA-256: `7353df2f6921f16aba4237b721da09e0b548a53a39aa861545ed2856febb4817`. The full release library suite is pending at this documentation revision.
+Focused release validation: 53 passed, zero failed, source and compile-time fixture hashes unchanged. Log SHA-256: `7353df2f6921f16aba4237b721da09e0b548a53a39aa861545ed2856febb4817`. Full release library validation passed 6080 tests, zero failed, 125 ignored, with all source and compile-time fixture hashes unchanged. Full-library log SHA-256: `cbdf665f767f0065355c2d4a82dd0915d1f9ebe07f190239ae7b81fe25067f7f`.
 
 Independent review found no concrete blocker in the bound-target handoff. Dense source/target mutation controls cover the actual produced profile. Earlier missing-import, checker-budget and publication-fault failures remain recorded in session logs and S3 checkpoints.
 
