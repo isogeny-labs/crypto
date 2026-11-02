@@ -1,5 +1,4 @@
 import Mathlib.Tactic.LinearCombination
-import Mathlib.Data.ZMod.Basic
 
 namespace Frobenius70
 
@@ -15,11 +14,11 @@ theorem two_row_kernel_zero {K : Type*} [Field K]
   exact ⟨(mul_eq_zero.mp hxmul).resolve_left hdet,
          (mul_eq_zero.mp hymul).resolve_left hdet⟩
 
-/-- R70's saved first two binary rows are (1,0) and (1,1). -/
-theorem saved_row_minor_zero (x y : ZMod 2)
-    (h₁ : (1 : ZMod 2) * x + 0 * y = 0)
-    (h₂ : (1 : ZMod 2) * x + 1 * y = 0) : x = 0 ∧ y = 0 := by
-  have hdet : (1 : ZMod 2) * 1 - 0 * 1 ≠ 0 := by decide
+/-- R70's saved binary rows (1,0) and (1,1) kill the kernel over any field. -/
+theorem saved_row_minor_zero {K : Type*} [Field K] (x y : K)
+    (h₁ : (1 : K) * x + 0 * y = 0)
+    (h₂ : (1 : K) * x + 1 * y = 0) : x = 0 ∧ y = 0 := by
+  have hdet : (1 : K) * 1 - 0 * 1 ≠ 0 := by simp
   exact two_row_kernel_zero 1 0 1 1 x y hdet h₁ h₂
 
 /-- Iterate characteristic-two squaring as used by descending Frobenius. -/
@@ -48,6 +47,7 @@ theorem stable_sandwich_eq_closure {K : Type*} [Monoid K]
     apply hcriterion x
     intro n
     exact hWV (squareIter_mem W hsq hx n)
-  · exact hCW
+  · intro hx
+    exact hCW hx
 
 end Frobenius70

@@ -2,7 +2,7 @@
 
 Four conditional theorems in `lean/Frobenius70.lean`: a generic nonzero
 two-by-two minor kills the two-coordinate kernel; the actual saved R70
-rows `(1,0)` and `(1,1)` instantiate that lemma over `ZMod 2`; a
+rows `(1,0)` and `(1,1)` instantiate a stronger field-generic lemma; a
 square-stable set contains every iterated square; and a set between the
 integral closure and a conductor over-lattice equals the closure if the
 all-iterates integrality criterion is supplied. The criterion itself is
@@ -14,3 +14,13 @@ separately for compile and audit, no virtual cap. One mathematical job at
 a time. No sorry, axioms, `native_decide`, or unsound evaluation. Fresh
 attempt `frobenius-lean70-01` after source freeze. Keep all failed
 compiles/audits; repair under a new source revision and attempt ID.
+
+## Version 2 repair, frozen before the second Lean attempt
+
+`frobenius-lean70-01` failed compilation: `Field (ZMod 2)` was not
+synthesized at the concrete-row lemma, and the final set-inclusion
+direction needed an explicit element argument. The new row theorem is
+field-generic, which is stronger than the binary application; the set
+proof applies the recorded inclusion to the element. Preserve the first
+raw compile failure. Fresh `frobenius-lean70-02` uses the same pinned
+toolchain and separately audited compile result.
