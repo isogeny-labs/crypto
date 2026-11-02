@@ -1418,7 +1418,12 @@ mod tests {
     /// by counting points: small enough that a whole pipeline needs a few
     /// dozen F4 calls.
     fn small_prime_order_instance() -> PrimeInstance {
-        let is_prime = |n: u64| n > 1 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0);
+        let is_prime = |n: u64| {
+            n > 1
+                && (2..)
+                    .take_while(|d| d * d <= n)
+                    .all(|d| !n.is_multiple_of(d))
+        };
         for p in (1009u64..1200).filter(|&p| is_prime(p)) {
             for b in 1..p {
                 let curve = PrimeCurve { p, a: 1, b };
