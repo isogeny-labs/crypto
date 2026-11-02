@@ -1,0 +1,104 @@
+LIB "linalg.lib";
+proc require72(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump72(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../61/runs/trace61-01/trace-polynomial61.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));
+map unitToTable72=tracePolynomial61,u;
+matrix sourceUnit72=unitToTable72(unit61);
+require72(nrows(sourceUnit72)==32 && ncols(sourceUnit72)==1,"LOCAL72_UNIT_SHAPE");
+intmat slots72[32][32];int p72;int a72;int b72;int i72;int j72;int k72;int f72;int step72;int rank72;int oldRank72;int stable72;int branch72;int picked72;int mask72;int maskCount72;int bits72;int w72;int primitive72;int primitiveCount72;int lengthSum72;int ramificationSum72;int localRank72;int expectedRank72;int expectedBranches72;int expectedMasks72;
+for(p72=1;p72<=528;p72++){
+ a72=parents50[p72,1];b72=parents50[p72,2];
+ require72(a72>=1 && a72<=b72 && b72<=32 && slots72[a72,b72]==0,"LOCAL72_UNIQUE_PRODUCT_SLOT");
+ slots72[a72,b72]=p72;slots72[b72,a72]=p72;
+}
+for(i72=1;i72<=32;i72++){for(j72=1;j72<=32;j72++){require72(slots72[i72,j72]>0,"LOCAL72_ALL_PRODUCT_SLOTS");}}
+matrix fiberTable72[32][528];matrix square72[32][32];matrix unitFiber72[32][1];
+matrix image72[32][32];matrix nextImage72[32][32];matrix fixedCandidates72[32][32];
+matrix selected72[32][32];matrix trial72[32][32];matrix idempotents72[32][15];
+matrix operators72[32][480];matrix operator72[32][32];matrix vector72[32][1];matrix other72[32][1];matrix primitiveSum72[32][1];
+intmat primitiveMasks72[4][1];intmat primitiveRanks72[4][1];
+link out72="ASCII:w rational-local72.sing";open(out72);write(out72,"ring rationalLocal72=2,(u),dp;short=0;");
+for(f72=0;f72<=1;f72++){
+ expectedRank72=8;expectedBranches72=4;expectedMasks72=15;
+ if(f72==0){expectedRank72=4;expectedBranches72=2;expectedMasks72=3;}
+ for(p72=1;p72<=528;p72++){for(i72=1;i72<=32;i72++){fiberTable72[i72,p72]=subst(table50[i72,p72],u,f72);}}
+ for(i72=1;i72<=32;i72++){
+  unitFiber72[i72,1]=subst(sourceUnit72[i72,1],u,f72);
+  for(j72=1;j72<=32;j72++){square72[i72,j72]=fiberTable72[i72,slots72[j72,j72]];}
+ }
+ require72(square72*unitFiber72==unitFiber72 && unitFiber72!=matrix(0,32,1),"LOCAL72_UNIT_SQUARE");
+ image72=unitmat(32);oldRank72=32;stable72=0;step72=0;
+ while(stable72==0 && step72<32){
+  nextImage72=square72*image72;rank72=mat_rk(nextImage72);step72++;
+  require72(rank72<=oldRank72,"LOCAL72_NESTED_FROBENIUS_RANK");
+  image72=nextImage72;if(rank72==oldRank72){stable72=1;}oldRank72=rank72;
+ }
+ require72(stable72==1 && rank72==expectedRank72,"LOCAL72_R71_REDUCED_DIMENSION");
+ require72(square72*square72*image72==image72,"LOCAL72_ALL_RESIDUE_DEGREE_TWO");
+ fixedCandidates72=(square72+unitmat(32))*image72;
+ branch72=mat_rk(fixedCandidates72);
+ require72(branch72==expectedBranches72 && branch72*2==rank72,"LOCAL72_R71_BRANCH_COUNT");
+ require72(square72*fixedCandidates72==fixedCandidates72,"LOCAL72_FIXED_IMAGE");
+ selected72=matrix(0,32,32);picked72=0;
+ for(j72=1;j72<=32;j72++){
+  trial72=selected72;
+  for(i72=1;i72<=32;i72++){trial72[i72,picked72+1]=fixedCandidates72[i72,j72];}
+  if(mat_rk(trial72)>picked72){selected72=trial72;picked72++;}
+ }
+ require72(picked72==branch72,"LOCAL72_COMPLETE_FIXED_BASIS");
+ maskCount72=1;for(j72=1;j72<=branch72;j72++){maskCount72=2*maskCount72;}maskCount72--;
+ require72(maskCount72==expectedMasks72,"LOCAL72_COMPLETE_IDEMPOTENT_COUNT");
+ for(mask72=1;mask72<=maskCount72;mask72++){
+  bits72=mask72;vector72=matrix(0,32,1);
+  for(j72=1;j72<=branch72;j72++){
+   if(bits72!=2*(bits72/2)){for(i72=1;i72<=32;i72++){vector72[i72,1]=vector72[i72,1]+selected72[i72,j72];}}
+   bits72=bits72/2;
+  }
+  require72(bits72==0 && vector72!=matrix(0,32,1) && square72*vector72==vector72,"LOCAL72_EVERY_FIXED_VECTOR_IDEMPOTENT");
+  for(i72=1;i72<=32;i72++){idempotents72[i72,mask72]=vector72[i72,1];}
+  operator72=matrix(0,32,32);
+  for(j72=1;j72<=32;j72++){for(i72=1;i72<=32;i72++){
+   if(vector72[i72,1]!=0){for(k72=1;k72<=32;k72++){operator72[k72,j72]=operator72[k72,j72]+vector72[i72,1]*fiberTable72[k72,slots72[i72,j72]];}}
+  }}
+  require72(operator72*operator72==operator72 && operator72*unitFiber72==vector72,"LOCAL72_FULL_PRODUCT_IDEMPOTENT");
+  for(i72=1;i72<=32;i72++){for(j72=1;j72<=32;j72++){operators72[i72,32*(mask72-1)+j72]=operator72[i72,j72];}}
+ }
+ primitiveCount72=0;lengthSum72=0;ramificationSum72=0;primitiveSum72=matrix(0,32,1);
+ for(mask72=1;mask72<=maskCount72;mask72++){
+  for(i72=1;i72<=32;i72++){vector72[i72,1]=idempotents72[i72,mask72];for(j72=1;j72<=32;j72++){operator72[i72,j72]=operators72[i72,32*(mask72-1)+j72];}}
+  primitive72=1;
+  for(w72=1;w72<=maskCount72;w72++){
+   if(w72!=mask72){
+    for(i72=1;i72<=32;i72++){other72[i72,1]=idempotents72[i72,w72];}
+    if(operator72*other72==other72){primitive72=0;}
+   }
+  }
+  if(primitive72==1){
+   primitiveCount72++;require72(primitiveCount72<=branch72,"LOCAL72_TOO_MANY_PRIMITIVES");
+   localRank72=mat_rk(operator72);
+   require72(localRank72>0 && localRank72==2*(localRank72/2),"LOCAL72_LOCAL_LENGTH_DIVISIBLE_BY_RESIDUE_DEGREE");
+   primitiveMasks72[primitiveCount72,1]=mask72;primitiveRanks72[primitiveCount72,1]=localRank72;
+   lengthSum72=lengthSum72+localRank72;ramificationSum72=ramificationSum72+localRank72/2;
+   primitiveSum72=primitiveSum72+vector72;
+   print("LOCAL72_FACTOR fiber="+string(f72)+" mask="+string(mask72)+" residue_degree=2 local_length="+string(localRank72)+" ramification="+string(localRank72/2));
+  }
+ }
+ require72(primitiveCount72==branch72 && lengthSum72==32 && ramificationSum72==16 && primitiveSum72==unitFiber72,"LOCAL72_ALL_PRIMITIVES_SUM_AND_RANK");
+ for(a72=1;a72<=primitiveCount72;a72++){for(b72=a72+1;b72<=primitiveCount72;b72++){
+  mask72=primitiveMasks72[a72,1];w72=primitiveMasks72[b72,1];
+  for(i72=1;i72<=32;i72++){other72[i72,1]=idempotents72[i72,w72];for(j72=1;j72<=32;j72++){operator72[i72,j72]=operators72[i72,32*(mask72-1)+j72];}}
+  require72(operator72*other72==matrix(0,32,1),"LOCAL72_PAIRWISE_PRIMITIVE_ORTHOGONALITY");
+ }}
+ dump72(out72,"squareFiber"+string(f72)+"_72",square72);
+ dump72(out72,"stableImage"+string(f72)+"_72",image72);
+ dump72(out72,"fixedBasis"+string(f72)+"_72",selected72);
+ dump72(out72,"allIdempotents"+string(f72)+"_72",idempotents72);
+ write(out72,"int primitiveCount"+string(f72)+"_72="+string(primitiveCount72)+";");
+ for(a72=1;a72<=primitiveCount72;a72++){write(out72,"int primitiveMask"+string(f72)+"_"+string(a72)+"_72="+string(primitiveMasks72[a72,1])+";int primitiveRank"+string(f72)+"_"+string(a72)+"_72="+string(primitiveRanks72[a72,1])+";");}
+ print("LOCAL72_RESULT fiber="+string(f72)+" algebra_dimension=32 reduced_dimension="+string(rank72)+" branches="+string(branch72)+" nonzero_idempotents="+string(maskCount72)+" primitive_count="+string(primitiveCount72)+" local_length_sum="+string(lengthSum72)+" ramification_sum="+string(ramificationSum72));
+}
+close(out72);print("RATIONAL_LOCAL72_ALL_CHECKS_PASS");quit;
