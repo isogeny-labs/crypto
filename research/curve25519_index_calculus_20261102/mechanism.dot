@@ -1,0 +1,53 @@
+digraph Curve25519IC {
+  graph [
+    rankdir=TB,
+    bgcolor="white",
+    pad="0.25",
+    nodesep="0.38",
+    ranksep="0.48",
+    fontname="DejaVu Sans",
+    label="Curve25519 index calculus: exact binding and remaining boundary",
+    labelloc="t",
+    fontsize=18
+  ];
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="DejaVu Sans",
+    fontsize=11,
+    color="#334155",
+    fillcolor="#f8fafc",
+    margin="0.14,0.09"
+  ];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#64748b"];
+
+  rfc [label="RFC 7748 exact target\np = 2^255 - 19\nMontgomery A = 486662\nprime subgroup order l", fillcolor="#dbeafe", color="#2563eb"];
+  map [label="Exact model adapter\nx = u + A/3, y = v\nshort Weierstrass a,b\nBigUint arithmetic", fillcolor="#dcfce7", color="#16a34a"];
+  cert [label="Replay evidence\nIDC1h32739202ad9d0c15\n[l]P = O\nS3(G, 2G, -3G) = 0", fillcolor="#ecfccb", color="#65a30d"];
+
+  generic [label="Generic decomposition track\ntables / rho comparison\ncoordinate change: constants only", fillcolor="#f1f5f9"];
+  pkm [label="Algebraic PKM track\nV = {x : L(x)=0}\nSemaev + tower constraints", fillcolor="#fef3c7", color="#d97706"];
+
+  kummer [label="Kummer in F_p\nv2(p-1)=2\nmax 4 abscissae", fillcolor="#fee2e2", color="#dc2626"];
+  torus [label="norm-one / Dickson\nv2(p+1)=1\nmax 2 abscissae", fillcolor="#fee2e2", color="#dc2626"];
+  remaining [label="remaining factor-base routes\nauxiliary isogeny\nmixed radix", fillcolor="#ffedd5", color="#ea580c"];
+  solver [label="Unresolved decomposition solver\nrequired: T < p^(1/2 - 1/m)\ncurrent harness: p < 2^63\nmeasured degree not bounded", fillcolor="#fee2e2", color="#b91c1c", penwidth=2];
+  outcome [label="Status\nexact adapter verified\nno full-size attack\nnext: frozen isogeny-tower study", fillcolor="#ede9fe", color="#7c3aed", penwidth=2];
+
+  { rank=same; cert; generic; pkm; }
+  { rank=same; kummer; torus; remaining; }
+
+  rfc -> map [label="depress cubic"];
+  map -> cert [label="verify"];
+  map -> generic;
+  map -> pkm;
+  pkm -> kummer [label="split binary"];
+  pkm -> torus [label="torus binary"];
+  pkm -> remaining;
+  remaining -> solver [label="must instantiate + solve"];
+  kummer -> outcome [label="too shallow at fixed small m", color="#dc2626"];
+  torus -> outcome [label="too shallow at fixed small m", color="#dc2626"];
+  generic -> outcome [label="no exponent change"];
+  solver -> outcome [label="blocked"];
+  cert -> outcome [label="enabling result", color="#16a34a"];
+}

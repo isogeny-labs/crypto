@@ -1,0 +1,247 @@
+{
+  "id": "IDC1h32739202ad9d0c15",
+  "independence": "issued by examples/curve25519_ic_artifact.rs; replayed by the native checker with 32 additional domain-separated points",
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "proof": null,
+  "schema": "identity.certificate/v1",
+  "seed": 2689102097129279746,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": 27,
+          "op": "const"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "u",
+                  "op": "var"
+                },
+                {
+                  "args": "u",
+                  "op": "var"
+                },
+                {
+                  "args": "u",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "u",
+                      "op": "var"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "u",
+              "op": "var"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "depress the Curve25519 Montgomery cubic by x = u + A/3",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": 3,
+                      "op": "const"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "A",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": 3,
+                      "op": "const"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "A",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": 3,
+                      "op": "const"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "A",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": 3,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": 3,
+                  "op": "const"
+                },
+                {
+                  "args": {
+                    "args": [
+                      {
+                        "args": "A",
+                        "op": "var"
+                      },
+                      {
+                        "args": "A",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": 3,
+                      "op": "const"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "A",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": 2,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": "A",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": -9,
+              "op": "const"
+            },
+            {
+              "args": "A",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "research/curve25519_index_calculus_20261102/README.md; direct integer expansion of the Montgomery-to-short-Weierstrass translation",
+    "variables": [
+      "A",
+      "u"
+    ]
+  },
+  "value_digest": "bd2e6bc2a97fc874d1b4b6406253c3e4fedc0360082b76ba24012c78329c11b7"
+}

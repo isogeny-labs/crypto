@@ -1,0 +1,38 @@
+{
+  "curve": {
+    "base_u": "9",
+    "base_v": "14781619447589544791020593568409986887264606134616475288964881837755586237401",
+    "cofactor": 8,
+    "field_prime": "57896044618658097711785492504343953926634992332820282019728792003956564819949",
+    "montgomery_equation": "v^2 = u^3 + 486662*u^2 + u",
+    "name": "Curve25519",
+    "prime_subgroup_order": "7237005577332262213973186563042994240857116359379907606001950938285454250989"
+  },
+  "implementation_boundary": {
+    "exact_field_arithmetic": "BigUint",
+    "existing_end_to_end_pkm_harness": "single-word p < 2^63; not wired to this exact model",
+    "performance_measurement": false,
+    "semaev_polynomial": "S3 on the exact short-Weierstrass model"
+  },
+  "pkm_binary_tower_limits": {
+    "max_binary_torus_abscissae": 2,
+    "max_kummer_abscissae": 4,
+    "provenance": "derived_exactly_from_p_plus_or_minus_1",
+    "scope": "binary Kummer and norm-one/Dickson towers only; auxiliary-isogeny and mixed-radix PKM constructions remain separate",
+    "v2_p_minus_1": 2,
+    "v2_p_plus_1": 1
+  },
+  "schema": "curve25519-index-calculus-model/v1",
+  "short_weierstrass_adapter": {
+    "a": "19298681539552699237261830834781317975544997444273427339909597334573241639236",
+    "b": "55751746669818908907645289078257140818241103727901012315294400837956729358436",
+    "base_x": "19298681539552699237261830834781317975544997444273427339909597334652188435546",
+    "base_y": "14781619447589544791020593568409986887264606134616475288964881837755586237401",
+    "inverse": "u = x - A/3; v = y",
+    "map": "x = u + A/3; y = v",
+    "provenance": "derived_exactly_mod_p",
+    "x_shift_A_over_3": "19298681539552699237261830834781317975544997444273427339909597334652188435537"
+  },
+  "standard_source": "RFC 7748 section 4.1",
+  "status": "exact_model_adapter_not_an_attack"
+}
