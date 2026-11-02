@@ -1,4 +1,4 @@
-import Mathlib.Tactic.Omega
+import Init.Omega
 
 namespace FiveFiber73
 

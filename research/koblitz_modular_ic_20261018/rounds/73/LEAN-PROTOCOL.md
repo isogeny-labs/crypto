@@ -18,3 +18,11 @@ separate R72/R65 tame exponent arithmetic at `z=1`.
 
 No EKS, Diem, freezer, Conductor claim, merge, or retarget. Preserve
 failed compile/audit attempts and freeze repairs before a fresh run.
+
+## Version 2 import repair, frozen before attempt 02
+
+`degree-five-lean73-01` failed compilation before theorem checking:
+the pinned mathlib build lacks `Mathlib.Tactic.Omega.olean`. The pinned
+Lean core has `Init.Omega.olean`; import that module instead. The
+three theorem statements, proof tactic, audit and resource gates are
+unchanged. Retain the failed first compile and use a fresh attempt ID.
