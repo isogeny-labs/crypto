@@ -1097,6 +1097,45 @@ pub fn subspace_triple_oracle(
     (found, muls)
 }
 
+/// Four-point oracle: `R = s_k P_k + (triple)` for every `P_k` in the base,
+/// with the triple from [`subspace_triple_oracle`] on `R ∓ P_k`.  Keeps the
+/// decompositions with `k` above every other index (each quadruple once)
+/// and the shorter ones met on the way.  Costs about `2|F|` triple-oracle
+/// calls, i.e. `4|F|²` pair tests a residual.
+pub fn subspace_quad_oracle(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    r: &Pt3,
+    rng: &mut StdRng,
+) -> (Vec<Vec<(usize, i64)>>, u64) {
+    let curve = &inst.curve;
+    let (mut found, mut muls) = subspace_triple_oracle(inst, base, r, rng);
+    for (k, pk) in base.points.iter().enumerate() {
+        for s_k in [1i64, -1] {
+            let y = if s_k == 1 {
+                curve.sub(r, pk)
+            } else {
+                curve.add(r, pk)
+            };
+            if y.inf {
+                continue;
+            }
+            let (triples, m) = subspace_triple_oracle(inst, base, &y, rng);
+            muls += m;
+            for t in triples {
+                if t.len() == 3 && t.iter().all(|&(idx, _)| idx < k) {
+                    let mut terms = t;
+                    terms.push((k, s_k));
+                    found.push(terms);
+                }
+            }
+        }
+    }
+    found.sort();
+    found.dedup();
+    (found, muls)
+}
+
 // ── Gaudry's O(1) solve: symmetrised S₄, Macaulay matrix, eigenvalues ────
 
 /// Sparse polynomial over `F_{p³}` in four variables, exponents ≤ 255.
@@ -3074,11 +3113,11 @@ pub struct GaudryReport {
     pub la_fp_equiv: f64,
     /// Large primes: the small base `|F'|` (`= |F|` when unused), the
     /// maximum number of large primes accepted per relation, the
-    /// decompositions by number of large primes (`0, 1, 2, ≥ 3`), and
+    /// decompositions by number of large primes (`0, 1, 2, 3, ≥ 4`), and
     /// the full relations produced by eliminating large primes.
     pub small_base: usize,
     pub max_large_primes: u8,
-    pub lp_histogram: [u64; 4],
+    pub lp_histogram: [u64; 5],
     pub lp_full_relations: u64,
 }
 
@@ -3112,6 +3151,10 @@ pub struct GaudryOptions {
     /// it in discarded residuals; which side of that trade wins is
     /// [`GaudryReport::lp_abandoned`] against the fitted exponent.
     pub max_merge_level: u8,
+    /// Points per decomposition: 3 (Gaudry's `m = n`, the default) or 4
+    /// (one more summand, [`subspace_quad_oracle`]; meet-in-the-middle only).
+    /// With `arity = 4` a relation can carry up to four large primes.
+    pub arity: u8,
 }
 
 impl Default for GaudryOptions {
@@ -3125,6 +3168,7 @@ impl Default for GaudryOptions {
             small_base: 0,
             max_large_primes: 0,
             max_merge_level: 0,
+            arity: 3,
         }
     }
 }
@@ -3669,6 +3713,10 @@ pub fn run_gaudry_opts(
         h > 0 && !h.is_multiple_of(n),
         "cofactor must be invertible modulo n"
     );
+    assert!(
+        opts.arity == 3 || (opts.arity == 4 && solver == Solver::MeetInTheMiddle && !cross_check),
+        "arity must be 3, or 4 with the meet-in-the-middle oracle and no cross-check"
+    );
     let mut rng = StdRng::seed_from_u64(seed ^ 0x9A0D);
     curve.reset();
     let start = Instant::now();
@@ -3749,7 +3797,7 @@ pub fn run_gaudry_opts(
         la_fp_equiv,
         small_base: small,
         max_large_primes: max_lp,
-        lp_histogram: [0; 4],
+        lp_histogram: [0; 5],
         lp_full_relations: 0,
     };
     let mut la = std::time::Duration::ZERO;
@@ -3781,6 +3829,12 @@ pub fn run_gaudry_opts(
         };
         let r = curve.add(&subgroup_residual, &torsion);
         let decs = match solver {
+            Solver::MeetInTheMiddle if opts.arity == 4 => {
+                let (decs, muls) = subspace_quad_oracle(inst, base, &r, &mut rng);
+                rep.oracle_fp_muls += muls;
+                rep.pair_tests += 4 * (base.len() as u64) * (base.len() as u64);
+                decs
+            }
             Solver::MeetInTheMiddle => {
                 let (decs, muls) = subspace_triple_oracle(inst, base, &r, &mut rng);
                 rep.oracle_fp_muls += muls;
@@ -3869,7 +3923,7 @@ pub fn run_gaudry_opts(
             cols.push((small, (n - mm(h % n, b, n)) % n));
             cols.sort_unstable();
             let lp_count = cols.iter().filter(|&&(c, _)| c > small).count();
-            rep.lp_histogram[lp_count.min(3)] += 1;
+            rep.lp_histogram[lp_count.min(4)] += 1;
             if lp_count > max_lp as usize {
                 continue;
             }
@@ -4743,6 +4797,27 @@ mod tests {
         assert!(lp.lp_full_relations > 0, "{lp:?}");
         assert!(lp.lp_histogram[1] + lp.lp_histogram[2] > 0, "{lp:?}");
         assert_eq!(lp.la_unknowns, base.len() / 3 + 1);
+    }
+
+    #[test]
+    fn arity_four_with_four_large_primes_recovers_the_planted_logarithm() {
+        let inst = generate_instance3(31, 5);
+        let mut rng = StdRng::seed_from_u64(3);
+        let base = SubspaceBase::build(&inst, &mut rng);
+        let rep = run_gaudry_opts(
+            &inst,
+            &base,
+            1,
+            &GaudryOptions {
+                max_residuals: 200_000,
+                small_base: (base.len() as f64).powf(0.75).ceil() as usize,
+                max_large_primes: 4,
+                arity: 4,
+                ..GaudryOptions::default()
+            },
+        );
+        assert_eq!(rep.correct, Some(true), "{rep:?}");
+        assert!(rep.lp_histogram[4] > 0, "{rep:?}");
     }
 
     #[test]

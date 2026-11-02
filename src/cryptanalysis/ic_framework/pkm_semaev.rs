@@ -301,6 +301,54 @@ impl PkmSemaevOracle {
         o
     }
 
+    /// The oracle a pipeline spec names, on the tower its factor base was
+    /// built from: `prime-kummer:t,g` (the `μ_{2^t}` coset), PKM's isogeny
+    /// form `prime-isogeny:t,seed,aux` (the tower is rebuilt
+    /// deterministically from `(p, t, seed, aux)`; the rebuild is not
+    /// charged, since the base's build on the factor-base ledger is the
+    /// same work), or any base with `bits=T[,lo=L]` on the oracle (an
+    /// interval written in bits). ecbench and `ic bench` both build the
+    /// oracle here, so the two harnesses solve the same system.
+    pub fn from_spec(
+        m: u32,
+        spec: &super::PipelineSpec,
+        inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    ) -> Result<Self, String> {
+        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxKind};
+        let fb = &spec.factor_base_params;
+        let oracle = match spec.factor_base.as_str() {
+            "prime-kummer" => Self::new(m, fb.u64("t")? as u32, fb.u64_or("g", 1)?),
+            "prime-isogeny" => {
+                let p = inst.curve.p;
+                let t = fb.u64("t")? as u32;
+                let seed = fb.u64_or("seed", 0)?;
+                let kind = AuxKind::parse(fb.get("aux").unwrap_or("ordinary"), p)?;
+                let mut scratch = GroupOps::default();
+                let tower = if kind == AuxKind::Ordinary {
+                    isogeny_tower(p, t, seed, &mut scratch)?
+                } else {
+                    supersingular_tower(p, t, seed, kind, &mut scratch)?
+                };
+                let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+                Self::new_isogeny(m, t, tower.v.clone(), steps, tower.c)
+            }
+            _ if spec.oracle_params.get("bits").is_some() => Self::new_bits(
+                m,
+                spec.oracle_params.u64("bits")? as u32,
+                spec.oracle_params.u64_or("lo", 0)?,
+            ),
+            other => {
+                return Err(format!(
+                    "oracle `pkm-semaev` solves on prime-kummer or prime-isogeny, or on any base \
+                     with `bits=T` (an interval [lo, lo + 2^T) written in bits), not `{other}`"
+                ))
+            }
+        };
+        let budget = (spec.solver_budget_seconds > 0)
+            .then(|| Duration::from_secs(spec.solver_budget_seconds));
+        Ok(oracle.with_budget(budget))
+    }
+
     /// A wall-clock budget per F4 call (the harness's
     /// `solver_budget_seconds`); `None` is unbounded.
     pub fn with_budget(mut self, budget: Option<Duration>) -> Self {
@@ -1364,6 +1412,136 @@ mod tests {
         assert!(narrow
             .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
             .is_err());
+    }
+
+    /// A prime-order curve `y² = x³ + x + b` over a prime near 1000, found
+    /// by counting points: small enough that a whole pipeline needs a few
+    /// dozen F4 calls.
+    fn small_prime_order_instance() -> PrimeInstance {
+        let is_prime = |n: u64| {
+            n > 1
+                && (2..)
+                    .take_while(|d| d * d <= n)
+                    .all(|d| !n.is_multiple_of(d))
+        };
+        for p in (1009u64..1200).filter(|&p| is_prime(p)) {
+            for b in 1..p {
+                let curve = PrimeCurve { p, a: 1, b };
+                if (4 + 27 * b % p * b) % p == 0 {
+                    continue;
+                }
+                let n = (p + 1) as i64
+                    + (0..p)
+                        .map(|x| i64::from(curve.legendre(curve.rhs(x))))
+                        .sum::<i64>();
+                let n = n as u64;
+                if !is_prime(n) {
+                    continue;
+                }
+                let (x, y) = (1..p)
+                    .find_map(|x| curve.sqrt(curve.rhs(x)).filter(|&y| y != 0).map(|y| (x, y)))
+                    .expect("a point of order n");
+                return PrimeInstance {
+                    name: format!("small-p{p}-b{b}"),
+                    curve,
+                    group_order: n,
+                    r: n,
+                    cofactor: 1,
+                    generator: (x, y),
+                };
+            }
+        }
+        panic!("no prime-order curve in range")
+    }
+
+    /// The two arms of the sweeper's `prime-algebraic` space, end to end
+    /// through `from_spec` (the constructor ecbench and `ic bench` share):
+    /// Semaev's naive interval `prime-abscissa:below=2^T` with `bits=T`, and
+    /// PKM's auxiliary-curve tower `prime-isogeny`.  Both recover the
+    /// planted logarithm, and the naive base is exactly the carriers below
+    /// `2^T`.
+    #[test]
+    fn both_prime_algebraic_arms_solve_through_from_spec() {
+        use crate::cryptanalysis::ic_boundary::Calibration;
+        use crate::cryptanalysis::ic_framework::plugins::PrimeAbscissaBase;
+        use crate::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase;
+        use crate::cryptanalysis::ic_framework::stages::Targets;
+        use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+        let inst = small_prime_order_instance();
+        let curve = &inst.curve;
+        let mut ops = GroupOps::default();
+        let planted = 1 + 7919 % (inst.r - 1);
+        let target = curve.mul(&mut ops, inst.generator_point(), planted);
+        let ictx = InstanceCtx {
+            group: curve,
+            generator: inst.generator_point(),
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+
+        let naive = PrimeAbscissaBase { instance: &inst };
+        let (_, below) = Params::parse_spec("prime-abscissa:below=32").unwrap();
+        let fb = naive.build(&ictx, &below, &mut ops).unwrap();
+        let carriers: Vec<u64> = (1..32)
+            .filter(|&x| curve.legendre(curve.rhs(x)) >= 0)
+            .collect();
+        let mut got = fb.abscissa_list.clone();
+        got.sort_unstable();
+        assert_eq!(got, carriers);
+        let (_, both) = Params::parse_spec("prime-abscissa:below=32,size=4").unwrap();
+        assert!(naive.build(&ictx, &both, &mut ops).is_err());
+
+        let arms: [(&str, &str, &dyn FactorBaseBuilder<PrimeCurve>); 2] = [
+            (
+                "prime-abscissa:below=32",
+                "pkm-semaev:m=2,bits=5,lo=0",
+                &naive,
+            ),
+            (
+                "prime-isogeny:t=4,seed=0,aux=ordinary",
+                "pkm-semaev:m=2",
+                &PrimeIsogenyBase { instance: &inst },
+            ),
+        ];
+        for (fb_spec, or_spec, builder) in arms {
+            let (fb_name, factor_base_params) = Params::parse_spec(fb_spec).unwrap();
+            let (oracle, oracle_params) = Params::parse_spec(or_spec).unwrap();
+            let spec = PipelineSpec {
+                factor_base: fb_name,
+                factor_base_params,
+                oracle,
+                oracle_params,
+                targets: Targets::Random,
+                linalg: "incremental-gauss".into(),
+                max_trials: 20_000,
+                seed: 11,
+                ..Default::default()
+            };
+            let mut o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
+            let report = run_pipeline(
+                &ictx,
+                &spec,
+                builder,
+                &mut o,
+                planted,
+                &Calibration::default(),
+                Some(1.0),
+            )
+            .unwrap_or_else(|e| panic!("{fb_spec}: {e}"));
+            assert!(report.verified, "{fb_spec}: {report:?}");
+        }
+
+        // A base the oracle cannot solve on is refused, not silently run.
+        let spec = PipelineSpec {
+            factor_base: "glv-orbit".into(),
+            oracle: "pkm-semaev".into(),
+            ..Default::default()
+        };
+        assert!(PkmSemaevOracle::from_spec(2, &spec, &inst).is_err());
     }
 
     /// The oracle refuses a base that is not its tower.
