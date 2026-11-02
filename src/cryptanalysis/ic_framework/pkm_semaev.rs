@@ -242,8 +242,9 @@ pub struct PkmSemaevOracle {
     stop_staircase: Option<usize>,
     budget: Option<Duration>,
     crosscheck: bool,
-    /// Hybrid guessing (bits form only): the top `guess` bits of the first
-    /// summand are enumerated, one F4 system per assignment.
+    /// Hybrid guessing (bits and isogeny forms): the top `guess` bits (or
+    /// tower levels) of the first summand are enumerated, one F4 system per
+    /// assignment.
     guess: u32,
     /// Cofactor-fiber lifts (`lifts=1`): the rational `h`-torsion `E(F_q)[h]`,
     /// computed once in `prepare`; `decompose` tries the targets `R + K`.
@@ -445,12 +446,12 @@ impl PkmSemaevOracle {
             o => return Err(format!("pkm-semaev: lifts is 0 or 1, not {o}")),
         };
         if self.guess > 0 {
-            if !matches!(self.membership, Membership::Bits { .. }) {
-                return Err("pkm-semaev: guess=G applies to the bits form only".into());
+            if matches!(self.membership, Membership::Kummer) {
+                return Err("pkm-semaev: guess=G applies to the bits and isogeny forms".into());
             }
             if self.guess >= self.t || self.guess > 12 {
                 return Err(format!(
-                    "pkm-semaev: guess = {} must be below bits = {} and at most 12",
+                    "pkm-semaev: guess = {} must be below the tower height {} and at most 12",
                     self.guess, self.t
                 ));
             }
@@ -493,6 +494,32 @@ impl PkmSemaevOracle {
         Ok(())
     }
 
+    /// Isogeny-form guessing: apply the first `t − G` Vélu maps to every
+    /// element of `V` and group `V` by the value reached at level `t − G`.
+    /// Returns the sorted `(c', members)` pairs, `2^G` of them; each group is
+    /// the zero set of a sub-tower of height `t − G` whose top value is `c'`.
+    fn isogeny_groups(&self, p: u64) -> Vec<(u64, Vec<u64>)> {
+        let Membership::Isogeny { v, steps, .. } = &self.membership else {
+            return Vec::new();
+        };
+        let lev = self.t as usize - self.guess as usize;
+        let mut groups: BTreeMap<u64, Vec<u64>> = BTreeMap::new();
+        for &x in v {
+            let mut y = x % p;
+            for &(xi, tau) in &steps[..lev] {
+                let d = subm(y, xi % p, p);
+                assert!(
+                    d != 0,
+                    "pkm-semaev: a zero of the tower hits a kernel point"
+                );
+                let inv = crate::cryptanalysis::residual_walk::pow_mod(d, p - 2, p);
+                y = addm(y, mulm(tau % p, inv, p), p);
+            }
+            groups.entry(y).or_default().push(x);
+        }
+        groups.into_iter().collect()
+    }
+
     fn build_system(&self, curve: &PrimeCurve) -> Prepared {
         self.build_system_fixed(curve, None)
     }
@@ -504,6 +531,13 @@ impl PkmSemaevOracle {
         let (a, b) = (curve.a % p, curve.b % p);
         let (m, t) = (self.m as usize, self.t as usize);
         let n_t = m * t;
+        // Isogeny guessing: the group (sub-tower) summand 1 is restricted to.
+        let iso_group: Option<(u64, Vec<u64>)> = match (&self.membership, fixed) {
+            (Membership::Isogeny { .. }, Some(a)) => {
+                Some(self.isogeny_groups(p)[a as usize].clone())
+            }
+            _ => None,
+        };
         let n_free = if self.mode == PkmMode::Chain {
             m - 2
         } else {
@@ -548,6 +582,12 @@ impl PkmSemaevOracle {
                 let top = j + 1 == t;
                 if let Membership::Isogeny { steps, c, .. } = &self.membership {
                     let (xi, tau) = (steps[j].0 % p, steps[j].1 % p);
+                    // Guessed summand: the sub-tower tops out at level t − G
+                    // with that group's value; the levels above are unused.
+                    let (top, c) = match &iso_group {
+                        Some((cg, _)) if i == 0 => (j + 1 == t - self.guess as usize, cg),
+                        _ => (top, c),
+                    };
                     rules.push(if top {
                         SquareRule {
                             next: None,
@@ -636,7 +676,10 @@ impl PkmSemaevOracle {
                 }
                 v
             }
-            Membership::Isogeny { v, .. } => v.clone(),
+            Membership::Isogeny { v, .. } => match &iso_group {
+                Some((_, members)) => members.clone(),
+                None => v.clone(),
+            },
             Membership::Bits { lo } => (0..(1u64 << t)).map(|k| (lo + k) % p).collect(),
         };
         Prepared {
@@ -816,7 +859,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             ("lo", "left end of the bit interval, default 0"),
             (
                 "guess",
-                "bits form: enumerate the top G bits of the first summand, one F4 system per assignment (hybrid guessing)",
+                "bits or isogeny form: enumerate the top G bits (tower levels) of the first summand, one F4 system per assignment (hybrid guessing)",
             ),
             (
                 "lifts",
@@ -1440,6 +1483,46 @@ mod tests {
             &|| PkmSemaevOracle::new_isogeny(2, t, v.clone(), steps.clone(), c),
             "isogeny",
             "",
+        );
+    }
+
+    /// Isogeny-form hybrid guessing: same verdicts as the grid and the exact
+    /// decomposable set with 1 and 2 guessed levels; `G ≥ t` is refused.
+    #[test]
+    fn isogeny_guessing_agrees_with_grid() {
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        let inst = instance();
+        let t = 4;
+        let b = PrimeIsogenyBase { instance: &inst };
+        let mut params = Params::default();
+        params.set("t", t.to_string());
+        let fb = b
+            .build(&ctx(&inst), &params, &mut GroupOps::default())
+            .expect("isogeny base");
+        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+        let (v, c) = (tower.v.clone(), tower.c);
+        for g in [1, 2] {
+            agrees_with_grid(
+                &inst,
+                &fb,
+                &|| PkmSemaevOracle::new_isogeny(2, t, v.clone(), steps.clone(), c),
+                &format!("isogeny guess={g}"),
+                &format!(",guess={g}"),
+            );
+        }
+        // The groups partition V into 2^G sets of 2^(t-G).
+        let mut o = PkmSemaevOracle::new_isogeny(2, t, v.clone(), steps.clone(), c);
+        o.guess = 2;
+        let groups = o.isogeny_groups(inst.curve.p);
+        assert_eq!(groups.len(), 4);
+        assert!(groups.iter().all(|(_, m)| m.len() == 4));
+        let (_, params) = Params::parse_spec(&format!("pkm-semaev:m=2,guess={t}")).unwrap();
+        assert!(
+            PkmSemaevOracle::new_isogeny(2, t, v, steps, c)
+                .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+                .is_err(),
+            "guess must be below the tower height"
         );
     }
 
