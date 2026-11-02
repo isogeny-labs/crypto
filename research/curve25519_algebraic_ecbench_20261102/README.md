@@ -128,3 +128,23 @@ w = 0 column and is a lower bound; the price of the F4 work lives only in
 `sessions/` (the two G = 0 record files). Session 1's `records.jsonl`
 (222 KB, over 64 KiB) is not committed: sha256 in `analysis/records.sha256`.
 `REPORT.pdf`: this file rendered.
+
+## Coordinator review (main session, 2026-11-02)
+
+- **What this settles, at k = 20 on one curve:** the algebraic arm is behind the
+  generic baseline at every weight of the band. That includes w = 0, where F4
+  work is free: there it is 2.58× behind on group operations alone. At w = 0.1
+  the F4 term is about 5.6e4× the group-operation term, and the arm is 1.35e5×
+  behind the baseline and 9.55e5× behind rho-neg.
+- **Carrying lead B over (an estimate, not a measurement).** Lead B's deepest
+  cell (t = 10, G = 9) cut modelled F4 cost per relation by about 46× against
+  t = 6, G = 4. Even if all of that carried over to a full solve, the arm would
+  still be about 3e3× behind the baseline at w = 0.1. This is arithmetic on two
+  separate measurements and has not been run.
+- **Open audit defect.** `ecbench verify --replay` fails on the G = 0 session
+  ("differs in phase counts") and fails again independently, while a full
+  re-run matches. A replay mismatch is a validation-gate problem in its own
+  right. The G = 0 row ranks nothing until the cause is found.
+- **Data.** Session 1's `records.jsonl` (222 KB) is in the artifact store
+  (`sessions/s1/.artifacts.json`; `python3 tools/artifacts/artifacts.py pull
+  research/curve25519_algebraic_ecbench_20261102`).
