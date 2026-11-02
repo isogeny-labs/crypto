@@ -120,7 +120,7 @@ fn modulus_string(irr: &IrreduciblePoly) -> String {
 fn alt_moduli(n: u32, count: usize, skip: &IrreduciblePoly) -> Vec<IrreduciblePoly> {
     let nn = n as usize;
     let mut out: Vec<IrreduciblePoly> = Vec::new();
-    let mut same = |lt: &[u32]| {
+    let same = |lt: &[u32]| {
         let mut a = lt.to_vec();
         a.sort_unstable();
         let mut b = skip.low_terms.clone();
