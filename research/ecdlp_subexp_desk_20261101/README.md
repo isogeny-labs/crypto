@@ -1,5 +1,17 @@
 # Sub-exponential ECDLP over prime fields: a desk evaluation against the lead atlas (2026-11-01)
 
+> **Historical snapshot, not the current pursuit queue.** The counts,
+> dispositions, PDF, and generated data below preserve the atlas at
+> `cfc1dae2` (154 leads). The canonical reconciliation later catalogued 160
+> leads, keeps 139 under active pursuit, and excludes only 21 exactly scoped
+> mathematical obstructions. The kernel-checked JKSST audit also showed that
+> the classic xedni end-to-end obstruction is conditional: selected-lift,
+> height, good-reduction/useful-relation, cofactor, and adaptive-trial bridges
+> remain open. Accordingly, `LEAD-TRF-global-lift-small-height` and
+> `LEAD-ICP-char0-lifting-xedni-smoothness` are active next-step leads; broad
+> “xedni is closed” statements below are superseded. The scoped fixed-arity CM
+> obstruction remains closed only within its stated model.
+
 **What this is.** The owner asked for "drastic changes to solve ECDLP in
 sub-exponential time" with "exotic ideas". This note is the desk evaluation
 that AGENTS.md ("Pointers": read the lead atlas and run `--match` before

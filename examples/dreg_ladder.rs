@@ -24,6 +24,20 @@
 //! offset by `M << 48`, the JSON line carries `"m"`, and controls are off
 //! (their density is defined for `M = 3`).
 //!
+//! `--min-sat K` keeps walking the same deterministic stream after the
+//! requested UNSAT quota until at least `K` natural satisfiable draws have
+//! also been emitted (or `--max-draws` is reached).  Extra UNSAT draws seen
+//! while waiting are emitted and retained but are not added to the requested
+//! UNSAT panel.  This lets a preregistered stream supply natural soundness
+//! controls without changing seeds or selecting on a later closure outcome.
+//!
+//! `--audit-jsonl FILE` independently replays a committed complete stream
+//! prefix and compares every generated field except elapsed time.  Audit mode
+//! requires explicit `--expect-m`, `--expect-n`, `--expect-lambda`,
+//! `--expect-seed`, `--expect-count`, `--expect-d-max`, and
+//! `--expect-ffd-max` values, so no scientific parameter is inferred from the
+//! file being audited.
+//!
 //! `--shard I/J` (with `--first-draw F`, default 0) measures a fixed draw
 //! range in parallel processes: process `I` of `J` walks the cell's one
 //! sequential stream to `--max-draws`, sampling every draw (cheap) and
@@ -37,6 +51,9 @@ use crypto_lib::cryptanalysis::koblitz_bench::{
 };
 use rand::rngs::StdRng;
 use rand::SeedableRng;
+use serde_json::{json, Value};
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 fn outcome_json(o: &LadderOutcome) -> String {
     match o {
@@ -70,6 +87,123 @@ fn outcome_short(o: &LadderOutcome) -> String {
     }
 }
 
+fn outcome_value(o: &LadderOutcome) -> Value {
+    match o {
+        LadderOutcome::Satisfiable => json!({"kind": "satisfiable"}),
+        LadderOutcome::Resolved { degree, refuted } => {
+            json!({"kind": "resolved", "degree": degree, "refuted": refuted})
+        }
+        LadderOutcome::AtLeast(degree) => json!({"kind": "at_least", "degree": degree}),
+        LadderOutcome::CapsHit { built } => json!({"kind": "caps_hit", "built": built}),
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn expected_draw_value(
+    draw: &LadderDraw,
+    draw_index: usize,
+    m: usize,
+    n: u32,
+    ell: usize,
+    d_max: u32,
+) -> Value {
+    let mut value = json!({
+        "cell": cell_name(n, ell, m),
+        "n": n,
+        "ell": ell,
+        "surplus": i64::from(n) - (m * ell) as i64,
+        "d_max": d_max,
+        "draw": draw_index,
+        "n_vars": draw.n_vars,
+        "n_eqs": draw.n_eqs,
+        "v_basis": draw.v_basis,
+        "x_r": draw.x_r,
+        "solutions": draw.solutions,
+        "outcome": outcome_value(&draw.outcome),
+        "ffd": draw.ffd,
+    });
+    if m != 3 {
+        value
+            .as_object_mut()
+            .expect("record is an object")
+            .insert("m".into(), Value::from(m));
+    }
+    value
+}
+
+/// Independently replay and verify a generator JSONL.  Every record is the
+/// next draw in the cell's deterministic RNG stream, and every scientific
+/// field is compared with a fresh [`ladder_draw_m`] result.  Only `secs` is
+/// excluded: it is required to be a finite nonnegative number, but its value
+/// is deliberately not compared.
+#[allow(clippy::too_many_arguments)]
+fn audit_jsonl(
+    path: &str,
+    m: usize,
+    n: u32,
+    ell: usize,
+    seed: u64,
+    expected_count: usize,
+    d_max: u32,
+    ffd_max: u32,
+) -> Result<(), String> {
+    if m < 3 {
+        return Err("--expect-m must be at least 3".into());
+    }
+    if ell == 0 || ell as u32 >= n || n >= 64 {
+        return Err("expected cell must satisfy 1 <= lambda < n < 64".into());
+    }
+    if expected_count == 0 {
+        return Err("--expect-count must be positive".into());
+    }
+    if d_max == 0 || ffd_max == 0 {
+        return Err("expected degree bounds must be positive".into());
+    }
+
+    let file = File::open(path).map_err(|e| format!("open audit JSONL {path}: {e}"))?;
+    let mut rng = StdRng::seed_from_u64(cell_seed(seed, n, ell, m));
+    let mut seen = 0usize;
+    for (line_index, line) in BufReader::new(file).lines().enumerate() {
+        let line_number = line_index + 1;
+        let line = line.map_err(|e| format!("read audit JSONL line {line_number}: {e}"))?;
+        if line.trim().is_empty() {
+            return Err(format!("blank audit JSONL line {line_number}"));
+        }
+        if seen >= expected_count {
+            return Err(format!(
+                "extra audit JSONL record at line {line_number}; expected exactly {expected_count}"
+            ));
+        }
+        let mut actual: Value = serde_json::from_str(&line)
+            .map_err(|e| format!("malformed audit JSONL line {line_number}: {e}"))?;
+        let object = actual
+            .as_object_mut()
+            .ok_or_else(|| format!("audit JSONL line {line_number} is not an object"))?;
+        let secs = object
+            .remove("secs")
+            .ok_or_else(|| format!("audit JSONL line {line_number} lacks secs"))?;
+        secs.as_f64()
+            .filter(|secs| secs.is_finite() && *secs >= 0.0)
+            .ok_or_else(|| format!("audit JSONL line {line_number} has invalid non-timing secs"))?;
+
+        let draw = ladder_draw_m(m, n, ell, d_max, ffd_max, &mut rng)
+            .ok_or_else(|| format!("could not rebuild draw {seen} at line {line_number}"))?;
+        let expected = expected_draw_value(&draw, seen, m, n, ell, d_max);
+        if actual != expected {
+            return Err(format!(
+                "audit JSONL line {line_number} differs from deterministic draw {seen}\nexpected: {expected}\nactual:   {actual}"
+            ));
+        }
+        seen += 1;
+    }
+    if seen != expected_count {
+        return Err(format!(
+            "audit JSONL ended after {seen} records; expected exactly {expected_count}"
+        ));
+    }
+    Ok(())
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let flag = |name: &str| {
@@ -79,6 +213,40 @@ fn main() {
             .cloned()
     };
     let num = |name: &str, default: u64| flag(name).and_then(|v| v.parse().ok()).unwrap_or(default);
+    if let Some(path) = flag("--audit-jsonl") {
+        let required = |name: &str| -> Result<u64, String> {
+            let value = flag(name).ok_or_else(|| format!("audit mode requires {name}"))?;
+            value
+                .parse()
+                .map_err(|_| format!("audit mode requires an integer {name}"))
+        };
+        let result = (|| {
+            let m = usize::try_from(required("--expect-m")?)
+                .map_err(|_| "--expect-m does not fit usize".to_string())?;
+            let n = u32::try_from(required("--expect-n")?)
+                .map_err(|_| "--expect-n does not fit u32".to_string())?;
+            let ell = usize::try_from(required("--expect-lambda")?)
+                .map_err(|_| "--expect-lambda does not fit usize".to_string())?;
+            let seed = required("--expect-seed")?;
+            let count = usize::try_from(required("--expect-count")?)
+                .map_err(|_| "--expect-count does not fit usize".to_string())?;
+            let d_max = u32::try_from(required("--expect-d-max")?)
+                .map_err(|_| "--expect-d-max does not fit u32".to_string())?;
+            let ffd_max = u32::try_from(required("--expect-ffd-max")?)
+                .map_err(|_| "--expect-ffd-max does not fit u32".to_string())?;
+            audit_jsonl(&path, m, n, ell, seed, count, d_max, ffd_max)
+        })();
+        match result {
+            Ok(()) => {
+                eprintln!("deterministic draw audit passed: {path}");
+                return;
+            }
+            Err(error) => {
+                eprintln!("deterministic draw audit failed: {error}");
+                std::process::exit(65);
+            }
+        }
+    }
     let cells: Vec<(u32, usize, u32)> = flag("--cells")
         .unwrap_or_else(|| "7:3:7".into())
         .split(',')
@@ -92,6 +260,7 @@ fn main() {
         })
         .collect();
     let want_unsat = num("--unsat", 4) as usize;
+    let min_sat = num("--min-sat", 0) as usize;
     let max_draws = num("--max-draws", 4096) as usize;
     let ffd_max = num("--ffd-max", 5) as u32;
     let controls = num("--controls", 0) as usize;
@@ -112,6 +281,10 @@ fn main() {
     let only_unsat = flag("--unsat-index").map(|v| v.parse::<usize>().expect("--unsat-index K"));
     let control_only = args.iter().any(|a| a == "--control-only");
     assert!(
+        (only_unsat.is_none() && !control_only) || min_sat == 0,
+        "--min-sat applies only to a complete sequential cell stream"
+    );
+    assert!(
         m == 3 || (controls == 0 && !control_only),
         "controls are defined for m = 3 only"
     );
@@ -123,7 +296,7 @@ fn main() {
     });
     if let Some((i, j)) = shard {
         assert_eq!(cells.len(), 1, "one cell per process in this mode");
-        assert!(only_unsat.is_none() && !control_only && controls == 0);
+        assert!(only_unsat.is_none() && !control_only && controls == 0 && min_sat == 0);
         let (n, ell, d_max) = cells[0];
         let first = num("--first-draw", 0) as usize;
         shard_run(
@@ -184,7 +357,7 @@ fn main() {
         let mut unsat: Vec<LadderDraw> = Vec::new();
         let (mut drawn, mut sat) = (0usize, 0usize);
         let mut shape = None;
-        while unsat.len() < want_unsat && drawn < max_draws {
+        while (unsat.len() < want_unsat || sat < min_sat) && drawn < max_draws {
             let d = ladder_draw_m(m, n, ell, d_max, ffd_max, &mut rng).expect("cell builds");
             drawn += 1;
             shape = Some((d.n_vars, d.n_eqs));
@@ -205,7 +378,7 @@ fn main() {
             );
             if d.outcome == LadderOutcome::Satisfiable {
                 sat += 1;
-            } else {
+            } else if unsat.len() < want_unsat {
                 eprintln!(
                     "n={n} ℓ={ell}: unsat draw {} -> {} ({:.1}s)",
                     unsat.len(),
@@ -213,6 +386,11 @@ fn main() {
                     d.secs
                 );
                 unsat.push(d);
+            } else {
+                eprintln!(
+                    "n={n} ℓ={ell}: retained extra unsat draw {} while awaiting natural SAT control",
+                    drawn - 1
+                );
             }
         }
         let (n_vars, n_eqs) = shape.unwrap_or((0, 0));
@@ -441,4 +619,76 @@ fn ladder_terms_per_eq(n: u32, ell: usize, seed: u64) -> usize {
     let x_r = F2mElement::from_biguint(&BigUint::from(rng.gen::<u64>() & ((1u64 << n) - 1)), n);
     let sys = build_decomposition_system(&basis, &x_r, &F2mElement::one(n), 3, &st).unwrap();
     sys.equations.iter().map(|e| e.terms.len()).sum::<usize>() / sys.equations.len().max(1)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn temporary_jsonl(label: &str) -> std::path::PathBuf {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock after epoch")
+            .as_nanos();
+        std::env::temp_dir().join(format!(
+            "dreg_ladder_{label}_{}_{}.jsonl",
+            std::process::id(),
+            nonce
+        ))
+    }
+
+    #[test]
+    fn deterministic_audit_rejects_a_changed_scientific_field() {
+        let (m, n, ell, seed, d_max, ffd_max) = (3, 5, 1, 77, 1, 1);
+        let mut rng = StdRng::seed_from_u64(cell_seed(seed, n, ell, m));
+        let draw = ladder_draw_m(m, n, ell, d_max, ffd_max, &mut rng).expect("small draw");
+        let mut record = expected_draw_value(&draw, 0, m, n, ell, d_max);
+        record
+            .as_object_mut()
+            .expect("record object")
+            .insert("secs".into(), json!(0.0));
+        let path = temporary_jsonl("changed_field");
+        std::fs::write(&path, format!("{record}\n")).expect("write valid fixture");
+        assert!(audit_jsonl(
+            path.to_str().expect("UTF-8 path"),
+            m,
+            n,
+            ell,
+            seed,
+            1,
+            d_max,
+            ffd_max
+        )
+        .is_ok());
+
+        record
+            .as_object_mut()
+            .expect("record object")
+            .insert("solutions".into(), Value::from(draw.solutions + 1));
+        std::fs::write(&path, format!("{record}\n")).expect("write changed fixture");
+        let error = audit_jsonl(
+            path.to_str().expect("UTF-8 path"),
+            m,
+            n,
+            ell,
+            seed,
+            1,
+            d_max,
+            ffd_max,
+        )
+        .expect_err("changed solution count must fail");
+        assert!(error.contains("differs from deterministic draw"));
+        std::fs::remove_file(path).expect("remove fixture");
+    }
+
+    #[test]
+    fn deterministic_audit_rejects_blank_records() {
+        let path = temporary_jsonl("blank");
+        std::fs::write(&path, "\n").expect("write blank fixture");
+        let error = audit_jsonl(path.to_str().expect("UTF-8 path"), 3, 5, 1, 77, 1, 1, 1)
+            .expect_err("blank record must fail");
+        assert!(error.contains("blank audit JSONL line"));
+        std::fs::remove_file(path).expect("remove fixture");
+    }
 }
