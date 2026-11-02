@@ -2095,7 +2095,12 @@ mod tests {
     /// 2-torsion point), in short Weierstrass form `x_W = u + A/3`.
     /// Returns the instance and `A/3`.
     fn montgomery_instance() -> (PrimeInstance, u64) {
-        let is_prime = |n: u64| n > 1 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0);
+        let is_prime = |n: u64| {
+            n > 1
+                && (2..)
+                    .take_while(|d| d * d <= n)
+                    .all(|d| !n.is_multiple_of(d))
+        };
         let p = (10_007u64..).find(|&n| n % 8 == 5 && is_prime(n)).unwrap();
         let leg = |v: u64| crate::cryptanalysis::residual_walk::pow_mod(v % p, (p - 1) / 2, p);
         let inv = |v: u64| crate::cryptanalysis::residual_walk::pow_mod(v % p, p - 2, p);
