@@ -1,0 +1,162 @@
+2026-10-31T16:54:59Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 101 --seed 1 --rho-runs 16 --max-residuals 40000000 --json /home/user/crypto/experiments/36_handover_ladder/ic_p101s1.json.part
+e32 ic p=101 seed=1 arm B n=2^22.63 h=16 cols 5 | residuals 21166 unsolved 11 reruns 224 fallbacks Some(235) | rel 6 y 3527.7 | C median 5.9929e5 | S 1.3833e10 entries 3.8324e9 | correct true | 43 s
+2026-10-31T16:55:41Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 101 --seed 1 --walks 16 --pool 16 --json /home/user/crypto/experiments/36_handover_ladder/walk_p101s1.json.part
+e32 walk p=101 seed=1 n=2^22.63 | steps 2007.2 muls (iii) 3.518348e5 per step 175.29 | correct true | 0 s
+2026-10-31T16:55:41Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 101 --seed 2 --rho-runs 16 --max-residuals 40000000 --json /home/user/crypto/experiments/36_handover_ladder/ic_p101s2.json.part
+e32 ic p=101 seed=2 arm B n=2^22.63 h=16 cols 7 | residuals 7106 unsolved 7 reruns 78 fallbacks Some(85) | rel 8 y 888.2 | C median 5.9933e5 | S 4.6597e9 entries 1.2885e9 | correct true | 15 s
+2026-10-31T16:55:56Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 101 --seed 2 --walks 16 --pool 16 --json /home/user/crypto/experiments/36_handover_ladder/walk_p101s2.json.part
+e32 walk p=101 seed=2 n=2^22.63 | steps 1192.4 muls (iii) 2.726858e5 per step 228.68 | correct true | 0 s
+2026-10-31T16:55:57Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 101 --seed 3 --rho-runs 1 --max-residuals 40000000 --json /home/user/crypto/experiments/36_handover_ladder/ic_p101s3.json.part
+e32 ic p=101 seed=3 arm B n=2^22.63 h=16 cols 6 | residuals 9562 unsolved 3 reruns 123 fallbacks Some(126) | rel 7 y 1366.0 | C median 5.9947e5 | S 6.3490e9 entries 1.7411e9 | correct true | 20 s
+2026-10-31T16:56:17Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 101 --seed 3 --walks 16 --pool 16 --json /home/user/crypto/experiments/36_handover_ladder/walk_p101s3.json.part
+e32 walk p=101 seed=3 n=2^22.63 | steps 1549.1 muls (iii) 3.071158e5 per step 198.25 | correct true | 0 s
+2026-10-31T16:56:17Z size p=101 done; spent 0.02 h
+2026-10-31T16:56:17Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 149 --seed 1 --rho-runs 16 --max-residuals 40000000 --json /home/user/crypto/experiments/36_handover_ladder/ic_p149s1.json.part
+2026-10-31T16:56:40Z runner switched: run_ladder.py stopped during p=149 seed=1 (child killed, partial discarded, its wall added to spent_s); run_ladder.sh continues (AGENTS.md: no Python orchestration)
+2026-10-31T16:56:44Z size p=101 done (3 curves); spent 102 s
+2026-10-31T16:56:44Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 149 --seed 1 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p149s1.json.part
+e32 ic p=149 seed=1 arm B n=2^24.88 h=16 cols 5 | residuals 132036 unsolved 27 reruns 987 fallbacks Some(1014) | rel 6 y 22006.0 | C median 6.1036e5 | S 8.6000e10 entries 2.3709e10 | correct true | 257 s
+2026-10-31T17:01:01Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 149 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p149s1.json.part
+e32 walk p=149 seed=1 n=2^24.88 | steps 4056.6 muls (iii) 5.646105e5 per step 139.18 | correct true | 0 s
+2026-10-31T17:01:01Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 149 --seed 2 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p149s2.json.part
+e32 ic p=149 seed=2 arm B n=2^24.88 h=16 cols 7 | residuals 34176 unsolved 11 reruns 275 fallbacks Some(286) | rel 8 y 4272.0 | C median 6.1046e5 | S 2.2353e10 entries 6.1466e9 | correct true | 58 s
+2026-10-31T17:01:59Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 149 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p149s2.json.part
+e32 walk p=149 seed=2 n=2^24.88 | steps 3965.1 muls (iii) 5.542063e5 per step 139.77 | correct true | 0 s
+2026-10-31T17:01:59Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 149 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p149s3.json.part
+e32 ic p=149 seed=3 arm B n=2^24.88 h=16 cols 12 | residuals 5695 unsolved 3 reruns 64 fallbacks Some(67) | rel 13 y 438.1 | C median 6.1076e5 | S 3.8156e9 entries 1.0329e9 | correct true | 11 s
+2026-10-31T17:02:10Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 149 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p149s3.json.part
+e32 walk p=149 seed=3 n=2^24.88 | steps 2988.7 muls (iii) 4.617252e5 per step 154.49 | correct true | 0 s
+2026-10-31T17:02:10Z size p=149 done (3 curves); spent 428 s
+2026-10-31T17:02:10Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 197 --seed 1 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p197s1.json.part
+e32 ic p=197 seed=1 arm B n=2^26.49 h=16 cols 11 | residuals 37794 unsolved 2 reruns 238 fallbacks Some(240) | rel 12 y 3149.5 | C median 6.1841e5 | S 2.4750e10 entries 6.7649e9 | correct true | 72 s
+2026-10-31T17:03:23Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 197 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p197s1.json.part
+e32 walk p=197 seed=1 n=2^26.49 | steps 5454.0 muls (iii) 7.095251e5 per step 130.09 | correct true | 0 s
+2026-10-31T17:03:23Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 197 --seed 2 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p197s2.json.part
+e32 ic p=197 seed=2 arm B n=2^26.49 h=16 cols 15 | residuals 15500 unsolved 2 reruns 90 fallbacks Some(92) | rel 16 y 968.8 | C median 6.1844e5 | S 1.0122e10 entries 2.7711e9 | correct true | 24 s
+2026-10-31T17:03:47Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 197 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p197s2.json.part
+e32 walk p=197 seed=2 n=2^26.49 | steps 5119.2 muls (iii) 6.772713e5 per step 132.30 | correct true | 0 s
+2026-10-31T17:03:47Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 197 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p197s3.json.part
+e32 ic p=197 seed=3 arm B n=2^26.49 h=16 cols 15 | residuals 13489 unsolved 0 reruns 75 fallbacks Some(75) | rel 16 y 843.1 | C median 6.1824e5 | S 8.7850e9 entries 2.4097e9 | correct true | 26 s
+2026-10-31T17:04:14Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 197 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p197s3.json.part
+e32 walk p=197 seed=3 n=2^26.49 | steps 6579.2 muls (iii) 8.174646e5 per step 124.25 | correct true | 0 s
+2026-10-31T17:04:14Z size p=197 done (3 curves); spent 552 s
+2026-10-31T17:04:14Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 269 --seed 1 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p269s1.json.part
+e32 ic p=269 seed=1 arm B n=2^28.29 h=16 cols 15 | residuals 47207 unsolved 4 reruns 201 fallbacks Some(205) | rel 16 y 2950.4 | C median 6.2249e5 | S 3.0692e10 entries 8.4054e9 | correct true | 91 s
+2026-10-31T17:05:45Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 269 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p269s1.json.part
+e32 walk p=269 seed=1 n=2^28.29 | steps 9565.4 muls (iii) 1.117088e6 per step 116.78 | correct true | 1 s
+2026-10-31T17:05:46Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 269 --seed 2 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p269s2.json.part
+e32 ic p=269 seed=2 arm B n=2^28.29 h=16 cols 20 | residuals 15079 unsolved 1 reruns 57 fallbacks Some(58) | rel 21 y 718.0 | C median 6.2258e5 | S 9.7738e9 entries 2.6815e9 | correct true | 25 s
+2026-10-31T17:06:10Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 269 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p269s2.json.part
+e32 walk p=269 seed=2 n=2^28.29 | steps 9478.4 muls (iii) 1.107118e6 per step 116.80 | correct true | 1 s
+2026-10-31T17:06:11Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 269 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p269s3.json.part
+e32 ic p=269 seed=3 arm B n=2^28.29 h=16 cols 16 | residuals 32603 unsolved 0 reruns 149 fallbacks Some(149) | rel 17 y 1917.8 | C median 6.2269e5 | S 2.1251e10 entries 5.8093e9 | correct true | 53 s
+2026-10-31T17:07:04Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 269 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p269s3.json.part
+e32 walk p=269 seed=3 n=2^28.29 | steps 10580.8 muls (iii) 1.213479e6 per step 114.69 | correct true | 1 s
+2026-10-31T17:07:04Z size p=269 done (3 curves); spent 722 s
+2026-10-31T17:07:04Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 397 --seed 1 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p397s1.json.part
+e32 ic p=397 seed=1 arm B n=2^30.53 h=16 cols 30 | residuals 24789 unsolved 3 reruns 63 fallbacks Some(66) | rel 31 y 799.6 | C median 6.3236e5 | S 1.6189e10 entries 4.3942e9 | correct true | 49 s
+2026-10-31T17:07:53Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 397 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p397s1.json.part
+e32 walk p=397 seed=1 n=2^30.53 | steps 24193.6 muls (iii) 2.532751e6 per step 104.69 | correct true | 2 s
+2026-10-31T17:07:55Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 397 --seed 2 --rho-runs 16 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p397s2.json.part
+e32 ic p=397 seed=2 arm B n=2^30.53 h=16 cols 24 | residuals 33726 unsolved 2 reruns 95 fallbacks Some(97) | rel 25 y 1349.0 | C median 6.3197e5 | S 2.2044e10 entries 5.9823e9 | correct true | 77 s
+2026-10-31T17:09:11Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 397 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p397s2.json.part
+e32 walk p=397 seed=2 n=2^30.53 | steps 21438.8 muls (iii) 2.268123e6 per step 105.80 | correct true | 1 s
+2026-10-31T17:09:13Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 397 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p397s3.json.part
+e32 ic p=397 seed=3 arm B n=2^30.53 h=16 cols 25 | residuals 37464 unsolved 2 reruns 106 fallbacks Some(108) | rel 26 y 1440.9 | C median 6.3218e5 | S 2.4497e10 entries 6.6456e9 | correct true | 85 s
+2026-10-31T17:10:37Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 397 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p397s3.json.part
+e32 walk p=397 seed=3 n=2^30.53 | steps 26987.9 muls (iii) 2.799809e6 per step 103.74 | correct true | 2 s
+2026-10-31T17:10:39Z size p=397 done (3 curves); spent 937 s
+2026-10-31T17:10:39Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 557 --seed 1 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p557s1.json.part
+e32 ic p=557 seed=1 arm B n=2^32.49 h=16 cols 36 | residuals 54471 unsolved 0 reruns 79 fallbacks Some(79) | rel 37 y 1472.2 | C median 6.3915e5 | S 3.5674e10 entries 9.6270e9 | correct true | 110 s
+2026-10-31T17:12:29Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 557 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p557s1.json.part
+e32 walk p=557 seed=1 n=2^32.49 | steps 47763.1 muls (iii) 4.802106e6 per step 100.54 | correct true | 2 s
+2026-10-31T17:12:31Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 557 --seed 2 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p557s2.json.part
+e32 ic p=557 seed=2 arm B n=2^32.49 h=16 cols 37 | residuals 42867 unsolved 0 reruns 79 fallbacks Some(79) | rel 38 y 1128.1 | C median 6.3927e5 | S 2.8160e10 entries 7.5840e9 | correct true | 89 s
+2026-10-31T17:14:01Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 557 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p557s2.json.part
+e32 walk p=557 seed=2 n=2^32.49 | steps 56590.8 muls (iii) 5.649112e6 per step 99.82 | correct true | 3 s
+2026-10-31T17:14:04Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 557 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p557s3.json.part
+e32 ic p=557 seed=3 arm B n=2^32.49 h=16 cols 36 | residuals 43676 unsolved 1 reruns 86 fallbacks Some(87) | rel 37 y 1180.4 | C median 6.3910e5 | S 2.8708e10 entries 7.7298e9 | correct true | 90 s
+2026-10-31T17:15:34Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 557 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p557s3.json.part
+e32 walk p=557 seed=3 n=2^32.49 | steps 44004.5 muls (iii) 4.444193e6 per step 100.99 | correct true | 2 s
+2026-10-31T17:15:36Z size p=557 done (3 curves); spent 1234 s
+2026-10-31T17:15:36Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 773 --seed 1 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p773s1.json.part
+e32 ic p=773 seed=1 arm B n=2^34.38 h=16 cols 44 | residuals 102069 unsolved 0 reruns 138 fallbacks Some(138) | rel 45 y 2268.2 | C median 6.4244e5 | S 6.7185e10 entries 1.8035e10 | correct true | 235 s
+2026-10-31T17:19:31Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 773 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p773s1.json.part
+e32 walk p=773 seed=1 n=2^34.38 | steps 89426.2 muls (iii) 8.807026e6 per step 98.48 | correct true | 5 s
+2026-10-31T17:19:36Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 773 --seed 2 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p773s2.json.part
+e32 ic p=773 seed=2 arm B n=2^34.38 h=16 cols 40 | residuals 162300 unsolved 0 reruns 196 fallbacks Some(196) | rel 41 y 3958.5 | C median 6.4236e5 | S 1.0669e11 entries 2.8666e10 | correct true | 346 s
+2026-10-31T17:25:22Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 773 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p773s2.json.part
+e32 walk p=773 seed=2 n=2^34.38 | steps 94679.5 muls (iii) 9.308312e6 per step 98.31 | correct true | 5 s
+2026-10-31T17:25:27Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 773 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p773s3.json.part
+e32 ic p=773 seed=3 arm B n=2^34.38 h=16 cols 48 | residuals 87504 unsolved 0 reruns 123 fallbacks Some(123) | rel 49 y 1785.8 | C median 6.4229e5 | S 5.7595e10 entries 1.5463e10 | correct true | 185 s
+2026-10-31T17:28:32Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 773 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p773s3.json.part
+e32 walk p=773 seed=3 n=2^34.38 | steps 89760.1 muls (iii) 8.835542e6 per step 98.44 | correct true | 5 s
+2026-10-31T17:28:37Z size p=773 done (3 curves); spent 2015 s
+2026-10-31T17:28:37Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 1093 --seed 1 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p1093s1.json.part
+e32 ic p=1093 seed=1 arm B n=2^36.38 h=16 cols 59 | residuals 169192 unsolved 0 reruns 165 fallbacks Some(165) | rel 60 y 2819.9 | C median 6.5268e5 | S 1.1290e11 entries 2.9865e10 | correct true | 382 s
+2026-10-31T17:34:59Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 1093 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p1093s1.json.part
+e32 walk p=1093 seed=1 n=2^36.38 | steps 230375.3 muls (iii) 2.231235e7 per step 96.85 | correct true | 15 s
+2026-10-31T17:35:14Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 1093 --seed 2 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p1093s2.json.part
+e32 ic p=1093 seed=2 arm B n=2^36.38 h=16 cols 71 | residuals 108600 unsolved 1 reruns 85 fallbacks Some(86) | rel 72 y 1508.3 | C median 6.5264e5 | S 7.2363e10 entries 1.9160e10 | correct true | 244 s
+2026-10-31T17:39:18Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 1093 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p1093s2.json.part
+e32 walk p=1093 seed=2 n=2^36.38 | steps 203315.4 muls (iii) 1.972019e7 per step 96.99 | correct true | 12 s
+2026-10-31T17:39:30Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 1093 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p1093s3.json.part
+e32 ic p=1093 seed=3 arm B n=2^36.38 h=16 cols 69 | residuals 109441 unsolved 1 reruns 98 fallbacks Some(99) | rel 70 y 1563.4 | C median 6.5265e5 | S 7.2983e10 entries 1.9314e10 | correct true | 294 s
+2026-10-31T17:44:24Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 1093 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p1093s3.json.part
+e32 walk p=1093 seed=3 n=2^36.38 | steps 171697.2 muls (iii) 1.669459e7 per step 97.23 | correct true | 10 s
+2026-10-31T17:44:34Z size p=1093 done (3 curves); spent 2972 s
+2026-10-31T17:44:34Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 1549 --seed 1 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p1549s1.json.part
+e32 ic p=1549 seed=1 arm B n=2^38.39 h=16 cols 100 | residuals 140545 unsolved 0 reruns 99 fallbacks Some(99) | rel 101 y 1391.5 | C median 6.5405e5 | S 9.3879e10 entries 2.4791e10 | correct true | 387 s
+2026-10-31T17:51:01Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 1549 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p1549s1.json.part
+e32 walk p=1549 seed=1 n=2^38.39 | steps 411291.3 muls (iii) 3.964210e7 per step 96.38 | correct true | 25 s
+2026-10-31T17:51:26Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 1549 --seed 2 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p1549s2.json.part
+e32 ic p=1549 seed=2 arm B n=2^38.39 h=16 cols 90 | residuals 198611 unsolved 0 reruns 129 fallbacks Some(129) | rel 91 y 2182.5 | C median 6.5408e5 | S 1.3263e11 entries 3.5028e10 | correct true | 619 s
+2026-10-31T18:01:45Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 1549 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p1549s2.json.part
+e32 walk p=1549 seed=2 n=2^38.39 | steps 369943.9 muls (iii) 3.568311e7 per step 96.46 | correct true | 27 s
+2026-10-31T18:02:11Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 1549 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p1549s3.json.part
+e32 ic p=1549 seed=3 arm B n=2^38.39 h=16 cols 98 | residuals 127127 unsolved 0 reruns 89 fallbacks Some(89) | rel 99 y 1284.1 | C median 6.5404e5 | S 8.4911e10 entries 2.2424e10 | correct true | 283 s
+2026-10-31T18:06:54Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 1549 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p1549s3.json.part
+e32 walk p=1549 seed=3 n=2^38.39 | steps 425158.6 muls (iii) 4.096459e7 per step 96.35 | correct true | 29 s
+2026-10-31T18:07:23Z size p=1549 done (3 curves); spent 4341 s
+2026-10-31T18:07:23Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 2213 --seed 1 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p2213s1.json.part
+e32 ic p=2213 seed=1 arm B n=2^40.45 h=16 cols 137 | residuals 188895 unsolved 0 reruns 79 fallbacks Some(79) | rel 138 y 1368.8 | C median 6.6735e5 | S 1.2856e11 entries 3.3294e10 | correct true | 345 s
+2026-10-31T18:13:08Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 2213 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p2213s1.json.part
+e32 walk p=2213 seed=1 n=2^40.45 | steps 829360.3 muls (iii) 7.967690e7 per step 96.07 | correct true | 56 s
+2026-10-31T18:14:04Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 2213 --seed 2 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p2213s2.json.part
+e32 ic p=2213 seed=2 arm B n=2^40.45 h=16 cols 140 | residuals 221920 unsolved 0 reruns 107 fallbacks Some(107) | rel 141 y 1573.9 | C median 6.6736e5 | S 1.5109e11 entries 3.9122e10 | correct true | 417 s
+2026-10-31T18:21:01Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 2213 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p2213s2.json.part
+2026-11-01T17:23:58Z interruption: the container restarted during 'walk --p 2213 --seed 2' (started 2026-10-31T18:21:01Z; no output, its wall time unrecorded and not in spent_s). Pinned binaries re-verified (sha256 -c OK). run_ladder.sh restarted; it reruns only the missing walk.
+2026-11-01T17:23:59Z size p=101 done (3 curves); spent 5159 s
+2026-11-01T17:23:59Z size p=149 done (3 curves); spent 5159 s
+2026-11-01T17:23:59Z size p=197 done (3 curves); spent 5159 s
+2026-11-01T17:24:00Z size p=269 done (3 curves); spent 5159 s
+2026-11-01T17:24:00Z size p=397 done (3 curves); spent 5159 s
+2026-11-01T17:24:00Z size p=557 done (3 curves); spent 5159 s
+2026-11-01T17:24:01Z size p=773 done (3 curves); spent 5159 s
+2026-11-01T17:24:01Z size p=1093 done (3 curves); spent 5159 s
+2026-11-01T17:24:01Z size p=1549 done (3 curves); spent 5159 s
+2026-11-01T17:24:01Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 2213 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p2213s2.json.part
+e32 walk p=2213 seed=2 n=2^40.45 | steps 766822.3 muls (iii) 7.368525e7 per step 96.09 | correct true | 43 s
+2026-11-01T17:24:44Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 2213 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p2213s3.json.part
+e32 ic p=2213 seed=3 arm B n=2^40.45 h=16 cols 152 | residuals 151507 unsolved 0 reruns 76 fallbacks Some(76) | rel 153 y 990.2 | C median 6.6737e5 | S 1.0320e11 entries 2.6710e10 | correct true | 404 s
+2026-11-01T17:31:28Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 2213 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p2213s3.json.part
+e32 walk p=2213 seed=3 n=2^40.45 | steps 800903.1 muls (iii) 7.694428e7 per step 96.07 | correct true | 55 s
+2026-11-01T17:32:23Z size p=2213 done (3 curves); spent 5661 s
+2026-11-01T17:32:23Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 3089 --seed 1 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p3089s1.json.part
+e32 ic p=3089 seed=1 arm B n=2^42.37 h=16 cols 191 | residuals 287154 unsolved 0 reruns 67 fallbacks Some(67) | rel 192 y 1495.6 | C median 6.6473e5 | S 1.9457e11 entries 5.0589e10 | correct true | 673 s
+2026-11-01T17:43:36Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 3089 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p3089s1.json.part
+e32 walk p=3089 seed=1 n=2^42.37 | steps 1191287.4 muls (iii) 1.143330e8 per step 95.97 | correct true | 68 s
+2026-11-01T17:44:44Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 3089 --seed 2 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p3089s2.json.part
+e32 ic p=3089 seed=2 arm B n=2^42.37 h=16 cols 193 | residuals 263828 unsolved 0 reruns 83 fallbacks Some(83) | rel 194 y 1359.9 | C median 6.6472e5 | S 1.7885e11 entries 4.6489e10 | correct true | 572 s
+2026-11-01T17:54:16Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 3089 --seed 2 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p3089s2.json.part
+e32 walk p=3089 seed=2 n=2^42.37 | steps 1631224.7 muls (iii) 1.564382e8 per step 95.90 | correct true | 97 s
+2026-11-01T17:55:52Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 3089 --seed 3 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p3089s3.json.part
+e32 ic p=3089 seed=3 arm B n=2^42.37 h=16 cols 177 | residuals 346783 unsolved 0 reruns 102 fallbacks Some(102) | rel 178 y 1948.2 | C median 6.6470e5 | S 2.3500e11 entries 6.1103e10 | correct true | 838 s
+2026-11-01T18:09:51Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 3089 --seed 3 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p3089s3.json.part
+e32 walk p=3089 seed=3 n=2^42.37 | steps 1588676.8 muls (iii) 1.523752e8 per step 95.91 | correct true | 77 s
+2026-11-01T18:11:07Z size p=3089 done (3 curves); spent 7985 s
+2026-11-01T18:11:07Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder ic --p 4337 --seed 1 --rho-runs 1 --max-residuals 40000000 --json experiments/36_handover_ladder/ic_p4337s1.json.part
+e32 ic p=4337 seed=1 arm B n=2^44.33 h=16 cols 282 | residuals 354244 unsolved 1 reruns 85 fallbacks Some(86) | rel 283 y 1251.7 | C median 6.8765e5 | S 2.4841e11 entries 6.2409e10 | correct true | 908 s
+2026-11-01T18:26:16Z run taskset -c 1-3 /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/e32_ladder walk --p 4337 --seed 1 --walks 16 --pool 16 --json experiments/36_handover_ladder/walk_p4337s1.json.part
+2026-11-01T18:27:14Z p=4337 seed=1: walk-fail; stopping for inspection
+2026-11-01T18:27:27Z stop: p=4337 seed=1 walk killed by the session's memory cgroup OOM killer at anon-rss 4.8 GB (dmesg: CONSTRAINT_MEMCG, task e32_ladder); /proc/meminfo had shown >= 8 GB available, the registered gate, but the cgroup limit is lower. The 16-walk pool cannot be reduced without changing the matched reference, so p=4337 is not completed: ic_p4337s1.json is kept as an unpaired record (no matched rho; not in any fit). Ladder reached p=3089 (log2 n = 42.37). Runner exited (exit 2). spent_s = 8952.

@@ -2019,3 +2019,2026 @@ fold cannot pay for the curve's poorer yield.
 
 Either is a separate build: the symmetrised `S₅` over `F_{p⁴}` and a weighted Macaulay solve.  Each
 would be registered with its own falsifier before any code, as E17 and E18 were.
+
+### 9.5 Addendum and E19 pre-registration: the `C₄` lever was taken elsewhere; the method end to end
+
+*Added 2026-10-17, before any E19 code exists.*
+
+**The lever §9.4 named has been built by other lanes; this note does not rebuild it.**  C8
+(`research/gaudry_quartic_d4_20261013/`, PR #1785) ran the `D₄`-symmetrised `S₅` on E17/E18's
+2-torsion construction: `C₄ = 2.54·10¹⁰`, `48×` below the `S₄` form.  Lane `d4-s5`
+(`research/d4_symmetrised_s5_20261015/`) then built the weighted Macaulay solve that §9.4 called
+for, with four unknowns of weights `(2, 2, 2, 1)`, weighted Bézout 512 and degree 26.  It measured
+**`C_w ≈ 1.2`–`1.4·10⁹`** (`854×` below `S₄` at `p = 269`), past §9.4's `≈ 630×` projection.
+Read in E18's frame (`h = 4`, `106` residuals per relation, `r = 0.341`), it puts the handover at
+**`n* ≈ 2^{118.9}`**, against the `ψ` arm's `2^{146.0}`.  The `ψ`-on-the-system alternative of
+§9.4 stays closed: as at `k = 3` (`RESEARCH_GLV_INDEX_CALCULUS.md`), `S₅` is graded only under
+the simultaneous scaling that also moves the target.
+
+**What no lane has done: run the method.**  Every `k = 4` handover in this repository, C8's,
+`d4-s5`'s and E18's, is §11.16's model.  It is assembled from per-phase constants measured in
+separate harnesses: `C` from solves on planted and uniform targets, the yield and `r` from E18's
+meet-in-the-middle stand-in, and rho from E18's walks.  No run has collected relations with the
+`D₄` solve itself, filtered and solved the matrix, and recovered a logarithm.  C8's decision rule
+names that pipeline as the next step.
+
+**E19 — the first end-to-end `k = 4` index calculus with the `D₄` solve (registered here).**  On
+E18's 2-torsion instances (`quartic_folds::generate_translation_instance`, `h ≤ 4`), with E18's
+`τ_T`-folded base `x ∈ x₀ + F_p`:
+
+1. draw targets `R = aG + bQ`;
+2. decompose each with `d4_weighted_s5::solve_weighted` at weighted degree 26, preceded by
+   `weighted_system` and followed by `lift_back`, every multiplication charged;
+3. map the lifted `Y`-quadruple to base points and signs by a charged group check;
+4. keep one decomposition per target, drawn uniformly (E18's rule 2), as a folded row;
+5. filter and solve by §11.7's Wiedemann until `[d]G = Q` verifies;
+6. price the whole run in `F_p` multiplications against the matched negation walk on the same
+   curve (`16` walks).
+
+The total is the instance's `SymmetrisedD4` precompute, target generation, Weil restriction,
+solves, lift-back, the group checks, and the linear algebra at `16` per mod-`n` multiplication.
+Unsolvable targets (C8's degenerate `5 %`) are charged and counted, never dropped.  Sizes:
+`p = 53, 101, 149, 197, 269`, two curves each (`n ≈ 2^{20.9}`–`2^{30.3}`).
+
+| id | quantity | prediction (from C8, `d4-s5` and E18, before any run) | falsified by |
+|:--|:--|:--|:--|
+| G2.9 | correctness | every curve's logarithm recovered; every relation re-added in the group; every solve's decompositions are base points summing to `R` | any failure |
+| G2.10 | residuals per relation, exact oracle | E18's `106` (`83`–`199` per curve) from the stand-in, now from the solve | pooled `y` outside `[70, 160]` |
+| G2.11 | the solve in the pipeline | per-call `C` within `±30 %` of `d4-s5`'s medians at the same `p` (`1.2`–`1.4·10⁹`); the unsolved share `≤ 10 %` | outside the band at any size, or more than `10 %` unsolved |
+| G2.12 | end to end | `S / rho S ≈ 0.584·C/p` (the relation phase, `y·(p/4)·C` against `90.8·p²/2`): `≈ 3·10⁶×` at `p = 269`, `≈ 1.4·10⁷×` at `p = 53`; fitted slope in `n` `−1/4 ± 0.1`; every phase other than the solves `< 10 %` of the total | a measured ratio outside `×2` of the prediction at any size, or a slope outside `[−0.35, −0.15]` |
+| G2.13 | the handover, re-derived from E19's own constants | within `±3` bits of `d4-s5`'s `2^{118.9}` | outside `[2^{115.9}, 2^{121.9}]` |
+
+**What it would and would not say.**  If G2.9–G2.13 hold, the `2^{118.9}` handover rests on
+constants measured inside one pipeline, and only the exponents (`n^{1/4}`, `n^{1/2}`) remain
+extrapolated.  The measured rows are **`10⁶`–`10⁷×` slower than rho**: the distance remaining,
+reported as such, with no speed claimed.  Under the 2026-10-15 success criterion, E19 is a
+**measurement** of the current `k = 4` baseline, not an improvement of it.  **Class:
+accounting** for the method's first measured `S`, and engineering for nothing.
+
+### 9.6 E19 measured: the first end-to-end `k = 4` index calculus, `2.6`–`8.8·10⁶×` from rho
+
+*2026-10-18.*  `experiments/27_quartic_pipeline_d4/run_all.sh` (one curve per invocation,
+`--rho-runs 16`), binary `4e5810598`; raw `p{53,101,149,197,269}s{1,2}.json`, log `run.log`
+(one host restart, p = 101 seed 1 rerun from scratch, recorded there), tables `tables.md`.  Host:
+the 4-vCPU container, shared with E20–E24 for part of the run (operation counts only).
+
+| p | seed | log₂ n | cols | targets | y | unsolved | `C` median | `S` | rho (negation) | `S` / rho |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 53 | 1 | 20.9 | 15 | 1,498 | 93.6 | 2 | `1.37·10⁹` | `2.41·10¹²` | `3.40·10⁵` | `7.08·10⁶` |
+| 53 | 2 | 20.9 | 13 | 1,926 | 137.6 | 5 | `1.37·10⁹` | `3.00·10¹²` | `3.43·10⁵` | `8.75·10⁶` |
+| 101 | 1 | 24.6 | 23 | 2,608 | 108.7 | 0 | `1.39·10⁹` | `3.91·10¹²` | `6.18·10⁵` | `6.33·10⁶` |
+| 101 | 2 | 24.6 | 23 | 2,701 | 112.5 | 0 | `1.39·10⁹` | `4.01·10¹²` | `6.86·10⁵` | `5.85·10⁶` |
+| 149 | 1 | 26.9 | 37 | 3,525 | 92.8 | 0 | `1.40·10⁹` | `5.26·10¹²` | `1.29·10⁶` | `4.09·10⁶` |
+| 149 | 2 | 26.9 | 41 | 2,868 | 68.3 | 0 | `1.40·10⁹` | `4.30·10¹²` | `1.26·10⁶` | `3.40·10⁶` |
+| 197 | 1 | 28.5 | 48 | 7,061 | 144.1 | 0 | `1.41·10⁹` | `1.04·10¹³` | `2.11·10⁶` | `4.91·10⁶` |
+| 197 | 2 | 28.5 | 53 | 4,306 | 79.7 | 0 | `1.41·10⁹` | `6.29·10¹²` | `2.22·10⁶` | `2.83·10⁶` |
+| 269 | 1 | 30.3 | 58 | 11,975 | 203.0 | 0 | `1.41·10⁹` | `1.74·10¹³` | `3.17·10⁶` | `5.51·10⁶` |
+| 269 | 2 | 30.3 | 67 | 6,200 | 91.2 | 0 | `1.41·10⁹` | `9.01·10¹²` | `3.50·10⁶` | `2.57·10⁶` |
+
+All `h = 4`.  Every log recovered; every kept row re-added in the group; no lifted quadruple off
+the base (`Y = 0` never met) or without an exact sign vector; all 320 walks correct.  The solves
+are `100.0 %` of `S` on every curve (everything else `≤ 0.001 %`); unpriced native work at
+`0, 0.1, 1` GAE moves `S / rho` by at most `1.5×` and never reverses the order.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.9 | every log, row and decomposition verified | **holds** |
+| G2.10 | pooled `y = 115.1` | **holds** (`[70, 160]`) |
+| G2.11 | `C` median `1.37`–`1.41·10⁹` (d4-s5's `1.2`–`1.44·10⁹`); unsolved `7` of `44,668` targets | **holds** |
+| G2.12 | measured / registered `0.584·C/p`: per size (mean of two curves) `0.55, 0.81, 0.73, 1.00, 1.43` — inside `×2`; one curve (`p = 53` seed 1) at `0.495`, a hair outside; fitted slope in `n` **`−0.13`**; non-solve phases `0.001 %` | **holds per size; slope falsified** (`[−0.35, −0.15]`): rho's `S` per `√n` carries its set-up at small `n` (`242` at `p = 53` against `92` at `p = 269`), which flattens the fit |
+| G2.13 | handover from E19's own constants `2^{116.7}` (`2^{120.0}` from `p = 269` alone) | **holds** (`[2^{115.9}, 2^{121.9}]`) |
+
+**What it says.**  The `2^{119}` handover that C8, d4-s5 and E18 assembled from separate
+harnesses is reproduced from one pipeline's own constants (`2^{116.7}`).  The method recovers
+logarithms at `k = 4` with every phase priced, and is **`2.6`–`8.8·10⁶×` slower than rho**: the
+distance remaining.  **Class: accounting** (the baseline measured, not moved).  E24 (§9.14) moves it.
+
+### 9.7 Pre-registration of E20–E23: the four directions after E19
+
+*Added 2026-10-17, while E19 runs (5 of 10 curves in), before any E20–E23 code exists.  Owner
+request: pre-register the double-large-prime run and pursue all four directions named in the
+session's review of where `k = 4` cost lives.*
+
+**Where the cost is (E19, five curves so far).**  The weighted `D₄` solve is `100.0 %` of `S`
+on every curve; generation, Weil restriction, lift-back, group checks and the linear algebra
+together are `≤ 0.001 %`.  With the full base the relation phase grows as `p` and the linear
+algebra as `p²`, a fixed share `r` of rho (`0.34` on this family, E18), so the full-base method
+is at best `1/r` faster than rho, past the handover; it shares rho's exponent.  Four
+directions follow, each registered below with its prediction and what would falsify it.
+
+**A structural cost of translation folds, stated before E22 relies on it.**  A translation by
+rational torsion preserves the sum `P₁ + … + P₄`, so a target's decompositions arrive in orbits:
+`8` for `⟨τ_T⟩` (`T` added to an even number of summands), `64` for the full 2-torsion group
+`V₄ = {O, T₁, T₂, T₃}` (tuples in `V₄⁴` summing to `O`).  One row per target survives the fold,
+so the fold halves the columns per factor 2 of the group while the orbit grows by the cube of
+that factor: E18's `106` residuals per relation against `22.5` on `j = 0` is this effect.  The
+automorphism `ψ` does not cluster (`ψ` moves the target).  Derived, to be measured in E22: going
+from `⟨τ_T⟩` to `V₄` costs up to `4×` more targets for the same matrix.
+
+#### E20 — double large primes at `k = 4` on the `τ_T`-folded base (direction 1)
+
+The only lever here that changes the exponent: Gaudry/Diem's double-large-prime variation gives
+`Õ(q^{2−2/n})`, `N^{3/8}` at `n = 4` against rho's `N^{1/2}`; the repository has it at `k = 3`
+(`RESEARCH_RESIDUAL_WALKS.md` §11.7, `N^{4/9}`, `2,599×` rho at `2^{33.1}`) and not at `k = 4`.
+
+- **Protocol.**  On E18/E19's 2-torsion instances (`h ≤ 4`) and `τ_T`-folded base `F`
+  (columns = `τ_T`-classes), a small base `F' ⊂ F` of `⌈|F|^{3/4}⌉` columns (Gaudry's
+  `|F|^{1−1/n}`), chosen uniformly; a relation may carry at most two columns of `F \ F'`; large
+  primes eliminated by §11.7's pivot reduction (one pivot per large prime; cycles in the graph
+  give full relations); filtering and Wiedemann on `F'` until `[d]G = Q` verifies.  Every
+  combined relation is re-added in the group before the solve.
+- **Oracle substitution, declared.**  The decomposition sets come from E18's exact
+  meet-in-the-middle oracle (`mitm_signed`), which returns the same decompositions as the
+  weighted solve (d4-s5's brute-force and meet-in-the-middle agreement; E19's G2.9).  Every
+  target is charged **one weighted solve at E19's pooled per-call `C`** (flat in `p`,
+  `1.37`–`1.40·10⁹` median so far), plus the lift-back and checks at E19's measured shares.
+  This lets E20 reach `p` where the large-prime graph has cycles, which the solve itself cannot
+  reach in this container's budget.  The full-base arm runs on the same stream and the same
+  pricing, so the comparison is paired.
+- **Sizes.**  `p = 269, 521, 1033, 2053`, two curves each; `16` negation walks per curve.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.14 | correctness | every curve's log recovered; every combined relation re-adds to `O` | any failure |
+| G2.15 | at measured sizes | `S_DLP > S_full` at every `p` (the linear algebra is `≈ 0 %` of `S_full`, so shrinking it buys nothing while the targets per full relation rise) | `S_DLP ≤ S_full` at any measured `p` |
+| G2.16 | targets per full relation | `y_DLP / y_full` grows with `p`; fitted exponent in `p` within `[0.25, 1.0]` | outside the band |
+| G2.17 | the crossovers, derived from E20's own constants | `S_DLP = S_full` only past `n ≈ 2^{200}`; DLP below rho only past `2^{200}` | either below `2^{160}` |
+
+**What it would say.**  If G2.15–G2.17 hold, double large primes are the right exponent and the
+wrong constant: at `C ≈ 1.4·10⁹` the solve, not the matrix, decides every size anyone can run,
+and the exponent lever waits on `C`.  That is the reason E21 and E22 exist.  **Class:
+measurement** (a constant and an exponent of a known variant, not an improvement).
+
+#### E21 — the solve's repeated structure: trace replay on the weighted solve (direction 2a, 2c)
+
+Every target's system has the same monomial support; only the coefficients (polynomials in
+`Y_R`) change.  F4Remake's idea, already built for the unweighted solve
+(`gaudry_quartic::solve_system4_traced`, rows reducing to zero skipped; `RESEARCH_COVER_DECOMPOSITION_LEDGER.md`
+§12 measured `2.44×` on an F4 there), is not wired into the weighted `D₄` solve.  E21 adds a
+shape trace to `d4_weighted_s5::solve_weighted`: recorded on a curve's first target, it skips
+the input rows that reduced to zero (`291` of `3,979` at degree 26) and checks leading
+monomials, pivots and quotient dimension on every replay, falling back to the full solve (charged)
+on any mismatch.  It also records which pivots the normal forms reach (`2,877` of `3,688`) as the
+ceiling measurement for direction 2c (the normal forms are the largest phase, `7.4·10⁸` of
+`1.41·10⁹`).
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.18 | agreement | replayed and full solves return identical decomposition sets on every target (`p = 53, 101`, `≥ 200` targets each) | any disagreement |
+| G2.19 | per-call `C`, replayed / full | `÷ 1.03`–`1.20` (zero rows are `7 %` of the rows; the elimination is `34 %` of `C`) | outside the band |
+| G2.20 | fallback rate | `≤ 5 %` of targets at `p ≥ 101` | more |
+| G2.21 | 2c ceiling | the share of echelon pivots the normal forms never reach, measured; registered only as a ceiling on what a reached-pivot-only elimination could save | — (measurement) |
+
+**Class: engineering** (a constant on one phase), and named as such if it holds.
+
+#### E22 — the full 2-torsion symmetry `V₄` on a stable line (direction 2b, with direction 3)
+
+The successor of what `D₄` gave (`48×` over C8's form, `854×` with the weighted solve): with
+three rational 2-torsion points, the group acting on decompositions is `V₄⁴_0 ⋊ S₄` of order
+`64 · 24 = 1536` against `D₄`'s `192`, and the weighted Bézout number would fall from `512` by up
+to `8`.  Two facts, derived before any code, decide its form:
+
+1. **A `V₄`-stable `F_p`-line through `x(O) = ∞` is confined.**  If the base line is
+   `x ∈ a + b·F_p` (any line containing `∞`), `V₄` moves `∞` to the three 2-torsion abscissas,
+   so all three lie on the line: `f(a + bu) = b³·g(u)` with `g ∈ F_p[u]`.  Base points have
+   `y² = b³·g(u)` with `g(u) ∈ F_p ⊂ (F_{p⁴}^*)²`: if `b³` is a square, `E` is isomorphic over
+   `F_{p⁴}` to a curve over `F_p` and every base point lies in the image of its `F_{p²}`-points
+   (order `≈ p²`, no large prime); if not, the base is empty.  E19's `x₀ + F_p` escapes this only
+   because a single `T` is used: the other two roots are off the line.
+2. **A `V₄`-stable line avoiding `∞` exists and is not confined by this argument.**  Conjugate
+   `V₄` into `PGL₂(F_p)` as `⟨z ↦ −z, z ↦ κ/z⟩`, `κ ∈ F_p^*`: the invariant binary quartics are the
+   pencil `z⁴ + μz² + κ²`, so the curve is `v² = λ(z⁴ + μz² + κ²)` with `μ ∈ F_{p⁴}` free.  With
+   `μ ∉ F_p` the base `z ∈ F_p` is not all-or-nothing.  Whether both involutions are translations
+   by rational 2-torsion (and not negations about a point), and what the base density is, is
+   Stage A.
+
+- **Stage A (gate).**  Construct such curves over `F_{p⁴}` (a quartic model with a rational
+  point, mapped to Weierstrass), with three rational 2-torsion points whose translations induce
+  `z ↦ −z` and `z ↦ κ/z`; verify on points that the base `z ∈ F_p` is stable, that the folds are
+  translations (coefficient `1`), its density, and that relations reach the large subgroup (a
+  meet-in-the-middle stream recovers a logarithm at `p ≈ 101`).  Gate: all four hold.
+- **Stage B (only after A).**  `S₅` written in invariants of `V₄⁴_0 ⋊ S₄`, Weil-restricted,
+  solved with a weighted Macaulay solve on the invariant ring's generators; brute-force agreement
+  on tiny fields; per-call `C` at `p = 101, 269` against `C_w`.
+- **Direction 3 inside E22.**  Targets per relation `y` and decompositions per target measured
+  on the `V₄` base against E19's on the same `p`.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.22 | Stage A | such curves exist at every registered `p`; base density `≈ 1/2`; the folds are translations; a log is recovered | any of the four fails (then E22 stops at A, recorded as a negative) |
+| G2.23 | Stage B, `C_V₄` | `C_w / C_V₄` in `[4, 30]` | outside |
+| G2.24 | direction 3 | decompositions per decomposed target `≈ 64` (against E19's `≈ 8`); `y_V₄ / y_E19` in `[3, 10]` at matched `p` | outside |
+| G2.25 | net | the relation phase moves by `(C_w / C_V₄) / (targets ratio)`: a gain only if `C` falls by more than the target penalty (derived above, up to `4×`) | reported either way; a gain below `1` is a negative |
+
+**Class:** engineering if it holds (a constant), recorded as a negative if Stage A fails.
+
+#### E23 — `ψ` and `τ_T` together on `j = 0` (direction 4): closed by derivation, confirmed on points
+
+§9.4 closed `ψ` on the system.  The remaining question was a base stable under both folds.
+On `j = 0`, `E : y² = x³ + b`, a rational 2-torsion point `T = (x₀, 0)` forces `b = −x₀³`, and
+since `ω ∈ F_p` all three roots `x₀, ωx₀, ω²x₀` are rational.  The line `x ∈ x₀·F_p` **is**
+stable under the whole group `⟨−1, ψ, τ_{T₁}, τ_{T₂}⟩` of order `24`: `ψ(x₀t) = x₀(ωt)`, and
+translation by `(ω^i x₀, 0)` maps `x₀t ↦ x₀(ω^i + 3ω^{2i}/(t − ω^i))` (`f′(x) = 3x²`).  But it
+passes through `∞`, so fact 1 above applies: `y² = x₀³(t³ − 1)`, and either `x₀³` is a square,
+`E ≅ v² = t³ − 1` (defined over `F_p`) and every base point lies in its `F_{p²}`-points, or the
+base is empty.  The line `x₀ + F_p` (E19) is not `ψ`-stable (`(ω − 1)x₀ ∈ F_p` would force
+`x₀ ∈ F_p`).  **Registered result, before the check:** no base on a `j = 0` curve carries both
+folds without confinement.  **Confirmation (a unit test, cheap):** on `j = 0` curves over
+`F_{p⁴}` with rational 2-torsion at small `p`, build the `x₀·F_p` base, verify the order-24
+stability on points, and verify that every base point is killed by `#C(F_{p²})` (or that the base
+is empty).
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.26 | E23 | on every tested curve: the base is stable under the order-24 group, and either empty or killed by `#C(F_{p²})` | any non-confined base point |
+
+**Order of work.**  E23 (a test), E21 (a trace on one solver), E20 (a stream reprocessed with
+priced solves), E22 Stage A, then Stage B if the gate passes.  E19 finishes first in the
+background; none of these change E19's registered protocol.
+
+### 9.8 E23 measured: `ψ` and `τ_T` share no useful base on `j = 0`
+
+*2026-10-17.*  `quartic_folds::e23_tests::psi_and_translations_share_only_a_confined_base_on_j0`:
+`p = 37, 61, 73, 97`, six random `x₀ ∈ F_{p⁴} \ F_p` each, `E : y² = x³ − x₀³`.  On every curve
+the three 2-torsion points are on `E`; where the `x₀·F_p` base is non-empty, every base point's
+`ψ`-image and all three translates stay on the line, and every base point is killed by
+`#C(F_{p²})`, `C : v² = t³ − 1`; the other curves have an empty base.  Both branches occur.
+**G2.26 holds: direction 4 is closed** — the order-24 group exists on that line, and the line
+carries no point of the large subgroup.  Class: a negative, by derivation, confirmed on points.
+
+### 9.9 E20 measured: double large primes at `k = 4` on the folded base — the right exponent, the wrong constant
+
+*2026-10-18.*  Run: `experiments/28_e20_dlp/run.sh` (the ic_next10 ladder, `--arms d4dlp,rho
+--c4-d4 1.40e9`, one thread, 4 GB cap); raw `experiments/28_e20_dlp/ladder.jsonl`; tables
+`experiments/28_e20_dlp/tables.md` (`glv_invariant_experiment_tables`, `e20`).  **Deviations from
+§9.7, stated:** (1) `p = 2053` was dropped, because the ladder's exact three-point oracle table does
+not fit in memory there (`≈ 12 GB`); sizes are `p = 269, 521, 1033`, two curves each.  (2) The
+instances are the ladder's (`generate_translation_instance(p, seed, 16)`); every curve drew
+`h = 4`.  (3) The small base is the first `⌈cols^{3/4}⌉` `τ_T`-classes in base order, as the
+ladder's own DLP arm does, not a uniform draw.  **Prior work found after registration:** the
+ladder (`research/ic_next10_20261014/01-fp4-ladder/`, 2026-10-14) had already run DLP at
+`k = 4` on the *unfolded* `x`-line base, charged at the `S₄` solve's `C₄ = 1.213·10¹²`: DLP
+`1.8`–`4.5×` dearer than plain, crossing it at `#E ≈ 2^{219}`.  E20 adds the `τ_T`-folded `D₄`
+base charged at the weighted `C`, which that run did not have.
+
+| p | log₂ r | trials full | trials DLP | DLP / full | `S` full / rho-neg | `S` DLP / rho-neg |
+|--:|--:|--:|--:|--:|--:|--:|
+| 269 | 30.3 | 10,020 / 6,823 | 16,586 / 11,915 | 1.66 / 1.75 | `4.5·10⁶` / `2.8·10⁶` | `7.4·10⁶` / `4.8·10⁶` |
+| 521 | 34.1 | 10,717 / 12,459 | 25,905 / 31,499 | 2.42 / 2.53 | `1.2·10⁶` / `1.3·10⁶` | `2.8·10⁶` / `3.2·10⁶` |
+| 1033 | 38.1 | 24,319 / 30,321 | 76,761 / 109,255 | 3.16 / 3.60 | `7.2·10⁵` / `9.8·10⁵` | `2.3·10⁶` / `3.5·10⁶` |
+
+Fitted exponents in `p` (theory in brackets): relation full `0.89` (1), linear algebra full `2.12`
+(2), relation DLP `1.39` (3/2), linear algebra DLP `1.89` (3/2), rho `1.95` (2).
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.14 | every log verified (18 of 18: three arms × six curves); every walk correct; the null arm (`F' = F`) reproduced the full arm's trials and `S` exactly on all six | **holds** |
+| G2.15 | `S_DLP / S_full` = `1.66`–`3.60`, above 1 at every `p`, widening | **holds** |
+| G2.16 | targets per full relation DLP / full grows as `p^{0.51}` | **holds** (band `[0.25, 1.0]`) |
+| G2.17 | DLP below the full base at `2^{164}` (fitted exponents) / `2^{222}` (theory exponents); DLP below rho at `2^{193}` / `2^{209}` | **holds** (falsifier: either below `2^{160}`) |
+
+**A cross-check that comes for free.**  With the theory exponents imposed, the *full* base crosses
+rho at `2^{119}` — `d4-s5`'s `2^{118.9}`, re-derived here from a different harness and different
+targets.  With the freely fitted exponents it never does: the full-base linear algebra fits
+`p^{2.12}` against rho's `p^{1.95}` over three sizes, which a ±0.1 error in either exponent
+explains; the theory exponents (both `2`, E18's constant `r`) are the ones to read.
+
+**What it says.**  Double large primes have the sub-rho exponent at `k = 4` and lose by the
+constant: at the weighted `C ≈ 1.4·10⁹` the solve is the whole cost at every size anyone can run,
+so shrinking the matrix buys nothing until `n ≈ 2^{164}–2^{222}`, long after the full base has
+already crossed rho (`2^{119}`).  Cutting `C` moves both crossovers; that is E21's and E22's
+question.  **Class: measurement.**
+
+### 9.10 Amendment to E22 Stage B, before its code: the invariant form, derived
+
+*2026-10-18, additive to §9.7; G2.23's registered band stands.*  On each coordinate the
+translations act as `z ↦ −z, 1/z, −1/z`.  Their invariant is `u = z² + z⁻²`; the three
+non-trivial characters are carried by `v₁ = z − 1/z` (`v₁² = u − 2`), `v₂ = z + 1/z`
+(`v₂² = u + 2`) and `v₁v₂ = z² − z⁻²`.  The decomposition group `V₄⁴_0 ⋊ S₄` admits exactly the
+four diagonal characters, so `H / Πz_i⁴` (degree `8` in each `z_i`, i.e. `≤ 2` in each `u_i`) lies
+in the 30-dimensional span
+
+  `{e_i e_j : 0 ≤ i ≤ j ≤ 4} ∪ {P₁e_k} ∪ {P₂e_k} ∪ {P₁P₂e_k}`,  `e_k = e_k(u)`,
+  `P₁ = Πv₁(z_i)`, `P₂ = Πv₂(z_i)`,
+
+(precompute checks this on fresh points, as `SymmetrisedD4::precompute` does; failure ends Stage B
+as a negative).  `Π(u_i ∓ 2) = P_{1,2}²` give `e₄ = P₁² + 2e₃ − 4e₂ + 8e₁ − 16` and
+`P₂² − P₁² = 16e₁ + 4e₃`, so `e₁ = (P₂² − P₁² − 4e₃)/16` and `e₄` are eliminated: **four unknowns
+`(e₂, e₃, P₁, P₂)`, weights `(2, 2, 1, 1)`, four Weil components of weighted degree `4`.**
+Weighted Bézout `4⁴/(2·2·1·1) = 64` (`= 98,304 / 1536`, the multihomogeneous count over the group
+order, as `512 = 98,304 / 192` for `D₄`); weighted Macaulay bound `16 − 6 + 1 = 11` (`D₄`: `26`),
+`882`-odd columns before row selection (`D₄`: `4,200`), quotient `64` (`D₄`: `512`).  Lift-back:
+`u_i` from `T⁴ − e₁T³ + e₂T² − e₃T + e₄`, `z_i` from `z⁴ − u_iz² + 1`, the four `V₄`-choices per
+coordinate fixed by `P₁, P₂` and a group check.  **Derived expectation, not a prediction:** with
+an eighth of the quotient and a fifth of the columns, `C_V₄` could fall below `C_w / 30`, past
+G2.23's band, which would then be falsified on the high side.
+
+### 9.11 E21 measured: trace replay on the weighted solve is a net loss
+
+*2026-10-18.*  `examples/d4_replay.rs --sizes 53,101 --seed 1 --targets 201`, two threads, on the
+`τ_T` instances (`generate_translation_instance(p, 1, 4)`); raw
+`experiments/28_e21_replay/e21.json` (per target: both costs, rows, degrees, outcome), log
+`e21.log`.  The trace is recorded on each curve's first target; 200 more targets are solved in
+full and by replay.
+
+| p | agree | fell back | `C` full / replayed, median | total `C` full / replayed | zero rows skipped | pivots reached by the normal forms |
+|--:|--:|--:|--:|--:|--:|--:|
+| 53 | 200 / 200 | 47 (23.5 %) | 1.016× | 0.951× | 291 of 3,979 | 2,877 of 3,688 |
+| 101 | 200 / 200 | 26 (13 %) | 1.021× | 0.980× | 291 of 3,979 | 2,877 of 3,688 |
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.18 | identical decomposition sets on all 400 targets | **holds** |
+| G2.19 | replayed targets save `6.3 %` of the elimination, `1.02×` of `C` (median); with fallbacks charged the total is `0.95`–`0.98×` | **falsified** (band `1.03`–`1.20`) |
+| G2.20 | `13 %` fallbacks at `p = 101` (`23.5 %` at `53`): which rows reduce to zero is not stable across targets of one curve | **falsified** (`≤ 5 %`) |
+| G2.21 | `22 %` of the echelon's pivots are never reached by the normal forms — the ceiling on what a reached-pivots-only elimination could save on the elimination (`34 %` of `C`), i.e. `≤ 1.08×` of `C` | measured |
+
+**What it says.**  The weighted solve has little repeated structure to exploit: the rows that
+vanish are `7 %` of the matrix and not the same rows from one target to the next, and the
+elimination work they carry is small.  Unlike F4's pair selection (§12 of the cover ledger,
+`2.44×`), a Macaulay matrix at its bound wastes little.  Direction 2a is closed for this solver;
+direction 2c's ceiling is `≤ 1.08×`.  **Class: engineering, negative.**
+
+### 9.12 E22 measured: the `V₄` line exists, its solve is `≈ 820×` cheaper, its yield `≈ 10×` worse
+
+*2026-10-18.*  **Stage A** (`examples/klein_stage_a.rs`, `experiments/28_e22_stage_a/`):
+`generate_klein_instance(p, seed, 16)`, `p = 53, 101, 149, 197, 269`, seeds 1–2.  **Stage B**
+(`examples/klein_stage_b.rs`, `experiments/28_e22_stage_b/`): the `klein_v4` solve on 6 planted
+(signed sums of four base points) and 6 uniform (`aG + bQ`) targets per size, `p = 37, 41, 53,
+101, 269`, against brute force (`p ≤ 37`) or the exact meet-in-the-middle oracle.  Two
+corrections, stated: Stage A ran with the base before the fixed points `z ∈ {0, ±1, ±i}` were
+excluded (they are order-4 points, logarithm `0` in `⟨G⟩`, harmless to the solve and at most five
+points), and its `τ_T` comparison column divides all residuals by the folded arm's relations
+although its loop runs until the unfolded control also solves — it overstates `τ_T`'s `y`, so
+E19 (the same `τ_T` construction, folded arm only, exact oracle) is the comparator below.
+
+**Stage A** (all ten curves):
+
+| p | seed | base (density) | cols (pts/col) | `z(O) ∈ F_p` | residuals | y | decompositions per decomposed target | log | E19 residuals, same p and seed |
+|--:|--:|:--|:--|:--|--:|--:|:--|:--|--:|
+| 53 | 1 | 32 (0.60) | 8 (4.00) | no | 10,733 | 1,192.6 | 64 (×4), 24 (×5) | yes | 1,498 |
+| 53 | 2 | 36 (0.68) | 9 (4.00) | no | 2,086 | 208.6 | — | yes | 1,926 |
+| 101 | 1 | 36 (0.36) | 9 (4.00) | no | 55,508 | 5,550.8 | — | yes | 2,608 |
+| 101 | 2 | 52 (0.52) | 13 (4.00) | no | 14,840 | 1,060.0 | — | yes | 2,701 |
+| 149 | 1 | 64 (0.43) | 16 (4.00) | no | 48,795 | 2,870.3 | 64 (×11), 24 (×5) | yes | 3,525 |
+| 149 | 2 | 60 (0.40) | 15 (4.00) | no | 37,444 | 2,340.2 | 64 (×12), 24, 12, 4 | yes | 2,868 |
+| 197 | 1 | 76 (0.39) | 19 (4.00) | no | 81,149 | 4,057.4 | 64 (×16), 24 (×4) | yes | — |
+| 197 | 2 | 84 (0.43) | 21 (4.00) | no | 68,741 | 3,124.6 | 64 (×18), 24 (×4) | yes | — |
+| 269 | 1 | 132 (0.49) | 33 (4.00) | no | 59,115 | 1,738.7 | 64 (×27), 24 (×6), 4 | yes | — |
+| 269 | 2 | 148 (0.55) | 37 (4.00) | no | 44,751 | 1,177.7 | 64 (×31), 24 (×7) | yes | — |
+
+**Stage B:**
+
+| p | targets | agree | unsolved | planted agree | uniform solved | `C` median | precompute |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 37 | 12 | 11 | 1 | 5 / 6 | 6 / 6 | `1.59·10⁶` | `1.7·10⁶` |
+| 41 | 12 | 10 | 2 | 4 / 6 | 6 / 6 | `1.56·10⁶` | `1.7·10⁶` |
+| 53 | 12 | 9 | 3 | 3 / 6 | 6 / 6 | `1.55·10⁶` | `1.7·10⁶` |
+| 101 | 12 | 10 | 2 | 4 / 6 | 6 / 6 | `1.65·10⁶` | `1.7·10⁶` |
+| 269 | 12 | 11 | 1 | 5 / 6 | 6 / 6 | `1.72·10⁶` | `1.7·10⁶` |
+
+The precompute's span check passed on every curve: `H` is invariant under `V₄⁴_0 ⋊ S₄` and lies in
+the 30-function span.  Every solve that solved returned exactly the true decomposition set
+(64 or 128 sorted quadruples); the quotient is exactly `64` on every one, as derived.  **All nine
+failures are planted targets of one kind**: quotient `66`, "border unreachable" at degree 11,
+true decomposition counts not divisible by 64 (`56`–`752`).  Derived: a planted sum containing two
+points of one translation orbit has `P_a + P_b = T_i`, so `R − T_i = P_c + P_d` and `R` has the
+one-parameter family `{P, T_i − P, P_c, P_d}` of decompositions — a positive-dimensional system no
+degree resolves.  A uniform target `R ∈ ⟨G⟩` meets this only if `R − T_i` has a two-point
+decomposition (probability `≈ cols²/n`); all 30 uniform targets solved.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.22 | curves exist at every registered `p`; the pole is never in `F_p`; every fold checked on points as a translation (4 points per column); every log recovered; density `0.36`–`0.68`, pooled `0.46` | **holds** (density: `≈ 1/2` within the orbit-correlated spread, 4 points share one liftability) |
+| G2.23 | `C_w / C_V₄ ≈ 1.40·10⁹ / 1.7·10⁶ ≈ 820` | **falsified high** (band `[4, 30]`; §9.10 anticipated it) |
+| G2.24 | decompositions per decomposed target `64` (`24` and smaller on orbits with coincidences) — holds; `y_V₄ / y_E19` at matched `p`: `1.5`–`51`, median `≈ 13`; total targets `1.1`–`21×`, median `≈ 10×` | **half falsified** (`y` ratio band `[3, 10]`): the yield penalty is larger than the orbit factor alone, the lower base density (`≈ 0.45`, a fourth power in the decomposition count) adding the rest |
+| G2.25 | net on the relation phase: `≈ 820 / 10 ≈ 80×` cheaper per relation than E19, *derived from per-call and per-target measurements in separate harnesses* | a gain, **not yet measured end to end** — E24 below |
+
+### 9.13 E24 pre-registration: the `k = 4` index calculus end to end on the `V₄` line
+
+*Registered 2026-10-18, after Stage A and Stage B above and before any E24 code.*  The same
+protocol as E19 (§9.5), with the `V₄` line and solve: on `generate_klein_instance(p, seed, 16)`,
+uniform targets `R = aG + bQ`, each decomposed by `klein_v4::v4_system` → `solve_weighted_traced`
+(no trace) at weighted degree 11 → `lift_back_v4`; every lifted quadruple mapped to base points
+with exact signs by a charged group check; one decomposition per target drawn uniformly as a
+`V₄`-folded row; Wiedemann until `[d]G = Q` verifies; every phase charged in `F_p`
+multiplications (precompute, base, generation, Weil restriction, solves, lift-back, checks,
+linear algebra at `16` per mod-`n` multiplication); `16` negation walks and `16` unfolded walks
+on the same curve; unpriced native work at `0, 0.1, 1` GAE (Macaulay entries; one per walk step).
+Sizes `p = 101, 149, 197, 269, 397, 521`, two curves each.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.27 | correctness | every log recovered; every row re-added in the group; no lifted quadruple without an exact sign vector | any failure |
+| G2.28 | the solve in the pipeline | per-call `C` median in `[1.3, 2.2]·10⁶` at every `p`; unsolved `≤ 1 %` of targets | outside, or more |
+| G2.29 | end to end against E19 | `S_V₄ / rho` below E19's `S / rho` at matched `p` (`101`–`269`) by a factor in `[20, 300]` | outside the band |
+| G2.30 | slope | fitted exponent of `S / rho` in `n` in `[−0.35, −0.15]`; the solves `≥ 90 %` of `S` | outside, or less |
+| G2.31 | the handover, from E24's own constants (§11.16's model, the theory exponents) | `n* ∈ [2^{86}, 2^{98}]`, against E19's own `2^{116.7}` | outside |
+
+**What it would say.**  If G2.27–G2.31 hold, the `k = 4` baseline moves by two orders of magnitude
+at every measured size and its modelled handover by `≈ 2^{20}`–`2^{30}` in `n`: a verified,
+measured improvement of the index-calculus baseline under the 2026-10-15 success criterion
+(**class: engineering** — a constant; the exponents are unchanged), and the rows stay
+`10⁴`–`10⁵×` slower than rho: the distance remaining, reported as such.
+
+### 9.14 E24 measured: the `k = 4` baseline moves by `35`–`240×`, and its handover from `2^{117}` to `2^{90}`
+
+*2026-10-18.*  `experiments/29_quartic_pipeline_v4/run_all.sh` (one curve per invocation,
+`--rho-runs 16`), binary `854acdbc6`; raw `p{101,149,197,269,397,521}s{1,2}.json`, log `run.log`,
+tables `tables.md` (`glv_invariant_experiment_tables`, `e24`).  Host: the 4-vCPU container, shared
+with E19, E20 and E22 runs (operation counts only; no wall-time claim).
+
+| p | seed | log₂ n | base / cols | targets | y | unsolved | `C` median | solves share | `S` | rho (negation) | `S` / rho |
+|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| 101 | 1 | 24.6 | 36 / 9 | 77,960 | 7,796 | 9 | `1.62·10⁶` | 99.5 % | `1.28·10¹¹` | `7.6·10⁵` | `1.69·10⁵` |
+| 101 | 2 | 24.6 | 52 / 13 | 15,387 | 1,099 | 5 | `1.62·10⁶` | 99.5 % | `2.55·10¹⁰` | `7.4·10⁵` | `3.43·10⁴` |
+| 149 | 1 | 26.9 | 64 / 16 | 31,225 | 1,837 | 4 | `1.63·10⁶` | 99.5 % | `5.20·10¹⁰` | `1.37·10⁶` | `3.80·10⁴` |
+| 149 | 2 | 26.9 | 60 / 15 | 45,343 | 2,834 | 2 | `1.63·10⁶` | 99.5 % | `7.51·10¹⁰` | `1.36·10⁶` | `5.54·10⁴` |
+| 197 | 1 | 28.5 | 76 / 19 | 142,361 | 7,118 | 10 | `1.65·10⁶` | 99.4 % | `2.37·10¹¹` | `1.70·10⁶` | `1.40·10⁵` |
+| 197 | 2 | 28.5 | 84 / 21 | 74,345 | 3,379 | 7 | `1.64·10⁶` | 99.4 % | `1.24·10¹¹` | `2.27·10⁶` | `5.44·10⁴` |
+| 269 | 1 | 30.3 | 132 / 33 | 44,281 | 1,302 | 0 | `1.65·10⁶` | 99.4 % | `7.38·10¹⁰` | `3.21·10⁶` | `2.30·10⁴` |
+| 269 | 2 | 30.3 | 148 / 37 | 50,040 | 1,317 | 1 | `1.65·10⁶` | 99.4 % | `8.37·10¹⁰` | `3.58·10⁶` | `2.34·10⁴` |
+| 397 | 1 | 32.5 | 208 / 52 | 66,981 | 1,264 | 1 | `1.66·10⁶` | 99.3 % | `1.13·10¹¹` | `8.61·10⁶` | `1.31·10⁴` |
+| 397 | 2 | 32.5 | 188 / 47 | 89,424 | 1,863 | 2 | `1.66·10⁶` | 99.3 % | `1.50·10¹¹` | `9.48·10⁶` | `1.58·10⁴` |
+| 521 | 1 | 34.1 | 240 / 60 | 131,952 | 2,163 | 1 | `1.66·10⁶` | 99.3 % | `2.21·10¹¹` | `1.18·10⁷` | `1.88·10⁴` |
+| 521 | 2 | 34.1 | 232 / 58 | 142,487 | 2,415 | 1 | `1.66·10⁶` | 99.3 % | `2.39·10¹¹` | `1.11·10⁷` | `2.15·10⁴` |
+
+All `h = 4`.  Every log recovered; every one of the 381 kept rows re-added to `O` in the group;
+no lifted quadruple off the base or without an exact sign vector; all 384 walks correct.  The
+unsolved targets (`0`–`10` per curve, `≤ 0.012 %`) all end "border unreachable" — the same
+signature as Stage B's planted failures — and are charged.  Fitted exponent of `S / rho` in `n`:
+`−0.25`.  Handover by §11.16's model from E24's own constants (`y = 2,326` pooled,
+`cols / p = 0.114`, `C = 1.66·10⁶`, `S_rho = 110.9`, `r = 0.072`): **`n* = 2^{90.1}`** (from
+`p = 521` alone, where rho's set-up weighs least, `S_rho = 84.2`, `r = 0.090`: `2^{91.7}`).
+Unpriced native work (one GAE per Macaulay entry; one per walk step) at `0, 0.1, 1` GAE raises
+`S / rho` by up to `7×` at `1` GAE and never reverses the order: rho is ahead on every row
+across the band.
+
+**Against E19 at matched `p`** (E19's `τ_T`/`D₄` pipeline, same unit, same walks; different curves
+of the same `p`): `p = 101`: `6.33·10⁶`, `5.85·10⁶` → `37×`, `171×`; `p = 149`: `4.09·10⁶`,
+`3.40·10⁶` → `108×`, `61×`; `p = 197`: `4.91·10⁶`, `2.83·10⁶` → `35×`, `52×`; `p = 269`:
+`5.51·10⁶`, `2.57·10⁶` → `240×`, `110×` (pairing by seed; any pairing stays in `[20, 240]`).
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.27 | every log, row and quadruple verified | **holds** |
+| G2.28 | `C` median `1.62`–`1.66·10⁶`; unsolved `≤ 0.012 %` | **holds** |
+| G2.29 | below E19 at every matched `p`, by seed: `37×`, `171×` (`101`), `108×`, `61×` (`149`), `35×`, `52×` (`197`), `240×`, `110×` (`269`); by size (means) `60×, 80×, 40×, 174×` | **holds** (band `[20, 300]`) |
+| G2.30 | slope `−0.25`; solves `99.3`–`99.5 %` | **holds** |
+| G2.31 | `n* = 2^{90.1}` (`2^{91.7}` from the largest `p`) | **holds** (band `[2^{86}, 2^{98}]`; E19's frame `2^{119}`) |
+
+**What it says.**  The full rational 2-torsion symmetry, on a base line it keeps, cuts one `k = 4`
+decomposition from `1.4·10⁹` to `1.66·10⁶` `F_p` multiplications (quotient `512 → 64`, Macaulay
+degree `26 → 11`), and pays `≈ 10×` in targets per relation for the larger translation orbits and
+the thinner base.  Net, measured end to end: **the `k = 4` index-calculus baseline is `35`–`240×`
+cheaper at every size measured, and the modelled handover with rho moves from `2^{116.7}` (E19, §9.6) to
+`2^{90}`.**  The exponents are unchanged (`S / rho ∝ n^{−1/4}`, fitted `−0.25`): **class:
+engineering**, a constant — and under the 2026-10-15 success criterion a verified, measured
+improvement of the baseline.  **Distance remaining:** every row is still `1.3·10⁴`–`1.7·10⁵×`
+slower than the matched rho (`1.3·10⁴×` at `p = 397`, the best), and the handover is a model
+extrapolation of measured constants with the theory exponents, not a measured crossing.  **Scope:**
+curves over `F_{p⁴}` with full rational 2-torsion and rational halves of two of the `T`'s (the
+construction's condition), `h = 4`, `p ≤ 521` (`n ≤ 2^{34.1}`); a curve without rational 2-torsion,
+such as a prime-order curve, has no such symmetry.
+
+### 9.15 E25 pre-registration: the GLS endomorphism on the `V₄` line
+
+*Registered 2026-10-18, after E24 and before any E25 code.*  Owner request: pursue GLS-enabled
+index calculus.  E18's `ψ` was the `j = 0` automorphism of order 3 on prime-order curves, which
+have no rational 2-torsion, and E23 closed `ψ` with `τ_T` on `j = 0`.  The GLS endomorphism is a
+different map on a different family, and nothing below rules it out on the `V₄` line.  Four facts,
+derived before code:
+
+1. **The curves.**  Take `e₂ ∈ F_{p⁴} ∖ F_{p²}`, `e₃ = e₂^{p²}`, `e₁ = −e₂ − e₃ ∈ F_{p²}`, so
+   `E₀ : y² = Π(x − e_i)` is defined over `F_{p²}` with one root there.  With `μ` a non-square of
+   `F_{p⁴}`, `E : y² = Π(x − μe_i) = x³ + μ²a x + μ³b` is the quadratic twist of `E₀` over
+   `F_{p⁴}`, of order `(p² − 1)² + t²` (`t` the trace of `E₀/F_{p²}`), with the GLS endomorphism
+   `ψ(x, y) = (μ^{1−p²} x^{p²}, μ^{3(1−p²)/2} y^{p²})`, `ψ² = −1`, so `ψ = [λ]` on `⟨G⟩` with
+   `λ² ≡ −1 (mod n)`.  All of `E[2]` is rational over `F_{p⁴}`; `ψ` fixes `T₁` and swaps `T₂, T₃`.
+   E24's condition, rational abscissae of the halves of `T₁` and `T₂`, reads: `f′(x₁) =
+   μ²·N(e₁ − e₂)` is a square always, and `f′(x₂)` with probability `1/2`.  E24's generator
+   excluded `j ∈ F_{p²}`; these curves are exactly what it excluded.
+2. **`ψ` keeps the line and acts on it as `z ↦ ±i/z`.**  For `z ∈ F_p`, `z(ψP) = h(z(P))` with
+   `h = g⁻¹ ∘ [μ^{1−p²}] ∘ g^{σ}` a Möbius map (`σ` the `p²`-power).  `ψ(P + T) = ψP + ψT`, so `h`
+   normalises `V₄ = ⟨z ↦ −z, z ↦ 1/z⟩`, commutes with `z ↦ −z` (`T₁` fixed) and swaps `1/z` with
+   `−1/z` (`T₂ ↔ T₃`): `h ∈ {±iz, ±i/z}`.  `ψ² = −1` fixes every abscissa, so `h² = id` and
+   `h = ±i/z`.  With `p ≡ 1 (mod 4)`, `i ∈ F_p` and `h` keeps `z ∈ F_p`: the fold group on the line
+   is `⟨−z, 1/z, i/z⟩ ≅ D₄` of order `8`, so **`8` points a column against E24's `4`**.  The points
+   with `z⁴ = −1` are fixed by `±i/z`, so `ψP = ±P` and their `⟨G⟩`-component is `0`; they are
+   excluded with `z ∈ {0, ±1, ±i}`.
+3. **The base is not confined.**  In `z` the curve is `v² = κ(z⁴ + νz² + 1)` with `ν = −(w² + w⁻²)`
+   and `w = z(O)`.  `ψ(O) = O` gives `w·w^{σ} = ±i`, hence `ν^{σ} = −ν`: `ν ∉ F_{p²}` unless
+   `ν = 0`.  Were `ν ∈ F_{p²}`, every `z ∈ F_p` would lift or none would, and the base would lie in
+   one coset of a group of order `≈ p²` (E22's fact 1 in another form).  So the density should be
+   `≈ 1/2`, as on E24's curves.
+4. **What it buys, and what it does not.**  `ψ` acts on the base, not on the decomposition system
+   (§8.0): decompositions per target and targets per relation `y` are unchanged, the columns halve,
+   so the relation phase (`99.3 %` of `S` in E24) halves and the linear algebra quarters.  The
+   matched rho on these curves is the `⟨±ψ⟩` walk, `√2` fewer steps than the negation walk (E9
+   measured `1.40` on `F_{p²}` GLS twists).  **Net against the matched rho: `√2`**, a constant.
+   In §11.16's model `p* ∝ (cols/p) / S_rho`: `cols/p ÷ 2`, `S_rho ÷ √2`, so `p* ÷ √2` and
+   `n* = p*⁴/h ÷ 4`, two bits.
+
+**Protocol.**  `generate_gls_klein_instance(p, seed, 16)`; on each curve two arms on one target
+stream (same seed, uniform `R = aG + bQ`, the E24 oracle unchanged): **A**, E24's `V₄`-folded
+base (the control, `4` points a column), and **B**, the same base folded by `⟨V₄, ψ⟩` (`8` a
+column, coefficients `±λ^e` each checked on points).  Each runs until `[d]G = Q` verifies, every
+phase charged as in E24.  On each curve `16` `⟨±ψ⟩` walks, `16` negation walks and `16` unfolded
+walks.  Sizes `p = 101, 149, 197, 269, 397`, two curves each where time allows (at least one).
+Unpriced native work at `0, 0.1, 1` GAE as in E24.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.32 | Stage A (gate) | at every `p` a curve exists with `h ≤ 16`; `ψ² = −1` and `ψ(G) = [λ]G`, `λ² ≡ −1`, on points; every base point's `ψ`-image is in the base with `z ↦ ±i/z`; points per column `≥ 7.8`; density in `[0.3, 0.7]`; fold coefficients equal true logarithms (unit test); a log recovered | any (then E25 stops here, recorded as a negative) |
+| G2.33 | columns | `cols_A / cols_B` in `[1.9, 2.0]` | outside |
+| G2.34 | yield | `y_B / y_A` in `[0.8, 1.25]` per curve | outside |
+| G2.35 | end to end, same curve | `S_A / S_B` in `[1.6, 2.4]` on every curve | outside |
+| G2.36 | against the matched rho | `⟨±ψ⟩` / negation steps, mean over curves, in `[1.2, 1.6]`; `(S_A / rho_neg) / (S_B / rho_ψ)` in `[1.1, 2.0]` on every curve | outside |
+| G2.37 | handover, from arm B's own constants (§11.16's model) | `n* ∈ [2^{84}, 2^{92}]` (E24's own `2^{90.1}`, less two bits, with curve scatter) | outside |
+
+Against E24's rows at matched `p` the comparison crosses curve families (and E24's per-curve `y`
+spans `1,099`–`7,796`), so it is reported, not gated.  **Class if G2.32–G2.37 hold:** engineering
+(a constant, `√2` against the matched rho), on GLS twists over `F_{p⁴}` with the split 2-torsion
+above only.  The exponents do not move.
+
+### 9.16 E25 measured: the GLS fold halves the `k = 4` cost on its own curves, a constant
+
+*2026-10-18.*  **Stage A:** `examples/gls_stage_a.rs --sizes 29,37,41,53,61,89,97,101,109,113,149,197,269,397
+--seeds 4` (`experiments/30_gls_v4/stage_a.{json,log}`).  **End to end:**
+`experiments/30_gls_v4/run_all.sh` (one curve per invocation, both arms, `--rho-runs 16`), binary
+`46202dc97`; raw `p{101,149,197,269,397}s{1,2}.json`, log `run.log`, tables `tables.md`
+(`glv_invariant_experiment_tables`, `e25`).  Host: the 4-vCPU container (operation counts only; no
+wall-time claim).
+
+**Stage A (56 curves).**  Every `(p, seed)` gave a curve; `ψ² = −1`, `ψ(G) = [λ]G` with `λ² ≡ −1`,
+and `ψ` fixing `T₁` and swapping `T₂, T₃` were checked on points on every one.  Every non-empty
+base has exactly `8.00` points a column under `⟨V₄, ψ⟩` (`4.00` under `V₄`), and the two arms hold
+the same points.  `ν² ∉ F_p` on all 56 (fact 3), and wherever logarithms were computed (`n ≤ 2^{26}`,
+`p ≤ 149`) the number of distinct column logarithms equals the number of columns: no base is
+confined.  Density pooled over all 56: `0.49` (`0.52` at `p ≥ 149`); per curve `0`–`0.75`, 14 of 56
+outside `[0.3, 0.7]`, all but one at `p ≤ 113`, where a base is `3`–`13` orbits of `8` points that
+lift together (two `p = 41` curves have no base at all).  **Two facts the derivation did not
+predict:** every curve has `h = 16`, never `4` (the construction forces `4 | t`; E24's curves had
+`h = 4`), and the unit test confirms the fold coefficients against true logarithms at `p = 37, 41`.
+
+**End to end (10 curves, both arms, `h = 16` throughout).**  Every logarithm recovered on both
+arms; every kept row re-added to `O`; no lifted quadruple off the base or without a sign vector;
+all `960` walks correct; `198` unsolved of `1.15·10⁶` targets (`0.017 %`, "border unreachable",
+charged).  `C` median `1.62`–`1.66·10⁶` on every arm.
+
+| p | seed | log₂ n | cols A / B | y A | y B | `S_A` | `S_B` | `S_A / S_B` | neg / `±ψ` steps | `S_A` / rho neg | `S_B` / rho `±ψ` | improvement |
+|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 101 | 1 | 22.6 | 10 / 5 | 3,731 | 3,528 | `6.76·10¹⁰` | `3.48·10¹⁰` | 1.94 | 1.03 | `1.53·10⁵` | `6.77·10⁴` | 2.26 |
+| 101 | 2 | 22.6 | 14 / 7 | 1,001 | 888 | `2.47·10¹⁰` | `1.17·10¹⁰` | 2.11 | 1.49 | `6.02·10⁴` | `2.93·10⁴` | 2.05 |
+| 149 | 1 | 24.9 | 10 / 5 | 32,013 | 22,006 | `5.83·10¹¹` | `2.19·10¹¹` | 2.67 | 1.09 | `8.31·10⁵` | `2.65·10⁵` | 3.13 |
+| 149 | 2 | 24.9 | 14 / 7 | 4,039 | 4,272 | `1.01·10¹¹` | `5.67·10¹⁰` | 1.77 | 0.96 | `1.58·10⁵` | `7.01·10⁴` | 2.25 |
+| 197 | 1 | 26.5 | 22 / 11 | 2,218 | 3,150 | `8.53·10¹⁰` | `6.32·10¹⁰` | 1.35 | 1.52 | `7.71·10⁴` | `6.11·10⁴` | 1.26 |
+| 197 | 2 | 26.5 | 30 / 15 | 846 | 969 | `4.39·10¹⁰` | `2.59·10¹⁰` | 1.69 | 1.62 | `3.97·10⁴` | `2.62·10⁴` | 1.51 |
+| 269 | 1 | 28.3 | 30 / 15 | 2,645 | 2,950 | `1.37·10¹¹` | `7.88·10¹⁰` | 1.74 | 1.61 | `7.45·10⁴` | `4.84·10⁴` | 1.54 |
+| 269 | 2 | 28.3 | 40 / 20 | 744 | 718 | `5.10·10¹⁰` | `2.52·10¹⁰` | 2.02 | 2.08 | `2.24·10⁴` | `1.56·10⁴` | 1.44 |
+| 397 | 1 | 30.5 | 60 / 30 | 700 | 800 | `7.19·10¹⁰` | `4.17·10¹⁰` | 1.72 | 1.36 | `1.99·10⁴` | `1.13·10⁴` | 1.76 |
+| 397 | 2 | 30.5 | 48 / 24 | 1,600 | 1,349 | `1.31·10¹¹` | `5.65·10¹⁰` | 2.32 | 1.67 | `3.38·10⁴` | `1.71·10⁴` | 1.97 |
+
+"Improvement" is `(S_A / rho_neg) / (S_B / rho_±ψ)`: the ψ arm against its matched walk over the
+control against the negation walk, on one curve.  Handover by §11.16's model from arm B's own
+constants (`y = 2,474` pooled, `cols / p = 0.060`, `C = 1.66·10⁶`, `h = 16`, `S_rho = 121.7` for the
+`±ψ` walk, `r = 0.045`): **`n* = 2^{88.0}`** (from `p = 397` alone, `2^{85.7}`); arm A on the same
+curves and against the same walk: `2^{93.2}` (`2^{91.1}`).  Fitted exponent of `S / rho` in `n`:
+`−0.29` (B), `−0.30` (A).  Unpriced native work at `0, 0.1, 1` GAE never reverses the order: rho is
+ahead on every row of both arms across the band.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.32 | curves at every `p`; `ψ` verified on points; `ψ`-image of every base point in the base; `8.00` points a column; coefficients equal true logarithms; logs recovered; density `0.49` pooled, `14` of `56` curves outside `[0.3, 0.7]` (all small `p` but one) | **holds** on everything but per-curve density, which the band did not specify; pooled it holds |
+| G2.33 | `cols_A / cols_B = 2.00` on every curve | **holds** |
+| G2.34 | `y_B / y_A` `0.69`–`1.42` (two curves outside `[0.8, 1.25]`); pooled `2,474 / 2,707 = 0.91` | **falsified** per curve: with `5`–`60` relations a curve, `y` is a ratio of small counts and the band was narrower than its noise |
+| G2.35 | `S_A / S_B` `1.35`–`2.67`, median `1.86` (the same two curves outside `[1.6, 2.4]`, tracking their `y`) | **falsified** per curve (8 of 10 in band) |
+| G2.36 | steps ratio mean `1.44` (in `[1.2, 1.6]`); improvement `1.26`–`3.13`, median `1.87`: in `[1.1, 2.0]` on all six curves at `p ≥ 197`, above it on all four at `p ≤ 149` | steps **hold**; improvement **falsified high** at `p ≤ 149`: below `n ≈ 2^{25}` a walk is `≤ 3,000` steps, its set-up dominates and the `±ψ` walk costs more multiplications than the negation walk (`5.1` against `4.4·10⁵` at `p = 101` seed 1), which flatters arm B's ratio |
+| G2.37 | `n* = 2^{88.0}` (`2^{85.7}` from the largest `p`) | **holds** (band `[2^{84}, 2^{92}]`) |
+
+**What it says.**  On GLS twists over `F_{p⁴}` with the split 2-torsion of §9.15, `ψ` keeps E24's
+`V₄` line and acts on it as `z ↦ ±i/z`, so the base folds by `⟨V₄, ψ⟩` with `8` points a column.
+Measured end to end on the same curve, base and target stream, **the fold cuts the `k = 4` index
+calculus by `1.35`–`2.67×` (median `1.86×`), and against the matched `⟨±ψ⟩` walk the ψ arm gains
+`1.26`–`1.97×` over the control at every `p ≥ 197`**; the modelled handover on these curves moves
+from `2^{93.2}` to `2^{88.0}`.  **Class: engineering**, a constant: the exponent is unchanged
+(`−0.29` against `−0.30`), and the per-curve spread is the relation count's (`5`–`60` relations).
+Under the 2026-10-15 criterion this is a verified, measured improvement of the baseline *on this
+family*.  **What it does not say.**  It does not move E24's rows: these curves have `h = 16`, which
+makes rho `2×` cheaper at a given `p` than on E24's `h = 4` curves and absorbs most of the fold at
+matched `n` (arm B's handover `2^{88.0}` against E24's own `2^{90.1}`, two bits, from different
+curve families).  **Distance remaining:** every row is still `1.1·10⁴`–`2.7·10⁵×` slower than the
+matched rho (`1.13·10⁴×` at `p = 397` seed 1, the best), and the handover is a model extrapolation,
+not a measured crossing.  **Scope:** GLS twists over `F_{p⁴}` of curves over `F_{p²}` with one root
+there, the halves condition of E24, `p ≡ 1 (mod 4)`, `p ≤ 397` (`n ≤ 2^{30.5}`).  The next lever on
+this family is the cofactor, not the fold: a GLS construction with the `V₄` line and `h = 4` would
+keep the fold and give back the `2×` that `h = 16` costs against rho.
+
+### 9.17 E26 pre-registration: can a GLS curve carry the `V₄` line with `h = 4`?
+
+*Registered 2026-10-18, after E25 and before any E26 code.*  Owner request: try a GLS construction
+with `h = 4`, the lever §9.16 named.  A derivation says the `V₄` line cannot have one; E26 checks it
+on curves.  Notation as §9.15: `q = p²`, `E₀ / F_q` with one root `e₁ ∈ F_q`, `E` its quadratic twist
+over `F_{q²}`, `ψ² = −1`, `#E = (q − 1)² + t²`.
+
+1. **The cofactor is set by `t mod 4`.**  `ψ` satisfies `ψ² − tψ + q = 0` and `ψ² = −1` on
+   `E(F_{q²})`, so `α = (q − 1) − tψ` kills `E(F_{q²})`, a `Z[ψ] ≅ Z[i]`-module of order `N(α)`.  With
+   `8 | q − 1`, the `(1 + i)`-adic valuation of `α` is `2` when `t ≡ 2 (mod 4)` (2-part `Z[i]/(2) ≅
+   (Z/2)²`, `h = 4` possible) and `≥ 4` when `4 | t` (2-part of order `≥ 16`).  `h = 8` cannot occur.
+2. **`t ≡ 2 (mod 4)` rules out the `V₄` line.**  The line needs the halves of `T₁` and `T₂` to have
+   abscissae in `F_{q²}` (they are `g(0), g(∞), g(±1)`, and `g` is defined over `F_{q²}` whenever `z ∈ F_p`
+   gives rational `x`).  A half of `T_j` has a rational abscissa iff `T_j ∈ 2E(F_{q²})` or
+   `T_j ∈ 2E₀(F_{q²})`.  When `h = 4`, `E(F_{q²})` has no point of order 4, so both `T₁` and `T₂` must be
+   halved in `E₀(F_{q²})`, which with `E₀[2] ⊂ E₀(F_{q²})` puts all of `E₀[4]` in `E₀(F_{q²})`: the
+   `q`-Frobenius `π` of `E₀` satisfies `π² ≡ 1 (mod 4)` on `E₀[4]`.  But `π` swaps `T₂, T₃` (`π ≡
+   [[0,1],[1,0]] (mod 2)`) and `det π = q ≡ 1 (mod 4)`; writing `π = [[2a, 1+2b], [1+2c, 2d]]`, the
+   determinant forces `b + c` odd and then `(π²)₁₁ ≡ 1 + 2(b + c) ≡ 3 (mod 4)`.  Contradiction.
+3. **The other `ψ`-actions do not escape.**  If `ψ` fixes all three `T`'s (`E₀` with full 2-torsion over
+   `F_q`), §9.15 fact 2 gives `h ∈ V₄` and a confined line.  If it fixes none, `E[2]` is not rational
+   over `F_{q²}`.  So **on GLS twists the `V₄` line forces `h ≥ 16`**; E25's `h = 16` is the minimum, not
+   a sampling accident.
+
+**E26 (an exact census, no cost measured).**  `gls_cofactor_census(p, seed)`: E25's generator without
+the halves condition (`f′(x₂)` a square) and without a cofactor bound; for each curve record `t mod 4`,
+`v₂(#E)`, whether `f′(x₂)` is a square in `F_{q²}`, and whether `E₀(F_q)` has a point of order 4.  Sizes
+`p ≡ 1 (mod 4)` from `29` to `397`, `40` curves each.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.38 | `t ≡ 2 (mod 4)` curves exist, each with `v₂(#E) = 2` and a point of order 4 in `E₀(F_q)` | about half of all curves | none at some `p`, or any with `v₂(#E) ≠ 2` |
+| G2.39 | the obstruction | `f′(x₂)` a non-square on **every** `t ≡ 2 (mod 4)` curve | any `t ≡ 2 (mod 4)` curve with `f′(x₂)` a square (then a GLS `V₄` curve with `h = 4` exists, and E25 is re-run on it) |
+| G2.40 | the converse | every curve with `f′(x₂)` a square has `4 | t` and `v₂(#E) ≥ 4` | any exception |
+
+**Class:** accounting (an exact statement about a family; no algorithm changes).  If G2.39 holds, the
+GLS lever on the `V₄` line is closed at `h = 16`, and what is left is §9.16's measured `√2`-class
+constant against the matched walk.
+
+### 9.18 E26 measured: no GLS curve carries the `V₄` line with `h = 4`
+
+*2026-10-18.*  `examples/gls_cofactor_census.rs --sizes 29,37,41,53,61,89,97,101,109,113,149,197,269,397
+--seeds 40` (`experiments/31_gls_cofactor/census.{json,log}`), 560 GLS twists, every order computed
+and checked to be `(p² − 1)² + t²`.
+
+| class | curves | `v₂(#E)` | `E₀(F_{p²})` has a point of order 4 | halves of `T₂` have rational abscissae |
+|:--|--:|:--|:--|:--|
+| `t ≡ 2 (mod 4)` | 310 | `2` on all 310 | yes, on all 310 | **no, on all 310** |
+| `4 | t` | 250 | `4` (131), `6` (60), `7` (45), `≥ 8` (14) | no, on all 250 | yes, on all 250 |
+
+At every one of the 14 sizes both classes occur (`t ≡ 2 (mod 4)`: `18`–`28` of `40`).
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.38 | `t ≡ 2 (mod 4)` on `310 / 560`, at every `p`; `v₂(#E) = 2` and an order-4 point in `E₀(F_{p²})` on every one | **holds** |
+| G2.39 | the halves condition fails on all `310` | **holds**: no GLS twist of this shape has the `V₄` line with `h = 4` |
+| G2.40 | the halves condition holds on all `250` with `4 | t`, each with `v₂(#E) ≥ 4` | **holds** |
+
+**What it says.**  The census is sharper than the derivation: on these twists the three conditions
+coincide exactly.  `4 | t` holds iff the halves of `T₂` have rational abscissae iff `E₀(F_{p²})` has
+no point of order 4, and each fails together with the others.  So E25's `h = 16` is the smallest
+cofactor any GLS twist with the `V₄` line can have, as §9.17 derived.  **Class: accounting**, an
+exact statement about the family.  The GLS lever on the `V₄` line ends at §9.16's measured constant
+(median `1.86×` on the same curve, `1.26`–`1.97×` against the matched walk at `p ≥ 197`), with the
+`h = 16` penalty that absorbs most of it at matched `n`.  **What remains open:** the `ψ` fold without
+the full `V₄` symmetry (E19's single-`τ_T` line, where `h = 4` is not excluded by this argument but
+the solve costs `≈ 820×` more per call), and GLS-type endomorphisms of higher order (quartic or sextic
+twists of `j = 1728` and `j = 0`), which act on the 2-torsion differently and are not covered here.
+
+### 9.19 Errata found by the validation gate (§9.6, §9.14, §9.16)
+
+*2026-10-21.*  The validation gate (`docs/VALIDATION_GATE.md`) had an independent validator replay
+every recorded run of E19, E24 and E25 and recompute the claimed numbers from the raw JSON
+(`benchmarks/20261018-k4-v4-line/` and `benchmarks/20261018-k4-gls-v4/`: `replay-certificate.json`,
+`validator-report.json`, `validate.py`).  Every run replayed field-identical (wall time aside)
+and every logarithm was confirmed; no result, verdict or ranking changes.  The note's text had
+seven errors, corrected here.  The sections above are left as written; where they differ, this
+section is the record.
+
+| where | written | raw data gives | effect |
+|:--|:--|:--|:--|
+| §9.14 table, `p = 521` seed 1, matched rho | `1.18·10⁷` | `1.1749·10⁷` → **`1.17·10⁷`** | none (the ratio column, `1.88·10⁴`, was computed from the unrounded value) |
+| §9.14 and G2.29, E19 / E24 at `p = 101` seed 2 | `171×` | **`170×`** (`170.4`); `171` came from dividing the rounded `5.85·10⁶` by `3.43·10⁴` | none: the range stays `35`–`240×`, G2.29 holds |
+| §9.14, kept rows re-added to `O` | `381` | **`392`** (all twelve curves; `0` failures) | none |
+| §9.14 and G2.28, unsolved targets per curve | `≤ 0.012 %` | **`≤ 0.033 %`**: `5 / 15,387` at `p = 101` seed 2 and `0.0128 %` at `p = 149` seed 1; `0.0047 %` pooled | none: G2.28 registered `≤ 1 %` and holds |
+| §9.6 G2.12, `p = 53` seed 1, measured / registered | `0.495` | **`0.494`** (`0.49448`, with the registered `C = 1.3·10⁹`) | none: still a hair outside `×2`; per size holds |
+| §9.6 G2.12, rho's `S` per `√n` (explanatory) | "`242` at `p = 53` against `92` at `p = 269`" | **`243`** against **`92`**, both the mean of the two curves (seed 1 alone: `241.9` and `87.5`); the written pair mixed a single curve with a mean | none: the explanation stands |
+| §9.16 G2.36, why the improvement exceeds the band at `p ≤ 149` (explanatory) | "below `n ≈ 2^{25}` a walk is `≤ 3,000` steps" | false at `p = 149` (`n ≈ 2^{24.9}`): the `⟨±ψ⟩` walk averages **`4,057`** and **`3,965`** steps; at `p = 101` (`n ≈ 2^{22.6}`) it averages `2,007` and `1,192` | the mechanism stands (walk set-up and the `±ψ` step's extra multiplications dominate at these sizes), but the `3,000`-step threshold is wrong; the measured improvement and the "falsified high" verdict are unchanged |
+
+The same `171` and `0.495` appear in `research/glv_k4_pipeline_d4_20261017/REPORT.typ`, which now
+carries an errata section with these values; its PDF is rebuilt there and in
+`benchmarks/20261018-k4-v4-line/REPORT.pdf`.
+
+The validator also recorded these limitations of the evidence, which the earlier sections did not
+state:
+
+- **Thread count.**  Each round draws `2 ×` (worker threads) targets from one seeded stream, so a
+  replay must fix `RAYON_NUM_THREADS=4`, the recording host's count.  Another thread count gives
+  different, still valid, runs.
+- **`⟨±ψ⟩` walk overhead.**  The walk applies `ψ` to both coordinates on every step (`152`–`154`
+  against `109` multiplications per step at `p = 397`).  Comparing abscissae first would save about
+  `6 %` (the validator's estimate, not measured), so E25's distance to rho leans about that much in
+  the index calculus's favour.
+- **Partial pairing in E25.**  Arms A and B share the target stream only until B's first
+  linear-algebra attempt.  This adds noise, not bias, to the per-curve `S_A / S_B`.
+- **Price band.**  The `35`–`240×` E19-to-E24 factor holds at `0` GAE per unpriced native
+  operation.  Pricing one GAE (`97` `F_p` multiplications, the measured cost of an affine addition)
+  per Macaulay-matrix entry and per walk step, it is `19`–`132×` at `0.1` GAE and `6.5`–`45×` at
+  `1` GAE (recomputed from the raw JSON); E24 stays below E19 on every curve at every price.
+
+### 9.22 E31 pre-registration: the solve itself, by its `P₂`-chains
+
+*Registered 2026-10-24, after the profile below and before any E31 solver code.*  **Numbering:**
+§9.20–§9.21 and G2.41–G2.84 are claimed by unregistered drafts (E27–E30) on other branches, so
+E31 takes §9.22 and starts at G2.85.  The red team's finding stands as the motivation: the solve
+is `99.0`–`99.4 %` of `S` on every E25 run and nothing proposed so far touches it.  The baseline is
+E25 (§9.16) as validated (§9.19), both arms, its binary `46202dc97`.
+
+**The profile (step 1).**  `examples/e31_solve_profile.rs` (commit `a2de57077a`) rebuilds four E25
+curves and replays the first 400 targets of arm A's stream exactly as `collect_and_solve` draws
+them with four workers, through the unchanged `v4_system` → `solve_weighted_traced` (degree 11) →
+`lift_back_v4`, summing the solver's own phase counters (`experiments/31_solve_cost/profile*.{json,log}`).
+Per-call medians are `1.650`, `1.652`, `1.663`, `1.660·10⁶`, E25's `C`.
+
+| phase, per call (mean) | p = 269 s1 | p = 269 s2 | p = 397 s1 | p = 397 s2 | share |
+|:--|--:|--:|--:|--:|--:|
+| Weil restriction | `5,691` | `5,691` | `5,691` | `5,691` | `0.3 %` |
+| triangularise | `175` | `175` | `175` | `175` | `0.0 %` |
+| echelon (393 × 448 Macaulay matrix, 384 pivots) | `427,590` | `430,028` | `431,110` | `426,309` | `25.6`–`25.9 %` |
+| normal forms (border of `M_{P₂}`, 240 pivots reached) | `859,113` | `857,751` | `864,187` | `851,998` | `51.4`–`51.9 %` |
+| characteristic polynomial of the `64 × 64` `M_{P₂}` | `268,238` | `268,746` | `269,168` | `267,733` | `16.0`–`16.3 %` |
+| rational roots | `32,577` | `32,648` | `40,998` | `40,743` | `2.0`–`2.5 %` |
+| eigenvectors | `61,153` | `70,561` | `69,349` | `53,666` | `3.3`–`4.2 %` |
+| solution checks | `270` | `310` | `305` | `236` | `0.0 %` |
+| lift-back (outside `C`, in `S`) | `454` | `535` | `584` | `515` | — |
+
+Wall time per call (one thread): echelon `10.2`–`11.9` ms of `17.7`–`21.1` ms; the echelon's
+dense row updates cost far more time than the `F_p` multiplications it is charged.
+
+**Two structural facts, measured on the same 1,600 calls.**  (1) The 64 standard monomials fall
+into exactly **12 `P₂`-chains** `h, P₂h, …, P₂^{k−1}h` on every call.  `M_{P₂}` is the unit shift
+inside each chain; only the 12 chain ends map to non-standard monomials, so only 12 of its 64
+columns need a normal form, and they are what the existing normal-form phase computes — by back
+substitution of a dense 64-vector through all 240 reached pivots.  (2) A *left-looking* normal form
+of each of the 12 targets separately (substitute pivot rows left to right into one sparse
+accumulator) costs at most `Σ_t Σ_{c reached from t} nnz(row c)`, measured at `≈ 6.7·10⁴` per call,
+against `8.6·10⁵`.  Moreover `F_p[e₂, e₃, P₁, P₂]/I` is presented over `F_p[x]`, `x = P₂`, by the
+12 chain heads with the relation matrix `R(x) = diag(x^{k_i}) − C(x)` (`C` read off the 12 normal
+forms), so `charpoly(M_{P₂}) = det R(x)`, monic of degree `Σk_i = 64`, and a dual eigenvector at a
+rational root `λ` is a kernel vector of the `12 × 12` matrix `R(λ)`.
+
+**What is not proposed, and why.**  A shape trace or elimination template (Joux–Vitse, F4Remake)
+on this matrix: E21 (§9.11) measured `1.02×` on the `D₄` solve because a Macaulay matrix at its
+bound has little to skip, and the counted echelon already charges only nonzero pivot entries.  A
+symbolic eliminant precomputed per curve: the coefficients depend on `z_R ∈ F_{p⁴}`, four `F_p`
+parameters, through degree 8; an eliminant in them is far larger than the system.  More symmetry:
+`V₄⁴_0 ⋊ S₄` is already quotiented (§9.10), and `ψ` acts on the base, not the system (§8.0).
+
+**The solvers (E31).**  Beside `solve_weighted_traced`, never replacing it, selected by a flag:
+
+- **A, the chain solve.**  The same rows, triangularisation and echelon (the same code path and
+  count); the 12 border targets by left-looking normal forms; `det R(x)` by evaluation at 65 points
+  of `F_p` and interpolation (each inversion charged `2⌈log₂ p⌉`, which the existing echelon and
+  Hessenberg do not charge — conservative against A); the same root finder on the same polynomial;
+  at each rational root a kernel of `R(λ)`; the same solution check.  Anything other than one
+  clean solve at degree 11 — an eigenspace of dimension above 1, an unresolved vector, an
+  unreachable border, a non-standard unknown — reruns the existing solver from the same RNG state,
+  and both runs are charged.
+- **B, A with sparsest pivots.**  `echelon_by_lead_with(…, sparsest = true)`: the same row space and
+  pivot columns, hence the same standard monomials and the same (unique) normal forms, with less
+  fill.  Exploratory.
+
+**Correctness bar.**  On every call, the same decomposition set, outcome and degree as the
+existing solver; in the agreement test also the same `M_{P₂}` and the same characteristic
+polynomial.  Because the outputs and the RNG state after each call coincide, an end-to-end rerun of
+E25 with A or B must reproduce every E25 count except the solve's multiplications — itself a
+replay check.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.85 | agreement | A and B return the existing solver's decomposition set, outcome and degree on every call of Stage A and of the end-to-end runs; `M_{P₂}` and `charpoly` identical on every call of the test; the negative control (one coefficient of one equation perturbed) changes the set | any disagreement, or a control that agrees |
+| G2.86 | normal forms, existing / A, per-call mean | `[12, 40]` (the bound gives `≥ 12.8`) | outside |
+| G2.87 | characteristic polynomial, existing / A (with A's evaluations, interpolation and inversions) | `[1.8, 3.2]` (derived `≈ 2.4`) | outside |
+| G2.88 | eigenvectors, existing / A | `[15, 80]` | outside |
+| G2.89 | per-call `C` median, existing / A, every curve of Stage A (`p = 101`–`397`, two seeds each) | `[2.2, 3.0]` (derived `≈ 2.55`, the echelon becoming `≈ 2/3` of `C`) | outside; **kill** below `1.5` on any curve (then E31 is recorded as a negative and stops before end to end) |
+| G2.90 | fallbacks of A (charged reruns of the existing solver) | `≤ 1 %` of calls | more |
+| G2.91 | per-call wall time, existing / A (practicality note) | `[1.2, 2.0]` | outside |
+| G2.92 | B against A: echelon multiplications, A / B | `[1.0, 1.6]`; B is carried to end to end only if its per-call `C` median is `≥ 2 %` below A's on every curve | — (exploratory; reported either way) |
+| G2.93 | end to end, E25's ten curves, both arms, rerun with A (and B if carried) | every E25 count other than the solve's reproduced exactly; `S_E25 / S_A` in `[2.1, 2.9]` on every curve and arm at `0` GAE; the gap to the matched `⟨±ψ⟩` rho shrinks by the same factor | any count differs, or outside the band |
+| G2.94 | §5a band | unpriced native work as in E25 (one GAE per Macaulay entry, unchanged by A; one per walk step): `S_E25 / S_A` `[1.3, 1.6]` at `0.1` GAE and `[1.03, 1.10]` at `1` GAE; A below E25 at every weight | A above E25 at any weight |
+
+**What it would say.**  If G2.85–G2.89 and G2.93 hold, the `k = 4` index calculus on the `V₄` line
+costs `≈ 2.5×` less end to end on E25's curves with the same relations, logs and walks: **class
+engineering** (a constant on the dominant phase; exponents unchanged), a verified, measured
+improvement of the baseline under the 2026-10-15 criterion.  The band (G2.94) says how much of it
+survives once the Macaulay matrix's own entries are priced: most of it at `0.1` GAE, a few percent
+at `1` GAE, where the matrix A still builds dominates.  The rows would stay `≈ 4·10³`–`10⁵×` from
+the matched rho: the distance remaining.  After A the echelon is the next lever.
+
+### 9.23 E31 measured: the chain solve cuts the `k = 4` solve `2.6×` (A) and `5.1×` (B) for the same output, and `S` by `2.5×` and `4.7×`
+
+*2026-10-24.*  Code: `klein_v4::solve_weighted_chain` beside the unchanged `solve_weighted_traced`
+(commit `f6ab6b7253`), selected by `V4Solver` / `quartic_pipeline_gls --solver`.  **Stage A:**
+`examples/e31_stage_a.rs`, binary `a8f52422d5` (`experiments/31_solve_cost/binary_commit.txt`), one
+thread, the first 1,000 targets of E25 arm A's stream on each of E25's ten curves, the three solvers
+interleaved per call from the same per-target RNG seed (`stage_a.{json,log}`).  **End to end:**
+`experiments/31_solve_cost/run_e2e.sh` (E25's `run_all.sh` plus `--solver`, `RAYON_NUM_THREADS=4`), same
+binary, both solvers, both arms, all ten curves (`e2e_{chain,chain-sparsest}_p*s*.json`, logs).
+Tables: `experiments/31_solve_cost/tables.md` (`examples/e31_tables.rs`).  Host: the 4-vCPU container;
+wall times are a practicality note.
+
+**Stage A** (per call; existing = E25's solver; all calls, fallbacks charged):
+
+| p | seed | `C` median existing | A | B | existing / A | existing / B | NF existing / A | charpoly existing / A | eigvec existing / A | echelon A / B | fallbacks A | wall existing / A / B (µs, median) |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|
+| 101 | 1 | `1,617,013` | `600,981` | `304,257` | 2.69 | 5.31 | 9.2 | 2.85 | 16.4 | 2.52 | 12 | `15,381` / `9,804` / `10,008` |
+| 101 | 2 | `1,616,974` | `600,890` | `304,103` | 2.69 | 5.32 | 9.7 | 2.87 | 15.7 | 2.54 | 11 | `17,333` / `10,884` / `11,332` |
+| 149 | 1 | `1,632,660` | `612,064` | `313,237` | 2.67 | 5.21 | 10.6 | 2.87 | 18.7 | 2.58 | 7 | `16,666` / `10,569` / `10,795` |
+| 149 | 2 | `1,633,472` | `612,068` | `313,320` | 2.67 | 5.21 | 9.5 | 2.82 | 15.4 | 2.54 | 10 | `15,494` / `9,838` / `9,984` |
+| 197 | 1 | `1,645,617` | `620,058` | `320,425` | 2.65 | 5.14 | 10.9 | 2.88 | 20.4 | 2.60 | 5 | `15,757` / `9,755` / `9,943` |
+| 197 | 2 | `1,646,416` | `620,152` | `320,741` | 2.65 | 5.13 | 10.0 | 2.84 | 15.6 | 2.56 | 8 | `17,060` / `10,422` / `10,477` |
+| 269 | 1 | `1,650,218` | `623,969` | `323,602` | 2.64 | 5.10 | 10.9 | 2.84 | 20.5 | 2.60 | 5 | `15,215` / `9,747` / `9,926` |
+| 269 | 2 | `1,651,643` | `624,544` | `324,142` | 2.64 | 5.10 | 11.2 | 2.85 | 25.9 | 2.61 | 4 | `16,602` / `10,308` / `10,540` |
+| 397 | 1 | `1,663,086` | `633,960` | `333,134` | 2.62 | 4.99 | 11.6 | 2.86 | 26.5 | 2.62 | 3 | `19,819` / `11,849` / `11,388` |
+| 397 | 2 | `1,661,986` | `633,419` | `332,624` | 2.62 | 5.00 | 12.4 | 2.89 | 30.0 | 2.65 | 1 | `18,678` / `11,614` / `11,202` |
+
+Agreement: A and B returned the existing solver's solutions, degree, outcome and decomposition set
+on all 10,000 calls each; on the 9,996 calls the existing solver does not refuse, `M_{P₂}` and the
+characteristic polynomial were identical too.  On the calls that did not fall back, A's normal forms
+cost `65.6`–`66.8·10³` (the registered bound, `≈ 6.7·10⁴`, holds) and B's `31.6`–`32.2·10³`.
+A's per-call `C` is now echelon `≈ 70 %`, charpoly `≈ 15 %`; B's echelon `≈ 170·10³`, charpoly
+`≈ 94·10³`.  The unit test (`e31_chain_solve_agrees_with_the_existing_solver`: E25 `p = 101, 149`,
+E24 `p = 101, 53`, both pivot rules) agrees on every call, and its negative control (one coefficient
+of one equation moved) changes every non-empty solution set.
+
+**What the fallbacks are.**  In all 40 end-to-end runs the number of fallbacks equals E25's
+`reruns + unsolved` exactly (e.g. `488 = 467 + 21` at `p = 101` seed 1, arm A): the chain solve hands
+back precisely the calls that the existing solver itself cannot finish cleanly at degree 11
+(degenerate eigenspaces, unresolved vectors, unreachable borders), and no others.  Those calls cost
+the existing solver `4.5`–`4.8·10⁶` each, and the chain attempt adds `≈ 13 %` to them.
+
+**End to end** (E25's ten curves, both arms, `S` in `F_p` multiplications; the matched walk is the
+`⟨±ψ⟩` walk; E25's numbers from its records):
+
+| p | seed | arm | `S` E25 | `S` A | `S` B | E25 / A | E25 / B | `S`/rho E25 | `S`/rho A | `S`/rho B |
+|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| 101 | 1 | A | `6.76·10¹⁰` | `2.71·10¹⁰` | `1.49·10¹⁰` | 2.50 | 4.53 | `1.31·10⁵` | `5.27·10⁴` | `2.90·10⁴` |
+| 101 | 1 | B | `3.48·10¹⁰` | `1.39·10¹⁰` | `7.63·10⁹` | 2.51 | 4.57 | `6.77·10⁴` | `2.70·10⁴` | `1.48·10⁴` |
+| 101 | 2 | A | `2.47·10¹⁰` | `9.87·10⁹` | `5.42·10⁹` | 2.50 | 4.56 | `6.19·10⁴` | `2.47·10⁴` | `1.36·10⁴` |
+| 101 | 2 | B | `1.17·10¹⁰` | `4.68·10⁹` | `2.58·10⁹` | 2.50 | 4.54 | `2.93·10⁴` | `1.17·10⁴` | `6.46·10³` |
+| 149 | 1 | A | `5.83·10¹¹` | `2.30·10¹¹` | `1.25·10¹¹` | 2.53 | 4.66 | `7.07·10⁵` | `2.79·10⁵` | `1.52·10⁵` |
+| 149 | 1 | B | `2.19·10¹¹` | `8.64·10¹⁰` | `4.70·10¹⁰` | 2.53 | 4.65 | `2.65·10⁵` | `1.05·10⁵` | `5.71·10⁴` |
+| 149 | 2 | A | `1.01·10¹¹` | `3.98·10¹⁰` | `2.17·10¹⁰` | 2.53 | 4.64 | `1.24·10⁵` | `4.92·10⁴` | `2.68·10⁴` |
+| 149 | 2 | B | `5.67·10¹⁰` | `2.25·10¹⁰` | `1.23·10¹⁰` | 2.52 | 4.62 | `7.01·10⁴` | `2.78·10⁴` | `1.52·10⁴` |
+| 197 | 1 | A | `8.53·10¹⁰` | `3.35·10¹⁰` | `1.83·10¹⁰` | 2.54 | 4.67 | `8.24·10⁴` | `3.24·10⁴` | `1.76·10⁴` |
+| 197 | 1 | B | `6.32·10¹⁰` | `2.49·10¹⁰` | `1.36·10¹⁰` | 2.54 | 4.66 | `6.11·10⁴` | `2.40·10⁴` | `1.31·10⁴` |
+| 197 | 2 | A | `4.39·10¹⁰` | `1.72·10¹⁰` | `9.37·10⁹` | 2.55 | 4.68 | `4.44·10⁴` | `1.74·10⁴` | `9.48·10³` |
+| 197 | 2 | B | `2.59·10¹⁰` | `1.02·10¹⁰` | `5.53·10⁹` | 2.55 | 4.68 | `2.62·10⁴` | `1.03·10⁴` | `5.60·10³` |
+| 269 | 1 | A | `1.37·10¹¹` | `5.36·10¹⁰` | `2.90·10¹⁰` | 2.56 | 4.73 | `8.41·10⁴` | `3.29·10⁴` | `1.78·10⁴` |
+| 269 | 1 | B | `7.88·10¹⁰` | `3.09·10¹⁰` | `1.67·10¹⁰` | 2.55 | 4.72 | `4.84·10⁴` | `1.90·10⁴` | `1.02·10⁴` |
+| 269 | 2 | A | `5.10·10¹⁰` | `1.99·10¹⁰` | `1.07·10¹⁰` | 2.56 | 4.76 | `3.16·10⁴` | `1.23·10⁴` | `6.65·10³` |
+| 269 | 2 | B | `2.52·10¹⁰` | `9.83·10⁹` | `5.30·10⁹` | 2.56 | 4.75 | `1.56·10⁴` | `6.09·10³` | `3.29·10³` |
+| 397 | 1 | A | `7.19·10¹⁰` | `2.81·10¹⁰` | `1.52·10¹⁰` | 2.56 | 4.72 | `1.95·10⁴` | `7.62·10³` | `4.13·10³` |
+| 397 | 1 | B | `4.17·10¹⁰` | `1.63·10¹⁰` | `8.82·10⁹` | 2.56 | 4.73 | `1.13·10⁴` | `4.42·10³` | `2.39·10³` |
+| 397 | 2 | A | `1.31·10¹¹` | `5.15·10¹⁰` | `2.79·10¹⁰` | 2.55 | 4.70 | `3.97·10⁴` | `1.56·10⁴` | `8.45·10³` |
+| 397 | 2 | B | `5.65·10¹⁰` | `2.22·10¹⁰` | `1.20·10¹⁰` | 2.55 | 4.70 | `1.71·10⁴` | `6.71·10³` | `3.64·10³` |
+
+Every record reproduces E25's field for field apart from the solve's multiplications, what is
+derived from them, wall time, `macaulay_entries` (a fallback builds the matrix twice) and the solver
+tags: the same residuals, unsolved targets, reruns, decompositions, relations, linear algebra, logs
+and walks.  Every log recovered, every walk correct, every kept row re-added (as in E25).  The solves
+are now `98.4`–`98.9 %` of `S` (A) and `97.0`–`97.9 %` (B).
+
+**§5a band** (one GAE, `97` `F_p` multiplications, per Macaulay entry and per walk step, as E25 priced
+it): `S_E25 / S_A` is `2.50`–`2.56` at `0`, `1.39`–`1.43` at `0.1`, `1.034`–`1.053` at `1` GAE;
+`S_E25 / S_B` is `4.53`–`4.76`, `1.59`–`1.64`, `1.051`–`1.071`.  Both stay below E25 on every row at every
+weight, and the matched rho stays ahead of every row of both at every weight.  At `1` GAE the matrix
+the chain solve still builds (`393 × 448` entries per call) is almost all of the cost: what E31 cut is
+the arithmetic, not the matrix.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.85 | identical outputs on all 10,000 Stage A calls (A and B) and all 40 end-to-end records; `M_{P₂}` and charpoly identical on 9,996 of 9,996 applicable calls; the negative control differs on every non-empty set | **holds** |
+| G2.86 | NF existing / A, all calls with fallbacks charged: `9.2`–`12.4` (in band on one curve of ten); on calls without fallback `≈ 13×` (A's NF `65.6`–`66.8·10³`) | **falsified low**: the band was set from the clean-call bound and did not price the charged fallbacks, which carry the existing `≈ 8.5·10⁵` normal forms on top |
+| G2.87 | charpoly existing / A `2.82`–`2.89` | **holds** |
+| G2.88 | eigenvectors existing / A `15.4`–`30.0` | **holds** |
+| G2.89 | `C` median existing / A `2.62`–`2.69` on every curve | **holds**; kill (`< 1.5`) not reached |
+| G2.90 | fallbacks `0.1`–`1.2 %` per curve in Stage A (`1.2 %`, `1.1 %` at `p = 101`), `0.2`–`1.1 %` per end-to-end run | **falsified at `p = 101`**, holds at `p ≥ 149`; the fallbacks are exactly E25's reruns and unsolved targets |
+| G2.91 | wall existing / A `1.56`–`1.67` | **holds** |
+| G2.92 | echelon A / B `2.52`–`2.65`; B's `C` median `49`–`50 %` below A's on every curve | **falsified high** (band `[1.0, 1.6]`); B carried to end to end by the registered rule |
+| G2.93 | every E25 count reproduced; `S_E25 / S_A` `2.50`–`2.56` on every curve and arm; gap to the matched rho shrinks by the same factor | **holds** |
+| G2.94 | `1.39`–`1.43` at `0.1` GAE, `1.034`–`1.053` at `1` GAE; A below E25 at every weight | **holds** |
+
+**What it says.**  The `k = 4` decomposition on the `V₄` line was paying for a dense 64-wide normal
+form at each of 240 pivots, a dense Hessenberg reduction and a dense 64-dimensional kernel, while
+its quotient is a 12-generator module over `F_p[P₂]`.  Working in that module — left-looking normal
+forms of the 12 chain ends, `det R(x)` of a `12 × 12` polynomial matrix, kernels of `R(λ)` — and
+choosing the sparsest pivot rows cuts one call from `1.62`–`1.66·10⁶` to `3.04`–`3.33·10⁵` `F_p`
+multiplications (B), with the same decompositions on every call.  **End to end, on E25's curves and
+target streams, `S` falls `4.53`–`4.76×` (B; `2.50`–`2.56×` with A alone), with every relation, log and
+walk unchanged.**  **Class: engineering** (a constant on the dominant phase; the exponents and the
+matrix are unchanged) — a verified, measured improvement of the baseline under the 2026-10-15
+criterion, and B is the new baseline on this family.  It is an operation-count result at `0` GAE;
+at `1` GAE per Macaulay entry it is `5`–`7 %`.  **Distance remaining:** every row is still
+`2.39·10³`–`1.52·10⁵×` slower than the matched `⟨±ψ⟩` rho (`2.39·10³×` at `p = 397` seed 1, arm B, the
+best; E25's best was `1.13·10⁴×`).  The §11.16 handover was not recomputed here.  **Scope:** E25's
+GLS twists, `p ≤ 397`, the degree-11 solve; E24's curves use the same solver and the unit test covers
+two of them, but E24 was not rerun end to end.  **Next levers, in order of measured weight:** B's
+echelon (`≈ 1.7·10⁵`, wall time `≈ 10` ms of `≈ 11` ms per call), `det R(x)` (`≈ 9.4·10⁴`, `64`
+evaluations of a `12 × 12` determinant), and the `0.2`–`1.1 %` fallbacks (`≈ 4.6·10⁶` each, up to
+`≈ 16 %` of B's mean `C` at `p = 101`), which a chain-side treatment of degenerate eigenspaces would
+remove.  Not done here: the validation gate (independent replay certificate and validator report),
+the leaderboard, `benchmarks/` and the visual report.
+
+### 9.24 E31 validated, with errata and a §5a qualification on solver B
+
+*2026-10-24.*  Independent validation `VAL-20261024-24ef8b` (`benchmarks/20261024-e31-chain-solve/`:
+`VALIDATION.json`, `replay-certificate.json`, `validator-report.json`, `validate.py`, `replay/`) passed.
+It rebuilt from a tree whose build inputs equal the recorded binary `a8f52422d5` and replayed all 40
+end-to-end records and all ten Stage A curves.  Every deterministic field was identical (only wall
+times differ).  It also ran a control of the existing solver through the new path, which reproduces
+E25 `p = 101` seed 2 exactly.  An out-of-sample agreement check on three new GLS curves
+(`(113, 4)`, `(229, 3)`, `(353, 3)`) agreed on all 3,000 calls.  It found no uncounted
+multiplication, cache or per-curve precomputation in the chain solve; fallbacks are charged in full.
+All 361 deciding figures of §9.23 and the ten G2.85–G2.94 verdicts recompute.  §9.21–§9.23 stand as
+recorded; the following are additive corrections.
+
+**Errata** (none changes a table cell or a verdict):
+
+1. "B's `C` median `49`–`50 %` below A's" (G2.92) is `47.45`–`49.39 %`.
+2. "`0.2`–`1.1 %` fallbacks per end-to-end run" (G2.90 and "Next levers") is `0.266`–`1.196 %`.
+3. "Those calls cost the existing solver `4.5`–`4.8·10⁶` each" holds for the 62 Stage A reruns
+   (`4.54`–`4.84·10⁶`).  The 4 calls the existing solver itself refuses cost `0.44`–`0.52·10⁶`.
+4. A's echelon share "≈ 70 %" is `66.1`–`67.4 %` of the mean `C`; only the median over calls without
+   a fallback reaches `≈ 68`–`70 %`.  B's fallback weight at `p = 101`, "up to ≈ 16 %", is at most
+   `≈ 15 %` (4 fallbacks unidentified in Stage A, so approximate).
+5. "Every row is still `2.39·10³`–`1.52·10⁵×`" and "at 1 GAE it is 5–7 %" are solver B's ranges; A's
+   rows reach `2.79·10⁵×` and its 1-GAE saving is `3.4`–`5.3 %`.
+6. §9.22's quoted "the solve is `99.0`–`99.4 %` of `S`" fits neither definition: solve/`S` is
+   `99.03`–`99.20 %`, (Weil + solve)/`S` is `99.37`–`99.54 %`.
+7. The E31 JSON records carry `"experiment": "e25"`; only the `solver` field distinguishes them.
+
+**§5a qualification on solver B.**  The sparsest-pivot rule counts the nonzeros of every row it
+builds and recounts each updated row.  That work is neither counted nor emitted, and the registered
+band model (one native operation per Macaulay entry) does not see it.  The validator priced it at the
+band's rate from an exact lower bound (`2 E_E25 − E_E31` entry reads per record).  On that basis B
+falls *behind* E25 on all 20 rows at `0.1` GAE (`S_E25/S_B = 0.885`–`0.899`) and at `1` GAE
+(`0.542`–`0.544`).  So **B beats E25 and A only at 0 GAE; across the band its rank is unresolved**,
+and B is not a new baseline.  On wall clock B is no faster than A on this host (`B/A = 0.96`–`1.04`).
+**Solver A** is ahead of E25 at every weight under the registered model: `S_E25/S_A = 2.50`–`2.56`
+(0), `1.39`–`1.43` (0.1), `1.034`–`1.053` (1 GAE).  A's 1-GAE margin is smaller than the native
+traffic both solvers leave unpriced, so at 1 GAE it holds only under that model.
+
+**Distance remaining to the matched `⟨±ψ⟩` rho** (`S`/rho over the 20 rows):
+
+| GAE | E25 | A | B (registered model) | B, pivot pass priced |
+|--:|:--|:--|:--|:--|
+| 0 | `1.13·10⁴`–`7.07·10⁵` | `4.42·10³`–`2.79·10⁵` | `2.39·10³`–`1.52·10⁵` | `2.39·10³`–`1.52·10⁵` |
+| 0.1 | `2.15·10⁴`–`1.38·10⁶` | `1.50·10⁴`–`9.77·10⁵` | `1.31·10⁴`–`8.55·10⁵` | `2.39·10⁴`–`1.55·10⁶` |
+| 1 | `7.72·10⁴`–`5.45·10⁶` | `7.33·10⁴`–`5.22·10⁶` | `7.21·10⁴`–`5.14·10⁶` | `1.42·10⁵`–`1.0·10⁷` |
+
+Rho is ahead of every row at every weight.  **What E31 establishes:** a validated engineering
+(phase) speed-up of the `k = 4` solve, solver A, ranked ahead of E25 across the band under the
+registered model.  It is not an exponent change.  Next levers are unchanged from §9.23.  B's
+pivot-selection pass should be counted, or replaced by a counted sparsity estimate, before B is
+ranked.
+
+### 9.25 E27 pre-registration: the matched walk, strengthened (Karatsuba tower products, batched norm inversions)
+
+*Registered 2026-10-30, before any E27 code.*  **Numbering:** the 2026-10-22 drafts of E27–E30 are
+lost; §9.22 recorded that they claimed §9.20–§9.21 and G2.41–G2.84, which stay unused.  E27 takes
+§9.25 and G2.95 onward.  **Motivation** (an independent red team's surviving finding, not re-derived
+here except where stated): every distance to rho in §9.14–§9.24 is measured against a walk whose
+arithmetic is weaker than it needs to be.  `Fp4::mul` is charged `19` (schoolbook: `16` products and
+`3` reductions by `c`) and `Fp4::inv` `40` (`24` products and `16` for one `inv_mod`), so an affine
+addition is `40 + 3·19 = 97`, the GAE used in every band above.  With E31 the solve is a smaller share
+of `S`, so a stronger reference matters more than it did.  **Class, fixed in advance:** the rho-side
+change is a *reference correction* (accounting), not an improvement: if it holds, every row moves
+further from rho.
+
+**The arithmetic (derived before code).**  `F_{p⁴} = F_{p²}[t]/(t² − s)`, `F_{p²} = F_p[s]/(s² − c)`.
+A Karatsuba product in `F_{p²}` costs `3` products and `1` reduction by `c`; in `F_{p⁴}` it takes three
+`F_{p²}` products (`AC`, `BD`, `(A + B)(C + D)`) and one more reduction by `c` for `BD·s`: **`13`**,
+every one a real `F_p` multiplication, counted as performed.  The inversion keeps its `24` products
+(norm to `F_{p²}`, norm to `F_p`, two scalings, two `F_{p²}` products) and replaces its one `F_p`
+inversion (`16`) by a share of Montgomery's simultaneous inversion over `m` concurrent walks:
+`3(m − 1) + 16` for the batch, so `3.81` per inversion at `m = 16`.  An affine addition then costs
+`24 + 3.81 + 3·13 ≈ 66.8` (red team: `≈ 66`), a doubling `≈ 79.8` (was `116`), the GLS map `ψ`
+`2·13` (was `2·19`).  Every component falls by `1.45`–`1.46×`.  Batching the whole `F_{p⁴}` inversion
+instead of its norm is worse (red team) and is not built.
+
+**Protocol (Stage W).**  On E25's ten curves (`generate_gls_klein_instance(p, seed, 16)`,
+`p ∈ {101, 149, 197, 269, 397}`, seeds `1, 2`), the `⟨±ψ⟩` walks and the negation walks with E25's
+seeds (`1000·seed + k`, `k < 16`), each walk run three ways: **(i)** E25's arithmetic, serial (a
+replay of E25's records); **(ii)** Karatsuba products, serial; **(iii)** Karatsuba products with the
+norm inversions batched over a pool of `16` walks run in lockstep, set-up included (the `66` scalar
+multiplications of each walk's set-up run in lockstep too).  When a recorded walk finishes, a filler
+walk with a fresh seed takes its slot so the batch stays at `m = 16`; fillers are not recorded and pay
+their own share.  A batch's cost is split among its members in integers (rotating remainder), so the
+walk totals are exact.  Each walk also records a digest of every class representative it visits.
+Then E31's solver-A pipeline (`experiments/31_solve_cost/run_e2e.sh` with `--solver chain`) is rerun
+on the same ten curves and both arms with Karatsuba products in all of its `F_{p⁴}` work (generation,
+base, precompute, Weil restriction where it uses `F_{p⁴}`, lift-back, checks; the solve is over `F_p`
+and is untouched); the IC side does not get batched inversions, and the most they could save is
+reported from a new counter of `F_p` inversions.  Distances to rho use E31 A's `S` (and the
+Karatsuba `S`) against walk (iii).  §5a band as in E25/E31: one GAE per Macaulay entry and per walk
+step, GAE `= 97` (primary, comparable with §9.24); with GAE re-measured under (iii) as a sensitivity.
+Host: the 4-vCPU container (isolab-eks is not reachable from it); operation counts only.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.95 | bit identity (**kill**) | arithmetic (i) reproduces every E25 walk record field for field (steps, group operations, `F_p` multiplications, cycle escapes, recovered log, correctness); (ii) and (iii) give the same steps, group operations, cycle escapes, recovered logs and visit digests as (i) on all `320` walks; unit tests: Karatsuba `=` schoolbook on random products, batched `=` unbatched inverses and additions, and a negative control (one perturbed norm inverse in a batch) is detected | any difference (E27 then stops and is recorded as a failure) |
+| G2.96 | per-operation costs | `Fp4::mul` `13` exactly; addition of distinct points in (iii) `[64, 70]`; `F_p` multiplications per group operation over a whole walk, (i) / (iii), `[1.38, 1.50]` | outside |
+| G2.97 | the matched walk | `rho_E25 / rho_E27` (mean `F_p` multiplications, (i) over (iii)) in `[1.38, 1.50]` on every curve for the `⟨±ψ⟩` walk and for the negation walk (red team's estimate of the row shift: `1.03`–`1.3`; this band is derived from the component costs above) | outside |
+| G2.98 | the IC side | `S_A / S_{A,K}` in `[1.001, 1.008]` on every row (non-solve `F_{p⁴}` work `≤ 2.5 %` of `S_A`); every other field of E31 A's records reproduced exactly | outside, or any other field differs |
+| G2.99 | distance to rho | `(S/rho)` grows by `[1.37, 1.50]` per row at `0` GAE, `[1.30, 1.48]` at `0.1`, `[1.12, 1.30]` at `1` GAE (GAE `= 97`); rho ahead of every row at every weight | outside; any row below rho |
+
+**What it would say.**  If G2.95–G2.99 hold, the matched rho of §9.24 was `≈ 1.45×` too expensive, and
+E31's distances read `≈ 1.45×` larger at `0` GAE: a correction of the reference, reported as such and
+not as a change of the index calculus.  The IC side gains a few tenths of a percent (engineering,
+negligible), because its `F_{p⁴}` work is `≈ 2 %` of `S`.
+
+### 9.26 E28 pre-registration: the GLS fold on the single-`τ_T` line (stages 0, A and A2 only)
+
+*Registered 2026-10-30, before any E28 code.*  **What E28 is, reconstructed.**  The 2026-10-22 draft is
+lost; what survives is the red team's reading that this `τ_T` variant "predicts itself `≥ 10×` behind
+E24, so it can improve the E19 row but not the baseline", and that only its cheap stages 0, A and A2
+should run, plus one new cheap control on solve cost.  §9.18 named the variant: the `ψ` fold without the
+full `V₄` symmetry, on E19's single-`τ_T` line, where §9.17's obstruction to `h = 4` does not apply but
+the solve is E19's weighted `D₄` solve (`≈ 1.4·10⁹` a call, `≈ 820×` E24's).  The derivation below is new
+and is checked by Stage 0 before anything is measured.
+
+1. **The curves.**  Over `F_p[t]/(t⁴ − c)` the `p²`-power map is `σ: t ↦ −t`.  Take `x₀` with
+   `σ(x₀) = −x₀` (coordinates on `t` and `t³` only, not both zero), `c ∈ F_p^*`, and E19's
+   `a = c² − 3x₀²`, `b = −x₀³ − a x₀`, so `T = (x₀, 0)` is on `E` and `f′(x₀) = c²`.  Then `x₀² ∈ F_{p²}`,
+   `σ(a) = a`, `σ(b) = −b`, and `E` is the quadratic twist over `F_{p⁴}` by `x₀` (a square root of a
+   non-square of `F_{p²}`) of a curve over `F_{p²}`: a GLS twist, `j ∈ F_{p²}`.
+2. **`ψ` keeps `T` and the line.**  `ψ(x, y) = (−σ(x), i·σ(y))`, `i² = −1` in `F_p` (`p ≡ 1 mod 4`): on
+   `E` because `σ(f(x)) = f(−σ(x))·(−1)` and `i² = −1`; `ψ² = −1`; `ψ(T) = T`.  On E19's line
+   `x = x₀ + u`, `u ∈ F_p`: `ψ(x₀ + u) = x₀ − u`, so `ψ` acts as `u ↦ −u`, `τ_T` as `u ↦ c²/u`, `τ_T ψ` as
+   `u ↦ −c²/u`: **`8` points a column** (`4` abscissae, `±`) against E19's `4`.  Points with `u² = −c²`
+   have `ψP = ±(P + T)`, so `λ·log P = ±log P` and `log P = 0`; they are excluded with `u ∈ {0, ±c}`.
+3. **The cofactor.**  All of `E[2]` is rational (the other two roots lie in `F_{p²}(√(9x₀² − 4c²)) ⊆ F_{p⁴}`),
+   so `4 | h`; §9.17's argument excludes `h = 4` only for the `V₄` line, which needs the halves of a second
+   `T`.  Here only `T`'s halves matter, and `f′(x₀) = c²` is already a square.  So `h = 4` is not excluded.
+4. **What it can buy.**  As in E25, `ψ` acts on the base, not on the system: decompositions per target
+   (`≈ 8`, E19's `τ_T` orbit) and `y` unchanged, columns halved, so the relation phase halves; the matched
+   walk is the `⟨±ψ⟩` walk, `√2` fewer steps than E19's negation walk.  Net against the matched rho
+   `≈ √2`, on a line whose rows are `2.6`–`8.8·10⁶×` from rho (E19) against E24's `1.3·10⁴`–`1.7·10⁵×`:
+   the variant can improve E19's row and cannot approach the baseline (E31 A on E25's curves).
+
+**Protocol.**  Sizes E19's: `p = 53, 101, 149, 197, 269`.  **Stage 0** (gate): seeds `1`–`8` per `p`,
+the generator keeping the least `h` (`≤ 16`) its budget meets; on every curve check on points `ψ² = −1`,
+`ψ(G) = [λ]G` with `λ² ≡ −1 (mod n)`, `ψ(T) = T`, and that every base point's `ψ`-, `τ_T`- and
+`τ_Tψ`-images are base points with the derived `u`-action; record `h`, density and points per column.
+**Stage A** (the fold, measured): seeds `1, 2` per `p`; one target stream `R = aG + bQ` decomposed by
+E18's exact meet-in-the-middle oracle (`mitm_signed`, every decomposition re-added in the group), one
+decomposition per target drawn uniformly, feeding two arms on the same points: **τ**, E19's `τ_T`-folded
+base (`4` points a column), and **τψ**, the `⟨τ_T, ψ⟩`-folded base (`8`); each filtered and solved by
+Wiedemann until `[d]G = Q` verifies; `16` `⟨±ψ⟩` and `16` negation walks per curve, priced both with
+E25's arithmetic and with E27's (§9.25).  **Solve-cost control** (new, cheap): E19's weighted `D₄` solve,
+unchanged (`weighted_system` → `solve_weighted` → `lift_back`), on `3` uniform targets of each Stage A
+curve, compared with `mitm_signed` on the same base.  **Stage A2** (a model, labelled as such):
+`S_model = (residuals to the τψ log) × (control's median C) + LA + generation`, against the matched
+walk, compared with E19's measured `S/rho` at the same `p` and with E31 A's.  **No Stage B** (no
+end-to-end run with the `D₄` solve).  Host: the 4-vCPU container, operation counts only.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.100 | Stage 0 (gate; **kill**) | at every `p` curves exist; `ψ² = −1`, `ψ(G) = [λ]G`, `λ² ≡ −1`, `ψ(T) = T` on points; every image in the base with the derived action; `8.00` / `4.00` points a column on the same points; density pooled in `[0.3, 0.7]`; `h = 4` on at least one of `8` seeds at every `p` | a `ψ`/line check fails or no curve (E28 stops, recorded as a negative); `h = 4` never met at some `p` (recorded; Stage A runs on the least `h`) |
+| G2.101 | Stage A (fold) | `cols_τ / cols_τψ = 2.00` on every curve; decompositions per decomposed target median `8`; `y_τψ / y_τ` pooled in `[0.8, 1.25]`; residuals to the log `τ / τψ` pooled in `[1.6, 2.4]`; both arms recover the log on every curve | outside, or a log not recovered |
+| G2.102 | solve-cost control | every solved call's decomposition set equals `mitm_signed`'s; per-call `C` median within `±30 %` of E19's `1.37`–`1.41·10⁹` at the same `p` | any disagreement, or outside |
+| G2.103 | Stage A2 (model, extrapolation) | `S_model / rho_⟨±ψ⟩` below E19's `S / rho_neg` at the same `p` by `[1.4, 4.0]` (E25 arithmetic on both); `≥ 10×` above E31 A's `S/rho` range on E25's curves at every `p` | outside the first band; within `10×` of E31 A |
+
+**What it would say.**  If G2.100–G2.103 hold, the `ψ` fold carries over to E19's line with `h = 4`, cuts
+that line's modelled cost by `≈ 2×` against its own matched walk, and leaves it two orders of magnitude
+behind the `V₄` line: **class engineering on the `D₄`/`τ_T` line, not an improvement of the baseline**,
+and since A2 is a model, not a measured `S` either.  A Stage B would be justified only if A2 put the line
+within reach of E31 A, which the derivation says it cannot.
+
+### 9.27 E29 pre-registration: the order-24 twist action on E18's `j = 0` line (kill test, Stage R, Stage A only)
+
+*Registered 2026-10-30, before any E29 code.*  **What E29 is, reconstructed.**  The draft is lost; the red
+team's surviving findings: a twist construction whose draft predicted a handover `n* ≈ 2^{139}`–`2^{144}`
+(against E24's `2^{90.1}`), so it cannot beat the baseline; only Stage R and Stage A should run, after a cheap
+kill test — does `ψ_p`, the endomorphism derived from the `p`-power Frobenius, have order `24` on E18's
+curves?  The red team noted that E18's eight prime orders are `≡ 1 (mod 24)` (also mod `16` and `48`;
+`n mod 96 ∈ {1, 49}`), which allows it but does not prove it.  The lane
+`research/twist_index_calculus_20261020/` built the object on canonical quartic twists
+`y² = x³ + b₀t³` (`Twist24Instance`, `rho_twist24`, `run_k4_twist24`): the transported Frobenius
+`ψ(x, y) = (h²x^p, h³y^p)`, `ψ⁴ = −1`, with the cubic automorphism `ι` a signed action of order `24`.
+E29 measures what that action does to **E18's `ψ` arm** (§9.3: `r_ψ = 0.138` against the order-6 walk,
+handover `2^{146.0}`).  Derived before code:
+
+1. **`ψ_p` exists on every E18 curve.**  `E_b : y² = x³ + b` over `F_{p⁴}`, `p ≡ 1 (mod 12)`; Frobenius maps
+   `E_b` to `E_{b^p}`, isomorphic to `E_b` because `b^{p−1}` is a sixth power (`12 | p − 1`).  With
+   `u = b^{−(p−1)/6}`, `ψ_p(x, y) = (u²x^p, u³y^p)` is an endomorphism of `E_b` over `F_{p⁴}` and
+   `ψ_p⁴ = (ζ²x, ζ³y)`, `ζ = N(u) = χ₆(b)⁻¹`: **`ord ψ_p = 4·ord χ₆(b)`**, `24` exactly when `b` is
+   neither a square nor a cube.  The group `⟨ψ_p, Aut E⟩` has order `24` on every curve (`ψ_p⁴ ∈ Aut E`,
+   `ψ_p^j ∉ Aut E` for `j = 1, 2, 3`), and it acts faithfully on `⟨G⟩` (a non-trivial element minus `1` has
+   degree `≤ (1 + p^{3/2})² < n`), so as a cyclic group of order `24`.
+2. **It does not keep E18's base** unless `u² ∈ F_p`; but each E18 curve is `F_{p⁴}`-isomorphic to a
+   canonical model `y² = x³ + b₀t³` with the same prime order (E18's `p = 241, 337` orders equal the lane's
+   `(241, 49)`, `(337, 100)`), where `h² ∈ F_p` and the line `x ∈ F_p` is kept.  Rho and the base can both
+   use the order-24 action on that model, and an attacker maps to it at the cost of one isomorphism.
+3. **What it moves.**  Against E18's order-6 `⟨±ψ⟩` walk, an order-24 walk takes `√4 = 2×` fewer steps
+   but pays a costlier class representative (three Frobenius images and twelve candidates): derived
+   `F_p`-multiplication ratio `[1.3, 2.0]`.  On the base, columns `÷ 4` (`12` abscissae a column against
+   `3`), the linear algebra `÷ ≈ 16`, so `r_24 ≈ r_ψ · (rho ratio)/16`, and §11.16's handover moves by
+   `(cols ÷ 4)` against `(S_rho ÷ ratio)`: `n* ÷ (4/ratio)⁴`, i.e. `2^{146.0} → ≈ 2^{140}`–`2^{144}` (the
+   draft's band).  The order-24 walk alone (no base fold) moves E18's `ψ` handover *later* by
+   `4·log₂(ratio)` bits.
+
+**Protocol.**  E18's eight `ψ` curves (`generate_psi_instance(p, 1)`, `p = 241, 337, 541, 601, 733, 769, 997,
+1069`).  **Kill test (first, per curve):** on E18's own model compute `ψ_p` as above; check on points that it
+maps `E` to `E`; find `λ_p` with `ψ_p(G) = [λ_p]G` among the 24th roots of unity mod `n`; record `ord λ_p`,
+`ord χ₆(b)`, `|⟨λ_p, λ_ω, −1⟩|`, and whether `u² ∈ F_p`; find `b₀` with `#(y² = x³ + b₀t³) = n`.
+**Kill:** `|⟨λ_p, λ_ω, −1⟩| < 24` on a curve (that curve leaves E29), or no curve passes (E29 stops).
+**Stage R** (the matched reference, retrospective): on the canonical model of each passing curve, `16`
+order-6 `⟨±ψ⟩` walks (`rho4_folded`, `Psi`) and `16` order-24 walks (`rho_twist24`), the same seeds, both in
+E18's arithmetic (schoolbook) and in E27's products (Karatsuba; unbatched, as `rho_twist24` is serial),
+the `[d]G` check excluded from both.  First on `p = 241` alone (the red team's one-curve kill budget),
+then on the rest.  **Stage A** (the base fold): the lane's `run_k4_twist24` (E18's exact oracle, one
+stream, three arms flat / cubic `= E18's ψ fold` / twist24, Wiedemann to the verified log) on the canonical
+models at `p = 241, 337, 541`, `16` walks each fold; `r = LA / rho` per arm; §11.16's handover from the
+twist24 arm's own constants (`y`, `cols/p`, `r`, `S_rho`) with §11.17's `C₄ = 1.213·10¹²`.  **No Stage B**
+(no `S₅` solve).  Host: the 4-vCPU container, operation counts only.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.104 | kill test | `|⟨λ_p, λ_ω, −1⟩| = 24` on all eight curves; `ord λ_p = 4·ord χ₆(b)`; a canonical `b₀` of the same order exists for every curve; `u² ∉ F_p` on E18's model (E18's base not kept) | a group of order `< 24` (**kill** for that curve), or any other item |
+| G2.105 | Stage R steps | order-6 / order-24 walk steps, pooled per curve, in `[1.7, 2.3]` | outside |
+| G2.106 | Stage R cost | order-6 / order-24 walk `F_p` multiplications in `[1.3, 2.0]` on every curve, in both arithmetics | outside |
+| G2.107 | E18's `ψ` arm re-read | `r_ψ` against the order-24 walk `= 0.138 × (G2.106 ratio)` and its handover later by `4·log₂(ratio)` bits — a reference correction, reported as such | — (derived from G2.106) |
+| G2.108 | Stage A | cubic / twist24 columns `4.00`; LA ratio in `[10, 22]`; `r_24` (twist24 arm against the order-24 walk) in `[0.01, 0.06]`; log recovered on every arm | outside, or any log not recovered |
+| G2.109 | handover (model) | from Stage A's twist24 constants, `n* ∈ [2^{139}, 2^{144}]`; above E24's `2^{90.1}` by `≥ 2^{45}` | outside the band |
+
+**What it would say.**  If G2.104–G2.109 hold, E18's `j = 0` rows were measured against a walk weaker than
+the one the curve allows: the order-24 walk is the matched reference, and against it E18's `ψ` arm stands
+further from rho (a reference correction).  The order-24 base fold then brings the modelled `S₅`-based
+handover from `2^{146}` to `≈ 2^{140}`–`2^{144}`: **engineering on the `j = 0` / `S₅` line, a model,
+not an improvement of the baseline**, which (E24, E25, E31 on the `V₄` line) sits `≈ 2^{50}` earlier.
+
+### 9.28 E30 pre-registration: "invariants", lite — an accounting audit of trivial `F_{p⁴}` products
+
+*Registered 2026-10-30, before any E30 code.*  **What survives of the draft:** E30 ("invariants") had a full
+version with a Stage B and a "lite" version that changed only counters or accounting; its draft touched
+`gaudry_quartic.rs` and predicted that the lite version would move E25's distance to rho by only `≈ 0.6 %`.
+Only the lite version is to run, as an accounting correction.  **What cannot be reconstructed:** which
+counter the draft changed.  The note does not say, and no draft file survives.  So E30 is pre-registered here
+as a minimal, honest accounting audit in the same place (`gaudry_quartic.rs`'s `F_{p⁴}` counters) and on the
+same object (the `V₄` invariant system and the walks), not as the lost draft.
+
+**The audit.**  `Fp4::mul` charges a full product (`19`, or `13` with E27's products) whatever its operands.
+Some operands are structurally trivial, and a counted implementation would not pay for them: the factor `1`
+(`v4_system` evaluates the `30` invariant coefficients as `Σ_j c_j z_R^j` from `z_R^0 = 1`, and `Fp4::pow`
+starts from `1`), the factor `0`, and factors in `F_p` (a scaling, `4`, as `Fp4::scale` is charged).  E30
+re-prices exactly these products: `0` when an operand is `0` or `1`, `4` when an operand lies in `F_p`, the
+full product otherwise.  Nothing is computed differently; recorded counts are unchanged (the audit is a
+separate counter of the difference).  **Class, fixed in advance: accounting.**  Whatever it moves is not an
+improvement of the index calculus.
+
+**Protocol.**  E25's ten curves, both arms, E31's solver A with E27's products (the §9.25 baseline): the
+pipeline rerun with the audit counter on, every other field required to equal E27's records; the matched
+`⟨±ψ⟩` and negation walks (E25's seeds) re-priced the same way, serially.  Report `S`, the walk, and the
+distance to rho at `0`, `0.1` and `1` GAE, before and after the audit.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.110 | replay | every field of the §9.25 Karatsuba records reproduced; the audit changes only its own counter | any other field differs |
+| G2.111 | IC side | `S` falls by `[0.01 %, 1 %]` (trivial products in the invariant system's evaluation and in powering) | outside |
+| G2.112 | walk | the `⟨±ψ⟩` walk's cost falls by `[0 %, 1 %]` on E25's curves (its `ψ` multipliers are not expected in `F_p`) | outside |
+| G2.113 | distance | `S/rho` moves by less than `1 %` at every weight on every row (red team's estimate for the lost draft: `≈ 0.6 %`) | `≥ 1 %` on any row |
+
+### 9.29 E27 measured: the matched walk was `1.45×` too expensive; every row moves `1.45×` further from rho
+
+*2026-10-30.*  Code `6490d0fac` (with the compile repairs `af2504ef1`), binary `af2504ef1`
+(`experiments/32_walk_karatsuba/binary_commit.txt`).  **Stage W:** `examples/e27_walk.rs` on E25's ten
+curves, `16` `⟨±ψ⟩` and `16` negation walks each, three arithmetics (`stage_w.{json,log}`).  **IC side:**
+`experiments/32_walk_karatsuba/run_e2e.sh` (E31's solver-A command plus `--karatsuba`,
+`RAYON_NUM_THREADS=4`), ten curves, both arms (`e2e_chain_karatsuba_p*s*.json`, log).  Tables:
+`examples/e27_tables.rs` → `tables.md`, `summary.json`.  Host: the 4-vCPU container (isolab-eks is not
+reachable from it); operation counts only, no wall-time claim.
+
+**A finding about the reference before E27 touched it.**  Replaying E25's walks with today's code
+reproduced every step, group operation and collision but charged `+31` group operations and `+3,309`
+`F_p` multiplications per walk at `p = 101` seed 1.  The difference is the `[d]G = Q` check after the
+collision: main's `652238c03` (2026-10-24, the twist lane) began charging it inside `rho4_folded`, which
+E25's and E31's records did not.  It is `0.13`–`0.78 %` of a `⟨±ψ⟩` walk on these curves, and it raises
+the matched rho of every pipeline run since that commit.  E27 records it per walk (`verify_fp_muls`) and
+prices every walk without it, as E25 did.
+
+**Per operation** (`F_p` multiplications): `Fp4::mul` `19 → 13`; affine addition of distinct points
+`97` → `79` (Karatsuba, unbatched) → `66.3`–`66.7` (batched: the norm-inversion share is `3.27`–`3.75`
+per inversion over the twenty walk pools); doubling `116 → 92` unbatched; the GLS map `ψ` `38 → 26`.
+
+**Stage W.**  All `320` walks gave the same steps, group operations, cycle escapes, recovered logarithms,
+correctness and visit digests under the three arithmetics; arithmetic (i) reproduced all `320` E25 walk
+records field for field (E25's convention).  The walk's `F_p` cost, (i) over (iii): **`1.4533`–`1.4634`**
+(`⟨±ψ⟩` `1.4559`–`1.4634`, negation `1.4533`–`1.4621`); (i)/(ii) (Karatsuba alone) `≈ 1.27`.
+
+**IC side.**  Every field of E31 A's twenty records was reproduced except the multiplication counts and what
+derives from them (`call` includes the Weil restriction, which uses `F_{p⁴}` products; `solve_muls` is
+unchanged, as it is over `F_p`), wall times, and the walks.  `S_A / S_{A,K}` = **`1.00475`–`1.00566`**: the
+non-solve `F_{p⁴}` work is `2.00`–`2.48 %` of `S_A`.  Batching the IC side's `F_p` inversions too
+(`4.7·10⁵`–`2.6·10⁷` per run) could save at most a further `0.127`–`0.170 %` of `S` (bound, not built).
+
+**Distance to the matched `⟨±ψ⟩` rho** (`S/rho` over the twenty rows; E31 A against E25's walk, E27 against
+walk (iii); band as §9.24, one GAE `= 97` per Macaulay entry and per walk step):
+
+| GAE | E31 A (§9.24) | E27 (A with Karatsuba, walk (iii)) | growth per row |
+|--:|:--|:--|:--|
+| 0 | `4.42·10³`–`2.79·10⁵` | `6.39·10³`–`4.06·10⁵` | `1.4477`–`1.4564` |
+| 0.1 | `1.50·10⁴`–`9.77·10⁵` | `2.13·10⁴`–`1.39·10⁶` | `1.4150`–`1.4427` |
+| 1 | `7.33·10⁴`–`5.22·10⁶` | `9.07·10⁴`–`6.64·10⁶` | `1.2364`–`1.3252` |
+
+With the GAE itself re-measured under (iii) (`66.3`–`66.7` instead of `97`) on the E27 side, the `1`-GAE
+growth is `1.016`–`1.017`: at that weight the band's price per step dominates both sides.  The best row,
+`p = 397` seed 1 arm B (E31's solver A): `4.42·10³ → 6.39·10³×` at `0` GAE.  Rho is ahead of every row
+at every weight.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.95 | all `320` walks identical under (i), (ii), (iii); (i) = E25's records; unit tests `e27_tests` (Karatsuba = schoolbook with a perturbed-factor control; batched additions = serial with a perturbed-inverse control; batched walks = serial walks; digests distinguish walks) | **holds** for the runs; the unit tests are run with the session's final test build (§9.32 records the result) |
+| G2.96 | `13` exactly; distinct addition `66.3`–`66.7`; per group operation (i)/(iii) `1.453`–`1.463` | **holds** |
+| G2.97 | `1.4533`–`1.4634` on every curve, both walks | **holds** (red team's `1.03`–`1.3` was low: every component, not only the addition, falls `1.45×`) |
+| G2.98 | `1.00475`–`1.00566`; non-solve share `2.00`–`2.48 %`; every other field reproduced | **holds** |
+| G2.99 | `1.448`–`1.456` (0), `1.415`–`1.443` (0.1), `1.236`–`1.325` (1 GAE); rho ahead everywhere | **holds** at `0` and `0.1`; **falsified high at `1` GAE on the two `p = 101` seed 2 rows** (`1.3252`, band `≤ 1.30`): their walks are the shortest (`1,192` steps), so the per-step price is a smaller share |
+
+**What it says.**  The rho reference of §9.14–§9.24 used `19`-multiplication products and one `F_p`
+inversion per addition.  A Karatsuba tower and Montgomery-batched norm inversions make the same walks
+(same points, collisions and logarithms) `1.45×` cheaper.  **This is a correction of the reference, not a
+change to the index calculus: every row is `1.45×` further from rho at `0` GAE than §9.24 said**
+(`1.24`–`1.33×` at `1` GAE).  The same products make the IC side `0.5 %` cheaper (engineering, below the
+noise of anything else in this note), because its `F_{p⁴}` work is `≈ 2 %` of `S`.  **Distance remaining:**
+`6.39·10³`–`4.06·10⁵×` at `0` GAE.  The rho walk is now the stronger reference for E28–E30 and for any
+later row on these curves.
+
+### 9.30 E28 measured: the `ψ` fold carries over to E19's line with `h = 4`, and the line stays two orders behind the `V₄` line
+
+*2026-10-30.*  Code `789dc2ff6` (Stage 0, Stage A, registered control; binary `789dc2ff6`,
+`experiments/33_tau_stage_a/binary_commit.txt`), supplementary control and tables `0e4fccce1`.  **Stage 0:**
+`examples/e28_tau.rs --stage 0`, `40` curves (`stage0.{json,log}`).  **Stage A:** `run_stage_a.sh`, `10` curves
+(`stage_a_p*s*.json`, `stage_a.log`).  **Supplementary control:** `--stage c` (`control_decomposed.{json,log}`).
+Tables `examples/e28_tables.rs` → `tables.md`, `summary.json`.  Host: the 4-vCPU container; operation counts only.
+
+**One deviation, recorded.**  The registered control drew `3` uniform targets per curve; none had a
+decomposition, so its agreement check (`0 = 0` on all `30` calls) was vacuous.  A supplementary control was added
+after the run: `3` targets per curve that the exact oracle decomposes (`30` calls), with the same solver.
+
+**Stage 0.**  All `40` curves (`8` seeds × `5` sizes) built; `ψ² = −1`, `ψ(G) = [λ]G`, `λ² ≡ −1`, `ψ(T) = T`
+on points on every one; every base point's `ψ`-, `τ_T`- and `τ_Tψ`-image is a base point with the derived action
+`u ↦ −u, c²/u, −c²/u`; `4` points a column under `τ_T` and `8` under `⟨τ_T, ψ⟩` (with `±`) on the same points;
+`j ∈ F_{p²}` throughout; **`h = 4` on all `40`**; density pooled `0.50`–`0.52` per size.
+
+**Stage A** (same stream, both arms, exact oracle):
+
+| p | seed | cols τ / τψ | residuals to the log τ / τψ | ratio | y τ / τψ | control `C` median (uniform / decomposed) |
+|--:|--:|:--|:--|--:|:--|:--|
+| 53 | 1 | 8 / 4 | 5,519 / 4,055 | 1.36 | 613 / 811 | `1.36` / `1.37·10⁹` |
+| 53 | 2 | 16 / 8 | 748 / 292 | 2.56 | 44 / 32 | `1.39` / `1.38·10⁹` |
+| 101 | 1 | 24 / 12 | 2,273 / 1,261 | 1.80 | 91 / 97 | `1.40` / `1.42·10⁹` |
+| 101 | 2 | 32 / 16 | 1,183 / 481 | 2.46 | 36 / 28 | `1.37` / `1.40·10⁹` |
+| 149 | 1 | 36 / 18 | 4,288 / 2,306 | 1.86 | 116 / 121 | `1.38` / `1.40·10⁹` |
+| 149 | 2 | 48 / 24 | 1,570 / 696 | 2.26 | 32 / 28 | `1.40` / `1.48·10⁹` |
+| 197 | 1 | 42 / 21 | 8,804 / 4,738 | 1.86 | 205 / 215 | `1.38` / `1.41·10⁹` |
+| 197 | 2 | 52 / 26 | 4,307 / 2,166 | 1.99 | 81 / 80 | `1.41` / `1.46·10⁹` |
+| 269 | 1 | 80 / 40 | 3,493 / 1,986 | 1.76 | 43 / 48 | `1.44` / `1.44·10⁹` |
+| 269 | 2 | 66 / 33 | 8,564 / 5,364 | 1.60 | 128 / 158 | `1.38` / `1.41·10⁹` |
+
+Every log recovered on both arms; all `640` walks correct; decompositions per decomposed target: median `8`
+on every curve.  Pooled: residuals `40,749 / 23,345` (`1.75`), `y` `98.4 / 110.1` (`1.12`).  The `30`
+supplementary calls returned exactly the oracle's decompositions (`2` or `8` each).
+
+**Stage A2 (a model, not a measured `S`).**  `S_model = R·C + R·g + 16·LA` (`R` the arm's residuals to its log,
+`C` the control's median call, `g` the measured generation per target), against the matched walk in E25's
+arithmetic: the τψ arm `6.99·10⁵`–`1.74·10⁷×` the `⟨±ψ⟩` walk at `0` GAE (`7.32·10⁵`–`1.92·10⁷` at `0.1`,
+`9.09·10⁵`–`3.19·10⁷` at `1`); against E27's walk (iii) `1.02·10⁶`–`2.55·10⁷` at `0` GAE.  On the same curve,
+the τψ arm against the `⟨±ψ⟩` walk is `1.30`–`2.82×` below the τ arm against the negation walk.  Against E19's
+measured `S/rho` at the same `p` (E19's other curves, mean of its two seeds): `0.45`–`6.98×` per curve; by size
+(geometric mean of the two seeds) `1.77, 4.29, 2.39, 1.83, 3.65` at `p = 53 … 269`.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.100 | every check on all `40` curves; `h = 4` on all `40`; density `0.50`–`0.52` | **holds** (gate passed) |
+| G2.101 | columns `2.00`; decompositions per target median `8`; `y` ratio pooled `1.12`; residuals ratio pooled `1.75`; every log recovered | **holds** (pooled, as registered; per curve the residuals ratio is `1.36`–`2.56`, the noise of `8`–`80` columns) |
+| G2.102 | `C` median `1.36`–`1.44·10⁹` (uniform) and `1.37`–`1.48·10⁹` (decomposed); agreement on all `30` decomposed calls (the registered uniform calls agree vacuously) | **holds**, with the deviation above |
+| G2.103 | E19/E28 `0.45`–`6.98` per curve, by size `1.77`–`4.29`; E28's best row (`6.99·10⁵`) against E31 A's rows at the same `p`: `≥ 16.6×` at `p = 101`, `≥ 52×` at `197`, `≥ 21×` at `269`, but only `3.3×` above E31 A's worst row at `p = 149` (`2.79·10⁵`, a high-`y` curve) | **falsified** per curve and at `p = 101` by size (`4.29 > 4.0`); holds by size at the other four; the `≥ 10×` gap to E31 A **fails at `p = 149`** under the strict reading (best E28 row against worst E31 row), holds at the other matched sizes and by a factor `≈ 100` between medians |
+
+**What it says.**  On GLS twists over `F_{p⁴}` built on E19's line (`σ(x₀) = −x₀`, `c ∈ F_p`), `ψ` keeps `T` and
+the line and acts as `u ↦ −u`, and every one of `40` curves has `h = 4`: the cofactor penalty §9.17 found on
+the `V₄` line does not arise here.  The fold halves the columns exactly and cuts the residuals to the log
+`1.75×` (pooled) with an unchanged solve (`C ≈ 1.4·10⁹`, the same decompositions).  Modelled with that solve, the
+line moves by `≈ 2`–`4×` against its own matched walks relative to E19.  **Class: engineering on the `D₄`/`τ_T`
+line, and a model (Stage A2), not a measured end-to-end `S`; not an improvement of the baseline.**  **Distance
+remaining (model):** `≥ 7·10⁵×` the matched rho in E25's arithmetic, `≥ 1.0·10⁶×` against E27's walk; E31 A on
+E25's curves is two orders of magnitude closer.  A Stage B is not justified: what this line needs is a cheaper
+solve, which the `V₄` line already has.
+
+### 9.31 E29 measured: `ψ_p` has order `24` on all of E18's curves; the order-24 walk as built is not cheaper; the order-24 base fold moves the `S₅` handover by `≈ 10` bits, to `2^{135}`–`2^{142}`
+
+*2026-10-30.*  Code and binary `0e4fccce1` (`experiments/34_twist24_stage_r/binary_commit.txt`):
+`examples/e29_twist.rs` (`kill.{json,log}`, `stage_r_*.{json,log}`, `stage_a_p{241,337,541}.{json,log}`), tables
+`examples/e29_tables.rs` → `tables.md`, `summary.json`.  Host: the 4-vCPU container; operation counts only.
+Total compute: under `10` core-minutes (the red team budgeted `≈ 0.3` core-hours for one curve's Stage R).
+
+**Kill test** (E18's own models, `generate_psi_instance(p, 1)`): on all eight curves `ψ_p = (u²x^p, u³y^p)`,
+`u = b^{−(p−1)/6}`, maps `E` to `E`; `λ_p` is a 24th root of unity mod `n` of **order `24`**, `χ₆(b)` has order
+`6` (so `ord λ_p = 4·ord χ₆(b)`, as derived), `λ_ω` order `3`, and `|⟨λ_p, λ_ω, −1⟩| = 24`.  `u² ∉ F_p` on every
+E18 model (its base is not kept).  Each curve has a canonical model `y² = x³ + b₀t³` of the same order (least
+`b₀`: `3, 3, 3, 9, 9, 2, 17, 3`).  **Not killed.**
+
+**Stage R** (canonical models, `16` walks per order, both arithmetics, all `256` walks correct): steps order 6 /
+order 24 per curve `1.29`–`2.10`, pooled per `√n` **`1.701`**; but the order-24 walk's class representative (three
+Frobenius images, twelve candidates) costs `191`–`210` `F_p` multiplications a step against `109`–`122` (schoolbook),
+so its `F_p` cost ratio, order 6 / order 24, is `0.743`–`1.202` per curve, **`0.962` pooled** (Karatsuba: `0.684`–
+`1.107`, pooled `0.884`).  `S_rho` per `√n`: `52.9` (order 6) and `55.0` (order 24), schoolbook; E18's `ψ` walk
+measured `54.1`.
+
+**Stage A** (the lane's `run_k4_twist24`, E18's exact oracle, one stream, flat / cubic / twist24 arms, logs
+recovered on all nine arms, all walks correct):
+
+| p | log₂ n | cols cubic / twist24 | LA cubic / twist24 | y cubic / twist24 | `r` twist24 (order-24 walk) | `n*` cubic | `n*` twist24 (order-6 / order-24 walk) |
+|--:|--:|:--|--:|:--|--:|:--|:--|
+| 241 | 31.7 | 32 / 8 | 13.3 | 79.9 / 65.2 | 0.0058 | `2^{151.9}` | `2^{142.2}` / `2^{141.8}` |
+| 337 | 33.6 | 60 / 15 | 15.2 | 19.8 / 15.6 | 0.0103 | `2^{145.7}` | `2^{135.3}` / `2^{135.0}` |
+| 541 | 36.3 | 88 / 22 | 13.9 | 29.8 / 27.8 | 0.0083 | `2^{147.9}` | `2^{138.8}` / `2^{137.9}` |
+
+(`n*` is §11.16's model with §11.17's `C₄ = 1.213·10¹²` and each arm's own `y`, `cols/p`, `r` and walk; an
+extrapolation, driven mostly by `y`, which here rests on `9`–`89` relations.)
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.104 | group of order `24` on all eight; `ord λ_p = 24 = 4·ord χ₆(b)`; canonical `b₀` for every curve; `u² ∉ F_p` everywhere | **holds** (not killed) |
+| G2.105 | pooled `1.701`; per curve `1.29`–`2.10` (five of eight below `1.7`) | **holds pooled** (at the band's edge); per curve falsified (16 walks a curve) |
+| G2.106 | `F_p` ratio `0.74`–`1.20` (schoolbook), `0.68`–`1.11` (Karatsuba); pooled `0.96` / `0.88` | **falsified**: as built, the order-24 walk costs more than the order-6 walk; its representative costs `1.8×` a step |
+| G2.107 | the matched reference stays the order-6 walk (cheaper pooled); on three curves (`p = 601, 997, 1069`, schoolbook) the order-24 walk is `1.04`–`1.20×` cheaper, which would move E18's handover there later by `≤ 1.1` bits | no correction of E18's `ψ` rows at the pooled level |
+| G2.108 | columns `4.00`; LA `13.3`–`15.2`; `r_24` `0.0058`–`0.0103`; every log recovered | **holds** except `r_24`, **falsified low** at `p = 241, 541` (below `0.01`) |
+| G2.109 | `n*` twist24 `2^{135.0}`–`2^{142.2}`; `2^{44.9}`–`2^{52.1}` above E24's `2^{90.1}` | **holds at `p = 241`**, **falsified low** at `337`, `541`; the `≥ 2^{45}` clause misses by `0.1` bit at `p = 337` |
+
+**What it says.**  The red team's question has a clean answer: on every one of E18's `j = 0` curves the
+Frobenius-derived `ψ_p` has order `24` and, with the automorphisms, acts as a cyclic group of order `24` on
+`⟨G⟩` (proved in §9.27 and checked on points).  Two consequences differ.  **The walk:** an order-24 walk takes
+`1.70×` fewer steps, but with the lane's class representative it pays more than that per step, so it is not a
+stronger reference; E18's `ψ`-arm distances stand.  A cheaper representative (comparing abscissae first, `x`-only
+images) is the obvious next step and is not built here.  **The base:** on the canonical model the order-24 fold
+divides the columns by `4.00` and the linear algebra by `13`–`15` against E18's cubic fold, and moves the modelled
+`S₅` handover by `≈ 9`–`10` bits on the same curves, to `2^{135}`–`2^{142}`.  **Class: engineering on the `j = 0`
+/ `S₅` line, and a model (no `S₅` solve was run); not an improvement of the baseline**, whose modelled handover
+(E24, `2^{90.1}`; E25 `2^{88.0}`) is `≥ 2^{45}` earlier.
+
+### 9.32 E30 measured: trivial products are `0.31 %` of `S`; the distance to rho moves `−0.31 %` at most — an accounting correction
+
+*2026-10-30.*  Code and binary `0e4fccce1` (`experiments/35_invariants_lite/binary_commit.txt`).  Walk audit
+`examples/e30_audit.rs` (`walk_audit.{json,log}`); IC side `run_e2e.sh` (E27's Karatsuba solver-A runs plus
+`--audit`; `e2e_audit_p*s*.json`, log, finished `2026-10-30T22:23:38Z`); tables `examples/e30_tables.rs` →
+`tables.md`, `summary.json`.  Host: the 4-vCPU container; operation counts only.  As §9.28 states, this is a
+minimal accounting audit registered in place of the lost "invariants-lite" draft, not that draft.
+
+**Results.**  All twenty audited records reproduce E27's Karatsuba records in every field except wall times and
+the new counter (the walks are re-run and not compared here; E27 established them).  The audit re-prices
+`0.3087`–`0.3131 %` of `S` away on every row (`1.4·10⁷`–`7.1·10⁸` `F_p` multiplications per run): products by
+`0`, `1` or an element of `F_p` in the IC side's `F_{p⁴}` work, which here is `≈ 2 %` of `S`, so about one in seven
+of its counted products is trivial.  The `⟨±ψ⟩` walk's saving is `0`–`1.1` multiplications per walk
+(`≤ 0.0002 %`): its `ψ` multipliers are not in `F_p` on any of the ten curves.  The distance to the matched walk
+(E27's (iii)) moves by **`−0.309`–`−0.313 %`** at `0` GAE, `−0.084`–`−0.086 %` at `0.1` and `−0.011 %` at `1` GAE.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.110 | every non-count field of E27's records reproduced on all `20` | **holds** |
+| G2.111 | `S` falls `0.309`–`0.313 %` | **holds** |
+| G2.112 | walk `≤ 0.0002 %` | **holds** |
+| G2.113 | largest change `0.313 %` (red team's estimate for the lost draft: `≈ 0.6 %`) | **holds** |
+
+**What it says.**  Pricing a product by `0`, `1` or an `F_p` scalar as such moves `S` by `0.31 %` and the walk
+by nothing measurable.  **Class: accounting** — no algorithm changed, and it is not an improvement.  It is
+recorded so that a later counter change of this kind is not mistaken for progress.  Of comparable size, and
+also an accounting effect, is main's change of 2026-10-24 (§9.29): charging the walks' `[d]G` check moved
+every matched rho of these curves by `0.13`–`0.78 %` in the other direction.
+
+**Unit tests (E27–E30), run in one build at the end of the session:** recorded in the session log and the PR.
+
+### 9.33 E27–E30 validated: errata, and a §5a qualification on E29's reference
+
+*2026-10-31.*  Each experiment was replayed by an independent validator from a fresh build of its recorded binary
+commit, every non-timing field compared, and its headline figures recomputed by a tool that shares no producer
+code (operation counts only; local container, no wall time admitted).  §9.29–§9.32 stand as recorded; the
+following are additive corrections.
+
+| | evidence | replay | headline figures | gate |
+|:--|:--|:--|:--|:--|
+| E27 | `research/e27_walk_20261030/` (`VAL-20261031-e27a1c`) | 11/11 runs, 23,144 fields identical | 59 agree | **valid** |
+| E28 | `research/e28_tau_20261030/` | 12 records, 8,690 fields identical | 224/226 agree | **refused**: end-to-end `S` is a model |
+| E29 | `research/e29_twists_20261030/` | 6 records, 26,124 fields identical | 265/265 agree | not submitted: no index-calculus cost |
+| E30 | `research/e30_invariants_lite_20261030/` | 11 records, 12,281 fields identical | 174/174 agree | **valid** |
+
+E27 and E30 are on the IC leaderboard as a reference correction and an accounting audit.  E28 and E29 are named
+there as not shown.  Their measured stages are verified; their deciding quantities are models.
+
+**E27 errata** (none changes a verdict):
+
+1. §9.29 Stage W, "(i)/(ii) ≈ 1.27" holds for the `⟨±ψ⟩` walk (`1.265`–`1.283`); the negation walk is
+   `1.230`–`1.241`.  The registered quantity (i)/(iii) reproduces exactly.
+2. §9.29, "batching the IC side's inversions could save at most `0.127`–`0.170 %`" is the saving at the walk's
+   measured batch share.  The upper bound under the batch cost `3(m−1)+16` is `0.130`–`0.180 %` of `S`.
+3. In `experiments/32_walk_karatsuba/e2e_chain_karatsuba_p*s*.json`, `rho_matched_muls` is walk (ii)
+   (Karatsuba, unbatched) *with* the `[d]G` check, and `ratio` is `S` over that.  Neither is E27's distance,
+   which uses walk (iii) without the check.  Read from those records, the distance is understated at `0` GAE by
+   `1.137`–`1.166×`.  The records are not changed; this note and the leaderboard use walk (iii).
+
+**E28 errata** (none changes a verdict):
+
+1. §9.30 A2, by size: `1.77`, `2.39` are `1.78`, `2.40` (geometric means of rounded per-curve values were
+   printed).  All stay in `[1.4, 4.0]`, and `p = 101` stays above `4.0` (`4.287`).
+2. §9.30 G2.103, "`≥ 52×` at 197" is `51.6×`.
+3. §9.30, "`≥ 7·10⁵×` the matched rho in E25's arithmetic": the least row is `6.99·10⁵×`.  Against the
+   strongest walk (iii) every row is `≥ 1.02·10⁶×`.
+4. §9.30 G2.103, "≈ 100 between medians" is `60`–`112×` depending on which E31 solver-A rows are pooled (arm A
+   `59.9`, all 20 rows `79.6`, arm B `111.5`).
+5. The registered A2 model prices each call at the control's *median* `C`; E19's measured `S` is priced at the
+   mean.  Applied to E19's own rows the median formula under-prices them by `1.03`–`1.17×`, so E28's modelled
+   `S` is optimistic.  With E28's 3-call mean, E19/E28 by size becomes `1.48`, `4.20`, `2.40`, `1.82`, `3.02`.
+   G2.103's falsifications, including the `≥ 10×` failure at `p = 149`, stand under either pricing.
+
+The control deviation of §9.30 (30 uniform targets had no decomposition, so the registered agreement check was
+vacuous; 30 decomposable targets added) is disclosed and adequate.  The uniform calls are a negative control
+(≈ 0.45 decomposable expected), and the added calls match the oracle's decomposition sets exactly; three calls
+per curve is a small sample.  The validator confirmed independently that `⟨±ψ⟩` is the largest fold on all 40
+curves (`j ∈ F_{p²} \ F_p`, `Aut(E) = {±1}`, `ψ² = −1`).  So walk (iii) is the strongest reference; §9.30's
+headline uses walk (i).
+
+**E29 erratum and §5a qualification.**  §9.31's "the matched reference stays the order-6 walk" and "E18's
+`ψ`-arm distances stand" hold **at 0 GAE only**.  With one native operation per walk step priced (E27's
+convention), the pooled order-6/order-24 cost ratio is:
+
+| arithmetic | 0 GAE | 0.1 GAE | 1 GAE |
+|:--|--:|--:|--:|
+| schoolbook | `0.962` | `0.996` | `1.205` |
+| Karatsuba | `0.884` | `0.927` | `1.172` |
+
+At `1` GAE the order-24 walk is cheaper on 7 of 8 curves.  The order of the two walks changes inside the band,
+so neither is the stronger reference across it.  The order-24 walk also has unemitted per-step work (12
+candidate comparisons) that the band does not price, so the ranking is **unresolved, not reversed**.  E18's
+`ψ`-arm distances are lower bounds at `1` GAE: a cheaper rho there lengthens them.  The kill
+test was re-derived on the canonical models `y² = x³ + b₀t³`: `⟨λ, λ_ω, −1⟩` has order 24 on all 8 curves and
+`n` equals E18's.  E18's own coefficients are not in the records, so "order 24 in E18's normalisation" rests on
+the replayed binary check.
+
+**E30 erratum.**  §9.32's "about one in seven of its counted products is trivial" cannot be checked: product
+counts are not emitted.  The `F_{p⁴}`-priced phases are `1.53`–`1.90 %` of `S` ("≈ 2 %"), and the saving is
+`0.164`–`0.202` of their multiplications.
+
+**Where the line stands.**  Against the strengthened walk (iii), the `k = 4` `V₄`/GLS line with E31's solver A
+is `6.39·10³`–`4.06·10⁵×` rho at `0` GAE, rho ahead at every weight.  The modelled handover (`2^{88}`–`2^{90}`) is
+an extrapolation from `p = 101`–`521` (`22`–`32`-bit `n`), and every `S` above is `≥ 99 %` solve.
+
+### 9.34 E32 pre-registration: the handover ladder — the crossover order fitted from many sizes, with intervals
+
+*Registered 2026-10-31, before any E32 run.*  **Numbering:** E32 owns §9.34 (this registration), §9.36
+(results) and G2.114–G2.123; E33 owns §9.35, §9.37 and G2.124–G2.133.  **Question.**  §9.33's handover
+(`2^{88}`–`2^{90}`) is §11.16's model applied to constants from four or five sizes (`n = 2^{22}`–`2^{32}`).
+The lead atlas (`LEAD-ICE-charged-toy-ic-exponent-vs-rho`) records that a four-size ratio exponent was
+unidentifiable and asks instead for a fit of the crossover order `log l*`, the size at which
+`S_IC = S_rho`.  E32 measures the line's current best configuration and its matched rho on a ladder of
+sizes, two decades wider in `n` than any run so far, and fits `log₂ n*` directly, with intervals, at
+`0`, `0.1` and `1` GAE.  **Class, fixed in advance:** a *measurement of distance* (and a fit of where it
+reaches `1`); nothing in E32 changes either arm, so no outcome is an improvement, and a fitted `n*`
+beyond the measured range is an extrapolation, reported as such.
+
+**The arms (unchanged code, pinned binaries).**  *IC:* the `k = 4` `V₄`/GLS index calculus on E25's
+curves, arm **B** (the `⟨V₄, ψ⟩`-folded base, the line's best arm), E31's solver **A** (`chain`), E27's
+Karatsuba `F_{p⁴}` products: exactly `quartic_pipeline_gls --solver chain --karatsuba` restricted to arm
+B (`run_k4_gls_pipeline_with`, unchanged), every phase charged as in E25/E31.  *Matched rho:* E27's walk
+(iii) — the `⟨±ψ⟩` walk, Karatsuba products, norm inversions batched over a pool of `16` walks with
+fillers — `16` walks per curve, seeds `1000·seed + k`, cost per walk **without** the `[d]G = Q` check
+(E25's and E27's convention), `rho` = mean over the `16` walks.  Both arms run through
+`examples/e32_ladder.rs` (modes `ic` and `walk`), which calls only those two unchanged library
+functions.  Binaries: built from `e75771052` (build inputs identical at `45378560dd`), copied to the
+session scratchpad and run only from there; sha256 in `experiments/36_handover_ladder/binary_commit.txt`.
+
+**Sizes, curves, seeds.**  `p ∈ {101, 149, 197, 269, 397, 557, 773, 1093, 1549, 2213, 3089}` (`log₂ n ≈
+22.6`–`42.4`, eleven sizes, `≈ 2` bits apart above `p = 397`), and `p = 4337` (`2^{44.3}`) only under the
+budget rule below.  At each size three curves, `generate_gls_klein_instance(p, seed, 16)` with seeds
+`1, 2, 3`; a seed that yields no curve is replaced by the next unused seed (`4, 5, …`), recorded.  At the
+five E25 sizes seeds `1, 2` are E25's curves, and their runs (with `--rho-runs 16`) are also the identity
+check against E27's records; elsewhere `--rho-runs 1` (the pipeline's own walks are not used by E32).
+The target stream is the pipeline's (seeded by the curve seed); the replicate unit for intervals is the
+curve.  Per curve: `S` (`total_muls`), Macaulay entries, `C`, `y`, columns, phase shares; per walk: steps,
+`F_p` multiplications, correctness, visit digest.
+
+**Distance and band (§5a).**  `S(g) = S + 97 g · E` (`E` = Macaulay entries), `rho(g) = rho + 97 g ·
+steps` (mean steps), `D(g) = S(g) / rho(g)`, `g ∈ {0, 0.1, 1}`, one GAE `= 97` (as §9.24 and §9.29).
+Rho's own unpriced native work is priced by the same rule (one per step).  A row is "ahead of rho" only
+if `D < 1` at all three weights.
+
+**Fit (frozen).**  Per curve `c`: `x_c = log₂ n_c − 32`, `L_c(g) = log₂ D_c(g)`.
+- **M1 (primary):** OLS `L = α + β x` on the curves with `p ≥ 269` (where the walk's set-up — `66`
+  scalar multiplications, `≈ 13 %` of a walk at `2^{30}` and falling — no longer bends `rho`); the
+  crossover order `log₂ n* = 32 − α/β` (defined for `β < 0`).
+- **M1-all (sensitivity):** M1 on every curve.
+- **M2 (sensitivity, theory slope):** `β` fixed at `−1/4` (`S ∝ p`, `rho ∝ p²`), `α` the mean of
+  `L + x/4` over `p ≥ 269`; `log₂ n* = 32 + 4α`.
+- **Intervals:** cluster bootstrap over curves, stratified by size (resample each size's curves with
+  replacement), `10,000` replicates, fixed RNG seed `32`; 95 % percentile intervals for `β`, `α` and
+  `log₂ n*`; the fraction of replicates with `β ≥ 0` (no crossover) is reported, and those replicates
+  count as `n* = ∞` in the percentiles.  Also reported: the OLS standard-error interval for `β`.
+- **Measured bound:** if no row has `D(g) ≤ 1`, the crossover is *empty in the reachable range* and is
+  recorded as `n* > 2^{x_max}` with `x_max` the largest `log₂ n` measured, beside the fit.  The linear
+  algebra is `≤ 0.002 %` of `S` at `p ≤ 397`; its share is reported per curve and its `∝ p²` term
+  is not modelled (sensitivity: its extrapolated share at the fitted `n*`).
+
+**Route, budget, stopping.**  isolab-eks is the default and was checked: unreachable from this container
+(no `aws` or `kubectl`; the GitHub `isolab-experiment.yml` dispatch is refused by the session proxy for
+both repository paths).  So: local, **operation counts only, no wall-time claim**, at most `3` of the `4`
+cores (`taskset -c 1-3`; `RAYON_NUM_THREADS=4`, which fixes the pipeline's target stream as in §9.19), one
+curve at a time.  Cost estimate from E27's arm-B walls (`≈ 2` ms per target on three cores, `≈ 0.07 p`
+columns, median `y ≈ 1,500`): `≈ 0.2 p` seconds per curve at the median, `≈ 1.6` h for the six new sizes,
+`×2`–`×10` on a heavy-tailed `y` curve.  **Budget:** `14` h of wall time for all E32 runs; a curve still
+running after `4` h is stopped and recorded as censored (not in the fits; reported).  Sizes run in
+ascending order, all three curves of a size before the next; a size is not started if the budget left is
+under `3×` the previous size's median curve time `× p_next / p_prev`.  `p = 4337` runs only if, after
+`p = 3089`, `≥ 3` h of budget remain and `≥ 8` GB of memory are free (its 16-walk pool holds `≈ 6` GB).
+No size, curve or seed is dropped or added for any reason other than these rules.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.114 | identity (**kill**) | `ic` reproduces every field of E27's ten arm-B records (`experiments/32_walk_karatsuba/e2e_chain_karatsuba_p*s*.json`) apart from wall times; `walk` reproduces E27's `rho_e27` and `walk_steps` (`summary.json`) on the ten curves exactly; at every size every log recovered, every kept row re-added, every walk correct | any difference or failure (E32 then stops) |
+| G2.115 | curves and base | every `(p, seed)` yields a curve with `h = 16`; columns / `p` in `[0.04, 0.10]` on every curve with `p ≥ 557` | a size without three curves, or outside |
+| G2.116 | per-call cost | `C` median in `[6.2, 6.9]·10⁵` and Macaulay entries per residual in `[1.70, 1.85]·10⁵` on every curve with `p ≥ 557` | outside |
+| G2.117 | phase shares | (Weil + solve) / `S` `≥ 98 %` and linear algebra `≤ 0.1 %` of `S` on every curve | outside |
+| G2.118 | yield | OLS exponent of `y` in `p`, all curves, in `[−0.5, 0.5]`; per-size median `y` in `[400, 6,000]` | outside |
+| G2.119 | matched rho | steps / `√n` in `[0.4, 0.9]` per curve (mean of `16`); `F_p` multiplications per step (set-up included) falling with `p`, in `[66, 80]` at every curve with `p ≥ 1549` | outside |
+| G2.120 | distance reached | per-size median `D(0)` falls with `n`; at the largest size reached the median `D(0)` is in `[3·10², 5·10³]`; rho ahead of every row at every weight (**the crossover is empty in the reachable range**) | outside; any row with `D ≤ 1` at any weight |
+| G2.121 | slope (M1, `0` GAE) | `β` in `[−0.30, −0.15]`; its 95 % interval contains `−0.25` | outside, or `−0.25` excluded |
+| G2.122 | crossover order at `0` GAE | M1: `log₂ n*` in `[74, 96]`, 95 % interval wider than `8` bits; M2: `log₂ n*` in `[76, 90]`, 95 % interval at most `6` bits wide | any of the four outside |
+| G2.123 | crossover across the band | M2 `log₂ n*` later than at `0` GAE by `[5, 9]` bits at `0.1` GAE and `[11, 17]` bits at `1` GAE (derived: per call `E/C ≈ 1.78·10⁵ / 6.45·10⁵`, per step `≈ 70`; `D` grows `≈ 3.2×` and `≈ 11.6×`); `D(0) < D(0.1) < D(1)` on every row | outside, or the order breaks on a row |
+
+**What it would say.**  If G2.114–G2.123 hold, the line's distance to the matched rho is measured over
+`2^{22.6}`–`2^{42.4}` (or `2^{44.3}`), falls as `≈ n^{−1/4}` with an interval on the exponent, and still
+exceeds `≈ 10³` at the largest size: the crossover is empty in the reachable range, recorded as a bound
+`n* > 2^{42}`, and the fitted crossover order with its interval replaces §9.33's single-point
+extrapolation.  A free-slope interval spanning more than a decade of bits says the slope, not the
+constant, limits what the ladder can tell; the theory-slope fit says where the constants put it.
+Neither moves the line toward rho: the distance remaining is reported as measured.
+
+### 9.35 E33 pre-registration: solver B's pivot selection, counted (and two cheaper selections)
+
+*Registered 2026-10-31, before any E33 code.*  **Numbering:** E32 (a parallel experiment in this
+checkout) owns §9.34, §9.36 and G2.114–G2.123; E33 takes §9.35 (this registration), §9.37 (results) and
+G2.124–G2.133.  **Motivation:** §9.24.  Solver B (`echelon_by_lead_with(…, sparsest = true)`,
+`gaudry_quartic.rs`) counts the nonzeros of every row of the built matrix before eliminating, compares
+the counts of every bucket's candidates, and recounts each updated row's tail after every row update.
+None of that is counted or emitted; the validator priced the first pass alone from a lower bound
+(`2 E_E25 − E_E31` entry reads) and found B behind E25 at `0.1` and `1` GAE, so B's rank is unresolved
+and B is not a baseline.  E33 counts the whole pass and, separately, builds two cheaper selections.
+**Class, fixed in advance:** counting B's work is *accounting*; only a variant that is cheaper than A
+with its own selection work counted, at weights where the order holds across the band, would be an
+improvement.
+
+**Counting rule.**  One native operation per Macaulay-matrix entry examined for its zero status and
+one per comparison of two candidates' keys (the convention of §9.16–§9.24: one per Macaulay entry,
+priced at `g · 97` `F_p` multiplications for `g ∈ {0, 0.1, 1}`).  Index bookkeeping that A also does
+(the bucket sort, the lead scan `row[c+1..].position(≠ 0)`, the swap) is common to every arm and is not
+pivot selection; it is emitted separately as `lead_scan_reads` and used only in the sensitivity G2.133.
+
+- **B, counted** (`chain-sparsest-counted`; the same code as B and the same choices): (i) the initial
+  pass, `rows · cols` per echelon built; (ii) `|bucket| − 1` comparisons in each column whose bucket
+  holds more than one row; (iii) the recount, `cols − l` reads per updated row with new lead `l`.
+- **B′, incremental** (`chain-sparsest-inc`; the same choices, by construction and checked): (i) each
+  row's count is inherited from its equation (a monomial shift is injective on terms), at one operation
+  per coefficient of each triangularised equation examined plus one per row; (ii) as B; (iii) during
+  each row update, the zero status of each updated entry before and after (two operations per entry the
+  pivot row touches) plus one per updated row.
+- **B″, estimate** (`chain-sparsest-est`; possibly different choices, so its `C` is measured): (i) as
+  B′; (ii) as B; (iii) the Markowitz fill bound `min(nnz − 1 + |pivot| − 1, cols − l)`, two operations
+  per updated row and no entry read.  Any pivot rule spans the same row space with the same pivot
+  columns, so the standard monomials, normal forms and decompositions must not change.
+- **A, counted** (`chain-counted`): A with `lead_scan_reads` emitted (no selection work), for G2.133.
+
+A fallback (the existing solver rerun) adds no selection work; the chain attempt's selection work is
+charged.  All new counting sits behind these new solver names; `macaulay`, `chain` and
+`chain-sparsest` are unchanged, and a test shows E25, A, B and E27 outputs bit-identical.
+
+**Protocol.**  *Stage A:* E31's setting exactly (`examples/e31_stage_a.rs`): E25's ten curves, the first
+1,000 targets of E25 arm A's stream per curve, one thread, every solver interleaved per call from the
+same per-target RNG seed: existing, A, A counted, B, B counted, B′, B″.  Per call: outputs, degree,
+outcome, decomposition set, every phase count, the pivot-selection work by part, `lead_scan_reads`, and
+a digest of the pivot row chosen in every column.  *End to end:* `quartic_pipeline_gls` on E25's ten
+curves, both arms, with `--karatsuba` (E27), `RAYON_NUM_THREADS=4` (the target stream), for B counted
+and B′; B″ only if, in Stage A, its per-call `S` at `0.1` GAE (`C + 9.7·(entries + selection work)`) is
+below A's on every curve.  *Reference:* A is E27's records (A with Karatsuba); E25 is its own records
+(schoolbook), compared with B's schoolbook `S` (E31 B's records plus the selection work measured here,
+which does not depend on the `F_{p⁴}` product); the matched rho is walk (iii) of E27 without the
+`[d]G` check (`experiments/32_walk_karatsuba/summary.json`, `rho_e27`, `walk_steps`).  Band:
+`S(g) = total_muls + 97 g (macaulay_entries + selection work)` and `rho(g) = rho + 97 g · steps`.  A rank
+is stated only where the order holds at `0`, `0.1` and `1` GAE on every row.  Host: the 4-vCPU
+container, at most 2 cores (isolab-eks is not reachable from it: no AWS CLI, the GitHub route refused);
+operation counts only, no wall-time claim.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.124 | identity (**kill**) | B counted, B′, B″ and A counted return the existing solver's decomposition set, outcome and degree on every Stage A call and every end-to-end record; B counted and B′ choose B's pivot in every column (equal digests) and reproduce B's phase counts; A counted reproduces A's; the end-to-end B counted and B′ records reproduce every field of each other apart from the selection fields and the solver tag, and every non-product field of E31 B's records; rerunning `macaulay`, `chain`, `chain-sparsest` and E27's `chain --karatsuba` at `p = 101` seed 2 reproduces the stored records byte for byte (wall times aside); unit tests: B′'s inherited and incremental counts equal a recount on every row of real E25 matrices.  Negative controls: a pivot moved to the second-sparsest candidate in one column changes the digest and is flagged; an incremental count off by one on one row is flagged by the recount check; E31's perturbed-coefficient control still changes non-empty sets | any difference, or a control not detected (E33 then stops) |
+| G2.125 | B's selection work per call (Stage A mean, all calls) | initial pass exactly `rows · cols` per echelon (`393 · 448 = 176,064`); comparisons `≤ 2 %` of the total; recount `>` initial pass; total in `[3·10⁵, 2·10⁶]` | outside |
+| G2.126 | B′'s selection work | B′ / B per call in `[0.15, 0.8]` | outside |
+| G2.127 | B″ | selection work `≤ 2·10⁴` per call; `C` median B″ / B in `[1.0, 1.3]` on every curve | outside |
+| G2.128 | B against A, counted (end to end, Karatsuba) | `S_A / S_B > 1` at `0` GAE and `< 1` at `0.1` and `1` GAE on every row: the order flips inside the band, so B is not ranked ahead of A | B ahead of A at `0.1` or `1` GAE on any row |
+| G2.129 | B against E25 | `S_E25 / S_B > 1` at `0`, `≤ 0.899` at `0.1` and `≤ 0.544` at `1` GAE on every row (the validator's lower bound; the recount only adds) | any row above those bounds |
+| G2.130 | B′ against A and E25 | behind A on every row at `0.1` and `1` GAE; behind E25 on every row at `0.1` and `1` GAE | B′ ahead of A or E25 at `0.1` or `1` GAE on any row |
+| G2.131 | B″ against A and E25 (Stage A per call; end to end if carried) | ahead of A at `0` and `0.1` GAE and behind at `1` GAE (unranked against A); ahead of E25 at every weight | any other order |
+| G2.132 | distance to the matched rho (walk (iii)), B counted | `S_B / rho` at `0` GAE in `[3.0·10³, 2.5·10⁵]`; rho ahead of every row of B, B′ and B″ at every weight | outside; any row below rho |
+| G2.133 | sensitivity: `lead_scan_reads` priced for every arm (Stage A) | changes no rank decided by G2.128–G2.131 | a rank changes |
+
+**What it would say.**  If G2.124–G2.130 hold, B's advantage over A and E25 exists at `0` GAE only:
+its pivot selection reads the matrix again, and any operation per entry costs more at `0.1` GAE than
+the `≈ 3·10⁵` multiplications per call that sparser pivots save.  A stays the ranked solver.  A
+selection that costs `O(1)` per row update (B″) could keep part of B's saving at `0.1` GAE, but at
+`1` GAE its comparisons and updates (thousands per call, `97` multiplications each) should exceed the
+saving; if so, no sparsest-pivot rule here ranks ahead of A across the band, and the next lever is the
+echelon's arithmetic itself, not its pivot order.
+
+### 9.36 E32 measured: the distance to rho over `2^{22.6}`–`2^{42.4}`, falling as `n^{−0.24}`; no crossover reached; fitted crossover order `2^{85.5}` `[2^{79.2}, 2^{94.3}]` at `0` GAE
+
+*2026-10-31 to 2026-11-01.*  Binaries pinned from `e757710521` (`experiments/36_handover_ladder/binary_commit.txt`),
+run only from the scratchpad copies (sha256 re-verified after a container restart).  Runner
+`experiments/36_handover_ladder/run_ladder.sh` (it replaced the pre-registration's `run_ladder.py` after the three
+`p = 101` curves, with the same logic, because AGENTS.md forbids Python orchestration); records `ic_p*s*.json`,
+`walk_p*s*.json`, log `run.log`; tables and fits `examples/e32_tables.rs` → `tables.md`, `summary.json`, `fit.json`.
+Report: `research/e32_handover_ladder_20261031/`.  **Route:** local 4-vCPU container, `taskset -c 1-3`,
+operation counts only, **no wall-time claim** (isolab-eks unreachable, §9.34).  Compute used: `8,952` s of the
+`14` h budget.
+
+**What ran.**  Eleven sizes `p = 101`–`3089`, three curves each (seeds `1`–`3`; every seed gave an `h = 16` curve,
+no replacement), **33 paired curves**: arm B with solver A and Karatsuba, and `16` walk-(iii) `⟨±ψ⟩` walks per
+curve (`528` walks).  Every logarithm recovered, every kept row re-added, every walk correct.
+**Deviations, both disclosed:** (1) the container restarted during the `p = 2213` seed 2 walk; the restart-safe
+runner reran that walk only (its interrupted wall time is not in the budget count). (2) `p = 4337` qualified
+under the budget rule, and its seed 1 index calculus completed (`S = 2.484·10¹¹`, `y = 1,252`, `282` columns), but
+its 16-walk pool was killed by the session's memory-cgroup OOM killer at `4.8` GB. `/proc/meminfo` had passed the
+registered `8` GB gate, but the cgroup limit is lower. Shrinking the pool would change the matched reference, so
+`p = 4337` is not completed. Its record is kept unpaired, outside every fit. **The ladder reached
+`p = 3089`, `log₂ n = 42.37`.**
+
+**Identity (G2.114).**  The ten E25-curve runs reproduce E27's arm-B records in all `604` compared fields each
+(`6,040`, wall times aside), and the walks reproduce E27's `rho_e27` and mean steps exactly on all ten curves.
+
+| p | log₂ n | curves | y median | `D(0)` median [min, max] | `D(0.1)` median | `D(1)` median |
+|--:|--:|--:|--:|:--|--:|--:|
+| 101 | 22.63 | 3 | 1,366 | `2.07·10⁴` [`1.71·10⁴`, `3.93·10⁴`] | `7.21·10⁴` | `3.83·10⁵` |
+| 149 | 24.88 | 3 | 4,272 | `4.03·10⁴` [`8.26·10³`, `1.52·10⁵`] | `1.38·10⁵` | `6.59·10⁵` |
+| 197 | 26.49 | 3 | 969 | `1.49·10⁴` [`1.07·10⁴`, `3.49·10⁴`] | `5.09·10⁴` | `2.38·10⁵` |
+| 269 | 28.29 | 3 | 1,918 | `1.75·10⁴` [`8.83·10³`, `2.75·10⁴`] | `5.90·10⁴` | `2.61·10⁵` |
+| 397 | 30.53 | 3 | 1,349 | `8.75·10³` [`6.39·10³`, `9.72·10³`] | `2.91·10⁴` | `1.24·10⁵` |
+| 557 | 32.49 | 3 | 1,180 | `6.46·10³` [`4.98·10³`, `7.43·10³`] | `2.13·10⁴` | `8.94·10⁴` |
+| 773 | 34.38 | 3 | 2,268 | `7.63·10³` [`6.52·10³`, `1.15·10⁴`] | `2.50·10⁴` | `1.04·10⁵` |
+| 1093 | 36.38 | 3 | 1,563 | `4.37·10³` [`3.67·10³`, `5.06·10³`] | `1.42·10⁴` | `5.84·10⁴` |
+| 1549 | 38.39 | 3 | 1,392 | `2.37·10³` [`2.07·10³`, `3.72·10³`] | `7.66·10³` | `3.14·10⁴` |
+| 2213 | 40.45 | 3 | 1,369 | `1.61·10³` [`1.34·10³`, `2.05·10³`] | `5.15·10³` | `2.10·10⁴` |
+| 3089 | 42.37 | 3 | 1,496 | `1.54·10³` [`1.14·10³`, `1.70·10³`] | `4.93·10³` | `2.01·10⁴` |
+
+`D(g) = (S + 97g·E) / (rho + 97g·steps)`, `rho` = walk (iii) without the `[d]G` check.  Per-curve rows (with `S`, `rho`,
+`C`, shares, steps) are in `tables.md`.  `C` median rises slowly, `5.99·10⁵` (`p = 101`) to `6.65·10⁵` (`p = 3089`);
+Macaulay entries per residual `1.76`–`1.82·10⁵`; Weil restriction plus solve is `98.3`–`99.1 %` of `S` (the solve alone `97.69`–`98.45 %`), the linear algebra `≤ 0.006 %`.
+The walk's cost per step falls from `175`–`229` (`p = 101`, set-up dominated) to `95.9` (`p = 3089`).
+
+**Fits** (`log₂ D = α + β(log₂ n − 32)`; stratified cluster bootstrap over curves, `10,000` replicates, seed `32`;
+no replicate had `β ≥ 0`):
+
+| GAE | model | curves | `β` [95 %] | `log₂ n*` [95 %] |
+|--:|:--|--:|:--|:--|
+| 0 | **M1** (`p ≥ 269`) | 24 | `−0.243` [`−0.279`, `−0.205`] | **`85.5` [`79.2`, `94.3`]** |
+| 0 | M1-all | 33 | `−0.232` [`−0.272`, `−0.191`] | `87.7` [`80.2`, `98.6`] |
+| 0 | M2 (`β = −1/4`) | 24 | — | `84.0` [`83.4`, `84.6`] |
+| 0.1 | **M1** | 24 | `−0.248` [`−0.284`, `−0.211`] | **`91.2` [`84.4`, `100.7`]** |
+| 0.1 | M1-all | 33 | `−0.239` [`−0.278`, `−0.197`] | `93.5` [`85.4`, `105.4`] |
+| 0.1 | M2 | 24 | — | `90.8` [`90.3`, `91.4`] |
+| 1 | **M1** | 24 | `−0.256` [`−0.292`, `−0.219`] | **`97.6` [`90.1`, `107.9`]** |
+| 1 | M1-all | 33 | `−0.256` [`−0.295`, `−0.216`] | `97.7` [`89.6`, `108.9`] |
+| 1 | M2 | 24 | — | `99.1` [`98.5`, `99.6`] |
+
+Yield exponent in `p`: `−0.066` (OLS 95 % `[−0.285, 0.154]`).  Linear-algebra sensitivity: `0.0044 %` of `S` at
+`p = 3089` (`∝ p²` against the rest `∝ p`) extrapolates to `≈ 5.6 %` at M2's `n*` (`p ≈ 4.2·10⁶`); it would move
+`n*` by well under a bit.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.114 | `6,040` of `6,040` fields; ten walk references exact; every log, row and walk correct at every size | **holds** |
+| G2.115 | `33` of `33` seeds gave `h = 16` curves; columns / `p` `0.0517`–`0.0687` at `p ≥ 557` | **holds** (for the sizes reached) |
+| G2.116 | `C` median `6.39`–`6.67·10⁵`; entries per residual `1.762`–`1.770·10⁵` at `p ≥ 557` | **holds** |
+| G2.117 | Weil + solve `≥ 98.28 %`; linear algebra `≤ 0.0057 %` | **holds** |
+| G2.118 | exponent `−0.066`; per-size median `y` `969`–`4,272` | **holds** |
+| G2.119 | steps / `√n` `0.468`–`0.787`; per step at `p ≥ 1549` `95.9`–`96.5` | steps **hold**; per step **falsified high**: the band `[66, 80]` priced the batched addition alone and missed the `ψ` map (`26`) the class representative costs at every step |
+| G2.120 | largest size `D(0)` median `1.54·10³` (in band); no row at or below rho at any weight; medians fall from `2^{14}`–`2^{15}` to `2^{10.6}`, but not monotonically (up at `149`, `269`, `773`, within the per-curve scatter) | level and "rho ahead" **hold**; "falls with `n`" **holds as a trend** (`β < 0` in every replicate) and is **falsified read as monotone**, at 3 of 10 steps |
+| G2.121 | `β = −0.243` `[−0.279, −0.205]` | **holds** (contains `−0.25`) |
+| G2.122 | M1 `85.5`, interval `15.1` bits wide; M2 `84.0`, interval `1.1` bits wide | **holds** |
+| G2.123 | M2 shift `+6.8` bits (`0.1` GAE), `+15.1` (`1` GAE); `D(0) < D(0.1) < D(1)` on all 33 rows | **holds** |
+
+**What it says.**  On the line's best configuration (arm B, solver A, Karatsuba) and against its strongest
+matched walk, **the distance to rho was measured over twenty bits of `n`, from `2^{22.6}` to `2^{42.4}`: per-size
+median `2.1·10⁴×` → `1.5·10³×` at `0` GAE (best row `1.14·10³×`, `p = 3089` seed 2), `4.9·10³×` at `0.1` GAE and
+`2.0·10⁴×` at `1` GAE at the largest size.  The crossover is empty in the reachable range: `n* > 2^{42.4}`, measured.**
+The free-slope fit gives `β = −0.243` with a `±0.04` interval that contains the theory's `−1/4`, so with eleven
+sizes and three curves each the slope is identified, unlike the four-size ratio exponent of
+`LEAD-ICE-charged-toy-ic-exponent-vs-rho`. The crossover order it implies is
+**`2^{85.5}` [`2^{79.2}`, `2^{94.3}`] at `0` GAE, `2^{91.2}` [`2^{84.4}`, `2^{100.7}`] at `0.1`, and `2^{97.6}`
+[`2^{90.1}`, `2^{107.9}`] at `1` GAE**. The theory-slope fit puts it at `2^{84.0}`, `2^{90.8}` and `2^{99.1}`. The
+`15`-bit width of the free-slope interval is what the ladder can say about an extrapolation over `43` bits beyond
+its top size. **Class:** a measurement of distance, and a fitted extrapolation of where it would reach `1`. It is not
+an improvement, and the fitted `n*` is not a measured crossing. It replaces §9.33's single-point model handover
+(`2^{88}`–`2^{90}`, before E31 and E27) with an interval that contains it. **Distance remaining:** `≈ 1.5·10³×`
+at `2^{42.4}` and `0` GAE, and `≈ 43` bits of `n` to the fitted crossover. **Scope:** E25's GLS twists
+(`h = 16`, `p ≡ 1 (mod 4)`), the degree-11 `V₄` solve, `p ≤ 3089`, operation counts. The validation gate is not run;
+the owner arranges it.
+
+**Erratum (2026-11-01, from the independent validator's replay of all 66 runs from a fresh build and its recompute, `research/e32_handover_ladder_20261031/`).** Four statements in this section disagreed with the records and are corrected in place above; no verdict changes (G2.114–G2.118 and G2.121–G2.123 hold; G2.119's per-step cost is falsified high; G2.120 holds with the median rising at `p = 149, 269, 773`).
+
+1. The build-input commit is `e757710521b…`; `binary_commit.txt` dropped a digit (`e75771052b…`). The record keeps its text and carries a correction line.
+2. The share printed as "the solve" (`98.3`–`99.1 %`, and `≥ 98.28 %` in G2.117) is Weil restriction plus solve; the solve alone is `97.69`–`98.45 %`. G2.117's registered quantity is Weil plus solve, so its verdict stands.
+3. G2.115: columns / `p` is `0.0517`–`0.0687`, not `0.057`–`0.068`; the registered band still holds.
+4. M2's `log₂ n*` at `0.1` GAE is `90.847`, printed `90.9`; now `90.8`.
+
+### 9.37 E33 measured: solver B's pivot selection costs `1.05·10⁶` native operations per call — B is ahead of A and E25 at `0` GAE only; a counted estimate (B″) stays ahead of A through `0.1` GAE but not at `1`
+
+*2026-11-01.*  Code `c443138920` (compile fix of the unit test and the checks example `c689d19821`; the
+library build is unchanged), binaries pinned in `experiments/37_solver_b_pivot_count/binary_sha256.txt`.
+**Stage A:** `examples/e33_stage_a.rs`, one thread, E31's calls exactly (the first 1,000 targets of
+E25 arm A's stream on each of E25's ten curves), seven solvers per call from the same per-target seed:
+existing, A, A counted, B, B counted, B′, B″ (`stage_a.{json,log}`; the JSON is in the artifact store,
+sha256 `7bc6e00b…`).  **End to end:** `run_e2e.sh` (E27's command with `--solver chain-sparsest-counted`,
+`chain-sparsest-inc`, `chain-sparsest-est`; `--karatsuba`; `RAYON_NUM_THREADS=4` on two cores), E25's ten
+curves, both arms, 30 runs, 0 failures.  Tables: `examples/e33_tables.rs` → `tables.md`, `summary.json`.
+Host: the 4-vCPU container; isolab-eks is not reachable from it (no AWS CLI; the GitHub route refused
+through the proxy), so operation counts only, no wall-time claim.  Report:
+`research/e33_solver_b_pivot_count_20261031/`.
+
+**Identity.**  On all 10,000 Stage A calls every solver returned the existing solver's solutions,
+degree, outcome and decomposition set.  A counted reproduced A's phase counts, and B counted and B′
+reproduced B's, on every call.  B′ chose B's pivot in every column of every call (equal digests), and its
+maintained counts never differed from a recount.  B's initial pass was exactly `rows · cols` on every
+call: `393 · 448 = 176,064` on 9,999 calls, and `396 · 448` on one.  End to end, all 30 records
+reproduce every non-product field of E31 B's records.  The one exception is `folded.recovered`, a key
+added to the records after E31 (E27's records carry it too).  B′'s records equal B counted's apart from
+the selection fields and the tag.  B″'s also differ in its solve multiplications and what derives from
+them, and in nothing else: every relation, log and walk is the same.  The pre-E33 binary (E32's pinned
+build) and E33's give identical records for `macaulay`, `chain`, `chain-sparsest` and
+`chain --karatsuba` at `p = 101` seed 2 (1,206–1,214 leaves each, timing aside).  The new
+`chain --karatsuba` record equals E27's stored one, and no uncounted solver emits an E33 field
+(`identity_existing_solvers.json`).  Negative controls (`e33_checks`, 32 calls): a second-best pivot in
+one column changed the digest on 32/32 calls and the output on none; a count off by one was flagged on
+32/32.
+
+**Selection work per call** (Stage A means over 1,000 calls per curve; end to end in brackets):
+
+| solver | initial counts | comparisons | count updates | total | end to end |
+|:--|--:|--:|--:|--:|--:|
+| B (as built, counted) | `176,064` | `3,681`–`3,713` | `8.69`–`8.77·10⁵` | `1.049`–`1.057·10⁶` | `1.049`–`1.057·10⁶` |
+| B′ (incremental) | `506`–`507` | as B | `2.89`–`2.94·10⁵` | `2.93`–`2.98·10⁵` | `2.93`–`2.98·10⁵` |
+| B″ (Markowitz estimate) | `506`–`507` | `4,070`–`4,105` | `8,121`–`8,192` | `12,696`–`12,804` | `12,694`–`12,802` |
+
+B's selection pass reads the matrix about six times per call: once in the initial count (`176,064`
+entries, the validator's lower bound) and about five times more in recounts.  The recounts are 83 % of the
+pass.  B′ removes the initial pass and replaces recounts with two status tests per touched entry,
+`0.279`–`0.282` of B's work.  B″ does `O(1)` work per row update.  Its estimate picks other pivots, so its
+`C` median is `1.205`–`1.222 ×` B's (`3.71`–`4.02·10⁵` against `3.04`–`3.33·10⁵`; A's is `6.01`–`6.34·10⁵`).
+Lead-scan reads (`79,114`–`79,119` per call) are identical for A, B, B′ and B″ on every call: a row's
+lead-scan reads telescope to its final lead, which the shared pivot columns fix.
+
+**End to end** (20 rows; `S_E25/S_X` in schoolbook arithmetic against E25's records, X's schoolbook `S`
+being E31 B's total re-priced by X's own solve; `S_A/S_X` with Karatsuba products against E27's
+solver-A records; `S_X/rho` against walk (iii) of E27 without the `[d]G` check; one GAE `= 97` per
+Macaulay entry, per selection operation and per walk step):
+
+| X | quantity | `0` GAE | `0.1` GAE | `1` GAE | rank across the band |
+|:--|:--|:--|:--|:--|:--|
+| B | `S_E25 / S_B` | `4.53`–`4.76` | `0.274`–`0.276` | `0.157`–`0.158` | unresolved: the order flips between `0` and `0.1` |
+| B | `S_A / S_B` | `1.82`–`1.86` | `0.193`–`0.197` | `0.149`–`0.152` | unresolved: the order flips between `0` and `0.1` |
+| B | `S_B / rho` | `3.45·10³`–`2.19·10⁵` | `1.10·10⁵`–`7.17·10⁶` | `6.10·10⁵`–`4.40·10⁷` | rho ahead at every weight |
+| B′ | `S_E25 / S_B′` | `4.53`–`4.76` | `0.678`–`0.683` | `0.404`–`0.407` | unresolved: the order flips between `0` and `0.1` |
+| B′ | `S_A / S_B′` | `1.82`–`1.86` | `0.478`–`0.487` | `0.384`–`0.393` | unresolved: the order flips between `0` and `0.1` |
+| B′ | `S_B′ / rho` | `3.45·10³`–`2.19·10⁵` | `4.45·10⁴`–`2.89·10⁶` | `2.36·10⁵`–`1.71·10⁷` | rho ahead at every weight |
+| B″ | `S_E25 / S_B″` | `3.83`–`3.98` | `1.457`–`1.497` | `0.980`–`0.997` | unresolved: B″ ahead at `0` and `0.1`, behind at `1` on all 20 rows |
+| B″ | `S_A / S_B″` | `1.538`–`1.558` | `1.046`–`1.048` | `0.9465`–`0.9480` | unresolved: B″ ahead at `0` and `0.1`, behind at `1` on all 20 rows |
+| B″ | `S_B″ / rho` | `4.12·10³`–`2.61·10⁵` | `2.03·10⁴`–`1.33·10⁶` | `9.58·10⁴`–`7.01·10⁶` | rho ahead at every weight |
+
+For comparison, solver A (E27, walk (iii)) is at `6.39·10³`–`4.06·10⁵` (`0`), `2.13·10⁴`–`1.39·10⁶`
+(`0.1`) and `9.07·10⁴`–`6.64·10⁶` (`1` GAE).  **Sensitivity (G2.133):** pricing every arm's lead-scan
+reads too (E25's taken as A's: the same echelon on the same rows) moves the Stage A per-call ratios but
+reverses none.  B″/A becomes `1.035`–`1.036` at `0.1` and `0.962`–`0.963` at `1` GAE; E25/B″ becomes
+`0.986`–`0.999` at `1` GAE.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.124 | identical outputs on all 10,000 Stage A calls and all 30 end-to-end records, with the field rule above; phase counts and digests as registered; old binary = new for the four existing configurations; both negative controls detected 32/32. The in-crate unit tests type-check (`cargo check --release --lib --tests`) but were not executed: a release test build of the library needs about 9 GB of RSS, which the shared container could not provide beside E32. Their solver-level content runs as `e33_checks`. | **holds** (unit tests not executed; disclosed) |
+| G2.125 | initial pass `rows · cols` exactly; comparisons `0.35 %` of the total; recount `8.7·10⁵` > initial `1.76·10⁵`; total `1.049`–`1.057·10⁶` | **holds** |
+| G2.126 | B′/B `0.279`–`0.282` | **holds** |
+| G2.127 | B″ `12,696`–`12,804` per call (≤ `2·10⁴`); `C` median B″/B `1.205`–`1.222` | **holds** |
+| G2.128 | `S_A/S_B` `1.82`–`1.86` (0), `0.193`–`0.197` (0.1), `0.149`–`0.152` (1) on every row | **holds**: the order flips; B is not ranked ahead of A |
+| G2.129 | `S_E25/S_B` `4.53`–`4.76`, `0.274`–`0.276`, `0.157`–`0.158` | **holds** (far below the validator's lower-bound values `0.885`–`0.899` and `0.542`–`0.544`: the recounts were the larger part) |
+| G2.130 | B′ behind A (`0.478`–`0.487`, `0.384`–`0.393`) and E25 (`0.678`–`0.683`, `0.404`–`0.407`) at `0.1` and `1` GAE on every row | **holds** |
+| G2.131 | against A: ahead at `0` and `0.1`, behind at `1` GAE on every row, as registered; against E25: ahead at `0` and `0.1`, **behind at `1` GAE on all 20 rows** (`0.980`–`0.997`) | **falsified** for E25 at `1` GAE; holds against A |
+| G2.132 | `S_B/rho` `3.45·10³`–`2.19·10⁵` at `0` GAE; rho ahead of every row of B, B′, B″ at every weight | **holds** |
+| G2.133 | lead scans identical across rules; no rank reverses | **holds** |
+
+**What it says.**  Counting B's selection work is accounting, not an improvement.  The count settles
+what §9.24 left open: **B as built is ahead of A and E25 at `0` GAE only.**  Its pass costs about six
+matrix reads per call, and at `0.1` GAE each read costs more than the multiplications sparser pivots
+save, so B falls to `0.19×` A.  Maintaining the counts incrementally (B′) keeps B's choices for `28 %` of
+the work, which is still behind A and E25 at `0.1` and `1` GAE.  A counted estimate (B″), with `O(1)` work
+per row update, gives up `22.5`–`22.7 %` of B's saving in mean `C` (worse pivots).  With its `1.27·10⁴` selection
+operations counted, it is ahead of A at `0` GAE (`1.54`–`1.56×`) and at `0.1` GAE (`1.046`–`1.048×`).  At
+`1` GAE it is behind A (`0.946`–`0.948`) and E25 (`0.980`–`0.997`): at that weight its selection
+operations cost `1.2·10⁶` multiplications per call, more than the `2.30`–`2.33·10⁵` it saves against A's mean `C`.  **No pivot rule
+tested here ranks ahead of A across the band; A remains the ranked solver.**  B″ is a measured
+improvement of the baseline at `0` and `0.1` GAE only.  Under the §5a rule it is not ranked, and it is
+not claimed as an improvement across the band.  **Distance remaining:** the best row (`p = 397` seed 1,
+arm B) is `4.12·10³×` the matched rho for B″ and `6.39·10³×` for A at `0` GAE.  Rho is ahead of every row
+at every weight.  **Next lever:** the band is set by the Macaulay entries (`176,064` per call, `1.7·10⁷`
+multiplications at `1` GAE).  No pivot rule removes them; a smaller matrix would.  Not done here: the
+validation gate, the leaderboard and `benchmarks/`.
+
+
+**Erratum (2026-11-01, from the independent validator's recompute of `stage_a.json` and the end-to-end records).** Fourteen printed figures in this section disagreed with the raw records and are corrected in place above; no verdict or rank changes (G2.124–G2.130, G2.132, G2.133 hold; G2.131 is falsified against E25 at `1` GAE; no variant is ranked).
+
+1. Transcription: B′'s count updates were printed `2.92`–`2.98·10⁵`; the records give `288,884.5`–`294,201.3`, i.e. `2.89`–`2.94·10⁵` (`stage_a.log`, p = 101 seed 1: `289,121`).
+2. Truncated means, now rounded: B's comparisons minimum `3,680.79` → `3,681`; B′ and B″ initial counts `505.85`–`506.74` → `506`–`507`; B″ comparisons minimum `4,069.53` → `4,070`; B″ total maximum `12,803.90` → `12,804`; `C` median B″/B maximum `1.22156` → `1.222`.
+3. Double rounding (four places, then three), now rounded once: `S_A/S_B` at `1` GAE maximum `0.152475` → `0.152`; `S_E25/S_B′` at `0.1` GAE minimum `0.678485` → `0.678`; `S_E25/S_B″` at `1` GAE minimum `0.980463` → `0.980`. The prose summary's `S_A/S_B″` at `1` GAE (`0.946478`–`0.947987`) was printed `0.947`–`0.948` (rounded twice); now `0.946`–`0.948`.
+
+### 9.38 E34 pre-registration: a cheaper order-24 class representative, and which walk is the matched rho on E18's `j = 0` curves across the §5a band
+
+*Registered 2026-10-31, before any E34 code.*  **Question.**  §9.31 and §9.33 left the matched reference on
+E18's eight `j = 0` curves unresolved: E29's order-24 walk takes `1.701×` fewer steps (pooled) but its class
+representative costs `≈ 90` `F_p` multiplications a call (three full Frobenius images, twelve `ψ` candidates),
+so at `0` GAE the order-6 walk is cheaper (`0.962` schoolbook, `0.884` Karatsuba), at `1` GAE the order-24 walk
+(`1.205`, `1.172`), and the order-24 walk's `12` candidate comparisons were not emitted.  E34 builds the cheaper
+representative §9.31 names, counts and emits every per-step operation of every arm, and re-ranks.
+
+**Design (derived before code).**  On the canonical model `y² = x³ + b₀t³` (`t⁴ = c`), E29's representative of
+`P` is: among the twelve points `ι^k ∘ Φ^j (P)` (`j < 4`, `k < 3`, `Φ` the transported Frobenius, `ι` the cubic
+automorphism) the one with least abscissa in the lexicographic order of `E4`'s coordinates (first in the order
+`j`-major, `k`-minor on a tie), then the least of `±y`; multiplier `λ_Φ^j λ_ω^k`, negated with `y`.  Both maps are
+coordinate-wise on `x`: `Φ(x)_i = h² zⁱ x_i` with `z = t^{p−1} ∈ F_p` and `h² = z^{−1}` (`h = t^{−(p−1)/2}`), and
+`ι(x) = ωx`; so candidate `(j, k)` has `x_i·c_{ijk}`, `c_{ijk} = h^{2j} z^{ij} ω^k ∈ F_p`, a table of `48`
+constants computed once per walk (charged).  On `y`, `Φ^j` is a monomial map (a coordinate permutation with
+`F_p` scalars), `ι` fixes `y`.  The new representative:
+1. computes coordinate `0` of the twelve candidate abscissae, `x₀·c_{0jk}` (`c = ±1` taken as a copy or a
+   negation, every other constant as one `F_p` multiplication), and keeps the minimum by `11` comparisons;
+   only on a tie (`x₀ = 0`, probability `≈ 1/p`) does it go on to coordinate `1`, `2`, `3` over the tied set;
+2. completes the winner's abscissa (coordinates `1`–`3`, `≤ 3` multiplications) and computes only the
+   winner's ordinate (`Φ^j` on `y`, `≤ 4` multiplications);
+3. resolves the sign by comparing, at the first non-zero coordinate `y_i`, `y_i` against `(p − 1)/2` (equal to
+   E29's `−y < y`), and negates `y` only when needed; the multiplier comes from a `24`-entry table.
+The same construction gives a cheap order-6 representative (three candidates `ω^k x`, the arm E29 did not have),
+run as a fourth arm so that the order-24 walk is ranked against the strongest order-6 walk too.  A mul-lean
+variant (sign classes `c_{0,j+2,k} = −c_{0jk}`: `5` multiplications and `6` negations instead of `10` and `1`)
+is registered as a fifth arm, producing the same walk.
+
+**Counting rule.**  Every arm is one serial walk loop (a copy of E29's, which this experiment does not modify)
+with a pluggable representative.  Counted unit: `F_p` multiplications (`F_{p⁴}` products at `19` / `13`, as
+E27), the per-walk constants included, the `[d]G` check excluded.  **Emitted native operations**, each one
+counter, applied the same way to every arm: `cmp`, a comparison of two `F_p` residues in the representative
+(an `E4` comparison counts one per coordinate it examines; a test against `0` or `(p−1)/2` counts one); `neg`,
+an `F_p` negation or addition in the representative (outside the group law; `F_p` additions inside an affine
+addition are part of the counted group operation, as the GAE that prices native operations is itself a group
+addition); `modn`, a multiplication, addition, subtraction or negation mod `n` in the logarithm bookkeeping
+(`pow_mod(λ, k)` counted by its products: `0, 2, 3` for `k = 0, 1, 2`; the collision's inversion as one);
+`hash`, a partition-hash evaluation; `table`, a hash-table lookup or insert.  E27's visit digest is an
+instrument, not part of the walk, and is not counted.  The band (§5a): `cost(w) = F_p multiplications + w·97·
+(native operations)`, `w ∈ {0, 0.1, 1}`, one GAE `= 97` in both arithmetics (as §9.33; the Karatsuba
+arithmetic's own `79` is a sensitivity column).  The validator's convention (one native operation per step)
+is reported beside it for continuity.  A ratio is order 6 over order 24 (`> 1`: the order-24 walk is cheaper),
+pooled as §9.33 (sum over curves of cost`/√n`).  **Ranking rule:** two walks are ranked only where the pooled
+ratio is on one side of `1` at all three weights, in both arithmetics; per curve, the same test per curve.
+
+**Identity and controls.**  (a) The counted copies of E29's two walks must reproduce E29's `256` Stage R
+records field for field (`rho4_folded_with`, `rho_twist24_with` unchanged; E29's outputs bit-identical, shown
+by a unit test and by the rerun).  (b) The new representatives must equal E29's on every one of the `24`
+(resp. `6`) class members of `≥ 200` random points per curve, including forced `x₀ = 0` and `x = 0` points, in
+both point and multiplier, and `rep = [m]P` checked by scalar multiplication on a sample.  (c) The new walks
+must equal E29's walks per seed: steps, group operations, cycle escapes, recovered log, correctness, and the
+visit digest of every representative visited.  **Negative controls:** a perturbed representative that omits
+candidate `(j, k) = (3, 2)`, and one that takes `Φ^{j−1}` for the ordinate; both must fail (b), and the first
+must change the visit digest of every one of `16` Stage R walks at `p = 241`.  **Positive control:** the
+counters must reproduce the analytic counts of the order-6 arm (`8` multiplications per E29 representative).
+
+**Protocol.**  E29's eight curves and canonical models (`b₀ = 3, 3, 3, 9, 9, 2, 17, 3`), seeds `1000`–`1015`,
+five arms (order 6 as built; order 6 cheap; order 24 as built = E29; order 24 cheap; order 24 cheap mul-lean)
+× schoolbook and Karatsuba.  Route: isolab-eks is the default but unreachable from this container (no `aws`
+CLI, no `kubectl`); so local, operation counts only, one core (`RAYON_NUM_THREADS=1`), no wall-time claim.
+Records `experiments/38_twist24_cheap_rep/`; report `research/e34_twist24_cheap_rep_20261031/`.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.134 | identity (b) | both cheap representatives equal E29's on every class member tested, all eight curves; both negative controls caught | any mismatch, or a control not caught |
+| G2.135 | E29 replay (a) | counted copies reproduce all `256` E29 Stage R records in every field; E29's functions untouched | any field differs |
+| G2.136 | walk identity (c) | all `128` cheap order-24 walks (and their mul-lean twins) per arithmetic equal E29's per seed, digests included; cheap order 6 equals order 6 likewise | any walk differs |
+| G2.137 | negative control in the walk | the omitted-candidate walk's digest differs from E29's on `16/16` seeds at `p = 241` | fewer than `16` |
+| G2.138 | representative cost | `F_p` multiplications per call: order 6 as built `8.0`; order 6 cheap `[3, 5]`; order 24 as built `[85, 100]`; order 24 cheap `[12, 20]`; mul-lean `[7, 15]` (equal in both arithmetics) | outside |
+| G2.139 | per-step multiplications | cheap order 24 / order 6 as built, per step, `[1.00, 1.15]` on every curve with `p ≥ 541`, both arithmetics | outside |
+| G2.140 | native operations per step | order 6 as built `[14, 19]`; order 6 cheap `[12, 17]`; order 24 as built `[40, 70]`; order 24 cheap `[22, 30]` (of which `cmp` `[11, 14]` per representative) | outside |
+| G2.141 | ranking, pooled | order 6 as built / cheap order 24: `0` GAE `[1.40, 1.80]`, `0.1` GAE `[1.10, 1.45]`, `1` GAE `[1.00, 1.30]`, both arithmetics: **the cheap order-24 walk is cheaper across the band**; per curve, the same holds on `≥ 6` of `8` | a pooled ratio `≤ 1` at any weight, or `< 6` curves |
+| G2.142 | against the strongest order-6 walk | cheap order 6 / cheap order 24 pooled: `> 1.3` at `0` GAE, `> 1.0` at `0.1`, and in `[0.90, 1.10]` at `1` GAE (a crossing inside the band is possible) | outside |
+| G2.143 | consequence for E18 | the `ψ`-arm distances to rho lengthen by the pooled ratio against the strongest walk at each weight where the ranking holds (`[1.4, 1.8]×` at `0` GAE, handover later by `4·log₂` of it, `[1.9, 3.4]` bits); a **reference correction, not an improvement** | — (derived from G2.141–G2.142) |
+
+**What it would say.**  If G2.141 holds, the order-24 walk with the cheap representative is the stronger rho
+on E18's curves at every weight of the band against E29's order-6 walk, and E18's `ψ` rows stand further from
+rho by the pooled ratio — a reference correction.  If G2.142's `1` GAE ratio straddles `1`, the matched
+reference is the cheap order-24 walk at `0` and `0.1` GAE and unresolved at `1` GAE against the cheap order-6
+walk; the deciding counters are the `11` comparisons a minimum of twelve needs, which no representative equal
+to E29's can avoid.
+
+### 9.39 E34 measured: the cheap order-24 walk is the matched rho on E18's `j = 0` curves at every weight of the band (pooled); E18's `ψ` rows move `1.13`–`1.63×` further from rho — a reference correction
+
+*2026-11-01.*  Code and binary `bd0118f39` (`experiments/38_twist24_cheap_rep/binary_commit.txt`, sha256 recorded):
+`src/cryptanalysis/twist24_rep.rs` (new module; E29's functions untouched), `examples/e34_cheap_rep.rs`
+(`identity.{json,log}`, `stage_r_p*.{json,log}`, `negative_walks.{json,log}`); tables `examples/e34_tables.rs` →
+`tables.md`, `summary.json`.  Report `research/e34_twist24_cheap_rep_20261031/`.  Route: isolab-eks unreachable
+from this container (no `aws`, no `kubectl`), so local, serial, one core; operation counts only, no wall-time claim.
+All runs together took under a minute of CPU.  E33's uncommitted solver edits were in the worktree when the
+binary was built (no walk path); the E29 replay below is the check.
+
+**Identity.**  (a) The counted copies of E29's walks reproduce **all `512`** E29 Stage R records (8 curves × 2 orders ×
+16 seeds × 2 arithmetics; §9.38 said `256`, the count per arithmetic) in every field, except the visit digest of the order-24 records, which E29 stored as `0`.  (b) Every one of the `24`
+(resp. `6`) class members of `200` random points of `⟨G⟩` plus `8` forced `x₀ = 0` points per curve gets E29's
+representative and multiplier from both cheap order-24 representatives (`39,936` members) and the cheap order-6 one
+(`9,984`), `0` mismatches, `rep = [m]P` on every scalar check.  No curve has a point with `x = 0` (`b₀t³` is not a
+square), so that case is untested by points (the code keeps E29's first-candidate rule).  (c) All `768` cheap walks
+equal their built walk per seed in steps, group operations, cycle escapes, recovered log, correctness and the
+digest of every representative visited; digests also agree across the two arithmetics.  **Negative controls:**
+the omitted-candidate representative mismatches `416/4,992` members per curve, the wrong-ordinate one `4,992/4,992`
+(and fails every scalar check); the omitted-candidate walk's digest differs from E29's on `16/16` seeds at
+`p = 241` (all `16` still recover the log: an inconsistent class map is still a valid walk, so a digest, not
+correctness, is the detector).  **Positive control:** E29's order-6 representative costs exactly `8.000`.
+
+**Per step** (schoolbook, `p = 541`–`1069`; Karatsuba in `tables.md`):
+
+| arm | rep `F_p` mults / call | mults / step | native ops / step | of which `cmp` | `neg` | `modn` | `hash` | `table` |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| order 6, E29 | `8.00` | `109.1`–`111.2` | `16.77` | `3.10` | `4.13` | `5.55` | `2.00` | `2.00` |
+| order 6, cheap | `4.00` | `105.0`–`107.1` | `15.22` | `4.65` | `2.06` | `4.52` | `2.00` | `2.00` |
+| order 24, E29 | `86`–`92` | `191.0`–`199.4` | `65.25` | `16.52` | `4.13` | `40.61` | `2.00` | `2.00` |
+| order 24, cheap | `15.17` | `117.2`–`120.2` | `25.81` | `13.95` | `3.35` | `4.52` | `2.00` | `2.00` |
+| order 24, cheap mul-lean | `10.17` | `112.1`–`115.0` | `30.96` | `13.95` | `8.50` | `4.52` | `2.00` | `2.00` |
+
+The cheap representative needs `13.5` comparisons a call (`11` for the minimum of twelve, one zero test, `≈ 1.5` for
+the sign).  E29's walk as built also spent `40.6` mod-`n` operations a step on its multipliers (`pow_mod` per
+candidate), which no earlier pricing counted; with every operation priced, E29's order-24 walk loses to the
+order-6 walk at **every** weight (`0.962`, `0.562`, `0.453`, schoolbook), so §9.33's crossing at `1` GAE was an
+artefact of the one-op-per-step convention.
+
+**The band** (pooled, order 6 / order 24, `> 1`: order 24 cheaper; every emitted operation at `w·97`):
+
+| order 6 / order 24 | arithmetic | 0 GAE | 0.1 GAE | 1 GAE | pooled order holds | curves: order 24 / unresolved |
+|:--|:--|--:|--:|--:|:--|:--|
+| E29 / E29 | schoolbook | `0.962` | `0.562` | `0.453` | yes (order 6) | `0` / `3` (order 6 on 5; `p = 601, 997, 1069` unresolved: order 24 cheaper at `0` GAE) |
+| E29 / cheap | schoolbook | `1.563` | `1.254` | `1.126` | **yes** | `7` / `1` (`p = 769`) |
+| E29 / cheap | Karatsuba | `1.544` | `1.232` | `1.122` | **yes** | `7` / `1` |
+| cheap / cheap | schoolbook | `1.505` | `1.167` | `1.026` | **yes** | `3` / `5` |
+| cheap / cheap | Karatsuba | `1.476` | `1.140` | `1.021` | **yes** | `3` / `5` |
+| cheap / mul-lean | schoolbook | `1.572` | `1.042` | `0.864` | no | — |
+
+With the Karatsuba arithmetic's own GAE (`79`) the cheap/cheap row is `1.476`, `1.160`, `1.025`; under the
+validator's one-op-per-step convention every cheap order-24 row is `1.48`–`1.66` at every weight.  The mul-lean
+variant is cheapest at `0` GAE and loses its lead by `0.1` (its six negations); the strongest order-24 walk is the
+mul-lean one at `0` GAE and the op-lean one at `0.1` and `1`, the strongest order-6 walk the cheap one throughout.
+Per curve against the cheap order-6 walk, the cheap order-24 walk is cheaper at every weight on `p = 601, 997,
+1069`; on the other five it is cheaper at `0` (`1.16`–`1.46`) and the order changes at `0.1` (`p = 769`) or `1` GAE
+(`0.78`–`0.99`): there the ranking is unresolved.  The per-curve spread is the step count of `16` walks (steps
+ratio `1.29`–`2.10` per curve, `1.701` pooled), not the representative.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.134 | `0` mismatches on `49,920` members; both controls caught on all eight curves | **holds** (the `x = 0` case has no point to test) |
+| G2.135 | `512/512` E29 records identical; E29's functions untouched; unit test `e34_built_arms_reproduce_e29_walks` passes | **holds** (registered count `256` was per arithmetic) |
+| G2.136 | `768/768` | **holds** |
+| G2.137 | `16/16` | **holds** |
+| G2.138 | `8.00`; `4.00`; `86`–`92`; `15.16`–`15.17`; `10.17`–`10.18`; equal in both arithmetics | **holds** |
+| G2.139 | `1.072`–`1.086` (schoolbook), `1.086`–`1.100` (Karatsuba) | **holds** |
+| G2.140 | `16.77`; `15.22`; `65.25`–`65.29`; `25.81`–`25.87` (`cmp` `13.52`–`13.59` a call) | **holds** |
+| G2.141 | `1.563 / 1.254 / 1.126` (S), `1.544 / 1.232 / 1.122` (K); `7/8` curves | **holds** |
+| G2.142 | `1.505 / 1.167 / 1.026` (S), `1.476 / 1.140 / 1.021` (K) | **holds**: above `1` at every weight, pooled, by `2 %` at `1` GAE |
+| G2.143 | see below | derived |
+
+**Consequence for E18.**  E18's `ψ` arm was measured against E29's order-6 walk.  The strongest walk now costs
+`1.632×` (`0` GAE), `1.254×` (`0.1`) and `1.126×` (`1` GAE) less than that walk, pooled, schoolbook (Karatsuba
+`1.627`, `1.232`, `1.122`): **every E18 `ψ`-arm distance to rho lengthens by that factor, and the modelled handover
+(§9.3, `2^{146.0}`) moves later by `4·log₂` of it, `2.83` / `1.31` / `0.68` bits (Karatsuba `2.81` / `1.20` / `0.66`).**  Of this, the order-6 walk's own
+cheaper representative is `1.035`–`1.039×` at `0` GAE; the rest is the order-24 action.  This is a **reference
+correction, not an improvement**: no index-calculus cost changed, the rho reference got stronger.  §9.33's "lower
+bounds at `1` GAE" now has a value.
+
+**Unit tests.**  `cargo test --release --lib twist24_rep`: `3` passed (`e34_built_arms_reproduce_e29_walks`: the counted copies equal `rho4_folded_with` / `rho_twist24_with` on `p = 241`, both arithmetics, with the positive control of `8` products per order-6 representative; `e34_cheap_arms_give_e29s_walks`; `e34_cheap_representatives_equal_e29s_and_controls_are_caught`), run after E33's compile fix of the crate's test build (`c689d1982`).  Clippy (no warning in E34's files; one `is_multiple_of` rewrite after the runs, behaviour-identical) and rustfmt pass.
+
+**What it says.**  The order-24 action is the stronger rho on E18's `j = 0` curves once its class representative is
+built as the coordinate-wise structure allows: `15` multiplications instead of `86`–`92`, so a step costs `7–10 %`
+more than an order-6 step instead of `80 %`, against `1.70×` fewer steps.  That holds pooled at every weight of the
+band with every operation of both walks emitted.  The margin at `1` GAE is thin (`2 %` over the cheap order-6 walk)
+and rests on the `11` comparisons that a minimum of twelve needs.  No representative equal to E29's avoids them.
+
+
+**Erratum (2026-11-01, from the independent validator's recompute; replay byte-identical from a fresh build of `bd0118f39`).** Six statements in this section disagreed with the records and are corrected in place above; no verdict changes (G2.134–G2.143 hold).
+
+1. G2.138: the cheap representative costs `15.16`–`15.17` F_p multiplications a call, not `15.16`–`15.18`.
+2. Mul-lean multiplications per step: top `115.047` → `115.0` (was rounded twice to `115.1`).
+3. Cheap order-24 native operations per step, pooled: `25.81`, not `25.82`.
+4. E29 / E29 per curve (schoolbook): order 6 is cheaper across the band on 5 of 8 curves, not all 8; on `p = 601, 997, 1069` E29's order-24 walk is cheaper at `0` GAE, so those three are unresolved. The pooled correction to §9.33 is unaffected.
+5. The five curves unresolved against the cheap order-6 walk are cheaper at `0` GAE by `1.16`–`1.46`, not `1.16`–`1.86` (`1.86` is `p = 601`, a resolved curve).
+6. Wording: the E29 replay matches every field except the order-24 visit digest, which E29 stored as `0` (disclosed in `tables.md`).
+
+**Two cautions from the validator.** The cheap order-24 lead over the cheap order-6 walk at `1` GAE (`1.026`, schoolbook) is `0.4` standard errors from `1` with `16` walks per curve and arm (steps ratio `1.701 ± 0.111` against the expected `2.0`); the registered rule ranks on point estimates, so G2.142 stands, but the data do not resolve that margin statistically, and the per-curve ranks are within sampling noise. The `1.632` factor at `0` GAE for E18 uses the mul-lean walk, which is not ranked across the band; against the band-ranked cheap walk it is `1.563` (`2.58` bits) schoolbook and `1.544` (`2.51` bits) Karatsuba.

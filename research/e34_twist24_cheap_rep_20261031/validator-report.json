@@ -1,0 +1,5578 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E34; this recompute is its own standard-library Rust program (validate_e34.rs: own JSON parser, own SHA-256) and shares no code with examples/e34_cheap_rep.rs, examples/e34_tables.rs, experiments/38_twist24_cheap_rep/summary.json or tables.md",
+ "date": "2026-11-01",
+ "row": "E34 (GLV note §9.38 pre-registration, §9.39 results): a cheaper order-24 class representative on E18's eight j = 0 curves; five walk arms x two arithmetics x 16 seeds per curve, identity checks and negative controls; a rho-against-rho reference correction for E18's psi rows",
+ "script": "research/e34_twist24_cheap_rep_20261031/validate_e34.rs (rustc -O --edition 2021; `validate_e34 report <repo> research/e34_twist24_cheap_rep_20261031`)",
+ "status_rule": "pass iff every check holds and every headline agrees with its printed figure within half a unit of the last printed digit (exact for counts). Headlines are the claims the validation task names, at the precision it states them, and §9.33's figures that the claimed correction concerns. Every other figure printed in §9.39 is checked the same way under note_figures; one that disagrees is reported as an erratum (errata), and would fail the report only if it changed a registered verdict or a headline",
+ "cost_definition": "walk cost(w) = mean over the 16 seeds of (fp_muls - verify_fp_muls) + w * 97 * mean native operations (cmp + neg + modn + hash + table), w = 0, 0.1, 1; pooled ratio = sum over the 8 curves of cost / sqrt(n), arm A over arm B; per-curve ratio = cost A / cost B; an arm is ranked over another only where the ratio stays on one side of 1 at all three weights",
+ "raw_data": [
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p241.json",
+   "sha256": "eeeb357ba97c262cb88bc0ee45d749ebd3dd4d6e95c5afbf5ff5fa7b85a159c1"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p337.json",
+   "sha256": "7046ac5dbcb4f2f96ebc296ad11a4acfce3055002d310d36be177c2ea268110d"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p541.json",
+   "sha256": "9157d53db6e2d946590abc930a4a14ff913a666c3b6f172babae89dfb4c43986"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p601.json",
+   "sha256": "0cd28049524dd477171dfbfeedde23ade3cbe23c1e2dea54c3993ea092d3936d"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p733.json",
+   "sha256": "0159a1acda5b8fe5ada1e6568ca8190b6373eb9117d7bdc97115a57519be0153"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p769.json",
+   "sha256": "e57ebd0b2b336541ce87a863b70767618fe04b80efac21ae590b258b19fcf2bd"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p997.json",
+   "sha256": "6668ebb33c0f8c8eb7dde73a99e6d1a2168da630e9deb48b9a34f9bbeabd23ab"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p1069.json",
+   "sha256": "65803d2162a9d42387410c1a8d1cfb0fd67d2d91821dcbf2e68ec6f913e3e31f"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/identity.json",
+   "sha256": "d6479f4aa7c1b82adb17b11f28ae9211dd1553dcdfc9fad3bb4f001abe57d111"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/negative_walks.json",
+   "sha256": "05693f924b6fc8302d393f7344de056654891784ef529397e27ab264351621ba"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/binary_commit.txt",
+   "sha256": "1994a5fd2e65b09bc2ce93eb520de64f16468135a5622824a76fe08f65b1f3c5"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/stage_r_p241.json",
+   "sha256": "6b67abb555a1035b20071c54b692c7752bcee1e1e083a2a3e922a1a8b366d0aa"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/stage_r_rest.json",
+   "sha256": "e3193c18b6ac2b2699a618815ca2cc1233f3739b6f915673dbac31469909fb87"
+  }
+ ],
+ "check_failures": [],
+ "headline_disagreements": [],
+ "checks": [
+  {
+   "check": "eight curves, p and canonical b0 as registered in §9.38 (b0 = 3, 3, 3, 9, 9, 2, 17, 3)",
+   "holds": true,
+   "detail": "p [241, 337, 541, 601, 733, 769, 997, 1069], b0 [3, 3, 3, 9, 9, 2, 17, 3]"
+  },
+  {
+   "check": "n and bits equal E29's kill-test records on every curve; bits = log2(n)",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "E29's kill test records canonical b0 equal to E34's and a group <lambda_p, lambda_omega, -1> of order 24 on every curve",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "each curve: 160 walks = 2 arithmetics x 5 arms x seeds 1000-1015, each once, in order",
+   "holds": true,
+   "detail": "1280 walks"
+  },
+  {
+   "check": "all 1,280 Stage R walks report correct = true",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "every walk of a curve (E34's 160 and E29's 64) recovers the same logarithm",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "fold label Psi on order-6 arms, Twist24 on order-24 arms",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "counter identity on all 1,280 walks: table = 2 steps - escapes - 1, hash = 2 (steps - escapes - 1)",
+   "holds": true,
+   "detail": "table true, hash true"
+  },
+  {
+   "check": "every cmp and neg is the representative's; the representative emits no hash or table operation",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "mod-n operations outside the representative = 2 + 4 (steps - escapes - 1) + 5 escapes + 4 on the built arms; the cheap arms add one constant set-up",
+   "holds": true,
+   "detail": "built arms true; cheap arms' set-up mod-n operations [12]; cheap arms' table F_p multiplications [40, 42]"
+  },
+  {
+   "check": "positive control: E29's order-6 representative costs exactly 8 F_p multiplications per call on all 256 walks",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "representative multiplications, calls and every native-operation counter equal in both arithmetics, walk by walk",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "the [d]G = Q check costs the same on every arm (per curve, arithmetic and seed)",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "G2.135: E34's counted copies (Order6Built, Order24Built) reproduce E29's Stage R records field for field",
+   "holds": true,
+   "detail": "512/512 records, 5376/5376 fields; key sets equal true; E29's order-24 records carry visit_digest = 0 (256/256), so that field is compared on the 256 order-6 records only; mismatches []"
+  },
+  {
+   "check": "E34's code commit touches only examples/e34_cheap_rep.rs, src/cryptanalysis/mod.rs and src/cryptanalysis/twist24_rep.rs (E29's functions untouched)",
+   "holds": true,
+   "detail": "examples/e34_cheap_rep.rs, src/cryptanalysis/mod.rs, src/cryptanalysis/twist24_rep.rs"
+  },
+  {
+   "check": "independent: every curve's n is prime (deterministic Miller-Rabin) and n = 1 mod 24, so an order-24 multiplier group exists in (Z/n)*",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "rho heuristic as the null control for per-curve ranks (informational): mean steps over sqrt(pi n / (2 m)), m = 6 or 24, and the 16-walk standard error of each curve's steps ratio",
+   "holds": true,
+   "detail": "order 6: 0.924 of the heuristic, order 24: 1.086 (mean over curves); heuristic steps ratio 2.000, pooled observed 1.701 +- 0.111 (2.7 standard errors below 2); per-curve steps-ratio standard error 13.3-20.8 % from 16 walks a side, so per-curve ranks that turn on the steps ratio are within sampling noise"
+  },
+  {
+   "check": "G2.136: every cheap walk equals its built walk per seed (steps, group_ops, cycle_escapes, recovered, correct, visit_digest)",
+   "holds": true,
+   "detail": "768/768; representative calls, hash and table counts equal too: true"
+  },
+  {
+   "check": "visit digests, steps and group operations equal across the two arithmetics, every arm and seed",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "identity records: 8 curves x 5 representatives, 200 random points + 8 forced x0 = 0 points, members = class size x 208, no x = 0 point",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "G2.134 (a): both cheap order-24 representatives and the cheap order-6 one equal E29's on every class member, rep = [m]P on every scalar check",
+   "holds": true,
+   "detail": "Order24Cheap 0/39936 mismatches, scalar failures 0/520; mul-lean 0/39936, 0/520; Order6Cheap 0/9984, 0/208"
+  },
+  {
+   "check": "G2.134 (b): the omitted-candidate control is caught on every curve, at exactly members/12 (2 of every 24-member class, the analytic rate); the wrong-ordinate control mismatches every member and fails every scalar check",
+   "holds": true,
+   "detail": "omitted candidate [416, 416, 416, 416, 416, 416, 416, 416] per curve (3328 of 39936); wrong ordinate 39936/39936, scalar failures 520/520"
+  },
+  {
+   "check": "G2.137: the omitted-candidate walk's visit digest differs from E29's (Order24Built) on every seed at p = 241, schoolbook",
+   "holds": true,
+   "detail": "16/16 digests differ; 16/16 still recover the log; steps differ on 16/16"
+  },
+  {
+   "check": "per curve, E29 order 6 / cheap order 24 (schoolbook): the only unresolved curve is p = 769, the other seven favour the cheap order-24 walk across the band",
+   "holds": true,
+   "detail": "unresolved [769], order 24 across the band on 7"
+  },
+  {
+   "check": "per curve, E29 order 6 / cheap order 24 (Karatsuba): the only unresolved curve is p = 769, the other seven favour the cheap order-24 walk across the band",
+   "holds": true,
+   "detail": "unresolved [769], order 24 across the band on 7"
+  },
+  {
+   "check": "per curve, cheap order 6 / cheap order 24 (schoolbook): curves where the order-24 walk is cheaper across the band, and where the order changes",
+   "holds": true,
+   "detail": "cheaper across the band on p = [601, 997, 1069]; order changes at 0.1 GAE on [769], at 1 GAE on [241, 337, 541, 733]; at 0 GAE 1.1586-1.4567, at 1 GAE 0.7787-0.9931 on the unresolved curves"
+  },
+  {
+   "check": "per curve, cheap order 6 / cheap order 24 (schoolbook): the cheap order-24 walk is cheaper across the band on exactly p = 601, 997, 1069",
+   "holds": true,
+   "detail": "held [601, 997, 1069], unresolved 5"
+  },
+  {
+   "check": "per curve, cheap order 6 / cheap order 24 (Karatsuba): curves where the order-24 walk is cheaper across the band, and where the order changes",
+   "holds": true,
+   "detail": "cheaper across the band on p = [601, 997, 1069]; order changes at 0.1 GAE on [769], at 1 GAE on [241, 337, 541, 733]; at 0 GAE 1.1346-1.4268, at 1 GAE 0.7750-0.9884 on the unresolved curves"
+  },
+  {
+   "check": "per curve, cheap order 6 / cheap order 24 (Karatsuba): the cheap order-24 walk is cheaper across the band on exactly p = 601, 997, 1069",
+   "holds": true,
+   "detail": "held [601, 997, 1069], unresolved 5"
+  },
+  {
+   "check": "sampling error of the pooled band ratios (informational, 16 walks per curve and arm, delta method)",
+   "holds": true,
+   "detail": "E29 order 6 / cheap order 24, schoolbook: 1 GAE 1.126 +- 0.073; cheap order 6 / cheap order 24, schoolbook: 0 GAE 1.505 +- 0.094, 0.1 GAE 1.167 +- 0.075, 1 GAE 1.026 +- 0.067 (Karatsuba 1 GAE 1.021 +- 0.066): the 1 GAE margin over the cheap order-6 walk is 0.4 standard errors; with the rho heuristic's step counts (ratio 2.000 instead of the observed 1.701) the cheap/cheap ratio would be 1.772 / 1.373 / 1.207"
+  },
+  {
+   "check": "strongest walks, pooled, both arithmetics: order 6 the cheap one at every weight; order 24 the mul-lean one at 0 GAE and the op-lean cheap one at 0.1 and 1 GAE; the overall strongest is that order-24 walk",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "§9.33 correction (pooled, the reading §9.33's table and §9.39's sentence use): with every emitted operation priced, E29's order-24 walk loses to E29's order-6 walk at every weight in both arithmetics, while E29's own records under the one-operation-per-step convention cross at 1 GAE",
+   "holds": true,
+   "detail": "per curve (not claimed by the sentence; see erratum E4): order 6 cheaper across the band on 5/8 (schoolbook) and 6/8 (Karatsuba), unresolved on 3 and 2; every operation, pooled: schoolbook 0.9617/0.5620/0.4530, Karatsuba 0.8844/0.5353/0.4493; one op per step from E29's records: schoolbook 0.9617/0.9963/1.2049, Karatsuba 0.8844/0.9265/1.1723"
+  },
+  {
+   "check": "pre-registration commit 45378560d is an ancestor of the code commit bd0118f39 and older; the records commit is a descendant of the code commit and newer; twist24_rep.rs and e34_cheap_rep.rs first appear in bd0118f39",
+   "holds": true,
+   "detail": "prereg 45378560ddac2fdfcde99944caa0d8559cb19ba5 @1793465118; code bd0118f393537a2e610336e5d45f5426a6a0fa83 @1793466968; records d3a23e791886aec6e286e327e5d2e1cdde94aca8 @1793468834; ancestry true/true; first-add true"
+  },
+  {
+   "check": "§9.38 (G2.134-G2.143) at HEAD is identical to its text at the pre-registration commit",
+   "holds": true,
+   "detail": "8926 bytes, equal true"
+  },
+  {
+   "check": "raw E34 records at HEAD are byte-identical to the records commit and the working tree is clean for them (committed snapshot)",
+   "holds": true,
+   "detail": "unchanged since d3a23e791886aec6e286e327e5d2e1cdde94aca8 at HEAD 61c4dfecc8e2: true; working-tree status ''"
+  },
+  {
+   "check": "binary_commit.txt names a prefix of bd0118f39 and records a binary sha256 and the dirty-worktree caveat",
+   "holds": true,
+   "detail": "[\"bd0118f393\", \"7552c98ef75034d74356f36a79453fc62ddf5e347468b6ab39b179e30a327a49\", \"worktree also held E33's uncommitted edits to gaudry_quartic.rs, klein_v4.rs, quartic_folds.rs (solver/pipeline only; no walk path); E29 replay in tables.md is the check\"]"
+  },
+  {
+   "check": "G2.134 holds against its registered threshold",
+   "holds": true,
+   "detail": "0 mismatches on 39936 order-24 members (each cheap representative) and 9984 order-6 members; omitted candidate caught on 8/8 curves (3328 total), wrong ordinate 39936/39936; the x = 0 case has no point on these curves (x_zero_point false on all 40 checks)"
+  },
+  {
+   "check": "G2.135 holds against its registered threshold",
+   "holds": true,
+   "detail": "512/512 records identical (registered '256' is the count per arithmetic); visit_digest compared on order 6 only (E29's order-24 records carry 0)"
+  },
+  {
+   "check": "G2.136 holds against its registered threshold",
+   "holds": true,
+   "detail": "768/768"
+  },
+  {
+   "check": "G2.137 holds against its registered threshold",
+   "holds": true,
+   "detail": "16/16"
+  },
+  {
+   "check": "G2.138 holds against its registered threshold",
+   "holds": true,
+   "detail": "8.000; 3.997-4.001; 86.00-92.00; 15.161-15.168; 10.170-10.182; equal in both arithmetics true"
+  },
+  {
+   "check": "G2.139 holds against its registered threshold",
+   "holds": true,
+   "detail": "schoolbook 1.0718-1.0863, Karatsuba 1.0856-1.0996"
+  },
+  {
+   "check": "G2.140 holds against its registered threshold",
+   "holds": true,
+   "detail": "order 6 E29 16.768-16.781; cheap 15.222-15.232; order 24 E29 65.251-65.289; cheap 25.806-25.872, cmp per call 13.519-13.588 (all 8 curves; identical in both arithmetics)"
+  },
+  {
+   "check": "G2.141 holds against its registered threshold",
+   "holds": true,
+   "detail": "schoolbook 1.5630/1.2545/1.1258, Karatsuba 1.5445/1.2318/1.1218; curves 7/8 (sb), 7/8 (K)"
+  },
+  {
+   "check": "G2.142 holds against its registered threshold",
+   "holds": true,
+   "detail": "schoolbook 1.5053/1.1671/1.0261, Karatsuba 1.4757/1.1396/1.0213"
+  },
+  {
+   "check": "G2.143 holds against its registered threshold",
+   "holds": true,
+   "detail": "derived: factor 1.6319/1.2545/1.1258 (sb), 1.6266/1.2318/1.1218 (K); handover +2.83/1.31/0.68 bits (sb), +2.81/1.20/0.66 (K); 0 GAE inside the registered [1.4, 1.8] and [1.9, 3.4]"
+  }
+ ],
+ "headline": [
+  {
+   "name": "E29 Stage R records reproduced by the counted copies",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "512",
+   "claimed": 512,
+   "recomputed": 512,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "records equal field for field (visit_digest on order 6 only: E29's order-24 records carry 0)"
+  },
+  {
+   "name": "order-24 class members checked, cheap representative",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "39936",
+   "claimed": 39936,
+   "recomputed": 39936,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum of identity members, Order24Cheap"
+  },
+  {
+   "name": "order-24 class members checked, mul-lean representative",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "39936",
+   "claimed": 39936,
+   "recomputed": 39936,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum of identity members, Order24CheapMulLean"
+  },
+  {
+   "name": "order-6 class members checked",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "9984",
+   "claimed": 9984,
+   "recomputed": 9984,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum of identity members, Order6Cheap"
+  },
+  {
+   "name": "mismatches, cheap order-24 representative",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum over 8 curves"
+  },
+  {
+   "name": "mismatches, mul-lean representative",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum over 8 curves"
+  },
+  {
+   "name": "mismatches, cheap order-6 representative",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum over 8 curves"
+  },
+  {
+   "name": "cheap walks equal to their built walk",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "768",
+   "claimed": 768,
+   "recomputed": 768,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "steps, group_ops, cycle_escapes, recovered, correct, visit_digest"
+  },
+  {
+   "name": "omitted-candidate control: mismatches",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "3328",
+   "claimed": 3328,
+   "recomputed": 3328,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum over 8 curves"
+  },
+  {
+   "name": "omitted-candidate walks whose digest differs from E29's, p = 241",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "16",
+   "claimed": 16,
+   "recomputed": 16,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "of 16, schoolbook"
+  },
+  {
+   "name": "wrong-ordinate control: mismatches (every member)",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "39936",
+   "claimed": 39936,
+   "recomputed": 39936,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "of 39,936 members"
+  },
+  {
+   "name": "order 6 E29: F_p mults per step, least",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "109",
+   "claimed": 109,
+   "recomputed": 109.1014245445602,
+   "rel_tol": 0.004587155963311927,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 6 E29: F_p mults per step, most",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "111",
+   "claimed": 111,
+   "recomputed": 111.219112043274,
+   "rel_tol": 0.004504504504513513,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 6 E29: native ops per step",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "16.8",
+   "claimed": 16.8,
+   "recomputed": 16.769077177050313,
+   "rel_tol": 0.00297619047625,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "order 6 cheap: F_p mults per step, least",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "105",
+   "claimed": 105,
+   "recomputed": 104.97559313833365,
+   "rel_tol": 0.004761904761914285,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 6 cheap: F_p mults per step, most",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "107",
+   "claimed": 107,
+   "recomputed": 107.09157402701523,
+   "rel_tol": 0.004672897196271028,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 6 cheap: native ops per step",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "15.2",
+   "claimed": 15.2,
+   "recomputed": 15.223402121027323,
+   "rel_tol": 0.003289473684276316,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "order 24 E29: F_p mults per step, least",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "191",
+   "claimed": 191,
+   "recomputed": 190.98870665905156,
+   "rel_tol": 0.0026178010471256544,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 24 E29: F_p mults per step, most",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "199",
+   "claimed": 199,
+   "recomputed": 199.41347831345954,
+   "rel_tol": 0.002512562814075377,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 24 E29: native ops per step",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "65.3",
+   "claimed": 65.3,
+   "recomputed": 65.2546972279485,
+   "rel_tol": 0.0007656967840888208,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "order 24 cheap: F_p mults per step, least",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "117",
+   "claimed": 117,
+   "recomputed": 117.23019526088643,
+   "rel_tol": 0.00427350427351282,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 24 cheap: F_p mults per step, most",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "120",
+   "claimed": 120,
+   "recomputed": 120.19302501434045,
+   "rel_tol": 0.004166666666675,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 24 cheap: native ops per step",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "25.8",
+   "claimed": 25.8,
+   "recomputed": 25.811331949381177,
+   "rel_tol": 0.0019379844961627908,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "order 24 mul-lean: F_p mults per step, least",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "112",
+   "claimed": 112,
+   "recomputed": 112.0785251150603,
+   "rel_tol": 0.004464285714294643,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 24 mul-lean: F_p mults per step, most",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "115",
+   "claimed": 115,
+   "recomputed": 115.04700475739229,
+   "rel_tol": 0.004347826086965217,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "order 24 mul-lean: native ops per step",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "31.0",
+   "claimed": 31,
+   "recomputed": 30.961560102232024,
+   "rel_tol": 0.0016129032258387097,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "band E29/E29 schoolbook, 0 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "0.962",
+   "claimed": 0.962,
+   "recomputed": 0.9617131057920246,
+   "rel_tol": 0.0005197505207900208,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/E29 schoolbook, 0.1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "0.562",
+   "claimed": 0.562,
+   "recomputed": 0.5620060790282726,
+   "rel_tol": 0.0008896797170818505,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/E29 schoolbook, 1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "0.453",
+   "claimed": 0.453,
+   "recomputed": 0.45299695398035905,
+   "rel_tol": 0.001103752761589404,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/cheap schoolbook, 0 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.563",
+   "claimed": 1.563,
+   "recomputed": 1.5629500991459313,
+   "rel_tol": 0.0003198976333973129,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/cheap schoolbook, 0.1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.254",
+   "claimed": 1.254,
+   "recomputed": 1.254490984844032,
+   "rel_tol": 0.0003987240837320574,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/cheap schoolbook, 1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.126",
+   "claimed": 1.126,
+   "recomputed": 1.1258433555918146,
+   "rel_tol": 0.00044404973445825936,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/cheap Karatsuba, 0 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.544",
+   "claimed": 1.544,
+   "recomputed": 1.5444922331125954,
+   "rel_tol": 0.0003238341975388601,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/cheap Karatsuba, 0.1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.232",
+   "claimed": 1.232,
+   "recomputed": 1.231843038896687,
+   "rel_tol": 0.00040584415665584415,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band E29/cheap Karatsuba, 1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.122",
+   "claimed": 1.122,
+   "recomputed": 1.1218054934707387,
+   "rel_tol": 0.0004456327994652406,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/cheap schoolbook, 0 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.505",
+   "claimed": 1.505,
+   "recomputed": 1.5052945407857283,
+   "rel_tol": 0.0003322259142857143,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/cheap schoolbook, 0.1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.167",
+   "claimed": 1.167,
+   "recomputed": 1.1671149200310924,
+   "rel_tol": 0.0004284490154241645,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/cheap schoolbook, 1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.026",
+   "claimed": 1.026,
+   "recomputed": 1.0260718953503016,
+   "rel_tol": 0.0004873294356725146,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/cheap Karatsuba, 0 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.476",
+   "claimed": 1.476,
+   "recomputed": 1.475651725307404,
+   "rel_tol": 0.0003387533882113821,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/cheap Karatsuba, 0.1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.140",
+   "claimed": 1.14,
+   "recomputed": 1.1395639380432983,
+   "rel_tol": 0.0004385964921052632,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/cheap Karatsuba, 1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.021",
+   "claimed": 1.021,
+   "recomputed": 1.0212771302012753,
+   "rel_tol": 0.0004897159657198825,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "curves where the cheap order-24 walk beats E29's order-6 walk across the band, schoolbook",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "7",
+   "claimed": 7,
+   "recomputed": 7,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "curves unresolved against E29's order-6 walk, schoolbook (p = 769)",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "curves where the cheap order-24 walk beats E29's order-6 walk across the band, Karatsuba",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "7",
+   "claimed": 7,
+   "recomputed": 7,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "curves unresolved against E29's order-6 walk, Karatsuba",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "curves where the cheap order-24 walk beats the cheap order-6 walk across the band, schoolbook (p = 601, 997, 1069)",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "curves unresolved against the cheap order-6 walk, schoolbook",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "5",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "curves where the cheap order-24 walk beats the cheap order-6 walk across the band, Karatsuba",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "curves unresolved against the cheap order-6 walk, Karatsuba",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "5",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "E18 psi-arm distance lengthening, schoolbook, 0 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.632",
+   "claimed": 1.632,
+   "recomputed": 1.631945917052385,
+   "rel_tol": 0.000306372549632353,
+   "agrees": true,
+   "definition": "E29 order-6 pooled cost / strongest walk's (mul-lean)"
+  },
+  {
+   "name": "E18 psi-arm distance lengthening, schoolbook, 0.1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.254",
+   "claimed": 1.254,
+   "recomputed": 1.254490984844032,
+   "rel_tol": 0.0003987240837320574,
+   "agrees": true,
+   "definition": "E29 order-6 pooled cost / strongest walk's (cheap order 24)"
+  },
+  {
+   "name": "E18 psi-arm distance lengthening, schoolbook, 1 GAE",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.126",
+   "claimed": 1.126,
+   "recomputed": 1.1258433555918146,
+   "rel_tol": 0.00044404973445825936,
+   "agrees": true,
+   "definition": "E29 order-6 pooled cost / strongest walk's (cheap order 24)"
+  },
+  {
+   "name": "E18 handover shift, schoolbook, 0 GAE (bits)",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "2.83",
+   "claimed": 2.83,
+   "recomputed": 2.8263729878327557,
+   "rel_tol": 0.0017667844526501769,
+   "agrees": true,
+   "definition": "4 log2 of the factor"
+  },
+  {
+   "name": "E18 handover shift, schoolbook, 0.1 GAE (bits)",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "1.31",
+   "claimed": 1.31,
+   "recomputed": 1.3084084125458049,
+   "rel_tol": 0.00381679389389313,
+   "agrees": true,
+   "definition": "4 log2 of the factor"
+  },
+  {
+   "name": "E18 handover shift, schoolbook, 1 GAE (bits)",
+   "source": "E34's claims as named by the validation task (§9.39 and the 2026-11-01 session log), at the precision stated there",
+   "printed": "0.68",
+   "claimed": 0.68,
+   "recomputed": 0.6840244470376522,
+   "rel_tol": 0.0073529411779411765,
+   "agrees": true,
+   "definition": "4 log2 of the factor"
+  },
+  {
+   "name": "§9.33 one op per step from E29's records, schoolbook, 0 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33",
+   "printed": "0.962",
+   "claimed": 0.962,
+   "recomputed": 0.9617131057920246,
+   "rel_tol": 0.0005197505207900208,
+   "agrees": true,
+   "definition": "E29 Stage R records, order 6 / order 24, steps at w*97"
+  },
+  {
+   "name": "§9.33 one op per step, schoolbook, 0.1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33",
+   "printed": "0.996",
+   "claimed": 0.996,
+   "recomputed": 0.9962646749771445,
+   "rel_tol": 0.0005020080331325301,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "§9.33 one op per step, schoolbook, 1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33",
+   "printed": "1.205",
+   "claimed": 1.205,
+   "recomputed": 1.2049195275127502,
+   "rel_tol": 0.0004149377601659751,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "§9.33 one op per step, Karatsuba, 0 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33",
+   "printed": "0.884",
+   "claimed": 0.884,
+   "recomputed": 0.8843589602434904,
+   "rel_tol": 0.0005656108608597285,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "§9.33 one op per step, Karatsuba, 0.1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33",
+   "printed": "0.927",
+   "claimed": 0.927,
+   "recomputed": 0.9265467049267079,
+   "rel_tol": 0.0005393743268608414,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "§9.33 one op per step, Karatsuba, 1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33",
+   "printed": "1.172",
+   "claimed": 1.172,
+   "recomputed": 1.1723334300269752,
+   "rel_tol": 0.00042662116126279865,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "§9.33 curves where the order-24 walk is cheaper at 1 GAE (one op per step)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33",
+   "printed": "7",
+   "claimed": 7,
+   "recomputed": 7,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "schoolbook, E29's records"
+  }
+ ],
+ "note_figures": [
+  {
+   "name": "class members checked, order 24 + order 6",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "49920",
+   "claimed": 49920,
+   "recomputed": 49920,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "Order24Cheap + Order6Cheap members"
+  },
+  {
+   "name": "omitted-candidate mismatches per curve, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "416",
+   "claimed": 416,
+   "recomputed": 416,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "of 4,992 per curve"
+  },
+  {
+   "name": "omitted-candidate mismatches per curve, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "416",
+   "claimed": 416,
+   "recomputed": 416,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "of 4,992 per curve"
+  },
+  {
+   "name": "omitted-candidate walks that still recover the log",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "16",
+   "claimed": 16,
+   "recomputed": 16,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "of 16"
+  },
+  {
+   "name": "E29 order-6 representative F_p mults per call (positive control)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "8.000",
+   "claimed": 8,
+   "recomputed": 8,
+   "rel_tol": 0.000062500000125,
+   "agrees": true,
+   "definition": "rep_fp_muls / rep_calls, largest curve (least is 8 too: check)"
+  },
+  {
+   "name": "cheap order-6 representative F_p mults per call",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "4.00",
+   "claimed": 4,
+   "recomputed": 3.998640271051611,
+   "rel_tol": 0.0012500000002500001,
+   "agrees": true,
+   "definition": "p >= 541, pooled"
+  },
+  {
+   "name": "E29 order-24 representative F_p mults per call, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "86",
+   "claimed": 86,
+   "recomputed": 86,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "E29 order-24 representative F_p mults per call, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "92",
+   "claimed": 92,
+   "recomputed": 92,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "cheap order-24 representative F_p mults per call (table)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "15.17",
+   "claimed": 15.17,
+   "recomputed": 15.16595317861529,
+   "rel_tol": 0.00032959789063941996,
+   "agrees": true,
+   "definition": "p >= 541, pooled"
+  },
+  {
+   "name": "G2.138 cheap order-24 F_p mults per call, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "15.16",
+   "claimed": 15.16,
+   "recomputed": 15.160681282699498,
+   "rel_tol": 0.0003298153034960423,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "G2.138 cheap order-24 F_p mults per call, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "15.18",
+   "claimed": 15.18,
+   "recomputed": 15.16757059283464,
+   "rel_tol": 0.00032938076422924905,
+   "agrees": false,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "mul-lean F_p mults per call (table)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "10.17",
+   "claimed": 10.17,
+   "recomputed": 10.171966558306034,
+   "rel_tol": 0.000491642084660767,
+   "agrees": true,
+   "definition": "p >= 541, pooled"
+  },
+  {
+   "name": "G2.138 mul-lean F_p mults per call, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "10.17",
+   "claimed": 10.17,
+   "recomputed": 10.169977964763664,
+   "rel_tol": 0.000491642084660767,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "G2.138 mul-lean F_p mults per call, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "10.18",
+   "claimed": 10.18,
+   "recomputed": 10.18152690785335,
+   "rel_tol": 0.0004911591356581533,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "table: order 6 E29 mults per step, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "109.1",
+   "claimed": 109.1,
+   "recomputed": 109.1014245445602,
+   "rel_tol": 0.00045829514208065996,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 6 E29 mults per step, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "111.2",
+   "claimed": 111.2,
+   "recomputed": 111.219112043274,
+   "rel_tol": 0.000449640287778777,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 6 cheap mults per step, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "105.0",
+   "claimed": 105,
+   "recomputed": 104.97559313833365,
+   "rel_tol": 0.00047619047620000004,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 6 cheap mults per step, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "107.1",
+   "claimed": 107.1,
+   "recomputed": 107.09157402701523,
+   "rel_tol": 0.00046685340803921573,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 24 E29 mults per step, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "191.0",
+   "claimed": 191,
+   "recomputed": 190.98870665905156,
+   "rel_tol": 0.00026178010471727747,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 24 E29 mults per step, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "199.4",
+   "claimed": 199.4,
+   "recomputed": 199.41347831345954,
+   "rel_tol": 0.00025075225677532596,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 24 cheap mults per step, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "117.2",
+   "claimed": 117.2,
+   "recomputed": 117.23019526088643,
+   "rel_tol": 0.0004266211604180887,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 24 cheap mults per step, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "120.2",
+   "claimed": 120.2,
+   "recomputed": 120.19302501434045,
+   "rel_tol": 0.00041597337771214643,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: mul-lean mults per step, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "112.1",
+   "claimed": 112.1,
+   "recomputed": 112.0785251150603,
+   "rel_tol": 0.00044603033007136486,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: mul-lean mults per step, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "115.1",
+   "claimed": 115.1,
+   "recomputed": 115.04700475739229,
+   "rel_tol": 0.00043440486534317987,
+   "agrees": false,
+   "definition": "schoolbook, p >= 541, per curve mean F_p mults / mean steps"
+  },
+  {
+   "name": "table: order 6 E29 native ops per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "16.77",
+   "claimed": 16.77,
+   "recomputed": 16.769077177050313,
+   "rel_tol": 0.00029815146100178896,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 cheap native ops per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "15.22",
+   "claimed": 15.22,
+   "recomputed": 15.223402121027323,
+   "rel_tol": 0.000328515111760841,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 E29 native ops per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "65.25",
+   "claimed": 65.25,
+   "recomputed": 65.2546972279485,
+   "rel_tol": 0.00007662835250574714,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 cheap native ops per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "25.82",
+   "claimed": 25.82,
+   "recomputed": 25.811331949381177,
+   "rel_tol": 0.00019364833466305192,
+   "agrees": false,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: mul-lean native ops per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "30.96",
+   "claimed": 30.96,
+   "recomputed": 30.961560102232024,
+   "rel_tol": 0.00016149870804263566,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 E29 cmp per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "3.10",
+   "claimed": 3.1,
+   "recomputed": 3.0975508014598265,
+   "rel_tol": 0.0016129032261290323,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 E29 neg per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "4.13",
+   "claimed": 4.13,
+   "recomputed": 4.12510470328109,
+   "rel_tol": 0.0012106537532687652,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 E29 modn per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "5.55",
+   "claimed": 5.55,
+   "recomputed": 5.5475267407010405,
+   "rel_tol": 0.0009009009010810812,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 E29 hash per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9992632877389036,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 E29 table per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.999631643869452,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 cheap cmp per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "4.65",
+   "claimed": 4.65,
+   "recomputed": 4.647187300309253,
+   "rel_tol": 0.001075268817419355,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 cheap neg per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.06",
+   "claimed": 2.06,
+   "recomputed": 2.061030778833144,
+   "rel_tol": 0.0024271844665048545,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 cheap modn per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "4.52",
+   "claimed": 4.52,
+   "recomputed": 4.5162891102765705,
+   "rel_tol": 0.001106194690486726,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 cheap hash per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9992632877389036,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 6 cheap table per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.999631643869452,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 E29 cmp per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "16.52",
+   "claimed": 16.52,
+   "recomputed": 16.51922762850195,
+   "rel_tol": 0.0003026634383171913,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 E29 neg per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "4.13",
+   "claimed": 4.13,
+   "recomputed": 4.125143733390232,
+   "rel_tol": 0.0012106537532687652,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 E29 modn per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "40.61",
+   "claimed": 40.61,
+   "recomputed": 40.610602866021566,
+   "rel_tol": 0.00012312238367397194,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 E29 hash per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9998153333565007,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 E29 table per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9999076666782503,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 cheap cmp per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "13.95",
+   "claimed": 13.95,
+   "recomputed": 13.94833348732104,
+   "rel_tol": 0.000358422939139785,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 cheap neg per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "3.35",
+   "claimed": 3.35,
+   "recomputed": 3.347611947184628,
+   "rel_tol": 0.0014925373137313434,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 cheap modn per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "4.52",
+   "claimed": 4.52,
+   "recomputed": 4.515663514840758,
+   "rel_tol": 0.001106194690486726,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 cheap hash per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9998153333565007,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: order 24 cheap table per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9999076666782503,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: mul-lean cmp per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "13.95",
+   "claimed": 13.95,
+   "recomputed": 13.94833348732104,
+   "rel_tol": 0.000358422939139785,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: mul-lean neg per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "8.50",
+   "claimed": 8.5,
+   "recomputed": 8.497840100035475,
+   "rel_tol": 0.0005882352942352942,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: mul-lean modn per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "4.52",
+   "claimed": 4.52,
+   "recomputed": 4.515663514840758,
+   "rel_tol": 0.001106194690486726,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: mul-lean hash per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9998153333565007,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "table: mul-lean table per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.00",
+   "claimed": 2,
+   "recomputed": 1.9999076666782503,
+   "rel_tol": 0.0025000000005000003,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "G2.140 order 24 E29 native ops per step, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "65.25",
+   "claimed": 65.25,
+   "recomputed": 65.25120226287662,
+   "rel_tol": 0.00007662835250574714,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "G2.140 order 24 E29 native ops per step, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "65.29",
+   "claimed": 65.29,
+   "recomputed": 65.28913580346388,
+   "rel_tol": 0.00007658140604993108,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "G2.140 order 24 cheap native ops per step, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "25.81",
+   "claimed": 25.81,
+   "recomputed": 25.806293101599376,
+   "rel_tol": 0.00019372336307632703,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "G2.140 order 24 cheap native ops per step, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "25.87",
+   "claimed": 25.87,
+   "recomputed": 25.87185509570178,
+   "rel_tol": 0.00019327406265945112,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "G2.140 cheap representative cmp per call, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "13.52",
+   "claimed": 13.52,
+   "recomputed": 13.519125197505021,
+   "rel_tol": 0.0003698224852810651,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "G2.140 cheap representative cmp per call, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "13.59",
+   "claimed": 13.59,
+   "recomputed": 13.588393656053046,
+   "rel_tol": 0.00036791758653421637,
+   "agrees": true,
+   "definition": "per curve, all 8"
+  },
+  {
+   "name": "cheap representative comparisons a call",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "13.5",
+   "claimed": 13.5,
+   "recomputed": 13.527238633164284,
+   "rel_tol": 0.003703703703777778,
+   "agrees": true,
+   "definition": "all 8 curves, pooled"
+  },
+  {
+   "name": "E29 order-24 walk: mod-n operations per step",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "40.6",
+   "claimed": 40.6,
+   "recomputed": 40.610602866021566,
+   "rel_tol": 0.0012315270936206896,
+   "agrees": true,
+   "definition": "schoolbook, p >= 541, pooled (sum of native operations / sum of steps)"
+  },
+  {
+   "name": "G2.139 cheap order 24 / order 6 E29 per-step mults, schoolbook, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.072",
+   "claimed": 1.072,
+   "recomputed": 1.0717755860544937,
+   "rel_tol": 0.00046641791138059697,
+   "agrees": true,
+   "definition": "per curve, p >= 541"
+  },
+  {
+   "name": "G2.139 schoolbook, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.086",
+   "claimed": 1.086,
+   "recomputed": 1.0863459738869279,
+   "rel_tol": 0.0004604051574585635,
+   "agrees": true,
+   "definition": "per curve, p >= 541"
+  },
+  {
+   "name": "G2.139 Karatsuba, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.086",
+   "claimed": 1.086,
+   "recomputed": 1.085565347664042,
+   "rel_tol": 0.0004604051574585635,
+   "agrees": true,
+   "definition": "per curve, p >= 541"
+  },
+  {
+   "name": "G2.139 Karatsuba, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.100",
+   "claimed": 1.1,
+   "recomputed": 1.0996034258763148,
+   "rel_tol": 0.00045454545545454544,
+   "agrees": true,
+   "definition": "per curve, p >= 541"
+  },
+  {
+   "name": "band cheap/mul-lean schoolbook, 0 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.572",
+   "claimed": 1.572,
+   "recomputed": 1.5717451767263027,
+   "rel_tol": 0.00031806615839694653,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/mul-lean schoolbook, 0.1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.042",
+   "claimed": 1.042,
+   "recomputed": 1.0418026784413423,
+   "rel_tol": 0.00047984645009596926,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/mul-lean schoolbook, 1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "0.864",
+   "claimed": 0.864,
+   "recomputed": 0.8636364282625414,
+   "rel_tol": 0.0005787037048611112,
+   "agrees": true,
+   "definition": "pooled order 6 / order 24, every emitted operation at w*97"
+  },
+  {
+   "name": "band cheap/cheap Karatsuba with GAE 79, 0 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.476",
+   "claimed": 1.476,
+   "recomputed": 1.475651725307404,
+   "rel_tol": 0.0003387533882113821,
+   "agrees": true,
+   "definition": "Karatsuba, its own GAE 79"
+  },
+  {
+   "name": "band cheap/cheap Karatsuba with GAE 79, 0.1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.160",
+   "claimed": 1.16,
+   "recomputed": 1.1603445812526814,
+   "rel_tol": 0.00043103448362068967,
+   "agrees": true,
+   "definition": "Karatsuba, its own GAE 79"
+  },
+  {
+   "name": "band cheap/cheap Karatsuba with GAE 79, 1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.025",
+   "claimed": 1.025,
+   "recomputed": 1.0252899348858573,
+   "rel_tol": 0.00048780487902439027,
+   "agrees": true,
+   "definition": "Karatsuba, its own GAE 79"
+  },
+  {
+   "name": "one op per step: every cheap order-24 row, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.48",
+   "claimed": 1.48,
+   "recomputed": 1.475651725307404,
+   "rel_tol": 0.0033783783790540547,
+   "agrees": true,
+   "definition": "both cheap order-24 arms against both order-6 arms, both arithmetics, three weights"
+  },
+  {
+   "name": "one op per step: every cheap order-24 row, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.66",
+   "claimed": 1.66,
+   "recomputed": 1.663803176504237,
+   "rel_tol": 0.0030120481933734945,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "band table: E29/E29 schoolbook, curves where order 6 is cheaper across the band ('order 6 on all 8')",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "8",
+   "claimed": 8,
+   "recomputed": 5,
+   "rel_tol": 0.000000000001,
+   "agrees": false,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "band table: E29/E29 schoolbook, curves unresolved ('0')",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "0",
+   "claimed": 0,
+   "recomputed": 3,
+   "rel_tol": 0.000000000001,
+   "agrees": false,
+   "definition": "per-curve test: ratio on one side of 1 at 0, 0.1 and 1 GAE"
+  },
+  {
+   "name": "cheap/cheap on the five unresolved curves, 0 GAE, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.16",
+   "claimed": 1.16,
+   "recomputed": 1.1585859267155965,
+   "rel_tol": 0.004310344828448277,
+   "agrees": true,
+   "definition": "schoolbook, per curve"
+  },
+  {
+   "name": "cheap/cheap on the five unresolved curves, 0 GAE, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.86",
+   "claimed": 1.86,
+   "recomputed": 1.4567307949149169,
+   "rel_tol": 0.002688172043548387,
+   "agrees": false,
+   "definition": "schoolbook, per curve"
+  },
+  {
+   "name": "cheap/cheap on the five unresolved curves, 1 GAE, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "0.78",
+   "claimed": 0.78,
+   "recomputed": 0.7786939899193733,
+   "rel_tol": 0.006410256411538462,
+   "agrees": true,
+   "definition": "schoolbook, per curve"
+  },
+  {
+   "name": "cheap/cheap on the five unresolved curves, 1 GAE, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "0.99",
+   "claimed": 0.99,
+   "recomputed": 0.9930768982873863,
+   "rel_tol": 0.005050505051515152,
+   "agrees": true,
+   "definition": "schoolbook, per curve"
+  },
+  {
+   "name": "steps ratio order 6 / order 24 per curve, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.29",
+   "claimed": 1.29,
+   "recomputed": 1.2901238667336834,
+   "rel_tol": 0.003875968993023256,
+   "agrees": true,
+   "definition": "mean steps, E29's walks"
+  },
+  {
+   "name": "steps ratio per curve, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.10",
+   "claimed": 2.1,
+   "recomputed": 2.10256309238886,
+   "rel_tol": 0.0023809523814285714,
+   "agrees": true,
+   "definition": "mean steps"
+  },
+  {
+   "name": "steps ratio pooled",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.701",
+   "claimed": 1.701,
+   "recomputed": 1.700927367223997,
+   "rel_tol": 0.00029394473897707233,
+   "agrees": true,
+   "definition": "sum of mean steps / sqrt(n)"
+  },
+  {
+   "name": "the order-6 walk's own cheaper representative at 0 GAE, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.035",
+   "claimed": 1.035,
+   "recomputed": 1.0350805847504998,
+   "rel_tol": 0.00048309178840579714,
+   "agrees": true,
+   "definition": "E29 order 6 / cheap order 6, per curve, schoolbook"
+  },
+  {
+   "name": "the order-6 walk's own cheaper representative at 0 GAE, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.039",
+   "claimed": 1.039,
+   "recomputed": 1.0393027682233684,
+   "rel_tol": 0.0004812319547641964,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "E18 lengthening, Karatsuba, 0 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.627",
+   "claimed": 1.627,
+   "recomputed": 1.6266032685661556,
+   "rel_tol": 0.00030731407559926247,
+   "agrees": true,
+   "definition": "E29 order-6 pooled cost / strongest walk's"
+  },
+  {
+   "name": "E18 lengthening, Karatsuba, 0.1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.232",
+   "claimed": 1.232,
+   "recomputed": 1.231843038896687,
+   "rel_tol": 0.00040584415665584415,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "E18 lengthening, Karatsuba, 1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.122",
+   "claimed": 1.122,
+   "recomputed": 1.1218054934707387,
+   "rel_tol": 0.0004456327994652406,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "E18 handover shift, Karatsuba, 0 GAE (bits)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "2.81",
+   "claimed": 2.81,
+   "recomputed": 2.8074496721017232,
+   "rel_tol": 0.0017793594309608543,
+   "agrees": true,
+   "definition": "4 log2 of the factor"
+  },
+  {
+   "name": "E18 handover shift, Karatsuba, 0.1 GAE (bits)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "1.20",
+   "claimed": 1.2,
+   "recomputed": 1.20327375974276,
+   "rel_tol": 0.004166666667500001,
+   "agrees": true,
+   "definition": "same"
+  },
+  {
+   "name": "E18 handover shift, Karatsuba, 1 GAE (bits)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.39",
+   "printed": "0.66",
+   "claimed": 0.66,
+   "recomputed": 0.6632902120536305,
+   "rel_tol": 0.007575757577272728,
+   "agrees": true,
+   "definition": "same"
+  }
+ ],
+ "note_figure_disagreements": [
+  "G2.138 cheap order-24 F_p mults per call, most: printed 15.18, recomputed 15.16757059283464",
+  "table: mul-lean mults per step, most: printed 115.1, recomputed 115.04700475739229",
+  "table: order 24 cheap native ops per step: printed 25.82, recomputed 25.811331949381177",
+  "band table: E29/E29 schoolbook, curves where order 6 is cheaper across the band ('order 6 on all 8'): printed 8, recomputed 5",
+  "band table: E29/E29 schoolbook, curves unresolved ('0'): printed 0, recomputed 3",
+  "cheap/cheap on the five unresolved curves, 0 GAE, most: printed 1.86, recomputed 1.4567307949149169"
+ ],
+ "verdicts_recomputed": [
+  {
+   "id": "G2.134",
+   "verdict": "holds",
+   "recomputed": "0 mismatches on 39936 order-24 members (each cheap representative) and 9984 order-6 members; omitted candidate caught on 8/8 curves (3328 total), wrong ordinate 39936/39936; the x = 0 case has no point on these curves (x_zero_point false on all 40 checks)"
+  },
+  {
+   "id": "G2.135",
+   "verdict": "holds",
+   "recomputed": "512/512 records identical (registered '256' is the count per arithmetic); visit_digest compared on order 6 only (E29's order-24 records carry 0)"
+  },
+  {
+   "id": "G2.136",
+   "verdict": "holds",
+   "recomputed": "768/768"
+  },
+  {
+   "id": "G2.137",
+   "verdict": "holds",
+   "recomputed": "16/16"
+  },
+  {
+   "id": "G2.138",
+   "verdict": "holds",
+   "recomputed": "8.000; 3.997-4.001; 86.00-92.00; 15.161-15.168; 10.170-10.182; equal in both arithmetics true"
+  },
+  {
+   "id": "G2.139",
+   "verdict": "holds",
+   "recomputed": "schoolbook 1.0718-1.0863, Karatsuba 1.0856-1.0996"
+  },
+  {
+   "id": "G2.140",
+   "verdict": "holds",
+   "recomputed": "order 6 E29 16.768-16.781; cheap 15.222-15.232; order 24 E29 65.251-65.289; cheap 25.806-25.872, cmp per call 13.519-13.588 (all 8 curves; identical in both arithmetics)"
+  },
+  {
+   "id": "G2.141",
+   "verdict": "holds",
+   "recomputed": "schoolbook 1.5630/1.2545/1.1258, Karatsuba 1.5445/1.2318/1.1218; curves 7/8 (sb), 7/8 (K)"
+  },
+  {
+   "id": "G2.142",
+   "verdict": "holds",
+   "recomputed": "schoolbook 1.5053/1.1671/1.0261, Karatsuba 1.4757/1.1396/1.0213"
+  },
+  {
+   "id": "G2.143",
+   "verdict": "holds",
+   "recomputed": "derived: factor 1.6319/1.2545/1.1258 (sb), 1.6266/1.2318/1.1218 (K); handover +2.83/1.31/0.68 bits (sb), +2.81/1.20/0.66 (K); 0 GAE inside the registered [1.4, 1.8] and [1.9, 3.4]"
+  }
+ ],
+ "band": [
+  {
+   "pair": "Order6Built / Order24Built",
+   "arithmetic": "schoolbook",
+   "pooled_ratio_0_0p1_1": [
+    0.9617131057920246,
+    0.5620060790282726,
+    0.45299695398035905
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order6Built",
+   "pooled_ratio_one_op_per_step": [
+    0.9617131057920246,
+    0.9962646749771445,
+    1.2049195275127502
+   ],
+   "pooled_ratio_karatsuba_gae79": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      0.9294587962327886,
+      0.5412774415785464,
+      0.4290800800986666
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      0.9478368200852567,
+      0.5488198080491561,
+      0.43921731155119537
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      0.8672666738365203,
+      0.5116993375654594,
+      0.4139565892322022
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.2022121053636445,
+      0.6948832236732371,
+      0.5599188144344072
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      0.9058084080001391,
+      0.5342738094160675,
+      0.4331895214425434
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      0.7433384654324905,
+      0.4269871347556742,
+      0.3435943871728036
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.0419678852455476,
+      0.6147226963460036,
+      0.4989610575058405
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.1328135031265147,
+      0.6686667936908323,
+      0.5428351033007729
+     ],
+     "cheaper_across_band": "unresolved"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    0,
+    3,
+    5
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24Built",
+   "arithmetic": "Karatsuba",
+   "pooled_ratio_0_0p1_1": [
+    0.8843589602434904,
+    0.535279469036059,
+    0.44933503055227847
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order6Built",
+   "pooled_ratio_one_op_per_step": [
+    0.8843589602434904,
+    0.9265467049267079,
+    1.1723334300269752
+   ],
+   "pooled_ratio_karatsuba_gae79": [
+    0.8843589602434904,
+    0.5519073160774339,
+    0.4520297337913052
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      0.8607894181982625,
+      0.5147903614927214,
+      0.4253533016924462
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      0.874578524400662,
+      0.5225286672843142,
+      0.4355905758793456
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      0.7956017808356018,
+      0.48731844869867386,
+      0.41061954819763846
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.1067528076849824,
+      0.6621602235188759,
+      0.5554589098017239
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      0.8303084995636796,
+      0.5089602061213915,
+      0.429738279072405
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      0.6836289741291431,
+      0.40675617386500673,
+      0.34084575350053326
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      0.9548357699336701,
+      0.5856827948314347,
+      0.49500798249983485
+     ],
+     "cheaper_across_band": "Order6Built"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.0381582067662536,
+      0.6370988979253766,
+      0.5385370933505738
+     ],
+     "cheaper_across_band": "unresolved"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    0,
+    2,
+    6
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24Cheap",
+   "arithmetic": "schoolbook",
+   "pooled_ratio_0_0p1_1": [
+    1.5629500991459313,
+    1.254490984844032,
+    1.1258433555918146
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order24Cheap",
+   "pooled_ratio_one_op_per_step": [
+    1.5629500991459313,
+    1.573133570547011,
+    1.6241396944302249
+   ],
+   "pooled_ratio_karatsuba_gae79": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4246229239782098,
+      1.1764729956602524,
+      1.060786666832909
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.4960342103937194,
+      1.2119910563331198,
+      1.0893861596829064
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.4388910174650382,
+      1.149148131782853,
+      1.0297303648971
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.9354451923505769,
+      1.5501194793071877,
+      1.39184081133563
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.5136484545223308,
+      1.20386798442093,
+      1.0783174814723469
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.203725745874648,
+      0.9551582126541351,
+      0.8545251136496337
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.7463048177877782,
+      1.3872129377819722,
+      1.242634327174172
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.8977872465481898,
+      1.5086421462772726,
+      1.3518197525184201
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    7,
+    1,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24Cheap",
+   "arithmetic": "Karatsuba",
+   "pooled_ratio_0_0p1_1": [
+    1.5444922331125954,
+    1.231843038896687,
+    1.1218054934707387
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order24Cheap",
+   "pooled_ratio_one_op_per_step": [
+    1.5444922331125954,
+    1.5580832318644369,
+    1.620764099175108
+   ],
+   "pooled_ratio_karatsuba_gae79": [
+    1.5444922331125954,
+    1.2511744505126536,
+    1.1255384471772487
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4111512904236614,
+      1.1567235523659583,
+      1.0570298255394026
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.4795299416310324,
+      1.1906024125701535,
+      1.085498108924181
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.4213627607326853,
+      1.1280552782599833,
+      1.0259945885105966
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.9121103507960149,
+      1.5221518369770193,
+      1.3868961189973317
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.4946404179181614,
+      1.1815963883756613,
+      1.0744091124555315
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.1884350117750329,
+      0.9372951360149806,
+      0.8513925128731017
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.72413969897789,
+      1.3615219132805727,
+      1.2381421510599164
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.8737868145319676,
+      1.4807826436643035,
+      1.346945973727681
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    7,
+    1,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Cheap / Order24Cheap",
+   "arithmetic": "schoolbook",
+   "pooled_ratio_0_0p1_1": [
+    1.5052945407857283,
+    1.1671149200310924,
+    1.0260718953503016
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order24Cheap",
+   "pooled_ratio_one_op_per_step": [
+    1.5052945407857283,
+    1.519733305380047,
+    1.5920529875996425
+   ],
+   "pooled_ratio_karatsuba_gae79": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.3763401081681064,
+      1.097250628763264,
+      0.9671404268158701
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.4422472695402644,
+      1.1285023278438173,
+      0.9930768982873863
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.3854912261276522,
+      1.0688838670179621,
+      0.9383938854763744
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.8629956476426346,
+      1.4415883833260283,
+      1.2684886440359593
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.4567307949149169,
+      1.1194488399734053,
+      0.982752297855928
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.1585859267155965,
+      0.888171749575868,
+      0.7786939899193733
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.6802766025710627,
+      1.2896018683058954,
+      1.1323072776325667
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.8260196206273498,
+      1.402481857861235,
+      1.2317994934732208
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    3,
+    5,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Cheap / Order24Cheap",
+   "arithmetic": "Karatsuba",
+   "pooled_ratio_0_0p1_1": [
+    1.475651725307404,
+    1.1395639380432983,
+    1.0212771302012753
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order24Cheap",
+   "pooled_ratio_one_op_per_step": [
+    1.475651725307404,
+    1.4952235496645099,
+    1.5854876242888503
+   ],
+   "pooled_ratio_karatsuba_gae79": [
+    1.475651725307404,
+    1.1603445812526814,
+    1.0252899348858573
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.3532050883032822,
+      1.0725414600333532,
+      0.9625675896507674
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.4152026679201632,
+      1.1022646860303935,
+      0.9884260055217953
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.3576400511078706,
+      1.043340609404504,
+      0.9339754560246267
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.825670740270259,
+      1.4076240050673874,
+      1.2626259878034944
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.4267763782981708,
+      1.0925759841292444,
+      0.9781447013644745
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.1346170575865322,
+      0.8666616970978213,
+      0.7750073220956599
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.645440067154923,
+      1.2586268533531804,
+      1.127014659398349
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.7882426820479267,
+      1.3688702636701098,
+      1.2260539474589143
+     ],
+     "cheaper_across_band": "Order24Cheap"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    3,
+    5,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Cheap / Order24CheapMulLean",
+   "arithmetic": "schoolbook",
+   "pooled_ratio_0_0p1_1": [
+    1.5717451767263027,
+    1.0418026784413423,
+    0.8636364282625414
+   ],
+   "pooled_order_holds": false,
+   "pooled_cheaper": "unresolved",
+   "pooled_ratio_one_op_per_step": [
+    1.5717451767263027,
+    1.5816680837170387,
+    1.6304147964628473
+   ],
+   "pooled_ratio_karatsuba_gae79": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4298848263615218,
+      0.9839946531581371,
+      0.8153170304265667
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.503440198056731,
+      1.0088287206895394,
+      0.8363464091089272
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.4474638601002783,
+      0.9536848115874986,
+      0.789744325500336
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.94666744004426,
+      1.2860104535693544,
+      1.0674584053187126
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.5231518628467196,
+      0.9981058028052816,
+      0.8268711384517272
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.2114837543861845,
+      0.7918536837285116,
+      0.655158488294105
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.7575102278468142,
+      1.1494402096188656,
+      0.9525371008070549
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.9098727854669917,
+      1.2500860680746815,
+      1.0362317787315778
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    2,
+    6,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Cheap / Order24CheapMulLean",
+   "arithmetic": "Karatsuba",
+   "pooled_ratio_0_0p1_1": [
+    1.554102939587476,
+    1.0111179031693478,
+    0.858569585387252
+   ],
+   "pooled_order_holds": false,
+   "pooled_cheaper": "unresolved",
+   "pooled_ratio_one_op_per_step": [
+    1.554102939587476,
+    1.5674753588372667,
+    1.6275899416469868
+   ],
+   "pooled_ratio_karatsuba_gae79": [
+    1.554102939587476,
+    1.0396814085173882,
+    0.8634816315483881
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4168819474511665,
+      0.9556604628332811,
+      0.8103535818908036
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.4876169972952096,
+      0.9793415842362098,
+      0.8313902319779494
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.4307383231038269,
+      0.9253646921954942,
+      0.7850962961634508
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.9243554199351094,
+      1.2482680834908575,
+      1.061273219568356
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.505029245787422,
+      0.968424310313957,
+      0.8220403560057873
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.1969266861564962,
+      0.768141083298803,
+      0.6513017332974468
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.7363892475960867,
+      1.115270041977686,
+      0.9469939539352137
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.886995027797483,
+      1.2129851703580758,
+      1.0302103948355825
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    2,
+    6,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24CheapMulLean",
+   "arithmetic": "schoolbook",
+   "pooled_ratio_0_0p1_1": [
+    1.631945917052385,
+    1.1197972416085749,
+    0.9476132606424024
+   ],
+   "pooled_order_holds": false,
+   "pooled_cheaper": "unresolved",
+   "pooled_ratio_one_op_per_step": [
+    1.631945917052385,
+    1.6372446080832608,
+    1.6632746585364222
+   ],
+   "pooled_ratio_karatsuba_gae79": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.480046022196151,
+      1.055039848661951,
+      0.8942625198346337
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.5595092582778405,
+      1.0834637702377192,
+      0.9174558429009985
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.5032522091277882,
+      1.025298587958798,
+      0.866612330983
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      2.022370874943554,
+      1.3828287448260372,
+      1.1712617057403605
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.5826647389131385,
+      1.073374305422099,
+      0.9072780653504532
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.2586845327886527,
+      0.8515757786654422,
+      0.718959422976938
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.8265734186287859,
+      1.2364423231526294,
+      1.0453481336308312
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.9849360728903198,
+      1.3447108197517252,
+      1.1371969172733687
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    3,
+    5,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24CheapMulLean",
+   "arithmetic": "Karatsuba",
+   "pooled_ratio_0_0p1_1": [
+    1.6266032685661556,
+    1.0929957582385788,
+    0.943081998932547
+   ],
+   "pooled_order_holds": false,
+   "pooled_cheaper": "unresolved",
+   "pooled_ratio_one_op_per_step": [
+    1.6266032685661556,
+    1.6333725304908533,
+    1.663803176504237
+   ],
+   "pooled_ratio_karatsuba_gae79": [
+    1.6266032685661556,
+    1.1210659626691464,
+    0.9479092124777827
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4775548849219133,
+      1.030668749523056,
+      0.8898781908936293
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.5552358252773433,
+      1.0578280041984003,
+      0.9130400450296533
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.4978920010156136,
+      1.0005002354335137,
+      0.8624472368384956
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      2.015467431177451,
+      1.3498303165371428,
+      1.1657258155882562
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.5766153513039636,
+      1.0473291415005153,
+      0.9029417100218056
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.2537001544662227,
+      0.8307450341467919,
+      0.7154944263639819
+     ],
+     "cheaper_across_band": "unresolved"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.8194388810740496,
+      1.2064454189361482,
+      1.0403707896683625
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.9772631744395102,
+      1.3121531199550505,
+      1.1317917505116086
+     ],
+     "cheaper_across_band": "Order24CheapMulLean"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    3,
+    5,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Built / Order6Cheap",
+   "arithmetic": "schoolbook",
+   "pooled_ratio_0_0p1_1": [
+    1.0383018451193664,
+    1.074865005419185,
+    1.0972363249530883
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order6Cheap",
+   "pooled_ratio_one_op_per_step": [
+    1.0383018451193664,
+    1.0351379185926375,
+    1.0201542957932324
+   ],
+   "pooled_ratio_karatsuba_gae79": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.0350805847504998,
+      1.0722007942581742,
+      1.0968279656402657
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.037293841347053,
+      1.073981884156873,
+      1.0969806684271988
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.0385421360528098,
+      1.075091660788947,
+      1.097332773406083
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.0388887353545981,
+      1.0752857731350172,
+      1.097243414735823
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.0390721880845102,
+      1.0754113465779553,
+      1.0972423914193978
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.0389611319438479,
+      1.0754206189402618,
+      1.0973824438250923
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.0392960391852646,
+      1.0756908561277947,
+      1.0974356093270703
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.0393027682233684,
+      1.0756945894315741,
+      1.0974348988460667
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    8,
+    0,
+    0
+   ]
+  },
+  {
+   "pair": "Order6Built / Order6Cheap",
+   "arithmetic": "Karatsuba",
+   "pooled_ratio_0_0p1_1": [
+    1.0466509181160961,
+    1.0809775544598557,
+    1.0984339708553457
+   ],
+   "pooled_order_holds": true,
+   "pooled_cheaper": "Order6Cheap",
+   "pooled_ratio_one_op_per_step": [
+    1.0466509181160961,
+    1.0420403238124702,
+    1.0222496059545596
+   ],
+   "pooled_ratio_karatsuba_gae79": [
+    1.0466509181160961,
+    1.0782783586250857,
+    1.0977757694486214
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.0428214485899068,
+      1.0784884272259156,
+      1.0981356913574323
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.0454544604592972,
+      1.0801420272819338,
+      1.098208771177708
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.0469363802082998,
+      1.0811956019845053,
+      1.0985241441757367
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.0473467688445068,
+      1.0813625169060321,
+      1.0984219653280078
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.0475645943206162,
+      1.081477540728999,
+      1.098415307016203
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.0474327032443687,
+      1.0815005891614786,
+      1.0985606052996923
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.0478289263728968,
+      1.0817518390405096,
+      1.098603412772725
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.0478369817155209,
+      1.0817552860664406,
+      1.098602534186464
+     ],
+     "cheaper_across_band": "Order6Cheap"
+    }
+   ],
+   "curves_denominator_cheaper_unresolved_numerator_cheaper": [
+    8,
+    0,
+    0
+   ]
+  }
+ ],
+ "strongest_walks": [
+  {
+   "arithmetic": "schoolbook",
+   "weight_gae": "0",
+   "pooled_cost_per_sqrt_n_by_arm": {
+    "Order6Built": 52.875972638812165,
+    "Order6Cheap": 50.925434532704095,
+    "Order24Built": 54.98102533942889,
+    "Order24Cheap": 33.83087704956547,
+    "Order24CheapMulLean": 32.40056676284749
+   },
+   "strongest_walk": "Order24CheapMulLean",
+   "strongest_order6": "Order6Cheap",
+   "strongest_order24": "Order24CheapMulLean",
+   "e29_order6_over_strongest": 1.631945917052385,
+   "handover_shift_bits_4log2": 2.8263729878327557
+  },
+  {
+   "arithmetic": "schoolbook",
+   "weight_gae": "0.1",
+   "pooled_cost_per_sqrt_n_by_arm": {
+    "Order6Built": 129.78037667080085,
+    "Order6Cheap": 120.74109401318539,
+    "Order24Built": 230.9234392894744,
+    "Order24Cheap": 103.45261802494034,
+    "Order24CheapMulLean": 115.89631751938676
+   },
+   "strongest_walk": "Order24Cheap",
+   "strongest_order6": "Order6Cheap",
+   "strongest_order24": "Order24Cheap",
+   "e29_order6_over_strongest": 1.254490984844032,
+   "handover_shift_bits_4log2": 1.3084084125458049
+  },
+  {
+   "arithmetic": "schoolbook",
+   "weight_gae": "1",
+   "pooled_cost_per_sqrt_n_by_arm": {
+    "Order6Built": 821.9200129586987,
+    "Order6Cheap": 749.0820293375172,
+    "Order24Built": 1814.405164839884,
+    "Order24Cheap": 730.0482868033142,
+    "Order24CheapMulLean": 867.35807432824
+   },
+   "strongest_walk": "Order24Cheap",
+   "strongest_order6": "Order6Cheap",
+   "strongest_order24": "Order24Cheap",
+   "e29_order6_over_strongest": 1.1258433555918146,
+   "handover_shift_bits_4log2": 0.6840244470376522
+  },
+  {
+   "arithmetic": "Karatsuba",
+   "weight_gae": "0",
+   "pooled_cost_per_sqrt_n_by_arm": {
+    "Order6Built": 43.761893270736216,
+    "Order6Cheap": 41.81135516462814,
+    "Order24Built": 49.48431037402195,
+    "Order24Cheap": 28.334162084158514,
+    "Order24CheapMulLean": 26.903851797440538
+   },
+   "strongest_walk": "Order24CheapMulLean",
+   "strongest_order6": "Order6Cheap",
+   "strongest_order24": "Order24CheapMulLean",
+   "e29_order6_over_strongest": 1.6266032685661556,
+   "handover_shift_bits_4log2": 2.8074496721017232
+  },
+  {
+   "arithmetic": "Karatsuba",
+   "weight_gae": "0.1",
+   "pooled_cost_per_sqrt_n_by_arm": {
+    "Order6Built": 120.6662973027249,
+    "Order6Cheap": 111.62701464510945,
+    "Order24Built": 225.42672432406746,
+    "Order24Cheap": 97.9559030595334,
+    "Order24CheapMulLean": 110.39960255397982
+   },
+   "strongest_walk": "Order24Cheap",
+   "strongest_order6": "Order6Cheap",
+   "strongest_order24": "Order24Cheap",
+   "e29_order6_over_strongest": 1.231843038896687,
+   "handover_shift_bits_4log2": 1.20327375974276
+  },
+  {
+   "arithmetic": "Karatsuba",
+   "weight_gae": "1",
+   "pooled_cost_per_sqrt_n_by_arm": {
+    "Order6Built": 812.8059335906229,
+    "Order6Cheap": 739.9679499694411,
+    "Order24Built": 1808.9084498744771,
+    "Order24Cheap": 724.5515718379072,
+    "Order24CheapMulLean": 861.8613593628331
+   },
+   "strongest_walk": "Order24Cheap",
+   "strongest_order6": "Order6Cheap",
+   "strongest_order24": "Order24Cheap",
+   "e29_order6_over_strongest": 1.1218054934707387,
+   "handover_shift_bits_4log2": 0.6632902120536305
+  }
+ ],
+ "strongest_walk_over_both_arithmetics": [
+  {
+   "weight_gae": "0",
+   "strongest_walk": "Order24CheapMulLean",
+   "arithmetic": "Karatsuba",
+   "pooled_cost_per_sqrt_n": 26.903851797440538
+  },
+  {
+   "weight_gae": "0.1",
+   "strongest_walk": "Order24Cheap",
+   "arithmetic": "Karatsuba",
+   "pooled_cost_per_sqrt_n": 97.9559030595334
+  },
+  {
+   "weight_gae": "1",
+   "strongest_walk": "Order24Cheap",
+   "arithmetic": "Karatsuba",
+   "pooled_cost_per_sqrt_n": 724.5515718379072
+  }
+ ],
+ "section_9_33_correction": [
+  {
+   "arithmetic": "schoolbook",
+   "e29_records_one_op_per_step_0_0p1_1": [
+    0.9617131057920246,
+    0.9962646749771445,
+    1.2049195275127502
+   ],
+   "order24_cheaper_curves_at_1_gae": 7,
+   "e34_built_arms_every_operation_0_0p1_1": [
+    0.9617131057920246,
+    0.5620060790282726,
+    0.45299695398035905
+   ],
+   "e34_built_arms_curves_order6_cheaper_across_band": 5
+  },
+  {
+   "arithmetic": "Karatsuba",
+   "e29_records_one_op_per_step_0_0p1_1": [
+    0.8843589602434904,
+    0.9265467049267079,
+    1.1723334300269752
+   ],
+   "order24_cheaper_curves_at_1_gae": 7,
+   "e34_built_arms_every_operation_0_0p1_1": [
+    0.8843589602434904,
+    0.535279469036059,
+    0.44933503055227847
+   ],
+   "e34_built_arms_curves_order6_cheaper_across_band": 6
+  }
+ ],
+ "logarithms": [
+  {
+   "p": 241,
+   "d": 271
+  },
+  {
+   "p": 337,
+   "d": 271
+  },
+  {
+   "p": 541,
+   "d": 271
+  },
+  {
+   "p": 601,
+   "d": 271
+  },
+  {
+   "p": 733,
+   "d": 271
+  },
+  {
+   "p": 769,
+   "d": 271
+  },
+  {
+   "p": 997,
+   "d": 271
+  },
+  {
+   "p": 1069,
+   "d": 271
+  }
+ ],
+ "steps_heuristic": [
+  {
+   "p": 241,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 24896,
+   "sd_steps_order6": 13788.985754337891,
+   "heuristic_order6_sqrt_pi_n_over_12": 29718.418226825816,
+   "mean_steps_order24": 15513.6875,
+   "sd_steps_order24": 7612.689369018459,
+   "heuristic_order24_sqrt_pi_n_over_48": 14859.209113412908,
+   "steps_ratio": 1.6047764272678562,
+   "steps_ratio_standard_error": 0.2968725368161292
+  },
+  {
+   "p": 337,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 54891.4375,
+   "sd_steps_order6": 31265.830701622177,
+   "heuristic_order6_sqrt_pi_n_over_12": 58108.646608823685,
+   "mean_steps_order24": 33319.8125,
+   "sd_steps_order24": 13380.388112052904,
+   "heuristic_order24_sqrt_pi_n_over_48": 29054.323304411842,
+   "steps_ratio": 1.6474113562313712,
+   "steps_ratio_standard_error": 0.28702903791515566
+  },
+  {
+   "p": 541,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 130967.8125,
+   "sd_steps_order6": 69351.44289219343,
+   "heuristic_order6_sqrt_pi_n_over_12": 149754.1801169824,
+   "mean_steps_order24": 84224.1875,
+   "sd_steps_order24": 47645.9819281315,
+   "heuristic_order24_sqrt_pi_n_over_48": 74877.0900584912,
+   "steps_ratio": 1.554990512671909,
+   "steps_ratio_standard_error": 0.301228944721029
+  },
+  {
+   "p": 601,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 200133.125,
+   "sd_steps_order6": 105741.8722108229,
+   "heuristic_order6_sqrt_pi_n_over_12": 184813.82168011233,
+   "mean_steps_order24": 95185.3125,
+   "sd_steps_order24": 57919.97096882186,
+   "heuristic_order24_sqrt_pi_n_over_48": 92406.91084005617,
+   "steps_ratio": 2.10256309238886,
+   "steps_ratio_standard_error": 0.4235993998747736
+  },
+  {
+   "p": 733,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 272175.75,
+   "sd_steps_order6": 158143.50973235248,
+   "heuristic_order6_sqrt_pi_n_over_12": 274911.53619171976,
+   "mean_steps_order24": 167135.6875,
+   "sd_steps_order24": 68332.22635888941,
+   "heuristic_order24_sqrt_pi_n_over_48": 137455.76809585988,
+   "steps_ratio": 1.6284717768609411,
+   "steps_ratio_standard_error": 0.28924106360418184
+  },
+  {
+   "p": 769,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 230688.5,
+   "sd_steps_order6": 112581.77693510911,
+   "heuristic_order6_sqrt_pi_n_over_12": 302577.56320427975,
+   "mean_steps_order24": 178811.125,
+   "sd_steps_order24": 85405.56102805406,
+   "heuristic_order24_sqrt_pi_n_over_48": 151288.78160213988,
+   "steps_ratio": 1.2901238667336834,
+   "steps_ratio_standard_error": 0.2202437670153743
+  },
+  {
+   "p": 997,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 510536.125,
+   "sd_steps_order6": 364241.75368361693,
+   "heuristic_order6_sqrt_pi_n_over_12": 508597.5097899575,
+   "mean_steps_order24": 272126.3125,
+   "sd_steps_order24": 117038.99472325096,
+   "heuristic_order24_sqrt_pi_n_over_48": 254298.75489497875,
+   "steps_ratio": 1.876099816698174,
+   "steps_ratio_standard_error": 0.3907257201365387
+  },
+  {
+   "p": 1069,
+   "n_prime": true,
+   "n_mod_24": 1,
+   "mean_steps_order6": 523426.0625,
+   "sd_steps_order6": 229552.23547549223,
+   "heuristic_order6_sqrt_pi_n_over_12": 584708.4298714491,
+   "mean_steps_order24": 256443.5,
+   "sd_steps_order24": 77705.3428107317,
+   "heuristic_order24_sqrt_pi_n_over_48": 292354.21493572457,
+   "steps_ratio": 2.0410970155219377,
+   "steps_ratio_standard_error": 0.27200459173832564
+  }
+ ],
+ "pooled_ratio_sampling_error": [
+  {
+   "pair": "Order6Built / Order24Cheap",
+   "arithmetic": "schoolbook",
+   "weights": [
+    {
+     "weight_gae": "0",
+     "pooled_ratio": 1.5629500991459313,
+     "standard_error": 0.09792182107871815,
+     "z_from_1": 5.748974977634276,
+     "ratio_under_rho_heuristic_steps": 1.8396984376349048
+    },
+    {
+     "weight_gae": "0.1",
+     "pooled_ratio": 1.2544909848440318,
+     "standard_error": 0.08062942542376075,
+     "z_from_1": 3.156304085096898,
+     "ratio_under_rho_heuristic_steps": 1.475730844051696
+    },
+    {
+     "weight_gae": "1",
+     "pooled_ratio": 1.1258433555918146,
+     "standard_error": 0.07325476563693867,
+     "z_from_1": 1.717886263065978,
+     "ratio_under_rho_heuristic_steps": 1.323908981869746
+    }
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24Cheap",
+   "arithmetic": "Karatsuba",
+   "weights": [
+    {
+     "weight_gae": "0",
+     "pooled_ratio": 1.5444922331125954,
+     "standard_error": 0.09692326090190782,
+     "z_from_1": 5.6177663446925745,
+     "ratio_under_rho_heuristic_steps": 1.8179103419912768
+    },
+    {
+     "weight_gae": "0.1",
+     "pooled_ratio": 1.231843038896687,
+     "standard_error": 0.07934353940175562,
+     "z_from_1": 2.9220153353980205,
+     "ratio_under_rho_heuristic_steps": 1.4490009567582829
+    },
+    {
+     "weight_gae": "1",
+     "pooled_ratio": 1.1218054934707387,
+     "standard_error": 0.07302243777208678,
+     "z_from_1": 1.6680556988649242,
+     "ratio_under_rho_heuristic_steps": 1.3191430893835911
+    }
+   ]
+  },
+  {
+   "pair": "Order6Cheap / Order24Cheap",
+   "arithmetic": "schoolbook",
+   "weights": [
+    {
+     "weight_gae": "0",
+     "pooled_ratio": 1.5052945407857283,
+     "standard_error": 0.0942389032568759,
+     "z_from_1": 5.361846576338003,
+     "ratio_under_rho_heuristic_steps": 1.7719161064182514
+    },
+    {
+     "weight_gae": "0.1",
+     "pooled_ratio": 1.1671149200310922,
+     "standard_error": 0.07496863341900153,
+     "z_from_1": 2.229131203407201,
+     "ratio_under_rho_heuristic_steps": 1.3729908511797397
+    },
+    {
+     "weight_gae": "1",
+     "pooled_ratio": 1.0260718953503016,
+     "standard_error": 0.06675305873290287,
+     "z_from_1": 0.3905722950407767,
+     "ratio_under_rho_heuristic_steps": 1.2065870938411778
+    }
+   ]
+  },
+  {
+   "pair": "Order6Cheap / Order24Cheap",
+   "arithmetic": "Karatsuba",
+   "weights": [
+    {
+     "weight_gae": "0",
+     "pooled_ratio": 1.475651725307404,
+     "standard_error": 0.09252176863514142,
+     "z_from_1": 5.140970955528654,
+     "ratio_under_rho_heuristic_steps": 1.736977936202693
+    },
+    {
+     "weight_gae": "0.1",
+     "pooled_ratio": 1.1395639380432985,
+     "standard_error": 0.07335883012143571,
+     "z_from_1": 1.9024831477310786,
+     "ratio_under_rho_heuristic_steps": 1.3404949050309192
+    },
+    {
+     "weight_gae": "1",
+     "pooled_ratio": 1.0212771302012753,
+     "standard_error": 0.06647019410504033,
+     "z_from_1": 0.3201003169578813,
+     "ratio_under_rho_heuristic_steps": 1.2009309824549124
+    }
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24Built",
+   "arithmetic": "schoolbook",
+   "weights": [
+    {
+     "weight_gae": "0",
+     "pooled_ratio": 0.9617131057920246,
+     "standard_error": 0.06070481939374119,
+     "z_from_1": -0.6307060063821365,
+     "ratio_under_rho_heuristic_steps": 1.1318357785892565
+    },
+    {
+     "weight_gae": "0.1",
+     "pooled_ratio": 0.5620060790282726,
+     "standard_error": 0.03625008995120243,
+     "z_from_1": -12.082560941540477,
+     "ratio_under_rho_heuristic_steps": 0.6611045933816329
+    },
+    {
+     "weight_gae": "1",
+     "pooled_ratio": 0.45299695398035905,
+     "standard_error": 0.029489769281338386,
+     "z_from_1": -18.54890897250232,
+     "ratio_under_rho_heuristic_steps": 0.5326876596557298
+    }
+   ]
+  },
+  {
+   "pair": "Order6Built / Order24Built",
+   "arithmetic": "Karatsuba",
+   "weights": [
+    {
+     "weight_gae": "0",
+     "pooled_ratio": 0.8843589602434904,
+     "standard_error": 0.05593654668862866,
+     "z_from_1": -2.0673610832686298,
+     "ratio_under_rho_heuristic_steps": 1.0407424980627535
+    },
+    {
+     "weight_gae": "0.1",
+     "pooled_ratio": 0.5352794690360589,
+     "standard_error": 0.0345823077274599,
+     "z_from_1": -13.438100621461192,
+     "ratio_under_rho_heuristic_steps": 0.6296238494799495
+    },
+    {
+     "weight_gae": "1",
+     "pooled_ratio": 0.44933503055227847,
+     "standard_error": 0.029260352138042393,
+     "z_from_1": -18.819492221072178,
+     "ratio_under_rho_heuristic_steps": 0.5283739889326043
+    }
+   ]
+  }
+ ],
+ "per_curve": [
+  {
+   "p": 241,
+   "b0": 3,
+   "n": 3373515841,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 24896,
+     "mean_fp_muls_walk": 3029977.875,
+     "mean_native_ops": 417788.0625,
+     "fp_muls_per_step": 121.70540950353471,
+     "native_ops_per_step": 16.781332844633678,
+     "ops_per_step": {
+      "cmp": 3.1079791934447303,
+      "neg": 4.127018396529563,
+      "modn": 5.547600518155527,
+      "hash": 1.9991564910025708,
+      "table": 1.9995782455012854
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0123240507561104,
+     "cost_0_0p1_1_gae97": [
+      3029977.875,
+      7082522.081250001,
+      43555419.9375
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 24896,
+     "mean_fp_muls_walk": 2500810.125,
+     "mean_native_ops": 417788.0625,
+     "fp_muls_per_step": 100.45027815713368,
+     "native_ops_per_step": 16.781332844633678,
+     "ops_per_step": {
+      "cmp": 3.1079791934447303,
+      "neg": 4.127018396529563,
+      "modn": 5.547600518155527,
+      "hash": 1.9991564910025708,
+      "table": 1.9995782455012854
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0123240507561104,
+     "cost_0_0p1_1_gae97": [
+      2500810.125,
+      6553354.331250001,
+      43026252.1875
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 24896,
+     "mean_fp_muls_walk": 2927286.9375,
+     "mean_native_ops": 379206.8125,
+     "fp_muls_per_step": 117.58061284945373,
+     "native_ops_per_step": 15.2316361062018,
+     "ops_per_step": {
+      "cmp": 4.663565432197943,
+      "neg": 2.0530080133354756,
+      "modn": 4.516327924164524,
+      "hash": 1.9991564910025708,
+      "table": 1.9995782455012854
+     },
+     "rep_fp_muls_per_call": 4.000596128812487,
+     "rep_cmp_per_call": 4.520033577867806,
+     "cost_0_0p1_1_gae97": [
+      2927286.9375,
+      6605593.018750001,
+      39710347.75
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 24896,
+     "mean_fp_muls_walk": 2398119.1875,
+     "mean_native_ops": 379206.8125,
+     "fp_muls_per_step": 96.3254815030527,
+     "native_ops_per_step": 15.2316361062018,
+     "ops_per_step": {
+      "cmp": 4.663565432197943,
+      "neg": 2.0530080133354756,
+      "modn": 4.516327924164524,
+      "hash": 1.9991564910025708,
+      "table": 1.9995782455012854
+     },
+     "rep_fp_muls_per_call": 4.000596128812487,
+     "rep_cmp_per_call": 4.520033577867806,
+     "cost_0_0p1_1_gae97": [
+      2398119.1875,
+      6076425.268750001,
+      39181180
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 15513.6875,
+     "mean_fp_muls_walk": 3259937.8125,
+     "mean_native_ops": 1012875.25,
+     "fp_muls_per_step": 210.13300754575596,
+     "native_ops_per_step": 65.28913580346388,
+     "ops_per_step": {
+      "cmp": 16.56149206950314,
+      "neg": 4.124245122250915,
+      "modn": 40.60401500288052,
+      "hash": 1.9995890725528667,
+      "table": 1.9997945362764333
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.06256813413095,
+     "cost_0_0p1_1_gae97": [
+      3259937.8125,
+      13084827.7375,
+      101508837.0625
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 15513.6875,
+     "mean_fp_muls_walk": 2905251.9375,
+     "mean_native_ops": 1012875.25,
+     "fp_muls_per_step": 187.27023716959621,
+     "native_ops_per_step": 65.28913580346388,
+     "ops_per_step": {
+      "cmp": 16.56149206950314,
+      "neg": 4.124245122250915,
+      "modn": 40.60401500288052,
+      "hash": 1.9995890725528667,
+      "table": 1.9997945362764333
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.06256813413095,
+     "cost_0_0p1_1_gae97": [
+      2905251.9375,
+      12730141.8625,
+      101154151.1875
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 15513.6875,
+     "mean_fp_muls_walk": 2126863.0625,
+     "mean_native_ops": 401367.875,
+     "fp_muls_per_step": 137.09590724320057,
+     "native_ops_per_step": 25.87185509570178,
+     "ops_per_step": {
+      "cmp": 14.010466563800515,
+      "neg": 3.344361229398233,
+      "modn": 4.517643693673731,
+      "hash": 1.9995890725528667,
+      "table": 1.9997945362764333
+     },
+     "rep_fp_muls_per_call": 15.160681282699498,
+     "rep_cmp_per_call": 13.588393656053046,
+     "cost_0_0p1_1_gae97": [
+      2126863.0625,
+      6020131.450000001,
+      41059546.9375
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 15513.6875,
+     "mean_fp_muls_walk": 1772177.1875,
+     "mean_native_ops": 401367.875,
+     "fp_muls_per_step": 114.2331368670408,
+     "native_ops_per_step": 25.87185509570178,
+     "ops_per_step": {
+      "cmp": 14.010466563800515,
+      "neg": 3.344361229398233,
+      "modn": 4.517643693673731,
+      "hash": 1.9995890725528667,
+      "table": 1.9997945362764333
+     },
+     "rep_fp_muls_per_call": 15.160681282699498,
+     "rep_cmp_per_call": 13.588393656053046,
+     "cost_0_0p1_1_gae97": [
+      1772177.1875,
+      5665445.575000001,
+      40704861.0625
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 15513.6875,
+     "mean_fp_muls_walk": 2047218.6875,
+     "mean_native_ops": 481012.25,
+     "fp_muls_per_step": 131.96209395735218,
+     "native_ops_per_step": 31.005668381550162,
+     "ops_per_step": {
+      "cmp": 14.010466563800515,
+      "neg": 8.478174515246616,
+      "modn": 4.517643693673731,
+      "hash": 1.9995890725528667,
+      "table": 1.9997945362764333
+     },
+     "rep_fp_muls_per_call": 10.18152690785335,
+     "rep_cmp_per_call": 13.588393656053046,
+     "cost_0_0p1_1_gae97": [
+      2047218.6875,
+      6713037.5125,
+      48705406.9375
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 15513.6875,
+     "mean_fp_muls_walk": 1692532.8125,
+     "mean_native_ops": 481012.25,
+     "fp_muls_per_step": 109.09932358119241,
+     "native_ops_per_step": 31.005668381550162,
+     "ops_per_step": {
+      "cmp": 14.010466563800515,
+      "neg": 8.478174515246616,
+      "modn": 4.517643693673731,
+      "hash": 1.9995890725528667,
+      "table": 1.9997945362764333
+     },
+     "rep_fp_muls_per_call": 10.18152690785335,
+     "rep_cmp_per_call": 13.588393656053046,
+     "cost_0_0p1_1_gae97": [
+      1692532.8125,
+      6358351.6375,
+      48350721.0625
+     ]
+    }
+   ]
+  },
+  {
+   "p": 337,
+   "b0": 3,
+   "n": 12897718513,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 54891.4375,
+     "mean_fp_muls_walk": 6296368.625,
+     "mean_native_ops": 920636.9375,
+     "fp_muls_per_step": 114.70584323830106,
+     "native_ops_per_step": 16.77195896901042,
+     "ops_per_step": {
+      "cmp": 3.1021698511721434,
+      "neg": 4.123817125394102,
+      "modn": 5.547065059099609,
+      "hash": 1.9992712888963784,
+      "table": 1.9996356444481893
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0090275653294665,
+     "cost_0_0p1_1_gae97": [
+      6296368.625,
+      15226546.918750001,
+      95598151.5625
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 54891.4375,
+     "mean_fp_muls_walk": 5206598.375,
+     "mean_native_ops": 920636.9375,
+     "fp_muls_per_step": 94.85265119901442,
+     "native_ops_per_step": 16.77195896901042,
+     "ops_per_step": {
+      "cmp": 3.1021698511721434,
+      "neg": 4.123817125394102,
+      "modn": 5.547065059099609,
+      "hash": 1.9992712888963784,
+      "table": 1.9996356444481893
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0090275653294665,
+     "cost_0_0p1_1_gae97": [
+      5206598.375,
+      14136776.668750001,
+      94508381.3125
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 54891.4375,
+     "mean_fp_muls_walk": 6069995.1875,
+     "mean_native_ops": 835841.4375,
+     "fp_muls_per_step": 110.58182230152016,
+     "native_ops_per_step": 15.22717340933183,
+     "ops_per_step": {
+      "cmp": 4.655046381323134,
+      "neg": 2.056890703581957,
+      "modn": 4.51632939108217,
+      "hash": 1.9992712888963784,
+      "table": 1.9996356444481893
+     },
+     "rep_fp_muls_per_call": 3.9990954763879576,
+     "rep_cmp_per_call": 4.515279159842244,
+     "cost_0_0p1_1_gae97": [
+      6069995.1875,
+      14177657.131250001,
+      87146614.625
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 54891.4375,
+     "mean_fp_muls_walk": 4980224.9375,
+     "mean_native_ops": 835841.4375,
+     "fp_muls_per_step": 90.72863026223352,
+     "native_ops_per_step": 15.22717340933183,
+     "ops_per_step": {
+      "cmp": 4.655046381323134,
+      "neg": 2.056890703581957,
+      "modn": 4.51632939108217,
+      "hash": 1.9992712888963784,
+      "table": 1.9996356444481893
+     },
+     "rep_fp_muls_per_call": 3.9990954763879576,
+     "rep_cmp_per_call": 4.515279159842244,
+     "cost_0_0p1_1_gae97": [
+      4980224.9375,
+      13087886.881250001,
+      86056844.375
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 33319.8125,
+     "mean_fp_muls_walk": 6642882.5,
+     "mean_native_ops": 2175389.875,
+     "fp_muls_per_step": 199.36734337865798,
+     "native_ops_per_step": 65.28817876751258,
+     "ops_per_step": {
+      "cmp": 16.549052084251674,
+      "neg": 4.125495904276172,
+      "modn": 40.613979670503845,
+      "hash": 1.9997674056539183,
+      "table": 1.9998837028269592
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.04563666355669,
+     "cost_0_0p1_1_gae97": [
+      6642882.5,
+      27744164.2875,
+      217655700.375
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 33319.8125,
+     "mean_fp_muls_walk": 5953265.75,
+     "mean_native_ops": 2175389.875,
+     "fp_muls_per_step": 178.67044569953688,
+     "native_ops_per_step": 65.28817876751258,
+     "ops_per_step": {
+      "cmp": 16.549052084251674,
+      "neg": 4.125495904276172,
+      "modn": 40.613979670503845,
+      "hash": 1.9997674056539183,
+      "table": 1.9998837028269592
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.04563666355669,
+     "cost_0_0p1_1_gae97": [
+      5953265.75,
+      27054547.5375,
+      216966083.625
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 33319.8125,
+     "mean_fp_muls_walk": 4208706.3125,
+     "mean_native_ops": 861293.1875,
+     "fp_muls_per_step": 126.31242485233072,
+     "native_ops_per_step": 25.84928073949996,
+     "ops_per_step": {
+      "cmp": 13.989259393341424,
+      "neg": 3.3441195835060595,
+      "modn": 4.516250654171598,
+      "hash": 1.9997674056539183,
+      "table": 1.9998837028269592
+     },
+     "rep_fp_muls_per_call": 15.166218356876417,
+     "rep_cmp_per_call": 13.563711823193167,
+     "cost_0_0p1_1_gae97": [
+      4208706.3125,
+      12563250.231250001,
+      87754145.5
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 33319.8125,
+     "mean_fp_muls_walk": 3519089.5625,
+     "mean_native_ops": 861293.1875,
+     "fp_muls_per_step": 105.61552717320963,
+     "native_ops_per_step": 25.84928073949996,
+     "ops_per_step": {
+      "cmp": 13.989259393341424,
+      "neg": 3.3441195835060595,
+      "modn": 4.516250654171598,
+      "hash": 1.9997674056539183,
+      "table": 1.9998837028269592
+     },
+     "rep_fp_muls_per_call": 15.166218356876417,
+     "rep_cmp_per_call": 13.563711823193167,
+     "cost_0_0p1_1_gae97": [
+      3519089.5625,
+      11873633.481250001,
+      87064528.75
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 33319.8125,
+     "mean_fp_muls_walk": 4037403.8125,
+     "mean_native_ops": 1032595.6875,
+     "fp_muls_per_step": 121.1712644691503,
+     "native_ops_per_step": 30.990441122680387,
+     "ops_per_step": {
+      "cmp": 13.989259393341424,
+      "neg": 8.485279966686488,
+      "modn": 4.516250654171598,
+      "hash": 1.9997674056539183,
+      "table": 1.9998837028269592
+     },
+     "rep_fp_muls_per_call": 10.181449977539042,
+     "rep_cmp_per_call": 13.563711823193167,
+     "cost_0_0p1_1_gae97": [
+      4037403.8125,
+      14053581.981250001,
+      104199185.5
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 33319.8125,
+     "mean_fp_muls_walk": 3347787.0625,
+     "mean_native_ops": 1032595.6875,
+     "fp_muls_per_step": 100.47436679002921,
+     "native_ops_per_step": 30.990441122680387,
+     "ops_per_step": {
+      "cmp": 13.989259393341424,
+      "neg": 8.485279966686488,
+      "modn": 4.516250654171598,
+      "hash": 1.9997674056539183,
+      "table": 1.9998837028269592
+     },
+     "rep_fp_muls_per_call": 10.181449977539042,
+     "rep_cmp_per_call": 13.563711823193167,
+     "cost_0_0p1_1_gae97": [
+      3347787.0625,
+      13363965.231250001,
+      103509568.75
+     ]
+    }
+   ]
+  },
+  {
+   "p": 541,
+   "b0": 3,
+   "n": 85662211249,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 130967.8125,
+     "mean_fp_muls_walk": 14566123.8125,
+     "mean_native_ops": 2196515.6875,
+     "fp_muls_per_step": 111.219112043274,
+     "native_ops_per_step": 16.77141616379979,
+     "ops_per_step": {
+      "cmp": 3.099700546651491,
+      "neg": 4.1253914964793355,
+      "modn": 5.547462282001542,
+      "hash": 1.9992412257782803,
+      "table": 1.9996206128891403
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.005484981773795,
+     "cost_0_0p1_1_gae97": [
+      14566123.8125,
+      35872325.98125,
+      227628145.5
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 130967.8125,
+     "mean_fp_muls_walk": 12057752.1875,
+     "mean_native_ops": 2196515.6875,
+     "fp_muls_per_step": 92.06653113718303,
+     "native_ops_per_step": 16.77141616379979,
+     "ops_per_step": {
+      "cmp": 3.099700546651491,
+      "neg": 4.1253914964793355,
+      "modn": 5.547462282001542,
+      "hash": 1.9992412257782803,
+      "table": 1.9996206128891403
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.005484981773795,
+     "cost_0_0p1_1_gae97": [
+      12057752.1875,
+      33363954.356250003,
+      225119773.875
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 130967.8125,
+     "mean_fp_muls_walk": 14025549.1875,
+     "mean_native_ops": 1993939.3125,
+     "fp_muls_per_step": 107.09157402701523,
+     "native_ops_per_step": 15.224651572309035,
+     "ops_per_step": {
+      "cmp": 4.650552497393205,
+      "neg": 2.0590312028003064,
+      "modn": 4.516206033448104,
+      "hash": 1.9992412257782803,
+      "table": 1.9996206128891403
+     },
+     "rep_fp_muls_per_call": 3.9976077816964297,
+     "rep_cmp_per_call": 4.509198704037713,
+     "cost_0_0p1_1_gae97": [
+      14025549.1875,
+      33366760.51875,
+      207437662.5
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 130967.8125,
+     "mean_fp_muls_walk": 11517177.5625,
+     "mean_native_ops": 1993939.3125,
+     "fp_muls_per_step": 87.93899312092427,
+     "native_ops_per_step": 15.224651572309035,
+     "ops_per_step": {
+      "cmp": 4.650552497393205,
+      "neg": 2.0590312028003064,
+      "modn": 4.516206033448104,
+      "hash": 1.9992412257782803,
+      "table": 1.9996206128891403
+     },
+     "rep_fp_muls_per_call": 3.9976077816964297,
+     "rep_cmp_per_call": 4.509198704037713,
+     "cost_0_0p1_1_gae97": [
+      11517177.5625,
+      30858388.89375,
+      204929290.875
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 84224.1875,
+     "mean_fp_muls_walk": 16795438.1875,
+     "mean_native_ops": 5495759.375,
+     "fp_muls_per_step": 199.41347831345954,
+     "native_ops_per_step": 65.25155704232824,
+     "ops_per_step": {
+      "cmp": 16.524930115829257,
+      "neg": 4.1242428132654885,
+      "modn": 40.60267574561049,
+      "hash": 1.9998055784153455,
+      "table": 1.9999027892076726
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.027116602036497,
+     "cost_0_0p1_1_gae97": [
+      16795438.1875,
+      70104304.125,
+      549884097.5625
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 84224.1875,
+     "mean_fp_muls_walk": 15155511.8125,
+     "mean_native_ops": 5495759.375,
+     "fp_muls_per_step": 179.9425113183787,
+     "native_ops_per_step": 65.25155704232824,
+     "ops_per_step": {
+      "cmp": 16.524930115829257,
+      "neg": 4.1242428132654885,
+      "modn": 40.60267574561049,
+      "hash": 1.9998055784153455,
+      "table": 1.9999027892076726
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.027116602036497,
+     "cost_0_0p1_1_gae97": [
+      15155511.8125,
+      68464377.75,
+      548244171.1875
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 84224.1875,
+     "mean_fp_muls_walk": 10123159.875,
+     "mean_native_ops": 2174566.0625,
+     "fp_muls_per_step": 120.19302501434045,
+     "native_ops_per_step": 25.81878349969241,
+     "ops_per_step": {
+      "cmp": 13.958406396024895,
+      "neg": 3.3449751296205736,
+      "modn": 4.515693606423927,
+      "hash": 1.9998055784153455,
+      "table": 1.9999027892076726
+     },
+     "rep_fp_muls_per_call": 15.165579181312813,
+     "rep_cmp_per_call": 13.537909408367664,
+     "cost_0_0p1_1_gae97": [
+      10123159.875,
+      31216450.681250002,
+      221056067.9375
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 84224.1875,
+     "mean_fp_muls_walk": 8483233.5,
+     "mean_native_ops": 2174566.0625,
+     "fp_muls_per_step": 100.7220580192596,
+     "native_ops_per_step": 25.81878349969241,
+     "ops_per_step": {
+      "cmp": 13.958406396024895,
+      "neg": 3.3449751296205736,
+      "modn": 4.515693606423927,
+      "hash": 1.9998055784153455,
+      "table": 1.9999027892076726
+     },
+     "rep_fp_muls_per_call": 15.165579181312813,
+     "rep_cmp_per_call": 13.537909408367664,
+     "cost_0_0p1_1_gae97": [
+      8483233.5,
+      29576524.306250002,
+      219416141.5625
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 84224.1875,
+     "mean_fp_muls_walk": 9689740.5,
+     "mean_native_ops": 2607985.4375,
+     "fp_muls_per_step": 115.04700475739229,
+     "native_ops_per_step": 30.964803756640574,
+     "ops_per_step": {
+      "cmp": 13.958406396024895,
+      "neg": 8.490995386568734,
+      "modn": 4.515693606423927,
+      "hash": 1.9998055784153455,
+      "table": 1.9999027892076726
+     },
+     "rep_fp_muls_per_call": 10.174582782753388,
+     "rep_cmp_per_call": 13.537909408367664,
+     "cost_0_0p1_1_gae97": [
+      9689740.5,
+      34987199.243750006,
+      262664327.9375
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 84224.1875,
+     "mean_fp_muls_walk": 8049814.125,
+     "mean_native_ops": 2607985.4375,
+     "fp_muls_per_step": 95.57603776231144,
+     "native_ops_per_step": 30.964803756640574,
+     "ops_per_step": {
+      "cmp": 13.958406396024895,
+      "neg": 8.490995386568734,
+      "modn": 4.515693606423927,
+      "hash": 1.9998055784153455,
+      "table": 1.9999027892076726
+     },
+     "rep_fp_muls_per_call": 10.174582782753388,
+     "rep_cmp_per_call": 13.537909408367664,
+     "cost_0_0p1_1_gae97": [
+      8049814.125,
+      33347272.868750002,
+      261024401.5625
+     ]
+    }
+   ]
+  },
+  {
+   "p": 601,
+   "b0": 9,
+   "n": 130466877601,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 200133.125,
+     "mean_fp_muls_walk": 22063936.6875,
+     "mean_native_ops": 3356537.3125,
+     "fp_muls_per_step": 110.24630074356756,
+     "native_ops_per_step": 16.771523017491482,
+     "ops_per_step": {
+      "cmp": 3.0992289507296706,
+      "neg": 4.125478978055232,
+      "modn": 5.547914044713988,
+      "hash": 1.9992673626617283,
+      "table": 1.9996336813308642
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0049639978441096,
+     "cost_0_0p1_1_gae97": [
+      22063936.6875,
+      54622348.618750006,
+      347648056
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 200133.125,
+     "mean_fp_muls_walk": 18269974.3125,
+     "mean_native_ops": 3356537.3125,
+     "fp_muls_per_step": 91.2891072504864,
+     "native_ops_per_step": 16.771523017491482,
+     "ops_per_step": {
+      "cmp": 3.0992289507296706,
+      "neg": 4.125478978055232,
+      "modn": 5.547914044713988,
+      "hash": 1.9992673626617283,
+      "table": 1.9996336813308642
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0049639978441096,
+     "cost_0_0p1_1_gae97": [
+      18269974.3125,
+      50828386.243750006,
+      343854093.625
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 200133.125,
+     "mean_fp_muls_walk": 21238017.0625,
+     "mean_native_ops": 3047419.1875,
+     "fp_muls_per_step": 106.11944955389069,
+     "native_ops_per_step": 15.226960491922563,
+     "ops_per_step": {
+      "cmp": 4.6502100164577955,
+      "neg": 2.0612451711829314,
+      "modn": 4.516604260289245,
+      "hash": 1.9992673626617283,
+      "table": 1.9996336813308642
+     },
+     "rep_fp_muls_per_call": 3.9984757371509545,
+     "rep_cmp_per_call": 4.508771021443841,
+     "cost_0_0p1_1_gae97": [
+      21238017.0625,
+      50797983.181250006,
+      316837678.25
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 200133.125,
+     "mean_fp_muls_walk": 17444054.6875,
+     "mean_native_ops": 3047419.1875,
+     "fp_muls_per_step": 87.16225606080953,
+     "native_ops_per_step": 15.226960491922563,
+     "ops_per_step": {
+      "cmp": 4.6502100164577955,
+      "neg": 2.0612451711829314,
+      "modn": 4.516604260289245,
+      "hash": 1.9992673626617283,
+      "table": 1.9996336813308642
+     },
+     "rep_fp_muls_per_call": 3.9984757371509545,
+     "rep_cmp_per_call": 4.508771021443841,
+     "cost_0_0p1_1_gae97": [
+      17444054.6875,
+      47004020.806250006,
+      313043715.875
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 95185.3125,
+     "mean_fp_muls_walk": 18352782,
+     "mean_native_ops": 6211725.0625,
+     "fp_muls_per_step": 192.81107051048448,
+     "native_ops_per_step": 65.25928107343242,
+     "ops_per_step": {
+      "cmp": 16.52549270666102,
+      "neg": 4.1249956499328615,
+      "modn": 40.60910001214736,
+      "hash": 1.9997951364607853,
+      "table": 1.9998975682303928
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.024737099473054,
+     "cost_0_0p1_1_gae97": [
+      18352782,
+      78606515.10625,
+      620890113.0625
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 95185.3125,
+     "mean_fp_muls_walk": 16507728,
+     "mean_native_ops": 6211725.0625,
+     "fp_muls_per_step": 173.4272606396076,
+     "native_ops_per_step": 65.25928107343242,
+     "ops_per_step": {
+      "cmp": 16.52549270666102,
+      "neg": 4.1249956499328615,
+      "modn": 40.60910001214736,
+      "hash": 1.9997951364607853,
+      "table": 1.9998975682303928
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.024737099473054,
+     "cost_0_0p1_1_gae97": [
+      16507728,
+      76761461.10625,
+      619045059.0625
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 95185.3125,
+     "mean_fp_muls_walk": 11399928.4375,
+     "mean_native_ops": 2457482.5,
+     "fp_muls_per_step": 119.76562494870204,
+     "native_ops_per_step": 25.817875000410385,
+     "ops_per_step": {
+      "cmp": 13.957241302328024,
+      "neg": 3.3454268482860736,
+      "modn": 4.515514145105107,
+      "hash": 1.9997951364607853,
+      "table": 1.9998975682303928
+     },
+     "rep_fp_muls_per_call": 15.16757059283464,
+     "rep_cmp_per_call": 13.534308868961055,
+     "cost_0_0p1_1_gae97": [
+      11399928.4375,
+      35237508.6875,
+      249775730.9375
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 95185.3125,
+     "mean_fp_muls_walk": 9554874.4375,
+     "mean_native_ops": 2457482.5,
+     "fp_muls_per_step": 100.38181507782517,
+     "native_ops_per_step": 25.817875000410385,
+     "ops_per_step": {
+      "cmp": 13.957241302328024,
+      "neg": 3.3454268482860736,
+      "modn": 4.515514145105107,
+      "hash": 1.9997951364607853,
+      "table": 1.9998975682303928
+     },
+     "rep_fp_muls_per_call": 15.16757059283464,
+     "rep_cmp_per_call": 13.534308868961055,
+     "cost_0_0p1_1_gae97": [
+      9554874.4375,
+      33392454.687500004,
+      247930676.9375
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 95185.3125,
+     "mean_fp_muls_walk": 10909935.9375,
+     "mean_native_ops": 2947475,
+     "fp_muls_per_step": 114.6178507056958,
+     "native_ops_per_step": 30.965649243416625,
+     "ops_per_step": {
+      "cmp": 13.957241302328024,
+      "neg": 8.493201091292315,
+      "modn": 4.515514145105107,
+      "hash": 1.9997951364607853,
+      "table": 1.9998975682303928
+     },
+     "rep_fp_muls_per_call": 10.175784244560525,
+     "rep_cmp_per_call": 13.534308868961055,
+     "cost_0_0p1_1_gae97": [
+      10909935.9375,
+      39500443.4375,
+      296815010.9375
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 95185.3125,
+     "mean_fp_muls_walk": 9064881.9375,
+     "mean_native_ops": 2947475,
+     "fp_muls_per_step": 95.23404083481893,
+     "native_ops_per_step": 30.965649243416625,
+     "ops_per_step": {
+      "cmp": 13.957241302328024,
+      "neg": 8.493201091292315,
+      "modn": 4.515514145105107,
+      "hash": 1.9997951364607853,
+      "table": 1.9998975682303928
+     },
+     "rep_fp_muls_per_call": 10.175784244560525,
+     "rep_cmp_per_call": 13.534308868961055,
+     "cost_0_0p1_1_gae97": [
+      9064881.9375,
+      37655389.4375,
+      294969956.9375
+     ]
+    }
+   ]
+  },
+  {
+   "p": 733,
+   "b0": 9,
+   "n": 288680402833,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 272175.75,
+     "mean_fp_muls_walk": 29873879.6875,
+     "mean_native_ops": 4564160.125,
+     "fp_muls_per_step": 109.75952004357478,
+     "native_ops_per_step": 16.769165236065298,
+     "ops_per_step": {
+      "cmp": 3.097771614480717,
+      "neg": 4.124753950342748,
+      "modn": 5.547716411179174,
+      "hash": 1.9992821733751078,
+      "table": 1.9996410866875538
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0040789358825215,
+     "cost_0_0p1_1_gae97": [
+      29873879.6875,
+      74146232.9,
+      472597411.8125
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 272175.75,
+     "mean_fp_muls_walk": 24740624.3125,
+     "mean_native_ops": 4564160.125,
+     "fp_muls_per_step": 90.8994438795521,
+     "native_ops_per_step": 16.769165236065298,
+     "ops_per_step": {
+      "cmp": 3.097771614480717,
+      "neg": 4.124753950342748,
+      "modn": 5.547716411179174,
+      "hash": 1.9992821733751078,
+      "table": 1.9996410866875538
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0040789358825215,
+     "cost_0_0p1_1_gae97": [
+      24740624.3125,
+      69012977.525,
+      467464156.4375
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 272175.75,
+     "mean_fp_muls_walk": 28750533.4375,
+     "mean_native_ops": 4143950.9375,
+     "fp_muls_per_step": 105.63223739624121,
+     "native_ops_per_step": 15.225276085397027,
+     "ops_per_step": {
+      "cmp": 4.647926018390691,
+      "neg": 2.061854794190886,
+      "modn": 4.516572012752789,
+      "hash": 1.9992821733751078,
+      "table": 1.9996410866875538
+     },
+     "rep_fp_muls_per_call": 3.997398139059268,
+     "rep_cmp_per_call": 4.507348631551194,
+     "cost_0_0p1_1_gae97": [
+      28750533.4375,
+      68946857.53125,
+      430713774.375
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 272175.75,
+     "mean_fp_muls_walk": 23617278.0625,
+     "mean_native_ops": 4143950.9375,
+     "fp_muls_per_step": 86.77216123221852,
+     "native_ops_per_step": 15.225276085397027,
+     "ops_per_step": {
+      "cmp": 4.647926018390691,
+      "neg": 2.061854794190886,
+      "modn": 4.516572012752789,
+      "hash": 1.9992821733751078,
+      "table": 1.9996410866875538
+     },
+     "rep_fp_muls_per_call": 3.997398139059268,
+     "rep_cmp_per_call": 4.507348631551194,
+     "cost_0_0p1_1_gae97": [
+      23617278.0625,
+      63813602.15625001,
+      425580519
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 167135.6875,
+     "mean_fp_muls_walk": 32980351.5,
+     "mean_native_ops": 10907125,
+     "fp_muls_per_step": 197.3268067000951,
+     "native_ops_per_step": 65.25910272753687,
+     "ops_per_step": {
+      "cmp": 16.522401521817415,
+      "neg": 4.125257509710486,
+      "modn": 40.61170508542647,
+      "hash": 1.9998257403883297,
+      "table": 1.9999128701941649
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.020722568639815,
+     "cost_0_0p1_1_gae97": [
+      32980351.5,
+      138779464,
+      1090971476.5
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 167135.6875,
+     "mean_fp_muls_walk": 29796906,
+     "mean_native_ops": 10907125,
+     "fp_muls_per_step": 178.27973454203192,
+     "native_ops_per_step": 65.25910272753687,
+     "ops_per_step": {
+      "cmp": 16.522401521817415,
+      "neg": 4.125257509710486,
+      "modn": 40.61170508542647,
+      "hash": 1.9998257403883297,
+      "table": 1.9999128701941649
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.020722568639815,
+     "cost_0_0p1_1_gae97": [
+      29796906,
+      135596018.5,
+      1087788031
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 167135.6875,
+     "mean_fp_muls_walk": 19736339.4375,
+     "mean_native_ops": 4314810.6875,
+     "fp_muls_per_step": 118.08572862393616,
+     "native_ops_per_step": 25.81621407157583,
+     "ops_per_step": {
+      "cmp": 13.95258605377143,
+      "neg": 3.3481157338105905,
+      "modn": 4.515773673411311,
+      "hash": 1.9998257403883297,
+      "table": 1.9999128701941649
+     },
+     "rep_fp_muls_per_call": 15.164719601176397,
+     "rep_cmp_per_call": 13.528935850359202,
+     "cost_0_0p1_1_gae97": [
+      19736339.4375,
+      61590003.10625,
+      438272976.125
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 167135.6875,
+     "mean_fp_muls_walk": 16552893.9375,
+     "mean_native_ops": 4314810.6875,
+     "fp_muls_per_step": 99.03865646587298,
+     "native_ops_per_step": 25.81621407157583,
+     "ops_per_step": {
+      "cmp": 13.95258605377143,
+      "neg": 3.3481157338105905,
+      "modn": 4.515773673411311,
+      "hash": 1.9998257403883297,
+      "table": 1.9999128701941649
+     },
+     "rep_fp_muls_per_call": 15.164719601176397,
+     "rep_cmp_per_call": 13.528935850359202,
+     "cost_0_0p1_1_gae97": [
+      16552893.9375,
+      58406557.60625,
+      435089530.625
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 167135.6875,
+     "mean_fp_muls_walk": 18875684.125,
+     "mean_native_ops": 5175466,
+     "fp_muls_per_step": 112.93628791876061,
+     "native_ops_per_step": 30.965654776751375,
+     "ops_per_step": {
+      "cmp": 13.95258605377143,
+      "neg": 8.497556438986138,
+      "modn": 4.515773673411311,
+      "hash": 1.9998257403883297,
+      "table": 1.9999128701941649
+     },
+     "rep_fp_muls_per_call": 10.171634255057542,
+     "rep_cmp_per_call": 13.528935850359202,
+     "cost_0_0p1_1_gae97": [
+      18875684.125,
+      69077704.325,
+      520895886.125
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 167135.6875,
+     "mean_fp_muls_walk": 15692238.625,
+     "mean_native_ops": 5175466,
+     "fp_muls_per_step": 93.88921576069743,
+     "native_ops_per_step": 30.965654776751375,
+     "ops_per_step": {
+      "cmp": 13.95258605377143,
+      "neg": 8.497556438986138,
+      "modn": 4.515773673411311,
+      "hash": 1.9998257403883297,
+      "table": 1.9999128701941649
+     },
+     "rep_fp_muls_per_call": 10.171634255057542,
+     "rep_cmp_per_call": 13.528935850359202,
+     "cost_0_0p1_1_gae97": [
+      15692238.625,
+      65894258.825,
+      517712440.625
+     ]
+    }
+   ]
+  },
+  {
+   "p": 769,
+   "b0": 2,
+   "n": 349707394369,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 230688.5,
+     "mean_fp_muls_walk": 25385681.6875,
+     "mean_native_ops": 3868390.75,
+     "fp_muls_per_step": 110.04311739640251,
+     "native_ops_per_step": 16.76889290103321,
+     "ops_per_step": {
+      "cmp": 3.0977438190460296,
+      "neg": 4.1249151995006255,
+      "modn": 5.547327890206924,
+      "hash": 1.999270661519755,
+      "table": 1.9996353307598775
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.003934548202156,
+     "cost_0_0p1_1_gae97": [
+      25385681.6875,
+      62909071.962500006,
+      400619584.4375
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 230688.5,
+     "mean_fp_muls_walk": 21021773.3125,
+     "mean_native_ops": 3868390.75,
+     "fp_muls_per_step": 91.1262300136331,
+     "native_ops_per_step": 16.76889290103321,
+     "ops_per_step": {
+      "cmp": 3.0977438190460296,
+      "neg": 4.1249151995006255,
+      "modn": 5.547327890206924,
+      "hash": 1.999270661519755,
+      "table": 1.9996353307598775
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.003934548202156,
+     "cost_0_0p1_1_gae97": [
+      21021773.3125,
+      58545163.587500006,
+      396255676.0625
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 230688.5,
+     "mean_fp_muls_walk": 24433716.4375,
+     "mean_native_ops": 3511697.125,
+     "fp_muls_per_step": 105.91649101494006,
+     "native_ops_per_step": 15.222679609083244,
+     "ops_per_step": {
+      "cmp": 4.647392479469068,
+      "neg": 2.0602300288050768,
+      "modn": 4.516151108529467,
+      "hash": 1.999270661519755,
+      "table": 1.9996353307598775
+     },
+     "rep_fp_muls_per_call": 3.9981724948387956,
+     "rep_cmp_per_call": 4.5066550507818395,
+     "cost_0_0p1_1_gae97": [
+      24433716.4375,
+      58497178.550000004,
+      365068337.5625
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 230688.5,
+     "mean_fp_muls_walk": 20069808.0625,
+     "mean_native_ops": 3511697.125,
+     "fp_muls_per_step": 86.99960363217066,
+     "native_ops_per_step": 15.222679609083244,
+     "ops_per_step": {
+      "cmp": 4.647392479469068,
+      "neg": 2.0602300288050768,
+      "modn": 4.516151108529467,
+      "hash": 1.999270661519755,
+      "table": 1.9996353307598775
+     },
+     "rep_fp_muls_per_call": 3.9981724948387956,
+     "rep_cmp_per_call": 4.5066550507818395,
+     "cost_0_0p1_1_gae97": [
+      20069808.0625,
+      54133270.175000004,
+      360704429.1875
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 178811.125,
+     "mean_fp_muls_walk": 34150905.5,
+     "mean_native_ops": 11668203.1875,
+     "fp_muls_per_step": 190.98870665905156,
+     "native_ops_per_step": 65.2543469401023,
+     "ops_per_step": {
+      "cmp": 16.51972612162694,
+      "neg": 4.125027176021626,
+      "modn": 40.60987047086696,
+      "hash": 1.9998154477245194,
+      "table": 1.9999077238622598
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.019022825017462,
+     "cost_0_0p1_1_gae97": [
+      34150905.5,
+      147332476.41875002,
+      1165966614.6875
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 178811.125,
+     "mean_fp_muls_walk": 30750266.75,
+     "mean_native_ops": 11668203.1875,
+     "fp_muls_per_step": 171.9706575863219,
+     "native_ops_per_step": 65.2543469401023,
+     "ops_per_step": {
+      "cmp": 16.51972612162694,
+      "neg": 4.125027176021626,
+      "modn": 40.60987047086696,
+      "hash": 1.9998154477245194,
+      "table": 1.9999077238622598
+     },
+     "rep_fp_muls_per_call": 86,
+     "rep_cmp_per_call": 16.019022825017462,
+     "cost_0_0p1_1_gae97": [
+      30750266.75,
+      143931837.66875002,
+      1162565975.9375
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 178811.125,
+     "mean_fp_muls_walk": 21089257.0625,
+     "mean_native_ops": 4615794.375,
+     "fp_muls_per_step": 117.94152663879275,
+     "native_ops_per_step": 25.813798638088095,
+     "ops_per_step": {
+      "cmp": 13.949576333687292,
+      "neg": 3.348549342217941,
+      "modn": 4.515949790596083,
+      "hash": 1.9998154477245194,
+      "table": 1.9999077238622598
+     },
+     "rep_fp_muls_per_call": 15.16662062775831,
+     "rep_cmp_per_call": 13.52677278324351,
+     "cost_0_0p1_1_gae97": [
+      21089257.0625,
+      65862462.50000001,
+      468821311.4375
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 178811.125,
+     "mean_fp_muls_walk": 17688618.3125,
+     "mean_native_ops": 4615794.375,
+     "fp_muls_per_step": 98.92347756606307,
+     "native_ops_per_step": 25.813798638088095,
+     "ops_per_step": {
+      "cmp": 13.949576333687292,
+      "neg": 3.348549342217941,
+      "modn": 4.515949790596083,
+      "hash": 1.9998154477245194,
+      "table": 1.9999077238622598
+     },
+     "rep_fp_muls_per_call": 15.16662062775831,
+     "rep_cmp_per_call": 13.52677278324351,
+     "cost_0_0p1_1_gae97": [
+      17688618.3125,
+      62461823.75000001,
+      465420672.6875
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 178811.125,
+     "mean_fp_muls_walk": 20168422.6875,
+     "mean_native_ops": 5536628.75,
+     "fp_muls_per_step": 112.79176666161013,
+     "native_ops_per_step": 30.96355861527072,
+     "ops_per_step": {
+      "cmp": 13.949576333687292,
+      "neg": 8.498309319400569,
+      "modn": 4.515949790596083,
+      "hash": 1.9998154477245194,
+      "table": 1.9999077238622598
+     },
+     "rep_fp_muls_per_call": 10.17294688217169,
+     "rep_cmp_per_call": 13.52677278324351,
+     "cost_0_0p1_1_gae97": [
+      20168422.6875,
+      73873721.5625,
+      557221411.4375
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 178811.125,
+     "mean_fp_muls_walk": 16767783.9375,
+     "mean_native_ops": 5536628.75,
+     "fp_muls_per_step": 93.77371758888044,
+     "native_ops_per_step": 30.96355861527072,
+     "ops_per_step": {
+      "cmp": 13.949576333687292,
+      "neg": 8.498309319400569,
+      "modn": 4.515949790596083,
+      "hash": 1.9998154477245194,
+      "table": 1.9999077238622598
+     },
+     "rep_fp_muls_per_call": 10.17294688217169,
+     "rep_cmp_per_call": 13.52677278324351,
+     "cost_0_0p1_1_gae97": [
+      16767783.9375,
+      70473082.8125,
+      553820772.6875
+     ]
+    }
+   ]
+  },
+  {
+   "p": 997,
+   "b0": 17,
+   "n": 988052069713,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 510536.125,
+     "mean_fp_muls_walk": 55709604.75,
+     "mean_native_ops": 8561034.5625,
+     "fp_muls_per_step": 109.11980959231828,
+     "native_ops_per_step": 16.76871457920828,
+     "ops_per_step": {
+      "cmp": 3.097064017751927,
+      "neg": 4.125269294117042,
+      "modn": 5.547512431172231,
+      "hash": 1.9992458907780521,
+      "table": 1.9996229453890262
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0030175457089148,
+     "cost_0_0p1_1_gae97": [
+      55709604.75,
+      138751640.00625002,
+      886129957.3125
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 510536.125,
+     "mean_fp_muls_walk": 46146560.25,
+     "mean_native_ops": 8561034.5625,
+     "fp_muls_per_step": 90.38843284596169,
+     "native_ops_per_step": 16.76871457920828,
+     "ops_per_step": {
+      "cmp": 3.097064017751927,
+      "neg": 4.125269294117042,
+      "modn": 5.547512431172231,
+      "hash": 1.9992458907780521,
+      "table": 1.9996229453890262
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0030175457089148,
+     "cost_0_0p1_1_gae97": [
+      46146560.25,
+      129188595.50625001,
+      876566912.8125
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 510536.125,
+     "mean_fp_muls_walk": 53603210.875,
+     "mean_native_ops": 7771668.75,
+     "fp_muls_per_step": 104.99396271909261,
+     "native_ops_per_step": 15.222563829347042,
+     "ops_per_step": {
+      "cmp": 4.646266828816472,
+      "neg": 2.061209552017499,
+      "modn": 4.516218612345992,
+      "hash": 1.9992458907780521,
+      "table": 1.9996229453890262
+     },
+     "rep_fp_muls_per_call": 3.999360191519962,
+     "rep_cmp_per_call": 4.505176750950454,
+     "cost_0_0p1_1_gae97": [
+      53603210.875,
+      128988397.75000001,
+      807455079.625
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 510536.125,
+     "mean_fp_muls_walk": 44040166.375,
+     "mean_native_ops": 7771668.75,
+     "fp_muls_per_step": 86.26258597273602,
+     "native_ops_per_step": 15.222563829347042,
+     "ops_per_step": {
+      "cmp": 4.646266828816472,
+      "neg": 2.061209552017499,
+      "modn": 4.516218612345992,
+      "hash": 1.9992458907780521,
+      "table": 1.9996229453890262
+     },
+     "rep_fp_muls_per_call": 3.999360191519962,
+     "rep_cmp_per_call": 4.505176750950454,
+     "cost_0_0p1_1_gae97": [
+      44040166.375,
+      119425353.25000001,
+      797892035.125
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 272126.3125,
+     "mean_fp_muls_walk": 53465759.875,
+     "mean_native_ops": 17757570.875,
+     "fp_muls_per_step": 196.47405421333522,
+     "native_ops_per_step": 65.25488370405195,
+     "ops_per_step": {
+      "cmp": 16.516981199677264,
+      "neg": 4.125414186105211,
+      "modn": 40.61275910244806,
+      "hash": 1.9998194772142808,
+      "table": 1.9999097386071405
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.014858585892327,
+     "cost_0_0p1_1_gae97": [
+      53465759.875,
+      225714197.3625,
+      1775950134.75
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 272126.3125,
+     "mean_fp_muls_walk": 48329316.625,
+     "mean_native_ops": 17757570.875,
+     "fp_muls_per_step": 177.5988370290359,
+     "native_ops_per_step": 65.25488370405195,
+     "ops_per_step": {
+      "cmp": 16.516981199677264,
+      "neg": 4.125414186105211,
+      "modn": 40.61275910244806,
+      "hash": 1.9998194772142808,
+      "table": 1.9999097386071405
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.014858585892327,
+     "cost_0_0p1_1_gae97": [
+      48329316.625,
+      220577754.1125,
+      1770813691.5
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 272126.3125,
+     "mean_fp_muls_walk": 31901420.75,
+     "mean_native_ops": 7022727.3125,
+     "fp_muls_per_step": 117.23019526088643,
+     "native_ops_per_step": 25.806866112956275,
+     "ops_per_step": {
+      "cmp": 13.944335132972487,
+      "neg": 3.3473726929658816,
+      "modn": 4.515429071196487,
+      "hash": 1.9998194772142808,
+      "table": 1.9999097386071405
+     },
+     "rep_fp_muls_per_call": 15.165035346567837,
+     "rep_cmp_per_call": 13.520421954176951,
+     "cost_0_0p1_1_gae97": [
+      31901420.75,
+      100021875.68125,
+      713105970.0625
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 272126.3125,
+     "mean_fp_muls_walk": 26764977.5,
+     "mean_native_ops": 7022727.3125,
+     "fp_muls_per_step": 98.35497807658713,
+     "native_ops_per_step": 25.806866112956275,
+     "ops_per_step": {
+      "cmp": 13.944335132972487,
+      "neg": 3.3473726929658816,
+      "modn": 4.515429071196487,
+      "hash": 1.9998194772142808,
+      "table": 1.9999097386071405
+     },
+     "rep_fp_muls_per_call": 15.165035346567837,
+     "rep_cmp_per_call": 13.520421954176951,
+     "cost_0_0p1_1_gae97": [
+      26764977.5,
+      94885432.43125,
+      707969526.8125
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 272126.3125,
+     "mean_fp_muls_walk": 30499515.75,
+     "mean_native_ops": 8424632.3125,
+     "fp_muls_per_step": 112.0785251150603,
+     "native_ops_per_step": 30.9585362587824,
+     "ops_per_step": {
+      "cmp": 13.944335132972487,
+      "neg": 8.499042838792004,
+      "modn": 4.515429071196487,
+      "hash": 1.9998194772142808,
+      "table": 1.9999097386071405
+     },
+     "rep_fp_muls_per_call": 10.169977964763664,
+     "rep_cmp_per_call": 13.520421954176951,
+     "cost_0_0p1_1_gae97": [
+      30499515.75,
+      112218449.18125,
+      847688850.0625
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 272126.3125,
+     "mean_fp_muls_walk": 25363072.5,
+     "mean_native_ops": 8424632.3125,
+     "fp_muls_per_step": 93.20330793076101,
+     "native_ops_per_step": 30.9585362587824,
+     "ops_per_step": {
+      "cmp": 13.944335132972487,
+      "neg": 8.499042838792004,
+      "modn": 4.515429071196487,
+      "hash": 1.9998194772142808,
+      "table": 1.9999097386071405
+     },
+     "rep_fp_muls_per_call": 10.169977964763664,
+     "rep_cmp_per_call": 13.520421954176951,
+     "cost_0_0p1_1_gae97": [
+      25363072.5,
+      107082005.93125,
+      842552406.8125
+     ]
+    }
+   ]
+  },
+  {
+   "p": 1069,
+   "b0": 3,
+   "n": 1305900486769,
+   "arms": [
+    {
+     "arm": "Order6Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 523426.0625,
+     "mean_fp_muls_walk": 57106529.0625,
+     "mean_native_ops": 8776779.875,
+     "fp_muls_per_step": 109.1014245445602,
+     "native_ops_per_step": 16.767945854816887,
+     "ops_per_step": {
+      "cmp": 3.0966461714924636,
+      "neg": 4.1249952088505335,
+      "modn": 5.547397752094165,
+      "hash": 1.99927114825315,
+      "table": 1.999635574126575
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0028118964582955,
+     "cost_0_0p1_1_gae97": [
+      57106529.0625,
+      142241293.85000002,
+      908454176.9375
+     ]
+    },
+    {
+     "arm": "Order6Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 523426.0625,
+     "mean_fp_muls_walk": 47303880.9375,
+     "mean_native_ops": 8776779.875,
+     "fp_muls_per_step": 90.37356816274314,
+     "native_ops_per_step": 16.767945854816887,
+     "ops_per_step": {
+      "cmp": 3.0966461714924636,
+      "neg": 4.1249952088505335,
+      "modn": 5.547397752094165,
+      "hash": 1.99927114825315,
+      "table": 1.999635574126575
+     },
+     "rep_fp_muls_per_call": 8,
+     "rep_cmp_per_call": 3.0028118964582955,
+     "cost_0_0p1_1_gae97": [
+      47303880.9375,
+      132438645.72500001,
+      898651528.8125
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 523426.0625,
+     "mean_fp_muls_walk": 54946961.375,
+     "mean_native_ops": 7967534.25,
+     "fp_muls_per_step": 104.97559313833365,
+     "native_ops_per_step": 15.221890579818043,
+     "ops_per_step": {
+      "cmp": 4.645612793688507,
+      "neg": 2.0611991879941973,
+      "modn": 4.516171875755614,
+      "hash": 1.99927114825315,
+      "table": 1.999635574126575
+     },
+     "rep_fp_muls_per_call": 3.999111331879044,
+     "rep_cmp_per_call": 4.504841880757527,
+     "cost_0_0p1_1_gae97": [
+      54946961.375,
+      132232043.60000001,
+      827797783.625
+     ]
+    },
+    {
+     "arm": "Order6Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 523426.0625,
+     "mean_fp_muls_walk": 45144313.25,
+     "mean_native_ops": 7967534.25,
+     "fp_muls_per_step": 86.24773675651659,
+     "native_ops_per_step": 15.221890579818043,
+     "ops_per_step": {
+      "cmp": 4.645612793688507,
+      "neg": 2.0611991879941973,
+      "modn": 4.516171875755614,
+      "hash": 1.99927114825315,
+      "table": 1.999635574126575
+     },
+     "rep_fp_muls_per_call": 3.999111331879044,
+     "rep_cmp_per_call": 4.504841880757527,
+     "cost_0_0p1_1_gae97": [
+      45144313.25,
+      122429395.47500001,
+      817995135.5
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "schoolbook",
+     "mean_steps": 256443.5,
+     "mean_fp_muls_walk": 50411236.1875,
+     "mean_native_ops": 16733246.6875,
+     "fp_muls_per_step": 196.57833475014965,
+     "native_ops_per_step": 65.25120226287662,
+     "ops_per_step": {
+      "cmp": 16.51499696814308,
+      "neg": 4.125214715912082,
+      "modn": 40.611268417799636,
+      "hash": 1.999814774014549,
+      "table": 1.9999073870072746
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.01370896350216,
+     "cost_0_0p1_1_gae97": [
+      50411236.1875,
+      212723729.05625,
+      1673536164.875
+     ]
+    },
+    {
+     "arm": "Order24Built",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 256443.5,
+     "mean_fp_muls_walk": 45565194.8125,
+     "mean_native_ops": 16733246.6875,
+     "fp_muls_per_step": 177.68122339813644,
+     "native_ops_per_step": 65.25120226287662,
+     "ops_per_step": {
+      "cmp": 16.51499696814308,
+      "neg": 4.125214715912082,
+      "modn": 40.611268417799636,
+      "hash": 1.999814774014549,
+      "table": 1.9999073870072746
+     },
+     "rep_fp_muls_per_call": 92,
+     "rep_cmp_per_call": 16.01370896350216,
+     "cost_0_0p1_1_gae97": [
+      45565194.8125,
+      207877687.68125,
+      1668690123.5
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "schoolbook",
+     "mean_steps": 256443.5,
+     "mean_fp_muls_walk": 30091112.25,
+     "mean_native_ops": 6617856.125,
+     "fp_muls_per_step": 117.340124627842,
+     "native_ops_per_step": 25.806293101599376,
+     "ops_per_step": {
+      "cmp": 13.942323552751386,
+      "neg": 3.348560940324087,
+      "modn": 4.515686447502081,
+      "hash": 1.999814774014549,
+      "table": 1.9999073870072746
+     },
+     "rep_fp_muls_per_call": 15.166788293050896,
+     "rep_cmp_per_call": 13.519125197505021,
+     "cost_0_0p1_1_gae97": [
+      30091112.25,
+      94284316.66250001,
+      672023156.375
+     ]
+    },
+    {
+     "arm": "Order24Cheap",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 256443.5,
+     "mean_fp_muls_walk": 25245070.875,
+     "mean_native_ops": 6617856.125,
+     "fp_muls_per_step": 98.44301327582879,
+     "native_ops_per_step": 25.806293101599376,
+     "ops_per_step": {
+      "cmp": 13.942323552751386,
+      "neg": 3.348560940324087,
+      "modn": 4.515686447502081,
+      "hash": 1.999814774014549,
+      "table": 1.9999073870072746
+     },
+     "rep_fp_muls_per_call": 15.166788293050896,
+     "rep_cmp_per_call": 13.519125197505021,
+     "cost_0_0p1_1_gae97": [
+      25245070.875,
+      89438275.28750001,
+      667177115
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "schoolbook",
+     "mean_steps": 256443.5,
+     "mean_fp_muls_walk": 28769958.8125,
+     "mean_native_ops": 7939009.5625,
+     "fp_muls_per_step": 112.18829415641262,
+     "native_ops_per_step": 30.958123573028757,
+     "ops_per_step": {
+      "cmp": 13.942323552751386,
+      "neg": 8.500391411753466,
+      "modn": 4.515686447502081,
+      "hash": 1.999814774014549,
+      "table": 1.9999073870072746
+     },
+     "rep_fp_muls_per_call": 10.171333921614316,
+     "rep_cmp_per_call": 13.519125197505021,
+     "cost_0_0p1_1_gae97": [
+      28769958.8125,
+      105778351.56875001,
+      798853886.375
+     ]
+    },
+    {
+     "arm": "Order24CheapMulLean",
+     "arithmetic": "Karatsuba",
+     "mean_steps": 256443.5,
+     "mean_fp_muls_walk": 23923917.4375,
+     "mean_native_ops": 7939009.5625,
+     "fp_muls_per_step": 93.29118280439941,
+     "native_ops_per_step": 30.958123573028757,
+     "ops_per_step": {
+      "cmp": 13.942323552751386,
+      "neg": 8.500391411753466,
+      "modn": 4.515686447502081,
+      "hash": 1.999814774014549,
+      "table": 1.9999073870072746
+     },
+     "rep_fp_muls_per_call": 10.171333921614316,
+     "rep_cmp_per_call": 13.519125197505021,
+     "cost_0_0p1_1_gae97": [
+      23923917.4375,
+      100932310.19375001,
+      794007845
+     ]
+    }
+   ]
+  }
+ ],
+ "id": "VAL-20261101-146a90",
+ "replay": {
+  "certificate": {
+   "path": "replay-certificate.json",
+   "sha256": "cb59334f82d38f72f539a2a7db462be49533388e46744f1bf8f3837058d6e2df"
+  },
+  "comparison": {
+   "path": "replay/replay_comparison.json",
+   "sha256": "e618d3122e03d8ac72da208445cb6c30e230faa63f55cc551e12856b5ccbfde3"
+  },
+  "summary": "fresh build of bd0118f39 from a clean export; all eight curves replayed in a nonce-drawn order (nonce 7d808504472a563714d9994b38194cc2: 601, 241, 769 mandatory, then 1069, 997, 733, 337, 541), the identity stage on all eight and the negative-control walks at p = 241: 10 of 10 records byte-identical to the committed ones (34,076 leaves compared, all identical), 1,296 walks all correct, the ten logs text-identical"
+ },
+ "gate_refusal": "No VALIDATION.json is written for E34 (coordinator's decision, 2026-11-01). E34 is a rho-against-rho measurement with no index-calculus arm: there is no measured S in this unit for the gate's gae_band 'ic' slot. E18's psi arm, whose distances the result corrects, is linear algebra only with a modelled handover (note §9.3), not a measured end-to-end S. Putting a rho walk in the 'ic' slot would pass the gate by relabelling. Same reason as E29 (research/e29_twists_20261030/validator-report.json, gate_refusal). This report and the replay certificate stand on their own as evidence that E34's records and figures are what they say.",
+ "rho_reference_finding": {
+  "statement": "The strongest walk implemented on E18's eight j = 0 curves, pooled, at each weight of the band: the mul-lean cheap order-24 walk at 0 GAE and the op-lean cheap order-24 walk at 0.1 and 1 GAE, in each arithmetic; the cheapest arithmetic is Karatsuba at every weight (pooled cost per sqrt(n) 26.904, 97.956, 724.552 at 0, 0.1, 1 GAE). Against E29's order-6 walk, the walk E18's psi rows were measured against: 1.632 / 1.254 / 1.126 (schoolbook), 1.627 / 1.232 / 1.122 (Karatsuba).",
+  "band_ranking": "The op-lean cheap order-24 walk is ranked above both order-6 walks across the band, pooled, in both arithmetics (point estimates). The mul-lean walk is not ranked across the band against either order-6 walk (E29 order 6 / mul-lean 1.632 / 1.120 / 0.948 schoolbook; cheap order 6 / mul-lean 1.572 / 1.042 / 0.864): it supplies the 0 GAE factor as the cheaper implementation of the same walk (identical steps and digests). Against the band-ranked op-lean walk alone the 0 GAE factor is 1.563 (schoolbook) / 1.544 (Karatsuba), a handover shift of 2.58 / 2.51 bits instead of 2.83 / 2.81.",
+  "gae_band_values_for_the_record": {
+   "unit": "mean over the 8 curves of walk F_p multiplications / sqrt(n), every emitted native operation at w * 97, [d]G check excluded, schoolbook",
+   "0": {
+    "e29_order6": 52.876,
+    "strongest": 32.401,
+    "strongest_walk": "Order24CheapMulLean"
+   },
+   "0.1": {
+    "e29_order6": 129.78,
+    "strongest": 103.453,
+    "strongest_walk": "Order24Cheap"
+   },
+   "1": {
+    "e29_order6": 821.92,
+    "strongest": 730.048,
+    "strongest_walk": "Order24Cheap"
+   }
+  }
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.39 G2.138 row: cheap order-24 representative '15.16-15.18' F_p multiplications a call",
+   "recomputed": "15.161-15.168 per curve (15.16-15.17); the producer's per-curve table prints 15.16-15.17 too",
+   "effect": "none: G2.138 [12, 20] holds"
+  },
+  {
+   "id": "E2",
+   "claim": "§9.39 per-step table: mul-lean '112.1-115.1' F_p multiplications a step (schoolbook, p >= 541)",
+   "recomputed": "112.08-115.05 (p = 541: 115.047), i.e. 112.1-115.0; 115.1 is 115.05 rounded twice",
+   "effect": "none"
+  },
+  {
+   "id": "E3",
+   "claim": "§9.39 per-step table: cheap order 24 '25.82' native operations a step (schoolbook, p >= 541)",
+   "recomputed": "25.811 pooled over p >= 541 (per curve 25.806-25.819); the other four arms' figures in that column reproduce as pooled values",
+   "effect": "none: G2.140 [22, 30] holds; the task's '25.8' agrees"
+  },
+  {
+   "id": "E4",
+   "claim": "§9.39 band table, row E29 / E29 schoolbook, 'curves: order 24 / unresolved: 0 / 0 (order 6 on all 8)'",
+   "recomputed": "0 / 3: with every operation priced, E29's order-6 walk is cheaper across the band on 5 of 8 curves (schoolbook) and 6 of 8 (Karatsuba); on p = 601, 997, 1069 (schoolbook; 601 and 1069 Karatsuba) E29's order-24 walk is cheaper at 0 GAE (1.202, 1.042, 1.133, as E29 found) and dearer at 0.1 and 1 GAE, so the order changes inside the band per curve",
+   "effect": "none on any registered verdict or on which walk is the matched reference. The §9.33 correction holds as the note states it (pooled: 0.962 / 0.562 / 0.453 schoolbook, 0.884 / 0.535 / 0.449 Karatsuba, below 1 at every weight); per curve it holds at 1 GAE on 8 of 8 (one op per step had 7 of 8 the other way), not across the band on all 8"
+  },
+  {
+   "id": "E5",
+   "claim": "§9.39: 'on the other five it is cheaper at 0 (1.16-1.86)'",
+   "recomputed": "1.159-1.457 on those five (schoolbook; 1.135-1.427 Karatsuba); 1.86 is p = 601 (1.863), one of the three curves where the cheap order-24 walk is cheaper across the band; 1.16-1.86 is the range over all eight",
+   "effect": "none; the 1 GAE range 0.78-0.99 on the five reproduces"
+  },
+  {
+   "id": "E6",
+   "claim": "§9.39 Identity (a): the counted copies reproduce all 512 E29 records 'in every field'",
+   "recomputed": "true for every field except visit_digest on the 256 order-24 records, which E29 recorded as 0 (E29's order-24 walk computed no digest); disclosed in tables.md, not in §9.39. The order-24 digest identity is carried instead by the walk identity (cheap = built, 768/768) and the cross-arithmetic agreement",
+   "effect": "none on G2.135"
+  }
+ ],
+ "heuristic_validation_checks": [
+  {
+   "check": "pre-registered prediction",
+   "result": "G2.134-G2.143 committed in 45378560d (2026-10-31 16:45 UTC) before the code commit bd0118f39 (17:16) and the records commit d3a23e791 (17:47); §9.38 unchanged since (checked byte for byte). The walk-cost prediction is the counted per-step cost model of §9.38, not a fitted distribution."
+  },
+  {
+   "check": "sample integrity",
+   "result": "seeds 1000-1015 per arm and arithmetic in the records and in order; identity sampling (200 random points + 8 forced x0 = 0 per curve) is deterministic in the binary and reproduced byte for byte; sample sizes are the registered ones"
+  },
+  {
+   "check": "null control for the statistical signal",
+   "result": "The deciding quantity is a ratio of walk costs, dominated by step counts of 16 walks per curve and arm. Null: the rho heuristic sqrt(pi n / (2 m)) for class size m. Observed order 6 at 0.924 and order 24 at 1.086 of the heuristic (mean over curves); pooled steps ratio 1.701 against the heuristic's 2.000. Per-curve steps-ratio standard errors are 13-21 %, so the per-curve ranks (3 of 8 against the cheap order-6 walk) are within sampling noise. The pooled cheap / cheap ratio at 1 GAE, 1.026 +- 0.067 (schoolbook) and 1.021 +- 0.066 (Karatsuba), is 0.4 and 0.3 standard errors from 1: the registered point-estimate rule ranks it, but the measurement does not resolve it statistically. Under the heuristic's step counts the ratio would be 1.772 / 1.373 / 1.207, so the shortfall comes from the observed pooled steps ratio, 1.701 +- 0.111, which is 2.7 standard errors below 2 (E29 registered [1.7, 2.3] for it, G2.105). What should happen as the parameter grows: the representative's per-step cost is independent of n and the heuristic steps ratio is constant, so the ratios should not trend with n; the per-curve steps ratio (1.29-2.10) shows no monotone trend in n over p = 241-1069."
+  },
+  {
+   "check": "correspondence validity",
+   "result": "not applicable (direct walks on the curves, no substitute sampler)"
+  },
+  {
+   "check": "scale binding",
+   "result": "p = 241-1069, n = 2^31.7-2^40.2, 8 curves x 16 walks x 5 arms x 2 arithmetics; the representative costs are size-independent, but the ranking at 1 GAE rests on the measured steps ratio of these 8 curves (assumption: it does not drift with n)"
+  }
+ ],
+ "cost_model_checks": [
+  {
+   "check": "unit declared",
+   "result": "F_p multiplications (F_p4 products at 19 schoolbook / 13 Karatsuba), the walk's set-up (32 jump points, start point) and the cheap arms' per-walk constants (40 or 42 F_p multiplications, 12 mod-n operations) included, the [d]G = Q check excluded; native operations cmp, neg, modn, hash, table each one count, priced at w * 97 F_p multiplications"
+  },
+  {
+   "check": "optimistic assumptions flagged",
+   "result": "every native operation is priced alike (a 40-bit mod-n multiplication and an F_p comparison both count one); GAE 97 (schoolbook affine addition) is used for the Karatsuba arm too, with 79 as a sensitivity; the walk stores every visited point (no distinguished points) and no batching of inversions across walks is implemented for these j = 0 walks (E27's batched arithmetic would lower rho further)"
+  },
+  {
+   "check": "memory reported alongside time",
+   "result": "not reported by the producer. The walks store every visited class representative, so memory is proportional to steps: the order-24 walk stores 1.70x fewer points (pooled). Not a cost claim of E34; noted as a limitation"
+  },
+  {
+   "check": "per-attempt cost x inverse success probability",
+   "result": "every walk is run to its collision and every one of the 1,280 (and 16 control) walks succeeds (correct = true, recovered log 271 on every curve), so the measured mean cost per walk is the expected cost; no success-probability scaling applies"
+  }
+ ],
+ "observations": [
+  "The planted logarithm is 271 on all eight curves (E29's instances); the walks start from random combinations aG + bQ, so its size does not help them.",
+  "The counters obey identities derived from the counting rule on all 1,280 walks: table = 2 steps - escapes - 1, hash = 2 (steps - escapes - 1), mod-n outside the representative = 2 + 4 (steps - escapes - 1) + 5 escapes + 4 (+ 12 set-up on the cheap arms); every cmp and neg is the representative's.",
+  "The omitted-candidate control mismatches exactly members / 12 = 416 per curve: in a class of 24 members with twelve distinct abscissae the omitted candidate (3, 2) is the winner for exactly two members (+-), so the control is caught at its analytic rate.",
+  "Every n is prime and n = 1 mod 24 (validator's own Miller-Rabin), so an order-24 multiplier group exists; the order-24 action itself rests on E29's kill-test records (order_lambda_p = 24, group_order = 24) and E29's validator's own group computation (research/e29_twists_20261030/validator-report.json, K.2).",
+  "E34's code commit touches only examples/e34_cheap_rep.rs, src/cryptanalysis/mod.rs and src/cryptanalysis/twist24_rep.rs; E29's functions are untouched by it. Since then twist24_rep.rs changed by one behaviour-identical clippy line and quartic_folds.rs gained E33's pipeline-report fields; neither is in the replayed binary (built from bd0118f39)."
+ ],
+ "limitations": [
+  "Operation counts only; local container, not isolab-eks (unreachable). No wall time is claimed or compared.",
+  "The build target was on tmpfs, not the briefed shared target (disk); the build is still a fresh, independent build from a clean export of the recorded commit.",
+  "The producer's in-crate unit tests (twist24_rep::tests) were not re-run: the release test build needs about 9 GB of disk, which this container does not have; the replay of every record stands in for them.",
+  "The x = 0 identity case has no point on these curves (b0 t^3 is not a square), so it is untested by points, as §9.39 says.",
+  "Per-curve ranks and the 1 GAE pooled margin over the cheap order-6 walk are within the sampling error of 16 walks per curve and arm (see heuristic_validation_checks); the registered ranking rule uses point estimates.",
+  "The order-24 group order itself is not recomputed here from curve coefficients (they are not in E34's records); it rests on E29's kill test and its validator.",
+  "A CI job may move data files to the artifact store after push (it moved E34's PNGs); every replayed file is pinned by SHA-256 in the certificate."
+ ],
+ "review_attestation": {
+  "joints_owned": [
+   "replay of E34's recorded runs from a fresh build of bd0118f39",
+   "independent recompute of E34's headline figures, the band, the per-curve ranks, the E18 consequence, the §9.33 correction and G2.134-G2.143",
+   "pre-registration ordering"
+  ],
+  "sources_read": [
+   "/home/user/crypto-autoresearcher/docs/agent-runtime-core.md",
+   "/home/user/crypto-autoresearcher/agents/validator.md",
+   "docs/session-logs/2026-11-01.md",
+   "docs/VALIDATION_GATE.md",
+   "scripts/validation_gate.py (lines 150-260 and constants)",
+   "research/e27_walk_20261030/VALIDATION.json, replay-certificate.json and validator-report.json (key summary), replay/build.json (template)",
+   "research/e29_twists_20261030/validator-report.json (pooling definition, walk_band_5a, gate_refusal)",
+   "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33, §9.38 (HEAD and 45378560d), §9.39, the opening of §9.3, lines mentioning E18",
+   "experiments/38_twist24_cheap_rep/: binary_commit.txt, identity.json, negative_walks.json, stage_r_p*.json and their logs; tables.md line 5 and its per-curve rows (grep), read after the recompute only to locate the source of disagreeing figures, not used in any computation",
+   "experiments/34_twist24_stage_r/: stage_r_p241.json, stage_r_rest.json, binary_commit.txt",
+   "experiments/26_quartic_folds_psi.json (structure only)",
+   "src/cryptanalysis/twist24_rep.rs at bd0118f39 (NativeOps, rho_j0_counted, test header) and examples/e34_cheap_rep.rs at bd0118f39 (the code under test, to run it and to read the counting rule)",
+   "docs/ic/LEADERBOARD.md (grep for E18, E27, E29)",
+   "scratchpad: the E32 validator's build.log first and last lines (build duration) and directory listings; another validator's export_tree.sh (40 lines, not used)"
+  ],
+  "read_sibling_reports": false,
+  "sibling_note": "The E32 and E33 validators' reports exist untracked in the same worktree; they were not opened.",
+  "verdict_on_joints": "holds"
+ }
+}

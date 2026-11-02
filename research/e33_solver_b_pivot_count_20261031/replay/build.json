@@ -1,0 +1,61 @@
+{
+  "schema": "e33-validator-build/v1",
+  "summary": {
+    "recorded_binary_commit": "c4431389209ae4a8d83bc916bbb233eb4a8438cb",
+    "pre_e33_commit": "bd0118f393537a2e610336e5d45f5426a6a0fa83 (the code commit's parent; E33's diff against it: examples/e33_stage_a.rs, examples/e33_tables.rs, examples/quartic_pipeline_gls.rs, run_e2e.sh, src/cryptanalysis/{gaudry_quartic,klein_v4,quartic_folds}.rs)",
+    "source": "git archive of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, benches/, every explicit [[bin]]/[[example]] path of Cargo.toml, the six path dependencies (crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, isogeny_algos, research/pencil_large_prime_20261029) and the 78 include_str!/include_bytes! targets present at the commit. /dev/shm/e33val/tree: 4,317 files, each equal to its c443138920 blob (git hash-object); /dev/shm/e33val/tree_pre: 4,315 files, each equal to its bd0118f39 blob. One validator-owned file was added to tree/examples for the build: e33val_controls.rs (= replay/e33val_controls.rs); it is not part of the recorded commit and no recorded binary depends on it.",
+    "target_dir": "/dev/shm/e33val/target: a fresh, empty target directory on tmpfs, both trees built into it in turn (dependencies compiled once, crypto_lib once per tree). Not /home/user/crypto/target as the task suggested: the root filesystem had about 600 MB free and the crypto_lib rlib alone is about 380 MB, which would have taken it below the 300 MB floor. Nothing was reused from the producer's target/ directory; its binaries were not run.",
+    "commands": [
+      "cd /dev/shm/e33val/tree && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/e33val/target CARGO_INCREMENTAL=0 CARGO_PROFILE_RELEASE_DEBUG=0 cargo build --release --offline -j 2 --example e33_stage_a --example quartic_pipeline_gls --example e33val_controls",
+      "cd /dev/shm/e33val/tree_pre && touch src/cryptanalysis/{gaudry_quartic,klein_v4,quartic_folds}.rs examples/quartic_pipeline_gls.rs && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/e33val/target CARGO_INCREMENTAL=0 cargo build --release --offline -j 2 --example quartic_pipeline_gls",
+      "cd /dev/shm/e33val/tree && touch src/cryptanalysis/{gaudry_quartic,klein_v4,quartic_folds}.rs examples/{quartic_pipeline_gls,e33_stage_a}.rs && (same command as the first, with examples/e33val_controls.rs extended by the NC3 stream)"
+    ],
+    "build_logs": [
+      "build 1 (c443138920): lock acquired 2026-11-01T20:44:06Z     Finished `release` profile [optimized] target(s) in 18m 32s exit=0 at 2026-11-01T21:02:39Z ",
+      "build 2 (bd0118f39): lock acquired 2026-11-01T21:02:58Z     Finished `release` profile [optimized] target(s) in 0.98s exit=0 at 2026-11-01T21:02:59Z attempt 1 (above) finished in 0.98 s without compiling: cargo judged the artifacts fresh because the four replaced files had mtimes older than build 1's outputs and the -C metadata hash of a path package does not depend on its directory; the four files were touched and the build rerun. queued 2026-11-01T21:03:42Z lock acquired 2026-11-01T21:03:42Z     Finished `release` profile [optimized] target(s) in 10m 08s exit=0 at 2026-11-01T21:13:51Z ",
+      "build 3 (c443138920 again): rebuild of c443138920 with the extended e33val_controls (NC3 stream); E33's four changed files touched so cargo rebuilds crypto_lib over the pre-E33 artifacts. queued 2026-11-01T22:09:36Z lock acquired 2026-11-01T22:09:36Z     Finished `release` profile [optimized] target(s) in 9m 54s exit=0 at 2026-11-01T22:19:31Z "
+    ],
+    "pre_e33_build_note": "The first pre-E33 attempt finished in 0.98 s without compiling: the -C metadata hash of a path package does not depend on its directory and the four replaced files were older than build 1's outputs, so cargo judged build 1's artifacts fresh. Caught because nothing compiled; the four files were touched and the build rerun (10 min). The resulting binary differs from E33's (sha256 23b22013…) and contains none of E33's solver names (strings chain-sparsest-counted absent), and its macaulay/chain/chain-sparsest records equal E33's build's while emitting no E33 field. Build 3 rebuilt c443138920 over it; its e33_stage_a and quartic_pipeline_gls are byte-identical to build 1's.",
+    "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+    "binaries": [
+      {
+        "name": "e33_stage_a",
+        "sha256": "68b7297d721866eff3a512bd55e5648db3a9650f6c177fe78e8ddf47505acde2",
+        "bytes": 5587184,
+        "producer_pinned_sha256": "68b7297d721866eff3a512bd55e5648db3a9650f6c177fe78e8ddf47505acde2",
+        "equals_pinned": true
+      },
+      {
+        "name": "quartic_pipeline_gls",
+        "sha256": "621ac63fa94b9f005de64183d3cc17f2adf23fd362a8bafd7d61e29956cecaa0",
+        "bytes": 5836560,
+        "producer_pinned_sha256": "621ac63fa94b9f005de64183d3cc17f2adf23fd362a8bafd7d61e29956cecaa0",
+        "equals_pinned": true
+      },
+      {
+        "name": "e33val_controls (build 3, with the NC3 stream; used for replay/controls)",
+        "sha256": "52ed449808d4c14fabff43847c0f5289a087f30b4ce44443942eb6e2de7cad2e",
+        "bytes": 5542520,
+        "producer_pinned_sha256": null,
+        "equals_pinned": false
+      },
+      {
+        "name": "e33val_controls (build 1, first version; its first-stream output is reproduced field for field by build 3's)",
+        "sha256": "efe6b449a18cbfa8d47e3c4734083d332c88f202f43b2e1ab476e068aa01b716",
+        "bytes": 5535656,
+        "producer_pinned_sha256": null,
+        "equals_pinned": false
+      },
+      {
+        "name": "quartic_pipeline_gls (pre-E33, bd0118f39)",
+        "sha256": "23b220137af15eb4a644485cc77734c5a980017f87330bb1167741cdea551b36",
+        "bytes": 5824688,
+        "producer_pinned_sha256": null,
+        "equals_pinned": false
+      }
+    ],
+    "binary_identity_note": "The fresh builds of e33_stage_a and quartic_pipeline_gls are byte-identical to the producer's pinned binaries (experiments/37_solver_b_pivot_count/binary_sha256.txt): the build is reproducible, and the replay used the validator's own build, never the producer's files. Equality of the replayed records is the replay criterion in any case.",
+    "host": "Intel Xeon @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, shared with two other validators, not isolab-eks (unreachable from it). Operation counts only.",
+    "run_environment": "every run alone on one core (taskset -c 2); Stage A RAYON_NUM_THREADS=1 as recorded, end to end and identity RAYON_NUM_THREADS=4 (fixes the target stream, §9.19) on that one core"
+  }
+}

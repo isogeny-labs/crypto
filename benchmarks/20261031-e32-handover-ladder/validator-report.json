@@ -1,0 +1,4996 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E32; this recompute is its own standard-library Rust program (validate_e32.rs: own JSON parser, SHA-256, xoshiro256** resampling, OLS), sharing no code with examples/e32_ladder.rs, examples/e32_tables.rs or crypto_lib",
+ "date": "2026-11-01",
+ "row": "E32 (GLV note §9.34 pre-registration at 246460f094, §9.36 results at 8afc92781b): the handover ladder, arm B with E31 solver A and Karatsuba products against E27's walk (iii), 11 sizes p = 101-3089, 3 curves each, 33 paired curves, 528 walks; fitted crossover order at 0, 0.1, 1 GAE",
+ "script": "research/e32_handover_ladder_20261031/validate_e32.rs (rustc -O --edition 2021; `validate_e32 report . research/e32_handover_ladder_20261031`)",
+ "status_rule": "pass iff every check holds and every headline agrees: printed figures within half a unit of their last printed digit (bootstrap endpoints: plus 4 sigma of resampling noise), full-precision values of fit.json within a relative 1e-9, counts exactly",
+ "raw_data": [
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p101s1.json",
+   "sha256": "bb89cb8aa6fdd88cfa758c1ecc3ea269e911fd5a0e22dbe11af809bb87b99afe"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p101s1.json",
+   "sha256": "e54484d038c76a63a911cf04fd1cc2eb6d0e1a0d0b552e8fe23d24ac8f8784e6"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p101s2.json",
+   "sha256": "c928d26c7383aa81b58972aebdfa449a26a464fb5ef1cc3fbc25cb1d12b16917"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p101s2.json",
+   "sha256": "b4cdae0755544e3acc05a2fc1ef69a2cfd1b0b85e8150aa0de46098b6498f021"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p101s3.json",
+   "sha256": "b906108689f0dc7ca633bd4e0a32ec6e7acfb751730f2c5d2826ca13979fe746"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p101s3.json",
+   "sha256": "dedde4039f080c69dc86340b96f3fcf39d7b58887717f99018c1a0fe580f949d"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p149s1.json",
+   "sha256": "c4fd5dacf330fb081ecea07f74b621d93b88b06bcded9d6f87f333ae98f13de7"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p149s1.json",
+   "sha256": "d6746c4616585388a3d55689c5e3565b14afbd21955155b8e7e8f9acbaea80eb"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p149s2.json",
+   "sha256": "1a04248d53c0ddf09104f2dad956311385ac7fb7ff6460a35f75f382827c5021"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p149s2.json",
+   "sha256": "7048fbde8ad53a9a572d933076840430330b172908c8d1cfb4c0485706dad5cc"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p149s3.json",
+   "sha256": "36117fe9a41f1eafa945ba04dbf292949488507f68e56457b9eb3247e316335b"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p149s3.json",
+   "sha256": "9ac4a289994b69cd11c87d1d0a150a2d041e1b23d5a37e41e84759303ef77d26"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p197s1.json",
+   "sha256": "306225075189147338f631a789040602ad100dbf35404eb85598368be63888c1"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p197s1.json",
+   "sha256": "56bcf5fb13a75813990c9d5faa419348a4361a2d0eb99b3501441f603cb9d68d"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p197s2.json",
+   "sha256": "75972cc1a1fc7cb66908d96692ec199849ed223337deb617d7de960a9e97ced5"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p197s2.json",
+   "sha256": "02c756a3d3b279c40945053ee57df5cf8a094c3c94ad7735343a9894eefe7ca1"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p197s3.json",
+   "sha256": "079e755b58ab753ed4a4987320e5310a2a3435d8377279e3d9e025c57c28d93f"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p197s3.json",
+   "sha256": "eaa9221de28f1a959d552991f252952fe486a343dc95f403d4378540c6fc7f6e"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p269s1.json",
+   "sha256": "6b2c6721448f9eb8d35dc9e48ffc3ccadd75514bfd604050a660e14cbe1722fd"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p269s1.json",
+   "sha256": "6b21501410ab8764bc66fee18b7514b66267c4782b9885a743c06743e5a34955"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p269s2.json",
+   "sha256": "daf851735dd5d7be5f30f970719db2077fd22f076d9549ccefb820f5a5809871"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p269s2.json",
+   "sha256": "b6d0b9d1e91aabe0671376261f7cf75770b435ad3914a2eb68eb3c0824b9ace5"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p269s3.json",
+   "sha256": "39070eda603540e7c3e99e156c765b9e1fcb65d38ec24b99b417dce4848252f5"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p269s3.json",
+   "sha256": "879af9e45b15db7081792a37309249179ae5d6220b33cf63765e4309f08c83c6"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p397s1.json",
+   "sha256": "9cc55d323dd20bc50d8ee051a90d64299264ba17346956b81f983f2abfad3063"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p397s1.json",
+   "sha256": "d8f328dfc6aed216567a5556211d44a35b57c44442af71ee005a294867c75170"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p397s2.json",
+   "sha256": "5eda827d0c4eedd5233ac43f8f2def52dfe7261ef5b011219c1b0cd0c9750864"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p397s2.json",
+   "sha256": "aa670f471e49d6b036721757f6ae82922f1e2be566761b01059eba7e51c7a951"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p397s3.json",
+   "sha256": "ebc07cce45e454f094cbaef5615ff72ab39e365a5db4e72d64aca3d52d2ba27e"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p397s3.json",
+   "sha256": "756e19be66084513f756bff0b26a17db9bcdbd9d0a85d81d6f11ca285cd4b6a1"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p557s1.json",
+   "sha256": "e2aa4f0ac41c05a38d0812fafe5caff9ab18b7469eb3b3eaac55e60716616b10"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p557s1.json",
+   "sha256": "9c34707eea3d55965c64a4470fb390b92fea7676b2b2610e8b14ff4af45066f0"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p557s2.json",
+   "sha256": "7391869fb69b034a19191c2c95caeedfff3571b6b2ab69e151fcd7c15955faa7"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p557s2.json",
+   "sha256": "dbab67bda5f8351e4cdfba10f0c522b8749a3f1439622d9a1c1882581557e1f4"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p557s3.json",
+   "sha256": "52850b726205ee137919b5dcc843efd7f4b465d6a5ab41924f21f2d0756ed3e9"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p557s3.json",
+   "sha256": "fb21584b0340c6b2f1a4289a9c05b667545b5a569fb4170a39d4875a6d613fe4"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p773s1.json",
+   "sha256": "f1c6cf2a8a36286b3bd3ad7f7fc85d5a326ca28966839b092ef85abd5f9ad828"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p773s1.json",
+   "sha256": "dced00fc6d43a08c3002d2e2dea288412b1b767269c1acbe4cc340578150cfd8"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p773s2.json",
+   "sha256": "8ea3c2662fe80e73feffa6d319e21734c208c0d29faf02f96fc986660f307be7"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p773s2.json",
+   "sha256": "1b149b6718f283c7507652e2509b04d78b4a051fb2458a13b006ea70f69f4be9"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p773s3.json",
+   "sha256": "4b896d99b292139acc6adf21262016e3ca95e0e9464c7f4ead1522003d48a6c6"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p773s3.json",
+   "sha256": "4d6b0530eb5f3767a8b70c132d2208b675899a251efd5c72c0c921aad4eee8a2"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p1093s1.json",
+   "sha256": "68ff8450d37a36e5d393e3a79e34dc2c791abdca941cb65f0a6fd58260266038"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p1093s1.json",
+   "sha256": "4973f0c9976125c36e371babc8494f233cb08dec9e1f6424a46e8854806aa541"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p1093s2.json",
+   "sha256": "47614c9bcacabd80c9aa9e8bf25a098ed90936f42ecb2a90f6d40e45c91ec048"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p1093s2.json",
+   "sha256": "7c6c054f696e86f901fd5346ff75175732b74d9e997227d0650cb65cfb9f0755"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p1093s3.json",
+   "sha256": "547ea294676c021b362848c4e689f9e880be121a20e1d165f9db3912b3d3b18e"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p1093s3.json",
+   "sha256": "3ce7bfec6caa21456b2b2af00ce59860ca159634830a4f5b6595efb1812abbb4"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p1549s1.json",
+   "sha256": "349b2d038a36f0298e8f9c1a48d6c006eed0b851b6ab9f5c017ef659803ed9ca"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p1549s1.json",
+   "sha256": "890a272cda1293a55dd0f9d7050fd54675417446606c6f57f0a2cba5b2f7f288"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p1549s2.json",
+   "sha256": "8722f22454aa9636e8f6ace623d120feed985185d601a01d5e3e2ba8a3c3f9e5"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p1549s2.json",
+   "sha256": "0044bbb62439489a0d70721a89c9b95d7b60ed0734d58541cb8eb88aed90ec8a"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p1549s3.json",
+   "sha256": "5c18edb25d87f68c4871cec1afdaa2f1378c189e6bbe53218a270c534e78571b"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p1549s3.json",
+   "sha256": "fb159c0f9d025cf0ae4705922f0a8f9cabc7b9de64e073bb69a64f9388d1e820"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p2213s1.json",
+   "sha256": "937e8845ea4842225138e111ae864b044ef66db1f08d2d439dc56e8da13b01d5"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p2213s1.json",
+   "sha256": "d944e4e8928add7169708ff2b272885596be0ca28b8aa0a68ce969644fd45918"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p2213s2.json",
+   "sha256": "f0bcd015c583912979e91a879b08361734bc7962fd059f7a7a2c9b73985fcc60"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p2213s2.json",
+   "sha256": "9c7ba52b5d69cddb3cd7b925433260ba5e73817e962cf44fe816d4ea67b745a0"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p2213s3.json",
+   "sha256": "54ab62eab0f8fbdd5d89f1b45adbb7a2775930e9270f75826d21687d15042f5d"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p2213s3.json",
+   "sha256": "59b9ca3f603f8f66860de606f81a22c44797e9bd84ae8fa7bdbca2a032a01acf"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p3089s1.json",
+   "sha256": "a94922f54f667ef7b9fc0e7d8d8b75e94cf9548548b4855f56cf041ff1a1f109"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p3089s1.json",
+   "sha256": "7c0c689be832f65272ee532671727c137f6ce48d0f37b051a8608a96308ae9d3"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p3089s2.json",
+   "sha256": "3228e9bc57f67ca3f5eccc313e37bb1366baa0b3df4b8262bd8f240cfba1762f"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p3089s2.json",
+   "sha256": "f65d3d3f7195a79cdaa8a879cea18f2c3f7461039796869f0b983e0b22c0176b"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p3089s3.json",
+   "sha256": "26b80a2e0ace9bd77936f26991db43f137dbca08fe27837a0daee793e6daeecf"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/walk_p3089s3.json",
+   "sha256": "2e1937b1f77c0a7ba12004faffa76cd56dfe9ab9f72662331d408f8eb1adbc3f"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/ic_p4337s1.json",
+   "sha256": "f9179c156137c3ed30748c2d6ead29c7ba6b9f443bfb6a2b9468420cb9d18b47"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/run.log",
+   "sha256": "3c272bda2e221bb73864574a0320eae1538f92708f61cd98d2e1ddd1375f8ea6"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/run_ladder.sh",
+   "sha256": "aa9e9b5e0ca644a925629f4df840d885c220f9563ac84b4a21070c275241f9a3"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/binary_commit.txt",
+   "sha256": "a2574542cff4ed530f38a9a89e201fc17e4877bb5d9ea5f0433469c458fcda4b"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/summary.json",
+   "sha256": "342fe7c9f0b1d1203aa1f03a98ebfb10afe9f0d4f3c365d48bc762475753c3a6"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/fit.json",
+   "sha256": "57b5941faa7dce7cd625740c803b054f088912e4612161a81857373474b944bc"
+  },
+  {
+   "path": "../../experiments/36_handover_ladder/tables.md",
+   "sha256": "0ac5270fa1b8e783fcbe19df38f73078d79df4ccd7bf4e5649740ac98071042a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/stage_w.json",
+   "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/summary.json",
+   "sha256": "b20666d943bd0c3e2ab593dedfeef63eb06ea7a66449fb89c341d147f23c46d2"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s1.json",
+   "sha256": "39d93707a3dc8430fce2df47886012ea6545b63b02d8cdf58990eb4e6d3adadb"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s2.json",
+   "sha256": "bc4c3a81a1a7de63ddf204a4b8b289ae6bcc200f33a7bcc6251e65430afd31f9"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s1.json",
+   "sha256": "71618ef39d4b6ca0ec0a38b3667288393d087572cc6d97208e5d331baed0d5f7"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s2.json",
+   "sha256": "683e68771a3615fc2cacfa573736b156478899cbe8d99a81e4edaf611a3a8b24"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s1.json",
+   "sha256": "db97629bc6887c37fd5b3b06bd62b37e14936c660022af252e653a0a796c0d10"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s2.json",
+   "sha256": "d86f811e85852e311ee8583823ef5a3619635c0511148038c6cf99f83ed1f38a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s1.json",
+   "sha256": "ed045d101098b39e58686b48cc663aaedb8b40920f13f8824be7badebe5c817a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+   "sha256": "a67423a8acf8fab3fd32276b31374ab60deef3864d2c4129a0b63db14f232e1a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s1.json",
+   "sha256": "cb469c62cbf518eb8610f42e50dff859b28c480c4d9776fe9921bf1e3465eabd"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s2.json",
+   "sha256": "7fbc78e9ffc61aeca3353f14d70badf51624b15e2344cd380b066951f847fd0c"
+  }
+ ],
+ "headline": [
+  {
+   "name": "p=4337 S (unpaired)",
+   "source": "note §9.36",
+   "printed": "2.484e11",
+   "claimed": 248400000000,
+   "recomputed": 248408339603,
+   "rel_tol": 0.00020128148728786141,
+   "agrees": true,
+   "definition": "total_muls of ic_p4337s1.json"
+  },
+  {
+   "name": "p=4337 y (unpaired)",
+   "source": "note §9.36",
+   "printed": "1252",
+   "claimed": 1252,
+   "recomputed": 1251.7455830388692,
+   "rel_tol": 0.0003993610227635783,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "p=4337 columns (unpaired)",
+   "source": "note §9.36",
+   "printed": "282",
+   "claimed": 282,
+   "recomputed": 282,
+   "rel_tol": 0.0017730496471631207,
+   "agrees": true,
+   "definition": "folded.columns"
+  },
+  {
+   "name": "G2.114 IC fields compared (6,040)",
+   "source": "note §9.36",
+   "printed": "6040",
+   "claimed": 6040,
+   "recomputed": 6040,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "leaves of E27's arm-B records minus wall_ms, solve_ms and `experiment`, ten curves"
+  },
+  {
+   "name": "G2.114 IC fields identical (6,040)",
+   "source": "note §9.36",
+   "printed": "6040",
+   "claimed": 6040,
+   "recomputed": 6040,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "of those, equal in E32's record"
+  },
+  {
+   "name": "p=101 log2 n",
+   "source": "note §9.36",
+   "printed": "22.63",
+   "claimed": 22.63,
+   "recomputed": 22.632664446397584,
+   "rel_tol": 0.0002209196366093717,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=101 y median",
+   "source": "note §9.36",
+   "printed": "1366",
+   "claimed": 1366,
+   "recomputed": 1366,
+   "rel_tol": 0.0003660322112005857,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=101 D(0) median",
+   "source": "note §9.36",
+   "printed": "2.07e4",
+   "claimed": 20700,
+   "recomputed": 20673.092242686136,
+   "rel_tol": 0.002415458939613527,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=101 D(0) min",
+   "source": "note §9.36",
+   "printed": "1.71e4",
+   "claimed": 17100,
+   "recomputed": 17088.26643856527,
+   "rel_tol": 0.0029239766111111114,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=101 D(0) max",
+   "source": "note §9.36",
+   "printed": "3.93e4",
+   "claimed": 39300,
+   "recomputed": 39317.337428057945,
+   "rel_tol": 0.001271703612725276,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=101 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "7.21e4",
+   "claimed": 72100,
+   "recomputed": 72134.56099380918,
+   "rel_tol": 0.0006931490170750629,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=101 D(1) median",
+   "source": "note §9.36",
+   "printed": "3.83e5",
+   "claimed": 383000,
+   "recomputed": 383126.26490910543,
+   "rel_tol": 0.0013050527888465759,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=149 log2 n",
+   "source": "note §9.36",
+   "printed": "24.88",
+   "claimed": 24.88,
+   "recomputed": 24.87662471484766,
+   "rel_tol": 0.00020096463042604506,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=149 y median",
+   "source": "note §9.36",
+   "printed": "4272",
+   "claimed": 4272,
+   "recomputed": 4272,
+   "rel_tol": 0.00011704119861891387,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=149 D(0) median",
+   "source": "note §9.36",
+   "printed": "4.03e4",
+   "claimed": 40300,
+   "recomputed": 40334.0137433025,
+   "rel_tol": 0.0012396485102676533,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=149 D(0) min",
+   "source": "note §9.36",
+   "printed": "8.26e3",
+   "claimed": 8260,
+   "recomputed": 8263.754135170213,
+   "rel_tol": 0.0006050518835888639,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=149 D(0) max",
+   "source": "note §9.36",
+   "printed": "1.52e5",
+   "claimed": 152000,
+   "recomputed": 152316.87736235865,
+   "rel_tol": 0.003282630324087531,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=149 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "1.38e5",
+   "claimed": 138000,
+   "recomputed": 138316.32504498967,
+   "rel_tol": 0.00361490229253392,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=149 D(1) median",
+   "source": "note §9.36",
+   "printed": "6.59e5",
+   "claimed": 659000,
+   "recomputed": 658888.0059116929,
+   "rel_tol": 0.0007587253421851291,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=197 log2 n",
+   "source": "note §9.36",
+   "printed": "26.49",
+   "claimed": 26.49,
+   "recomputed": 26.48813466031776,
+   "rel_tol": 0.0001887504720649302,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=197 y median",
+   "source": "note §9.36",
+   "printed": "969",
+   "claimed": 969,
+   "recomputed": 968.75,
+   "rel_tol": 0.0005159958725490196,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=197 D(0) median",
+   "source": "note §9.36",
+   "printed": "1.49e4",
+   "claimed": 14900,
+   "recomputed": 14944.66147050928,
+   "rel_tol": 0.0033456763238609594,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=197 D(0) min",
+   "source": "note §9.36",
+   "printed": "1.07e4",
+   "claimed": 10700,
+   "recomputed": 10746.620957039957,
+   "rel_tol": 0.004652625253079734,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=197 D(0) max",
+   "source": "note §9.36",
+   "printed": "3.49e4",
+   "claimed": 34900,
+   "recomputed": 34883.11230698138,
+   "rel_tol": 0.0014326647578796563,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=197 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "5.09e4",
+   "claimed": 50900,
+   "recomputed": 50900.57078596455,
+   "rel_tol": 0.0009823072566366414,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=197 D(1) median",
+   "source": "note §9.36",
+   "printed": "2.38e5",
+   "claimed": 238000,
+   "recomputed": 237611.32640730258,
+   "rel_tol": 0.002100840338235294,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=269 log2 n",
+   "source": "note §9.36",
+   "printed": "28.29",
+   "claimed": 28.29,
+   "recomputed": 28.28583380859642,
+   "rel_tol": 0.00017674089802050197,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=269 y median",
+   "source": "note §9.36",
+   "printed": "1918",
+   "claimed": 1918,
+   "recomputed": 1917.8235294117646,
+   "rel_tol": 0.0002606882171532847,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=269 D(0) median",
+   "source": "note §9.36",
+   "printed": "1.75e4",
+   "claimed": 17500,
+   "recomputed": 17512.78824631675,
+   "rel_tol": 0.002855056507664671,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=269 D(0) min",
+   "source": "note §9.36",
+   "printed": "8.83e3",
+   "claimed": 8830,
+   "recomputed": 8828.166302310306,
+   "rel_tol": 0.0005662514161947906,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=269 D(0) max",
+   "source": "note §9.36",
+   "printed": "2.75e4",
+   "claimed": 27500,
+   "recomputed": 27474.66104938253,
+   "rel_tol": 0.00181818182,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=269 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "5.90e4",
+   "claimed": 59000,
+   "recomputed": 58962.786927800575,
+   "rel_tol": 0.0008474576279661018,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=269 D(1) median",
+   "source": "note §9.36",
+   "printed": "2.61e5",
+   "claimed": 261000,
+   "recomputed": 261072.24247148653,
+   "rel_tol": 0.0019151787097956552,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=397 log2 n",
+   "source": "note §9.36",
+   "printed": "30.53",
+   "claimed": 30.53,
+   "recomputed": 30.531974584782137,
+   "rel_tol": 0.00016376274620286496,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=397 y median",
+   "source": "note §9.36",
+   "printed": "1349",
+   "claimed": 1349,
+   "recomputed": 1349.04,
+   "rel_tol": 0.00037063393264840185,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=397 D(0) median",
+   "source": "note §9.36",
+   "printed": "8.75e3",
+   "claimed": 8750,
+   "recomputed": 8749.480088274766,
+   "rel_tol": 0.0005714285720000001,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=397 D(0) min",
+   "source": "note §9.36",
+   "printed": "6.39e3",
+   "claimed": 6390,
+   "recomputed": 6391.730928925254,
+   "rel_tol": 0.0007822607147577052,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=397 D(0) max",
+   "source": "note §9.36",
+   "printed": "9.72e3",
+   "claimed": 9720,
+   "recomputed": 9719.08436064901,
+   "rel_tol": 0.0005144032926954733,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=397 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "2.91e4",
+   "claimed": 29100,
+   "recomputed": 29056.41623264124,
+   "rel_tol": 0.0017182130601374572,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=397 D(1) median",
+   "source": "note §9.36",
+   "printed": "1.24e5",
+   "claimed": 124000,
+   "recomputed": 123507.13649591786,
+   "rel_tol": 0.004032258068548387,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=557 log2 n",
+   "source": "note §9.36",
+   "printed": "32.49",
+   "claimed": 32.49,
+   "recomputed": 32.48613461898974,
+   "rel_tol": 0.00015389350584795323,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=557 y median",
+   "source": "note §9.36",
+   "printed": "1180",
+   "claimed": 1180,
+   "recomputed": 1180.4324324324325,
+   "rel_tol": 0.0004235735877484202,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=557 D(0) median",
+   "source": "note §9.36",
+   "printed": "6.46e3",
+   "claimed": 6460,
+   "recomputed": 6459.562740024416,
+   "rel_tol": 0.0007739938088235295,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=557 D(0) min",
+   "source": "note §9.36",
+   "printed": "4.98e3",
+   "claimed": 4980,
+   "recomputed": 4984.941223484743,
+   "rel_tol": 0.001003020854377242,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=557 D(0) max",
+   "source": "note §9.36",
+   "printed": "7.43e3",
+   "claimed": 7430,
+   "recomputed": 7428.771216234169,
+   "rel_tol": 0.0006729475107671602,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=557 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "2.13e4",
+   "claimed": 21300,
+   "recomputed": 21286.3997899092,
+   "rel_tol": 0.0023474178427230047,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=557 D(1) median",
+   "source": "note §9.36",
+   "printed": "8.94e4",
+   "claimed": 89400,
+   "recomputed": 89353.09916569175,
+   "rel_tol": 0.0005592841168903804,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=773 log2 n",
+   "source": "note §9.36",
+   "printed": "34.38",
+   "claimed": 34.38,
+   "recomputed": 34.377297625784145,
+   "rel_tol": 0.00014543339165212335,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=773 y median",
+   "source": "note §9.36",
+   "printed": "2268",
+   "claimed": 2268,
+   "recomputed": 2268.2,
+   "rel_tol": 0.00022043911493695447,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=773 D(0) median",
+   "source": "note §9.36",
+   "printed": "7.63e3",
+   "claimed": 7630,
+   "recomputed": 7628.582461718084,
+   "rel_tol": 0.0006553079954128441,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=773 D(0) min",
+   "source": "note §9.36",
+   "printed": "6.52e3",
+   "claimed": 6520,
+   "recomputed": 6518.6150466469,
+   "rel_tol": 0.0007668711664110431,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=773 D(0) max",
+   "source": "note §9.36",
+   "printed": "1.15e4",
+   "claimed": 11500,
+   "recomputed": 11461.530641153804,
+   "rel_tol": 0.004347826091304349,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=773 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "2.50e4",
+   "claimed": 25000,
+   "recomputed": 25026.861687628494,
+   "rel_tol": 0.0019978533734701727,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=773 D(1) median",
+   "source": "note §9.36",
+   "printed": "1.04e5",
+   "claimed": 104000,
+   "recomputed": 103913.36842184671,
+   "rel_tol": 0.0048076923125,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=1093 log2 n",
+   "source": "note §9.36",
+   "printed": "36.38",
+   "claimed": 36.38,
+   "recomputed": 36.37630969290507,
+   "rel_tol": 0.0001374381529686641,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=1093 y median",
+   "source": "note §9.36",
+   "printed": "1563",
+   "claimed": 1563,
+   "recomputed": 1563.442857142857,
+   "rel_tol": 0.0003198070196270137,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=1093 D(0) median",
+   "source": "note §9.36",
+   "printed": "4.37e3",
+   "claimed": 4370,
+   "recomputed": 4371.668096241599,
+   "rel_tol": 0.0011437281822237579,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=1093 D(0) min",
+   "source": "note §9.36",
+   "printed": "3.67e3",
+   "claimed": 3670,
+   "recomputed": 3669.485336465538,
+   "rel_tol": 0.0013623978215258855,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=1093 D(0) max",
+   "source": "note §9.36",
+   "printed": "5.06e3",
+   "claimed": 5060,
+   "recomputed": 5059.9610698080605,
+   "rel_tol": 0.0009881422934782608,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=1093 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "1.42e4",
+   "claimed": 14200,
+   "recomputed": 14179.225465937625,
+   "rel_tol": 0.0035211267640845073,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=1093 D(1) median",
+   "source": "note §9.36",
+   "printed": "5.84e4",
+   "claimed": 58400,
+   "recomputed": 58366.11130761661,
+   "rel_tol": 0.0008561643844178082,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=1549 log2 n",
+   "source": "note §9.36",
+   "printed": "38.39",
+   "claimed": 38.39,
+   "recomputed": 38.38848475347412,
+   "rel_tol": 0.00013024225071633238,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=1549 y median",
+   "source": "note §9.36",
+   "printed": "1392",
+   "claimed": 1392,
+   "recomputed": 1391.5346534653465,
+   "rel_tol": 0.000359195402658046,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=1549 D(0) median",
+   "source": "note §9.36",
+   "printed": "2.37e3",
+   "claimed": 2370,
+   "recomputed": 2368.164956807999,
+   "rel_tol": 0.0021097046434599156,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=1549 D(0) min",
+   "source": "note §9.36",
+   "printed": "2.07e3",
+   "claimed": 2070,
+   "recomputed": 2072.7895662821497,
+   "rel_tol": 0.0024122082078829785,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=1549 D(0) max",
+   "source": "note §9.36",
+   "printed": "3.72e3",
+   "claimed": 3720,
+   "recomputed": 3716.883121299335,
+   "rel_tol": 0.0013440860228494625,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=1549 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "7.66e3",
+   "claimed": 7660,
+   "recomputed": 7663.019234460374,
+   "rel_tol": 0.0006524843344402877,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=1549 D(1) median",
+   "source": "note §9.36",
+   "printed": "3.14e4",
+   "claimed": 31400,
+   "recomputed": 31414.025155906107,
+   "rel_tol": 0.0015916457633764762,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=2213 log2 n",
+   "source": "note §9.36",
+   "printed": "40.45",
+   "claimed": 40.45,
+   "recomputed": 40.447150539805506,
+   "rel_tol": 0.00012360939443757725,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=2213 y median",
+   "source": "note §9.36",
+   "printed": "1369",
+   "claimed": 1369,
+   "recomputed": 1368.804347826087,
+   "rel_tol": 0.00036523009532505484,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=2213 D(0) median",
+   "source": "note §9.36",
+   "printed": "1.61e3",
+   "claimed": 1610,
+   "recomputed": 1613.4608681525008,
+   "rel_tol": 0.0030989285849400664,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=2213 D(0) min",
+   "source": "note §9.36",
+   "printed": "1.34e3",
+   "claimed": 1340,
+   "recomputed": 1341.17124746448,
+   "rel_tol": 0.003728084697947882,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=2213 D(0) max",
+   "source": "note §9.36",
+   "printed": "2.05e3",
+   "claimed": 2050,
+   "recomputed": 2050.534472267557,
+   "rel_tol": 0.0024383886604309635,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=2213 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "5.15e3",
+   "claimed": 5150,
+   "recomputed": 5147.069926589769,
+   "rel_tol": 0.0009708737873786408,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=2213 D(1) median",
+   "source": "note §9.36",
+   "printed": "2.10e4",
+   "claimed": 21000,
+   "recomputed": 20971.74104673376,
+   "rel_tol": 0.002380952383333334,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "p=3089 log2 n",
+   "source": "note §9.36",
+   "printed": "42.37",
+   "claimed": 42.37,
+   "recomputed": 42.37169647940739,
+   "rel_tol": 0.00011800329985442042,
+   "agrees": true,
+   "definition": "mean over the size's three curves of log2 n"
+  },
+  {
+   "name": "p=3089 y median",
+   "source": "note §9.36",
+   "printed": "1496",
+   "claimed": 1496,
+   "recomputed": 1495.59375,
+   "rel_tol": 0.0003342245992647059,
+   "agrees": true,
+   "definition": "median over 3 curves of residuals / relations"
+  },
+  {
+   "name": "p=3089 D(0) median",
+   "source": "note §9.36",
+   "printed": "1.54e3",
+   "claimed": 1540,
+   "recomputed": 1542.2428347599964,
+   "rel_tol": 0.003242031599892698,
+   "agrees": true,
+   "definition": "median over 3 curves of S / rho"
+  },
+  {
+   "name": "p=3089 D(0) min",
+   "source": "note §9.36",
+   "printed": "1.14e3",
+   "claimed": 1140,
+   "recomputed": 1143.2671379697808,
+   "rel_tol": 0.0043734310546868545,
+   "agrees": true,
+   "definition": "min over 3 curves"
+  },
+  {
+   "name": "p=3089 D(0) max",
+   "source": "note §9.36",
+   "printed": "1.70e3",
+   "claimed": 1700,
+   "recomputed": 1701.746808444159,
+   "rel_tol": 0.002938157415774034,
+   "agrees": true,
+   "definition": "max over 3 curves"
+  },
+  {
+   "name": "p=3089 D(0.1) median",
+   "source": "note §9.36",
+   "printed": "4.93e3",
+   "claimed": 4930,
+   "recomputed": 4933.097413822862,
+   "rel_tol": 0.0010135619846041704,
+   "agrees": true,
+   "definition": "median of (S + 9.7 E) / (rho + 9.7 steps)"
+  },
+  {
+   "name": "p=3089 D(1) median",
+   "source": "note §9.36",
+   "printed": "2.01e4",
+   "claimed": 20100,
+   "recomputed": 20105.98689596759,
+   "rel_tol": 0.002486821478035872,
+   "agrees": true,
+   "definition": "median of (S + 97 E) / (rho + 97 steps)"
+  },
+  {
+   "name": "C median at p=101",
+   "source": "note §9.36",
+   "printed": "5.99e5",
+   "claimed": 599000,
+   "recomputed": 599333,
+   "rel_tol": 0.0008342607540382393,
+   "agrees": true,
+   "definition": "median over 3 curves of call.median"
+  },
+  {
+   "name": "C median at p=3089",
+   "source": "note §9.36",
+   "printed": "6.65e5",
+   "claimed": 665000,
+   "recomputed": 664721,
+   "rel_tol": 0.0007518797000000001,
+   "agrees": true,
+   "definition": "median over 3 curves of call.median"
+  },
+  {
+   "name": "Macaulay entries per residual, min (all curves)",
+   "source": "note §9.36",
+   "printed": "1.76e5",
+   "claimed": 176000,
+   "recomputed": 176172.19716249817,
+   "rel_tol": 0.002838132285077927,
+   "agrees": true,
+   "definition": "E / residuals"
+  },
+  {
+   "name": "Macaulay entries per residual, max (all curves)",
+   "source": "note §9.36",
+   "printed": "1.82e5",
+   "claimed": 182000,
+   "recomputed": 182084.16983894582,
+   "rel_tol": 0.002745982810819041,
+   "agrees": true,
+   "definition": "E / residuals"
+  },
+  {
+   "name": "'solve' share of S, min (%)",
+   "source": "note §9.36",
+   "printed": "98.3",
+   "claimed": 98.3,
+   "recomputed": 98.28423747571699,
+   "rel_tol": 0.0005086469994913531,
+   "agrees": true,
+   "definition": "(weil_muls + solve_muls) / S, which the note labels 'solve' (erratum E2; the solve alone is 97.69-98.45 %)"
+  },
+  {
+   "name": "'solve' share of S, max (%)",
+   "source": "note §9.36",
+   "printed": "99.1",
+   "claimed": 99.1,
+   "recomputed": 99.06226894292233,
+   "rel_tol": 0.0005045408683148336,
+   "agrees": true,
+   "definition": "(weil_muls + solve_muls) / S (erratum E2)"
+  },
+  {
+   "name": "linear algebra share of S, max (%), prose",
+   "source": "note §9.36",
+   "printed": "0.006",
+   "claimed": 0.006,
+   "recomputed": 0.005716407109768873,
+   "rel_tol": 0.08333333341666667,
+   "agrees": true,
+   "definition": "la_fp_muls / S"
+  },
+  {
+   "name": "walk F_p mults per step at p=101, min",
+   "source": "note §9.36",
+   "printed": "175",
+   "claimed": 175,
+   "recomputed": 175.28746691577143,
+   "rel_tol": 0.002852457219547011,
+   "agrees": true,
+   "definition": "rho / steps"
+  },
+  {
+   "name": "walk F_p mults per step at p=101, max",
+   "source": "note §9.36",
+   "printed": "229",
+   "claimed": 229,
+   "recomputed": 228.67928088474238,
+   "rel_tol": 0.002183406115720524,
+   "agrees": true,
+   "definition": "rho / steps"
+  },
+  {
+   "name": "walk F_p mults per step at p=3089 (median)",
+   "source": "note §9.36",
+   "printed": "95.9",
+   "claimed": 95.9,
+   "recomputed": 95.91328097424476,
+   "rel_tol": 0.0005213042400606264,
+   "agrees": true,
+   "definition": "rho / steps"
+  },
+  {
+   "name": "paired curves",
+   "source": "note §9.36",
+   "printed": "33",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "ic + walk records present"
+  },
+  {
+   "name": "walk-(iii) walks",
+   "source": "note §9.36",
+   "printed": "528",
+   "claimed": 528,
+   "recomputed": 528,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "16 per paired curve"
+  },
+  {
+   "name": "ladder top log2 n (p=3089)",
+   "source": "note §9.36",
+   "printed": "42.37",
+   "claimed": 42.37,
+   "recomputed": 42.371696502001654,
+   "rel_tol": 0.0001180032997914964,
+   "agrees": true,
+   "definition": "log2 n at p = 3089 (median of 3 curves)"
+  },
+  {
+   "name": "M1 0 GAE alpha",
+   "source": "fit.json",
+   "printed": "12.978842840506186",
+   "claimed": 12.978842840506186,
+   "recomputed": 12.978842840506186,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M1 0 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "85.47929559400498",
+   "claimed": 85.47929559400498,
+   "recomputed": 85.47929559400498,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M1 0 GAE curves",
+   "source": "fit.json",
+   "printed": "24",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M1 0 GAE beta",
+   "source": "fit.json",
+   "printed": "-0.24268911354100017",
+   "claimed": -0.24268911354100017,
+   "recomputed": -0.24268911354100017,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1 0 GAE beta OLS se",
+   "source": "fit.json",
+   "printed": "0.021132796467862914",
+   "claimed": 0.021132796467862914,
+   "recomputed": 0.021132796467862914,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "sqrt(RSS/(n-2)/Sxx)"
+  },
+  {
+   "name": "M1 0 GAE beta OLS 95% lo",
+   "source": "fit.json",
+   "printed": "-0.2841093946180115",
+   "claimed": -0.2841093946180115,
+   "recomputed": -0.2841093946180115,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta - 1.96 se"
+  },
+  {
+   "name": "M1 0 GAE beta OLS 95% hi",
+   "source": "fit.json",
+   "printed": "-0.20126883246398886",
+   "claimed": -0.20126883246398886,
+   "recomputed": -0.20126883246398886,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta + 1.96 se"
+  },
+  {
+   "name": "M1 0 GAE beta (printed)",
+   "source": "note §9.36",
+   "printed": "-0.243",
+   "claimed": -0.243,
+   "recomputed": -0.24268911354100017,
+   "rel_tol": 0.002057613170781893,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1 0 GAE beta 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "-0.279",
+   "claimed": -0.279,
+   "recomputed": -0.2787626571999326,
+   "rel_tol": 0.005910398620779662,
+   "agrees": true,
+   "definition": "own stratified cluster bootstrap, mean of 20 x 10,000; tolerance half a printed unit + 4 sigma resampling noise"
+  },
+  {
+   "name": "M1 0 GAE beta 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "-0.205",
+   "claimed": -0.205,
+   "recomputed": -0.204768132223459,
+   "rel_tol": 0.011761897769017635,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "M1 0 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "85.5",
+   "claimed": 85.5,
+   "recomputed": 85.47929559400498,
+   "rel_tol": 0.0005847953222222223,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M1 0 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "79.2",
+   "claimed": 79.2,
+   "recomputed": 79.196797550397,
+   "rel_tol": 0.003947145558502279,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1 0 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "94.3",
+   "claimed": 94.3,
+   "recomputed": 94.4201575305672,
+   "rel_tol": 0.005746374919820442,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1_all 0 GAE alpha",
+   "source": "fit.json",
+   "printed": "12.934638174085121",
+   "claimed": 12.934638174085121,
+   "recomputed": 12.934638174085121,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M1_all 0 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "87.72707705602616",
+   "claimed": 87.72707705602616,
+   "recomputed": 87.72707705602616,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M1_all 0 GAE curves",
+   "source": "fit.json",
+   "printed": "33",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M1_all 0 GAE beta",
+   "source": "fit.json",
+   "printed": "-0.23210688335727822",
+   "claimed": -0.23210688335727822,
+   "recomputed": -0.23210688335727822,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1_all 0 GAE beta OLS se",
+   "source": "fit.json",
+   "printed": "0.021398779976701292",
+   "claimed": 0.021398779976701292,
+   "recomputed": 0.021398779976701292,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "sqrt(RSS/(n-2)/Sxx)"
+  },
+  {
+   "name": "M1_all 0 GAE beta OLS 95% lo",
+   "source": "fit.json",
+   "printed": "-0.27404849211161275",
+   "claimed": -0.27404849211161275,
+   "recomputed": -0.27404849211161275,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta - 1.96 se"
+  },
+  {
+   "name": "M1_all 0 GAE beta OLS 95% hi",
+   "source": "fit.json",
+   "printed": "-0.1901652746029437",
+   "claimed": -0.1901652746029437,
+   "recomputed": -0.1901652746029437,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta + 1.96 se"
+  },
+  {
+   "name": "M1_all 0 GAE beta (printed)",
+   "source": "note §9.36",
+   "printed": "-0.232",
+   "claimed": -0.232,
+   "recomputed": -0.23210688335727822,
+   "rel_tol": 0.0021541799763445985,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1_all 0 GAE beta 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "-0.272",
+   "claimed": -0.272,
+   "recomputed": -0.2720697005086644,
+   "rel_tol": 0.008580734765519231,
+   "agrees": true,
+   "definition": "own stratified cluster bootstrap, mean of 20 x 10,000; tolerance half a printed unit + 4 sigma resampling noise"
+  },
+  {
+   "name": "M1_all 0 GAE beta 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "-0.191",
+   "claimed": -0.191,
+   "recomputed": -0.1914994143263492,
+   "rel_tol": 0.015319128309443774,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "M1_all 0 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "87.7",
+   "claimed": 87.7,
+   "recomputed": 87.72707705602616,
+   "rel_tol": 0.0005699494583418974,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M1_all 0 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "80.2",
+   "claimed": 80.2,
+   "recomputed": 80.25564515477028,
+   "rel_tol": 0.004148284153484409,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1_all 0 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "98.6",
+   "claimed": 98.6,
+   "recomputed": 98.482429159674,
+   "rel_tol": 0.008500521002069245,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M2 0 GAE alpha",
+   "source": "fit.json",
+   "printed": "13.003759147678494",
+   "claimed": 13.003759147678494,
+   "recomputed": 13.003759147678494,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M2 0 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "84.01503659071398",
+   "claimed": 84.01503659071398,
+   "recomputed": 84.01503659071398,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M2 0 GAE curves",
+   "source": "fit.json",
+   "printed": "24",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M2 0 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "84.0",
+   "claimed": 84,
+   "recomputed": 84.01503659071398,
+   "rel_tol": 0.0005951315630983896,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M2 0 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "83.4",
+   "claimed": 83.4,
+   "recomputed": 83.45381741541823,
+   "rel_tol": 0.0009353486166832093,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M2 0 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "84.6",
+   "claimed": 84.6,
+   "recomputed": 84.5701588327449,
+   "rel_tol": 0.0009260973753577843,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1 0.1 GAE alpha",
+   "source": "fit.json",
+   "printed": "14.705980844552855",
+   "claimed": 14.705980844552855,
+   "recomputed": 14.705980844552855,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M1 0.1 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "91.23253329729746",
+   "claimed": 91.23253329729746,
+   "recomputed": 91.23253329729746,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M1 0.1 GAE curves",
+   "source": "fit.json",
+   "printed": "24",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M1 0.1 GAE beta",
+   "source": "fit.json",
+   "printed": "-0.2482753991078046",
+   "claimed": -0.2482753991078046,
+   "recomputed": -0.2482753991078046,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1 0.1 GAE beta OLS se",
+   "source": "fit.json",
+   "printed": "0.02117682428791458",
+   "claimed": 0.02117682428791458,
+   "recomputed": 0.02117682428791458,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "sqrt(RSS/(n-2)/Sxx)"
+  },
+  {
+   "name": "M1 0.1 GAE beta OLS 95% lo",
+   "source": "fit.json",
+   "printed": "-0.2897819747121172",
+   "claimed": -0.2897819747121172,
+   "recomputed": -0.2897819747121172,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta - 1.96 se"
+  },
+  {
+   "name": "M1 0.1 GAE beta OLS 95% hi",
+   "source": "fit.json",
+   "printed": "-0.20676882350349202",
+   "claimed": -0.20676882350349202,
+   "recomputed": -0.20676882350349202,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta + 1.96 se"
+  },
+  {
+   "name": "M1 0.1 GAE beta (printed)",
+   "source": "note §9.36",
+   "printed": "-0.248",
+   "claimed": -0.248,
+   "recomputed": -0.2482753991078046,
+   "rel_tol": 0.002013892646217812,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1 0.1 GAE beta 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "-0.284",
+   "claimed": -0.284,
+   "recomputed": -0.2842190536046708,
+   "rel_tol": 0.007669856296096303,
+   "agrees": true,
+   "definition": "own stratified cluster bootstrap, mean of 20 x 10,000; tolerance half a printed unit + 4 sigma resampling noise"
+  },
+  {
+   "name": "M1 0.1 GAE beta 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "-0.211",
+   "claimed": -0.211,
+   "recomputed": -0.21047523079471656,
+   "rel_tol": 0.010721664471933345,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "M1 0.1 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "91.2",
+   "claimed": 91.2,
+   "recomputed": 91.23253329729746,
+   "rel_tol": 0.0005480501115437198,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M1 0.1 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "84.4",
+   "claimed": 84.4,
+   "recomputed": 84.36657209145761,
+   "rel_tol": 0.00368619412594441,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1 0.1 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "100.7",
+   "claimed": 100.7,
+   "recomputed": 100.93763036311242,
+   "rel_tol": 0.005610858423286719,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1_all 0.1 GAE alpha",
+   "source": "fit.json",
+   "printed": "14.666491991178319",
+   "claimed": 14.666491991178319,
+   "recomputed": 14.666491991178319,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M1_all 0.1 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "93.45460894357436",
+   "claimed": 93.45460894357436,
+   "recomputed": 93.45460894357436,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M1_all 0.1 GAE curves",
+   "source": "fit.json",
+   "printed": "33",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M1_all 0.1 GAE beta",
+   "source": "fit.json",
+   "printed": "-0.23865568821119046",
+   "claimed": -0.23865568821119046,
+   "recomputed": -0.23865568821119046,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1_all 0.1 GAE beta OLS se",
+   "source": "fit.json",
+   "printed": "0.021385314915031133",
+   "claimed": 0.021385314915031133,
+   "recomputed": 0.021385314915031133,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "sqrt(RSS/(n-2)/Sxx)"
+  },
+  {
+   "name": "M1_all 0.1 GAE beta OLS 95% lo",
+   "source": "fit.json",
+   "printed": "-0.28057090544465146",
+   "claimed": -0.28057090544465146,
+   "recomputed": -0.28057090544465146,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta - 1.96 se"
+  },
+  {
+   "name": "M1_all 0.1 GAE beta OLS 95% hi",
+   "source": "fit.json",
+   "printed": "-0.19674047097772945",
+   "claimed": -0.19674047097772945,
+   "recomputed": -0.19674047097772945,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta + 1.96 se"
+  },
+  {
+   "name": "M1_all 0.1 GAE beta (printed)",
+   "source": "note §9.36",
+   "printed": "-0.239",
+   "claimed": -0.239,
+   "recomputed": -0.23865568821119046,
+   "rel_tol": 0.0020920502112970717,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1_all 0.1 GAE beta 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "-0.278",
+   "claimed": -0.278,
+   "recomputed": -0.2788335542288435,
+   "rel_tol": 0.01033223484070312,
+   "agrees": true,
+   "definition": "own stratified cluster bootstrap, mean of 20 x 10,000; tolerance half a printed unit + 4 sigma resampling noise"
+  },
+  {
+   "name": "M1_all 0.1 GAE beta 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "-0.197",
+   "claimed": -0.197,
+   "recomputed": -0.19798522708417665,
+   "rel_tol": 0.013345911413236091,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "M1_all 0.1 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "93.5",
+   "claimed": 93.5,
+   "recomputed": 93.45460894357436,
+   "rel_tol": 0.0005347593588235295,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M1_all 0.1 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "85.4",
+   "claimed": 85.4,
+   "recomputed": 85.29912504042818,
+   "rel_tol": 0.005184132118072658,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1_all 0.1 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "105.4",
+   "claimed": 105.4,
+   "recomputed": 105.063362192597,
+   "rel_tol": 0.007931329147933599,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M2 0.1 GAE alpha",
+   "source": "fit.json",
+   "printed": "14.71185847455307",
+   "claimed": 14.71185847455307,
+   "recomputed": 14.71185847455307,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M2 0.1 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "90.84743389821227",
+   "claimed": 90.84743389821227,
+   "recomputed": 90.84743389821227,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M2 0.1 GAE curves",
+   "source": "fit.json",
+   "printed": "24",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M2 0.1 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "90.3",
+   "claimed": 90.3,
+   "recomputed": 90.287287674814,
+   "rel_tol": 0.0008038686553312784,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M2 0.1 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "91.4",
+   "claimed": 91.4,
+   "recomputed": 91.39766141251769,
+   "rel_tol": 0.0008580595654496034,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1 1 GAE alpha",
+   "source": "fit.json",
+   "printed": "16.79513220462907",
+   "claimed": 16.79513220462907,
+   "recomputed": 16.79513220462907,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M1 1 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "97.55002437136686",
+   "claimed": 97.55002437136686,
+   "recomputed": 97.55002437136686,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M1 1 GAE curves",
+   "source": "fit.json",
+   "printed": "24",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M1 1 GAE beta",
+   "source": "fit.json",
+   "printed": "-0.2562185501179678",
+   "claimed": -0.2562185501179678,
+   "recomputed": -0.2562185501179678,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1 1 GAE beta OLS se",
+   "source": "fit.json",
+   "printed": "0.021180528579398054",
+   "claimed": 0.021180528579398054,
+   "recomputed": 0.021180528579398054,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "sqrt(RSS/(n-2)/Sxx)"
+  },
+  {
+   "name": "M1 1 GAE beta OLS 95% lo",
+   "source": "fit.json",
+   "printed": "-0.297732386133588",
+   "claimed": -0.297732386133588,
+   "recomputed": -0.297732386133588,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta - 1.96 se"
+  },
+  {
+   "name": "M1 1 GAE beta OLS 95% hi",
+   "source": "fit.json",
+   "printed": "-0.2147047141023476",
+   "claimed": -0.2147047141023476,
+   "recomputed": -0.2147047141023476,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta + 1.96 se"
+  },
+  {
+   "name": "M1 1 GAE beta (printed)",
+   "source": "note §9.36",
+   "printed": "-0.256",
+   "claimed": -0.256,
+   "recomputed": -0.2562185501179678,
+   "rel_tol": 0.001951459019145143,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1 1 GAE beta 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "-0.292",
+   "claimed": -0.292,
+   "recomputed": -0.2921789854031098,
+   "rel_tol": 0.007783923515147574,
+   "agrees": true,
+   "definition": "own stratified cluster bootstrap, mean of 20 x 10,000; tolerance half a printed unit + 4 sigma resampling noise"
+  },
+  {
+   "name": "M1 1 GAE beta 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "-0.219",
+   "claimed": -0.219,
+   "recomputed": -0.21825059149150544,
+   "rel_tol": 0.011287932700493964,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "M1 1 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "97.6",
+   "claimed": 97.6,
+   "recomputed": 97.55002437136686,
+   "rel_tol": 0.0005122950824795083,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M1 1 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "90.1",
+   "claimed": 90.1,
+   "recomputed": 90.0939406523168,
+   "rel_tol": 0.00424898208953059,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1 1 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "107.9",
+   "claimed": 107.9,
+   "recomputed": 108.05192024721892,
+   "rel_tol": 0.005878679227733122,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1_all 1 GAE alpha",
+   "source": "fit.json",
+   "printed": "16.80039920545235",
+   "claimed": 16.80039920545235,
+   "recomputed": 16.80039920545235,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M1_all 1 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "97.7437822171223",
+   "claimed": 97.7437822171223,
+   "recomputed": 97.7437822171223,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M1_all 1 GAE curves",
+   "source": "fit.json",
+   "printed": "33",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M1_all 1 GAE beta",
+   "source": "fit.json",
+   "printed": "-0.25554354554729064",
+   "claimed": -0.25554354554729064,
+   "recomputed": -0.25554354554729064,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1_all 1 GAE beta OLS se",
+   "source": "fit.json",
+   "printed": "0.021018932616723548",
+   "claimed": 0.021018932616723548,
+   "recomputed": 0.021018932616723548,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "sqrt(RSS/(n-2)/Sxx)"
+  },
+  {
+   "name": "M1_all 1 GAE beta OLS 95% lo",
+   "source": "fit.json",
+   "printed": "-0.2967406534760688",
+   "claimed": -0.2967406534760688,
+   "recomputed": -0.2967406534760688,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta - 1.96 se"
+  },
+  {
+   "name": "M1_all 1 GAE beta OLS 95% hi",
+   "source": "fit.json",
+   "printed": "-0.2143464376185125",
+   "claimed": -0.2143464376185125,
+   "recomputed": -0.2143464376185125,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "beta + 1.96 se"
+  },
+  {
+   "name": "M1_all 1 GAE beta (printed)",
+   "source": "note §9.36",
+   "printed": "-0.256",
+   "claimed": -0.256,
+   "recomputed": -0.25554354554729064,
+   "rel_tol": 0.001953125001953125,
+   "agrees": true,
+   "definition": "OLS slope"
+  },
+  {
+   "name": "M1_all 1 GAE beta 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "-0.295",
+   "claimed": -0.295,
+   "recomputed": -0.2948495169403587,
+   "rel_tol": 0.008194479011520442,
+   "agrees": true,
+   "definition": "own stratified cluster bootstrap, mean of 20 x 10,000; tolerance half a printed unit + 4 sigma resampling noise"
+  },
+  {
+   "name": "M1_all 1 GAE beta 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "-0.216",
+   "claimed": -0.216,
+   "recomputed": -0.21551182131874147,
+   "rel_tol": 0.011781275680379835,
+   "agrees": true,
+   "definition": "as above"
+  },
+  {
+   "name": "M1_all 1 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "97.7",
+   "claimed": 97.7,
+   "recomputed": 97.7437822171223,
+   "rel_tol": 0.0005115414905772005,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M1_all 1 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "89.6",
+   "claimed": 89.6,
+   "recomputed": 89.62058563673853,
+   "rel_tol": 0.004649063406000574,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M1_all 1 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "108.9",
+   "claimed": 108.9,
+   "recomputed": 109.0116965656963,
+   "rel_tol": 0.006700856958865919,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M2 1 GAE alpha",
+   "source": "fit.json",
+   "printed": "16.773938700151245",
+   "claimed": 16.773938700151245,
+   "recomputed": 16.773938700151245,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "OLS intercept of log2 D on log2 n - 32 (M2: mean of L + x/4)"
+  },
+  {
+   "name": "M2 1 GAE log2 n*",
+   "source": "fit.json",
+   "printed": "99.09575480060498",
+   "claimed": 99.09575480060498,
+   "recomputed": 99.09575480060498,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "32 - alpha/beta (M2: 32 + 4 alpha)"
+  },
+  {
+   "name": "M2 1 GAE curves",
+   "source": "fit.json",
+   "printed": "24",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "curves in the fit"
+  },
+  {
+   "name": "M2 1 GAE log2 n* (printed)",
+   "source": "note §9.36",
+   "printed": "99.1",
+   "claimed": 99.1,
+   "recomputed": 99.09575480060498,
+   "rel_tol": 0.0005045408683148336,
+   "agrees": true,
+   "definition": "point estimate"
+  },
+  {
+   "name": "M2 1 GAE log2 n* 95% lo (printed)",
+   "source": "note §9.36",
+   "printed": "98.5",
+   "claimed": 98.5,
+   "recomputed": 98.53294497846927,
+   "rel_tol": 0.0007870477369690892,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "M2 1 GAE log2 n* 95% hi (printed)",
+   "source": "note §9.36",
+   "printed": "99.6",
+   "claimed": 99.6,
+   "recomputed": 99.65027329604864,
+   "rel_tol": 0.0008027570625674478,
+   "agrees": true,
+   "definition": "own bootstrap, as above"
+  },
+  {
+   "name": "yield exponent of y in p",
+   "source": "note §9.36",
+   "printed": "-0.066",
+   "claimed": -0.066,
+   "recomputed": -0.06581811335259444,
+   "rel_tol": 0.0075757575833333346,
+   "agrees": true,
+   "definition": "OLS slope of ln y on ln p, 33 curves"
+  },
+  {
+   "name": "yield exponent 95% lo",
+   "source": "note §9.36",
+   "printed": "-0.285",
+   "claimed": -0.285,
+   "recomputed": -0.28543923667407917,
+   "rel_tol": 0.0017516863004749103,
+   "agrees": true,
+   "definition": "beta - 1.96 se"
+  },
+  {
+   "name": "yield exponent 95% hi",
+   "source": "note §9.36",
+   "printed": "0.154",
+   "claimed": 0.154,
+   "recomputed": 0.1538030099688903,
+   "rel_tol": 0.0032467532500000005,
+   "agrees": true,
+   "definition": "beta + 1.96 se"
+  },
+  {
+   "name": "LA share at p=3089 (%, mean of 3)",
+   "source": "note §9.36",
+   "printed": "0.0044",
+   "claimed": 0.0044,
+   "recomputed": 0.0043702370575708464,
+   "rel_tol": 0.011363636375000001,
+   "agrees": true,
+   "definition": "la_fp_muls / S"
+  },
+  {
+   "name": "p at M2's n* (0 GAE)",
+   "source": "note §9.36",
+   "printed": "4.2e6",
+   "claimed": 4200000,
+   "recomputed": 4205247.107964045,
+   "rel_tol": 0.011889907719170234,
+   "agrees": true,
+   "definition": "p = 2 n^(1/4) (n = #E/16, #E ~ p^4)"
+  },
+  {
+   "name": "LA share extrapolated to M2's n* (%)",
+   "source": "note §9.36",
+   "printed": "5.6",
+   "claimed": 5.6,
+   "recomputed": 5.615620038863193,
+   "rel_tol": 0.008903736311212721,
+   "agrees": true,
+   "definition": "LA/rest ratio scaled by p*/3089 (LA ~ p^2, rest ~ p), share = r/(1+r)"
+  },
+  {
+   "name": "G2.116 C median min (p>=557)",
+   "source": "note §9.36",
+   "printed": "6.39e5",
+   "claimed": 639000,
+   "recomputed": 639101,
+   "rel_tol": 0.0007823489565811977,
+   "agrees": true,
+   "definition": "call.median"
+  },
+  {
+   "name": "G2.116 C median max (p>=557)",
+   "source": "note §9.36",
+   "printed": "6.67e5",
+   "claimed": 667000,
+   "recomputed": 667374,
+   "rel_tol": 0.0007492050941451121,
+   "agrees": true,
+   "definition": "call.median"
+  },
+  {
+   "name": "G2.116 E/residual min (p>=557)",
+   "source": "note §9.36",
+   "printed": "1.762e5",
+   "claimed": 176200,
+   "recomputed": 176172.19716249817,
+   "rel_tol": 0.0002837684452326901,
+   "agrees": true,
+   "definition": "E / residuals"
+  },
+  {
+   "name": "G2.116 E/residual max (p>=557)",
+   "source": "note §9.36",
+   "printed": "1.770e5",
+   "claimed": 177000,
+   "recomputed": 176981.03782397654,
+   "rel_tol": 0.0002824858759887006,
+   "agrees": true,
+   "definition": "E / residuals"
+  },
+  {
+   "name": "G2.117 'solve' share min (%)",
+   "source": "note §9.36",
+   "printed": "98.28",
+   "claimed": 98.28,
+   "recomputed": 98.28423747571699,
+   "rel_tol": 0.00005087285747356331,
+   "agrees": true,
+   "definition": "(weil_muls + solve_muls) / S, the registered quantity, labelled 'solve' in the note (erratum E2)"
+  },
+  {
+   "name": "G2.117 LA share max (%)",
+   "source": "note §9.36",
+   "printed": "0.0057",
+   "claimed": 0.0057,
+   "recomputed": 0.005716407109768873,
+   "rel_tol": 0.008746752827410435,
+   "agrees": true,
+   "definition": "la_fp_muls / S"
+  },
+  {
+   "name": "G2.118 per-size median y min",
+   "source": "note §9.36",
+   "printed": "969",
+   "claimed": 969,
+   "recomputed": 968.75,
+   "rel_tol": 0.0005159958725490196,
+   "agrees": true,
+   "definition": "median of residuals/relations"
+  },
+  {
+   "name": "G2.118 per-size median y max",
+   "source": "note §9.36",
+   "printed": "4272",
+   "claimed": 4272,
+   "recomputed": 4272,
+   "rel_tol": 0.00011704119861891387,
+   "agrees": true,
+   "definition": "median of residuals/relations"
+  },
+  {
+   "name": "G2.119 steps/sqrt n min",
+   "source": "note §9.36",
+   "printed": "0.468",
+   "claimed": 0.468,
+   "recomputed": 0.4676225130624763,
+   "rel_tol": 0.0010683760694444443,
+   "agrees": true,
+   "definition": "mean steps / sqrt n"
+  },
+  {
+   "name": "G2.119 steps/sqrt n max",
+   "source": "note §9.36",
+   "printed": "0.787",
+   "claimed": 0.787,
+   "recomputed": 0.7870495067997224,
+   "rel_tol": 0.0006352840528838972,
+   "agrees": true,
+   "definition": "mean steps / sqrt n"
+  },
+  {
+   "name": "G2.119 per step min (p>=1549)",
+   "source": "note §9.36",
+   "printed": "95.9",
+   "claimed": 95.9,
+   "recomputed": 95.90228629984489,
+   "rel_tol": 0.0005213640047503318,
+   "agrees": true,
+   "definition": "rho / steps"
+  },
+  {
+   "name": "G2.119 per step max (p>=1549)",
+   "source": "note §9.36",
+   "printed": "96.5",
+   "claimed": 96.5,
+   "recomputed": 96.45546360656336,
+   "rel_tol": 0.0005181347155440415,
+   "agrees": true,
+   "definition": "rho / steps"
+  },
+  {
+   "name": "G2.120 rows at or below rho, any weight",
+   "source": "note §9.36",
+   "printed": "0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 500000000500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000,
+   "agrees": true,
+   "definition": "count of D(g) <= 1"
+  },
+  {
+   "name": "G2.120 non-monotone steps",
+   "source": "note §9.36",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "per-size median D(0) not below the previous size's"
+  },
+  {
+   "name": "G2.122 M1 interval width (bits)",
+   "source": "note §9.36",
+   "printed": "15.1",
+   "claimed": 15.1,
+   "recomputed": 15.223359980170224,
+   "rel_tol": 0.044891146164009355,
+   "agrees": true,
+   "definition": "own bootstrap 97.5% - 2.5% of log2 n*, 0 GAE; tolerance half a printed unit + 4 sigma resampling noise"
+  },
+  {
+   "name": "G2.122 M2 interval width (bits)",
+   "source": "note §9.36",
+   "printed": "1.1",
+   "claimed": 1.1,
+   "recomputed": 1.1163414173266601,
+   "rel_tol": 0.08193763180657987,
+   "agrees": true,
+   "definition": "own bootstrap, 0 GAE; as above"
+  },
+  {
+   "name": "G2.123 M2 shift at 0.1 GAE (bits)",
+   "source": "note §9.36",
+   "printed": "6.8",
+   "claimed": 6.8,
+   "recomputed": 6.832397307498297,
+   "rel_tol": 0.007318075603584542,
+   "agrees": true,
+   "definition": "M2 log2 n*(0.1) - log2 n*(0)"
+  },
+  {
+   "name": "G2.123 M2 shift at 1 GAE (bits)",
+   "source": "note §9.36",
+   "printed": "15.1",
+   "claimed": 15.1,
+   "recomputed": 15.080718209891003,
+   "rel_tol": 0.003311258281456954,
+   "agrees": true,
+   "definition": "M2 log2 n*(1) - log2 n*(0)"
+  },
+  {
+   "name": "G2.123 rows ordered D(0)<D(0.1)<D(1)",
+   "source": "note §9.36",
+   "printed": "33",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "count"
+  },
+  {
+   "name": "best row D(0)",
+   "source": "note §9.36",
+   "printed": "1.14e3",
+   "claimed": 1140,
+   "recomputed": 1143.2671379697808,
+   "rel_tol": 0.0043734310546868545,
+   "agrees": true,
+   "definition": "min over 33 curves of S / rho"
+  },
+  {
+   "name": "best row p",
+   "source": "note §9.36",
+   "printed": "3089",
+   "claimed": 3089,
+   "recomputed": 3089,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "its size"
+  },
+  {
+   "name": "best row seed",
+   "source": "note §9.36",
+   "printed": "2",
+   "claimed": 2,
+   "recomputed": 2,
+   "rel_tol": 0.0000000010000000010000002,
+   "agrees": true,
+   "definition": "its seed"
+  },
+  {
+   "name": "largest size median D(0.1)",
+   "source": "note §9.36",
+   "printed": "4.9e3",
+   "claimed": 4900,
+   "recomputed": 4933.097413822862,
+   "rel_tol": 0.010135619846041704,
+   "agrees": true,
+   "definition": "p = 3089"
+  },
+  {
+   "name": "largest size median D(1)",
+   "source": "note §9.36",
+   "printed": "2.0e4",
+   "claimed": 20000,
+   "recomputed": 20105.98689596759,
+   "rel_tol": 0.02486821478035872,
+   "agrees": true,
+   "definition": "p = 3089"
+  },
+  {
+   "name": "bits of n from the top rung to M1's n* (0 GAE)",
+   "source": "note §9.36",
+   "printed": "43",
+   "claimed": 43,
+   "recomputed": 43.107599092003326,
+   "rel_tol": 0.011598883051521014,
+   "agrees": true,
+   "definition": "log2 n* - 42.37"
+  }
+ ],
+ "headline_disagreements": [],
+ "checks": [
+  {
+   "check": "own SHA-256 reproduces the FIPS 180-2 'abc' vector",
+   "holds": true,
+   "detail": "sha256(\"abc\")"
+  },
+  {
+   "check": "raw records committed and unmodified (git status of experiments/36_handover_ladder empty)",
+   "holds": true,
+   "detail": "clean"
+  },
+  {
+   "check": "no censored, no-curve or partial record (every seed 1-3 gave a curve; no replacement)",
+   "holds": true,
+   "detail": "[]"
+  },
+  {
+   "check": "33 paired curves x 17 record checks each",
+   "holds": true,
+   "detail": "S = sum of its eight charged phases; ic p, seed match the file name; walk p, seed match the file name; ic arm B, chain, Karatsuba, psi-folded base, matched fold Gls; walk is E27 walk (iii): fold Gls, Karatsuba + batched, pool 16, 16 walks; walk seeds are 1000*seed + k, k < 16; cofactor h = 16 in both records; same n in both records; IC solved and correct (logarithm checked in the binary); every kept row re-added (rows_readded = relations, 0 failures); check_failures = 0; residual cap 40,000,000 not reached; pipeline walks as registered (48 at E25 curves, 3 elsewhere); all 16 walks correct (all_correct and per walk); every walk recovers the IC's logarithm (two algorithms agree); rho_iii_mean_fp_muls = mean(fp_muls - verify_fp_muls); mean_steps = mean(steps)"
+  },
+  {
+   "check": "p = 4337: IC record complete, walk pool absent (OOM marker), excluded from summary.json and every fit; this recompute uses the 33 paired curves only",
+   "holds": true,
+   "detail": "ic correct true, walk absent with .oom true, in summary false, in fit sizes false"
+  },
+  {
+   "check": "j-invariant probe (replay/j_invariant_probe.json; the validator's example calling the library's generator and F_p4 arithmetic): on all 34 instances j(E) lies in F_p2, not in F_p, and is neither 0 nor 1728, so Aut(E) = {±1} and <±psi> is the largest fold; n, #E, h = 16 and the planted d equal the records, and d is the recovered logarithm",
+   "holds": true,
+   "detail": "34 instances"
+  },
+  {
+   "check": "pre-registration commit 246460f094 predates the first run (run.log line 1)",
+   "holds": true,
+   "detail": "commit time 2026-10-31T16:54:52+00:00 (unix 1793465692) < first run 2026-10-31T16:54:59Z (unix 1793465699), 7 s earlier"
+  },
+  {
+   "check": "no run record exists in the pre-registration commit's tree",
+   "holds": true,
+   "detail": "[\"experiments/36_handover_ladder/binary_commit.txt\", \"experiments/36_handover_ladder/run_ladder.py\"]"
+  },
+  {
+   "check": "pre-registration is an ancestor of the results commit 8afc92781b, which is in HEAD",
+   "holds": true,
+   "detail": "true true"
+  },
+  {
+   "check": "§9.34 (frozen predictions G2.114-G2.123) byte-identical at the pre-registration and at HEAD",
+   "holds": true,
+   "detail": "8934 bytes, sha256 9cfba8b1249e55bda2cb1f57f887497ffbf80717ebbd72090e2139dba5c0e424"
+  },
+  {
+   "check": "examples/e32_ladder.rs unchanged since the pre-registration",
+   "holds": true,
+   "detail": "blob 86e922b3c3ee69cad72200c92c5f8b758c3f5a47"
+  },
+  {
+   "check": "recorded binary commit resolves (binary_commit.txt prints it with one digit dropped: e75771052b28668c… for e757710521b28668c…; the 9-digit prefix e75771052 is unambiguous)",
+   "holds": true,
+   "detail": "erratum E1"
+  },
+  {
+   "check": "G2.114 identity: E32's ten E25-curve IC records equal E27's arm-B records leaf by leaf (wall_ms, solve_ms and the runner label `experiment` aside)",
+   "holds": true,
+   "detail": "6040/6040 fields"
+  },
+  {
+   "check": "G2.114 identity: E32's walk pools on the ten E25 curves equal E27's walk (iii) records walk by walk (16 walks x 10 fields incl. visit digest) and pool by pool (7 batch fields)",
+   "holds": true,
+   "detail": "1670/1670 fields"
+  },
+  {
+   "check": "G2.114 identity: rho_e27 and walk_steps of E27's summary reproduced exactly on the ten curves",
+   "holds": true,
+   "detail": "10/10"
+  },
+  {
+   "check": "summary.json per-curve values (S, E, rho, steps, D(g) at 3 weights, y, C, E/residual, (Weil + solve) share [its `solve_share`, erratum E2], LA share, log2 n, steps/sqrt n, muls/step, columns) equal the recompute",
+   "holds": true,
+   "detail": "33 curves x 16 values, max relative difference 0.00e0"
+  },
+  {
+   "check": "summary.json per-size D medians, minima and maxima equal the recompute",
+   "holds": true,
+   "detail": "[]"
+  },
+  {
+   "check": "bootstrap: every 95% endpoint of fit.json (alpha, beta, log2 n*; 3 weights x 3 models) agrees with this validator's own resampling within 4 sigma of resampling noise",
+   "holds": true,
+   "detail": "48 endpoints"
+  },
+  {
+   "check": "no bootstrap replicate with beta >= 0 (claimed: none)",
+   "holds": true,
+   "detail": "own max fraction 0, fit.json max 0"
+  },
+  {
+   "check": "every recomputed G2.114-G2.123 verdict equals the note's",
+   "holds": true,
+   "detail": "[]"
+  },
+  {
+   "check": "rho below IC on all 33 paired rows at 0, 0.1 and 1 GAE (order holds across the band)",
+   "holds": true,
+   "detail": "min D over rows and weights 1143.3"
+  },
+  {
+   "check": "replay: every required run (nonce-selected IC per size, every walk pool) and every extension run replayed and identical on every non-timing leaf, scalars verified",
+   "holds": true,
+   "detail": "required 44/44, extension 22/22, all 66/66 of 66 recorded runs, 14619/14619 fields"
+  }
+ ],
+ "check_failures": [],
+ "verdicts_recomputed": [
+  {
+   "id": "G2.114",
+   "claimed": "holds",
+   "recomputed": "IC 6040/6040 fields; walks 1670/1670 fields; rho and steps exact on 10/10; every log, row and walk correct at every size: true",
+   "agrees": true
+  },
+  {
+   "id": "G2.115",
+   "claimed": "holds (for the sizes reached)",
+   "recomputed": "33/33 seeds gave h = 16 curves: true; columns/p at p >= 557 in [0.0517, 0.0687]",
+   "agrees": true
+  },
+  {
+   "id": "G2.116",
+   "claimed": "holds",
+   "recomputed": "C median [639101, 667374], E/residual [176172, 176981] at p >= 557",
+   "agrees": true
+  },
+  {
+   "id": "G2.117",
+   "claimed": "holds",
+   "recomputed": "(Weil + solve)/S >= 98.2842 %, solve alone >= 97.6921 %; LA <= 0.00572 %",
+   "agrees": true
+  },
+  {
+   "id": "G2.118",
+   "claimed": "holds",
+   "recomputed": "exponent -0.0658 in [-0.5, 0.5]; per-size median y [968.8, 4272.0] in [400, 6000]",
+   "agrees": true
+  },
+  {
+   "id": "G2.119",
+   "claimed": "steps hold; per step falsified high",
+   "recomputed": "steps/sqrt n [0.468, 0.787] (band [0.4, 0.9]: true); per step at p >= 1549 [95.90, 96.46] (band [66, 80]: false); per-size median per step strictly falling: true",
+   "agrees": true
+  },
+  {
+   "id": "G2.120",
+   "claimed": "level and rho ahead hold; falls with n holds as a trend, falsified read as monotone (3 of 10 steps)",
+   "recomputed": "largest-size median D(0) 1542.2 in [3e2, 5e3]: true; rows with D <= 1 at any weight: 0; per-size median D(0) rises at 3 of 10 steps (p = [149, 269, 773])",
+   "agrees": true
+  },
+  {
+   "id": "G2.121",
+   "claimed": "holds",
+   "recomputed": "beta -0.2427 in [-0.30, -0.15]; own 95% [-0.2788, -0.2048] contains -0.25",
+   "agrees": true
+  },
+  {
+   "id": "G2.122",
+   "claimed": "holds",
+   "recomputed": "M1 log2 n* 85.48 in [74, 96], interval 15.22 bits (> 8); M2 84.02 in [76, 90], interval 1.12 bits (<= 6)",
+   "agrees": true
+  },
+  {
+   "id": "G2.123",
+   "claimed": "holds",
+   "recomputed": "M2 shift +6.83 bits at 0.1 GAE (band [5, 9]), +15.08 at 1 GAE (band [11, 17]); D(0) < D(0.1) < D(1) on 33/33 rows",
+   "agrees": true
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "experiments/36_handover_ladder/binary_commit.txt: 'Build-input commit: e75771052b28668c834d227588389abff164fc7'",
+   "recomputed": "the commit is e757710521b28668c834d227588389abff164fc7 (39 hex digits printed; the tenth digit '1' dropped); the 9-digit prefix e75771052 the note cites is unambiguous",
+   "effect": "none on any number; the record is a typo"
+  },
+  {
+   "id": "E2",
+   "claim": "§9.36: 'the solve is 98.3-99.1 % of S' and G2.117 'solve >= 98.28 %'; summary.json/tables.md `solve_share` / 'solve %'",
+   "recomputed": "these figures are (weil_muls + solve_muls) / S: 98.2842-99.0623 %; the solve alone is 97.6921-98.4498 % of S",
+   "effect": "none on G2.117: its registered quantity is (Weil + solve) / S >= 98 %, which is what the figures measure; only the label 'solve' is wrong"
+  },
+  {
+   "id": "E3",
+   "claim": "§9.36 G2.115: 'columns / p 0.057-0.068 at p >= 557'",
+   "recomputed": "0.0517 (p = 773 seed 2: 40 / 773) to 0.0687 (p = 2213 seed 3: 152 / 2213); folded.columns in summary.json equals the records",
+   "effect": "none on G2.115: the band [0.04, 0.10] holds on every curve with p >= 557; the printed range is wrong at both ends"
+  },
+  {
+   "id": "E4",
+   "claim": "§9.36 fits table: M2 at 0.1 GAE, log2 n* = 90.9",
+   "recomputed": "90.8474 (fit.json 90.84743389821227), i.e. 90.8 to one decimal; the printed 90.9 is consistent with a double rounding 90.847 -> 90.85 -> 90.9",
+   "effect": "none: G2.123's shift (+6.8 bits) and the M2 interval [90.3, 91.4] are computed from the unrounded value; M2 is a sensitivity row"
+  }
+ ],
+ "limitations": [
+  "Replay scope: full. All 33 index-calculus runs and all 33 walk pools (528 walks) were re-executed with the validator's fresh build; the nonce sample (one IC curve per size) and every walk pool ran first, the other 22 IC runs as phase 2. The p = 4337 IC record (unpaired) was not replayed.",
+  "Local 4-vCPU container, one core (taskset -c 3), RAYON_NUM_THREADS=4 as the producer; not isolab-eks (unreachable). Operation counts only: no wall time is compared or claimed.",
+  "The fit is an extrapolation: log2 n* lies 37-66 bits beyond the top rung (2^42.37); the recompute confirms the arithmetic and the resampling, not the model's validity beyond the measured range. The LA term (~p^2) is not modelled; its extrapolated share is a sensitivity.",
+  "Bootstrap intervals are compared within resampling noise (own xoshiro256** streams named by the replay nonce, 20 batches x 10,000 replicates, 4 sigma); E32's own generator (SplitMix64, seed 32) is not re-run, so its exact endpoints are not reproduced digit for digit.",
+  "strongest_available rests on the E25/E27 argument (Aut(E) = {±1}, psi the only Frobenius-type endomorphism, <±psi> the largest fold) and on this validator's j-invariant probe of all 34 instances (replay/j_invariant_probe.json); the probe calls the library's generator and F_p4 arithmetic, so it is a consistency check, not an independent implementation.",
+  "p = 4337 is outside the measurement: its IC run completed but its walk pool was OOM-killed (memory cgroup); it is excluded from every fit and the gate band.",
+  "Unit: F_p multiplications counted by the library's counters; the §5a band prices one native operation per Macaulay entry (IC) or walk step (rho) at 97 F_p multiplications per GAE.",
+  "Not a measured bound in the sense of the autoresearcher ledger (no sealed ECBND1h record): E32 claims a distance measurement and a labelled extrapolation, not an improvement; this gate admits it as evidence only."
+ ],
+ "heuristic_validation_checks": [
+  {
+   "check": "pre-registered prediction",
+   "holds": true,
+   "detail": "the theory slope -1/4 (S ~ p, rho ~ p^2), the fit models M1/M1-all/M2, the bootstrap (10,000 replicates, stratified by size) and the bands G2.114-G2.123 are in §9.34, committed at 246460f094 before the first run (checks above); §9.34 is byte-identical at HEAD"
+  },
+  {
+   "check": "sample integrity",
+   "holds": true,
+   "detail": "sizes, seeds (1-3 per size, replacement rule, none used), rho-run counts and the stopping rule are in §9.34 and run_ladder.sh; every distance, median, fit and interval is recomputed here from the 66 raw records"
+  },
+  {
+   "check": "correspondence validity",
+   "holds": true,
+   "detail": "no substitute sampler: curves are E25's GLS generator itself; the scope is E25's GLS twists (h = 16, p = 1 mod 4) and nothing is transferred to other curve families"
+  },
+  {
+   "check": "scale binding",
+   "holds": true,
+   "detail": "measured p = 101-3089, log2 n = 22.6-42.4; the fitted log2 n* (85.5 [79.2, 94.3] at 0 GAE) lies 37-52 bits beyond the top rung and is labelled an extrapolation in §9.34 and §9.36 (AGENTS.md §6); the measured statement is n* > 2^42.4"
+  },
+  {
+   "check": "null-object control (inventor protocol §3)",
+   "holds": true,
+   "detail": "not applicable: no correlation, bias or excess against a null is claimed; the slope is a cost trend compared with a pre-registered theory slope, and the bootstrap shows no replicate with beta >= 0"
+  }
+ ],
+ "cost_model_checks": [
+  {
+   "check": "unit declared",
+   "holds": true,
+   "detail": "F_p multiplications from the library's counters on both arms; the §5a band adds 97 g per Macaulay entry (IC) or walk step (rho)"
+  },
+  {
+   "check": "optimistic assumptions flagged",
+   "holds": true,
+   "detail": "the walk's [d]G = Q check is excluded (E25's convention, stated); unpriced native work is priced by the band, not assumed free; the LA's p^2 term is not modelled (sensitivity reported, ~5.6 % at M2's n*)"
+  },
+  {
+   "check": "memory reported alongside cost",
+   "holds": false,
+   "detail": "limitation, not a failure of this gate: neither arm's memory is recorded; the only datum is the p = 4337 16-walk pool killed at 4.8 GB, which is why that rung is unpaired. Any extrapolation to 2^85 says nothing about memory"
+  },
+  {
+   "check": "cost bookkeeping (per-attempt x inverse success)",
+   "holds": true,
+   "detail": "success probability 1 in every recorded run (every IC log recovered, 528/528 walks correct); S is the whole run's count including reruns and fallbacks, rho the mean over 16 walks of the full walk cost; nothing is scaled by an assumed success rate"
+  }
+ ],
+ "identity_e27": [
+  {
+   "p": 101,
+   "seed": 1,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "ic_fields_compared": 604,
+   "ic_fields_identical": 604,
+   "ic_mismatches": [],
+   "walk_fields_compared": 167,
+   "walk_fields_identical": 167,
+   "rho_e27_and_walk_steps_exact": true
+  }
+ ],
+ "curves": [
+  {
+   "p": 101,
+   "seed": 1,
+   "n": 6503869,
+   "log2n": 22.632866768472404,
+   "S": 13833208042,
+   "E": 3832401664,
+   "rho": 351834.8125,
+   "steps": 2007.1875,
+   "D": {
+    "0": 39317.337428057945,
+    "0.1": 137373.77244248215,
+    "1": 705496.0541194294
+   },
+   "y": 3527.6666666666665,
+   "columns": 5,
+   "relations": 6,
+   "residuals": 21166,
+   "C_median": 599288,
+   "entries_per_residual": 181064.04913540583,
+   "solve_share": 0.9844889673929188,
+   "weil_plus_solve_share": 0.9906226894292233,
+   "la_share": 0.0000006558131687498552,
+   "steps_per_sqrt_n": 0.7870495067997224,
+   "muls_per_step": 175.28746691577143,
+   "logarithm": 1538068
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "n": 6502501,
+   "log2n": 22.632563285360174,
+   "S": 4659726750,
+   "E": 1288514304,
+   "rho": 272685.75,
+   "steps": 1192.4375,
+   "D": {
+    "0": 17088.26643856527,
+    "0.1": 60362.958680625015,
+    "1": 333835.15893804515
+   },
+   "y": 888.25,
+   "columns": 7,
+   "relations": 8,
+   "residuals": 7106,
+   "C_median": 599333,
+   "entries_per_residual": 181327.653250774,
+   "solve_share": 0.9842105383110715,
+   "weil_plus_solve_share": 0.9903237096467084,
+   "la_share": 0.000003059406863288711,
+   "steps_per_sqrt_n": 0.4676225130624763,
+   "muls_per_step": 228.67928088474238,
+   "logarithm": 557533
+  },
+  {
+   "p": 101,
+   "seed": 3,
+   "n": 6502501,
+   "log2n": 22.632563285360174,
+   "S": 6349033521,
+   "E": 1741088832,
+   "rho": 307115.8125,
+   "steps": 1549.125,
+   "D": {
+    "0": 20673.092242686136,
+    "0.1": 72134.56099380918,
+    "1": 383126.26490910543
+   },
+   "y": 1366,
+   "columns": 6,
+   "relations": 7,
+   "residuals": 9562,
+   "C_median": 599472,
+   "entries_per_residual": 182084.16983894582,
+   "solve_share": 0.9844980052988446,
+   "weil_plus_solve_share": 0.9905354264076187,
+   "la_share": 0.0000015725228047665872,
+   "steps_per_sqrt_n": 0.6074999532872026,
+   "muls_per_step": 198.25114984265312,
+   "logarithm": 4444425
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "n": 30804181,
+   "log2n": 24.876622843008242,
+   "S": 85999708286,
+   "E": 23709225792,
+   "rho": 564610.5,
+   "steps": 4056.625,
+   "D": {
+    "0": 152316.87736235865,
+    "0.1": 523179.2216760467,
+    "1": 2490122.9813961834
+   },
+   "y": 22006,
+   "columns": 5,
+   "relations": 6,
+   "residuals": 132036,
+   "C_median": 610358,
+   "entries_per_residual": 179566.37426156504,
+   "solve_share": 0.9835916282028864,
+   "weil_plus_solve_share": 0.9897478737129213,
+   "la_share": 0.00000011609341704738442,
+   "steps_per_sqrt_n": 0.7309034797177673,
+   "muls_per_step": 139.18232520876344,
+   "logarithm": 4914788
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "n": 30802501,
+   "log2n": 24.876544159086606,
+   "S": 22353365025,
+   "E": 6146620032,
+   "rho": 554206.3125,
+   "steps": 3965.0625,
+   "D": {
+    "0": 40334.0137433025,
+    "0.1": 138316.32504498967,
+    "1": 658888.0059116929
+   },
+   "y": 4272,
+   "columns": 7,
+   "relations": 8,
+   "residuals": 34176,
+   "C_median": 610460,
+   "entries_per_residual": 179851.94382022473,
+   "solve_share": 0.9835318921966202,
+   "weil_plus_solve_share": 0.9896624081545861,
+   "la_share": 0.0000006535033979744175,
+   "steps_per_sqrt_n": 0.7144256640787978,
+   "muls_per_step": 139.7724027048754,
+   "logarithm": 2874927
+  },
+  {
+   "p": 149,
+   "seed": 3,
+   "n": 30805981,
+   "log2n": 24.87670714244814,
+   "S": 3815583944,
+   "E": 1032893568,
+   "rho": 461725.25,
+   "steps": 2988.6875,
+   "D": {
+    "0": 8263.754135170213,
+    "0.1": 28192.81442095212,
+    "1": 138374.65965666025
+   },
+   "y": 438.0769230769231,
+   "columns": 12,
+   "relations": 13,
+   "residuals": 5695,
+   "C_median": 610759,
+   "entries_per_residual": 181368.4930640913,
+   "solve_share": 0.9831507950176027,
+   "weil_plus_solve_share": 0.989135659545589,
+   "la_share": 0.000013162860714669156,
+   "steps_per_sqrt_n": 0.5384718266784441,
+   "muls_per_step": 154.4909763901378,
+   "logarithm": 22721433
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "n": 94129093,
+   "log2n": 26.488137357833217,
+   "S": 24750444620,
+   "E": 6764870784,
+   "rho": 709525.125,
+   "steps": 5454,
+   "D": {
+    "0": 34883.11230698138,
+    "0.1": 118528.67626290544,
+    "1": 549784.5825726484
+   },
+   "y": 3149.5,
+   "columns": 11,
+   "relations": 12,
+   "residuals": 37794,
+   "C_median": 618414,
+   "entries_per_residual": 178993.2471820924,
+   "solve_share": 0.9828142885297387,
+   "weil_plus_solve_share": 0.9889380426411103,
+   "la_share": 0.0000017415444716968483,
+   "steps_per_sqrt_n": 0.562151270605794,
+   "muls_per_step": 130.09261551155114,
+   "logarithm": 79622603
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "n": 94128829,
+   "log2n": 26.488133311560034,
+   "S": 10121590489,
+   "E": 2771075328,
+   "rho": 677271.3125,
+   "steps": 5119.1875,
+   "D": {
+    "0": 14944.66147050928,
+    "0.1": 50900.57078596455,
+    "1": 237611.32640730258
+   },
+   "y": 968.75,
+   "columns": 15,
+   "relations": 16,
+   "residuals": 15500,
+   "C_median": 618436,
+   "entries_per_residual": 178779.05341935484,
+   "solve_share": 0.982536473868203,
+   "weil_plus_solve_share": 0.9886777742959919,
+   "la_share": 0.000008014550686293825,
+   "steps_per_sqrt_n": 0.5276424263232975,
+   "muls_per_step": 132.300548182695,
+   "logarithm": 7399960
+  },
+  {
+   "p": 197,
+   "seed": 3,
+   "n": 94128829,
+   "log2n": 26.488133311560034,
+   "S": 8784981799,
+   "E": 2409703296,
+   "rho": 817464.5625,
+   "steps": 6579.25,
+   "D": {
+    "0": 10746.620957039957,
+    "0.1": 36491.22163819543,
+    "1": 166610.0364306729
+   },
+   "y": 843.0625,
+   "columns": 15,
+   "relations": 16,
+   "residuals": 13489,
+   "C_median": 618244,
+   "entries_per_residual": 178642.10067462377,
+   "solve_share": 0.9825598106512367,
+   "weil_plus_solve_share": 0.9887174456057174,
+   "la_share": 0.00000887696773701648,
+   "steps_per_sqrt_n": 0.6781332845080503,
+   "muls_per_step": 124.24889805068968,
+   "logarithm": 8411066
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "n": 327253141,
+   "log2n": 28.28583179843023,
+   "S": 30691610728,
+   "E": 8405358528,
+   "rho": 1117087.875,
+   "steps": 9565.4375,
+   "D": {
+    "0": 27474.66104938253,
+    "0.1": 92756.5321426529,
+    "1": 413710.58672253235
+   },
+   "y": 2950.4375,
+   "columns": 15,
+   "relations": 16,
+   "residuals": 47207,
+   "C_median": 622486,
+   "entries_per_residual": 178053.22363208845,
+   "solve_share": 0.9819631118449261,
+   "weil_plus_solve_share": 0.9881320565014303,
+   "la_share": 0.000002273455134641834,
+   "steps_per_sqrt_n": 0.5287652751146806,
+   "muls_per_step": 116.78377230523957,
+   "logarithm": 270725152
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "n": 327248941,
+   "log2n": 28.285813282616946,
+   "S": 9773820165,
+   "E": 2681474880,
+   "rho": 1107117.8125,
+   "steps": 9478.4375,
+   "D": {
+    "0": 8828.166302310306,
+    "0.1": 29843.51625708886,
+    "1": 133172.1627218004
+   },
+   "y": 718.047619047619,
+   "columns": 20,
+   "relations": 21,
+   "residuals": 15079,
+   "C_median": 622584,
+   "entries_per_residual": 177828.4289409112,
+   "solve_share": 0.9815792650201683,
+   "weil_plus_solve_share": 0.9877670629312219,
+   "la_share": 0.000014227394985019147,
+   "steps_per_sqrt_n": 0.5239593875418042,
+   "muls_per_step": 116.803831063928,
+   "logarithm": 309622187
+  },
+  {
+   "p": 269,
+   "seed": 3,
+   "n": 327258709,
+   "log2n": 28.285856344742072,
+   "S": 21251404052,
+   "E": 5809308288,
+   "rho": 1213479.1875,
+   "steps": 10580.8125,
+   "D": {
+    "0": 17512.78824631675,
+    "0.1": 58962.786927800575,
+    "1": 261072.24247148653
+   },
+   "y": 1917.8235294117646,
+   "columns": 16,
+   "relations": 17,
+   "residuals": 32603,
+   "C_median": 622689,
+   "entries_per_residual": 178183.24350519892,
+   "solve_share": 0.9818805919337005,
+   "weil_plus_solve_share": 0.9880336839214129,
+   "la_share": 0.000002821084190639998,
+   "steps_per_sqrt_n": 0.5848889439136294,
+   "muls_per_step": 114.68676791125445,
+   "logarithm": 291579638
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "n": 1552521829,
+   "log2n": 30.531966407371566,
+   "S": 16188662103,
+   "E": 4394191872,
+   "rho": 2532750.875,
+   "steps": 24193.5625,
+   "D": {
+    "0": 6391.730928925254,
+    "0.1": 21251.614891748253,
+    "1": 90669.71546396094
+   },
+   "y": 799.6451612903226,
+   "columns": 30,
+   "relations": 31,
+   "residuals": 24789,
+   "C_median": 632355,
+   "entries_per_residual": 177263.78119327122,
+   "solve_share": 0.9807526675757685,
+   "weil_plus_solve_share": 0.9868948125144521,
+   "la_share": 0.0000132052913724343,
+   "steps_per_sqrt_n": 0.6140178056965002,
+   "muls_per_step": 104.68697509926453,
+   "logarithm": 1275612762
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "n": 1552521829,
+   "log2n": 30.531966407371566,
+   "S": 22044076955,
+   "E": 5982337536,
+   "rho": 2268122.8125,
+   "steps": 21438.8125,
+   "D": {
+    "0": 9719.08436064901,
+    "0.1": 32338.5245603062,
+    "1": 138540.50012321206
+   },
+   "y": 1349.04,
+   "columns": 24,
+   "relations": 25,
+   "residuals": 33726,
+   "C_median": 631969,
+   "entries_per_residual": 177380.58281444584,
+   "solve_share": 0.9810605886627835,
+   "weil_plus_solve_share": 0.9871973568421069,
+   "la_share": 0.000008095780121086953,
+   "steps_per_sqrt_n": 0.5441039370695696,
+   "muls_per_step": 105.79516997501611,
+   "logarithm": 1421554453
+  },
+  {
+   "p": 397,
+   "seed": 3,
+   "n": 1552548229,
+   "log2n": 30.531990939603283,
+   "S": 24496874737,
+   "E": 6645569280,
+   "rho": 2799809.1875,
+   "steps": 26987.9375,
+   "D": {
+    "0": 8749.480088274766,
+    "0.1": 29056.41623264124,
+    "1": 123507.13649591786
+   },
+   "y": 1440.923076923077,
+   "columns": 25,
+   "relations": 26,
+   "residuals": 37464,
+   "C_median": 632179,
+   "entries_per_residual": 177385.47085201793,
+   "solve_share": 0.9810073393853269,
+   "weil_plus_solve_share": 0.9871417521466832,
+   "la_share": 0.000008014736659589264,
+   "steps_per_sqrt_n": 0.6849315091006132,
+   "muls_per_step": 103.74298471307783,
+   "logarithm": 315298380
+  },
+  {
+   "p": 557,
+   "seed": 1,
+   "n": 6015876613,
+   "log2n": 32.48612783130126,
+   "S": 35673748223,
+   "E": 9627016896,
+   "rho": 4802106.1875,
+   "steps": 47763.0625,
+   "D": {
+    "0": 7428.771216234169,
+    "0.1": 24510.126227331468,
+    "1": 102753.75969624986
+   },
+   "y": 1472.1891891891892,
+   "columns": 36,
+   "relations": 37,
+   "residuals": 54471,
+   "C_median": 639151,
+   "entries_per_residual": 176736.5551577904,
+   "solve_share": 0.9802597229593617,
+   "weil_plus_solve_share": 0.9863848310257779,
+   "la_share": 0.000010940481991414878,
+   "steps_per_sqrt_n": 0.6158042831570176,
+   "muls_per_step": 100.54016505955832,
+   "logarithm": 2865689438
+  },
+  {
+   "p": 557,
+   "seed": 2,
+   "n": 6015919069,
+   "log2n": 32.486138012833976,
+   "S": 28160491908,
+   "E": 7583968896,
+   "rho": 5649112.125,
+   "steps": 56590.8125,
+   "D": {
+    "0": 4984.941223484743,
+    "0.1": 16412.436973512817,
+    "1": 68573.94590363136
+   },
+   "y": 1128.078947368421,
+   "columns": 37,
+   "relations": 38,
+   "residuals": 42867,
+   "C_median": 639272,
+   "entries_per_residual": 176918.58296591783,
+   "solve_share": 0.9802038140235174,
+   "weil_plus_solve_share": 0.9863101300481729,
+   "la_share": 0.000012146946904106615,
+   "steps_per_sqrt_n": 0.7296169870931972,
+   "muls_per_step": 99.82383845434275,
+   "logarithm": 1861961401
+  },
+  {
+   "p": 557,
+   "seed": 3,
+   "n": 6015919069,
+   "log2n": 32.486138012833976,
+   "S": 28707543916,
+   "E": 7729823808,
+   "rho": 4444193.0625,
+   "steps": 44004.5,
+   "D": {
+    "0": 6459.562740024416,
+    "0.1": 21286.3997899092,
+    "1": 89353.09916569175
+   },
+   "y": 1180.4324324324325,
+   "columns": 36,
+   "relations": 37,
+   "residuals": 43676,
+   "C_median": 639101,
+   "entries_per_residual": 176981.03782397654,
+   "solve_share": 0.9803137921288689,
+   "weil_plus_solve_share": 0.9864167876868537,
+   "la_share": 0.000014081316088301756,
+   "steps_per_sqrt_n": 0.5673435190304539,
+   "muls_per_step": 100.99405884625436,
+   "logarithm": 261503468
+  },
+  {
+   "p": 773,
+   "seed": 1,
+   "n": 22314983293,
+   "log2n": 34.37729367533276,
+   "S": 67185127421,
+   "E": 18034665600,
+   "rho": 8807026.4375,
+   "steps": 89426.1875,
+   "D": {
+    "0": 7628.582461718084,
+    "0.1": 25026.861687628494,
+    "1": 103913.36842184671
+   },
+   "y": 2268.2,
+   "columns": 44,
+   "relations": 45,
+   "residuals": 102069,
+   "C_median": 642441,
+   "entries_per_residual": 176690.92084766188,
+   "solve_share": 0.9796542109024454,
+   "weil_plus_solve_share": 0.9857486762955707,
+   "la_share": 0.000006822700463566038,
+   "steps_per_sqrt_n": 0.5986409658252011,
+   "muls_per_step": 98.48375161358635,
+   "logarithm": 14822397573
+  },
+  {
+   "p": 773,
+   "seed": 2,
+   "n": 22315074949,
+   "log2n": 34.37729960100984,
+   "S": 106687498191,
+   "E": 28666071168,
+   "rho": 9308311.5625,
+   "steps": 94679.5,
+   "D": {
+    "0": 11461.530641153804,
+    "0.1": 37621.93928355087,
+    "1": 156135.7113056942
+   },
+   "y": 3958.5365853658536,
+   "columns": 40,
+   "relations": 41,
+   "residuals": 162300,
+   "C_median": 642363,
+   "entries_per_residual": 176623.97515711645,
+   "solve_share": 0.9797302206943829,
+   "weil_plus_solve_share": 0.9858328831060029,
+   "la_share": 0.0000038217036383218455,
+   "steps_per_sqrt_n": 0.633806634362015,
+   "muls_per_step": 98.3139070495725,
+   "logarithm": 9484412546
+  },
+  {
+   "p": 773,
+   "seed": 3,
+   "n": 22315074949,
+   "log2n": 34.37729960100984,
+   "S": 57595494582,
+   "E": 15463338240,
+   "rho": 8835541.625,
+   "steps": 89760.0625,
+   "D": {
+    "0": 6518.6150466469,
+    "0.1": 21387.31647212632,
+    "1": 88787.79708576945
+   },
+   "y": 1785.795918367347,
+   "columns": 48,
+   "relations": 49,
+   "residuals": 87504,
+   "C_median": 642291,
+   "entries_per_residual": 176715.78716401535,
+   "solve_share": 0.9797190280511098,
+   "weil_plus_solve_share": 0.9858137571535786,
+   "la_share": 0.0000107191717769005,
+   "steps_per_sqrt_n": 0.6008747734541174,
+   "muls_per_step": 98.43510999115001,
+   "logarithm": 4494919666
+  },
+  {
+   "p": 1093,
+   "seed": 1,
+   "n": 89199024469,
+   "log2n": 36.37630888097625,
+   "S": 112899613521,
+   "E": 29865127488,
+   "rho": 22312348.25,
+   "steps": 230375.3125,
+   "D": {
+    "0": 5059.9610698080605,
+    "0.1": 16400.844671510826,
+    "1": 67395.90202948132
+   },
+   "y": 2819.866666666667,
+   "columns": 59,
+   "relations": 60,
+   "residuals": 169192,
+   "C_median": 652682,
+   "entries_per_residual": 176516.19159298312,
+   "solve_share": 0.9790972400931998,
+   "weil_plus_solve_share": 0.9851091849336818,
+   "la_share": 0.000008456220267064239,
+   "steps_per_sqrt_n": 0.7713578168744324,
+   "muls_per_step": 96.85216704806423,
+   "logarithm": 34149132946
+  },
+  {
+   "p": 1093,
+   "seed": 2,
+   "n": 89199116269,
+   "log2n": 36.37631036573841,
+   "S": 72362948496,
+   "E": 19160139264,
+   "rho": 19720190.125,
+   "steps": 203315.4375,
+   "D": {
+    "0": 3669.485336465538,
+    "0.1": 11903.565124071065,
+    "1": 48955.602076713054
+   },
+   "y": 1508.3333333333333,
+   "columns": 71,
+   "relations": 72,
+   "residuals": 108600,
+   "C_median": 652640,
+   "entries_per_residual": 176428.53834254143,
+   "solve_share": 0.9790311706399875,
+   "weil_plus_solve_share": 0.9850517976881527,
+   "la_share": 0.00001842335100640203,
+   "steps_per_sqrt_n": 0.6807538082273901,
+   "muls_per_step": 96.9930781817785,
+   "logarithm": 21259903030
+  },
+  {
+   "p": 1093,
+   "seed": 3,
+   "n": 89199083269,
+   "log2n": 36.37630983200055,
+   "S": 72983204297,
+   "E": 19314239616,
+   "rho": 16694589.5,
+   "steps": 171697.25,
+   "D": {
+    "0": 4371.668096241599,
+    "0.1": 14179.225465937625,
+    "1": 58366.11130761661
+   },
+   "y": 1563.442857142857,
+   "columns": 69,
+   "relations": 70,
+   "residuals": 109441,
+   "C_median": 652646,
+   "entries_per_residual": 176480.84005080364,
+   "solve_share": 0.9790444665079899,
+   "weil_plus_solve_share": 0.9850601634375648,
+   "la_share": 0.000018438653289648945,
+   "steps_per_sqrt_n": 0.5748878681223001,
+   "muls_per_step": 97.23271339523492,
+   "logarithm": 73670974494
+  },
+  {
+   "p": 1549,
+   "seed": 1,
+   "n": 359820157189,
+   "log2n": 38.38848505264622,
+   "S": 93879028038,
+   "E": 24790819200,
+   "rho": 39642098.3125,
+   "steps": 411291.3125,
+   "D": {
+    "0": 2368.164956807999,
+    "0.1": 7663.019234460374,
+    "1": 31414.025155906107
+   },
+   "y": 1391.5346534653465,
+   "columns": 100,
+   "relations": 101,
+   "residuals": 140545,
+   "C_median": 654046,
+   "entries_per_residual": 176390.616528514,
+   "solve_share": 0.9782019914163185,
+   "weil_plus_solve_share": 0.984207983252661,
+   "la_share": 0.000029481174420337153,
+   "steps_per_sqrt_n": 0.6856568067384703,
+   "muls_per_step": 96.38447763834058,
+   "logarithm": 12315842101
+  },
+  {
+   "p": 1549,
+   "seed": 2,
+   "n": 359820028429,
+   "log2n": 38.38848453638429,
+   "S": 132629964142,
+   "E": 35028063168,
+   "rho": 35683114,
+   "steps": 369943.9375,
+   "D": {
+    "0": 3716.883121299335,
+    "0.1": 12029.113542976746,
+    "1": 49328.86313817224
+   },
+   "y": 2182.5384615384614,
+   "columns": 90,
+   "relations": 91,
+   "residuals": 198611,
+   "C_median": 654082,
+   "entries_per_residual": 176365.17195925704,
+   "solve_share": 0.9782155446720425,
+   "weil_plus_solve_share": 0.9842231260972092,
+   "la_share": 0.00001775067960871499,
+   "steps_per_sqrt_n": 0.6167274059383024,
+   "muls_per_step": 96.45546360656336,
+   "logarithm": 40240660139
+  },
+  {
+   "p": 1549,
+   "seed": 3,
+   "n": 359820062101,
+   "log2n": 38.38848467139185,
+   "S": 84910979921,
+   "E": 22423756992,
+   "rho": 40964592.5,
+   "steps": 425158.625,
+   "D": {
+    "0": 2072.7895662821497,
+    "0.1": 6707.265555555887,
+    "1": 27492.439414265224
+   },
+   "y": 1284.111111111111,
+   "columns": 98,
+   "relations": 99,
+   "residuals": 127127,
+   "C_median": 654042,
+   "entries_per_residual": 176388.6270579814,
+   "solve_share": 0.9782081661791967,
+   "weil_plus_solve_share": 0.9842145263163015,
+   "la_share": 0.000023665066660042555,
+   "steps_per_sqrt_n": 0.7087748630557482,
+   "muls_per_step": 96.35131475928543,
+   "logarithm": 125079070748
+  },
+  {
+   "p": 2213,
+   "seed": 1,
+   "n": 1499013458989,
+   "log2n": 40.44715047532272,
+   "S": 128555555607,
+   "E": 33294240000,
+   "rho": 79676897.125,
+   "steps": 829360.3125,
+   "D": {
+    "0": 1613.4608681525008,
+    "0.1": 5147.069926589769,
+    "1": 20971.74104673376
+   },
+   "y": 1368.804347826087,
+   "columns": 137,
+   "relations": 138,
+   "residuals": 188895,
+   "C_median": 667353,
+   "entries_per_residual": 176257.9210672596,
+   "solve_share": 0.9777287197470281,
+   "weil_plus_solve_share": 0.9836235917766485,
+   "la_share": 0.000037382624012698226,
+   "steps_per_sqrt_n": 0.6773926546969928,
+   "muls_per_step": 96.07030373182947,
+   "logarithm": 551154564982
+  },
+  {
+   "p": 2213,
+   "seed": 2,
+   "n": 1499013419989,
+   "log2n": 40.44715043778797,
+   "S": 151094139840,
+   "E": 39121736640,
+   "rho": 73685247.375,
+   "steps": 766822.3125,
+   "D": {
+    "0": 2050.534472267557,
+    "0.1": 6540.34260826061,
+    "1": 26649.43763603435
+   },
+   "y": 1573.900709219858,
+   "columns": 140,
+   "relations": 141,
+   "residuals": 221920,
+   "C_median": 667355,
+   "entries_per_residual": 176287.56596971882,
+   "solve_share": 0.9777657160856306,
+   "weil_plus_solve_share": 0.9836581302053494,
+   "la_share": 0.00003403790514606367,
+   "steps_per_sqrt_n": 0.6263137997725491,
+   "muls_per_step": 96.09168404968655,
+   "logarithm": 1321661952886
+  },
+  {
+   "p": 2213,
+   "seed": 3,
+   "n": 1499013698989,
+   "log2n": 40.44715070630583,
+   "S": 103195449287,
+   "E": 26710168128,
+   "rho": 76944275,
+   "steps": 800903.0625,
+   "D": {
+    "0": 1341.17124746448,
+    "0.1": 4276.60372910559,
+    "1": 17422.55152038831
+   },
+   "y": 990.2418300653595,
+   "columns": 152,
+   "relations": 153,
+   "residuals": 151507,
+   "C_median": 667374,
+   "entries_per_residual": 176296.5944015788,
+   "solve_share": 0.9776203180376972,
+   "weil_plus_solve_share": 0.9835103410493667,
+   "la_share": 0.000057164071097688734,
+   "steps_per_sqrt_n": 0.6541497103904397,
+   "muls_per_step": 96.0718950927972,
+   "logarithm": 997281917140
+  },
+  {
+   "p": 3089,
+   "seed": 1,
+   "n": 5690515981729,
+   "log2n": 42.37169661201176,
+   "S": 194565885707,
+   "E": 50588551104,
+   "rho": 114333039.875,
+   "steps": 1191287.375,
+   "D": {
+    "0": 1701.746808444159,
+    "0.1": 5443.505023856179,
+    "1": 22191.92486585047
+   },
+   "y": 1495.59375,
+   "columns": 191,
+   "relations": 192,
+   "residuals": 287154,
+   "C_median": 664732,
+   "entries_per_residual": 176172.19716249817,
+   "solve_share": 0.9769213455191109,
+   "weil_plus_solve_share": 0.98284237475717,
+   "la_share": 0.00004633650944121107,
+   "steps_per_sqrt_n": 0.4993910049494739,
+   "muls_per_step": 95.9743570479793,
+   "logarithm": 4753176148990
+  },
+  {
+   "p": 3089,
+   "seed": 2,
+   "n": 5690514846529,
+   "log2n": 42.37169632420876,
+   "S": 178850626888,
+   "E": 46489098432,
+   "rho": 156438177,
+   "steps": 1631224.6875,
+   "D": {
+    "0": 1143.2671379697808,
+    "0.1": 3656.0491070287358,
+    "1": 14899.222341796987
+   },
+   "y": 1359.9381443298969,
+   "columns": 193,
+   "relations": 194,
+   "residuals": 263828,
+   "C_median": 664721,
+   "entries_per_residual": 176209.8732204315,
+   "solve_share": 0.9769328890438639,
+   "weil_plus_solve_share": 0.9828509554404822,
+   "la_share": 0.000050874096212689814,
+   "steps_per_sqrt_n": 0.6838140270252764,
+   "muls_per_step": 95.90228629984489,
+   "logarithm": 93802689116
+  },
+  {
+   "p": 3089,
+   "seed": 3,
+   "n": 5690515547809,
+   "log2n": 42.371696502001654,
+   "S": 234999559624,
+   "E": 61103297472,
+   "rho": 152375199.5,
+   "steps": 1588676.75,
+   "D": {
+    "0": 1542.2428347599964,
+    "0.1": 4933.097413822862,
+    "1": 20105.98689596759
+   },
+   "y": 1948.2191011235955,
+   "columns": 177,
+   "relations": 178,
+   "residuals": 346783,
+   "C_median": 664704,
+   "entries_per_residual": 176200.38315603707,
+   "solve_share": 0.9770387318613131,
+   "weil_plus_solve_share": 0.9829589852406216,
+   "la_share": 0.00003389650607322451,
+   "steps_per_sqrt_n": 0.6659777696132274,
+   "muls_per_step": 95.91328097424476,
+   "logarithm": 2448607092683
+  }
+ ],
+ "per_size": [
+  {
+   "p": 101,
+   "curves": 3,
+   "log2n_mean": 22.632664446397584,
+   "y_median": 1366,
+   "C_median_median": 599333,
+   "muls_per_step_median": 198.25114984265312,
+   "D": {
+    "0": {
+     "median": 20673.092242686136,
+     "min": 17088.26643856527,
+     "max": 39317.337428057945,
+     "median_S_g": 6349033521,
+     "median_rho_g": 307115.8125
+    },
+    "0.1": {
+     "median": 72134.56099380918,
+     "min": 60362.958680625015,
+     "max": 137373.77244248215,
+     "median_S_g": 23237595191.4,
+     "median_rho_g": 322142.325
+    },
+    "1": {
+     "median": 383126.26490910543,
+     "min": 333835.15893804515,
+     "max": 705496.0541194294,
+     "median_S_g": 175234650225,
+     "median_rho_g": 457380.9375
+    }
+   }
+  },
+  {
+   "p": 149,
+   "curves": 3,
+   "log2n_mean": 24.87662471484766,
+   "y_median": 4272,
+   "C_median_median": 610460,
+   "muls_per_step_median": 139.7724027048754,
+   "D": {
+    "0": {
+     "median": 40334.0137433025,
+     "min": 8263.754135170213,
+     "max": 152316.87736235865,
+     "median_S_g": 22353365025,
+     "median_rho_g": 554206.3125
+    },
+    "0.1": {
+     "median": 138316.32504498967,
+     "min": 28192.81442095212,
+     "max": 523179.2216760467,
+     "median_S_g": 81975579335.40001,
+     "median_rho_g": 592667.41875
+    },
+    "1": {
+     "median": 658888.0059116929,
+     "min": 138374.65965666025,
+     "max": 2490122.9813961834,
+     "median_S_g": 618575508129,
+     "median_rho_g": 938817.375
+    }
+   }
+  },
+  {
+   "p": 197,
+   "curves": 3,
+   "log2n_mean": 26.48813466031776,
+   "y_median": 968.75,
+   "C_median_median": 618414,
+   "muls_per_step_median": 130.09261551155114,
+   "D": {
+    "0": {
+     "median": 14944.66147050928,
+     "min": 10746.620957039957,
+     "max": 34883.11230698138,
+     "median_S_g": 10121590489,
+     "median_rho_g": 709525.125
+    },
+    "0.1": {
+     "median": 50900.57078596455,
+     "min": 36491.22163819543,
+     "max": 118528.67626290544,
+     "median_S_g": 37001021170.600006,
+     "median_rho_g": 762428.925
+    },
+    "1": {
+     "median": 237611.32640730258,
+     "min": 166610.0364306729,
+     "max": 549784.5825726484,
+     "median_S_g": 278915897305,
+     "median_rho_g": 1238563.125
+    }
+   }
+  },
+  {
+   "p": 269,
+   "curves": 3,
+   "log2n_mean": 28.28583380859642,
+   "y_median": 1917.8235294117646,
+   "C_median_median": 622584,
+   "muls_per_step_median": 116.78377230523957,
+   "D": {
+    "0": {
+     "median": 17512.78824631675,
+     "min": 8828.166302310306,
+     "max": 27474.66104938253,
+     "median_S_g": 21251404052,
+     "median_rho_g": 1117087.875
+    },
+    "0.1": {
+     "median": 58962.786927800575,
+     "min": 29843.51625708886,
+     "max": 92756.5321426529,
+     "median_S_g": 77601694445.6,
+     "median_rho_g": 1209872.61875
+    },
+    "1": {
+     "median": 261072.24247148653,
+     "min": 133172.1627218004,
+     "max": 413710.58672253235,
+     "median_S_g": 584754307988,
+     "median_rho_g": 2044935.3125
+    }
+   }
+  },
+  {
+   "p": 397,
+   "curves": 3,
+   "log2n_mean": 30.531974584782137,
+   "y_median": 1349.04,
+   "C_median_median": 632179,
+   "muls_per_step_median": 104.68697509926453,
+   "D": {
+    "0": {
+     "median": 8749.480088274766,
+     "min": 6391.730928925254,
+     "max": 9719.08436064901,
+     "median_S_g": 22044076955,
+     "median_rho_g": 2532750.875
+    },
+    "0.1": {
+     "median": 29056.41623264124,
+     "min": 21251.614891748253,
+     "max": 32338.5245603062,
+     "median_S_g": 80072751054.20001,
+     "median_rho_g": 2767428.43125
+    },
+    "1": {
+     "median": 123507.13649591786,
+     "min": 90669.71546396094,
+     "max": 138540.50012321206,
+     "median_S_g": 602330817947,
+     "median_rho_g": 4879526.4375
+    }
+   }
+  },
+  {
+   "p": 557,
+   "curves": 3,
+   "log2n_mean": 32.48613461898974,
+   "y_median": 1180.4324324324325,
+   "C_median_median": 639151,
+   "muls_per_step_median": 100.54016505955832,
+   "D": {
+    "0": {
+     "median": 6459.562740024416,
+     "min": 4984.941223484743,
+     "max": 7428.771216234169,
+     "median_S_g": 28707543916,
+     "median_rho_g": 4802106.1875
+    },
+    "0.1": {
+     "median": 21286.3997899092,
+     "min": 16412.436973512817,
+     "max": 24510.126227331468,
+     "median_S_g": 103686834853.6,
+     "median_rho_g": 5265407.89375
+    },
+    "1": {
+     "median": 89353.09916569175,
+     "min": 68573.94590363136,
+     "max": 102753.75969624986,
+     "median_S_g": 778500453292,
+     "median_rho_g": 9435123.25
+    }
+   }
+  },
+  {
+   "p": 773,
+   "curves": 3,
+   "log2n_mean": 34.377297625784145,
+   "y_median": 2268.2,
+   "C_median_median": 642363,
+   "muls_per_step_median": 98.43510999115001,
+   "D": {
+    "0": {
+     "median": 7628.582461718084,
+     "min": 6518.6150466469,
+     "max": 11461.530641153804,
+     "median_S_g": 67185127421,
+     "median_rho_g": 8835541.625
+    },
+    "0.1": {
+     "median": 25026.861687628494,
+     "min": 21387.31647212632,
+     "max": 37621.93928355087,
+     "median_S_g": 242121383741.00003,
+     "median_rho_g": 9706214.23125
+    },
+    "1": {
+     "median": 103913.36842184671,
+     "min": 88787.79708576945,
+     "max": 156135.7113056942,
+     "median_S_g": 1816547690621,
+     "median_rho_g": 17542267.6875
+    }
+   }
+  },
+  {
+   "p": 1093,
+   "curves": 3,
+   "log2n_mean": 36.37630969290507,
+   "y_median": 1563.442857142857,
+   "C_median_median": 652646,
+   "muls_per_step_median": 96.9930781817785,
+   "D": {
+    "0": {
+     "median": 4371.668096241599,
+     "min": 3669.485336465538,
+     "max": 5059.9610698080605,
+     "median_S_g": 72983204297,
+     "median_rho_g": 19720190.125
+    },
+    "0.1": {
+     "median": 14179.225465937625,
+     "min": 11903.565124071065,
+     "max": 16400.844671510826,
+     "median_S_g": 260331328572.2,
+     "median_rho_g": 21692349.86875
+    },
+    "1": {
+     "median": 58366.11130761661,
+     "min": 48955.602076713054,
+     "max": 67395.90202948132,
+     "median_S_g": 1946464447049,
+     "median_rho_g": 39441787.5625
+    }
+   }
+  },
+  {
+   "p": 1549,
+   "curves": 3,
+   "log2n_mean": 38.38848475347412,
+   "y_median": 1391.5346534653465,
+   "C_median_median": 654046,
+   "muls_per_step_median": 96.38447763834058,
+   "D": {
+    "0": {
+     "median": 2368.164956807999,
+     "min": 2072.7895662821497,
+     "max": 3716.883121299335,
+     "median_S_g": 93879028038,
+     "median_rho_g": 39642098.3125
+    },
+    "0.1": {
+     "median": 7663.019234460374,
+     "min": 6707.265555555887,
+     "max": 12029.113542976746,
+     "median_S_g": 334349974278,
+     "median_rho_g": 43631624.04375
+    },
+    "1": {
+     "median": 31414.025155906107,
+     "min": 27492.439414265224,
+     "max": 49328.86313817224,
+     "median_S_g": 2498588490438,
+     "median_rho_g": 79537355.625
+    }
+   }
+  },
+  {
+   "p": 2213,
+   "curves": 3,
+   "log2n_mean": 40.447150539805506,
+   "y_median": 1368.804347826087,
+   "C_median_median": 667355,
+   "muls_per_step_median": 96.0718950927972,
+   "D": {
+    "0": {
+     "median": 1613.4608681525008,
+     "min": 1341.17124746448,
+     "max": 2050.534472267557,
+     "median_S_g": 128555555607,
+     "median_rho_g": 76944275
+    },
+    "0.1": {
+     "median": 5147.069926589769,
+     "min": 4276.60372910559,
+     "max": 6540.34260826061,
+     "median_S_g": 451509683607.00006,
+     "median_rho_g": 84713034.70625
+    },
+    "1": {
+     "median": 20971.74104673376,
+     "min": 17422.55152038831,
+     "max": 26649.43763603435,
+     "median_S_g": 3358096835607,
+     "median_rho_g": 154631872.0625
+    }
+   }
+  },
+  {
+   "p": 3089,
+   "curves": 3,
+   "log2n_mean": 42.37169647940739,
+   "y_median": 1495.59375,
+   "C_median_median": 664721,
+   "muls_per_step_median": 95.91328097424476,
+   "D": {
+    "0": {
+     "median": 1542.2428347599964,
+     "min": 1143.2671379697808,
+     "max": 1701.746808444159,
+     "median_S_g": 194565885707,
+     "median_rho_g": 152375199.5
+    },
+    "0.1": {
+     "median": 4933.097413822862,
+     "min": 3656.0491070287358,
+     "max": 5443.505023856179,
+     "median_S_g": 685274831415.8,
+     "median_rho_g": 167785363.975
+    },
+    "1": {
+     "median": 20105.98689596759,
+     "min": 14899.222341796987,
+     "max": 22191.92486585047,
+     "median_S_g": 5101655342795,
+     "median_rho_g": 306476844.25
+    }
+   }
+  }
+ ],
+ "fits": {
+  "0": {
+   "M1": {
+    "curves": 24,
+    "alpha": 12.978842840506186,
+    "beta": -0.24268911354100017,
+    "beta_se": 0.021132796467862914,
+    "beta_ols_ci95": [
+     -0.2841093946180115,
+     -0.20126883246398886
+    ],
+    "log2_nstar": 85.47929559400498,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      12.743989645251789,
+      13.19898667229657
+     ],
+     "beta": [
+      -0.2787626571999326,
+      -0.204768132223459
+     ],
+     "log2_nstar": [
+      79.196797550397,
+      94.4201575305672
+     ]
+    }
+   },
+   "M1_all": {
+    "curves": 33,
+    "alpha": 12.934638174085121,
+    "beta": -0.23210688335727822,
+    "beta_se": 0.021398779976701292,
+    "beta_ols_ci95": [
+     -0.27404849211161275,
+     -0.1901652746029437
+    ],
+    "log2_nstar": 87.72707705602616,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      12.695570651277071,
+      13.170144510711904
+     ],
+     "beta": [
+      -0.2720697005086644,
+      -0.1914994143263492
+     ],
+     "log2_nstar": [
+      80.25564515477028,
+      98.482429159674
+     ]
+    }
+   },
+   "M2": {
+    "curves": 24,
+    "alpha": 13.003759147678494,
+    "beta": -0.25,
+    "beta_se": 0,
+    "beta_ols_ci95": [
+     -0.25,
+     -0.25
+    ],
+    "log2_nstar": 84.01503659071398,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      12.863454353854559,
+      13.142539708186224
+     ],
+     "beta": [
+      -0.25,
+      -0.25
+     ],
+     "log2_nstar": [
+      83.45381741541823,
+      84.5701588327449
+     ]
+    }
+   }
+  },
+  "0.1": {
+   "M1": {
+    "curves": 24,
+    "alpha": 14.705980844552855,
+    "beta": -0.2482753991078046,
+    "beta_se": 0.02117682428791458,
+    "beta_ols_ci95": [
+     -0.2897819747121172,
+     -0.20676882350349202
+    ],
+    "log2_nstar": 91.23253329729746,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      14.471111231226285,
+      14.926109631994564
+     ],
+     "beta": [
+      -0.2842190536046708,
+      -0.21047523079471656
+     ],
+     "log2_nstar": [
+      84.36657209145761,
+      100.93763036311242
+     ]
+    }
+   },
+   "M1_all": {
+    "curves": 33,
+    "alpha": 14.666491991178319,
+    "beta": -0.23865568821119046,
+    "beta_se": 0.021385314915031133,
+    "beta_ols_ci95": [
+     -0.28057090544465146,
+     -0.19674047097772945
+    ],
+    "log2_nstar": 93.45460894357436,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      14.427954149228091,
+      14.901999267527245
+     ],
+     "beta": [
+      -0.2788335542288435,
+      -0.19798522708417665
+     ],
+     "log2_nstar": [
+      85.29912504042818,
+      105.063362192597
+     ]
+    }
+   },
+   "M2": {
+    "curves": 24,
+    "alpha": 14.71185847455307,
+    "beta": -0.25,
+    "beta_se": 0,
+    "beta_ols_ci95": [
+     -0.25,
+     -0.25
+    ],
+    "log2_nstar": 90.84743389821227,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      14.5718219187035,
+      14.84941535312943
+     ],
+     "beta": [
+      -0.25,
+      -0.25
+     ],
+     "log2_nstar": [
+      90.287287674814,
+      91.39766141251769
+     ]
+    }
+   }
+  },
+  "1": {
+   "M1": {
+    "curves": 24,
+    "alpha": 16.79513220462907,
+    "beta": -0.2562185501179678,
+    "beta_se": 0.021180528579398054,
+    "beta_ols_ci95": [
+     -0.297732386133588,
+     -0.2147047141023476
+    ],
+    "log2_nstar": 97.55002437136686,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      16.561013557746897,
+      17.016490221681128
+     ],
+     "beta": [
+      -0.2921789854031098,
+      -0.21825059149150544
+     ],
+     "log2_nstar": [
+      90.0939406523168,
+      108.05192024721892
+     ]
+    }
+   },
+   "M1_all": {
+    "curves": 33,
+    "alpha": 16.80039920545235,
+    "beta": -0.25554354554729064,
+    "beta_se": 0.021018932616723548,
+    "beta_ols_ci95": [
+     -0.2967406534760688,
+     -0.2143464376185125
+    ],
+    "log2_nstar": 97.7437822171223,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      16.563203295906153,
+      17.034571419814167
+     ],
+     "beta": [
+      -0.2948495169403587,
+      -0.21551182131874147
+     ],
+     "log2_nstar": [
+      89.62058563673853,
+      109.0116965656963
+     ]
+    }
+   },
+   "M2": {
+    "curves": 24,
+    "alpha": 16.773938700151245,
+    "beta": -0.25,
+    "beta_se": 0,
+    "beta_ols_ci95": [
+     -0.25,
+     -0.25
+    ],
+    "log2_nstar": 99.09575480060498,
+    "bootstrap_ci95_mean_of_batches": {
+     "alpha": [
+      16.63323624461732,
+      16.91256832401216
+     ],
+     "beta": [
+      -0.25,
+      -0.25
+     ],
+     "log2_nstar": [
+      98.53294497846927,
+      99.65027329604864
+     ]
+    }
+   }
+  }
+ },
+ "bootstrap": {
+  "method": "stratified cluster bootstrap over curves (resample each size's curves with replacement), 20 independent batches of 10,000 replicates; streams xoshiro256** seeded by SHA-256 of 'e32-validator-bootstrap:<nonce>:<weight>:<model>:batch<b>'; percentiles by linear interpolation; replicates with beta >= 0 count as n* = infinity (none occurred)",
+  "rows": [
+   {
+    "weight": "0",
+    "model": "M1",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 12.743459106803998,
+      "own_mean_of_batches": 12.743989645251789,
+      "own_batch_sd": 0.0027772771530430035,
+      "z": -0.18642450190240215,
+      "tolerance": 0.01138344890026244,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 13.197321916617556,
+      "own_mean_of_batches": 13.19898667229657,
+      "own_batch_sd": 0.0024890378371384856,
+      "z": -0.6527161477221085,
+      "tolerance": 0.010202019268707452,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "2.5%",
+      "claimed_fit_json": -0.27904126720291395,
+      "own_mean_of_batches": -0.2787626571999326,
+      "own_batch_sd": 0.0002803275920299895,
+      "z": -0.9699206569883527,
+      "tolerance": 0.0011490012135485245,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "97.5%",
+      "claimed_fit_json": -0.20513210218975333,
+      "own_mean_of_batches": -0.204768132223459,
+      "own_batch_sd": 0.0004662823809465351,
+      "z": -0.7617665414178519,
+      "tolerance": 0.0019111890402374254,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 79.18901102563362,
+      "own_mean_of_batches": 79.196797550397,
+      "own_batch_sd": 0.06407123785379423,
+      "z": -0.11860033205435389,
+      "tolerance": 0.2626139279207666,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 94.31505907657721,
+      "own_mean_of_batches": 94.4201575305672,
+      "own_batch_sd": 0.1201756590489592,
+      "z": -0.8534639187942054,
+      "tolerance": 0.49257362461657284,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "0",
+    "model": "M1_all",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 12.691707778061907,
+      "own_mean_of_batches": 12.695570651277071,
+      "own_batch_sd": 0.0032130130050230564,
+      "z": -1.173284467437883,
+      "tolerance": 0.013169434429143664,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 13.169477480460785,
+      "own_mean_of_batches": 13.170144510711904,
+      "own_batch_sd": 0.0029478897544941035,
+      "z": -0.22082062931065793,
+      "tolerance": 0.012082752471111123,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "2.5%",
+      "claimed_fit_json": -0.2720566135990204,
+      "own_mean_of_batches": -0.2720697005086644,
+      "own_batch_sd": 0.0004475863057620397,
+      "z": 0.028534197565602444,
+      "tolerance": 0.001834557935464544,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "97.5%",
+      "claimed_fit_json": -0.19133529887359194,
+      "own_mean_of_batches": -0.1914994143263492,
+      "own_batch_sd": 0.0005937386037804325,
+      "z": 0.26974881083701274,
+      "tolerance": 0.002433604096315074,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 80.23937146910882,
+      "own_mean_of_batches": 80.25564515477028,
+      "own_batch_sd": 0.06902619792761908,
+      "z": -0.23007918009353043,
+      "tolerance": 0.2829232206902781,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 98.55653208222148,
+      "own_mean_of_batches": 98.482429159674,
+      "own_batch_sd": 0.19228924486104618,
+      "z": 0.37608472367783985,
+      "tolerance": 0.788151369965876,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "0",
+    "model": "M2",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 12.86018886120276,
+      "own_mean_of_batches": 12.863454353854559,
+      "own_batch_sd": 0.0017113879313483385,
+      "z": -1.8621111313978873,
+      "tolerance": 0.007014603149593549,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 13.142244287150916,
+      "own_mean_of_batches": 13.142539708186224,
+      "own_batch_sd": 0.0017290410657512091,
+      "z": -0.16674063769665662,
+      "tolerance": 0.007086959469229982,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 83.44075544481103,
+      "own_mean_of_batches": 83.45381741541823,
+      "own_batch_sd": 0.0068455517253962666,
+      "z": -1.862111131397095,
+      "tolerance": 0.028058412598386134,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 84.56897714860366,
+      "own_mean_of_batches": 84.5701588327449,
+      "own_batch_sd": 0.006916164263005026,
+      "z": -0.16674063769665204,
+      "tolerance": 0.028347837876920707,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "0.1",
+    "model": "M1",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 14.471507815340928,
+      "own_mean_of_batches": 14.471111231226285,
+      "own_batch_sd": 0.002922835004547728,
+      "z": 0.13241474999728156,
+      "tolerance": 0.011980058555449547,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 14.929672605205877,
+      "own_mean_of_batches": 14.926109631994564,
+      "own_batch_sd": 0.0028116166056463003,
+      "z": 1.2366927303855104,
+      "tolerance": 0.011524198772324834,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "2.5%",
+      "claimed_fit_json": -0.2841566482229207,
+      "own_mean_of_batches": -0.2842190536046708,
+      "own_batch_sd": 0.00040985834077613965,
+      "z": 0.14859138034618166,
+      "tolerance": 0.0016799192955803978,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "97.5%",
+      "claimed_fit_json": -0.2114137143309134,
+      "own_mean_of_batches": -0.21047523079471656,
+      "own_batch_sd": 0.00042995014847976404,
+      "z": -2.130168240838772,
+      "tolerance": 0.0017622712013156646,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 84.35091166606846,
+      "own_mean_of_batches": 84.36657209145761,
+      "own_batch_sd": 0.06370548416852395,
+      "z": -0.23990101447552842,
+      "tolerance": 0.26111478391859344,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 100.65110695457437,
+      "own_mean_of_batches": 100.93763036311242,
+      "own_batch_sd": 0.12597570847574216,
+      "z": -2.2196201051537146,
+      "tolerance": 0.5163467529831237,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "0.1",
+    "model": "M1_all",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 14.428323408943232,
+      "own_mean_of_batches": 14.427954149228091,
+      "own_batch_sd": 0.0027204437109526716,
+      "z": 0.13246389972791395,
+      "tolerance": 0.01115050110707858,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 14.901286011532102,
+      "own_mean_of_batches": 14.901999267527245,
+      "own_batch_sd": 0.002900956097174868,
+      "z": -0.23994385105259539,
+      "tolerance": 0.011890381720784474,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "2.5%",
+      "claimed_fit_json": -0.27837092912040473,
+      "own_mean_of_batches": -0.2788335542288435,
+      "own_batch_sd": 0.0005808981167326789,
+      "z": 0.7772032032270543,
+      "tolerance": 0.0023809737608793654,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "97.5%",
+      "claimed_fit_json": -0.197345242121062,
+      "own_mean_of_batches": -0.19798522708417665,
+      "own_batch_sd": 0.000522666046730034,
+      "z": 1.1949530222921703,
+      "tolerance": 0.002142293299152559,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 85.37933333875928,
+      "own_mean_of_batches": 85.29912504042818,
+      "own_batch_sd": 0.09581506035564094,
+      "z": 0.8169413441045842,
+      "tolerance": 0.39272488244068005,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 105.34930773028123,
+      "own_mean_of_batches": 105.063362192597,
+      "own_batch_sd": 0.19175511557233385,
+      "z": 1.4552637631202099,
+      "tolerance": 0.7859620913562392,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "0.1",
+    "model": "M2",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 14.56992261661402,
+      "own_mean_of_batches": 14.5718219187035,
+      "own_batch_sd": 0.0013778086293526966,
+      "z": -1.345273217330652,
+      "tolerance": 0.005647334875956544,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 14.845825711680362,
+      "own_mean_of_batches": 14.84941535312943,
+      "own_batch_sd": 0.0017338477595032372,
+      "z": -2.0204376842221405,
+      "tolerance": 0.0071066610509196125,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 90.27969046645607,
+      "own_mean_of_batches": 90.287287674814,
+      "own_batch_sd": 0.0055112345174105236,
+      "z": -1.3452732173307163,
+      "tolerance": 0.0225893395038251,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 91.38330284672146,
+      "own_mean_of_batches": 91.39766141251769,
+      "own_batch_sd": 0.006935391038010179,
+      "z": -2.0204376842169482,
+      "tolerance": 0.028426644203667098,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "1",
+    "model": "M1",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 16.561964367307247,
+      "own_mean_of_batches": 16.561013557746897,
+      "own_batch_sd": 0.0034359842080977252,
+      "z": 0.2700522072015533,
+      "tolerance": 0.014083344405196829,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 17.018793458092965,
+      "own_mean_of_batches": 17.016490221681128,
+      "own_batch_sd": 0.0021779188194522396,
+      "z": 1.0320534274527835,
+      "tolerance": 0.008926810766073582,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "2.5%",
+      "claimed_fit_json": -0.2922752019726242,
+      "own_mean_of_batches": -0.2921789854031098,
+      "own_batch_sd": 0.00043288459985851423,
+      "z": -0.21691175255163575,
+      "tolerance": 0.0017742988728369268,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "97.5%",
+      "claimed_fit_json": -0.21874148396591014,
+      "own_mean_of_batches": -0.21825059149150544,
+      "own_batch_sd": 0.0004811327057136111,
+      "z": -0.9956961892060435,
+      "tolerance": 0.0019720572589361205,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 90.13052803124916,
+      "own_mean_of_batches": 90.0939406523168,
+      "own_batch_sd": 0.08120300699344285,
+      "z": 0.43970817203803947,
+      "tolerance": 0.3328332858838728,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 107.90456116883087,
+      "own_mean_of_batches": 108.05192024721892,
+      "own_batch_sd": 0.14277480974702342,
+      "z": -1.0072346487684558,
+      "tolerance": 0.5852025784387991,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "1",
+    "model": "M1_all",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 16.563254018524557,
+      "own_mean_of_batches": 16.563203295906153,
+      "own_batch_sd": 0.00243354750981374,
+      "z": 0.020340760474612227,
+      "tolerance": 0.009974576607873991,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 17.029360444617836,
+      "own_mean_of_batches": 17.034571419814167,
+      "own_batch_sd": 0.0037841484656995104,
+      "z": -1.3438666903075942,
+      "tolerance": 0.015510393207641776,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "2.5%",
+      "claimed_fit_json": -0.29475319824542334,
+      "own_mean_of_batches": -0.2948495169403587,
+      "own_batch_sd": 0.00046779069934410925,
+      "z": 0.20093905574764587,
+      "tolerance": 0.0019173713059811588,
+      "agrees": true
+     },
+     {
+      "quantity": "beta",
+      "end": "97.5%",
+      "claimed_fit_json": -0.2158454157587998,
+      "own_mean_of_batches": -0.21551182131874147,
+      "own_batch_sd": 0.0004988692712396873,
+      "z": -0.65258547109779,
+      "tolerance": 0.0020447555444172883,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 89.63853131283696,
+      "own_mean_of_batches": 89.62058563673853,
+      "own_batch_sd": 0.08945387585677393,
+      "z": 0.19577895810366255,
+      "tolerance": 0.3666517846914498,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 108.92251313705533,
+      "own_mean_of_batches": 109.0116965656963,
+      "own_batch_sd": 0.16601811610632583,
+      "z": -0.5242446821934603,
+      "tolerance": 0.6804717847995541,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   },
+   {
+    "weight": "1",
+    "model": "M2",
+    "endpoints": [
+     {
+      "quantity": "alpha",
+      "end": "2.5%",
+      "claimed_fit_json": 16.632553324863856,
+      "own_mean_of_batches": 16.63323624461732,
+      "own_batch_sd": 0.0016803859456522112,
+      "z": -0.39661212291502,
+      "tolerance": 0.006887532821163469,
+      "agrees": true
+     },
+     {
+      "quantity": "alpha",
+      "end": "97.5%",
+      "claimed_fit_json": 16.911028789540545,
+      "own_mean_of_batches": 16.91256832401216,
+      "own_batch_sd": 0.001829505264558053,
+      "z": -0.8212230006993202,
+      "tolerance": 0.007498740148796104,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "2.5%",
+      "claimed_fit_json": 98.53021329945543,
+      "own_mean_of_batches": 98.53294497846927,
+      "own_batch_sd": 0.006721543782608845,
+      "z": -0.39661212291502,
+      "tolerance": 0.027550131284653875,
+      "agrees": true
+     },
+     {
+      "quantity": "log2_nstar",
+      "end": "97.5%",
+      "claimed_fit_json": 99.64411515816218,
+      "own_mean_of_batches": 99.65027329604864,
+      "own_batch_sd": 0.007318021058232212,
+      "z": -0.8212230006993202,
+      "tolerance": 0.029994960595184417,
+      "agrees": true
+     }
+    ],
+    "frac_beta_nonneg": 0,
+    "replicates_per_batch": 10000,
+    "batches": 20
+   }
+  ]
+ },
+ "yield_exponent": {
+  "slope": -0.06581811335259444,
+  "se": 0.11205159353136976,
+  "ci95": [
+   -0.28543923667407917,
+   0.1538030099688903
+  ]
+ },
+ "la_extrapolation": {
+  "share_at_3089_mean": 0.00004370237057570847,
+  "p_star": 4205247.107964045,
+  "share_at_nstar": 0.056156200388631936
+ },
+ "gae_band": {
+  "definition": "medians over the three curves of the ladder's top rung (p = 3089, log2 n = 42.37) of S(g) = S + g * 97 * Macaulay entries (IC: arm B, solver A, Karatsuba) and rho(g) = rho + g * 97 * steps (E27 walk (iii), mean of 16 walks, [d]G = Q check excluded), g = 0, 0.1, 1; median_D is the median of the per-curve ratio (the note's figure), not the ratio of the medians. Per-size medians for every rung are in per_size[].D.",
+  "values": {
+   "0": {
+    "ic": 194565885707,
+    "rho": 152375199.5,
+    "median_D": 1542.2428347599964
+   },
+   "0.1": {
+    "ic": 685274831415.8,
+    "rho": 167785363.975,
+    "median_D": 4933.097413822862
+   },
+   "1": {
+    "ic": 5101655342795,
+    "rho": 306476844.25,
+    "median_D": 20105.98689596759
+   }
+  },
+  "order_rho_below_ic_on_all_33_rows_all_weights": true
+ }
+}
