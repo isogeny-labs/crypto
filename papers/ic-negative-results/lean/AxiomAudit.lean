@@ -31,7 +31,9 @@ run_cmd do
       `IcNegative.Lemma4.red_feY,
       `IcNegative.Lemma4Reverse.reverse_fails_witnessR,
       `IcNegative.Lemma4Reverse.fake_noFall,
-      `IcNegative.FakeDegreeGap.gap_two_witnessW3] do
+      `IcNegative.FakeDegreeGap.gap_two_witnessW3,
+      `IcNegative.InsideGap.fe_first_fall_four,
+      `IcNegative.InsideGap.insideA_fall4] do
     let axioms ← Lean.collectAxioms name
     let forbidden := axioms.filter fun ax => !allowed.contains ax
     unless forbidden.isEmpty do
