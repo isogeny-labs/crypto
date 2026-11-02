@@ -372,3 +372,51 @@ FACT-PF-EP-LINEARIZED-NO-GAIN	structural_theorem	conditional	algebraic_coordinat
 THM-PF-MM-TRINOMIALS	structural_theorem	proved_external	mathematical	theorem	-	S-PF-MCGUIRE-MUELLER-2019
 FACT-PF-MM-TRINOMIAL-NO-GAIN	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-PF-MCGUIRE-MUELLER-2019
 GAP-PF-QSP-EXISTENCE	open_obligation	open	mathematical	-	-	S-PF-HKPYY-2020,S-PF-EULER-PETIT-2021
+DEF-GB-DEGREE-OF-REGULARITY	definition	definition	algebraic_coordinate	definition	-	S-GB-CG-2020,S-CAMINATA-GORLA-2021,S-GB-SALIZZONI-2023,S-GB-BARDET-THESIS-2004
+DEF-GB-DS-DEGREE-OF-REGULARITY	definition	definition	algebraic_coordinate	definition	-	S-GB-CG-2020,S-CAMINATA-GORLA-2021,S-GB-DUBOIS-GAMA-2010,S-HKYY-2015
+DEF-GB-SEMI-REGULAR	definition	definition	mathematical	definition	HS(z) = [ prod_{i=1}^m (1 - z^{d_i}) / (1 - z)^n ]_+	S-GB-BDDGMT-2021,S-GB-BARDET-THESIS-2004,S-GB-PARDUE-2010
+DEF-GB-SEMI-REGULAR-F2	definition	definition	mathematical	definition	T_{d,n}(z) = [ (1+z)^n / prod_i (1+z^{d_i}) ]_+	S-GB-BARDET-THESIS-2004,S-GB-HMS-2017
+DEF-GB-CM-REGULARITY	definition	definition	mathematical	definition	-	S-GB-CG-2020,S-GB-STEINER-2024
+THM-GB-MACAULAY-MATRIX-COST	algorithmic_upper_bound	proved_external	algebraic_coordinate	theorem	O(m D C(n+D-1,D)^omega)	S-GB-BFS-F5-2015,S-GB-LAZARD-1983,S-GB-FAUGERE-F4-1999
+THM-GB-LAZARD-MACAULAY-BOUND	structural_theorem	proved_external	algebraic_coordinate	theorem	maxGBdeg <= sum_i (d_i - 1) + 1	S-GB-BFS-F5-2015,S-GB-CG-2020,S-GB-LAZARD-1983
+THM-GB-F5-COMPLEXITY	algorithmic_upper_bound	proved_external	algebraic_coordinate	theorem	B(delta)^n n (A(delta,l)+O(1/n))	S-GB-BFS-F5-2015,S-GB-FAUGERE-F5-2002
+THM-GB-BFS-DREG-ASYMPTOTICS	structural_theorem	proved_external	mathematical	theorem	-	S-GB-BARDET-THESIS-2004,S-GB-BFSY-MEGA-2005
+CONJ-GB-FROBERG	open_obligation	open	mathematical	open	-	S-GB-BARDET-THESIS-2004,S-GB-BDDGMT-2021,S-GB-FROBERG-1985,S-GB-PARDUE-2010
+CONJ-GB-BFS-SEMIREG-PROPORTION-F2	assumption	refuted	mathematical	counterexample	-	S-GB-BFS-RR5049-2003,S-GB-BARDET-THESIS-2004,S-GB-HMS-2017,S-GB-BDDGMT-2021
+THM-GB-HMS-NONEXISTENCE	structural_theorem	proved_external	mathematical	theorem	-	S-GB-HMS-2017
+HEUR-GB-SEMIREG-ASSUMPTION	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-GB-BARDET-THESIS-2004,S-GB-BDDGMT-2021,S-GB-CG-2020,S-GB-HMS-2017
+THM-GB-CG-GBDEG-LE-DREG	structural_theorem	proved_external	algebraic_coordinate	theorem	maxGBdeg_tau(F) <= d_reg(F)	S-GB-CG-2020,S-GB-SALIZZONI-2023
+THM-GB-CG-SD-LE-REG	structural_theorem	proved_external	algebraic_coordinate	theorem	sd_DRL(F) <= reg(F^h)	S-GB-CG-2020,S-CAMINATA-GORLA-2021
+THM-GB-CG-FIELD-EQUATIONS-GENERIC	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-CG-2020
+MEAS-GB-CG-SUMMATION-SD-GT-DREG	structural_theorem	proved_external	algebraic_coordinate	counterexample	-	S-GB-CG-2020
+MEAS-GB-CG-SUMMATION-DREG-UNDEFINED	structural_theorem	proved_external	algebraic_coordinate	counterexample	-	S-GB-CG-2020
+CEX-GB-BDDGMT-EX24	structural_theorem	proved_external	algebraic_coordinate	counterexample	-	S-GB-BDDGMT-2021
+MEAS-GB-BDDGMT-EX22-23	structural_theorem	proved_external	algebraic_coordinate	counterexample	-	S-GB-BDDGMT-2021
+THM-GB-BDDGMT-SEMIREG-SD-BOUNDS	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-BDDGMT-2021
+MEAS-GB-BDDGMT-JV-SUMMATION	structural_theorem	proved_external	algebraic_coordinate	measurement	-	S-GB-BDDGMT-2021
+THM-GB-SALIZZONI-SD-LE-DREG-PLUS-1	structural_theorem	proved_external	algebraic_coordinate	theorem	sd_sigma(F) <= max{d_reg(F)+1, max_i deg f_i}	S-GB-SALIZZONI-2023,S-GB-KUDO-YOKOYAMA
+THM-GB-SALIZZONI-CONSEQUENCES	structural_theorem	proved_external	algebraic_coordinate	theorem	Lfd(F) <= max{d_reg+1, deg F}; cost O((n+1)^{4(d_reg+1)})	S-GB-SALIZZONI-2023
+CEX-GB-SALIZZONI-EX39	structural_theorem	proved_external	algebraic_coordinate	counterexample	-	S-GB-SALIZZONI-2023,S-CAMINATA-GORLA-2021
+CLAIM-GB-LFD-LE-DREG	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-HKYY-2015,S-GB-GMP-2022,S-GB-HUANG-2021,S-GB-HUANG-2023,S-GB-SALIZZONI-2023
+THM-GB-GMP-SD-GE-LFD	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-GMP-2022,S-CAMINATA-GORLA-2021
+THM-GB-GMP-COORDINATE-DEPENDENCE	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-GMP-2022
+THM-GB-GMP-HFE-BOUNDS	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-GMP-2022,S-HKYY-2015,S-HKY-2015
+THM-GB-CG21-FIRST-FALL-INCOMPARABLE	structural_theorem	proved_external	algebraic_coordinate	counterexample	-	S-CAMINATA-GORLA-2021
+THM-GB-CG21-LASTFALL-DETECTION	structural_theorem	proved_external	algebraic_coordinate	counterexample	-	S-CAMINATA-GORLA-2021
+THM-GB-CG21-DREG-LE-REG	structural_theorem	proved_external	algebraic_coordinate	theorem	d_reg(F) <= reg(F^h)	S-CAMINATA-GORLA-2021
+THM-GB-SEMAEV-TENTI-2DREG	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	sd <= 2 d_reg - 2	S-GB-SEMAEV-TENTI-2021,S-CAMINATA-GORLA-2021,S-GB-KUDO-YOKOYAMA
+THM-GB-KUDO-YOKOYAMA-AFFINE	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-KUDO-YOKOYAMA
+THM-GB-STEINER-GENERIC-COORD	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-STEINER-2024
+THM-GB-CCG-WEIL-RESTRICTION	structural_theorem	proved_external	algebraic_coordinate	theorem	reg(Weil(I)) = n reg(I) - n + 1; d_reg(Weil(F)) = n d_reg(F) - n + 1	S-GB-CCG-2023
+THM-GB-HUANG-2021-NONZERODIM	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-HUANG-2021
+THM-GB-HUANG-2023-SEMILOCAL	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-GB-HUANG-2023
+THM-GB-PQ-FIRST-FALL-BOUND	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	D_ff <= m^2 + 1	S-PETIT-QUISQUATER-2012,S-GB-KW-2019,S-GB-HPS-2014
+THM-GB-KW-FIRST-FALL-SUMMATION	structural_theorem	proved_external	algebraic_coordinate	theorem	D_ff <= m^2 - m + 1	S-GB-KW-2019
+MEAS-GB-KW-TABLE1	structural_theorem	proved_external	algebraic_coordinate	measurement	-	S-GB-KW-2019
+HEUR-GB-PQ-ASSUMPTION-2	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PETIT-QUISQUATER-2012,S-GB-KW-2019,S-HKY-2015
+COND-GB-PQ-SUBEXP-BINARY-ECDLP	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	O(2^{c log(n) (n^{2/3}+1)}), c = 2omega/3	S-PETIT-QUISQUATER-2012,S-GB-KW-2019
+THM-GB-HPS-FIRST-FALL-WEIL	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	-	S-GB-HPS-2014,S-GB-HMS-2017,S-GB-KW-2019
+MEAS-GB-HKY-FFA-DOUBT	structural_theorem	proved_external_unread	algebraic_coordinate	measurement	-	S-HKY-2015,S-HKYY-2015
+COND-GB-HFE-FIRST-FALL-ESTIMATES	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-GB-DUBOIS-GAMA-2010,S-GB-DING-HODGES-2011,S-GB-DING-KLEINJUNG-2012,S-HKYY-2015
+CEX-GB-DING-SCHMIDT-DEGENERATE	structural_theorem	proved_external_unread	algebraic_coordinate	counterexample	-	S-GB-DING-SCHMIDT-2013,S-GB-CG-2020,S-CAMINATA-GORLA-2021
+GAP-GB-SUMMATION-DREG-GROWTH	open_obligation	open	algebraic_coordinate	open	-	S-GB-KW-2019,S-HKYY-2015,S-GB-CCG-2023,S-GB-HUANG-2021

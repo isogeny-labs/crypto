@@ -7,28 +7,28 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 373,
-    "frontier": 245,
-    "contaminated_by_refuted": 1,
+    "nodes": 421,
+    "frontier": 257,
+    "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
-      "definition": 34,
+      "definition": 39,
       "assumed": 15,
-      "proved_external": 62,
+      "proved_external": 93,
       "algorithm": 12,
-      "conditional": 60,
+      "conditional": 62,
       "measured": 20,
       "proved_internal_unreviewed": 39,
-      "open": 38,
-      "heuristic": 50,
-      "refuted": 13,
-      "proved_external_unread": 30
+      "open": 40,
+      "heuristic": 52,
+      "refuted": 14,
+      "proved_external_unread": 35
     },
     "by_formal_state": {
-      "none": 347,
+      "none": 394,
       "lean_written_unchecked": 10,
       "kernel_checked": 13,
-      "stated_open": 3
+      "stated_open": 4
     }
   },
   "frontier": [
@@ -172,6 +172,73 @@
       "pressure": []
     },
     {
+      "id": "HEUR-FIRST-FALL-DEGREE",
+      "label": "First-fall/regularity degree heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 5,
+      "downstream": [
+        "COND-BINARY-WEIL-DESCENT",
+        "COND-ECC2K130-FFDA-PROJECTION",
+        "COND-GB-HFE-FIRST-FALL-ESTIMATES",
+        "COND-NAGAO-2015-COMPLEXITY",
+        "COND-PKM-PRIME-ALGEBRAIC"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-CG-SOLVING-DEGREE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-KY-S3-FIRST-FALL-TWO",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-RP-GUARDED-EXACT-PAIR",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-FALL-DEGREE-TOY",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-DREG-PROXY-MISS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "OPEN-BK-GG-BINARY-SUBEXP",
+          "relation": "qualifies"
+        },
+        {
+          "from": "COND-PF-KY-FFA-REDUCTIO",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-CG-SUMMATION-SD-GT-DREG",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-CG-SUMMATION-DREG-UNDEFINED",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-GB-CG21-FIRST-FALL-INCOMPARABLE",
+          "relation": "obstructs"
+        },
+        {
+          "from": "CEX-GB-DING-SCHMIDT-DEGENERATE",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-HKY-FFA-DOUBT",
+          "relation": "obstructs"
+        }
+      ]
+    },
+    {
       "id": "ASM-GG-RANDOM-PARTITION",
       "label": "Rigorous rho analyses assume a uniformly random partition",
       "status": "assumed",
@@ -257,52 +324,6 @@
         "RT-BK-DECOMP-MEASURE"
       ],
       "pressure": []
-    },
-    {
-      "id": "HEUR-FIRST-FALL-DEGREE",
-      "label": "First-fall/regularity degree heuristic",
-      "status": "heuristic",
-      "formal": "none",
-      "action": "prove, or measure on a scaling family without censoring",
-      "impact": 4,
-      "downstream": [
-        "COND-BINARY-WEIL-DESCENT",
-        "COND-ECC2K130-FFDA-PROJECTION",
-        "COND-NAGAO-2015-COMPLEXITY",
-        "COND-PKM-PRIME-ALGEBRAIC"
-      ],
-      "depends_citations": [],
-      "research_targets": [],
-      "pressure": [
-        {
-          "from": "THM-CG-SOLVING-DEGREE",
-          "relation": "qualifies"
-        },
-        {
-          "from": "THM-KY-S3-FIRST-FALL-TWO",
-          "relation": "obstructs"
-        },
-        {
-          "from": "THM-RP-GUARDED-EXACT-PAIR",
-          "relation": "qualifies"
-        },
-        {
-          "from": "MEAS-RP-FALL-DEGREE-TOY",
-          "relation": "qualifies"
-        },
-        {
-          "from": "MEAS-RP-DREG-PROXY-MISS",
-          "relation": "qualifies"
-        },
-        {
-          "from": "OPEN-BK-GG-BINARY-SUBEXP",
-          "relation": "qualifies"
-        },
-        {
-          "from": "COND-PF-KY-FFA-REDUCTIO",
-          "relation": "obstructs"
-        }
-      ]
     },
     {
       "id": "HEUR-PF-PKM-AUX-CURVE-SEARCH",
@@ -493,6 +514,22 @@
       "pressure": []
     },
     {
+      "id": "THM-GB-HPS-FIRST-FALL-WEIL",
+      "label": "Hodges-Petit-Schlather: first fall degree bounds for Weil descent",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 3,
+      "downstream": [
+        "COND-GB-PQ-SUBEXP-BINARY-ECDLP",
+        "THM-GB-HMS-NONEXISTENCE",
+        "THM-GB-PQ-FIRST-FALL-BOUND"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CLAIM-NAGAO-LEMMA4",
       "label": "Nagao 2015/984 Lemma 4: d_F <= d'_F",
       "status": "refuted",
@@ -516,6 +553,41 @@
       ]
     },
     {
+      "id": "CONJ-GB-BFS-SEMIREG-PROPORTION-F2",
+      "label": "BFS Conjecture 2: almost all F_2 sequences are semi-regular",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 2,
+      "downstream": [
+        "COND-BINARY-WEIL-DESCENT",
+        "HEUR-GB-SEMIREG-ASSUMPTION"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GB-HMS-NONEXISTENCE",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CONJ-GB-FROBERG",
+      "label": "Froberg's conjecture (generic Hilbert series)",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 2,
+      "downstream": [
+        "COND-BINARY-WEIL-DESCENT",
+        "HEUR-GB-SEMIREG-ASSUMPTION"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "HEUR-BK-GG-RHO-HEURISTIC",
       "label": "Rho/kangaroo analyses are heuristic; worst case unbounded",
       "status": "heuristic",
@@ -534,6 +606,40 @@
         {
           "from": "THEOREM-RHO-THREE-PARTITION",
           "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-GB-PQ-ASSUMPTION-2",
+      "label": "Petit-Quisquater Assumption 2: D_reg = D_ff + o(1) for binary summation descents",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 2,
+      "downstream": [
+        "COND-GB-PQ-SUBEXP-BINARY-ECDLP",
+        "COND-NAGAO-2015-COMPLEXITY"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GB-SUMMATION-INVARIANTS"
+      ],
+      "pressure": [
+        {
+          "from": "THM-GB-CG21-FIRST-FALL-INCOMPARABLE",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-KY-S3-FIRST-FALL-TWO",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-KW-TABLE1",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-HKY-FFA-DOUBT",
+          "relation": "obstructs"
         }
       ]
     },
@@ -954,6 +1060,65 @@
         "RT-BK-BOOK-INVENTORY"
       ],
       "pressure": []
+    },
+    {
+      "id": "HEUR-GB-SEMIREG-ASSUMPTION",
+      "label": "Semi-regularity assumption: cryptographic systems behave like semi-regular ones and d_reg sets the cost",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-BINARY-WEIL-DESCENT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GB-HMS-NONEXISTENCE",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-GB-BDDGMT-SEMIREG-SD-BOUNDS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-GB-BDDGMT-EX24",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-BDDGMT-EX22-23",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-CG-SUMMATION-SD-GT-DREG",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-GB-CG-SUMMATION-DREG-UNDEFINED",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-GB-CG-GBDEG-LE-DREG",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-SALIZZONI-SD-LE-DREG-PLUS-1",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-SEMAEV-TENTI-2DREG",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-KUDO-YOKOYAMA-AFFINE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-CCG-WEIL-RESTRICTION",
+          "relation": "obstructs"
+        }
+      ]
     },
     {
       "id": "HEUR-GG-BRENT-POLLARD-ADDING",
@@ -1469,6 +1634,25 @@
       "pressure": []
     },
     {
+      "id": "THM-GB-PQ-FIRST-FALL-BOUND",
+      "label": "Petit-Quisquater: first fall degree of descended S_{m+1} <= m^2 + 1",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "COND-GB-PQ-SUBEXP-BINARY-ECDLP"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GB-KW-FIRST-FALL-SUMMATION",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "THM-GG-JM-AGM-TRANSFER",
       "label": "Jaeger-Mohan: AGM proofs transfer to the GGM under general frameworks",
       "status": "proved_external_unread",
@@ -1938,6 +2122,54 @@
         {
           "from": "THM-RP-SECANT-DEGREE-REDUCTION",
           "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-CG21-LASTFALL-DETECTION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-SALIZZONI-SD-LE-DREG-PLUS-1",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-CG-SD-LE-REG",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-CG21-FIRST-FALL-INCOMPARABLE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-GB-SUMMATION-DREG-GROWTH",
+      "label": "Does the solving degree of binary summation descents grow with n?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GB-SUMMATION-INVARIANTS",
+        "RT-GB-FACTOR-BASE-WEIL-BOUND"
+      ],
+      "pressure": [
+        {
+          "from": "THM-HKYY-ZERO-DIM-LAST-FALL",
+          "relation": "does_not_cover"
+        },
+        {
+          "from": "THM-GB-CCG-WEIL-RESTRICTION",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-GB-HUANG-2021-NONZERODIM",
+          "relation": "does_not_cover"
+        },
+        {
+          "from": "THM-GB-HUANG-2023-SEMILOCAL",
+          "relation": "does_not_cover"
         }
       ]
     },
@@ -2118,7 +2350,16 @@
         "RT-PKM-DEGREE",
         "RT-PF-CSTEP-T14"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-GB-GMP-COORDINATE-DEPENDENCE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GB-SALIZZONI-SD-LE-DREG-PLUS-1",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PROTOCOL-ASSUMPTION-MAPPING",
@@ -3048,6 +3289,43 @@
       ]
     },
     {
+      "id": "COND-GB-HFE-FIRST-FALL-ESTIMATES",
+      "label": "First-fall/degree-of-regularity HFE estimates (Dubois-Gama, Ding-Hodges, Ding-Kleinjung)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-GB-DING-SCHMIDT-DEGENERATE",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-GB-GMP-HFE-BOUNDS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-HKYY-ZERO-DIM-LAST-FALL",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-GB-PQ-SUBEXP-BINARY-ECDLP",
+      "label": "Petit-Quisquater subexponential binary ECDLP: 2^{c n^{2/3} log n}",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "COND-PF-APS-BEATS-PKM",
       "label": "APS outperforms PKM for fixed m and growing p",
       "status": "conditional",
@@ -3397,6 +3675,18 @@
       "pressure": []
     },
     {
+      "id": "CEX-GB-DING-SCHMIDT-DEGENERATE",
+      "label": "Ding-Schmidt 2013: degenerate systems with first-fall degree far below the solving degree",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-NAGAO-LEMMA4-F2",
       "label": "Witnesses A, B: d'_F = 2 < d_F = 3 over F_2",
       "status": "proved_internal_unreviewed",
@@ -3570,6 +3860,18 @@
       ]
     },
     {
+      "id": "MEAS-GB-HKY-FFA-DOUBT",
+      "label": "HKY 2015: computational evidence against the first fall degree assumption for ECDLP",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "OBS-XT-GLOBAL-TORSION-LIFT",
       "label": "Global torsion lifts: torsion too small over Q, fields too large otherwise",
       "status": "proved_external_unread",
@@ -3702,6 +4004,23 @@
         "RT-BK-ONE-OUT-OF-L"
       ],
       "pressure": []
+    },
+    {
+      "id": "THM-GB-SEMAEV-TENTI-2DREG",
+      "label": "Semaev-Tenti: two-phase solving degree <= 2 d_reg - 2 with field equations",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GB-KUDO-YOKOYAMA-AFFINE",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "THM-GG-AGM-UNINSTANTIABLE",
@@ -4070,6 +4389,14 @@
   ],
   "contaminated": [
     {
+      "id": "COND-BINARY-WEIL-DESCENT",
+      "status": "conditional",
+      "refuted_ancestors": [
+        "CONJ-GB-BFS-SEMIREG-PROPORTION-F2"
+      ],
+      "depends_citations": []
+    },
+    {
       "id": "COND-NAGAO-2015-COMPLEXITY",
       "status": "conditional",
       "refuted_ancestors": [
@@ -4078,6 +4405,14 @@
       "depends_citations": [
         "research/ic_candidate_tournament_20260915/campaign_20260916/DECOMPOSITION-SURVEY.md"
       ]
+    },
+    {
+      "id": "HEUR-GB-SEMIREG-ASSUMPTION",
+      "status": "heuristic",
+      "refuted_ancestors": [
+        "CONJ-GB-BFS-SEMIREG-PROPORTION-F2"
+      ],
+      "depends_citations": []
     }
   ],
   "unlinked_citations": []

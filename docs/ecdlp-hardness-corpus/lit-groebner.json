@@ -724,13 +724,13 @@
     {
       "id": "MEAS-GB-CG-SUMMATION-SD-GT-DREG",
       "label": "CG 2020 Ex. 12: index-calculus summation systems have sd = 5 > d_reg = 4",
-      "kind": "measured_bound",
-      "status": "measured",
+      "kind": "structural_theorem",
+      "status": "proved_external",
       "model": "algebraic_coordinate",
       "statement": "For the Gaudry-style relation-collection systems of [BG18] with n = 3 (three affine cubic equations in two variables), on 150,000 random cryptographic-size instances (3 primes q, 5 curves each, 10,000 points per curve): (F^top)_d = R_d for d >> 0 and sd_DRL(F) = reg(F^h) = 5 > 4 = d_reg(F) = i_reg(F^top). Computed by G. Bianco in Magma.",
       "scope": "Prime-field-extension (F_{q^3}) decomposition systems of the Gaudry/Diem type. A published computation, not a proof; shows the BFS degree of regularity under-predicts the solving degree on ECDLP systems while reg(F^h) matches it.",
       "assumptions": [
-        "Magma computation as reported"
+        "Magma computation as reported (published computational result, not a proof)"
       ],
       "source_refs": [
         "S-GB-CG-2020"
@@ -750,13 +750,13 @@
     {
       "id": "MEAS-GB-CG-SUMMATION-DREG-UNDEFINED",
       "label": "CG 2020 Ex. 13: summation systems with d_reg undefined, i_reg(F^top) = 8 vs sd = 15",
-      "kind": "measured_bound",
-      "status": "measured",
+      "kind": "structural_theorem",
+      "status": "proved_external",
       "model": "algebraic_coordinate",
       "statement": "For the [GM15] index-calculus relation systems with n = 3 (three affine equations of degrees 7, 7, 8 in two variables), on 150,000 random cryptographic-size instances: sd_DRL(F) = reg(F^h) = 15 while (F^top)_d != R_d for all d (d_reg undefined although |Z(F)| is finite) and i_reg(F^top) = 8.",
       "scope": "Shows that substituting i_reg(F^top) for an undefined d_reg understates the solving degree by almost a factor 2 on an ECDLP system. By Steiner Cor. 3.5 such zero-dimensional F has F^h NOT in generic coordinates, so the equality sd = reg(F^h) here is observed, not guaranteed by CG Theorem 10.",
       "assumptions": [
-        "Magma computation as reported"
+        "Magma computation as reported (published computational result, not a proof)"
       ],
       "source_refs": [
         "S-GB-CG-2020"
@@ -799,8 +799,8 @@
     {
       "id": "MEAS-GB-BDDGMT-EX22-23",
       "label": "Bigdeli et al. Ex. 2.2-2.3: sd far above d_reg with field equations",
-      "kind": "measured_bound",
-      "status": "measured",
+      "kind": "structural_theorem",
+      "status": "proved_external",
       "model": "algebraic_coordinate",
       "statement": "Over F_7 with field equations included (radical ideals): products of f_1 = x^5+y^5+z^5-1, f_2 = x^3+y^3+z^2-1, f_3 = y^6-1, f_4 = z^6-1 give solv.deg = 24 > 15 = d_reg (Ex. 2.2); products of pairs from {f_1, f_2, x^7-x, y^7-y, z^7-z} give 21 > 13 = d_reg (Ex. 2.3). The paper states that the input degrees (18, resp. 14) do not account for the gap.",
       "scope": "Magma 'largest step degree' used as a proxy for the solving degree. Bigdeli et al. state they found no proof in the literature that d_reg bounds the solving degree and that these examples show it does not.",
@@ -849,8 +849,8 @@
     {
       "id": "MEAS-GB-BDDGMT-JV-SUMMATION",
       "label": "Bigdeli et al. Ex. 3.9: Joux-Vitse decomposition systems are cryptographic semi-regular",
-      "kind": "measured_bound",
-      "status": "measured",
+      "kind": "structural_theorem",
+      "status": "proved_external",
       "model": "algebraic_coordinate",
       "statement": "Running Joux-Vitse-style point decomposition over F_{q^n}, q a large prime, n in {3,4,5} (decomposing into n-1 factor-base points), almost all of the resulting overdetermined systems of n equations in n-1 variables were inhomogeneous cryptographic semi-regular; their homogenizations are regular sequences of n forms in n variables, so sd <= d_1+..+d_n - (n-1).",
       "scope": "Python experiment, extension degree n <= 5, large-prime base field; says nothing about binary fields or growing n. Gives the rigorous bound for instances that are verified semi-regular, which is a Macaulay-type bound (linear in the summation-polynomial degrees 2^{n-2}, so exponential in n).",
@@ -1365,8 +1365,8 @@
     {
       "id": "MEAS-GB-KW-TABLE1",
       "label": "Kousidis-Wiemers Table 1: D_ff = 2 but D_reg rises to 5 for m = 2; equal for small m = 3, 4",
-      "kind": "measured_bound",
-      "status": "measured",
+      "kind": "structural_theorem",
+      "status": "proved_external",
       "model": "algebraic_coordinate",
       "statement": "Magma GroebnerBasis on Weil descents of S_{m+1} over F_{2^n} with random curves, random n' = ceil(n/m)-dimensional factor-base subspaces, 10 repetitions per cell: m = 2, n = 34..48: D_ff = 2 always, D_reg (highest step degree) = 4 for n <= 36 and 5 for n = 37..48 (memory up to 208 GB at n = 48); m = 3, n = 13..21: D_ff = D_reg = 7; m = 4, n = 13..16: D_ff = D_reg = 13. With the low-degree basis span{1, z, .., z^{n'}} the rise for m = 2 appears at n = 45.",
       "scope": "Empirical first fall = Magma step degree of the first degree fall; D_reg = highest step degree (a solving-degree proxy). For m >= 3 only small n are covered, so the equality there says nothing about growth. The authors state that such data can neither falsify Petit-Quisquater Assumption 2 nor confirm n-dependence.",
@@ -1488,8 +1488,8 @@
     {
       "id": "MEAS-GB-HKY-FFA-DOUBT",
       "label": "HKY 2015: computational evidence against the first fall degree assumption for ECDLP",
-      "kind": "measured_bound",
-      "status": "measured",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
       "model": "algebraic_coordinate",
       "statement": "Huang-Kosters-Yeo (CRYPTO 2015) present computational evidence that casts doubt on the first fall degree assumption used for subexponential characteristic-2 ECDLP claims, construct a Weil descent system from summation polynomials for which the assumption is unlikely to hold, and conclude that complexity estimates resting on it need more care; they also prove HFE systems have small last fall degree (unconditional polynomial time for fixed defining degree and base field).",
       "scope": "Abstract-level only (ePrint 2015/573 metadata; PDF not read). HKYY (read) confirm the context: 'more recent works ... have cast serious doubt on the first fall degree assumption' and summation descents without field equations are not zero-dimensional.",
@@ -1854,10 +1854,10 @@
     },
     {
       "id": "E-GB-027",
-      "from": "HEUR-GB-SEMIREG-ASSUMPTION",
-      "to": "THM-GB-BDDGMT-SEMIREG-SD-BOUNDS",
-      "relation": "conditions",
-      "statement": "Applying the bounds to a concrete cryptographic system requires that its F^h be semi-regular, which is assumed, not proved.",
+      "from": "THM-GB-BDDGMT-SEMIREG-SD-BOUNDS",
+      "to": "HEUR-GB-SEMIREG-ASSUMPTION",
+      "relation": "qualifies",
+      "statement": "Gives proved solving-degree bounds for systems whose F^h is verified semi-regular and in generic coordinates; the heuristic is needed only where semi-regularity is assumed rather than checked.",
       "source_refs": [
         "S-GB-BDDGMT-2021"
       ]
