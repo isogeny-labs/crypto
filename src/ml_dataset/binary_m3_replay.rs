@@ -2,6 +2,9 @@
 use super::*;
 use crate::ml_dataset::types::{Artifact, CaseConfig, CaseData};
 use serde_json::Value;
+#[path="binary_m3_boolean_replay.rs"]
+mod boolean_replay;
+pub(in crate::ml_dataset) use boolean_replay::Projection as BooleanProjection;
 
 pub(in crate::ml_dataset::solvers) fn is_source(outcome: &Value, artifacts: &[Artifact]) -> bool {
     outcome["adapter_id"] == "binary-m3-native-v1"
@@ -17,6 +20,7 @@ pub(in crate::ml_dataset::solvers) fn is_source(outcome: &Value, artifacts: &[Ar
 // Historical checking has a separate, explicit fixed decode/algebra allowance.
 // It never renews a producer deadline or changes a reported producer ledger.
 struct ReplayAdmission {
+    deadline: Instant,
     work: u64,
     bytes: u64,
 }
@@ -36,6 +40,7 @@ impl OriginalAdmission for ReplayAdmission {
         Ok(())
     }
     fn check_deadline(&mut self) -> Result<(), Failure> {
+        if Instant::now() >= self.deadline { return Err(Failure::Admission); }
         Ok(())
     }
 }
@@ -208,6 +213,16 @@ pub(in crate::ml_dataset::solvers) fn verify(
     outcome: &Value,
     artifacts: &[Artifact],
 ) -> Result<Option<Value>, String> {
+    verify_with_projection(dir,config,outcome,artifacts,None)
+}
+
+pub(in crate::ml_dataset::solvers) fn verify_with_projection(
+    dir: &std::path::Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[Artifact],
+    mut projection:Option<&mut Option<BooleanProjection>>,
+) -> Result<Option<Value>, String> {
     let reserved_source = is_source(outcome, artifacts);
     let expected_route = config.family == "binary"
         && config.m == 3
@@ -314,7 +329,12 @@ pub(in crate::ml_dataset::solvers) fn verify(
     let limits = OriginalLimits::from_original(config, &launch)?;
     let math = solvers::binary_m3_original::authenticate(Profile::OrdinaryBinary, config, &case)?;
     validate_reserved_artifacts(artifacts)?;
-    let mut admission = ReplayAdmission { work: 0, bytes: 0 };
+    let mut admission = ReplayAdmission {
+        deadline: Instant::now() + std::time::Duration::from_secs(30), work: 0, bytes: 0 };
+    if projection.is_some() {
+        // Prepay the bounded terminal unknown record before any optional refusal.
+        admission.reserve(Quote{work:32_768,bytes:16_384}).map_err(|_|"Boolean projection terminal admission")?;
+    }
     let admitted_prefix = capture::verify_live_committed_prefix(dir, &binding, &capture_limits)?;
     let captured_input = admitted_prefix.as_ref().and_then(|p| {
         p.payloads
@@ -956,8 +976,15 @@ pub(in crate::ml_dataset::solvers) fn verify(
             return Err(format!("ordinary unsupported outcome claim {key}"));
         }
     }
+    let boolean = boolean_replay::verify_optional(dir, artifacts, &binding, limits,
+        &capture_limits, &config_bytes, &public_bytes, &factor_bytes,
+        input_bytes.as_deref(), result.as_ref(), &mut admission, projection.as_deref_mut())?;
+    if let Some(slot)=projection { if slot.is_none() && !matches!(boolean,boolean_replay::Assessment::Absent) {
+        *slot=Some(BooleanProjection::restricted(&boolean,admission.deadline)?);
+    }}
     Ok(Some(
         serde_json::json!({"scope":"ordinary-original-bound-native-and-signed-replay",
+        "boolean_identity_replay":boolean,
         "solver_completed":completed,"retained_witness_verified":witness,
         "group_domain_complete":completed && domain_complete,"matrix_prefix_complete":matrix_complete,
         "offline_checking_reserved_work":admission.work,"offline_checking_reserved_bytes":admission.bytes}),
@@ -1352,4 +1379,9 @@ mod optional_boolean_identity_tests {
             }
         }
     }
+}
+
+#[cfg(test)]
+pub(super) fn test_boolean_successful_interval(before: &Value, after: &Value) -> Result<(), String> {
+    boolean_replay::test_successful_interval(before,after)
 }

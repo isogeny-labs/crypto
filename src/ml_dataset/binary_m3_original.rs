@@ -212,6 +212,7 @@ mod tests {
     use serde_json::{json, Value};
     fn config(family: &str, twist: bool) -> CaseConfig {
         CaseConfig {
+                        channels: None,
             family: family.into(),
             n: 23,
             m: 3,

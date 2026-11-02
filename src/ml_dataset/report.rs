@@ -881,6 +881,7 @@ mod tests {
             protocol["freeze"] = json!({"status":"frozen","protocol_sha256":body_hash,"filed_before_affected_data":true,"frozen_at":"2026-10-28T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = DatasetPlan {
+                                channels: None,
                 schema: if policies.is_empty() {
                     "crypto.ml-dataset.plan/v1"
                 } else {

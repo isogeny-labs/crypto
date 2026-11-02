@@ -1156,6 +1156,7 @@ mod admission_tests {
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-30T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
+                                channels: None,
                 factor_base_policies: vec![],
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![23],
@@ -1300,6 +1301,7 @@ mod mathematical_tests {
 
     fn config(n: u32, twist: bool, size: usize) -> CaseConfig {
         CaseConfig {
+                        channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n,
@@ -1403,6 +1405,7 @@ mod construction_tests {
 
     pub(super) fn fixture() -> MathInput {
         let config = CaseConfig {
+                        channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
@@ -1801,6 +1804,7 @@ mod input_verification_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let config = CaseConfig {
+                                        channels: None,
                     factor_base_policy: None,
                     family: "koblitz".into(),
                     n,
@@ -2012,6 +2016,7 @@ mod signed_prefix_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let cfg = CaseConfig {
+                                        channels: None,
                     factor_base_policy: None,
                     family: "koblitz".into(),
                     n,

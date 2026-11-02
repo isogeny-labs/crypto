@@ -593,6 +593,37 @@ pub(super) fn verify_koblitz_m3_cell(
     koblitz_m3::verify_worker_cell(dir, config, outcome, artifacts)
 }
 
+/// Config-bound capability disposition only: never an execution or identity claim.
+/// Bounded by two fixed entries; persisted within the existing capped final outcome.
+pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<Value>,String>{
+    let Some(c)=&config.channels else {return Ok(None)};
+    c.validate()?;
+    let boolean=c.boolean_consequence.as_ref().map(|r| {
+        let eligible=config.family=="binary" && config.m==3
+            && ((23..=31).contains(&config.n)||(47..=61).contains(&config.n))
+            && matches!(config.solver.as_str(),"f4"|"f5") && config.factor_base_size==4
+            && (1..=6).contains(&config.degree_bound) && config.work_limit>0;
+        super::types::ChannelDisposition {request:r.clone(),
+            status:if eligible {super::types::ChannelDispositionStatus::Requested} else {super::types::ChannelDispositionStatus::Unsupported},
+            reason:if eligible {super::types::ChannelDispositionReason::RequiresActualOriginalShapeAndRetainedRow} else {super::types::ChannelDispositionReason::OutsideOrdinaryN3Profile},
+            execution_verified:false,training_export_admitted:false}
+    });
+    let sat=c.sat_initial.as_ref().map(|r|super::types::ChannelDisposition {request:r.clone(),
+        status:super::types::ChannelDispositionStatus::Unsupported,
+        reason:super::types::ChannelDispositionReason::SatCentralWorkerReplayNotIntegrated,
+        execution_verified:false,training_export_admitted:false});
+    Ok(Some(serde_json::to_value(super::types::RequestedChannelDispositions {
+        schema:"crypto.ml-dataset.requested-channels/v1".into(),boolean_consequence:boolean,sat_initial:sat,
+    }).map_err(|e|e.to_string())?))
+}
+pub(super) fn verify_requested_channel_disposition(config:&CaseConfig,outcome:&Value)->Result<(),String>{
+    match requested_channel_disposition(config)? {
+        Some(expected) if outcome.get("requested_channels")==Some(&expected)=>Ok(()),
+        None if outcome.get("requested_channels").is_none()=>Ok(()),
+        _=>Err("requested channel disposition differs from frozen configuration".into()),
+    }
+}
+
 /// Internal worker path; unsupervised callers cannot obtain this token by
 /// setting an outcome flag. Adapter consumption is integrated separately.
 pub(super) fn solve_with_verified_worker_originals(
@@ -624,6 +655,11 @@ pub(super) fn solve_with_verified_worker_originals(
         let emitter = CaptureEmitter::create(directory, binding.clone(), limits.clone())?;
         LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
         let _guard = LiveSinkGuard;
+        if let Some(super::types::BooleanRequest::Produce { row_index }) = config.channels.as_ref().and_then(|c|c.boolean_consequence.as_ref()) {
+            return koblitz_m3::ordinary_construction::persisted::native_ownership::worker::run_with_produced_boolean_row(
+                original, case, context, &binding, &limits, *row_index as usize,
+            );
+        }
         return koblitz_m3::ordinary_construction::persisted::native_ownership::worker::run(
             original, case, context, &binding, &limits,
         );
@@ -642,6 +678,15 @@ pub(super) fn solve_with_verified_worker_originals(
     }
     solve_with_bound_event_sink_context(config, case, directory, binding, limits, context)
         .map(WorkerSolveOutput::legacy)
+}
+
+pub(super) use koblitz_m3::ordinary_construction::persisted::native_ownership::replay::BooleanProjection;
+pub(super) fn verify_ordinary_m3_cell_with_projection(
+    dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact],
+    projection:&mut Option<BooleanProjection>,
+)->Result<Option<Value>,String>{
+    koblitz_m3::ordinary_construction::persisted::native_ownership::replay::verify_with_projection(
+        dir,config,outcome,artifacts,Some(projection))
 }
 
 pub(super) fn verify_ordinary_m3_cell(
@@ -4352,6 +4397,7 @@ mod tests {
     #[test]
     fn dynamic_unsupported_axes_preserve_outcomes_without_reading_curve_bytes() {
         let base = CaseConfig {
+                        channels: None,
             factor_base_policy: None,
             family: "prime".into(),
             n: 47,
@@ -4402,6 +4448,7 @@ mod tests {
     fn dynamic_runtime_composes_actual_bound_capture_and_independent_replay() {
         for twist in [false, true] {
             let config = CaseConfig {
+                                channels: None,
                 factor_base_policy: None,
                 family: "prime".into(),
                 n: 47,
@@ -4772,6 +4819,7 @@ mod tests {
             for m in [4, 15] {
                 for twist in [false, true] {
                     let config = CaseConfig {
+                                                channels: None,
                         factor_base_policy: None,
                         family: "prime".into(),
                         n,
@@ -4830,6 +4878,7 @@ mod tests {
     #[test]
     fn dynamic_original_rejects_unbound_or_different_profile_limits() {
         let config = CaseConfig {
+                        channels: None,
             factor_base_policy: None,
             family: "prime".into(),
             n: 47,
@@ -5337,6 +5386,7 @@ mod tests {
 
     fn config(family: &str, solver: &str) -> CaseConfig {
         CaseConfig {
+                        channels: None,
             factor_base_policy: None,
             family: family.into(),
             n: 7,
@@ -6427,6 +6477,7 @@ mod verified_worker_original_tests {
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-31T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
+                                channels: None,
                 factor_base_policies: policy.clone().into_iter().collect(),
                 schema: if policy.is_some() {
                     "crypto.ml-dataset.plan/v2"
@@ -6724,6 +6775,7 @@ mod capability_dispatch_metadata_controls {
     use super::*;
     fn config() -> CaseConfig {
         CaseConfig {
+                        channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
@@ -6860,5 +6912,32 @@ mod capability_dispatch_metadata_controls {
         c.work_limit = 1;
         c.degree_bound = 11;
         assert!(!dynamic_supported(&c));
+    }
+}
+
+#[cfg(test)]
+mod requested_channel_tests {
+    use super::*;
+    #[test]
+    fn full_arity_requests_are_retained_and_unsupported_is_not_success() {
+        let mut c:CaseConfig=serde_json::from_value(json!({"family":"binary","n":23,"m":3,
+            "twist":false,"curve_seed":0,"generator_index":0,"key_index":0,"seed":20261027,
+            "factor_base_size":4,"degree_bound":3,"work_limit":16384,"solver":"f4",
+            "channels":{"schema":"crypto.ml-dataset.channel-requests/v1",
+                "boolean_consequence":{"mode":"produce","row_index":0},
+                "sat_initial":{"mode":"capture_and_check_initial"}}})).unwrap();
+        for m in 2..=15 { for twist in [false,true] {
+            c.m=m;c.twist=twist;
+            let d=requested_channel_disposition(&c).unwrap().unwrap();
+            assert_eq!(d["boolean_consequence"]["status"],if m==3 {"requested"} else {"unsupported"});
+            assert_eq!(d["sat_initial"]["status"],"unsupported");
+            let mut outcome=json!({"requested_channels":d});
+            verify_requested_channel_disposition(&c,&outcome).unwrap();
+            outcome["requested_channels"]["sat_initial"]["status"]=json!("verified");
+            assert!(verify_requested_channel_disposition(&c,&outcome).is_err());
+        }}
+        c.channels=None;
+        verify_requested_channel_disposition(&c,&json!({})).unwrap();
+        assert!(verify_requested_channel_disposition(&c,&json!({"requested_channels":null})).is_err());
     }
 }

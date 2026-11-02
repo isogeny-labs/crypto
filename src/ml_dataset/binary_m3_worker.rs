@@ -66,6 +66,17 @@ pub(in crate::ml_dataset::solvers) fn run(
     run_with_boolean_request(original, case, context, binding, limits, None)
 }
 
+// Narrow CLI bridge: no new owner, allowance, deadline or proof authority.
+pub(in crate::ml_dataset::solvers) fn run_with_produced_boolean_row(
+    original: &VerifiedWorkerOriginal<'_>, case: &types::CaseData,
+    context: &execution::SolverExecutionContext, binding: &capture::AttemptBinding,
+    limits: &capture::CaptureLimits, row_index: usize,
+) -> Result<solvers::WorkerSolveOutput,String> {
+    run_with_boolean_request(original,case,context,binding,limits,
+        Some(retained_storage::boolean_worker::Request { row_index,
+            proof: retained_storage::boolean_worker::ProofMode::Produce }))
+}
+
 // Explicit optional entry; normal dispatch remains run(..., None).
 // A supplied proof is untrusted and is independently checked after actual
 // original/result admission. No CLI/config route is activated in this patch.
@@ -1471,7 +1482,62 @@ mod boolean_producer_worker_tests {
                 artifacts.extend(receipts.iter().cloned());
                 storage::write_json(&f.root,"worker-artifacts.json","artifact-registry",&artifacts).unwrap();
                 let collected=dataset::collect_cell_artifacts(&f.root).unwrap();
-                assert!(replay::verify(&f.root,&f.config,&data.outcome,&collected).unwrap().is_some());
+                let mut sealed_projection=None;
+                let historical = replay::verify_with_projection(&f.root,&f.config,&data.outcome,&collected,Some(&mut sealed_projection)).unwrap().unwrap();
+                let mut sealed_projection=sealed_projection.expect("actual replay did not produce export seal");
+                sealed_projection.finish_admission(&f.root,&collected).unwrap();
+                let (public_equations,restricted_record)=sealed_projection.into_rows().unwrap();
+                assert_eq!(restricted_record["status"],"verified_nonzero", "strict actual nonzero training target gate");
+                let public_equations=public_equations.expect("actual nonzero source feature missing");
+                assert_eq!(public_equations["source_equations"].as_array().unwrap().len(),f.config.n as usize);
+                assert_eq!(public_equations["ring"]["variables"],3);
+                assert!(restricted_record["receipt"].is_object());
+                assert!(public_equations.get("receipt").is_none());
+                assert_eq!(historical["boolean_identity_replay"]["status"], "identity", "{historical}");
+                assert_eq!(historical["boolean_identity_replay"]["training_export_admitted"], false);
+                // Corrupt genuine receipts, refreshing transport hashes so rejection
+                // must survive a newly self-consistent root artifact inventory.
+                // Direct semantic control over real successful receipt ledgers;
+                // transport rejection cannot satisfy these assertions.
+                let before = &check["producer"]["check"]["before"];
+                let after = &check["producer"]["check"]["after"];
+                replay::test_boolean_successful_interval(before,after).unwrap();
+                let mut stopped_before=before.clone();
+                stopped_before["first_stop"]=json!("Work");
+                let err=replay::test_boolean_successful_interval(&stopped_before,after).unwrap_err();
+                assert_eq!(err,"Boolean cumulative ledger cleared or replaced first stop");
+                let mut stopped_after=after.clone();
+                stopped_after["first_stop"]=json!("Work");
+                let err=replay::test_boolean_successful_interval(&stopped_before,&stopped_after).unwrap_err();
+                assert_eq!(err,"Boolean successful checker interval is stopped or outside MatrixComplete");
+                stopped_after["first_stop"]=json!("Bytes");
+                let err=replay::test_boolean_successful_interval(&stopped_before,&stopped_after).unwrap_err();
+                assert_eq!(err,"Boolean cumulative ledger cleared or replaced first stop");
+                let path = f.root.join("binary-m3-boolean-check.json");
+                let original_bytes = std::fs::read(&path).unwrap();
+                for mutation in 0..5 {
+                    let mut damaged: serde_json::Value = serde_json::from_slice(&original_bytes).unwrap();
+                    match mutation {
+                        0 => damaged["requested_row_index"] = json!(999),
+                        1 => damaged["producer"]["check"]["outcome"]["anchor_sha256"] = json!("00".repeat(32)),
+                        2 => damaged["producer"]["check"]["outcome"]["wire_hex"] = json!("00"),
+                        3 => damaged["producer"]["check"]["outcome"]["watermark"]["event_count"] = json!(0),
+                        _ => damaged["producer"]["checker_profile"] = json!("unknown-profile"),
+                    }
+                    let bytes = serde_json::to_vec(&damaged).unwrap();
+                    std::fs::write(&path,&bytes).unwrap();
+                    let mut changed = collected.clone();
+                    let member = changed.iter_mut().find(|a| a.path=="binary-m3-boolean-check.json").unwrap();
+                    member.bytes=bytes.len() as u64;
+                    member.sha256=dataset::digest(&bytes);
+                    let mut rejected_projection=None;
+                    assert!(replay::verify_with_projection(&f.root,&f.config,&data.outcome,&changed,Some(&mut rejected_projection)).is_err(),
+                        "Boolean historical corruption {mutation} admitted");
+                    assert!(rejected_projection.is_none(),"corruption leaked a provisional projection");
+                    std::fs::write(&path,&original_bytes).unwrap();
+                }
+                let restored = replay::verify(&f.root,&f.config,&data.outcome,&collected).unwrap().unwrap();
+                assert_eq!(restored["boolean_identity_replay"]["status"],"identity");
             }
         }
     }

@@ -78,9 +78,50 @@ impl FactorBasePolicy {
     }
 }
 
+/// Frozen opt-in request; absence preserves legacy bytes and identities.
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ChannelRequests {
+    pub schema: String,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_boolean")]
+    pub boolean_consequence: Option<BooleanRequest>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_sat")]
+    pub sat_initial: Option<SatRequest>,
+}
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
+pub enum BooleanRequest { Produce { row_index: u32 } }
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
+pub enum SatRequest { CaptureAndCheckInitial {} }
+fn present_boolean<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<BooleanRequest>,D::Error>{
+    BooleanRequest::deserialize(d).map(Some)
+}
+fn present_sat<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<SatRequest>,D::Error>{
+    SatRequest::deserialize(d).map(Some)
+}
+pub(super) fn present_channels<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<ChannelRequests>,D::Error>{
+    let c=ChannelRequests::deserialize(d)?;
+    c.validate().map_err(serde::de::Error::custom)?;
+    Ok(Some(c))
+}
+impl ChannelRequests {
+    pub fn validate(&self)->Result<(),String>{
+        if self.schema != "crypto.ml-dataset.channel-requests/v1" || (self.boolean_consequence.is_none() && self.sat_initial.is_none()) {
+            return Err("unknown or empty channel request".into());
+        }
+        if matches!(self.boolean_consequence,Some(BooleanRequest::Produce{row_index}) if row_index>7) {
+            return Err("ordinary N3 retained row index must be 0..7".into());
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct CaseConfig {
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_channels")]
+    pub channels: Option<ChannelRequests>,
     pub family: String,
     pub n: u32,
     pub m: usize,
@@ -219,5 +260,55 @@ mod policy_tests {
         assert!(serde_json::to_string(&explicit)
             .unwrap()
             .contains("factor_base_policy"));
+    }
+}
+
+/// Request disposition only; execution and arithmetic admission are separate receipts.
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+#[serde(rename_all="snake_case")]
+pub enum ChannelDispositionStatus { Requested, Unsupported }
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+#[serde(rename_all="snake_case")]
+pub enum ChannelDispositionReason {
+    RequiresActualOriginalShapeAndRetainedRow, OutsideOrdinaryN3Profile,
+    SatCentralWorkerReplayNotIntegrated,
+}
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ChannelDisposition<T> {
+    pub request:T, pub status:ChannelDispositionStatus, pub reason:ChannelDispositionReason,
+    pub execution_verified:bool, pub training_export_admitted:bool,
+}
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+#[serde(deny_unknown_fields)]
+pub struct RequestedChannelDispositions {
+    pub schema:String,
+    pub boolean_consequence:Option<ChannelDisposition<BooleanRequest>>,
+    pub sat_initial:Option<ChannelDisposition<SatRequest>>,
+}
+#[cfg(test)]
+mod channel_tests {
+    use super::*;
+    #[derive(Deserialize,Serialize)]
+    #[serde(deny_unknown_fields)]
+    struct Envelope {
+        #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_channels")]
+        channels:Option<ChannelRequests>,
+    }
+    #[test]
+    fn strict_absence_null_duplicates_and_versions() {
+        let absent:Envelope=serde_json::from_str("{}").unwrap();
+        assert_eq!(serde_json::to_string(&absent).unwrap(),"{}");
+        for bad in [
+            r#"{"channels":null}"#,
+            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1"}}"#,
+            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","sat_initial":null}}"#,
+            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v2","sat_initial":{"mode":"capture_and_check_initial"}}}"#,
+            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","boolean_consequence":{"mode":"produce","row_index":8}}}"#,
+            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","boolean_consequence":{"mode":"produce","row_index":0,"row_index":1}}}"#,
+            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","sat_initial":{"mode":"capture_and_check_initial","extra":true}}}"#,
+        ] { assert!(serde_json::from_str::<Envelope>(bad).is_err(),"{bad}"); }
+        let c:Envelope=serde_json::from_str(r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","boolean_consequence":{"mode":"produce","row_index":0},"sat_initial":{"mode":"capture_and_check_initial"}}}"#).unwrap();
+        c.channels.unwrap().validate().unwrap();
     }
 }
