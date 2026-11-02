@@ -23,3 +23,12 @@ Trials: 8 per (size, k, theta) cell and 16 for rho, distinct seeds; cap 3e7 GAE 
 - C2 (descriptive): fitted exponent of log2(cost) on log2(r) for each k's best cell across the three sizes, against rho; compared with the generic prediction (k = 1: 1/2 only at theta = 1; k = 2: about 1; k = 3, 4: about 2/3).
 - Any k-LP cell below the matched rho across the band would be reported as such and sent for independent replay before any claim.
 No threshold is tuned after data. Scope: stdlib Python prototype outside ecbench, toy sizes; not a leaderboard row.
+
+## Amendment 1 (2026-11-02, before any data under this protocol): multi-target batch, k = 1
+Owner: run multi-target first, then return to k = 2..4. Script `scripts/mt.py` (the shared-table prototype of
+`research/ic_largeprime_multitarget_20261102`, unchanged except an added seed offset argument). T targets (T in 1, 2, 4, 8, 16, 32, 64) share one point table and one GF(r) linear system;
+walks step by multiples of G only, so trails of different targets merge; arms B = 0 (multi-target rho) and B = 1 (one unknown base point subtracted every step, the residual collector's structure).
+Counted: group additions per solved target (walk steps + 2 per walk start + scalar-mult starts); jump/base setup not counted (equal across arms). Every recovered log asserted equal to the planted one.
+Sizes 18, 20, 22 bits (curves as in the main protocol), 16 trials per cell, seed offset 500000 (fresh, distinct from the earlier 20-bit exploratory run).
+Measures: (M1) per-target cost vs T for each B and size; (M2) B=1/B=0 ratio vs T; (M3) per-target cost at T relative to T = 1 (the multi-target gain), against the sqrt(T) ideal.
+Reference for any "parity" statement: B = 0 at the same T (multi-target rho), never single-target rho. No negation map, no distinguished points (table memory reported, not charged).
