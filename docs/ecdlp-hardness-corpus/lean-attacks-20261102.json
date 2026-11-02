@@ -154,21 +154,43 @@
     },
     {
       "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
-      "label": "Is d_F(inside) - d'_F bounded?",
-      "kind": "open_obligation",
-      "status": "open",
+      "label": "Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
-      "statement": "Decide whether there is a constant c (or any function) with d_F <= d'_F + c for every system over F_2 with the field equations inside the generating set.",
-      "scope": "Observed maximum 2 over all 521,731 pairs of degree <= 2 in three variables; W_k stays at 3. Outside, no bound exists (CEX-FAKE-GAP-FAMILY-WK).",
+      "statement": "With the field equations inside the generating set, for n >= 2 variables and every system F over F_2, d_F(F ∪ S_fe) <= 4, because Y^2 (X^2 + X) + X^2 (Y^2 + Y) = X Y^2 + X^2 Y is a fall at degree 4 made of field equations alone; since d'_F >= 1, d_F(inside) - d'_F <= 3. The bound 3 is attained at n = 4. For n = 1, {X^k, X^k + 1} has d_F(inside) = k and d'_F = 1, so the gap is unbounded.",
+      "scope": "Settles the question posed 2026-11-02 (inside fake-to-true gap). The n >= 2 bound is a one-line hand proof whose key identity is kernel-checked in two variables (pending the gate); d_F(S_fe) = 4 checked for n = 2..8 (Rust) and n = 2..5 (independent Python). It also shows that inside-placement d_F under the equality reading never exceeds 4: the 'trivial' field-equation falls that Ding-Hodges and Petit-Quisquater exclude.",
       "assumptions": [],
       "source_refs": [
-        "S-LEAN-ATTACKS-20261102"
+        "S-LEAN-ATTACKS-20261102",
+        "S-INSIDE-GAP-20261102"
       ],
       "tags": [
-        "open",
         "first-fall-degree",
+        "fake-degree",
+        "bound",
         "attack-graph"
-      ]
+      ],
+      "formula": "n >= 2: d_F(inside) <= 4, gap <= 3",
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/InsideGap.lean",
+            "decl": "IcNegative.InsideGap.fe_first_fall_four"
+          },
+          {
+            "path": "research/inside_gap_n4_20261102/family_n8.rs",
+            "decl": "main"
+          },
+          {
+            "path": "research/inside_gap_n4_20261102/independent_falls.py",
+            "decl": "true_first_fall_inside"
+          }
+        ],
+        "notes": "Lean: the field-equation fall at 4 in two variables, alone and padded with witness A; that zero multipliers on further generators keep the fall is argued."
+      }
     },
     {
       "id": "MEAS-REVERSE-TRIPLES",
@@ -266,15 +288,15 @@
     {
       "id": "RT-FAKE-GAP-INSIDE",
       "label": "Bound or break the inside fake-to-true gap",
-      "status": "ready",
+      "status": "working",
       "priority": 3,
-      "objective": "Prove d_F <= d'_F + c with the field equations inside, or find a family with growing gap (n = 4 sample, three generators, degree 3).",
+      "objective": "Settled 2026-11-02: gap <= 3 for n >= 2 (tight at n = 4), unbounded for n = 1 (research/inside_gap_n4_20261102). Remaining: the proof gate on InsideGap.lean, and a 4-variable Lean encoding if the n = 4 gap-3 witness is to be kernel-checked.",
       "depends_on": [
         "GAP-FAKE-GAP-INSIDE-BOUNDED",
         "CEX-FAKE-GAP-INSIDE-YZ"
       ],
       "acceptance": "A proof reviewed independently, or a witness family checked by two implementations (Lean where it fits the encoding).",
-      "next_step": "Freeze a protocol for a seeded n = 4 sample and three-generator systems using fall_gap_census.rs.",
+      "next_step": "Dispatch lean-proof-gate on the branch carrying InsideGap.lean and record the run.",
       "source_refs": [
         "S-LEAN-ATTACKS-20261102"
       ]
