@@ -1,0 +1,50 @@
+{
+  "candidate_id": "spike35",
+  "certificate_sha256": "afd58b7d151c6cbb45f6e14a0bd0df32c4f256ec2e0e80bafc2d1c258b709ee2",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/koblitz-m6-natural/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/koblitz-m6-natural/output"
+  ],
+  "elapsed_seconds": 1.613,
+  "family": "koblitz",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "koblitz-m6-natural",
+  "input_row_sha256": "04288c8d03e7ff7317f9fd6bc3657a51c9e0ae8c7762fed2a2f33bf09d23b67d",
+  "m": 6,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/koblitz-m6-natural/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/koblitz-m6-natural/output/koblitz-m6-natural.json"
+    ],
+    "elapsed_seconds": 0.67,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"koblitz-m6-natural\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_certificate_prefix": "s3://setec-astronomy-artifacts/runs/n83-ffd-lfd-factorbase-panel-20261102/v2/attempt-02/spike35/first-fall-attempt-01/certificates/koblitz-m6-natural.json",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"koblitz-m6-natural\",\"status\":\"certified\"}\n",
+  "system_bytes": 49210350,
+  "system_sha256": "528df66f66cbe5819d3db3dcca6660b571847ad98f41067669692068aff532e9",
+  "target_kind": "natural"
+}

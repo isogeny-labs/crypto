@@ -1,6 +1,6 @@
 {
   "schema": "n83.dataset-file-layout/v1",
-  "dataset": "candidate-first-fall-spike35-spike37-attempt-01",
+  "dataset": "candidate-first-fall-spike35-spike37-attempts-01-02-combined-144",
   "protocol": "N83-FACTOR-BASE-PDP-FFD-LFD-20261031-V2",
   "files": [
     {
@@ -82,6 +82,36 @@
       "path": "attempt-02/",
       "role": "fresh continuation for untouched systems",
       "contents": "143-system preflight, source index, corrected runner and analysis bindings, per-system attempts/certificates/replays, independent validation and a continuation S3 receipt. The attempt-01 verified system is excluded from this path."
+    },
+    {
+      "path": "combined-144/combined-summary.json",
+      "role": "combined cohort result index",
+      "contents": "Joins the single recovered attempt-01 row with all 143 attempt-02 rows; records status, hashes, first-fall degree or lower bound, replay and attempt provenance."
+    },
+    {
+      "path": "combined-144/S3-CUSTODY.json",
+      "role": "S3 and archive custody receipt",
+      "contents": "Records remote case-object byte comparisons, unique archive key, size, digest, and successful full archive readback."
+    },
+    {
+      "path": "combined-144/plot-data.csv and plot.svg",
+      "role": "derived run graph and plotted data",
+      "contents": "Recorded first-fall outcome counts by family and m; six systems per family/m cell."
+    },
+    {
+      "path": "../../../reports/run-20261102T1745Z/report.pdf",
+      "role": "rendered run report",
+      "contents": "Inspected PDF report with measured outcomes, execution provenance, custody, scope, and next technical dependency."
+    },
+    {
+      "path": "combined-144/combine_attempts.py",
+      "role": "deterministic combined-index builder",
+      "contents": "Rebuilds the 144-row combined summary directly from attempt-01 and attempt-02 source records."
+    },
+    {
+      "path": "combined-144/S3-CUSTODY-complete.json",
+      "role": "complete archive custody receipt",
+      "contents": "Canonical complete archive key, SHA-256, byte size and successful S3 readback; includes counts for verified per-case objects."
     }
   ]
 }
