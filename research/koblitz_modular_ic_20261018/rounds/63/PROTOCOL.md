@@ -38,3 +38,20 @@ actual formula components and both generator square identities. Reads all
 inverse/root negatives required. No inverse producer is rerun. Samecaps.
 R62Square62generator/pair proofs are reused with concrete native inputs
 external;do not duplicate proofs or imply normalization/991action.
+
+## Actual half-pole-space involution/descent freeze
+All10mixed and128cubic roots from acceptedR62kernel matrices,actualR61
+sigma matrices and all source functions are hash-bound beforedata. Transfer
+only matrices whose entries are0/1 across coefficient rings. Check every
+K left inverse and K A=S K,A²=I,(A+I)²=0,full fixed/trace ranks and
+constant1 coordinates. Trace-one may be present or absent;retainbothcases.
+If present save an actual preimage and check source sigma(t)+t=1. If absent
+save ell(A+I)=0,ell(c)=1 andreject altered separator. In bothcases reject
+alteredaction. No predicted fixed/trace dimensions are acceptance assumptions.
+Fresh actual FIELD61 checks source ideal preservation/nontrivial involution,
+all138rootbindings,g²=f,276sourceinvolutionidentities,all fixed root
+functions andconstant1. Save complete restricted matrices and functions.
+No actualT action,C5block,globalCartier or proper polarization inferred.
+Samecaps/seed,allcases,onejob;freeze source before half-descent63-01.
+Half63fiveconditionaltheorems compiled/audited separately under pinned
+Leanlimits;nativefield/valuation/modelinputs stay explicit.
