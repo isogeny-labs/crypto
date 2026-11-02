@@ -2,7 +2,7 @@
 """summary.json: per-cell, per-arm means from the verified records and the
 saved paired comparisons, and the five frozen predictions of PROTOCOL.md
 evaluated by code.  Standard library only.  Reads sessions/<cell>/records.jsonl
-(not committed: see README.md) and sessions/<cell>/comparisons/*.json."""
+(in the artifact store: `artifacts.py pull`, see README.md) and sessions/<cell>/comparisons/*.json."""
 import json, os, statistics as st, sys
 from collections import defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)

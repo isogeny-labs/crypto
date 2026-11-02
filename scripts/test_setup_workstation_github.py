@@ -220,6 +220,18 @@ class GithubStepTests(unittest.TestCase):
         app = self.app_env("111", "10", self.api_a)
         self.assertEqual(self.credential(app).get("password"), "ghs_A_app111_inst10")
 
+    def test_lazy_helper_falls_back_to_the_gh_token(self):
+        # Claude Code sessions often have only GH_TOKEN; git gets it for the
+        # helper's host and nowhere else, and a service token still wins.
+        self.assertEqual(self.setup(dict(self.env, GITHUB_LAZY="1")).returncode, 0)
+        for var in ("GH_TOKEN", "GITHUB_TOKEN"):
+            with self.subTest(var=var):
+                env = dict(self.env, **{var: "ghp_TESTGHTOKEN"})
+                self.assertEqual(self.credential(env).get("password"), "ghp_TESTGHTOKEN")
+                self.assertNotIn("password", self.credential(env, host="example.com"))
+        both = dict(self.env, GH_TOKEN="ghp_TESTGHTOKEN", GH_SERVICE_TOKEN="ghp_TESTSERVICETOKEN")
+        self.assertEqual(self.credential(both).get("password"), "ghp_TESTSERVICETOKEN")
+
     def test_dry_run_changes_nothing(self):
         env = self.app_env("111", "10", self.api_a)
         result = self.setup(env, "--dry-run")
