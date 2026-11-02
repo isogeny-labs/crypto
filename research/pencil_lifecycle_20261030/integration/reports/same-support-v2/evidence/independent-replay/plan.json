@@ -1,0 +1,40 @@
+{
+  "created_utc": "2026-10-30T21:25:34.701611+00:00",
+  "phase": "independent fresh source replay after source fidelity review",
+  "directory": "/var/tmp/independent-same-support-replay-ow8hrtl9",
+  "mirror": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r",
+  "inputs": {
+    "ProjectiveLawBoundary.lean": {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/ProjectiveLawBoundary.lean",
+      "sha256": "0cbdbb636e11f34ad94493353f2fc748a353c89f248f868accbdaaf02fc88e2b"
+    },
+    "RuntimeSemantics.lean": {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/RuntimeSemantics.lean",
+      "sha256": "9e015c3c79f465b2b16f6e0dae5c744f9de3400f51646f746c61c54c4722c318"
+    },
+    "SameSupport.lean": {
+      "path": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/candidate-attempt3b/SameSupport.lean",
+      "sha256": "ecb3a5f91f7217d1ab107466c470a491559f7cfe0276ca6d72661fffef66170b"
+    },
+    "SameSupportClassifier.lean": {
+      "path": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/candidate-attempt4/SameSupportClassifier.lean",
+      "sha256": "7f21fd6153d972309fe5f0d4b7a5b00ff188eb4e6510cbfbd8c33f7a12efa41e"
+    }
+  },
+  "order": [
+    "ProjectiveLawBoundary.lean",
+    "RuntimeSemantics.lean",
+    "SameSupport.lean",
+    "SameSupportClassifier.lean"
+  ],
+  "limits": {
+    "per_command_seconds": 120,
+    "threads": 1,
+    "memory_mib": 4096
+  },
+  "stop": "first failure",
+  "LEAN_PATH": "/var/tmp/independent-same-support-replay-ow8hrtl9:/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/deps",
+  "LEAN_SYSROOT": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain",
+  "commands": "lean -j1 -M4096 -o MODULE.olean MODULE.lean; then fresh Readback.lean printing declarations and axioms",
+  "exclusions": "No producer logs/readbacks; no downloads; no shared edits; dependency/toolchain mirror reused, project oleans rebuilt."
+}

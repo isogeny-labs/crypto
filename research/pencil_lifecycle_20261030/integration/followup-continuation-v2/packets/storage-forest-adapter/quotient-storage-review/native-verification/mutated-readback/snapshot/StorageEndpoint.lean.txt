@@ -1,0 +1,39 @@
+import StoredDivision
+set_option autoImplicit false
+namespace QuotientStorage
+open Polynomial CoefficientTraversal TraversalPolynomial ScaleTrim MonicRemainder NativeDivision MonicZeroTest
+
+theorem finish_normal {n:Nat} (xs:State n) : Normal (finish xs) := trim_finished _ _ le_rfl
+
+theorem word_normal (p:UInt64) (b a:List UInt64) (fuel:Nat) (q out:List UInt64)
+ (ho:wordDiv p b a fuel=some (q,out)) : Normal q := by
+ unfold wordDiv at ho
+ split_ifs at ho
+ cases he:wloop p b fuel (ProductPolynomial.zeros (a.length-b.length+1)) (trimFuel a.length a) with
+ | none => simp [he] at ho
+ | some z =>
+   rw [he] at ho
+   have hz:finish z.1=q:=congrArg Prod.fst (Option.some.inj ho)
+   exact hz ▸ finish_normal z.1
+
+theorem word_success (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (fuel:Nat) (q out:List UInt64) (ho:wordDiv p b a fuel=some (q,out)) :
+ wordsPoly p a=wordsPoly p q*wordsPoly p b+wordsPoly p out ∧
+ (out=[] ∨ out.length<b.length) := by
+ have h:=word_projection p b a hp hb hbs ha fuel
+ rw [ho] at h
+ have hh:checkedDiv p b a fuel=some (wordsPoly p q,out):=h.symm
+ exact (checked_correct p b a hp hb hbs ha fuel _ out hh).2
+
+theorem word_total (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (hm:b.getLast?=some 1) (fuel:Nat) (hf:a.length≤fuel) :
+ ∃q out,wordDiv p b a fuel=some (q,out) := by
+ obtain ⟨q,r,hq⟩:=checked_exists p b a hp hb hbs ha hm fuel hf
+ have h:=word_projection p b a hp hb hbs ha fuel
+ rw [hq] at h
+ cases he:wordDiv p b a fuel with
+ | none => simp [he] at h
+ | some z => exact ⟨z.1,z.2,rfl⟩
+end QuotientStorage

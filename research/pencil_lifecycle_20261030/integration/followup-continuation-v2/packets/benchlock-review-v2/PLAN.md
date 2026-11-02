@@ -1,0 +1,1 @@
+Additive review under the frozen v1 review plan: verify correction of explicit destructor invocation, exact primitive extraction and unchanged fixed controls. No native execution or repository mutation. Original review remains immutable.

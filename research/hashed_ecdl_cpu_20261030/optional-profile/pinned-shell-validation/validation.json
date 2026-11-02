@@ -1,0 +1,61 @@
+{
+  "source": {
+    "base_commit": "7bf39b33cf052112e49dc9579930f0a8ece77152",
+    "path": "src/cryptanalysis/hashed_ecdl.rs",
+    "base_sha256": "9c27f57a09433ae1b2ae7668e4f897e0aea9b3079451c8fa199541fc1a83f225",
+    "candidate_sha256": "f686bec1052c408c02d443263035cec833771e38743227bd8e049fe37ab77222",
+    "patch_sha256": "12b08d04ada9b9bcf6834212a204eb2e7ebe4fb4913156c270f224befd21bb3e",
+    "status": "unapplied; shared path reserved by T-906"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--all-targets",
+        "--manifest-path",
+        "/workspace/pr-integration/2963-pinned-v3-optional-profile/crates/hashed-ecdl-cpu/Cargo.toml",
+        "--target-dir",
+        "/workspace/pr-integration/2963-pinned-build"
+      ],
+      "exit_code": 0,
+      "log": "validation-0.log",
+      "sha256": "6124e37d13cbbeac31ea3f81552e980d46c83c19a10c67416f0adbdbfbd808f7"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--all-targets",
+        "--manifest-path",
+        "/workspace/pr-integration/2963-pinned-v3-optional-profile/crates/hashed-ecdl-cpu/Cargo.toml",
+        "--target-dir",
+        "/workspace/pr-integration/2963-pinned-build",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "validation-1.log",
+      "sha256": "38d171df3aaf9a396a98b88dd3a3a0837e43b3c5a104ec582ac8b4c620432780"
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--check",
+        "--manifest-path",
+        "/workspace/pr-integration/2963-pinned-v3-optional-profile/crates/hashed-ecdl-cpu/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "log": "validation-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "shared_source_unchanged": true,
+  "shared_source_sha256": "6b9f56c6b1c2f05c6e2c3537cf68d0f242d7ba2c7750b0451a89c4693940b979",
+  "scope": "development correctness checks only; no timing or EKS execution"
+}

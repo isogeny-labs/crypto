@@ -1,0 +1,54 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-02-01
+experiment_id: BLINDSPOT-02
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/02-deployed-binary-pricing/raw/receipt-card-01.json
+binds:
+  - {path: examples/blindspots_02_deployed_binary_pricing.rs, sha256: a7bf5c5f0ace27a685dc1ebd3ce8f8667b8a672b864089f7399523aac7daa50c}
+  - {path: research/notes/ecc2k130/descent_degree_cost-output-20261016-scale.txt, sha256: d2a8f134be00ad5acd83f332f7f677df2848cfc6d15aeb4995f60b51e06a82ea}
+  - {path: research/ic_next10_20261014/06-equivariant-f4-m4/cost_d4-output.txt, sha256: e7b4a419025440ef85a7f269e22bad2bc826bc825ba078fbb2be3503c9d469dc}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-02/card-01]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -o, target/blindspots-02/card-01/b02, examples/blindspots_02_deployed_binary_pricing.rs]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-build.stdout.log
+    stderr: research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-build.stderr.log
+  - id: control
+    argv: [prlimit, --as=4294967296, target/blindspots-02/card-01/b02, control, --scale-ref, research/notes/ecc2k130/descent_degree_cost-output-20261016-scale.txt, --d4-ref, research/ic_next10_20261014/06-equivariant-f4-m4/cost_d4-output.txt, --out-dir, research/blindspots_20261018/02-deployed-binary-pricing/raw]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-control.stdout.log
+    stderr: research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-control.stderr.log
+    outputs: [research/blindspots_20261018/02-deployed-binary-pricing/raw/control.txt]
+  - id: cells
+    argv: [prlimit, --as=4294967296, target/blindspots-02/card-01/b02, cells, --out-dir, research/blindspots_20261018/02-deployed-binary-pricing/raw]
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-cells.stdout.log
+    stderr: research/blindspots_20261018/02-deployed-binary-pricing/raw/card-01-cells.stderr.log
+    outputs:
+      - research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.tsv
+      - research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.md
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-02/card-01/b02]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-02
+background: false
+write_scope:
+  - research/blindspots_20261018/02-deployed-binary-pricing/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

@@ -1,0 +1,260 @@
+[
+  {
+    "Id": "7d27f2c3bcc377834f8aa98abffde996564450f02ba4b089420bfbae6859a70c",
+    "Created": "2026-10-31T07:09:01.498101888Z",
+    "Path": "/qualification/exec-gate",
+    "Args": [
+      "Q1",
+      "0159ca8a-9eec-479a-9aa2-04d62b131f89"
+    ],
+    "State": {
+      "Status": "created",
+      "Running": false,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 0,
+      "ExitCode": 0,
+      "Error": "",
+      "StartedAt": "0001-01-01T00:00:00Z",
+      "FinishedAt": "0001-01-01T00:00:00Z"
+    },
+    "Image": "sha256:1adcc3d49e5660bf25cd15f839f757786e0aa50455d6e255fe38cd19bc3cad60",
+    "ResolvConfPath": "",
+    "HostnamePath": "",
+    "HostsPath": "",
+    "LogPath": "",
+    "Name": "/isolab-runtime-q-0159ca8a-9eec-479a-9aa2-04d62b131f89",
+    "RestartCount": 0,
+    "Driver": "overlay2",
+    "Platform": "linux",
+    "MountLabel": "",
+    "ProcessLabel": "",
+    "AppArmorProfile": "",
+    "ExecIDs": null,
+    "HostConfig": {
+      "Binds": null,
+      "ContainerIDFile": "",
+      "LogConfig": {
+        "Type": "json-file",
+        "Config": {}
+      },
+      "NetworkMode": "none",
+      "PortBindings": {},
+      "RestartPolicy": {
+        "Name": "no",
+        "MaximumRetryCount": 0
+      },
+      "AutoRemove": false,
+      "VolumeDriver": "",
+      "VolumesFrom": null,
+      "ConsoleSize": [
+        0,
+        0
+      ],
+      "CapAdd": null,
+      "CapDrop": [
+        "ALL"
+      ],
+      "CgroupnsMode": "private",
+      "Dns": [],
+      "DnsOptions": [],
+      "DnsSearch": [],
+      "ExtraHosts": null,
+      "GroupAdd": null,
+      "IpcMode": "private",
+      "Cgroup": "",
+      "Links": null,
+      "OomScoreAdj": 0,
+      "PidMode": "",
+      "Privileged": false,
+      "PublishAllPorts": false,
+      "ReadonlyRootfs": true,
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "Tmpfs": {
+        "/tmp": "rw,noexec,nosuid,nodev,size=16m,mode=1777",
+        "/work": "rw,noexec,nosuid,nodev,size=16m,mode=1777"
+      },
+      "UTSMode": "",
+      "UsernsMode": "",
+      "ShmSize": 67108864,
+      "Runtime": "runc",
+      "Isolation": "",
+      "CpuShares": 0,
+      "Memory": 536870912,
+      "NanoCpus": 1000000000,
+      "CgroupParent": "",
+      "BlkioWeight": 0,
+      "BlkioWeightDevice": [],
+      "BlkioDeviceReadBps": [],
+      "BlkioDeviceWriteBps": [],
+      "BlkioDeviceReadIOps": [],
+      "BlkioDeviceWriteIOps": [],
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpuRealtimePeriod": 0,
+      "CpuRealtimeRuntime": 0,
+      "CpusetCpus": "",
+      "CpusetMems": "",
+      "Devices": [],
+      "DeviceCgroupRules": null,
+      "DeviceRequests": null,
+      "MemoryReservation": 0,
+      "MemorySwap": 536870912,
+      "MemorySwappiness": null,
+      "OomKillDisable": false,
+      "PidsLimit": 1,
+      "Ulimits": [
+        {
+          "Name": "nofile",
+          "Hard": 65536,
+          "Soft": 32768
+        }
+      ],
+      "CpuCount": 0,
+      "CpuPercent": 0,
+      "IOMaximumIOps": 0,
+      "IOMaximumBandwidth": 0,
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Source": "/var/tmp/pencil-runtime-fixtures-20261031-v1/prepared/fixtures",
+          "Target": "/fixtures",
+          "ReadOnly": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/var/tmp/pencil-qualification-filled-binding-20261031-v1/gate/exec-gate",
+          "Target": "/qualification/exec-gate",
+          "ReadOnly": true
+        }
+      ],
+      "MaskedPaths": [
+        "/proc/asound",
+        "/proc/acpi",
+        "/proc/kcore",
+        "/proc/keys",
+        "/proc/latency_stats",
+        "/proc/timer_list",
+        "/proc/timer_stats",
+        "/proc/sched_debug",
+        "/proc/scsi",
+        "/sys/firmware",
+        "/sys/devices/virtual/powercap"
+      ],
+      "ReadonlyPaths": [
+        "/proc/bus",
+        "/proc/fs",
+        "/proc/irq",
+        "/proc/sys",
+        "/proc/sysrq-trigger"
+      ]
+    },
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/7ff60d9c65f9c7078eb798941813392e64976fe03f1d0ef46ae2ef7ada8ca4cf-init/diff:/var/lib/docker/overlay2/ffcef6970fb15005437c25ce65663482c7e831e8de72febe38f6744464a13f71/diff:/var/lib/docker/overlay2/4d16fb90043023944564245f7b32e2ae2efc87f65bbe927a84ebf63c94cd9eb1/diff:/var/lib/docker/overlay2/44a77a6ae9e529e1dd0270d6fd6564013d8cc967a2956fb819c722b0ac063203/diff:/var/lib/docker/overlay2/a7c3f23cc908c85c8686398399d8816d7d42e068c99b07f8f20639c9ed581a4e/diff:/var/lib/docker/overlay2/e08a7295fe26727e75e0768345f0881558bada22fd23c0db3fb06b1fc6d5ec38/diff:/var/lib/docker/overlay2/8588c26b29f8c19916348ba6f90878adfdb81155e00edd1b6cc8324e0c8b4c21/diff:/var/lib/docker/overlay2/a8c0f8b95e18c10ff676d0e8506d94b5ae3f20a89cea6116144537788f0ec524/diff:/var/lib/docker/overlay2/d9a29970af8670878a823e17f3379096addd2ef37e4b37fecd8dfdc2a03eee39/diff:/var/lib/docker/overlay2/e408b3d698dd3257ab3c28eeb5f88fc28d3249f30be2a3e4f4553d804162ae60/diff:/var/lib/docker/overlay2/fb97e3f4cb5227ea0c06dce1ae83b0def5064e990ba25a9398760e811bd6c4fe/diff:/var/lib/docker/overlay2/27358fb42485a85db4a1c946efc1103eb0697520ed9db0857d0e8703ec73907d/diff",
+        "MergedDir": "/var/lib/docker/overlay2/7ff60d9c65f9c7078eb798941813392e64976fe03f1d0ef46ae2ef7ada8ca4cf/merged",
+        "UpperDir": "/var/lib/docker/overlay2/7ff60d9c65f9c7078eb798941813392e64976fe03f1d0ef46ae2ef7ada8ca4cf/diff",
+        "WorkDir": "/var/lib/docker/overlay2/7ff60d9c65f9c7078eb798941813392e64976fe03f1d0ef46ae2ef7ada8ca4cf/work"
+      },
+      "Name": "overlay2"
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/var/tmp/pencil-runtime-fixtures-20261031-v1/prepared/fixtures",
+        "Destination": "/fixtures",
+        "Mode": "",
+        "RW": false,
+        "Propagation": "rprivate"
+      },
+      {
+        "Type": "bind",
+        "Source": "/var/tmp/pencil-qualification-filled-binding-20261031-v1/gate/exec-gate",
+        "Destination": "/qualification/exec-gate",
+        "Mode": "",
+        "RW": false,
+        "Propagation": "rprivate"
+      }
+    ],
+    "Config": {
+      "Hostname": "7d27f2c3bcc3",
+      "Domainname": "",
+      "User": "1000:1000",
+      "AttachStdin": false,
+      "AttachStdout": true,
+      "AttachStderr": true,
+      "Tty": false,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Env": [
+        {
+          "name": "PATH",
+          "sha256": "3df505b4bf853c456422990cd474612e074d20d307e66398a090b4bfa519348b"
+        },
+        {
+          "name": "HOME",
+          "sha256": "ae7d0074884ea604e7fd67c59e982510134609b8460d8bece95274f34f3bf668"
+        }
+      ],
+      "Cmd": [
+        "Q1",
+        "0159ca8a-9eec-479a-9aa2-04d62b131f89"
+      ],
+      "Image": "sha256:1adcc3d49e5660bf25cd15f839f757786e0aa50455d6e255fe38cd19bc3cad60",
+      "Volumes": null,
+      "WorkingDir": "/work",
+      "Entrypoint": [
+        "/qualification/exec-gate"
+      ],
+      "OnBuild": null,
+      "Labels": {
+        "isolab.local-assembly.owner": "467e8502-46d8-4ab9-a13b-8d2375dd2ca2",
+        "isolab.local-assembly.phase": "runtime",
+        "isolab.runtime-qualification.owner": "0159ca8a-9eec-479a-9aa2-04d62b131f89",
+        "org.opencontainers.image.revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+        "org.opencontainers.image.source": "https://github.com/aburan28/crypto"
+      }
+    },
+    "NetworkSettings": {
+      "Bridge": "",
+      "SandboxID": "",
+      "SandboxKey": "",
+      "Ports": {},
+      "HairpinMode": false,
+      "LinkLocalIPv6Address": "",
+      "LinkLocalIPv6PrefixLen": 0,
+      "SecondaryIPAddresses": null,
+      "SecondaryIPv6Addresses": null,
+      "EndpointID": "",
+      "Gateway": "",
+      "GlobalIPv6Address": "",
+      "GlobalIPv6PrefixLen": 0,
+      "IPAddress": "",
+      "IPPrefixLen": 0,
+      "IPv6Gateway": "",
+      "MacAddress": "",
+      "Networks": {
+        "none": {
+          "IPAMConfig": null,
+          "Links": null,
+          "Aliases": null,
+          "MacAddress": "",
+          "NetworkID": "",
+          "EndpointID": "",
+          "Gateway": "",
+          "IPAddress": "",
+          "IPPrefixLen": 0,
+          "IPv6Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "DriverOpts": null,
+          "DNSNames": null
+        }
+      }
+    }
+  }
+]

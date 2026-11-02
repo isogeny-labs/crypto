@@ -25,8 +25,12 @@ Sources (all committed, read at --ref unless noted):
                                 verified fixed-cohort cutoff coverage, not random sampling or security
   research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
                                 verified broader recorded-census coverage, not historical use or security
+  research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json
+                                exact fixed-score allocation coverage, not sampled curves or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/explicit_relations_e2e_20261030/results-v*/
+                                exact recovery counts and bounded two-target frontier; no L0 timing rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -34,9 +38,11 @@ Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 # problem, unit, better (higher|lower|neutral), kind (gauge|event), label, source.
 # Reads committed state at --ref via `git show`; never the working tree. stdlib only.
 import argparse
+import atexit
 import datetime as dt
 import json
 import os
+import posixpath
 import subprocess
 import sys
 from pathlib import Path
@@ -52,9 +58,41 @@ def _git(*args, check=True):
     return p.stdout
 
 
+_object_reader = None
+
+
+def _close_object_reader():
+    global _object_reader
+    if _object_reader is not None:
+        _object_reader.stdin.close()
+        _object_reader.stdout.close()
+        _object_reader.wait()
+        _object_reader = None
+
+
+atexit.register(_close_object_reader)
+
+
 def show(ref, path):
-    p = subprocess.run(["git", "-C", str(REPO), "show", f"{ref}:{path}"], capture_output=True, text=True)
-    return p.stdout if p.returncode == 0 else None
+    """Read committed blobs through one Git process, preserving missing=None."""
+    global _object_reader
+    if _object_reader is None:
+        _object_reader = subprocess.Popen(
+            ["git", "-C", str(REPO), "cat-file", "--batch"],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    reader = _object_reader
+    reader.stdin.write(f"{ref}:{path}\n".encode())
+    reader.stdin.flush()
+    header = reader.stdout.readline().split()
+    if header and header[-1] == b"missing":
+        return None
+    if len(header) != 3 or header[1] != b"blob":
+        raise RuntimeError(f"invalid committed metrics source: {path}")
+    size = int(header[2])
+    data = reader.stdout.read(size)
+    if len(data) != size or reader.stdout.read(1) != b"\n":
+        raise RuntimeError(f"truncated committed metrics source: {path}")
+    return data.decode()
 
 
 def ls(ref, path=""):
@@ -349,6 +387,19 @@ def nist_selection_broader_census(ref, since):
                  source=f"{path}@{commit}")
 
 
+def nist_selection_exact_pair_audit(ref, since):
+    """Export the verified allocation inventory; do not compute a statistic."""
+    path = "research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        emit("nist.selection_exact_pair_audit.verified_assignments", data.get("assignments"),
+             date=date, problem="nist-candidate-selection", unit="label assignments", better="neutral",
+             label="Verified fixed-score allocation inventory; not sampled curves or security",
+             source=f"{path}@{commit}")
+
+
 def koblitz_modular_augmentation(ref, since):
     """Export the recorded scalar for the fixed n=5 augmentation presentation."""
     path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
@@ -565,6 +616,164 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
+                          metric_prefix="gpu.explicit_relations"):
+    """Exact completed-panel counts; no timing or global-maximum claims."""
+    revision = _git("rev-parse", ref).strip()[:12]
+    paths = [p for p in ls(ref, study) if p.endswith("/coverage.json")]
+    requested = [f"{p.rsplit('/', 1)[0]}/{name}" for p in paths
+                 for name in ("coverage.json", "export.json", "frontier.txt")]
+    # One Git process avoids per-file process and remote-filesystem overhead.
+    batch = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                           input="".join(f"{ref}:{p}\n" for p in requested).encode(),
+                           capture_output=True, check=True).stdout
+    blobs, offset = {}, 0
+    for path in requested:
+        end = batch.index(b"\n", offset)
+        header = batch[offset:end].split()
+        offset = end + 1
+        if header[-1] == b"missing":
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"invalid committed GPU source: {path}")
+        size = int(header[2])
+        blobs[path] = batch[offset:offset + size].decode()
+        if batch[offset + size:offset + size + 1] != b"\n":
+            raise ValueError(f"truncated committed GPU source: {path}")
+        offset += size + 1
+    for path in paths:
+        directory = path.rsplit("/", 1)[0]
+        name = directory.rsplit("/", 1)[-1]
+        if not name.startswith("results-v") or not name[9:].isdigit():
+            continue
+        coverage_text = blobs.get(path)
+        export_text = blobs.get(f"{directory}/export.json")
+        if not coverage_text or not export_text:
+            continue
+        coverage, export = json.loads(coverage_text), json.loads(export_text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        verified = sum(r.get("status") == "succeeded" and
+                       r.get("verification", {}).get("status") == "verified" for r in runs)
+        if len(runs) != coverage.get("attempted") or verified != coverage.get("verified_recoveries"):
+            raise ValueError(f"inconsistent completed GPU panel: {path}")
+        prefix = f"{metric_prefix}.{name[8:]}"
+        source = f"{path}@{revision}"
+        for suffix, value, label in (
+            ("attempted", coverage["attempted"], "recorded executions"),
+            ("verified_recoveries", verified, "fresh CPU-replayed recoveries"),
+            ("timeouts", sum(r.get("status") == "timeout" for r in runs), "retained solve timeouts"),
+        ):
+            emit(f"{prefix}.{suffix}", value, date=date, problem="gpu-generic-decomposition",
+                 unit="count", better="neutral", label=f"GPU {name}: {label}; fixed bounded panel, L0",
+                 source=source)
+        frontier = blobs.get(f"{directory}/frontier.txt")
+        if frontier:
+            key, _, value = frontier.strip().partition("=")
+            if key == "largest_complete_bits" and value.isdigit():
+                emit(f"{prefix}.complete_field_bits", int(value), date=date,
+                     problem="gpu-generic-decomposition", unit="field bits", better="neutral",
+                     label=f"GPU {name}: complete two-target rung under fixed limits; not a global maximum",
+                     source=f"{directory}/frontier.txt@{revision}")
+
+
+
+def explicit_gpu_profile(ref, since):
+    """Committed diagnostic coverage only; no recovery or timing promotion."""
+    study = "research/explicit_relations_profile_20261031"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for version in (1, 2):
+        path = f"{study}/results-v{version}/export.json"
+        text = show(ref, path)
+        if text is None:
+            continue
+        export = json.loads(text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        if len(runs) != export.get("flow", {}).get("attempted"):
+            raise ValueError(f"inconsistent GPU profile coverage: {path}")
+        verified = [r for r in runs if r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified"]
+        if version == 1:
+            samples = (
+                ("verified_cells", len(verified), "byte-exact query replay cells"),
+                ("verified_queries", sum(r["measurements"]["counted"]["verified_queries"]
+                                         for r in verified), "byte-exact query replies"),
+            )
+        else:
+            samples = (
+                ("timeline_profiles", sum(r["arm"] == "t" for r in verified),
+                 "successful Nsight Systems traces"),
+                ("counter_unavailable", sum(r["measurements"]["counters"].get("native_status")
+                                             == "unsupported" for r in runs),
+                 "retained unavailable hardware-counter profiles"),
+            )
+        for suffix, value, label in samples:
+            emit(f"gpu.explicit_relations.profile.v{version}.{suffix}", value,
+                 date=date, problem="gpu-query-diagnostics", unit="count",
+                 better="neutral", label=f"GPU profile v{version}: {label}; fixed prefixes",
+                 source=f"{path}@{revision}")
+
+
+def explicit_gpu_fullcache(ref, since):
+    """Read both committed strata; retain preflight failures separately."""
+    study = "research/explicit_relations_fullcache_20261101"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for path in ls(ref, study):
+        directory, _, name = path.rpartition("/")
+        version = directory.rsplit("/", 1)[-1]
+        if not version.startswith("results-v") or not version[9:].isdigit():
+            continue
+        if name not in ("failure.json", "export-small.json", "export.json"):
+            continue
+        record = json.loads(show(ref, path))
+        date = record.get("created", record.get("observed_at", ""))[:10]
+        if len(date) != 10 or date < since:
+            continue
+        prefix = f"gpu.explicit_relations.fullcache.{version[8:]}"
+        if name == "failure.json":
+            if record.get("kind") != "preflight_failure" or record.get("attempted_recovery_cells") != 0:
+                raise ValueError(f"invalid GPU preflight record: {path}")
+            samples = [("preflight_failures", 1, "retained preflight failure; zero recovery attempts")]
+        else:
+            runs = record.get("runs", [])
+            attempted = sum(r.get("attempts", 0) >= 1 for r in runs)
+            if attempted != record.get("flow", {}).get("attempted"):
+                raise ValueError(f"inconsistent GPU full-cache coverage: {path}")
+            protocol_path = posixpath.normpath(f"{directory}/{record['protocol']['path']}")
+            protocol = json.loads(show(ref, protocol_path))
+            sample = protocol["sample_size"]
+            planned = len(protocol["arms"]) * sample["instances"] * (
+                sample["replicates"] + sample.get("warmups", 0))
+            if attempted > planned:
+                raise ValueError(f"GPU full-cache attempts exceed protocol: {path}")
+            prefix += ".small" if name == "export-small.json" else ".large"
+            samples = [
+                ("planned", planned, "protocol-planned executions"),
+                ("attempted", attempted, "recorded complete-recovery executions"),
+                ("verified_recoveries", sum(r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified" for r in runs),
+                 "fresh CPU-replayed recoveries"),
+                ("timeouts", sum(r.get("status") == "timeout" for r in runs),
+                 "retained solve timeouts"),
+                ("failed", sum(r.get("status") == "failed" for r in runs),
+                 "retained failed or resource-limited executions"),
+                ("interrupted", sum(r.get("status") == "interrupted" for r in runs),
+                 "retained interrupted executions; no complete clock"),
+                ("not_attempted", planned - attempted,
+                 "planned cells not started after infrastructure stop"),
+            ]
+        for suffix, value, label in samples:
+            emit(f"{prefix}.{suffix}", value, date=date,
+                 problem="gpu-generic-decomposition", unit="count", better="neutral",
+                 label=f"Full-cache {version}: {label}; fixed bounded panel, L0",
+                 source=f"{path}@{revision}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -584,6 +793,7 @@ def main():
     nist_selection_strict_elkies(a.ref, a.since)
     nist_selection_expanded_cutoff(a.ref, a.since)
     nist_selection_broader_census(a.ref, a.since)
+    nist_selection_exact_pair_audit(a.ref, a.since)
 
 
     ghs_ipsec_archive(a.ref, a.since)
@@ -594,6 +804,11 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
+                          "gpu.explicit_relations.affine")
+    explicit_gpu_profile(a.ref, a.since)
+    explicit_gpu_fullcache(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

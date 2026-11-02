@@ -207,6 +207,19 @@ class GithubStepTests(unittest.TestCase):
         self.assertIn("no GitHub service credential set", result.stdout + result.stderr)
         self.assertFalse((self.home / ".local/bin/gh-app-token").exists())
 
+    def test_lazy_setup_reads_the_credential_when_git_needs_it(self):
+        # A cloud setup script runs before the session's variables exist: the
+        # helper is installed with no credential and git falls through until
+        # one appears in the environment.
+        result = self.setup(dict(self.env, GITHUB_LAZY="1"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("credentials read from the environment at use time", result.stdout)
+        self.assertNotIn("password", self.credential(dict(self.env)))
+        later = dict(self.env, GH_SERVICE_TOKEN="ghp_TESTLATERTOKEN")
+        self.assertEqual(self.credential(later).get("password"), "ghp_TESTLATERTOKEN")
+        app = self.app_env("111", "10", self.api_a)
+        self.assertEqual(self.credential(app).get("password"), "ghs_A_app111_inst10")
+
     def test_dry_run_changes_nothing(self):
         env = self.app_env("111", "10", self.api_a)
         result = self.setup(env, "--dry-run")

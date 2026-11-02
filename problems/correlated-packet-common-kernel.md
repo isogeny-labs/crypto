@@ -94,6 +94,21 @@ not a demonstrated runtime or algorithm.
 
 ## Next discriminating step
 
+An [anchored-pole completion](../research/prime_pole_anchor_20261030/README.md)
+has now been constructed inside W_base+C H with constant H. Exact checks
+certify one extra odd-level crossing bit, old even-level coarse weights,
+and degree2L instead of2L-1 for L4,8,16. Its single-axis mode family does
+not give the requested two-axis density or improved asymptotic exponent.
+The valuation/global integration arguments are written and partially
+formalized only; a complete recursive proof and end-to-end cost remain open.
+
+A new [nonscalar-origin/jet-completion proposal](../research/prime_jet_completion_20261030/README.md)
+uses `W_new=W_base+C H` to preserve all node values while optimizing crossing
+jets. Ordinary derivative flattening supplies a finite control:5440 nodal
+checks pass, but the tested first crossing coefficient gains only2valuation
+bits as degree roughly doubles. The matrix completion is not implemented;
+its integral factorization, higher jets and adjusted costs remain open.
+
 - **Action:** construct a fixed kernel with different valid local factorizations
   at different valuation levels; prove an actual common-family/jet identity
   before trying a relation search or fitting timing exponents.

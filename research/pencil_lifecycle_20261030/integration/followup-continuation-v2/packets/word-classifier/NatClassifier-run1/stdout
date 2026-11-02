@@ -1,0 +1,38 @@
+/var/tmp/pencil-word-classifier-v2-20261031/NatClassifier.lean:18:6: error: Tactic `rewrite` failed: motive is not type correct:
+  fun _a =>
+    (if _a ∧ t₁ = residueNeg p t₂ then Branch22Prelude.sameUInverse
+      else
+        if s₁ = s₂ ∧ t₁ = t₂ then Branch22Prelude.sameUDouble
+        else if residueSub p s₁ s₂ = 0 then Branch22Prelude.sameUMixedZeroSlope else Branch22Prelude.sameUMixed) =
+      if ↑s₁ = -↑s₂ ∧ ↑t₁ = -↑t₂ then Branch22Prelude.sameUInverse
+      else
+        if ↑s₁ = ↑s₂ ∧ ↑t₁ = ↑t₂ then Branch22Prelude.sameUDouble
+        else if ↑s₁ - ↑s₂ = 0 then Branch22Prelude.sameUMixedZeroSlope else Branch22Prelude.sameUMixed
+Error: Application type mismatch: The argument
+  instDecidableEqNat s₁ (residueNeg p s₂)
+has type
+  Decidable (s₁ = residueNeg p s₂)
+but is expected to have type
+  Decidable _a
+in the application
+  @instDecidableAnd _a (t₁ = residueNeg p t₂) (instDecidableEqNat s₁ (residueNeg p s₂))
+
+Explanation: The rewrite tactic rewrites an expression 'e' using an equality 'a = b' by the following process. First, it looks for all 'a' in 'e'. Second, it tries to abstract these occurrences of 'a' to create a function 'm := fun _a => ...', called the *motive*, with the property that 'm a' is definitionally equal to 'e'. Third, we observe that 'congrArg' implies that 'm a = m b', which can be used with lemmas such as 'Eq.mpr' to change the goal. However, if 'e' depends on specific properties of 'a', then the motive 'm' might not typecheck.
+
+Possible solutions: use rewrite's 'occs' configuration option to limit which occurrences are rewritten, or use 'simp' or 'conv' mode, which have strategies for certain kinds of dependencies (these tactics can handle proofs and 'Decidable' instances whose types depend on the rewritten term, and 'simp' can apply user-defined '@[congr]' theorems as well).
+
+p s₁ t₁ s₂ t₂ : ℕ
+inst✝ : Fact (Nat.Prime p)
+hp : 0 < p
+hs₁ : s₁ < p
+ht₁ : t₁ < p
+hs₂ : s₂ < p
+ht₂ : t₂ < p
+⊢ (if s₁ = residueNeg p s₂ ∧ t₁ = residueNeg p t₂ then Branch22Prelude.sameUInverse
+    else
+      if s₁ = s₂ ∧ t₁ = t₂ then Branch22Prelude.sameUDouble
+      else if residueSub p s₁ s₂ = 0 then Branch22Prelude.sameUMixedZeroSlope else Branch22Prelude.sameUMixed) =
+    if ↑s₁ = -↑s₂ ∧ ↑t₁ = -↑t₂ then Branch22Prelude.sameUInverse
+    else
+      if ↑s₁ = ↑s₂ ∧ ↑t₁ = ↑t₂ then Branch22Prelude.sameUDouble
+      else if ↑s₁ - ↑s₂ = 0 then Branch22Prelude.sameUMixedZeroSlope else Branch22Prelude.sameUMixed

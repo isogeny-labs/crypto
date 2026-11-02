@@ -1,0 +1,20 @@
+# Original non-torsion G-step: paired software integration
+
+The additive two-call candidate completes63 fixed transitions across21 models with63 exact signed recoveries. Its selected pairs, branch choices and labels match the eager walker on all63 transitions. The eager recovery helper succeeds61 times and returns general_conversion_inapplicable twice; both outcomes are retained. The new degree1 helper recovers those two points. The bounded locked/offline software gate exits0.
+
+## Original transition and direct neighbour
+This packet uses the original non-torsion anchor G, not the torsion-grid replacement. State is([R],[R+G]), R=aG+bQ. At each step c=branch([R]); the eager version computes both doubles and mixed addition while the candidate computes the selected double plus mixed addition. Output is([2R+cG],[2R+(c+1)G]); labels are(2a+c,2b) modulo r.
+Before checks, verify G,Q valid, rG=rQ=0, G not2-torsion,2<=r<=2^63 and canonical labels. Input fixtures are the pinned first retained target from each21 models; each has exactly3 steps. Initialization constructs Q+G and projects the pair and fixed G/identity. Model setup and subgroup checks are separately outside phase estimates.
+The transition uses advance with expected-point diagnostic validation disabled. Recovery immediately consumes the propagated pair and signed G. Only afterward does the harness compute aG+bQ and its neighbour to verify both corners and exact signed result. No expected-neighbour construction feeds the ordinary candidate. The unchanged labelled fallback would reconstruct from public G,Q and labels if needed and be counted; it is not invoked in these63 cases.
+
+## Coverage and failures
+All126 candidate quotient corners match the independent signed reference. Candidate recovery modes are61 generic and2 degree1. Baseline failures are recorded as helper-call failures, not asserted to be full collector solve failures: the original collector can skip unsuitable coordinate cases before relation processing, whereas this harness deliberately attempts signed recovery at every selected state.
+Neither arm observes a successful geometric repair or labelled fallback. The Delta_zero helper is included but unexercised here. Successful repairs and Delta coverage from the separately scoped torsion-grid fixtures are not counted as original G-step coverage. These are63 bounded transition checks, not independent target solves.
+
+## Accounting and source boundaries
+phase-counters.csv contains126 arm/transition rows; initialization-counters.csv contains42 arm/model rows. Native field, walk and signed counters are separate for initialization, transition, recovery and reference verification. Every ordinary candidate transition skips exactly one eager doubling call; no timing or complete cost ratio is inferred. Recovery work, including additional coordinate conversion, square roots, candidate validity and signed-neighbour checks, is retained in its own phase.
+The reused square-root implementation searches for a quadratic nonresidue. The at-most-four Mumford candidate bound does not eliminate that work. Counters are implementation observations, not a complete independent census of exponentiation/search costs. Counter banks and verification costs must not be silently combined into a claimed end-to-end price.
+
+## Reproducibility
+PLAN.md freezes the original G-step family, assumptions, fixed21x3 checks and120s bound before code. pre-execution-manifest.json pins fixtures/source. receipt.json records exit0. The production candidate is a private additive source snapshot; no original cohort, cloud job, published runtime, or shared repository source was changed. Independent review remains pending before integration or prospective scientific execution.
+References: pinned N19 main_labelled.rs and prior two-call/degree1/Delta additive source; Chung-Costello-Smith sections2,3,6.4, https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/recovery.pdf . The earlier supplied-neighbour and square-root wording corrections remain preserved in their immutable addenda.

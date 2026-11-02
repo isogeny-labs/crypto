@@ -1,0 +1,100 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Prime orbit IC relation collection: shipped affine versus shipped Jacobian",
+  "description": "Paired L2 component benchmark. Affine is one lane; Jacobian is 32 lanes with batch normalization. This is not a coordinate-only comparison.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic_a_minus_3",
+        "bits": 28,
+        "seed": 2026110101
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic_a_minus_3",
+        "bits": 30,
+        "seed": 2026110102
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "j0_b7",
+        "bits": 28,
+        "seed": 2026110103
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "j0_b7",
+        "bits": 30,
+        "seed": 2026110104
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "j1728",
+        "bits": 28,
+        "seed": 2026110105
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "j1728",
+        "bits": 30,
+        "seed": 2026110106
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261101
+  },
+  "arms": [
+    {
+      "name": "affine",
+      "role": "reference",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "32",
+          "relations_per_orbit": "1.5",
+          "max_ops": "4294967296",
+          "max_descent_ops": "4294967296"
+        }
+      }
+    },
+    {
+      "name": "jacobian",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "jacobian",
+          "orbits": "32",
+          "relations_per_orbit": "1.5",
+          "max_ops": "4294967296",
+          "max_descent_ops": "4294967296"
+        }
+      }
+    },
+    {
+      "name": "affine-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "32",
+          "relations_per_orbit": "1.5",
+          "max_ops": "4294967296",
+          "max_descent_ops": "4294967296"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 8,
+    "warmup": 2,
+    "order": "alternate_measured",
+    "seed": 20261101,
+    "algorithm_seed_round": "measured_index",
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

@@ -90,6 +90,15 @@ configured GitHub role's S3 authorization. Mock transport and development
 successes do not close this execution requirement or the general audit.
 The original frozen A/B/profiling, complete binary/schoolbook pipelines and
 both challenge scalar requirements remain open. No runtime gain is claimed.
+2026-10-30 program assessment and theorem-bridge source review: the
+[dated assessment](../research/hashed_ecdl_leads_20261030/README.md) and
+[interface map](../research/hashed_ecdl_leads_20261030/BRIDGE.md) distinguish
+fixed-width formal counting endpoints from the required general implicit
+tensor statement. The native packet representation has no nested parent
+evaluator callback; coefficient extraction, preparation, mode enumeration,
+retained data and aggregate bit costs remain general audit obligations.
+This is source inspection, without a Lean/kernel check, experiment, new
+theorem, smaller-packet proof or performance claim. Status stays open.
 
 2026-10-30 checked hash-prime follow-up: retained verified auxiliary prime facts
 through factor-base construction and replay, with an optional explicit fixed

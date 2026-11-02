@@ -1,0 +1,39 @@
+import FallbackWordNumerator
+set_option autoImplicit false
+namespace FallbackWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem quotient_normal (p last : UInt64) (b a : List UInt64) (fuel : Nat) (q r : List UInt64)
+ (ho : NonmonicStorage.wordDiv p last b a fuel=some (q,r)) : Normal q := by
+ unfold NonmonicStorage.wordDiv at ho
+ cases he : NonmonicStorage.wloop p last b fuel (ProductPolynomial.zeros (a.length-b.length+1)) (trimFuel a.length a) with
+ | none => simp [he] at ho
+ | some z =>
+   rw [he] at ho
+   have hq : QuotientStorage.finish z.1=q := congrArg Prod.fst (Option.some.inj ho)
+   exact hq ▸ (show Normal (QuotientStorage.finish z.1) from trim_finished _ _ le_rfl)
+
+theorem exact_normal (p : UInt64) (a b q : List UInt64) (ho : exactDiv p a b=some q) : Normal q := by
+ unfold exactDiv at ho
+ cases hl : b.getLast? with
+ | none => simp [hl] at ho
+ | some last =>
+   rw [hl] at ho
+   dsimp only at ho
+   cases hw : NonmonicStorage.wordDiv p last b a a.length with
+   | none => simp [hw] at ho
+   | some z =>
+     rw [hw] at ho
+     dsimp at ho
+     split_ifs at ho
+     · have hq : z.1=q := Option.some.inj ho
+       exact hq ▸ quotient_normal p last b a a.length z.1 z.2 hw
+
+theorem exact_total_normal (p : UInt64) [Fact p.toNat.Prime] (a b : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (ha : Canon p a) (hc : Canon p b)
+ (hn : Normal b) (hbn : wordsPoly p b ≠ 0) (hd : wordsPoly p b ∣ wordsPoly p a) :
+ ∃ q, exactDiv p a b=some q ∧ Canon p q ∧ Normal q ∧
+ wordsPoly p a=wordsPoly p q*wordsPoly p b := by
+ obtain ⟨q,he,hc,hdec⟩ := exact_total p a b hp hb ha hc hn hbn hd
+ exact ⟨q,he,hc,exact_normal p a b q he,hdec⟩
+end FallbackWord

@@ -1,0 +1,39 @@
+import WordBZero
+import FieldFixtures
+set_option autoImplicit false
+set_option maxHeartbeats 1600000
+open PencilWordRefinement MixedCancellation
+namespace BZeroWordControls
+instance : Fact (Nat.Prime (5:UInt64).toNat) := ⟨by decide⟩
+def a : WeightedWord := ⟨1,0,4,0,2,3⟩
+theorem da : a.decodeTwo 5=BZeroControls.a := by
+ unfold WeightedWord.decodeTwo a BZeroControls.a
+ congr 1 <;> norm_num <;> decide
+@[simp] theorem four_neg_one : (4:ZMod 5)= -1 := by decide
+theorem va : a.normalizedValid 5 (WeightedDoubling.curve (0:ZMod 5) 4 1 0) := by
+ change validTwo _ (a.decodeTwo 5)
+ rw [da,four_neg_one];exact BZeroControls.va
+theorem hg : IsCoprime (WeightedDoubling.curve (0:ZMod 5) 4 1 0)
+ (WeightedDoubling.curve (0:ZMod 5) 4 1 0).derivative := by
+ rw [four_neg_one];exact BZeroControls.hg
+example : let d := (bzeroWords 5 a).point
+ let c := dblWordPayload 5 0 4 1 0 d
+ d.canonical 5 ∧ d.y≠0 ∧ bzeroWordDispatch 5 0 4 1 0 a=some c ∧
+ c.canonical 5 ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid 5 (WeightedDoubling.curve (0:ZMod 5) 4 1 0) := by
+ exact bzero_word_preserves 5 (by decide) (by decide) 0 4 1 0 a
+  (by decide) (by decide) (by decide) (by decide)
+  (by norm_num [WeightedWord.canonical,a]) (by decide) (by decide) (by decide)
+  (by decide) va hg
+example : (bzeroWords 5 a).b=0 ∧ (bzeroWords 5 a).point.x=4 ∧
+ (bzeroWords 5 a).point.y=4 ∧ (bzeroWords 5 a).point.z=3 ∧
+ (bzeroWords 5 a).point.w=3 := by decide
+example : let c := dblWordPayload 5 0 4 1 0 (bzeroWords 5 a).point
+ c.q=2 ∧ c.r=1 ∧ c.s=3 ∧ c.t=2 ∧ c.z=3 ∧ c.w=3 := by decide
+example : bzeroWordDispatch 5 0 4 1 0 ⟨0,0,0,0,1,1⟩=none := by decide
+example : (bzeroWords 5 ⟨0,1,1,0,1,1⟩).b=3 ∧
+ bzeroWordDispatch 5 0 4 1 0 ⟨0,1,1,0,1,1⟩=none := by decide
+example : ¬ (⟨5,0,1,0,1,1⟩ : WeightedWord).canonical 5 := by
+ norm_num [WeightedWord.canonical]
+example : ¬ (5≤(2:UInt64).toNat) := by decide
+end BZeroWordControls

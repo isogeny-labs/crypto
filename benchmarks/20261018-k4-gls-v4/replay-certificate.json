@@ -1,0 +1,1704 @@
+{
+ "schema": "replay-certificate/v1",
+ "row": "benchmarks/README.md, row 20261018-k4-gls-v4 (E25)",
+ "date": "2026-10-21",
+ "validator": "validator subagent (review-adversarial policy), independent of the session that produced E25: fresh build, fresh runs, own comparison and own instance checks",
+ "repository": {
+  "commit": "edea86713a3ab729a1d74353d2b253fea5271cb4",
+  "branch": "claude/glv-endomorphism-index-calculus-pe7ige",
+  "working_tree": "clean (git status --short empty) at build and at replay start"
+ },
+ "recorded_binary": "46202dc97 (experiments/30_gls_v4/binary_commit.txt; run.log: built from the identical tree before that commit)",
+ "code_drift": "git diff 46202dc97..edea86713 over the pipeline path (quartic_folds.rs, klein_v4.rs, gaudry_quartic*.rs, d4_weighted_s5.rs, gaudry_cubic.rs, residual_walk.rs, the driver, Cargo.lock): +96 lines in quartic_folds.rs (E26's census, additive) and +1 in Cargo.lock; every deterministic field replays identically",
+ "build": {
+  "command": "cargo build --release --example quartic_pipeline_d4 --example quartic_pipeline_v4 --example quartic_pipeline_gls; cargo build --release --example gls_stage_a",
+  "toolchain": "rustc 1.94.1 (e408947bf 2026-03-25), cargo 1.94.1",
+  "binaries": [
+   {
+    "name": "quartic_pipeline_gls",
+    "sha256": "04553025e6bfd76b02f0dd26821ce60d08cae271f5e9dd9a44a0672ca3a0b5c6"
+   },
+   {
+    "name": "gls_stage_a",
+    "sha256": "bc412b9974a66fcfdf45192db6e6d3157ee9f31239a4f51f606adf6544a67a87"
+   }
+  ]
+ },
+ "environment": {
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44, 15 GiB",
+  "RAYON_NUM_THREADS": 4,
+  "determinism_note": "collect_and_solve draws each round's targets (2 x rayon threads of them) from the run's single seeded RNG, which also chooses each target's row and feeds Wiedemann, so the thread count is part of the trajectory; the recorded host had 4 vCPUs (rayon default 4) and 4 threads reproduce every record. Field counters are per-instance Cell<u64>, not shared across threads.",
+  "concurrency": "the E25 replays ran beside the E19 replay stream on the same 4 vCPUs; only wall-clock fields are affected"
+ },
+ "command": "RAYON_NUM_THREADS=4 quartic_pipeline_gls --sizes P --first-seed S --seeds 1 --rho-runs 16 --max-residuals 5000000 --json OUT (experiments/30_gls_v4/run_all.sh's arguments; OUT in scratch, then copied to replay/e25/); replay/replay.sh",
+ "comparison": "replay/replay_compare.py: every field of every committed record compared with the replay leaf by leaf, integers and floats exactly; wall_ms and solve_ms are wall-clock and are reported, not compared",
+ "scalar_verification": "For every run and both arms the replayed binary recovered x by Wiedemann, checked [x]G = Q by double-and-add on the curve, and set correct = (x == d) for the instance's planted d (quartic_folds.rs Arm::attempt); every replay reports solved = true and correct = true, so x = d on all 20 arm runs. The committed JSON records correct = true but not x, so x is tied to the committed run through the instance: the replay regenerates it from (p, seed) and its n, #E and h equal the committed ones, and every deterministic counter (targets, decompositions, relations, Wiedemann operations, every walk's steps and F_p multiplications) is identical, which a different instance or a different row system would not give. Independently of the repository code (replay/harness/check_instances.py: own F_{p^4} and curve arithmetic), the regenerated instance satisfies G, Q on E, n prime, [n]G = O, [d]G = Q, #E = h n killing random points, psi^2(G) = -G and psi(G) = [lambda]G with lambda^2 = -1 mod n. Each of the 480 walks per arm set (16 <±psi>, 16 negation, 16 unfolded per curve, identical across the two arms) also recovered d (correct = true) and replays identically.",
+ "instance_checks": [
+  {
+   "experiment": "e25",
+   "p": 101,
+   "seed": 1,
+   "n": 6503869,
+   "group_order": 104061904,
+   "cofactor": 16,
+   "planted_d": 1538068,
+   "j": [
+    100,
+    0,
+    42,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 101,
+   "seed": 2,
+   "n": 6502501,
+   "group_order": 104040016,
+   "cofactor": 16,
+   "planted_d": 557533,
+   "j": [
+    34,
+    0,
+    95,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 149,
+   "seed": 1,
+   "n": 30804181,
+   "group_order": 492866896,
+   "cofactor": 16,
+   "planted_d": 4914788,
+   "j": [
+    38,
+    0,
+    130,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 149,
+   "seed": 2,
+   "n": 30802501,
+   "group_order": 492840016,
+   "cofactor": 16,
+   "planted_d": 2874927,
+   "j": [
+    36,
+    0,
+    62,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 197,
+   "seed": 1,
+   "n": 94129093,
+   "group_order": 1506065488,
+   "cofactor": 16,
+   "planted_d": 79622603,
+   "j": [
+    48,
+    0,
+    195,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 197,
+   "seed": 2,
+   "n": 94128829,
+   "group_order": 1506061264,
+   "cofactor": 16,
+   "planted_d": 7399960,
+   "j": [
+    11,
+    0,
+    69,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 269,
+   "seed": 1,
+   "n": 327253141,
+   "group_order": 5236050256,
+   "cofactor": 16,
+   "planted_d": 270725152,
+   "j": [
+    252,
+    0,
+    203,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 269,
+   "seed": 2,
+   "n": 327248941,
+   "group_order": 5235983056,
+   "cofactor": 16,
+   "planted_d": 309622187,
+   "j": [
+    194,
+    0,
+    8,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 397,
+   "seed": 1,
+   "n": 1552521829,
+   "group_order": 24840349264,
+   "cofactor": 16,
+   "planted_d": 1275612762,
+   "j": [
+    19,
+    0,
+    382,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e25",
+   "p": 397,
+   "seed": 2,
+   "n": 1552521829,
+   "group_order": 24840349264,
+   "cofactor": 16,
+   "planted_d": 1421554453,
+   "j": [
+    149,
+    0,
+    126,
+    0
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": true,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "psi_G_on_curve": true,
+    "psi2_G_eq_minus_G": true,
+    "lambda2_eq_minus1_mod_n": true,
+    "psi_G_eq_lambda_G": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  }
+ ],
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "runs_total": 21,
+ "runs_matched": 21,
+ "runs": [
+  {
+   "experiment": "e25",
+   "p": 101,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p101s1.json",
+    "sha256": "e73678810c24da921589f8e77d8ad83d894dc5ff023e7913508ef6b201438db7"
+   },
+   "replay_output": {
+    "path": "replay/e25/p101s1.json",
+    "sha256": "0468d1bab9a3f3695a0258c6edcb04d4650c183d6a1a5c2ddb3b585255896566"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 156731.0918699997,
+     "replay": 266907.1034169974
+    },
+    "wall_ms": {
+     "committed": 56654.323998,
+     "replay": 110053.593725
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1538068,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 41043,
+    "unsolved": 21,
+    "decompositions": 336,
+    "total_muls": 67608592257,
+    "solve_muls": 67065738530,
+    "la_fp_muls": 22320,
+    "macaulay_entries": 7293380864,
+    "rho_matched_muls": 514284.875,
+    "rho_matched_steps": 2007.1875,
+    "ratio": 131461.3661484795
+   },
+   "relations": 11,
+   "columns": 10,
+   "la_ops": 1395,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 101,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p101s1.json",
+    "sha256": "e73678810c24da921589f8e77d8ad83d894dc5ff023e7913508ef6b201438db7"
+   },
+   "replay_output": {
+    "path": "replay/e25/p101s1.json",
+    "sha256": "0468d1bab9a3f3695a0258c6edcb04d4650c183d6a1a5c2ddb3b585255896566"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 86685.15259199993,
+     "replay": 134234.6245659984
+    },
+    "wall_ms": {
+     "committed": 32741.325469000003,
+     "replay": 56348.90618
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1538068,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 21166,
+    "unsolved": 11,
+    "decompositions": 172,
+    "total_muls": 34825654827,
+    "solve_muls": 34544724144,
+    "la_fp_muls": 9072,
+    "macaulay_entries": 3758803328,
+    "rho_matched_muls": 514284.875,
+    "rho_matched_steps": 2007.1875,
+    "ratio": 67716.66156232964
+   },
+   "relations": 6,
+   "columns": 5,
+   "la_ops": 567,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 101,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p101s2.json",
+    "sha256": "4aae4ec5866654358f72e1df8b9d021b751eb6cba2e3d7ae1f54293d6c9bbd91"
+   },
+   "replay_output": {
+    "path": "replay/e25/p101s2.json",
+    "sha256": "30be87bbabc2d1a66139b7cca5b907841aa7472b71010ee3a46f3782b6bf62ef"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 62014.3823659999,
+     "replay": 61096.38868700006
+    },
+    "wall_ms": {
+     "committed": 23970.923898999998,
+     "replay": 21349.403034000003
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 557533,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 15010,
+    "unsolved": 13,
+    "decompositions": 624,
+    "total_muls": 24712296642,
+    "solve_muls": 24511082085,
+    "la_fp_muls": 49584,
+    "macaulay_entries": 2665742016,
+    "rho_matched_muls": 399050.4375,
+    "rho_matched_steps": 1192.4375,
+    "ratio": 61927.75228319353
+   },
+   "relations": 15,
+   "columns": 14,
+   "la_ops": 3099,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 101,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p101s2.json",
+    "sha256": "4aae4ec5866654358f72e1df8b9d021b751eb6cba2e3d7ae1f54293d6c9bbd91"
+   },
+   "replay_output": {
+    "path": "replay/e25/p101s2.json",
+    "sha256": "30be87bbabc2d1a66139b7cca5b907841aa7472b71010ee3a46f3782b6bf62ef"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 23734.497258000036,
+     "replay": 30497.007668000097
+    },
+    "wall_ms": {
+     "committed": 8485.111491,
+     "replay": 10891.690259
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 557533,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 7106,
+    "unsolved": 7,
+    "decompositions": 312,
+    "total_muls": 11695092130,
+    "solve_muls": 11598745375,
+    "la_fp_muls": 14256,
+    "macaulay_entries": 1262331840,
+    "rho_matched_muls": 399050.4375,
+    "rho_matched_steps": 1192.4375,
+    "ratio": 29307.303115035425
+   },
+   "relations": 8,
+   "columns": 7,
+   "la_ops": 891,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 149,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p149s1.json",
+    "sha256": "d35fe1354818e709a43c1d7520ffa7269f75ac9fdad08ae69c69d28edde25db7"
+   },
+   "replay_output": {
+    "path": "replay/e25/p149s1.json",
+    "sha256": "cb6e5b2f6b8aecaeb8fc7da04e6193faebfb9857957c5850d76c59c93e66e5fa"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 1321022.400406045,
+     "replay": 2259801.5357639804
+    },
+    "wall_ms": {
+     "committed": 490957.939628,
+     "replay": 950707.315873
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 4914788,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 352146,
+    "unsolved": 58,
+    "decompositions": 408,
+    "total_muls": 582509291729,
+    "solve_muls": 577602318388,
+    "la_fp_muls": 29504,
+    "macaulay_entries": 62367443712,
+    "rho_matched_muls": 823986.25,
+    "rho_matched_steps": 4056.625,
+    "ratio": 706940.5487397392
+   },
+   "relations": 11,
+   "columns": 10,
+   "la_ops": 1844,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 149,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p149s1.json",
+    "sha256": "d35fe1354818e709a43c1d7520ffa7269f75ac9fdad08ae69c69d28edde25db7"
+   },
+   "replay_output": {
+    "path": "replay/e25/p149s1.json",
+    "sha256": "cb6e5b2f6b8aecaeb8fc7da04e6193faebfb9857957c5850d76c59c93e66e5fa"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 461937.0667429979,
+     "replay": 846938.6954800023
+    },
+    "wall_ms": {
+     "committed": 164833.12629100002,
+     "replay": 355127.56094
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 4914788,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 132036,
+    "unsolved": 27,
+    "decompositions": 224,
+    "total_muls": 218535034476,
+    "solve_muls": 216693681320,
+    "la_fp_muls": 9984,
+    "macaulay_entries": 23388758400,
+    "rho_matched_muls": 823986.25,
+    "rho_matched_steps": 4056.625,
+    "ratio": 265216.8461257697
+   },
+   "relations": 6,
+   "columns": 5,
+   "la_ops": 624,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 149,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p149s2.json",
+    "sha256": "8b86c30cb57af6e563ee2888f8860dab9090a6c9171e3fda0218ffacd07f6f85"
+   },
+   "replay_output": {
+    "path": "replay/e25/p149s2.json",
+    "sha256": "8b95190dc66e4ca856840750b9588c2597fac28ffe0f325eaed5231d88ac2429"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 200680.57809599958,
+     "replay": 375032.7685650053
+    },
+    "wall_ms": {
+     "committed": 71818.035129,
+     "replay": 159132.185127
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 2874927,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 60585,
+    "unsolved": 13,
+    "decompositions": 668,
+    "total_muls": 100505737317,
+    "solve_muls": 99656462135,
+    "la_fp_muls": 51504,
+    "macaulay_entries": 10734873408,
+    "rho_matched_muls": 808767.625,
+    "rho_matched_steps": 3965.0625,
+    "ratio": 124270.22819688164
+   },
+   "relations": 15,
+   "columns": 14,
+   "la_ops": 3219,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 149,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p149s2.json",
+    "sha256": "8b86c30cb57af6e563ee2888f8860dab9090a6c9171e3fda0218ffacd07f6f85"
+   },
+   "replay_output": {
+    "path": "replay/e25/p149s2.json",
+    "sha256": "8b95190dc66e4ca856840750b9588c2597fac28ffe0f325eaed5231d88ac2429"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 122488.79661199989,
+     "replay": 204485.34054399942
+    },
+    "wall_ms": {
+     "committed": 43732.909851000004,
+     "replay": 86762.941212
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 2874927,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 34176,
+    "unsolved": 11,
+    "decompositions": 380,
+    "total_muls": 56705564507,
+    "solve_muls": 56225528690,
+    "la_fp_muls": 14608,
+    "macaulay_entries": 6056718528,
+    "rho_matched_muls": 808767.625,
+    "rho_matched_steps": 3965.0625,
+    "ratio": 70113.54405661329
+   },
+   "relations": 8,
+   "columns": 7,
+   "la_ops": 913,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 197,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p197s1.json",
+    "sha256": "99ab02e0f3143f09259e3be67c9916912feb197753c7679e1b9740ef7358c935"
+   },
+   "replay_output": {
+    "path": "replay/e25/p197s1.json",
+    "sha256": "da43b4513849e9c72811f9b4d9d18f90895ea534dcf2adc3f83dddf5b76ffcc8"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 183972.07318700198,
+     "replay": 348145.5196759974
+    },
+    "wall_ms": {
+     "committed": 64512.73496899999,
+     "replay": 144952.439732
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 79622603,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 51024,
+    "unsolved": 5,
+    "decompositions": 1152,
+    "total_muls": 85316189300,
+    "solve_muls": 84569356362,
+    "la_fp_muls": 135984,
+    "macaulay_entries": 9028071360,
+    "rho_matched_muls": 1034958.1875,
+    "rho_matched_steps": 5454.0,
+    "ratio": 82434.43100448925
+   },
+   "relations": 23,
+   "columns": 22,
+   "la_ops": 8499,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 197,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p197s1.json",
+    "sha256": "99ab02e0f3143f09259e3be67c9916912feb197753c7679e1b9740ef7358c935"
+   },
+   "replay_output": {
+    "path": "replay/e25/p197s1.json",
+    "sha256": "da43b4513849e9c72811f9b4d9d18f90895ea534dcf2adc3f83dddf5b76ffcc8"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 137026.11114999946,
+     "replay": 263822.51494699746
+    },
+    "wall_ms": {
+     "committed": 48185.131890000004,
+     "replay": 108685.829109
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 79622603,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 37794,
+    "unsolved": 2,
+    "decompositions": 648,
+    "total_muls": 63223472776,
+    "solve_muls": 62670190148,
+    "la_fp_muls": 43104,
+    "macaulay_entries": 6688389120,
+    "rho_matched_muls": 1034958.1875,
+    "rho_matched_steps": 5454.0,
+    "ratio": 61087.94880759373
+   },
+   "relations": 12,
+   "columns": 11,
+   "la_ops": 2694,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 197,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p197s2.json",
+    "sha256": "e2db47a63c72e035f701b8d8e62cfb031b21681fc16b7e696c30f151dcc6451b"
+   },
+   "replay_output": {
+    "path": "replay/e25/p197s2.json",
+    "sha256": "b0a49290a225d627784867c88f8f398ab5c9224c5032d0ec642e2d153ba47233"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 90701.34039600012,
+     "replay": 188332.1617399997
+    },
+    "wall_ms": {
+     "committed": 31969.486673,
+     "replay": 77596.134425
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 7399960,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 26236,
+    "unsolved": 3,
+    "decompositions": 1904,
+    "total_muls": 43878678034,
+    "solve_muls": 43490503293,
+    "la_fp_muls": 250864,
+    "macaulay_entries": 4641366912,
+    "rho_matched_muls": 988036.9375,
+    "rho_matched_steps": 5119.1875,
+    "ratio": 44409.95712672939
+   },
+   "relations": 31,
+   "columns": 30,
+   "la_ops": 15679,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 197,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p197s2.json",
+    "sha256": "e2db47a63c72e035f701b8d8e62cfb031b21681fc16b7e696c30f151dcc6451b"
+   },
+   "replay_output": {
+    "path": "replay/e25/p197s2.json",
+    "sha256": "b0a49290a225d627784867c88f8f398ab5c9224c5032d0ec642e2d153ba47233"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 51927.66544000019,
+     "replay": 107772.03634000046
+    },
+    "wall_ms": {
+     "committed": 18115.041051,
+     "replay": 45159.992668
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 7399960,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 15500,
+    "unsolved": 2,
+    "decompositions": 984,
+    "total_muls": 25919573654,
+    "solve_muls": 25689666256,
+    "la_fp_muls": 81120,
+    "macaulay_entries": 2741934720,
+    "rho_matched_muls": 988036.9375,
+    "rho_matched_steps": 5119.1875,
+    "ratio": 26233.4055238699
+   },
+   "relations": 16,
+   "columns": 15,
+   "la_ops": 5070,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 269,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p269s1.json",
+    "sha256": "ca89fc4676ba87f1ed5d8bfb1d7f02fc7166d0b9440bb864e0f7bc4dc26f208a"
+   },
+   "replay_output": {
+    "path": "replay/e25/p269s1.json",
+    "sha256": "40c24795b14e5c790d911daec16a921f642e5321ec8fe792edb11c71a5b8b594"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 269795.5990729974,
+     "replay": 536855.361184999
+    },
+    "wall_ms": {
+     "committed": 94375.159997,
+     "replay": 225835.07002400002
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 270725152,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 81994,
+    "unsolved": 6,
+    "decompositions": 1664,
+    "total_muls": 136903497485,
+    "solve_muls": 135656679780,
+    "la_fp_muls": 262064,
+    "macaulay_entries": 14485808064,
+    "rho_matched_muls": 1628025.4375,
+    "rho_matched_steps": 9565.4375,
+    "ratio": 84091.74348972665
+   },
+   "relations": 31,
+   "columns": 30,
+   "la_ops": 16379,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 269,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p269s1.json",
+    "sha256": "ca89fc4676ba87f1ed5d8bfb1d7f02fc7166d0b9440bb864e0f7bc4dc26f208a"
+   },
+   "replay_output": {
+    "path": "replay/e25/p269s1.json",
+    "sha256": "40c24795b14e5c790d911daec16a921f642e5321ec8fe792edb11c71a5b8b594"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 153469.05368000033,
+     "replay": 299545.0306419979
+    },
+    "wall_ms": {
+     "committed": 53955.981469,
+     "replay": 126519.544207
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 270725152,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 47207,
+    "unsolved": 4,
+    "decompositions": 944,
+    "total_muls": 78830518113,
+    "solve_muls": 78111645069,
+    "la_fp_muls": 69776,
+    "macaulay_entries": 8340360000,
+    "rho_matched_muls": 1628025.4375,
+    "rho_matched_steps": 9565.4375,
+    "ratio": 48420.937595454496
+   },
+   "relations": 16,
+   "columns": 15,
+   "la_ops": 4361,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 269,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p269s2.json",
+    "sha256": "d1aa960d1537b7b4510d236bc32c34fa63c59e605c60ecccadde800ed489f8da"
+   },
+   "replay_output": {
+    "path": "replay/e25/p269s2.json",
+    "sha256": "1838a0cacd3c2de3162bcfbcc82bc04bda7c76d8a3c2253e7757c582d8b12207"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 95578.96311799918,
+     "replay": 197735.82948600006
+    },
+    "wall_ms": {
+     "committed": 33048.251770999996,
+     "replay": 83740.729657
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 309622187,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 30514,
+    "unsolved": 1,
+    "decompositions": 2224,
+    "total_muls": 50987187104,
+    "solve_muls": 50517016479,
+    "la_fp_muls": 471600,
+    "macaulay_entries": 5388954816,
+    "rho_matched_muls": 1613435.5,
+    "rho_matched_steps": 9478.4375,
+    "ratio": 31601.627151503733
+   },
+   "relations": 41,
+   "columns": 40,
+   "la_ops": 29475,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 269,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p269s2.json",
+    "sha256": "d1aa960d1537b7b4510d236bc32c34fa63c59e605c60ecccadde800ed489f8da"
+   },
+   "replay_output": {
+    "path": "replay/e25/p269s2.json",
+    "sha256": "1838a0cacd3c2de3162bcfbcc82bc04bda7c76d8a3c2253e7757c582d8b12207"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 48169.63912300025,
+     "replay": 101421.89781599992
+    },
+    "wall_ms": {
+     "committed": 16829.454319,
+     "replay": 42881.516448
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 309622187,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 15079,
+    "unsolved": 1,
+    "decompositions": 1224,
+    "total_muls": 25202029895,
+    "solve_muls": 24968325472,
+    "la_fp_muls": 139056,
+    "macaulay_entries": 2663066112,
+    "rho_matched_muls": 1613435.5,
+    "rho_matched_steps": 9478.4375,
+    "ratio": 15620.10374446329
+   },
+   "relations": 21,
+   "columns": 20,
+   "la_ops": 8691,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 397,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p397s1.json",
+    "sha256": "c01cde05204b4dbd42f89c7b8ff7283ad6681bcf86a2aaf882f1d92e3ae245a0"
+   },
+   "replay_output": {
+    "path": "replay/e25/p397s1.json",
+    "sha256": "b08e2ec8a1447b9db9aa53e3d3f333423343fd66453df7428c2562df83becd9a"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 285539.26822800003,
+     "replay": 534570.273832996
+    },
+    "wall_ms": {
+     "committed": 87119.38977200001,
+     "replay": 187726.40063
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1275612762,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 42695,
+    "unsolved": 3,
+    "decompositions": 3608,
+    "total_muls": 71928854428,
+    "solve_muls": 71235494520,
+    "la_fp_muls": 886064,
+    "macaulay_entries": 7534168320,
+    "rho_matched_muls": 3687401.0625,
+    "rho_matched_steps": 24193.5625,
+    "ratio": 19506.653387801915
+   },
+   "relations": 61,
+   "columns": 60,
+   "la_ops": 55379,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 397,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p397s1.json",
+    "sha256": "c01cde05204b4dbd42f89c7b8ff7283ad6681bcf86a2aaf882f1d92e3ae245a0"
+   },
+   "replay_output": {
+    "path": "replay/e25/p397s1.json",
+    "sha256": "b08e2ec8a1447b9db9aa53e3d3f333423343fd66453df7428c2562df83becd9a"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 171358.32825100087,
+     "replay": 316356.79442499886
+    },
+    "wall_ms": {
+     "committed": 53274.805795,
+     "replay": 112463.815495
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1275612762,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 24789,
+    "unsolved": 3,
+    "decompositions": 1848,
+    "total_muls": 41737731799,
+    "solve_muls": 41334558032,
+    "la_fp_muls": 213776,
+    "macaulay_entries": 4373511744,
+    "rho_matched_muls": 3687401.0625,
+    "rho_matched_steps": 24193.5625,
+    "ratio": 11319.010623352826
+   },
+   "relations": 31,
+   "columns": 30,
+   "la_ops": 13361,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 397,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p397s2.json",
+    "sha256": "ca27c4538a37d8c225b462d86aa02a5a2766364f2787bfe72a0227a89cdcf664"
+   },
+   "replay_output": {
+    "path": "replay/e25/p397s2.json",
+    "sha256": "fcd97109bf4599d7e323a09bb68529dedfed94fd9274f420e6396e10670f1590"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 519293.7975609992,
+     "replay": 989285.0312669915
+    },
+    "wall_ms": {
+     "committed": 158608.966091,
+     "replay": 347366.09396900004
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1421554453,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 78391,
+    "unsolved": 5,
+    "decompositions": 2936,
+    "total_muls": 131255013245,
+    "solve_muls": 130002160654,
+    "la_fp_muls": 585424,
+    "macaulay_entries": 13833328320,
+    "rho_matched_muls": 3302439.875,
+    "rho_matched_steps": 21438.8125,
+    "ratio": 39744.86083414312
+   },
+   "relations": 49,
+   "columns": 48,
+   "la_ops": 36589,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25",
+   "p": 397,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p397s2.json",
+    "sha256": "ca27c4538a37d8c225b462d86aa02a5a2766364f2787bfe72a0227a89cdcf664"
+   },
+   "replay_output": {
+    "path": "replay/e25/p397s2.json",
+    "sha256": "fcd97109bf4599d7e323a09bb68529dedfed94fd9274f420e6396e10670f1590"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 224433.0855010007,
+     "replay": 413979.7747090028
+    },
+    "wall_ms": {
+     "committed": 69109.964848,
+     "replay": 146079.672493
+    }
+   },
+   "fields_added_in_replay_binary": [],
+   "added_field_cross_checks": {},
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1421554453,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 48,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16,
+     "Gls": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 33726,
+    "unsolved": 2,
+    "decompositions": 1560,
+    "total_muls": 56478967827,
+    "solve_muls": 55937600348,
+    "la_fp_muls": 178464,
+    "macaulay_entries": 5951597568,
+    "rho_matched_muls": 3302439.875,
+    "rho_matched_steps": 21438.8125,
+    "ratio": 17102.194124578877
+   },
+   "relations": 25,
+   "columns": 24,
+   "la_ops": 11154,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e25-stage-a",
+   "command": "gls_stage_a --sizes 29,37,41,53,61,89,97,101,109,113,149,197,269,397 --seeds 4 --json OUT",
+   "committed": {
+    "path": "experiments/30_gls_v4/stage_a.json",
+    "sha256": "089ef8565c636ec095c1e6dd5a7ac0485d41b9d0a556880a5d71aa786d061fc3"
+   },
+   "replay_output": {
+    "path": "replay/e25_stage_a/stage_a.json",
+    "sha256": "089ef8565c636ec095c1e6dd5a7ac0485d41b9d0a556880a5d71aa786d061fc3"
+   },
+   "replayed": true,
+   "rows": 56,
+   "fields_compared": 896,
+   "fields_identical": 896,
+   "mismatches": [],
+   "matched": true,
+   "note": "the gate run (G2.32): 56 curves; its stderr log replays line for line identical to experiments/30_gls_v4/stage_a.log (replay/e25_stage_a/stage_a.log adds the shell's timing lines)"
+  }
+ ]
+}

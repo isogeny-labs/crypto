@@ -1,0 +1,41 @@
+PencilWordRefinement.constructor_decode (p q r s t z w : UInt64) (hp : 0 < p.toNat) (hb : p.toNat < 2 ^ 31)
+  (hq : q.toNat < p.toNat) (hr : r.toNat < p.toNat) (hs : s.toNat < p.toNat) (ht : t.toNat < p.toNat)
+  (hz : z.toNat < p.toNat) (hw : w.toNat < p.toNat) :
+  have a := PencilWordRefinement.weightConstructor p q r s t z w;
+  PencilWordRefinement.WeightedWord.canonical p a ∧
+    ↑a.q.toNat = ↑q.toNat * ↑z.toNat ^ 2 ∧
+      ↑a.r.toNat = ↑r.toNat * ↑z.toNat ^ 4 ∧
+        ↑a.s.toNat = ↑s.toNat * (↑z.toNat ^ 3 * ↑w.toNat) ∧ ↑a.t.toNat = ↑t.toNat * (↑z.toNat ^ 5 * ↑w.toNat)
+PencilWordRefinement.constructor_preserves_invariant (p q r s t z w : UInt64) [Fact (Nat.Prime p.toNat)]
+  (hp : 0 < p.toNat) (hb : p.toNat < 2 ^ 31) (hq : q.toNat < p.toNat) (hr : r.toNat < p.toNat) (hs : s.toNat < p.toNat)
+  (ht : t.toNat < p.toNat) (hz : z.toNat < p.toNat) (hw : w.toNat < p.toNat) (hnz : z ≠ 0) (hnw : w ≠ 0)
+  (f : Polynomial (ZMod p.toNat))
+  (valid :
+    Polynomial.X ^ 2 + Polynomial.C ↑q.toNat * Polynomial.X + Polynomial.C ↑r.toNat ∣
+      f - (Polynomial.C ↑s.toNat * Polynomial.X + Polynomial.C ↑t.toNat) ^ 2) :
+  have a := PencilWordRefinement.weightConstructor p q r s t z w;
+  PencilWordRefinement.WeightedWord.canonical p a ∧
+    a.z ≠ 0 ∧ a.w ≠ 0 ∧ PencilWordRefinement.WeightedWord.normalizedValid p f a
+PencilWordRefinement.from_affine_two_invariant (p q r s t : UInt64) [Fact (Nat.Prime p.toNat)] (hfive : 5 ≤ p.toNat)
+  (hb : p.toNat < 2 ^ 31) (hq : q.toNat < p.toNat) (hr : r.toNat < p.toNat) (hs : s.toNat < p.toNat)
+  (ht : t.toNat < p.toNat) (f : Polynomial (ZMod p.toNat))
+  (valid :
+    Polynomial.X ^ 2 + Polynomial.C ↑q.toNat * Polynomial.X + Polynomial.C ↑r.toNat ∣
+      f - (Polynomial.C ↑s.toNat * Polynomial.X + Polynomial.C ↑t.toNat) ^ 2) :
+  have a := PencilWordRefinement.weightConstructor p q r s t 1 1;
+  PencilWordRefinement.WeightedWord.canonical p a ∧
+    a.z ≠ 0 ∧ a.w ≠ 0 ∧ PencilWordRefinement.WeightedWord.normalizedValid p f a
+PencilWordRefinement.initialized_against_valid_partner (p q r s t : UInt64) [Fact (Nat.Prime p.toNat)]
+  (hfive : 5 ≤ p.toNat) (hb : p.toNat < 2 ^ 31) (hq : q.toNat < p.toNat) (hr : r.toNat < p.toNat)
+  (hs : s.toNat < p.toNat) (ht : t.toNat < p.toNat) (f : Polynomial (ZMod p.toNat))
+  (valid :
+    Polynomial.X ^ 2 + Polynomial.C ↑q.toNat * Polynomial.X + Polynomial.C ↑r.toNat ∣
+      f - (Polynomial.C ↑s.toNat * Polynomial.X + Polynomial.C ↑t.toNat) ^ 2)
+  (b : PencilWordRefinement.WeightedWord) (hbc : PencilWordRefinement.WeightedWord.canonical p b) (hbz : b.z ≠ 0)
+  (hbw : b.w ≠ 0) (hbv : PencilWordRefinement.WeightedWord.normalizedValid p f b) :
+  PencilWordRefinement.crossPreludeWord p (PencilWordRefinement.weightConstructor p q r s t 1 1) b ≠
+    some ProjectiveLawRuntime.Branch22Prelude.sameUMixedZeroSlope
+'PencilWordRefinement.constructor_decode' depends on axioms: [propext, Quot.sound]
+'PencilWordRefinement.constructor_preserves_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.from_affine_two_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.initialized_against_valid_partner' depends on axioms: [propext, Classical.choice, Quot.sound]

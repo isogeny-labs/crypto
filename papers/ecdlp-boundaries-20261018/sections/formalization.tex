@@ -1,0 +1,68 @@
+\section{The two requested Lean targets}\label{sec:formal}
+
+\subsection{Yield conservation: a core theorem already exists}
+The file
+\art{crypto:research/factor_base_designs_20261015/lean/FactorBaseDesigns/Yield.lean}
+defines \art{count D phi g} as the length of the filtered list of domain
+entries mapping to $g$. Its theorem \art{sum_count} states, exactly in
+mathematical notation,
+\[
+ \text{$Gs$ has no duplicates and contains every $\varphi(x)$ for $x\in D$}
+ \quad\Longrightarrow\quad
+ \sum_{g\in Gs}\operatorname{count}(D,\varphi,g)=\operatorname{length}(D).
+\]
+It requires decidable equality of the target type, not a group law.
+\art{patterns_neutral} compares two equally long domains;
+\art{restrict_le} proves that filtering the domain cannot increase
+any target's multiplicity. The committed axiom log lists
+\art{propext} and \art{Quot.sound} for these three declarations. A
+committed build log reports a successful build. The present campaign also
+rebuilt this nine-job project with its pinned Lean 4.34.1 toolchain and
+reran its axiom audit; fresh logs are retained under
+\art{crypto:research/ideas_execution_20261018/runs/}.
+
+The campaign's new \art{IdeasExecution.OrderedYield} module enumerates the
+ordered Cartesian power and proves \art{tuples_length},
+\art{ordered_total_yield} and \art{ordered_patterns_neutral}. Its build
+passes; its separate axiom audit lists only \art{propext} and
+\art{Quot.sound}. This is an application bridge for ordered list-domain
+multiplicity, not a new conservation principle.
+For the multiset convention one still needs the enumeration length
+$\binom{B+m-1}{m}$ without duplicate multiset entries. Prove that the
+sum map and full target enumeration meet \art{sum_count}'s hypotheses.
+For a mean in $\mathbb Q$, require a nonempty target set before dividing.
+Those remaining bridges instantiate the existing theorem rather than create
+a new conservation principle.
+
+\subsection{Compact-pipeline genericity: an interface bridge is missing}
+The exact theorem \art{GenericInvariance.run_map} in
+\art{crypto:research/conductor_gap_cm_pairs_20261010/lean/GenericInvariance.lean}
+states that an injective map preserving the declared multiplication and
+inversion operations commutes with every bounded run of its handle-only
+algorithm. \art{dlog_invariant} specializes it to a two-handle DLP input.
+The source contains no elliptic-curve construction and no probabilistic
+DLP lower bound. Its explicit representation-hashing limitation is
+binding, as discussed above.
+The campaign also rebuilt this four-job project and reran its axiom audit;
+successful checking does not extend its interface to representation hashing.
+
+A faithful target for the compact pipeline has three layers:
+\begin{enumerate}
+\item Specify a concrete fragment with generically constructed advice,
+known scalar actions, membership through stored equality, and all index
+operations exposed. Prove an abstraction relation between concrete
+states and symbolic states across every executed instruction.
+\item Prove a transcript simulation, including target-independent setup,
+lookup/multiplicity semantics, exceptional cases and the exact resource
+counters. Distinguish random-label hashing from the stricter
+handle-only theorem rather than extending that theorem by prose.
+\item Import or separately formalize the appropriate generic
+preprocessing lower bound with its success probability, advice units,
+automorphism assumptions and parameter range. It is not a corollary of
+injective transport invariance alone.
+\end{enumerate}
+No inspected Lean file closes all three layers for the current compact
+pipeline. A machine check of a small rewritten toy algorithm would not
+close the concrete-code correspondence. This target therefore remains
+open. The draft does not insert an unproved axiom or a \art{sorry} and
+call that a formalization.
