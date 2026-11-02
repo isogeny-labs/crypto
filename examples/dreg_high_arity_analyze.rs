@@ -2135,8 +2135,7 @@ fn scan_rows(v: &Value) -> Result<Vec<&Value>, String> {
         .get("scan")
         .and_then(Value::as_array)
         .ok_or_else(|| "missing scan array".to_string())?;
-    let mut expected = 3u64;
-    for step in scan {
+    for (expected, step) in (3u64..).zip(scan.iter()) {
         if expected > 4 {
             return Err("scan extends past the registered degree four".into());
         }
@@ -2167,7 +2166,6 @@ fn scan_rows(v: &Value) -> Result<Vec<&Value>, String> {
                 "degree {expected} has no numeric diagnostic seconds field"
             ));
         }
-        expected += 1;
     }
     let implied_measured_to = scan.last().map_or(2, |s| field_u64(s, "degree").unwrap());
     if field_u64(v, "measured_to") != Some(implied_measured_to) {

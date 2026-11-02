@@ -939,8 +939,7 @@ fn validate_summary(value: &Value, protocol: &Protocol) -> Result<(), String> {
 fn markdown_escape(value: &str) -> String {
     value
         .replace('|', "\\|")
-        .replace('\r', " ")
-        .replace('\n', " ")
+        .replace(['\r', '\n'], " ")
 }
 
 fn xml_escape(value: &str) -> String {
@@ -956,8 +955,7 @@ fn typst_string(value: &str) -> String {
     value
         .replace('\\', "\\\\")
         .replace('"', "\\\"")
-        .replace('\r', " ")
-        .replace('\n', " ")
+        .replace(['\r', '\n'], " ")
 }
 
 fn status(global: &str) -> (&'static str, &'static str) {
@@ -1492,7 +1490,7 @@ fn render_pdf(
     }
     stream.push_str("ET\n");
 
-    let objects = vec![
+    let objects = [
         "<< /Type /Catalog /Pages 2 0 R >>".as_bytes().to_vec(),
         "<< /Type /Pages /Kids [3 0 R] /Count 1 >>"
             .as_bytes()
