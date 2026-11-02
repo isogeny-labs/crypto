@@ -189,3 +189,26 @@ argmins unchanged (checked on all steps; smallest 2.19 at k = 20, t = 10, G = 4 
 ## Files
 
 `PROTOCOL.md`, `README.md`, `REPORT.pdf`, `analysis/` (scripts, `cells.jsonl`, status, `support.jsonl`, `binary.sha256`, `table_rows.md`, `argmin_rows.md`, `ratio_rows.md`, `guess_optimum.svg`).
+
+## Coordinator review (main session, 2026-11-02)
+
+- **What the falsifier means.** Cost falls at every step all the way to
+  G = t − 1, where each branch system leaves 2^(t−G) = 2 candidate base
+  elements per summand. At m = 2 on the isogeny form, then, the cheapest point
+  measured is the end where the oracle has almost become enumeration of the base
+  by guessing. Gröbner-basis work is cheapest when there is least of it. That is
+  evidence the algebraic step does not pay for itself at m = 2 in these cells. It
+  is not evidence that an algebraic method beats enumeration.
+- **The relevant comparison is not inside this table.** The question is whether
+  G = t − 1 beats a direct enumeration or pair-table oracle on the same base, in
+  one unit. That is lead A's ecbench comparison, with native work priced across
+  the §5a band. Until then the 1.18e7 per relation (k = 20, t = 10, G = 9) is a
+  modelled F4 figure, not a solve cost.
+- **Uncharged native work** reaches about 7% (k = 20, t = 10, G = 9) and about
+  24% (k = 24, t = 12, G = 11) of the charged work, and grows towards G = t − 1.
+  Pricing it at weight 1 leaves every argmin unchanged, but any extension of the
+  grid must keep it priced.
+- **Binary identity.** The frozen binary's sha256 fc72092f… is the build of main
+  56c3e282ee. It is the same binary lead 5 first picked up by mistake from the
+  shared target directory; for this lead it is the correct one, since lead B
+  made no code change.
