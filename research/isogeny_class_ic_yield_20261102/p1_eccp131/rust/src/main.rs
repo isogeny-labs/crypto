@@ -11,6 +11,9 @@ mod analyze;
 mod engine;
 mod fp;
 mod poly;
+mod pari;
+mod jsonv;
+mod construct;
 
 use fp::Fp;
 use poly::Poly;
@@ -60,14 +63,14 @@ fn sha_file(path: &str) -> String {
 // ---------------------------------------------------------------- tower, curve
 
 #[derive(Clone)]
-struct Tower {
-    t: usize,
-    c: Fp,
-    stages: Vec<([Fp; 3], [Fp; 2])>,
-    v: Vec<Fp>,
+pub(crate) struct Tower {
+    pub(crate) t: usize,
+    pub(crate) c: Fp,
+    pub(crate) stages: Vec<([Fp; 3], [Fp; 2])>,
+    pub(crate) v: Vec<Fp>,
 }
 
-fn load_tower(j: &Value, t: usize) -> Tower {
+pub(crate) fn load_tower(j: &Value, t: usize) -> Tower {
     let tj = &j["towers"][t.to_string()];
     let h = |x: &Value| Fp::from_hex(x.as_str().unwrap());
     let stages = tj["stages"]
@@ -84,17 +87,17 @@ fn load_tower(j: &Value, t: usize) -> Tower {
     Tower { t, c: h(&tj["c"]), stages, v }
 }
 
-fn rhs(x: Fp, a: Fp, b: Fp) -> Fp {
+pub(crate) fn rhs(x: Fp, a: Fp, b: Fp) -> Fp {
     x.mul(x).mul(x).add(a.mul(x)).add(b)
 }
 
-fn fb_abscissae(tw: &Tower, a: Fp, b: Fp) -> Vec<Fp> {
+pub(crate) fn fb_abscissae(tw: &Tower, a: Fp, b: Fp) -> Vec<Fp> {
     tw.v.iter().copied().filter(|&x| rhs(x, a, b).is_square()).collect()
 }
 
-type Pt = Option<(Fp, Fp)>;
+pub(crate) type Pt = Option<(Fp, Fp)>;
 
-fn ec_add(p1: Pt, p2: Pt, a: Fp) -> Pt {
+pub(crate) fn ec_add(p1: Pt, p2: Pt, a: Fp) -> Pt {
     match (p1, p2) {
         (None, q) | (q, None) => q,
         (Some((x1, y1)), Some((x2, y2))) => {
@@ -117,9 +120,9 @@ fn ec_add(p1: Pt, p2: Pt, a: Fp) -> Pt {
 // ---------------------------------------------------------------- systems
 
 #[derive(Clone, Copy, Debug)]
-struct Cfg {
-    m: usize,
-    t: usize,
+pub(crate) struct Cfg {
+    pub(crate) m: usize,
+    pub(crate) t: usize,
 }
 
 impl Cfg {
@@ -132,7 +135,7 @@ impl Cfg {
     fn name(&self) -> String {
         format!("m{}t{}", self.m, self.t)
     }
-    fn nvars(&self) -> usize {
+    pub(crate) fn nvars(&self) -> usize {
         self.m * self.t + usize::from(self.m == 3)
     }
 }
@@ -173,7 +176,7 @@ fn tower_poly(u: &Poly, unext: &Poly, st: &([Fp; 3], [Fp; 2])) -> Poly {
 }
 
 /// Logical variable index: element e, level j -> e*t + j; the auxiliary partial sum w -> m*t.
-fn build_system(cfg: Cfg, tw: &Tower, a: Fp, b: Fp, xr: Fp, perm: &[usize]) -> Vec<Poly> {
+pub(crate) fn build_system(cfg: Cfg, tw: &Tower, a: Fp, b: Fp, xr: Fp, perm: &[usize]) -> Vec<Poly> {
     let v = |idx: usize| Poly::var(perm[idx]);
     let mut polys = Vec::new();
     for e in 0..cfg.m {
@@ -203,7 +206,7 @@ fn x_map(st: &([Fp; 3], [Fp; 2]), u: Fp) -> Fp {
 }
 
 /// Values of every variable (by position) at the planted decomposition.
-fn assignment(cfg: Cfg, tw: &Tower, xs: &[Fp], w: Option<Fp>, perm: &[usize]) -> Vec<Fp> {
+pub(crate) fn assignment(cfg: Cfg, tw: &Tower, xs: &[Fp], w: Option<Fp>, perm: &[usize]) -> Vec<Fp> {
     let mut vals = vec![Fp::ZERO; cfg.nvars()];
     for e in 0..cfg.m {
         let mut u = xs[e];
@@ -271,7 +274,7 @@ fn distinct_common_roots(f: &[Fp; 3], g: &[Fp; 3]) -> usize {
 }
 
 /// Exact number of solutions of the system over the algebraic closure (the tower fixes x_i in V).
-fn count_solutions(cfg: Cfg, tw: &Tower, a: Fp, b: Fp, xr: Fp) -> usize {
+pub(crate) fn count_solutions(cfg: Cfg, tw: &Tower, a: Fp, b: Fp, xr: Fp) -> usize {
     let v = &tw.v;
     let mut k = 0usize;
     if cfg.m == 2 {
@@ -701,6 +704,14 @@ fn main() {
         Some("selftest") => cmd_selftest(),
         Some("run") => cmd_run(&args[2..]),
         Some("analyze") => analyze::cmd_analyze(&args[2..]),
+        Some("build-neighbours") => construct::cmd_build_neighbours(&args[2..]),
+        Some("build-tower") => construct::cmd_build_tower(&args[2..]),
+        Some("make-targets") => construct::cmd_make_targets(&args[2..]),
+        Some("jsoncmp") => construct::cmd_jsoncmp(&args[2..]),
+        Some("gp") => {
+            let p = pari::Pari::open(&pari::find_libpari(), 1usize << 30).unwrap();
+            println!("{}", p.eval(&args[2]).unwrap());
+        }
         _ => eprintln!("usage: p1_eccp131 selftest | run ... | analyze --rows rows.jsonl"),
     }
 }

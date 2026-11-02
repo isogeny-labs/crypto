@@ -1,0 +1,16 @@
+[package]
+name = "p1_crosscheck"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+# the repository's library: f4_fp (F4 over F_p, p < 2^63) is the independent reference
+crypto = { path = "../../../..", package = "crypto" }
+libc = "0.2"
+sha2 = "0.10"
+
+[profile.release]
+opt-level = 3
