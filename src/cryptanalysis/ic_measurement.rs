@@ -11,30 +11,45 @@ use std::collections::BTreeMap;
 use std::marker::PhantomData;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU8, Ordering};
-#[cfg(not(unix))]
+#[cfg(not(all(target_os = "linux", target_pointer_width = "64")))]
 use std::time::Instant;
 
 /// The monotonic clock in nanoseconds: `CLOCK_MONOTONIC`, the clock
-/// `std::time::Instant` reads on unix, kept as a plain count.  A boundary
+/// `std::time::Instant` reads on Linux, kept as a plain count.  A boundary
 /// runs once per relation (millions in a 32-bit child), and `Instant`'s
 /// checked difference, `Duration` normalisation and 128-bit nanosecond
 /// conversion cost more instructions than the clock read itself; the
 /// interval between two reads is the same number either way.
+///
+/// The C function is declared here rather than taken from the `libc` crate,
+/// because research crates compile this file by `#[path]` and do not all
+/// depend on `libc`.  Elsewhere the clock is `Instant` from a fixed anchor.
 #[inline]
 fn now_ns() -> u64 {
-    #[cfg(unix)]
+    #[cfg(all(target_os = "linux", target_pointer_width = "64"))]
     {
-        let mut ts = libc::timespec {
+        /// `struct timespec` on 64-bit Linux.
+        #[repr(C)]
+        struct Timespec {
+            tv_sec: i64,
+            tv_nsec: i64,
+        }
+        extern "C" {
+            fn clock_gettime(clock: i32, tp: *mut Timespec) -> i32;
+        }
+        /// `CLOCK_MONOTONIC` in `<linux/time.h>`.
+        const CLOCK_MONOTONIC: i32 = 1;
+        let mut ts = Timespec {
             tv_sec: 0,
             tv_nsec: 0,
         };
-        // SAFETY: `ts` is a valid, writable timespec, and CLOCK_MONOTONIC
-        // exists on every unix target this crate builds for.
-        let rc = unsafe { libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts) };
+        // SAFETY: `ts` is a valid, writable `struct timespec` of the
+        // 64-bit Linux ABI, and CLOCK_MONOTONIC always exists there.
+        let rc = unsafe { clock_gettime(CLOCK_MONOTONIC, &mut ts) };
         debug_assert_eq!(rc, 0);
         (ts.tv_sec as u64) * 1_000_000_000 + ts.tv_nsec as u64
     }
-    #[cfg(not(unix))]
+    #[cfg(not(all(target_os = "linux", target_pointer_width = "64")))]
     {
         static ANCHOR: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
         u64::try_from(ANCHOR.get_or_init(Instant::now).elapsed().as_nanos()).expect("bounded clock")

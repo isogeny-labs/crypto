@@ -10,10 +10,11 @@ and every edge says how one claim depends on or limits another.
 
 ## Current snapshot
 
-- 82 claim nodes
-- 119 typed dependency edges
-- 49 source records
-- 12 prioritized research targets
+- 101 claim nodes
+- 145 typed dependency edges
+- 50 source records
+- 13 prioritized research targets
+- 717 labeled results and 375 numbered sections in the Galbraith book inventory
 
 Run `node validate.mjs` for the authoritative assembled counts; generated counts are in
 `stats.tsv`.
@@ -26,6 +27,13 @@ Run `node validate.mjs` for the authoritative assembled counts; generated counts
 - [`corpus.json`](corpus.json): curated backbone and fragment manifest
 - [`corpus-extension.json`](corpus-extension.json): deep foundations, index-calculus,
   xedni, protocol-boundary, and quantum-resource expansion
+- [`galbraith-promotions.json`](galbraith-promotions.json): missing generalized-DLP,
+  rigorous-walk, CDH-reduction, isogeny, and pairing dependencies promoted from the book
+- [`galbraith-2018-inventory.json`](galbraith-2018-inventory.json): all distinct numbered
+  definitions, theorems, lemmas, corollaries, conjectures, heuristics, and algorithms in
+  the supplied 696-page PDF, with page provenance
+- [`GALBRAITH_BOOK_AUDIT.md`](GALBRAITH_BOOK_AUDIT.md): chapter counts, extraction
+  reconciliation, and book-result-to-graph promotion ledger
 - [`schema.json`](schema.json): field and vocabulary contract
 - [`claims.tsv`](claims.tsv): flat claim index
 - [`sources.tsv`](sources.tsv): source status, location, and primary-text hashes
@@ -95,6 +103,12 @@ dot -Tsvg docs/ecdlp-hardness-corpus/graph.dot \
   pandoc REPORT.md -o REPORT.pdf --pdf-engine=xelatex)
 ```
 
+To reproduce the book inventory, pass the matching PDF (SHA-256 is checked):
+
+```sh
+node docs/ecdlp-hardness-corpus/extract-galbraith-inventory.mjs /path/to/book.pdf
+```
+
 `render.mjs` deterministically regenerates the DOT and TSV artifacts. Graphviz renders
 the SVGs. The subshell for `REPORT.pdf` is intentional: `REPORT.md` embeds
 `overview.pdf` by a path relative to the corpus directory.
@@ -111,4 +125,6 @@ the SVGs. The subshell for `REPORT.pdf` is intentional: `REPORT.md` embeds
 
 The validator requires a primary-read source for every node marked
 `proved_external`, checks repository source paths, rejects dangling edges, and validates
-research-target dependencies.
+research-target dependencies. It also checks the fixed book digest, all inventory counts,
+page ranges and label uniqueness, the complete Algorithm 1--29 sequence, and every book
+locator cited by a promoted claim.

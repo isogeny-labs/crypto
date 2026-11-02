@@ -97,6 +97,11 @@
         "scope": { "type": "string", "minLength": 1 },
         "assumptions": { "type": "array", "items": { "type": "string" } },
         "source_refs": { "$ref": "#/$defs/sourceRefs" },
+        "source_locations": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
         "tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
         "formula": { "type": "string" },
         "parameters": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
