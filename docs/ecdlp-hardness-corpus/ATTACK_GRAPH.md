@@ -284,7 +284,7 @@ Corpus 2026-11-01: 536 claims, 327 on the frontier, 3 resting on a refuted claim
 | 263 | `THEOREM-JMV-ISOGENY-REDUCTION` JMV random reduction within an isogeny stratum | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
 | 264 | `THM-PF-YYTK-NAIVE-LOWER-BOUND` YYTK: naive Semaev index calculus cannot beat generic methods | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-PF-YYTK-READ |
 | 265 | `THM-RP-KOBLITZ-CYCLIC-WINDOW` Cyclic-cover window for the n=131 trace-zero factor: genus >= 394 (conditional), modular carrier genus 378,708,949 | conditional | lean_written_unchecked | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 266 | `CEX-FAKE-GAP-FAMILY-WK` Family W_k = {X^k Y, XY + X}: d'_F = 2, d_F = k + 1 | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
+| 266 | `CEX-FAKE-GAP-FAMILY-WK` Family W_k = {X^k Y, XY + X}: d'_F = 2, d_F = k + 1 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
 | 267 | `CEX-FAKE-GAP-INSIDE-YZ` {YZ + 1, XZ + X + 1}: d_F(inside) = 3, d'_F = 1 | proved_internal_unreviewed | native_exact | 0 | independent review, then kernel-check | RT-FAKE-GAP-INSIDE |
 | 268 | `CEX-GB-DING-SCHMIDT-DEGENERATE` Ding-Schmidt 2013: degenerate systems with first-fall degree far below the solving degree | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
 | 269 | `CEX-LEMMA4-REVERSE-R` Witness R {X, X^2+X}: d_F = 2, no fake fall | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |

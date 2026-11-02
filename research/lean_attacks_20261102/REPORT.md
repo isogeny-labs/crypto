@@ -37,7 +37,8 @@ Source: `results/family.txt`.
 
 **Lean.** `IcNegative.FakeDegreeGap.gap_two_witnessW3` kernel-checks `k = 3`
 (`d'_F = 2`, `d_F = 4`), which already refutes `d_F ≤ d'_F + 1`. It is core Lean using
-`decide +kernel`, pending the repository proof gate. The all-k statement is the hand proof
+`decide +kernel`, and the repository proof gate passed it (run 41399938870: target PASS,
+40 theorems, 8 of them new, 0 trusted). The all-k statement is the hand proof
 above plus the native table.
 
 ## A2. Inside, the gap reaches 2

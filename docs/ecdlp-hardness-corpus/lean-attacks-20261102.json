@@ -45,7 +45,7 @@
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
       "statement": "Over F_2, W_k = {X^k Y, XY + X} (k >= 2) has fake first fall degree 2 for every k (X^k Y reduces to XY) and, with the field equations outside, true first fall degree k + 1 (X^{k-1}(XY + X) + X^k Y = X^k; below k + 1 only multiples of XY + X are admissible and a single generator never falls).",
-      "scope": "Hand proof for all k; native computation k = 2..7; core-Lean decide +kernel for k = 3 (gap 2), pending the proof gate. Inside placement: d_F = 3 for k = 2..7.",
+      "scope": "Hand proof for all k; native computation k = 2..7; core-Lean decide +kernel for k = 3 (gap 2), kernel-checked by the repository proof gate. Inside placement: d_F = 3 for k = 2..7.",
       "assumptions": [
         "Equality reading"
       ],
@@ -60,7 +60,7 @@
       ],
       "evidence_class": "counterexample",
       "formal": {
-        "state": "lean_written_unchecked",
+        "state": "kernel_checked",
         "artifacts": [
           {
             "path": "papers/ic-negative-results/lean/IcNegative/FakeDegreeGap.lean",
@@ -71,7 +71,7 @@
             "decl": "family"
           }
         ],
-        "notes": "Lean covers k = 3; the all-k statement is a hand proof plus the native table k = 2..7."
+        "notes": "Lean covers k = 3; the all-k statement is a hand proof plus the native table k = 2..7. lean-proof-gate run 41399938870 (commit 6427e000c): papers/ic-negative-results/lean PASS, 40 theorems (8 from FakeDegreeGap), 0 trusted."
       },
       "cited_by": [
         {
