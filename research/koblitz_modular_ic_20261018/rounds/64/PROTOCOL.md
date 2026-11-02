@@ -48,3 +48,15 @@ defines its **rows** as normal-order basis coordinates in the power basis.
 The fresh script checks this identity after `z=1/u`, then maps each of all
 32 rows. No failed attempt's partial function is accepted; rank, inverse
 products, source equations and both negatives remain mandatory.
+
+## Version 4 exact source-matrix transport
+`bridge64-03` is rejected at `H*sourceLift=D I`. The earlier inference that
+the retained basis should be read by rows was not established: mapping the
+module and casting its image did not preserve the original matrix
+representation. Reproduce the accepted R53 sequence exactly: cast
+`basis51` to a matrix **in the compact source ring**, check its identity
+with `sourceLift51` and `D` there, then map those already constructed
+matrices and denominator to the actual coefficient field. Check the same
+identity after substitution before evaluating any of the 32 retained
+columns. Full rank, inverse products, source equations and negatives stay
+mandatory; all three rejected raw attempts remain intact.

@@ -2,6 +2,8 @@ LIB "linalg.lib";
 proc require64(int ok,string tag){if(!ok){ERROR(tag);quit;}}
 execute(read("../../../53/runs/discrim53-02/actual-source53.sing"));
 execute(read("../../../52/source-data/compact-pid51.sing"));
+matrix originalH64=matrix(basis51);matrix originalLift64=sourceLift51;poly originalD64=commonDenominator51;
+require64(originalH64*originalLift64==originalD64*unitmat(32),"BRIDGE64_ORIGINAL_SOURCE_MATRIX_IDENTITY");
 poly oldZ64=u;
 execute(read("../../../61/runs/field61-01/field-space61.sing"));
 ideal actualGB64=std(sourceIdeal61);
@@ -15,17 +17,17 @@ ideal wrongEquations64=oldWrong64(source53);
 require64(reduce(wrongEquations64[1],actualGB64)!=0,"BRIDGE64_CHANGED_QUADRATIC_COORDINATE_REJECTED");
 map oldCoefficient64=compactPid51,1/u;
 require64(oldCoefficient64(oldZ64)==1/u,"BRIDGE64_COEFFICIENT_INVERSION");
-matrix H64=matrix(oldCoefficient64(basis51));
-poly D64=oldCoefficient64(commonDenominator51);
+matrix H64=oldCoefficient64(originalH64);
+poly D64=oldCoefficient64(originalD64);
 require64(nrows(H64)==32 && ncols(H64)==32 && D64!=0,"BRIDGE64_COMPACT_PID_BASIS_SHAPE");
-matrix powerLift64=oldCoefficient64(sourceLift51);
+matrix powerLift64=oldCoefficient64(originalLift64);
 require64(H64*powerLift64==D64*unitmat(32),"BRIDGE64_ROW_ORIENTATION_SOURCE_IDENTITY");
 matrix imageColumns64[32][32];list imageFunctions64;
 int i64;int j64;int k64;intvec exponent64;poly image64;poly remainder64;poly term64;int row64;
 for(j64=1;j64<=32;j64++){
  image64=0;
  for(k64=1;k64<=32;k64++){
-  if(H64[j64,k64]!=0){image64=image64+H64[j64,k64]*l^((k64-1)%16)*(v/u^2)^((k64-1) div 16);}
+  if(H64[k64,j64]!=0){image64=image64+H64[k64,j64]*l^((k64-1)%16)*(v/u^2)^((k64-1) div 16);}
  }
  image64=reduce(image64/D64,actualGB64);
  imageFunctions64[j64]=image64;remainder64=image64;
