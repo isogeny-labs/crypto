@@ -28,3 +28,13 @@ each contains all source equations and the eight grouped/derivative/inverse/
 root entries. Preserve them even if later full-cohort work caps;any reuse
 requires a fresh exact source-bound checker. A partial generator cache
 is not an accepted124-function outcome. All112/124scope/limits unchanged.
+
+## Fresh actual-source replay,freeze beforedata
+CHECK112 reads actual marked23 source and both saved generator bundles,
+checks every cache source equation,grouping,derivative and inverse product,
+actual formula components and both generator square identities. Reads all
+124savedfunctions and binds each to the original112monomials/3controls/
+9namedfunctions before checking every whole-source identity. Altered
+inverse/root negatives required. No inverse producer is rerun. Samecaps.
+R62Square62generator/pair proofs are reused with concrete native inputs
+external;do not duplicate proofs or imply normalization/991action.
