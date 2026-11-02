@@ -3,3 +3,4 @@ import IcNegative.YieldConservation
 import IcNegative.Lemma4Witness
 import IcNegative.Lemma4Reverse
 import IcNegative.FakeDegreeGap
+import IcNegative.InsideGap
