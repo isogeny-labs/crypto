@@ -1,0 +1,35 @@
+name: Finite-field handbook Lean proof
+
+on:
+  pull_request:
+    paths:
+      - 'knowledge/finite-fields/lean/**'
+      - '.github/workflows/finite-field-handbook-lean.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /knowledge/finite-fields/lean/
+            /tools/lean/
+            /.github/workflows/finite-field-handbook-lean.yml
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build and audit finite-field handbook
+        run: tools/lean/proof-gate.sh --out receipts knowledge/finite-fields/lean
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: finite-field-lean-receipt
+          path: receipts/

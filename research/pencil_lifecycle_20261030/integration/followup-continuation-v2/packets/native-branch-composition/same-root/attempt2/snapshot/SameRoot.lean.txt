@@ -1,0 +1,73 @@
+import Composition
+set_option autoImplicit false
+namespace GraphSameRoot
+open SignedGraphAlgebra GraphFind GraphUnion GraphForest
+variable {K : Type*} [Field K] [DecidableEq K] {n : Nat}
+inductive Result (K : Type*)
+ | none : Result K
+ | answer : K → Result K
+ | inconsistent : Result K
+ deriving DecidableEq
+
+def Safe (o : Result K) (k : K) : Prop := match o with
+ | .none => True
+ | .answer a => a=k
+ | .inconsistent => False
+
+def constraint (a b : K) : Result K :=
+ if b=0 then if a=0 then .none else .inconsistent else .answer ((-a)*b⁻¹)
+
+theorem constraint_safe (a b k : K) (he : a+b*k=0) : Safe (constraint a b) k := by
+ by_cases hb : b=0
+ · have ha : a=0 := by simpa [hb] using he
+   simp [constraint,hb,ha,Safe]
+ · simpa [constraint,hb,Safe] using GraphCycle.constraint_solution a b k hb he
+
+def anchor (s : GraphUnion.State K n) (root : Fin n) (a b : K) : GraphUnion.State K n × Result K :=
+ match s.fixed root with
+ | some xy => (s,constraint (xy.1-a) (xy.2-b))
+ | none => (⟨s.graph,fun i=>if i=root then some (a,b) else s.fixed i⟩,.none)
+
+theorem anchor_safe (s : GraphUnion.State K n) (root : Fin n) (a b : K)
+ (value : Fin n → K) (k : K) (hv : Valid s value k) (he : value root=a+b*k) :
+ Valid (anchor s root a b).1 value k ∧ Safe (anchor s root a b).2 k ∧
+ (anchor s root a b).1.graph=s.graph := by
+ cases hf : s.fixed root with
+ | none =>
+   simp only [anchor,hf]
+   refine ⟨⟨hv.1,?_⟩,True.intro,rfl⟩
+   intro i x y hx
+   by_cases hi : i=root
+   · subst i
+     have hxy : (a,b)=(x,y) := by simpa [anchor,hf] using hx
+     cases hxy
+     exact he
+   · exact hv.2 i x y (by simpa [anchor,hf,hi] using hx)
+ | some xy =>
+   simp only [anchor,hf]
+   refine ⟨hv,?_,rfl⟩
+   exact constraint_safe _ _ k (GraphCycle.existing_anchor_equation _ _ _ _ _ _ (hv.2 root xy.1 xy.2 hf) he)
+
+def sameRoot (s : GraphUnion.State K n) (root : Fin n) (cu cv a b : K) :
+ GraphUnion.State K n × Result K :=
+ if cu+cv=0 then (s,constraint (-a) (-b)) else
+ let ci := (if cu=1 then (2:K) else -2)⁻¹
+ anchor s root (a*ci) (b*ci)
+
+theorem same_root_safe (s : GraphUnion.State K n) (root : Fin n) (cu cv a b : K)
+ (value : Fin n → K) (k : K) (hv : Valid s value k) (h2 : (2:K)≠0)
+ (hu : cu=1 ∨ cu= -1) (hw : cv=1 ∨ cv= -1)
+ (he : cu*value root+cv*value root=a+b*k) :
+ Valid (sameRoot s root cu cv a b).1 value k ∧
+ Safe (sameRoot s root cu cv a b).2 k ∧
+ (sameRoot s root cu cv a b).1.graph=s.graph := by
+ by_cases hc : cu+cv=0
+ · simp only [sameRoot,if_pos hc]
+   refine ⟨hv,?_,rfl⟩
+   simpa [sameRoot,hc] using constraint_safe (-a) (-b) k (GraphCycle.opposite_cycle cu cv (value root) a b k hc he)
+ · have heq:=GraphCycle.same_sign_branch cu cv hu hw hc
+   have hn : cu≠0 := by rcases hu with h|h <;> rw [h] <;> simp
+   have ha := GraphCycle.same_cycle_anchor cu (value root) a b k h2 hn (by simpa [←heq] using he)
+   have hd:=GraphCycle.native_denominator cu hu
+   simpa [sameRoot,hc,hd] using anchor_safe s root (a*(2*cu)⁻¹) (b*(2*cu)⁻¹) value k hv ha
+end GraphSameRoot

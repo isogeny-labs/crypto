@@ -1,0 +1,47 @@
+
+--------------- INPUT DATA ---------------
+#variables                       6
+#equations                       6
+#invalid equations               0
+field characteristic          4111
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         4
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  8       5       5     929 x 3003        0.80%        5 new       0 zero         0.00 | 0.00         
+  9       8       8     827 x 4081        2.46%        8 new       0 zero         0.00 | 0.01         
+ 10      16      16    1392 x 6254        3.83%        8 new       8 zero         0.02 | 0.02         
+ 11      20      20    2232 x 9210        4.58%       12 new       8 zero         0.03 | 0.04         
+ 12      36      36    3369 x 12999       4.57%       20 new      16 zero         0.14 | 0.18         
+ 13      60      60    4932 x 17766       5.05%       28 new      32 zero         0.21 | 0.34         
+ 14      84      84    6954 x 23532       5.54%       36 new      48 zero         0.40 | 0.84         
+ 15     128     128    9507 x 30305       6.02%       64 new      64 zero         0.84 | 1.87         
+ 16     256     256   12466 x 37784       6.28%      106 new     150 zero         2.48 | 6.81         
+ 17     424     424   16042 x 46062       7.18%      136 new     288 zero         6.27 | 18.24        
+ 18     544     544   19888 x 54726       7.84%      154 new     390 zero        12.67 | 37.13        
+ 19     616     616   24020 x 63632       8.47%      160 new     456 zero        21.21 | 64.35        
+ 20     720     720   28373 x 72561       8.98%{"cmd": ["msolve", "-v", "2", "-t", "4", "-P", "1", "-f", "/tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr/research/ecgfp5_quotient_solve_20261101/results/m5_p4111_planted/quot.ms", "-o", "/tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr/research/ecgfp5_quotient_solve_20261101/results/m5_p4111_planted/quot.out"], "exit_code": null, "signal": 15, "killed_by_rss_cap": false, "rss_cap_gib": 12, "killed_by_wall_cap": false, "wall_cap_seconds": 14400, "wall_seconds": 72.536, "user_seconds": 213.634, "sys_seconds": 3.247, "maxrss_kib": 918128, "peak_rss_sampled_kib": 918412, "last_rss_sampled_kib": 918412, "rss_samples_s_kib": [[0.0,100],[1.0,50252],[2.0,86624],[3.0,151616],[4.0,155352],[5.0,145612],[6.0,255636],[7.0,270832],[8.0,272780],[9.0,272780],[10.0,272780],[11.0,254348],[12.0,254352],[13.0,281368],[14.0,382220],[15.0,414492],[16.0,424632],[17.0,431028],[18.0,431028],[19.0,431028],[20.0,431028],[21.0,431028],[22.0,431028],[23.0,407172],[24.0,409280],[25.1,409280],[26.1,409280],[27.1,502040],[28.1,561704],[29.1,617524],[30.1,626708],[31.1,634468],[32.1,641996],[33.1,644340],[34.1,644340],[35.1,644340],[36.1,644340],[37.1,644340],[38.1,644340],[39.1,644340],[40.1,644340],[41.1,644340],[42.1,644340],[43.1,644340],[44.1,621596],[45.1,615596],[46.1,615608],[47.1,615608],[48.1,615608],[49.1,645816],[50.1,710860],[51.1,777488],[52.1,851520],[53.1,878272],[54.1,886744],[55.1,895084],[56.1,901904],[57.1,907672],[58.1,914480],[59.1,918412],[60.1,918412],[70.1,918412]]}

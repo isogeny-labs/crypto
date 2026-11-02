@@ -1,0 +1,63 @@
+{
+  "schema": "formal.technical-review/v1",
+  "joint": "A",
+  "reviewer": "/root/strict_storage_reviewer",
+  "producer_commit": "e45227d1b8f420414c71de1cbecd787b887f69e7",
+  "plan_commit": "660bbb72be",
+  "machine_status": "passed",
+  "fidelity": "faithful_scoped",
+  "review_outcome": "validated_scoped",
+  "declarations": [
+    {
+      "name": "ReductionWord.step_exists_strict",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "name": "ReductionWord.initialized_run_strict",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "name": "ReductionWord.reduction_exists_strict",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "name": "ReductionWord.fallback_reduced_strict",
+      "machine_status": "passed",
+      "fidelity": "faithful_scoped"
+    }
+  ],
+  "fresh_modules": 6,
+  "producer_controls": 2,
+  "producer_readbacks": 6,
+  "reviewer_controls": 4,
+  "reviewer_readbacks": 4,
+  "false_exit": 1,
+  "checker_reject_controls": 3,
+  "unexpected_failures": [],
+  "dependency_boundary": "private copied helper caches; shared content-hashed union caches; no complete dependency rebuild or independent kernel recheck",
+  "bindings_unchanged": true,
+  "review_attestation": {
+    "joints_owned": [
+      "A"
+    ],
+    "sibling_reports_read": [],
+    "blind_rederivation": false,
+    "inherited_context": true,
+    "author_of_reviewed_component": false,
+    "verdict": "holds",
+    "sources_read": "REVIEW.md and helper-source-bindings.json; semantic reads distinguished from mechanical traversal"
+  },
+  "remaining_bridges": [
+    "optimized branch",
+    "compiled Rust equivalence",
+    "all Field configurations",
+    "Jacobian group law",
+    "collector and Kummer invariants",
+    "runtime and cohort costs"
+  ],
+  "scientific_execution": false,
+  "official_transition": false
+}

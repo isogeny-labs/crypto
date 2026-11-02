@@ -76,10 +76,29 @@ SOURCES = {
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
     "frontier_establishment": "research/ecbench_e2e_frontier_20261031/establishment/certificate.json",
+    "pfdr_other_families": "research/pfdr_other_families_20261101/results/analysis-main.json",
+    "pfdr_other_families_readme": "research/pfdr_other_families_20261101/README.md",
+    "n83_fourbyte_pair_plain_fp2": "research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json",
+    "n83_fourbyte_pair_fp2_plain": "research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json",
+    "n83_fourbyte_pair_readme": "research/n83_fourbyte_pair_20261027/README.md",
+    "n83_image_closed_degree2": "research/n83_image_closed_degree2_20261101/ASSESSMENT.json",
+    "n83_image_closed_degree2_readme": "research/n83_image_closed_degree2_20261101/README.md",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
+    "f4_fp_ic_effect": "research/f4_fp_ic_effect_20261018/summary.json",
+    "f4_fp_ic_main": "research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json",
+    "f4_fp_ic_new": "research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "glv_k4": "research/glv_k4_pipeline_d4_20261017/summary.json",
+    "glv_gls": "research/glv_gls_v4_20261018/summary.json",
+    "glv_e31": "research/e31_chain_solve_20261024/summary.json",
+    "glv_e27": "experiments/32_walk_karatsuba/summary.json",
+    "glv_e30": "experiments/35_invariants_lite/summary.json",
+    "glv_e32": "experiments/36_handover_ladder/summary.json",
+    "glv_e33": "experiments/37_solver_b_pivot_count/summary.json",
+    "glv_e34": "experiments/38_twist24_cheap_rep/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
+    "generator_orbit": "research/ecbench_generator_orbit_20261022/figures/summary.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
@@ -725,8 +744,15 @@ def roster(names: Names, measured: set[str]) -> list[dict]:
     for c in names.reg["curves"]:
         p = c["params"]
         if c["family"] == "prime":
-            field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
-            coeff = f"a = {p['a']}, b = {p['b']}" if len(p["p"]) < 40 else "standard coefficients"
+            p_text = str(p["p"])
+            field = f"GF(p), p = {p_text}" if len(p_text) < 40 else f"GF(p), {int(p_text).bit_length()}-bit p"
+            coeff = f"a = {p['a']}, b = {p['b']}" if len(p_text) < 40 else "standard coefficients"
+        elif c["family"] == "extension":
+            degree = p.get("k", p.get("degree"))
+            if degree is None:
+                raise ValueError(f"extension curve {c['slug']} has no field degree")
+            field = f"GF({p['p']}^{degree})"
+            coeff = f"a = {p['a']}, b = {p['b']}"
         else:
             m = p.get("n", p.get("m"))
             field = f"GF(2^{m})"
@@ -859,6 +885,45 @@ def lazy_members_component() -> dict:
             "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
 
+def generator_orbit_component() -> dict:
+    """The orbit-layout table and generator-orbit base of
+    research/ecbench_generator_orbit_20261022: paired ratios and §5a band rows
+    copied from the study's saved ecbench comparisons and `ecbench band` JSON
+    (figures/summary.json). Engineering; the ranked tables A-C keep the
+    oracle each row was measured with. Its validation standing is the gate's
+    own verdict on the study directory's VALIDATION.json."""
+    d = load(SOURCES["generator_orbit"])
+    if d.get("schema") != "crypto.generator_orbit_study/v1":
+        raise SystemExit(f"{SOURCES['generator_orbit']}: unexpected schema")
+    study = "research/ecbench_generator_orbit_20261022"
+
+    def arm(c, prefix):
+        return next(a["arm"] for a in c["arms"] if a["arm"].startswith(prefix))
+
+    def cmp(c, a, b):
+        m = next(x for x in c["comparisons"] if x["a"] == a and x["b"] == b)
+        return {"ratio": m["ratio"], "ci95": m["ci95"], "pairs": m["pairs"]}
+
+    def band(c, name):
+        return next(r["mean_s"] for r in c["band"] if r["arm"] == name)
+
+    rows = []
+    for c in d["curves"]:
+        lazy, layout, gen = arm(c, "ic-lazy-"), arm(c, "ic-layout-"), arm(c, "ic-gen-layout-")
+        rows.append({"session": c["session"], "curve": c["band"][0]["curve"], "a": c["a"], "n": c["n"],
+                     "log2_r": c["log2r"], "columns": int(gen.rsplit("-c", 1)[1]),
+                     "lazy_over_layout": cmp(c, layout, lazy), "layout_over_gen": cmp(c, gen, layout),
+                     "lazy_over_gen": cmp(c, gen, lazy), "gen_over_rho_frob": cmp(c, "rho-frob", gen),
+                     "band_gen": band(c, gen), "band_lazy": band(c, lazy), "band_rho_frob": band(c, "rho-frob")})
+    errors = gate.check_evidence_dir(REPO / study)
+    validation = ("Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study "
+                  "directory: replay certificate, validator report, §5a-banded rho-frob reference)."
+                  if not errors else NOT_VALIDATED + " Gate: " + "; ".join(errors) + ".")
+    return {"rows": rows, "unit": "ecbench.gae, paired by target, cluster-bootstrap 95% CI", "class": "engineering",
+            "weights": d["weights"], "study": study + "/", "report": study + "/REPORT.pdf",
+            "source": SOURCES["generator_orbit"], "validated": not errors, "validation": validation}
+
+
 def lazy_columns2_component() -> dict:
     """Two orbit columns against the frozen per-curve column count, under the lazy oracle:
     research/ecbench_lazy_columns2_20261018, ratios copied from the study's saved ecbench
@@ -873,6 +938,128 @@ def lazy_columns2_component() -> dict:
     return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
             "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
             "source": SOURCES["lazy_columns2"], "validation": NOT_VALIDATED}
+
+def k4_v4_component() -> dict:
+    """The k = 4 decomposition oracle on its own family: E19 (the tau_T line,
+    weighted D4 solve) as the before figure and E24 (the full-2-torsion V4
+    line and its invariant solve) as the after, end to end on curves over
+    F_{p^4} with rational 2-torsion, copied from the study's summary.json
+    (written by examples/glv_invariant_experiment_tables.rs --k4-summary from
+    the raw records). A solver speed-up on curves no table A-C row prices:
+    it moves no row there."""
+    sm = load(SOURCES["glv_k4"])
+    if (sm.get("schema") != "crypto.glv_k4_pipeline_summary/v1"
+            or sm.get("all_verified") is not True
+            or sm.get("class") != "engineering"):
+        raise SystemExit("review the k = 4 V4-line summary before updating the leaderboard")
+    gls = load(SOURCES["glv_gls"])
+    if (gls.get("schema") != "crypto.glv_gls_v4_summary/v1"
+            or gls.get("all_verified") is not True
+            or gls.get("class") != "engineering"):
+        raise SystemExit("review the E25 GLS summary before updating the leaderboard")
+    e31 = load(SOURCES["glv_e31"])
+    e2e = e31.get("end_to_end", {})
+    if (e31.get("experiment") != "E31"
+            or e31.get("class") != "engineering (phase speed-up)"
+            or e2e.get("all_correct") is not True
+            or e2e.get("all_replay_fields_identical") is not True
+            or e2e.get("rho_ahead_every_row_every_weight") is not True):
+        raise SystemExit("review the E31 chain-solve summary before updating the leaderboard")
+    e27 = load(SOURCES["glv_e27"])
+    e27_study = "research/e27_walk_20261030"
+    if (e27.get("experiment") != "e27" or e27.get("all_walks_identical") is not True
+            or not all(z["other_fields_equal"] for z in e27["rows"])
+            or gate.check_evidence_dir(REPO / e27_study, REPO)):
+        raise SystemExit("review the E27 walk summary and its VALIDATION.json before updating the leaderboard")
+    span = lambda key, i: [min(z[key][i] for z in e27["rows"]), max(z[key][i] for z in e27["rows"])]
+    e30 = load(SOURCES["glv_e30"])
+    e30_study = "research/e30_invariants_lite_20261030"
+    if (e30.get("experiment") != "e30" or not all(z["other_fields_equal"] for z in e30["rows"])
+            or gate.check_evidence_dir(REPO / e30_study, REPO)):
+        raise SystemExit("review the E30 audit summary and its VALIDATION.json before updating the leaderboard")
+    span30 = lambda f: [min(f(z) for z in e30["rows"]), max(f(z) for z in e30["rows"])]
+    e32 = load(SOURCES["glv_e32"])
+    e32_study = "research/e32_handover_ladder_20261031"
+    if (e32.get("experiment") != "e32" or e32.get("rows_at_or_below_rho_any_weight") != 0
+            or not all(c["ic_correct"] and c["walks_correct"] for c in e32["curves"])
+            or gate.check_evidence_dir(REPO / e32_study, REPO)):
+        raise SystemExit("review the E32 ladder summary and its VALIDATION.json before updating the leaderboard")
+    e33 = load(SOURCES["glv_e33"])
+    e33_study = "research/e33_solver_b_pivot_count_20261031"
+    if (e33.get("experiment") != "e33" or e33.get("e2e_identity_ok") is not True
+            or gate.check_evidence_dir(REPO / e33_study, REPO)):
+        raise SystemExit("review the E33 pivot-count summary and its VALIDATION.json before updating the leaderboard")
+    e34 = load(SOURCES["glv_e34"])
+    e34_study = "research/e34_twist24_cheap_rep_20261031"
+    e34_val = load(f"{e34_study}/validator-report.json")
+    if e34.get("experiment") not in ("e34", "E34") or e34_val.get("status") != "pass":
+        raise SystemExit("review the E34 summary and its validator report before updating the leaderboard")
+    return {**sm, "source": SOURCES["glv_k4"],
+            "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
+            "gls": {**gls, "source": SOURCES["glv_gls"],
+                    "report": "research/glv_gls_v4_20261018/REPORT.pdf"},
+            "e31": {"source": SOURCES["glv_e31"],
+                    "report": "research/e31_chain_solve_20261024/REPORT.pdf",
+                    "validation": "benchmarks/20261024-e31-chain-solve/VALIDATION.json",
+                    "e25_over_a": e2e["E25_over_A_range_by_weight"],
+                    "e25_over_b": e2e["E25_over_B_range_by_weight"],
+                    "s_over_rho_e25": e2e["S_over_rho_E25_range_by_weight"],
+                    "s_over_rho_a": e2e["S_over_rho_A_range_by_weight"],
+                    "s_over_rho_b": e2e["S_over_rho_B_range_by_weight"],
+                    "per_call_a": e31["stage_a"]["existing_over_A_range"],
+                    "per_call_b": e31["stage_a"]["existing_over_B_range"],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "log2_n", "S_E25", "S_A", "S_B",
+                                                "E25_over_A", "E25_over_B", "S_over_rho_A")}
+                             for z in e2e["rows"]]},
+            "e27": {"source": SOURCES["glv_e27"],
+                    "report": f"{e27_study}/REPORT.pdf",
+                    "validation": f"{e27_study}/VALIDATION.json",
+                    "add_cost": [e27["per_op_costs"]["schoolbook"]["add_distinct_unbatched"],
+                                 e27["per_op_costs"]["karatsuba"]["add_distinct_unbatched"]],
+                    "walk_ratio": e27["walk_ratio_range"],
+                    "ic_ratio": [min(z["S_A"] / z["S_AK"] for z in e27["rows"]),
+                                 max(z["S_A"] / z["S_AK"] for z in e27["rows"])],
+                    "growth": [span("growth", i) for i in range(3)],
+                    "dist_new": [span("dist_new", i) for i in range(3)],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_A", "S_AK", "rho_e25", "rho_e27",
+                                                "dist_old", "dist_new", "growth")}
+                             for z in e27["rows"]]},
+            "e30": {"source": SOURCES["glv_e30"],
+                    "report": f"{e30_study}/REPORT.pdf",
+                    "validation": f"{e30_study}/VALIDATION.json",
+                    "share": span30(lambda z: 100 * z["saving_share"]),
+                    "change": [span30(lambda z, i=i: 100 * z["distance_change"][i]) for i in range(3)],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "S_K", "saving", "saving_share",
+                                                "walk_saving", "distance_change")}
+                             for z in e30["rows"]]},
+            "e32": {"source": SOURCES["glv_e32"],
+                    "report": f"{e32_study}/REPORT.pdf",
+                    "validation": f"{e32_study}/VALIDATION.json",
+                    "reached_log2n": e32["reached_log2n"],
+                    "curves": len(e32["curves"]),
+                    "best_d0": min(c["D"]["0"] for c in e32["curves"]),
+                    "fits": {w: {"log2_nstar": e32["fits"][w]["M1"]["log2_nstar"],
+                                 "ci": e32["fits"][w]["M1"]["ci95"]["log2_nstar"],
+                                 "beta": e32["fits"][w]["M1"]["beta"],
+                                 "beta_ci": e32["fits"][w]["M1"]["ci95"]["beta"]}
+                             for w in ("0", "0.1", "1")},
+                    "rows": [{"p": z["p"], "log2n": z["log2n"], "curves": z["curves"],
+                              "d": [z[f"D_{w}"]["median"] for w in ("0", "0.1", "1")],
+                              "d_min": z["D_0"]["min"], "d_max": z["D_0"]["max"]}
+                             for z in e32["per_size"]]},
+            "e33": {"source": SOURCES["glv_e33"],
+                    "report": f"{e33_study}/REPORT.pdf",
+                    "validation": f"{e33_study}/VALIDATION.json",
+                    "ranks": [{"solver": r["solver"], "quantity": r["quantity"], "ranges": r["ranges"],
+                               "rank": r["rank"], "rows": r["rows"], "rows_x_ahead": r["rows_x_ahead"]}
+                              for r in e33["ranks"]],
+                    "per_call": {sv: [min(z[sv]["selection_per_call"] for z in e33["e2e"]),
+                                      max(z[sv]["selection_per_call"] for z in e33["e2e"])]
+                                 for sv in ("chain-sparsest-counted", "chain-sparsest-inc", "chain-sparsest-est")}},
+            "e34": {"source": SOURCES["glv_e34"],
+                    "report": f"{e34_study}/REPORT.pdf",
+                    "validator_report": f"{e34_study}/validator-report.json",
+                    "certificate": f"{e34_study}/replay-certificate.json"}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -1550,6 +1737,11 @@ def jv_sieve_table() -> dict:
     }
 
 
+def f4_fp_ic_component() -> dict:
+    """Display the frozen engineering result; native-audit checks its arithmetic."""
+    return load(SOURCES["f4_fp_ic_effect"])
+
+
 def build(allow_unvalidated: bool = False) -> dict:
     names = Names()
     frontier_audit = latest_frontier_audit()
@@ -1700,6 +1892,163 @@ def build(allow_unvalidated: bool = False) -> dict:
         },
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
+    }
+    pfdr = load(SOURCES["pfdr_other_families"])
+    pfdr_readme = (REPO / SOURCES["pfdr_other_families_readme"]).read_text()
+    pfdr_lines = [line for line in pfdr.get("lines", []) if line.get("kind") == "struct"]
+    expected_pfdr_labels = {
+        f"structured|theta={theta:.2f}|d={d}"
+        for theta in (0.30, 0.35) for d in (1, 2, 3)
+    }
+    if (pfdr.get("experiment") != "EXP-PFDR-2d36f9-R2-FAM"
+            or pfdr.get("outcome") != "O-SUB-BE"
+            or pfdr.get("reading") != "O-SUB-BE"
+            or pfdr.get("break_even_met") is not False
+            or pfdr.get("selftest_pass") is not True
+            or set(pfdr.get("valid_lines", [])) != expected_pfdr_labels
+            or pfdr.get("alive_lines") != []
+            or pfdr.get("failed_infrastructure") != []
+            or len(pfdr_lines) != 6
+            or {line.get("label") for line in pfdr_lines} != expected_pfdr_labels
+            or any(line.get("class") != "SUB-BE" or line.get("valid") is not True
+                   or [rung.get("bits") for rung in line.get("kappa_by_rung", [])]
+                   != [16, 20, 24, 28, 32]
+                   for line in pfdr_lines)
+            or any(pfdr.get("controls", {}).get(key, {}).get("pass") is not True
+                   for key in ("C3", "C4", "C5", "C6"))
+            or "19,887 jobs" not in pfdr_readme):
+        raise SystemExit("review the PFDR structured-family result before updating the leaderboard")
+    pfdr_family_names = {1: "Dickson", 2: "geometric progression", 3: "quadratic progression"}
+    pfdr_diagnostic = {
+        "source": SOURCES["pfdr_other_families"],
+        "readme": SOURCES["pfdr_other_families_readme"],
+        "experiment": pfdr["experiment"],
+        "reading": pfdr["reading"],
+        "class": "structural factor-base diagnostic; no E2E IC price and no rho comparison",
+        "jobs": 19_887,
+        "cells": len(pfdr["cells"]),
+        "bits": [16, 20, 24, 28, 32],
+        "break_even_slope": 1 / 3,
+        "selftest_pass": pfdr["selftest_pass"],
+        "controls_pass": all(pfdr["controls"][key]["pass"] for key in ("C3", "C4", "C5", "C6")),
+        "calibration": {
+            "n": pfdr["calibration"]["n"],
+            "mean": pfdr["calibration"]["mean"],
+            "sd": pfdr["calibration"]["sd"],
+        },
+        "lines": [{
+            "family": pfdr_family_names[line["d"]],
+            "theta": line["theta"],
+            "delta_hat": line["delta_hat"],
+            "ci95": line["ci95"],
+            "class": line["class"],
+        } for line in sorted(pfdr_lines, key=lambda line: (line["d"], line["theta"]))],
+        "slope_range": [min(line["delta_hat"] for line in pfdr_lines),
+                        max(line["delta_hat"] for line in pfdr_lines)],
+        "largest_upper_ci95": max(line["ci95"][1] for line in pfdr_lines),
+        "online_speedup": None,
+        "fully_priced_cold_speedup": None,
+    }
+    n83_pair_docs = [load(SOURCES[key]) for key in
+                     ("n83_fourbyte_pair_plain_fp2", "n83_fourbyte_pair_fp2_plain")]
+    n83_pair_readme = (REPO / SOURCES["n83_fourbyte_pair_readme"]).read_text()
+    expected_orders = [("plain", "fp2"), ("fp2", "plain")]
+    for pair, order in zip(n83_pair_docs, expected_orders):
+        arms = pair.get("arms", [])
+        if (pair.get("schema") != "n83.fourbyte-paired-k1107-replay/v1"
+                or pair.get("status") != "PASS_PAIRED_FULL_REPLAY"
+                or pair.get("host_tier") != "shared_local_diagnostic"
+                or len(arms) != 2
+                or tuple(arm.get("layout") for arm in arms) != order
+                or any(arm.get("status") != "PASS_INDEPENDENT_FULL_REPLAY"
+                       or not arm.get("checks")
+                       or not all(arm["checks"].values()) for arm in arms)
+                or len({arm.get("base_hash") for arm in arms}) != 1):
+            raise SystemExit("review the N83 four-byte paired replay before updating the leaderboard")
+        by_layout = {arm["layout"]: arm for arm in arms}
+        if (not math.isclose(pair["plain_over_fp2_index_build"],
+                             by_layout["plain"]["index_build_ms"] / by_layout["fp2"]["index_build_ms"],
+                             rel_tol=1e-12)
+                or not math.isclose(pair["plain_over_fp2_process_wall"],
+                                    by_layout["plain"]["process_wall_seconds"]
+                                    / by_layout["fp2"]["process_wall_seconds"], rel_tol=1e-12)):
+            raise SystemExit("N83 four-byte paired replay ratios do not rederive")
+    if ("PASS_PAIRED_FULL_REPLAY" not in n83_pair_readme
+            or "shared" not in n83_pair_readme
+            or "does not justify selecting the FP2" not in n83_pair_readme
+            or "layout for K5500" not in n83_pair_readme):
+        raise SystemExit("review the N83 four-byte paired study limits before updating the leaderboard")
+    n83_root_index_diagnostic = {
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "sources": [SOURCES["n83_fourbyte_pair_plain_fp2"],
+                    SOURCES["n83_fourbyte_pair_fp2_plain"]],
+        "readme": SOURCES["n83_fourbyte_pair_readme"],
+        "class": "alternating shared-host full-process diagnostic; no Tier 1 or matched-rho promotion",
+        "base_columns": 1_107,
+        "pairs": [{
+            "order": [arm["layout"] for arm in pair["arms"]],
+            "plain_over_fp2_index_build": pair["plain_over_fp2_index_build"],
+            "plain_over_fp2_process_wall": pair["plain_over_fp2_process_wall"],
+            "arms": [{
+                "layout": arm["layout"],
+                "index_build_ms": arm["index_build_ms"],
+                "process_wall_seconds": arm["process_wall_seconds"],
+                "online_ms": arm["online_ms"],
+                "peak_rss_bytes": arm["peak_rss_bytes"],
+                "root_fp2_bytes": arm["root_fp2_bytes"],
+                "status": arm["status"],
+            } for arm in pair["arms"]],
+        } for pair in n83_pair_docs],
+        "plain_over_fp2_index_build_range": [
+            min(pair["plain_over_fp2_index_build"] for pair in n83_pair_docs),
+            max(pair["plain_over_fp2_index_build"] for pair in n83_pair_docs),
+        ],
+        "plain_over_fp2_process_wall_range": [
+            min(pair["plain_over_fp2_process_wall"] for pair in n83_pair_docs),
+            max(pair["plain_over_fp2_process_wall"] for pair in n83_pair_docs),
+        ],
+        "candidate_id": None,
+        "matched_rho_speedup": None,
+        "tier1_speedup": None,
+    }
+    n83_image = load(SOURCES["n83_image_closed_degree2"])
+    n83_image_readme = (REPO / SOURCES["n83_image_closed_degree2_readme"]).read_text()
+    relation = n83_image.get("projected_relation", {})
+    image_cost = n83_image.get("complete_cost", {})
+    if (n83_image.get("schema") != "crypto.transfer-assessment/v3"
+            or n83_image.get("case_id") != "n83-image-closed-degree-two-fiber"
+            or n83_image.get("status") != "rejected_by_structural_and_cost_gates"
+            or relation.get("identity") != "[3]P=P+[2]P"
+            or relation.get("new_information") is not False
+            or relation.get("useful_relation_probability") != 0
+            or relation.get("independent_rank_per_identity") != 0
+            or any(image_cost.get(key) is not False for key in
+                   ("finite_crossover_against_strong_source_rho", "collector_admitted",
+                    "eks_timing_admitted", "speedup_claim"))
+            or len(n83_image.get("controls", [])) != 5
+            or "scoped rejection" not in n83_image_readme
+            or "No result in this directory establishes a discrete-log speedup" not in n83_image_readme):
+        raise SystemExit("review the N83 degree-two image-calculus assessment before updating the leaderboard")
+    n83_image_diagnostic = {
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "source": SOURCES["n83_image_closed_degree2"],
+        "readme": SOURCES["n83_image_closed_degree2_readme"],
+        "case_id": n83_image["case_id"],
+        "status": n83_image["status"],
+        "class": "structural transfer rejection; collector and timing stopped before performance measurement",
+        "map": n83_image["transformation"]["map"],
+        "fiber_support_degrees": [1, 2],
+        "projected_identity": relation["identity"],
+        "useful_relation_probability": relation["useful_relation_probability"],
+        "independent_rank_per_identity": relation["independent_rank_per_identity"],
+        "source_rho_exponent": image_cost["source_rho_exponent"],
+        "ambient_collection_exponent": image_cost["ordinary_ambient_genus3_collection_exponent"],
+        "ambient_gap_bits": image_cost["ordinary_ambient_gap_bits"],
+        "controls": n83_image["controls"],
+        "open_obligations": n83_image["open_obligations"],
+        "collector_admitted": image_cost["collector_admitted"],
+        "timing_admitted": image_cost["eks_timing_admitted"],
+        "speedup_claim": image_cost["speedup_claim"],
     }
     rank_columns = load(SOURCES["n37_rank_columns"])
     if (rank_columns["status"] != "independently_replayed_l0_bounded_diagnostic"
@@ -1932,6 +2281,9 @@ def build(allow_unvalidated: bool = False) -> dict:
         "f6_small_cold_diagnostic": small_cold_diagnostic,
         "f6_ecbench_ladder_diagnostic": ladder_diagnostic,
         "f4_f5_f6_cross_family_diagnostic": cross_diagnostic,
+        "pfdr_other_families_diagnostic": pfdr_diagnostic,
+        "n83_root_index_diagnostic": n83_root_index_diagnostic,
+        "n83_image_closed_degree2_diagnostic": n83_image_diagnostic,
         "latest_frontier_audit": frontier_audit,
         "n83_tier1_cold_holdout": {
             "source": SOURCES["n83_tier1_cold_holdout"],
@@ -1985,11 +2337,14 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
+        "generator_orbit_component": generator_orbit_component(),
         "lazy_columns2_component": lazy_columns2_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
+        "f4_fp_ic_component": f4_fp_ic_component(),
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "algebraic_ladder": algebraic_ladder(),
@@ -2321,6 +2676,33 @@ def markdown(doc: dict) -> str:
     L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
               f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
               "rho is claimed.", "", lz["validation"], ""]
+    go = doc["generator_orbit_component"]
+
+    def gci(x):
+        return f"{x['ratio']:.3f} [{x['ci95'][0]:.3f}, {x['ci95'][1]:.3f}]"
+
+    def gband(b):
+        return " / ".join(f"{v:.3f}" for v in b)
+    L += ["## Component improvement: orbit-layout table and generator-orbit base (2026-10-22, engineering)", "",
+          "Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` names a hit's "
+          "Frobenius images by index and adds each orbit's own pairs once per rotation class (the same "
+          "relations as the lazy table on 960/960 run pairs); `generator_orbit=1` makes column 0 the "
+          "orbit of G, whose logarithm is known, and `stride-generator` draws targets Q + [k]G with no "
+          f"scalar multiplication. {go['unit']}; above 1 the second-named arm is cheaper. Band: mean S "
+          "with native work at w = 0 / 0.1 / 1 GAE (AGENTS.md §5a).", "",
+          "| curve | log₂ r | c | lazy ÷ layout | lazy ÷ gen-layout (net) | gen-layout ÷ rho-frob | "
+          "band S gen-layout | band S rho-frob |",
+          "|:--|--:|--:|:--|:--|:--|:--|:--|"]
+    for r in go["rows"]:
+        L.append(f"| `{r['curve']}` | {r['log2_r']:.1f} | {r['columns']} | {gci(r['lazy_over_layout'])} | "
+                 f"**{gci(r['lazy_over_gen'])}** | {gci(r['gen_over_rho_frob'])} | {gband(r['band_gen'])} | "
+                 f"{gband(r['band_rho_frob'])} |")
+    L += ["", f"[Report]({'../../' + go['report']}) · [study](../../{go['study']}) · "
+              f"[data](../../{go['source']}). At n = 29 (c = 1) the IC arm is below rho-frob at every band "
+              "weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the "
+              "crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not \"faster than rho\": "
+              "the gap grows with r. At n = 19 no pinned calibration row exists and the band does not "
+              "re-price the IC natives.", "", go["validation"], ""]
     c2 = doc["lazy_columns2_component"]
     L += ["## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)", "",
           "Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that the "
@@ -2607,6 +2989,58 @@ def markdown(doc: dict) -> str:
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
     L.append("")
+    p = doc["pfdr_other_families_diagnostic"]
+    L += ["## Structured factor-base growth screen, outside tables A–C", "",
+          f"The preregistered `{p['experiment']}` census ran {p['jobs']:,} deterministic local jobs "
+          f"across {p['cells']} cells and five sizes ({p['bits'][0]}–{p['bits'][-1]} bits). It asks whether "
+          "the coincidence multiplier κ for Dickson, geometric-progression, or quadratic-progression "
+          f"x-bases grows with N fast enough to reach the frozen break-even slope δ* = {p['break_even_slope']:.3f}. "
+          "It does not price a complete index-calculus pipeline and has no matched rho arm.", "",
+          f"All six structured lines are valid and read `{p['reading']}`. Their five-rung slopes range from "
+          f"{p['slope_range'][0]:.4f} to {p['slope_range'][1]:.4f}; the largest upper 95% limit is "
+          f"{p['largest_upper_ci95']:.4f}, far below 1/3. Self-test and controls C3–C6 pass; the null "
+          f"calibration is n={p['calibration']['n']}, mean {p['calibration']['mean']:.2f}, "
+          f"sd {p['calibration']['sd']:.2f}.", "",
+          "| family | θ | slope of log2 κ on log2 N | 95% interval | reading |",
+          "|:--|--:|--:|:--|:--|"]
+    for row in p["lines"]:
+        L.append(f"| {row['family']} | {row['theta']:.2f} | {row['delta_hat']:.4f} | "
+                 f"[{row['ci95'][0]:.4f}, {row['ci95'][1]:.4f}] | `{row['class']}` |")
+    L += ["", "This is negative structural evidence, not a performance promotion: no ranked row moves and "
+          "rho is not being inferred from an unpriced component. "
+          f"Read the [analysis](../../{p['source']}) and [study limits](../../{p['readme']}).", ""]
+    n83 = doc["n83_root_index_diagnostic"]
+    L += ["## N83 four-byte root-index loop, outside tables A–C", "",
+          "The plain four-byte ID31 root index and its packed two-bit fingerprint (FP2) variant ran "
+          f"in both alternating orders on the same K{n83['base_columns']} base and public point. "
+          "Every arm completed the full process, recovered the same scalar, and passed independent "
+          "replay. Ratios below are plain / FP2, so values above 1 favor FP2.", "",
+          "| order | plain / FP2 index build | plain / FP2 whole process | plain wall (s) | FP2 wall (s) |",
+          "|:--|--:|--:|--:|--:|"]
+    for pair in n83["pairs"]:
+        arms = {arm["layout"]: arm for arm in pair["arms"]}
+        L.append(f"| {' → '.join(pair['order'])} | {pair['plain_over_fp2_index_build']:.3f}× | "
+                 f"{pair['plain_over_fp2_process_wall']:.3f}× | "
+                 f"{arms['plain']['process_wall_seconds']:.3f} | {arms['fp2']['process_wall_seconds']:.3f} |")
+    L += ["", f"The observed index-build range is {n83['plain_over_fp2_index_build_range'][0]:.3f}–"
+          f"{n83['plain_over_fp2_index_build_range'][1]:.3f}× and the whole-process range is "
+          f"{n83['plain_over_fp2_process_wall_range'][0]:.3f}–"
+          f"{n83['plain_over_fp2_process_wall_range'][1]:.3f}×. The host was shared and its load varied "
+          "substantially; two pairs do not select the K5500 layout. This is a correctness-backed "
+          "optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. "
+          f"Read the [study and limits](../../{n83['readme']}).", ""]
+    image = doc["n83_image_closed_degree2_diagnostic"]
+    L += ["## N83 degree-two image calculus, outside tables A–C", "",
+          f"The exact `{image['case_id']}` transfer audit is `{image['status']}`. Generic odd-degree "
+          f"fibers of `{image['map']}` split into closed support degrees 1+2, but their projected "
+          f"labels give only `{image['projected_identity']}`. Useful relation probability and independent "
+          f"rank per identity are both {image['useful_relation_probability']}; the collector and timing "
+          "stages therefore stop under the frozen protocol.", "",
+          f"The ordinary ambient genus-three scale is `{image['ambient_collection_exponent']}`, about "
+          f"{image['ambient_gap_bits']} bits above `{image['source_rho_exponent']}`. This is a scoped "
+          "structural rejection, not zero-cost attack data: no wall time or speedup was measured, and no "
+          "ranked row moves. A compact growing-degree or adaptive target-local router remains open. "
+          f"Read the [assessment](../../{image['source']}) and [scope](../../{image['readme']}).", ""]
     pb = doc["prime_base_size_component"]
     L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
           "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
@@ -2836,6 +3270,19 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    f4 = doc["f4_fp_ic_component"]
+    L += ["", "## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC", "",
+          f"Component speed-up, class {f4['class']}: `f4_fp` before and after #1717 in "
+          f"{f4['pipeline']}, same seeds and the same relations. Both builds recorded "
+          f"`solved=true` and `correct=true` for every DLP row (`{f4['study']}`, {f4['run']}); "
+          "the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of "
+          "tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).", "",
+          "| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |",
+          "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for r in f4["dlp"]:
+        L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['s_before']:.4g} | "
+                 f"{r['s_after']:.4g} | {r['s_ratio']:.2f} | {r['s_over_rho_before']:.0f} | "
+                 f"{r['s_over_rho_after']:.0f} |")
     L += ghs_md(doc["ghs_weak_n4_component"])
     ls = doc["jv_cover_linear_stage_component"]
     L += ["", "## Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC", "",
@@ -2996,7 +3443,138 @@ def markdown(doc: dict) -> str:
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
+    k = doc["k4_v4_component"]
+
+    def rr(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    L += ["## k = 4 decomposition oracle on curves with rational 2-torsion, outside tables A–C", "",
+          f"Before: {k['before']}. After: {k['after']}. Both end to end over F_p^4 "
+          f"({k['e19_curves']} and {k['e24_curves']} curves, every logarithm verified), every phase "
+          "charged in F_p multiplications against 16 matched negation walks per curve. "
+          f"Handover from each pipeline's own constants: 2^{k['e19_handover_log2_n']:.1f} → "
+          f"2^{k['e24_handover_log2_n']:.1f} (extrapolated). Class: {k['class']}, a constant; "
+          f"every row still {rr(k['e24_s_over_rho_all'])}× slower than rho. "
+          f"Read the [report](../../{k['report']}) and [summary](../../{k['source']}).", "",
+          "| p | log2 n | E19 S/rho | E24 S/rho | E19 / E24 (by seed) | E19 C per call | E24 C per call |",
+          "|--:|--:|--:|--:|--:|--:|--:|"]
+    for z in k["rows"]:
+        L.append(f"| {z['p']} | {z['log2_n']:.1f} | {rr(z['e19_s_over_rho'])} | {rr(z['e24_s_over_rho'])} | "
+                 f"{rr(z['e19_over_e24_by_seed'], '{:.0f}')} | {rr(z['e19_c_median'])} | {rr(z['e24_c_median'])} |")
+    L.append("")
+    g = k["gls"]
+    L += [f"**The GLS endomorphism on the V₄ line (E25).** Before: {g['before']}. After: {g['after']}. "
+          f"Same curve, base and target stream ({g['curves']} GLS curves, h = 16, every logarithm verified); "
+          f"handover from each arm's own constants 2^{g['handover_log2_n_a']:.1f} → 2^{g['handover_log2_n_b']:.1f} "
+          f"(extrapolated). Class: {g['class']}, a constant, on this family only. "
+          f"Read the [report](../../{g['report']}) and [summary](../../{g['source']}).", "",
+          "| p | seed | log2 n | cols A / B | S_A / S_B | S_A / rho (negation) | S_B / rho (±ψ) |",
+          "|--:|--:|--:|:--|--:|--:|--:|"]
+    for z in g["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['log2_n']:.1f} | {z['columns'][0]} / {z['columns'][1]} | "
+                 f"{z['s_a_over_s_b']:.2f} | {z['s_a_over_rho_negation']:.2e} | {z['s_b_over_rho_psi']:.2e} |")
+    L.append("")
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    L += [("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                      a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                      r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S E25 | S A | S B | E25 / A (0, 0.1, 1 GAE) | E25 / B (0 GAE) | S_A / rho (0 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|:--|--:|--:|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_E25']:.2e} | {z['S_A']:.2e} | {z['S_B']:.2e} | "
+                 f"{z['E25_over_A'][0]:.2f}, {z['E25_over_A'][1]:.2f}, {z['E25_over_A'][2]:.3f} | "
+                 f"{z['E25_over_B'][0]:.2f} | {z['S_over_rho_A'][0]:.2e} |")
+    L.append("")
+    e = k["e27"]
+    L += [("The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from {a0} to {a1} F_p multiplications ({a2} with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes {w} cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only {ic}. Every row therefore moves further from rho, by {g0} at 0 GAE, {g1} at 0.1 and {g2} at 1; distance remaining {d0} at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29).").format(a0=e["add_cost"][0], a1=e["add_cost"][1], a2="66.3–66.7", w=R(e["walk_ratio"], "{:.3f}"), ic=R(e["ic_ratio"], "{:.4f}"), g0=R(e["growth"][0], "{:.3f}"), g1=R(e["growth"][1], "{:.3f}"), g2=R(e["growth"][2], "{:.3f}"), d0=R(e["dist_new"][0], "{:.2e}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S (E31 A) | S (E27) | rho E25 walk | rho E27 walk | S / rho before → after (0 GAE) | growth (0, 0.1, 1 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|--:|:--|:--|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_A']:.3e} | {z['S_AK']:.3e} | {z['rho_e25']:.4g} | "
+                 f"{z['rho_e27']:.4g} | {z['dist_old'][0]:.3e} → {z['dist_new'][0]:.3e} | "
+                 f"{z['growth'][0]:.3f}, {z['growth'][1]:.3f}, {z['growth'][2]:.3f} |")
+    L.append("")
+    e = k["e30"]
+    P2 = lambda r, f="{:.3f}": f"{f.format(r[0])} to {f.format(r[1])} %"
+    L += [("Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are {s} of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by {c0} at 0 GAE, {c1} at 0.1 and {c2} at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030).").format(s=P2(e["share"]), c0=P2(e["change"][0]), c1=P2(e["change"][1], "{:.4f}"), c2=P2(e["change"][2], "{:.4f}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S (E27) | trivial-product saving | share of S | walk saving | distance change (0, 0.1, 1 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|--:|:--|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_K']:.3e} | {z['saving']:.3e} | "
+                 f"{100 * z['saving_share']:.3f} % | {z['walk_saving']:.3g} | "
+                 + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + " |")
+    L.append("")
+    t = glv_e32_e34_text(k)
+    for key, title, src, extra in (("e32", "e32", k["e32"], True), ("e33", "e33", k["e33"], True)):
+        L += [t[key] + f" Read the [report](../../{src['report']}), [summary](../../{src['source']}) and "
+              f"[validation](../../{src['validation']}).", "",
+              "| " + " | ".join(t[key + "_head"]) + " |",
+              "|" + "|".join(":--" if i == 0 or (key == "e33" and i in (1, 5)) else "--:"
+                             for i in range(len(t[key + "_head"]))) + "|"]
+        L += ["| " + " | ".join(r) + " |" for r in t[key + "_rows"]]
+        L.append("")
+    L += [t["e34"] + f" Read the [report](../../{k['e34']['report']}), [summary](../../{k['e34']['source']}) and "
+          f"[validator report](../../{k['e34']['validator_report']}).", ""]
     return "\n".join(L) + "\n"
+
+
+E33_NAMES = {"chain-sparsest-counted": "B (as built, counted)", "chain-sparsest-inc": "B′ (incremental counts)",
+             "chain-sparsest-est": "B″ (counted estimate)"}
+
+
+def glv_e32_e34_text(k: dict) -> dict:
+    """Prose and tables for E32 (measurement), E33 (accounting) and E34 (reference
+    correction, gate refused: no IC arm), shared by the Markdown and HTML pages."""
+    e, f = k["e32"], k["e32"]["fits"]
+    R2 = lambda r, fmt="{:.1f}": f"[{fmt.format(r[0])}, {fmt.format(r[1])}]"
+    e32 = ("The handover ladder (E32, measurement). E25's GLS curves at eleven sizes, {c} paired curves from 2^{lo:.1f} "
+           "to 2^{hi:.1f}: E31 solver A with Karatsuba products against E27's matched ⟨±ψ⟩ walk (iii). No crossover in "
+           "the measured range: rho is ahead on every curve at every weight, so n* > 2^{hi:.1f} is what is measured; "
+           "the best curve is {b:,.0f}× from rho at 0 GAE. The fitted slope of log D against log n is {be:.3f} {bci} "
+           "(theory −1/4), and the extrapolated crossover order log₂ n* is {n0:.1f} {c0} at 0 GAE, {n1:.1f} {c1} at "
+           "0.1 and {n2:.1f} {c2} at 1, an extrapolation 37–66 bits past the top size, not a measured crossing. "
+           "Class: measurement, not an improvement; validated (independent replay 66/66 runs, note §9.34 and §9.36)."
+           ).format(c=e["curves"], lo=e["rows"][0]["log2n"], hi=e["reached_log2n"], b=e["best_d0"],
+                    be=f["0"]["beta"], bci=R2(f["0"]["beta_ci"], "{:.3f}"),
+                    n0=f["0"]["log2_nstar"], c0=R2(f["0"]["ci"]), n1=f["0.1"]["log2_nstar"], c1=R2(f["0.1"]["ci"]),
+                    n2=f["1"]["log2_nstar"], c2=R2(f["1"]["ci"]))
+    e32_rows = [[str(z["p"]), f"{z['log2n']:.1f}", str(z["curves"]), f"{z['d'][0]:.3g}", f"{z['d'][1]:.3g}",
+                 f"{z['d'][2]:.3g}", f"{z['d_min']:.3g}–{z['d_max']:.3g}"] for z in e["rows"]]
+    g = k["e33"]
+    pc = g["per_call"]
+    e33 = ("Solver B's pivot selection counted (E33, accounting). E31 left solver B's pivot-selection pass unpriced; "
+           "counted, it is {b} native operations per call (B′, the same pivots with incremental counts, {bi}; "
+           "B″, a counted sparsity estimate with different pivots, {be}). With that work priced, no B variant is "
+           "ranked against solver A or E25 across the §5a band: B and B′ lead only at 0 GAE, B″ at 0 and 0.1 but "
+           "not at 1. Solver A stays the ranked solve, and rho is ahead of every row at every weight. Class: "
+           "accounting, not an improvement; validated (independent replay, note §9.35 and §9.37, with a "
+           "fourteen-figure erratum)."
+           ).format(b="–".join(f"{x:,.0f}" for x in pc["chain-sparsest-counted"]),
+                    bi="–".join(f"{x:,.0f}" for x in pc["chain-sparsest-inc"]),
+                    be="–".join(f"{x:,.0f}" for x in pc["chain-sparsest-est"]))
+    e33_rows = [[E33_NAMES.get(r["solver"], r["solver"]), r["quantity"]]
+                + ["–".join((f"{x:.3g}" if x >= 10 else f"{x:.3f}") for x in rg) for rg in r["ranges"]]
+                + [r["rank"]] for r in g["ranks"]]
+    e34 = ("A cheaper order-24 walk on E18's j = 0 curves (E34, reference correction; not shown as a row). A class "
+           "representative that compares one coordinate of the twelve candidates first makes the order-24 walk "
+           "cheaper than both order-6 walks, pooled, at every weight (1.563 / 1.254 / 1.126 against E29's order-6 "
+           "walk at 0 / 0.1 / 1 GAE; 1.505 / 1.167 / 1.026 against an equally cheap order-6 walk, the last within "
+           "sampling noise). E18's ψ-arm distances to rho therefore lengthen by 1.63×, 1.25× and 1.13× and the "
+           "modelled handover moves 2.8, 1.3 and 0.7 bits later. Independently replayed byte for byte from a fresh "
+           "build (validator report: pass), but it compares rho walks only and has no index-calculus arm, so like "
+           "E29 it cannot pass the validation gate (note §9.38 and §9.39).")
+    return {"e32": e32, "e32_head": ["p", "log₂ n", "curves", "median D (0 GAE)", "median D (0.1)", "median D (1)",
+                                     "D range (0 GAE)"],
+            "e32_rows": e32_rows, "e33": e33,
+            "e33_head": ["solver", "ratio", "0 GAE", "0.1 GAE", "1 GAE", "rank across the band"],
+            "e33_rows": e33_rows, "e34": e34}
 
 
 STYLE = """
@@ -3327,6 +3905,35 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
              'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
              f'<p class="muted">{esc(lz["validation"])}</p></section>')
+    go = doc["generator_orbit_component"]
+
+    def gci(x):
+        return f'{x["ratio"]:.3f} [{x["ci95"][0]:.3f}, {x["ci95"][1]:.3f}]'
+
+    def gband(b):
+        return " / ".join(f"{v:.3f}" for v in b)
+    P.append('<section class="panel" id="generator-orbit"><h2>Component improvement · orbit-layout table and '
+             'generator-orbit base <span class="chip">engineering</span></h2>'
+             '<p>Against the lazy orbit IC: <code>mitm-frobenius-layout-counted</code> names a hit\'s Frobenius '
+             'images by index and adds each orbit\'s own pairs once per rotation class (same relations, 960/960 '
+             'run pairs); <code>generator_orbit=1</code> makes column 0 the orbit of G (known logarithm) and '
+             '<code>stride-generator</code> draws Q + [k]G with no scalar multiplication. '
+             f'{esc(go["unit"])}; above 1 the second-named arm is cheaper. Band: mean S at w = 0 / 0.1 / 1.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>log₂ r</th><th>c</th><th>lazy ÷ layout</th>'
+             '<th>lazy ÷ gen-layout (net)</th><th>gen-layout ÷ rho-frob</th><th>band S gen-layout</th>'
+             '<th>band S rho-frob</th></tr></thead><tbody>')
+    for r in go["rows"]:
+        P.append(f'<tr><td><code>{esc(r["curve"])}</code></td><td>{r["log2_r"]:.1f}</td><td>{r["columns"]}</td>'
+                 f'<td>{gci(r["lazy_over_layout"])}</td><td><b>{gci(r["lazy_over_gen"])}</b></td>'
+                 f'<td>{gci(r["gen_over_rho_frob"])}</td><td>{gband(r["band_gen"])}</td>'
+                 f'<td>{gband(r["band_rho_frob"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(go["report"], "Report")} · {gh(go["study"], "study")} · {gh(go["source"], "data")}. '
+             'At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline '
+             'is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob\'s fixed set-up at '
+             'log₂ r = 15.4, so it is not “faster than rho”: the gap grows with r. At n = 19 no pinned '
+             'calibration row exists and the band does not re-price the IC natives.</p>'
+             f'<p class="muted">{esc(go["validation"])}</p></section>')
     c2 = doc["lazy_columns2_component"]
     P.append('<section class="panel" id="lazy-columns2"><h2>Component tuning · two orbit columns under the '
              'lazy oracle <span class="chip">engineering</span></h2>'
@@ -3500,6 +4107,79 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td><code>{esc(c["curve"])}</code></td><td class="n">{c["log2_r"]:.2f}</td><td>K16 / K8</td>'
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
     P.append('</tbody></table></section>')
+
+    p = doc["pfdr_other_families_diagnostic"]
+    P.append('<section class="card" id="pfdr-other-families"><h2>Structured factor-base growth screen, '
+             'outside the priced tables</h2>'
+             f'<p>The preregistered <code>{esc(p["experiment"])}</code> census ran {p["jobs"]:,} '
+             f'deterministic local jobs across {p["cells"]} cells and five sizes '
+             f'({p["bits"][0]}–{p["bits"][-1]} bits). It tests whether the coincidence multiplier κ '
+             'for Dickson, geometric-progression, or quadratic-progression x-bases grows with N fast '
+             f'enough to reach the frozen break-even slope δ* = {p["break_even_slope"]:.3f}. It does '
+             'not price a complete index-calculus pipeline and has no matched rho arm.</p>'
+             f'<p>All six structured lines are valid and read <code>{esc(p["reading"])}</code>. Their '
+             f'five-rung slopes range from {p["slope_range"][0]:.4f} to {p["slope_range"][1]:.4f}; '
+             f'the largest upper 95% limit is {p["largest_upper_ci95"]:.4f}, far below 1/3. Self-test '
+             f'and controls C3–C6 pass; the null calibration is n={p["calibration"]["n"]}, mean '
+             f'{p["calibration"]["mean"]:.2f}, sd {p["calibration"]["sd"]:.2f}.</p>'
+             '<div class="scroll"><table><thead><tr><th>Family</th><th class="n">θ</th>'
+             '<th class="n">Slope of log₂ κ on log₂ N</th><th>95% interval</th><th>Reading</th>'
+             '</tr></thead><tbody>')
+    for row in p["lines"]:
+        P.append(f'<tr><td>{esc(row["family"])}</td><td class="n">{row["theta"]:.2f}</td>'
+                 f'<td class="n">{row["delta_hat"]:.4f}</td>'
+                 f'<td>[{row["ci95"][0]:.4f}, {row["ci95"][1]:.4f}]</td>'
+                 f'<td><code>{esc(row["class"])}</code></td></tr>')
+    P.append('</tbody></table></div><p>This is negative structural evidence, not a performance '
+             'promotion: no ranked row moves and rho is not inferred from an unpriced component. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["source"])}">Analysis</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(p["readme"])}">study limits</a>.'
+             '</p></section>')
+
+    n83 = doc["n83_root_index_diagnostic"]
+    P.append('<section class="card" id="n83-root-index"><h2>N83 four-byte root-index loop, '
+             'outside the priced tables</h2><p>The plain four-byte ID31 root index and its packed '
+             f'two-bit fingerprint (FP2) variant ran in both alternating orders on the same K{n83["base_columns"]} '
+             'base and public point. Every arm completed the full process, recovered the same scalar, '
+             'and passed independent replay. Ratios are plain / FP2, so values above 1 favor FP2.</p>'
+             '<div class="scroll"><table><thead><tr><th>Order</th><th class="n">Plain / FP2 index build</th>'
+             '<th class="n">Plain / FP2 whole process</th><th class="n">Plain wall (s)</th>'
+             '<th class="n">FP2 wall (s)</th></tr></thead><tbody>')
+    for pair in n83["pairs"]:
+        arms = {arm["layout"]: arm for arm in pair["arms"]}
+        P.append(f'<tr><td>{esc(" → ".join(pair["order"]))}</td>'
+                 f'<td class="n">{pair["plain_over_fp2_index_build"]:.3f}×</td>'
+                 f'<td class="n">{pair["plain_over_fp2_process_wall"]:.3f}×</td>'
+                 f'<td class="n">{arms["plain"]["process_wall_seconds"]:.3f}</td>'
+                 f'<td class="n">{arms["fp2"]["process_wall_seconds"]:.3f}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>The observed index-build range is {n83["plain_over_fp2_index_build_range"][0]:.3f}–'
+             f'{n83["plain_over_fp2_index_build_range"][1]:.3f}× and the whole-process range is '
+             f'{n83["plain_over_fp2_process_wall_range"][0]:.3f}–'
+             f'{n83["plain_over_fp2_process_wall_range"][1]:.3f}×. The host was shared and its load '
+             'varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed '
+             'optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(n83["readme"])}">Study and limits</a>.'
+             '</p></section>')
+
+    image = doc["n83_image_closed_degree2_diagnostic"]
+    P.append('<section class="card" id="n83-image-degree2"><h2>N83 degree-two image calculus, '
+             'outside the priced tables</h2>'
+             f'<p>The exact <code>{esc(image["case_id"])}</code> transfer audit is '
+             f'<code>{esc(image["status"])}</code>. Generic odd-degree fibers of '
+             f'<code>{esc(image["map"])}</code> split into closed support degrees 1+2, but their '
+             f'projected labels give only <code>{esc(image["projected_identity"])}</code>. Useful '
+             f'relation probability and independent rank per identity are both '
+             f'{image["useful_relation_probability"]}; the collector and timing stages stop under '
+             'the frozen protocol.</p>'
+             f'<p>The ordinary ambient genus-three scale is <code>{esc(image["ambient_collection_exponent"])}</code>, '
+             f'{esc(image["ambient_gap_bits"])} bits above <code>{esc(image["source_rho_exponent"])}</code>. '
+             'This is a scoped structural rejection, not zero-cost attack data: no wall time or speedup '
+             'was measured, and no ranked row moves. A compact growing-degree or adaptive target-local '
+             'router remains open. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(image["source"])}">Assessment</a> · '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(image["readme"])}">scope</a>.'
+             '</p></section>')
 
     pb = doc["prime_base_size_component"]
     P.append('<section class="card" id="prime-base-size"><h2>Prime-field baseline · factor-base size and oracle '
@@ -4057,6 +4737,24 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
 
+    f4 = doc["f4_fp_ic_component"]
+    P.append('<section id="f4-fp-ic-component"><h2>F<sub>p</sub> Gröbner engine '
+             '(<code>f4_fp</code>) in the Jacobian-cover IC</h2>'
+             f'<p>Component speed-up, class {esc(f4["class"])}: <code>f4_fp</code> before and after '
+             f'#1717 in {esc(f4["pipeline"])}, same seeds and relations. Both builds recorded '
+             '<code>solved=true</code> and <code>correct=true</code> for every DLP row; the '
+             'archived rows have no recovered-scalar certificate for an independent replay. '
+             'It moves no row of tables A–C. S/rho is a lower-bound '
+             'comparison because native work is not emitted.</p>'
+             '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>S before</th>'
+             '<th>S after</th><th>before ÷ after</th><th>S/rho before</th>'
+             '<th>S/rho after</th></tr></thead><tbody>')
+    for r in f4["dlp"]:
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["seed"]}</td><td>{r["relations"]}</td>'
+                 f'<td>{r["s_before"]:.4g}</td><td>{r["s_after"]:.4g}</td>'
+                 f'<td>{r["s_ratio"]:.2f}</td><td>{r["s_over_rho_before"]:.0f}</td>'
+                 f'<td>{r["s_over_rho_after"]:.0f}</td></tr>')
+    P.append('</tbody></table>' + gh(SOURCES["f4_fp_ic_effect"], 'Frozen engineering summary') + '</section>')
     P.append(ghs_html(doc["ghs_weak_n4_component"]))
     ls = doc["jv_cover_linear_stage_component"]
     P.append('<section id="jv-cover-linear-stage-component"><h2>Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC</h2>'
@@ -4162,6 +4860,92 @@ def page(doc: dict, standalone: bool) -> str:
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
 
+    k = doc["k4_v4_component"]
+
+    def rh(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    P.append('<section id="k4-v4-line"><h2>k = 4 decomposition oracle on curves with rational 2-torsion, '
+             'outside tables A–C</h2>'
+             f'<p>Before: {esc(k["before"])}. After: {esc(k["after"])}. Both end to end over '
+             f'F<sub>p⁴</sub> ({k["e19_curves"]} and {k["e24_curves"]} curves, every logarithm verified), '
+             'every phase charged in F<sub>p</sub> multiplications against 16 matched negation walks per curve. '
+             f'Handover from each pipeline&rsquo;s own constants: 2<sup>{k["e19_handover_log2_n"]:.1f}</sup> &rarr; '
+             f'2<sup>{k["e24_handover_log2_n"]:.1f}</sup> (extrapolated). Class: {esc(k["class"])}, a constant; '
+             f'every row still {rh(k["e24_s_over_rho_all"])}&times; slower than rho.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>log2 n</th><th>E19 S/rho</th>'
+             '<th>E24 S/rho</th><th>E19 / E24 (by seed)</th><th>E19 C per call</th><th>E24 C per call</th>'
+             '</tr></thead><tbody>')
+    for z in k["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["log2_n"]:.1f}</td><td>{rh(z["e19_s_over_rho"])}</td>'
+                 f'<td>{rh(z["e24_s_over_rho"])}</td><td>{rh(z["e19_over_e24_by_seed"], "{:.0f}")}</td>'
+                 f'<td>{rh(z["e19_c_median"])}</td><td>{rh(z["e24_c_median"])}</td></tr>')
+    g = k["gls"]
+    P.append('</tbody></table></div>' + gh(k["source"], 'Frozen study summary')
+             + f'<h3>The GLS endomorphism on the V₄ line (E25)</h3><p>Before: {esc(g["before"])}. '
+             f'After: {esc(g["after"])}. Same curve, base and target stream ({g["curves"]} GLS curves, '
+             f'h = 16, every logarithm verified); handover from each arm&rsquo;s own constants '
+             f'2<sup>{g["handover_log2_n_a"]:.1f}</sup> &rarr; 2<sup>{g["handover_log2_n_b"]:.1f}</sup> '
+             f'(extrapolated). Class: {esc(g["class"])}, a constant, on this family only.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>log2 n</th><th>cols A / B</th>'
+             '<th>S_A / S_B</th><th>S_A / rho (negation)</th><th>S_B / rho (±ψ)</th></tr></thead><tbody>')
+    for z in g["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["log2_n"]:.1f}</td>'
+                 f'<td>{z["columns"][0]} / {z["columns"][1]}</td><td>{z["s_a_over_s_b"]:.2f}</td>'
+                 f'<td>{z["s_a_over_rho_negation"]:.2e}</td><td>{z["s_b_over_rho_psi"]:.2e}</td></tr>')
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    P.append('</tbody></table></div>' + gh(g["source"], 'Frozen study summary')
+             + '<h3>The chain solve (E31)</h3><p>' + esc(("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(
+                 pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                 a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                 r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S E25</th><th>S A</th>'
+             '<th>S B</th><th>E25 / A (0, 0.1, 1 GAE)</th><th>E25 / B (0 GAE)</th><th>S_A / rho (0 GAE)</th>'
+             '</tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_E25"]:.2e}</td>'
+                 f'<td>{z["S_A"]:.2e}</td><td>{z["S_B"]:.2e}</td><td>{z["E25_over_A"][0]:.2f}, '
+                 f'{z["E25_over_A"][1]:.2f}, {z["E25_over_A"][2]:.3f}</td><td>{z["E25_over_B"][0]:.2f}</td>'
+                 f'<td>{z["S_over_rho_A"][0]:.2e}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary'))
+    e = k["e27"]
+    P.append('<h3>The matched walk made stronger (E27)</h3><p>' + esc(("The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from {a0} to {a1} F_p multiplications ({a2} with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes {w} cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only {ic}. Every row therefore moves further from rho, by {g0} at 0 GAE, {g1} at 0.1 and {g2} at 1; distance remaining {d0} at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29).").format(a0=e["add_cost"][0], a1=e["add_cost"][1], a2="66.3–66.7", w=R(e["walk_ratio"], "{:.3f}"), ic=R(e["ic_ratio"], "{:.4f}"), g0=R(e["growth"][0], "{:.3f}"), g1=R(e["growth"][1], "{:.3f}"), g2=R(e["growth"][2], "{:.3f}"), d0=R(e["dist_new"][0], "{:.2e}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S (E31 A)</th>'
+             '<th>S (E27)</th><th>rho E25 walk</th><th>rho E27 walk</th><th>S / rho before → after (0 GAE)</th>'
+             '<th>growth (0, 0.1, 1 GAE)</th></tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_A"]:.3e}</td>'
+                 f'<td>{z["S_AK"]:.3e}</td><td>{z["rho_e25"]:.4g}</td><td>{z["rho_e27"]:.4g}</td>'
+                 f'<td>{z["dist_old"][0]:.3e} → {z["dist_new"][0]:.3e}</td>'
+                 f'<td>{z["growth"][0]:.3f}, {z["growth"][1]:.3f}, {z["growth"][2]:.3f}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
+             + gh(e["validation"], 'Validation'))
+    e = k["e30"]
+    P2 = lambda r, f="{:.3f}": f"{f.format(r[0])} to {f.format(r[1])} %"
+    P.append('<h3>Trivial products repriced (E30)</h3><p>' + esc(("Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are {s} of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by {c0} at 0 GAE, {c1} at 0.1 and {c2} at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030).").format(s=P2(e["share"]), c0=P2(e["change"][0]), c1=P2(e["change"][1], "{:.4f}"), c2=P2(e["change"][2], "{:.4f}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S (E27)</th>'
+             '<th>trivial-product saving</th><th>share of S</th><th>walk saving</th>'
+             '<th>distance change (0, 0.1, 1 GAE)</th></tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_K"]:.3e}</td>'
+                 f'<td>{z["saving"]:.3e}</td><td>{100 * z["saving_share"]:.3f} %</td>'
+                 f'<td>{z["walk_saving"]:.3g}</td><td>'
+                 + ", ".join(f"{100 * x:.4f} %" for x in z["distance_change"]) + '</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + ' · '
+             + gh(e["validation"], 'Validation'))
+    t = glv_e32_e34_text(k)
+    for key, h in (("e32", "The handover ladder (E32)"), ("e33", "Solver B's pivot selection counted (E33)")):
+        src = k[key]
+        P.append(f'<h3>{esc(h)}</h3><p>' + esc(t[key]) + '</p><div class="scroll"><table><thead><tr>'
+                 + "".join(f"<th>{esc(c)}</th>" for c in t[key + "_head"]) + '</tr></thead><tbody>')
+        for r in t[key + "_rows"]:
+            P.append("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>")
+        P.append('</tbody></table></div>' + gh(src["source"], 'Frozen study summary') + ' · '
+                 + gh(src["validation"], 'Validation') + ' · ' + gh(src["report"], 'Report'))
+    P.append('<h3>A cheaper order-24 walk (E34, not shown as a row)</h3><p>' + esc(t["e34"]) + '</p>'
+             + gh(k["e34"]["source"], 'Frozen study summary') + ' · '
+             + gh(k["e34"]["validator_report"], 'Validator report') + '</section>')
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'

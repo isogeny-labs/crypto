@@ -1604,8 +1604,18 @@ pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Re
     // All data-sized storage was admitted by prepare. No parent access escapes
     // while the native and callback allowances are exclusively loaned below.
     let available = remaining(&prepared.ledger);
+    // Each persisted native event reserves CALLBACK_WORK (81,920) plus
+    // serialization work. The m13 basis prefix alone can exceed the old
+    // quarter-loan; the higher-arity profile gives the observer half of the
+    // same bounded algebra pool. The other half remains native F4 work, while
+    // group checking and terminal retention have separate admitted pools.
+    // Exhaustion still surfaces through the caller's persistence guard.
     let observer_supply = Supply {
-        work: available.work / 4,
+        work: if prepared.m >= 5 {
+            available.work / 2
+        } else {
+            available.work / 4
+        },
         bytes: 0,
     };
     let native_supply = Supply {

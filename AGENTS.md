@@ -14,6 +14,13 @@ every finished piece of work, after every decision, and whenever we switch
 tasks. Preserve previous entries. Record concrete facts from commands and
 logs; distinguish verified results from plans or assumptions.
 
+Keep the log current *always*, not only at handoff: it is the session's working
+memory. Before choosing the next step in any task, read the newest entries in
+today's log (and the previous day's when the session spans a date change) and
+let them decide the next action; if work already done is missing from the log,
+write that entry before doing anything else. Never start a new measurement,
+experiment or code change without the previous one recorded and reviewed.
+
 Every entry has four headings:
 
 - What was done (commands, files, features)
@@ -744,6 +751,11 @@ requires explicit authorization for that merge, and it follows these rules:
     wait; say in the PR why you stepped in.
   - Conflicts in frozen evidence, ledger rows, or claim files are never
     resolved by picking a side: report them to the user.
+  - A conflicted binary file (PDF, PNG, archive) is never resolved by keeping
+    both sides, which concatenates the two versions: take one side and
+    regenerate it. `binary-merges.yml` fails a merge whose result matches
+    neither parent unless the merge names the file with a
+    `Binary-Regenerated: <path>` trailer.
   - If Copilot is unavailable in the session (no GitHub MCP access, plan
     limits), say so and fall back to resolving it yourself.
 - If a documentation-only change legitimately triggers no CI, verify the
@@ -943,6 +955,15 @@ Every cross-method comparison and every ranking must:
 - **Never compare a calibrated cost on one side with an uncalibrated one
   on the other.** If a calibration exists for only some arms or sizes,
   use the band alone.
+- **The band prices operations, not bytes** (owner, 2026-11-01). A
+  memory-size counter (`residual_table_bytes_uncharged`,
+  `factor_base_vec_bytes_floor_uncharged`, `native_table_bytes_uncharged`)
+  is still listed with its count for every arm, but is not charged `w` and
+  cannot block a ranking. The list is `NON_OPERATION_COUNTERS` in
+  `src/cryptanalysis/ecbench/band.rs`, by name, so committed records replay
+  unchanged. A new byte-valued counter is added there; do not name a byte
+  count `*_uncharged` without doing so. The audit and the re-run studies are
+  in `research/ic_byte_counter_pricing_20261101/`.
 
 This applies to `ecbench compare` read-outs, tables, frontier syntheses,
 ledger rows, papers and PR descriptions. A ratio produced before this rule
@@ -1335,7 +1356,15 @@ resources, deadline and acceptance criteria, submit the job, and retain its
 receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
 region `us-east-2`, account `104186811093`. Karpenter starts Spot workers;
 `cpu-spot` serves ordinary work and `cpu-l2-spot` serves native L2 benchmarks.
-Keep the combined 64-vCPU worker cap and the shared 96-vCPU account quota.
+Follow the owner cost ceilings in [COST_CONTROLS.md](taskq/deploy/eks-karpenter/COST_CONTROLS.md):
+24 worker vCPUs / 160 GiB total, with no automatic quota or cap increases.
+Before any EKS/IsoLab build or run, commit and push the exact experiment code,
+protocol, configuration and launch command to GitHub; retain the publication
+check receipt. Publish outcomes, including failures, in the same experiment PR.
+Record a finite dollar ceiling, CPU/RAM, original deadline and total retry
+allowance before spending; charge build, idle, failed and interrupted attempts.
+Queue work that cannot fit. Never bypass a budget stop through another pool,
+account, region, provider or a renamed retry.
 
 - **Use existing authentication.** Verify the caller with
   `aws sts get-caller-identity` and check the required permissions using
@@ -1783,11 +1812,20 @@ The user guide, including S3 storage, is
 
 ## Querying the curve database (ecdb)
 
-ecdb is a Postgres catalogue on RDS (us-west-2). It holds every curve in the
-registry, the walk outputs and the trait catalogue, with their Jacobians,
-isogenies, covers, transfer prices and computed polynomials. Agents reach it
-through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
-[ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md); read it before the first query.
+ecdb is a Postgres catalogue on RDS (us-west-2). It holds:
+
+- every curve in the registry, the walk outputs and the trait catalogue,
+  with their Jacobians, isogenies, covers, transfer prices and computed
+  polynomials;
+- this repository's measured results: the IC leaderboard and its recipes,
+  the progress timeline, the boundary ledger, the `benchmarks/` index, and
+  every ecbench session with its runs;
+- the curve records and measured datasets of cryptanalysis,
+  crypto-autoresearcher, cryptanalysis-rl and ml-cryptanalysis.
+
+Agents reach it through the MCP server `ecdb` in `.mcp.json`, over HTTP, or
+with `scripts/ecdb.sh`. The guide is [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md);
+read it before the first query.
 
 - **Look up before computing.** Query ecdb before writing code or scanning
   `docs/curves/*.json` for a curve fact. This covers trace, order, cofactor,
@@ -1812,6 +1850,16 @@ through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
 - **Transfer prices are leads.** `dlp_transfer.ratio_log2` is a formula
   estimate. It is not a measured speedup, and it never enters the IC
   leaderboard or `benchmarks/` (§5a and "The rule: boundary, table, ratio").
+- **Measured rows are copies.** Leaderboard, progress, boundary, benchmark,
+  ecbench and sibling-dataset rows are the producers' frozen records with
+  their units:
+  - compare a ratio only within its leaderboard family, ecbench session or
+    dataset;
+  - rank arms only across the §5a band;
+  - keep `unvalidated (pre-gate)` rows out of any claim.
+
+  Querying them is not a measurement. A new result still goes through its
+  run, the validation gate and the generators of the files ecdb copies.
 - **Relations are not routes.** A twist, isomorphism or model-change row
   does not transport a logarithm. Only a kernel-certified `isogeny` row does
   (the typed curve-link rules above).
@@ -1819,10 +1867,14 @@ through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
   need the write token. They record what a run or certificate in a PR
   supports, with its artifact hash and true status. Correct imported data in
   the source file, then redeploy (`ecdb/deploy/README.md`). Never patch rows.
-- **Keep it current.** A PR that changes a catalogue ecdb imports (the
-  registry, `traits.json`, `covers.json`, `jacobian-transfers.json`, the
-  certificates, the imported walk outputs) says so in its body. After merge,
-  redeploy with `ecdb/deploy/build-lambda.sh` and `ecdb/deploy/deploy-aws.sh`.
+- **Keep it current.** A PR that changes a file ecdb imports says so in its
+  body. That covers the registry, `traits.json`, `covers.json`,
+  `jacobian-transfers.json`, the certificates, the imported walk outputs,
+  `docs/ic/leaderboard.json`, `progress-timeline.json`,
+  `boundary_targets.json`, `benchmarks/` and ecbench sessions.
+  `scripts/ecdb.sh check` lists the files that differ from ecdb's copy. After
+  merge, redeploy with `ecdb/deploy/build-lambda.sh` and
+  `ecdb/deploy/deploy-aws.sh`.
 
 ## IC measurement rules
 

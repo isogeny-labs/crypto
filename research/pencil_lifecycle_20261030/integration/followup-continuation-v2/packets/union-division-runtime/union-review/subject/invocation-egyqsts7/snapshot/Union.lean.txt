@@ -1,0 +1,93 @@
+import Find
+import Cycles
+set_option autoImplicit false
+namespace GraphUnion
+open SignedGraphAlgebra GraphFind
+variable {K : Type*} [Field K] [DecidableEq K] {n : Nat}
+structure State (K : Type*) (n : Nat) where
+ graph : GraphFind.State K n
+ fixed : Fin n → Option (K × K)
+def Anchored (s : State K n) (v : Fin n → K) (k : K) : Prop :=
+ ∀i a b,s.fixed i=some (a,b) → v i=a+b*k
+def Valid (s : State K n) (v : Fin n → K) (k : K) : Prop :=
+ Represents s.graph v k ∧ Anchored s v k
+def transport (p : Potential K) (ab : K × K) : K × K :=
+ (p.s*(ab.1-p.a),p.s*(ab.2-p.b))
+def joined (s : State K n) (child parent : Fin n) (p : Potential K) : State K n :=
+ ⟨compress s.graph child parent p,fun i=>
+ if i=parent then match s.fixed child,s.fixed parent with
+ | some ab,none => some (transport p ab)
+ | _,_ => s.fixed i
+ else s.fixed i⟩
+def constraint (a b : K) : Option K := if b=0 then none else some ((-a)*b⁻¹)
+def result (s : State K n) (child parent : Fin n) (p : Potential K) : Option K :=
+ match s.fixed child,s.fixed parent with
+ | some ab,some xy => constraint (xy.1-(transport p ab).1) (xy.2-(transport p ab).2)
+ | _,_ => none
+
+theorem join_preserves (s : State K n) (child parent : Fin n) (p : Potential K)
+ (v : Fin n → K) (k : K) (hv : Valid s v k)
+ (hs : p.s*p.s=1) (he : v child=eval p (v parent) k) :
+ Valid (joined s child parent p) v k := by
+ constructor
+ · intro i
+   by_cases hi : i=child
+   · subst i; simpa [joined,compress] using he
+   · simpa [joined,compress,hi] using hv.1 i
+ · intro i a b ha
+   by_cases hi : i=parent
+   · subst i
+     cases hc : s.fixed child with
+     | none => exact hv.2 parent a b (by simpa [joined,hc] using ha)
+     | some ab =>
+       cases hp : s.fixed parent with
+       | none =>
+         have hab : transport p ab=(a,b) := by simpa [joined,hc,hp] using ha
+         have ht:=fixed_child_transport p (v child) (v parent) ab.1 ab.2 k hs he (hv.2 child ab.1 ab.2 hc)
+         change v parent=(transport p ab).1+(transport p ab).2*k at ht
+         simpa [hab] using ht
+       | some xy => exact hv.2 parent a b (by simpa [joined,hc,hp] using ha)
+   · exact hv.2 i a b (by simpa [joined,hi] using ha)
+
+theorem join_result (s : State K n) (child parent : Fin n) (p : Potential K)
+ (v : Fin n → K) (k answer : K) (hv : Valid s v k)
+ (hs : p.s*p.s=1) (he : v child=eval p (v parent) k)
+ (hr : result s child parent p=some answer) : answer=k := by
+ cases hc : s.fixed child with
+ | none => simp [result,hc] at hr
+ | some ab =>
+   cases hp : s.fixed parent with
+   | none => simp [result,hc,hp] at hr
+   | some xy =>
+     have ht:=fixed_child_transport p (v child) (v parent) ab.1 ab.2 k hs he (hv.2 child ab.1 ab.2 hc)
+     change v parent=(transport p ab).1+(transport p ab).2*k at ht
+     have hold:=hv.2 parent xy.1 xy.2 hp
+     by_cases hb : xy.2-(transport p ab).2=0
+     · simp [result,hc,hp,constraint,hb] at hr
+     · have ha : (-(xy.1-(transport p ab).1))*(xy.2-(transport p ab).2)⁻¹=answer := by
+         simpa [result,hc,hp,constraint,hb] using hr
+       rw [←ha]
+       exact GraphCycle.existing_anchor_solution _ _ _ _ _ _ hb hold ht
+
+theorem both_fixed_zero_consistent (s : State K n) (child parent : Fin n) (p : Potential K)
+ (v : Fin n → K) (k : K) (hv : Valid s v k) (hs : p.s*p.s=1)
+ (he : v child=eval p (v parent) k) (ab xy : K × K)
+ (hc : s.fixed child=some ab) (hp : s.fixed parent=some xy)
+ (hb : xy.2-(transport p ab).2=0) : xy.1-(transport p ab).1=0 := by
+ have ht:=fixed_child_transport p (v child) (v parent) ab.1 ab.2 k hs he (hv.2 child ab.1 ab.2 hc)
+ exact GraphCycle.existing_anchor_zero _ _ _ _ _ _ hb (hv.2 parent xy.1 xy.2 hp) ht
+
+theorem forward_global (s : State K n) (ru rv : Fin n) (cu cv a b k : K)
+ (v : Fin n → K) (hv : Valid s v k) (hu : cu*cu=1) (hw : cv*cv=1)
+ (he : cu*v ru+cv*v rv=a+b*k) :
+ Valid (joined s ru rv (unionPotential cu cv a b)) v k :=
+ join_preserves s ru rv _ v k hv (union_sign cu cv hu hw)
+   (union_forward cu cv (v ru) (v rv) a b k hu he)
+
+theorem backward_global (s : State K n) (ru rv : Fin n) (cu cv a b k : K)
+ (v : Fin n → K) (hv : Valid s v k) (hu : cu*cu=1) (hw : cv*cv=1)
+ (he : cu*v ru+cv*v rv=a+b*k) :
+ Valid (joined s rv ru (reverse (unionPotential cu cv a b))) v k :=
+ join_preserves s rv ru _ v k hv (union_sign cu cv hu hw)
+   (union_backward cu cv (v ru) (v rv) a b k hu hw he)
+end GraphUnion
