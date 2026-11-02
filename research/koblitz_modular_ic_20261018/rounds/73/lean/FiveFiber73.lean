@@ -1,4 +1,5 @@
 import Init.Omega
+import Mathlib.Tactic.LinearCombination
 
 namespace FiveFiber73
 

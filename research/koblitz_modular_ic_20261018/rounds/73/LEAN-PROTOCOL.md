@@ -26,3 +26,12 @@ the pinned mathlib build lacks `Mathlib.Tactic.Omega.olean`. The pinned
 Lean core has `Init.Omega.olean`; import that module instead. The
 three theorem statements, proof tactic, audit and resource gates are
 unchanged. Retain the failed first compile and use a fresh attempt ID.
+
+## Version 3 natural-number instance import, frozen before attempt 03
+
+`degree-five-lean73-02` also failed compilation: `Init.Omega` alone
+does not import the natural-number arithmetic/order instances required
+by these theorem statements. Add the pinned available
+`Mathlib.Tactic.LinearCombination` module used by R70, retaining the
+same statements and `omega` proofs. Preserve both rejected logs and
+compile/audit under a fresh attempt ID.
