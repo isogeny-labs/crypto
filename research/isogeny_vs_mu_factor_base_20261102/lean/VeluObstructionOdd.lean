@@ -235,7 +235,7 @@ theorem fibInf_simple_slope (N ψ : MvPolynomial (Fin 2) K)
 Möbius coordinates make the map monomial of degree `ℓ`. -/
 theorem not_monomial_of_sq_denominator {ℓ : ℕ} (hℓ : 2 ≤ ℓ) (hℓK : (ℓ : K) ≠ 0)
     (N ψ : MvPolynomial (Fin 2) K) (r : K)
-    (hψ∞ : MvPolynomial.eval ![1, 0] ψ ≠ 0) (hψr : MvPolynomial.eval ![r, 1] ψ = 0)
+    (hψinf : MvPolynomial.eval ![1, 0] ψ ≠ 0) (hψr : MvPolynomial.eval ![r, 1] ψ = 0)
     (m m' : Mob K) (hm : m.det ≠ 0) (hm' : m'.det ≠ 0) :
     ¬ IsMonomialL ℓ (conjL ⟨N, MvPolynomial.X 1 * ψ ^ 2⟩ m m') := by
   intro hG
@@ -263,7 +263,7 @@ theorem not_monomial_of_sq_denominator {ℓ : ℕ} (hℓ : 2 ≤ ℓ) (hℓK : (
       fibInf_double N ψ _ _ hψr, mul_zero]
   · rw [key, hRapp, hQapp, Polynomial.eval_mul, Polynomial.eval_C, fibInf_simple_val, mul_zero]
   · rw [key, hRapp, hQapp, Polynomial.derivative_C_mul, Polynomial.eval_mul, Polynomial.eval_C]
-    exact mul_ne_zero hm' (fibInf_simple_slope N ψ hψ∞)
+    exact mul_ne_zero hm' (fibInf_simple_slope N ψ hψinf)
 
 /-- **Main theorem (odd ℓ).** Let `ℓ ≥ 3` be a unit in `K`. Take a Vélu ℓ-isogeny
 x-map in Kohel's form `x ↦ N(x)/ψ(x)²`, with kernel polynomial
