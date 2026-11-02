@@ -77,3 +77,36 @@ Record/report/custody/PRupdate without repeating acceptedproducers.
 ### Errors
 Freshreplay onlybenign cache redefinition warning;no native error/cap.
 Half native/Lean sources not yetexecuted.
+
+## 2026-11-02 — actual half-space descent and proof audit
+
+### What was done
+The first native half-space attempt is rejected: it printed a late marker
+after Singular question-mark errors because the retained R61 export omitted
+`oneAmbient61`. Version5 reconstructs it as `kernel61*oneMixed61` and
+checks its fixed, nonzero property. Fresh `half-descent63-02` passed native0,
+exact marker and no question-mark errors. It checks every one of 10 mixed
+and 128 cubic roots against the actual degree32 source, all 276 root/square
+involution identities, and all fixed roots. The mixed action has fixed
+dimension6/trace rank4; cubic has fixed dimension64/trace rank64. Both
+spaces contain actual source functions with trace one. `half-lean63-01`
+compiled and audited five conditional statements, zero failing and zero
+trusted native decisions. The degree112 producer/replay remain accepted.
+
+### Decisions made
+Keep the first native run as rejected, including its partial output and
+late marker. Interpret the trace-one witnesses only in the retained
+10/128-dimensional root spaces. Preserve actual T/C5, global differentials,
+proper valuations and target-factor action as separate source obligations.
+A new descending Frobenius trace-dual normalization construction is recorded
+for the rank32 affine order; its source-field substitution must be checked.
+
+### Open threads
+Render and inspect the R63 report, seal raw receipts and publish custody,
+then update PR3272. Run the complete affine normalization and local branch
+valuation calculation next; continue selected991 action, level77 map,
+quotient saturation, coupled divisors, reverse evaluation and controls.
+
+### Errors
+`half-descent63-01` rejected despite late marker: missing ambient constant
+caused two Singular error blocks. Attempt02 and Lean compile/audit passed.

@@ -19,6 +19,12 @@ product/trace tables, but the last field identification and the F2 twist
 coordinate bridge need an explicit audit before interpreting any output as
 the normalization of the target source curve.
 
+The coordinate bridge is substantive: the compact PID export says its
+polynomial variable is z=1/(the actual FIELD61 variable u). Its old quadratic
+equation is V^2+z^2 V+z+z^3=0; FIELD61 uses v^2+v=u^3+u. These equations agree
+under z=1/u and V=z^2 v. The degree-16 lambda equation and all 32 basis
+functions still need the same explicit substitution and full source reduction.
+
 Write G for the trace Gram matrix and D=det G. The R53 factorization predicts
 D=z^76(z+1)^24 f_C^12 with deg f_C=5, hence deg D=160. Recompute this from
 the exact R61 G in the new checker. Let V0=O^vee=G^-1 A^32 in the O basis.
