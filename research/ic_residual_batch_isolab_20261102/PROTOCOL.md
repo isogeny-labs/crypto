@@ -16,3 +16,13 @@ Class: replay / infrastructure evidence. Not an algorithm speedup.
 
 ## Decision rule
 Report the lab's result.json state verbatim. A failed admission (L2, replay or A/A) is reported as failed with its receipt; nothing is retried or edited to pass. One dispatch (a rerun after a Job exists is a new experiment).
+
+## Amendment 1 (2026-11-02, no Job was created; nothing measured)
+Dispatch: workflow run 41496023931 (run 178, workflow on main f147d0c914), source commit 1307de808809b3ff29014b475762e2ab312e0edb, spec as frozen.
+The build job built and published the image (digest sha256:6084e1ca33e5cd0f889239995f5e079c136916b15f2678acb0873cc09392847c, ecbench sha256 a776f12252172e761a8d23405a83e10c93a648e25fefda4e0858f411f54e1306).
+The launcher failed before submission: result state `launcher_failed`, exit 127, no Job/Pod UID, request sha256 7258ef550fd9a5280a5d9d6d8fd8d573d484549d756210cb2561ea5acc59d9a3,
+receipt s3://isolab-results-104186811093-us-east-2/runs/gh-41496023931-1/launcher/22a809fb-9936-40b5-95a0-bdac17593f88/ (readiness ready=true; overview.json empty; no submission.json).
+Cause, from `taskq/deploy/eks-karpenter/remote/run-request` and the receipts: the step after `check-ready` is `isolab-eks-mcp call isolab_k8s_overview`, and exit 127 with an empty overview.json means the
+`isolab-eks-mcp` binary was not found in the CodeBuild launcher environment. The launcher scripts and workflow are unchanged between the last successful workflow run (177, main a56dbd30) and this one,
+so this is a launcher-environment problem outside the request. This session has no CodeBuild read or deploy permission (codebuild:BatchGetBuilds denied), so it cannot be diagnosed or fixed here.
+Because no Job was created, a later dispatch with the same request after the launcher is repaired is not a rerun of a measurement. No further dispatch until then.
