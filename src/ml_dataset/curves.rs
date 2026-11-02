@@ -1551,6 +1551,7 @@ mod tests {
     use super::*;
     fn config(family: &str, n: u32, twist: bool) -> CaseConfig {
         CaseConfig {
+                        channels: None,
             family: family.into(),
             n,
             m: 2,

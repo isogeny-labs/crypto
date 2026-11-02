@@ -343,6 +343,18 @@ pub(super) fn verify_input(
     bytes: &[u8],
     admission: &mut impl OriginalAdmission,
 ) -> Result<(), Failure> {
+    verify_input_owned(original_config,original_public,original_factor_base,binding,limits,bytes,admission).map(|_|())
+}
+
+pub(super) fn verify_input_owned(
+    original_config: &[u8],
+    original_public: &[u8],
+    original_factor_base: &[u8],
+    binding: &capture::AttemptBinding,
+    limits: OriginalLimits,
+    bytes: &[u8],
+    admission: &mut impl OriginalAdmission,
+) -> Result<MathInput, Failure> {
     admission.reserve(Quote {
         work: 32 * (INPUT_CAP as u64 + 256 * 1024),
         bytes: 2 * 1024 * 1024,
@@ -415,7 +427,8 @@ pub(super) fn verify_input(
         construction.evidence.as_ref().ok_or(Failure::Input)?,
         admission,
     )?;
-    admission.check_deadline()
+    admission.check_deadline()?;
+    Ok(math)
 }
 
 #[cfg(test)]

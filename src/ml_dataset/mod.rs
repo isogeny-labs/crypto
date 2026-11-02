@@ -226,6 +226,9 @@ pub enum BudgetCommand {
 
 #[derive(Args)]
 pub struct PlanArgs {
+    /// Strict immutable optional channel request JSON; selects plan/v3.
+    #[arg(long)]
+    pub channels: Option<PathBuf>,
     #[arg(long)]
     pub out: PathBuf,
     #[arg(long, default_value = "23-31,47-61")]
@@ -300,6 +303,8 @@ pub struct GenerateArgs {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DatasetPlan {
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "types::present_channels")]
+    pub channels: Option<types::ChannelRequests>,
     pub schema: String,
     pub field_sizes: Vec<u32>,
     pub arities: Vec<usize>,
@@ -346,12 +351,14 @@ impl DatasetPlan {
     }
 
     pub fn validate(&self) -> Result<(), String> {
+        if let Some(c)=&self.channels { c.validate()?; }
         let policy_plan = match self.schema.as_str() {
-            "crypto.ml-dataset.plan/v1" if self.factor_base_policies.is_empty() => false,
-            "crypto.ml-dataset.plan/v2" if !self.factor_base_policies.is_empty() => true,
+            "crypto.ml-dataset.plan/v3" if self.channels.is_some() => !self.factor_base_policies.is_empty(),
+            "crypto.ml-dataset.plan/v1" if self.channels.is_none() && self.factor_base_policies.is_empty() => false,
+            "crypto.ml-dataset.plan/v2" if self.channels.is_none() && !self.factor_base_policies.is_empty() => true,
             _ => {
                 return Err(
-                    "expected plan/v1 without policies or plan/v2 with explicit policies".into(),
+                    "expected legacy plan/v1, policy plan/v2 or requested-channel plan/v3".into(),
                 )
             }
         };
@@ -475,6 +482,7 @@ impl DatasetPlan {
         let n = self.field_sizes[digit(self.field_sizes.len() as u64) as usize];
         let family = self.families[digit(self.families.len() as u64) as usize].clone();
         Ok(CaseConfig {
+            channels: self.channels.clone(),
             family,
             n,
             m,
@@ -994,6 +1002,14 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         }
         DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
         DatasetCommand::Plan(a) => {
+            let channels = a.channels.as_ref().map(|p| {
+                let meta=fs::metadata(p).map_err(|e|e.to_string())?;
+                if meta.len()>4096 {return Err("channel request exceeds 4096 bytes".into());}
+                let bytes=fs::read(p).map_err(|e|e.to_string())?;
+                if bytes.len()>4096 {return Err("channel request exceeds 4096 bytes".into());}
+                let c:types::ChannelRequests=serde_json::from_slice(&bytes).map_err(|e|e.to_string())?;
+                c.validate()?; Ok::<_,String>(c)
+            }).transpose()?;
             let factor_base_policies: Vec<FactorBasePolicy> = a
                 .factor_base_policies
                 .as_ref()
@@ -1004,7 +1020,8 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 return Err("explicit factor-base policy array must not be empty".into());
             }
             let plan = DatasetPlan {
-                schema: if factor_base_policies.is_empty() {
+                channels: channels.clone(),
+                schema: if channels.is_some() {"crypto.ml-dataset.plan/v3"} else if factor_base_policies.is_empty() {
                     "crypto.ml-dataset.plan/v1"
                 } else {
                     "crypto.ml-dataset.plan/v2"
@@ -1448,6 +1465,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
     let capture_context = admit_capture_context(&out)?;
+    if config.channels.is_some() && capture_context.is_none() {
+        return Err("requested channels require original bound execution".into());
+    }
     let execution_context = execution::admit(&out)?;
     if telemetry::checked::policy_present(&out)? {
         capture::AttemptBinding::from_cell_files(&out)?;
@@ -1521,6 +1541,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         Err(e) => json!({"status":"error","reason":e,
         "solver_completed":false,"scalar_recovered_without_witness":false}),
     };
+    if let Some(disposition)=solvers::requested_channel_disposition(config)? {
+        outcome["requested_channels"]=disposition;
+    }
     outcome["known_answer_verified"] = json!(known_answer);
     outcome["factor_base_verified"] = json!(factor_base_verified);
     registry.push(storage::write_json(
@@ -1890,6 +1913,9 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             };
             outcome =
                 execution::terminal_outcome(outcome, stop_reason, exit.success(), exit.code());
+            if let Some(disposition)=solvers::requested_channel_disposition(&config)? {
+                outcome["requested_channels"]=disposition;
+            }
             outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
             "instruction_counter_status":"whole_worker_not_counted; see phase telemetry for available hardware counts","memory_limit_bytes":memory,
@@ -1989,6 +2015,11 @@ fn verify_protocol(plan: &DatasetPlan, bytes: &[u8]) -> Result<(), String> {
     let mut value = protocol_unique_json(text, 0)?;
     if value["schema"] != "experiment.protocol/v1" {
         return Err("expected experiment.protocol/v1 protocol".into());
+    }
+    if let Some(channels)=&plan.channels {
+        if value["extensions"]["dataset_channels"] != serde_json::to_value(channels).map_err(|e|e.to_string())? {
+            return Err("frozen protocol does not authorize exact requested channels".into());
+        }
     }
     let freeze = value.get("freeze").ok_or("protocol has no freeze record")?;
     if freeze["status"] != "frozen" || freeze["filed_before_affected_data"] != true {
@@ -2657,7 +2688,12 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
     Ok(())
 }
 
-fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
+fn verify_cell(dir:&Path,replay:bool)->Result<CellManifest,String>{
+    verify_cell_with_boolean_projection(dir,replay,false).map(|(m,_)|m)
+}
+fn verify_cell_with_boolean_projection(dir:&Path,replay:bool,project:bool)
+    ->Result<(CellManifest,Option<solvers::BooleanProjection>),String>{
+    let mut boolean_projection=None;
     checked_directory(dir, false)?;
     let metadata = fs::symlink_metadata(dir.join("manifest.json")).map_err(|e| e.to_string())?;
     if !metadata.is_file() || metadata.file_type().is_symlink() {
@@ -2692,6 +2728,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("cell provenance differs from frozen plan".into());
     }
+    solvers::verify_requested_channel_disposition(&manifest.config, &manifest.outcome)?;
     // Bind the original cell before admitting any specialized replay claim.
     let dynamic_replay = solvers::verify_dynamic_cell(
         dir,
@@ -2709,12 +2746,18 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     )?;
     // Reserved ordinary paths/roles cannot evade semantic replay by removing
     // strategy labels or disabling optional known-answer replay.
+    let channel_present=manifest.config.channels.as_ref().is_some_and(|c|c.boolean_consequence.is_some())
+        || manifest.artifacts.iter().any(|a|a.path=="binary-m3-boolean-check.json" || a.path=="binary-m3-boolean-anchor.json");
+    if project && channel_present {
+        solvers::verify_ordinary_m3_cell_with_projection(dir,&manifest.config,&manifest.outcome,&manifest.artifacts,&mut boolean_projection)?;
+    } else {
     solvers::verify_ordinary_m3_cell(
         dir,
         &manifest.config,
         &manifest.outcome,
         &manifest.artifacts,
-    )?;
+    )?;    }
+
     let wide_prime_replay = solvers::verify_prime_f4_wide(
         dir,
         &manifest.config,
@@ -2969,7 +3012,8 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             }
         }
     }
-    Ok(manifest)
+    if let Some(seal)=boolean_projection.as_mut(){seal.finish_admission(dir,&manifest.artifacts)?;}
+    Ok((manifest,boolean_projection))
 }
 
 fn publication_confirmations(dir: &Path, manifest_sha: &str) -> Result<usize, String> {
@@ -3836,6 +3880,7 @@ mod tests {
 
     fn plan() -> DatasetPlan {
         DatasetPlan {
+            channels: None,
             schema: "crypto.ml-dataset.plan/v1".into(),
             field_sizes: vec![23, 31],
             arities: vec![2, 15],
@@ -7201,5 +7246,99 @@ mod worker_receipt_adoption_tests {
         assert_eq!(fs::read(root.join("conflict.bin")).unwrap(), b"old");
         storage::verify_manifest(&root, &registry).unwrap();
         fs::remove_dir_all(root).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod channel_plan_tests {
+    use super::*;
+    fn legacy() -> DatasetPlan {
+        serde_json::from_value(json!({"schema":"crypto.ml-dataset.plan/v1",
+            "field_sizes":[23,31,47,61],"arities":[2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+            "families":["binary","koblitz","prime"],"solvers":["f4","f5","sat"],
+            "curve_seeds":1,"generators":1,"keys":1,"seed":20261027,
+            "factor_base_size":4,"degree_bound":3,"work_limit":16384,"twists":true,
+            "protocol_sha256":null,"split_rule":"curve-twist-component-sha256-v1"})).unwrap()
+    }
+    fn request() -> types::ChannelRequests {
+        serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v1",
+            "boolean_consequence":{"mode":"produce","row_index":0},
+            "sat_initial":{"mode":"capture_and_check_initial"}})).unwrap()
+    }
+    #[test]
+    fn frozen_protocol_requires_exact_channels_in_canonical_extensions() {
+        fn frozen(plan: &mut DatasetPlan, mut body: serde_json::Value) -> Vec<u8> {
+            let body_hash = digest(&protocol_canonical_bytes(&body).unwrap());
+            body["freeze"] = json!({"status":"frozen","protocol_sha256":body_hash,
+                "filed_before_affected_data":true,"frozen_at":"2026-11-02T00:00:00Z"});
+            let bytes = serde_json::to_vec(&body).unwrap();
+            plan.protocol_sha256 = Some(digest(&bytes));
+            bytes
+        }
+        let mut plan = legacy();
+        plan.schema = "crypto.ml-dataset.plan/v3".into();
+        plan.channels = Some(request());
+        let body = json!({"schema":"experiment.protocol/v1",
+            "extensions":{"dataset_channels":request()}});
+        let bytes = frozen(&mut plan, body.clone());
+        assert_eq!(verify_protocol(&plan, &bytes), Ok(()));
+        let mut wrong_row = body.clone();
+        wrong_row["extensions"]["dataset_channels"]["boolean_consequence"]["row_index"] = json!(1);
+        let mut missing_sat = body.clone();
+        missing_sat["extensions"]["dataset_channels"].as_object_mut().unwrap().remove("sat_initial");
+        for mismatch in [wrong_row, missing_sat,
+            json!({"schema":"experiment.protocol/v1","extensions":{}}),
+            json!({"schema":"experiment.protocol/v1","dataset_channels":request()})] {
+            // Recompute BOTH hashes: each rejection must be authorization, not stale custody.
+            let bytes = frozen(&mut plan, mismatch);
+            assert_eq!(verify_protocol(&plan, &bytes),
+                Err("frozen protocol does not authorize exact requested channels".into()));
+        }
+        let mut legacy_plan = legacy();
+        let bytes = frozen(&mut legacy_plan, json!({"schema":"experiment.protocol/v1"}));
+        assert_eq!(verify_protocol(&legacy_plan, &bytes), Ok(()));
+    }
+    #[test]
+    fn requested_plan_preserves_full_axes_and_changes_identity() {
+        let original=legacy();original.validate().unwrap();
+        let bytes=serde_json::to_vec(&original).unwrap();
+        assert!(!String::from_utf8(bytes.clone()).unwrap().contains("channels"));
+        assert_eq!(serde_json::to_vec(&serde_json::from_slice::<DatasetPlan>(&bytes).unwrap()).unwrap(),bytes);
+        let mut enabled=original.clone();enabled.channels=Some(request());
+        assert!(enabled.validate().is_err());
+        enabled.schema="crypto.ml-dataset.plan/v3".into();enabled.validate().unwrap();
+        assert_eq!(enabled.cell_count().unwrap(),original.cell_count().unwrap());
+        assert_ne!(enabled.binding_sha256().unwrap(),original.binding_sha256().unwrap());
+        for i in 0..enabled.cell_count().unwrap() {
+            let mut new=enabled.cell(i).unwrap();let old=original.cell(i).unwrap();
+            assert_eq!(new.channels,enabled.channels);new.channels=None;assert_eq!(new,old);
+        }
+        for policy in [types::FactorBasePolicy::Legacy{},
+            types::FactorBasePolicy::SampledXProjectedControl{candidate_limit:64},
+            types::FactorBasePolicy::BinarySubspaceIntersection{basis:vec![1,2],candidate_limit:64},
+            types::FactorBasePolicy::BinaryFrobeniusUnionIntersection{basis:vec![1,2],candidate_limit:64}] {
+            enabled.factor_base_policies=vec![policy.clone()];enabled.validate().unwrap();
+            assert_eq!(enabled.cell(0).unwrap().factor_base_policy,Some(policy));
+        }
+        enabled.channels=None;assert!(enabled.validate().is_err());
+    }
+    #[test]
+    fn actual_plan_command_roundtrips_frozen_request() {
+        let path=std::env::temp_dir().join(format!("channel-plan-{}-{}",std::process::id(),
+            std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+        fs::create_dir(&path).unwrap();
+        let request_path=path.join("request.json");let plan_path=path.join("plan.json");
+        fs::write(&request_path,serde_json::to_vec(&request()).unwrap()).unwrap();
+        run(&DatasetArgs{command:DatasetCommand::Plan(PlanArgs{
+            channels:Some(request_path),out:plan_path.clone(),n:"23-31,47-61".into(),m:"2-15".into(),
+            families:"binary,koblitz,prime".into(),solvers:"f4,f5,sat".into(),curve_seeds:1,generators:1,keys:1,
+            seed:20261027,factor_base_size:4,factor_base_policies:None,degree_bound:3,work_limit:16384,
+            protocol_sha256:None,
+        })}).unwrap();
+        let plan:DatasetPlan=read_json(&plan_path).unwrap();
+        assert_eq!(plan.schema,"crypto.ml-dataset.plan/v3");
+        assert_eq!(plan.arities,(2..=15).collect::<Vec<_>>());
+        assert_eq!(plan.channels,Some(request()));
+        fs::remove_dir_all(path).unwrap();
     }
 }

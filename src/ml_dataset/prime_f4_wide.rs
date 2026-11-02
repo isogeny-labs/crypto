@@ -1532,6 +1532,7 @@ mod tests {
     }
     fn fixture_at(twist: bool, n: u32) -> (CaseConfig, CaseData, SolverExecutionContext) {
         let cfg = CaseConfig {
+                        channels: None,
             factor_base_policy: None,
             family: "prime".into(),
             solver: "f4".into(),

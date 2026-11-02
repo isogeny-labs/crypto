@@ -85,7 +85,7 @@ fn signed_capture_event(event: Value) -> Result<Option<SignedPrefix>, String> {
     }
 }
 
-fn static_inputs(original: &MathInput, twist: bool) -> Value {
+pub(super) fn static_inputs(original: &MathInput, twist: bool) -> Value {
     json!({
         "family":"binary", "m":3, "n":original.curve.m, "twist":twist,
         "field":{"characteristic":"2", "degree":original.curve.m,
@@ -446,6 +446,7 @@ mod tests {
     use super::*;
     fn ordinary_original() -> MathInput {
         let config = CaseConfig {
+                        channels: None,
             family: "binary".into(),
             n: 23,
             m: 3,
@@ -471,6 +472,7 @@ mod tests {
     #[test]
     fn foreign_family_and_non_m3_reject_before_hooks_or_callbacks() {
         let mut config = CaseConfig {
+                        channels: None,
             family: "binary".into(),
             n: 23,
             m: 3,

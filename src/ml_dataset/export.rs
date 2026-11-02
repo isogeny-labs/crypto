@@ -1099,6 +1099,9 @@ fn export_with_graph_projector(
     let mut prefix_records = Sorter::new(&scratch.0, "prefix-record");
     let mut algebraic_features = Sorter::new(&scratch.0, "algebraic-feature");
     let mut algebraic_records = Sorter::new(&scratch.0, "algebraic-record");
+    let mut boolean_features=Sorter::new(&scratch.0,"boolean-equation-feature");
+    let mut boolean_records=Sorter::new(&scratch.0,"boolean-equation-record");
+    let mut boolean_nonzero=0u64;let mut boolean_zero=0u64;let mut boolean_unknown=0u64;let mut boolean_rejected=0u64;
     let mut algebraic_occurrences = 0u64;
     let mut algebraic_verified_nonzero = 0u64;
     let mut algebraic_verified_zero = 0u64;
@@ -1149,7 +1152,8 @@ fn export_with_graph_projector(
                     "status":"unsealed_attempt_excluded","feature_id":null,"source_run_sha256":source_run_sha}))?;
                 continue;
             }
-            let manifest = super::verify_cell(&dir, true)?;
+            let before_manifest_sha=crate::store::hash_file(&dir.join("manifest.json"))?.0;
+            let (manifest,boolean_projection)=super::verify_cell_with_boolean_projection(&dir,true,true)?;
             if manifest.cell_index != cell_index
                 || manifest.plan_sha256 != plan_sha
                 || manifest.config != expected
@@ -1158,8 +1162,39 @@ fn export_with_graph_projector(
                 return Err("source cell is inconsistent with export run binding".into());
             }
             let manifest_sha = crate::store::hash_file(&dir.join("manifest.json"))?.0;
+            if manifest_sha!=before_manifest_sha {return Err("source manifest changed during export admission".into());}
             let target_id =
                 super::digest(format!("{source_run_sha}\n{manifest_sha}\n{cell_index}").as_bytes());
+            let wants_boolean=manifest.config.channels.as_ref().is_some_and(|c|c.boolean_consequence.is_some());
+            let retained_boolean=manifest.artifacts.iter().any(|a|a.path=="binary-m3-boolean-check.json" || a.path=="binary-m3-boolean-anchor.json");
+            if boolean_projection.is_some() || wants_boolean || retained_boolean {
+                let (feature,record)=match boolean_projection {
+                    Some(seal)=>seal.into_rows()?,
+                    None=>super::solvers::BooleanProjection::unknown_rows()?,
+                };
+                match record["status"].as_str() {
+                    Some("verified_nonzero")=>boolean_nonzero+=1,
+                    Some("verified_zero")=>boolean_zero+=1,
+                    Some("unknown")=>boolean_unknown+=1,
+                    Some("rejected")=>boolean_rejected+=1,
+                    _=>return Err("unknown Boolean equation record status".into()),
+                }
+                let (group,partition)=split_for_size(manifest.config.n as u64);
+                let feature_id=if let Some(feature)=feature {
+                    if record["status"]!="verified_nonzero" {return Err("unverified Boolean public equation feature".into());}
+                    let id=super::digest(bounded_json(&feature,MAX_RECORD_BYTES)?.as_bytes());
+                    boolean_features.push(&id,&json!({"schema":"ml-dataset.boolean-equation-features/v1",
+                        "feature_id":id,"split_component":group,"split":partition,"inputs":feature}))?;
+                    Some(id)
+                } else {None};
+                if record["status"]=="verified_nonzero" && feature_id.is_none() {
+                    return Err("nonzero Boolean record lacks sealed public source".into());
+                }
+                let record_id=super::digest(format!("{target_id}\nboolean-equation-record").as_bytes());
+                boolean_records.push(&record_id,&json!({"schema":"ml-dataset.restricted-boolean-equation-record/v1",
+                    "record_id":record_id,"source_target_id":target_id,"feature_id":feature_id,
+                    "split_component":group,"split":partition,"record":record}))?;
+            }
             let has = |path: &str| manifest.artifacts.iter().any(|a| a.path == path);
             let mut feature_id = None;
             let mut component = None;
@@ -1483,7 +1518,7 @@ fn export_with_graph_projector(
     if target_rows != sealed || index_rows != sealed + unsealed {
         return Err("export lost or duplicated source identities".into());
     }
-    let artifacts = vec![
+    let mut artifacts = vec![
         install(
             &out,
             &features_staged,
@@ -1527,6 +1562,19 @@ fn export_with_graph_projector(
             "restricted-checked-polynomial-consequences-certificates-and-provenance",
         )?,
     ];
+    let boolean_record_count=boolean_nonzero+boolean_zero+boolean_unknown+boolean_rejected;
+    let mut boolean_unique_features=0u64;
+    if boolean_record_count>0 {
+        let feature_path=scratch.0.join("boolean-equation-features.jsonl");
+        let record_path=scratch.0.join("boolean-equation-records.jsonl");
+        boolean_unique_features=boolean_features.finish(&feature_path)?;
+        let records=boolean_records.finish(&record_path)?;
+        if records!=boolean_record_count || boolean_unique_features>boolean_nonzero {
+            return Err("export lost Boolean feature/record joins".into());
+        }
+        artifacts.push(install(&out,&feature_path,"boolean-equation-features.jsonl","allowlisted-original-boolean-equations")?);
+        artifacts.push(install(&out,&record_path,"restricted/boolean-equation-records.jsonl","restricted-checked-boolean-consequences")?);
+    }
     // Keep each object expansion bounded without changing manifest keys or order.
     let mut manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
         "source_commit":binding["source_commit"],"binary_sha256":binding["binary_sha256"],"artifacts":artifacts,
@@ -1538,6 +1586,14 @@ fn export_with_graph_projector(
         "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
         "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
         "restricted_prefix_record_rows":prefix_record_rows});
+    if boolean_record_count>0 {
+        manifest["boolean_equations"]=json!({"schema":"ml-dataset.boolean-equation-export/v1",
+            "verified_nonzero":boolean_nonzero,"verified_zero":boolean_zero,"unknown":boolean_unknown,"rejected":boolean_rejected,
+            "restricted_records":boolean_record_count,"unique_public_sources":boolean_unique_features,
+            "public_file":"boolean-equation-features.jsonl","restricted_file":"restricted/boolean-equation-records.jsonl",
+            "native_operation_witness":false,"producer_execution_verified":false});
+    }
+
     let manifest_tail = json!({
         "algebraic_feature_occurrences":algebraic_occurrences,"unique_algebraic_feature_rows":unique_algebraic_features,
         "restricted_algebraic_record_rows":algebraic_record_rows,
@@ -1549,7 +1605,7 @@ fn export_with_graph_projector(
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":if plan.schema == "crypto.ml-dataset.plan/v2" {"strict-structural-allowlist-v7"} else {"strict-structural-allowlist-v6"},"only_features_jsonl_is_model_input":false,
+        "feature_policy":{"version":structural_allowlist_version(&plan),"only_features_jsonl_is_model_input":false,
             "model_input_files":["features.jsonl","prefix-features.jsonl","algebraic-features.jsonl"],
             "algebraic_task":"prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
             "algebraic_claim_limits":["recursive prime m3..15 and p<2^32 only","admission requires a previously certified equality node","separate cumulative consequence-channel caps preserve existing branch budget","witness-dependent cancellation is not exact first/last fall degree","no native-operation or native-instruction witness"],
@@ -1573,10 +1629,22 @@ fn export_with_graph_projector(
         .as_object_mut()
         .expect("manifest is an object literal")
         .extend(tail_fields);
+    if boolean_record_count>0 {
+        manifest["feature_policy"]["model_input_files"].as_array_mut().ok_or("feature file allowlist missing")?
+            .push(json!("boolean-equation-features.jsonl"));
+        manifest["feature_policy"]["boolean_equation_task"]=json!("original-source-only Boolean equations; independently checked nonzero targets and proofs restricted");
+    }
     let manifest_artifact =
         storage::write_json(&out, "manifest.json", "training-export-manifest", &manifest)?;
     storage::verify_manifest(&out, &artifacts)?;
     Ok(json!({"manifest":manifest_artifact,"export":manifest}))
+}
+
+// V3 can carry either legacy or explicit-policy domains. Select the existing
+// policy allowlist by the actual validated axis, not only the old schema tag.
+fn structural_allowlist_version(plan:&super::DatasetPlan)->&'static str {
+    if plan.factor_base_policies.is_empty(){"strict-structural-allowlist-v6"}
+    else{"strict-structural-allowlist-v7"}
 }
 
 #[cfg(test)]
@@ -1584,6 +1652,24 @@ mod tests {
     use super::*;
     use crate::ml_dataset::types::{CaseConfig, FactorBasePolicy};
     use crate::ml_dataset::{curves, CellManifest, DatasetPlan};
+
+    #[test]
+    fn v3_explicit_policy_metadata_retains_v2_allowlist() {
+        let mut plan:DatasetPlan=serde_json::from_value(json!({"schema":"crypto.ml-dataset.plan/v1",
+            "field_sizes":[23],"arities":[2,3,15],"families":["binary"],"solvers":["f4"],
+            "curve_seeds":1,"generators":1,"keys":1,"seed":42,"factor_base_size":4,"degree_bound":3,"work_limit":16384,
+            "twists":true,"protocol_sha256":null,"split_rule":"curve-twist-component-sha256-v1"})).unwrap();
+        plan.validate().unwrap();assert_eq!(structural_allowlist_version(&plan),"strict-structural-allowlist-v6");
+        plan.factor_base_policies=vec![FactorBasePolicy::SampledXProjectedControl{candidate_limit:64}];
+        plan.schema="crypto.ml-dataset.plan/v2".into();plan.validate().unwrap();
+        assert_eq!(structural_allowlist_version(&plan),"strict-structural-allowlist-v7");
+        plan.channels=Some(serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v1",
+            "boolean_consequence":{"mode":"produce","row_index":0}})).unwrap());
+        plan.schema="crypto.ml-dataset.plan/v3".into();plan.validate().unwrap();
+        assert_eq!(structural_allowlist_version(&plan),"strict-structural-allowlist-v7");
+        plan.factor_base_policies.clear();plan.validate().unwrap();
+        assert_eq!(structural_allowlist_version(&plan),"strict-structural-allowlist-v6");
+    }
 
     struct Fixture(PathBuf);
     impl Fixture {
@@ -1653,6 +1739,7 @@ mod tests {
                 "filed_before_affected_data":true,"frozen_at":"2026-10-28T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = DatasetPlan {
+                                channels: None,
                 schema: if policy.is_some() {
                     "crypto.ml-dataset.plan/v2"
                 } else {
