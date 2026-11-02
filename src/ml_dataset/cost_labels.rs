@@ -97,7 +97,9 @@ struct CellCost {
     status: String,
     instruction_to_solve: Option<u64>,
     reason: &'static str,
+    missing_gates: Vec<&'static str>,
     phase_records: usize,
+    phase_artifacts: Vec<String>,
 }
 
 /// Replays the native run and emits a bounded local coverage projection.
@@ -111,17 +113,36 @@ pub(super) fn report_run(root: &Path) -> Result<Value, String> {
     let mut reasons = BTreeMap::<&'static str, usize>::new();
     for dir in super::completed_cells(&root)? {
         let manifest = super::verify_cell(&dir, true)?;
-        let phase_records = manifest
+        let phase_artifacts: Vec<String> = manifest
             .artifacts
             .iter()
             .filter(|a| a.path.starts_with("telemetry/") && a.path.ends_with(".json"))
-            .count();
+            .map(|a| format!("{}:{}", a.path, a.sha256))
+            .collect();
+        let phase_records = phase_artifacts.len();
+        let solver_completed = manifest.outcome["solver_completed"] == true;
+        let scalar_replay_verified = manifest.outcome["scalar_replay_verified"] == true
+            && (manifest.outcome["scalar_recovered_without_witness"] == true
+                || manifest.outcome["pdp_witness_verified"] == true);
+        let mut missing_gates = vec![
+            "trusted_whole_worker_counter",
+            "worker_containment",
+            "descendant_lifetime_accounting",
+            "complete_nonmultiplexed_pmu_readback",
+            "platform_hardware_validation",
+            "independent_cost_evidence_replay",
+        ];
+        if !solver_completed {
+            missing_gates.push("complete_solve");
+        }
+        if !scalar_replay_verified {
+            missing_gates.push("independent_scalar_replay");
+        }
         let d = admit(
             None,
             false,
-            manifest.outcome["solver_completed"] == true,
-            manifest.outcome["scalar_replay_verified"] == true
-                && manifest.outcome["scalar_recovered_without_witness"] == true,
+            solver_completed,
+            scalar_replay_verified,
         );
         *reasons.entry(d.reason).or_default() += 1;
         rows.push(CellCost {
@@ -136,7 +157,9 @@ pub(super) fn report_run(root: &Path) -> Result<Value, String> {
                 .into(),
             instruction_to_solve: d.instruction_to_solve,
             reason: d.reason,
+            missing_gates,
             phase_records,
+            phase_artifacts,
         });
     }
     rows.sort_by_key(|r| r.cell_index);
