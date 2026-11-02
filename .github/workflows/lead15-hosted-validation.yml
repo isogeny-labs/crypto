@@ -1,0 +1,621 @@
+name: LEAD-15 hosted compile and exact regressions
+
+# One-shot, exact-parent-bound validation of the audited source commit. This workflow
+# compiles and runs eight named non-target unit tests. It must never execute the
+# example's run-size command, freeze a manifest, checkpoint data, build an image,
+# submit a Job, or read/write target-size result objects.
+# It uses a GitHub-hosted runner only as a pre-freeze correctness gate. Recorded
+# build duration and resource use are infrastructure provenance, not scientific
+# measurements or performance evidence.
+on:
+  push:
+    branches:
+      - codex/lead15
+    paths:
+      - .github/workflows/lead15-hosted-validation.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lead15-hosted-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LEAD15_DIR: research/lead15_diem_quartic_20261101
+  CARGO_BUILD_JOBS: "1"
+  CARGO_PROFILE_TEST_DEBUG: "0"
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: "1"
+  LEAD15_EXPECTED_COMMIT: ${{ github.sha }}
+  LEAD15_EVENT_BEFORE: ${{ github.event.before }}
+  LEAD15_TRIGGER_PARENT: 7b32cfecd6f38476030a3fd012ce8a5f5796503c
+
+jobs:
+  compile-and-test-only:
+    if: ${{ github.event_name == 'push' && github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/lead15' && github.event.before == '7b32cfecd6f38476030a3fd012ce8a5f5796503c' }}
+    runs-on: ubuntu-latest
+    # Per-step deadlines sum below the job deadline, reserving cleanup/upload
+    # time even when compilation reaches its own limit.
+    timeout-minutes: 240
+    env:
+      CARGO_TARGET_DIR: ${{ runner.temp }}/lead15-validation-target-${{ github.run_id }}-${{ github.run_attempt }}
+      LEAD15_VALIDATION_LOG_DIR: ${{ runner.temp }}/lead15-validation-logs-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Initialize isolated receipt directory
+        id: initialize
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$LEAD15_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REF" = refs/heads/codex/lead15
+          test "$LEAD15_EXPECTED_COMMIT" = "$GITHUB_SHA"
+          test "$LEAD15_EVENT_BEFORE" = "$LEAD15_TRIGGER_PARENT"
+          expected_log_dir="$RUNNER_TEMP/lead15-validation-logs-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          test "$LEAD15_VALIDATION_LOG_DIR" = "$expected_log_dir"
+          case "$LEAD15_VALIDATION_LOG_DIR" in
+            "$RUNNER_TEMP"/lead15-validation-logs-*) ;;
+            *) echo "refusing unexpected log path: $LEAD15_VALIDATION_LOG_DIR" >&2; exit 2 ;;
+          esac
+          test ! -e "$LEAD15_VALIDATION_LOG_DIR"
+          test ! -L "$LEAD15_VALIDATION_LOG_DIR"
+          mkdir -m 0700 "$LEAD15_VALIDATION_LOG_DIR"
+          printf 'initialized_at=%s\nrun_id=%s\nrun_attempt=%s\n' \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" \
+            > "$LEAD15_VALIDATION_LOG_DIR/initialization.txt"
+
+      - name: Check out the exact one-shot revision
+        id: checkout
+        timeout-minutes: 10
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 2
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Pin recorded stable Rust toolchain
+        id: toolchain
+        timeout-minutes: 20
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.0 --profile minimal --no-self-update \
+            2>&1 | tee "$LEAD15_VALIDATION_LOG_DIR/rustup-install.txt"
+          rustup override set 1.99.0 \
+            2>&1 | tee "$LEAD15_VALIDATION_LOG_DIR/rustup-override.txt"
+          rustc --version --verbose | tee "$LEAD15_VALIDATION_LOG_DIR/rustc.txt"
+          cargo --version --verbose | tee "$LEAD15_VALIDATION_LOG_DIR/cargo.txt"
+          grep -Fx 'rustc 1.99.0 (b940084d7 2026-09-28)' \
+            "$LEAD15_VALIDATION_LOG_DIR/rustc.txt"
+          grep -Fx 'commit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4' \
+            "$LEAD15_VALIDATION_LOG_DIR/rustc.txt"
+          grep -Fx 'release: 1.99.0' "$LEAD15_VALIDATION_LOG_DIR/rustc.txt"
+          grep -Fx 'host: x86_64-unknown-linux-gnu' "$LEAD15_VALIDATION_LOG_DIR/rustc.txt"
+          grep -Fx 'cargo 1.99.0 (5f94df478 2026-08-27)' \
+            "$LEAD15_VALIDATION_LOG_DIR/cargo.txt"
+          grep -Fx 'commit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e' \
+            "$LEAD15_VALIDATION_LOG_DIR/cargo.txt"
+          grep -Fx 'release: 1.99.0' "$LEAD15_VALIDATION_LOG_DIR/cargo.txt"
+          grep -Fx 'host: x86_64-unknown-linux-gnu' "$LEAD15_VALIDATION_LOG_DIR/cargo.txt"
+
+      - name: Admit only the draft non-target validation scope
+        id: admission
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = x86_64
+          test "$RUNNER_ENVIRONMENT" = github-hosted
+          test "$RUNNER_OS" = Linux
+          test "$RUNNER_ARCH" = X64
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REF" = refs/heads/codex/lead15
+          [[ "$LEAD15_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          test "$LEAD15_EXPECTED_COMMIT" = "$GITHUB_SHA"
+          test "$LEAD15_EVENT_BEFORE" = "$LEAD15_TRIGGER_PARENT"
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$LEAD15_TRIGGER_PARENT"
+          test "$(git rev-list --count "$LEAD15_TRIGGER_PARENT".."$GITHUB_SHA")" -eq 1
+          test "$(git diff --name-only "$LEAD15_TRIGGER_PARENT" "$GITHUB_SHA")" = \
+            .github/workflows/lead15-hosted-validation.yml
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+
+          for tool in cargo rustc rustup jq sha256sum grep find sort cmp cat date wc \
+              mkdir git uname df awk tee du mv realpath /usr/bin/time; do
+            command -v "$tool" >/dev/null
+          done
+          cat /proc/self/cgroup > "$LEAD15_VALIDATION_LOG_DIR/self-cgroup.txt"
+          grep -F ' - cgroup2 ' /proc/self/mountinfo \
+            > "$LEAD15_VALIDATION_LOG_DIR/cgroup2-mountinfo.txt"
+          test "$(grep -Ec '^0::/' "$LEAD15_VALIDATION_LOG_DIR/self-cgroup.txt")" -eq 1
+          cgroup_mount=$(awk '$0 ~ / - cgroup2 / {print $5; found=1; exit}
+            END {if (!found) exit 1}' "$LEAD15_VALIDATION_LOG_DIR/cgroup2-mountinfo.txt")
+          test "$cgroup_mount" = /sys/fs/cgroup
+          cgroup_path=$(awk -F: '$1 == "0" && $2 == "" {print $3; found=1}
+            END {if (!found) exit 1}' "$LEAD15_VALIDATION_LOG_DIR/self-cgroup.txt")
+          [[ "$cgroup_path" == /* && "$cgroup_path" != *..* ]]
+          cgroup_dir=$(realpath -e -- "${cgroup_mount}${cgroup_path}")
+          case "$cgroup_dir" in
+            "$cgroup_mount"|"$cgroup_mount"/*) ;;
+            *) echo "refusing cgroup path outside $cgroup_mount: $cgroup_dir" >&2; exit 2 ;;
+          esac
+          for metric in memory.max memory.swap.max cpu.max; do
+            test -r "$cgroup_dir/$metric"
+            cat "$cgroup_dir/$metric" > "$LEAD15_VALIDATION_LOG_DIR/cgroup-$metric.txt"
+          done
+          memory_max=$(<"$LEAD15_VALIDATION_LOG_DIR/cgroup-memory.max.txt")
+          memory_swap_max=$(<"$LEAD15_VALIDATION_LOG_DIR/cgroup-memory.swap.max.txt")
+          cpu_max=$(<"$LEAD15_VALIDATION_LOG_DIR/cgroup-cpu.max.txt")
+          test -f /etc/os-release
+          uname -a > "$LEAD15_VALIDATION_LOG_DIR/uname.txt"
+          cat /etc/os-release > "$LEAD15_VALIDATION_LOG_DIR/os-release.txt"
+          df -PB1 "$RUNNER_TEMP" > "$LEAD15_VALIDATION_LOG_DIR/disk.txt"
+          read -r disk_size_bytes disk_available_bytes < <(
+            awk 'NR == 2 { print $2, $4 }' "$LEAD15_VALIDATION_LOG_DIR/disk.txt"
+          )
+          [[ "$disk_size_bytes" =~ ^[0-9]+$ ]]
+          [[ "$disk_available_bytes" =~ ^[0-9]+$ ]]
+          test "$disk_available_bytes" -ge $((8 * 1024 * 1024 * 1024))
+          jq -e '
+            .schema == "lead15.source-manifest/v1" and .status == "draft" and
+            ([.instrument_commit,.freeze_commit,.protocol_sha256,.protocol_file_sha256,
+              .binary_sha256,.build_info_sha256,.build_info_schema_sha256,
+              .analysis_source_sha256,.library_source_sha256,.worker_source_sha256,
+              .collector_source_sha256,.k4_reference_sha256,.result_schema_sha256,
+              .source_manifest_schema_sha256,.completion_receipt_schema_sha256,
+              .request_schema_sha256,.image_uri,.image_digest,.durable_output_prefix,
+              .frozen_at] | all(. == null)) and
+            (.jobs | length == 4 and all(.[];
+              .job_name == null and .argv_template == null and
+              .request_artifact_s3_uri == null and .results_prefix == null)) and
+            (.pre_manifest_package_receipt == {
+              scope:"pre_manifest_package_excluding_source_manifest_and_requests",
+              s3_uri:null,sha256:null,bytes:null,version_id:null,readback_verified:null})
+          ' "$LEAD15_DIR/source-manifest.json" >/dev/null
+          jq -e '
+            .freeze == {status:"draft",protocol_sha256:null,commit:null,
+              frozen_at:null,filed_before_affected_data:null} and .amendments == []
+          ' "$LEAD15_DIR/protocol.json" >/dev/null
+          test -d "$LEAD15_DIR"
+          test ! -L "$LEAD15_DIR"
+          test ! -e "$LEAD15_DIR/source-manifest.frozen.json"
+          test ! -L "$LEAD15_DIR/source-manifest.frozen.json"
+          for variable in LEAD15_COMMIT LEAD15_SOURCE_MANIFEST_SHA256 LEAD15_PROTOCOL_SHA256 LEAD15_BINARY_SHA256 LEAD15_IMAGE_DIGEST; do
+            test -z "${!variable+x}"
+          done
+
+          cat > "$LEAD15_VALIDATION_LOG_DIR/study-files.expected" <<'EOF'
+          research/lead15_diem_quartic_20261101/LINEAGE.md
+          research/lead15_diem_quartic_20261101/PROTOCOL.md
+          research/lead15_diem_quartic_20261101/SOURCES.md
+          research/lead15_diem_quartic_20261101/build-info.schema.json
+          research/lead15_diem_quartic_20261101/collector-adversarial-tests.sh
+          research/lead15_diem_quartic_20261101/completion-receipt.schema.json
+          research/lead15_diem_quartic_20261101/isolab-request.schema.json
+          research/lead15_diem_quartic_20261101/k4-reference.json
+          research/lead15_diem_quartic_20261101/lead15-collect.sh
+          research/lead15_diem_quartic_20261101/lead15-image.Dockerfile
+          research/lead15_diem_quartic_20261101/lead15-worker.sh
+          research/lead15_diem_quartic_20261101/lineage-contract-tests.sh
+          research/lead15_diem_quartic_20261101/protocol.json
+          research/lead15_diem_quartic_20261101/result-schema-tests.sh
+          research/lead15_diem_quartic_20261101/result.schema.json
+          research/lead15_diem_quartic_20261101/source-manifest.json
+          research/lead15_diem_quartic_20261101/source-manifest.schema.json
+          EOF
+          git ls-files "$LEAD15_DIR" | LC_ALL=C sort \
+            > "$LEAD15_VALIDATION_LOG_DIR/study-files.actual"
+          cmp "$LEAD15_VALIDATION_LOG_DIR/study-files.expected" \
+            "$LEAD15_VALIDATION_LOG_DIR/study-files.actual"
+          awk '{print $0 "\tf"}' "$LEAD15_VALIDATION_LOG_DIR/study-files.expected" \
+            > "$LEAD15_VALIDATION_LOG_DIR/study-filesystem.expected"
+          find "$LEAD15_DIR" -mindepth 1 -maxdepth 1 -printf '%p\t%y\n' | LC_ALL=C sort \
+            > "$LEAD15_VALIDATION_LOG_DIR/study-filesystem.before"
+          cmp "$LEAD15_VALIDATION_LOG_DIR/study-filesystem.expected" \
+            "$LEAD15_VALIDATION_LOG_DIR/study-filesystem.before"
+
+          tests=(
+            tests::result_schema_rejects_unknown_fields
+            tests::deep_validator_contains_malformed_cell_failure
+            tests::common_cover_replay_rejects_tampered_certificate
+            tests::canonical_flow_keeps_unattempted_plans_out_of_runs
+            tests::k4_bigint_cross_product_handles_admissible_denominators
+            tests::panic_message_truncates_utf8_on_a_character_boundary
+            tests::harvest_count_partition_rejects_balanced_impossibilities
+            tests::partial_attempt_authentication_rejects_wrong_identity
+          )
+          test "${#tests[@]}" -eq 8
+          for test_name in "${tests[@]}"; do
+            function_name=${test_name#tests::}
+            test "$(grep -Ec "^[[:space:]]*fn ${function_name}\\(" examples/lead15_diem_quartic.rs)" -eq 1
+          done
+
+          log_dir=$LEAD15_VALIDATION_LOG_DIR
+          target_dir=$CARGO_TARGET_DIR
+          expected_target_dir="$RUNNER_TEMP/lead15-validation-target-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          test "$target_dir" = "$expected_target_dir"
+          test -d "$log_dir"
+          test ! -L "$log_dir"
+          test ! -e "$target_dir"
+          mkdir -m 0700 "$target_dir"
+          printf '%s\n' "${tests[@]}" > "$log_dir/tests.txt"
+          printf '%s\n' \
+            'cargo check --locked --example lead15_diem_quartic' \
+            'cargo test --locked --example lead15_diem_quartic TEST_NAME -- --exact --nocapture --test-threads=1' \
+            > "$log_dir/commands.txt"
+          printf 'source_sha=%s\nexpected_commit=%s\ngithub_ref=%s\nrunner=%s\nrunner_environment=%s\nrunner_os=%s\nrunner_arch=%s\ncgroup_mount=%s\ncgroup_path=%s\ncgroup_dir=%s\nmemory_max=%s\nmemory_swap_max=%s\ncpu_max=%s\ndisk_size_bytes=%s\ndisk_available_bytes=%s\n' \
+            "$GITHUB_SHA" "$LEAD15_EXPECTED_COMMIT" "$GITHUB_REF" \
+            "$RUNNER_NAME" "$RUNNER_ENVIRONMENT" "$RUNNER_OS" \
+            "$RUNNER_ARCH" "$cgroup_mount" "$cgroup_path" "$cgroup_dir" \
+            "$memory_max" "$memory_swap_max" "$cpu_max" \
+            "$disk_size_bytes" "$disk_available_bytes" \
+            > "$log_dir/host.txt"
+          cat > "$log_dir/bound-source.expected" <<'EOF'
+          Cargo.lock
+          Cargo.toml
+          .github/workflows/lead15-hosted-validation.yml
+          docs/session-logs/2026-11-01.md
+          examples/lead15_diem_quartic.rs
+          problems/lead15-analyzer-test-profile-memory.md
+          research/lead15_diem_quartic_20261101/LINEAGE.md
+          research/lead15_diem_quartic_20261101/PROTOCOL.md
+          research/lead15_diem_quartic_20261101/collector-adversarial-tests.sh
+          research/lead15_diem_quartic_20261101/completion-receipt.schema.json
+          research/lead15_diem_quartic_20261101/lead15-collect.sh
+          research/lead15_diem_quartic_20261101/lead15-image.Dockerfile
+          research/lead15_diem_quartic_20261101/lead15-worker.sh
+          research/lead15_diem_quartic_20261101/lineage-contract-tests.sh
+          research/lead15_diem_quartic_20261101/protocol.json
+          research/lead15_diem_quartic_20261101/result-schema-tests.sh
+          research/lead15_diem_quartic_20261101/result.schema.json
+          research/lead15_diem_quartic_20261101/source-manifest.json
+          research/lead15_diem_quartic_20261101/source-manifest.schema.json
+          src/cryptanalysis/diem_quartic.rs
+          EOF
+          test "$(wc -l < "$log_dir/bound-source.expected")" -eq 20
+          test "$(LC_ALL=C sort -u "$log_dir/bound-source.expected" | wc -l)" -eq 20
+          : > "$log_dir/source-files-before.sha256"
+          while IFS= read -r path; do
+            test -f "$path"
+            test ! -L "$path"
+            sha256sum -- "$path" >> "$log_dir/source-files-before.sha256"
+          done < "$log_dir/bound-source.expected"
+          jq -n \
+            --arg schema 'lead15.hosted-admission/v1' \
+            --arg source_sha "$GITHUB_SHA" \
+            --arg expected_commit "$LEAD15_EXPECTED_COMMIT" \
+            --arg event_before "$LEAD15_EVENT_BEFORE" \
+            --arg trigger_parent "$LEAD15_TRIGGER_PARENT" \
+            --arg github_ref "$GITHUB_REF" \
+            --arg runner "$RUNNER_NAME" \
+            --arg runner_environment "$RUNNER_ENVIRONMENT" \
+            --arg runner_os "$RUNNER_OS" \
+            --arg runner_arch "$RUNNER_ARCH" \
+            --arg runner_temp "$RUNNER_TEMP" \
+            --arg cgroup_mount "$cgroup_mount" \
+            --arg cgroup_path "$cgroup_path" \
+            --arg cgroup_dir "$cgroup_dir" \
+            --arg memory_max "$memory_max" \
+            --arg memory_swap_max "$memory_swap_max" \
+            --arg cpu_max "$cpu_max" \
+            --argjson disk_size_bytes "$disk_size_bytes" \
+            --argjson disk_available_bytes "$disk_available_bytes" \
+            '{schema:$schema,scope:"compile_and_eight_named_non_target_tests_only",
+              source_sha:$source_sha,expected_commit:$expected_commit,
+              event_before:$event_before,trigger_parent:$trigger_parent,
+              github_ref:$github_ref,workflow_only_commit:true,bound_source_files:20,
+              runner:{name:$runner,environment:$runner_environment,os:$runner_os,arch:$runner_arch},
+              cgroup:{mount:$cgroup_mount,membership_path:$cgroup_path,
+                resolved_dir:$cgroup_dir,memory_max:$memory_max,
+                memory_swap_max:$memory_swap_max,cpu_max:$cpu_max},
+              disk:{path:$runner_temp,size_bytes:$disk_size_bytes,
+                available_bytes:$disk_available_bytes},
+              provenance_files:{host:"host.txt",kernel:"uname.txt",os_release:"os-release.txt",
+                disk:"disk.txt",rustc:"rustc.txt",cargo:"cargo.txt",
+                rustup_install:"rustup-install.txt",rustup_override:"rustup-override.txt",
+                self_cgroup:"self-cgroup.txt",cgroup2_mountinfo:"cgroup2-mountinfo.txt",
+                memory_max:"cgroup-memory.max.txt",
+                memory_swap_max:"cgroup-memory.swap.max.txt",cpu_max:"cgroup-cpu.max.txt",
+                bound_source_list:"bound-source.expected",
+                bound_source_hashes:"source-files-before.sha256"},
+              draft_manifest_verified:true,protocol_draft_verified:true,
+              target_data_inputs_present:false,repository_clean:true,
+              scientific_measurement:false,performance_claim:false}' \
+            > "$log_dir/admission-receipt.json"
+
+      - name: Cargo check and eight exact tests
+        id: validation
+        timeout-minutes: 120
+        shell: bash
+        run: |
+          set -euo pipefail
+          log_dir=$LEAD15_VALIDATION_LOG_DIR
+          overall=0
+
+          run_logged() {
+            local label=$1
+            shift
+            set +e
+            /usr/bin/time -v -o "$log_dir/$label.time" "$@" \
+              > "$log_dir/$label.stdout" 2> "$log_dir/$label.stderr"
+            local code=$?
+            set -e
+            cat "$log_dir/$label.stdout"
+            cat "$log_dir/$label.stderr" >&2
+            printf '%s\n' "$code" > "$log_dir/$label.exit"
+            return "$code"
+          }
+
+          if run_logged cargo-check cargo check --locked --example lead15_diem_quartic; then
+            printf 'cargo-check\tpassed\t0\n' > "$log_dir/status.tsv"
+          else
+            code=$?
+            printf 'cargo-check\tfailed\t%s\n' "$code" > "$log_dir/status.tsv"
+            overall=1
+          fi
+
+          if [[ $overall == 0 ]]; then
+            while IFS= read -r test_name; do
+              label=${test_name#tests::}
+              if run_logged "$label" cargo test --locked --example lead15_diem_quartic \
+                  "$test_name" -- --exact --nocapture --test-threads=1; then
+                if [[ $(grep -Fxc 'running 1 test' "$log_dir/$label.stdout") == 1 &&
+                      $(grep -Fxc "test $test_name ... ok" "$log_dir/$label.stdout") == 1 ]]; then
+                  printf '%s\tpassed\t0\n' "$test_name" >> "$log_dir/status.tsv"
+                else
+                  printf '%s\tfailed_exact_match_count\t0\n' "$test_name" >> "$log_dir/status.tsv"
+                  overall=1
+                fi
+              else
+                code=$?
+                printf '%s\tfailed\t%s\n' "$test_name" "$code" >> "$log_dir/status.tsv"
+                overall=1
+              fi
+            done < "$log_dir/tests.txt"
+          else
+            while IFS= read -r test_name; do
+              printf '%s\tskipped_check_failed\tnull\n' "$test_name" >> "$log_dir/status.tsv"
+            done < "$log_dir/tests.txt"
+          fi
+
+          manifest_draft=false
+          protocol_draft=false
+          no_study_artifact_dirs=false
+          exact_study_filesystem=false
+          repository_clean=false
+          source_hashes_match=false
+          jq -e '.status == "draft" and .freeze_commit == null and .frozen_at == null' \
+            "$LEAD15_DIR/source-manifest.json" >/dev/null && manifest_draft=true
+          jq -e '.freeze == {status:"draft",protocol_sha256:null,commit:null,
+            frozen_at:null,filed_before_affected_data:null}' \
+            "$LEAD15_DIR/protocol.json" >/dev/null && protocol_draft=true
+          if [[ -d "$LEAD15_DIR" && ! -L "$LEAD15_DIR" ]]; then
+            find "$LEAD15_DIR" -mindepth 1 -maxdepth 1 -printf '%p\t%y\n' | LC_ALL=C sort \
+              > "$log_dir/study-filesystem.after"
+            if cmp "$log_dir/study-filesystem.expected" \
+                "$log_dir/study-filesystem.after" >/dev/null; then
+              exact_study_filesystem=true
+              no_study_artifact_dirs=true
+            fi
+          fi
+          test -z "$(git status --porcelain=v1 --untracked-files=all)" \
+            && repository_clean=true
+          sha256sum --check "$log_dir/source-files-before.sha256" >/dev/null \
+            && source_hashes_match=true
+          if [[ "$manifest_draft" != true || "$protocol_draft" != true ||
+                "$no_study_artifact_dirs" != true || "$exact_study_filesystem" != true ||
+                "$repository_clean" != true ||
+                "$source_hashes_match" != true ]]; then
+            overall=1
+          fi
+
+          statuses=$(jq -Rn '[inputs | split("\t") | {
+            name:.[0], status:.[1],
+            exit_code:(if .[2] == "null" then null else (.[2] | tonumber) end)
+          }]' < "$log_dir/status.tsv")
+          jq -n \
+            --arg schema 'lead15.hosted-validation/v1' \
+            --arg source_sha "$GITHUB_SHA" \
+            --arg expected_commit "$LEAD15_EXPECTED_COMMIT" \
+            --arg github_ref "$GITHUB_REF" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg runner "$RUNNER_NAME" \
+            --arg target_dir "$CARGO_TARGET_DIR" \
+            --arg analysis_sha "$(sha256sum examples/lead15_diem_quartic.rs | awk '{print $1}')" \
+            --arg library_sha "$(sha256sum src/cryptanalysis/diem_quartic.rs | awk '{print $1}')" \
+            --arg cargo_lock_sha "$(sha256sum Cargo.lock | awk '{print $1}')" \
+            --argjson statuses "$statuses" \
+            --argjson manifest_draft "$manifest_draft" \
+            --argjson protocol_draft "$protocol_draft" \
+            --argjson no_study_artifact_dirs "$no_study_artifact_dirs" \
+            --argjson exact_study_filesystem "$exact_study_filesystem" \
+            --argjson repository_clean "$repository_clean" \
+            --argjson source_hashes_match "$source_hashes_match" \
+            --argjson success "$([[ $overall == 0 ]] && echo true || echo false)" \
+            '{schema:$schema,source_sha:$source_sha,expected_commit:$expected_commit,
+              github_ref:$github_ref,workflow_run_id:$run_id,
+              workflow_run_attempt:$run_attempt,runner:$runner,target_dir:$target_dir,
+              scope:"compile_and_eight_named_non_target_tests_only",
+              command_scope_excludes_target_driver_freeze_checkpoint_image_and_launch:true,
+              scientific_measurement:false,performance_claim:false,
+              post_guards:{manifest_draft:$manifest_draft,protocol_draft:$protocol_draft,
+                no_study_artifact_dirs:$no_study_artifact_dirs,repository_clean:$repository_clean,
+                exact_study_filesystem:$exact_study_filesystem,
+                source_hashes_match:$source_hashes_match},
+              source_hashes:{analysis:$analysis_sha,library:$library_sha,cargo_lock:$cargo_lock_sha},
+              commands:$statuses,success:$success}' > "$log_dir/validation-receipt.json"
+          exit "$overall"
+
+      - name: Remove only the fresh Cargo target
+        if: always()
+        id: cleanup
+        timeout-minutes: 30
+        env:
+          INITIALIZE_OUTCOME: ${{ steps.initialize.outcome }}
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          TOOLCHAIN_OUTCOME: ${{ steps.toolchain.outcome }}
+          ADMISSION_OUTCOME: ${{ steps.admission.outcome }}
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_log_dir="$RUNNER_TEMP/lead15-validation-logs-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          test "$LEAD15_VALIDATION_LOG_DIR" = "$expected_log_dir"
+          case "$LEAD15_VALIDATION_LOG_DIR" in
+            "$RUNNER_TEMP"/lead15-validation-logs-*) ;;
+            *) echo "refusing unexpected log path: $LEAD15_VALIDATION_LOG_DIR" >&2; exit 2 ;;
+          esac
+          test ! -L "$LEAD15_VALIDATION_LOG_DIR"
+          mkdir -p -m 0700 "$LEAD15_VALIDATION_LOG_DIR"
+          expected_target_dir="$RUNNER_TEMP/lead15-validation-target-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          test "$CARGO_TARGET_DIR" = "$expected_target_dir"
+          case "$CARGO_TARGET_DIR" in
+            "$RUNNER_TEMP"/lead15-validation-target-*) ;;
+            *) echo "refusing unexpected target cleanup: $CARGO_TARGET_DIR" >&2; exit 2 ;;
+          esac
+          cleanup_exit=0
+          target_bytes=null
+          if [[ -d "$CARGO_TARGET_DIR" && ! -L "$CARGO_TARGET_DIR" ]]; then
+            target_bytes=$(du -sb "$CARGO_TARGET_DIR" | awk '{print $1}')
+            printf '%s\t%s\n' "$target_bytes" "$CARGO_TARGET_DIR" \
+              > "$LEAD15_VALIDATION_LOG_DIR/target-size-before-clean.txt"
+            cargo clean --target-dir "$CARGO_TARGET_DIR" \
+              > "$LEAD15_VALIDATION_LOG_DIR/cargo-clean.stdout" \
+              2> "$LEAD15_VALIDATION_LOG_DIR/cargo-clean.stderr" || cleanup_exit=$?
+          elif [[ -e "$CARGO_TARGET_DIR" || -L "$CARGO_TARGET_DIR" ]]; then
+            cleanup_exit=2
+          fi
+          if [[ -e "$CARGO_TARGET_DIR" || -L "$CARGO_TARGET_DIR" ]]; then
+            cleanup_exit=2
+          fi
+
+          admission_ok=false
+          validation_ok=false
+          post_guards_ok=false
+          step_outcomes_ok=false
+          if [[ -f "$LEAD15_VALIDATION_LOG_DIR/admission-receipt.json" &&
+                ! -L "$LEAD15_VALIDATION_LOG_DIR/admission-receipt.json" ]] &&
+              jq -e --arg source "$GITHUB_SHA" --arg expected "$LEAD15_EXPECTED_COMMIT" \
+                --arg before "$LEAD15_EVENT_BEFORE" --arg parent "$LEAD15_TRIGGER_PARENT" \
+                --arg ref "$GITHUB_REF" '
+              .schema == "lead15.hosted-admission/v1" and
+              .scope == "compile_and_eight_named_non_target_tests_only" and
+              .source_sha == $source and .expected_commit == $expected and
+              .event_before == $before and .trigger_parent == $parent and
+              .github_ref == $ref and .workflow_only_commit == true and
+              .bound_source_files == 20 and .runner.environment == "github-hosted" and
+              .runner.os == "Linux" and .runner.arch == "X64" and
+              (.cgroup.membership_path | type == "string" and startswith("/")) and
+              (.cgroup.resolved_dir | type == "string" and startswith("/sys/fs/cgroup")) and
+              (.disk.size_bytes | type == "number" and . > 0) and
+              (.disk.available_bytes | type == "number" and . >= 8589934592) and
+              .draft_manifest_verified == true and .protocol_draft_verified == true and
+              .target_data_inputs_present == false and .repository_clean == true and
+              .scientific_measurement == false and .performance_claim == false
+            ' "$LEAD15_VALIDATION_LOG_DIR/admission-receipt.json" >/dev/null 2>&1; then
+            admission_ok=true
+          fi
+          if [[ -f "$LEAD15_VALIDATION_LOG_DIR/validation-receipt.json" &&
+                ! -L "$LEAD15_VALIDATION_LOG_DIR/validation-receipt.json" ]] &&
+              jq -e --arg source "$GITHUB_SHA" --arg expected "$LEAD15_EXPECTED_COMMIT" \
+                --arg ref "$GITHUB_REF" --arg run_id "$GITHUB_RUN_ID" \
+                --arg run_attempt "$GITHUB_RUN_ATTEMPT" --arg target "$CARGO_TARGET_DIR" '
+              .schema == "lead15.hosted-validation/v1" and
+              .source_sha == $source and .expected_commit == $expected and
+              .github_ref == $ref and .workflow_run_id == $run_id and
+              .workflow_run_attempt == $run_attempt and .target_dir == $target and
+              .scope == "compile_and_eight_named_non_target_tests_only" and
+              .command_scope_excludes_target_driver_freeze_checkpoint_image_and_launch == true and
+              .scientific_measurement == false and .performance_claim == false and
+              .post_guards == {manifest_draft:true,protocol_draft:true,
+                no_study_artifact_dirs:true,repository_clean:true,
+                exact_study_filesystem:true,source_hashes_match:true} and
+              .commands == [
+                {name:"cargo-check",status:"passed",exit_code:0},
+                {name:"tests::result_schema_rejects_unknown_fields",status:"passed",exit_code:0},
+                {name:"tests::deep_validator_contains_malformed_cell_failure",status:"passed",exit_code:0},
+                {name:"tests::common_cover_replay_rejects_tampered_certificate",status:"passed",exit_code:0},
+                {name:"tests::canonical_flow_keeps_unattempted_plans_out_of_runs",status:"passed",exit_code:0},
+                {name:"tests::k4_bigint_cross_product_handles_admissible_denominators",status:"passed",exit_code:0},
+                {name:"tests::panic_message_truncates_utf8_on_a_character_boundary",status:"passed",exit_code:0},
+                {name:"tests::harvest_count_partition_rejects_balanced_impossibilities",status:"passed",exit_code:0},
+                {name:"tests::partial_attempt_authentication_rejects_wrong_identity",status:"passed",exit_code:0}
+              ] and .success == true
+            ' "$LEAD15_VALIDATION_LOG_DIR/validation-receipt.json" >/dev/null 2>&1; then
+            validation_ok=true
+          fi
+          if jq -e '.post_guards == {manifest_draft:true,protocol_draft:true,
+                no_study_artifact_dirs:true,repository_clean:true,
+                exact_study_filesystem:true,source_hashes_match:true}' \
+              "$LEAD15_VALIDATION_LOG_DIR/validation-receipt.json" >/dev/null 2>&1; then
+            post_guards_ok=true
+          fi
+          if [[ "$INITIALIZE_OUTCOME" == success && "$CHECKOUT_OUTCOME" == success &&
+                "$TOOLCHAIN_OUTCOME" == success && "$ADMISSION_OUTCOME" == success &&
+                "$VALIDATION_OUTCOME" == success ]]; then
+            step_outcomes_ok=true
+          fi
+          final_success=false
+          if [[ "$admission_ok" == true && "$validation_ok" == true &&
+                "$post_guards_ok" == true && "$step_outcomes_ok" == true &&
+                $cleanup_exit == 0 ]]; then
+            final_success=true
+          fi
+          jq -n \
+            --arg schema 'lead15.hosted-final-receipt/v1' \
+            --arg source_sha "$GITHUB_SHA" \
+            --arg expected_commit "$LEAD15_EXPECTED_COMMIT" \
+            --arg event_before "$LEAD15_EVENT_BEFORE" \
+            --arg trigger_parent "$LEAD15_TRIGGER_PARENT" \
+            --arg github_ref "$GITHUB_REF" \
+            --arg initialize "$INITIALIZE_OUTCOME" \
+            --arg checkout "$CHECKOUT_OUTCOME" \
+            --arg toolchain "$TOOLCHAIN_OUTCOME" \
+            --arg admission "$ADMISSION_OUTCOME" \
+            --arg validation "$VALIDATION_OUTCOME" \
+            --arg target_dir "$CARGO_TARGET_DIR" \
+            --argjson target_bytes "$target_bytes" \
+            --argjson cleanup_exit "$cleanup_exit" \
+            --argjson admission_ok "$admission_ok" \
+            --argjson validation_ok "$validation_ok" \
+            --argjson post_guards_ok "$post_guards_ok" \
+            --argjson step_outcomes_ok "$step_outcomes_ok" \
+            --argjson success "$final_success" \
+            '{schema:$schema,source_sha:$source_sha,expected_commit:$expected_commit,
+              event_before:$event_before,trigger_parent:$trigger_parent,
+              github_ref:$github_ref,
+              scope:"compile_and_eight_named_non_target_tests_only",
+              step_outcomes:{initialize:$initialize,checkout:$checkout,toolchain:$toolchain,
+                admission:$admission,validation:$validation},
+              draft_no_target_admission:$admission_ok,post_guards_passed:$post_guards_ok,
+              validation_passed:$validation_ok,step_outcomes_passed:$step_outcomes_ok,
+              target_dir:$target_dir,
+              target_bytes_before_cleanup:$target_bytes,target_removed:($cleanup_exit == 0),
+              cleanup_exit:$cleanup_exit,
+              target_driver_freeze_checkpoint_image_and_launch_commands_authorized:false,
+              scientific_measurement:false,performance_claim:false,
+              success:$success}' > "$LEAD15_VALIDATION_LOG_DIR/receipt.json"
+          test -z "$(find "$LEAD15_VALIDATION_LOG_DIR" -mindepth 1 ! -type f -print -quit)"
+          checksum_tmp="$RUNNER_TEMP/lead15-validation-SHA256SUMS-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          (
+            cd "$LEAD15_VALIDATION_LOG_DIR"
+            files=()
+            while IFS= read -r -d '' path; do files+=("$path"); done \
+              < <(find . -maxdepth 1 -type f ! -name SHA256SUMS -print0 | sort -z)
+            sha256sum -- "${files[@]}"
+          ) > "$checksum_tmp"
+          mv "$checksum_tmp" "$LEAD15_VALIDATION_LOG_DIR/SHA256SUMS"
+          exit "$cleanup_exit"
+
+      - name: Upload compile/test logs and receipt
+        if: always() && steps.cleanup.outcome == 'success'
+        timeout-minutes: 20
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lead15-hosted-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.LEAD15_VALIDATION_LOG_DIR }}/
+          retention-days: 30
+          if-no-files-found: error
