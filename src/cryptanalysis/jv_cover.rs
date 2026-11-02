@@ -2447,7 +2447,7 @@ pub fn fb_line_from_env(spec: &Spec, seed: u64) -> (Spec, Option<LineSearch>) {
 /// `(p + 1)/2` directions (classes of `a = t²` modulo `F_p^×`) times `p`
 /// offsets (cosets of `a·F_p` in `F_q`).
 pub fn line_classes(p: u64) -> u64 {
-    (p + 1) / 2 * p
+    p.div_ceil(2) * p
 }
 
 /// `χ(h(x))` for every `x = (x₀, x₁) ∈ F_q`, at index `x₀·p + x₁`: `true`
@@ -2590,7 +2590,7 @@ pub fn search_fb_line_mode(spec: &Spec, n: u64, seed: u64, table: bool) -> (Spec
             };
             dirs.entry(key).or_insert((a, t));
         }
-        assert_eq!(dirs.len() as u64, (p + 1) / 2, "square directions");
+        assert_eq!(dirs.len() as u64, p.div_ceil(2), "square directions");
         let dirs: Vec<(E2, E2)> = dirs.into_values().collect();
         // (count, first-index) per direction, best offset u of each
         let res: Vec<(usize, u64)> = dirs
