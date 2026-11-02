@@ -7,17 +7,11 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::path::Path;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Scope {
-    WholeWorker,
-    Phase,
-}
-
 /// A producer-consistency projection; `trusted_replay` is supplied only by an
 /// independent caller, never parsed from the producer's JSON.
 #[derive(Clone, Copy, Debug)]
 struct CounterProof {
-    scope: Scope,
+    whole_worker_scope: bool,
     requested_hardware_instructions: bool,
     opened_event_id: u64,
     read_event_id: u64,
@@ -62,7 +56,7 @@ fn admit(
     let Some(p) = proof else {
         return reject("whole_worker_counter_missing");
     };
-    if p.scope != Scope::WholeWorker {
+    if !p.whole_worker_scope {
         return reject("phase_only_counter");
     }
     if !p.requested_hardware_instructions
@@ -183,7 +177,7 @@ mod tests {
 
     fn valid() -> CounterProof {
         CounterProof {
-            scope: Scope::WholeWorker,
+            whole_worker_scope: true,
             requested_hardware_instructions: true,
             opened_event_id: 12,
             read_event_id: 12,
@@ -253,7 +247,7 @@ mod tests {
     #[test]
     fn phase_counter_and_incomplete_readback_are_rejected() {
         let mut p = valid();
-        p.scope = Scope::Phase;
+        p.whole_worker_scope = false;
         assert_eq!(
             admit(Some(&p), true, true, true).reason,
             "phase_only_counter"
@@ -263,6 +257,12 @@ mod tests {
         assert_eq!(
             admit(Some(&p), true, true, true).reason,
             "execution_or_readback_incomplete"
+        );
+        p = valid();
+        p.platform_admitted = false;
+        assert_eq!(
+            admit(Some(&p), true, true, true).reason,
+            "hardware_event_unverified"
         );
     }
 }
