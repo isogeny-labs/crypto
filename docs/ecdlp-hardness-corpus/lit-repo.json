@@ -1,0 +1,2827 @@
+{
+  "sources": [
+    {
+      "id": "S-RP-FALL-DEGREE-BOUNDS",
+      "title": "Fall-degree experiments E1-E12 and the Lean scoring of their registered verdicts",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/fall_degree_bounds_20261008/RESULTS.md (E2 table; E3-E10 registered readings; E12b Amendment 15 continuation; 'Lean and cairn' and 'Lean (E12b, job r1)' sections).",
+      "repository_path": "research/fall_degree_bounds_20261008/RESULTS.md",
+      "notes": "Lean build receipts: e12/run-b1/out/lean/status and run-b2/out/lean/status (exit=0, lake build of Rule, Data, Verdict). The repository's d_F in this study is the degree of the degree-truncated closure that reaches 1 (UNSAT) or the last fall (SAT), not Nagao's first fall degree."
+    },
+    {
+      "id": "S-RP-GUARDED-FALL-DEGREE",
+      "title": "Guarded summation-polynomial fall degrees: written derivations and scope",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/guarded_fall_degree_20261028/README.md and STATUS.md: derived first/last fall table for the explicit membership presentation, growing-B proof, characteristic-two classification, fully Boolean d_F <= 3*ell+1 bound, prime bit-restricted bound.",
+      "repository_path": "research/guarded_fall_degree_20261028/README.md"
+    },
+    {
+      "id": "S-RP-GUARDED-EXACT-PAIR-LEAN",
+      "title": "Complete Lean proof of the ordinary guarded pair (4,5)",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/guarded_fall_degree_20261028/formal/complete-exact-pair.md and complete-exact-pair-claims.json (24 declarations, central GuardedExactPair.exact_pair_prime); receipts in formal/complete-exact-pair-validation/ (lake build exit 0, tools/lean/AuditAxioms.lean over 13 modules: 231 theorems, 0 failing, 0 trusted; 13 leanchecker --fresh exits 0).",
+      "repository_path": "research/guarded_fall_degree_20261028/formal/complete-exact-pair-claims.json",
+      "notes": "The earlier formal/exact-pair-claims.json (request_complete=false) is the historical partial record superseded by complete-exact-pair-claims.json."
+    },
+    {
+      "id": "S-RP-FACTOR-BASE-DESIGNS",
+      "title": "Factor-base designs register, Lean proofs and preregistered experiments",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/factor_base_designs_20261015/README.md, sections 1-4 (break-even model, design register, proof map); proof_logs/{lake_build,axioms,leanchecker}.txt.",
+      "repository_path": "research/factor_base_designs_20261015/README.md",
+      "notes": "Committed proof logs record lake build, #print axioms (only propext/Classical.choice/Quot.sound) and leanchecker --fresh; CI .github/workflows/factor-base-designs-lean.yml."
+    },
+    {
+      "id": "S-RP-ROOTFINDING-S3",
+      "title": "Root-finding decomposition paper, Proposition 1 in Lean (S3Roots)",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "papers/rootfinding-decomposition/README.md, 'Lean formalization (Proposition 1)'; lean/axiom-audit.txt copied from green CI run 38984047507 (leanchecker --fresh success, axioms propext/Classical.choice/Quot.sound).",
+      "repository_path": "papers/rootfinding-decomposition/README.md"
+    },
+    {
+      "id": "S-RP-IC-NEGATIVE-OPEN",
+      "title": "Open Lean targets O1-O4 of the IC negative-results paper",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "papers/ic-negative-results/lean/OPEN_TARGETS.md (O1 Theorem 15.1 in full, O2 multiset yield conservation, O3 Lemma 4 witnesses, O4 Semaev-cover monodromy); README statements S1-S6.",
+      "repository_path": "papers/ic-negative-results/lean/OPEN_TARGETS.md",
+      "notes": "README line 54: the new Lean modules are written but not yet kernel-checked; the repository proof gate is the first check."
+    },
+    {
+      "id": "S-RP-ISOGENY-CLASS-RHO",
+      "title": "Isogeny-class rho proof map",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "papers/isogeny-class-rho/PROOF-MAP.md (2026-10-19): ScalarTransport, ConductorSquares, ConductorModEight; lake build (2900 jobs) and builtin leanchecker recorded.",
+      "repository_path": "papers/isogeny-class-rho/PROOF-MAP.md"
+    },
+    {
+      "id": "S-RP-JKSST-AUDIT-README",
+      "title": "JKSST xedni skeptical Lean audit: status and refuted overbroad inferences",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/jksst_xedni_audit_20261101/README.md (status 'kernel-checked scoped audit; conditional theorem repaired, several overbroad inferences refuted') with PROOF_MAP.md rows for the counterexample declarations.",
+      "repository_path": "research/jksst_xedni_audit_20261101/README.md",
+      "notes": "No committed gate receipt file in the study directory; the README records representative #print axioms checks and the proof-gate command."
+    },
+    {
+      "id": "S-RP-PRIME-FB-DEGREE",
+      "title": "Prime-field factor bases: canonical top-ideal degree reduction in Lean",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/prime_factor_base_degree_20261031/proof/FORMALIZATION.md (DegreeBridge.canonical_strict_reduction, CanonicalFixture.degree_five_to_three); proof/verification/{build.log,axioms.log}: 121 declarations, zero failures, zero trusted native.",
+      "repository_path": "research/prime_factor_base_degree_20261031/proof/FORMALIZATION.md"
+    },
+    {
+      "id": "S-RP-PRIME-FB-FOUR-TRACKS",
+      "title": "Four complete selector presentations of one F17 factor base",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/prime_factor_base_degree_20261031/four_tracks_20261101/README.md and verification/README.md (verify.sh exit 0: 372 declarations in 28 modules, zero failures, zero trusted/native; no lean4checker).",
+      "repository_path": "research/prime_factor_base_degree_20261031/four_tracks_20261101/README.md"
+    },
+    {
+      "id": "S-RP-PRIME-FB-F4",
+      "title": "Split-graph bases: toy audit and stock F4 comparison",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/prime_factor_base_degree_20261031/parallel_20261031/RESULTS.md, run-20261031T201044Z: 14,220 attempted systems, 14,194 verified, 26 root-extraction caps.",
+      "repository_path": "research/prime_factor_base_degree_20261031/parallel_20261031/RESULTS.md"
+    },
+    {
+      "id": "S-RP-KOBLITZ-MODULAR",
+      "title": "Koblitz modular and low-genus carrier investigation",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/koblitz_modular_ic_20261018/REPORT.md (signed-character modular carrier, genus table) and VALIDATION.md ('Conditional Lean theorem: PASS; propext, Classical.choice, Quot.sound only'; cyclic-window replay 30 candidates, 0 survive).",
+      "repository_path": "research/koblitz_modular_ic_20261018/REPORT.md",
+      "notes": "VALIDATION.md cites lean-check.log, which is not present in the study tree at this checkout; later rounds (e.g. rounds/13/VALIDATION.md) record full proof-gate passes for the lean/ project."
+    },
+    {
+      "id": "S-RP-TWIST-LEAN",
+      "title": "Quadratic-twist evidence: Lean proof map",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/quadratic_twist_evidence_20261021/lean/README.md: proof gate receipt with 106 named research theorems, 127 audited declarations, zero trusted native; TwistProof and FrobeniusBridge tables.",
+      "repository_path": "research/quadratic_twist_evidence_20261021/lean/README.md"
+    },
+    {
+      "id": "S-RP-TWIST-CENSUS",
+      "title": "Quadratic twists: executed S3 censuses (F13, F37) and collection laws",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/quadratic_twist_evidence_20261021/README.md, dated entries 2026-10-25 to 2026-10-30 (uniform census 0/210 strict joint gains; F37 size-two 2592 configurations; size-three caps 0-12, zero strongest-source joint records).",
+      "repository_path": "research/quadratic_twist_evidence_20261021/README.md"
+    },
+    {
+      "id": "S-RP-PLANNER",
+      "title": "Planner studies re-tested exhaustively, arithmetic checked in Lean",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/ic_planner_exhaustive_20261026/README.md and lean/README.md: Band, KeyedInvariance, 2428 decide certificates; leanchecker --fresh passes on all three modules; 14 new ecbench sessions, 3328 verified records.",
+      "repository_path": "research/ic_planner_exhaustive_20261026/README.md"
+    },
+    {
+      "id": "S-RP-COMMON-KERNEL",
+      "title": "Common-kernel stage: gauges, exterior lifts and coded operators",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/prime_common_kernel_20261030/README.md; lean-gauges/PROOF_MAP.md and VERIFICATION.json (PASS); lean-exterior/PROOF_MAP.md (default build, axiom audit, proof gate and fresh leanchecker exited 0).",
+      "repository_path": "research/prime_common_kernel_20261030/README.md"
+    },
+    {
+      "id": "S-RP-FF-HANDBOOK",
+      "title": "Finite-field handbook in Lean",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "knowledge/finite-fields/README.md and receipts/audit.log ('audited 58 theorems in [FiniteFieldHandbook]; 0 failing, 0 trusted').",
+      "repository_path": "knowledge/finite-fields/README.md"
+    },
+    {
+      "id": "S-RP-IC-BOUNDARY-LEDGER",
+      "title": "Index-calculus boundary ledger: three regimes, one unit, every phase priced",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md: frozen run docs/ic/runs/ic-boundary-ledger-2026-09-21.json (commit a696a93), sections 1-4 (Round 1), 11.2-11.3 (family shape law), later rounds 2-5.",
+      "repository_path": "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
+    },
+    {
+      "id": "S-RP-BOUNDARY-TARGETS",
+      "title": "docs/ic/boundary_targets.json (schema 2, updated 2026-10-31)",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "docs/ic/boundary_targets.json: regimes.prime/binary/koblitz records per stage (vs_rho, decomposition, factor_base), route_assessments, claim_hygiene.",
+      "repository_path": "docs/ic/boundary_targets.json"
+    },
+    {
+      "id": "S-RP-COVER-LEDGER",
+      "title": "Cover-and-decomposition route on E(F_{p^6}): registered, built and measured",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md sections 6-7 (Nagao test route), 11.5 and 14.4 (sieving variant), 13 and 17.5 (isogeny walk), 18.4 (end to end from non-weak curves).",
+      "repository_path": "research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md",
+      "notes": "The algorithm is Joux-Vitse (Eurocrypt 2012, ePrint 2011/020) reproduced in the repository harness; the ledger labels it 'accounting and engineering, no advance'."
+    },
+    {
+      "id": "S-RP-IC-ASSUMPTION-GRAPH",
+      "title": "Index calculus for ECDLP: pipeline and assumption graph (cryptanalysis repository)",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "isogeny-labs/cryptanalysis (sibling checkout /home/user/cryptanalysis), experiments/ic-assumption-graph/ic_assumptions.dot and REPORT-2026-10-06.md (base commit 6350e7f7; 32 assumption ellipses A-SETUP1..A-BASE3, sections 3-6).",
+      "notes": "Read in the sibling checkout; not resolvable from /home/user/crypto, so no repository_path. Mapping of its assumption nodes to corpus nodes: A-SETUP1 -> DEF-RP-EC1-INSTANCE-ID; A-SETUP2 -> DEF-SUBGROUP-COFACTOR; A-FB1 -> THM-RP-SUBSPACE-PRODUCT-BOUND; A-FB2 -> HEUR-RP-LIFT-SUBGROUP-HALF; A-FB3 -> THM-RP-AUTOMORPHISM-ORBIT-FOLD; A-FB4 -> THM-RP-TRACE-ZERO-DOUBLING; A-PDP1 -> THEOREM-SEMAEV-SUMMATION (and THM-RP-S3-ROOTS-FACTOR for m=2); A-PDP2 -> THM-RP-WEIL-LIFT-SOUNDNESS; A-PDP3 -> HEUR-DECOMPOSITION-PROBABILITY (with THEOREM-YIELD-CONSERVATION for the mean); A-PDP4 -> HEUR-FIRST-FALL-DEGREE; A-PDP5 -> HEUR-RP-SEMIREGULAR-DREG-PROXY; A-PDP6 -> GAP-FALL-DEGREE-COST-BRIDGE (DEF-LAST-FALL-DEGREE); A-PDP7 -> GAP-RP-SAT-SCALING; A-PDP8 -> THM-RP-S3-LINEAR-HALF-TRACE; A-RC1 -> HEUR-RP-WALK-TARGET-GUARD; A-RC2 -> HEUR-RP-LARGE-PRIME-GRAPH; A-RC3 and A-LA4 -> HEUR-RELATION-RANK qualified by THM-RP-COFACTOR4-RANK-SHORTFALL; A-LA1 and A-LA3 -> ALG-SPARSE-LINEAR-ALGEBRA; A-LA2 -> ALG-POHLIG-HELLMAN; A-TD1 -> HEUR-RP-DESCENT-TERMINATION; A-TD2 -> DEF-INDEX-CALCULUS-PIPELINE (verified learned logs); A-TD3 -> THEOREM-RANDOM-SELF-REDUCTION; A-ISO1 -> THM-RP-VOLCANO-STRUCTURE; A-ISO2 and A-ISO3 -> RED-ISOGENY-DLP-TRANSPORT (with THM-RP-SCALAR-TRANSPORT); A-ISO4 -> THEOREM-JMV-ISOGENY-REDUCTION; A-ISO5 -> ALG-RP-VELU-COST; A-BASE1 -> LB-SHOUP-DLP and HEUR-AUTOMORPHISM-SPEEDUP; A-BASE2 -> HEUR-RHO-RANDOM-MAPPING; A-BASE3 -> FACT-MEASURED-BOUND qualified by MEAS-RP-CALIBRATION-DRIFT. Its derived/measured findings 5.3 and 5.5 -> COND-RP-LINEARIZED-SUBSPACE-FLOOR and MEAS-RP-GAUDRY-CUBIC."
+    },
+    {
+      "id": "S-RP-IC-LIT-SECONDARY",
+      "title": "Literature results cited by the cryptanalysis assumption graph, recalled there",
+      "kind": "primary_publication",
+      "verification": "secondary_only",
+      "citation": "Hou-Leung-Xiang (field Kneser theorem, J. Number Theory 2002); Bachoc-Serra-Zemor (linear Vosper theorem, 2017); Kohel (PhD thesis, UC Berkeley 1996) and Sutherland (isogeny volcanoes) for volcano structure; Velu (1971) and Bernstein-De Feo-Leroux-Smith (sqrt-Velu, 2020) for isogeny evaluation cost.",
+      "notes": "secondary_only: these statements are taken as reported in cryptanalysis experiments/ic-assumption-graph/REPORT-2026-10-06.md sections 3.2 and 3.7, which mark them [metadata]/recalled; none was read here. Factor-base designs README (K3) records that the linear Vosper theorem is not formalized in the repository."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "THM-RP-S3-ROOTS-FACTOR",
+      "label": "S3(xR,xF,X) = (xR-xF)^2 (X-x(R+F)) (X-x(R-F)) (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "Over any field K, for affine points R=(xR,yR), F=(xF,yF) on y^2=x^3+ax+b with xR != xF, Semaev's third summation polynomial factors as S3(xR,xF,X) = (xR-xF)^2 (X - x(R+F)) (X - x(R-F)); hence S3(xR,xF,X)=0 iff X is x(R+F) or x(R-F). Bridge lemmas identify the chord formulas with Mathlib's WeierstrassCurve.Affine point addition when a1=a2=0 (and a3=0 where negation enters).",
+      "scope": "Formalized: the identity and root characterization for distinct abscissas over an arbitrary field, plus the Mathlib group-law bridge. Not formalized: the case xR = xF (doubling/2-torsion), general Weierstrass models, S_m for m>3, and the paper's algorithmic claim that the m=2 / m=3 rootfinders are group-law table algorithms (FACT-S3-ROOTS-ARE-GROUP-LAW), which is a reading of the oracle, not a Lean statement.",
+      "assumptions": [
+        "xR != xF",
+        "short Weierstrass model for the identity; a1=a2(=a3)=0 for the Mathlib bridge"
+      ],
+      "source_refs": [
+        "S-RP-ROOTFINDING-S3"
+      ],
+      "tags": [
+        "lean",
+        "summation-polynomial",
+        "s3",
+        "group-law"
+      ],
+      "source_locations": [
+        "rootfinding_decomposition.tex, Proposition 1"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "papers/rootfinding-decomposition/lean/S3Roots.lean",
+            "decl": "SemaevS3.S3_factor"
+          },
+          {
+            "path": "papers/rootfinding-decomposition/lean/S3Roots.lean",
+            "decl": "SemaevS3.S3_root_iff"
+          },
+          {
+            "path": "papers/rootfinding-decomposition/lean/S3Roots.lean",
+            "decl": "SemaevS3.S3_factor_mathlib"
+          }
+        ],
+        "notes": "Gate record: lean/axiom-audit.txt from green CI run 38984047507 (workflow rootfinding-s3roots-lean.yml): grep for sorry/admit/native_decide clean, leanchecker --fresh success, axioms exactly propext/Classical.choice/Quot.sound."
+      },
+      "cited_by": [
+        {
+          "path": "papers/rootfinding-decomposition/rootfinding_decomposition.tex",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "THM-RP-YIELD-SUM-COUNT",
+      "label": "Total yield = domain size; K2 neutrality; K5 restriction (Lean, list form)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For any decomposition map phi from a finite list domain D of candidate tuples to a duplicate-free list of targets covering its image, the yields summed over targets equal |D| (sum_count); two maps on domains of equal size have equal total yield (patterns_neutral, design K2); restricting the domain by any predicate never increases the yield at any target (restrict_le, design K5).",
+      "scope": "Formalized: the double count in Lean core (no Mathlib) over lists. Not formalized: the instantiation to m-multisets of a factor base (C(B+m-1,m) count), any statement about variance, per-target distribution, rank, solver visibility or recognition cost. It fixes only the mean yield per target, which is why the factor-base register closes K2 and K1 only 'in the mean'.",
+      "assumptions": [
+        "targets list duplicate-free and containing every image"
+      ],
+      "source_refs": [
+        "S-RP-FACTOR-BASE-DESIGNS"
+      ],
+      "tags": [
+        "lean",
+        "yield",
+        "factor-base"
+      ],
+      "source_locations": [
+        "research/factor_base_designs_20261015/README.md section 3, row 'total yield = domain size; K2; K5'"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/Yield.lean",
+            "decl": "FactorBaseDesigns.sum_count"
+          },
+          {
+            "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/Yield.lean",
+            "decl": "FactorBaseDesigns.patterns_neutral"
+          },
+          {
+            "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/Yield.lean",
+            "decl": "FactorBaseDesigns.restrict_le"
+          }
+        ],
+        "notes": "Committed receipts proof_logs/axioms.txt (sum_count, patterns_neutral, restrict_le depend on propext, Quot.sound) and proof_logs/leanchecker.txt."
+      }
+    },
+    {
+      "id": "THM-RP-ICNEG-YIELD-CONSERVATION",
+      "label": "Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For any map phi : tau -> G between finite types, sum over g of #{t : phi t = g} = |tau| (sum_yield), two maps on equal-size domains have equal total yield (total_yield_eq), and the number of targets with at least one decomposition is at most min(|tau|,|G|) (coverage_le_card_dom, coverage_le_card_cod).",
+      "scope": "Mathlib restatement of THM-RP-YIELD-SUM-COUNT for finite types plus the coverage bound; paper statement S3 claims mean yield C(B+m-1,m)/N for every base of size B, but the multiset instantiation is open target O2 (GAP-RP-O2-MULTISET-YIELD). Written, not yet through the proof gate.",
+      "assumptions": [
+        "finite domain and codomain, decidable equality on targets"
+      ],
+      "source_refs": [
+        "S-IC-NEGATIVE",
+        "S-RP-IC-NEGATIVE-OPEN"
+      ],
+      "tags": [
+        "lean",
+        "yield",
+        "ic-negative"
+      ],
+      "source_locations": [
+        "papers/ic-negative-results statement S3"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/YieldConservation.lean",
+            "decl": "IcNegative.sum_yield"
+          },
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/YieldConservation.lean",
+            "decl": "IcNegative.total_yield_eq"
+          },
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/YieldConservation.lean",
+            "decl": "IcNegative.coverage_le_card_cod"
+          }
+        ],
+        "notes": "README: written but not yet kernel-checked (no Lean toolchain on the authoring host); pending lean-proof-gate.yml. Repository proof gate PASS: lean-proof-gate run 41390917050 (workflow_dispatch on this branch, commit 34e8a0dce), target papers/ic-negative-results/lean, 24 theorems, 0 trusted native; axiom audit allows only propext / Classical.choice / Quot.sound."
+      }
+    },
+    {
+      "id": "GAP-RP-O2-MULTISET-YIELD",
+      "label": "O2: mean yield of m-multisets of a base is C(|D|+m-1,m)",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "mathematical",
+      "statement": "Open Lean target: for a base D : Finset G of an additive group, sum over g of yieldAt (fun s : Sym D m => sum of s) g = Nat.choose (|D|+m-1) m (mean_yield_multiset).",
+      "scope": "Stated as Lean-syntax pseudocode only, never elaborated. Needs Sym.card_sym_eq_choose and an AddCommGroup sum map. Closing it formalizes the exact count used by the IC boundary ledger's counting ceiling p_ceiling = min(1, C(F+m-1,m)/#E).",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-NEGATIVE-OPEN"
+      ],
+      "tags": [
+        "lean",
+        "yield",
+        "open-target"
+      ],
+      "source_locations": [
+        "papers/ic-negative-results/lean/OPEN_TARGETS.md, O2"
+      ],
+      "evidence_class": "open",
+      "formal": {
+        "state": "stated_open",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/OPEN_TARGETS.md",
+            "decl": "mean_yield_multiset"
+          }
+        ]
+      }
+    },
+    {
+      "id": "THM-RP-AFFINE-CORE",
+      "label": "Counting core of the isogeny-augmented generic group bound (IcNegative, unchecked)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "Over any field F: two distinct affine forms a+bx agree on at most one secret (agree_card_le_one); for a family P of forms the set of secrets where two members collide has at most |P|^2-|P| elements, hence at most n^2 when |P|<=n (badSecrets_card_le, badSecrets_card_le_sq); off that set evaluation is injective on P (injOn_of_not_bad).",
+      "scope": "Exactly the combinatorial step of RESEARCH_ISOGENY_FIBERS_ECDLP.md Theorem 15.1 (the (Q+2)^2/r term). Not formalized: the oracle model, random encodings, isogeny oracles with scalars lambda_psi, the simulator and hybrid step, and the final 1/r guessing term (open target O1). The Lean statement is therefore not Theorem 15.1.",
+      "assumptions": [
+        "field F with decidable equality"
+      ],
+      "source_refs": [
+        "S-IC-NEGATIVE",
+        "S-RP-IC-NEGATIVE-OPEN",
+        "S-ISOGENY-FIBERS"
+      ],
+      "tags": [
+        "lean",
+        "generic-group",
+        "isogeny",
+        "ic-negative"
+      ],
+      "source_locations": [
+        "papers/ic-negative-results statement S2",
+        "RESEARCH_ISOGENY_FIBERS_ECDLP.md section 15.1"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/AffineCore.lean",
+            "decl": "IcNegative.badSecrets_card_le_sq"
+          },
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/AffineCore.lean",
+            "decl": "IcNegative.injOn_of_not_bad"
+          },
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/AffineCore.lean",
+            "decl": "IcNegative.agree_card_le_one"
+          }
+        ],
+        "notes": "Pending the proof gate; README S2 label 'proved; Lean not yet kernel-checked'. Repository proof gate PASS: lean-proof-gate run 41390917050 (workflow_dispatch on this branch, commit 34e8a0dce), target papers/ic-negative-results/lean, 24 theorems, 0 trusted native; axiom audit allows only propext / Classical.choice / Quot.sound."
+      }
+    },
+    {
+      "id": "GAP-RP-O1-ISOGENY-GGM",
+      "label": "O1: Theorem 15.1 in full (isogeny-augmented GGM success bound)",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "generic_group",
+      "statement": "Open Lean target: define the isogeny-augmented generic group model (encodings sigma_j : ZMod r -> bitstrings, group and isogeny oracles with known scalars lambda_psi, Q-query adversaries) and prove successProb adv <= (Q+2)^2/r + 1/r (isogeny_ggm_success_le), with r prime, r not dividing the cofactor, each psi on G_i an isomorphism onto G_j or zero.",
+      "scope": "Stated, not elaborated. Until closed, LB-ISOGENY-GENERIC rests on the written proof plus the unchecked counting core THM-RP-AFFINE-CORE.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-NEGATIVE-OPEN"
+      ],
+      "tags": [
+        "lean",
+        "generic-group",
+        "isogeny",
+        "open-target"
+      ],
+      "source_locations": [
+        "papers/ic-negative-results/lean/OPEN_TARGETS.md, O1"
+      ],
+      "evidence_class": "open",
+      "formal": {
+        "state": "stated_open",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/OPEN_TARGETS.md",
+            "decl": "isogeny_ggm_success_le"
+          }
+        ]
+      }
+    },
+    {
+      "id": "THM-RP-SEMAEV-MONODROMY",
+      "label": "Monodromy of the Semaev cover is (Z/2)^(m-2)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "The splitting group of S_m(t_1,...,t_{m-1},T) over K(t_1,...,t_{m-1}) is (Z/2)^(m-2), acting simply transitively on the 2^(m-2) roots.",
+      "scope": "Paper statement S4, labelled 'derived, unreviewed', with a written derivation and native monodromy experiments (KN-FIND-a8990a, EXP-SMON-e5cbe6). Lean: open target O4 only, judged out of reach of current Mathlib (needs Galois theory of function fields of E^(m-1)). It constrains how a root-finding oracle can split S_m but is not by itself a cost bound.",
+      "assumptions": [
+        "generic t_i (function-field statement)"
+      ],
+      "source_refs": [
+        "S-IC-NEGATIVE",
+        "S-RP-IC-NEGATIVE-OPEN"
+      ],
+      "tags": [
+        "summation-polynomial",
+        "monodromy",
+        "ic-negative"
+      ],
+      "source_locations": [
+        "papers/ic-negative-results statement S4",
+        "lean/OPEN_TARGETS.md, O4"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "stated_open",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/OPEN_TARGETS.md",
+            "decl": "O4 (no declaration name)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "THM-RP-GUARDED-EXACT-PAIR",
+      "label": "Guarded three-abscissa prime-field system: first fall 4, last fall 5 (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For p>3 prime, K=ZMod p, nonsingular y^2=x^3+alpha x+beta, a target abscissa r with an ordinate, three distinct base abscissas a,b,c each with a rational ordinate, and the six generators g(x), g(y), g(z), S3(x,y,u), S3(u,z,r), v(x-y)-1 (g(T)=(T-a)(T-b)(T-c)) having no common solution in K^5: the first fall degree (ordinary homogeneous-top syzygies modulo Koszul syzygies) is exactly 4 and the last fall degree (ordinary filtered-closure convention max(d, deg q)) is exactly 5, both with attainment and minimality.",
+      "scope": "Kernel-checked for exactly this six-input presentation with B=3. The first-fall notion is the ordinary-ring Koszul convention, NOT Nagao's d_F with field equations or the truncated finite-field convention of DEF-FIRST-FALL-DEGREE; the README warns not to identify them. UNSAT of the polynomial system is a hypothesis. Outside scope: growing B, characteristic two, Boolean/Weil-descent encodings, numerical standard-curve fixtures, signed-point group-law equivalence.",
+      "assumptions": [
+        "p > 3 prime",
+        "a,b,c pairwise distinct with rational lifts",
+        "polynomial UNSAT (no K-solution)"
+      ],
+      "source_refs": [
+        "S-RP-GUARDED-EXACT-PAIR-LEAN",
+        "S-RP-GUARDED-FALL-DEGREE"
+      ],
+      "tags": [
+        "lean",
+        "fall-degree",
+        "last-fall-degree",
+        "summation-polynomial",
+        "prime-field"
+      ],
+      "source_locations": [
+        "research/guarded_fall_degree_20261028/formal/complete-exact-pair.md, 'Exact statement'"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/guarded_fall_degree_20261028/formal/GuardedExactPair.lean",
+            "decl": "GuardedExactPair.exact_pair_prime"
+          },
+          {
+            "path": "research/guarded_fall_degree_20261028/formal/WeightedFirstFall.lean",
+            "decl": "WeightedFirstFall.exact_first_four"
+          },
+          {
+            "path": "research/guarded_fall_degree_20261028/formal/GuardedLastFall.lean",
+            "decl": "GuardedLastFall.exact_last_five"
+          }
+        ],
+        "notes": "Receipts: formal/complete-exact-pair-validation/verification.json (lake build exit 0, 1690 jobs; tools/lean/AuditAxioms.lean over 13 modules, 231 theorems, 0 failing, 0 trusted; 13 leanchecker --fresh exits 0)."
+      },
+      "cited_by": [
+        {
+          "path": "research/guarded_fall_degree_20261028/README.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "THM-RP-GUARDED-GROWING-B",
+      "label": "Explicit-membership presentation: first fall B+1, last fall in [max(5,B+1), 3B-4]",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For the same guarded presentation with a factor base of B>=3 abscissas (membership polynomial of degree B), every unsatisfiable instance has ordinary first fall B+1 and last fall d_F with max(5,B+1) <= d_F <= 3B-4 (short Weierstrass, char > 3); the ordinary binary analogue has first fall B+1 and B+1 <= d_F <= 3B-4 for B>=4, with exact pair (4,5) at B=3 except the cube-orbit case g=T^3+c (pair (4,4)), which needs even extension degree.",
+      "scope": "Written proofs (growing_b/proof.txt, binary_bridge.txt, characteristic_two/extension_proof.txt) with native replays; no Lean beyond B=3. The degree grows linearly with the factor-base size in this explicit-membership presentation, so it gives no bounded-degree route for a growing base; it says nothing about Weil-descent or tower (PKM) presentations.",
+      "assumptions": [
+        "polynomial UNSAT",
+        "rational-lift hypotheses on base abscissas"
+      ],
+      "source_refs": [
+        "S-RP-GUARDED-FALL-DEGREE"
+      ],
+      "tags": [
+        "fall-degree",
+        "factor-base",
+        "prime-field",
+        "binary"
+      ],
+      "source_locations": [
+        "research/guarded_fall_degree_20261028/README.md, derived first/last fall table",
+        "extensions/growing_b/proof.txt"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "none",
+        "artifacts": [
+          {
+            "path": "research/guarded_fall_degree_20261028/extensions/growing_b/proof.txt"
+          }
+        ],
+        "notes": "Written derivation only; Lean covers B=3 (THM-RP-GUARDED-EXACT-PAIR)."
+      }
+    },
+    {
+      "id": "THM-RP-BOOLEAN-CHAIN-UPPER",
+      "label": "Fully Boolean two-S3 chain: d_F <= 3*ell+1, independent of n",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For the binary one-auxiliary two-S3 chain with x,y,z each encoded by a linear ell-bit map into GF(2^n), the shared u (and optional guard v) by n bits each, and every bit equation b^2+b included, every unsatisfiable instance has last-fall-type degree d_F <= 3*ell+1 (ell>=1), with or without the inverse guard. A separate prime-field Boolean-constrained lookup presentation gives d_F <= 3*ell+2 for normalized inputs (max(3*ell+2, d_raw) for raw inputs).",
+      "scope": "Written proof by staged assignment indicators; the degree bound is independent of n but the proof (and any derivation reaching it) may have exponential size, so it is not a polynomial-cost bound. Upper bound only: no first-fall equality and no growing lower bound. Applying it to the E12 encodings needs an encoding audit. Not in Lean (the prime bit-restricted Lean module PrimeBitLocal checks only eight local identities).",
+      "assumptions": [
+        "exact encoding as specified, including all field equations",
+        "polynomial UNSAT"
+      ],
+      "source_refs": [
+        "S-RP-GUARDED-FALL-DEGREE"
+      ],
+      "tags": [
+        "fall-degree",
+        "binary",
+        "weil-descent",
+        "upper-bound"
+      ],
+      "source_locations": [
+        "research/guarded_fall_degree_20261028/extensions/characteristic_two/boolean_upper_bound.txt",
+        "extensions/large_curves/prime_bit_restricted_upper.txt"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "none",
+        "artifacts": [
+          {
+            "path": "research/guarded_fall_degree_20261028/extensions/characteristic_two/boolean_upper_bound.txt"
+          }
+        ]
+      }
+    },
+    {
+      "id": "THM-RP-SECANT-DEGREE-REDUCTION",
+      "label": "Split-graph secant presentation: top-ideal first vanishing d+1 vs dense 2d+1 (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For a field K with 2 != 0, d>=2, a,b != 0 and graph lower terms of degree < d, the canonical highest-total-degree ideal of the three-variable secant presentation has first vanishing homogeneous degree d+1, while the dense two-summand presentation (actual short-Weierstrass S3 plus degree-2d membership polynomials) has 2d+1 (canonical_strict_reduction). The exact F17 graph base drops from 5 to 3 for every target and all four sign branches (degree_five_to_three). The dense exclusion (THEORY.md) shows d_reg = Bv+1 for the dense m=2 presentation regardless of the base set.",
+      "scope": "This is the first-vanishing degree of the ideal generated by the highest-degree forms (a homogeneous quotient invariant), explicitly 'not a universal definition of affine Groebner solving degree'. The two presentations have different variable counts. No solving-degree, yield, rank or time claim; literature novelty unconfirmed.",
+      "assumptions": [
+        "2 != 0 in K",
+        "complete squarefree rational splitting for the relation interpretation (written, not Lean)"
+      ],
+      "source_refs": [
+        "S-RP-PRIME-FB-DEGREE"
+      ],
+      "tags": [
+        "lean",
+        "factor-base",
+        "degree-of-regularity",
+        "prime-field"
+      ],
+      "source_locations": [
+        "research/prime_factor_base_degree_20261031/proof/FORMALIZATION.md, proof map",
+        "THEORY.md"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/prime_factor_base_degree_20261031/proof/DegreeBridge.lean",
+            "decl": "DegreeBridge.canonical_strict_reduction"
+          },
+          {
+            "path": "research/prime_factor_base_degree_20261031/proof/CanonicalFixture.lean",
+            "decl": "CanonicalFixture.degree_five_to_three"
+          }
+        ],
+        "notes": "proof/verification/axioms.log: repository auditor, 121 declarations, zero failures, zero trusted native."
+      }
+    },
+    {
+      "id": "THM-RP-RECODED-SELECTOR-DEGREE",
+      "label": "Selector recodings of one F17 base: canonical degree 7 -> 6 (XOR) -> 5 (one-hot)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For the F17 curve y^2=x^3+2x+2 with factor base FB1h29cc024e755c (8 columns, 16 signed points), the canonical top ideal of the seven-variable XOR-recoded presentation vanishes from degree 6 and of the nine-variable bounded one-hot presentation from degree 5 (RecodedTop.vanishes, SupportOneHot.vanishes), against 7 for linear labels and 9 for the same-base dense control.",
+      "scope": "Exact first-vanishing degrees of canonical highest-form ideals, not affine F4 degrees or timings. The ambient monomial count through the vanishing degree is larger for the degree-5 arm (2002) than the degree-6 arm (1716), so lower degree is not lower matrix size; no cost claim.",
+      "assumptions": [
+        "fixed F17 fixture; order-19/cofactor-1 metadata inherited, not reproved"
+      ],
+      "source_refs": [
+        "S-RP-PRIME-FB-FOUR-TRACKS"
+      ],
+      "tags": [
+        "lean",
+        "factor-base",
+        "prime-field",
+        "toy"
+      ],
+      "source_locations": [
+        "four_tracks_20261101/README.md, matched presentation dashboard"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/prime_factor_base_degree_20261031/four_tracks_20261101/RecodedTop.lean",
+            "decl": "RecodedTop.vanishes"
+          },
+          {
+            "path": "research/prime_factor_base_degree_20261031/four_tracks_20261101/SupportOneHot.lean",
+            "decl": "SupportOneHot.vanishes"
+          }
+        ],
+        "notes": "verification/README.md: verify.sh exit 0, 372 declarations in 28 modules, zero failures, zero trusted/native; no separate lean4checker pass."
+      }
+    },
+    {
+      "id": "THM-RP-SCALAR-TRANSPORT",
+      "label": "Scalar transport and answer reflection under an injective homomorphism (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For phi : A -> B preserving 0 and +, phi(n.p) = n.phi(p) for the recursive natural multiple (mapNatMul); if phi is also injective then n.phi(p) = phi(q) iff n.p = q (answersReflected).",
+      "scope": "Algebraic core of the isogeny-class rho study's transport claim only. Does not construct an elliptic curve, isogeny, kernel or degree; does not prove equality of rho operation distributions, which needs coupled encodings and randomness (open per PROOF-MAP).",
+      "assumptions": [
+        "phi additive and injective on the transported subgroup"
+      ],
+      "source_refs": [
+        "S-RP-ISOGENY-CLASS-RHO"
+      ],
+      "tags": [
+        "lean",
+        "isogeny",
+        "transport"
+      ],
+      "source_locations": [
+        "papers/isogeny-class-rho/PROOF-MAP.md, rows 'Scalar transport', 'Answer reflection'"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "papers/isogeny-class-rho/lean/ScalarTransport.lean",
+            "decl": "ScalarTransport.answersReflected"
+          },
+          {
+            "path": "papers/isogeny-class-rho/lean/ScalarTransport.lean",
+            "decl": "ScalarTransport.mapNatMul"
+          }
+        ],
+        "notes": "PROOF-MAP.md records lake build success (2900 jobs), #print axioms (propext at most) and builtin leanchecker replay; not the tools/lean gate receipt and not lean4checker --fresh."
+      }
+    },
+    {
+      "id": "CEX-RP-JKSST-LANG-QUADRATICITY",
+      "label": "Quadraticity of height alone gives no uniform Lang constant (Lean countermodel)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "There is no C>0 such that for every scale>0 and every nonzero integer z, C <= scale*z^2 (no_uniform_lower_bound_from_quadraticity): a family of scaled rank-one quadratic height lattices has no uniform positive minimum, so a Lang-type lower bound cannot be derived from quadraticity of the canonical height.",
+      "scope": "Countermodel on scaled lattices, not on actual elliptic curves; it does not refute Lang's conjecture and the project explicitly does not call Lang proved or disproved. It shows JKSST Lemma 4.1 needs Lang (or a direct height gap) as an independent hypothesis.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README",
+        "S-JKSST-LEAN-AUDIT-2026"
+      ],
+      "tags": [
+        "lean",
+        "xedni",
+        "height",
+        "counterexample"
+      ],
+      "source_locations": [
+        "research/jksst_xedni_audit_20261101/PROOF_MAP.md, row 'Quadraticity alone gives no Lang constant'",
+        "JKSST 2000, Lemma 4.1"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTLang.lean",
+            "decl": "JKSSTLang.no_uniform_lower_bound_from_quadraticity"
+          }
+        ],
+        "notes": "README status 'kernel-checked scoped audit'; no committed gate receipt in the study directory. Integrator 2026-11-02: downgraded from kernel_checked because no gate or audit receipt is committed in the tree; re-promote when one is."
+      }
+    },
+    {
+      "id": "CEX-RP-JKSST-MODEL-DISCRIMINANT",
+      "label": "No all-multiples height bound by a fixed model discriminant; model log-discriminant unbounded under rescaling",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For a Mathlib Weierstrass curve with a supplied nontorsion rational point P, there is no C1>0 with C1*hhat(nP) <= log|Delta(W)| for all n (no_uniform_bound_by_actual_model_discriminant); and the log absolute discriminant of a short model is unbounded under rescaling (scaled_logAbs_discriminant_unbounded).",
+      "scope": "Counterexample schema conditional on a nontorsion point being supplied (no concrete positive-rank curve exhibited); it is not a selected-lift theorem. It shows the height/discriminant comparison in JKSST must be stated for the selected lift and minimal discriminant, which is an open bridge.",
+      "assumptions": [
+        "a nontorsion rational point exists (hypothesis)"
+      ],
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README",
+        "S-JKSST-LEAN-AUDIT-2026"
+      ],
+      "tags": [
+        "lean",
+        "xedni",
+        "height",
+        "counterexample"
+      ],
+      "source_locations": [
+        "PROOF_MAP.md rows 'No all-multiples bound by fixed actual model discriminant' and 'Model-discriminant log is unbounded under rescaling'"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTActualHeightCounterexample.lean",
+            "decl": "JKSSTActualHeightCounterexample.no_uniform_bound_by_actual_model_discriminant"
+          },
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTModelDiscriminant.lean",
+            "decl": "JKSSTModelDiscriminant.scaled_logAbs_discriminant_unbounded"
+          }
+        ],
+        "notes": "Integrator 2026-11-02: downgraded from kernel_checked because no gate or audit receipt is committed in the tree; re-promote when one is."
+      }
+    },
+    {
+      "id": "CEX-RP-JKSST-ASYMPTOTIC-COUNTING",
+      "label": "Asymptotic remainders and coarse lattice data do not give finite counting bounds",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "There exist f, main, error with f - main = O(error) at infinity and main(n) < f(n) for every n (bigO_remainder_does_not_imply_main_upper_bound), so deleting an asymptotic error term does not yield a finite upper bound; and two lattices with the same minimum have different radius-one point counts, in sup norm and in Euclidean norm (same_minimum_different_radius_one_count, same_euclidean_minimum_different_radius_one_count).",
+      "scope": "Refutes two overbroad inference steps in a literal reading of the JKSST counting argument; it does not refute JKSST's conditional theorem, which the audit repairs separately (finite packing with visible fibre multiplicity is in THEOREM-XEDNI-FINITE-CORE).",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README",
+        "S-JKSST-LEAN-AUDIT-2026"
+      ],
+      "tags": [
+        "lean",
+        "xedni",
+        "counting",
+        "counterexample"
+      ],
+      "source_locations": [
+        "PROOF_MAP.md rows 'Coarse lattice data do not determine exact ... count' and 'Deleting an asymptotic error does not give a finite upper bound'"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTAsymptotic.lean",
+            "decl": "JKSSTAsymptotic.bigO_remainder_does_not_imply_main_upper_bound"
+          },
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTCountNonDeterminacy.lean",
+            "decl": "JKSSTCountNonDeterminacy.same_minimum_different_radius_one_count"
+          },
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTCountNonDeterminacy.lean",
+            "decl": "JKSSTCountNonDeterminacy.same_euclidean_minimum_different_radius_one_count"
+          }
+        ],
+        "notes": "Integrator 2026-11-02: downgraded from kernel_checked because no gate or audit receipt is committed in the tree; re-promote when one is."
+      }
+    },
+    {
+      "id": "CEX-RP-JKSST-PROBABILITY",
+      "label": "Finite-field relation probability: composite modulus, fixed probability not O(1/p), usefulness not automatic",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "In ZMod 4 the relation event has probability exactly 1/2, not 1/q (relation_probability_is_one_half); a fixed positive success probability is not O(1/p) as p -> infinity (fixed_positive_probability_not_bigO_inverse_nat); and at the zero sample no relation is useful for extracting the logarithm (no_useful_reduction_at_zero_sample), so the 'useful relation' step needs its own selection certificate.",
+      "scope": "Each refutes a literal or overbroad reading of JKSST's final finite-field step ('approximately (2*C2)^r/p'); the exact individual-event probability (q-1)/q^2 for prime q and the union upper bound are proved separately (THEOREM-XEDNI-FINITE-CORE). q is the subgroup order; replacing it by p needs the Hasse/cofactor bridge.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README",
+        "S-JKSST-LEAN-AUDIT-2026"
+      ],
+      "tags": [
+        "lean",
+        "xedni",
+        "probability",
+        "counterexample"
+      ],
+      "source_locations": [
+        "PROOF_MAP.md rows 'Composite coefficient need not give 1/q', 'Fixed positive probability is not O(1/p)', 'Usefulness is not automatic'"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTCompositeModulus.lean",
+            "decl": "JKSSTCompositeModulus.relation_probability_is_one_half"
+          },
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTProbability.lean",
+            "decl": "JKSSTProbability.fixed_positive_probability_not_bigO_inverse_nat"
+          },
+          {
+            "path": "research/jksst_xedni_audit_20261101/lean/JKSSTSuccessComposition.lean",
+            "decl": "JKSSTSuccessComposition.no_useful_reduction_at_zero_sample"
+          }
+        ],
+        "notes": "Integrator 2026-11-02: downgraded from kernel_checked because no gate or audit receipt is committed in the tree; re-promote when one is."
+      }
+    },
+    {
+      "id": "THM-RP-TWIST-MIXED-RELATION",
+      "label": "A rational relation with a Frobenius-negated (twist) term forces that term to vanish on odd order (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "In an additive group with an involutive endomorphism (Frobenius), if A is fixed, B is negated and A+B is fixed then 2B=0, and with an odd annihilator B=0 (mixed_relation_odd); on an actual Mathlib elliptic point group over a finite field extension, a rational relation with a Frobenius-negated B forces B=0 and the two lifted rational points coincide (rational_relation_has_zero_twist_term). Finite groups of coprime orders admit no nonzero homomorphic transport (finite_hom_coprime).",
+      "scope": "Formalizes why quadratic-twist points cannot contribute to a relation in an odd prime-order subgroup of E(F_q) through the plus/minus eigenspace split. Does not cover pairing transfers, non-rational correspondences, or a probability/cost model for twist-assisted collection.",
+      "assumptions": [
+        "odd annihilator (odd prime subgroup order)",
+        "finite base field, Weierstrass model"
+      ],
+      "source_refs": [
+        "S-RP-TWIST-LEAN"
+      ],
+      "tags": [
+        "lean",
+        "quadratic-twist",
+        "frobenius",
+        "obstruction"
+      ],
+      "source_locations": [
+        "research/quadratic_twist_evidence_20261021/lean/README.md, TwistProof and FrobeniusBridge tables"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/quadratic_twist_evidence_20261021/lean/TwistProof.lean",
+            "decl": "TwistProof.mixed_relation_odd"
+          },
+          {
+            "path": "research/quadratic_twist_evidence_20261021/lean/FrobeniusBridge.lean",
+            "decl": "FrobeniusBridge.rational_relation_has_zero_twist_term"
+          },
+          {
+            "path": "research/quadratic_twist_evidence_20261021/lean/TwistProof.lean",
+            "decl": "TwistProof.finite_hom_coprime"
+          }
+        ],
+        "notes": "lean/README.md: repository proof gate receipt, 106 named research theorems, 127 audited declarations, zero trusted native."
+      }
+    },
+    {
+      "id": "THM-RP-KEYED-INVARIANCE",
+      "label": "Keyed-generic transcript invariance under injective operation-preserving maps (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "generic_group",
+      "statement": "In a keyed-generic model where an algorithm sees elements only through add, neg, handle equality and a per-element key, two carriers joined by an injective map preserving add, neg and key produce identical transcripts: every equality answer and key read, the operation count and the answer (exec_map, exec_map_seen_cost). Corollary run_transported_key: a keyed algorithm on E from transported handles is the same algorithm on Z/r with E's key pulled back along k -> [k]G.",
+      "scope": "Lean core proof about an abstract machine model. Not proved: that the Rust residual collector touches elements only through those four operations (checked by reading code), any bound on success probability (the key is not a random encoding, so Shoup's bound does not follow), or anything about coordinate predicates beyond the key.",
+      "assumptions": [
+        "algorithm interacts only via add, neg, equality, key"
+      ],
+      "source_refs": [
+        "S-RP-PLANNER"
+      ],
+      "tags": [
+        "lean",
+        "generic-group",
+        "keyed-model"
+      ],
+      "source_locations": [
+        "research/ic_planner_exhaustive_20261026/lean/README.md, KeyedInvariance row"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/ic_planner_exhaustive_20261026/lean/KeyedInvariance.lean",
+            "decl": "KeyedInvariance.exec_map"
+          },
+          {
+            "path": "research/ic_planner_exhaustive_20261026/lean/KeyedInvariance.lean",
+            "decl": "KeyedInvariance.run_transported_key"
+          }
+        ],
+        "notes": "README: no sorry/admit/native_decide/custom axiom; leanchecker --fresh passes on all three modules; print-axioms.log is a manifest-listed artifact (lean/.artifacts.json), not in the tree."
+      }
+    },
+    {
+      "id": "THM-RP-BAND-AFFINE",
+      "label": "Priced cost is affine in the native-work weight; band reversals force an interior crossing (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "With an arm's priced cost c + w*n (charged plus weight times native work), the order of two arms at weight p/q is decided by an integer inequality (order_at); a reversal between w=0 and w=1 forces a crossing weight strictly inside (0,1) with fixed strict orders on either side (crossing, sides); and as the weight rises the optimal arm can only move to one with no more native work (optimal_native_nonincreasing). Certificates.lean closes 2428 band verdicts by decide.",
+      "scope": "Formalizes the AGENTS.md section 5a band rule (rank two arms only where the order holds at 0, 0.1 and 1 GAE) as integer arithmetic over committed exact sums. Bootstrap intervals and ecbench's arithmetic are not proved.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-PLANNER"
+      ],
+      "tags": [
+        "lean",
+        "accounting",
+        "band"
+      ],
+      "source_locations": [
+        "research/ic_planner_exhaustive_20261026/lean/README.md, Band row"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/ic_planner_exhaustive_20261026/lean/Band.lean",
+            "decl": "Band.crossing"
+          },
+          {
+            "path": "research/ic_planner_exhaustive_20261026/lean/Band.lean",
+            "decl": "Band.optimal_native_nonincreasing"
+          }
+        ]
+      }
+    },
+    {
+      "id": "THM-RP-FB-BREAK-EVEN",
+      "label": "Break-even of the per-relation cost model at m=4, n=131 (Lean instances)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For cost_omega(ell, D) = C(4*ell, D)^omega * 2^(131-4*ell): at degree slope 1 (the measured m=4 fit) and slope 1/2, every step up in ell in [8,32] raises the cost for omega in {2,3}; at slope 0 every step lowers it; at slope 1/4 a step lowers it at omega=2 and raises it at omega=3. Under the measured slopes the optimum is the smallest base; an interior optimum needs slope <~ 1/4.",
+      "scope": "Kernel-decided instances of a model, not statements about real systems; the relevance to ECC2K-130 depends on the measured slope (GAP-BINARY-M4-DEGREE) and on the cost model itself.",
+      "assumptions": [
+        "cost model C(m*ell,D)^omega * 2^(n-m*ell) per relation"
+      ],
+      "source_refs": [
+        "S-RP-FACTOR-BASE-DESIGNS"
+      ],
+      "tags": [
+        "lean",
+        "factor-base",
+        "koblitz",
+        "cost-model"
+      ],
+      "source_locations": [
+        "research/factor_base_designs_20261015/README.md section 1"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/BreakEven.lean",
+            "decl": "FactorBaseDesigns.BreakEven.slope_one_loses"
+          },
+          {
+            "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/BreakEven.lean",
+            "decl": "FactorBaseDesigns.BreakEven.slope_quarter_straddles"
+          }
+        ]
+      }
+    },
+    {
+      "id": "THM-RP-KOBLITZ-CYCLIC-WINDOW",
+      "label": "Cyclic-cover window for the n=131 trace-zero factor: genus >= 394 (conditional), modular carrier genus 378,708,949",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "Numeric implication (cyclic_window_numeric): if g = 131(b-1)+1+65R (Riemann-Hurwitz), 130d <= g-b (spectral), d in {1,2} or d>=5, and b<=3, d<=2 force R>=65 (branch), then g >= 394. Separately, the signed-character modular carrier for A_131(E_0) (character mod 787, level 30,349,081) has carrier genus 378,708,949, 25.57% below the historical 508,799,809.",
+      "scope": "The Lean file proves only the integer implication; the Riemann-Hurwitz, spectral and branch hypotheses (curves, Jacobians, class field theory) are not formalized. The genus figures are native computations within the scanned family (prime moduli <= 10,000). Neither is an executable IC improvement.",
+      "assumptions": [
+        "RH, spectral and branch hypotheses as stated"
+      ],
+      "source_refs": [
+        "S-RP-KOBLITZ-MODULAR"
+      ],
+      "tags": [
+        "lean",
+        "koblitz",
+        "cover",
+        "genus",
+        "ecc2k130"
+      ],
+      "source_locations": [
+        "research/koblitz_modular_ic_20261018/REPORT.md sections 1-2",
+        "CyclicWindow.lean"
+      ],
+      "evidence_class": "conditional_theorem",
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          {
+            "path": "research/koblitz_modular_ic_20261018/CyclicWindow.lean",
+            "decl": "cyclic_window_numeric"
+          }
+        ],
+        "notes": "VALIDATION.md: 'Conditional Lean theorem PASS; propext, Classical.choice, Quot.sound only' (cited lean-check.log not present in the tree). Integrator 2026-11-02: downgraded from kernel_checked because no gate or audit receipt is committed in the tree; re-promote when one is."
+      }
+    },
+    {
+      "id": "GAP-RP-COMMON-KERNEL",
+      "label": "Common-kernel construction for a prime-field correlated-packet route",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "Construct a single deformation with compatible two-axis local factorizations giving sufficiently few modes at every valuation level, preserving the actual jets and paying all recursive entry, degree, padding and precision costs; this is the missing ingredient of the repository's candidate sub-exponential prime-field route.",
+      "scope": "Problem record problems/correlated-packet-common-kernel.md; 'an essentially new sub-exponential prime-field ECDLP algorithm remains unproved'. No speed measurement or general contraction algorithm exists.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-COMMON-KERNEL"
+      ],
+      "tags": [
+        "prime-field",
+        "open-target",
+        "tensor"
+      ],
+      "source_locations": [
+        "research/prime_common_kernel_20261030/README.md, opening section"
+      ],
+      "evidence_class": "open",
+      "formal": {
+        "state": "none",
+        "artifacts": [
+          {
+            "path": "problems/correlated-packet-common-kernel.md"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CEX-RP-COMMON-KERNEL-WITNESSES",
+      "label": "Boolean kernel not multiplicative under gauge; exterior/code witness has a nonzero passive-axis coefficient (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For W=[[1,1],[0,1]], V=[[1,0],[1,1]] the Boolean interpolation kernel satisfies (K(W)K(V))[11,11]=4 but K(WV)[11,11]=6, so K is not multiplicative (kernel_not_multiplicative); on the explicit degree-8 rational source grid the global-even-parity code positions (0,0) and (2,1) have a nonzero one-axis chart product coefficient -200/9 (passive_product_nonzero).",
+      "scope": "Finite exact witnesses only. They close two specific disappearance arguments for the common-kernel construction; the general gauge, determinantal-ideal, exterior-lift and mode-count analyses are written and unformalized, and no ECDLP or runtime theorem is proved.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-COMMON-KERNEL"
+      ],
+      "tags": [
+        "lean",
+        "counterexample",
+        "prime-field",
+        "tensor"
+      ],
+      "source_locations": [
+        "lean-gauges/PROOF_MAP.md",
+        "lean-exterior/PROOF_MAP.md"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/prime_common_kernel_20261030/lean-gauges/GaugeCounterexample.lean",
+            "decl": "GaugeCounterexample.kernel_not_multiplicative"
+          },
+          {
+            "path": "research/prime_common_kernel_20261030/lean-exterior/ExteriorWitness.lean",
+            "decl": "ExteriorWitness.passive_product_nonzero"
+          }
+        ],
+        "notes": "lean-gauges/VERIFICATION.json status PASS; lean-exterior PROOF_MAP: build, axiom audit, pinned proof gate and fresh leanchecker exited 0."
+      }
+    },
+    {
+      "id": "THM-RP-FF-HANDBOOK",
+      "label": "Finite-field handbook facts (cyclic multiplicative group, Frobenius, trace/norm surjectivity) in Lean",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For a finite field K and finite extension L: K^x is cyclic (multiplicative_group_cyclic), a^|K| = a (power_card), Frobenius is additive (frobenius_add), and the trace and norm L -> K are surjective (trace_surjective, norm_surjective), with the trace pairing nondegenerate.",
+      "scope": "Kernel-checked wrappers of Mathlib facts. They are the bridges the factor-base register names but does not import (K7 needs F_{2^n}^* cyclic) and the trace facts behind trace-zero bases; the handbook is not yet imported by those projects, so the bridges remain unconnected in Lean.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-FF-HANDBOOK"
+      ],
+      "tags": [
+        "lean",
+        "finite-field",
+        "background"
+      ],
+      "source_locations": [
+        "knowledge/finite-fields/lean/FiniteFieldHandbook.lean"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "knowledge/finite-fields/lean/FiniteFieldHandbook.lean",
+            "decl": "FiniteFieldHandbook.multiplicative_group_cyclic"
+          },
+          {
+            "path": "knowledge/finite-fields/lean/FiniteFieldHandbook.lean",
+            "decl": "FiniteFieldHandbook.trace_surjective"
+          }
+        ],
+        "notes": "receipts/audit.log: 58 theorems audited, 0 failing, 0 trusted (native_decide)."
+      }
+    },
+    {
+      "id": "MEAS-RP-IC-BOUNDARY-ROUND1",
+      "label": "IC boundary ledger: no variant below rho at r >= 2^20; fitted exponents >= 0.54",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On the frozen 2026-09-21 run (prime 2^10-2^24, random binary n=15-27, Koblitz n=11-41), no index-calculus variant is below the same-process Pollard rho reference on any instance with r >= 2^20 (closest: prime meet-in-the-middle m=3 at 14.5x rho, r=2^23.4); every fitted total exponent is >= 0.54 against rho's 0.25-0.30 here (0.5 in the limit); measured yield/ceiling (relations per trial over C(F+m-1,m)/#E) is 0.75-1.25 and never exceeds one on a base not confined to a proper subgroup.",
+      "scope": "Counted operations per sqrt(r) (S unit), every phase charged, toy and medium sizes only; a measured upper bound on these implementations, not a lower bound on index calculus. The algebraic S4 pairs-and-solve oracle is a relabelling of the table (same trials and yield).",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ],
+      "tags": [
+        "measurement",
+        "index-calculus",
+        "boundary"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "RESEARCH_IC_BOUNDARY_LEDGER.md sections 2-4, 3.1-3.5"
+      ],
+      "cited_by": [
+        {
+          "path": "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md",
+          "use": "measures"
+        }
+      ]
+    },
+    {
+      "id": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "label": "Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "For every two-summand pipeline with a pair table (F^2/(4t) additions) and relations needing about K/2 = F/(4k) edges before a cycle closes, each costing #E/(c-weighted) targets at the counting ceiling p = F^2/(2#E), the cost ops(F) = F^2/(4t) + c#E/(2kF) is minimized at S_family ~ 0.75 r^(1/6) on a prime-order curve; since rho's S is constant (1.25 at A=1, 0.886 at A=2) the two cross only near r ~ 22 and the gap widens as r^(1/6) (extrapolated 153x at 2^48, 6.4e7x at 2^160).",
+      "scope": "Derived law with the ledger's ladder converging to it; the table of ratios at large r is an extrapolation, not a measurement. It rests on the random-graph cycle heuristic for elimination and on the counting-ceiling yield; it covers only the pair-table two-summand family (table fold t, column fold k), not m>=3 algebraic oracles.",
+      "assumptions": [
+        "relations behave like random graph edges (cycle at ~K/2)",
+        "yield at the counting ceiling"
+      ],
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ],
+      "tags": [
+        "index-calculus",
+        "family-law",
+        "prime-field",
+        "koblitz"
+      ],
+      "source_locations": [
+        "RESEARCH_IC_BOUNDARY_LEDGER.md sections 11.2-11.3"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "formula": "ops(F) = F^2/(4t) + c #E/(2kF);  S_family ~ 0.75 r^(1/6)"
+    },
+    {
+      "id": "MEAS-RP-BOUNDARY-TARGETS-PRIME",
+      "label": "Prime-field IC slower than rho at all measured sizes (boundary targets)",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "docs/ic/boundary_targets.json records prime vs_rho status 'not_achieved': IC slower than rho at all measured sizes, dense 3-sum wall about 80 bits; binary vs_rho: no charged binary crossover on record. The first Semaev-S4 3-decomposition family on a P-256-shaped 16-bit prime curve measured 1.0 trials per relation but 3.3 s per relation from the B^2/2 quartic sweep, so 2-decomposition stays faster at these sizes.",
+      "scope": "Repository ledger of best records per regime and stage; claims are bounded by the file's claim_hygiene (public synthetic fixtures, one-target online pairing for primary vs_rho rows).",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-BOUNDARY-TARGETS"
+      ],
+      "tags": [
+        "measurement",
+        "prime-field",
+        "binary",
+        "boundary"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "docs/ic/boundary_targets.json regimes.prime.records.vs_rho, .decomposition; regimes.binary.records.vs_rho"
+      ],
+      "cited_by": [
+        {
+          "path": "docs/ic/boundary_targets.json",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-RP-KOBLITZ-N61-ONLINE",
+      "label": "Koblitz n=61 compact-orbit IC: online 37.13x vs strong rho on the same point, cold about 90x slower",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On the a=0, n=61 Koblitz rung (log2 r = 47.21), compact-orbit IC at K=800 beats strong rho rung 3 on the identical public point over 64 one-target workloads: median online speedup 37.13x (95% CI 21.44-58.54, range 0.59-1421.69) on an unpinned arm64 host; 13.94x (CI 9.81-19.13) on a taskset-pinned x86 host at an earlier K; median cold ratio (whole process including reusable IC preparation) 90.6 and 83.4 respectively, i.e. IC slower than rho cold. An n=71 rung reads 6.12x online (pending independent validation).",
+      "scope": "Constant-factor online win only after excluding reusable IC preparation (the online interval starts at the first operation on the public point); no asymptotic sub-rho claim, no key recovery, public synthetic fixtures, toy 47-bit subgroup. It is an advice/preprocessing tradeoff and must be read against the generic preprocessing lines (MEAS-RP-COMPACT-ORBIT-PREPROCESSING).",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-BOUNDARY-TARGETS"
+      ],
+      "tags": [
+        "measurement",
+        "koblitz",
+        "online",
+        "preprocessing"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "docs/ic/boundary_targets.json regimes.koblitz.records.vs_rho"
+      ],
+      "cited_by": [
+        {
+          "path": "docs/ic/boundary_targets.json",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-RP-COMPACT-ORBIT-PREPROCESSING",
+      "label": "Compact-orbit Koblitz IC sits on or above S*T^2 >~ r/|Aut| at every rung",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On seven compact-orbit rungs n in {37,41,53,61,71,73,83} (table S = K^2 n entries, T in probes), every measured row has log2(S T^2) - log2(r/A) >= 7.1 (frozen targets 7.1-25.4; rank stage plus target 16.8-45.8); at the rank-stage mean S T/(r/A) lies in [1.053, 2.734]; single frozen targets fall below the non-adaptive line S T ~ r/A at n37, n41, n53, n71, n73. Across 208 configurations none has measured cost below its bound.",
+      "scope": "Recorded comparison (paper statement S1) against the Bernstein-Lange/CGK adaptive line and the DKM25 non-adaptive line, with r divided by |Aut| by the audit's own convention (not a theorem of the cited papers); T counted in probes, not group operations; the configuration is not proved to be a generic algorithm (structured generic bound vacuous); n71/n73 frozen targets are improbably cheap draws (P ~ 0.006-0.007).",
+      "assumptions": [],
+      "source_refs": [
+        "S-IC-NEGATIVE"
+      ],
+      "tags": [
+        "measurement",
+        "koblitz",
+        "preprocessing",
+        "generic-group"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "papers/ic-negative-results/ic_negative_results.tex, Proposition S1 and Table s1"
+      ],
+      "cited_by": [
+        {
+          "path": "papers/ic-negative-results/ic_negative_results.tex",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-RP-JV-WEAK-CLASS",
+      "label": "Joux-Vitse cover-and-decomposition on the weak F_{p^6} class: S/rho ~ n^-0.32, sieve crossover near 2^49-2^50",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On the weak class y^2 = h(x)(x-alpha)(x-sigma(alpha)) over F_{p^6} (genus-3 hyperelliptic GHS cover), the Nagao-test route costs C_cov = 5.2e6 F_p-multiplications per test flat in p, S/rho falls as p^(-1.92 +- 0.12) (n^(-0.32)) to 8.1-10.2x at l = 2^57.9, extrapolated parity near 2^67; the measured decomposition rate is the exact count 16 C(|F|,6)/l, not 1/720. The sieving variant crosses rho measured at p ~ 430 (l ~ 2^50), later p ~ 371 (2^49) with the traced descent and p ~ 333 from the 20-prime bands.",
+      "scope": "Reproduction of a published route in the harness ('accounting and engineering, no advance'); weak class only (Theta(1/q) of curves over F_{q^3}, order divisible by 4); every relation verified in the group; extension-field curves, not prime-field or prime-order curves.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-COVER-LEDGER"
+      ],
+      "tags": [
+        "measurement",
+        "cover",
+        "weil-descent",
+        "extension-field"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "RESEARCH_COVER_DECOMPOSITION_LEDGER.md sections 6-7, 11.5, 14.4, 16.1"
+      ],
+      "cited_by": [
+        {
+          "path": "research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md",
+          "use": "measures"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-RP-JV-E2E-NONWEAK",
+      "label": "JV route end to end from non-weak curves: 32/32 verified, S/rho 0.005-0.019 at l = 2^61.4",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "From challenge curves that are not weak, an isogeny walk to the weak locus plus the sieved JV route recovered and verified [d]G = Q on the challenge curve in 32/32 runs; walk, transport and model change are below 0.9% of total (M=8); end-to-end S/rho means 5.7 at p=251 (2^45.8), 0.49-0.65 at p=503 (2^51.8), 0.056-0.100 at p=1009 (2^57.9), 0.010-0.011 at p=1511 (2^61.4).",
+      "scope": "Curves over F_{p^6} in the walkable class (order divisible by 4, walks found a weak curve after a median of 3-16 curves); rho reference is the pooled S = 1.36 measured to 2^45.8; registered E4 (paired ratio) falsified by instance-to-instance spread. Says nothing about prime-field or prime-order extension-field curves.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-COVER-LEDGER"
+      ],
+      "tags": [
+        "measurement",
+        "cover",
+        "isogeny-walk",
+        "extension-field",
+        "sub-rho"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "RESEARCH_COVER_DECOMPOSITION_LEDGER.md section 18.4"
+      ]
+    },
+    {
+      "id": "MEAS-RP-FALL-DEGREE-TOY",
+      "label": "Semaev closure degree bounded at toy size: d_F <= 4 through m=6, N <= 60; one below the semi-regular control",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Measured medians of the closure degree d_F: random-base Semaev m=2 systems read 3 for n=8-16 and 4 at n=18, one below matched plain/planted controls and the semi-regular D_reg (H2a held at n=8-18, gap flat at 1); E3/E4/E6-E10 registered readings: every unsatisfiable Semaev draw has d_F <= 4 at toy sizes ('bounded'), structure-matched controls read >= 5 ('Semaev-specific'), every E7 draw (m=5,6; N=44-54) and E9 draw (N=58,60) has d_F <= 4; m=4,5,6 diagonals m*ell = n are flat.",
+      "scope": "Toy sizes only, no exponent or security claim; d_F here is the degree-truncated closure degree of this study, distinct from Nagao's first fall degree (the report states the result is 'not a statement about the first fall degree assumption'). The Lean theorem re-derives the registered verdicts from the recorded rows, not the degrees themselves; the rule transcription was written after part of the data was seen.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-FALL-DEGREE-BOUNDS"
+      ],
+      "tags": [
+        "measurement",
+        "fall-degree",
+        "binary",
+        "summation-polynomial"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "research/fall_degree_bounds_20261008/RESULTS.md, E2 table and E3-E10 sections"
+      ],
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/fall_degree_bounds_20261008/lean/FallDegree/Verdict.lean",
+            "decl": "FallDegree.registered_scoring"
+          }
+        ],
+        "notes": "Lean checks the scoring of 282 recorded rows by kernel decide; e12/run-b1/out/lean/status and run-b2 exit=0 (lake build). No separate axiom-audit receipt."
+      }
+    },
+    {
+      "id": "MEAS-RP-FALL-DEGREE-M3-DIAGONAL",
+      "label": "m=3 diagonal: d_F censored >= 5 exactly at ell >= 7; (3,24,7) reads 'mixed'",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Along m*ell = n the m=3 diagonal grows (E10: medians 4, then >=5 at (21,7), (24,8), (27,9)); cells 3:30:4, 3:27:5, 3:24:6 at N=42 all read 4,4,4,4, excluding an n-driven reading; the completed (3,24,7) cell reads >=5, 4, >=5, 4, lower median 4, registered reading 'mixed'. Every draw with ell <= 6 at any m and N <= 60 has d_F <= 4.",
+      "scope": "Censored values (>=5 is cap+1, exact degree unknown); E12a and E12c were Spot-interrupted with no reading. Consistent with the HKYY conditional needing growth along n' = n^(2/3); refutes nothing about first-fall degrees (Kousidis-Wiemers' first fall 7 at m=3 is consistent).",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-FALL-DEGREE-BOUNDS"
+      ],
+      "tags": [
+        "measurement",
+        "fall-degree",
+        "binary",
+        "censored"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "research/fall_degree_bounds_20261008/RESULTS.md, E10 reading and 'E12b (Amendment 15)'"
+      ]
+    },
+    {
+      "id": "MEAS-RP-SECANT-F4",
+      "label": "Split-graph secant bases lower the observed stock-F4 degree but raise branch-summed rows vs dense",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On F17, F83, F101, F127 (all finite targets, 14,194 verified systems), the candidate secant presentation's observed handled F4 degree (max of input degree and selected-pair LCM degree) is 3/4/5/6 for graph degree 2/3/4/5, below the matched nongraph secant control (4, 6, 8, 10) and the same-base dense presentation (6, 8, 10, 12). On the F17 toy, the candidate beats the matched secant control on degree, width and pair/row counts but, against its own dense presentation, increases branch-summed pairs (976 vs 344) and reduced rows (2,102 vs 736).",
+      "scope": "Component proxy counts from stock F4, not field-operation totals; cost per usable relation and timing speedup are null; F127 degree-5 has 26 capped/unknown systems. Total ordered yield is fixed by base size (K^2 - K); only its distribution changes.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-PRIME-FB-F4"
+      ],
+      "tags": [
+        "measurement",
+        "factor-base",
+        "prime-field",
+        "groebner"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "research/prime_factor_base_degree_20261031/parallel_20261031/RESULTS.md, 'Observed degree reduction' and 'All-branch work and relation yield'"
+      ]
+    },
+    {
+      "id": "MEAS-RP-TWIST-CENSUS",
+      "label": "Quadratic-twist S3 censuses: zero strict joint useful-rank/degree gains",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Uniform F13 census: 96 arms, 896 source recoveries, 0/210 strict joint mean-rank/lower-degree gains in both input forms; F37 size-two frontier: 2,592 configurations, 19,440 verified original-source recoveries, zero strongest-source joint gains; F37 size-three, caps 0-12: 4,368 profiles, 21,464,352 comparisons, zero strongest-source joint records (the 0-8 result was boundary-limited and resolved by caps 9-12).",
+      "scope": "Repeated small fixtures (eighteen actual points at F37); not a universal no-advantage theorem; actual-state/iid probability and complete-cost bridges remain open; no speed claim.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-TWIST-CENSUS"
+      ],
+      "tags": [
+        "measurement",
+        "quadratic-twist",
+        "toy"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "research/quadratic_twist_evidence_20261021/README.md, entries 2026-10-29 and 2026-10-30"
+      ]
+    },
+    {
+      "id": "MEAS-RP-PLANNER-RETEST",
+      "label": "Planner re-test: Koblitz descent dearer at all six sizes; residual collector wins only as a generic collision search",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "14 new ecbench sessions (4 prime 15.7-36.3 bits, 4 random binary, 6 Koblitz 36.6-47.2 bits; 3,328 verified records): the Koblitz descent routing is dearer than the alternative at all six sizes (K1 held; K2 failed narrowly, pipeline/rho dips from k59 to k61); the residual collector is ranked below the plan across the band from 36 bits but as a generic collision search (keyed-invariance corollary); the prime, binary and Koblitz weight rules W1-W3 failed.",
+      "scope": "Toy sizes; rankings only where the order holds across the 0/0.1/1 GAE band; bootstrap intervals are statistics, not Lean facts.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-PLANNER"
+      ],
+      "tags": [
+        "measurement",
+        "koblitz",
+        "planner"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "research/ic_planner_exhaustive_20261026/README.md, Result table"
+      ]
+    },
+    {
+      "id": "MEAS-RP-CALIBRATION-DRIFT",
+      "label": "Per-run GAE calibration drifted ratios up to 3.7x before pinning",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Before the round-4 fix, per-run re-measurement of native-to-group-addition conversion factors drifted ratios by up to 3.7x and repriced identical work by up to 8%; conversions are now pinned in calibration.json.",
+      "scope": "Measured property of the harness unit, reported in the cryptanalysis synthesis (citing suite/docs/ic/README.md) and the IC boundary ledger Round 4 ('the unit, pinned'); any S row computed with an unpinned factor carries this uncertainty.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH",
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ],
+      "tags": [
+        "measurement",
+        "accounting",
+        "calibration"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "cryptanalysis REPORT-2026-10-06 section 3.9 (A-BASE3)",
+        "RESEARCH_IC_BOUNDARY_LEDGER.md section 12"
+      ]
+    },
+    {
+      "id": "MEAS-RP-DREG-PROXY-MISS",
+      "label": "Two-summand Weil systems: homogeneous D_reg = l+1 while D_solve = 2-4",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "For two-summand Weil-descent systems the homogeneous degree of regularity is exactly l+1 (bilinear block structure) while the measured solving degree is 2-4; the semi-regular prediction misses by 0.5-1.2 degrees on average; a structure-only excess rule D = 2 + [e < -3.5] + [e < -8.5] fits with MAE 0.06 (leave-one-n-out 0.08) for m=2. Separately, FFD is 2 for all m=2 and 3 for all m=3 toy systems while the solving degree diverges.",
+      "scope": "m=2 toy systems in the cryptanalysis pdp-degree-heuristics study, reported in the synthesis; m>=3 degree prediction at scale stays open.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "measurement",
+        "degree-of-regularity",
+        "binary"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "cryptanalysis REPORT-2026-10-06 section 3.3 (A-PDP4, A-PDP5) and section 6 table"
+      ]
+    },
+    {
+      "id": "MEAS-RP-GAUDRY-CUBIC",
+      "label": "Gaudry cubic-extension IC whole method never beats rho at measured sizes",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On E(F_{p^3}) the relation phase grows as n^(1/3) but plain linear algebra as n^0.68, so the whole-method S bottoms near 200x rho and rises after; the double-large-prime variation grows as n^(4/9) with a projected crossover past 2^230.",
+      "scope": "Repository measurement reported in the cryptanalysis synthesis (citing suite/docs/ECDLP_ATTACK_MATRIX.md section 10b and the crypto residual-walks note); the crossover is an extrapolation.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "measurement",
+        "extension-field",
+        "linear-algebra"
+      ],
+      "evidence_class": "measurement",
+      "source_locations": [
+        "cryptanalysis REPORT-2026-10-06 section 5 item 5"
+      ]
+    },
+    {
+      "id": "DEF-RP-EC1-INSTANCE-ID",
+      "label": "EC1 curve identity binds the exact representation (A-SETUP1)",
+      "kind": "definition",
+      "status": "definition",
+      "model": "mathematical",
+      "statement": "An instance is identified by the SHA-256 of the canonical {field, curve} record (sorted-key compact JSON), excluding the ID and run data; it binds field representation, defining modulus, Weierstrass model, subgroup order r, cofactor, generator and encoding before anything is timed.",
+      "scope": "A bookkeeping definition that makes measured rows comparable; it carries no hardness content.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "definition",
+        "instance"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.1, A-SETUP1"
+      ],
+      "evidence_class": "definition"
+    },
+    {
+      "id": "THM-RP-SUBSPACE-PRODUCT-BOUND",
+      "label": "Field Kneser/Vosper product bound: dim V^(2) >= 2l-1, equality only for progressions (A-FB1)",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "mathematical",
+      "statement": "For prime n and an l-dimensional F_2-subspace V of F_{2^n}, dim V^(2) >= 2l-1 (field Kneser), and below n-1 only geometric progressions c*span{1,g,...,g^(l-1)} attain it (linear Vosper); hence progressions minimize the product profile and the PDP unknown count.",
+      "scope": "Cited, not read here; the factor-base register (K3) notes its kill of 'optimizing index sets' rests on the linear Vosper theorem, which is not formalized in the repository.",
+      "assumptions": [
+        "n prime"
+      ],
+      "source_refs": [
+        "S-RP-IC-LIT-SECONDARY",
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "factor-base",
+        "additive-combinatorics",
+        "binary"
+      ],
+      "source_locations": [
+        "Hou-Leung-Xiang 2002 (field Kneser) and Bachoc-Serra-Zemor 2017 (linear Vosper), as cited in REPORT-2026-10-06 section 3.2 A-FB1"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "HEUR-RP-LIFT-SUBGROUP-HALF",
+      "label": "A random abscissa lifts with probability ~1/2 and lands in <G> with probability ~1/2 (A-FB2)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "A random base abscissa yields a curve point with probability about one half, and a lifted point lies in the prime-order subgroup with probability about one half (cofactor and trace dependent); usable base size B is therefore measured, never inferred from l.",
+      "scope": "Heuristic with toy measurements; receipts record usable, geometric, strict-subgroup and folded counts separately.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "factor-base",
+        "heuristic"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.2, A-FB2"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "THM-RP-AUTOMORPHISM-ORBIT-FOLD",
+      "label": "Automorphism-orbit factor bases: psi(G) = [lambda]G with per-instance checks (A-FB3)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "curve_family_restricted",
+      "statement": "For prime-field curves with extra automorphisms ({+-1}, mu4, mu6), an orbit base with w*m points carries m unknowns, and orbit folding preserves the relation lattice provided psi(G) = [lambda]G is checked on the subgroup point (sign branch fixed) and cofactors are handled.",
+      "scope": "Proved with per-instance checks; an older j=0 module discarded non-representative images and its orbits added size without coverage (measured 8.6x vs 8.7x predicted after the fix).",
+      "assumptions": [
+        "eigenvalue lambda verified on G"
+      ],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "factor-base",
+        "automorphism",
+        "prime-field"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.2, A-FB3"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-RP-TRACE-ZERO-DOUBLING",
+      "label": "Trace-zero bases lie in 2E and double the yield at the same degree (A-FB4)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "curve_family_restricted",
+      "statement": "On y^2+xy=x^3+b every point of the odd-order subgroup is a double, so choosing V inside ker Tr puts the base in 2E and doubles the decomposition yield at the same degree (except near excess zero, where the vacuous trace row costs one degree).",
+      "scope": "Proved in the cryptanalysis pdp-degree-heuristics study (sections 4-5, 8); Kosters-Yeo trace mechanism cited at metadata level.",
+      "assumptions": [
+        "binary curve with a2 = 0 form y^2+xy=x^3+b"
+      ],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "factor-base",
+        "binary",
+        "trace-zero"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.2, A-FB4"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-RP-WEIL-LIFT-SOUNDNESS",
+      "label": "Weil descent is sound but solutions need lift checks (A-PDP2)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Weil descent of a summation-polynomial decomposition to an MQ/Boolean (binary) or F_p (prime) system is sound, but solutions name abscissas over the algebraic closure: lifts can fail (twist points) or hit x=0 (2-torsion), so lift failures and unliftable systems must be counted apart from non-decomposition.",
+      "scope": "Proved with checks; volcano-ic rejected 146 spurious solutions at lift time against 28,932 expected hits.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "weil-descent",
+        "lift"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.3, A-PDP2"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "HEUR-RP-SEMIREGULAR-DREG-PROXY",
+      "label": "Semi-regular D_reg predicts Groebner cost of descended Semaev systems (A-PDP5)",
+      "kind": "heuristic",
+      "status": "refuted",
+      "model": "algebraic_coordinate",
+      "statement": "The Bardet-Faugere-Salvy semi-regular degree of regularity of the descended summation-polynomial system predicts its Groebner solving degree and hence its cost.",
+      "scope": "Refuted as a cost proxy for two-summand Weil systems by MEAS-RP-DREG-PROXY-MISS (D_reg = l+1 vs D_solve 2-4); not refuted for systems that are in fact semi-regular, and the m>=3 picture at scale is open.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "degree-of-regularity",
+        "refuted"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.3, A-PDP5"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "GAP-RP-SAT-SCALING",
+      "label": "Does descended CNF-XOR SAT scale past Groebner? (A-PDP7)",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "Open whether SAT/CDCL/WDSat on descended CNF-XOR decomposition systems scales asymptotically better than Groebner-basis solving.",
+      "scope": "On the same systems CryptoMiniSat gains only about 10% from the product profile where Groebner gains 10-100x; no theoretical bound is claimed.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "sat",
+        "open-target"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.3, A-PDP7"
+      ],
+      "evidence_class": "open"
+    },
+    {
+      "id": "THM-RP-S3-LINEAR-HALF-TRACE",
+      "label": "S3 is F_2-linear in (e1,e2): linearized half-trace two-point PDP (A-PDP8)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "In characteristic two S3 is F_2-linear in the elementary symmetric functions (e1,e2), so two-point decomposition over V is a linear system in dim V + dim V^(2) unknowns plus half-trace splits; it needs dim V + dim V^(2) <= n (3l-1 <= n for progressions).",
+      "scope": "Derived in the cryptanalysis study (Courtois 2016, Karabina 2015 at metadata level); no in-tree implementation or exactness measurement at the base commit, so any cost claim stays proposed.",
+      "assumptions": [
+        "binary field"
+      ],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "summation-polynomial",
+        "binary",
+        "linearization"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.3, A-PDP8"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "HEUR-RP-WALK-TARGET-GUARD",
+      "label": "Walk targets behave as uniform, with a mandatory repeated-target guard (A-RC1)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "classical_unrestricted",
+      "statement": "Relation targets produced by an r-adding walk are treated as uniform, provided a guard rejects two rows with the same factor-base part and different (a,b), which pin the logarithm by collision rather than by relation.",
+      "scope": "Measured: 24.4% of unguarded two-summand runs ended by such collisions (82% when walk segments share one jump table); the boundary ledger Round 2 caught this artifact before reporting.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH",
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ],
+      "tags": [
+        "relation-collection",
+        "heuristic"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.4, A-RC1",
+        "RESEARCH_IC_BOUNDARY_LEDGER.md section 10.2"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "HEUR-RP-LARGE-PRIME-GRAPH",
+      "label": "Large-prime leftovers meet with birthday probability and the graph connects (A-RC2)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "classical_unrestricted",
+      "statement": "In single/double large-prime variations leftovers meet with birthday probability and the large-prime graph connects; prime-orbit runs learn about N large-prime logs from N differences and descent hits after about r/(w L) differences.",
+      "scope": "Heuristic with toy measurements only.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "relation-collection",
+        "large-prime",
+        "heuristic"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.4, A-RC2"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "THM-RP-COFACTOR4-RANK-SHORTFALL",
+      "label": "Cofactor-4 curves: two-summand relation space has rank C-1 (A-RC3/A-LA4)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "curve_family_restricted",
+      "statement": "On cofactor-4 curves the two-summand relation space has rank C-1 (C columns) unless the base holds a 4-torsion point or lies in ker Tr, because of the class-in-E/<G> ~ Z/4 kernel; collectors must stop at the achievable rank, solve modulo the kernel and verify by fresh descents.",
+      "scope": "Proved systematic shortfall with measurement (36 collections, 108/108 descended logs verified); it contradicts the naive 'B+eps relations give full rank' heuristic on these curves.",
+      "assumptions": [
+        "cofactor 4"
+      ],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "linear-algebra",
+        "rank",
+        "cofactor"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.4, A-RC3 / A-LA4"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "HEUR-RP-DESCENT-TERMINATION",
+      "label": "Recursive target descent terminates (A-TD1)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "classical_unrestricted",
+      "statement": "Recursive descent subproblems are strictly smaller and the descent terminates.",
+      "scope": "Toy descents verify (108/108; prime-orbit 64-target batches all recovered) but no general termination bound is claimed.",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "descent",
+        "heuristic"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 3.6, A-TD1"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "THM-RP-VOLCANO-STRUCTURE",
+      "label": "Ordinary l-isogeny components are volcanoes (A-ISO1)",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "mathematical",
+      "statement": "Ordinary components of the l-isogeny graph over a finite field are l-volcanoes whose depth is the l-adic valuation of the Frobenius conductor, with horizontal and descending edge counts given by the splitting of l.",
+      "scope": "Standard theorem cited at metadata level (Kohel; Sutherland); used by the repository's volcano walks and isogeny routes.",
+      "assumptions": [
+        "ordinary curves"
+      ],
+      "source_refs": [
+        "S-RP-IC-LIT-SECONDARY",
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "isogeny",
+        "volcano"
+      ],
+      "source_locations": [
+        "Kohel 1996 thesis; Sutherland, isogeny volcanoes; as cited in REPORT-2026-10-06 section 3.7 A-ISO1"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "ALG-RP-VELU-COST",
+      "label": "Velu O(l) and sqrt-Velu O~(sqrt l) isogeny evaluation (A-ISO5)",
+      "kind": "algorithmic_upper_bound",
+      "status": "proved_external_unread",
+      "model": "mathematical",
+      "statement": "Given a rational kernel of degree l, Velu's formulas evaluate the isogeny in O(l) field operations, and sqrt-Velu in O~(sqrt l) in the kernel's field of definition.",
+      "scope": "Cited at metadata level; vertical volcano navigation still costs at least linear in l, and kernel rationality must be proved per edge (A-ISO2).",
+      "assumptions": [],
+      "source_refs": [
+        "S-RP-IC-LIT-SECONDARY",
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "isogeny",
+        "algorithm"
+      ],
+      "source_locations": [
+        "Velu 1971; Bernstein-De Feo-Leroux-Smith 2020; as cited in REPORT-2026-10-06 section 3.7 A-ISO5"
+      ],
+      "evidence_class": "algorithm"
+    },
+    {
+      "id": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
+      "label": "Linearized k-point subspace IC needs relation work >= 2^(2n/3)",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "A linearized k-point oracle over a subspace base needs sum_{i<=k} dim V^(i) <= n; with the product bound this forces l <= 2n/(k(k+1)), so the relation phase is at least 2^(2n/3) for every k (2^87.3 at n=131, about 26 bits above rho's 2^60.9) with online cost about 2^(n/3), the Bernstein-Lange precomputation exponent; going below needs a non-subspace base or a non-linearized oracle.",
+      "scope": "Derived in the cryptanalysis synthesis from the cited product bound and recalled linearization literature; the in-tree measurement of the bound is not present.",
+      "assumptions": [
+        "subspace factor base",
+        "linearized oracle"
+      ],
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ],
+      "tags": [
+        "binary",
+        "koblitz",
+        "factor-base",
+        "precomputation"
+      ],
+      "source_locations": [
+        "REPORT-2026-10-06 section 5 item 3"
+      ],
+      "evidence_class": "conditional_theorem"
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-RP-001",
+      "from": "THM-RP-S3-ROOTS-FACTOR",
+      "to": "FACT-S3-ROOTS-ARE-GROUP-LAW",
+      "relation": "enables",
+      "statement": "The kernel-checked factorization is the algebraic content of the claim that S3 roots are x(R+F), x(R-F); the 'group-law table algorithm' reading of the oracle is the remaining informal step.",
+      "source_refs": [
+        "S-RP-ROOTFINDING-S3"
+      ]
+    },
+    {
+      "id": "E-RP-002",
+      "from": "THM-RP-S3-ROOTS-FACTOR",
+      "to": "THEOREM-SEMAEV-SUMMATION",
+      "relation": "instantiates",
+      "statement": "Explicit m=2 (S3) case of Semaev's criterion for distinct abscissas, with the group law taken from Mathlib.",
+      "source_refs": [
+        "S-RP-ROOTFINDING-S3"
+      ]
+    },
+    {
+      "id": "E-RP-003",
+      "from": "THM-RP-YIELD-SUM-COUNT",
+      "to": "THEOREM-YIELD-CONSERVATION",
+      "relation": "instantiates",
+      "statement": "Kernel-checked list form of the double count behind mean decomposition-yield conservation.",
+      "source_refs": [
+        "S-RP-FACTOR-BASE-DESIGNS"
+      ]
+    },
+    {
+      "id": "E-RP-004",
+      "from": "THM-RP-ICNEG-YIELD-CONSERVATION",
+      "to": "THEOREM-YIELD-CONSERVATION",
+      "relation": "instantiates",
+      "statement": "Mathlib Finset form of the same double count with a coverage bound; not yet through the proof gate.",
+      "source_refs": [
+        "S-RP-IC-NEGATIVE-OPEN"
+      ]
+    },
+    {
+      "id": "E-RP-005",
+      "from": "GAP-RP-O2-MULTISET-YIELD",
+      "to": "THEOREM-YIELD-CONSERVATION",
+      "relation": "leaves_open",
+      "statement": "The exact C(B+m-1,m) instance for multisets of a base, which the corpus statement uses, is not formalized.",
+      "source_refs": [
+        "S-RP-IC-NEGATIVE-OPEN"
+      ]
+    },
+    {
+      "id": "E-RP-006",
+      "from": "THM-RP-YIELD-SUM-COUNT",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "relation": "qualifies",
+      "statement": "Fixes the mean yield for every base geometry of equal size (K2), so any claimed yield gain must come from distribution, not total.",
+      "source_refs": [
+        "S-RP-FACTOR-BASE-DESIGNS"
+      ]
+    },
+    {
+      "id": "E-RP-007",
+      "from": "THM-RP-AFFINE-CORE",
+      "to": "LB-ISOGENY-GENERIC",
+      "relation": "enables",
+      "statement": "The counting step (at most n^2 bad secrets, injectivity elsewhere) supplies the (Q+2)^2/r term of the isogeny-augmented generic bound.",
+      "source_refs": [
+        "S-IC-NEGATIVE",
+        "S-ISOGENY-FIBERS"
+      ]
+    },
+    {
+      "id": "E-RP-008",
+      "from": "GAP-RP-O1-ISOGENY-GGM",
+      "to": "LB-ISOGENY-GENERIC",
+      "relation": "leaves_open",
+      "statement": "The oracle model, simulator, hybrid step and 1/r term are not formalized, so the generic isogeny bound remains a written internal proof.",
+      "source_refs": [
+        "S-RP-IC-NEGATIVE-OPEN"
+      ]
+    },
+    {
+      "id": "E-RP-009",
+      "from": "THM-RP-SEMAEV-MONODROMY",
+      "to": "THEOREM-SEMAEV-SUMMATION",
+      "relation": "qualifies",
+      "statement": "Describes the Galois structure of the roots of S_m, constraining how root-finding oracles can split the summation polynomial.",
+      "source_refs": [
+        "S-IC-NEGATIVE"
+      ]
+    },
+    {
+      "id": "E-RP-010",
+      "from": "DEF-LAST-FALL-DEGREE",
+      "to": "THM-RP-GUARDED-EXACT-PAIR",
+      "relation": "defines",
+      "statement": "The last-fall half of the exact pair uses the ordinary filtered-closure last fall degree.",
+      "source_refs": [
+        "S-RP-GUARDED-EXACT-PAIR-LEAN"
+      ]
+    },
+    {
+      "id": "E-RP-011",
+      "from": "THM-RP-GUARDED-EXACT-PAIR",
+      "to": "HEUR-FIRST-FALL-DEGREE",
+      "relation": "qualifies",
+      "statement": "A kernel-checked family where the (ordinary Koszul) first fall 4 is strictly below the last fall 5: a first-fall value does not equal the degree needed to refute, even at B=3.",
+      "source_refs": [
+        "S-RP-GUARDED-EXACT-PAIR-LEAN"
+      ]
+    },
+    {
+      "id": "E-RP-012",
+      "from": "THM-RP-GUARDED-EXACT-PAIR",
+      "to": "GAP-FALL-DEGREE-COST-BRIDGE",
+      "relation": "qualifies",
+      "statement": "Supplies an exact, uniform last-fall value for one prime-field presentation, the quantity the Caminata-Gorla bridge needs, but only for B=3.",
+      "source_refs": [
+        "S-RP-GUARDED-EXACT-PAIR-LEAN"
+      ]
+    },
+    {
+      "id": "E-RP-013",
+      "from": "THM-RP-GUARDED-EXACT-PAIR",
+      "to": "THM-RP-GUARDED-GROWING-B",
+      "relation": "instantiates",
+      "statement": "B=3 case of the growing-cardinality statement, the only case in Lean.",
+      "source_refs": [
+        "S-RP-GUARDED-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-RP-014",
+      "from": "THM-RP-GUARDED-GROWING-B",
+      "to": "GAP-END-TO-END-IC-EXPONENT",
+      "relation": "qualifies",
+      "statement": "In the explicit degree-B membership presentation the last fall degree is at least B+1, so this presentation cannot give a bounded-degree prime-field decomposition as the base grows.",
+      "source_refs": [
+        "S-RP-GUARDED-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-RP-015",
+      "from": "THM-RP-BOOLEAN-CHAIN-UPPER",
+      "to": "COND-BINARY-WEIL-DESCENT",
+      "relation": "qualifies",
+      "statement": "An n-independent upper bound 3*ell+1 on the last fall of the exact Boolean two-S3 encoding; it does not bound proof size or cost, and ell grows with n in any attack parameterization.",
+      "source_refs": [
+        "S-RP-GUARDED-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-RP-016",
+      "from": "THM-RP-BOOLEAN-CHAIN-UPPER",
+      "to": "MEAS-RP-FALL-DEGREE-M3-DIAGONAL",
+      "relation": "upper_bounds",
+      "statement": "For an encoding matching its hypotheses the m=3 closure degree is at most 3*ell+1 (22 at ell=7), far above the censored >=5 readings; applying it to E12 needs an encoding audit.",
+      "source_refs": [
+        "S-RP-GUARDED-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-RP-017",
+      "from": "THM-RP-SECANT-DEGREE-REDUCTION",
+      "to": "GAP-FALL-DEGREE-COST-BRIDGE",
+      "relation": "qualifies",
+      "statement": "A strict reduction of a homogeneous top-ideal invariant, explicitly not the affine solving degree; it reaches a cost only through a last-fall or solving-degree bridge.",
+      "source_refs": [
+        "S-RP-PRIME-FB-DEGREE"
+      ]
+    },
+    {
+      "id": "E-RP-018",
+      "from": "THM-RP-SECANT-DEGREE-REDUCTION",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "qualifies",
+      "statement": "A prime-field presentation change that lowers the homogeneous degree for split-graph bases; like PKM it still needs yield, rank and full-pipeline costs.",
+      "source_refs": [
+        "S-RP-PRIME-FB-DEGREE"
+      ]
+    },
+    {
+      "id": "E-RP-019",
+      "from": "THM-RP-RECODED-SELECTOR-DEGREE",
+      "to": "THM-RP-SECANT-DEGREE-REDUCTION",
+      "relation": "qualifies",
+      "statement": "Further recodings lower the same invariant (7 to 6 to 5) while enlarging the ambient monomial envelope, showing the invariant is not a cost proxy.",
+      "source_refs": [
+        "S-RP-PRIME-FB-FOUR-TRACKS"
+      ]
+    },
+    {
+      "id": "E-RP-020",
+      "from": "MEAS-RP-SECANT-F4",
+      "to": "THM-RP-SECANT-DEGREE-REDUCTION",
+      "relation": "measures",
+      "statement": "Stock F4 confirms a lower observed handled degree for the secant presentation, but branch-summed rows rise against the same-base dense presentation.",
+      "source_refs": [
+        "S-RP-PRIME-FB-F4"
+      ]
+    },
+    {
+      "id": "E-RP-021",
+      "from": "THM-RP-SCALAR-TRANSPORT",
+      "to": "RED-ISOGENY-DLP-TRANSPORT",
+      "relation": "instantiates",
+      "statement": "Abstract algebraic core of transporting a logarithm through an injective group homomorphism; the isogeny itself is not constructed.",
+      "source_refs": [
+        "S-RP-ISOGENY-CLASS-RHO"
+      ]
+    },
+    {
+      "id": "E-RP-022",
+      "from": "CEX-RP-JKSST-LANG-QUADRATICITY",
+      "to": "OBSTRUCTION-XEDNI-HEIGHT",
+      "relation": "qualifies",
+      "statement": "JKSST's height lower bound needs Lang's conjecture (or a direct gap) as a genuine hypothesis; quadraticity of the height does not supply it.",
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README"
+      ]
+    },
+    {
+      "id": "E-RP-023",
+      "from": "CEX-RP-JKSST-MODEL-DISCRIMINANT",
+      "to": "OBSTRUCTION-XEDNI-HEIGHT",
+      "relation": "qualifies",
+      "statement": "The height/discriminant comparison must be for the selected lift and minimal discriminant; a fixed model discriminant cannot bound all multiples.",
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README"
+      ]
+    },
+    {
+      "id": "E-RP-024",
+      "from": "CEX-RP-JKSST-MODEL-DISCRIMINANT",
+      "to": "GAP-XEDNI-END-TO-END",
+      "relation": "qualifies",
+      "statement": "Pins down why the selected-point height/minimal-discriminant theorem is a separate open interface.",
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README"
+      ]
+    },
+    {
+      "id": "E-RP-025",
+      "from": "CEX-RP-JKSST-ASYMPTOTIC-COUNTING",
+      "to": "OBSTRUCTION-XEDNI-HEIGHT",
+      "relation": "qualifies",
+      "statement": "Two literal counting inferences fail; the repaired finite packing bound with visible fibre multiplicity must be used instead.",
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README"
+      ]
+    },
+    {
+      "id": "E-RP-026",
+      "from": "CEX-RP-JKSST-PROBABILITY",
+      "to": "OBSTRUCTION-XEDNI-HEIGHT",
+      "relation": "qualifies",
+      "statement": "The final 'approximately (2C2)^r/p' step needs prime q, an explicit usefulness certificate and the Hasse/cofactor conversion from q to p.",
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README"
+      ]
+    },
+    {
+      "id": "E-RP-027",
+      "from": "CEX-RP-JKSST-PROBABILITY",
+      "to": "THEOREM-XEDNI-FINITE-CORE",
+      "relation": "qualifies",
+      "statement": "Marks the boundary of the proved finite probability statements: individual-event probability, union upper bound, and only for prime subgroup order.",
+      "source_refs": [
+        "S-RP-JKSST-AUDIT-README"
+      ]
+    },
+    {
+      "id": "E-RP-028",
+      "from": "THEOREM-QUADRATIC-TWIST-ORDER",
+      "to": "THM-RP-TWIST-MIXED-RELATION",
+      "relation": "enables",
+      "statement": "#E + #E^t = 2(q+1) underlies the common-odd-divisor step (common_order_divides_q_plus_one).",
+      "source_refs": [
+        "S-RP-TWIST-LEAN"
+      ]
+    },
+    {
+      "id": "E-RP-029",
+      "from": "THM-RP-TWIST-MIXED-RELATION",
+      "to": "MEAS-RP-TWIST-CENSUS",
+      "relation": "qualifies",
+      "statement": "Explains part of the null census: on odd prime-order subgroups a rational relation's twist component vanishes, so twist points cannot add independent relations.",
+      "source_refs": [
+        "S-RP-TWIST-LEAN",
+        "S-RP-TWIST-CENSUS"
+      ]
+    },
+    {
+      "id": "E-RP-030",
+      "from": "THM-RP-KEYED-INVARIANCE",
+      "to": "BRIDGE-GENERIC-TABLE",
+      "relation": "instantiates",
+      "statement": "A kernel-checked instance of the simulation schema: an algorithm using only add, neg, equality and a key runs identically on Z/r with the pulled-back key.",
+      "source_refs": [
+        "S-RP-PLANNER"
+      ]
+    },
+    {
+      "id": "E-RP-031",
+      "from": "THM-RP-KEYED-INVARIANCE",
+      "to": "LB-SHOUP-DLP",
+      "relation": "does_not_cover",
+      "statement": "The key is a fixed, curve-derived function rather than a random encoding, so transcript invariance does not import Shoup's bound.",
+      "source_refs": [
+        "S-RP-PLANNER"
+      ]
+    },
+    {
+      "id": "E-RP-032",
+      "from": "THM-RP-BAND-AFFINE",
+      "to": "MEASURED-CURRENT-FRONTIER",
+      "relation": "qualifies",
+      "statement": "Frontier rankings between arms with unpriced native work hold only where the order is the same across the weight band; reversals are exact interior crossings.",
+      "source_refs": [
+        "S-RP-PLANNER"
+      ]
+    },
+    {
+      "id": "E-RP-033",
+      "from": "THM-RP-FB-BREAK-EVEN",
+      "to": "COND-BINARY-WEIL-DESCENT",
+      "relation": "qualifies",
+      "statement": "Under the measured m=4 degree slope a larger factor base only raises the per-relation cost model at n=131; an interior optimum needs slope <~ 1/4.",
+      "source_refs": [
+        "S-RP-FACTOR-BASE-DESIGNS"
+      ]
+    },
+    {
+      "id": "E-RP-034",
+      "from": "GAP-BINARY-M4-DEGREE",
+      "to": "THM-RP-FB-BREAK-EVEN",
+      "relation": "qualifies",
+      "statement": "The break-even conclusion applies to ECC2K-130 only if the toy-size degree slope persists, which is exactly the open degree-growth question.",
+      "source_refs": [
+        "S-RP-FACTOR-BASE-DESIGNS"
+      ]
+    },
+    {
+      "id": "E-RP-035",
+      "from": "THM-RP-KOBLITZ-CYCLIC-WINDOW",
+      "to": "THEOREM-GHS-GENUS-131",
+      "relation": "qualifies",
+      "statement": "Cyclic and modular carriers of the degree-131 trace-zero factor also have very large genus (>= 394 under stated hypotheses; best modular carrier 3.8e8), extending the GHS obstruction pattern to other covers without proving it for all.",
+      "source_refs": [
+        "S-RP-KOBLITZ-MODULAR"
+      ]
+    },
+    {
+      "id": "E-RP-036",
+      "from": "CEX-RP-COMMON-KERNEL-WITNESSES",
+      "to": "GAP-RP-COMMON-KERNEL",
+      "relation": "qualifies",
+      "statement": "Closes two proposed disappearance arguments (gauge multiplicativity, parity-code passive coefficients); the construction remains open.",
+      "source_refs": [
+        "S-RP-COMMON-KERNEL"
+      ]
+    },
+    {
+      "id": "E-RP-037",
+      "from": "GAP-RP-COMMON-KERNEL",
+      "to": "GAP-END-TO-END-IC-EXPONENT",
+      "relation": "enables",
+      "statement": "A common-kernel construction would be one ingredient of the repository's candidate prime-field route; every other pipeline stage would still need bounding.",
+      "source_refs": [
+        "S-RP-COMMON-KERNEL"
+      ]
+    },
+    {
+      "id": "E-RP-038",
+      "from": "THM-RP-FF-HANDBOOK",
+      "to": "THEOREM-FROB-SUBSPACES-131",
+      "relation": "enables",
+      "statement": "Supplies kernel-checked finite-field facts (cyclic unit group, Frobenius additivity, trace surjectivity) of the kind the Frobenius-subspace and factor-base bridges cite; the n=131 classification itself is not formalized.",
+      "source_refs": [
+        "S-RP-FF-HANDBOOK"
+      ]
+    },
+    {
+      "id": "E-RP-039",
+      "from": "MEAS-RP-IC-BOUNDARY-ROUND1",
+      "to": "MEASURED-CURRENT-FRONTIER",
+      "relation": "instantiates",
+      "statement": "The ledger's frozen run is one of the repository's scoped frontier records.",
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-040",
+      "from": "MEAS-RP-IC-BOUNDARY-ROUND1",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "relation": "measures",
+      "statement": "Yield/ceiling 0.75-1.25 on unconfined bases: the counting ceiling predicts the measured yield and no base exploits structure.",
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-041",
+      "from": "MEAS-RP-IC-BOUNDARY-ROUND1",
+      "to": "GAP-END-TO-END-IC-EXPONENT",
+      "relation": "qualifies",
+      "statement": "Every priced variant's fitted total exponent is at or above 0.54, with the phase exponents naming what a later round must move.",
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-042",
+      "from": "HEUR-DECOMPOSITION-PROBABILITY",
+      "to": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "relation": "conditions",
+      "statement": "The family law prices relations at the counting-ceiling yield.",
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-043",
+      "from": "HEUR-RELATION-RANK",
+      "to": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "relation": "conditions",
+      "statement": "The law assumes elimination closes when the relation graph first carries a cycle, about K/2 relations.",
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-044",
+      "from": "MEAS-RP-IC-BOUNDARY-ROUND1",
+      "to": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "relation": "measures",
+      "statement": "The ledger ladder converges to the derived r^(1/6) law at measured sizes.",
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-045",
+      "from": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "to": "GAP-END-TO-END-IC-EXPONENT",
+      "relation": "obstructs",
+      "statement": "No base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters.",
+      "source_refs": [
+        "S-RP-IC-BOUNDARY-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-046",
+      "from": "MEAS-RP-BOUNDARY-TARGETS-PRIME",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "qualifies",
+      "statement": "No prime-field IC record beats rho at any measured size; the next target is any charged IC < rho on a >= 16-bit prime-order instance.",
+      "source_refs": [
+        "S-RP-BOUNDARY-TARGETS"
+      ]
+    },
+    {
+      "id": "E-RP-047",
+      "from": "MEAS-RP-BOUNDARY-TARGETS-PRIME",
+      "to": "MEASURED-CURRENT-FRONTIER",
+      "relation": "instantiates",
+      "statement": "Per-regime best records of the IC boundary ledger.",
+      "source_refs": [
+        "S-RP-BOUNDARY-TARGETS"
+      ]
+    },
+    {
+      "id": "E-RP-048",
+      "from": "MEAS-RP-KOBLITZ-N61-ONLINE",
+      "to": "MEASURED-CURRENT-FRONTIER",
+      "relation": "instantiates",
+      "statement": "Current primary single-target online Koblitz rung.",
+      "source_refs": [
+        "S-RP-BOUNDARY-TARGETS"
+      ]
+    },
+    {
+      "id": "E-RP-049",
+      "from": "MEAS-RP-COMPACT-ORBIT-PREPROCESSING",
+      "to": "MEAS-RP-KOBLITZ-N61-ONLINE",
+      "relation": "qualifies",
+      "statement": "The online speedups exclude reusable preparation; with that preparation counted as advice the configuration stays on or above the S T^2 >~ r/|Aut| line, and cold it is ~90x slower than rho.",
+      "source_refs": [
+        "S-IC-NEGATIVE",
+        "S-RP-BOUNDARY-TARGETS"
+      ]
+    },
+    {
+      "id": "E-RP-050",
+      "from": "MEAS-RP-COMPACT-ORBIT-PREPROCESSING",
+      "to": "LB-CGK-PREPROCESS-TIME",
+      "relation": "measures",
+      "statement": "Places every measured compact-orbit rung relative to the adaptive (BL/CGK) and non-adaptive preprocessing lines, with the |Aut| division as an audit convention.",
+      "source_refs": [
+        "S-IC-NEGATIVE"
+      ]
+    },
+    {
+      "id": "E-RP-051",
+      "from": "GAP-AUTOMORPHISM-PREPROCESS",
+      "to": "MEAS-RP-COMPACT-ORBIT-PREPROCESSING",
+      "relation": "qualifies",
+      "statement": "Dividing r by |Aut| in the preprocessing lines is not a theorem of the cited papers; it needs the automorphism-aware bridge.",
+      "source_refs": [
+        "S-IC-NEGATIVE"
+      ]
+    },
+    {
+      "id": "E-RP-052",
+      "from": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
+      "to": "MEAS-RP-KOBLITZ-N61-ONLINE",
+      "relation": "qualifies",
+      "statement": "An online ~2^(n/3) after ~2^(2n/3) relation work is the Bernstein-Lange precomputation regime, the fair online opponent for setup-excluded IC figures.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-053",
+      "from": "MEAS-RP-JV-WEAK-CLASS",
+      "to": "ATTACK-GHS-WEIL-DESCENT",
+      "relation": "measures",
+      "statement": "Measures a GHS genus-3 cover plus Nagao/sieve decomposition route on the weak F_{p^6} class in counted operations against rho on the same group.",
+      "source_refs": [
+        "S-RP-COVER-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-054",
+      "from": "MEAS-RP-JV-WEAK-CLASS",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "relation": "qualifies",
+      "statement": "The measured rate follows the exact count 16 C(|F|,6)/l, not the asymptotic 1/(ng)!; small bases are 3-30% below the asymptotic rate.",
+      "source_refs": [
+        "S-RP-COVER-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-055",
+      "from": "MEAS-RP-JV-E2E-NONWEAK",
+      "to": "MEAS-RP-JV-WEAK-CLASS",
+      "relation": "qualifies",
+      "statement": "From non-weak curves the isogeny walk is a negligible share, so the weak-class crossover carries over to the walkable class.",
+      "source_refs": [
+        "S-RP-COVER-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-056",
+      "from": "MEAS-RP-JV-E2E-NONWEAK",
+      "to": "STANDARD-CURVE-EXCLUSIONS",
+      "relation": "qualifies",
+      "statement": "Curves over F_{p^6} with order divisible by 4 that walk to the weak class fall below rho in the harness from about 2^50; exclusion lists must cover this class, not only the weak curves themselves.",
+      "source_refs": [
+        "S-RP-COVER-LEDGER"
+      ]
+    },
+    {
+      "id": "E-RP-057",
+      "from": "MEAS-RP-FALL-DEGREE-TOY",
+      "to": "HEUR-FIRST-FALL-DEGREE",
+      "relation": "qualifies",
+      "statement": "Semaev closure degrees stay at or below 4 through m=6 at toy sizes, one below semi-regular controls; the study states this is not evidence about the first fall degree assumption.",
+      "source_refs": [
+        "S-RP-FALL-DEGREE-BOUNDS"
+      ]
+    },
+    {
+      "id": "E-RP-058",
+      "from": "MEAS-RP-FALL-DEGREE-TOY",
+      "to": "GAP-BINARY-M4-DEGREE",
+      "relation": "measures",
+      "statement": "Flat m=4,5,6 diagonals at N <= 60 are the repository's direct small-dimension measurement of the degree-growth question.",
+      "source_refs": [
+        "S-RP-FALL-DEGREE-BOUNDS"
+      ]
+    },
+    {
+      "id": "E-RP-059",
+      "from": "MEAS-RP-FALL-DEGREE-M3-DIAGONAL",
+      "to": "GAP-BINARY-M4-DEGREE",
+      "relation": "qualifies",
+      "statement": "Growth appears exactly at ell >= 7 for m=3, so flat toy cells at small ell do not extrapolate to large ell.",
+      "source_refs": [
+        "S-RP-FALL-DEGREE-BOUNDS"
+      ]
+    },
+    {
+      "id": "E-RP-060",
+      "from": "MEAS-RP-FALL-DEGREE-M3-DIAGONAL",
+      "to": "THM-HKYY-ZERO-DIM-LAST-FALL",
+      "relation": "qualifies",
+      "statement": "Consistent with the HKYY conditional, which needs degree growth along n' = n^(2/3); the censored readings neither confirm nor refute it.",
+      "source_refs": [
+        "S-RP-FALL-DEGREE-BOUNDS"
+      ]
+    },
+    {
+      "id": "E-RP-061",
+      "from": "MEAS-RP-TWIST-CENSUS",
+      "to": "DEF-FACTOR-BASE",
+      "relation": "qualifies",
+      "statement": "Twist-transferred factor-base choices gave no strict joint useful-rank/degree gain on the executed small censuses.",
+      "source_refs": [
+        "S-RP-TWIST-CENSUS"
+      ]
+    },
+    {
+      "id": "E-RP-062",
+      "from": "THM-RP-KEYED-INVARIANCE",
+      "to": "MEAS-RP-PLANNER-RETEST",
+      "relation": "qualifies",
+      "statement": "The residual collector's win is that of a keyed generic collision search; what the curve contributes is only the key function.",
+      "source_refs": [
+        "S-RP-PLANNER"
+      ]
+    },
+    {
+      "id": "E-RP-063",
+      "from": "MEAS-RP-CALIBRATION-DRIFT",
+      "to": "FACT-MEASURED-BOUND",
+      "relation": "qualifies",
+      "statement": "Measured S rows are reproducible only with pinned native-to-GAE conversion factors; unpinned factors drifted up to 3.7x.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-064",
+      "from": "MEAS-RP-DREG-PROXY-MISS",
+      "to": "HEUR-RP-SEMIREGULAR-DREG-PROXY",
+      "relation": "refutes",
+      "statement": "D_reg = l+1 against measured D_solve 2-4 on two-summand Weil systems: the semi-regular degree is not a cost predictor for these systems.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-065",
+      "from": "MEAS-RP-DREG-PROXY-MISS",
+      "to": "HEUR-FIRST-FALL-DEGREE",
+      "relation": "qualifies",
+      "statement": "FFD is 2 (m=2) and 3 (m=3) on every toy system while the solving degree diverges, which the cryptanalysis synthesis reads as refuting the FFD assumption 'as stated'.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-066",
+      "from": "MEAS-RP-GAUDRY-CUBIC",
+      "to": "ALG-GAUDRY-FIXED-EXTENSION",
+      "relation": "measures",
+      "statement": "At n=3 the linear algebra phase (n^0.68) dominates and whole-method S stays near 200x rho at best.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-067",
+      "from": "DEF-RP-EC1-INSTANCE-ID",
+      "to": "DEF-INDEX-CALCULUS-PIPELINE",
+      "relation": "defines",
+      "statement": "Every pipeline stage is measured against an EC1-identified exact instance.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-068",
+      "from": "THM-RP-SUBSPACE-PRODUCT-BOUND",
+      "to": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
+      "relation": "conditions",
+      "statement": "The floor uses dim V^(2) >= 2l-1 to bound l by 2n/(k(k+1)).",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-069",
+      "from": "THM-RP-S3-LINEAR-HALF-TRACE",
+      "to": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
+      "relation": "conditions",
+      "statement": "The floor is stated for linearized oracles whose unknown count is dim V + dim V^(2).",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-070",
+      "from": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
+      "to": "COND-BINARY-WEIL-DESCENT",
+      "relation": "obstructs",
+      "statement": "Subspace bases with linearized oracles cannot beat precomputation rho asymptotically; non-subspace bases or non-linearized oracles are required.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-071",
+      "from": "THM-RP-SUBSPACE-PRODUCT-BOUND",
+      "to": "DEF-FACTOR-BASE",
+      "relation": "qualifies",
+      "statement": "Geometric progressions minimize the product profile, fixing which binary subspace bases are optimal for PDP unknown counts.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-072",
+      "from": "HEUR-RP-LIFT-SUBGROUP-HALF",
+      "to": "DEF-FACTOR-BASE",
+      "relation": "qualifies",
+      "statement": "Usable factor-base size is about a quarter of the abscissa set and must be measured.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-073",
+      "from": "THM-RP-AUTOMORPHISM-ORBIT-FOLD",
+      "to": "HEUR-AUTOMORPHISM-SPEEDUP",
+      "relation": "qualifies",
+      "statement": "The IC analogue of automorphism folding needs a verified eigenvalue and cofactor handling; the prime-orbit pipeline is a generic algorithm with the automorphism oracle at 1.1-1.4x folded batch rho.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-074",
+      "from": "THM-RP-TRACE-ZERO-DOUBLING",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "relation": "qualifies",
+      "statement": "A structured (trace-zero) base doubles the yield of a same-degree base by landing in 2E, a deviation from the uniform-subgroup count.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-075",
+      "from": "THM-RP-WEIL-LIFT-SOUNDNESS",
+      "to": "COND-BINARY-WEIL-DESCENT",
+      "relation": "enables",
+      "statement": "Descent is sound only with explicit lift checks for twist points and 2-torsion.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-076",
+      "from": "THEOREM-SEMAEV-SUMMATION",
+      "to": "THM-RP-WEIL-LIFT-SOUNDNESS",
+      "relation": "enables",
+      "statement": "Descended systems inherit Semaev's criterion up to sign before lifting.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-077",
+      "from": "HEUR-RP-WALK-TARGET-GUARD",
+      "to": "HEUR-RELATION-RANK",
+      "relation": "qualifies",
+      "statement": "Without the repeated-target guard a 'full-rank' solve can be a collision, not a relation solve.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-078",
+      "from": "HEUR-RP-LARGE-PRIME-GRAPH",
+      "to": "DEF-INDEX-CALCULUS-PIPELINE",
+      "relation": "enables",
+      "statement": "Large-prime variations are an optional relation-collection stage resting on birthday matching.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-079",
+      "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
+      "to": "HEUR-RELATION-RANK",
+      "relation": "qualifies",
+      "statement": "On cofactor-4 curves B+eps relations systematically give rank C-1 unless the base meets 4-torsion or ker Tr.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-080",
+      "from": "HEUR-RP-DESCENT-TERMINATION",
+      "to": "DEF-INDEX-CALCULUS-PIPELINE",
+      "relation": "conditions",
+      "statement": "Individual-logarithm recovery by recursive descent assumes termination.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    },
+    {
+      "id": "E-RP-081",
+      "from": "THM-RP-VOLCANO-STRUCTURE",
+      "to": "THEOREM-JMV-ISOGENY-REDUCTION",
+      "relation": "enables",
+      "statement": "Horizontal versus vertical movement in the volcano determines which curves a JMV-style walk can reach.",
+      "source_refs": [
+        "S-RP-IC-LIT-SECONDARY"
+      ]
+    },
+    {
+      "id": "E-RP-082",
+      "from": "ALG-RP-VELU-COST",
+      "to": "RED-ISOGENY-DLP-TRANSPORT",
+      "relation": "enables",
+      "statement": "Efficient transport requires evaluating the isogeny, which costs O(l) (Velu) or O~(sqrt l) given a rational kernel.",
+      "source_refs": [
+        "S-RP-IC-LIT-SECONDARY"
+      ]
+    },
+    {
+      "id": "E-RP-083",
+      "from": "GAP-RP-SAT-SCALING",
+      "to": "GAP-COORDINATE-ALGEBRAIC",
+      "relation": "qualifies",
+      "statement": "SAT solvers are one coordinate-algebraic solving route whose scaling is unknown.",
+      "source_refs": [
+        "S-RP-IC-ASSUMPTION-GRAPH"
+      ]
+    }
+  ],
+  "research_targets": [
+    {
+      "id": "RT-RP-PROOF-GATE-IC-NEGATIVE",
+      "label": "Kernel-check the IC negative-results Lean and promote yield conservation",
+      "status": "ready",
+      "priority": 1,
+      "objective": "Run the repository proof gate on papers/ic-negative-results/lean so AffineCore and YieldConservation move from lean_written_unchecked to kernel_checked, then close O2 (mean_yield_multiset) so THEOREM-YIELD-CONSERVATION's exact C(B+m-1,m) statement is formal.",
+      "depends_on": [
+        "THM-RP-ICNEG-YIELD-CONSERVATION",
+        "THM-RP-AFFINE-CORE",
+        "GAP-RP-O2-MULTISET-YIELD",
+        "THEOREM-YIELD-CONSERVATION"
+      ],
+      "acceptance": "tools/lean/proof-gate.sh papers/ic-negative-results/lean passes with only propext/Classical.choice/Quot.sound; mean_yield_multiset proved without sorry.",
+      "next_step": "Read the lean-proof-gate.yml result on the PR that added the IcNegative modules; then write mean_yield_multiset with Sym.card_sym_eq_choose.",
+      "source_refs": [
+        "S-RP-IC-NEGATIVE-OPEN"
+      ]
+    },
+    {
+      "id": "RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE",
+      "label": "Bridge top-ideal degree reductions to solving degree and full cost",
+      "status": "open",
+      "priority": 2,
+      "objective": "Decide whether the kernel-checked secant/recoded top-ideal reductions (d+1 vs 2d+1; 7 to 6 to 5) translate into lower last-fall or solving degree and lower field-operation cost per usable relation against matched controls.",
+      "depends_on": [
+        "THM-RP-SECANT-DEGREE-REDUCTION",
+        "THM-RP-RECODED-SELECTOR-DEGREE",
+        "MEAS-RP-SECANT-F4",
+        "GAP-FALL-DEGREE-COST-BRIDGE"
+      ],
+      "acceptance": "Either a proof bounding sd or last fall by the top-ideal degree for these presentations, or a preregistered matched measurement of full F4 field-operation cost per verified relation with all four sign branches.",
+      "next_step": "Run the prospective complete protocol in four_tracks_20261101/PROTOCOL.md with a counting F4 backend.",
+      "source_refs": [
+        "S-RP-PRIME-FB-DEGREE",
+        "S-RP-PRIME-FB-FOUR-TRACKS",
+        "S-RP-PRIME-FB-F4"
+      ]
+    },
+    {
+      "id": "RT-RP-M3-DIAGONAL-UNCENSOR",
+      "label": "Uncensor the m=3 closure degree at ell >= 7",
+      "status": "blocked",
+      "priority": 3,
+      "objective": "Measure the exact closure degree (5, 6 or 7) of the (3,21,7), (3,24,7) and (4,28,7) cells instead of the censored >=5, and test it against the Boolean upper bound 3*ell+1.",
+      "depends_on": [
+        "MEAS-RP-FALL-DEGREE-M3-DIAGONAL",
+        "THM-RP-BOOLEAN-CHAIN-UPPER",
+        "GAP-BINARY-M4-DEGREE"
+      ],
+      "acceptance": "At least three completed uncensored draws per cell under a registered amendment, with a checkpointed run that survives Spot reclaim.",
+      "next_step": "Register a new amendment with checkpoint/resume (E12a/E12c were reclaimed with no reading).",
+      "source_refs": [
+        "S-RP-FALL-DEGREE-BOUNDS",
+        "S-RP-GUARDED-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "RT-RP-ONLINE-VS-PREPROCESSING",
+      "label": "Price Koblitz online wins against the preprocessing lower-bound lines",
+      "status": "open",
+      "priority": 2,
+      "objective": "Report each Koblitz online vs_rho rung together with its advice size S and online probes T in group operations, against the BL/CGK adaptive line and the precomputation-rho opponent, so an online speedup is not read as an asymptotic gain.",
+      "depends_on": [
+        "MEAS-RP-KOBLITZ-N61-ONLINE",
+        "MEAS-RP-COMPACT-ORBIT-PREPROCESSING",
+        "LB-CGK-PREPROCESS-TIME",
+        "GAP-AUTOMORPHISM-PREPROCESS"
+      ],
+      "acceptance": "Every promoted online rung carries S, T (in group operations), cold ratio and the matched precomputation-rho online cost on the same point.",
+      "next_step": "Add S and T in group operations to the n=61/n=71 claim drafts and run a precomputation-rho arm on the n=61 fixture.",
+      "source_refs": [
+        "S-RP-BOUNDARY-TARGETS",
+        "S-IC-NEGATIVE"
+      ]
+    }
+  ]
+}
