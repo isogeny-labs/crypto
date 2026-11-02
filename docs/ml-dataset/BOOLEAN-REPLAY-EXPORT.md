@@ -10,7 +10,9 @@ The combined release dataset suite passed669 tests,0 failed,2 ignored on2026-11-
 
 The preceding replay/CLI run passed663 tests and failed one exhaustive test because its two test wire suffixes omitted the mandatory newline. The correction changes those test inputs only; the strict parser is unchanged. Failure log SHA256 `ad0fef0c562f3b150cf6cb04dcdb87dc98963123ce2633170e2fcfec483cd933` is preserved externally with S3 custody.
 
-Actual CLI generate/verify/export acceptance and the full release library gate remain pending at this source checkpoint. Source review and library tests are not substitutes for those gates. The construction is the current ordinary N3 profile; full higher-arity/family/policy dataset acceptance remains separate. No exact first/last-fall-degree claim follows from a polynomial identity alone.
+Final source `3a3f8fa72054` passed the full release library suite: **6103 passed, 0 failed, 125 ignored, 0 filtered**, with source and fixture hashes unchanged. The fixed four-cell CLI acceptance also passed: ordinary binary n23/m3, explicit Legacy factor base of size4, F4/F5 on both twists, one Generate invocation. All nine commands exited0; fresh CLI replay and the frozen export analyzer passed. Export contains two public source-feature rows and four restricted nonzero proof records, with byte-identical repeat export. The canonical experiment export has zero schema errors and zero findings.
+
+Native solver status is partial; this gate verifies the original-bound polynomial identities and export contract. SAT remains explicitly unsupported in this channel. The broader 24192-cell cohort was planned only and generated zero cells. The construction is the current ordinary N3 profile; full higher-arity/family/policy dataset acceptance remains separate. No exact first/last-fall-degree claim follows from a polynomial identity alone. See [terminal receipts and archive custody](../../research/ml_dataset_20261028/boolean-replay-export-20261102/final-acceptance/README.md).
 
 ## Design sources
 
