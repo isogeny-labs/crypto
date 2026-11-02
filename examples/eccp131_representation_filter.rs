@@ -187,15 +187,14 @@ fn random_base(c: &Curve<F>, g: &Point, size: usize, seed: u64) -> Vec<Point> {
 }
 
 fn signed(c: &Curve<F>, f: &mut F, p: Point, sign: i8) -> Point {
-    if sign == 1 { p } else { c.negate(f, &p) }
+    if sign == 1 {
+        p
+    } else {
+        c.negate(f, &p)
+    }
 }
 
-fn pair_features(
-    c: &Curve<F>,
-    f: &mut F,
-    a: Point,
-    b: Point,
-) -> Option<([Words; 5], Point)> {
+fn pair_features(c: &Curve<F>, f: &mut F, a: Point, b: Point) -> Option<([Words; 5], Point)> {
     let sum = c.add_points(f, &a, &b)?;
     let ax = f.key(a.x);
     let bx = f.key(b.x);
@@ -205,7 +204,13 @@ fn pair_features(
     let endpoint_add = f.key(endpoint_add_element);
     let endpoint_mul = f.key(endpoint_mul_element);
     Some((
-        [f.key(sum.x), f.key(sum.y), endpoint_add, endpoint_xor, endpoint_mul],
+        [
+            f.key(sum.x),
+            f.key(sum.y),
+            endpoint_add,
+            endpoint_xor,
+            endpoint_mul,
+        ],
         sum,
     ))
 }
@@ -221,10 +226,20 @@ fn samples(c: &Curve<F>, base: &[Point], count: usize, seed: u64) -> Vec<Sample>
             let s = if rng.gen::<bool>() { 1 } else { -1 };
             *p = signed(c, &mut f, base[i], s);
         }
-        let Some((left, lsum)) = pair_features(c, &mut f, ps[0], ps[1]) else { continue };
-        let Some((right, rsum)) = pair_features(c, &mut f, ps[2], ps[3]) else { continue };
-        let Some(target) = c.add_points(&mut f, &lsum, &rsum) else { continue };
-        out.push(Sample { left, right, target_x: f.key(target.x) });
+        let Some((left, lsum)) = pair_features(c, &mut f, ps[0], ps[1]) else {
+            continue;
+        };
+        let Some((right, rsum)) = pair_features(c, &mut f, ps[2], ps[3]) else {
+            continue;
+        };
+        let Some(target) = c.add_points(&mut f, &lsum, &rsum) else {
+            continue;
+        };
+        out.push(Sample {
+            left,
+            right,
+            target_x: f.key(target.x),
+        });
     }
     out
 }
@@ -257,7 +272,10 @@ fn predicate(sample: &Sample, target: Words, cfg: Config) -> bool {
 
 fn hits(data: &[Sample], cfg: Config) -> (usize, usize) {
     let n = data.len();
-    let relation = data.iter().filter(|s| predicate(s, s.target_x, cfg)).count();
+    let relation = data
+        .iter()
+        .filter(|s| predicate(s, s.target_x, cfg))
+        .count();
     let null = data
         .iter()
         .enumerate()
@@ -271,9 +289,7 @@ fn wilson(k: usize, n: usize) -> [f64; 2] {
     let p = k as f64 / n as f64;
     let den = 1.0 + z * z / n as f64;
     let center = (p + z * z / (2.0 * n as f64)) / den;
-    let half = z
-        * ((p * (1.0 - p) / n as f64 + z * z / (4.0 * (n * n) as f64)).sqrt())
-        / den;
+    let half = z * ((p * (1.0 - p) / n as f64 + z * z / (4.0 * (n * n) as f64)).sqrt()) / den;
     [(center - half).max(0.0), (center + half).min(1.0)]
 }
 
@@ -300,7 +316,9 @@ fn counts(relation: usize, null: usize, n: usize) -> Counts {
 fn offsets(width: usize) -> Vec<usize> {
     let last = FIELD_BITS - width;
     let mut v: Vec<usize> = (0..=last).step_by(8).collect();
-    if v.last().copied() != Some(last) { v.push(last); }
+    if v.last().copied() != Some(last) {
+        v.push(last);
+    }
     v
 }
 
@@ -311,10 +329,17 @@ fn select(train: &[Sample], test: &[Sample]) -> Selected {
         for combiner in 0..COMBINERS.len() {
             for width in 1..=8 {
                 for offset in offsets(width) {
-                    let cfg = Config { source, combiner, width, offset };
+                    let cfg = Config {
+                        source,
+                        combiner,
+                        width,
+                        offset,
+                    };
                     let (rh, nh) = hits(train, cfg);
                     evaluated += 1;
-                    if nh < 32 { continue; }
+                    if nh < 32 {
+                        continue;
+                    }
                     let c = counts(rh, nh, train.len());
                     let replace = best.as_ref().is_none_or(|(old, oldc)| {
                         c.log2_enrichment > oldc.log2_enrichment
@@ -322,7 +347,9 @@ fn select(train: &[Sample], test: &[Sample]) -> Selected {
                                 && (cfg.source, cfg.combiner, cfg.width, cfg.offset)
                                     < (old.source, old.combiner, old.width, old.offset))
                     });
-                    if replace { best = Some((cfg, c)); }
+                    if replace {
+                        best = Some((cfg, c));
+                    }
                 }
             }
         }
@@ -364,13 +391,24 @@ fn run_arm(
     let sweep = Instant::now();
     let selected = select(&train, &test);
     let sweep_ms = sweep.elapsed().as_secs_f64() * 1000.0;
-    ArmResult { base_design: design, size, train_seed, test_seed, generation_ms, sweep_ms, selected }
+    ArmResult {
+        base_design: design,
+        size,
+        train_seed,
+        test_seed,
+        generation_ms,
+        sweep_ms,
+        selected,
+    }
 }
 
 fn add_many(c: &Curve<F>, f: &mut F, terms: &[Point]) -> Option<Point> {
     let mut acc = None;
     for p in terms {
-        acc = match acc { None => Some(*p), Some(a) => c.add_points(f, &a, p) };
+        acc = match acc {
+            None => Some(*p),
+            Some(a) => c.add_points(f, &a, p),
+        };
     }
     acc
 }
@@ -387,10 +425,15 @@ fn mitm_probe(c: &Curve<F>, base: &[Point], q: &Point) -> MitmResult {
     let mut index = HashMap::new();
     for i in 0..signed_points.len() {
         for j in i..signed_points.len() {
-            let Some(p) = c.add_points(&mut f, &signed_points[i].0, &signed_points[j].0) else { continue };
+            let Some(p) = c.add_points(&mut f, &signed_points[i].0, &signed_points[j].0) else {
+                continue;
+            };
             let entry = PairEntry {
                 point: p,
-                terms: [(signed_points[i].1, signed_points[i].2), (signed_points[j].1, signed_points[j].2)],
+                terms: [
+                    (signed_points[i].1, signed_points[i].2),
+                    (signed_points[j].1, signed_points[j].2),
+                ],
             };
             let pos = entries.len();
             index.entry(point_key(&f, &p)).or_insert(pos);
@@ -399,13 +442,18 @@ fn mitm_probe(c: &Curve<F>, base: &[Point], q: &Point) -> MitmResult {
     }
     let setup_ms = setup.elapsed().as_secs_f64() * 1000.0;
     let planted_terms = [(0usize, 1i8), (1, -1), (2, 1), (3, 1)];
-    let planted_points: Vec<Point> = planted_terms.iter().map(|&(i, s)| signed(c, &mut f, base[i], s)).collect();
+    let planted_points: Vec<Point> = planted_terms
+        .iter()
+        .map(|&(i, s)| signed(c, &mut f, base[i], s))
+        .collect();
     let target = add_many(c, &mut f, &planted_points).expect("fixed planted target is finite");
 
     let query = |target: &Point, f: &mut F| -> Option<Vec<(usize, i8)>> {
         for e in &entries {
             let minus = c.negate(f, &e.point);
-            let Some(rest) = c.add_points(f, target, &minus) else { continue };
+            let Some(rest) = c.add_points(f, target, &minus) else {
+                continue;
+            };
             if let Some(&j) = index.get(&point_key(f, &rest)) {
                 let other = &entries[j];
                 return Some(vec![e.terms[0], e.terms[1], other.terms[0], other.terms[1]]);
@@ -417,7 +465,10 @@ fn mitm_probe(c: &Curve<F>, base: &[Point], q: &Point) -> MitmResult {
     let witness = query(&target, &mut f);
     let planted_query_ms = started.elapsed().as_secs_f64() * 1000.0;
     let replayed = witness.as_ref().is_some_and(|terms| {
-        let ps: Vec<Point> = terms.iter().map(|&(i, s)| signed(c, &mut f, base[i], s)).collect();
+        let ps: Vec<Point> = terms
+            .iter()
+            .map(|&(i, s)| signed(c, &mut f, base[i], s))
+            .collect();
         add_many(c, &mut f, &ps).as_ref() == Some(&target)
     });
     let started = Instant::now();
@@ -441,17 +492,26 @@ fn mitm_probe(c: &Curve<F>, base: &[Point], q: &Point) -> MitmResult {
 fn solver_control(n: &BigUint) -> SolverControl {
     let started = Instant::now();
     let cols = 16usize;
-    let known: Vec<BigUint> = (0..cols).map(|i| BigUint::from((i * i + 17 * i + 3) as u64) % n).collect();
+    let known: Vec<BigUint> = (0..cols)
+        .map(|i| BigUint::from((i * i + 17 * i + 3) as u64) % n)
+        .collect();
     let mut matrix = vec![vec![BigUint::zero(); cols]; cols];
     for i in 0..cols {
         matrix[i][i] = BigUint::one();
-        if i + 1 < cols { matrix[i][i + 1] = BigUint::from(3u8); }
+        if i + 1 < cols {
+            matrix[i][i + 1] = BigUint::from(3u8);
+        }
     }
     let mut rhs: Vec<BigUint> = matrix
         .iter()
-        .map(|row| row.iter().zip(&known).fold(BigUint::zero(), |a, (m, x)| (a + m * x) % n))
+        .map(|row| {
+            row.iter()
+                .zip(&known)
+                .fold(BigUint::zero(), |a, (m, x)| (a + m * x) % n)
+        })
         .collect();
-    let sol = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, n).expect("prime-order system");
+    let sol =
+        gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, n).expect("prime-order system");
     SolverControl {
         columns: cols,
         rows: cols,
@@ -468,17 +528,23 @@ fn curve_digest(c: &Curve<F>, g: &Point, q: &Point) -> String {
     h.update(b"ECCP131-REPRESENTATION-FILTER-CURVE-v1\n");
     h.update(c.name.as_bytes());
     h.update(format!("\n{:x}\n{:x}\n", f.modulus(), c.order));
-    h.update(format!("{:?}\n{:?}\n{:?}\n{:?}\n", f.key(g.x), f.key(g.y), f.key(q.x), f.key(q.y)));
+    h.update(format!(
+        "{:?}\n{:?}\n{:?}\n{:?}\n",
+        f.key(g.x),
+        f.key(g.y),
+        f.key(q.x),
+        f.key(q.y)
+    ));
     format!("{:x}", h.finalize())
 }
 
 fn escape(s: &str) -> String {
-    s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
 }
 
 fn write_svg(path: &Path, arms: &[ArmResult]) -> Result<(), String> {
-    let width = 1040.0;
-    let height = 520.0;
     let zero_y = 280.0;
     let scale = 65.0;
     let mut svg = format!("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1040\" height=\"520\" viewBox=\"0 0 1040 520\"><rect width=\"1040\" height=\"520\" fill=\"#f7f4ed\"/><text x=\"48\" y=\"48\" font-family=\"sans-serif\" font-size=\"26\" fill=\"#152238\">Exact ECCp-131 held-out representation-filter enrichment</text><text x=\"48\" y=\"76\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#52606d\">Training-selected configuration; 8,192 relation and 8,192 independent-null samples per cell</text><line x1=\"60\" y1=\"{zero_y}\" x2=\"1000\" y2=\"{zero_y}\" stroke=\"#263238\" stroke-width=\"2\"/><text x=\"10\" y=\"{}\" font-family=\"sans-serif\" font-size=\"13\">0 bits</text>", zero_y + 5.0);
@@ -486,7 +552,11 @@ fn write_svg(path: &Path, arms: &[ArmResult]) -> Result<(), String> {
         let x = 105.0 + i as f64 * 145.0;
         let v = arm.selected.test.log2_enrichment.clamp(-3.5, 3.5);
         let y = zero_y - v * scale;
-        let color = if arm.base_design == "small_x" { "#00796b" } else { "#d2691e" };
+        let color = if arm.base_design == "small_x" {
+            "#00796b"
+        } else {
+            "#d2691e"
+        };
         let top = y.min(zero_y);
         let h = (y - zero_y).abs().max(1.0);
         svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"72\" height=\"{}\" fill=\"{}\"/><text x=\"{}\" y=\"{}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#152238\">{:.3}</text><text x=\"{}\" y=\"430\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#152238\">{}</text><text x=\"{}\" y=\"450\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#52606d\">B={}</text>", x, top, h, color, x + 36.0, if v >= 0.0 { top - 8.0 } else { top + h + 18.0 }, arm.selected.test.log2_enrichment, x + 36.0, escape(arm.base_design), x + 36.0, arm.size));
@@ -495,17 +565,43 @@ fn write_svg(path: &Path, arms: &[ArmResult]) -> Result<(), String> {
     fs::write(path, svg).map_err(|e| e.to_string())
 }
 
-fn write_report(path: &Path, value: &serde_json::Value, arms: &[ArmResult], mitm: &MitmResult, solver: &SolverControl) -> Result<(), String> {
-    let qualifying = arms.iter().any(|a| a.base_design == "small_x" && a.selected.pre_add && a.selected.test.ratio_lower95 > 1.0)
-        && !arms.iter().any(|a| a.base_design == "random_base" && a.selected.test.ratio_lower95 > 1.0);
-    let verdict = if qualifying { "qualifying_filter_observed" } else { "no_qualifying_filter_in_frozen_family" };
+fn write_report(
+    path: &Path,
+    value: &serde_json::Value,
+    arms: &[ArmResult],
+    mitm: &MitmResult,
+    solver: &SolverControl,
+) -> Result<(), String> {
+    let qualifying = arms.iter().any(|a| {
+        a.base_design == "small_x" && a.selected.pre_add && a.selected.test.ratio_lower95 > 1.0
+    }) && !arms
+        .iter()
+        .any(|a| a.base_design == "random_base" && a.selected.test.ratio_lower95 > 1.0);
+    let verdict = if qualifying {
+        "qualifying_filter_observed"
+    } else {
+        "no_qualifying_filter_in_frozen_family"
+    };
     let mut out = format!("# Exact ECCp-131 representation-filter sweep\n\n## Result\n\nVerdict: `{verdict}`. The planted four-sum root was found and replayed: `{}`. The published-target bounded MITM probe found a four-sum: `{}`. The 16-column modular solver control recovered its known solution: `{}`.\n\n", mitm.planted_replayed, mitm.published_found, solver.recovered_exactly);
     out.push_str("## Held-out cells\n\n| Base | B | Selected source | Combiner | w | offset | relation hits | null hits | log2 enrichment | ratio lower95 | pre-add |\n| --- | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |\n");
     for a in arms {
         let s = &a.selected;
-        out.push_str(&format!("| {} | {} | {} | {} | {} | {} | {} | {} | {:.6} | {:.6} | {} |\n", a.base_design, a.size, s.source_name, s.combiner_name, s.config.width, s.config.offset, s.test.relation_hits, s.test.null_hits, s.test.log2_enrichment, s.test.ratio_lower95, s.pre_add));
+        out.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {} | {} | {} | {:.6} | {:.6} | {} |\n",
+            a.base_design,
+            a.size,
+            s.source_name,
+            s.combiner_name,
+            s.config.width,
+            s.config.offset,
+            s.test.relation_hits,
+            s.test.null_hits,
+            s.test.log2_enrichment,
+            s.test.ratio_lower95,
+            s.pre_add
+        ));
     }
-    out.push_str("\n## Phase ledger\n\n| Phase | State | Evidence |\n| --- | --- | --- |\n| Exact curve/target validation | completed | subgroup and curve checks in native instrument |\n| Factor-base generation | completed | small-x and matched scalar-random arms |\n| Hyperparameter search | completed | training-only exhaustive frozen grid |\n| Held-out relation filter | completed | 8,192 relation and null samples per cell |\n| F4 algebraic solve | unavailable | no exact 131-bit F4 decomposition backend is dispatched |\n| F5 algebraic solve | unavailable | no exact 131-bit F5 decomposition backend is dispatched |\n| F6 geometric pair index | completed | exact signed MITM root probe |\n| Root finding | completed | planted control plus published target probe |\n| Relation solving | control completed; natural rows separate | exact modular known-answer control; `ic prime` raw runs carry natural rank |\n| Published discrete logarithm | not completed | no target logarithm inferred from a bounded null |\n\n## Flow\n\nThe local native sweep planned, attempted, and completed six filter cells, one planted root control, one published-target probe, and one modular-solver control. Local clocks are descriptive and invalid for performance claims. Exact arity-2/3 natural relation/rank runs are retained separately. Cloud L2 execution is excluded by the repository cost gate until recorded budget headroom exists.\n\n## Reproduction\n\n```sh\ncargo run --release --example eccp131_representation_filter -- research/eccp131_representation_filter_20261102/raw/local\n```\n\nProtocol SHA-256: `{}`. Source revision: `{}`.\n", value["protocol_sha256"].as_str().unwrap_or("unknown"), value["source_revision"].as_str().unwrap_or("unknown"));
+    out.push_str(&format!("\n## Phase ledger\n\n| Phase | State | Evidence |\n| --- | --- | --- |\n| Exact curve/target validation | completed | subgroup and curve checks in native instrument |\n| Factor-base generation | completed | small-x and matched scalar-random arms |\n| Hyperparameter search | completed | training-only exhaustive frozen grid |\n| Held-out relation filter | completed | 8,192 relation and null samples per cell |\n| F4 algebraic solve | unavailable | no exact 131-bit F4 decomposition backend is dispatched |\n| F5 algebraic solve | unavailable | no exact 131-bit F5 decomposition backend is dispatched |\n| F6 geometric pair index | completed | exact signed MITM root probe |\n| Root finding | completed | planted control plus published target probe |\n| Relation solving | control completed; natural rows separate | exact modular known-answer control; `ic prime` raw runs carry natural rank |\n| Published discrete logarithm | not completed | no target logarithm inferred from a bounded null |\n\n## Flow\n\nThe local native sweep planned, attempted, and completed six filter cells, one planted root control, one published-target probe, and one modular-solver control. Local clocks are descriptive and invalid for performance claims. Exact arity-2/3 natural relation/rank runs are retained separately. Cloud L2 execution is excluded by the repository cost gate until recorded budget headroom exists.\n\n## Reproduction\n\n```sh\ncargo run --release --example eccp131_representation_filter -- research/eccp131_representation_filter_20261102/raw/local\n```\n\nProtocol SHA-256: `{}`. Source revision: `{}`.\n", value["protocol_sha256"].as_str().unwrap_or("unknown"), value["source_revision"].as_str().unwrap_or("unknown")));
     fs::write(path, out).map_err(|e| e.to_string())
 }
 
@@ -516,7 +612,11 @@ fn sha256_file(path: &Path) -> Result<String, String> {
 
 fn main() -> Result<(), String> {
     let all = Instant::now();
-    let output = PathBuf::from(env::args().nth(1).unwrap_or_else(|| "research/eccp131_representation_filter_20261102/raw/local".into()));
+    let output = PathBuf::from(
+        env::args()
+            .nth(1)
+            .unwrap_or_else(|| "research/eccp131_representation_filter_20261102/raw/local".into()),
+    );
     fs::create_dir_all(&output).map_err(|e| e.to_string())?;
     let (curve, g, q) = exact_curve()?;
     let digest = curve_digest(&curve, &g, &q);
@@ -529,15 +629,25 @@ fn main() -> Result<(), String> {
     }
     let mitm_base = small_x_base(&curve, 128)?;
     let mitm = mitm_probe(&curve, &mitm_base, &q);
-    if !mitm.planted_found || !mitm.planted_replayed { return Err("planted MITM root control failed".into()); }
-    if arms.iter().any(|a| !a.selected.aa_identical) { return Err("A/A count replay failed".into()); }
+    if !mitm.planted_found || !mitm.planted_replayed {
+        return Err("planted MITM root control failed".into());
+    }
+    if arms.iter().any(|a| !a.selected.aa_identical) {
+        return Err("A/A count replay failed".into());
+    }
     let solver = solver_control(&curve.order);
-    if !solver.all_determined || !solver.recovered_exactly { return Err("modular solver control failed".into()); }
+    if !solver.all_determined || !solver.recovered_exactly {
+        return Err("modular solver control failed".into());
+    }
     let protocol = Path::new("research/eccp131_representation_filter_20261102/protocol.json");
     let protocol_sha256 = sha256_file(protocol).unwrap_or_else(|_| "unavailable".into());
-    let source_revision = env::var("SOURCE_REVISION").unwrap_or_else(|_| "working-tree-development-run".into());
-    let qualifying = arms.iter().any(|a| a.base_design == "small_x" && a.selected.pre_add && a.selected.test.ratio_lower95 > 1.0)
-        && !arms.iter().any(|a| a.base_design == "random_base" && a.selected.test.ratio_lower95 > 1.0);
+    let source_revision =
+        env::var("SOURCE_REVISION").unwrap_or_else(|_| "working-tree-development-run".into());
+    let qualifying = arms.iter().any(|a| {
+        a.base_design == "small_x" && a.selected.pre_add && a.selected.test.ratio_lower95 > 1.0
+    }) && !arms
+        .iter()
+        .any(|a| a.base_design == "random_base" && a.selected.test.ratio_lower95 > 1.0);
     let value = json!({
         "schema": "eccp131.representation-filter/v1",
         "status": "complete",
@@ -558,9 +668,16 @@ fn main() -> Result<(), String> {
         ]
     });
     let result_path = output.join("result.json");
-    fs::write(&result_path, serde_json::to_vec_pretty(&value).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    fs::write(
+        &result_path,
+        serde_json::to_vec_pretty(&value).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     write_svg(&output.join("filter-enrichment.svg"), &arms)?;
     write_report(&output.join("REPORT.md"), &value, &arms, &mitm, &solver)?;
-    println!("{}", serde_json::to_string_pretty(&value).map_err(|e| e.to_string())?);
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&value).map_err(|e| e.to_string())?
+    );
     Ok(())
 }
