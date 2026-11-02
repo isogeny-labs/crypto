@@ -138,7 +138,7 @@ def veluOddX (A B : K) (S : Finset K) (x : K) : K :=
   x + ∑ q ∈ S, ((6 * q ^ 2 + 2 * A) / (x - q) + 4 * (q ^ 3 + A * q + B) / (x - q) ^ 2)
 
 /-- Its numerator over the kernel polynomial squared. -/
-noncomputable def veluOddN (A B : K) (S : Finset K) : Polynomial K :=
+noncomputable def veluOddN [DecidableEq K] (A B : K) (S : Finset K) : Polynomial K :=
   Polynomial.X * ∏ q ∈ S, (Polynomial.X - Polynomial.C q) ^ 2
     + ∑ q ∈ S, (Polynomial.C (6 * q ^ 2 + 2 * A) * (Polynomial.X - Polynomial.C q)
         + Polynomial.C (4 * (q ^ 3 + A * q + B)))
@@ -146,7 +146,7 @@ noncomputable def veluOddN (A B : K) (S : Finset K) : Polynomial K :=
 
 /-- **Vélu's odd-degree x-map is `N/ψ²`**, with `ψ = ∏_{q ∈ S} (X - q)` the
 kernel polynomial (away from its roots). -/
-theorem veluOddX_eq_div (A B : K) (S : Finset K) (x : K) (hx : ∀ q ∈ S, x ≠ q) :
+theorem veluOddX_eq_div [DecidableEq K] (A B : K) (S : Finset K) (x : K) (hx : ∀ q ∈ S, x ≠ q) :
     veluOddX A B S x
       = (veluOddN A B S).eval x
           / ((∏ q ∈ S, (Polynomial.X - Polynomial.C q)).eval x) ^ 2 := by
