@@ -241,6 +241,10 @@ pub struct PkmSemaevOracle {
     stop_staircase: Option<usize>,
     budget: Option<Duration>,
     crosscheck: bool,
+    /// Hybrid guessing (bits form only): the top `guess` bits of the first
+    /// summand are enumerated, one F4 system per assignment.
+    guess: u32,
+    branches: Vec<Prepared>,
     prepared: Option<Prepared>,
     totals: SolverTotals,
     shape: Option<SystemShape>,
@@ -266,6 +270,8 @@ impl PkmSemaevOracle {
             stop_staircase: None,
             budget: None,
             crosscheck: false,
+            guess: 0,
+            branches: Vec::new(),
             prepared: None,
             totals: SolverTotals {
                 solver: "f4-fp-tower".into(),
@@ -375,6 +381,18 @@ impl PkmSemaevOracle {
             .map(|_| params.u64("staircase").map(|v| v as usize))
             .transpose()?;
         self.crosscheck = params.flag("crosscheck");
+        self.guess = params.u64_or("guess", 0)? as u32;
+        if self.guess > 0 {
+            if !matches!(self.membership, Membership::Bits { .. }) {
+                return Err("pkm-semaev: guess=G applies to the bits form only".into());
+            }
+            if self.guess >= self.t || self.guess > 12 {
+                return Err(format!(
+                    "pkm-semaev: guess = {} must be below bits = {} and at most 12",
+                    self.guess, self.t
+                ));
+            }
+        }
         // The grid that reads a consistent system's solutions takes m ≤ 3.
         if !(2..=3).contains(&self.m) {
             return Err(format!("pkm-semaev: m is 2 or 3, not {}", self.m));
@@ -405,11 +423,21 @@ impl PkmSemaevOracle {
             semi_regular_degree: None,
         });
         self.setup_mults = check_mults;
+        self.branches = (0..(1u64 << self.guess))
+            .filter(|_| self.guess > 0)
+            .map(|a| self.build_system_fixed(curve, Some(a)))
+            .collect();
         self.prepared = Some(prep);
         Ok(())
     }
 
     fn build_system(&self, curve: &PrimeCurve) -> Prepared {
+        self.build_system_fixed(curve, None)
+    }
+
+    /// The system, with the top `guess` bits of the first summand fixed to
+    /// `fixed` when it is given (bits form; hybrid guessing).
+    fn build_system_fixed(&self, curve: &PrimeCurve, fixed: Option<u64>) -> Prepared {
         let p = curve.p;
         let (a, b) = (curve.a % p, curve.b % p);
         let (m, t) = (self.m as usize, self.t as usize);
@@ -425,8 +453,13 @@ impl PkmSemaevOracle {
             Membership::Kummer => Pol::var(n, i * t).scale(self.g, p),
             Membership::Isogeny { .. } => Pol::var(n, i * t),
             Membership::Bits { lo } => {
-                let mut acc = Pol::constant(n, lo % p, p);
-                for j in 0..t {
+                let g = self.guess as usize;
+                let (base, free_bits) = match fixed {
+                    Some(a) if i == 0 => ((lo + (a << (t - g))) % p, t - g),
+                    _ => (lo % p, t),
+                };
+                let mut acc = Pol::constant(n, base, p);
+                for j in 0..free_bits {
                     acc = acc.add(&Pol::var(n, i * t + j).scale((1u64 << j) % p, p), p);
                 }
                 acc
@@ -555,8 +588,14 @@ impl PkmSemaevOracle {
 
     /// The system at `x_R`: `Σ_k x_R^k E_k`, one multiplication per
     /// coefficient of every `k ≥ 1` part (and one per power of `x_R`).
-    fn specialise(&mut self, x_r: u64) -> Vec<RPoly> {
-        let prep = self.prepared.as_ref().expect("prepared");
+    /// The system at `x_R` on guessing branch `b` (or the full system):
+    /// `Σ_k x_R^k E_k`, one multiplication per coefficient of every `k ≥ 1`
+    /// part (and one per power of `x_R`).
+    fn specialise_branch(&mut self, branch: Option<usize>, x_r: u64) -> Vec<RPoly> {
+        let prep = match branch {
+            Some(b) => &self.branches[b],
+            None => self.prepared.as_ref().expect("prepared"),
+        };
         let p = prep.ring.p;
         let fp = Fp::new(p);
         let mut mults = 0u64;
@@ -713,6 +752,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "on a base other than prime-kummer/prime-isogeny: write membership in [lo, lo + 2^bits) as bits b_j² = b_j",
             ),
             ("lo", "left end of the bit interval, default 0"),
+            (
+                "guess",
+                "bits form: enumerate the top G bits of the first summand, one F4 system per assignment (hybrid guessing)",
+            ),
         ]
     }
 
@@ -849,63 +892,83 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 sols
             }
             PkmEngine::F4 => {
-                let sys = self.specialise(x_r);
-                if let Some(snapshot) = &mut self.dataset_artifact {
-                    snapshot["specialized_equations"] = serde_json::json!(sys
-                        .iter()
-                        .map(Self::polynomial_artifact)
-                        .collect::<Vec<_>>());
+                // Hybrid guessing: one F4 system per assignment of the guessed
+                // bits; the first consistent branch goes to the grid, and the
+                // target is refuted only when every branch is.
+                let n_branches = self.branches.len().max(1);
+                let mut last = None;
+                for br in 0..n_branches {
+                    let branch = (!self.branches.is_empty()).then_some(br);
+                    let sys = self.specialise_branch(branch, x_r);
+                    if let Some(snapshot) = &mut self.dataset_artifact {
+                        snapshot["specialized_equations"] = serde_json::json!(sys
+                            .iter()
+                            .map(Self::polynomial_artifact)
+                            .collect::<Vec<_>>());
+                    }
+                    let ring = match branch {
+                        Some(b) => self.branches[b].ring.clone(),
+                        None => self.prepared.as_ref().expect("prepared").ring.clone(),
+                    };
+                    let mut opts = TowerF4Options::new(self.max_degree);
+                    if let Some(b) = self.budget {
+                        opts = opts.with_budget(b);
+                    }
+                    if let Some(n) = self.max_nnz {
+                        opts = opts.with_max_nnz(n);
+                    }
+                    if let Some(s) = self.stop_staircase {
+                        opts = opts.stopping_below(s);
+                    }
+                    let rep = f4_tower(&sys, &ring, &opts);
+                    if let Some(snapshot) = &mut self.dataset_artifact {
+                        snapshot["f4_basis"] = serde_json::json!(rep
+                            .basis
+                            .iter()
+                            .map(Self::polynomial_artifact)
+                            .collect::<Vec<_>>());
+                        snapshot["f4_report"] = serde_json::json!({"inconsistent":rep.inconsistent,
+                            "timed_out":rep.timed_out,"oversize":rep.oversize,"degree_reached":rep.degree_reached,
+                            "observed_productive_degree_max":rep.solving_degree_max,"pairs_above_bound":rep.pairs_above_bound,
+                            "elimination_fp_muladds":rep.muladds,"max_rows":rep.max_rows,"max_cols":rep.max_cols,
+                            "max_nnz":rep.max_nnz,"critical_pairs_reduced":rep.critical_pairs_reduced,
+                            "tower_pairs_reduced":rep.tower_pairs_reduced,"pairs_product_skipped":rep.pairs_product_skipped,
+                            "pairs_chain_skipped":rep.pairs_chain_skipped,"reducer_rows":rep.reducer_rows,
+                            "full_exposed_native_report_debug":format!("{rep:#?}")});
+                    }
+                    let undecided = !rep.inconsistent
+                        && rep.staircase_at_stop.is_none()
+                        && (rep.timed_out || rep.oversize || rep.pairs_above_bound > 0);
+                    let mut extra = BTreeMap::new();
+                    extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
+                    extra.insert("steps".to_string(), rep.steps as u64);
+                    extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
+                    extra.insert(
+                        "staircase_stops".to_string(),
+                        u64::from(rep.staircase_at_stop.is_some()),
+                    );
+                    let cost = SolverCost {
+                        ops: rep.muladds,
+                        op_unit: "F_p multiply-adds (elimination only)".into(),
+                        wall_ns: (rep.ms * 1e6) as u64,
+                        peak_bytes: 0,
+                        degree_reached: Some(rep.degree_reached),
+                        solving_degree: (!undecided).then_some(rep.solving_degree_max),
+                        timed_out: rep.timed_out,
+                        extra,
+                    };
+                    let shape = self.shape.clone().unwrap_or_default();
+                    self.totals.absorb(&shape, Some(&cost), undecided);
+                    if branch.is_some() {
+                        self.bump("pkm_guess_branches_solved", 1);
+                    }
+                    let stop = !rep.inconsistent;
+                    last = Some((rep, undecided));
+                    if stop {
+                        break;
+                    }
                 }
-                let ring = self.prepared.as_ref().expect("prepared").ring.clone();
-                let mut opts = TowerF4Options::new(self.max_degree);
-                if let Some(b) = self.budget {
-                    opts = opts.with_budget(b);
-                }
-                if let Some(n) = self.max_nnz {
-                    opts = opts.with_max_nnz(n);
-                }
-                if let Some(s) = self.stop_staircase {
-                    opts = opts.stopping_below(s);
-                }
-                let rep = f4_tower(&sys, &ring, &opts);
-                if let Some(snapshot) = &mut self.dataset_artifact {
-                    snapshot["f4_basis"] = serde_json::json!(rep
-                        .basis
-                        .iter()
-                        .map(Self::polynomial_artifact)
-                        .collect::<Vec<_>>());
-                    snapshot["f4_report"] = serde_json::json!({"inconsistent":rep.inconsistent,
-                        "timed_out":rep.timed_out,"oversize":rep.oversize,"degree_reached":rep.degree_reached,
-                        "observed_productive_degree_max":rep.solving_degree_max,"pairs_above_bound":rep.pairs_above_bound,
-                        "elimination_fp_muladds":rep.muladds,"max_rows":rep.max_rows,"max_cols":rep.max_cols,
-                        "max_nnz":rep.max_nnz,"critical_pairs_reduced":rep.critical_pairs_reduced,
-                        "tower_pairs_reduced":rep.tower_pairs_reduced,"pairs_product_skipped":rep.pairs_product_skipped,
-                        "pairs_chain_skipped":rep.pairs_chain_skipped,"reducer_rows":rep.reducer_rows,
-                        "full_exposed_native_report_debug":format!("{rep:#?}")});
-                }
-                let undecided = !rep.inconsistent
-                    && rep.staircase_at_stop.is_none()
-                    && (rep.timed_out || rep.oversize || rep.pairs_above_bound > 0);
-                let mut extra = BTreeMap::new();
-                extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
-                extra.insert("steps".to_string(), rep.steps as u64);
-                extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
-                extra.insert(
-                    "staircase_stops".to_string(),
-                    u64::from(rep.staircase_at_stop.is_some()),
-                );
-                let cost = SolverCost {
-                    ops: rep.muladds,
-                    op_unit: "F_p multiply-adds (elimination only)".into(),
-                    wall_ns: (rep.ms * 1e6) as u64,
-                    peak_bytes: 0,
-                    degree_reached: Some(rep.degree_reached),
-                    solving_degree: (!undecided).then_some(rep.solving_degree_max),
-                    timed_out: rep.timed_out,
-                    extra,
-                };
-                let shape = self.shape.clone().unwrap_or_default();
-                self.totals.absorb(&shape, Some(&cost), undecided);
+                let (rep, undecided) = last.expect("at least one branch");
                 if rep.inconsistent {
                     if self.crosscheck {
                         let (sols, mults) = self.grid(curve, x_r, true);
@@ -1167,6 +1230,7 @@ mod tests {
         fb: &FactorBase<PrimePoint>,
         make: &dyn Fn() -> PkmSemaevOracle,
         label: &str,
+        extra: &str,
     ) {
         let curve = &inst.curve;
         let decomposable = decomposable_points(curve, fb, 2, &mut GroupOps::default());
@@ -1177,7 +1241,7 @@ mod tests {
                 .unwrap_or_else(|e| panic!("{label}: prepare: {e}"));
             o
         };
-        let mut f4 = prep("m=2,crosscheck=1");
+        let mut f4 = prep(&format!("m=2,crosscheck=1{extra}"));
         let mut grid = prep("m=2,engine=exhaustive");
         let mut rng = StdRng::seed_from_u64(29);
         let g = inst.generator_point();
@@ -1256,6 +1320,7 @@ mod tests {
             &fb,
             &|| PkmSemaevOracle::new_isogeny(2, t, v.clone(), steps.clone(), c),
             "isogeny",
+            "",
         );
     }
 
@@ -1269,7 +1334,31 @@ mod tests {
         let fb = prime_factor_base(&inst, 6);
         let max = *fb.abscissa_list.iter().max().unwrap();
         let t = 64 - max.leading_zeros();
-        agrees_with_grid(&inst, &fb, &|| PkmSemaevOracle::new_bits(2, t, 0), "bits");
+        agrees_with_grid(
+            &inst,
+            &fb,
+            &|| PkmSemaevOracle::new_bits(2, t, 0),
+            "bits",
+            "",
+        );
+        // Hybrid guessing: the same verdicts with 1 and 2 guessed bits, and
+        // every branch's F4 work charged.
+        for g in [1, 2] {
+            agrees_with_grid(
+                &inst,
+                &fb,
+                &|| PkmSemaevOracle::new_bits(2, t, 0),
+                &format!("bits guess={g}"),
+                &format!(",guess={g}"),
+            );
+        }
+        let (_, params) = Params::parse_spec(&format!("pkm-semaev:m=2,guess={t}")).unwrap();
+        assert!(
+            PkmSemaevOracle::new_bits(2, t, 0)
+                .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+                .is_err(),
+            "guess must be below the bit count"
+        );
         let (_, params) = Params::parse_spec("pkm-semaev:m=2").unwrap();
         let mut narrow = PkmSemaevOracle::new_bits(2, t - 1, 0);
         assert!(narrow
