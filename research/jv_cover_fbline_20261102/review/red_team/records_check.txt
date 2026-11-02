@@ -1,0 +1,112 @@
+## 0. Record identity and options
+p=1301 s=1 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1301 s=2 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1301 s=3 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1451 s=1 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1451 s=2 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1451 s=3 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1601 s=1 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1601 s=2 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+p=1601 s=3 l equal; c_add_e 331 ; plain stop_mode "full" trace false ; line stop_mode "full" trace false ; JV options otherwise as recorded
+
+## 1. Decomposition rate vs model, both arms
+| p | s | arm | B | decomp | residuals | rate/simple | rate/ff | poisson rel se |
+|---|---|---|---|---|---|---|---|---|
+| 1301 | 1 | plain | 634 | 635 | 568769 | 0.938 | 0.960 | 0.040 |
+| 1301 | 1 | line | 728 | 729 | 275600 | 0.969 | 0.990 | 0.037 |
+| 1301 | 2 | plain | 651 | 652 | 508789 | 0.918 | 0.940 | 0.039 |
+| 1301 | 2 | line | 725 | 726 | 295572 | 0.923 | 0.942 | 0.037 |
+| 1301 | 3 | plain | 662 | 663 | 428147 | 1.004 | 1.027 | 0.039 |
+| 1301 | 3 | line | 730 | 731 | 265906 | 0.991 | 1.012 | 0.037 |
+| 1451 | 1 | plain | 735 | 736 | 518223 | 0.946 | 0.965 | 0.037 |
+| 1451 | 1 | line | 811 | 812 | 315400 | 0.950 | 0.968 | 0.035 |
+| 1451 | 2 | plain | 729 | 730 | 546934 | 0.934 | 0.953 | 0.037 |
+| 1451 | 2 | line | 800 | 801 | 332057 | 0.966 | 0.984 | 0.035 |
+| 1451 | 3 | plain | 703 | 704 | 655128 | 0.935 | 0.955 | 0.038 |
+| 1451 | 3 | line | 804 | 805 | 320031 | 0.978 | 0.996 | 0.035 |
+| 1601 | 1 | plain | 764 | 765 | 793128 | 0.919 | 0.937 | 0.036 |
+| 1601 | 1 | line | 884 | 885 | 368821 | 0.953 | 0.969 | 0.034 |
+| 1601 | 2 | plain | 820 | 821 | 507722 | 1.008 | 1.026 | 0.035 |
+| 1601 | 2 | line | 883 | 884 | 355043 | 0.995 | 1.012 | 0.034 |
+| 1601 | 3 | plain | 824 | 825 | 471586 | 1.059 | 1.078 | 0.035 |
+| 1601 | 3 | line | 883 | 884 | 356689 | 0.991 | 1.008 | 0.034 |
+plain: geo-mean rate/simple 0.9611 (sd of log 0.0501); rate/ff 0.9814
+line: geo-mean rate/simple 0.9681 (sd of log 0.0247); rate/ff 0.9865
+paired log(rate/ff) line - plain: mean +0.0052 (factor 1.0052), sd 0.0347, t(8) +0.45; expected noise sd of a difference ~ sqrt(1/700+1/700) = 0.0535
+
+## 2. Per-residual costs (F_p multiplications per residual), paired
+| p | s | f4/res plain | f4/res line | ratio | lin/res plain | lin/res line | ratio | weil+stream+post /res ratio | f4_native/res ratio | (f4+lin)/res ratio |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1301 | 1 | 745397 | 745454 | 1.0001 | 205272 | 205536 | 1.0013 | 1.0404 | 1.0001 | 1.0003 |
+| 1301 | 2 | 745312 | 745445 | 1.0002 | 205372 | 205590 | 1.0011 | 1.0315 | 1.0001 | 1.0004 |
+| 1301 | 3 | 745334 | 745368 | 1.0000 | 205410 | 205625 | 1.0010 | 1.0287 | 1.0000 | 1.0003 |
+| 1451 | 1 | 745473 | 745534 | 1.0001 | 205732 | 205915 | 1.0009 | 1.0321 | 1.0001 | 1.0003 |
+| 1451 | 2 | 745411 | 745489 | 1.0001 | 205730 | 205906 | 1.0009 | 1.0299 | 1.0001 | 1.0003 |
+| 1451 | 3 | 745443 | 745496 | 1.0001 | 205720 | 205971 | 1.0012 | 1.0424 | 1.0000 | 1.0003 |
+| 1601 | 1 | 745476 | 745475 | 1.0000 | 205695 | 205957 | 1.0013 | 1.0405 | 1.0000 | 1.0003 |
+| 1601 | 2 | 745555 | 745526 | 1.0000 | 205814 | 206048 | 1.0011 | 1.0205 | 1.0000 | 1.0002 |
+| 1601 | 3 | 745512 | 745568 | 1.0001 | 205847 | 206002 | 1.0008 | 1.0211 | 1.0001 | 1.0002 |
+geo-mean ratio line/plain: f4/res 1.0001, lin/res 1.0011, f4_native/res 1.0001
+
+## 3. Accounting identity and phase shares (line arm)
+p=1301 s=1 plain: sum(phases)/total 1.000000  S recomputed 1.4940 (record 1.4940)  f4 77.9% lin 21.4% search 0.00% la 0.030%
+p=1301 s=1 line: sum(phases)/total 1.000000  S recomputed 0.7288 (record 0.7288)  f4 77.4% lin 21.3% search 0.55% la 0.080%
+p=1301 s=2 plain: sum(phases)/total 1.000000  S recomputed 1.3366 (record 1.3366)  f4 77.8% lin 21.5% search 0.00% la 0.035%
+p=1301 s=2 line: sum(phases)/total 1.000000  S recomputed 0.7813 (record 0.7813)  f4 77.4% lin 21.3% search 0.52% la 0.074%
+p=1301 s=3 plain: sum(phases)/total 1.000000  S recomputed 1.1249 (record 1.1249)  f4 77.8% lin 21.5% search 0.00% la 0.042%
+p=1301 s=3 line: sum(phases)/total 1.000000  S recomputed 0.7033 (record 0.7033)  f4 77.3% lin 21.3% search 0.57% la 0.083%
+p=1451 s=1 plain: sum(phases)/total 1.000000  S recomputed 0.9821 (record 0.9821)  f4 77.8% lin 21.5% search 0.00% la 0.044%
+p=1451 s=1 line: sum(phases)/total 1.000000  S recomputed 0.6015 (record 0.6015)  f4 77.3% lin 21.4% search 0.54% la 0.087%
+p=1451 s=2 plain: sum(phases)/total 1.000000  S recomputed 1.0364 (record 1.0364)  f4 77.8% lin 21.5% search 0.00% la 0.040%
+p=1451 s=2 line: sum(phases)/total 1.000000  S recomputed 0.6330 (record 0.6330)  f4 77.3% lin 21.4% search 0.51% la 0.081%
+p=1451 s=3 plain: sum(phases)/total 1.000000  S recomputed 1.2412 (record 1.2412)  f4 77.8% lin 21.5% search 0.00% la 0.032%
+p=1451 s=3 line: sum(phases)/total 1.000000  S recomputed 0.6103 (record 0.6103)  f4 77.3% lin 21.4% search 0.53% la 0.083%
+p=1601 s=1 plain: sum(phases)/total 1.000000  S recomputed 1.1184 (record 1.1184)  f4 77.8% lin 21.5% search 0.00% la 0.031%
+p=1601 s=1 line: sum(phases)/total 1.000000  S recomputed 0.5233 (record 0.5233)  f4 77.4% lin 21.4% search 0.51% la 0.089%
+p=1601 s=2 plain: sum(phases)/total 1.000000  S recomputed 0.7164 (record 0.7164)  f4 77.8% lin 21.5% search 0.00% la 0.056%
+p=1601 s=2 line: sum(phases)/total 1.000000  S recomputed 0.5040 (record 0.5040)  f4 77.3% lin 21.4% search 0.53% la 0.091%
+p=1601 s=3 plain: sum(phases)/total 1.000000  S recomputed 0.6654 (record 0.6654)  f4 77.8% lin 21.5% search 0.00% la 0.060%
+p=1601 s=3 line: sum(phases)/total 1.000000  S recomputed 0.5063 (record 0.5063)  f4 77.3% lin 21.4% search 0.53% la 0.091%
+
+## 4. Regression to the mean and extreme values (random-line model B ~ N((p-1)/2, p/4))
+max of 65536 iid N(0,1): mean 4.291, sd 0.277
+| p | s | B_plain | z_plain | B_best | z_best | E[B_max] model | residual ratio measured | model (B+1)/rate_ff | (B_plain/B_best)^5 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1301 | 1 | 634 | -0.89 | 728 | +4.32 | 727.4 | 0.485 | 0.499 | 0.501 |
+| 1301 | 2 | 651 | +0.06 | 725 | +4.16 | 727.4 | 0.581 | 0.582 | 0.584 |
+| 1301 | 3 | 662 | +0.67 | 730 | +4.44 | 727.4 | 0.621 | 0.612 | 0.613 |
+| 1451 | 1 | 735 | +0.53 | 811 | +4.52 | 806.7 | 0.609 | 0.610 | 0.611 |
+| 1451 | 2 | 729 | +0.21 | 800 | +3.94 | 806.7 | 0.607 | 0.627 | 0.628 |
+| 1451 | 3 | 703 | -1.16 | 804 | +4.15 | 806.7 | 0.489 | 0.510 | 0.511 |
+| 1601 | 1 | 764 | -1.80 | 884 | +4.20 | 885.8 | 0.465 | 0.481 | 0.482 |
+| 1601 | 2 | 820 | +1.00 | 883 | +4.15 | 885.8 | 0.699 | 0.690 | 0.691 |
+| 1601 | 3 | 824 | +1.20 | 883 | +4.15 | 885.8 | 0.756 | 0.707 | 0.708 |
+z_plain over 9 instances: mean -0.021 (se under H0 0.333), sd 1.034  -> plain instances were not unlucky on average
+z_best over 9 instances: mean +4.224, sd 0.175; EVT (Gaussian) predicts 4.291 +- 0.277
+realised geo-mean S_line/S_plain 0.5865 (x1.705); typical-plain (E over B_plain) vs realised B_best: 0.5825 (x1.717); vs EVT-expected B_best: 0.5780 (x1.730)
+
+## 5. Small-sample statistics
+paired log ratio n=9: mean -0.5336 sd 0.1675; t(8) 95%: ratio 0.5865 [0.5156, 0.6671] speed-up x1.705 [1.499, 1.939] (study bootstrap 0.5865 [0.5301, 0.6508])
+log(measured/model) per instance: mean +0.0011 sd 0.0346 (Poisson floor for two ~700-count runs 0.0535)
+U1/U2 per prime with a t(2) cover-side interval combined with the reference se (0.0415 relative):
+  p=1301 U1: 0.791 [0.677, 0.924] (cover log-sd 0.0535, 3 seeds)
+  p=1301 U2: 1.900 [1.626, 2.220] (cover log-sd 0.0535, 3 seeds)
+  p=1451 U1: 0.660 [0.594, 0.732] (cover log-sd 0.0263, 3 seeds)
+  p=1451 U2: 1.585 [1.428, 1.759] (cover log-sd 0.0263, 3 seeds)
+  p=1601 U1: 0.548 [0.498, 0.604] (cover log-sd 0.0206, 3 seeds)
+  p=1601 U2: 1.318 [1.197, 1.450] (cover log-sd 0.0206, 3 seeds)
+
+## 6. Section 5a with the search's native operations, and tuned-cover thresholds
+search natives per (line, point): k = 1 (square-table lookup) or 3 (lookup, zero test, counter)
+  p=1301 k=0: search natives/sqrt(l) 0.0000; w=0: U1 0.791 U2 1.900; w=0.1: U1 0.822 U2 1.050; w=1: U1 0.838 U2 0.866;
+  p=1301 k=1: search natives/sqrt(l) 0.0774; w=0: U1 0.791 U2 1.900; w=0.1: U1 0.825 U2 1.054; w=1: U1 0.843 U2 0.871;
+  p=1301 k=3: search natives/sqrt(l) 0.2323; w=0: U1 0.791 U2 1.900; w=0.1: U1 0.832 U2 1.061; w=1: U1 0.852 U2 0.881;
+  p=1301: cover geo-mean S 0.7371; tuned rho/harness rho = 0.4161; cover must shrink its F_p-mult count by x1.900 (tau* = 0.526) to reach the tuned negation rho
+  p=1451 k=0: search natives/sqrt(l) 0.0000; w=0: U1 0.660 U2 1.585; w=0.1: U1 0.686 U2 0.875; w=1: U1 0.699 U2 0.722;
+  p=1451 k=1: search natives/sqrt(l) 0.0623; w=0: U1 0.660 U2 1.585; w=0.1: U1 0.688 U2 0.878; w=1: U1 0.703 U2 0.726;
+  p=1451 k=3: search natives/sqrt(l) 0.1868; w=0: U1 0.660 U2 1.585; w=0.1: U1 0.693 U2 0.885; w=1: U1 0.710 U2 0.734;
+  p=1451: cover geo-mean S 0.6148; tuned rho/harness rho = 0.4161; cover must shrink its F_p-mult count by x1.585 (tau* = 0.631) to reach the tuned negation rho
+  p=1601 k=0: search natives/sqrt(l) 0.0000; w=0: U1 0.548 U2 1.318; w=0.1: U1 0.570 U2 0.728; w=1: U1 0.581 U2 0.601;
+  p=1601 k=1: search natives/sqrt(l) 0.0511; w=0: U1 0.548 U2 1.318; w=0.1: U1 0.572 U2 0.730; w=1: U1 0.584 U2 0.604;
+  p=1601 k=3: search natives/sqrt(l) 0.1534; w=0: U1 0.548 U2 1.318; w=0.1: U1 0.576 U2 0.736; w=1: U1 0.590 U2 0.610;
+  p=1601: cover geo-mean S 0.5111; tuned rho/harness rho = 0.4161; cover must shrink its F_p-mult count by x1.318 (tau* = 0.759) to reach the tuned negation rho
