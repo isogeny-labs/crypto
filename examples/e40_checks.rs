@@ -9,8 +9,10 @@
 //! - **P2** (broken count): V's stored-cell counter short by one per row.
 //!   Detected when the counter differs from the measured row lengths.
 //! - **Perturbed coefficient** (E31's): one coefficient of one equation moved
-//!   by one; V's decomposition set must change on every call whose clean set
-//!   is non-empty.
+//!   by one; V's solution set must change on every call whose clean solution
+//!   set is non-empty (E31's definition; the first harness tested the
+//!   decomposition set after the lift, empty on all 320 calls, which made the
+//!   control vacuous — fixed before any verdict was taken).
 //! - Clean V against A counted (the identity itself) on the same calls.
 //!
 //! ```text
@@ -160,8 +162,8 @@ fn main() {
                     let id = v == a;
                     let d1 = v1 != a;
                     let d2 = m2.is_some_and(|m| m.counter != m.measured);
-                    let ne = !v.3.is_empty();
-                    let dp = ne && vp.3 != v.3;
+                    let ne = v.0.as_ref().is_some_and(|s| !s.is_empty());
+                    let dp = ne && vp.0 != v.0;
                     c_id += usize::from(id);
                     c_p1 += usize::from(d1);
                     c_p2 += usize::from(d2);
