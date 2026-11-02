@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ECCP131-REPRESENTATION-FILTER-20261102",
-  "version": 4,
+  "version": 5,
   "created": "2026-11-02",
   "repository": "crypto",
   "study_dir": "research/eccp131_representation_filter_20261102",
@@ -666,13 +666,27 @@
         "arms[].instrument.binary_sha256",
         "analysis_plan.script.sha256"
       ]
+    },
+    {
+      "id": "A4-SOURCE-REVISION-CUSTODY",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "The first deterministic local bundle supplied a non-resolving long SOURCE_REVISION after the correct 68cc86da7c prefix. Preserve and invalidate that bundle; repeat the identical fixed cohorts once with the exact pinned instrument commit. This is a metadata-custody correction, not a seed or outcome retry.",
+      "changes": [
+        "Move the complete first bundle to raw/invalid-source-revision without editing it.",
+        "Repeat the identical fixed seeds, sizes and candidate grid once with SOURCE_REVISION=33355ba6aed5fbb175211a757f0cc6da460f72ab.",
+        "Require bit-identical counted outcomes between the invalid and corrected bundles before admitting the corrected bundle."
+      ],
+      "supersedes_fields": [
+        "run.source_revision"
+      ]
     }
   ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "20949a2eac68e6c8cc5e49cbe3926d370baac2814f7666e9d9343fd443b24dca",
-    "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
-    "frozen_at": "2026-11-02T17:58:44Z",
+    "protocol_sha256": "6e56a761622da5ab41aaff666c248b0a28bb062893f319440e074e20de1baa4e",
+    "commit": "68cc86da7c69396ba722bc063c77ebdd6aa017c2",
+    "frozen_at": "2026-11-02T18:00:41Z",
     "filed_before_affected_data": true
   }
 }
