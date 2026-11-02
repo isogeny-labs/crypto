@@ -64,6 +64,9 @@ pub struct RuleCheck {
     /// Negative control (S, H): map one row back to its neighbour's index
     /// after the echelon (a wrong inverse permutation).
     pub corrupt_inverse: bool,
+    /// Negative control (S, H), added after the first control proved inert
+    /// (§9.43): the rows of the two last pivot columns swap their targets.
+    pub corrupt_pivot_inverse: bool,
 }
 
 /// Uncharged per-thread tallies for the §9.41 sensitivities σ2 and σ3,
@@ -77,6 +80,9 @@ pub struct RuleDiag {
     pub ordered_candidates: u64,
     /// `Σ (|b| − 1)` over all contested columns (= row updates).
     pub row_updates: u64,
+    /// Calls where a corrupted inverse actually moved different contents
+    /// (diagnostic of the negative controls).
+    pub corrupt_changed: u64,
 }
 
 thread_local! {
@@ -84,6 +90,7 @@ thread_local! {
         contested: 0,
         ordered_candidates: 0,
         row_updates: 0,
+        corrupt_changed: 0,
     }) };
 }
 
@@ -306,9 +313,31 @@ pub(crate) fn echelon_by_rule(
     work.digest = digest;
     // Back to the original row indices.
     let mut inv_perm = perm.clone();
+    let mut swapped: Option<(usize, usize)> = None;
     if check.corrupt_inverse && rule.permutes() && nrows > 1 {
         // Negative control: the first two permuted rows swap their targets.
-        inv_perm.swap(0, 1);
+        swapped = Some((0, 1));
+    }
+    if check.corrupt_pivot_inverse && rule.permutes() {
+        let mut piv: Vec<usize> = pivot_row
+            .iter()
+            .filter(|&&r| r != u32::MAX)
+            .map(|&r| r as usize)
+            .collect();
+        if piv.len() > 1 {
+            let (a, b) = (piv.pop().unwrap_or(0), piv.pop().unwrap_or(0));
+            swapped = Some((a, b));
+        }
+    }
+    if let Some((a, b)) = swapped {
+        inv_perm.swap(a, b);
+        if rows[a] != rows[b] {
+            DIAG.with(|d| {
+                let mut x = d.get();
+                x.corrupt_changed += 1;
+                d.set(x);
+            });
+        }
     }
     let mut out: Vec<Vec<u16>> = vec![Vec::new(); nrows];
     for (i, row) in rows.into_iter().enumerate() {

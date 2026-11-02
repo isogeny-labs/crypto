@@ -70,6 +70,9 @@ fn main() {
     let (mut calls, mut nonempty, mut contested) = (0usize, 0usize, 0usize);
     let mut perturb_detected = [0usize; 5];
     let mut inverse_detected = [0usize; 2];
+    let mut inverse_changed = [0usize; 2];
+    let mut pivot_inverse_detected = [0usize; 2];
+    let mut pivot_inverse_changed = [0usize; 2];
     let mut digest_differs = [0usize; 5];
     for (p, seed) in [(101u64, 2u64), (149, 1)] {
         let ki = generate_gls_klein_instance(p, seed, 16).unwrap();
@@ -156,17 +159,34 @@ fn main() {
                 .into_iter()
                 .enumerate()
             {
+                let _ = take_diag();
                 let bad = run(
                     &comps,
                     Pivot::Rule(
                         rule,
                         RuleCheck {
                             corrupt_inverse: true,
+                            ..Default::default()
                         },
                     ),
                 );
+                inverse_changed[j] += take_diag().corrupt_changed as usize;
                 if (&bad.0, bad.1, &bad.2) != (&ua.0, ua.1, &ua.2) || bad.4 != ua.4 {
                     inverse_detected[j] += 1;
+                }
+                let bad = run(
+                    &comps,
+                    Pivot::Rule(
+                        rule,
+                        RuleCheck {
+                            corrupt_pivot_inverse: true,
+                            ..Default::default()
+                        },
+                    ),
+                );
+                pivot_inverse_changed[j] += take_diag().corrupt_changed as usize;
+                if (&bad.0, bad.1, &bad.2) != (&ua.0, ua.1, &ua.2) || bad.4 != ua.4 {
+                    pivot_inverse_detected[j] += 1;
                 }
             }
             calls += 1;
@@ -180,10 +200,23 @@ fn main() {
             format!("{name}: perturbed coefficient detected {}/{nonempty}", perturb_detected[i]),
         );
     }
+    // A corruption that moves no different contents cannot be detected by any
+    // output check; the registered control is judged on the calls where it
+    // changed something, and the pivot-row variant on every call.
     for (j, name) in ["S", "H"].iter().enumerate() {
         check(
-            inverse_detected[j] == calls,
-            format!("{name}: corrupt inverse detected {}/{calls}", inverse_detected[j]),
+            inverse_detected[j] == inverse_changed[j],
+            format!(
+                "{name}: corrupt inverse detected {}/{} effective",
+                inverse_detected[j], inverse_changed[j]
+            ),
+        );
+        check(
+            pivot_inverse_changed[j] == calls && pivot_inverse_detected[j] == calls,
+            format!(
+                "{name}: corrupt pivot inverse detected {}/{calls} ({} effective)",
+                pivot_inverse_detected[j], pivot_inverse_changed[j]
+            ),
         );
     }
     check(
@@ -191,7 +224,7 @@ fn main() {
         format!("F/L digests never differ from A's on {contested} contested calls"),
     );
     println!(
-        "{{\"calls\": {calls}, \"nonempty\": {nonempty}, \"contested\": {contested}, \"perturbed_detected\": {perturb_detected:?}, \"corrupt_inverse_detected\": {inverse_detected:?}, \"digest_differs_from_a\": {digest_differs:?}, \"rules\": [\"F\", \"S\", \"H\", \"K\", \"L\"], \"failures\": {}}}",
+        "{{\"calls\": {calls}, \"nonempty\": {nonempty}, \"contested\": {contested}, \"perturbed_detected\": {perturb_detected:?}, \"corrupt_inverse_detected\": {inverse_detected:?}, \"corrupt_inverse_effective\": {inverse_changed:?}, \"corrupt_pivot_inverse_detected\": {pivot_inverse_detected:?}, \"corrupt_pivot_inverse_effective\": {pivot_inverse_changed:?}, \"digest_differs_from_a\": {digest_differs:?}, \"rules\": [\"F\", \"S\", \"H\", \"K\", \"L\"], \"failures\": {}}}",
         fails.len()
     );
     if !fails.is_empty() {
