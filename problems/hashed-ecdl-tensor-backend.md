@@ -45,6 +45,13 @@ Explicit work policies can terminate a run with an unknown result.
   comparisons retaining both taper levels. See the
   [sampling audit](../docs/hashed-ecdl-audit-20261029/README.md).
   These bounded checks leave the general obligations below open.
+- The 2026-11-02 continuation independently mapped the source guards and major
+  recursive invariants to code and added a host-independent exact numeric
+  evaluator. At the first even nonzero-scale boundary `2^131071+2`, every D.4
+  numeric guard passes for degree two while the live graph representation is
+  unavailable. The concentrated remaining gaps are a typed predicate
+  description/evaluation-cost certificate and aggregate construction/space
+  accounting; arbitrary `FnPredicate` closures cannot supply either by type.
 - The follow-up source review makes the representation boundary explicit:
   on a 64-bit build lambda is at most 64, so root_u=lambda/131072 is zero
   for every publicly representable graph. Public calls therefore select a
@@ -77,6 +84,18 @@ reconsidered. A practical timing study is a separate requested experiment with
 the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
+
+2026-11-02 focused theorem/code continuation: the
+[requirement matrix and attack graph](../research/ic_weak_assumptions_20261102/FOLLOWUP.md)
+trace subdivision, degree admission, exact D.4 parameters, conditional-
+expectation packing, incidence, balance, child shrink, creation precision and
+Hermite shape checks into the implementation. The new
+[`admission` module](../crates/hashed-ecdl-tensor/src/admission.rs) independently
+mirrors numeric guards with `BigUint`; four boundary/fail-closed tests pass.
+This materially narrows but does not close the independent audit: mode and
+reconstruction correctness still lack a general formal proof, and the public
+predicate API has no enforceable uniform description/evaluation-cost
+certificate. No recursive performance result or ECDLP conclusion is claimed.
 
 2026-10-30 program assessment and theorem-bridge source review: the
 [dated assessment](../research/hashed_ecdl_leads_20261030/README.md) and
