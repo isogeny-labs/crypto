@@ -35,3 +35,13 @@ to hashes before execution. Accept only exit 0, exact marker and zero
 whitespace-question-mark error lines. Preserve failed raw attempts;
 freeze repairs under fresh revisions and IDs. No EKS, Diem, freezer,
 Conductor claim, merge or PR retarget.
+
+## Version 2 source-ring transport repair, frozen before attempt 02
+
+`degree-five73-01` is rejected despite exit 0 and a late marker:
+Singular printed source-table undefined errors after changing rings.
+The repair constructs all 32 by 32 source square columns in the source
+ring and transports that complete matrix as one object to `F32`.
+The fiber cohort, controls, resource caps and acceptance gate are
+unchanged. Preserve attempt 01 raw; run a fresh full attempt under the
+new committed source revision.

@@ -15,14 +15,15 @@ for(p73=1;p73<=528;p73++){
  }
 }
 for(j73=1;j73<=32;j73++){require73(slots73[j73,1]>0,"FIVE73_ALL_32_SQUARE_SLOTS");}
+matrix sourceSquares73[32][32];
+for(i73=1;i73<=32;i73++){for(j73=1;j73<=32;j73++){sourceSquares73[i73,j73]=table50[i73,slots73[j73,1]];}}
 ring degreeFive73=(2,a),(q),dp;minpoly=a^5+a^3+a^2+a+1;short=0;
 require73(a^32+a==0 && a^2+a!=0,"FIVE73_EXACT_F32_BASE_FIELD");
 map tableToFive73=tablePidCertificate50,a;
 map unitToFive73=tracePolynomial61,a;
-matrix square73[32][32];matrix sourceUnit73=unitToFive73(unit61);matrix unitSquared73[32][1];
+matrix square73=tableToFive73(sourceSquares73);matrix sourceUnit73=unitToFive73(unit61);matrix unitSquared73[32][1];
 for(i73=1;i73<=32;i73++){
  unitSquared73[i73,1]=sourceUnit73[i73,1]^2;
- for(j73=1;j73<=32;j73++){square73[i73,j73]=tableToFive73(table50[i73,slots73[j73,1]]);}
 }
 require73(nrows(sourceUnit73)==32 && ncols(sourceUnit73)==1 && sourceUnit73!=matrix(0,32,1),"FIVE73_SOURCE_UNIT_SHAPE");
 require73(square73*unitSquared73==sourceUnit73,"FIVE73_ABSOLUTE_FROBENIUS_UNIT");
