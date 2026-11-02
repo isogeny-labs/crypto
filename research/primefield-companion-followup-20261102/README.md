@@ -192,3 +192,7 @@ Seven Python files parse; four complete AST substitution audits cover driver, se
 ### Selected columns through checked compression
 
 `companion-selected-reuse/` restricts cached pivot columns after deletion and independently checks compression factor identities before rebinding them to the new operator. Derived repeated-search query reduction is one for the first-diagonal branch, two for secondary-diagonal/pair branches; checker products/reductions and copies remain separate costs. Driver preserves pivot choices and root checks. Two static AST audits pass; five Python files parse; report inspected. Numerical/corruption/heap/performance trials zero. Source `d072d3cb829735f2ccd03fa43e6c0104d649d4ad`.
+
+### Compact actual-feature diagonal
+
+`feature-diagonal-events/` derives a constant background plus q exceptional diagonal corrections for the original weighted character-feature Gram. Geometrically scaled interval events construct these with O(q^2) field operations and O(q) arithmetic workspace, without an r-point sweep. C nonzero bounds the root zero-column prefix by q-1; diagonal zeros alone do not certify zero columns. A constant-weight diagnostic reports at most q+1 forbidden values without changing inputs. Five Python files parse; original constructor bytes/pattern AST checked; report inspected. Independent direct-character checker implemented but unexecuted. No numerical/corruption/heap/performance trial. Schur-diagonal closure remains a separate construction. Source `0de2baf50632fd07aceca933541334c8526dbd79`.
