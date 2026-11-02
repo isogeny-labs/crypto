@@ -111,6 +111,11 @@ paths:
       summary: This document.
       security: [{}]
       responses: { "200": { description: OK } }
+  /viewer:
+    get:
+      summary: A browser viewer for the catalogue (HTML). It carries no data; it calls the read routes with a token the visitor pastes, kept in that browser tab. A browser that asks GET / for text/html is redirected here.
+      security: [{}]
+      responses: { "200": { description: "HTML page", content: { text/html: {} } } }
   /v1/meta:
     get:
       summary: Row counts, schema version and the pinned input files (path, sha256, commit).
