@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 539,
-    "frontier": 329,
+    "nodes": 541,
+    "frontier": 330,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -17,19 +17,19 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 88,
-      "measured": 23,
+      "measured": 24,
       "proved_internal_unreviewed": 47,
       "open": 45,
       "heuristic": 71,
-      "refuted": 19,
+      "refuted": 20,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 503,
+      "none": 504,
       "kernel_checked": 29,
       "stated_open": 3,
       "lean_written_unchecked": 1,
-      "native_exact": 3
+      "native_exact": 4
     }
   },
   "frontier": [
@@ -1710,6 +1710,10 @@
         {
           "from": "HEUR-FIRST-FALL-DEGREE",
           "relation": "qualifies"
+        },
+        {
+          "from": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
+          "relation": "qualifies"
         }
       ]
     },
@@ -2588,6 +2592,23 @@
       "pressure": [
         {
           "from": "CEX-LEMMA4-REVERSE-R",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
+      "label": "Semaev: first fall degree of S_3(x1,x2,z) systems 'always 4'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-SP-SEMAEV15-T2-TRACE",
           "relation": "refutes"
         }
       ]
@@ -4959,9 +4980,9 @@
     },
     {
       "id": "CEX-SP-SEMAEV15-T2-TRACE",
-      "label": "Trace identity gives d_ff = 2 < d_F4 = 4 on Semaev's t = 2 rows",
+      "label": "Trace identity: d_ff = 2 on Semaev's t = 2 rows (checked); solver needs 2 or 3",
       "status": "proved_internal_unreviewed",
-      "formal": "none",
+      "formal": "native_exact",
       "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
@@ -4969,7 +4990,12 @@
       "research_targets": [
         "RT-SP-T2-TRACE-CHECK"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "MEAS-SEMAEV-T2-MACAULAY",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",

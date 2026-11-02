@@ -279,7 +279,7 @@ digraph ecdlp_claims {
     "OBS-SP-SHANTZ-TESKE-EXPERIMENTS" [label="OBS-SP-SHANTZ-TESKE-EXPERIMENTS\\nShantz-Teske 2013: experimental study of Petit-Quisquater", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "OBS-SP-GG2014-RHO-STILL-FASTER" [label="OBS-SP-GG2014-RHO-STILL-FASTER\\nGalbraith-Gebregiyorgis 2014: Pollard rho still much faster", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-SP-SEMAEV15-SPLITTING" [label="THM-SP-SEMAEV15-SPLITTING\\nSemaev 2015 Lemmas 1-2: S_3-chain splitting of S_{t+1}", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
-    "CEX-SP-SEMAEV15-T2-TRACE" [label="CEX-SP-SEMAEV15-T2-TRACE\\nTrace identity gives d_ff = 2 < d_F4 = 4 on Semaev's t = 2 rows", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CEX-SP-SEMAEV15-T2-TRACE" [label="CEX-SP-SEMAEV15-T2-TRACE\\nTrace identity: d_ff = 2 on Semaev's t = 2 rows (checked); solver needs 2 or 3", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "OBS-SP-KY-SEMAEV-N45" [label="OBS-SP-KY-SEMAEV-N45\\nKosters-Yeo: degree of regularity 5 at n = 45 on Semaev's system", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CLAIM-LEMMA4-REVERSE-GENERAL" [label="CLAIM-LEMMA4-REVERSE-GENERAL\\nReverse repair d'_F <= d_F (outside), unrestricted\\nd'_F <= d_F\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "CEX-LEMMA4-REVERSE-R" [label="CEX-LEMMA4-REVERSE-R\\nWitness R {X, X^2+X}: d_F = 2, no fake fall", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
@@ -507,6 +507,8 @@ digraph ecdlp_claims {
     "MEAS-LEMMA4-REVERSE-CENSUS" [label="MEAS-LEMMA4-REVERSE-CENSUS\\nReverse-repair census: 0 nondegenerate counterexamples in 531,497 pairs", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
     "MEAS-REVERSE-TRIPLES" [label="MEAS-REVERSE-TRIPLES\\nReverse repair, triples: 0 counterexamples with independent reduced generators", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
     "MEAS-INSIDE-GAP-N4" [label="MEAS-INSIDE-GAP-N4\\nInside gap census n = 2, 3, 4: maxima 1, 2, 3", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
+    "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" [label="CLAIM-SP-SEMAEV15-DFF-ALWAYS-4\\nSemaev: first fall degree of S_3(x1,x2,z) systems 'always 4'\\nd_ff(S_3(x_1, x_2, z)) = 4\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "MEAS-SEMAEV-T2-MACAULAY" [label="MEAS-SEMAEV-T2-MACAULAY\\nSemaev t = 2 rows: degree needed to prove no solution is 2 or 3", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
   }
   subgraph cluster_open {
     label="Open proof and attack surfaces"; color="#cad5df"; style="rounded";
@@ -1461,4 +1463,8 @@ digraph ecdlp_claims {
   "MEAS-INSIDE-GAP-N4" -> "GAP-FAKE-GAP-INSIDE-BOUNDED" [label="measures", color="#66788a", style="solid"];
   "GAP-FAKE-GAP-INSIDE-BOUNDED" -> "DEF-FIRST-FALL-DEGREE" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-FAKE-GAP-INSIDE-BOUNDED" -> "CLAIM-NAGAO-LEMMA4" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-SP-SEMAEV15-T2-TRACE" -> "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" [label="refutes", color="#a33a3a", style="solid"];
+  "MEAS-SEMAEV-T2-MACAULAY" -> "CEX-SP-SEMAEV15-T2-TRACE" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-SEMAEV-T2-MACAULAY" -> "HEUR-SP-SEMAEV15-ASSUMPTION1" [label="measures", color="#66788a", style="solid"];
+  "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" -> "HEUR-SP-SEMAEV15-ASSUMPTION1" [label="qualifies", color="#66788a", style="dashed"];
 }
