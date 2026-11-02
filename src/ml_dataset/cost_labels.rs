@@ -3,7 +3,7 @@
 //! The current checked collector is a calling-thread phase diagnostic. Its
 //! records cannot be promoted into whole-worker training costs.
 use serde::Serialize;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -25,11 +25,13 @@ struct CounterProof {
     enabled_ns: u64,
     running_ns: u64,
     complete_execution: bool,
+    worker_contained: bool,
     whole_worker_coverage: bool,
     descendant_lifetimes_accounted: bool,
     escaped_descendant: bool,
     readback_complete: bool,
     independently_checked_hardware: bool,
+    platform_admitted: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -63,7 +65,10 @@ fn admit(
     if p.scope != Scope::WholeWorker {
         return reject("phase_only_counter");
     }
-    if !p.requested_hardware_instructions || !p.independently_checked_hardware {
+    if !p.requested_hardware_instructions
+        || !p.independently_checked_hardware
+        || !p.platform_admitted
+    {
         return reject("hardware_event_unverified");
     }
     if p.opened_event_id == 0 || p.read_event_id != p.opened_event_id {
@@ -78,7 +83,11 @@ fn admit(
     if !p.complete_execution || !p.readback_complete {
         return reject("execution_or_readback_incomplete");
     }
-    if !p.whole_worker_coverage || !p.descendant_lifetimes_accounted || p.escaped_descendant {
+    if !p.worker_contained
+        || !p.whole_worker_coverage
+        || !p.descendant_lifetimes_accounted
+        || p.escaped_descendant
+    {
         return reject("worker_or_descendant_coverage_missing");
     }
     Decision {
@@ -138,12 +147,7 @@ pub(super) fn report_run(root: &Path) -> Result<Value, String> {
         if !scalar_replay_verified {
             missing_gates.push("independent_scalar_replay");
         }
-        let d = admit(
-            None,
-            false,
-            solver_completed,
-            scalar_replay_verified,
-        );
+        let d = admit(None, false, solver_completed, scalar_replay_verified);
         *reasons.entry(d.reason).or_default() += 1;
         rows.push(CellCost {
             cell_index: manifest.cell_index,
@@ -187,11 +191,13 @@ mod tests {
             enabled_ns: 80,
             running_ns: 80,
             complete_execution: true,
+            worker_contained: true,
             whole_worker_coverage: true,
             descendant_lifetimes_accounted: true,
             escaped_descendant: false,
             readback_complete: true,
             independently_checked_hardware: true,
+            platform_admitted: true,
         }
     }
 
@@ -232,6 +238,12 @@ mod tests {
         );
         p = valid();
         p.escaped_descendant = true;
+        assert_eq!(
+            admit(Some(&p), true, true, true).reason,
+            "worker_or_descendant_coverage_missing"
+        );
+        p = valid();
+        p.worker_contained = false;
         assert_eq!(
             admit(Some(&p), true, true, true).reason,
             "worker_or_descendant_coverage_missing"
