@@ -171,3 +171,12 @@ Adds `companion-paired-transport/`: combines simultaneous row/column swaps into 
 Outside-query cost is 3n+4 field products and 4n+1 additions, versus 4 and 2n+2. Derived fused native-product counts change from 16w+48 to (2+h)(4w+8), h in {0,1}; these units are separate and no net runtime gain is claimed. The complete driver changes only its transport import, with normalized whole-driver AST equality checked. Identity swaps and upstream cohorts are preserved.
 
 Four Python files parse; twelve originals are separately manifested and the one-page report is visually inspected. Numerical, corruption-control, heap and performance validation remain unrun under the cost gate. No zero-prefix query elision or reduced metric validation is included in these counts.
+
+
+### Immutable inverse-metric views
+
+Adds `companion-metric-views/`: validate canonical inverse pairs once in an immutable root, then derive index views by checked permutations and trailing-coordinate selection. Selector and row-cache entry points still match every supplied metric pair to the same-meter root coordinates and captured prime, replacing repeated field products with native checks. Global DA symmetry remains caller-established; frozen Python objects provide internal provenance, not public attestation.
+
+Derived removed products equal the sum of nonzero selector-node dimensions plus the sum of nonterminal cache-node dimensions. Full scalar descent removes N(N+1)-1; full even pair-only descent removes N(N+2)/2-2; initially zero source removes zero. The initial N products remain. Native label/permutation/coordinate checks, tuple allocations and index metadata remain explicit; no runtime or whole-heap claim. Source queries, pivot rules, paired transport, block equations and root verification are unchanged.
+
+Seven Python files parse; four complete AST substitution audits cover driver, selector, row helper and block cache. Sixteen originals are separately manifested and the one-page report is inspected. Numerical, corruption-control, heap and performance trials remain unrun under the existing cost gate.
