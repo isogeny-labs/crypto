@@ -1,0 +1,31 @@
+selftest n=13 k=3 trial=0 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok
+   frobenius-conjugate count 6 == 6: true
+selftest n=13 k=3 trial=1 planted_satisfies=true brute=1 numeric=1 chained_fast=1 -> ok
+   frobenius-conjugate count 1 == 1: true
+selftest n=13 k=3 trial=2 planted_satisfies=true brute=3 numeric=3 chained_fast=3 -> ok
+   frobenius-conjugate count 3 == 3: true
+selftest n=13 k=3 trial=3 planted_satisfies=true brute=3 numeric=3 chained_fast=3 -> ok
+   frobenius-conjugate count 3 == 3: true
+selftest n=17 k=4 trial=0 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok
+   frobenius-conjugate count 6 == 6: true
+selftest n=17 k=4 trial=1 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok
+   frobenius-conjugate count 6 == 6: true
+selftest n=17 k=4 trial=2 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok
+   frobenius-conjugate count 6 == 6: true
+selftest n=17 k=4 trial=3 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok
+   frobenius-conjugate count 6 == 6: true
+selftest n=21 k=4 trial=0 planted_satisfies=true brute=3 numeric=3 chained_fast=3 -> ok
+   frobenius-conjugate count 3 == 3: true
+selftest n=21 k=4 trial=1 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok
+   frobenius-conjugate count 6 == 6: true
+selftest n=21 k=4 trial=2 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok
+   frobenius-conjugate count 6 == 6: true
+selftest n=21 k=4 trial=3 planted_satisfies=true brute=3 numeric=3 chained_fast=3 -> ok
+   frobenius-conjugate count 3 == 3: true
+selftest m=2 n=13 k=5 brute=2 numeric=2 -> ok
+selftest m=2 n=13 k=5 brute=0 numeric=0 -> ok
+selftest m=2 n=13 k=5 brute=0 numeric=0 -> ok
+selftest m=2 n=13 k=5 brute=0 numeric=0 -> ok
+selftest iso z^43+z^6+z^4+z^3+1 -> z^43+z^6+z^5+z+1 : ok
+selftest iso z^43+z^6+z^4+z^3+1 -> z^43+z^6+z^5+z^4+1 : ok
+selftest ALL OK
