@@ -1744,6 +1744,8 @@ fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, St
         }
     }
     let mut reached = 0usize;
+    // E37 (§9.44): the read probe, off unless a control turned it on.
+    let probe = super::chain_pivot_rules::probe_on();
     while let Some(c) = stack.pop() {
         let pr = b.ech.pivot_row[c];
         if pr == u32::MAX {
@@ -1751,6 +1753,9 @@ fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, St
         }
         reached += 1;
         let row = &b.ech.rows[pr as usize];
+        if probe {
+            super::chain_pivot_rules::probe_read(0, c, pr, row);
+        }
         for j in (c + 1)..ncols {
             if row[j] != 0 && !b.is_std[j] && !seen[j] {
                 seen[j] = true;
@@ -1787,6 +1792,9 @@ fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, St
             }
             acc[c] = 0;
             let row = &b.ech.rows[b.ech.pivot_row[c] as usize];
+            if probe {
+                super::chain_pivot_rules::probe_read(1, c, b.ech.pivot_row[c], row);
+            }
             let nf_ = pp - f;
             let mut k = 0u64;
             for j in (c + 1)..ncols {

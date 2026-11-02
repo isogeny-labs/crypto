@@ -1,5 +1,7 @@
 //! E36 (`RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` §9.41): pivot rules for
-//! the `k = 4` chain solve whose selection work fits the §5a band.
+//! the `k = 4` chain solve whose selection work fits the §5a band.  E37
+//! (§9.44) adds negative controls aimed at rows the normal forms read and a
+//! read probe; the rules themselves are E36's, unchanged.
 //!
 //! Additive.  `echelon_by_lead_with` and E33's `echelon_by_lead_counted`
 //! are unchanged; the echelon below performs the same elimination (the same
@@ -67,6 +69,61 @@ pub struct RuleCheck {
     /// Negative control (S, H), added after the first control proved inert
     /// (§9.43): the rows of the two last pivot columns swap their targets.
     pub corrupt_pivot_inverse: bool,
+    /// E37 C_SH (§9.44; S, H): the inverse permutation maps the contents of
+    /// these two original rows to each other (rows the caller has seen the
+    /// normal forms read).
+    pub swap_rows: Option<(u32, u32)>,
+    /// E37 C_F (F): at this column the bucket's second arrival is filed in
+    /// the bucket of its next nonzero without its update.
+    pub misfile_at: Option<u32>,
+    /// E37 C_0 (any rule): the first nonzero right of this original row's
+    /// pivot is moved by one (to another nonzero value).
+    pub bump_row: Option<u32>,
+}
+
+/// E37 (§9.44) read probe: what the normal-form stage reads.  Off unless
+/// [`probe_begin`] was called on this thread; nothing here is charged.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ReadProbe {
+    /// Per pivot row read, in order: `(phase, column, original row, hash of
+    /// the row's entries from the column on, nonzeros right of the column)`;
+    /// phase `0` = the reachability pass, `1` = the left-looking normal forms.
+    pub reads: Vec<(u8, u32, u32, u64, u32)>,
+    /// Columns with more than one candidate in an E36-rule echelon, in order.
+    pub contested: Vec<u32>,
+}
+
+thread_local! {
+    static PROBE: std::cell::RefCell<Option<ReadProbe>> = const { std::cell::RefCell::new(None) };
+}
+
+/// Start recording reads on this thread.
+pub fn probe_begin() {
+    PROBE.with(|p| *p.borrow_mut() = Some(ReadProbe::default()));
+}
+
+/// Stop recording and return what was read.
+pub fn probe_end() -> ReadProbe {
+    PROBE.with(|p| p.borrow_mut().take().unwrap_or_default())
+}
+
+/// Is the probe recording on this thread?
+pub fn probe_on() -> bool {
+    PROBE.with(|p| p.borrow().is_some())
+}
+
+/// Record one pivot row read at column `c` (call only when [`probe_on`]).
+pub(crate) fn probe_read(phase: u8, c: usize, pr: u32, row: &[u16]) {
+    let mut h = 0xCBF2_9CE4_8422_2325u64;
+    for &x in &row[c..] {
+        h = fnv(h, u64::from(x));
+    }
+    let nnz = row[c + 1..].iter().filter(|&&x| x != 0).count() as u32;
+    PROBE.with(|p| {
+        if let Some(pb) = p.borrow_mut().as_mut() {
+            pb.reads.push((phase, c as u32, pr, h, nnz));
+        }
+    });
 }
 
 /// Uncharged per-thread tallies for the §9.41 sensitivities σ2 and σ3,
@@ -197,6 +254,7 @@ pub(crate) fn echelon_by_rule(
     }
     // Rows at the front of each bucket that are still at their initial lead.
     let initial_len: Vec<usize> = buckets.iter().map(|b| b.len()).collect();
+    let probing = probe_on();
     let mut digest = 0xCBF2_9CE4_8422_2325u64;
     let mut pivot_row = vec![u32::MAX; ncols];
     for c in 0..ncols {
@@ -207,6 +265,13 @@ pub(crate) fn echelon_by_rule(
         let contested = b.len() > 1;
         if contested {
             work.contested += 1;
+            if probing {
+                PROBE.with(|p| {
+                    if let Some(pb) = p.borrow_mut().as_mut() {
+                        pb.contested.push(c as u32);
+                    }
+                });
+            }
         }
         let mut ordered = false;
         // `b` is in arrival order here.
@@ -251,6 +316,12 @@ pub(crate) fn echelon_by_rule(
                 d.set(x);
             });
         }
+        // E37 C_F: the second arrival skips its update and is filed by its
+        // next nonzero right of `c` (a control; never in a solver).
+        let misfiled = (rule == ArrivalRule::Fifo
+            && check.misfile_at == Some(c as u32)
+            && b.len() > 1)
+            .then(|| b.remove(1));
         let pr = b[0] as usize;
         digest = fnv(fnv(digest, c as u64), u64::from(perm[pr]));
         let mut piv = std::mem::take(&mut rows[pr]);
@@ -270,6 +341,20 @@ pub(crate) fn echelon_by_rule(
             .map(|&r| (r, std::mem::take(&mut rows[r as usize]), None, 0))
             .collect();
         *muls += (others.len() * nz.len()) as u64;
+        if let Some(r) = misfiled {
+            DIAG.with(|d| {
+                let mut x = d.get();
+                x.corrupt_changed += 1;
+                d.set(x);
+            });
+            match rows[r as usize][c + 1..].iter().position(|&x| x != 0) {
+                Some(k) => buckets[c + 1 + k].push(r),
+                None => {
+                    zero_rows += 1;
+                    zero_ids.push(r);
+                }
+            }
+        }
         let nzr = &nz;
         others.par_iter_mut().for_each(|(_, row, lead, scan)| {
             let f = row[c] as u32;
@@ -329,6 +414,14 @@ pub(crate) fn echelon_by_rule(
             swapped = Some((a, b));
         }
     }
+    if let (Some((r1, r2)), true) = (check.swap_rows, rule.permutes()) {
+        let pos = |r: u32| perm.iter().position(|&x| x == r);
+        if let (Some(a), Some(b)) = (pos(r1), pos(r2)) {
+            if a != b {
+                swapped = Some((a, b));
+            }
+        }
+    }
     if let Some((a, b)) = swapped {
         inv_perm.swap(a, b);
         if rows[a] != rows[b] {
@@ -346,6 +439,20 @@ pub(crate) fn echelon_by_rule(
     for pr in pivot_row.iter_mut() {
         if *pr != u32::MAX {
             *pr = perm[*pr as usize];
+        }
+    }
+    if let Some(r) = check.bump_row {
+        // E37 C_0: one nonzero right of row `r`'s pivot moved by one.
+        if let Some(c) = pivot_row.iter().position(|&x| x == r) {
+            let row = &mut out[r as usize];
+            if let Some(j) = (c + 1..row.len()).find(|&j| row[j] != 0) {
+                row[j] = (row[j] % (p as u16 - 1)) + 1;
+                DIAG.with(|d| {
+                    let mut x = d.get();
+                    x.corrupt_changed += 1;
+                    d.set(x);
+                });
+            }
         }
     }
     let mut zero_ids: Vec<u32> = zero_ids.into_iter().map(|r| perm[r as usize]).collect();
