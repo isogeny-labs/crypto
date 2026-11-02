@@ -375,7 +375,8 @@ pub(super) struct WorkerResidualArtifact {
     untransferred_root: Option<super::types::Artifact>,
 }
 impl WorkerResidualCustody {
-    const CAPACITY: usize = 10;
+    // Legacy ordinary worst-case9 + optional Boolean anchor/check2 + one spare.
+    const CAPACITY: usize = 12;
     fn admit(charge: impl FnOnce(u64, u64) -> Result<(), String>) -> Result<Self, String> {
         charge(
             4096,

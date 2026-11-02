@@ -20,6 +20,8 @@ enum Slot {
     GroupReplay,
     ParentDelivery,
     Witness,
+    BooleanAnchor,
+    BooleanCheck,
 }
 impl Slot {
     const ALL: [Self; 7] = [
@@ -56,6 +58,8 @@ impl Slot {
                 "json",
             ),
             Self::Witness => ("pdp-witness.json", "independently-verified-pdp", "json"),
+            Self::BooleanAnchor => ("binary-m3-boolean-anchor.json", "restricted-binary-m3-boolean-anchor/v1", "json"),
+            Self::BooleanCheck => ("binary-m3-boolean-check.json", "restricted-binary-m3-boolean-check/v1", "json"),
         }
     }
     fn matches(self, artifact: &types::Artifact) -> bool {
@@ -84,6 +88,12 @@ impl<'o> OrdinaryRootRegistry<'o> {
         ledger: &mut Budget,
         limits: &capture::CaptureLimits,
     ) -> Result<Self, String> {
+        Self::admit_with_boolean(original, ledger, limits, false)
+    }
+    pub(super) fn admit_with_boolean(
+        original: &'o VerifiedWorkerOriginal<'o>, ledger: &mut Budget,
+        limits: &capture::CaptureLimits, boolean: bool,
+    ) -> Result<Self, String> {
         if ledger.phase != Phase::Setup
             || original.binding.is_none()
             || original.config.family != "binary"
@@ -96,7 +106,7 @@ impl<'o> OrdinaryRootRegistry<'o> {
             .reserve_checking(1024, 1024, Instant::now())
             .map_err(|s| format!("ordinary sealed identity comparison admission: {s:?}"))?;
         let receipts =
-            solvers::WorkerStoredReceipts::admit(original, Slot::ALL.len(), |work, bytes| {
+            solvers::WorkerStoredReceipts::admit(original, Slot::ALL.len() + if boolean { 2 } else { 0 }, |work, bytes| {
                 ledger
                     .reserve_checking(work, bytes, Instant::now())
                     .map_err(|s| format!("ordinary receipt admission: {s:?}"))

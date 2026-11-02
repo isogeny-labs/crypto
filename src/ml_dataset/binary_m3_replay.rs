@@ -149,6 +149,46 @@ fn root<'a>(artifacts: &'a [Artifact], slot: Slot) -> Result<Option<&'a Artifact
         )),
     }
 }
+const OPTIONAL_BOOLEAN_SLOTS: [Slot; 2] = [Slot::BooleanAnchor, Slot::BooleanCheck];
+// Identity/custody only. This does not admit a Boolean certificate, captured
+// payload or training label; central mathematical/capture replay is separate.
+fn validate_reserved_artifacts(artifacts: &[Artifact]) -> Result<(), String> {
+    for slot in Slot::ALL.into_iter().chain(OPTIONAL_BOOLEAN_SLOTS) {
+        root(artifacts, slot)?;
+    }
+    for artifact in artifacts {
+        let path = artifact.path.strip_prefix("live/payloads/").unwrap_or(&artifact.path);
+        if (path.starts_with("binary-m3-") || path.starts_with("partial-binary-m3-")
+            || artifact.role.starts_with("restricted-binary-m3-"))
+            && !Slot::ALL.iter().chain(OPTIONAL_BOOLEAN_SLOTS.iter()).any(|s| {
+                let (p,r,e)=s.identity(); path==p && artifact.role==r && artifact.encoding==e
+            })
+            && !(artifact.role=="unregistered-partial-artifact" && artifact.encoding=="native") {
+            return Err("unknown or relabeled reserved ordinary artifact".into());
+        }
+    }
+    for slot in OPTIONAL_BOOLEAN_SLOTS {
+        let original=root(artifacts,slot)?;
+        let (path,role,encoding)=slot.identity();
+        let mut captured:Option<&Artifact>=None;
+        for artifact in artifacts {
+            let Some(normalized)=artifact.path.strip_prefix("live/payloads/") else {continue};
+            if normalized!=path && artifact.role!=role {continue;}
+            // Raw collector custody remains unknown, just as for root(...).
+            if normalized==path && artifact.role=="unregistered-partial-artifact"
+                && artifact.encoding=="native" {continue;}
+            if normalized!=path || artifact.role!=role || artifact.encoding!=encoding
+                || captured.is_some() {
+                return Err("optional Boolean captured identity/uniqueness mismatch".into());
+            }
+            if original.is_some_and(|a|a.sha256!=artifact.sha256 || a.bytes!=artifact.bytes) {
+                return Err("optional Boolean root/captured content mismatch".into());
+            }
+            captured=Some(artifact);
+        }
+    }
+    Ok(())
+}
 fn read(dir: &std::path::Path, artifact: &Artifact, cap: usize) -> Result<Vec<u8>, String> {
     if artifact.bytes > cap as u64 {
         return Err("ordinary artifact exceeds decode cap".into());
@@ -273,26 +313,7 @@ pub(in crate::ml_dataset::solvers) fn verify(
     };
     let limits = OriginalLimits::from_original(config, &launch)?;
     let math = solvers::binary_m3_original::authenticate(Profile::OrdinaryBinary, config, &case)?;
-    for slot in Slot::ALL {
-        root(artifacts, slot)?;
-    }
-    for artifact in artifacts {
-        let path = artifact
-            .path
-            .strip_prefix("live/payloads/")
-            .unwrap_or(&artifact.path);
-        if (path.starts_with("binary-m3-")
-            || path.starts_with("partial-binary-m3-")
-            || artifact.role.starts_with("restricted-binary-m3-"))
-            && !Slot::ALL.iter().any(|s| {
-                let (p, r, e) = s.identity();
-                path == p && artifact.role == r && artifact.encoding == e
-            })
-            && !(artifact.role == "unregistered-partial-artifact" && artifact.encoding == "native")
-        {
-            return Err("unknown or relabeled reserved ordinary artifact".into());
-        }
-    }
+    validate_reserved_artifacts(artifacts)?;
     let mut admission = ReplayAdmission { work: 0, bytes: 0 };
     let admitted_prefix = capture::verify_live_committed_prefix(dir, &binding, &capture_limits)?;
     let captured_input = admitted_prefix.as_ref().and_then(|p| {
@@ -1096,7 +1117,7 @@ fn check_delivery(
     if v.schema != "crypto.ml-dataset.binary-m3-parent-delivery/v1"
         || Some(v.input_sha256) != input_sha
         || v.source_completion_claimed
-        || v.accepted_roots_before_delivery.len() > Slot::ALL.len() - 1
+        || v.accepted_roots_before_delivery.len() > Slot::ALL.len() + 1
     {
         return Err("ordinary parent delivery identity/cap mismatch".into());
     }
@@ -1129,7 +1150,9 @@ fn check_delivery(
     for root in roots {
         if !paths.insert(&root.path)
             || !artifacts.iter().any(|a| a == root)
-            || !Slot::ALL.iter().any(|s| s.matches(root))
+            || !(Slot::ALL.iter().any(|s| s.matches(root))
+                || Slot::BooleanAnchor.matches(root)
+                || Slot::BooleanCheck.matches(root))
             || Slot::ParentDelivery.matches(root)
         {
             return Err("ordinary delivery invented/duplicated root receipt".into());
@@ -1278,5 +1301,55 @@ mod exact_index_endpoint_tests {
         assert!(!exact_index_endpoint(&index(1, 4), None, 4, 2));
         assert!(exact_index_endpoint(&index(1, 1), Some(1), 0, 0));
         assert!(!exact_index_endpoint(&index(1, 2), Some(1), 0, 0));
+    }
+}
+
+#[cfg(test)]
+mod optional_boolean_identity_tests {
+    use super::*;
+    fn artifact(slot:Slot, live:bool)->Artifact {
+        let (path,role,encoding)=slot.identity();
+        Artifact {path:if live {format!("live/payloads/{path}")}else{path.into()},
+            role:role.into(),encoding:encoding.into(),sha256:"a".repeat(64),bytes:123}
+    }
+    #[test]
+    fn exact_optional_roots_and_normalized_payloads_are_custody_only() {
+        assert!(validate_reserved_artifacts(&[]).is_ok());
+        for slot in OPTIONAL_BOOLEAN_SLOTS {
+            let root_artifact=artifact(slot,false);
+            let captured=artifact(slot,true);
+            assert!(validate_reserved_artifacts(std::slice::from_ref(&root_artifact)).is_ok());
+            assert!(validate_reserved_artifacts(std::slice::from_ref(&captured)).is_ok());
+            assert!(validate_reserved_artifacts(&[root_artifact.clone(),captured.clone()]).is_ok());
+            assert!(validate_reserved_artifacts(&[root_artifact.clone(),root_artifact.clone()]).is_err());
+            assert!(validate_reserved_artifacts(&[captured.clone(),captured.clone()]).is_err());
+            let mut changed=captured;
+            changed.sha256="b".repeat(64);
+            assert!(validate_reserved_artifacts(&[root_artifact.clone(),changed.clone()]).is_err());
+            changed.sha256=root_artifact.sha256.clone();changed.bytes+=1;
+            assert!(validate_reserved_artifacts(&[root_artifact,changed]).is_err());
+        }
+    }
+    #[test]
+    fn optional_unknown_relabel_and_encoding_mutations_refuse() {
+        for slot in OPTIONAL_BOOLEAN_SLOTS {
+            for live in [false,true] {
+                for mutation in 0..4 {
+                    let mut bad=artifact(slot,live);
+                    match mutation {
+                        0=>bad.role.push_str("-foreign"),
+                        1=>bad.encoding="jsonl".into(),
+                        2=>bad.path=if live {"live/payloads/binary-m3-forged.json".into()}else{"binary-m3-forged.json".into()},
+                        _=>{bad.path="binary-m3-unknown.json".into();bad.role="restricted-binary-m3-unknown/v1".into();},
+                    }
+                    assert!(validate_reserved_artifacts(&[bad]).is_err());
+                }
+                let mut raw=artifact(slot,live);
+                raw.role="unregistered-partial-artifact".into();raw.encoding="native".into();
+                assert!(validate_reserved_artifacts(std::slice::from_ref(&raw)).is_ok());
+                // Raw residual custody is never selected as an admitted root.
+                assert!(root(&[raw],slot).unwrap().is_none());
+            }
+        }
     }
 }

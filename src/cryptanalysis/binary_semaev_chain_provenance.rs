@@ -2,6 +2,8 @@
 //! simplification. This does not authenticate a native snapshot or search trace.
 use super::*;
 
+#[path = "binary_semaev_chain_gate_wire.rs"]
+pub mod gate_wire;
 /// Fresh pre-solve attachment only; not a search-prefix or UNSAT verifier.
 #[path = "binary_semaev_chain_initial.rs"]
 pub mod initial;
