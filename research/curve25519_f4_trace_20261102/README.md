@@ -190,3 +190,24 @@ With more targets the amortised cost tends to the trace column (trace/plain
   yield beyond consistency with `coverage_exact`.
 - Run locally (a development measurement inside the lead), not on EKS, as the
   task specified; no L2 or cross-method claim.
+
+## Coordinator review (main session, 2026-11-02)
+
+- **Prior art in the lab.** F4 trace replay already exists here: the Joux–Vitse
+  (n − 1)-decomposition work (`research/joux_vitse_n1_20261015`, leaderboard
+  rows of 2026-10-15 and 2026-10-20) and the G1 direction in
+  `docs/ic/RESEARCH_IC_NOVEL_DIRECTIONS_20261007.md`. This lead ports the
+  technique to the prime-field `pkm-semaev` engine (`f4_fp_tower.rs`); it is not
+  a new method. Whether the existing implementation could have been reused was
+  not checked.
+- **What the gain is worth.** 0.29–0.45× F4 multiply-adds per target is a
+  measured component speed-up with identical verdicts and hits. Against lead A's
+  full-solve comparison (`../curve25519_algebraic_ecbench_20261102`: the
+  algebraic arm is 1.35e5× behind the generic baseline at w = 0.1), a 2–3×
+  saving in the F4 term does not change the ranking. At w = 0.1 the arm would
+  still be about 6e4× behind (estimate from two separate measurements, not run).
+- **CLI after merging main.** Lead 5 had put `max_nnz` at argument 12, so
+  `trace` moved to argument 13 when this lead was merged with main
+  (`... [lifts] [max_nnz|-] [trace 0|1]`). The cells were run with the earlier
+  binary, which takes `trace` at argument 12: `analysis/run_cells.sh` and the
+  frozen sha256 refer to that binary, and the data are unchanged.
