@@ -1725,6 +1725,10 @@ struct ChainQuotient {
 fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, String> {
     let ncols = b.cols.len();
     let dim = b.standard.len();
+    // E38 (§9.46): the pivot set and border targets this function reads.
+    if super::chain_pivot_rules::probe_on() {
+        super::chain_pivot_rules::probe_pivots(&b.ech.pivot_row);
+    }
     for v in 0..=4usize {
         let m: [u8; 4] = core::array::from_fn(|k| u8::from(v > 0 && k == v - 1));
         if !b.is_std[b.col_index[&m]] {
@@ -1732,6 +1736,9 @@ fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, St
         }
     }
     let chains = p2_chains(b);
+    if super::chain_pivot_rules::probe_on() {
+        super::chain_pivot_rules::probe_targets(&chains.target);
+    }
     // The existing solver's reachability test: every column structurally
     // reachable from a border target is standard or a pivot.
     let mut seen = vec![false; ncols];

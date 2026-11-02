@@ -1,7 +1,9 @@
 //! E36 (`RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` §9.41): pivot rules for
 //! the `k = 4` chain solve whose selection work fits the §5a band.  E37
 //! (§9.44) adds negative controls aimed at rows the normal forms read and a
-//! read probe; the rules themselves are E36's, unchanged.
+//! read probe; the rules themselves are E36's, unchanged.  E38 (§9.46) adds
+//! probe records of the pivot set, the border targets and the updates, and
+//! two structure-preserving F controls (`bump_update`, `bump_pivot`).
 //!
 //! Additive.  `echelon_by_lead_with` and E33's `echelon_by_lead_counted`
 //! are unchanged; the echelon below performs the same elimination (the same
@@ -79,6 +81,13 @@ pub struct RuleCheck {
     /// E37 C_0 (any rule): the first nonzero right of this original row's
     /// pivot is moved by one (to another nonzero value).
     pub bump_row: Option<u32>,
+    /// E38 C_F^mid (§9.46; any rule, used on F): at column `.0`, right
+    /// after the update of original row `.1`, that row's last-column entry
+    /// is moved by one (its lead recomputed).
+    pub bump_update: Option<(u32, u32)>,
+    /// E38 C_F^mid-b (the registered fallback): at this column the pivot
+    /// row's last-column entry is moved by one before its normalisation.
+    pub bump_pivot: Option<u32>,
 }
 
 /// E37 (§9.44) read probe: what the normal-form stage reads.  Off unless
@@ -91,6 +100,14 @@ pub struct ReadProbe {
     pub reads: Vec<(u8, u32, u32, u64, u32)>,
     /// Columns with more than one candidate in an E36-rule echelon, in order.
     pub contested: Vec<u32>,
+    /// E38: per `chain_quotient` call, the pivot set it reads (sorted
+    /// columns with a pivot row).
+    pub pivots: Vec<Vec<u32>>,
+    /// E38: per `chain_quotient` call, the border targets (`chains.target`).
+    pub targets: Vec<Vec<Option<u32>>>,
+    /// E38: every `(column, original row)` updated as a non-pivot of a
+    /// contested column in an E36-rule echelon, in order.
+    pub updates: Vec<(u32, u32)>,
 }
 
 thread_local! {
@@ -123,6 +140,38 @@ pub(crate) fn probe_read(phase: u8, c: usize, pr: u32, row: &[u16]) {
         if let Some(pb) = p.borrow_mut().as_mut() {
             pb.reads.push((phase, c as u32, pr, h, nnz));
         }
+    });
+}
+
+/// E38: record the pivot set `chain_quotient` reads (call only when
+/// [`probe_on`]).
+pub(crate) fn probe_pivots(pivot_row: &[u32]) {
+    let cols: Vec<u32> = (0..pivot_row.len() as u32)
+        .filter(|&c| pivot_row[c as usize] != u32::MAX)
+        .collect();
+    PROBE.with(|p| {
+        if let Some(pb) = p.borrow_mut().as_mut() {
+            pb.pivots.push(cols);
+        }
+    });
+}
+
+/// E38: record the border targets `chain_quotient` starts from (call only
+/// when [`probe_on`]).
+pub(crate) fn probe_targets(targets: &[Option<usize>]) {
+    let t: Vec<Option<u32>> = targets.iter().map(|x| x.map(|c| c as u32)).collect();
+    PROBE.with(|p| {
+        if let Some(pb) = p.borrow_mut().as_mut() {
+            pb.targets.push(t);
+        }
+    });
+}
+
+fn note_corrupt() {
+    DIAG.with(|d| {
+        let mut x = d.get();
+        x.corrupt_changed += 1;
+        d.set(x);
     });
 }
 
@@ -322,9 +371,22 @@ pub(crate) fn echelon_by_rule(
             && check.misfile_at == Some(c as u32)
             && b.len() > 1)
             .then(|| b.remove(1));
+        if probing && contested {
+            PROBE.with(|p| {
+                if let Some(pb) = p.borrow_mut().as_mut() {
+                    pb.updates
+                        .extend(b[1..].iter().map(|&r| (c as u32, perm[r as usize])));
+                }
+            });
+        }
         let pr = b[0] as usize;
         digest = fnv(fnv(digest, c as u64), u64::from(perm[pr]));
         let mut piv = std::mem::take(&mut rows[pr]);
+        if check.bump_pivot == Some(c as u32) && c + 1 < ncols {
+            // E38 C_F^mid-b: the pivot row's last entry moved by one.
+            piv[ncols - 1] = ((u32::from(piv[ncols - 1]) + 1) % p) as u16;
+            note_corrupt();
+        }
         let inv = inv_mod(piv[c] as u64, p as u64) as u32;
         let mut nz: Vec<u32> = Vec::new();
         for j in c..ncols {
@@ -373,7 +435,13 @@ pub(crate) fn echelon_by_rule(
                 None => (ncols - c - 1) as u64,
             };
         });
-        for (r, row, lead, scan) in others {
+        for (r, mut row, mut lead, scan) in others {
+            if check.bump_update == Some((c as u32, perm[r as usize])) {
+                // E38 C_F^mid: this row's last entry moved by one after its update.
+                row[ncols - 1] = ((u32::from(row[ncols - 1]) + 1) % p) as u16;
+                lead = row[c + 1..].iter().position(|&x| x != 0).map(|k| k + c + 1);
+                note_corrupt();
+            }
             work.lead_scan += scan;
             if rule == ArrivalRule::EstimateK2 {
                 if let Some(l) = lead {
