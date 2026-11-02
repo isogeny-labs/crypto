@@ -162,3 +162,12 @@ Adds `companion-metric-solver/`: connects exact compression, principal scalar/an
 Cached weighted rows/columns handle leading-supported requests, leaving two full source applications per nonterminal node across the specified generator/RHS/lift phases, versus 2w+8 for the same uncached block. Cache arithmetic, row reconstruction, metric validation and changing transport widths are charged separately. Primal lifts use C tails and shared root metric through Fz=D1^-1 C^T D2 z; dual lifts use C^T v. Frames retain kq+2k field values plus two length-n index tuples, with shared root metric2N; total heap and runtime remain unmeasured.
 
 Five Python files parse; the zero-terminal and final root-verification ASTs exactly match the preserved rank solver; dependencies are recorded. Thirteen originals are separately manifested; the one-page report is inspected. Numerical, corruption-control, heap and performance validation remain unrun under the cost gate. Feature annihilation remains separate. This completes the previously missing driver implementation; acceptance still requires its full frozen cohort and controls.
+
+
+### Paired symmetry transport with selected-column reuse
+
+Adds `companion-paired-transport/`: combines simultaneous row/column swaps into the exact same ordered generator columns as the sequential reference. Cached pivot columns provide Au and A^T u through the known diagonal metric. Each nontrivial swap needs two structural queries plus zero or one missing-column query, all at input width w, versus four reference queries at widths w,w,w+2,w+2. Output width remains w+4; cache keys and column coordinates are transported together across pair pivots.
+
+Outside-query cost is 3n+4 field products and 4n+1 additions, versus 4 and 2n+2. Derived fused native-product counts change from 16w+48 to (2+h)(4w+8), h in {0,1}; these units are separate and no net runtime gain is claimed. The complete driver changes only its transport import, with normalized whole-driver AST equality checked. Identity swaps and upstream cohorts are preserved.
+
+Four Python files parse; twelve originals are separately manifested and the one-page report is visually inspected. Numerical, corruption-control, heap and performance validation remain unrun under the cost gate. No zero-prefix query elision or reduced metric validation is included in these counts.
