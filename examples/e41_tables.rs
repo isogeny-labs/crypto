@@ -207,6 +207,27 @@ fn main() {
         ));
         so.insert(arm.to_string(), json!({"walks": ws.len(), "steps_over_ideal": m, "se": se, "fruitless_per_step": fr / st, "redirects_per_step": rd / st}));
     }
+    let mut per_curve_steps = serde_json::Map::new();
+    for (arm, data) in [
+        ("O6B", &school),
+        ("O24", &school),
+        ("O24F", &school),
+        ("O24AA", &aa),
+    ] {
+        let rows: Vec<Value> = data
+            .1
+            .keys()
+            .map(|&p| {
+                let xs: Vec<f64> = data.0[&(p, arm.to_string())]
+                    .iter()
+                    .map(|w| w.steps / w.ideal)
+                    .collect();
+                let (m, se) = mean_se(&xs);
+                json!({"p": p, "walks": xs.len(), "steps_over_ideal": m, "se": se})
+            })
+            .collect();
+        per_curve_steps.insert(arm.to_string(), Value::Array(rows));
+    }
     let steps_pooled = |data: &Data, arm: &str| -> f64 {
         data.1
             .iter()
@@ -281,9 +302,9 @@ fn main() {
                 && (rs.iter().all(|r| r.1 > 1.0) || rs.iter().all(|r| r.2 < 1.0))
                 && rs.iter().zip(&floor).all(|(r, f)| (r.0 - 1.0).abs() > *f);
             let (mut c2, mut c1) = (0, 0);
+            let mut pcs: Vec<Vec<f64>> = Vec::new();
             if b != "O24AA" {
-                let pcs: Vec<Vec<f64>> =
-                    WEIGHTS.iter().map(|&w| per_curve(data, a, b, w)).collect();
+                pcs = WEIGHTS.iter().map(|&w| per_curve(data, a, b, w)).collect();
                 for i in 0..8 {
                     if pcs.iter().all(|v| v[i] > 1.0) {
                         c2 += 1
@@ -301,7 +322,7 @@ fn main() {
                 8 - c2 - c1
             ));
             resolved_of.insert(format!("{a}/{b}|{lab}"), (rs.clone(), resolved, c2));
-            band.insert(format!("{a}/{b}|{lab}"), json!({"rows": rs.iter().zip(WEIGHTS).map(|(r, w)| json!({"weight": w, "ratio": r.0, "lo": r.1, "hi": r.2})).collect::<Vec<_>>(), "resolved": resolved, "curves_second_cheaper": c2, "curves_first_cheaper": c1}));
+            band.insert(format!("{a}/{b}|{lab}"), json!({"rows": rs.iter().zip(WEIGHTS).map(|(r, w)| json!({"weight": w, "ratio": r.0, "lo": r.1, "hi": r.2})).collect::<Vec<_>>(), "resolved": resolved, "curves_second_cheaper": c2, "curves_first_cheaper": c1, "per_curve": pcs}));
         }
     }
 
@@ -433,7 +454,7 @@ fn main() {
     let summary = json!({
         "experiment": "E41", "note": "§9.52/§9.53", "gae": GAE, "weights": WEIGHTS,
         "identity": ident, "wrong_logs": wrong, "control_flagged": flagged, "control_walks": cw.len(),
-        "steps_over_ideal": so, "steps_ratio_o6_o24_per_sqrt_n": steps_ratio, "steps_ratio_vs_aa_stream": steps_ratio_aa,
+        "steps_over_ideal": so, "steps_over_ideal_per_curve": per_curve_steps, "steps_ratio_o6_o24_per_sqrt_n": steps_ratio, "steps_ratio_vs_aa_stream": steps_ratio_aa,
         "aa": aa_r.iter().map(|r| json!([r.0, r.1, r.2])).collect::<Vec<_>>(),
         "band": band, "e18_psi_rows": e18, "ic_rows": ic,
         "fix": {"added_32_adds_64_modn_on_every_walk": added_ok, "steps_gain_percent": f_gain},
