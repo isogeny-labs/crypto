@@ -219,6 +219,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "ic.residual_batch",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
         "rho.preprocessing",
         NativeAdaptive,
         DiagnosticOnly,

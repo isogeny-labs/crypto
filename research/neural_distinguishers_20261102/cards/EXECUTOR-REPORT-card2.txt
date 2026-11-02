@@ -1,0 +1,38 @@
+CARD-neural-distinguishers-20261102-2: exit 0 (completed). Command: `python3 tools/task_card.py run research/neural_distinguishers_20261102/cards/run-20261102-2.yaml`, run from /home/user/crypto-ml as the dispatch named, background limit 7200000 ms. No retries, no extra commands.
+
+Verbatim tool output:
+
+card: CARD-neural-distinguishers-20261102-2 (sha256 c8d0b1846409bc63971935eaacff9a3fc34a3b0edd7ae086c9dd1a2e6a0eb90b)
+commit: f0993f8282ddbd2216185a6f3dd4e31d6b27eabf
+receipt: research/neural_distinguishers_20261102/cards/CARD-neural-distinguishers-20261102-2.receipt.json sha256 b8902ba693050473678484f19fc2762e88d50c9dbbd6bd4a6d243d2327c753dc
+status: completed
+command 1 (head-commit): ["git", "-C", "/home/user/crypto-ml", "rev-parse", "HEAD"] exit 0 (0.003 s) succeeded
+  stdout sha256 5c29e261b65d9b6282e4532e81f77ab5f6454ee587435f6f64f8ebcd6c3d855e; last 1 lines:
+    f0993f8282ddbd2216185a6f3dd4e31d6b27eabf
+command 2 (build): ["cargo", "build", "--release", "--locked"] in research/neural_distinguishers_20261102 exit 0 (0.1 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+        Finished `release` profile [optimized + debuginfo] target(s) in 0.03s
+command 3 (binary-sha256): ["sha256sum", "target/release/neural-distinguishers"] in research/neural_distinguishers_20261102 exit 0 (0.009 s) succeeded
+  stdout sha256 cf5a35e574704a1941b886013c29e06266862f2318c4dc5d1907af2db182129c; last 1 lines:
+    41b8d479741c2a3958e392ddba453932347de2e126d293a1536b27786cbabb31  target/release/neural-distinguishers
+command 4 (run-cell-aes-r4): ["./target/release/neural-distinguishers", "run", "results", "aes-r4"] in research/neural_distinguishers_20261102 exit 0 (135.667 s) succeeded
+  stdout sha256 7383c384fa45da6689d107f4b15b7e38ca7c38b61cca5ec89647d4aff3a156f8; last 5 lines:
+    {"cell":"aes-r4","cipher":"aes128","rounds":4,"role":"target","model":"mlp","arm":"primary","n_train":524288,"n_test":131072,"correct":65746,"accuracy":0.501602,"wilson95":[0.498895,0.504309],"bonferroni_lower":0.496741,"train_loss":0.692547,"train_seconds":42.20,"gen_seconds":0.85,"independent_unit":"key (one fresh key per sample)"}
+    {"cell":"aes-r4","cipher":"aes128","rounds":4,"role":"target","model":"mlp","arm":"aa_seed2","n_train":524288,"n_test":131072,"correct":65588,"accuracy":0.500397,"wilson95":[0.497690,0.503104],"bonferroni_lower":0.495536,"train_loss":0.693074,"train_seconds":41.11,"gen_seconds":0.85,"independent_unit":"key (one fresh key per sample)"}
+    {"cell":"aes-r4","cipher":"aes128","rounds":4,"role":"target","model":"logreg","arm":"primary","n_train":524288,"n_test":131072,"correct":65737,"accuracy":0.501534,"wilson95":[0.498827,0.504240],"bonferroni_lower":0.496672,"train_loss":0.693402,"train_seconds":8.42,"gen_seconds":0.85,"independent_unit":"key (one fresh key per sample)"}
+    {"cell":"aes-r4","cipher":"aes128","rounds":4,"role":"target","model":"mlp","arm":"label_shuffle_control","n_train":524288,"n_test":131072,"correct":65394,"accuracy":0.498917,"wilson95":[0.496210,0.501624],"bonferroni_lower":0.494056,"train_loss":0.693128,"train_seconds":42.05,"gen_seconds":0.85,"independent_unit":"key (one fresh key per sample)"}
+    {"cell":"aes-r4","cipher":"aes128","rounds":4,"role":"target","model":"difference_table_nb","arm":"primary","n_train":524288,"n_test":131072,"correct":65745,"accuracy":0.501595,"wilson95":[0.498888,0.504301],"bonferroni_lower":0.496733,"train_loss":null,"train_seconds":0.05,"gen_seconds":0.85,"independent_unit":"key (one fresh key per sample)"}
+  output research/neural_distinguishers_20261102/results/rows.jsonl: ab49ea47153d58d4f34277d5f1fe9c698eeaa97aa58523ba3ea2493c9e24a506
+command 5 (summary): ["./target/release/neural-distinguishers", "summary", "results"] in research/neural_distinguishers_20261102 exit 0 (0.004 s) succeeded
+  stdout sha256 5fba482aa0d4080bbf6d2579b2740ab3b472b0ec3c719e32f90aeda1217bff23; last 1 lines:
+    summary.json and fig_accuracy.svg written (7 cells)
+  output research/neural_distinguishers_20261102/results/summary.json: 2405a91a078a1da0fffc4d3aba8528882928ed9bc282b128557a5acefa379b6c
+  output research/neural_distinguishers_20261102/results/fig_accuracy.svg: 2066b66069239aeb09d314d9105bb6c42a29f795a312e222501f20e7d00f3758
+command 6 (output-sha256): ["sha256sum", "results/rows.jsonl", "results/summary.json", "results/fig_accuracy.svg"] in research/neural_distinguishers_20261102 exit 0 (0.004 s) succeeded
+  stdout sha256 3fcef1c189cf7980cba36118fc912f0f424d4a00604397bfe20ba5156b2308b1; last 3 lines:
+    ab49ea47153d58d4f34277d5f1fe9c698eeaa97aa58523ba3ea2493c9e24a506  results/rows.jsonl
+    2405a91a078a1da0fffc4d3aba8528882928ed9bc282b128557a5acefa379b6c  results/summary.json
+    2066b66069239aeb09d314d9105bb6c42a29f795a312e222501f20e7d00f3758  results/fig_accuracy.svg
+
+[exited with code 0]
