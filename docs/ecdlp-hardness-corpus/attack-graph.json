@@ -7,25 +7,25 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 171,
-    "frontier": 96,
+    "nodes": 373,
+    "frontier": 245,
     "contaminated_by_refuted": 1,
     "unlinked_citations": 0,
     "by_status": {
-      "definition": 19,
-      "assumed": 2,
-      "proved_external": 33,
-      "algorithm": 7,
-      "conditional": 23,
-      "measured": 16,
-      "proved_internal_unreviewed": 35,
-      "open": 18,
-      "heuristic": 13,
-      "refuted": 2,
-      "proved_external_unread": 3
+      "definition": 34,
+      "assumed": 15,
+      "proved_external": 62,
+      "algorithm": 12,
+      "conditional": 60,
+      "measured": 20,
+      "proved_internal_unreviewed": 39,
+      "open": 38,
+      "heuristic": 50,
+      "refuted": 13,
+      "proved_external_unread": 30
     },
     "by_formal_state": {
-      "none": 145,
+      "none": 347,
       "lean_written_unchecked": 10,
       "kernel_checked": 13,
       "stated_open": 3
@@ -52,6 +52,209 @@
       ],
       "research_targets": [
         "RT-FALL-DEGREE-BRIDGE"
+      ],
+      "pressure": [
+        {
+          "from": "OPEN-BK-GG-SUBFIELD-IC",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-DECOMPOSITION-PROBABILITY",
+      "label": "Random decomposition-yield heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 7,
+      "downstream": [
+        "COND-PF-APS-COST",
+        "COND-PF-EP-BETA-THRESHOLD",
+        "COND-PF-HKPYY-COMPLEXITY",
+        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+        "DEF-INDEX-CALCULUS-PIPELINE",
+        "FACT-PF-EP-LINEARIZED-NO-GAIN",
+        "FACT-PF-MM-TRINOMIAL-NO-GAIN"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-END-TO-END-IC",
+        "RT-BK-DECOMP-MEASURE"
+      ],
+      "pressure": [
+        {
+          "from": "THEOREM-YIELD-CONSERVATION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-YIELD-SUM-COUNT",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-JV-WEAK-CLASS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-TRACE-ZERO-DOUBLING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-RHO-RANDOM-MAPPING",
+      "label": "Rho random-mapping heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 7,
+      "downstream": [
+        "ALG-GG-BL-PRECOMP-RHO",
+        "ALG-GG-BLS-BRANCHLESS-NEGATION",
+        "ALG-GG-KUHN-STRUIK",
+        "ALG-POLLARD-RHO",
+        "HEUR-GG-DP-RHO",
+        "STD-BK-NIST-HALF-BITLENGTH",
+        "STD-BK-SAFECURVES-RHO"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GG-KMPT-RHO-OPTIMAL",
+          "relation": "qualifies"
+        },
+        {
+          "from": "HEUR-GG-BRENT-POLLARD-ADDING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-XT-NFS-SMOOTHNESS",
+      "label": "Classical NFS smoothness heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 6,
+      "downstream": [
+        "ALG-XT-COPPERSMITH-F2N",
+        "ALG-XT-EXTNFS",
+        "ALG-XT-MSS-NORM-UPPER-BOUND",
+        "ALG-XT-NFS-L13",
+        "COND-XT-BD-BN-100BIT",
+        "COND-XT-BD-KEYSIZES"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-BN-NORM-REPLAY"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-XT-BK-WEIL-SUFFICES",
+      "label": "Balasubramanian-Koblitz: E[r] lies in E(F_{q^k}) iff r | q^k - 1",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 6,
+      "downstream": [
+        "ATTACK-MOV-PAIRING",
+        "CONCLUSION-SPECIFIC-CURVE",
+        "COND-XT-MOV-SS-SMALLCHAR",
+        "DEF-GAP-DH",
+        "STANDARD-CURVE-EXCLUSIONS",
+        "STD-BK-SEC1-VALIDATION"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-MOV-KW-COMPOSITION"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "ASM-GG-RANDOM-PARTITION",
+      "label": "Rigorous rho analyses assume a uniformly random partition",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 5,
+      "downstream": [
+        "THEOREM-RHO-THREE-PARTITION",
+        "THM-GG-KMPT-RHO-OPTIMAL",
+        "THM-GG-KMT-NEAR-OPTIMAL",
+        "THM-GG-MV-MIXING",
+        "THM-GG-MV-NONDEGENERACY"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GG-ADDING-WALK-PROOF"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "ATTACK-MOV-PAIRING",
+      "label": "MOV pairing transfer",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 5,
+      "downstream": [
+        "CONCLUSION-SPECIFIC-CURVE",
+        "COND-XT-MOV-SS-SMALLCHAR",
+        "DEF-GAP-DH",
+        "STANDARD-CURVE-EXCLUSIONS",
+        "STD-BK-SEC1-VALIDATION"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PAIRING-TARGET-COST",
+        "RT-XT-MOV-KW-COMPOSITION"
+      ],
+      "pressure": [
+        {
+          "from": "THM-XT-BK-IMPROBABILITY",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-XT-ECC2K130-EMBEDDING-DEGREE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-RP-S3-ROOTS-FACTOR",
+      "label": "S3(xR,xF,X) = (xR-xF)^2 (X-x(R+F)) (X-x(R-F)) (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 5,
+      "downstream": [
+        "BRIDGE-GENERIC-TABLE",
+        "CLAIM-GG-FKL-AGM-TO-GGM",
+        "FACT-S3-ROOTS-ARE-GROUP-LAW",
+        "LB-CGK-ADVICE",
+        "LB-SHOUP-DLP"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-BK-GG-FACTOR-BASE-SIZE",
+      "label": "Heuristic #F ~ #V for subspace factor bases",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 4,
+      "downstream": [
+        "COND-BK-GG-GAUDRY-FIXED-N",
+        "COND-BK-GG-OVERDETERMINED-TRADEOFF",
+        "HEUR-BK-GG-BREAK-SYMMETRY",
+        "HEUR-BK-GG-DECOMP-PROPORTION"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-DECOMP-MEASURE"
       ],
       "pressure": []
     },
@@ -90,42 +293,32 @@
         {
           "from": "MEAS-RP-DREG-PROXY-MISS",
           "relation": "qualifies"
+        },
+        {
+          "from": "OPEN-BK-GG-BINARY-SUBEXP",
+          "relation": "qualifies"
+        },
+        {
+          "from": "COND-PF-KY-FFA-REDUCTIO",
+          "relation": "obstructs"
         }
       ]
     },
     {
-      "id": "THM-RP-S3-ROOTS-FACTOR",
-      "label": "S3(xR,xF,X) = (xR-xF)^2 (X-x(R+F)) (X-x(R-F)) (Lean)",
-      "status": "proved_internal_unreviewed",
-      "formal": "kernel_checked",
-      "action": "independent review, then kernel-check",
+      "id": "HEUR-PF-PKM-AUX-CURVE-SEARCH",
+      "label": "Cost of finding PKM's auxiliary curve",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
       "impact": 4,
       "downstream": [
-        "BRIDGE-GENERIC-TABLE",
-        "FACT-S3-ROOTS-ARE-GROUP-LAW",
-        "LB-CGK-ADVICE",
-        "LB-SHOUP-DLP"
+        "COND-PF-APS-BEATS-PKM",
+        "COND-PF-PKM-COST-THRESHOLD",
+        "COND-PKM-PRIME-ALGEBRAIC",
+        "DEF-PF-PKM-ISOGENY-BASE"
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
-    },
-    {
-      "id": "ATTACK-MOV-PAIRING",
-      "label": "MOV pairing transfer",
-      "status": "conditional",
-      "formal": "none",
-      "action": "discharge each condition, or keep the row labelled conditional",
-      "impact": 3,
-      "downstream": [
-        "CONCLUSION-SPECIFIC-CURVE",
-        "DEF-GAP-DH",
-        "STANDARD-CURVE-EXCLUSIONS"
-      ],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-PAIRING-TARGET-COST"
-      ],
       "pressure": []
     },
     {
@@ -134,14 +327,169 @@
       "status": "proved_internal_unreviewed",
       "formal": "none",
       "action": "independent review, then kernel-check",
-      "impact": 3,
+      "impact": 4,
       "downstream": [
         "BRIDGE-GENERIC-TABLE",
+        "CLAIM-GG-FKL-AGM-TO-GGM",
         "LB-CGK-ADVICE",
         "LB-SHOUP-DLP"
       ],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-BK-GG-DECOMP-PROPORTION",
+      "label": "Decomposable proportion ~1/n! (l=1) or q^(lk-n)/k!",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 3,
+      "downstream": [
+        "COND-BK-GG-GAUDRY-FIXED-N",
+        "COND-BK-GG-OVERDETERMINED-TRADEOFF",
+        "HEUR-BK-GG-BREAK-SYMMETRY"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-BOOK-INVENTORY",
+        "RT-BK-DECOMP-MEASURE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-GG-KANGAROO-FOOTPRINTS",
+      "label": "Kangaroo heuristic (Galbraith Heur. 14.5.4)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 3,
+      "downstream": [
+        "ALG-GG-FOWLER-FIVE-KANGAROO",
+        "ALG-GG-GPR-FOUR-KANGAROO",
+        "ALG-KANGAROO-INTERVAL"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GG-MT-KANGAROO",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-PF-PKM-RANK-DELTA",
+      "label": "PKM: Delta = 10 surplus relations suffice",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 3,
+      "downstream": [
+        "COND-PF-APS-BEATS-PKM",
+        "COND-PF-PKM-COST-THRESHOLD",
+        "COND-PKM-PRIME-ALGEBRAIC"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-PF-PKM-SOLUTION-COUNT",
+      "label": "PKM expected solutions per target",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 3,
+      "downstream": [
+        "COND-PF-APS-BEATS-PKM",
+        "COND-PF-PKM-COST-THRESHOLD",
+        "COND-PKM-PRIME-ALGEBRAIC"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ASM-PF-PKM-UNIT-COST",
+      "label": "PKM unit-cost accounting model",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 3,
+      "downstream": [
+        "COND-PF-APS-BEATS-PKM",
+        "COND-PF-PKM-COST-THRESHOLD",
+        "COND-PKM-PRIME-ALGEBRAIC"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-PF-HKPYY-COMPLEXITY",
+      "label": "HKPYY Theorem 3.2: QSP index-calculus complexity",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 3,
+      "downstream": [
+        "COND-PF-EP-BETA-THRESHOLD",
+        "FACT-PF-EP-LINEARIZED-NO-GAIN",
+        "FACT-PF-MM-TRINOMIAL-NO-GAIN"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+          "relation": "obstructs"
+        },
+        {
+          "from": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+          "relation": "obstructs"
+        }
+      ]
+    },
+    {
+      "id": "COND-PF-PKM-COST-THRESHOLD",
+      "label": "PKM cost decomposition and the p^(1/2-1/m) bar",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 3,
+      "downstream": [
+        "COND-PF-APS-BEATS-PKM",
+        "COND-PKM-PRIME-ALGEBRAIC"
+      ],
+      "depends_citations": [
+        "research/notes/ecdlp-general/RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md"
+      ],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-FIRST-FALL-DEGREE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "BRIDGE-GENERIC-TABLE",
+      "label": "Conditional generic simulation of table decomposition",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 3,
+      "downstream": [
+        "CLAIM-GG-FKL-AGM-TO-GGM",
+        "LB-CGK-ADVICE",
+        "LB-SHOUP-DLP"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GENERIC-BRIDGE",
+        "RT-REPRESENTATION-FILTER"
+      ],
       "pressure": []
     },
     {
@@ -168,38 +516,44 @@
       ]
     },
     {
-      "id": "HEUR-DECOMPOSITION-PROBABILITY",
-      "label": "Random decomposition-yield heuristic",
+      "id": "HEUR-BK-GG-RHO-HEURISTIC",
+      "label": "Rho/kangaroo analyses are heuristic; worst case unbounded",
       "status": "heuristic",
       "formal": "none",
       "action": "prove, or measure on a scaling family without censoring",
       "impact": 2,
       "downstream": [
-        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-        "DEF-INDEX-CALCULUS-PIPELINE"
+        "ALG-POLLARD-RHO",
+        "STD-BK-SEC1-HARDNESS-NARRATIVE"
       ],
       "depends_citations": [],
       "research_targets": [
-        "RT-END-TO-END-IC"
+        "RT-BK-BOOK-INVENTORY"
       ],
       "pressure": [
         {
-          "from": "THEOREM-YIELD-CONSERVATION",
-          "relation": "qualifies"
-        },
-        {
-          "from": "THM-RP-YIELD-SUM-COUNT",
-          "relation": "qualifies"
-        },
-        {
-          "from": "MEAS-RP-JV-WEAK-CLASS",
-          "relation": "qualifies"
-        },
-        {
-          "from": "THM-RP-TRACE-ZERO-DOUBLING",
+          "from": "THEOREM-RHO-THREE-PARTITION",
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "HEUR-GG-DGM-CYCLE-RATES",
+      "label": "Fruitless-cycle rates: 2-cycles Theta(1/r), 2c-cycles Theta(1/r^c)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 2,
+      "downstream": [
+        "ALG-GG-BLS-BRANCHLESS-NEGATION"
+      ],
+      "depends_citations": [
+        "src/cryptanalysis/pollard_collab/walk.rs"
+      ],
+      "research_targets": [
+        "RT-GG-NEGATION-OVERHEAD"
+      ],
+      "pressure": []
     },
     {
       "id": "HEUR-RELATION-RANK",
@@ -226,6 +580,30 @@
       ]
     },
     {
+      "id": "HEUR-XT-BGJT-DESCENT",
+      "label": "BGJT descent heuristics (smoothness and PGL2 full rank)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 2,
+      "downstream": [
+        "COND-XT-BGJT-QUASIPOLY",
+        "COND-XT-GKZ-F2-1223-59BIT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-XT-CWZ-TRAPS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-XT-GKZ-RIGOROUS-INFINITE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "HEUR-ZERO-DIMENSIONAL-PDP",
       "label": "Zero-dimensional PDP hypothesis",
       "status": "heuristic",
@@ -239,6 +617,58 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "ASM-PF-KY-CURVE-CONSTRUCTION",
+      "label": "Kosters-Yeo Assumption 3.3 (curves with a large-order point)",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 2,
+      "downstream": [
+        "COND-PF-KY-FFA-REDUCTIO",
+        "THM-PF-KY-NPC-SMOOTH"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-XT-EXTNFS",
+      "label": "Kim-Barbulescu exTNFS: medium-prime L(1/3, (48/9)^(1/3))",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 2,
+      "downstream": [
+        "COND-XT-BD-BN-100BIT",
+        "COND-XT-BD-KEYSIZES"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-BN-NORM-REPLAY"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-GG-EQUIV-CLASS-RHO",
+      "label": "Rho on equivalence classes: sqrt(pi r/(2 N_C)) (C1 + C2)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 2,
+      "downstream": [
+        "ALG-RHO-AUTOMORPHISM",
+        "HEUR-AUTOMORPHISM-SPEEDUP"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-GG-DGM-CYCLE-RATES",
+          "relation": "obstructs"
+        }
+      ]
     },
     {
       "id": "ALG-RP-VELU-COST",
@@ -256,20 +686,121 @@
       "pressure": []
     },
     {
-      "id": "BRIDGE-GENERIC-TABLE",
-      "label": "Conditional generic simulation of table decomposition",
+      "id": "THM-GG-HILDEBRAND-RADDING",
+      "label": "Hildebrand: random r-step walks on Z/n mix in O(n^(2/(r-1)))",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 2,
+      "downstream": [
+        "ALG-POLLARD-RHO",
+        "HEUR-GG-TESKE-ADDING-WALK"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GG-ADDING-WALK-PROOF"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-PF-REPO-KUMMER-FFD-FOUR",
+      "label": "Kummer m = 2 PKM systems have first fall degree 4 for every t",
       "status": "proved_internal_unreviewed",
       "formal": "none",
       "action": "independent review, then kernel-check",
       "impact": 2,
       "downstream": [
-        "LB-CGK-ADVICE",
-        "LB-SHOUP-DLP"
+        "HEUR-PF-PKM-FFA-TRANSPOSED"
+      ],
+      "depends_citations": [
+        "research/prime_fall_degree_20261027/PREREGISTRATION.md"
+      ],
+      "research_targets": [
+        "RT-PF-PROVE-HT-OR-BOUNDED"
+      ],
+      "pressure": [
+        {
+          "from": "THM-KY-S3-FIRST-FALL-TWO",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-XT-VERHEUL-DISTORTION-EXISTS",
+      "label": "Verheul: distortion maps exist on supersingular curves",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 2,
+      "downstream": [
+        "DEF-GAP-DH",
+        "RED-PAIRING-CO-DDH"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CONJ-XT-GKZ-REPRESENTATION",
+      "label": "GKZ representation conjecture (all extensions)",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "COND-XT-GKZ-ALL-EXTENSIONS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-XT-KW-QUASIPOLY",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "CONJ-XT-LANG-HEIGHT",
+      "label": "Lang's canonical-height conjecture",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "OBSTRUCTION-XEDNI-HEIGHT"
       ],
       "depends_citations": [],
       "research_targets": [
-        "RT-GENERIC-BRIDGE",
-        "RT-REPRESENTATION-FILTER"
+        "RT-XT-SZPIRO-XEDNI-LIFTS"
+      ],
+      "pressure": [
+        {
+          "from": "OBS-XT-HARD-LIFT-HEIGHT",
+          "relation": "does_not_cover"
+        },
+        {
+          "from": "THM-XT-HS-SZPIRO-IMPLIES-LANG",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CONJ-XT-SZPIRO",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PF-PKM-ASYMPTOTIC-OPEN",
+      "label": "PKM asymptotic complexity is open by the authors' statement",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "GAP-PKM-SOLVING-DEGREE"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-PROVE-HT-OR-BOUNDED"
       ],
       "pressure": []
     },
@@ -293,6 +824,38 @@
       ]
     },
     {
+      "id": "OPEN-BK-EMBEDDING-THRESHOLD-DISAGREEMENT",
+      "label": "Standards disagree on the MOV/embedding-degree threshold",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "src/ecc_safety.rs"
+      ],
+      "research_targets": [
+        "RT-BK-THRESHOLDS"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "OPEN-BK-GG-ONE-OUT-OF-L",
+      "label": "One-out-of-L ECDLP: no speedup known",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "src/ecc_safety.rs"
+      ],
+      "research_targets": [
+        "RT-BK-ONE-OUT-OF-L"
+      ],
+      "pressure": []
+    },
+    {
       "id": "HEUR-AUTOMORPHISM-SPEEDUP",
       "label": "Automorphism quotient speedup",
       "status": "heuristic",
@@ -312,12 +875,110 @@
         {
           "from": "THM-RP-AUTOMORPHISM-ORBIT-FOLD",
           "relation": "qualifies"
+        },
+        {
+          "from": "HEUR-BK-GG-NEGATION-DISPUTE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "STD-BK-SAFECURVES-DISC",
+          "relation": "qualifies"
+        },
+        {
+          "from": "ALG-GG-WZ-NEGATION",
+          "relation": "qualifies"
         }
       ]
     },
     {
-      "id": "HEUR-RHO-RANDOM-MAPPING",
-      "label": "Rho random-mapping heuristic",
+      "id": "HEUR-BK-BRAINPOOL-CLASS-NUMBER-LIFT",
+      "label": "Large class number as a guard against lifting",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "STD-BK-BRAINPOOL-REQS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "STD-BK-NIST-DISC-NO-RATIONALE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-BK-GG-FFDA-DESCRIPTION",
+      "label": "Survey definition of the First Fall Degree Assumption",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-BK-GG-SEMAEV-UNROLLED-CONJ"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-BOOK-INVENTORY"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-BK-GG-ISOGENY-WALK",
+      "label": "Mapping ECDLP to an isogenous curve is generally efficient",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "THEOREM-JMV-ISOGENY-REDUCTION"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-BK-GG-RIGHT-KERNEL-RANK",
+      "label": "Right-kernel IC needs full rank, rarely met at #relations = #F",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-BK-GG-GAUDRY-FIXED-N"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-BOOK-INVENTORY"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-GG-BRENT-POLLARD-ADDING",
+      "label": "Brent-Pollard nonrandomness: factor 1/sqrt(1 - sum p_i^2)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "ecc2k130/WALK-CONSTANT.md"
+      ],
+      "research_targets": [
+        "RT-GG-WALK-NONRANDOMNESS"
+      ],
+      "pressure": [
+        {
+          "from": "HEUR-GG-BL-HIGHER-ANTICOLLISIONS",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-GG-DP-RHO",
+      "label": "DP rho heuristic (Galbraith Heur. 14.2.15 / Thm 14.2.16)",
       "status": "heuristic",
       "formal": "none",
       "action": "prove, or measure on a scaling family without censoring",
@@ -326,7 +987,71 @@
         "ALG-POLLARD-RHO"
       ],
       "depends_citations": [],
-      "research_targets": [],
+      "research_targets": [
+        "RT-GG-WALK-NONRANDOMNESS"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-GG-TESKE-ADDING-WALK",
+      "label": "Teske: r-adding walks with r >= 20 behave like random walks",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "ALG-POLLARD-RHO"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GG-WALK-NONRANDOMNESS"
+      ],
+      "pressure": [
+        {
+          "from": "HEUR-GG-BRENT-POLLARD-ADDING",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-GG-MV-MIXING",
+          "relation": "does_not_cover"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-PF-APS-T-EQUALS-TPRIME",
+      "label": "APS assumption (13): T(E,m,V) ~ T'(E,m,V)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-PF-APS-BEATS-PKM"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-APS-VS-PKM-REMEASURE"
+      ],
+      "pressure": [
+        {
+          "from": "CEX-PF-APS-COMPARISON-MISMATCH",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-PF-YYTK-STATISTICAL",
+      "label": "YYTK statistical assumptions on summation polynomials",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "THM-PF-YYTK-NAIVE-LOWER-BOUND"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-YYTK-READ"
+      ],
       "pressure": []
     },
     {
@@ -369,6 +1094,194 @@
       ],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-BK-GG-SYMMETRIC-VSPACE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-XT-BGJT-REPRESENTATION",
+      "label": "BGJT heuristic: a sparse medium subfield representation exists",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-XT-BGJT-QUASIPOLY"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-XT-MILLER-HEIGHT",
+      "label": "Miller's height argument against lifted index calculus",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "HEUR-XT-SS-ANALYSIS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-XT-PPVW-BOUNDED-RANK",
+      "label": "PPVW heuristic: ranks of E/Q are bounded (finitely many > 21)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "OBS-XT-LIFT-BOUNDED-RANK"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-HKT-SCOPE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "MEAS-PF-PKM-DEGREE-TABLES",
+      "label": "PKM Tables 4-5 (published measurement): corrected degree 4 -> 5 -> 6 at m = 2",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-PROVE-HT-OR-BOUNDED"
+      ],
+      "pressure": [
+        {
+          "from": "MEAS-PF-REPO-KUMMER-DEGREE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "STD-BK-SAFECURVES-RHO",
+      "label": "SafeCurves rho rule: l >= 2^200 (0.886 sqrt l > 2^100)",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "src/ecc_safety.rs"
+      ],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-GG-BL-PRECOMP-RHO",
+      "label": "Bernstein-Lange precomputed-DP rho: ~ell^(1/3) online",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "src/cryptanalysis/preprocessing_rho.rs"
+      ],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-GG-BLS-BRANCHLESS-NEGATION",
+      "label": "BLS branchless negating rho: (1+o(1)) sqrt(pi ell/4)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "src/cryptanalysis/ecbench/negation_strong.rs"
+      ],
+      "research_targets": [
+        "RT-GG-NEGATION-OVERHEAD"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "ALG-GG-KUHN-STRUIK",
+      "label": "Kuhn-Struik: L targets with one DP table in about sqrt(2 r L)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "src/cryptanalysis/ecbench/work.rs"
+      ],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-STATIC-DH-AUXILIARY-POWERS",
+      "label": "Static-DH auxiliary-power attack",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [
+        "CLAIM-BK-SEC1-COFACTOR-CDH"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-XT-NFS-L13",
+      "label": "NFS/SNFS/FFS L(1/3) discrete logarithms",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "research/transfer_audit_20261011/PROTOCOL.md"
+      ],
+      "research_targets": [
+        "RT-XT-TRANSFER-PRICE-MODEL"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "ATTACK-CHEON-AUXILIARY",
+      "label": "Cheon auxiliary-input attack",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [
+        "FACT-BK-KM-GENERIC-GAP-REAL"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ATTACK-FREY-RUECK",
+      "label": "Frey-Rueck Tate-pairing transfer",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [
+        "COND-XT-MOV-SS-SMALLCHAR"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PAIRING-TARGET-COST"
+      ],
       "pressure": []
     },
     {
@@ -383,7 +1296,80 @@
         "research/ic_candidate_tournament_20260915/campaign_20260916/DECOMPOSITION-SURVEY.md"
       ],
       "research_targets": [],
+      "pressure": [
+        {
+          "from": "OPEN-BK-GG-BINARY-SUBEXP",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-PF-EP-BETA-THRESHOLD",
+      "label": "Euler-Petit Prop. 8: beating generic needs beta < 0.103",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [
+        "FACT-PF-EP-LINEARIZED-NO-GAIN"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "COND-XT-BGJT-QUASIPOLY",
+      "label": "BGJT heuristic quasi-polynomial DLP in small characteristic",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "research/notes/ecc2k130/RESEARCH_ECC2K130_EXTENSION.md"
+      ],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CLAIM-XT-BGJT-PROP2-ALL-P",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-XT-KW-QUASIPOLY",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "label": "Target finite-field DLP governs pairing attack",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [
+        "STD-BK-SAFECURVES-TRANSFER"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PAIRING-TARGET-COST",
+        "RT-BK-THRESHOLDS",
+        "RT-XT-TRANSFER-PRICE-MODEL"
+      ],
+      "pressure": [
+        {
+          "from": "FACT-PAIRING-FRIENDLY-TWO-DLPS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
+          "relation": "qualifies"
+        },
+        {
+          "from": "HEUR-XT-NFS-C32-FLOOR",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "RED-DEN-BOER-FIXED-CDH",
@@ -443,8 +1429,58 @@
         {
           "from": "MEAS-RP-JV-E2E-NONWEAK",
           "relation": "qualifies"
+        },
+        {
+          "from": "OPEN-BK-EMBEDDING-THRESHOLD-DISAGREEMENT",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-XT-BK-IMPROBABILITY",
+          "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "RED-GG-FKL-AGM-CDH-DL",
+      "label": "FKL: CDH, SDH, LRSW equivalent to DL in the AGM",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "CLAIM-GG-FKL-AGM-TO-GGM"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-BK-GG-SEMAEV-LEMMA2",
+      "label": "Survey statement of Semaev polynomials: irreducible, degree 2^(m-2) (GG Lemma 2)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "DEF-BK-GG-UNROLLED-SYSTEM"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-GG-JM-AGM-TRANSFER",
+      "label": "Jaeger-Mohan: AGM proofs transfer to the GGM under general frameworks",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "CLAIM-GG-FKL-AGM-TO-GGM"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "THM-RP-AFFINE-CORE",
@@ -533,6 +1569,228 @@
       "pressure": []
     },
     {
+      "id": "THM-XT-HKT-LIFT-RANK",
+      "label": "Huang-Kueh-Tan: bounded-height lifting implies arbitrarily large rank",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "OBS-XT-LIFT-BOUNDED-RANK"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-HKT-SCOPE"
+      ],
+      "pressure": [
+        {
+          "from": "RED-XT-CHENG-HUANG-PARTIAL-LIFT",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-XT-MASSER-DEPENDENCE",
+      "label": "Masser: dependent specializations have density zero",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "HEUR-XT-EASY-LIFT-DEPENDENCE"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CLAIM-BK-SAFECURVES-BRAINPOOL-1E6",
+      "label": "SafeCurves: Brainpool class number must exceed 1000000",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "STD-BK-BRAINPOOL-REQS",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-BK-SAFECURVES-SEC1-20",
+      "label": "SafeCurves: 'SEC1 requires the embedding degree to be at least 20'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "STD-BK-SEC1-VALIDATION",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-BK-X962-NO-AMORTIZATION",
+      "label": "ANSI X9.62 (1997): effort must be repeated per key",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "ALG-BK-MULTI-TARGET-AMORTIZED",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-GG-BKL-SIMD-NEGATION",
+      "label": "BKL 2010: negation gives little or no speedup on SIMD",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "ALG-GG-BLS-BRANCHLESS-NEGATION",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-GG-CERTICOM-DP-NORMALIZATION",
+      "label": "Certicom 1998: normalizing distinguished points alone gives sqrt 2 / sqrt(2d)",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "FACT-GG-WALK-CLASS-WELLDEFINED",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-XT-AMOR-F2-1223-128BIT",
+      "label": "Claim: new small-characteristic algorithms leave the F_{2^1223} genus-1 curve at ~128 bits",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "COND-XT-GKZ-F2-1223-59BIT",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-XT-BGJT-PROP2-ALL-P",
+      "label": "Claim: BGJT descent step applies to every polynomial P",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-XT-CWZ-TRAPS",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-XT-BN3072-128BIT",
+      "label": "Claim: BN curves with a 3072-bit F_{p^12} reach 128-bit security",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "COND-XT-BD-BN-100BIT",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-XT-JOUX-PINPOINT-ORIGINAL",
+      "label": "Claim: Joux pinpointing reaches L(1/3, (8/9)^(1/3))",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-XT-JOUX-PINPOINT-CORRECTED",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-XT-SS-GENUS2-F2-367-128BIT",
+      "label": "Claim: the genus-2 supersingular curve over F_{2^367} gives 128-bit security",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "ALG-XT-GKZ-F2-367-BREAK",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-PF-HKPYY-SPARSE-DENSITY",
+      "label": "HKPYY density heuristic: sparse factors of X^n - 1 are as rare as random",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-PF-EP-QSP-FAMILIES",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "HEUR-RP-SEMIREGULAR-DREG-PROXY",
       "label": "Semi-regular D_reg predicts Groebner cost of descended Semaev systems (A-PDP5)",
       "status": "refuted",
@@ -548,6 +1806,20 @@
           "relation": "refutes"
         }
       ]
+    },
+    {
+      "id": "CONJ-XT-SZPIRO",
+      "label": "Szpiro's conjecture (Szpiro ratio bounded, 6 the largest limit point)",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-SZPIRO-XEDNI-LIFTS"
+      ],
+      "pressure": []
     },
     {
       "id": "GAP-AUTOMORPHISM-PREPROCESS",
@@ -670,6 +1942,34 @@
       ]
     },
     {
+      "id": "GAP-GG-ADDING-WALK-RIGOROUS",
+      "label": "No rigorous sqrt bound for r-adding (doubling-free) rho walks",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GG-ADDING-WALK-PROOF"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-GG-RHO-CONSTANT",
+      "label": "Rigorous constant for implemented rho is open",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GG-RHO-CONSTANT-GAP"
+      ],
+      "pressure": []
+    },
+    {
       "id": "GAP-LEMMA4-REVERSE",
       "label": "Reverse inequality d'_F <= d_F (outside placement)?",
       "status": "open",
@@ -693,9 +1993,23 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [
-        "RT-MULTITARGET-MODEL"
+        "RT-MULTITARGET-MODEL",
+        "RT-BK-ONE-OUT-OF-L"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "ALG-BK-MULTI-TARGET-AMORTIZED",
+          "relation": "qualifies"
+        },
+        {
+          "from": "LB-GG-YUN-MDLP",
+          "relation": "qualifies"
+        },
+        {
+          "from": "ALG-GG-KUHN-STRUIK",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-NAGAO-PROP5-ROUTE",
@@ -710,6 +2024,88 @@
       "pressure": []
     },
     {
+      "id": "GAP-PF-DEDICATED-ROOT-FINDER",
+      "label": "Dedicated algorithm for the generalized root-finding problem",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PF-PRIME-RELATION-SEARCH",
+      "label": "No known sub-rho relation search over prime fields",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+          "relation": "obstructs"
+        },
+        {
+          "from": "THM-PF-KY-NPC-SMOOTH",
+          "relation": "does_not_cover"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PF-QSP-EXISTENCE",
+      "label": "Do quasi-subfield polynomials with beta < 0.103 exist?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PF-SPECIAL-PRIME-EXPOSURE",
+      "label": "Do special primes (smooth p-1, P-224) weaken curves against PKM?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "MEAS-PF-PKM-DEGREE-TABLES",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+      "label": "H_T: tower solving degree grows linearly in the height",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-CSTEP-T14",
+        "RT-PF-PROVE-HT-OR-BOUNDED"
+      ],
+      "pressure": []
+    },
+    {
       "id": "GAP-PKM-SOLVING-DEGREE",
       "label": "Prime-field PKM solving-degree growth",
       "status": "open",
@@ -719,7 +2115,8 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [
-        "RT-PKM-DEGREE"
+        "RT-PKM-DEGREE",
+        "RT-PF-CSTEP-T14"
       ],
       "pressure": []
     },
@@ -838,14 +2235,110 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [
-        "RT-XEDNI-END-TO-END"
+        "RT-XEDNI-END-TO-END",
+        "RT-XT-SZPIRO-XEDNI-LIFTS"
       ],
       "pressure": [
         {
           "from": "CEX-RP-JKSST-MODEL-DISCRIMINANT",
           "relation": "qualifies"
+        },
+        {
+          "from": "THM-XT-PETSCHE-HEIGHT-BOUND",
+          "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
+      "label": "No lower bound for target-field DLP cost exists",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-TRANSFER-PRICE-MODEL"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-XT-RIGOROUS-L13",
+      "label": "No proved L(1/3) DLP in large or medium characteristic",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "OPEN-BK-GG-BINARY-SUBEXP",
+      "label": "No consensus on subexponential ECDLP over F_(2^n) (GG Sec. 10.2)",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-BK-GG-DIEM-SUBEXP-REPORT",
+          "relation": "does_not_cover"
+        }
+      ]
+    },
+    {
+      "id": "OPEN-BK-GG-BSGS-CONSTANT",
+      "label": "Best-possible BSGS constant and grumpy-giants running time",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "OPEN-BK-GG-EXOTIC-ROUTES",
+      "label": "Brauer-group, signature-calculus and Kolyvagin routes: no practical impact",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "OPEN-BK-GG-PRIME-FIELD-DECOMPOSITION",
+      "label": "No efficient decomposition for prime-field small-abscissa factor base",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "OPEN-BK-GG-SUBFIELD-IC",
+      "label": "Speeding up index calculus on subfield (Koblitz) curves is open",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL",
@@ -857,7 +2350,139 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": [
+        {
+          "from": "ALG-GG-GPR-FOUR-KANGAROO",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+      "label": "PKM (published, preliminary): Semaev's naive system was easier than theirs",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "HEUR-BK-GG-BREAK-SYMMETRY",
+      "label": "Disjoint factor bases: expected (k-1)! gain",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-BK-GG-GHS-GENERIC-FAILURE",
+      "label": "GHS fails in general: cover genus exponential in n",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-BK-GG-NEGATION-DISPUTE",
+      "label": "Negation-map speedup: practical dispute recorded",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-BK-KM-ORACLE-NOT-ALGORITHM",
+      "label": "Oracle-relative DL assumptions (all-primes-but-p) are easier than DL",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-GG-BL-HIGHER-ANTICOLLISIONS",
+      "label": "Bernstein-Lange: higher-degree local anti-collisions slow rho beyond Brent-Pollard",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-GG-WALK-NONRANDOMNESS"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+      "label": "No-subfield obstruction for prime-field index calculus",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC",
+      "label": "PKM systems look easier than semi-generic ones",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-PF-PKM-FFA-TRANSPOSED",
+      "label": "First-fall assumption transposed to PKM towers (D ~ ffd)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-CSTEP-T14"
+      ],
+      "pressure": [
+        {
+          "from": "MEAS-PF-REPO-KUMMER-DEGREE",
+          "relation": "obstructs"
+        }
+      ]
     },
     {
       "id": "HEUR-RP-LIFT-SUBGROUP-HALF",
@@ -896,6 +2521,85 @@
         "RT-REPRESENTATION-FILTER"
       ],
       "pressure": []
+    },
+    {
+      "id": "HEUR-XT-EASY-LIFT-DEPENDENCE",
+      "label": "Easy-lift (xedni) points are dependent with probability below 1/p",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-XT-JOUX-PINPOINT-CORRECTED",
+      "label": "Joux pinpointing: corrected constant L(1/3, 2^(1/3))",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-XT-LS-MNT-COUNT",
+      "label": "Luca-Shparlinski: about z^(1/2+o(1)) MNT curves with CM discriminant <= z",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-XT-NFS-C32-FLOOR",
+      "label": "Barbulescu-Duquesne: arguments that c cannot go below 32",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-TRANSFER-PRICE-MODEL"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-XT-SS-ANALYSIS",
+      "label": "Silverman-Suzuki: lifted index calculus slower than brute force",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ASM-BK-GG-CDH-ONLY-VIA-DLP",
+      "label": "CDH: only known method is solving ECDLP",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "RED-MAURER-AUXILIARY-CURVE",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "ASM-CLASSICAL-ECDLP",
@@ -948,6 +2652,127 @@
       ]
     },
     {
+      "id": "STD-BK-BRAINPOOL-REQS",
+      "label": "Brainpool (RFC 5639) security requirements",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-THRESHOLDS"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "STD-BK-NIST-DISC-NO-RATIONALE",
+      "label": "NIST SP 800-186: no technical rationale for a |Disc| bound",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-THRESHOLDS"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "STD-BK-NIST-HALF-BITLENGTH",
+      "label": "NIST: security strength ~ half the bit length of n",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-AUTOMORPHISM-SPEEDUP",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "STD-BK-SAFECURVES-DISC",
+      "label": "SafeCurves discriminant rule: |D| > 2^100",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "STD-BK-NIST-DISC-NO-RATIONALE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "STD-BK-SAFECURVES-TRANSFER",
+      "label": "SafeCurves transfer rule: embedding degree >= (l-1)/100",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-THRESHOLDS"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "STD-BK-SAFECURVES-TWIST",
+      "label": "SafeCurves twist-security rule (>= 2^100 combined attack)",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "STD-BK-SEC1-HARDNESS-NARRATIVE",
+      "label": "SEC 1 v2.0 ECDLP hardness narrative",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-BOOK-INVENTORY"
+      ],
+      "pressure": [
+        {
+          "from": "OPEN-BK-GG-BINARY-SUBEXP",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "STD-BK-SEC1-VALIDATION",
+      "label": "SEC 1 v2.0 domain-parameter validation (B < 100, n != p)",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-THRESHOLDS"
+      ],
+      "pressure": []
+    },
+    {
       "id": "ALG-GAUDRY-FIXED-EXTENSION",
       "label": "Gaudry fixed-extension index calculus",
       "status": "conditional",
@@ -965,8 +2790,8 @@
       ]
     },
     {
-      "id": "ALG-STATIC-DH-AUXILIARY-POWERS",
-      "label": "Static-DH auxiliary-power attack",
+      "id": "ALG-GG-BL-SMALLDL-TABLE",
+      "label": "BL small DL: 1.77 ell^(1/3) with a table of ell^(1/3)",
       "status": "conditional",
       "formal": "none",
       "action": "discharge each condition, or keep the row labelled conditional",
@@ -977,8 +2802,8 @@
       "pressure": []
     },
     {
-      "id": "ATTACK-CHEON-AUXILIARY",
-      "label": "Cheon auxiliary-input attack",
+      "id": "ALG-GG-FOWLER-FIVE-KANGAROO",
+      "label": "Fowler: five kangaroos at 1.737 sqrt N (not below four)",
       "status": "conditional",
       "formal": "none",
       "action": "discharge each condition, or keep the row labelled conditional",
@@ -989,17 +2814,99 @@
       "pressure": []
     },
     {
-      "id": "ATTACK-FREY-RUECK",
-      "label": "Frey-Rueck Tate-pairing transfer",
+      "id": "ALG-GG-GLV-FROBENIUS-WALK",
+      "label": "Gallant-Lambert-Vanstone multiplicative walk on Frobenius-negation orbits",
       "status": "conditional",
       "formal": "none",
       "action": "discharge each condition, or keep the row labelled conditional",
       "impact": 0,
       "downstream": [],
       "depends_citations": [],
-      "research_targets": [
-        "RT-PAIRING-TARGET-COST"
-      ],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-GG-BRENT-POLLARD-ADDING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "ALG-GG-GPR-FOUR-KANGAROO",
+      "label": "Galbraith-Pollard-Ruprai: 4-kangaroo 1.714 sqrt N, hybrid 1.66 sqrt N",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "ALG-GG-FOWLER-FIVE-KANGAROO",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "ALG-GG-WZ-NEGATION",
+      "label": "Wiener-Zuccherato negating additive walk with 2-cycle look-back",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-GG-DGM-CYCLE-RATES",
+          "relation": "obstructs"
+        },
+        {
+          "from": "CLAIM-GG-BKL-SIMD-NEGATION",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "ALG-XT-COPPERSMITH-F2N",
+      "label": "Coppersmith's algorithm for F_{2^n}",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-XT-MSS-NORM-UPPER-BOUND",
+      "label": "MSS 2016 key-size method (norm upper bounds, B^2 linear algebra)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "COND-XT-BD-BN-100BIT",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "ATTACK-BK-GG-CHEON-COST",
+      "label": "Cheon / Brown-Gallant cost O(max(sqrt(r/d), sqrt d))",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
     },
     {
@@ -1013,6 +2920,44 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "CLAIM-BK-SEC1-COFACTOR-CDH",
+      "label": "SEC 1: a slightly larger cofactor makes ECDH roughly as hard as DLP",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "RED-MAURER-AUXILIARY-CURVE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-GG-FKL-AGM-TO-GGM",
+      "label": "FKL transfer: AGM results plus GGM DL bound give GGM bounds",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GG-KZZ-AGM-NOT-WEAKER",
+          "relation": "obstructs"
+        },
+        {
+          "from": "LB-GG-AHP-GEOMETRIC",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "COND-BINARY-WEIL-DESCENT",
@@ -1040,8 +2985,110 @@
         {
           "from": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
           "relation": "obstructs"
+        },
+        {
+          "from": "OPEN-BK-GG-BINARY-SUBEXP",
+          "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "COND-BK-GG-GAUDRY-FIXED-N",
+      "label": "Survey statement: O~(q^2), O~(q^(2-2/n)) for fixed n",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-DECOMP-MEASURE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "COND-BK-GG-NONUNIFORM-R13",
+      "label": "Precomputation: r^(1/3) per instance after r^(2/3) (Bernstein-Lange)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-BK-GG-OVERDETERMINED-TRADEOFF",
+      "label": "Over-/under-determined decomposition trade-off",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-BK-GG-SEMAEV-UNROLLED-CONJ",
+      "label": "Semaev 2015 unrolled-resultant subexponential conjecture (as surveyed)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "OPEN-BK-GG-BINARY-SUBEXP",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-PF-APS-BEATS-PKM",
+      "label": "APS outperforms PKM for fixed m and growing p",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-APS-VS-PKM-REMEASURE"
+      ],
+      "pressure": [
+        {
+          "from": "CEX-PF-APS-COMPARISON-MISMATCH",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-PF-APS-COST",
+      "label": "APS cost q m^m / s^m * T(E,m,V)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-PF-KY-FFA-REDUCTIO",
+      "label": "Kosters-Yeo reductio: unrestricted FFA would decide an NP-complete problem",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "COND-PKM-PRIME-ALGEBRAIC",
@@ -1061,6 +3108,22 @@
         {
           "from": "MEAS-RP-BOUNDARY-TARGETS-PRIME",
           "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PF-PKM-ASYMPTOTIC-OPEN",
+          "relation": "qualifies"
+        },
+        {
+          "from": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+          "relation": "does_not_cover"
+        },
+        {
+          "from": "COND-PF-HKPYY-COMPLEXITY",
+          "relation": "does_not_cover"
         }
       ]
     },
@@ -1089,6 +3152,75 @@
       "pressure": []
     },
     {
+      "id": "COND-XT-BD-BN-100BIT",
+      "label": "BD: the 3072-bit BN curve offers about 100 bits, not 128",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-BN-NORM-REPLAY"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "COND-XT-BD-KEYSIZES",
+      "label": "BD updated pairing key sizes",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-XT-GKZ-ALL-EXTENSIONS",
+      "label": "GKZ conditional: quasi-polynomial DLP in every F_{p^n}",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-XT-GKZ-F2-1223-59BIT",
+      "label": "GKZ: the genus-1 supersingular F_{2^1223} target has about 59-bit security",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-XT-MOV-SS-SMALLCHAR",
+      "label": "Rigorous quasi-polynomial ECDLP on supersingular curves of fixed characteristic",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-MOV-KW-COMPOSITION"
+      ],
+      "pressure": []
+    },
+    {
       "id": "ESTIMATE-QUANTUM-IONQ-2026",
       "label": "2026 trapped-ion secp256k1 preprint estimate",
       "status": "conditional",
@@ -1101,23 +3233,28 @@
       "pressure": []
     },
     {
-      "id": "FACT-FIELD-DLP-AFTER-PAIRING",
-      "label": "Target finite-field DLP governs pairing attack",
+      "id": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "label": "No linearized QSP beats generic algorithms (under HKPYY's estimate)",
       "status": "conditional",
       "formal": "none",
       "action": "discharge each condition, or keep the row labelled conditional",
       "impact": 0,
       "downstream": [],
       "depends_citations": [],
-      "research_targets": [
-        "RT-PAIRING-TARGET-COST"
-      ],
-      "pressure": [
-        {
-          "from": "FACT-PAIRING-FRIENDLY-TWO-DLPS",
-          "relation": "qualifies"
-        }
-      ]
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+      "label": "McGuire-Mueller: their split trinomials do not beat generic algorithms",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "FACT-PRIME-FIELD-NO-EXTENSION-GAIN",
@@ -1129,6 +3266,29 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": [
+        {
+          "from": "OPEN-BK-GG-PRIME-FIELD-DECOMPOSITION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "OBS-XT-LIFT-BOUNDED-RANK",
+      "label": "Bounded rank would rule out growing-factor-base lifting",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-HKT-SCOPE"
+      ],
       "pressure": []
     },
     {
@@ -1140,8 +3300,23 @@
       "impact": 0,
       "downstream": [],
       "depends_citations": [],
-      "research_targets": [],
-      "pressure": []
+      "research_targets": [
+        "RT-GG-NEGATION-OVERHEAD"
+      ],
+      "pressure": [
+        {
+          "from": "HEUR-GG-DGM-CYCLE-RATES",
+          "relation": "qualifies"
+        },
+        {
+          "from": "ALG-GG-BLS-BRANCHLESS-NEGATION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "ALG-GG-GLV-FROBENIUS-WALK",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "RED-SCHNORR-ROM",
@@ -1153,6 +3328,25 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": [
+        {
+          "from": "DEF-GG-GENERIC-ROM",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "RED-XT-CHENG-HUANG-PARTIAL-LIFT",
+      "label": "Cheng-Huang: ECDLP reduces to three partial lifting problems",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XT-HKT-SCOPE"
+      ],
       "pressure": []
     },
     {
@@ -1166,6 +3360,29 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "label": "YYTK: naive Semaev index calculus cannot beat generic methods",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-YYTK-READ"
+      ],
+      "pressure": [
+        {
+          "from": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-PF-REPO-DIRECT-LOWER-BOUND",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "THM-RP-KOBLITZ-CYCLIC-WINDOW",
@@ -1191,6 +3408,20 @@
       "research_targets": [
         "RT-LEMMA4-FORMAL",
         "RT-LEMMA4-REVERSE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PF-APS-COMPARISON-MISMATCH",
+      "label": "APS Table 2 compares against PKM's m = 2 data",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PF-APS-VS-PKM-REMEASURE"
       ],
       "pressure": []
     },
@@ -1255,6 +3486,71 @@
       "pressure": []
     },
     {
+      "id": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",
+      "label": "Only l = p torsion leaks through E(Z/p^2)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "LB-GG-AHP-GEOMETRIC",
+      "label": "AHP: GGM bounds via geometric-search reductions (with preprocessing)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "LB-GG-CDG-AI-GGM",
+      "label": "CDG: auxiliary-input GGM bounds via presampling",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "LB-GG-NECHAEV-DETERMINISTIC",
+      "label": "Nechaev: deterministic generic DLP needs Omega(sqrt r)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "LB-SHOUP-DLP",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "LB-GG-YUN-MDLP",
+      "label": "Yun: generic n-target DLP needs Omega(sqrt(n p))",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "LB-ISOGENY-GENERIC",
       "label": "Isogeny-augmented generic lower bound",
       "status": "proved_internal_unreviewed",
@@ -1272,6 +3568,37 @@
           "relation": "does_not_cover"
         }
       ]
+    },
+    {
+      "id": "OBS-XT-GLOBAL-TORSION-LIFT",
+      "label": "Global torsion lifts: torsion too small over Q, fields too large otherwise",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-XT-PETSCHE-TORSION",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "RED-BK-AGCODE-MINDIST",
+      "label": "AG-code minimum distance vs ECDLP (survey says 'equivalent')",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-AGCODE-DIRECTION"
+      ],
+      "pressure": []
     },
     {
       "id": "THEOREM-FROB-SUBSPACES-131",
@@ -1348,6 +3675,114 @@
         "RT-ALGEBRAIC-SOLUTION-COUNT",
         "RT-RP-PROOF-GATE-IC-NEGATIVE"
       ],
+      "pressure": []
+    },
+    {
+      "id": "THM-BK-GG-DIEM-SUBEXP-REPORT",
+      "label": "Survey report of Diem's rigorous L(2/3) sequence",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-BK-GG-YUN-MULTI-LB",
+      "label": "Yun: generic Omega(sqrt(rL)) for L-instance DLP",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-BK-ONE-OUT-OF-L"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-GG-AGM-UNINSTANTIABLE",
+      "label": "Zhandry: un-instantiability in the AGM",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-GG-KZZ-AGM-NOT-WEAKER",
+      "label": "KZZ: AGM is not (as formalized) weaker than the GGM",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-GG-JM-AGM-TRANSFER",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-GG-ZHANDRY-LABELS",
+      "label": "Shoup vs Maurer generic models differ on multi-stage games",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-PF-HKPYY-LEMMA41",
+      "label": "HKPYY Lemma 4.1: floor(n/n') l + (n mod n') >= n'",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-PF-EP-LINEARIZED-BETA",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-PF-KYTY-APS-LIMITATION",
+      "label": "Kudo et al. 2018: acceleration of APS and its limitation",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-PF-REPO-DIRECT-LOWER-BOUND",
+      "label": "Direct-presentation algebraic IC over F_p costs >= c_m r (internal, conditional)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
     },
     {
@@ -1554,6 +3989,78 @@
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
       "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-XT-BK-IMPROBABILITY",
+      "label": "Balasubramanian-Koblitz: small embedding degree is improbable",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-XT-HS-SZPIRO-IMPLIES-LANG",
+      "label": "Hindry-Silverman: Szpiro implies Lang",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-XT-RIGOROUS-L-HALF",
+      "label": "Rigorous L(1/2) discrete logarithms (Pomerance; F_p index calculus)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-XT-RUECK-JACOBIAN-PTORSION",
+      "label": "Rueck: p-torsion DLP in Jacobians of curves in characteristic p",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-XT-SATOH-ARAKI-FERMAT",
+      "label": "Satoh-Araki Fermat-quotient anomalous attack",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-XT-TRACE-MAP-DISTORTION",
+      "label": "The trace map distorts some points but not the G1/G2 eigenspaces",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
       "impact": 0,
       "downstream": [],
       "depends_citations": [],

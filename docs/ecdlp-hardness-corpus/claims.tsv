@@ -170,3 +170,205 @@ HEUR-RP-DESCENT-TERMINATION	heuristic	heuristic	classical_unrestricted	asymptoti
 THM-RP-VOLCANO-STRUCTURE	structural_theorem	proved_external_unread	mathematical	theorem	-	S-RP-IC-LIT-SECONDARY,S-RP-IC-ASSUMPTION-GRAPH
 ALG-RP-VELU-COST	algorithmic_upper_bound	proved_external_unread	mathematical	algorithm	-	S-RP-IC-LIT-SECONDARY,S-RP-IC-ASSUMPTION-GRAPH
 COND-RP-LINEARIZED-SUBSPACE-FLOOR	structural_theorem	conditional	curve_family_restricted	conditional_theorem	-	S-RP-IC-ASSUMPTION-GRAPH
+THM-BK-GG-WEIL-RESTRICTION	structural_theorem	proved_external	mathematical	theorem	-	S-BK-GG-2016,S-BK-HEHCC-2005,S-BK-BSS-2005
+THM-BK-GG-SEMAEV-LEMMA2	structural_theorem	proved_external_unread	mathematical	theorem	-	S-BK-GG-2016,S-SEMAEV-2004
+HEUR-BK-GG-FACTOR-BASE-SIZE	heuristic	heuristic	algebraic_coordinate	assumption	-	S-BK-GG-2016
+HEUR-BK-GG-DECOMP-PROPORTION	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	Pr[decompose] ~ q^(l k - n) / k!  (l = 1, k = n: 1/n!)	S-BK-GG-2016
+COND-BK-GG-GAUDRY-FIXED-N	conditional_attack	conditional	algebraic_coordinate	asymptotic_heuristic	O~(q^2); O~(q^(2-2/n)) with double large primes	S-BK-GG-2016
+THM-BK-GG-DIEM-SUBEXP-REPORT	algorithmic_upper_bound	proved_external_unread	classical_unrestricted	theorem	-	S-BK-GG-2016,S-DIEM-2011
+OPEN-BK-GG-PRIME-FIELD-DECOMPOSITION	open_obligation	open	algebraic_coordinate	open	-	S-BK-GG-2016
+HEUR-BK-GG-FFDA-DESCRIPTION	heuristic	heuristic	algebraic_coordinate	assumption	-	S-BK-GG-2016
+OPEN-BK-GG-BINARY-SUBEXP	open_obligation	open	algebraic_coordinate	open	-	S-BK-GG-2016
+COND-BK-GG-SEMAEV-UNROLLED-CONJ	conditional_attack	conditional	algebraic_coordinate	asymptotic_heuristic	L_{2^n}(2/3) or L_{2^n}(1/2) (conjectured)	S-BK-GG-2016
+DEF-BK-GG-UNROLLED-SYSTEM	definition	definition	algebraic_coordinate	definition	-	S-BK-GG-2016
+THM-BK-GG-SYMMETRIC-VSPACE	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-BK-GG-2016
+HEUR-BK-GG-RIGHT-KERNEL-RANK	heuristic	heuristic	classical_unrestricted	asymptotic_heuristic	-	S-BK-GG-2016,S-BK-JOUX-2009
+HEUR-BK-GG-GHS-GENERIC-FAILURE	heuristic	heuristic	curve_family_restricted	asymptotic_heuristic	-	S-BK-GG-2016,S-BK-BSS-2005
+OPEN-BK-GG-SUBFIELD-IC	open_obligation	open	algebraic_coordinate	open	-	S-BK-GG-2016
+HEUR-BK-GG-BREAK-SYMMETRY	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-BK-GG-2016
+COND-BK-GG-OVERDETERMINED-TRADEOFF	conditional_attack	conditional	algebraic_coordinate	asymptotic_heuristic	-	S-BK-GG-2016
+CLAIM-BK-GG-BSGS-OPTIMAL	algorithmic_upper_bound	algorithm	generic_group	algorithm	-	S-BK-GG-2016,S-SHOUP-1997
+OPEN-BK-GG-BSGS-CONSTANT	open_obligation	open	generic_group	open	-	S-BK-GG-2016
+HEUR-BK-GG-RHO-HEURISTIC	heuristic	heuristic	generic_group	asymptotic_heuristic	(sqrt(pi/2) + o(1)) sqrt r serial, heuristic	S-BK-GG-2016
+HEUR-BK-GG-NEGATION-DISPUTE	heuristic	heuristic	generic_group	asymptotic_heuristic	-	S-BK-GG-2016
+ALG-BK-MULTI-TARGET-AMORTIZED	algorithmic_upper_bound	algorithm	generic_group	algorithm	total O(sqrt(r L)); Kuhn-Struik ~ sqrt(2 r L) for L < r^(1/4)	S-BK-GG-2016,S-BK-SAFECURVES
+CLAIM-BK-X962-NO-AMORTIZATION	assumption	refuted	classical_unrestricted	assumption	-	S-BK-SAFECURVES
+THM-BK-GG-YUN-MULTI-LB	model_lower_bound	proved_external_unread	generic_group	theorem	-	S-BK-GG-2016
+OPEN-BK-GG-ONE-OUT-OF-L	open_obligation	open	generic_group	open	-	S-BK-GG-2016,S-BK-SAFECURVES
+COND-BK-GG-NONUNIFORM-R13	conditional_attack	conditional	generic_group_preprocessing	asymptotic_heuristic	online O(r^(1/3)), precomputation O(r^(2/3)), advice O(r^(1/3) log r) bits	S-BK-GG-2016,S-BL-2013
+ATTACK-BK-GG-CHEON-COST	conditional_attack	conditional	generic_group	algorithm	O(max(sqrt(r/d), sqrt(d)))	S-BK-GG-2016,S-BK-SEC1-V2
+HEUR-BK-GG-ISOGENY-WALK	heuristic	heuristic	classical_unrestricted	asymptotic_heuristic	-	S-BK-GG-2016
+RED-BK-AGCODE-MINDIST	reduction	proved_external_unread	classical_unrestricted	theorem	-	S-BK-GG-2016
+OPEN-BK-GG-EXOTIC-ROUTES	open_obligation	open	mathematical	open	-	S-BK-GG-2016
+ASM-BK-GG-CDH-ONLY-VIA-DLP	assumption	assumed	classical_unrestricted	assumption	-	S-BK-GG-2016
+FACT-BK-KM-GENERIC-GAP-REAL	structural_theorem	proved_external	generic_group	theorem	-	S-BK-KM-2010-INTRACTABLE,S-BK-KM-2007-GENERIC
+HEUR-BK-KM-ORACLE-NOT-ALGORITHM	heuristic	heuristic	generic_group	asymptotic_heuristic	-	S-BK-KM-2010-INTRACTABLE
+STD-BK-SEC1-VALIDATION	assumption	assumed	classical_unrestricted	assumption	-	S-BK-SEC1-V2
+STD-BK-SEC1-HARDNESS-NARRATIVE	assumption	assumed	classical_unrestricted	assumption	-	S-BK-SEC1-V2,S-BK-HMV-2004,S-BK-BSS-1999,S-BK-BSS-2005,S-BK-HEHCC-2005,S-BK-GM-2005
+CLAIM-BK-SEC1-COFACTOR-CDH	reduction	conditional	classical_unrestricted	conditional_theorem	-	S-BK-SEC1-V2
+STD-BK-BRAINPOOL-REQS	assumption	assumed	classical_unrestricted	assumption	-	S-BK-RFC5639
+HEUR-BK-BRAINPOOL-CLASS-NUMBER-LIFT	heuristic	heuristic	mathematical	assumption	-	S-BK-RFC5639
+STD-BK-NIST-DISC-NO-RATIONALE	assumption	assumed	classical_unrestricted	assumption	-	S-NIST-800-186
+STD-BK-NIST-HALF-BITLENGTH	assumption	assumed	classical_unrestricted	assumption	-	S-NIST-800-186
+STD-BK-SAFECURVES-RHO	assumption	assumed	classical_unrestricted	assumption	-	S-BK-SAFECURVES
+STD-BK-SAFECURVES-TRANSFER	assumption	assumed	classical_unrestricted	assumption	-	S-BK-SAFECURVES
+CLAIM-BK-SAFECURVES-SEC1-20	assumption	refuted	classical_unrestricted	assumption	-	S-BK-SAFECURVES
+STD-BK-SAFECURVES-DISC	assumption	assumed	classical_unrestricted	assumption	-	S-BK-SAFECURVES
+CLAIM-BK-SAFECURVES-BRAINPOOL-1E6	assumption	refuted	classical_unrestricted	assumption	-	S-BK-SAFECURVES
+STD-BK-SAFECURVES-TWIST	assumption	assumed	classical_unrestricted	assumption	-	S-BK-SAFECURVES
+OPEN-BK-EMBEDDING-THRESHOLD-DISAGREEMENT	open_obligation	open	classical_unrestricted	open	-	S-BK-SEC1-V2,S-NIST-800-186,S-BK-RFC5639,S-BK-SAFECURVES
+DEF-XT-LIFTING-PROBLEM	definition	definition	algebraic_coordinate	definition	-	S-XT-SILVERMAN-FOUR-FACES-2007,S-XT-SILVERMAN-SAC-2008
+DEF-XT-LIFTED-INDEX-CALCULUS	definition	definition	algebraic_coordinate	definition	-	S-GALBRAITH-MPKC-2018,S-XT-MILLER-1986
+HEUR-XT-MILLER-HEIGHT	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-XT-MILLER-1986,S-GALBRAITH-MPKC-2018
+HEUR-XT-SS-ANALYSIS	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-XT-SILVERMAN-SUZUKI-1998,S-XT-HKT-2000
+THM-XT-HKT-LIFT-RANK	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	-	S-XT-HKT-2000
+HEUR-XT-PPVW-BOUNDED-RANK	heuristic	heuristic	mathematical	asymptotic_heuristic	#{E : ht E <= H, rk >= r} = H^((21-r)/24+o(1)), 1<=r<=20 (model)	S-XT-PPVW-2019
+OBS-XT-LIFT-BOUNDED-RANK	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-XT-HKT-2000,S-XT-PPVW-2019
+RED-XT-CHENG-HUANG-PARTIAL-LIFT	reduction	conditional	algebraic_coordinate	conditional_theorem	-	S-XT-CHENG-HUANG-2006
+OBS-XT-LOCAL-NONTORSION-LIFT	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-XT-SILVERMAN-FOUR-FACES-2007
+OBS-XT-LOCAL-TORSION-LIFT	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-XT-SILVERMAN-FOUR-FACES-2007
+FACT-XT-ANOMALOUS-ONLY-L-EQ-P	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	theorem	-	S-XT-COVER-GAP-LIT,S-XT-SILVERMAN-FOUR-FACES-2007
+OBS-XT-GLOBAL-TORSION-LIFT	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	-	S-XT-SILVERMAN-FOUR-FACES-2007
+THM-XT-PETSCHE-TORSION	structural_theorem	proved_external	mathematical	theorem	|E(k)_tors| <= 134861 d sigma^2 log(104613 d sigma^2)	S-XT-PETSCHE-2006
+THM-XT-MASSER-DEPENDENCE	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	-	S-XT-SILVERMAN-FOUR-FACES-2007
+HEUR-XT-EASY-LIFT-DEPENDENCE	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	Pr[lifted points dependent] < 1/p (heuristic)	S-XT-SILVERMAN-FOUR-FACES-2007,S-JKSST-XEDNI-2000
+OBS-XT-HARD-LIFT-HEIGHT	structural_theorem	proved_external	algebraic_coordinate	theorem	h(T^) = m^2 h(S^); size(T^) = O(p^2) bits for m ~ p	S-XT-SILVERMAN-FOUR-FACES-2007
+CONJ-XT-LANG-HEIGHT	open_obligation	open	mathematical	open	h(P) >= c(k) log|N(Delta_{E/k})|	S-XT-PETSCHE-2006,S-XT-HINDRY-SILVERMAN-1988
+CONJ-XT-SZPIRO	open_obligation	open	mathematical	open	-	S-XT-PETSCHE-2006
+THM-XT-HS-SZPIRO-IMPLIES-LANG	structural_theorem	proved_external_unread	mathematical	theorem	-	S-XT-HINDRY-SILVERMAN-1988,S-XT-PETSCHE-2006
+THM-XT-PETSCHE-HEIGHT-BOUND	structural_theorem	proved_external	mathematical	theorem	h(P) >= log|N(Delta)| / (1e15 d^3 sigma^6 log^2(104613 d sigma^2))	S-XT-PETSCHE-2006
+THM-XT-SEMAEV-RUECK-DIFFERENTIAL	structural_theorem	proved_external	curve_family_restricted	theorem	-	S-GALBRAITH-MPKC-2018,S-XT-SEMAEV-1998,S-XT-RUECK-1999
+THM-XT-SATOH-ARAKI-FERMAT	conditional_attack	proved_external_unread	curve_family_restricted	algorithm	-	S-XT-SATOH-ARAKI-1998,S-GALBRAITH-MPKC-2018
+THM-XT-RUECK-JACOBIAN-PTORSION	structural_theorem	proved_external_unread	curve_family_restricted	theorem	-	S-XT-RUECK-1999,S-GALBRAITH-MPKC-2018
+THM-XT-BK-WEIL-SUFFICES	structural_theorem	proved_external_unread	curve_family_restricted	theorem	-	S-XT-BK-1998,S-GALBRAITH-MPKC-2018
+THM-XT-BK-IMPROBABILITY	structural_theorem	proved_external_unread	curve_family_restricted	theorem	Pr[k <= (log p)^2] <= C (log M)^9 (log log M)^2 / M (transcription unverified)	S-XT-BK-1998,S-GALBRAITH-MPKC-2018
+MEAS-XT-ECC2K130-EMBEDDING-DEGREE	measured_bound	measured	repository_measurement	measurement	ord_r(2^131) > 10^7	S-XT-ECC2K130-EXT
+HEUR-XT-LS-MNT-COUNT	heuristic	heuristic	curve_family_restricted	asymptotic_heuristic	-	S-XT-LUCA-SHPARLINSKI-2006
+DEF-XT-DISTORTION-MAP	definition	definition	curve_family_restricted	definition	-	S-GALBRAITH-MPKC-2018,S-XT-VERHEUL-2004
+THM-XT-VERHEUL-DISTORTION-EXISTS	structural_theorem	proved_external_unread	curve_family_restricted	theorem	-	S-XT-VERHEUL-2004,S-GALBRAITH-MPKC-2018
+THM-XT-TRACE-MAP-DISTORTION	structural_theorem	proved_external_unread	curve_family_restricted	theorem	-	S-GALBRAITH-MPKC-2018
+DEF-XT-GPS-PAIRING-TYPES	definition	definition	curve_family_restricted	definition	-	S-XT-GPS-2008,S-GALBRAITH-MPKC-2018
+THM-XT-RIGOROUS-L-HALF	algorithmic_upper_bound	proved_external_unread	classical_unrestricted	theorem	L_p(1/2, 2+o(1)) proved; L_{p^n}(1/2) proved (fixed p)	S-GALBRAITH-MPKC-2018,S-XT-POMERANCE-1987,S-XT-KW-2019
+HEUR-XT-NFS-SMOOTHNESS	heuristic	heuristic	classical_unrestricted	assumption	-	S-XT-KB-2016,S-GALBRAITH-MPKC-2018,S-XT-BD-2019
+ALG-XT-NFS-L13	algorithmic_upper_bound	conditional	classical_unrestricted	asymptotic_heuristic	L_p(1/3,(64/9)^(1/3)) ~ L(1/3,1.923); SNFS/SFFS L(1/3,(32/9)^(1/3)) ~ L(1/3,1.526)	S-GALBRAITH-MPKC-2018
+ALG-XT-COPPERSMITH-F2N	algorithmic_upper_bound	conditional	classical_unrestricted	asymptotic_heuristic	-	S-GALBRAITH-MPKC-2018
+ALG-XT-EXTNFS	algorithmic_upper_bound	conditional	classical_unrestricted	asymptotic_heuristic	L_Q(1/3,(48/9)^(1/3)) ~ L(1/3,1.747); special p: L_Q(1/3,(32/9)^(1/3))	S-XT-KB-2016
+HEUR-XT-NFS-C32-FLOOR	heuristic	heuristic	classical_unrestricted	asymptotic_heuristic	-	S-XT-BD-2019
+COND-XT-BD-BN-100BIT	algorithmic_upper_bound	conditional	curve_family_restricted	concrete_estimate	2^98.65 + 2^98.73 = 2^99.69	S-XT-BD-2019
+CLAIM-XT-BN3072-128BIT	structural_theorem	refuted	curve_family_restricted	counterexample	-	S-XT-BD-2019,S-XT-KB-2016
+COND-XT-BD-KEYSIZES	algorithmic_upper_bound	conditional	curve_family_restricted	concrete_estimate	-	S-XT-BD-2019
+ALG-XT-MSS-NORM-UPPER-BOUND	algorithmic_upper_bound	conditional	curve_family_restricted	concrete_estimate	-	S-XT-MSS-2016,S-XT-BD-2019
+GAP-XT-NFS-SECURITY-LOWER-BOUND	open_obligation	open	classical_unrestricted	open	-	S-XT-BD-2019,S-XT-MSS-2016
+DEF-XT-SPARSE-MEDIUM-SUBFIELD-REP	definition	definition	mathematical	definition	-	S-XT-BGJT-2014,S-XT-KW-2019
+HEUR-XT-BGJT-REPRESENTATION	heuristic	heuristic	mathematical	assumption	-	S-XT-BGJT-2014,S-XT-GKZ-2018,S-XT-KW-2019
+HEUR-XT-BGJT-DESCENT	heuristic	heuristic	mathematical	assumption	-	S-XT-BGJT-2014,S-XT-CWZ-2014
+COND-XT-BGJT-QUASIPOLY	algorithmic_upper_bound	conditional	classical_unrestricted	asymptotic_heuristic	max(q,k)^O(log k); 2^O((log log Q)^2)	S-XT-BGJT-2014
+CLAIM-XT-BGJT-PROP2-ALL-P	structural_theorem	refuted	mathematical	counterexample	-	S-XT-BGJT-2014,S-XT-CWZ-2014
+CEX-XT-CWZ-TRAPS	structural_theorem	proved_external	mathematical	counterexample	-	S-XT-CWZ-2014
+THM-XT-GKZ-RIGOROUS-INFINITE	algorithmic_upper_bound	proved_external	classical_unrestricted	theorem	exp((1/log 2 + o(1))(log n)^2); q^(log2 l + O(k))	S-XT-GKZ-2018
+CONJ-XT-GKZ-REPRESENTATION	open_obligation	open	mathematical	open	-	S-XT-GKZ-2018,S-XT-KW-2019
+COND-XT-GKZ-ALL-EXTENSIONS	algorithmic_upper_bound	conditional	classical_unrestricted	conditional_theorem	-	S-XT-GKZ-2018
+THM-XT-KW-ELLIPTIC-MODEL	structural_theorem	proved_external	mathematical	theorem	-	S-XT-KW-2019
+THM-XT-KW-QUASIPOLY	algorithmic_upper_bound	proved_external	classical_unrestricted	theorem	(pn)^(2 log2 n + O(1))	S-XT-KW-2019
+GAP-XT-RIGOROUS-L13	open_obligation	open	classical_unrestricted	open	-	S-GALBRAITH-MPKC-2018,S-XT-KW-2019,S-XT-KB-2016
+COND-XT-MOV-SS-SMALLCHAR	algorithmic_upper_bound	conditional	curve_family_restricted	conditional_theorem	-	S-XT-KW-2019,S-GALBRAITH-MPKC-2018,S-FST-2010
+CLAIM-XT-JOUX-PINPOINT-ORIGINAL	heuristic	refuted	classical_unrestricted	counterexample	-	S-XT-GKZ-SS-BINARY-2014
+HEUR-XT-JOUX-PINPOINT-CORRECTED	heuristic	heuristic	classical_unrestricted	asymptotic_heuristic	-	S-XT-GKZ-SS-BINARY-2014
+ALG-XT-GKZ-F2-367-BREAK	algorithmic_upper_bound	proved_external	curve_family_restricted	measurement	~52240 core-hours (~2^48 M_r2)	S-XT-GKZ-SS-BINARY-2014
+CLAIM-XT-SS-GENUS2-F2-367-128BIT	structural_theorem	refuted	curve_family_restricted	counterexample	-	S-XT-GKZ-SS-BINARY-2014
+COND-XT-GKZ-F2-1223-59BIT	algorithmic_upper_bound	conditional	curve_family_restricted	concrete_estimate	~2^59 M_r	S-XT-GKZ-SS-BINARY-2014
+CLAIM-XT-AMOR-F2-1223-128BIT	structural_theorem	refuted	curve_family_restricted	counterexample	-	S-XT-GKZ-SS-BINARY-2014
+LB-GG-NECHAEV-DETERMINISTIC	model_lower_bound	proved_external_unread	generic_group	theorem	time, space = Omega(sqrt r)	S-GG-NECHAEV-1994,S-GALBRAITH-MPKC-2018,S-GG-BL-SMALLDL-2012
+DEF-GG-MAURER-MODEL	definition	definition	generic_group	-	-	S-GG-MAURER-2005,S-GALBRAITH-MPKC-2018
+THM-GG-ZHANDRY-LABELS	structural_theorem	proved_external_unread	generic_group	theorem	-	S-GG-ZHANDRY-2022
+DEF-GG-GENERIC-ROM	definition	definition	generic_group	-	-	S-GG-SJ-2000
+DEF-GG-AGM	definition	definition	generic_group	-	-	S-GG-FKL-2018
+RED-GG-FKL-AGM-CDH-DL	reduction	proved_external_unread	generic_group	theorem	-	S-GG-FKL-2018
+CLAIM-GG-FKL-AGM-TO-GGM	structural_theorem	conditional	generic_group	conditional_theorem	-	S-GG-FKL-2018,S-GG-KZZ-2022,S-GG-JM-AGM-TRANSFER
+THM-GG-KZZ-AGM-NOT-WEAKER	structural_theorem	proved_external_unread	generic_group	counterexample	-	S-GG-KZZ-2022
+THM-GG-JM-AGM-TRANSFER	structural_theorem	proved_external_unread	generic_group	theorem	-	S-GG-JM-AGM-TRANSFER
+THM-GG-AGM-UNINSTANTIABLE	structural_theorem	proved_external_unread	generic_group	counterexample	-	S-GG-ZHANDRY-2022
+LB-GG-YUN-MDLP	model_lower_bound	proved_external_unread	generic_group	theorem	Omega(sqrt(n p))	S-GG-YUN-2015
+ALG-GG-KUHN-STRUIK	algorithmic_upper_bound	conditional	generic_group	asymptotic_heuristic	~sqrt(2 r L) for L targets	S-GG-KUHN-STRUIK-2001,S-GALBRAITH-MPKC-2018,S-GG-BL-NONUNIFORM-PREPRINT
+LB-GG-CDG-AI-GGM	model_lower_bound	proved_external_unread	generic_group_preprocessing	theorem	-	S-GG-CDG-2018
+LB-GG-AHP-GEOMETRIC	model_lower_bound	proved_external_unread	generic_group_preprocessing	theorem	-	S-GG-AHP-2023
+ALG-GG-BL-PRECOMP-RHO	algorithmic_upper_bound	conditional	generic_group_preprocessing	asymptotic_heuristic	online ~ 2 ell^(1/3); RAM cost (p ell)^(1/3); AT cost (p ell)^(1/2)	S-GG-BL-NONUNIFORM-PREPRINT,S-BL-2013
+ALG-GG-BL-SMALLDL-TABLE	algorithmic_upper_bound	conditional	generic_group_preprocessing	measurement	1.77 ell^(1/3) online, table ell^(1/3), precomputation 1.24 ell^(2/3)	S-GG-BL-SMALLDL-2012
+ASM-GG-RANDOM-PARTITION	assumption	assumed	generic_group	-	-	S-GALBRAITH-MPKC-2018,S-GG-KMPT-2010,S-GG-MV-2008
+HEUR-GG-DP-RHO	heuristic	heuristic	generic_group	asymptotic_heuristic	E[T] = (1.253 + o(1)) sqrt r (DP); (3.093 + o(1)) sqrt r (Floyd)	S-GALBRAITH-MPKC-2018,S-VOW-1999
+THM-GG-MV-MIXING	structural_theorem	proved_external	generic_group	theorem	t_mix = O((log n)^3)	S-GG-MV-2006
+THM-GG-MV-NONDEGENERACY	structural_theorem	proved_external	generic_group	theorem	-	S-GG-MV-2008
+THM-GG-KMT-NEAR-OPTIMAL	algorithmic_upper_bound	proved_external	generic_group	theorem	T = O(sqrt(|G|) log|G| log log|G|)	S-GG-KMT-2007
+THM-GG-KMPT-BIRTHDAY-MARKOV	structural_theorem	proved_external	mathematical	theorem	-	S-GG-KMPT-2010
+THM-GG-KMPT-RHO-OPTIMAL	algorithmic_upper_bound	proved_external	generic_group	theorem	E[T_collision] <= (1+o(1)) 12 sqrt(19) sqrt|G| < 52.5 sqrt|G|	S-GG-KMPT-2010
+HEUR-GG-BRENT-POLLARD-ADDING	heuristic	heuristic	generic_group	asymptotic_heuristic	slowdown ~= 1/sqrt(1 - sum p_i^2) = 1/sqrt(1 - 1/r)	S-GG-BRENT-POLLARD-1981,S-GG-BL-GRUMPY-2012,S-GALBRAITH-MPKC-2018,S-TESKE-2001
+HEUR-GG-BL-HIGHER-ANTICOLLISIONS	heuristic	heuristic	generic_group	asymptotic_heuristic	r = 6: 1.129162 (all degrees) vs 1.095445 (Brent-Pollard)	S-GG-BL-GRUMPY-2012
+HEUR-GG-TESKE-ADDING-WALK	heuristic	heuristic	generic_group	asymptotic_heuristic	E[cycle length] <= 1.3 sqrt r for r >= 20 (conjectured)	S-GALBRAITH-MPKC-2018,S-TESKE-2001,S-GG-KMPT-2010,S-GG-BL-NONUNIFORM-PREPRINT
+THM-GG-HILDEBRAND-RADDING	structural_theorem	proved_external_unread	mathematical	theorem	t_mix = O(ell^(2/(r-1)))	S-GG-HILDEBRAND-1994,S-GG-BL-GRUMPY-2012
+GAP-GG-ADDING-WALK-RIGOROUS	open_obligation	open	generic_group	open	-	S-GG-MV-2006,S-GALBRAITH-MPKC-2018,S-GG-BL-GRUMPY-2012
+GAP-GG-RHO-CONSTANT	open_obligation	open	generic_group	open	-	S-GALBRAITH-MPKC-2018,S-GG-KMPT-2010
+ALG-GG-GRUMPY	algorithmic_upper_bound	algorithm	generic_group	algorithm	success after 1.5 sqrt(ell): 0.71875 (grumpy) vs 0.6753 (random walk) vs 0.5625 (BSGS)	S-GG-BL-GRUMPY-2012
+HEUR-GG-KANGAROO-FOOTPRINTS	heuristic	heuristic	generic_group	asymptotic_heuristic	E[T] = (2 + o(1)) sqrt w	S-GALBRAITH-MPKC-2018
+THM-GG-MT-KANGAROO	algorithmic_upper_bound	proved_external	generic_group	theorem	average (2 + o(1)) sqrt(b-a); worst (3 + o(1)) sqrt(b-a)	S-GG-MT-KANGAROO,S-GALBRAITH-MPKC-2018
+ALG-GG-GPR-FOUR-KANGAROO	algorithmic_upper_bound	conditional	generic_group	asymptotic_heuristic	1.818, 1.714, 1.661 times sqrt N	S-GG-GPR-2013,S-GG-FOWLER-2014,S-GALBRAITH-MPKC-2018
+ALG-GG-FOWLER-FIVE-KANGAROO	algorithmic_upper_bound	conditional	generic_group	asymptotic_heuristic	(1.737 + o(1)) sqrt N	S-GG-FOWLER-2014
+THM-GG-EQUIV-CLASS-RHO	algorithmic_upper_bound	conditional	generic_group	conditional_theorem	(sqrt(pi/(2 N_C)) + o(1)) sqrt(r) (C1 + C2)	S-GALBRAITH-MPKC-2018
+HEUR-GG-DGM-CYCLE-RATES	heuristic	heuristic	generic_group	asymptotic_heuristic	P(2-cycle per step) ~ 1/(2r); P(2c-cycle) = Theta(1/r^c)	S-DGM-1999,S-GG-BLS-2011-PREPRINT,S-GALBRAITH-MPKC-2018
+CLAIM-GG-CERTICOM-DP-NORMALIZATION	conditional_attack	refuted	generic_group	counterexample	-	S-GG-BLS-2011-PREPRINT,S-GG-WZ-1998
+FACT-GG-WALK-CLASS-WELLDEFINED	structural_theorem	proved_external	generic_group	theorem	-	S-GALBRAITH-MPKC-2018,S-GG-BLS-2011-PREPRINT,S-GG-WZ-1998
+ALG-GG-WZ-NEGATION	algorithmic_upper_bound	conditional	generic_group	asymptotic_heuristic	-	S-GG-WZ-1998,S-GG-BLS-2011-PREPRINT
+CLAIM-GG-BKL-SIMD-NEGATION	conditional_attack	refuted	generic_group	counterexample	-	S-GG-BKL-2010,S-GG-BLS-2011-PREPRINT,S-GALBRAITH-MPKC-2018
+ALG-GG-BLS-BRANCHLESS-NEGATION	algorithmic_upper_bound	conditional	generic_group	measurement	E[iterations] = (1+o(1)) sqrt(pi ell/4); overhead 1 + Theta(1/sqrt r)	S-GG-BLS-2011-PREPRINT,S-BLS-2011
+ALG-GG-GLV-FROBENIUS-WALK	algorithmic_upper_bound	conditional	generic_group	asymptotic_heuristic	~ sqrt(pi 2^m / (4m)) group operations on Koblitz curves	S-GG-GLV-2000,S-GALBRAITH-MPKC-2018,S-GG-BLS-2011-PREPRINT,S-GG-BL-GRUMPY-2012
+DEF-PF-SEMAEV-SMALL-X-BASE	definition	definition	algebraic_coordinate	-	-	S-SEMAEV-2004,S-PF-PKM-2016,S-PF-SEMAEV-2015,S-PF-APS-2018
+GAP-PF-PRIME-RELATION-SEARCH	open_obligation	open	algebraic_coordinate	-	-	S-PF-SEMAEV-2015,S-PF-PKM-2016,S-PF-APS-2018,S-PF-HU-2024
+HEUR-PF-NO-SUBFIELD-OBSTRUCTION	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-PKM-2016,S-PF-APS-2018,S-PF-SEMAEV-2015
+DEF-PF-GENERALIZED-ROOT-FINDING	definition	definition	algebraic_coordinate	-	-	S-PF-PKM-2016
+DEF-PF-RATIONAL-MAP-FACTOR-BASE	definition	definition	algebraic_coordinate	-	-	S-PF-PKM-2016,S-PKM-2016
+ALG-PF-PKM-INDEX-CALCULUS	algorithmic_upper_bound	algorithm	algebraic_coordinate	-	-	S-PF-PKM-2016
+HEUR-PF-PKM-SOLUTION-COUNT	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-PKM-2016
+ASM-PF-PKM-UNIT-COST	assumption	assumed	algebraic_coordinate	assumption	-	S-PF-PKM-2016
+COND-PF-PKM-COST-THRESHOLD	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	P(p,m) + m! p (deg L)^(1-m) T(E,m,L) + (deg L)^omega < p^(1/2)  <=  T(E,m,L) < p^(1/2-1/m) when (deg L)^m ~ m! p	S-PF-PKM-2016
+HEUR-PF-PKM-RANK-DELTA	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-PKM-2016
+DEF-PF-PKM-SMOOTH-SUBGROUP-BASE	definition	definition	curve_family_restricted	-	-	S-PF-PKM-2016
+FACT-PF-P224-PMINUS1-SMOOTH	structural_theorem	proved_external	curve_family_restricted	theorem	-	S-PF-PKM-2016
+DEF-PF-PKM-ISOGENY-BASE	definition	definition	algebraic_coordinate	-	-	S-PF-PKM-2016
+THM-PF-PKM-LEMMA1	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-PF-PKM-2016
+HEUR-PF-PKM-AUX-CURVE-SEARCH	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-PKM-2016
+MEAS-PF-PKM-DEGREE-TABLES	heuristic	heuristic	algebraic_coordinate	measurement	-	S-PF-PKM-2016
+HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-PKM-2016
+FACT-PF-PKM-NAIVE-SEMAEV-EASIER	heuristic	heuristic	algebraic_coordinate	measurement	-	S-PF-PKM-2016
+GAP-PF-PKM-ASYMPTOTIC-OPEN	open_obligation	open	algebraic_coordinate	-	-	S-PF-PKM-2016
+GAP-PF-DEDICATED-ROOT-FINDER	open_obligation	open	algebraic_coordinate	-	-	S-PF-PKM-2016
+ALG-PF-APS-SINGLE-RELATION	algorithmic_upper_bound	algorithm	algebraic_coordinate	-	-	S-PF-APS-2018,S-APS-2018
+COND-PF-APS-COST	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	(q m^m / s^m) * T(E,m,V)	S-PF-APS-2018
+HEUR-PF-APS-T-EQUALS-TPRIME	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-APS-2018
+COND-PF-APS-BEATS-PKM	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-PF-APS-2018
+CEX-PF-APS-COMPARISON-MISMATCH	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	counterexample	-	S-PF-APS-2018,S-PF-PKM-2016
+THM-PF-KYTY-APS-LIMITATION	structural_theorem	proved_external_unread	algebraic_coordinate	-	-	S-PF-KYTY-2018
+HEUR-PF-YYTK-STATISTICAL	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-YYTK-2020
+THM-PF-YYTK-NAIVE-LOWER-BOUND	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-PF-YYTK-2020
+ASM-PF-KY-CURVE-CONSTRUCTION	assumption	assumed	mathematical	assumption	-	S-KOSTERS-YEO-2015
+THM-PF-KY-SUBSET-SUM-NPC	structural_theorem	proved_external	mathematical	theorem	-	S-KOSTERS-YEO-2015
+THM-PF-KY-NPC-SMOOTH	structural_theorem	proved_external	mathematical	theorem	-	S-KOSTERS-YEO-2015
+THM-PF-KY-NPC-CUSPIDAL	structural_theorem	proved_external	mathematical	theorem	-	S-KOSTERS-YEO-2015
+COND-PF-KY-FFA-REDUCTIO	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-KOSTERS-YEO-2015
+HEUR-PF-PKM-FFA-TRANSPOSED	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-PF-REPO-FALL-DEGREE,S-PF-PKM-2016
+THM-PF-REPO-KUMMER-FFD-FOUR	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	theorem	-	S-PF-REPO-FALL-DEGREE
+MEAS-PF-REPO-KUMMER-DEGREE	measured_bound	measured	repository_measurement	measurement	-	S-PF-REPO-FALL-DEGREE-T14,S-PF-REPO-FALL-DEGREE
+MEAS-PF-REPO-HIGHER-M-DEGREE	measured_bound	measured	repository_measurement	measurement	-	S-PF-REPO-HIGHER-M-DEGREE
+MEAS-PF-REPO-PKM-VS-RHO	measured_bound	measured	repository_measurement	measurement	-	S-PF-REPO-PKM-PRICED
+THM-PF-REPO-DIRECT-LOWER-BOUND	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	conditional_theorem	-	S-PF-REPO-IC-LOWER-BOUND
+GAP-PF-TOWER-SOLVING-DEGREE-HT	open_obligation	open	algebraic_coordinate	-	-	S-PF-REPO-IC-LOWER-BOUND
+GAP-PF-SPECIAL-PRIME-EXPOSURE	open_obligation	open	curve_family_restricted	-	-	S-PF-PKM-2016,S-PF-NIKOLAEV-2024
+DEF-PF-QUASI-SUBFIELD-POLY	definition	definition	algebraic_coordinate	-	-	S-PF-HKPYY-2020,S-PF-EULER-PETIT-2021,S-PF-MCGUIRE-MUELLER-2019
+THM-PF-HKPYY-LEMMA41	structural_theorem	proved_external_unread	mathematical	theorem	-	S-PF-HKPYY-2020,S-PF-EULER-PETIT-2021
+COND-PF-HKPYY-COMPLEXITY	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-PF-HKPYY-2020,S-PF-MCGUIRE-MUELLER-2019,S-PF-EULER-PETIT-2021
+COND-PF-EP-BETA-THRESHOLD	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	cost = O~(p^((1 - 1/(4 kappa beta)) n)); generic beaten iff beta < 1/(2 kappa) ~ 0.103	S-PF-EULER-PETIT-2021
+THM-PF-EP-LINEARIZED-BETA	structural_theorem	proved_external	mathematical	theorem	-	S-PF-EULER-PETIT-2021
+THM-PF-EP-QSP-FAMILIES	structural_theorem	proved_external	mathematical	theorem	-	S-PF-EULER-PETIT-2021
+HEUR-PF-HKPYY-SPARSE-DENSITY	heuristic	refuted	mathematical	asymptotic_heuristic	-	S-PF-HKPYY-2020,S-PF-EULER-PETIT-2021
+FACT-PF-EP-LINEARIZED-NO-GAIN	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-PF-EULER-PETIT-2021
+THM-PF-MM-TRINOMIALS	structural_theorem	proved_external	mathematical	theorem	-	S-PF-MCGUIRE-MUELLER-2019
+FACT-PF-MM-TRINOMIAL-NO-GAIN	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-PF-MCGUIRE-MUELLER-2019
+GAP-PF-QSP-EXISTENCE	open_obligation	open	mathematical	-	-	S-PF-HKPYY-2020,S-PF-EULER-PETIT-2021
