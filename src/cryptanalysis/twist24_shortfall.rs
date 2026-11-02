@@ -61,6 +61,27 @@ pub struct Shortfall {
     pub final_cycle: u64,
     /// Stored classes by partition.
     pub part_hist: Vec<u64>,
+    /// The number of jumps (partitions).
+    pub jumps: u64,
+    /// The fix's added set-up work (all of it charged to the walk): group
+    /// operations, their `F_p` multiplications, and mod-`n` operations.
+    pub added_group_ops: u64,
+    pub added_fp_muls: u64,
+    pub added_modn: u64,
+}
+
+/// The jump table (E41, §9.52).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum Jumps {
+    /// E34's `32` jumps: the walk is E34's, byte for byte.
+    E34,
+    /// Fix F: E34's `32` jumps plus `R_{32+j} = R_j + R_{(j+1) mod 32}` with
+    /// `(a, b)` the sums (`32` group additions and `64` mod-`n` additions a
+    /// walk, charged), `r = 64` partitions.
+    PairSums,
+    /// Positive control F̸: F with `b` of each pair jump taken as `b_j`
+    /// (`b_{j+1}` dropped), which corrupts the logarithm bookkeeping.
+    PairSumsBroken,
 }
 
 /// E34's walk ([`super::twist24_rep::rho_j0_counted`]) with the instrument.
@@ -69,6 +90,18 @@ pub fn rho_j0_instrumented(
     arm: RepArm,
     seed: u64,
     karatsuba: bool,
+) -> (CountedWalk, Shortfall) {
+    rho_j0_e41(inst, arm, seed, karatsuba, Jumps::E34)
+}
+
+/// E34's walk with the instrument and the jump table `jumps_kind`; with
+/// [`Jumps::E34`] it is E34's walk exactly.
+pub fn rho_j0_e41(
+    inst: &Twist24Instance,
+    arm: RepArm,
+    seed: u64,
+    karatsuba: bool,
+    jumps_kind: Jumps,
 ) -> (CountedWalk, Shortfall) {
     let curve = Curve4::with_params_arith(inst.core.p, inst.core.a, inst.core.b, karatsuba);
     let f = &curve.f;
@@ -84,10 +117,9 @@ pub fn rho_j0_instrumented(
         class_size,
         classes,
         ideal_steps: (std::f64::consts::PI * classes as f64 / 2.0).sqrt(),
-        part_hist: vec![0; jumps],
         ..Default::default()
     };
-    let mults: Vec<(u64, u64, Pt4)> = (0..jumps)
+    let mut mults: Vec<(u64, u64, Pt4)> = (0..jumps)
         .map(|_| {
             let a = rng.gen_range(0..n);
             let b = rng.gen_range(1..n);
@@ -101,6 +133,26 @@ pub fn rho_j0_instrumented(
     let mut a = rng.gen_range(0..n);
     let mut b = rng.gen_range(1..n);
     let start = curve.add(&curve.mul(&inst.core.g, a), &curve.mul(&inst.core.q, b));
+    let (ops0, muls0, modn0) = (curve.ops(), f.muls(), ops.modn);
+    if jumps_kind != Jumps::E34 {
+        for j in 0..jumps {
+            let (a1, b1, p1) = mults[j];
+            let (a2, b2, p2) = mults[(j + 1) % jumps];
+            ops.modn += 2;
+            let bj = if jumps_kind == Jumps::PairSumsBroken {
+                b1
+            } else {
+                (b1 + b2) % n
+            };
+            mults.push(((a1 + a2) % n, bj, curve.add(&p1, &p2)));
+        }
+    }
+    sf.added_group_ops = curve.ops() - ops0;
+    sf.added_fp_muls = f.muls() - muls0;
+    sf.added_modn = ops.modn - modn0;
+    let jumps = mults.len();
+    sf.jumps = jumps as u64;
+    sf.part_hist = vec![0; jumps];
     let tables = RepTables::new(inst, f);
     let cheap = !matches!(arm, RepArm::Order6Built | RepArm::Order24Built);
     let table_fp_muls = if cheap { tables.setup_fp_muls } else { 0 };
@@ -230,6 +282,29 @@ mod tests {
                 assert_eq!(sf.fruitless, w.run.cycle_escapes);
                 assert_eq!(sf.stored + sf.fruitless + 1, w.run.steps);
             }
+        }
+    }
+
+    #[test]
+    fn e41_pair_sums_recover_the_log_and_the_broken_control_does_not() {
+        let inst = construct_twist24(241, 3, 1).expect("E29's p = 241 model");
+        for seed in [1000u64, 1001] {
+            let e34 = rho_j0_counted(&inst, RepArm::Order24Cheap, seed, false);
+            let (f, sf) = rho_j0_e41(&inst, RepArm::Order24Cheap, seed, false, Jumps::PairSums);
+            assert!(f.run.correct);
+            assert_eq!(sf.jumps, 64);
+            assert_eq!((sf.added_group_ops, sf.added_modn), (32, 64));
+            // The added work: 32 additions, 64 mod-n additions (a walk differs
+            // after its first step, so compare the set-up only through counts).
+            assert_ne!(f.run.visit_digest, e34.run.visit_digest);
+            let (x, _) = rho_j0_e41(
+                &inst,
+                RepArm::Order24Cheap,
+                seed,
+                false,
+                Jumps::PairSumsBroken,
+            );
+            assert!(!x.run.correct);
         }
     }
 }
