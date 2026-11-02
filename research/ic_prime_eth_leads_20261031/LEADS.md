@@ -16,6 +16,8 @@ leads are written to be measured. Lean files in `lean/` compile (axioms: `propex
 Label convention, as in the lab: **measured** (quoted from a committed file), **derived** (arithmetic
 from quoted values, or a Lean theorem here), **plan**.
 
+> **Errata 2026-11-02:** several claims below were corrected after evaluation. Read section 9 (Errata) and SYNTHESIS.md before relying on sections 2, 5 (L8, L10) or 6.
+
 ## 0. One-paragraph verdict
 
 The "ETH false proof" is OpenAI's deterministic #k-SAT algorithm; its sharper bound rests on a Boolean
@@ -527,3 +529,18 @@ contractor-exponent problem the lab already opened (`problems/correlated-packet-
   (26 Oct); arXiv:1010.1101 (Pospelov, char-2 Schönhage); ePrint 2019/313 and arXiv:2001.11229 (WDSat);
   ePrint 2026/384 (structured generic-group model; the elliptic-curve theorem is in the ePrint revision,
   which was not fetchable); SODA 2017 LPTWY, ICALP 2019 BKW, arXiv:2005.04800 (Dinur).
+
+## 9. Errata (2026-11-02)
+
+These corrections come from the Sonnet evaluation of all twelve leads with adversarial skeptics (SYNTHESIS.md section 6, leads/SKEPTIC_DIGEST.md). The text above is left unchanged so the original claims stay auditable; where it conflicts with this section, this section wins.
+
+1. Lean overclaims (L10, all confirmed): (a) the E(m) cost model is an unproved hypothesis; (b) no_crossover needs c >= 1; (c) crossover_bits is unlinked arithmetic, the 256 is not tight; (d) interface_lower_bound is an injectivity count (k <= s) only, not "c k / sqrt(k)" or "each addition needs >= b edges"; (e) polymethod covers only 1/(2d); (f) items (b) and (d) of the L10 list have no Lean receipt; (g) the sibling KR-2 is withdrawn and KR-1 is an upper bound only. LEADS says L10 is "done; file as known results" and lists KR-2 as ready; both wrong. "iff below rho" holds only for the relation phase.
+2. Section 2 sentence "never beat rho ... whatever D.1's constant is" is wrong as stated. Lean proves g > 16c; the 2^256 figure needs c >= 1, an outside assumption on an unspecified O(); the general threshold is log2 b > 256 c^2.
+3. Section 2 "~10^5 b edges per point addition": measured 3,364 edges per slot-bit for the freed binary network and 1.17e4 per slot-bit for the unfreed prototype (L08/t3.py, fit.py output), 11.9k edges per bit for the m = 2 prime network at b = 131 (L09). The 1e5 figure is 9x to 30x high. The exponent argument is unaffected (a*c rule).
+4. Clustering loophole (from L09 skeptic and proposals): closed. No row is D.1-admitted; hidden interface bits cost 2^h entry evaluation; s_eff >= (h/A)^1.11; the b < 2^36 closure is m = 3 specific (m = 4: b < 2^16); m >= 4 is closed by no_crossover not by the floor. Free linear merge is legal but known (about 2x in s).
+5. Paths: prime_sat_prefix_search_20261030 is under crypto-autoresearcher/research (Python transcript adapter, no CaDiCaL propagator); the Bochum hash is in cryptanalysis/bindings/rust/hashed-ecdl-tensor/src/reduction.rs; the prime CNF emitter is the sweep worktree's sweeper and it bakes the target into constants; fourier-width.md does not exist; Bochum text (bochum.txt, eth.txt) is not on disk.
+6. Ladder feasibility: m = 3 prime SAT is censored above b about 12. Evidence: sweep m = 3 times out at 120 s with 2e5..9e5 conflicts at b = 12, l = 4 (STATUS.md); L05 aborted b = 12 pilot 104 of 125 censored; L11 b = 12 26..30 of 30 censored at 3e5 (L11/analysis.md); L12 fresh 0/256 at b = 12, 16 at 20k cap. Feasible pilots are the diagonal b = 6, 9, 12, 15 with a conflict cap, with only b = 6 and 9 uncensored.
+7. Section 5 L8 hand bound 80d + 228 sqrt(d) fails at d = 46; supported: edges <= about 175 d, degree <= about 56 d^(3/4) for d <= 5000, not a proof beyond.
+8. The claim (L08 report, and any LEADS use of it) that the char-2 gadget is not worse than the integer one: the true margin is about 1.4x, not 3.42x.
+
+Status changes: L10 is not "done; file as known results"; its rows need the fixes in SYNTHESIS.md section 4 before filing. KR-2 is withdrawn, KR-1 is an upper bound only. Verdicts per lead: L03, L07, L11 narrow constant_only; L04, L09 contested partial; L01, L05, L06, L08, L10, L12 refuted as stated; L02 not run.
