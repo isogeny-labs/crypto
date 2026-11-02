@@ -30,7 +30,7 @@ const pressureRelations = new Set(["refutes", "obstructs", "qualifies", "does_no
 // everything it rests on.
 const strength = {
   refuted: 0, open: 1, heuristic: 2, assumed: 3, conditional: 4,
-  proved_internal_unreviewed: 5, measured: 6, algorithm: 7, proved_external: 8, definition: 9
+  proved_internal_unreviewed: 5, proved_external_unread: 5, measured: 6, algorithm: 7, proved_external: 8, definition: 9
 };
 const action = {
   refuted: "audit every dependent; repair or retract the estimates that use it",
@@ -38,7 +38,8 @@ const action = {
   heuristic: "prove, or measure on a scaling family without censoring",
   assumed: "assumption: narrow its scope or reduce it to a weaker one",
   conditional: "discharge each condition, or keep the row labelled conditional",
-  proved_internal_unreviewed: "independent review, then kernel-check"
+  proved_internal_unreviewed: "independent review, then kernel-check",
+  proved_external_unread: "read the primary text, record its SHA-256, confirm the statement and hypotheses"
 };
 
 const nodes = new Map(corpus.nodes.map(node => [node.id, node]));
@@ -115,6 +116,7 @@ function trackedFiles() {
     /\.(md|tex|rs|typ|py|lean|txt)$/.test(file) &&
     !/(^|\/)(target|node_modules)\//.test(file) &&
     !file.startsWith("docs/session-logs/") &&
+    !file.startsWith("docs/ecdlp-hardness-corpus/") &&
     !/\/verification\/[^/]+\/run[^/]*\/source\//.test(file));
 }
 const unlinked = [];
