@@ -7,6 +7,9 @@ name: LEAD-15 hosted compile and exact regressions
 # It uses a GitHub-hosted runner only as a pre-freeze correctness gate. Recorded
 # build duration and resource use are infrastructure provenance, not scientific
 # measurements or performance evidence.
+# Amendment after run 41490089825: GitHub rejected `runner.temp` in job-level
+# `env` before scheduling any job.  Paths are now derived from `RUNNER_TEMP`
+# inside the first step; no source, test selector, or scientific scope changed.
 on:
   push:
     branches:
@@ -29,18 +32,15 @@ env:
   RUST_BACKTRACE: "1"
   LEAD15_EXPECTED_COMMIT: ${{ github.sha }}
   LEAD15_EVENT_BEFORE: ${{ github.event.before }}
-  LEAD15_TRIGGER_PARENT: 7b32cfecd6f38476030a3fd012ce8a5f5796503c
+  LEAD15_TRIGGER_PARENT: 1574b20ced876664fe1fa6ad5f85f8b9515b8247
 
 jobs:
   compile-and-test-only:
-    if: ${{ github.event_name == 'push' && github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/lead15' && github.event.before == '7b32cfecd6f38476030a3fd012ce8a5f5796503c' }}
+    if: ${{ github.event_name == 'push' && github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/lead15' && github.event.before == '1574b20ced876664fe1fa6ad5f85f8b9515b8247' }}
     runs-on: ubuntu-latest
     # Per-step deadlines sum below the job deadline, reserving cleanup/upload
     # time even when compilation reaches its own limit.
     timeout-minutes: 240
-    env:
-      CARGO_TARGET_DIR: ${{ runner.temp }}/lead15-validation-target-${{ github.run_id }}-${{ github.run_attempt }}
-      LEAD15_VALIDATION_LOG_DIR: ${{ runner.temp }}/lead15-validation-logs-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Initialize isolated receipt directory
         id: initialize
@@ -53,18 +53,27 @@ jobs:
           test "$GITHUB_REF" = refs/heads/codex/lead15
           test "$LEAD15_EXPECTED_COMMIT" = "$GITHUB_SHA"
           test "$LEAD15_EVENT_BEFORE" = "$LEAD15_TRIGGER_PARENT"
+          expected_target_dir="$RUNNER_TEMP/lead15-validation-target-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           expected_log_dir="$RUNNER_TEMP/lead15-validation-logs-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          test "$LEAD15_VALIDATION_LOG_DIR" = "$expected_log_dir"
-          case "$LEAD15_VALIDATION_LOG_DIR" in
-            "$RUNNER_TEMP"/lead15-validation-logs-*) ;;
-            *) echo "refusing unexpected log path: $LEAD15_VALIDATION_LOG_DIR" >&2; exit 2 ;;
+          printf 'CARGO_TARGET_DIR=%s\nLEAD15_VALIDATION_LOG_DIR=%s\n' \
+            "$expected_target_dir" "$expected_log_dir" >> "$GITHUB_ENV"
+          printf 'log_dir=%s\n' "$expected_log_dir" >> "$GITHUB_OUTPUT"
+          case "$expected_target_dir" in
+            "$RUNNER_TEMP"/lead15-validation-target-*) ;;
+            *) echo "refusing unexpected target path: $expected_target_dir" >&2; exit 2 ;;
           esac
-          test ! -e "$LEAD15_VALIDATION_LOG_DIR"
-          test ! -L "$LEAD15_VALIDATION_LOG_DIR"
-          mkdir -m 0700 "$LEAD15_VALIDATION_LOG_DIR"
+          case "$expected_log_dir" in
+            "$RUNNER_TEMP"/lead15-validation-logs-*) ;;
+            *) echo "refusing unexpected log path: $expected_log_dir" >&2; exit 2 ;;
+          esac
+          test ! -e "$expected_target_dir"
+          test ! -L "$expected_target_dir"
+          test ! -e "$expected_log_dir"
+          test ! -L "$expected_log_dir"
+          mkdir -m 0700 "$expected_log_dir"
           printf 'initialized_at=%s\nrun_id=%s\nrun_attempt=%s\n' \
             "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" \
-            > "$LEAD15_VALIDATION_LOG_DIR/initialization.txt"
+            > "$expected_log_dir/initialization.txt"
 
       - name: Check out the exact one-shot revision
         id: checkout
@@ -463,6 +472,10 @@ jobs:
         run: |
           set -euo pipefail
           expected_log_dir="$RUNNER_TEMP/lead15-validation-logs-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          expected_target_dir="$RUNNER_TEMP/lead15-validation-target-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          LEAD15_VALIDATION_LOG_DIR=${LEAD15_VALIDATION_LOG_DIR:-$expected_log_dir}
+          CARGO_TARGET_DIR=${CARGO_TARGET_DIR:-$expected_target_dir}
+          export LEAD15_VALIDATION_LOG_DIR CARGO_TARGET_DIR
           test "$LEAD15_VALIDATION_LOG_DIR" = "$expected_log_dir"
           case "$LEAD15_VALIDATION_LOG_DIR" in
             "$RUNNER_TEMP"/lead15-validation-logs-*) ;;
@@ -470,12 +483,12 @@ jobs:
           esac
           test ! -L "$LEAD15_VALIDATION_LOG_DIR"
           mkdir -p -m 0700 "$LEAD15_VALIDATION_LOG_DIR"
-          expected_target_dir="$RUNNER_TEMP/lead15-validation-target-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           test "$CARGO_TARGET_DIR" = "$expected_target_dir"
           case "$CARGO_TARGET_DIR" in
             "$RUNNER_TEMP"/lead15-validation-target-*) ;;
             *) echo "refusing unexpected target cleanup: $CARGO_TARGET_DIR" >&2; exit 2 ;;
           esac
+          printf 'log_dir=%s\n' "$LEAD15_VALIDATION_LOG_DIR" >> "$GITHUB_OUTPUT"
           cleanup_exit=0
           target_bytes=null
           if [[ -d "$CARGO_TARGET_DIR" && ! -L "$CARGO_TARGET_DIR" ]]; then
@@ -616,6 +629,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: lead15-hosted-validation-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ env.LEAD15_VALIDATION_LOG_DIR }}/
+          path: ${{ steps.cleanup.outputs.log_dir }}/
           retention-days: 30
           if-no-files-found: error
