@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ECCP131-REPRESENTATION-FILTER-20261102",
-  "version": 3,
+  "version": 4,
   "created": "2026-11-02",
   "repository": "crypto",
   "study_dir": "research/eccp131_representation_filter_20261102",
@@ -71,7 +71,7 @@
       "description": "exact ECCp-131 small-x base, coordinate-filter sweep",
       "instrument": {
         "repo": "crypto",
-        "commit": "b65ba79ac7ac201139f98127868ea962ba644fac",
+        "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
         "build": [
           [
             "cargo",
@@ -81,7 +81,7 @@
             "eccp131_representation_filter"
           ]
         ],
-        "binary_sha256": "2dc0b27dfb0a91ba93ff0ccf3d4441e9bcb63ed4631f985af8f4a9c26ce5aef5",
+        "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
         "flags": {
           "profile": "release"
         },
@@ -105,7 +105,7 @@
       "description": "matched distinct scalar-derived points in the exact ECCp-131 subgroup",
       "instrument": {
         "repo": "crypto",
-        "commit": "b65ba79ac7ac201139f98127868ea962ba644fac",
+        "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
         "build": [
           [
             "cargo",
@@ -115,7 +115,7 @@
             "eccp131_representation_filter"
           ]
         ],
-        "binary_sha256": "2dc0b27dfb0a91ba93ff0ccf3d4441e9bcb63ed4631f985af8f4a9c26ce5aef5",
+        "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
         "flags": {
           "profile": "release"
         },
@@ -140,7 +140,7 @@
       "description": "bit-identical re-evaluation of the selected small-x winner on the frozen held-out cohort",
       "instrument": {
         "repo": "crypto",
-        "commit": "b65ba79ac7ac201139f98127868ea962ba644fac",
+        "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
         "build": [
           [
             "cargo",
@@ -150,7 +150,7 @@
             "eccp131_representation_filter"
           ]
         ],
-        "binary_sha256": "2dc0b27dfb0a91ba93ff0ccf3d4441e9bcb63ed4631f985af8f4a9c26ce5aef5",
+        "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
         "flags": {
           "profile": "release"
         },
@@ -171,7 +171,7 @@
       "description": "known four-summand target recovered by exact signed pair-table lookup",
       "instrument": {
         "repo": "crypto",
-        "commit": "b65ba79ac7ac201139f98127868ea962ba644fac",
+        "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
         "build": [
           [
             "cargo",
@@ -181,7 +181,7 @@
             "eccp131_representation_filter"
           ]
         ],
-        "binary_sha256": "2dc0b27dfb0a91ba93ff0ccf3d4441e9bcb63ed4631f985af8f4a9c26ce5aef5",
+        "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
         "flags": {
           "profile": "release"
         },
@@ -203,7 +203,7 @@
       "description": "pair features matched to a target coordinate from an independent four-sum sample",
       "instrument": {
         "repo": "crypto",
-        "commit": "b65ba79ac7ac201139f98127868ea962ba644fac",
+        "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
         "build": [
           [
             "cargo",
@@ -213,7 +213,7 @@
             "eccp131_representation_filter"
           ]
         ],
-        "binary_sha256": "2dc0b27dfb0a91ba93ff0ccf3d4441e9bcb63ed4631f985af8f4a9c26ce5aef5",
+        "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
         "flags": {
           "profile": "release"
         },
@@ -565,7 +565,7 @@
   "analysis_plan": {
     "script": {
       "path": "examples/eccp131_representation_filter.rs",
-      "sha256": "2423b0059d4ddc72bc7fca30d89581cd71267a61f02d37ac2dfcf8b226e3c072"
+      "sha256": "b5a49207cb475a69923f1b32595ef3c20128f88d1d84d6b7623493c0f4dcd867"
     },
     "inputs": [
       "protocol.json",
@@ -650,13 +650,29 @@
         "execution.queue",
         "execution.placement"
       ]
+    },
+    {
+      "id": "A3-PROTOCOL-DIGEST-CUSTODY",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "A pre-run source audit found that the reporter labelled the whole-file digest as protocol_sha256 instead of the canonical freeze hash. Correct the custody fields before generating any cohort.",
+      "changes": [
+        "Result protocol_sha256 now comes from freeze.protocol_sha256.",
+        "The exact protocol file bytes are separately retained as protocol_file_sha256.",
+        "All arm source, binary and analysis-script hashes advance to the corrected pre-data build."
+      ],
+      "supersedes_fields": [
+        "arms[].instrument.commit",
+        "arms[].instrument.binary_sha256",
+        "analysis_plan.script.sha256"
+      ]
     }
   ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "5825ab201478807992fd2d118bc07c84e5d55397e21e03d9ca269fe592a2aa99",
-    "commit": "9e54b690e1b371c8e92bb9303919b725aa1d38ea",
-    "frozen_at": "2026-11-02T17:55:18Z",
+    "protocol_sha256": "20949a2eac68e6c8cc5e49cbe3926d370baac2814f7666e9d9343fd443b24dca",
+    "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
+    "frozen_at": "2026-11-02T17:58:44Z",
     "filed_before_affected_data": true
   }
 }
