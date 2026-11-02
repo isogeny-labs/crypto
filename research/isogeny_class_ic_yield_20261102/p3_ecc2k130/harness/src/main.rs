@@ -980,17 +980,17 @@ fn cmd_isocheck(_a: &Args) {
         }
     }
     {
-        let n = 19u32;
+        let n = 13u32;
         let m0 = binary::find_irreducible(n);
         let mut rng = derive(0x150D, &[1]);
-        for _ in 0..4 {
+        for _ in 0..12 {
             let b = rand_elem(n, &mut rng);
             let gp = GPres::new(&b, &m0).unwrap();
             let xr = rand_elem(n, &mut rng);
-            let (c0, c1, _) = iso_counts(2, &b, 6, &xr, &b, &m0, &gp, None);
+            let (c0, c1, _) = iso_counts(2, &b, 7, &xr, &b, &m0, &gp, None);
             let good = c0 == c1;
             ok &= good;
-            println!("isocheck m=2 n={n} k=6 g=b count base={c0} gpres={c1} -> {}", if good { "ok" } else { "FAIL" });
+            println!("isocheck m=2 n={n} k=7 g=b count base={c0} gpres={c1} -> {}", if good { "ok" } else { "FAIL" });
         }
     }
     println!("isocheck {}", if ok { "ALL OK" } else { "FAILED" });
