@@ -183,8 +183,20 @@ fn main() {
                     no_hit += 1;
                     continue;
                 };
+                // Neither may equal the clean entry (a no-op corruption).
+                let clean_row = clean.choice[col].0;
                 let used = bl.choice[first_piv.unwrap()].0;
-                let later = bl.choice.iter().rev().find(|c| c.0 != u32::MAX).unwrap().0;
+                let later = bl
+                    .choice
+                    .iter()
+                    .rev()
+                    .find(|c| c.0 != u32::MAX && c.0 != clean_row)
+                    .unwrap()
+                    .0;
+                if used == clean_row {
+                    no_hit += 1;
+                    continue;
+                }
                 for (k, ctrl) in ctl.iter_mut().enumerate() {
                     let mut t = clean.clone();
                     match k {
