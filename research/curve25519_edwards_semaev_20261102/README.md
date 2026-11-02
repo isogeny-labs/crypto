@@ -144,3 +144,23 @@ What the measurements show, within the scope above:
 
 Offsets or other windows, sets structured in y, m = 3 cost, other k, other curves,
 repeat seeds, spread between runs, the cost of grid recovery or lifting.
+
+## Coordinator review (main session, 2026-11-02)
+
+- **The arms are paired at equal t, not at equal base size.** The Edwards-y
+  interval [0, 2^t) holds a different number of base points from the
+  Weierstrass interval: 7/7, 14/11, 29/25 and 63/58 columns at t = 4, 5, 6, 7.
+  The per-relation ratios mostly follow `coverage_exact`, which follows the
+  base size. A ratio below 1 here is therefore not evidence that the Edwards
+  algebra is cheaper. An equal-columns comparison (choose the Edwards window or
+  offset so the columns match) was not run.
+- **The one per-target difference is unexplained.** At t = 5, G = 0 Edwards
+  costs 0.646x as much per target, with more columns (14 vs 11), the same
+  solving degree and the same polynomial size. Without a mechanism it is a
+  single-seed observation, and it needs a repeat over seeds before it is read
+  as an effect.
+- **Scope of the conclusions.** At k = 20, m = 2, one curve, one seed per t:
+  the solving degree is the same in every pair; F4 cost per target is the same
+  to within about 1% in 7 of 8 pairs; and per-relation differences come from
+  base composition. Nothing here says Edwards coordinates give or do not give
+  an advantage beyond these cells.
