@@ -5258,3 +5258,95 @@ dependency closure (a trace-shaped lever) and the rest is the matrix itself.  Py
 every number comes from the Rust examples.  Host: the 4-vCPU container, local runs (isolab-eks unreachable),
 operation counts only, no wall-time claim.  Leaderboard, `benchmarks/` and the validation gate are not touched
 here; if V is ranked the main session arranges independent validation.
+
+### 9.52 E41 pre-registration: the order-24 walk's step shortfall — where it comes from, and whether a fix makes the matched reference cheaper across the band
+
+*Registered 2026-11-02, after Stage 0 (counts only) and before any fix code or registered run.*  E39 owns
+§9.48–§9.49 and G2.190–G2.203, E40 §9.50–§9.51 and G2.204–G2.215; E41 takes §9.52 (this registration),
+§9.53 (results) and G2.216–G2.229; records `experiments/48_twist24_shortfall/`, report
+`research/e41_twist24_shortfall_20261102/`.
+
+**Question.**  E34 (§9.39) measured the cheap order-24 `⟨±ψ⟩` walk on E18's eight `j = 0` curves at `1.701 ±
+0.111` times fewer steps than the order-6 walk (pooled per `√n`, `16` walks per curve and order), against the
+`√(24/6) = 2` of ideal walks on `(n − 1)/m` classes; its `1` GAE lead over the cheap order-6 walk (`1.026`) was
+within noise.  Where does the shortfall come from, and does a fix make the order-24 walk measurably cheaper?
+This walk is the matched rho reference: a cheaper walk moves the reference, never an index-calculus cost.
+
+**Stage 0 (counts only; done before this registration).**  Instrument `src/cryptanalysis/twist24_shortfall.rs`
+(`089f7f7823`): a copy of E34's loop with counters outside the walk's cost (look-ahead redirects, fruitless
+revisits by cycle length, escape re-hits, `x₀ = 0` representative inputs, the useful collision's tail and cycle,
+partition occupancy); unit test: equal to E34's `CountedWalk` field for field.  Binary from a clean export of
+`6115e0ea0a` (sha256 `49eeef9f…5f9f`).  Records `experiments/48_twist24_shortfall/stage0_{records,run}.{json,log}`.
+
+| source | arm | walks | steps / ideal `√(π(n−1)/2m)` | fruitless revisits / step (2-cycles, 4-cycles, other) | redirects / step | steps lost to fruitless cycles |
+|:--|:--|--:|:--|:--|--:|--:|
+| E34 records (seeds `1000`–`1015`) | order 6 | `128` | **`0.924 ± 0.046`** | (`9.5`–`190` escapes a walk) | — | — |
+| E34 records | order 24 | `128` | **`1.086 ± 0.045`** | (`2.2`–`23.6` a walk) | — | — |
+| instrument, seeds `41000`–`41063` | order 6 cheap | `512` | `1.027 ± 0.023` | `3.57·10⁻⁴` (`44,784`, `3,993`, `109`) | `0.03124` | `3.7·10⁻⁴` of ideal |
+| instrument | order 24 cheap | `512` | `1.038 ± 0.023` | `0.84·10⁻⁴` (`5,733`, `116`, `3`) | `0.03123` | `0.95·10⁻⁴` of ideal |
+
+Breakdown of the shortfall: **distinguished-point losses `0`** (exhaustive storage, no distinguished points);
+**fruitless cycles `< 10⁻⁴`** of the ideal (each costs one revisit step and one doubling; the cycle's classes stay
+stored and count for the birthday bound); **look-ahead redirects** at `1/r = 0.03125` in both orders (no order-24
+excess); **representative ties** (`x₀ = 0` inputs, `≈ 1/p` of calls) cost no step (ties are resolved exactly,
+§9.39 identity); **escape re-hits** `1` in `512` walks per order.  What remains is a `+2.7 ± 2.3 %` (order 6) and
+`+3.8 ± 2.3 %` (order 24) step excess **common to both orders** (consistent with the r-adding factor
+`1/√(1 − 1/r) = 1.016` at `r = 32` plus noise), and the difference between E34's two arms, which is **sampling
+noise**: E34's order-6 seeds ran `7.6 %` under their ideal and its order-24 seeds `8.6 %` over (each `≈ 1.7`
+standard errors), while on fresh seeds the implied steps ratio is `2 × 1.027/1.038 ≈ 1.98` (derived, not a
+registered measurement).  No order-24-specific cause is visible above `0.1 %`.
+
+**The fix, chosen from Stage 0.**  The only non-noise component is the common r-adding excess.  Its cheapest
+lever is a larger jump table whose new jumps cost one group addition each: **F (pair-sum jumps)**: E34's `32`
+jumps and start (same draws, same order), plus `R_{32+j} = R_j + R_{(j+1) mod 32}` with `(a, b)` the sums,
+`r = 64` partitions (E34's partition hash mod `64`, the look-ahead to `(j + 1) mod 64`).  Added work, all priced:
+`32` group additions (their `F_p` multiplications counted by the curve) and `64` mod-`n` additions per walk;
+per step nothing.  Theory predicts the excess falls from `1.6 %` to `0.8 %` of steps, i.e. **below what this
+design can resolve**; F is registered as the test the task asks for, with a null prediction.  The main
+consequence registered here is the **re-measured reference**: E34's ranking on `16` seeds understated the
+order-24 walk's lead; `128` fresh seeds per curve resolve it.  Behind an option (`Jumps::E34` default), E34's
+and E27's walks stay byte-identical.
+
+**Arms** (E18's eight curves, canonical models `b₀ = 3, 3, 3, 9, 9, 2, 17, 3`, E34's code otherwise):
+O6B (E29's order-6 walk as built), O6C (cheap order 6), O24 (E34's cheap order-24 walk), O24L (E34's mul-lean
+twin; same walk), O24F (O24 with F), and the A/A arm O24′ (O24 on a second, disjoint seed stream).
+**GLS curves:** order 24 does not apply on E25/E27's GLS curves (`Aut = {±1}`, `⟨±ψ⟩` of order 4 the largest
+fold on all 40, validator §9.33), so no arm runs there; the IC rows' reference, walk (iii), is not changed by
+E41 (F is not applied to it).  **Seeds:** main stream `48000 + k`, A/A stream `49000 + k`, `k < 128`, schoolbook;
+Karatsuba sensitivity on `k < 32` of the main stream (steps and digests equal across arithmetics, as E34).
+**Counted unit and band:** as §9.38: `F_p` multiplications (set-up included, the `[d]G` check excluded)
+`+ w·97·(cmp + neg + modn + hash + table)`, `w ∈ {0, 0.1, 1}`; pooled = Σ over curves of mean cost `/√n`; ratios
+"other arm / O24-family arm" (`> 1`: the order-24 arm cheaper).  **Noise rule (registered):** a pooled ratio is
+*resolved* only if its 95 % interval (`± 1.96` SE, delta method over the per-curve means' standard errors)
+excludes `1` at all three weights **and** `|ratio − 1|` exceeds the A/A arm's `|O24/O24′ − 1|` at that weight.
+**Identity:** (a) with F off, the E41 walk reproduces all `1,280` E34 Stage R records (8 curves × 5 arms × 16
+seeds × 2 arithmetics) as serialized records, byte for byte; E27's walk code (`quartic_folds.rs`) is not touched
+by any E41 commit and E34's unit test against `rho4_folded_with` / `rho_twist24_with` still passes;
+(b) every walk of every non-control arm recovers the planted log, verified by `[d]G = Q`.
+**Positive control:** F̸ (F with `b` of each pair jump taken as `b_j`, dropping `b_{j+1}`): a broken fix that
+keeps the walk's points and corrupts its logarithm bookkeeping; `16` seeds each at `p = 241` and `541`.
+Python only plots; tables in Rust (`examples/e41_tables.rs`).  Route: isolab-eks unreachable; local, one core,
+operation counts only.  Binaries from a clean export of a committed SHA, hashes recorded.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.216 | identity (a), F off | `1,280/1,280` E34 records byte-identical; no E41 commit touches `quartic_folds.rs` | any difference (**kill**) |
+| G2.217 | correctness (b) | every walk of O6B, O6C, O24, O24L, O24F, O24′ recovers the log (`6,144` schoolbook walks and `1,280` Karatsuba) | any wrong log (**kill**) |
+| G2.218 | positive control F̸ | wrong log on `≥ 31/32` walks, each flagged by (b) | fewer (**kill**: the check cannot see a broken fix) |
+| G2.219 | steps / ideal, main stream | O6 and O24 each in `[0.98, 1.08]`; steps ratio O6/O24 pooled per `√n` in `[1.85, 2.10]` | outside |
+| G2.220 | A/A floor | O24 / O24′ pooled cost in `[0.94, 1.06]` at every weight | outside |
+| G2.221 | F's steps | O24F steps / ideal below O24's by `[−2, +3] %` (theory `+0.8 %`); added cost `32` additions + `64` mod-`n` operations a walk, exactly | outside, or a different added count |
+| G2.222 | F ranked (O24 / O24F) | **not resolved** at any weight (null prediction): F is not measurably cheaper | resolved either way |
+| G2.223 | corrected reference, O6B / O24 | pooled `[1.65, 1.95]` (0 GAE), `[1.32, 1.56]` (0.1), `[1.18, 1.40]` (1), resolved | outside, or unresolved |
+| G2.224 | corrected reference, O6C / O24 | pooled `[1.58, 1.88]`, `[1.23, 1.45]`, `[1.08, 1.28]`, **resolved at `1` GAE** (E34: `1.026`, within noise) | outside, or unresolved at any weight |
+| G2.225 | per curve, O6C / O24 | order 24 cheaper at every weight on `≥ 7` of `8` curves | fewer |
+| G2.226 | Karatsuba sensitivity (`32` seeds) | the same orders as G2.223–G2.224 | an order changes |
+| G2.227 | E18's `ψ` rows | distances lengthen by O6B / strongest order-24 arm at each weight (G2.223's band; E34: `1.563 / 1.254 / 1.126` against the band-ranked cheap walk), handover later by `4·log₂` of it | — (derived) |
+| G2.228 | IC rows (solver A, E27; E31/E27 records, 20 rows) | reference walk (iii) unchanged, every distance unchanged (factor `1` exactly), old and new columns kept side by side | — (derived) |
+| G2.229 | class | a **reference correction** (and a measurement of E34's sampling error), not an index-calculus improvement | — |
+
+**Kill criteria:** G2.216, G2.217, G2.218.  **What it would say.**  If G2.219–G2.224 hold, E34's shortfall was
+sampling noise in a 16-seed design, the order-24 walk sits on its `√24` ceiling as well as the order-6 walk sits on
+`√6`, no walk-level fix of the shortfall exists to make (F is not measurably cheaper), and the matched reference on
+E18's `j = 0` curves is stronger than E34 reported: E18's `ψ`-arm rows move further from rho; the GLS IC rows do
+not move.
