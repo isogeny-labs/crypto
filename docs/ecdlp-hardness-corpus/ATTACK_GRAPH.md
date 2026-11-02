@@ -5,7 +5,7 @@ Support edges are `conditions`, `enables` and `model_bridge` (B rests on A).
 Impact counts the claims that rest on a node
 transitively plus the repository files whose estimates cite it as `depends`.
 
-Corpus 2026-11-01: 421 claims, 257 on the frontier, 3 resting on a refuted claim, 0 unlinked citations.
+Corpus 2026-11-01: 478 claims, 290 on the frontier, 3 resting on a refuted claim, 0 unlinked citations.
 
 ## Resting on a refuted claim
 
@@ -19,263 +19,296 @@ Corpus 2026-11-01: 421 claims, 257 on the frontier, 3 resting on a refuted claim
 
 | # | claim | status | formal | impact | action | targets |
 |---|---|---|---|---|---|---|
-| 1 | `COND-ECC2K130-FFDA-PROJECTION` ECC2K-130 IC projection 2^86 (FFDA) | conditional | none | 8 | discharge each condition, or keep the row labelled conditional | RT-FALL-DEGREE-BRIDGE |
-| 2 | `HEUR-DECOMPOSITION-PROBABILITY` Random decomposition-yield heuristic | heuristic | none | 7 | prove, or measure on a scaling family without censoring | RT-END-TO-END-IC, RT-BK-DECOMP-MEASURE |
-| 3 | `HEUR-RHO-RANDOM-MAPPING` Rho random-mapping heuristic | heuristic | none | 7 | prove, or measure on a scaling family without censoring | - |
-| 4 | `HEUR-XT-NFS-SMOOTHNESS` Classical NFS smoothness heuristic | heuristic | none | 6 | prove, or measure on a scaling family without censoring | RT-XT-BN-NORM-REPLAY |
-| 5 | `THM-XT-BK-WEIL-SUFFICES` Balasubramanian-Koblitz: E[r] lies in E(F_{q^k}) iff r \| q^k - 1 | proved_external_unread | none | 6 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-XT-MOV-KW-COMPOSITION |
-| 6 | `HEUR-FIRST-FALL-DEGREE` First-fall/regularity degree heuristic | heuristic | none | 5 | prove, or measure on a scaling family without censoring | - |
-| 7 | `ASM-GG-RANDOM-PARTITION` Rigorous rho analyses assume a uniformly random partition | assumed | none | 5 | assumption: narrow its scope or reduce it to a weaker one | RT-GG-ADDING-WALK-PROOF |
-| 8 | `ATTACK-MOV-PAIRING` MOV pairing transfer | conditional | none | 5 | discharge each condition, or keep the row labelled conditional | RT-PAIRING-TARGET-COST, RT-XT-MOV-KW-COMPOSITION |
-| 9 | `THM-RP-S3-ROOTS-FACTOR` S3(xR,xF,X) = (xR-xF)^2 (X-x(R+F)) (X-x(R-F)) (Lean) | proved_internal_unreviewed | kernel_checked | 5 | independent review, then kernel-check | - |
-| 10 | `HEUR-BK-GG-FACTOR-BASE-SIZE` Heuristic #F ~ #V for subspace factor bases | heuristic | none | 4 | prove, or measure on a scaling family without censoring | RT-BK-DECOMP-MEASURE |
-| 11 | `HEUR-PF-PKM-AUX-CURVE-SEARCH` Cost of finding PKM's auxiliary curve | heuristic | none | 4 | prove, or measure on a scaling family without censoring | - |
-| 12 | `FACT-S3-ROOTS-ARE-GROUP-LAW` S3 rootfinding collapses to group subtraction | proved_internal_unreviewed | none | 4 | independent review, then kernel-check | - |
-| 13 | `HEUR-BK-GG-DECOMP-PROPORTION` Decomposable proportion ~1/n! (l=1) or q^(lk-n)/k! | heuristic | none | 3 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY, RT-BK-DECOMP-MEASURE |
-| 14 | `HEUR-GG-KANGAROO-FOOTPRINTS` Kangaroo heuristic (Galbraith Heur. 14.5.4) | heuristic | none | 3 | prove, or measure on a scaling family without censoring | - |
-| 15 | `HEUR-PF-PKM-RANK-DELTA` PKM: Delta = 10 surplus relations suffice | heuristic | none | 3 | prove, or measure on a scaling family without censoring | - |
-| 16 | `HEUR-PF-PKM-SOLUTION-COUNT` PKM expected solutions per target | heuristic | none | 3 | prove, or measure on a scaling family without censoring | - |
-| 17 | `ASM-PF-PKM-UNIT-COST` PKM unit-cost accounting model | assumed | none | 3 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 18 | `COND-PF-HKPYY-COMPLEXITY` HKPYY Theorem 3.2: QSP index-calculus complexity | conditional | none | 3 | discharge each condition, or keep the row labelled conditional | - |
-| 19 | `COND-PF-PKM-COST-THRESHOLD` PKM cost decomposition and the p^(1/2-1/m) bar | conditional | none | 3 | discharge each condition, or keep the row labelled conditional | - |
-| 20 | `BRIDGE-GENERIC-TABLE` Conditional generic simulation of table decomposition | proved_internal_unreviewed | none | 3 | independent review, then kernel-check | RT-GENERIC-BRIDGE, RT-REPRESENTATION-FILTER |
-| 21 | `THM-GB-HPS-FIRST-FALL-WEIL` Hodges-Petit-Schlather: first fall degree bounds for Weil descent | proved_external_unread | none | 3 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 22 | `CLAIM-NAGAO-LEMMA4` Nagao 2015/984 Lemma 4: d_F <= d'_F | refuted | none | 2 | audit every dependent; repair or retract the estimates that use it | RT-LEMMA4-FORMAL |
-| 23 | `CONJ-GB-BFS-SEMIREG-PROPORTION-F2` BFS Conjecture 2: almost all F_2 sequences are semi-regular | refuted | none | 2 | audit every dependent; repair or retract the estimates that use it | - |
-| 24 | `CONJ-GB-FROBERG` Froberg's conjecture (generic Hilbert series) | open | none | 2 | prove or refute | - |
-| 25 | `HEUR-BK-GG-RHO-HEURISTIC` Rho/kangaroo analyses are heuristic; worst case unbounded | heuristic | none | 2 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY |
-| 26 | `HEUR-GB-PQ-ASSUMPTION-2` Petit-Quisquater Assumption 2: D_reg = D_ff + o(1) for binary summation descents | heuristic | none | 2 | prove, or measure on a scaling family without censoring | RT-GB-SUMMATION-INVARIANTS |
-| 27 | `HEUR-GG-DGM-CYCLE-RATES` Fruitless-cycle rates: 2-cycles Theta(1/r), 2c-cycles Theta(1/r^c) | heuristic | none | 2 | prove, or measure on a scaling family without censoring | RT-GG-NEGATION-OVERHEAD |
-| 28 | `HEUR-RELATION-RANK` Relation independence/rank heuristic | heuristic | none | 2 | prove, or measure on a scaling family without censoring | - |
-| 29 | `HEUR-XT-BGJT-DESCENT` BGJT descent heuristics (smoothness and PGL2 full rank) | heuristic | none | 2 | prove, or measure on a scaling family without censoring | - |
-| 30 | `HEUR-ZERO-DIMENSIONAL-PDP` Zero-dimensional PDP hypothesis | heuristic | none | 2 | prove, or measure on a scaling family without censoring | - |
-| 31 | `ASM-PF-KY-CURVE-CONSTRUCTION` Kosters-Yeo Assumption 3.3 (curves with a large-order point) | assumed | none | 2 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 32 | `ALG-XT-EXTNFS` Kim-Barbulescu exTNFS: medium-prime L(1/3, (48/9)^(1/3)) | conditional | none | 2 | discharge each condition, or keep the row labelled conditional | RT-XT-BN-NORM-REPLAY |
-| 33 | `THM-GG-EQUIV-CLASS-RHO` Rho on equivalence classes: sqrt(pi r/(2 N_C)) (C1 + C2) | conditional | none | 2 | discharge each condition, or keep the row labelled conditional | - |
-| 34 | `ALG-RP-VELU-COST` Velu O(l) and sqrt-Velu O~(sqrt l) isogeny evaluation (A-ISO5) | proved_external_unread | none | 2 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 35 | `THM-GG-HILDEBRAND-RADDING` Hildebrand: random r-step walks on Z/n mix in O(n^(2/(r-1))) | proved_external_unread | none | 2 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-GG-ADDING-WALK-PROOF |
-| 36 | `THM-PF-REPO-KUMMER-FFD-FOUR` Kummer m = 2 PKM systems have first fall degree 4 for every t | proved_internal_unreviewed | none | 2 | independent review, then kernel-check | RT-PF-PROVE-HT-OR-BOUNDED |
-| 37 | `THM-XT-VERHEUL-DISTORTION-EXISTS` Verheul: distortion maps exist on supersingular curves | proved_external_unread | none | 2 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 38 | `CONJ-XT-GKZ-REPRESENTATION` GKZ representation conjecture (all extensions) | open | none | 1 | prove or refute | - |
-| 39 | `CONJ-XT-LANG-HEIGHT` Lang's canonical-height conjecture | open | none | 1 | prove or refute | RT-XT-SZPIRO-XEDNI-LIFTS |
-| 40 | `GAP-PF-PKM-ASYMPTOTIC-OPEN` PKM asymptotic complexity is open by the authors' statement | open | none | 1 | prove or refute | RT-PF-PROVE-HT-OR-BOUNDED |
-| 41 | `GAP-RP-COMMON-KERNEL` Common-kernel construction for a prime-field correlated-packet route | open | none | 1 | prove or refute | - |
-| 42 | `OPEN-BK-EMBEDDING-THRESHOLD-DISAGREEMENT` Standards disagree on the MOV/embedding-degree threshold | open | none | 1 | prove or refute | RT-BK-THRESHOLDS |
-| 43 | `OPEN-BK-GG-ONE-OUT-OF-L` One-out-of-L ECDLP: no speedup known | open | none | 1 | prove or refute | RT-BK-ONE-OUT-OF-L |
-| 44 | `HEUR-AUTOMORPHISM-SPEEDUP` Automorphism quotient speedup | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 45 | `HEUR-BK-BRAINPOOL-CLASS-NUMBER-LIFT` Large class number as a guard against lifting | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 46 | `HEUR-BK-GG-FFDA-DESCRIPTION` Survey definition of the First Fall Degree Assumption | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY |
-| 47 | `HEUR-BK-GG-ISOGENY-WALK` Mapping ECDLP to an isogenous curve is generally efficient | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 48 | `HEUR-BK-GG-RIGHT-KERNEL-RANK` Right-kernel IC needs full rank, rarely met at #relations = #F | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY |
-| 49 | `HEUR-GB-SEMIREG-ASSUMPTION` Semi-regularity assumption: cryptographic systems behave like semi-regular ones and d_reg sets the cost | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 50 | `HEUR-GG-BRENT-POLLARD-ADDING` Brent-Pollard nonrandomness: factor 1/sqrt(1 - sum p_i^2) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
-| 51 | `HEUR-GG-DP-RHO` DP rho heuristic (Galbraith Heur. 14.2.15 / Thm 14.2.16) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
-| 52 | `HEUR-GG-TESKE-ADDING-WALK` Teske: r-adding walks with r >= 20 behave like random walks | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
-| 53 | `HEUR-PF-APS-T-EQUALS-TPRIME` APS assumption (13): T(E,m,V) ~ T'(E,m,V) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-PF-APS-VS-PKM-REMEASURE |
-| 54 | `HEUR-PF-YYTK-STATISTICAL` YYTK statistical assumptions on summation polynomials | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-PF-YYTK-READ |
-| 55 | `HEUR-RP-DESCENT-TERMINATION` Recursive target descent terminates (A-TD1) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 56 | `HEUR-RP-LARGE-PRIME-GRAPH` Large-prime leftovers meet with birthday probability and the graph connects (A-RC2) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 57 | `HEUR-SYMMETRY-PDP-SPEEDUP` Invariant-coordinate PDP speedup | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 58 | `HEUR-XT-BGJT-REPRESENTATION` BGJT heuristic: a sparse medium subfield representation exists | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 59 | `HEUR-XT-MILLER-HEIGHT` Miller's height argument against lifted index calculus | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
-| 60 | `HEUR-XT-PPVW-BOUNDED-RANK` PPVW heuristic: ranks of E/Q are bounded (finitely many > 21) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-XT-HKT-SCOPE |
-| 61 | `MEAS-PF-PKM-DEGREE-TABLES` PKM Tables 4-5 (published measurement): corrected degree 4 -> 5 -> 6 at m = 2 | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-PF-PROVE-HT-OR-BOUNDED |
-| 62 | `STD-BK-SAFECURVES-RHO` SafeCurves rho rule: l >= 2^200 (0.886 sqrt l > 2^100) | assumed | none | 1 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 63 | `ALG-GG-BL-PRECOMP-RHO` Bernstein-Lange precomputed-DP rho: ~ell^(1/3) online | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 64 | `ALG-GG-BLS-BRANCHLESS-NEGATION` BLS branchless negating rho: (1+o(1)) sqrt(pi ell/4) | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-GG-NEGATION-OVERHEAD |
-| 65 | `ALG-GG-KUHN-STRUIK` Kuhn-Struik: L targets with one DP table in about sqrt(2 r L) | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 66 | `ALG-STATIC-DH-AUXILIARY-POWERS` Static-DH auxiliary-power attack | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 67 | `ALG-XT-NFS-L13` NFS/SNFS/FFS L(1/3) discrete logarithms | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-XT-TRANSFER-PRICE-MODEL |
-| 68 | `ATTACK-CHEON-AUXILIARY` Cheon auxiliary-input attack | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 69 | `ATTACK-FREY-RUECK` Frey-Rueck Tate-pairing transfer | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-PAIRING-TARGET-COST |
-| 70 | `COND-NAGAO-2015-COMPLEXITY` Nagao 2015/984: polynomial-time binary ECDLP under FFDA | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 71 | `COND-PF-EP-BETA-THRESHOLD` Euler-Petit Prop. 8: beating generic needs beta < 0.103 | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 72 | `COND-XT-BGJT-QUASIPOLY` BGJT heuristic quasi-polynomial DLP in small characteristic | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 73 | `FACT-FIELD-DLP-AFTER-PAIRING` Target finite-field DLP governs pairing attack | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-PAIRING-TARGET-COST, RT-BK-THRESHOLDS, RT-XT-TRANSFER-PRICE-MODEL |
-| 74 | `RED-DEN-BOER-FIXED-CDH` den Boer DLP-to-Fixed-CDH reduction | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 75 | `RED-MAURER-AUXILIARY-CURVE` Maurer auxiliary-curve reduction | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 76 | `RED-PAIRING-CO-DDH` Pairing decision reduction | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 77 | `STANDARD-CURVE-EXCLUSIONS` Standard curve exclusion checklist | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
-| 78 | `RED-GG-FKL-AGM-CDH-DL` FKL: CDH, SDH, LRSW equivalent to DL in the AGM | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 79 | `THM-BK-GG-SEMAEV-LEMMA2` Survey statement of Semaev polynomials: irreducible, degree 2^(m-2) (GG Lemma 2) | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 80 | `THM-GB-PQ-FIRST-FALL-BOUND` Petit-Quisquater: first fall degree of descended S_{m+1} <= m^2 + 1 | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 81 | `THM-GG-JM-AGM-TRANSFER` Jaeger-Mohan: AGM proofs transfer to the GGM under general frameworks | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 82 | `THM-RP-AFFINE-CORE` Counting core of the isogeny-augmented generic group bound (IcNegative, unchecked) | proved_internal_unreviewed | lean_written_unchecked | 1 | independent review, then kernel-check | RT-RP-PROOF-GATE-IC-NEGATIVE |
-| 83 | `THM-RP-FF-HANDBOOK` Finite-field handbook facts (cyclic multiplicative group, Frobenius, trace/norm surjectivity) in Lean | proved_internal_unreviewed | kernel_checked | 1 | independent review, then kernel-check | - |
-| 84 | `THM-RP-S3-LINEAR-HALF-TRACE` S3 is F_2-linear in (e1,e2): linearized half-trace two-point PDP (A-PDP8) | proved_internal_unreviewed | none | 1 | independent review, then kernel-check | - |
-| 85 | `THM-RP-SUBSPACE-PRODUCT-BOUND` Field Kneser/Vosper product bound: dim V^(2) >= 2l-1, equality only for progressions (A-FB1) | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 86 | `THM-RP-VOLCANO-STRUCTURE` Ordinary l-isogeny components are volcanoes (A-ISO1) | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 87 | `THM-RP-WEIL-LIFT-SOUNDNESS` Weil descent is sound but solutions need lift checks (A-PDP2) | proved_internal_unreviewed | none | 1 | independent review, then kernel-check | - |
-| 88 | `THM-XT-HKT-LIFT-RANK` Huang-Kueh-Tan: bounded-height lifting implies arbitrarily large rank | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-XT-HKT-SCOPE |
-| 89 | `THM-XT-MASSER-DEPENDENCE` Masser: dependent specializations have density zero | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 90 | `CLAIM-BK-SAFECURVES-BRAINPOOL-1E6` SafeCurves: Brainpool class number must exceed 1000000 | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 91 | `CLAIM-BK-SAFECURVES-SEC1-20` SafeCurves: 'SEC1 requires the embedding degree to be at least 20' | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 92 | `CLAIM-BK-X962-NO-AMORTIZATION` ANSI X9.62 (1997): effort must be repeated per key | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 93 | `CLAIM-GG-BKL-SIMD-NEGATION` BKL 2010: negation gives little or no speedup on SIMD | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 94 | `CLAIM-GG-CERTICOM-DP-NORMALIZATION` Certicom 1998: normalizing distinguished points alone gives sqrt 2 / sqrt(2d) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 95 | `CLAIM-XT-AMOR-F2-1223-128BIT` Claim: new small-characteristic algorithms leave the F_{2^1223} genus-1 curve at ~128 bits | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 96 | `CLAIM-XT-BGJT-PROP2-ALL-P` Claim: BGJT descent step applies to every polynomial P | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 97 | `CLAIM-XT-BN3072-128BIT` Claim: BN curves with a 3072-bit F_{p^12} reach 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 98 | `CLAIM-XT-JOUX-PINPOINT-ORIGINAL` Claim: Joux pinpointing reaches L(1/3, (8/9)^(1/3)) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 99 | `CLAIM-XT-SS-GENUS2-F2-367-128BIT` Claim: the genus-2 supersingular curve over F_{2^367} gives 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 100 | `HEUR-PF-HKPYY-SPARSE-DENSITY` HKPYY density heuristic: sparse factors of X^n - 1 are as rare as random | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 101 | `HEUR-RP-SEMIREGULAR-DREG-PROXY` Semi-regular D_reg predicts Groebner cost of descended Semaev systems (A-PDP5) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 102 | `CONJ-XT-SZPIRO` Szpiro's conjecture (Szpiro ratio bounded, 6 the largest limit point) | open | none | 0 | prove or refute | RT-XT-SZPIRO-XEDNI-LIFTS |
-| 103 | `GAP-AUTOMORPHISM-PREPROCESS` Preprocessing bounds with automorphism quotients | open | none | 0 | prove or refute | RT-AUTOMORPHISM-PREPROCESS, RT-RP-ONLINE-VS-PREPROCESSING |
-| 104 | `GAP-BINARY-M4-DEGREE` Binary m=4 Weil-descent degree growth | open | none | 0 | prove or refute | RT-BINARY-M4-DEGREE, RT-RP-M3-DIAGONAL-UNCENSOR |
-| 105 | `GAP-COORDINATE-ALGEBRAIC` Coordinate-algebraic escape from generic bounds | open | none | 0 | prove or refute | RT-GENERIC-BRIDGE, RT-ALGEBRAIC-SOLUTION-COUNT, RT-REPRESENTATION-FILTER |
-| 106 | `GAP-END-TO-END-IC-EXPONENT` End-to-end index-calculus exponent obligation | open | none | 0 | prove or refute | RT-END-TO-END-IC, RT-REPRESENTATION-FILTER |
-| 107 | `GAP-FALL-DEGREE-COST-BRIDGE` Every degree-based cost must pass through sd or last fall | open | none | 0 | prove or refute | RT-FALL-DEGREE-BRIDGE, RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
-| 108 | `GAP-GB-SUMMATION-DREG-GROWTH` Does the solving degree of binary summation descents grow with n? | open | none | 0 | prove or refute | RT-GB-SUMMATION-INVARIANTS, RT-GB-FACTOR-BASE-WEIL-BOUND |
-| 109 | `GAP-GG-ADDING-WALK-RIGOROUS` No rigorous sqrt bound for r-adding (doubling-free) rho walks | open | none | 0 | prove or refute | RT-GG-ADDING-WALK-PROOF |
-| 110 | `GAP-GG-RHO-CONSTANT` Rigorous constant for implemented rho is open | open | none | 0 | prove or refute | RT-GG-RHO-CONSTANT-GAP |
-| 111 | `GAP-LEMMA4-REVERSE` Reverse inequality d'_F <= d_F (outside placement)? | open | none | 0 | prove or refute | RT-LEMMA4-REVERSE |
-| 112 | `GAP-MULTITARGET-NONUNIFORM` Multi-target/nonuniform security conversion | open | none | 0 | prove or refute | RT-MULTITARGET-MODEL, RT-BK-ONE-OUT-OF-L |
-| 113 | `GAP-NAGAO-PROP5-ROUTE` Does Nagao Prop. 5 survive without Lemma 4? | open | none | 0 | prove or refute | - |
-| 114 | `GAP-PF-DEDICATED-ROOT-FINDER` Dedicated algorithm for the generalized root-finding problem | open | none | 0 | prove or refute | - |
-| 115 | `GAP-PF-PRIME-RELATION-SEARCH` No known sub-rho relation search over prime fields | open | none | 0 | prove or refute | - |
-| 116 | `GAP-PF-QSP-EXISTENCE` Do quasi-subfield polynomials with beta < 0.103 exist? | open | none | 0 | prove or refute | - |
-| 117 | `GAP-PF-SPECIAL-PRIME-EXPOSURE` Do special primes (smooth p-1, P-224) weaken curves against PKM? | open | none | 0 | prove or refute | - |
-| 118 | `GAP-PF-TOWER-SOLVING-DEGREE-HT` H_T: tower solving degree grows linearly in the height | open | none | 0 | prove or refute | RT-PF-CSTEP-T14, RT-PF-PROVE-HT-OR-BOUNDED |
-| 119 | `GAP-PKM-SOLVING-DEGREE` Prime-field PKM solving-degree growth | open | none | 0 | prove or refute | RT-PKM-DEGREE, RT-PF-CSTEP-T14 |
-| 120 | `GAP-PROTOCOL-ASSUMPTION-MAPPING` Protocol-to-problem assumption mapping | open | none | 0 | prove or refute | RT-PROTOCOL-MAP |
-| 121 | `GAP-QUANTUM-RESOURCES` Concrete fault-tolerant quantum resources | open | none | 0 | prove or refute | RT-QUANTUM-RESOURCES |
-| 122 | `GAP-RP-O1-ISOGENY-GGM` O1: Theorem 15.1 in full (isogeny-augmented GGM success bound) | open | stated_open | 0 | prove or refute | - |
-| 123 | `GAP-RP-O2-MULTISET-YIELD` O2: mean yield of m-multisets of a base is C(\|D\|+m-1,m) | open | stated_open | 0 | prove or refute | RT-RP-PROOF-GATE-IC-NEGATIVE |
-| 124 | `GAP-RP-SAT-SCALING` Does descended CNF-XOR SAT scale past Groebner? (A-PDP7) | open | none | 0 | prove or refute | - |
-| 125 | `GAP-TRANSPORT-ORACLE-SIM` Coordinate transport-oracle simulation | open | none | 0 | prove or refute | RT-TRANSPORT-SIM |
-| 126 | `GAP-UNCONDITIONAL-CLASSICAL` No unconditional classical ECDLP lower bound | open | none | 0 | prove or refute | - |
-| 127 | `GAP-XEDNI-END-TO-END` Xedni end-to-end bridge obligations | open | none | 0 | prove or refute | RT-XEDNI-END-TO-END, RT-XT-SZPIRO-XEDNI-LIFTS |
-| 128 | `GAP-XT-NFS-SECURITY-LOWER-BOUND` No lower bound for target-field DLP cost exists | open | none | 0 | prove or refute | RT-XT-TRANSFER-PRICE-MODEL |
-| 129 | `GAP-XT-RIGOROUS-L13` No proved L(1/3) DLP in large or medium characteristic | open | none | 0 | prove or refute | - |
-| 130 | `OPEN-BK-GG-BINARY-SUBEXP` No consensus on subexponential ECDLP over F_(2^n) (GG Sec. 10.2) | open | none | 0 | prove or refute | - |
-| 131 | `OPEN-BK-GG-BSGS-CONSTANT` Best-possible BSGS constant and grumpy-giants running time | open | none | 0 | prove or refute | - |
-| 132 | `OPEN-BK-GG-EXOTIC-ROUTES` Brauer-group, signature-calculus and Kolyvagin routes: no practical impact | open | none | 0 | prove or refute | - |
-| 133 | `OPEN-BK-GG-PRIME-FIELD-DECOMPOSITION` No efficient decomposition for prime-field small-abscissa factor base | open | none | 0 | prove or refute | - |
-| 134 | `OPEN-BK-GG-SUBFIELD-IC` Speeding up index calculus on subfield (Koblitz) curves is open | open | none | 0 | prove or refute | - |
-| 135 | `ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL` Gaudry-Schost two-dimensional walk | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 136 | `FACT-PF-PKM-NAIVE-SEMAEV-EASIER` PKM (published, preliminary): Semaev's naive system was easier than theirs | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 137 | `HEUR-BK-GG-BREAK-SYMMETRY` Disjoint factor bases: expected (k-1)! gain | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 138 | `HEUR-BK-GG-GHS-GENERIC-FAILURE` GHS fails in general: cover genus exponential in n | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 139 | `HEUR-BK-GG-NEGATION-DISPUTE` Negation-map speedup: practical dispute recorded | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 140 | `HEUR-BK-KM-ORACLE-NOT-ALGORITHM` Oracle-relative DL assumptions (all-primes-but-p) are easier than DL | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 141 | `HEUR-GG-BL-HIGHER-ANTICOLLISIONS` Bernstein-Lange: higher-degree local anti-collisions slow rho beyond Brent-Pollard | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
-| 142 | `HEUR-PF-NO-SUBFIELD-OBSTRUCTION` No-subfield obstruction for prime-field index calculus | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 143 | `HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC` PKM systems look easier than semi-generic ones | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 144 | `HEUR-PF-PKM-FFA-TRANSPOSED` First-fall assumption transposed to PKM towers (D ~ ffd) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-PF-CSTEP-T14 |
-| 145 | `HEUR-RP-LIFT-SUBGROUP-HALF` A random abscissa lifts with probability ~1/2 and lands in <G> with probability ~1/2 (A-FB2) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 146 | `HEUR-RP-WALK-TARGET-GUARD` Walk targets behave as uniform, with a mandatory repeated-target guard (A-RC1) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 147 | `HEUR-WAGNER-FOUR-SUM` Wagner four-sum cube-root heuristic | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-REPRESENTATION-FILTER |
-| 148 | `HEUR-XT-EASY-LIFT-DEPENDENCE` Easy-lift (xedni) points are dependent with probability below 1/p | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 149 | `HEUR-XT-JOUX-PINPOINT-CORRECTED` Joux pinpointing: corrected constant L(1/3, 2^(1/3)) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 150 | `HEUR-XT-LS-MNT-COUNT` Luca-Shparlinski: about z^(1/2+o(1)) MNT curves with CM discriminant <= z | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 151 | `HEUR-XT-NFS-C32-FLOOR` Barbulescu-Duquesne: arguments that c cannot go below 32 | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-XT-TRANSFER-PRICE-MODEL |
-| 152 | `HEUR-XT-SS-ANALYSIS` Silverman-Suzuki: lifted index calculus slower than brute force | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
-| 153 | `ASM-BK-GG-CDH-ONLY-VIA-DLP` CDH: only known method is solving ECDLP | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 154 | `ASM-CLASSICAL-ECDLP` Named-curve classical ECDLP hardness assumption | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 155 | `CONCLUSION-SPECIFIC-CURVE` Specific-curve hardness remains assumption-based | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 156 | `STD-BK-BRAINPOOL-REQS` Brainpool (RFC 5639) security requirements | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
-| 157 | `STD-BK-NIST-DISC-NO-RATIONALE` NIST SP 800-186: no technical rationale for a \|Disc\| bound | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
-| 158 | `STD-BK-NIST-HALF-BITLENGTH` NIST: security strength ~ half the bit length of n | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 159 | `STD-BK-SAFECURVES-DISC` SafeCurves discriminant rule: \|D\| > 2^100 | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 160 | `STD-BK-SAFECURVES-TRANSFER` SafeCurves transfer rule: embedding degree >= (l-1)/100 | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
-| 161 | `STD-BK-SAFECURVES-TWIST` SafeCurves twist-security rule (>= 2^100 combined attack) | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
-| 162 | `STD-BK-SEC1-HARDNESS-NARRATIVE` SEC 1 v2.0 ECDLP hardness narrative | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-BOOK-INVENTORY |
-| 163 | `STD-BK-SEC1-VALIDATION` SEC 1 v2.0 domain-parameter validation (B < 100, n != p) | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
-| 164 | `ALG-GAUDRY-FIXED-EXTENSION` Gaudry fixed-extension index calculus | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 165 | `ALG-GG-BL-SMALLDL-TABLE` BL small DL: 1.77 ell^(1/3) with a table of ell^(1/3) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 166 | `ALG-GG-FOWLER-FIVE-KANGAROO` Fowler: five kangaroos at 1.737 sqrt N (not below four) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 167 | `ALG-GG-GLV-FROBENIUS-WALK` Gallant-Lambert-Vanstone multiplicative walk on Frobenius-negation orbits | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 168 | `ALG-GG-GPR-FOUR-KANGAROO` Galbraith-Pollard-Ruprai: 4-kangaroo 1.714 sqrt N, hybrid 1.66 sqrt N | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 169 | `ALG-GG-WZ-NEGATION` Wiener-Zuccherato negating additive walk with 2-cycle look-back | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 170 | `ALG-XT-COPPERSMITH-F2N` Coppersmith's algorithm for F_{2^n} | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 171 | `ALG-XT-MSS-NORM-UPPER-BOUND` MSS 2016 key-size method (norm upper bounds, B^2 linear algebra) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 172 | `ATTACK-BK-GG-CHEON-COST` Cheon / Brown-Gallant cost O(max(sqrt(r/d), sqrt d)) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 173 | `BOUNDARY-INVALID-CURVE` Invalid-curve and small-subgroup boundary | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 174 | `CLAIM-BK-SEC1-COFACTOR-CDH` SEC 1: a slightly larger cofactor makes ECDH roughly as hard as DLP | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 175 | `CLAIM-GG-FKL-AGM-TO-GGM` FKL transfer: AGM results plus GGM DL bound give GGM bounds | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 176 | `COND-BINARY-WEIL-DESCENT` Binary summation-polynomial Weil descent | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 177 | `COND-BK-GG-GAUDRY-FIXED-N` Survey statement: O~(q^2), O~(q^(2-2/n)) for fixed n | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-BK-DECOMP-MEASURE |
-| 178 | `COND-BK-GG-NONUNIFORM-R13` Precomputation: r^(1/3) per instance after r^(2/3) (Bernstein-Lange) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 179 | `COND-BK-GG-OVERDETERMINED-TRADEOFF` Over-/under-determined decomposition trade-off | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 180 | `COND-BK-GG-SEMAEV-UNROLLED-CONJ` Semaev 2015 unrolled-resultant subexponential conjecture (as surveyed) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 181 | `COND-GB-HFE-FIRST-FALL-ESTIMATES` First-fall/degree-of-regularity HFE estimates (Dubois-Gama, Ding-Hodges, Ding-Kleinjung) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 182 | `COND-GB-PQ-SUBEXP-BINARY-ECDLP` Petit-Quisquater subexponential binary ECDLP: 2^{c n^{2/3} log n} | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 183 | `COND-PF-APS-BEATS-PKM` APS outperforms PKM for fixed m and growing p | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-PF-APS-VS-PKM-REMEASURE |
-| 184 | `COND-PF-APS-COST` APS cost q m^m / s^m * T(E,m,V) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 185 | `COND-PF-KY-FFA-REDUCTIO` Kosters-Yeo reductio: unrestricted FFA would decide an NP-complete problem | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 186 | `COND-PKM-PRIME-ALGEBRAIC` PKM prime-field algebraic route | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 187 | `COND-RP-LINEARIZED-SUBSPACE-FLOOR` Linearized k-point subspace IC needs relation work >= 2^(2n/3) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 188 | `COND-RP-TWO-SUMMAND-FAMILY-LAW` Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 189 | `COND-XT-BD-BN-100BIT` BD: the 3072-bit BN curve offers about 100 bits, not 128 | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-BN-NORM-REPLAY |
-| 190 | `COND-XT-BD-KEYSIZES` BD updated pairing key sizes | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 191 | `COND-XT-GKZ-ALL-EXTENSIONS` GKZ conditional: quasi-polynomial DLP in every F_{p^n} | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 192 | `COND-XT-GKZ-F2-1223-59BIT` GKZ: the genus-1 supersingular F_{2^1223} target has about 59-bit security | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 193 | `COND-XT-MOV-SS-SMALLCHAR` Rigorous quasi-polynomial ECDLP on supersingular curves of fixed characteristic | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-MOV-KW-COMPOSITION |
-| 194 | `ESTIMATE-QUANTUM-IONQ-2026` 2026 trapped-ion secp256k1 preprint estimate | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 195 | `FACT-PF-EP-LINEARIZED-NO-GAIN` No linearized QSP beats generic algorithms (under HKPYY's estimate) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 196 | `FACT-PF-MM-TRINOMIAL-NO-GAIN` McGuire-Mueller: their split trinomials do not beat generic algorithms | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 197 | `FACT-PRIME-FIELD-NO-EXTENSION-GAIN` Prime-field boundary for extension index calculus | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 198 | `OBS-XT-LIFT-BOUNDED-RANK` Bounded rank would rule out growing-factor-base lifting | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-HKT-SCOPE |
-| 199 | `OBSTRUCTION-NEGATION-CYCLES` Negation-map fruitless-cycle obstruction | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-GG-NEGATION-OVERHEAD |
-| 200 | `RED-SCHNORR-ROM` Schnorr-to-DL random-oracle reduction | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 201 | `RED-XT-CHENG-HUANG-PARTIAL-LIFT` Cheng-Huang: ECDLP reduces to three partial lifting problems | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-HKT-SCOPE |
-| 202 | `THEOREM-JMV-ISOGENY-REDUCTION` JMV random reduction within an isogeny stratum | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 203 | `THM-PF-YYTK-NAIVE-LOWER-BOUND` YYTK: naive Semaev index calculus cannot beat generic methods | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-PF-YYTK-READ |
-| 204 | `THM-RP-KOBLITZ-CYCLIC-WINDOW` Cyclic-cover window for the n=131 trace-zero factor: genus >= 394 (conditional), modular carrier genus 378,708,949 | conditional | lean_written_unchecked | 0 | discharge each condition, or keep the row labelled conditional | - |
-| 205 | `CEX-GB-DING-SCHMIDT-DEGENERATE` Ding-Schmidt 2013: degenerate systems with first-fall degree far below the solving degree | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 206 | `CEX-NAGAO-LEMMA4-F2` Witnesses A, B: d'_F = 2 < d_F = 3 over F_2 | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | RT-LEMMA4-FORMAL, RT-LEMMA4-REVERSE |
-| 207 | `CEX-PF-APS-COMPARISON-MISMATCH` APS Table 2 compares against PKM's m = 2 data | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-PF-APS-VS-PKM-REMEASURE |
-| 208 | `CEX-RP-COMMON-KERNEL-WITNESSES` Boolean kernel not multiplicative under gauge; exterior/code witness has a nonzero passive-axis coefficient (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 209 | `CEX-RP-JKSST-ASYMPTOTIC-COUNTING` Asymptotic remainders and coarse lattice data do not give finite counting bounds | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
-| 210 | `CEX-RP-JKSST-LANG-QUADRATICITY` Quadraticity of height alone gives no uniform Lang constant (Lean countermodel) | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
-| 211 | `CEX-RP-JKSST-MODEL-DISCRIMINANT` No all-multiples height bound by a fixed model discriminant; model log-discriminant unbounded under rescaling | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
-| 212 | `CEX-RP-JKSST-PROBABILITY` Finite-field relation probability: composite modulus, fixed probability not O(1/p), usefulness not automatic | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
-| 213 | `FACT-XT-ANOMALOUS-ONLY-L-EQ-P` Only l = p torsion leaks through E(Z/p^2) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 214 | `LB-GG-AHP-GEOMETRIC` AHP: GGM bounds via geometric-search reductions (with preprocessing) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 215 | `LB-GG-CDG-AI-GGM` CDG: auxiliary-input GGM bounds via presampling | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 216 | `LB-GG-NECHAEV-DETERMINISTIC` Nechaev: deterministic generic DLP needs Omega(sqrt r) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 217 | `LB-GG-YUN-MDLP` Yun: generic n-target DLP needs Omega(sqrt(n p)) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 218 | `LB-ISOGENY-GENERIC` Isogeny-augmented generic lower bound | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-TRANSPORT-SIM |
-| 219 | `MEAS-GB-HKY-FFA-DOUBT` HKY 2015: computational evidence against the first fall degree assumption for ECDLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 220 | `OBS-XT-GLOBAL-TORSION-LIFT` Global torsion lifts: torsion too small over Q, fields too large otherwise | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 221 | `RED-BK-AGCODE-MINDIST` AG-code minimum distance vs ECDLP (survey says 'equivalent') | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-AGCODE-DIRECTION |
-| 222 | `THEOREM-FROB-SUBSPACES-131` Frobenius-stable subspaces at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-BINARY-M4-DEGREE |
-| 223 | `THEOREM-GHS-GENUS-131` GHS genus classification at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 224 | `THEOREM-XEDNI-FF-DENSITY` Exact codimension-three function-field lift density | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 225 | `THEOREM-XEDNI-FINITE-CORE` Kernel-checked finite xedni core | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-XEDNI-END-TO-END |
-| 226 | `THEOREM-YIELD-CONSERVATION` Mean decomposition-yield conservation | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-ALGEBRAIC-SOLUTION-COUNT, RT-RP-PROOF-GATE-IC-NEGATIVE |
-| 227 | `THM-BK-GG-DIEM-SUBEXP-REPORT` Survey report of Diem's rigorous L(2/3) sequence | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 228 | `THM-BK-GG-YUN-MULTI-LB` Yun: generic Omega(sqrt(rL)) for L-instance DLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-ONE-OUT-OF-L |
-| 229 | `THM-GB-SEMAEV-TENTI-2DREG` Semaev-Tenti: two-phase solving degree <= 2 d_reg - 2 with field equations | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 230 | `THM-GG-AGM-UNINSTANTIABLE` Zhandry: un-instantiability in the AGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 231 | `THM-GG-KZZ-AGM-NOT-WEAKER` KZZ: AGM is not (as formalized) weaker than the GGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 232 | `THM-GG-ZHANDRY-LABELS` Shoup vs Maurer generic models differ on multi-stage games | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 233 | `THM-PF-HKPYY-LEMMA41` HKPYY Lemma 4.1: floor(n/n') l + (n mod n') >= n' | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 234 | `THM-PF-KYTY-APS-LIMITATION` Kudo et al. 2018: acceleration of APS and its limitation | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 235 | `THM-PF-REPO-DIRECT-LOWER-BOUND` Direct-presentation algebraic IC over F_p costs >= c_m r (internal, conditional) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 236 | `THM-RP-AUTOMORPHISM-ORBIT-FOLD` Automorphism-orbit factor bases: psi(G) = [lambda]G with per-instance checks (A-FB3) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 237 | `THM-RP-BAND-AFFINE` Priced cost is affine in the native-work weight; band reversals force an interior crossing (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 238 | `THM-RP-BOOLEAN-CHAIN-UPPER` Fully Boolean two-S3 chain: d_F <= 3*ell+1, independent of n | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-RP-M3-DIAGONAL-UNCENSOR |
-| 239 | `THM-RP-COFACTOR4-RANK-SHORTFALL` Cofactor-4 curves: two-summand relation space has rank C-1 (A-RC3/A-LA4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 240 | `THM-RP-FB-BREAK-EVEN` Break-even of the per-relation cost model at m=4, n=131 (Lean instances) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 241 | `THM-RP-GUARDED-EXACT-PAIR` Guarded three-abscissa prime-field system: first fall 4, last fall 5 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 242 | `THM-RP-GUARDED-GROWING-B` Explicit-membership presentation: first fall B+1, last fall in [max(5,B+1), 3B-4] | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 243 | `THM-RP-ICNEG-YIELD-CONSERVATION` Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked) | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | RT-RP-PROOF-GATE-IC-NEGATIVE |
-| 244 | `THM-RP-KEYED-INVARIANCE` Keyed-generic transcript invariance under injective operation-preserving maps (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 245 | `THM-RP-RECODED-SELECTOR-DEGREE` Selector recodings of one F17 base: canonical degree 7 -> 6 (XOR) -> 5 (one-hot) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
-| 246 | `THM-RP-SCALAR-TRANSPORT` Scalar transport and answer reflection under an injective homomorphism (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 247 | `THM-RP-SECANT-DEGREE-REDUCTION` Split-graph secant presentation: top-ideal first vanishing d+1 vs dense 2d+1 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
-| 248 | `THM-RP-SEMAEV-MONODROMY` Monodromy of the Semaev cover is (Z/2)^(m-2) | proved_internal_unreviewed | stated_open | 0 | independent review, then kernel-check | - |
-| 249 | `THM-RP-TRACE-ZERO-DOUBLING` Trace-zero bases lie in 2E and double the yield at the same degree (A-FB4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 250 | `THM-RP-TWIST-MIXED-RELATION` A rational relation with a Frobenius-negated (twist) term forces that term to vanish on odd order (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 251 | `THM-RP-YIELD-SUM-COUNT` Total yield = domain size; K2 neutrality; K5 restriction (Lean, list form) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 252 | `THM-XT-BK-IMPROBABILITY` Balasubramanian-Koblitz: small embedding degree is improbable | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 253 | `THM-XT-HS-SZPIRO-IMPLIES-LANG` Hindry-Silverman: Szpiro implies Lang | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 254 | `THM-XT-RIGOROUS-L-HALF` Rigorous L(1/2) discrete logarithms (Pomerance; F_p index calculus) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 255 | `THM-XT-RUECK-JACOBIAN-PTORSION` Rueck: p-torsion DLP in Jacobians of curves in characteristic p | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 256 | `THM-XT-SATOH-ARAKI-FERMAT` Satoh-Araki Fermat-quotient anomalous attack | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 257 | `THM-XT-TRACE-MAP-DISTORTION` The trace map distorts some points but not the G1/G2 eigenspaces | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 1 | `HEUR-RELATION-RANK` Relation independence/rank heuristic | heuristic | none | 9 | prove, or measure on a scaling family without censoring | - |
+| 2 | `HEUR-DECOMPOSITION-PROBABILITY` Random decomposition-yield heuristic | heuristic | none | 8 | prove, or measure on a scaling family without censoring | RT-END-TO-END-IC, RT-BK-DECOMP-MEASURE |
+| 3 | `ALG-WD-GAUDRY-2000` Gaudry 2000: fixed-genus index calculus, Õ(q^2) | conditional | none | 8 | discharge each condition, or keep the row labelled conditional | - |
+| 4 | `COND-ECC2K130-FFDA-PROJECTION` ECC2K-130 IC projection 2^86 (FFDA) | conditional | none | 8 | discharge each condition, or keep the row labelled conditional | RT-FALL-DEGREE-BRIDGE |
+| 5 | `HEUR-RHO-RANDOM-MAPPING` Rho random-mapping heuristic | heuristic | none | 7 | prove, or measure on a scaling family without censoring | - |
+| 6 | `HEUR-XT-NFS-SMOOTHNESS` Classical NFS smoothness heuristic | heuristic | none | 6 | prove, or measure on a scaling family without censoring | RT-XT-BN-NORM-REPLAY |
+| 7 | `THM-XT-BK-WEIL-SUFFICES` Balasubramanian-Koblitz: E[r] lies in E(F_{q^k}) iff r \| q^k - 1 | proved_external_unread | none | 6 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-XT-MOV-KW-COMPOSITION |
+| 8 | `HEUR-FIRST-FALL-DEGREE` First-fall/regularity degree heuristic | heuristic | none | 5 | prove, or measure on a scaling family without censoring | - |
+| 9 | `ASM-GG-RANDOM-PARTITION` Rigorous rho analyses assume a uniformly random partition | assumed | none | 5 | assumption: narrow its scope or reduce it to a weaker one | RT-GG-ADDING-WALK-PROOF |
+| 10 | `ATTACK-MOV-PAIRING` MOV pairing transfer | conditional | none | 5 | discharge each condition, or keep the row labelled conditional | RT-PAIRING-TARGET-COST, RT-XT-MOV-KW-COMPOSITION |
+| 11 | `COND-WD-FREY-1998` Frey 1998: Weil descent as an attack methodology | conditional | none | 5 | discharge each condition, or keep the row labelled conditional | - |
+| 12 | `ALG-RP-VELU-COST` Velu O(l) and sqrt-Velu O~(sqrt l) isogeny evaluation (A-ISO5) | proved_external_unread | none | 5 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 13 | `THM-RP-S3-ROOTS-FACTOR` S3(xR,xF,X) = (xR-xF)^2 (X-x(R+F)) (X-x(R-F)) (Lean) | proved_internal_unreviewed | kernel_checked | 5 | independent review, then kernel-check | - |
+| 14 | `HEUR-BK-GG-FACTOR-BASE-SIZE` Heuristic #F ~ #V for subspace factor bases | heuristic | none | 4 | prove, or measure on a scaling family without censoring | RT-BK-DECOMP-MEASURE |
+| 15 | `HEUR-PF-PKM-AUX-CURVE-SEARCH` Cost of finding PKM's auxiliary curve | heuristic | none | 4 | prove, or measure on a scaling family without censoring | - |
+| 16 | `ALG-WD-THERIAULT-2003` Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2))) | proved_external_unread | none | 4 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 17 | `FACT-S3-ROOTS-ARE-GROUP-LAW` S3 rootfinding collapses to group subtraction | proved_internal_unreviewed | none | 4 | independent review, then kernel-check | - |
+| 18 | `HEUR-BK-GG-DECOMP-PROPORTION` Decomposable proportion ~1/n! (l=1) or q^(lk-n)/k! | heuristic | none | 3 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY, RT-BK-DECOMP-MEASURE |
+| 19 | `HEUR-GG-KANGAROO-FOOTPRINTS` Kangaroo heuristic (Galbraith Heur. 14.5.4) | heuristic | none | 3 | prove, or measure on a scaling family without censoring | - |
+| 20 | `HEUR-PF-PKM-RANK-DELTA` PKM: Delta = 10 surplus relations suffice | heuristic | none | 3 | prove, or measure on a scaling family without censoring | - |
+| 21 | `HEUR-PF-PKM-SOLUTION-COUNT` PKM expected solutions per target | heuristic | none | 3 | prove, or measure on a scaling family without censoring | - |
+| 22 | `HEUR-WD-DT-ASSUMPTION12` Diem-Thome Heuristic Assumption 12: large-prime graph reach | heuristic | none | 3 | prove, or measure on a scaling family without censoring | RT-WD-DT-ASSUMPTION12 |
+| 23 | `HEUR-WD-SUBGROUP-SMOOTHNESS` Subgroup smoothness equals full-group smoothness | heuristic | none | 3 | prove, or measure on a scaling family without censoring | RT-WD-COST-MODEL-HYPOTHESES |
+| 24 | `ASM-PF-PKM-UNIT-COST` PKM unit-cost accounting model | assumed | none | 3 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 25 | `ALG-WD-MMT-EG-COST` MMT non-asymptotic Enge-Gaudry cost model for GHS curves | conditional | none | 3 | discharge each condition, or keep the row labelled conditional | RT-WD-COST-MODEL-HYPOTHESES |
+| 26 | `COND-PF-HKPYY-COMPLEXITY` HKPYY Theorem 3.2: QSP index-calculus complexity | conditional | none | 3 | discharge each condition, or keep the row labelled conditional | - |
+| 27 | `COND-PF-PKM-COST-THRESHOLD` PKM cost decomposition and the p^(1/2-1/m) bar | conditional | none | 3 | discharge each condition, or keep the row labelled conditional | - |
+| 28 | `COND-WD-DIEM-PLANE-CURVES` Diem 2006 (ANTS): Õ(q^(2-2/(d-2))) for plane curves of degree d | conditional | none | 3 | discharge each condition, or keep the row labelled conditional | - |
+| 29 | `BRIDGE-GENERIC-TABLE` Conditional generic simulation of table decomposition | proved_internal_unreviewed | none | 3 | independent review, then kernel-check | RT-GENERIC-BRIDGE, RT-REPRESENTATION-FILTER |
+| 30 | `THM-GB-HPS-FIRST-FALL-WEIL` Hodges-Petit-Schlather: first fall degree bounds for Weil descent | proved_external_unread | none | 3 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 31 | `THM-WD-MOMOSE-CHAO` Momose-Chao: classes of curves with weak Weil restrictions | proved_external_unread | none | 3 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 32 | `CLAIM-NAGAO-LEMMA4` Nagao 2015/984 Lemma 4: d_F <= d'_F | refuted | none | 2 | audit every dependent; repair or retract the estimates that use it | RT-LEMMA4-FORMAL |
+| 33 | `CONJ-GB-BFS-SEMIREG-PROPORTION-F2` BFS Conjecture 2: almost all F_2 sequences are semi-regular | refuted | none | 2 | audit every dependent; repair or retract the estimates that use it | - |
+| 34 | `CONJ-GB-FROBERG` Froberg's conjecture (generic Hilbert series) | open | none | 2 | prove or refute | - |
+| 35 | `HEUR-BK-GG-RHO-HEURISTIC` Rho/kangaroo analyses are heuristic; worst case unbounded | heuristic | none | 2 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY |
+| 36 | `HEUR-GB-PQ-ASSUMPTION-2` Petit-Quisquater Assumption 2: D_reg = D_ff + o(1) for binary summation descents | heuristic | none | 2 | prove, or measure on a scaling family without censoring | RT-GB-SUMMATION-INVARIANTS |
+| 37 | `HEUR-GG-DGM-CYCLE-RATES` Fruitless-cycle rates: 2-cycles Theta(1/r), 2c-cycles Theta(1/r^c) | heuristic | none | 2 | prove, or measure on a scaling family without censoring | RT-GG-NEGATION-OVERHEAD |
+| 38 | `HEUR-XT-BGJT-DESCENT` BGJT descent heuristics (smoothness and PGL2 full rank) | heuristic | none | 2 | prove, or measure on a scaling family without censoring | - |
+| 39 | `HEUR-ZERO-DIMENSIONAL-PDP` Zero-dimensional PDP hypothesis | heuristic | none | 2 | prove, or measure on a scaling family without censoring | - |
+| 40 | `ASM-PF-KY-CURVE-CONSTRUCTION` Kosters-Yeo Assumption 3.3 (curves with a large-order point) | assumed | none | 2 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 41 | `ALG-XT-EXTNFS` Kim-Barbulescu exTNFS: medium-prime L(1/3, (48/9)^(1/3)) | conditional | none | 2 | discharge each condition, or keep the row labelled conditional | RT-XT-BN-NORM-REPLAY |
+| 42 | `COND-WD-DT-RESULT13` Diem-Thome Heuristic Result 13: Õ(q) for non-hyperelliptic genus 3 | conditional | none | 2 | discharge each condition, or keep the row labelled conditional | RT-WD-DT-ASSUMPTION12 |
+| 43 | `THM-GG-EQUIV-CLASS-RHO` Rho on equivalence classes: sqrt(pi r/(2 N_C)) (C1 + C2) | conditional | none | 2 | discharge each condition, or keep the row labelled conditional | - |
+| 44 | `THM-GG-HILDEBRAND-RADDING` Hildebrand: random r-step walks on Z/n mix in O(n^(2/(r-1))) | proved_external_unread | none | 2 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-GG-ADDING-WALK-PROOF |
+| 45 | `THM-PF-REPO-KUMMER-FFD-FOUR` Kummer m = 2 PKM systems have first fall degree 4 for every t | proved_internal_unreviewed | none | 2 | independent review, then kernel-check | RT-PF-PROVE-HT-OR-BOUNDED |
+| 46 | `THM-WD-DIEM-GHS-ODD` Diem 2003: GHS attack in odd characteristic | proved_external_unread | none | 2 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 47 | `THM-XT-VERHEUL-DISTORTION-EXISTS` Verheul: distortion maps exist on supersingular curves | proved_external_unread | none | 2 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 48 | `CONJ-XT-GKZ-REPRESENTATION` GKZ representation conjecture (all extensions) | open | none | 1 | prove or refute | - |
+| 49 | `CONJ-XT-LANG-HEIGHT` Lang's canonical-height conjecture | open | none | 1 | prove or refute | RT-XT-SZPIRO-XEDNI-LIFTS |
+| 50 | `GAP-PF-PKM-ASYMPTOTIC-OPEN` PKM asymptotic complexity is open by the authors' statement | open | none | 1 | prove or refute | RT-PF-PROVE-HT-OR-BOUNDED |
+| 51 | `GAP-RP-COMMON-KERNEL` Common-kernel construction for a prime-field correlated-packet route | open | none | 1 | prove or refute | - |
+| 52 | `OPEN-BK-EMBEDDING-THRESHOLD-DISAGREEMENT` Standards disagree on the MOV/embedding-degree threshold | open | none | 1 | prove or refute | RT-BK-THRESHOLDS |
+| 53 | `OPEN-BK-GG-ONE-OUT-OF-L` One-out-of-L ECDLP: no speedup known | open | none | 1 | prove or refute | RT-BK-ONE-OUT-OF-L |
+| 54 | `HEUR-AUTOMORPHISM-SPEEDUP` Automorphism quotient speedup | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 55 | `HEUR-BK-BRAINPOOL-CLASS-NUMBER-LIFT` Large class number as a guard against lifting | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 56 | `HEUR-BK-GG-FFDA-DESCRIPTION` Survey definition of the First Fall Degree Assumption | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY |
+| 57 | `HEUR-BK-GG-ISOGENY-WALK` Mapping ECDLP to an isogenous curve is generally efficient | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 58 | `HEUR-BK-GG-RIGHT-KERNEL-RANK` Right-kernel IC needs full rank, rarely met at #relations = #F | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-BK-BOOK-INVENTORY |
+| 59 | `HEUR-GB-SEMIREG-ASSUMPTION` Semi-regularity assumption: cryptographic systems behave like semi-regular ones and d_reg sets the cost | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 60 | `HEUR-GG-BRENT-POLLARD-ADDING` Brent-Pollard nonrandomness: factor 1/sqrt(1 - sum p_i^2) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
+| 61 | `HEUR-GG-DP-RHO` DP rho heuristic (Galbraith Heur. 14.2.15 / Thm 14.2.16) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
+| 62 | `HEUR-GG-TESKE-ADDING-WALK` Teske: r-adding walks with r >= 20 behave like random walks | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
+| 63 | `HEUR-PF-APS-T-EQUALS-TPRIME` APS assumption (13): T(E,m,V) ~ T'(E,m,V) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-PF-APS-VS-PKM-REMEASURE |
+| 64 | `HEUR-PF-YYTK-STATISTICAL` YYTK statistical assumptions on summation polynomials | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-PF-YYTK-READ |
+| 65 | `HEUR-RP-DESCENT-TERMINATION` Recursive target descent terminates (A-TD1) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 66 | `HEUR-RP-LARGE-PRIME-GRAPH` Large-prime leftovers meet with birthday probability and the graph connects (A-RC2) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 67 | `HEUR-SYMMETRY-PDP-SPEEDUP` Invariant-coordinate PDP speedup | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 68 | `HEUR-WD-ADH-NORM-SMOOTH` ADH: norms of a(x) + y b(x) are as smooth as random polynomials | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 69 | `HEUR-WD-EG07-SMOOTHNESS` Enge-Gaudry 2007 Heuristics 1 and 2 | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 70 | `HEUR-WD-JV-WEAKNESS-INDEPENDENT` Joux-Vitse: weakness independent of isogeny class | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-WD-JV-ISOGENY-CONJ |
+| 71 | `HEUR-WD-SMITH-HYP1` Smith Hypothesis 1: trigonal codomain is non-hyperelliptic | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-WD-SMITH-HYPOTHESES |
+| 72 | `HEUR-WD-SMITH-HYP2` Smith Hypothesis 2: rational trigonal map with probability 1/2 | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-WD-SMITH-HYPOTHESES |
+| 73 | `HEUR-WD-SMITH-HYP3` Smith Hypothesis 3: rational isogeny with probability 1/2 | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-WD-SMITH-HYPOTHESES |
+| 74 | `HEUR-WD-SMITH-HYP4` Smith Hypothesis 4: independence across tractable subgroups | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-WD-SMITH-HYPOTHESES |
+| 75 | `HEUR-XT-BGJT-REPRESENTATION` BGJT heuristic: a sparse medium subfield representation exists | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 76 | `HEUR-XT-MILLER-HEIGHT` Miller's height argument against lifted index calculus | heuristic | none | 1 | prove, or measure on a scaling family without censoring | - |
+| 77 | `HEUR-XT-PPVW-BOUNDED-RANK` PPVW heuristic: ranks of E/Q are bounded (finitely many > 21) | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-XT-HKT-SCOPE |
+| 78 | `MEAS-PF-PKM-DEGREE-TABLES` PKM Tables 4-5 (published measurement): corrected degree 4 -> 5 -> 6 at m = 2 | heuristic | none | 1 | prove, or measure on a scaling family without censoring | RT-PF-PROVE-HT-OR-BOUNDED |
+| 79 | `STD-BK-SAFECURVES-RHO` SafeCurves rho rule: l >= 2^200 (0.886 sqrt l > 2^100) | assumed | none | 1 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 80 | `ALG-GG-BL-PRECOMP-RHO` Bernstein-Lange precomputed-DP rho: ~ell^(1/3) online | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 81 | `ALG-GG-BLS-BRANCHLESS-NEGATION` BLS branchless negating rho: (1+o(1)) sqrt(pi ell/4) | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-GG-NEGATION-OVERHEAD |
+| 82 | `ALG-GG-KUHN-STRUIK` Kuhn-Struik: L targets with one DP table in about sqrt(2 r L) | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 83 | `ALG-STATIC-DH-AUXILIARY-POWERS` Static-DH auxiliary-power attack | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 84 | `ALG-XT-NFS-L13` NFS/SNFS/FFS L(1/3) discrete logarithms | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-XT-TRANSFER-PRICE-MODEL |
+| 85 | `ATTACK-CHEON-AUXILIARY` Cheon auxiliary-input attack | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 86 | `ATTACK-FREY-RUECK` Frey-Rueck Tate-pairing transfer | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-PAIRING-TARGET-COST |
+| 87 | `COND-NAGAO-2015-COMPLEXITY` Nagao 2015/984: polynomial-time binary ECDLP under FFDA | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 88 | `COND-PF-EP-BETA-THRESHOLD` Euler-Petit Prop. 8: beating generic needs beta < 0.103 | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 89 | `COND-WD-GALHS-ISOGENY` Galbraith-Hess-Smart 2002: extend GHS through isogenies | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 90 | `COND-WD-SMITH-THM2` Smith Theorem 2: about 18.57% of genus-3 hyperelliptic DLPs move to plane quartics | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-WD-SMITH-HYPOTHESES |
+| 91 | `COND-XT-BGJT-QUASIPOLY` BGJT heuristic quasi-polynomial DLP in small characteristic | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 92 | `FACT-FIELD-DLP-AFTER-PAIRING` Target finite-field DLP governs pairing attack | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | RT-PAIRING-TARGET-COST, RT-BK-THRESHOLDS, RT-XT-TRANSFER-PRICE-MODEL |
+| 93 | `RED-DEN-BOER-FIXED-CDH` den Boer DLP-to-Fixed-CDH reduction | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 94 | `RED-MAURER-AUXILIARY-CURVE` Maurer auxiliary-curve reduction | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 95 | `RED-PAIRING-CO-DDH` Pairing decision reduction | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 96 | `STANDARD-CURVE-EXCLUSIONS` Standard curve exclusion checklist | conditional | none | 1 | discharge each condition, or keep the row labelled conditional | - |
+| 97 | `RED-GG-FKL-AGM-CDH-DL` FKL: CDH, SDH, LRSW equivalent to DL in the AGM | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 98 | `THM-BK-GG-SEMAEV-LEMMA2` Survey statement of Semaev polynomials: irreducible, degree 2^(m-2) (GG Lemma 2) | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 99 | `THM-GB-PQ-FIRST-FALL-BOUND` Petit-Quisquater: first fall degree of descended S_{m+1} <= m^2 + 1 | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 100 | `THM-GG-JM-AGM-TRANSFER` Jaeger-Mohan: AGM proofs transfer to the GGM under general frameworks | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 101 | `THM-RP-AFFINE-CORE` Counting core of the isogeny-augmented generic group bound (IcNegative, unchecked) | proved_internal_unreviewed | lean_written_unchecked | 1 | independent review, then kernel-check | RT-RP-PROOF-GATE-IC-NEGATIVE |
+| 102 | `THM-RP-FF-HANDBOOK` Finite-field handbook facts (cyclic multiplicative group, Frobenius, trace/norm surjectivity) in Lean | proved_internal_unreviewed | kernel_checked | 1 | independent review, then kernel-check | - |
+| 103 | `THM-RP-S3-LINEAR-HALF-TRACE` S3 is F_2-linear in (e1,e2): linearized half-trace two-point PDP (A-PDP8) | proved_internal_unreviewed | none | 1 | independent review, then kernel-check | - |
+| 104 | `THM-RP-SUBSPACE-PRODUCT-BOUND` Field Kneser/Vosper product bound: dim V^(2) >= 2l-1, equality only for progressions (A-FB1) | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 105 | `THM-RP-VOLCANO-STRUCTURE` Ordinary l-isogeny components are volcanoes (A-ISO1) | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 106 | `THM-RP-WEIL-LIFT-SOUNDNESS` Weil descent is sound but solutions need lift checks (A-PDP2) | proved_internal_unreviewed | none | 1 | independent review, then kernel-check | - |
+| 107 | `THM-WD-SCHOLTEN-GENUS2` Scholten forms: genus-2 covers over F_q of E/F_(q^2) | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 108 | `THM-XT-HKT-LIFT-RANK` Huang-Kueh-Tan: bounded-height lifting implies arbitrarily large rank | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-XT-HKT-SCOPE |
+| 109 | `THM-XT-MASSER-DEPENDENCE` Masser: dependent specializations have density zero | proved_external_unread | none | 1 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 110 | `CLAIM-BK-SAFECURVES-BRAINPOOL-1E6` SafeCurves: Brainpool class number must exceed 1000000 | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 111 | `CLAIM-BK-SAFECURVES-SEC1-20` SafeCurves: 'SEC1 requires the embedding degree to be at least 20' | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 112 | `CLAIM-BK-X962-NO-AMORTIZATION` ANSI X9.62 (1997): effort must be repeated per key | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 113 | `CLAIM-GG-BKL-SIMD-NEGATION` BKL 2010: negation gives little or no speedup on SIMD | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 114 | `CLAIM-GG-CERTICOM-DP-NORMALIZATION` Certicom 1998: normalizing distinguished points alone gives sqrt 2 / sqrt(2d) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 115 | `CLAIM-XT-AMOR-F2-1223-128BIT` Claim: new small-characteristic algorithms leave the F_{2^1223} genus-1 curve at ~128 bits | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 116 | `CLAIM-XT-BGJT-PROP2-ALL-P` Claim: BGJT descent step applies to every polynomial P | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 117 | `CLAIM-XT-BN3072-128BIT` Claim: BN curves with a 3072-bit F_{p^12} reach 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 118 | `CLAIM-XT-JOUX-PINPOINT-ORIGINAL` Claim: Joux pinpointing reaches L(1/3, (8/9)^(1/3)) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 119 | `CLAIM-XT-SS-GENUS2-F2-367-128BIT` Claim: the genus-2 supersingular curve over F_{2^367} gives 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 120 | `HEUR-PF-HKPYY-SPARSE-DENSITY` HKPYY density heuristic: sparse factors of X^n - 1 are as rare as random | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 121 | `HEUR-RP-SEMIREGULAR-DREG-PROXY` Semi-regular D_reg predicts Groebner cost of descended Semaev systems (A-PDP5) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 122 | `CONJ-XT-SZPIRO` Szpiro's conjecture (Szpiro ratio bounded, 6 the largest limit point) | open | none | 0 | prove or refute | RT-XT-SZPIRO-XEDNI-LIFTS |
+| 123 | `GAP-AUTOMORPHISM-PREPROCESS` Preprocessing bounds with automorphism quotients | open | none | 0 | prove or refute | RT-AUTOMORPHISM-PREPROCESS, RT-RP-ONLINE-VS-PREPROCESSING |
+| 124 | `GAP-BINARY-M4-DEGREE` Binary m=4 Weil-descent degree growth | open | none | 0 | prove or refute | RT-BINARY-M4-DEGREE, RT-RP-M3-DIAGONAL-UNCENSOR |
+| 125 | `GAP-COORDINATE-ALGEBRAIC` Coordinate-algebraic escape from generic bounds | open | none | 0 | prove or refute | RT-GENERIC-BRIDGE, RT-ALGEBRAIC-SOLUTION-COUNT, RT-REPRESENTATION-FILTER |
+| 126 | `GAP-END-TO-END-IC-EXPONENT` End-to-end index-calculus exponent obligation | open | none | 0 | prove or refute | RT-END-TO-END-IC, RT-REPRESENTATION-FILTER |
+| 127 | `GAP-FALL-DEGREE-COST-BRIDGE` Every degree-based cost must pass through sd or last fall | open | none | 0 | prove or refute | RT-FALL-DEGREE-BRIDGE, RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
+| 128 | `GAP-GB-SUMMATION-DREG-GROWTH` Does the solving degree of binary summation descents grow with n? | open | none | 0 | prove or refute | RT-GB-SUMMATION-INVARIANTS, RT-GB-FACTOR-BASE-WEIL-BOUND |
+| 129 | `GAP-GG-ADDING-WALK-RIGOROUS` No rigorous sqrt bound for r-adding (doubling-free) rho walks | open | none | 0 | prove or refute | RT-GG-ADDING-WALK-PROOF |
+| 130 | `GAP-GG-RHO-CONSTANT` Rigorous constant for implemented rho is open | open | none | 0 | prove or refute | RT-GG-RHO-CONSTANT-GAP |
+| 131 | `GAP-LEMMA4-REVERSE` Reverse inequality d'_F <= d_F (outside placement)? | open | none | 0 | prove or refute | RT-LEMMA4-REVERSE |
+| 132 | `GAP-MULTITARGET-NONUNIFORM` Multi-target/nonuniform security conversion | open | none | 0 | prove or refute | RT-MULTITARGET-MODEL, RT-BK-ONE-OUT-OF-L |
+| 133 | `GAP-NAGAO-PROP5-ROUTE` Does Nagao Prop. 5 survive without Lemma 4? | open | none | 0 | prove or refute | - |
+| 134 | `GAP-PF-DEDICATED-ROOT-FINDER` Dedicated algorithm for the generalized root-finding problem | open | none | 0 | prove or refute | - |
+| 135 | `GAP-PF-PRIME-RELATION-SEARCH` No known sub-rho relation search over prime fields | open | none | 0 | prove or refute | - |
+| 136 | `GAP-PF-QSP-EXISTENCE` Do quasi-subfield polynomials with beta < 0.103 exist? | open | none | 0 | prove or refute | - |
+| 137 | `GAP-PF-SPECIAL-PRIME-EXPOSURE` Do special primes (smooth p-1, P-224) weaken curves against PKM? | open | none | 0 | prove or refute | - |
+| 138 | `GAP-PF-TOWER-SOLVING-DEGREE-HT` H_T: tower solving degree grows linearly in the height | open | none | 0 | prove or refute | RT-PF-CSTEP-T14, RT-PF-PROVE-HT-OR-BOUNDED |
+| 139 | `GAP-PKM-SOLVING-DEGREE` Prime-field PKM solving-degree growth | open | none | 0 | prove or refute | RT-PKM-DEGREE, RT-PF-CSTEP-T14 |
+| 140 | `GAP-PROTOCOL-ASSUMPTION-MAPPING` Protocol-to-problem assumption mapping | open | none | 0 | prove or refute | RT-PROTOCOL-MAP |
+| 141 | `GAP-QUANTUM-RESOURCES` Concrete fault-tolerant quantum resources | open | none | 0 | prove or refute | RT-QUANTUM-RESOURCES |
+| 142 | `GAP-RP-O1-ISOGENY-GGM` O1: Theorem 15.1 in full (isogeny-augmented GGM success bound) | open | stated_open | 0 | prove or refute | - |
+| 143 | `GAP-RP-O2-MULTISET-YIELD` O2: mean yield of m-multisets of a base is C(\|D\|+m-1,m) | open | stated_open | 0 | prove or refute | RT-RP-PROOF-GATE-IC-NEGATIVE |
+| 144 | `GAP-RP-SAT-SCALING` Does descended CNF-XOR SAT scale past Groebner? (A-PDP7) | open | none | 0 | prove or refute | - |
+| 145 | `GAP-TRANSPORT-ORACLE-SIM` Coordinate transport-oracle simulation | open | none | 0 | prove or refute | RT-TRANSPORT-SIM |
+| 146 | `GAP-UNCONDITIONAL-CLASSICAL` No unconditional classical ECDLP lower bound | open | none | 0 | prove or refute | - |
+| 147 | `GAP-WD-GGHS-NONHYP-COST` Index-calculus cost on non-hyperelliptic gGHS covers | open | none | 0 | prove or refute | RT-WD-COST-MODEL-HYPOTHESES |
+| 148 | `GAP-WD-JV-ISOGENY-CONJ` Joux-Vitse conjecture: all #E = 0 mod 4 curves over F_(p^6) are reachable | open | none | 0 | prove or refute | RT-WD-JV-ISOGENY-CONJ |
+| 149 | `GAP-XEDNI-END-TO-END` Xedni end-to-end bridge obligations | open | none | 0 | prove or refute | RT-XEDNI-END-TO-END, RT-XT-SZPIRO-XEDNI-LIFTS |
+| 150 | `GAP-XT-NFS-SECURITY-LOWER-BOUND` No lower bound for target-field DLP cost exists | open | none | 0 | prove or refute | RT-XT-TRANSFER-PRICE-MODEL |
+| 151 | `GAP-XT-RIGOROUS-L13` No proved L(1/3) DLP in large or medium characteristic | open | none | 0 | prove or refute | - |
+| 152 | `OPEN-BK-GG-BINARY-SUBEXP` No consensus on subexponential ECDLP over F_(2^n) (GG Sec. 10.2) | open | none | 0 | prove or refute | - |
+| 153 | `OPEN-BK-GG-BSGS-CONSTANT` Best-possible BSGS constant and grumpy-giants running time | open | none | 0 | prove or refute | - |
+| 154 | `OPEN-BK-GG-EXOTIC-ROUTES` Brauer-group, signature-calculus and Kolyvagin routes: no practical impact | open | none | 0 | prove or refute | - |
+| 155 | `OPEN-BK-GG-PRIME-FIELD-DECOMPOSITION` No efficient decomposition for prime-field small-abscissa factor base | open | none | 0 | prove or refute | - |
+| 156 | `OPEN-BK-GG-SUBFIELD-IC` Speeding up index calculus on subfield (Koblitz) curves is open | open | none | 0 | prove or refute | - |
+| 157 | `ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL` Gaudry-Schost two-dimensional walk | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 158 | `FACT-PF-PKM-NAIVE-SEMAEV-EASIER` PKM (published, preliminary): Semaev's naive system was easier than theirs | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 159 | `HEUR-BK-GG-BREAK-SYMMETRY` Disjoint factor bases: expected (k-1)! gain | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 160 | `HEUR-BK-GG-GHS-GENERIC-FAILURE` GHS fails in general: cover genus exponential in n | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 161 | `HEUR-BK-GG-NEGATION-DISPUTE` Negation-map speedup: practical dispute recorded | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 162 | `HEUR-BK-KM-ORACLE-NOT-ALGORITHM` Oracle-relative DL assumptions (all-primes-but-p) are easier than DL | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 163 | `HEUR-GG-BL-HIGHER-ANTICOLLISIONS` Bernstein-Lange: higher-degree local anti-collisions slow rho beyond Brent-Pollard | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-GG-WALK-NONRANDOMNESS |
+| 164 | `HEUR-PF-NO-SUBFIELD-OBSTRUCTION` No-subfield obstruction for prime-field index calculus | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 165 | `HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC` PKM systems look easier than semi-generic ones | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 166 | `HEUR-PF-PKM-FFA-TRANSPOSED` First-fall assumption transposed to PKM towers (D ~ ffd) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-PF-CSTEP-T14 |
+| 167 | `HEUR-RP-LIFT-SUBGROUP-HALF` A random abscissa lifts with probability ~1/2 and lands in <G> with probability ~1/2 (A-FB2) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 168 | `HEUR-RP-WALK-TARGET-GUARD` Walk targets behave as uniform, with a mandatory repeated-target guard (A-RC1) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 169 | `HEUR-WAGNER-FOUR-SUM` Wagner four-sum cube-root heuristic | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-REPRESENTATION-FILTER |
+| 170 | `HEUR-WD-GTTD-GENERAL` GTTD Section 6: double-large-prime bound for general curves | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 171 | `HEUR-XT-EASY-LIFT-DEPENDENCE` Easy-lift (xedni) points are dependent with probability below 1/p | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 172 | `HEUR-XT-JOUX-PINPOINT-CORRECTED` Joux pinpointing: corrected constant L(1/3, 2^(1/3)) | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 173 | `HEUR-XT-LS-MNT-COUNT` Luca-Shparlinski: about z^(1/2+o(1)) MNT curves with CM discriminant <= z | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 174 | `HEUR-XT-NFS-C32-FLOOR` Barbulescu-Duquesne: arguments that c cannot go below 32 | heuristic | none | 0 | prove, or measure on a scaling family without censoring | RT-XT-TRANSFER-PRICE-MODEL |
+| 175 | `HEUR-XT-SS-ANALYSIS` Silverman-Suzuki: lifted index calculus slower than brute force | heuristic | none | 0 | prove, or measure on a scaling family without censoring | - |
+| 176 | `ASM-BK-GG-CDH-ONLY-VIA-DLP` CDH: only known method is solving ECDLP | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 177 | `ASM-CLASSICAL-ECDLP` Named-curve classical ECDLP hardness assumption | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 178 | `CONCLUSION-SPECIFIC-CURVE` Specific-curve hardness remains assumption-based | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 179 | `STD-BK-BRAINPOOL-REQS` Brainpool (RFC 5639) security requirements | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
+| 180 | `STD-BK-NIST-DISC-NO-RATIONALE` NIST SP 800-186: no technical rationale for a \|Disc\| bound | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
+| 181 | `STD-BK-NIST-HALF-BITLENGTH` NIST: security strength ~ half the bit length of n | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 182 | `STD-BK-SAFECURVES-DISC` SafeCurves discriminant rule: \|D\| > 2^100 | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 183 | `STD-BK-SAFECURVES-TRANSFER` SafeCurves transfer rule: embedding degree >= (l-1)/100 | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
+| 184 | `STD-BK-SAFECURVES-TWIST` SafeCurves twist-security rule (>= 2^100 combined attack) | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | - |
+| 185 | `STD-BK-SEC1-HARDNESS-NARRATIVE` SEC 1 v2.0 ECDLP hardness narrative | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-BOOK-INVENTORY |
+| 186 | `STD-BK-SEC1-VALIDATION` SEC 1 v2.0 domain-parameter validation (B < 100, n != p) | assumed | none | 0 | assumption: narrow its scope or reduce it to a weaker one | RT-BK-THRESHOLDS |
+| 187 | `ALG-GAUDRY-FIXED-EXTENSION` Gaudry fixed-extension index calculus | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 188 | `ALG-GG-BL-SMALLDL-TABLE` BL small DL: 1.77 ell^(1/3) with a table of ell^(1/3) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 189 | `ALG-GG-FOWLER-FIVE-KANGAROO` Fowler: five kangaroos at 1.737 sqrt N (not below four) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 190 | `ALG-GG-GLV-FROBENIUS-WALK` Gallant-Lambert-Vanstone multiplicative walk on Frobenius-negation orbits | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 191 | `ALG-GG-GPR-FOUR-KANGAROO` Galbraith-Pollard-Ruprai: 4-kangaroo 1.714 sqrt N, hybrid 1.66 sqrt N | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 192 | `ALG-GG-WZ-NEGATION` Wiener-Zuccherato negating additive walk with 2-cycle look-back | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 193 | `ALG-WD-ADH-1994` Adleman-DeMarrais-Huang: subexponential DLP on large-genus hyperelliptic Jacobians | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 194 | `ALG-XT-COPPERSMITH-F2N` Coppersmith's algorithm for F_{2^n} | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 195 | `ALG-XT-MSS-NORM-UPPER-BOUND` MSS 2016 key-size method (norm upper bounds, B^2 linear algebra) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 196 | `ATTACK-BK-GG-CHEON-COST` Cheon / Brown-Gallant cost O(max(sqrt(r/d), sqrt d)) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 197 | `BOUNDARY-INVALID-CURVE` Invalid-curve and small-subgroup boundary | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 198 | `CLAIM-BK-SEC1-COFACTOR-CDH` SEC 1: a slightly larger cofactor makes ECDH roughly as hard as DLP | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 199 | `CLAIM-GG-FKL-AGM-TO-GGM` FKL transfer: AGM results plus GGM DL bound give GGM bounds | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 200 | `COND-BINARY-WEIL-DESCENT` Binary summation-polynomial Weil descent | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 201 | `COND-BK-GG-GAUDRY-FIXED-N` Survey statement: O~(q^2), O~(q^(2-2/n)) for fixed n | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-BK-DECOMP-MEASURE |
+| 202 | `COND-BK-GG-NONUNIFORM-R13` Precomputation: r^(1/3) per instance after r^(2/3) (Bernstein-Lange) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 203 | `COND-BK-GG-OVERDETERMINED-TRADEOFF` Over-/under-determined decomposition trade-off | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 204 | `COND-BK-GG-SEMAEV-UNROLLED-CONJ` Semaev 2015 unrolled-resultant subexponential conjecture (as surveyed) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 205 | `COND-GB-HFE-FIRST-FALL-ESTIMATES` First-fall/degree-of-regularity HFE estimates (Dubois-Gama, Ding-Hodges, Ding-Kleinjung) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 206 | `COND-GB-PQ-SUBEXP-BINARY-ECDLP` Petit-Quisquater subexponential binary ECDLP: 2^{c n^{2/3} log n} | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 207 | `COND-PF-APS-BEATS-PKM` APS outperforms PKM for fixed m and growing p | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-PF-APS-VS-PKM-REMEASURE |
+| 208 | `COND-PF-APS-COST` APS cost q m^m / s^m * T(E,m,V) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 209 | `COND-PF-KY-FFA-REDUCTIO` Kosters-Yeo reductio: unrestricted FFA would decide an NP-complete problem | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 210 | `COND-PKM-PRIME-ALGEBRAIC` PKM prime-field algebraic route | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 211 | `COND-RP-LINEARIZED-SUBSPACE-FLOOR` Linearized k-point subspace IC needs relation work >= 2^(2n/3) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 212 | `COND-RP-TWO-SUMMAND-FAMILY-LAW` Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 213 | `COND-WD-EG-2007-L13` Enge-Gaudry 2007: L(1/3 + epsilon) DLP for low-degree curves | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 214 | `COND-WD-HESS-F2155` Hess 2004: about 2^123 more curves over F_(2^155) attackable | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 215 | `COND-WD-JV-COVER-DECOMP` Joux-Vitse 2012: cover-and-decomposition index calculus | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 216 | `COND-WD-KMPS-INEFFECTIVE` KMPS: Weil descent attacks are asymptotically almost never effective | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 217 | `COND-WD-LAINE-LAUTER` Laine-Lauter: time-memory trade-offs for genus-3 index calculus | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 218 | `COND-WD-MMT-COMPOSITE-N` MMT: GHS beats rho on some curves for many composite N in [160, 600] | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 219 | `COND-WD-MQ-PRIME-N-FAILS` Menezes-Qu: GHS fails for prime N in [160, 600] | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 220 | `COND-WD-MT-HESS-FIELDS` Menezes-Teske 2006: which GF(2^N) are weak under gGHS | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 221 | `COND-WD-MTW-WEAK-FIELDS` Menezes-Teske-Weng: weak fields for ECC (e.g. GF(2^210)) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 222 | `COND-XT-BD-BN-100BIT` BD: the 3072-bit BN curve offers about 100 bits, not 128 | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-BN-NORM-REPLAY |
+| 223 | `COND-XT-BD-KEYSIZES` BD updated pairing key sizes | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 224 | `COND-XT-GKZ-ALL-EXTENSIONS` GKZ conditional: quasi-polynomial DLP in every F_{p^n} | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 225 | `COND-XT-GKZ-F2-1223-59BIT` GKZ: the genus-1 supersingular F_{2^1223} target has about 59-bit security | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 226 | `COND-XT-MOV-SS-SMALLCHAR` Rigorous quasi-polynomial ECDLP on supersingular curves of fixed characteristic | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-MOV-KW-COMPOSITION |
+| 227 | `ESTIMATE-QUANTUM-IONQ-2026` 2026 trapped-ion secp256k1 preprint estimate | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 228 | `FACT-PF-EP-LINEARIZED-NO-GAIN` No linearized QSP beats generic algorithms (under HKPYY's estimate) | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 229 | `FACT-PF-MM-TRINOMIAL-NO-GAIN` McGuire-Mueller: their split trinomials do not beat generic algorithms | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 230 | `FACT-PRIME-FIELD-NO-EXTENSION-GAIN` Prime-field boundary for extension index calculus | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 231 | `OBS-XT-LIFT-BOUNDED-RANK` Bounded rank would rule out growing-factor-base lifting | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-HKT-SCOPE |
+| 232 | `OBSTRUCTION-NEGATION-CYCLES` Negation-map fruitless-cycle obstruction | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-GG-NEGATION-OVERHEAD |
+| 233 | `RED-SCHNORR-ROM` Schnorr-to-DL random-oracle reduction | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 234 | `RED-XT-CHENG-HUANG-PARTIAL-LIFT` Cheng-Huang: ECDLP reduces to three partial lifting problems | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-XT-HKT-SCOPE |
+| 235 | `THEOREM-JMV-ISOGENY-REDUCTION` JMV random reduction within an isogeny stratum | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 236 | `THM-PF-YYTK-NAIVE-LOWER-BOUND` YYTK: naive Semaev index calculus cannot beat generic methods | conditional | none | 0 | discharge each condition, or keep the row labelled conditional | RT-PF-YYTK-READ |
+| 237 | `THM-RP-KOBLITZ-CYCLIC-WINDOW` Cyclic-cover window for the n=131 trace-zero factor: genus >= 394 (conditional), modular carrier genus 378,708,949 | conditional | lean_written_unchecked | 0 | discharge each condition, or keep the row labelled conditional | - |
+| 238 | `CEX-GB-DING-SCHMIDT-DEGENERATE` Ding-Schmidt 2013: degenerate systems with first-fall degree far below the solving degree | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 239 | `CEX-NAGAO-LEMMA4-F2` Witnesses A, B: d'_F = 2 < d_F = 3 over F_2 | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | RT-LEMMA4-FORMAL, RT-LEMMA4-REVERSE |
+| 240 | `CEX-PF-APS-COMPARISON-MISMATCH` APS Table 2 compares against PKM's m = 2 data | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-PF-APS-VS-PKM-REMEASURE |
+| 241 | `CEX-RP-COMMON-KERNEL-WITNESSES` Boolean kernel not multiplicative under gauge; exterior/code witness has a nonzero passive-axis coefficient (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 242 | `CEX-RP-JKSST-ASYMPTOTIC-COUNTING` Asymptotic remainders and coarse lattice data do not give finite counting bounds | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
+| 243 | `CEX-RP-JKSST-LANG-QUADRATICITY` Quadraticity of height alone gives no uniform Lang constant (Lean countermodel) | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
+| 244 | `CEX-RP-JKSST-MODEL-DISCRIMINANT` No all-multiples height bound by a fixed model discriminant; model log-discriminant unbounded under rescaling | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
+| 245 | `CEX-RP-JKSST-PROBABILITY` Finite-field relation probability: composite modulus, fixed probability not O(1/p), usefulness not automatic | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | - |
+| 246 | `FACT-XT-ANOMALOUS-ONLY-L-EQ-P` Only l = p torsion leaks through E(Z/p^2) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 247 | `LB-GG-AHP-GEOMETRIC` AHP: GGM bounds via geometric-search reductions (with preprocessing) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 248 | `LB-GG-CDG-AI-GGM` CDG: auxiliary-input GGM bounds via presampling | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 249 | `LB-GG-NECHAEV-DETERMINISTIC` Nechaev: deterministic generic DLP needs Omega(sqrt r) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 250 | `LB-GG-YUN-MDLP` Yun: generic n-target DLP needs Omega(sqrt(n p)) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 251 | `LB-ISOGENY-GENERIC` Isogeny-augmented generic lower bound | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-TRANSPORT-SIM |
+| 252 | `MEAS-GB-HKY-FFA-DOUBT` HKY 2015: computational evidence against the first fall degree assumption for ECDLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 253 | `OBS-XT-GLOBAL-TORSION-LIFT` Global torsion lifts: torsion too small over Q, fields too large otherwise | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 254 | `RED-BK-AGCODE-MINDIST` AG-code minimum distance vs ECDLP (survey says 'equivalent') | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-AGCODE-DIRECTION |
+| 255 | `THEOREM-FROB-SUBSPACES-131` Frobenius-stable subspaces at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-BINARY-M4-DEGREE |
+| 256 | `THEOREM-GHS-GENUS-131` GHS genus classification at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 257 | `THEOREM-XEDNI-FF-DENSITY` Exact codimension-three function-field lift density | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 258 | `THEOREM-XEDNI-FINITE-CORE` Kernel-checked finite xedni core | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-XEDNI-END-TO-END |
+| 259 | `THEOREM-YIELD-CONSERVATION` Mean decomposition-yield conservation | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-ALGEBRAIC-SOLUTION-COUNT, RT-RP-PROOF-GATE-IC-NEGATIVE |
+| 260 | `THM-BK-GG-DIEM-SUBEXP-REPORT` Survey report of Diem's rigorous L(2/3) sequence | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 261 | `THM-BK-GG-YUN-MULTI-LB` Yun: generic Omega(sqrt(rL)) for L-instance DLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-ONE-OUT-OF-L |
+| 262 | `THM-GB-SEMAEV-TENTI-2DREG` Semaev-Tenti: two-phase solving degree <= 2 d_reg - 2 with field equations | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 263 | `THM-GG-AGM-UNINSTANTIABLE` Zhandry: un-instantiability in the AGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 264 | `THM-GG-KZZ-AGM-NOT-WEAKER` KZZ: AGM is not (as formalized) weaker than the GGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 265 | `THM-GG-ZHANDRY-LABELS` Shoup vs Maurer generic models differ on multi-stage games | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 266 | `THM-PF-HKPYY-LEMMA41` HKPYY Lemma 4.1: floor(n/n') l + (n mod n') >= n' | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 267 | `THM-PF-KYTY-APS-LIMITATION` Kudo et al. 2018: acceleration of APS and its limitation | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 268 | `THM-PF-REPO-DIRECT-LOWER-BOUND` Direct-presentation algebraic IC over F_p costs >= c_m r (internal, conditional) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 269 | `THM-RP-AUTOMORPHISM-ORBIT-FOLD` Automorphism-orbit factor bases: psi(G) = [lambda]G with per-instance checks (A-FB3) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 270 | `THM-RP-BAND-AFFINE` Priced cost is affine in the native-work weight; band reversals force an interior crossing (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 271 | `THM-RP-BOOLEAN-CHAIN-UPPER` Fully Boolean two-S3 chain: d_F <= 3*ell+1, independent of n | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-RP-M3-DIAGONAL-UNCENSOR |
+| 272 | `THM-RP-COFACTOR4-RANK-SHORTFALL` Cofactor-4 curves: two-summand relation space has rank C-1 (A-RC3/A-LA4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 273 | `THM-RP-FB-BREAK-EVEN` Break-even of the per-relation cost model at m=4, n=131 (Lean instances) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 274 | `THM-RP-GUARDED-EXACT-PAIR` Guarded three-abscissa prime-field system: first fall 4, last fall 5 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 275 | `THM-RP-GUARDED-GROWING-B` Explicit-membership presentation: first fall B+1, last fall in [max(5,B+1), 3B-4] | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 276 | `THM-RP-ICNEG-YIELD-CONSERVATION` Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked) | proved_internal_unreviewed | lean_written_unchecked | 0 | independent review, then kernel-check | RT-RP-PROOF-GATE-IC-NEGATIVE |
+| 277 | `THM-RP-KEYED-INVARIANCE` Keyed-generic transcript invariance under injective operation-preserving maps (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 278 | `THM-RP-RECODED-SELECTOR-DEGREE` Selector recodings of one F17 base: canonical degree 7 -> 6 (XOR) -> 5 (one-hot) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
+| 279 | `THM-RP-SCALAR-TRANSPORT` Scalar transport and answer reflection under an injective homomorphism (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 280 | `THM-RP-SECANT-DEGREE-REDUCTION` Split-graph secant presentation: top-ideal first vanishing d+1 vs dense 2d+1 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
+| 281 | `THM-RP-SEMAEV-MONODROMY` Monodromy of the Semaev cover is (Z/2)^(m-2) | proved_internal_unreviewed | stated_open | 0 | independent review, then kernel-check | - |
+| 282 | `THM-RP-TRACE-ZERO-DOUBLING` Trace-zero bases lie in 2E and double the yield at the same degree (A-FB4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 283 | `THM-RP-TWIST-MIXED-RELATION` A rational relation with a Frobenius-negated (twist) term forces that term to vanish on odd order (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 284 | `THM-RP-YIELD-SUM-COUNT` Total yield = domain size; K2 neutrality; K5 restriction (Lean, list form) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 285 | `THM-XT-BK-IMPROBABILITY` Balasubramanian-Koblitz: small embedding degree is improbable | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 286 | `THM-XT-HS-SZPIRO-IMPLIES-LANG` Hindry-Silverman: Szpiro implies Lang | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 287 | `THM-XT-RIGOROUS-L-HALF` Rigorous L(1/2) discrete logarithms (Pomerance; F_p index calculus) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 288 | `THM-XT-RUECK-JACOBIAN-PTORSION` Rueck: p-torsion DLP in Jacobians of curves in characteristic p | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 289 | `THM-XT-SATOH-ARAKI-FERMAT` Satoh-Araki Fermat-quotient anomalous attack | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 290 | `THM-XT-TRACE-MAP-DISTORTION` The trace map distorts some points but not the G1/G2 eigenspaces | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
 
 ## Unlinked citations
 

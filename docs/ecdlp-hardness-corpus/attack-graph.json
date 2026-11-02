@@ -7,25 +7,25 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 421,
-    "frontier": 257,
+    "nodes": 478,
+    "frontier": 290,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
-      "definition": 39,
+      "definition": 41,
       "assumed": 15,
-      "proved_external": 93,
+      "proved_external": 115,
       "algorithm": 12,
-      "conditional": 62,
+      "conditional": 79,
       "measured": 20,
       "proved_internal_unreviewed": 39,
-      "open": 40,
-      "heuristic": 52,
+      "open": 42,
+      "heuristic": 62,
       "refuted": 14,
-      "proved_external_unread": 35
+      "proved_external_unread": 39
     },
     "by_formal_state": {
-      "none": 394,
+      "none": 451,
       "lean_written_unchecked": 10,
       "kernel_checked": 13,
       "stated_open": 4
@@ -33,29 +33,32 @@
   },
   "frontier": [
     {
-      "id": "COND-ECC2K130-FFDA-PROJECTION",
-      "label": "ECC2K-130 IC projection 2^86 (FFDA)",
-      "status": "conditional",
+      "id": "HEUR-RELATION-RANK",
+      "label": "Relation independence/rank heuristic",
+      "status": "heuristic",
       "formal": "none",
-      "action": "discharge each condition, or keep the row labelled conditional",
-      "impact": 8,
-      "downstream": [],
-      "depends_citations": [
-        "src/cryptanalysis/matmul_exponent.rs",
-        "src/cryptanalysis/ic_engine.rs",
-        "research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md",
-        "research/notes/ecc2k130/RESEARCH_ECC2K130_ROUTES.md",
-        "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md",
-        "research/notes/ecc2k130/RESEARCH_ECC2K130_ROUTE_TARGETS.md",
-        "examples/descent_degree_cost.rs",
-        "examples/certicom131_ic_gates.rs"
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 9,
+      "downstream": [
+        "ALG-SPARSE-LINEAR-ALGEBRA",
+        "ALG-WD-GAUDRY-2000",
+        "ALG-WD-THERIAULT-2003",
+        "ATTACK-GHS-WEIL-DESCENT",
+        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+        "COND-WD-JV-COVER-DECOMP",
+        "COND-WD-KMPS-INEFFECTIVE",
+        "THM-WD-DIEM-SMALL-GENUS",
+        "THM-WD-GTTD-THM1"
       ],
-      "research_targets": [
-        "RT-FALL-DEGREE-BRIDGE"
-      ],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": [
         {
-          "from": "OPEN-BK-GG-SUBFIELD-IC",
+          "from": "HEUR-RP-WALK-TARGET-GUARD",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
           "relation": "qualifies"
         }
       ]
@@ -66,12 +69,13 @@
       "status": "heuristic",
       "formal": "none",
       "action": "prove, or measure on a scaling family without censoring",
-      "impact": 7,
+      "impact": 8,
       "downstream": [
         "COND-PF-APS-COST",
         "COND-PF-EP-BETA-THRESHOLD",
         "COND-PF-HKPYY-COMPLEXITY",
         "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+        "COND-WD-JV-COVER-DECOMP",
         "DEF-INDEX-CALCULUS-PIPELINE",
         "FACT-PF-EP-LINEARIZED-NO-GAIN",
         "FACT-PF-MM-TRINOMIAL-NO-GAIN"
@@ -96,6 +100,56 @@
         },
         {
           "from": "THM-RP-TRACE-ZERO-DOUBLING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "ALG-WD-GAUDRY-2000",
+      "label": "Gaudry 2000: fixed-genus index calculus, Õ(q^2)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 8,
+      "downstream": [
+        "ALG-WD-THERIAULT-2003",
+        "ATTACK-GHS-WEIL-DESCENT",
+        "COND-WD-JV-COVER-DECOMP",
+        "COND-WD-KMPS-INEFFECTIVE",
+        "THM-WD-DIEM-SMALL-GENUS",
+        "THM-WD-GTTD-THM1"
+      ],
+      "depends_citations": [
+        "src/cryptanalysis/hyperelliptic_index_calculus.rs",
+        "src/cryptanalysis/jacobian_transfer/cost.rs"
+      ],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-ECC2K130-FFDA-PROJECTION",
+      "label": "ECC2K-130 IC projection 2^86 (FFDA)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 8,
+      "downstream": [],
+      "depends_citations": [
+        "src/cryptanalysis/matmul_exponent.rs",
+        "src/cryptanalysis/ic_engine.rs",
+        "research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md",
+        "research/notes/ecc2k130/RESEARCH_ECC2K130_ROUTES.md",
+        "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md",
+        "research/notes/ecc2k130/RESEARCH_ECC2K130_ROUTE_TARGETS.md",
+        "examples/descent_degree_cost.rs",
+        "examples/certicom131_ic_gates.rs"
+      ],
+      "research_targets": [
+        "RT-FALL-DEGREE-BRIDGE"
+      ],
+      "pressure": [
+        {
+          "from": "OPEN-BK-GG-SUBFIELD-IC",
           "relation": "qualifies"
         }
       ]
@@ -289,6 +343,42 @@
       ]
     },
     {
+      "id": "COND-WD-FREY-1998",
+      "label": "Frey 1998: Weil descent as an attack methodology",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 5,
+      "downstream": [
+        "COND-WD-DIEM-PLANE-CURVES",
+        "COND-WD-DT-RESULT13",
+        "COND-WD-LAINE-LAUTER",
+        "COND-WD-SMITH-THM2",
+        "DEF-WD-COVER-ATTACK"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-RP-VELU-COST",
+      "label": "Velu O(l) and sqrt-Velu O~(sqrt l) isogeny evaluation (A-ISO5)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 5,
+      "downstream": [
+        "COND-WD-GALHS-ISOGENY",
+        "COND-WD-MTW-WEAK-FIELDS",
+        "GAP-WD-JV-ISOGENY-CONJ",
+        "RED-ISOGENY-DLP-TRANSPORT",
+        "THEOREM-JMV-ISOGENY-REDUCTION"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "THM-RP-S3-ROOTS-FACTOR",
       "label": "S3(xR,xF,X) = (xR-xF)^2 (X-x(R+F)) (X-x(R-F)) (Lean)",
       "status": "proved_internal_unreviewed",
@@ -337,6 +427,23 @@
         "COND-PF-PKM-COST-THRESHOLD",
         "COND-PKM-PRIME-ALGEBRAIC",
         "DEF-PF-PKM-ISOGENY-BASE"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-WD-THERIAULT-2003",
+      "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 4,
+      "downstream": [
+        "COND-WD-JV-COVER-DECOMP",
+        "COND-WD-KMPS-INEFFECTIVE",
+        "THM-WD-DIEM-SMALL-GENUS",
+        "THM-WD-GTTD-THM1"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -432,6 +539,42 @@
       "pressure": []
     },
     {
+      "id": "HEUR-WD-DT-ASSUMPTION12",
+      "label": "Diem-Thome Heuristic Assumption 12: large-prime graph reach",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 3,
+      "downstream": [
+        "COND-WD-DT-RESULT13",
+        "COND-WD-LAINE-LAUTER",
+        "COND-WD-SMITH-THM2"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-DT-ASSUMPTION12"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+      "label": "Subgroup smoothness equals full-group smoothness",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 3,
+      "downstream": [
+        "ALG-WD-MMT-EG-COST",
+        "COND-WD-MMT-COMPOSITE-N",
+        "COND-WD-MQ-PRIME-N-FAILS"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-COST-MODEL-HYPOTHESES"
+      ],
+      "pressure": []
+    },
+    {
       "id": "ASM-PF-PKM-UNIT-COST",
       "label": "PKM unit-cost accounting model",
       "status": "assumed",
@@ -445,6 +588,25 @@
       ],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-WD-MMT-EG-COST",
+      "label": "MMT non-asymptotic Enge-Gaudry cost model for GHS curves",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 3,
+      "downstream": [
+        "COND-WD-MMT-COMPOSITE-N",
+        "COND-WD-MQ-PRIME-N-FAILS"
+      ],
+      "depends_citations": [
+        "src/cryptanalysis/jacobian_transfer/cost.rs"
+      ],
+      "research_targets": [
+        "RT-WD-COST-MODEL-HYPOTHESES"
+      ],
       "pressure": []
     },
     {
@@ -495,6 +657,22 @@
       ]
     },
     {
+      "id": "COND-WD-DIEM-PLANE-CURVES",
+      "label": "Diem 2006 (ANTS): Õ(q^(2-2/(d-2))) for plane curves of degree d",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 3,
+      "downstream": [
+        "COND-WD-DT-RESULT13",
+        "COND-WD-LAINE-LAUTER",
+        "COND-WD-SMITH-THM2"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "BRIDGE-GENERIC-TABLE",
       "label": "Conditional generic simulation of table decomposition",
       "status": "proved_internal_unreviewed",
@@ -524,6 +702,22 @@
         "COND-GB-PQ-SUBEXP-BINARY-ECDLP",
         "THM-GB-HMS-NONEXISTENCE",
         "THM-GB-PQ-FIRST-FALL-BOUND"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-WD-MOMOSE-CHAO",
+      "label": "Momose-Chao: classes of curves with weak Weil restrictions",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 3,
+      "downstream": [
+        "COND-WD-JV-COVER-DECOMP",
+        "THM-WD-JV-GENUS3-FAMILY",
+        "THM-WD-SCHOLTEN-GENUS2"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -662,30 +856,6 @@
       "pressure": []
     },
     {
-      "id": "HEUR-RELATION-RANK",
-      "label": "Relation independence/rank heuristic",
-      "status": "heuristic",
-      "formal": "none",
-      "action": "prove, or measure on a scaling family without censoring",
-      "impact": 2,
-      "downstream": [
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "COND-RP-TWO-SUMMAND-FAMILY-LAW"
-      ],
-      "depends_citations": [],
-      "research_targets": [],
-      "pressure": [
-        {
-          "from": "HEUR-RP-WALK-TARGET-GUARD",
-          "relation": "qualifies"
-        },
-        {
-          "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
-          "relation": "qualifies"
-        }
-      ]
-    },
-    {
       "id": "HEUR-XT-BGJT-DESCENT",
       "label": "BGJT descent heuristics (smoothness and PGL2 full rank)",
       "status": "heuristic",
@@ -757,6 +927,28 @@
       "pressure": []
     },
     {
+      "id": "COND-WD-DT-RESULT13",
+      "label": "Diem-Thome Heuristic Result 13: Õ(q) for non-hyperelliptic genus 3",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 2,
+      "downstream": [
+        "COND-WD-LAINE-LAUTER",
+        "COND-WD-SMITH-THM2"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-DT-ASSUMPTION12"
+      ],
+      "pressure": [
+        {
+          "from": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+          "relation": "does_not_cover"
+        }
+      ]
+    },
+    {
       "id": "THM-GG-EQUIV-CLASS-RHO",
       "label": "Rho on equivalence classes: sqrt(pi r/(2 N_C)) (C1 + C2)",
       "status": "conditional",
@@ -775,21 +967,6 @@
           "relation": "obstructs"
         }
       ]
-    },
-    {
-      "id": "ALG-RP-VELU-COST",
-      "label": "Velu O(l) and sqrt-Velu O~(sqrt l) isogeny evaluation (A-ISO5)",
-      "status": "proved_external_unread",
-      "formal": "none",
-      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
-      "impact": 2,
-      "downstream": [
-        "RED-ISOGENY-DLP-TRANSPORT",
-        "THEOREM-JMV-ISOGENY-REDUCTION"
-      ],
-      "depends_citations": [],
-      "research_targets": [],
-      "pressure": []
     },
     {
       "id": "THM-GG-HILDEBRAND-RADDING",
@@ -830,6 +1007,21 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "THM-WD-DIEM-GHS-ODD",
+      "label": "Diem 2003: GHS attack in odd characteristic",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 2,
+      "downstream": [
+        "COND-WD-JV-COVER-DECOMP",
+        "THM-WD-JV-GENUS3-FAMILY"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "THM-XT-VERHEUL-DISTORTION-EXISTS",
@@ -1267,6 +1459,119 @@
       ]
     },
     {
+      "id": "HEUR-WD-ADH-NORM-SMOOTH",
+      "label": "ADH: norms of a(x) + y b(x) are as smooth as random polynomials",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "ALG-WD-ADH-1994"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-WD-EG07-SMOOTHNESS",
+      "label": "Enge-Gaudry 2007 Heuristics 1 and 2",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-WD-EG-2007-L13"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-WD-JV-WEAKNESS-INDEPENDENT",
+      "label": "Joux-Vitse: weakness independent of isogeny class",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "GAP-WD-JV-ISOGENY-CONJ"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-JV-ISOGENY-CONJ"
+      ],
+      "pressure": [
+        {
+          "from": "THM-WD-JV-GENUS3-FAMILY",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-WD-SMITH-HYP1",
+      "label": "Smith Hypothesis 1: trigonal codomain is non-hyperelliptic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-WD-SMITH-THM2"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-SMITH-HYPOTHESES"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-WD-SMITH-HYP2",
+      "label": "Smith Hypothesis 2: rational trigonal map with probability 1/2",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-WD-SMITH-THM2"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-SMITH-HYPOTHESES"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-WD-SMITH-HYP3",
+      "label": "Smith Hypothesis 3: rational isogeny with probability 1/2",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-WD-SMITH-THM2"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-SMITH-HYPOTHESES"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-WD-SMITH-HYP4",
+      "label": "Smith Hypothesis 4: independence across tractable subgroups",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-WD-SMITH-THM2"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-SMITH-HYPOTHESES"
+      ],
+      "pressure": []
+    },
+    {
       "id": "HEUR-XT-BGJT-REPRESENTATION",
       "label": "BGJT heuristic: a sparse medium subfield representation exists",
       "status": "heuristic",
@@ -1481,6 +1786,41 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "COND-WD-GALHS-ISOGENY",
+      "label": "Galbraith-Hess-Smart 2002: extend GHS through isogenies",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [
+        "COND-WD-MTW-WEAK-FIELDS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-WD-SMITH-THM2",
+      "label": "Smith Theorem 2: about 18.57% of genus-3 hyperelliptic DLPs move to plane quartics",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 1,
+      "downstream": [],
+      "depends_citations": [
+        "src/cryptanalysis/smith_prop24.rs"
+      ],
+      "research_targets": [
+        "RT-WD-SMITH-HYPOTHESES"
+      ],
+      "pressure": [
+        {
+          "from": "THM-WD-SMITH-PROP5",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "COND-XT-BGJT-QUASIPOLY",
@@ -1747,6 +2087,20 @@
       "impact": 1,
       "downstream": [
         "COND-BINARY-WEIL-DESCENT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-WD-SCHOLTEN-GENUS2",
+      "label": "Scholten forms: genus-2 covers over F_q of E/F_(q^2)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "COND-WD-JV-COVER-DECOMP"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -2467,6 +2821,34 @@
       "pressure": []
     },
     {
+      "id": "GAP-WD-GGHS-NONHYP-COST",
+      "label": "Index-calculus cost on non-hyperelliptic gGHS covers",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-COST-MODEL-HYPOTHESES"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-WD-JV-ISOGENY-CONJ",
+      "label": "Joux-Vitse conjecture: all #E = 0 mod 4 curves over F_(p^6) are reachable",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WD-JV-ISOGENY-CONJ"
+      ],
+      "pressure": []
+    },
+    {
       "id": "GAP-XEDNI-END-TO-END",
       "label": "Xedni end-to-end bridge obligations",
       "status": "open",
@@ -2764,6 +3146,18 @@
       "pressure": []
     },
     {
+      "id": "HEUR-WD-GTTD-GENERAL",
+      "label": "GTTD Section 6: double-large-prime bound for general curves",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "HEUR-XT-EASY-LIFT-DEPENDENCE",
       "label": "Easy-lift (xedni) points are dependent with probability below 1/p",
       "status": "heuristic",
@@ -3027,6 +3421,10 @@
         {
           "from": "FACT-PRIME-FIELD-NO-EXTENSION-GAIN",
           "relation": "obstructs"
+        },
+        {
+          "from": "COND-WD-JV-COVER-DECOMP",
+          "relation": "qualifies"
         }
       ]
     },
@@ -3108,6 +3506,18 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "ALG-WD-ADH-1994",
+      "label": "Adleman-DeMarrais-Huang: subexponential DLP on large-genus hyperelliptic Jacobians",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "ALG-XT-COPPERSMITH-F2N",
@@ -3428,6 +3838,129 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "COND-WD-EG-2007-L13",
+      "label": "Enge-Gaudry 2007: L(1/3 + epsilon) DLP for low-degree curves",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-WD-HESS-F2155",
+      "label": "Hess 2004: about 2^123 more curves over F_(2^155) attackable",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-WD-JV-COVER-DECOMP",
+      "label": "Joux-Vitse 2012: cover-and-decomposition index calculus",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-WD-KMPS-INEFFECTIVE",
+      "label": "KMPS: Weil descent attacks are asymptotically almost never effective",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "COND-WD-EG-2007-L13",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-WD-LAINE-LAUTER",
+      "label": "Laine-Lauter: time-memory trade-offs for genus-3 index calculus",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-WD-MMT-COMPOSITE-N",
+      "label": "MMT: GHS beats rho on some curves for many composite N in [160, 600]",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-WD-MQ-PRIME-N-FAILS",
+      "label": "Menezes-Qu: GHS fails for prime N in [160, 600]",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-WD-MT-HESS-FIELDS",
+      "label": "Menezes-Teske 2006: which GF(2^N) are weak under gGHS",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "COND-WD-KMPS-INEFFECTIVE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-WD-MTW-WEAK-FIELDS",
+      "label": "Menezes-Teske-Weng: weak fields for ECC (e.g. GF(2^210))",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "COND-WD-KMPS-INEFFECTIVE",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "COND-XT-BD-BN-100BIT",
