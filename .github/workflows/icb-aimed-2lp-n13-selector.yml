@@ -1,0 +1,569 @@
+name: ICB aimed 2LP n13 fixture selector (one shot)
+
+# This workflow is a one-time, pre-freeze selector for one deterministic toy
+# fixture. It runs only the ignored n=13 actual-collector grid. It must not run
+# ecbench, a provider, any target-size case, or any freeze/checkpoint/image/
+# launch path. Once the tuple is preserved, delete this search and replace it
+# with a non-ignored exact fixture before the focused gates can be refreshed.
+on:
+  push:
+    branches:
+      - codex/large-prime
+    paths:
+      - .github/workflows/icb-aimed-2lp-n13-selector.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: icb-aimed-2lp-n13-selector
+  cancel-in-progress: false
+
+env:
+  STUDY_DIR: research/icb_aimed_large_prime_n53_n61_20261101
+  CARGO_BUILD_JOBS: "1"
+  CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_RELEASE_DEBUG: "0"
+  RAYON_NUM_THREADS: "1"
+  OMP_NUM_THREADS: "1"
+  RUSTFLAGS: "-C target-cpu=x86-64"
+  RUSTUP_TOOLCHAIN: "1.99.0"
+
+jobs:
+  select-n13-fixture:
+    # Two-push handoff: replace this fail-closed placeholder only after the
+    # separately reviewed source commit exists, then add this workflow as its
+    # sole child change. There is deliberately no dispatch escape hatch.
+    if: ${{ github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/large-prime' && github.event_name == 'push' && github.event.before == 'deb4901d661e1aeae42ce2f52ce2cb402698b632' && !github.event.forced }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      EXPECTED_COMMIT: ${{ github.sha }}
+      EVENT_BEFORE: ${{ github.event.before }}
+      TRIGGER_PARENT_COMMIT: deb4901d661e1aeae42ce2f52ce2cb402698b632
+    steps:
+      - name: Check out the exact pre-freeze source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Assert one-shot source and disabled scientific boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          CARGO_TARGET_DIR="$RUNNER_TEMP/icb-aimed-2lp-n13-selector-target"
+          EVIDENCE_DIR="$RUNNER_TEMP/icb-aimed-2lp-n13-selector-evidence"
+          export CARGO_TARGET_DIR EVIDENCE_DIR
+          test ! -e "$CARGO_TARGET_DIR"
+          test ! -L "$CARGO_TARGET_DIR"
+          test ! -e "$EVIDENCE_DIR"
+          test ! -L "$EVIDENCE_DIR"
+          mkdir -m 700 "$CARGO_TARGET_DIR" "$EVIDENCE_DIR"
+          test ! -L "$CARGO_TARGET_DIR"
+          test ! -L "$EVIDENCE_DIR"
+          test -z "$(find "$CARGO_TARGET_DIR" -mindepth 1 -print -quit)"
+          printf 'CARGO_TARGET_DIR=%s\nEVIDENCE_DIR=%s\n' \
+            "$CARGO_TARGET_DIR" "$EVIDENCE_DIR" >> "$GITHUB_ENV"
+          exec > >(tee "$EVIDENCE_DIR/preconditions.log") 2>&1
+
+          [[ "$EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$TRIGGER_PARENT_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          test "$EXPECTED_COMMIT" = "$GITHUB_SHA"
+          test "$EVENT_BEFORE" = "$TRIGGER_PARENT_COMMIT"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT"
+          test "$(git rev-parse HEAD^)" = "$TRIGGER_PARENT_COMMIT"
+          test -z "$(git status --porcelain --untracked-files=all)"
+
+          mapfile -t changed_paths < <(
+            git diff --name-only "$TRIGGER_PARENT_COMMIT" "$EXPECTED_COMMIT" |
+              LC_ALL=C sort
+          )
+          test "${#changed_paths[@]}" -eq 1
+          test "${changed_paths[0]}" = \
+            .github/workflows/icb-aimed-2lp-n13-selector.yml
+          printf '%s\n' "${changed_paths[@]}" > "$EVIDENCE_DIR/changed-paths.txt"
+
+          assert_empty_or_absent() {
+            local path=$1
+            if test -e "$path" || test -L "$path"; then
+              test -d "$path"
+              test ! -L "$path"
+              test -z "$(find "$path" -mindepth 1 -print -quit)"
+            fi
+          }
+          assert_empty_or_absent target
+          assert_empty_or_absent "$STUDY_DIR/attempts"
+          assert_empty_or_absent "$STUDY_DIR/sessions"
+          jq -e '
+            .freeze.status == "draft" and
+            .freeze.protocol_sha256 == null and
+            .freeze.commit == null and
+            .freeze.frozen_at == null and
+            .freeze.filed_before_affected_data == null and
+            .analysis_plan.frozen_before_data == false and
+            (.extensions.target_launch_gate | startswith("DISABLED:"))
+          ' "$STUDY_DIR/protocol/protocol.json" >/dev/null
+          jq -e '
+            .status == "invalidated" and
+            .source_commit == null and
+            .target_data.n53_runs == 0 and
+            .target_data.n61_runs == 0
+          ' "$STUDY_DIR/receipts/focused-gates.json" >/dev/null
+          for request in "$STUDY_DIR"/requests/*.json; do
+            jq -e '
+              .status == "draft_identity_blocked" and
+              .source_revision == null and
+              .ecbench_sha256 == null and
+              .image_uri == null and
+              .image_digest == null and
+              .argv == null and
+              .payload_sha256 == null and
+              .payload_bytes == null and
+              .provider_identity_sha256 == null and
+              .pod_spec_sha256 == null
+            ' "$request" >/dev/null
+          done
+          for forbidden in \
+            "$STUDY_DIR/results.json" \
+            "$STUDY_DIR/VALIDATION.json" \
+            "$STUDY_DIR/export.json" \
+            "$STUDY_DIR/receipts/checkpoint.json" \
+            "$STUDY_DIR/receipts/image.json" \
+            "$STUDY_DIR/receipts/provider-preflight.json" \
+            "$STUDY_DIR/receipts/native-analyzer-tests.json"; do
+            test ! -e "$forbidden"
+            test ! -L "$forbidden"
+          done
+
+          test "$(uname -m)" = x86_64
+          memory_total_bytes=$(awk '/^MemTotal:/ {printf "%.0f\n", $2 * 1024}' /proc/meminfo)
+          disk_available_bytes=$(df -PB1 "$RUNNER_TEMP" | awk 'NR == 2 {print $4}')
+          [[ "$memory_total_bytes" =~ ^[0-9]+$ ]]
+          [[ "$disk_available_bytes" =~ ^[0-9]+$ ]]
+          test "$memory_total_bytes" -ge $((6 * 1024 * 1024 * 1024))
+          test "$disk_available_bytes" -ge $((10 * 1024 * 1024 * 1024))
+          cgroup_memory_max=$(cat /sys/fs/cgroup/memory.max 2>/dev/null || printf unavailable)
+          cgroup_cpu_max=$(cat /sys/fs/cgroup/cpu.max 2>/dev/null || printf unavailable)
+          if [[ "$cgroup_memory_max" =~ ^[0-9]+$ ]]; then
+            test "$cgroup_memory_max" -ge $((6 * 1024 * 1024 * 1024))
+          fi
+          jq -n \
+            --arg commit "$EXPECTED_COMMIT" \
+            --arg parent "$TRIGGER_PARENT_COMMIT" \
+            --arg ref "$GITHUB_REF" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg runner_name "$RUNNER_NAME" \
+            --arg arch "$(uname -m)" \
+            --arg kernel "$(uname -sr)" \
+            --arg image_os "${ImageOS:-unknown}" \
+            --arg image_version "${ImageVersion:-unknown}" \
+            --arg os_release "$(tr '\n' ';' < /etc/os-release)" \
+            --arg cgroup_memory_max "$cgroup_memory_max" \
+            --arg cgroup_cpu_max "$cgroup_cpu_max" \
+            --arg runner_temp_disk "$(df -PB1 "$RUNNER_TEMP" | tail -n 1)" \
+            --arg workspace_disk "$(df -PB1 "$GITHUB_WORKSPACE" | tail -n 1)" \
+            --argjson memory_total_bytes "$memory_total_bytes" \
+            --argjson disk_available_bytes "$disk_available_bytes" \
+            '{
+              schema:"icb.aimed2lp.n13_selector_host/v1",
+              commit:$commit,
+              parent:$parent,
+              ref:$ref,
+              run_id:$run_id,
+              run_attempt:$run_attempt,
+              runner_name:$runner_name,
+              arch:$arch,
+              kernel:$kernel,
+              image_os:$image_os,
+              image_version:$image_version,
+              os_release:$os_release,
+              memory:{
+                proc_meminfo_total_bytes:$memory_total_bytes,
+                cgroup_max:$cgroup_memory_max
+              },
+              cpu:{cgroup_max:$cgroup_cpu_max},
+              disk:{
+                runner_temp_available_bytes:$disk_available_bytes,
+                runner_temp_df:$runner_temp_disk,
+                workspace_df:$workspace_disk
+              },
+              scientific_scope:{degree:13,target_sizes:false,provider:false,freeze:false},
+              evidence_scope:"toy_fixture_selection_only_no_wall_or_performance_claim"
+            }' > "$EVIDENCE_DIR/host.json"
+
+          hash_bound_source() {
+            {
+              printf '%s\n' \
+                Cargo.toml Cargo.lock \
+                .github/workflows/icb-aimed-2lp-n13-selector.yml \
+                docs/session-logs/2026-11-01.md \
+                examples/ecbench_aimed2lp_analyze.rs \
+                src/cryptanalysis/ecbench/koblitz_descent.rs \
+                src/cryptanalysis/ecbench/methods.rs \
+                src/cryptanalysis/ic_framework/large_prime.rs
+              find "$STUDY_DIR" -type f -print
+            } | LC_ALL=C sort -u | while IFS= read -r path; do
+              test -f "$path"
+              test ! -L "$path"
+              sha256sum "$path"
+            done
+          }
+          hash_bound_source > "$EVIDENCE_DIR/source-bindings.before.sha256"
+          printf 'one-shot n=13 selector preconditions pass for %s\n' "$EXPECTED_COMMIT"
+
+      - name: Select and record the exact Rust toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.0 --profile minimal \
+            2>&1 | tee "$EVIDENCE_DIR/rustup-toolchain-install.log"
+          cargo -V | tee "$EVIDENCE_DIR/cargo-version.txt"
+          rustc -Vv | tee "$EVIDENCE_DIR/rustc-version.txt"
+          test "$(cargo -V)" = "cargo 1.99.0 (5f94df478 2026-08-27)"
+          test "$(rustc -V)" = "rustc 1.99.0 (b940084d7 2026-09-28)"
+          grep -Fxq 'commit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4' \
+            "$EVIDENCE_DIR/rustc-version.txt"
+
+      - name: Run only the ignored n13 actual-collector selector
+        id: selector
+        shell: bash
+        run: |
+          set -uo pipefail
+          test_name='cryptanalysis::ecbench::koblitz_descent::tests::select_unsaturated_n13_actual_collector_fixture'
+          log="$EVIDENCE_DIR/n13-selector.log"
+          jq -n --arg test "$test_name" '{argv:[
+            "cargo","test","--locked","--release","--no-default-features",
+            "--lib",$test,"--jobs","1","--","--exact","--ignored",
+            "--nocapture","--test-threads=1"
+          ]}' > "$EVIDENCE_DIR/n13-selector-command.json"
+          started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          set +e
+          cargo test --locked --release --no-default-features \
+            --lib "$test_name" --jobs 1 -- \
+            --exact --ignored --nocapture --test-threads=1 \
+            2>&1 | tee "$log"
+          exit_code=${PIPESTATUS[0]}
+          set -e
+          finished_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          pass_count=$(grep -c '^test result: ok\. 1 passed; 0 failed;' "$log" || true)
+          record_count=$(grep -c '^ICB_AIMED2LP_N13_SELECTOR=' "$log" || true)
+          record_path="$EVIDENCE_DIR/n13-selector-record.json"
+          record_valid=false
+          record_canonical_valid=false
+          observation_hash_valid=false
+          relation_stream_hash_valid=false
+          record_sha256=null
+          observation_sha256=null
+          relation_stream_sha256=null
+          if test "$record_count" -eq 1; then
+            record_line=$(grep '^ICB_AIMED2LP_N13_SELECTOR=' "$log")
+            record_json=${record_line#ICB_AIMED2LP_N13_SELECTOR=}
+            printf '%s' "$record_json" > "$record_path"
+            if jq -e . "$record_path" >/dev/null; then
+              record_canonical=$(jq -cS . "$record_path")
+              if test "$record_json" = "$record_canonical"; then
+                record_canonical_valid=true
+              fi
+              if jq -e '
+                .observation as $o |
+                .schema == "icb.aimed2lp.n13_fixture_selection/v1" and
+                .curve == "K_0/GF(2^13)" and
+                .degree == 13 and
+                .selection_scope == "pre-target-ordinary-stream" and
+                .collected_b == 0 and
+                .target_data == false and
+                ((.observation_sha256 | type) == "string") and
+                (.observation_sha256 | test("^[0-9a-f]{64}$")) and
+                ($o.seed as $seed |
+                  [1,3,5,7,11,13,17,19,23,29,31] | index($seed) != null) and
+                ($o.factor_base_points as $points |
+                  [52,80,104,130] | index($points) != null) and
+                ($o.window as $window | [1,2,4,8] | index($window) != null) and
+                ($o.unit_trials as $trials | [8,16,32] | index($trials) != null) and
+                (($o.units | type) == "number") and
+                $o.units >= 1 and $o.units <= 128 and
+                (($o.ordinary_rows | type) == "number") and $o.ordinary_rows >= 0 and
+                (($o.projected_rows | type) == "number") and $o.projected_rows > 0 and
+                $o.ordinary_rank_deficient == true and
+                $o.combined_table_verified == true and
+                (($o.ordinary_columns | type) == "number") and
+                $o.ordinary_columns > 0 and
+                (($o.ordinary_relations | type) == "number") and
+                (($o.ordinary_coefficient_rank | type) == "number") and
+                $o.ordinary_coefficient_rank < $o.ordinary_columns and
+                (($o.ordinary_solve_attempts | type) == "number") and
+                $o.ordinary_rejected_relations == 0 and
+                (($o.ordinary_duplicate_relations | type) == "number") and
+                $o.ordinary_relations + $o.ordinary_duplicate_relations ==
+                  $o.ordinary_rows and
+                (($o.combined_columns | type) == "number") and
+                $o.combined_columns == $o.ordinary_columns and
+                (($o.combined_relations | type) == "number") and
+                (($o.combined_coefficient_rank | type) == "number") and
+                $o.combined_coefficient_rank == $o.combined_columns and
+                (($o.combined_solve_attempts | type) == "number") and
+                $o.combined_solve_attempts > 0 and
+                $o.combined_rejected_relations == 0 and
+                (($o.combined_duplicate_relations | type) == "number") and
+                $o.combined_relations + $o.combined_duplicate_relations ==
+                  ($o.ordinary_rows + $o.projected_rows) and
+                (($o.partial_scan_trials | type) == "number") and
+                $o.partial_scan_trials > 0 and
+                (($o.partial_summands_scanned | type) == "number") and
+                $o.partial_summands_scanned > 0 and
+                (($o.summands_scanned | type) == "number") and
+                $o.summands_scanned >= $o.partial_summands_scanned and
+                (($o.relation_scalars | type) == "array") and
+                ($o.relation_scalars | length) ==
+                  ($o.ordinary_rows + $o.projected_rows) and
+                (($o.relation_stream_records | type) == "number") and
+                (($o.relation_stream | type) == "array") and
+                ($o.relation_stream | length) == $o.relation_stream_records and
+                $o.relation_stream_records ==
+                  ($o.ordinary_rows + $o.projected_rows) and
+                [$o.relation_stream[].a] == $o.relation_scalars and
+                ([ $o.relation_stream[] | select(.kind == "ordinary") ] | length) ==
+                  $o.ordinary_rows and
+                ([ $o.relation_stream[] | select(.kind == "projected") ] | length) ==
+                  $o.projected_rows and
+                all($o.relation_stream[];
+                  ((keys | sort) == ["a","kind","points","trial"] and
+                    .kind == "ordinary" and
+                    ((.trial | type) == "number") and
+                    ((.a | type) == "number") and
+                    ((.points | type) == "array") and
+                    all(.points[]; type == "number")) or
+                  ((keys | sort) == ["a","columns","kind","trial"] and
+                    .kind == "projected" and
+                    ((.trial | type) == "number") and
+                    ((.a | type) == "number") and
+                    ((.columns | type) == "array") and
+                    all(.columns[];
+                      (type == "array") and length == 2 and
+                      ((.[0] | type) == "number") and
+                      ((.[1] | type) == "number")))) and
+                (($o.relation_stream_sha256 | type) == "string") and
+                ($o.relation_stream_sha256 | test("^[0-9a-f]{64}$")) and
+                (($o.lp_relations | type) == "object") and
+                (($o.lp_relations.lp_partials_fed | type) == "number") and
+                $o.lp_relations.lp_partials_fed > 0 and
+                (($o.lp_relations.lp_merged_relations | type) == "number") and
+                $o.lp_relations.lp_merged_relations == $o.projected_rows and
+                $o.lp_relations.lp_rejected == 0 and
+                $o.lp_relations.lp_verification_failures == 0 and
+                $o.lp_relations.lp_direct_two_sum == 0 and
+                $o.lp_relations.lp_capped == 0 and
+                (($o.lp_relations.lp_verification_scalar_mults | type) == "number") and
+                $o.lp_relations.lp_verification_scalar_mults > 0 and
+                (($o.lp_relations.lp_eliminator_relation_scalar_mults | type) == "number") and
+                $o.lp_relations.lp_eliminator_relation_scalar_mults > 0 and
+                (($o.oracle_lookups | type) == "number") and $o.oracle_lookups > 0 and
+                (($o.oracle_canonicalisations | type) == "number") and
+                (($o.oracle_frobenius_maps | type) == "number")
+              ' "$record_path" >/dev/null; then
+                record_valid=true
+              fi
+              observation_canonical=$(jq -cS '.observation' "$record_path")
+              observed_hash=$(
+                printf '%s' "$observation_canonical" | sha256sum | awk '{print $1}'
+              )
+              observation_sha256=$(jq -r '.observation_sha256' "$record_path")
+              if test "$observed_hash" = "$observation_sha256"; then
+                observation_hash_valid=true
+              fi
+              relation_stream_canonical=$(jq -cS '.observation.relation_stream' "$record_path")
+              observed_stream_hash=$(
+                printf '%s' "$relation_stream_canonical" | sha256sum | awk '{print $1}'
+              )
+              relation_stream_sha256=$(
+                jq -r '.observation.relation_stream_sha256' "$record_path"
+              )
+              if test "$observed_stream_hash" = "$relation_stream_sha256"; then
+                relation_stream_hash_valid=true
+              fi
+              record_sha256=$(sha256sum "$record_path" | awk '{print $1}')
+            fi
+          fi
+          outcome=pass
+          if test "$exit_code" -ne 0 || test "$pass_count" -ne 1 || \
+             test "$record_count" -ne 1 || test "$record_valid" != true || \
+             test "$record_canonical_valid" != true || \
+             test "$observation_hash_valid" != true || \
+             test "$relation_stream_hash_valid" != true; then
+            outcome=fail
+          fi
+          jq -n \
+            --arg schema 'icb.aimed2lp.n13_selector/v1' \
+            --arg commit "$GITHUB_SHA" \
+            --arg test "$test_name" \
+            --arg outcome "$outcome" \
+            --arg started_at "$started_at" \
+            --arg finished_at "$finished_at" \
+            --arg record_sha256 "$record_sha256" \
+            --arg observation_sha256 "$observation_sha256" \
+            --arg relation_stream_sha256 "$relation_stream_sha256" \
+            --argjson record_valid "$record_valid" \
+            --argjson record_canonical_valid "$record_canonical_valid" \
+            --argjson observation_hash_valid "$observation_hash_valid" \
+            --argjson relation_stream_hash_valid "$relation_stream_hash_valid" \
+            --argjson exit_code "$exit_code" \
+            --argjson pass_count "$pass_count" \
+            --argjson record_count "$record_count" \
+            '{
+              schema:$schema,
+              commit:$commit,
+              test:$test,
+              degree:13,
+              target_data:false,
+              outcome:$outcome,
+              exit_code:$exit_code,
+              pass_count:$pass_count,
+              record_count:$record_count,
+              record_valid:$record_valid,
+              record_canonical_valid:$record_canonical_valid,
+              observation_hash_valid:$observation_hash_valid,
+              relation_stream_hash_valid:$relation_stream_hash_valid,
+              record_sha256:(if $record_sha256 == "null" then null else $record_sha256 end),
+              observation_sha256:(if $observation_sha256 == "null" then null else $observation_sha256 end),
+              relation_stream_sha256:(if $relation_stream_sha256 == "null" then null else $relation_stream_sha256 end),
+              started_at:$started_at,
+              finished_at:$finished_at
+            }' > "$EVIDENCE_DIR/n13-selector-result.json"
+          test "$outcome" = pass
+
+      - name: Delete build target and reassert the disabled boundary
+        if: ${{ always() }}
+        shell: bash
+        env:
+          SELECTOR_OUTCOME: ${{ steps.selector.outcome }}
+        run: |
+          set -euo pipefail
+          cargo_target_dir="$RUNNER_TEMP/icb-aimed-2lp-n13-selector-target"
+          evidence_dir="$RUNNER_TEMP/icb-aimed-2lp-n13-selector-evidence"
+          test "${CARGO_TARGET_DIR:-$cargo_target_dir}" = "$cargo_target_dir"
+          test "${EVIDENCE_DIR:-$evidence_dir}" = "$evidence_dir"
+          CARGO_TARGET_DIR=$cargo_target_dir
+          EVIDENCE_DIR=$evidence_dir
+          test -d "$EVIDENCE_DIR"
+          test ! -L "$EVIDENCE_DIR"
+          printf 'postcondition audit for %s\n' "$GITHUB_SHA" \
+            | tee "$EVIDENCE_DIR/postconditions.log"
+          if test -e "$CARGO_TARGET_DIR" || test -L "$CARGO_TARGET_DIR"; then
+            test -d "$CARGO_TARGET_DIR"
+            test ! -L "$CARGO_TARGET_DIR"
+            find "$CARGO_TARGET_DIR" -depth -delete
+          fi
+          test ! -e "$CARGO_TARGET_DIR"
+          test ! -L "$CARGO_TARGET_DIR"
+
+          assert_empty_or_absent() {
+            local path=$1
+            if test -e "$path" || test -L "$path"; then
+              test -d "$path"
+              test ! -L "$path"
+              test -z "$(find "$path" -mindepth 1 -print -quit)"
+            fi
+          }
+          assert_empty_or_absent target
+          assert_empty_or_absent "$STUDY_DIR/attempts"
+          assert_empty_or_absent "$STUDY_DIR/sessions"
+          jq -e '
+            .freeze.status == "draft" and
+            .freeze.protocol_sha256 == null and
+            .freeze.commit == null and
+            .freeze.frozen_at == null and
+            .freeze.filed_before_affected_data == null and
+            .analysis_plan.frozen_before_data == false and
+            (.extensions.target_launch_gate | startswith("DISABLED:"))
+          ' "$STUDY_DIR/protocol/protocol.json" >/dev/null
+          jq -e '
+            .status == "invalidated" and
+            .source_commit == null and
+            .target_data.n53_runs == 0 and
+            .target_data.n61_runs == 0
+          ' "$STUDY_DIR/receipts/focused-gates.json" >/dev/null
+          for request in "$STUDY_DIR"/requests/*.json; do
+            jq -e '
+              .status == "draft_identity_blocked" and
+              .source_revision == null and
+              .ecbench_sha256 == null and
+              .image_uri == null and
+              .image_digest == null and
+              .argv == null and
+              .payload_sha256 == null and
+              .payload_bytes == null and
+              .provider_identity_sha256 == null and
+              .pod_spec_sha256 == null
+            ' "$request" >/dev/null
+          done
+          for forbidden in \
+            "$STUDY_DIR/results.json" \
+            "$STUDY_DIR/VALIDATION.json" \
+            "$STUDY_DIR/export.json" \
+            "$STUDY_DIR/receipts/checkpoint.json" \
+            "$STUDY_DIR/receipts/image.json" \
+            "$STUDY_DIR/receipts/provider-preflight.json" \
+            "$STUDY_DIR/receipts/native-analyzer-tests.json"; do
+            test ! -e "$forbidden"
+            test ! -L "$forbidden"
+          done
+
+          hash_bound_source() {
+            {
+              printf '%s\n' \
+                Cargo.toml Cargo.lock \
+                .github/workflows/icb-aimed-2lp-n13-selector.yml \
+                docs/session-logs/2026-11-01.md \
+                examples/ecbench_aimed2lp_analyze.rs \
+                src/cryptanalysis/ecbench/koblitz_descent.rs \
+                src/cryptanalysis/ecbench/methods.rs \
+                src/cryptanalysis/ic_framework/large_prime.rs
+              find "$STUDY_DIR" -type f -print
+            } | LC_ALL=C sort -u | while IFS= read -r path; do
+              test -f "$path"
+              test ! -L "$path"
+              sha256sum "$path"
+            done
+          }
+          hash_bound_source > "$EVIDENCE_DIR/source-bindings.after.sha256"
+          cmp "$EVIDENCE_DIR/source-bindings.before.sha256" \
+              "$EVIDENCE_DIR/source-bindings.after.sha256"
+          test -z "$(git status --porcelain --untracked-files=all)"
+          test -z "$(find "$EVIDENCE_DIR" -mindepth 1 -type l -print -quit)"
+
+          jq -n \
+            --arg schema 'icb.aimed2lp.n13_selector_workflow/v1' \
+            --arg commit "$GITHUB_SHA" \
+            --arg selector_outcome "$SELECTOR_OUTCOME" \
+            '{schema:$schema,commit:$commit,selector_outcome:$selector_outcome}' \
+            > "$EVIDENCE_DIR/workflow-outcome.json"
+          while IFS= read -r artifact; do
+            test ! -L "$artifact"
+            case "$artifact" in
+              *.json|*.log|*.txt|*.sha256) ;;
+              *) printf 'unexpected evidence file: %s\n' "$artifact" >&2; exit 1 ;;
+            esac
+          done < <(find "$EVIDENCE_DIR" -maxdepth 1 -type f -print | LC_ALL=C sort)
+          printf 'source unchanged; target and all scientific outputs absent\n' \
+            | tee -a "$EVIDENCE_DIR/postconditions.log"
+          (
+            cd "$EVIDENCE_DIR"
+            find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%P\n' \
+              | LC_ALL=C sort | xargs -r sha256sum
+          ) > "$EVIDENCE_DIR/SHA256SUMS"
+
+      - name: Upload selector evidence on success or failure
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: icb-aimed-2lp-n13-selector-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/icb-aimed-2lp-n13-selector-evidence/*.json
+            ${{ runner.temp }}/icb-aimed-2lp-n13-selector-evidence/*.log
+            ${{ runner.temp }}/icb-aimed-2lp-n13-selector-evidence/*.txt
+            ${{ runner.temp }}/icb-aimed-2lp-n13-selector-evidence/*.sha256
+            ${{ runner.temp }}/icb-aimed-2lp-n13-selector-evidence/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
