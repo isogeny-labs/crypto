@@ -1,0 +1,16 @@
+[package]
+name = "twist-certificate-instance-proof"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde_json = { version = "=1.0.154", features = ["arbitrary_precision"] }
+sha2 = "=0.10.9"
+hex = "=0.4.3"
+serde = { version = "=1.0.229", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
