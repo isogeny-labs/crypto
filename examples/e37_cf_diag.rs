@@ -29,98 +29,24 @@
 //! RAYON_NUM_THREADS=1 ./e37_checks --json experiments/44_pivot_rules_confirm/checks.json
 //! ```
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use crypto_lib::cryptanalysis::chain_pivot_rules::{
-    probe_begin, probe_end, take_diag, ArrivalRule, ReadProbe, RuleCheck,
+    probe_begin, probe_end, ArrivalRule, ReadProbe, RuleCheck,
 };
-use crypto_lib::cryptanalysis::gaudry_quartic::{PivotCheck, PivotRule, QuarticSolve};
+use crypto_lib::cryptanalysis::gaudry_quartic::QuarticSolve;
 use crypto_lib::cryptanalysis::klein_v4::{
-    lift_back_v4, solve_weighted_chain_with, v4_system, Pivot, SymmetrisedV4, MACAULAY_BOUND,
+    solve_weighted_chain_with, v4_system, Pivot, SymmetrisedV4, MACAULAY_BOUND,
 };
 use crypto_lib::cryptanalysis::quartic_folds::{generate_gls_klein_instance, klein_base_with};
 use crypto_lib::cryptanalysis::residual_walk::mix64;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
-use serde::Serialize;
-use serde_json::json;
 
 const SALT: u64 = 0xE37C_0001;
-const CALLS_PER_CURVE: usize = 32;
-const CURVES: [(u64, u64); 10] = [
-    (101, 1),
-    (101, 2),
-    (149, 1),
-    (149, 2),
-    (197, 1),
-    (197, 2),
-    (269, 1),
-    (269, 2),
-    (397, 1),
-    (397, 2),
-];
-const RULES: [(ArrivalRule, &str); 4] = [
-    (ArrivalRule::Fifo, "F"),
-    (ArrivalRule::Static, "S"),
-    (ArrivalRule::FifoStatic, "H"),
-    (ArrivalRule::Lifo, "L"),
-];
-
-/// `(solutions, degree, decomposition set, fell back, probe, state)`.
-type Run = (
-    Option<Vec<[u64; 4]>>,
-    u16,
-    Vec<[u64; 4]>,
-    bool,
-    ReadProbe,
-    QuarticSolve,
-);
-
-/// One control's tallies.
-#[derive(Default, Serialize, Clone)]
-struct Tally {
-    calls: usize,
-    /// Calls where the control could be aimed (a target row or column found).
-    aimed: usize,
-    /// Calls where the corruption moved different contents (diagnostic).
-    effective: usize,
-    /// Positive check: first log difference at the same phase and column,
-    /// different row hash.
-    positive: usize,
-    /// First log difference elsewhere (another column or phase, or one log
-    /// a prefix of the other): structure changed, no same-column read.
-    structural: usize,
-    /// Logs identical.
-    unread: usize,
-    /// Detected (any call), and detected with a positive check.
-    detected: usize,
-    detected_positive: usize,
-    /// Calls with a non-empty clean solution set, and those detected with a
-    /// positive check.
-    nonempty: usize,
-    nonempty_detected_positive: usize,
-    /// Detections that came through the fallback flag only.
-    via_fallback: usize,
-}
 
 fn log_key(p: &ReadProbe) -> Vec<(u8, u32, u64)> {
     p.reads.iter().map(|r| (r.0, r.1, r.3)).collect()
-}
-
-/// 0 = positive (same phase/column, other hash), 1 = structural, 2 = equal.
-fn first_difference(clean: &ReadProbe, bad: &ReadProbe) -> u8 {
-    let (a, b) = (log_key(clean), log_key(bad));
-    match a.iter().zip(&b).position(|(x, y)| x != y) {
-        Some(k) => {
-            if (a[k].0, a[k].1) == (b[k].0, b[k].1) {
-                0
-            } else {
-                1
-            }
-        }
-        None if a.len() != b.len() => 1,
-        None => 2,
-    }
 }
 
 fn main() {
@@ -176,17 +102,6 @@ fn main() {
                 c.0.pivots, bad.0.pivots, c.0.zero_rows, bad.0.zero_rows, c.0.dim, bad.0.dim,
                 c.0.reached_pivots, bad.0.reached_pivots, c.2, bad.2, ka.len(), kb.len(),
                 k.map(|k| ka.get(k)), k.map(|k| kb.get(k))
-            );
-            let _ = (
-                HashMap::<u8, u8>::new(),
-                take_diag(),
-                PivotCheck::default(),
-                PivotRule::Lowest,
-                lift_back_v4 as usize,
-                json!(0),
-                CURVES,
-                RULES,
-                CALLS_PER_CURVE,
             );
         }
     }
