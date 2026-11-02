@@ -33,7 +33,9 @@ session's setup.
    the server until a checkout needs them. Each repository then gets its
    virtualenv.
 3. **Credentials.** Installs a git credential helper for `https://github.com`
-   that reads `GH_APP_*` or `GH_SERVICE_TOKEN` when git needs a credential.
+   that reads `GH_APP_*`, `GH_SERVICE_TOKEN`, or else `GH_TOKEN`/`GITHUB_TOKEN`
+   when git needs a credential. The fallback lets a session clone a sibling
+   repository that the session's own git proxy does not cover.
    gh, aws, kubectl and the agent CLIs read their own variables. Writes
    `~/.config/cloud-setup/env` (PATH, mode 600) and sources it from `~/.bashrc`
    and `~/.profile`. It prints the names of the credential variables it can
@@ -43,6 +45,15 @@ session's setup.
 
 The Conductor control plane and the cairn node are processes. The SessionStart
 hook (`.claude/hooks/session-start.sh`) starts them in each session.
+
+**Containers restored from a cache.** On 2026-11-02, a test session in an
+environment whose setup-script field had just changed got a container whose
+session-start log was a day older. None of the files `cloud-setup.sh` leaves
+behind were present, so the setup script had not run in it. The SessionStart
+hooks run in every session, so they cover this case. crypto's hook runs
+`setup-workstation.sh` with the credential helper and installs the lean Sage
+build in the background. crypto-autoresearcher's hook runs `cloud-setup.sh`
+itself.
 
 ## Credentials
 
@@ -59,7 +70,7 @@ The script writes no credentials. Set them in the environment's settings:
 
 | Service | Variables |
 | --- | --- |
-| GitHub | `GH_TOKEN` (gh), or `GH_SERVICE_TOKEN`, or `GH_APP_ID` + `GH_APP_INSTALLATION_ID` + `GH_APP_PRIVATE_KEY` (git and gh) |
+| GitHub | `GH_APP_ID` + `GH_APP_INSTALLATION_ID` + `GH_APP_PRIVATE_KEY`, or `GH_SERVICE_TOKEN`, or `GH_TOKEN`/`GITHUB_TOKEN` (git, in that order; gh reads `GH_TOKEN` itself) |
 | AWS, S3 checkpoints | `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` [+ `AWS_SESSION_TOKEN`], `AWS_REGION`, `CHECKPOINT_BUCKET` |
 | Iso Lab | `ISOLAB_URL`, or `KUBECONFIG` + `ISOLAB_KUBE_CONTEXT` |
 | Conductor | `CONDUCTOR_ENDPOINT` + `CONDUCTOR_TOKEN` (shared control plane) |

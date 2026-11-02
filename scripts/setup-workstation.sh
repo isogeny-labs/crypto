@@ -41,6 +41,8 @@
 #   WITH_GEMINI=1       also install @google/gemini-cli
 #   WITH_LATEX=1        also install a TeX Live (papers/, iacr-eprint skill)
 #   WITH_RUST_BUILD=1   also `cargo build --release` the crypto workspace (slow)
+#   CLONE_KEEP_RE       ERE of paths a partial clone keeps on disk even when
+#                       over CLONE_BLOB_LIMIT (src/, include/, source files)
 #   CLONE_REPOS         space-separated repos to clone when missing (all three);
 #                       repos already in $WORKSPACE are set up either way
 #
@@ -374,7 +376,7 @@ install_sage() {
     run "$mm" create -y -r "$SAGE_PREFIX" -p "$env" -c conda-forge "${sage_pkgs[@]}" \
       || { warn "SageMath install failed"; run rm -rf "$SAGE_PREFIX/pkgs"; return; }
     # The environment hard-links the extracted packages; this drops the archives.
-    run "$mm" clean -a -y -r "$SAGE_PREFIX" >/dev/null || true
+    run env MAMBA_ROOT_PREFIX="$SAGE_PREFIX" "$mm" clean -a -y >/dev/null || true
   fi
   # `sage -python script.py` is the upstream CLI convention frozen trial plans
   # use; conda-forge's `sage` has no -python, so wrap it.
@@ -514,8 +516,11 @@ mint() (
     jq -r .token "$tok"
   elif [ -n "${GH_SERVICE_TOKEN:-}" ]; then
     printf '%s\n' "$GH_SERVICE_TOKEN"
+  elif [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ]; then
+    # The token gh itself would use; still handed only to https://$host.
+    printf '%s\n' "${GH_TOKEN:-$GITHUB_TOKEN}"
   else
-    echo "gh-app-token: no GitHub service credential (GH_APP_* or GH_SERVICE_TOKEN) in the environment" >&2
+    echo "gh-app-token: no GitHub credential (GH_APP_*, GH_SERVICE_TOKEN, GH_TOKEN or GITHUB_TOKEN) in the environment" >&2
     return 1
   fi
 )
@@ -599,9 +604,12 @@ clone_repo() {
     || { warn "clone of $name failed"; return 1; }
   # A dry run has no clone to inspect or configure.
   [ "$DRY_RUN" = 1 ] && return 0
-  local skipped
+  # Large sources stay on disk anyway (fetched by the checkout): a build reads
+  # them, e.g. cryptanalysis's generated src/generated/*.h tables.
+  local skipped keep="${CLONE_KEEP_RE:-(^|/)(src|include)/|\.(c|h|cc|cpp|hpp|rs|py|go|lean|sage|sh)\$}"
   skipped="$(join <(git -C "$dir" rev-list --objects --missing=print -1 HEAD | sed -n 's/^?//p' | sort) \
-      <(git -C "$dir" ls-tree -r HEAD --format='%(objectname) %(path)' | sort) | cut -d' ' -f2-)" || true
+      <(git -C "$dir" ls-tree -r HEAD --format='%(objectname) %(path)' | sort) | cut -d' ' -f2- |
+      grep -Ev -- "$keep")" || true
   { echo '/*'; [ -n "$skipped" ] && printf '%s\n' "$skipped" | sed 's/[][*?!#\\]/\\&/g; s#^#!/#'; } |
     git -C "$dir" sparse-checkout set --no-cone --stdin \
     && run git -C "$dir" checkout -q \

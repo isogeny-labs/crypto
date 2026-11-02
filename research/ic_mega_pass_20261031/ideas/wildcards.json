@@ -1,0 +1,132 @@
+{
+ "lens": "wildcards",
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/ideas/wildcards.json",
+ "ideas": [
+  {
+   "id": "MP-wildcards-1",
+   "title": "Belief propagation / replica cavity on the descended Boolean S_3 system as a solvability-phase predictor",
+   "statement": "Treat the Weil-descended S_3 system over F_2 (n vars per point, l-dim subspace) as a random-like XOR-SAT/ANF factor graph; run BP/survey propagation and compute the replica-symmetric free energy; predict a phase (easy/clustered/frozen) as a function of (n,l,m) and use BP marginals to fix variables before F4.",
+   "mechanism": "Statistical physics: decimation via BP marginals reduces effective l before Gr\u00f6bner; the cavity entropy predicts whether d_F stays bounded (RS-easy phase) or grows (clustered).",
+   "wall_bypassed": "TREAT-first-fall-degree-constant (open question whether d_F grows unboundedly)",
+   "why_wall_hypotheses_fail": "The closure is a measurement of Gr\u00f6bner presentations; it does not bound message-passing decimation, which uses the field representation non-generically and is not an algebraic-degree method.",
+   "nongenericity_argument": "If BP-decimation solves a constant fraction of variables at O(poly n) cost per instance in the RS phase, per-target D drops polynomially while B=2^l is unchanged; B*D^2<N needs l<=n/3 regime with poly D, which is exactly the regime where d_F would be bounded \u2014 so honest expectation: accounting (predicts d_F growth) unless decimation succeeds beyond the algebraic easy region.",
+   "prior_art": "Mezard-Montanari; Coja-Oghlan et al. k-XORSAT threshold (arXiv:2301.09287, in corpus as RMT threshold, but not for the decomposition system itself); Petit-Quisquater Boolean descent; WDSat (Trimoska).",
+   "novelty_status": "novelty_unverified (no web search run)",
+   "falsifier": {
+    "design": "Generate 200 descended S_3 instances at n=17,19,21, l=n/3..n/2 (planted-decomposable and random targets). Run loopy BP on the ANF factor graph (numpy, damping 0.5), decimate the most biased 10% variables, then msolve on residual; compare success rate and residual solving degree vs plain msolve.",
+    "prediction_if_true": "BP marginal bias on planted solution bits >0.6 for >=30% of vars at l<=n/3, residual d_F drops by >=1 vs baseline.",
+    "prediction_if_false": "Marginals ~0.5 (paramagnetic, no information) at all (n,l); residual d_F unchanged; closes BP decimation for this system.",
+    "tools": "python3+numpy+cypari2; msolve; cryptominisat5",
+    "toy_params": "n in {17,19,21}, l in {5..9}, m=2 (S_3), 200 instances/cell",
+    "cpu_minutes": 15
+   },
+   "expected_class": "accounting",
+   "risk": "High-degree factors (S_3 degree 2 in each x, ANF degree up to ~4) make factor graph dense; BP likely paramagnetic."
+  },
+  {
+   "id": "MP-wildcards-2",
+   "title": "Automaton/transducer for tau-adic NAF windows on Koblitz curves: factor base = points whose scalar has a regular-language tau-adic expansion",
+   "statement": "Define factor bases on Koblitz K-curves as sets S_L={[k]G : tau-NAF(k) in regular language L} (e.g. digits supported in a window, or sparse). Sums of two members are computed by a finite carry transducer, so 'is R in S_L+S_L' becomes an automaton-intersection problem on the tau-adic expansion of log R.",
+   "mechanism": "Transducer carry propagation on Z[tau]: addition of tau-adic expansions is rational; regular languages closed under transducer images.",
+   "wall_bypassed": "Generic oracle bound / KN-OPEN-91d4f6 (non-group filters)",
+   "why_wall_hypotheses_fail": "It does not escape: membership needs log R, i.e. the transducer acts on scalars, not on coordinates. Wall applies fully unless a coordinate-side transducer exists (it does not: x([k]G) is not automatic in k).",
+   "nongenericity_argument": "None. Honest: this is a relabelling of discrete-log structure; it gives a closure note that tau-adic regular factor bases are equivalent to scalar-side interval/digit bases (closed by Wagner/k-list and generic bound). Included as falsifiable obstruction: test whether x-coordinates of S_L have any low-complexity F_2-structure (would be a coordinate-side door).",
+   "prior_art": "Solinas tau-NAF; Allouche-Shallit automatic sequences; programme INTERNAL item (b) tau-adic NAF weight sum-closure (corpus, which measures scalar side) \u2014 new here is the coordinate-side automaticity test.",
+   "novelty_status": "novelty_unverified (no web search run)",
+   "falsifier": {
+    "design": "K-curve over F_{2^23} (and n=29): S_L = scalars with tau-NAF supported in first 12 digits (|S_L|~3^12/..). Compute x(P) for P in S_L; measure F_2-linear complexity (Berlekamp-Massey over bits) and dimension of F_2-span of x(S_L) vs random sets of equal size; also the Gr\u00f6bner degree of the vanishing ideal of x(S_L) bits.",
+    "prediction_if_true": "F_2-span dimension or vanishing-ideal degree markedly below random (e.g. span < n or a degree-2 annihilator space beyond counting).",
+    "prediction_if_false": "x(S_L) indistinguishable from random sets: full span n, annihilator counts match binomial prediction -> closes automaton bases as coordinate-generic.",
+    "tools": "python3+numpy+cypari2; msolve; cryptominisat5",
+    "toy_params": "K-curve y^2+xy=x^3+1 over F_{2^23}, F_{2^29}; |S_L| 2^10..2^14",
+    "cpu_minutes": 15
+   },
+   "expected_class": "relabelling",
+   "risk": "Expected null; kept for the coordinate-side test only."
+  },
+  {
+   "id": "MP-wildcards-3",
+   "title": "Tropical/Newton-polytope (Bernstein-Kushnirenko) count of the descended summation system restricted to Hamming-ball / sparse bases",
+   "statement": "Compute the mixed volume / tropical prevariety of the Weil-descended S_3 system with the factor base given by a monomial-sparse parametrisation (x = sum of few basis elements). BKK root count below the Bezout count would predict a smaller Gr\u00f6bner/homotopy problem; tropical initial forms identify which monomial supports collapse.",
+   "mechanism": "Tropical geometry: polyhedral homotopy cost ~ mixed volume, which can be exponentially below Bezout for sparse supports; sparse resultants (Canny-Emiris) give a degree certificate.",
+   "wall_bypassed": "TREAT-first-fall-degree-constant / no-low-degree-membership (cost = solving degree)",
+   "why_wall_hypotheses_fail": "Closure measures Macaulay/F4 solving degree of dense presentations; sparse-resultant degree is a different complexity measure keyed to Newton polytopes, not covered by d_F measurements.",
+   "nongenericity_argument": "Only via the descended system's solve cost: if mixed volume grows like 2^{c n} with c below the Bezout exponent such that per-target D shrinks enough that B*D^2<N at l~n/m. Most likely the field equations x_i^2=x_i destroy sparsity (each Boolean var adds a full simplex), making MV=Bezout: then accounting.",
+   "prior_art": "Tropical Semaev polynomials (adjacent_fields lane (4), no concrete experiment in corpus); Canny-Emiris sparse resultants; Faugere-Spaenlehauer-Svartz sparse Gr\u00f6bner bases.",
+   "novelty_status": "novelty_unverified (no web search run)",
+   "falsifier": {
+    "design": "Prime-field analogue first: S_3 over F_p with base x=a0+a1 t (2-dim F_p-param of F_{p^2}?) \u2014 use F_{p^n} with n=3..5 descent (csd/fpn_degrees.py convention), compute Newton polytopes in Python, mixed volume via PARI-free exact LP (scipy/own lifting), compare with Bezout and with msolve degree of the ideal.",
+    "prediction_if_true": "MV/Bezout ratio decays exponentially in n and msolve degree tracks MV.",
+    "prediction_if_false": "MV = Bezout (up to O(1)) for all n: tropical view adds nothing; record as accounting closure.",
+    "tools": "python3+numpy+cypari2; msolve; cryptominisat5",
+    "toy_params": "F_{p^n}, p~2^10, n=3,4,5, m=2,3",
+    "cpu_minutes": 15
+   },
+   "expected_class": "accounting",
+   "risk": "Mixed-volume computation for n*m vars is itself expensive; keep n*m<=10."
+  },
+  {
+   "id": "MP-wildcards-4",
+   "title": "Random-matrix / k-XORSAT core prediction of Macaulay rank deficiency at degree d for descended S_3",
+   "statement": "Model the degree-d Macaulay matrix of the descended S_3 system as a structured sparse random matrix over F_2; predict its rank via 2-core/peeling (cavity) analysis of the row-column hypergraph. The degree where predicted rank reaches the number of monomials minus solutions gives a statistical d_F estimate that can be extrapolated to n=131.",
+   "mechanism": "Random matrix theory/peeling: rank of sparse F_2 matrices determined by core structure (Coja-Oghlan et al. 2023); deviation from prediction exposes algebraic (non-random) syzygies = structure.",
+   "wall_bypassed": "TREAT-first-fall-degree-constant ('whether d_F grows without bound is open')",
+   "why_wall_hypotheses_fail": "Closure leaves growth open; it does not use any statistical rank model. This is an accounting tool to decide the open question, not a bypass.",
+   "nongenericity_argument": "Theory/accounting: no exponent change itself. It would decide whether lever 1 (bounded d_F) can ever give B*D^2<N.",
+   "prior_art": "k-XORSAT threshold revisited (arXiv:2301.09287) \u2014 corpus lists it for the RELATION matrix; new mechanism here is applying it to the MACAULAY matrix rows (degree-d multiples), with excess rank defect as signature of non-random syzygies.",
+   "novelty_status": "novelty_unverified (no web search run)",
+   "falsifier": {
+    "design": "Build degree-d Macaulay matrices (d=2..5) of descended S_3 at n=13..23, l=n/3; compute actual F_2 rank (numpy bit-packed Gaussian elimination / M4RI-free) and peeling-core predicted rank of a degree-matched random matrix with identical row/column degree sequence. Fit d_F(n) from both.",
+    "prediction_if_true": "Actual rank defect vs random model is O(1) and predicted d_F stays <=5 through n=23 -> supports bounded d_F (lever 1 alive).",
+    "prediction_if_false": "Defect grows with n and random-model d_F grows ~log n or sqrt n -> evidence for unbounded d_F; closes statistical optimism.",
+    "tools": "python3+numpy+cypari2; msolve; cryptominisat5",
+    "toy_params": "n in 13,15,17,19,21,23; l=floor(n/3); d=2..5; 20 instances each",
+    "cpu_minutes": 15
+   },
+   "expected_class": "theory",
+   "risk": "Matrix sizes at d=5,n=23 (~C(46,5)) may exceed budget; cap at d=4 for n>=21."
+  },
+  {
+   "id": "MP-wildcards-5",
+   "title": "Transfer-operator spectrum of the translation walk x -> x(P+G_i) restricted to a factor-base subspace: Ruelle gaps as non-uniform hitting of V",
+   "statement": "Consider the Markov operator T on F_2^n-cosets of a factor-base subspace V induced by random r-adding steps P->P+G_i, observed through x(P) mod V. If T's spectral gap on V-coset functions is anomalously small, walks linger near V and hit decomposable points more often than uniform; this is a non-generic (coordinate-dependent) sampler for relation candidates.",
+   "mechanism": "Dynamical systems: transfer operator of the walk projected through the representation map x mod V; spectral gap = rate of equidistribution of coordinates.",
+   "wall_bypassed": "Summation-cover monodromy (mean yield is double count) / Generic oracle bound",
+   "why_wall_hypotheses_fail": "Monodromy closure fixes mean yield over uniform targets; a sampler biased toward targets that decompose changes the distribution of targets, which the closure does not cover. Generic bound: the projection x mod V is representation-dependent.",
+   "nongenericity_argument": "Gain = hitting-probability bias factor beta of V-cosets; B*D^2 drops by beta. Need beta super-polynomial; by Weil/character-sum bounds (Kohel-Shparlinski) equidistribution of x in subspaces is O(sqrt q) error, so beta=1+O(q^{-1/2}*2^{n-l}) -> expect constant factor at best. Classified engineering unless measured beta grows with n.",
+   "prior_art": "Teske r-adding walks; Kohel-Shparlinski character sums on EC; LEAD-RHO-r-adding-walk-mixing (closed, about mixing in group, not coordinate projection).",
+   "novelty_status": "novelty_unverified (no web search run)",
+   "falsifier": {
+    "design": "Binary curve over F_{2^n}, n=17..25, V = random l-dim F_2-subspace (l=n/2). Run 2^20-step r=20 adding walks; record x(P) in V coset histogram and the empirical transition matrix on coset-classes of the quotient map F_2^n -> F_2^n/V restricted to a hash of 2^8 classes; compute second eigenvalue and the frequency of x(P) in V vs 2^{l-n}.",
+    "prediction_if_true": "Frequency of x in V exceeds 2^{l-n} by factor growing with n, or second eigenvalue bounded away from 0 in a way that correlates with V.",
+    "prediction_if_false": "Frequency = 2^{l-n}(1+O(2^{-n/2}*poly)) and spectrum flat -> closes walk-biased sampling as generic.",
+    "tools": "python3+numpy+cypari2; msolve; cryptominisat5",
+    "toy_params": "n in 17,19,21,23,25; l=n/2; 8 subspaces; 2^20 steps each",
+    "cpu_minutes": 15
+   },
+   "expected_class": "engineering",
+   "risk": "Almost certainly killed by Weil bound; cheap falsifier."
+  },
+  {
+   "id": "MP-wildcards-6",
+   "title": "Exact tensor-network contraction of the hashed factor-base relation count (hashed-ecdl-tensor) with tree-width bounded by l",
+   "statement": "Write #decompositions of R over a hashed/subspace base as a tensor-network contraction: each point slot is a tensor indexed by l subspace bits, the addition constraint is factored through the Semaev cover into local 3-index tensors via intermediate points (chain S_3(x1,x2,u),S_3(u,x3,R)). Contraction cost is 2^{tw} with tw = treewidth; if bounded by ~l+const, counting (and thus decision) costs 2^l*poly instead of 2^{2l}.",
+   "mechanism": "Tensor networks: exact contraction order; intermediate point u ranges over the whole field (2^n) unless u is also projected \u2014 the key question is whether the S_3 tensor on (V,V,F) has low CP/Tucker rank over F_2 or over C after Fourier transform.",
+   "wall_bypassed": "Generic oracle bound (MITM/enumeration) + Wagner k-list",
+   "why_wall_hypotheses_fail": "If the S_3 tensor restricted to V x V x F has low rank in an algebraic (field-representation) basis, contraction uses coordinate structure, not group operations; generic bound does not apply to low-rank-decomposition of an algebraically defined tensor.",
+   "nongenericity_argument": "Requires tensor rank r_T of S_3|_{VxVxF} with r_T << 2^l: then per-target D ~ r_T*2^l and B*D^2 < N could hold when r_T ~ poly. Generic expectation: rank ~ 2^{min} full -> constant factor. The 9/4 threshold noted for the crate is the stated rank target.",
+   "prior_art": "crates/hashed-ecdl-tensor (programme); Hell's Bells ternary fast MM (ePrint 2026/1688) for rank; Valiant holographic algorithms; MPS/PEPS counting.",
+   "novelty_status": "novelty_unverified (no web search run)",
+   "falsifier": {
+    "design": "n=11,13,15 binary curve, l=4..6. Build tensor T[a,b,c]=1 iff S_3(x(a),x(b),x(c))=0 for a,b in V, c in F_{2^n}. Compute F_2 flattening ranks (mode-1,2,3) and over Q/C via numpy SVD, plus a greedy CP-rank upper bound by ALS over R; compare to random 0/1 tensor of equal density.",
+    "prediction_if_true": "Flattening rank of mode-3 << min(2^{2l},2^n) (e.g. polynomial in l) and CP upper bound sub-2^l, distinctly below random control.",
+    "prediction_if_false": "Flattening ranks full (=min of dims) like random control -> tensor contraction gives only constant factor; closes the crate's exponent hope.",
+    "tools": "python3+numpy+cypari2; msolve; cryptominisat5",
+    "toy_params": "n in 11,13,15; l in 4,5,6; F_2 and R ranks",
+    "cpu_minutes": 15
+   },
+   "expected_class": "advance",
+   "risk": "Flattening rank is lower bound for CP; full flattening rank kills it quickly."
+  }
+ ]
+}
