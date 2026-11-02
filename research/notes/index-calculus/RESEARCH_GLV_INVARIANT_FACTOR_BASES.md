@@ -4366,3 +4366,113 @@ generic; at `p ≤ 397` with `≈ 450` columns, accidental zeros are too frequen
 would have to be priced, and it could not exceed the `70`–`88 %` per-column agreement above.  Also not done: the
 validation gate, the leaderboard and `benchmarks/`.  **Next lever:** unchanged from §9.37, the Macaulay matrix
 itself (`176,064` entries a call, all of the `1`-GAE cost).
+
+### 9.43 E36 measured: arrival-order pivots (F) cut A's per-call `C` `1.47`–`1.55×` with no selection work and are ahead of A and E25 at every weight on all 20 rows — but the registered kill criterion fired on the S/H inverse-map control
+
+*2026-11-02.*  Pre-registration §9.41 (`cd7e571f7c`, before any code).  Code: `a86c6c846d` (module
+`src/cryptanalysis/chain_pivot_rules.rs`), `78add3ddbb` (the `klein_v4` dispatch hook, a commit of its
+own), `df82b2e4b3` (harness); control revision `ab560e5cf1` (below).  Binaries built from an export of
+`df82b2e4b3` (no E35 code), pinned by sha256 in `experiments/40_pivot_rules/binary_sha256.txt`, run only
+from the scratchpad copies.  Records: `experiments/40_pivot_rules/` (`stage_a.{json,log}`,
+`checks{,_v1}.{json,log}`, `identity_existing_solvers.json`, `identity/`, `e2e_<rule>_karatsuba_p*s*.json`
+and logs, `tables.md`, `summary.json` from `examples/e36_tables.rs`).  Report:
+`research/e36_pivot_rules_20261102/`.  Host: this 4-vCPU container, runs on two cores (a parallel
+experiment, E35, on the others); isolab-eks is unreachable from it (no `aws`, no `kubectl`): **operation
+counts only, no wall-time claim.**  Runs: Stage A 100,000 solves (10 solvers × 10,000 calls), 40
+end-to-end runs (four rules × ten curves, both arms each), 0 failures; every log recovered and every walk
+correct in every record.
+
+**Identity.**  On all 10,000 Stage A calls every solver (existing, A, A counted, B″, A's rule through the
+new echelon, F, S, H, K, L) returned the existing solver's solutions, degree, outcome and decomposition
+set.  Existing, A, A counted and B″ reproduced E33's per-call `C`, echelon multiplications, entries,
+selection work and lead scans on every call; A's rule through E36's echelon reproduced A counted's phase
+counts, digest and lead scans on every call (the elimination is A's).  The 40 end-to-end records equal
+E27's solver-A records in every field except the solve's multiplications and what derives from them, the
+selection fields, wall times and the tag (same residuals, unsolved targets, reruns, fallbacks, entries,
+decompositions, relations, logs and walks).  The E36 binary reproduces `macaulay`, `chain`,
+`chain-sparsest`, `chain --karatsuba` (E33's canonical hashes) and `chain-sparsest-est --karatsuba`
+(E33's stored record) at `p = 101` seed 2 byte for byte (wall times aside).  **Controls** (`e36_checks`,
+32 calls): E31's perturbed coefficient changed every non-empty solution set (22/22) under each of F, S,
+H, K, L; F's and L's pivot digests differ from A's on 32/32 calls (and on every Stage A call).  **The
+registered S/H control — the inverse permutation wrong by one row (the first two permuted rows swapped) —
+was detected on 0/32 calls.**  A diagnostic added afterwards (`ab560e5cf1`, control paths only) shows the
+swap did move different row contents on 32/32 calls, yet no output changed: the rows it moves are pivots
+the left-looking normal forms never read (§9.22: `≈ 240` of `384` pivots reached; the mechanism is
+inferred, not traced row by row).  A post-hoc variant swapping the rows of the two last pivot columns
+changed the output on 27/32 calls.  **By G2.154 as registered, a control not detected stops E36.**  The
+end-to-end runs had already started and are reported below as measured, descriptive data; no rank below
+is claimed as a pre-registered result.
+
+**Per call** (Stage A means over 1,000 calls per curve; `C` with fallbacks charged; selection in native
+operations; A's `C` is `6.39`–`6.58·10⁵`):
+
+| rule | selection / call | `C_A / C_X` | `S_A/S_X` 0 GAE | 0.1 GAE | 1 GAE |
+|:--|--:|--:|--:|--:|--:|
+| F arrival order | `0` | `1.470`–`1.548` | `1.470`–`1.548` | `1.095`–`1.106` | `1.0115`–`1.0129` |
+| S static order | `512`–`513` | `1.411`–`1.460` | `1.411`–`1.460` | `1.083`–`1.091` | `1.0077`–`1.0086` |
+| H hybrid | `846`–`847` | `1.510`–`1.558` | `1.510`–`1.558` | `1.096`–`1.103` | `1.0076`–`1.0083` |
+| K bounded `k = 2` | `8,529`–`8,755` | `1.602`–`1.716` | `1.602`–`1.716` | `1.071`–`1.085` | `0.968`–`0.970` |
+| L last arrival (control) | `0` | `0.708`–`0.720` | `0.708`–`0.720` | `0.900`–`0.904` | `0.986` |
+| B″ (E33, reproduced) | `12,696`–`12,804` | `1.542`–`1.565` | `1.542`–`1.565` | `1.046`–`1.048` | `0.946`–`0.948` |
+
+F's echelon is `1.73`–`1.87×` cheaper than A's; F's `C` is `1.016`–`1.051×` B″'s.  F's saving per call is
+`2,146`–`2,331` GAE-equivalents at `1` GAE (the budget it would have for selection work), which is why a
+rule with zero selection keeps the order across the band while K (`≈ 8.6·10³` operations, `C` below B″'s)
+and B″ do not.  The arrival order is informative because rows still at their initial lead come first in
+each bucket: in a contested column F takes a never-updated row (as sparse as its equation) when one
+exists, which A's lowest-index rule does not.  **Sensitivities** (Stage A): σ1 (lead scans priced, equal
+for all rules) and σ3 (one op per contested column, `≈ 334` per call, charged to every rule) change no
+order for F, S, H, K; σ2 (bucket ordering priced at `|b| − 1` for A, S and H's second branch; A
+`≈ 4.1·10³` per call) strengthens F, S, H and moves the **negative control L ahead of A at `1` GAE on
+10/10 curves** — an accounting effect on A, not a property of L.
+
+**End to end** (20 rows; `S_A/S_X` against E27's solver-A records, Karatsuba; `S_E25/S_X` schoolbook,
+X re-priced by E31 A − E27 A on the same calls; `S_X/rho` against walk (iii) of E27; one GAE `= 97` per
+Macaulay entry, per selection operation and per walk step):
+
+| X | quantity | `0` GAE | `0.1` GAE | `1` GAE | order across the band |
+|:--|:--|:--|:--|:--|:--|
+| F | `S_A / S_F` | `1.464`–`1.528` | `1.094`–`1.105` | `1.0115`–`1.0128` | F ahead on 20/20 rows at every weight |
+| F | `S_E25 / S_F` | `3.65`–`3.91` | `1.524`–`1.579` | `1.046`–`1.067` | F ahead on 20/20 at every weight |
+| F | `S_F / rho` | `4.18·10³`–`2.71·10⁵` | `1.92·10⁴`–`1.27·10⁶` | `8.95·10⁴`–`6.56·10⁶` | rho ahead on every row |
+| S | `S_A / S_S` | `1.407`–`1.445` | `1.083`–`1.090` | `1.0078`–`1.0085` | S ahead on 20/20 at every weight |
+| S | `S_E25 / S_S` | `3.51`–`3.69` | `1.508`–`1.557` | `1.042`–`1.062` | S ahead on 20/20 |
+| H | `S_A / S_H` | `1.504`–`1.538` | `1.096`–`1.102` | `1.0076`–`1.0083` | H ahead on 20/20 at every weight |
+| H | `S_E25 / S_H` | `3.75`–`3.93` | `1.527`–`1.575` | `1.042`–`1.062` | H ahead on 20/20 |
+| K | `S_A / S_K` | `1.594`–`1.688` | `1.071`–`1.084` | `0.968`–`0.970` | unresolved (behind A at `1` GAE on 20/20) |
+| K | `S_E25 / S_K` | `3.97`–`4.31` | `1.492`–`1.548` | `1.001`–`1.021` | K ahead on 20/20 |
+| — | `S_A / rho` (E27, for reference) | `6.39·10³`–`4.06·10⁵` | `2.13·10⁴`–`1.39·10⁶` | `9.07·10⁴`–`6.64·10⁶` | rho ahead |
+
+S, H and K are behind rho on every row at every weight as well (`S/rho` at `0` GAE: S `4.42·10³`–`2.84·10⁵`,
+H `4.16·10³`–`2.66·10⁵`, K `3.79·10³`–`2.47·10⁵`).
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.154 | outputs identical on every Stage A call and every end-to-end record; E33 and the existing solvers reproduced; perturbed-coefficient control 22/22 for every rule; F/L digests differ; **S/H inverse-map control 0/32** | **falsified (kill criterion triggered as registered)** |
+| G2.155 | F, L `0`; S `512`–`513`; H − S `334`; K `8,529`–`8,755` | **holds** |
+| G2.156 | `C_A/C_F` `1.470`–`1.548`; `C_F/C_B″` `1.016`–`1.051` | **holds** |
+| G2.157 | `C_A/C_S` `1.411`–`1.460` (band `[0.9, 1.3]`) | **falsified high**: the static order helps far more than an equation key was expected to |
+| G2.158 | `C_H/C_F` `0.974`–`0.994` | **holds** |
+| G2.159 | `C_K/C_B″` `0.917`–`0.964` (band `[0.95, 1.25]`); K behind A at `1` GAE on every curve | **falsified low** on the quality band (K's two-candidate rule beats B″'s full estimate in `C`); the bound part holds |
+| G2.160 | `C_L/C_A` `1.388`–`1.413` | **holds** |
+| G2.161 | F ahead at every weight on every curve; S ahead too (predicted not); F/S/H/K orders unchanged under σ1–σ3, but L's order changes under σ2 at `1` GAE | **falsified** (S's predicted loss; L under σ2) |
+| G2.162 | F `1.464`–`1.528` / `1.094`–`1.105` / `1.0115`–`1.0128`; E25/F `> 1` everywhere | **holds as measured** — but not admissible as a pre-registered rank, because G2.154's kill fired |
+| G2.163 | rho ahead of every row of every rule at every weight; F `4.18·10³`–`2.71·10⁵` at `0` GAE | **holds** |
+
+**What it says.**  The selection budget of §9.41 is real: a rule beats A at `1` GAE only with selection
+work below `≈ 2.2·10³`–`3.1·10³` operations per call, and every rule here that maintains anything per row
+update (K, B″) exceeds it.  A rule that reads nothing — take each bucket's first-arrived row — keeps
+`90.7`–`97.2 %` of B″'s per-call saving over A (`2.08`–`2.26·10⁵` multiplications) at zero selection cost, and in these measurements it is ahead
+of A and E25 at `0`, `0.1` and `1` GAE on all 20 rows (S and H too).  **Status: not ranked.**  The
+registered kill criterion (G2.154) fired on a control specific to S's and H's inverse permutation; the
+registration says E36 then stops, and that is the recorded outcome.  The failed control does not bear on
+F's arithmetic (F permutes nothing), and every other identity check holds, but a pre-registered rank
+cannot be recovered after the fact: **F (and S, H) need a re-registration (E36b) with a control that
+corrupts only rows the solve reads, or an independent validation, before any of them is ranked or
+called an improvement.**  K and B″ remain unresolved against A.  **Distance remaining** (as measured, F,
+best row `p = 397` seed 1 arm B): `4.18·10³×` the matched rho at `0` GAE (A: `6.39·10³×`), `1.92·10⁴×` at
+`0.1`, `8.95·10⁴×` at `1` GAE (A: `9.07·10⁴×`); rho is ahead of every row of every rule at every weight.
+At `1` GAE the Macaulay entries (`≈ 1.8·10⁵` per call) are still almost all of `S`, and no pivot rule
+touches them.  **Not done:** the validation gate, the leaderboard, `benchmarks/`; the unit test in the
+module type-checks but was not executed (a release test build does not fit this container); E24's curves
+were not rerun.
