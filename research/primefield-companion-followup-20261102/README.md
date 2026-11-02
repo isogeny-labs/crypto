@@ -104,3 +104,20 @@ one-page report is rendered and visually inspected. Numerical trials remain
 zero. This path charges pivot searches, swaps, scalar solves, compression,
 Schur setup and root verification; it does not inherit balanced-inverse speed
 or memory bounds. See DERIVATION.md for transport identities and costs.
+
+## Added construction: cached pivot-column transport
+
+`companion-cached-pivot/` reuses the first nonzero column and the zero prefix
+established by search. Derived additional transport queries change from two
+to one for interior columns and from two to zero for the last column. The
+first-column identity branch is unchanged. Explicit scalar products drop
+from two to zero; column-1 interior adds n subtractions. These are derived
+schedules, not timings or a total-cost result. Nonsingular nodes take the
+unchanged first-column branch.
+
+A separate solve_cached.py preserves the original solver; a reproducible
+normalized-AST audit permits only one import and two call-site changes.
+The internal cache is one-use and source-bound, not a public certificate.
+Four Python files are syntax checked and one-page report visually inspected;
+zero numerical/performance trials. The twelve original files are separately
+bound in publication.json at source revision 0174135d9384b1ffec715de9fb5fd714a7fce56d.
