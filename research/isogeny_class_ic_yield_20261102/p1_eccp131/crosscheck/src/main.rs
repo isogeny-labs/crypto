@@ -26,7 +26,7 @@ mod p1;
 pub use p1::{arg, sha_hex};
 pub(crate) use p1::{engine, fp, poly};
 
-use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering as FOrd, Verdict};
+use crypto::cryptanalysis::f4_fp::{self, F4Options, Ordering as FOrd, Verdict};
 use fp::Fp;
 use p1::{assignment, build_system, count_solutions, ec_add, fb_abscissae, load_tower, rhs, Cfg, Tower};
 use poly::{mono_exp, Poly};

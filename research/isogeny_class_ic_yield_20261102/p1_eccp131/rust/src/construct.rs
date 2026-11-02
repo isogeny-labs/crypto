@@ -8,8 +8,8 @@
 //!   p1_eccp131 make-targets     [--nb neighbours.json] [--ntargets 16] [--out targets.json] [--libpari PATH]
 //!   p1_eccp131 jsoncmp A.json B.json [--skip timing_s,wall_s,build_total_s_sum]
 
-use crate::jsonv::{self, flt, int, obj, s, J};
-use crate::pari::{find_libpari, Pari};
+use super::jsonv::{self, flt, int, obj, s, J};
+use super::pari::{find_libpari, Pari};
 use sha2::{Digest, Sha256};
 use std::time::Instant;
 
