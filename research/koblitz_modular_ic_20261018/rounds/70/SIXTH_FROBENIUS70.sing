@@ -1,0 +1,181 @@
+LIB "linalg.lib";
+proc require70(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump70(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../69/runs/fifth-frobenius69-01/fifth-lattice-polynomial69.sing"));
+require70(nrows(inclusion69)==32 && ncols(inclusion69)==32 && nrows(basisV569)==32 && ncols(basisV569)==32,"FROB70_SAVED_POLYNOMIAL_SHAPES");
+matrix inclusion70=lift(module(basisV569),module(inclusion69));
+require70(basisV569*inclusion70==inclusion69,"FROB70_COMPLETE_ORDER_INCLUSION");
+module quotientGB70=std(module(inclusion70));int quotientLength70=vdim(quotientGB70);
+require70(quotientLength70==2,"FROB70_COMPLETE_V5_ORDER_QUOTIENT");
+module quotientModule70=kbase(quotientGB70);matrix quotientQ70=matrix(quotientModule70);
+require70(nrows(quotientQ70)==32 && ncols(quotientQ70)==2,"FROB70_ALL_2_QUOTIENT_CLASSES");
+link quotientOut70="ASCII:w quotient-basis70.sing";open(quotientOut70);
+write(quotientOut70,"ring sixthPolynomial70=2,(u),dp;short=0;");
+dump70(quotientOut70,"inclusion70",inclusion70);dump70(quotientOut70,"quotientQ70",quotientQ70);close(quotientOut70);
+execute(read("../../../69/runs/fifth-frobenius69-01/fifth-lattice-field69.sing"));
+map polyToField70=fifthLatticePolynomial69,u;
+matrix inclusionField70=polyToField70(inclusion70);
+matrix Qfield70=polyToField70(quotientQ70);
+require70(V5coordinates69*V5inverse69==unitmat(32) && V5inverse69*V5coordinates69==unitmat(32),"FROB70_SAVED_V5_TWO_SIDED_INVERSE");
+require70(V5inverse69==inclusionField70,"FROB70_SAVED_POLYNOMIAL_INCLUSION_MATCH");
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat squareSlots70[32][1];int p70;int i70;int j70;int k70;
+for(p70=1;p70<=528;p70++){
+ if(parents50[p70,1]==parents50[p70,2]){j70=parents50[p70,1];require70(j70>=1 && j70<=32 && squareSlots70[j70,1]==0,"FROB70_UNIQUE_SQUARE_SLOTS");squareSlots70[j70,1]=p70;}
+}
+matrix squareSource70[32][32];
+for(j70=1;j70<=32;j70++){
+ require70(squareSlots70[j70,1]>0,"FROB70_ALL_SQUARE_SLOTS");
+ for(i70=1;i70<=32;i70++){squareSource70[i70,j70]=table50[i70,squareSlots70[j70,1]];}
+}
+setring fifthLatticeField69;
+map tableToField70=tablePidCertificate50,u;
+matrix square70=tableToField70(squareSource70);
+matrix sourceColumns70=V5coordinates69*Qfield70;
+matrix sourceSquares70[32][2];
+for(i70=1;i70<=32;i70++){for(j70=1;j70<=2;j70++){sourceSquares70[i70,j70]=sourceColumns70[i70,j70]^2;}}
+matrix squareImage70=V5inverse69*square70*sourceSquares70;
+string rationalCode70="matrix numeratorRows70[32][2];matrix denominatorRows70[32][2];";
+number coefficient70;int nonzero70=0;
+for(i70=1;i70<=32;i70++){for(j70=1;j70<=2;j70++){
+ require70(diff(squareImage70[i70,j70],q)==0,"FROB70_SCALAR_RATIONAL_COORDINATE");
+ if(squareImage70[i70,j70]!=0){
+  coefficient70=leadcoef(squareImage70[i70,j70]);
+  require70(numerator(coefficient70)/denominator(coefficient70)==coefficient70,"FROB70_RATIONAL_NUMERATOR_DENOMINATOR");
+  rationalCode70=rationalCode70+"numeratorRows70["+string(i70)+","+string(j70)+"]="+string(numerator(coefficient70))+";denominatorRows70["+string(i70)+","+string(j70)+"]="+string(denominator(coefficient70))+";";
+  nonzero70++;
+ }
+}}
+ring binaryRing70=2,(u),dp;short=0;execute(rationalCode70);
+matrix remainderRows70[32][2];list denominators70;intvec offsets70;
+poly common70;poly den70;poly exactQuotient70;poly numerator70;poly remainder70;ideal principal70;
+int rows70=0;int degree70;
+for(i70=1;i70<=32;i70++){
+ common70=1;
+ for(j70=1;j70<=2;j70++){
+  if(numeratorRows70[i70,j70]!=0){den70=denominatorRows70[i70,j70];require70(den70!=0,"FROB70_NONZERO_DENOMINATOR");common70=(common70*den70)/gcd(common70,den70);}
+ }
+ require70(common70!=0,"FROB70_NONZERO_COMMON_DENOMINATOR");
+ denominators70[i70]=common70;offsets70[i70]=rows70;degree70=deg(common70);
+ if(common70!=1){principal70=std(ideal(common70));}
+ for(j70=1;j70<=2;j70++){
+  remainder70=0;
+  if(numeratorRows70[i70,j70]!=0){
+   den70=denominatorRows70[i70,j70];exactQuotient70=common70/den70;
+   require70(exactQuotient70*den70==common70,"FROB70_EXACT_ROW_CLEARING");
+   numerator70=numeratorRows70[i70,j70]*exactQuotient70;
+   if(common70!=1){remainder70=reduce(numerator70,principal70);}
+  }
+  require70(remainder70==0 || deg(remainder70)<degree70,"FROB70_COMPLETE_REMAINDER_BOUND");
+  remainderRows70[i70,j70]=remainder70;
+ }
+ rows70=rows70+degree70;
+}
+matrix binaryMap70[rows70+1][2];matrix terms70;poly rebuilt70;int exponent70;
+for(i70=1;i70<=32;i70++){for(j70=1;j70<=2;j70++){
+ remainder70=remainderRows70[i70,j70];rebuilt70=0;
+ if(remainder70!=0){terms70=coef(remainder70,u);for(k70=1;k70<=ncols(terms70);k70++){
+  exponent70=deg(terms70[1,k70]);
+  require70(terms70[1,k70]==u^exponent70 && terms70[2,k70]==1,"FROB70_BINARY_MONOMIAL_COEFFICIENTS");
+  binaryMap70[offsets70[i70]+exponent70+1,j70]=1;
+  rebuilt70=rebuilt70+terms70[1,k70]*terms70[2,k70];
+ }}
+ require70(rebuilt70==remainder70,"FROB70_EVERY_REMAINDER_RECONSTRUCTION");
+}}
+int rank70=mat_rk(binaryMap70);int kernelDimension70=2-rank70;
+require70(rank70>=0 && kernelDimension70>=0,"FROB70_BINARY_RANK_BOUND");
+link kernelOut70="ASCII:w square-kernel70.sing";open(kernelOut70);
+write(kernelOut70,"ring sixthBinary70=2,(u),dp;short=0;");
+dump70(kernelOut70,"numeratorRows70",numeratorRows70);dump70(kernelOut70,"denominatorRows70",denominatorRows70);
+dump70(kernelOut70,"remainderRows70",remainderRows70);dump70(kernelOut70,"binaryMap70",binaryMap70);
+write(kernelOut70,"int rank70="+string(rank70)+";int kernelDimension70="+string(kernelDimension70)+";");
+if(kernelDimension70==0){
+ require70(rank70==2,"FROB70_ZERO_KERNEL_FULL_RANK");
+ int witnessRowA70=0;int witnessRowB70=0;
+ for(i70=1;i70<=rows70+1;i70++){for(j70=i70+1;j70<=rows70+1;j70++){
+  if(witnessRowA70==0 && binaryMap70[i70,1]*binaryMap70[j70,2]+binaryMap70[i70,2]*binaryMap70[j70,1]==1){witnessRowA70=i70;witnessRowB70=j70;}
+ }}
+ require70(witnessRowA70>0 && witnessRowB70>witnessRowA70,"FROB70_EXPLICIT_RANK_TWO_MINOR");
+ write(kernelOut70,"int witnessRowA70="+string(witnessRowA70)+";int witnessRowB70="+string(witnessRowB70)+";");close(kernelOut70);
+ map polyToBinary70=fifthLatticePolynomial69,u;
+ matrix basisV670=polyToBinary70(inclusion70);
+ require70(nrows(basisV670)==32 && ncols(basisV670)==32 && det(basisV670)!=0,"FROB70_ZERO_KERNEL_ORDER_BASIS");
+ require70(vdim(std(module(basisV670)))==2,"FROB70_ZERO_KERNEL_OLD_QUOTIENT");
+ link polynomialOut70="ASCII:w sixth-lattice-polynomial70.sing";open(polynomialOut70);
+ write(polynomialOut70,"ring sixthLatticePolynomial70=2,(u),dp;short=0;");
+ dump70(polynomialOut70,"inclusion70",basisV670);dump70(polynomialOut70,"basisV670",basisV670);close(polynomialOut70);
+ setring fifthLatticeField69;
+ matrix V6coordinates70=V5coordinates69*inclusionField70;
+ matrix V6inverse70=unitmat(32);
+ require70(V6coordinates70==unitmat(32) && V6coordinates70*V6inverse70==unitmat(32) && V6inverse70*V6coordinates70==unitmat(32),"FROB70_ZERO_KERNEL_V6_EQUALS_ORDER");
+ for(i70=1;i70<=32;i70++){for(j70=1;j70<=32;j70++){
+  if(square70[i70,j70]!=0){coefficient70=leadcoef(square70[i70,j70]);require70(denominator(coefficient70)==1,"FROB70_ALL_ORDER_BASIS_SQUARES_IN_ORDER");}
+ }}
+ matrix squareInV570=V5inverse69*square70;
+ for(i70=1;i70<=32;i70++){for(j70=1;j70<=32;j70++){
+  if(squareInV570[i70,j70]!=0){coefficient70=leadcoef(squareInV570[i70,j70]);require70(denominator(coefficient70)==1,"FROB70_ALL_ORDER_BASIS_SQUARES_IN_V5");}
+ }}
+ matrix changedInverse70=V6inverse70;changedInverse70[1,1]=changedInverse70[1,1]+1;
+ require70(V6coordinates70*changedInverse70!=unitmat(32),"FROB70_ZERO_KERNEL_CHANGED_INVERSE_REJECTED");
+ link fieldOut70="ASCII:w sixth-lattice-field70.sing";open(fieldOut70);
+ write(fieldOut70,"ring sixthLatticeField70=(2,u),(q),dp;short=0;");
+ dump70(fieldOut70,"V6coordinates70",V6coordinates70);dump70(fieldOut70,"V6inverse70",V6inverse70);
+ dump70(fieldOut70,"squareInV570",squareInV570);close(fieldOut70);
+ print("FROB70_RESULT order_rank=32 old_quotient=2 square_columns=2 binary_rows="+string(rows70)+" square_rank=2 survivor_dimension=0 new_quotient_length=2 new_order_quotient=0 rational_nonzero_entries="+string(nonzero70)+" sixth_basis_columns=32 rank_witness_rows="+string(witnessRowA70)+","+string(witnessRowB70)+" stabilized_order=1 changed_kernel_rejected=na changed_inverse_rejected=1");
+ print("SIXTH_FROBENIUS70_ALL_CHECKS_PASS");quit;
+}
+matrix kernelBasis70=matrix(syz(module(binaryMap70)));
+require70(nrows(kernelBasis70)==2 && ncols(kernelBasis70)==kernelDimension70 && mat_rk(kernelBasis70)==kernelDimension70,"FROB70_COMPLETE_KERNEL_DIMENSION");
+require70(binaryMap70*kernelBasis70==matrix(0,rows70+1,kernelDimension70),"FROB70_ALL_KERNEL_PRODUCTS");
+for(i70=1;i70<=2;i70++){for(j70=1;j70<=kernelDimension70;j70++){require70(kernelBasis70[i70,j70]==0 || kernelBasis70[i70,j70]==1,"FROB70_KERNEL_OVER_F2");}}
+int changedKernel70=0;
+if(rank70>0 && kernelDimension70>0){
+ int changeColumn70=0;
+ for(i70=1;i70<=rows70+1;i70++){for(j70=1;j70<=2;j70++){if(changeColumn70==0 && binaryMap70[i70,j70]!=0){changeColumn70=j70;}}}
+ require70(changeColumn70>0,"FROB70_NONZERO_CHANGED_KERNEL_COLUMN");
+ matrix badKernel70=kernelBasis70;badKernel70[changeColumn70,1]=badKernel70[changeColumn70,1]+1;
+ require70(binaryMap70*badKernel70!=matrix(0,rows70+1,kernelDimension70),"FROB70_CHANGED_KERNEL_REJECTED");changedKernel70=1;
+}
+dump70(kernelOut70,"kernelBasis70",kernelBasis70);close(kernelOut70);
+map polyToBinary70=fifthLatticePolynomial69,u;
+matrix Jbinary70=polyToBinary70(inclusion70);matrix Qbinary70=polyToBinary70(quotientQ70);
+matrix survivorPoly70=Qbinary70*kernelBasis70;
+matrix combined70[32][32+kernelDimension70];
+for(i70=1;i70<=32;i70++){
+ for(j70=1;j70<=32;j70++){combined70[i70,j70]=Jbinary70[i70,j70];}
+ for(j70=1;j70<=kernelDimension70;j70++){combined70[i70,32+j70]=survivorPoly70[i70,j70];}
+}
+module moduleV670=std(module(combined70));int quotientLength670=vdim(moduleV670);
+require70(quotientLength670==rank70,"FROB70_KERNEL_LATTICE_LENGTH_IDENTITY");
+matrix basisV670=matrix(moduleV670);
+require70(nrows(basisV670)==32 && ncols(basisV670)==32,"FROB70_FULL_SIXTH_PID_BASIS");
+require70(mat_rk(matrix(reduce(module(combined70),moduleV670)))==0 && mat_rk(matrix(reduce(module(basisV670),std(module(combined70)))))==0,"FROB70_BOTH_SIXTH_MODULE_INCLUSIONS");
+link polynomialOut70="ASCII:w sixth-lattice-polynomial70.sing";open(polynomialOut70);
+write(polynomialOut70,"ring sixthLatticePolynomial70=2,(u),dp;short=0;");
+dump70(polynomialOut70,"inclusion70",Jbinary70);dump70(polynomialOut70,"quotientQ70",Qbinary70);
+dump70(polynomialOut70,"kernelBasis70",kernelBasis70);dump70(polynomialOut70,"basisV670",basisV670);close(polynomialOut70);
+setring fifthLatticeField69;
+map binaryToField70=binaryRing70,u;
+matrix V6basisField70=binaryToField70(basisV670);
+matrix V6coordinates70=V5coordinates69*V6basisField70;
+matrix V6inverse70=lift(module(V6coordinates70),module(unitmat(32)));
+require70(V6coordinates70*V6inverse70==unitmat(32) && V6inverse70*V6coordinates70==unitmat(32),"FROB70_BOTH_SIXTH_BASIS_INVERSES");
+for(i70=1;i70<=32;i70++){for(j70=1;j70<=32;j70++){
+ if(V6inverse70[i70,j70]!=0){coefficient70=leadcoef(V6inverse70[i70,j70]);require70(denominator(coefficient70)==1,"FROB70_ORDER_INSIDE_SIXTH_LATTICE");}
+}}
+matrix V6squared70[32][32];for(i70=1;i70<=32;i70++){for(j70=1;j70<=32;j70++){V6squared70[i70,j70]=V6coordinates70[i70,j70]^2;}}
+matrix squareInV570=V5inverse69*square70*V6squared70;
+for(i70=1;i70<=32;i70++){for(j70=1;j70<=32;j70++){
+ if(squareInV570[i70,j70]!=0){coefficient70=leadcoef(squareInV570[i70,j70]);require70(denominator(coefficient70)==1,"FROB70_EVERY_V6_BASIS_SQUARE_IN_V5");}
+}}
+matrix changedInverse70=V6inverse70;changedInverse70[1,1]=changedInverse70[1,1]+1;
+require70(V6coordinates70*changedInverse70!=unitmat(32),"FROB70_CHANGED_INVERSE_REJECTED");
+link fieldOut70="ASCII:w sixth-lattice-field70.sing";open(fieldOut70);
+write(fieldOut70,"ring sixthLatticeField70=(2,u),(q),dp;short=0;");
+dump70(fieldOut70,"V6coordinates70",V6coordinates70);dump70(fieldOut70,"V6inverse70",V6inverse70);
+dump70(fieldOut70,"squareInV570",squareInV570);close(fieldOut70);
+print("FROB70_RESULT order_rank=32 old_quotient=2 square_columns=2 binary_rows="+string(rows70)+" square_rank="+string(rank70)+" survivor_dimension="+string(kernelDimension70)+" new_quotient_length="+string(quotientLength670)+" rational_nonzero_entries="+string(nonzero70)+" sixth_basis_columns=32 changed_kernel_rejected="+string(changedKernel70)+" changed_inverse_rejected=1");
+print("SIXTH_FROBENIUS70_ALL_CHECKS_PASS");quit;
