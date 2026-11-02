@@ -70,3 +70,20 @@ numerical stages, verification body before fingerprinting, and main schedule
 after the declared guard/output-routing substitutions. These checks do not
 execute the research kernels or establish runtime improvement. Repository-wide
 checks and artifact publication status are recorded separately as they finish.
+
+## Added construction: exact generator compression
+
+`companion-generator-compression/` adds deterministic two-sided rank
+factorization and a separately implemented certificate checker. The derived
+output width is rank(G K^T), so all algebraic generator redundancy is removed
+without forming the full displacement. The same field and operator are kept.
+Source commit: 3c49347e183e08baca60365ead000b3438de64d8. Its separate publication.json binds
+the ten original files; the initial 110-file manifest remains unchanged.
+
+Validation is syntax-only for three Python files, plus a rendered and visually
+inspected one-page report. Numerical/corruption/performance trials are zero.
+The certificate checks factor identities and triangular rank minors; actual
+Meter-count validation remains pending. Setup has derived classical O(n s^2)
+cost, and smaller width helps only when later query savings repay that cost.
+No frozen numerical caller was changed. See its DERIVATION.md and
+reports/design/report.pdf for the proof, exact arithmetic schedule and prior art.

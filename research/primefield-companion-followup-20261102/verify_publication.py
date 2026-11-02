@@ -15,7 +15,12 @@ def digest(path):
 def main():
     root = Path(__file__).resolve().parent
     manifest = json.loads((root / 'publication-manifest.json').read_text())
-    entries = manifest['entries']
+    entries = list(manifest['entries'])
+    extension = root / 'companion-generator-compression' / 'publication.json'
+    if extension.exists():
+        added = json.loads(extension.read_text())
+        for entry in added['entries']:
+            entries.append(dict(entry, path='companion-generator-compression/' + entry['path']))
     seen = set()
     for entry in entries:
         rel = Path(entry['path'])
