@@ -44,3 +44,12 @@ Small base |F'| = ceil(|F|^e) with e in {2/3, 3/4} for max_large_primes >= 1 (Ga
 p in {61, 103, 151} (p = 1 mod 3), 8 instances (seeds) each, max_residuals 2e6. Every IC and rho answer checked (report `correct`).
 Measure: the engine's own S (total_ops / sqrt(n), F_p multiplications converted with its fp_muls_per_add) per arm, ratio to rho's S on the same instance, and
 the fitted exponent of log2(total_ops) on log2(n) per arm. Unpriced native work as the engine reports it; no new pricing introduced.
+
+## Amendment 3 (2026-11-02, before any data under it): quadruple large primes (engine extension)
+`src/cryptanalysis/gaudry_cubic.rs` gains `GaudryOptions.arity` (default 3, unchanged behaviour) and `subspace_quad_oracle`:
+for each signed base point P_k, the existing 3-point oracle on R -/+ P_k, keeping quadruples with k above the other indices
+(each once). Meet-in-the-middle only; about 4|F|^2 pair tests per residual, F_p multiplications counted by the engine as before.
+The large-prime histogram widens to 0, 1, 2, 3, >=4. A unit test checks recovery with arity 4 and four large primes.
+New arms in `examples/klp_cubic.rs`, same instances, seeds, rho reference and measures as Amendment 2:
+arity 4 with no large primes (full base), and arity 4 with max_large_primes = 4 at |F|^(2/3) and |F|^(3/4).
+p in {61, 103, 151}, 8 instances each, max_residuals 2e6. Every answer checked.
