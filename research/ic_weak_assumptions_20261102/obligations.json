@@ -1,0 +1,186 @@
+{
+  "schema": "ic-weak-assumptions/v1",
+  "created": "2026-11-02",
+  "status_vocabulary": [
+    "proved",
+    "proved_internal",
+    "measured_scaling",
+    "measured_bounded",
+    "conditional",
+    "open",
+    "refuted",
+    "not_applicable"
+  ],
+  "obligations": [
+    {
+      "id": "O-SOLVE",
+      "title": "solver degree, width, work and memory",
+      "depends_on": ["O-GEOMETRY"],
+      "falsifier": "a growing lower bound, censored scaling slope, or matrix/work growth incompatible with the route's claimed cost"
+    },
+    {
+      "id": "O-NONGENERIC",
+      "title": "genuinely non-generic decomposition interface",
+      "depends_on": [],
+      "falsifier": "a same-cost G0/G1 table or enumeration simulator after all setup and advice are charged"
+    },
+    {
+      "id": "O-YIELD",
+      "title": "rational decomposition probability and target-wise variance",
+      "depends_on": ["O-GEOMETRY"],
+      "falsifier": "excess zero mass, solver failure, non-rational solutions, or variance that destroys the claimed collection probability"
+    },
+    {
+      "id": "O-RANK",
+      "title": "relation independence and terminal rank",
+      "depends_on": ["O-YIELD"],
+      "falsifier": "dead columns, support disconnection, persistent rank defect, or full-rank probability below the claimed success"
+    },
+    {
+      "id": "O-GEOMETRY",
+      "title": "dimension, radicality, rational lifts and exceptional fibres",
+      "depends_on": [],
+      "falsifier": "positive-dimensional fibres, embedded components, exceptional-chart loss, non-rational solutions, or unit-ideal evidence misread as successful geometry"
+    },
+    {
+      "id": "O-E2E",
+      "title": "complete end-to-end cost composition",
+      "depends_on": ["O-SOLVE", "O-NONGENERIC", "O-YIELD", "O-RANK", "O-GEOMETRY"],
+      "falsifier": "any missing phase, incompatible parameter family, uncharged failure, failed fixed-arity gate, or incomplete recovery"
+    }
+  ],
+  "routes": [
+    {
+      "id": "R-HASHED-BTN",
+      "title": "hashed factor base plus exact Boolean tensor contraction",
+      "track": "algebraic-conditional",
+      "disposition": "highest_priority_audit",
+      "cost_model": {
+        "kind": "conditional_formula",
+        "formula": "2^{O(b/(log b)^(1/4))}",
+        "complete_under_source_hypotheses": true,
+        "unconditional": false
+      },
+      "obligations": {
+        "O-SOLVE": {"status": "conditional", "basis": "OpenAI Appendix D exact contraction theorem; public native recursion is unreachable with the current usize guard"},
+        "O-NONGENERIC": {"status": "proved_internal", "basis": "hash and compact Boolean coordinate predicate use concrete field/bit representation outside G0/G1"},
+        "O-YIELD": {"status": "conditional", "basis": "hash-selected factor-base and relation-count model in the pinned reduction; no independent target-distribution audit"},
+        "O-RANK": {"status": "conditional", "basis": "collection of N+1 useful relations is part of the theorem chain; no independent rank proof or scaling panel"},
+        "O-GEOMETRY": {"status": "proved_internal", "basis": "finite Boolean assignment space with exact predicate semantics; code correspondence remains bounded"},
+        "O-E2E": {"status": "conditional", "basis": "explicit end-to-end bound exists only conditional on the pinned contraction result and uncompleted bridge audit"}
+      },
+      "evidence": [
+        "research/prime_ic_lead_review_20261031/README.md",
+        "research/hashed_ecdl_speed_20261029/README.md",
+        "problems/hashed-ecdl-tensor-backend.md"
+      ]
+    },
+    {
+      "id": "R-M3-CDCLT",
+      "title": "arity-three chained S3 with CDCL(T)/Fp",
+      "track": "algebraic",
+      "disposition": "open_unfrozen",
+      "cost_model": {"kind": "fixed_arity", "m": 3, "setup_exponent_a": null, "query_exponent_e": null},
+      "obligations": {
+        "O-SOLVE": {"status": "open", "basis": "no production propagator or natural-query exponent exists"},
+        "O-NONGENERIC": {"status": "conditional", "basis": "the intended Fp theory is coordinate-algebraic, but the production oracle is not implemented"},
+        "O-YIELD": {"status": "conditional", "basis": "mean combinatorics and guarded rationality are available; natural solver success and variance are unmeasured"},
+        "O-RANK": {"status": "open", "basis": "no fixed natural relation population exists"},
+        "O-GEOMETRY": {"status": "conditional", "basis": "guarded disjoint-window argument covers rationality; exceptional charts and complete model-set equivalence remain gates"},
+        "O-E2E": {"status": "open", "basis": "strict a<1.5 and e<0.5 gates have no measurements"}
+      },
+      "evidence": [
+        "research/prime_ic_lead_review_20261031/PDP_ARITY_CORRECTION.md",
+        "research/prime_ic_lead_review_20261031/PROTOCOL.md"
+      ]
+    },
+    {
+      "id": "R-PKM-M4",
+      "title": "PKM tower generalized root finding at m=4",
+      "track": "algebraic",
+      "disposition": "open_blocked",
+      "cost_model": {"kind": "fixed_arity", "m": 4, "setup_exponent_a": null, "query_exponent_e": null},
+      "obligations": {
+        "O-SOLVE": {"status": "measured_bounded", "basis": "F4 degrees 6,7,7 at N=8,12,16; columns and multiply-adds grow sharply and exceed the recorded degree-4 cost threshold"},
+        "O-NONGENERIC": {"status": "proved_internal", "basis": "tower membership and polynomial-system solving use the coordinate-algebraic C interface"},
+        "O-YIELD": {"status": "conditional", "basis": "PKM heuristic mean is not a target-wise natural solver-success distribution"},
+        "O-RANK": {"status": "open", "basis": "no full fixed-population rank experiment for algebraically solved m=4 relations"},
+        "O-GEOMETRY": {"status": "measured_bounded", "basis": "tower quotient is a proved function algebra; full systems have only toy planted finite-basis and random unit-ideal checks"},
+        "O-E2E": {"status": "open", "basis": "no fitted a/e exponents or complete natural successful m=4 recovery"}
+      },
+      "evidence": [
+        "research/prime_fall_degree_20261027/DERIVED.md",
+        "research/pkm_tower_round4_20260926/runs/T4-kummer-m4-p1-N8.jsonl",
+        "research/pkm_tower_round4_20260926/runs/T4-kummer-m4-p1-N12.jsonl",
+        "research/pkm_tower_round3_20260925/runs/M4b-kummer-m4-p1-N16.jsonl"
+      ]
+    },
+    {
+      "id": "R-WAGNER-FILTER",
+      "title": "Wagner four-list join with a sum-compatible filter",
+      "track": "representation",
+      "disposition": "open_next_statistic",
+      "cost_model": {"kind": "incomplete"},
+      "obligations": {
+        "O-SOLVE": {"status": "not_applicable", "basis": "list join rather than polynomial solving"},
+        "O-NONGENERIC": {"status": "open", "basis": "no useful cheap filter with a non-generic interface witness has survived"},
+        "O-YIELD": {"status": "open", "basis": "bucket-resolved second moment W is unmeasured"},
+        "O-RANK": {"status": "open", "basis": "no admitted relation population"},
+        "O-GEOMETRY": {"status": "not_applicable", "basis": "exact group relations; filter correctness replaces algebraic geometry"},
+        "O-E2E": {"status": "open", "basis": "density, enumeration, yield, memory and interface obligations are incomplete"}
+      },
+      "evidence": ["crypto-autoresearcher:knowledge/leads/ecdlp/exotic/LEAD-EXO-four-list-ktree-join.yaml"]
+    },
+    {
+      "id": "R-GENERIC-PAIR",
+      "title": "generic subtraction, root finding, MITM and pair tables",
+      "track": "generic-decomposition",
+      "disposition": "control_not_algebraic_escape",
+      "cost_model": {"kind": "fixed_arity", "m": 2, "setup_exponent_a": 0.0, "query_exponent_e": 1.0},
+      "obligations": {
+        "O-SOLVE": {"status": "not_applicable", "basis": "enumeration/table lookup"},
+        "O-NONGENERIC": {"status": "refuted", "basis": "same relation set is simulated with G0/G1 group operations and equality once setup is charged"},
+        "O-YIELD": {"status": "measured_bounded", "basis": "toy m=2 stopped controls track the leading size-driven hit-rate model; exact count means, hit probability and variance are distinct"},
+        "O-RANK": {"status": "measured_bounded", "basis": "842 selected early rows have rank 842, but no full fixed-population matrix was collected"},
+        "O-GEOMETRY": {"status": "not_applicable", "basis": "exact group-key verification"},
+        "O-E2E": {"status": "refuted", "basis": "as an algebraic escape, e=1 fails the m=2 strict gate e<0; it remains a valid generic-track control"}
+      },
+      "evidence": [
+        "docs/ecdlp-hardness-corpus/GENERIC_INTERFACE_AUDIT.md",
+        "research/ecbench_yield_sweep_20261004/sessions/prime/records.jsonl"
+      ]
+    },
+    {
+      "id": "R-NAIVE-SEMAEV",
+      "title": "naive prime-field Semaev Groebner decomposition",
+      "track": "algebraic",
+      "disposition": "closed_known",
+      "cost_model": {"kind": "empirical_p_exponent", "measured_beta": 0.797, "required_below": 0.5},
+      "obligations": {
+        "O-SOLVE": {"status": "refuted", "basis": "measured beta_work 0.797 for interval/random bases and 0.647 for subgroup bases in the cited toy ladder"},
+        "O-NONGENERIC": {"status": "proved_internal", "basis": "polynomial-system solving is coordinate-algebraic"},
+        "O-YIELD": {"status": "conditional", "basis": "standard decomposition heuristic does not repair solver cost"},
+        "O-RANK": {"status": "open", "basis": "no independent rank law"},
+        "O-GEOMETRY": {"status": "conditional", "basis": "target and factor-base dependent system geometry"},
+        "O-E2E": {"status": "refuted", "basis": "the measured solver exponent exceeds the scoped threshold; generic root/table alternatives are separate routes"}
+      },
+      "evidence": ["crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-prime-field-semaev-solving-degree.yaml"]
+    },
+    {
+      "id": "R-XEDNI",
+      "title": "xedni lifting and height relation calculus",
+      "track": "lifting-relation",
+      "disposition": "conditional_obstruction_open_bridges",
+      "cost_model": {"kind": "conditional_runtime_obstruction", "claimed_under_hazard": "Omega(p)"},
+      "obligations": {
+        "O-SOLVE": {"status": "conditional", "basis": "bounded relation follows only after selected-height, packing and scalar-reduction certificates are composed"},
+        "O-NONGENERIC": {"status": "proved_internal", "basis": "rational lifts, heights and reduction maps use concrete arithmetic outside G0"},
+        "O-YIELD": {"status": "conditional", "basis": "one fixed nonzero direction has exact useful probability (q-1)/q^2; selection and adaptive trials remain open"},
+        "O-RANK": {"status": "open", "basis": "full-row-rank for the actual cubic evaluation conditions is unproved"},
+        "O-GEOMETRY": {"status": "conditional", "basis": "uniform selected-lift height/minimal-discriminant comparison, Lang/family gap and reduction correspondence remain assumptions"},
+        "O-E2E": {"status": "conditional", "basis": "JKSST gives a strong conditional obstruction; the one-shot-to-adaptive hazard bridge is not automatic"}
+      },
+      "evidence": ["research/jksst_xedni_audit_20261101/README.md"]
+    }
+  ]
+}
