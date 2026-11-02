@@ -7,25 +7,28 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 115,
-    "frontier": 55,
+    "nodes": 171,
+    "frontier": 96,
     "contaminated_by_refuted": 1,
     "unlinked_citations": 0,
     "by_status": {
-      "definition": 18,
+      "definition": 19,
       "assumed": 2,
       "proved_external": 33,
       "algorithm": 7,
-      "conditional": 20,
-      "measured": 2,
-      "proved_internal_unreviewed": 9,
-      "open": 14,
-      "heuristic": 9,
-      "refuted": 1
+      "conditional": 23,
+      "measured": 16,
+      "proved_internal_unreviewed": 35,
+      "open": 18,
+      "heuristic": 13,
+      "refuted": 2,
+      "proved_external_unread": 3
     },
     "by_formal_state": {
-      "none": 112,
-      "lean_written_unchecked": 3
+      "none": 145,
+      "lean_written_unchecked": 10,
+      "kernel_checked": 13,
+      "stated_open": 3
     }
   },
   "frontier": [
@@ -75,8 +78,37 @@
         {
           "from": "THM-KY-S3-FIRST-FALL-TWO",
           "relation": "obstructs"
+        },
+        {
+          "from": "THM-RP-GUARDED-EXACT-PAIR",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-FALL-DEGREE-TOY",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-DREG-PROXY-MISS",
+          "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "THM-RP-S3-ROOTS-FACTOR",
+      "label": "S3(xR,xF,X) = (xR-xF)^2 (X-x(R+F)) (X-x(R-F)) (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 4,
+      "downstream": [
+        "BRIDGE-GENERIC-TABLE",
+        "FACT-S3-ROOTS-ARE-GROUP-LAW",
+        "LB-CGK-ADVICE",
+        "LB-SHOUP-DLP"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "ATTACK-MOV-PAIRING",
@@ -136,6 +168,64 @@
       ]
     },
     {
+      "id": "HEUR-DECOMPOSITION-PROBABILITY",
+      "label": "Random decomposition-yield heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 2,
+      "downstream": [
+        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+        "DEF-INDEX-CALCULUS-PIPELINE"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-END-TO-END-IC"
+      ],
+      "pressure": [
+        {
+          "from": "THEOREM-YIELD-CONSERVATION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-YIELD-SUM-COUNT",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-JV-WEAK-CLASS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-TRACE-ZERO-DOUBLING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-RELATION-RANK",
+      "label": "Relation independence/rank heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 2,
+      "downstream": [
+        "ALG-SPARSE-LINEAR-ALGEBRA",
+        "COND-RP-TWO-SUMMAND-FAMILY-LAW"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "HEUR-RP-WALK-TARGET-GUARD",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "HEUR-ZERO-DIMENSIONAL-PDP",
       "label": "Zero-dimensional PDP hypothesis",
       "status": "heuristic",
@@ -145,6 +235,21 @@
       "downstream": [
         "ALG-GAUDRY-FIXED-EXTENSION",
         "FACT-GROEBNER-COST-DEPENDENCE"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ALG-RP-VELU-COST",
+      "label": "Velu O(l) and sqrt-Velu O~(sqrt l) isogeny evaluation (A-ISO5)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 2,
+      "downstream": [
+        "RED-ISOGENY-DLP-TRANSPORT",
+        "THEOREM-JMV-ISOGENY-REDUCTION"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -169,6 +274,25 @@
       "pressure": []
     },
     {
+      "id": "GAP-RP-COMMON-KERNEL",
+      "label": "Common-kernel construction for a prime-field correlated-packet route",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "GAP-END-TO-END-IC-EXPONENT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-RP-COMMON-KERNEL-WITNESSES",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "HEUR-AUTOMORPHISM-SPEEDUP",
       "label": "Automorphism quotient speedup",
       "status": "heuristic",
@@ -184,43 +308,12 @@
         {
           "from": "OBSTRUCTION-NEGATION-CYCLES",
           "relation": "obstructs"
-        }
-      ]
-    },
-    {
-      "id": "HEUR-DECOMPOSITION-PROBABILITY",
-      "label": "Random decomposition-yield heuristic",
-      "status": "heuristic",
-      "formal": "none",
-      "action": "prove, or measure on a scaling family without censoring",
-      "impact": 1,
-      "downstream": [
-        "DEF-INDEX-CALCULUS-PIPELINE"
-      ],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-END-TO-END-IC"
-      ],
-      "pressure": [
+        },
         {
-          "from": "THEOREM-YIELD-CONSERVATION",
+          "from": "THM-RP-AUTOMORPHISM-ORBIT-FOLD",
           "relation": "qualifies"
         }
       ]
-    },
-    {
-      "id": "HEUR-RELATION-RANK",
-      "label": "Relation independence/rank heuristic",
-      "status": "heuristic",
-      "formal": "none",
-      "action": "prove, or measure on a scaling family without censoring",
-      "impact": 1,
-      "downstream": [
-        "ALG-SPARSE-LINEAR-ALGEBRA"
-      ],
-      "depends_citations": [],
-      "research_targets": [],
-      "pressure": []
     },
     {
       "id": "HEUR-RHO-RANDOM-MAPPING",
@@ -231,6 +324,34 @@
       "impact": 1,
       "downstream": [
         "ALG-POLLARD-RHO"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-RP-DESCENT-TERMINATION",
+      "label": "Recursive target descent terminates (A-TD1)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "DEF-INDEX-CALCULUS-PIPELINE"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-RP-LARGE-PRIME-GRAPH",
+      "label": "Large-prime leftovers meet with birthday probability and the graph connects (A-RC2)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "DEF-INDEX-CALCULUS-PIPELINE"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -318,7 +439,115 @@
       ],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": [
+        {
+          "from": "MEAS-RP-JV-E2E-NONWEAK",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-RP-AFFINE-CORE",
+      "label": "Counting core of the isogeny-augmented generic group bound (IcNegative, unchecked)",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "LB-ISOGENY-GENERIC"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-RP-PROOF-GATE-IC-NEGATIVE"
+      ],
       "pressure": []
+    },
+    {
+      "id": "THM-RP-FF-HANDBOOK",
+      "label": "Finite-field handbook facts (cyclic multiplicative group, Frobenius, trace/norm surjectivity) in Lean",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "THEOREM-FROB-SUBSPACES-131"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-S3-LINEAR-HALF-TRACE",
+      "label": "S3 is F_2-linear in (e1,e2): linearized half-trace two-point PDP (A-PDP8)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "COND-RP-LINEARIZED-SUBSPACE-FLOOR"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-SUBSPACE-PRODUCT-BOUND",
+      "label": "Field Kneser/Vosper product bound: dim V^(2) >= 2l-1, equality only for progressions (A-FB1)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "COND-RP-LINEARIZED-SUBSPACE-FLOOR"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-VOLCANO-STRUCTURE",
+      "label": "Ordinary l-isogeny components are volcanoes (A-ISO1)",
+      "status": "proved_external_unread",
+      "formal": "none",
+      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 1,
+      "downstream": [
+        "THEOREM-JMV-ISOGENY-REDUCTION"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-WEIL-LIFT-SOUNDNESS",
+      "label": "Weil descent is sound but solutions need lift checks (A-PDP2)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "COND-BINARY-WEIL-DESCENT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-RP-SEMIREGULAR-DREG-PROXY",
+      "label": "Semi-regular D_reg predicts Groebner cost of descended Semaev systems (A-PDP5)",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "MEAS-RP-DREG-PROXY-MISS",
+          "relation": "refutes"
+        }
+      ]
     },
     {
       "id": "GAP-AUTOMORPHISM-PREPROCESS",
@@ -330,7 +559,8 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [
-        "RT-AUTOMORPHISM-PREPROCESS"
+        "RT-AUTOMORPHISM-PREPROCESS",
+        "RT-RP-ONLINE-VS-PREPROCESSING"
       ],
       "pressure": []
     },
@@ -344,11 +574,16 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [
-        "RT-BINARY-M4-DEGREE"
+        "RT-BINARY-M4-DEGREE",
+        "RT-RP-M3-DIAGONAL-UNCENSOR"
       ],
       "pressure": [
         {
           "from": "THEOREM-FROB-SUBSPACES-131",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-FALL-DEGREE-M3-DIAGONAL",
           "relation": "qualifies"
         }
       ]
@@ -375,6 +610,10 @@
         {
           "from": "FACT-S3-ROOTS-ARE-GROUP-LAW",
           "relation": "does_not_cover"
+        },
+        {
+          "from": "GAP-RP-SAT-SCALING",
+          "relation": "qualifies"
         }
       ]
     },
@@ -391,7 +630,20 @@
         "RT-END-TO-END-IC",
         "RT-REPRESENTATION-FILTER"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-RP-GUARDED-GROWING-B",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-IC-BOUNDARY-ROUND1",
+          "relation": "qualifies"
+        },
+        {
+          "from": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+          "relation": "obstructs"
+        }
+      ]
     },
     {
       "id": "GAP-FALL-DEGREE-COST-BRIDGE",
@@ -403,9 +655,19 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [
-        "RT-FALL-DEGREE-BRIDGE"
+        "RT-FALL-DEGREE-BRIDGE",
+        "RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-RP-GUARDED-EXACT-PAIR",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-SECANT-DEGREE-REDUCTION",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-LEMMA4-REVERSE",
@@ -503,6 +765,44 @@
       ]
     },
     {
+      "id": "GAP-RP-O1-ISOGENY-GGM",
+      "label": "O1: Theorem 15.1 in full (isogeny-augmented GGM success bound)",
+      "status": "open",
+      "formal": "stated_open",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-RP-O2-MULTISET-YIELD",
+      "label": "O2: mean yield of m-multisets of a base is C(|D|+m-1,m)",
+      "status": "open",
+      "formal": "stated_open",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-RP-PROOF-GATE-IC-NEGATIVE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-RP-SAT-SCALING",
+      "label": "Does descended CNF-XOR SAT scale past Groebner? (A-PDP7)",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "GAP-TRANSPORT-ORACLE-SIM",
       "label": "Coordinate transport-oracle simulation",
       "status": "open",
@@ -540,11 +840,40 @@
       "research_targets": [
         "RT-XEDNI-END-TO-END"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-RP-JKSST-MODEL-DISCRIMINANT",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL",
       "label": "Gaudry-Schost two-dimensional walk",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-RP-LIFT-SUBGROUP-HALF",
+      "label": "A random abscissa lifts with probability ~1/2 and lands in <G> with probability ~1/2 (A-FB2)",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "HEUR-RP-WALK-TARGET-GUARD",
+      "label": "Walk targets behave as uniform, with a mandatory repeated-target guard (A-RC1)",
       "status": "heuristic",
       "formal": "none",
       "action": "prove, or measure on a scaling family without censoring",
@@ -699,12 +1028,57 @@
         {
           "from": "THM-HKYY-ZERO-DIM-LAST-FALL",
           "relation": "does_not_cover"
+        },
+        {
+          "from": "THM-RP-BOOLEAN-CHAIN-UPPER",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-FB-BREAK-EVEN",
+          "relation": "qualifies"
+        },
+        {
+          "from": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
+          "relation": "obstructs"
         }
       ]
     },
     {
       "id": "COND-PKM-PRIME-ALGEBRAIC",
       "label": "PKM prime-field algebraic route",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-RP-SECANT-DEGREE-REDUCTION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-BOUNDARY-TARGETS-PRIME",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "COND-RP-LINEARIZED-SUBSPACE-FLOOR",
+      "label": "Linearized k-point subspace IC needs relation work >= 2^(2n/3)",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "label": "Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho",
       "status": "conditional",
       "formal": "none",
       "action": "discharge each condition, or keep the row labelled conditional",
@@ -794,6 +1168,18 @@
       "pressure": []
     },
     {
+      "id": "THM-RP-KOBLITZ-CYCLIC-WINDOW",
+      "label": "Cyclic-cover window for the n=131 trace-zero factor: genus >= 394 (conditional), modular carrier genus 378,708,949",
+      "status": "conditional",
+      "formal": "lean_written_unchecked",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-NAGAO-LEMMA4-F2",
       "label": "Witnesses A, B: d'_F = 2 < d_F = 3 over F_2",
       "status": "proved_internal_unreviewed",
@@ -806,6 +1192,66 @@
         "RT-LEMMA4-FORMAL",
         "RT-LEMMA4-REVERSE"
       ],
+      "pressure": []
+    },
+    {
+      "id": "CEX-RP-COMMON-KERNEL-WITNESSES",
+      "label": "Boolean kernel not multiplicative under gauge; exterior/code witness has a nonzero passive-axis coefficient (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-RP-JKSST-ASYMPTOTIC-COUNTING",
+      "label": "Asymptotic remainders and coarse lattice data do not give finite counting bounds",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-RP-JKSST-LANG-QUADRATICITY",
+      "label": "Quadraticity of height alone gives no uniform Lang constant (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-RP-JKSST-MODEL-DISCRIMINANT",
+      "label": "No all-multiples height bound by a fixed model discriminant; model log-discriminant unbounded under rescaling",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-RP-JKSST-PROBABILITY",
+      "label": "Finite-field relation probability: composite modulus, fixed probability not O(1/p), usefulness not automatic",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
     },
     {
@@ -851,7 +1297,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-RP-KOBLITZ-CYCLIC-WINDOW",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "THEOREM-XEDNI-FF-DENSITY",
@@ -877,7 +1328,12 @@
       "research_targets": [
         "RT-XEDNI-END-TO-END"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-RP-JKSST-PROBABILITY",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "THEOREM-YIELD-CONSERVATION",
@@ -889,8 +1345,219 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [
-        "RT-ALGEBRAIC-SOLUTION-COUNT"
+        "RT-ALGEBRAIC-SOLUTION-COUNT",
+        "RT-RP-PROOF-GATE-IC-NEGATIVE"
       ],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-AUTOMORPHISM-ORBIT-FOLD",
+      "label": "Automorphism-orbit factor bases: psi(G) = [lambda]G with per-instance checks (A-FB3)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-BAND-AFFINE",
+      "label": "Priced cost is affine in the native-work weight; band reversals force an interior crossing (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-BOOLEAN-CHAIN-UPPER",
+      "label": "Fully Boolean two-S3 chain: d_F <= 3*ell+1, independent of n",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-RP-M3-DIAGONAL-UNCENSOR"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-COFACTOR4-RANK-SHORTFALL",
+      "label": "Cofactor-4 curves: two-summand relation space has rank C-1 (A-RC3/A-LA4)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-FB-BREAK-EVEN",
+      "label": "Break-even of the per-relation cost model at m=4, n=131 (Lean instances)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "GAP-BINARY-M4-DEGREE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-RP-GUARDED-EXACT-PAIR",
+      "label": "Guarded three-abscissa prime-field system: first fall 4, last fall 5 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-GUARDED-GROWING-B",
+      "label": "Explicit-membership presentation: first fall B+1, last fall in [max(5,B+1), 3B-4]",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-ICNEG-YIELD-CONSERVATION",
+      "label": "Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked)",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-RP-PROOF-GATE-IC-NEGATIVE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-KEYED-INVARIANCE",
+      "label": "Keyed-generic transcript invariance under injective operation-preserving maps (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-RECODED-SELECTOR-DEGREE",
+      "label": "Selector recodings of one F17 base: canonical degree 7 -> 6 (XOR) -> 5 (one-hot)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-SCALAR-TRANSPORT",
+      "label": "Scalar transport and answer reflection under an injective homomorphism (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-SECANT-DEGREE-REDUCTION",
+      "label": "Split-graph secant presentation: top-ideal first vanishing d+1 vs dense 2d+1 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE"
+      ],
+      "pressure": [
+        {
+          "from": "THM-RP-RECODED-SELECTOR-DEGREE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "THM-RP-SEMAEV-MONODROMY",
+      "label": "Monodromy of the Semaev cover is (Z/2)^(m-2)",
+      "status": "proved_internal_unreviewed",
+      "formal": "stated_open",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-TRACE-ZERO-DOUBLING",
+      "label": "Trace-zero bases lie in 2E and double the yield at the same degree (A-FB4)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-TWIST-MIXED-RELATION",
+      "label": "A rational relation with a Frobenius-negated (twist) term forces that term to vanish on odd order (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-YIELD-SUM-COUNT",
+      "label": "Total yield = domain size; K2 neutrality; K5 restriction (Lean, list form)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
     }
   ],
