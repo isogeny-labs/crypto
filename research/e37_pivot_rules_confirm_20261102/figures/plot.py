@@ -64,7 +64,7 @@ for gi, ax in enumerate(axs):
     ax.set_ylabel(f"S_A / S_X at {GS[gi]} GAE")
     if gi == 2:
         ax.set_xticks(range(len(E)), rl, rotation=75, fontsize=6.5)
-axs[0].legend(fontsize=7, ncol=5, loc="upper right")
+axs[0].legend(fontsize=7, ncol=5, loc="center right")
 fig.suptitle("E37 end to end, paired on the fresh stream 0xE37E0001: A's S(g) over each arm's (>1: arm cheaper than A); left of the dashed line E25's 20 GLS rows, right E24's 12 curves", fontsize=8.5)
 save(fig, "e2e_band")
 
@@ -95,6 +95,11 @@ ax.bar([i + w for i in xs], [c["nonempty_detection_rate"] for c in C], w, color=
 for y, t in [(0.95, "0.95"), (0.75, "0.75")]:
     ax.axhline(y, color=INK, lw=0.7, ls="--")
     ax.text(len(C) - 0.5, y + 0.01, t, fontsize=7, ha="right")
+for i, c in enumerate(C):
+    t = c["tally"]
+    if c["positive_rate"] == 0:
+        ax.text(i, 0.05, f"positive 0/{t['calls']}\n{t['structural']} structural\nraw detected\n{t['detected']}/{t['calls']}",
+                ha="center", fontsize=6.5, color=INK)
 ax.set_xticks(list(xs), lab, fontsize=8)
 ax.set_ylim(0, 1.05)
 ax.set_ylabel("rate over 320 control calls")

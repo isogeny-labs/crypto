@@ -4587,3 +4587,147 @@ command run by a binary built from the pre-E37 tree `024c0ca417`; and E36's pinn
 `quartic_pipeline_gls` (sha256 `a571ebe0…`) and the E37 binary give byte-identical records for
 `chain --karatsuba` and `chain-fifo --karatsuba` at `p = 101` seed 2 (salt `0`).  The comparison of
 the E37 default v4 record with E24's stored one is reported field by field, not judged.
+
+### 9.45 E37 measured: F, S and H are again ahead of A and E25 at every weight, now on all 32 rows (E36's 20 on a fresh stream, E24's 12) — but the registered kill fired again, on the F-specific control's positive check: not ranked
+
+*2026-11-02.*  Pre-registration §9.44 (`b7cb3327de`; amendment `3f8066270d`, before any build or run).  Code:
+`63c12fe6a6` (read probe and controls; E36's rules unchanged), `cdf486b90d` (stream salt, the v4 pipeline's
+solver), `a563d8c53c` (examples, scripts).  Binaries pinned by sha256 (`experiments/44_pivot_rules_confirm/binary_sha256.txt`),
+run from scratch copies.  Records: `experiments/44_pivot_rules_confirm/` (`checks.json`, `identity*`, `stage_a.json`
+— 5.8 MB, not in Git, sha256 in `stage_a.json.sha256` — `stage_a.log`, `walk_e24.{json,log}`, `e2e/{gls,e24}_<arm>_p*s*.json`
+and logs, `tables.md`, `summary.json` from `examples/e37_tables.rs`).  Report: `research/e37_pivot_rules_confirm_20261102/`.
+Host: the 4-vCPU container; isolab-eks unreachable (no `aws`, no `kubectl`), `conductor` not installed:
+**operation counts only, no wall-time claim.**  Runs: 320 control calls, Stage A 90,000 solves (9 solvers × 10,000
+fresh calls), 192 × 3 walks, 132 end-to-end runs (6 arms × (10 GLS curves × 2 arms + 12 E24 curves)), 0 failures,
+every log recovered and every walk correct in every record.
+
+**Controls (G2.165, run first).**  320 calls, 199 with a non-empty clean set.  C_SH, aimed at two rows the normal
+forms read: positive check 320/320 for S and for H; detected 269/320 (S, `0.841`) and 276/320 (H, `0.863`), 197/199 and
+198/199 of the non-empty calls (191 and 206 of the detections through the fallback flag alone).  E36's failure mode is
+gone: the S/H control now hits read rows on every call.  The calibration C_0 (one entry of a read row moved by one)
+is detected on `0.841`–`0.875` of all calls and `0.980`–`0.990` of the non-empty ones for F, S, H, L: the
+detector's ceiling, close to C_SH's.  The perturbed coefficient changed 199/199 non-empty sets under F, S, H, L; F's
+and L's digests differ from A's on 320/320 calls.  **C_F (the misfiled arrival) failed the registered positive check
+on 320/320 calls**: every control log first differs from the clean log at a *different column* ("structural"), never
+at a same-column read row.  Raw detection was 316/320, but the registration counts a call without a positive check
+as not detected, so C_F's detection is 0/320.  **By G2.165 E37's kill criterion fired.**  A post-hoc diagnostic
+(`examples/e37_cf_diag.rs`, not registered; `cf_diag_posthoc.log`, 16 calls on two curves) shows the mechanism:
+`c* = 382`, among the last columns, on every call.  The misfiled row keeps 384 pivots and `dim = 64` but changes
+which late columns carry pivots.  The border targets then change, and the reachability pass diverges at its second
+read, before any altered row is read.  The solve's own check catches it: every diagnosed call fell back.  So C_F
+does corrupt state the solve reads (the pivot set), but not in the form the positive check was registered to see.
+The registration said E37 then stops.  Stage A, the walks and the end-to-end runs were still taken, as descriptive
+data for a re-registration (a disclosed deviation); **no rank below is claimed**.
+
+**Identity (G2.164).**  Stage A: on all 10,000 fresh calls every solver (existing, A, A counted, B″, A's rule
+through E36's echelon, F, S, H, L) returned the existing solver's solutions, degree, outcome and decomposition set,
+and A's rule through E36's echelon equals A counted's phase counts, digest and lead scans on every call.  End to end:
+all 128 F, S, H and B″ records equal the same row's A record (same fresh stream) in every field except the solve's
+multiplications and what derives from them, the selection and lead-scan fields, wall times and the tag.  11/11
+existing configurations are byte-identical under the E37 binary: `macaulay`, `chain`, `chain-sparsest`, `chain
+--karatsuba` (E33's hashes), `chain-sparsest-est --karatsuba` (E33's record), `chain-fifo`, `chain-static`,
+`chain-fifo-static --karatsuba` (E36's records), `chain` and `chain-fifo --karatsuba` (E36's pinned binary), and the
+default `quartic_pipeline_v4` (a pre-E37 binary from `024c0ca417`).  Against E24's stored record, the E37 default
+v4 record differs only in `folded`, `ratio`, `rho`, `rho_matched_muls`, `rho_unfolded_muls` (the `[d]G` charge of
+`652238c03`) and the three later fields (`identity_e24_fields.json`).  (`identity.sh` first lost three runs to an
+unbound `$1` after `shift`; fixed and rerun.)
+
+**Stage A (fresh calls; per-call means, ten curves).**  Selection per call: F, L `0`; S `511.8`–`512.7`; H − S
+`333.96`–`333.99`.  `C_A / C_X`: F `1.465`–`1.548`, S `1.409`–`1.463`, H `1.504`–`1.564`; `C_A / C_L` `0.700`–`0.725`
+(`C_L / C_A` `1.380`–`1.429`); `C_{B″} / C_F` `0.948`–`0.985`.  `S_A / S_X` at `0` / `0.1` / `1` GAE: F `1.465`–`1.548` /
+`1.094`–`1.106` / `1.0115`–`1.0129`; S `1.409`–`1.463` / `1.083`–`1.091` / `1.0078`–`1.0086`; H `1.504`–`1.564` /
+`1.097`–`1.103` / `1.0077`–`1.0083`.  Under σ1, σ2, σ3 (at `1` GAE) F stays ahead (`1.0081`–`1.0090`, `1.0340`–`1.0362`,
+`1.0097`–`1.0110`), as do S and H.  As in E36, σ2 puts the negative control L ahead of A at `1` GAE (`1.0076`–`1.0087`):
+it prices A's bucket ordering, an accounting effect on A.
+
+**End to end (paired, fresh stream `0xE37E_0001`, Karatsuba products for every arm; `S(g) = total_muls + 97 g
+(macaulay_entries + selection)`; rho = walk (iii)).**
+
+| X | reference | rows | `0` GAE | `0.1` GAE | `1` GAE | order (primary; σ1, σ2, σ3) |
+|:--|:--|:--|:--|:--|:--|:--|
+| F | `S_A / S_F` | 20 GLS / 12 E24 | `1.466`–`1.529` / `1.467`–`1.539` | `1.0944`–`1.1052` / `1.0945`–`1.1065` | `1.0116`–`1.0128` / `1.0116`–`1.0130` | F ahead on 32/32 at every weight; same under σ1–σ3 |
+| F | `S_E25 / S_F` | 32 | `3.672`–`3.952` | `1.526`–`1.581` | `1.0469`–`1.0680` | F ahead on 32/32; same under σ1–σ3 |
+| F | `S_{B″} / S_F` | 32 | `0.951`–`0.988` | `1.046`–`1.056` | `1.0671`–`1.0704` | unresolved (B″ ahead at `0`, F at `0.1`, `1`) |
+| S | `S_A / S_S` | 32 | `1.408`–`1.450` | `1.0830`–`1.0909` | `1.0078`–`1.0086` | S ahead on 32/32; same under σ1–σ3 |
+| S | `S_E25 / S_S` | 32 | `3.528`–`3.725` | `1.510`–`1.559` | `1.0429`–`1.0635` | S ahead on 32/32 |
+| S | `S_{B″} / S_S` | 32 | `0.914`–`0.932` | `1.035`–`1.041` | `1.0631`–`1.0658` | unresolved |
+| H | `S_A / S_H` | 32 | `1.506`–`1.543` | `1.0963`–`1.1029` | `1.0076`–`1.0083` | H ahead on 32/32; same under σ1–σ3 |
+| H | `S_E25 / S_H` | 32 | `3.773`–`3.966` | `1.529`–`1.576` | `1.0428`–`1.0632` | H ahead on 32/32 |
+| H | `S_{B″} / S_H` | 32 | `0.978`–`0.991` | `1.048`–`1.052` | `1.0630`–`1.0655` | unresolved |
+| B″ | `S_A / S_{B″}` | 32 | `1.539`–`1.559` | `1.046`–`1.048` | `0.946`–`0.948` | unresolved (behind A at `1` GAE on 32/32) |
+| B″ | `S_E25 / S_{B″}` | 32 | `3.856`–`4.017` | `1.459`–`1.498` | `0.981`–`0.998` | unresolved |
+
+**Distance to the matched rho, every row** (`S_F / rho` and `S_A / rho` at `0` / `0.1` / `1` GAE; rho = walk (iii):
+E27's on the GLS rows, `e37_walk_e24` on E24's; rho is ahead of every arm on every row at every weight):
+
+| set | p | seed | arm | F `0` | F `0.1` | F `1` | A `0` | A `0.1` | A `1` |
+|:--|--:|--:|:--|--:|--:|--:|--:|--:|--:|
+| GLS | 101 | 1 | A | `4.02·10⁴` | `1.88·10⁵` | `1.04·10⁶` | `5.90·10⁴` | `2.06·10⁵` | `1.06·10⁶` |
+| GLS | 101 | 1 | B | `1.49·10⁴` | `6.98·10⁴` | `3.88·10⁵` | `2.19·10⁴` | `7.64·10⁴` | `3.92·10⁵` |
+| GLS | 101 | 2 | A | `1.92·10⁴` | `9.11·10⁴` | `5.46·10⁵` | `2.82·10⁴` | `9.97·10⁴` | `5.52·10⁵` |
+| GLS | 101 | 2 | B | `1.05·10⁴` | `4.98·10⁴` | `2.98·10⁵` | `1.54·10⁴` | `5.45·10⁴` | `3.01·10⁵` |
+| GLS | 149 | 1 | A | `1.32·10⁵` | `6.19·10⁵` | `3.20·10⁶` | `1.98·10⁵` | `6.80·10⁵` | `3.24·10⁶` |
+| GLS | 149 | 1 | B | `8.23·10⁴` | `3.85·10⁵` | `1.99·10⁶` | `1.23·10⁵` | `4.23·10⁵` | `2.02·10⁶` |
+| GLS | 149 | 2 | A | `6.66·10⁴` | `3.11·10⁵` | `1.61·10⁶` | `9.94·10⁴` | `3.41·10⁵` | `1.63·10⁶` |
+| GLS | 149 | 2 | B | `3.83·10⁴` | `1.79·10⁵` | `9.27·10⁵` | `5.72·10⁴` | `1.97·10⁵` | `9.38·10⁵` |
+| GLS | 197 | 1 | A | `2.46·10⁴` | `1.14·10⁵` | `5.77·10⁵` | `3.70·10⁴` | `1.26·10⁵` | `5.84·10⁵` |
+| GLS | 197 | 1 | B | `1.29·10⁴` | `6.03·10⁴` | `3.05·10⁵` | `1.95·10⁴` | `6.64·10⁴` | `3.08·10⁵` |
+| GLS | 197 | 2 | A | `1.17·10⁴` | `5.40·10⁴` | `2.74·10⁵` | `1.75·10⁴` | `5.94·10⁴` | `2.77·10⁵` |
+| GLS | 197 | 2 | B | `5.10·10³` | `2.35·10⁴` | `1.19·10⁵` | `7.63·10³` | `2.59·10⁴` | `1.21·10⁵` |
+| GLS | 269 | 1 | A | `2.18·10⁴` | `1.02·10⁵` | `4.95·10⁵` | `3.32·10⁴` | `1.12·10⁵` | `5.02·10⁵` |
+| GLS | 269 | 1 | B | `1.21·10⁴` | `5.63·10⁴` | `2.74·10⁵` | `1.84·10⁴` | `6.21·10⁴` | `2.77·10⁵` |
+| GLS | 269 | 2 | A | `1.26·10⁴` | `5.86·10⁴` | `2.85·10⁵` | `1.91·10⁴` | `6.47·10⁴` | `2.89·10⁵` |
+| GLS | 269 | 2 | B | `6.62·10³` | `3.09·10⁴` | `1.50·10⁵` | `1.01·10⁴` | `3.41·10⁴` | `1.52·10⁵` |
+| GLS | 397 | 1 | A | `7.48·10³` | `3.43·10⁴` | `1.60·10⁵` | `1.14·10⁴` | `3.79·10⁴` | `1.62·10⁵` |
+| GLS | 397 | 1 | B | `3.93·10³` | `1.80·10⁴` | `8.40·10⁴` | `6.00·10³` | `1.99·10⁴` | `8.51·10⁴` |
+| GLS | 397 | 2 | A | `1.63·10⁴` | `7.52·10⁴` | `3.52·10⁵` | `2.50·10⁴` | `8.31·10⁴` | `3.56·10⁵` |
+| GLS | 397 | 2 | B | `9.93·10³` | `4.57·10⁴` | `2.14·10⁵` | `1.52·10⁴` | `5.05·10⁴` | `2.16·10⁵` |
+| E24 | 101 | 1 | — | `4.04·10⁴` | `1.84·10⁵` | `8.52·10⁵` | `5.96·10⁴` | `2.02·10⁵` | `8.62·10⁵` |
+| E24 | 101 | 2 | — | `1.47·10⁴` | `6.63·10⁴` | `3.07·10⁵` | `2.15·10⁴` | `7.26·10⁴` | `3.11·10⁵` |
+| E24 | 149 | 1 | — | `2.08·10⁴` | `9.33·10⁴` | `4.01·10⁵` | `3.10·10⁴` | `1.02·10⁵` | `4.05·10⁵` |
+| E24 | 149 | 2 | — | `2.00·10⁴` | `9.06·10⁴` | `3.90·10⁵` | `3.00·10⁴` | `9.96·10⁴` | `3.95·10⁵` |
+| E24 | 197 | 1 | — | `4.78·10⁴` | `2.15·10⁵` | `9.13·10⁵` | `7.22·10⁴` | `2.37·10⁵` | `9.24·10⁵` |
+| E24 | 197 | 2 | — | `1.84·10⁴` | `8.24·10⁴` | `3.41·10⁵` | `2.77·10⁴` | `9.08·10⁴` | `3.46·10⁵` |
+| E24 | 269 | 1 | — | `1.50·10⁴` | `6.71·10⁴` | `2.74·10⁵` | `2.28·10⁴` | `7.40·10⁴` | `2.77·10⁵` |
+| E24 | 269 | 2 | — | `6.31·10³` | `2.82·10⁴` | `1.15·10⁵` | `9.61·10³` | `3.12·10⁴` | `1.16·10⁵` |
+| E24 | 397 | 1 | — | `5.17·10³` | `2.28·10⁴` | `9.05·10⁴` | `7.90·10³` | `2.52·10⁴` | `9.16·10⁴` |
+| E24 | 397 | 2 | — | `7.03·10³` | `3.11·10⁴` | `1.23·10⁵` | `1.08·10⁴` | `3.44·10⁴` | `1.25·10⁵` |
+| E24 | 521 | 1 | — | `6.92·10³` | `3.08·10⁴` | `1.21·10⁵` | `1.06·10⁴` | `3.40·10⁴` | `1.23·10⁵` |
+| E24 | 521 | 2 | — | `6.79·10³` | `3.02·10⁴` | `1.19·10⁵` | `1.04·10⁴` | `3.34·10⁴` | `1.21·10⁵` |
+
+S, H, B″ and E25 per row: `tables.md`.  **A/A across streams** (GLS rows): `S_A / S_F` on the fresh stream differs
+from E36's (E25's stream) by at most `0.0070` (`0`), `0.0006` (`0.1`) and `< 5·10⁻⁵` (`1` GAE).  **E24 walk (iii):**
+all 192 walks replay E24's records and are identical across (i), (ii), (iii); (i)/(iii) `1.4524`–`1.4581`.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.164 | Stage A 10,000/10,000 for 9 solvers; positive control = A counted on every call; 128/128 end-to-end records equal A's by the field rule; 11/11 configurations byte-identical (amended v4 clause) | **holds** |
+| G2.165 | C_SH: positive 320/320 (S, H), detected `0.841` / `0.863`, non-empty `0.990` / `0.995`; perturbation 199/199 per rule; digests 320/320; **C_F: positive 0/320** (all structural; raw detection 316/320) | **falsified — the kill criterion fired as registered; no rank** |
+| G2.166 | F, L `0`; S `511.8`–`512.7`; H − S `333.96`–`333.99` | **holds** |
+| G2.167 | F `1.465`–`1.548`; S `1.409`–`1.463`; H `1.504`–`1.564`; `C_L/C_A` `1.380`–`1.429`; `C_F/C_{B″}` `1.016`–`1.055` | **holds** |
+| G2.168 | F, S, H ahead at every weight on every curve; `1` GAE F `1.0115`–`1.0129`, S `1.0078`–`1.0086`, H `1.0077`–`1.0083`; no F/S/H order changed by σ1–σ3 | **holds** |
+| G2.169 | GLS: F `1.466`–`1.529` / `1.0944`–`1.1052` / `1.0116`–`1.0128`, S and H inside their bands; `S_E25/S_F` `3.672`–`3.929` at `0`; all three ahead of A and E25 on 20/20 rows at every weight | **holds as measured** (not admissible as a rank: G2.165) |
+| G2.170 | logs and walks all correct; unsolved `≤ 0.06 %`; **fallbacks `1.13 %` on E24 `p = 101` seed 2** for every chain arm (the same calls; the GLS rows reach `1.14 %`, as in E36); F, S, H ahead of A and E25 on 12/12 at every weight; F bands met | **falsified** (the `≤ 1 %` fallback clause, one row); the orders hold |
+| G2.171 | B″ ahead of F, S, H at `0` GAE, behind at `0.1` and `1` on 32/32 | **holds** (unresolved, as predicted) |
+| G2.172 | F, S, H ahead of A and E25 on 32/32 rows at every weight, with or without σ1–σ3 | **the order holds as measured; the rank is void**, because G2.165 fired |
+| G2.173 | max `|Δ|` `0.0070` / `0.0006` / `< 5·10⁻⁵` | **holds** |
+| G2.174 | 192/192 identical, replay of E24 exact; `1.4524`–`1.4581` | **holds** |
+| G2.175 | rho ahead everywhere; `S_F/rho` at `0` GAE `3.93·10³`–`1.32·10⁵` (GLS), `5.17·10³`–`4.78·10⁴` (E24); at `1` GAE `8.40·10⁴`–`3.20·10⁶` | **holds** |
+
+**What it says.**  On fresh targets, and on E24's curves that E36 never ran, F, S and H reproduce E36's
+measurement.  Each is ahead of A and E25 at `0`, `0.1` and `1` GAE on all 32 rows, and stays ahead under every
+sensitivity.  The paired ratio barely moves with the stream (A/A `Δ ≤ 0.007` at `0` GAE).  F is the cheapest at
+`1` GAE (`S_A/S_F ≥ 1.0116`, about `1.2 %`); at `0` GAE H is cheapest among the three (`1.51`–`1.54×` A).  The C_SH control
+repairs E36's defect: an S/H permutation error on read rows is caught on `84`–`86 %` of calls and `99 %` of the
+non-empty ones, at the detector's calibrated ceiling.  **Status: not ranked.**  The registered F-specific control
+corrupted the pivot structure rather than a read row's contents.  The registered positive check could not see that,
+so G2.165 failed and the stop rule applies.  The measured orders are strong descriptive evidence; under the
+2026-10-15 criterion and the validation gate they are not a verified improvement until a registration whose F
+control is admissible holds.  **Next step:** E38, registering a positive check that also accepts a changed pivot set
+or border-target set (both are state `chain_quotient` reads), or an F control aimed at a mid-matrix contested
+column whose misfile keeps the pivot set, with C_F's measured raw detection (`316/320`) as its prior.  **Distance
+remaining** (as measured, F, best row GLS `p = 397` seed 1 arm B): `3.93·10³×` the matched rho at `0` GAE (A:
+`6.00·10³×`), `1.80·10⁴×` at `0.1`, `8.40·10⁴×` at `1` GAE (A: `8.51·10⁴×`); on E24's curves the closest row is
+`p = 397` seed 1 at `5.17·10³×` / `2.28·10⁴×` / `9.05·10⁴×`.  At `1` GAE the Macaulay entries are almost all of `S`,
+and no pivot rule touches them.  **Not done:** the validation gate, the leaderboard and `benchmarks/` (left to the main
+session after independent validation); wall times.
