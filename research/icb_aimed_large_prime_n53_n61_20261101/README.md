@@ -22,8 +22,14 @@ scope and need a separate versioned method/protocol.
 `ic.koblitz_descent` entry is not modified. For an active LP arm, it probes the
 same aimed three-summand window, uses Base membership only to keep a bounded
 residual domain disjoint, and never emits a direct two-summand Base relation.
-It maps exact graph-closed rows into the frozen projected columns and verifies
-both raw and projected group equations before sparse ingestion.
+The exact frozen `PairSumTable` scan runs first. Only a probe with no ordinary
+hit enters a partials-only LP pass, so the graph cannot pre-empt an ordinary
+witness or mutate on a probe the frozen stream would consume. The exact named
+third summands visited by the incremental second pass are included in
+`summands_scanned` and exposed separately as
+`lp_partial_scan_trials` and `lp_partial_summands_scanned`. Exact graph-closed
+rows are mapped into the frozen projected columns, and both raw and projected
+group equations are verified before sparse ingestion.
 
 The prospective treatment is the full versioned adapter composition. A
 deterministic focused gate must first prove parity with the frozen collector's

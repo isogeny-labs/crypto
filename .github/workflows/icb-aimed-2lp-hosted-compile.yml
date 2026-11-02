@@ -5,6 +5,10 @@ name: ICB aimed 2LP hosted compile fallback (no performance claim)
 # planner preflight as the high-memory gate. It never invokes ecbench, any
 # provider, or any freeze/checkpoint/image/launch path, and its host timing is
 # not scientific evidence or a wall/performance claim.
+# Governance correction after immutable run 41360223353: that run was the
+# exact-parent-bound push from aeae3a6c... to 30810997.... Its source-binding
+# list omitted the original high-memory workflow, whose trigger-commit diff
+# was comments only; the corrected list below binds both workflows.
 on:
   # One-shot branch trigger: the job also requires the push's parent to be the
   # audited pre-trigger commit, so later source pushes cannot execute it.
@@ -31,12 +35,6 @@ on:
       - taskq/deploy/eks-karpenter/arc/README.md
       - taskq/deploy/eks-karpenter/arc/highmem-values.yaml
       - taskq/deploy/eks-karpenter/run-ecbench
-  workflow_dispatch:
-    inputs:
-      expected_commit:
-        description: Exact 40-character commit to compile (must equal the dispatched SHA)
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -56,13 +54,13 @@ env:
 
 jobs:
   hosted-compile-gates:
-    if: ${{ github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/large-prime' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.before == 'aeae3a6c1a2fabf711044ebfda8a7dc2e0758acf')) }}
+    if: ${{ github.event_name == 'push' && github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/codex/large-prime' && github.event.before == '308109977c29705bd6e3e2b10b0dd51331003acc' }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
-      EXPECTED_COMMIT: ${{ github.event_name == 'push' && github.sha || inputs.expected_commit }}
+      EXPECTED_COMMIT: ${{ github.sha }}
       EVENT_BEFORE: ${{ github.event.before }}
-      TRIGGER_PARENT_COMMIT: aeae3a6c1a2fabf711044ebfda8a7dc2e0758acf
+      TRIGGER_PARENT_COMMIT: 308109977c29705bd6e3e2b10b0dd51331003acc
     steps:
       - name: Check out the exact unfrozen source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -94,9 +92,6 @@ jobs:
             push)
               test "$EVENT_BEFORE" = "$TRIGGER_PARENT_COMMIT"
               test "$(git rev-parse HEAD^)" = "$TRIGGER_PARENT_COMMIT"
-              ;;
-            workflow_dispatch)
-              test -n "$EXPECTED_COMMIT"
               ;;
             *)
               printf 'unauthorized event: %s\n' "$GITHUB_EVENT_NAME" >&2
@@ -218,6 +213,7 @@ jobs:
             {
               printf '%s\n' \
                 Cargo.toml Cargo.lock \
+                .github/workflows/icb-aimed-2lp-compile.yml \
                 .github/workflows/icb-aimed-2lp-hosted-compile.yml \
                 benchmarks/20261101-icb-aimed-large-prime/README.md \
                 docs/ecbench/README.md docs/session-logs/2026-11-01.md \
@@ -305,7 +301,7 @@ jobs:
             'cryptanalysis::ecbench::koblitz_descent::tests::projected_large_prime_rows_map_to_the_frozen_log_columns_and_fail_closed'
             'cryptanalysis::ecbench::koblitz_descent::tests::aimed_lp_adapter_preserves_the_frozen_ordinary_three_sum_opportunities'
             'cryptanalysis::ecbench::koblitz_descent::tests::lp_zero_is_the_frozen_pipeline_and_two_lp_recovers_a_toy_target'
-            'cryptanalysis::ecbench::methods::tests::aimed_lp_report_control_and_native_ownership_are_exact'
+            'cryptanalysis::ecbench::methods::accounting_rules_tests::aimed_lp_report_control_and_native_ownership_are_exact'
             'cryptanalysis::koblitz_index_calculus::tests::exported_aimed_window_indices_are_the_collectors_exact_scan'
             'cryptanalysis::ic_framework::large_prime::tests::aimed_decomposition_scans_only_the_named_third_summands'
           )
@@ -591,6 +587,7 @@ jobs:
             {
               printf '%s\n' \
                 Cargo.toml Cargo.lock \
+                .github/workflows/icb-aimed-2lp-compile.yml \
                 .github/workflows/icb-aimed-2lp-hosted-compile.yml \
                 benchmarks/20261101-icb-aimed-large-prime/README.md \
                 docs/ecbench/README.md docs/session-logs/2026-11-01.md \

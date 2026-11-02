@@ -658,6 +658,48 @@ impl<'i> LargePrimeCollector<'i> {
         )
     }
 
+    /// Large-prime partials over an explicit aimed/windowed subset after the
+    /// caller has completed the frozen ordinary m=3 scan and found no hit.
+    /// This path never probes the collector's small-pair table and never
+    /// emits a direct relation, so it can only extend a failed ordinary
+    /// probe; it cannot replace or pre-empt the frozen stream. The returned
+    /// count is the exact number of named third summands visited before a row
+    /// was emitted or the scan was exhausted.
+    #[allow(clippy::too_many_arguments)]
+    pub fn decompose_indices_partials_only(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'_>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+        a: u64,
+        b: u64,
+        indices: &[u32],
+    ) -> (Vec<Relation>, u64) {
+        let g = ctx.group;
+        let small_points = self.small_points;
+        let mut scanned = 0u64;
+        for i in indices
+            .iter()
+            .copied()
+            .map(|index| index as usize)
+            .filter(|&index| index < small_points)
+        {
+            scanned += 1;
+            let t = g.add(ops, point, g.neg(fb.points[i]));
+            if g.is_identity(&t) {
+                continue;
+            }
+            if let Some(relation) =
+                self.decompose_lp_residual(g, fb, ops, counters, i, t, a, b, false)
+            {
+                return (vec![relation], scanned);
+            }
+        }
+        (Vec::new(), scanned)
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn decompose_over<I: IntoIterator<Item = usize>>(
         &mut self,
@@ -672,7 +714,6 @@ impl<'i> LargePrimeCollector<'i> {
         allow_direct_two_sum: bool,
     ) -> Vec<Relation> {
         let g = ctx.group;
-        let mut out = Vec::new();
         for i in indices {
             let t = g.add(ops, point, g.neg(fb.points[i]));
             if g.is_identity(&t) {
@@ -681,63 +722,87 @@ impl<'i> LargePrimeCollector<'i> {
             // The classic probe, unchanged.
             if let Some((j, k)) = self.table_small.probe(g, fb, ops, counters, t) {
                 self.counters.direct_three_sum += 1;
-                out.push(Relation::Summands(vec![i, j, k]));
-                return out;
+                return vec![Relation::Summands(vec![i, j, k])];
             }
-            // The large table: F × D and, with two large primes, D × D.
-            if let Some((j, k)) = self.table_large.probe(g, &self.envelope, ops, counters, t) {
-                let (j_large, k_large) = (j >= self.small_points, k >= self.small_points);
-                let (small, residual) = match (j_large, k_large) {
-                    (false, false) => {
-                        unreachable!("F × F pairs are filtered out of the large table")
-                    }
-                    (true, true) => {
-                        self.counters.partials_two_large += 1;
-                        (
-                            vec![i],
-                            vec![self.envelope.points[j], self.envelope.points[k]],
-                        )
-                    }
-                    (false, true) => {
-                        self.counters.partials_mixed += 1;
-                        (vec![i, j], vec![self.envelope.points[k]])
-                    }
-                    (true, false) => {
-                        self.counters.partials_mixed += 1;
-                        (vec![i, k], vec![self.envelope.points[j]])
-                    }
-                };
-                if let Some(row) = self.feed(g, fb, ops, a, b, small, residual) {
-                    out.push(row);
-                    return out;
-                }
-            }
-            // Membership of T itself: in D, a one-large-prime partial; in
-            // F, a two-summand relation the classic m = 3 loop never looks
-            // for.  One canonicalisation and one lookup.
-            counters.canonicalisations += 1;
-            let key = self.table_small.orbit_key(t.x);
-            counters.lookups += 1;
-            match self.membership.get(&key) {
-                Some(Membership::Domain) => {
-                    self.counters.partials_one_large += 1;
-                    if let Some(row) = self.feed(g, fb, ops, a, b, vec![i], vec![t]) {
-                        out.push(row);
-                        return out;
-                    }
-                }
-                Some(Membership::Base) if allow_direct_two_sum => {
-                    counters.lookups += 1;
-                    if let Some(&j) = fb.point_index.get(&t.pack()) {
-                        self.counters.direct_two_sum += 1;
-                        out.push(Relation::Summands(vec![i, j]));
-                        return out;
-                    }
-                }
-                Some(Membership::Base) | None => {}
+            if let Some(relation) =
+                self.decompose_lp_residual(
+                    g,
+                    fb,
+                    ops,
+                    counters,
+                    i,
+                    t,
+                    a,
+                    b,
+                    allow_direct_two_sum,
+                )
+            {
+                return vec![relation];
             }
         }
-        out
+        Vec::new()
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_lp_residual(
+        &mut self,
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        i: usize,
+        t: FastPoint,
+        a: u64,
+        b: u64,
+        allow_direct_two_sum: bool,
+    ) -> Option<Relation> {
+        // The large table: F × D and, with two large primes, D × D.
+        if let Some((j, k)) = self.table_large.probe(g, &self.envelope, ops, counters, t) {
+            let (j_large, k_large) = (j >= self.small_points, k >= self.small_points);
+            let (small, residual) = match (j_large, k_large) {
+                (false, false) => {
+                    unreachable!("F × F pairs are filtered out of the large table")
+                }
+                (true, true) => {
+                    self.counters.partials_two_large += 1;
+                    (
+                        vec![i],
+                        vec![self.envelope.points[j], self.envelope.points[k]],
+                    )
+                }
+                (false, true) => {
+                    self.counters.partials_mixed += 1;
+                    (vec![i, j], vec![self.envelope.points[k]])
+                }
+                (true, false) => {
+                    self.counters.partials_mixed += 1;
+                    (vec![i, k], vec![self.envelope.points[j]])
+                }
+            };
+            if let Some(row) = self.feed(g, fb, ops, a, b, small, residual) {
+                return Some(row);
+            }
+        }
+        // Membership of T itself: in D, a one-large-prime partial; in
+        // F, a two-summand relation the classic m = 3 loop never looks
+        // for. One canonicalisation and one lookup.
+        counters.canonicalisations += 1;
+        let key = self.table_small.orbit_key(t.x);
+        counters.lookups += 1;
+        match self.membership.get(&key) {
+            Some(Membership::Domain) => {
+                self.counters.partials_one_large += 1;
+                self.feed(g, fb, ops, a, b, vec![i], vec![t])
+            }
+            Some(Membership::Base) if allow_direct_two_sum => {
+                counters.lookups += 1;
+                fb.point_index.get(&t.pack()).map(|&j| {
+                    self.counters.direct_two_sum += 1;
+                    Relation::Summands(vec![i, j])
+                })
+            }
+            Some(Membership::Base) | None => None,
+        }
     }
 }
 
@@ -1054,25 +1119,25 @@ mod tests {
 
         let mut ops = GroupOps::default();
         let mut counters = OracleCounters::default();
-        assert!(lp
-            .decompose_indices_lp_only(
-                &ctx,
-                &fb,
-                &mut ops,
-                &mut counters,
-                point,
-                123,
-                0,
-                &[],
-            )
-            .is_empty());
+        let (rows, scanned) = lp.decompose_indices_partials_only(
+            &ctx,
+            &fb,
+            &mut ops,
+            &mut counters,
+            point,
+            123,
+            0,
+            &[],
+        );
+        assert!(rows.is_empty());
+        assert_eq!(scanned, 0);
         assert_eq!(ops.gae(), 0.0);
         assert_eq!(counters.lookups, 0);
         assert_eq!(counters.canonicalisations, 0);
 
         let mut ops = GroupOps::default();
         let mut counters = OracleCounters::default();
-        let rows = lp.decompose_indices_lp_only(
+        let (rows, scanned) = lp.decompose_indices_partials_only(
             &ctx,
             &fb,
             &mut ops,
@@ -1082,11 +1147,10 @@ mod tests {
             0,
             &[0],
         );
+        assert_eq!(scanned, 1);
         assert!(ops.gae() >= 1.0, "one named summand performs R - P_0");
-        assert!(rows.iter().all(|row| match row {
-            Relation::Summands(points) => points.len() == 3,
-            Relation::Row { .. } => true,
-        }));
+        assert!(rows.iter().all(|row| matches!(row, Relation::Row { .. })));
+        assert_eq!(lp.relation_counters()["lp_direct_three_sum"], 0);
         assert_eq!(lp.relation_counters()["lp_direct_two_sum"], 0);
 
         // Prove that this is a treatment restriction, not an unreachable
@@ -1137,7 +1201,7 @@ mod tests {
             LargePrimeCollector::new(&inst, &ctx, &fb, config, &mut aimed_setup).unwrap();
         let mut aimed_ops = GroupOps::default();
         let mut aimed_counters = OracleCounters::default();
-        let rows = aimed.decompose_indices_lp_only(
+        let (rows, scanned) = aimed.decompose_indices_partials_only(
             &ctx,
             &fb,
             &mut aimed_ops,
@@ -1147,10 +1211,9 @@ mod tests {
             0,
             &[index],
         );
-        assert!(rows.iter().all(|row| match row {
-            Relation::Summands(points) => points.len() == 3,
-            Relation::Row { .. } => true,
-        }));
+        assert_eq!(scanned, 1);
+        assert!(rows.iter().all(|row| matches!(row, Relation::Row { .. })));
+        assert_eq!(aimed.relation_counters()["lp_direct_three_sum"], 0);
         assert_eq!(aimed.relation_counters()["lp_direct_two_sum"], 0);
     }
 

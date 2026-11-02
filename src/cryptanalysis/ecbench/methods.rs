@@ -8129,6 +8129,17 @@ mod accounting_rules_tests {
             Some(wrapper_relations)
         );
         assert!(relations.scalar_mults >= wrapper_relations);
+        let ordinary_summands = two.counters["collection_trials"] * 16;
+        let partial_summands = two.counters["aimed_lp_partial_summands_scanned"];
+        assert!(two.counters["aimed_lp_partial_scan_trials"] > 0);
+        assert!(partial_summands > 0);
+        assert_eq!(
+            two.counters["summands_scanned"],
+            ordinary_summands + partial_summands,
+            "treatment scan accounting is frozen ordinary work plus the exact LP second pass"
+        );
+        assert!(relations.adds + relations.doubles >= two.counters["summands_scanned"]);
+        assert!(two.counters["pair_filter_probes_uncharged"] >= ordinary_summands);
         assert!(two.counters["lp_small_table_lookups_uncharged"] > 0);
         assert!(two.counters["lp_table_lookups_uncharged"] > 0);
         assert!(two.counters["lp_oracle_lookups_uncharged"] > 0);

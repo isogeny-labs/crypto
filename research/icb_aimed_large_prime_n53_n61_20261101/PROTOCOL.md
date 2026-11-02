@@ -24,7 +24,9 @@ eventual source commit, covering all of the following:
   branch is never emitted or admitted, and `aimed_lp_direct_two_sum == 0`;
 - on the same deterministic n=13 base, unit, and aimed window, the nonzero-LP
   adapter has exactly the frozen collector's ordinary three-summand hit-trial
-  census and probe scalars, and every adapted ordinary witness replays;
+  census and probe scalars, and every adapted ordinary witness replays; the
+  exact frozen `PairSumTable` scan must finish first, and only an ordinary miss
+  may enter the separately counted partials-only LP pass or mutate its graph;
 - toy recovery is under-ranked without graph elimination and succeeds only
   after at least one merged 2LP projected row;
 - raw-to-projected sparse mapping solves and replays, while a mutated sparse
@@ -34,6 +36,10 @@ eventual source commit, covering all of the following:
 - global thread-local accounting owns group adds/doubles, canonicalisations,
   and Frobenius coordinate maps exactly once; LP-local accounting contributes
   only disjoint hash/table work and wrapper scalar-multiplication metadata;
+- `summands_scanned` includes the frozen ordinary window and the exact number
+  of named third summands visited by the LP pass on ordinary misses, while
+  `lp_partial_scan_trials` and `lp_partial_summands_scanned` expose that
+  incremental scan explicitly;
 - setup and relation wrapper scalar multiplications survive into final phase
   and total counts without duplicating their underlying adds/doubles.
 

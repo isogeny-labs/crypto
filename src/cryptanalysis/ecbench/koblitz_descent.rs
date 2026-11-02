@@ -64,7 +64,7 @@ use crate::cryptanalysis::koblitz_index_calculus::{
     DecompositionStrategy, FactorBaseLogSolver, FactorBaseSelectionCost, FrobeniusFactorBase,
     IndividualLogSolver, KoblitzCurve, KoblitzIcOptions, LinearAlgebra, PairSumTable,
     ProbeBudget, ProjectedFactorBase, ProjectedRelation, RelationCollector, RelationWorkUnit,
-    PROBE_RUN,
+    Scan, ScanScratch, PROBE_RUN,
 };
 use crate::cryptanalysis::koblitz_large_prime::LargePrimeLimits;
 use crate::cryptanalysis::koblitz_sparse_la::{SparseSolveOptions, SparseSolveReport};
@@ -449,6 +449,8 @@ struct AimedUnit {
     relations: Vec<AimedRelation>,
     trials: u64,
     summands_scanned: u64,
+    partial_scan_trials: u64,
+    partial_summands_scanned: u64,
     /// See [`AimedLargePrimeCounts::wrapper_scalar_mults_relations`].
     wrapper_scalar_mults: u64,
 }
@@ -628,27 +630,17 @@ fn projected_relation_from_raw(
     })
 }
 
-fn adapt_large_prime_relation(
+fn adapt_projected_large_prime_relation(
     trial: u64,
-    probe_a: u64,
     relation: Relation,
     raw_to_projected: &[(usize, u64)],
     r: u64,
 ) -> Result<AimedRelation, String> {
     match relation {
-        Relation::Summands(points) => {
-            if points.len() != 3 {
-                return Err(format!(
-                    "aimed m=3 large-prime collection refuses a direct {}-summand relation",
-                    points.len()
-                ));
-            }
-            Ok(AimedRelation::Ordinary(CollectedRelation {
-                trial,
-                a: probe_a,
-                points,
-            }))
-        }
+        Relation::Summands(points) => Err(format!(
+            "partials-only LP seam emitted a forbidden direct {}-summand relation",
+            points.len()
+        )),
         Relation::Row { columns, a, b } => {
             if b != 0 {
                 return Err("factor-base precomputation received a target-bearing LP row".into());
@@ -671,6 +663,7 @@ fn collect_aimed_large_prime_unit(
     framework_fb: &crate::cryptanalysis::ic_boundary::FactorBase<
         crate::cryptanalysis::koblitz_fast::FastPoint,
     >,
+    ordinary_pair: &PairSumTable,
     collector: &mut LargePrimeCollector<'_>,
     counters: &mut OracleCounters,
     unit: RelationWorkUnit,
@@ -712,6 +705,7 @@ fn collect_aimed_large_prime_unit(
         ..AimedUnit::default()
     };
     let mut ops = GroupOps::default();
+    let mut ordinary_scratch = ScanScratch::default();
     for run in first_run..=last_run {
         let run_start = (run * PROBE_RUN).max(unit.start);
         let run_end = ((run + 1) * PROBE_RUN).min(end);
@@ -727,25 +721,42 @@ fn collect_aimed_large_prime_unit(
                     trial,
                 )
                 .ok_or("aimed large-prime scan has no valid third summands")?;
-                let relations = collector.decompose_indices_lp_only(
-                    ctx,
-                    framework_fb,
-                    &mut ops,
-                    counters,
+                if let Some(points) = ordinary_pair.decompose_fast_scan(
                     point,
-                    a,
-                    0,
-                    &indices,
-                );
-                for relation in relations {
-                    let adapted = adapt_large_prime_relation(
-                        trial,
-                        a,
-                        relation,
-                        raw_to_projected,
-                        instance.r,
-                    )?;
-                    out.relations.push(adapted);
+                    3,
+                    Scan::Indices(&indices),
+                    &mut ordinary_scratch,
+                ) {
+                    out.relations
+                        .push(AimedRelation::Ordinary(CollectedRelation {
+                            trial,
+                            a,
+                            points,
+                        }));
+                } else {
+                    out.partial_scan_trials += 1;
+                    let (relations, partial_summands_scanned) =
+                        collector.decompose_indices_partials_only(
+                            ctx,
+                            framework_fb,
+                            &mut ops,
+                            counters,
+                            point,
+                            a,
+                            0,
+                            &indices,
+                        );
+                    out.partial_summands_scanned += partial_summands_scanned;
+                    out.summands_scanned += partial_summands_scanned;
+                    for relation in relations {
+                        let adapted = adapt_projected_large_prime_relation(
+                            trial,
+                            relation,
+                            raw_to_projected,
+                            instance.r,
+                        )?;
+                        out.relations.push(adapted);
+                    }
                 }
             }
             a = ((a as u128 + stride as u128) % instance.r as u128) as u64;
@@ -883,6 +894,7 @@ fn pipeline_aimed_large_prime(
             instance,
             &ctx,
             &framework_fb,
+            &pair,
             &mut collector,
             &mut oracle_counters,
             work(unit),
@@ -920,6 +932,7 @@ fn pipeline_aimed_large_prime(
             instance,
             &ctx,
             &framework_fb,
+            &pair,
             &mut collector,
             &mut oracle_counters,
             work(next),
@@ -982,7 +995,18 @@ fn pipeline_aimed_large_prime(
         .flat_map(|unit| &unit.relations)
         .filter(|relation| matches!(relation, AimedRelation::Projected(_)))
         .count();
-    let lp_relations = collector.relation_counters();
+    let mut lp_relations = collector.relation_counters();
+    lp_relations.insert(
+        "lp_partial_scan_trials".into(),
+        units.values().map(|unit| unit.partial_scan_trials).sum(),
+    );
+    lp_relations.insert(
+        "lp_partial_summands_scanned".into(),
+        units
+            .values()
+            .map(|unit| unit.partial_summands_scanned)
+            .sum(),
+    );
     let wrapper_scalar_mults_relations = units
         .values()
         .map(|unit| unit.wrapper_scalar_mults)
@@ -1757,6 +1781,13 @@ mod tests {
     fn aimed_lp_adapter_preserves_the_frozen_ordinary_three_sum_opportunities() {
         let inst = koblitz_instance(0, 13).expect("K_0/GF(2^13)");
         let kc = inst.koblitz.as_ref().unwrap();
+        assert!(adapt_projected_large_prime_relation(
+            0,
+            Relation::Summands(vec![0, 1, 2]),
+            &[],
+            kc.subgroup_order.to_u64().unwrap(),
+        )
+        .is_err());
         let p = params(11, 80, 16, 256);
         let (fb, _) = build_subgroup_orbit_factor_base_with_cost(
             kc,
@@ -1831,6 +1862,7 @@ mod tests {
             &inst,
             &ctx,
             &framework_fb,
+            &pair,
             &mut lp,
             &mut oracle_counters,
             unit,
@@ -1918,7 +1950,9 @@ mod tests {
         assert_eq!(two.base.recovered.as_ref(), Some(&d));
         assert!(two.base.verified);
         assert!(two.large_prime.projected_relations > 0);
-        assert!(two.large_prime.ordinary_relations < two.base.counts.log_columns);
+        // Raw emitted-row count is not matrix rank: ordinary rows may be
+        // duplicate or dependent, so their count need not be below the
+        // number of columns when projected graph rows are admitted.
         assert_eq!(
             two.large_prime.projected_relations as u64,
             two.large_prime
@@ -1962,5 +1996,169 @@ mod tests {
                 .copied(),
             Some(0)
         );
+
+        // Replay the exact deterministic toy relation stream and test the
+        // causal claim at matrix rank, rather than using raw row counts as a
+        // proxy. The ordinary subset must remain underdetermined; admitting
+        // the graph-produced projected rows must yield a verified log table
+        // that recovers the same target.
+        let (fb, _) = build_subgroup_orbit_factor_base_with_cost(
+            kc,
+            p.seed,
+            p.factor_base_points,
+        )
+        .expect("toy subgroup base replay");
+        let probes = ProbeBudget::for_run(
+            kc,
+            fb.points.len(),
+            true,
+            p.collection_window,
+            p.unit_trials,
+            p.units,
+            p.descent_summands,
+            1,
+        );
+        let pair = PairSumTable::build_within_for(
+            kc,
+            &fb,
+            PairSumTable::DEFAULT_BYTE_BUDGET,
+            probes,
+        )
+        .expect("frozen aimed pair table replay");
+        let framework_fb = koblitz_factor_base(
+            &inst,
+            &fb,
+            ColumnFold::SignedFrobeniusOrbit,
+            "projected-row necessity replay".into(),
+        )
+        .expect("framework view of the toy base");
+        let raw_to_projected = raw_to_projected_columns(kc, &fb).unwrap();
+        let group = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.fast.lift(&q),
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let lp_params = AimedLargePrimeParams {
+            large_primes: 2,
+            domain_factor: 3.0,
+            raw_x_cap: 1 << 13,
+        };
+        let mut setup = GroupOps::default();
+        let mut lp = LargePrimeCollector::new(
+            &inst,
+            &ctx,
+            &framework_fb,
+            lp_params.config(),
+            &mut setup,
+        )
+        .expect("LP necessity replay");
+        let mut oracle_counters = OracleCounters::default();
+        let mut coverage = Some(ColumnCoverage::new(kc, &fb).unwrap());
+        let mut replay_units = Vec::new();
+        for unit_index in 0..two.base.counts.units {
+            let aim = coverage
+                .as_ref()
+                .map(ColumnCoverage::missing_points)
+                .filter(|points| !points.is_empty());
+            let unit = RelationWorkUnit {
+                seed: p.seed,
+                start: unit_index as u64 * p.unit_trials,
+                count: p.unit_trials,
+            };
+            let collected = collect_aimed_large_prime_unit(
+                &inst,
+                &ctx,
+                &framework_fb,
+                &pair,
+                &mut lp,
+                &mut oracle_counters,
+                unit,
+                aim.as_deref(),
+                p.collection_window.unwrap() as usize,
+                &raw_to_projected,
+            )
+            .expect("deterministic LP necessity unit");
+            add_aimed_coverage(&mut coverage, &collected.relations);
+            replay_units.push(collected);
+        }
+        assert!(lp.last_error().is_none());
+
+        let options = p.options();
+        let mut ordinary_solver = FactorBaseLogSolver::new(kc, &fb, &options).unwrap();
+        let mut combined_solver = FactorBaseLogSolver::new(kc, &fb, &options).unwrap();
+        let mut ordinary_rows = 0usize;
+        let mut projected_rows = 0usize;
+        let mut replay_relation_scalars = Vec::new();
+        for unit in &replay_units {
+            for relation in &unit.relations {
+                match relation {
+                    AimedRelation::Ordinary(relation) => {
+                        ordinary_rows += 1;
+                        replay_relation_scalars.push(relation.a);
+                        ordinary_solver.push(std::slice::from_ref(relation));
+                        combined_solver.push(std::slice::from_ref(relation));
+                    }
+                    AimedRelation::Projected(relation) => {
+                        projected_rows += 1;
+                        replay_relation_scalars.push(relation.a);
+                        combined_solver.push_projected(std::slice::from_ref(relation));
+                    }
+                }
+            }
+        }
+        assert_eq!(ordinary_rows, two.large_prime.ordinary_relations);
+        assert_eq!(projected_rows, two.large_prime.projected_relations);
+        assert_eq!(replay_relation_scalars, two.base.relation_scalars);
+        assert_eq!(
+            replay_units
+                .iter()
+                .map(|unit| unit.summands_scanned)
+                .sum::<u64>(),
+            two.base.counts.summands_scanned
+        );
+        let mut replay_lp_relations = lp.relation_counters();
+        replay_lp_relations.insert(
+            "lp_partial_scan_trials".into(),
+            replay_units
+                .iter()
+                .map(|unit| unit.partial_scan_trials)
+                .sum(),
+        );
+        replay_lp_relations.insert(
+            "lp_partial_summands_scanned".into(),
+            replay_units
+                .iter()
+                .map(|unit| unit.partial_summands_scanned)
+                .sum(),
+        );
+        assert_eq!(replay_lp_relations, two.large_prime.relations);
+        assert_eq!(oracle_counters.lookups, two.large_prime.oracle_lookups);
+        assert_eq!(
+            oracle_counters.canonicalisations,
+            two.large_prime.oracle_canonicalisations
+        );
+        assert_eq!(
+            oracle_counters.frobenius_maps,
+            two.large_prime.oracle_frobenius_maps
+        );
+        assert!(
+            ordinary_solver.try_solve().is_none(),
+            "the exact ordinary subset must remain rank-deficient"
+        );
+        let (table, solve_report) = combined_solver
+            .try_solve()
+            .expect("projected graph rows determine the toy log table");
+        assert!(solve_report.verified);
+        let descent = IndividualLogSolver::new(kc, &fb, &table, &options, Some(&pair))
+            .expect("descent from the graph-completed table");
+        let recovered = descent.solve_report(&q);
+        assert_eq!(recovered.log.as_ref(), Some(&d));
+        assert_eq!(kc.mul(kc.generator(), recovered.log.as_ref().unwrap()), q);
     }
 }

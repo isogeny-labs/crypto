@@ -73,7 +73,7 @@
     {
       "id": "H-aimed-2lp",
       "statement": "Closing exact 2LP partials inside the aimed rule-v8 relation stream reduces enough collection work to repay its additional cold domain, table, verification, and elimination cost.",
-      "mechanism": "After a deterministic focused gate proves that the adapter preserves the frozen collector's ordinary aimed three-sum trial census and probe scalars, the disjoint domain turns failed aimed three-sum probes into exact partial rows; graph closure supplies sparse projected rows while keeping the same factor-base columns and descent. The causal treatment is the full versioned adapter composition, not graph closure in isolation.",
+      "mechanism": "The adapter first completes the exact frozen PairSumTable scan over the exact aimed window. Only an ordinary miss enters a separately counted partials-only LP pass or mutates its graph. After a deterministic focused gate proves that this preserves the frozen collector's ordinary aimed three-sum trial census and probe scalars, the disjoint domain turns those failed aimed three-sum probes into exact partial rows; graph closure supplies sparse projected rows while keeping the same factor-base columns and descent. The causal treatment is the full versioned adapter composition, including the incremental second scan on ordinary misses, not graph closure in isolation.",
       "predictions": [
         {
           "id": "P-cold",
@@ -353,7 +353,7 @@
     "positive": {
       "present": true,
       "arm": "aimed-lp0",
-      "expected_detection": "On the frozen n=13 L2 gate, ten measured A/A pairs have identical operations and counters; ten measured LP=0 pairs have the same recovered values, relation scalars, column logs, phase operations and replayed counters as aimed; each of the twenty measured 2LP rows recovers its target, emits lp_partials_fed > 0, lp_projected_relations > 0 and lp_merged_relations > 0, and emits lp_verification_failures = 0 and lp_direct_two_sum = 0.",
+      "expected_detection": "On the frozen n=13 L2 gate, ten measured A/A pairs have identical operations and counters; ten measured LP=0 pairs have the same recovered values, relation scalars, column logs, phase operations and replayed counters as aimed; each of the twenty measured 2LP rows recovers its target, emits lp_partial_scan_trials > 0, lp_partial_summands_scanned > 0, lp_partials_fed > 0, lp_projected_relations > 0 and lp_merged_relations > 0, has total summands_scanned at least its partial-scan summands, and emits lp_verification_failures = 0 and lp_direct_two_sum = 0.",
       "not_applicable_reason": null
     },
     "negative": {
@@ -607,7 +607,7 @@
         "name": "large-prime graph activity",
         "unit": "events",
         "kind": "counted",
-        "definition": "Partials fed/stored, pivot reductions, merged sources, projected rows, direct-two-sum rows, verification failures and caps, retained per arm and size. The aimed 2LP method requires direct-two-sum rows to remain exactly zero.",
+        "definition": "Ordinary-miss partial-scan trials and actually visited partial-scan summands, partials fed/stored, pivot reductions, merged sources, projected rows, direct-two-sum rows, verification failures and caps, retained per arm and size. Verified aimed 2LP rows require positive partial-scan trials and summands, total summands_scanned at least the partial-scan summands, and direct-two-sum rows exactly zero.",
         "source": "records.jsonl counters aimed_lp_* and detail.large_prime",
         "aggregation": "sum",
         "uncertainty": "none_exact"

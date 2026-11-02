@@ -1113,24 +1113,43 @@ fn exact_pair_gate(blocks: &Blocks<'_>, a: &str, b: &str) -> Result<usize, Strin
     Ok(pairs)
 }
 
+fn lp_counter_gate(
+    run_id: &str,
+    counters: &BTreeMap<String, u64>,
+    require_activity: bool,
+) -> Result<(), String> {
+    let counter = |name: &str| counters.get(name).copied();
+    if counter("aimed_lp_direct_two_sum") != Some(0)
+        || counter("aimed_lp_verification_failures") != Some(0)
+    {
+        return Err(format!("{run_id} violates the fail-closed LP invariant"));
+    }
+    if require_activity {
+        let partial_trials = counter("aimed_lp_partial_scan_trials").unwrap_or(0);
+        let partial_summands = counter("aimed_lp_partial_summands_scanned").unwrap_or(0);
+        let total_summands = counter("summands_scanned").unwrap_or(0);
+        if counter("aimed_lp_partials_fed").unwrap_or(0) == 0
+            || counter("lp_projected_relations").unwrap_or(0) == 0
+            || counter("aimed_lp_merged_relations").unwrap_or(0) == 0
+            || partial_trials == 0
+            || partial_summands == 0
+            || total_summands < partial_summands
+        {
+            return Err(format!("{run_id} lacks active merged 2LP flow"));
+        }
+    }
+    Ok(())
+}
+
 fn lp_gate(records: &[Record], require_activity: bool) -> Result<(), String> {
     for record in records.iter().filter(|record| {
         !record.warmup && matches!(record.arm.as_str(), "aimed-lp2-c05" | "aimed-lp2-c1")
     }) {
-        let counter = |name: &str| record.counters.get(name).copied();
-        if counter("aimed_lp_direct_two_sum") != Some(0)
-            || counter("aimed_lp_verification_failures") != Some(0)
-        {
-            return Err(format!("{} violates the fail-closed LP invariant", record.run_id));
-        }
-        if require_activity
-            && verified(record)
-            && (counter("aimed_lp_partials_fed").unwrap_or(0) == 0
-                || counter("lp_projected_relations").unwrap_or(0) == 0
-                || counter("aimed_lp_merged_relations").unwrap_or(0) == 0)
-        {
-            return Err(format!("{} lacks active merged 2LP flow", record.run_id));
-        }
+        lp_counter_gate(
+            &record.run_id,
+            &record.counters,
+            require_activity && verified(record),
+        )?;
     }
     Ok(())
 }
@@ -4431,6 +4450,32 @@ fn self_test() -> Result<(), String> {
     }
     if valid_argv(&json!(["ecbench", ""])) {
         return Err("empty frozen argv element passed request validation".into());
+    }
+
+    let mut lp_activity = BTreeMap::from([
+        ("aimed_lp_direct_two_sum".into(), 0),
+        ("aimed_lp_verification_failures".into(), 0),
+        ("aimed_lp_partials_fed".into(), 1),
+        ("lp_projected_relations".into(), 1),
+        ("aimed_lp_merged_relations".into(), 1),
+        ("aimed_lp_partial_scan_trials".into(), 2),
+        ("aimed_lp_partial_summands_scanned".into(), 17),
+        ("summands_scanned".into(), 49),
+    ]);
+    lp_counter_gate("lp-activity-self-test", &lp_activity, true)?;
+    for required in [
+        "aimed_lp_partial_scan_trials",
+        "aimed_lp_partial_summands_scanned",
+    ] {
+        let saved = lp_activity.insert(required.into(), 0).unwrap();
+        if lp_counter_gate("lp-activity-self-test", &lp_activity, true).is_ok() {
+            return Err(format!("zero {required} passed the active LP gate"));
+        }
+        lp_activity.insert(required.into(), saved);
+    }
+    lp_activity.insert("summands_scanned".into(), 16);
+    if lp_counter_gate("lp-activity-self-test", &lp_activity, true).is_ok() {
+        return Err("partial LP scan exceeded total summands without rejection".into());
     }
 
     let digest = "0".repeat(64);
