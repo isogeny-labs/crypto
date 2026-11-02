@@ -1,0 +1,57 @@
+{
+  "schema": "n83.dataset-file-layout/v1",
+  "dataset": "candidate-first-fall-spike35-spike37-attempt-01",
+  "protocol": "N83-FACTOR-BASE-PDP-FFD-LFD-20261031-V2",
+  "files": [
+    {
+      "path": "run_first_fall.py",
+      "role": "pinned producer and per-case fresh-process replay runner",
+      "contents": "Verifies frozen protocol, release binary, source index, and every candidate system before invoking the exact first-fall CLI. Writes one attempt.json per system and an aggregate producer summary."
+    },
+    {
+      "path": "analyze_run.py",
+      "role": "independent post-run checker",
+      "contents": "Recomputes planned/attempted/completed/replayed/status counts and SHA-256 bindings from the per-case attempt records and saved certificates."
+    },
+    {
+      "path": "attempt-01/preflight.json",
+      "role": "pre-data protocol, instrument, host, and source binding",
+      "contents": "Protocol ID and freeze digest, binary digest, dataset-index digest, host metadata, three candidate IDs, and the declared 144-system scope."
+    },
+    {
+      "path": "attempt-01/source-index.json",
+      "role": "per-input source map",
+      "contents": "One row per PDP system with candidate, family, m, target kind, original system byte count and SHA-256, and canonical input-row SHA-256."
+    },
+    {
+      "path": "attempt-01/cases/<candidate>/<system-id>/attempt.json",
+      "role": "raw per-case execution and replay record",
+      "contents": "Exact command argv, return code, elapsed time, stdout/stderr, source hashes, certificate hash and fields, S3 certificate key, and fresh-process replay outcome. Failed and timed-out attempts are retained."
+    },
+    {
+      "path": "attempt-01/cases/<candidate>/<system-id>/output/<system-id>.json",
+      "role": "native first-fall certificate",
+      "contents": "The source-bound polynomial presentation, explicit witness or certified lower bound, certificate fields, and original system SHA-256."
+    },
+    {
+      "path": "attempt-01/summary.json",
+      "role": "producer summary",
+      "contents": "Counts and compact first-fall rows for the fixed 144-system cohort; it does not encode missing LFD as a value."
+    },
+    {
+      "path": "attempt-01/independent-validation.json",
+      "role": "recomputed dataset checks",
+      "contents": "Counts and source/certificate/replay consistency recomputed by analyze_run.py."
+    },
+    {
+      "path": "attempt-01/bundle.tar.gz",
+      "role": "immutable S3 result bundle",
+      "contents": "The preflight, source index, raw case records, certificates, summaries, validation, run source, and this format document; original system inputs remain referenced by SHA-256 in the already-persisted content-addressed store."
+    },
+    {
+      "path": "attempt-01/S3-CUSTODY.json",
+      "role": "S3 publication receipt",
+      "contents": "Archive S3 key, byte count and SHA-256, per-certificate readback results, bundle readback result, and source input custody references."
+    }
+  ]
+}
