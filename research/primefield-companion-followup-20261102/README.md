@@ -153,3 +153,12 @@ Adds `companion-metric-pivot/`: derives DA symmetric from the actual public comp
 Each nontrivial simultaneous swap still costs four source queries and adds four generator columns; the pair branch needs at most two swaps. Local metric/reciprocal checks do not certify global symmetry. This is a set of implemented primitives and a derived closure argument, not a complete new driver. Next integrate shared weighted block borders and full singular solve/witness behavior. Dumas–Pernet2018 supplies established exact-field 1x1/2x2 pivot context; no rank-profile or fast-complexity claim is inherited.
 
 Six Python files, including the preserved constructor dependency, parse and dependency hashes are recorded; the one-page report is inspected. Fourteen originals are separately manifested. Numerical, corruption-control and performance trials remain zero under the existing cost gate. Frozen callers are unchanged.
+
+
+### Complete conditional weighted-symmetry driver
+
+Adds `companion-metric-solver/`: connects exact compression, principal scalar/antidiagonal-pair pivots, simultaneous transport, explicit small inverses, Schur descent, compact block lifts and original-system solution/witness verification. Zero-source and singular compatible/incompatible behavior is retained. The caller must establish DA=A^T D; inverse-metric checks alone do not certify it. The public weighted Gram compiler supplies this invariant.
+
+Cached weighted rows/columns handle leading-supported requests, leaving two full source applications per nonterminal node across the specified generator/RHS/lift phases, versus 2w+8 for the same uncached block. Cache arithmetic, row reconstruction, metric validation and changing transport widths are charged separately. Primal lifts use C tails and shared root metric through Fz=D1^-1 C^T D2 z; dual lifts use C^T v. Frames retain kq+2k field values plus two length-n index tuples, with shared root metric2N; total heap and runtime remain unmeasured.
+
+Five Python files parse; the zero-terminal and final root-verification ASTs exactly match the preserved rank solver; dependencies are recorded. Thirteen originals are separately manifested; the one-page report is inspected. Numerical, corruption-control, heap and performance validation remain unrun under the cost gate. Feature annihilation remains separate. This completes the previously missing driver implementation; acceptance still requires its full frozen cohort and controls.
