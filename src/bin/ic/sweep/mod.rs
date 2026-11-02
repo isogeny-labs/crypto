@@ -345,8 +345,8 @@ mod tests {
     #[test]
     fn every_listed_space_resolves_to_an_instance_and_builds() {
         for &name in SPACE_NAMES {
-            let inst = instance_for(name, 0, "generic", 8)
-                .unwrap_or_else(|e| panic!("{name}: {e}"));
+            let inst =
+                instance_for(name, 0, "generic", 8).unwrap_or_else(|e| panic!("{name}: {e}"));
             space_for(name, &inst).unwrap_or_else(|e| panic!("{name}: {e}"));
         }
     }
