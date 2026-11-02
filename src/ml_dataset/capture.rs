@@ -343,6 +343,8 @@ impl Write for LimitedBytes {
 /// Closed kinds for typed solver events. Payload commits remain emitter-owned.
 #[derive(Clone, Copy, Debug, Serialize)]
 pub enum TypedEventKind {
+    #[serde(rename = "binary_sat_initial")]
+    BinarySatInitial,
     #[serde(rename = "binary_m3_native")]
     OrdinaryBinaryM3Native,
     #[serde(rename = "wide_prime_dynamic")]

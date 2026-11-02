@@ -1,5 +1,9 @@
 //! Prepaid terminal custody for authoritative ordinary bytes. No signed proof.
 use super::*;
+#[path = "binary_m3_boolean_identity.rs"]
+mod boolean_consequence;
+#[path = "binary_m3_boolean_worker.rs"]
+pub(super) mod boolean_worker;
 use std::io::Write;
 pub(super) const CAPS: [usize; 4] = [8192, 0, 32768, 16384];
 // The read/format limits above are unchanged. Native bounded_matrix produces
@@ -368,6 +372,7 @@ pub(super) fn test_store(
     }
     let result = registry.retain_authoritative_slots(input, events);
     assert_eq!(result.is_err(), collision);
+    boolean_consequence::test_transferred_result_custody(registry, input.ledger);
     let slots = registry.slots.as_ref().unwrap();
     assert_eq!(slots.slots[0].bytes, construction_bytes);
     let index: serde_json::Value = serde_json::from_slice(&slots.slots[1].bytes).unwrap();

@@ -4,8 +4,9 @@ use serde_json::json;
 
 // Normal branch: at most two not-yet-moved buffers + two signed slots +
 // four terminal slots + one unretained encoding buffer = nine. Early branches retain at most three owners and
-// never enter normal assembly. Capacity ten includes one spare fixed entry.
-const _: () = assert!(solvers::WorkerResidualCustody::CAPACITY >= 9);
+// never enter normal assembly. Optional Boolean anchor/check add two owners.
+// Capacity twelve includes one spare fixed entry.
+const _: () = assert!(solvers::WorkerResidualCustody::CAPACITY >= 11);
 
 fn partial(reason: &str) -> solvers::WorkerSolveOutput {
     solvers::WorkerSolveOutput::legacy(types::SolverData {
@@ -62,6 +63,20 @@ pub(in crate::ml_dataset::solvers) fn run(
     binding: &capture::AttemptBinding,
     limits: &capture::CaptureLimits,
 ) -> Result<solvers::WorkerSolveOutput, String> {
+    run_with_boolean_request(original, case, context, binding, limits, None)
+}
+
+// Explicit optional entry; normal dispatch remains run(..., None).
+// A supplied proof is untrusted and is independently checked after actual
+// original/result admission. No CLI/config route is activated in this patch.
+pub(in crate::ml_dataset::solvers) fn run_with_boolean_request(
+    original: &VerifiedWorkerOriginal<'_>,
+    case: &types::CaseData,
+    context: &execution::SolverExecutionContext,
+    binding: &capture::AttemptBinding,
+    limits: &capture::CaptureLimits,
+    request: Option<retained_storage::boolean_worker::Request<'_>>,
+) -> Result<solvers::WorkerSolveOutput, String> {
     if original.binding != Some(binding) || context.launch.binding != *binding {
         return Err("ordinary original token differs from execution/capture attempt".into());
     }
@@ -115,7 +130,12 @@ pub(in crate::ml_dataset::solvers) fn run(
             ))
         }
     };
-    let mut registry = match OrdinaryRootRegistry::admit(original, &mut budget, limits) {
+    let mut registry = match OrdinaryRootRegistry::admit_with_boolean(
+        original,
+        &mut budget,
+        limits,
+        request.is_some(),
+    ) {
         Ok(r) => r,
         Err(_) => {
             return Ok(partial_admitted(
@@ -123,6 +143,20 @@ pub(in crate::ml_dataset::solvers) fn run(
                 &mut budget,
             ))
         }
+    };
+    let mut boolean = match request {
+        Some(request) => {
+            match retained_storage::boolean_worker::Owned::admit(request, &mut budget, limits) {
+                Ok(owned) => Some(owned),
+                Err(_) => {
+                    return Ok(partial_admitted(
+                        "ordinary Boolean output admission refused",
+                        &mut budget,
+                    ))
+                }
+            }
+        }
+        None => None,
     };
     let mut domain = false;
     let mut witness = false;
@@ -233,6 +267,9 @@ pub(in crate::ml_dataset::solvers) fn run(
                                         .report
                                         .as_ref()
                                         .is_some_and(|r| r.native_step_complete);
+                                    if let Some(owned) = boolean.as_mut() {
+                                        owned.run_before_signed(&mut registry, &mut input, &events);
+                                    }
                                     let mut signed = input.run_signed(&mut events, signed);
                                     let group_stored =
                                         signed.store(&mut input, &mut registry).is_ok();
@@ -267,6 +304,9 @@ pub(in crate::ml_dataset::solvers) fn run(
                 }
             }
         },
+    }
+    if let Some(owned) = boolean.take() {
+        owned.finish(&mut registry, &budget, &mut custody);
     }
     if let Some(slots) = registry.slots.take() {
         slots.move_residuals(&mut custody);
@@ -1191,5 +1231,248 @@ mod tests {
         })
         .into_parts();
         assert!(roots.is_empty() && residual.items.is_empty());
+    }
+}
+
+#[cfg(test)]
+fn expected_boolean_resource_refusal(outcome:&serde_json::Value)->bool {
+    let Ok(stop)=serde_json::from_value::<Stop>(outcome["first_stop"].clone()) else {return false;};
+    if !matches!(stop,Stop::Work|Stop::Bytes|Stop::Deadline) || outcome["status"]!="partial" {return false;}
+    if let Some(ledger)=outcome.get("admission_ledger") {
+        if ledger["first_stop"]!=outcome["first_stop"] {return false;}
+    }
+    true
+}
+#[cfg(test)]
+mod boolean_refusal_classification_tests {
+    use super::*;
+    #[test]
+    fn only_named_resource_refusals_are_censored_diagnostics() {
+        for stop in [Stop::Work,Stop::Bytes,Stop::Deadline] {
+            assert!(expected_boolean_resource_refusal(&json!({"status":"partial","first_stop":stop})));
+        }
+        for stop in [Stop::InvalidLimits,Stop::Overflow,Stop::Phase,Stop::Nonmonotone,
+            Stop::Trace,Stop::Additions,Stop::Observer,Stop::NativeFailure,Stop::Allocation,
+            Stop::Serialization,Stop::Events] {
+            assert!(!expected_boolean_resource_refusal(&json!({"status":"partial","first_stop":stop,
+                "reason":"ordinary admission refused"})));
+        }
+        for value in [json!(null),json!("work"),json!("unknown")] {
+            assert!(!expected_boolean_resource_refusal(&json!({"status":"partial","first_stop":value})));
+        }
+        assert!(!expected_boolean_resource_refusal(&json!({"status":"partial","reason":"admission refused"})));
+        assert!(!expected_boolean_resource_refusal(&json!({"status":"verified","first_stop":"Work"})));
+        assert!(!expected_boolean_resource_refusal(&json!({"status":"partial","first_stop":"Work",
+            "admission_ledger":{"first_stop":"Observer"}})));
+    }
+}
+
+#[cfg(test)]
+mod boolean_worker_tests {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, telemetry};
+    #[test]
+    fn genuine_optional_worker_custody_or_explicit_original_cap_refusal() {
+        // Use the requested original16384 profile. A recorded cap refusal
+        // remains unresolved functional integration, not an accepted identity.
+        for (proof, expected) in [
+            (&b" 1 5 3 0 1 2\n"[..], "equal"),
+            (&b" 0\n"[..], "equality_mismatch"),
+            (&b" 1 61 0\n"[..], "malformed"),
+        ] {
+            let f = solvers::verified_worker_original_tests::Fixture::with_ordinary_limits_shape(
+                23, false, "f4", false, 3, 16384,
+            );
+            execution::create(&f.root).unwrap();
+            let context = execution::admit(&f.root).unwrap().unwrap();
+            let (_, limits) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+            let mut artifacts = Vec::new();
+            let case = telemetry::measured(&f.root, &mut artifacts, "curve-construction", || {
+                solvers::curves::generate(&f.config)
+            })
+            .unwrap();
+            let original = solvers::verify_and_store_worker_originals(
+                &f.config,
+                &case,
+                &f.root,
+                Some(&f.binding),
+                &mut artifacts,
+            )
+            .unwrap();
+            let emitter = capture::CaptureEmitter::create(
+                &f.root.join("live"),
+                f.binding.clone(),
+                limits.clone(),
+            )
+            .unwrap();
+            assert!(solvers::LIVE_SINK.with(|slot| slot.borrow().is_none()));
+            solvers::LIVE_SINK
+                .with(|slot| *slot.borrow_mut() = Some(solvers::EventSink::Bound(emitter)));
+            let guard = solvers::LiveSinkGuard;
+            let output = telemetry::measured(&f.root, &mut artifacts, "solver", || {
+                run_with_boolean_request(
+                    &original,
+                    &case,
+                    &context,
+                    &f.binding,
+                    &limits,
+                    Some(retained_storage::boolean_worker::Request {
+                        row_index: 0,
+                        proof: retained_storage::boolean_worker::ProofMode::Supplied(proof),
+                    }),
+                )
+            })
+            .unwrap();
+            drop(guard);
+            let (data, receipts, residual) = output.into_parts();
+            let receipt=receipts.iter().find(|r|Slot::BooleanCheck.matches(r)).map(|r|{
+                let bytes=std::fs::read(f.root.join(&r.path)).unwrap();
+                assert_eq!(dataset::digest(&bytes),r.sha256);
+                serde_json::from_slice::<serde_json::Value>(&bytes).unwrap()
+            });
+            let arithmetic_reached=receipt.as_ref().is_some_and(|c|c["attempt"]["outcome"]["status"]=="arithmetic_audit");
+            eprintln!("BOOLEAN_SUPPLIED_REQUESTED_PROFILE {}",json!({"work_limit":16384,
+                "expected_arithmetic_result":expected,"arithmetic_reached":arithmetic_reached,
+                "outcome":data.outcome,"check":receipt,"residual_owners":residual.items.len()}));
+            if !arithmetic_reached {
+                assert!(expected_boolean_resource_refusal(&data.outcome),
+                    "non-resource failure is not an admitted diagnostic refusal: {}",data.outcome);
+                continue;
+            }
+            assert!(residual.items.is_empty());
+            for slot in [Slot::BooleanAnchor, Slot::BooleanCheck, Slot::Result] {
+                let roots: Vec<_> = receipts.iter().filter(|r| slot.matches(r)).collect();
+                assert_eq!(roots.len(), 1);
+                let bytes = std::fs::read(f.root.join(&roots[0].path)).unwrap();
+                assert_eq!(dataset::digest(&bytes), roots[0].sha256);
+                assert_eq!(bytes.len() as u64, roots[0].bytes);
+            }
+            let read = |slot: Slot| -> serde_json::Value {
+                serde_json::from_slice(&std::fs::read(f.root.join(slot.identity().0)).unwrap())
+                    .unwrap()
+            };
+            let anchor = read(Slot::BooleanAnchor);
+            let check = read(Slot::BooleanCheck);
+            let terminal = read(Slot::Result);
+            // Assert the genuine source facts behind the fixed positive proof;
+            // a changed fixture cannot silently turn this into a vacuous test.
+            let saved: serde_json::Value =
+                serde_json::from_slice(&std::fs::read(f.root.join(INPUT_PATH)).unwrap()).unwrap();
+            let construction: serde_json::Value =
+                serde_json::from_str(saved["construction_json"].as_str().unwrap()).unwrap();
+            assert_eq!(construction["evidence"]["coordinate_anfs"][5], 1);
+            assert_eq!(
+                anchor["report"]["rows"][0],
+                json!({"n_vars":3,"terms":[{"mask":7}]})
+            );
+            assert_eq!(anchor["ledger"]["phase"], "MatrixComplete");
+            assert_eq!(check["attempt"]["before"]["phase"], "MatrixComplete");
+            assert_eq!(check["attempt"]["after"]["phase"], "MatrixComplete");
+            assert_eq!(
+                check["attempt"]["outcome"]["audit"]["result"]["kind"],
+                expected
+            );
+            let before = check["attempt"]["before"]["checking_reserved_work"]
+                .as_u64()
+                .unwrap();
+            let after = check["attempt"]["after"]["checking_reserved_work"]
+                .as_u64()
+                .unwrap();
+            assert_eq!(after - before, 3_064_064);
+            assert_eq!(check["training_export_admitted"], false);
+            assert_eq!(check["native_operation_witness"], false);
+            assert_eq!(terminal["ledger"]["phase"], "Complete");
+            assert!(
+                terminal["event_accounting"]["acknowledged"]
+                    .as_u64()
+                    .unwrap()
+                    > anchor["event_accounting"]["acknowledged"].as_u64().unwrap()
+            );
+            // Successful signed execution must not rewrite the earlier anchor.
+            assert_eq!(read(Slot::BooleanAnchor), anchor);
+            artifacts.extend(receipts.iter().cloned());
+            storage::write_json(
+                &f.root,
+                "worker-artifacts.json",
+                "artifact-registry",
+                &artifacts,
+            )
+            .unwrap();
+            let collected = dataset::collect_cell_artifacts(&f.root).unwrap();
+            assert!(
+                replay::verify(&f.root, &f.config, &data.outcome, &collected)
+                    .unwrap()
+                    .is_some()
+            );
+        }
+    }
+}
+
+#[cfg(test)]
+mod boolean_producer_worker_tests {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, telemetry};
+    #[test]
+    fn genuine_producer_fixed_shared_cap_success_or_explicit_refusal() {
+        producer_controls(false);
+    }
+    // Strict activation gate: unlike the diagnostic control, resource refusal
+    // fails this test. It remains unexecuted/unresolved in this source proposal.
+    #[test]
+    fn genuine_producer_original16384_positive_functional_gate() {
+        producer_controls(true);
+    }
+    fn producer_controls(require_positive:bool) {
+        for (work,twist,engine) in [(16384,false,"f4"),(16384,true,"f4"),
+            (16384,false,"f5"),(16384,true,"f5"),(65536,false,"f4")] {
+            let f=solvers::verified_worker_original_tests::Fixture::with_ordinary_limits_shape(
+                23,twist,engine,false,3,work);
+            execution::create(&f.root).unwrap();
+            let context=execution::admit(&f.root).unwrap().unwrap();
+            let (_,limits)=dataset::admit_capture_context(&f.root).unwrap().unwrap();
+            //65536 changes additions only: shared native/checking ceiling is identical.
+            assert_eq!(OriginalLimits::from_original(&f.config,&context.launch).unwrap().native_work,16_777_216);
+            let mut artifacts=Vec::new();
+            let case=telemetry::measured(&f.root,&mut artifacts,"curve-construction",||solvers::curves::generate(&f.config)).unwrap();
+            let original=solvers::verify_and_store_worker_originals(&f.config,&case,&f.root,Some(&f.binding),&mut artifacts).unwrap();
+            let emitter=capture::CaptureEmitter::create(&f.root.join("live"),f.binding.clone(),limits.clone()).unwrap();
+            assert!(solvers::LIVE_SINK.with(|s|s.borrow().is_none()));
+            solvers::LIVE_SINK.with(|s|*s.borrow_mut()=Some(solvers::EventSink::Bound(emitter)));
+            let guard=solvers::LiveSinkGuard;
+            let output=telemetry::measured(&f.root,&mut artifacts,"solver",||run_with_boolean_request(
+                &original,&case,&context,&f.binding,&limits,
+                Some(retained_storage::boolean_worker::Request{row_index:0,proof:retained_storage::boolean_worker::ProofMode::Produce}))).unwrap();
+            drop(guard);
+            let(data,receipts,residual)=output.into_parts();
+            let check=receipts.iter().find(|r|Slot::BooleanCheck.matches(r)).map(|r|{
+                let bytes=std::fs::read(f.root.join(&r.path)).unwrap();
+                assert_eq!(dataset::digest(&bytes),r.sha256);
+                serde_json::from_slice::<serde_json::Value>(&bytes).unwrap()
+            });
+            let verified=check.as_ref().is_some_and(|c|c["producer"]["check"]["outcome"]["audit"]["result"]["kind"]=="equal");
+            if require_positive && work==16384 {
+                assert!(verified,"strict original16384 functionality unmet: {}",data.outcome);
+            }
+            eprintln!("BOOLEAN_FIXED_SHARED_CAP_PROFILE {}",json!({"configured_work_limit":work,
+                "shared_work_cap":16_777_216,"twist":twist,"engine":engine,"identity_verified":verified,
+                "outcome":data.outcome,"check":check,"residual_owners":residual.items.len()}));
+            if !verified {
+                assert!(expected_boolean_resource_refusal(&data.outcome),
+                    "non-resource failure is not an admitted diagnostic refusal: {}",data.outcome);
+            } else {
+                let check=check.unwrap();
+                assert_eq!(check["producer"]["before"]["phase"],"MatrixComplete");
+                assert_eq!(check["producer"]["after_check"]["phase"],"MatrixComplete");
+                assert_eq!(check["producer"]["check"]["before"]["original_limits"],check["producer"]["check"]["after"]["original_limits"]);
+                assert_eq!(check["training_export_admitted"],false);
+                assert!(residual.items.is_empty());
+                assert_eq!(receipts.iter().filter(|r|Slot::BooleanAnchor.matches(r)).count(),1);
+                assert_eq!(receipts.iter().filter(|r|Slot::Result.matches(r)).count(),1);
+                artifacts.extend(receipts.iter().cloned());
+                storage::write_json(&f.root,"worker-artifacts.json","artifact-registry",&artifacts).unwrap();
+                let collected=dataset::collect_cell_artifacts(&f.root).unwrap();
+                assert!(replay::verify(&f.root,&f.config,&data.outcome,&collected).unwrap().is_some());
+            }
+        }
     }
 }

@@ -14844,3 +14844,7 @@ mod ordinary_terminal_nested_guard_tests {
         assert!(guard_worker_terminal_profile(profile, &partial).is_ok());
     }
 }
+
+// Draft original-bound SAT preparation; runtime activation remains separate.
+#[path = "sat_original_owner.rs"]
+mod sat_original_owner;
