@@ -33,6 +33,7 @@ fn main() {
         Some("selftest") => selftest(),
         Some("dlp") => dlp::run(&args),
         Some("summarize") => summarize::run(args.get(2).map(|s| s.as_str()).unwrap_or("data")),
+        Some("summarize-dlp") => summarize::run_dlp(args.get(2).map(|s| s.as_str()).unwrap_or("data")),
         _ => eprintln!("usage: ic-weakpoints algebra|yield|pipeline|selftest ..."),
     }
 }

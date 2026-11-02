@@ -108,3 +108,53 @@ ax[1].legend(fontsize=7, frameon=False)
 fig.text(0.01, 0.01, RUN, fontsize=6, color="#888")
 save(fig, "fig4_cost_band")
 print("ok")
+
+# fig5: large-prime variation (arm L, Amendment 2) -- only if its summary exists
+SD = D / "summary_dlp.jsonl"
+if SD.exists():
+    L = [json.loads(l) for l in SD.read_text().splitlines()]
+    cells = [s for s in L if s["summary"] == "dlp_cell"]
+    fits = {(s["r"], s["lp"]): s for s in L if s["summary"] == "dlp_fit"}
+    models = [s for s in L if s["summary"] == "dlp_model"]
+    fig, ax = plt.subplots(1, 3, figsize=(10.5, 3.0))
+    names = {0: "0 large primes", 1: "1 large prime", 2: "2 large primes"}
+    cols = {0: "#888888", 1: "#2a6fb0", 2: "#c0392b"}
+    for lp in (0, 1, 2):
+        c = [s for s in cells if abs(s["r"] - 2 / 3) < 1e-3 and s["lp"] == lp]
+        x = [math.log2(s["p"]) for s in c]
+        y = [s["T_geomean"] for s in c]
+        mk = ["o" if s["all_reached"] else "x" for s in c]
+        for xi, yi, m in zip(x, y, mk):
+            ax[0].scatter(xi, yi, color=cols[lp], marker=m, s=18)
+        ax[0].plot(x, y, color=cols[lp], lw=.8, label=names[lp] + (f"  slope {fits[(c[0]['r'], lp)]['alpha']:.2f}" if c and (c[0]['r'], lp) in fits else "  (censored)"))
+    ax[0].set_yscale("log")
+    ax[0].set_xlabel("log2 p")
+    ax[0].set_ylabel("trials to |FB|+21 full rows")
+    ax[0].set_title("|FB| ~ p^(2/3)/2: trials (x = censored)", fontsize=9)
+    ax[0].legend(fontsize=6, frameon=False)
+    rs = sorted({s["r"] for s in fits.values()}, reverse=True)
+    for lp in (0, 1, 2):
+        pts = [(r, fits[(r, lp)]["alpha"], fits[(r, lp)]["alpha_se"]) for r in rs if (r, lp) in fits]
+        if pts:
+            ax[1].errorbar([q[0] for q in pts], [q[1] for q in pts], yerr=[2 * q[2] for q in pts], fmt="o-", color=cols[lp], ms=4, label=names[lp])
+    rr = [0.5, 1.0]
+    ax[1].plot(rr, [3 - 2 * r for r in rr], ":", color="#888", label="0LP law 3-2r")
+    ax[1].axhline(1.5, color="#2a9d55", lw=.8, ls="--", label="rho exponent 1.5")
+    ax[1].axhline(4 / 3, color="#c0392b", lw=.6, ls="--", label="GTTD 4/3")
+    ax[1].set_xlabel("factor-base scaling r (|FB| ~ p^r / 2)")
+    ax[1].set_ylabel("fitted exponent of trials in p (+-2 se)")
+    ax[1].set_title("Trial exponents by variant", fontsize=9)
+    ax[1].legend(fontsize=6, frameon=False)
+    for m, ls in zip(models, ("-", "--")):
+        for lp in (0, 1, 2):
+            ax[2].plot([g["log2_group"] for g in m["grid"]], [g["variants"][lp]["ratio"] for g in m["grid"]], ls, color=cols[lp], lw=1,
+                       label=f"{names[lp]}, w={m['w']}")
+    ax[2].axhline(1, color="#888", lw=.8)
+    ax[2].set_yscale("log")
+    ax[2].set_xlabel("log2 group order (p^3)")
+    ax[2].set_ylabel("IC / rho (negation map), best r")
+    ax[2].set_title("DERIVED: fitted laws + measured c(3)", fontsize=9)
+    ax[2].legend(fontsize=5.5, frameon=False, ncol=2)
+    fig.text(0.01, 0.01, "arm L (Amendment 2), seed 20261104, 2 curves per p", fontsize=6, color="#888")
+    save(fig, "fig5_large_primes")
+    print("fig5 ok")
