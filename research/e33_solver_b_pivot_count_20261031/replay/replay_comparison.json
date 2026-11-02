@@ -5,22 +5,40 @@
  "stage_a_replayed": true,
  "e2e_replayed": [
   "chain-sparsest-counted p101s1",
+  "chain-sparsest-counted p101s2",
+  "chain-sparsest-counted p149s1",
   "chain-sparsest-counted p149s2",
+  "chain-sparsest-counted p197s1",
+  "chain-sparsest-counted p197s2",
+  "chain-sparsest-counted p269s1",
   "chain-sparsest-counted p269s2",
   "chain-sparsest-counted p397s1",
+  "chain-sparsest-counted p397s2",
   "chain-sparsest-inc p101s1",
+  "chain-sparsest-inc p101s2",
+  "chain-sparsest-inc p149s1",
   "chain-sparsest-inc p149s2",
+  "chain-sparsest-inc p197s1",
+  "chain-sparsest-inc p197s2",
+  "chain-sparsest-inc p269s1",
   "chain-sparsest-inc p269s2",
   "chain-sparsest-inc p397s1",
+  "chain-sparsest-inc p397s2",
   "chain-sparsest-est p101s1",
+  "chain-sparsest-est p101s2",
+  "chain-sparsest-est p149s1",
   "chain-sparsest-est p149s2",
+  "chain-sparsest-est p197s1",
+  "chain-sparsest-est p197s2",
+  "chain-sparsest-est p269s1",
   "chain-sparsest-est p269s2",
-  "chain-sparsest-est p397s1"
+  "chain-sparsest-est p397s1",
+  "chain-sparsest-est p397s2"
  ],
- "runs_total": 13,
- "runs_identical": 13,
- "fields_compared": 506150,
- "fields_identical": 506150,
+ "runs_total": 31,
+ "runs_identical": 31,
+ "fields_compared": 528110,
+ "fields_identical": 528110,
  "all_identical": true,
  "runs": [
   {
@@ -80,6 +98,86 @@
    "identical": true
   },
   {
+   "run": "chain-sparsest-counted p101s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p101s2.json",
+    "sha256": "50a4bf894d4ce7cfa89b3182237d958cde875e4a2daba01486aaca753ac9e2fc"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p101s2.json",
+    "sha256": "02862ffd4c6a7d664524fa16abe93bb5e300973db5e6509168576adf4214d68a"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 95319.12986600083,
+     "replay": 86205.14301500029
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 39467.099123,
+     "replay": 36722.599575
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 48268.46054999999,
+     "replay": 39192.061855999855
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 19736.03723,
+     "replay": 17064.724204000002
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p149s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s1.json",
+    "sha256": "d80112cb9edf3ec559f2575b530a1d6940e7f8f17bca8a6812df75a480b02983"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p149s1.json",
+    "sha256": "4f877c814b751fe8220fbfb793ea57b073dad288c868d10f7b19b6ae2086234a"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 2269399.460765976,
+     "replay": 2037210.1935889288
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 930424.234449,
+     "replay": 853863.62789
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 852659.5744380078,
+     "replay": 785657.1096930036
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 349104.708751,
+     "replay": 327390.02058099996
+    }
+   ],
+   "identical": true
+  },
+  {
    "run": "chain-sparsest-counted p149s2",
    "committed": {
     "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s2.json",
@@ -115,6 +213,126 @@
      "path": "$[1].wall_ms",
      "committed": 85636.431558,
      "replay": 87189.40354500001
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p197s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p197s1.json",
+    "sha256": "209450367a56d1eb42ae7f81708590e351199a1b4d1b711e3f6b7de2cb6448f3"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p197s1.json",
+    "sha256": "e119adbb70d0aa92b37cb9b0842bb41542c852fb919eda9ce7fa90e16b3e3113"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 323323.06624900136,
+     "replay": 353610.9570489979
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 133652.170135,
+     "replay": 147547.737034
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 239931.97499000022,
+     "replay": 216815.1449179981
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 99428.418151,
+     "replay": 90666.717998
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p197s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p197s2.json",
+    "sha256": "57124d855b718807a06ea2230e056e9d6121496542eda7bcde7e7476138546ec"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p197s2.json",
+    "sha256": "6a0ed93fd523d13bc19edc3984a452119aa917546321370e2c14b7875152a0b5"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 161412.28764300235,
+     "replay": 161722.58423400047
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 67160.03303600001,
+     "replay": 67056.672582
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 97780.53093099939,
+     "replay": 94337.4138809997
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 40748.852706,
+     "replay": 39433.362398
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-counted p269s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p269s1.json",
+    "sha256": "ce9ca8880b883ec936b4791f15aad06d7e143908f14a7db0367d94c7bd661817"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p269s1.json",
+    "sha256": "061613e1dd601b1fdbfa232b4a836234c6689d55a01f5971f4703f6c5cc66110"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 473738.9454579964,
+     "replay": 472539.86807799636
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 196514.156461,
+     "replay": 197641.41839900002
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 255083.5866120022,
+     "replay": 268296.2351409992
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 106115.136159,
+     "replay": 112756.419438
     }
    ],
    "identical": true
@@ -200,6 +418,46 @@
    "identical": true
   },
   {
+   "run": "chain-sparsest-counted p397s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p397s2.json",
+    "sha256": "feeee03c1e9a05636a6a85e0fde377feb5ace41d91f8f6572f44a27280b334cc"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-counted_karatsuba_p397s2.json",
+    "sha256": "7f415f1b422ef5b76826549a7f52406294908711cbb38bf4548184ac35ebc443"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 530384.2312789971,
+     "replay": 641038.963162995
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 201086.499783,
+     "replay": 254508.974971
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 210103.65683000002,
+     "replay": 272719.28230299836
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 82171.39736999999,
+     "replay": 109348.59400400001
+    }
+   ],
+   "identical": true
+  },
+  {
    "run": "chain-sparsest-inc p101s1",
    "committed": {
     "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s1.json",
@@ -240,6 +498,86 @@
    "identical": true
   },
   {
+   "run": "chain-sparsest-inc p101s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s2.json",
+    "sha256": "feda2fa0f4fa321e66e04183704b72d79be4e09e437cc8b7e6c7a58ec98e804e"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p101s2.json",
+    "sha256": "3e765d24ae9f81305cecbdecd61670dfe1b697be3ed5d3a6c2c864898b434105"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 75935.86871299965,
+     "replay": 80315.40993300073
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 31788.862037000003,
+     "replay": 35171.627072
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 37934.10093300004,
+     "replay": 36205.14907100019
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 15885.479189,
+     "replay": 16140.377220000002
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p149s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s1.json",
+    "sha256": "fd50b814baa695cce7998593ef422c32b4ff11a075efb72b4d0038bc4fd9c9be"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p149s1.json",
+    "sha256": "4ac0e3b63179a8cedc64f9cd72c350a8fbb2d1d64ab1fe76edda760975ff88cc"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 2001311.471077021,
+     "replay": 1765313.2397199764
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 831120.945707,
+     "replay": 780306.674798
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 703288.9279280026,
+     "replay": 668206.1942680072
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 290808.280593,
+     "replay": 294378.207444
+    }
+   ],
+   "identical": true
+  },
+  {
    "run": "chain-sparsest-inc p149s2",
    "committed": {
     "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s2.json",
@@ -275,6 +613,126 @@
      "path": "$[1].wall_ms",
      "committed": 57244.784003,
      "replay": 80821.67619700001
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p197s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p197s1.json",
+    "sha256": "ba8388231befd3fc1b1d9a505ad5317a155b34e6d35109669819b8536be89e2d"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p197s1.json",
+    "sha256": "8f25b5f9f287fc99730b6d2ee83ba5129cc4cb45f100087301598c9a6d72a795"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 186540.6858979996,
+     "replay": 284173.16082899895
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 73518.123601,
+     "replay": 120515.631521
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 133003.91077600032,
+     "replay": 221974.6519230009
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 51960.148171999994,
+     "replay": 93229.947358
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p197s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p197s2.json",
+    "sha256": "66eedae183a0207ad3b9977c220bde0083d64b035e0ce1bd9596b64d26d7fa8e"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p197s2.json",
+    "sha256": "4be4238bd1d150252c6eee46952183bb2d5f0a86e3d2d2b551ffaf38f935dbf2"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 93320.10653899967,
+     "replay": 149359.50898899976
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 36527.283941,
+     "replay": 63168.890529000004
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 52898.157597999765,
+     "replay": 87085.02564300006
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 20974.331298999998,
+     "replay": 37478.041321
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-inc p269s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p269s1.json",
+    "sha256": "80b9cf01b09d0662807a6cb0d65fb33a67b4194f1194f18bd3c5f5b858f57390"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p269s1.json",
+    "sha256": "e1b1d3812bd26cf79c67f2c7f28639d56b9ae69d3b3ac0a4f53127a1ad5f615e"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 276680.90793000086,
+     "replay": 426689.7814890041
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 109485.03631600001,
+     "replay": 186832.505404
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 150956.8532810013,
+     "replay": 260230.79092199836
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 59912.984164,
+     "replay": 111766.024309
     }
    ],
    "identical": true
@@ -360,6 +818,46 @@
    "identical": true
   },
   {
+   "run": "chain-sparsest-inc p397s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p397s2.json",
+    "sha256": "606e2de76992e1ebbc510b2da7231e7c023ffe4a09de665e58e262bc9be58b13"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-inc_karatsuba_p397s2.json",
+    "sha256": "70db12c6b7fbe3e2d3ae6af1504650bd51d11ea2be4ba061b736d4843facac13"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 357208.76215699926,
+     "replay": 605687.7414430043
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 132716.565133,
+     "replay": 243356.424795
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 191845.02314600046,
+     "replay": 263619.06959599967
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 73924.34245200001,
+     "replay": 106303.742608
+    }
+   ],
+   "identical": true
+  },
+  {
    "run": "chain-sparsest-est p101s1",
    "committed": {
     "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s1.json",
@@ -400,6 +898,86 @@
    "identical": true
   },
   {
+   "run": "chain-sparsest-est p101s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s2.json",
+    "sha256": "5f5e8d7f403d9c61a861cfeb746fd818b9b654d2736c129c2933e49ffc74c0ff"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p101s2.json",
+    "sha256": "8fa771e5703d8ae8f5afe549a2623c87b622c9c4ee8793eb1956b45700912de9"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 45556.28041900001,
+     "replay": 68609.83803899995
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 18848.640201,
+     "replay": 32418.180485
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 24977.567098000076,
+     "replay": 30815.061372999993
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 10782.867994,
+     "replay": 15024.142117
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p149s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s1.json",
+    "sha256": "94a7146419c2e6ac0acf5a8c8bcabd3e9c78380ae921a023532aea4fd63edc04"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p149s1.json",
+    "sha256": "33dc074a94ee01b440f5719b6a780b7b050e84678beb46642bfbd3829efdbfd6"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 1183036.3574169988,
+     "replay": 1526349.2960650206
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 492780.996296,
+     "replay": 732750.913917
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 430472.09035000025,
+     "replay": 643416.8981500097
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 176077.522997,
+     "replay": 289275.606266
+    }
+   ],
+   "identical": true
+  },
+  {
    "run": "chain-sparsest-est p149s2",
    "committed": {
     "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s2.json",
@@ -435,6 +1013,126 @@
      "path": "$[1].wall_ms",
      "committed": 41545.526477,
      "replay": 70966.93708799999
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p197s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p197s1.json",
+    "sha256": "dbeebea84d442d407bc87caf289b09a177f4441ac55cf88592840e6c040c426c"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p197s1.json",
+    "sha256": "4515be06275219bf0aa7361ea5db4958e339e75a31e3064446614c0890089277"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 193299.83277499978,
+     "replay": 259426.52697200148
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 81163.287737,
+     "replay": 113245.684927
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 120728.99197999974,
+     "replay": 193975.20011200127
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 49233.681939999995,
+     "replay": 84294.96112699999
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p197s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p197s2.json",
+    "sha256": "18aec35d7b62bc252041f30ebec2da3ca47eeb32c8b734cf7552ecf97c1304f2"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p197s2.json",
+    "sha256": "ee621141ed7e07c90d2a5f7316797878118ae8924a24005942fb43c20c1c4faa"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 78588.77026500038,
+     "replay": 114552.9012319996
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 32208.583759,
+     "replay": 54821.90824
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 47401.33026599991,
+     "replay": 69534.96394299965
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 19561.940450000002,
+     "replay": 33188.689406000005
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p269s1",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p269s1.json",
+    "sha256": "cd34743bbe2764fb0649a8878d1224f2e396b07a26fb600bf7e6f2cbb7ecd58b"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p269s1.json",
+    "sha256": "e37fed96b59e39b573a1bc96f318da01051f43b238ac541261f0f4642378267e"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 264393.0576659974,
+     "replay": 374241.27266299404
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 106531.962557,
+     "replay": 175852.66233300001
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 148613.896262001,
+     "replay": 212190.30622599984
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 60223.211003000004,
+     "replay": 100713.352419
     }
    ],
    "identical": true
@@ -515,6 +1213,46 @@
      "path": "$[1].wall_ms",
      "committed": 45598.424394,
      "replay": 76381.293265
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "chain-sparsest-est p397s2",
+   "committed": {
+    "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p397s2.json",
+    "sha256": "bf26a6374a4b10797b7a2fb5b364b28a3ed27e6cdd1bedf481b6e5586bf7bda2"
+   },
+   "replay": {
+    "path": "research/e33_solver_b_pivot_count_20261031/replay/e2e/e2e_chain-sparsest-est_karatsuba_p397s2.json",
+    "sha256": "2bd1911cb179a187fc9bf00176f523b1af7361d156a1d09c9875ced600f9c7d5"
+   },
+   "fields_compared": 1220,
+   "fields_identical": 1220,
+   "mismatches": [],
+   "mismatch_count": 0,
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 406239.47751699545,
+     "replay": 609157.5002500014
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 149276.805489,
+     "replay": 244141.451237
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 188548.73465699883,
+     "replay": 255891.33604699824
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 68517.769332,
+     "replay": 103665.35729100001
     }
    ],
    "identical": true
