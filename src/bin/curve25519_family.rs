@@ -1355,6 +1355,31 @@ fn support(k: u32, form: &str, t: u32) -> Value {
             v.dedup();
             v
         }
+        // Ed25519's coordinate: the Edwards y of the birationally equivalent
+        // twisted Edwards curve is y = (u − 1)/(u + 1) for Montgomery u, so
+        // u = (1 + y)/(1 − y).  `ey`: y in [0, 2^t); `ey2`: the T₀-invariant
+        // y² in [0, 2^t) (translation by T₀ is y ↦ −y).
+        "ey" | "ey2" => {
+            let mut ys = Vec::new();
+            for v in 0..span {
+                if form == "ey" {
+                    ys.push(v);
+                } else if let Some(r) = sqrtm(v, p) {
+                    ys.push(r);
+                    if r != 0 {
+                        ys.push(p - r);
+                    }
+                }
+            }
+            let mut v: Vec<u64> = ys
+                .into_iter()
+                .filter(|&y| y != 1)
+                .map(|y| addm(mulm(addm(1, y, p), invm(subm(1, y, p), p), p), shift, p))
+                .collect();
+            v.sort_unstable();
+            v.dedup();
+            v
+        }
         "isogeny" => {
             let mut ops = crypto_lib::cryptanalysis::ic_boundary::GroupOps::default();
             crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(p, t, 0, &mut ops)
