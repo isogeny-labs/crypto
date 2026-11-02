@@ -180,3 +180,7 @@ Adds `companion-metric-views/`: validate canonical inverse pairs once in an immu
 Derived removed products equal the sum of nonzero selector-node dimensions plus the sum of nonterminal cache-node dimensions. Full scalar descent removes N(N+1)-1; full even pair-only descent removes N(N+2)/2-2; initially zero source removes zero. The initial N products remain. Native label/permutation/coordinate checks, tuple allocations and index metadata remain explicit; no runtime or whole-heap claim. Source queries, pivot rules, paired transport, block equations and root verification are unchanged.
 
 Seven Python files parse; four complete AST substitution audits cover driver, selector, row helper and block cache. Sixteen originals are separately manifested and the one-page report is inspected. Numerical, corruption-control, heap and performance trials remain unrun under the existing cost gate.
+
+### Proven-zero prefix transport
+
+`companion-zero-prefix/` preserves the first nonzero search column separately from the selected pivot. Proven-zero column indices follow both simultaneous swaps; missing front columns reuse this information. Derived query savings for a nonempty zero prefix: one scalar or two pair transport queries. All generator arithmetic and final checks are preserved by three static substitution audits. Five Python files parse; report inspected. Numerical, corruption, heap and performance trials: zero. Native set/materialization costs and internal provenance assumptions are explicit in DERIVATION.md. Source `3090ba584b463d078516a478257b85e987d6a086`.
