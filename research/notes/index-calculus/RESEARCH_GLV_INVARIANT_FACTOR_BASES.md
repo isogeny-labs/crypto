@@ -4576,3 +4576,14 @@ relations, logs and walks, `≈ 1.5×` fewer solve multiplications at `0` GAE an
 GAE, where the Macaulay entries still dominate; the rows stay `≳ 10³`–`10⁵×` from the matched rho.  If
 G2.165 fails, E37 stops as E36 did and the controls, not the rules, are the result.  If a rule falls
 behind A at `1` GAE on any row, that rule stays unranked.
+
+**Amendment (2026-11-02, after the control code was written and before any build or run).**  E24's stored
+records (binary `854acdbc6`) predate fields added since (`arm`, `fp4_product`, `ic_fp_inversions`,
+`lead_scan_reads`, `matched_fold`, `pivot_selection*`, `rho_negation_*`, `solver*`) and the `[d]G` charge
+of `652238c03`, so no current binary reproduces them byte for byte.  G2.164's E24 clause is therefore
+replaced by: the E37 binary's default `quartic_pipeline_v4 --sizes 101 --first-seed 2 --seeds 1
+--rho-runs 16 --max-residuals 5000000` equals, byte for byte (canonical JSON without timings), the same
+command run by a binary built from the pre-E37 tree `024c0ca417`; and E36's pinned
+`quartic_pipeline_gls` (sha256 `a571ebe0…`) and the E37 binary give byte-identical records for
+`chain --karatsuba` and `chain-fifo --karatsuba` at `p = 101` seed 2 (salt `0`).  The comparison of
+the E37 default v4 record with E24's stored one is reported field by field, not judged.
