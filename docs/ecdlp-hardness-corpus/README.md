@@ -10,10 +10,10 @@ and every edge says how one claim depends on or limits another.
 
 ## Current snapshot
 
-- 115 claim nodes (one refuted)
-- 163 typed dependency edges
-- 58 source records
-- 16 prioritized research targets
+- 525 claim nodes (15 refuted; 29 with a Lean record, 15 kernel-checked)
+- 888 typed dependency edges
+- 229 source records (83 primary texts read and hashed)
+- 51 prioritized research targets
 - 717 labeled results and 375 numbered sections in the Galbraith book inventory
 
 Run `node validate.mjs` for the authoritative assembled counts; generated counts are in
@@ -22,6 +22,10 @@ Run `node validate.mjs` for the authoritative assembled counts; generated counts
 ## Start here
 
 - [`REPORT.md`](REPORT.md): findings, theorem table, attack surface, and research plan
+- [`LITERATURE_GRAPH.md`](LITERATURE_GRAPH.md): the eight-cluster literature graph
+  (summation polynomials, Groebner/fall degrees, prime fields, generic/rho, covers,
+  transfers, books/standards, this repository): findings, repository issues, and what
+  to attack next
 - [`LEMMA_LINKAGE.md`](LEMMA_LINKAGE.md): the proof-linkage layer (refutations,
   formalization state, repository citations, taint) and the Nagao Lemma 4 audit
 - [`ATTACK_GRAPH.md`](ATTACK_GRAPH.md), [`attack-graph.svg`](attack-graph.svg): every

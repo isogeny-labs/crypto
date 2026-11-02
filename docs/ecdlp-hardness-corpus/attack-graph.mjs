@@ -162,11 +162,13 @@ const report = {
 };
 fs.writeFileSync(path.join(here, "attack-graph.json"), `${JSON.stringify(report, null, 2)}\n`);
 
-// DOT: frontier nodes that support something or are refuted, and everything they support.
-// Isolated frontier nodes are listed only in ATTACK_GRAPH.md.
+// DOT: frontier nodes that support at least two claims or are refuted, and everything
+// they support.
 const keep = new Set();
 for (const row of frontier) {
-  if (row.downstream.length === 0 && row.status !== "refuted") continue;
+  // The figure keeps claims that carry at least two others, plus every refuted claim;
+  // the full frontier is in ATTACK_GRAPH.md and attack-graph.json.
+  if (row.downstream.length < 2 && row.status !== "refuted") continue;
   keep.add(row.id);
   for (const id of row.downstream) keep.add(id);
 }

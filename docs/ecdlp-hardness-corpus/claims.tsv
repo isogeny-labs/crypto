@@ -60,10 +60,10 @@ HEUR-FIRST-FALL-DEGREE	heuristic	heuristic	algebraic_coordinate	asymptotic_heuri
 FACT-GROEBNER-COST-DEPENDENCE	structural_theorem	proved_external	algebraic_coordinate	theorem	FGLM=O(n D^3); F4/F5 matrix cost depends on d_reg/d_solve	S-FGHR-2014
 ALG-SPARSE-LINEAR-ALGEBRA	algorithmic_upper_bound	algorithm	algebraic_coordinate	algorithm	T_LA roughly O(m B^2), storage O(mB)	S-WIEDEMANN-1986,S-FGHR-2014
 HEUR-RELATION-RANK	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	R >= B + margin	S-FGHR-2014,S-SYNTHESIS
-ALG-GAUDRY-FIXED-EXTENSION	algorithmic_upper_bound	conditional	algebraic_coordinate	conditional_theorem	T=soft-O(q^(2-2/n)) for fixed n	S-GAUDRY-2009,S-FGHR-2014,S-DIEM-2011
+ALG-GAUDRY-FIXED-EXTENSION	algorithmic_upper_bound	conditional	algebraic_coordinate	conditional_theorem	T=soft-O(q^(2-2/n)) for fixed n	S-GAUDRY-2009,S-FGHR-2014,S-DIEM-2011,S-SP-GAUDRY-2009-HAL
 HEUR-SYMMETRY-PDP-SPEEDUP	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-FGHR-2014
-FACT-PRIME-FIELD-NO-EXTENSION-GAIN	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-GAUDRY-2009,S-FGHR-2014,S-PRIME-PROGRAM
-COND-PKM-PRIME-ALGEBRAIC	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-PKM-2016,S-PRIME-PROGRAM,S-SYNTHESIS
+FACT-PRIME-FIELD-NO-EXTENSION-GAIN	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-GAUDRY-2009,S-FGHR-2014,S-PRIME-PROGRAM,S-BK-GG-2016,S-SP-GAUDRY-2009-HAL
+COND-PKM-PRIME-ALGEBRAIC	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-PKM-2016,S-PRIME-PROGRAM,S-SYNTHESIS,S-PF-PKM-2016
 COND-BINARY-WEIL-DESCENT	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-FPPR-2012,S-PETIT-QUISQUATER-2012,S-HKY-2015,S-KOBLITZ-PROGRAM
 DEF-XEDNI-CALCULUS	definition	definition	algebraic_coordinate	definition	-	S-SILVERMAN-XEDNI-2000,S-JKSST-XEDNI-2000
 OBSTRUCTION-XEDNI-HEIGHT	structural_theorem	proved_external	algebraic_coordinate	conditional_theorem	one-shot Pr[success] <= C0/p (conditional); history-uniform hazard <= C0/p => E[T]=Omega(p)	S-JKSST-XEDNI-2000,S-JKSST-LEAN-AUDIT-2026
@@ -477,3 +477,50 @@ HEUR-WD-SMITH-HYP3	heuristic	heuristic	curve_family_restricted	asymptotic_heuris
 HEUR-WD-SMITH-HYP4	heuristic	heuristic	curve_family_restricted	asymptotic_heuristic	-	S-WD-SMITH-2009
 COND-WD-SMITH-THM2	conditional_attack	conditional	curve_family_restricted	conditional_theorem	sum_T (1-(3/4)^s(T)) / prod (nu_T(n)! n^nu_T(n)) ~ 0.1857	S-WD-SMITH-2009
 HEUR-WD-EG07-SMOOTHNESS	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-WD-EG-2007
+DEF-SP-SUMMATION-POLYNOMIAL	definition	definition	algebraic_coordinate	-	-	S-SEMAEV-2004,S-SP-GAUDRY-2009-HAL,S-FGHR-2014,S-SP-FPPR-2012-HAL
+THM-SP-DIEM-HOMOGENEOUS-SUMPOLY	structural_theorem	proved_external	algebraic_coordinate	theorem	multideg S_{phi,m} = (2^(m-2), ..., 2^(m-2))	S-DIEM-2011
+THM-SP-SUMPOLY-COMPUTE-COST	structural_theorem	proved_external	algebraic_coordinate	theorem	T(S_m) = Poly(e^(m^2) log q)	S-DIEM-2011,S-SP-FPPR-2012-HAL
+COND-SP-SEMAEV-2004-PRIME-FIELD	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-SEMAEV-2004,S-DIEM-2011
+GAP-SP-BOUNDED-ROOT-SUMPOLY	open_obligation	open	algebraic_coordinate	open	-	S-DIEM-2011,S-SEMAEV-2004,S-KOSTERS-YEO-2015
+THM-SP-KY-SUMPOLY-NP-COMPLETE	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-KOSTERS-YEO-2015
+ALG-SP-GAUDRY-ABELIAN-IC	algorithmic_upper_bound	conditional	algebraic_coordinate	conditional_theorem	T = O~(q^(2-2/n)), constant c(n, family)	S-SP-GAUDRY-2009-HAL
+HEUR-SP-GAUDRY-FACTOR-BASE-CURVE	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-SP-GAUDRY-2009-HAL,S-DIEM-2011
+HEUR-SP-DOUBLE-LARGE-PRIME	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-SP-GAUDRY-2009-HAL,S-SP-JV-2012-HAL
+HEUR-SP-GENERIC-IDEAL-DEGREE	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	deg I = 2^(n(n-1)) generically; FGLM O~(n D^3)	S-SP-GAUDRY-2009-HAL,S-SP-JV-2013-HAL,S-DIEM-2011
+DEF-SP-DIEM-CONDITION-27	definition	definition	algebraic_coordinate	-	-	S-DIEM-2011
+THM-SP-DIEM11-COVERING	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-DIEM-2011
+THM-SP-DIEM11-FACTOR-BASE-SIZE	structural_theorem	proved_external	algebraic_coordinate	theorem	#F >= (q+1)/2	S-DIEM-2011,S-SP-JV-2013-HAL
+THM-SP-DIEM11-DECOMPOSITION-ALG	structural_theorem	proved_external	algebraic_coordinate	theorem	T_decomp = Poly(e^(n^2) log q); #isolated <= n! d^n	S-DIEM-2011
+THM-SP-DIEM11-ISOLATED-DECOMP-PROB	structural_theorem	proved_external	algebraic_coordinate	theorem	Pr[isolated decomposition] >= q^(-1/2)	S-DIEM-2011
+THM-SP-DIEM11-POLY-Q	structural_theorem	proved_external	algebraic_coordinate	theorem	T = Poly(q)	S-DIEM-2011
+THM-SP-DIEM11-SUBEXP-COROLLARIES	structural_theorem	proved_external	algebraic_coordinate	theorem	T = e^(O(log(q^n)^(2/3))) for n ~ sqrt(log q)	S-DIEM-2011
+THM-SP-DIEM-FIXED-N-RIGOROUS	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	T = O~(q^(2-2/n)), n fixed	S-SP-DIEM-MATHCOMP-2011,S-DIEM-2011
+THM-SP-DIEM13-THM2	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	T = e^(O(max(log q, n sqrt(log q), n^(3/2))))	S-SP-DIEM-2013
+THM-SP-DIEM13-THM3	structural_theorem	proved_external_unread	algebraic_coordinate	theorem	T = e^(O(max(m, n, min(m sqrt n, n sqrt m))))	S-SP-DIEM-2013
+FACT-SP-DIEM-PRIME-DEGREE-TRIVIAL	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-SP-DIEM-2013,S-DIEM-2011
+HEUR-SP-JV-ASSUMPTION1	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-SP-JV-2013-HAL
+GAP-SP-JV-CONJECTURE	open_obligation	open	algebraic_coordinate	open	-	S-SP-JV-2013-HAL
+HEUR-SP-JV-ASSUMPTION2	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-SP-JV-2013-HAL
+COND-SP-JV-N1-DECOMPOSITION	algorithmic_upper_bound	conditional	algebraic_coordinate	conditional_theorem	T = O~(((n-1)! 2^((n-1)(n-2)) e^n n^(-1/2))^omega q^2)	S-SP-JV-2013-HAL
+OBS-SP-JV-FP5-TIMINGS	algorithmic_upper_bound	proved_external	algebraic_coordinate	measurement	-	S-SP-JV-2013-HAL
+ALG-SP-JV-COVER-DECOMPOSITION	algorithmic_upper_bound	conditional	algebraic_coordinate	conditional_theorem	T = O~(p^(2-2/(ng))) or O~(p^(2-2/(ng+2)))	S-SP-JV-2012-HAL
+OBS-SP-JV-149BIT-RECORD	algorithmic_upper_bound	proved_external	algebraic_coordinate	measurement	-	S-SP-JV-2012-HAL
+HEUR-SP-FPPR-ASSUMPTION1	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-SP-FPPR-2012-HAL
+COND-SP-FPPR-BINARY	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	T = O(2^(omega t)), t ~ n/2	S-SP-FPPR-2012-HAL
+OBS-SP-FPPR-GB-COUNTS	algorithmic_upper_bound	proved_external	algebraic_coordinate	measurement	-	S-SP-FPPR-2012-HAL
+HEUR-SP-FGHR-HYPOTHESIS3	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-FGHR-2014
+THM-SP-FGHR-DRL-BOUND	structural_theorem	proved_external	algebraic_coordinate	theorem	O(2^(omega n(n-1))) for S_n; O(2^(omega (n-1)^2)) for D_n	S-FGHR-2014
+COND-SP-FGHR-PDP-EDWARDS	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	O~(n 2^(3(n-1)^2)) or O~(n^2 2^(omega (n-1)^2))	S-FGHR-2014
+OBS-SP-FHJRV-SYMMETRIZED-RECORDS	algorithmic_upper_bound	proved_external	algebraic_coordinate	measurement	-	S-SP-FHJRV-2014-HAL
+COND-SP-HPST-SYMMETRIZED-PRIME-DEGREE	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-SP-HPST-2013
+OBS-SP-SHANTZ-TESKE-EXPERIMENTS	structural_theorem	proved_external_unread	algebraic_coordinate	measurement	-	S-SP-SHANTZ-TESKE-2013,S-SP-KARABINA-2015
+OBS-SP-GG2014-RHO-STILL-FASTER	structural_theorem	proved_external_unread	algebraic_coordinate	measurement	-	S-SP-GG-2014,S-SP-KARABINA-2015
+THM-SP-SEMAEV15-SPLITTING	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-SP-SEMAEV-2015
+CLAIM-SP-SEMAEV15-FFDA-T2	heuristic	refuted	algebraic_coordinate	counterexample	-	S-SP-SEMAEV-2015,S-KOSTERS-YEO-2015
+CEX-SP-SEMAEV15-T2-TRACE	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	counterexample	-	S-KOSTERS-YEO-2015,S-SP-SEMAEV-2015
+HEUR-SP-SEMAEV15-ASSUMPTION1	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-SP-SEMAEV-2015,S-IC-NEGATIVE
+OBS-SP-KY-SEMAEV-N45	structural_theorem	proved_external	algebraic_coordinate	measurement	-	S-KOSTERS-YEO-2015
+COND-SP-SEMAEV15-COMPLEXITY	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	T ~ 2^(c sqrt(n ln n)); first stage m! 2^(n/m) n^(4 omega); second 2^(2k)	S-SP-SEMAEV-2015,S-SP-SEMAEV-2015-REV
+HEUR-SP-SEMAEV15-WEAK-REGULARITY	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-SP-SEMAEV-2015-REV,S-KOSTERS-YEO-2015
+COND-SP-KARABINA-PDP	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	T ~ 2^31 2^(n/5) n^12 + 2^(2n/5) (m = 5, D_reg = 4)	S-SP-KARABINA-2015,S-KOSTERS-YEO-2015
+GAP-SP-DEGREE-GROWTH-SPLIT-SYSTEMS	open_obligation	open	algebraic_coordinate	open	-	S-SP-SEMAEV-2015,S-KOSTERS-YEO-2015,S-SP-KARABINA-2015,S-SP-HPST-2013,S-IC-NEGATIVE
