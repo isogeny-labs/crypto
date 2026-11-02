@@ -31,6 +31,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 };
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
+use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, ChainedXOracle, CmMultiplierBase,
@@ -39,6 +40,7 @@ use crypto_lib::cryptanalysis::ic_framework::plugins::{
     PrimeAbscissaBase, PrimeBatchMitmOracle, RootfindSubtractOracle, SubtractOracle,
     SymmetrisedOracle,
 };
+use crypto_lib::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
 };
@@ -279,7 +281,19 @@ fn listing() -> Value {
                      "parameters": [{"name": "store", "means": "local verified factory cache"}, {"name": "manifest", "means": "immutable SHA-256 manifest"},
                                     {"name": "symmetry", "means": "none, negation (default), frobenius (certified closed Koblitz archive), cubic (j=0), quartic (j=1728); every point coefficient is replayed"}]},
                     {"name": "prime-abscissa", "regimes": ["prime"],
-                     "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"}]},
+                     "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"},
+                                    {"name": "below", "means": "instead of size: every abscissa in [1, below) carrying a point; with below = 2^T it is pkm-semaev's bits=T interval (the naive algebraic arm)"}]},
+                    {"name": "prime-kummer", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "t", "means": "tower height: abscissae in g*mu_{2^t}, the zeros of t squarings; needs 2^t | p - 1"},
+                        {"name": "g", "means": "coset representative; default 1"}],
+                     "needs": "oracle pkm-semaev for the algebraic track; any other oracle treats it as a plain abscissa set"},
+                    {"name": "prime-isogeny", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "t", "means": "tower height: abscissae x(R' + <Q>) for Q of order 2^t on an auxiliary curve E'/F_p, the zeros of t Velu 2-isogeny x-maps; no condition on p"},
+                        {"name": "seed", "means": "public seed of the auxiliary-curve search (or of R' on a supersingular E'); default 0"},
+                        {"name": "aux", "means": "ordinary (searched, charged to the factor-base phase), supersingular, ss-j1728, ss-j1728-twist, ss-j0 or ss-j0-twist (#E' = p + 1, no search)"}],
+                     "needs": "oracle pkm-semaev for the algebraic track"},
                     {"name": "known-log", "regimes": ["prime"],
                      "parameters": [{"name": "size", "means": "multiples [i]G, 1 <= i <= size, one column each, every logarithm known so linear algebra is skipped"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
@@ -347,6 +361,15 @@ fn listing() -> Value {
                     {"name": "mitm", "summands": "2 or 3", "regimes": ["prime", "char2", "koblitz"],
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
+                    {"name": "pkm-semaev", "summands": "2 or 3", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "m", "means": "summands, 2 or 3"},
+                        {"name": "mode", "means": "chain (S3 chain with free unknowns, default) or full (S_{m+1})"},
+                        {"name": "engine", "means": "f4 (algebraic track) or exhaustive (the grid reference: the control an algebraic engine has to beat)"},
+                        {"name": "degree", "means": "F4 degree bound; default 12"},
+                        {"name": "max_nnz", "means": "F4 matrix size bound"},
+                        {"name": "bits", "means": "on a base other than prime-kummer/prime-isogeny: membership in [lo, lo + 2^bits) written in bits"}],
+                     "needs": "prime-kummer or prime-isogeny (it solves on the base's own tower), or bits=T; F4 multiply-adds are native work priced across the AGENTS.md 5a band"},
                     {"name": "hashed-tensor", "summands": "2..8", "regimes": ["prime"],
                      "parameters": [
                         {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match hashed-affine"},
@@ -622,6 +645,8 @@ fn run_prime(
     let known_log = KnownLogBase;
     let multiplier = CmMultiplierBase { instance: inst };
     let hashed = HashedAffineBase { instance: inst };
+    let kummer = PrimeKummerBase { instance: inst };
+    let isogeny = PrimeIsogenyBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
         "archive" => &archive,
         "prime-abscissa" => &abscissa,
@@ -629,9 +654,11 @@ fn run_prime(
         "known-log" => &known_log,
         "cm-multiplier" => &multiplier,
         "hashed-affine" => &hashed,
+        "prime-kummer" => &kummer,
+        "prime-isogeny" => &isogeny,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log, cm-multiplier or hashed-affine"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer or prime-isogeny"
             ))
         }
     };
@@ -660,7 +687,13 @@ fn run_prime(
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
         let mut hashed = HashedTensorOracle::new();
+        // Built on the base's own tower, so it refuses any other base.
+        let mut pkm = match or_name {
+            "pkm-semaev" => Some(PkmSemaevOracle::from_spec(m, &spec, inst)?),
+            _ => None,
+        };
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
+            "pkm-semaev" => pkm.as_mut().expect("built above"),
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-prime-batch" => &mut batch,
@@ -670,7 +703,7 @@ fn run_prime(
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract or hashed-tensor"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, hashed-tensor or pkm-semaev"
                 ))
             }
         };
