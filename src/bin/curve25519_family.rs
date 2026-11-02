@@ -1516,7 +1516,24 @@ fn f4cost_m(
         field_degree: None,
     };
     let span = 1u64 << t;
-    let (fb, mut oracle) = match form {
+    // `t0-bits@LO`: the T₀-invariant interval [LO, LO + 2^t) (LO default 0).
+    let (form_name, t0_lo) = match form.split_once('@') {
+        Some((f, lo)) => (f, lo.parse::<u64>().expect("form@lo: lo is an integer")),
+        None => (form, 0),
+    };
+    let (fb, mut oracle) = match form_name {
+        "t0-bits" => {
+            // Every point whose invariant w = z + d/z is in [lo, lo + 2^t):
+            // closed under T₀ and −, so a returned relation is exact.
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::{
+                edwards_shift, t0_factor_base, T0Quotient,
+            };
+            let shift = edwards_shift(&inst.curve).unwrap();
+            assert_eq!(shift, m.shift);
+            let q = T0Quotient::new(&inst.curve, shift);
+            let fb = t0_factor_base(&inst, &q, t, t0_lo);
+            (fb, PkmSemaevOracle::new_t0_bits(nsum, t, t0_lo))
+        }
         "bits" => {
             // The prime-abscissa base of every abscissa in [0, 2^t) on the curve.
             let n = (0..span)
@@ -1550,7 +1567,7 @@ fn f4cost_m(
                 PkmSemaevOracle::new_isogeny(nsum, t, tower.v.clone(), steps, tower.c),
             )
         }
-        o => panic!("form is bits, edwards-bits or isogeny, not {o}"),
+        o => panic!("form is bits, edwards-bits, t0-bits[@lo] or isogeny, not {o}"),
     };
     let mut spec = if guess > 0 {
         format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
@@ -1618,6 +1635,46 @@ fn f4cost_m(
         .get("pkm_trace_learn_muladds")
         .copied()
         .unwrap_or(0);
+    // Planted targets (env F4COST_PLANTED=n, default 0): n sums of `nsum`
+    // random base points, run through the same oracle after the random
+    // targets (their F4 work is reported on its own; the totals above were
+    // read before).  Every such target is decomposable, so a miss is a
+    // completeness failure and every hit is re-summed exactly.
+    let planted: u64 = std::env::var("F4COST_PLANTED")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
+    let (mut p_done, mut p_hits, mut p_exact) = (0u64, 0u64, 0u64);
+    let p_ops0 = oracle.solver_totals().map_or(0, |t| t.ops);
+    for _ in 0..planted {
+        if started.elapsed().as_secs() >= cap_s {
+            break;
+        }
+        let mut target = inst.curve.identity();
+        for _ in 0..nsum {
+            st = st
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let i = ((st >> 11) % fb.points.len() as u64) as usize;
+            target = inst
+                .curve
+                .add(&mut GroupOps::default(), target, fb.points[i]);
+        }
+        if target.infinity || inst.curve.rhs(target.x) == 0 {
+            continue;
+        }
+        let mut ops = GroupOps::default();
+        let mut ctr = OracleCounters::default();
+        if let Some(idx) = oracle.decompose(&ctx, &fb, &mut ops, &mut ctr, target) {
+            p_hits += 1;
+            let s = idx.iter().fold(inst.curve.identity(), |acc, &i| {
+                inst.curve.add(&mut GroupOps::default(), acc, fb.points[i])
+            });
+            p_exact += u64::from(s == target);
+        }
+        p_done += 1;
+    }
+    let p_ops = oracle.solver_totals().map_or(0, |t| t.ops) - p_ops0;
     // Exact coverage of the base at this m: the fraction of the subgroup that
     // is a sum of m base points (the hit rate an ideal oracle would see).
     let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
@@ -1646,10 +1703,11 @@ fn f4cost_m(
         })
         .count();
     let coverage = covered as f64 / m.r as f64;
-    json!({
+    let mut out = json!({
         "coverage_exact": coverage, "covered_points": covered, "covered_points_all_cosets": all.len(),
         "muladds_per_relation_at_exact_coverage": if coverage > 0.0 { Some(per_target / coverage) } else { None },
         "k": k, "form": form, "t": t, "guess": guess, "columns": fb.columns,
+        "base_points": fb.points.len(), "lo": t0_lo,
         "m": nsum, "mode": mode,
         "muladds_per_relation": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
         "targets_done": done, "targets_requested": targets, "capped": done < targets,
@@ -1668,7 +1726,56 @@ fn f4cost_m(
         "hits": hits, "hits_verified": verified,
         "hit_rate": hits as f64 / done.max(1) as f64, "max_nnz_cap": max_nnz,
         "native": native,
-    })
+    });
+    out["solver_extra"] = json!(tot.extra);
+    out["planted_done"] = json!(p_done);
+    out["planted_hits"] = json!(p_hits);
+    out["planted_exact"] = json!(p_exact);
+    out["planted_muladds"] = json!(p_ops);
+    out
+}
+
+/// Base sizes for pairing the plain and the T₀-invariant interval at equal
+/// point count: for `lo` in `lo_from..=lo_to`, the points and columns of the
+/// T₀-closed base over `w ∈ [lo, lo + 2^t)`, beside the plain Weierstrass
+/// bits base `[0, 2^t)` that `f4cost bits` uses.
+fn t0size(k: u32, t: u32, lo_from: u64, lo_to: u64) -> Vec<Value> {
+    use crypto_lib::cryptanalysis::ic_boundary::{prime_factor_base, PrimeCurve, PrimeInstance};
+    use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::{
+        edwards_shift, t0_factor_base, T0Quotient,
+    };
+    let m = build_miniature(k);
+    let inst = PrimeInstance {
+        name: format!("c25519-mini-k{k}"),
+        curve: PrimeCurve {
+            p: m.p,
+            a: m.weier.a,
+            b: m.weier.b,
+        },
+        group_order: m.order,
+        r: m.r,
+        cofactor: 8,
+        generator: (m.g.x, m.g.y),
+    };
+    let span = 1u64 << t;
+    let n = (0..span)
+        .filter(|&x| sqrtm(m.weier.rhs(x), m.p).is_some())
+        .count();
+    let plain = prime_factor_base(&inst, n);
+    let q = T0Quotient::new(&inst.curve, edwards_shift(&inst.curve).unwrap());
+    let mut out = vec![json!({
+        "form": "bits", "k": k, "t": t, "lo": 0,
+        "points": plain.points.len(), "columns": plain.columns,
+    })];
+    for lo in lo_from..=lo_to {
+        let fb = t0_factor_base(&inst, &q, t, lo);
+        out.push(json!({
+            "form": "t0-bits", "k": k, "t": t, "lo": lo,
+            "points": fb.points.len(), "columns": fb.columns,
+            "w_classes": fb.columns / 2,
+        }));
+    }
+    out
 }
 
 /// Base size `N_a = round(0.63·r^{1/3})`: the lab's validated prime-order
@@ -1819,6 +1926,15 @@ fn main() {
                 "{}",
                 serde_json::to_string(&support(k, &args[3], t)).unwrap()
             );
+        }
+        "t0size" => {
+            // t0size <k> <t> <lo_from> <lo_to>
+            let k: u32 = args[2].parse().unwrap();
+            let t: u32 = args[3].parse().unwrap();
+            let (a, b): (u64, u64) = (args[4].parse().unwrap(), args[5].parse().unwrap());
+            for row in t0size(k, t, a, b) {
+                println!("{}", serde_json::to_string(&row).unwrap());
+            }
         }
         "f4cost" => {
             // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz|-] [trace 0|1]
