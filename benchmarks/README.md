@@ -65,6 +65,14 @@ cell, shared host, tier L). Under the frozen G1 rule this is a CLOSE verdict. We
 and Singular sba probes gave no improvement. It remains outside the admitted table: it is
 a stage cost, not an end-to-end solve, with no replay certificate or matched rho reference.
 
+The [2 November EcGFp5 block-Wiedemann finish](20261102-ecgfp5-bw-finish/) keeps
+documentary PDF/SVG/PNG copies of a frozen-protocol follow-up to that study. It replaces
+msolve's change of order with a block-Wiedemann finish on the BNS22 chain matrix. The
+eliminant is identical and the planted point is recovered at every prime. Whole-solve CPU
+is 1.72–1.97× lower at the three toy primes: c_cyc 2^45.43–2^45.84, with a G1 band that
+straddles CLOSE, so the verdict is unchanged. It remains outside the admitted table: it
+is a stage cost, with no replay certificate or matched rho reference.
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
