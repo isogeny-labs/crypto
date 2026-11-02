@@ -1538,6 +1538,8 @@ mod tests {
                 extra,
             );
         }
+    }
+
     /// A prime-order curve `y² = x³ + x + b` over a prime near 1000, found
     /// by counting points: small enough that a whole pipeline needs a few
     /// dozen F4 calls.
