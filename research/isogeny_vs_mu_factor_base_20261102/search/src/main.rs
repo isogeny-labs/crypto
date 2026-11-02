@@ -1023,7 +1023,11 @@ const Q4_SELECT: std::ops::Range<usize> = 8..10; // selection split, disjoint fr
 const Q4_SELECT_NR: usize = 2;
 
 /// `only`: development filter (p, k); the frozen run passes none.
-fn search(out: &str, only: Option<(u64, u32)>) {
+fn search(out: &str, only: Option<(u64, u32)>) { search_impl(out, only, false) }
+
+/// `msolve_mode`: confirmation systems are solved by msolve (Q5) instead of the
+/// Buchberger engine; selection is unchanged (Buchberger termops, as frozen in Q4).
+fn search_impl(out: &str, only: Option<(u64, u32)>, msolve_mode: bool) {
     std::fs::create_dir_all(out).unwrap();
     let mut s4 = String::from("p,k,chain,kernel_kind,kernel_id,repr,valid,dim,expected_dim,density,chain_termops\n");
     let mut sel = String::from("p,k,candidate,chain,kernel_kind,kernel_id,repr,density\n");
@@ -1150,6 +1154,11 @@ fn search(out: &str, only: Option<(u64, u32)>) {
             for (cn, ch, r, _, _) in &cands {
                 let (nf, nd, _) = yield_exact(&f, &tg[ti], &ch.v);
                 writeln!(yields, "{},{},{},{},{},{},{},{:.6}", p, k, cn, ti, ch.v.len(), nf, nd, nd as f64 / expected_d(nf, tg[ti].order(&f) - 1)).unwrap();
+                if msolve_mode {
+                    let (rw, gf, tot) = eval_systems_ms(&f, p, k, ti, &tg[ti], cn, ch, r, Q2_NR, "Q4R", out);
+                    q5_append(out, &rw); gate_fail += gf; total += tot;
+                    continue;
+                }
                 let (rw, _, gf, tot) = eval_systems(&f, p, k, ti, &tg[ti], cn, ch, r, Q2_NR, "Q4R");
                 rows.push_str(&rw); gate_fail += gf; total += tot;
             }
@@ -1253,11 +1262,193 @@ fn analyze_q4(out: &str) {
         rows.len(), gate_fail, n_gr, sel_imp_g, verdict(sel_imp_g), sel_imp_l, verdict(sel_imp_l), rep_imp, verdict(rep_imp), best_imp, verdict(best_imp), med_of(&rhos))).unwrap();
 }
 
+// =================================================================== Q5 msolve replay
+// Protocol: ../PROTOCOL_Q5_MSOLVE.md. Same systems and seeds as Q2/Q4; engine msolve (F4, DRL).
+
+const Q5_TIMEOUT: u64 = 120;
+const Q5_HEADER: &str = "part,p,k,target,arm,instance,stratum,r_index,xr,nvars,status,gate_ok,inconsistent,rounds,max_deg,max_rows,max_cols,cells,wall_us\n";
+
+#[derive(Default, Clone, Debug)]
+struct MsOut { status: String, inconsistent: bool, rounds: u32, max_deg: u32, max_rows: u64, max_cols: u64, cells: u64, wall_us: u128 }
+
+fn ms_poly(p: &P, n: usize) -> String {
+    let mut terms = vec![];
+    for (m, c) in p.t.iter() {
+        let mut s = c.to_string();
+        for i in 0..n { if m[i] > 0 { write!(s, "*x{}^{}", i, m[i]).unwrap(); } }
+        terms.push(s);
+    }
+    if terms.is_empty() { "0".into() } else { terms.join("+") }
+}
+
+fn run_ms(f: &F, eqs: &[P], n: usize, dir: &str) -> MsOut {
+    let path = format!("{}/q5_tmp.ms", dir);
+    let outp = format!("{}/q5_tmp.ms.out", dir);
+    let vars: Vec<String> = (0..n).map(|i| format!("x{}", i)).collect();
+    let polys: Vec<String> = eqs.iter().filter(|e| !e.t.is_empty()).map(|e| ms_poly(e, n)).collect();
+    std::fs::write(&path, format!("{}\n{}\n{}\n", vars.join(","), f.p, polys.join(",\n"))).unwrap();
+    let _ = std::fs::remove_file(&outp);
+    let t0 = Instant::now();
+    let res = std::process::Command::new("timeout")
+        .args([Q5_TIMEOUT.to_string(), "msolve".into(), "-v".into(), "2".into(), "-g".into(), "2".into(),
+               "-t".into(), "1".into(), "-f".into(), path.clone(), "-o".into(), outp.clone()])
+        .output();
+    let mut o = MsOut::default();
+    o.wall_us = t0.elapsed().as_micros();
+    match res {
+        Err(e) => { o.status = format!("spawn_failed:{}", e); }
+        Ok(r) => {
+            let text = String::from_utf8_lossy(&r.stdout).to_string();
+            for line in text.lines() {
+                let t: Vec<&str> = line.split_whitespace().collect();
+                if t.len() >= 7 && t[4] == "x" {
+                    if let (Ok(d), Ok(rows), Ok(cols)) = (t[0].parse::<u32>(), t[3].parse::<u64>(), t[5].parse::<u64>()) {
+                        o.rounds += 1; o.max_deg = o.max_deg.max(d); o.max_rows = o.max_rows.max(rows);
+                        o.max_cols = o.max_cols.max(cols); o.cells += rows * cols;
+                    }
+                }
+            }
+            o.status = if r.status.success() { "ok".into() } else if r.status.code() == Some(124) { "censored_timeout".into() } else { format!("exit{:?}", r.status.code()) };
+            if r.status.success() {
+                let gb = std::fs::read_to_string(&outp).unwrap_or_default();
+                o.inconsistent = gb.lines().any(|l| l.trim() == "[1]:");
+            }
+        }
+    }
+    o
+}
+
+fn q5_row(part: &str, p: u64, k: u32, ti: usize, arm: &str, inst: &str, stratum: &str, ri: usize, xr: u64, n: usize, o: &MsOut, gate_ok: bool) -> String {
+    format!("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n", part, p, k, ti, arm, inst, stratum, ri, xr, n,
+        o.status, gate_ok, o.inconsistent, o.rounds, o.max_deg, o.max_rows, o.max_cols, o.cells, o.wall_us)
+}
+fn q5_append(out: &str, rows: &str) {
+    use std::io::Write;
+    let mut fh = std::fs::OpenOptions::new().append(true).open(format!("{}/q5_systems.csv", out)).unwrap();
+    fh.write_all(rows.as_bytes()).unwrap();
+}
+fn gate_ms(o: &MsOut, witness: bool) -> bool { if o.status != "ok" { true } else { o.inconsistent != witness } }
+
+/// The Q4 confirmation systems of one (target, candidate), solved by msolve. Same picks as `eval_systems`.
+fn eval_systems_ms(f: &F, p: u64, k: u32, ti: usize, e: &Ec, cn: &str, ch: &NativeChain, r: &Repr, nr: usize, label: &str, out: &str) -> (String, u64, u64) {
+    let v = &ch.v;
+    let all = e.points(f);
+    let (_, _, d) = yield_exact(f, e, v);
+    let xcons = |xr: u64| v.iter().any(|&a| v.iter().any(|&b| s3_val(f, e, a, b, xr) == 0));
+    let mut rs = Rng::new(derive(MASTER, &format!("{}/{}/{}/{}/{}", label, p, k, ti, cn)));
+    let mut dv: Vec<(u64, u64)> = d.iter().copied().collect(); dv.sort();
+    let mut picks: Vec<(&str, u64)> = vec![];
+    if !dv.is_empty() { for _ in 0..nr { picks.push(("dec", dv[rs.below(dv.len() as u64) as usize].0)); } }
+    let (mut got, mut tries) = (0, 0);
+    while got < nr && tries < 100_000 { tries += 1; let q = all[rs.below(all.len() as u64) as usize]; if !d.contains(&q) && !xcons(q.0) { picks.push(("nodec", q.0)); got += 1; } }
+    let (mut rows, mut gf, mut tot) = (String::new(), 0u64, 0u64);
+    for (ri, (stratum, xr)) in picks.iter().enumerate() {
+        let witness = v.iter().any(|&a| v.iter().any(|&b| s3_val(f, e, a, b, *xr) == 0));
+        let (eqs, n) = system_repr(f, e, ch, r, *xr);
+        let o = run_ms(f, &eqs, n, out);
+        let ok = gate_ms(&o, witness);
+        if !ok { gf += 1; }
+        tot += 1;
+        rows.push_str(&q5_row("Q4", p, k, ti, cn, &r.name.replace(',', ";"), stratum, ri, *xr, n, &o, ok));
+    }
+    (rows, gf, tot)
+}
+
+/// Q5: the Q2 arms (same picks as `q2`) and the Q4 confirmation candidates, solved by msolve.
+fn q5(out: &str) {
+    std::fs::create_dir_all(out).unwrap();
+    std::fs::write(format!("{}/q5_systems.csv", out), Q5_HEADER).unwrap();
+    let (mut gate_fail, mut total) = (0u64, 0u64);
+    for &p in &Q2_PRIMES { for &k in &Q2_K {
+        let f = F::new(p);
+        if (p - 1) % (1 << (k + 1)) != 0 { continue; }
+        let tg = targets(&f, k, Q1_NE);
+        let ax = auxes(&f, k, Q2_NAUX);
+        let (v0, c0) = mu_coset(&f, k, false);
+        let (v1, c1) = mu_coset(&f, k, true);
+        let mut ar = Rng::new(derive(MASTER, &format!("alpha/{}/{}", p, k)));
+        let alphas: Vec<u64> = (0..Q2_NALPHA).map(|_| loop { let x = ar.below(p); if x > 1 && x != p - 1 { break x; } }).collect();
+        let mut arms: Vec<(String, String, Vec<u64>, Chain)> = vec![("A0".into(), "0".into(), v0, c0), ("A1".into(), "0".into(), v1.clone(), c1)];
+        for (i, &a) in alphas.iter().enumerate() { arms.push(("A2".into(), i.to_string(), v1.clone(), mobius_chain(&f, k, a))); }
+        for (i, a) in ax.iter().enumerate() {
+            let (vb, cb) = velu_chain(&f, a, k, k as usize); arms.push(("B".into(), i.to_string(), vb.clone(), cb));
+            let (_, cb2) = velu_chain(&f, a, k, k as usize + 1); arms.push(("B2".into(), i.to_string(), vb, cb2));
+        }
+        for (ti, e) in tg.iter().take(Q2_NE).enumerate() {
+            let all: Vec<(u64, u64)> = e.points(&f);
+            let mut rows = String::new();
+            for (arm, inst, v, ch) in &arms {
+                let (_, _, d) = yield_exact(&f, e, v);
+                let xcons = |xr: u64| v.iter().any(|&a| v.iter().any(|&b| s3_val(&f, e, a, b, xr) == 0));
+                let mut rs = Rng::new(derive(MASTER, &format!("R/{}/{}/{}/{}/{}", p, k, ti, arm, inst)));
+                let mut dv: Vec<(u64, u64)> = d.iter().copied().collect(); dv.sort();
+                let mut picks: Vec<(&str, u64)> = vec![];
+                if !dv.is_empty() { for _ in 0..Q2_NR { picks.push(("dec", dv[rs.below(dv.len() as u64) as usize].0)); } }
+                let mut got = 0; let mut tries = 0;
+                while got < Q2_NR && tries < 100_000 { tries += 1; let q = all[rs.below(all.len() as u64) as usize]; if !d.contains(&q) && !xcons(q.0) { picks.push(("nodec", q.0)); got += 1; } }
+                for (ri, (stratum, xr)) in picks.iter().enumerate() {
+                    let witness = v.iter().any(|&a| v.iter().any(|&b| s3_val(&f, e, a, b, *xr) == 0));
+                    let (eqs, n) = system(&f, e, ch, *xr);
+                    let o = run_ms(&f, &eqs, n, out);
+                    let ok = gate_ms(&o, witness);
+                    if !ok { gate_fail += 1; }
+                    total += 1;
+                    rows.push_str(&q5_row("Q2", p, k, ti, arm, inst, stratum, ri, *xr, n, &o, ok));
+                }
+            }
+            q5_append(out, &rows);
+            eprintln!("q5/Q2 p={} k={} target={} done", p, k, ti);
+        }
+    } }
+    std::fs::write(format!("{}/q5_q2_summary.json", out), format!("{{\"systems\":{},\"gate_failures\":{}}}\n", total, gate_fail)).unwrap();
+    // Q4 part: recompute the frozen selection (Buchberger) and solve the confirmation systems with msolve.
+    search_impl(out, None, true);
+}
+
+fn analyze_q5(out: &str) {
+    let (h, rows) = read_csv(&format!("{}/q5_systems.csv", out));
+    let c = |n: &str| col(&h, n);
+    let (ipart, ip, ik, ia, is, icells, igate, ist) = (c("part"), c("p"), c("k"), c("arm"), c("stratum"), c("cells"), c("gate_ok"), c("status"));
+    let gate_fail = rows.iter().filter(|r| r[igate] != "true").count();
+    let censored = rows.iter().filter(|r| r[ist] != "ok").count();
+    let mut g: BTreeMap<(String, u64, u32, String), BTreeMap<String, Vec<f64>>> = BTreeMap::new();
+    for r in &rows {
+        g.entry((r[ipart].clone(), r[ip].parse().unwrap(), r[ik].parse().unwrap(), r[is].clone()))
+            .or_default().entry(r[ia].clone()).or_default().push(r[icells].parse().unwrap());
+    }
+    let ratio = |x: &[f64], y: &[f64]| med_of(x) / med_of(y);
+    let mut tab = String::from("part,p,k,stratum,num,den,median_num,median_den,ratio,ci_lo,ci_hi\n");
+    let (mut a_in, mut a_out, mut b_persist, mut n_q2, mut sel_imp, mut n_q4) = (0, 0, 0, 0, 0, 0);
+    let pairs_q2 = [("A2", "B"), ("B", "A1"), ("A2", "A1"), ("B2", "B"), ("A0", "A1")];
+    let pairs_q4 = [("C_sel_grevlex", "C_nat"), ("C_sel_lex", "C_nat"), ("C_best", "C_nat"), ("C_rep", "C_nat"), ("C_inv", "C_nat"), ("C_sel_grevlex", "A1"), ("C_nat", "A1"), ("D", "A1")];
+    for ((part, p, k, s), m) in &g {
+        let pairs: &[(&str, &str)] = if part == "Q2" { &pairs_q2 } else { &pairs_q4 };
+        for (a, b) in pairs {
+            let (x, y) = (m.get(*a).cloned().unwrap_or_default(), m.get(*b).cloned().unwrap_or_default());
+            if x.is_empty() || y.is_empty() { continue; }
+            let (lo, hi) = boot_ci(&x, &y, ratio, BOOT, derive(MASTER, &format!("q5boot/{}/{}/{}/{}/{}/{}", part, p, k, s, a, b)));
+            let rr = ratio(&x, &y);
+            writeln!(tab, "{},{},{},{},{},{},{:.0},{:.0},{:.4},{:.4},{:.4}", part, p, k, s, a, b, med_of(&x), med_of(&y), rr, lo, hi).unwrap();
+            if part == "Q2" && *a == "A2" && *b == "B" { n_q2 += 1; if (0.8..=1.25).contains(&rr) { a_in += 1 } else { a_out += 1 } }
+            if part == "Q2" && *a == "B" && *b == "A1" && rr >= 1.5 { b_persist += 1; }
+            if part == "Q4" && *a == "C_sel_grevlex" && *b == "C_nat" { n_q4 += 1; if rr <= 0.8 && hi < 1.0 { sel_imp += 1; } }
+        }
+    }
+    std::fs::write(format!("{}/q5_cells.csv", out), tab).unwrap();
+    let v5a = if a_in >= 12 { "presentation_explains_cost" } else if a_out >= 12 { "presentation_does_not_explain" } else { "inconclusive" };
+    let v5b = if sel_imp >= 12 { "improvement" } else if sel_imp == 0 { "no_improvement" } else { "inconclusive" };
+    std::fs::write(format!("{}/q5_verdicts.json", out), format!(
+        "{{\"schema\":\"isomu-q5-verdicts/v1\",\"systems\":{},\"gate_failures\":{},\"non_ok_status\":{},\"q5a_comparisons\":{},\"q5a_in_band\":{},\"q5a_out_of_band\":{},\"q5a_verdict\":\"{}\",\"b_over_a1_ge_1_5\":{},\"q5b_comparisons\":{},\"q5b_improvement_count\":{},\"q5b_verdict\":\"{}\"}}\n",
+        rows.len(), gate_fail, censored, n_q2, a_in, a_out, v5a, b_persist, n_q4, sel_imp, v5b)).unwrap();
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let out = args.get(1).cloned().expect("out dir");
     match args.get(2).map(|s| s.as_str()) {
         Some("analyze") => analyze_q4(&out),
+        Some("msolve") => q5(&out),
+        Some("analyze_msolve") => analyze_q5(&out),
         _ => search(&out, args.get(2).map(|a| (a.parse().unwrap(), args[3].parse().unwrap()))),
     }
 }
@@ -1287,5 +1478,24 @@ mod q4tests {
         let m = native_mu_coset(&f, 3); let n = Repr { name: "n".into(), mobs: vec![MOB_ID; 3], inverse_form: false };
         let s = s1_general(&f, &m, &n); assert!(s.ok && (s.density - 1.0).abs() < 1e-12);
         let d = native_dickson(&f, 3); assert_eq!(d.v.len(), 8); assert!(s1_general(&f, &d, &n).ok);
+    }
+}
+
+#[cfg(test)]
+mod q5tests {
+    use super::*;
+    /// Toy systems only (format check, not study data): x²-y, xy-1 is consistent with
+    /// F4 rounds 2x3 and 3x3; x-1, x-2 is inconsistent.
+    #[test]
+    fn msolve_parse_toy() {
+        if std::process::Command::new("msolve").arg("-h").output().is_err() { return; }
+        let f = F::new(1153);
+        let dir = std::env::temp_dir().join("isomu_q5_test"); std::fs::create_dir_all(&dir).unwrap();
+        let d = dir.to_str().unwrap();
+        let (x, y) = (P::var(0), P::var(1));
+        let o = run_ms(&f, &[x.mul(&f, &x).sub(&f, &y), x.mul(&f, &y).sub(&f, &P::c(&f, 1))], 2, d);
+        assert_eq!(o.status, "ok"); assert!(!o.inconsistent); assert_eq!(o.rounds, 2); assert_eq!(o.cells, 15);
+        let o2 = run_ms(&f, &[x.sub(&f, &P::c(&f, 1)), x.sub(&f, &P::c(&f, 2))], 2, d);
+        assert_eq!(o2.status, "ok"); assert!(o2.inconsistent);
     }
 }

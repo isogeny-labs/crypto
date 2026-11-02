@@ -1,0 +1,13 @@
+card_id: CARD-isogeny-ic-yield-p3-a-main-k5-20261102-1
+relay_verbatim: not_checked   # no receipt exists (the card never completed) and no executor report file was supplied; check-relay needs both
+outcome: impeded
+stopped_at_step: measure
+recommendation: rerun_after_infrastructure_fix
+reasons:
+  - "Infrastructure stop, not a card or data fault: the main session stopped the run at about 5 min because the executor tool would have killed the background command at its 30-minute limit; the card timeout_seconds is 2160, so the card limit was not reached."
+  - "No receipt: cards/CARD-isogeny-ic-yield-p3-a-main-k5-20261102-1.receipt.json does not exist, nor do .run.stdout and .run.stderr."
+  - "Partial output retained unread under p3_ecc2k130/full/_failed/CARD-isogeny-ic-yield-p3-a-main-k5-20261102-1-attempt1/p3a_main_k5.jsonl (272 lines, 125692 bytes, sha256 9d33368f55efd453a9f6481cb5e15c84bd725979bb4b7f608c36be29f3ec48c4). The run was incomplete: no data is used in analysis."
+  - "Moved aside so must_not_exist (p3_ecc2k130/full/p3a_main_k5.jsonl) passes: ls reports no such file in /home/user/crypto-p3run. HEAD there is d97f5953b2, the pin; nothing committed there. Other full/ files (setup and cards A1 to A3 outputs) were not touched."
+  - "Card unchanged: python3 tools/task_card.py lint in /home/user/crypto-p3run prints CARD OK (card sha256 dff4b6e5858e910184c70ca26df3b48a4abbee9f7280471af945aa0c21ccfc5f); every bind sha256 matches the file on disk. PROTOCOL.md (a bound file) was not edited; the launch note is in LAUNCH_NOTE.md, which no card binds."
+  - "Relaunch route: detached launch per LAUNCH_NOTE.md in the same directory, same card, same argv, env and binary."
+interpretation: not_assessed

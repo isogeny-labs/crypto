@@ -23,3 +23,11 @@ The original C-10-14 binary (679cdc2f...) and B binary (a133714d..., glibc, rust
 
 ## Raw sessions
 `s3://setec-astronomy-artifacts/validation/hashed-ecdl-counts/20261031/v2/sessions/{B,C-10-14,C-16}/` (all three, hashes match the receipts). They are not in git (about 3.4 MB); a validation gate row would need them committed.
+
+## EKS image for the merged e2e branch (2026-11-02)
+`codex/hashed-ecdl-ecbench-e2e` was merged with main (merge commit `dfa13276e6e6471ec9b113c43d2fbbf1339c0926`; the original tip `3ae1ac2bd` remains in its history, so the pin above stays reachable). Iso Lab run 41488072786 (`isolab-experiment.yml` on main, `publish_only=true`, `source_revision=dfa13276e...`) passed contracts, build and experiment (publication only; no experiment was submitted). Receipt (artifact `isolab-publication-41488072786-1`):
+- image: `104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:26794ab178706365547a7cb1d020afb3401b222a932490ffb73499de883bf5cd`
+- source_revision `dfa13276e6e6471ec9b113c43d2fbbf1339c0926`; `ecbench` sha256 `0302dd8bf091a66a561915d62f388ffa20213b493052af42ac541fbebc39904d`; `fresh_owner` sha256 `d984cff156a4e7acc548b29a582fdb027d685c4fb64ad9810c089d7d18562fff`
+- build: rustc 1.99.1 (58cf8f9c3), x86_64-unknown-linux-musl, `default_features=false`, `-C target-cpu=x86-64`, built 2026-11-02T17:24:26Z.
+
+This is a new source commit relative to the Track B protocol's pin (`3ae1ac2bd`); using it for a run needs a Coordinator amendment. The image build only shows that the merged tree compiles and publishes; it is not a run and carries no result.
