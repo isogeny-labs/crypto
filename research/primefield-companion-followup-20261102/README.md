@@ -121,3 +121,10 @@ The internal cache is one-use and source-bound, not a public certificate.
 Four Python files are syntax checked and one-page report visually inspected;
 zero numerical/performance trials. The twelve original files are separately
 bound in publication.json at source revision 0174135d9384b1ffec715de9fb5fd714a7fce56d.
+
+
+### Leading-border Schur cache
+
+Adds `companion-border-cache/`: reuses the transported pivot column, obtains the first row with one transpose query, and answers scalar-leading-vector requests by charged scaling. Borders are released before descent. For the specified setup/RHS/lift phases, the derived full-source query count changes from 2w+8 to 3+ell (ell is zero or one), with n(2w+5) additional field products. Static inspection records 4w+8 instrumented native integer products per successful fused application; these units are kept separate and runtime is unmeasured.
+
+Five Python files parse; the integration AST and preserved-kernel syntax audits pass; the one-page PDF is visually inspected. Fourteen original files have an independent publication manifest. Numerical, mutation-control and performance trials remain zero. Full reference, release-lifetime, cache and counter validation awaits funded execution.
