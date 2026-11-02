@@ -135,3 +135,12 @@ Five Python files parse; the integration AST and preserved-kernel syntax audits 
 Adds `companion-compact-lift/`: retain two border tails, a scalar inverse and one RHS entry, without keeping Schur/source/generator objects or a full parent RHS in unwind frames. Derived primal/dual head identities replace each nonzero lift source query with n-1 field multiplications and additions; common scalar solve arithmetic and original-system verification stay intact. Zero input tails introduce dot arithmetic where the reference already skipped its query. The specified setup/RHS/lift source-query count is three per nonterminal node. No runtime dominance claim.
 
 Each frame has 2n field-value slots, giving N(N+1)-2 across full scalar descent, excluding audit/certificate/current-operator memory. This remains quadratic; no heap measurement is claimed. Four Python files parse, complete normalized integration AST and static ownership/source-call audits pass, and the one-page report is visually inspected. Thirteen original files have a separate source manifest. Numerical, corruption-control, heap and performance trials remain zero under the existing cost gate.
+
+
+### Conditional border sharing and rank-one representation limit
+
+Adds `companion-shared-border/`: checks t=aJc exactly at each frame and shares the column tail for zero-row, reversal or scaled-reversal modes; failures retain both tails. With q=n-1, retained border field slots are q, q or q+1 instead of 2q. Detection failures and scaled-dot overhead are charged; no guaranteed inheritance through Schur reduction or runtime gain is claimed. Independent coefficient checker is implemented but unexecuted.
+
+Derives C_a(g)=sum g_i Z_a^i with displacement (a-b)g e_last^T. Fixing a=1,b=2,g0=1 leaves q arbitrary tail values at displacement rank one. Exact self-contained encodings for arbitrary dot queries therefore need q log2(p) bits in the worst case; recurrences stored by d initial values and d coefficients cannot cover this family if 2d<q. This concerns the stated operator/query model, not an elliptic lower bound. It directs further compression toward actual feature-map structure or charged recomputation.
+
+Six Python files parse; frame and solver normalized-AST checks pass; one-page report inspected. Fifteen originals are independently manifested. Numerical, certificate mutation, heap and performance trials remain zero under the existing cost gate.
