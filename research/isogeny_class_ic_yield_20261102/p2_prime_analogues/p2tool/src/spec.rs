@@ -24,6 +24,80 @@ pub fn predicted_yield(n: u64, m: u32, nfb: u64) -> f64 {
     if m == 2 { 2.0 * f * f / n } else { 4.0 / 3.0 * f * f * f / n }
 }
 
+/// Follow-up 1 (FOLLOWUP_c32A_m3.md section 6): the workload list of `spec --focus`.
+/// Order: primary, comparators ascending as listed in the focus file, iso models by k.
+/// Every workload is re-verified in exact u64/u128 arithmetic: (gx,gy) on the curve,
+/// n*G = O, and for the iso models j(a,b) = primary.j. Any failure is an Err (the caller exits nonzero).
+pub fn focus_curves(c: &Value, focus: &Value, cid: &str, m: u32) -> Result<Vec<Value>, String> {
+    use crate::ec::Curve;
+    let fcid = focus["class_id"].as_str().unwrap_or("");
+    if fcid != cid {
+        return Err(format!("focus class_id {fcid} != --class {cid}"));
+    }
+    if focus["m"].as_u64() != Some(m as u64) {
+        return Err(format!("focus m {} != --m {m}", focus["m"]));
+    }
+    let u = |v: &Value, what: &str| v.as_u64().ok_or_else(|| format!("missing/non-integer {what}"));
+    let (p, n) = (u(&c["p"], "class p")?, u(&c["n"], "class n")?);
+    if u(&focus["p"], "focus p")? != p || u(&focus["n"], "focus n")? != n {
+        return Err("focus p/n differ from the class".into());
+    }
+    let prim = &focus["primary"];
+    let pidx = u(&prim["index"], "primary.index")? as usize;
+    let cj = u(&prim["j"], "primary.j")?;
+    let curves = c["curves"].as_array().ok_or("class has no curves")?;
+    let mut models: Vec<(String, Value)> = vec![];
+    // primary and comparators come from classes.json; the focus file's primary is cross-checked against it
+    let from_class = |i: usize| curves.get(i).cloned().ok_or_else(|| format!("curve index {i} not in class"));
+    let pc = from_class(pidx)?;
+    for k in ["a", "b", "gx", "gy"] {
+        if pc[k] != prim[k] {
+            return Err(format!("primary.{k} in the focus file differs from classes.json curve {pidx}"));
+        }
+    }
+    if pc["j"].as_u64() != Some(cj) {
+        return Err(format!("primary.j differs from classes.json curve {pidx}"));
+    }
+    models.push((format!("primary {pidx}"), pc));
+    let comps = focus["comparator_indices"].as_array().ok_or("comparator_indices")?;
+    let mut last = None;
+    for ci in comps {
+        let i = u(ci, "comparator index")? as usize;
+        if last.map_or(false, |l| i <= l) || i == pidx {
+            return Err("comparator indices must be strictly ascending and exclude the primary".into());
+        }
+        last = Some(i);
+        models.push((format!("comparator {i}"), from_class(i)?));
+    }
+    let isos = focus["iso_models"].as_array().ok_or("iso_models")?;
+    for (k, im) in isos.iter().enumerate() {
+        if im["k"].as_u64() != Some(k as u64) || im["of"].as_u64() != Some(pidx as u64) {
+            return Err(format!("iso model {k}: k/of mismatch"));
+        }
+        models.push((format!("iso k={k}"), im.clone()));
+    }
+    let mut out = vec![];
+    for (name, cv) in models {
+        let (a, b, gx, gy) = (u(&cv["a"], "a")?, u(&cv["b"], "b")?, u(&cv["gx"], "gx")?, u(&cv["gy"], "gy")?);
+        let e = Curve { p, a, b };
+        let g = Some((gx, gy));
+        if !e.on(g) {
+            return Err(format!("{name}: G not on the curve"));
+        }
+        if e.mul(n, g).is_some() {
+            return Err(format!("{name}: n*G != O"));
+        }
+        if name.starts_with("iso") && e.j() != cj {
+            return Err(format!("{name}: j {} != primary j {cj}", e.j()));
+        }
+        if name.starts_with("primary") && e.j() != cj {
+            return Err(format!("{name}: computed j {} != j {cj}", e.j()));
+        }
+        out.push(cv);
+    }
+    Ok(out)
+}
+
 pub fn run(args: &[String]) {
     let classes_path = arg(args, "--classes").expect("--classes classes.json");
     let cid = arg(args, "--class").expect("--class c24A");
@@ -37,6 +111,7 @@ pub fn run(args: &[String]) {
     let level = arg(args, "--isolation").unwrap_or("L2".into());
     let seed: u64 = arg(args, "--seed").map(|s| s.parse().unwrap()).unwrap_or(20261102);
     let out = arg(args, "--out").expect("--out spec.json");
+    let focus_path = arg(args, "--focus");
     let doc: Value = serde_json::from_str(&std::fs::read_to_string(&classes_path).unwrap()).unwrap();
     let c = doc["classes"].as_array().unwrap().iter().find(|c| c["id"] == cid.as_str()).expect("class id");
     let n = c["n"].as_u64().unwrap();
@@ -58,20 +133,36 @@ pub fn run(args: &[String]) {
                                   "gx": cv["gx"], "gy": cv["gy"], "r": n});
     // Curves: the first `first` of the class plus the base curve of every selected
     // isomorphic model (so a smoke subset still has its iso pairs); all of them in a full run.
-    let iso_sel: Vec<&Value> = c["iso_models"].as_array().unwrap().iter().take(iso).collect();
-    let mut idx: Vec<usize> = (0..c["curves"].as_array().unwrap().len().min(first)).collect();
-    for m in &iso_sel {
-        idx.push(m["of"].as_u64().unwrap() as usize);
-    }
-    idx.sort();
-    idx.dedup();
-    let mut curves = vec![];
-    for &i in &idx {
-        curves.push(mk(&c["curves"][i]));
-    }
-    for cv in &iso_sel {
-        curves.push(mk(cv));
-    }
+    let curves = if let Some(fp) = &focus_path {
+        if arg(args, "--first").is_some() || arg(args, "--iso").is_some() {
+            eprintln!("error: --focus cannot be combined with --first or --iso");
+            std::process::exit(2);
+        }
+        let focus: Value = serde_json::from_str(&std::fs::read_to_string(fp).expect("read --focus file")).expect("focus json");
+        match focus_curves(c, &focus, &cid, m) {
+            Ok(v) => v.iter().map(|cv| mk(cv)).collect::<Vec<Value>>(),
+            Err(e) => {
+                eprintln!("error: focus verification failed: {e}");
+                std::process::exit(1);
+            }
+        }
+    } else {
+        let iso_sel: Vec<&Value> = c["iso_models"].as_array().unwrap().iter().take(iso).collect();
+        let mut idx: Vec<usize> = (0..c["curves"].as_array().unwrap().len().min(first)).collect();
+        for m in &iso_sel {
+            idx.push(m["of"].as_u64().unwrap() as usize);
+        }
+        idx.sort();
+        idx.dedup();
+        let mut curves = vec![];
+        for &i in &idx {
+            curves.push(mk(&c["curves"][i]));
+        }
+        for cv in &iso_sel {
+            curves.push(mk(cv));
+        }
+        curves
+    };
     let arm = |name: &str, role: &str, size: u64| {
         json!({"name": name, "role": role, "method": {"id": "ic.pipeline", "params": {
             "factor_base": format!("prime-abscissa:size={size}"),
@@ -97,4 +188,49 @@ pub fn run(args: &[String]) {
     });
     std::fs::write(&out, serde_json::to_string_pretty(&spec).unwrap()).unwrap();
     eprintln!("wrote {out}: kind {kind} class {cid} m={m} |F|={nfb} (pc {nfb_pc}) predicted_yield={y_eff:.3e} attempts={attempts} curves={}", spec["workloads"]["curves"].as_array().unwrap().len());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn load(name: &str) -> Value {
+        let p = format!("{}/../{name}", env!("CARGO_MANIFEST_DIR"));
+        serde_json::from_str(&std::fs::read_to_string(p).unwrap()).unwrap()
+    }
+    fn class() -> Value {
+        load("classes.json")["classes"].as_array().unwrap().iter().find(|c| c["id"] == "c32A").unwrap().clone()
+    }
+    #[test]
+    fn focus_builds_24_in_order() {
+        let (c, f) = (class(), load("followup1_focus.json"));
+        let v = focus_curves(&c, &f, "c32A", 3).unwrap();
+        assert_eq!(v.len(), 24);
+        assert_eq!(v[0]["a"], c["curves"][80]["a"]);
+        assert_eq!(v[1]["a"], c["curves"][7]["a"]);
+        assert_eq!(v[15]["a"], c["curves"][123]["a"]);
+        assert_eq!(v[16]["a"], f["iso_models"][0]["a"]);
+        assert_eq!(v[23]["a"], f["iso_models"][7]["a"]);
+    }
+    #[test]
+    fn focus_rejects_bad_models() {
+        let (c, f0) = (class(), load("followup1_focus.json"));
+        assert!(focus_curves(&c, &f0, "c32A", 2).is_err());
+        assert!(focus_curves(&c, &f0, "c24A", 3).is_err());
+        let mut f = f0.clone();
+        f["iso_models"][3]["gy"] = serde_json::json!(f0["iso_models"][3]["gy"].as_u64().unwrap() + 1); // off the curve
+        assert!(focus_curves(&c, &f, "c32A", 3).unwrap_err().contains("not on the curve"));
+        let mut f = f0.clone();
+        // a different (valid-looking) model of another curve: right curve and order but wrong j
+        f["iso_models"][0]["a"] = c["curves"][34]["a"].clone();
+        f["iso_models"][0]["b"] = c["curves"][34]["b"].clone();
+        f["iso_models"][0]["gx"] = c["curves"][34]["gx"].clone();
+        f["iso_models"][0]["gy"] = c["curves"][34]["gy"].clone();
+        assert!(focus_curves(&c, &f, "c32A", 3).unwrap_err().contains("j "));
+        let mut f = f0.clone();
+        f["primary"]["a"] = serde_json::json!(1);
+        assert!(focus_curves(&c, &f, "c32A", 3).is_err());
+        let mut f = f0.clone();
+        f["comparator_indices"][2] = serde_json::json!(5); // not ascending
+        assert!(focus_curves(&c, &f, "c32A", 3).is_err());
+    }
 }

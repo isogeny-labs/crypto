@@ -2,6 +2,7 @@
 //! Rust only (AGENTS.md "Implementation language: no Python"). libpari is
 //! used through dlopen by `build` alone, on a machine that has it.
 mod analyze;
+mod analyze_focus;
 mod ec;
 mod pari;
 mod spec;
@@ -229,6 +230,7 @@ fn main() {
         Some("build") => build(&args),
         Some("spec") => spec::run(&args),
         Some("analyze") => analyze::run(&args),
-        _ => eprintln!("usage: p2tool build|spec|analyze ..."),
+        Some("analyze-focus") => analyze_focus::run(&args),
+        _ => eprintln!("usage: p2tool build|spec|analyze|analyze-focus ..."),
     }
 }
