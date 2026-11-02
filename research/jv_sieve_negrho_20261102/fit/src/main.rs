@@ -372,10 +372,10 @@ fn graph(pts: &[Vec<f64>], ci: &dyn Fn(usize, usize) -> (f64, f64), newr: &[Run]
     let _ = write!(s, "<text x=\"20\" y=\"28\" font-size=\"17\" font-weight=\"bold\">Sieve route vs matched negation-map rho at p = 1511 (primary reference: {refname})</text>");
     let _ = write!(s, "<text x=\"20\" y=\"48\" fill=\"#444\">Panel A: sieve / rho (log scale, 1 = parity with rho; points are far below 1). Panel B: steps/sqrt(l) of the reference runs.</text>");
     // panel A
-    let (x0, x1) = (250.0, 960.0);
+    let (x0, x1) = (300.0, 960.0);
     let (lo, hi) = (1e-3f64.ln(), 2.0f64.ln());
     let xp = |v: f64| x0 + (v.ln() - lo) / (hi - lo) * (x1 - x0);
-    let rowsd: [(&str, usize); 4] = [("S, U1 (group additions)", 0), ("S, U2 (textbook F_p mults)", 1), ("S+, U1 (adds+lookups, rho unpriced)", 2), ("S+, U2 (adds+lookups, rho unpriced)", 3)];
+    let rowsd: [(&str, usize); 4] = [("S, U1 (group additions)", 0), ("S, U2 (textbook F_p mults)", 1), ("S+, U1 (rho unpriced)", 2), ("S+, U2 (rho unpriced)", 3)];
     let ytop = 80.0;
     for t in [1e-3, 1e-2, 1e-1, 1.0] {
         let x = xp(t);
