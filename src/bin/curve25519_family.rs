@@ -868,6 +868,266 @@ fn summarise(dirs: &[String]) -> (Value, String, String) {
     )
 }
 
+// ── t0: the 2-torsion symmetry x ↦ 1/x in m = 2 relation collection ────
+//
+// research/curve25519_t0_symmetry_20261102/PROTOCOL.md.  Exact coverage of
+// three pair-table oracles with the same N columns (blind, T₀-keyed, and
+// cofactor-projected), and a Monte Carlo of the blind and T₀-keyed oracles
+// whose every hit is verified by point arithmetic.
+
+/// `x ↦ x + 1/x` on Montgomery abscissae: invariant under translation by `T₀`.
+fn kappa(xm: u64, p: u64) -> u64 {
+    addm(xm, invm(xm, p), p)
+}
+
+fn t0_experiment(k: u32, n: usize, samples: u64, seed: u64) -> Value {
+    let m = build_miniature(k);
+    let (w, shift, p, r) = (m.weier, m.shift, m.p, m.r);
+    let mx = |q: &Pt| subm(q.x, shift, p);
+    let t0 = m.t0_weier;
+    // A point of order 8 spanning E[8]: [r]Q for some Q, [4]([r]Q) ≠ O.
+    let t8 = (2..p)
+        .find_map(|u| {
+            let y = sqrtm(Mont { p, a: m.a_mont }.rhs(u), p)?;
+            let q = w.mul(
+                Pt {
+                    x: addm(u, shift, p),
+                    y,
+                    inf: false,
+                },
+                r,
+            );
+            (!w.mul(q, 4).inf).then_some(q)
+        })
+        .unwrap();
+    assert_eq!(w.mul(t8, 4), t0, "[4]T8 must be T0");
+    let e8: Vec<Pt> = (0..8).map(|j| w.mul(t8, j)).collect();
+    let label = |q: &Pt| -> u64 {
+        let t = w.mul(*q, r);
+        e8.iter().position(|e| *e == t).expect("[r]P in E[8]") as u64
+    };
+    // Base: smallest Montgomery u ≥ 2 on E, not torsion, one point per u.
+    let mont = Mont { p, a: m.a_mont };
+    let mut base: Vec<(u64, Pt, u64)> = Vec::new();
+    let mut u = 2u64;
+    while base.len() < n {
+        if let Some(y) = sqrtm(mont.rhs(u), p) {
+            let q = Pt {
+                x: addm(u, shift, p),
+                y: y.min(p - y),
+                inf: false,
+            };
+            if !w.mul(q, 8).inf {
+                let l = label(&q);
+                base.push((u, q, l));
+            }
+        }
+        u += 1;
+    }
+    let max_u = u - 1;
+    // Exact coverage: distinct target abscissae D for each oracle.
+    use std::collections::HashSet;
+    let (mut blind, mut t0set, mut proj) = (HashSet::new(), HashSet::new(), HashSet::new());
+    let mut label_hist = [0u64; 8];
+    for i in 0..n {
+        for j in i..n {
+            for sgn in [1i8, -1] {
+                if i == j && sgn < 0 {
+                    continue;
+                }
+                let (pj, lj) = if sgn > 0 {
+                    (base[j].1, base[j].2)
+                } else {
+                    (w.neg(base[j].1), (8 - base[j].2) % 8)
+                };
+                let s = w.add(base[i].1, pj);
+                if s.inf {
+                    continue;
+                }
+                let l = (base[i].2 + lj) % 8;
+                label_hist[l as usize] += 1;
+                let xs = mx(&s);
+                if l == 0 {
+                    blind.insert(xs);
+                    t0set.insert(xs);
+                } else if l == 4 && xs != 0 {
+                    t0set.insert(invm(xs, p)); // R = S + T₀ has x = 1/x(S)
+                }
+            }
+        }
+    }
+    let pb: Vec<Pt> = {
+        let mut seen = HashSet::new();
+        base.iter()
+            .map(|b| w.mul(b.1, 8))
+            .filter(|q| !q.inf && seen.insert(q.x))
+            .collect()
+    };
+    for i in 0..pb.len() {
+        for j in i..pb.len() {
+            for s in [w.add(pb[i], pb[j]), w.add(pb[i], w.neg(pb[j]))] {
+                if !s.inf {
+                    proj.insert(mx(&s));
+                }
+            }
+        }
+    }
+    let y = |d: usize| 2.0 * d as f64 / (r - 1) as f64;
+    let (yb, yt, yp) = (y(blind.len()), y(t0set.len()), y(proj.len()));
+
+    // Monte Carlo: blind (key x) and t0 (key κ) tables, verified hits.
+    let mut tab_b: HashMap<u64, (usize, usize, i8)> = HashMap::new();
+    let mut tab_t: HashMap<u64, (usize, usize, i8)> = HashMap::new();
+    for i in 0..n {
+        for j in i..n {
+            for sgn in [1i8, -1] {
+                if i == j && sgn < 0 {
+                    continue;
+                }
+                let pj = if sgn > 0 { base[j].1 } else { w.neg(base[j].1) };
+                let s = w.add(base[i].1, pj);
+                if s.inf || mx(&s) == 0 {
+                    continue;
+                }
+                let lj = if sgn > 0 {
+                    base[j].2
+                } else {
+                    (8 - base[j].2) % 8
+                };
+                let l = (base[i].2 + lj) % 8;
+                if l == 0 {
+                    tab_b.entry(mx(&s)).or_insert((i, j, sgn));
+                }
+                if l == 0 || l == 4 {
+                    tab_t.entry(kappa(mx(&s), p)).or_insert((i, j, sgn));
+                }
+            }
+        }
+    }
+    let mut st = seed;
+    let (mut hb, mut ht, mut vb, mut vt, mut t0_only) = (0u64, 0u64, 0u64, 0u64, 0u64);
+    for _ in 0..samples {
+        st = st
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        let a = 1 + (st >> 11) % (r - 1);
+        let rt = w.mul(m.g, a);
+        let xr = mx(&rt);
+        if xr == 0 {
+            continue;
+        }
+        let check = |(i, j, sgn): (usize, usize, i8)| -> bool {
+            let pj = if sgn > 0 { base[j].1 } else { w.neg(base[j].1) };
+            let s = w.add(base[i].1, pj);
+            let st0 = w.add(s, t0);
+            [s, w.neg(s), st0, w.neg(st0)].contains(&rt)
+        };
+        let b_hit = tab_b.get(&xr).copied();
+        if let Some(e) = b_hit {
+            hb += 1;
+            let pj = if e.2 > 0 {
+                base[e.1].1
+            } else {
+                w.neg(base[e.1].1)
+            };
+            let s = w.add(base[e.0].1, pj);
+            if rt == s || rt == w.neg(s) {
+                vb += 1;
+            }
+        }
+        if let Some(e) = tab_t.get(&kappa(xr, p)).copied() {
+            ht += 1;
+            if check(e) {
+                vt += 1;
+            }
+            if b_hit.is_none() {
+                t0_only += 1;
+            }
+        }
+    }
+    let z = |hits: u64, yv: f64| {
+        let e = samples as f64 * yv;
+        (hits as f64 - e) / (e * (1.0 - yv)).sqrt().max(1e-9)
+    };
+    json!({
+        "k": k, "p": p, "A": m.a_mont, "r": r, "N": n, "max_u": max_u,
+        "coset_histogram_of_pair_sums": label_hist,
+        "exact": {
+            "D_blind": blind.len(), "D_t0": t0set.len(), "D_proj": proj.len(),
+            "yield_blind": yb, "yield_t0": yt, "yield_proj": yp,
+            "t0_over_blind": yt / yb, "proj_over_t0": yp / yt, "proj_over_blind": yp / yb,
+            "Q1_holds": (1.8..=2.2).contains(&(yt / yb)),
+            "Q2_holds": (3.6..=4.4).contains(&(yp / yt)),
+        },
+        "monte_carlo": {
+            "samples": samples, "seed": seed,
+            "blind_hits": hb, "blind_verified": vb, "blind_z": z(hb, yb),
+            "t0_hits": ht, "t0_verified": vt, "t0_only_hits": t0_only, "t0_z": z(ht, yt),
+            "Q3_holds": vt == ht && vb == hb && z(ht, yt).abs() <= 4.0 && z(hb, yb).abs() <= 4.0,
+        }
+    })
+}
+
+/// Figure for the T₀ study: covered-target ratios to the blind oracle, per
+/// (k, N) cell, from the `t0` JSON lines.
+fn t0_figure(jsonl: &str) -> String {
+    let rows: Vec<Value> = jsonl
+        .lines()
+        .map(|l| serde_json::from_str(l).unwrap())
+        .collect();
+    let (w, h, ml, mr, mt, mb) = (820.0, 400.0, 60.0, 230.0, 34.0, 70.0);
+    let n = rows.len() as f64;
+    let xs = |i: f64| ml + (i + 0.5) / n * (w - ml - mr);
+    let ys = |v: f64| mt + (1.0 - v / 9.0) * (h - mt - mb);
+    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='12'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Targets covered per pair table, relative to the blind table (same N columns, exact counts)</text>\n");
+    for v in [1.0, 2.0, 4.0, 8.0] {
+        let y = ys(v);
+        s += &format!("<line x1='{ml}' x2='{}' y1='{y:.1}' y2='{y:.1}' stroke='#ddd'/><text x='{}' y='{:.1}' text-anchor='end'>{v}×</text>\n", w - mr, ml - 6.0, y + 4.0);
+    }
+    let bw = (w - ml - mr) / n / 4.0;
+    for (i, r) in rows.iter().enumerate() {
+        let e = &r["exact"];
+        let vals = [
+            1.0,
+            e["t0_over_blind"].as_f64().unwrap(),
+            e["proj_over_blind"].as_f64().unwrap(),
+        ];
+        for (j, (v, c)) in vals
+            .iter()
+            .zip(["#c0392b", "#e67e22", "#1f77b4"])
+            .enumerate()
+        {
+            let x = xs(i as f64) - 1.5 * bw + j as f64 * bw;
+            let y = ys(*v);
+            s += &format!(
+                "<rect x='{x:.1}' y='{y:.1}' width='{:.1}' height='{:.1}' fill='{c}'/>\n",
+                bw * 0.9,
+                ys(0.0) - y
+            );
+        }
+        s += &format!(
+            "<text x='{:.1}' y='{}' text-anchor='middle' font-size='11'>k={} N={}</text>\n",
+            xs(i as f64),
+            h - mb + 16.0,
+            r["k"],
+            r["N"]
+        );
+    }
+    for (j, (c, lab)) in [
+        ("#c0392b", "blind (coset 0 of 8)"),
+        ("#e67e22", "T₀-keyed, x + 1/x (cosets 0, 4)"),
+        ("#1f77b4", "cofactor-projected = baseline (all 8)"),
+    ]
+    .iter()
+    .enumerate()
+    {
+        let y = mt + 20.0 + 22.0 * j as f64;
+        s += &format!("<rect x='{}' y='{}' width='14' height='10' fill='{c}'/><text x='{}' y='{}' font-size='11'>{lab}</text>\n", w - mr + 10.0, y - 9.0, w - mr + 30.0, y);
+    }
+    s += &format!("<text x='{ml}' y='{}' font-size='10' fill='#666'>Curve25519 miniatures; ratios of distinct covered target abscissae D (yield = 2D/(r−1)); theory 1 : 2 : 8</text>\n</svg>\n", h - 12.0);
+    s
+}
+
 /// Base size `N_a = round(0.63·r^{1/3})`: the lab's validated prime-order
 /// optimum (`docs/ic/LEADERBOARD.md`, prime-field baseline: N = 162, 407,
 /// 1024 at 24, 28, 32 bits is 0.63·n^{1/3}) scaled to the subgroup.
@@ -978,6 +1238,22 @@ fn main() {
                 "{}",
                 serde_json::to_string_pretty(&baseline_spec(k, targets, seed)).unwrap()
             );
+        }
+        "t0" => {
+            // t0 <k> <N> <samples> <seed>
+            let k: u32 = args[2].parse().unwrap();
+            let n: usize = args[3].parse().unwrap();
+            let samples: u64 = args[4].parse().unwrap();
+            let seed: u64 = args[5].parse().unwrap();
+            println!(
+                "{}",
+                serde_json::to_string(&t0_experiment(k, n, samples, seed)).unwrap()
+            );
+        }
+        "t0-figure" => {
+            // t0-figure <t0.jsonl> <out.svg>
+            let text = std::fs::read_to_string(&args[2]).unwrap();
+            std::fs::write(&args[3], t0_figure(&text)).unwrap();
         }
         "summarise" => {
             // summarise <out_prefix> <session_dir>...

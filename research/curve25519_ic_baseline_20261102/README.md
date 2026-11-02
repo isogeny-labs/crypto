@@ -123,7 +123,7 @@ Per-arm, per-curve detail with phase shares: [`analysis/summary.md`](analysis/su
    pair-table oracle: at fixed unknowns it covers 8× the targets for 8× the
    table, which moves the balanced optimum by `8^{1/3} ≈ 2` in theory; it
    must beat `proj-a` on fresh targets across the band.
-3. **`T₀`-closed base** (`{x} ∪ {1/x}` in Montgomery coordinates): the
+3. **`T₀`-closed base** — tried in [`../curve25519_t0_symmetry_20261102`](../curve25519_t0_symmetry_20261102/README.md): 2.0× over blind, 4× below projection (generic track closed; algebraic track open). Original note: (`{x} ∪ {1/x}` in Montgomery coordinates): the
    2-element sub-case of 2, cheaper to build; measures whether the Kummer-line
    symmetry gives anything beyond projection.
 4. **Algebraic track:** `pkm-semaev` on the miniatures, with `S₃`/`S₄`
