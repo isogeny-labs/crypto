@@ -1192,7 +1192,7 @@ mod tests {
             if target.infinity {
                 continue;
             }
-            let mut run = |o: &mut PkmSemaevOracle| {
+            let run = |o: &mut PkmSemaevOracle| {
                 let got = o.decompose(
                     &ctx(inst),
                     fb,
