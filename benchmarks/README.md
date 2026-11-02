@@ -73,6 +73,13 @@ is 1.72–1.97× lower at the three toy primes: c_cyc 2^45.43–2^45.84, with a 
 straddles CLOSE, so the verdict is unchanged. It remains outside the admitted table: it
 is a stage cost, with no replay certificate or matched rho reference.
 
+The [2 November exact ECCp-131 representation-filter sweep](20261102-eccp131-representation-filter/)
+keeps documentary PDF/SVG/PNG copies of the six-cell held-out search. All six
+recorded lower enrichment ratios were below 1; the planted four-sum, modular
+solver, and 6/6 A/A controls passed. Local clocks earned only L0 and are invalid,
+so this is counted scientific evidence rather than a performance result and
+remains outside the admitted table.
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 

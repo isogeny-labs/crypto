@@ -436,13 +436,13 @@ pub fn rep(
 }
 
 /// E18's partition (`rho_part`, `r` classes).
-fn part(pt: &Pt4, r: usize) -> usize {
+pub(crate) fn part(pt: &Pt4, r: usize) -> usize {
     let h = pt.x.0[0] ^ pt.x.0[1].wrapping_mul(0x9E37_79B9) ^ pt.x.0[2].rotate_left(17);
     (mix64(h ^ pt.x.0[3].rotate_left(29)) % r as u64) as usize
 }
 
 /// E27's visit digest (an instrument; not counted).
-fn visit_digest(acc: u64, pt: &Pt4) -> u64 {
+pub(crate) fn visit_digest(acc: u64, pt: &Pt4) -> u64 {
     let mut h = acc;
     for v in pt.x.0.iter().chain(pt.y.0.iter()) {
         h = mix64(h ^ v.wrapping_mul(0x9E37_79B9_7F4A_7C15));
