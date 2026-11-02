@@ -285,6 +285,10 @@ digraph ecdlp_claims {
     "CEX-LEMMA4-REVERSE-R" [label="CEX-LEMMA4-REVERSE-R\\nWitness R {X, X^2+X}: d_F = 2, no fake fall", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CLAIM-GB-LFD-LE-DREG-BFS" [label="CLAIM-GB-LFD-LE-DREG-BFS\\n'last fall <= d_reg' with BFS d_reg\\nd_lastfall <= d_reg (BFS)\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "THM-SALIZZONI-EX39-EXACT" [label="THM-SALIZZONI-EX39-EXACT\\nSalizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-FAKE-DEGREE-BOUNDS-TRUE" [label="CLAIM-FAKE-DEGREE-BOUNDS-TRUE\\nd_F bounded by a function of d'_F (outside)\\nd_F <= f(d'_F)\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-FAKE-GAP-FAMILY-WK" [label="CEX-FAKE-GAP-FAMILY-WK\\nFamily W_k = {X^k Y, XY + X}: d'_F = 2, d_F = k + 1", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE" [label="CLAIM-FAKE-GAP-INSIDE-PLUS-ONE\\nd_F <= d'_F + 1 (inside)\\nd_F(inside) <= d'_F + 1\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-FAKE-GAP-INSIDE-YZ" [label="CEX-FAKE-GAP-INSIDE-YZ\\n{YZ + 1, XZ + X + 1}: d_F(inside) = 3, d'_F = 1", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -498,6 +502,7 @@ digraph ecdlp_claims {
     "HEUR-SP-SEMAEV15-ASSUMPTION1" [label="HEUR-SP-SEMAEV15-ASSUMPTION1\\nSemaev 2015 Assumption 1: d_F4 <= 4", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
     "HEUR-SP-SEMAEV15-WEAK-REGULARITY" [label="HEUR-SP-SEMAEV15-WEAK-REGULARITY\\nSemaev 2015 (revised): regularity degree o(sqrt(n/ln n))", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
     "MEAS-LEMMA4-REVERSE-CENSUS" [label="MEAS-LEMMA4-REVERSE-CENSUS\\nReverse-repair census: 0 nondegenerate counterexamples in 531,497 pairs", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
+    "MEAS-REVERSE-TRIPLES" [label="MEAS-REVERSE-TRIPLES\\nReverse repair, triples: 0 counterexamples with independent reduced generators", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
   }
   subgraph cluster_open {
     label="Open proof and attack surfaces"; color="#cad5df"; style="rounded";
@@ -546,6 +551,7 @@ digraph ecdlp_claims {
     "GAP-SP-BOUNDED-ROOT-SUMPOLY" [label="GAP-SP-BOUNDED-ROOT-SUMPOLY\\nSmall-coordinate roots of summation polynomials over F_p", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-SP-JV-CONJECTURE" [label="GAP-SP-JV-CONJECTURE\\nJoux-Vitse Conjecture on the summation morphism C^(n-1) -> W(E)", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-SP-DEGREE-GROWTH-SPLIT-SYSTEMS" [label="GAP-SP-DEGREE-GROWTH-SPLIT-SYSTEMS\\nGrowth law of the solving degree of split summation systems", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-FAKE-GAP-INSIDE-BOUNDED" [label="GAP-FAKE-GAP-INSIDE-BOUNDED\\nIs d_F(inside) - d'_F bounded?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -1441,4 +1447,10 @@ digraph ecdlp_claims {
   "CEX-GB-SALIZZONI-EX39" -> "CLAIM-GB-LFD-LE-DREG-BFS" [label="refutes", color="#a33a3a", style="solid"];
   "CLAIM-GB-LFD-LE-DREG-BFS" -> "CLAIM-GB-LFD-LE-DREG" [label="qualifies", color="#66788a", style="dashed"];
   "THM-SALIZZONI-EX39-EXACT" -> "CEX-GB-SALIZZONI-EX39" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-FAKE-GAP-FAMILY-WK" -> "CLAIM-FAKE-DEGREE-BOUNDS-TRUE" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-FAKE-GAP-INSIDE-YZ" -> "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE" [label="refutes", color="#a33a3a", style="solid"];
+  "CLAIM-FAKE-DEGREE-BOUNDS-TRUE" -> "GAP-NAGAO-PROP5-ROUTE" [label="qualifies", color="#66788a", style="dashed"];
+  "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE" -> "GAP-FAKE-GAP-INSIDE-BOUNDED" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-REVERSE-TRIPLES" -> "GAP-LEMMA4-REVERSE" [label="measures", color="#66788a", style="solid"];
+  "CLAIM-NAGAO-LEMMA4" -> "GAP-FAKE-GAP-INSIDE-BOUNDED" [label="leaves_open", color="#66788a", style="dashed"];
 }

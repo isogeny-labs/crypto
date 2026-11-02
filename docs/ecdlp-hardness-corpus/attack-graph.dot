@@ -31,6 +31,8 @@ digraph attack_graph {
   "CLAIM-BK-SAFECURVES-BRAINPOOL-1E6" [label="CLAIM-BK-SAFECURVES-BRAINPOOL-1E6\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-BK-SAFECURVES-SEC1-20" [label="CLAIM-BK-SAFECURVES-SEC1-20\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-BK-X962-NO-AMORTIZATION" [label="CLAIM-BK-X962-NO-AMORTIZATION\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-FAKE-DEGREE-BOUNDS-TRUE" [label="CLAIM-FAKE-DEGREE-BOUNDS-TRUE\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE" [label="CLAIM-FAKE-GAP-INSIDE-PLUS-ONE\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-GB-LFD-LE-DREG-BFS" [label="CLAIM-GB-LFD-LE-DREG-BFS\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-GG-BKL-SIMD-NEGATION" [label="CLAIM-GG-BKL-SIMD-NEGATION\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-GG-CERTICOM-DP-NORMALIZATION" [label="CLAIM-GG-CERTICOM-DP-NORMALIZATION\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
@@ -325,4 +327,8 @@ digraph attack_graph {
   "CEX-LEMMA4-REVERSE-R" -> "CLAIM-LEMMA4-REVERSE-GENERAL" [label="refutes", color="#a33a3a", penwidth=2];
   "CEX-GB-SALIZZONI-EX39" [fillcolor="#dff4e5", color="#257942"];
   "CEX-GB-SALIZZONI-EX39" -> "CLAIM-GB-LFD-LE-DREG-BFS" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-FAKE-GAP-FAMILY-WK" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-FAKE-GAP-FAMILY-WK" -> "CLAIM-FAKE-DEGREE-BOUNDS-TRUE" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-FAKE-GAP-INSIDE-YZ" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-FAKE-GAP-INSIDE-YZ" -> "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE" [label="refutes", color="#a33a3a", penwidth=2];
 }

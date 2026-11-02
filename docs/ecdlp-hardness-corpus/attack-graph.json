@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 530,
-    "frontier": 322,
+    "nodes": 536,
+    "frontier": 327,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -17,18 +17,19 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 88,
-      "measured": 21,
-      "proved_internal_unreviewed": 42,
-      "open": 45,
+      "measured": 22,
+      "proved_internal_unreviewed": 44,
+      "open": 46,
       "heuristic": 71,
-      "refuted": 17,
+      "refuted": 19,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 499,
+      "none": 503,
       "kernel_checked": 27,
       "stated_open": 3,
-      "lean_written_unchecked": 1
+      "lean_written_unchecked": 2,
+      "native_exact": 1
     }
   },
   "frontier": [
@@ -2486,6 +2487,40 @@
       ]
     },
     {
+      "id": "CLAIM-FAKE-DEGREE-BOUNDS-TRUE",
+      "label": "d_F bounded by a function of d'_F (outside)",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-FAKE-GAP-FAMILY-WK",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
+      "label": "d_F <= d'_F + 1 (inside)",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-FAKE-GAP-INSIDE-YZ",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "CLAIM-GB-LFD-LE-DREG-BFS",
       "label": "'last fall <= d_reg' with BFS d_reg",
       "status": "refuted",
@@ -2806,6 +2841,25 @@
       ]
     },
     {
+      "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "label": "Is d_F(inside) - d'_F bounded?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-FAKE-GAP-INSIDE"
+      ],
+      "pressure": [
+        {
+          "from": "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "GAP-FALL-DEGREE-COST-BRIDGE",
       "label": "Every degree-based cost must pass through sd or last fall",
       "status": "open",
@@ -2966,7 +3020,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CLAIM-FAKE-DEGREE-BOUNDS-TRUE",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PF-DEDICATED-ROOT-FINDER",
@@ -4748,6 +4807,32 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-FAKE-GAP-FAMILY-WK",
+      "label": "Family W_k = {X^k Y, XY + X}: d'_F = 2, d_F = k + 1",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-FAKE-GAP-INSIDE-YZ",
+      "label": "{YZ + 1, XZ + X + 1}: d_F(inside) = 3, d'_F = 1",
+      "status": "proved_internal_unreviewed",
+      "formal": "native_exact",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-FAKE-GAP-INSIDE"
+      ],
       "pressure": []
     },
     {
