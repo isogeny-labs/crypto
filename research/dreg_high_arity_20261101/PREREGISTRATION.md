@@ -6,9 +6,11 @@ closure scan.
 Amendment `A1-REPORTER-AND-SOURCE-IDENTITY` was filed on 2026-11-02 before
 any affected data after final review identified incomplete reporter and
 transitive-source identity checks. It supersedes the v1 identities. Protocol
-v2 is currently draft pending the new immutable source commit, four-binary
-rebuild, and canonical refreeze; no registered draw, closure attempt,
-analysis, publication, or cloud job has run.
+v2 was canonically frozen before affected data at source commit
+`69ace2cc326d85c5128a5d36af5e72de1747385d`, protocol SHA-256
+`673323704df4252797f9a659ed4499b92a07758d99d63fd4726327a73926d984`,
+after the four-binary rebuild and validation. No registered draw, closure
+attempt, analysis, publication, or cloud job has run.
 
 ## Question and scope
 
