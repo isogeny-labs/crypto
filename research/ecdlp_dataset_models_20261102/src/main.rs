@@ -308,6 +308,7 @@ fn evaluate(rows: &[Row]) -> Value {
     let groups: BTreeSet<String> = rows.iter().map(|r| r.group.clone()).collect();
     let names = ["stratum_majority", "logistic_regression", "mlp_32"];
     let mut pooled: Vec<Score> = vec![Score::default(); 3];
+    let mut by_arm: BTreeMap<String, Vec<Score>> = BTreeMap::new();
     let mut folds = Vec::new();
     for (gi, g) in groups.iter().enumerate() {
         let train: Vec<&Row> = rows.iter().filter(|r| &r.group != g).collect();
@@ -318,14 +319,22 @@ fn evaluate(rows: &[Row]) -> Value {
         let mut fold = serde_json::Map::new();
         for (mi, m) in models.iter().enumerate() {
             let mut s = Score::default();
-            for r in &test { let p = m.predict(r); s.add(p, r.y); pooled[mi].add(p, r.y); }
+            for r in &test {
+                let p = m.predict(r); s.add(p, r.y); pooled[mi].add(p, r.y);
+                by_arm.entry(r.arm.clone()).or_insert_with(|| vec![Score::default(); 3])[mi].add(p, r.y);
+            }
             fold.insert(names[mi].into(), s.json());
         }
         folds.push(json!({"held_out_component": g, "train_rows": train.len(), "test_rows": test.len(),
             "test_verified_rate": test.iter().map(|r| r.y).sum::<f64>() / test.len() as f64, "models": fold}));
     }
     json!({"components": groups.len(), "folds": folds,
-        "pooled": names.iter().zip(&pooled).map(|(n, s)| (n.to_string(), s.json())).collect::<serde_json::Map<_, _>>()})
+        "pooled": names.iter().zip(&pooled).map(|(n, s)| (n.to_string(), s.json())).collect::<serde_json::Map<_, _>>(),
+        // The arm is a query input that nearly fixes the label for some arms; per-arm scores show where any gain lives.
+        "pooled_by_arm": by_arm.iter().map(|(a, ss)| (a.clone(), json!({
+            "positive_rate": ss[0].bins.iter().map(|b| b.1).sum::<f64>() / ss[0].n.max(1) as f64,
+            "models": names.iter().zip(ss).map(|(n, s)| (n.to_string(), s.json())).collect::<serde_json::Map<_, _>>()})))
+            .collect::<serde_json::Map<_, _>>()})
 }
 
 fn train(table: &Path, out: &Path) {
@@ -345,9 +354,65 @@ fn train(table: &Path, out: &Path) {
         println!("{label:9} pooled Brier: majority {:.4} | logreg {:.4} | mlp {:.4}   (n={}, components={})",
             p["stratum_majority"]["brier"].as_f64().unwrap_or(f64::NAN), p["logistic_regression"]["brier"].as_f64().unwrap_or(f64::NAN),
             p["mlp_32"]["brier"].as_f64().unwrap_or(f64::NAN), p["stratum_majority"]["n"], s["components"]);
+        for (arm, v) in s["pooled_by_arm"].as_object().unwrap() {
+            let b = |m: &str| v["models"][m]["brier"].as_f64().unwrap_or(f64::NAN);
+            println!("    {arm:20} n={:3} positive {:.3}  Brier majority {:.4} | logreg {:.4} | mlp {:.4}", v["models"]["stratum_majority"]["n"],
+                v["positive_rate"].as_f64().unwrap_or(f64::NAN), b("stratum_majority"), b("logistic_regression"), b("mlp_32"));
+        }
     }
     let sha = |p: &Path| { use sha2::Digest; format!("{:x}", sha2::Sha256::digest(fs::read(p).unwrap())) };
     println!("table sha256 {}  summary sha256 {}", sha(table), sha(&out.join("summary.json")));
+}
+
+// ------------------------------------------------------------------ figure
+
+/// Per-arm pooled Brier score (lower is better), three models, primary versus the within-stratum permutation
+/// control, one panel per endpoint summary. Values are read from the summaries, never recomputed.
+fn figure(summaries: &[(String, Value)], out: &Path) {
+    let models = [("stratum_majority", "majority", "#8a94a0"), ("logistic_regression", "logistic regression", "#2f6fdf"),
+                  ("mlp_32", "MLP (32)", "#d9822b")];
+    let (pw, ph, l, t, b) = (480.0, 310.0, 52.0, 34.0, 62.0);
+    let ymax = 0.25;
+    let mut svg = format!("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {} {}\" font-family=\"system-ui,sans-serif\" font-size=\"11\">\n<rect width=\"100%\" height=\"100%\" fill=\"#fff\"/>\n",
+        pw * summaries.len() as f64 + 10.0, ph + 54.0);
+    for (pi, (title, s)) in summaries.iter().enumerate() {
+        let ox = pi as f64 * pw;
+        let y = |v: f64| t + (ph - t - b) * (1.0 - v.min(ymax) / ymax);
+        svg += &format!("<text x=\"{:.1}\" y=\"18\" font-size=\"13\" fill=\"#1b1f24\">{title}: pooled Brier by arm (lower is better)</text>\n", ox + l);
+        for k in 0..=5 {
+            let v = ymax * k as f64 / 5.0;
+            svg += &format!("<line x1=\"{:.1}\" x2=\"{:.1}\" y1=\"{2:.1}\" y2=\"{2:.1}\" stroke=\"#e3e6ea\"/><text x=\"{3:.1}\" y=\"{4:.1}\" text-anchor=\"end\" fill=\"#5c6773\">{v:.2}</text>\n",
+                ox + l, ox + pw - 10.0, y(v), ox + l - 4.0, y(v) + 4.0);
+        }
+        let arms: Vec<String> = s["primary"]["pooled_by_arm"].as_object().unwrap().keys().cloned().collect();
+        let gw = (pw - l - 10.0) / arms.len() as f64;
+        for (ai, arm) in arms.iter().enumerate() {
+            let gx = ox + l + ai as f64 * gw;
+            let pr = &s["primary"]["pooled_by_arm"][arm];
+            let ctl = &s["negative_control_within_stratum_permutation"]["pooled_by_arm"][arm];
+            let bw = (gw - 16.0) / 6.0;
+            for (mi, (key, label, col)) in models.iter().enumerate() {
+                for (ci, (src, opacity, kind)) in [(pr, "1", "primary"), (ctl, "0.35", "permuted control")].iter().enumerate() {
+                    let v = src["models"][key]["brier"].as_f64().unwrap_or(0.0);
+                    let x0 = gx + 8.0 + (mi * 2 + ci) as f64 * bw;
+                    svg += &format!("<rect x=\"{x0:.1}\" y=\"{:.1}\" width=\"{:.1}\" height=\"{:.1}\" fill=\"{col}\" fill-opacity=\"{opacity}\"><title>{arm} {label} ({kind}): Brier {v:.4}, n={}</title></rect>\n",
+                        y(v), bw - 1.0, (ph - b) - y(v), src["models"][key]["n"]);
+                }
+            }
+            let rate = pr["positive_rate"].as_f64().unwrap_or(f64::NAN);
+            svg += &format!("<text x=\"{:.1}\" y=\"{:.1}\" text-anchor=\"middle\" fill=\"#1b1f24\">{arm}</text><text x=\"{0:.1}\" y=\"{:.1}\" text-anchor=\"middle\" fill=\"#5c6773\">n={}</text><text x=\"{0:.1}\" y=\"{:.1}\" text-anchor=\"middle\" fill=\"#5c6773\">positive {rate:.2}</text>\n",
+                gx + gw / 2.0, ph - b + 16.0, ph - b + 30.0, pr["models"]["stratum_majority"]["n"], ph - b + 44.0);
+        }
+    }
+    let mut lx = l;
+    for (_, label, col) in models {
+        svg += &format!("<rect x=\"{lx:.1}\" y=\"{:.1}\" width=\"10\" height=\"10\" fill=\"{col}\"/><text x=\"{:.1}\" y=\"{:.1}\" fill=\"#1b1f24\">{label}</text>\n", ph + 12.0, lx + 14.0, ph + 21.0);
+        lx += 150.0;
+    }
+    svg += &format!("<text x=\"{l:.1}\" y=\"{:.1}\" fill=\"#5c6773\">solid = primary; faint = within-stratum label permutation (negative control); evaluation leave-one-field-size-out; bars clipped at {ymax}</text>\n", ph + 40.0);
+    let _ = lx;
+    svg += "</svg>\n";
+    fs::write(out, svg).unwrap();
 }
 
 fn main() {
@@ -364,7 +429,15 @@ fn main() {
             join(Path::new(&a[2]), Path::new(&a[3]), endpoint, flags.iter().any(|f| f == "--canary"))
         }
         Some("train") => train(Path::new(&a[2]), Path::new(&a[3])),
-        _ => eprintln!("usage: ecdlp-dataset-models audit <export> <out.json> | join <export> <table.jsonl> [--endpoint completion|ecdlp] [--canary] | train <table.jsonl> <out dir>"),
+        Some("figure") => {
+            let out = Path::new(a.last().unwrap());
+            let panels: Vec<(String, Value)> = a[2..a.len() - 1].iter().map(|spec| {
+                let (title, path) = spec.split_once('=').expect("figure <title=summary.json>... <out.svg>");
+                (title.to_string(), serde_json::from_str(&fs::read_to_string(path).unwrap()).unwrap())
+            }).collect();
+            figure(&panels, out);
+        }
+        _ => eprintln!("usage: ecdlp-dataset-models audit <export> <out.json> | join <export> <table.jsonl> [--endpoint completion|ecdlp] [--canary] | train <table.jsonl> <out dir> | figure <title=summary.json>... <out.svg>"),
     }
 }
 
