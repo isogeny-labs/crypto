@@ -38,6 +38,7 @@ use crate::cryptanalysis::ecbench::generic::{
 };
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
+use crate::cryptanalysis::ecbench::koblitz_batched::{self, BatchedParams as KoblitzBatchedParams};
 use crate::cryptanalysis::ecbench::koblitz_descent::{
     self as koblitz_descent, DescentParams as KoblitzDescentParams,
 };
@@ -58,11 +59,11 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
-    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, rho_walk_with_policy,
-    signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy, BinaryGroup, BinaryInstance,
-    Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
-    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult,
-    RhoResult, RhoWalk, WalkPolicy,
+    ic_residual_batch_with, price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with,
+    rho_walk_with_policy, signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
+    NegationClasses, PhaseCost, PointClasses, PreprocessingRho, PrimeInstance, PrimePoint,
+    QuarticClasses, RhoBatchResult, RhoResult, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -302,6 +303,10 @@ const POOLED_PARAMS: &[ParamDecl] = &[
 /// `POOLED_COMPANION_INDEX + j`, far from any workload's own index.
 const POOLED_COMPANION_INDEX: u64 = 1 << 40;
 
+/// Index of `ic.residual_batch`'s base point `P0` under the same public
+/// law: one point, hashed to `⟨G⟩`, below the companions' range.
+const RESIDUAL_BATCH_BASE_INDEX: u64 = (1 << 40) - 1;
+
 // Keep the defaults of the frozen `ic.pipeline_counted` sessions. The
 // existing `ic.pipeline` declaration below retains main's newer options.
 const IC_COUNTED_PARAMS: &[ParamDecl] = &[
@@ -479,6 +484,14 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 pub fn registry() -> &'static [MethodDecl] {
     &[
         MethodDecl {
+            id: super::prime_orbit::ID,
+            family: "ic",
+            summary: "prime-field orbit IC relation collector inside a verified one-target solve; affine is one lane, Jacobian is 32 lanes with batch normalization, and relation wall time is a native phase",
+            entry: "ecbench::prime_orbit::solve",
+            applies: Applies::PrimeOnly,
+            params: super::prime_orbit::PARAMS,
+        },
+        MethodDecl {
             id: super::aps::ID,
             family: "ic",
             summary: "bounded APS summation-polynomial instrument: exclusive cold/online wall accounting, retained failures, separate affine witness checks; native operation pricing is incomplete",
@@ -550,6 +563,16 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "rho",
             summary: "Kuhn–Struik batch: the record's target and L − 1 public companions (hashed to ⟨G⟩, logs unknown to anyone) solved in sequence on {P, −P} (A = 2) with one shared distinguished-point table and jumps in G only; S is the whole batch's operations over √r, expected ≈ Σ_{i<L} C(2i,i)4^{−i}·√(π/4) → √L",
             entry: "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
+            applies: Applies::PrimeOnly,
+            params: POOLED_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.residual_batch",
+            // A rho-style batch solve (one online phase, the rho walker), so
+            // the rho family's online window and pricing describe it.
+            family: "rho",
+            summary: "the residual collector's structure in the Kuhn–Struik batch of rho.multitarget_pooled: the same targets, walker, table and charging, plus one base point P0 of unknown logarithm in every relation (an index-calculus column, B = 1); the first target needs two independent equations (d_1 and log P0), later ones one collision; log P0 and every d_i checked; S is the whole batch's operations over √r",
+            entry: "ic_boundary::ic_residual_batch_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::PrimeOnly,
             params: POOLED_PARAMS,
         },
@@ -1194,6 +1217,14 @@ pub fn registry() -> &'static [MethodDecl] {
             applies: Applies::KoblitzOnly,
             params: KOBLITZ_DESCENT_PARAMS,
         },
+        MethodDecl {
+            id: "ic.koblitz_batched",
+            family: "ic",
+            summary: "the candidate tournament worker's pair-table pipeline (examples/ic_tournament_worker.rs): subgroup-orbit base, signed-Frobenius pair table, relation collection in batch_trials queries with a rank check after each batch, sparse logs, one-target descent; every stage charged by counted point additions and doublings (group_op_count), native work unpriced; exists so the tournament's batch_trials candidates can be measured on an isolated host with L2, replay and A/A",
+            entry: "ecbench::koblitz_batched::run",
+            applies: Applies::KoblitzOnly,
+            params: KOBLITZ_BATCHED_PARAMS,
+        },
         // ── `_v2`: the same algorithms under the accounting rules of README
         // §7 "Accounting v2".  The ids above keep the counts they were
         // recorded with; these are the ones to read new work against.
@@ -1342,6 +1373,43 @@ const KOBLITZ_DESCENT_PARAMS: &[ParamDecl] = &[
         name: "seed",
         default: Some("rule_v8"),
         help: "seed of the factor base, the probes and the descent walks (`run`: the run's algorithm seed)",
+    },
+];
+
+/// `ic.koblitz_batched`'s parameters: the fields of an `icprog tournament`
+/// job that the pair-table pipeline reads.  The defaults are the worker's
+/// (`batch_trials` 64, `max_trials` 4096, `summands` 3) and the tournament's
+/// registered factor-base seed (43); the factor-base size is per cell.
+const KOBLITZ_BATCHED_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "factor_base_points",
+        default: None,
+        help: "points of the subgroup-orbit factor base (the tournament's cells name it: 78 on K_0/GF(2^13))",
+    },
+    ParamDecl {
+        name: "fb_seed",
+        default: Some("43"),
+        help: "seed of the factor base (the tournament registers 43)",
+    },
+    ParamDecl {
+        name: "batch_trials",
+        default: Some("64"),
+        help: "queries collected before each rank check (the tournament's incumbent: 64; its batch16 candidate: 16)",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("4096"),
+        help: "cap on the queries drawn in all (at most 65536, at least batch_trials)",
+    },
+    ParamDecl {
+        name: "summands",
+        default: Some("3"),
+        help: "collection summands m (2..4)",
+    },
+    ParamDecl {
+        name: "seed",
+        default: Some("run"),
+        help: "seed of the probes and the descent (`run`: the run's algorithm seed)",
     },
 ];
 
@@ -2219,6 +2287,59 @@ fn solve_pooled(
     Ok(rep)
 }
 
+/// `ic.residual_batch` on a prime curve: the companions of
+/// [`solve_pooled`] (same law, same indices, so the two methods solve the
+/// same batch), the base point `P0` hashed by the same law at
+/// [`RESIDUAL_BATCH_BASE_INDEX`], and one [`ic_residual_batch_with`] run.
+fn solve_residual_batch(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+    i: &PrimeInstance,
+    target: PrimePoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let batch = param_u64(m, "batch")?;
+    if !(1..=65_536).contains(&batch) {
+        return Err(format!("`batch` must be in 1..=65536, not {batch}"));
+    }
+    let cap = rho_cap(i.r, param_u64(m, "cap_multiple")? as f64);
+    let mut targets = Vec::with_capacity(batch as usize);
+    let mut companions = Vec::with_capacity(batch as usize - 1);
+    for j in 0..batch - 1 {
+        let (xy, _) = inst
+            .hash_to_subgroup(curve, seed, POOLED_COMPANION_INDEX + j)
+            .ok_or("no public companion target on this curve")?;
+        targets.push(PrimePoint::affine(parse_hex(&xy[0])?, parse_hex(&xy[1])?));
+        companions.push(xy);
+    }
+    targets.push(target);
+    let (base_xy, _) = inst
+        .hash_to_subgroup(curve, seed, RESIDUAL_BATCH_BASE_INDEX)
+        .ok_or("no public base point on this curve")?;
+    let base = PrimePoint::affine(parse_hex(&base_xy[0])?, parse_hex(&base_xy[1])?);
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let res = ic_residual_batch_with(
+        &i.curve,
+        &NegationClasses { r: i.r },
+        i.generator_point(),
+        base,
+        &targets,
+        i.r,
+        seed,
+        cap,
+        RhoWalk::negation(),
+    );
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let f = field_ops_of(&i.curve, &[res.group_ops]);
+    let mut rep = pooled_report(res, wall, f);
+    rep.detail["companions"] = json!(companions);
+    rep.detail["base_point"] = json!(base_xy);
+    Ok(rep)
+}
+
 /// Run the generic and rho methods on any counted group.
 fn solve_generic<G: CountedGroup>(
     m: &ResolvedMethod,
@@ -2417,7 +2538,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         .unwrap_or(m.id.as_str());
     three_leads_applicable(m, inst, curve)?;
     hyper_ic_variant_guard(m, inst, curve)?;
-    if id == "rho.multitarget_pooled" {
+    if id == "rho.multitarget_pooled" || id == "ic.residual_batch" {
         let batch = param_u64(m, "batch")?;
         if !(1..=65_536).contains(&batch) {
             return Err(format!("`batch` must be in 1..=65536, not {batch}"));
@@ -2537,6 +2658,11 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`ic.koblitz_descent` runs on one-word Koblitz curves only; {} is {}",
             curve.slug, curve.family
         )),
+        Instance::Binary(i) if id == "ic.koblitz_batched" => koblitz_batched_applicable(m, i),
+        _ if id == "ic.koblitz_batched" => Err(format!(
+            "`ic.koblitz_batched` runs on one-word Koblitz curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         _ => Ok(()),
     }
 }
@@ -2602,6 +2728,22 @@ fn koblitz_descent_applicable(m: &ResolvedMethod, i: &BinaryInstance) -> Result<
         ));
     }
     KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, 0).map(|_| ())
+}
+
+/// `ic.koblitz_batched` needs a Koblitz instance of odd degree below 64
+/// whose subgroup order fits a word, and valid collection limits.
+fn koblitz_batched_applicable(m: &ResolvedMethod, i: &BinaryInstance) -> Result<(), String> {
+    let kc = i
+        .koblitz
+        .as_ref()
+        .ok_or("`ic.koblitz_batched` needs a Koblitz instance")?;
+    if kc.n.is_multiple_of(2) || kc.n >= 64 || kc.subgroup_order.bits() > 64 {
+        return Err(format!(
+            "`ic.koblitz_batched` needs odd n < 64 and a subgroup order of at most 64 bits; n = {}",
+            kc.n
+        ));
+    }
+    KoblitzBatchedParams::from_method(&m.params, 0).map(|_| ())
 }
 
 /// The refusal of a [`Applies::PrimeOnly`] method on any other instance.
@@ -2798,8 +2940,14 @@ fn solve_inner(
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
+        (Instance::Prime(i), _) if m.id == "ic.residual_batch" => {
+            solve_residual_batch(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Prime(i), _) if m.id == super::aps::ID => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
+        (Instance::Prime(i), _) if m.id == super::prime_orbit::ID => {
+            super::prime_orbit::solve(m, i, curve, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) if m.id == "ic.tensor_contraction_v1" => {
             solve_tensor_contraction(m, i, PrimePoint::affine(tx, ty), seed)
@@ -2846,6 +2994,9 @@ fn solve_inner(
         }
         (Instance::Binary(i), _) if m.id == "ic.koblitz_descent" => {
             solve_koblitz_descent(m, i, curve, FastPoint::affine(tx, ty), seed)
+        }
+        (Instance::Binary(i), _) if m.id == "ic.koblitz_batched" => {
+            solve_koblitz_batched(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _)
             if matches!(
@@ -5660,24 +5811,14 @@ fn solve_ic_prime(
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
-    // `pkm-semaev` writes its system on the base's own tower, so it reads
-    // the tower from the `prime-kummer` spec and runs on no other base.
+    // `pkm-semaev` writes its system on the base's own tower; the shared
+    // constructor rebuilds it from the base's spec (`ic bench` uses the same).
     let mut pkm = match or_name.as_str() {
-        "pkm-semaev" => {
-            if fb_name != "prime-kummer" {
-                return Err(format!(
-                    "oracle `pkm-semaev` needs the prime-kummer base, whose tower it solves on, not `{fb_name}`"
-                ));
-            }
-            let t = spec.factor_base_params.u64("t")? as u32;
-            let g = spec.factor_base_params.u64_or("g", 1)?;
-            let budget = (spec.solver_budget_seconds > 0)
-                .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
-            Some(
-                crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::new(ms, t, g)
-                    .with_budget(budget),
-            )
-        }
+        "pkm-semaev" => Some(
+            crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::from_spec(
+                ms, &spec, inst,
+            )?,
+        ),
         _ => None,
     };
     let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {
@@ -6776,6 +6917,239 @@ fn koblitz_descent_online(snap: &Snapshot) -> Option<OnlineWindow> {
     w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
     w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
     (w.phases_ns.values().sum::<u64>() == w.wall_ns).then_some(w)
+}
+
+/// `ic.koblitz_batched`: the tournament worker's pipeline on the target,
+/// every stage charged by the point additions and doublings it performed
+/// ([`koblitz_batched`]).  The run's algorithm seed is used where
+/// `seed = run`.
+fn solve_koblitz_batched(
+    m: &ResolvedMethod,
+    inst: &BinaryInstance,
+    curve: &CurveFacts,
+    target: FastPoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    koblitz_batched_applicable(m, inst)?;
+    let kc = inst.koblitz.as_ref().ok_or("not a Koblitz instance")?;
+    let p = KoblitzBatchedParams::from_method(&m.params, seed)?;
+    let q = inst.fast.lower(target);
+    let started = Instant::now();
+    let out = koblitz_batched::run(kc, &q, &p)?;
+    let wall = started.elapsed().as_nanos() as u64;
+    if !out.single_thread {
+        return Err("ic.koblitz_batched did not run on its one counting thread".into());
+    }
+    let phases: Vec<PhaseRecord> = out
+        .phases
+        .iter()
+        .map(|ph| PhaseRecord {
+            name: ph.name.clone(),
+            adds: ph.ops.adds,
+            doubles: ph.ops.doubles,
+            scalar_mults: ph.ops.scalar_mults,
+            gae: ph.ops.gae(),
+            wall_ns: Some(ph.wall_ns),
+            native: koblitz_descent::native_of(&ph.ops),
+            work_native: BTreeMap::new(),
+        })
+        .collect();
+    let total_gae: f64 = phases.iter().map(|p| p.gae).sum();
+    let c = &out.counts;
+    let mut counters: BTreeMap<String, u64> = [
+        ("fb_points", c.fb_points as u64),
+        ("fb_signed_orbits", c.fb_signed_orbits as u64),
+        ("columns", c.columns as u64),
+        ("pair_table_entries", c.pair_table_entries as u64),
+        ("collection_batches", c.units as u64),
+        ("collection_trials", c.trials),
+        ("summands_scanned", c.summands_scanned),
+        ("relations_collected", c.relations_collected as u64),
+        ("relations_accepted", c.relations_accepted as u64),
+        ("relations_rejected", c.relations_rejected as u64),
+        ("relations_duplicate", c.relations_duplicate as u64),
+        ("solve_attempts", c.solve_attempts as u64),
+        ("descent_trials", c.descent_trials as u64),
+    ]
+    .into_iter()
+    .map(|(k, v)| (k.to_string(), v))
+    .collect();
+    let mut native = OpCounts::default();
+    for ph in &out.phases {
+        native.merge(&ph.ops);
+    }
+    let la_row_ops = c.sparse.as_ref().map_or(0, |r| r.row_ops);
+    for (name, v) in [
+        ("canonicalisations_uncharged", native.canonicalisations),
+        ("pair_filter_probes_uncharged", native.filter_probes),
+        ("pair_bucket_reads_uncharged", native.bucket_reads),
+        ("frobenius_maps_uncharged", native.frobenius_maps),
+        ("la_row_ops_uncharged", la_row_ops),
+    ] {
+        counters.insert(name.into(), v);
+    }
+    let mut unpriced = unpriced_of(&counters);
+    // Counted nowhere in the unit: the field arithmetic outside the group
+    // law, the projected-orbit maps and hashing, the modular combination
+    // of the descent's relation, and the forward pass of a vector batch
+    // that declined a degenerate block (host-dependent, so not replayed).
+    unpriced.extend([
+        "field_arithmetic_uncharged".into(),
+        "hash_and_allocation_uncharged".into(),
+        "modular_combination_uncharged".into(),
+        "vector_declined_lanes_uncharged".into(),
+    ]);
+    unpriced.sort();
+    unpriced.dedup();
+    let facts = koblitz_descent::factor_base_facts(
+        &curve.slug,
+        kc,
+        &out.factor_base,
+        c.fb_signed_orbits,
+        p.factor_base_points,
+        p.fb_seed,
+    )?;
+    let online = match &out.snapshot {
+        Ok(snap) => koblitz_batched_online(snap),
+        Err(_) => None,
+    };
+    let online_error = match (&out.snapshot, &online) {
+        (Err(e), _) => Some(e.clone()),
+        (Ok(_), None) => Some("the descent's online interval did not close".into()),
+        _ => None,
+    };
+    Ok(SolveReport {
+        recovered: out
+            .recovered
+            .as_ref()
+            .and_then(|d| d.to_u64())
+            .map(u128::from),
+        exhausted: out.recovered.is_none(),
+        phases,
+        total_gae,
+        automorphisms_used: 2 * inst.n,
+        counters,
+        unpriced,
+        deterministic: true,
+        nondeterminism: Vec::new(),
+        solve_wall_ns: wall,
+        factor_base: Some(facts),
+        detail: koblitz_batched::detail_of(&out, &p),
+        online,
+        online_error,
+        solver: None,
+        field_ops: None,
+    })
+}
+
+/// The batched pipeline's online window: the same interval and phases as
+/// `ic.koblitz_descent`'s, the descent over a solved log table.
+fn koblitz_batched_online(snap: &Snapshot) -> Option<OnlineWindow> {
+    let mut w = online_window("ic", "ic.koblitz_batched", snap)?;
+    w.start_event = "the descent's first target-dependent operation ([a0]G + [b]Q, the walks' start), after the factor base, pair table and every column log are ready".into();
+    w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
+    w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
+    (w.phases_ns.values().sum::<u64>() == w.wall_ns).then_some(w)
+}
+
+#[cfg(test)]
+mod koblitz_batched_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method(batch: &str) -> ResolvedMethod {
+        let params: BTreeMap<String, String> = [
+            ("factor_base_points", "78"),
+            ("batch_trials", batch),
+            ("seed", "7"),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v.to_string()))
+        .collect();
+        resolve(&MethodSpec {
+            id: "ic.koblitz_batched".into(),
+            params,
+        })
+        .unwrap()
+    }
+
+    fn solve_at(batch: &str, scalar: u64) -> SolveReport {
+        let spec = CurveSpec::Koblitz { a: 0, n: 13 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let m = method(batch);
+        applicable(&m, &inst, &facts).unwrap();
+        let Instance::Binary(bi) = &inst else {
+            unreachable!()
+        };
+        let target = bi.fast.mul_u64(bi.generator, scalar % bi.r);
+        solve(
+            &m,
+            &inst,
+            &facts,
+            &[format!("0x{:x}", target.x), format!("0x{:x}", target.y)],
+            3,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn the_tournament_cell_recovers_the_scalar_with_every_stage_charged() {
+        let rep = solve_at("64", 1_234);
+        assert_eq!(rep.recovered, Some(1_234));
+        let names: Vec<&str> = rep.phases.iter().map(|p| p.name.as_str()).collect();
+        assert_eq!(names, koblitz_batched::PHASES);
+        assert_eq!(rep.total_gae, rep.phases.iter().map(|p| p.gae).sum::<f64>());
+        assert!(rep
+            .phases
+            .iter()
+            .all(|p| p.gae == (p.adds + p.doubles) as f64));
+        assert!(rep.phases.iter().all(|p| p.gae > 0.0), "{:?}", rep.phases);
+        let online = rep.online.clone().expect("the descent's online window");
+        assert_eq!(online.phases_ns.values().sum::<u64>(), online.wall_ns);
+        // The trials are whole batches (the last may be cut by max_trials).
+        assert_eq!(rep.counters["collection_trials"] % 64, 0);
+        // A solve is attempted only once the relations can cover the
+        // columns, so it never runs more often than a batch is collected
+        // (the tournament worker's `solve_attempts` behaves the same way).
+        let attempts = rep.counters["solve_attempts"];
+        assert!(
+            (1..=rep.counters["collection_batches"]).contains(&attempts),
+            "{attempts}"
+        );
+    }
+
+    #[test]
+    fn a_smaller_batch_stops_no_later_and_draws_whole_batches() {
+        // Same seed, same factor base, same probes (the work units are
+        // indexed by trial): 16 divides 64, so the narrow run reaches a
+        // solvable relation set at a batch boundary no later than the wide
+        // run does, and both recover the same scalar.
+        let wide = solve_at("64", 1_234);
+        let narrow = solve_at("16", 1_234);
+        assert_eq!(narrow.recovered, Some(1_234));
+        assert_eq!(wide.recovered, Some(1_234));
+        assert!(narrow.counters["collection_trials"] <= wide.counters["collection_trials"]);
+        assert_eq!(narrow.counters["collection_trials"] % 16, 0);
+    }
+
+    #[test]
+    fn the_worker_limits_are_enforced() {
+        let spec = CurveSpec::Koblitz { a: 0, n: 13 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let mut m = method("64");
+        m.params.insert("batch_trials".into(), "5000".into());
+        assert!(applicable(&m, &inst, &facts)
+            .unwrap_err()
+            .contains("collection limits"));
+        let mut m = method("64");
+        m.params.insert("max_trials".into(), "32".into());
+        assert!(applicable(&m, &inst, &facts).is_err());
+        let mut m = method("64");
+        m.params.remove("factor_base_points");
+        assert!(applicable(&m, &inst, &facts).is_err());
+    }
 }
 
 #[cfg(test)]
@@ -8879,6 +9253,7 @@ mod accounting_rules_tests {
             "ic.hyperelliptic",
             "ic.hyperelliptic_thread", // hyper_ic tests
             "ic.known_log_mitm2_v1",
+            "ic.koblitz_batched", // koblitz_batched tests
             "ic.koblitz_descent", // koblitz_descent tests
             "ic.pipeline_wordram",
             "ic.trace_line_2lp",

@@ -87,6 +87,8 @@ jobs:
           taskq/deploy/eks-karpenter/remote/test-contract.sh
           taskq/deploy/eks-karpenter/remote/test-build-verification.sh
           taskq/deploy/eks-karpenter/remote/test-publish-image.sh
+          taskq/deploy/eks-karpenter/remote/test-launch-remote.sh
+          taskq/deploy/eks-karpenter/test-censored-gates.sh
           taskq/deploy/eks-karpenter/test-ic-sweep.sh
           taskq/deploy/eks-karpenter/resume/test-publisher.sh
           cargo +1.99.1 test --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/fixture/Cargo.toml

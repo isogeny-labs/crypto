@@ -239,3 +239,125 @@ No production semantic cut, matched natural/null pair, rank ladder or timing
 was generated. The E1 protocol remains draft. The production cut generator,
 rewired-null constructor, fresh-process A/A runner, disjoint preflight, power
 record, final ladder, source commit and image digest remain open.
+
+## 2026-11-01 rigorous boundary-rank bounds
+
+Scope: exact finite lower-bound certificates, architecture-level formal
+theorems and a named asymptotic family obstruction. No affected E1 data.
+
+### Formal verification
+
+The standalone Lean project pins Lean 4.35.0, `crypto-lean`
+`148f5dc389b341401e06d76abe7783c4ccf42f2e`, and Mathlib
+`cfc55fc58714a59dc06e6e79edc6d1d95140d3c2`.
+
+```text
+lake build
+tools/lean/proof-gate.sh --out /tmp/tensor-bound-proof-receipts \
+  research/tensor_boolean_breakthrough_20261031/lean
+lake env leanchecker --fresh TensorBoundaryBounds
+```
+
+All commands exited 0. The repository proof gate audited eight theorems: eight
+passed, zero failed, and zero used trusted native evaluation. The only
+transitive axioms were Mathlib's permitted `propext`, `Classical.choice`, and
+`Quot.sound`; the three elementary family transitivity theorems require only
+`propext`. Fresh `leanchecker` replay exited 0 with no diagnostic. The proof
+gate initially returned `FAIL_no_sources` while the new files were untracked;
+after staging those exact sources, the same target passed. This was a discovery
+rule issue, not a proof retry or theorem change.
+
+The proof map and exposed hypotheses are in
+[`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md). No `sorry`, project axiom, or
+`native_decide` appears in the project.
+
+### Native certificate verification
+
+Rust 1.78.0 passed formatting, the focused release suite, and the census CLI
+build. Current stable Rust passed all-target Clippy with warnings denied.
+
+```text
+cargo +1.78.0 fmt --manifest-path crates/hashed-ecdl-tensor/Cargo.toml -- --check
+cargo +1.78.0 test --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --locked --release census --lib
+cargo +1.78.0 check --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --locked --release --bin tensor-census
+cargo +stable clippy --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --locked --all-targets -- -D warnings
+```
+
+The focused suite passed 4/4 tests. Its deterministic property control checks
+1,152 integer matrices of every shape from 1-by-1 through 6-by-6: exact rank
+agrees with independent rational Gaussian elimination and the rank-profile
+minor's independently recomputed determinant is nonzero. The equality-network
+test independently verifies its order-two certificate and rejects a changed
+determinant. Cap and pin failures still fail closed.
+
+The complete standalone crate release suite passed 117 tests with zero
+failures: 67 library tests, 50 binary/integration tests and zero doc-tests. The
+pre-existing exact `structured` integration suite took 183.40 seconds; no
+timeout or retry was hidden.
+
+Source hashes for the locally checked files are:
+
+```text
+00d91c5e7663a11cbfc37fe15778cd2fab37f949c5aeac9b87144c06ae4a0e80  crates/hashed-ecdl-tensor/src/census.rs
+08d9f262662167ee8f8d350a750c457167430b6924b2b55f0e00171a381841ad  crates/hashed-ecdl-tensor/src/bin/tensor-census.rs
+e2e21c9ab3dd071fa7af952d8ecfdd32de13e0251df8db377bc487cfe804d3e5  research/tensor_boolean_breakthrough_20261031/lean/TensorBoundaryBounds.lean
+```
+
+These identify checked source, not a frozen E1 binary or experiment image.
+
+### Bound diagram and PDF
+
+Graphviz rendered `figures/rigorous-bound-chain.dot` to SVG and PNG. Pandoc
+with pdfLaTeX rendered `BOUNDS_REPORT.md` to a one-page US-letter PDF.
+`pdftotext` recovered the finite bound, family condition, claim boundary and
+reproducibility sections. The page was rendered to PNG and visually inspected:
+the graph, formulas, caption and footer are legible and unclipped.
+
+```text
+4ea554443bc4af3849668c68c6709c72d77d582ef420c7efafd6dd082e34f378  figures/rigorous-bound-chain.svg
+f361544edd9af0f184c0e9cc3758ff8a13ee62c438b5f6793e358e89de738ed7  bounds-20261101.pdf
+```
+
+### Repository and evidence boundary
+
+`git diff --check` passed. The required pre-edit `conductor check` returned
+exit 127 because `conductor` is not installed; the documented warn-and-allow
+path was used and no reservation was claimed.
+
+The finite theorem and verifier do not supply the uniform family hypothesis.
+No production semantic cut, rank ladder, natural/null comparison, timing, or
+benchmark row was generated. The precise open lemma is tracked in
+[`problems/hashed-ecdl-boundary-rank-family-lower-bound.md`](../../problems/hashed-ecdl-boundary-rank-family-lower-bound.md).
+
+### Current-head repository-level library gate
+
+The required current-head root command was run under stable Rust:
+
+```text
+cargo +stable test --locked --release --lib
+```
+
+It exited 101 after 1,856.71 seconds: 5,903 passed, 5 failed and 128 were
+ignored. No failure is in `hashed-ecdl-tensor`, the certificate code, or the
+formal project. The five failures were:
+
+```text
+cryptanalysis::ecbench::optimization::tests::every_live_method_and_parameter_has_an_optimization_policy
+cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars
+cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure
+cryptanalysis::ic_framework::residual::tests::fused_residual_collector_recovers_and_halves_the_additions_per_step
+cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline
+```
+
+The two diagnostic publication failures reproduce the documented host limit:
+this environment has neither `/proc/self/ns/time` nor
+`/proc/self/timens_offsets`. The `ic_wide` mismatch also reproduces the prior
+baseline (`13130` versus `3757`). The two additional current-main failures
+were rerun exactly and reproduced independently: the optimization registry is
+missing `ic.prime_orbit_relations_v1`, and the residual test reports fused
+per-step cost `4.900233826968043`. These failures are retained as failures;
+the passing standalone and focused gates are not substituted for the required
+root result.

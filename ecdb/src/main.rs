@@ -180,6 +180,9 @@ enum ImportWhat {
     Siblings,
     /// ℓ-volcano levels, isogeny directions and End(E) derived from the stored census isogeny graphs.
     Volcanoes,
+    /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
+    /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
+    FactorBases,
     /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
     Generated { paths: Vec<String> },
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
@@ -219,10 +222,13 @@ async fn main() -> Result<()> {
             let (sessions, runs, parts) = import::ecbench::write_pack(&repo_root, &pack_dir)?;
             let bench = import::results::collect_benchmarks(&repo_root)?;
             let bench_sha = import::pack::write(&pack_dir, "benchmarks", &bench)?;
+            let fbs = import::factor_bases::collect(&repo_root)?;
+            let fbs_sha = import::pack::write(&pack_dir, import::factor_bases::PACK, &fbs)?;
             let staged = import::siblings::stage(&repo_root, &out)?;
             print(&serde_json::json!({
                 "ecbench": { "sessions": sessions, "runs": runs, "parts": parts },
                 "benchmarks": { "entries": bench.len(), "sha256": bench_sha },
+                "factor_bases": { "rows": fbs.len(), "sha256": fbs_sha },
                 "sibling_files": staged.len(),
             }))?;
         }
@@ -275,6 +281,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Ecbench => import::run(&ctx, Selection::Ecbench, None).await?,
                 ImportWhat::Siblings => import::run(&ctx, Selection::Siblings, None).await?,
                 ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
+                ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };

@@ -42,7 +42,14 @@ The `minimal` profile is the root files, the dot-directories (`.github/`,
 - every `include_str!`/`include_bytes!` target and every `#[path = "…"]`
   module, with its directory (they must exist to compile);
 - every `research/` path a string literal in `src/` or `tests/` names
-  (`cargo test` reads them).
+  (`cargo test` reads them);
+- every crate `Cargo.toml` depends on by path (`name = { path = "…" }`),
+  followed transitively. Each gets its manifest, lockfile, build script,
+  `src/` and declared target directories, but not its data. Cargo reads
+  every path dependency's manifest, so one excluded `Cargo.toml` breaks the
+  whole workspace build. Until 2026-11-02 the heavy
+  `research/pencil_large_prime_20261029` lost its manifest this way, in both
+  profiles. The `harness` profile emits the same rules.
 
 Every other directory, the rest of `research/` included, stays off disk until
 named with `add --path` (end a directory with `/`). Use it for code, docs and

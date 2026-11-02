@@ -68,6 +68,30 @@ pub struct RankOperations {
     pub row_normalizations: u64,
 }
 
+/// Independently recomputable lower-bound certificate for one flattening.
+///
+/// The selected square minor has the exact signed determinant recorded in
+/// `determinant`. A verifier needs only the boundary tensor and these indices;
+/// it does not trust the elimination that discovered the minor.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RankCertificate {
+    /// Boundary-index positions assigned to matrix rows, in bit order.
+    pub row_positions: Vec<usize>,
+    /// Matrix rows selected for the square minor, in determinant order.
+    pub minor_rows: Vec<usize>,
+    /// Matrix columns selected for the square minor, in determinant order.
+    pub minor_columns: Vec<usize>,
+    /// Exact signed determinant of the selected square minor.
+    pub determinant: BigInt,
+}
+
+impl RankCertificate {
+    /// Certified rank lower bound, equal to the minor order.
+    pub fn order(&self) -> usize {
+        self.minor_rows.len()
+    }
+}
+
 /// Exact ranks of the canonical and best balanced flattenings.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RankSummary {
@@ -81,6 +105,10 @@ pub struct RankSummary {
     pub balanced_splits_examined: usize,
     /// Positions placed on the row side of the best split.
     pub best_row_positions: Vec<usize>,
+    /// Nonzero-minor certificate for the canonical split.
+    pub canonical_certificate: RankCertificate,
+    /// Nonzero-minor certificate for the best admitted balanced split.
+    pub best_balanced_certificate: RankCertificate,
     /// Fraction-free integer-operation counters over every examined split.
     pub operations: RankOperations,
 }
@@ -190,14 +218,20 @@ pub fn contract_boundary(
     })
 }
 
-fn exact_rank(mut matrix: Vec<Vec<BigInt>>, operations: &mut RankOperations) -> Result<usize> {
+fn exact_rank_witness(
+    mut matrix: Vec<Vec<BigInt>>,
+    operations: &mut RankOperations,
+) -> Result<(usize, Vec<usize>, Vec<usize>)> {
     if matrix.is_empty() {
-        return Ok(0);
+        return Ok((0, vec![], vec![]));
     }
     let columns = matrix[0].len();
     if matrix.iter().any(|row| row.len() != columns) {
         return Err(invalid("ragged rank matrix"));
     }
+    let mut row_origins: Vec<_> = (0..matrix.len()).collect();
+    let mut pivot_rows = Vec::new();
+    let mut pivot_columns = Vec::new();
     let mut pivot_row = 0usize;
     for column in 0..columns {
         if pivot_row == matrix.len() {
@@ -213,6 +247,9 @@ fn exact_rank(mut matrix: Vec<Vec<BigInt>>, operations: &mut RankOperations) -> 
         }
         let Some(pivot) = pivot else { continue };
         matrix.swap(pivot_row, pivot);
+        row_origins.swap(pivot_row, pivot);
+        pivot_rows.push(row_origins[pivot_row]);
+        pivot_columns.push(column);
         let pivot_value = matrix[pivot_row][column].clone();
         for row in pivot_row + 1..matrix.len() {
             operations.comparisons += 1;
@@ -240,15 +277,18 @@ fn exact_rank(mut matrix: Vec<Vec<BigInt>>, operations: &mut RankOperations) -> 
         }
         pivot_row += 1;
     }
-    Ok(pivot_row)
+    Ok((pivot_row, pivot_rows, pivot_columns))
 }
 
-fn split_rank(
+fn exact_rank(matrix: Vec<Vec<BigInt>>, operations: &mut RankOperations) -> Result<usize> {
+    exact_rank_witness(matrix, operations).map(|(rank, _, _)| rank)
+}
+
+fn split_matrix(
     tensor: &BoundaryTensor,
     row_positions: &[usize],
-    operations: &mut RankOperations,
     meter: &Meter,
-) -> Result<usize> {
+) -> Result<Vec<Vec<BigInt>>> {
     let row_set: BTreeSet<_> = row_positions.iter().copied().collect();
     if row_set.len() != row_positions.len()
         || row_positions
@@ -283,7 +323,123 @@ fn split_rank(
         }
         matrix[row][column] = BigInt::from(value.clone());
     }
-    exact_rank(matrix, operations)
+    Ok(matrix)
+}
+
+fn split_rank(
+    tensor: &BoundaryTensor,
+    row_positions: &[usize],
+    operations: &mut RankOperations,
+    meter: &Meter,
+) -> Result<usize> {
+    exact_rank(split_matrix(tensor, row_positions, meter)?, operations)
+}
+
+fn exact_determinant(mut matrix: Vec<Vec<BigInt>>, meter: &mut Meter) -> Result<BigInt> {
+    let size = matrix.len();
+    if matrix.iter().any(|row| row.len() != size) {
+        return Err(invalid("nonsquare determinant matrix"));
+    }
+    if size == 0 {
+        return Ok(BigInt::one());
+    }
+    let mut sign = BigInt::one();
+    let mut previous = BigInt::one();
+    for pivot_index in 0..size.saturating_sub(1) {
+        let pivot_row = (pivot_index..size)
+            .find(|&row| !matrix[row][pivot_index].is_zero())
+            .ok_or_else(|| integrity("certificate minor is singular"))?;
+        if pivot_row != pivot_index {
+            matrix.swap(pivot_index, pivot_row);
+            sign = -sign;
+        }
+        let pivot = matrix[pivot_index][pivot_index].clone();
+        for row in pivot_index + 1..size {
+            for column in pivot_index + 1..size {
+                meter.charge(3, "certificate determinant")?;
+                let numerator = &matrix[row][column] * &pivot
+                    - &matrix[row][pivot_index] * &matrix[pivot_index][column];
+                let (quotient, remainder) = numerator.div_rem(&previous);
+                if !remainder.is_zero() {
+                    return Err(integrity("nonexact Bareiss division"));
+                }
+                matrix[row][column] = quotient;
+            }
+            matrix[row][pivot_index] = BigInt::zero();
+        }
+        previous = pivot;
+    }
+    Ok(sign * &matrix[size - 1][size - 1])
+}
+
+fn selected_minor(
+    matrix: &[Vec<BigInt>],
+    rows: &[usize],
+    columns: &[usize],
+) -> Result<Vec<Vec<BigInt>>> {
+    if rows.len() != columns.len()
+        || rows.iter().any(|&row| row >= matrix.len())
+        || columns
+            .iter()
+            .any(|&column| matrix.first().map_or(true, |row| column >= row.len()))
+    {
+        return Err(invalid("rank certificate minor indices"));
+    }
+    if rows.iter().copied().collect::<BTreeSet<_>>().len() != rows.len()
+        || columns.iter().copied().collect::<BTreeSet<_>>().len() != columns.len()
+    {
+        return Err(invalid("duplicate rank certificate minor index"));
+    }
+    Ok(rows
+        .iter()
+        .map(|&row| {
+            columns
+                .iter()
+                .map(|&column| matrix[row][column].clone())
+                .collect()
+        })
+        .collect())
+}
+
+fn split_rank_certificate(
+    tensor: &BoundaryTensor,
+    row_positions: &[usize],
+    operations: &mut RankOperations,
+    meter: &mut Meter,
+) -> Result<RankCertificate> {
+    let matrix = split_matrix(tensor, row_positions, meter)?;
+    let (rank, minor_rows, minor_columns) = exact_rank_witness(matrix.clone(), operations)?;
+    let determinant =
+        exact_determinant(selected_minor(&matrix, &minor_rows, &minor_columns)?, meter)?;
+    if determinant.is_zero() || rank != minor_rows.len() || rank != minor_columns.len() {
+        return Err(integrity("rank witness determinant"));
+    }
+    Ok(RankCertificate {
+        row_positions: row_positions.to_vec(),
+        minor_rows,
+        minor_columns,
+        determinant,
+    })
+}
+
+/// Recompute a certificate's selected flattening and exact determinant.
+///
+/// Success establishes only the stated minor-order lower bound. It does not
+/// trust, or independently establish, that the minor has maximum order.
+pub fn verify_rank_certificate(
+    tensor: &BoundaryTensor,
+    certificate: &RankCertificate,
+    meter: &mut Meter,
+) -> Result<usize> {
+    let matrix = split_matrix(tensor, &certificate.row_positions, meter)?;
+    let determinant = exact_determinant(
+        selected_minor(&matrix, &certificate.minor_rows, &certificate.minor_columns)?,
+        meter,
+    )?;
+    if determinant.is_zero() || determinant != certificate.determinant {
+        return Err(integrity("rank certificate determinant mismatch"));
+    }
+    Ok(certificate.order())
 }
 
 fn balanced_splits(width: usize, exhaustive_width: usize) -> Result<Vec<Vec<usize>>> {
@@ -343,14 +499,25 @@ pub fn rank_summary(
             best = Some((rank, split));
         }
     }
+    let canonical_rank = canonical_rank.ok_or_else(|| integrity("canonical split absent"))?;
     let (best_balanced_rank, best_row_positions) =
         best.ok_or_else(|| integrity("no balanced flattening"))?;
+    let canonical_certificate = split_rank_certificate(tensor, &canonical, &mut operations, meter)?;
+    let best_balanced_certificate =
+        split_rank_certificate(tensor, &best_row_positions, &mut operations, meter)?;
+    if canonical_certificate.order() != canonical_rank
+        || best_balanced_certificate.order() != best_balanced_rank
+    {
+        return Err(integrity("rank certificate order"));
+    }
     Ok(RankSummary {
         width: tensor.width(),
-        canonical_rank: canonical_rank.ok_or_else(|| integrity("canonical split absent"))?,
+        canonical_rank,
         best_balanced_rank,
         balanced_splits_examined: balanced_splits(tensor.width(), exhaustive_width)?.len(),
         best_row_positions,
+        canonical_certificate,
+        best_balanced_certificate,
         operations,
     })
 }
@@ -473,8 +640,12 @@ mod tests {
                         })
                         .collect();
                     let expected = rational_rank(&matrix);
-                    let actual = exact_rank(matrix, &mut RankOperations::default()).unwrap();
+                    let (actual, rows, columns) =
+                        exact_rank_witness(matrix.clone(), &mut RankOperations::default()).unwrap();
                     assert_eq!(actual, expected);
+                    let minor = selected_minor(&matrix, &rows, &columns).unwrap();
+                    let determinant = exact_determinant(minor, &mut work()).unwrap();
+                    assert!(!determinant.is_zero());
                 }
             }
         }
@@ -522,6 +693,13 @@ mod tests {
         let summary = rank_summary(&tensor, 16, &mut meter).unwrap();
         assert_eq!(summary.canonical_rank, 2);
         assert_eq!(summary.best_balanced_rank, 2);
+        assert_eq!(
+            verify_rank_certificate(&tensor, &summary.canonical_certificate, &mut meter).unwrap(),
+            2
+        );
+        let mut corrupted = summary.canonical_certificate;
+        corrupted.determinant += BigInt::one();
+        assert!(verify_rank_certificate(&tensor, &corrupted, &mut meter).is_err());
     }
 
     #[test]

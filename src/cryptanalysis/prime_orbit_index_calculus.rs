@@ -535,6 +535,27 @@ impl OrbitCurve {
         self.fast.scalar_mul(self.fast.g, k % self.r)
     }
 
+    /// Adopt canonical affine coordinates in the curve's Montgomery
+    /// representation. This is the checked bridge used by harnesses that
+    /// already constructed a target on the same prime-field curve.
+    pub fn point_from_affine(&self, x: u64, y: u64) -> Result<FastPoint, String> {
+        let p = self.fast.f.modulus();
+        if x >= p || y >= p {
+            return Err(format!(
+                "target coordinates must be canonical modulo {p}: ({x}, {y})"
+            ));
+        }
+        let point = FastPoint {
+            x: self.fast.f.to_mont(x),
+            y: self.fast.f.to_mont(y),
+            infinity: false,
+        };
+        self.fast
+            .on_curve(point)
+            .then_some(point)
+            .ok_or_else(|| "target is not on the orbit curve".into())
+    }
+
     /// The generator in the general representation.
     pub fn generator(&self) -> Point {
         self.fast.lower(self.fast.g)
@@ -1508,6 +1529,12 @@ pub struct LogsReport {
     pub certified_columns: usize,
     /// Solved columns that failed that check; must be zero.
     pub uncertified_columns: usize,
+    /// Wall time spent only in relation-collector construction and its
+    /// probe loops. Jump-table construction, gain-graph solving,
+    /// certification and database assembly are excluded.
+    pub collection_ns: u64,
+    /// End-to-end logarithm-precomputation wall time, including
+    /// [`Self::collection_ns`] and all excluded stages named above.
     pub seconds: f64,
 }
 
@@ -2110,10 +2137,16 @@ pub fn solve_logs(
     let jumps = RhoJumps::new(c, opts.seed ^ 0x6c61_7267_655f_7072);
     rep.probe_ops += jumps.ops;
     let (rows, anchors, (certified, stats, uncertified)) = if opts.large_primes {
+        let collection_begin = Instant::now();
         let mut collector = LargePrimeCollector::new(c, &jumps, opts, &mut rep);
+        rep.collection_ns = collection_begin.elapsed().as_nanos() as u64;
         let mut want = round;
         loop {
+            let collection_begin = Instant::now();
             collector.collect(c, fb, opts, want, &mut rep);
+            rep.collection_ns = rep
+                .collection_ns
+                .saturating_add(collection_begin.elapsed().as_nanos() as u64);
             rep.collection_rounds += 1;
             let solved = certify_columns(c, fb, &collector.rows);
             let certified = solved.0.iter().flatten().count();
@@ -2127,7 +2160,9 @@ pub fn solve_logs(
             want += round;
         }
     } else {
+        let collection_begin = Instant::now();
         let rows = collect_full(c, fb, opts, round, &mut rep);
+        rep.collection_ns = collection_begin.elapsed().as_nanos() as u64;
         rep.collection_rounds = 1;
         let solved = certify_columns(c, fb, &rows);
         (rows, FxMap::default(), solved)

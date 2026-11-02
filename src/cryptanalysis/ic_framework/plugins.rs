@@ -90,6 +90,9 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
     }
 
     fn describe(&self, params: &Params) -> String {
+        if let Some(below) = params.get("below") {
+            return format!("every abscissa in [1, {below}) carrying a point, one column each");
+        }
         match params.get("stride") {
             None | Some("1") => format!(
                 "the {} smallest abscissae carrying a point, one column each",
@@ -112,6 +115,11 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
                 "stride",
                 "fixed nonzero abscissa stride modulo p; default 1",
             ),
+            (
+                "below",
+                "instead of size: every abscissa in [1, below) carrying a point (Semaev's naive \
+                 small-abscissa base; with below = 2^T it is the point set of pkm-semaev's bits=T)",
+            ),
         ]
     }
 
@@ -121,6 +129,29 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
         params: &Params,
         _ops: &mut GroupOps,
     ) -> Result<FactorBase<PrimePoint>, String> {
+        if let Some(below) = params.get("below") {
+            if params.get("size").is_some() || params.get("stride").is_some() {
+                return Err("prime-abscissa: below= replaces size= and stride=".into());
+            }
+            let below: u64 = below
+                .parse()
+                .map_err(|_| "below must be an unsigned integer".to_string())?;
+            let curve = &self.instance.curve;
+            if below < 2 || below > curve.p {
+                return Err(format!("below must lie in 2..=p = {}", curve.p));
+            }
+            // The scan below takes abscissae 1, 2, ... in order, so "every
+            // carrier below B" is that scan stopped after this many. The
+            // count repeats the scan's Legendre symbols, uncharged: the
+            // baseline is, if anything, under-charged by them.
+            let size = (1..below)
+                .filter(|&x| curve.legendre(curve.rhs(x)) >= 0)
+                .count();
+            if size == 0 {
+                return Err(format!("no abscissa in [1, {below}) carries a point"));
+            }
+            return Ok(prime_factor_base(self.instance, size));
+        }
         let size = params.u64("size")? as usize;
         if size == 0 {
             return Err("factor base size must be positive".into());

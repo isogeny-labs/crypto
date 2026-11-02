@@ -151,7 +151,7 @@ fn instance_for(
     let regime = match space {
         s if s.starts_with("koblitz") => "koblitz",
         "char2-algebraic" | "char2-algebraic-elim" => "char2",
-        "prime-table" | "prime-rootfind" => "prime",
+        "prime-table" | "prime-rootfind" | "prime-algebraic" => "prime",
         other => {
             return Err(format!(
                 "unknown space `{other}`; the spaces are {}",
@@ -334,4 +334,20 @@ fn show(a: ShowArgs) -> Result<Value, String> {
             "rung_log2_ratio": t.rungs.iter().map(|r| r.log2_ratio).collect::<Vec<_>>(),
         })).collect::<Vec<_>>(),
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `instance_for` keeps its own name-to-regime table; every space the
+    /// sweeper lists must resolve through it and build for its regime.
+    #[test]
+    fn every_listed_space_resolves_to_an_instance_and_builds() {
+        for &name in SPACE_NAMES {
+            let inst =
+                instance_for(name, 0, "generic", 8).unwrap_or_else(|e| panic!("{name}: {e}"));
+            space_for(name, &inst).unwrap_or_else(|e| panic!("{name}: {e}"));
+        }
+    }
 }

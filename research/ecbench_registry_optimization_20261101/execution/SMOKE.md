@@ -4,14 +4,14 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
 
 ## Coverage and integrity
 
-- 35 complete admitted sessions, 1,005 records.
-- 952 verified outcomes, 20 exhausted, 23 timed out, and 10 explicit errors.
-- All 35 admitted receipts passed; 782/782 eligible deterministic measured replays
+- 38 complete admitted sessions, 1,095 records.
+- 1,042 verified outcomes, 20 exhausted, 23 timed out, and 10 explicit errors.
+- All 38 admitted receipts passed; 854/854 eligible deterministic measured replays
   reproduced exactly; zero audit problems.
-- 72/72 runnable native top-level methods executed. The six unexecuted registry
+- 73/73 runnable native top-level methods executed. The six unexecuted registry
   entries are external CM wrappers awaiting a real backend and digest.
 - 11/11 system solvers, 9/9 PDP3 engines, and 4/4 PKM tower engines executed.
-- The campaign-structure audit separately admits 111 specs with 78/78 methods
+- The campaign-structure audit separately admits 114 specs with 79/79 methods
   and 24/24 nested algorithms.
 - The latest merged-head audit reproduced 782/782 eligible runs across all 35
   admitted sessions with zero problems, using source `907d68631e79` and release
@@ -22,10 +22,10 @@ Status: replay-verified L0 development evidence; not a leaderboard result.
   session exposed cross-record cache charging (13/16 replays); it is retained
   as a failed negative control. After resetting the cache once per independent
   pipeline invocation, the corrected session passed 16/16.
-- All 37 raw JSONL payloads are local pending artifact-store delivery; tracked
-  receipts bind their hashes and results. They were untracked without deleting
-  the local bytes, are not a remotely hydrated evidence bundle, and cannot
-  support promotion.
+- The trusted artifact workflow remotely hydrated and replayed 37 campaign
+  payloads, including all three new prime-orbit sessions. Three older
+  post-merge diagnostics remain local. Receipts bind every payload hash;
+  artifact delivery cannot promote L0 data.
 
 Every timing here is L0 and descriptive. The completion and nested panels use
 one target, one warm-up, and four measured rounds. Deterministic work can select
@@ -35,6 +35,11 @@ a holdout candidate, but one target cannot establish a curve-family frontier.
 
 | lane | candidate/reference work ratio | result at this boundary |
 |:--|--:|:--|
+| generic-prime orbit IC (affine, 8 orbits) / negation rho | 5.4169 [3.389, 8.658] | rho leads at every pricing-band weight; one L0 target, with factor-base draws unpriced |
+| j=0 prime-orbit IC (affine, 8 orbits) / cubic rho | 4.2011 [3.085, 5.721] | specialized rho leads at every pricing-band weight; one L0 target |
+| j=1728 prime-orbit IC (affine, 8 orbits) / quartic rho | 5.7901 [3.824, 8.768] | specialized rho leads at every pricing-band weight; one L0 target |
+| prime-orbit 8-orbit affine / 16-orbit affine | 0.8721 [0.754, 1.008] | internal operation-count candidate; no default change from one toy target |
+| prime-orbit Jacobian / affine at 16 orbits | 1.3351 [1.229, 1.450] | Jacobian loses in charged operations; L0 wall clocks are descriptive |
 | Koblitz n=29 full-price generator-orbit pipeline / signed-Frobenius rho | 0.4405, 95% within-target interval [0.363, 0.534] | selected for holdout; wins at pricing weights 0, 0.1, and 1, but only one L0 development target |
 | Koblitz n=13 pair-index F6-IC / inherited F6-IC | 0.2792 [0.246, 0.317] | same solver count; pair-index closure cuts charged group work and wins at all recorded weights, but L0 method wall is 0.922 [0.828, 1.027] |
 | Koblitz n=13 pair-index F6-IC / strong rho | 139.3034 [85.480, 227.016] | rho leads at every pricing weight |
@@ -52,13 +57,18 @@ a holdout candidate, but one target cannot establish a curve-family frontier.
 | Koblitz n=13 inherited F4 / strong rho | 209.8054 [193.206, 227.831] | rho leads at every pricing weight |
 | Koblitz n=13 F6-IC / strong rho | 522.5885 [472.687, 577.758] | rho leads at every pricing weight |
 
-The Koblitz n=29 result is the only new candidate selection. Its comparison is
+The Koblitz n=29 result is the only new holdout candidate selection. Its comparison is
 [`smoke-completion-generator-orbit-a1-n29-t0/comparison-rho-frob-full__ic-gen-layout-c1.json`](smoke-completion-generator-orbit-a1-n29-t0/comparison-rho-frob-full__ic-gen-layout-c1.json).
 The matched solver comparisons and raw records are under
 [`smoke-nested-solver-backends-k17-matched/`](smoke-nested-solver-backends-k17-matched/).
 The post-merge receipts and comparisons are under
 [`post-merge-pdp3-pair-fixed/`](post-merge-pdp3-pair-fixed/) and
 [`post-merge-pkm-tower/`](post-merge-pkm-tower/).
+The 79th-method grid and symmetry cross-checks are under
+[`prime-orbit-grid-l0-20261101/`](prime-orbit-grid-l0-20261101/),
+[`prime-orbit-j0-crosscheck-l0-20261101/`](prime-orbit-j0-crosscheck-l0-20261101/),
+and
+[`prime-orbit-j1728-crosscheck-l0-20261101/`](prime-orbit-j1728-crosscheck-l0-20261101/).
 
 ## Matched n=17 system-solver panel
 
@@ -131,7 +141,7 @@ refused the 18-unknown/17-equation system; Buchberger hit the common cap.
   conflicts for `m = 5..8`; the `m = 9` query arm caps after a 958.8-second
   one-time lookup build. Planted/control arms do not establish an ECDLP gain,
   and no rho comparison, symmetric pricing, or L2 holdout exists. It is
-  recorded as an integration/measurement gap rather than added to the 78+24
+  recorded as an integration/measurement gap rather than added to the 79+24
   coverage total.
 - Both dense and Wiedemann F_((2^10)^4) pipeline arms timed out in all five
   attempts at 17 seconds; both rho controls completed.

@@ -5,11 +5,24 @@
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
 - **Last updated:** 2026-10-30
-- **Latest search:** [30 October verified broader-census check](../research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/RESULTS.md)
+- **Latest search:** [30 October exact label-allocation audit](../research/nist_skip_criterion_20261025/exact_pair_audit_20261030/RESULTS.md)
 
 ## Problem
 
-**Latest result, 30 October, broader scope:** the fixed strict-splitting rule
+**Latest result, 30 October, exact allocation audit:** using the already
+verified scores, the fixed comparison of42additional candidates with eight
+publications gives55higher additional scores,7ties and40lower scores across
+102within-field pairs. Independent subset enumeration and rank-DP methods
+agree on all20037600label assignments:5869345are at least as extreme as the
+observed117/204score, an exact allocation fraction0.292916567. All68external
+score observations match within the stated seed-ID/multiset scope. This is
+retrospective existing-results arithmetic, not new random-curve sampling or
+repair of the external study's disclosed procedural deviations. All ten
+phases pass, including three deliberate corrupt-output refusals. Public
+G=[s]Qrecipes with invertible known s merely convert the DLP between bases;
+they supply no solver. Historical cause and both weakness hypotheses stay open.
+
+**Earlier result, 30 October, broader scope:** the fixed strict-splitting rule
 fails throughout100--5000on the recorded69position prime-order census. All82
 branches are retained, and the independent PARI verifier proves all76distinct
 field/order primes, checks the point certificates and reconstructs six output

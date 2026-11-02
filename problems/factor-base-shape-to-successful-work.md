@@ -152,3 +152,17 @@ point checks and independent relation rank. Its
 is not a frozen executable protocol, implemented adapter or experiment result.
 No old card was promoted or dispatched. The native successful-work and
 regularity obligations remain open; custody completion does not discharge them.
+
+
+2026-11-01 four-presentation continuation: [same-base recoding study](../research/prime_factor_base_degree_20261031/four_tracks_20261101/README.md)
+checks exact canonical degree6 with seven-variable XOR labels and degree5 with
+nine-variable one-hot support, against the original same-base degree7 on
+`icv1-fp5-tm1-a77cc6af` / `FB1h29cc024e755c`. All variables, support products
+and actual highest forms are included. Complete symmetric charts and the
+expanded determinant's free-ordinate obstruction are also proved. This closes
+these specific two-summand presentation-degree obligations; it does not price
+successful decomposition. The new [protocol](../research/prime_factor_base_degree_20261031/four_tracks_20261101/PROTOCOL.md)
+requires complete branch-summed matched CAS work and replay. No new experiment
+or performance leaderboard promotion occurred. Next action: admit/implement the
+standalone complete EKS/CAS adapter and root decoder, with host/budget frozen;
+keep the original rank, growth and end-to-end obligations open.

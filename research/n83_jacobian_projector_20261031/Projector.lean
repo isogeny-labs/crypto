@@ -1,4 +1,6 @@
 import CoverProjection
+import Init.Grind.Module.Basic
+import Mathlib.Tactic.Ring
 
 /-!
 # Image-endomorphism and Prym-factor identities for the binary cubic cover
@@ -14,8 +16,18 @@ set_option autoImplicit false
 namespace N83JacobianProjector
 
 open GhsSubgroupTransfer
+open Lean.Grind
 
 variable {E J : Type} [IntModule E] [IntModule J]
+
+private theorem transfer_map_sub {A B : Type} [IntModule A] [IntModule B]
+    (f : AdditiveTransfer A B) (x y : A) :
+    f.apply (x - y) = f.apply x - f.apply y := by
+  have hneg (z : A) : f.apply (-z) = -f.apply z := by
+    have h := f.map_zsmul (-1) z
+    simpa [IntModule.neg_zsmul, IntModule.one_zsmul] using h
+  rw [AddCommGroup.sub_eq_add_neg, f.map_add, hneg,
+    ← AddCommGroup.sub_eq_add_neg]
 
 def imageOperator
     (pull : AdditiveTransfer E J) (push : AdditiveTransfer J E) (y : J) : J :=
@@ -42,7 +54,7 @@ theorem complementary_push_zero
     (y : J) :
     push.apply (GhsCoverProjection.complementaryOperator pull push degree y) = 0 := by
   unfold GhsCoverProjection.complementaryOperator
-  rw [push.map_sub, push.map_zsmul, composition]
+  rw [transfer_map_sub push, push.map_zsmul, composition]
   exact AddCommGroup.sub_self _
 
 /-- Unconditional integer-polynomial expansion behind the Prym factorization. -/

@@ -188,6 +188,51 @@ pub struct PullPushCompositionCertificate {
     pub identity_holds: bool,
 }
 
+/// One irreducible closed-point component of a reduced Mumford support and
+/// its residue-field pushforward.
+///
+/// `support` is monic and irreducible over the base field.  Its degree is the
+/// residue degree of the closed point.  `image` is the sum of the complete
+/// Frobenius orbit after applying `phi`, represented in `E(k)`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ClosedPointPushforwardCertificate {
+    pub support: F2mPoly,
+    pub degree: usize,
+    pub image: BinaryPoint,
+}
+
+/// Replayable decomposition of an arbitrary Jacobian pushforward into its
+/// irreducible closed-point norms.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct JacobianPushforwardCertificate {
+    pub input: MumfordDivisor,
+    pub components: Vec<ClosedPointPushforwardCertificate>,
+    pub reconstructed_support: F2mPoly,
+    pub component_image_sum: BinaryPoint,
+    pub general_pushforward: BinaryPoint,
+    pub support_reconstruction_holds: bool,
+    pub component_sum_holds: bool,
+}
+
+/// Closed-point certificate for one point-class pullback.
+///
+/// For a generic rational target point the component degrees sum to the
+/// geometric cover degree three.  At a ramified point the reduced Mumford
+/// support can have smaller degree; `fiber_kind` records the scheme-theoretic
+/// multiplicity separately.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PullbackClosedPointCertificate {
+    pub input: BinaryPoint,
+    pub pullback: MumfordDivisor,
+    pub fiber_kind: PullbackFiberKind,
+    pub components: Vec<ClosedPointPushforwardCertificate>,
+    pub reduced_support_degree: usize,
+    pub component_image_sum: BinaryPoint,
+    pub three_times_input: BinaryPoint,
+    pub every_component_is_degree_times_input: bool,
+    pub total_matches_three_times_input: bool,
+}
+
 /// Conditional subgroup-preservation consequence of `phi_* phi^* = [3]`.
 ///
 /// This type does not certify that the caller's integer is the order of a
@@ -644,6 +689,55 @@ impl OrdinaryBinaryCover {
         })
     }
 
+    /// Factor a point-class pullback into closed points and certify every
+    /// component norm separately.
+    ///
+    /// A component of residue degree `s` in a fiber above a rational point
+    /// `P` must push to `[s]P`.  This exposes that equality directly, including
+    /// nonsplit degree-two and degree-three support, before the component
+    /// images are summed.
+    pub fn pullback_closed_point_certificate(
+        &self,
+        point: &BinaryPoint,
+    ) -> Result<PullbackClosedPointCertificate, CoverTransferError> {
+        let pullback = self.pullback_point_class(point)?;
+        let fiber_kind = self.pullback_fiber_kind(point)?;
+        let certificate = self.jacobian_pushforward_certificate(&pullback)?;
+        let reduced_support_degree = certificate
+            .components
+            .iter()
+            .map(|component| component.degree)
+            .sum();
+        let every_component_is_degree_times_input =
+            certificate.components.iter().all(|component| {
+                self.target_scalar_mul_small(point, component.degree as u32)
+                    .is_ok_and(|expected| expected == component.image)
+            });
+        if !every_component_is_degree_times_input {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point pullback component did not push to its residue degree times the input",
+            ));
+        }
+        let three_times_input = self.target_scalar_mul_small(point, 3)?;
+        let total_matches_three_times_input = certificate.component_image_sum == three_times_input;
+        if !total_matches_three_times_input {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point pullback components did not sum to three times the input",
+            ));
+        }
+        Ok(PullbackClosedPointCertificate {
+            input: point.clone(),
+            pullback,
+            fiber_kind,
+            components: certificate.components,
+            reduced_support_degree,
+            component_image_sum: certificate.component_image_sum,
+            three_times_input,
+            every_component_is_degree_times_input,
+            total_matches_three_times_input,
+        })
+    }
+
     /// Push the typed pullback witness forward without invoking a general
     /// Jacobian norm.  This is deliberately private: it is valid only for
     /// the three point fibers constructed by `pullback_point_class`.
@@ -827,6 +921,80 @@ impl OrdinaryBinaryCover {
                 ));
         }
         self.pushforward_via_residue_fields(divisor)
+    }
+
+    /// Certify an arbitrary pushforward component by component.
+    ///
+    /// This is the public evidence surface for the residue-field norm used by
+    /// [`Self::pushforward_arbitrary_jacobian_class`].  It reconstructs the
+    /// Mumford support from monic irreducible factors, reports each factor's
+    /// closed-point image, sums those images, and compares the result with the
+    /// general pushforward path.  On the fixed `GF(8)` fixture the latter is
+    /// the independently enumerated 486-class lookup table.
+    pub fn jacobian_pushforward_certificate(
+        &self,
+        divisor: &MumfordDivisor,
+    ) -> Result<JacobianPushforwardCertificate, CoverTransferError> {
+        if divisor.u.coeffs.len() > 4 {
+            return Err(CoverTransferError::DivisorPolynomialTooLong {
+                polynomial: "u",
+                maximum_coefficients: 4,
+                actual_coefficients: divisor.u.coeffs.len(),
+            });
+        }
+        if divisor.v.coeffs.len() > 3 {
+            return Err(CoverTransferError::DivisorPolynomialTooLong {
+                polynomial: "v",
+                maximum_coefficients: 3,
+                actual_coefficients: divisor.v.coeffs.len(),
+            });
+        }
+        divisor.validate(&self.source)?;
+        let factors = self.factor_small_support(&divisor.u)?;
+        let reconstructed_support = factors
+            .iter()
+            .fold(F2mPoly::one(self.m), |product, factor| {
+                product.mul(factor, &self.irreducible)
+            });
+        let support_reconstruction_holds = reconstructed_support == divisor.u;
+        if !support_reconstruction_holds {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point certificate did not reconstruct the Mumford support",
+            ));
+        }
+
+        let mut components = Vec::with_capacity(factors.len());
+        let mut component_image_sum = BinaryPoint::Infinity;
+        for support in factors {
+            let degree = support
+                .degree()
+                .ok_or(CoverTransferError::CertificateFailure(
+                    "closed-point certificate contains the zero polynomial",
+                ))?;
+            let image = self.pushforward_irreducible_support(&support, &divisor.v)?;
+            component_image_sum = self.target_add(&component_image_sum, &image)?;
+            components.push(ClosedPointPushforwardCertificate {
+                support,
+                degree,
+                image,
+            });
+        }
+        let general_pushforward = self.pushforward_arbitrary_jacobian_class(divisor)?;
+        let component_sum_holds = component_image_sum == general_pushforward;
+        if !component_sum_holds {
+            return Err(CoverTransferError::CertificateFailure(
+                "closed-point component sum differs from the general pushforward",
+            ));
+        }
+        Ok(JacobianPushforwardCertificate {
+            input: divisor.clone(),
+            components,
+            reconstructed_support,
+            component_image_sum,
+            general_pushforward,
+            support_reconstruction_holds,
+            component_sum_holds,
+        })
     }
 
     /// Evaluate `e=phi^* phi_*` on an arbitrary reduced class.
@@ -1680,6 +1848,13 @@ mod tests {
         OrdinaryBinaryCover::new(3, f8_modulus(), elt(a), elt(b)).unwrap()
     }
 
+    fn point_one_zero(m: u32) -> BinaryPoint {
+        BinaryPoint::Affine {
+            x: F2mElement::one(m),
+            y: F2mElement::zero(m),
+        }
+    }
+
     fn coefficients_from_code(mut code: usize, length: usize) -> Vec<F2mElement> {
         (0..length)
             .map(|_| {
@@ -1716,6 +1891,68 @@ mod tests {
             }
         }
         divisors
+    }
+
+    #[test]
+    fn closed_point_pullback_certificate_detects_odd_and_even_fiber_splitting() {
+        let odd = cover(0, 1);
+        let odd_certificate = odd
+            .pullback_closed_point_certificate(&point_one_zero(3))
+            .unwrap();
+        let mut odd_degrees: Vec<_> = odd_certificate
+            .components
+            .iter()
+            .map(|component| component.degree)
+            .collect();
+        odd_degrees.sort_unstable();
+        assert_eq!(odd_degrees, vec![1, 2]);
+        assert_eq!(odd_certificate.reduced_support_degree, 3);
+        assert!(odd_certificate.every_component_is_degree_times_input);
+        assert!(odd_certificate.total_matches_three_times_input);
+
+        let even = OrdinaryBinaryCover::new(
+            2,
+            IrreduciblePoly {
+                degree: 2,
+                low_terms: vec![0, 1],
+            },
+            F2mElement::zero(2),
+            F2mElement::one(2),
+        )
+        .unwrap();
+        let even_certificate = even
+            .pullback_closed_point_certificate(&point_one_zero(2))
+            .unwrap();
+        let mut even_degrees: Vec<_> = even_certificate
+            .components
+            .iter()
+            .map(|component| component.degree)
+            .collect();
+        even_degrees.sort_unstable();
+        assert_eq!(even_degrees, vec![1, 1, 1]);
+        assert_eq!(even_certificate.reduced_support_degree, 3);
+        assert!(even_certificate.every_component_is_degree_times_input);
+        assert!(even_certificate.total_matches_three_times_input);
+    }
+
+    #[test]
+    fn closed_point_pullback_certificate_keeps_ramification_separate() {
+        let c = cover(0, 1);
+        let ramified = BinaryPoint::Affine {
+            x: F2mElement::zero(3),
+            y: F2mElement::one(3),
+        };
+        let certificate = c.pullback_closed_point_certificate(&ramified).unwrap();
+        assert_eq!(certificate.reduced_support_degree, 1);
+        assert_eq!(certificate.components.len(), 1);
+        assert!(matches!(
+            certificate.fiber_kind,
+            PullbackFiberKind::ExceptionalTwoTorsionRamified {
+                ramification_index: 3
+            }
+        ));
+        assert!(certificate.every_component_is_degree_times_input);
+        assert!(certificate.total_matches_three_times_input);
     }
 
     fn target_point(x: u32, y: u32) -> BinaryPoint {

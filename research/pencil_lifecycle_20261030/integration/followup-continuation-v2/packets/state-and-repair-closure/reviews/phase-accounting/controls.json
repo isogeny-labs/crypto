@@ -1,0 +1,54 @@
+{
+  "schema": "readonly-negative-controls/v1",
+  "controls": [
+    {
+      "name": "altered_bits",
+      "reporter_exit": 0,
+      "review_gate_exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "name": "duplicate_native",
+      "reporter_exit": 101,
+      "review_gate_exit": 2,
+      "expected_rejection": true
+    },
+    {
+      "name": "duplicate_standard",
+      "reporter_exit": 101,
+      "review_gate_exit": 2,
+      "expected_rejection": true
+    },
+    {
+      "name": "empty_cohort",
+      "reporter_exit": 0,
+      "review_gate_exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "name": "empty_phases",
+      "reporter_exit": 0,
+      "review_gate_exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "name": "omitted_phase",
+      "reporter_exit": 0,
+      "review_gate_exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "name": "unsigned_counter",
+      "reporter_exit": 0,
+      "review_gate_exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "name": "wrong_workload",
+      "reporter_exit": 0,
+      "review_gate_exit": 1,
+      "expected_rejection": true
+    }
+  ],
+  "all_rejected": true
+}

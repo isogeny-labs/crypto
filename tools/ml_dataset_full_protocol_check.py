@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Fail-closed preflight for the full ECDLP dataset campaign protocol.
 
-This validates the campaign-specific invariants in addition to (not in place of)
-the shared experiment.protocol/v1 checker. ``admit`` deliberately requires
-immutable execution identities and a current per-wave authorization.
+This validates campaign-specific invariants in addition to (not in place of)
+the shared experiment.protocol/v1 checker. Wave admission is a separate record:
+putting the plan hash inside the protocol creates a circular native binding.
 """
 
 from __future__ import annotations
@@ -51,7 +51,8 @@ def _sha(value: object, name: str, errors: list[str]) -> None:
         errors.append(f"{name}: expected lowercase SHA256")
 
 
-def validate(protocol: object, *, admit: bool = False, now: dt.datetime | None = None) -> list[str]:
+def validate(protocol: object, *, admit: bool = False, admission: object = None,
+             now: dt.datetime | None = None) -> list[str]:
     """Return every structural/admission error; never mutate the record."""
     errors: list[str] = []
     p = _obj(protocol, "protocol", errors)
@@ -150,31 +151,36 @@ def validate(protocol: object, *, admit: bool = False, now: dt.datetime | None =
             errors.append("analysis_plan.script.path: required")
         _sha(script.get("sha256"), "analysis_plan.script.sha256", errors)
         _eq(analysis.get("frozen_before_data"), True, "analysis_plan.frozen_before_data", errors)
-        admission = _obj(execution.get("admission"), "execution.admission", errors)
-        _sha(admission.get("plan_sha256"), "execution.admission.plan_sha256", errors)
+        if "admission" in execution:
+            errors.append("execution.admission: wave bindings belong in a separate record")
+        admission = _obj(admission, "wave_admission", errors)
+        _eq(admission.get("schema"), "crypto.ml-dataset.wave-admission/v1",
+            "wave_admission.schema", errors)
+        for name in ("protocol_file_sha256", "plan_sha256", "plan_file_sha256", "job_sha256"):
+            _sha(admission.get(name), f"wave_admission.{name}", errors)
         if not isinstance(admission.get("image"), str) or not IMAGE.fullmatch(admission["image"]):
-            errors.append("execution.admission.image: expected immutable image digest")
+            errors.append("wave_admission.image: expected immutable image digest")
         if not isinstance(admission.get("artifact_prefix"), str) or not admission["artifact_prefix"].startswith("s3://"):
-            errors.append("execution.admission.artifact_prefix: S3 prefix required")
+            errors.append("wave_admission.artifact_prefix: S3 prefix required")
         for name in ("worker_grant", "budget"):
-            item = _obj(admission.get(name), f"execution.admission.{name}", errors)
+            item = _obj(admission.get(name), f"wave_admission.{name}", errors)
             if not isinstance(item.get("uri"), str) or not item["uri"]:
-                errors.append(f"execution.admission.{name}.uri: required")
-            _sha(item.get("sha256"), f"execution.admission.{name}.sha256", errors)
+                errors.append(f"wave_admission.{name}.uri: required")
+            _sha(item.get("sha256"), f"wave_admission.{name}.sha256", errors)
             expiry = item.get("expires_at")
             try:
                 when = dt.datetime.fromisoformat(expiry.replace("Z", "+00:00"))
                 if when.tzinfo is None or when <= (now or dt.datetime.now(dt.timezone.utc)):
-                    errors.append(f"execution.admission.{name}.expires_at: not current")
+                    errors.append(f"wave_admission.{name}.expires_at: not current")
             except (AttributeError, TypeError, ValueError):
-                errors.append(f"execution.admission.{name}.expires_at: expected ISO 8601 UTC")
-        budget = _obj(admission.get("budget"), "execution.admission.budget", errors)
+                errors.append(f"wave_admission.{name}.expires_at: expected ISO 8601 UTC")
+        budget = _obj(admission.get("budget"), "wave_admission.budget", errors)
         if type(budget.get("cap_usd")) not in (int, float) or budget["cap_usd"] <= 0:
-            errors.append("execution.admission.budget.cap_usd: positive cap required")
+            errors.append("wave_admission.budget.cap_usd: positive cap required")
         if admission.get("region") != budget.get("region") or not admission.get("region"):
-            errors.append("execution.admission.region: must match budget region")
+            errors.append("wave_admission.region: must match budget region")
         if not isinstance(admission.get("wave_id"), str) or not admission["wave_id"]:
-            errors.append("execution.admission.wave_id: required")
+            errors.append("wave_admission.wave_id: required")
     else:
         _eq(freeze.get("status"), "draft", "freeze.status", errors)
     return errors
@@ -184,13 +190,15 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("draft", "admit"))
     parser.add_argument("protocol", type=Path)
+    parser.add_argument("--admission", type=Path)
     args = parser.parse_args(argv)
     try:
         p = json.loads(args.protocol.read_text())
+        admission = json.loads(args.admission.read_text()) if args.admission else None
     except (OSError, ValueError) as exc:
         print(f"protocol read error: {exc}", file=sys.stderr)
         return 2
-    errors = validate(p, admit=args.mode == "admit")
+    errors = validate(p, admit=args.mode == "admit", admission=admission)
     for error in errors:
         print(f"ERROR: {error}", file=sys.stderr)
     if errors:

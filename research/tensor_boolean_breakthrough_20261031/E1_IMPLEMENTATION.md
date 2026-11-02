@@ -51,6 +51,14 @@ growth. The implementation records big-integer additions/subtractions,
 multiplications, comparisons and row normalizations. No modular rank is
 promoted to exact rank.
 
+For the canonical and selected minimum-rank balanced split, the implementation
+also emits a nonzero-minor certificate. It records the split, selected rows and
+columns, and the exact signed determinant. The public verifier reconstructs
+the matrix from the boundary tensor and recomputes only that determinant with
+Bareiss elimination; it does not call the rank routine. The mathematical
+implication and its formal proof are in
+[`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md).
+
 ## CLI
 
 [`tensor-census.rs`](../../crates/hashed-ecdl-tensor/src/bin/tensor-census.rs)
@@ -61,9 +69,9 @@ tensor-census BTNIR LEFT_VERTICES [MAX_FREE_EDGES] [EXHAUSTIVE_WIDTH]
 ```
 
 `LEFT_VERTICES` is a strictly increasing comma-separated list. Output is one
-`tensor-boundary-census/v1` JSON object carrying the canonical-IR and tensor
-digests, exact ranks and counts, cut identities, operation counters and the
-bounded claim scope. A caller can rerun the same bytes in a fresh process and
+`tensor-boundary-census/v2` JSON object carrying the canonical-IR and tensor
+digests, exact ranks and counts, cut identities, nonzero-minor certificates,
+operation counters and the bounded claim scope. A caller can rerun the same bytes in a fresh process and
 compare every exact field; the experiment runner that performs and records
 that A/A comparison is not yet implemented.
 
@@ -85,7 +93,10 @@ The four focused release tests pass:
 - exact contraction of a canonical equality network to the 2-by-2 identity;
 - free-edge-cap and pinned-cut rejection;
 - 1,152 deterministic integer matrices of sizes 1-by-1 through 6-by-6,
-  cross-checked against independent rational Gaussian elimination.
+  cross-checked against independent rational Gaussian elimination; every
+  discovered rank-profile minor also has a recomputed nonzero determinant;
+- independent certificate verification and rejection after determinant
+  corruption.
 
 Current stable Rust 1.99.1 all-target Clippy passes with warnings denied. Rust
 1.78 all-target Clippy reaches an unrelated pre-existing `format_collect`
@@ -99,6 +110,10 @@ No production network, natural/null pair, rank ladder or wall time was
 measured. In particular, this receipt does not establish low boundary rank,
 full boundary rank, a solver improvement, a relation-oracle improvement or an
 asymptotic result.
+
+Even a full-rank certificate at one size is finite evidence. A uniform family
+minor/rank theorem is separately tracked in
+[`problems/hashed-ecdl-boundary-rank-family-lower-bound.md`](../../problems/hashed-ecdl-boundary-rank-family-lower-bound.md).
 
 Before E1 freezes, the workstream still needs:
 
