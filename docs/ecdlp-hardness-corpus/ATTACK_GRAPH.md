@@ -5,7 +5,7 @@ Support edges are `conditions`, `enables` and `model_bridge` (B rests on A).
 Impact counts the claims that rest on a node
 transitively plus the repository files whose estimates cite it as `depends`.
 
-Corpus 2026-11-01: 536 claims, 327 on the frontier, 3 resting on a refuted claim, 0 unlinked citations.
+Corpus 2026-11-01: 541 claims, 330 on the frontier, 3 resting on a refuted claim, 0 unlinked citations.
 
 ## Resting on a refuted claim
 
@@ -150,20 +150,20 @@ Corpus 2026-11-01: 536 claims, 327 on the frontier, 3 resting on a refuted claim
 | 129 | `CLAIM-GG-BKL-SIMD-NEGATION` BKL 2010: negation gives little or no speedup on SIMD | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
 | 130 | `CLAIM-GG-CERTICOM-DP-NORMALIZATION` Certicom 1998: normalizing distinguished points alone gives sqrt 2 / sqrt(2d) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
 | 131 | `CLAIM-LEMMA4-REVERSE-GENERAL` Reverse repair d'_F <= d_F (outside), unrestricted | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 132 | `CLAIM-SP-SEMAEV15-FFDA-T2` Semaev 2015 FFDA instance: d_F4 <= first fall degree on t = 2 systems | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | RT-SP-T2-TRACE-CHECK |
-| 133 | `CLAIM-XT-AMOR-F2-1223-128BIT` Claim: new small-characteristic algorithms leave the F_{2^1223} genus-1 curve at ~128 bits | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 134 | `CLAIM-XT-BGJT-PROP2-ALL-P` Claim: BGJT descent step applies to every polynomial P | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 135 | `CLAIM-XT-BN3072-128BIT` Claim: BN curves with a 3072-bit F_{p^12} reach 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 136 | `CLAIM-XT-JOUX-PINPOINT-ORIGINAL` Claim: Joux pinpointing reaches L(1/3, (8/9)^(1/3)) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 137 | `CLAIM-XT-SS-GENUS2-F2-367-128BIT` Claim: the genus-2 supersingular curve over F_{2^367} gives 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 138 | `HEUR-PF-HKPYY-SPARSE-DENSITY` HKPYY density heuristic: sparse factors of X^n - 1 are as rare as random | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 139 | `HEUR-RP-SEMIREGULAR-DREG-PROXY` Semi-regular D_reg predicts Groebner cost of descended Semaev systems (A-PDP5) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
-| 140 | `CONJ-XT-SZPIRO` Szpiro's conjecture (Szpiro ratio bounded, 6 the largest limit point) | open | none | 0 | prove or refute | RT-XT-SZPIRO-XEDNI-LIFTS |
-| 141 | `GAP-AUTOMORPHISM-PREPROCESS` Preprocessing bounds with automorphism quotients | open | none | 0 | prove or refute | RT-AUTOMORPHISM-PREPROCESS, RT-RP-ONLINE-VS-PREPROCESSING |
-| 142 | `GAP-BINARY-M4-DEGREE` Binary m=4 Weil-descent degree growth | open | none | 0 | prove or refute | RT-BINARY-M4-DEGREE, RT-RP-M3-DIAGONAL-UNCENSOR |
-| 143 | `GAP-COORDINATE-ALGEBRAIC` Coordinate-algebraic escape from generic bounds | open | none | 0 | prove or refute | RT-GENERIC-BRIDGE, RT-ALGEBRAIC-SOLUTION-COUNT, RT-REPRESENTATION-FILTER |
-| 144 | `GAP-END-TO-END-IC-EXPONENT` End-to-end index-calculus exponent obligation | open | none | 0 | prove or refute | RT-END-TO-END-IC, RT-REPRESENTATION-FILTER |
-| 145 | `GAP-FAKE-GAP-INSIDE-BOUNDED` Is d_F(inside) - d'_F bounded? | open | none | 0 | prove or refute | RT-FAKE-GAP-INSIDE |
+| 132 | `CLAIM-SP-SEMAEV15-DFF-ALWAYS-4` Semaev: first fall degree of S_3(x1,x2,z) systems 'always 4' | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 133 | `CLAIM-SP-SEMAEV15-FFDA-T2` Semaev 2015 FFDA instance: d_F4 <= first fall degree on t = 2 systems | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | RT-SP-T2-TRACE-CHECK |
+| 134 | `CLAIM-XT-AMOR-F2-1223-128BIT` Claim: new small-characteristic algorithms leave the F_{2^1223} genus-1 curve at ~128 bits | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 135 | `CLAIM-XT-BGJT-PROP2-ALL-P` Claim: BGJT descent step applies to every polynomial P | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 136 | `CLAIM-XT-BN3072-128BIT` Claim: BN curves with a 3072-bit F_{p^12} reach 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 137 | `CLAIM-XT-JOUX-PINPOINT-ORIGINAL` Claim: Joux pinpointing reaches L(1/3, (8/9)^(1/3)) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 138 | `CLAIM-XT-SS-GENUS2-F2-367-128BIT` Claim: the genus-2 supersingular curve over F_{2^367} gives 128-bit security | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 139 | `HEUR-PF-HKPYY-SPARSE-DENSITY` HKPYY density heuristic: sparse factors of X^n - 1 are as rare as random | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 140 | `HEUR-RP-SEMIREGULAR-DREG-PROXY` Semi-regular D_reg predicts Groebner cost of descended Semaev systems (A-PDP5) | refuted | none | 0 | audit every dependent; repair or retract the estimates that use it | - |
+| 141 | `CONJ-XT-SZPIRO` Szpiro's conjecture (Szpiro ratio bounded, 6 the largest limit point) | open | none | 0 | prove or refute | RT-XT-SZPIRO-XEDNI-LIFTS |
+| 142 | `GAP-AUTOMORPHISM-PREPROCESS` Preprocessing bounds with automorphism quotients | open | none | 0 | prove or refute | RT-AUTOMORPHISM-PREPROCESS, RT-RP-ONLINE-VS-PREPROCESSING |
+| 143 | `GAP-BINARY-M4-DEGREE` Binary m=4 Weil-descent degree growth | open | none | 0 | prove or refute | RT-BINARY-M4-DEGREE, RT-RP-M3-DIAGONAL-UNCENSOR |
+| 144 | `GAP-COORDINATE-ALGEBRAIC` Coordinate-algebraic escape from generic bounds | open | none | 0 | prove or refute | RT-GENERIC-BRIDGE, RT-ALGEBRAIC-SOLUTION-COUNT, RT-REPRESENTATION-FILTER |
+| 145 | `GAP-END-TO-END-IC-EXPONENT` End-to-end index-calculus exponent obligation | open | none | 0 | prove or refute | RT-END-TO-END-IC, RT-REPRESENTATION-FILTER |
 | 146 | `GAP-FALL-DEGREE-COST-BRIDGE` Every degree-based cost must pass through sd or last fall | open | none | 0 | prove or refute | RT-FALL-DEGREE-BRIDGE, RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
 | 147 | `GAP-GB-SUMMATION-DREG-GROWTH` Does the solving degree of binary summation descents grow with n? | open | none | 0 | prove or refute | RT-GB-SUMMATION-INVARIANTS, RT-GB-FACTOR-BASE-WEIL-BOUND |
 | 148 | `GAP-GG-ADDING-WALK-RIGOROUS` No rigorous sqrt bound for r-adding (doubling-free) rho walks | open | none | 0 | prove or refute | RT-GG-ADDING-WALK-PROOF |
@@ -287,65 +287,68 @@ Corpus 2026-11-01: 536 claims, 327 on the frontier, 3 resting on a refuted claim
 | 266 | `CEX-FAKE-GAP-FAMILY-WK` Family W_k = {X^k Y, XY + X}: d'_F = 2, d_F = k + 1 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
 | 267 | `CEX-FAKE-GAP-INSIDE-YZ` {YZ + 1, XZ + X + 1}: d_F(inside) = 3, d'_F = 1 | proved_internal_unreviewed | native_exact | 0 | independent review, then kernel-check | RT-FAKE-GAP-INSIDE |
 | 268 | `CEX-GB-DING-SCHMIDT-DEGENERATE` Ding-Schmidt 2013: degenerate systems with first-fall degree far below the solving degree | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 269 | `CEX-LEMMA4-REVERSE-R` Witness R {X, X^2+X}: d_F = 2, no fake fall | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 270 | `CEX-NAGAO-LEMMA4-F2` Witnesses A, B: d'_F = 2 < d_F = 3 over F_2 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-LEMMA4-FORMAL, RT-LEMMA4-REVERSE |
-| 271 | `CEX-PF-APS-COMPARISON-MISMATCH` APS Table 2 compares against PKM's m = 2 data | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-PF-APS-VS-PKM-REMEASURE |
-| 272 | `CEX-RP-COMMON-KERNEL-WITNESSES` Boolean kernel not multiplicative under gauge; exterior/code witness has a nonzero passive-axis coefficient (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 273 | `CEX-RP-JKSST-ASYMPTOTIC-COUNTING` Asymptotic remainders and coarse lattice data do not give finite counting bounds | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 274 | `CEX-RP-JKSST-LANG-QUADRATICITY` Quadraticity of height alone gives no uniform Lang constant (Lean countermodel) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 275 | `CEX-RP-JKSST-MODEL-DISCRIMINANT` No all-multiples height bound by a fixed model discriminant; model log-discriminant unbounded under rescaling | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 276 | `CEX-RP-JKSST-PROBABILITY` Finite-field relation probability: composite modulus, fixed probability not O(1/p), usefulness not automatic | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 277 | `CEX-SP-SEMAEV15-T2-TRACE` Trace identity gives d_ff = 2 < d_F4 = 4 on Semaev's t = 2 rows | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-SP-T2-TRACE-CHECK |
-| 278 | `FACT-XT-ANOMALOUS-ONLY-L-EQ-P` Only l = p torsion leaks through E(Z/p^2) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 279 | `LB-GG-AHP-GEOMETRIC` AHP: GGM bounds via geometric-search reductions (with preprocessing) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 280 | `LB-GG-CDG-AI-GGM` CDG: auxiliary-input GGM bounds via presampling | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 281 | `LB-GG-NECHAEV-DETERMINISTIC` Nechaev: deterministic generic DLP needs Omega(sqrt r) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 282 | `LB-GG-YUN-MDLP` Yun: generic n-target DLP needs Omega(sqrt(n p)) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 283 | `LB-ISOGENY-GENERIC` Isogeny-augmented generic lower bound | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-TRANSPORT-SIM |
-| 284 | `MEAS-GB-HKY-FFA-DOUBT` HKY 2015: computational evidence against the first fall degree assumption for ECDLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 285 | `OBS-SP-GG2014-RHO-STILL-FASTER` Galbraith-Gebregiyorgis 2014: Pollard rho still much faster | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 286 | `OBS-SP-SHANTZ-TESKE-EXPERIMENTS` Shantz-Teske 2013: experimental study of Petit-Quisquater | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 287 | `OBS-XT-GLOBAL-TORSION-LIFT` Global torsion lifts: torsion too small over Q, fields too large otherwise | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 288 | `RED-BK-AGCODE-MINDIST` AG-code minimum distance vs ECDLP (survey says 'equivalent') | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-AGCODE-DIRECTION |
-| 289 | `THEOREM-FROB-SUBSPACES-131` Frobenius-stable subspaces at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-BINARY-M4-DEGREE |
-| 290 | `THEOREM-GHS-GENUS-131` GHS genus classification at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 291 | `THEOREM-XEDNI-FF-DENSITY` Exact codimension-three function-field lift density | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 292 | `THEOREM-XEDNI-FINITE-CORE` Kernel-checked finite xedni core | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-XEDNI-END-TO-END |
-| 293 | `THEOREM-YIELD-CONSERVATION` Mean decomposition-yield conservation | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-ALGEBRAIC-SOLUTION-COUNT, RT-RP-PROOF-GATE-IC-NEGATIVE |
-| 294 | `THM-BK-GG-DIEM-SUBEXP-REPORT` Survey report of Diem's rigorous L(2/3) sequence | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 295 | `THM-BK-GG-YUN-MULTI-LB` Yun: generic Omega(sqrt(rL)) for L-instance DLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-ONE-OUT-OF-L |
-| 296 | `THM-GB-SEMAEV-TENTI-2DREG` Semaev-Tenti: two-phase solving degree <= 2 d_reg - 2 with field equations | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 297 | `THM-GG-AGM-UNINSTANTIABLE` Zhandry: un-instantiability in the AGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 298 | `THM-GG-KZZ-AGM-NOT-WEAKER` KZZ: AGM is not (as formalized) weaker than the GGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 299 | `THM-GG-ZHANDRY-LABELS` Shoup vs Maurer generic models differ on multi-stage games | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 300 | `THM-PF-HKPYY-LEMMA41` HKPYY Lemma 4.1: floor(n/n') l + (n mod n') >= n' | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 301 | `THM-PF-KYTY-APS-LIMITATION` Kudo et al. 2018: acceleration of APS and its limitation | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 302 | `THM-PF-REPO-DIRECT-LOWER-BOUND` Direct-presentation algebraic IC over F_p costs >= c_m r (internal, conditional) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 303 | `THM-RP-AUTOMORPHISM-ORBIT-FOLD` Automorphism-orbit factor bases: psi(G) = [lambda]G with per-instance checks (A-FB3) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 304 | `THM-RP-BAND-AFFINE` Priced cost is affine in the native-work weight; band reversals force an interior crossing (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 305 | `THM-RP-BOOLEAN-CHAIN-UPPER` Fully Boolean two-S3 chain: d_F <= 3*ell+1, independent of n | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-RP-M3-DIAGONAL-UNCENSOR |
-| 306 | `THM-RP-COFACTOR4-RANK-SHORTFALL` Cofactor-4 curves: two-summand relation space has rank C-1 (A-RC3/A-LA4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 307 | `THM-RP-FB-BREAK-EVEN` Break-even of the per-relation cost model at m=4, n=131 (Lean instances) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 308 | `THM-RP-GUARDED-EXACT-PAIR` Guarded three-abscissa prime-field system: first fall 4, last fall 5 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 309 | `THM-RP-GUARDED-GROWING-B` Explicit-membership presentation: first fall B+1, last fall in [max(5,B+1), 3B-4] | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 310 | `THM-RP-ICNEG-YIELD-CONSERVATION` Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-PROOF-GATE-IC-NEGATIVE |
-| 311 | `THM-RP-KEYED-INVARIANCE` Keyed-generic transcript invariance under injective operation-preserving maps (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 312 | `THM-RP-RECODED-SELECTOR-DEGREE` Selector recodings of one F17 base: canonical degree 7 -> 6 (XOR) -> 5 (one-hot) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
-| 313 | `THM-RP-SCALAR-TRANSPORT` Scalar transport and answer reflection under an injective homomorphism (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 314 | `THM-RP-SECANT-DEGREE-REDUCTION` Split-graph secant presentation: top-ideal first vanishing d+1 vs dense 2d+1 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
-| 315 | `THM-RP-SEMAEV-MONODROMY` Monodromy of the Semaev cover is (Z/2)^(m-2) | proved_internal_unreviewed | stated_open | 0 | independent review, then kernel-check | - |
-| 316 | `THM-RP-TRACE-ZERO-DOUBLING` Trace-zero bases lie in 2E and double the yield at the same degree (A-FB4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
-| 317 | `THM-RP-TWIST-MIXED-RELATION` A rational relation with a Frobenius-negated (twist) term forces that term to vanish on odd order (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 318 | `THM-RP-YIELD-SUM-COUNT` Total yield = domain size; K2 neutrality; K5 restriction (Lean, list form) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 319 | `THM-SALIZZONI-EX39-EXACT` Salizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
-| 320 | `THM-SP-DIEM-FIXED-N-RIGOROUS` Diem: rigorous O~(q^(2-2/n)) for fixed n | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-SP-DIEM-READ |
-| 321 | `THM-SP-DIEM13-THM3` Diem 2013 Theorem 3: fixed characteristic p, fields F_{p^(mn)} | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-SP-DIEM-READ |
-| 322 | `THM-XT-BK-IMPROBABILITY` Balasubramanian-Koblitz: small embedding degree is improbable | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 323 | `THM-XT-HS-SZPIRO-IMPLIES-LANG` Hindry-Silverman: Szpiro implies Lang | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 324 | `THM-XT-RIGOROUS-L-HALF` Rigorous L(1/2) discrete logarithms (Pomerance; F_p index calculus) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 325 | `THM-XT-RUECK-JACOBIAN-PTORSION` Rueck: p-torsion DLP in Jacobians of curves in characteristic p | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 326 | `THM-XT-SATOH-ARAKI-FERMAT` Satoh-Araki Fermat-quotient anomalous attack | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
-| 327 | `THM-XT-TRACE-MAP-DISTORTION` The trace map distorts some points but not the G1/G2 eigenspaces | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 269 | `CEX-INSIDE-GAP-N1-FAMILY` n = 1: {X^k, X^k+1} has inside gap k - 1 | proved_internal_unreviewed | native_exact | 0 | independent review, then kernel-check | - |
+| 270 | `CEX-INSIDE-GAP-THREE` {XYW+XY+W, XZW+XW+1}: d_F(inside) = 4, d'_F = 1 | proved_internal_unreviewed | native_exact | 0 | independent review, then kernel-check | - |
+| 271 | `CEX-LEMMA4-REVERSE-R` Witness R {X, X^2+X}: d_F = 2, no fake fall | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 272 | `CEX-NAGAO-LEMMA4-F2` Witnesses A, B: d'_F = 2 < d_F = 3 over F_2 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-LEMMA4-FORMAL, RT-LEMMA4-REVERSE |
+| 273 | `CEX-PF-APS-COMPARISON-MISMATCH` APS Table 2 compares against PKM's m = 2 data | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-PF-APS-VS-PKM-REMEASURE |
+| 274 | `CEX-RP-COMMON-KERNEL-WITNESSES` Boolean kernel not multiplicative under gauge; exterior/code witness has a nonzero passive-axis coefficient (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 275 | `CEX-RP-JKSST-ASYMPTOTIC-COUNTING` Asymptotic remainders and coarse lattice data do not give finite counting bounds | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 276 | `CEX-RP-JKSST-LANG-QUADRATICITY` Quadraticity of height alone gives no uniform Lang constant (Lean countermodel) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 277 | `CEX-RP-JKSST-MODEL-DISCRIMINANT` No all-multiples height bound by a fixed model discriminant; model log-discriminant unbounded under rescaling | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 278 | `CEX-RP-JKSST-PROBABILITY` Finite-field relation probability: composite modulus, fixed probability not O(1/p), usefulness not automatic | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 279 | `CEX-SP-SEMAEV15-T2-TRACE` Trace identity: d_ff = 2 on Semaev's t = 2 rows (checked); solver needs 2 or 3 | proved_internal_unreviewed | native_exact | 0 | independent review, then kernel-check | RT-SP-T2-TRACE-CHECK |
+| 280 | `FACT-XT-ANOMALOUS-ONLY-L-EQ-P` Only l = p torsion leaks through E(Z/p^2) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 281 | `GAP-FAKE-GAP-INSIDE-BOUNDED` Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-FAKE-GAP-INSIDE |
+| 282 | `LB-GG-AHP-GEOMETRIC` AHP: GGM bounds via geometric-search reductions (with preprocessing) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 283 | `LB-GG-CDG-AI-GGM` CDG: auxiliary-input GGM bounds via presampling | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 284 | `LB-GG-NECHAEV-DETERMINISTIC` Nechaev: deterministic generic DLP needs Omega(sqrt r) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 285 | `LB-GG-YUN-MDLP` Yun: generic n-target DLP needs Omega(sqrt(n p)) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 286 | `LB-ISOGENY-GENERIC` Isogeny-augmented generic lower bound | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-TRANSPORT-SIM |
+| 287 | `MEAS-GB-HKY-FFA-DOUBT` HKY 2015: computational evidence against the first fall degree assumption for ECDLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 288 | `OBS-SP-GG2014-RHO-STILL-FASTER` Galbraith-Gebregiyorgis 2014: Pollard rho still much faster | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 289 | `OBS-SP-SHANTZ-TESKE-EXPERIMENTS` Shantz-Teske 2013: experimental study of Petit-Quisquater | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 290 | `OBS-XT-GLOBAL-TORSION-LIFT` Global torsion lifts: torsion too small over Q, fields too large otherwise | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 291 | `RED-BK-AGCODE-MINDIST` AG-code minimum distance vs ECDLP (survey says 'equivalent') | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-AGCODE-DIRECTION |
+| 292 | `THEOREM-FROB-SUBSPACES-131` Frobenius-stable subspaces at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-BINARY-M4-DEGREE |
+| 293 | `THEOREM-GHS-GENUS-131` GHS genus classification at n=131 | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 294 | `THEOREM-XEDNI-FF-DENSITY` Exact codimension-three function-field lift density | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 295 | `THEOREM-XEDNI-FINITE-CORE` Kernel-checked finite xedni core | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-XEDNI-END-TO-END |
+| 296 | `THEOREM-YIELD-CONSERVATION` Mean decomposition-yield conservation | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-ALGEBRAIC-SOLUTION-COUNT, RT-RP-PROOF-GATE-IC-NEGATIVE |
+| 297 | `THM-BK-GG-DIEM-SUBEXP-REPORT` Survey report of Diem's rigorous L(2/3) sequence | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 298 | `THM-BK-GG-YUN-MULTI-LB` Yun: generic Omega(sqrt(rL)) for L-instance DLP | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-BK-ONE-OUT-OF-L |
+| 299 | `THM-GB-SEMAEV-TENTI-2DREG` Semaev-Tenti: two-phase solving degree <= 2 d_reg - 2 with field equations | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 300 | `THM-GG-AGM-UNINSTANTIABLE` Zhandry: un-instantiability in the AGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 301 | `THM-GG-KZZ-AGM-NOT-WEAKER` KZZ: AGM is not (as formalized) weaker than the GGM | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 302 | `THM-GG-ZHANDRY-LABELS` Shoup vs Maurer generic models differ on multi-stage games | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 303 | `THM-PF-HKPYY-LEMMA41` HKPYY Lemma 4.1: floor(n/n') l + (n mod n') >= n' | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 304 | `THM-PF-KYTY-APS-LIMITATION` Kudo et al. 2018: acceleration of APS and its limitation | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 305 | `THM-PF-REPO-DIRECT-LOWER-BOUND` Direct-presentation algebraic IC over F_p costs >= c_m r (internal, conditional) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 306 | `THM-RP-AUTOMORPHISM-ORBIT-FOLD` Automorphism-orbit factor bases: psi(G) = [lambda]G with per-instance checks (A-FB3) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 307 | `THM-RP-BAND-AFFINE` Priced cost is affine in the native-work weight; band reversals force an interior crossing (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 308 | `THM-RP-BOOLEAN-CHAIN-UPPER` Fully Boolean two-S3 chain: d_F <= 3*ell+1, independent of n | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | RT-RP-M3-DIAGONAL-UNCENSOR |
+| 309 | `THM-RP-COFACTOR4-RANK-SHORTFALL` Cofactor-4 curves: two-summand relation space has rank C-1 (A-RC3/A-LA4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 310 | `THM-RP-FB-BREAK-EVEN` Break-even of the per-relation cost model at m=4, n=131 (Lean instances) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 311 | `THM-RP-GUARDED-EXACT-PAIR` Guarded three-abscissa prime-field system: first fall 4, last fall 5 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 312 | `THM-RP-GUARDED-GROWING-B` Explicit-membership presentation: first fall B+1, last fall in [max(5,B+1), 3B-4] | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 313 | `THM-RP-ICNEG-YIELD-CONSERVATION` Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-PROOF-GATE-IC-NEGATIVE |
+| 314 | `THM-RP-KEYED-INVARIANCE` Keyed-generic transcript invariance under injective operation-preserving maps (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 315 | `THM-RP-RECODED-SELECTOR-DEGREE` Selector recodings of one F17 base: canonical degree 7 -> 6 (XOR) -> 5 (one-hot) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
+| 316 | `THM-RP-SCALAR-TRANSPORT` Scalar transport and answer reflection under an injective homomorphism (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 317 | `THM-RP-SECANT-DEGREE-REDUCTION` Split-graph secant presentation: top-ideal first vanishing d+1 vs dense 2d+1 (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | RT-RP-TOP-IDEAL-TO-SOLVING-DEGREE |
+| 318 | `THM-RP-SEMAEV-MONODROMY` Monodromy of the Semaev cover is (Z/2)^(m-2) | proved_internal_unreviewed | stated_open | 0 | independent review, then kernel-check | - |
+| 319 | `THM-RP-TRACE-ZERO-DOUBLING` Trace-zero bases lie in 2E and double the yield at the same degree (A-FB4) | proved_internal_unreviewed | none | 0 | independent review, then kernel-check | - |
+| 320 | `THM-RP-TWIST-MIXED-RELATION` A rational relation with a Frobenius-negated (twist) term forces that term to vanish on odd order (Lean) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 321 | `THM-RP-YIELD-SUM-COUNT` Total yield = domain size; K2 neutrality; K5 restriction (Lean, list form) | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 322 | `THM-SALIZZONI-EX39-EXACT` Salizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2 | proved_internal_unreviewed | kernel_checked | 0 | independent review, then kernel-check | - |
+| 323 | `THM-SP-DIEM-FIXED-N-RIGOROUS` Diem: rigorous O~(q^(2-2/n)) for fixed n | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-SP-DIEM-READ |
+| 324 | `THM-SP-DIEM13-THM3` Diem 2013 Theorem 3: fixed characteristic p, fields F_{p^(mn)} | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | RT-SP-DIEM-READ |
+| 325 | `THM-XT-BK-IMPROBABILITY` Balasubramanian-Koblitz: small embedding degree is improbable | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 326 | `THM-XT-HS-SZPIRO-IMPLIES-LANG` Hindry-Silverman: Szpiro implies Lang | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 327 | `THM-XT-RIGOROUS-L-HALF` Rigorous L(1/2) discrete logarithms (Pomerance; F_p index calculus) | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 328 | `THM-XT-RUECK-JACOBIAN-PTORSION` Rueck: p-torsion DLP in Jacobians of curves in characteristic p | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 329 | `THM-XT-SATOH-ARAKI-FERMAT` Satoh-Araki Fermat-quotient anomalous attack | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
+| 330 | `THM-XT-TRACE-MAP-DISTORTION` The trace map distorts some points but not the G1/G2 eigenspaces | proved_external_unread | none | 0 | read the primary text, record its SHA-256, confirm the statement and hypotheses | - |
 
 ## Unlinked citations
 
