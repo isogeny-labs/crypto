@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 525,
-    "frontier": 318,
+    "nodes": 530,
+    "frontier": 322,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -17,18 +17,18 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 88,
-      "measured": 20,
-      "proved_internal_unreviewed": 40,
+      "measured": 21,
+      "proved_internal_unreviewed": 42,
       "open": 45,
       "heuristic": 71,
-      "refuted": 15,
+      "refuted": 17,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 496,
+      "none": 499,
       "kernel_checked": 20,
-      "stated_open": 4,
-      "lean_written_unchecked": 5
+      "stated_open": 3,
+      "lean_written_unchecked": 8
     }
   },
   "frontier": [
@@ -2486,6 +2486,23 @@
       ]
     },
     {
+      "id": "CLAIM-GB-LFD-LE-DREG-BFS",
+      "label": "'last fall <= d_reg' with BFS d_reg",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-GB-SALIZZONI-EX39",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "CLAIM-GG-BKL-SIMD-NEGATION",
       "label": "BKL 2010: negation gives little or no speedup on SIMD",
       "status": "refuted",
@@ -2515,6 +2532,23 @@
       "pressure": [
         {
           "from": "FACT-GG-WALK-CLASS-WELLDEFINED",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-LEMMA4-REVERSE-GENERAL",
+      "label": "Reverse repair d'_F <= d_F (outside), unrestricted",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-LEMMA4-REVERSE-R",
           "relation": "refutes"
         }
       ]
@@ -2877,7 +2911,7 @@
     },
     {
       "id": "GAP-LEMMA4-REVERSE",
-      "label": "Reverse inequality d'_F <= d_F (outside placement)?",
+      "label": "Reverse inequality d'_F <= d_F (outside), reduced generators independent?",
       "status": "open",
       "formal": "none",
       "action": "prove or refute",
@@ -2887,7 +2921,12 @@
       "research_targets": [
         "RT-LEMMA4-REVERSE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CLAIM-LEMMA4-REVERSE-GENERAL",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-MULTITARGET-NONUNIFORM",
@@ -4724,6 +4763,18 @@
       "pressure": []
     },
     {
+      "id": "CEX-LEMMA4-REVERSE-R",
+      "label": "Witness R {X, X^2+X}: d_F = 2, no fake fall",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-NAGAO-LEMMA4-F2",
       "label": "Witnesses A, B: d'_F = 2 < d_F = 3 over F_2",
       "status": "proved_internal_unreviewed",
@@ -5387,6 +5438,18 @@
       "label": "Total yield = domain size; K2 neutrality; K5 restriction (Lean, list form)",
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-SALIZZONI-EX39-EXACT",
+      "label": "Salizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2",
+      "status": "proved_internal_unreviewed",
+      "formal": "lean_written_unchecked",
       "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],

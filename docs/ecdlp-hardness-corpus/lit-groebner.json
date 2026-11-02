@@ -953,10 +953,19 @@
       ],
       "evidence_class": "counterexample",
       "formal": {
-        "state": "stated_open",
-        "artifacts": [],
-        "notes": "Small enough (k = 2: three polynomials in two variables) for a decide-style Lean or native exact check of x, y not in V_{F,2} and in V_{F,3}."
-      }
+    "state": "lean_written_unchecked",
+    "artifacts": [
+     {
+      "path": "research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean",
+      "decl": "SalizzoniEx39.x_mem_V3"
+     },
+     {
+      "path": "research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean",
+      "decl": "SalizzoniEx39.y_mem_V3"
+     }
+    ],
+    "notes": "k = 2 over F_2: memberships, top parts and d_reg in core Lean (decide +kernel), pending the proof gate; exact linear algebra over F_2, F_3, F_5 and Q in salizzoni_ex39.py (THM-SALIZZONI-EX39-EXACT)."
+   }
     },
     {
       "id": "CLAIM-GB-LFD-LE-DREG",
@@ -2661,7 +2670,7 @@
     {
       "id": "RT-GB-SALIZZONI-EX39-FORMAL",
       "label": "Kernel-check Salizzoni Ex. 3.9 at k = 2",
-      "status": "ready",
+      "status": "working",
       "priority": 3,
       "objective": "Formally verify, for F_2 = {x^2 + y, y^2 + x, xy} over a small field, that x, y are not in V_{F,2} and are in V_{F,3}, hence sd = last fall = 3 = d_reg + 1.",
       "depends_on": [

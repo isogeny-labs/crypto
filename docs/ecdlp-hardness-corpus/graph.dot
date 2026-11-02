@@ -281,6 +281,10 @@ digraph ecdlp_claims {
     "THM-SP-SEMAEV15-SPLITTING" [label="THM-SP-SEMAEV15-SPLITTING\\nSemaev 2015 Lemmas 1-2: S_3-chain splitting of S_{t+1}", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CEX-SP-SEMAEV15-T2-TRACE" [label="CEX-SP-SEMAEV15-T2-TRACE\\nTrace identity gives d_ff = 2 < d_F4 = 4 on Semaev's t = 2 rows", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "OBS-SP-KY-SEMAEV-N45" [label="OBS-SP-KY-SEMAEV-N45\\nKosters-Yeo: degree of regularity 5 at n = 45 on Semaev's system", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-LEMMA4-REVERSE-GENERAL" [label="CLAIM-LEMMA4-REVERSE-GENERAL\\nReverse repair d'_F <= d_F (outside), unrestricted\\nd'_F <= d_F\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-LEMMA4-REVERSE-R" [label="CEX-LEMMA4-REVERSE-R\\nWitness R {X, X^2+X}: d_F = 2, no fake fall", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-GB-LFD-LE-DREG-BFS" [label="CLAIM-GB-LFD-LE-DREG-BFS\\n'last fall <= d_reg' with BFS d_reg\\nd_lastfall <= d_reg (BFS)\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "THM-SALIZZONI-EX39-EXACT" [label="THM-SALIZZONI-EX39-EXACT\\nSalizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -493,6 +497,7 @@ digraph ecdlp_claims {
     "CLAIM-SP-SEMAEV15-FFDA-T2" [label="CLAIM-SP-SEMAEV15-FFDA-T2\\nSemaev 2015 FFDA instance: d_F4 <= first fall degree on t = 2 systems\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "HEUR-SP-SEMAEV15-ASSUMPTION1" [label="HEUR-SP-SEMAEV15-ASSUMPTION1\\nSemaev 2015 Assumption 1: d_F4 <= 4", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
     "HEUR-SP-SEMAEV15-WEAK-REGULARITY" [label="HEUR-SP-SEMAEV15-WEAK-REGULARITY\\nSemaev 2015 (revised): regularity degree o(sqrt(n/ln n))", fillcolor="#f4e8fb", color="#7b3fa1", style="rounded,filled,dashed"];
+    "MEAS-LEMMA4-REVERSE-CENSUS" [label="MEAS-LEMMA4-REVERSE-CENSUS\\nReverse-repair census: 0 nondegenerate counterexamples in 531,497 pairs", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
   }
   subgraph cluster_open {
     label="Open proof and attack surfaces"; color="#cad5df"; style="rounded";
@@ -508,7 +513,7 @@ digraph ecdlp_claims {
     "GAP-END-TO-END-IC-EXPONENT" [label="GAP-END-TO-END-IC-EXPONENT\\nEnd-to-end index-calculus exponent obligation", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PROTOCOL-ASSUMPTION-MAPPING" [label="GAP-PROTOCOL-ASSUMPTION-MAPPING\\nProtocol-to-problem assumption mapping", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-NAGAO-PROP5-ROUTE" [label="GAP-NAGAO-PROP5-ROUTE\\nDoes Nagao Prop. 5 survive without Lemma 4?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
-    "GAP-LEMMA4-REVERSE" [label="GAP-LEMMA4-REVERSE\\nReverse inequality d'_F <= d_F (outside placement)?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-LEMMA4-REVERSE" [label="GAP-LEMMA4-REVERSE\\nReverse inequality d'_F <= d_F (outside), reduced generators independent?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-FALL-DEGREE-COST-BRIDGE" [label="GAP-FALL-DEGREE-COST-BRIDGE\\nEvery degree-based cost must pass through sd or last fall", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-RP-O2-MULTISET-YIELD" [label="GAP-RP-O2-MULTISET-YIELD\\nO2: mean yield of m-multisets of a base is C(|D|+m-1,m)", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-RP-O1-ISOGENY-GGM" [label="GAP-RP-O1-ISOGENY-GGM\\nO1: Theorem 15.1 in full (isogeny-augmented GGM success bound)", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
@@ -1430,4 +1435,10 @@ digraph ecdlp_claims {
   "CEX-RP-JKSST-LANG-QUADRATICITY" -> "CONJ-XT-LANG-HEIGHT" [label="qualifies", color="#66788a", style="dashed"];
   "THM-RP-GUARDED-EXACT-PAIR" -> "THM-CG-SOLVING-DEGREE" [label="instantiates", color="#66788a", style="solid"];
   "HEUR-XT-EASY-LIFT-DEPENDENCE" -> "GAP-XEDNI-END-TO-END" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-LEMMA4-REVERSE-R" -> "CLAIM-LEMMA4-REVERSE-GENERAL" [label="refutes", color="#a33a3a", style="solid"];
+  "CLAIM-LEMMA4-REVERSE-GENERAL" -> "GAP-LEMMA4-REVERSE" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-LEMMA4-REVERSE-CENSUS" -> "GAP-LEMMA4-REVERSE" [label="measures", color="#66788a", style="solid"];
+  "CEX-GB-SALIZZONI-EX39" -> "CLAIM-GB-LFD-LE-DREG-BFS" [label="refutes", color="#a33a3a", style="solid"];
+  "CLAIM-GB-LFD-LE-DREG-BFS" -> "CLAIM-GB-LFD-LE-DREG" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-SALIZZONI-EX39-EXACT" -> "CEX-GB-SALIZZONI-EX39" [label="qualifies", color="#66788a", style="dashed"];
 }
