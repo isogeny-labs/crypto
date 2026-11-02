@@ -1,0 +1,45 @@
+rows: 4025  (sha256 2071f8227a965a0fac6cc3fa110815f7bd4f08aaea8ff6ba7eb4e4d9ab77555b)
+
+== per (k, arm): attempts x curves, Dreg (mean, sd, distribution), solutions mean, time medians ==
+k=3       aa  n=200    dreg mean 7.000 sd 0.000 hist {7: 200} sol_mean 0.0000 t_med 0.0389s
+k=3   badapt  n=220    dreg mean 6.314 sd 0.465 hist {6: 151, 7: 69} sol_mean 0.0000 t_med 0.0025s
+k=3  bsparse  n=1200   dreg mean 6.488 sd 0.500 hist {6: 614, 7: 586} sol_mean 0.0000 t_med 0.0043s
+k=3      iso  n=200    dreg mean 7.000 sd 0.000 hist {7: 200} sol_mean 0.0000 t_med 0.0393s
+k=3     main  n=200    dreg mean 7.000 sd 0.000 hist {7: 200} sol_mean 0.0000 t_med 0.0394s
+k=3  nbadapt  n=320    dreg mean 6.409 sd 0.492 hist {6: 189, 7: 131} sol_mean 0.0000 t_med 0.0031s
+k=3     null  n=320    dreg mean 7.000 sd 0.000 hist {7: 320} sol_mean 0.0000 t_med 0.0394s
+k=3  planted  n=199    dreg mean 9.593 sd 1.030 hist {7: 27, 10: 172} sol_mean 3.7236 t_med 1.0712s
+k=3     stdv  n=800    dreg mean 6.688 sd 0.464 hist {6: 250, 7: 550} sol_mean 0.0000 t_med 0.0309s
+k=4       aa  n=20     dreg mean 8.000 sd 0.000 hist {8: 20} sol_mean 0.0000 t_med 14.9430s
+k=4   badapt  n=22     dreg mean 8.000 sd 0.000 hist {8: 22} sol_mean 0.0000 t_med 11.8089s
+k=4  bsparse  n=120    dreg mean 8.000 sd 0.000 hist {8: 120} sol_mean 0.0000 t_med 11.9835s
+k=4      iso  n=20     dreg mean 8.000 sd 0.000 hist {8: 20} sol_mean 0.0000 t_med 15.1802s
+k=4     main  n=20     dreg mean 8.000 sd 0.000 hist {8: 20} sol_mean 0.0000 t_med 14.6936s
+k=4  nbadapt  n=32     dreg mean 8.000 sd 0.000 hist {8: 32} sol_mean 0.0000 t_med 11.9321s
+k=4     null  n=32     dreg mean 8.000 sd 0.000 hist {8: 32} sol_mean 0.0000 t_med 15.6098s
+k=4  planted  n=20     dreg mean 9.000 sd 0.000 hist {9: 20} sol_mean 4.5000 t_med 15.3866s
+k=4     stdv  n=80     dreg mean 8.000 sd 0.000 hist {8: 80} sol_mean 0.0000 t_med 11.9720s
+
+isomorphic-model control (Frobenius conjugate instance): 220/220 identical (dreg, solutions, refuted)
+A/A repeat: 220/220 identical counts; time ratio repeat/first median 1.009, sd 0.159 (noise floor for the time column)
+within-orbit Dreg spread (same V, x_R; curves of one orbit are Galois conjugates but V is NOT conjugated, so this is a between-presentation spread):
+  #distinct dreg values per (k, attempt, orbit): {1: 154}
+
+== main arm mean dreg by (k, orbit) ==
+k=3 orbit=O0 n=60 mean=7.000 sd=0.000
+k=3 orbit=O1 n=20 mean=7.000 sd=0.000
+k=3 orbit=O2 n=20 mean=7.000 sd=0.000
+k=3 orbit=O3 n=40 mean=7.000 sd=0.000
+k=3 orbit=O4 n=20 mean=7.000 sd=0.000
+k=3 orbit=O5 n=20 mean=7.000 sd=0.000
+k=3 orbit=crater n=20 mean=7.000 sd=0.000
+k=4 orbit=O0 n=6 mean=8.000 sd=0.000
+k=4 orbit=O1 n=2 mean=8.000 sd=0.000
+k=4 orbit=O2 n=2 mean=8.000 sd=0.000
+k=4 orbit=O3 n=4 mean=8.000 sd=0.000
+k=4 orbit=O4 n=2 mean=8.000 sd=0.000
+k=4 orbit=O5 n=2 mean=8.000 sd=0.000
+k=4 orbit=crater n=2 mean=8.000 sd=0.000
+
+== presentation-family minima per (k, arm, curve, attempt): min Dreg over presentations | min time | #pres | sel (w,deg) of b image | mod-weight at min time ==
+(per-instance lines omitted: rerun p3h analyze --rows <pooled file> for the full listing)
