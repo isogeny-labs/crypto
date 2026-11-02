@@ -85,5 +85,9 @@ while the USD 25 daily cost gate has unknown or exhausted headroom. Amendment
 A1 prospectively selects one GitHub-hosted counted-only run because that route
 can use the repository's scoped S3 checkpoint token. Its exact counts and
 correctness checks are usable, but every clock is invalid for a performance
-claim. The frozen EKS workload is not reduced to fit.
+claim. That secret was unset and run `41494848329` failed before data.
+Amendment A2 then selects the current local executor after its authorized AWS
+account successfully pushed and gated the full resume checkpoint in the
+existing `crypto-autoresearcher` bucket. Local clocks remain invalid. The
+frozen EKS workload is not reduced to fit.
 

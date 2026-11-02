@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ECCP131-REPRESENTATION-FILTER-20261102",
-  "version": 2,
+  "version": 3,
   "created": "2026-11-02",
   "repository": "crypto",
   "study_dir": "research/eccp131_representation_filter_20261102",
@@ -502,10 +502,10 @@
     "timed_primary_justification": null
   },
   "execution": {
-    "backend": "ephemeral",
-    "queue": "github-hosted",
+    "backend": "local",
+    "queue": "current-executor",
     "placement": {
-      "instance_type": "ubuntu-24.04 hosted runner; exact type recorded at runtime",
+      "instance_type": "current x86_64 executor; exact host facts recorded at runtime",
       "cpus": 4,
       "spot": false
     },
@@ -633,13 +633,30 @@
         "execution.placement",
         "execution.checkpoint"
       ]
+    },
+    {
+      "id": "A2-LOCAL-CHECKPOINTED",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "GitHub Actions run 41494848329 failed closed before data because CHECKPOINT_UPLOAD_TOKEN was unset. The current authorized account already owns the existing crypto-autoresearcher bucket and successfully passed checkpoint push/gate in us-west-2; use the already-built exact source locally for counted-only evidence.",
+      "changes": [
+        "Execution backend changes from the failed GitHub-hosted route to the current local x86_64 executor.",
+        "The source, protocol and resume card are checkpointed at s3://crypto-autoresearcher/checkpoints/crypto/codex__eccp131-representation-filter-20261102/ before data.",
+        "The release binary remains the pre-data Rust 1.99.1 build pinned in every arm.",
+        "All local wall and CPU clocks remain invalid for performance claims; exact counts and correctness checks are the only deciding evidence."
+      ],
+      "supersedes_fields": [
+        "execution.backend",
+        "execution.queue",
+        "execution.placement"
+      ]
     }
   ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "515916e18e17e5d858c9df9de081f9d13c47e08ab10faddfe1a09ebfb8d6b0ef",
-    "commit": "3fe55ae891d5bfa55913939ed2909734401cc8b8",
-    "frozen_at": "2026-11-02T17:49:41Z",
+    "protocol_sha256": "5825ab201478807992fd2d118bc07c84e5d55397e21e03d9ca269fe592a2aa99",
+    "commit": "9e54b690e1b371c8e92bb9303919b725aa1d38ea",
+    "frozen_at": "2026-11-02T17:55:18Z",
     "filed_before_affected_data": true
   }
 }
