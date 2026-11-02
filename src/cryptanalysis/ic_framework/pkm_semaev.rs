@@ -46,6 +46,7 @@
 use std::collections::{BTreeMap, HashSet};
 use std::time::{Duration, Instant};
 
+use super::fiber::{cofactor_fiber, CofactorFiber};
 use super::prime_tower::primitive_two_power_root;
 use super::stages::{
     DecompositionOracle, InstanceCtx, Params, SolverCost, SolverTotals, SystemShape,
@@ -244,6 +245,11 @@ pub struct PkmSemaevOracle {
     /// Hybrid guessing (bits form only): the top `guess` bits of the first
     /// summand are enumerated, one F4 system per assignment.
     guess: u32,
+    /// Cofactor-fiber lifts (`lifts=1`): the rational `h`-torsion `E(F_q)[h]`,
+    /// computed once in `prepare`; `decompose` tries the targets `R + K`.
+    lifts: bool,
+    fiber: Option<CofactorFiber<PrimePoint>>,
+    in_lift: bool,
     branches: Vec<Prepared>,
     prepared: Option<Prepared>,
     totals: SolverTotals,
@@ -271,6 +277,9 @@ impl PkmSemaevOracle {
             budget: None,
             crosscheck: false,
             guess: 0,
+            lifts: false,
+            fiber: None,
+            in_lift: false,
             branches: Vec::new(),
             prepared: None,
             totals: SolverTotals {
@@ -430,6 +439,11 @@ impl PkmSemaevOracle {
             .transpose()?;
         self.crosscheck = params.flag("crosscheck");
         self.guess = params.u64_or("guess", 0)? as u32;
+        self.lifts = match params.u64_or("lifts", 0)? {
+            0 => false,
+            1 => true,
+            o => return Err(format!("pkm-semaev: lifts is 0 or 1, not {o}")),
+        };
         if self.guess > 0 {
             if !matches!(self.membership, Membership::Bits { .. }) {
                 return Err("pkm-semaev: guess=G applies to the bits form only".into());
@@ -804,6 +818,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "guess",
                 "bits form: enumerate the top G bits of the first summand, one F4 system per assignment (hybrid guessing)",
             ),
+            (
+                "lifts",
+                "1: cofactor-fiber lifts; try R + K for each x-distinct K in E(F_q)[h], first liftable relation wins; relations are over the projection [h]P (see fiber.rs)",
+            ),
         ]
     }
 
@@ -812,9 +830,15 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         ctx: &InstanceCtx<PrimeCurve>,
         fb: &FactorBase<PrimePoint>,
         params: &Params,
-        _ops: &mut GroupOps,
+        ops: &mut GroupOps,
     ) -> Result<(), String> {
         self.read_params(params)?;
+        self.fiber = None;
+        if self.lifts {
+            // E(F_q)[h] once, from [r]P over the base points; its group
+            // operations are charged to the set-up ledger.
+            self.fiber = Some(cofactor_fiber(ctx.group, fb, ctx.r, ctx.cofactor, ops));
+        }
         let curve = ctx.group;
         let p = curve.p;
         if p >= 1 << 31 {
@@ -882,6 +906,12 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         if self.setup_mults > 0 {
             m.insert("pkm_base_check_fp_mults_uncharged".into(), self.setup_mults);
         }
+        if let Some(f) = &self.fiber {
+            m.insert("pkm_fiber_size".into(), f.size() as u64);
+            m.insert("pkm_fiber_cofactor".into(), f.h);
+            m.insert("pkm_fiber_complete".into(), u64::from(f.complete));
+            m.insert("pkm_fiber_samples".into(), f.samples);
+        }
         m
     }
 
@@ -893,6 +923,47 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         counters: &mut OracleCounters,
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
+        if !self.in_lift {
+            if let Some(ks) = self
+                .fiber
+                .as_ref()
+                .filter(|f| f.size() > 1)
+                .map(|f| f.points.clone())
+            {
+                if point.infinity {
+                    return None;
+                }
+                // The cofactor fiber of the target: every row is written over
+                // the projection [h]P and [h]K = O, so a decomposition of
+                // R + K is as good a relation as one of R (fiber.rs, `lifts`).
+                // A lift whose abscissa was already tried is skipped
+                // (x(R+K) = x(-R-K)); each addition is charged.
+                let mut tried_x: Vec<u64> = Vec::with_capacity(ks.len());
+                self.in_lift = true;
+                let mut found = None;
+                for (i, &k) in ks.iter().enumerate() {
+                    let t = if i == 0 {
+                        point
+                    } else {
+                        ctx.group.add(ops, point, k)
+                    };
+                    if t.infinity || tried_x.contains(&t.x) {
+                        continue;
+                    }
+                    tried_x.push(t.x);
+                    self.bump("pkm_lift_targets_tried", 1);
+                    if let Some(idx) = self.decompose(ctx, fb, ops, counters, t) {
+                        if i != 0 {
+                            self.bump("pkm_lift_hits_nonidentity", 1);
+                        }
+                        found = Some(idx);
+                        break;
+                    }
+                }
+                self.in_lift = false;
+                return found;
+            }
+        }
         if self.dataset_trace {
             self.dataset_artifact = None;
         }
@@ -1681,5 +1752,210 @@ mod tests {
             .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
             .unwrap_err();
         assert!(err.contains("not in g·μ"), "{err}");
+    }
+
+    /// A small curve `y² = x³ − 3x + b` over `F_10007` with `#E = h·r`,
+    /// `r` prime, `h ∈ {8, 4}` and the whole `E[h]` rational, found by a
+    /// fixed search so the test is deterministic.  Returns the instance and
+    /// the brute-force `E[h]` (every point killed by `h`).
+    fn cofactor_instance() -> (PrimeInstance, Vec<PrimePoint>) {
+        let p = 10_007u64;
+        let is_prime = |n: u64| {
+            n > 1
+                && (2..)
+                    .take_while(|d| d * d <= n)
+                    .all(|d| !n.is_multiple_of(d))
+        };
+        for b in 1..p {
+            let curve = PrimeCurve { p, a: p - 3, b };
+            let mut pts = vec![];
+            for x in 0..p {
+                let rhs = curve.rhs(x);
+                if curve.legendre(rhs) >= 0 {
+                    if let Some(y) = curve.sqrt(rhs) {
+                        pts.push(PrimePoint::affine(x, y));
+                        if y != 0 {
+                            pts.push(PrimePoint::affine(x, p - y));
+                        }
+                    }
+                }
+            }
+            let n = pts.len() as u64 + 1;
+            for h in [8u64, 4] {
+                if !n.is_multiple_of(h) || !is_prime(n / h) || n / h < 500 {
+                    continue;
+                }
+                let r = n / h;
+                let mut ops = GroupOps::default();
+                let torsion: Vec<PrimePoint> = std::iter::once(curve.identity())
+                    .chain(
+                        pts.iter()
+                            .copied()
+                            .filter(|&q| curve.mul(&mut ops, q, h).infinity),
+                    )
+                    .collect();
+                if torsion.len() as u64 != h {
+                    continue;
+                }
+                let gen = pts
+                    .iter()
+                    .map(|&q| curve.mul(&mut ops, q, h))
+                    .find(|q| !q.infinity)
+                    .unwrap();
+                let inst = PrimeInstance {
+                    name: format!("cof{h}-b{b}"),
+                    curve,
+                    group_order: n,
+                    r,
+                    cofactor: h,
+                    generator: (gen.x, gen.y),
+                };
+                return (inst, torsion);
+            }
+        }
+        panic!("no cofactor curve found");
+    }
+
+    /// `lifts=1`: the verdict is "R + K decomposes for some K in E[h]"
+    /// (brute force over the whole torsion), every relation is accepted
+    /// by the pipeline's rule, the fiber is charged to set-up, and `h = 1`
+    /// is unchanged.
+    #[test]
+    fn cofactor_lifts_match_the_brute_force_fiber() {
+        use crate::cryptanalysis::ic_boundary::prime_factor_base;
+        let (inst, torsion) = cofactor_instance();
+        let curve = &inst.curve;
+        let h = inst.cofactor;
+        let fb = prime_factor_base(&inst, 20);
+        let max = *fb.abscissa_list.iter().max().unwrap();
+        let t = 64 - max.leading_zeros();
+        let decomposable = decomposable_points(curve, &fb, 2, &mut GroupOps::default());
+        let c = InstanceCtx {
+            cofactor: inst.cofactor,
+            ..ctx(&inst)
+        };
+        let prep = |spec: &str| {
+            let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+            let mut o = PkmSemaevOracle::new_bits(2, t, 0);
+            let mut setup = GroupOps::default();
+            o.prepare(&c, &fb, &params, &mut setup).expect("prepare");
+            (o, setup)
+        };
+        let (mut blind, setup0) = prep("m=2,mode=full");
+        let (mut lifted, setup1) = prep("m=2,mode=full,lifts=1");
+        let (mut lifted_g, _) = prep("m=2,mode=full,lifts=1,guess=1");
+        assert_eq!(setup0.adds + setup0.doubles, 0, "lifts=0 has no set-up");
+        assert!(setup1.adds + setup1.doubles > 0, "the fiber is charged");
+        let native = lifted.setup_native();
+        assert_eq!(native["pkm_fiber_size"], h);
+        assert_eq!(native["pkm_fiber_complete"], 1);
+        // The pipeline's row: Σ coef·x_col = h·a (mod r), x_col the
+        // logarithm to base G of the projected column point [h]P_col.
+        let mut ops = GroupOps::default();
+        let mut dlog = std::collections::HashMap::new();
+        let mut acc = curve.identity();
+        let g = inst.generator_point();
+        for j in 0..inst.r {
+            dlog.insert(curve.key(&acc), j);
+            acc = curve.add(&mut ops, acc, g);
+        }
+        // One unknown per column: the logarithm of the coef-1 member [h]P_c
+        // (its negation carries coef r - 1 on the same unknown).
+        let mut col_log = vec![0u64; fb.columns];
+        for i in 0..fb.points.len() {
+            if fb.coef_of[i] == 1 {
+                col_log[fb.col_of[i]] = dlog[&curve.key(&curve.mul(&mut ops, fb.points[i], h))];
+            }
+        }
+        let mut rng = StdRng::seed_from_u64(77);
+        let (mut blind_hits, mut lift_hits, mut by_lift) = (0, 0, 0);
+        for _ in 0..80u64 {
+            let a = rng.gen_range(1..inst.r);
+            let target = curve.mul(&mut ops, g, a);
+            let truth_blind = decomposable.contains(&curve.key(&target));
+            let truth_lift = torsion.iter().any(|&kk| {
+                let s = curve.add(&mut ops, target, kk);
+                decomposable.contains(&curve.key(&s))
+            });
+            let run = |o: &mut PkmSemaevOracle| {
+                o.decompose(
+                    &c,
+                    &fb,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    target,
+                )
+            };
+            assert_eq!(run(&mut blind).is_some(), truth_blind, "blind, a = {a}");
+            for o in [&mut lifted, &mut lifted_g] {
+                let got = run(o);
+                assert_eq!(got.is_some(), truth_lift, "lifts verdict, a = {a}");
+                if let Some(idx) = got {
+                    // Sum = R + K for some K in E[h]: equal after projection.
+                    let s = sum(curve, &fb, &idx);
+                    let d = curve.add(&mut ops, s, curve.neg(target));
+                    assert!(torsion.contains(&d), "sum - R is in E[h]");
+                    assert_eq!(
+                        curve.mul(&mut ops, s, h),
+                        curve.mul(&mut ops, target, h),
+                        "projected sum equals projected target"
+                    );
+                    let lhs = idx.iter().fold(0u128, |acc, &i| {
+                        (acc + fb.coef_of[i] as u128 * col_log[fb.col_of[i]] as u128)
+                            % inst.r as u128
+                    });
+                    assert_eq!(
+                        lhs,
+                        (h as u128 * a as u128) % inst.r as u128,
+                        "row: Σ coef·x = h·a (mod r)"
+                    );
+                    if !truth_blind {
+                        by_lift += 1;
+                    }
+                }
+            }
+            blind_hits += usize::from(truth_blind);
+            lift_hits += usize::from(truth_lift);
+        }
+        eprintln!(
+            "cofactor_lifts: h = {h}, 80 targets, blind decomposable {blind_hits}, lift-decomposable {lift_hits}, relations from a non-identity lift (both lift oracles) {by_lift}"
+        );
+        assert!(lift_hits > blind_hits, "lifts raise the yield");
+        assert!(by_lift > 0, "some relations come only from a lift");
+        assert!(lifted.relation_counters()["pkm_lift_hits_nonidentity"] > 0);
+        assert!(
+            lifted.solver_totals().unwrap().calls > blind.solver_totals().unwrap().calls,
+            "every extra F4 call is charged"
+        );
+
+        // h = 1: the fiber is trivial and lifts=1 is the blind oracle.
+        let inst1 = instance();
+        let fb1 = base(&inst1, 3);
+        let (_, p1) = Params::parse_spec("pkm-semaev:m=2,lifts=1").unwrap();
+        let mut o1 = PkmSemaevOracle::new(2, 3, 1);
+        o1.prepare(&ctx(&inst1), &fb1, &p1, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(o1.setup_native()["pkm_fiber_size"], 1);
+        let mut o0 = oracle(&inst1, &fb1, 2, 3, "m=2");
+        let mut rng = StdRng::seed_from_u64(5);
+        for _ in 0..20 {
+            let tg = inst1
+                .curve
+                .mul(&mut ops, inst1.generator_point(), rng.gen_range(1..inst1.r));
+            let run = |o: &mut PkmSemaevOracle| {
+                o.decompose(
+                    &ctx(&inst1),
+                    &fb1,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    tg,
+                )
+            };
+            assert_eq!(run(&mut o1), run(&mut o0));
+        }
+        assert_eq!(
+            o1.solver_totals().unwrap().calls,
+            o0.solver_totals().unwrap().calls
+        );
     }
 }

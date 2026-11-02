@@ -1461,7 +1461,7 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 /// oracle returned, re-checked here by summing the points.
 #[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
-    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full")
+    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full", false)
 }
 
 /// `f4cost` with the number of summands `m` (2 or 3) and the presentation
@@ -1478,6 +1478,7 @@ fn f4cost_m(
     cap_s: u64,
     nsum: u32,
     mode: &str,
+    lifts: bool,
 ) -> Value {
     use crypto_lib::cryptanalysis::ic_boundary::{
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
@@ -1536,18 +1537,22 @@ fn f4cost_m(
         }
         o => panic!("form is bits or isogeny, not {o}"),
     };
-    let spec = if guess > 0 {
+    let mut spec = if guess > 0 {
         format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
     } else {
         format!("pkm-semaev:m={nsum},mode={mode}")
     };
+    if lifts {
+        spec.push_str(",lifts=1");
+    }
     let (_, params) = Params::parse_spec(&spec).unwrap();
+    let mut setup_ops = GroupOps::default();
     oracle
-        .prepare(&ctx, &fb, &params, &mut GroupOps::default())
+        .prepare(&ctx, &fb, &params, &mut setup_ops)
         .expect("prepare");
     let started = std::time::Instant::now();
     let mut st = seed;
-    let (mut done, mut hits, mut verified) = (0u64, 0u64, 0u64);
+    let (mut done, mut hits, mut verified, mut exact) = (0u64, 0u64, 0u64, 0u64);
     for _ in 0..targets {
         if started.elapsed().as_secs() >= cap_s {
             break;
@@ -1567,7 +1572,18 @@ fn f4cost_m(
             let s = idx.iter().fold(inst.curve.identity(), |acc, &i| {
                 inst.curve.add(&mut GroupOps::default(), acc, fb.points[i])
             });
-            if s == target {
+            exact += u64::from(s == target);
+            // The pipeline writes rows over [h]P, so a lift R + K (K in E[h])
+            // is accepted when the projected sums agree; without lifts the
+            // sum must be R itself.
+            let ok = if lifts {
+                let mut o = GroupOps::default();
+                inst.curve.mul(&mut o, s, inst.cofactor)
+                    == inst.curve.mul(&mut o, target, inst.cofactor)
+            } else {
+                s == target
+            };
+            if ok {
                 verified += 1;
             }
         }
@@ -1614,6 +1630,11 @@ fn f4cost_m(
         "wall_s": started.elapsed().as_secs_f64(),
         "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
         "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
+        "lifts": lifts, "hits_exact": exact,
+        "calls_per_target": tot.calls as f64 / done.max(1) as f64,
+        "muladds_per_hit": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
+        "setup_group_ops": setup_ops.adds + setup_ops.doubles,
+        "setup_native": oracle.setup_native(),
         "hits": hits, "hits_verified": verified,
         "hit_rate": hits as f64 / done.max(1) as f64,
         "native": native,
@@ -1770,7 +1791,7 @@ fn main() {
             );
         }
         "f4cost" => {
-            // f4cost <k> <bits|isogeny> <t> <guess> <targets> <seed> [cap_s]
+            // f4cost <k> <bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1]
             let k: u32 = args[2].parse().unwrap();
             let t: u32 = args[4].parse().unwrap();
             let g: u32 = args[5].parse().unwrap();
@@ -1780,10 +1801,13 @@ fn main() {
             // Optional: <m> <mode> (default 2 full, the original measurement).
             let nsum: u32 = args.get(9).map_or(2, |v| v.parse().unwrap());
             let mode = args.get(10).map_or("full", String::as_str);
+            let lifts = args.get(11).is_some_and(|v| v == "1");
             println!(
                 "{}",
-                serde_json::to_string(&f4cost_m(k, &args[3], t, g, n, seed, cap, nsum, mode))
-                    .unwrap()
+                serde_json::to_string(&f4cost_m(
+                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts
+                ))
+                .unwrap()
             );
         }
         "summarise" => {
