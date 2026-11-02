@@ -385,6 +385,7 @@ pub mod three_leads_followup;
 pub mod tls12_kdf;
 pub mod tls13_kdf;
 pub mod twist24_rep;
+pub mod twist24_shortfall;
 pub mod two_rank_null;
 pub mod two_sylow_search;
 pub mod visual_demos;
