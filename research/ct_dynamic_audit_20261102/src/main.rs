@@ -18,8 +18,8 @@ use std::fs;
 use std::hint::black_box;
 use std::path::Path;
 
-use crypto::ecc::curve::CurveParams;
-use crypto::ecc::keys::EccPrivateKey;
+use crypto_lib::ecc::curve::CurveParams;
+use crypto_lib::ecc::keys::EccPrivateKey;
 use num_bigint::BigUint;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
@@ -150,30 +150,30 @@ fn call(target: &str, s: &[u8], ctx: &Ctx) {
             k.copy_from_slice(s);
             let mut u = [0u8; 32];
             u[0] = 9;
-            black_box(crypto::ecc::x25519::x25519(&k, &u));
+            black_box(crypto_lib::ecc::x25519::x25519(&k, &u));
         }
-        "smul_p256" => { black_box(crypto::ecc::ct::scalar_mul_secret(&ctx.p256.generator(), &big(), &ctx.p256)); }
-        "smul_secp256k1" => { black_box(crypto::ecc::ct::scalar_mul_secret(&ctx.secp.generator(), &big(), &ctx.secp)); }
-        "smul_sm2_generic" => { black_box(crypto::ecc::ct::scalar_mul_secret(&ctx.sm2.generator(), &big(), &ctx.sm2)); }
-        "inv_prime_ct" => { black_box(crypto::utils::mod_inverse_prime_ct(&big(), &ctx.p256.n)); }
+        "smul_p256" => { black_box(crypto_lib::ecc::ct::scalar_mul_secret(&ctx.p256.generator(), &big(), &ctx.p256)); }
+        "smul_secp256k1" => { black_box(crypto_lib::ecc::ct::scalar_mul_secret(&ctx.secp.generator(), &big(), &ctx.secp)); }
+        "smul_sm2_generic" => { black_box(crypto_lib::ecc::ct::scalar_mul_secret(&ctx.sm2.generator(), &big(), &ctx.sm2)); }
+        "inv_prime_ct" => { black_box(crypto_lib::utils::mod_inverse_prime_ct(&big(), &ctx.p256.n)); }
         "inv_euclid" => {
             let one_plus_d = (BigUint::from(1u32) + big()) % &ctx.sm2.n;
-            black_box(crypto::utils::mod_inverse(&one_plus_d, &ctx.sm2.n));
+            black_box(crypto_lib::utils::mod_inverse(&one_plus_d, &ctx.sm2.n));
         }
         "ed25519_sign" => {
             let mut seed = [0u8; 32];
             seed.copy_from_slice(s);
-            black_box(crypto::ecc::ed25519::ed25519_sign(MSG, &seed));
+            black_box(crypto_lib::ecc::ed25519::ed25519_sign(MSG, &seed));
         }
         "ecdsa_p256_sign" => {
             let key = EccPrivateKey { scalar: big(), curve_name: ctx.p256.name.to_string() };
-            black_box(crypto::ecc::ecdsa::sign(MSG, &key, &ctx.p256));
+            black_box(crypto_lib::ecc::ecdsa::sign(MSG, &key, &ctx.p256));
         }
         "sm2_sign" => {
             // The public key is derived outside the tainted region (see `taint`), so only signing is inspected.
             let d = big();
-            let pa = crypto::ecc::ct::scalar_mul_secret(&ctx.sm2.generator(), &d, &ctx.sm2);
-            black_box(crypto::ecc::sm2::sign(MSG, &d, &pa, b"ALICE123@YAHOO.COM", &ctx.sm2));
+            let pa = crypto_lib::ecc::ct::scalar_mul_secret(&ctx.sm2.generator(), &d, &ctx.sm2);
+            black_box(crypto_lib::ecc::sm2::sign(MSG, &d, &pa, b"ALICE123@YAHOO.COM", &ctx.sm2));
         }
         other => panic!("unknown target {other}"),
     }
@@ -207,11 +207,11 @@ fn run_taint(target: &str) {
         if target == "sm2_sign" {
             // derive the public key while the secret is still defined; only `sign` is inspected
             let d = BigUint::from_bytes_be(&s);
-            let pa = crypto::ecc::ct::scalar_mul_secret(&ctx.sm2.generator(), &d, &ctx.sm2);
+            let pa = crypto_lib::ecc::ct::scalar_mul_secret(&ctx.sm2.generator(), &d, &ctx.sm2);
             let mut sec = s.clone();
             undefine(&mut sec);
             let d_t = BigUint::from_bytes_be(&sec);
-            black_box(crypto::ecc::sm2::sign(MSG, &d_t, &pa, b"ALICE123@YAHOO.COM", &ctx.sm2));
+            black_box(crypto_lib::ecc::sm2::sign(MSG, &d_t, &pa, b"ALICE123@YAHOO.COM", &ctx.sm2));
             define(&mut sec);
             continue;
         }
