@@ -1368,6 +1368,14 @@ pub struct QuarticSolve {
     pub pivot_count_mismatches: u64,
     #[serde(skip)]
     pub pivot_digest: u64,
+    /// E40 (§9.50): Macaulay cells the profile build stores (rows kept from
+    /// their lead on); zero, and absent from the JSON, for every other solver.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub macaulay_stored_entries: u64,
+    /// E40: native operations the profile storage adds (each use of a row's
+    /// offset); zero and absent for every other solver.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub profile_offset_ops: u64,
 }
 
 fn is_zero(v: &u64) -> bool {
