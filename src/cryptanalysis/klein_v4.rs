@@ -91,7 +91,7 @@ fn leading(f: &HashMap<[u8; 4], u64>) -> Option<[u8; 4]> {
 
 /// Make the leading monomials pairwise distinct (as `gaudry_quartic`'s
 /// `triangularise_leads4`, in the weighted order).
-fn triangularise(
+pub(crate) fn triangularise(
     comps: &[HashMap<[u8; 4], u64>],
     p: u64,
     muls: &mut u64,
