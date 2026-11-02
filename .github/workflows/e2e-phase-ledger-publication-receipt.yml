@@ -71,7 +71,8 @@ jobs:
             'research/e2e_phase_ledger_20261101/diagnostic/verify-publication-receipt' \
             | sha256sum -c -
           research/e2e_phase_ledger_20261101/diagnostic/verify-publication-receipt \
-            "$RUNNER_TEMP/publication" "$RUNNER_TEMP/publication-receipt.json"
+            "$RUNNER_TEMP/publication/isolab-publication-41362392013-1" \
+            "$RUNNER_TEMP/publication-receipt.json"
           jq -c . "$RUNNER_TEMP/publication-receipt.json"
           jq -r '
             "Fixed publication receipt verified.\n\n" +
