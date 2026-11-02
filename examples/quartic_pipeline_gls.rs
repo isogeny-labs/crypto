@@ -73,6 +73,14 @@ fn main() {
             "--karatsuba" => {
                 crypto_lib::cryptanalysis::gaudry_quartic::set_karatsuba_default(true);
             }
+            "--stream-salt" => {
+                // E37 (§9.44): a fresh target stream on the same rows; 0 = E25's.
+                i += 1;
+                let v = args[i].trim_start_matches("0x");
+                crypto_lib::cryptanalysis::quartic_folds::set_stream_salt(
+                    u64::from_str_radix(v, 16).expect("--stream-salt <hex>"),
+                );
+            }
             "--json" => {
                 i += 1;
                 json = Some(args[i].clone());
@@ -118,6 +126,10 @@ fn main() {
                 let mut v = serde_json::to_value(&r).unwrap();
                 v["experiment"] = Value::from("e25");
                 v["arm"] = Value::from(arm);
+                let salt = crypto_lib::cryptanalysis::quartic_folds::stream_salt();
+                if salt != 0 {
+                    v["stream_salt"] = Value::from(format!("{salt:#x}"));
+                }
                 rows.push(v);
                 if let Some(path) = &json {
                     fs::write(path, serde_json::to_string_pretty(&rows).unwrap())

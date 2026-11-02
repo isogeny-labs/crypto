@@ -19,7 +19,8 @@
 use std::env;
 use std::fs;
 
-use crypto_lib::cryptanalysis::quartic_folds::run_k4_v4_pipeline;
+use crypto_lib::cryptanalysis::klein_v4::V4Solver;
+use crypto_lib::cryptanalysis::quartic_folds::run_k4_v4_pipeline_with;
 use serde_json::Value;
 
 fn main() {
@@ -30,6 +31,7 @@ fn main() {
     let mut rho_runs = 16usize;
     let mut max_residuals = 200_000u64;
     let mut json: Option<String> = None;
+    let mut solver = V4Solver::Macaulay;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -60,6 +62,22 @@ fn main() {
                 i += 1;
                 json = Some(args[i].clone());
             }
+            // E37 (§9.44): the solver, Karatsuba products and a fresh target
+            // stream; without them the run is E24's.
+            "--solver" => {
+                i += 1;
+                solver = V4Solver::parse(&args[i]).expect("--solver");
+            }
+            "--karatsuba" => {
+                crypto_lib::cryptanalysis::gaudry_quartic::set_karatsuba_default(true);
+            }
+            "--stream-salt" => {
+                i += 1;
+                let v = args[i].trim_start_matches("0x");
+                crypto_lib::cryptanalysis::quartic_folds::set_stream_salt(
+                    u64::from_str_radix(v, 16).expect("--stream-salt <hex>"),
+                );
+            }
             other => panic!("unknown argument {other}"),
         }
         i += 1;
@@ -67,7 +85,7 @@ fn main() {
     let mut rows: Vec<Value> = Vec::new();
     for &p in &sizes {
         for seed in first_seed..first_seed + seeds {
-            let r = match run_k4_v4_pipeline(p, seed, rho_runs, max_residuals) {
+            let r = match run_k4_v4_pipeline_with(p, seed, rho_runs, max_residuals, solver) {
                 Ok(r) => r,
                 Err(e) => {
                     eprintln!("e24 p={p} seed={seed}: {e}");
@@ -91,6 +109,10 @@ fn main() {
             );
             let mut v = serde_json::to_value(&r).unwrap();
             v["experiment"] = Value::from("e24");
+            let salt = crypto_lib::cryptanalysis::quartic_folds::stream_salt();
+            if salt != 0 {
+                v["stream_salt"] = Value::from(format!("{salt:#x}"));
+            }
             rows.push(v);
             if let Some(path) = &json {
                 fs::write(path, serde_json::to_string_pretty(&rows).unwrap()).expect("write json");

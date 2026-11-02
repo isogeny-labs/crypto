@@ -2382,6 +2382,23 @@ struct Setup {
 /// drawn in parallel batches, each decomposed by `decompose`, one verified
 /// decomposition per target as a folded row, Wiedemann until `[d]G = Q`.
 #[allow(clippy::too_many_arguments)]
+/// E37 (§9.44): the target stream's salt.  `0` (the default) is the
+/// existing stream, byte for byte; otherwise [`collect_and_solve`] reseeds
+/// the target generator `StdRng(seed ^ salt)` after the factor base and the
+/// precompute and derives the per-target seeds from `seed ^ salt`.  The
+/// factor base, precompute and rho walks do not depend on it.
+static STREAM_SALT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+/// Set the target stream's salt (E37); `0` restores the existing stream.
+pub fn set_stream_salt(salt: u64) {
+    STREAM_SALT.store(salt, std::sync::atomic::Ordering::Relaxed);
+}
+
+/// The target stream's salt (E37).
+pub fn stream_salt() -> u64 {
+    STREAM_SALT.load(std::sync::atomic::Ordering::Relaxed)
+}
+
 fn collect_and_solve(
     inst: &FoldInstance4,
     fb: &FoldedBase4,
@@ -2420,13 +2437,22 @@ fn collect_and_solve(
     let (mut lift_muls, mut check_muls, mut entries) = (0u64, 0u64, 0u64);
     let mut solve_ms = 0.0;
     let threads = rayon::current_num_threads().max(1);
+    let salt = stream_salt();
+    let mut salted;
+    let rng: &mut StdRng = if salt == 0 {
+        rng
+    } else {
+        salted = StdRng::seed_from_u64(seed ^ salt);
+        &mut salted
+    };
+    let sseed = seed ^ salt;
     while residuals < max_residuals && !folded.rep.solved {
         let batch: Vec<(u64, u64, u64)> = (0..threads as u64 * 2)
             .map(|k| {
                 (
                     rng.gen_range(0..n),
                     rng.gen_range(1..n),
-                    mix64(seed ^ (residuals + k).wrapping_mul(0x9E37_79B9_7F4A_7C15)),
+                    mix64(sseed ^ (residuals + k).wrapping_mul(0x9E37_79B9_7F4A_7C15)),
                 )
             })
             .collect();
@@ -3245,6 +3271,25 @@ pub fn run_k4_v4_pipeline(
     rho_runs: usize,
     max_residuals: u64,
 ) -> Result<K4PipelineReport, String> {
+    run_k4_v4_pipeline_with(
+        p,
+        seed,
+        rho_runs,
+        max_residuals,
+        super::klein_v4::V4Solver::Macaulay,
+    )
+}
+
+/// [`run_k4_v4_pipeline`] (E24) with the solver chosen (E37, §9.44): the
+/// Macaulay solver reproduces E24's record; any other is tagged as E25's
+/// pipeline tags it.
+pub fn run_k4_v4_pipeline_with(
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    max_residuals: u64,
+    solver: super::klein_v4::V4Solver,
+) -> Result<K4PipelineReport, String> {
     let start = Instant::now();
     let ki = generate_klein_instance(p, seed, 16)?;
     let inst = ki.inst;
@@ -3287,19 +3332,9 @@ pub fn run_k4_v4_pipeline(
             fp_muls_per_add,
             start,
             matched: RhoFold::Negation,
-            solver: None,
+            solver: (solver != super::klein_v4::V4Solver::Macaulay).then(|| solver.name()),
         },
-        &|r: &Pt4, tseed: u64| {
-            v4_decompose(
-                &ki,
-                &pre,
-                base,
-                &by_z,
-                r,
-                tseed,
-                super::klein_v4::V4Solver::Macaulay,
-            )
-        },
+        &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed, solver),
     )
 }
 
