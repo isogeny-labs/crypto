@@ -5,10 +5,11 @@
 //! * `audit <export> <out.json>`: scans every public file of a native `crypto dataset export` for restricted material
 //!   (forbidden keys inside `inputs`, and every known-answer / recovered scalar as a literal anywhere in the public
 //!   bytes), and writes the allowlist of input field paths actually present. Exit 1 on any finding.
-//! * `join <export> <table.jsonl> [--canary]`: the *evaluator* side. Reads restricted labels, featurises **public
+//! * `join <export> <table.jsonl> [--endpoint completion|ecdlp] [--canary]`: the *evaluator* side. Reads restricted labels, featurises **public
 //!   inputs only** into engineered descriptors, adds the attempted arm as a one-hot *query* input, and labels each row
 //!   verified = 1 / censored-at-cap = 0 (budget_exhausted, timeout, partial). Unsupported arms are excluded and
-//!   counted. `--canary` appends a column equal to the label: the positive control for the leakage tooling only.
+//!   counted. `--endpoint ecdlp` instead labels 1 only an independently recovered and replayed scalar (a verified
+//!   "no decomposition exists" enumeration is a completed computation but not an ECDLP solve). `--canary` appends a column equal to the label: the positive control for the leakage tooling only.
 //! * `train <table.jsonl> <out dir>`: leave-one-component-out evaluation over the exporter's `split_component`, with
 //!   a stratum-majority baseline (arm x family x m), logistic regression and a small MLP; a within-stratum label
 //!   permutation negative control; Brier score, log loss, accuracy and calibration bins. Development-only: nothing
@@ -117,21 +118,32 @@ fn featurize(inp: &Value) -> Vec<(String, f64)> {
     f
 }
 
-fn join(export: &Path, table: &Path, canary: bool) {
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum Endpoint { Completion, Ecdlp }
+
+/// The label of one restricted target row, or None (excluded) for statuses outside the event/censor set.
+fn label_of(labels: &Value, endpoint: Endpoint) -> Option<f64> {
+    let status = labels["status"].as_str().unwrap_or("missing");
+    let completed = match status { "verified" => true, "budget_exhausted" | "timeout" | "partial" => false, _ => return None };
+    Some(match endpoint {
+        Endpoint::Completion => completed as u8 as f64,
+        Endpoint::Ecdlp => (completed && labels["scalar_recovered_without_witness"] == json!(true)
+            && labels["scalar_replay_verified"] == json!(true)) as u8 as f64,
+    })
+}
+
+fn join(export: &Path, table: &Path, endpoint: Endpoint, canary: bool) {
     let feats: HashMap<String, Value> = read_jsonl(&export.join("features.jsonl")).into_iter()
         .map(|r| (r["feature_id"].as_str().unwrap().to_string(), r)).collect();
     let mut out = String::new();
     let mut excluded: BTreeMap<String, usize> = BTreeMap::new();
     let mut kept = 0;
+    let mut positives = 0;
     let mut names: Vec<String> = Vec::new();
     for t in read_jsonl(&export.join("restricted/targets.jsonl")) {
         let status = t["labels"]["status"].as_str().unwrap_or("missing").to_string();
         let arm = t["solver"].as_str().unwrap_or("").to_string();
-        let label = match status.as_str() {
-            "verified" => 1.0,
-            "budget_exhausted" | "timeout" | "partial" => 0.0,
-            other => { *excluded.entry(format!("status:{other}")).or_default() += 1; continue; }
-        };
+        let Some(label) = label_of(&t["labels"], endpoint) else { *excluded.entry(format!("status:{status}")).or_default() += 1; continue };
         let Some(fid) = t["feature_id"].as_str() else { *excluded.entry("no_feature_identity".into()).or_default() += 1; continue };
         let Some(row) = feats.get(fid) else { *excluded.entry("feature_row_missing".into()).or_default() += 1; continue };
         if !ARMS.contains(&arm.as_str()) { *excluded.entry(format!("arm:{arm}")).or_default() += 1; continue; }
@@ -144,13 +156,18 @@ fn join(export: &Path, table: &Path, canary: bool) {
             "x": f.iter().map(|x| x.1).collect::<Vec<_>>()}).to_string());
         out.push('\n');
         kept += 1;
+        positives += (label == 1.0) as usize;
     }
     fs::write(table, &out).unwrap();
     fs::write(table.with_extension("meta.json"), serde_json::to_string_pretty(&json!({
         "schema": "ecdlp-dataset-models.table/v1", "feature_names": names, "rows": kept, "excluded": excluded, "canary": canary,
-        "label": "1 = verified within the fixed work cap; 0 = right-censored at the cap (budget_exhausted, timeout, partial)",
+        "endpoint": format!("{endpoint:?}").to_lowercase(),
+        "label": match endpoint {
+            Endpoint::Completion => "1 = verified completion within the fixed work cap; 0 = right-censored at the cap (budget_exhausted, timeout, partial)",
+            Endpoint::Ecdlp => "1 = scalar recovered without the witness and independently replayed within the cap; 0 = otherwise (censored, or completed without a scalar)",
+        },
         "query_input": "arm_* one-hot: the method being attempted, chosen before any outcome exists"})).unwrap() + "\n").unwrap();
-    println!("join: {kept} rows, excluded {excluded:?}, {} features{}", names.len(), if canary { " (+ LEAK CANARY)" } else { "" });
+    println!("join[{endpoint:?}]: {kept} rows ({} positive), excluded {excluded:?}, {} features{}", positives, names.len(), if canary { " (+ LEAK CANARY)" } else { "" });
 }
 
 // ------------------------------------------------------------------ models
@@ -337,9 +354,17 @@ fn main() {
     let a: Vec<String> = std::env::args().collect();
     match a.get(1).map(String::as_str) {
         Some("audit") => { if !audit(Path::new(&a[2]), Path::new(&a[3])) { std::process::exit(1); } }
-        Some("join") => join(Path::new(&a[2]), Path::new(&a[3]), a.get(4).map(String::as_str) == Some("--canary")),
+        Some("join") => {
+            let flags = &a[4..];
+            let endpoint = match flags.iter().position(|f| f == "--endpoint").map(|i| flags.get(i + 1).map(String::as_str)) {
+                None | Some(Some("completion")) => Endpoint::Completion,
+                Some(Some("ecdlp")) => Endpoint::Ecdlp,
+                other => { eprintln!("join: --endpoint must be completion or ecdlp, got {other:?}"); std::process::exit(2) }
+            };
+            join(Path::new(&a[2]), Path::new(&a[3]), endpoint, flags.iter().any(|f| f == "--canary"))
+        }
         Some("train") => train(Path::new(&a[2]), Path::new(&a[3])),
-        _ => eprintln!("usage: ecdlp-dataset-models audit <export> <out.json> | join <export> <table.jsonl> [--canary] | train <table.jsonl> <out dir>"),
+        _ => eprintln!("usage: ecdlp-dataset-models audit <export> <out.json> | join <export> <table.jsonl> [--endpoint completion|ecdlp] [--canary] | train <table.jsonl> <out dir>"),
     }
 }
 
@@ -408,7 +433,7 @@ mod tests {
     #[test]
     fn join_uses_public_inputs_and_censors_at_cap() {
         let d = tmp("join"); synthetic_export(&d, false, false);
-        join(&d, &d.join("t.jsonl"), false);
+        join(&d, &d.join("t.jsonl"), Endpoint::Completion, false);
         let rows = load(&d.join("t.jsonl"));
         assert_eq!(rows.len(), 72);
         assert!(rows.iter().any(|r| r.y == 0.0) && rows.iter().any(|r| r.y == 1.0));
@@ -419,7 +444,7 @@ mod tests {
     #[test]
     fn canary_column_is_learned_positive_control() {
         let d = tmp("canary"); synthetic_export(&d, false, false);
-        join(&d, &d.join("t.jsonl"), true);
+        join(&d, &d.join("t.jsonl"), Endpoint::Completion, true);
         let rows = load(&d.join("t.jsonl"));
         let r = evaluate(&rows);
         assert_eq!(r["components"], 2);
@@ -427,9 +452,23 @@ mod tests {
     }
 
     #[test]
+    fn ecdlp_endpoint_needs_a_replayed_scalar() {
+        let exhaustive = json!({"status": "verified", "scalar_recovered_without_witness": false, "scalar_replay_verified": false});
+        let solved = json!({"status": "verified", "scalar_recovered_without_witness": true, "scalar_replay_verified": true});
+        let unreplayed = json!({"status": "verified", "scalar_recovered_without_witness": true, "scalar_replay_verified": false});
+        let capped = json!({"status": "budget_exhausted", "scalar_recovered_without_witness": true, "scalar_replay_verified": true});
+        assert_eq!(label_of(&exhaustive, Endpoint::Completion), Some(1.0));
+        assert_eq!(label_of(&exhaustive, Endpoint::Ecdlp), Some(0.0));
+        assert_eq!(label_of(&solved, Endpoint::Ecdlp), Some(1.0));
+        assert_eq!(label_of(&unreplayed, Endpoint::Ecdlp), Some(0.0));
+        assert_eq!(label_of(&capped, Endpoint::Ecdlp), Some(0.0));
+        assert_eq!(label_of(&json!({"status": "unsupported"}), Endpoint::Ecdlp), None);
+    }
+
+    #[test]
     fn permutation_keeps_stratum_label_counts() {
         let d = tmp("perm"); synthetic_export(&d, false, false);
-        join(&d, &d.join("t.jsonl"), false);
+        join(&d, &d.join("t.jsonl"), Endpoint::Completion, false);
         let mut rows = load(&d.join("t.jsonl"));
         let before: BTreeMap<String, f64> = rows.iter().fold(BTreeMap::new(), |mut m, r| { *m.entry(r.stratum.clone()).or_default() += r.y; m });
         permute_within_stratum(&mut rows, 7);
