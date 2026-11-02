@@ -32,3 +32,15 @@ Counted: group additions per solved target (walk steps + 2 per walk start + scal
 Sizes 18, 20, 22 bits (curves as in the main protocol), 16 trials per cell, seed offset 500000 (fresh, distinct from the earlier 20-bit exploratory run).
 Measures: (M1) per-target cost vs T for each B and size; (M2) B=1/B=0 ratio vs T; (M3) per-target cost at T relative to T = 1 (the multi-target gain), against the sqrt(T) ideal.
 Reference for any "parity" statement: B = 0 at the same T (multi-target rho), never single-target rho. No negation map, no distinguished points (table memory reported, not charged).
+
+## Amendment 2 (2026-11-02, before any data under it): triple large primes with the existing Gaudry engine on E/F_{p^3}
+Reason: the prime-field k-LP script (scripts/klp.py) could not be written in this session. The repository already has a tested
+Gaudry index calculus with an arbitrary-count large-prime eliminator (`src/cryptanalysis/gaudry_cubic.rs`, `GaudryOptions.max_large_primes`,
+`small_base`; relations are 3-point decompositions, so at most 3 large primes per relation: quadruple is not expressible there).
+**Different setting from the main protocol:** curves over the cubic extension F_{p^3} (where a subfield factor base exists), not prime fields.
+Driver `examples/klp_cubic.rs` (calls only existing library functions): `generate_instance3(p, seed)`, `SubspaceBase::build`,
+`run_gaudry_opts` with max_large_primes in {0, 1, 2, 3}, and `run_rho3` as the matched rho on the same instance.
+Small base |F'| = ceil(|F|^e) with e in {2/3, 3/4} for max_large_primes >= 1 (Gaudry's |F|^(1-1/n) is 2/3 at n = 3); e = 1 (no large primes) for max_large_primes = 0.
+p in {61, 103, 151} (p = 1 mod 3), 8 instances (seeds) each, max_residuals 2e6. Every IC and rho answer checked (report `correct`).
+Measure: the engine's own S (total_ops / sqrt(n), F_p multiplications converted with its fp_muls_per_add) per arm, ratio to rho's S on the same instance, and
+the fitted exponent of log2(total_ops) on log2(n) per arm. Unpriced native work as the engine reports it; no new pricing introduced.
