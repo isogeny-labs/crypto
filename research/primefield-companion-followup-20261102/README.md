@@ -87,3 +87,20 @@ Meter-count validation remains pending. Setup has derived classical O(n s^2)
 cost, and smaller width helps only when later query savings repay that cost.
 No frozen numerical caller was changed. See its DERIVATION.md and
 reports/design/report.pdf for the proof, exact arithmetic schedule and prior art.
+
+## Added construction: structured solve or normalized witness
+
+`companion-rank-solver/` connects compression, explicit same-field row/column
+pivots, scalar leading inverses and Schur primal/dual lifts. It is a separate
+iterative scalar-pivot route; no frozen program is changed. Under the stated
+field/operator and primitive-correctness assumptions, the derivation covers
+singular compatible and incompatible systems, returning either Ax=b or a
+normalized A^T w=0, w^T b=1 witness checked against the original operator.
+Feature annihilation remains a separate unchecked requirement.
+
+Source revision afc04886374411a8d982c67bc315f506f89fc8d2; nine original files
+bound by its own publication.json. Two Python files are syntax checked; the
+one-page report is rendered and visually inspected. Numerical trials remain
+zero. This path charges pivot searches, swaps, scalar solves, compression,
+Schur setup and root verification; it does not inherit balanced-inverse speed
+or memory bounds. See DERIVATION.md for transport identities and costs.
