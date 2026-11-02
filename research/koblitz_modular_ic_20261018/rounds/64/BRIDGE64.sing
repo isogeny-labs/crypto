@@ -15,7 +15,7 @@ ideal wrongEquations64=oldWrong64(source53);
 require64(reduce(wrongEquations64[1],actualGB64)!=0,"BRIDGE64_CHANGED_QUADRATIC_COORDINATE_REJECTED");
 map oldCoefficient64=compactPid51,1/u;
 require64(oldCoefficient64(oldZ64)==1/u,"BRIDGE64_COEFFICIENT_INVERSION");
-matrix H64=oldCoefficient64(matrix(basis51));
+matrix H64=matrix(oldCoefficient64(basis51));
 poly D64=oldCoefficient64(commonDenominator51);
 require64(nrows(H64)==32 && ncols(H64)==32 && D64!=0,"BRIDGE64_COMPACT_PID_BASIS_SHAPE");
 matrix imageColumns64[32][32];list imageFunctions64;

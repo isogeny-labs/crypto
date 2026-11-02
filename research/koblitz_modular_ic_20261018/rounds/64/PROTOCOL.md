@@ -29,3 +29,13 @@ pass. Affine integral closure, both proper charts, local valuations,
 polarization and subgroup transfer remain separate. After a successful
 bridge, run the complete descending Frobenius normalization prescribed in
 NORMALIZATION-LEAD.md with the R61 trace Gram and multiplication table.
+
+## Version 2 source-ring map repair
+`bridge64-01` is rejected in full despite a late marker. Both mapped old
+source equations, the changed-quadratic negative and coefficient inversion
+were reached without an assertion failure, but Singular reported that
+`basis51` was undefined when the source module was matrix-cast *before*
+the cross-ring map. The fresh script maps the source module first and then
+casts its image to a matrix. All 32 columns, rank, inverse products and
+negative controls retain their original acceptance requirements. The first
+attempt's partial values are diagnostic only.
