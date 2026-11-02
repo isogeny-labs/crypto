@@ -5350,3 +5350,74 @@ sampling noise in a 16-seed design, the order-24 walk sits on its `√24` ceilin
 `√6`, no walk-level fix of the shortfall exists to make (F is not measurably cheaper), and the matched reference on
 E18's `j = 0` curves is stronger than E34 reported: E18's `ψ`-arm rows move further from rho; the GLS IC rows do
 not move.
+
+### 9.53 E41 measured: the order-24 walk's step shortfall was sampling noise; no walk fix to make (F not measurably cheaper); the corrected reference is resolved at every weight — E18's `ψ` rows move `1.76`/`1.42`/`1.28×` from rho against E29's walk; the GLS IC rows do not move
+
+*2026-11-02.*  Code `b0e307d9b8` (`Jumps` option in `src/cryptanalysis/twist24_shortfall.rs`, default `Jumps::E34`;
+`examples/e41_run.rs`), tables `examples/e41_tables.rs` at `5d15482969`; binaries from clean `git archive` exports,
+sha256 in `experiments/48_twist24_shortfall/binary_sha256.txt`.  Records and `tables.md`, `summary.json` there (the
+three records over 1 MiB are identified by `.sha256` files: the artifact store needs the `aws` CLI, which this
+container lacks).  Report `research/e41_twist24_shortfall_20261102/REPORT.pdf`.  Local, one core per process,
+operation counts only.
+
+**Stage 0** (§9.52): E34's stored walks put order 6 at `0.924 ± 0.046` and order 24 at `1.086 ± 0.045` of their ideal;
+fruitless cycles `< 10⁻⁴` of the ideal, redirects `1/r` in both orders, no distinguished-point losses, ties cost no
+step.  **Checks:** with the fix off, `1,280/1,280` E34 Stage R records recomputed byte-identical; `0` wrong logs in
+`7,424` walks; the broken fix F̸ flagged on `32/32`; F's added work exactly `32` additions and `64` mod-`n`
+operations on all `1,280` F walks, zero elsewhere.  **Steps / ideal** (`1,024` walks each, schoolbook): O6B
+`0.969 ± 0.016`, O24 `1.006 ± 0.016`, O24F `0.999 ± 0.016`, O24′ `0.987 ± 0.016`; steps ratio order 6 / order 24
+`1.927` (`1.965` against the A/A stream; E34 `1.701`).
+
+| pooled ratio (> 1: second arm cheaper) | arithmetic | 0 GAE [95 %] | 0.1 GAE [95 %] | 1 GAE [95 %] | resolved |
+|:--|:--|:--|:--|:--|:--|
+| O6B / O24 | schoolbook | `1.761` [`1.686`, `1.836`] | `1.418` [`1.356`, `1.481`] | `1.275` [`1.218`, `1.332`] | **yes** (8/8 curves) |
+| O6C / O24 | schoolbook | `1.696` [`1.623`, `1.768`] | `1.320` [`1.262`, `1.378`] | `1.162` [`1.110`, `1.214`] | **yes** (7/8; 1 unresolved) |
+| O24 / O24F (the fix) | schoolbook | `1.021` [`0.978`, `1.064`] | `1.019` [`0.975`, `1.064`] | `1.018` [`0.973`, `1.064`] | no |
+| O24 / O24′ (A/A floor) | schoolbook | `1.019` | `1.019` | `1.020` | — |
+| O6B / O24 | Karatsuba (32 walks) | `1.711` | `1.369` | `1.249` | yes |
+| O6C / O24 | Karatsuba | `1.635` | `1.267` | `1.137` | yes |
+| O24 / O24F | Karatsuba | `0.984` | `0.981` | `0.979` | no |
+
+E34, 16 walks: O6B / cheap `1.563`, `1.254`, `1.126`; O6C / cheap `1.505`, `1.167`, `1.026`.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.216 | `1,280/1,280` byte-identical; no E41 commit touches `quartic_folds.rs` | **holds** |
+| G2.217 | `0` wrong logs in `7,424` walks | **holds** |
+| G2.218 | `32/32` flagged | **holds** |
+| G2.219 | O6B `0.969`, O24 `1.006`, steps ratio `1.927` | **falsified** (O6B below the registered `0.98`; ratio and O24 inside) |
+| G2.220 | A/A `1.019` / `1.019` / `1.020` | **holds** |
+| G2.221 | F `0.75 %` fewer steps (theory `0.8 %`); added work exact | **holds** |
+| G2.222 | O24 / O24F not resolved at any weight | **holds** (null: F is not measurably cheaper) |
+| G2.223 | `1.761` / `1.418` / `1.275`, resolved | **holds** |
+| G2.224 | `1.696` / `1.320` / `1.162`, resolved at `1` GAE | **holds** |
+| G2.225 | `7/8` curves | **holds** |
+| G2.226 | Karatsuba: the same orders | **holds** |
+| G2.227 | see below | derived |
+| G2.228 | `20` rows, factor `1` | derived |
+
+**E18's `ψ` rows (a reference correction).**  Against E29's order-6 walk, the band-ranked order-24 walk (O24) is
+`1.761×` (0 GAE), `1.418×` (0.1) and `1.275×` (1 GAE) cheaper, pooled, schoolbook (Karatsuba `1.711`, `1.369`, `1.249`).
+E18's `ψ`-arm distances to rho lengthen by these factors, not by E34's `1.563` / `1.254` / `1.126`.  The modelled
+handover (§9.3, `2^{146.0}`) moves later by `3.27` / `2.02` / `1.40` bits (E34: `2.58` / `1.31` / `0.68`).  The
+cheapest point estimates (`1.838` with O24L at 0 GAE, `1.446` and `1.298` with O24F) are not ranked against O24.
+
+**IC rows (E31 solver A/B with E27 products; the 20 GLS rows).**  Order 24 does not apply on these curves
+(`Aut = {±1}`, §9.33), and E41 changes no walk there.  Their matched reference stays walk (iii), so every distance is
+unchanged (factor `1`).  The old and new columns are listed side by side in `tables.md`: for example, `p = 101` seed 1
+arm A gives `7.664·10⁴`, `2.672·10⁵`, `1.371·10⁶` before and after; `p = 397` seed 1 arm A `1.103·10⁴`, `3.664·10⁴`,
+`1.563·10⁵`.  Rho is ahead of every row at every weight.
+
+**What it says.**  E34's step shortfall (`1.701` against `2`) was sampling noise in a 16-seed design: its order-6
+seeds ran `7.6 %` under the ideal and its order-24 seeds `8.6 %` over.  On fresh seeds both walks sit within a few
+per cent of their own ceiling, and no order-24-specific cause exceeds `0.1 %` of steps, so there is no walk defect
+to fix.  F targets the only systematic component, the r-adding excess common to both orders.  It cuts steps by
+`0.75 %` as theory predicts, but it is not measurably cheaper (null, as registered).  The order-6 walk ran `3 %`
+under its ideal on this stream (G2.219's falsified bound), so the steps ratio `1.927` is still below `2`; against
+the A/A stream it is `1.965`.  This is sampling, not a mechanism: Stage 0's fresh order-6 walks sat at `1.027`.
+The matched rho on E18's `j = 0` curves is the cheap order-24 walk, now **resolved at every weight** against both
+order-6 walks, including `1.162×` at `1` GAE against the cheap order-6 walk (E34's `1.026` was within noise).
+**Class: a reference correction and a re-measurement, not an index-calculus improvement.**  E18's rows move further
+from rho, and the GLS IC rows do not move.  The leaderboard, `benchmarks/` and the validation gate are left to the
+main session.  Unit tests were not run in this session, because release unit-test builds are excluded on this host.
+The identity run (`1,280/1,280`) covers what `e41_instrument_is_e34s_walk` asserts.
