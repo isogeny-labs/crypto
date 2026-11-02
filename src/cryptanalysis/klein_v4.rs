@@ -1126,13 +1126,16 @@ pub fn lift_back_v4(
 /// forward echelon, built by exactly the operations (and counts) of
 /// `solve_at`'s first half.
 pub(crate) struct Built {
-    cols: Vec<[u8; 4]>,
-    col_index: HashMap<[u8; 4], usize>,
-    comps: Vec<HashMap<[u8; 4], u64>>,
-    ech: super::gaudry_quartic::Echelon,
-    is_std: Vec<bool>,
-    standard: Vec<usize>,
-    std_index: Vec<u32>,
+    pub(crate) cols: Vec<[u8; 4]>,
+    pub(crate) col_index: HashMap<[u8; 4], usize>,
+    pub(crate) comps: Vec<HashMap<[u8; 4], u64>>,
+    pub(crate) ech: super::gaudry_quartic::Echelon,
+    pub(crate) is_std: Vec<bool>,
+    pub(crate) standard: Vec<usize>,
+    pub(crate) std_index: Vec<u32>,
+    /// E40 (§9.50): each row's first stored column when the rows are stored
+    /// from their lead on (`macaulay_profile`); empty for dense rows.
+    pub(crate) offs: Vec<u32>,
 }
 
 pub(crate) fn build_echelon(
@@ -1286,6 +1289,7 @@ pub(crate) fn build_echelon(
             st.pivot_digest = w.digest;
             ech
         }
+        Pivot::Profile(_) => unreachable!("the profile build is macaulay_profile::build_profile"),
     };
     st.echelon_muls += ech_muls;
     st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
@@ -1308,6 +1312,7 @@ pub(crate) fn build_echelon(
         is_std,
         standard,
         std_index,
+        offs: Vec::new(),
     })
 }
 
@@ -1491,6 +1496,8 @@ pub enum V4Solver {
     ChainEstK2,
     /// E36 L (negative control): the last row in arrival order.
     ChainLifo,
+    /// E40 (§9.50) V: A counted on rows stored from their lead.
+    ChainProfile,
 }
 
 /// The echelon's pivot rule in the chain solve: E31's (uncounted) or E33's
@@ -1511,6 +1518,9 @@ pub enum Pivot {
         super::chain_pivot_rules::ArrivalRule,
         super::chain_pivot_rules::RuleCheck,
     ),
+    /// E40 (§9.50): A's counted rule on rows stored from their lead
+    /// ([`super::macaulay_profile`]).
+    Profile(super::macaulay_profile::ProfileCheck),
 }
 
 impl V4Solver {
@@ -1529,6 +1539,7 @@ impl V4Solver {
             "chain-fifo-static" => Some(V4Solver::ChainFifoStatic),
             "chain-est-k2" => Some(V4Solver::ChainEstK2),
             "chain-lifo" => Some(V4Solver::ChainLifo),
+            "chain-profile" => Some(V4Solver::ChainProfile),
             _ => None,
         }
     }
@@ -1547,6 +1558,7 @@ impl V4Solver {
             V4Solver::ChainFifoStatic => "chain-fifo-static",
             V4Solver::ChainEstK2 => "chain-est-k2",
             V4Solver::ChainLifo => "chain-lifo",
+            V4Solver::ChainProfile => "chain-profile",
         }
     }
     /// E33: the solver emits its pivot-selection work.
@@ -1563,6 +1575,7 @@ impl V4Solver {
                 | V4Solver::ChainFifoStatic
                 | V4Solver::ChainEstK2
                 | V4Solver::ChainLifo
+                | V4Solver::ChainProfile
         )
     }
     /// The chain solve's pivot rule for this solver (`Macaulay` has none
@@ -1588,6 +1601,7 @@ impl V4Solver {
             V4Solver::ChainFifoStatic => rule(ArrivalRule::FifoStatic),
             V4Solver::ChainEstK2 => rule(ArrivalRule::EstimateK2),
             V4Solver::ChainLifo => rule(ArrivalRule::Lifo),
+            V4Solver::ChainProfile => Pivot::Profile(Default::default()),
         }
     }
 }
@@ -1719,8 +1733,17 @@ struct ChainQuotient {
 /// `Err` reproduces the existing solver's refusals ("1 or an unknown is
 /// not standard", "border unreachable"), decided structurally as it
 /// decides them.
-fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, String> {
+fn chain_quotient(
+    b: &Built,
+    p: u64,
+    muls: &mut u64,
+    offset_ops: &mut u64,
+) -> Result<ChainQuotient, String> {
     let ncols = b.cols.len();
+    // E40: a row stored from its lead is read through its offset (one
+    // operation per row read); dense rows have offset 0 and no charge.
+    let off = |r: u32| -> usize { b.offs.get(r as usize).map_or(0, |&o| o as usize) };
+    let profiled = u64::from(!b.offs.is_empty());
     let dim = b.standard.len();
     // E38 (§9.46): the pivot set and border targets this function reads.
     if super::chain_pivot_rules::probe_on() {
@@ -1760,8 +1783,10 @@ fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, St
         if probe {
             super::chain_pivot_rules::probe_read(0, c, pr, row);
         }
-        for j in (c + 1)..ncols {
-            if row[j] != 0 && !b.is_std[j] && !seen[j] {
+        *offset_ops += profiled;
+        for (i, &a) in row[c + 1 - off(pr)..].iter().enumerate() {
+            let j = c + 1 + i;
+            if a != 0 && !b.is_std[j] && !seen[j] {
                 seen[j] = true;
                 stack.push(j);
             }
@@ -1801,8 +1826,10 @@ fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, St
             }
             let nf_ = pp - f;
             let mut k = 0u64;
-            for j in (c + 1)..ncols {
-                let a = row[j] as u32;
+            *offset_ops += profiled;
+            for (i, &a) in row[c + 1 - off(b.ech.pivot_row[c])..].iter().enumerate() {
+                let j = c + 1 + i;
+                let a = a as u32;
                 if a != 0 {
                     acc[j] = (acc[j] + nf_ * a) % pp;
                     k += 1;
@@ -1952,12 +1979,17 @@ fn chain_at(
     pivot: Pivot,
     info: &mut ChainInfo,
 ) -> Result<Vec<[u64; 4]>, String> {
-    let b = build_echelon(comps, d, p, st, true, pivot)?;
+    let b = match pivot {
+        Pivot::Profile(check) => super::macaulay_profile::build_profile(comps, d, p, st, check)?,
+        _ => build_echelon(comps, d, p, st, true, pivot)?,
+    };
     let dim = b.standard.len();
     let t2 = Instant::now();
     let mut nf_muls = 0u64;
-    let q = chain_quotient(&b, p, &mut nf_muls);
+    let mut offset_ops = 0u64;
+    let q = chain_quotient(&b, p, &mut nf_muls, &mut offset_ops);
     st.nf_muls += nf_muls;
+    st.profile_offset_ops += offset_ops;
     st.nf_ms += t2.elapsed().as_secs_f64() * 1e3;
     let q = q?;
     st.reached_pivots = q.reached;
@@ -2102,6 +2134,8 @@ pub fn solve_weighted_chain_with(
             st.lead_scan_reads += spent.lead_scan_reads;
             st.pivot_count_mismatches += spent.pivot_count_mismatches;
             st.pivot_digest = spent.pivot_digest;
+            st.macaulay_stored_entries += spent.macaulay_stored_entries;
+            st.profile_offset_ops += spent.profile_offset_ops;
             st.build_ms += spent.build_ms;
             st.echelon_ms += spent.echelon_ms;
             st.nf_ms += spent.nf_ms;
@@ -2152,7 +2186,8 @@ pub fn solve_v4(
         | V4Solver::ChainStatic
         | V4Solver::ChainFifoStatic
         | V4Solver::ChainEstK2
-        | V4Solver::ChainLifo => {
+        | V4Solver::ChainLifo
+        | V4Solver::ChainProfile => {
             let (s, d, info) =
                 solve_weighted_chain_with(comps, MACAULAY_BOUND, p, rng, st, solver.pivot());
             (s, d, info.fell_back)
@@ -2173,7 +2208,7 @@ pub fn chain_quotient_agrees(
     let mut st = QuarticSolve::default();
     let b = build_echelon(comps, d, p, &mut st, true, Pivot::Uncounted { sparsest }).ok()?;
     let mut scratch = 0u64;
-    let q = chain_quotient(&b, p, &mut scratch).ok()?;
+    let q = chain_quotient(&b, p, &mut scratch, &mut 0).ok()?;
     let dim = b.standard.len();
     let ours = chain_mult_matrix(&q, dim);
     let mut nfs = NormalForms4 {
