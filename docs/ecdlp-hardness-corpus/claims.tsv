@@ -1,0 +1,102 @@
+id	kind	status	model	evidence_class	formula	source_refs
+PROB-ECDLP	definition	definition	mathematical	-	-	-
+ASM-CLASSICAL-ECDLP	assumption	assumed	classical_unrestricted	-	-	-
+PROB-CDH	definition	definition	mathematical	-	-	-
+PROB-DDH	definition	definition	mathematical	-	-	-
+RED-CDH-DLP	reduction	proved_external	mathematical	-	-	S-SHOUP-1997
+RED-DDH-CDH	reduction	proved_external	mathematical	-	-	S-CGK-2018
+THEOREM-RANDOM-SELF-REDUCTION	structural_theorem	proved_external	mathematical	-	-	S-CGK-2018
+ALG-POHLIG-HELLMAN	algorithmic_upper_bound	algorithm	classical_unrestricted	-	-	S-POHLIG-HELLMAN-1978
+ALG-BSGS	algorithmic_upper_bound	algorithm	classical_unrestricted	-	-	S-BOUND-CONTRACT
+ALG-POLLARD-RHO	algorithmic_upper_bound	algorithm	classical_unrestricted	-	T = O(sqrt(r))	S-POLLARD-1978,S-BOUND-CONTRACT
+ALG-RHO-AUTOMORPHISM	algorithmic_upper_bound	algorithm	classical_unrestricted	-	-	S-KOBLITZ-PROGRAM
+LB-SHOUP-DLP	model_lower_bound	proved_external	generic_group	-	success = O(m^2/p); constant success => m = Omega(sqrt(p))	S-SHOUP-1997
+LB-SHOUP-CDH	model_lower_bound	proved_external	generic_group	-	-	S-SHOUP-1997
+LB-CGK-ADVICE	model_lower_bound	proved_external	generic_group_preprocessing	-	S T^2 = soft-Omega(epsilon N)	S-CGK-2018
+LB-CGK-PREPROCESS-TIME	model_lower_bound	proved_external	generic_group_preprocessing	-	P T + T^2 = Omega(epsilon N)	S-CGK-2018
+ATTACK-SMART-TRACE-ONE	conditional_attack	proved_external	curve_family_restricted	-	-	S-SMART-1999
+ATTACK-MOV-PAIRING	conditional_attack	conditional	curve_family_restricted	-	-	S-MOV-1993,S-SMART-1999
+ATTACK-GHS-WEIL-DESCENT	conditional_attack	proved_external	curve_family_restricted	-	T = O(q^(2+epsilon)) for fixed n	S-GHS-2002
+THEOREM-SEMAEV-SUMMATION	structural_theorem	proved_external	algebraic_coordinate	-	-	S-DIEM-2011,S-SEMAEV-2004
+ATTACK-DIEM-EXTENSION	algorithmic_upper_bound	proved_external	algebraic_coordinate	-	T = exp(O(max(log q, n^2)))	S-DIEM-2011
+ATTACK-SHOR-QUANTUM	algorithmic_upper_bound	proved_external	quantum	-	-	S-SHOR-1997
+FACT-MEASURED-BOUND	measured_bound	measured	repository_measurement	-	-	S-BOUND-CONTRACT,S-FRONTIER-2026
+BRIDGE-GENERIC-TABLE	structural_theorem	proved_internal_unreviewed	generic_group	-	-	S-SCOPED-BOUNDARIES
+THEOREM-YIELD-CONSERVATION	structural_theorem	proved_internal_unreviewed	mathematical	-	-	S-SCOPED-BOUNDARIES,S-SYNTHESIS
+LB-ISOGENY-GENERIC	model_lower_bound	proved_internal_unreviewed	generic_group	-	-	S-SCOPED-BOUNDARIES,S-ISOGENY-FIBERS
+THEOREM-JMV-ISOGENY-REDUCTION	reduction	conditional	curve_family_restricted	-	-	S-JMV-2005,S-ISOGENY-FIBERS
+THEOREM-FROB-SUBSPACES-131	structural_theorem	proved_internal_unreviewed	mathematical	-	-	S-KOBLITZ-PROGRAM,S-SYNTHESIS
+THEOREM-GHS-GENUS-131	structural_theorem	proved_internal_unreviewed	curve_family_restricted	-	-	S-KOBLITZ-PROGRAM,S-SYNTHESIS
+MEASURED-CURRENT-FRONTIER	measured_bound	measured	repository_measurement	-	-	S-FRONTIER-2026,S-BOUND-CONTRACT
+GAP-UNCONDITIONAL-CLASSICAL	open_obligation	open	classical_unrestricted	-	-	S-SHOUP-1997,S-CGK-2018,S-SYNTHESIS
+GAP-COORDINATE-ALGEBRAIC	open_obligation	open	algebraic_coordinate	-	-	S-SCOPED-BOUNDARIES,S-PRIME-PROGRAM,S-SYNTHESIS
+GAP-AUTOMORPHISM-PREPROCESS	open_obligation	open	generic_group_preprocessing	-	-	S-SCOPED-BOUNDARIES,S-CGK-2018
+GAP-PKM-SOLVING-DEGREE	open_obligation	open	algebraic_coordinate	-	-	S-SYNTHESIS,S-PRIME-PROGRAM
+GAP-BINARY-M4-DEGREE	open_obligation	open	algebraic_coordinate	-	-	S-SYNTHESIS,S-KOBLITZ-PROGRAM
+GAP-TRANSPORT-ORACLE-SIM	open_obligation	open	algebraic_coordinate	-	-	S-ISOGENY-FIBERS,S-SCOPED-BOUNDARIES
+GAP-QUANTUM-RESOURCES	open_obligation	open	quantum	-	-	S-SHOR-1997,S-LEAD-ATLAS
+CONCLUSION-SPECIFIC-CURVE	assumption	assumed	classical_unrestricted	-	-	S-SHOUP-1997,S-CGK-2018,S-SYNTHESIS
+THEOREM-HASSE-BOUND	structural_theorem	proved_external	mathematical	theorem	#E(F_q)=q+1-t, |t|<=2 sqrt(q)	S-NIST-800-186
+DEF-SUBGROUP-COFACTOR	definition	definition	mathematical	definition	#E(F_q)=h r	S-NIST-800-186
+THEOREM-QUADRATIC-TWIST-ORDER	structural_theorem	proved_external	mathematical	theorem	#E(F_q)+#E'(F_q)=2(q+1)	S-NIST-800-186
+DEF-EMBEDDING-DEGREE	definition	definition	curve_family_restricted	definition	k=ord_r(q)	S-FST-2010,S-NIST-800-186
+THEOREM-SUPERSINGULAR-SMALL-K	structural_theorem	proved_external	curve_family_restricted	theorem	k=2 over F_p (p>=5); k<=6 in general	S-FST-2010
+STANDARD-CURVE-EXCLUSIONS	structural_theorem	conditional	classical_unrestricted	conditional_theorem	-	S-NIST-800-186
+DEF-CONCRETE-SECURITY	definition	definition	classical_unrestricted	definition	-	S-CGK-2018,S-BOUND-CONTRACT
+HEUR-RHO-RANDOM-MAPPING	heuristic	heuristic	generic_group	asymptotic_heuristic	E[steps to repeat] ~= sqrt(pi N/2)	S-VOW-1999,S-TESKE-2001,S-POLLARD-1978
+ALG-PARALLEL-COLLISION	algorithmic_upper_bound	proved_external	generic_group	theorem	T_detect=(sqrt(pi N/(2u))/m + 1/theta) t	S-VOW-1999
+ALG-KANGAROO-INTERVAL	algorithmic_upper_bound	algorithm	generic_group	algorithm	T=O(sqrt(W))	S-POLLARD-1978,S-VOW-1999
+HEUR-AUTOMORPHISM-SPEEDUP	heuristic	heuristic	generic_group	asymptotic_heuristic	T_quotient/T_plain ~= 1/sqrt(a)	S-DGM-1999,S-BLS-2011,S-KOBLITZ-PROGRAM
+OBSTRUCTION-NEGATION-CYCLES	structural_theorem	conditional	generic_group	conditional_theorem	-	S-BLS-2011,S-SCOPED-BOUNDARIES
+ATTACK-CHEON-AUXILIARY	conditional_attack	conditional	classical_unrestricted	conditional_theorem	T=O(sqrt(r/d)+sqrt(d))	S-CHEON-2006
+ATTACK-FREY-RUECK	conditional_attack	conditional	curve_family_restricted	conditional_theorem	-	S-FREY-RUECK-1994,S-FST-2010,S-NIST-800-186
+FACT-FIELD-DLP-AFTER-PAIRING	algorithmic_upper_bound	conditional	curve_family_restricted	conditional_theorem	-	S-FST-2010,S-MOV-1993,S-FREY-RUECK-1994
+DEF-INDEX-CALCULUS-PIPELINE	definition	definition	algebraic_coordinate	definition	-	S-FGHR-2014,S-GAUDRY-2009,S-DIEM-2011
+DEF-FACTOR-BASE	definition	definition	algebraic_coordinate	definition	B=|F|	S-FGHR-2014,S-PRIME-PROGRAM
+HEUR-DECOMPOSITION-PROBABILITY	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	mu=B^m/r; Pr[decomposition]~=1-exp(-mu)	S-SCOPED-BOUNDARIES,S-FGHR-2014,S-SYNTHESIS
+THEOREM-SEMAEV-DEGREE	structural_theorem	proved_external	algebraic_coordinate	theorem	deg_Xi S_m=2^(m-2)	S-FGHR-2014,S-DIEM-2011
+HEUR-ZERO-DIMENSIONAL-PDP	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-FGHR-2014,S-PETIT-QUISQUATER-2012
+HEUR-FIRST-FALL-DEGREE	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-FPPR-2012,S-PETIT-QUISQUATER-2012,S-HKY-2015,S-SYNTHESIS
+FACT-GROEBNER-COST-DEPENDENCE	structural_theorem	proved_external	algebraic_coordinate	theorem	FGLM=O(n D^3); F4/F5 matrix cost depends on d_reg/d_solve	S-FGHR-2014
+ALG-SPARSE-LINEAR-ALGEBRA	algorithmic_upper_bound	algorithm	algebraic_coordinate	algorithm	T_LA roughly O(m B^2), storage O(mB)	S-WIEDEMANN-1986,S-FGHR-2014
+HEUR-RELATION-RANK	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	R >= B + margin	S-FGHR-2014,S-SYNTHESIS
+ALG-GAUDRY-FIXED-EXTENSION	algorithmic_upper_bound	conditional	algebraic_coordinate	conditional_theorem	T=soft-O(q^(2-2/n)) for fixed n	S-GAUDRY-2009,S-FGHR-2014,S-DIEM-2011
+HEUR-SYMMETRY-PDP-SPEEDUP	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	-	S-FGHR-2014
+FACT-PRIME-FIELD-NO-EXTENSION-GAIN	structural_theorem	conditional	algebraic_coordinate	conditional_theorem	-	S-GAUDRY-2009,S-FGHR-2014,S-PRIME-PROGRAM
+COND-PKM-PRIME-ALGEBRAIC	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-PKM-2016,S-PRIME-PROGRAM,S-SYNTHESIS
+COND-BINARY-WEIL-DESCENT	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	-	S-FPPR-2012,S-PETIT-QUISQUATER-2012,S-HKY-2015,S-KOBLITZ-PROGRAM
+DEF-XEDNI-CALCULUS	definition	definition	algebraic_coordinate	definition	-	S-SILVERMAN-XEDNI-2000,S-JKSST-XEDNI-2000
+OBSTRUCTION-XEDNI-HEIGHT	structural_theorem	proved_external	algebraic_coordinate	conditional_theorem	one-shot Pr[success] <= C0/p (conditional); history-uniform hazard <= C0/p => E[T]=Omega(p)	S-JKSST-XEDNI-2000,S-JKSST-LEAN-AUDIT-2026
+THEOREM-XEDNI-FINITE-CORE	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	theorem	Pr[fixed useful relation]=(q-1)/q^2; uniform hazard O(1/p) => E[T]=Omega(p)	S-JKSST-LEAN-AUDIT-2026,S-JKSST-XEDNI-2000
+GAP-XEDNI-END-TO-END	open_obligation	open	algebraic_coordinate	open	-	S-JKSST-LEAN-AUDIT-2026,S-JKSST-XEDNI-2000
+THEOREM-XEDNI-FF-DENSITY	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	theorem	P_lift(p)=(1-2/p+p^-3)/(2p^3)=Theta(p^-3)	S-XEDNI-EXACT-2026,S-SYNTHESIS
+FACT-S3-ROOTS-ARE-GROUP-LAW	structural_theorem	proved_internal_unreviewed	generic_group	theorem	S3(x_R,x_F,X)=(x_R-x_F)^2 (X-x(R-F))(X-x(R+F))	S-METHOD-CLASSIFICATION,S-SCOPED-BOUNDARIES,S-GENERIC-AUDIT
+ESTIMATE-QUANTUM-ROETTELER	algorithmic_upper_bound	proved_external	quantum	concrete_estimate	Q<=9n+2 ceil(log2 n)+10; Toffoli<=448 n^3 log2(n)+4090 n^3	S-ROETTELER-2017
+ESTIMATE-QUANTUM-HAENER	algorithmic_upper_bound	proved_external	quantum	concrete_estimate	-	S-HAENER-2020
+ESTIMATE-QUANTUM-CAT-2023	algorithmic_upper_bound	proved_external	quantum	concrete_estimate	126133 cat qubits; 9 h; mean 19 photons/cat under stated assumptions	S-GOUZIEN-2023
+ESTIMATE-QUANTUM-IONQ-2026	algorithmic_upper_bound	conditional	quantum	concrete_estimate	~1450 logical qubits; 40e6 Toffoli; 19397 physical qubits; 25.7 d; estimated success 63%	S-IONQ-2026
+DEF-GAP-DH	definition	definition	mathematical	definition	-	S-FST-2010
+RED-SCHNORR-ROM	reduction	conditional	classical_unrestricted	conditional_theorem	-	S-POINTCHEVAL-STERN-1996
+BOUNDARY-INVALID-CURVE	conditional_attack	conditional	classical_unrestricted	conditional_theorem	-	S-NIST-800-186
+GAP-MULTITARGET-NONUNIFORM	open_obligation	open	generic_group_preprocessing	open	-	S-CGK-2018,S-BL-2013
+GAP-END-TO-END-IC-EXPONENT	open_obligation	open	algebraic_coordinate	open	-	S-GAUDRY-GALBRAITH-2016,S-PRIME-PROGRAM,S-SYNTHESIS
+GAP-PROTOCOL-ASSUMPTION-MAPPING	open_obligation	open	classical_unrestricted	open	-	S-POINTCHEVAL-STERN-1996,S-FST-2010
+DEF-MULTIDIMENSIONAL-DLP	definition	definition	mathematical	-	-	S-GALBRAITH-MPKC-2018
+LB-GENERIC-REPRESENTATION	model_lower_bound	proved_external	generic_group	theorem	T = Omega(s^(l/2)/log(s)^(c/2))	S-GALBRAITH-MPKC-2018
+DEF-LOW-HAMMING-DLP	definition	definition	mathematical	-	-	S-GALBRAITH-MPKC-2018
+ALG-COPPERSMITH-LOW-HAMMING	algorithmic_upper_bound	algorithm	classical_unrestricted	theorem	E[T] = O(sqrt(w) * binom(n/2,w/2)); S = O(binom(n/2,w/2))	S-GALBRAITH-MPKC-2018
+HEUR-WAGNER-FOUR-SUM	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	T,S = soft-O(2^(n/3))	S-GALBRAITH-MPKC-2018
+THEOREM-RHO-THREE-PARTITION	algorithmic_upper_bound	proved_external	generic_group	theorem	T = O_epsilon(sqrt(r) log(r)^3)	S-GALBRAITH-MPKC-2018
+ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL	algorithmic_upper_bound	heuristic	generic_group	asymptotic_heuristic	E[T] = (2.43+o(1)) N	S-GALBRAITH-MPKC-2018
+DEF-SUBEXPONENTIAL-L	definition	definition	mathematical	-	L_N(alpha,c)=exp((c+o(1))(log N)^alpha(log log N)^(1-alpha))	S-GALBRAITH-MPKC-2018
+DEF-FIXED-CDH	definition	definition	mathematical	-	-	S-GALBRAITH-MPKC-2018
+THEOREM-CDH-RANDOM-SELF-REDUCTION	structural_theorem	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+THEOREM-CDH-SELF-CORRECTION	reduction	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+RED-DEN-BOER-FIXED-CDH	reduction	conditional	mathematical	conditional_theorem	group cost = O(sqrt(l) log(r)^2/log(l)); oracle queries = O(log(r)log log(r))	S-GALBRAITH-MPKC-2018
+RED-MAURER-AUXILIARY-CURVE	reduction	conditional	mathematical	conditional_theorem	oracle queries = O(log(r)^2 log log(r))	S-GALBRAITH-MPKC-2018
+ALG-STATIC-DH-AUXILIARY-POWERS	conditional_attack	conditional	classical_unrestricted	conditional_theorem	T = O((sqrt((r-1)/d)+sqrt(d))log(r)); Q = d	S-GALBRAITH-MPKC-2018
+RED-DLP-LEAST-SIGNIFICANT-BIT	reduction	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+RED-ISOGENY-DLP-TRANSPORT	reduction	proved_external	curve_family_restricted	theorem	-	S-GALBRAITH-MPKC-2018
+THEOREM-PAIRING-BILINEAR-NONDEGENERATE	structural_theorem	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+RED-PAIRING-CO-DDH	conditional_attack	conditional	curve_family_restricted	conditional_theorem	-	S-GALBRAITH-MPKC-2018
+FACT-PAIRING-FRIENDLY-TWO-DLPS	structural_theorem	proved_external	curve_family_restricted	definition	-	S-GALBRAITH-MPKC-2018

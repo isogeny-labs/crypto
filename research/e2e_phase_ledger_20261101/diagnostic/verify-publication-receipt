@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# Verify the fixed publication artifact without executing or republishing it.
+set -euo pipefail
+
+[[ $# == 2 ]] || { echo 'Usage: verify-publication-receipt ARTIFACT_DIR OUTPUT.json' >&2; exit 2; }
+reject() {
+  printf 'publication receipt rejected: %s\n' "$1" >&2
+  exit 1
+}
+
+artifact=$(realpath "$1") || reject artifact_path
+output=$2
+
+expected_source=a34125841c2b696420bd97440d59b73c13355abc
+expected_binary=f3aab23417ece64cb3373e5c66d2c3be343e18c0e89347f626e0aea18ab1b774
+expected_image_digest=sha256:3f571ddab4df5624a48a8131b7c1c07ac9c11609120904954f5c2f4e67161e7e
+
+[[ -d "$artifact" && ! -L "$artifact" ]] || reject artifact_directory
+mapfile -t files < <(find "$artifact" -type f -printf '%P\n' | LC_ALL=C sort)
+[[ ${#files[@]} -eq 2 ]] || reject artifact_file_count
+[[ "${files[0]}" == isolab-build/build-info.json && "${files[1]}" == isolab-image.json ]] \
+  || reject artifact_file_names
+[[ -z $(find "$artifact" \( -type l -o \( ! -type d ! -type f \) \) -print -quit) ]] \
+  || reject artifact_object_types
+
+image=$artifact/isolab-image.json
+build=$artifact/isolab-build/build-info.json
+[[ -f "$image" && ! -L "$image" && -f "$build" && ! -L "$build" ]] \
+  || reject artifact_regular_files
+
+jq -e 'keys == ["ecbench_sha256", "image_uri", "source_revision"]' "$image" \
+  >/dev/null 2>&1 || reject image_json_keys
+jq -e --arg source "$expected_source" '.source_revision == $source' "$image" \
+  >/dev/null 2>&1 || reject image_source_revision
+jq -e --arg binary "$expected_binary" '.ecbench_sha256 == $binary' "$image" \
+  >/dev/null 2>&1 || reject image_ecbench_sha256
+jq -e '.image_uri | test("^[0-9]{12}\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[a-f0-9]{64}$")' \
+  "$image" >/dev/null 2>&1 || reject image_uri_shape
+jq -e --arg digest "$expected_image_digest" '.image_uri | endswith("@" + $digest)' "$image" \
+  >/dev/null 2>&1 || reject image_digest
+
+jq -e 'keys == ["architecture", "built_at", "default_features", "ecbench_sha256",
+                   "fresh_owner_sha256", "rustc", "rustflags", "source_repository",
+                   "source_revision", "target"]' "$build" \
+  >/dev/null 2>&1 || reject build_json_keys
+jq -e '.source_repository == "https://github.com/aburan28/crypto"' "$build" \
+  >/dev/null 2>&1 || reject build_source_repository
+jq -e --arg source "$expected_source" '.source_revision == $source' "$build" \
+  >/dev/null 2>&1 || reject build_source_revision
+jq -e --arg binary "$expected_binary" '.ecbench_sha256 == $binary' "$build" \
+  >/dev/null 2>&1 || reject build_ecbench_sha256
+jq -e '.fresh_owner_sha256 | test("^[a-f0-9]{64}$")' "$build" \
+  >/dev/null 2>&1 || reject build_fresh_owner_sha256
+jq -e '.built_at | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")' "$build" \
+  >/dev/null 2>&1 || reject build_timestamp
+jq -e '.rustc | startswith("rustc 1.99.1 ")' "$build" \
+  >/dev/null 2>&1 || reject build_rustc
+jq -e '.rustflags == "-C target-cpu=x86-64"' "$build" \
+  >/dev/null 2>&1 || reject build_rustflags
+jq -e '.architecture == "linux/amd64"' "$build" \
+  >/dev/null 2>&1 || reject build_architecture
+jq -e '.target == "x86_64-unknown-linux-musl"' "$build" \
+  >/dev/null 2>&1 || reject build_target
+jq -e '.default_features == false' "$build" \
+  >/dev/null 2>&1 || reject build_default_features
+
+[[ $(jq -r .source_revision "$image") == $(jq -r .source_revision "$build") ]] \
+  || reject cross_file_source_revision
+[[ $(jq -r .ecbench_sha256 "$image") == $(jq -r .ecbench_sha256 "$build") ]] \
+  || reject cross_file_ecbench_sha256
+
+jq -n --arg source "$expected_source" --arg binary "$expected_binary" \
+  --arg image_digest "$expected_image_digest" \
+  --arg fresh_owner "$(jq -r .fresh_owner_sha256 "$build")" \
+  --arg built_at "$(jq -r .built_at "$build")" \
+  --arg rustc "$(jq -r .rustc "$build")" \
+  '{schema:"e2e.phase-ledger.publication-receipt/v1",
+    publication_workflow_run:"41362392013",publication_run_attempt:1,
+    artifact_id:13106247069,artifact_name:"isolab-publication-41362392013-1",
+    artifact_zip_sha256:"48a414ed62769dfff32378747d0e6157662410ad3c1281bb8544424ed23f3de4",
+    workflow_head_sha:"12b14adcb1a86f62fef461030e199343c08ff82f",
+    source_revision:$source,ecbench_sha256:$binary,image_digest:$image_digest,
+    fresh_owner_sha256:$fresh_owner,built_at:$built_at,rustc:$rustc,
+    architecture:"linux/amd64",target:"x86_64-unknown-linux-musl",
+    default_features:false,artifact_file_count:2}' > "$output"

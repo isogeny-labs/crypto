@@ -28,6 +28,9 @@ flowchart LR
   C --> R[Versioned result receipt]
 ```
 
+Before any build or run, follow [cost controls and GitHub custody](COST_CONTROLS.md).
+These owner limits also apply to direct MCP and arbitrary-command submissions.
+
 ## The request
 
 ```json
@@ -117,7 +120,9 @@ taskq/deploy/eks-karpenter/remote/launch-remote request.json
 ```
 
 The script validates and normalizes the request, uploads it under its SHA-256,
-starts the configured CodeBuild project, and returns a
+uploads and hash-pins the current reviewed `remote/run-request`, starts the
+configured CodeBuild project with the repository's fixed buildspec and a
+100-minute terminal override, and returns a
 [result receipt](contracts/result.schema.json). An SDK can perform the same
 `S3 PutObject → CodeBuild StartBuild → BatchGetBuilds → S3 GetObject` sequence.
 Use the normalized request hash as the StartBuild token; AWS's short-lived token
@@ -130,6 +135,13 @@ The supplied GitHub OIDC role is restricted to the configured repository's main
 branch. Other AWS roles/CI identity providers need their own explicit grants.
 StartBuild can override project settings, so this permission is for trusted lab
 operators, not a public unauthenticated service.
+
+The per-build override changes only `remote/run-request`: the deployed launcher
+bundle still supplies its validated request parser, readiness checks, build
+verifier and pinned tools. Both override files are content-addressed under the
+existing request-write boundary and re-hashed inside CodeBuild. This lets a
+reviewed launcher correction take effect without silently depending on whether
+the CloudFormation source bundle has already been redeployed.
 
 ## GitHub Actions
 
@@ -217,8 +229,10 @@ use the native cancel tool or an authorized Kubernetes Job deletion. Cancellatio
 can lose artifacts that were not uploaded yet.
 
 CodeBuild allows two concurrent launchers, with a ten-minute queue timeout and
-70-minute build timeout. The EKS Spot pool retains its separate aggregate
-combined 64-vCPU limit (32 per ordinary/benchmark pool). Native Job objects expire after a day; empty workers and their pod
+100-minute build timeout. The portable client waits the requested EKS duration
+plus one hour for provisioning, verification and a terminal launcher state.
+The EKS Spot pool retains its separate aggregate
+combined 24-vCPU / 160-GiB ceiling (ordinary 16/128, L2 8/32). Native Job objects expire after a day; empty workers and their pod
 logs can disappear after two minutes. S3 is the durable experiment record.
 
 ## Deploy and update the portable launcher

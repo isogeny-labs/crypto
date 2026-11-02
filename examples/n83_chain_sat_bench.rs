@@ -66,6 +66,10 @@ fn main() {
             for part in parts {
                 if part == "affine" {
                     options.patterns = ChainS3Patterns::AffineOnly;
+                } else if part == "parbuild" {
+                    options.tables.parallel_build = true;
+                } else if part == "parallel" {
+                    options.tables.parallel = true;
                 } else if part == "indexed" {
                     options.tables.indexed = true;
                 } else if part == "rebuild" {
@@ -81,6 +85,8 @@ fn main() {
                         meet: options.tables.meet,
                         rebuild: options.tables.rebuild,
                         indexed: options.tables.indexed,
+                        parallel: options.tables.parallel,
+                        parallel_build: options.tables.parallel_build,
                     };
                 } else {
                     panic!("unknown arm modifier {part}");
@@ -131,7 +137,7 @@ fn main() {
                 continue;
             }
             let start = Instant::now();
-            let front = chain_s3_meet_front(&kc, &fb, d);
+            let front = chain_s3_meet_front_with(&kc, &fb, d, options.tables.parallel_build);
             println!(
                 "{}",
                 json!({
@@ -139,6 +145,8 @@ fn main() {
                     "curve": kc.label(), "m": m, "union_dim": dim,
                     "base_points": fb.points.len(), "meet_depth": d,
                     "front_fingerprints": front.len(),
+                    "parallel_build": options.tables.parallel_build,
+                    "threads": if options.tables.parallel_build { rayon::current_num_threads() } else { 1 },
                     "seconds": start.elapsed().as_secs_f64(), "seed": seed,
                 })
             );
@@ -185,6 +193,7 @@ fn main() {
                     "patterns_refuted_by_lookup": stats.patterns_refuted_by_lookup,
                     "meet_domain": stats.meet_domain,
                     "witness_by_lookup": stats.witness_by_lookup,
+                    "threads": if options.tables.parallel { rayon::current_num_threads() } else { 1 },
                     "seed": seed,
                 })
             );
