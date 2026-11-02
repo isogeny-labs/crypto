@@ -75,9 +75,10 @@ Top of the current frontier (55 claims):
   The corpus records the reading as a parameter of the definition nodes.
 - **Formalized.** [`Lemma4Witness.lean`](../../papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean)
   states witness A in core Lean and checks every admissible multiplier tuple with
-  `decide +kernel`. It is **written, not yet kernel-checked**: no Lean toolchain on the
-  authoring host, so the repository proof gate is the first check. A Python mirror of the
-  same functions agrees on every statement and on the positive control `X, X+1`. The
+  `decide +kernel`. **Kernel-checked**: the repository proof gate passed it on
+  2026-11-02 (run 41390917050, 24 theorems in the target, 0 trusted native). It was
+  written without a local toolchain; before the gate, a Python mirror of the same
+  functions agreed on every statement and on the positive control `X, X+1`. The
   two encoding bridges (mask completeness, reduction as a ring homomorphism) are argued
   in the module docstring, not proved.
 - **What survives.** Per instance, a fake-degree certificate whose products already

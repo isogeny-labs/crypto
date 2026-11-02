@@ -40,7 +40,7 @@ The list form without the binomial count is already kernel-checked in
 
 ## O3. The Lemma 4 witnesses as kernel-checked statements
 
-**Witness A: written, pending the proof gate** (`IcNegative/Lemma4Witness.lean`,
+**Witness A: kernel-checked** (proof gate PASS, run 41390917050) (`IcNegative/Lemma4Witness.lean`,
 `IcNegative.Lemma4.lemma4_fails_witnessA`, core Lean only, `decide +kernel`). It
 encodes `F_2[X, Y]` as bitmasks with carry-less products and the quotient by the
 field equations as 4-bit masks, and checks `d'_F = 2` and `d_F = 3` in both

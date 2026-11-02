@@ -86,11 +86,11 @@
       "tags": ["first-fall-degree", "definition", "reading-sensitive"],
       "parameters": ["reading: equality | literal_ge", "placement: outside | inside"],
       "formal": {
-        "state": "lean_written_unchecked",
+        "state": "kernel_checked",
         "artifacts": [
           { "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean", "decl": "IcNegative.Lemma4.IsFall" }
         ],
-        "notes": "Mask encoding of F_2[X, Y] up to degree 7; equality reading only."
+        "notes": "Mask encoding of F_2[X, Y] up to degree 7; equality reading only. Repository proof gate PASS: lean-proof-gate run 41390917050 (workflow_dispatch on this branch, commit 34e8a0dce), target papers/ic-negative-results/lean, 24 theorems, 0 trusted native; axiom audit allows only propext / Classical.choice / Quot.sound."
       }
     },
     {
@@ -105,10 +105,11 @@
       "source_refs": ["S-NAGAO-2015", "S-IC-NEGATIVE"],
       "tags": ["first-fall-degree", "fake-degree", "definition"],
       "formal": {
-        "state": "lean_written_unchecked",
+        "state": "kernel_checked",
         "artifacts": [
           { "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean", "decl": "IcNegative.Lemma4.IsFakeFall" }
-        ]
+        ],
+        "notes": "Repository proof gate PASS: lean-proof-gate run 41390917050 (workflow_dispatch on this branch, commit 34e8a0dce), target papers/ic-negative-results/lean, 24 theorems, 0 trusted native; axiom audit allows only propext / Classical.choice / Quot.sound."
       }
     },
     {
@@ -199,12 +200,12 @@
       "tags": ["counterexample", "first-fall-degree", "lean"],
       "evidence_class": "counterexample",
       "formal": {
-        "state": "lean_written_unchecked",
+        "state": "kernel_checked",
         "artifacts": [
           { "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean", "decl": "IcNegative.Lemma4.lemma4_fails_witnessA" },
           { "path": "research/blindspots_20261018/instruments/blindspots_19_checks.rs", "decl": "lemma4" }
         ],
-        "notes": "Bridges argued, not proved in Lean: mask completeness for degree <= k, and reduction as a ring homomorphism."
+        "notes": "Bridges argued, not proved in Lean: mask completeness for degree <= k, and reduction as a ring homomorphism. Repository proof gate PASS: lean-proof-gate run 41390917050 (workflow_dispatch on this branch, commit 34e8a0dce), target papers/ic-negative-results/lean, 24 theorems, 0 trusted native; axiom audit allows only propext / Classical.choice / Quot.sound."
       }
     },
     {
@@ -353,7 +354,7 @@
       "label": "Kernel-check the Lemma 4 refutation",
       "status": "working",
       "priority": 2,
-      "objective": "Move CEX-NAGAO-LEMMA4-F2 from lean_written_unchecked to kernel_checked, then prove the two encoding bridges and add witness B.",
+      "objective": "Witness A is kernel-checked (proof gate run 41390917050). Remaining: prove the two encoding bridges and add witness B.",
       "depends_on": ["CEX-NAGAO-LEMMA4-F2", "CLAIM-NAGAO-LEMMA4"],
       "acceptance": "lean-proof-gate passes IcNegative.Lemma4.lemma4_fails_witnessA with only propext / Classical.choice / Quot.sound; bridges proved or stated as named hypotheses.",
       "next_step": "Read the lean-proof-gate result on the PR that adds Lemma4Witness.lean.",

@@ -14,9 +14,9 @@ integer counts from one deterministic run, so there are no intervals: census of 
 pairs (d_F > d'_F in 6138 outside / 4830 inside; d_F < d'_F in 0 / 224), witnesses A, B
 (d_F 3, d'_F 2), witness C (3 outside, 2 inside, 2 fake). Controls passed: positive
 (X, X+1), negative (Z/8, Z/9), yield mirror. Caveats: host is shared, L0 isolation, toy
-scale; Lean not kernel-checked. Second-pass re-run (this assessment) again matched `evidence/checks.txt` (20 PASS, source sha256 751277a8). The campaign-item table (items 01, 02, 04, 05, 07, 10, 14, 17) is in `reports/report.typ` and section 8 of the paper; none changes a label. Item 10's README may still change after the digest in the ledger. Graph: `reports/lemma4_census.svg` / `.png` (source
+scale; Lean kernel-checked by the repository proof gate since 2026-11-02 (see below). Second-pass re-run (this assessment) again matched `evidence/checks.txt` (20 PASS, source sha256 751277a8). The campaign-item table (items 01, 02, 04, 05, 07, 10, 14, 17) is in `reports/report.typ` and section 8 of the paper; none changes a label. Item 10's README may still change after the digest in the ledger. Graph: `reports/lemma4_census.svg` / `.png` (source
 `reports/plot_census.py`); report: `REPORT.pdf` (source `reports/report.typ`). No
-`benchmarks/` copy: not a speed result. Lean gate: pending CI (`lean-proof-gate.yml`).
+`benchmarks/` copy: not a speed result. Lean gate: PASS, lean-proof-gate run 41390917050 (2026-11-02, commit 34e8a0dce: PASS, 24 theorems, 0 trusted).
 
 `ic_negative_results.tex` (11 pages, A4). **Status**: research draft written
 2026-10-18 for blind-spot item 19 (`research/blindspots_20261018/EXPERIMENTS.md`,
@@ -31,7 +31,7 @@ paper claims none. Restore the authors with `make deanonymize` after creating an
 | # | statement | label | evidence |
 |:--|:--|:--|:--|
 | S1 | compact-orbit Koblitz IC sits on or above `S*T^2 >~ r/|Aut|`; at the rank-stage mean on `S*T ~ r/|Aut|`; single frozen targets at n37, n41, n53, n71, n73 fall below the non-adaptive line | recorded (14 rows) | `research/lit2026_w3_ggm_audit_20261011/` |
-| S2 | isogeny oracles add nothing in the generic group model (Thm 15.1, bound `(Q+2)^2/r + 1/r`); counting core in Lean | proved; Lean not yet kernel-checked | `RESEARCH_ISOGENY_FIBERS_ECDLP.md` s15.1 |
+| S2 | isogeny oracles add nothing in the generic group model (Thm 15.1, bound `(Q+2)^2/r + 1/r`); counting core in Lean | proved; Lean counting core kernel-checked | `RESEARCH_ISOGENY_FIBERS_ECDLP.md` s15.1 |
 | S3 | mean decomposition yield `C(B+m-1,m)/N` for every base of size `B` | proved; exact; recorded | `KN-FIND-007`, cyclotomic falsifier, native check |
 | S4 | monodromy of the Semaev cover is `(Z/2)^{m-2}` | derived, unreviewed | `KN-FIND-a8990a`, `EXP-SMON-e5cbe6` |
 | S5 | Nagao 2015/984 Lemma 4 (`d_F <= d'_F`) is false over `F_2`, equality reading, both field-equation placements | exact (hand proof for witness A; native re-derivation of both) | `KN-FIND-936151`, `evidence/checks.txt` |
@@ -51,9 +51,9 @@ No speedup, no key recovery, no sub-rho or deployed-curve claim. S1 is a compari
 probes and table entries, not a proof of genericity, and the structured generic-group
 bound is vacuous at these rungs. S4 has had no independent proof review and its novelty
 is not adjudicated. S5 says nothing about Proposition 5 of Nagao's paper. S6 is open.
-The new Lean modules are written but **not yet kernel-checked** (no Lean toolchain on
-the authoring host); the repository proof gate (`tools/lean/proof-gate.sh`,
-`.github/workflows/lean-proof-gate.yml`) is the first check.
+The Lean modules (AffineCore, YieldConservation, Lemma4Witness) pass the repository
+proof gate (`tools/lean/proof-gate.sh`): lean-proof-gate run 41390917050 (2026-11-02, commit 34e8a0dce: PASS, 24 theorems, 0 trusted). They formalize the counting core of S2,
+the yield double count of S3 and witness A of S5, not the full statements.
 
 ## Files
 
@@ -66,7 +66,7 @@ the authoring host); the repository proof gate (`tools/lean/proof-gate.sh`,
   (`lemma4`, `affine`, `yield`; std-only Rust, about 0.3 s).
 - `lean/`: Lake project `ic_negative` (`IcNegative/AffineCore.lean`,
   `IcNegative/YieldConservation.lean`, `IcNegative/Lemma4Witness.lean` (S5 witness A in
-  core Lean, `decide +kernel`, added 2026-11-02, pending the proof gate), `AxiomAudit.lean`), pinned to Lean `v4.34.1` and
+  core Lean, `decide +kernel`, added 2026-11-02, gate PASS), `AxiomAudit.lean`), pinned to Lean `v4.34.1` and
   the Mathlib revision of `../rootfinding-decomposition/lean/`. `lean/OPEN_TARGETS.md`
   holds the statements that are not proved (O1 to O4), outside compiled sources because
   the proof gate fails any `sorry`.
@@ -88,8 +88,9 @@ prlimit --as=4294967296 /tmp/b19 all                                            
 ## Owed before submission
 
 - [ ] Authors, affiliation and email (never invented): `AUTHORS`, `make deanonymize`.
-- [ ] `lean-proof-gate.yml` passes on the `lean/` project; fix any proof that fails and
-      only then say "machine-checked" (the paper says "written, not yet kernel-checked").
+- [x] `lean-proof-gate.yml` passes on the `lean/` project (lean-proof-gate run 41390917050 (2026-11-02, commit 34e8a0dce: PASS, 24 theorems, 0 trusted)).
+- [ ] Update the paper's wording, which still says "written, not yet kernel-checked"
+      (an author decision; scope the claim to what each module formalizes).
 - [ ] An independent reader of function fields on S4 (Artin's theorem for a quotient by a
       finite group; properness of the preimage of `E[2]` in characteristic 2).
 - [ ] Re-read the sibling-repository evidence if its heads moved

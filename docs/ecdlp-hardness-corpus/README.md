@@ -10,7 +10,7 @@ and every edge says how one claim depends on or limits another.
 
 ## Current snapshot
 
-- 525 claim nodes (15 refuted; 29 with a Lean record, 15 kernel-checked)
+- 525 claim nodes (15 refuted; 29 with a Lean record, 20 kernel-checked)
 - 888 typed dependency edges
 - 229 source records (83 primary texts read and hashed)
 - 51 prioritized research targets

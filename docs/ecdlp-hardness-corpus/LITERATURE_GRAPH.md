@@ -11,7 +11,7 @@ the repository's own results, each claim linked to what it rests on.
 | sources | 50 | **229** (83 primary text read and SHA-256 hashed) |
 | research targets | 13 | **51** |
 | refuted claims | 0 | **15** |
-| claims with a Lean record | 0 | **29** (15 kernel-checked with a committed receipt) |
+| claims with a Lean record | 0 | **29** (20 kernel-checked with a gate run or committed receipt) |
 
 `node validate.mjs` passes, `node attack-graph.mjs --check` reports 0 unlinked
 citations, and three claims rest on a refuted claim.
