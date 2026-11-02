@@ -72,6 +72,7 @@ pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
+pub mod prime_tower_wide;
 pub mod residual;
 pub mod rootfind;
 pub mod shared_rank;

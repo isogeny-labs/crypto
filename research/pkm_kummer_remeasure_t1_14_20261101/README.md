@@ -45,7 +45,7 @@ Solving degree `D` (`solving_degree_max`, the maximum F4 step degree) at
 | 8 | 16 | 5 | 5 | ✓ | 75.3 s |
 | 9 | 18 | 5 | 5 | ✓ | 269.8 s |
 | 10 | 20 | 6 | 6 | ✓ | 1,667.4 s |
-| 11 | 22 | (running) | | | |
+| 11 | 22 | **6** | 6 | ✓ | 12,369.7 s |
 | 12 | 24 | (running) | | | |
 | 13 | 26 | (running) | | | |
 | 14 | 28 | (running) | | | |

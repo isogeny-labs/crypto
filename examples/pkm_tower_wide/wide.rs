@@ -9,12 +9,18 @@
 //! representation, so one seed builds the same system under every backend
 //! that holds the prime, and the backends can be compared row for row.
 //!
-//! Two tower kinds:
+//! Three tower kinds:
 //! - `kummer`: `y_{j+1} = y_j²`, `V = g·μ_{2^t}`, needs `2^t | p − 1`
 //!   (P-224: `v₂(p − 1) = 96`);
 //! - `dickson-torus`: `y_{j+1} = y_j² − 2`, `V = {w + w⁻¹ : w ∈ u·μ_{2^t}}`
 //!   with `u`, `μ_{2^t}` in the norm-1 torus of `F_{p²}`, needs
-//!   `2^t | p + 1` and `p ≡ 3 mod 4` (P-192: `v₂(p + 1) = 64`; P-256: 96).
+//!   `2^t | p + 1` and `p ≡ 3 mod 4` (P-192: `v₂(p + 1) = 64`; P-256: 96);
+//! - `isogeny` (since 2026-11-01): `V = x(R' + ⟨Q⟩)` for `Q` of order `2^t`
+//!   on an auxiliary curve `E'/F_p`, built by
+//!   `prime_tower_wide` over this backend — the supersingular `E'`
+//!   when `v₂(p + 1) ≥ t` (one draw, no search), else the charged
+//!   ordinary search.  Closes the u64 gap: an F4 system on the
+//!   isogeny tower now runs at P-192 and above.
 //!
 //! **Verification.** After each solve, every decomposition of the target
 //! over `V^m` is enumerated independently of the engine: the `S₃` links are
@@ -34,6 +40,11 @@ use crypto_lib::cryptanalysis::f4_tower_generic::{
     f4_tower_generic, staircase, GPoly, GSquareRule, GTowerRing,
 };
 use crypto_lib::cryptanalysis::fp_backend::PrimeField;
+use crypto_lib::cryptanalysis::ic_boundary::GroupOps;
+use crypto_lib::cryptanalysis::ic_framework::prime_tower::{AuxFamily, AuxKind};
+use crypto_lib::cryptanalysis::ic_framework::prime_tower_wide::{
+    isogeny_tower_wide, supersingular_tower_wide,
+};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use rand::rngs::StdRng;
@@ -247,6 +258,7 @@ fn s3_roots<F: PrimeField>(
 pub enum WKind {
     Kummer,
     DicksonTorus,
+    Isogeny,
 }
 
 impl WKind {
@@ -254,6 +266,7 @@ impl WKind {
         match self {
             WKind::Kummer => "kummer",
             WKind::DicksonTorus => "dickson-torus",
+            WKind::Isogeny => "isogeny",
         }
     }
     /// The pilot's `Kind` discriminant, so cell seeds follow its formula.
@@ -261,6 +274,7 @@ impl WKind {
         match self {
             WKind::Kummer => 0,
             WKind::DicksonTorus => 3,
+            WKind::Isogeny => 2,
         }
     }
 }
@@ -271,6 +285,9 @@ pub struct WTower<E> {
     v: Vec<E>,
     scale: E,
     c: E,
+    /// The Vélu 2-isogeny steps `(ξ_j, τ_j)` of the isogeny kind; `None`
+    /// for the uniform (square / Dickson) towers.
+    velu: Option<Vec<(E, E)>>,
     info: Value,
 }
 
@@ -278,8 +295,11 @@ impl<E: Copy + PartialEq + std::hash::Hash + Eq> WTower<E> {
     fn dickson(&self) -> bool {
         self.kind == WKind::DicksonTorus
     }
-    fn step<F: PrimeField<Elem = E>>(&self, f: &F, y: E) -> E {
-        if self.dickson() {
+    fn step<F: PrimeField<Elem = E>>(&self, f: &F, j: usize, y: E) -> E {
+        if let Some(vs) = &self.velu {
+            let (xi, tau) = vs[j];
+            f.add(y, f.mul(tau, f.inv(f.sub(y, xi)).expect("x ∈ V avoids the kernels")))
+        } else if self.dickson() {
             f.sub(f.sqr(y), f.from_u64(2))
         } else {
             f.sqr(y)
@@ -289,7 +309,7 @@ impl<E: Copy + PartialEq + std::hash::Hash + Eq> WTower<E> {
         let mut y = vec![f.zero(); self.t];
         y[0] = f.mul(x, f.inv(self.scale).unwrap());
         for j in 0..self.t - 1 {
-            y[j + 1] = self.step(f, y[j]);
+            y[j + 1] = self.step(f, j, y[j]);
         }
         y
     }
@@ -302,15 +322,48 @@ impl<E: Copy + PartialEq + std::hash::Hash + Eq> WTower<E> {
                 } else {
                     WPol::constant(f, n, self.c)
                 };
-                let mut sq = yj.mul(f, &yj);
-                if self.dickson() {
-                    sq = sq.sub(f, &WPol::constant(f, n, f.from_u64(2)));
+                if let Some(vs) = &self.velu {
+                    // y_{j+1}(y_j − ξ) = y_j² − ξ·y_j + τ
+                    let (xi, tau) = vs[j];
+                    let lhs = next.mul(f, &yj.sub(f, &WPol::constant(f, n, xi)));
+                    let rhs = yj
+                        .mul(f, &yj)
+                        .sub(f, &yj.scale(f, xi))
+                        .add(f, &WPol::constant(f, n, tau));
+                    lhs.sub(f, &rhs)
+                } else {
+                    let mut sq = yj.mul(f, &yj);
+                    if self.dickson() {
+                        sq = sq.sub(f, &WPol::constant(f, n, f.from_u64(2)));
+                    }
+                    next.sub(f, &sq)
                 }
-                next.sub(f, &sq)
             })
             .collect()
     }
     fn square_rules<F: PrimeField<Elem = E>>(&self, f: &F, base: usize) -> Vec<GSquareRule<E>> {
+        if let Some(vs) = &self.velu {
+            // y_{j+1}(y_j − ξ) = y_j² − ξ·y_j + τ, so
+            // y_j² = y_j·y_{j+1} − ξ·y_{j+1} + ξ·y_j − τ; on top, y_{j+1} → c:
+            // y_j² = (c + ξ)·y_j − (c·ξ + τ).
+            return (0..self.t)
+                .map(|j| {
+                    let (xi, tau) = vs[j];
+                    let top = j + 1 == self.t;
+                    GSquareRule {
+                        next: (!top).then_some((base + j + 1) as u8),
+                        a: if top { f.zero() } else { f.one() },
+                        b: if top { f.zero() } else { f.neg(xi) },
+                        c: if top { f.add(self.c, xi) } else { xi },
+                        d: if top {
+                            f.neg(f.add(f.mul(self.c, xi), tau))
+                        } else {
+                            f.neg(tau)
+                        },
+                    }
+                })
+                .collect();
+        }
         let two = if self.dickson() {
             f.from_u64(2)
         } else {
@@ -374,6 +427,7 @@ fn kummer<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::Elem> {
         v,
         scale: g,
         c: f.one(),
+        velu: None,
         info: json!({"g": s(f, g), "zeta": s(f, zeta)}),
     }
 }
@@ -458,6 +512,7 @@ fn dickson_torus<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::
             v,
             scale: f.one(),
             c,
+            velu: None,
             info: json!({"case": "torus", "u": [s(f, u.0), s(f, u.1)],
                          "zeta": [s(f, zeta.0), s(f, zeta.1)], "c": s(f, c)}),
         };
@@ -504,6 +559,56 @@ fn check_torus<F: PrimeField>(
     assert!(tower.c != two && tower.c != f.neg(two), "c = ±2");
 }
 
+/// The isogeny tower over any backend: the supersingular auxiliary
+/// curve when `v₂(p + 1) ≥ t` allows one (P-192: 64), else the charged
+/// ordinary search of `prime_tower_wide` (`Θ(p^{1/4})` group
+/// operations per curve tried, a small-prime instrument at NIST size).
+fn isogeny<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::Elem> {
+    let seed = rng.gen::<u64>();
+    let mut ops = GroupOps::default();
+    let p = f.modulus().clone();
+    let ss_kind = if (&p % &BigUint::from(4u32)) == BigUint::from(3u32) {
+        Some(AuxKind::SsJ1728)
+    } else if (&p % &BigUint::from(3u32)) == BigUint::from(2u32) {
+        Some(AuxKind::SsJ0)
+    } else {
+        None
+    };
+    let supersingular = ss_kind.is_some()
+        && (p.clone() + BigUint::one()).trailing_zeros().unwrap_or(0) >= t as u64;
+    let (tower, which) = if supersingular {
+        (
+            supersingular_tower_wide(f, t as u32, seed, ss_kind.expect("checked"), &mut ops)
+                .expect("supersingular tower"),
+            "supersingular",
+        )
+    } else {
+        (
+            isogeny_tower_wide(f, t as u32, seed, AuxFamily::Any, &mut ops).expect("ordinary tower"),
+            "ordinary",
+        )
+    };
+    let steps: Vec<(F::Elem, F::Elem)> =
+        tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+    WTower {
+        kind: WKind::Isogeny,
+        t,
+        v: tower.v,
+        scale: f.one(),
+        c: tower.c,
+        velu: Some(steps),
+        info: json!({
+            "aux": which,
+            "aux_order": tower.aux_order.to_string(),
+            "aux_curves_tried": tower.cost.curves_tried,
+            "aux_search_gae": tower.cost.search_gae,
+            "aux_count_gae": tower.cost.count_gae,
+            "aux_tower_build_gae": tower.cost.build_gae,
+            "velu_evaluations_uncharged": tower.cost.velu_evaluations,
+        }),
+    }
+}
+
 pub fn build_tower<F: PrimeField>(
     f: &F,
     kind: WKind,
@@ -513,6 +618,7 @@ pub fn build_tower<F: PrimeField>(
     let tower = match kind {
         WKind::Kummer => kummer(f, t, rng),
         WKind::DicksonTorus => dickson_torus(f, t, rng),
+        WKind::Isogeny => isogeny(f, t, rng),
     };
     tower.check(f);
     tower
@@ -1065,7 +1171,7 @@ pub fn run_cell<F: PrimeField>(f: &F, cell: &WCell, a: &WArgs) -> (Vec<Value>, b
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crypto_lib::cryptanalysis::fp_backend::{Fp224, Fp32, Fp64, FpWide};
+    use crypto_lib::cryptanalysis::fp_backend::{Fp224, Fp32, Fp64, FpP192, FpWide};
     use rand::SeedableRng;
 
     fn p224() -> BigUint {
@@ -1127,5 +1233,62 @@ mod tests {
             strip(run_cell(&FpWide::<4>::new(&BigUint::from(p)), &cell, &a).0),
             want
         );
+    }
+
+    /// The isogeny kind at the NIST P-192 prime: the supersingular
+    /// auxiliary curve (v₂(p+1) = 64), the Vélu square rules, and a full
+    /// solved cell with the exhaustive verification — the first F4 run
+    /// of a PKM tower at P-192 (`docs/ic/factor-base-encyclopedia`
+    /// §0.2: "no F4 run ... because the plug-in and the isogeny system
+    /// builder are u64").
+    #[test]
+    fn isogeny_tower_solves_at_p192() {
+        let f = FpP192::new();
+        let mut rng = StdRng::seed_from_u64(2026_1101);
+        let tower = build_tower(&f, WKind::Isogeny, 4, &mut rng);
+        assert_eq!(tower.info["aux"], json!("supersingular"));
+        assert_eq!(tower.v.len(), 1 << 4);
+        // The square rules vanish on the level values of every x ∈ V.
+        let rules = tower.square_rules(&f, 0);
+        for &x in &tower.v {
+            let y = tower.values(&f, x);
+            for (j, r) in rules.iter().enumerate() {
+                let yj = y[j];
+                let y2 = f.sqr(yj);
+                let rhs = match r.next {
+                    Some(_) => {
+                        let a = f.mul(f.mul(r.a, yj), y[j + 1]);
+                        let b = f.mul(r.b, y[j + 1]);
+                        let c = f.mul(r.c, yj);
+                        f.add(f.add(a, b), f.add(c, r.d))
+                    }
+                    None => f.add(f.mul(r.c, yj), r.d),
+                };
+                assert!(f.is_zero(f.sub(y2, rhs)), "rule {j} fails on V");
+            }
+        }
+        // And one solved cell, m = 2, N = 8, with the exhaustive check.
+        let a = WArgs {
+            seed: 2026_1101,
+            planted: 1,
+            random: 0,
+            budget: 600,
+            max_nnz: None,
+            max_dense: None,
+            full_rank_exit: true,
+            trace: None,
+            targets: None,
+            verify: true,
+            label: "p192".into(),
+        };
+        let cell = WCell {
+            kind: WKind::Isogeny,
+            m: 2,
+            control: WControl::Tower,
+            t: 4,
+        };
+        let (rows, finished) = run_cell(&f, &cell, &a);
+        assert!(finished, "the cell stopped");
+        assert!(rows.iter().all(|r| r["verify"]["ok"] == json!(true)));
     }
 }

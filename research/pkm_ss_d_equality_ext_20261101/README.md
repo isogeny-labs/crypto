@@ -13,26 +13,29 @@ and `t = 12` (`N = 24`), same prime `p = 14,680,063 = 7·2^21 − 1`, two target
 per cell, default seeds, every finished row exhaustively re-verified
 (`verify = true`).
 
-## Status: running (rows land incrementally)
+## Results (all 8 rows, every one exhaustively re-verified, `verify = true`)
 
-- `ss-j1728, t = 11 (N = 22)`: **D = 6 on both targets** (width 63,073
-  columns, ≈470 s and ≈570 s per target). The ordinary arm initially
-  panicked: its seeded search landed on a supersingular curve
-  (`#E' = p + 1`, the study's own genuineness guard, probability ≈ 1/√p
-  per accepted curve) — `build_arm` now walks the seed until the searched
-  `E'` is ordinary (fixed in `examples/pkm_ss_tower.rs`, this task) and the
-  ordinary arm was relaunched.
-- `t = 12` cells for both arms and the ordinary `t = 11` cell: in flight.
+| arm | t | N | D (both targets) | width | per-target wall |
+|:--|--:|--:|:--:|--:|--:|
+| ss-j1728 | 11 | 22 | **6, 6** | 63,073 | 470 s, 570 s |
+| ordinary | 11 | 22 | **6, 6** | 63,078 | 960 s, 646 s |
+| ss-j1728 | 12 | 24 | **6, 6** | 110,862 | 1,878 s, 2,495 s |
+| ordinary | 12 | 24 | **6, 6** | 110,862 | 3,135 s, 2,049 s |
 
-## Reading (so far)
+The ordinary arm's seeded search initially landed on a supersingular curve
+(`#E' = p + 1`, the study's own genuineness guard, probability ≈ 1/√p per
+accepted curve): `build_arm` now walks the seed until the searched `E'` is
+ordinary (fixed in `examples/pkm_ss_tower.rs`, this task).
 
-At `N = 22` the supersingular tower's `D = 6` matches the ordinary tower's
-measured staircase at `N = 20`/`N = 22` (the re-measured Kummer ladder
-`research/pkm_kummer_remeasure_t1_14_20261101/` gives 6 at `t = 10 … 13`),
-i.e. the D-equality claim of PR #1947 Q2 extends one cell further, as its
-derived argument (same leading forms and supports) predicts. The
-comparison to close is ss-j1728 against the *ordinary* arm at the same
-`(m, t)` once that arm lands.
+## Reading
+
+**The D-equality of PR #1947 Q2 extends two cells beyond the measured
+`N ≤ 20`: supersingular `D` = ordinary `D` = 6 at `N = 22` and `N = 24`**,
+with the same widths (63,073/63,078 and 110,862 columns) and the
+supersingular arm cheaper per target (no search; its aux share is the
+build only).  This matches the derived argument (same leading forms and
+supports) and the re-measured Kummer ladder, which gives 6 at
+`t = 10 … 13` (`research/pkm_kummer_remeasure_t1_14_20261101/`).
 
 ## Reproduce
 

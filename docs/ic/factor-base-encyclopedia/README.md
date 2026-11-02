@@ -109,8 +109,12 @@ generic-field engine `f4_tower_generic`
 now runs the Kummer tower at the P-224 prime and the Dickson torus tower at
 the P-192 and P-256 primes. It gives the recorded small-prime `D`, width and
 step count in all 82 cells run (§0.1). The isogeny tower has an auxiliary
-curve and a built `V` at the P-192 prime (PR #1925, §0.2), but **no F4 run at
-P-192 yet**: its system builder is still `u64`. Both are stage diagnostics of
+curve and a built `V` at the P-192 prime (PR #1925, §0.2), and since
+2026-11-01 a **wide system builder** (`prime_tower_wide.rs`, generic over
+`fp_backend::PrimeField`): the supersingular auxiliary curve at P-192 and
+solved F4 cells on the isogeny tower at NIST primes
+(`research/pkm_isogeny_wide_p192_20261101/`); the `u64` pilot remains the
+small-prime instrument. Both are stage diagnostics of
 the solver or of the construction. Neither family has a priced relation phase
 (`S`, ratio to rho) at a NIST size; the `prime-kummer` and `prime-isogeny`
 plug-ins work in `u64` (`prime_tower.rs`, and `primitive_two_power_root`
@@ -516,8 +520,10 @@ its twist, `ss-j0`, `ss-j0-twist`). Three pre-registered questions:
 only, `N ≤ 20`. Priced end to end in ecbench at 20–28 bits (PRs #1889, #1947;
 accounting: no gain over a plain base for a table oracle). At P-192 the
 auxiliary curve and `V` are built (PR #1925), and the supersingular curve
-makes the auxiliary search free (PR #1947); no F4 run or relation phase has
-run at P-192, because the plug-in and the isogeny system builder are `u64`.
+makes the auxiliary search free (PR #1947); solved F4 cells on the isogeny
+tower at P-192 exist since 2026-11-01 (`prime_tower_wide`,
+`research/pkm_isogeny_wide_p192_20261101/`), but no relation phase: the
+priced `prime-isogeny` plug-in (ecbench) is still `u64`.
 The autoresearcher program cites the construction (`AR:KN-LIT-025`) but never
 built it: `AR:H-RELN-96e3ba` calls the PKM arm "unmaterialised".
 The P-192 `t = 48` auxiliary search card (§8) is abandoned as superseded

@@ -2242,3 +2242,10 @@ warning: stripping debug info with `rust-objcopy` failed: signal: 6 (SIGABRT)
 warning: `crypto` (example "pkm_ss_tower") generated 1 warning
     Finished `release` profile [optimized] target(s) in 14m 25s
      Running `/Volumes/SSD990-2/llm/build/crypto-target/release/examples/pkm_ss_tower f4 --p 14680063 --arm ordinary --m 2 --t-min 11 --t-max 12 --targets 2 --budget 259200 --out research/pkm_ss_d_equality_ext_20261101/ordinary_m2_t11_12.jsonl`
+ordinary        tower m=2 t=11 N=22 tgt=0 D=6 width=63078 steps=31 inc=true 959872.1 ms
+ss-j1728        tower m=2 t=12 N=24 tgt=0 D=6 width=110862 steps=34 inc=false 1878493.8 ms
+ordinary        tower m=2 t=11 N=22 tgt=1 D=6 width=63078 steps=31 inc=true 645825.2 ms
+ss-j1728        tower m=2 t=12 N=24 tgt=1 D=6 width=110862 steps=34 inc=true 2494665.4 ms
+done Sun Nov  1 18:57:28 PST 2026
+ordinary        tower m=2 t=12 N=24 tgt=0 D=6 width=110862 steps=34 inc=false 3135064.7 ms
+ordinary        tower m=2 t=12 N=24 tgt=1 D=6 width=110862 steps=34 inc=true 2049176.2 ms
