@@ -48,6 +48,7 @@ use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 
 use super::stages::{InstanceCtx, Params};
+use crate::cryptanalysis::group_op_count::ops_snapshot;
 use crate::cryptanalysis::ic_boundary::{
     BinaryGroup, BinaryInstance, CountedGroup, FactorBase, FrobeniusPairTable, GroupOps,
     OracleCounters, Relation,
@@ -121,6 +122,7 @@ struct Counters {
     trivial_rows: u64,
     target_only_rows: u64,
     verification_scalar_mults: u64,
+    eliminator_relation_scalar_mults: u64,
     verification_failures: u64,
     merge_depth_total: u64,
     merge_sources_total: u64,
@@ -358,6 +360,12 @@ impl<'i> LargePrimeCollector<'i> {
                 (fb.col_of[rep], fb.coef_of[rep])
             })
             .collect();
+        // `WideLargePrimeEliminator::with_base` validates `[r]Q`, `[r]G`
+        // and one representative of every raw signed orbit. Those calls use
+        // the globally measured Koblitz arithmetic (not this wrapper's
+        // `GroupOps`), so expose their exact subtotal separately from the
+        // wrapper scalar-multiplication metadata.
+        let eliminator_validation_scalar_mults = 2 + ffb.signed_orbits.len() as u64;
         let eliminator =
             WideLargePrimeEliminator::new_owned(kc, ffb, fast.lower(ctx.target), config.limits)
                 .map_err(|e| format!("large-prime eliminator: {e}"))?;
@@ -366,6 +374,10 @@ impl<'i> LargePrimeCollector<'i> {
         setup.insert("lp_domain_orbits".into(), domain_orbits as u64);
         setup.insert("lp_domain_points".into(), domain_point_count as u64);
         setup.insert("lp_base_orbit_keys".into(), base_keys);
+        setup.insert(
+            "lp_eliminator_validation_scalar_mults".into(),
+            eliminator_validation_scalar_mults,
+        );
         setup.insert("lp_domain_scan_abscissae_uncharged".into(), scanned);
         setup.insert("lp_domain_scan_lifts_uncharged".into(), lifts);
         setup.insert("lp_domain_scan_projected".into(), projected);
@@ -454,6 +466,10 @@ impl<'i> LargePrimeCollector<'i> {
             "lp_verification_scalar_mults".into(),
             c.verification_scalar_mults,
         );
+        out.insert(
+            "lp_eliminator_relation_scalar_mults".into(),
+            c.eliminator_relation_scalar_mults,
+        );
         out.insert("lp_verification_failures".into(), c.verification_failures);
         // `filter_wall_ns` is a wall-clock reading; recording it in the replayed
         // `native` map made every double-LP record differ from its own replay
@@ -484,9 +500,14 @@ impl<'i> LargePrimeCollector<'i> {
         };
         self.next_source += 1;
         self.counters.partials_fed += 1;
+        let global_before = ops_snapshot();
         let started = Instant::now();
         let outcome = self.eliminator.feed(candidate);
         self.counters.filter_wall_ns += started.elapsed().as_nanos() as u64;
+        self.counters.eliminator_relation_scalar_mults = self
+            .counters
+            .eliminator_relation_scalar_mults
+            .saturating_add(ops_snapshot().since(&global_before).scalar_mults);
         match outcome {
             Err(e) => {
                 self.counters.rejected += 1;
@@ -575,17 +596,7 @@ impl<'i> LargePrimeCollector<'i> {
         b: u64,
     ) -> Vec<Relation> {
         let small_points = self.small_points;
-        self.decompose_over(
-            ctx,
-            fb,
-            ops,
-            counters,
-            point,
-            a,
-            b,
-            0..small_points,
-            true,
-        )
+        self.decompose_over(ctx, fb, ops, counters, point, a, b, 0..small_points, true)
     }
 
     /// The large-prime probe over an explicit aimed/windowed subset of
@@ -725,17 +736,7 @@ impl<'i> LargePrimeCollector<'i> {
                 return vec![Relation::Summands(vec![i, j, k])];
             }
             if let Some(relation) =
-                self.decompose_lp_residual(
-                    g,
-                    fb,
-                    ops,
-                    counters,
-                    i,
-                    t,
-                    a,
-                    b,
-                    allow_direct_two_sum,
-                )
+                self.decompose_lp_residual(g, fb, ops, counters, i, t, a, b, allow_direct_two_sum)
             {
                 return vec![relation];
             }
@@ -1168,10 +1169,10 @@ mod tests {
                 if g.is_identity(&candidate) {
                     continue;
                 }
-                let log_i = ((seeds[fb.col_of[i]] as u128 * fb.coef_of[i] as u128)
-                    % inst.r as u128) as u64;
-                let log_j = ((seeds[fb.col_of[j]] as u128 * fb.coef_of[j] as u128)
-                    % inst.r as u128) as u64;
+                let log_i =
+                    ((seeds[fb.col_of[i]] as u128 * fb.coef_of[i] as u128) % inst.r as u128) as u64;
+                let log_j =
+                    ((seeds[fb.col_of[j]] as u128 * fb.coef_of[j] as u128) % inst.r as u128) as u64;
                 let a = ((log_i as u128 + log_j as u128) % inst.r as u128) as u64;
                 let mut probe_ops = GroupOps::default();
                 let mut probe_counters = OracleCounters::default();

@@ -2600,8 +2600,7 @@ fn koblitz_descent_applicable(m: &ResolvedMethod, i: &BinaryInstance) -> Result<
     if kc.n.is_multiple_of(2) || kc.n >= 64 || kc.subgroup_order.bits() > 64 {
         return Err(format!(
             "`{}` needs odd n < 64 and a subgroup order of at most 64 bits; n = {}",
-            m.id,
-            kc.n
+            m.id, kc.n
         ));
     }
     KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, 0)?;
@@ -6607,7 +6606,12 @@ fn solve_koblitz_descent_lp(
                     if name.contains("canonicalisations")
                         || name.contains("frobenius_maps")
                         || name == "lp_table_adds"
-                        || name == "lp_verification_scalar_mults"
+                        || matches!(
+                            name.as_str(),
+                            "lp_eliminator_validation_scalar_mults"
+                                | "lp_eliminator_relation_scalar_mults"
+                                | "lp_verification_scalar_mults"
+                        )
                     {
                         continue;
                     }
@@ -6618,9 +6622,7 @@ fn solve_koblitz_descent_lp(
                 // Hash lookups have no thread-local owner; canonicalisations
                 // and Frobenius coordinate maps do and therefore stay out of
                 // this explicit phase-native overlay.
-                for (name, value) in
-                    [("lp_oracle_lookups", out.large_prime.oracle_lookups)]
-                {
+                for (name, value) in [("lp_oracle_lookups", out.large_prime.oracle_lookups)] {
                     if value > 0 {
                         *native.entry(name.into()).or_insert(0) += value;
                     }
@@ -6685,14 +6687,8 @@ fn solve_koblitz_descent_lp(
         ("pair_bucket_reads_uncharged", native.bucket_reads),
         ("frobenius_maps_uncharged", native.frobenius_maps),
         ("la_row_ops_uncharged", la_row_ops),
-        (
-            "fb_abscissae_lifted_uncharged",
-            c.selection.abscissae_drawn,
-        ),
-        (
-            "fb_rebuilds_uncharged",
-            u64::from(c.selection.rebuilds),
-        ),
+        ("fb_abscissae_lifted_uncharged", c.selection.abscissae_drawn),
+        ("fb_rebuilds_uncharged", u64::from(c.selection.rebuilds)),
         (
             "lp_domain_scan_abscissae_uncharged",
             out.large_prime
@@ -6721,7 +6717,10 @@ fn solve_koblitz_descent_lp(
             "lp_small_table_lookups_uncharged",
             out.large_prime.setup.get("lookups").copied().unwrap_or(0),
         ),
-        ("lp_oracle_lookups_uncharged", out.large_prime.oracle_lookups),
+        (
+            "lp_oracle_lookups_uncharged",
+            out.large_prime.oracle_lookups,
+        ),
         (
             "lp_pivot_reductions_uncharged",
             out.large_prime
@@ -8085,16 +8084,29 @@ mod accounting_rules_tests {
         for unit in &two.unpriced {
             assert!(
                 !(unit.starts_with("lp_")
-                    && (unit.contains("canonicalisations")
-                        || unit.contains("frobenius_maps"))),
+                    && (unit.contains("canonicalisations") || unit.contains("frobenius_maps"))),
                 "{unit} duplicates a thread-local native unit"
+            );
+            assert!(
+                !matches!(
+                    unit.as_str(),
+                    "lp_eliminator_validation_scalar_mults"
+                        | "lp_eliminator_relation_scalar_mults"
+                        | "lp_verification_scalar_mults"
+                ),
+                "{unit} duplicates an explicitly phase-owned scalar count"
             );
         }
         for phase in &two.phases {
             assert!(phase.native.keys().all(|name| {
                 !(name.starts_with("lp_")
-                    && (name.contains("canonicalisations")
-                        || name.contains("frobenius_maps")))
+                    && (name.contains("canonicalisations") || name.contains("frobenius_maps")))
+                    && !matches!(
+                        name.as_str(),
+                        "lp_eliminator_validation_scalar_mults"
+                            | "lp_eliminator_relation_scalar_mults"
+                            | "lp_verification_scalar_mults"
+                    )
             }));
         }
         for (counter, native) in [
@@ -8113,7 +8125,17 @@ mod accounting_rules_tests {
             .iter()
             .find(|phase| phase.name == "oracle_setup")
             .unwrap();
+        let baseline_setup = baseline
+            .phases
+            .iter()
+            .find(|phase| phase.name == "oracle_setup")
+            .unwrap();
         let relations = two
+            .phases
+            .iter()
+            .find(|phase| phase.name == "relations")
+            .unwrap();
+        let baseline_relations = baseline
             .phases
             .iter()
             .find(|phase| phase.name == "relations")
@@ -8121,28 +8143,73 @@ mod accounting_rules_tests {
         let detail = &two.detail["large_prime"];
         let wrapper_setup = detail["wrapper_scalar_mults_setup"].as_u64().unwrap();
         let wrapper_relations = detail["wrapper_scalar_mults_relations"].as_u64().unwrap();
-        assert_eq!(setup.scalar_mults, wrapper_setup);
+        let raw_signed_orbits = detail["setup"]["lp_base_orbit_keys"].as_u64().unwrap();
+        let eliminator_validation = detail["setup"]["lp_eliminator_validation_scalar_mults"]
+            .as_u64()
+            .unwrap();
+        let eliminator_relations = detail["relations"]["lp_eliminator_relation_scalar_mults"]
+            .as_u64()
+            .unwrap();
+        assert_eq!(baseline_setup.scalar_mults, 0, "frozen n=13 setup oracle");
+        assert_eq!(
+            eliminator_validation,
+            2 + raw_signed_orbits,
+            "the treatment's non-wrapper residual is [r]Q, [r]G and one [r] representative per raw signed orbit"
+        );
+        assert_eq!(
+            eliminator_validation, 9,
+            "the n=13 treatment validates Q, G and seven raw orbit representatives"
+        );
+        assert_eq!(
+            setup.scalar_mults,
+            baseline_setup.scalar_mults + wrapper_setup + eliminator_validation,
+            "treatment setup is frozen setup plus wrapper metadata plus globally measured eliminator validation"
+        );
+        assert_eq!(
+            two.counters
+                .get("aimed_lp_eliminator_validation_scalar_mults")
+                .copied(),
+            Some(eliminator_validation)
+        );
         assert_eq!(
             two.counters
                 .get("aimed_lp_verification_scalar_mults")
                 .copied(),
             Some(wrapper_relations)
         );
-        assert!(relations.scalar_mults >= wrapper_relations);
+        assert_eq!(
+            two.counters
+                .get("aimed_lp_eliminator_relation_scalar_mults")
+                .copied(),
+            Some(eliminator_relations)
+        );
+        assert_eq!(
+            wrapper_relations, 0,
+            "the saturated control closes no wrapper rows"
+        );
+        assert_eq!(
+            eliminator_relations, 0,
+            "the saturated control feeds no eliminator candidates"
+        );
+        assert_eq!(
+            relations.scalar_mults,
+            baseline_relations.scalar_mults + wrapper_relations + eliminator_relations,
+            "treatment relation scalar multiplications have exact frozen-plus-wrapper-plus-eliminator ownership"
+        );
         let ordinary_summands = two.counters["collection_trials"] * 16;
         let partial_summands = two.counters["aimed_lp_partial_summands_scanned"];
-        assert!(two.counters["aimed_lp_partial_scan_trials"] > 0);
-        assert!(partial_summands > 0);
+        assert_eq!(two.counters["aimed_lp_partial_scan_trials"], 0);
+        assert_eq!(partial_summands, 0);
         assert_eq!(
             two.counters["summands_scanned"],
             ordinary_summands + partial_summands,
-            "treatment scan accounting is frozen ordinary work plus the exact LP second pass"
+            "the saturated integration control has frozen ordinary work and an exact zero LP second pass"
         );
         assert!(relations.adds + relations.doubles >= two.counters["summands_scanned"]);
         assert!(two.counters["pair_filter_probes_uncharged"] >= ordinary_summands);
         assert!(two.counters["lp_small_table_lookups_uncharged"] > 0);
         assert!(two.counters["lp_table_lookups_uncharged"] > 0);
-        assert!(two.counters["lp_oracle_lookups_uncharged"] > 0);
+        assert_eq!(two.counters["lp_oracle_lookups_uncharged"], 0);
     }
 
     #[test]
@@ -8972,7 +9039,7 @@ mod accounting_rules_tests {
             "ic.hyperelliptic",
             "ic.hyperelliptic_thread", // hyper_ic tests
             "ic.known_log_mitm2_v1",
-            "ic.koblitz_descent", // koblitz_descent tests
+            "ic.koblitz_descent",       // koblitz_descent tests
             "ic.koblitz_descent_lp_v1", // versioned aimed-LP tests
             "ic.pipeline_wordram",
             "ic.trace_line_2lp",

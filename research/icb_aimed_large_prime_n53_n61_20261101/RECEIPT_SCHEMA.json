@@ -268,7 +268,7 @@
         "verified_rows",
         "aa_pairs_identical",
         "lp0_pairs_identical",
-        "lp2_rows_active",
+        "lp2_rows_saturated",
         "lp2_rows_with_merged_relation",
         "lp_direct_two_sum",
         "lp_verification_failures",
@@ -276,7 +276,7 @@
         "note"
       ],
       "properties": {
-        "schema": {"const": "icb.aimed2lp.control/v1"},
+        "schema": {"const": "icb.aimed2lp.control/v2"},
         "created": {"type": "string", "minLength": 1},
         "status": {"enum": ["pass", "fail"]},
         "session_id": {"type": "string", "pattern": "^ECBS1h[0-9a-f]{12}$"},
@@ -287,8 +287,8 @@
         "verified_rows": {"const": 50},
         "aa_pairs_identical": {"const": 10},
         "lp0_pairs_identical": {"const": 10},
-        "lp2_rows_active": {"const": 20},
-        "lp2_rows_with_merged_relation": {"const": 20},
+        "lp2_rows_saturated": {"const": 20},
+        "lp2_rows_with_merged_relation": {"const": 0},
         "lp_direct_two_sum": {"const": 0},
         "lp_verification_failures": {"const": 0},
         "replay_required": {"const": true},

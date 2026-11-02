@@ -37,12 +37,20 @@ ordinary aimed three-sum opportunity census and probe scalars; that gate
 removes a known direct-search confound but does not relabel graph elimination
 alone as the measured treatment.
 
+Mechanism necessity is proved separately on one locked, unsaturated n=13
+actual-collector fixture selected only from target-independent (`b = 0`)
+relation behavior. Its exact prefix must contain ordinary misses and positive
+projected graph rows, leave the ordinary subset rank-deficient, and produce a
+verified combined table before the already-fixed toy target is descended.
+The timed window-16 n=13 integration control is intentionally saturated and
+must remain graph-inactive; it is not evidence for the mechanism.
+
 `large_primes=0` delegates at the final `SolveReport` boundary. The old
 focused PASS receipt predates audit repairs and is invalidated. A refreshed
 source-bound receipt must cover sparse mutated-row rejection, final LP0 report
 equivalence, three-summand/direct-two-sum invariants, merged-row recovery,
-accounting ownership, resolved plans, provider topology, native analysis, and
-canonical export.
+exact frozen-plus-eliminator-plus-wrapper scalar-multiplication ownership,
+resolved plans, provider topology, native analysis, and canonical export.
 
 ## Frozen design after approval
 
@@ -92,11 +100,13 @@ readback-verified custody listing.
 
 ## Controls and inference
 
-The n=13 positive control has two targets, five arms, one warmup, and five
+The n=13 integration control has two targets, five arms, one warmup, and five
 measured rounds: 60 executions, 50 measured. It must yield ten exact A/A
-pairs, ten exact LP0 pairs, twenty active 2LP rows each containing a merged
-relation, no direct two-sum, no LP verification failure, and complete
-replay-all/custody receipts.
+pairs, ten exact LP0 pairs, and twenty verified 2LP rows with the frozen
+window-16 saturation counters (no partial scan, projected row, or merge), no
+direct two-sum, no LP verification failure, and complete replay-all/custody
+receipts. The separate unsaturated focused fixture is the mechanism-positive
+control.
 
 For n=53/n=61 the real wrapper sees `rho-v2` as first reference and
 `aimed-aa` as first control; `aimed` supplies its same-method A/A peer. For the
@@ -108,8 +118,9 @@ repeated timings. The native analyzer reports target-cluster intervals and an
 exact `2^8` sign-flip test of `candidate - 0.95 * aimed`, then Holm-adjusts the
 four factor-by-size wall tests. One factor is an `IMPROVEMENT` only when its
 upper wall-ratio bound is at most 0.95 and adjusted `p <= 0.05` at both sizes,
-after every exact gate. This is a finite-host result, not an exponent or
-cross-hardware claim.
+after every exact gate. Every verified n=53/n=61 2LP row must also pass the
+strict positive partial-scan/projected-row/merge activity gate. This is a
+finite-host result, not an exponent or cross-hardware claim.
 
 Scientific exhaustion/cap/timeout is retained as
 `CENSORED NON-IMPROVEMENT`; authenticated resource/infrastructure refusal is

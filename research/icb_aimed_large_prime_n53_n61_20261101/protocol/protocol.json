@@ -353,7 +353,7 @@
     "positive": {
       "present": true,
       "arm": "aimed-lp0",
-      "expected_detection": "On the frozen n=13 L2 gate, ten measured A/A pairs have identical operations and counters; ten measured LP=0 pairs have the same recovered values, relation scalars, column logs, phase operations and replayed counters as aimed; each of the twenty measured 2LP rows recovers its target, emits lp_partial_scan_trials > 0, lp_partial_summands_scanned > 0, lp_partials_fed > 0, lp_projected_relations > 0 and lp_merged_relations > 0, has total summands_scanned at least its partial-scan summands, and emits lp_verification_failures = 0 and lp_direct_two_sum = 0.",
+      "expected_detection": "The focused mechanism-positive gate locks one unsaturated n=13 actual-collector prefix selected only from target-independent b=0 relations: ordinary misses feed the graph, projected rows are positive, the exact ordinary subset is rank-deficient, and the exact combined stream verifies the table and recovers the already-fixed toy target with exact replay/counter bindings. Separately, on the frozen saturated window-16 n=13 L2 integration gate, ten measured A/A pairs have identical operations and counters; ten measured LP=0 pairs have the same recovered values, relation scalars, column logs, phase operations and replayed counters as aimed; each of the twenty measured 2LP rows recovers its target with zero partial-scan trials/summands, partials fed, projected rows and merged rows, plus lp_verification_failures = 0 and lp_direct_two_sum = 0.",
       "not_applicable_reason": null
     },
     "negative": {
@@ -607,7 +607,7 @@
         "name": "large-prime graph activity",
         "unit": "events",
         "kind": "counted",
-        "definition": "Ordinary-miss partial-scan trials and actually visited partial-scan summands, partials fed/stored, pivot reductions, merged sources, projected rows, direct-two-sum rows, verification failures and caps, retained per arm and size. Verified aimed 2LP rows require positive partial-scan trials and summands, total summands_scanned at least the partial-scan summands, and direct-two-sum rows exactly zero.",
+        "definition": "Ordinary-miss partial-scan trials and actually visited partial-scan summands, partials fed/stored, pivot reductions, merged sources, projected rows, direct-two-sum rows, verification failures and caps, retained per arm and size. Eliminator validation and relation scalar-multiplication subtotals are exposed separately from wrapper metadata and remain globally phase-owned. The saturated window-16 n=13 integration rows require every activity count to be zero; mechanism activity is proved by the separately locked unsaturated focused fixture. Every verified n=53/n=61 aimed-2LP row keeps the strict production predicate: positive partial-scan trials and summands, positive partials fed, positive projected and merged rows, total summands_scanned at least partial-scan summands, and direct-two-sum and verification-failure counts exactly zero.",
         "source": "records.jsonl counters aimed_lp_* and detail.large_prime",
         "aggregation": "sum",
         "uncertainty": "none_exact"
@@ -727,7 +727,7 @@
       "preregistered": true
     },
     {
-      "rule": "Do not launch either target cell unless the focused-gate receipt, frozen protocol/checkpoint, immutable image identity, n=13 LP=0/2LP positive control and its replay-all receipt all pass.",
+      "rule": "Do not launch either target cell unless the focused-gate receipt includes the locked unsaturated n=13 actual-collector mechanism proof, the frozen protocol/checkpoint and immutable image identity pass, and the saturated n=13 LP=0/2LP integration control plus replay-all receipt pass.",
       "kind": "invalidation",
       "preregistered": true
     },
@@ -931,7 +931,7 @@
       "research/icb_aimed_large_prime_n53_n61_20261101/specs/n61.json"
     ],
     "spec_file_sha256": {
-      "research/icb_aimed_large_prime_n53_n61_20261101/specs/control-n13.json": "c3c83e00d6ea0da4ef1fd0a1380da9a6cd8cb5865a6b33fb25e647fc3dccfec6",
+      "research/icb_aimed_large_prime_n53_n61_20261101/specs/control-n13.json": "f1b95bc41d0ab9abb212ddb444ab9aa5311c1679e629700d4fa4642d9427cb69",
       "research/icb_aimed_large_prime_n53_n61_20261101/specs/n53.json": "0beac2080c9eb8bf5b0fc4db1a500a29841d0619dc0c3a96e04931c308a71a5c",
       "research/icb_aimed_large_prime_n53_n61_20261101/specs/n61.json": "7d992f8a20bf00e8e0d3508c2705108d88709166e2b43b5a4d255f38ec02464b"
     },

@@ -10,9 +10,7 @@
 use crypto_lib::cryptanalysis::ecbench::audit::{AuditReport, AUDIT_SCHEMA};
 use crypto_lib::cryptanalysis::ecbench::band::unpriced_counts;
 use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
-use crypto_lib::cryptanalysis::ecbench::compare::{
-    compare_loaded, CompareOptions, Comparison,
-};
+use crypto_lib::cryptanalysis::ecbench::compare::{compare_loaded, CompareOptions, Comparison};
 use crypto_lib::cryptanalysis::ecbench::record::Record;
 use crypto_lib::cryptanalysis::ecbench::runner::{read_records, read_session, Session};
 use crypto_lib::cryptanalysis::ecbench::spec::{plan, Execution, Level, Plan, Spec};
@@ -44,10 +42,7 @@ const CONTROL_ARMS: [&str; 5] = [
     "aimed-lp2-c05",
     "aimed-lp2-c1",
 ];
-const CANDIDATES: [(&str, &str); 2] = [
-    ("C-c05", "aimed-lp2-c05"),
-    ("C-c1", "aimed-lp2-c1"),
-];
+const CANDIDATES: [(&str, &str); 2] = [("C-c05", "aimed-lp2-c05"), ("C-c1", "aimed-lp2-c1")];
 const TARGETS: usize = 8;
 const ROUNDS: usize = 5;
 const RESAMPLES: usize = 20_000;
@@ -228,12 +223,18 @@ fn protocol_identity(path: &Path) -> Result<(Value, String), String> {
         .remove("freeze");
     let actual = sha256_hex(&protocol_canonical_bytes(&body)?);
     if actual != expected {
-        return Err(format!("frozen protocol hash differs: {actual} != {expected}"));
+        return Err(format!(
+            "frozen protocol hash differs: {actual} != {expected}"
+        ));
     }
     Ok((value, actual))
 }
 
-fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Result<Identity, String> {
+fn load_identity(
+    base: &Path,
+    manifest_path: &Path,
+    manifest: &Manifest,
+) -> Result<Identity, String> {
     let protocol_path = base.join(&manifest.protocol);
     let (protocol, protocol_sha256) = protocol_identity(&protocol_path)?;
     let protocol_id = protocol["protocol_id"]
@@ -249,13 +250,28 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
     exact_keys(
         &image,
         &[
-            "schema", "created", "source_commit", "cargo_lock_sha256", "binary_sha256",
-            "image_digest", "image_ref", "build_command", "rustflags", "cargo_build_jobs",
-            "focused_gate_receipt_sha256", "protocol_sha256", "checkpoint_receipt_sha256",
-            "analysis_manifest_sha256", "result_schema_sha256", "receipt_schema_sha256",
-            "request_schema_sha256", "native_analyzer_source_sha256",
-            "native_analyzer_binary_sha256", "native_provider_preflight_source_sha256",
-            "native_provider_preflight_binary_sha256", "specs",
+            "schema",
+            "created",
+            "source_commit",
+            "cargo_lock_sha256",
+            "binary_sha256",
+            "image_digest",
+            "image_ref",
+            "build_command",
+            "rustflags",
+            "cargo_build_jobs",
+            "focused_gate_receipt_sha256",
+            "protocol_sha256",
+            "checkpoint_receipt_sha256",
+            "analysis_manifest_sha256",
+            "result_schema_sha256",
+            "receipt_schema_sha256",
+            "request_schema_sha256",
+            "native_analyzer_source_sha256",
+            "native_analyzer_binary_sha256",
+            "native_provider_preflight_source_sha256",
+            "native_provider_preflight_binary_sha256",
+            "specs",
         ],
         "immutable image receipt",
     )?;
@@ -281,15 +297,21 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
         ],
         "image spec bindings",
     )?;
-    for relative in [expected_spec_path(13), expected_spec_path(53), expected_spec_path(61)] {
+    for relative in [
+        expected_spec_path(13),
+        expected_spec_path(53),
+        expected_spec_path(61),
+    ] {
         let spec = &image["specs"][relative.as_str()];
-        exact_keys(spec, &["file_sha256", "identity_sha256", "spec_id"], "image spec")?;
+        exact_keys(
+            spec,
+            &["file_sha256", "identity_sha256", "spec_id"],
+            "image spec",
+        )?;
         if sha256_string(&spec["file_sha256"]).is_none()
             || sha256_string(&spec["identity_sha256"]).is_none()
             || !spec["spec_id"].as_str().is_some_and(|id| {
-                id.len() == 17
-                    && id.starts_with("ECS1h")
-                    && lowercase_hex(&id[5..])
+                id.len() == 17 && id.starts_with("ECS1h") && lowercase_hex(&id[5..])
             })
         {
             return Err(format!("image spec binding is malformed for {relative}"));
@@ -308,8 +330,8 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
         || !image_digest.starts_with("sha256:")
         || !lowercase_hex(&image_digest[7..])
         || !image["image_ref"]
-        .as_str()
-        .is_some_and(|reference| reference.ends_with(&format!("@{image_digest}")))
+            .as_str()
+            .is_some_and(|reference| reference.ends_with(&format!("@{image_digest}")))
         || image["protocol_sha256"] != protocol_sha256
         || image["analysis_manifest_sha256"] != sha256_hex(&bytes(manifest_path)?)
         || image["cargo_lock_sha256"] != sha256_hex(&bytes(&base.join("../../Cargo.lock"))?)
@@ -371,8 +393,7 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
         &std::env::current_exe().map_err(|e| format!("current analyzer: {e}"))?,
     )?);
     if protocol["extensions"]["native_analyzer_binary_sha256"] != analysis_binary_sha256
-        || protocol["extensions"]["native_analysis"]["binary_sha256"]
-            != analysis_binary_sha256
+        || protocol["extensions"]["native_analysis"]["binary_sha256"] != analysis_binary_sha256
         || manifest.native_analyzer.binary_sha256 != analysis_binary_sha256
         || image["native_analyzer_binary_sha256"] != analysis_binary_sha256
     {
@@ -385,8 +406,7 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             .ok_or("provider-preflight source path missing")?,
     );
     if fs::canonicalize(&preflight_source_path).map_err(|error| error.to_string())?
-        != fs::canonicalize(&protocol_preflight_source_path)
-            .map_err(|error| error.to_string())?
+        != fs::canonicalize(&protocol_preflight_source_path).map_err(|error| error.to_string())?
     {
         return Err("manifest and protocol name different provider-preflight sources".into());
     }
@@ -396,8 +416,7 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             != provider_preflight_source_sha256
         || protocol["extensions"]["provider_preflight"]["source_sha256"]
             != provider_preflight_source_sha256
-        || image["native_provider_preflight_source_sha256"]
-            != provider_preflight_source_sha256
+        || image["native_provider_preflight_source_sha256"] != provider_preflight_source_sha256
     {
         return Err("native provider-preflight source differs from the frozen protocol".into());
     }
@@ -414,18 +433,27 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             != provider_preflight_binary_sha256
         || protocol["extensions"]["provider_preflight"]["binary_sha256"]
             != provider_preflight_binary_sha256
-        || image["native_provider_preflight_binary_sha256"]
-            != provider_preflight_binary_sha256
+        || image["native_provider_preflight_binary_sha256"] != provider_preflight_binary_sha256
     {
-        return Err("native provider-preflight binary differs from protocol/image identities".into());
+        return Err(
+            "native provider-preflight binary differs from protocol/image identities".into(),
+        );
     }
     let self_test = json_value(&base.join(&manifest.native_analyzer.self_test_receipt))?;
     exact_keys(
         &self_test,
         &[
-            "schema", "created", "status", "source_sha256", "binary_sha256",
-            "analysis_manifest_sha256", "result_schema_sha256", "receipt_schema_sha256",
-            "request_schema_sha256", "command", "checks",
+            "schema",
+            "created",
+            "status",
+            "source_sha256",
+            "binary_sha256",
+            "analysis_manifest_sha256",
+            "result_schema_sha256",
+            "receipt_schema_sha256",
+            "request_schema_sha256",
+            "command",
+            "checks",
         ],
         "native analyzer self-test receipt",
     )?;
@@ -468,7 +496,9 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
     }
     for required in SELF_TEST_CHECKS {
         if !check_ids.contains(required) {
-            return Err(format!("native analyzer self-test receipt omits {required}"));
+            return Err(format!(
+                "native analyzer self-test receipt omits {required}"
+            ));
         }
     }
     if focused["source_commit"] != source_commit
@@ -482,7 +512,10 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
         .as_array()
         .filter(|checks| !checks.is_empty())
         .ok_or("focused gate receipt has no checks")?;
-    if focused_checks.iter().any(|check| check["outcome"] != "pass") {
+    if focused_checks
+        .iter()
+        .any(|check| check["outcome"] != "pass")
+    {
         return Err("focused gate receipt contains a non-passing check".into());
     }
     let focused_names = focused_checks
@@ -527,15 +560,27 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
     exact_keys(
         &provider_preflight,
         &[
-            "schema", "created", "status", "source_sha256", "binary_sha256", "wrapper",
-            "compare_implementation", "request", "specs", "gate",
+            "schema",
+            "created",
+            "status",
+            "source_sha256",
+            "binary_sha256",
+            "wrapper",
+            "compare_implementation",
+            "request",
+            "specs",
+            "gate",
         ],
         "provider preflight receipt",
     )?;
     if provider_preflight["schema"] != "icb.aimed2lp.provider_preflight/v1"
         || provider_preflight["status"] != "pass"
-        || provider_preflight["created"].as_str().is_none_or(str::is_empty)
-        || provider_preflight["gate"].as_str().is_none_or(str::is_empty)
+        || provider_preflight["created"]
+            .as_str()
+            .is_none_or(str::is_empty)
+        || provider_preflight["gate"]
+            .as_str()
+            .is_none_or(str::is_empty)
         || provider_preflight["source_sha256"] != provider_preflight_source_sha256
         || provider_preflight["binary_sha256"] != provider_preflight_binary_sha256
     {
@@ -552,7 +597,9 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             .ok_or_else(|| format!("provider preflight {field} path is absent"))?;
         let source_path = base.join("../..").join(relative);
         if provider_preflight[field]["sha256"] != sha256_hex(&bytes(&source_path)?) {
-            return Err(format!("provider preflight {field} source binding is stale"));
+            return Err(format!(
+                "provider preflight {field} source binding is stale"
+            ));
         }
     }
     for (key, expected) in manifest
@@ -590,7 +637,10 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
     )?;
     exact_keys(
         &provider_preflight["request"]["node_selector"],
-        &["node.kubernetes.io/instance-type", "eks.amazonaws.com/capacityType"],
+        &[
+            "node.kubernetes.io/instance-type",
+            "eks.amazonaws.com/capacityType",
+        ],
         "provider preflight node selector",
     )?;
     if provider_preflight["request"]["node_selector"]["node.kubernetes.io/instance-type"]
@@ -617,12 +667,30 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
         exact_keys(
             spec,
             &[
-                "path", "file_sha256", "spec_id", "spec_sha256", "request_template_path",
-                "request_template_sha256", "payload_sha256", "payload_bytes", "argv",
-                "provider_identity_sha256", "pod_spec_sha256", "durable_prefix",
-                "first_reference", "first_control", "aa_denominator", "aa_numerator",
-                "aa_selection", "scheduled_aa_pairs", "measured_rows", "rounds", "warmup",
-                "targets", "child_timeout_seconds", "isolation_required",
+                "path",
+                "file_sha256",
+                "spec_id",
+                "spec_sha256",
+                "request_template_path",
+                "request_template_sha256",
+                "payload_sha256",
+                "payload_bytes",
+                "argv",
+                "provider_identity_sha256",
+                "pod_spec_sha256",
+                "durable_prefix",
+                "first_reference",
+                "first_control",
+                "aa_denominator",
+                "aa_numerator",
+                "aa_selection",
+                "scheduled_aa_pairs",
+                "measured_rows",
+                "rounds",
+                "warmup",
+                "targets",
+                "child_timeout_seconds",
+                "isolation_required",
             ],
             "provider preflight spec",
         )?;
@@ -633,9 +701,7 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             .strip_prefix("research/icb_aimed_large_prime_n53_n61_20261101/specs/")
             .and_then(|name| name.strip_suffix(".json"))
             .ok_or("provider preflight spec path is outside the study")?;
-        if !matches!(cell, "control-n13" | "n53" | "n61")
-            || !preflight_cells.insert(cell)
-        {
+        if !matches!(cell, "control-n13" | "n53" | "n61") || !preflight_cells.insert(cell) {
             return Err("provider preflight repeats or invents a cell".into());
         }
         let template_relative = manifest
@@ -644,9 +710,8 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             .ok_or("provider preflight cell has no request template")?;
         let template = json_value(&base.join(template_relative))?;
         let spec_receipt = &image["specs"][path];
-        let expected_request_path = format!(
-            "research/icb_aimed_large_prime_n53_n61_20261101/{template_relative}"
-        );
+        let expected_request_path =
+            format!("research/icb_aimed_large_prime_n53_n61_20261101/{template_relative}");
         if spec["file_sha256"] != spec_receipt["file_sha256"]
             || spec["spec_id"] != spec_receipt["spec_id"]
             || spec["spec_sha256"] != spec_receipt["identity_sha256"]
@@ -659,9 +724,17 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             || spec["pod_spec_sha256"] != template["pod_spec_sha256"]
             || spec["durable_prefix"] != template["durable_prefix"]
             || spec["first_reference"]
-                != if cell == "control-n13" { "aimed" } else { "rho-v2" }
+                != if cell == "control-n13" {
+                    "aimed"
+                } else {
+                    "rho-v2"
+                }
             || spec["first_control"]
-                != if cell == "control-n13" { "aimed-lp0" } else { "aimed-aa" }
+                != if cell == "control-n13" {
+                    "aimed-lp0"
+                } else {
+                    "aimed-aa"
+                }
             || spec["aa_denominator"] != "aimed"
             || spec["aa_numerator"] != "aimed-aa"
             || spec["aa_selection"].as_str().is_none_or(str::is_empty)
@@ -670,8 +743,7 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             || spec["rounds"] != 5
             || spec["warmup"] != 1
             || spec["targets"] != if cell == "control-n13" { 2 } else { 8 }
-            || spec["child_timeout_seconds"]
-                != if cell == "control-n13" { 600 } else { 3_600 }
+            || spec["child_timeout_seconds"] != if cell == "control-n13" { 600 } else { 3_600 }
             || spec["isolation_required"] != "L2"
         {
             return Err(format!("provider preflight binding drifts for {cell}"));
@@ -681,12 +753,24 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
     exact_keys(
         &checkpoint,
         &[
-            "schema", "created", "status", "source_commit", "protocol_sha256",
-            "filed_before_affected_data", "resume_sha256", "focused_gate_receipt_sha256",
-            "analysis_manifest_sha256", "result_schema_sha256", "receipt_schema_sha256",
-            "request_schema_sha256", "request_templates", "native_analyzer_source_sha256",
-            "native_analyzer_binary_sha256", "native_provider_preflight_source_sha256",
-            "native_provider_preflight_binary_sha256", "provider_preflight_receipt_sha256",
+            "schema",
+            "created",
+            "status",
+            "source_commit",
+            "protocol_sha256",
+            "filed_before_affected_data",
+            "resume_sha256",
+            "focused_gate_receipt_sha256",
+            "analysis_manifest_sha256",
+            "result_schema_sha256",
+            "receipt_schema_sha256",
+            "request_schema_sha256",
+            "request_templates",
+            "native_analyzer_source_sha256",
+            "native_analyzer_binary_sha256",
+            "native_provider_preflight_source_sha256",
+            "native_provider_preflight_binary_sha256",
+            "provider_preflight_receipt_sha256",
             "target_rows",
         ],
         "prospective checkpoint receipt",
@@ -710,18 +794,13 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
             != sha256_hex(&bytes(&base.join(&manifest.receipt_schema))?)
         || checkpoint["request_schema_sha256"]
             != sha256_hex(&bytes(&base.join(&manifest.request_schema))?)
-        || checkpoint["resume_sha256"]
-            != sha256_hex(&bytes(&base.join("../../.resume/RESUME.md"))?)
+        || checkpoint["resume_sha256"] != sha256_hex(&bytes(&base.join("../../.resume/RESUME.md"))?)
         || checkpoint["native_analyzer_source_sha256"] != source_sha256
         || checkpoint["native_analyzer_binary_sha256"] != analysis_binary_sha256
-        || checkpoint["native_provider_preflight_source_sha256"]
-            != provider_preflight_source_sha256
-        || checkpoint["native_provider_preflight_binary_sha256"]
-            != provider_preflight_binary_sha256
-        || checkpoint["native_provider_preflight_source_sha256"]
-            != provider_preflight_source_sha256
-        || checkpoint["native_provider_preflight_binary_sha256"]
-            != provider_preflight_binary_sha256
+        || checkpoint["native_provider_preflight_source_sha256"] != provider_preflight_source_sha256
+        || checkpoint["native_provider_preflight_binary_sha256"] != provider_preflight_binary_sha256
+        || checkpoint["native_provider_preflight_source_sha256"] != provider_preflight_source_sha256
+        || checkpoint["native_provider_preflight_binary_sha256"] != provider_preflight_binary_sha256
         || checkpoint["provider_preflight_receipt_sha256"]
             != sha256_hex(&bytes(&base.join(&manifest.provider_preflight))?)
         || checkpoint["target_rows"] != 0
@@ -734,7 +813,9 @@ fn load_identity(base: &Path, manifest_path: &Path, manifest: &Manifest) -> Resu
         if checkpoint["request_templates"][cell.as_str()]
             != sha256_hex(&bytes(&base.join(relative))?)
         {
-            return Err(format!("checkpoint does not bind the {cell} request template"));
+            return Err(format!(
+                "checkpoint does not bind the {cell} request template"
+            ));
         }
     }
     for arm in protocol["arms"].as_array().ok_or("protocol arms missing")? {
@@ -810,7 +891,10 @@ fn checked_audit(path: &Path, session: &Session, measured: usize) -> Result<Audi
         || !audit.problems.is_empty()
         || !audit.regraded
     {
-        return Err(format!("{} is not a complete replay-all audit", path.display()));
+        return Err(format!(
+            "{} is not a complete replay-all audit",
+            path.display()
+        ));
     }
     Ok(audit)
 }
@@ -832,14 +916,20 @@ fn load_bundle(
         || session.git_commit.as_deref() != Some(&identity.source_commit)
         || session.binary_sha256.as_deref() != Some(&identity.binary_sha256)
     {
-        return Err(format!("{} is not the expected complete frozen session", dir.display()));
+        return Err(format!(
+            "{} is not the expected complete frozen session",
+            dir.display()
+        ));
     }
     let spec_path = expected_spec_path(n);
     let spec_receipt = &identity.image["specs"][spec_path.as_str()];
     if spec_receipt["identity_sha256"] != session.spec_sha256
         || spec_receipt["spec_id"] != session.spec_id
     {
-        return Err(format!("{} does not use the image-bound n={n} spec", dir.display()));
+        return Err(format!(
+            "{} does not use the image-bound n={n} spec",
+            dir.display()
+        ));
     }
     let records = read_records(&dir)?;
     if records.len() != expected_records
@@ -863,10 +953,17 @@ fn load_bundle(
     if records.iter().filter(|record| !record.warmup).all(verified)
         && audit.replays.len() != expected_measured
     {
-        return Err(format!("{} did not replay every eligible measured row", dir.display()));
+        return Err(format!(
+            "{} did not replay every eligible measured row",
+            dir.display()
+        ));
     }
     Ok(Bundle {
-        cell: if n == 13 { "control-n13".into() } else { format!("n{n}") },
+        cell: if n == 13 {
+            "control-n13".into()
+        } else {
+            format!("n{n}")
+        },
         dir,
         session,
         records,
@@ -891,7 +988,10 @@ fn load_retained_bundle(
         || session.git_commit.as_deref() != Some(&identity.source_commit)
         || session.binary_sha256.as_deref() != Some(&identity.binary_sha256)
     {
-        return Err(format!("{} retained session has identity drift", dir.display()));
+        return Err(format!(
+            "{} retained session has identity drift",
+            dir.display()
+        ));
     }
     let spec_path = expected_spec_path(n);
     let spec_receipt = &identity.image["specs"][spec_path.as_str()];
@@ -902,7 +1002,10 @@ fn load_retained_bundle(
     }
     let records = read_records(&dir)?;
     if records.len() > expected_records || session.records_written != records.len() as u64 {
-        return Err(format!("{} retained rows disagree with session flow", dir.display()));
+        return Err(format!(
+            "{} retained rows disagree with session flow",
+            dir.display()
+        ));
     }
     for record in &records {
         if record.session_id != session.session_id
@@ -913,7 +1016,10 @@ fn load_retained_bundle(
         if matches!(record.outcome.status.as_str(), "wrong_answer" | "verified")
             && !verified(record)
         {
-            return Err(format!("{} retained row is a correctness failure", record.run_id));
+            return Err(format!(
+                "{} retained row is a correctness failure",
+                record.run_id
+            ));
         }
     }
     let audit_path = base.join(audit_rel);
@@ -923,14 +1029,21 @@ fn load_retained_bundle(
             || audit.session_id != session.session_id
             || audit.replays.iter().any(|replay| !replay.reproduced)
         {
-            return Err(format!("{} retained audit has identity/replay failure", audit_path.display()));
+            return Err(format!(
+                "{} retained audit has identity/replay failure",
+                audit_path.display()
+            ));
         }
         Some(audit)
     } else {
         None
     };
     Ok(Some(Bundle {
-        cell: if n == 13 { "control-n13".into() } else { format!("n{n}") },
+        cell: if n == 13 {
+            "control-n13".into()
+        } else {
+            format!("n{n}")
+        },
         dir,
         session,
         records,
@@ -948,7 +1061,10 @@ fn validate_retained_terminal_shape(
     observed: TerminalClass,
     declared: TerminalClass,
 ) -> Result<(), String> {
-    if matches!(declared, TerminalClass::Complete | TerminalClass::NotAttempted) {
+    if matches!(
+        declared,
+        TerminalClass::Complete | TerminalClass::NotAttempted
+    ) {
         return Err("retained noncomplete validation received an inapplicable class".into());
     }
     match session_status {
@@ -989,10 +1105,7 @@ fn validate_retained_terminal_shape(
     Ok(())
 }
 
-fn validate_retained_terminal(
-    bundle: &Bundle,
-    declared: TerminalClass,
-) -> Result<(), String> {
+fn validate_retained_terminal(bundle: &Bundle, declared: TerminalClass) -> Result<(), String> {
     let stop = bundle.session.stop.as_ref();
     validate_retained_terminal_shape(
         &bundle.session.status,
@@ -1022,7 +1135,10 @@ fn paired_blocks<'a>(
             .insert(record.arm.clone(), record)
             .is_some()
         {
-            return Err(format!("duplicate {} round {} arm {}", key.0, key.1, record.arm));
+            return Err(format!(
+                "duplicate {} round {} arm {}",
+                key.0, key.1, record.arm
+            ));
         }
     }
     if blocks.len() != expected_targets * ROUNDS {
@@ -1049,7 +1165,9 @@ fn paired_blocks<'a>(
                 && verified(record)
                 && record.outcome.recovered != first.outcome.recovered
             {
-                return Err(format!("{workload} round {round} verified answers disagree"));
+                return Err(format!(
+                    "{workload} round {round} verified answers disagree"
+                ));
             }
         }
     }
@@ -1059,7 +1177,12 @@ fn paired_blocks<'a>(
 fn remove_clocks(value: &mut Value) {
     match value {
         Value::Object(fields) => {
-            for key in ["wall_ns", "solve_wall_ns", "method_call_wall_ns", "phases_ns"] {
+            for key in [
+                "wall_ns",
+                "solve_wall_ns",
+                "method_call_wall_ns",
+                "phases_ns",
+            ] {
                 fields.remove(key);
             }
             for child in fields.values_mut() {
@@ -1106,7 +1229,9 @@ fn exact_pair_gate(blocks: &Blocks<'_>, a: &str, b: &str) -> Result<usize, Strin
             continue;
         }
         if operation_signature(ra) != operation_signature(rb) {
-            return Err(format!("{a}/{b} operations differ at {workload} round {round}"));
+            return Err(format!(
+                "{a}/{b} operations differ at {workload} round {round}"
+            ));
         }
         pairs += 1;
     }
@@ -1154,6 +1279,32 @@ fn lp_gate(records: &[Record], require_activity: bool) -> Result<(), String> {
     Ok(())
 }
 
+fn saturated_n13_lp_gate(records: &[Record]) -> Result<(), String> {
+    for record in records.iter().filter(|record| {
+        !record.warmup
+            && verified(record)
+            && matches!(record.arm.as_str(), "aimed-lp2-c05" | "aimed-lp2-c1")
+    }) {
+        lp_counter_gate(&record.run_id, &record.counters, false)?;
+        for counter in [
+            "aimed_lp_partial_scan_trials",
+            "aimed_lp_partial_summands_scanned",
+            "aimed_lp_partials_fed",
+            "lp_projected_relations",
+            "aimed_lp_merged_relations",
+        ] {
+            if record.counters.get(counter) != Some(&0) {
+                return Err(format!(
+                    "{} is not the frozen saturated n13 integration control: {counter} must be present and zero, observed {:?}",
+                    record.run_id,
+                    record.counters.get(counter)
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 fn solve_wall(record: &Record) -> Option<f64> {
     record
         .time
@@ -1179,9 +1330,7 @@ fn target_clusters(
         };
         by_target.entry(workload.clone()).or_default().push((x, y));
     }
-    if by_target.len() != TARGETS
-        || by_target.values().any(|rounds| rounds.len() != ROUNDS)
-    {
+    if by_target.len() != TARGETS || by_target.values().any(|rounds| rounds.len() != ROUNDS) {
         return Err(format!(
             "{a}/{b} has {} complete target clusters, expected {TARGETS} x {ROUNDS}",
             by_target.len()
@@ -1202,10 +1351,7 @@ fn sign_flip_p(clusters: &[(f64, f64)], threshold: f64) -> Option<f64> {
     if clusters.is_empty() || clusters.len() >= usize::BITS as usize {
         return None;
     }
-    let differences: Vec<f64> = clusters
-        .iter()
-        .map(|(a, b)| b - threshold * a)
-        .collect();
+    let differences: Vec<f64> = clusters.iter().map(|(a, b)| b - threshold * a).collect();
     let observed: f64 = differences.iter().sum();
     let total = 1usize << differences.len();
     let tolerance = 1e-12 * observed.abs().max(1.0);
@@ -1340,7 +1486,10 @@ fn compare_saved(path: &Path, bundle: &Bundle, a: &str, b: &str) -> Result<Compa
     if serde_json::to_value(&fresh).map_err(|e| e.to_string())?
         != serde_json::to_value(&saved).map_err(|e| e.to_string())?
     {
-        return Err(format!("{} differs from native recomputation", path.display()));
+        return Err(format!(
+            "{} differs from native recomputation",
+            path.display()
+        ));
     }
     Ok(saved)
 }
@@ -1357,9 +1506,7 @@ fn lowercase_hex(text: &str) -> bool {
 fn sha256_string(value: &Value) -> Option<&str> {
     value
         .as_str()
-        .filter(|hash| {
-            hash.len() == 64 && lowercase_hex(hash)
-        })
+        .filter(|hash| hash.len() == 64 && lowercase_hex(hash))
 }
 
 fn valid_argv(value: &Value) -> bool {
@@ -1375,11 +1522,13 @@ fn local_artifact(base: &Path, relative: &str) -> Result<PathBuf, String> {
     use std::path::Component;
     let path = Path::new(relative);
     if path.is_absolute()
-        || path.components().any(|component| {
-            !matches!(component, Component::Normal(_) | Component::CurDir)
-        })
+        || path
+            .components()
+            .any(|component| !matches!(component, Component::Normal(_) | Component::CurDir))
     {
-        return Err(format!("attempt artifact is not a safe relative path: {relative}"));
+        return Err(format!(
+            "attempt artifact is not a safe relative path: {relative}"
+        ));
     }
     Ok(base.join(path))
 }
@@ -1453,10 +1602,13 @@ fn canonical_artifact_json(path: &Path) -> Result<(Value, Vec<u8>), String> {
     let content = bytes(path)?;
     let text = std::str::from_utf8(&content)
         .map_err(|error| format!("{}: invalid UTF-8: {error}", path.display()))?;
-    let value = protocol_unique_json(text, 0)
-        .map_err(|error| format!("{}: {error}", path.display()))?;
+    let value =
+        protocol_unique_json(text, 0).map_err(|error| format!("{}: {error}", path.display()))?;
     if protocol_canonical_bytes(&value)? != content {
-        return Err(format!("{} is not exact canonical JSON bytes", path.display()));
+        return Err(format!(
+            "{} is not exact canonical JSON bytes",
+            path.display()
+        ));
     }
     Ok((value, content))
 }
@@ -1483,8 +1635,14 @@ fn validate_provider_and_pod_artifacts(
     exact_keys(
         &provider,
         &[
-            "schema", "provider_tool", "cloud_account_id", "region", "cluster", "namespace",
-            "service_account", "admission_controller",
+            "schema",
+            "provider_tool",
+            "cloud_account_id",
+            "region",
+            "cluster",
+            "namespace",
+            "service_account",
+            "admission_controller",
         ],
         "provider identity artifact",
     )?;
@@ -1507,11 +1665,7 @@ fn validate_provider_and_pod_artifacts(
     Ok(())
 }
 
-fn require_artifact_path(
-    artifacts: &[Value],
-    required: &str,
-    what: &str,
-) -> Result<(), String> {
+fn require_artifact_path(artifacts: &[Value], required: &str, what: &str) -> Result<(), String> {
     let count = artifacts
         .iter()
         .filter(|artifact| artifact["path"] == required)
@@ -1619,7 +1773,13 @@ fn require_session_core_custody(
     session: &str,
     what: &str,
 ) -> Result<(), String> {
-    for name in ["session.json", "host.json", "plan.json", "spec.json", "records.jsonl"] {
+    for name in [
+        "session.json",
+        "host.json",
+        "plan.json",
+        "spec.json",
+        "records.jsonl",
+    ] {
         require_artifact_path(artifacts, &format!("{session}/{name}"), what)?;
     }
     Ok(())
@@ -1679,7 +1839,11 @@ fn validate_attempt_envelope(
         return Err("provider identity and Pod spec name the same artifact".into());
     }
     for (path, anchor, name) in [
-        (provider_path, &template["provider_identity_sha256"], "provider identity"),
+        (
+            provider_path,
+            &template["provider_identity_sha256"],
+            "provider identity",
+        ),
         (pod_path, &template["pod_spec_sha256"], "Pod spec"),
     ] {
         let matching = artifacts
@@ -1687,14 +1851,18 @@ fn validate_attempt_envelope(
             .filter(|artifact| artifact["path"] == path)
             .collect::<Vec<_>>();
         if matching.len() != 1 || &matching[0]["sha256"] != anchor {
-            return Err(format!("attempt does not custody the anchored {name} artifact"));
+            return Err(format!(
+                "attempt does not custody the anchored {name} artifact"
+            ));
         }
     }
     for artifact in artifacts {
         if !artifact["object_uri"]
             .as_str()
             .is_some_and(|uri| uri.starts_with(durable_prefix))
-            || artifact["object_version"].as_str().is_none_or(str::is_empty)
+            || artifact["object_version"]
+                .as_str()
+                .is_none_or(str::is_empty)
             || artifact["readback_sha256"] != artifact["sha256"]
             || artifact["readback_bytes"] != artifact["bytes"]
             || artifact["readback_verified"] != true
@@ -1741,12 +1909,20 @@ fn check_attempt_receipts(
         expected.insert(format!("n{}", size.n), size.attempt_receipt.clone());
     }
     if expected.len() != 3
-        || manifest.attempt_receipts.iter().cloned().collect::<BTreeSet<_>>()
+        || manifest
+            .attempt_receipts
+            .iter()
+            .cloned()
+            .collect::<BTreeSet<_>>()
             != expected.values().cloned().collect::<BTreeSet<_>>()
     {
         return Err("manifest must bind exactly the control-n13, n53 and n61 aggregates".into());
     }
-    if manifest.request_templates.keys().cloned().collect::<BTreeSet<_>>()
+    if manifest
+        .request_templates
+        .keys()
+        .cloned()
+        .collect::<BTreeSet<_>>()
         != expected.keys().cloned().collect::<BTreeSet<_>>()
     {
         return Err("manifest must bind exactly three prospective request templates".into());
@@ -1763,11 +1939,13 @@ fn check_attempt_receipts(
         let template_path = base.join(template_relative);
         let template_bytes = bytes(&template_path)?;
         let frozen_request_sha256 = sha256_hex(&template_bytes);
-        if identity.protocol["extensions"]["request_template_sha256"]
-            [template_relative.as_str()]
+        if identity.protocol["extensions"]["request_template_sha256"][template_relative.as_str()]
             != frozen_request_sha256
         {
-            return Err(format!("{} differs from the frozen request hash", template_path.display()));
+            return Err(format!(
+                "{} differs from the frozen request hash",
+                template_path.display()
+            ));
         }
         let template = json_value(&template_path)?;
         if protocol_canonical_bytes(&template)? != template_bytes {
@@ -1779,24 +1957,54 @@ fn check_attempt_receipts(
         exact_keys(
             &template,
             &[
-                "schema", "status", "cell", "provider_tool", "job_name", "spec_path",
-                "spec_file_sha256", "source_revision", "image_uri", "image_digest",
-                "ecbench_sha256", "argv", "payload_sha256", "payload_bytes",
-                "provider_identity_sha256", "pod_spec_sha256", "instance_type", "capacity",
-                "node_selector", "exclusive_vcpus", "cpu_request", "cpu_limit", "memory",
-                "memory_bytes", "memory_request", "memory_limit", "restart_policy",
-                "child_timeout_seconds", "outer_deadline_seconds", "durable_prefix",
-                "provider_retries", "scientific_retries", "infrastructure_attempts_max",
+                "schema",
+                "status",
+                "cell",
+                "provider_tool",
+                "job_name",
+                "spec_path",
+                "spec_file_sha256",
+                "source_revision",
+                "image_uri",
+                "image_digest",
+                "ecbench_sha256",
+                "argv",
+                "payload_sha256",
+                "payload_bytes",
+                "provider_identity_sha256",
+                "pod_spec_sha256",
+                "instance_type",
+                "capacity",
+                "node_selector",
+                "exclusive_vcpus",
+                "cpu_request",
+                "cpu_limit",
+                "memory",
+                "memory_bytes",
+                "memory_request",
+                "memory_limit",
+                "restart_policy",
+                "child_timeout_seconds",
+                "outer_deadline_seconds",
+                "durable_prefix",
+                "provider_retries",
+                "scientific_retries",
+                "infrastructure_attempts_max",
                 "retain_failed_artifacts",
             ],
             &format!("{cell} frozen request"),
         )?;
         exact_keys(
             &template["node_selector"],
-            &["node.kubernetes.io/instance-type", "eks.amazonaws.com/capacityType"],
+            &[
+                "node.kubernetes.io/instance-type",
+                "eks.amazonaws.com/capacityType",
+            ],
             &format!("{cell} node selector"),
         )?;
-        let n = cell.strip_prefix('n').and_then(|value| value.parse::<u32>().ok());
+        let n = cell
+            .strip_prefix('n')
+            .and_then(|value| value.parse::<u32>().ok());
         let expected_n = n.unwrap_or(13);
         let spec_path = expected_spec_path(expected_n);
         let spec_content = bytes(&base.join("../..").join(&spec_path))?;
@@ -1830,8 +2038,7 @@ fn check_attempt_receipts(
             || template["pod_spec_sha256"] != expected_pod_spec_sha256
             || template["instance_type"] != "c8a.2xlarge"
             || template["capacity"] != "spot"
-            || template["node_selector"]["node.kubernetes.io/instance-type"]
-                != "c8a.2xlarge"
+            || template["node_selector"]["node.kubernetes.io/instance-type"] != "c8a.2xlarge"
             || template["node_selector"]["eks.amazonaws.com/capacityType"] != "SPOT"
             || template["exclusive_vcpus"] != 4
             || template["cpu_request"] != "4"
@@ -1849,16 +2056,28 @@ fn check_attempt_receipts(
             || template["infrastructure_attempts_max"] != 2
             || template["retain_failed_artifacts"] != true
         {
-            return Err(format!("{} is not the frozen cell request", template_path.display()));
+            return Err(format!(
+                "{} is not the frozen cell request",
+                template_path.display()
+            ));
         }
         let path = base.join(&relative);
         let receipt = json_value(&path)?;
         exact_keys(
             &receipt,
             &[
-                "schema", "created", "cell", "final_class", "not_attempted_reason",
-                "frozen_request_sha256", "protocol_sha256", "source_commit", "binary_sha256",
-                "image_digest", "provider_identity_sha256", "attempts",
+                "schema",
+                "created",
+                "cell",
+                "final_class",
+                "not_attempted_reason",
+                "frozen_request_sha256",
+                "protocol_sha256",
+                "source_commit",
+                "binary_sha256",
+                "image_digest",
+                "provider_identity_sha256",
+                "attempts",
             ],
             &format!("{cell} attempt aggregate"),
         )?;
@@ -1872,7 +2091,10 @@ fn check_attempt_receipts(
             || receipt["image_digest"] != identity.image_digest
             || receipt["provider_identity_sha256"] != template["provider_identity_sha256"]
         {
-            return Err(format!("{} has an unbound aggregate identity", path.display()));
+            return Err(format!(
+                "{} has an unbound aggregate identity",
+                path.display()
+            ));
         }
         let class = terminal_class(&receipt["final_class"])?;
         let attempts = receipt["attempts"]
@@ -1902,9 +2124,19 @@ fn check_attempt_receipts(
             exact_keys(
                 attempt,
                 &[
-                    "schema", "created", "status", "protocol_sha256", "source_commit",
-                    "binary_sha256", "image_digest", "lineage", "request", "terminal",
-                    "authentication", "provider_identity_artifact", "pod_spec_artifact",
+                    "schema",
+                    "created",
+                    "status",
+                    "protocol_sha256",
+                    "source_commit",
+                    "binary_sha256",
+                    "image_digest",
+                    "lineage",
+                    "request",
+                    "terminal",
+                    "authentication",
+                    "provider_identity_artifact",
+                    "pod_spec_artifact",
                     "artifacts",
                 ],
                 &format!("{cell} attempt {index}"),
@@ -1916,14 +2148,19 @@ fn check_attempt_receipts(
                 || attempt["binary_sha256"] != identity.binary_sha256
                 || attempt["image_digest"] != identity.image_digest
             {
-                return Err(format!("{} attempt {index} has identity drift", path.display()));
+                return Err(format!(
+                    "{} attempt {index} has identity drift",
+                    path.display()
+                ));
             }
             let status = attempt["status"]
                 .as_str()
                 .ok_or_else(|| format!("{} attempt {index} lacks status", path.display()))?;
             let terminal = attempt["terminal"]["classification"]
                 .as_str()
-                .ok_or_else(|| format!("{} attempt {index} lacks terminal class", path.display()))?;
+                .ok_or_else(|| {
+                    format!("{} attempt {index} lacks terminal class", path.display())
+                })?;
             let consistent = matches!(
                 (status, terminal),
                 ("succeeded", "scientific_complete")
@@ -1933,27 +2170,47 @@ fn check_attempt_receipts(
                     | ("invalid", "identity_or_correctness_invalid")
             );
             if !consistent || status == "invalid" {
-                return Err(format!("{} attempt {index} is invalid or inconsistent", path.display()));
+                return Err(format!(
+                    "{} attempt {index} is invalid or inconsistent",
+                    path.display()
+                ));
             }
             let terminal_value = &attempt["terminal"];
             if terminal_value["reason"].as_str().is_none_or(str::is_empty)
-                || terminal_value["finished"].as_str().is_none_or(str::is_empty)
+                || terminal_value["finished"]
+                    .as_str()
+                    .is_none_or(str::is_empty)
                 || (!terminal_value["started"].is_null()
                     && terminal_value["started"].as_str().is_none_or(str::is_empty))
                 || (!terminal_value["exit_code"].is_null()
                     && terminal_value["exit_code"].as_i64().is_none())
             {
-                return Err(format!("{} attempt {index} has an invalid terminal object", path.display()));
+                return Err(format!(
+                    "{} attempt {index} has an invalid terminal object",
+                    path.display()
+                ));
             }
             if index + 1 < attempts.len() && terminal != "infrastructure_blocked" {
-                return Err(format!("{} retries a non-infrastructure outcome", path.display()));
+                return Err(format!(
+                    "{} retries a non-infrastructure outcome",
+                    path.display()
+                ));
             }
             let lineage = &attempt["lineage"];
             exact_keys(
                 lineage,
                 &[
-                    "request_id", "job_name", "job_uid", "pod_name", "pod_uid", "node_name",
-                    "instance_id", "instance_type", "capacity", "attempt", "restart_count",
+                    "request_id",
+                    "job_name",
+                    "job_uid",
+                    "pod_name",
+                    "pod_uid",
+                    "node_name",
+                    "instance_id",
+                    "instance_type",
+                    "capacity",
+                    "attempt",
+                    "restart_count",
                 ],
                 &format!("{cell} attempt {index} lineage"),
             )?;
@@ -1965,20 +2222,28 @@ fn check_attempt_receipts(
                 || lineage["attempt"].as_u64() != Some(index as u64)
                 || lineage["restart_count"] != 0
             {
-                return Err(format!("{} attempt {index} has incomplete lineage", path.display()));
+                return Err(format!(
+                    "{} attempt {index} has incomplete lineage",
+                    path.display()
+                ));
             }
-            register_lineage_ids(
-                lineage,
-                &mut request_ids,
-                &mut job_uids,
-                &mut pod_uids,
-            )
-            .map_err(|error| format!("{} attempt {index}: {error}", path.display()))?;
-            let job_uid = lineage["job_uid"].as_str().filter(|value| !value.is_empty());
-            let pod_name = lineage["pod_name"].as_str().filter(|value| !value.is_empty());
-            let pod_uid = lineage["pod_uid"].as_str().filter(|value| !value.is_empty());
-            let node_name = lineage["node_name"].as_str().filter(|value| !value.is_empty());
-            let instance_id = lineage["instance_id"].as_str().filter(|value| !value.is_empty());
+            register_lineage_ids(lineage, &mut request_ids, &mut job_uids, &mut pod_uids)
+                .map_err(|error| format!("{} attempt {index}: {error}", path.display()))?;
+            let job_uid = lineage["job_uid"]
+                .as_str()
+                .filter(|value| !value.is_empty());
+            let pod_name = lineage["pod_name"]
+                .as_str()
+                .filter(|value| !value.is_empty());
+            let pod_uid = lineage["pod_uid"]
+                .as_str()
+                .filter(|value| !value.is_empty());
+            let node_name = lineage["node_name"]
+                .as_str()
+                .filter(|value| !value.is_empty());
+            let instance_id = lineage["instance_id"]
+                .as_str()
+                .filter(|value| !value.is_empty());
             if status != "resource_refused"
                 && (job_uid.is_none()
                     || pod_name.is_none()
@@ -2000,46 +2265,72 @@ fn check_attempt_receipts(
                         !lineage[*field].is_null()
                             && lineage[*field].as_str().is_none_or(str::is_empty)
                     })
-                    || !matches!(lineage["instance_type"].as_str(), None | Some("c8a.2xlarge"))
+                    || !matches!(
+                        lineage["instance_type"].as_str(),
+                        None | Some("c8a.2xlarge")
+                    )
                     || !matches!(lineage["capacity"].as_str(), None | Some("spot")))
             {
-                return Err(format!("{} refused attempt {index} has malformed lineage", path.display()));
+                return Err(format!(
+                    "{} refused attempt {index} has malformed lineage",
+                    path.display()
+                ));
             }
 
             validate_attempt_envelope(&template, attempt, &expected_prefix)
                 .map_err(|error| format!("{} attempt {index}: {error}", path.display()))?;
             exact_keys(
                 &attempt["terminal"],
-                &["classification", "reason", "exit_code", "started", "finished"],
+                &[
+                    "classification",
+                    "reason",
+                    "exit_code",
+                    "started",
+                    "finished",
+                ],
                 &format!("{cell} attempt {index} terminal"),
             )?;
             exact_keys(
                 &attempt["authentication"],
                 &[
-                    "provider_identity_sha256", "pod_spec_sha256", "lineage_object_sha256",
-                    "request_object_sha256", "terminal_object_sha256", "artifact_listing_sha256",
+                    "provider_identity_sha256",
+                    "pod_spec_sha256",
+                    "lineage_object_sha256",
+                    "request_object_sha256",
+                    "terminal_object_sha256",
+                    "artifact_listing_sha256",
                 ],
                 &format!("{cell} attempt {index} authentication"),
             )?;
             let artifacts = attempt["artifacts"]
                 .as_array()
                 .filter(|artifacts| !artifacts.is_empty())
-                .ok_or_else(|| format!("{} attempt {index} lacks artifact custody", path.display()))?;
+                .ok_or_else(|| {
+                    format!("{} attempt {index} lacks artifact custody", path.display())
+                })?;
             let mut artifact_paths = BTreeSet::new();
             let mut object_uris = BTreeSet::new();
             for artifact in artifacts {
                 exact_keys(
                     artifact,
                     &[
-                        "path", "sha256", "bytes", "object_uri", "object_version",
-                        "readback_sha256", "readback_bytes", "readback_verified",
+                        "path",
+                        "sha256",
+                        "bytes",
+                        "object_uri",
+                        "object_version",
+                        "readback_sha256",
+                        "readback_bytes",
+                        "readback_verified",
                     ],
                     &format!("{cell} attempt {index} artifact"),
                 )?;
                 let relative_artifact = artifact["path"]
                     .as_str()
                     .filter(|value| !value.is_empty())
-                    .ok_or_else(|| format!("{} attempt {index} has an unnamed artifact", path.display()))?;
+                    .ok_or_else(|| {
+                        format!("{} attempt {index} has an unnamed artifact", path.display())
+                    })?;
                 let artifact_path = local_artifact(base, relative_artifact)?;
                 let content = bytes(&artifact_path)?;
                 let digest = sha256_hex(&content);
@@ -2050,7 +2341,10 @@ fn check_attempt_receipts(
                     || !artifact_paths.insert(relative_artifact.to_string())
                     || !object_uris.insert(artifact["object_uri"].as_str().unwrap_or_default())
                 {
-                    return Err(format!("{} has stale artifact {relative_artifact}", path.display()));
+                    return Err(format!(
+                        "{} has stale artifact {relative_artifact}",
+                        path.display()
+                    ));
                 }
                 *global_artifact_owners
                     .entry(relative_artifact.to_string())
@@ -2089,9 +2383,17 @@ fn check_attempt_receipts(
                 }
             }
         }
-        let complete_attempt = attempts.iter().any(|attempt| attempt["status"] == "succeeded");
+        let complete_attempt = attempts
+            .iter()
+            .any(|attempt| attempt["status"] == "succeeded");
         if complete_attempt || base.join(&session_relative).exists() {
-            for name in ["session.json", "host.json", "plan.json", "spec.json", "records.jsonl"] {
+            for name in [
+                "session.json",
+                "host.json",
+                "plan.json",
+                "spec.json",
+                "records.jsonl",
+            ] {
                 let consumed = format!("{session_relative}/{name}");
                 globally_consumed.insert(consumed.clone());
                 require_unique_attempt_owner(attempts, &consumed, &consumed)?;
@@ -2112,12 +2414,21 @@ fn check_attempt_receipts(
         let final_matches = matches!(
             (class, final_terminal),
             (TerminalClass::Complete, Some("scientific_complete"))
-                | (TerminalClass::ScientificCensored, Some("scientific_censored"))
-                | (TerminalClass::InfrastructureBlocked, Some("infrastructure_blocked"))
+                | (
+                    TerminalClass::ScientificCensored,
+                    Some("scientific_censored")
+                )
+                | (
+                    TerminalClass::InfrastructureBlocked,
+                    Some("infrastructure_blocked")
+                )
                 | (TerminalClass::NotAttempted, None)
         );
         if !final_matches {
-            return Err(format!("{} final_class disagrees with its last attempt", path.display()));
+            return Err(format!(
+                "{} final_class disagrees with its last attempt",
+                path.display()
+            ));
         }
         checked.insert(
             cell,
@@ -2182,19 +2493,32 @@ fn control_gate(
     {
         return Err("n13 A/A or LP=0 does not contain ten exact pairs".into());
     }
-    lp_gate(&bundle.records, true)?;
+    saturated_n13_lp_gate(&bundle.records)?;
     let receipt = json_value(&base.join(&input.receipt))?;
     exact_keys(
         &receipt,
         &[
-            "schema", "created", "status", "session_id", "source_commit", "binary_sha256",
-            "spec_identity_sha256", "measured_rows", "verified_rows", "aa_pairs_identical",
-            "lp0_pairs_identical", "lp2_rows_active", "lp2_rows_with_merged_relation",
-            "lp_direct_two_sum", "lp_verification_failures", "replay_required", "note",
+            "schema",
+            "created",
+            "status",
+            "session_id",
+            "source_commit",
+            "binary_sha256",
+            "spec_identity_sha256",
+            "measured_rows",
+            "verified_rows",
+            "aa_pairs_identical",
+            "lp0_pairs_identical",
+            "lp2_rows_saturated",
+            "lp2_rows_with_merged_relation",
+            "lp_direct_two_sum",
+            "lp_verification_failures",
+            "replay_required",
+            "note",
         ],
         "n13 control receipt",
     )?;
-    if receipt["schema"] != "icb.aimed2lp.control/v1"
+    if receipt["schema"] != "icb.aimed2lp.control/v2"
         || receipt["created"].as_str().is_none_or(str::is_empty)
         || receipt["status"] != "pass"
         || receipt["session_id"] != bundle.session.session_id
@@ -2205,8 +2529,8 @@ fn control_gate(
         || receipt["verified_rows"] != 50
         || receipt["aa_pairs_identical"] != 10
         || receipt["lp0_pairs_identical"] != 10
-        || receipt["lp2_rows_active"] != 20
-        || receipt["lp2_rows_with_merged_relation"] != 20
+        || receipt["lp2_rows_saturated"] != 20
+        || receipt["lp2_rows_with_merged_relation"] != 0
         || receipt["lp_direct_two_sum"] != 0
         || receipt["lp_verification_failures"] != 0
         || receipt["replay_required"] != true
@@ -2251,9 +2575,8 @@ fn target_gate(
             ));
         }
         if let Some(bundle) = &retained {
-            validate_retained_terminal(bundle, attempt.class).map_err(|error| {
-                format!("n={} retained terminal mismatch: {error}", input.n)
-            })?;
+            validate_retained_terminal(bundle, attempt.class)
+                .map_err(|error| format!("n={} retained terminal mismatch: {error}", input.n))?;
             lp_gate(&bundle.records, false)?;
         }
         return Ok(retained);
@@ -2287,7 +2610,7 @@ fn target_gate(
     if aa_pairs != TARGETS * ROUNDS || lp0_pairs != TARGETS * ROUNDS {
         return Err(format!("n={} fails A/A or LP=0 exact identity", input.n));
     }
-    lp_gate(&bundle.records, false)?;
+    lp_gate(&bundle.records, true)?;
     for (id, relative) in &input.comparisons {
         let (a, b) = comparison_arms(id)
             .ok_or_else(|| format!("n={} has unknown comparison {id}", input.n))?;
@@ -2334,17 +2657,14 @@ fn push_file_if_exists(
     Ok(())
 }
 
-fn load_cell_plan(
-    base: &Path,
-    cell: &str,
-    n: u32,
-    identity: &Identity,
-) -> Result<Plan, String> {
+fn load_cell_plan(base: &Path, cell: &str, n: u32, identity: &Identity) -> Result<Plan, String> {
     let relative = expected_spec_path(n);
     let path = base.join("../..").join(&relative);
     let content = bytes(&path)?;
     if identity.image["specs"][relative.as_str()]["file_sha256"] != sha256_hex(&content) {
-        return Err(format!("{cell} spec bytes differ from the immutable image receipt"));
+        return Err(format!(
+            "{cell} spec bytes differ from the immutable image receipt"
+        ));
     }
     let text = std::str::from_utf8(&content)
         .map_err(|error| format!("{} is not UTF-8: {error}", path.display()))?;
@@ -2356,7 +2676,9 @@ fn load_cell_plan(
     if identity.image["specs"][relative.as_str()]["identity_sha256"] != expanded.spec_sha256
         || identity.image["specs"][relative.as_str()]["spec_id"] != expanded.spec_id
     {
-        return Err(format!("{cell} expanded plan differs from the immutable image receipt"));
+        return Err(format!(
+            "{cell} expanded plan differs from the immutable image receipt"
+        ));
     }
     let expected = if n == 13 { 60 } else { 288 };
     if expanded.executions.len() != expected {
@@ -2376,7 +2698,9 @@ fn attempt_backend(attempt: &Value) -> Result<String, String> {
         .ok_or("attempt lineage lacks request_id")?;
     let job_uid = lineage["job_uid"].as_str().unwrap_or("resource-refused");
     let pod_uid = lineage["pod_uid"].as_str().unwrap_or("resource-refused");
-    let number = lineage["attempt"].as_u64().ok_or("attempt lineage lacks attempt")?;
+    let number = lineage["attempt"]
+        .as_u64()
+        .ok_or("attempt lineage lacks attempt")?;
     Ok(format!(
         "request={request_id};job_uid={job_uid};pod_uid={pod_uid};attempt={number}"
     ))
@@ -2424,10 +2748,12 @@ fn validate_record_against_execution(
         .arms
         .get(execution.arm)
         .ok_or_else(|| format!("{cell} execution {} has invalid arm index", execution.seq))?;
-    let workload = plan
-        .workloads
-        .get(execution.workload)
-        .ok_or_else(|| format!("{cell} execution {} has invalid workload index", execution.seq))?;
+    let workload = plan.workloads.get(execution.workload).ok_or_else(|| {
+        format!(
+            "{cell} execution {} has invalid workload index",
+            execution.seq
+        )
+    })?;
     if record.seq != execution.seq
         || record.round != execution.round
         || record.warmup != execution.warmup
@@ -2474,15 +2800,17 @@ fn record_export(record: &Record, class: TerminalClass, attempt: &Value) -> Resu
         .total_gae
         .map(|gae| json!({"cold_gae": gae}))
         .unwrap_or_else(|| json!({}));
-    let wall_valid = class == TerminalClass::Complete
-        && verified(record)
-        && record.isolation.level >= Level::L2;
+    let wall_valid =
+        class == TerminalClass::Complete && verified(record) && record.isolation.level >= Level::L2;
     let (excluded, exclusion_rule) = if let Some(rule) = cell_exclusion(class) {
         (true, Some(rule))
     } else if record.warmup {
         (true, Some("preregistered warmup"))
     } else if !verified(record) {
-        (true, Some("non-verified terminal row retained outside decisive inference"))
+        (
+            true,
+            Some("non-verified terminal row retained outside decisive inference"),
+        )
     } else if record.isolation.level < Level::L2 {
         (true, Some("row below preregistered L2 wall admission"))
     } else {
@@ -2534,12 +2862,15 @@ fn missing_export(
     stopped_here: bool,
 ) -> Result<Value, String> {
     if stopped_here && attempt.is_none() {
-        return Err(format!("{cell} stopped execution has no authenticated provider attempt"));
+        return Err(format!(
+            "{cell} stopped execution has no authenticated provider attempt"
+        ));
     }
     let arm = &plan.arms[execution.arm];
     let workload = &plan.workloads[execution.workload];
-    let (status, blocker, attempted) = if stopped_here {
-        match class {
+    let (status, blocker, attempted) =
+        if stopped_here {
+            match class {
             TerminalClass::ScientificCensored => (
                 "interrupted",
                 "scientific stopping rule censored this execution and every later scheduled row",
@@ -2557,24 +2888,26 @@ fn missing_export(
                 return Err(format!("not-attempted {cell} cannot have a stopped execution"))
             }
         }
-    } else {
-        (
-            "cancelled",
-            match class {
-                TerminalClass::ScientificCensored => {
-                    "not attempted after the preregistered scientific stopping rule fired"
-                }
-                TerminalClass::InfrastructureBlocked => {
-                    "not attempted after the infrastructure-blocked terminal decision"
-                }
-                TerminalClass::Complete => return Err(format!("complete {cell} has a missing row")),
-                TerminalClass::NotAttempted => {
-                    "not attempted because the preregistered prerequisite gate did not pass"
-                }
-            },
-            false,
-        )
-    };
+        } else {
+            (
+                "cancelled",
+                match class {
+                    TerminalClass::ScientificCensored => {
+                        "not attempted after the preregistered scientific stopping rule fired"
+                    }
+                    TerminalClass::InfrastructureBlocked => {
+                        "not attempted after the infrastructure-blocked terminal decision"
+                    }
+                    TerminalClass::Complete => {
+                        return Err(format!("complete {cell} has a missing row"))
+                    }
+                    TerminalClass::NotAttempted => {
+                        "not attempted because the preregistered prerequisite gate did not pass"
+                    }
+                },
+                false,
+            )
+        };
     Ok(json!({
         "run_id": format!("planned-{cell}-{:03}", execution.seq),
         "arm": arm.name,
@@ -2626,15 +2959,47 @@ fn build_export(
 ) -> Result<Value, String> {
     let source_path = base.join(&manifest.native_analyzer.source);
     let mut files = vec![
-        file_row(&base.join(&manifest.protocol), manifest.protocol.clone(), "protocol")?,
+        file_row(
+            &base.join(&manifest.protocol),
+            manifest.protocol.clone(),
+            "protocol",
+        )?,
         file_row(manifest_path, "analysis-manifest.json".into(), "analysis")?,
-        file_row(&base.join(&manifest.result_schema), manifest.result_schema.clone(), "other")?,
-        file_row(&base.join(&manifest.receipt_schema), manifest.receipt_schema.clone(), "other")?,
-        file_row(&base.join(&manifest.request_schema), manifest.request_schema.clone(), "other")?,
-        file_row(&base.join(&manifest.focused_gates), manifest.focused_gates.clone(), "receipt")?,
-        file_row(&base.join(&manifest.checkpoint_receipt), manifest.checkpoint_receipt.clone(), "receipt")?,
-        file_row(&base.join(&manifest.image_receipt), manifest.image_receipt.clone(), "receipt")?,
-        file_row(&base.join(&manifest.provider_preflight), manifest.provider_preflight.clone(), "receipt")?,
+        file_row(
+            &base.join(&manifest.result_schema),
+            manifest.result_schema.clone(),
+            "other",
+        )?,
+        file_row(
+            &base.join(&manifest.receipt_schema),
+            manifest.receipt_schema.clone(),
+            "other",
+        )?,
+        file_row(
+            &base.join(&manifest.request_schema),
+            manifest.request_schema.clone(),
+            "other",
+        )?,
+        file_row(
+            &base.join(&manifest.focused_gates),
+            manifest.focused_gates.clone(),
+            "receipt",
+        )?,
+        file_row(
+            &base.join(&manifest.checkpoint_receipt),
+            manifest.checkpoint_receipt.clone(),
+            "receipt",
+        )?,
+        file_row(
+            &base.join(&manifest.image_receipt),
+            manifest.image_receipt.clone(),
+            "receipt",
+        )?,
+        file_row(
+            &base.join(&manifest.provider_preflight),
+            manifest.provider_preflight.clone(),
+            "receipt",
+        )?,
         file_row(
             &base.join(&manifest.native_analyzer.self_test_receipt),
             manifest.native_analyzer.self_test_receipt.clone(),
@@ -2710,7 +3075,13 @@ fn build_export(
             .unwrap_or(&bundle.dir)
             .display()
             .to_string();
-        for name in ["host.json", "plan.json", "records.jsonl", "session.json", "spec.json"] {
+        for name in [
+            "host.json",
+            "plan.json",
+            "records.jsonl",
+            "session.json",
+            "spec.json",
+        ] {
             push_file_if_exists(
                 &mut files,
                 &bundle.dir.join(name),
@@ -2721,7 +3092,10 @@ fn build_export(
     }
     let mut bundle_by_cell = BTreeMap::new();
     for bundle in bundles {
-        if bundle_by_cell.insert(bundle.cell.as_str(), *bundle).is_some() {
+        if bundle_by_cell
+            .insert(bundle.cell.as_str(), *bundle)
+            .is_some()
+        {
             return Err(format!("duplicate retained bundle for {}", bundle.cell));
         }
     }
@@ -2752,10 +3126,11 @@ fn build_export(
                 .enumerate()
                 .any(|(index, seq)| seq != index as u64)
             {
-                return Err(format!("{cell} retained records are not a contiguous prefix"));
+                return Err(format!(
+                    "{cell} retained records are not a contiguous prefix"
+                ));
             }
-            if retained.session.last_seq != actual.keys().next_back().copied()
-                && !actual.is_empty()
+            if retained.session.last_seq != actual.keys().next_back().copied() && !actual.is_empty()
             {
                 return Err(format!("{cell} last_seq disagrees with retained records"));
             }
@@ -2789,9 +3164,11 @@ fn build_export(
             return Err(format!("{cell} contains out-of-plan sequence {seq}"));
         }
         if receipt.class == TerminalClass::Complete
-            && runs.iter().rev().take(expanded.executions.len()).any(|run| {
-                run["status"] == "cancelled" || run["outcome_class"] == "not_completed"
-            })
+            && runs
+                .iter()
+                .rev()
+                .take(expanded.executions.len())
+                .any(|run| run["status"] == "cancelled" || run["outcome_class"] == "not_completed")
         {
             return Err(format!("complete {cell} has an incomplete canonical row"));
         }
@@ -2800,7 +3177,10 @@ fn build_export(
         }
     }
     if runs.len() != 636 {
-        return Err(format!("canonical export has {} rows, expected 636", runs.len()));
+        return Err(format!(
+            "canonical export has {} rows, expected 636",
+            runs.len()
+        ));
     }
     let run_count = runs.len();
     let completed = runs
@@ -2819,7 +3199,10 @@ fn build_export(
                 .unwrap_or("unspecified exclusion")
                 .to_string();
             if let Some(run_id) = run["run_id"].as_str() {
-                excluded_by_rule.entry(rule).or_default().push(run_id.to_string());
+                excluded_by_rule
+                    .entry(rule)
+                    .or_default()
+                    .push(run_id.to_string());
             }
         }
     }
@@ -2836,13 +3219,15 @@ fn build_export(
         .as_array()
         .ok_or("protocol arms missing")?
         .iter()
-        .map(|arm| json!({
-            "id": arm["id"],
-            "role": arm["role"],
-            "binary_sha256": identity.binary_sha256,
-            "commit": identity.source_commit,
-            "image_digest": identity.image_digest,
-        }))
+        .map(|arm| {
+            json!({
+                "id": arm["id"],
+                "role": arm["role"],
+                "binary_sha256": identity.binary_sha256,
+                "commit": identity.source_commit,
+                "image_digest": identity.image_digest,
+            })
+        })
         .collect();
     let output_row = |path: &Path, content: &[u8]| {
         json!({
@@ -2912,14 +3297,17 @@ fn analyse(
     out_path: &Path,
     validation_path: &Path,
     export_path: &Path,
-) -> Result<(
-    Value,
-    Value,
-    Vec<Bundle>,
-    Manifest,
-    Identity,
-    BTreeMap<String, AttemptReceipt>,
-), String> {
+) -> Result<
+    (
+        Value,
+        Value,
+        Vec<Bundle>,
+        Manifest,
+        Identity,
+        BTreeMap<String, AttemptReceipt>,
+    ),
+    String,
+> {
     let manifest: Manifest = read_typed(manifest_path)?;
     if manifest.schema != "icb.aimed2lp.analysis_manifest/v1" {
         return Err("analysis manifest has the wrong schema".into());
@@ -2942,11 +3330,17 @@ fn analyse(
         ),
     ] {
         if prospective_path(actual)? != prospective_path(&base.join(relative))? {
-            return Err(format!("{label} output path differs from the frozen manifest"));
+            return Err(format!(
+                "{label} output path differs from the frozen manifest"
+            ));
         }
     }
     if manifest.sizes.len() != 2
-        || manifest.sizes.iter().map(|size| size.n).collect::<BTreeSet<_>>()
+        || manifest
+            .sizes
+            .iter()
+            .map(|size| size.n)
+            .collect::<BTreeSet<_>>()
             != BTreeSet::from([53, 61])
     {
         return Err("manifest must contain exactly n=53 and n=61".into());
@@ -2960,18 +3354,16 @@ fn analyse(
                 .into(),
         );
     }
-    let control = control_gate(
-        base,
-        &manifest.positive_control,
-        &identity,
-        control_attempt,
-    )?;
+    let control = control_gate(base, &manifest.positive_control, &identity, control_attempt)?;
     if control_attempt.class != TerminalClass::Complete
-        && manifest.sizes.iter().any(|size| {
-            attempts[&format!("n{}", size.n)].class != TerminalClass::NotAttempted
-        })
+        && manifest
+            .sizes
+            .iter()
+            .any(|size| attempts[&format!("n{}", size.n)].class != TerminalClass::NotAttempted)
     {
-        return Err("a target cell was attempted despite a non-passing positive-control gate".into());
+        return Err(
+            "a target cell was attempted despite a non-passing positive-control gate".into(),
+        );
     }
     if control_attempt.class != TerminalClass::Complete {
         for size in &manifest.sizes {
@@ -2983,9 +3375,11 @@ fn analyse(
                 ));
             }
         }
-    } else if manifest.sizes.iter().any(|size| {
-        attempts[&format!("n{}", size.n)].class == TerminalClass::NotAttempted
-    }) {
+    } else if manifest
+        .sizes
+        .iter()
+        .any(|size| attempts[&format!("n{}", size.n)].class == TerminalClass::NotAttempted)
+    {
         return Err(
             "a target cell is not_attempted after the positive control passed; authenticated resource refusal must be infrastructure_blocked"
                 .into(),
@@ -3017,7 +3411,10 @@ fn analyse(
             .ok_or_else(|| format!("n={} complete attempt lacks a session", input.n))?;
         let blocks = paired_blocks(&bundle.records, &ARMS, TARGETS)?;
         let aa_clusters = target_clusters(&blocks, "aimed", "aimed-aa", solve_wall)?;
-        aa.insert(input.n, estimate(&aa_clusters, 1.0, 2026110100 + input.n as u64)?);
+        aa.insert(
+            input.n,
+            estimate(&aa_clusters, 1.0, 2026110100 + input.n as u64)?,
+        );
         for (index, (id, arm)) in CANDIDATES.into_iter().enumerate() {
             let clusters = target_clusters(&blocks, "aimed", arm, solve_wall)?;
             estimates.insert(
@@ -3038,7 +3435,10 @@ fn analyse(
         let class = classes[&input.n];
         let blocks = if class == TerminalClass::Complete {
             Some(paired_blocks(
-                &bundle.as_ref().ok_or("complete size has no bundle")?.records,
+                &bundle
+                    .as_ref()
+                    .ok_or("complete size has no bundle")?
+                    .records,
                 &ARMS,
                 TARGETS,
             )?)
@@ -3047,10 +3447,8 @@ fn analyse(
         };
         let mut comparisons = Vec::new();
         let aa_row = if let Some(row) = aa.get(&input.n) {
-            let stable = row.ci95.0 >= 0.9
-                && row.ci95.1 <= 1.1
-                && row.ci95.0 <= 1.0
-                && row.ci95.1 >= 1.0;
+            let stable =
+                row.ci95.0 >= 0.9 && row.ci95.1 <= 1.1 && row.ci95.0 <= 1.0 && row.ci95.1 >= 1.0;
             json!({
                 "status": if stable { "pass" } else { "fail" },
                 "ratio_b_over_a": row.point,
@@ -3190,14 +3588,20 @@ fn analyse(
         "NOT ATTEMPTED"
     } else if control_attempt.class != TerminalClass::Complete {
         "BLOCKED"
-    } else if classes.values().any(|class| *class == TerminalClass::NotAttempted) {
+    } else if classes
+        .values()
+        .any(|class| *class == TerminalClass::NotAttempted)
+    {
         "NOT ATTEMPTED"
     } else if classes
         .values()
         .any(|class| *class == TerminalClass::InfrastructureBlocked)
     {
         "BLOCKED"
-    } else if classes.values().any(|class| *class == TerminalClass::ScientificCensored) {
+    } else if classes
+        .values()
+        .any(|class| *class == TerminalClass::ScientificCensored)
+    {
         "CENSORED NON-IMPROVEMENT"
     } else if candidate_verdicts.values().any(|by_size| {
         by_size.get(&53).map(String::as_str) == Some("IMPROVEMENT")
@@ -3349,8 +3753,13 @@ fn validate_aa_contract(value: &Value) -> Result<(), String> {
             exact_keys(
                 value,
                 &[
-                    "status", "ratio_b_over_a", "ci95", "target_clusters",
-                    "rounds_per_target", "required_interval", "must_contain",
+                    "status",
+                    "ratio_b_over_a",
+                    "ci95",
+                    "target_clusters",
+                    "rounds_per_target",
+                    "required_interval",
+                    "must_contain",
                 ],
                 "evaluated A/A row",
             )?;
@@ -3367,7 +3776,13 @@ fn validate_aa_contract(value: &Value) -> Result<(), String> {
         Some("not_evaluated") => {
             exact_keys(
                 value,
-                &["status", "ratio_b_over_a", "ci95", "target_clusters", "rounds_per_target"],
+                &[
+                    "status",
+                    "ratio_b_over_a",
+                    "ci95",
+                    "target_clusters",
+                    "rounds_per_target",
+                ],
                 "unevaluated A/A row",
             )?;
             if !value["ratio_b_over_a"].is_null()
@@ -3387,8 +3802,13 @@ fn validate_exact_sign_flip(value: &Value) -> Result<(), String> {
     exact_keys(
         value,
         &[
-            "statistic", "alternative", "null_ratio", "sign_assignments",
-            "raw_one_sided_p", "holm_family_size", "holm_adjusted_p",
+            "statistic",
+            "alternative",
+            "null_ratio",
+            "sign_assignments",
+            "raw_one_sided_p",
+            "holm_family_size",
+            "holm_adjusted_p",
         ],
         "exact sign-flip row",
     )?;
@@ -3397,8 +3817,7 @@ fn validate_exact_sign_flip(value: &Value) -> Result<(), String> {
             .as_f64()
             .is_some_and(|number| (0.0..=1.0).contains(&number))
     };
-    if value["statistic"]
-        != "sum_over_targets(sum_candidate_rounds - 0.95 * sum_baseline_rounds)"
+    if value["statistic"] != "sum_over_targets(sum_candidate_rounds - 0.95 * sum_baseline_rounds)"
         || value["alternative"] != "candidate_below_null_ratio"
         || value["null_ratio"] != 0.95
         || value["sign_assignments"] != 256
@@ -3423,8 +3842,14 @@ fn validate_pricing_contract(value: &Value) -> Result<(), String> {
             exact_keys(
                 value,
                 &[
-                    "status", "role", "weights", "ratios", "ci95",
-                    "missing_native_count", "missing_unpriced_units", "note",
+                    "status",
+                    "role",
+                    "weights",
+                    "ratios",
+                    "ci95",
+                    "missing_native_count",
+                    "missing_unpriced_units",
+                    "note",
                 ],
                 "evaluated pricing row",
             )?;
@@ -3436,11 +3861,15 @@ fn validate_pricing_contract(value: &Value) -> Result<(), String> {
                 || value["weights"] != json!([0.0, 0.1, 1.0])
                 || ratios.is_none_or(|items| {
                     items.len() != 3
-                        || items.iter().any(|item| !item.is_null() && item.as_f64().is_none())
+                        || items
+                            .iter()
+                            .any(|item| !item.is_null() && item.as_f64().is_none())
                 })
                 || intervals.is_none_or(|items| {
                     items.len() != 3
-                        || items.iter().any(|item| !item.is_null() && !numeric_interval(item))
+                        || items
+                            .iter()
+                            .any(|item| !item.is_null() && !numeric_interval(item))
                 })
                 || missing.is_none_or(|items| {
                     items.len() != 3 || items.iter().any(|item| item.as_bool().is_none())
@@ -3467,10 +3896,20 @@ fn validate_pricing_contract(value: &Value) -> Result<(), String> {
 fn validate_comparison_contract(value: &Value, size_status: &str) -> Result<(), String> {
     exact_keys(
         value,
-        &["id", "a", "b", "wall", "wall_verdict", "pricing_band", "pricing_status"],
+        &[
+            "id",
+            "a",
+            "b",
+            "wall",
+            "wall_verdict",
+            "pricing_band",
+            "pricing_status",
+        ],
         "candidate comparison",
     )?;
-    let id = value["id"].as_str().ok_or("candidate comparison lacks id")?;
+    let id = value["id"]
+        .as_str()
+        .ok_or("candidate comparison lacks id")?;
     let expected_arm = match id {
         "C-c05" => "aimed-lp2-c05",
         "C-c1" => "aimed-lp2-c1",
@@ -3484,8 +3923,14 @@ fn validate_comparison_contract(value: &Value, size_status: &str) -> Result<(), 
         exact_keys(
             wall,
             &[
-                "status", "metric", "ratio_b_over_a", "ci95", "target_clusters",
-                "rounds_per_target", "ci_method", "exact_sign_flip",
+                "status",
+                "metric",
+                "ratio_b_over_a",
+                "ci95",
+                "target_clusters",
+                "rounds_per_target",
+                "ci_method",
+                "exact_sign_flip",
             ],
             "complete wall row",
         )?;
@@ -3510,8 +3955,13 @@ fn validate_comparison_contract(value: &Value, size_status: &str) -> Result<(), 
         exact_keys(
             wall,
             &[
-                "status", "metric", "ratio_b_over_a", "ci95", "target_clusters",
-                "rounds_per_target", "exact_sign_flip",
+                "status",
+                "metric",
+                "ratio_b_over_a",
+                "ci95",
+                "target_clusters",
+                "rounds_per_target",
+                "exact_sign_flip",
             ],
             "terminal wall row",
         )?;
@@ -3575,13 +4025,11 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
     )?;
     if result["schema"] != RESULT_SCHEMA
         || result["protocol_id"] != "ICB-AIMED-2LP-N53-N61-20261101"
-        || !result["source_commit"].as_str().is_some_and(|commit| {
-            commit.len() == 40 && lowercase_hex(commit)
-        })
+        || !result["source_commit"]
+            .as_str()
+            .is_some_and(|commit| commit.len() == 40 && lowercase_hex(commit))
         || !result["image_digest"].as_str().is_some_and(|digest| {
-            digest.len() == 71
-                && digest.starts_with("sha256:")
-                && lowercase_hex(&digest[7..])
+            digest.len() == 71 && digest.starts_with("sha256:") && lowercase_hex(&digest[7..])
         })
         || !nonempty_string(&result["created"])
         || !matches!(
@@ -3667,7 +4115,12 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
     {
         return Err("positive n13 result control is malformed".into());
     }
-    for gate in ["lp0_identity", "aa_operation_identity", "direct_two_sum_zero", "replay_all"] {
+    for gate in [
+        "lp0_identity",
+        "aa_operation_identity",
+        "direct_two_sum_zero",
+        "replay_all",
+    ] {
         if !matches!(
             result["controls"][gate].as_str(),
             Some("pass" | "not_evaluated")
@@ -3679,12 +4132,14 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
         return Err("provider attempt receipts are not passing".into());
     }
     let evaluated = positive["status"] == "pass";
-    if ["lp0_identity", "aa_operation_identity", "direct_two_sum_zero", "replay_all"]
-        .iter()
-        .any(|gate| {
-            result["controls"][*gate]
-                != if evaluated { "pass" } else { "not_evaluated" }
-        })
+    if [
+        "lp0_identity",
+        "aa_operation_identity",
+        "direct_two_sum_zero",
+        "replay_all",
+    ]
+    .iter()
+    .any(|gate| result["controls"][*gate] != if evaluated { "pass" } else { "not_evaluated" })
     {
         return Err("positive-control state disagrees with its dependent gates".into());
     }
@@ -3695,14 +4150,20 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
     )?;
     for cell in ["control-n13", "n53", "n61"] {
         let summary = &result["attempt_receipts"][cell];
-        exact_keys(summary, &["path", "sha256", "final_class", "attempts"], cell)?;
+        exact_keys(
+            summary,
+            &["path", "sha256", "final_class", "attempts"],
+            cell,
+        )?;
         let class = summary["final_class"].as_str();
         let count = summary["attempts"].as_u64();
         if !nonempty_string(&summary["path"])
             || sha256_string(&summary["sha256"]).is_none()
             || !matches!(
                 class,
-                Some("complete" | "scientific_censored" | "infrastructure_blocked" | "not_attempted")
+                Some(
+                    "complete" | "scientific_censored" | "infrastructure_blocked" | "not_attempted"
+                )
             )
             || count.is_none_or(|count| count > 2)
             || (class == Some("not_attempted")) != (count == Some(0))
@@ -3777,9 +4238,7 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
         let records = size["records"].as_u64().filter(|count| *count <= 288);
         let measured = size["measured_rows"].as_u64().filter(|count| *count <= 240);
         let session_id_valid = size["session_id"].as_str().is_some_and(|session| {
-            session.len() == 18
-                && session.starts_with("ECBS1h")
-                && lowercase_hex(&session[6..])
+            session.len() == 18 && session.starts_with("ECBS1h") && lowercase_hex(&session[6..])
         });
         if !nonempty_string(&size["attempt_receipt"])
             || !nonempty_string(&size["session_export"])
@@ -3791,23 +4250,18 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
             || (status == "complete"
                 && (!session_id_valid || records != Some(288) || measured != Some(240)))
             || (status == "not_attempted"
-                && (!size["session_id"].is_null()
-                    || records != Some(0)
-                    || measured != Some(0)))
+                && (!size["session_id"].is_null() || records != Some(0) || measured != Some(0)))
         {
             return Err(format!("n{n} result size flow violates the v2 schema"));
         }
         validate_aa_contract(&size["aa"])?;
-        if (status == "complete")
-            != matches!(size["aa"]["status"].as_str(), Some("pass" | "fail"))
+        if (status == "complete") != matches!(size["aa"]["status"].as_str(), Some("pass" | "fail"))
         {
             return Err(format!("n{n} A/A evaluation disagrees with size status"));
         }
         let cell = format!("n{n}");
         let summary = &result["attempt_receipts"][&cell];
-        if size["attempt_receipt"] != summary["path"]
-            || size["status"] != summary["final_class"]
-        {
+        if size["attempt_receipt"] != summary["path"] || size["status"] != summary["final_class"] {
             return Err(format!("n{n} size row disagrees with its attempt receipt"));
         }
         let comparisons = size["comparisons"]
@@ -3826,7 +4280,13 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
             comparison_verdicts
                 .entry(comparison["id"].as_str().unwrap_or_default().to_string())
                 .or_default()
-                .insert(n, comparison["wall_verdict"].as_str().unwrap_or_default().to_string());
+                .insert(
+                    n,
+                    comparison["wall_verdict"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string(),
+                );
         }
     }
     let expected_overall = if comparison_verdicts
@@ -3877,8 +4337,7 @@ fn validate_result_contract(result: &Value) -> Result<(), String> {
     }
     if result["limitations"].as_array().is_none_or(|limitations| {
         limitations.is_empty() || limitations.iter().any(|item| !nonempty_string(item))
-    })
-    {
+    }) {
         return Err("result limitations are absent".into());
     }
     Ok(())
@@ -3955,14 +4414,18 @@ fn validate_export_file(value: &Value, what: &str) -> Result<(), String> {
                 )
             ))
     {
-        return Err(format!("{what} violates the experiment.export/v1 file shape"));
+        return Err(format!(
+            "{what} violates the experiment.export/v1 file shape"
+        ));
     }
     Ok(())
 }
 
 fn validate_export_top_level(export: &Value) -> Result<(), String> {
     if !export_id(&export["export_id"])
-        || export["created"].as_str().is_none_or(|created| created.len() < 10)
+        || export["created"]
+            .as_str()
+            .is_none_or(|created| created.len() < 10)
         || !matches!(
             export["backend"].as_str(),
             Some(
@@ -3998,7 +4461,9 @@ fn validate_export_top_level(export: &Value) -> Result<(), String> {
     if !nonempty_string(&export["protocol"]["path"])
         || sha256_string(&export["protocol"]["sha256"]).is_none()
         || !export_id(&export["protocol"]["protocol_id"])
-        || export["protocol"]["version"].as_u64().is_none_or(|version| version < 1)
+        || export["protocol"]["version"]
+            .as_u64()
+            .is_none_or(|version| version < 1)
         || (!export["protocol"]["seed_nonce"].is_null()
             && !nonempty_string(&export["protocol"]["seed_nonce"]))
     {
@@ -4024,11 +4489,10 @@ fn validate_export_top_level(export: &Value) -> Result<(), String> {
     )?;
     if !nonempty_string(&export["source"]["repo"])
         || (!export["source"]["commit"].is_null()
-            && !export["source"]["commit"].as_str().is_some_and(|commit| {
-                commit.len() == 40 && lowercase_hex(commit)
-            }))
-        || (!export["source"]["dirty"].is_null()
-            && export["source"]["dirty"].as_bool().is_none())
+            && !export["source"]["commit"]
+                .as_str()
+                .is_some_and(|commit| commit.len() == 40 && lowercase_hex(commit)))
+        || (!export["source"]["dirty"].is_null() && export["source"]["dirty"].as_bool().is_none())
     {
         return Err("canonical source violates experiment.export/v1".into());
     }
@@ -4068,9 +4532,16 @@ fn validate_export_top_level(export: &Value) -> Result<(), String> {
         "canonical host summary",
     )?;
     let summary = &export["host"]["summary"];
-    if ["cpu_model", "kernel", "hypervisor", "isolation_tier_max", "gpu", "instance_type"]
-        .iter()
-        .any(|field| !summary[*field].is_null() && summary[*field].as_str().is_none())
+    if [
+        "cpu_model",
+        "kernel",
+        "hypervisor",
+        "isolation_tier_max",
+        "gpu",
+        "instance_type",
+    ]
+    .iter()
+    .any(|field| !summary[*field].is_null() && summary[*field].as_str().is_none())
         || ["logical_cpus", "memory_bytes"]
             .iter()
             .any(|field| !summary[*field].is_null() && summary[*field].as_u64().is_none())
@@ -4104,9 +4575,9 @@ fn validate_export_top_level(export: &Value) -> Result<(), String> {
             )
             || !nullable_sha256(&arm["binary_sha256"])
             || (!arm["commit"].is_null()
-                && !arm["commit"].as_str().is_some_and(|commit| {
-                    commit.len() == 40 && lowercase_hex(commit)
-                }))
+                && !arm["commit"]
+                    .as_str()
+                    .is_some_and(|commit| commit.len() == 40 && lowercase_hex(commit)))
             || !nullable_string(&arm["image_digest"])
         {
             return Err("canonical arm violates experiment.export/v1".into());
@@ -4121,7 +4592,13 @@ fn validate_export_top_level(export: &Value) -> Result<(), String> {
     }
     exact_keys(
         &export["analysis"],
-        &["script", "blinded", "blinding_key_sha256", "outputs", "unmasked_at"],
+        &[
+            "script",
+            "blinded",
+            "blinding_key_sha256",
+            "outputs",
+            "unmasked_at",
+        ],
         "canonical analysis",
     )?;
     if !export["analysis"]["script"].is_null() {
@@ -4158,8 +4635,21 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
     exact_keys(
         export,
         &[
-            "schema", "export_id", "created", "protocol", "producer", "source", "backend",
-            "host", "arms", "runs", "flow", "files", "analysis", "notes", "reviews_dir",
+            "schema",
+            "export_id",
+            "created",
+            "protocol",
+            "producer",
+            "source",
+            "backend",
+            "host",
+            "arms",
+            "runs",
+            "flow",
+            "files",
+            "analysis",
+            "notes",
+            "reviews_dir",
         ],
         "canonical export",
     )?;
@@ -4186,10 +4676,26 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
         exact_keys(
             run,
             &[
-                "run_id", "arm", "instance_id", "seed", "replicate", "warmup", "status",
-                "outcome_class", "attempts", "resumed", "checkpoint", "measurements",
-                "isolation", "verification", "exclusion", "artifacts", "started_at",
-                "finished_at", "worker", "backend_ref",
+                "run_id",
+                "arm",
+                "instance_id",
+                "seed",
+                "replicate",
+                "warmup",
+                "status",
+                "outcome_class",
+                "attempts",
+                "resumed",
+                "checkpoint",
+                "measurements",
+                "isolation",
+                "verification",
+                "exclusion",
+                "artifacts",
+                "started_at",
+                "finished_at",
+                "worker",
+                "backend_ref",
             ],
             "canonical run row",
         )?;
@@ -4204,8 +4710,10 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
         if !matches!(
             status,
             "succeeded" | "failed" | "timeout" | "cancelled" | "infra_error" | "interrupted"
-        ) || !matches!(run["outcome_class"].as_str(), Some("completed" | "not_completed"))
-            || !nonempty_string(&run["arm"])
+        ) || !matches!(
+            run["outcome_class"].as_str(),
+            Some("completed" | "not_completed")
+        ) || !nonempty_string(&run["arm"])
             || !arm_ids.contains(run["arm"].as_str().unwrap_or_default())
             || !nonempty_string(&run["instance_id"])
             || (!run["seed"].is_null()
@@ -4218,15 +4726,20 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
             || (!run["started_at"].is_null() && !nonempty_string(&run["started_at"]))
             || (!run["finished_at"].is_null() && !nonempty_string(&run["finished_at"]))
             || (status == "succeeded" && run["outcome_class"] != "completed")
-            || (matches!(status, "timeout" | "cancelled" | "infra_error" | "interrupted")
-                && run["outcome_class"] != "not_completed")
+            || (matches!(
+                status,
+                "timeout" | "cancelled" | "infra_error" | "interrupted"
+            ) && run["outcome_class"] != "not_completed")
         {
             return Err(format!("canonical row {id} has malformed core fields"));
         }
         exact_keys(
             &run["checkpoint"],
             &[
-                "policy", "generations_written", "restored_from_generation", "manifest_sha256",
+                "policy",
+                "generations_written",
+                "restored_from_generation",
+                "manifest_sha256",
             ],
             "canonical checkpoint row",
         )?;
@@ -4235,13 +4748,20 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
             || !run["checkpoint"]["restored_from_generation"].is_null()
             || !run["checkpoint"]["manifest_sha256"].is_null()
         {
-            return Err(format!("canonical row {id} claims a forbidden restore/checkpoint"));
+            return Err(format!(
+                "canonical row {id} claims a forbidden restore/checkpoint"
+            ));
         }
         exact_keys(
             &run["measurements"],
             &[
-                "counted", "wall_seconds", "wall_valid", "cpu_user_seconds", "cpu_sys_seconds",
-                "max_rss_bytes", "counters",
+                "counted",
+                "wall_seconds",
+                "wall_valid",
+                "cpu_user_seconds",
+                "cpu_sys_seconds",
+                "max_rss_bytes",
+                "counters",
             ],
             "canonical measurements",
         )?;
@@ -4271,13 +4791,12 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
                 && run["measurements"]["cpu_sys_seconds"].as_f64().is_none())
             || (!run["measurements"]["max_rss_bytes"].is_null()
                 && run["measurements"]["max_rss_bytes"].as_u64().is_none())
-            || (!run["isolation"]["tier"].is_null()
-                && !nonempty_string(&run["isolation"]["tier"]))
+            || (!run["isolation"]["tier"].is_null() && !nonempty_string(&run["isolation"]["tier"]))
             || (!run["isolation"]["contended"].is_null()
                 && run["isolation"]["contended"].as_bool().is_none())
-            || run["isolation"]["blockers"].as_array().is_none_or(|items| {
-                items.iter().any(|item| item.as_str().is_none())
-            })
+            || run["isolation"]["blockers"]
+                .as_array()
+                .is_none_or(|items| items.iter().any(|item| item.as_str().is_none()))
             || run["artifacts"].as_array().is_none()
             || !matches!(
                 run["verification"]["status"].as_str(),
@@ -4286,10 +4805,8 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
             || (!run["verification"]["verifier"].is_null()
                 && !nonempty_string(&run["verification"]["verifier"]))
             || run["exclusion"]["excluded"].as_bool().is_none()
-            || (run["exclusion"]["excluded"] == true
-                && !nonempty_string(&run["exclusion"]["rule"]))
-            || (run["exclusion"]["excluded"] == false
-                && !run["exclusion"]["rule"].is_null())
+            || (run["exclusion"]["excluded"] == true && !nonempty_string(&run["exclusion"]["rule"]))
+            || (run["exclusion"]["excluded"] == false && !run["exclusion"]["rule"].is_null())
             || (!run["worker"].is_null() && !nonempty_string(&run["worker"]))
             || (!run["backend_ref"].is_null() && !nonempty_string(&run["backend_ref"]))
         {
@@ -4316,11 +4833,14 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
         if run["exclusion"]["excluded"] == true {
             expected_excluded.insert(id.to_string());
         }
-        if matches!(status, "cancelled" | "timeout" | "infra_error" | "interrupted")
-            && (run["measurements"]["wall_valid"] != false
-                || run["exclusion"]["excluded"] != true)
+        if matches!(
+            status,
+            "cancelled" | "timeout" | "infra_error" | "interrupted"
+        ) && (run["measurements"]["wall_valid"] != false || run["exclusion"]["excluded"] != true)
         {
-            return Err(format!("non-completed canonical row {id} admits a wall clock"));
+            return Err(format!(
+                "non-completed canonical row {id} admits a wall clock"
+            ));
         }
         if status == "cancelled"
             && (run["attempts"] != 1
@@ -4339,7 +4859,12 @@ fn validate_export_contract(export: &Value) -> Result<(), String> {
     exact_keys(
         flow,
         &[
-            "planned", "attempted", "completed", "not_completed", "interrupted", "resumed",
+            "planned",
+            "attempted",
+            "completed",
+            "not_completed",
+            "interrupted",
+            "resumed",
             "excluded",
         ],
         "canonical export flow",
@@ -4410,10 +4935,7 @@ fn write_new(path: &Path, content: &[u8]) -> Result<(), String> {
 fn self_test() -> Result<(), String> {
     let clusters = vec![(100.0, 80.0); TARGETS];
     let row = estimate(&clusters, WALL_THRESHOLD, 7)?;
-    if (row.point - 0.8).abs() > 1e-12
-        || row.ci95 != (0.8, 0.8)
-        || row.raw_p != 1.0 / 256.0
-    {
+    if (row.point - 0.8).abs() > 1e-12 || row.ci95 != (0.8, 0.8) || row.raw_p != 1.0 / 256.0 {
         return Err(format!(
             "exact target-cluster fixture differs: point={} ci={:?} p={}",
             row.point, row.ci95, row.raw_p
@@ -4525,7 +5047,8 @@ fn self_test() -> Result<(), String> {
             "artifact_listing_sha256":canonical_sha256(&artifacts)?,
         },
     });
-    let prefix = "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/n53/";
+    let prefix =
+        "s3://setec-astronomy-artifacts/ecbench/icb-aimed-large-prime-n53-n61-20261101/n53/";
     validate_attempt_envelope(&template, &envelope, prefix)?;
     envelope["lineage"]["restart_count"] = json!(1);
     if validate_attempt_envelope(&template, &envelope, prefix).is_ok() {
@@ -4686,22 +5209,16 @@ fn self_test() -> Result<(), String> {
     semantic_template["provider_identity_sha256"] = json!(sha256_hex(&provider_bytes));
     let mut semantic_pod = expected_pod_job_spec(&semantic_template);
     for (name, drifted) in [
-        (
-            "argv",
-            {
-                let mut value = semantic_pod.clone();
-                value["argv"][0] = json!("tampered");
-                value
-            },
-        ),
-        (
-            "outer deadline",
-            {
-                let mut value = semantic_pod.clone();
-                value["outer_deadline_seconds"] = json!(7_801);
-                value
-            },
-        ),
+        ("argv", {
+            let mut value = semantic_pod.clone();
+            value["argv"][0] = json!("tampered");
+            value
+        }),
+        ("outer deadline", {
+            let mut value = semantic_pod.clone();
+            value["outer_deadline_seconds"] = json!(7_801);
+            value
+        }),
     ] {
         if validate_pod_job_spec(&semantic_template, &drifted).is_ok() {
             return Err(format!("Pod/Job {name} drift passed semantic validation"));
@@ -4722,21 +5239,15 @@ fn self_test() -> Result<(), String> {
     let semantic_check = (|| -> Result<(), String> {
         fs::write(semantic_root.join("provider.json"), &provider_bytes)
             .map_err(|error| error.to_string())?;
-        fs::write(semantic_root.join("pod.json"), &pod_bytes)
-            .map_err(|error| error.to_string())?;
+        fs::write(semantic_root.join("pod.json"), &pod_bytes).map_err(|error| error.to_string())?;
         let semantic_attempt = json!({
             "provider_identity_artifact":"provider.json",
             "pod_spec_artifact":"pod.json",
         });
-        validate_provider_and_pod_artifacts(
-            &semantic_root,
-            &semantic_template,
-            &semantic_attempt,
-        )?;
+        validate_provider_and_pod_artifacts(&semantic_root, &semantic_template, &semantic_attempt)?;
         semantic_pod["resources"]["cpu_limit"] = json!("5");
         let mutated = protocol_canonical_bytes(&semantic_pod)?;
-        fs::write(semantic_root.join("pod.json"), &mutated)
-            .map_err(|error| error.to_string())?;
+        fs::write(semantic_root.join("pod.json"), &mutated).map_err(|error| error.to_string())?;
         semantic_template["pod_spec_sha256"] = json!(sha256_hex(&mutated));
         if validate_provider_and_pod_artifacts(
             &semantic_root,
@@ -4745,7 +5256,9 @@ fn self_test() -> Result<(), String> {
         )
         .is_ok()
         {
-            return Err("resource-drifted canonical Pod artifact passed semantic validation".into());
+            return Err(
+                "resource-drifted canonical Pod artifact passed semantic validation".into(),
+            );
         }
         Ok(())
     })();
@@ -4758,12 +5271,8 @@ fn self_test() -> Result<(), String> {
         .into_iter()
         .map(|name| json!({"path":format!("sessions/n53/{name}")}))
         .collect::<Vec<_>>();
-    if require_session_core_custody(
-        &incomplete_custody,
-        "sessions/n53",
-        "adversarial fixture",
-    )
-    .is_ok()
+    if require_session_core_custody(&incomplete_custody, "sessions/n53", "adversarial fixture")
+        .is_ok()
     {
         return Err("session custody without host.json passed".into());
     }
@@ -4808,10 +5317,7 @@ fn self_test() -> Result<(), String> {
         return Err("decisive artifact with two attempt owners passed custody".into());
     }
     let cross_cell_consumed = BTreeSet::from(["sessions/n53/replay-all.json".to_string()]);
-    let cross_cell_owners = BTreeMap::from([(
-        "sessions/n53/replay-all.json".to_string(),
-        2usize,
-    )]);
+    let cross_cell_owners = BTreeMap::from([("sessions/n53/replay-all.json".to_string(), 2usize)]);
     if validate_global_artifact_owners(&cross_cell_consumed, &cross_cell_owners).is_ok() {
         return Err("cross-cell duplicate owner passed global custody".into());
     }
@@ -4943,8 +5449,8 @@ fn self_test() -> Result<(), String> {
         return Err("wrong result export denominator passed the v2 contract test".into());
     }
     result_fixture["canonical_export"]["expected_rows"] = json!(636);
-    result_fixture["sizes"][0]["comparisons"][0]["wall"]["exact_sign_flip"]
-        ["sign_assignments"] = json!(255);
+    result_fixture["sizes"][0]["comparisons"][0]["wall"]["exact_sign_flip"]["sign_assignments"] =
+        json!(255);
     if validate_result_contract(&result_fixture).is_ok() {
         return Err("nested sign-flip drift passed the v2 contract test".into());
     }
@@ -5054,7 +5560,10 @@ fn self_test() -> Result<(), String> {
     if validate_export_contract(&export_fixture).is_ok() {
         return Err("extra canonical producer field passed the v1 contract test".into());
     }
-    export_fixture["producer"].as_object_mut().unwrap().remove("unexpected");
+    export_fixture["producer"]
+        .as_object_mut()
+        .unwrap()
+        .remove("unexpected");
     export_fixture["files"] = json!([{
         "path":"fixture.bin",
         "sha256":digest,

@@ -27,21 +27,27 @@ eventual source commit, covering all of the following:
   census and probe scalars, and every adapted ordinary witness replays; the
   exact frozen `PairSumTable` scan must finish first, and only an ordinary miss
   may enter the separately counted partials-only LP pass or mutate its graph;
-- toy recovery is under-ranked without graph elimination and succeeds only
-  after at least one merged 2LP projected row;
+- one locked unsaturated n=13 actual-collector prefix, selected only from
+  target-independent (`b = 0`) toy relations, has ordinary misses and positive
+  projected graph rows; its exact ordinary subset remains rank-deficient,
+  while the exact combined stream verifies the table and recovers the
+  already-fixed toy target;
 - raw-to-projected sparse mapping solves and replays, while a mutated sparse
   coefficient is rejected fail-closed;
 - the exported aimed window is the frozen collector's exact scan and only the
   named third summands are probed;
 - global thread-local accounting owns group adds/doubles, canonicalisations,
-  and Frobenius coordinate maps exactly once; LP-local accounting contributes
-  only disjoint hash/table work and wrapper scalar-multiplication metadata;
+  Frobenius coordinate maps, eliminator validation, and eliminator relation
+  scalar multiplications exactly once; LP detail exposes the two eliminator
+  scalar subtotals and wrapper metadata, while the phase-native overlay adds
+  only disjoint hash/table work;
 - `summands_scanned` includes the frozen ordinary window and the exact number
   of named third summands visited by the LP pass on ordinary misses, while
   `lp_partial_scan_trials` and `lp_partial_summands_scanned` expose that
   incremental scan explicitly;
-- setup and relation wrapper scalar multiplications survive into final phase
-  and total counts without duplicating their underlying adds/doubles.
+- setup and relation ownership is exact: phase scalar multiplications equal
+  frozen ordinary work plus the separately exposed eliminator and wrapper
+  subtotals, without duplicating their underlying adds/doubles.
 
 The existing focused receipt is audit-invalidated. Its earlier PASS lines and
 two infrastructure-only events remain provenance, not a launch gate.
@@ -116,25 +122,35 @@ Resource refusal or unavailable exact placement is `BLOCKED`; it never
 authorizes a smaller domain, different host, altered target set, or longer
 scientific cap.
 
-## 4. Pre-target positive control
+## 4. Pre-target saturated integration control
 
 Run `specs/control-n13.json` in the frozen image at L2. It schedules two public
 targets, five arms, one warmup, and five measured rounds: 60 executions total,
 50 measured. Retain the complete session, failed rows, replay-all audit,
 canonical export, provider attempt receipt, and artifact hashes.
 
-The control passes only with:
+This window-16 control is intentionally saturated. Mechanism activity belongs
+to the separately locked unsaturated focused fixture in section 1. The timed
+control passes only with:
 
 - 50/50 verified measured rows and replay of every eligible row;
 - ten operation-identical aimed/A-A pairs and ten exact aimed/LP=0 pairs;
-- all twenty measured 2LP rows reporting partial activity, a projected row,
-  at least one graph-merged row, zero projected-row verification failures, and
+- all twenty measured 2LP rows reporting the exact saturated shape: zero
+  partial-scan trials and summands, zero partials fed, zero projected and
+  graph-merged rows, zero projected-row verification failures, and
   `aimed_lp_direct_two_sum == 0`;
 - one complete L2-bound session and a passing real wrapper topology gate.
 
 A failed scientific control blocks the targets. Changing toy parameters
 requires a pre-data versioned amendment, a new source/test receipt, and a new
 freeze.
+
+For each complete n=53/n=61 cell, every verified measured 2LP row must retain
+the strict production activity predicate: positive partial-scan trials and
+summands, positive partials fed, positive projected and graph-merged rows,
+total summands at least partial-scan summands, zero verification failures, and
+zero direct two-sum rows. The saturated n=13 exception does not weaken that
+target-size gate.
 
 ## 5. Target cells and custody
 
