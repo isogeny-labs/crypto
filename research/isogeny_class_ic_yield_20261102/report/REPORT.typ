@@ -32,7 +32,7 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
   [L0 isolation stated (counted exact, clock descriptive)], [verified complete], [section 1 and 3; P1 A1 section 14, P2 A1 and 10.1, P3 A1],
   [Deferred cells stated (P1 tier 2, P2 36\/40-bit, P3a-Y)], [verified complete], [sections 1 and 8],
   [P1 ECCp-131 tier 1, arm-ratio strip plot], [complete at tier-1 scope (tier 2 deferred)], [section 5, figure 2, #raw("p1_eccp131/runs/tier1_analysis.json")],
-  [P2 per-cell yield per curve, A\/A band, planted control], [partial: 10 of 12 run-scope cells finished], [section 6, figure 3, #raw("p2_prime_analogues/runs/<cell>/analysis.json")],
+  [P2 per-cell yield per curve, A\/A band, planted control], [partial: 12 of 12 run-scope cells finished], [section 6, figure 3, #raw("p2_prime_analogues/runs/<cell>/analysis.json")],
   [P3 Dreg per curve and presentation family, E0 highlighted, standard V versus b-adapted], [partial: 16 of 16 cards completed (receipt); more output present], [section 7, figures 4 and 5, #raw("p3_ecc2k130/full/")],
   [Class-structure diagram (ECC2K-130 volcano levels beside ECCp-131 crater)], [verified complete (structure from DESIGN.md)], [section 3, figure 1],
   [Generator, REPORT.md, REPORT.typ, REPORT.pdf, SVGs], [see section 9], [#raw("report/")],
@@ -67,9 +67,11 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
   [P2 c24B\_m3], [ecbench isolation level recorded on rows: L1: 1761, L2: 27807], [audit: OK, 36960 records, 12 replays; in-session A\/A: counts identical 9856\/9856],
   [P2 c28A\_m2], [ecbench isolation level recorded on rows: L1: 1050, L2: 5478], [audit: OK, 8160 records, 12 replays; in-session A\/A: counts identical 2176\/2176],
   [P2 c28A\_m3], [ecbench isolation level recorded on rows: L1: 316, L2: 6212], [audit: OK, 8160 records, 12 replays; in-session A\/A: counts identical 2176\/2176],
+  [P2 c28B\_m2], [ecbench isolation level recorded on rows: L1: 2518, L2: 12266], [audit: OK, 18480 records, 12 replays; in-session A\/A: counts identical 4928\/4928],
   [P2 c28B\_m3], [ecbench isolation level recorded on rows: L1: 14784], [audit: OK, 18480 records, 12 replays; in-session A\/A: counts identical 4928\/4928],
   [P2 c32A\_m2], [ecbench isolation level recorded on rows: L1: 4352], [audit: OK, 5440 records, 12 replays; in-session A\/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A\/A used)],
   [P2 c32A\_m3], [ecbench isolation level recorded on rows: L1: 1002, L2: 3350], [audit: OK, 5440 records, 12 replays; in-session A\/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A\/A used)],
+  [P2 c32B\_m2], [ecbench isolation level recorded on rows: L1: 3401, L2: 6455], [audit: OK, 12320 records, 12 replays; in-session A\/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A\/A used)],
   [P2 c32B\_m3], [ecbench isolation level recorded on rows: L1: 3019, L2: 6837], [audit: OK, 12320 records, 12 replays; in-session A\/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A\/A used)],
 )])
 
@@ -161,6 +163,8 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 
 = 6. P2: prime analogues of ECCp-131's class
 
+Main-session reading (p2\_prime\_analogues\/RESULTS.md): all 12 run-scope cells finished and audited. 9 cells support the null (planted 20% power \>= 0.99; bootstrap upper bound on the curve share of yield variance \<= 0.10 in every cell); 2 m = 3 cells at 24 bits are not informative at 20% (power 0.38, 0.84); the one flag (c32A m = 3, curve 80, max abs z p = 0.0005) was rerun on fresh seeds under the preregistered follow-up 1 (FOLLOWUP\_c32A\_m3.md) and did not replicate: curve 80 vs 15 comparators 1.0021 (95% 0.9815 to 1.0232), p = 0.84, positive control met (1.19), negative control informative.
+
 #figure(kind: table, supplement: [Table], gap: 0.5em, caption: [Cell inventory: 12 run-scope cells (24, 28, 32 bits, classes A and B, m = 2, 3) and 8 deferred cells (36 and 40 bits). Pending cells have no values; deferred cells were not run.], [
 #set text(size: 7.5pt)
 #set align(left)
@@ -168,9 +172,9 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
   [c24A], [finished (128 curves)], [finished (128 curves)], [p 2^23.70, D -84171, h 128],
   [c24B], [finished (300 curves)], [finished (300 curves)], [p 2^23.72, D -414651, h 300],
   [c28A], [finished (128 curves)], [finished (128 curves)], [p 2^27.31, D -84171, h 128],
-  [c28B], [pending], [finished (300 curves)], [p 2^27.86, D -414651, h 300],
+  [c28B], [finished (300 curves)], [finished (300 curves)], [p 2^27.86, D -414651, h 300],
   [c32A], [finished (128 curves)], [finished (128 curves)], [p 2^31.94, D -84171, h 128],
-  [c32B], [pending], [finished (300 curves)], [p 2^31.91, D -414651, h 300],
+  [c32B], [finished (300 curves)], [finished (300 curves)], [p 2^31.91, D -414651, h 300],
   [c36A], [not run (deferred)], [not run (deferred)], [-],
   [c36B], [not run (deferred)], [not run (deferred)], [-],
   [c40A], [not run (deferred)], [not run (deferred)], [-],
@@ -191,9 +195,11 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
   [c24B\_m3], [0.0340], [0.0014 \/ 0.041], [0.2814], [2.75 (3.78) p 0.8266], [1.156 (1.199)], [0.0528 \/ 0.0361], [1.177 \/ 0.84], [0.421], [power \< 0.9],
   [c28A\_m2], [0.0199], [0.0143 \/ 0.103], [0.0540], [3.24 (3.56) p 0.1489], [1.115 (1.114)], [0.0347 \/ 0.0202], [1.196 \/ 1.00], [0.450], [none],
   [c28A\_m3], [0.0329], [0.0045 \/ 0.093], [0.2884], [3.14 (3.55) p 0.2019], [1.156 (1.172)], [0.0525 \/ 0.0430], [1.196 \/ 1.00], [0.090], [none],
+  [c28B\_m2], [0.0171], [0.0107 \/ 0.089], [0.0330], [3.30 (3.77) p 0.2679], [1.113 (1.127)], [0.0337 \/ 0.0244], [1.197 \/ 1.00], [0.421], [none],
   [c28B\_m3], [0.0330], [0.0062 \/ 0.085], [0.1134], [3.24 (3.75) p 0.2859], [1.140 (1.173)], [0.0446 \/ 0.0445], [1.189 \/ 1.00], [0.193], [none],
   [c32A\_m2], [0.0010], [-0.0076 \/ 0.080], [0.8186], [3.64 (3.56) p 0.0360], [1.109 (1.117)], [0.0326 \/ 0.0261], [1.200 \/ 1.00], [0.512], [none],
   [c32A\_m3], [0.0330], [0.0117 \/ 0.102], [0.0795], [4.15 (3.53) p 0.0005], [1.126 (1.115)], [0.0370 \/ 0.0230], [1.194 \/ 1.00], [0.133], [max|z| p \< 0.0025],
+  [c32B\_m2], [0.0010], [-0.0029 \/ 0.075], [0.7096], [2.83 (3.75) p 0.7616], [1.095 (1.124)], [0.0340 \/ 0.0220], [1.201 \/ 1.00], [0.676], [none],
   [c32B\_m3], [0.0329], [-0.0009 \/ 0.078], [0.5282], [3.24 (3.76) p 0.2989], [1.117 (1.125)], [0.0377 \/ 0.0278], [1.195 \/ 1.00], [0.449], [none],
 )])
 
@@ -279,9 +285,9 @@ Main-session reading of the frozen pooled analyses (masked first, unmasked after
 - *Not run (deferred), P1 tier 2:* config #raw("m2t4"), 39 arms, 8 plus 2 targets (about 6.3 CPU-hours). In the preregistered design, no data taken under protocol version 1 amendment A1. Needs a further amendment before running.
 - *Not run (deferred), P2 at 36 and 40 bits:* c36A\_m2, c36A\_m3, c36B\_m2, c36B\_m3, c40A\_m2, c40A\_m3, c40B\_m2, c40B\_m3 (8 cells). In the population and the preregistration; no data taken under amendment A1.
 - *Not run (deferred), P3a-Y:* n = 43, k = 13 yield line (about 19.4 CPU-hours); claim C3 (yield against the Poisson prediction) is not run, and the #raw("solutions") column of the cells that did run is descriptive.
-- *Pending at generation time, P2:* c28B\_m2, c32B\_m2.
+- *Pending at generation time, P2:* none.
 - *Pending or partial at generation time, P3:* none.
-- Statements about pending cells are not made. In particular the C2 outcome (N or G) is open until the b-adapted and b-sparse arms and the remaining standard-V shards finish.
+- No cell is pending: every run-scope cell of P1, P2 and P3 has a completed receipt.
 
 
 = 9. Reproduce, inputs and files
@@ -313,12 +319,16 @@ Rerun from the repository root: #raw("research/isogeny_class_ic_yield_20261102/r
   [#raw("p2_prime_analogues/runs/c28A_m2/audit.json")], [#raw("b7b9447ece6d7693")],
   [#raw("p2_prime_analogues/runs/c28A_m3/analysis.json")], [#raw("017d0ca14e8795c9")],
   [#raw("p2_prime_analogues/runs/c28A_m3/audit.json")], [#raw("002d0164ac54045d")],
+  [#raw("p2_prime_analogues/runs/c28B_m2/analysis.json")], [#raw("a0faeefba936a42c")],
+  [#raw("p2_prime_analogues/runs/c28B_m2/audit.json")], [#raw("e4e4b112a63a998f")],
   [#raw("p2_prime_analogues/runs/c28B_m3/analysis.json")], [#raw("1765c53edc0276c3")],
   [#raw("p2_prime_analogues/runs/c28B_m3/audit.json")], [#raw("f27c9e54faf6b29b")],
   [#raw("p2_prime_analogues/runs/c32A_m2/analysis.json")], [#raw("dba868b529f5322f")],
   [#raw("p2_prime_analogues/runs/c32A_m2/audit.json")], [#raw("af60cc5c2c3c00c2")],
   [#raw("p2_prime_analogues/runs/c32A_m3/analysis.json")], [#raw("b4e907dd0328bc41")],
   [#raw("p2_prime_analogues/runs/c32A_m3/audit.json")], [#raw("9906464becf9e795")],
+  [#raw("p2_prime_analogues/runs/c32B_m2/analysis.json")], [#raw("2d18ada46b05a867")],
+  [#raw("p2_prime_analogues/runs/c32B_m2/audit.json")], [#raw("8c9455f0074f0eb2")],
   [#raw("p2_prime_analogues/runs/c32B_m3/analysis.json")], [#raw("2330be8d60844005")],
   [#raw("p2_prime_analogues/runs/c32B_m3/audit.json")], [#raw("3d394c5f8f2912ab")],
   [#raw("p3_ecc2k130/data/ecc2k130_curves.tsv")], [#raw("ee987b52191581be")],
