@@ -640,7 +640,14 @@ fn main() -> Result<(), String> {
         return Err("modular solver control failed".into());
     }
     let protocol = Path::new("research/eccp131_representation_filter_20261102/protocol.json");
-    let protocol_sha256 = sha256_file(protocol).unwrap_or_else(|_| "unavailable".into());
+    let protocol_file_sha256 = sha256_file(protocol).unwrap_or_else(|_| "unavailable".into());
+    let protocol_record: serde_json::Value = serde_json::from_slice(
+        &fs::read(protocol).map_err(|e| format!("read {}: {e}", protocol.display()))?,
+    )
+    .map_err(|e| format!("parse {}: {e}", protocol.display()))?;
+    let protocol_sha256 = protocol_record["freeze"]["protocol_sha256"]
+        .as_str()
+        .ok_or("protocol has no frozen canonical SHA-256")?;
     let source_revision =
         env::var("SOURCE_REVISION").unwrap_or_else(|_| "working-tree-development-run".into());
     let qualifying = arms.iter().any(|a| {
@@ -653,6 +660,7 @@ fn main() -> Result<(), String> {
         "status": "complete",
         "curve": {"name": curve.name, "field_bits": curve.field.modulus().bits(), "subgroup_bits": curve.order.bits(), "cofactor": curve.cofactor, "digest_sha256": digest},
         "protocol_sha256": protocol_sha256,
+        "protocol_file_sha256": protocol_file_sha256,
         "source_revision": source_revision,
         "samples": {"training_relation_and_null_each": TRAIN, "heldout_relation_and_null_each": TEST},
         "arms": &arms,
