@@ -1,6 +1,6 @@
 # High-arity Boolean closure-degree discriminator
 
-Status: **protocol v3 amendment filed before affected data; refreeze pending;
+Status: **protocol v4 amendment filed before affected data; refreeze pending;
 no scientific run has started**.
 
 The v1 protocol was frozen on 2026-11-01 at source commit
@@ -13,9 +13,18 @@ source commit `69ace2cc326d85c5128a5d36af5e72de1747385d`, with protocol
 SHA-256 `673323704df4252797f9a659ed4499b92a07758d99d63fd4726327a73926d984`.
 It was superseded before any affected data by amendment
 `A2-MAINLINE-SOURCE-ADVANCE` after the PR branch incorporated active mainline
-work inside the recursively frozen source tree. Protocol v3 is draft pending a
-new immutable source commit, four-binary rebuild, and canonical refreeze. The
-runner rejects a draft freeze. Execution also remains blocked by the
+work inside the recursively frozen source tree. The A2 filing reset protocol
+v3 to a fail-closed draft pending a new immutable source commit, four-binary
+rebuild, and canonical refreeze; those steps then completed at pushed source
+commit
+`d84d7d44f3c8bcb27a88408f6ba132cbc7575128`; protocol v3 was canonically
+frozen before affected data with SHA-256
+`bb4703b0b2fe207adbbdc468f5b8729574cb42e4908eb2e963799afc5726c270`.
+Before that follow-up could merge, current main changed the recursively frozen
+root `Cargo.toml` by registering a new binary. Amendment
+`A3-CARGO-MANIFEST-ADVANCE` superseded the v3 identities before affected data
+and reset protocol v4 to a fail-closed draft pending a new pushed source
+commit, rebuild, and canonical refreeze. Execution also remains blocked by the
 independent custody, draw-command, account, and budget gates below.
 
 This study executes the still-unmeasured native closure cells identified by
@@ -169,8 +178,10 @@ contract is [protocol.json](protocol.json). The exact publication mapping is
 specified in [REPORT_EXPORT_CONTRACT.md](REPORT_EXPORT_CONTRACT.md). Its code
 and consistency tests pass; the v1 source, binary, and analysis identities are
 historical and explicitly superseded. The validated v2 identities are likewise
-historical after the pre-data A2 amendment; v3 identities await the new build
-and refreeze. The compiler and image remain pinned. The runner also requires a
+historical after the pre-data A2 amendment; the validated v3 identities are
+historical after the pre-data A3 amendment. Protocol v4 identities await the
+new source commit, build, and refreeze. The compiler and image remain pinned.
+The runner also requires a
 byte-identical fresh frozen-analyzer replay immediately before publication. The
 analyzer itself emits only
 `dreg_high_arity.summary/v1`,

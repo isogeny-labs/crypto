@@ -263,6 +263,9 @@ fn summation_poly(m: usize, x_r: u64, a: u64, b: u64, p: u64) -> Pol {
             p,
         );
     }
+    if m == 4 {
+        return summation_poly_5(x_r, a, b, p);
+    }
     assert_eq!(m, 3);
     // Work in variables (x1, x2, x3, u), then eliminate u (degree 2 in each).
     let n = 4;
@@ -296,6 +299,193 @@ fn summation_poly(m: usize, x_r: u64, a: u64, b: u64, p: u64) -> Pol {
     let t3 = f1.mul(&g0, p).sub(&f0.mul(&g1, p), p);
     let r = t1.mul(&t1, p).sub(&t2.mul(&t3, p), p);
     r.remap(3, &[0, 1, 2, 0])
+}
+
+/// Univariate polynomials over `F_p`, constant term first.
+fn upoly_mul(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut c = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        for (j, &y) in b.iter().enumerate() {
+            c[i + j] = addm(c[i + j], mulm(x, y, p), p);
+        }
+    }
+    c
+}
+fn upoly_add(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut c = vec![0u64; a.len().max(b.len())];
+    for (i, &x) in a.iter().enumerate() {
+        c[i] = addm(c[i], x, p);
+    }
+    for (i, &x) in b.iter().enumerate() {
+        c[i] = addm(c[i], x, p);
+    }
+    c
+}
+fn upoly_scale(a: &[u64], k: u64, p: u64) -> Vec<u64> {
+    a.iter().map(|&x| mulm(x, k, p)).collect()
+}
+
+/// `S_3(v, c, u)` as a quadratic in `v` whose coefficients are polynomials in
+/// `u` (each of degree ≤ 2), constant term first.
+fn s3_in_v_over_u(c: u64, a: u64, b: u64, p: u64) -> [Vec<u64>; 3] {
+    let f = s3(&Pol::var(2, 0), &Pol::c(2, c, p), &Pol::var(2, 1), a, b, p);
+    let mut out = [vec![0u64; 3], vec![0u64; 3], vec![0u64; 3]];
+    for (e, &v) in &f.t {
+        out[e[0] as usize][e[1] as usize] = addm(out[e[0] as usize][e[1] as usize], v, p);
+    }
+    out
+}
+
+/// `S_3(u, c, d)` as a quadratic in `u`, constant term first.
+fn s3_in_u(c: u64, d: u64, a: u64, b: u64, p: u64) -> Vec<u64> {
+    let f = s3(&Pol::var(1, 0), &Pol::c(1, c, p), &Pol::c(1, d, p), a, b, p);
+    let mut out = vec![0u64; 3];
+    for (e, &v) in &f.t {
+        out[e[0] as usize] = addm(out[e[0] as usize], v, p);
+    }
+    out
+}
+
+/// `S_4(x1, x2, x3, u)` as a polynomial in `u` (formal degree 4):
+/// `Res_v(S_3(x1, x2, v), S_3(v, x3, u))`.
+fn s4_in_u(x1: u64, x2: u64, x3: u64, a: u64, b: u64, p: u64) -> Vec<u64> {
+    let fa = s3_in_u(x1, x2, a, b, p); // S_3(v, x1, x2) = S_3(x1, x2, v), symmetric
+    let [b0, b1, b2] = s3_in_v_over_u(x3, a, b, p);
+    let (a0, a1, a2) = (vec![fa[0]], vec![fa[1]], vec![fa[2]]);
+    let neg = |v: &[u64]| upoly_scale(v, p - 1, p);
+    let t1 = upoly_add(&upoly_mul(&a2, &b0, p), &neg(&upoly_mul(&a0, &b2, p)), p);
+    let t2 = upoly_add(&upoly_mul(&a2, &b1, p), &neg(&upoly_mul(&a1, &b2, p)), p);
+    let t3 = upoly_add(&upoly_mul(&a1, &b0, p), &neg(&upoly_mul(&a0, &b1, p)), p);
+    let mut r = upoly_add(&upoly_mul(&t1, &t1, p), &neg(&upoly_mul(&t2, &t3, p)), p);
+    r.resize(5, 0);
+    r
+}
+
+/// Determinant mod `p` by Gaussian elimination.
+fn det_mod(mut m: Vec<Vec<u64>>, p: u64) -> u64 {
+    let n = m.len();
+    let mut det = 1u64;
+    for c in 0..n {
+        let Some(r) = (c..n).find(|&r| m[r][c] != 0) else {
+            return 0;
+        };
+        if r != c {
+            m.swap(r, c);
+            det = mulm(det, p - 1, p);
+        }
+        det = mulm(det, m[c][c], p);
+        let inv = invm(m[c][c], p);
+        for r in c + 1..n {
+            let f = mulm(m[r][c], inv, p);
+            if f == 0 {
+                continue;
+            }
+            for k in c..n {
+                m[r][k] = subm(m[r][k], mulm(f, m[c][k], p), p);
+            }
+        }
+    }
+    det
+}
+
+/// Sylvester resultant of `f` (formal degree `df`) and `g` (formal degree `dg`).
+fn sylvester(f: &[u64], df: usize, g: &[u64], dg: usize, p: u64) -> u64 {
+    let n = df + dg;
+    let mut m = vec![vec![0u64; n]; n];
+    for i in 0..dg {
+        for k in 0..=df {
+            m[i][i + k] = f[df - k];
+        }
+    }
+    for i in 0..df {
+        for k in 0..=dg {
+            m[dg + i][i + k] = g[dg - k];
+        }
+    }
+    det_mod(m, p)
+}
+
+/// `S_5(x1, x2, x3, x4, x_R)` with `x_R` fixed, in four variables:
+/// `Res_u(S_4(x1, x2, x3, u), S_3(u, x4, x_R))`, degree ≤ 8 in each variable,
+/// recovered exactly by evaluation on a 9⁴ grid and tensor Lagrange
+/// interpolation.
+fn summation_poly_5(x_r: u64, a: u64, b: u64, p: u64) -> Pol {
+    const K: usize = 9;
+    let nodes: Vec<u64> = (0..K as u64).collect();
+    let mut vals = vec![0u64; K * K * K * K];
+    for i1 in 0..K {
+        for i2 in 0..K {
+            for i3 in 0..K {
+                let s4 = s4_in_u(nodes[i1], nodes[i2], nodes[i3], a, b, p);
+                for i4 in 0..K {
+                    let g = s3_in_u(nodes[i4], x_r, a, b, p);
+                    vals[((i1 * K + i2) * K + i3) * K + i4] = sylvester(&s4, 4, &g, 2, p);
+                }
+            }
+        }
+    }
+    // Inverse Vandermonde on the nodes: coefficient vector = V^{-1} · values.
+    let mut v: Vec<Vec<u64>> = (0..K)
+        .map(|i| (0..K).map(|j| powm(nodes[i], j as u64, p)).collect())
+        .collect();
+    let mut inv: Vec<Vec<u64>> = (0..K)
+        .map(|i| (0..K).map(|j| (i == j) as u64).collect())
+        .collect();
+    for c in 0..K {
+        let r = (c..K)
+            .find(|&r| v[r][c] != 0)
+            .expect("Vandermonde invertible");
+        v.swap(r, c);
+        inv.swap(r, c);
+        let ic = invm(v[c][c], p);
+        for k in 0..K {
+            v[c][k] = mulm(v[c][k], ic, p);
+            inv[c][k] = mulm(inv[c][k], ic, p);
+        }
+        for r in 0..K {
+            if r != c && v[r][c] != 0 {
+                let f = v[r][c];
+                for k in 0..K {
+                    v[r][k] = subm(v[r][k], mulm(f, v[c][k], p), p);
+                    inv[r][k] = subm(inv[r][k], mulm(f, inv[c][k], p), p);
+                }
+            }
+        }
+    }
+    // Apply V^{-1} along each axis.
+    let idx = |a: [usize; 4]| ((a[0] * K + a[1]) * K + a[2]) * K + a[3];
+    for axis in 0..4 {
+        let mut out = vec![0u64; vals.len()];
+        for flat in 0..vals.len() {
+            let mut a = [
+                flat / (K * K * K),
+                flat / (K * K) % K,
+                flat / K % K,
+                flat % K,
+            ];
+            let deg = a[axis];
+            let mut acc = 0u64;
+            for node in 0..K {
+                a[axis] = node;
+                acc = addm(acc, mulm(inv[deg][node], vals[idx(a)], p), p);
+            }
+            out[flat] = acc;
+        }
+        vals = out;
+    }
+    let mut f = Pol::zero(4);
+    for (flat, &c) in vals.iter().enumerate() {
+        if c != 0 {
+            let e = vec![
+                (flat / (K * K * K)) as u32,
+                (flat / (K * K) % K) as u32,
+                (flat / K % K) as u32,
+                (flat % K) as u32,
+            ];
+            f.t.insert(e, c);
+        }
+    }
+    f
 }
 
 /// Rewrite a symmetric polynomial in `m` variables as a polynomial in the
@@ -592,12 +782,18 @@ fn main() {
         .collect();
     let tmax2: usize = get("--t-max-m2", "9").parse().unwrap();
     let tmax3: usize = get("--t-max-m3", "5").parse().unwrap();
+    let tmax4: usize = get("--t-max-m4", "4").parse().unwrap();
+    let tmin: usize = get("--t-min", "1").parse().unwrap();
     let randoms: usize = get("--random", "2").parse().unwrap();
     let budget = Duration::from_secs(get("--budget", "600").parse().unwrap());
     let arms_filter = get("--arms", "plain-chain,plain-smp1,symmetric");
     for &m in &ms {
-        let tmax = if m == 2 { tmax2 } else { tmax3 };
-        for t in 1..=tmax {
+        let tmax = match m {
+            2 => tmax2,
+            3 => tmax3,
+            _ => tmax4,
+        };
+        for t in tmin..=tmax {
             let mut rng = Rng(0x504B_4D53 ^ ((m as u64) << 32) ^ t as u64);
             assert!((p - 1).is_multiple_of(1u64 << t), "2^t must divide p − 1");
             let zeta = loop {
@@ -619,7 +815,19 @@ fn main() {
                 continue;
             }
             // Planted check: distinct summands from V, x_R solving S_{m+1}.
+            if base.len() < m {
+                eprintln!(
+                    "m={m} t={t}: |V| = {} < m, no distinct summands; cell skipped",
+                    base.len()
+                );
+                continue;
+            }
+            let mut tries = 0u32;
             let planted = loop {
+                tries += 1;
+                if tries > 200_000 {
+                    break None;
+                }
                 let mut idx: Vec<usize> = Vec::new();
                 while idx.len() < m {
                     let k = rng.below(base.len() as u64) as usize;
@@ -629,17 +837,24 @@ fn main() {
                 }
                 let xs: Vec<u64> = idx.iter().map(|&k| base[k]).collect();
                 let w: Vec<u64> = idx.iter().map(|&k| powm(zeta, k as u64, p)).collect();
-                if m == 2 {
-                    if let Some(xr) = s3_root(xs[0], xs[1], inst.a, inst.b, p) {
-                        break (w, vec![], xr);
-                    }
-                } else if let Some(u) = s3_root(xs[0], xs[1], inst.a, inst.b, p) {
-                    if let Some(xr) = s3_root(u, xs[2], inst.a, inst.b, p) {
-                        break (w, vec![u], xr);
+                // Partial sums u_1 = x(P1+P2), u_k = x(u_{k−1} + P_{k+1}); the last is x_R.
+                let mut chain = Vec::new();
+                let mut acc = s3_root(xs[0], xs[1], inst.a, inst.b, p);
+                for &x in &xs[2..] {
+                    let Some(u) = acc else { break };
+                    chain.push(u);
+                    acc = s3_root(u, x, inst.a, inst.b, p);
+                }
+                if let Some(xr) = acc {
+                    if chain.len() == m - 2 {
+                        break Some((w, chain, xr));
                     }
                 }
             };
-            let (w, partial, xr_pl) = planted;
+            let Some((w, partial, xr_pl)) = planted else {
+                eprintln!("m={m} t={t}: no planted decomposition in 200000 draws; cell skipped");
+                continue;
+            };
             let arms: Vec<&str> = arms_filter
                 .split(',')
                 .filter(|a| !(m == 2 && *a == "plain-smp1"))
