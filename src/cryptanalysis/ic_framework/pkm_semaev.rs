@@ -44,6 +44,7 @@
 //! forms) is done once in `prepare` and reported as setup native work.
 
 use std::collections::{BTreeMap, HashSet};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use super::fiber::{cofactor_fiber, CofactorFiber};
@@ -52,7 +53,7 @@ use super::stages::{
     DecompositionOracle, InstanceCtx, Params, SolverCost, SolverTotals, SystemShape,
 };
 use crate::cryptanalysis::f4_fp_tower::{
-    f4_tower, Fp, RPoly, SquareRule, TowerF4Options, TowerRing,
+    f4_tower, F4Trace, Fp, RPoly, SquareRule, TowerF4Options, TowerRing,
 };
 use crate::cryptanalysis::ic_boundary::{
     lift_abscissae, CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimePoint,
@@ -417,6 +418,13 @@ pub struct PkmSemaevOracle {
     /// tower levels) of the first summand are enumerated, one F4 system per
     /// assignment.
     guess: u32,
+    /// F4 trace (`trace=1`): learn one refutation trace per branch system at
+    /// `prepare`, replay it per target, fall back to plain F4 when it fails.
+    trace: bool,
+    /// One learned trace per branch system (one entry without guessing).
+    traces: Vec<Option<Arc<F4Trace>>>,
+    /// Learning cost and shape counters, reported as setup native work.
+    trace_setup: BTreeMap<String, u64>,
     /// Cofactor-fiber lifts (`lifts=1`): the rational `h`-torsion `E(F_q)[h]`,
     /// computed once in `prepare`; `decompose` tries the targets `R + K`.
     lifts: bool,
@@ -449,6 +457,9 @@ impl PkmSemaevOracle {
             budget: None,
             crosscheck: false,
             guess: 0,
+            trace: false,
+            traces: Vec::new(),
+            trace_setup: BTreeMap::new(),
             lifts: false,
             fiber: None,
             in_lift: false,
@@ -623,6 +634,14 @@ impl PkmSemaevOracle {
             .transpose()?;
         self.crosscheck = params.flag("crosscheck");
         self.guess = params.u64_or("guess", 0)? as u32;
+        self.trace = match params.u64_or("trace", 0)? {
+            0 => false,
+            1 => true,
+            o => return Err(format!("pkm-semaev: trace is 0 or 1, not {o}")),
+        };
+        if self.trace && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some()) {
+            return Err("pkm-semaev: trace=1 needs engine=f4 and no staircase stop".into());
+        }
         self.lifts = match params.u64_or("lifts", 0)? {
             0 => false,
             1 => true,
@@ -674,7 +693,103 @@ impl PkmSemaevOracle {
             .map(|a| self.build_system_fixed(curve, Some(a)))
             .collect();
         self.prepared = Some(prep);
+        self.traces.clear();
+        self.trace_setup.clear();
+        if self.trace {
+            self.learn_traces();
+        }
         Ok(())
+    }
+
+    /// The F4 options of a run (the budget clock starts here).
+    fn f4_options(&self) -> TowerF4Options {
+        let mut opts = TowerF4Options::new(self.max_degree);
+        if let Some(b) = self.budget {
+            opts = opts.with_budget(b);
+        }
+        if let Some(n) = self.max_nnz {
+            opts = opts.with_max_nnz(n);
+        }
+        if let Some(s) = self.stop_staircase {
+            opts = opts.stopping_below(s);
+        }
+        opts
+    }
+
+    /// Learn one refutation trace per branch system (one system without
+    /// guessing): plain F4 with recording on `x_R` values drawn from a fixed
+    /// stream, until one refutes (at most 8 tries). Every try's
+    /// multiply-adds are charged to the learning ledger, once per system
+    /// shape; a branch with no refuting try gets no trace and runs plain.
+    fn learn_traces(&mut self) {
+        let n = self.branches.len().max(1);
+        let p = self.prepared.as_ref().expect("prepared").ring.p;
+        let (mut learn, mut runs, mut learned, mut kept, mut spec, mut selfok) =
+            (0u64, 0u64, 0u64, 0u64, 0u64, 0u64);
+        for br in 0..n {
+            let branch = (!self.branches.is_empty()).then_some(br);
+            let mut found = None;
+            for attempt in 0..8u64 {
+                // splitmix64 of a fixed counter: the learning x_R do not
+                // depend on the targets.
+                let mut z = (br as u64 * 16 + attempt + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+                z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+                z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+                let x_r = (z ^ (z >> 31)) % p;
+                let before = self.native.get("pkm_system_fp_mults_uncharged").copied();
+                let sys = self.specialise_branch(branch, x_r);
+                let after = self.native.get("pkm_system_fp_mults_uncharged").copied();
+                spec += after.unwrap_or(0) - before.unwrap_or(0);
+                // Not a per-target cost: take it back off the target ledger.
+                match before {
+                    Some(b) => {
+                        self.native
+                            .insert("pkm_system_fp_mults_uncharged".into(), b);
+                    }
+                    None => {
+                        self.native.remove("pkm_system_fp_mults_uncharged");
+                    }
+                }
+                let ring = match branch {
+                    Some(b) => self.branches[b].ring.clone(),
+                    None => self.prepared.as_ref().expect("prepared").ring.clone(),
+                };
+                let mut opts = self.f4_options();
+                opts.record_trace = true;
+                let rep = f4_tower(&sys, &ring, &opts);
+                learn += rep.muladds;
+                runs += 1;
+                if let (true, Some(tr)) = (rep.inconsistent, rep.learned) {
+                    kept += tr.kept_rows() as u64;
+                    // Diagnostic, not charged: the trace replayed on its own x_R.
+                    let mut ropts = self.f4_options();
+                    ropts.replay = Some(Arc::new(tr.clone()));
+                    let again = f4_tower(&sys, &ring, &ropts);
+                    selfok += u64::from(again.inconsistent);
+                    if let Some(m) = again.replay_mismatch {
+                        self.trace_setup.insert(
+                            format!("pkm_trace_self_mismatch_step{}_got{}_want{}", m.0, m.1, m.2),
+                            1,
+                        );
+                    }
+                    found = Some(Arc::new(tr));
+                    learned += 1;
+                    break;
+                }
+            }
+            self.traces.push(found);
+        }
+        for (k, v) in [
+            ("pkm_trace_branches", n as u64),
+            ("pkm_trace_branches_learned", learned),
+            ("pkm_trace_learn_runs", runs),
+            ("pkm_trace_learn_muladds", learn),
+            ("pkm_trace_kept_rows", kept),
+            ("pkm_trace_selfcheck_refuted", selfok),
+            ("pkm_trace_learn_spec_fp_mults_uncharged", spec),
+        ] {
+            self.trace_setup.insert(k.into(), v);
+        }
     }
 
     /// Isogeny-form guessing: apply the first `t − G` Vélu maps to every
@@ -1111,6 +1226,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "bits or isogeny form: enumerate the top G bits (tower levels) of the first summand, one F4 system per assignment (hybrid guessing)",
             ),
             (
+                "trace",
+                "1: F4 trace; learn one refutation trace per branch system at prepare (charged once, as setup native work), replay it per target with x_R specialised (only a refutation is accepted), and fall back to plain F4 when the replay does not refute",
+            ),
+            (
                 "lifts",
                 "1: cofactor-fiber lifts; try R + K for each x-distinct K in E(F_q)[h], first liftable relation wins; relations are over the projection [h]P (see fiber.rs)",
             ),
@@ -1215,6 +1334,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         if self.setup_mults > 0 {
             m.insert("pkm_base_check_fp_mults_uncharged".into(), self.setup_mults);
         }
+        m.extend(self.trace_setup.clone());
         if let Some(f) = &self.fiber {
             m.insert("pkm_fiber_size".into(), f.size() as u64);
             m.insert("pkm_fiber_cofactor".into(), f.h);
@@ -1338,17 +1458,49 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         Some(b) => self.branches[b].ring.clone(),
                         None => self.prepared.as_ref().expect("prepared").ring.clone(),
                     };
-                    let mut opts = TowerF4Options::new(self.max_degree);
-                    if let Some(b) = self.budget {
-                        opts = opts.with_budget(b);
-                    }
-                    if let Some(n) = self.max_nnz {
-                        opts = opts.with_max_nnz(n);
-                    }
-                    if let Some(s) = self.stop_staircase {
-                        opts = opts.stopping_below(s);
-                    }
-                    let rep = f4_tower(&sys, &ring, &opts);
+                    let opts = self.f4_options();
+                    let mut extra_ops = 0u64;
+                    let mut extra_ms = 0.0f64;
+                    let rep = if self.trace {
+                        let tr = self.traces.get(br).cloned().flatten();
+                        match tr {
+                            None => {
+                                self.bump("pkm_trace_untraced_branch_runs", 1);
+                                f4_tower(&sys, &ring, &opts)
+                            }
+                            Some(tr) => {
+                                let mut ropts = opts.clone();
+                                ropts.replay = Some(tr);
+                                let r = f4_tower(&sys, &ring, &ropts);
+                                self.bump("pkm_trace_replays", 1);
+                                self.bump("pkm_trace_replay_muladds", r.muladds);
+                                if r.inconsistent {
+                                    self.bump("pkm_trace_refuted", 1);
+                                    r
+                                } else {
+                                    let why = r
+                                        .replay_failure
+                                        .unwrap_or("no refutation")
+                                        .replace(' ', "_");
+                                    self.bump(&format!("pkm_trace_failure_{why}"), 1);
+                                    if let Some((s, g, w)) = r.replay_mismatch {
+                                        self.bump(
+                                            &format!("pkm_trace_mismatch_step{s}_got{g}_want{w}"),
+                                            1,
+                                        );
+                                    }
+                                    let plain = f4_tower(&sys, &ring, &opts);
+                                    self.bump("pkm_trace_fallbacks", 1);
+                                    self.bump("pkm_trace_fallback_plain_muladds", plain.muladds);
+                                    extra_ops = r.muladds;
+                                    extra_ms = r.ms;
+                                    plain
+                                }
+                            }
+                        }
+                    } else {
+                        f4_tower(&sys, &ring, &opts)
+                    };
                     if let Some(snapshot) = &mut self.dataset_artifact {
                         snapshot["f4_basis"] = serde_json::json!(rep
                             .basis
@@ -1376,9 +1528,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         u64::from(rep.staircase_at_stop.is_some()),
                     );
                     let cost = SolverCost {
-                        ops: rep.muladds,
+                        ops: rep.muladds + extra_ops,
                         op_unit: "F_p multiply-adds (elimination only)".into(),
-                        wall_ns: (rep.ms * 1e6) as u64,
+                        wall_ns: ((rep.ms + extra_ms) * 1e6) as u64,
                         peak_bytes: 0,
                         degree_reached: Some(rep.degree_reached),
                         solving_degree: (!undecided).then_some(rep.solving_degree_max),
@@ -1750,6 +1902,142 @@ mod tests {
             "isogeny",
             "",
         );
+    }
+
+    /// F4 trace (`trace=1`): the verdicts equal plain F4's and the grid's
+    /// (and the exact decomposable set) on random and planted targets, in
+    /// the isogeny form at `G in {0, 1, 2}` and the bit form at `G = 1`; the
+    /// fallback is exercised on the planted (consistent) targets and is
+    /// charged; the ledger is exactly replay plus fallback work.
+    #[test]
+    fn trace_agrees_with_plain_f4_and_grid() {
+        use crate::cryptanalysis::ic_boundary::prime_factor_base;
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        let inst = instance();
+        let curve = &inst.curve;
+        let t = 4;
+        let b = PrimeIsogenyBase { instance: &inst };
+        let mut params = Params::default();
+        params.set("t", t.to_string());
+        let fb = b
+            .build(&ctx(&inst), &params, &mut GroupOps::default())
+            .expect("isogeny base");
+        let tower = isogeny_tower(curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+        let (v, c) = (tower.v.clone(), tower.c);
+        let bits_fb = prime_factor_base(&inst, 6);
+        let bits_t = 64 - bits_fb.abscissa_list.iter().max().unwrap().leading_zeros();
+        let decomposable = |fb: &FactorBase<PrimePoint>| {
+            decomposable_points(curve, fb, 2, &mut GroupOps::default())
+        };
+        for (label, g, use_bits) in [
+            ("isogeny G=0", 0u32, false),
+            ("isogeny G=1", 1, false),
+            ("isogeny G=2", 2, false),
+            ("bits G=1", 1, true),
+        ] {
+            let fb = if use_bits { &bits_fb } else { &fb };
+            let exact = decomposable(fb);
+            let make = || {
+                if use_bits {
+                    PkmSemaevOracle::new_bits(2, bits_t, 0)
+                } else {
+                    PkmSemaevOracle::new_isogeny(2, t, v.clone(), steps.clone(), c)
+                }
+            };
+            let prep = |spec: &str| {
+                let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+                let mut o = make();
+                o.prepare(&ctx(&inst), fb, &params, &mut GroupOps::default())
+                    .unwrap_or_else(|e| panic!("{label}: prepare: {e}"));
+                o
+            };
+            let gs = if g > 0 {
+                format!(",guess={g}")
+            } else {
+                String::new()
+            };
+            let mut traced = prep(&format!("m=2,crosscheck=1,trace=1{gs}"));
+            let mut plain = prep(&format!("m=2{gs}"));
+            let mut grid = prep("m=2,engine=exhaustive");
+            let setup = traced.setup_native();
+            assert_eq!(setup["pkm_trace_branches"], 1 << g, "{label}");
+            assert!(
+                setup["pkm_trace_learn_muladds"] > 0,
+                "{label}: learning is charged"
+            );
+            assert_eq!(
+                setup["pkm_trace_branches_learned"],
+                1 << g,
+                "{label}: all learned"
+            );
+            let mut rng = StdRng::seed_from_u64(77);
+            let gen = inst.generator_point();
+            let mut hits = 0;
+            for k in 0..32u64 {
+                let target = if k.is_multiple_of(3) {
+                    let idx: Vec<usize> =
+                        (0..2).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                    sum(curve, fb, &idx)
+                } else {
+                    curve.mul(&mut GroupOps::default(), gen, rng.gen_range(1..inst.r))
+                };
+                if target.infinity {
+                    continue;
+                }
+                let run = |o: &mut PkmSemaevOracle| {
+                    let got = o.decompose(
+                        &ctx(&inst),
+                        fb,
+                        &mut GroupOps::default(),
+                        &mut OracleCounters::default(),
+                        target,
+                    );
+                    if let Some(idx) = &got {
+                        assert_eq!(sum(curve, fb, idx), target, "{label}: relation sums to R");
+                    }
+                    got.is_some()
+                };
+                let (a, b, c2) = (run(&mut traced), run(&mut plain), run(&mut grid));
+                assert_eq!(a, b, "{label}: trace against plain F4, target {k}");
+                assert_eq!(a, c2, "{label}: trace against the grid, target {k}");
+                assert_eq!(
+                    c2,
+                    exact.contains(&curve.key(&target)),
+                    "{label}: target {k}"
+                );
+                hits += usize::from(c2);
+            }
+            assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+            let n = traced.relation_counters();
+            let get = |k: &str| n.get(k).copied().unwrap_or(0);
+            assert_eq!(get("pkm_crosscheck_disagreements"), 0, "{label}");
+            assert!(
+                get("pkm_trace_refuted") > 0,
+                "{label}: replays refute {n:?} {setup:?}"
+            );
+            assert!(
+                get("pkm_trace_fallbacks") > 0,
+                "{label}: fallback exercised"
+            );
+            assert!(
+                get("pkm_trace_fallback_plain_muladds") > 0,
+                "{label}: fallback charged"
+            );
+            assert_eq!(get("pkm_trace_untraced_branch_runs"), 0, "{label}");
+            assert_eq!(
+                get("pkm_trace_replays"),
+                get("pkm_trace_refuted") + get("pkm_trace_fallbacks"),
+                "{label}"
+            );
+            // The solver ledger is replay work plus fallback work: nothing
+            // else is charged per target, and the learning is not.
+            assert_eq!(
+                traced.solver_totals().unwrap().ops,
+                get("pkm_trace_replay_muladds") + get("pkm_trace_fallback_plain_muladds"),
+                "{label}: ledger"
+            );
+        }
     }
 
     /// Isogeny-form hybrid guessing: same verdicts as the grid and the exact
