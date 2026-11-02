@@ -711,7 +711,7 @@ construction and cubic-split field arithmetic are not completely counted:
 S remains a lower bound, and the common native-work band does not calibrate
 those omissions. See the [protocol and accounting scope](../../research/ic_algebraic_crossover_20261023/PIPELINE.md).
 
-`prime-kummer:t=T[,g=G]` and `prime-isogeny:t=T[,seed=S]` are Petit,
+`prime-kummer:t=T[,g=G]` and `prime-isogeny:t=T[,seed=S][,family=any|z2xz8]` are Petit,
 Kosters and Messeng's tower bases for prime curves
 (`ic_framework::prime_tower`): every point whose abscissa lies in a set `V`
 of `2^t` elements that is the zero set of `t` composed degree-2 maps, both
@@ -722,14 +722,22 @@ needs no condition on `p`; `E'` is searched from the public seed, and the
 search is **charged to the factor-base phase**: on every curve tried, a
 baby-step giant-step over the multiples of `2^t` in the Hasse interval
 filters out curves with `2^t ∤ #E'`, and the survivors' orders are computed
-by Mestre's baby-step giant-step; with `Q`, `⟨Q⟩`, `R'`, `V` and the Vélu
+by Mestre's baby-step giant-step; the ordinary search can draw from the
+genus-0 family `X₁(2, 8)` instead of every curve (`family=z2xz8`, needs
+`p ≡ 3 mod 4`: every draw's 2-Sylow exponent is at least `2³`, about 8×
+fewer curves tried, `research/pkm_aux_seed_panel_20261101/`).  With `Q`, `⟨Q⟩`, `R'`, `V` and the Vélu
 chain's kernels, every addition and doubling on `E'` is charged in the unit
 (a curve over the same field).  The phase records `aux_curves_tried`,
 `aux_search_gae`, `aux_count_gae` and `aux_tower_build_gae` apart; the
 Legendre symbols and square roots of point sampling join the phase's
 `legendre_symbols` and `sqrt_solves` (unpriced, as for every prime base),
 and the `2t` Vélu evaluations are `velu_evaluations_uncharged`
-(`research/pkm_isogeny_tower_ecbench_20261015/`).
+(`research/pkm_isogeny_tower_ecbench_20261015/`).  Two sub-total
+counters are recorded for diagnosis only: `aux_legendre_symbols` and
+`aux_sqrt_solves` repeat values already inside the phase's
+`legendre_symbols` and `sqrt_solves` — a consumer summing every native
+counter would count them twice.  They are `Shape` in `bitop/v1`: priced
+once, through the phase's own counters, never again.
 
 `rootfind-mitm:m=3` and `rootfind-pairs:m=3` are the root-finding
 decomposition oracles of `research/pdp_root_finder_20261012` as plug-ins

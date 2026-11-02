@@ -80,7 +80,8 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeKummerBase<'_> {
     ) -> Result<FactorBase<PrimePoint>, String> {
         let curve = &self.instance.curve;
         let p = curve.p;
-        let t = params.u64("t")? as u32;
+        let t = u32::try_from(params.u64("t")?)
+            .map_err(|_| "t must be at most 2^32 − 1".to_string())?;
         let g = params.u64_or("g", 1)? % p;
         if g == 0 {
             return Err("g must be non-zero".into());
@@ -197,8 +198,8 @@ pub struct IsogenyTowerCost {
     pub filter_false_positives: u64,
     /// `#E'` not determined within the draw limit (rejected).
     pub orders_undetermined: u64,
-    /// `2^t | #E'` but no point of order `2^t` found (2-Sylow not cyclic
-    /// enough, or unlucky draws): rejected.
+    /// `2^t | #E'` but the 2-Sylow exponent is below `2^t` (no point of
+    /// order `2^t` exists): rejected.
     pub two_sylow_rejected: u64,
     /// Group additions plus doublings of the search (filter and order
     /// computations, every curve tried).
@@ -429,7 +430,12 @@ fn mestre_order(
 ///    multiples of `2^t` in the Hasse interval for `[k]P = O`.  No hit
 ///    proves `2^t ∤ #E'` (`#E'` would be one), and the curve is dropped;
 /// 2. *count*: on a hit, `#E'` by Mestre's baby-step giant-step;
-/// 3. `Q = [#E'/2^t]P'` for random `P'` until `[2^{t−1}]Q ≠ O`.
+/// 3. `Q`: `T = [odd part of #E']P'` has 2-power order `2^b`; when
+///    `b ≥ t`, `Q = [2^{b−t}]T` has order exactly `2^t`.  This never
+///    rejects a curve that has a point of order `2^t` (the
+///    `Z/2 × Z/2^b` case with `b ≥ t` that a direct `[#E'/2^t]P'` draw
+///    can miss), and rejects in the `b < t` case, where no such point
+///    exists.
 ///
 /// Then `⟨Q⟩` by `2^t − 1` additions, `R'` with `2R' ∉ ⟨Q⟩`,
 /// `V = x(R' + ⟨Q⟩)` by `2^t` additions, and the chain: `K_j =
@@ -440,6 +446,7 @@ pub fn isogeny_tower(
     p: u64,
     t: u32,
     seed: u64,
+    family: AuxFamily,
     ops: &mut GroupOps,
 ) -> Result<IsogenyTower, String> {
     if !(1..=20).contains(&t) {
@@ -447,6 +454,11 @@ pub fn isogeny_tower(
     }
     if p < 64 || (1u64 << t) > p / 4 {
         return Err(format!("p = {p} is too small for t = {t}"));
+    }
+    if family == AuxFamily::Z2xZ8 && p % 4 != 3 {
+        return Err(format!(
+            "p = {p} is not 3 mod 4: the X₁(2, 8) family needs −1 to be a non-residue"
+        ));
     }
     let two_t = 1u64 << t;
     let w = (4 * p).isqrt();
@@ -465,13 +477,54 @@ pub fn isogeny_tower(
         }
         tried_limit -= 1;
         cost.curves_tried += 1;
-        let a = rng.range(0, p);
-        let b = rng.range(1, p);
-        let disc = (mul(4, mul(mul(a, a, p), a, p), p) + mul(27, mul(b, b, p), p)) % p;
-        if disc == 0 {
-            cost.singular += 1;
-            continue;
-        }
+        let (a, b) = match family {
+            AuxFamily::Any => {
+                let a = rng.range(0, p);
+                let b = rng.range(1, p);
+                let disc =
+                    (mul(4, mul(mul(a, a, p), a, p), p) + mul(27, mul(b, b, p), p)) % p;
+                if disc == 0 {
+                    cost.singular += 1;
+                    continue;
+                }
+                (a, b)
+            }
+            // The genus-0 family `X₁(2, 8)` (the `z2xz8` family of
+            // `two_sylow_search`): Legendre roots `(0, −B⁴, −A⁴)` for
+            // `A = m² − 1`, `B = 2m`, `m` drawn at random.  `−1` is a
+            // non-residue, so `C = m² + 1 ≠ 0`, and the curve is singular
+            // iff `A·B = 0` or `A⁴ = B⁴`.  Every draw's 2-Sylow exponent is
+            // at least `2³`, so the filter accepts with probability
+            // `2^{3−t}` instead of `2^{−t}`: about 8× fewer curves tried.
+            AuxFamily::Z2xZ8 => {
+                let m = rng.range(1, p);
+                let m2 = mul(m, m, p);
+                let fa = (m2 + p - 1) % p;
+                let fb = mul(2, m, p);
+                if fa == 0 || fb == 0 {
+                    cost.singular += 1;
+                    continue;
+                }
+                let fa4 = mul(mul(fa, fa, p), mul(fa, fa, p), p);
+                let fb4 = mul(mul(fb, fb, p), mul(fb, fb, p), p);
+                if fa4 == fb4 {
+                    cost.singular += 1;
+                    continue;
+                }
+                let e2 = (p - fb4) % p;
+                let e3 = (p - fa4) % p;
+                let s1 = (e2 + e3) % p;
+                let s2 = mul(e2, e3, p);
+                let inv3 = pow_mod(3, p - 2, p);
+                let inv27 = pow_mod(27, p - 2, p);
+                let s1sq = mul(s1, s1, p);
+                let a = (s2 + p - mul(s1sq, inv3, p)) % p;
+                let t1 = mul(mul(2, mul(s1sq, s1, p), p), inv27, p);
+                let t2 = mul(mul(s1, s2, p), inv3, p);
+                let b = (t2 + p - t1) % p;
+                (a, b)
+            }
+        };
         let e = PrimeCurve { p, a, b };
         let before = gae(ops);
         let pt = random_point(&e, &mut rng, &mut cost);
@@ -495,14 +548,26 @@ pub fn isogeny_tower(
             continue;
         }
         let build_before = gae(ops);
+        // A point of order 2^t exists iff the 2-Sylow exponent is at least
+        // 2^t.  T = [odd part of n]P' has 2-power order 2^b (b = the exponent
+        // with probability at least 1/2 per draw); find b by doubling, then
+        // Q = [2^{b−t}]T.  Unlike a direct [n/2^t]P' draw, this cannot miss a
+        // point of order 2^t on a Z/2 × Z/2^b curve with b ≥ t.
+        let odd = n >> n.trailing_zeros();
         let mut q = None;
         for _ in 0..8 {
-            let cand = e.mul(ops, random_point(&e, &mut rng, &mut cost), n / two_t);
-            let mut half = cand;
-            for _ in 0..t - 1 {
-                half = e.double(ops, half);
+            let t0 = e.mul(ops, random_point(&e, &mut rng, &mut cost), odd);
+            let mut order_bits = 0u32;
+            let mut cur = t0;
+            while !e.is_identity(&cur) {
+                cur = e.double(ops, cur);
+                order_bits += 1;
             }
-            if !e.is_identity(&half) {
+            if order_bits >= t {
+                let mut cand = t0;
+                for _ in 0..(order_bits - t) {
+                    cand = e.double(ops, cand);
+                }
                 q = Some(cand);
                 break;
             }
@@ -609,6 +674,41 @@ fn finish_tower(
         return Err(format!("|V| = {} ≠ 2^{t}", distinct.len()));
     }
     Ok(tower)
+}
+
+// ── The draw family of the ordinary search ───────────────────────────
+
+/// Which family the seeded ordinary search draws its auxiliary curves
+/// from.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum AuxFamily {
+    /// Every curve `(a', b')` (the original search).
+    #[default]
+    Any,
+    /// The genus-0 modular curve `X₁(2, 8)` (the `z2xz8` family of
+    /// `two_sylow_search`): every draw's 2-Sylow exponent is at least
+    /// `2³`, so the residue filter accepts with probability `2^{3−t}`
+    /// instead of `2^{−t}` — about 8× fewer curves tried.  Needs
+    /// `p ≡ 3 (mod 4)`.
+    Z2xZ8,
+}
+
+impl AuxFamily {
+    /// The `family=` parameter value: `any` (default) or `z2xz8`.
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "any" => Ok(AuxFamily::Any),
+            "z2xz8" => Ok(AuxFamily::Z2xZ8),
+            _ => Err(format!("family = {s:?} is not one of any, z2xz8")),
+        }
+    }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            AuxFamily::Any => "any",
+            AuxFamily::Z2xZ8 => "z2xz8",
+        }
+    }
 }
 
 // ── Supersingular auxiliary curves (`aux=supersingular`) ─────────────
@@ -814,8 +914,14 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
             (
                 "aux",
                 "ordinary (default: the charged search), supersingular (y² = x³ + x when p ≡ 3 mod 4, \
-                 else y² = x³ + 1 when p ≡ 2 mod 3; #E' = p + 1, no search), ss-j1728, \
-                 ss-j1728-twist, ss-j0, ss-j0-twist",
+                  else y² = x³ + 1 when p ≡ 2 mod 3; #E' = p + 1, no search), ss-j1728, \
+                  ss-j1728-twist, ss-j0, ss-j0-twist",
+            ),
+            (
+                "family",
+                "ordinary search only: any (default, every curve) or z2xz8 (the X₁(2, 8) family; \
+                  every draw has 2-Sylow exponent at least 2³, about 8× fewer curves tried; \
+                  needs p ≡ 3 mod 4)",
             ),
         ]
     }
@@ -827,12 +933,14 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
         ops: &mut GroupOps,
     ) -> Result<FactorBase<PrimePoint>, String> {
         let p = self.instance.curve.p;
-        let t = params.u64("t")? as u32;
+        let t = u32::try_from(params.u64("t")?)
+            .map_err(|_| "t must be at most 2^32 − 1".to_string())?;
         let seed = params.u64_or("seed", 0)?;
         let kind = AuxKind::parse(params.get("aux").unwrap_or("ordinary"), p)?;
+        let family = AuxFamily::parse(params.get("family").unwrap_or("any"))?;
         let mut aux_ops = GroupOps::default();
         let tower = if kind == AuxKind::Ordinary {
-            isogeny_tower(p, t, seed, &mut aux_ops)?
+            isogeny_tower(p, t, seed, family, &mut aux_ops)?
         } else {
             supersingular_tower(p, t, seed, kind, &mut aux_ops)?
         };
@@ -881,6 +989,9 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
         }
         if kind != AuxKind::Ordinary {
             fb.cost.count("aux_supersingular", 1);
+        }
+        if kind == AuxKind::Ordinary && family == AuxFamily::Z2xZ8 {
+            fb.cost.count("aux_family_z2xz8", 1);
         }
         ops.merge(aux_ops);
         Ok(fb)
@@ -942,7 +1053,7 @@ mod tests {
         // one with deeper 2-adicity: the isogeny tower needs neither.
         for (p, t) in [(16_411u64, 5u32), (40_961, 6), (65_519, 4)] {
             let mut ops = GroupOps::default();
-            let tower = isogeny_tower(p, t, 7, &mut ops).unwrap();
+            let tower = isogeny_tower(p, t, 7, AuxFamily::Any, &mut ops).unwrap();
             assert_eq!(tower.v.len(), 1 << t);
             let mut v = tower.v.clone();
             v.sort_unstable();
@@ -971,15 +1082,50 @@ mod tests {
                     + c.two_sylow_rejected
             );
             // Deterministic in (p, t, seed); another seed, another curve.
-            let again = isogeny_tower(p, t, 7, &mut GroupOps::default()).unwrap();
+            let again = isogeny_tower(p, t, 7, AuxFamily::Any, &mut GroupOps::default()).unwrap();
             assert_eq!(again.v, tower.v);
             assert_eq!(again.cost, tower.cost);
-            let other = isogeny_tower(p, t, 8, &mut GroupOps::default()).unwrap();
+            let other = isogeny_tower(p, t, 8, AuxFamily::Any, &mut GroupOps::default()).unwrap();
             assert_ne!(
                 (other.aux.a, other.aux.b, other.r),
                 (tower.aux.a, tower.aux.b, tower.r)
             );
         }
+    }
+
+    #[test]
+    fn the_z2xz8_family_needs_p_three_mod_four_and_tries_fewer_curves() {
+        // p = 65,519 is 3 mod 4, so the X₁(2, 8) family is defined, and the
+        // Hasse window holds several multiples of 2^6; 786,433 is 1 mod 4
+        // and must be refused.
+        let p = 65_519u64;
+        let t = 6u32;
+        let any = isogeny_tower(p, t, 5, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+        let fam = isogeny_tower(p, t, 5, AuxFamily::Z2xZ8, &mut GroupOps::default()).unwrap();
+        assert_eq!(fam.v.len(), 1 << t);
+        let mut v = fam.v.clone();
+        v.sort_unstable();
+        v.dedup();
+        assert_eq!(v.len(), 1 << t, "|V| = 2^t, distinct");
+        for &x in &fam.v {
+            assert_eq!(fam.eval(x), Some(fam.c), "x = {x} is not a root");
+        }
+        // The family guarantees a point of order 8 on every curve drawn,
+        // so 8 | #E' — checked against the exhaustive point count — and
+        // the search tries fewer curves than the any-family search at the
+        // same seed (the Haar models give 2^{3−t} against 2^{−t}).
+        assert!(fam.aux_order.is_multiple_of(8));
+        assert_eq!(fam.aux_order, fam.aux.point_count());
+        assert!(fam.cost.curves_tried < any.cost.curves_tried,
+            "z2xz8 tried {} curves, any tried {}", fam.cost.curves_tried, any.cost.curves_tried);
+        // Deterministic in (p, t, seed, family).
+        let again = isogeny_tower(p, t, 5, AuxFamily::Z2xZ8, &mut GroupOps::default()).unwrap();
+        assert_eq!(again.v, fam.v);
+        assert_eq!(again.cost, fam.cost);
+        // And the family is refused where −1 is a residue.
+        assert!(isogeny_tower(786_433, 8, 5, AuxFamily::Z2xZ8, &mut GroupOps::default())
+            .unwrap_err()
+            .contains("3 mod 4"));
     }
 
     #[test]
@@ -1040,7 +1186,7 @@ mod tests {
             .build(&ctx, &params, &mut ops)
             .unwrap();
         let p = inst.curve.p;
-        let tower = isogeny_tower(p, t, 2, &mut GroupOps::default()).unwrap();
+        let tower = isogeny_tower(p, t, 2, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let lifting: Vec<u64> = {
             let mut v: Vec<u64> = tower
                 .v
