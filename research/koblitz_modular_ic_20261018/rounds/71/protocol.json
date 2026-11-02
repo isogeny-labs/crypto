@@ -1,0 +1,23 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R71-RATIONAL-FIBER-RESIDUES",
+  "version": 1,
+  "goal": "determine reduced residue-algebra degree profiles at both omitted rational fibers of the normal rank-32 affine order",
+  "claims": [{"id":"rational_fibers71","class":"exact_computation","statement":"Complete 32-dimensional fibers at z=0 and z=1 have verified stable Frobenius images and residue-degree profiles"}],
+  "arms": {
+    "reference": "R52 complete source multiplication table and R61 source unit",
+    "candidate": "full specialized 32-square Frobenius matrix and integer gcd-degree inversion",
+    "positive": ["all 32 source square slots", "unit squares to itself at each fiber", "stable image invariant under Frobenius", "all 32 fixed dimensions reconstructed from residue degrees"],
+    "negative": [],
+    "baseline": {"not_applicable_reason":"exact algebra"},
+    "A_A": {"not_applicable_reason":"complete deterministic fibers"}
+  },
+  "variables": {"fixed":["two rational omitted fibers","full rank32 order","complete 528-column table","1200sec/4GiB","one Singular/FLINT thread","one math job"],"measured":["Frobenius image ranks","32 fixed dimensions","residue degree multiplicities","exit/errors/UTC/hashes"],"statistical":"not applicable"},
+  "randomization": {"method":"fixed","reason":"complete two-fiber cohort","seeds":[71]},
+  "blinding": {"method":"none","reason":"exact algebra"},
+  "sample_size": {"instances":2,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics": ["fiber dimension32", "stable image dimension", "branch count", "residue degree counts"],
+  "execution": {"launcher":"REPLAY_CAS.sh rational-fibers71-01 RATIONAL_FIBERS71.sing RATIONAL_FIBERS71_ALL_CHECKS_PASS","backend":"original manually authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":71,"CPU_affinity":"not pinned","queue":"one math job at a time; R70 terminal and published","source_gate":"copied source/protocol/driver bytes match Git; donor hashes","checkpoint":"existing checkpoint gate; immutable raw copies"},
+  "stopping": {"accept":"exit0/exact marker/no whitespace-question-mark errors and every assertion","failure":"retain raw attempt; freeze repair before fresh ID"},
+  "analysis": {"method":"exact finite-algebra Frobenius ranks and integer gcd-degree inversion","scope":"reduced residue algebras at z=0 and z=1 only; no ramification or divisors"}
+}
