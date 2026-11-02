@@ -4247,3 +4247,122 @@ paid for it per row update, which the band prices above any saving.  At `1` GAE 
 (`≈ 1.8·10⁵` per call) remain almost all of `S`; no pivot rule changes that, and the rows stay
 `≳ 10⁴×` from the matched rho at `1` GAE.  If F does not beat A, the arrival order is not informative and
 the result is a negative for candidate (d).
+
+### 9.42 E35 measured: B's pivot schedule is not a property of the curve — the replay keeps a fifth to a third of B's saving, is ahead of A at `0` and `0.1` GAE and splits 14 / 6 at `1` GAE; unranked
+
+*2026-11-02.*  Code `b1f5df9a45` (module `chain_trace.rs`, examples) and `2308fa4664` (dispatch hook), binaries
+built from `git archive 2308fa4664` and pinned by sha256 (`experiments/39_chain_trace/binary_sha256.txt`; the
+checks example rebuilt once, see below).  **Stage 0 + A:** `e35_stage_a`, one thread, E31/E33's calls exactly
+(the first 1,000 targets of E25 arm A's stream on each of E25's ten curves), five solvers per call from the same
+per-target seed: existing (E25), A counted, B counted, B″, T (`stage_a.log`; `stage_a.json` sha256 `6c7c8a44…`, not
+in Git: the artifact store is not reachable without the AWS CLI).  **Controls:** `e35_checks`, 32 calls each of
+`p = 101` seed 2 and `p = 397` seed 1 (`checks.{json,log}`).  **Identity:** `identity.sh`.  **End to end:**
+`run_e2e.sh` (E33's command with `--solver chain-sparsest-trace`), ten curves, both arms, 10 runs, 0 failures.
+Tables: `e35_tables` → `tables.md`, `summary.json`.  Host: the 4-vCPU container, two cores; isolab-eks is not
+reachable from it (no AWS CLI, no kubectl), so operation counts only, no wall-time claim.  Report:
+`research/e35_chain_trace_20261102/`.
+
+**Stage 0: B's choices depend on the target.**  On every curve, *no* call's pivot sequence equals the learned
+trace, and 997–1,000 of the 1,000 calls have pairwise distinct sequences; none of the three learning sequences
+equals their per-column mode.  The shape is the trace's on 9,999 of 10,000 calls.  Per contested column (334
+a call):
+
+| p | seed | B's row = trace | (row, position) = trace | all columns, row = trace | best other curve's trace |
+|--:|--:|--:|--:|--:|--:|
+| 101 | 1 | `81.4 %` | `63.5 %` | `83.8 %` | `81.8 %` |
+| 101 | 2 | `69.8 %` | `50.2 %` | `73.7 %` | `82.2 %` |
+| 149 | 1 | `81.7 %` | `68.4 %` | `84.1 %` | `84.9 %` |
+| 149 | 2 | `80.9 %` | `67.0 %` | `83.4 %` | `84.4 %` |
+| 197 | 1 | `86.0 %` | `74.0 %` | `87.9 %` | `86.2 %` |
+| 197 | 2 | `86.4 %` | `74.0 %` | `88.2 %` | `86.4 %` |
+| 269 | 1 | `80.5 %` | `70.5 %` | `83.0 %` | `88.5 %` |
+| 269 | 2 | `83.4 %` | `74.5 %` | `85.6 %` | `88.3 %` |
+| 397 | 1 | `88.4 %` | `80.3 %` | `89.9 %` | `90.2 %` |
+| 397 | 2 | `87.3 %` | `78.8 %` | `89.0 %` | `89.9 %` |
+
+Agreement rises with `p` (accidental zeros, probability `≈ 1/p` per entry, move B's counts), and another curve's
+trace agrees as well as the curve's own, often better (`69.3`–`90.2 %` across all pairs).  What is stable is the
+generic structure of the Macaulay matrix, shared by all ten curves; what varies from call to call is the target.
+The schedule is not a per-curve object.
+
+**Stage A** (per call; means over all calls, fallbacks charged; T's learning amortised over the curve's 1,000
+calls): T agrees with the existing solver on all 10,000 calls, as do A counted, B counted and B″.  T's selection
+work is `744`–`817` operations a call (trace lookups `≈ 335`, tests `≈ 410–480`).  It misses on `186`–`259` of the
+`334` contested columns (`55.6`–`77.5 %`; about two thirds of the misses are rows still among the candidates at
+another position): one changed choice changes later columns' candidates, so the misses cascade, and every call
+misses at least once.  T's `C` median is `5.23`–`5.51·10⁵`, against B's `3.04`–`3.33·10⁵` and A's `6.01`–`6.34·10⁵`:
+T / B `1.571`–`1.791`, A / T `1.103`–`1.211`.  Per-call `S_A / S_T` is `1.092`–`1.254` (`0`), `1.014`–`1.049`
+(`0.1`) and `0.9916`–`0.9952` (`1` GAE) on the ten curves: behind A at `1` GAE on every curve.  `S_{B″} / S_T` is
+`0.705`–`0.804`, `0.969`–`1.0006` and `1.046`–`1.051`.  Learning costs `5.08`–`5.28·10⁵` multiplications and
+`1.40`–`1.43·10⁶` native operations per curve (528,192 entries, B′'s selection `≈ 8.8·10⁵`, the mode 1,344).
+
+**Controls.**  A corrupted trace entry — a row already used as an earlier pivot, or another call's pivot row of a
+later column, in the first contested column where the clean replay used the trace — was rejected by the check
+on 63 of 63 calls for each kind, and a trace of another shape fell back on 63 of 63; outputs were the existing
+solver's on every call.  Replayed without the check, every corrupted call aborted on a zero pivot.  The abort
+also follows from the trace's own invalid entries, so this shows the check is necessary, not that each corruption
+alone breaks the echelon.  A first version of the controls (`checks_v1.*`) counted one corruption out of 63 as
+undetected.  There the corrupted row was the trace's own entry, a no-op.  The example now excludes no-op
+corruptions; only `e35_checks` was rebuilt (sha256 `ed21fbd0…`).
+
+**Identity.**  E33's pinned binary and E35's give identical records (canonical JSON without timings) for `macaulay`,
+`chain`, `chain-sparsest`, and `chain`, `chain-sparsest-counted`, `chain-sparsest-inc`, `chain-sparsest-est` with
+`--karatsuba` at `p = 101` seed 2.  The four Karatsuba records also equal the stored E27 and E33 ones, and none
+carries `trace_learning`.  End to end, all 20 T records equal E33's B counted records in every field except
+the solve's multiplications (and `call`, `total_muls`, `ratio`), the selection, learning and lead-scan fields,
+`macaulay_entries` (learning's `528,192`) and the tag.  Every relation, log and walk is the same.
+
+**End to end** (20 rows; `S(g) = total_muls + 97 g (macaulay_entries + pivot_selection_ops)` with T's learning
+inside its totals; A = E27's records, B, B′, B″ = E33's, all Karatsuba; E25 schoolbook against T shifted by the
+schoolbook re-pricing measured on B; rho = walk (iii) of E27):
+
+| X | `S_X / S_T`, `0` GAE | `0.1` GAE | `1` GAE | rank across the band |
+|:--|:--|:--|:--|:--|
+| A | `1.093`–`1.252` | `1.020`–`1.055` | `0.9981`–`1.0028` (T behind on 6 rows: `p = 101` both seeds, `p = 149` seed 2, both arms) | **unresolved**: T ahead at `0` and `0.1` on every row; at `1` GAE ahead on 14, behind on 6 |
+| E25 | `2.727`–`3.204` | `1.421`–`1.507` | `1.0325`–`1.0557` | T ahead at every weight on every row (as A is: §9.24) |
+| B | `0.598`–`0.676` | `5.19`–`5.48` | `6.55`–`6.74` | unresolved (B ahead at `0`) |
+| B′ | `0.598`–`0.676` | `2.10`–`2.21` | `2.54`–`2.61` | unresolved (B′ ahead at `0`) |
+| B″ | `0.709`–`0.807` | `0.975`–`1.007` | `1.053`–`1.059` | unresolved (B″ ahead at `0` on every row, at `0.1` on 18 of 20; T ahead at `1` GAE on every row) |
+
+T's selection is `744`–`817` operations a call and learning adds `4`–`197` a call (`1.4·10⁶` per run over
+`7,106`–`352,146` calls).  Its solve multiplications are `1.50`–`1.69×` B's.  **Distance to the matched rho**
+(`S_T / rho`): `5.11·10³`–`3.53·10⁵` (`0`), `2.02·10⁴`–`1.35·10⁶` (`0.1`), `9.04·10⁴`–`6.63·10⁶` (`1` GAE); rho is ahead
+of every row at every weight.  For comparison A is at `6.39·10³`–`4.06·10⁵`, `2.13·10⁴`–`1.39·10⁶`, `9.07·10⁴`–`6.64·10⁶`
+and B″ at `4.12·10³`–`2.61·10⁵`, `2.03·10⁴`–`1.33·10⁶`, `9.58·10⁴`–`7.01·10⁶`.  **Sensitivity:** lead-scan reads are
+identical for A, B and T on every Stage A call (`79,114`–`79,119`; they telescope to the shared final leads), so
+pricing them for every arm moves the ratios toward 1 and reverses nothing (Stage A `S_A / S_T` `1.010`–`1.035` at
+`0.1`, `0.9932`–`0.9957` at `1` GAE).
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.144 | shape `99.9`–`100 %`; whole sequence `0 %` on every curve; contested-column agreement `69.8`–`88.4 %`, below `90 %` on every curve | **falsified** (agreement); the sequence depends on the target, and the curve explains less than the generic structure does |
+| G2.145 | Stage A 10,000 / 10,000; end to end 20 / 20 with the registered field rule; existing solvers identical old = new (7 / 7) and = stored (4 / 4), no E35 field | **holds** |
+| G2.146 | corruptions rejected 63 / 63 per kind, outputs unchanged; unchecked replay aborted 126 / 126 | **holds** (controls v2; v1's one undetected case was a no-op corruption; disclosed) |
+| G2.147 | `744`–`817` a call; learning `1.40`–`1.43·10⁶` | **holds** |
+| G2.148 | `C` median T / B `1.571`–`1.791`; A / T `1.103`–`1.211` | **falsified** (the replay misses `56`–`77 %` of contested columns) |
+| G2.149 | T below A at `0` and `0.1`, **above at `1` GAE on every curve** (`0.992`–`0.995`); below B at `0.1` and `1`; below B″ at `1` but above at `0.1` on 9 of 10 | **falsified** |
+| G2.150 | `1.093`–`1.252`, `1.020`–`1.055`, `0.998`–`1.003` (6 rows `< 1`) | **falsified**: T is not ranked ahead of A |
+| G2.151 | `2.727`–`3.204`, `1.421`–`1.507`, `1.0325`–`1.0557`: ahead of E25 at every weight, below every registered band at `0` and partly below at `0.1` and `1` | **falsified** (bands); the order holds |
+| G2.152 | below B and B′ at `0.1` and `1`; above B″ at `0` and at `0.1` (18 / 20), below at `1`; `S_T / S_B` at `0` is `1.48`–`1.67` | **falsified** |
+| G2.153 | `S_T / rho` at `0` GAE `5.11·10³`–`3.53·10⁵` (above `2.5·10⁵` on one row); rho ahead everywhere; sensitivity reverses nothing | **falsified** (upper end); the rest holds |
+
+**What it says.**  Replaying solver B's pivot order does not work on this line, because there is no
+per-curve order to replay.  B's choice among candidates with nearly equal counts is decided by accidental zeros
+of the target's coefficients and fill: no two calls of a curve share a sequence.  The 70–88 % of contested columns
+that do agree are generic structure, which the other nine curves' traces predict as well.  A counted replay with an
+`O(1)` check therefore keeps B's choice in only `23`–`44 %` of contested columns.  It keeps `18.8`–`36.8 %` of the multiplications B saves over A (`C` medians; A / T `1.10`–`1.21`
+against A / B `1.90`–`1.98`), for `≈ 800` native operations a call.  At `1` GAE that is break-even with A: ahead on 14 rows, behind on 6, by at most `0.3 %`
+either way.  **Under the 2026-10-15 criterion T is not an improvement**: it is ahead of the baseline A at `0`
+and `0.1` GAE only, so it is unranked.  At those weights it is behind B″ (E33), which also stays unranked.  It
+does have the smallest 1-GAE cost of any sparsest-pivot variant tested (`S_{B″} / S_T` `1.053`–`1.059`).
+**Class:** engineering, negative.  A stays the ranked solver, and the distance to rho is unchanged:
+`6.39·10³×` at `0` GAE on the best row (`p = 397` seed 1, arm B; T `5.11·10³×` there, unranked).
+This agrees with E21 (§9.11) on a different object.  The per-call structure of the `V₄` systems differs from
+target to target in exactly the places a trace would need to fix: E21's vanishing rows, and here the tie-breaks
+among nearly equal rows.  Joux–Vitse trace reuse (`KR-IC-f3da82`) presupposes systems whose reduction pattern is
+generic; at `p ≤ 397` with `≈ 450` columns, accidental zeros are too frequent for that.
+**Not done:** a membership test by a row-to-lead map instead of the position test.  It would recover up to the
+`≈ 2/3` of misses whose row was still a candidate (an upper bound, exploratory, not registered).  Its bookkeeping
+would have to be priced, and it could not exceed the `70`–`88 %` per-column agreement above.  Also not done: the
+validation gate, the leaderboard and `benchmarks/`.  **Next lever:** unchanged from §9.37, the Macaulay matrix
+itself (`176,064` entries a call, all of the `1`-GAE cost).
