@@ -5,15 +5,22 @@ use clap::{Args, Subcommand};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
-use super::storage;
+use super::budget::BudgetScope;
+use super::s3_budget::S3BudgetContext;
+use super::storage::{self, PublishReceipt};
+use super::types::Artifact;
+use super::BudgetArgs;
+use crate::store::backend::{object_key as remote_object_key, RemoteSpec};
 
 const CHUNK_BYTES: usize = 4 * 1024 * 1024;
 const DEFAULT_MAX_BYTES: u64 = 1024 * 1024 * 1024 * 1024;
+const MAX_REMOTE_OBJECTS: usize = 1_000_002;
 const DEFAULT_MAX_FILES: usize = 1_000_000;
 
 #[derive(Args)]
@@ -49,6 +56,28 @@ pub enum CustodyCommand {
         bundle: PathBuf,
         #[arg(long)]
         destination: PathBuf,
+    },
+    /// Publish a verified local bundle with an active grant-bound S3 budget.
+    Publish {
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        bundle: PathBuf,
+        #[arg(long)]
+        remote: String,
+        #[command(flatten)]
+        budget: BudgetArgs,
+    },
+    /// Fetch every exact remote object and replay a fresh restored run.
+    RestoreRemote {
+        #[arg(long)]
+        receipt: PathBuf,
+        #[arg(long)]
+        bundle: PathBuf,
+        #[arg(long)]
+        destination: PathBuf,
+        #[command(flatten)]
+        budget: BudgetArgs,
     },
 }
 
@@ -308,6 +337,330 @@ fn replay_members(
     Ok(total)
 }
 
+fn bundle_objects(bundle: &Path, manifest: &Manifest) -> Result<Vec<Artifact>, String> {
+    check_manifest(manifest)?;
+    let mut chunks = BTreeMap::<String, u64>::new();
+    for member in &manifest.members {
+        for (index, digest) in member.chunks.iter().enumerate() {
+            let size = if index + 1 == member.chunks.len() {
+                member.bytes - CHUNK_BYTES as u64 * index as u64
+            } else {
+                CHUNK_BYTES as u64
+            };
+            if let Some(previous) = chunks.insert(digest.clone(), size) {
+                if previous != size {
+                    return Err(format!("custody chunk {digest} has conflicting lengths"));
+                }
+            }
+        }
+    }
+    let mut artifacts = Vec::with_capacity(chunks.len() + 1);
+    for (digest, bytes) in chunks {
+        let path = object_path(&digest)?;
+        storage::check_file(
+            &storage::contained_path(bundle, &path, false)?,
+            &digest,
+            bytes,
+        )?;
+        artifacts.push(Artifact {
+            role: "restricted-full-run-custody-chunk".into(),
+            path,
+            sha256: digest,
+            bytes,
+            encoding: "binary".into(),
+        });
+    }
+    let (sha256, bytes) = crate::store::hash_file(&bundle.join("manifest.json"))?;
+    artifacts.push(Artifact {
+        role: "restricted-full-run-custody-manifest".into(),
+        path: "manifest.json".into(),
+        sha256,
+        bytes,
+        encoding: "json".into(),
+    });
+    Ok(artifacts)
+}
+
+fn approved_remote(uri: &str) -> Result<RemoteSpec, String> {
+    let remote = RemoteSpec::parse(uri)?;
+    if !matches!(&remote, RemoteSpec::S3 { bucket, prefix }
+        if bucket == "setec-astronomy-artifacts" && !prefix.is_empty())
+    {
+        return Err("custody requires an approved nonempty S3 prefix".into());
+    }
+    Ok(remote)
+}
+
+fn publish_bundle(
+    out: &Path,
+    bundle: &Path,
+    remote: &RemoteSpec,
+    context: &Arc<S3BudgetContext>,
+) -> Result<Value, String> {
+    let root = super::checked_directory(out, false)?;
+    let bundle = super::checked_directory(bundle, false)?;
+    let _lease = super::Lease::acquire(&root)?;
+    #[cfg(target_os = "linux")]
+    super::assert_no_workers(&root)?;
+    let manifest = read_manifest(&bundle)?;
+    replay_members(&bundle, &manifest, None)?;
+    let (_, binding, _) = super::bound_run(&root)?;
+    for (name, expected) in [
+        ("plan.json", &manifest.plan_file_sha256),
+        ("protocol.json", &manifest.protocol_file_sha256),
+        ("run.json", &manifest.run_file_sha256),
+    ] {
+        if crate::store::hash_file(&root.join(name))?.0 != *expected {
+            return Err(format!("custody {name} differs from bound run"));
+        }
+    }
+    if binding["source_commit"].as_str() != Some(manifest.source_commit.as_str())
+        || binding["binary_sha256"].as_str() != Some(manifest.binary_sha256.as_str())
+    {
+        return Err("custody producer differs from bound run".into());
+    }
+    super::verify_run(&root, true)?;
+    let objects = bundle_objects(&bundle, &manifest)?;
+    let custody_manifest = objects
+        .iter()
+        .find(|a| a.path == "manifest.json")
+        .ok_or("custody manifest missing")?;
+    let binding = storage::write_json(
+        &bundle,
+        "publication/custody-objects.json",
+        "restricted-custody-publication-binding",
+        &json!({"schema":"crypto.ml-dataset.custody-publication/v1",
+            "custody_manifest_sha256":custody_manifest.sha256,
+            "artifacts":objects}),
+    )?;
+    let mut cfg = crate::store::Config::discover()?;
+    cfg.remote = Some(remote.clone());
+    cfg.index_path = bundle.join("store-index.json");
+    cfg.cache_dir = bundle.join("store-cache");
+    let namespace = format!("ml-dataset/custody/{}", custody_manifest.sha256);
+    let receipt = storage::publish_budgeted(
+        &bundle,
+        &objects,
+        &binding,
+        cfg,
+        &namespace,
+        Some(context),
+        BudgetScope::Work,
+    )?;
+    let receipt_path = format!(
+        "publication/full-run-{}-{}.json",
+        sha(remote.display().as_bytes()),
+        custody_manifest.sha256
+    );
+    let local_receipt = storage::write_json(
+        &bundle,
+        &receipt_path,
+        "restricted-custody-publication-receipt",
+        &receipt,
+    )?;
+    Ok(
+        json!({"schema":"crypto.ml-dataset.custody-remote-publication/v1",
+        "remote":remote.display(),"custody_manifest_sha256":custody_manifest.sha256,
+        "custody_manifest_bytes":custody_manifest.bytes,"objects":objects.len()+1,
+        "receipt":local_receipt,"publication":receipt,"all_remote_objects_read_back":true}),
+    )
+}
+
+fn download_exact(
+    bundle: &Path,
+    remote: &RemoteSpec,
+    context: &Arc<S3BudgetContext>,
+    artifact: &Artifact,
+) -> Result<(), String> {
+    crate::store::index::validate_sha256(&artifact.sha256)?;
+    let key = remote_object_key(&artifact.sha256)?;
+    storage::expect_remote_object(Some(context), remote, &key, artifact, BudgetScope::Work)?;
+    let mut cfg = crate::store::Config::discover()?;
+    cfg.remote = Some(remote.clone());
+    cfg.index_path = bundle.join("readback-index.json");
+    cfg.cache_dir = bundle.join("readback-cache");
+    let store = storage::dataset_store(cfg, Some(context), BudgetScope::Work)?;
+    let backend = store.remote()?;
+    let meta = backend
+        .head(&key)?
+        .ok_or_else(|| format!("remote custody object absent: {key}"))?;
+    if meta.bytes != artifact.bytes || meta.sha256.as_ref().is_some_and(|v| v != &artifact.sha256) {
+        return Err(format!("remote custody HEAD mismatch: {key}"));
+    }
+    let target = storage::contained_path(bundle, &artifact.path, true)?;
+    let temporary = target.with_extension(format!("remote-{}", std::process::id()));
+    if temporary.exists() || target.exists() {
+        return Err(format!(
+            "remote custody destination exists: {}",
+            target.display()
+        ));
+    }
+    backend.get(&key, &temporary)?;
+    storage::check_file(&temporary, &artifact.sha256, artifact.bytes)?;
+    File::open(&temporary)
+        .and_then(|f| f.sync_all())
+        .map_err(|e| e.to_string())?;
+    fs::hard_link(&temporary, &target).map_err(|e| e.to_string())?;
+    storage::sync_directory(target.parent().ok_or("missing custody object parent")?)?;
+    fs::remove_file(&temporary).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+fn restore_local(bundle: &Path, destination: &Path) -> Result<Value, String> {
+    let bundle = super::checked_directory(bundle, false)?;
+    let manifest = read_manifest(&bundle)?;
+    replay_members(&bundle, &manifest, None)?;
+    let parent = super::checked_directory(destination.parent().unwrap_or(Path::new(".")), false)?;
+    let target = parent.join(
+        destination
+            .file_name()
+            .ok_or("invalid restore destination")?,
+    );
+    if target.starts_with(&bundle) || bundle.starts_with(&target) {
+        return Err("custody restore destination must be separate from bundle".into());
+    }
+    if destination.exists() {
+        return Err("custody restore destination already exists".into());
+    }
+    fs::create_dir(destination).map_err(|e| e.to_string())?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(destination, fs::Permissions::from_mode(0o700))
+            .map_err(|e| e.to_string())?;
+    }
+    let bytes = replay_members(&bundle, &manifest, Some(destination))?;
+    let replay = super::verify_run(&destination.join("run"), true)?;
+    Ok(
+        json!({"schema":"crypto.ml-dataset.restricted-custody-restore/v1",
+        "destination":destination,"members":manifest.members.len(),"bytes":bytes,
+        "native_run_replay":replay,"cloud_requests":0}),
+    )
+}
+
+fn restore_remote(
+    receipt_path: &Path,
+    bundle: &Path,
+    destination: &Path,
+    context: &Arc<S3BudgetContext>,
+) -> Result<Value, String> {
+    let receipt: PublishReceipt =
+        serde_json::from_reader(File::open(receipt_path).map_err(|e| e.to_string())?)
+            .map_err(|e| e.to_string())?;
+    if receipt.schema != "ml-dataset.publication/v1"
+        || receipt.objects.len() < 2
+        || receipt.objects.len() > MAX_REMOTE_OBJECTS
+    {
+        return Err("invalid custody publication receipt".into());
+    }
+    let remote = approved_remote(&receipt.remote)?;
+    if bundle.exists() || destination.exists() {
+        return Err("remote custody requires fresh bundle and restore destinations".into());
+    }
+    let mut seen = BTreeSet::new();
+    let mut original_manifest = None;
+    let mut binding_manifest = None;
+    for object in &receipt.objects {
+        if !object.roundtrip_verified
+            || object.object_key != remote_object_key(&object.artifact.sha256)?
+            || !seen.insert(&object.artifact.path)
+            || object.artifact.bytes > DEFAULT_MAX_BYTES
+        {
+            return Err("invalid or duplicate custody publication object".into());
+        }
+        match object.artifact.path.as_str() {
+            "manifest.json" => original_manifest = Some(&object.artifact),
+            "publication/custody-objects.json" => binding_manifest = Some(&object.artifact),
+            path if path.starts_with("objects/sha256/") => {
+                if object_path(&object.artifact.sha256)? != path {
+                    return Err("custody chunk path and digest differ".into());
+                }
+            }
+            _ => return Err("unexpected custody publication path".into()),
+        }
+    }
+    let original_manifest = original_manifest.ok_or("custody manifest missing from receipt")?;
+    let binding_manifest = binding_manifest.ok_or("publication binding missing from receipt")?;
+    if binding_manifest.sha256 != receipt.manifest_sha256 {
+        return Err("publication binding digest differs from receipt".into());
+    }
+    if receipt.namespace != format!("ml-dataset/custody/{}", original_manifest.sha256) {
+        return Err("publication namespace differs from custody manifest".into());
+    }
+    if receipt.completion.roundtrip_verified == false
+        || receipt
+            .catalog
+            .as_ref()
+            .is_none_or(|c| !c.roundtrip_verified)
+    {
+        return Err("custody publication lacks verified completion and catalog".into());
+    }
+    let parent = super::checked_directory(bundle.parent().unwrap_or(Path::new(".")), false)?;
+    if parent.join(bundle.file_name().ok_or("invalid bundle path")?) == destination {
+        return Err("bundle and restore destinations must differ".into());
+    }
+    fs::create_dir(bundle).map_err(|e| e.to_string())?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(bundle, fs::Permissions::from_mode(0o700))
+            .map_err(|e| e.to_string())?;
+    }
+    // Fetch the binding and native manifest first, then every referenced chunk.
+    download_exact(bundle, &remote, context, binding_manifest)?;
+    download_exact(bundle, &remote, context, original_manifest)?;
+    let binding: Value = serde_json::from_reader(
+        File::open(bundle.join(&binding_manifest.path)).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    let expected: Vec<Artifact> = serde_json::from_value(
+        binding
+            .get("artifacts")
+            .cloned()
+            .ok_or("publication artifact list missing")?,
+    )
+    .map_err(|e| e.to_string())?;
+    let actual: Vec<Artifact> = receipt
+        .objects
+        .iter()
+        .filter(|o| o.artifact.path != binding_manifest.path)
+        .map(|o| o.artifact.clone())
+        .collect();
+    if binding["schema"] != "crypto.ml-dataset.custody-publication/v1"
+        || binding["custody_manifest_sha256"].as_str() != Some(original_manifest.sha256.as_str())
+        || expected != actual
+    {
+        return Err("publication binding does not match receipt objects".into());
+    }
+    let manifest = read_manifest(bundle)?;
+    let expected_chunks: BTreeSet<String> = manifest
+        .members
+        .iter()
+        .flat_map(|m| m.chunks.iter().cloned())
+        .collect();
+    let receipt_chunks: BTreeSet<String> = receipt
+        .objects
+        .iter()
+        .filter(|o| o.artifact.path.starts_with("objects/sha256/"))
+        .map(|o| o.artifact.sha256.clone())
+        .collect();
+    if expected_chunks != receipt_chunks {
+        return Err("custody manifest chunks differ from publication receipt".into());
+    }
+    for object in &receipt.objects {
+        if object.artifact.path.starts_with("objects/sha256/") {
+            download_exact(bundle, &remote, context, &object.artifact)?;
+        }
+    }
+    let replay = restore_local(bundle, destination)?;
+    super::validate_budget_run(context.session(), &destination.join("run"))?;
+    Ok(
+        json!({"schema":"crypto.ml-dataset.custody-remote-restore/v1",
+        "remote":remote.display(),"bundle":bundle,"custody_manifest_sha256":original_manifest.sha256,
+        "objects_read_back":receipt.objects.len(),"native_restore":replay}),
+    )
+}
+
 pub fn run(args: &CustodyArgs) -> Result<Value, String> {
     match &args.command {
         CustodyCommand::Create {
@@ -431,36 +784,37 @@ pub fn run(args: &CustodyArgs) -> Result<Value, String> {
         CustodyCommand::Restore {
             bundle,
             destination,
+        } => restore_local(bundle, destination),
+        CustodyCommand::Publish {
+            out,
+            bundle,
+            remote,
+            budget,
         } => {
-            let bundle = super::checked_directory(bundle, false)?;
-            let manifest = read_manifest(&bundle)?;
-            replay_members(&bundle, &manifest, None)?;
-            let parent =
-                super::checked_directory(destination.parent().unwrap_or(Path::new(".")), false)?;
-            let target = parent.join(
-                destination
-                    .file_name()
-                    .ok_or("invalid restore destination")?,
-            );
-            if target.starts_with(&bundle) || bundle.starts_with(&target) {
-                return Err("custody restore destination must be separate from bundle".into());
-            }
-            if destination.exists() {
-                return Err("custody restore destination already exists".into());
-            }
-            fs::create_dir(destination).map_err(|e| e.to_string())?;
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                fs::set_permissions(destination, fs::Permissions::from_mode(0o700))
-                    .map_err(|e| e.to_string())?;
-            }
-            let bytes = replay_members(&bundle, &manifest, Some(destination))?;
-            let replay = super::verify_run(&destination.join("run"), true)?;
-            Ok(
-                json!({"schema":"crypto.ml-dataset.restricted-custody-restore/v1",
-                "destination":destination,"members":manifest.members.len(),"bytes":bytes,
-                "native_run_replay":replay,"cloud_requests":0}),
+            let remote = approved_remote(remote)?;
+            let session = super::open_budget(budget)?
+                .ok_or("custody S3 publication requires an active bound budget session")?;
+            super::validate_budget_run(&session, out)?;
+            let context = S3BudgetContext::from_env(session)?;
+            let result = publish_bundle(out, bundle, &remote, &context);
+            super::combine_finalization(
+                result,
+                super::finalize_budget(bundle, Some(&context), Some(&remote), true),
+            )
+        }
+        CustodyCommand::RestoreRemote {
+            receipt,
+            bundle,
+            destination,
+            budget,
+        } => {
+            let session = super::open_budget(budget)?
+                .ok_or("custody remote restore requires an active bound budget session")?;
+            let context = S3BudgetContext::from_env(session)?;
+            let result = restore_remote(receipt, bundle, destination, &context);
+            super::combine_finalization(
+                result,
+                super::finalize_budget(bundle, Some(&context), None, false),
             )
         }
     }
@@ -556,6 +910,10 @@ mod tests {
             members,
             ..manifest
         };
+        storage::write_json(&bundle, "manifest.json", "custody-test", &manifest).unwrap();
+        let objects = bundle_objects(&bundle, &manifest).unwrap();
+        assert_eq!(objects.len(), 6);
+        assert_eq!(objects.last().unwrap().path, "manifest.json");
         assert_eq!(
             replay_members(&bundle, &manifest, Some(&restored)).unwrap(),
             total + 30
@@ -569,6 +927,15 @@ mod tests {
         .unwrap();
         fs::write(object, b"tampered").unwrap();
         assert!(replay_members(&bundle, &manifest, None).is_err());
+        assert!(bundle_objects(&bundle, &manifest).is_err());
+    }
+
+    #[test]
+    fn remote_must_use_approved_s3_prefix() {
+        assert!(approved_remote("file:///tmp/custody").is_err());
+        assert!(approved_remote("s3://setec-astronomy-artifacts").is_err());
+        assert!(approved_remote("s3://other-bucket/custody").is_err());
+        assert!(approved_remote("s3://setec-astronomy-artifacts/custody").is_ok());
     }
 
     #[test]
