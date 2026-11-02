@@ -18,9 +18,9 @@ export RAYON_NUM_THREADS=4
 F='walk(if type=="object" then with_entries(select((.key|test("_ms$|^ms$|wall"))|not)) else . end)'
 canon() { jq -S -c "$F" "$1" | sha256sum | cut -d' ' -f1; }
 run() { # file binary solver extra...
-  f=$out/$1.json; b=$2; s=$3; shift 3
+  name=$1; f=$out/$1.json; b=$2; s=$3; shift 3
   [ -s "$f" ] || taskset -c "$cpus" "$b" --sizes 101 --first-seed 2 --seeds 1 --rho-runs 16 \
-    --max-residuals 5000000 --solver "$s" "$@" --json "$f" >"$out/$1.log" 2>&1
+    --max-residuals 5000000 --solver "$s" "$@" --json "$f" >"$out/$name.log" 2>&1
 }
 run macaulay "$nb/quartic_pipeline_gls" macaulay
 run chain "$nb/quartic_pipeline_gls" chain
