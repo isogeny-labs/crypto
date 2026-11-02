@@ -1,0 +1,85 @@
+LIB "linalg.lib";
+proc require73(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc gcd73(int a,int b){int t;while(b!=0){t=a-(a/b)*b;a=b;b=t;}return(a);}
+proc phi73(int n){int a;int count=0;for(a=1;a<=n;a++){if(gcd73(a,n)==1){count++;}}return(count);}
+proc dump73(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../61/runs/trace61-01/trace-polynomial61.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat slots73[32][1];int p73;int i73;int j73;int t73;int d73;int e73;int oldRank73;int rank73;int step73;int stable73;int numerator73;int phiD73;int count73;int reduced73;int branches73;int predicted73;
+for(p73=1;p73<=528;p73++){
+ if(parents50[p73,1]==parents50[p73,2]){
+  j73=parents50[p73,1];require73(j73>=1 && j73<=32 && slots73[j73,1]==0,"FIVE73_UNIQUE_SQUARE_SLOTS");slots73[j73,1]=p73;
+ }
+}
+for(j73=1;j73<=32;j73++){require73(slots73[j73,1]>0,"FIVE73_ALL_32_SQUARE_SLOTS");}
+ring degreeFive73=(2,a),(q),dp;minpoly=a^5+a^3+a^2+a+1;short=0;
+require73(a^32+a==0 && a^2+a!=0,"FIVE73_EXACT_F32_BASE_FIELD");
+map tableToFive73=tablePidCertificate50,a;
+map unitToFive73=tracePolynomial61,a;
+matrix square73[32][32];matrix sourceUnit73=unitToFive73(unit61);matrix unitSquared73[32][1];
+for(i73=1;i73<=32;i73++){
+ unitSquared73[i73,1]=sourceUnit73[i73,1]^2;
+ for(j73=1;j73<=32;j73++){square73[i73,j73]=tableToFive73(table50[i73,slots73[j73,1]]);}
+}
+require73(nrows(sourceUnit73)==32 && ncols(sourceUnit73)==1 && sourceUnit73!=matrix(0,32,1),"FIVE73_SOURCE_UNIT_SHAPE");
+require73(square73*unitSquared73==sourceUnit73,"FIVE73_ABSOLUTE_FROBENIUS_UNIT");
+matrix powerColumns73=unitmat(32);matrix squaredColumns73[32][32];matrix relative73[32][32];
+for(t73=1;t73<=5;t73++){
+ for(i73=1;i73<=32;i73++){for(j73=1;j73<=32;j73++){squaredColumns73[i73,j73]=powerColumns73[i73,j73]^2;}}
+ powerColumns73=square73*squaredColumns73;
+}
+relative73=powerColumns73;
+matrix aColumns73[32][32];for(i73=1;i73<=32;i73++){aColumns73[i73,i73]=a;}
+for(t73=1;t73<=5;t73++){
+ for(i73=1;i73<=32;i73++){for(j73=1;j73<=32;j73++){squaredColumns73[i73,j73]=aColumns73[i73,j73]^2;}}
+ aColumns73=square73*squaredColumns73;
+}
+require73(aColumns73==a*relative73 && relative73*sourceUnit73==sourceUnit73,"FIVE73_F32_LINEARITY_AND_UNIT");
+for(i73=1;i73<=32;i73++){for(j73=1;j73<=32;j73++){squaredColumns73[i73,j73]=relative73[i73,j73]^2;require73(diff(relative73[i73,j73],q)==0,"FIVE73_SCALAR_RELATIVE_COORDINATE");}}
+require73(square73*squaredColumns73==relative73*square73,"FIVE73_SEMILINEAR_COMMUTATION");
+matrix image73=unitmat(32);matrix nextImage73[32][32];
+oldRank73=32;stable73=0;step73=0;
+while(stable73==0 && step73<32){
+ nextImage73=relative73*image73;rank73=mat_rk(nextImage73);step73++;
+ require73(rank73<=oldRank73,"FIVE73_NESTED_IMAGE_RANK");
+ image73=nextImage73;if(rank73==oldRank73){stable73=1;}oldRank73=rank73;
+}
+require73(stable73==1 && rank73>=1 && mat_rk(relative73*image73)==rank73,"FIVE73_STABLE_REDUCED_IMAGE");
+matrix FrobeniusPower73=unitmat(32);
+intmat fixed73[32][1];intmat divisibility73[32][1];intmat degrees73[32][1];
+for(d73=1;d73<=32;d73++){
+ FrobeniusPower73=relative73*FrobeniusPower73;
+ fixed73[d73,1]=rank73-mat_rk((FrobeniusPower73+unitmat(32))*image73);
+ require73(fixed73[d73,1]>=1 && fixed73[d73,1]<=rank73,"FIVE73_FIXED_DIMENSION_RANGE");
+}
+for(d73=1;d73<=32;d73++){
+ numerator73=fixed73[d73,1];
+ for(e73=1;e73<d73;e73++){if(d73==(d73/e73)*e73){numerator73=numerator73-phi73(e73)*divisibility73[e73,1];}}
+ phiD73=phi73(d73);require73(phiD73>0 && numerator73==(numerator73/phiD73)*phiD73,"FIVE73_TOTIENT_DIVISIBILITY");
+ divisibility73[d73,1]=numerator73/phiD73;
+ require73(divisibility73[d73,1]>=0,"FIVE73_DIVISIBILITY_NONNEGATIVE");
+}
+for(d73=32;d73>=1;d73--){
+ count73=divisibility73[d73,1];
+ for(e73=d73+1;e73<=32;e73++){if(e73==(e73/d73)*d73){count73=count73-degrees73[e73,1];}}
+ require73(count73>=0,"FIVE73_DEGREE_MULTIPLICITY_NONNEGATIVE");degrees73[d73,1]=count73;
+}
+reduced73=0;branches73=0;
+for(e73=1;e73<=32;e73++){reduced73=reduced73+e73*degrees73[e73,1];branches73=branches73+degrees73[e73,1];}
+require73(reduced73==rank73 && branches73==fixed73[1,1],"FIVE73_REDUCED_DIMENSION_AND_BRANCH_COUNT");
+for(d73=1;d73<=32;d73++){
+ predicted73=0;for(e73=1;e73<=32;e73++){predicted73=predicted73+gcd73(d73,e73)*degrees73[e73,1];}
+ require73(predicted73==fixed73[d73,1],"FIVE73_ALL_FIXED_DIMENSIONS_RECONSTRUCTED");
+}
+link out73="ASCII:w degree-five73.sing";open(out73);
+write(out73,"ring degreeFiveResult73=(2,a),(q),dp;minpoly=a^5+a^3+a^2+a+1;short=0;");
+dump73(out73,"square73",square73);dump73(out73,"relative73",relative73);dump73(out73,"stableImage73",image73);
+write(out73,"int stableSteps73="+string(step73)+";int reducedDimension73="+string(rank73)+";int branches73="+string(branches73)+";");
+for(d73=1;d73<=32;d73++){write(out73,"int fixed"+string(d73)+"_73="+string(fixed73[d73,1])+";int degreeCount"+string(d73)+"_73="+string(degrees73[d73,1])+";");}
+close(out73);
+print("FIVE73_RESULT base_degree=5 fiber_dimension_over_F32=32 fiber_dimension_over_F2=160 stable_steps="+string(step73)+" reduced_dimension_over_F32="+string(rank73)+" branches="+string(branches73));
+for(e73=1;e73<=32;e73++){if(degrees73[e73,1]>0){print("FIVE73_DEGREE relative_degree="+string(e73)+" absolute_degree="+string(5*e73)+" multiplicity="+string(degrees73[e73,1]));}}
+print("DEGREE_FIVE73_ALL_CHECKS_PASS");quit;
