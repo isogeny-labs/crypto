@@ -111,7 +111,7 @@ const frontier = rows
 
 // Citation lint: files that match a tracked node's citation_patterns but are not linked.
 function trackedFiles() {
-  const out = execFileSync("git", ["ls-files", "-z"], { cwd: repoRoot, encoding: "utf8", maxBuffer: 1 << 28 });
+  const out = execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], { cwd: repoRoot, encoding: "utf8", maxBuffer: 1 << 28 });
   return out.split("\0").filter(file =>
     /\.(md|tex|rs|typ|py|lean|txt)$/.test(file) &&
     !/(^|\/)(target|node_modules)\//.test(file) &&
