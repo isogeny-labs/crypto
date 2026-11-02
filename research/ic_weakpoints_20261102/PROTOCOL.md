@@ -47,3 +47,17 @@ Follow-up arm Y2, fresh seed base 20261103 (independent curves and targets):
 Decision rule: the deficit is real if the pooled Y2 full ratio at phi = 1/2 has a 95% CI excluding 1
 in the same direction; otherwise the frozen-arm deviation is recorded as noise. Y and Y2 are reported
 separately, then pooled.
+
+## Amendment 2 (2026-11-02, before any data): large-prime variation, arm L
+Tool subcommand `dlp` (`tool/src/dlp.rs`). One relation stream per curve; factor base FB_r = the first
+ceil(F p^(r-1)) x-classes (F = all x-classes in F_p, so |FB_r| ~ p^r / 2), r in {1, 5/6, 3/4, 2/3, 1/2}.
+Variants on the same stream: 0LP (full relations only), 1LP (merge relations with one point outside
+FB_r), 2LP (also two, eliminated as graph cycles). Each variant stops at |FB_r| + 21 full rows, which are
+solved mod ell; log Q checked against the planted k. Trial cap 40 p (censored cells reported as such).
+Arms: `dlp --p P --curves 2 --seed 20261104` for P in 127 251 509 1021; P = 2039 as two processes
+(`--c0 0 --curves 1`, `--c0 1 --curves 1`).
+Predictions: (a) 0LP trials T ~ p^(3-2r) (from the measured phi^3 yield); (b) at r = 2/3 the 2LP
+trial exponent is <= 1.4 (theory 4/3, Gaudry-Thome-Theriault-Diem), below rho's 1.5, while 0LP is 5/3;
+(c) every reached cell recovers log Q; (d) merged 2LP rows are heavier than 0LP rows but by < 3x.
+Falsified: (b) if the fitted 2LP exponent at r = 2/3 exceeds 1.5; (c) by any wrong or undetermined k.
+Exponents are least-squares slopes of log T on log p over reached cells (curves averaged in log).

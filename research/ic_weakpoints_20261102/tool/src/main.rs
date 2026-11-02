@@ -7,6 +7,7 @@
 //!
 //! Every line printed on stdout is one JSON record. Counts only: no timings.
 mod curve;
+mod dlp;
 mod field;
 mod poly;
 mod summarize;
@@ -30,6 +31,7 @@ fn main() {
         Some("yield") => yield_cmd(&args),
         Some("pipeline") => pipeline(&args),
         Some("selftest") => selftest(),
+        Some("dlp") => dlp::run(&args),
         Some("summarize") => summarize::run(args.get(2).map(|s| s.as_str()).unwrap_or("data")),
         _ => eprintln!("usage: ic-weakpoints algebra|yield|pipeline|selftest ..."),
     }
