@@ -208,7 +208,9 @@ fn main() {
                     ctrl.calls += 1;
                     let (g, _, _) = run(Some(Pivot::Trace(t, false)));
                     let w = last_replay();
-                    if (k < 2 && w.miss_cols.contains(&(col as u32))) || (k == 2 && w.shape_fallback) {
+                    if (k < 2 && w.miss_cols.contains(&(col as u32)))
+                        || (k == 2 && w.shape_fallback)
+                    {
                         ctrl.detected += 1;
                     }
                     ctrl.outputs_equal += usize::from(g == want);
@@ -218,7 +220,10 @@ fn main() {
                         Ok((g, st, fell)) => {
                             if fell && !fell_clean {
                                 ctrl.unchecked_fallback += 1;
-                            } else if g != want || st.pivots != st_clean.pivots || st.dim != st_clean.dim {
+                            } else if g != want
+                                || st.pivots != st_clean.pivots
+                                || st.dim != st_clean.dim
+                            {
                                 ctrl.unchecked_wrong += 1;
                             } else {
                                 ctrl.unchecked_fine += 1;

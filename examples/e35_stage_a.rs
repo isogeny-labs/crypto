@@ -356,7 +356,8 @@ fn main() {
                         } else {
                             s0.contested_columns +=
                                 l.contested.iter().filter(|&&x| x).count() as u64;
-                            s0.columns += rows_seq.iter().filter(|&&x| x != u32::MAX).count() as u64;
+                            s0.columns +=
+                                rows_seq.iter().filter(|&&x| x != u32::MAX).count() as u64;
                         }
                         *seq_count.entry(rows_seq.clone()).or_insert(0) += 1;
                         seqs.push((l.rows, l.cols, rows_seq, l.contested));
@@ -512,12 +513,17 @@ fn main() {
         contested_agree: cont,
     });
     if let Some(x) = &out.cross {
-        eprintln!("cross-curve contested agreement (row: calls of curve i, column: trace of curve j):");
+        eprintln!(
+            "cross-curve contested agreement (row: calls of curve i, column: trace of curve j):"
+        );
         for (i, r) in x.contested_agree.iter().enumerate() {
             eprintln!(
                 "  {:?}: {}",
                 x.curves[i],
-                r.iter().map(|v| format!("{v:.3}")).collect::<Vec<_>>().join(" ")
+                r.iter()
+                    .map(|v| format!("{v:.3}"))
+                    .collect::<Vec<_>>()
+                    .join(" ")
             );
         }
     }

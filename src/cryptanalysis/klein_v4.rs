@@ -1277,13 +1277,8 @@ pub(crate) fn build_echelon(
         }
         Pivot::Learn => {
             let mut w = PivotWork::default();
-            let ech = super::chain_trace::echelon_learn(
-                rows,
-                p as u32,
-                &mut ech_muls,
-                row_nnz,
-                &mut w,
-            );
+            let ech =
+                super::chain_trace::echelon_learn(rows, p as u32, &mut ech_muls, row_nnz, &mut w);
             st.pivot_init_ops += w.init + inherit_ops;
             st.pivot_compare_ops += w.compare;
             st.pivot_update_ops += w.update;
@@ -1502,7 +1497,9 @@ pub enum V4Solver {
 /// counted rules.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Pivot {
-    Uncounted { sparsest: bool },
+    Uncounted {
+        sparsest: bool,
+    },
     Counted(PivotRule, PivotCheck),
     /// E35: replay a learned trace; `true` skips the checks (the positive
     /// control's diagnostic only).

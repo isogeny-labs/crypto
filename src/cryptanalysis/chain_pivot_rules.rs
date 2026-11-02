@@ -367,10 +367,9 @@ pub(crate) fn echelon_by_rule(
         }
         // E37 C_F: the second arrival skips its update and is filed by its
         // next nonzero right of `c` (a control; never in a solver).
-        let misfiled = (rule == ArrivalRule::Fifo
-            && check.misfile_at == Some(c as u32)
-            && b.len() > 1)
-            .then(|| b.remove(1));
+        let misfiled =
+            (rule == ArrivalRule::Fifo && check.misfile_at == Some(c as u32) && b.len() > 1)
+                .then(|| b.remove(1));
         if probing && contested {
             PROBE.with(|p| {
                 if let Some(pb) = p.borrow_mut().as_mut() {
@@ -544,9 +543,11 @@ mod tests {
             .map(|_| {
                 (0..m)
                     .map(|_| {
-                        s = s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                        s = s
+                            .wrapping_mul(6364136223846793005)
+                            .wrapping_add(1442695040888963407);
                         let v = (s >> 33) as u32;
-                        if v % 3 == 0 {
+                        if v.is_multiple_of(3) {
                             (v % p) as u16
                         } else {
                             0
@@ -591,7 +592,12 @@ mod tests {
                 assert_eq!(mm, m, "Lowest charges A's multiplications");
                 assert_eq!(e.pivot_row, a.pivot_row);
             }
-            let cols = |x: &Echelon| x.pivot_row.iter().map(|&r| r != u32::MAX).collect::<Vec<_>>();
+            let cols = |x: &Echelon| {
+                x.pivot_row
+                    .iter()
+                    .map(|&r| r != u32::MAX)
+                    .collect::<Vec<_>>()
+            };
             assert_eq!(cols(&e), cols(&a), "{rule:?}");
             assert_eq!(e.zero_rows, a.zero_rows, "{rule:?}");
             for (c, &r) in e.pivot_row.iter().enumerate() {

@@ -131,7 +131,11 @@ fn main() {
     // ── Stage 0 and Stage A ─────────────────────────────────────────────
     let sa = load(&format!("{dir}/stage_a.json"));
     let curves = sa["curves"].as_array().unwrap();
-    writeln!(md, "## Stage 0: B's pivot sequence against the curve's learned trace\n").unwrap();
+    writeln!(
+        md,
+        "## Stage 0: B's pivot sequence against the curve's learned trace\n"
+    )
+    .unwrap();
     writeln!(md, "Per curve, over the Stage A calls (B's sequence by B′'s elimination; its digest checked against B counted's). *Contested*: the call's columns with more than one candidate.\n").unwrap();
     writeln!(md, "| p | seed | calls | shape = trace | sequence = trace | distinct sequences | modal sequence calls (= trace) | contested: row = trace | contested: (row, position) = trace | all columns: row = trace | instrument = B | learned = mode |").unwrap();
     writeln!(md, "|--:|--:|--:|--:|--:|--:|:--|--:|--:|--:|--:|--:|").unwrap();
@@ -181,7 +185,11 @@ fn main() {
     }
     summary["stage0"] = json!(s0rows);
 
-    writeln!(md, "## Stage A: per call (means over all calls; fallbacks charged)\n").unwrap();
+    writeln!(
+        md,
+        "## Stage A: per call (means over all calls; fallbacks charged)\n"
+    )
+    .unwrap();
     writeln!(md, "Solvers: {}. Agreement with the existing solver (solutions, degree, outcome, decomposition set) per solver.\n", curves[0]["solvers"]).unwrap();
     writeln!(md, "| p | seed | calls | agree | T digest = B | contested / call | misses / call | calls with a miss | shape fallbacks | T selection / call | learning (muls; native) |").unwrap();
     writeln!(md, "|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|:--|").unwrap();
@@ -193,22 +201,50 @@ fn main() {
         writeln!(
             md,
             "| {} | {} | {} | {} | {} | {:.1} | {:.2} | {} | {} | {:.0} | {} ; {} |",
-            c["p"], c["seed"], calls, c["agree"], c["trace_digest_equal_b"],
-            f(c, "trace_contested") / calls, f(c, "trace_misses") / calls,
-            c["trace_calls_with_miss"], c["trace_shape_fallbacks"], f(st, "sel_total_mean"),
-            sci(f(l, "muls")), sci(f(l, "entries") + f(l, "selection_ops"))
+            c["p"],
+            c["seed"],
+            calls,
+            c["agree"],
+            c["trace_digest_equal_b"],
+            f(c, "trace_contested") / calls,
+            f(c, "trace_misses") / calls,
+            c["trace_calls_with_miss"],
+            c["trace_shape_fallbacks"],
+            f(st, "sel_total_mean"),
+            sci(f(l, "muls")),
+            sci(f(l, "entries") + f(l, "selection_ops"))
         )
         .unwrap();
     }
     writeln!(md, "\n| p | seed | `C` median A | B | B″ | T | T / B | A / T | `S_A/S_T` 0 | 0.1 | 1 | `S_B/S_T` 0.1 | 1 | `S_B″/S_T` 0.1 | 1 | lead scans priced: `S_A/S_T` 0.1 | 1 |").unwrap();
-    writeln!(md, "|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
+    writeln!(
+        md,
+        "|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|"
+    )
+    .unwrap();
     for c in curves {
         let su = c["summaries"].as_array().unwrap();
         let (a, b, e, t) = (&su[1], &su[2], &su[3], &su[4]);
-        let med = |k: usize| median(&c["arms"][k]["call"].as_array().unwrap().iter().map(|v| v.as_u64().unwrap()).collect::<Vec<_>>());
-        let sm = |x: &Value, k: &str| -> Vec<f64> { x[k].as_array().unwrap().iter().map(|v| v.as_f64().unwrap()).collect() };
+        let med = |k: usize| {
+            median(
+                &c["arms"][k]["call"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|v| v.as_u64().unwrap())
+                    .collect::<Vec<_>>(),
+            )
+        };
+        let sm = |x: &Value, k: &str| -> Vec<f64> {
+            x[k].as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_f64().unwrap())
+                .collect()
+        };
         let st_l = sm(t, "s_mean_learning");
-        let ratio = |x: &Value| -> Vec<f64> { (0..3).map(|g| sm(x, "s_mean")[g] / st_l[g]).collect() };
+        let ratio =
+            |x: &Value| -> Vec<f64> { (0..3).map(|g| sm(x, "s_mean")[g] / st_l[g]).collect() };
         let (ra, rb, re) = (ratio(a), ratio(b), ratio(e));
         // Lead scans for every arm; the existing solver's taken as A's.
         let tl = sm(t, "s_mean_lead");
@@ -245,9 +281,18 @@ fn main() {
                 writeln!(
                     md,
                     "| {} | {} | {} | {} | {}/{} | {}/{} | {} | {} | {} | {} |",
-                    c["p"], c["seed"], c["clean_outputs_equal"], k["kind"].as_str().unwrap(),
-                    k["detected"], k["calls"], k["outputs_equal"], k["calls"], k["unchecked_abort"],
-                    k["unchecked_fallback"], k["unchecked_wrong"], k["unchecked_fine"]
+                    c["p"],
+                    c["seed"],
+                    c["clean_outputs_equal"],
+                    k["kind"].as_str().unwrap(),
+                    k["detected"],
+                    k["calls"],
+                    k["outputs_equal"],
+                    k["calls"],
+                    k["unchecked_abort"],
+                    k["unchecked_fallback"],
+                    k["unchecked_wrong"],
+                    k["unchecked_fine"]
                 )
                 .unwrap();
             }
@@ -270,9 +315,15 @@ fn main() {
         let r25 = load(&format!("{e25}/p{p}s{seed}.json"));
         let r31 = load(&format!("{e31}/e2e_chain-sparsest_p{p}s{seed}.json"));
         let r27 = load(&format!("{e27}/e2e_chain_karatsuba_p{p}s{seed}.json"));
-        let rb = load(&format!("{e33}/e2e_chain-sparsest-counted_karatsuba_p{p}s{seed}.json"));
-        let rbi = load(&format!("{e33}/e2e_chain-sparsest-inc_karatsuba_p{p}s{seed}.json"));
-        let rbe = load(&format!("{e33}/e2e_chain-sparsest-est_karatsuba_p{p}s{seed}.json"));
+        let rb = load(&format!(
+            "{e33}/e2e_chain-sparsest-counted_karatsuba_p{p}s{seed}.json"
+        ));
+        let rbi = load(&format!(
+            "{e33}/e2e_chain-sparsest-inc_karatsuba_p{p}s{seed}.json"
+        ));
+        let rbe = load(&format!(
+            "{e33}/e2e_chain-sparsest-est_karatsuba_p{p}s{seed}.json"
+        ));
         for a in ["A", "B"] {
             let (x, x25, x31, x27) = (arm(&rt, a), arm(&r25, a), arm(&r31, a), arm(&r27, a));
             let (xb, xbi, xbe) = (arm(&rb, a), arm(&rbi, a), arm(&rbe, a));
@@ -289,16 +340,21 @@ fn main() {
                 .iter()
                 .map(|g| f(&x25, "total_muls") + GAE * g * f(&x25, "macaulay_entries"))
                 .collect();
-            let (s_t, s_a, s_b, s_bi, s_be) = (s_rec(&x), s_rec(&x27), s_rec(&xb), s_rec(&xbi), s_rec(&xbe));
+            let (s_t, s_a, s_b, s_bi, s_be) =
+                (s_rec(&x), s_rec(&x27), s_rec(&xb), s_rec(&xbi), s_rec(&xbe));
             // Schoolbook S of T: T's Karatsuba total shifted by the
             // schoolbook re-pricing measured on B (E31 B's total minus B
             // counted's Karatsuba total: the same calls), as E33 did.
             let shift = f(&x31, "total_muls") - f(&xb, "total_muls");
             let s_t_school: Vec<f64> = s_t.iter().map(|v| v + shift).collect();
-            let over = |num: &[f64], den: &[f64]| -> Vec<f64> { (0..3).map(|g| num[g] / den[g]).collect() };
+            let over = |num: &[f64], den: &[f64]| -> Vec<f64> {
+                (0..3).map(|g| num[g] / den[g]).collect()
+            };
             let d = diff_fields(&xb, &x, may_differ_vs_bc);
             let l = &x["trace_learning"];
-            identity.push(json!({"p": p, "seed": seed, "arm": a, "fields_differing_from_b_counted": d}));
+            identity.push(
+                json!({"p": p, "seed": seed, "arm": a, "fields_differing_from_b_counted": d}),
+            );
             rows.push(json!({
                 "p": p, "seed": seed, "arm": a, "residuals": x["residuals"],
                 "selection_ops": x["pivot_selection_ops"], "selection_parts": x["pivot_selection"],
@@ -320,7 +376,11 @@ fn main() {
             }));
         }
     }
-    writeln!(md, "\n## End to end (E25's ten curves, both arms; Karatsuba products)\n").unwrap();
+    writeln!(
+        md,
+        "\n## End to end (E25's ten curves, both arms; Karatsuba products)\n"
+    )
+    .unwrap();
     writeln!(md, "`S_E25/S_T`: schoolbook (E25's records against T's total shifted by the schoolbook re-pricing measured on B, as E33 did; T's learning stays Karatsuba-priced); `S_X/S_T` for X = A (E27), B, B′, B″ (E33): Karatsuba; `S_T/rho`: walk (iii) of E27 without the `[d]G` check.  Band: one GAE (`97`) per Macaulay entry, per selection operation and per walk step; T's learning is inside its record's totals.\n").unwrap();
     writeln!(md, "| p | seed | arm | calls | T sel / call | learning muls; native | misses / echelon | solve T/B | E25/T 0 | 0.1 | 1 | A/T 0 | 0.1 | 1 | B/T 0 | 0.1 | 1 | B″/T 0 | 0.1 | 1 | T/rho 0 | 0.1 | 1 |").unwrap();
     writeln!(md, "|--:|--:|:--|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
@@ -341,8 +401,17 @@ fn main() {
         .unwrap();
     }
     if !rows.is_empty() {
-        writeln!(md, "\n### Ranges over the {} rows and ranks across the band\n", rows.len()).unwrap();
-        writeln!(md, "| quantity | `0` GAE | `0.1` GAE | `1` GAE | T ahead at every weight on every row? |").unwrap();
+        writeln!(
+            md,
+            "\n### Ranges over the {} rows and ranks across the band\n",
+            rows.len()
+        )
+        .unwrap();
+        writeln!(
+            md,
+            "| quantity | `0` GAE | `0.1` GAE | `1` GAE | T ahead at every weight on every row? |"
+        )
+        .unwrap();
         writeln!(md, "|:--|:--|:--|:--|:--|").unwrap();
         let mut ranks = json!({});
         for (k, label) in [
@@ -352,26 +421,59 @@ fn main() {
             ("Bp_over_T", "`S_B′ / S_T`"),
             ("Bpp_over_T", "`S_B″ / S_T`"),
         ] {
-            let per: Vec<Vec<f64>> = (0..3).map(|i| rows.iter().map(|r| g(r, k, i)).collect()).collect();
+            let per: Vec<Vec<f64>> = (0..3)
+                .map(|i| rows.iter().map(|r| g(r, k, i)).collect())
+                .collect();
             let ahead = per.iter().all(|v| v.iter().all(|&x| x > 1.0));
             let at: Vec<bool> = per.iter().map(|v| v.iter().all(|&x| x > 1.0)).collect();
             let behind: Vec<bool> = per.iter().map(|v| v.iter().all(|&x| x < 1.0)).collect();
-            writeln!(md, "| {label} | {} | {} | {} | {} |", r3(&per[0]), r3(&per[1]), r3(&per[2]),
-                if ahead { "**yes: T ranked ahead**".to_string() } else { format!("no (T ahead on all rows at {at:?}; behind on all rows at {behind:?})") }).unwrap();
+            writeln!(
+                md,
+                "| {label} | {} | {} | {} | {} |",
+                r3(&per[0]),
+                r3(&per[1]),
+                r3(&per[2]),
+                if ahead {
+                    "**yes: T ranked ahead**".to_string()
+                } else {
+                    format!("no (T ahead on all rows at {at:?}; behind on all rows at {behind:?})")
+                }
+            )
+            .unwrap();
             ranks[k] = json!({"ahead_all": ahead, "ahead_at": at, "behind_at": behind,
                 "ranges": per.iter().map(|v| { let (lo, hi) = range(v); json!([lo, hi]) }).collect::<Vec<_>>()});
         }
-        for (k, label) in [("T_over_rho", "`S_T / rho`"), ("A_over_rho", "`S_A / rho`"), ("Bpp_over_rho", "`S_B″ / rho`")] {
-            let per: Vec<(f64, f64)> = (0..3).map(|i| range(&rows.iter().map(|r| g(r, k, i)).collect::<Vec<_>>())).collect();
-            writeln!(md, "| {label} | {}–{} | {}–{} | {}–{} | rho ahead on every row: {} |",
-                sci(per[0].0), sci(per[0].1), sci(per[1].0), sci(per[1].1), sci(per[2].0), sci(per[2].1),
-                per.iter().all(|x| x.0 > 1.0)).unwrap();
+        for (k, label) in [
+            ("T_over_rho", "`S_T / rho`"),
+            ("A_over_rho", "`S_A / rho`"),
+            ("Bpp_over_rho", "`S_B″ / rho`"),
+        ] {
+            let per: Vec<(f64, f64)> = (0..3)
+                .map(|i| range(&rows.iter().map(|r| g(r, k, i)).collect::<Vec<_>>()))
+                .collect();
+            writeln!(
+                md,
+                "| {label} | {}–{} | {}–{} | {}–{} | rho ahead on every row: {} |",
+                sci(per[0].0),
+                sci(per[0].1),
+                sci(per[1].0),
+                sci(per[1].1),
+                sci(per[2].0),
+                sci(per[2].1),
+                per.iter().all(|x| x.0 > 1.0)
+            )
+            .unwrap();
             ranks[k] = json!(per.iter().map(|x| json!([x.0, x.1])).collect::<Vec<_>>());
         }
         summary["ranks"] = ranks;
         let bad: Vec<&Value> = identity
             .iter()
-            .filter(|r| !r["fields_differing_from_b_counted"].as_array().unwrap().is_empty())
+            .filter(|r| {
+                !r["fields_differing_from_b_counted"]
+                    .as_array()
+                    .unwrap()
+                    .is_empty()
+            })
             .collect();
         writeln!(md, "\nIdentity against E33's B counted records (fields other than the solve's multiplications and what derives from them, selection, learning, lead scans, entries, tag and wall times): {} of {} rows identical{}.\n",
             identity.len() - bad.len(), identity.len(),

@@ -125,7 +125,11 @@ fn main() {
     // ── Stage A ──────────────────────────────────────────────────────────
     let sa = load(&format!("{dir}/stage_a.json"));
     let sa33 = load(&format!("{e33}/stage_a.json"));
-    writeln!(md, "## Stage A (per call; means over all calls, fallbacks charged)\n").unwrap();
+    writeln!(
+        md,
+        "## Stage A (per call; means over all calls, fallbacks charged)\n"
+    )
+    .unwrap();
     writeln!(md, "Agreement with the existing solver per solver (order of `solvers`); A's rule through E36's echelon equal to A counted (phases, digest, lead scans); calls whose pivot digest differs from A's; E33 reproduction: calls where `C`, echelon, entries and selection of existing / A / A counted / B″ equal E33's records.\n").unwrap();
     writeln!(md, "| p | seed | calls | agree | lowest = A | digest ≠ A | contested calls | E33 reproduced (existing, A, A counted, B″) |").unwrap();
     writeln!(md, "|--:|--:|--:|:--|--:|:--|--:|:--|").unwrap();
@@ -133,7 +137,10 @@ fn main() {
     let mut e33_ok = true;
     for (ci, c) in sa.as_array().unwrap().iter().enumerate() {
         let c33 = &sa33.as_array().unwrap()[ci];
-        assert_eq!((c["p"].clone(), c["seed"].clone()), (c33["p"].clone(), c33["seed"].clone()));
+        assert_eq!(
+            (c["p"].clone(), c["seed"].clone()),
+            (c33["p"].clone(), c33["seed"].clone())
+        );
         let arm_of = |cv: &Value, name: &str| -> Value {
             cv["arms"]
                 .as_array()
@@ -162,8 +169,14 @@ fn main() {
         writeln!(
             md,
             "| {} | {} | {} | {} | {} | {} | {} | {:?} |",
-            c["p"], c["seed"], c["calls"], c["agree"], c["lowest_equals_a"],
-            c["digest_differs_from_a"], c["calls_contested"], repro
+            c["p"],
+            c["seed"],
+            c["calls"],
+            c["agree"],
+            c["lowest_equals_a"],
+            c["digest_differs_from_a"],
+            c["calls_contested"],
+            repro
         )
         .unwrap();
         let sums = c["summaries"].as_array().unwrap();
@@ -223,9 +236,17 @@ fn main() {
             "s_mean_est": b2["s_mean"].clone(),
         }));
     }
-    writeln!(md, "\nE33 per-call reproduction on every call: **{e33_ok}**\n").unwrap();
+    writeln!(
+        md,
+        "\nE33 per-call reproduction on every call: **{e33_ok}**\n"
+    )
+    .unwrap();
     writeln!(md, "| p | seed | solver | C median | C mean | echelon | entries | sel init | cmp | upd | selection | lead scan | contested | ordered cand. | row updates | fallbacks |").unwrap();
-    writeln!(md, "|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
+    writeln!(
+        md,
+        "|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|"
+    )
+    .unwrap();
     for r in &stage_rows {
         for n in ARMS.iter().chain(["chain-sparsest-est"].iter()) {
             let x = &r["per"][*n];
@@ -242,7 +263,11 @@ fn main() {
     }
     writeln!(md, "\nPer-call `S(g)` ratios `S_A / S_X` (Stage A means; `>1`: X cheaper), primary and under σ1–σ3; and `C_A / C_X`:\n").unwrap();
     writeln!(md, "| p | seed | X | C_A/C_X | 0 | 0.1 | 1 | σ1 0.1 | σ1 1 | σ2 0.1 | σ2 1 | σ3 0.1 | σ3 1 | E25/X 0 | 0.1 | 1 |").unwrap();
-    writeln!(md, "|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
+    writeln!(
+        md,
+        "|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|"
+    )
+    .unwrap();
     let mut carried: Vec<&str> = Vec::new();
     let mut stage_ranks = Vec::new();
     for x in RULES.iter().chain(["chain-sparsest-est"].iter()) {
@@ -265,7 +290,10 @@ fn main() {
             };
             let rat = |k: &str, g: usize| key(k, "chain", g) / key(k, x, g);
             let e25 = |g: usize| key("s_mean", "existing", g) / key("s_mean", x, g);
-            for (i, k) in ["s_mean", "s_sigma1", "s_sigma2", "s_sigma3"].iter().enumerate() {
+            for (i, k) in ["s_mean", "s_sigma1", "s_sigma2", "s_sigma3"]
+                .iter()
+                .enumerate()
+            {
                 for g in 0..3 {
                     if rat(k, g) > 1.0 {
                         ahead[i][g] += 1;
@@ -303,13 +331,26 @@ fn main() {
         let ahead_v: Vec<Value> = ahead
             .iter()
             .enumerate()
-            .map(|(i, a)| if *x == "chain-sparsest-est" && i > 0 { Value::Null } else { json!(a) })
+            .map(|(i, a)| {
+                if *x == "chain-sparsest-est" && i > 0 {
+                    Value::Null
+                } else {
+                    json!(a)
+                }
+            })
             .collect();
         stage_ranks.push(json!({"solver": x, "curves_ahead_of_a": ahead_v, "curves_ahead_of_e25": ahead_e25, "curves": n}));
     }
     writeln!(md, "\nCurves (of 10) where X is ahead of A, `[0, 0.1, 1]` GAE, primary / σ1 / σ2 / σ3, and of E25 (primary):\n").unwrap();
     for s in &stage_ranks {
-        writeln!(md, "- `{}`: A {} ; E25 {}", s["solver"].as_str().unwrap(), s["curves_ahead_of_a"], s["curves_ahead_of_e25"]).unwrap();
+        writeln!(
+            md,
+            "- `{}`: A {} ; E25 {}",
+            s["solver"].as_str().unwrap(),
+            s["curves_ahead_of_a"],
+            s["curves_ahead_of_e25"]
+        )
+        .unwrap();
     }
     writeln!(md, "\nCarried end to end (Stage A `S(0.1)` below A's on every curve; L never): **{carried:?}**\n").unwrap();
 
@@ -331,7 +372,12 @@ fn main() {
         let r27 = load(&format!("{e27}/e2e_chain_karatsuba_p{p}s{seed}.json"));
         let recs: Vec<(String, Value)> = solvers
             .iter()
-            .map(|s| (s.to_string(), load(&format!("{dir}/e2e_{s}_karatsuba_p{p}s{seed}.json"))))
+            .map(|s| {
+                (
+                    s.to_string(),
+                    load(&format!("{dir}/e2e_{s}_karatsuba_p{p}s{seed}.json")),
+                )
+            })
             .collect();
         for a in ["A", "B"] {
             let (x25, x31, x27) = (arm(&r25, a), arm(&r31, a), arm(&r27, a));
@@ -369,9 +415,7 @@ fn main() {
                     .iter()
                     .map(|g| f(&x, "total_muls") + GAE * g * (f(&x, "macaulay_entries") + sel))
                     .collect();
-                let s_xs: Vec<f64> = (0..3)
-                    .map(|g| s_x[g] + shift)
-                    .collect();
+                let s_xs: Vec<f64> = (0..3).map(|g| s_x[g] + shift).collect();
                 row[s.as_str()] = json!({
                     "selection_ops": sel,
                     "selection_parts": x["pivot_selection"].clone(),
@@ -389,7 +433,11 @@ fn main() {
     }
     let mut ranks = Vec::new();
     if !solvers.is_empty() {
-        writeln!(md, "## End to end (E25's ten curves, both arms; Karatsuba products)\n").unwrap();
+        writeln!(
+            md,
+            "## End to end (E25's ten curves, both arms; Karatsuba products)\n"
+        )
+        .unwrap();
         writeln!(md, "`S_A/S_X`: E27's solver-A records against this run (Karatsuba); `S_E25/S_X`: schoolbook (E25's records against X re-priced by E31 A − E27 A); `S_X/rho`: against walk (iii) of E27 without the `[d]G` check.  One GAE (`97`) per Macaulay entry, per selection operation and per walk step.\n").unwrap();
         for s in &solvers {
             writeln!(md, "### {s}\n").unwrap();
@@ -411,7 +459,11 @@ fn main() {
             writeln!(md).unwrap();
         }
         writeln!(md, "### Ranges and ranks (an order is stated only where it holds at every weight on every row)\n").unwrap();
-        writeln!(md, "| X | quantity | 0 GAE | 0.1 GAE | 1 GAE | rows X ahead (0 / 0.1 / 1) | rank |").unwrap();
+        writeln!(
+            md,
+            "| X | quantity | 0 GAE | 0.1 GAE | 1 GAE | rows X ahead (0 / 0.1 / 1) | rank |"
+        )
+        .unwrap();
         writeln!(md, "|:--|:--|:--|:--|:--|:--|:--|").unwrap();
         for s in &solvers {
             for (k, what) in [
@@ -423,7 +475,10 @@ fn main() {
                 let mut ahead = Vec::new();
                 let mut rr = Vec::new();
                 for g in 0..3 {
-                    let v: Vec<f64> = e2e_rows.iter().map(|r| r[*s][k][g].as_f64().unwrap()).collect();
+                    let v: Vec<f64> = e2e_rows
+                        .iter()
+                        .map(|r| r[*s][k][g].as_f64().unwrap())
+                        .collect();
                     let (lo, hi) = range(&v);
                     rr.push(json!([lo, hi]));
                     cells.push(if k == "over_rho" {
@@ -445,20 +500,38 @@ fn main() {
                 } else {
                     "unresolved (order changes inside the band or across rows)"
                 };
-                writeln!(md, "| {s} | {what} | {} | {} | {} | {}/{}/{} of {n} | {rank} |", cells[0], cells[1], cells[2], ahead[0], ahead[1], ahead[2]).unwrap();
+                writeln!(
+                    md,
+                    "| {s} | {what} | {} | {} | {} | {}/{}/{} of {n} | {rank} |",
+                    cells[0], cells[1], cells[2], ahead[0], ahead[1], ahead[2]
+                )
+                .unwrap();
                 ranks.push(json!({"solver": s, "quantity": what, "ranges": rr, "rows_x_ahead": ahead, "rows": n, "rank": rank}));
             }
         }
         // A's own distance to rho, for comparison.
         let mut cells = Vec::new();
         for g in 0..3 {
-            let v: Vec<f64> = e2e_rows.iter().map(|r| r["A_over_rho"][g].as_f64().unwrap()).collect();
+            let v: Vec<f64> = e2e_rows
+                .iter()
+                .map(|r| r["A_over_rho"][g].as_f64().unwrap())
+                .collect();
             let (lo, hi) = range(&v);
             cells.push(format!("{}–{}", sci(lo), sci(hi)));
         }
-        writeln!(md, "| A (E27) | S_A / rho | {} | {} | {} | — | rho ahead |", cells[0], cells[1], cells[2]).unwrap();
+        writeln!(
+            md,
+            "| A (E27) | S_A / rho | {} | {} | {} | — | rho ahead |",
+            cells[0], cells[1], cells[2]
+        )
+        .unwrap();
     }
-    let ident_ok = identity.iter().all(|i| i["fields_differing_from_e27_a"].as_array().unwrap().is_empty());
+    let ident_ok = identity.iter().all(|i| {
+        i["fields_differing_from_e27_a"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    });
     writeln!(md, "\nEnd-to-end identity (every field of E27's solver-A record apart from the solve's multiplications and what derives from them, the selection fields, wall times and the tag): **{ident_ok}**\n").unwrap();
     fs::write(format!("{dir}/tables.md"), &md).unwrap();
     let summary = json!({
@@ -474,6 +547,10 @@ fn main() {
         "e2e_identity_ok": ident_ok,
         "e2e_identity": identity,
     });
-    fs::write(format!("{dir}/summary.json"), serde_json::to_string_pretty(&summary).unwrap()).unwrap();
+    fs::write(
+        format!("{dir}/summary.json"),
+        serde_json::to_string_pretty(&summary).unwrap(),
+    )
+    .unwrap();
     print!("{md}");
 }

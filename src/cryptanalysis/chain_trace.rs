@@ -460,6 +460,7 @@ pub struct Learned {
 /// B′'s echelon on one system, as the learner runs it (also Stage 0's
 /// instrument: B's pivot sequence for a call).  `None` if the system is
 /// refused before the echelon (charged by the caller from `st`).
+#[allow(clippy::result_large_err)] // the Err carries the charged counters by value, as E35 recorded them
 pub fn learn_one(comps: &[HashMap<[u8; 4], u64>], p: u64) -> Result<Learned, QuarticSolve> {
     let mut st = QuarticSolve::default();
     match build_echelon(comps, MACAULAY_BOUND, p, &mut st, true, Pivot::Learn) {

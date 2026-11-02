@@ -200,7 +200,12 @@ fn main() {
             };
             sv(n, g) + w * extra
         };
-        for n in ["chain-lowest-e36", "chain-fifo", "chain-static", "chain-fifo-static"] {
+        for n in [
+            "chain-lowest-e36",
+            "chain-fifo",
+            "chain-static",
+            "chain-fifo-static",
+        ] {
             let e = pool_acc.entry(n.to_string()).or_default();
             e.0 += f(&by(n), "ordered_candidates_mean");
             e.1 += f(&by(n), "contested_mean");
@@ -237,12 +242,19 @@ fn main() {
         stage.push(json!({"p": c["p"], "seed": c["seed"], "calls": calls, "per": per}));
     }
     for (n, (o, ct, k)) in &pool_acc {
-        pooled.insert(n.clone(), json!({"ordered_candidates_mean": o / k, "contested_mean": ct / k}));
+        pooled.insert(
+            n.clone(),
+            json!({"ordered_candidates_mean": o / k, "contested_mean": ct / k}),
+        );
     }
     writeln!(md, "\nStage A identity (every solver agrees with the existing solver on every call; A's rule through E36's echelon = A counted on every call): **{sa_identity}**\n").unwrap();
 
     writeln!(md, "| p | seed | X | C mean | sel / call | C_A/C_X | S_A/S_X 0 | 0.1 | 1 | σ1 1 | σ2 1 | σ3 1 | S_E25/S_X 1 | S_B″/S_X 0 | 0.1 | 1 |").unwrap();
-    writeln!(md, "|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
+    writeln!(
+        md,
+        "|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|"
+    )
+    .unwrap();
     let mut g166 = true;
     let mut g167 = true;
     let mut g168 = true;
@@ -264,7 +276,13 @@ fn main() {
             && within(ca / f(&per["chain-fifo-static"], "c_mean"), 1.48, 1.59)
             && within(f(&per["chain-lifo"], "c_mean") / ca, 1.36, 1.44)
             && within(cf / cb, 1.00, 1.08);
-        for x in ["chain-fifo", "chain-static", "chain-fifo-static", "chain-lifo", "chain-sparsest-est"] {
+        for x in [
+            "chain-fifo",
+            "chain-static",
+            "chain-fifo-static",
+            "chain-lifo",
+            "chain-sparsest-est",
+        ] {
             let rat = |k: &str, g: usize| s("chain", k, g) / s(x, k, g);
             let v = vec![
                 ca / f(&per[x], "c_mean"),
@@ -321,7 +339,12 @@ fn main() {
 
     // ── Controls ────────────────────────────────────────────────────────
     let ck = load(&format!("{dir}/checks.json"));
-    writeln!(md, "\n## Controls (G2.165; {} calls, {} with a non-empty clean set)\n", ck["calls"], ck["nonempty"]).unwrap();
+    writeln!(
+        md,
+        "\n## Controls (G2.165; {} calls, {} with a non-empty clean set)\n",
+        ck["calls"], ck["nonempty"]
+    )
+    .unwrap();
     writeln!(md, "Positive check: the control's read log first differs from the clean run's at the same phase and column with a different row hash.  Detected: solutions, degree, decomposition set or fallback flag differ (a call without a positive check counts as not detected).\n").unwrap();
     writeln!(md, "| control | rule | aimed | effective | positive | structural | unread | detected (positive) | rate | non-empty detected | rate | via fallback only | thresholds met |").unwrap();
     writeln!(md, "|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|").unwrap();
@@ -351,18 +374,20 @@ fn main() {
                 t["via_fallback"], if gating { "" } else { " (calibration)" }
             )
             .unwrap();
-            controls.push(json!({"control": ctl, "rule": rule, "gating": gating, "calls": n,
+            controls.push(
+                json!({"control": ctl, "rule": rule, "gating": gating, "calls": n,
                 "positive_rate": pos / n, "detection_rate": det / n,
-                "nonempty_detection_rate": ned / ne.max(1.0), "thresholds_met": ok, "tally": t}));
+                "nonempty_detection_rate": ned / ne.max(1.0), "thresholds_met": ok, "tally": t}),
+            );
         }
     }
     let nonempty = ck["nonempty"].as_u64().unwrap();
     let pert_ok = ["F", "S", "H", "L"]
         .iter()
         .all(|r| ck["perturbed_detected"][r].as_u64() == Some(nonempty));
-    let dig_ok = ["F", "L"].iter().all(|r| {
-        ck["digest_differs_from_a"][r].as_u64() == ck["contested_calls_f"].as_u64()
-    });
+    let dig_ok = ["F", "L"]
+        .iter()
+        .all(|r| ck["digest_differs_from_a"][r].as_u64() == ck["contested_calls_f"].as_u64());
     g165 &= pert_ok && dig_ok && ck["identity_failures"].as_u64() == Some(0);
     writeln!(md, "\nPerturbed coefficient detected (non-empty calls {nonempty}): {}; digests ≠ A: {} (contested calls {}); clean-run identity failures: {}.  **G2.165 thresholds met: {g165}**\n",
         ck["perturbed_detected"], ck["digest_differs_from_a"], ck["contested_calls_f"], ck["identity_failures"]).unwrap();
@@ -395,7 +420,10 @@ fn main() {
     // curve; for E24's rows, which have no Stage A, the ten curves' mean).
     // A and E25 take A's ordered candidates (the positive control's tally).
     let tally = |set: &str, p: u64, seed: u64, arm: &str| -> (f64, f64) {
-        let ordered = matches!(arm, "chain-counted" | "macaulay" | "chain-static" | "chain-fifo-static");
+        let ordered = matches!(
+            arm,
+            "chain-counted" | "macaulay" | "chain-static" | "chain-fifo-static"
+        );
         let contested = matches!(arm, "chain-fifo" | "chain-static" | "chain-fifo-static");
         if !ordered && !contested {
             return (0.0, 0.0);
@@ -410,8 +438,16 @@ fn main() {
             pooled[key].clone()
         };
         (
-            if ordered { f(&src, "ordered_candidates_mean") } else { 0.0 },
-            if contested { f(&src, "contested_mean") } else { 0.0 },
+            if ordered {
+                f(&src, "ordered_candidates_mean")
+            } else {
+                0.0
+            },
+            if contested {
+                f(&src, "contested_mean")
+            } else {
+                0.0
+            },
         )
     };
     let mut rows: Vec<Value> = Vec::new();
@@ -476,19 +512,25 @@ fn main() {
                     });
                     let unsolved = f(&x, "unsolved");
                     let fb = x["solver_fallbacks"].as_f64().unwrap_or(0.0);
-                    let rho_ok = x["rho"].as_array().is_some_and(|w| w.iter().all(|w| w["correct"] == true));
+                    let rho_ok = x["rho"]
+                        .as_array()
+                        .is_some_and(|w| w.iter().all(|w| w["correct"] == true));
                     health.push(json!({"set": set, "p": p, "seed": seed, "arm": a.unwrap_or("—"), "solver": s,
                         "log_recovered": x["folded"]["correct"] == true, "rho_walks_correct": rho_ok,
                         "unsolved_share": unsolved / calls, "fallback_share": fb / calls,
                         "stream_salt": x["stream_salt"].clone()}));
                     if *s != "chain-counted" && *s != "macaulay" {
                         let d = diff_fields(&xa, &x, may_differ);
-                        identity.push(json!({"set": set, "p": p, "seed": seed, "arm": a.unwrap_or("—"),
-                            "solver": s, "fields_differing_from_a": d}));
+                        identity.push(
+                            json!({"set": set, "p": p, "seed": seed, "arm": a.unwrap_or("—"),
+                            "solver": s, "fields_differing_from_a": d}),
+                        );
                     } else if *s == "macaulay" {
-                        identity.push(json!({"set": set, "p": p, "seed": seed, "arm": a.unwrap_or("—"),
+                        identity.push(
+                            json!({"set": set, "p": p, "seed": seed, "arm": a.unwrap_or("—"),
                             "solver": s, "informational": true,
-                            "fields_differing_from_a": diff_fields(&xa, &x, may_differ)}));
+                            "fields_differing_from_a": diff_fields(&xa, &x, may_differ)}),
+                        );
                     }
                 }
                 rows.push(row);
@@ -521,9 +563,14 @@ fn main() {
     for x in RULES {
         writeln!(md, "### {} (`{x}`)\n", short(x)).unwrap();
         writeln!(md, "| set | p | seed | arm | sel/call | A/X 0 | 0.1 | 1 | E25/X 0 | 0.1 | 1 | B″/X 0 | 0.1 | 1 | X/rho 0 | 0.1 | 1 |").unwrap();
-        writeln!(md, "|:--|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
+        writeln!(
+            md,
+            "|:--|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|"
+        )
+        .unwrap();
         for r in &rows {
-            let v = |n: &str, g: usize| r[n]["S"][g].as_f64().unwrap() / r[x]["S"][g].as_f64().unwrap();
+            let v =
+                |n: &str, g: usize| r[n]["S"][g].as_f64().unwrap() / r[x]["S"][g].as_f64().unwrap();
             let o = |g: usize| r[x]["over_rho"][g].as_f64().unwrap();
             writeln!(
                 md,
@@ -582,7 +629,10 @@ fn main() {
                     let ah: Vec<usize> = (0..3)
                         .map(|g| {
                             sel.iter()
-                                .filter(|r| r[rf][k][g].as_f64().unwrap() / r[x][k][g].as_f64().unwrap() > 1.0)
+                                .filter(|r| {
+                                    r[rf][k][g].as_f64().unwrap() / r[x][k][g].as_f64().unwrap()
+                                        > 1.0
+                                })
                                 .count()
                         })
                         .collect();
@@ -595,8 +645,10 @@ fn main() {
                     short(x), cells[0], cells[1], cells[2], ahead[0], ahead[1], ahead[2], sig[0], sig[1], sig[2]
                 )
                 .unwrap();
-                ranks.push(json!({"x": x, "reference": rf, "set": set, "rows": n, "ranges": rr,
-                    "rows_x_ahead": ahead, "order": prim, "order_sigma": sig}));
+                ranks.push(
+                    json!({"x": x, "reference": rf, "set": set, "rows": n, "ranges": rr,
+                    "rows_x_ahead": ahead, "order": prim, "order_sigma": sig}),
+                );
                 if rf == "chain-counted" && set != "all" {
                     band_checks.insert(format!("{x}_{set}"), json!(rr));
                 }
@@ -604,8 +656,16 @@ fn main() {
         }
     }
     // Distance to rho.
-    writeln!(md, "\n### Distance to the matched rho (`S_X / rho`, walk (iii))\n").unwrap();
-    writeln!(md, "| X | rows | 0 GAE | 0.1 GAE | 1 GAE | rows below rho |").unwrap();
+    writeln!(
+        md,
+        "\n### Distance to the matched rho (`S_X / rho`, walk (iii))\n"
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "| X | rows | 0 GAE | 0.1 GAE | 1 GAE | rows below rho |"
+    )
+    .unwrap();
     writeln!(md, "|:--|:--|:--|:--|:--|--:|").unwrap();
     let mut rho_ranges = Vec::new();
     let mut any_below = false;
@@ -616,21 +676,37 @@ fn main() {
             let mut rr = Vec::new();
             let mut below = 0;
             for g in 0..3 {
-                let v: Vec<f64> = sel.iter().map(|r| r[x]["over_rho"][g].as_f64().unwrap()).collect();
+                let v: Vec<f64> = sel
+                    .iter()
+                    .map(|r| r[x]["over_rho"][g].as_f64().unwrap())
+                    .collect();
                 below += v.iter().filter(|&&q| q < 1.0).count();
                 let (lo, hi) = range(&v);
                 rr.push(json!([lo, hi]));
                 cells.push(format!("{}–{}", sci(lo), sci(hi)));
             }
             any_below |= below > 0;
-            writeln!(md, "| {} | {set} ({}) | {} | {} | {} | {below} |", short(x), sel.len(), cells[0], cells[1], cells[2]).unwrap();
+            writeln!(
+                md,
+                "| {} | {set} ({}) | {} | {} | {} | {below} |",
+                short(x),
+                sel.len(),
+                cells[0],
+                cells[1],
+                cells[2]
+            )
+            .unwrap();
             rho_ranges.push(json!({"x": x, "set": set, "ranges": rr, "rows_below_rho": below}));
         }
     }
 
     // A/A across streams: S_A / S_F on E36's stream (E27 A, E36 F) vs here.
     writeln!(md, "\n### A/A across streams (GLS rows): `S_A / S_F` on E25's stream (E27's A, E36's F) and on the fresh stream\n").unwrap();
-    writeln!(md, "| p | seed | arm | E36 0 | 0.1 | 1 | E37 0 | 0.1 | 1 | Δ 0 | Δ 0.1 | Δ 1 |").unwrap();
+    writeln!(
+        md,
+        "| p | seed | arm | E36 0 | 0.1 | 1 | E37 0 | 0.1 | 1 | Δ 0 | Δ 0.1 | Δ 1 |"
+    )
+    .unwrap();
     writeln!(md, "|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
     let mut aa = Vec::new();
     let mut g173 = true;
@@ -643,7 +719,10 @@ fn main() {
                 .iter()
                 .map(|g| {
                     (f(&xa, "total_muls") + GAE * g * f(&xa, "macaulay_entries"))
-                        / (f(&xf, "total_muls") + GAE * g * (f(&xf, "macaulay_entries") + f(&xf, "pivot_selection_ops")))
+                        / (f(&xf, "total_muls")
+                            + GAE
+                                * g
+                                * (f(&xf, "macaulay_entries") + f(&xf, "pivot_selection_ops")))
                 })
                 .collect();
             let r = rows
@@ -651,7 +730,10 @@ fn main() {
                 .find(|r| r["set"] == "gls" && r["p"] == p && r["seed"] == seed && r["arm"] == a)
                 .unwrap();
             let new: Vec<f64> = (0..3)
-                .map(|g| r["chain-counted"]["S"][g].as_f64().unwrap() / r["chain-fifo"]["S"][g].as_f64().unwrap())
+                .map(|g| {
+                    r["chain-counted"]["S"][g].as_f64().unwrap()
+                        / r["chain-fifo"]["S"][g].as_f64().unwrap()
+                })
                 .collect();
             let d: Vec<f64> = (0..3).map(|g| new[g] - old[g]).collect();
             g173 &= d[0].abs() <= 0.05 && d[1].abs() <= 0.01 && d[2].abs() <= 0.002;
@@ -686,7 +768,9 @@ fn main() {
         let v: Vec<f64> = rows
             .iter()
             .filter(|r| r["set"] == "gls")
-            .map(|r| r["macaulay"]["S"][0].as_f64().unwrap() / r["chain-fifo"]["S"][0].as_f64().unwrap())
+            .map(|r| {
+                r["macaulay"]["S"][0].as_f64().unwrap() / r["chain-fifo"]["S"][0].as_f64().unwrap()
+            })
             .collect();
         range(&v)
     };
@@ -707,11 +791,16 @@ fn main() {
         && inside("chain-fifo", "e24", 0, 1.30, 1.70)
         && inside("chain-fifo", "e24", 1, 1.05, 1.15)
         && inside("chain-fifo", "e24", 2, 1.005, 1.020);
-    let g171 = RULES.iter().all(|x| rank_of(x, "chain-sparsest-est", "all") == "unresolved")
+    let g171 = RULES
+        .iter()
+        .all(|x| rank_of(x, "chain-sparsest-est", "all") == "unresolved")
         && {
             let b: Vec<f64> = rows
                 .iter()
-                .map(|r| r["chain-sparsest-est"]["S"][0].as_f64().unwrap() / r["chain-fifo"]["S"][0].as_f64().unwrap())
+                .map(|r| {
+                    r["chain-sparsest-est"]["S"][0].as_f64().unwrap()
+                        / r["chain-fifo"]["S"][0].as_f64().unwrap()
+                })
                 .collect();
             let (lo, hi) = range(&b);
             lo >= 0.92 && hi < 1.0
@@ -772,6 +861,10 @@ fn main() {
         "health": health,
         "verdict_checks": verdict,
     });
-    fs::write(format!("{dir}/summary.json"), serde_json::to_string_pretty(&summary).unwrap()).unwrap();
+    fs::write(
+        format!("{dir}/summary.json"),
+        serde_json::to_string_pretty(&summary).unwrap(),
+    )
+    .unwrap();
     print!("{md}");
 }

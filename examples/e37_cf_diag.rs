@@ -123,7 +123,6 @@ fn first_difference(clean: &ReadProbe, bad: &ReadProbe) -> u8 {
     }
 }
 
-
 fn main() {
     for (p, seed) in [(101u64, 1u64), (397, 2)] {
         let ki = generate_gls_klein_instance(p, seed, 16).expect("instance");
@@ -141,7 +140,9 @@ fn main() {
             let tseed = mix64(sseed ^ residuals.wrapping_mul(0x9E37_79B9_7F4A_7C15));
             residuals += 1;
             let r = curve.add(&curve.mul(&ki.inst.g, a), &curve.mul(&ki.inst.q, b));
-            let Some(z_r) = ki.z_of_x(f, &r.x) else { continue };
+            let Some(z_r) = ki.z_of_x(f, &r.x) else {
+                continue;
+            };
             done += 1;
             let mut fp = 0u64;
             let comps = v4_system(&pre, f, &z_r, &mut fp);
@@ -149,13 +150,24 @@ fn main() {
                 let mut tr = StdRng::seed_from_u64(tseed);
                 let mut st = QuarticSolve::default();
                 probe_begin();
-                let (_s, _d, info) = solve_weighted_chain_with(&comps, MACAULAY_BOUND, p, &mut tr, &mut st, pivot);
+                let (_s, _d, info) =
+                    solve_weighted_chain_with(&comps, MACAULAY_BOUND, p, &mut tr, &mut st, pivot);
                 (st, probe_end(), info.fell_back)
             };
             let c = run(Pivot::Rule(ArrivalRule::Fifo, RuleCheck::default()));
             let contested: HashSet<u32> = c.1.contested.iter().copied().collect();
-            let cstar = c.1.reads.iter().find(|r| r.0 == 1 && contested.contains(&r.1)).map(|r| r.1);
-            let bad = run(Pivot::Rule(ArrivalRule::Fifo, RuleCheck { misfile_at: cstar, ..Default::default() }));
+            let cstar =
+                c.1.reads
+                    .iter()
+                    .find(|r| r.0 == 1 && contested.contains(&r.1))
+                    .map(|r| r.1);
+            let bad = run(Pivot::Rule(
+                ArrivalRule::Fifo,
+                RuleCheck {
+                    misfile_at: cstar,
+                    ..Default::default()
+                },
+            ));
             let (ka, kb) = (log_key(&c.1), log_key(&bad.1));
             let k = ka.iter().zip(&kb).position(|(x, y)| x != y);
             let first0 = c.1.reads.iter().find(|r| r.0 == 0).map(|r| r.1);
@@ -165,7 +177,17 @@ fn main() {
                 c.0.reached_pivots, bad.0.reached_pivots, c.2, bad.2, ka.len(), kb.len(),
                 k.map(|k| ka.get(k)), k.map(|k| kb.get(k))
             );
-            let _ = (HashMap::<u8, u8>::new(), take_diag(), PivotCheck::default(), PivotRule::Lowest, lift_back_v4 as usize, json!(0), CURVES, RULES, CALLS_PER_CURVE);
+            let _ = (
+                HashMap::<u8, u8>::new(),
+                take_diag(),
+                PivotCheck::default(),
+                PivotRule::Lowest,
+                lift_back_v4 as usize,
+                json!(0),
+                CURVES,
+                RULES,
+                CALLS_PER_CURVE,
+            );
         }
     }
 }

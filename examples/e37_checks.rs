@@ -189,7 +189,10 @@ fn main() {
             let same = |x: &Run, y: &Run| (&x.0, x.1, &x.2) == (&y.0, y.1, &y.2);
             let at = format!("p = {p} seed {seed} call {calls}");
             let ua = run(&comps, Pivot::Uncounted { sparsest: false });
-            let ac = run(&comps, Pivot::Counted(PivotRule::Lowest, PivotCheck::default()));
+            let ac = run(
+                &comps,
+                Pivot::Counted(PivotRule::Lowest, PivotCheck::default()),
+            );
             let has_sols = ua.0.as_ref().is_some_and(|s| !s.is_empty());
             nonempty += usize::from(has_sols);
             let mut clean: Vec<Run> = Vec::new();
@@ -221,7 +224,11 @@ fn main() {
                 t.calls += 1;
                 t.aimed += usize::from(aimed);
                 t.effective += usize::from(effective > 0);
-                let kind = if aimed { first_difference(&clean.4, &bad.4) } else { 2 };
+                let kind = if aimed {
+                    first_difference(&clean.4, &bad.4)
+                } else {
+                    2
+                };
                 match kind {
                     0 => t.positive += 1,
                     1 => t.structural += 1,
@@ -285,12 +292,11 @@ fn main() {
             {
                 let c = &clean[0];
                 let contested: HashSet<u32> = c.4.contested.iter().copied().collect();
-                let cstar = c
-                    .4
-                    .reads
-                    .iter()
-                    .find(|r| r.0 == 1 && contested.contains(&r.1))
-                    .map(|r| r.1);
+                let cstar =
+                    c.4.reads
+                        .iter()
+                        .find(|r| r.0 == 1 && contested.contains(&r.1))
+                        .map(|r| r.1);
                 let _ = take_diag();
                 let bad = run(
                     &comps,
@@ -307,7 +313,9 @@ fn main() {
             }
             calls += 1;
         }
-        per_curve.push(json!({"p": p, "seed": seed, "calls": calls - calls0, "residuals_drawn": residuals}));
+        per_curve.push(
+            json!({"p": p, "seed": seed, "calls": calls - calls0, "residuals_drawn": residuals}),
+        );
         eprintln!(
             "p={p} seed={seed}: {} calls; so far positive/detected C_SH(S) {}/{}, C_SH(H) {}/{}, C_F {}/{}",
             calls - calls0,
@@ -319,11 +327,17 @@ fn main() {
             t_f.detected_positive
         );
     }
-    check(calls == CURVES.len() * CALLS_PER_CURVE, format!("calls {calls}"));
+    check(
+        calls == CURVES.len() * CALLS_PER_CURVE,
+        format!("calls {calls}"),
+    );
     for (i, (_, name)) in RULES.iter().enumerate() {
         check(
             perturb[i] == nonempty,
-            format!("{name}: perturbed coefficient detected {}/{nonempty}", perturb[i]),
+            format!(
+                "{name}: perturbed coefficient detected {}/{nonempty}",
+                perturb[i]
+            ),
         );
     }
     let out = json!({

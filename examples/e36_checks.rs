@@ -112,9 +112,15 @@ fn main() {
             };
             let at = format!("p = {p} call {calls}");
             let ua = run(&comps, Pivot::Uncounted { sparsest: false });
-            let ac = run(&comps, Pivot::Counted(PivotRule::Lowest, PivotCheck::default()));
+            let ac = run(
+                &comps,
+                Pivot::Counted(PivotRule::Lowest, PivotCheck::default()),
+            );
             let _ = take_diag();
-            let lo = run(&comps, Pivot::Rule(ArrivalRule::Lowest, RuleCheck::default()));
+            let lo = run(
+                &comps,
+                Pivot::Rule(ArrivalRule::Lowest, RuleCheck::default()),
+            );
             let dg = take_diag();
             check(
                 (&lo.0, lo.1, &lo.2) == (&ua.0, ua.1, &ua.2),
@@ -197,7 +203,10 @@ fn main() {
     for (i, (_, name)) in RULES.iter().enumerate() {
         check(
             perturb_detected[i] == nonempty,
-            format!("{name}: perturbed coefficient detected {}/{nonempty}", perturb_detected[i]),
+            format!(
+                "{name}: perturbed coefficient detected {}/{nonempty}",
+                perturb_detected[i]
+            ),
         );
     }
     // A corruption that moves no different contents cannot be detected by any

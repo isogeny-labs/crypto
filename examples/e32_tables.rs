@@ -42,14 +42,19 @@ impl SplitMix {
 }
 
 fn read(path: &str) -> Value {
-    serde_json::from_str(&fs::read_to_string(path).unwrap_or_else(|e| panic!("{path}: {e}"))).unwrap()
+    serde_json::from_str(&fs::read_to_string(path).unwrap_or_else(|e| panic!("{path}: {e}")))
+        .unwrap()
 }
 
 fn flat(v: &Value, pre: &str, out: &mut BTreeMap<String, Value>) {
     match v {
         Value::Object(m) => {
             for (k, x) in m {
-                let key = if pre.is_empty() { k.clone() } else { format!("{pre}.{k}") };
+                let key = if pre.is_empty() {
+                    k.clone()
+                } else {
+                    format!("{pre}.{k}")
+                };
                 flat(x, &key, out);
             }
         }
@@ -123,7 +128,13 @@ fn pct(v: &mut [f64], q: f64) -> f64 {
     let k = (v.len() - 1) as f64 * q;
     let (lo, hi) = (k.floor() as usize, k.ceil() as usize);
     if v[hi].is_infinite() {
-        return if v[lo].is_infinite() { f64::INFINITY } else if lo == hi { v[lo] } else { f64::INFINITY };
+        return if v[lo].is_infinite() {
+            f64::INFINITY
+        } else if lo == hi {
+            v[lo]
+        } else {
+            f64::INFINITY
+        };
     }
     v[lo] + (v[hi] - v[lo]) * (k - lo as f64)
 }
@@ -139,7 +150,10 @@ fn num(x: f64) -> Value {
 fn bootstrap(rows: &[Row], wi: usize, pmin: u64, model: Model, rng: &mut SplitMix) -> Value {
     let mut strata: BTreeMap<u64, Vec<(f64, f64)>> = BTreeMap::new();
     for r in rows.iter().filter(|r| r.p >= pmin) {
-        strata.entry(r.p).or_default().push((r.log2n - X0, r.d[wi].log2()));
+        strata
+            .entry(r.p)
+            .or_default()
+            .push((r.log2n - X0, r.d[wi].log2()));
     }
     let pts: Vec<(f64, f64)> = strata.values().flatten().copied().collect();
     if pts.len() < 2 {
@@ -202,8 +216,14 @@ fn fmt_inf(v: &Value) -> String {
 
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
-    let dir = args.first().cloned().unwrap_or("experiments/36_handover_ladder".into());
-    let e27 = args.get(1).cloned().unwrap_or("experiments/32_walk_karatsuba".into());
+    let dir = args
+        .first()
+        .cloned()
+        .unwrap_or("experiments/36_handover_ladder".into());
+    let e27 = args
+        .get(1)
+        .cloned()
+        .unwrap_or("experiments/32_walk_karatsuba".into());
 
     // G2.114: identity against E27.
     let summ = read(&format!("{e27}/summary.json"));
@@ -215,14 +235,22 @@ fn main() {
             if fs::metadata(&icf).is_ok() {
                 let mine = read(&icf);
                 let refs = read(&format!("{e27}/e2e_chain_karatsuba_p{p}s{s}.json"));
-                let r = refs.as_array().unwrap().iter().find(|r| r["arm"] == "B").unwrap();
+                let r = refs
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|r| r["arm"] == "B")
+                    .unwrap();
                 let (mut a, mut b) = (BTreeMap::new(), BTreeMap::new());
                 flat(&mine, "", &mut a);
                 flat(r, "", &mut b);
                 a.retain(|k, _| !ignored(k));
                 b.retain(|k, _| !ignored(k));
                 let keys: std::collections::BTreeSet<&String> = a.keys().chain(b.keys()).collect();
-                let diff: Vec<&String> = keys.into_iter().filter(|k| a.get(*k) != b.get(*k)).collect();
+                let diff: Vec<&String> = keys
+                    .into_iter()
+                    .filter(|k| a.get(*k) != b.get(*k))
+                    .collect();
                 item["ic_fields_compared"] = json!(b.len());
                 item["ic_diff"] = json!(diff);
             }
@@ -277,7 +305,13 @@ fn main() {
             "walks_correct": w["all_correct"], "ic_wall_s": f(&ic, "wall_ms") / 1e3, "walk_wall_s": w["wall_s"],
             "D": {"0": d[0], "0.1": d[1], "1": d[2]},
         });
-        rows.push(Row { p: ic["p"].as_u64().unwrap(), seed: ic["seed"].as_u64().unwrap(), log2n: n.log2(), d, v });
+        rows.push(Row {
+            p: ic["p"].as_u64().unwrap(),
+            seed: ic["seed"].as_u64().unwrap(),
+            log2n: n.log2(),
+            d,
+            v,
+        });
     }
     rows.sort_by_key(|r| (r.p, r.seed));
 
@@ -293,8 +327,10 @@ fn main() {
             }),
         );
     }
-    let ypts: Vec<(f64, f64)> =
-        rows.iter().map(|r| ((r.p as f64).log2(), f(&r.v, "y").log2())).collect();
+    let ypts: Vec<(f64, f64)> = rows
+        .iter()
+        .map(|r| ((r.p as f64).log2(), f(&r.v, "y").log2()))
+        .collect();
     let (_, by, sey) = ols(&ypts);
 
     let mut sizes: Vec<u64> = rows.iter().map(|r| r.p).collect();
@@ -308,13 +344,20 @@ fn main() {
         for (wi, g) in ["0", "0.1", "1"].iter().enumerate() {
             let mut vals: Vec<f64> = rs.iter().map(|r| r.d[wi]).collect();
             let gm = (vals.iter().map(|v| v.log2()).sum::<f64>() / vals.len() as f64).exp2();
-            let (mn, mx) = (vals.iter().cloned().fold(f64::MAX, f64::min), vals.iter().cloned().fold(0.0, f64::max));
-            o[format!("D_{g}")] = json!({"median": median(&mut vals), "min": mn, "max": mx, "geomean": gm});
+            let (mn, mx) = (
+                vals.iter().cloned().fold(f64::MAX, f64::min),
+                vals.iter().cloned().fold(0.0, f64::max),
+            );
+            o[format!("D_{g}")] =
+                json!({"median": median(&mut vals), "min": mn, "max": mx, "geomean": gm});
         }
         per_size.push(o);
     }
     let reached = rows.iter().map(|r| r.log2n).fold(0.0, f64::max);
-    let below = rows.iter().filter(|r| r.d.iter().any(|&x| x <= 1.0)).count();
+    let below = rows
+        .iter()
+        .filter(|r| r.d.iter().any(|&x| x <= 1.0))
+        .count();
 
     // LA sensitivity: share extrapolated to the M2 n* at 0 GAE (LA ∝ p², the rest ∝ p).
     let la_ext = (|| {
@@ -324,7 +367,9 @@ fn main() {
         let ns = fits["0"]["M2"]["log2_nstar"].as_f64()?;
         let pstar = (16.0 * ns.exp2()).powf(0.25);
         let ratio = share / (1.0 - share) * pstar / pb as f64;
-        Some(json!({"p_from": pb, "share_from": share, "p_star": pstar, "share_at_nstar": ratio / (1.0 + ratio)}))
+        Some(
+            json!({"p_from": pb, "share_from": share, "p_star": pstar, "share_at_nstar": ratio / (1.0 + ratio)}),
+        )
     })();
 
     let summary = json!({
@@ -335,8 +380,16 @@ fn main() {
         "reached_log2n": reached, "rows_at_or_below_rho_any_weight": below, "la_extrapolation": la_ext,
         "bootstrap": {"replicates": B, "rng": "SplitMix64", "seed": 32, "strata": "size", "unit": "curve"},
     });
-    fs::write(format!("{dir}/summary.json"), serde_json::to_string_pretty(&summary).unwrap()).unwrap();
-    fs::write(format!("{dir}/fit.json"), serde_json::to_string_pretty(&summary["fits"]).unwrap()).unwrap();
+    fs::write(
+        format!("{dir}/summary.json"),
+        serde_json::to_string_pretty(&summary).unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        format!("{dir}/fit.json"),
+        serde_json::to_string_pretty(&summary["fits"]).unwrap(),
+    )
+    .unwrap();
 
     let mut t = String::from("# E32 tables (examples/e32_tables.rs)\n\n## Per curve\n\n");
     t += "| p | seed | log₂ n | cols | y | C median | E / residual | solve % | LA % | S | rho (iii) | steps/√n | mul/step | D(0) | D(0.1) | D(1) |\n";
@@ -354,11 +407,22 @@ fn main() {
     for o in &per_size {
         let cell = |g: &str| {
             let d = &o[format!("D_{g}")];
-            format!("{:.3e} [{:.2e}, {:.2e}]", f(d, "median"), f(d, "min"), f(d, "max"))
+            format!(
+                "{:.3e} [{:.2e}, {:.2e}]",
+                f(d, "median"),
+                f(d, "min"),
+                f(d, "max")
+            )
         };
         t += &format!(
             "| {} | {} | {:.2} | {:.0} | {} | {} | {} |\n",
-            o["p"], o["curves"], f(o, "log2n"), f(o, "y_median"), cell("0"), cell("0.1"), cell("1")
+            o["p"],
+            o["curves"],
+            f(o, "log2n"),
+            f(o, "y_median"),
+            cell("0"),
+            cell("0.1"),
+            cell("1")
         );
     }
     t += "\n## Fits: log₂ D = α + β (log₂ n − 32); crossover log₂ n* = 32 − α/β\n\n| GAE | model | curves | β [95 %] | log₂ n* [95 %] | P(β ≥ 0) |\n|--:|:--|--:|:--|:--|--:|\n";
@@ -370,9 +434,13 @@ fn main() {
             }
             t += &format!(
                 "| {g} | {m} | {} | {:.4} [{:.4}, {:.4}] | {} [{}, {}] | {:.4} |\n",
-                x["n_curves"], f(x, "beta"), x["ci95"]["beta"][0].as_f64().unwrap(),
-                x["ci95"]["beta"][1].as_f64().unwrap(), fmt_inf(&x["log2_nstar"]),
-                fmt_inf(&x["ci95"]["log2_nstar"][0]), fmt_inf(&x["ci95"]["log2_nstar"][1]),
+                x["n_curves"],
+                f(x, "beta"),
+                x["ci95"]["beta"][0].as_f64().unwrap(),
+                x["ci95"]["beta"][1].as_f64().unwrap(),
+                fmt_inf(&x["log2_nstar"]),
+                fmt_inf(&x["ci95"]["log2_nstar"][0]),
+                fmt_inf(&x["ci95"]["log2_nstar"][1]),
                 f(x, "frac_beta_nonneg")
             );
         }
