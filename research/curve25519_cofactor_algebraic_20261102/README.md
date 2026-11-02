@@ -63,3 +63,13 @@ Not an improvement: the criterion needs at least 3 hits in both arms in a cell, 
 5. Runs were local (not isolab-eks), as instructed by the task; counts are operation counts, independent of load.
 6. No supplementary larger-target run was done.
 7. Clippy: `cargo clippy --release --lib --bin curve25519_family -- -D warnings` exit 0 (only the environmental unknown-lint `clippy::chunks_exact_to_as_chunks` warning).
+
+Report PDF: [REPORT.pdf](REPORT.pdf).
+
+## Coordinator note (reading, not a new measurement)
+
+Each lift is a separate F4 system of the same size, so with 8 lifts the cost per target rises
+×8 and the best the yield can do is rise ×8: per relation, independent lifts are at best
+cost-neutral. A cofactor-aware oracle can only win if the 8 lifts share one system (for
+example a single system in a coordinate invariant under the `E[8]` action, or one system with
+the torsion choice as a variable). That is not what was measured here.
