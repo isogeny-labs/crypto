@@ -170,3 +170,34 @@ curve, L0 local. Raw sessions over 64 KiB are not committed; their sha256 is
 listed. Success criterion (CLAUDE.md): the gap is a distance remaining;
 re-labelling and accounting changes are not improvements, and this experiment
 claims none.
+
+## Amendment 1 (after the first session was started and stopped; before any measured record was read)
+
+Reason: session 1 of `spec.json` was started and killed (by its own PID)
+after its warm-up round and the first 2 of 4 warm-up records had completed
+(the warm-up records are discarded by ecbench from every table). A
+pkm-iso-t6-g4 solve of the warm-up target took 296 s wall and 161,147 F4
+calls (about 10,000 trials at 16 branches), against 38 s for the one-target
+probe, so the 12-target, 2-round plan (50 algebraic solves) would take
+about four hours on this loaded box. I saw the warm-up records' cost line
+before deciding: the pkm arm there had S(w=0) = 34.5 (the proj-a warm-up
+record 12.6), i.e. above the baseline at w = 0 on that one target; that
+already speaks against P2 as written, and P2 is **kept unchanged** and will be
+judged on the measured records.
+
+Changes (nothing else): `spec_a1.json` = `spec.json` with 6 targets
+(the same first 6 targets of the same `target_seed`), 1 measured round, no
+warm-up (counts do not need a warm-up; the A/A arm stays); sha256
+`71c30d842f980f85bc6c14b3b0d52680f44c3a6ac1ca6dd7db6560b6efda236c`. `spec_g0_a1.json` = `spec_g0.json` with 1 target (the first
+target of the same seed) and timeout 5400 s; sha256 `a88357240450843af37e3717c1325e53b6c79f5e6954217633ec3ca5b8a83c4a`.
+Predictions P1 to P3 are unchanged. P4 is replaced: at the observed trial
+counts a G = 0 solve costs about 5.55e7 multiply-adds per trial times
+thousands of trials, i.e. several hours; a G = 0 solve is expected to hit
+the 5400 s timeout, in which case the extrapolation rule above applies and
+the per-trial ratio is taken from lead 4's measurement (5.55e7 / 7.1e5 =
+78.2 multiply-adds per F4-decided target, G = 0 against G = 4, 100 targets
+at k = 20), not from this session. If the G = 0 solve does finish, P4 is
+judged as written (`solver.ops / trials` ratio below 20 falsifies it).
+With 6 targets the mean S of every arm is noisier; the ratios asked by P1
+are of order 10^3 to 10^4 in the probe, far from the threshold, and the
+README reports the per-target spread.
