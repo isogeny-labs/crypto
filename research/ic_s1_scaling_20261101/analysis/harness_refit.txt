@@ -1,0 +1,19 @@
+cell | n l calls | whole | child(-3.5e7) | startup | emitter(src) | solver-only | harness-free | share(child+start) | share(emitter+start) | ratio whole / harness-free / solver-only
+K0 n=9      n9 l6 calls 15 | 1.01e+09 | 6.02e+08 | 2.15e+08 | 6.02e+08 (est) | 1.97e+08 | 1.97e+08 | 0.81 | 0.81 | 3.43 / 0.67 / 0.67
+K1 n=9      n9 l3 calls 12 | 4.81e+08 | 2.75e+08 | 1.6e+08 | 2.21e+08 (est) | 4.64e+07 | 1e+08 | 0.90 | 0.79 | 2.03 / 0.42 / 0.20
+K1 n=11     n11 l8 calls 32 | 3.87e+09 | 2.04e+09 | 4.71e+08 | 1.92e+09 (S2) | 1.37e+09 | 1.48e+09 | 0.65 | 0.62 | 8.49 / 3.25 / 3.00
+K0 n=13     n13 l8 calls 41 | 5.74e+09 | 2.92e+09 | 6.04e+08 | 2.91e+09 (S2) | 2.09e+09 | 2.23e+09 | 0.64 | 0.61 | 5.57 / 2.16 / 2.03
+K0 n=15     n15 l10 calls 48 | 1.34e+10 | 6.05e+09 | 7.8e+08 | 6.05e+09 (S2) | 6.61e+09 | 6.61e+09 | 0.51 | 0.51 | 7.27 / 3.57 / 3.57
+K1 n=15     n15 l3 calls 150 | 4.81e+09 | 1.9e+09 | 2.03e+09 | 1.9e+09 (est) | 8.84e+08 | 8.84e+08 | 0.82 | 0.82 | 3.67 / 0.67 / 0.67
+K1 n=17     n17 l11 calls 220 | 9.23e+10 | 3.65e+10 | 3.78e+09 | 3.2e+10 (est) | 5.21e+10 | 5.66e+10 | 0.44 | 0.39 | 10.80 / 6.62 / 6.10
+K0 n=19     n19 l12 calls 342 | 2.43e+11 | 7.63e+10 | 6.4e+09 | 6.07e+10 (est) | 1.6e+11 | 1.76e+11 | 0.34 | 0.28 | 11.49 / 8.32 / 7.59
+K1 n=19     n19 l14 calls 458 | 4.62e+11 | 1.42e+11 | 1e+10 | 9.53e+10 (est) | 3.1e+11 | 3.57e+11 | 0.33 | 0.23 | 17.52 / 13.53 / 11.76
+K0 n=13 s2  n13 l3 calls 156 | 4.93e+09 | 1.87e+09 | 2.1e+09 | 1.87e+09 (est) | 9.58e+08 | 9.58e+08 | 0.81 | 0.81 | 4.91 / 0.95 / 0.95
+fit harness-free (whole - emitter - start-up) | all 10 k=10: slope +0.264 +- 0.155 (CI +0.110..+0.419) x2.88/4bits -> growing
+fit harness-free (whole - emitter - start-up) | without n=19 k=8: slope +0.217 +- 0.259 (CI -0.043..+0.476) x2.38/4bits -> undecided
+fit solver-only (S1 metric, ratio of medians) | all 10 k=10: slope +0.287 +- 0.164 (CI +0.122..+0.451) x3.15/4bits -> growing
+fit solver-only (S1 metric, ratio of medians) | without n=19 k=8: slope +0.261 +- 0.283 (CI -0.022..+0.545) x2.84/4bits -> undecided
+fit whole run (ratio of medians) | all 10    k=10: slope +0.144 +- 0.085 (CI +0.059..+0.228) x1.78/4bits -> growing
+fit whole run (ratio of medians) | without n=19 k=8: slope +0.123 +- 0.140 (CI -0.018..+0.263) x1.63/4bits -> undecided
+share share_child_start: slope per bit -0.0488 +- 0.0243 (p=0.002)
+share share_emit_start: slope per bit -0.0512 +- 0.0279 (p=0.003)
