@@ -69,3 +69,28 @@ These are measurements of the algebraic track's distance, not improvement
 claims against the generic incumbent. Hybrid guessing, chained S₃ and shared
 preprocessing (owner's item 6) are next steps, and only once Q-B shows which
 model is cheapest.
+
+## Amendment 1 (2026-11-02, before any Q-B or Q-C data): hybrid guessing
+
+Owner request: add hybrid guessing to the bits form. `pkm-semaev` gains
+`guess=G` (bits form only, `G < bits`, `G ≤ 12`). For a target, the oracle
+enumerates the `2^G` assignments of the top G bits of the first summand,
+runs F4 on each reduced system, and stops at the first consistent branch.
+The target is refuted only when all branches refute. Every branch's F4
+multiply-adds are charged; `pkm_guess_branches_solved` counts the systems
+solved. Unit test: for `G ∈ {1, 2}` the verdicts equal the grid's and the
+exact decomposable set on random and planted targets.
+
+### Q-C: guessing sweep
+
+The bits form on the k = 20 miniature at the t that the Q-B ladder shows
+cheapest in S at w = 0.1, with `G ∈ {0, 1, 2, 3, 4}` at that t. The same
+4 targets, seed and timeout as Q-B. The cost target is the owner's
+`C(G) = 2^G·C_solve(after G)` plus grid recovery and verification, read
+as F4 multiply-adds per call (`ecbench` solver block) and as S across the
+band.
+
+Prediction **C1**: total F4 multiply-adds per target first fall with G,
+because each branch has G fewer Boolean variables and a lower solving
+degree. They then rise once `2^G` dominates. The best G lies in 1 … 3. The
+relation verdicts are independent of G, since refutation is exact.
