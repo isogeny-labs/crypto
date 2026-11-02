@@ -1,0 +1,34 @@
+card: CARD-isogeny-vs-mu-factor-base-20261102-2 (sha256 b65c0f2233ca44bef8ae6f95dffe07c82d0f6b96778f99468c172794f27063b8)
+commit: e2cb73312b89577d7673a48b71efafb452427812
+receipt: research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102.receipt.json sha256 974f62496ef2734eb4fbbd6d2e3a4cd2709dc102ef6083b61aa0e29758d4e437
+status: completed
+command 1 (run-q4-search): ["research/isogeny_vs_mu_factor_base_20261102/run_q4.sh", "research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102"] exit 0 (846.182 s) succeeded
+  stdout sha256 db01a95eec44ef811530c7b266c33b1980db3be8ffa8f4ca2a8aaab15f2bd26d; last 1 lines:
+    {"schema":"isomu-q4-verdicts/v1","systems":6828,"gate_failures":0,"grevlex_comparisons":16,"sel_grevlex_improvement_count":0,"sel_grevlex_verdict":"no_improvement","sel_lex_improvement_count":16,"sel_lex_verdict":"improvement","rep_improvement_count":0,"rep_verdict":"no_improvement","best_improvement_count":0,"best_verdict":"no_improvement","median_spearman_density_termops_grevlex":0.134}
+  stderr last 12 lines:
+    warning: variable does not need to be mutable
+        --> src/main.rs:1051:17
+         |
+    1051 |             let mut eval = |r: &Repr, s4: &mut String| -> f64 {
+         |                 ----^^^^
+         |                 |
+         |                 help: remove this `mut`
+         |
+         = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+    warning: `isomu_search` (bin "isomu_search") generated 1 warning (run `cargo fix --bin "isomu_search" -p isomu_search` to apply 1 suggestion)
+        Finished `release` profile [optimized] target(s) in 0.00s
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_verdicts.json: db01a95eec44ef811530c7b266c33b1980db3be8ffa8f4ca2a8aaab15f2bd26d
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_summary.json: 20a818cfae2e408b455ab7f0fb51e5c1c5a9ad7bc901c187752cc804dcb5ef6c
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_s1_search.csv: 8ac8bb8d66aa5c8155f03f461fa63e3c4b8f794f2f7686bbb92e42284a1c3571
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_candidates.csv: 173997744611bc9551b7655dc91fef4212168210be5b18eb07e7c4020ad84069
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_selection_systems.csv: a37445d760125830b48c786642180bad295af56ce5df2512aa7cdfcdec8c09be
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_systems.csv: 1541b37829f3448db6eafc7dadac4dfd601be39ff4bf423ee3fad19816022a32
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_yield.csv: d20bbe96d298edb885845954bc8d06c8948d72de88ef533c2f9428aaea57da01
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/q4_cells.csv: 6fbd806f69740cc30e714d529423a094f80c5637d0af939fea2c923fc4aa59c0
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/host.txt: 93ba86941b1f57e1748bca7ad533e1d79fa683b8fde59bd6f02b7a707ba13c7b
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/SHA256SUMS: 072856be521a1bedbc5255158317ebf9933b6ef0e81c1aa0bb2ab9f135bedcdb
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/progress.log: 44dc0c422af66ce21d53ae6d9b7033526f750c862ac43eac7007a841fe2859de
+  output research/isogeny_vs_mu_factor_base_20261102/results/run-q4-20261102/cargo-test.log: 9b81394cbaa325e11ee34dd1d28f8ecf75a3ffbe5dcbf8f6dbce1bea4d9ea0db
+
+[exited with code 0]
