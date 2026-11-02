@@ -4476,3 +4476,103 @@ At `1` GAE the Macaulay entries (`≈ 1.8·10⁵` per call) are still almost all
 touches them.  **Not done:** the validation gate, the leaderboard, `benchmarks/`; the unit test in the
 module type-checks but was not executed (a release test build does not fit this container); E24's curves
 were not rerun.
+
+### 9.44 E37 pre-registration: a confirmation run of E36's pivot rules F, S and H, with controls that corrupt state the solve reads
+
+*Registered 2026-11-02, before any E37 code or run.*  **Numbering:** E37 takes §9.44 (this
+registration), §9.45 (results) and G2.164–G2.175.  **What this is.**  A confirmation run of a
+hypothesis E36 generated: E36 (§9.43) measured arrival-order pivots F, and S and H, ahead of A and
+E25 at `0`, `0.1` and `1` GAE on all 20 end-to-end rows, but its registered kill criterion G2.154
+fired (the S/H inverse-map control was detected on 0/32 calls, because it swapped pivot rows the
+normal forms never read), so nothing was ranked.  E37 re-tests F, S and H on fresh target streams,
+on E36's 20 rows and on E24's 12 curves, with negative controls that must be shown, call by call, to
+alter a row the normal-form stage reads.  The hypothesis and every band below come from E36's
+measurements; E37 does not change the rules.  **Class, fixed in advance:** a rule ahead of A at every
+weight on every row, with G2.164 and G2.165 holding, is a measured engineering improvement of the
+baseline (a constant on the echelon); anything else is reported, not ranked.
+
+**Arms (fixed).**  A (E27's solver A: `chain`, here run as `chain-counted`, which E33 showed makes the
+same choices and only emits lead scans), E25 (the existing Macaulay solver, `macaulay`), F
+(`chain-fifo`), S (`chain-static`), H (`chain-fifo-static`), B″ (`chain-sparsest-est`), and the
+matched rho (walk (iii) of E27: Karatsuba products, batched norm inversions, no `[d]G` check).  Every
+IC arm runs with `--karatsuba` (one instrument for every arm; E25 is no longer re-priced from
+schoolbook).  K is not an arm.  L (`chain-lifo`) is a control only.  E36's solver code
+(`chain_pivot_rules.rs`'s rules, `klein_v4`'s dispatch) is reused unchanged.
+
+**Rows (fixed).**  (i) *Stage A:* E25's ten curves (`generate_gls_klein_instance(p, seed, 16)`,
+`p ∈ {101, 149, 197, 269, 397}`, `seed ∈ {1, 2}`), the factor base and precompute from E25's stream
+exactly as E33/E36, then **1,000 fresh targets per curve**: the target generator reseeded
+`StdRng(seed ^ 0xE37A_0001)` after the precompute, per-target solve seed
+`mix64((seed ^ 0xE37A_0001) ^ (i · 0x9E37_79B9_7F4A_7C15))` (E36's rule with the salted seed).
+Solvers per call: existing, A, A counted, B″, A's rule through E36's echelon (positive control), F,
+S, H, L.  One thread.  (ii) *End to end, GLS:* E36's 20 rows (E25's ten curves, arms A and B of the
+pipeline), `quartic_pipeline_gls --rho-runs 16 --max-residuals 5000000 --karatsuba`,
+`RAYON_NUM_THREADS=4`, at most two cores; the factor base, precompute and rho walks exactly as E25,
+**the target stream fresh**: the pipeline's target generator reseeded `StdRng(seed ^ 0xE37E_0001)`
+after the precompute and per-target seeds `mix64((seed ^ 0xE37E_0001) ^ (i · φ))`
+(`--stream-salt 0xE37E0001`; salt `0` is the existing stream, byte for byte).  Every arm on the
+same fresh stream, so every comparison is paired.  (iii) *End to end, E24:* E24's 12 curves
+(`generate_klein_instance(p, seed, 16)`, `p ∈ {101, …, 521}`, `seed ∈ {1, 2}`), `quartic_pipeline_v4`
+with the same flags and the same salt, every arm.  The rho reference of the E24 rows is walk (iii)
+measured on E24's curves (negation fold, E24's walk seeds `1000·seed + k`, `k < 16`) by a new
+example that also replays E24's recorded walks (i) and requires (i), (ii) and (iii) bit-identical,
+as E27's Stage W did.
+
+**Pricing (fixed).**  §5a band: `S(g) = total_muls + 97 g (macaulay_entries + selection)`,
+`rho(g) = rho + 97 g · steps`, `g ∈ {0, 0.1, 1}`, GAE `= 97` `F_p` multiplications.  An order is stated
+only where it holds at all three weights on every row of the set.  *Sensitivities* (not used for
+ranks), now end to end: σ1 lead-scan reads priced for every arm (from the records; E25 takes A's);
+σ2 `|b| − 1` comparisons per contested column for every arm that orders a bucket by a key or index
+(A, S, H's second branch), σ3 one operation per contested column for every rule (F included).  The
+pipelines do not record σ2/σ3 tallies, so σ2/σ3 end to end are priced as the curve's Stage A
+per-call mean × the row's number of calls (an estimate, stated as such).
+
+**Negative controls (fixed).**  A *read probe* (uncharged, off by default) records, for every pivot
+row the normal-form stage (`chain_quotient`: the reachability pass and the left-looking normal
+forms) reads, the column and a hash of the row's entries from that column on.  **Positive check:**
+a control call passes only if the control's read log first differs from the clean run's (same rule,
+same call) at an entry with the same phase and column and a different row hash — a row the normal
+forms read was altered.  **Detection:** the solve's observable outcome (solutions, degree,
+decomposition set after the lift, or the fallback flag) differs from the clean run's.  Control calls:
+E25's ten curves, the first 32 targets per curve of a control stream `StdRng(seed ^ 0xE37C_0001)`
+after E25's precompute (320 calls).  Every control's target is chosen from the clean run's read log
+of the same call, before the corrupted run.
+
+- **C_SH — the S/H inverse permutation, wrong at two read rows** (S and H): after the echelon, the
+  inverse permutation maps the contents of two original rows to each other: `r₁` = the row of the
+  first left-looking normal-form read, `r₂` = the row of the last left-looking read whose row and
+  hash differ from `r₁`'s (E36's control, aimed at rows the solve reads).
+- **C_F — a misfiled arrival** (F): at `c*`, the first contested column in the clean F run's
+  normal-form read log, the bucket's second arrival is moved to the bucket of its next nonzero right
+  of `c*` *without* its update — an arrival filed before its elimination, which breaks the invariant
+  that a row in bucket `l` is zero on every pivot column left of `l`.
+- **C_0 — detector calibration** (F, S, H, L): one nonzero entry right of the pivot of the first
+  normal-form-read row with such an entry moved by one (to a nonzero value).
+- **L — last arrival**, kept as E36's: the same outputs, `C_L > C_A`.  Also kept: E31's perturbed
+  coefficient (every non-empty set changes under F, S, H, L) and F's/L's digests differ from A's.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.164 | identity (**kill**) | F, S, H, L, B″, A counted and A's rule through E36's echelon return the existing solver's solutions, degree, outcome and decomposition set on every Stage A call; the positive control reproduces A counted's phase counts, digest and lead scans on every call; every end-to-end record of F, S, H, B″ equals the same row's A record (same stream) in every field except the solve's multiplications and what derives from them, the selection and lead-scan fields, wall times and the tag; the new binary reproduces byte for byte (canonical JSON without timings) E33's identity hashes (`macaulay`, `chain`, `chain-sparsest`, `chain --karatsuba`), E33's stored `chain-sparsest-est --karatsuba` record, E36's stored `chain-fifo`, `chain-static`, `chain-fifo-static --karatsuba` records and E24's stored `p = 101` seed 2 record (all at `p = 101` seed 2, salt `0`) | any difference (E37 stops) |
+| G2.165 | controls (**kill**) | positive check on `≥ 95 %` of the 320 calls for each of C_SH (S), C_SH (H), C_F; detection on `≥ 75 %` of all 320 calls and on `≥ 95 %` of the calls with a non-empty clean solution set, for each of C_SH (S), C_SH (H), C_F, counting a call without a positive check as not detected; perturbed coefficient detected on every non-empty call under F, S, H, L; F's and L's digests differ from A's on every contested call.  C_0 is reported, with the same thresholds, as the detector's calibration | any control below a threshold (E37 then stops: no rank) |
+| G2.166 | selection work per call (Stage A means) | F, L `0` exactly; S in `[500, 525]`; H − S in `[325, 345]` (E36: `512`–`513`, `334`) | outside |
+| G2.167 | pivot quality on fresh calls (Stage A means, every curve) | `C_A / C_F` in `[1.44, 1.58]`; `C_A / C_S` in `[1.38, 1.49]`; `C_A / C_H` in `[1.48, 1.59]`; `C_L / C_A` in `[1.36, 1.44]`; `C_F / C_B″` in `[1.00, 1.08]` (E36 ± `0.03`) | outside on any curve |
+| G2.168 | Stage A band against A | F, S, H ahead of A at `0`, `0.1` and `1` GAE on every curve; `S_A / S_X` at `1` GAE: F in `[1.009, 1.016]`, S in `[1.006, 1.011]`, H in `[1.006, 1.011]`; no F/S/H order against A changes under σ1–σ3 | any rule behind A at any weight on any curve; a band missed; an order changed by σ1–σ3 |
+| G2.169 | end to end, GLS rows (20, paired, fresh stream) | `S_A / S_X` at `0` / `0.1` / `1` GAE on every row — F: `[1.43, 1.56]` / `[1.085, 1.115]` / `[1.010, 1.015]`; S: `[1.38, 1.47]` / `[1.075, 1.100]` / `[1.006, 1.011]`; H: `[1.47, 1.57]` / `[1.087, 1.110]` / `[1.006, 1.011]`; `S_E25 / S_X > 1` at every weight on every row (`S_E25 / S_F` at `0` GAE in `[3.3, 4.1]`) — **F, S and H ranked ahead of A and E25 across the band on these rows** (if G2.164, G2.165 hold) | any rule behind A or E25 at any weight on any row (that rule unranked); a band missed (reported) |
+| G2.170 | end to end, E24 rows (12, paired, fresh stream) | every log recovered; unsolved and fallbacks `≤ 1 %` of calls for every arm; F, S, H ahead of A and of E25 (Macaulay) at every weight on every row; `S_A / S_F` in `[1.30, 1.70]` / `[1.05, 1.15]` / `[1.005, 1.020]` | a failure; any rule behind A or E25 at any weight on any row; a band missed |
+| G2.171 | against B″ (all rows) | B″ ahead of F at `0` GAE (`S_{B″} / S_F` in `[0.92, 1.0)`) and F ahead of B″ at `0.1` and `1` GAE on every row: **F vs B″ unresolved**; likewise S and H unresolved against B″ | F ranked against B″ either way |
+| G2.172 | the rank (the confirmation) | with G2.164 and G2.165 holding: F ranked ahead of A and E25 across the band on all 32 rows (20 GLS + 12 E24); S and H likewise | F behind A or E25 at any weight on any of the 32 rows |
+| G2.173 | A/A across streams (GLS rows) | per row, `S_A / S_F` on the fresh stream within `0.05` (`0` GAE), `0.01` (`0.1`) and `0.002` (`1` GAE) of E36's value on E25's stream | outside on any row |
+| G2.174 | E24 walk (iii) | all 192 walks (12 curves × 16) identical across (i), (ii), (iii) and equal to E24's records; (i)/(iii) cost in `[1.40, 1.50]` | any difference; outside |
+| G2.175 | distance to the matched rho | rho ahead of every row of every arm at every weight; `S_F / rho` at `0` GAE in `[3·10³, 4·10⁵]` (GLS rows) and `[2·10³, 2·10⁵]` (E24 rows); at `1` GAE in `[6·10⁴, 1·10⁷]` (all rows) | any row below rho; outside |
+
+**Host.**  This 4-vCPU container; isolab-eks is unreachable from it (no `aws`, no `kubectl`) and
+`conductor` is not installed: operation counts only, no wall-time claim.  Binaries built once from
+the commit carrying the controls and harness, pinned by sha256, run from scratch copies.
+
+**What it would say.**  If G2.164, G2.165 and G2.172 hold, the rule that takes each bucket's
+first-arrived row is a ranked engineering improvement of the `k = 4` solve's echelon: the same
+relations, logs and walks, `≈ 1.5×` fewer solve multiplications at `0` GAE and `≈ 1 %` less at `1`
+GAE, where the Macaulay entries still dominate; the rows stay `≳ 10³`–`10⁵×` from the matched rho.  If
+G2.165 fails, E37 stops as E36 did and the controls, not the rules, are the result.  If a rule falls
+behind A at `1` GAE on any row, that rule stays unranked.
