@@ -1,0 +1,5 @@
+E33 validation replay, stopping rule (written 2026-11-01T21:34:35Z, before any end-to-end replay finished):
+end-to-end runs proceed in the nonce order of sample.json (e2e_order), all three solvers per curve; the first four curves (12 runs) are the committed minimum.
+After them the validator pauses the queue once to rebuild e33val_controls (NC3 stream) and rerun the controls, then resumes the same order.
+No new run is started after 2026-11-02T01:00Z; a run in progress then is completed and compared. Curves are never skipped or reordered for cost.
+2026-11-02T00:10:08Z: all 30 end-to-end runs completed (last at 2026-11-02T00:09:46Z), before the cutoff; no curve was skipped.
