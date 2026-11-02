@@ -5,7 +5,8 @@
 - **Target B, "last fall degree ≤ degree of regularity" with the Bardet–Faugère–Salvy `d_reg`:** REFUTED.
 
 Both results are exact. Each witness has a hand proof, an independent native or exact
-computation, and a core-Lean `decide +kernel` module awaiting the repository proof gate.
+computation, and a core-Lean `decide +kernel` module that has passed the repository
+proof gate (run 41396053760).
 
 No speedup, cost or cross-method claim is made, so there is no matched-rho row.
 
@@ -93,11 +94,15 @@ and `Q`; all PASS (`results/salizzoni_ex39.txt`).
 
 | module | statements | state |
 |---|---|---|
-| `papers/ic-negative-results/lean/IcNegative/Lemma4Reverse.lean` | `reverse_fails_witnessR`: the true fall at 2, no fall below 2, no fake fall at any degree | written, core Lean `decide +kernel`, pending the proof gate |
-| `research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean` | top parts and `d_reg`, `x, y ∉ V_{F,2}`, the two `V_{F,3}` certificates (over `F_2`) | written, core Lean, standalone, pending the proof gate |
+| `papers/ic-negative-results/lean/IcNegative/Lemma4Reverse.lean` | `reverse_fails_witnessR`: the true fall at 2, no fall below 2, no fake fall at any degree | **kernel-checked**: proof gate run 41396053760, target PASS, 32 theorems (8 new), 0 trusted |
+| `research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean` | top parts and `d_reg`, `x, y ∉ V_{F,2}`, the two `V_{F,3}` certificates (over `F_2`) | **kernel-checked**: proof gate run 41396053760, PASS, 4 theorems, 0 trusted |
 
-No Lean toolchain is available on the authoring host. A Python mirror of the same
-functions agreed with every statement before the modules were written.
+The modules were written without a local Lean toolchain; a Python mirror of the same
+functions agreed with every statement before the gate ran.
+
+The same gate runs (41390917050, 41396053760: 97 targets, 0 failures) also cover
+`research/jksst_xedni_audit_20261101/lean` (294 theorems), so the four JKSST
+counterexample claims in the corpus are now recorded as kernel-checked.
 
 ## What this does not say
 

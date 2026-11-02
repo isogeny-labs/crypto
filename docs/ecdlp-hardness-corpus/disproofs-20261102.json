@@ -46,7 +46,7 @@
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
       "statement": "Over F_2, f_1 = X, f_2 = X^2 + X: with the field equations outside, X*f_1 + f_2 = X is a fall at degree 2 and none exists below, so d_F = 2; f_2 reduces to 0 modulo the field equations, leaving one effective generator, so no fake fall exists at any degree (d'_F = infinity).",
-      "scope": "Exact. Hand proof in the Lean docstring; native census instrument; core-Lean decide +kernel module pending the proof gate. Degenerate by construction: one generator is a field equation.",
+      "scope": "Exact. Hand proof in the Lean docstring; native census instrument; core-Lean decide +kernel module, kernel-checked by the repository proof gate. Degenerate by construction: one generator is a field equation.",
       "assumptions": [
         "Equality reading"
       ],
@@ -60,7 +60,7 @@
       ],
       "evidence_class": "counterexample",
       "formal": {
-        "state": "lean_written_unchecked",
+        "state": "kernel_checked",
         "artifacts": [
           {
             "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Reverse.lean",
@@ -71,7 +71,7 @@
             "decl": "census"
           }
         ],
-        "notes": "Encoding bridges as in Lemma4Witness (mask completeness; reduction a ring homomorphism), argued not formalised. fake_noFall covers every degree by a degree bound in the quotient."
+        "notes": "Encoding bridges as in Lemma4Witness (mask completeness; reduction a ring homomorphism), argued not formalised. fake_noFall covers every degree by a degree bound in the quotient. lean-proof-gate run 41396053760 (commit d722ba45e): papers/ic-negative-results/lean PASS, 32 theorems, 0 trusted (8 from Lemma4Reverse)."
       },
       "cited_by": [
         {
@@ -146,7 +146,7 @@
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
       "statement": "For F = {x^2 + y, y^2 + x, xy} over F_2, F_3, F_5 and Q: (F^top)_2 = R_2 and (F^top)_1 = 0, so d_reg = 2; x, y are not in V_{F,2} and are in V_{F,3}; V_{F,d} = (x, y) cap R_{<=d} for d = 3..6. Hence last fall degree 3 (Caminata-Gorla Thm 2.9 with the reduced Groebner basis {x, y}).",
-      "scope": "Exact linear algebra (salizzoni_ex39.py); the F_2 memberships and the top parts are also stated in core Lean (pending the proof gate). The Thm 2.9 step is cited, not formalised.",
+      "scope": "Exact linear algebra (salizzoni_ex39.py); the F_2 memberships and the top parts are also kernel-checked in core Lean (repository proof gate). The Thm 2.9 step is cited, not formalised.",
       "assumptions": [],
       "source_refs": [
         "S-DISPROVE-20261102",
@@ -160,7 +160,7 @@
       ],
       "evidence_class": "theorem",
       "formal": {
-        "state": "lean_written_unchecked",
+        "state": "kernel_checked",
         "artifacts": [
           {
             "path": "research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean",
@@ -174,7 +174,8 @@
             "path": "research/disprove_easy_targets_20261102/salizzoni_ex39.py",
             "decl": "check"
           }
-        ]
+        ],
+        "notes": "lean-proof-gate run 41396053760 (commit d722ba45e): SalizzoniEx39.lean PASS, 4 theorems, 0 trusted."
       },
       "cited_by": [
         {
