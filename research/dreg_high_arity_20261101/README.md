@@ -1,7 +1,7 @@
 # High-arity Boolean closure-degree discriminator
 
-Status: **protocol v3 frozen before affected data; launch blocked; no
-scientific run has started**.
+Status: **protocol v4 amendment filed before affected data; refreeze pending;
+no scientific run has started**.
 
 The v1 protocol was frozen on 2026-11-01 at source commit
 `a52f8e5a6e977dda20f1fc7add5ba48c543ecca6`, then superseded before any
@@ -20,8 +20,12 @@ commit
 `d84d7d44f3c8bcb27a88408f6ba132cbc7575128`; protocol v3 was canonically
 frozen before affected data with SHA-256
 `bb4703b0b2fe207adbbdc468f5b8729574cb42e4908eb2e963799afc5726c270`.
-Execution remains blocked by the independent custody, draw-command, account,
-and budget gates below.
+Before that follow-up could merge, current main changed the recursively frozen
+root `Cargo.toml` by registering a new binary. Amendment
+`A3-CARGO-MANIFEST-ADVANCE` superseded the v3 identities before affected data
+and reset protocol v4 to a fail-closed draft pending a new pushed source
+commit, rebuild, and canonical refreeze. Execution also remains blocked by the
+independent custody, draw-command, account, and budget gates below.
 
 This study executes the still-unmeasured native closure cells identified by
 `research/factor_base_arity_review_20261024/README.md`:
@@ -174,9 +178,10 @@ contract is [protocol.json](protocol.json). The exact publication mapping is
 specified in [REPORT_EXPORT_CONTRACT.md](REPORT_EXPORT_CONTRACT.md). Its code
 and consistency tests pass; the v1 source, binary, and analysis identities are
 historical and explicitly superseded. The validated v2 identities are likewise
-historical after the pre-data A2 amendment; the v3 source, binary, and analysis
-identities are current and canonically frozen before affected data. The
-compiler and image remain pinned. The runner also requires a
+historical after the pre-data A2 amendment; the validated v3 identities are
+historical after the pre-data A3 amendment. Protocol v4 identities await the
+new source commit, build, and refreeze. The compiler and image remain pinned.
+The runner also requires a
 byte-identical fresh frozen-analyzer replay immediately before publication. The
 analyzer itself emits only
 `dreg_high_arity.summary/v1`,
