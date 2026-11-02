@@ -11,7 +11,7 @@
 //!     solution count over the closure `K` of `count_solutions`;
 //!   * the dimension of the quotient (standard monomials of the F4 reduced basis);
 //!   * the degree at which each solver finishes (engine `D_solve`, F4 `solving_degree`,
-//!     `solving_degree_max`, `degree_reached`), against the inclusion relation proved in CROSSCHECK.md;
+//!     `solving_degree_max`, `degree_reached`), against the expected relation of CROSSCHECK.md;
 //!   * the per-degree rank / pivot / staircase profile of the engine against an independent dense
 //!     Gaussian elimination of the same Macaulay matrix written here (own monomial order, own
 //!     arithmetic), for every degree whose matrix is small enough.
@@ -600,14 +600,37 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
         f4_std(&rep.basis, n).map(|x| x.0)
     };
     let f4_std_by_deg = if f4_complete && !rep.inconsistent { f4_std(&rep.basis, n).map(|x| x.1) } else { None };
+    // F_p solutions with the repository's F4 and root finder: `f4_fp::solve` finds univariate roots by scanning
+    // 0..p and `solve_visit` refuses p >= 2^32, so for large p the substitution tree is run here
+    // (`solve_big`: f4_fp::f4 per node, glv_invariant_base::poly_roots_fp_counted_until for roots).  For small p the
+    // repository's own `f4_fp::solve` is run as well and must agree.
     let sopts = F4Options::new(FOrd::Grevlex, o.f4_maxdeg).with_budget(Duration::from_secs_f64(o.f4_budget));
     let ts = Instant::now();
-    let srep = f4_fp::solve(&f4in, n, modulus, &sopts);
+    let mut runs = 0usize;
+    let big = solve_big(&f4in, n, modulus, &sopts, &mut runs);
     let solve_ms = ts.elapsed().as_secs_f64() * 1e3;
-    let f4_sols: Option<BTreeSet<Vec<u64>>> = match &srep.verdict {
-        Verdict::Solutions(v) => Some(v.iter().cloned().collect()),
-        Verdict::Inconsistent => Some(BTreeSet::new()),
-        Verdict::Undetermined => None,
+    let f4_sols: Option<BTreeSet<Vec<u64>>> = big.as_ref().map(|v| v.iter().cloned().collect());
+    let mut legacy = "not_run";
+    if modulus <= (1u64 << 22) {
+        let lrep = f4_fp::solve(&f4in, n, modulus, &sopts);
+        let lsols: Option<BTreeSet<Vec<u64>>> = match &lrep.verdict {
+            Verdict::Solutions(v) => Some(v.iter().cloned().collect()),
+            Verdict::Inconsistent => Some(BTreeSet::new()),
+            Verdict::Undetermined => None,
+        };
+        legacy = match (&lsols, &f4_sols) {
+            (Some(a), Some(b)) if a == b => "agrees_with_solve_big",
+            (Some(_), Some(_)) => {
+                failures.push("f4_fp::solve and solve_big disagree".into());
+                "DISAGREE"
+            }
+            _ => "undetermined",
+        };
+    }
+    let srep_verdict = match &f4_sols {
+        Some(s) if s.is_empty() => "inconsistent",
+        Some(_) => "solutions",
+        None => "undetermined",
     };
 
     // ---- 1. solution sets
@@ -660,22 +683,25 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
         notes.push(format!("f4 incomplete (timed_out {}, pairs_above_bound {})", rep.timed_out, rep.pairs_above_bound));
     }
 
-    // ---- 3. degrees.  Inclusion: every element F4 derives at step degree d lies in the Macaulay span at
-    // degree d, hence D_engine <= F4 degree.  Report the relation; a violation is a blocker.
+    // ---- 3. degrees.  No inequality between the two degrees is provable for systems with degree falls: an
+    // element F4 creates at step d may have lower degree and is then reused with small multipliers, which a
+    // Macaulay matrix of degree D can only match with rows of degree d + (small multiplier).  The expected
+    // relation (CROSSCHECK.md, section B) is D_engine >= F4's top learning step; an engine D below it is
+    // reported as UNEXPECTED_ORDER (a note, since nothing proves it impossible).
     let f4_deg = if rep.inconsistent { rep.solving_degree } else { rep.solving_degree_max };
+    let f4_top = rep.solving_degree_max.max(rep.solving_degree);
     let rel = match eo.d_solve {
         Some(d) if eo.status == "solved" && f4_complete => {
-            if d > f4_deg {
-                failures.push(format!("engine D {d} > F4 degree {f4_deg}: contradicts the inclusion XL(d) contains F4(d)"));
-                "VIOLATION"
-            } else if d == f4_deg {
-                "equal"
+            if d >= f4_top {
+                if d == f4_top { "engine_equal_f4_top_step" } else { "engine_above_f4_top_step" }
             } else {
-                "engine_lower"
+                notes.push(format!("UNEXPECTED_ORDER: engine D {d} < F4 top learning step {f4_top}"));
+                "engine_below_f4_top_step"
             }
         }
         _ => "n/a",
     };
+    let _ = f4_deg;
 
     // ---- 4. per-degree profile against the dense reference
     let mut dense_json = Value::Null;
@@ -771,6 +797,7 @@ fn compare(inst: &Instance, cfg: Cfg, tw: &Tower, modulus: u64, o: &Opts, do_den
         "f4": {"complete": f4_complete, "inconsistent": rep.inconsistent, "dim": f4_dim, "std_by_degree": f4_std_by_deg,
                "solving_degree": rep.solving_degree, "solving_degree_max": rep.solving_degree_max, "degree_reached": rep.degree_reached,
                "steps": rep.steps, "max_rows": rep.max_rows, "max_cols": rep.max_cols, "ms": f4_ms, "solve_ms": solve_ms,
+               "solve": {"verdict": srep_verdict, "f4_runs": runs, "legacy_f4_fp_solve": legacy},
                "step_degrees": log.steps.iter().map(|s| s.degree).collect::<Vec<_>>(),
                "basis_size": rep.basis.len(),
                "basis_lead_degrees": rep.basis.iter().map(|g| g.first().map(|t| t.0.iter().sum::<u32>()).unwrap_or(0)).collect::<Vec<_>>()},
@@ -863,4 +890,68 @@ fn main() {
     if n_fail > 0 {
         std::process::exit(1);
     }
+}
+
+/// Substitution tree over F_p built from the repository's F4 and root finder.  None: undetermined (timeout, or a
+/// node without a univariate element, which cannot happen for a zero-dimensional ideal in a degrevlex basis).
+fn solve_big(input: &[f4_fp::Poly], n: usize, p: u64, opts: &F4Options, runs: &mut usize) -> Option<Vec<Vec<u64>>> {
+    if n == 0 {
+        let bad = input.iter().any(|f| f.iter().any(|(_, c)| *c % p != 0));
+        return Some(if bad { vec![] } else { vec![vec![]] });
+    }
+    let r = f4_fp::f4(input, n, p, opts);
+    *runs += 1;
+    if r.timed_out {
+        return None;
+    }
+    if r.inconsistent {
+        return Some(vec![]);
+    }
+    let mut best: Option<(usize, Vec<u64>)> = None;
+    for g in &r.basis {
+        let vars: BTreeSet<usize> = g.iter().flat_map(|(e, _)| e.iter().enumerate().filter(|(_, &k)| k > 0).map(|(i, _)| i)).collect();
+        if vars.len() != 1 {
+            continue;
+        }
+        let i = *vars.iter().next().unwrap();
+        let deg = g.iter().map(|(e, _)| e[i]).max().unwrap() as usize;
+        let mut coeffs = vec![0u64; deg + 1];
+        for (e, c) in g {
+            coeffs[e[i] as usize] = *c;
+        }
+        let mut muls = 0u64;
+        let roots = crypto::cryptanalysis::glv_invariant_base::poly_roots_fp_counted_until(&coeffs, p, 0x5031, &mut muls, opts.deadline)?;
+        if best.as_ref().map_or(true, |(_, rs)| roots.len() < rs.len()) {
+            best = Some((i, roots));
+        }
+    }
+    let (var, values) = best?;
+    let mut sols = Vec::new();
+    for a in values {
+        let sub: Vec<f4_fp::Poly> = r
+            .basis
+            .iter()
+            .map(|g| {
+                let terms: Vec<(Vec<u32>, u64)> = g
+                    .iter()
+                    .map(|(e, c)| {
+                        let mut e2 = e.clone();
+                        let k = e2.remove(var);
+                        (e2, mulm(*c, powm(a, k as u64, p), p))
+                    })
+                    .collect();
+                f4_fp::normalise(&terms, p, FOrd::Grevlex)
+            })
+            .filter(|g| !g.is_empty())
+            .collect();
+        for mut s in solve_big(&sub, n - 1, p, opts, runs)? {
+            s.insert(var, a);
+            sols.push(s);
+        }
+    }
+    // a truncated basis spans a sub-ideal: keep only the candidates that satisfy the input
+    sols.retain(|s| input.iter().all(|f| f4_fp::eval(f, s, p) == 0));
+    sols.sort();
+    sols.dedup();
+    Some(sols)
 }

@@ -776,6 +776,229 @@ fn cmd_selftest(_a: &Args) {
     }
 }
 
+
+// ───────────── b-adapted presentations (generator g, modulus = minpoly of g) ─────────────
+
+/// Presentation of the base field F_{M0} in the power basis of a generator g: modulus M_g = minimal polynomial of g over
+/// F_2 (degree n, since n is prime and g is not in F_2); g maps to z.  `apply` is the field isomorphism F_{M0} -> F_{M_g}.
+struct GPres {
+    irr: IrreduciblePoly,
+    pinv: Vec<Vec<u64>>, // rows of P^{-1}, P = (g^0, .., g^{n-1}) as bit rows in the base representation
+    n: u32,
+}
+impl GPres {
+    fn new(g: &F2mElement, m0: &IrreduciblePoly) -> Option<GPres> {
+        let n = m0.degree;
+        let nw = (n as usize).div_ceil(64);
+        let mut pows: Vec<F2mElement> = vec![F2mElement::one(n)];
+        for i in 1..=n as usize {
+            let nx = pows[i - 1].mul(g, m0);
+            pows.push(nx);
+        }
+        let mut a: Vec<Vec<u64>> = (0..n as usize).map(|i| pows[i].raw_bits().to_vec()).collect();
+        let mut inv: Vec<Vec<u64>> = (0..n as usize)
+            .map(|i| {
+                let mut r = vec![0u64; nw];
+                r[i / 64] |= 1 << (i % 64);
+                r
+            })
+            .collect();
+        for col in 0..n as usize {
+            // None: g generates a proper subfield (cannot happen for g outside F_2 when n is prime)
+            let p = (col..n as usize).find(|&i| (a[i][col / 64] >> (col % 64)) & 1 == 1)?;
+            a.swap(col, p);
+            inv.swap(col, p);
+            let (pa, pi) = (a[col].clone(), inv[col].clone());
+            for i in 0..n as usize {
+                if i != col && (a[i][col / 64] >> (col % 64)) & 1 == 1 {
+                    for w in 0..nw {
+                        a[i][w] ^= pa[w];
+                        inv[i][w] ^= pi[w];
+                    }
+                }
+            }
+        }
+        let mut gp = GPres { irr: IrreduciblePoly { degree: n, low_terms: vec![] }, pinv: inv, n };
+        // g^n = sum c_i g^i  =>  M_g = z^n + sum c_i z^i
+        let c = gp.apply(&pows[n as usize]);
+        let low: Vec<u32> = (0..n).filter(|&i| bit_of(&c, i as usize)).collect();
+        gp.irr = IrreduciblePoly { degree: n, low_terms: low };
+        Some(gp)
+    }
+    /// Coordinates of e in the basis (1, g, .., g^{n-1}) = the image of e in F_2[z]/M_g.
+    fn apply(&self, e: &F2mElement) -> F2mElement {
+        let nw = (self.n as usize).div_ceil(64);
+        let mut acc = vec![0u64; nw];
+        for j in 0..self.n as usize {
+            if bit_of(e, j) {
+                for w in 0..nw {
+                    acc[w] ^= self.pinv[j][w];
+                }
+            }
+        }
+        F2mElement::from_words(&acc, self.n)
+    }
+}
+fn weight(e: &F2mElement) -> u32 {
+    e.raw_bits().iter().map(|w| w.count_ones()).sum()
+}
+fn pow_big(e: &F2mElement, x: &BigUint, irr: &IrreduciblePoly) -> F2mElement {
+    let mut acc = F2mElement::one(e.m_value());
+    for i in (0..x.bits()).rev() {
+        acc = acc.square(irr);
+        if x.bit(i) {
+            acc = acc.mul(e, irr);
+        }
+    }
+    acc
+}
+fn is_f2(e: &F2mElement) -> bool {
+    weight(e) == 0 || (weight(e) == 1 && bit_of(e, 0))
+}
+/// One entry of a curve's presentation family.
+struct Cand {
+    name: String,
+    g: F2mElement,
+    pres: GPres,
+    bw: u32,
+    bdeg: i64,
+    sel: bool, // lexicographic minimum of (weight, degree) of b's image within the family
+}
+/// Declared family F_b for a curve with b not in F_2: g in {b, b+1, 1/b (= j), b^3, b^(1/3), b^2+b}, each a generator of
+/// F_{2^n} (n prime).  For E0 (b in F_2 fixes b = 1 in every presentation) the family is the standard generator z, the
+/// `borrowed` generators (the b of the first curve of each other orbit) and seeded random generators, `FAM` in all.
+const FAM: usize = 6;
+fn cand_family(b: &F2mElement, m0: &IrreduciblePoly, borrowed: &[(String, F2mElement)], rseed: u64) -> Vec<Cand> {
+    let n = m0.degree;
+    let one = F2mElement::one(n);
+    let mut gens: Vec<(String, F2mElement)> = Vec::new();
+    if !is_f2(b) {
+        let e13 = ((BigUint::from(1u8) << (n + 1)) - 1u8) / 3u8; // 3 * e13 = 1 mod 2^n - 1 (n odd)
+        gens.push(("b".into(), b.clone()));
+        gens.push(("b+1".into(), b.add(&one)));
+        gens.push(("1/b".into(), b.flt_inverse(m0).unwrap()));
+        gens.push(("b^3".into(), b.square(m0).mul(b, m0)));
+        gens.push(("b^(1/3)".into(), pow_big(b, &e13, m0)));
+        gens.push(("b^2+b".into(), b.square(m0).add(b)));
+    } else {
+        gens.push(("z".into(), F2mElement::z(n)));
+        for (nm, g) in borrowed {
+            gens.push((format!("borrow:{nm}"), g.clone()));
+        }
+        let mut r = rseed;
+        while gens.len() < FAM {
+            let g = rand_elem(n, &mut r);
+            if !is_f2(&g) {
+                gens.push((format!("rand{}", gens.len()), g));
+            }
+        }
+        gens.truncate(FAM);
+    }
+    let mut out: Vec<Cand> = gens
+        .into_iter()
+        .map(|(name, g)| {
+            let pres = GPres::new(&g, m0).expect("generator of a proper subfield");
+            let bimg = pres.apply(b);
+            let (bw, bdeg) = (weight(&bimg), bimg.degree().map_or(-1, |d| d as i64));
+            Cand { name, g, pres, bw, bdeg, sel: false }
+        })
+        .collect();
+    let best = (0..out.len()).min_by_key(|&i| (out[i].bw, out[i].bdeg, i)).unwrap();
+    out[best].sel = true;
+    out
+}
+
+fn powers(g: &F2mElement, k: usize, m0: &IrreduciblePoly) -> Vec<F2mElement> {
+    let mut v: Vec<F2mElement> = vec![F2mElement::one(m0.degree)];
+    for i in 1..k {
+        let nx = v[i - 1].mul(g, m0);
+        v.push(nx);
+    }
+    v
+}
+
+/// Exact solution count of one instance in both presentations: base field with V_g = span(1,g,..,g^{k-1}) vs the
+/// g-presentation with the standard V.  Returns (count_base, count_g, planted point satisfies the g-presentation system).
+fn iso_counts(m: usize, g: &F2mElement, k: usize, xr: &F2mElement, b: &F2mElement, m0: &IrreduciblePoly, gp: &GPres, planted: Option<u64>) -> (i64, i64, i64) {
+    let n = m0.degree;
+    let vg = powers(g, k, m0);
+    let std = std_subspace(n, k);
+    let (xr2, b2) = (gp.apply(xr), gp.apply(b));
+    let cnt = |basis: &[F2mElement], x: &F2mElement, bb: &F2mElement, irr: &IrreduciblePoly| -> i64 {
+        if m == 2 {
+            count_m2(basis, x, bb, irr) as i64
+        } else if n < 64 && k <= 15 {
+            count_m3_fast(basis, x, bb, irr) as i64
+        } else {
+            count_m3_numeric(basis, x, bb, irr) as i64
+        }
+    };
+    let c0 = cnt(&vg, xr, b, m0);
+    let c1 = cnt(&std, &xr2, &b2, &gp.irr);
+    let pk = planted.map_or(-1, |pm| {
+        let (eqs, _) = build_system(m, &std, &xr2, &b2, &gp.irr);
+        eqs.iter().all(|p| !eval_poly(p, pm)) as i64
+    });
+    (c0, c1, pk)
+}
+
+/// Sanity check: the g-presentation is a ring isomorphism and preserves the exact solution count (random x_R and a planted
+/// x_R with count >= 1), for m = 3 and m = 2.
+fn cmd_isocheck(_a: &Args) {
+    let mut ok = true;
+    let cases: Vec<(u32, Vec<usize>)> = vec![(13, vec![3, 4, 5]), (17, vec![3, 4, 5]), (19, vec![4, 5, 6]), (43, vec![4, 5, 6, 8]), (131, vec![4, 5, 6])];
+    for (n, ks) in cases {
+        let m0 = if n == 131 { base_modulus(131, "131") } else { binary::find_irreducible(n) };
+        let mut rng = derive(0x150C, &[n as u64]);
+        for trial in 0..2u64 {
+            let b = rand_elem(n, &mut rng);
+            let fam = cand_family(&b, &m0, &[], 5);
+            for cd in fam.iter().take(4) {
+                let irr_ok = binary::is_irreducible(&poly_of(&cd.pres.irr), n as usize);
+                let (x, y) = (rand_elem(n, &mut rng), rand_elem(n, &mut rng));
+                let (ax, ay) = (cd.pres.apply(&x), cd.pres.apply(&y));
+                let hom = cd.pres.apply(&x.mul(&y, &m0)) == ax.mul(&ay, &cd.pres.irr) && cd.pres.apply(&x.add(&y)) == ax.add(&ay);
+                let gz = cd.pres.apply(&cd.g) == F2mElement::z(n);
+                ok &= irr_ok && hom && gz;
+                for &k in &ks {
+                    if cd.name == "b^(1/3)" && k > 4 {
+                        continue;
+                    }
+                    let xr = rand_elem(n, &mut rng);
+                    let (c0, c1, _) = iso_counts(3, &cd.g, k, &xr, &b, &m0, &cd.pres, None);
+                    let vg = powers(&cd.g, k, &m0);
+                    let mut pr = derive(0x9A, &[n as u64, k as u64, trial]);
+                    let (p0, p1, pk) = match plant(&vg, false, &b, &m0, &mut pr) {
+                        Some((xp, pm)) => iso_counts(3, &cd.g, k, &xp, &b, &m0, &cd.pres, Some(pm)),
+                        None => (-1, -1, -1),
+                    };
+                    let good = c0 == c1 && p0 == p1 && (pk == 1 || pk == -1) && (p0 >= 1 || p0 == -1);
+                    ok &= good;
+                    println!("isocheck n={n} k={k} b#{trial} g={:<8} Mg_irred={irr_ok} ring_hom={hom} g->z={gz} b_img(w={},deg={}) count[random xR] base={c0} gpres={c1} | count[planted xR] base={p0} gpres={p1} planted_satisfies={pk} -> {}", cd.name, cd.bw, cd.bdeg, if good { "ok" } else { "FAIL" });
+                }
+            }
+        }
+    }
+    {
+        let n = 19u32;
+        let m0 = binary::find_irreducible(n);
+        let mut rng = derive(0x150D, &[1]);
+        for _ in 0..4 {
+            let b = rand_elem(n, &mut rng);
+            let gp = GPres::new(&b, &m0).unwrap();
+            let xr = rand_elem(n, &mut rng);
+            let (c0, c1, _) = iso_counts(2, &b, 6, &xr, &b, &m0, &gp, None);
+            let good = c0 == c1;
+            ok &= good;
+            println!("isocheck m=2 n={n} k=6 g=b count base={c0} gpres={c1} -> {}", if good { "ok" } else { "FAIL" });
+        }
+    }
+    println!("isocheck {}", if ok { "ALL OK" } else { "FAILED" });
+    if !ok {
+        std::process::exit(1);
+    }
+}
+
 // ───────────── measure ─────────────
 
 fn jline(
@@ -791,9 +1014,10 @@ fn jline(
     me: &Meas,
     vwords: &str,
     xr: &str,
+    extra: &str,
 ) -> String {
     format!(
-        "{{\"arm\":\"{arm}\",\"curve\":{},\"label\":\"{}\",\"orbit\":\"{}\",\"frob\":{},\"n\":{n},\"m\":{m},\"k\":{k},\"attempt\":{att},\"v\":\"{vkind}\",\"presentation\":{pres},\"seq\":{seq},\"n_vars\":{},\"n_eqs\":{},\"solutions\":{},\"outcome\":\"{}\",\"dreg\":{},\"refuted\":{},\"ffd\":{},\"rows\":{},\"cols\":{},\"build_s\":{:.4},\"dreg_s\":{:.4},\"solve_s\":{:.4},\"solve_nsol\":{},\"solve_exhausted\":{},\"planted_ok\":{},\"planted_found\":{},\"v_basis\":\"{vwords}\",\"x_r\":\"{xr}\"}}",
+        "{{\"arm\":\"{arm}\",\"curve\":{},\"label\":\"{}\",\"orbit\":\"{}\",\"frob\":{},\"n\":{n},\"m\":{m},\"k\":{k},\"attempt\":{att},\"v\":\"{vkind}\",\"presentation\":{pres},\"seq\":{seq},\"n_vars\":{},\"n_eqs\":{},\"solutions\":{},\"outcome\":\"{}\",\"dreg\":{},\"refuted\":{},\"ffd\":{},\"rows\":{},\"cols\":{},\"build_s\":{:.4},\"dreg_s\":{:.4},\"solve_s\":{:.4},\"solve_nsol\":{},\"solve_exhausted\":{},\"planted_ok\":{},\"planted_found\":{},\"v_basis\":\"{vwords}\",\"x_r\":\"{xr}\"{extra}}}",
         c.idx, c.label, c.orbit, c.frob, me.n_vars, me.n_eqs, me.solutions, me.outcome, me.dreg, me.refuted, me.ffd, me.rows, me.cols, me.build_s, me.dreg_s, me.solve_s, me.solve_nsol, me.solve_exhausted, me.planted_ok, me.planted_found
     )
 }
@@ -829,6 +1053,25 @@ fn cmd_measure(a: &Args) {
             CurveRow { idx: 100000 + i, label: format!("N{i:02}"), orbit: "null".into(), frob: 0, a2: false, b_hex: hex(&b) }
         })
         .collect();
+    // b-adapted presentation families (arms badapt, bsparse): one per curve, independent of k and attempt
+    let borrowed: Vec<(String, F2mElement)> = {
+        let mut seen: Vec<String> = Vec::new();
+        let mut v = Vec::new();
+        for c in &curves {
+            if c.orbit != "crater" && !seen.contains(&c.orbit) && seen.len() < 2 {
+                seen.push(c.orbit.clone());
+                v.push((c.label.clone(), parse_hex(&c.b_hex, n)));
+            }
+        }
+        v
+    };
+    let mut fams: HashMap<usize, Vec<Cand>> = HashMap::new();
+    if arms.iter().any(|x| x == "badapt" || x == "bsparse") {
+        for r in &rows {
+            let b = parse_hex(&r.b_hex, n);
+            fams.insert(r.idx, cand_family(&b, &m0, &borrowed, derive(seed, &[0xE0E0, n as u64, r.idx as u64])));
+        }
+    }
     let mut seq = 0usize;
     for &k in &ks {
         for att in first_attempt..first_attempt + attempts {
@@ -848,6 +1091,14 @@ fn cmd_measure(a: &Args) {
                                 jobs.push((arm.clone(), (*r).clone(), p));
                             }
                         }
+                        "badapt" | "bsparse" => {
+                            for (pi, cd) in fams[&r.idx].iter().enumerate() {
+                                // badapt: g = b (floor curves) or the borrowed floor generators (E0, b = 1 fixed); bsparse: the whole family
+                                if arm == "bsparse" || cd.name == "b" || cd.name.starts_with("borrow:") {
+                                    jobs.push((arm.clone(), (*r).clone(), pi));
+                                }
+                            }
+                        }
                         _ => {}
                     }
                 }
@@ -864,6 +1115,7 @@ fn cmd_measure(a: &Args) {
                 jobs.swap(i, j);
             }
             for (arm, c, pres) in jobs {
+                let mut extra = String::new();
                 let b = parse_hex(&c.b_hex, n);
                 let (name, me, vw, xrs) = match arm.as_str() {
                     "main" | "null" | "aa" => {
@@ -898,9 +1150,19 @@ fn cmd_measure(a: &Args) {
                         let me = measure_instance(m, &basis, &xr, &bb, &mm, None, &opts);
                         ("stdv", me, words(&basis), hex(&xr))
                     }
+                    "badapt" | "bsparse" => {
+                        // modulus M_g = minpoly of g; V = span(1,g,..,g^(k-1)) is the standard V in that presentation; b, x_R mapped
+                        let cd = &fams[&c.idx][pres];
+                        let (bb, xr) = (cd.pres.apply(&b), cd.pres.apply(&xr_rand));
+                        let basis = std_subspace(n, k);
+                        let me = measure_instance(m, &basis, &xr, &bb, &cd.pres.irr, None, &opts);
+                        let nm: &'static str = if arm == "badapt" { "badapt" } else { "bsparse" };
+                        extra = format!(",\"gname\":\"{}\",\"b_w\":{},\"b_deg\":{},\"sel\":{},\"mg_w\":{}", cd.name, cd.bw, cd.bdeg, cd.sel as i32, cd.pres.irr.low_terms.len() + 1);
+                        (nm, me, words(&basis), hex(&xr))
+                    }
                     _ => unreachable!(),
                 };
-                let line = jline(name, &c, n, m, k, att, if name == "stdv" { "std" } else { "rand" }, pres, seq, &me, &vw, &xrs);
+                let line = jline(name, &c, n, m, k, att, match name { "stdv" => "std", "badapt" | "bsparse" => "gpow", _ => "rand" }, pres, seq, &me, &vw, &xrs, &extra);
                 seq += 1;
                 writeln!(f, "{line}").unwrap();
                 f.flush().unwrap();
@@ -1027,6 +1289,33 @@ fn cmd_analyze(a: &Args) {
             println!("k={k} orbit={o} n={} mean={:.3} sd={:.3}", v.len(), mean_sd(v).0, mean_sd(v).1);
         }
     }
+    // Presentation-family minima (C2): per (k, arm, curve, attempt) the minimum Dreg over the declared presentations, the
+    // minimum time among presentations attaining it, the overall minimum time, the sparsest-b image (weight, degree) and the
+    // modulus weight of the presentation attaining the minimum time (time depends on the modulus density).
+    {
+        type K = (i64, String, String, i64);
+        let mut fam: std::collections::BTreeMap<K, Vec<&serde_json::Value>> = Default::default();
+        for r in &rows {
+            let arm = r["arm"].as_str().unwrap();
+            if arm == "stdv" || arm == "badapt" || arm == "bsparse" {
+                fam.entry((r["k"].as_i64().unwrap(), arm.to_string(), r["label"].as_str().unwrap().to_string(), r["attempt"].as_i64().unwrap())).or_default().push(r);
+            }
+        }
+        if !fam.is_empty() {
+            println!("\n== presentation-family minima per (k, arm, curve, attempt): min Dreg over presentations | min time | #pres | sel (w,deg) of b image | mod-weight at min time ==");
+            for ((k, arm, lab, att), v) in &fam {
+                let tm = |r: &serde_json::Value| r["build_s"].as_f64().unwrap() + r["dreg_s"].as_f64().unwrap();
+                let dmin = v.iter().map(|r| r["dreg"].as_i64().unwrap()).min().unwrap();
+                let tmin = v.iter().map(|r| tm(r)).fold(f64::INFINITY, f64::min);
+                let tat = v.iter().filter(|r| r["dreg"].as_i64().unwrap() == dmin).map(|r| tm(r)).fold(f64::INFINITY, f64::min);
+                let sel = v.iter().find(|r| r.get("sel").and_then(|x| x.as_i64()) == Some(1));
+                let sel_s = sel.map_or("-".to_string(), |r| format!("({},{})", r["b_w"], r["b_deg"]));
+                let mw = v.iter().min_by(|a, b| tm(a).partial_cmp(&tm(b)).unwrap()).and_then(|r| r.get("mg_w")).map_or("-".to_string(), |x| x.to_string());
+                let hit = v.iter().filter(|r| r["dreg"].as_i64().unwrap() == dmin).count();
+                println!("k={k} {:>8} {lab:<6} att={att} dreg_min={dmin} ({hit}/{} pres reach it) t_at_dreg_min={tat:.3}s t_min={tmin:.3}s sel(w,deg)={sel_s} modw@tmin={mw}", code(arm, 0), v.len());
+            }
+        }
+    }
     println!("\nDecision rule, null set and thresholds: PROTOCOL.md section 6.  Masked output hides arm names; rerun with --unmask only after the analysis is frozen.");
 }
 
@@ -1042,6 +1331,7 @@ fn main() {
         "gt" => cmd_gt(&a),
         "selftest" => cmd_selftest(&a),
         "measure" => cmd_measure(&a),
+        "isocheck" => cmd_isocheck(&a),
         "analyze" => cmd_analyze(&a),
         c => {
             eprintln!("unknown subcommand {c}");
