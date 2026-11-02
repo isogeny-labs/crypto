@@ -184,3 +184,7 @@ Seven Python files parse; four complete AST substitution audits cover driver, se
 ### Proven-zero prefix transport
 
 `companion-zero-prefix/` preserves the first nonzero search column separately from the selected pivot. Proven-zero column indices follow both simultaneous swaps; missing front columns reuse this information. Derived query savings for a nonempty zero prefix: one scalar or two pair transport queries. All generator arithmetic and final checks are preserved by three static substitution audits. Five Python files parse; report inspected. Numerical, corruption, heap and performance trials: zero. Native set/materialization costs and internal provenance assumptions are explicit in DERIVATION.md. Source `3090ba584b463d078516a478257b85e987d6a086`.
+
+### Zero-coordinate deletion
+
+`companion-zero-delete/` removes a proved-zero prefix using weighted symmetry. The restricted operator has dimension n-j and width w+2 before compression, constructed with one transpose query and the retained first nonzero column. A nonzero prefix RHS instead gives an immediate normalized witness and leaves the full rank unknown. Compact zero-padding frames preserve both primal and dual lifts; final root checks remain. Three declared-substitution AST audits pass; six Python sources parse; report inspected. Numerical/corruption/heap/performance trials zero. Repeated compression/selection, copies and width growth remain charged. Source `d6a7316b2818bb633e3aa6ebd7c2aa94e5ed29ec`.
