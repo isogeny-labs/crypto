@@ -1128,6 +1128,195 @@ fn t0_figure(jsonl: &str) -> String {
     s
 }
 
+/// Closed cofactor fiber on a prime curve (ratchet round 1, Part 2): exact
+/// covered targets and table entries for the blind small-x table, the closed
+/// fiber (every pair sum shifted by its own torsion component, i.e. the
+/// table of `P_i ± P_j + K`, `K ∈ E[8]`, restricted to the entries that land
+/// in `G`), and the projected base, at the same N columns.
+fn fiber_experiment(k: u32, n: usize) -> Value {
+    use std::collections::HashSet;
+    let m = build_miniature(k);
+    let (w, shift, p, r) = (m.weier, m.shift, m.p, m.r);
+    let mx = |q: &Pt| subm(q.x, shift, p);
+    let mont = Mont { p, a: m.a_mont };
+    let t8 = (2..p)
+        .find_map(|u| {
+            let y = sqrtm(mont.rhs(u), p)?;
+            let q = w.mul(
+                Pt {
+                    x: addm(u, shift, p),
+                    y,
+                    inf: false,
+                },
+                r,
+            );
+            (!w.mul(q, 4).inf).then_some(q)
+        })
+        .unwrap();
+    let e8: Vec<Pt> = (0..8).map(|j| w.mul(t8, j)).collect();
+    let rinv8 = (1..8u64).find(|c| (c * (r % 8)) % 8 == 1).unwrap();
+    let label = |q: &Pt| -> u64 {
+        let t = w.mul(*q, r);
+        e8.iter().position(|e| *e == t).unwrap() as u64
+    };
+    let mut base = Vec::new();
+    let mut u = 2u64;
+    while base.len() < n {
+        if let Some(y) = sqrtm(mont.rhs(u), p) {
+            let q = Pt {
+                x: addm(u, shift, p),
+                y: y.min(p - y),
+                inf: false,
+            };
+            if !w.mul(q, 8).inf {
+                base.push((q, label(&q)));
+            }
+        }
+        u += 1;
+    }
+    let (mut blind, mut fiber, mut proj) = (HashSet::new(), HashSet::new(), HashSet::new());
+    let (mut entries_blind, mut checked) = (0u64, 0u64);
+    for i in 0..n {
+        for j in i..n {
+            for sgn in [1i8, -1] {
+                if i == j && sgn < 0 {
+                    continue;
+                }
+                let (pj, lj) = if sgn > 0 {
+                    (base[j].0, base[j].1)
+                } else {
+                    (w.neg(base[j].0), (8 - base[j].1) % 8)
+                };
+                let s = w.add(base[i].0, pj);
+                if s.inf {
+                    continue;
+                }
+                entries_blind += 1;
+                let l = (base[i].1 + lj) % 8;
+                if l == 0 {
+                    blind.insert(mx(&s));
+                }
+                // S − t(S), t(S) = (L · r⁻¹ mod 8)·T₈: the lift of S in G.
+                let rs = w.add(s, w.neg(e8[((l * rinv8) % 8) as usize]));
+                if !rs.inf {
+                    if checked < 2000 {
+                        assert!(w.mul(rs, r).inf, "fiber representative must lie in G");
+                        checked += 1;
+                    }
+                    fiber.insert(mx(&rs));
+                }
+            }
+        }
+    }
+    let pb: Vec<Pt> = {
+        let mut seen = HashSet::new();
+        base.iter()
+            .map(|b| w.mul(b.0, 8))
+            .filter(|q| !q.inf && seen.insert(q.x))
+            .collect()
+    };
+    let mut entries_proj = 0u64;
+    for i in 0..pb.len() {
+        for j in i..pb.len() {
+            for (idx, s) in [w.add(pb[i], pb[j]), w.add(pb[i], w.neg(pb[j]))]
+                .into_iter()
+                .enumerate()
+            {
+                if idx == 1 && i == j {
+                    continue;
+                }
+                if !s.inf {
+                    entries_proj += 1;
+                    proj.insert(mx(&s));
+                }
+            }
+        }
+    }
+    // The closed table holds every sum shifted by every K ∈ E[8].
+    let entries_fiber = 8 * entries_blind;
+    let (db, df, dp) = (blind.len() as f64, fiber.len() as f64, proj.len() as f64);
+    json!({
+        "k": k, "r": r, "N": n,
+        "D_blind": blind.len(), "D_fiber": fiber.len(), "D_proj": proj.len(),
+        "entries_blind": entries_blind, "entries_fiber": entries_fiber, "entries_proj": entries_proj,
+        "fiber_over_blind_D": df / db, "fiber_over_proj_D": df / dp,
+        "entries_fiber_over_proj": entries_fiber as f64 / entries_proj as f64,
+        "coverage_per_entry_fiber_over_proj": (df / entries_fiber as f64) / (dp / entries_proj as f64),
+        "F1_holds": (0.95..=1.05).contains(&(df / dp)),
+        "F2_holds": (7.5..=8.5).contains(&(entries_fiber as f64 / entries_proj as f64)),
+        "membership_checks": checked,
+    })
+}
+
+/// Ratchet round 1 figure: mean S (w = 0) of the projected base against
+/// N / N_a, one line per k, from the train sessions' records.
+fn sweep_figure(dirs: &[String]) -> String {
+    use std::collections::BTreeMap;
+    let (w, h, ml, mr, mt, mb) = (760.0, 400.0, 60.0, 150.0, 34.0, 60.0);
+    let xs = |f: f64| ml + (f - 0.3) / 0.75 * (w - ml - mr);
+    let ys = |v: f64| mt + (1.0 - (v - 0.0) / 45.0) * (h - mt - mb);
+    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='12'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Base-size retune (train): mean S at w = 0, projected base, mitm:negation_folded=1</text>\n");
+    for v in [0.0, 10.0, 20.0, 30.0, 40.0] {
+        let y = ys(v);
+        s += &format!("<line x1='{ml}' x2='{}' y1='{y:.1}' y2='{y:.1}' stroke='#ddd'/><text x='{}' y='{:.1}' text-anchor='end'>{v}</text>\n", w - mr, ml - 6.0, y + 4.0);
+    }
+    for f in [0.35, 0.5, 0.7, 1.0] {
+        s += &format!(
+            "<text x='{:.1}' y='{}' text-anchor='middle'>{f}·N_a</text>\n",
+            xs(f),
+            h - mb + 18.0
+        );
+    }
+    s += &format!("<text x='{}' y='{}' text-anchor='middle'>factor-base size N relative to the incumbent N_a = round(0.63·r^(1/3))</text>\n", (ml + w - mr) / 2.0, h - 14.0);
+    let cols = ["#1f77b4", "#2ca02c", "#e67e22", "#c0392b"];
+    for (ci, dir) in dirs.iter().enumerate() {
+        let k: u32 = dir
+            .trim_end_matches('/')
+            .rsplit('k')
+            .next()
+            .unwrap()
+            .parse()
+            .unwrap();
+        let mut agg: BTreeMap<u64, (f64, f64)> = BTreeMap::new();
+        for line in std::fs::read_to_string(format!("{dir}/records.jsonl"))
+            .unwrap()
+            .lines()
+        {
+            let r: Value = serde_json::from_str(line).unwrap();
+            if r["warmup"].as_bool().unwrap_or(false) || r["outcome"]["status"] != "verified" {
+                continue;
+            }
+            let Some(n) = r["arm"].as_str().unwrap().strip_prefix("proj-") else {
+                continue;
+            };
+            let e = agg.entry(n.parse().unwrap()).or_default();
+            e.0 += r["cost"]["s"].as_f64().unwrap();
+            e.1 += 1.0;
+        }
+        let na = *agg.keys().max().unwrap() as f64;
+        let pts: Vec<(f64, f64)> = agg
+            .iter()
+            .map(|(n, (t, c))| (xs(*n as f64 / na), ys(t / c)))
+            .collect();
+        let path: Vec<String> = pts.iter().map(|(x, y)| format!("{x:.1},{y:.1}")).collect();
+        s += &format!(
+            "<polyline fill='none' stroke='{}' stroke-width='2' points='{}'/>\n",
+            cols[ci % 4],
+            path.join(" ")
+        );
+        for (x, y) in &pts {
+            s += &format!(
+                "<circle cx='{x:.1}' cy='{y:.1}' r='3.5' fill='{}'/>\n",
+                cols[ci % 4]
+            );
+        }
+        let ly = mt + 20.0 + 22.0 * ci as f64;
+        s += &format!("<line x1='{}' x2='{}' y1='{ly}' y2='{ly}' stroke='{}' stroke-width='2'/><text x='{}' y='{}' font-size='11'>k = {k}</text>\n", w - mr + 10.0, w - mr + 32.0, cols[ci % 4], w - mr + 36.0, ly + 4.0);
+    }
+    s += "</svg>\n";
+    s
+}
+
 /// Base size `N_a = round(0.63·r^{1/3})`: the lab's validated prime-order
 /// optimum (`docs/ic/LEADERBOARD.md`, prime-field baseline: N = 162, 407,
 /// 1024 at 24, 28, 32 bits is 0.63·n^{1/3}) scaled to the subgroup.
@@ -1254,6 +1443,19 @@ fn main() {
             // t0-figure <t0.jsonl> <out.svg>
             let text = std::fs::read_to_string(&args[2]).unwrap();
             std::fs::write(&args[3], t0_figure(&text)).unwrap();
+        }
+        "fiber" => {
+            // fiber <k> <N>
+            let k: u32 = args[2].parse().unwrap();
+            let n: usize = args[3].parse().unwrap();
+            println!(
+                "{}",
+                serde_json::to_string(&fiber_experiment(k, n)).unwrap()
+            );
+        }
+        "sweep-figure" => {
+            // sweep-figure <out.svg> <train_session_dir>...
+            std::fs::write(&args[2], sweep_figure(&args[3..])).unwrap();
         }
         "summarise" => {
             // summarise <out_prefix> <session_dir>...
