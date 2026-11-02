@@ -144,3 +144,12 @@ Adds `companion-shared-border/`: checks t=aJc exactly at each frame and shares t
 Derives C_a(g)=sum g_i Z_a^i with displacement (a-b)g e_last^T. Fixing a=1,b=2,g0=1 leaves q arbitrary tail values at displacement rank one. Exact self-contained encodings for arbitrary dot queries therefore need q log2(p) bits in the worst case; recurrences stored by d initial values and d coefficients cannot cover this family if 2d<q. This concerns the stated operator/query model, not an elliptic lower bound. It directs further compression toward actual feature-map structure or charged recomputation.
 
 Six Python files parse; frame and solver normalized-AST checks pass; one-page report inspected. Fifteen originals are independently manifested. Numerical, certificate mutation, heap and performance trials remain zero under the existing cost gate.
+
+
+### Feature-metric principal-pivot primitives
+
+Adds `companion-metric-pivot/`: derives DA symmetric from the actual public compiler A=D^-1JBJ, selects a nonzero scalar or invertible antidiagonal 2x2 principal pivot using at most one query beyond the first nonzero column, applies simultaneous row/column generator transports, and supplies explicit small inverses. Principal Schur reduction preserves the trailing permuted diagonal metric. Leading rows can be reconstructed from cached columns with n+2n*cut charged products including metric validation and no source queries.
+
+Each nontrivial simultaneous swap still costs four source queries and adds four generator columns; the pair branch needs at most two swaps. Local metric/reciprocal checks do not certify global symmetry. This is a set of implemented primitives and a derived closure argument, not a complete new driver. Next integrate shared weighted block borders and full singular solve/witness behavior. Dumas–Pernet2018 supplies established exact-field 1x1/2x2 pivot context; no rank-profile or fast-complexity claim is inherited.
+
+Six Python files, including the preserved constructor dependency, parse and dependency hashes are recorded; the one-page report is inspected. Fourteen originals are separately manifested. Numerical, corruption-control and performance trials remain zero under the existing cost gate. Frozen callers are unchanged.
