@@ -15,6 +15,10 @@ require63(nrows(kernelBasis62)==324 && ncols(kernelBasis62)==128,"HALF63_ACTUAL_
 string cubicKernelCode63=constantCode63(kernelBasis62,"cubicInclusion63");
 execute(read("../../../61/runs/cubic61-02/cubic-space61.sing"));
 execute(mixedKernelCode63);execute(cubicKernelCode63);
+// The retained R61 bundle stores the mixed constant and its ambient inclusion.
+// Reconstruct the ambient constant rather than referring to an unsaved symbol.
+matrix oneAmbient61=kernel61*oneMixed61;
+require63(sigmaAmbient61*oneAmbient61==oneAmbient61 && oneAmbient61!=matrix(0,324,1),"HALF63_RECONSTRUCTED_AMBIENT_ONE");
 proc restricted63(matrix K,matrix S,matrix one,string family){
  int d=ncols(K);int ambient=nrows(K);require63(nrows(S)==ambient && ncols(S)==ambient && mat_rk(K)==d,"HALF63_INCLUSION_AND_ACTION_DIMENSIONS");
  matrix recovery=transpose(lift(module(transpose(K)),module(unitmat(d))));

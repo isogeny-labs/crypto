@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R63-DEGREE112-GENERATOR",
-  "version": 4,
+  "version": 5,
   "goal": "generate and pursue Koblitz cover/modular transfer leads at larger sizes",
   "claims": [
     {
@@ -87,7 +87,7 @@
     "all actual fixed roots and any actual trace-one source function"
   ],
   "execution": {
-    "launcher": "REPLAY_CAS.sh half-descent63-01 HALF_DESCENT63.sing HALF_DESCENT63_ALL_CHECKS_PASS; then REPLAY_LEAN.sh half-lean63-01",
+    "launcher": "REPLAY_CAS.sh half-descent63-02 HALF_DESCENT63.sing HALF_DESCENT63_ALL_CHECKS_PASS; separately REPLAY_LEAN.sh half-lean63-01 under frozen version4",
     "backend": "original manually authorized local Singular",
     "timeout_seconds": 1200,
     "virtual_KiB": 4194304,
@@ -120,6 +120,6 @@
   "validation_note": "canonical schema/checker absent selectedindex; manual contract/source checks only",
   "amendment": {
     "before_affected_data": true,
-    "reason": "Degree112 producer and fresh124 replay accepted; freeze actual10/128root-space involution/descent with both trace-one outcomes admitted before first half-space data"
+    "reason": "half-descent63-01 rejected despite late marker: retained R61 export omitted oneAmbient61, causing Singular question-mark errors. Reconstruct it exactly as kernel61 times oneMixed61 with involution/nonzero checks; preserve full cohort and all acceptance criteria for fresh attempt02. The version4 Lean source and copied protocol remain fixed."
   }
 }

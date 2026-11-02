@@ -55,3 +55,14 @@ No actualT action,C5block,globalCartier or proper polarization inferred.
 Samecaps/seed,allcases,onejob;freeze source before half-descent63-01.
 Half63fiveconditionaltheorems compiled/audited separately under pinned
 Leanlimits;nativefield/valuation/modelinputs stay explicit.
+
+## Version 5 repair before fresh half-space attempt02
+`half-descent63-01` produced a late marker but is rejected: Singular emitted
+question-mark errors because the retained R61 bundle did not export the local
+`oneAmbient61` symbol. Its partial mixed result and its marker do not satisfy
+the strict gate. The new source reconstructs that vector as the saved
+`kernel61*oneMixed61`, checks it is nonzero and fixed by the saved ambient
+involution, and retains every original whole-source and rank check. Run only
+as `half-descent63-02` after source/protocol freeze. Do not import any of the
+failed attempt's calculations as accepted data. The independent `Half63`
+proof attempt uses the earlier frozen version4 source and copied protocol.
