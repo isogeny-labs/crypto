@@ -1461,7 +1461,9 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 /// oracle returned, re-checked here by summing the points.
 #[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
-    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full", false)
+    f4cost_m(
+        k, form, t, guess, targets, seed, cap_s, 2, "full", false, false,
+    )
 }
 
 /// `f4cost` with the number of summands `m` (2 or 3) and the presentation
@@ -1479,6 +1481,7 @@ fn f4cost_m(
     nsum: u32,
     mode: &str,
     lifts: bool,
+    trace: bool,
 ) -> Value {
     use crypto_lib::cryptanalysis::ic_boundary::{
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
@@ -1545,6 +1548,9 @@ fn f4cost_m(
     if lifts {
         spec.push_str(",lifts=1");
     }
+    if trace {
+        spec.push_str(",trace=1");
+    }
     let (_, params) = Params::parse_spec(&spec).unwrap();
     let mut setup_ops = GroupOps::default();
     oracle
@@ -1592,6 +1598,11 @@ fn f4cost_m(
     let tot = oracle.solver_totals().unwrap_or_default();
     let native = oracle.relation_counters();
     let per_target = tot.ops as f64 / done.max(1) as f64;
+    let learn_muladds = oracle
+        .setup_native()
+        .get("pkm_trace_learn_muladds")
+        .copied()
+        .unwrap_or(0);
     // Exact coverage of the base at this m: the fraction of the subgroup that
     // is a sum of m base points (the hit rate an ideal oracle would see).
     let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
@@ -1630,7 +1641,9 @@ fn f4cost_m(
         "wall_s": started.elapsed().as_secs_f64(),
         "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
         "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
-        "lifts": lifts, "hits_exact": exact,
+        "lifts": lifts, "trace": trace, "hits_exact": exact,
+        "trace_learn_muladds": learn_muladds,
+        "amortised_muladds_per_target": (learn_muladds + tot.ops) as f64 / done.max(1) as f64,
         "calls_per_target": tot.calls as f64 / done.max(1) as f64,
         "muladds_per_hit": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
         "setup_group_ops": setup_ops.adds + setup_ops.doubles,
@@ -1791,7 +1804,7 @@ fn main() {
             );
         }
         "f4cost" => {
-            // f4cost <k> <bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1]
+            // f4cost <k> <bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [trace 0|1]
             let k: u32 = args[2].parse().unwrap();
             let t: u32 = args[4].parse().unwrap();
             let g: u32 = args[5].parse().unwrap();
@@ -1802,10 +1815,12 @@ fn main() {
             let nsum: u32 = args.get(9).map_or(2, |v| v.parse().unwrap());
             let mode = args.get(10).map_or("full", String::as_str);
             let lifts = args.get(11).is_some_and(|v| v == "1");
+            // Position 12: F4 trace (learn once per branch system, replay per target).
+            let trace = args.get(12).is_some_and(|v| v == "1");
             println!(
                 "{}",
                 serde_json::to_string(&f4cost_m(
-                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts
+                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts, trace
                 ))
                 .unwrap()
             );
