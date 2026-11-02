@@ -94,3 +94,35 @@ Prediction **C1**: total F4 multiply-adds per target first fall with G,
 because each branch has G fewer Boolean variables and a lower solving
 degree. They then rise once `2^G` dominates. The best G lies in 1 … 3. The
 relation verdicts are independent of G, since refutation is exact.
+
+## Amendment 2 (2026-11-02, after the timing smoke, before any Q-B, Q-C or Q-D data)
+
+The timing smoke (`sessions/smoke-k20`, one target, `interrupted` after 4 of
+8 runs; used for sizing only) showed:
+- `iso-t3`: 131,202 F4 calls at 43k multiply-adds each. It exhausted its
+  10⁸-trial cap with no relation set (1 class, matching Q-A).
+- `bits-t3`: 85,005 calls at 87k each for 2 relations, S = 378.
+- `iso-t6`: no finish within 30 minutes on one target.
+
+At these costs the frozen Q-B ladder (14 arms × 4 targets, 1800 s timeouts)
+would take days. Q-B and Q-C are therefore replaced by a stage measurement
+with the same instrument (the `pkm-semaev` oracle, same code path, called
+directly) plus the exact Q-A yields:
+
+### Q-D: F4 cost per call and per relation
+
+`curve25519_family f4cost <k> <form> <t> <G> <targets> <seed>`, k = 20,
+forms `bits` (with `G ∈ {0, 1, 2, 3}` where `G < t`) and `isogeny`, t = 3 … 9.
+200 random subgroup targets per cell, seed `2026110800 + t`, and a per-cell
+wall cap of 600 s; a capped cell reports how many targets it finished.
+Reported per cell:
+- F4 calls, multiply-adds per target, the maximum solving degree, and
+  undecided systems;
+- the hit rate, against the exact Q-A λ;
+- the projected multiply-adds per relation, `(multiply-adds per target)/λ`.
+
+One verified end-to-end ecbench run then measures the cheapest cell, to
+confirm that the stage figure carries over to S. Predictions:
+- **B2** stands as stated.
+- **C1** is restated per target: total multiply-adds per target are
+  minimised at G ∈ {1, 2, 3}.
