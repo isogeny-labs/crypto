@@ -157,8 +157,7 @@ Metric families: dreg (k = 3,4,5,6 cells), time ratio, solution count. For each 
 3. E0 vs floor, C2 (family minima; this replaces "gap vanishes with random V"). Per cell (n, k), curve c and attempt a:
    D(c,a) = min over the presentations of F_c of Dreg (arms stdv, badapt, bsparse pooled; F_E0 as in section 4, E0 also gets the
    stdv presentations), and T(c,a) = min over F_c of `dreg_s` (F4 time; `build_s` is reported separately, see section 4 on the
-   modulus weight). Gap(c) = mean_a D(c,a) - mean_a D(E0,a), percentile-bootstrap 95% interval over attempts (paired: same
-   V-free instance data, same x_R); time ratio T(c)/T(E0) against the A/A band of the run. Floor curves are pooled by orbit
+   modulus weight). Gap(c) = mean_a D(c,a) - mean_a D(E0,a), percentile-bootstrap 95% interval over attempts (paired: same x_R in every presentation, mapped by the isomorphism); time ratio T(c)/T(E0) against the A/A band of the run. Floor curves are pooled by orbit
    (inference unit = orbit, 2 at n=131, 6 at n=43).
    - Outcome N (null, C2 supported): |Gap| < 0.5 degree for every orbit and the T ratio inside the A/A band, with the
      single-presentation (stdv) gap present in the same run (positive control seen). Reported: "the E0 vs floor gap under
@@ -182,14 +181,63 @@ What does not count: changing N, k, dmax, metric, null or thresholds after data;
 
 ## 7. Pre-flight runtime (measured 2026-11-02, 4-core x86 VM, one thread; smoke/)
 
-Per instance (random V): n=43: k=3 0.04 s, k=4 0.24 s, k=5 1.0 s (dmax 7); n=131: k=3 0.004 s, k=4 2.4 s, k=5 10 s; k=6 >660 s (unfinished).
-Standard V n=131: k=5 0.07 s, k=6 0.15 s (E0, Dreg 6) to 19.8 s (floor curves, Dreg 7), k=7 capshit ~1 s.
-Exact count n=43 (library AS count): k=10 2.3 s, k=12 27 s, k=13 ~100 s. dmax 9 raises the Dreg scans for capped cells by an
-unmeasured factor (budgeted x3 below).
-CPU-hours (single thread, sum; divide by 4 for a 4-core wall clock):
-- P3a-D main 259x20x(0.04+0.24+1.0)x3 = ~6 h; P3a controls ~3 h; m=2 ~0.5 h; P3a-Y 7x100x100 s = ~19.5 h.
-- P3b main 263x2x(0.004+2.4+10)x3 = ~5.5 h; stdv 263x3x(~20 s at k=6) = ~4.4 h; controls ~2 h.
-Total ~41 CPU-h (~11 h wall on 4 cores). P3a-Y is the single largest line and can be dropped (yield is then predicted only).
+Per instance, measured at the dmax of the cell (section 5). Counts (Dreg, rows, cols) are exact; seconds are from runs that
+shared the 4 cores with up to 3 other `p3h` processes and are good to about +-30% (identical counts varied 10.6-23.4 s at
+n=43 k=4 under load).
+- n=43, random V: k=3 0.05 s (Dreg 7, 430 x 424); k=4 17-18 s at dmax 9 (Dreg 8, 3397 x 3419; 0.2 s at dmax 7 where it
+  returns `atleast`); k=5: dmax 7 about 1 s (`atleast`), dmax 8 72 s (`atleast`), dmax 9 84-107 s (capshit, 5203 x 19051).
+  m=2: 0.00-0.05 s for k=3,4,5,8 (Dreg 2,2,2,3).
+  planted (positive control, `--solve`): k=3 at dmax 9 about 1 s (Dreg 10 capshit or 7, planted_ok and planted_found 1), k=4 at dmax 8
+  15.7 s (`atleast` 9, planted_ok 1, solve 0.04 s).
+- n=131, random V: k=3 0.004 s; k=4 2.6-2.9 s (Dreg 7, 1703 x 2423); k=5 10 s at dmax 7 (`atleast`), > 9 min at dmax 9 (killed
+  at the 15 min limit, no answer); k=6 > 660 s.
+- n=131, standard V: k=5 0.07 s; k=6 0.2 s (E0, Dreg 6) and 18-21 s (floor, Dreg 7); k=7 capshit ~1 s.
+- n=131, b-adapted (`badapt`, g = b): k=3 0.013 s, k=4 0.054 s, k=5 0.18-0.22 s, k=6 0.5-0.7 s, Dreg 6 at k=3..6 for all of
+  A000, A010, B000, B010 and the borrowed E0 presentations. `bsparse` k=6 family of one floor curve: 4 presentations at
+  0.3-0.6 s and the two dense-image ones (b^3, b^2+b) at 17-29 s: about 45 s per floor curve-attempt, 2.5 s for E0.
+- Exact count n=43 (library AS count): k=10 2.3 s, k=12 27 s, k=13 ~100 s (P3a-Y).
+- Revision 1 budgeted n=43 and n=131 cells "at dmax 9 times 3" from dmax-7 timings, which understated the cost; at dmax 9 as
+  specified the P3a main lines alone would be about 259 x 20 x 17.5 s = 25 CPU-h for k=4 plus 259 x 20 x ~100 s = 144 CPU-h
+  for k=5 (capshit), i.e. about 170 CPU-h, and P3b random-V k=5 more than 263 x 2 x 540 s = 79 CPU-h. Revision 2's per-cell
+  dmax removes these (section 5).
+CPU-hours, single thread, sum (divide by 4 for a 4-core wall clock):
+| line | CPU-h |
+| --- | --- |
+| P3a main: k=3 (259 x 20 x 0.05 s) 0.07; k=4 (259 x 2 x 17.5 s) 2.5; k=5 (259 x 2 x 1 s) 0.15 | 2.7 |
+| P3a-C controls and C2 family, 10 curves: k=3 20 attempts ~0.05; k=4 2 attempts x ~182 jobs x ~14 s | 1.5 |
+| P3a m=2 control | 0.05 |
+| P3a-Y exact count (7 x 100 x 100 s), droppable | 19.4 |
+| P3b random V: 263 x 2 x (0.004 + 2.6 + 10 s) | 1.85 |
+| P3b standard V: 262 x 3 x ~19.5 s (k=6) + small | 4.3 |
+| P3b badapt, all 263 + E0, k=3..6, 2 attempts (263 x 2 x 0.9 s) | 0.13 |
+| P3b bsparse + nbadapt, CTRL131 (6 floor x 45 s + E0) x 2 attempts, k=5,6 | 0.16 |
+| P3b controls (iso, aa, planted, null 8, main), k=3,4,5 dmax 7, 2 attempts (36 jobs x ~12.6 s) | 0.25 |
+| total | ~30.3 incl. P3a-Y, ~10.9 without |
+About 7.6 h wall on 4 cores (2.7 h without P3a-Y). The b-adapted additions (`badapt`, `bsparse`, `nbadapt`) cost about 1.0 CPU-h
+of that (0.13 + 0.16 in P3b, ~0.7 h of the 1.5 h in P3a-C at k=4: 87 of its 182 jobs per attempt).
+
+### 7a. Smoke of the b-adapted arms (n=131 k=5,6; n=43 k=3,4; binary sha256 73f1ff63...; files in smoke/. The rows were written by two earlier builds whose `measure` code is identical to this one; only `analyze` changed afterwards)
+
+n=131, k=6, one attempt (x_R of the attempt mapped by each isomorphism); Dreg and F4 time `dreg_s`;
+`modw` = modulus weight; b image (weight, degree):
+| curve | presentation g | b image | modw | Dreg | dreg_s (s) |
+| --- | --- | --- | --- | --- | --- |
+| E0 | z (base modulus) | (1,0) | 5 | 6 | 0.16 |
+| E0 | borrowed b(A000), b(B000), 3 random g | (1,0) | 65-71 | 6 | 0.16-0.22 |
+| E0 | stdv, 3 presentations | (1,0) | - | 6 | 0.17-0.19 |
+| A000 | g=b / b+1 / b^(1/3) / 1/b | (1,1) / (2,1) / (1,3) / (64,130) | 65-73 | 6 | 0.16-0.25 |
+| A000 | g=b^3 / b^2+b | (75,129) / (68,129) | 73 / 59 | 7 | 21.1 / 21.3 |
+| A000 | stdv, 3 presentations | dense | - | 7 | 17.8-20.0 |
+| B000 | g=b / b+1 / b^(1/3) / 1/b | (1,1) / (2,1) / (1,3) / (66,130) | 65-75 | 6 | 0.16-0.17 |
+| B000 | g=b^3 / b^2+b | (67,130) / (65,130) | 65 / 69 | 7 | 21.7 / 28.8 |
+| B000 | stdv, 3 presentations | dense | - | 7 | 18.7-23.9 |
+A010 and B010 (other Frobenius members of each orbit) match A000 and B000. `nbadapt` (4 random dense b, g = b): Dreg 6, `dreg_s`
+0.16-0.20 at k=6, i.e. like the floor curves. k=5: Dreg 6 in every presentation of every curve (`dreg_s` 0.05-0.07), no gap.
+Family minima k=6: E0 6, A000/A010/B000/B010 6, `dreg_s` 0.157-0.205 for all (Gap 0 degree; standard V alone: gap 1).
+n=43, k=3, 2 attempts, 4 curves: Dreg 6 or 7 depending on the attempt (x_R) for every arm and curve; family minimum 6 for E0
+and all floor curves in both attempts (single presentations: 7 for some). k=4 (dmax 9, 1-2 attempts): Dreg 8 in every
+presentation of every curve (E0, L000, L043, L086; stdv, badapt, bsparse), 10-23 s; so there is no E0 standard-V gap at
+n=43 k=4 to begin with. k=5: capshit / `atleast` for E0 in stdv and badapt (75-115 s), matrix shape identical to L000.
 
 ## 8. Reporting
 
@@ -206,3 +254,14 @@ experiment.export/v1 wrapper and `protocol.json` are for the director. Report-ev
   (V, x_R) across curves replaces them; planted targets are curve-specific).
 - Level-1 set at n=43 comes from the class-polynomial route plus an order check on every curve; no explicit Velu isogeny
   (binary_velu) cross-check was run for n=43.
+- The presentation family F is finite and declared (section 4). It contains the presentations that the prior work found
+  adapted to b (V = span{b^j}, span{(b+1)^j}) and the inverse and cube-root monomials, but not every element g of F_{2^n}; an
+  attacker could try more. A null under C2 is a null for F. E0 is given the same count of presentations (6 in bsparse, plus the
+  stdv ones), including those the first floor curves use, but its family cannot be b-adapted (b = 1 has no adapted modulus).
+- Time depends on the modulus weight through `build_s` only (E0 in the base modulus has weight 5, adapted moduli 59-75); the
+  headline time for C2 is `dreg_s`. n=43 adapted moduli have weight 19-27.
+- Dreg of a floor curve in an adapted presentation follows whether b is a monomial/binomial in g (including g^-1), not the
+  Hamming weight of b's image (g = 1/b: weight 64, Dreg 6). `sel` (minimum weight) is therefore descriptive only.
+- At n=43 the cells k=4 (Dreg 8 for every curve and arm) and k=5 (`atleast`) carry no curve information at the available
+  dmax; the information at n=43 is k=3 and the exact yield.
+- Cells with `atleast` or capshit are bounds ("Dreg > dmax"), never values; the b-adapted arms at k=7 and above were not run.
