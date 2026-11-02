@@ -172,9 +172,15 @@ and priced across the §5a band.
 
 ```bash
 ic sweep spaces --space prime-algebraic
-ic sweep run --space prime-algebraic --rungs 14,16,18,20 --target-log2r 24 \
-    --trials 40 --workers 2 --store runs/prime-algebraic.jsonl
+ic sweep run --space prime-algebraic --rungs 10,11,12,13 --target-log2r 24 \
+    --trials 40 --workers 2 --timeout-seconds 900 --store runs/prime-algebraic.jsonl
 ```
+
+**Rung sizes.** F4 on these systems is slow. In a one-repeat development
+smoke on one host (2026-11-02, not a measurement), the baseline finished at
+10 bits in 2 s and at 12 bits in 26 s. At 14 bits it did not finish one
+repeat within 500 s. Keep rungs at about 13 bits or below until the oracle
+gets faster, or give each trial a long `--timeout-seconds`.
 
 | parameter | values | meaning |
 |:--|:--|:--|
