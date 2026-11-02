@@ -9,8 +9,12 @@ transitive-source identity checks. It supersedes the v1 identities. Protocol
 v2 was canonically frozen before affected data at source commit
 `69ace2cc326d85c5128a5d36af5e72de1747385d`, protocol SHA-256
 `673323704df4252797f9a659ed4499b92a07758d99d63fd4726327a73926d984`,
-after the four-binary rebuild and validation. No registered draw, closure
-attempt, analysis, publication, or cloud job has run.
+after the four-binary rebuild and validation. Amendment
+`A2-MAINLINE-SOURCE-ADVANCE` then superseded those identities before affected
+data when the PR branch incorporated active mainline changes inside the
+recursively frozen source tree. Protocol v3 is draft pending the new source
+commit, rebuild, and refreeze. No registered draw, closure attempt, analysis,
+publication, or cloud job has run.
 
 ## Question and scope
 

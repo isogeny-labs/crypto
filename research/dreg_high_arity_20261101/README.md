@@ -1,7 +1,7 @@
 # High-arity Boolean closure-degree discriminator
 
-Status: **protocol v2 frozen before affected data; no scientific run has
-started**.
+Status: **protocol v3 amendment filed before affected data; refreeze pending;
+no scientific run has started**.
 
 The v1 protocol was frozen on 2026-11-01 at source commit
 `a52f8e5a6e977dda20f1fc7add5ba48c543ecca6`, then superseded before any
@@ -11,9 +11,12 @@ required a new immutable source commit and rebuilt four-binary manifest.
 Protocol v2 was canonically frozen before affected data on 2026-11-02 at
 source commit `69ace2cc326d85c5128a5d36af5e72de1747385d`, with protocol
 SHA-256 `673323704df4252797f9a659ed4499b92a07758d99d63fd4726327a73926d984`.
-The four release identities are recorded in `binary.sha256`. Execution remains
-blocked by the independent custody, draw-command, account, and budget gates
-below.
+It was superseded before any affected data by amendment
+`A2-MAINLINE-SOURCE-ADVANCE` after the PR branch incorporated active mainline
+work inside the recursively frozen source tree. Protocol v3 is draft pending a
+new immutable source commit, four-binary rebuild, and canonical refreeze. The
+runner rejects a draft freeze. Execution also remains blocked by the
+independent custody, draw-command, account, and budget gates below.
 
 This study executes the still-unmeasured native closure cells identified by
 `research/factor_base_arity_review_20261024/README.md`:
@@ -165,10 +168,11 @@ Commands and exact decision rules are recorded in
 contract is [protocol.json](protocol.json). The exact publication mapping is
 specified in [REPORT_EXPORT_CONTRACT.md](REPORT_EXPORT_CONTRACT.md). Its code
 and consistency tests pass; the v1 source, binary, and analysis identities are
-historical and explicitly superseded. The v2 source, binary, analysis,
-compiler, and image identities are frozen and validated. The runner also
-requires a byte-identical fresh frozen-analyzer replay immediately before
-publication. The analyzer itself emits only
+historical and explicitly superseded. The validated v2 identities are likewise
+historical after the pre-data A2 amendment; v3 identities await the new build
+and refreeze. The compiler and image remain pinned. The runner also requires a
+byte-identical fresh frozen-analyzer replay immediately before publication. The
+analyzer itself emits only
 `dreg_high_arity.summary/v1`,
 and no export or report from a registered run is claimed to exist.
 

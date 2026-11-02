@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "DREG-HIGH-ARITY-20261101",
-  "version": 2,
+  "version": 3,
   "created": "2026-11-01",
   "repository": "crypto",
   "study_dir": "research/dreg_high_arity_20261101",
@@ -801,13 +801,39 @@
         "variable_ledger.factors.source_build_and_caps.how",
         "freeze"
       ]
+    },
+    {
+      "id": "A2-MAINLINE-SOURCE-ADVANCE",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "After protocol v2 was locally refrozen as 673323704df4252797f9a659ed4499b92a07758d99d63fd4726327a73926d984, the current PR branch merged active mainline index-calculus work that changed or added twenty files inside the recursively frozen root source tree. The clean-source gate would correctly reject the v2 binaries. No registered draw, closure attempt, analysis, publication, or cloud job was generated under v2.",
+      "changes": [
+        "Integrate the current mainline source modules rather than reverting concurrent ECDLP lead work.",
+        "Regenerate sources.sha256 over the expanded recursive frozen set and bind a new pushed immutable source commit.",
+        "Rebuild all four release examples in the same pinned Rust image, rerun exact release and canonical export-checker tests, and replace every affected source, binary, protocol, launch, and custody identity before any registered execution."
+      ],
+      "supersedes_fields": [
+        "version",
+        "arms[*].instrument.commit",
+        "arms[*].instrument.binary_sha256",
+        "arms[*].instrument.flags.ladder_binary_sha256",
+        "arms[*].instrument.flags.analyzer_binary_sha256",
+        "arms[*].instrument.flags.report_binary_sha256",
+        "arms[*].instrument.flags.ladder_source_sha256",
+        "arms[*].instrument.flags.closure_source_sha256",
+        "arms[*].instrument.flags.analyzer_source_sha256",
+        "arms[*].instrument.flags.report_source_sha256",
+        "analysis_plan.script.sha256",
+        "variable_ledger.factors.source_build_and_caps.how",
+        "freeze"
+      ]
     }
   ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "673323704df4252797f9a659ed4499b92a07758d99d63fd4726327a73926d984",
-    "commit": "69ace2cc326d85c5128a5d36af5e72de1747385d",
-    "frozen_at": "2026-11-02T17:30:22Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }
