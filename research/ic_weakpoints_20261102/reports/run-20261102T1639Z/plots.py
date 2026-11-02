@@ -113,8 +113,10 @@ print("ok")
 SD = D / "summary_dlp.jsonl"
 if SD.exists():
     L = [json.loads(l) for l in SD.read_text().splitlines()]
-    cells = [s for s in L if s["summary"] == "dlp_cell"]
-    fits = {(s["r"], s["lp"]): s for s in L if s["summary"] == "dlp_fit"}
+    M = "T_square" if any(s.get("metric") == "T_square" for s in L) else "T"
+    cells = [s for s in L if s["summary"] == "dlp_cell" and s.get("metric", "T") == M]
+    fits = {(s["r"], s["lp"]): s for s in L if s["summary"] == "dlp_fit" and s.get("metric", "T") == M}
+    fitsT = {(s["r"], s["lp"]): s for s in L if s["summary"] == "dlp_fit" and s.get("metric", "T") == "T"}
     models = [s for s in L if s["summary"] == "dlp_model"]
     fig, ax = plt.subplots(1, 3, figsize=(10.5, 3.0))
     names = {0: "0 large primes", 1: "1 large prime", 2: "2 large primes"}
@@ -129,7 +131,7 @@ if SD.exists():
         ax[0].plot(x, y, color=cols[lp], lw=.8, label=names[lp] + (f"  slope {fits[(c[0]['r'], lp)]['alpha']:.2f}" if c and (c[0]['r'], lp) in fits else "  (censored)"))
     ax[0].set_yscale("log")
     ax[0].set_xlabel("log2 p")
-    ax[0].set_ylabel("trials to |FB|+21 full rows")
+    ax[0].set_ylabel("trials to |FB|+1 full rows" if M == "T_square" else "trials to |FB|+21 full rows")
     ax[0].set_title("|FB| ~ p^(2/3)/2: trials (x = censored)", fontsize=9)
     ax[0].legend(fontsize=6, frameon=False)
     rs = sorted({s["r"] for s in fits.values()}, reverse=True)
@@ -137,6 +139,10 @@ if SD.exists():
         pts = [(r, fits[(r, lp)]["alpha"], fits[(r, lp)]["alpha_se"]) for r in rs if (r, lp) in fits]
         if pts:
             ax[1].errorbar([q[0] for q in pts], [q[1] for q in pts], yerr=[2 * q[2] for q in pts], fmt="o-", color=cols[lp], ms=4, label=names[lp])
+        if M != "T":
+            pt = [(r, fitsT[(r, lp)]["alpha"]) for r in rs if (r, lp) in fitsT]
+            ax[1].plot([q[0] for q in pt], [q[1] for q in pt], "o", mfc="none", color=cols[lp], ms=4, lw=0,
+                       label="run-1 metric T (+20 margin, biased)" if lp == 2 else None)
     rr = [0.5, 1.0]
     ax[1].plot(rr, [3 - 2 * r for r in rr], ":", color="#888", label="0LP law 3-2r")
     ax[1].axhline(1.5, color="#2a9d55", lw=.8, ls="--", label="rho exponent 1.5")
@@ -155,6 +161,6 @@ if SD.exists():
     ax[2].set_ylabel("IC / rho (negation map), best r")
     ax[2].set_title("DERIVED: fitted laws + measured c(3)", fontsize=9)
     ax[2].legend(fontsize=5.5, frameon=False, ncol=2)
-    fig.text(0.01, 0.01, "arm L (Amendment 2), seed 20261104, 2 curves per p", fontsize=6, color="#888")
+    fig.text(0.01, 0.01, "arm L (Amendments 2-3), seed 20261104, 2 curves per p; panel 3 extrapolates fits from p <= 2039 and is a model, not a measurement", fontsize=6, color="#888")
     save(fig, "fig5_large_primes")
     print("fig5 ok")
