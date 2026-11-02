@@ -4880,3 +4880,69 @@ the Macaulay entries still dominate; the rows stay `≳ 10³`–`10⁵×` from t
 that an F-specific defect is caught both when it breaks the structure (C_F) and when it leaves the structure
 intact and corrupts only a read row's contents (C_F^mid).  If G2.178 fails, E38 stops and the controls, not
 the rules, are again the result.
+
+### 9.47 E38 measured: the kill fired at the pilot — the structure-preserving F control could never be aimed, because every column the normal forms read is contested; the repaired check on E37's F control passed 160/160; not ranked
+
+*2026-11-02.*  Pre-registration §9.46 (`c20e4fa066`, before any code).  Code `149dac81b9` (probe records, controls) and
+`da3e7e5363` (harness).  Binaries built once from a clean `git archive` export of `da3e7e5363` (4,675 files checked
+blob by blob, 0 mismatches; plus the five `include_str!` docs files from the same commit), pinned by sha256
+(`experiments/45_pivot_rules_confirm2/binary_sha256.txt`, provenance in `binary_commit.txt`), run from pinned copies.
+The main session's rustfmt/clippy commit `699c05df9a` (no behaviour change) landed after the build SHA and is not in
+the binaries.  Records: `experiments/45_pivot_rules_confirm2/` (`identity_existing.json`, `identity/`, `pilot.json`,
+`pilot_p2.json` and logs, `tables.md`, `summary.json` from `examples/e38_tables.rs`).  Report:
+`research/e38_pivot_rules_confirm2_20261102/`.  Host: the 4-vCPU container; isolab-eks unreachable, `conductor` not
+installed: **operation counts only, no wall-time claim.**  Runs, in the registered order: identity, pilot P1, fallback
+pilot P2.  Then the stop rule applied: **the main control run, Stage A and the end-to-end runs were not taken.**
+
+**Identity (G2.177, binary clauses).**  19/19 byte-identical (canonical JSON without timings) under the E38 binaries:
+E37's eleven identity configurations (`macaulay`, `chain`, `chain-sparsest`, `chain`/`chain-sparsest-est`/`chain-fifo`/
+`chain-static`/`chain-fifo-static --karatsuba`, the default `quartic_pipeline_v4`, and the two E36-binary records);
+E37's stored end-to-end records at `p = 101` seed 2 on its stream `0xE37E0001` (GLS A, F, S, H, B″; E24 F); E37's
+`checks.json` from E37's unchanged `e37_checks` built at the E38 commit; E37's `walk_e24.json` from `e37_walk_e24`.
+The probe additions and the two control hooks change nothing that existed.
+
+**Pilot P1** (stream `0xE38D_0001`, 8 calls on each of E25's ten curves = 80, 57 with a non-empty clean set):
+
+| control | check | aimed | positive | strict / `P` changed / `T` changed | detected (all) | non-empty detected | pilot |
+|:--|:--|--:|--:|:--|--:|--:|:--|
+| C_F (i), E37's misfile | `P_ext` | 80 | 80/80 | 0 / 80 / 80 | 79/80 | 56/57 | pass |
+| C_F^mid (ii) | `P_mid` | **0** | **0/80** | — | 0 | 0/57 | **fail** |
+| C_SH (S) | strict | 80 | 80/80 | 80 / 0 / 0 | 76/80 | 57/57 | pass |
+| C_SH (H) | strict | 80 | 80/80 | 80 / 0 / 0 | 73/80 | 56/57 | pass |
+| C_0 (F, S, H, L), calibration | strict | 80 | 80/80 each | 80 / 0 / 0 | 70–74/80 | 56/57 each | — |
+
+The perturbed coefficient changed 57/57 non-empty sets under F, S, H and L; the F and L digests differ from A's on
+80/80 calls; no clean-run identity failure.  **Why C_F^mid was never aimed:** its candidate set `U`, the pivot columns read
+by the left-looking normal forms whose bucket held one row, was empty on all 80 calls.  Every column the normal forms
+read is contested in F's echelon.  The normal forms start at the border targets, late in the column order, and read
+only columns at or right of them, where the buckets always hold several rows (`≈ 334` of `384` pivot columns are
+contested per call).  This is inferred from the records; no column-by-column trace was taken.  **Fallback pilot P2**
+(stream `0xE38D_0101`, 80 calls, 58 non-empty, `--fallback cfmid`): C_F^mid-b draws `l*` from the same `U` and was also
+aimed on **0/80** calls.  On P2, C_F under `P_ext` was 80/80 positive and detected 80/80 (58/58 non-empty); C_SH (S, H)
+80/80 positive, 58/58 non-empty; C_0 80/80, 57–58/58.  **By §9.46 a fallback that fails its pilot stops E38: the
+kill fired.**
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.176 | C_F^mid 0/80 on P1 (`U = ∅` on every call); fallback C_F^mid-b 0/80 on P2; the other primaries pass | **falsified — the kill fired as registered; E38 stops, no rank** |
+| G2.177 | 19/19 existing configurations byte-identical; the Stage A and end-to-end clauses were not run | holds where tested |
+| G2.178 | not run (stop rule) | not tested |
+| G2.179 | C_F^mid aimed on 0 % of pilot calls (predicted `≥ 95 %`); C_F under `P_ext` 160/160 positive with the strict check 0/160 (predicted `≥ 99 %` and `≤ 5 %`) | falsified for C_F^mid (pilot data; the main run was not taken) |
+| G2.180–G2.189 | not run (stop rule) | not tested |
+
+**What it says.**  Nothing new about F, S or H: the rules were not run.  The verified, ranked state stays as before
+E36, and F, S, H remain **unranked**.  E37's descriptive orders (§9.45) are the latest measurement.  On the closest
+GLS row (`p = 397` seed 1 arm B), F is `3.93·10³×` the matched rho at `0` GAE and `8.40·10⁴×` at `1` GAE (A:
+`6.00·10³×`, `8.51·10⁴×`); rho is ahead of every row at every weight.  Two things are now known about the controls:
+
+1. **E37's F-control failure was in its positive check, and the extended check repairs it.**  Judged by `P_ext`, the
+   misfile passed on 160/160 pilot calls.  It always changes both the pivot set and the border targets, and it never
+   passes the strict check.  It is detected on 114/115 non-empty calls.
+2. **A structure-preserving F control cannot target an uncontested read column, because none exists.**
+
+The registration erred in its prediction for C_F^mid, not in its stop rule.  **Next step (E39, not registered here):**
+the same provable construction applied to a *contested* read column `l` *after* its bucket's updates.  The pivot row of
+`l` is never used again by the echelon, so its last-column entry can be moved with every other row, the pivot set and
+the border targets unchanged, while a row the normal forms read is altered.  E39 would pair that control with C_F under
+`P_ext`, with the main run, Stage A and the end to end as registered here.  **Not done:** the main control run, Stage A,
+the end to end (by the stop rule); the validation gate, the leaderboard and `benchmarks/` (main session).
