@@ -115,15 +115,21 @@ across exactly (`lineR_subst`).
 
 ## Bridges (`VeluBridge.lean`), added after the obstruction PR
 
-Status: **pending the proof gate**; the record is appended below when it runs.
+Status: **checked.** Run 41499169867, job 125462584516 (target 23), at `0db9e35`, reports
+`PASS 78 thm 0 trusted`: 11 theorems beyond the 67 already checked at `faea6a9`. Axioms are
+limited to the gate whitelist (`propext`, `Classical.choice`, `Quot.sound`).
+
+The first bridge run (41497954323, at `344bb15`) reported `FAIL_build`. `S.erase` in the
+odd-ℓ bridge needs `DecidableEq K`, which `0db9e35` adds. Everything before that
+declaration, including both ℓ = 2 bridges, compiled in that run.
 
 | Statement | Lean declaration | Hypotheses | Status |
 |---|---|---|---|
-| ℓ = 2: Vélu's map sends E to E′ (Mathlib `Equation`) | `velu2_maps_to_codomain` | `x₀` root of `x³+Ax+B`, `x ≠ x₀` | pending |
-| ℓ = 2: the x-map is invariant under `P ↦ P + T`, with `x(P+T)` from Mathlib's `addX ∘ slope` | `velu2_x_kernel_invariant` | as above, plus `3x₀²+A ≠ 0` | pending |
-| ℓ = 2: the obstruction's forms evaluate to this x-map | `velu_dmap_eval` | `x ≠ x₀` | pending |
-| Odd ℓ: Vélu's sum `x + Σ((6q²+2A)/(x−q) + 4y_q²/(x−q)²)` equals `N(x)/ψ(x)²` | `veluOddX_eq_div` | `x ∉ S` | pending |
-| Density 1 on `u·u` forces a monomial step | `density_one_step_monomial` | `n₂ ≠ 0`, nonzero resultant, pairwise products of `d₁, d₀, n₁, n₀` vanish | pending |
+| ℓ = 2: Vélu's map sends E to E′ (Mathlib `Equation`) | `velu2_maps_to_codomain` | `x₀` root of `x³+Ax+B`, `x ≠ x₀` | checked |
+| ℓ = 2: the x-map is invariant under `P ↦ P + T`, with `x(P+T)` from Mathlib's `addX ∘ slope` | `velu2_x_kernel_invariant` | as above, plus `3x₀²+A ≠ 0` | checked |
+| ℓ = 2: the obstruction's forms evaluate to this x-map | `velu_dmap_eval` | `x ≠ x₀` | checked |
+| Odd ℓ: Vélu's sum `x + Σ((6q²+2A)/(x−q) + 4y_q²/(x−q)²)` equals `N(x)/ψ(x)²` | `veluOddX_eq_div` | `x ∉ S` | checked |
+| Density 1 on `u·u` forces a monomial step | `density_one_step_monomial` | `n₂ ≠ 0`, nonzero resultant, pairwise products of `d₁, d₀, n₁, n₀` vanish | checked |
 
 ## Scope: what this does not prove
 
