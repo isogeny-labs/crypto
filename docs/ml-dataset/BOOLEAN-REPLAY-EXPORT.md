@@ -1,6 +1,6 @@
 # Original-bound Boolean replay and training export
 
-The optional typed channel request binds bounded ordinary binary m3 Boolean production into the plan, worker and historical verifier. Plans with channels use v3; absent channels preserve the legacy representation. Requested unsupported cells remain explicit. SAT initial capture remains unsupported through this optional CLI channel.
+The optional typed channel request binds bounded ordinary binary m3 Boolean production into the plan, worker and historical verifier. The frozen canonical protocol authorizes the exact channel object through `extensions.dataset_channels`. Plans with channels use v3; absent channels preserve the legacy representation. Requested unsupported cells remain explicit. SAT initial capture remains unsupported through this optional CLI channel.
 
 Historical replay reconstructs the original equations and retained target, checks capture custody and sticky budget transitions, then independently verifies the polynomial identity. Export uses a private admitted projection to write `boolean-equation-features.jsonl` containing source equations and selector conventions, and `restricted/boolean-equation-records.jsonl` containing targets, proofs, assessments and provenance. Public features exclude solver outcomes and proof-dependent data. Final custody and post-encoding deadline checks precede release; unknown/expired/rejected identities never release positive public features. The original producer and historical replay caps are unchanged.
 

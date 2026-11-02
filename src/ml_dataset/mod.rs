@@ -2017,7 +2017,7 @@ fn verify_protocol(plan: &DatasetPlan, bytes: &[u8]) -> Result<(), String> {
         return Err("expected experiment.protocol/v1 protocol".into());
     }
     if let Some(channels)=&plan.channels {
-        if value["dataset_channels"] != serde_json::to_value(channels).map_err(|e|e.to_string())? {
+        if value["extensions"]["dataset_channels"] != serde_json::to_value(channels).map_err(|e|e.to_string())? {
             return Err("frozen protocol does not authorize exact requested channels".into());
         }
     }
@@ -7264,6 +7264,39 @@ mod channel_plan_tests {
         serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v1",
             "boolean_consequence":{"mode":"produce","row_index":0},
             "sat_initial":{"mode":"capture_and_check_initial"}})).unwrap()
+    }
+    #[test]
+    fn frozen_protocol_requires_exact_channels_in_canonical_extensions() {
+        fn frozen(plan: &mut DatasetPlan, mut body: serde_json::Value) -> Vec<u8> {
+            let body_hash = digest(&protocol_canonical_bytes(&body).unwrap());
+            body["freeze"] = json!({"status":"frozen","protocol_sha256":body_hash,
+                "filed_before_affected_data":true,"frozen_at":"2026-11-02T00:00:00Z"});
+            let bytes = serde_json::to_vec(&body).unwrap();
+            plan.protocol_sha256 = Some(digest(&bytes));
+            bytes
+        }
+        let mut plan = legacy();
+        plan.schema = "crypto.ml-dataset.plan/v3".into();
+        plan.channels = Some(request());
+        let body = json!({"schema":"experiment.protocol/v1",
+            "extensions":{"dataset_channels":request()}});
+        let bytes = frozen(&mut plan, body.clone());
+        assert_eq!(verify_protocol(&plan, &bytes), Ok(()));
+        let mut wrong_row = body.clone();
+        wrong_row["extensions"]["dataset_channels"]["boolean_consequence"]["row_index"] = json!(1);
+        let mut missing_sat = body.clone();
+        missing_sat["extensions"]["dataset_channels"].as_object_mut().unwrap().remove("sat_initial");
+        for mismatch in [wrong_row, missing_sat,
+            json!({"schema":"experiment.protocol/v1","extensions":{}}),
+            json!({"schema":"experiment.protocol/v1","dataset_channels":request()})] {
+            // Recompute BOTH hashes: each rejection must be authorization, not stale custody.
+            let bytes = frozen(&mut plan, mismatch);
+            assert_eq!(verify_protocol(&plan, &bytes),
+                Err("frozen protocol does not authorize exact requested channels".into()));
+        }
+        let mut legacy_plan = legacy();
+        let bytes = frozen(&mut legacy_plan, json!({"schema":"experiment.protocol/v1"}));
+        assert_eq!(verify_protocol(&legacy_plan, &bytes), Ok(()));
     }
     #[test]
     fn requested_plan_preserves_full_axes_and_changes_identity() {
