@@ -113,16 +113,41 @@ across exactly (`lineR_subst`).
 | **Main theorem, odd ℓ** (Vélu–Kohel form N/ψ², ψ = ∏ (x − x_Q)) | `velu_odd_not_monomial` | `3 ≤ ℓ`, `(ℓ:K) ≠ 0`, `r ∈ S` (a kernel abscissa in K), `det M, det M' ≠ 0`; `N` arbitrary | checked |
 | ℓ ≥ 3: the predicate is not vacuous | `power_isMonomial` | none | checked |
 
+## Bridges (`VeluBridge.lean`), added after the obstruction PR
+
+Status: **checked.** Run 41499169867, job 125462584516 (target 23), at `0db9e35`, reports
+`PASS 78 thm 0 trusted`: 11 theorems beyond the 67 already checked at `faea6a9`. Axioms are
+limited to the gate whitelist (`propext`, `Classical.choice`, `Quot.sound`).
+
+The first bridge run (41497954323, at `344bb15`) reported `FAIL_build`. `S.erase` in the
+odd-ℓ bridge needs `DecidableEq K`, which `0db9e35` adds. Everything before that
+declaration, including both ℓ = 2 bridges, compiled in that run.
+
+| Statement | Lean declaration | Hypotheses | Status |
+|---|---|---|---|
+| ℓ = 2: Vélu's map sends E to E′ (Mathlib `Equation`) | `velu2_maps_to_codomain` | `x₀` root of `x³+Ax+B`, `x ≠ x₀` | checked |
+| ℓ = 2: the x-map is invariant under `P ↦ P + T`, with `x(P+T)` from Mathlib's `addX ∘ slope` | `velu2_x_kernel_invariant` | as above, plus `3x₀²+A ≠ 0` | checked |
+| ℓ = 2: the obstruction's forms evaluate to this x-map | `velu_dmap_eval` | `x ≠ x₀` | checked |
+| Odd ℓ: Vélu's sum `x + Σ((6q²+2A)/(x−q) + 4y_q²/(x−q)²)` equals `N(x)/ψ(x)²` | `veluOddX_eq_div` | `x ∉ S` | checked |
+| Density 1 on `u·u` forces a monomial step | `density_one_step_monomial` | `n₂ ≠ 0`, nonzero resultant, pairwise products of `d₁, d₀, n₁, n₀` vanish | checked |
+
 ## Scope: what this does not prove
 
 - **Vélu's theorem.** The pair of forms `velu x₀ v` is taken as the
-  definition of the step. That it is the x-map of the 2-isogeny with kernel
+  definition of the step. `VeluBridge.lean` proves that it is the x-map of a
+  map from E to E′, constant on cosets of the kernel and computed with
+  Mathlib's group law. It also proves that, for odd ℓ, Vélu's sum has
+  denominator ψ². **Still open:** that the map is a group homomorphism (an
+  isogeny), and the degree of the odd-ℓ numerator, which ties `N/ψ²` to the
+  homogeneous form `(N : Z·ψ²)` used by `velu_odd_not_monomial`. That it is the x-map of the 2-isogeny with kernel
   (x₀, 0) is Vélu's theorem, which is not in Mathlib. The study's harness
   checks it numerically (every pushed generator lies on the codomain).
-- **Density 1 ⇒ monomial steps.** The link from "S1 density 1" (the cost
-  measure in the study) to "every step is monomial in some coordinates" is
-  argued in the protocol but not formalised. The Lean theorem is about
-  monomial shape, not about Gröbner density.
+- **Density 1 ⇒ monomial steps.** `density_one_step_monomial` proves the
+  one-step coefficient statement: for a step whose leading monomial is u², a
+  single-term normal form of u² forces u′ = λu². **Still open:** that this
+  normal form is the Gröbner reduction inside the whole chain algebra (true
+  when the other levels' leading monomials are coprime, as in the study's
+  harness), and steps whose denominator has a u² term (leading monomial u²u′).
 - **ℓ ≥ 3** is formalised in `VeluObstructionOdd.lean`. For odd ℓ the
   obstruction is stronger: no Möbius coordinates make even one step
   monomial. The modelling input is again Vélu's theorem, in Kohel's form:
