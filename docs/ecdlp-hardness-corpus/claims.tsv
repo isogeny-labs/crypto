@@ -81,3 +81,22 @@ BOUNDARY-INVALID-CURVE	conditional_attack	conditional	classical_unrestricted	con
 GAP-MULTITARGET-NONUNIFORM	open_obligation	open	generic_group_preprocessing	open	-	S-CGK-2018,S-BL-2013
 GAP-END-TO-END-IC-EXPONENT	open_obligation	open	algebraic_coordinate	open	-	S-GAUDRY-GALBRAITH-2016,S-PRIME-PROGRAM,S-SYNTHESIS
 GAP-PROTOCOL-ASSUMPTION-MAPPING	open_obligation	open	classical_unrestricted	open	-	S-POINTCHEVAL-STERN-1996,S-FST-2010
+DEF-MULTIDIMENSIONAL-DLP	definition	definition	mathematical	-	-	S-GALBRAITH-MPKC-2018
+LB-GENERIC-REPRESENTATION	model_lower_bound	proved_external	generic_group	theorem	T = Omega(s^(l/2)/log(s)^(c/2))	S-GALBRAITH-MPKC-2018
+DEF-LOW-HAMMING-DLP	definition	definition	mathematical	-	-	S-GALBRAITH-MPKC-2018
+ALG-COPPERSMITH-LOW-HAMMING	algorithmic_upper_bound	algorithm	classical_unrestricted	theorem	E[T] = O(sqrt(w) * binom(n/2,w/2)); S = O(binom(n/2,w/2))	S-GALBRAITH-MPKC-2018
+HEUR-WAGNER-FOUR-SUM	heuristic	heuristic	algebraic_coordinate	asymptotic_heuristic	T,S = soft-O(2^(n/3))	S-GALBRAITH-MPKC-2018
+THEOREM-RHO-THREE-PARTITION	algorithmic_upper_bound	proved_external	generic_group	theorem	T = O_epsilon(sqrt(r) log(r)^3)	S-GALBRAITH-MPKC-2018
+ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL	algorithmic_upper_bound	heuristic	generic_group	asymptotic_heuristic	E[T] = (2.43+o(1)) N	S-GALBRAITH-MPKC-2018
+DEF-SUBEXPONENTIAL-L	definition	definition	mathematical	-	L_N(alpha,c)=exp((c+o(1))(log N)^alpha(log log N)^(1-alpha))	S-GALBRAITH-MPKC-2018
+DEF-FIXED-CDH	definition	definition	mathematical	-	-	S-GALBRAITH-MPKC-2018
+THEOREM-CDH-RANDOM-SELF-REDUCTION	structural_theorem	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+THEOREM-CDH-SELF-CORRECTION	reduction	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+RED-DEN-BOER-FIXED-CDH	reduction	conditional	mathematical	conditional_theorem	group cost = O(sqrt(l) log(r)^2/log(l)); oracle queries = O(log(r)log log(r))	S-GALBRAITH-MPKC-2018
+RED-MAURER-AUXILIARY-CURVE	reduction	conditional	mathematical	conditional_theorem	oracle queries = O(log(r)^2 log log(r))	S-GALBRAITH-MPKC-2018
+ALG-STATIC-DH-AUXILIARY-POWERS	conditional_attack	conditional	classical_unrestricted	conditional_theorem	T = O((sqrt((r-1)/d)+sqrt(d))log(r)); Q = d	S-GALBRAITH-MPKC-2018
+RED-DLP-LEAST-SIGNIFICANT-BIT	reduction	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+RED-ISOGENY-DLP-TRANSPORT	reduction	proved_external	curve_family_restricted	theorem	-	S-GALBRAITH-MPKC-2018
+THEOREM-PAIRING-BILINEAR-NONDEGENERATE	structural_theorem	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
+RED-PAIRING-CO-DDH	conditional_attack	conditional	curve_family_restricted	conditional_theorem	-	S-GALBRAITH-MPKC-2018
+FACT-PAIRING-FRIENDLY-TWO-DLPS	structural_theorem	proved_external	curve_family_restricted	definition	-	S-GALBRAITH-MPKC-2018

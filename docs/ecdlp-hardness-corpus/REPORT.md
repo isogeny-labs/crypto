@@ -19,8 +19,10 @@ header-includes:
 
 # Executive result
 
-The assembled corpus contains **82 claims, 119 typed logical edges, 49 source
-records, and 12 prioritized research targets**. It separates five propositions that are
+The assembled corpus contains **101 claims, 145 typed logical edges, 50 source
+records, and 13 prioritized research targets**. Its companion book inventory contains
+**717 labeled results and 375 numbered sections** from Galbraith's 696-page version 2.0.
+Together they separate five propositions that are
 often collapsed into “elliptic curves are secure”:
 
 1. the selected subgroup is large and avoids known exceptional attacks;
@@ -44,7 +46,7 @@ most credible active branch is coordinate algebra, but it does not become an att
 until factor-base generation, relation yield, polynomial solving, rank, sparse linear
 algebra, individual descent, memory, and verification all fit one sub-rho cost bound.
 
-![Seven-layer overview of the corpus. The full 82-node graph is in `graph.svg`.](overview.pdf){ width=100% }
+![Seven-layer overview of the corpus. The full 101-node graph is in `graph.svg`.](overview.pdf){ width=100% }
 
 # Scope and terminology
 
@@ -67,7 +69,25 @@ mechanisms and different obstructions.
 
 This report is a research map, not a security proof for a product and not a claim of a
 new ECDLP break. Exact records are in `corpus.json`, `corpus-extension.json`,
-`claims.tsv`, and `sources.tsv`.
+`galbraith-promotions.json`, `claims.tsv`, and `sources.tsv`. The complete book-level
+location inventory and its promotion rationale are in `galbraith-2018-inventory.json`
+and `GALBRAITH_BOOK_AUDIT.md`.
+
+## Book-depth coverage
+
+The Galbraith inventory is exhaustive at the numbered-result and numbered-section
+level: 209 definitions, 188 theorems, 230 lemmas, 46 corollaries, 3 propositions, 4
+conjectures, 8 explicitly labeled heuristics, and 29 algorithms. It retains exact page,
+chapter, section, and relevance metadata without reproducing the theorem prose.
+
+The dependency graph promotes only security-bearing results. This expansion adds
+generalized and low-Hamming-weight DLPs, their bounds, Wagner's representation-aware
+four-sum heuristic, a rigorous rho theorem, the Gaudry--Schost two-dimensional bound,
+L notation, Fixed-CDH granularity, CDH random self-reduction and amplification, den
+Boer and Maurer reductions, static-DH auxiliary powers, least-significant-bit recovery,
+isogeny transport, pairing foundations, co-DDH, and the two-sided source/target DLP
+requirement for pairing-friendly curves. Background results remain discoverable in the
+inventory instead of becoming misleading security edges.
 
 # Load-bearing theorems and bounds
 
@@ -77,7 +97,9 @@ new ECDLP break. Exact records are in `corpus.json`, `corpus-extension.json`,
 | Pohlig--Hellman | reduce DLP modulo the group order to prime-power components | known group order/factorization | hardness of the largest prime component |
 | BSGS | `O(sqrt(r))` group operations and storage | generic cyclic group | a memory-light optimum |
 | Pollard rho | expected `O(sqrt(r))`; random-mapping repeat constant about `sqrt(pi r/2)` | heuristic random walk; useful collision and restart conditions | an unconditional wall-time constant |
+| Rigorous rho partition bound | `O_epsilon(sqrt(r) log(r)^3)` with success at least `1-epsilon` | random three-set partition; fixed `epsilon` | the precise heuristic constant for a fixed cheap partition |
 | Shoup 1997 | generic DLP success `O(m^2/p)` after `m` oracle queries; constant success needs `Omega(sqrt(p))` | random encoding; `p` largest prime divisor; generic oracle | coordinate algorithms, pairings, polynomial systems, cheap extra maps |
+| Representation problem | `Omega(s^(l/2)/log(s)^(c/2))` for noticeable generic success | even `l`; equal coefficient-set size `s`; generic group | arbitrary structured representations or unequal distributions |
 | CGK 2018 advice | `S T^2 = soft-Omega(epsilon N)` | prime-order generic group; `S` advice bits; `T` online queries; success `epsilon` | uncharged or coordinate-augmented advice outside the interface |
 | CGK 2018 setup | `P T + T^2 = Omega(epsilon N)` | paper's generic preprocessing experiment | a many-user conversion without matching experiments |
 | Smart trace-one | polynomial/linear-basic-operation attack when `#E(F_p)=p` | anomalous prime-field curve; p-adic lift | ordinary non-anomalous curves |
@@ -85,6 +107,9 @@ new ECDLP break. Exact records are in `corpus.json`, `corpus-extension.json`,
 | GHS | conditional `O(q^(2+epsilon))` on specified characteristic-two families with fixed composite extension degree | transfer kernel does not kill the large subgroup; paper's family | arbitrary binary or prime-field curves |
 | Gaudry fixed extension | quoted `soft-O(q^(2-2/n))` for fixed `n>=3` under PDP hypotheses | extension field; decomposition/solver/rank assumptions; hidden exponential dependence on `n` | a prime-field result obtained by putting `n=1` |
 | Diem 2011 | expected `exp(O(max(log q,n^2)))` in the paper's input model | specified extension-field sequence and randomized construction | a uniform subexponential attack on named prime curves |
+| den Boer / Maurer | DLP-to-Fixed-CDH reductions with factor-of-`r-1` or auxiliary smooth-order-curve costs | perfect oracle plus arithmetic/smoothness hypotheses | unconditional CDH--DLP equivalence for every curve family |
+| Efficient isogeny transport | map an order-`r` DLP injectively through an isogeny of degree coprime to `r` | efficiently computable map; correct subgroup | equivalence from equal curve cardinality alone |
+| Pairing decision reduction | co-DDH is easy with independent torsion directions; DDH needs nontrivial self-pairing/distortion | nondegenerate computable pairing and suitable domains | easy DDH in every ordinary elliptic-curve subgroup |
 | Shor | polynomial-time DLP in finite abelian groups | scalable fault-tolerant quantum computation | practical physical resources on one architecture |
 | JKSST xedni analysis | one-shot `<= C0/p`; uniform conditional hazard gives `E[T]=Omega(p)` | selected-lift height/Lang; reduction, usefulness, bounded cofactor, adaptive recurrence | an unconditional lower bound on every lifting algorithm |
 
@@ -368,6 +393,7 @@ falsifiable obligation rather than an undifferentiated hope.
 
 # Selected sources
 
+- Steven D. Galbraith, [Mathematics of Public Key Cryptography, version 2.0](https://www.math.auckland.ac.nz/~sgal018/crypto-book/crypto-book.html), 2018.
 - Victor Shoup, [Lower Bounds for Discrete Logarithms and Related Problems](https://doi.org/10.1007/3-540-69053-0_18), EUROCRYPT 1997.
 - Henry Corrigan-Gibbs and Dmitry Kogan, [The Discrete-Logarithm Problem with Preprocessing](https://doi.org/10.1007/978-3-319-78375-8_14), EUROCRYPT 2018.
 - Paul van Oorschot and Michael Wiener, [Parallel Collision Search with Cryptanalytic Applications](https://doi.org/10.1007/PL00003816), Journal of Cryptology 1999.
