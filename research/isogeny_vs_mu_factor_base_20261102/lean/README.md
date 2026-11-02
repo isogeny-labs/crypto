@@ -94,24 +94,24 @@ across exactly (`lineR_subst`).
 
 | Report statement | Lean declaration | Hypotheses (exact) | Status |
 |---|---|---|---|
-| Fibres of a conjugated map are pulled-back fibres | `fibre_conj` | none (any field) | in gate |
-| Discriminant under substitution and scaling | `BQF.disc_comp`, `BQF.disc_smul` | none | in gate |
-| Double roots are carried by invertible substitutions | `BQF.grad_zero_of_comp` | `a*d - b*c ≠ 0` | in gate |
-| (1) Monomial branch values are only 0 and ∞ | `monomial_branch` | `(2:K) ≠ 0`, `IsMonomial G` | in gate |
-| (1) Monomial maps ramify at 0 and ∞ | `monomial_ramif` | `IsMonomial G`, `q₁ * q₂ = 0` | in gate |
-| (2) Vélu fibre discriminant and partials | `velu_fibre_disc`, `velu_fibre_dX`, `velu_fibre_dZ` | none | in gate |
-| (3) Codomain cubic factorisation | `codomain_cubic_factor` | `x₀³ + a x₀ + b = 0` | in gate |
-| (4) Core obstruction | `no_two_monomial_steps` | `(2:K) ≠ 0`, `(x₁ - x₀)² = 4v`, `v₁ ≠ 0`, `det Mᵢ ≠ 0` (i = 0, 1, 2) | in gate |
-| **Main theorem** (cyclic Vélu chains) | `velu_chain_not_monomial` | `(2:K) ≠ 0`, `x₀` root of `x³+ax+b`, `3x₀²+a ≠ 0`, `x₁` root of the codomain cubic, `x₁ ≠ -2x₀`, `det Mᵢ ≠ 0` | in gate |
-| The predicate is not vacuous | `squareMap_isMonomial` | none | in gate |
-| **ℓ ≥ 3, any field with ℓ a unit:** line restriction commutes with substitution | `lineR_subst`, `eval0_lineR` (`VeluObstructionOdd.lean`) | none | in gate |
-| ℓ ≥ 3: fibres of a conjugated map | `fibreL_conj` | none | in gate |
-| ℓ ≥ 3: monomial fibres are binomials αX^ℓ + βZ^ℓ | `monomial_fibre_binom` | `IsMonomialL ℓ G` | in gate |
-| ℓ ≥ 3: a binomial has no double zero together with a simple zero | `binom_contra` | `2 ≤ ℓ`, `(ℓ:K) ≠ 0`, `P ≠ 0` | in gate |
-| ℓ ≥ 3: fibre over ∞ of N/ψ² (double at roots of ψ, simple at ∞) | `fibInf_double`, `fibInf_simple_val`, `fibInf_simple_slope` | `ψ(r,1) = 0`; `ψ(1,0) ≠ 0` | in gate |
-| ℓ ≥ 3: core theorem (single step) | `not_monomial_of_sq_denominator` | `2 ≤ ℓ`, `(ℓ:K) ≠ 0`, `ψ(1,0) ≠ 0`, `ψ(r,1) = 0`, `det M, det M' ≠ 0` | in gate |
-| **Main theorem, odd ℓ** (Vélu–Kohel form N/ψ², ψ = ∏ (x − x_Q)) | `velu_odd_not_monomial` | `3 ≤ ℓ`, `(ℓ:K) ≠ 0`, `r ∈ S` (a kernel abscissa in K), `det M, det M' ≠ 0`; `N` arbitrary | in gate |
-| ℓ ≥ 3: the predicate is not vacuous | `power_isMonomial` | none | in gate |
+| Fibres of a conjugated map are pulled-back fibres | `fibre_conj` | none (any field) | checked |
+| Discriminant under substitution and scaling | `BQF.disc_comp`, `BQF.disc_smul` | none | checked |
+| Double roots are carried by invertible substitutions | `BQF.grad_zero_of_comp` | `a*d - b*c ≠ 0` | checked |
+| (1) Monomial branch values are only 0 and ∞ | `monomial_branch` | `(2:K) ≠ 0`, `IsMonomial G` | checked |
+| (1) Monomial maps ramify at 0 and ∞ | `monomial_ramif` | `IsMonomial G`, `q₁ * q₂ = 0` | checked |
+| (2) Vélu fibre discriminant and partials | `velu_fibre_disc`, `velu_fibre_dX`, `velu_fibre_dZ` | none | checked |
+| (3) Codomain cubic factorisation | `codomain_cubic_factor` | `x₀³ + a x₀ + b = 0` | checked |
+| (4) Core obstruction | `no_two_monomial_steps` | `(2:K) ≠ 0`, `(x₁ - x₀)² = 4v`, `v₁ ≠ 0`, `det Mᵢ ≠ 0` (i = 0, 1, 2) | checked |
+| **Main theorem** (cyclic Vélu chains) | `velu_chain_not_monomial` | `(2:K) ≠ 0`, `x₀` root of `x³+ax+b`, `3x₀²+a ≠ 0`, `x₁` root of the codomain cubic, `x₁ ≠ -2x₀`, `det Mᵢ ≠ 0` | checked |
+| The predicate is not vacuous | `squareMap_isMonomial` | none | checked |
+| **ℓ ≥ 3, any field with ℓ a unit:** line restriction commutes with substitution | `lineR_subst`, `eval0_lineR` (`VeluObstructionOdd.lean`) | none | checked |
+| ℓ ≥ 3: fibres of a conjugated map | `fibreL_conj` | none | checked |
+| ℓ ≥ 3: monomial fibres are binomials αX^ℓ + βZ^ℓ | `monomial_fibre_binom` | `IsMonomialL ℓ G` | checked |
+| ℓ ≥ 3: a binomial has no double zero together with a simple zero | `binom_contra` | `2 ≤ ℓ`, `(ℓ:K) ≠ 0`, `P ≠ 0` | checked |
+| ℓ ≥ 3: fibre over ∞ of N/ψ² (double at roots of ψ, simple at ∞) | `fibInf_double`, `fibInf_simple_val`, `fibInf_simple_slope` | `ψ(r,1) = 0`; `ψ(1,0) ≠ 0` | checked |
+| ℓ ≥ 3: core theorem (single step) | `not_monomial_of_sq_denominator` | `2 ≤ ℓ`, `(ℓ:K) ≠ 0`, `ψ(1,0) ≠ 0`, `ψ(r,1) = 0`, `det M, det M' ≠ 0` | checked |
+| **Main theorem, odd ℓ** (Vélu–Kohel form N/ψ², ψ = ∏ (x − x_Q)) | `velu_odd_not_monomial` | `3 ≤ ℓ`, `(ℓ:K) ≠ 0`, `r ∈ S` (a kernel abscissa in K), `det M, det M' ≠ 0`; `N` arbitrary | checked |
+| ℓ ≥ 3: the predicate is not vacuous | `power_isMonomial` | none | checked |
 
 ## Scope: what this does not prove
 
@@ -138,6 +138,23 @@ across exactly (`lineR_subst`).
 
 ## Verification record
 
-Pending the `lean-proof-gate` CI run on the PR that adds this directory. The
-gate is not a PR check, so it is dispatched by hand on the PR branch. The record
-(run id, commit, gate outcome, axiom audit) is appended here when it completes.
+Both runs used the repository gate, `lean-proof-gate.yml`, dispatched by hand
+on branch `claude/velu-obstruction-lean-20261102`. That gate is not a
+pull-request check. The project is gate target 23,
+`research/isogeny_vs_mu_factor_base_20261102/lean`. The gate compiles every
+module and audits each theorem's transitive axioms; only `propext`,
+`Classical.choice` and `Quot.sound` are accepted. It found no `sorry`, no
+`native_decide` and no user axioms.
+
+| Commit | Modules | Run / job | Gate line |
+|---|---|---|---|
+| `e2808ec` | `VeluObstruction` (ℓ = 2) | 41484877701 / 125412732227 | `PASS 42 thm 0 trusted` |
+| `9c6b4cf` | + `VeluObstructionOdd` | 41488716595 / 125426076496 | `FAIL_build`: parse error at `VeluObstructionOdd.lean:238`. The identifier `hψ∞` is invalid because `∞` is not an identifier character. The run was cancelled. |
+| `faea6a9` | `VeluObstruction` + `VeluObstructionOdd` | 41489297063 / 125428825698 | **`PASS 67 thm 0 trusted`** |
+
+In run 41489297063, targets 13 and 126 failed on unrelated projects. They
+failed before building anything: the elan installer download returned
+`curl: (22) … 500` from GitHub. That is an infrastructure failure, not
+evidence about any proof.
+
+Every row of the proof map above is kernel-checked at `faea6a9`.
