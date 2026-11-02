@@ -1,0 +1,97 @@
+name: ECCp-131 representation-filter counted run
+
+on:
+  push:
+    branches:
+      - codex/eccp131-representation-filter-20261102
+    paths:
+      - research/eccp131_representation_filter_20261102/RUN-GITHUB
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eccp131-representation-filter-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  counted:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      RAYON_NUM_THREADS: "1"
+      SOURCE_REVISION: ${{ github.sha }}
+      CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore prospective resume card
+        run: |
+          mkdir -p .resume
+          cp research/eccp131_representation_filter_20261102/GITHUB-RESUME.md .resume/RESUME.md
+
+      - name: Checkpoint source and protocol before data
+        run: |
+          scripts/checkpoint.sh push
+          scripts/checkpoint.sh gate
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: eccp131-representation-filter
+
+      - name: Record host
+        run: |
+          mkdir -p research/eccp131_representation_filter_20261102/raw/github
+          {
+            uname -a
+            lscpu
+            rustc -Vv
+            git rev-parse HEAD
+          } > research/eccp131_representation_filter_20261102/raw/github/host.txt
+
+      - name: Build pinned native instruments
+        run: |
+          cargo build --release --example eccp131_representation_filter --bin ic
+          sha256sum \
+            target/release/examples/eccp131_representation_filter \
+            target/release/ic \
+            examples/eccp131_representation_filter.rs \
+            research/eccp131_representation_filter_20261102/protocol.json \
+            > research/eccp131_representation_filter_20261102/raw/github/SHA256SUMS.build
+
+      - name: Run frozen exact-coordinate sweep
+        run: |
+          target/release/examples/eccp131_representation_filter \
+            research/eccp131_representation_filter_20261102/raw/github/sweep \
+            > research/eccp131_representation_filter_20261102/raw/github/sweep.stdout.json
+
+      - name: Run exact natural relation and rank baselines
+        run: |
+          target/release/ic prime --curve eccp131 --size 256 --trials 0 --controls 8 \
+            --setup-candidates 256 --target-candidates 256 --relation-arity 2 --seed 131006 \
+            > research/eccp131_representation_filter_20261102/raw/github/ic-prime-arity2.json
+          target/release/ic prime --curve eccp131 --size 256 --trials 0 --controls 8 \
+            --setup-candidates 256 --target-candidates 256 --relation-arity 3 --seed 131006 \
+            > research/eccp131_representation_filter_20261102/raw/github/ic-prime-arity3.json
+
+      - name: Seal raw outputs
+        if: always()
+        run: |
+          find research/eccp131_representation_filter_20261102/raw/github -type f -print0 \
+            | sort -z \
+            | xargs -0 sha256sum \
+            > research/eccp131_representation_filter_20261102/raw/github/SHA256SUMS
+
+      - name: Upload immutable counted evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eccp131-representation-filter-${{ github.sha }}
+          path: research/eccp131_representation_filter_20261102/raw/github
+          if-no-files-found: error
+          retention-days: 14
+
