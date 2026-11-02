@@ -62,7 +62,7 @@ Rho is ahead at every size and weight (`ecbench band`: rho < every IC arm
 across the band). The gap grows with size, as expected of an `m = 2` generic
 decomposition whose cost scales as `r^{2/3}` against rho's `r^{1/2}`.
 
-![IC / rho by size](analysis/summary.png)
+![IC / rho by size](analysis/summary.svg)
 
 ### The Curve25519-specific effect: the cofactor costs blind IC a factor 8 in yield
 
