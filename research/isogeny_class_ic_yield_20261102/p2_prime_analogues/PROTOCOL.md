@@ -285,3 +285,29 @@ Hashes (sha256).
 The draft cards `CARD-isogeny-ic-yield-p2-*-20261102-1` (pinned to commit
 4c43066b7, binary hashes of a different build) are superseded by the `-2` cards
 pinned to the amendment commit; they are kept, never run.
+
+### 10.1 Note to A1 (2026-11-02, filed before any data): `ALLOW_BUSY=1`
+
+Status: filed before any measurement of this protocol. The first attempt of the
+first cell (`CARD-isogeny-ic-yield-p2-c24A-m2-20261102-2`) stopped at its first
+command: `ecbench run` refused the host ("host is not quiet (PSI cpu some avg10
+29.77 > 5.00)") after `p2tool spec` had written `spec.json`; no session, audit or
+analysis was produced and no counted or timed value was taken. Its receipt,
+stdout, stderr and output directory are retained under
+`cards/CARD-isogeny-ic-yield-p2-c24A-m2-20261102-2.*` and
+`runs/_failed/c24A_m2-attempt1/` and are not data of this protocol.
+
+Decision (owner's route, relayed by the main session, consistent with A1): the
+host stays loaded by other study parts for hours, so every cell runs with
+`ALLOW_BUSY=1` (`run_class.sh` then passes `--allow-busy` to `ecbench run`). This
+is the A1 route already in force (isolation L0 accepted, counted metrics exact,
+`online_wall_ns_per_attempt` descriptive only), not a change of it. The README
+remark "`ALLOW_BUSY=1` (smoke only)" is superseded for this study by this note.
+Nothing else changes: question, claims, arms, controls, analysis binary, seeds,
+N, A, R, thresholds, decision rule and the 20-test multiplicity family are as in
+section 10. `protocol.json` (v2) is not modified by this note; its sha256 stays
+`8b6fc89c3c60352b7e5203bcd1120cc10babf28ce91c59b3fce77c12976a14e0`.
+
+The `-2` cards (no `ALLOW_BUSY`) are superseded by the `-3` cards (identical
+except `ALLOW_BUSY: "1"`, the commit pin and the `PROTOCOL.md` digest); the `-2`
+cards are kept and never run again.

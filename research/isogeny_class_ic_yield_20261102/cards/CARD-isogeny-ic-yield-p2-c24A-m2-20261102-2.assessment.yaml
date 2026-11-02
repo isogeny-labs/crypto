@@ -1,0 +1,13 @@
+card_id: CARD-isogeny-ic-yield-p2-c24A-m2-20261102-2
+relay_verbatim: not_checked   # no executor report file was supplied with the dispatch; check-relay needs --report
+outcome: stopped
+stopped_at_step: cell
+recommendation: respecify
+reasons:
+  - "cards/CARD-isogeny-ic-yield-p2-c24A-m2-20261102-2.receipt.json: status 'stopped at command 1', commands_total 1, attempts 1, exit_code 2 (attempt_log exit_code 2, 3.195 s, timed_out false). The dispatch said exit 3; the receipt says 2."
+  - "p2_prime_analogues/runs/_failed/c24A_m2-attempt1/run.log (one line): 'ecbench: host is not quiet (PSI cpu some avg10 29.77 > 5.00); wait, or pass --allow-busy to record runs below L2'. Cause: the host refused the run; the card set ALLOW_BUSY to the empty string, so run_class.sh passed no --allow-busy."
+  - "Only spec.json was produced (sha256 6e64019eb045b034d70b748ecb1c139a3d9f44a4f18e62e14a73b51af10373df); audit.json, analysis.json and the session directory do not exist: no counted or timed value was taken."
+  - "Only the card's one argv ran (receipt commands_total 1); git status --porcelain in /home/user/crypto-p2run showed only cards/ and runs/ paths, both inside write_scope."
+  - "The stop is a host condition (busy host refusal) but the remedy is a card change (ALLOW_BUSY=1) decided by the main session under amendment A1, not a wait; hence respecify, with PROTOCOL.md section 10.1 filed before data and -3 cards replacing the -2 cards."
+  - "The retained directory was moved to runs/_failed/c24A_m2-attempt1 so must_not_exist (runs/c24A_m2) passes for the -3 card."
+interpretation: not_assessed
