@@ -12,9 +12,12 @@ v2 was canonically frozen before affected data at source commit
 after the four-binary rebuild and validation. Amendment
 `A2-MAINLINE-SOURCE-ADVANCE` then superseded those identities before affected
 data when the PR branch incorporated active mainline changes inside the
-recursively frozen source tree. Protocol v3 is draft pending the new source
-commit, rebuild, and refreeze. No registered draw, closure attempt, analysis,
-publication, or cloud job has run.
+recursively frozen source tree. Protocol v3 was canonically frozen before
+affected data at pushed source commit
+`d84d7d44f3c8bcb27a88408f6ba132cbc7575128`, protocol SHA-256
+`bb4703b0b2fe207adbbdc468f5b8729574cb42e4908eb2e963799afc5726c270`,
+after the replacement four-binary rebuild and validation. No registered draw,
+closure attempt, analysis, publication, or cloud job has run.
 
 ## Question and scope
 
