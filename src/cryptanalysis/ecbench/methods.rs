@@ -59,11 +59,11 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
-    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, rho_walk_with_policy,
-    signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy, BinaryGroup, BinaryInstance,
-    Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
-    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult,
-    RhoResult, RhoWalk, WalkPolicy,
+    ic_residual_batch_with, price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with,
+    rho_walk_with_policy, signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
+    NegationClasses, PhaseCost, PointClasses, PreprocessingRho, PrimeInstance, PrimePoint,
+    QuarticClasses, RhoBatchResult, RhoResult, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -302,6 +302,10 @@ const POOLED_PARAMS: &[ParamDecl] = &[
 /// public-target law of [`Instance::hash_to_subgroup`] at indices
 /// `POOLED_COMPANION_INDEX + j`, far from any workload's own index.
 const POOLED_COMPANION_INDEX: u64 = 1 << 40;
+
+/// Index of `ic.residual_batch`'s base point `P0` under the same public
+/// law: one point, hashed to `⟨G⟩`, below the companions' range.
+const RESIDUAL_BATCH_BASE_INDEX: u64 = (1 << 40) - 1;
 
 // Keep the defaults of the frozen `ic.pipeline_counted` sessions. The
 // existing `ic.pipeline` declaration below retains main's newer options.
@@ -559,6 +563,16 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "rho",
             summary: "Kuhn–Struik batch: the record's target and L − 1 public companions (hashed to ⟨G⟩, logs unknown to anyone) solved in sequence on {P, −P} (A = 2) with one shared distinguished-point table and jumps in G only; S is the whole batch's operations over √r, expected ≈ Σ_{i<L} C(2i,i)4^{−i}·√(π/4) → √L",
             entry: "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
+            applies: Applies::PrimeOnly,
+            params: POOLED_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.residual_batch",
+            // A rho-style batch solve (one online phase, the rho walker), so
+            // the rho family's online window and pricing describe it.
+            family: "rho",
+            summary: "the residual collector's structure in the Kuhn–Struik batch of rho.multitarget_pooled: the same targets, walker, table and charging, plus one base point P0 of unknown logarithm in every relation (an index-calculus column, B = 1); the first target needs two independent equations (d_1 and log P0), later ones one collision; log P0 and every d_i checked; S is the whole batch's operations over √r",
+            entry: "ic_boundary::ic_residual_batch_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::PrimeOnly,
             params: POOLED_PARAMS,
         },
@@ -2273,6 +2287,59 @@ fn solve_pooled(
     Ok(rep)
 }
 
+/// `ic.residual_batch` on a prime curve: the companions of
+/// [`solve_pooled`] (same law, same indices, so the two methods solve the
+/// same batch), the base point `P0` hashed by the same law at
+/// [`RESIDUAL_BATCH_BASE_INDEX`], and one [`ic_residual_batch_with`] run.
+fn solve_residual_batch(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+    i: &PrimeInstance,
+    target: PrimePoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let batch = param_u64(m, "batch")?;
+    if !(1..=65_536).contains(&batch) {
+        return Err(format!("`batch` must be in 1..=65536, not {batch}"));
+    }
+    let cap = rho_cap(i.r, param_u64(m, "cap_multiple")? as f64);
+    let mut targets = Vec::with_capacity(batch as usize);
+    let mut companions = Vec::with_capacity(batch as usize - 1);
+    for j in 0..batch - 1 {
+        let (xy, _) = inst
+            .hash_to_subgroup(curve, seed, POOLED_COMPANION_INDEX + j)
+            .ok_or("no public companion target on this curve")?;
+        targets.push(PrimePoint::affine(parse_hex(&xy[0])?, parse_hex(&xy[1])?));
+        companions.push(xy);
+    }
+    targets.push(target);
+    let (base_xy, _) = inst
+        .hash_to_subgroup(curve, seed, RESIDUAL_BATCH_BASE_INDEX)
+        .ok_or("no public base point on this curve")?;
+    let base = PrimePoint::affine(parse_hex(&base_xy[0])?, parse_hex(&base_xy[1])?);
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let res = ic_residual_batch_with(
+        &i.curve,
+        &NegationClasses { r: i.r },
+        i.generator_point(),
+        base,
+        &targets,
+        i.r,
+        seed,
+        cap,
+        RhoWalk::negation(),
+    );
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let f = field_ops_of(&i.curve, &[res.group_ops]);
+    let mut rep = pooled_report(res, wall, f);
+    rep.detail["companions"] = json!(companions);
+    rep.detail["base_point"] = json!(base_xy);
+    Ok(rep)
+}
+
 /// Run the generic and rho methods on any counted group.
 fn solve_generic<G: CountedGroup>(
     m: &ResolvedMethod,
@@ -2471,7 +2538,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         .unwrap_or(m.id.as_str());
     three_leads_applicable(m, inst, curve)?;
     hyper_ic_variant_guard(m, inst, curve)?;
-    if id == "rho.multitarget_pooled" {
+    if id == "rho.multitarget_pooled" || id == "ic.residual_batch" {
         let batch = param_u64(m, "batch")?;
         if !(1..=65_536).contains(&batch) {
             return Err(format!("`batch` must be in 1..=65536, not {batch}"));
@@ -2872,6 +2939,9 @@ fn solve_inner(
     match (inst, d.family) {
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
+        }
+        (Instance::Prime(i), _) if m.id == "ic.residual_batch" => {
+            solve_residual_batch(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) if m.id == super::aps::ID => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
@@ -5741,24 +5811,14 @@ fn solve_ic_prime(
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
-    // `pkm-semaev` writes its system on the base's own tower, so it reads
-    // the tower from the `prime-kummer` spec and runs on no other base.
+    // `pkm-semaev` writes its system on the base's own tower; the shared
+    // constructor rebuilds it from the base's spec (`ic bench` uses the same).
     let mut pkm = match or_name.as_str() {
-        "pkm-semaev" => {
-            if fb_name != "prime-kummer" {
-                return Err(format!(
-                    "oracle `pkm-semaev` needs the prime-kummer base, whose tower it solves on, not `{fb_name}`"
-                ));
-            }
-            let t = spec.factor_base_params.u64("t")? as u32;
-            let g = spec.factor_base_params.u64_or("g", 1)?;
-            let budget = (spec.solver_budget_seconds > 0)
-                .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
-            Some(
-                crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::new(ms, t, g)
-                    .with_budget(budget),
-            )
-        }
+        "pkm-semaev" => Some(
+            crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::from_spec(
+                ms, &spec, inst,
+            )?,
+        ),
         _ => None,
     };
     let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {

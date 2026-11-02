@@ -1317,6 +1317,330 @@ fn sweep_figure(dirs: &[String]) -> String {
     s
 }
 
+/// Quotient support of a factor-base membership model on the k-bit
+/// miniature (algebraic-track comparison): physical points, classes after
+/// torsion compression (`[8]P`), after signed compression (`±[8]P`), the
+/// distinct projected 2-sums `M` (targets covered, both signs) and
+/// `λ = M/ℓ`; also the overstated count that takes every physical pair as
+/// a candidate.  Forms:
+/// - `xw`: Weierstrass abscissa in `[0, 2^t)` (the `bits` oracle's base);
+/// - `xm`: Montgomery abscissa in `[0, 2^t)`;
+/// - `w`: the T₀-invariant `w = x_M + 1/x_M` in `[0, 2^t)` (the
+///   x-coordinate of the 2-isogenous curve `E/⟨T₀⟩`, up to `+A`);
+/// - `isogeny`: PKM's isogeny tower (`prime-isogeny:t,seed=0`);
+/// - `kummer`: `μ_(2^t)` in the Weierstrass abscissa (needs `2^t | p − 1`).
+fn support(k: u32, form: &str, t: u32) -> Value {
+    use std::collections::HashSet;
+    let m = build_miniature(k);
+    let (w, shift, p, r) = (m.weier, m.shift, m.p, m.r);
+    let mont = Mont { p, a: m.a_mont };
+    let span = 1u64 << t;
+    // Weierstrass abscissae of the base.
+    let xs: Vec<u64> = match form {
+        "xw" => (0..span).collect(),
+        "xm" => (0..span).map(|u| addm(u, shift, p)).collect(),
+        "w" => {
+            let mut v = Vec::new();
+            for wv in 0..span {
+                // x² − w x + 1 = 0
+                let disc = subm(mulm(wv, wv, p), 4, p);
+                if let Some(sq) = sqrtm(disc, p) {
+                    let i2 = invm(2, p);
+                    for x in [mulm(addm(wv, sq, p), i2, p), mulm(subm(wv, sq, p), i2, p)] {
+                        v.push(addm(x, shift, p));
+                    }
+                }
+            }
+            v.sort_unstable();
+            v.dedup();
+            v
+        }
+        // Ed25519's coordinate: the Edwards y of the birationally equivalent
+        // twisted Edwards curve is y = (u − 1)/(u + 1) for Montgomery u, so
+        // u = (1 + y)/(1 − y).  `ey`: y in [0, 2^t); `ey2`: the T₀-invariant
+        // y² in [0, 2^t) (translation by T₀ is y ↦ −y).
+        "ey" | "ey2" => {
+            let mut ys = Vec::new();
+            for v in 0..span {
+                if form == "ey" {
+                    ys.push(v);
+                } else if let Some(r) = sqrtm(v, p) {
+                    ys.push(r);
+                    if r != 0 {
+                        ys.push(p - r);
+                    }
+                }
+            }
+            let mut v: Vec<u64> = ys
+                .into_iter()
+                .filter(|&y| y != 1)
+                .map(|y| addm(mulm(addm(1, y, p), invm(subm(1, y, p), p), p), shift, p))
+                .collect();
+            v.sort_unstable();
+            v.dedup();
+            v
+        }
+        "isogeny" => {
+            let mut ops = crypto_lib::cryptanalysis::ic_boundary::GroupOps::default();
+            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(p, t, 0, &mut ops)
+                .expect("isogeny tower")
+                .v
+        }
+        "kummer" => {
+            if (p - 1) % span != 0 {
+                return json!({"k": k, "form": form, "t": t, "error": format!("2^{t} does not divide p - 1")});
+            }
+            let g = (2..p).find(|&g| powm(g, (p - 1) / 2, p) == p - 1).unwrap();
+            let z = powm(g, (p - 1) / span, p);
+            (0..span).map(|j| powm(z, j, p)).collect()
+        }
+        o => panic!("form is xw, xm, w, isogeny or kummer, not {o}"),
+    };
+    let _ = mont;
+    let mut physical = Vec::new();
+    for &x in &xs {
+        if let Some(y) = sqrtm(w.rhs(x), p) {
+            physical.push(Pt { x, y, inf: false });
+            if y != 0 {
+                physical.push(Pt {
+                    x,
+                    y: p - y,
+                    inf: false,
+                });
+            }
+        }
+    }
+    let mut tors: HashSet<(u64, u64)> = HashSet::new();
+    let mut signed: Vec<Pt> = Vec::new();
+    let mut seen_x = HashSet::new();
+    for q in &physical {
+        let e = w.mul(*q, 8);
+        if e.inf {
+            continue;
+        }
+        tors.insert((e.x, e.y));
+        if seen_x.insert(e.x) {
+            signed.push(e);
+        }
+    }
+    let mut d = HashSet::new();
+    for i in 0..signed.len() {
+        for j in i..signed.len() {
+            for s in [
+                w.add(signed[i], signed[j]),
+                w.add(signed[i], w.neg(signed[j])),
+            ] {
+                if !s.inf {
+                    d.insert(s.x);
+                }
+            }
+        }
+    }
+    let mm = 2 * d.len() as u64;
+    let n_phys = physical.len() as u64;
+    let naive = n_phys * (n_phys + 1) / 2;
+    json!({
+        "k": k, "form": form, "t": t, "interval_or_tower_size": span, "abscissae": xs.len(),
+        "physical_points": n_phys,
+        "classes_torsion_compressed": tors.len(),
+        "classes_signed": signed.len(),
+        "M_projected_2sums": mm,
+        "lambda": mm as f64 / r as f64,
+        "M_naive_physical_pairs": naive,
+        "lambda_naive": naive as f64 / r as f64,
+        "naive_overstatement": naive as f64 / mm.max(1) as f64,
+        "membership_tower_vars_per_summand": t,
+    })
+}
+
+/// Stage measurement for the algebraic track (ladder protocol, Amendment 2,
+/// Q-D): the `pkm-semaev` oracle, called directly on `targets` random
+/// subgroup points of the k-bit miniature, with the bits form (and `guess`)
+/// or the isogeny form at height t.  Reports F4 calls, multiply-adds, the
+/// solving degree, undecided systems and hits; a hit is a relation the
+/// oracle returned, re-checked here by summing the points.
+#[allow(dead_code)]
+fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
+    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full", false)
+}
+
+/// `f4cost` with the number of summands `m` (2 or 3) and the presentation
+/// `mode` (`full` or `chain`; `chain` needs `m = 3`).  `m = 2, full` is the
+/// original measurement, byte for byte in its spec.
+#[allow(clippy::too_many_arguments)]
+fn f4cost_m(
+    k: u32,
+    form: &str,
+    t: u32,
+    guess: u32,
+    targets: u64,
+    seed: u64,
+    cap_s: u64,
+    nsum: u32,
+    mode: &str,
+    lifts: bool,
+) -> Value {
+    use crypto_lib::cryptanalysis::ic_boundary::{
+        prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
+    };
+    use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::stages::{
+        DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params,
+    };
+    let m = build_miniature(k);
+    let inst = PrimeInstance {
+        name: format!("c25519-mini-k{k}"),
+        curve: PrimeCurve {
+            p: m.p,
+            a: m.weier.a,
+            b: m.weier.b,
+        },
+        group_order: m.order,
+        r: m.r,
+        cofactor: 8,
+        generator: (m.g.x, m.g.y),
+    };
+    let ctx = InstanceCtx {
+        group: &inst.curve,
+        generator: inst.generator_point(),
+        target: inst.generator_point(),
+        r: inst.r,
+        cofactor: inst.cofactor,
+        group_order: inst.group_order,
+        name: inst.name.clone(),
+        field_degree: None,
+    };
+    let span = 1u64 << t;
+    let (fb, mut oracle) = match form {
+        "bits" => {
+            // The prime-abscissa base of every abscissa in [0, 2^t) on the curve.
+            let n = (0..span)
+                .filter(|&x| sqrtm(m.weier.rhs(x), m.p).is_some())
+                .count();
+            let fb = prime_factor_base(&inst, n);
+            assert!(fb.abscissa_list.iter().all(|&x| x < span));
+            (fb, PkmSemaevOracle::new_bits(nsum, t, 0))
+        }
+        "isogeny" => {
+            let mut params = Params::default();
+            params.set("t", t.to_string());
+            let fb = PrimeIsogenyBase { instance: &inst }
+                .build(&ctx, &params, &mut GroupOps::default())
+                .expect("isogeny base");
+            let tower = isogeny_tower(m.p, t, 0, &mut GroupOps::default()).expect("tower");
+            let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+            (
+                fb,
+                PkmSemaevOracle::new_isogeny(nsum, t, tower.v.clone(), steps, tower.c),
+            )
+        }
+        o => panic!("form is bits or isogeny, not {o}"),
+    };
+    let mut spec = if guess > 0 {
+        format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
+    } else {
+        format!("pkm-semaev:m={nsum},mode={mode}")
+    };
+    if lifts {
+        spec.push_str(",lifts=1");
+    }
+    let (_, params) = Params::parse_spec(&spec).unwrap();
+    let mut setup_ops = GroupOps::default();
+    oracle
+        .prepare(&ctx, &fb, &params, &mut setup_ops)
+        .expect("prepare");
+    let started = std::time::Instant::now();
+    let mut st = seed;
+    let (mut done, mut hits, mut verified, mut exact) = (0u64, 0u64, 0u64, 0u64);
+    for _ in 0..targets {
+        if started.elapsed().as_secs() >= cap_s {
+            break;
+        }
+        st = st
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        let a = 1 + (st >> 11) % (m.r - 1);
+        let mut ops = GroupOps::default();
+        let target = inst.curve.mul(&mut ops, ctx.generator, a);
+        if target.infinity {
+            continue;
+        }
+        let mut ctr = OracleCounters::default();
+        if let Some(idx) = oracle.decompose(&ctx, &fb, &mut ops, &mut ctr, target) {
+            hits += 1;
+            let s = idx.iter().fold(inst.curve.identity(), |acc, &i| {
+                inst.curve.add(&mut GroupOps::default(), acc, fb.points[i])
+            });
+            exact += u64::from(s == target);
+            // The pipeline writes rows over [h]P, so a lift R + K (K in E[h])
+            // is accepted when the projected sums agree; without lifts the
+            // sum must be R itself.
+            let ok = if lifts {
+                let mut o = GroupOps::default();
+                inst.curve.mul(&mut o, s, inst.cofactor)
+                    == inst.curve.mul(&mut o, target, inst.cofactor)
+            } else {
+                s == target
+            };
+            if ok {
+                verified += 1;
+            }
+        }
+        done += 1;
+    }
+    let tot = oracle.solver_totals().unwrap_or_default();
+    let native = oracle.relation_counters();
+    let per_target = tot.ops as f64 / done.max(1) as f64;
+    // Exact coverage of the base at this m: the fraction of the subgroup that
+    // is a sum of m base points (the hit rate an ideal oracle would see).
+    let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
+        &inst.curve,
+        &fb,
+        nsum,
+        &mut GroupOps::default(),
+    );
+    // Targets are subgroup points: count the covered points of order | r
+    // (the factor base may carry cofactor components).
+    let covered = all
+        .iter()
+        .filter(|&&key| {
+            use crypto_lib::cryptanalysis::ic_boundary::PrimePoint;
+            if key == 0 {
+                return false;
+            }
+            let x = (key >> 1) - 1;
+            let y = sqrtm(m.weier.rhs(x), m.p).expect("covered point is on the curve");
+            let q = PrimePoint {
+                x,
+                y,
+                infinity: false,
+            };
+            inst.curve.mul(&mut GroupOps::default(), q, m.r).infinity
+        })
+        .count();
+    let coverage = covered as f64 / m.r as f64;
+    json!({
+        "coverage_exact": coverage, "covered_points": covered, "covered_points_all_cosets": all.len(),
+        "muladds_per_relation_at_exact_coverage": if coverage > 0.0 { Some(per_target / coverage) } else { None },
+        "k": k, "form": form, "t": t, "guess": guess, "columns": fb.columns,
+        "m": nsum, "mode": mode,
+        "muladds_per_relation": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
+        "targets_done": done, "targets_requested": targets, "capped": done < targets,
+        "wall_s": started.elapsed().as_secs_f64(),
+        "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
+        "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
+        "lifts": lifts, "hits_exact": exact,
+        "calls_per_target": tot.calls as f64 / done.max(1) as f64,
+        "muladds_per_hit": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
+        "setup_group_ops": setup_ops.adds + setup_ops.doubles,
+        "setup_native": oracle.setup_native(),
+        "hits": hits, "hits_verified": verified,
+        "hit_rate": hits as f64 / done.max(1) as f64,
+        "native": native,
+    })
+}
+
 /// Base size `N_a = round(0.63·r^{1/3})`: the lab's validated prime-order
 /// optimum (`docs/ic/LEADERBOARD.md`, prime-field baseline: N = 162, 407,
 /// 1024 at 24, 28, 32 bits is 0.63·n^{1/3}) scaled to the subgroup.
@@ -1456,6 +1780,35 @@ fn main() {
         "sweep-figure" => {
             // sweep-figure <out.svg> <train_session_dir>...
             std::fs::write(&args[2], sweep_figure(&args[3..])).unwrap();
+        }
+        "support" => {
+            // support <k> <form> <t>
+            let k: u32 = args[2].parse().unwrap();
+            let t: u32 = args[4].parse().unwrap();
+            println!(
+                "{}",
+                serde_json::to_string(&support(k, &args[3], t)).unwrap()
+            );
+        }
+        "f4cost" => {
+            // f4cost <k> <bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1]
+            let k: u32 = args[2].parse().unwrap();
+            let t: u32 = args[4].parse().unwrap();
+            let g: u32 = args[5].parse().unwrap();
+            let n: u64 = args[6].parse().unwrap();
+            let seed: u64 = args[7].parse().unwrap();
+            let cap: u64 = args.get(8).map_or(600, |v| v.parse().unwrap());
+            // Optional: <m> <mode> (default 2 full, the original measurement).
+            let nsum: u32 = args.get(9).map_or(2, |v| v.parse().unwrap());
+            let mode = args.get(10).map_or("full", String::as_str);
+            let lifts = args.get(11).is_some_and(|v| v == "1");
+            println!(
+                "{}",
+                serde_json::to_string(&f4cost_m(
+                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts
+                ))
+                .unwrap()
+            );
         }
         "summarise" => {
             // summarise <out_prefix> <session_dir>...
