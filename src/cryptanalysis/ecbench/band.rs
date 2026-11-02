@@ -466,6 +466,37 @@ mod tests {
         assert!((g1 - g0 - 1_000_000.0).abs() < 1e-6);
     }
 
+    /// F4 field multiply-adds of `pkm-semaev` are native work: the record
+    /// lists the solver term and the two `pkm_*_fp_mults` counters as
+    /// unpriced, `unpriced_counts` resolves the solver term to `solver.ops`,
+    /// and the band charges them at `w` per operation with nothing missing
+    /// (`research/curve25519_algebraic_ecbench_20261102`, a real record of
+    /// `prime-isogeny:t=6` with `pkm-semaev:m=2,guess=4` on the k = 20
+    /// Curve25519 miniature).
+    #[test]
+    fn pkm_f4_multiply_adds_are_priced_by_the_band() {
+        let text = include_str!(
+            "../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json"
+        );
+        let r: Record = serde_json::from_str(text).unwrap();
+        let solver_name = "solver_F_p_multiply-adds_(elimination_only)_uncharged";
+        let ops = r.solver.as_ref().expect("solver block").ops;
+        assert!(ops > 1_000_000_000);
+        let counts = unpriced_counts(&r);
+        assert_eq!(counts[solver_name], Some(ops));
+        assert_eq!(counts["pkm_grid_fp_mults_uncharged"], Some(31_808));
+        assert_eq!(counts["pkm_system_fp_mults_uncharged"], Some(915_534));
+        let (u, missing) = unpriced_total(&r);
+        assert!(!missing, "every unpriced counter has a count");
+        assert!(u >= ops + 31_808 + 915_534);
+        let g = r.cost.total_gae.unwrap();
+        assert_eq!(priced_gae(&r, 0.0).unwrap().unwrap(), g);
+        let g1 = priced_gae(&r, 1.0).unwrap().unwrap();
+        assert!((g1 - g - u as f64).abs() < 1e-6);
+        // At w = 0.1 the F4 work alone is at least ops / 10 GAE.
+        assert!(priced_gae(&r, 0.1).unwrap().unwrap() >= g + ops as f64 / 10.0);
+    }
+
     #[test]
     fn the_exempt_list_names_only_byte_counters() {
         for n in NON_OPERATION_COUNTERS {
