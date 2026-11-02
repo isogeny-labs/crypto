@@ -91,4 +91,10 @@ Any change is a dated amendment saying whether it preceded the data it affects; 
 
 ## Amendments
 
-(none)
+**A1 (2026-11-02, execution only; no design change).** Card `-1` was killed by the agent harness's 30-minute limit
+on background shell commands after 33 of 35 arms (aes-r4's negative control and difference-table baseline
+missing); no receipt. Card `-2` re-ran only cell aes-r4 with the frozen code, seeds and binary
+(`41b8d479…`) and appended its rows. The three aes-r4 arms present in both runs agree exactly on `correct`. The
+summary uses the last row per (cell, model, arm), as `summary` already did before any data. Cells, sizes, models,
+seeds and the decision rule are unchanged. Target-cell results of the other six cells were visible before card
+`-2` ran; card `-2` could not change them.
