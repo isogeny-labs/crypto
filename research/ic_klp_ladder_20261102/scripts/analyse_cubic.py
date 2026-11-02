@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Amendment 2 analysis: per-arm S, ratio to same-instance rho, exponent fit across p."""
 import json, math, glob, collections, statistics as st
-rows = [json.loads(l) for f in sorted(glob.glob("logs/cubic-p*.jsonl")) for l in open(f)]
+rows = [json.loads(l) for f in sorted(glob.glob("logs/cubic-p*.jsonl") + glob.glob("logs/quad-p*.jsonl")) for l in open(f)]
 by = collections.defaultdict(list)
 for r in rows: by[(r["p"], r["seed"])].append(r)
 cells = collections.defaultdict(list); bad = 0
