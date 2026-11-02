@@ -121,3 +121,19 @@ solver at 3.5 GB.
   rebuilt binary (targets = 0) after the cells ran; solving code is unchanged between the two builds.
 - Preliminary test runs before the coordinator's note on the shared build directory were
   discarded; all quoted results come from the exclusive build.
+
+## Figure
+
+![per-relation cost, m = 3 vs m = 2](analysis/per_relation.svg)
+
+Values: [`analysis/per_relation.tsv`](analysis/per_relation.tsv) (jq over `analysis/f4cost_m3.jsonl`,
+`analysis/coverage.jsonl` and the ladder's `f4cost.jsonl`). Report PDF: [REPORT.pdf](REPORT.pdf).
+
+## Coordinator review note
+
+The λ₂ remark above was checked against the ladder code (`support` in
+`src/bin/curve25519_family.rs`): λ₂ counts 2-sums of the **8-projected** base, so it is the
+yield of a cofactor-aware oracle, not of the `pkm-semaev` oracle as run (which decomposes
+R into unprojected tower points). The ladder README already labels its per-λ figure a lower
+bound for this reason; lead 2 (cofactor-aware algebraic oracle) targets that factor ≈ 8. The
+m = 3 verdict holds under every m = 2 reading (observed, exact coverage, λ₂).
