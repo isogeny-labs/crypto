@@ -62,7 +62,8 @@ for (const [clusterId, clusterLabel, kinds] of clusters) {
   for (const node of corpus.nodes.filter(item => kinds.includes(item.kind))) {
     const [fill, stroke] = colors[node.kind];
     const style = node.status === "open" || node.status === "heuristic" ? "rounded,filled,dashed" : "rounded,filled";
-    lines.push(`    ${quote(node.id)} [label=${quote(label(node))}, fillcolor=\"${fill}\", color=\"${stroke}\", style=\"${style}\"];`);
+    const refuted = node.status === "refuted";
+    lines.push(`    ${quote(node.id)} [label=${quote(refuted ? `${label(node)}\\nREFUTED` : label(node))}, fillcolor=\"${refuted ? "#f8c9c9" : fill}\", color=\"${refuted ? "#a33a3a" : stroke}\", style=\"${style}\"${refuted ? ", penwidth=2" : ""}];`);
     emitted.add(node.id);
   }
   lines.push("  }");
@@ -75,7 +76,7 @@ for (const node of corpus.nodes.filter(item => !emitted.has(item.id))) {
 
 for (const edge of corpus.edges) {
   const dashed = ["does_not_cover", "leaves_open", "qualifies"].includes(edge.relation);
-  const color = edge.relation === "obstructs" ? "#a33a3a" : edge.relation === "hardness_implies" ? "#2468a2" : "#66788a";
+  const color = edge.relation === "obstructs" || edge.relation === "refutes" ? "#a33a3a" : edge.relation === "hardness_implies" ? "#2468a2" : "#66788a";
   lines.push(`  ${quote(edge.from)} -> ${quote(edge.to)} [label=${quote(edge.relation)}, color=\"${color}\", style=\"${dashed ? "dashed" : "solid"}\"];`);
 }
 
