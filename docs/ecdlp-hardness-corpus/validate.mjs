@@ -43,7 +43,7 @@ const allowedKinds = new Set([
 ]);
 const allowedStatuses = new Set([
   "definition", "assumed", "proved_external", "proved_internal_unreviewed",
-  "algorithm", "conditional", "measured", "heuristic", "open"
+  "algorithm", "conditional", "measured", "heuristic", "open", "refuted", "proved_external_unread"
 ]);
 const allowedModels = new Set([
   "mathematical", "classical_unrestricted", "generic_group",
@@ -53,11 +53,11 @@ const allowedModels = new Set([
 const allowedRelations = new Set([
   "defines", "reduces_to", "hardness_implies", "upper_bounds", "lower_bounds",
   "attacks_when", "enables", "conditions", "instantiates", "model_bridge",
-  "does_not_cover", "obstructs", "leaves_open", "measures", "qualifies"
+  "does_not_cover", "obstructs", "leaves_open", "measures", "qualifies", "refutes"
 ]);
 const allowedEvidenceClasses = new Set([
   "theorem", "algorithm", "conditional_theorem", "asymptotic_heuristic",
-  "concrete_estimate", "measurement", "assumption", "definition", "open"
+  "concrete_estimate", "measurement", "assumption", "definition", "open", "counterexample"
 ]);
 
 for (const source of corpus.sources ?? []) {
@@ -178,6 +178,67 @@ const sourceVerification = new Map((corpus.sources ?? []).map(source => [source.
 for (const node of corpus.nodes ?? []) {
   if (node.status === "proved_external") {
     requireValue(node.source_refs.some(ref => sourceVerification.get(ref) === "primary_read"), `${node.id}: externally proved claim lacks a primary-read source`);
+  }
+  if (node.status === "proved_external_unread") {
+    requireValue(node.source_refs.some(ref => ["metadata_only", "secondary_only", "primary_read"].includes(sourceVerification.get(ref))), `${node.id}: unread external theorem needs a cited publication source`);
+    requireValue((node.source_locations ?? []).length > 0, `${node.id}: unread external theorem needs a source location (theorem number, section or page)`);
+  }
+}
+
+// Proof-linkage layer: formalization state, repository citations, refutations, taint.
+const repoRoot = path.resolve(here, "../..");
+const formalStates = new Set(["kernel_checked", "lean_written_unchecked", "native_exact", "stated_open", "none"]);
+const citationUses = new Set(["depends", "reports", "measures", "mention"]);
+for (const node of corpus.nodes ?? []) {
+  if (node.formal !== undefined) {
+    requireValue(formalStates.has(node.formal.state), `${node.id}: unknown formal state ${node.formal.state}`);
+    requireValue(Array.isArray(node.formal.artifacts), `${node.id}: formal.artifacts must be an array`);
+    for (const artifact of node.formal.artifacts ?? []) {
+      const full = path.resolve(repoRoot, artifact.path ?? "");
+      requireValue(fs.existsSync(full), `${node.id}: missing formal artifact ${artifact.path}`);
+      if (node.formal.state === "kernel_checked" && artifact.path?.endsWith(".lean") && fs.existsSync(full)) {
+        requireValue(!/\bsorry\b|native_decide/.test(fs.readFileSync(full, "utf8")), `${node.id}: kernel_checked artifact ${artifact.path} contains sorry or native_decide`);
+      }
+    }
+    if (["kernel_checked", "lean_written_unchecked"].includes(node.formal.state)) {
+      requireValue(node.formal.artifacts.some(artifact => artifact.path.endsWith(".lean")), `${node.id}: Lean formal state without a .lean artifact`);
+    }
+  }
+  const citedPaths = new Set();
+  for (const citation of node.cited_by ?? []) {
+    requireValue(citationUses.has(citation.use), `${node.id}: unknown citation use ${citation.use}`);
+    requireValue(fs.existsSync(path.resolve(repoRoot, citation.path ?? "")), `${node.id}: cited_by path missing ${citation.path}`);
+    requireValue(!citedPaths.has(citation.path), `${node.id}: duplicate cited_by path ${citation.path}`);
+    citedPaths.add(citation.path);
+  }
+  for (const pattern of node.citation_patterns ?? []) {
+    try { new RegExp(pattern, "i"); } catch (error) { errors.push(`${node.id}: bad citation pattern ${pattern}: ${error.message}`); }
+  }
+  if (node.status === "refuted") {
+    requireValue((corpus.edges ?? []).some(edge => edge.relation === "refutes" && edge.to === node.id), `${node.id}: refuted claim has no refutes edge`);
+  }
+}
+const nodeStatus = new Map((corpus.nodes ?? []).map(node => [node.id, node.status]));
+for (const edge of corpus.edges ?? []) {
+  if (edge.relation === "refutes") {
+    requireValue(nodeStatus.get(edge.to) === "refuted", `${edge.id}: refutes a node whose status is not refuted`);
+    requireValue(nodeStatus.get(edge.from) !== "refuted" && nodeStatus.get(edge.from) !== "open", `${edge.id}: refutation must come from an established node`);
+  }
+}
+// Taint: nothing reached from a refuted claim through a support edge may be presented as established.
+const supportRelations = new Set(["conditions", "enables", "model_bridge"]);
+const establishedStatuses = new Set(["proved_external", "proved_external_unread", "proved_internal_unreviewed", "algorithm", "measured"]);
+for (const root of (corpus.nodes ?? []).filter(node => node.status === "refuted")) {
+  const seen = new Set([root.id]);
+  const queue = [root.id];
+  while (queue.length > 0) {
+    const current = queue.shift();
+    for (const edge of corpus.edges ?? []) {
+      if (edge.from !== current || !supportRelations.has(edge.relation) || seen.has(edge.to)) continue;
+      seen.add(edge.to);
+      queue.push(edge.to);
+      requireValue(!establishedStatuses.has(nodeStatus.get(edge.to)), `${edge.to}: status ${nodeStatus.get(edge.to)} but it depends on refuted ${root.id} (via ${edge.id})`);
+    }
   }
 }
 

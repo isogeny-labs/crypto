@@ -88,7 +88,7 @@
           "enum": ["definition", "assumption", "structural_theorem", "reduction", "algorithmic_upper_bound", "model_lower_bound", "conditional_attack", "measured_bound", "heuristic", "open_obligation"]
         },
         "status": {
-          "enum": ["definition", "assumed", "proved_external", "proved_internal_unreviewed", "algorithm", "conditional", "measured", "heuristic", "open"]
+          "enum": ["definition", "assumed", "proved_external", "proved_internal_unreviewed", "algorithm", "conditional", "measured", "heuristic", "open", "refuted", "proved_external_unread"]
         },
         "model": {
           "enum": ["mathematical", "classical_unrestricted", "generic_group", "generic_group_preprocessing", "algebraic_coordinate", "curve_family_restricted", "quantum", "repository_measurement"]
@@ -106,10 +106,42 @@
         "formula": { "type": "string" },
         "parameters": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
         "quantifiers": { "type": "string" },
-        "evidence_class": { "enum": ["theorem", "algorithm", "conditional_theorem", "asymptotic_heuristic", "concrete_estimate", "measurement", "assumption", "definition", "open"] },
+        "evidence_class": { "enum": ["theorem", "algorithm", "conditional_theorem", "asymptotic_heuristic", "concrete_estimate", "measurement", "assumption", "definition", "open", "counterexample"] },
         "failure_modes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
         "non_implications": { "type": "array", "items": { "type": "string" } },
-        "notes": { "type": "string" }
+        "notes": { "type": "string" },
+        "formal": {
+          "type": "object",
+          "required": ["state", "artifacts"],
+          "properties": {
+            "state": { "enum": ["kernel_checked", "lean_written_unchecked", "native_exact", "stated_open", "none"] },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path"],
+                "properties": { "path": { "type": "string", "minLength": 1 }, "decl": { "type": "string" } },
+                "additionalProperties": false
+              }
+            },
+            "notes": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "cited_by": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "use"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "use": { "enum": ["depends", "reports", "measures", "mention"] },
+              "note": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "citation_patterns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
       },
       "additionalProperties": false
     },
@@ -121,7 +153,7 @@
         "from": { "$ref": "#/$defs/id" },
         "to": { "$ref": "#/$defs/id" },
         "relation": {
-          "enum": ["defines", "reduces_to", "hardness_implies", "upper_bounds", "lower_bounds", "attacks_when", "enables", "conditions", "instantiates", "model_bridge", "does_not_cover", "obstructs", "leaves_open", "measures", "qualifies"]
+          "enum": ["defines", "reduces_to", "hardness_implies", "upper_bounds", "lower_bounds", "attacks_when", "enables", "conditions", "instantiates", "model_bridge", "does_not_cover", "obstructs", "leaves_open", "measures", "qualifies", "refutes"]
         },
         "statement": { "type": "string", "minLength": 1 },
         "source_refs": { "$ref": "#/$defs/sourceRefs" }
