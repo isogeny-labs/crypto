@@ -1,0 +1,60 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1he3c3ee9df97d",
+  "label": "S1 k1n19 A l12",
+  "spec_id": "ECS1h73f0879cd9d2",
+  "spec_sha256": "73f0879cd9d2952268e6a5856315db2b8c6727536763dec9fc3f02066d2e1773",
+  "env_class_id": "ECBENV3h1f2a01e56900",
+  "host_sha256": "b9d98840b4cb0543eadbbae88e95eea71cf5bdb13548ae406a30e4974e6d88eb",
+  "plan_sha256": "cc5466212fcdb189d6771f5cb3a974b101fecfcaf78d8a61ff347f8687d95567",
+  "binary_sha256": "6f303039e578b595357b278fdefe3be28da179144fb692d284790c0ddb7c03bf",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/Volumes/SSD990-2/s1-build/s1b-20261101/bench25.lock",
+    "wait_for_lock": true,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/Volumes/SSD990-2/s1-build/s1b-20261101/target/release/ecbench"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "child_env_sha256": "c6c12d5fc5f9ad157bf781e3376914c6cf704991630e629712739fe6b45fb760",
+  "child_env": {
+    "HOME": "/Users/adamburan",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/Users/adamburan/bin:/Users/adamburan/.local/bin:/Users/adamburan/.bun/bin:/Users/adamburan/.bun/bin:/Users/adamburan/.bun/bin:/Users/adamburan/bin:/Users/adamburan/.opencode/bin:/Users/adamburan/.bun/bin:/Users/adamburan/.atuin/bin:/Users/adamburan/.pyenv/shims:/Users/adamburan/.pyenv/bin:/Users/adamburan/.elan/bin:/Users/adamburan/.local/bin:/Users/adamburan/.local/share/solana/install/active_release/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Wireshark.app/Contents/MacOS:/usr/local/go/bin:/Users/adamburan/.cargo/bin:/Users/adamburan/.docker/bin:/Users/adamburan/go/bin:/Users/adamburan/istio-1.24.0/bin:/Users/adamburan/.local/bin:/Users/adamburan/.lmstudio/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793578432531,
+  "finished_unix_ms": 1793578713171,
+  "status": "interrupted",
+  "executions_planned": 8,
+  "records_written": 3,
+  "records_sha256": "67268fff49dfde749df5af70ac358a1b6aa47750e4c0bb68d392fdcff8cda200",
+  "status_counts": {
+    "crashed": 1,
+    "verified": 2
+  },
+  "last_seq": 2,
+  "stop": {
+    "kind": "interrupt",
+    "seq": 2,
+    "signal": 15,
+    "message": "interrupted by signal 15"
+  }
+}

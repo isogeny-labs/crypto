@@ -16,12 +16,12 @@ def load(sess, tm, START):
         l = int(p["factor_base"].split("=")[1])
         s = r.get("solver") or {}
         base = dict(t=r["workload"]["target_index"], ok=r["outcome"]["status"] == "verified", st=r["outcome"]["status"], r=r["workload"]["curve"]["r"], l=l, calls=s.get("calls"))
-        if "inherited-f4" in orc: out.append(dict(base, arm=f"lab-l{l}", whole=ir(tms[i]) - ECB, lower=None))
+        if "inherited-f4" in orc: out.append(dict(base, arm=f"lab-l{l}", whole=(ir(tms[i]) or 0) - ECB, lower=None))
         elif "wdsat-s4" in orc:
             kv = dict(x.split("=") for x in orc.split(",")[1:] if "=" in x)
             cfg = {(1, 1): "A", (0, 0): "B", (1, 0): "C", (0, 1): "D"}[(int(kv.get("xg", 1)), int(kv.get("sym", 1)))]
             wi, wc = ex.get("wdsat_ir", 0), ex.get("wdsat_calls", 0)
-            out.append(dict(base, arm=f"wd{cfg}-l{l}", whole=ir(tms[i]) + wi - ECB, lower=wi - wc * START.get(str(l), 0), wd_ir=wi, wd_calls=wc, unsat=ex.get("wdsat_unsat", 0),
+            out.append(dict(base, arm=f"wd{cfg}-l{l}", whole=(ir(tms[i]) or 0) + wi - ECB, lower=wi - wc * START.get(str(l), 0), wd_ir=wi, wd_calls=wc, unsat=ex.get("wdsat_unsat", 0),
                             inexact=ex.get("wdsat_inexact", 0), refuted=ex.get("refuted_by_emitter", 0), lift=ex.get("lift_failures", 0)))
     return out
 def summarize(recs):
