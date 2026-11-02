@@ -1,0 +1,17 @@
+rows: 979  (sha256 d4f06883ad92ccdf48aa7b0d7c7ba9bfb8174ea1873bccc2d402ea1ceb82e80b)
+
+== per (k, arm): attempts x curves, Dreg (mean, sd, distribution), solutions mean, time medians ==
+k=3     stdv  n=264    dreg mean 6.000 sd 0.000 hist {6: 264} sol_mean 0.0000 t_med 0.0039s
+k=4     stdv  n=264    dreg mean 6.000 sd 0.000 hist {6: 264} sol_mean 0.0000 t_med 0.0177s
+k=5     stdv  n=264    dreg mean 6.000 sd 0.000 hist {6: 264} sol_mean 0.0000 t_med 0.0759s
+k=6     stdv  n=187    dreg mean 6.984 sd 0.126 hist {6: 3, 7: 184} sol_mean 0.0000 t_med 20.1596s
+
+isomorphic-model control (Frobenius conjugate instance): 0/0 identical (dreg, solutions, refuted)
+A/A repeat: 0/0 identical counts; time ratio repeat/first median NaN, sd NaN (noise floor for the time column)
+within-orbit Dreg spread (same V, x_R; curves of one orbit are Galois conjugates but V is NOT conjugated, so this is a between-presentation spread):
+  #distinct dreg values per (k, attempt, orbit): {}
+
+== main arm mean dreg by (k, orbit) ==
+
+== presentation-family minima per (k, arm, curve, attempt): min Dreg over presentations | min time | #pres | sel (w,deg) of b image | mod-weight at min time ==
+(per-instance lines omitted: rerun p3h analyze --rows <pooled file> for the full listing)
