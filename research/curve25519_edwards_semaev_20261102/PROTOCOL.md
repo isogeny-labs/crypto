@@ -80,3 +80,19 @@ Only at k = 20, one curve, m = 2, t in {4..7}, G in {0,3}, intervals starting at
 or curves, or the 255-bit setting. Per-relation figures price only F4
 multiply-adds, not the grid recovery or lifting. No comparison to rho is made
 here (there is no complete DLP in this run).
+
+## Amendment 1 (pre-data, 2026-11-02)
+
+Written after rebasing onto main and before any cell ran. Main's `f4cost`
+gained `[m] [mode] [lifts]` at argument positions 9 to 11, so the
+`max_nnz` argument moved from position 9 to position 12. Cells, seeds, caps,
+targets, forms, t, G and predictions are unchanged. The exact command line is
+
+    curve25519_family f4cost 20 <form> <t> <G> 100 <seed> 600 2 full 0 30000000
+
+with `<form>` in {bits, edwards-bits}, `<t>` in {4,5,6,7}, `<G>` in {0,3},
+`<seed>` = 2026111500 + t. The "two at a time" line of the Design is replaced
+by strictly sequential execution (interleaved form order), under
+`ulimit -v 3500000` and `timeout 900` per cell. The `support` subcommand is
+re-run per cell as written; the lambda used for per-relation cost is read from
+the cell-matched support output.

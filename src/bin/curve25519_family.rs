@@ -1461,7 +1461,9 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 /// oracle returned, re-checked here by summing the points.
 #[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
-    f4cost_m(k, form, t, guess, targets, seed, cap_s, 2, "full", false, None)
+    f4cost_m(
+        k, form, t, guess, targets, seed, cap_s, 2, "full", false, None,
+    )
 }
 
 /// `f4cost` with the number of summands `m` (2 or 3) and the presentation
@@ -1532,7 +1534,7 @@ fn f4cost_m(
             };
             assert_eq!(edwards_shift(&inst.curve).unwrap(), m.shift);
             let fb = edwards_factor_base(&inst, t, m.shift);
-            (fb, PkmSemaevOracle::new_edwards_bits(2, t))
+            (fb, PkmSemaevOracle::new_edwards_bits(nsum, t))
         }
         "isogeny" => {
             let mut params = Params::default();
