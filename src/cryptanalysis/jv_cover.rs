@@ -2389,7 +2389,11 @@ fn line_count(f: &Fq, hp: &[E2], qr: &[bool]) -> usize {
                 am(mm(acc.0[1], s, p), hp[k].0[1], p),
             ]);
         }
-        let n = sm(mm(acc.0[0], acc.0[0], p), mm(mm(acc.0[1], acc.0[1], p), f.w, p), p);
+        let n = sm(
+            mm(acc.0[0], acc.0[0], p),
+            mm(mm(acc.0[1], acc.0[1], p), f.w, p),
+            p,
+        );
         if n != 0 && qr[n as usize] {
             cnt += 1;
         }
@@ -2429,7 +2433,11 @@ pub fn search_fb_line(spec: &Spec, n: u64, seed: u64) -> (Spec, LineSearch) {
             }
         };
         let a = f.mul(&t, &t);
-        let hp = if i == 0 { h.clone() } else { line_poly(&f, &h, &a, &b) };
+        let hp = if i == 0 {
+            h.clone()
+        } else {
+            line_poly(&f, &h, &a, &b)
+        };
         let c = line_count(&f, &hp, &qr);
         if i == 0 {
             b_plain = c;
@@ -3544,7 +3552,10 @@ pub fn run_cover_dlp_mode(
     let line_muls = fb_line.as_ref().map_or(0, |r| r.muls);
     let ctx = Ctx::with_trace(&spec, trace);
     let jac = ctx.jac();
-    assert!(jac.is_valid(&spec.gj) && jac.is_valid(&spec.qj), "moved divisors on H'");
+    assert!(
+        jac.is_valid(&spec.gj) && jac.is_valid(&spec.qj),
+        "moved divisors on H'"
+    );
     let l = spec.l;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x3D1F6);
     let (c_e, c_j) = unit_costs(&spec, &ctx);
