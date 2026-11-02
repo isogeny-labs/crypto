@@ -7,10 +7,10 @@
 //! See PROTOCOL.md.  Formulation: the PKM isogeny-tower factor base (the repository's
 //! `prime-isogeny` base) with the Semaev decomposition system at m = 2 and m = 3.
 
-mod analyze;
-mod engine;
-mod fp;
-mod poly;
+pub(crate) mod analyze;
+pub(crate) mod engine;
+pub(crate) mod fp;
+pub(crate) mod poly;
 mod pari;
 mod jsonv;
 mod construct;

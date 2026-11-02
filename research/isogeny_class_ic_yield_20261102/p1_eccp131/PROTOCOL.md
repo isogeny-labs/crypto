@@ -24,7 +24,7 @@ differ from curve to curve beyond what presentation and noise explain?
 
 | id | claim | class | what establishes it |
 |:--|:--|:--|:--|
-| C1 | The 27 neighbours, their isogenies and the transported planted DLP are correct: kernel degree (l-1)/2, x-map degrees (l, l-1), homomorphism on random points, `#E' = n`, image of the generator has order n, `phi(kP) = k phi(P)` | exact computation | `neighbours.json` checks (all 27 pass), re-derived in `make_targets.py` |
+| C1 | The 27 neighbours, their isogenies and the transported planted DLP are correct: kernel degree (l-1)/2, x-map degrees (l, l-1), homomorphism on random points, `#E' = n`, image of the generator has order n, `phi(kP) = k phi(P)` | exact computation | `neighbours.json` checks (all 27 pass), re-derived in `p1_eccp131 make-targets` |
 | C2 | Full-width per-trial yield of any fixed-size factor base is the same formula on every curve of the class and is astronomically small; it is **predicted analytically, not observed** (section 3) | heuristic estimate (analytic) | formula, section 3 |
 | C3 | For the PKM isogeny-tower factor base and the Semaev systems at m = 2 (t = 3, 4) and m = 3 (t = 2), the refutation/solving degree, first fall degree, rank profile and operation count of the transported-target systems on the 27 neighbours are inside the A/A band of E0 | comparative / statistical | this experiment (sections 5-9) |
 | C4 | The instrument can see an algebraic change: adding a known quadric to a planted system lowers D_solve; and a planted decomposition is found with `n_standard_monomials = K` (the exact solution count) on every curve | comparative (positive control) | `ladder` and `planted` rows |
@@ -75,7 +75,7 @@ ECCp-131's real base.
 
 **Factor base (the repository's PKM isogeny form, `src/cryptanalysis/ic_framework/prime_tower.rs`
 `prime-isogeny`).** `p - 1 = 2 * 5 * (129-bit prime)`, so the Kummer tower `g*mu_{2^t}` does not
-exist for t >= 2; the isogeny form needs no condition on `p`. `build_tower.py` finds an
+exist for t >= 2; the isogeny form needs no condition on `p`. `p1_eccp131 build-tower` finds an
 auxiliary curve `E_aux/F_p` with a rational cyclic subgroup `<Q>` of order 2^5 (10 candidates tried), a
 rational point `R'`, chains t Velu 2-isogenies, and sets `V = x(R' + <Q_t>)`, `|V| = 2^t`, `t = 2..5`
 (each tower asserted: `|V| = 2^t`, every `v` runs down the chain to the same `c`). Equations per base
@@ -148,7 +148,7 @@ across curves; `AA_repeat` and `AA_perm` use E0's planted instance.
 ## 6. Seeds, order, ledger
 
 * Master seed 20261102. Every random choice is `SHA-256("{seed}|{label}")`: targets
-  (`make_targets.py`: `k_tau = SHA256(seed|target-k|tau) mod (n-2) + 1`), planted points and signs,
+  (`p1_eccp131 make-targets`: `k_tau = SHA256(seed|target-k|tau) mod (n-2) + 1`), planted points and signs,
   random curves, the A/A permutation, ladder coefficients, schedule order. Nothing is chosen
   after a look.
 * **Order:** for every slot `(rep, config, kind, tau)` the arms are shuffled by a derived seed
@@ -254,27 +254,37 @@ configurations.
   priced into any yield or solve cost.
 * The 27 neighbour slugs are not yet in `docs/curves/registry.json` (AGENTS.md §11: register
   before citing; `python3 scripts/build_curve_registry.py`).
-* The three construction scripts are Python (a Rust port driving libpari by dlopen, as `p2_prime_analogues/p2tool/src/pari.rs` does, is an open item; the frozen outputs `neighbours.json`, `tower.json`, `targets.json` are what the run consumes) (PARI via cypari2: no Rust SEA / modular-polynomial
-  isogeny code exists here); they build and verify inputs only. Measurement, analysis and all
-  result tables are Rust, per AGENTS.md "no Python".
+* The three construction steps are Rust subcommands of the `rust/` crate (`build-neighbours`, `build-tower`, `make-targets`)
+  that drive libpari 2.17 through dlopen (`rust/src/pari.rs`, the mechanism of `p2_prime_analogues/p2tool/src/pari.rs`; the GP
+  source is `rust/gp/construct.gp`); no Rust SEA / modular-polynomial isogeny code exists here. They build and verify inputs
+  only. They replaced `build_neighbours.py`, `build_tower.py`, `make_targets.py` (deleted); the committed `neighbours.json`,
+  `tower.json`, `targets.json` were produced by those scripts and the Rust port reproduces them (table in `CROSSCHECK.md`, section A:
+  `targets.json` byte-identical; `neighbours.json` and `tower.json` identical to the byte except the wall-clock timing fields).
+  Measurement, analysis and all result tables are Rust, per AGENTS.md "no Python".
 
 ## 13. Files and commands
 
 | file | role |
 |:--|:--|
-| `build_neighbours.py` | the 27 neighbours, checks, planted DLP, per-neighbour build times -> `neighbours.json`, `build_neighbours.log` |
-| `build_tower.py` | PKM isogeny towers t = 2..5 -> `tower.json` |
-| `make_targets.py` | 32 seeded targets transported to 31 arms -> `targets.json` |
-| `rust/` | `p1_eccp131 selftest | run | analyze` |
+| `p1_eccp131 build-neighbours` | the 27 neighbours, checks, planted DLP, per-neighbour build times -> `neighbours.json`, `build_neighbours.log` |
+| `p1_eccp131 build-tower` | PKM isogeny towers t = 2..5 -> `tower.json` |
+| `p1_eccp131 make-targets` | 32 seeded targets transported to 31 arms -> `targets.json` |
+| `rust/` | `p1_eccp131 selftest \| run \| analyze \| build-neighbours \| build-tower \| make-targets \| jsoncmp`; GP source `rust/gp/construct.gp` |
+| `crosscheck/` | `p1_crosscheck`: the engine against the repository's `f4_fp` (see `CROSSCHECK.md`) |
 | `run_full.sh` | `tier1`, `tier2`, `analyze` orchestration |
 | `smoke/` | smoke rows, log, analysis |
 
-Rebuild inputs (venv with cypari2 and PARI 2.17; about 3 min for the first, seconds for the rest):
+Rebuild inputs (needs the libpari 2.17 shared object, e.g. the `cypari2.libs/libpari-*.so.2.17.2` of any venv that has cypari2;
+about 3 min for the first, seconds for the rest; `BIN` is the built binary, see below):
 
-    . $VENV/bin/activate
-    python3 build_neighbours.py --out neighbours.json
-    python3 build_tower.py --out tower.json --tmax 5
-    python3 make_targets.py --nb neighbours.json --ntargets 32 --out targets.json
+    export P1_LIBPARI=/path/to/libpari-....so.2.17.2        # or pass --libpari
+    $BIN build-neighbours --out neighbours.json
+    $BIN build-tower --out tower.json --tmax 5
+    $BIN make-targets --nb neighbours.json --ntargets 32 --out targets.json
+    $BIN jsoncmp OLD.json NEW.json --skip timing_s,wall_s,build_total_s_sum   # canonical comparison
+
+`build-tower` note: PARI's `ellgroup(E,,1)` picks its generator from the PARI random state, so the tower is reproduced only when
+no other randomised PARI call (`ellcard`, `isprime`) runs before it; `build-tower` therefore sets only `p` before the search.
 
 Build and test the instrument:
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Thin orchestration for the P1 measurement (see PROTOCOL.md).  Run by the executor, unchanged.
-# Usage: run_full.sh tier1|tier2|analyze   (OUT=runs by default; BIN overrides the binary path)
+# Usage: run_full.sh tier1|tier2|analyze|inputs   (OUT=runs by default; BIN overrides the binary path)
+#   inputs: rebuilds neighbours.json, tower.json, targets.json (Rust + libpari via dlopen; needs P1_LIBPARI) into $OUT/inputs/
+#           for comparison with the committed files (`$BIN jsoncmp`); the committed files are never overwritten.
 set -euo pipefail
 cd "$(dirname "$0")"
 OUT="${OUT:-runs}"; mkdir -p "$OUT"
@@ -22,5 +24,13 @@ case "${1:-}" in
       [ -f "$OUT/${t}_rows.jsonl" ] && "$BIN" analyze --rows "$OUT/${t}_rows.jsonl" --out "$OUT/${t}_analysis.json" \
         --boot 40000 --level 0.9995 --mask > "$OUT/${t}_analysis.txt"
     done ;;
-  *) echo "usage: $0 tier1|tier2|analyze" >&2; exit 2 ;;
+  inputs)
+    : "${P1_LIBPARI:?set P1_LIBPARI to the libpari 2.17 shared object}"; mkdir -p "$OUT/inputs"
+    "$BIN" build-neighbours --out "$OUT/inputs/neighbours.json" > "$OUT/inputs/build_neighbours.log"
+    "$BIN" build-tower --out "$OUT/inputs/tower.json" --tmax 5
+    "$BIN" make-targets --nb "$OUT/inputs/neighbours.json" --ntargets 32 --out "$OUT/inputs/targets.json"
+    "$BIN" jsoncmp neighbours.json "$OUT/inputs/neighbours.json" --skip timing_s,wall_s,build_total_s_sum
+    "$BIN" jsoncmp tower.json "$OUT/inputs/tower.json" --skip wall_s
+    "$BIN" jsoncmp targets.json "$OUT/inputs/targets.json" ;;
+  *) echo "usage: $0 tier1|tier2|analyze|inputs" >&2; exit 2 ;;
 esac

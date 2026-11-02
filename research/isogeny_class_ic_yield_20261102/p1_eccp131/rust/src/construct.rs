@@ -4,7 +4,7 @@
 //! Outputs keep the key order and layout of `json.dump(.., indent=1)`.
 //!
 //!   p1_eccp131 build-neighbours [--out neighbours.json] [--lmax 150] [--only 5,7] [--libpari PATH]
-//!   p1_eccp131 build-tower      [--out tower.json] [--tmax 5] [--libpari PATH]
+//!   p1_eccp131 build-tower      [--out tower.json] [--tmax 5] [--p DEC] [--libpari PATH]   (--p: same construction over another prime)
 //!   p1_eccp131 make-targets     [--nb neighbours.json] [--ntargets 16] [--out targets.json] [--libpari PATH]
 //!   p1_eccp131 jsoncmp A.json B.json [--skip timing_s,wall_s,build_total_s_sum]
 
