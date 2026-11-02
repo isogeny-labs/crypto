@@ -119,13 +119,28 @@ masked output has been produced. Order: interleaved per attempt (shuffled). Host
 
 ## 5. Cells (k grid) and stopping rule
 
-- P3a-D: n=43, m=3, k = 3,4,5; 259 curves; 20 attempts per k; dmax 9. (m=2 control: k = 3,4,5,8.)
+dmax is set per cell from the measured cost (section 7): Dreg beyond the first resolving degree costs a factor ~100 per
+degree at these sizes, so a cell whose Dreg exceeds dmax is reported as a bound "Dreg > dmax" (`atleast`) with its matrix shape
+(rows, cols), never as a value. Revision 1 specified dmax 9 everywhere; at dmax 9 the n=43 k=5 and n=131 random-V k=5 cells run
+for 100 s to more than 15 min per instance and return capshit / no answer.
+
+- P3a-D: n=43, m=3, 259 curves. k=3: 20 attempts, dmax 9. k=4: 2 attempts, dmax 8 (all measured arms and curves resolve at 8,
+  about 17 s). k=5: 2 attempts, dmax 7 (`atleast`: smoke shows Dreg > 8, indeed > 9 with capshit at 70-110 s; the cell
+  only certifies that the matrix shape is identical across curves). m=2 control: k = 3,4,5,8 (cheap, dmax 9).
+- P3a-C (controls and the C2 family, CTRL = 10 curves: E0 + one per orbit and more): arms main, iso, aa, planted, stdv
+  (3 other presentations), badapt, bsparse, null 16 (+ nbadapt on the same 16). k=3: 20 attempts with `--solve`, dmax 9.
+  k=4: 2 attempts, dmax 8, no `--solve`.
 - P3a-Y: n=43, m=3, k=13 only, E0 + 6 orbit representatives, 100 attempts. Expected ordered solution count per attempt
   ~ 2^(3k-n)=2^-4 times a small multiplicity; expect ~6 events per curve per 100 attempts. Power limit stated: per-curve
   yield differences of less than about 3x are not detectable; k=14 (3k=42 ~ n) costs ~300 s per instance (not budgeted).
-- P3b: n=131, m=3. Random V: k=3,4,5 (2 attempts, 263 curves). Standard V: k=3..6 in 3 presentations (1 attempt).
+- P3b: n=131, m=3. Random V (263 curves, 2 attempts): k=3,4 at dmax 9 (0.01 s, 2.6 s), k=5 at dmax 7 (`atleast` 8, 10 s).
+  Standard V: k=3..6 in 3 presentations (1 attempt, 263 curves, dmax 9; k=6 is the 19 s cell). b-adapted: `badapt` k=3..6 on
+  all 263 curves + E0, 2 attempts (0.9 s per curve-attempt in total); `bsparse` + `nbadapt` k=5,6 on CTRL131 (E0 + 6 floor
+  curves, null 8), 2 attempts. Controls iso, aa, planted (+`--solve`) with `main` in the same file, k=3,4,5, dmax 7.
   k=7 hits the F4 size cap (capshit at dmax 10) and random-V k=6 did not finish in 11 min on one instance: reported as
-  not measured, never as a bound.
+  not measured, never as a bound. b-adapted k=7 is not planned (not measured here).
+- The control lines of revision 1 listed `iso,aa,planted,...` without `main`; the iso/A-A identity checks in `analyze` compare
+  against `main` rows of the same file, so they read 0/0. `main` is now in every control line.
 - Stopping: fixed N as above; no sequential rule; no change after data.
 
 ## 6. Decision rule (per metric, inference unit = orbit)
