@@ -1,4 +1,4 @@
-# Lean: Vélu x-chains admit no monomial coordinates
+# Lean: Vélu x-chains admit no monomial coordinates (ℓ = 2 and odd ℓ ≥ 3)
 
 This directory formalises the obstruction stated in
 `../PROTOCOL_Q4_SEARCH.md` ("Structural expectation") and checked
@@ -59,6 +59,37 @@ Work in projective coordinates over a field K of characteristic ≠ 2.
 So no per-level Möbius coordinates make two consecutive steps of a cyclic
 2-isogeny x-chain monomial. Any chain of length ≥ 2 contains such a pair.
 
+## Readable proof, odd ℓ ≥ 3 (`VeluObstructionOdd.lean`)
+
+**Orders of zeros.** Restrict a binary form F to the line t ↦ p + tq.
+- F vanishes to order ≥ 2 at p when the derivative at t = 0 is 0 in every
+  direction q.
+- F has a simple zero at p when the value at t = 0 is 0 and the derivative
+  is nonzero in some direction.
+
+A linear substitution moves lines to lines, so it carries these orders
+across exactly (`lineR_subst`).
+
+1. **The Vélu map's fibre over ∞.** The map is (N : Z·ψ²). Its fibre over ∞
+   is −Z·ψ².
+   - It vanishes to order ≥ 2 at every root (r : 1) of ψ.
+   - It has a simple zero at (1 : 0), because ψ(1, 0) = 1 for monic ψ.
+2. **Monomial fibres.** The fibre of a monomial map over any target is a
+   binomial αX^ℓ + βZ^ℓ.
+3. **A binomial can't have both kinds of zero.** Suppose it has a zero of
+   order ≥ 2 at P ≠ 0. The directions (1, 0) and (0, 1) give
+   ℓαP₀^{ℓ−1} = 0 and ℓβP₁^{ℓ−1} = 0. So α = 0 or β = 0, and say α = 0.
+   - Then at any zero R the derivative ℓβR₁^{ℓ−1}q₁ is nonzero only when
+     βR₁ ≠ 0.
+   - But then the value βR₁^ℓ is nonzero, so R is not a zero after all.
+   - So a binomial with a zero of order ≥ 2 has no simple zero.
+4. **Contradiction.** If M′∘f∘M⁻¹ were monomial, the fibre over M′(∞) would
+   be a binomial. It would equal (up to det M′) the fibre of f over ∞ after
+   substitution by adj M.
+   - By (1) and the transport lemma, it would then have both a zero of order
+     ≥ 2 and a simple zero.
+   - (3) rules that out.
+
 ## Proof map
 
 | Report statement | Lean declaration | Hypotheses (exact) | Status |
@@ -73,6 +104,14 @@ So no per-level Möbius coordinates make two consecutive steps of a cyclic
 | (4) Core obstruction | `no_two_monomial_steps` | `(2:K) ≠ 0`, `(x₁ - x₀)² = 4v`, `v₁ ≠ 0`, `det Mᵢ ≠ 0` (i = 0, 1, 2) | in gate |
 | **Main theorem** (cyclic Vélu chains) | `velu_chain_not_monomial` | `(2:K) ≠ 0`, `x₀` root of `x³+ax+b`, `3x₀²+a ≠ 0`, `x₁` root of the codomain cubic, `x₁ ≠ -2x₀`, `det Mᵢ ≠ 0` | in gate |
 | The predicate is not vacuous | `squareMap_isMonomial` | none | in gate |
+| **ℓ ≥ 3, any field with ℓ a unit:** line restriction commutes with substitution | `lineR_subst`, `eval0_lineR` (`VeluObstructionOdd.lean`) | none | in gate |
+| ℓ ≥ 3: fibres of a conjugated map | `fibreL_conj` | none | in gate |
+| ℓ ≥ 3: monomial fibres are binomials αX^ℓ + βZ^ℓ | `monomial_fibre_binom` | `IsMonomialL ℓ G` | in gate |
+| ℓ ≥ 3: a binomial has no double zero together with a simple zero | `binom_contra` | `2 ≤ ℓ`, `(ℓ:K) ≠ 0`, `P ≠ 0` | in gate |
+| ℓ ≥ 3: fibre over ∞ of N/ψ² (double at roots of ψ, simple at ∞) | `fibInf_double`, `fibInf_simple_val`, `fibInf_simple_slope` | `ψ(r,1) = 0`; `ψ(1,0) ≠ 0` | in gate |
+| ℓ ≥ 3: core theorem (single step) | `not_monomial_of_sq_denominator` | `2 ≤ ℓ`, `(ℓ:K) ≠ 0`, `ψ(1,0) ≠ 0`, `ψ(r,1) = 0`, `det M, det M' ≠ 0` | in gate |
+| **Main theorem, odd ℓ** (Vélu–Kohel form N/ψ², ψ = ∏ (x − x_Q)) | `velu_odd_not_monomial` | `3 ≤ ℓ`, `(ℓ:K) ≠ 0`, `r ∈ S` (a kernel abscissa in K), `det M, det M' ≠ 0`; `N` arbitrary | in gate |
+| ℓ ≥ 3: the predicate is not vacuous | `power_isMonomial` | none | in gate |
 
 ## Scope: what this does not prove
 
@@ -84,14 +123,21 @@ So no per-level Möbius coordinates make two consecutive steps of a cyclic
   measure in the study) to "every step is monomial in some coordinates" is
   argued in the protocol but not formalised. The Lean theorem is about
   monomial shape, not about Gröbner density.
-- **ℓ ≥ 3.** The claim that no monomial step exists for ℓ ≥ 3 is not
-  formalised here.
+- **ℓ ≥ 3** is formalised in `VeluObstructionOdd.lean`. For odd ℓ the
+  obstruction is stronger: no Möbius coordinates make even one step
+  monomial. The modelling input is again Vélu's theorem, in Kohel's form:
+  the x-map is N(x)/ψ(x)², where ψ is the monic kernel polynomial. Only
+  the shape of the denominator is used; N is arbitrary.
+  - **Kernel point in K.** The theorem assumes one kernel abscissa is in K.
+    Over K̄ this always holds, and a Möbius map over K is also one over K̄,
+    so the statement over K̄ covers every K.
+  - **ℓ a unit in K.** The theorem needs (ℓ : K) ≠ 0, i.e. ℓ ≠ char K.
 - **Single steps.** A single Vélu step can be made monomial: send its
   ramification points and branch values to 0 and ∞. The obstruction is
   specifically about two consecutive steps sharing a level.
 
 ## Verification record
 
-Pending the `lean-proof-gate` CI run on the PR that adds this directory. That
-record (run id, gate outcome, axiom audit) is appended here when it
-completes.
+Pending the `lean-proof-gate` CI run on the PR that adds this directory. The
+gate is not a PR check, so it is dispatched by hand on the PR branch. The record
+(run id, commit, gate outcome, axiom audit) is appended here when it completes.
