@@ -17,7 +17,7 @@ def main():
     manifest = json.loads((root / 'publication-manifest.json').read_text())
     entries = list(manifest['entries'])
     for component in ('companion-generator-compression', 'companion-rank-solver',
-                      'companion-cached-pivot', 'companion-border-cache'):
+                      'companion-cached-pivot', 'companion-border-cache', 'companion-compact-lift'):
         extension = root / component / 'publication.json'
         if extension.exists():
             added = json.loads(extension.read_text())

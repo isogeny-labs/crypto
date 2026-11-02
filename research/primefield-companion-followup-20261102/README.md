@@ -128,3 +128,10 @@ bound in publication.json at source revision 0174135d9384b1ffec715de9fb5fd714a7f
 Adds `companion-border-cache/`: reuses the transported pivot column, obtains the first row with one transpose query, and answers scalar-leading-vector requests by charged scaling. Borders are released before descent. For the specified setup/RHS/lift phases, the derived full-source query count changes from 2w+8 to 3+ell (ell is zero or one), with n(2w+5) additional field products. Static inspection records 4w+8 instrumented native integer products per successful fused application; these units are kept separate and runtime is unmeasured.
 
 Five Python files parse; the integration AST and preserved-kernel syntax audits pass; the one-page PDF is visually inspected. Fourteen original files have an independent publication manifest. Numerical, mutation-control and performance trials remain zero. Full reference, release-lifetime, cache and counter validation awaits funded execution.
+
+
+### Compact scalar unwind frames
+
+Adds `companion-compact-lift/`: retain two border tails, a scalar inverse and one RHS entry, without keeping Schur/source/generator objects or a full parent RHS in unwind frames. Derived primal/dual head identities replace each nonzero lift source query with n-1 field multiplications and additions; common scalar solve arithmetic and original-system verification stay intact. Zero input tails introduce dot arithmetic where the reference already skipped its query. The specified setup/RHS/lift source-query count is three per nonterminal node. No runtime dominance claim.
+
+Each frame has 2n field-value slots, giving N(N+1)-2 across full scalar descent, excluding audit/certificate/current-operator memory. This remains quadratic; no heap measurement is claimed. Four Python files parse, complete normalized integration AST and static ownership/source-call audits pass, and the one-page report is visually inspected. Thirteen original files have a separate source manifest. Numerical, corruption-control, heap and performance trials remain zero under the existing cost gate.
