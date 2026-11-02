@@ -1,0 +1,862 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "P3-ecc2k130-isogeny-class-ic-dreg-20261102",
+  "version": 1,
+  "created": "2026-11-02",
+  "repository": "crypto",
+  "study_dir": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130",
+  "authors": [
+    "P3 builder (PROTOCOL.md, harness/)",
+    "experiment-director (machine-readable record of PROTOCOL.md and amendment A1, no design change)"
+  ],
+  "links": {
+    "note": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/PROTOCOL.md is the narrative; this file records it. Section 10 of the narrative is amendment A1: local route, isolation L0 on a loaded host, reduced scope (P3a-Y deferred), per-cell dmax accepted, at most 2 workers, clock descriptive only.",
+    "runner": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/run_full.sh",
+    "harness": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/src/main.rs",
+    "population_n43": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/data/n43_l257_curves.tsv",
+    "population_n131": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/data/ecc2k130_curves.tsv",
+    "parent_design": "research/isogeny_class_ic_yield_20261102/DESIGN.md"
+  },
+  "question": "Do the resolving degree (Dreg), matrix shape and exact solution count of the Weil-descended m=3 decomposition system differ between the curves of the ECC2K-130 isogeny class (E0 and the 262 level-263 curves) and at a same-shape Koblitz analogue (n=43, ell=257, E0 and 258 level-257 curves), beyond the random-b null, the A/A and isomorphic-model controls and the presentation family?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "comparative",
+      "decided_by": [
+        "C-null"
+      ],
+      "text": "Within the measured cells the per-curve Dreg distribution of class curves lies inside the random-b null and Frobenius orbits are exchangeable (inference unit = orbit: 2 floor orbits + E0 at n=131, 6 + E0 at n=43).",
+      "if_supported": "null for the descended system at these cells; licensed only if the positive control (planted) is detected and iso and A/A are 100 percent identical",
+      "if_not_supported": "an orbit-level anomaly with its cell and attempts is reported; a whole-degree shift in every attempt is flagged exact; nothing is claimed beyond the cell"
+    },
+    {
+      "id": "C2",
+      "class": "comparative",
+      "decided_by": [
+        "C-fam"
+      ],
+      "text": "Over the declared presentation family F (standard V in several moduli; V = span(1,g,..,g^(k-1)) in the b-adapted presentations) the minimum over F of a floor curve's Dreg equals E0's minimum over the same family (Gap < 0.5 degree), E0 minimised by the same procedure.",
+      "if_supported": "the standard-V gap between E0 and the floor curves is a presentation effect (outcome N)",
+      "if_not_supported": "outcome G (Gap >= 1 whole degree in every attempt of every floor orbit), read only through C2' after nbadapt equals the floor curves and isocheck passes; outcome U for capshit / atleast cells (bounds, never a gap)"
+    },
+    {
+      "id": "C2p",
+      "class": "heuristic_estimate",
+      "decided_by": [
+        "C-nb"
+      ],
+      "text": "If a gap survives the minimum over F it is attributed to b in F_2 (the Koblitz structure of E0), not to the isogeny class or the level; nbadapt (random dense b, b-adapted presentation) must equal the floor curves for this reading. A structural statement about E0 only, not a speedup."
+    },
+    {
+      "id": "C3",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "text": "Yield at n=43 (P3a-Y, k=13, 100 attempts, exact solution count versus Poisson) is deferred by amendment A1: not run, no data taken, reported as not run (deferred). The solutions column of the other cells is descriptive."
+    },
+    {
+      "id": "C4",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "text": "No result is an improvement over the index-calculus baseline, a speedup, a gap to rho or a statement about the cost of an end-to-end ECC2K-130 attack (no S is produced); no rho reference or section 5a band applies."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H0",
+      "statement": "The descended m=3 decomposition system depends on the curve only through b, so within the isogeny class of ECC2K-130 (E0 and the 262 level-263 curves) and at the n=43 Koblitz analogue (E0 and the 258 level-257 curves) the resolving degree, matrix shapes and exact solution counts of class curves lie inside the random-b null and Frobenius orbits are exchangeable; the E0 versus floor-curve difference seen under the standard V is a presentation effect that disappears after minimising over the declared presentation family F.",
+      "mechanism": "S3(a,c,d) = (a+c)^2 d^2 + acd + (ac)^2 + b: b is the only curve-dependent coefficient; b = 1 (E0) is fixed by every field isomorphism and by Frobenius and is the first basis vector of every power basis, whereas a floor curve has a dense b in a random presentation; the b-adapted presentation (modulus = minimal polynomial of b, b -> z) removes that difference.",
+      "predictions": [
+        {
+          "id": "P-null",
+          "metric": "dreg",
+          "direction": "equal_within",
+          "minimum_effect": "every class curve's mean Dreg differs from the random-b null mean by less than 0.5 degree in every cell that resolves (outcome resolved), and no orbit shows a whole-degree shift in every attempt",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "first_recorded_in": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/smoke/p3b_bp.jsonl",
+                "measured": "n=131 k=5,6, 1 attempt, E0 and 4 floor curves (A000, A010, B000, B010), b-adapted and b-sparse presentations: family-minimum Dreg 6 for every curve, standard V alone E0 6 vs floor 7; instrument test, not data of this protocol"
+              },
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/smoke/p3a_bp_k3.jsonl",
+                "measured": "n=43 k=3,4, 1-2 attempts, E0 + L000 + L043 + L086: family minimum 6 at k=3, Dreg 8 in every presentation at k=4; instrument test"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "n=131 curves and attempts not in the smoke (all 263 curves, 2 attempts, k=3,4 random V) and all n=43 curves (259) at k=3 (20 attempts) and k=4 (2 attempts)"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-pres",
+          "metric": "dreg",
+          "direction": "higher",
+          "minimum_effect": "under the standard V alone at n=131, k=6, the floor curves' Dreg exceeds E0's by one degree (E0 6, floor 7): the presentation effect the detector must see (positive control for C2)",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "first_recorded_in": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/smoke/p3b_stdv_k6.jsonl",
+                "measured": "n=131 standard V k=6: E0 Dreg 6, floor curves Dreg 7 in three presentations (4 floor curves x 3); instrument test, not data of this protocol"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "floor curves and orbits not in the smoke (the 258 floor curves other than the 4 smoked) at k=6, and k=3,4,5 in all 3 presentations"
+          },
+          "role": "calibration"
+        },
+        {
+          "id": "P-fam",
+          "metric": "dreg",
+          "direction": "equal_within",
+          "minimum_effect": "after taking the minimum over F, every floor orbit's mean Dreg differs from E0's by less than 0.5 degree (Gap 0), k=3..6 at n=131 and k=3,4 at n=43 where resolved",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "first_recorded_in": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/smoke/p3b_bp.jsonl",
+                "measured": "n=131 k=5,6, 1 attempt, E0 and 4 floor curves (A000, A010, B000, B010), b-adapted and b-sparse presentations: family-minimum Dreg 6 for every curve, standard V alone E0 6 vs floor 7; instrument test, not data of this protocol"
+              },
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/smoke/p3a_bp_k3.jsonl",
+                "measured": "n=43 k=3,4, 1-2 attempts, E0 + L000 + L043 + L086: family minimum 6 at k=3, Dreg 8 in every presentation at k=4; instrument test"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "the 258 floor curves and 2 orbits' other members not in the smoke (badapt on all 263 curves, bsparse on E0 + 6 floor curves, 2 attempts) and the n=43 control curves other than E0, L000, L043, L086"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "main",
+      "role": "reference",
+      "description": "Curve b (E0 or a class curve), random V = random k-dim F_2-subspace of F_{2^n}, random x_R, both shared by every curve of the attempt (paired); the system is built in the base modulus.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "main"
+      }
+    },
+    {
+      "id": "null",
+      "role": "control_negative",
+      "description": "Random b in F_{2^n}^* (16 at n=43, 8 at n=131) from derived seeds, same V and x_R as the class curves: the right null population (every b is a valid summation system).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "null"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "iso",
+      "role": "control_aa",
+      "description": "Isomorphic-model control: the Frobenius conjugate instance (b^2, V^2, x_R^2); must give identical dreg, solutions and refuted as main (expected 100 percent identical).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "iso"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "A/A: the main instance repeated; counts must be identical, the time ratio gives the noise floor of the run.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "aa"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "planted",
+      "role": "control_positive",
+      "description": "Three liftable abscissae drawn from V, x_R = x(P1+P2+P3) on the actual curve: the planted point must satisfy all equations (planted_ok), the solver must find it (planted_found, --solve) and the refutation Dreg must not refute (outcome differs from main).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "planted"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "stdv",
+      "role": "candidate",
+      "description": "Presentation control: V = span(1,z,..,z^(k-1)) in the base modulus and in --presentations other irreducible moduli (b and x_R mapped by the field isomorphism).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "stdv",
+        "presentations": "3 at n=43 (control cards), 2 other moduli at n=131 (3 presentations in total)"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "badapt",
+      "role": "candidate",
+      "description": "b-adapted presentation: floor curve g = b with modulus the minimal polynomial of b, V = span(1,g,..,g^(k-1)); E0 uses the borrowed generators of the first curves of the floor orbits.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "badapt"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "bsparse",
+      "role": "candidate",
+      "description": "b-sparse family F_b, 6 presentations per curve g in {b, b+1, 1/b, b^3, b^(1/3), b^2+b} (E0: z, the 2 borrowed generators, 3 seeded random generators); family minima are taken in the analysis.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "bsparse"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "nbadapt",
+      "role": "control_negative",
+      "description": "Random dense b (the null population) with g = b and V = span(1,z,..) in M_b: must reproduce the floor curves' badapt values so that 'floor = generic dense b' (C2') can be read.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "p3h measure (Weil-descended Semaev S4 / S3 system, Macaulay row space over F_2 in the Boolean ring)",
+        "arm": "nbadapt"
+      },
+      "same_instrument_as": "main"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "planted",
+      "expected_detection": "planted_ok = 1 on 100 percent of planted rows and solutions >= 1 (planted_found = 1 on rows run with --solve); the planted row's refutation outcome differs from main's. Plus the standard-V presentation effect at n=131, k=6 (E0 6 vs floor 7) seen in the same run; a miss makes a null uninformative.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "null",
+      "null_population": {
+        "description": "Random b in F_{2^n}^* (16 at n=43, 8 at n=131) drawn from derived seeds, with the same V and x_R as the class curves; nbadapt is the same population in the b-adapted presentation.",
+        "generator": "p3h measure --null N: b = rand_elem(derive(seed 20261102, [0x4E554C4C, n, i])), rejecting 0",
+        "n": 16,
+        "why_n": "the n=43 population (7 units); 8 at n=131 (3 units); matched null set sizes are fixed by PROTOCOL.md section 4",
+        "matched_on": [
+          "field F_{2^n} and modulus",
+          "k and m",
+          "V and x_R of the attempt",
+          "engine, dmax and caps",
+          "attempt seeds"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "curve",
+        "levels": [
+          "E0",
+          "the 262 level-263 curves at n=131 (orbits A, B)",
+          "the 258 level-257 curves at n=43 (orbits O0..O5)"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one p3h binary, sha256 recorded in the cards and the run ledger",
+        "how": "cards bind the sha256"
+      },
+      {
+        "name": "host_and_isolation",
+        "treatment": "measured",
+        "how": "isolation L0 on a loaded host shared with P2 and P1; the clock is descriptive only; counted metrics do not depend on the host"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "per (k, attempt) the job list is shuffled by a seeded Fisher-Yates (seed 20261102)"
+      },
+      {
+        "name": "k_and_V",
+        "treatment": "crossed",
+        "how": "k grid and V kind (random, standard, b-adapted) per cell of PROTOCOL.md section 5; V and x_R are drawn per (n, m, k, attempt) and shared by every curve of the attempt"
+      },
+      {
+        "name": "presentation",
+        "treatment": "crossed",
+        "how": "arms stdv, badapt, bsparse: the declared presentation family F"
+      },
+      {
+        "name": "b_population",
+        "treatment": "crossed",
+        "how": "class curve versus random dense b (null, nbadapt)"
+      },
+      {
+        "name": "planted_target",
+        "treatment": "crossed",
+        "how": "planted arm: x_R = x(P1+P2+P3) with three abscissae drawn from V"
+      },
+      {
+        "name": "shard",
+        "treatment": "fixed",
+        "value": "attempt or curve-index shards listed in PROTOCOL.md section 10",
+        "how": "scheduling only: V, x_R and every random draw are derived from (n, m, k, attempt, curve), not from the job list"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-null",
+        "arms": [
+          "main",
+          "null"
+        ],
+        "differs_in": [
+          "b_population"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-fam",
+        "arms": [
+          "stdv",
+          "badapt",
+          "bsparse"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-nb",
+        "arms": [
+          "badapt",
+          "nbadapt"
+        ],
+        "differs_in": [
+          "b_population"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "main",
+          "aa",
+          "iso"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-pos",
+        "arms": [
+          "main",
+          "planted"
+        ],
+        "differs_in": [
+          "planted_target"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "every draw is derive(seed 20261102, (n, m, k, attempt, curve) tuple) with a splitmix mixer in p3h; --seed 20261102 on every card; no seed chosen after a look"
+    },
+    "instance_sampling": {
+      "rule": "every curve of the two populations (263 at n=131, 259 at n=43) enumerated completely by construction; random-b nulls from derived seeds",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "p3h analyze hides arm names behind codes unless --unmask; the pooled masked analysis is produced first and --unmask is run only after it, by the main session",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 522,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 20,
+      "correction": "bonferroni",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "instances = 263 ECC2K-130 curves + 259 analogue curves; replicates = attempts (2 at n=131, 20 or 2 at n=43 by cell; the n=131 standard-V cell has 1 attempt); family = 20 Dreg-versus-null tests = (P3a k=3,4 + P3b random-V k=3,4) cells x orbit units (7 at n=43, 3 at n=131) = 2x7 + 2x3, Bonferroni alpha 0.05/20 = 0.0025, unchanged by amendment A1. Rank resolution: N+1 = 17 null curves at n=43 gives minimum p = 2/17 = 0.12 above 0.0025, so no rank rejection is claimed; the decisions are the exact integer-Dreg criteria of PROTOCOL.md section 6 (|Gap| < 0.5 degree for equivalence, a whole-degree shift in every attempt flagged exact), which do not rest on rank resolution."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 39240,
+      "measured_on": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/PROTOCOL.md section 7 and smoke/: single-thread CPU on the 3-core builder sandbox; run scope of amendment A1 = 10.9 CPU-hours = 39240 s (P3a 4.2 h, P3b 6.7 h; P3a-Y 19.4 h deferred); two single-thread workers give about 5.5 h wall if the host is quiet"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "dreg",
+        "name": "resolving degree",
+        "unit": "degree",
+        "kind": "exact",
+        "definition": "First Macaulay degree d <= dmax at which the constant 1 enters the row space (refutation) or all occurring variables are pinned; outcome resolved = a value; atleast or capshit = the bound dreg = dmax+1 (capshit = F4 size caps), never a value.",
+        "source": "rows jsonl fields dreg, outcome, refuted",
+        "aggregation": "distribution",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "solutions",
+        "name": "exact solution count per attempt",
+        "unit": "x-triples (m=3) or pairs (m=2) in V",
+        "kind": "exact",
+        "definition": "Exact count of x-triples (m=3) / pairs (m=2) in V with S4/S3 = 0 (n<64 library Artin-Schreier chained count; n=131 and 3k<=21 numeric); the per-attempt relation yield before lifting to points.",
+        "source": "rows jsonl field solutions",
+        "aggregation": "distribution",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "rows",
+        "name": "Macaulay rows",
+        "unit": "rows",
+        "kind": "exact",
+        "definition": "Rows of the Macaulay matrix at the last degree reached.",
+        "source": "rows jsonl field rows",
+        "aggregation": "distribution",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "cols",
+        "name": "Macaulay columns",
+        "unit": "columns",
+        "kind": "exact",
+        "definition": "Columns of the Macaulay matrix at the last degree reached.",
+        "source": "rows jsonl field cols",
+        "aggregation": "distribution",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dreg_s",
+        "name": "F4 time of the Dreg computation",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Single-thread (RAYON_NUM_THREADS=1) wall seconds of the Dreg computation, excluding system build; descriptive only at L0 on a loaded host.",
+        "source": "rows jsonl field dreg_s",
+        "aggregation": "median",
+        "resolution": "clock",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "build_s",
+        "name": "system build time",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Single-thread seconds to build the descended system (field multiplications in the modulus; depends on the modulus weight); descriptive only.",
+        "source": "rows jsonl field build_s",
+        "aggregation": "median",
+        "resolution": "clock",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "solve_s",
+        "name": "solver time",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Seconds of solve_boolean_system on rows run with --solve; descriptive only.",
+        "source": "rows jsonl field solve_s",
+        "aggregation": "median",
+        "resolution": "clock",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "planted_ok",
+        "name": "planted point satisfies the system",
+        "unit": "0/1",
+        "kind": "exact",
+        "definition": "1 iff the planted point satisfies every equation of the system (planted arm).",
+        "source": "rows jsonl field planted_ok",
+        "aggregation": "mean",
+        "resolution": "1",
+        "uncertainty": "clopper_pearson_ci95"
+      },
+      {
+        "id": "planted_found",
+        "name": "solver finds the planted point",
+        "unit": "0/1",
+        "kind": "exact",
+        "definition": "1 iff the solver returns the planted point (planted arm, --solve).",
+        "source": "rows jsonl field planted_found",
+        "aggregation": "mean",
+        "resolution": "1",
+        "uncertainty": "clopper_pearson_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "randomized",
+    "clock": "monotonic",
+    "counters": [
+      "dreg",
+      "outcome",
+      "solutions",
+      "rows",
+      "cols",
+      "planted_ok",
+      "planted_found"
+    ],
+    "record": [
+      "binary_sha256",
+      "commit",
+      "rustc -Vv",
+      "host CPU model",
+      "nproc",
+      "RAYON_NUM_THREADS",
+      "seed",
+      "args",
+      "attempt",
+      "seq"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "timeout_seconds": 36000,
+    "measurement_class": "measurement",
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design, amended by A1: the 17 cards of PROTOCOL.md section 10 (setup, P3a main k=3,4,5, P3a controls and C2 family k=3,4, P3a m=2, P3b random V k=3,4 and 5, P3b standard V, badapt, bsparse + nbadapt, controls), with the attempts, k grids, dmax and shards written there; then stop. No sequential rule, no interim looks; no change of N, k, dmax, metric, null or threshold after data. P3a-Y is deferred: no data are taken under this protocol version, reported as not run, not dropped from the preregistration.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "a cell whose rows end atleast or capshit is a bound (dreg > dmax) with its matrix shape, never a value or a gap; a cell that does not finish within its card timeout is reported as not measured, never as a bound",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "selftest or isocheck printing FAILED (nonzero exit), or the class reproduction differing from data/n43_l257_curves.tsv, voids the cells that use them",
+    "iso rows not 100 percent identical to main on (dreg, solutions, refuted), or A/A counts not identical, void the cell",
+    "planted_ok below 100 percent on planted rows is an instrument failure, reported first",
+    "a clock is descriptive only at L0 on a loaded host (identical counts varied up to 2.8x in the smoke); counted metrics remain"
+  ],
+  "decision_rule": {
+    "text": "Outcomes N / G / U of PROTOCOL.md section 6.3, per (n, k) cell, inference unit = orbit, applied to counted metrics only (amendment A1: a clock never decides at L0). N: |Gap| < 0.5 degree for every orbit with the standard-V gap present in the same run (positive control seen) and iso, A/A and planted checks passed. G: Gap >= 1 whole degree in every attempt of every floor orbit, read only through C2' after nbadapt equals the floor curves and isocheck passes. U: atleast or capshit cells are bounds, never a gap. Class versus null (section 6.2): effect size with percentile-bootstrap 95 percent interval over attempts and the equivalence statement |difference| < 0.5 degree; a rejection only for a whole-degree shift in every attempt, flagged exact. Time ratios against the A/A band are reported, never decisive. A null is not an improvement over the IC baseline.",
+    "comparison_ids": [
+      "C-null",
+      "C-fam",
+      "C-nb"
+    ],
+    "threshold": "|Gap| < 0.5 degree (equivalence); Gap >= 1 whole degree in every attempt of every floor orbit (outcome G); Bonferroni 0.05/20 for any rank p",
+    "statistic": "per cell, curve and attempt D(c,a) = min over the presentations of F_c of dreg; Gap(c) = mean_a D(c,a) - mean_a D(E0,a); class versus null by rank of the mean Dreg among the null curves and by the difference of means",
+    "interval": "percentile bootstrap 95 percent over attempts (paired: the same x_R in every presentation, mapped by the isomorphism)",
+    "multiple_comparison_correction": "bonferroni",
+    "effect_size_measure": "difference in mean Dreg in degrees (family minima) with bootstrap interval; whole-degree count of attempts",
+    "verdict_vocabulary": [
+      "null_supported",
+      "gap_survives_family_minimum",
+      "undetermined_bound_only",
+      "instrument_failed",
+      "not_run_deferred"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/src/main.rs",
+      "sha256": "57219432c086e0c5177ac7fe23eff3d0e0884440d9a136d3fb1d0fe4ceb4c63d"
+    },
+    "inputs": [
+      "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/*.jsonl (shard files pooled by concatenation in the card order of PROTOCOL.md section 10)"
+    ],
+    "outputs": [
+      "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/*.masked_analysis.txt",
+      "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/pooled/*.analysis.txt"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "per (cell, V kind): mean Dreg by orbit with the null band and the A/A band",
+      "E0 versus floor family minima per k at n=131 and n=43",
+      "matrix shape (rows, cols) by arm for the bound-only cells"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "reading any result as a speedup, an improvement over the index-calculus baseline, a gap to rho, or a statement about an end-to-end ECC2K-130 attack",
+    "reading an atleast or capshit row as a Dreg value or a gap, or a card that timed out as a bound",
+    "ranking curves or presentations by a clock at L0 on a loaded host",
+    "reading a null as informative when the planted or presentation positive control failed",
+    "dropping or filling a cell that did not run (P3a-Y is reported as not run, deferred)",
+    "changing N, k, dmax, metric, null, thresholds or seeds after seeing results",
+    "unmasking the analysis before the pooled masked analysis exists"
+  ],
+  "literature": [
+    {
+      "ref": "research/isogeny_class_difficulty_20261008",
+      "provenance": "internal",
+      "claim": "within an isogeny class only transport cost, automorphisms and model presentation can differ",
+      "verified_by": "repository review 2026-11-02"
+    },
+    {
+      "ref": "cryptanalysis/experiments/ecc2k130-isogeny-class/REPORT.md section 8 and gaps/G5",
+      "provenance": "internal",
+      "claim": "prior d_reg 8 versus 10-11 refutation with V = span{b^j} and span{(b+1)^j}: the presentation is chosen by the attacker, so both sides are minimised over a declared family",
+      "verified_by": "P3 builder, 2026-11-02"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A1-local-reduced-scope-20261102",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "Owner decision (2026-11-02, relayed by the main session): local route, reduced scope, isolation L0 on a loaded host shared with P2 (ecbench, one core, serial) and P1 (about 2 workers). No data of this protocol exist: p3_ecc2k130/full/ does not exist; smoke/ rows are harness checks, not data.",
+      "changes": [
+        "Run scope: the run_full.sh lines P3a main (k=3,4,5), P3a controls and C2 family (k=3,4), P3a m=2, P3b random V (k=3,4 and 5), P3b standard V, P3b badapt, P3b bsparse + nbadapt, P3b controls (about 10.9 CPU-hours), as 17 cards. P3a-Y (n=43, k=13 yield line, about 19.4 CPU-hours) is deferred: no data are taken for it under this protocol version, it stays in the preregistration and is reported as not run (deferred), never filled; claim C3 is therefore not run.",
+        "Per-cell dmax and attempts accepted as the builder set them (PROTOCOL.md section 5): P3a k=3 dmax 9, k=4 dmax 8, k=5 dmax 7; P3b random V k=3,4 dmax 9, k=5 dmax 7 (atleast 8); the row's own outcome decides value (resolved) versus bound (atleast, capshit); PROTOCOL.md section 10 lists which cells are expected to yield values and which bounds.",
+        "Route: local backend, no isolab-eks; isolation L0 on a loaded host; at most 2 P3 workers (two serial lanes), each single-threaded (RAYON_NUM_THREADS=1); a detached sparse git worktree pinned to the commit that files this amendment, the p3h binary copied there.",
+        "Clock descriptive only: dreg_s is the descriptive time headline (build_s reported beside it); counted metrics (dreg, outcome, rows, cols, solutions, planted_ok, planted_found) are exact and are the only ones that decide; the section 6.3 criterion 'T ratio outside the A/A band' cannot trigger outcome G at L0.",
+        "Sharding (scheduling only): attempt shards (--first-attempt, --attempts 1) for P3a main k=4, P3a controls k=4 and P3b random-V k=5; curve-index shards (--select) for P3b standard V; pooled for analysis by concatenation in card order.",
+        "Card timeouts: per command the larger of 1800 seconds and 4 times the PROTOCOL.md section 7 CPU estimate of that command.",
+        "Analysis commands (masked and unmasked analyze, pooling) are not on the cards: the main session runs them on the pooled files.",
+        "Multiplicity family stays 20 tests; the deferred P3a-Y tests (7) are not run and not removed from any divisor."
+      ],
+      "supersedes_fields": [
+        "PROTOCOL.md section 7 (route), run_full.sh (single script, P3a-Y line)"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "fe1e82e1c0f16cf957478d1de8f4f691f7e446b5a767f08ad765c6d2b369616a",
+    "commit": "db4a30779d0fadd3a7169efa396370645df18416",
+    "frozen_at": "2026-11-02T04:40:50Z",
+    "filed_before_affected_data": true
+  }
+}

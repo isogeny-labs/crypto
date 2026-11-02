@@ -1,6 +1,6 @@
 # P3 protocol: ECC2K-130 isogeny class, IC yield / Dreg (preregistered, predicted null)
 
-Status: DRAFT for the director to freeze (`protocol.json`, hash, commit not yet made). Study: `../DESIGN.md`.
+Status: FROZEN by the director on 2026-11-02 before any data of the full run (`protocol.json`, `experiment.protocol/v1`, version 1, hashes in section 10); amendment A1 (local route, reduced scope) is section 10. Study: `../DESIGN.md`.
 Date of draft: 2026-11-02. Revision 2 (same day, before any data of the full run): C2 redefined as a minimum over a declared
 presentation family including b-adapted presentations (arms `badapt`, `bsparse`, `nbadapt`, sections 1, 4, 6), the n=43 cost
 estimate corrected (section 7). Revision 1 (C2 = "gap vanishes with random V") is withdrawn, see section 1. Harness: `harness/` (Rust, `p3h`). No Python (AGENTS.md).
@@ -265,3 +265,96 @@ experiment.export/v1 wrapper and `protocol.json` are for the director. Report-ev
 - At n=43 the cells k=4 (Dreg 8 for every curve and arm) and k=5 (`atleast`) carry no curve information at the available
   dmax; the information at n=43 is k=3 and the exact yield.
 - Cells with `atleast` or capshit are bounds ("Dreg > dmax"), never values; the b-adapted arms at k=7 and above were not run.
+
+## 10. AMENDMENT A1 (2026-11-02, filed before any data): local route, reduced scope
+
+Status: filed before any measurement of this protocol. `full/` did not exist when this was filed; the rows in `smoke/` are
+harness checks, not data. Protocol record: `protocol.json` version 1, amendment id `A1-local-reduced-scope-20261102`.
+
+Why. Owner decision (2026-11-02, relayed by the main session): local route, reduced scope, isolation L0 accepted on a loaded
+host (3 cores reported by `nproc` on the build sandbox) shared with P2 (`ecbench`, one core, one cell at a time) and P1 (about 2
+workers). At most 2 P3 workers run at once.
+
+What changes.
+
+- **Run scope.** Every line of `run_full.sh` except P3a-Y (about 10.9 CPU-hours): P3a main (k=3,4,5), P3a controls and C2 family
+  (k=3,4), P3a m=2, P3b random V (k=3,4 and k=5), P3b standard V, P3b badapt, P3b bsparse + nbadapt, P3b controls.
+  **P3a-Y (n=43, k=13 yield line, about 19.4 CPU-hours) is deferred, not dropped:** no data are taken for it under this protocol
+  version; it stays in the preregistration (sections 1, 5, 6.5) and is reported as "not run (deferred)", never filled; claim C3 is
+  not run. Running it later needs a further amendment that says whether it precedes its data. The `solutions` column of the cells
+  that do run is descriptive.
+- **Per-cell dmax and attempts as the builder set them (section 5), accepted.** P3a: k=3 dmax 9, k=4 dmax 8, k=5 dmax 7;
+  P3b random V: k=3,4 dmax 9, k=5 dmax 7; P3b standard V and b-adapted arms dmax 9; P3b controls dmax 7. The row's own `outcome`
+  decides what a row is: `resolved` is a Dreg value; `atleast` (Dreg > dmax, reported as the bound dreg = dmax+1) and `capshit` are
+  bounds with their matrix shape (rows, cols), never values and never a gap. Expected from the smoke (not a prediction that decides
+  anything): values in P3a k=3 (Dreg 6 or 7, dmax 9) and k=4 (Dreg 8 = dmax, so a row that does not resolve at 8 is a bound); bounds
+  only in P3a k=5 (`atleast`, dmax 7, certifies that the matrix shape is identical across curves); values in P3b random V k=3,4
+  (Dreg 6, 7) and bound only in k=5 (`atleast` 8); values in P3b standard V, badapt, bsparse and nbadapt k=3..6 (dmax 9); in the
+  P3b controls (dmax 7) values at k=3,4 and bounds at k=5; planted rows are not Dreg values of the null system (the planted
+  system must not refute: its outcome differs from main).
+- **Route.** Local backend, no isolab-eks. Isolation L0 on a loaded host. Two serial lanes (A and B below), each one
+  single-threaded `p3h` at a time (`RAYON_NUM_THREADS=1`), so at most 2 P3 workers. The instrument is built once (builder, 04:14 UTC
+  on 2026-11-02, binary sha256 `73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299`, rustc 1.97.0) and copied into a
+  sparse detached git worktree `/home/user/crypto-p3run` pinned to the commit that files this amendment. The cards run there.
+- **Clock descriptive only.** `dreg_s` is the descriptive time headline (`build_s` reported beside it, section 4). The counted
+  metrics (`dreg`, `outcome`, `rows`, `cols`, `solutions`, `planted_ok`, `planted_found`) are exact and are the only ones that
+  decide. Consequence for section 6: the criterion "T ratio outside the A/A band" of outcome G cannot trigger G at L0; time ratios
+  against the A/A band are reported and never decide (section 6.4 already says a clock is read only when a run alone on its cores is
+  available, and none is available here).
+- **Sharding (scheduling only).** V, x_R, the null b, the planted draws and the b-sparse family are derived from
+  (n, m, k, attempt, curve) and the seed, never from the job list, so a shard produces the same instances as the one-line command.
+  Attempt shards use `--first-attempt` with `--attempts 1`: P3a main k=4, P3a controls k=4, P3b random-V k=5 (shards s0 =
+  attempt 0, s1 = attempt 1). Curve shards use `--select`: P3b standard V (s0 = curve indices 0..131 = E0 and orbit A, s1 = 132..262 =
+  orbit B). Only the within-attempt interleaving order and the `seq` counter differ between a shard and the one-line command. The
+  iso and A/A identity checks of `analyze` compare rows of the same (k, attempt, curve) key, and every control shard carries its
+  own `main` rows, so the checks are valid per shard. Pooling for analysis is concatenation of the shard files in the card order
+  below (analysis step, main session).
+- **Card timeouts.** Per command the larger of 1800 seconds and 4 times the section 7 CPU estimate of that command (the smoke
+  clocks of identical counts varied up to 2.8x under load).
+- **Analysis not on the cards.** The pooled masked analysis (`p3h analyze --rows <pooled file>`), the unmasked analysis and the
+  family-minima reading are run by the main session on the files the cards write; the executor runs none of them (blinding order
+  of section 4 is therefore kept: the masked output is produced before `--unmask`).
+- **Unchanged.** Question, claims C1, C2, C2' and their classes, arms, controls, populations, seeds (`--seed 20261102`), k grids,
+  attempts, dmax, null sizes, thresholds, decision rule, and the multiplicity family of 20 Dreg-versus-null tests (the 7
+  deferred P3a-Y Poisson tests are not run and not removed from any divisor).
+
+Cards (each `research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-<tag>-20261102-1.yaml`; output in
+`p3_ecc2k130/full/`; est = CPU seconds from the section 7 table). `setup` runs first and alone: `mkdir`, `p3h class` (must
+reproduce `data/n43_l257_curves.tsv`, compared by `cmp`), `p3h selftest`, `p3h isocheck` (each must exit 0 and print ALL OK). After
+`setup` the two lanes may run at the same time, one card at a time within a lane; no card reads another card's output, so the
+cards of different lanes are independent.
+
+| lane / order | tag | what (run_full.sh line) | output file(s) | est s | timeout s |
+| --- | --- | --- | --- | --- | --- |
+| 0 | setup | class, selftest, isocheck | n43_l257_curves.tsv, selftest.txt, isocheck.txt | 150 | 4 x 1800 |
+| A1 | a-ctrl-k3 | P3a controls + C2 family k=3, 20 attempts, --solve, dmax 9 | p3a_ctrl_k3.jsonl | 180 | 1800 |
+| A2 | a-main-k3 | P3a main k=3, 20 attempts, dmax 9 | p3a_main_k3.jsonl | 252 | 1800 |
+| A3 | a-m2 | P3a m=2, k=3,4,5,8, 20 attempts, main,null 16, dmax 9 | p3a_m2.jsonl | 180 | 1800 |
+| A4 | a-main-k5 | P3a main k=5, 2 attempts, dmax 7 (bound) | p3a_main_k5.jsonl | 540 | 2160 |
+| A5, A6 | a-ctrl-k4-s0, a-ctrl-k4-s1 | P3a controls + C2 family k=4, dmax 8, attempt 0 / attempt 1 | p3a_ctrl_k4.s0.jsonl, .s1.jsonl | 2520 each | 10080 each |
+| A7, A8 | a-main-k4-s0, a-main-k4-s1 | P3a main k=4, dmax 8, attempt 0 / attempt 1 | p3a_main_k4.s0.jsonl, .s1.jsonl | 4500 each | 18000 each |
+| A9 | b-badapt | P3b badapt, 263 curves, k=3..6, 2 attempts, dmax 9 | p3b_badapt.jsonl | 468 | 1872 |
+| A10 | b-bsparse | P3b bsparse + nbadapt, CTRL131, k=5,6, 2 attempts, null 8, dmax 9 | p3b_bsparse.jsonl | 576 | 2304 |
+| A11 | b-main-k5-s1 | P3b random-V main k=5, dmax 7, attempt 1 | p3b_main_k5.s1.jsonl | 2700 | 10800 |
+| B1 | b-ctrl | P3b controls, CTRL131, k=3,4,5, 2 attempts, null 8, dmax 7, --solve | p3b_ctrl.jsonl | 900 | 3600 |
+| B2 | b-main-k34 | P3b random-V main k=3,4, 2 attempts, dmax 9 | p3b_main_k34.jsonl | 1440 | 5760 |
+| B3, B4 | b-stdv-s0, b-stdv-s1 | P3b standard V, 3 presentations, k=3..6, 1 attempt, dmax 9, curves 0..131 / 132..262 | p3b_stdv.s0.jsonl, .s1.jsonl | 7740 each | 30960 each |
+| B5 | b-main-k5-s0 | P3b random-V main k=5, dmax 7, attempt 0 | p3b_main_k5.s0.jsonl | 2700 | 10800 |
+
+Lane A about 18,700 s (5.2 h) of CPU, lane B about 20,500 s (5.7 h), 10.9 CPU-hours in all; wall time on the loaded host is longer.
+Pool in the order of the table for each file family (`p3a_ctrl_k4`, `p3a_main_k4`, `p3b_main_k5`, `p3b_stdv`: s0 then s1). The C2
+family minima read the pooled `p3b_stdv`, `p3b_badapt`, `p3b_bsparse` (n=131) and `p3a_ctrl_k3`, `p3a_ctrl_k4` (n=43).
+
+Hashes (sha256).
+
+| file | hash |
+| --- | --- |
+| `protocol.json` (v1, full file, frozen 2026-11-02T04:40:50Z) | `b6c40d445e82808d71514e82245ddc526ef5dea85d80139643fc0e0bb62d7b49` |
+| canonical freeze hash (`freeze.protocol_sha256`) | `fe1e82e1c0f16cf957478d1de8f4f691f7e446b5a767f08ad765c6d2b369616a` |
+| `harness/src/main.rs` (frozen instrument and analysis, `analysis_plan.script`) | `57219432c086e0c5177ac7fe23eff3d0e0884440d9a136d3fb1d0fe4ceb4c63d` |
+| `p3h` binary (`target/release/p3h`) | `73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299` |
+| `data/n43_l257_curves.tsv` | `48bd3171e661b4563baded700f179058970359d28de94d613395c786c0d65c64` |
+| `data/ecc2k130_curves.tsv` | `ee987b52191581be4d38006324b8aaf3b932f503794a2fd81c2417665dcc63ea` |
+
+The hash of this file (`PROTOCOL.md`) cannot be written inside it; the cards bind it. `protocol.json` records `freeze.commit`
+`db4a30779d0fadd3a7169efa396370645df18416` (HEAD when it was frozen); the pin of the cards is the later commit that files this section.

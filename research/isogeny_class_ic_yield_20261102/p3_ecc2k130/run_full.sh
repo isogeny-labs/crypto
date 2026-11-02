@@ -5,6 +5,9 @@
 # Build: CARGO_TARGET_DIR=<repo>/target cargo build --release \
 #          --manifest-path research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml
 # Each line is independent; shard long lines over workers with --first-attempt/--attempts.
+# AMENDMENT A1 (2026-11-02, PROTOCOL.md section 10, filed before any data): the run is the task cards of cards/CARD-isogeny-ic-yield-p3-*,
+# whose argv are these lines (sharded where section 10 says), local route, isolation L0, at most 2 workers.  The P3a-Y line below is
+# DEFERRED (not in any card, no data taken).  The masked analysis lines are run by the main session on the pooled shard files.
 set -e
 P=${P:-target/release/p3h}; D=research/isogeny_class_ic_yield_20261102/p3_ecc2k130; export RAYON_NUM_THREADS=1
 OUT=${OUT:-$D/full}; mkdir -p $OUT; SEED=20261102
@@ -25,7 +28,7 @@ $P measure --n 43 --curves $N43 --ks 3 --attempts 20 --seed $SEED --select $CTRL
 $P measure --n 43 --curves $N43 --ks 4 --attempts 2 --seed $SEED --select $CTRL --arms main,iso,aa,planted,stdv,badapt,bsparse,null,nbadapt --null 16 --presentations 3 --dmax 8 --out $OUT/p3a_ctrl_k4.jsonl                # ~1.4 CPU-h
 # P3a m=2 control (cheap)
 $P measure --n 43 --m 2 --curves $N43 --ks 3,4,5,8 --attempts 20 --seed $SEED --arms main,null --null 16 --dmax 9 --out $OUT/p3a_m2.jsonl
-# P3a-Y  exact m=3 yield (ordered x-solution count per attempt), k=13, E0 + 6 orbit representatives, 100 attempts (--dmax 1 skips Dreg); ~19.4 CPU-h, droppable
+# P3a-Y  [DEFERRED under A1: not run, no data]  exact m=3 yield (ordered x-solution count per attempt), k=13, E0 + 6 orbit representatives, 100 attempts (--dmax 1 skips Dreg); ~19.4 CPU-h, droppable
 $P measure --n 43 --curves $N43 --ks 13 --attempts 100 --seed $SEED --select 0,1,44,87,130,173,216 --arms main --dmax 1 --out $OUT/p3a_yield.jsonl
 # ---- P3b  n=131: 263 curves.  Random V: k=3,4 dmax 9; k=5 dmax 7 (atleast 8, 10 s; dmax 9 does not finish in 15 min)
 $P measure --n 131 --curves $N131 --ks 3,4 --attempts 2 --seed $SEED --arms main --dmax 9 --out $OUT/p3b_main_k34.jsonl         # ~0.4 CPU-h
