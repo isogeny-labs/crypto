@@ -43,7 +43,7 @@ const allowedKinds = new Set([
 ]);
 const allowedStatuses = new Set([
   "definition", "assumed", "proved_external", "proved_internal_unreviewed",
-  "algorithm", "conditional", "measured", "heuristic", "open", "refuted"
+  "algorithm", "conditional", "measured", "heuristic", "open", "refuted", "proved_external_unread"
 ]);
 const allowedModels = new Set([
   "mathematical", "classical_unrestricted", "generic_group",
@@ -179,6 +179,10 @@ for (const node of corpus.nodes ?? []) {
   if (node.status === "proved_external") {
     requireValue(node.source_refs.some(ref => sourceVerification.get(ref) === "primary_read"), `${node.id}: externally proved claim lacks a primary-read source`);
   }
+  if (node.status === "proved_external_unread") {
+    requireValue(node.source_refs.some(ref => ["metadata_only", "secondary_only", "primary_read"].includes(sourceVerification.get(ref))), `${node.id}: unread external theorem needs a cited publication source`);
+    requireValue((node.source_locations ?? []).length > 0, `${node.id}: unread external theorem needs a source location (theorem number, section or page)`);
+  }
 }
 
 // Proof-linkage layer: formalization state, repository citations, refutations, taint.
@@ -223,7 +227,7 @@ for (const edge of corpus.edges ?? []) {
 }
 // Taint: nothing reached from a refuted claim through a support edge may be presented as established.
 const supportRelations = new Set(["conditions", "enables", "model_bridge"]);
-const establishedStatuses = new Set(["proved_external", "proved_internal_unreviewed", "algorithm", "measured"]);
+const establishedStatuses = new Set(["proved_external", "proved_external_unread", "proved_internal_unreviewed", "algorithm", "measured"]);
 for (const root of (corpus.nodes ?? []).filter(node => node.status === "refuted")) {
   const seen = new Set([root.id]);
   const queue = [root.id];
