@@ -758,7 +758,7 @@ fn fig_p1(p1: &P1, figdir: &Path) -> Option<String> {
     let lm = 150.0;
     let pw = 178.0;
     let gap = 14.0;
-    let ph = 74.0;
+    let ph = 92.0;
     let rgap = 12.0;
     let top = 112.0;
     let w = lm + 5.0 * (pw + gap) + 10.0;
@@ -775,12 +775,12 @@ fn fig_p1(p1: &P1, figdir: &Path) -> Option<String> {
             "random" => "random non-isogenous curve (27)",
             "iso" => "isomorphic model of E0",
             "AA_repeat" => "A/A repeat of E0",
-            _ => "A/A with permuted order",
+            _ => "A/A, variable order permuted",
         };
         s.text(lx + 12.0, 70.0, label, 9.5, "start", INK, "");
         lx += 18.0 + label.len() as f64 * 5.6 * TS + if i < 4 { 14.0 } else { 0.0 };
     }
-    s.wrap(12.0, 86.0, "Lane order inside each panel, top to bottom: neighbour, random, isomorphic, A/A repeat, A/A permuted. Panel x range is shared per column.", 9.0, w - 24.0, MUTED);
+    s.wrap(12.0, 86.0, "Lane order inside each panel, top to bottom: neighbour, random, isomorphic, A/A repeat, A/A permuted variable order. Panel x range is shared per column.", 9.0, w - 24.0, MUTED);
     // x ranges per metric
     let mut ranges = Vec::new();
     for (mk, _) in P1_METRICS.iter() {
@@ -815,7 +815,7 @@ fn fig_p1(p1: &P1, figdir: &Path) -> Option<String> {
     for (ri, c) in p1.cells.iter().enumerate() {
         let y0 = top + ri as f64 * (ph + rgap);
         s.text(lm - 8.0, y0 + ph / 2.0 - 4.0, &format!("{} {}", c.config, c.kind), 10.5, "end", INK, "font-weight=\"bold\"");
-        s.text(lm - 8.0, y0 + ph / 2.0 + 9.0, &format!("{} arms vs E0", c.n_arms - 1), 9.0, "end", MUTED, "");
+        s.text(lm - 8.0, y0 + ph / 2.0 + 9.0, &format!("{} arm{} vs E0", c.n_arms - 1, if c.n_arms - 1 == 1 { "" } else { "s" }), 9.0, "end", MUTED, "");
         for (ci, (mk, _)) in P1_METRICS.iter().enumerate() {
             let x0 = lm + ci as f64 * (pw + gap);
             let (lo, hi) = ranges[ci];
@@ -840,7 +840,7 @@ fn fig_p1(p1: &P1, figdir: &Path) -> Option<String> {
                 s.circle(xs(r), y, 2.4, p1_role_color(a.role), "#ffffff", 0.4, "opacity=\"0.9\"");
             }
             if maxdev < 5e-4 {
-                s.text(x0 + pw - 5.0, y0 + ph - 4.0, "all arms = 1.000", 8.5, "end", MUTED, "");
+                s.text(x0 + 5.0, y0 + 11.0, "all arms = 1.000", 8.0, "start", MUTED, "");
             }
             if ri == ncell - 1 {
                 for t in nice_ticks(lo + (hi - lo) * 0.06, hi - (hi - lo) * 0.06, 3) {
@@ -925,7 +925,7 @@ fn fig_p2(cells: &[P2Cell], figdir: &Path) -> String {
     let run: Vec<&P2Cell> = cells.iter().filter(|c| c.state != P2State::Deferred).collect();
     let classes: Vec<(u32, char)> = vec![(24, 'A'), (24, 'B'), (28, 'A'), (28, 'B'), (32, 'A'), (32, 'B')];
     let pw = 192.0;
-    let ph = 150.0;
+    let ph = 175.0;
     let lm = 54.0;
     let gap = 10.0;
     let top = 128.0;
@@ -984,7 +984,7 @@ fn fig_p2(cells: &[P2Cell], figdir: &Path) -> String {
                 }
             }
             let title = match cell.state {
-                P2State::Done => format!("c{}{} m={}  h={}  {} curves", bits, cl, m, cell.an.path("class_facts.h").i().unwrap_or(0), cell.an.path("metrics.yield.curves").i().unwrap_or(0)),
+                P2State::Done => format!("c{}{} m={} ({} curves)", bits, cl, m, cell.an.path("metrics.yield.curves").i().unwrap_or(0)),
                 _ => format!("c{}{} m={}", bits, cl, m),
             };
             s.text(x0, y0 - 4.0, &title, 9.5, "start", INK, "font-weight=\"bold\"");
@@ -1003,7 +1003,7 @@ fn fig_p2(cells: &[P2Cell], figdir: &Path) -> String {
             let pe = cell.an.path("metrics.yield.positive_control.planted_effect_pc_over_main_median").f().unwrap_or(f64::NAN);
             if !pe.is_nan() {
                 s.line(x0, ys(pe), x0 + pw, ys(pe), VERM, 1.3, "stroke-dasharray=\"4,2\"");
-                s.text(x0 + pw - 3.0, ys(pe) - 3.0, &format!("planted {}", fx(pe, 3)), 8.5, "end", VERM, "");
+                s.text(x0 + pw - 3.0, ys(pe) + 11.0, &format!("planted {}", fx(pe, 3)), 8.5, "end", VERM, "");
             }
             let mut pts: Vec<(i64, i64, f64)> = p2_yield_points(cell);
             pts.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal));
@@ -1039,8 +1039,7 @@ fn fig_p2(cells: &[P2Cell], figdir: &Path) -> String {
     let mut body = String::from("<defs><pattern id=\"hatch\" width=\"8\" height=\"8\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\"><rect width=\"8\" height=\"8\" fill=\"#f1f1f1\"/><line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"8\" stroke=\"#cfcfcf\" stroke-width=\"2\"/></pattern></defs>\n");
     body.push_str(&s.b);
     s.b = body;
-    s.text(12.0, h - 26.0, "x axis: curves of the class sorted by yield (one point per curve). y axis: yield / class grand mean, shared across panels. Rows: m = 2 (top), m = 3 (bottom). Columns: class A (h = 128) and class B (h = 300) at 24, 28 and 32 bits.", 9.0, "start", MUTED, "");
-    s.text(12.0, h - 13.0, "Source data: p2_yield_per_curve.data.tsv; per-cell statistics from runs/<cell>/analysis.json (frozen p2tool analyze). Positive-control detection: fraction of 200 plantings flagged at the permutation-null q95.", 9.0, "start", MUTED, "");
+    s.wrap(12.0, h - 44.0, "x axis: curves of the class sorted by yield (one point per curve). y axis: yield / class grand mean, shared across panels. Rows: m = 2 (top), m = 3 (bottom). Columns: class A (h = 128) and class B (h = 300) at 24, 28 and 32 bits. Source data: p2_yield_per_curve.data.tsv; per-cell statistics from runs/<cell>/analysis.json (frozen p2tool analyze). Positive-control detection: fraction of 200 plantings flagged at the permutation-null q95.", 9.0, w - 24.0, MUTED);
     let _ = std::fs::write(figdir.join("p2_yield_per_curve.svg"), s.finish("P2 yield per curve with A/A band and planted control"));
     let _ = std::fs::write(figdir.join("p2_yield_per_curve.data.tsv"), data);
     "figures/p2_yield_per_curve.svg".into()
@@ -1179,7 +1178,7 @@ struct Series {
     key: &'static str,
     name: &'static str,
 }
-const SERIES: [Series; 5] = [Series { key: "main", name: "random V (main)" }, Series { key: "stdv", name: "standard V" }, Series { key: "badapt", name: "b-adapted" }, Series { key: "bsparse", name: "b-sparse" }, Series { key: "nbadapt", name: "nbadapt (dense-b control)" }];
+const SERIES: [Series; 6] = [Series { key: "main", name: "random V (main)" }, Series { key: "stdv", name: "standard V" }, Series { key: "badapt", name: "b-adapted" }, Series { key: "bsparse", name: "b-sparse" }, Series { key: "nbadapt", name: "nbadapt (dense-b control)" }, Series { key: "null", name: "null curves (random b)" }];
 fn series_style(k: &str) -> (&'static str, &'static str) {
     // (colour, shape)
     match k {
@@ -1188,6 +1187,7 @@ fn series_style(k: &str) -> (&'static str, &'static str) {
         "badapt" => (VERM, "diamond"),
         "bsparse" => (GREEN, "square"),
         "nbadapt" => (PURPLE, "cross"),
+        "null" => (GREY, "ring"),
         _ => (INK, "circle"),
     }
 }
@@ -1210,7 +1210,7 @@ struct Pt {
 fn series_points(rows: &[R3], n: i64, k: i64, arm: &str) -> Vec<Pt> {
     // per curve: per attempt the minimum Dreg over presentations (bound if the minimising row is not resolved), then mean over attempts
     let mut by: BTreeMap<(i64, i64), Vec<&R3>> = BTreeMap::new();
-    for r in rows.iter().filter(|r| r.n == n && r.k == k && r.arm == arm && r.curve < 100000) {
+    for r in rows.iter().filter(|r| r.n == n && r.k == k && r.arm == arm) {
         by.entry((r.curve, r.attempt)).or_default().push(r);
     }
     // dedupe identical (curve, attempt, pres) rows that appear in two shards
@@ -1251,31 +1251,30 @@ fn fig_p3(p3: &P3, n: i64, ks: &[i64], figdir: &Path) -> String {
     let lm = 62.0;
     let rm = 18.0;
     let pwid = w - lm - rm;
-    let ph = 122.0;
-    let top = 100.0;
-    let gap = 44.0;
-    let h = top + ks.len() as f64 * (ph + gap) + 46.0;
+    let ph = 100.0;
+    let top = 120.0;
+    let gap = 42.0;
+    let h = top + ks.len() as f64 * (ph + gap) + 52.0;
     let mut s = Svg::new(w, h);
     let total = exp_curves(n);
     let maxidx = total as f64 - 1.0;
     s.text(12.0, 22.0, &format!("P3 ECC2K-130 analogue, n = {n}: Dreg per curve, by presentation family (E0 ringed)"), 13.0, "start", INK, "font-weight=\"bold\"");
-    s.text(12.0, 38.0, "Point = mean over attempts of the per-attempt minimum Dreg over a curve's presentations in that family (recorded `dreg`; hollow triangle = bound, Dreg > dmax). x = curve index, 0 = E0; bands = Frobenius orbits.", 9.3, "start", MUTED, "");
-    s.text(12.0, 51.0, "Each family drawn at a small vertical offset for legibility (the value is the point's centre line). Grey band in a panel: range of the random-b null curves' mean Dreg, arm `null`, when measured.", 9.3, "start", MUTED, "");
+    s.wrap(12.0, 40.0, "Point = mean over attempts of the per-attempt minimum Dreg over a curve's presentations in that family (recorded dreg; hollow triangle = bound, Dreg > dmax). x = curve index, 0 = E0; bands = Frobenius orbits. Each family drawn at a small vertical offset for legibility (the value is the point's centre line). Right strip: random-b curves (arm null, and the nbadapt control).", 9.3, w - 24.0, MUTED);
     // legend
     let mut lx = 12.0;
     for sr in SERIES.iter() {
         let (c, shape) = series_style(sr.key);
-        draw_marker(&mut s, lx + 5.0, 68.0, shape, c, 4.0);
-        s.text(lx + 14.0, 71.5, sr.name, 9.5, "start", INK, "");
-        lx += 30.0 + sr.name.len() as f64 * 5.7;
+        draw_marker(&mut s, lx + 5.0, 100.0, shape, c, 4.0);
+        s.text(lx + 14.0, 103.5, sr.name, 9.5, "start", INK, "");
+        lx += 30.0 + sr.name.len() as f64 * 5.7 * TS;
     }
-    s.circle(lx + 5.0, 68.0, 7.0, "none", INK, 1.4, "");
-    s.text(lx + 17.0, 71.5, "E0", 9.5, "start", INK, "font-weight=\"bold\"");
+    s.circle(lx + 5.0, 100.0, 7.0, "none", INK, 1.4, "");
+    s.text(lx + 17.0, 103.5, "E0", 9.5, "start", INK, "font-weight=\"bold\"");
     let mut data = String::from("n\tk\tseries\tcurve\tlabel\torbit\tmean_dreg_over_attempts\tbound\tattempts\n");
     let all_orbits: BTreeMap<i64, String> = p3.rows.iter().filter(|r| r.n == n && r.curve < 100000).map(|r| (r.curve, r.orbit.clone())).collect();
     for (pi, &k) in ks.iter().enumerate() {
         let y0 = top + pi as f64 * (ph + gap);
-        let xs = |c: f64| lm + 8.0 + c / maxidx * (pwid - 16.0);
+        let xs = |c: f64| if c >= 100000.0 { lm + pwid - 62.0 + (c - 100000.0) * 3.2 } else { lm + 8.0 + c / maxidx * (pwid - 88.0) };
         s.rect(lm, y0, pwid, ph, "#fbfbfb", "#bbbbbb", "stroke-width=\"0.6\"");
         // orbit bands
         let mut seg: Vec<(String, i64, i64)> = Vec::new();
@@ -1300,13 +1299,7 @@ fn fig_p3(p3: &P3, n: i64, ks: &[i64], figdir: &Path) -> String {
         for sr in SERIES.iter() {
             ser.push((sr, series_points(&p3.rows, n, k, sr.key)));
         }
-        let nullpts: Vec<f64> = {
-            let mut m: BTreeMap<i64, Vec<f64>> = BTreeMap::new();
-            for r in p3.rows.iter().filter(|r| r.n == n && r.k == k && r.arm == "null") {
-                m.entry(r.curve).or_default().push(r.dreg as f64);
-            }
-            m.values().map(|v| mean(v)).collect()
-        };
+        let nullpts: Vec<f64> = Vec::new();
         let mut vals: Vec<f64> = ser.iter().flat_map(|(_, p)| p.iter().map(|x| x.mean)).collect();
         vals.extend(nullpts.iter().cloned());
         if vals.is_empty() {
@@ -1330,15 +1323,17 @@ fn fig_p3(p3: &P3, n: i64, ks: &[i64], figdir: &Path) -> String {
             let (nl, nh) = minmax(&nullpts);
             s.rect(lm, ys(nh) - 2.0, pwid, (ys(nl) - ys(nh)).max(0.0) + 4.0, "#d9d9d9", "none", "opacity=\"0.55\"");
         }
-        let offs = [0.0, -0.11, 0.11, -0.22, 0.22];
+        let offs = [0.0, -0.11, 0.11, -0.22, 0.22, 0.0];
+        s.line(lm + pwid - 70.0, y0, lm + pwid - 70.0, y0 + ph, "#bbbbbb", 0.8, "stroke-dasharray=\"3,3\"");
+        s.text(lm + pwid - 36.0, y0 + 10.0, "random b", 8.5, "middle", MUTED, "");
         let mut status = Vec::new();
         for (si, (sr, pts)) in ser.iter().enumerate() {
             let (c, shape) = series_style(sr.key);
             if pts.is_empty() {
-                status.push(format!("{}: pending", sr.name));
+                status.push(format!("{}: pending", sr.key));
                 continue;
             }
-            status.push(format!("{}: {}/{} curves", sr.name, pts.len(), total));
+            if sr.key == "null" || sr.key == "nbadapt" { status.push(format!("{}: {} curves", sr.key, pts.len())); } else { status.push(format!("{}: {}/{} curves", sr.key, pts.len(), total)); }
             for p in pts {
                 let _ = writeln!(data, "{n}\t{k}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", sr.key, p.curve, p.label, p.orbit, p.mean, p.bound, p.att);
                 let x = xs(p.curve as f64);
@@ -1357,10 +1352,9 @@ fn fig_p3(p3: &P3, n: i64, ks: &[i64], figdir: &Path) -> String {
         // E0 values
         let e0: Vec<String> = ser.iter().filter_map(|(sr, p)| p.iter().find(|x| x.curve == 0).map(|x| format!("{} {}{}", sr.key, fx(x.mean, 2), if x.bound { " (bound)" } else { "" }))).collect();
         s.text(lm + pwid - 4.0, y0 + ph + 24.0, &format!("E0 mean Dreg: {}", if e0.is_empty() { "pending".to_string() } else { e0.join(", ") }), 8.5, "end", INK, "font-weight=\"bold\"");
-        s.text(lm + 4.0, y0 + ph + 24.0, if !nullpts.is_empty() { "grey band: null curves (random b)" } else { "null curves: not measured in this cell" }, 8.3, "start", MUTED, "");
+        s.text(lm + 4.0, y0 + ph + 24.0, "right strip: random-b curves (null population and nbadapt control), not curves of the class", 8.3, "start", MUTED, "");
     }
-    s.text(12.0, h - 24.0, "Counted metrics (dreg, outcome) are exact; presentations: stdv = standard V in several moduli, badapt = V = span(1,g,..,g^(k-1)) with g adapted to b (E0 borrows the floor curves' moduli), bsparse/nbadapt as in PROTOCOL section 4.", 9.0, "start", MUTED, "");
-    s.text(12.0, h - 11.0, &format!("Source data: p3_dreg_n{n}.data.tsv (pooled recorded rows of p3_ecc2k130/full). A series with no row in a cell is shown as pending; bounds are never plotted as values."), 9.0, "start", MUTED, "");
+    s.wrap(12.0, h - 42.0, &format!("Counted metrics (dreg, outcome) are exact; presentations: stdv = standard V in several moduli, badapt = V = span(1,g,..,g^(k-1)) with g adapted to b (E0 borrows the floor curves' moduli), bsparse and nbadapt as in PROTOCOL section 4. Source data: p3_dreg_n{n}.data.tsv (pooled recorded rows of p3_ecc2k130/full). A series with no row in a cell is shown as pending; bounds are never plotted as values."), 9.0, w - 24.0, MUTED);
     let name = format!("p3_dreg_n{n}");
     let _ = std::fs::write(figdir.join(format!("{name}.svg")), s.finish(&format!("P3 Dreg per curve and presentation family, n={n}")));
     let _ = std::fs::write(figdir.join(format!("{name}.data.tsv")), data);
@@ -1374,14 +1368,19 @@ fn draw_marker(s: &mut Svg, x: f64, y: f64, shape: &str, c: &str, r: f64) {
             s.line(x - r, y - r, x + r, y + r, c, 1.3, "");
             s.line(x - r, y + r, x + r, y - r, c, 1.3, "");
         }
+        "ring" => s.circle(x, y, r, "#ffffff", c, 1.0, ""),
         _ => s.circle(x, y, r, c, "none", 0.0, "opacity=\"0.85\""),
     }
 }
 
 // ================================================================ class structure diagram
 
-fn fig_class(study: &Path, figdir: &Path) -> String {
-    let tsv = std::fs::read_to_string(study.join("p3_ecc2k130/data/ecc2k130_curves.tsv")).unwrap_or_default();
+fn fig_class(study: &Path, figdir: &Path, inp: &mut Inputs) -> String {
+    let tp = study.join("p3_ecc2k130/data/ecc2k130_curves.tsv");
+    let tsv = std::fs::read_to_string(&tp).unwrap_or_default();
+    if tp.exists() {
+        inp.note(study, &tp);
+    }
     let mut orb: BTreeMap<String, usize> = BTreeMap::new();
     for l in tsv.lines().skip(1) {
         let f: Vec<&str> = l.split('\t').collect();
@@ -1392,77 +1391,61 @@ fn fig_class(study: &Path, figdir: &Path) -> String {
     let na = orb.get("A").copied().unwrap_or(0);
     let nb = orb.get("B").copied().unwrap_or(0);
     let w = 1000.0;
-    let h = 470.0;
+    let h = 565.0;
     let mut s = Svg::new(w, h);
     s.text(12.0, 22.0, "Class structure: ECC2K-130 (conductor 263 x p') beside ECCp-131 (conductor 1)", 13.0, "start", INK, "font-weight=\"bold\"");
-    s.text(12.0, 38.0, "Facts from DESIGN.md (PARI 2.17, agrees with ecdb curve 22) and p3_ecc2k130/data/ecc2k130_curves.tsv. Drawn structure, not measurements. p' = 146505763881528721, about 2^57.0.", 9.3, "start", MUTED, "");
-    // left: volcano
-    s.text(250.0, 66.0, "ECC2K-130: 263-isogeny volcano (depth 1)", 11.5, "middle", INK, "font-weight=\"bold\"");
-    s.rect(30.0, 82.0, 440.0, 120.0, "#fff3e0", "#e0c9a0", "stroke-width=\"0.7\"");
-    s.text(40.0, 98.0, "Level 0 · crater · 1 curve", 9.8, "start", INK, "font-weight=\"bold\"");
-    s.text(40.0, 111.0, "End conductor 1 at 263 (CM by Z[(1+sqrt(-7))/2])", 8.8, "start", MUTED, "");
-    s.ellipse(250.0, 156.0, 22.0, 22.0, "#ffffff", INK, 2.0, "");
-    s.text(250.0, 160.0, "E0", 12.0, "middle", INK, "font-weight=\"bold\"");
-    s.text(250.0, 192.0, "b = 1 in F_2, Koblitz curve, trace -22283658519494248867", 8.8, "middle", INK, "");
-    // loops (horizontal edges)
-    s.ellipse(206.0, 156.0, 20.0, 12.0, "none", "#555555", 1.2, "stroke-dasharray=\"4,2\"");
-    s.ellipse(294.0, 156.0, 20.0, 12.0, "none", "#555555", 1.2, "stroke-dasharray=\"4,2\"");
-    s.text(150.0, 134.0, "2 horizontal loops", 8.5, "middle", MUTED, "");
-    s.text(150.0, 144.0, "(264 - 262, derived)", 8.5, "middle", MUTED, "");
-    s.rect(30.0, 232.0, 440.0, 150.0, "#e8f1f8", "#a8c4dc", "stroke-width=\"0.7\"");
-    s.text(40.0, 248.0, "Level 1 · floor · 262 curves", 9.8, "start", INK, "font-weight=\"bold\"");
-    s.text(40.0, 261.0, "End conductor 263 (Z[pi] has 263 x p'; only the 263 part is walked)", 8.8, "start", MUTED, "");
-    // edges from E0 to floor
-    for (i, x) in [90.0, 150.0, 210.0, 290.0, 350.0, 410.0].iter().enumerate() {
-        s.line(250.0, 178.0, *x, 312.0, "#888888", 0.8, "");
-        let _ = i;
+    s.wrap(12.0, 40.0, "Facts from DESIGN.md (PARI 2.17, agrees with ecdb curve 22) and p3_ecc2k130/data/ecc2k130_curves.tsv. Drawn structure, not measurements. p' = 146505763881528721, about 2^57.0; only the 263 part of the conductor is walked.", 9.3, w - 24.0, MUTED);
+    // ---- left: volcano
+    s.text(250.0, 92.0, "ECC2K-130: 263-isogeny volcano, depth 1", 11.5, "middle", INK, "font-weight=\"bold\"");
+    s.rect(20.0, 104.0, 460.0, 124.0, "#fff3e0", "#e0c9a0", "stroke-width=\"0.7\"");
+    s.text(30.0, 122.0, "Level 0 · crater · 1 curve", 9.8, "start", INK, "font-weight=\"bold\"");
+    s.text(30.0, 137.0, "End conductor 1 at 263", 8.8, "start", MUTED, "");
+    s.ellipse(205.0, 178.0, 24.0, 13.0, "none", "#555555", 1.2, "stroke-dasharray=\"4,2\"");
+    s.ellipse(295.0, 178.0, 24.0, 13.0, "none", "#555555", 1.2, "stroke-dasharray=\"4,2\"");
+    s.circle(250.0, 178.0, 22.0, "#ffffff", INK, 2.0, "");
+    s.text(250.0, 182.5, "E0", 12.0, "middle", INK, "font-weight=\"bold\"");
+    s.text(30.0, 208.0, "2 horizontal loops (264 - 262, derived)", 8.6, "start", MUTED, "");
+    s.rect(20.0, 268.0, 460.0, 168.0, "#e8f1f8", "#a8c4dc", "stroke-width=\"0.7\"");
+    for x in [70.0, 130.0, 190.0, 250.0, 310.0, 370.0, 430.0] {
+        s.line(250.0, 200.0, x, 320.0, "#9a9a9a", 0.8, "");
     }
-    s.text(250.0, 224.0, "262 descending 263-isogenies (verified neighbours)", 8.8, "middle", INK, "");
-    for i in 0..22 {
-        let x = 60.0 + i as f64 * 17.5;
-        let c = if i < 11 { BLUE } else { VERM };
-        s.circle(x, 322.0, 3.4, c, "none", 0.0, "");
+    s.rect(120.0, 238.0, 260.0, 18.0, "#ffffff", "none", "opacity=\"0.9\"");
+    s.text(250.0, 251.0, "262 descending 263-isogenies (verified neighbours)", 8.8, "middle", INK, "");
+    for i in 0..24 {
+        let x = 40.0 + i as f64 * 17.6;
+        s.circle(x, 330.0, 3.6, if i < 12 { BLUE } else { VERM }, "none", 0.0, "");
     }
-    s.text(60.0, 346.0, &format!("orbit A: {na} curves (Frobenius orbit)"), 9.0, "start", BLUE, "font-weight=\"bold\"");
-    s.text(462.0, 346.0, &format!("orbit B: {nb} curves"), 9.0, "end", VERM, "font-weight=\"bold\"");
-    s.text(250.0, 366.0, "Isogenies preserve the group order; the descended system depends on a curve through b only.", 8.8, "middle", MUTED, "");
-    s.text(250.0, 400.0, "Studied here (P3): Dreg, yield and F4 time on E0 and on the 262 level-263 curves, plus the", 9.0, "middle", INK, "");
-    s.text(250.0, 413.0, "n = 43 analogue (level 258 curves, 6 Frobenius orbits).", 9.0, "middle", INK, "");
-    // right: ECCp-131
-    s.text(750.0, 66.0, "ECCp-131: one crater, no vertical levels", 11.5, "middle", INK, "font-weight=\"bold\"");
-    s.rect(530.0, 82.0, 440.0, 300.0, "#f1f7ee", "#b5cfa8", "stroke-width=\"0.7\"");
-    s.text(540.0, 98.0, "Level 0 · crater only · h about 2^63.6 curves", 9.8, "start", INK, "font-weight=\"bold\"");
-    s.text(540.0, 111.0, "conductor of Z[pi] = 1, fundamental discriminant -5328143084860676590809120034441032302419", 8.3, "start", MUTED, "");
-    s.ellipse(750.0, 220.0, 190.0, 82.0, "#ffffff", "#7a9a6a", 1.5, "");
-    s.text(750.0, 222.0, "class of E0 (not enumerable)", 10.0, "middle", MUTED, "");
-    // 27 neighbours on the ring
+    s.text(40.0, 358.0, &format!("orbit A: {na} curves"), 9.0, "start", BLUE, "font-weight=\"bold\"");
+    s.text(460.0, 358.0, &format!("orbit B: {nb} curves"), 9.0, "end", VERM, "font-weight=\"bold\"");
+    s.text(30.0, 396.0, "Level 1 · floor · 262 curves", 9.8, "start", INK, "font-weight=\"bold\"");
+    s.text(30.0, 411.0, "End conductor 263; two Frobenius orbits", 8.8, "start", MUTED, "");
+    s.wrap(20.0, 458.0, "E0: b = 1 in F_2 (Koblitz curve), trace -22283658519494248867, CM by Z[(1+sqrt(-7))/2]. Isogenies preserve the group order; the descended system depends on a curve through b only. Studied here (P3): Dreg, yield and F4 time on E0 and the 262 floor curves (n = 131), and the n = 43 analogue (258 level curves, 6 orbits).", 9.0, 460.0, INK);
+    // ---- right: ECCp-131
+    s.text(750.0, 92.0, "ECCp-131: one crater, no vertical levels", 11.5, "middle", INK, "font-weight=\"bold\"");
+    s.rect(520.0, 104.0, 460.0, 332.0, "#f1f7ee", "#b5cfa8", "stroke-width=\"0.7\"");
+    s.text(530.0, 122.0, "Level 0 · crater only · h about 2^63.6 curves", 9.8, "start", INK, "font-weight=\"bold\"");
+    s.wrap(530.0, 137.0, "conductor of Z[pi] = 1; fundamental discriminant -5328143084860676590809120034441032302419", 8.6, 440.0, MUTED);
+    s.ellipse(750.0, 268.0, 190.0, 72.0, "#ffffff", "#7a9a6a", 1.5, "");
+    s.text(750.0, 316.0, "class of E0 (not enumerable)", 9.0, "middle", MUTED, "");
     let ells = [5, 7, 13, 17, 29, 37, 61, 73, 83, 89, 107, 131, 149];
     let mut idx = 0usize;
-    let total_nb = 27.0;
     for l in ells.iter().chain(std::iter::once(&67)) {
         let reps = if *l == 67 { 1 } else { 2 };
         for _ in 0..reps {
-            let ang = (idx as f64 / total_nb) * std::f64::consts::PI * 2.0 - std::f64::consts::FRAC_PI_2;
-            s.circle(750.0 + 190.0 * ang.cos(), 220.0 + 82.0 * ang.sin(), 3.6, BLUE, "#ffffff", 0.6, "");
+            let ang = (idx as f64 / 27.0) * std::f64::consts::PI * 2.0 - std::f64::consts::FRAC_PI_2;
+            s.circle(750.0 + 190.0 * ang.cos(), 268.0 + 72.0 * ang.sin(), 4.0, BLUE, "#ffffff", 0.6, "");
             idx += 1;
         }
     }
-    s.ellipse(750.0, 258.0, 22.0, 22.0, "#ffffff", INK, 2.0, "");
-    s.text(750.0, 262.0, "E0", 12.0, "middle", INK, "font-weight=\"bold\"");
-    s.text(750.0, 164.0, "27 Elkies neighbours: l = 5,7,13,17,29,37,61,73,83,89,107,131,149 (2 each),", 8.6, "middle", BLUE, "");
-    s.text(750.0, 176.0, "l = 67 (1, ramified), by verified Velu", 8.6, "middle", BLUE, "");
-    s.line(730.0, 244.0, 700.0, 188.0, "#888888", 0.8, "");
-    s.line(770.0, 244.0, 800.0, 188.0, "#888888", 0.8, "");
-    // controls outside the class
-    s.text(750.0, 330.0, "Outside the class (null population, different orders):", 9.0, "middle", INK, "");
+    s.circle(750.0, 268.0, 22.0, "#ffffff", INK, 2.0, "");
+    s.text(750.0, 272.5, "E0", 12.0, "middle", INK, "font-weight=\"bold\"");
+    s.wrap(530.0, 368.0, "Blue dots: the 27 Elkies neighbours reachable at l <= 149 by verified Velu: l = 5, 7, 13, 17, 29, 37, 61, 73, 83, 89, 107, 131, 149 (2 each) and l = 67 (1, ramified).", 8.8, 440.0, BLUE);
+    s.text(750.0, 468.0, "Outside the class (null population, other group orders)", 9.0, "middle", INK, "");
     for i in 0..27 {
-        s.circle(560.0 + i as f64 * 14.3, 346.0, 3.0, ORANGE, "none", 0.0, "");
+        s.circle(560.0 + i as f64 * 14.3, 484.0, 3.2, ORANGE, "none", 0.0, "");
     }
-    s.text(750.0, 366.0, "27 random non-isogenous curves; 1 isomorphic model of E0 (same curve)", 8.8, "middle", ORANGE, "");
-    s.text(750.0, 400.0, "Studied here: P1 at full width (tier 1), P2 on scaled analogues with the full horizontal", 9.0, "middle", INK, "");
-    s.text(750.0, 413.0, "class enumerated (conductor 1, 24 to 32 bits finished or pending).", 9.0, "middle", INK, "");
-    s.text(12.0, h - 30.0, "Both pictures show the structure the instruments are applied to: on ECC2K-130 the class has two levels, and on ECCp-131 the class is a single crater (h is about 2^63.6, so only a sample of 27 neighbours at small l is reachable).", 9.0, "start", MUTED, "");
-    s.text(12.0, h - 16.0, "Not a measurement figure: no data file. Facts in tables of REPORT.md section 3.", 9.0, "start", MUTED, "");
+    s.text(750.0, 504.0, "27 random non-isogenous curves; the isomorphic model of E0 is the same curve", 8.8, "middle", ORANGE, "");
+    s.text(12.0, h - 8.0, "Not a measurement figure: no data file. Facts in the tables of REPORT.md section 3.", 9.0, "start", MUTED, "");
     let _ = std::fs::write(figdir.join("class_structure.svg"), s.finish("Class structure of ECC2K-130 and ECCp-131"));
     "figures/class_structure.svg".into()
 }
@@ -1485,7 +1468,7 @@ fn main() {
     let p2 = load_p2(&study, &mut inp);
     let p3 = load_p3(&study, &mut inp);
 
-    let fig_cls = fig_class(&study, &figdir);
+    let fig_cls = fig_class(&study, &figdir, &mut inp);
     let fig1 = fig_p1(&p1, &figdir);
     let fig2 = fig_p2(&p2, &figdir);
     let fig3a = fig_p3(&p3, 131, &[3, 4, 5, 6], &figdir);
@@ -1556,7 +1539,7 @@ fn main() {
         cond.push(vec![
             format!("P2 {}", c.id),
             format!("ecbench isolation level recorded on rows: {}", isos.join(", ")),
-            format!("audit: {}, {} records, {} replays; A/A in-session counts identical {}/{}", if c.audit.get("ok").b() == Some(true) { "OK" } else { "NOT ok" }, c.audit.get("records").i().unwrap_or(0), c.audit.get("replays").arr().len(), c.an.path("aa_in_session_identical_relation_counts.identical").i().unwrap_or(0), c.an.path("aa_in_session_identical_relation_counts.pairs").i().unwrap_or(0)),
+            format!("audit: {}, {} records, {} replays; in-session A/A: {}", if c.audit.get("ok").b() == Some(true) { "OK" } else { "NOT ok" }, c.audit.get("records").i().unwrap_or(0), c.audit.get("replays").arr().len(), { let np = c.an.path("aa_in_session_identical_relation_counts.pairs").i().unwrap_or(0); if np == 0 { "not run (dropped at 32 bits, PROTOCOL 4; round-parity A/A used)".to_string() } else { format!("counts identical {}/{}", c.an.path("aa_in_session_identical_relation_counts.identical").i().unwrap_or(0), np) } }),
         ]);
     }
     d.table_w(&["Part / cell", "Host and isolation as recorded", "Checks as recorded"], cond, vec!["1fr", "2fr", "2.4fr"], "Measurement conditions read from the recorded files. The protocols accept L0 (loaded host); the ecbench level on P2 rows is what ecbench graded and is reported as recorded. In every case the clock is descriptive only.");
@@ -1564,7 +1547,7 @@ fn main() {
     // ---------------- 5 P1
     d.h(1, "4. Method in one paragraph per part");
     d.bullets(vec![
-        "**P1 (ECCp-131, full width, tier 1).** XL/Macaulay engine (`xl-incremental-sparse-echelon`) on the fixed bounded decomposition system, configs `m2t3` and `m3t2`, kinds null, planted and ladder. 58 arms: E0, an A/A repeat, an A/A permuted-order arm, 1 isomorphic model, 27 Elkies neighbours, 27 random non-isogenous curves; 32 null targets, 8 planted targets, 3 reps, seed 20261102. Masked analysis frozen first, key opened after (A1 section 14).".into(),
+        "**P1 (ECCp-131, full width, tier 1).** XL/Macaulay engine (`xl-incremental-sparse-echelon`) on the fixed bounded decomposition system, configs `m2t3` and `m3t2`, kinds null, planted and ladder. 58 arms: E0, an A/A repeat, an A/A permuted variable order-order arm, 1 isomorphic model, 27 Elkies neighbours, 27 random non-isogenous curves; 32 null targets, 8 planted targets, 3 reps, seed 20261102. Masked analysis frozen first, key opened after (A1 section 14).".into(),
         "**P2 (prime analogues).** `ecbench` prime-abscissa mitm pipeline on every curve of an enumerated class (D = -84171, h = 128 for class A; D = -414651, h = 300 for class B), m = 2 and 3. Per curve pooled relation yield per attempt; ICC curve share of variance, max/min and max |z| against a 2000-permutation null; round-parity A/A halves; isomorphic-model control; planted +20% positive control (power must be at least 0.9 for a null to be informative).".into(),
         "**P3 (ECC2K-130).** `p3h measure`: Weil-descended decomposition system over F_2, recorded `dreg` (resolving degree), exact `solutions`, rows and cols, for random V, standard V and b-adapted presentations, at n = 43 (all 258 level curves plus E0) and n = 131 (E0 plus 262 level-263 curves), k = 3 to 6.".into(),
     ]);
@@ -1591,7 +1574,7 @@ fn main() {
             r.push(fx(minmax(&ident).0, 2));
             rows.push(r);
         }
-        d.table(&["cell", "arms vs E0", "D_solve ratio", "final_rank ratio", "field_mults ratio", "cpu_s ratio (descriptive)", "AA_perm field_mults ratio", "min identical-profile fraction"], rows, "Measured (derived from the recorded per-arm geometric-mean ratios vs E0): range over arms other than AA_perm, per cell. AA_perm is the A/A arm with permuted evaluation order and is listed separately.");
+        d.table(&["cell", "arms vs E0", "D_solve ratio", "final_rank ratio", "field_mults ratio", "cpu_s ratio (descriptive)", "AA_perm field_mults ratio", "min identical-profile fraction"], rows, "Measured (derived from the recorded per-arm geometric-mean ratios vs E0): range over arms other than AA_perm, per cell. AA_perm is the A/A arm with permuted variable order (re-encoding floor) and is listed separately.");
         d.fig(fig1.as_deref().unwrap_or(""), "P1 arm-ratio strip plot. One point per arm and metric: ratio to E0 (geometric mean over paired target and rep instances), whiskers the recorded confidence interval. Counted metrics (D_solve, first fall degree, final rank, field mults) are exact; cpu_s is descriptive (L0, loaded host). Run: tier1 card CARD-isogeny-ic-yield-p1-tier1-20261102-1, analysis tier1_analysis.json.");
         // not formed
         let mut nf_rows = Vec::new();
@@ -1622,6 +1605,7 @@ fn main() {
         let mut max_dev_cpu = 0.0f64;
         let mut perm_vals = Vec::new();
         let mut perm_cpu = Vec::new();
+        let mut perm_dev = 0.0f64;
         for c in &p1.cells {
             for mk in ["D_solve", "first_fall_degree_obs", "final_rank", "field_mults"] {
                 let (lo, hi) = p1_range(c, mk, true);
@@ -1630,6 +1614,11 @@ fn main() {
             let (lo, hi) = p1_range(c, "cpu_s", true);
             max_dev_cpu = max_dev_cpu.max((lo - 1.0).abs()).max((hi - 1.0).abs());
             for a in c.arms.iter().filter(|a| a.role == "AA_perm") {
+                for mk in ["D_solve", "final_rank"] {
+                    if let Some(x) = a.m.get(mk) {
+                        perm_dev = perm_dev.max((x.0 - 1.0).abs());
+                    }
+                }
                 if let Some(x) = a.m.get("field_mults") {
                     perm_vals.push(x.0);
                 }
@@ -1640,8 +1629,8 @@ fn main() {
         }
         let (pl, ph_) = minmax(&perm_vals);
         let (cl, ch) = minmax(&perm_cpu);
-        deds.push(format!("**Measured.** In every cell, every arm other than AA_perm has ratio to E0 within {} of 1 on D_solve, first fall degree, final rank and field mults (largest deviation over all cells and these four metrics: {}). The arms are the 27 Elkies neighbours, the isomorphic model and the 27 random non-isogenous curves, for configs m2t3 and m3t2 and kinds null, planted and ladder.", fx(max_dev_counted, 4), fx(max_dev_counted, 4)));
-        deds.push(format!("**Measured.** The arm that moves the operation count is AA_perm (field_mults ratio {} to {} over the cells in which it appears); its D_solve and final rank ratios stay at 1. This arm differs from the others in evaluation order only, so it sets the order-sensitivity of the count, not a curve effect.", fx(pl, 3), fx(ph_, 3)));
+        deds.push(format!("**Measured.** In every cell, every arm other than AA_perm has ratio to E0 within {} of 1 on D_solve, first fall degree, final rank and field mults (the largest deviation over all cells and these four metrics is {}; 0 means the recorded ratio is exactly 1). The arms present are the Elkies neighbours, the isomorphic model and the random non-isogenous curves (27 each, minus the planted instances that were not formed), for configs m2t3 and m3t2 and kinds null, planted and ladder.", fsig(max_dev_counted), fsig(max_dev_counted)));
+        deds.push(format!("**Measured.** The arm that moves the operation count is AA_perm (field_mults ratio {} to {} over the cells in which it appears); its D_solve and final rank ratios deviate from 1 by at most {}. By construction (PROTOCOL section 3) this arm is the E0 instance with a seeded permutation of the variable order, the re-encoding noise floor: it sets how far the operation count moves under a re-encoding of the same curve, and it is not a curve effect.", fx(pl, 3), fx(ph_, 3), fsig(perm_dev)));
         deds.push(format!("**Measured, descriptive.** `cpu_s` ratios of arms other than AA_perm lie within {} of 1 (cells above); AA_perm cpu ratio {} to {}. The clock was taken at L0 on a loaded host and decides nothing.", fx(max_dev_cpu, 3), fx(cl, 3), fx(ch, 3)));
         deds.push(format!("**Measured.** {nf_total} planted rows were not formed (see table); they are missing, not zero."));
         d.bullets(deds);
@@ -1651,17 +1640,24 @@ fn main() {
     // ---------------- 6 P2
     d.h(1, "6. P2: prime analogues of ECCp-131's class");
     let mut rows = Vec::new();
-    for c in &p2 {
-        let state = match c.state {
-            P2State::Done => "finished".to_string(),
-            P2State::Running => "pending (running)".to_string(),
-            P2State::Pending => "pending".to_string(),
-            P2State::Deferred => "not run (deferred)".to_string(),
-        };
-        let (cf, curves) = if c.state == P2State::Done { (format!("p 2^{}, D {}, h {}", fx(c.an.path("class_facts.log2_p").f().unwrap_or(f64::NAN), 2), c.an.path("class_facts.D").i().unwrap_or(0), c.an.path("class_facts.h").i().unwrap_or(0)), c.an.path("metrics.yield.curves").i().unwrap_or(0).to_string()) } else { ("-".into(), "-".into()) };
-        rows.push(vec![c.id.clone(), state, cf, curves]);
+    for bits in [24u32, 28, 32, 36, 40] {
+        for cl in ['A', 'B'] {
+            let mut r = vec![format!("c{bits}{cl}")];
+            let mut fact = "-".to_string();
+            for m in [2u32, 3] {
+                let c = p2.iter().find(|c| c.bits == bits && c.class == cl && c.m == m).unwrap();
+                r.push(match c.state {
+                    P2State::Done => { fact = format!("p 2^{}, D {}, h {}", fx(c.an.path("class_facts.log2_p").f().unwrap_or(f64::NAN), 2), c.an.path("class_facts.D").i().unwrap_or(0), c.an.path("class_facts.h").i().unwrap_or(0)); format!("finished ({} curves)", c.an.path("metrics.yield.curves").i().unwrap_or(0)) }
+                    P2State::Running => "pending (running)".to_string(),
+                    P2State::Pending => "pending".to_string(),
+                    P2State::Deferred => "not run (deferred)".to_string(),
+                });
+            }
+            r.push(fact);
+            rows.push(r);
+        }
     }
-    d.table(&["cell", "state", "class", "curves"], rows, "Cell inventory: 12 run-scope cells (24, 28, 32 bits, classes A and B, m = 2, 3) and 8 deferred cells (36 and 40 bits). Pending cells have no values; deferred cells were not run.");
+    d.table(&["class", "m = 2", "m = 3", "class facts (from a finished cell)"], rows, "Cell inventory: 12 run-scope cells (24, 28, 32 bits, classes A and B, m = 2, 3) and 8 deferred cells (36 and 40 bits). Pending cells have no values; deferred cells were not run.");
     d.fig(&fig2, "P2 yield per curve against the class mean with the A/A band and the planted-control effect, per finished cell (hatched panels are pending). Source: runs/<cell>/analysis.json (p2tool analyze, 2000 permutations, 2000 bootstrap resamples, seed 20261102).");
     // stat table
     let mut srows = Vec::new();
@@ -1755,7 +1751,7 @@ fn main() {
     // gap table, attempt 0
     let mut grows = Vec::new();
     for &n in &[131i64, 43] {
-        let ks: Vec<i64> = if n == 131 { vec![3, 4, 5, 6] } else { vec![3, 4, 5] };
+        let ks: Vec<i64> = if n == 131 { vec![3, 4, 5, 6] } else { vec![3, 4] };
         for &k in &ks {
             let fam_arms = ["stdv", "badapt", "bsparse"];
             let get = |arms: &[&str]| -> BTreeMap<i64, (f64, String)> {
@@ -1775,9 +1771,9 @@ fn main() {
             let missing: Vec<&str> = fam_arms.iter().cloned().filter(|a| !present.contains(a)).collect();
             let e0f = fam.get(&0).map(|x| x.0);
             let e0s = std_only.get(&0).map(|x| x.0);
-            let orbits: BTreeSet<String> = fam.values().filter(|x| x.1 != "crater").map(|x| x.1.clone()).chain(std_only.values().filter(|x| x.1 != "crater").map(|x| x.1.clone())).collect();
+            let orbits: BTreeSet<String> = p3.rows.iter().filter(|r| r.n == n && r.curve < 100000 && r.orbit != "crater").map(|r| r.orbit.clone()).collect();
             if orbits.is_empty() {
-                grows.push(vec![format!("n={n}, k={k}"), "-".into(), "pending".into(), "-".into(), "-".into(), present.join(", "), if missing.is_empty() { "complete".into() } else { format!("incomplete, arms pending: {}", missing.join(", ")) }]);
+                grows.push(vec![format!("n={n}, k={k}"), "-".into(), "pending".into(), "-".into(), "-".into(), present.join(", "), if missing.is_empty() { "all three family arms have rows (curve coverage in figures 4 and 5)".to_string() } else { format!("incomplete, arms pending: {}", missing.join(", ")) }]);
                 continue;
             }
             for o in orbits {
@@ -1790,17 +1786,17 @@ fn main() {
                     }
                     let (lo, hi) = minmax(v);
                     match e0 {
-                        Some(e) if e < 1000.0 => format!("{} ({} to {}; {} curves) vs E0 {} : diff {}", fx(mean(v), 3), fx(lo, 0), fx(hi, 0), v.len(), fx(e, 0), fx(mean(v) - e, 3)),
-                        _ => format!("{} ({} to {}; {} curves) vs E0 pending", fx(mean(v), 3), fx(lo, 0), fx(hi, 0), v.len()),
+                        Some(e) if e < 1000.0 => format!("{} (range {} to {}; {} curve(s)); E0 {}; difference {}", fx(mean(v), 3), fx(lo, 0), fx(hi, 0), v.len(), fx(e, 0), fx(mean(v) - e, 3)),
+                        _ => format!("{} (range {} to {}; {} curve(s)); E0 pending", fx(mean(v), 3), fx(lo, 0), fx(hi, 0), v.len()),
                     }
                 };
-                grows.push(vec![format!("n={n}, k={k}"), o.clone(), fmt(&sv, e0s), fmt(&fv, e0f), present.join(", "), if missing.is_empty() { "complete".into() } else { format!("incomplete, arms pending: {}", missing.join(", ")) }, String::new()]);
+                grows.push(vec![format!("n={n}, k={k}"), o.clone(), fmt(&sv, e0s), fmt(&fv, e0f), present.join(", "), if missing.is_empty() { "all three family arms have rows (curve coverage in figures 4 and 5)".to_string() } else { format!("incomplete, arms pending: {}", missing.join(", ")) }, String::new()]);
                 let l = grows.len() - 1;
                 grows[l].pop();
             }
         }
     }
-    d.table_w(&["cell", "orbit", "standard V only: floor mean min-Dreg vs E0", "family minimum (arms present): floor mean vs E0", "family arms with rows", "family status"], grows.into_iter().map(|mut r| { r.truncate(6); r }).collect(), vec!["0.7fr", "0.5fr", "2.2fr", "2.2fr", "1fr", "1.2fr"], "Descriptive recorded-value summary, attempt 0 only (the one attempt common to every family arm). Per curve: the minimum recorded Dreg over the presentations of the arms listed; per orbit: mean, range and count over curves, against E0 under the same procedure. This is not the frozen bootstrap analysis (`p3h analyze`, archived under report/data/p3_analysis/) and not PROTOCOL 6.3 outcome N or G: that reading needs the b-adapted and b-sparse arms to be complete, and cells marked incomplete must not be read as a family-minimum gap.");
+    d.table_w(&["cell", "orbit", "standard V only: floor-curve mean of min Dreg against E0", "family minimum (arms present): floor-curve mean against E0", "family arms with rows", "family status"], grows.into_iter().map(|mut r| { r.truncate(6); r }).collect(), vec!["0.7fr", "0.5fr", "2.2fr", "2.2fr", "1fr", "1.2fr"], "Descriptive recorded-value summary, attempt 0 only; n = 43 family cells are k = 3 and 4 only (PROTOCOL A1) (the one attempt common to every family arm). Per curve: the minimum recorded Dreg over the presentations of the arms listed; per orbit: mean, range and count over curves, against E0 under the same procedure. This is not the frozen bootstrap analysis (`p3h analyze`, archived under report/data/p3_analysis/) and not PROTOCOL 6.3 outcome N or G: that reading needs the b-adapted and b-sparse arms to be complete, and cells marked incomplete must not be read as a family-minimum gap.");
     d.p("The preregistered reading is C2: after minimising over the declared presentation family F on both sides, E0 and the floor curves coincide, with the single-presentation (standard V) gap present as the positive control (standard V, n = 131, k = 6: E0 Dreg 6 against floor Dreg 7). Where the table shows the single-presentation gap and an incomplete family, only the positive control is visible so far. A surviving gap would be read only as a statement about b in F_2 (E0 alone has b = 1), not about the isogeny class, and is not a speedup (no end-to-end S, no rho gap).");
 
     // ---------------- 8 deferred and pending

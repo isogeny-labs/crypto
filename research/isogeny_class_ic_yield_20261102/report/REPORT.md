@@ -31,7 +31,7 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 
 ## 3. Class structure and measurement conditions
 
-![Figure 1. Isogeny-class structure the instruments are applied to. Left: ECC2K-13](figures/class_structure.svg)
+![Figure 1](figures/class_structure.svg)
 
 *Figure 1. Isogeny-class structure the instruments are applied to. Left: ECC2K-130 as a 263-isogeny volcano of depth 1 (E0 on the crater, 262 curves on the floor in two Frobenius orbits). Right: ECCp-131, a single crater of about 2^63.6 curves with 27 Elkies neighbours reachable at l <= 149, and the 27 random non-isogenous controls outside the class. Source: DESIGN.md, p3_ecc2k130/data/ecc2k130_curves.tsv.*
 
@@ -50,17 +50,17 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | Part / cell | Host and isolation as recorded | Checks as recorded |
 |---|---|---|
 | P1 tier 1 | 2 workers, nproc 4, model name : Intel(R) Xeon(R) Processor @ 2.80GHz | rows 14016; binary sha256 c230a30013d85bd0; done 14016 jobs in 6883.4s |
-| P2 c24A_m2 | ecbench isolation level recorded on rows: L1: 93, L2: 6435 | audit: OK, 8160 records, 12 replays; A/A in-session counts identical 2176/2176 |
-| P2 c24A_m3 | ecbench isolation level recorded on rows: L1: 352, L2: 12704 | audit: OK, 16320 records, 12 replays; A/A in-session counts identical 4352/4352 |
-| P2 c24B_m2 | ecbench isolation level recorded on rows: L1: 175, L2: 14609 | audit: OK, 18480 records, 12 replays; A/A in-session counts identical 4928/4928 |
-| P2 c28A_m3 | ecbench isolation level recorded on rows: L1: 316, L2: 6212 | audit: OK, 8160 records, 12 replays; A/A in-session counts identical 2176/2176 |
-| P2 c32A_m2 | ecbench isolation level recorded on rows: L1: 4352 | audit: OK, 5440 records, 12 replays; A/A in-session counts identical 0/0 |
-| P2 c32A_m3 | ecbench isolation level recorded on rows: L1: 1002, L2: 3350 | audit: OK, 5440 records, 12 replays; A/A in-session counts identical 0/0 |
+| P2 c24A_m2 | ecbench isolation level recorded on rows: L1: 93, L2: 6435 | audit: OK, 8160 records, 12 replays; in-session A/A: counts identical 2176/2176 |
+| P2 c24A_m3 | ecbench isolation level recorded on rows: L1: 352, L2: 12704 | audit: OK, 16320 records, 12 replays; in-session A/A: counts identical 4352/4352 |
+| P2 c24B_m2 | ecbench isolation level recorded on rows: L1: 175, L2: 14609 | audit: OK, 18480 records, 12 replays; in-session A/A: counts identical 4928/4928 |
+| P2 c28A_m3 | ecbench isolation level recorded on rows: L1: 316, L2: 6212 | audit: OK, 8160 records, 12 replays; in-session A/A: counts identical 2176/2176 |
+| P2 c32A_m2 | ecbench isolation level recorded on rows: L1: 4352 | audit: OK, 5440 records, 12 replays; in-session A/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A/A used) |
+| P2 c32A_m3 | ecbench isolation level recorded on rows: L1: 1002, L2: 3350 | audit: OK, 5440 records, 12 replays; in-session A/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A/A used) |
 
 
 ## 4. Method in one paragraph per part
 
-- **P1 (ECCp-131, full width, tier 1).** XL/Macaulay engine (`xl-incremental-sparse-echelon`) on the fixed bounded decomposition system, configs `m2t3` and `m3t2`, kinds null, planted and ladder. 58 arms: E0, an A/A repeat, an A/A permuted-order arm, 1 isomorphic model, 27 Elkies neighbours, 27 random non-isogenous curves; 32 null targets, 8 planted targets, 3 reps, seed 20261102. Masked analysis frozen first, key opened after (A1 section 14).
+- **P1 (ECCp-131, full width, tier 1).** XL/Macaulay engine (`xl-incremental-sparse-echelon`) on the fixed bounded decomposition system, configs `m2t3` and `m3t2`, kinds null, planted and ladder. 58 arms: E0, an A/A repeat, an A/A permuted variable order-order arm, 1 isomorphic model, 27 Elkies neighbours, 27 random non-isogenous curves; 32 null targets, 8 planted targets, 3 reps, seed 20261102. Masked analysis frozen first, key opened after (A1 section 14).
 - **P2 (prime analogues).** `ecbench` prime-abscissa mitm pipeline on every curve of an enumerated class (D = -84171, h = 128 for class A; D = -414651, h = 300 for class B), m = 2 and 3. Per curve pooled relation yield per attempt; ICC curve share of variance, max/min and max |z| against a 2000-permutation null; round-parity A/A halves; isomorphic-model control; planted +20% positive control (power must be at least 0.9 for a null to be informative).
 - **P3 (ECC2K-130).** `p3h measure`: Weil-descended decomposition system over F_2, recorded `dreg` (resolving degree), exact `solutions`, rows and cols, for random V, standard V and b-adapted presentations, at n = 43 (all 258 level curves plus E0) and n = 131 (E0 plus 262 level-263 curves), k = 3 to 6.
 
@@ -69,7 +69,7 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 
 `tier1_analysis.json` covers 14016 rows in 6 cells (config x kind), CI level 0.9995, 40000 bootstrap resamples. The analysis was produced with arm labels masked (`arm_labels_masked` = true); the key (sha256 b1463033d4d5bd5275e9b9b3202097fb34e72b9327e549f89413e0ec5766c96b) maps the masked labels to arms and is applied here only to name the points.
 
-*Measured (derived from the recorded per-arm geometric-mean ratios vs E0): range over arms other than AA_perm, per cell. AA_perm is the A/A arm with permuted evaluation order and is listed separately.*
+*Measured (derived from the recorded per-arm geometric-mean ratios vs E0): range over arms other than AA_perm, per cell. AA_perm is the A/A arm with permuted variable order (re-encoding floor) and is listed separately.*
 
 | cell | arms vs E0 | D_solve ratio | final_rank ratio | field_mults ratio | cpu_s ratio (descriptive) | AA_perm field_mults ratio | min identical-profile fraction |
 |---|---|---|---|---|---|---|---|
@@ -80,7 +80,7 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | m3t2 null | 57 (27 nb, 27 rnd) | 1.000 to 1.000 | 1.000 to 1.000 | 1.000 to 1.000 | 0.968 to 0.995 | 0.976 | 1.00 |
 | m3t2 planted | 18 (8 nb, 8 rnd) | 1.000 to 1.000 | 1.000 to 1.000 | 1.000 to 1.000 | 0.973 to 1.015 | 0.976 | 1.00 |
 
-![Figure 2. P1 arm-ratio strip plot. One point per arm and metric: ratio to E0 (ge](figures/p1_arm_ratio_strip.svg)
+![Figure 2](figures/p1_arm_ratio_strip.svg)
 
 *Figure 2. P1 arm-ratio strip plot. One point per arm and metric: ratio to E0 (geometric mean over paired target and rep instances), whiskers the recorded confidence interval. Counted metrics (D_solve, first fall degree, final rank, field mults) are exact; cpu_s is descriptive (L0, loaded host). Run: tier1 card CARD-isogeny-ic-yield-p1-tier1-20261102-1, analysis tier1_analysis.json.*
 
@@ -131,8 +131,8 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 
 ### 5.1 What it shows now
 
-- **Measured.** In every cell, every arm other than AA_perm has ratio to E0 within 0.0000 of 1 on D_solve, first fall degree, final rank and field mults (largest deviation over all cells and these four metrics: 0.0000). The arms are the 27 Elkies neighbours, the isomorphic model and the 27 random non-isogenous curves, for configs m2t3 and m3t2 and kinds null, planted and ladder.
-- **Measured.** The arm that moves the operation count is AA_perm (field_mults ratio 0.976 to 1.165 over the cells in which it appears); its D_solve and final rank ratios stay at 1. This arm differs from the others in evaluation order only, so it sets the order-sensitivity of the count, not a curve effect.
+- **Measured.** In every cell, every arm other than AA_perm has ratio to E0 within 3.850e-5 of 1 on D_solve, first fall degree, final rank and field mults (the largest deviation over all cells and these four metrics is 3.850e-5; 0 means the recorded ratio is exactly 1). The arms present are the Elkies neighbours, the isomorphic model and the random non-isogenous curves (27 each, minus the planted instances that were not formed), for configs m2t3 and m3t2 and kinds null, planted and ladder.
+- **Measured.** The arm that moves the operation count is AA_perm (field_mults ratio 0.976 to 1.165 over the cells in which it appears); its D_solve and final rank ratios deviate from 1 by at most 0. By construction (PROTOCOL section 3) this arm is the E0 instance with a seeded permutation of the variable order, the re-encoding noise floor: it sets how far the operation count moves under a re-encoding of the same curve, and it is not a curve effect.
 - **Measured, descriptive.** `cpu_s` ratios of arms other than AA_perm lie within 0.074 of 1 (cells above); AA_perm cpu ratio 0.985 to 1.121. The clock was taken at L0 on a loaded host and decides nothing.
 - **Measured.** 1008 planted rows were not formed (see table); they are missing, not zero.
 
@@ -143,30 +143,20 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 
 *Cell inventory: 12 run-scope cells (24, 28, 32 bits, classes A and B, m = 2, 3) and 8 deferred cells (36 and 40 bits). Pending cells have no values; deferred cells were not run.*
 
-| cell | state | class | curves |
+| class | m = 2 | m = 3 | class facts (from a finished cell) |
 |---|---|---|---|
-| c24A_m2 | finished | p 2^23.70, D -84171, h 128 | 128 |
-| c24A_m3 | finished | p 2^23.70, D -84171, h 128 | 128 |
-| c24B_m2 | finished | p 2^23.72, D -414651, h 300 | 300 |
-| c24B_m3 | pending | - | - |
-| c28A_m2 | pending | - | - |
-| c28A_m3 | finished | p 2^27.31, D -84171, h 128 | 128 |
-| c28B_m2 | pending | - | - |
-| c28B_m3 | pending | - | - |
-| c32A_m2 | finished | p 2^31.94, D -84171, h 128 | 128 |
-| c32A_m3 | finished | p 2^31.94, D -84171, h 128 | 128 |
-| c32B_m2 | pending | - | - |
-| c32B_m3 | pending | - | - |
-| c36A_m2 | not run (deferred) | - | - |
-| c36A_m3 | not run (deferred) | - | - |
-| c36B_m2 | not run (deferred) | - | - |
-| c36B_m3 | not run (deferred) | - | - |
-| c40A_m2 | not run (deferred) | - | - |
-| c40A_m3 | not run (deferred) | - | - |
-| c40B_m2 | not run (deferred) | - | - |
-| c40B_m3 | not run (deferred) | - | - |
+| c24A | finished (128 curves) | finished (128 curves) | p 2^23.70, D -84171, h 128 |
+| c24B | finished (300 curves) | pending | p 2^23.72, D -414651, h 300 |
+| c28A | pending | finished (128 curves) | p 2^27.31, D -84171, h 128 |
+| c28B | pending | pending | - |
+| c32A | finished (128 curves) | finished (128 curves) | p 2^31.94, D -84171, h 128 |
+| c32B | pending | pending | - |
+| c36A | not run (deferred) | not run (deferred) | - |
+| c36B | not run (deferred) | not run (deferred) | - |
+| c40A | not run (deferred) | not run (deferred) | - |
+| c40B | not run (deferred) | not run (deferred) | - |
 
-![Figure 3. P2 yield per curve against the class mean with the A/A band and the pl](figures/p2_yield_per_curve.svg)
+![Figure 3](figures/p2_yield_per_curve.svg)
 
 *Figure 3. P2 yield per curve against the class mean with the A/A band and the planted-control effect, per finished cell (hatched panels are pending). Source: runs/<cell>/analysis.json (p2tool analyze, 2000 permutations, 2000 bootstrap resamples, seed 20261102).*
 
@@ -217,37 +207,38 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | n=131, k=4 | 14/14 | 14/14 | 14 / 0 / 0 |
 | n=131, k=5 | 14/14 | 14/14 | 14 / 0 / 0 |
 
-![Figure 4. P3 at full width (n = 131): Dreg per curve for random V, standard V an](figures/p3_dreg_n131.svg)
+![Figure 4](figures/p3_dreg_n131.svg)
 
 *Figure 4. P3 at full width (n = 131): Dreg per curve for random V, standard V and b-adapted presentations, E0 ringed (curve 0), orbits A and B shaded. Pending series are named under each panel. Source: p3_dreg_n131.data.tsv from the recorded rows.*
 
-![Figure 5. P3a analogue (n = 43, E0 plus 258 level curves, 6 orbits): Dreg per cu](figures/p3_dreg_n43.svg)
+![Figure 5](figures/p3_dreg_n43.svg)
 
 *Figure 5. P3a analogue (n = 43, E0 plus 258 level curves, 6 orbits): Dreg per curve. The control and family arms were measured on a subset of curves (`--select`), the main arm on all curves. Hollow triangles are bounds (Dreg > dmax). Source: p3_dreg_n43.data.tsv.*
 
-*Descriptive recorded-value summary, attempt 0 only (the one attempt common to every family arm). Per curve: the minimum recorded Dreg over the presentations of the arms listed; per orbit: mean, range and count over curves, against E0 under the same procedure. This is not the frozen bootstrap analysis (`p3h analyze`, archived under report/data/p3_analysis/) and not PROTOCOL 6.3 outcome N or G: that reading needs the b-adapted and b-sparse arms to be complete, and cells marked incomplete must not be read as a family-minimum gap.*
+*Descriptive recorded-value summary, attempt 0 only; n = 43 family cells are k = 3 and 4 only (PROTOCOL A1) (the one attempt common to every family arm). Per curve: the minimum recorded Dreg over the presentations of the arms listed; per orbit: mean, range and count over curves, against E0 under the same procedure. This is not the frozen bootstrap analysis (`p3h analyze`, archived under report/data/p3_analysis/) and not PROTOCOL 6.3 outcome N or G: that reading needs the b-adapted and b-sparse arms to be complete, and cells marked incomplete must not be read as a family-minimum gap.*
 
-| cell | orbit | standard V only: floor mean min-Dreg vs E0 | family minimum (arms present): floor mean vs E0 | family arms with rows | family status |
+| cell | orbit | standard V only: floor-curve mean of min Dreg against E0 | family minimum (arms present): floor-curve mean against E0 | family arms with rows | family status |
 |---|---|---|---|---|---|
-| n=131, k=3 | A | 6.000 (6 to 6; 87 curves) vs E0 6 : diff 0.000 | 6.000 (6 to 6; 131 curves) vs E0 6 : diff 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=3 | B | pending | 6.000 (6 to 6; 131 curves) vs E0 6 : diff 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=4 | A | 6.000 (6 to 6; 87 curves) vs E0 6 : diff 0.000 | 6.000 (6 to 6; 88 curves) vs E0 6 : diff 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=4 | B | pending | 6.000 (6 to 6; 10 curves) vs E0 6 : diff 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=5 | A | 6.000 (6 to 6; 87 curves) vs E0 6 : diff 0.000 | 6.000 (6 to 6; 87 curves) vs E0 6 : diff 0.000 | stdv | incomplete, arms pending: badapt, bsparse |
-| n=131, k=6 | A | 7.000 (7 to 7; 78 curves) vs E0 6 : diff 1.000 | 7.000 (7 to 7; 78 curves) vs E0 6 : diff 1.000 | stdv | incomplete, arms pending: badapt, bsparse |
-| n=43, k=3 | O0 | 6.333 (6 to 7; 3 curves) vs E0 6 : diff 0.333 | 6.000 (6 to 6; 3 curves) vs E0 6 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=3 | O1 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=3 | O2 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=3 | O3 | 7.000 (7 to 7; 2 curves) vs E0 6 : diff 1.000 | 6.000 (6 to 6; 2 curves) vs E0 6 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=3 | O4 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=3 | O5 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | 6.000 (6 to 6; 1 curves) vs E0 6 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=4 | O0 | 8.000 (8 to 8; 3 curves) vs E0 8 : diff 0.000 | 8.000 (8 to 8; 3 curves) vs E0 8 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=4 | O1 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=4 | O2 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=4 | O3 | 8.000 (8 to 8; 2 curves) vs E0 8 : diff 0.000 | 8.000 (8 to 8; 2 curves) vs E0 8 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=4 | O4 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=4 | O5 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | 8.000 (8 to 8; 1 curves) vs E0 8 : diff 0.000 | stdv, badapt, bsparse | complete |
-| n=43, k=5 | - | pending | - | - |  |
+| n=131, k=3 | A | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
+| n=131, k=3 | B | pending | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
+| n=131, k=4 | A | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 88 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
+| n=131, k=4 | B | pending | 6.000 (range 6 to 6; 10 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
+| n=131, k=5 | A | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | stdv | incomplete, arms pending: badapt, bsparse |
+| n=131, k=5 | B | pending | pending | stdv | incomplete, arms pending: badapt, bsparse |
+| n=131, k=6 | A | 7.000 (range 7 to 7; 78 curve(s)); E0 6; difference 1.000 | 7.000 (range 7 to 7; 78 curve(s)); E0 6; difference 1.000 | stdv | incomplete, arms pending: badapt, bsparse |
+| n=131, k=6 | B | pending | pending | stdv | incomplete, arms pending: badapt, bsparse |
+| n=43, k=3 | O0 | 6.333 (range 6 to 7; 3 curve(s)); E0 6; difference 0.333 | 6.000 (range 6 to 6; 3 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=3 | O1 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=3 | O2 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=3 | O3 | 7.000 (range 7 to 7; 2 curve(s)); E0 6; difference 1.000 | 6.000 (range 6 to 6; 2 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=3 | O4 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=3 | O5 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=4 | O0 | 8.000 (range 8 to 8; 3 curve(s)); E0 8; difference 0.000 | 8.000 (range 8 to 8; 3 curve(s)); E0 8; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=4 | O1 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=4 | O2 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=4 | O3 | 8.000 (range 8 to 8; 2 curve(s)); E0 8; difference 0.000 | 8.000 (range 8 to 8; 2 curve(s)); E0 8; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=4 | O4 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=43, k=4 | O5 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | 8.000 (range 8 to 8; 1 curve(s)); E0 8; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
 
 The preregistered reading is C2: after minimising over the declared presentation family F on both sides, E0 and the floor curves coincide, with the single-presentation (standard V) gap present as the positive control (standard V, n = 131, k = 6: E0 Dreg 6 against floor Dreg 7). Where the table shows the single-presentation gap and an incomplete family, only the positive control is visible so far. A surviving gap would be read only as a statement about b in F_2 (E0 alone has b = 1), not about the isogeny class, and is not a speedup (no end-to-end S, no rho gap).
 
@@ -291,6 +282,7 @@ Rerun from the repository root: `research/isogeny_class_ic_yield_20261102/report
 | `p2_prime_analogues/runs/c32A_m2/audit.json` | `af60cc5c2c3c00c2` |
 | `p2_prime_analogues/runs/c32A_m3/analysis.json` | `b4e907dd0328bc41` |
 | `p2_prime_analogues/runs/c32A_m3/audit.json` | `9906464becf9e795` |
+| `p3_ecc2k130/data/ecc2k130_curves.tsv` | `ee987b52191581be` |
 | `p3_ecc2k130/full/p3a_ctrl_k3.jsonl.gz` | `d5d056ae539a7e00` |
 | `p3_ecc2k130/full/p3a_ctrl_k4.s0.jsonl` | `38b5aa5f790b7d98` |
 | `p3_ecc2k130/full/p3a_ctrl_k4.s1.jsonl` | `df920701d2ff3636` |
