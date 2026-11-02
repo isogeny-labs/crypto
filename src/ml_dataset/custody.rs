@@ -90,7 +90,7 @@ struct Member {
     chunks: Vec<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct Manifest {
     schema: String,
@@ -391,6 +391,50 @@ fn approved_remote(uri: &str) -> Result<RemoteSpec, String> {
     Ok(remote)
 }
 
+fn source_files(
+    root: &Path,
+    prefix: &str,
+    files: &mut BTreeMap<String, (String, u64)>,
+) -> Result<(), String> {
+    for entry in fs::read_dir(root).map_err(|e| e.to_string())? {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let name = entry
+            .file_name()
+            .into_string()
+            .map_err(|_| "custody requires UTF-8 path names")?;
+        safe_name(&name)?;
+        let relative = format!("{prefix}/{name}");
+        let path = entry.path();
+        let meta = fs::symlink_metadata(&path).map_err(|e| e.to_string())?;
+        if meta.is_dir() && !meta.file_type().is_symlink() {
+            source_files(&path, &relative, files)?;
+        } else if meta.is_file() && !meta.file_type().is_symlink() {
+            files.insert(relative, crate::store::hash_file(&path)?);
+        } else {
+            return Err(format!(
+                "custody refuses nonregular source member {}",
+                path.display()
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn compare_source_run(root: &Path, manifest: &Manifest) -> Result<(), String> {
+    let mut actual = BTreeMap::new();
+    source_files(root, "run", &mut actual)?;
+    let expected: BTreeMap<_, _> = manifest
+        .members
+        .iter()
+        .filter(|m| m.path.starts_with("run/"))
+        .map(|m| (m.path.clone(), (m.sha256.clone(), m.bytes)))
+        .collect();
+    if actual != expected {
+        return Err("custody bundled run differs from locked source run".into());
+    }
+    Ok(())
+}
+
 fn publish_bundle(
     out: &Path,
     bundle: &Path,
@@ -404,6 +448,7 @@ fn publish_bundle(
     super::assert_no_workers(&root)?;
     let manifest = read_manifest(&bundle)?;
     replay_members(&bundle, &manifest, None)?;
+    compare_source_run(&root, &manifest)?;
     let (_, binding, _) = super::bound_run(&root)?;
     for (name, expected) in [
         ("plan.json", &manifest.plan_file_sha256),
@@ -503,6 +548,84 @@ fn download_exact(
     fs::hard_link(&temporary, &target).map_err(|e| e.to_string())?;
     storage::sync_directory(target.parent().ok_or("missing custody object parent")?)?;
     fs::remove_file(&temporary).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+fn verify_receipt_records(
+    bundle: &Path,
+    remote: &RemoteSpec,
+    context: &Arc<S3BudgetContext>,
+    receipt: &PublishReceipt,
+) -> Result<(), String> {
+    let completion = &receipt.completion;
+    if !completion.roundtrip_verified
+        || !completion.artifact.path.starts_with("publication/")
+        || !completion.artifact.path.ends_with(".json")
+        || completion.object_key != remote_object_key(&completion.artifact.sha256)?
+    {
+        return Err("invalid custody completion locator".into());
+    }
+    // Publication names the completion by the serialized record digest.
+    // Validate the safe path and its downloaded content.
+    safe_name(&completion.artifact.path)?;
+    download_exact(bundle, remote, context, &completion.artifact)?;
+    let completion_record: Value = serde_json::from_reader(
+        File::open(bundle.join(&completion.artifact.path)).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    if completion_record
+        != json!({"schema":receipt.schema,"remote":receipt.remote,
+        "namespace":receipt.namespace,"manifest_sha256":receipt.manifest_sha256,
+        "objects":receipt.objects})
+    {
+        return Err("remote completion does not bind custody receipt".into());
+    }
+    let catalog = receipt.catalog.as_ref().ok_or("custody catalog missing")?;
+    if !catalog.roundtrip_verified
+        || catalog.key
+            != format!(
+                "ml-dataset/catalog/{}/{}.json",
+                receipt.namespace, receipt.manifest_sha256
+            )
+    {
+        return Err("invalid custody catalog locator".into());
+    }
+    let artifact = Artifact {
+        role: "publication_portable_receipt".into(),
+        path: "publication/remote-catalog.json".into(),
+        sha256: catalog.sha256.clone(),
+        bytes: catalog.bytes,
+        encoding: "json".into(),
+    };
+    storage::expect_remote_object(
+        Some(context),
+        remote,
+        &catalog.key,
+        &artifact,
+        BudgetScope::Work,
+    )?;
+    let mut cfg = crate::store::Config::discover()?;
+    cfg.remote = Some(remote.clone());
+    cfg.index_path = bundle.join("readback-index.json");
+    cfg.cache_dir = bundle.join("readback-cache");
+    let store = storage::dataset_store(cfg, Some(context), BudgetScope::Work)?;
+    let backend = store.remote()?;
+    let meta = backend
+        .head(&catalog.key)?
+        .ok_or("remote custody catalog absent")?;
+    if meta.bytes != catalog.bytes || meta.sha256.as_ref().is_some_and(|v| v != &catalog.sha256) {
+        return Err("remote custody catalog HEAD mismatch".into());
+    }
+    let path = storage::contained_path(bundle, &artifact.path, true)?;
+    backend.get(&catalog.key, &path)?;
+    storage::check_file(&path, &catalog.sha256, catalog.bytes)?;
+    let portable: Value = serde_json::from_reader(File::open(path).map_err(|e| e.to_string())?)
+        .map_err(|e| e.to_string())?;
+    let mut expected = receipt.clone();
+    expected.catalog = None;
+    if portable != serde_json::to_value(&expected).map_err(|e| e.to_string())? {
+        return Err("remote catalog does not bind custody receipt".into());
+    }
     Ok(())
 }
 
@@ -647,8 +770,49 @@ fn restore_remote(
     if expected_chunks != receipt_chunks {
         return Err("custody manifest chunks differ from publication receipt".into());
     }
+    let provenance: BTreeSet<String> = manifest
+        .members
+        .iter()
+        .filter(|m| {
+            matches!(
+                m.path.as_str(),
+                "run/plan.json" | "run/protocol.json" | "run/run.json"
+            )
+        })
+        .flat_map(|m| m.chunks.iter().cloned())
+        .collect();
+    for digest in &provenance {
+        let object = receipt
+            .objects
+            .iter()
+            .find(|o| o.artifact.path == object_path(digest).unwrap())
+            .ok_or("custody provenance chunk absent from receipt")?;
+        download_exact(bundle, &remote, context, &object.artifact)?;
+    }
+    let preflight = bundle.join("preflight");
+    fs::create_dir(&preflight).map_err(|e| e.to_string())?;
+    let preflight_manifest = Manifest {
+        members: manifest
+            .members
+            .iter()
+            .filter(|m| {
+                matches!(
+                    m.path.as_str(),
+                    "run/plan.json" | "run/protocol.json" | "run/run.json"
+                )
+            })
+            .cloned()
+            .collect(),
+        ..manifest.clone()
+    };
+    replay_members(bundle, &preflight_manifest, Some(&preflight))?;
+    super::validate_budget_run(context.session(), &preflight.join("run"))?;
+    fs::remove_dir_all(&preflight).map_err(|e| e.to_string())?;
+    verify_receipt_records(bundle, &remote, context, &receipt)?;
     for object in &receipt.objects {
-        if object.artifact.path.starts_with("objects/sha256/") {
+        if object.artifact.path.starts_with("objects/sha256/")
+            && !provenance.contains(&object.artifact.sha256)
+        {
             download_exact(bundle, &remote, context, &object.artifact)?;
         }
     }
@@ -910,6 +1074,16 @@ mod tests {
             members,
             ..manifest
         };
+        for name in ["plan.json", "protocol.json", "run.json"] {
+            fs::write(source.join(name), name).unwrap();
+        }
+        compare_source_run(&source, &manifest).unwrap();
+        fs::write(source.join("trace.bin"), b"changed after capture").unwrap();
+        assert!(compare_source_run(&source, &manifest).is_err());
+        fs::write(source.join("trace.bin"), &data).unwrap();
+        fs::write(source.join("extra.txt"), b"not in bundle").unwrap();
+        assert!(compare_source_run(&source, &manifest).is_err());
+        fs::remove_file(source.join("extra.txt")).unwrap();
         storage::write_json(&bundle, "manifest.json", "custody-test", &manifest).unwrap();
         let objects = bundle_objects(&bundle, &manifest).unwrap();
         assert_eq!(objects.len(), 6);

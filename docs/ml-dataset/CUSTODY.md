@@ -40,7 +40,8 @@ directory for diagnosis; it must not be treated as complete.
 
 The local `create`, `verify`, and `restore` commands perform **zero S3 requests**.
 `publish` requires an active actor-bound budget journal, the run binding, and
-an explicit approved S3 prefix. It verifies the entire local bundle and
+an explicit approved S3 prefix. It verifies that every bundled run member
+matches the locked source run, including the exact file set, and replays the
 native run before publishing every unique 4 MiB chunk and the custody
 manifest through the immutable conditional-write store. A publication binding,
 round-trip completion, and catalog make the exact object set discoverable.
@@ -48,8 +49,11 @@ The command reports the local receipt path; use that exact path for
 `restore-remote`. An interrupted publish is not a completed cloud checkpoint.
 
 `restore-remote` also requires an active budget and fresh download and restore
-directories. It checks the receipt's namespace and object set, charges and
-checks a fresh HEAD/GET plus byte hash for each object, then performs native
+directories. It checks the receipt's namespace and object set, then downloads
+and validates the run plan, protocol, and binding against the actor-bound grant.
+It charges and checks a fresh HEAD/GET plus byte hash for the remote completion
+and catalog records before fetching the remaining chunks. It then checks a
+fresh HEAD/GET and byte hash for each remaining object and performs native
 member reconstruction and known-answer replay. The budget journal records
 requests and retains local checkpoints. The actual worker grant and budget
 must be approved and active before either remote command is run. Receipt and
