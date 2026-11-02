@@ -1,0 +1,284 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ECCP131-REPRESENTATION-FILTER-20261102",
+  "version": 1,
+  "created": "2026-11-02",
+  "repository": "crypto",
+  "study_dir": "research/eccp131_representation_filter_20261102",
+  "authors": ["Codex"],
+  "links": {
+    "spec": "research/eccp131_representation_filter_20261102/PROTOCOL.md",
+    "target": "docs/ecdlp-hardness-corpus/galbraith-promotions.json#RT-REPRESENTATION-FILTER",
+    "problem": "problems/eccp131-full-parameter-index-calculus.md"
+  },
+  "question": "Does a frozen simple coordinate tag on exact ECCp-131 enrich true four-summand small-x relations over matched nulls and random bases while admitting subquadratic qualifying-pair enumeration?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The exact planted ECCp-131 four-sum is recovered by the same pair-table root path used for the published target probe.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "The selected coordinate filter has held-out relation enrichment beyond its matched null and random-base controls.",
+      "class": "comparative",
+      "decided_by": ["C-filter"],
+      "if_supported": "candidate passes the frozen statistical and enumeration gates at the measured ECCp-131 sizes",
+      "if_not_supported": "no qualifying filter exists in the frozen candidate family; other predicates remain open"
+    },
+    {
+      "id": "C3",
+      "text": "Bounded exact ECCp-131 relation generation, modular rank, and published-target descent counts are reported without treating a null as a logarithm.",
+      "class": "exact_computation",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "A pre-add coordinate tag may retain more true four-sum relations than its null density and can reject pair candidates before an elliptic-curve addition.",
+      "mechanism": "small-x coordinate structure could couple endpoint arithmetic to the rational addition law in a way absent from a scalar-random base",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "heldout_log2_enrichment",
+          "direction": "higher",
+          "minimum_effect": "95% lower confidence bound above zero and not explained by the random-base arm",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "data_seen": [
+              {
+                "path": "research/eccp131_bsgs_ic_20261020",
+                "measured": "prior exact arity-2/3 null relation counts; no representation-tag sweep"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "small-x",
+      "role": "candidate",
+      "description": "exact ECCp-131 small-x base, coordinate-filter sweep",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [["cargo", "build", "--release", "--example", "eccp131_representation_filter"]],
+        "binary_sha256": null,
+        "flags": {"profile": "release"},
+        "env": {"RAYON_NUM_THREADS": "1"},
+        "threads": 1
+      },
+      "parameters": {"base": "small_x", "sizes": [64, 128, 256]}
+    },
+    {
+      "id": "random-base",
+      "role": "baseline",
+      "description": "matched distinct scalar-derived points in the exact ECCp-131 subgroup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [["cargo", "build", "--release", "--example", "eccp131_representation_filter"]],
+        "binary_sha256": null,
+        "flags": {"profile": "release"},
+        "env": {"RAYON_NUM_THREADS": "1"},
+        "threads": 1
+      },
+      "parameters": {"base": "scalar_random", "sizes": [64, 128, 256]},
+      "same_instrument_as": "small-x"
+    },
+    {
+      "id": "small-x-aa",
+      "role": "control_aa",
+      "description": "bit-identical re-evaluation of the selected small-x winner on the frozen held-out cohort",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [["cargo", "build", "--release", "--example", "eccp131_representation_filter"]],
+        "binary_sha256": null,
+        "flags": {"profile": "release"},
+        "env": {"RAYON_NUM_THREADS": "1"},
+        "threads": 1
+      },
+      "parameters": {"base": "small_x", "evaluation": "repeat_selected_only"},
+      "same_instrument_as": "small-x"
+    },
+    {
+      "id": "planted-root",
+      "role": "control_positive",
+      "description": "known four-summand target recovered by exact signed pair-table lookup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [["cargo", "build", "--release", "--example", "eccp131_representation_filter"]],
+        "binary_sha256": null,
+        "flags": {"profile": "release"},
+        "env": {"RAYON_NUM_THREADS": "1"},
+        "threads": 1
+      },
+      "parameters": {"base": "small_x", "size": 128, "target": "planted"},
+      "same_instrument_as": "small-x"
+    },
+    {
+      "id": "independent-null",
+      "role": "control_negative",
+      "description": "pair features matched to a target coordinate from an independent four-sum sample",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [["cargo", "build", "--release", "--example", "eccp131_representation_filter"]],
+        "binary_sha256": null,
+        "flags": {"profile": "release"},
+        "env": {"RAYON_NUM_THREADS": "1"},
+        "threads": 1
+      },
+      "parameters": {"null": "rotated_independent_target"},
+      "same_instrument_as": "small-x"
+    }
+  ],
+  "controls": {
+    "aa": {"present": true, "comparison": "C-aa", "not_applicable_reason": null},
+    "positive": {"present": true, "arm": "planted-root", "expected_detection": "exact witness recovered and group identity reverified", "not_applicable_reason": null},
+    "negative": {
+      "present": true,
+      "arm": "independent-null",
+      "null_population": {
+        "description": "same pair-feature distribution with an independent target coordinate",
+        "generator": "cyclically rotate the target coordinates by one sample after generating the fixed cohort",
+        "n": 8192,
+        "why_n": "at width eight this gives about 32 expected null hits, the preregistered eligibility floor",
+        "matched_on": ["curve", "factor base", "pair indices", "signs", "tag source", "bit slice"]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {"name": "factor_base_design", "levels": ["small_x", "scalar_random"]},
+      {"name": "filter_configuration", "levels": ["source", "combiner", "width", "offset"]}
+    ],
+    "factors": [
+      {"name": "curve", "treatment": "fixed", "value": "Certicom ECCp-131", "how": "exact published parameters and target"},
+      {"name": "factor_base_size", "treatment": "crossed", "value": [64, 128, 256], "how": "every design at every size"},
+      {"name": "cohort", "treatment": "fixed", "value": "4096 train; 8192 held-out", "how": "disjoint seeds and no test-driven selection"},
+      {"name": "relation_label", "treatment": "crossed", "value": ["true_four_sum", "independent_target_null"], "how": "every configuration is evaluated on both matched labels"},
+      {"name": "binary", "treatment": "fixed", "value": "one release example binary", "how": "same executable for all arms"},
+      {"name": "threads", "treatment": "fixed", "value": 1, "how": "single-threaded deterministic sweep"},
+      {"name": "seed", "treatment": "randomized", "how": "explicit frozen list; independent train/test/base streams"},
+      {"name": "arm_order", "treatment": "fixed", "value": "small-x then random-base", "how": "primary metrics are exact counts; local clocks are invalid and descriptive"},
+      {"name": "host", "treatment": "measured", "how": "host facts retained; clocks require L2 and are invalid locally"}
+    ],
+    "comparisons": [
+      {"id": "C-filter", "arms": ["small-x", "random-base", "independent-null"], "differs_in": ["factor_base_design", "relation_label"], "design": "factorial"},
+      {"id": "C-aa", "arms": ["small-x", "small-x-aa"], "differs_in": [], "design": "aa"}
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "decisive outputs are deterministic counts, not clocks; test data are generated before either arm is scored",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [131001, 131002, 131003, 131004, 131005, 131006],
+      "nonce": null,
+      "note": "small-x train/test, random-base construction/train/test respectively"
+    },
+    "instance_sampling": {"rule": "uniform signed base indices with rejected infinities; null target is a one-position cyclic rotation", "independent_of_arm": true},
+    "blinding": {"analysis_labels_masked": false, "how": "configuration selection is mechanical and test labels are never read during training selection", "unmasked_at": null}
+  },
+  "sample_size": {
+    "instances": 3,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "8192 held-out relation and null samples resolve a null rate of 1/256 with about 32 expected hits; training configurations below 32 null hits are ineligible"
+    },
+    "preflight_runtime": {"fixed_seconds": 30, "per_sample_seconds": 0.001, "threads": 1, "estimated_total_seconds": 900, "measured_on": "not yet measured; conservative source-level estimate"}
+  },
+  "metrics": {
+    "primary": [
+      {"id": "heldout_log2_enrichment", "name": "held-out log2 enrichment", "unit": "bits", "kind": "derived", "definition": "log2 of Jeffreys-smoothed true-relation hit rate divided by independent-null hit rate for the training-selected configuration", "formula": "log2(((relation_hits + 0.5)/(N + 1))/((null_hits + 0.5)/(N + 1)))", "source": "result.json arms[].selected.test", "aggregation": "per_row", "resolution": "one hit out of 8192", "uncertainty": "clopper_pearson_ci95"},
+      {"id": "qualifying_pair_count", "name": "qualifying pairs", "unit": "pairs", "kind": "counted", "definition": "number of endpoint pairs admitted by the selected tag before an EC group addition, or all pairs for post-add tags", "source": "result.json arms[].enumeration", "aggregation": "per_row", "resolution": "1", "uncertainty": "none_exact"}
+    ],
+    "secondary": [
+      {"id": "root_witnesses", "name": "root witnesses", "unit": "witnesses", "kind": "counted", "definition": "exact four-sum witnesses recovered by the signed pair table and reverified", "source": "result.json mitm", "aggregation": "per_row", "resolution": "1", "uncertainty": "none_exact"},
+      {"id": "relation_rows", "name": "natural relation rows", "unit": "rows", "kind": "counted", "definition": "exact scalar-derived rows found by ic prime for each arity and phase", "source": "raw/ic-prime-arity*.json", "aggregation": "per_row", "resolution": "1", "uncertainty": "none_exact"},
+      {"id": "wall_seconds", "name": "local wall time", "unit": "s", "kind": "timed", "definition": "process elapsed wall time", "source": "result.json elapsed_seconds", "aggregation": "per_row", "resolution": "1 us", "uncertainty": "range"}
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": ["samples", "candidate_configurations", "predicate_hits", "pair_entries", "relations", "rank"],
+    "record": ["cpu_model", "kernel_release", "binary_sha256", "source_revision", "isolation.level", "isolation.blockers", "threads"],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {"instance_type": "c8a.2xlarge", "cpus": 4, "spot": true},
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {"policy": "none", "interval_seconds": null, "grace_seconds": null, "restore_validation": "none", "after_restore": {"wall_time": "invalid", "counted_units": "valid"}},
+    "retries": {"infrastructure_only": true, "max_attempts": 1}
+  },
+  "stopping_rules": [
+    {"rule": "fixed B values, fixed train/test sizes, and complete candidate grid; then stop", "kind": "fixed_n", "preregistered": true},
+    {"rule": "do not launch cloud work while the USD 25 budget remainder is unknown or exhausted", "kind": "invalidation", "preregistered": true}
+  ],
+  "invalidation_rules": [
+    "positive root control fails group-law replay",
+    "A/A re-evaluation is not bit-identical",
+    "training and held-out seeds or samples overlap",
+    "a local clock is used for a performance claim",
+    "an unavailable exact-width F4 or F5 phase is reported as measured"
+  ],
+  "decision_rule": {
+    "text": "Support requires the training-selected winner to have held-out enrichment whose conservative 95% lower ratio exceeds 1, no matched random-base explanation, and a concrete subquadratic qualifying-pair enumerator. Otherwise report no_qualifying_filter_in_frozen_family.",
+    "comparison_ids": ["C-filter"],
+    "threshold": "lower confidence ratio > 1; random-base control below it; enumeration O(B + output) or otherwise o(B^2)",
+    "statistic": "held-out relation/null rate ratio and exact enumeration classification",
+    "interval": "ratio of Wilson bounds (relation lower / null upper), 95%",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "log2 enrichment and qualifying-pair fraction",
+    "verdict_vocabulary": ["qualifying_filter_observed", "no_qualifying_filter_in_frozen_family", "invalid_measurement", "inconclusive"]
+  },
+  "analysis_plan": {
+    "script": {"path": "examples/eccp131_representation_filter.rs", "sha256": null},
+    "inputs": ["protocol.json", "exact ECCp-131 public parameters"],
+    "outputs": ["raw/result.json", "REPORT.md", "filter-enrichment.svg", "experiment-export.json"],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {"export_schema": "experiment.export/v1", "review_schema": "experiment.review/v1", "graphs": ["held-out log2 enrichment by base design and B with zero line"], "report_dir": "."},
+  "inadmissible": [
+    "selecting a configuration on held-out data",
+    "changing seeds, sample counts, candidate grid, or minimum-null support after seeing results",
+    "calling post-add bucketing subquadratic enumeration",
+    "reading a bounded null as a proof about all factor bases or as a recovered logarithm",
+    "claiming an end-to-end speedup from local timing"
+  ],
+  "literature": [
+    {"ref": "Galbraith, Mathematics of Public Key Cryptography (2018), pp. 283-284", "provenance": "internal", "claim": "five-property generalized Wagner checklist and representation-aware four-sum heuristic", "verified_by": "GALBRAITH_BOOK_AUDIT.md and galbraith-promotions.json, 2026-11-02"},
+    {"ref": "research/factor_base_arity_review_20261024/lit_large_arity.md", "provenance": "internal", "claim": "Wagner needs a quotient/filter compatible with partial sums; no such generic quotient exists in a prime-order EC group", "verified_by": "Codex literature pass, 2026-11-02"},
+    {"ref": "problems/eccp131-full-parameter-index-calculus.md", "provenance": "internal", "claim": "prior B256-B1024 arity-2/3 exact probes produced zero natural rows; pair support is the bottleneck", "verified_by": "Codex literature pass, 2026-11-02"}
+  ],
+  "amendments": [],
+  "freeze": {"status": "draft", "protocol_sha256": null, "commit": null, "frozen_at": null, "filed_before_affected_data": true}
+}
+
