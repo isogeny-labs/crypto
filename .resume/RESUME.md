@@ -38,6 +38,13 @@ none yet. P2 (isogeny-class IC yield, scaled prime analogues) is cleared to run 
 (research/isogeny_class_ic_yield_20261102/p2_prime_analogues/PROTOCOL.md section 10; protocol.json v2). Cards
 CARD-isogeny-ic-yield-p2-<cell>-20261102-2 run in the git worktree /home/user/crypto-p2run (detached at the amendment
 commit), one at a time, smallest first. 36- and 40-bit cells deferred (no data taken).
+P3 (ECC2K-130 isogeny class, Dreg / matrix shape / solution counts, harness p3h) is cleared to run locally (owner decision
+2026-11-02), reduced scope (about 10.9 CPU-h; P3a-Y k=13 yield line deferred, no data), isolation L0, protocol frozen
+(p3_ecc2k130/protocol.json v1, PROTOCOL.md section 10 = amendment A1, pin commit 9684c0a0b3). 17 cards
+CARD-isogeny-ic-yield-p3-<tag>-20261102-1 in research/isogeny_class_ic_yield_20261102/cards/ run in the sparse detached git
+worktree /home/user/crypto-p3run (binary target/release/p3h sha256 73f1ff63...), setup card first, then two serial lanes (A, B;
+at most 2 P3 workers, RAYON_NUM_THREADS=1), outputs in p3_ecc2k130/full/. Analysis (masked, pooled shard files, then unmask) is the
+main session's job; the cards run none. Shards are pooled by concatenation in card order (PROTOCOL.md section 10).
 
 ## Stop and success conditions
 Budget: about one day of cluster CPU. Success = complete, controlled per-curve
