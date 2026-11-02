@@ -40,19 +40,17 @@ The list form without the binomial count is already kernel-checked in
 
 ## O3. The Lemma 4 witnesses as kernel-checked statements
 
-Definitions 5 and 6 of Nagao ePrint 2015/984 (equality reading) over
-`MvPolynomial (Fin n) (ZMod 2)`:
+**Witness A: written, pending the proof gate** (`IcNegative/Lemma4Witness.lean`,
+`IcNegative.Lemma4.lemma4_fails_witnessA`, core Lean only, `decide +kernel`). It
+encodes `F_2[X, Y]` as bitmasks with carry-less products and the quotient by the
+field equations as 4-bit masks, and checks `d'_F = 2` and `d_F = 3` in both
+placements over every admissible multiplier tuple. A Python mirror of the same
+functions agrees (positive control `X, X+1` falls at 1). Still open here:
 
-```lean
-def FirstFall (gens : List (MvPolynomial (Fin n) (ZMod 2))) (d : ℕ) : Prop := ...
-def FakeFirstFall (gens : List (MvPolynomial (Fin n) (ZMod 2))) (d : ℕ) : Prop := ...
-theorem witnessA_fake : IsLeastFall FakeFirstFall [X0^2 * X1, X0 * X1 + X0] 2
-theorem witnessA_true : IsLeastFall FirstFall [X0^2 * X1, X0 * X1 + X0] 3
-```
-
-The finite check is done natively (`examples/blindspots_19_checks.rs lemma4`,
-`evidence/checks.txt`); the open work is the Lean encoding of the definitions and
-a `decide`-style certificate over the finite multiplier spaces.
+- the two encoding bridges as Lean lemmas (mask completeness for degree `<= k`,
+  and `red` a ring homomorphism), which the module argues in its docstring;
+- witness B (three variables) and the 7875-pair census, which stay native-only;
+- a Mathlib `MvPolynomial (Fin n) (ZMod 2)` statement equivalent to the mask one.
 
 ## O4. Monodromy `(Z/2)^{m-2}` of the Semaev cover
 

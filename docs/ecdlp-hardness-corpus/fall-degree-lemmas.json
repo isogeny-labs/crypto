@@ -1,0 +1,385 @@
+{
+  "sources": [
+    {
+      "id": "S-NAGAO-2015",
+      "title": "Complexity of ECDLP under the First Fall Degree Assumption",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Koh-ichi Nagao, IACR Cryptology ePrint Archive 2015/984 (received 2015-10-12).",
+      "url": "https://eprint.iacr.org/2015/984",
+      "notes": "Abstract page read 2026-11-02 (claims O(n^(8w+1)) over F_2^n, O(n^((6p+2)w+1)) for p >= 3). The PDF was not retrievable from this host (bot check); a full-text transcription is held in crypto-autoresearcher:inputs/NAGAO-2015-984/paper_fulltext.md (cited by papers/ecdlp-boundaries-20261018/PROOF-MAP.md), not read in this pass. Definitions 5 and 6 and Lemma 4 are taken from the blind reader report crypto-autoresearcher:coordination/review/sembin-20260916-propquant/report.md (E29 of papers/ic-negative-results/EVIDENCE.md); papers/ecdlp-boundaries-20261018/sections/fall-degree.tex says a fresh PDF-level transcription is still owed."
+    },
+    {
+      "id": "S-KOSTERS-YEO-2015",
+      "title": "Notes on summation polynomials",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Michiel Kosters and Sze Ling Yeo, arXiv:1503.08001 (2015).",
+      "url": "https://arxiv.org/abs/1503.08001",
+      "sha256": "b5ea5e4c5de7dcacf579e283168d9463b2b6977b031002ddee134a3a0d7868eb",
+      "notes": "Read section 4: Corollary 4.11, Remark 4.12 and the Magma table (first fall degree 2 for n = 12..40; degree of regularity 3, 3, 4, 4, 4, >=5)."
+    },
+    {
+      "id": "S-HKYY-2015",
+      "title": "On the last fall degree of zero-dimensional Weil descent systems",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Ming-Deh A. Huang, Michiel Kosters, Yun Yang and Sze Ling Yeo, arXiv:1505.02532 (2015).",
+      "url": "https://arxiv.org/abs/1505.02532",
+      "sha256": "cffdbb8868ac4a4ee10ef4034136f862f41a77a00e67cdd6970397809f6fe36f",
+      "notes": "Read abstract and introduction: a last-fall-degree bound for zero-dimensional Weil descent systems independent of n; summation-polynomial descents are not zero-dimensional."
+    },
+    {
+      "id": "S-CAMINATA-GORLA-2021",
+      "title": "Solving degree, last fall degree, and related invariants",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Alessio Caminata and Elisa Gorla, J. Symbolic Comput.; arXiv:2112.05579, IACR ePrint 2021/1611.",
+      "url": "https://arxiv.org/abs/2112.05579",
+      "sha256": "9e9323db0cd2f755a375c1baa836b999972fc38eebca3e6f55f63dfecb226177",
+      "notes": "Read Theorems 2.8, 2.9, 3.1, Corollary 3.3 and Example 3.4."
+    },
+    {
+      "id": "S-IC-NEGATIVE",
+      "title": "Negative results for elliptic-curve index calculus (S5: Nagao Lemma 4)",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "papers/ic-negative-results, statement S5: hand proof of witness A, native re-derivation of witnesses A, B, C and a 7875-pair census.",
+      "repository_path": "papers/ic-negative-results/ic_negative_results.tex"
+    },
+    {
+      "id": "S-LEMMA4-LEAN",
+      "title": "Witness A against Nagao Lemma 4 in core Lean",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "IcNegative.Lemma4.lemma4_fails_witnessA, decide +kernel over every admissible multiplier tuple.",
+      "repository_path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean"
+    },
+    {
+      "id": "S-FALL-DEGREE-READINGS",
+      "title": "Fall-degree definition readings and the literal >= axis",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "papers/ecdlp-boundaries-20261018/sections/fall-degree.tex: equality versus literal >= reading, both generator placements.",
+      "repository_path": "papers/ecdlp-boundaries-20261018/sections/fall-degree.tex"
+    },
+    {
+      "id": "S-ECC2K130-IC-NOTES",
+      "title": "ECC2K-130 index-calculus literature and route notes",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md and companions: the conditional 2^86 projection at n = 131.",
+      "repository_path": "research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "DEF-FIRST-FALL-DEGREE",
+      "label": "First fall degree d_F (Nagao Def. 5)",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "For f_1..f_M over F_2, a fall at degree d is a tuple (g_i) with max_i deg(g_i f_i) = d, deg(sum g_i f_i) < d and sum g_i f_i != 0; d_F is the least such d.",
+      "scope": "Equality reading. The printed condition reads max_i deg(g_i f_i) >= d; the two readings agree on some systems and not others. The field equations may sit outside (F) or inside (F with S_fe) the generating set.",
+      "assumptions": [],
+      "source_refs": ["S-NAGAO-2015", "S-IC-NEGATIVE", "S-FALL-DEGREE-READINGS"],
+      "tags": ["first-fall-degree", "definition", "reading-sensitive"],
+      "parameters": ["reading: equality | literal_ge", "placement: outside | inside"],
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          { "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean", "decl": "IcNegative.Lemma4.IsFall" }
+        ],
+        "notes": "Mask encoding of F_2[X, Y] up to degree 7; equality reading only."
+      }
+    },
+    {
+      "id": "DEF-FAKE-FIRST-FALL-DEGREE",
+      "label": "Fake first fall degree d'_F (Nagao Def. 6)",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "d'_F is defined as d_F with every degree taken after reduction modulo the field equations S_fe = {X_j^2 + X_j} and with the reduced sum required to be nonzero.",
+      "scope": "Computable in the multilinear quotient, which is why estimates bound it; on its own it says nothing about the unreduced solver trace.",
+      "assumptions": [],
+      "source_refs": ["S-NAGAO-2015", "S-IC-NEGATIVE"],
+      "tags": ["first-fall-degree", "fake-degree", "definition"],
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          { "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean", "decl": "IcNegative.Lemma4.IsFakeFall" }
+        ]
+      }
+    },
+    {
+      "id": "DEF-LAST-FALL-DEGREE",
+      "label": "Last fall degree",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "The last fall degree of F is the least d such that every f in (F) lies in V_{F, max(d, deg f)}; equivalently (Caminata-Gorla Thm 2.8) the largest degree at which a degree fall occurs.",
+      "scope": "Independent of term order and coordinates (Caminata-Gorla Remark 3.2).",
+      "assumptions": [],
+      "source_refs": ["S-CAMINATA-GORLA-2021", "S-HKY-2015"],
+      "tags": ["last-fall-degree", "definition"]
+    },
+    {
+      "id": "DEF-SOLVING-DEGREE",
+      "label": "Solving degree sd_sigma",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "The least degree d such that Gaussian elimination on the degree-<=d Macaulay matrix under term order sigma yields a Groebner basis.",
+      "scope": "Depends on sigma and on coordinates; this is the degree that sets F4/XL matrix size and therefore cost.",
+      "assumptions": [],
+      "source_refs": ["S-CAMINATA-GORLA-2021"],
+      "tags": ["solving-degree", "definition"]
+    },
+    {
+      "id": "CLAIM-NAGAO-LEMMA4",
+      "label": "Nagao 2015/984 Lemma 4: d_F <= d'_F",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "algebraic_coordinate",
+      "statement": "For every system over F_2, the first fall degree is at most the fake first fall degree.",
+      "scope": "Refuted under the equality reading in both placements (witnesses A, B). Under the literal >= reading with the field equations inside, witness A gives True = Fake = 2, so the refutation is reading-specific; the paper declines to reproduce the proof of the lemma it derives Lemma 4 from.",
+      "assumptions": ["Equality reading of Definitions 5 and 6"],
+      "source_refs": ["S-NAGAO-2015", "S-IC-NEGATIVE", "S-FALL-DEGREE-READINGS"],
+      "tags": ["first-fall-degree", "fake-degree", "refuted", "reading-sensitive"],
+      "formula": "d_F <= d'_F",
+      "evidence_class": "counterexample",
+      "failure_modes": [
+        "A fake-degree certificate whose products have unreduced degree above d'_F does not certify a true fall at d'_F",
+        "An estimate written 'd'_F small, so by Lemma 4 d_F small' understates the degree"
+      ],
+      "non_implications": [
+        "Does not refute Nagao's Proposition 5, only the justification offered for it",
+        "Does not bear on Propositions 2 and 3, which exhibit explicit certificates",
+        "Says nothing about descended summation-polynomial systems at any n"
+      ],
+      "citation_patterns": ["Nagao[\\s\\S]{0,400}Lemma[~\\s]*4\\b", "Lemma[~\\s]*4\\b[\\s\\S]{0,400}Nagao", "fake[`'\"\\s]+(first[\\s-]+)?fall", "d'_\\{?F"],
+      "cited_by": [
+        { "path": "papers/ic-negative-results/ic_negative_results.tex", "use": "reports", "note": "S5 statement and proof" },
+        { "path": "papers/ic-negative-results/README.md", "use": "reports" },
+        { "path": "papers/ic-negative-results/PROTOCOL.md", "use": "reports" },
+        { "path": "papers/ic-negative-results/EVIDENCE.md", "use": "reports" },
+        { "path": "papers/ic-negative-results/lean/OPEN_TARGETS.md", "use": "reports" },
+        { "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean", "use": "reports" },
+        { "path": "papers/ic-negative-results/reports/report.typ", "use": "reports" },
+        { "path": "papers/ic-negative-results/reports/plot_census.py", "use": "reports" },
+        { "path": "papers/ecdlp-index-calculus-treatise/sections/falldegree.tex", "use": "reports" },
+        { "path": "papers/ecdlp-boundaries-20261018/sections/fall-degree.tex", "use": "reports", "note": "reading axis: literal >= inside gives True = Fake" },
+        { "path": "papers/ecdlp-boundaries-20261018/README.md", "use": "reports" },
+        { "path": "research/blindspots_20261018/EXPERIMENTS.md", "use": "reports" },
+        { "path": "research/blindspots_20261018/instruments/blindspots_19_checks.rs", "use": "measures", "note": "computes d'_F only to refute Lemma 4" },
+        { "path": "research/paper_opportunities_20261029/REPORT.md", "use": "reports" },
+        { "path": "papers/ecdlp-index-calculus-treatise/README.md", "use": "reports" },
+        { "path": "papers/ecdlp-boundaries-20261018/PROOF-MAP.md", "use": "reports", "note": "reading/placement axes; points to the autoresearcher full-text transcription" },
+        { "path": "papers/ecdlp-index-calculus-program/sections/companion_catalogue.tex", "use": "mention" },
+        { "path": "papers/ecdlp-index-calculus-treatise/sections/artefacts.tex", "use": "mention" },
+        { "path": "papers/ic-negative-results/evidence/ledger.tex", "use": "mention" },
+        { "path": "papers/ic-negative-results/evidence/checks.txt", "use": "measures" },
+        { "path": "research_notes/Index calculus leads next steps/autoresearcher_ideas_claims.md", "use": "mention", "note": "links KN-FIND-936151" },
+        { "path": "research/ic_candidate_tournament_20260915/campaign_20260916/DECOMPOSITION-SURVEY.md", "use": "depends", "note": "records that Nagao's O(n^(8w+1)) (Prop. 5) is justified through d'_F plus Lemma 4; flagged as suspect" },
+        { "path": "docs/ecdlp-hardness-corpus/fall-degree-lemmas.json", "use": "reports" },
+        { "path": "docs/ecdlp-hardness-corpus/LEMMA_LINKAGE.md", "use": "reports" },
+        { "path": "docs/ecdlp-hardness-corpus/README.md", "use": "mention" }
+      ]
+    },
+    {
+      "id": "CEX-NAGAO-LEMMA4-F2",
+      "label": "Witnesses A, B: d'_F = 2 < d_F = 3 over F_2",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Witness A {X^2 Y, X Y + X} and witness B {X1 X2 + X3, X1 X3 + X2} have d'_F = 2 and d_F = 3 with the field equations outside and inside the generating set (equality reading).",
+      "scope": "Exact finite computation. A: hand proof, three independent implementations, and a core-Lean decide +kernel check awaiting the proof gate. B and the census: native only.",
+      "assumptions": ["Equality reading"],
+      "source_refs": ["S-IC-NEGATIVE", "S-LEMMA4-LEAN"],
+      "tags": ["counterexample", "first-fall-degree", "lean"],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "lean_written_unchecked",
+        "artifacts": [
+          { "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Witness.lean", "decl": "IcNegative.Lemma4.lemma4_fails_witnessA" },
+          { "path": "research/blindspots_20261018/instruments/blindspots_19_checks.rs", "decl": "lemma4" }
+        ],
+        "notes": "Bridges argued, not proved in Lean: mask completeness for degree <= k, and reduction as a ring homomorphism."
+      }
+    },
+    {
+      "id": "THM-CG-SOLVING-DEGREE",
+      "label": "Caminata-Gorla: sd = max(last fall, max GB degree)",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "For a degree-compatible term order sigma, sd_sigma(F) = max{d_lastfall(F), maxGBdeg_sigma(F)} (Thm 3.1); equivalently sd_sigma(F) = max_i d_{g_i} over a reduced Groebner basis (Cor. 3.3).",
+      "scope": "Rigorous. Fails for non-degree-compatible orders (Example 3.4). It is the sound bridge from a degree invariant to solver cost; a first fall degree is a lower-end quantity and is not in it.",
+      "assumptions": ["sigma degree-compatible"],
+      "source_refs": ["S-CAMINATA-GORLA-2021"],
+      "tags": ["solving-degree", "last-fall-degree", "rigorous-bridge"],
+      "formula": "sd_sigma(F) = max{d_lastfall(F), maxGBdeg_sigma(F)}",
+      "evidence_class": "theorem",
+      "source_locations": ["Caminata-Gorla Theorem 3.1", "Caminata-Gorla Corollary 3.3"]
+    },
+    {
+      "id": "THM-KY-S3-FIRST-FALL-TWO",
+      "label": "Kosters-Yeo: descended S_3 has first fall degree 2",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "For ordinary curves over F_2^n the Weil descent of the third summation polynomial generically has first fall degree 2, from a group morphism to F_2 that yields a linear polynomial; in their Magma runs the degree of regularity rises from 3 (n = 12) to >= 5 (n = 40) while the first fall degree stays 2.",
+      "scope": "The first-fall value is a theorem (Cor. 4.11, Remark 4.12); the degree-of-regularity growth is their measurement on one random curve per n. Together they show the first fall degree does not track the solver degree on summation systems.",
+      "assumptions": ["Characteristic 2", "Ordinary curve", "Factor-base subspace of dimension ceil(n/2)"],
+      "source_refs": ["S-KOSTERS-YEO-2015"],
+      "tags": ["first-fall-degree", "summation-polynomial", "counterexample-to-heuristic"],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-HKYY-ZERO-DIM-LAST-FALL",
+      "label": "HKYY: n-independent last fall degree (zero-dim only)",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "For zero-dimensional systems over F_{q^n}, the last fall degree of the Weil descent system is bounded independently of n.",
+      "scope": "Zero-dimensional systems only; summation-polynomial descents with a factor-base subspace are not zero-dimensional, so this gives no bound for ECDLP relation search.",
+      "assumptions": ["Zero-dimensional input system"],
+      "source_refs": ["S-HKYY-2015"],
+      "tags": ["last-fall-degree", "weil-descent"],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "COND-NAGAO-2015-COMPLEXITY",
+      "label": "Nagao 2015/984: polynomial-time binary ECDLP under FFDA",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "Nagao claims O(n^(8w+1)) for ECDLP over F_2^n (and O(n^((6p+2)w+1)) for p >= 3) using a disjoint factor base and a first-fall-degree bound (Proposition 5).",
+      "scope": "Conditional twice: on the first-fall-degree assumption, and (for the justification offered) on Lemma 4, which is refuted under the equality reading. Not a usable cost.",
+      "assumptions": ["First fall degree controls the solving degree", "Lemma 4 (refuted, equality reading)"],
+      "source_refs": ["S-NAGAO-2015", "S-IC-NEGATIVE"],
+      "tags": ["first-fall-degree", "binary", "conditional", "tainted"],
+      "formula": "O(n^(8w+1))",
+      "evidence_class": "conditional_theorem",
+      "cited_by": [
+        { "path": "research/ic_candidate_tournament_20260915/campaign_20260916/DECOMPOSITION-SURVEY.md", "use": "depends", "note": "quotes the exponent, marks it suspect" }
+      ]
+    },
+    {
+      "id": "COND-ECC2K130-FFDA-PROJECTION",
+      "label": "ECC2K-130 IC projection 2^86 (FFDA)",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "Petit-Quisquater / Kousidis-Wiemers degree formulas (D = m^2 + 1, D = m^2 - m + 1) give a projected index-calculus cost of 2^86.0 at n = 131 (2^69.0 at w = 9/4), against matched rho about 2^60.8.",
+      "scope": "Conditional on the first-fall-degree assumption, which THM-KY-S3-FIRST-FALL-TWO and the repository's own ladders contradict for summation systems. Already labelled conditional at every use; listed so that any future row built on it inherits the taint.",
+      "assumptions": ["First fall degree controls the solving degree"],
+      "source_refs": ["S-ECC2K130-IC-NOTES", "S-PETIT-QUISQUATER-2012"],
+      "tags": ["first-fall-degree", "ecc2k130", "projection", "tainted"],
+      "formula": "2^86.0 at n = 131",
+      "evidence_class": "concrete_estimate",
+      "citation_patterns": ["conditional on the first-fall-degree assumption", "granting the suspect (first fall degree )?assumption"],
+      "cited_by": [
+        { "path": "src/cryptanalysis/matmul_exponent.rs", "use": "depends", "note": "BinaryIcHeuristic::log2_cost" },
+        { "path": "src/cryptanalysis/ic_engine.rs", "use": "depends", "note": "binary_heuristic(n), printed by icx" },
+        { "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md", "use": "depends" },
+        { "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_ROUTES.md", "use": "depends" },
+        { "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md", "use": "depends" },
+        { "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_ROUTE_TARGETS.md", "use": "depends" },
+        { "path": "examples/descent_degree_cost.rs", "use": "depends", "note": "semi-regular D_reg and extrapolated constant degrees" },
+        { "path": "examples/certicom131_ic_gates.rs", "use": "depends", "note": "a cost model, not a measurement" }
+      ]
+    },
+    {
+      "id": "GAP-NAGAO-PROP5-ROUTE",
+      "label": "Does Nagao Prop. 5 survive without Lemma 4?",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "Decide whether Proposition 5 of Nagao 2015/984 holds by a route that avoids Lemma 4: either exhibit, per instance family, fake-degree certificates whose products already have unreduced degree <= d'_F (which recovers the true bound), or find a family where the true first fall degree exceeds the fake bound used.",
+      "scope": "Blocked on a PDF-level transcription of Definitions 5, 6, Lemma 4 and Proposition 5.",
+      "assumptions": [],
+      "source_refs": ["S-NAGAO-2015", "S-IC-NEGATIVE", "S-FALL-DEGREE-READINGS"],
+      "tags": ["open", "first-fall-degree", "attack-graph"]
+    },
+    {
+      "id": "GAP-LEMMA4-REVERSE",
+      "label": "Reverse inequality d'_F <= d_F (outside placement)?",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "Prove or refute: with the field equations outside the generating set, d'_F <= d_F for every system over F_2 (equality reading).",
+      "scope": "Candidate repair. The 7875-pair census (three variables, degree <= 2 multilinear pairs, cap 6) has d_F < d'_F in 0 pairs outside and 224 inside, so the inside form of the reverse inequality is already false; the outside form has no counterexample in that population only.",
+      "assumptions": ["Equality reading", "Field equations outside"],
+      "source_refs": ["S-IC-NEGATIVE"],
+      "tags": ["open", "conjecture", "attack-graph"]
+    },
+    {
+      "id": "GAP-FALL-DEGREE-COST-BRIDGE",
+      "label": "Every degree-based cost must pass through sd or last fall",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "A cost row built from a degree must state which degree it uses; only a measured solving degree, or a proved bound on max{last fall degree, max GB degree} (Caminata-Gorla Thm 3.1), is a sound input. First fall, fake first fall and semi-regular degree-of-regularity values are lower-end or model quantities and leave the row conditional.",
+      "scope": "Obligation on every node tagged first-fall-degree; open until each such estimate is either re-derived through the bridge or kept labelled conditional.",
+      "assumptions": [],
+      "source_refs": ["S-CAMINATA-GORLA-2021", "S-KOSTERS-YEO-2015"],
+      "tags": ["open", "rule", "attack-graph"]
+    }
+  ],
+  "edges": [
+    { "id": "FD-001", "from": "DEF-FIRST-FALL-DEGREE", "to": "CLAIM-NAGAO-LEMMA4", "relation": "defines", "statement": "Lemma 4 compares d_F with d'_F.", "source_refs": ["S-NAGAO-2015"] },
+    { "id": "FD-002", "from": "DEF-FAKE-FIRST-FALL-DEGREE", "to": "CLAIM-NAGAO-LEMMA4", "relation": "defines", "statement": "Lemma 4 compares d_F with d'_F.", "source_refs": ["S-NAGAO-2015"] },
+    { "id": "FD-003", "from": "CEX-NAGAO-LEMMA4-F2", "to": "CLAIM-NAGAO-LEMMA4", "relation": "refutes", "statement": "Witnesses A and B have d'_F = 2 < d_F = 3 in both placements (equality reading).", "source_refs": ["S-IC-NEGATIVE", "S-LEMMA4-LEAN"] },
+    { "id": "FD-004", "from": "CLAIM-NAGAO-LEMMA4", "to": "COND-NAGAO-2015-COMPLEXITY", "relation": "conditions", "statement": "The justification offered for Proposition 5 bounds d'_F and transfers it to d_F through Lemma 4.", "source_refs": ["S-IC-NEGATIVE"] },
+    { "id": "FD-005", "from": "HEUR-FIRST-FALL-DEGREE", "to": "COND-NAGAO-2015-COMPLEXITY", "relation": "conditions", "statement": "The exponent equates the first fall degree with the solving degree.", "source_refs": ["S-NAGAO-2015"] },
+    { "id": "FD-006", "from": "COND-NAGAO-2015-COMPLEXITY", "to": "COND-BINARY-WEIL-DESCENT", "relation": "instantiates", "statement": "A binary Weil-descent summation route with a disjoint factor base.", "source_refs": ["S-NAGAO-2015"] },
+    { "id": "FD-007", "from": "COND-NAGAO-2015-COMPLEXITY", "to": "GAP-NAGAO-PROP5-ROUTE", "relation": "leaves_open", "statement": "Whether Proposition 5 holds by another route is undecided.", "source_refs": ["S-IC-NEGATIVE"] },
+    { "id": "FD-008", "from": "CLAIM-NAGAO-LEMMA4", "to": "GAP-LEMMA4-REVERSE", "relation": "leaves_open", "statement": "The refutation suggests the reverse inequality as a candidate repair; its outside form is unresolved.", "source_refs": ["S-IC-NEGATIVE"] },
+    { "id": "FD-009", "from": "DEF-LAST-FALL-DEGREE", "to": "THM-CG-SOLVING-DEGREE", "relation": "defines", "statement": "The identity is stated in terms of the last fall degree.", "source_refs": ["S-CAMINATA-GORLA-2021"] },
+    { "id": "FD-010", "from": "DEF-SOLVING-DEGREE", "to": "THM-CG-SOLVING-DEGREE", "relation": "defines", "statement": "The identity computes the solving degree.", "source_refs": ["S-CAMINATA-GORLA-2021"] },
+    { "id": "FD-011", "from": "THM-CG-SOLVING-DEGREE", "to": "HEUR-FIRST-FALL-DEGREE", "relation": "qualifies", "statement": "The rigorous bridge from a degree to solver cost goes through the last fall degree and the GB degree, not the first fall degree.", "source_refs": ["S-CAMINATA-GORLA-2021"] },
+    { "id": "FD-012", "from": "THM-CG-SOLVING-DEGREE", "to": "FACT-GROEBNER-COST-DEPENDENCE", "relation": "qualifies", "statement": "Makes the maximal degree reached exact for degree-compatible orders.", "source_refs": ["S-CAMINATA-GORLA-2021"] },
+    { "id": "FD-013", "from": "THM-KY-S3-FIRST-FALL-TWO", "to": "HEUR-FIRST-FALL-DEGREE", "relation": "obstructs", "statement": "On descended S_3 the first fall degree is 2 at every n while the measured degree of regularity grows.", "source_refs": ["S-KOSTERS-YEO-2015"] },
+    { "id": "FD-014", "from": "THM-HKYY-ZERO-DIM-LAST-FALL", "to": "COND-BINARY-WEIL-DESCENT", "relation": "does_not_cover", "statement": "The n-independent last-fall bound needs zero-dimensional systems; factor-base relation systems are not.", "source_refs": ["S-HKYY-2015"] },
+    { "id": "FD-015", "from": "HEUR-FIRST-FALL-DEGREE", "to": "COND-ECC2K130-FFDA-PROJECTION", "relation": "conditions", "statement": "The 2^86 projection takes the Petit-Quisquater / Kousidis-Wiemers first-fall bound as the solving degree.", "source_refs": ["S-ECC2K130-IC-NOTES"] },
+    { "id": "FD-016", "from": "COND-ECC2K130-FFDA-PROJECTION", "to": "COND-BINARY-WEIL-DESCENT", "relation": "instantiates", "statement": "The ECC2K-130 instance of the binary descent route.", "source_refs": ["S-ECC2K130-IC-NOTES"] },
+    { "id": "FD-017", "from": "HEUR-FIRST-FALL-DEGREE", "to": "GAP-FALL-DEGREE-COST-BRIDGE", "relation": "leaves_open", "statement": "Every estimate taking a first-fall or regularity degree as the solving degree owes the bridge.", "source_refs": ["S-CAMINATA-GORLA-2021"] },
+    { "id": "FD-018", "from": "THM-CG-SOLVING-DEGREE", "to": "GAP-FALL-DEGREE-COST-BRIDGE", "relation": "enables", "statement": "Supplies the sound target: bound max{last fall, max GB degree} or measure sd.", "source_refs": ["S-CAMINATA-GORLA-2021"] }
+  ],
+  "research_targets": [
+    {
+      "id": "RT-LEMMA4-FORMAL",
+      "label": "Kernel-check the Lemma 4 refutation",
+      "status": "working",
+      "priority": 2,
+      "objective": "Move CEX-NAGAO-LEMMA4-F2 from lean_written_unchecked to kernel_checked, then prove the two encoding bridges and add witness B.",
+      "depends_on": ["CEX-NAGAO-LEMMA4-F2", "CLAIM-NAGAO-LEMMA4"],
+      "acceptance": "lean-proof-gate passes IcNegative.Lemma4.lemma4_fails_witnessA with only propext / Classical.choice / Quot.sound; bridges proved or stated as named hypotheses.",
+      "next_step": "Read the lean-proof-gate result on the PR that adds Lemma4Witness.lean.",
+      "source_refs": ["S-LEMMA4-LEAN"]
+    },
+    {
+      "id": "RT-LEMMA4-REVERSE",
+      "label": "Prove or refute d'_F <= d_F (outside)",
+      "status": "ready",
+      "priority": 3,
+      "objective": "Settle the candidate repair GAP-LEMMA4-REVERSE: a proof in the multilinear quotient, or a counterexample from a wider census (four variables, degree 3, three generators).",
+      "depends_on": ["GAP-LEMMA4-REVERSE", "CEX-NAGAO-LEMMA4-F2"],
+      "acceptance": "Either a kernel-checked counterexample in the Lemma4Witness encoding, or a written proof reviewed independently; census controls as in blindspots_19_checks.rs.",
+      "next_step": "Extend the native instrument's census to the wider population and freeze it before running.",
+      "source_refs": ["S-IC-NEGATIVE"]
+    },
+    {
+      "id": "RT-FALL-DEGREE-BRIDGE",
+      "label": "Re-derive degree-based costs through Caminata-Gorla",
+      "status": "ready",
+      "priority": 2,
+      "objective": "For every node tagged first-fall-degree with a cited_by use of depends, either replace the degree input with a measured solving degree or a proved last-fall plus GB-degree bound, or keep the row labelled conditional and tainted.",
+      "depends_on": ["GAP-FALL-DEGREE-COST-BRIDGE", "THM-CG-SOLVING-DEGREE", "COND-ECC2K130-FFDA-PROJECTION"],
+      "acceptance": "node attack-graph.mjs lists no tainted node presented as proved or measured, and every depends citation names the degree it uses.",
+      "next_step": "Start with BinaryIcHeuristic::log2_cost in src/cryptanalysis/matmul_exponent.rs: record which degree each variant takes.",
+      "source_refs": ["S-CAMINATA-GORLA-2021", "S-ECC2K130-IC-NOTES"]
+    }
+  ]
+}

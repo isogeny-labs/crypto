@@ -1,0 +1,59 @@
+name: ECDLP claim corpus and attack graph
+
+# Validates docs/ecdlp-hardness-corpus (schema, sources, refutation and taint rules),
+# regenerates the attack graph and fails if a tracked lemma is cited somewhere in
+# the repository without being linked to its claim node (cited_by).
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/ecdlp-hardness-corpus/**'
+      - '**/*.md'
+      - '**/*.tex'
+      - '**/*.typ'
+      - '**/*.rs'
+      - '**/*.py'
+      - '**/*.lean'
+      - '.github/workflows/claim-corpus.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/ecdlp-hardness-corpus/**'
+      - '.github/workflows/claim-corpus.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  corpus:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|claim-corpus.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate corpus
+        run: node docs/ecdlp-hardness-corpus/validate.mjs
+      - name: Attack graph and citation linkage
+        run: node docs/ecdlp-hardness-corpus/attack-graph.mjs --check
+      - name: Generated files are current
+        run: |
+          node docs/ecdlp-hardness-corpus/render.mjs
+          git diff --exit-code -- \
+            docs/ecdlp-hardness-corpus/attack-graph.json \
+            docs/ecdlp-hardness-corpus/ATTACK_GRAPH.md \
+            docs/ecdlp-hardness-corpus/attack-graph.dot \
+            docs/ecdlp-hardness-corpus/claims.tsv \
+            docs/ecdlp-hardness-corpus/sources.tsv \
+            docs/ecdlp-hardness-corpus/stats.tsv \
+            docs/ecdlp-hardness-corpus/graph.dot \
+            docs/ecdlp-hardness-corpus/overview.dot

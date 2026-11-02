@@ -100,3 +100,17 @@ RED-ISOGENY-DLP-TRANSPORT	reduction	proved_external	curve_family_restricted	theo
 THEOREM-PAIRING-BILINEAR-NONDEGENERATE	structural_theorem	proved_external	mathematical	theorem	-	S-GALBRAITH-MPKC-2018
 RED-PAIRING-CO-DDH	conditional_attack	conditional	curve_family_restricted	conditional_theorem	-	S-GALBRAITH-MPKC-2018
 FACT-PAIRING-FRIENDLY-TWO-DLPS	structural_theorem	proved_external	curve_family_restricted	definition	-	S-GALBRAITH-MPKC-2018
+DEF-FIRST-FALL-DEGREE	definition	definition	algebraic_coordinate	-	-	S-NAGAO-2015,S-IC-NEGATIVE,S-FALL-DEGREE-READINGS
+DEF-FAKE-FIRST-FALL-DEGREE	definition	definition	algebraic_coordinate	-	-	S-NAGAO-2015,S-IC-NEGATIVE
+DEF-LAST-FALL-DEGREE	definition	definition	algebraic_coordinate	-	-	S-CAMINATA-GORLA-2021,S-HKY-2015
+DEF-SOLVING-DEGREE	definition	definition	algebraic_coordinate	-	-	S-CAMINATA-GORLA-2021
+CLAIM-NAGAO-LEMMA4	structural_theorem	refuted	algebraic_coordinate	counterexample	d_F <= d'_F	S-NAGAO-2015,S-IC-NEGATIVE,S-FALL-DEGREE-READINGS
+CEX-NAGAO-LEMMA4-F2	structural_theorem	proved_internal_unreviewed	algebraic_coordinate	counterexample	-	S-IC-NEGATIVE,S-LEMMA4-LEAN
+THM-CG-SOLVING-DEGREE	structural_theorem	proved_external	algebraic_coordinate	theorem	sd_sigma(F) = max{d_lastfall(F), maxGBdeg_sigma(F)}	S-CAMINATA-GORLA-2021
+THM-KY-S3-FIRST-FALL-TWO	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-KOSTERS-YEO-2015
+THM-HKYY-ZERO-DIM-LAST-FALL	structural_theorem	proved_external	algebraic_coordinate	theorem	-	S-HKYY-2015
+COND-NAGAO-2015-COMPLEXITY	conditional_attack	conditional	algebraic_coordinate	conditional_theorem	O(n^(8w+1))	S-NAGAO-2015,S-IC-NEGATIVE
+COND-ECC2K130-FFDA-PROJECTION	conditional_attack	conditional	algebraic_coordinate	concrete_estimate	2^86.0 at n = 131	S-ECC2K130-IC-NOTES,S-PETIT-QUISQUATER-2012
+GAP-NAGAO-PROP5-ROUTE	open_obligation	open	algebraic_coordinate	-	-	S-NAGAO-2015,S-IC-NEGATIVE,S-FALL-DEGREE-READINGS
+GAP-LEMMA4-REVERSE	open_obligation	open	algebraic_coordinate	-	-	S-IC-NEGATIVE
+GAP-FALL-DEGREE-COST-BRIDGE	open_obligation	open	algebraic_coordinate	-	-	S-CAMINATA-GORLA-2021,S-KOSTERS-YEO-2015

@@ -65,7 +65,8 @@ the authoring host); the repository proof gate (`tools/lean/proof-gate.sh`,
 - `evidence/checks.txt`: output of the native checks `examples/blindspots_19_checks.rs`
   (`lemma4`, `affine`, `yield`; std-only Rust, about 0.3 s).
 - `lean/`: Lake project `ic_negative` (`IcNegative/AffineCore.lean`,
-  `IcNegative/YieldConservation.lean`, `AxiomAudit.lean`), pinned to Lean `v4.34.1` and
+  `IcNegative/YieldConservation.lean`, `IcNegative/Lemma4Witness.lean` (S5 witness A in
+  core Lean, `decide +kernel`, added 2026-11-02, pending the proof gate), `AxiomAudit.lean`), pinned to Lean `v4.34.1` and
   the Mathlib revision of `../rootfinding-decomposition/lean/`. `lean/OPEN_TARGETS.md`
   holds the statements that are not proved (O1 to O4), outside compiled sources because
   the proof gate fails any `sorry`.

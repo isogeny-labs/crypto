@@ -10,10 +10,10 @@ and every edge says how one claim depends on or limits another.
 
 ## Current snapshot
 
-- 101 claim nodes
-- 145 typed dependency edges
-- 50 source records
-- 13 prioritized research targets
+- 115 claim nodes (one refuted)
+- 163 typed dependency edges
+- 58 source records
+- 16 prioritized research targets
 - 717 labeled results and 375 numbered sections in the Galbraith book inventory
 
 Run `node validate.mjs` for the authoritative assembled counts; generated counts are in
@@ -22,6 +22,12 @@ Run `node validate.mjs` for the authoritative assembled counts; generated counts
 ## Start here
 
 - [`REPORT.md`](REPORT.md): findings, theorem table, attack surface, and research plan
+- [`LEMMA_LINKAGE.md`](LEMMA_LINKAGE.md): the proof-linkage layer (refutations,
+  formalization state, repository citations, taint) and the Nagao Lemma 4 audit
+- [`ATTACK_GRAPH.md`](ATTACK_GRAPH.md), [`attack-graph.svg`](attack-graph.svg): every
+  unestablished claim ranked by what rests on it, with the action that would settle it
+- [`fall-degree-lemmas.json`](fall-degree-lemmas.json): fall-degree definitions, Lemma 4,
+  its counterexample, the Caminata–Gorla bridge, and the FFDA-conditioned estimates
 - [`overview.svg`](overview.svg): seven-layer overview
 - [`graph.svg`](graph.svg): full claim-level dependency graph
 - [`corpus.json`](corpus.json): curated backbone and fragment manifest
@@ -93,6 +99,11 @@ From the repository root:
 ```sh
 node docs/ecdlp-hardness-corpus/validate.mjs
 node docs/ecdlp-hardness-corpus/render.mjs
+node docs/ecdlp-hardness-corpus/attack-graph.mjs --check
+dot -Tsvg docs/ecdlp-hardness-corpus/attack-graph.dot \
+  -o docs/ecdlp-hardness-corpus/attack-graph.svg
+dot -Tpdf docs/ecdlp-hardness-corpus/attack-graph.dot \
+  -o docs/ecdlp-hardness-corpus/attack-graph.pdf
 dot -Tsvg docs/ecdlp-hardness-corpus/overview.dot \
   -o docs/ecdlp-hardness-corpus/overview.svg
 dot -Tpdf docs/ecdlp-hardness-corpus/overview.dot \
@@ -125,6 +136,11 @@ the SVGs. The subshell for `REPORT.pdf` is intentional: `REPORT.md` embeds
 
 The validator requires a primary-read source for every node marked
 `proved_external`, checks repository source paths, rejects dangling edges, and validates
-research-target dependencies. It also checks the fixed book digest, all inventory counts,
+research-target dependencies. It also enforces the proof-linkage layer: a `refuted`
+claim needs a `refutes` edge from an established node, nothing resting on a refuted
+claim may be marked proved, algorithm or measured, and `formal` and `cited_by` paths
+must exist. `attack-graph.mjs --check` fails when a file matches a claim's
+`citation_patterns` without being listed in its `cited_by`. CI:
+`.github/workflows/claim-corpus.yml`. It also checks the fixed book digest, all inventory counts,
 page ranges and label uniqueness, the complete Algorithm 1--29 sequence, and every book
 locator cited by a promoted claim.

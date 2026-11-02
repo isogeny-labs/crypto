@@ -4,13 +4,13 @@ digraph ecdlp_overview {
   edge [fontname="DejaVu Sans", fontsize=9, color="#66788a", arrowsize=0.8];
   "foundation" [label="Definitions, assumptions, reductions\\n35 claims", fillcolor="#e8eef5", color="#526575"];
   "generic" [label="Generic algorithms and model bounds\\n15 claims", fillcolor="#dff4e5", color="#526575"];
-  "algebraic" [label="Coordinate / index-calculus route\\n21 claims", fillcolor="#f4e8fb", color="#526575"];
+  "algebraic" [label="Coordinate / index-calculus route\\n32 claims", fillcolor="#f4e8fb", color="#526575"];
   "special" [label="Special-family and pairing attacks\\n12 claims", fillcolor="#fde2e2", color="#526575"];
   "quantum" [label="Quantum algorithms and resources\\n5 claims", fillcolor="#e6f1ff", color="#526575"];
   "evidence" [label="Measured repository evidence\\n2 claims", fillcolor="#ece7fb", color="#526575"];
-  "open" [label="Open proof obligations\\n11 claims", fillcolor="#fff1b8", color="#526575"];
+  "open" [label="Open proof obligations\\n14 claims", fillcolor="#fff1b8", color="#526575"];
   "algebraic" -> "foundation" [label="7 typed edges"];
-  "algebraic" -> "open" [label="4 typed edges"];
+  "algebraic" -> "open" [label="8 typed edges"];
   "evidence" -> "foundation" [label="1 typed edges"];
   "foundation" -> "algebraic" [label="2 typed edges"];
   "foundation" -> "evidence" [label="1 typed edges"];

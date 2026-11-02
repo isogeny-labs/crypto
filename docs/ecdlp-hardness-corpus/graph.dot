@@ -29,6 +29,10 @@ digraph ecdlp_claims {
     "RED-MAURER-AUXILIARY-CURVE" [label="RED-MAURER-AUXILIARY-CURVE\\nMaurer auxiliary-curve reduction\\noracle queries = O(log(r)^2 log log(r))", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
     "RED-DLP-LEAST-SIGNIFICANT-BIT" [label="RED-DLP-LEAST-SIGNIFICANT-BIT\\nLeast-significant DLP bit is as hard as DLP", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
     "RED-ISOGENY-DLP-TRANSPORT" [label="RED-ISOGENY-DLP-TRANSPORT\\nEfficient isogeny transports ECDLP", fillcolor="#e6f1ff", color="#2468a2", style="rounded,filled"];
+    "DEF-FIRST-FALL-DEGREE" [label="DEF-FIRST-FALL-DEGREE\\nFirst fall degree d_F (Nagao Def. 5)", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-FAKE-FIRST-FALL-DEGREE" [label="DEF-FAKE-FIRST-FALL-DEGREE\\nFake first fall degree d'_F (Nagao Def. 6)", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-LAST-FALL-DEGREE" [label="DEF-LAST-FALL-DEGREE\\nLast fall degree", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-SOLVING-DEGREE" [label="DEF-SOLVING-DEGREE\\nSolving degree sd_sigma", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
   }
   subgraph cluster_bounds {
     label="Rigorous model bounds and structural theorems"; color="#cad5df"; style="rounded";
@@ -59,6 +63,11 @@ digraph ecdlp_claims {
     "THEOREM-CDH-RANDOM-SELF-REDUCTION" [label="THEOREM-CDH-RANDOM-SELF-REDUCTION\\nCDH random self-reducibility", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THEOREM-PAIRING-BILINEAR-NONDEGENERATE" [label="THEOREM-PAIRING-BILINEAR-NONDEGENERATE\\nPairing bilinearity and nondegeneracy", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "FACT-PAIRING-FRIENDLY-TWO-DLPS" [label="FACT-PAIRING-FRIENDLY-TWO-DLPS\\nPairing-friendly security is two-sided", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-NAGAO-LEMMA4" [label="CLAIM-NAGAO-LEMMA4\\nNagao 2015/984 Lemma 4: d_F <= d'_F\\nd_F <= d'_F\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-NAGAO-LEMMA4-F2" [label="CEX-NAGAO-LEMMA4-F2\\nWitnesses A, B: d'_F = 2 < d_F = 3 over F_2", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-CG-SOLVING-DEGREE" [label="THM-CG-SOLVING-DEGREE\\nCaminata-Gorla: sd = max(last fall, max GB degree)\\nsd_sigma(F) = max{d_lastfall(F), maxGBdeg_sigma(F)}", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-KY-S3-FIRST-FALL-TWO" [label="THM-KY-S3-FIRST-FALL-TWO\\nKosters-Yeo: descended S_3 has first fall degree 2", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-HKYY-ZERO-DIM-LAST-FALL" [label="THM-HKYY-ZERO-DIM-LAST-FALL\\nHKYY: n-independent last fall degree (zero-dim only)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -90,6 +99,8 @@ digraph ecdlp_claims {
     "ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL" [label="ALG-GAUDRY-SCHOST-TWO-DIMENSIONAL\\nGaudry-Schost two-dimensional walk\\nE[T] = (2.43+o(1)) N", fillcolor="#fce8d8", color="#b45309", style="rounded,filled,dashed"];
     "ALG-STATIC-DH-AUXILIARY-POWERS" [label="ALG-STATIC-DH-AUXILIARY-POWERS\\nStatic-DH auxiliary-power attack\\nT = O((sqrt((r-1)/d)+sqrt(d))log(r)); Q = d", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
     "RED-PAIRING-CO-DDH" [label="RED-PAIRING-CO-DDH\\nPairing decision reduction", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
+    "COND-NAGAO-2015-COMPLEXITY" [label="COND-NAGAO-2015-COMPLEXITY\\nNagao 2015/984: polynomial-time binary ECDLP under FFDA\\nO(n^(8w+1))", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
+    "COND-ECC2K130-FFDA-PROJECTION" [label="COND-ECC2K130-FFDA-PROJECTION\\nECC2K-130 IC projection 2^86 (FFDA)\\n2^86.0 at n = 131", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
   }
   subgraph cluster_evidence {
     label="Measured and heuristic evidence"; color="#cad5df"; style="rounded";
@@ -117,6 +128,9 @@ digraph ecdlp_claims {
     "GAP-MULTITARGET-NONUNIFORM" [label="GAP-MULTITARGET-NONUNIFORM\\nMulti-target/nonuniform security conversion", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-END-TO-END-IC-EXPONENT" [label="GAP-END-TO-END-IC-EXPONENT\\nEnd-to-end index-calculus exponent obligation", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PROTOCOL-ASSUMPTION-MAPPING" [label="GAP-PROTOCOL-ASSUMPTION-MAPPING\\nProtocol-to-problem assumption mapping", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-NAGAO-PROP5-ROUTE" [label="GAP-NAGAO-PROP5-ROUTE\\nDoes Nagao Prop. 5 survive without Lemma 4?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-LEMMA4-REVERSE" [label="GAP-LEMMA4-REVERSE\\nReverse inequality d'_F <= d_F (outside placement)?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-FALL-DEGREE-COST-BRIDGE" [label="GAP-FALL-DEGREE-COST-BRIDGE\\nEvery degree-based cost must pass through sd or last fall", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -263,4 +277,22 @@ digraph ecdlp_claims {
   "RED-PAIRING-CO-DDH" -> "DEF-GAP-DH" [label="enables", color="#66788a", style="solid"];
   "FACT-PAIRING-FRIENDLY-TWO-DLPS" -> "ATTACK-MOV-PAIRING" [label="conditions", color="#66788a", style="solid"];
   "FACT-PAIRING-FRIENDLY-TWO-DLPS" -> "FACT-FIELD-DLP-AFTER-PAIRING" [label="qualifies", color="#66788a", style="dashed"];
+  "DEF-FIRST-FALL-DEGREE" -> "CLAIM-NAGAO-LEMMA4" [label="defines", color="#66788a", style="solid"];
+  "DEF-FAKE-FIRST-FALL-DEGREE" -> "CLAIM-NAGAO-LEMMA4" [label="defines", color="#66788a", style="solid"];
+  "CEX-NAGAO-LEMMA4-F2" -> "CLAIM-NAGAO-LEMMA4" [label="refutes", color="#a33a3a", style="solid"];
+  "CLAIM-NAGAO-LEMMA4" -> "COND-NAGAO-2015-COMPLEXITY" [label="conditions", color="#66788a", style="solid"];
+  "HEUR-FIRST-FALL-DEGREE" -> "COND-NAGAO-2015-COMPLEXITY" [label="conditions", color="#66788a", style="solid"];
+  "COND-NAGAO-2015-COMPLEXITY" -> "COND-BINARY-WEIL-DESCENT" [label="instantiates", color="#66788a", style="solid"];
+  "COND-NAGAO-2015-COMPLEXITY" -> "GAP-NAGAO-PROP5-ROUTE" [label="leaves_open", color="#66788a", style="dashed"];
+  "CLAIM-NAGAO-LEMMA4" -> "GAP-LEMMA4-REVERSE" [label="leaves_open", color="#66788a", style="dashed"];
+  "DEF-LAST-FALL-DEGREE" -> "THM-CG-SOLVING-DEGREE" [label="defines", color="#66788a", style="solid"];
+  "DEF-SOLVING-DEGREE" -> "THM-CG-SOLVING-DEGREE" [label="defines", color="#66788a", style="solid"];
+  "THM-CG-SOLVING-DEGREE" -> "HEUR-FIRST-FALL-DEGREE" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-CG-SOLVING-DEGREE" -> "FACT-GROEBNER-COST-DEPENDENCE" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-KY-S3-FIRST-FALL-TWO" -> "HEUR-FIRST-FALL-DEGREE" [label="obstructs", color="#a33a3a", style="solid"];
+  "THM-HKYY-ZERO-DIM-LAST-FALL" -> "COND-BINARY-WEIL-DESCENT" [label="does_not_cover", color="#66788a", style="dashed"];
+  "HEUR-FIRST-FALL-DEGREE" -> "COND-ECC2K130-FFDA-PROJECTION" [label="conditions", color="#66788a", style="solid"];
+  "COND-ECC2K130-FFDA-PROJECTION" -> "COND-BINARY-WEIL-DESCENT" [label="instantiates", color="#66788a", style="solid"];
+  "HEUR-FIRST-FALL-DEGREE" -> "GAP-FALL-DEGREE-COST-BRIDGE" [label="leaves_open", color="#66788a", style="dashed"];
+  "THM-CG-SOLVING-DEGREE" -> "GAP-FALL-DEGREE-COST-BRIDGE" [label="enables", color="#66788a", style="solid"];
 }
