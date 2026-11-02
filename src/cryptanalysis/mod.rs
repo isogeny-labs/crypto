@@ -280,6 +280,7 @@ pub mod line_oracle;
 pub mod line_s4_oracle;
 pub mod lopsided_thin_product;
 pub mod macaulay_profile;
+pub mod macaulay_tails;
 pub mod matmul_exponent;
 pub mod matrix_f5_f2;
 pub mod mazur_tate_sigma;
