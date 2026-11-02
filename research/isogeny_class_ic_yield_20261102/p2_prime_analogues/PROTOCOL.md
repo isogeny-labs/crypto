@@ -233,3 +233,55 @@ statement, not a speed claim, and not an improvement over the index-calculus
 baseline. A null is recorded as a closed lead. No leaderboard or
 `benchmarks/README.md` row follows (the validation gate needs a matched rho
 and this study has none by design).
+
+## 10. AMENDMENT A1 (2026-11-02, filed before any data): local route, reduced scope
+
+Status: filed before any measurement of this protocol. `runs/` did not exist
+when this was filed; `smoke/` and `calibration/` are harness and sizing checks,
+not data. Protocol record: `protocol.json` version 2, amendment id
+`A1-local-reduced-scope-20261102`.
+
+Why. The isolab-eks route could not be used from the submitting host. The owner
+decided (2026-11-02, relayed by the main session): local fallback, reduced
+scope, isolation L0 accepted.
+
+What changes.
+
+- **Run scope: 12 cells.** c24A, c24B, c28A, c28B, c32A, c32B for m = 2 and
+  m = 3, with the section 8 flags of `README.md` (`--targets 4`, 8 for m = 3 at
+  24 bits; `--rounds 4`; `--aa 1` at 24 and 28 bits, `--aa 0` at 32 bits).
+- **Deferred, not dropped: 8 cells.** c36A, c36B, c40A, c40B for m = 2 and
+  m = 3 stay in the population and in the preregistration; **no data are taken
+  for them under this protocol version**. They are reported as "not run (deferred)",
+  never filled. Running them later needs a further amendment that says whether
+  it precedes their data.
+- **Route.** Local backend, isolation L0, one cell at a time under the ecbench
+  host lock, smallest cell first; `ecbench verify --replay 12`; per-cell card
+  timeout 2 x the README estimate; the instrument is built in a dedicated git
+  worktree pinned to the commit that files this amendment.
+- **Clock.** At L0 `online_wall_ns_per_attempt` is descriptive only. The counted
+  metrics (yield, `rel_gae_per_attempt`, `oracle_setup_gae`) are exact and are
+  the only ones that decide.
+- **Unchanged.** Question, claims, arms, controls, analysis binary, seeds, N, A, R,
+  thresholds, permutation and bootstrap counts, and the decision rule. The
+  multiplicity family stays 20 tests, Bonferroni alpha 0.0025: the 8 deferred
+  tests are not run and are not removed from the divisor (more conservative).
+- **Restated for the run scope only.** `sample_size.instances` 1332 (3 sizes x
+  444 curve models; the v1 figure 444 was the per-size count),
+  `preflight_runtime.estimated_total_seconds` 67320 (18.7 CPU-hours, README cost
+  table, 12 cells), `stopping_rules[0]`, `variable_ledger` factors `size_D_h` and
+  `relations_per_run_R`.
+
+Hashes (sha256).
+
+| file | hash |
+|:--|:--|
+| `versions/protocol-v1.json` (frozen v1, byte-identical to the pre-amendment `protocol.json`) | `6fda9efb1a160d4d71d8bd394e6e2139b1d608c6673fa630c0034536f16a3b0d` |
+| v1 canonical freeze hash (`freeze.protocol_sha256`) | `1cab21213fa7eb5562009d924039c7bf17b6c02161499fed8b11bef40c376e9e` |
+| `protocol.json` (v2, full file) | `8b6fc89c3c60352b7e5203bcd1120cc10babf28ce91c59b3fce77c12976a14e0` |
+| v2 canonical freeze hash (`freeze.protocol_sha256`) | `334f54c93bdb3015f2732d6f9dc6d927a07fa7a2039b2a4d8eeb21db1be08b53` |
+| `p2tool/src/analyze.rs` (unchanged, frozen analysis) | `f6cc7286daae471bc40e5860ed8673f1e1676b9fadce3199b8fe67ca8d167678` |
+
+The draft cards `CARD-isogeny-ic-yield-p2-*-20261102-1` (pinned to commit
+4c43066b7, binary hashes of a different build) are superseded by the `-2` cards
+pinned to the amendment commit; they are kept, never run.

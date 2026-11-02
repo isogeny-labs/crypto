@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "P2-isogeny-class-ic-yield-20261102",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-02",
   "repository": "crypto",
   "study_dir": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues",
@@ -232,8 +232,8 @@
       {
         "name": "size_D_h",
         "treatment": "crossed",
-        "value": "sizes 24, 28, 32, 36, 40 bits; D fixed across sizes; class A (D = -84171, h = 128) and class B (D = -414651, h = 300)",
-        "how": "ten classes listed in classes.json"
+        "value": "sizes 24, 28, 32 bits run under amendment A1 (36 and 40 bits deferred, not dropped, no data taken); D fixed across sizes; class A (D = -84171, h = 128) and class B (D = -414651, h = 300)",
+        "how": "six run classes of the ten listed in classes.json; the other four (c36A, c36B, c40A, c40B) are deferred"
       },
       {
         "name": "m",
@@ -249,7 +249,7 @@
       {
         "name": "relations_per_run_R",
         "treatment": "fixed",
-        "value": "R = min(100, 0.6 N); at 40 bits R = 30 (reduced plan, --relations 30)",
+        "value": "R = min(100, 0.6 N); the 40-bit reduced plan (R = 30, --relations 30) applies only if the deferred 40-bit cells are later run",
         "how": "spec generator rule; the 40-bit cells report their own measured power"
       }
     ],
@@ -298,7 +298,7 @@
     }
   },
   "sample_size": {
-    "instances": 444,
+    "instances": 1332,
     "replicates": 16,
     "warmups": 1,
     "power": {
@@ -309,14 +309,14 @@
       "rank_test_n": null,
       "min_attainable_two_sided_p": null,
       "passes": true,
-      "note": "instances = 444 curve models per m over the ten classes (5 sizes x (128 + 8 and 300 + 8)); replicates = 4 rounds x 4 targets per curve (m = 3 at 24 bits: 4 x 8); family = yield ICC permutation p over 10 classes x 2 values of m, Bonferroni 0.05/20; add-one permutation p resolution 1/2001 < 0.0025; power against a planted 20 percent effect is measured per cell by the pc substitution and a cell below 0.9 is reported as not informative at 20 percent, never as a null"
+      "note": "instances = 1332 curve models per m over the six run classes (3 sizes x (128 + 8 and 300 + 8) = 3 x 444; the v1 figure 444 was the per-size count, v2 states the count of the run scope); replicates = 4 rounds x 4 targets per curve (m = 3 at 24 bits: 4 x 8); family stays the preregistered yield ICC permutation p over 10 classes x 2 values of m = 20 tests, Bonferroni 0.05/20 = 0.0025, unchanged by amendment A1 (8 of the 20 tests are deferred, not run; keeping the divisor 20 is the more conservative choice); add-one permutation p resolution 1/2001 < 0.0025; power against a planted 20 percent effect is measured per cell by the pc substitution and a cell below 0.9 is reported as not informative at 20 percent, never as a null"
     },
     "preflight_runtime": {
       "fixed_seconds": 0.17,
-      "per_sample_seconds": 22.5,
+      "per_sample_seconds": 0.7,
       "threads": 1,
-      "estimated_total_seconds": 388800,
-      "measured_on": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/calibration/calibration.md and README.md cost table on the 4-core builder host under load average 5 to 7: fixed = harness overhead per run, per sample = the largest measured per-run process wall (40 bits, m = 2), total = about 40 CPU-hours (24 to 36 bits) plus 68 CPU-hours (40 bits, R = 30, T = 4)"
+      "estimated_total_seconds": 67320,
+      "measured_on": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/calibration/calibration.md and README.md cost table on the 4-core builder host under load average 5 to 7: fixed = harness overhead per run (0.17 s), per sample = the largest measured per-run process wall of the run scope (32 bits, m = 2: 0.7 s); total = README cost table summed over the 12 run cells = (0.45+1.05+0.85+2.0) + (1.4+3.4+0.7+1.6) + (1.2+2.9+0.95+2.2) = 18.7 CPU-hours = 67320 s, single host, one cell at a time; the 36- and 40-bit cells (v1 total 388800 s) are deferred"
     }
   },
   "metrics": {
@@ -413,7 +413,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "fixed design: every curve of each of the ten classes x m in {2, 3} x targets x (rounds + 1 warm-up) x arms, as written by p2tool spec with rounds 4; 40-bit cells use --relations 30 and --targets 4; then stop",
+      "rule": "fixed design, amended by A1: every curve of each of the six run classes (c24A, c24B, c28A, c28B, c32A, c32B) x m in {2, 3} x targets x (rounds + 1 warm-up) x arms, as written by p2tool spec with rounds 4, --targets 4 (8 for m = 3 at 24 bits) and --aa 1 at 24 and 28 bits, --aa 0 at 32 bits; then stop. The cells of c36A, c36B, c40A, c40B for m = 2 and 3 are deferred: no data are taken under this protocol version, and they stay in the preregistered population (reported as not run, never filled)",
       "kind": "fixed_n",
       "preregistered": true
     },
@@ -485,12 +485,36 @@
       "verified_by": "repository review 2026-11-02"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1-local-reduced-scope-20261102",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "Owner decision relayed by the main session on 2026-11-02: the isolab-eks route could not be used from the submitting host, so run the local fallback at reduced scope. Run cells c24A, c24B, c28A, c28B, c32A, c32B for m = 2 and m = 3 (12 cells); defer the 36- and 40-bit cells. Isolation L0 on this host is accepted: counted metrics (yield, GAE) are exact, wall-clock is descriptive only. No data of this protocol has been taken: p2_prime_analogues/runs does not exist; smoke/ and calibration/ are harness and sizing checks, not data.",
+      "changes": [
+        "Run scope: the 12 cells c24A, c24B, c28A, c28B, c32A, c32B x m in {2, 3}; the 8 cells c36A, c36B, c40A, c40B x m in {2, 3} are deferred: recorded as not run, no data taken, not dropped from the protocol population.",
+        "Route: execution.backend local, measurement.isolation_required L0 (both already recorded in v1), one cell at a time under the ecbench host lock, smallest cell first; ecbench verify --replay 12 (REPLAYS=12); card timeouts are 2 x the README per-cell estimate; ecbench and p2tool are built in a dedicated git worktree pinned to the commit that files this amendment.",
+        "Clock metric (online_wall_ns_per_attempt) is descriptive only at L0; the counted metrics (yield, rel_gae_per_attempt, oracle_setup_gae) are exact and are the only ones that decide.",
+        "Decision rule unchanged: the multiplicity family stays 20 tests with Bonferroni alpha 0.0025; the 8 deferred tests are not run and are not removed from the divisor.",
+        "sample_size.instances 444 -> 1332 (3 sizes x 444 curve models per m; the v1 figure was the per-size count), preflight_runtime.estimated_total_seconds 388800 -> 67320 and per_sample_seconds 22.5 -> 0.7 for the run scope, stopping_rules[0] and variable_ledger.size_D_h and relations_per_run_R restated for the run scope.",
+        "Frozen v1 is retained unchanged at versions/protocol-v1.json."
+      ],
+      "supersedes_fields": [
+        "sample_size.instances",
+        "sample_size.power.note",
+        "sample_size.preflight_runtime",
+        "stopping_rules[0].rule",
+        "variable_ledger.factors[size_D_h]",
+        "variable_ledger.factors[relations_per_run_R]",
+        "version"
+      ]
+    }
+  ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "1cab21213fa7eb5562009d924039c7bf17b6c02161499fed8b11bef40c376e9e",
-    "commit": "4c43066b72c9e87aaba9c34cda5caa9266fde07f",
-    "frozen_at": "2026-11-02T03:59:01Z",
+    "protocol_sha256": "334f54c93bdb3015f2732d6f9dc6d927a07fa7a2039b2a4d8eeb21db1be08b53",
+    "commit": "ebaeba82f1422466ca09e38f84db7955be693dde",
+    "frozen_at": "2026-11-02T04:04:42Z",
     "filed_before_affected_data": true
   }
 }

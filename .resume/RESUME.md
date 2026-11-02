@@ -33,7 +33,11 @@ ECC2K-130: conductor 263*146505763881528721, ecdb curve id 22.
 4. Report + graphs + PDF (research-visuals), PR ready for review.
 
 ## Runs in flight
-none
+none yet. P2 (isogeny-class IC yield, scaled prime analogues) is cleared to run locally (owner decision 2026-11-02):
+12 cells (c24A c24B c28A c28B c32A c32B x m=2,3), isolation L0, protocol amendment A1 filed before data
+(research/isogeny_class_ic_yield_20261102/p2_prime_analogues/PROTOCOL.md section 10; protocol.json v2). Cards
+CARD-isogeny-ic-yield-p2-<cell>-20261102-2 run in the git worktree /home/user/crypto-p2run (detached at the amendment
+commit), one at a time, smallest first. 36- and 40-bit cells deferred (no data taken).
 
 ## Stop and success conditions
 Budget: about one day of cluster CPU. Success = complete, controlled per-curve
