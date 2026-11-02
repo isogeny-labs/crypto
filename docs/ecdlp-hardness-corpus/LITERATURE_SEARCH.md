@@ -15,6 +15,11 @@ The search used four evidence layers:
 3. publisher, author, standards-body, and arXiv PDFs for primary reading;
 4. source-code traces for claims about the live implementations.
 
+The user-supplied 696-page Galbraith version 2.0 book was then read as a bounded
+full-text corpus. A digest-locked extractor inventories every numbered result and
+section, while a manual pass over Chapters 13--15, 20--21, and 25--26 checks the
+security-bearing statements, hypotheses, asymptotics, and reduction directions.
+
 Broad keyword search was used only for discovery because it was noisy (for example,
 OpenAlex mixed astronomy papers into an ECDLP query). A claim entered the graph only
 after exact identity and scope checking. Direct PDF failures are retained as
@@ -38,6 +43,9 @@ Representative search strings included:
 The exact hashes and citations are machine-readable in `sources.tsv`. Primary text was
 read for:
 
+- Galbraith's *Mathematics of Public Key Cryptography*, version 2.0, including the
+  generalized-DLP, random-walk, subexponential, Diffie--Hellman, isogeny, and pairing
+  chapters;
 - Shoup's generic-group DLP/CDH bounds;
 - Corrigan-Gibbs--Kogan's advice and preprocessing tradeoffs;
 - Pohlig--Hellman's prime-power decomposition;
