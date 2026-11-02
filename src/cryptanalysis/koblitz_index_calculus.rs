@@ -9429,6 +9429,11 @@ pub struct ChainS3Tables {
     /// in the same order; only wall time changes.
     #[serde(default)]
     pub parallel: bool,
+    /// With `meet`: build a missing depth-`d` fingerprint set with the
+    /// parallel enumeration and sort ([`chain_s3_meet_front_with`]). Same set;
+    /// only the one-off build's wall time changes.
+    #[serde(default)]
+    pub parallel_build: bool,
 }
 
 /// Everything a chained-S3 search can vary besides its limits.
@@ -9985,6 +9990,99 @@ fn chain_s3_back_hits(
 }
 
 /// The sorted, distinct x-fingerprints of every affine sum of `depth`
+/// points of `signed` (as multisets). `parallel` splits the enumeration on
+/// the multiset's first index across the rayon pool: the multisets whose
+/// smallest index is `i` number exactly `C(n - i + depth - 2, depth - 1)`, so
+/// each worker writes its own slice of one array of the exact total size
+/// (no per-worker vectors to merge), the slices are compacted over the
+/// identity sums, and the array is sorted in parallel. Same set either way.
+fn chain_s3_build_fingerprints(
+    curve: &BinaryCurve,
+    signed: &[BinaryPoint],
+    depth: usize,
+    parallel: bool,
+) -> Vec<u64> {
+    let binomial =
+        |n: usize, k: usize| (0..k).fold(1u128, |acc, i| acc * (n - i) as u128 / (i as u128 + 1));
+    let n = signed.len();
+    let mut fingerprints: Vec<u64>;
+    if !parallel || depth < 2 || n == 0 {
+        // Reserve the exact multiset count C(n + depth - 1, depth) so a deep
+        // set is never reallocated (a doubling would need twice the memory).
+        let total = binomial(n + depth.max(1) - 1, depth);
+        fingerprints = Vec::with_capacity(usize::try_from(total).unwrap_or(0));
+        let mut scratch = ChainS3Scratch::default();
+        chain_s3_enumerate(
+            curve,
+            &BinaryPoint::Infinity,
+            signed,
+            depth,
+            0,
+            None,
+            &mut scratch,
+            &mut Vec::new(),
+            &mut |x, _| {
+                if let Some(x) = x {
+                    fingerprints.push(chain_s3_fingerprint(x));
+                }
+                true
+            },
+        );
+        fingerprints.sort_unstable();
+    } else {
+        let counts: Vec<usize> = (0..n)
+            .map(|i| binomial(n - i + depth - 2, depth - 1) as usize)
+            .collect();
+        fingerprints = vec![0u64; counts.iter().sum()];
+        let mut slices: Vec<&mut [u64]> = Vec::with_capacity(n);
+        let mut rest = fingerprints.as_mut_slice();
+        for &count in &counts {
+            let (head, tail) = rest.split_at_mut(count);
+            slices.push(head);
+            rest = tail;
+        }
+        let used: Vec<usize> = slices
+            .into_par_iter()
+            .enumerate()
+            .map(|(i, slice)| {
+                let mut written = 0usize;
+                let mut scratch = ChainS3Scratch::default();
+                chain_s3_enumerate(
+                    curve,
+                    &signed[i],
+                    signed,
+                    depth - 1,
+                    i,
+                    None,
+                    &mut scratch,
+                    &mut vec![i],
+                    &mut |x, _| {
+                        if let Some(x) = x {
+                            slice[written] = chain_s3_fingerprint(x);
+                            written += 1;
+                        }
+                        true
+                    },
+                );
+                written
+            })
+            .collect();
+        let mut write = 0usize;
+        let mut read = 0usize;
+        for (&count, &u) in counts.iter().zip(&used) {
+            fingerprints.copy_within(read..read + u, write);
+            write += u;
+            read += count;
+        }
+        fingerprints.truncate(write);
+        fingerprints.par_sort_unstable();
+    }
+    fingerprints.dedup();
+    fingerprints.shrink_to_fit();
+    fingerprints
+}
+
+/// The sorted, distinct x-fingerprints of every affine sum of `depth`
 /// signed base points: the query-independent side of
 /// [`ChainS3Tables::meet`]. Built once per (base, depth) and process, so a
 /// caller can pay for it before timing queries.
@@ -9992,6 +10090,17 @@ pub fn chain_s3_meet_front(
     kc: &KoblitzCurve,
     fb: &FrobeniusFactorBase,
     depth: usize,
+) -> Arc<ChainS3FrontSet> {
+    chain_s3_meet_front_with(kc, fb, depth, false)
+}
+
+/// [`chain_s3_meet_front`], building (on a cache miss) with the parallel
+/// enumeration and sort of [`chain_s3_build_fingerprints`] when `parallel`.
+pub fn chain_s3_meet_front_with(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    depth: usize,
+    parallel: bool,
 ) -> Arc<ChainS3FrontSet> {
     use std::hash::{Hash, Hasher};
     let signed = chain_s3_signed_base(fb);
@@ -10004,32 +10113,7 @@ pub fn chain_s3_meet_front(
     if let Some(hit) = cache.lock().expect("meet cache").get(&key) {
         return Arc::clone(hit);
     }
-    // Reserve the exact multiset count C(|signed| + depth - 1, depth) so a
-    // deep set is never reallocated (a doubling would need twice the memory).
-    let multisets = (0..depth).fold(1u128, |acc, i| {
-        acc * (signed.len() + i) as u128 / (i as u128 + 1)
-    });
-    let mut fingerprints: Vec<u64> = Vec::with_capacity(usize::try_from(multisets).unwrap_or(0));
-    let mut scratch = ChainS3Scratch::default();
-    chain_s3_enumerate(
-        &kc.curve,
-        &BinaryPoint::Infinity,
-        &signed,
-        depth,
-        0,
-        None,
-        &mut scratch,
-        &mut Vec::new(),
-        &mut |x, _| {
-            if let Some(x) = x {
-                fingerprints.push(chain_s3_fingerprint(x));
-            }
-            true
-        },
-    );
-    fingerprints.sort_unstable();
-    fingerprints.dedup();
-    fingerprints.shrink_to_fit();
+    let fingerprints = chain_s3_build_fingerprints(&kc.curve, &signed, depth, parallel);
     let front = Arc::new(ChainS3FrontSet::new(fingerprints));
     cache
         .lock()
@@ -10221,7 +10305,7 @@ fn sat_decompose_chained_s3_checked(
     if depth >= 2 && m > depth && m - depth <= depth && matches!(target, BinaryPoint::Affine { .. })
     {
         let step = depth - 1;
-        let front = chain_s3_meet_front(kc, fb, depth);
+        let front = chain_s3_meet_front_with(kc, fb, depth, tables.parallel_build);
         let signed = chain_s3_signed_base(fb);
         let Some((hit_paths, short)) = chain_s3_back_hits(
             &kc.curve,
@@ -23905,6 +23989,7 @@ mod chain_s3_tables_tests {
             rebuild: false,
             indexed: false,
             parallel: false,
+            parallel_build: false,
         };
         let (found, stats) =
             sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
@@ -23930,6 +24015,7 @@ mod chain_s3_tables_tests {
             rebuild: false,
             indexed: false,
             parallel: false,
+            parallel_build: false,
         };
         let (found, stats) =
             sat_decompose_chained_s3_with(&kc, &fb, &target, 3, LIMITS, options(tables));
@@ -24029,6 +24115,7 @@ mod chain_s3_tables_tests {
             rebuild: false,
             indexed: false,
             parallel: false,
+            parallel_build: false,
         });
         let planted = sum_of(&kc, &fb, &[3, 40, 97]);
         let (found, stats) =
@@ -24099,6 +24186,21 @@ mod chain_s3_tables_tests {
         assert_eq!(stats.conflicts, 0);
     }
 
+    /// The parallel build gives exactly the sequential fingerprint set, at
+    /// depths 1 to 3 (depth 2 and 3 include identity sums P + (-P) + ...).
+    #[test]
+    fn n83_parallel_build_matches_sequential() {
+        let kc = KoblitzCurve::known_n83_k1().expect("fixture");
+        let fb = union_base(&kc);
+        let signed = chain_s3_signed_base(&fb);
+        for depth in 1..=3 {
+            let sequential = chain_s3_build_fingerprints(&kc.curve, &signed, depth, false);
+            let parallel = chain_s3_build_fingerprints(&kc.curve, &signed, depth, true);
+            assert!(!sequential.is_empty());
+            assert_eq!(sequential, parallel, "depth {depth}");
+        }
+    }
+
     /// The parallel back enumeration returns exactly the sequential hits, in
     /// the same order, for a public and a planted m = 5 (d = 3) target.
     #[test]
@@ -24135,6 +24237,7 @@ mod chain_s3_tables_tests {
                 rebuild: true,
                 indexed: true,
                 parallel: false,
+                parallel_build: false,
                 ..ChainS3Tables::default()
             });
             let target = sum_of(&kc, &fb, picks);

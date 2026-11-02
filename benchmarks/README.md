@@ -58,6 +58,13 @@ admitted table: no independent timing replay, matched rho reference or
 completed 80-bit isogeny is supplied. The linked study preserves the native
 code and historical Sage provenance without promoting a benchmark row.
 
+The [1 November EcGFp5 quotient-solve study](20261101-ecgfp5-quotient-solve/)
+keeps documentary PDF/SVG/PNG copies of a per-system Gröbner-basis cost measurement:
+whole-solve c_cyc 2^46.30–2^46.63 for D = 2^16 at three toy primes (msolve, one run per
+cell, shared host, tier L). Under the frozen G1 rule this is a CLOSE verdict. Weighted F4
+and Singular sba probes gave no improvement. It remains outside the admitted table: it is
+a stage cost, not an end-to-end solve, with no replay certificate or matched rho reference.
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
