@@ -4145,3 +4145,105 @@ about `1 %`, because the `176,064` Macaulay entries every arm still builds domin
 first B variant ranked ahead of A across the band, and the new baseline on this family.  If G2.144's
 per-column agreement is low, the replay misses often, each miss costs fill toward A's, and T lands
 between B and A at `0` GAE.  Either way the next lever after E35 is the matrix itself (§9.37).
+
+### 9.41 E36 pre-registration: pivot rules whose selection work fits the band
+
+*Registered 2026-11-02, before any E36 code.*  **Numbering:** E35 (a parallel experiment on this
+branch, a trace replay of B's pivot schedule) takes §9.40/§9.42; E36 takes §9.41 (this registration),
+§9.43 (results) and G2.154–G2.163.  **Question.**  §9.37 left no pivot rule ranked ahead of A across the
+band: B″ is ahead of A at `0` and `0.1` GAE and behind at `1` (`0.946`–`0.948`).  Is there a rule, with
+every native operation of its selection counted, that is ahead of A (and E25) at `0`, `0.1` **and**
+`1` GAE on every row?  **Class, fixed in advance:** a rule ahead of A at every weight on every row is a
+measured improvement of the baseline (engineering: a constant on the echelon); anything else is
+reported, not ranked.
+
+**The budget (derived from E33's records, before any code).**  Every rule spans the same row space
+with the same pivot columns, so on every call it builds the same matrix (the same `macaulay_entries`,
+fallbacks included) and returns the same normal forms and decompositions.  Hence, per call,
+`S_A(g) − S_X(g) = (C_A − C_X) − 97 g · sel_X`.  At `1` GAE a rule beats A only if
+`sel_X < (C_A − C_X)/97`.  Taking B (exact sparsest) as the best measured pivot quality,
+`(C_A − C_B)/97 = 2.96·10⁵/97 ≈ 3,050` native operations per call (Stage A means; `3,054`–`3,103`
+over E33's ten curves).  In the elimination each non-pivot candidate of a bucket is updated once and
+moved, so `Σ_c (|bucket_c| − 1)` equals the number of row updates, `≈ 4,060` per call (B″'s `4,070`
+comparisons, `8,121`/2 updates).  **Consequence:** any rule that pays at least one counted operation
+per row update or per non-pivot candidate — B, B′, B″, and B″'s estimate maintained in any way
+(candidate (a)) — costs `≥ 4·10³` operations, `≥ 3.9·10⁵` multiplications at `1` GAE, more than any
+rule can save.  Only rules whose selection work is `O(rows)` or `O(columns)` per call (`≤ 393` rows,
+`≤ 384` pivot columns) can rank.  The rules below are chosen to that budget; one rule that is
+predicted to lose at `1` GAE (K) tests the bound itself.
+
+**Counting rule** (§9.35's, extended): one native operation per matrix or equation entry examined
+for its zero status, per comparison of two candidates' keys, per maintained count or key update,
+per per-column branch decision that A does not make, and per row moved by a permutation.  As in
+§9.35, the bookkeeping A itself does (bucketing by lead, the lead scan, A's ordering of a bucket by
+row index, the swap) is common and not selection work.  **Arrival order** — the order in which rows
+enter a bucket (the initial scan in row order, then pushes in elimination order) — is maintained by
+that common bookkeeping and costs nothing to read; A discards it by sorting.  All rules: one new
+module, `src/cryptanalysis/chain_pivot_rules.rs`, a counted echelon beside E33's
+(`echelon_by_lead_counted` and every existing solver unchanged), new solver names, and a minimal
+dispatch hook in `klein_v4` (a small separate commit).
+
+- **F — arrival order** (`chain-fifo`): each column's pivot is the bucket's first row in arrival
+  order.  Rows still at their initial lead (never updated, as sparse as their equation) come first;
+  otherwise the row that arrived earliest.  **Selection work `0`.**  (Candidate (d), the degenerate
+  static order: the build order itself.)
+- **S — static order from the initial structure** (`chain-static`): once per call, each
+  triangularised equation's nonzero count (one op per coefficient examined), the equations ordered by
+  that count (comparisons counted; ties by equation index), and the built rows permuted into
+  `(equation count, equation, build order)` blocks (one op per row moved; inverse-permuted after the
+  echelon, bookkeeping); then A's rule (lowest index) on the permuted rows.  Work `≈ 113 + ≤ 45 + 393
+  ≈ 5·10²`.  (Candidate (d).)
+- **H — hybrid by a structural criterion** (`chain-fifo-static`): in a column whose bucket still
+  holds a never-updated row, F's choice (the first such row); in a column holding only updated rows,
+  S's choice (lowest permuted index).  The criterion is read from the bucket's initial length (one op
+  per contested column: the branch).  Work = S's + contested columns `≈ 5·10² + ≤ 384`.  (Candidate (b):
+  the estimate-free branch decided by a pre-registered, counted criterion.)
+- **K — bounded Markowitz search, `k = 2`** (`chain-est-k2`): B″'s maintained estimate (inherited
+  counts as B′/B″, two ops per updated row), but only the first two rows in arrival order are
+  compared (one comparison per contested column).  Work `≈ 506 + 8.1·10³ + ≤ 384 ≈ 9·10³`.
+  (Candidates (a)/(c); the test of the bound.)
+- **Negative control L — last arrival** (`chain-lifo`): the bucket's most recently arrived row (the
+  most recently updated, most filled).  Work `0`.  Must return the same decompositions and should cost
+  more than A.
+
+A fallback (the existing solver rerun) adds no selection work; the chain attempt's is charged.
+
+**Protocol.**  *Stage A:* E33's harness setting exactly (`examples/e33_stage_a.rs` → `examples/e36_stage_a.rs`):
+E25's ten curves, the first 1,000 targets of E25 arm A's stream, one thread, every solver per call from
+the same per-target seed: existing, A, A counted, B″, F, S, H, K, L.  Per call: outputs, degree,
+outcome, decomposition set, `C`, echelon multiplications, entries, selection work by part, lead-scan
+reads, pivot digest.  *Carry rule:* a rule goes end to end if its Stage A per-call mean `S(0.1)` is below
+A's on every curve; L is never carried.  *End to end:* `quartic_pipeline_gls` with `--karatsuba` (E27's
+command, E33's `run_e2e.sh` pattern), `RAYON_NUM_THREADS=4` on at most two cores, E25's ten curves, both
+arms.  *References:* A = E27's solver-A Karatsuba records; E25 = its own records (schoolbook), against X's
+schoolbook `S` = X's Karatsuba total plus the schoolbook re-pricing of the non-solve `F_{p⁴}` work measured
+on A (E31 A's total − E27 A's total, the same calls); rho = walk (iii) of E27 without the `[d]G` check
+(`experiments/32_walk_karatsuba/summary.json`).  Band: `S(g) = total_muls + 97 g (macaulay_entries +
+selection)`, `rho(g) = rho + 97 g · steps`.  A rank is stated only where the order holds at `0`, `0.1`
+and `1` GAE on every row.  *Sensitivities* (not used for ranks): (σ1) lead-scan reads priced for every arm;
+(σ2) every arm that orders a bucket by a key or an index (A, S, H's second branch) charged `|b| − 1`
+comparisons per contested column; (σ3) one op per contested column charged to every rule, F and L
+included.  Host: this container, at most two cores; isolab-eks is unreachable from it (no `aws`, no
+`kubectl`): operation counts only, no wall-time claim.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.154 | identity (**kill**) | F, S, H, K, L return the existing solver's decomposition set, outcome and degree on every Stage A call and every end-to-end record; the end-to-end records equal E27's A records in every field except the solve's multiplications and what derives from them, the selection fields and the tag; A, A counted, B″ and the existing solver reproduce E33's Stage A per-call `C`, echelon and selection counts on every call; rerunning `macaulay`, `chain`, `chain-sparsest`, `chain-sparsest-est` and `chain --karatsuba` at `p = 101` seed 2 with the new binary reproduces the stored records (wall times aside).  Negative controls: E31's perturbed coefficient changes every non-empty set under each new rule; F's and L's digests differ from A's on calls with a contested column; S's permutation inverse-mapped wrong by one row is detected | any difference, or a control not detected (E36 then stops) |
+| G2.155 | selection work per call (Stage A mean) | F, L `0` exactly; S in `[400, 700]`; H − S in `[1, 384]`; K in `[8.0·10³, 1.0·10⁴]` | outside |
+| G2.156 | F's pivot quality | `C_A / C_F` (means) in `[1.2, 1.7]` and `C_F / C_B″` in `[0.85, 1.3]` on every curve | outside |
+| G2.157 | S | `C_A / C_S` in `[0.9, 1.3]` on every curve (a static key distinguishes only equations) | outside |
+| G2.158 | H against F | `C_H / C_F` in `[0.9, 1.1]` on every curve | outside |
+| G2.159 | K | `C_K / C_B″` in `[0.95, 1.25]`; K behind A at `1` GAE on every curve (the bound) | outside, or K ahead of A at `1` GAE on any curve |
+| G2.160 | negative control L | `C_L > C_A` on every curve | `C_L ≤ C_A` on any curve |
+| G2.161 | Stage A band against A | F ahead of A at every weight on every curve; S and H ahead of A at every weight on every curve iff `C_A − C_X > 97 · sel_X` (predicted: H yes, S no); no rank decided here changes under σ1–σ3 | F behind A at any weight on any curve; a rank changes under σ1–σ3 |
+| G2.162 | end to end (carried rules, 20 rows) | F: `S_A / S_F` in `[1.2, 1.7]` (`0`), `[1.02, 1.15]` (`0.1`), `[1.002, 1.02]` (`1` GAE) on every row; `S_E25 / S_F > 1` at every weight on every row — **F ranked ahead of A and E25 across the band** | F behind A or E25 at any weight on any row (F then unranked) |
+| G2.163 | distance to the matched rho (walk (iii)) | rho ahead of every row of every rule at every weight; F's `S / rho` at `0` GAE in `[3.5·10³, 3.4·10⁵]` | any row below rho, or outside |
+
+**What it would say.**  If G2.154 and G2.162 hold, a pivot rule that reads nothing — the order rows
+arrive in a bucket — keeps most of B's saving with no selection work, so it is ahead of A at every
+weight of the band: a ranked (small at `1` GAE, `≈ 1 %`) engineering improvement of the `k = 4` solve,
+with the same relations, logs and walks.  It would also say why B″ lost: its saving was real, but it
+paid for it per row update, which the band prices above any saving.  At `1` GAE the matrix entries
+(`≈ 1.8·10⁵` per call) remain almost all of `S`; no pivot rule changes that, and the rows stay
+`≳ 10⁴×` from the matched rho at `1` GAE.  If F does not beat A, the arrival order is not informative and
+the result is a negative for candidate (d).
