@@ -1804,8 +1804,10 @@ fn main() {
             let lifts = args.get(11).is_some_and(|v| v == "1");
             println!(
                 "{}",
-                serde_json::to_string(&f4cost_m(k, &args[3], t, g, n, seed, cap, nsum, mode, lifts))
-                    .unwrap()
+                serde_json::to_string(&f4cost_m(
+                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts
+                ))
+                .unwrap()
             );
         }
         "summarise" => {

@@ -1896,7 +1896,8 @@ mod tests {
                         "projected sum equals projected target"
                     );
                     let lhs = idx.iter().fold(0u128, |acc, &i| {
-                        (acc + fb.coef_of[i] as u128 * col_log[fb.col_of[i]] as u128) % inst.r as u128
+                        (acc + fb.coef_of[i] as u128 * col_log[fb.col_of[i]] as u128)
+                            % inst.r as u128
                     });
                     assert_eq!(
                         lhs,
