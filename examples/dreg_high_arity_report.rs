@@ -190,7 +190,70 @@ fn digest_file(path: &Path) -> Result<(String, u64), String> {
     Ok((format!("{:x}", hasher.finalize()), metadata.len()))
 }
 
-fn parse_protocol(value: &Value, protocol_path: &Path) -> Result<Protocol, String> {
+fn validate_binary_manifest(
+    path: &Path,
+    expected: [(&str, &str); 4],
+    report_executable: &Path,
+) -> Result<String, String> {
+    let metadata = fs::symlink_metadata(path)
+        .map_err(|e| format!("cannot inspect {}: {e}", path.display()))?;
+    if !metadata.is_file() || metadata.file_type().is_symlink() {
+        return Err(format!(
+            "binary manifest is not an ordinary file: {}",
+            path.display()
+        ));
+    }
+    if metadata.len() > 4096 {
+        return Err(format!(
+            "binary manifest is unexpectedly large: {}",
+            path.display()
+        ));
+    }
+    let bytes = fs::read(path).map_err(|e| format!("cannot read {}: {e}", path.display()))?;
+    let text =
+        std::str::from_utf8(&bytes).map_err(|e| format!("{} is not UTF-8: {e}", path.display()))?;
+    if !text.ends_with('\n') {
+        return Err(format!(
+            "binary manifest lacks its canonical terminal newline: {}",
+            path.display()
+        ));
+    }
+    let rows: Vec<_> = text.lines().collect();
+    if rows.len() != expected.len() {
+        return Err(format!(
+            "binary manifest has {} rows, expected exactly {}",
+            rows.len(),
+            expected.len()
+        ));
+    }
+    for (index, (line, (expected_label, expected_hash))) in rows.iter().zip(expected).enumerate() {
+        let fields: Vec<_> = line.split_whitespace().collect();
+        if fields.len() != 2
+            || !is_hex(fields[0], 64)
+            || *line != format!("{}  {}", fields[0], fields[1])
+        {
+            return Err(format!(
+                "{}:{}: malformed noncanonical binary manifest row",
+                path.display(),
+                index + 1
+            ));
+        }
+        if fields[1] != expected_label || fields[0] != expected_hash {
+            return Err(format!("binary manifest mismatch for {expected_label}"));
+        }
+    }
+    let (running_sha256, _) = digest_file(report_executable)?;
+    if running_sha256 != expected[3].1 {
+        return Err("running report binary differs from the frozen manifest".into());
+    }
+    Ok(digest(&bytes))
+}
+
+fn parse_protocol_with_executable(
+    value: &Value,
+    protocol_path: &Path,
+    report_executable: &Path,
+) -> Result<Protocol, String> {
     object(value, "protocol")?;
     if string(value, "schema", "protocol")? != "experiment.protocol/v1" {
         return Err("protocol has the wrong schema".into());
@@ -223,7 +286,6 @@ fn parse_protocol(value: &Value, protocol_path: &Path) -> Result<Protocol, Strin
         .parent()
         .unwrap_or_else(|| Path::new("."))
         .join("binary.sha256");
-    let (binary_manifest_sha256, _) = digest_file(&binary_manifest_path)?;
     let raw_arms = array(value, "arms", "protocol")?;
     if raw_arms.len() != 5 {
         return Err(format!(
@@ -234,6 +296,7 @@ fn parse_protocol(value: &Value, protocol_path: &Path) -> Result<Protocol, Strin
     let mut arms = Vec::new();
     let mut ids = BTreeSet::new();
     let mut commits = BTreeSet::new();
+    let mut closure_hashes = BTreeSet::new();
     let mut ladder_hashes = BTreeSet::new();
     let mut analyzer_hashes = BTreeSet::new();
     let mut report_hashes = BTreeSet::new();
@@ -267,6 +330,7 @@ fn parse_protocol(value: &Value, protocol_path: &Path) -> Result<Protocol, Strin
             ));
         }
         commits.insert(commit.clone());
+        closure_hashes.insert(binary.clone());
         let image_digest = instrument
             .get("image_digest")
             .and_then(Value::as_str)
@@ -296,9 +360,27 @@ fn parse_protocol(value: &Value, protocol_path: &Path) -> Result<Protocol, Strin
     if commits.len() != 1 || commits.first().map(String::as_str) != Some(freeze_commit) {
         return Err("protocol arms do not share the frozen source commit".into());
     }
-    if ladder_hashes.len() != 1 || analyzer_hashes.len() != 1 || report_hashes.len() != 1 {
-        return Err("protocol arms disagree on auxiliary binary identities".into());
+    if closure_hashes.len() != 1
+        || ladder_hashes.len() != 1
+        || analyzer_hashes.len() != 1
+        || report_hashes.len() != 1
+    {
+        return Err("protocol arms disagree on frozen binary identities".into());
     }
+    let closure_sha256 = closure_hashes.iter().next().expect("five arms");
+    let ladder_sha256 = ladder_hashes.iter().next().expect("five arms");
+    let analyzer_sha256 = analyzer_hashes.iter().next().expect("five arms");
+    let report_sha256 = report_hashes.iter().next().expect("five arms");
+    let binary_manifest_sha256 = validate_binary_manifest(
+        &binary_manifest_path,
+        [
+            ("dreg_ladder", ladder_sha256),
+            ("dreg_closure", closure_sha256),
+            ("dreg_high_arity_analyze", analyzer_sha256),
+            ("dreg_high_arity_report", report_sha256),
+        ],
+        report_executable,
+    )?;
     let analysis = value
         .get("analysis_plan")
         .and_then(|v| v.get("script"))
@@ -359,15 +441,20 @@ fn parse_protocol(value: &Value, protocol_path: &Path) -> Result<Protocol, Strin
         source_commit: freeze_commit.to_string(),
         backend,
         arms,
-        ladder_sha256: ladder_hashes.into_iter().next().expect("five arms"),
-        analyzer_sha256: analyzer_hashes.into_iter().next().expect("five arms"),
-        report_sha256: report_hashes.into_iter().next().expect("five arms"),
+        ladder_sha256: ladder_sha256.to_string(),
+        analyzer_sha256: analyzer_sha256.to_string(),
+        report_sha256: report_sha256.to_string(),
         protocol_path: canonical_protocol_path,
         binary_manifest_path,
         binary_manifest_sha256,
         analysis_path,
         analysis_sha256: analysis_sha256.to_string(),
     })
+}
+
+fn parse_protocol(value: &Value, protocol_path: &Path) -> Result<Protocol, String> {
+    let current_exe = env::current_exe().map_err(|e| format!("current executable: {e}"))?;
+    parse_protocol_with_executable(value, protocol_path, &current_exe)
 }
 
 const REGISTERED_CELLS: [&str; 3] = ["m5-n11-l2", "m5-n13-l3", "m6-n11-l2"];
@@ -937,10 +1024,7 @@ fn validate_summary(value: &Value, protocol: &Protocol) -> Result<(), String> {
 }
 
 fn markdown_escape(value: &str) -> String {
-    value
-        .replace('|', "\\|")
-        .replace('\r', " ")
-        .replace('\n', " ")
+    value.replace('|', "\\|").replace(['\r', '\n'], " ")
 }
 
 fn xml_escape(value: &str) -> String {
@@ -956,8 +1040,7 @@ fn typst_string(value: &str) -> String {
     value
         .replace('\\', "\\\\")
         .replace('"', "\\\"")
-        .replace('\r', " ")
-        .replace('\n', " ")
+        .replace(['\r', '\n'], " ")
 }
 
 fn status(global: &str) -> (&'static str, &'static str) {
@@ -1492,7 +1575,7 @@ fn render_pdf(
     }
     stream.push_str("ET\n");
 
-    let objects = vec![
+    let objects = [
         "<< /Type /Catalog /Pages 2 0 R >>".as_bytes().to_vec(),
         "<< /Type /Pages /Kids [3 0 R] /Count 1 >>"
             .as_bytes()
@@ -1884,7 +1967,7 @@ fn package_run(
         "replicate": 0,
         "warmup": false,
         "status": status,
-        "outcome_class": if valid { "completed" } else { "not_completed" },
+        "outcome_class": if valid || invalid { "completed" } else { "not_completed" },
         "attempts": composite_attempts,
         "resumed": resumed,
         "checkpoint": null,
@@ -1970,8 +2053,12 @@ fn compute_flow(runs: &[Value]) -> Value {
         .count();
     let resumed = runs
         .iter()
-        .filter_map(|run| run.get("resumed").and_then(Value::as_u64))
-        .sum::<u64>();
+        .filter(|run| {
+            run.get("resumed")
+                .and_then(Value::as_u64)
+                .is_some_and(|count| count > 0)
+        })
+        .count();
     json!({
         "planned": runs.len(),
         "attempted": runs.len(),
@@ -2320,6 +2407,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::process::{Command, Output};
     use std::time::{SystemTime, UNIX_EPOCH};
 
     fn validation_protocol() -> (Protocol, PathBuf) {
@@ -2538,6 +2626,309 @@ mod tests {
         json!({"global_classification": global, "cells": cells, "rows": rows})
     }
 
+    fn unique_fixture_root(label: &str) -> PathBuf {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock after epoch")
+            .as_nanos();
+        std::env::temp_dir().join(format!(
+            "dreg_high_arity_report_{label}_{}_{}",
+            std::process::id(),
+            nonce
+        ))
+    }
+
+    fn canonical_checker() -> PathBuf {
+        if let Some(path) = std::env::var_os("DREG_EXPERIMENT_PROTOCOL_CHECKER") {
+            return PathBuf::from(path);
+        }
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("crypto checkout has a parent")
+            .join("crypto-autoresearcher/tools/experiment_protocol.py")
+    }
+
+    fn checker_output(checker: &Path, export: &Path, protocol: &Path) -> Output {
+        Command::new("python3")
+            .arg(checker)
+            .arg("check-export")
+            .arg(export)
+            .arg("--protocol")
+            .arg(protocol)
+            .arg("--verify-files")
+            .output()
+            .expect("run canonical experiment export checker")
+    }
+
+    fn write_synthetic_protocol(root: &Path, report_executable: &Path) -> (PathBuf, Protocol) {
+        let repository = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let study = root.join("study");
+        fs::create_dir_all(&study).expect("create synthetic study directory");
+        let analyzer_path = study.join("analyzer.rs");
+        fs::write(&analyzer_path, b"// synthetic frozen analyzer fixture\n")
+            .expect("write synthetic analyzer");
+        let analyzer_source_sha256 = digest_file(&analyzer_path).unwrap().0;
+        fs::copy(
+            repository.join("research/dreg_high_arity_20261101/REPORT_EXPORT_CONTRACT.md"),
+            study.join("REPORT_EXPORT_CONTRACT.md"),
+        )
+        .expect("copy publication contract");
+        fs::write(
+            study.join("sources.sha256"),
+            format!("{analyzer_source_sha256}  analyzer.rs\n"),
+        )
+        .expect("write source manifest");
+
+        let report_sha256 = digest_file(report_executable).unwrap().0;
+        let ladder_sha256 = "1".repeat(64);
+        let closure_sha256 = "2".repeat(64);
+        let analyzer_sha256 = "3".repeat(64);
+        fs::write(
+            study.join("binary.sha256"),
+            format!(
+                "{ladder_sha256}  dreg_ladder\n{closure_sha256}  dreg_closure\n{analyzer_sha256}  dreg_high_arity_analyze\n{report_sha256}  dreg_high_arity_report\n"
+            ),
+        )
+        .expect("write synthetic binary manifest");
+
+        let (_, mut value) =
+            read_json(&repository.join("research/dreg_high_arity_20261101/protocol.json"))
+                .expect("read registered protocol template");
+        value["analysis_plan"]["script"]["path"] = json!("analyzer.rs");
+        value["analysis_plan"]["script"]["sha256"] = json!(analyzer_source_sha256);
+        let source_commit = "f".repeat(40);
+        for arm in value["arms"].as_array_mut().expect("protocol arms") {
+            arm["instrument"]["commit"] = json!(source_commit.clone());
+            arm["instrument"]["binary_sha256"] = json!(closure_sha256);
+            arm["instrument"]["flags"]["ladder_binary_sha256"] = json!(ladder_sha256);
+            arm["instrument"]["flags"]["analyzer_binary_sha256"] = json!(analyzer_sha256);
+            arm["instrument"]["flags"]["report_binary_sha256"] = json!(report_sha256);
+            arm["instrument"]["flags"]["analyzer_source_sha256"] = json!(analyzer_source_sha256);
+        }
+        let mut canonical_body = value.clone();
+        canonical_body
+            .as_object_mut()
+            .expect("protocol object")
+            .remove("freeze");
+        value["freeze"] = json!({
+            "status":"frozen",
+            "protocol_sha256":digest(&serde_json::to_vec(&canonical_body).unwrap()),
+            "commit":source_commit,
+            "frozen_at":"2026-11-01T00:00:00Z",
+            "filed_before_affected_data":true
+        });
+        let protocol_path = study.join("protocol.json");
+        let mut protocol_bytes = serde_json::to_vec_pretty(&value).unwrap();
+        protocol_bytes.push(b'\n');
+        fs::write(&protocol_path, protocol_bytes).expect("write synthetic protocol");
+        let protocol = parse_protocol_with_executable(&value, &protocol_path, report_executable)
+            .expect("parse synthetic frozen protocol");
+        (protocol_path, protocol)
+    }
+
+    fn install_synthetic_bundle(
+        root: &Path,
+        label: &str,
+        protocol_path: &Path,
+        protocol: &Protocol,
+        invalid_resume: bool,
+    ) -> (Args, PathBuf) {
+        let case_root = root.join(label);
+        let draw_dir = case_root.join("draws");
+        let output_root = case_root.join("output");
+        fs::create_dir_all(&draw_dir).expect("create synthetic draw directory");
+        fs::create_dir_all(&output_root).expect("create synthetic output directory");
+        let marker = draw_dir.join("registered-panel.jsonl");
+        fs::write(&marker, b"{\"fixture\":true}\n").expect("write synthetic evidence marker");
+
+        let mut summary = consistent_summary(protocol);
+        summary["draw_dir"] = json!(fs::canonicalize(&draw_dir).unwrap());
+        summary["output_root"] = json!(fs::canonicalize(&output_root).unwrap());
+        if invalid_resume {
+            invalidate_for_resume(&mut summary);
+            summary["rows"][0]["attempts"][0]["checkpoint_restored"] = json!(true);
+        }
+        let mut summary_bytes = serde_json::to_vec_pretty(&summary).unwrap();
+        summary_bytes.push(b'\n');
+        let summary_path = output_root.join("summary.json");
+        fs::write(&summary_path, &summary_bytes).expect("write synthetic summary");
+        let out_dir = output_root.join(format!(
+            "reports/run-DREG-HIGH-ARITY-{}",
+            &digest(&summary_bytes)[..16]
+        ));
+        let args = Args {
+            summary: summary_path,
+            protocol: protocol_path.to_path_buf(),
+            out_dir,
+            check: false,
+        };
+        let bundle = build(&args).expect("build synthetic publication bundle");
+        install_atomic(&args.out_dir, &bundle).expect("install synthetic publication bundle");
+        (args, marker)
+    }
+
+    #[test]
+    fn binary_manifest_binds_exact_rows_and_running_report() {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock after epoch")
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "dreg_high_arity_report_manifest_{}_{}",
+            std::process::id(),
+            nonce
+        ));
+        fs::create_dir(&directory).expect("create manifest test directory");
+        let executable = directory.join("report");
+        fs::write(&executable, b"synthetic frozen report executable")
+            .expect("write synthetic executable");
+        let report_sha256 = digest_file(&executable).unwrap().0;
+        let ladder_sha256 = "1".repeat(64);
+        let closure_sha256 = "2".repeat(64);
+        let analyzer_sha256 = "3".repeat(64);
+        let manifest = directory.join("binary.sha256");
+        let canonical = format!(
+            "{ladder_sha256}  dreg_ladder\n{closure_sha256}  dreg_closure\n{analyzer_sha256}  dreg_high_arity_analyze\n{report_sha256}  dreg_high_arity_report\n"
+        );
+        fs::write(&manifest, &canonical).expect("write canonical manifest");
+        let expected = [
+            ("dreg_ladder", ladder_sha256.as_str()),
+            ("dreg_closure", closure_sha256.as_str()),
+            ("dreg_high_arity_analyze", analyzer_sha256.as_str()),
+            ("dreg_high_arity_report", report_sha256.as_str()),
+        ];
+        assert_eq!(
+            validate_binary_manifest(&manifest, expected, &executable).unwrap(),
+            digest(canonical.as_bytes())
+        );
+
+        fs::write(
+            &manifest,
+            format!("{canonical}{}  unregistered_binary\n", "4".repeat(64)),
+        )
+        .expect("write extra row");
+        assert!(validate_binary_manifest(&manifest, expected, &executable).is_err());
+
+        fs::write(
+            &manifest,
+            canonical.replacen("  dreg_closure", " dreg_closure", 1),
+        )
+        .expect("write noncanonical spacing");
+        assert!(validate_binary_manifest(&manifest, expected, &executable).is_err());
+
+        fs::write(&manifest, &canonical).expect("restore canonical manifest");
+        fs::write(&executable, b"different report executable").expect("alter executable");
+        assert!(validate_binary_manifest(&manifest, expected, &executable).is_err());
+        fs::remove_dir_all(directory).expect("remove manifest test directory");
+    }
+
+    #[test]
+    #[ignore = "requires the canonical crypto-autoresearcher export checker"]
+    fn synthetic_full_bundles_pass_canonical_schema_and_file_verification() {
+        let checker = canonical_checker();
+        assert!(
+            checker.is_file(),
+            "set DREG_EXPERIMENT_PROTOCOL_CHECKER to the canonical experiment_protocol.py"
+        );
+        let root = unique_fixture_root("canonical_export");
+        fs::create_dir(&root).expect("create synthetic export fixture root");
+        let report_executable = env::current_exe().expect("resolve report test executable");
+        let (protocol_path, protocol) = write_synthetic_protocol(&root, &report_executable);
+        let (valid_args, evidence_marker) =
+            install_synthetic_bundle(&root, "valid", &protocol_path, &protocol, false);
+        let (invalid_args, _) =
+            install_synthetic_bundle(&root, "invalid", &protocol_path, &protocol, true);
+
+        for args in [&valid_args, &invalid_args] {
+            let export_path = args.out_dir.join("experiment.export.json");
+            let checked = checker_output(&checker, &export_path, &protocol_path);
+            assert!(
+                checked.status.success(),
+                "canonical checker rejected synthetic bundle:\nstdout:\n{}\nstderr:\n{}",
+                String::from_utf8_lossy(&checked.stdout),
+                String::from_utf8_lossy(&checked.stderr)
+            );
+            let regenerated = build(args).expect("regenerate synthetic bundle");
+            check_exact(&args.out_dir, &regenerated).expect("bundle is byte-exact");
+        }
+
+        let (_, valid_export) =
+            read_json(&valid_args.out_dir.join("experiment.export.json")).unwrap();
+        assert_eq!(valid_export["schema"], "experiment.export/v1");
+        assert_eq!(valid_export["runs"].as_array().unwrap().len(), 5);
+        assert_eq!(
+            valid_export["backend_record"]["rows"]
+                .as_array()
+                .unwrap()
+                .len(),
+            19
+        );
+        assert_eq!(valid_export["reviews_dir"], "../reviews");
+        let marker_relative = relative_path(
+            &valid_args.out_dir,
+            &fs::canonicalize(&evidence_marker).unwrap(),
+        )
+        .unwrap();
+        assert!(valid_export["files"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|entry| {
+                entry.get("path").and_then(Value::as_str) == Some(marker_relative.as_str())
+            }));
+
+        let svg = fs::read_to_string(valid_args.out_dir.join("closure-outcomes.svg")).unwrap();
+        assert!(svg.contains("role=\"img\" aria-labelledby=\"title desc\""));
+        assert!(svg.contains("<title id=\"title\">"));
+        assert!(svg.contains("<desc id=\"desc\">"));
+        assert_eq!(svg.matches("<g id=\"row-").count(), 19);
+        let pdf = fs::read(valid_args.out_dir.join("report.pdf")).unwrap();
+        let pdf_text = String::from_utf8_lossy(&pdf);
+        assert!(pdf_text.contains("All 19 subprocess classifications"));
+        assert!(pdf_text.contains(&format!("Protocol: {} v{}", protocol.id, protocol.version)));
+        for package in [
+            "identity-replay",
+            "satisfiable-controls",
+            "m5-n11-l2",
+            "m5-n13-l3",
+            "m6-n11-l2",
+        ] {
+            assert!(pdf_text.contains(package));
+        }
+
+        let (_, invalid_export) =
+            read_json(&invalid_args.out_dir.join("experiment.export.json")).unwrap();
+        assert!(invalid_export["runs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|run| {
+                run["status"] == "failed"
+                    && run["outcome_class"] == "completed"
+                    && run["verification"]["status"] == "error"
+            }));
+        assert_eq!(invalid_export["flow"]["resumed"], 1);
+
+        fs::write(&evidence_marker, b"{\"fixture\":false}\n")
+            .expect("alter retained immutable input");
+        let stale = checker_output(
+            &checker,
+            &valid_args.out_dir.join("experiment.export.json"),
+            &protocol_path,
+        );
+        assert!(!stale.status.success());
+        fs::write(&evidence_marker, b"{\"fixture\":true}\n")
+            .expect("restore retained immutable input");
+        let restored = checker_output(
+            &checker,
+            &valid_args.out_dir.join("experiment.export.json"),
+            &protocol_path,
+        );
+        assert!(restored.status.success());
+
+        fs::remove_dir_all(root).expect("remove synthetic export fixture root");
+    }
+
     #[test]
     fn visual_keeps_unmeasured_rows_visible() {
         let svg = render_svg(&summary("unmeasured", "unmeasured")).unwrap();
@@ -2587,6 +2978,42 @@ mod tests {
             row["measurements"]["counters"]["resource_interrupted_attempts"],
             5
         );
+    }
+
+    #[test]
+    fn failed_packages_and_resumed_flow_match_canonical_export_semantics() {
+        let arm = Arm {
+            id: "m5-n11-l2".into(),
+            role: "candidate".into(),
+            binary_sha256: "0".repeat(64),
+            commit: "0".repeat(40),
+            image_digest: None,
+        };
+        let run_id = "unsat-m5-n11-l2-d0";
+        let summary = json!({"rows":[{
+            "run_id":run_id,"classification":"invalid_record","attempts":[
+                {"termination":"nonzero_exit","checkpoint_restored":true}
+            ]
+        }]});
+        let package = json!({
+            "package_id":arm.id,"classification":"invalid_instrument",
+            "subprocesses":[run_id]
+        });
+        let evidence = vec![json!({
+            "path":"../../summary.json","sha256":"0".repeat(64),"bytes":1,"kind":"summary"
+        })];
+        let failed = package_run(&package, &arm, &summary, &evidence).unwrap();
+        assert_eq!(failed["status"], "failed");
+        assert_eq!(failed["outcome_class"], "completed");
+        assert_eq!(failed["verification"]["status"], "error");
+
+        let mut second = failed.clone();
+        second["run_id"] = json!("package-m5-n13-l3");
+        second["resumed"] = json!(3);
+        let flow = compute_flow(&[failed, second]);
+        assert_eq!(flow["completed"], 2);
+        assert_eq!(flow["not_completed"], 0);
+        assert_eq!(flow["resumed"], 2);
     }
 
     #[test]

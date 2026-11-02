@@ -6,6 +6,9 @@ set -euo pipefail
 usage() {
   cat >&2 <<'EOF'
 usage: run.sh LADDER_BIN CLOSURE_BIN ANALYZER_BIN REPORT_BIN STEP
+       run.sh --verify-source-tree-only REPO SOURCE_COMMIT SOURCE_MANIFEST
+       run.sh --verify-dep-info-only REPO DEP_INFO [DEP_INFO ...]
+       run.sh --verify-binary-manifest-only MANIFEST LADDER_SHA CLOSURE_SHA ANALYZER_SHA REPORT_SHA
 
 STEP is one of:
   gen-m5-n11-l2
@@ -24,18 +27,43 @@ EOF
   exit 2
 }
 
-[[ $# -eq 5 ]] || usage
-LADDER_ARG=$1
-CLOSURE_ARG=$2
-ANALYZER_ARG=$3
-REPORT_ARG=$4
-STEP=$5
+SOURCE_TREE_ONLY=false
+DEP_INFO_ONLY=false
+BINARY_MANIFEST_ONLY=false
+if [[ ${1:-} == --verify-source-tree-only ]]; then
+  [[ $# -eq 4 ]] || usage
+  SOURCE_TREE_REPO=$2
+  SOURCE_TREE_COMMIT=$3
+  SOURCE_TREE_MANIFEST=$4
+  SOURCE_TREE_ONLY=true
+elif [[ ${1:-} == --verify-dep-info-only ]]; then
+  [[ $# -ge 3 ]] || usage
+  DEP_INFO_REPO=$2
+  DEP_INFO_FILES=("${@:3}")
+  DEP_INFO_ONLY=true
+elif [[ ${1:-} == --verify-binary-manifest-only ]]; then
+  [[ $# -eq 6 ]] || usage
+  BINARY_MANIFEST_OVERRIDE=$2
+  BINARY_MANIFEST_HASHES=("${@:3}")
+  BINARY_MANIFEST_ONLY=true
+else
+  [[ $# -eq 5 ]] || usage
+  LADDER_ARG=$1
+  CLOSURE_ARG=$2
+  ANALYZER_ARG=$3
+  REPORT_ARG=$4
+  STEP=$5
+fi
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../.." && pwd)
 PROTOCOL=$HERE/protocol.json
 SOURCE_MANIFEST=$HERE/sources.sha256
-BINARY_MANIFEST=$HERE/binary.sha256
+if [[ $BINARY_MANIFEST_ONLY == true ]]; then
+  BINARY_MANIFEST=$BINARY_MANIFEST_OVERRIDE
+else
+  BINARY_MANIFEST=$HERE/binary.sha256
+fi
 DRAWS=$(realpath -m "${DREG_DRAWS_DIR:-$HERE/draws}")
 OUTPUT_ROOT=$(realpath -m "${DREG_OUTPUT_ROOT:-$HERE}")
 RUNS=$OUTPUT_ROOT/runs
@@ -58,6 +86,50 @@ SCIENTIFIC_ENV=(
 )
 
 CELLS=("5:11:2:43:44" "5:13:3:54:52" "6:11:2:56:55")
+
+# Every repository-local Rust package that the four frozen examples compile is
+# part of the scientific source identity. Directory pathspecs deliberately
+# reject both changes to existing files and newly added source files.
+FROZEN_SOURCE_PATHS=(
+  Cargo.toml
+  Cargo.lock
+  build.rs
+  src
+  crates/ecdl-tensor-ic/Cargo.toml
+  crates/ecdl-tensor-ic/src
+  crates/hashed-ecdl-tensor/Cargo.toml
+  crates/hashed-ecdl-tensor/src
+  tools/factor-base/Cargo.toml
+  tools/factor-base/Cargo.lock
+  tools/factor-base/src
+  isogeny_algos/Cargo.toml
+  isogeny_algos/src
+  research/pencil_large_prime_20261029/Cargo.toml
+  research/pencil_large_prime_20261029/src
+  tools/volcano-cli/Cargo.toml
+  tools/volcano-cli/src
+  docs/curves/registry.json
+  docs/curves/standards/parameters.json
+  docs/ecbench/schema.sql
+  docs/ic/boundary_targets.json
+  docs/ic/calibration.json
+  examples/dreg_ladder.rs
+  examples/dreg_closure.rs
+  examples/dreg_high_arity_analyze.rs
+  examples/dreg_high_arity_report.rs
+  research/dreg_high_arity_20261101/run.sh
+  research/dreg_high_arity_20261101/test-source-bindings.sh
+  research/dreg_high_arity_20261101/REPORT_EXPORT_CONTRACT.md
+  research/dreg_high_arity_20261101/sources.sha256
+)
+
+# These files are populated only after the immutable source commit and binary
+# build exist. They must be clean at execution time, but cannot equal the
+# earlier source commit by construction.
+FROZEN_POST_SOURCE_PATHS=(
+  research/dreg_high_arity_20261101/binary.sha256
+  research/dreg_high_arity_20261101/protocol.json
+)
 
 die() {
   echo "error: $*" >&2
@@ -266,18 +338,81 @@ cell_shape() {
   return 1
 }
 
-manifest_hash() {
-  local label=$1
-  awk -v label="$label" '
-    $1 ~ /^[0-9a-f]{64}$/ && $2 == label { value=$1; count++ }
-    END { if (count == 1) print value; else exit 1 }
-  ' "$BINARY_MANIFEST"
+verify_binary_manifest() {
+  local expected_hashes=("$@")
+  local expected_labels=(
+    dreg_ladder
+    dreg_closure
+    dreg_high_arity_analyze
+    dreg_high_arity_report
+  )
+  local index size
+  [[ ${#expected_hashes[@]} -eq ${#expected_labels[@]} ]] || return 1
+  [[ -f $BINARY_MANIFEST && ! -L $BINARY_MANIFEST ]] || return 1
+  size=$(stat -c %s -- "$BINARY_MANIFEST") || return 1
+  ((size <= 4096)) || return 1
+
+  for index in "${!expected_labels[@]}"; do
+    is_hex 64 "${expected_hashes[$index]}" || return 1
+  done
+  cmp -s -- "$BINARY_MANIFEST" <(
+    for index in "${!expected_labels[@]}"; do
+      printf '%s  %s\n' "${expected_hashes[$index]}" "${expected_labels[$index]}"
+    done
+  )
 }
 
 protocol_body_hash() {
   local canonical
   canonical=$(jq -cS 'del(.freeze)' "$PROTOCOL") || return 1
   printf '%s' "$canonical" | sha256sum | awk '{print $1}'
+}
+
+verify_source_tree() {
+  local repository=$1 source_commit=$2 source_manifest=$3
+  repository=$(realpath -e "$repository") || return 1
+  source_manifest=$(realpath -e "$source_manifest") || return 1
+  is_hex 40 "$source_commit" || return 1
+
+  (
+    cd "$repository"
+    sha256sum -c "$source_manifest" || exit 1
+    git cat-file -e "$source_commit^{commit}" || exit 1
+    git merge-base --is-ancestor "$source_commit" HEAD || exit 1
+    git diff --quiet || exit 1
+    git diff --cached --quiet || exit 1
+    git diff --quiet "$source_commit" -- "${FROZEN_SOURCE_PATHS[@]}" || exit 1
+    [[ -z $(git status --porcelain --untracked-files=all -- \
+      "${FROZEN_SOURCE_PATHS[@]}" "${FROZEN_POST_SOURCE_PATHS[@]}") ]] || exit 1
+  )
+}
+
+source_path_registered() {
+  local candidate=$1 registered
+  for registered in "${FROZEN_SOURCE_PATHS[@]}"; do
+    if [[ $candidate == "$registered" || $candidate == "$registered/"* ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+verify_dep_info_coverage() {
+  local repository=$1 dep_info token relative missing=0
+  shift
+  repository=$(realpath -e "$repository") || return 1
+  for dep_info in "$@"; do
+    dep_info=$(realpath -e "$dep_info") || return 1
+    while IFS= read -r token; do
+      [[ $token == "$repository/"* ]] || continue
+      relative=${token#"$repository/"}
+      if ! source_path_registered "$relative"; then
+        echo "unregistered repository input in $dep_info: $relative" >&2
+        missing=1
+      fi
+    done < <(tr '[:space:]' '\n' <"$dep_info")
+  done
+  ((missing == 0))
 }
 
 verify_bindings() {
@@ -300,12 +435,8 @@ verify_bindings() {
   CLOSURE_SOURCE_SHA=$(sha256sum "$REPO/examples/dreg_closure.rs" | awk '{print $1}')
   ANALYZER_SOURCE_SHA=$(sha256sum "$REPO/examples/dreg_high_arity_analyze.rs" | awk '{print $1}')
   REPORT_SOURCE_SHA=$(sha256sum "$REPO/examples/dreg_high_arity_report.rs" | awk '{print $1}')
-  [[ $LADDER_SHA == "$(manifest_hash dreg_ladder)" ]] || die "ladder binary hash mismatch"
-  [[ $CLOSURE_SHA == "$(manifest_hash dreg_closure)" ]] || die "closure binary hash mismatch"
-  [[ $ANALYZER_SHA == "$(manifest_hash dreg_high_arity_analyze)" ]] ||
-    die "analyzer binary hash mismatch"
-  [[ $REPORT_SHA == "$(manifest_hash dreg_high_arity_report)" ]] ||
-    die "report binary hash mismatch"
+  verify_binary_manifest "$LADDER_SHA" "$CLOSURE_SHA" "$ANALYZER_SHA" "$REPORT_SHA" ||
+    die "binary manifest is not the exact canonical ordered four-row identity"
 
   PROTOCOL_SHA=$(jq -er '.freeze.protocol_sha256' "$PROTOCOL") ||
     die "protocol has no frozen hash"
@@ -346,32 +477,8 @@ verify_bindings() {
       .analysis_plan.script.sha256 == $analyzer_source
     ' "$PROTOCOL" >/dev/null || die "protocol instrument identity is incomplete or mismatched"
 
-  (
-    cd "$REPO"
-    sha256sum -c "$SOURCE_MANIFEST"
-    git cat-file -e "$SOURCE_COMMIT^{commit}"
-    git merge-base --is-ancestor "$SOURCE_COMMIT" HEAD
-    git diff --quiet
-    git diff --cached --quiet
-    git diff --quiet "$SOURCE_COMMIT" -- \
-      Cargo.toml Cargo.lock build.rs src \
-      examples/dreg_ladder.rs examples/dreg_closure.rs \
-      examples/dreg_high_arity_analyze.rs \
-      examples/dreg_high_arity_report.rs \
-      research/dreg_high_arity_20261101/run.sh \
-      research/dreg_high_arity_20261101/REPORT_EXPORT_CONTRACT.md \
-      research/dreg_high_arity_20261101/sources.sha256
-    [[ -z $(git status --porcelain --untracked-files=all -- \
-      Cargo.toml Cargo.lock build.rs src \
-      examples/dreg_ladder.rs examples/dreg_closure.rs \
-      examples/dreg_high_arity_analyze.rs \
-      examples/dreg_high_arity_report.rs \
-      research/dreg_high_arity_20261101/run.sh \
-      research/dreg_high_arity_20261101/REPORT_EXPORT_CONTRACT.md \
-      research/dreg_high_arity_20261101/sources.sha256 \
-      research/dreg_high_arity_20261101/binary.sha256 \
-      research/dreg_high_arity_20261101/protocol.json) ]]
-  ) || die "current transitive Rust source tree differs from the frozen commit"
+  verify_source_tree "$REPO" "$SOURCE_COMMIT" "$SOURCE_MANIFEST" ||
+    die "current transitive Rust source tree differs from the frozen commit"
 
   [[ -n ${DREG_EXECUTION_REF:-} ]] ||
     die "scientific execution requires DREG_EXECUTION_REF=refs/heads/<pushed-branch>"
@@ -1591,6 +1698,24 @@ run_named_step() {
     run_closure_once "$logical" "$file" "$draw" unsat 400000
   fi
 }
+
+if [[ $BINARY_MANIFEST_ONLY == true ]]; then
+  verify_binary_manifest "${BINARY_MANIFEST_HASHES[@]}" ||
+    die "binary manifest is not the exact canonical ordered four-row identity"
+  exit 0
+fi
+
+if [[ $DEP_INFO_ONLY == true ]]; then
+  verify_dep_info_coverage "$DEP_INFO_REPO" "${DEP_INFO_FILES[@]}" ||
+    die "release dep-info contains an unregistered repository input"
+  exit 0
+fi
+
+if [[ $SOURCE_TREE_ONLY == true ]]; then
+  verify_source_tree "$SOURCE_TREE_REPO" "$SOURCE_TREE_COMMIT" "$SOURCE_TREE_MANIFEST" ||
+    die "current transitive Rust source tree differs from the frozen commit"
+  exit 0
+fi
 
 verify_bindings
 case "$STEP" in

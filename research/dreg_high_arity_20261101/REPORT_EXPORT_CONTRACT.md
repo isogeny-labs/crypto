@@ -1,10 +1,10 @@
 # Publication contract for the high-arity closure study
 
-Status: **contract registered; publisher implementation and consistency tests
-pass; frozen binary hashes remain pending**.
-`examples/dreg_high_arity_report.rs` must still be source- and binary-hashed
-and included in the frozen publication identity before any registered draw is
-generated. Until the remaining freeze gates pass, the only
+Status: **contract registered; publisher identity hardening and synthetic
+canonical export validation are implemented; refreeze is pending**.
+`examples/dreg_high_arity_report.rs` must be rebuilt, source- and binary-hashed,
+and included in a replacement frozen publication identity before any registered
+draw is generated. Until the replacement freeze gates pass, the only
 scientific analysis output available is `dreg_high_arity.summary/v1`; no
 `experiment.export/v1`, report, figure, Typst source, or PDF from a registered
 run is claimed to exist.
@@ -105,13 +105,17 @@ The export must validate against the canonical schema in
   complete rows may additionally carry registered exact counters. Resource-
   censored and invalid constituents stay explicit in counters/notes and are
   never converted to zero.
-- `outcome_class` is `completed` only for a scientifically classified package
-  whose shared gates passed; otherwise it is `not_completed`. A valid exact
-  package maps to `status: succeeded` and `verification.status: verified`; an
-  unmeasured package maps to `status: interrupted` and
-  `verification.status: not_run`; invalid evidence maps to `status: failed`
-  and `verification.status: error`. The exact detailed reason remains in the
-  linked summary and observation-only notes.
+- `outcome_class` follows the canonical execution-status mapping: terminal
+  `succeeded` and `failed` rows are `completed`, while an `interrupted` row is
+  `not_completed`. A valid exact package maps to `status: succeeded`,
+  `outcome_class: completed`, and
+  `verification.status: verified`; an unmeasured package maps to
+  `status: interrupted`, `outcome_class: not_completed`, and
+  `verification.status: not_run`; invalid evidence maps to `status: failed`,
+  `outcome_class: completed`, and `verification.status: error`. Here
+  `completed` means the terminal failed package row was retained, not that its
+  evidence supports a scientific conclusion. The exact detailed reason remains
+  in the linked summary and observation-only notes.
 - `flow.planned` is five and the remaining flow counts are computed from the
   five composite rows. The underlying 19 subprocess histories remain in
   `files` and linked artifacts; they are never presented as a sixth package or
@@ -190,3 +194,19 @@ Before freeze, tests must prove:
 7. schema validation, full file verification, deterministic Typst-source and
    native-PDF text checks, the external `../reviews` pointer, and the SVG
    accessibility checks pass.
+
+The synthetic end-to-end test is intentionally ignored by the default Rust
+suite because it invokes the canonical checker from the sibling repository.
+It must be run explicitly before every publication-identity freeze:
+
+```sh
+DREG_EXPERIMENT_PROTOCOL_CHECKER=../crypto-autoresearcher/tools/experiment_protocol.py \
+  cargo test --locked --example dreg_high_arity_report \
+  tests::synthetic_full_bundles_pass_canonical_schema_and_file_verification \
+  -- --ignored --exact
+```
+
+The test creates no registered draw. It builds valid and invalid/resumed
+synthetic bundles, requires both to pass `check-export --verify-files`, checks
+deterministic regeneration and the report formats, then changes one retained
+input and requires full file verification to fail.

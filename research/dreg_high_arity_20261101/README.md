@@ -1,13 +1,16 @@
 # High-arity Boolean closure-degree discriminator
 
-Status: **protocol frozen; no scientific run has started**.
+Status: **protocol v2 amendment filed before affected data; refreeze pending;
+no scientific run has started**.
 
-The protocol was frozen before affected data on 2026-11-01 at source commit
-`a52f8e5a6e977dda20f1fc7add5ba48c543ecca6`, with canonical protocol SHA-256
-`0a4c78928ead71060d3d65cf7b32bb34a78e89c4cbf463627fad3ceed311c192`.
-The four release identities are recorded in `binary.sha256`. Execution remains
-blocked by the independent custody, draw-command, account, and budget gates
-below.
+The v1 protocol was frozen on 2026-11-01 at source commit
+`a52f8e5a6e977dda20f1fc7add5ba48c543ecca6`, then superseded before any
+registered draw, closure attempt, analysis, publication, or cloud job by
+amendment `A1-REPORTER-AND-SOURCE-IDENTITY` on 2026-11-02. The amendment
+requires a new immutable source commit and rebuilt four-binary manifest; the
+v2 freeze therefore remains draft until those identities are installed and
+validated. The runner rejects a draft freeze. Execution also remains blocked
+by the independent custody, draw-command, account, and budget gates below.
 
 This study executes the still-unmeasured native closure cells identified by
 `research/factor_base_arity_review_20261024/README.md`:
@@ -90,8 +93,10 @@ evidence.
 
 ## Durable workers and current launch block
 
-Use a full repository checkout: the Cargo workspace and path dependencies are
-not compatible with the earlier sparse-path launch sketch. On an ephemeral
+Use a full repository checkout: the runner's frozen-source gate recursively
+binds every compiled local path dependency, its compile-time lock/data assets,
+and all repository-local inputs listed by exact Cargo dep-info. Those inputs
+are not compatible with the earlier sparse-path launch sketch. On an ephemeral
 worker, set `DREG_OUTPUT_ROOT=$EPHEMERAL_OUT`. The runner rejects a non-absolute
 or non-durable output root. On resume it hashes the prior evidence tree,
 copies it from `$EPHEMERAL_RESUME_DIR` into an initially empty
@@ -156,9 +161,11 @@ Commands and exact decision rules are recorded in
 [PREREGISTRATION.md](PREREGISTRATION.md). The canonical machine-readable
 contract is [protocol.json](protocol.json). The exact publication mapping is
 specified in [REPORT_EXPORT_CONTRACT.md](REPORT_EXPORT_CONTRACT.md). Its code
-and consistency tests pass; all source, binary, compiler, image, and analysis
-hashes are frozen. The runner also requires a byte-identical fresh frozen-analyzer replay
-immediately before publication. The analyzer itself emits only
+and consistency tests pass; the v1 source, binary, and analysis identities are
+historical and explicitly superseded, while the v2 identities await the
+post-source rebuild and refreeze. The compiler and image remain pinned. The
+runner also requires a byte-identical fresh frozen-analyzer replay immediately
+before publication. The analyzer itself emits only
 `dreg_high_arity.summary/v1`,
 and no export or report from a registered run is claimed to exist.
 

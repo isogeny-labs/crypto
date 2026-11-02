@@ -3,6 +3,13 @@
 Registered 2026-11-01 before generation of any draw or execution of any new
 closure scan.
 
+Amendment `A1-REPORTER-AND-SOURCE-IDENTITY` was filed on 2026-11-02 before
+any affected data after final review identified incomplete reporter and
+transitive-source identity checks. It supersedes the v1 identities. Protocol
+v2 is currently draft pending the new immutable source commit, four-binary
+rebuild, and canonical refreeze; no registered draw, closure attempt,
+analysis, publication, or cloud job has run.
+
 ## Question and scope
 
 Prior native measurements held the Boolean chained-system closure degree at
@@ -65,9 +72,11 @@ example, analyzer and report source hashes, compiler and container digest,
 paths enumerated by the runner and
 `sources.sha256`. The runner compares `Cargo.toml`, `Cargo.lock`, `build.rs`,
 root `src/**`, all four examples, the runner, and the source manifest to the
-registered commit. Cargo path-dependency trees require a full checkout but
-are not separately claimed as enumerated source coverage; the byte-identical
-release binaries bind the code that is actually executed.
+registered commit. Its `FROZEN_SOURCE_PATHS` also binds every recursively
+compiled local dependency's `Cargo.toml` and `src/**`, the factor-base
+compile-time `Cargo.lock`, and the five JSON/SQL assets named by exact Cargo
+dep-info. A retained dep-info coverage check rejects any repository-local
+compiler input outside that set; `sources.sha256` hashes the same inputs.
 
 The execution ref may be a pushed descendant that adds the frozen protocol or
 committed draw inputs, but the instrument, report, and runner paths must remain

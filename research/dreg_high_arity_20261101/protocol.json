@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "DREG-HIGH-ARITY-20261101",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-01",
   "repository": "crypto",
   "study_dir": "research/dreg_high_arity_20261101",
@@ -384,7 +384,7 @@
         "name": "source_build_and_caps",
         "treatment": "fixed",
         "value": "One frozen commit, container digest, compiler, three scientific release binaries, and one publication release binary; four threads; degree four; 400000 columns; 32 GB address space.",
-        "how": "The runner compares Cargo.toml, Cargo.lock, build.rs, root src/**, the three instrument examples, the report example, this runner, and sources.sha256 to the registered source commit; sources.sha256 additionally binds its enumerated files. Exact release-binary hashes, container/compiler identity, sanitized environment, argv, protocol hash, and manifests are checked before every executable stage. Cargo path-dependency trees require the full checkout but are not independently claimed as enumerated source coverage; the byte-identical frozen binaries are authoritative for executed code."
+        "how": "The runner compares Cargo.toml, Cargo.lock, build.rs, root src/**, the three instrument examples, the report example, this runner, and sources.sha256 to the registered source commit. Its frozen path set recursively covers every compiled local dependency Cargo.toml and src/** tree, the factor-base compile-time Cargo.lock, and all five JSON/SQL assets named by exact Cargo dep-info; the dep-info coverage check rejects any other repository-local compiler input. sources.sha256 independently hashes the same inputs. Exact release-binary hashes, container/compiler identity, sanitized environment, argv, protocol hash, and manifests are checked before every executable stage."
       },
       {
         "name": "draw_stream",
@@ -774,12 +774,40 @@
       "verified_by": "Direct source inspection and SHA256 binding on 2026-11-01."
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1-REPORTER-AND-SOURCE-IDENTITY",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "Final pre-launch review found that frozen v1 did not make the reporter verify its own executable, did not discharge the canonical full-export checker contract, and did not enumerate every compiled local dependency and compile-time asset. No registered draw, closure attempt, analysis, publication, or cloud job was generated under v1.",
+      "changes": [
+        "Require reporter, analyzer, and runner to accept only the same exact ordered four-row binary manifest and require the running analyzer/reporter executable hash to match its frozen row.",
+        "Validate synthetic valid and invalid/resumed publication bundles with the canonical check-export --verify-files implementation, including deterministic rebuild and immutable-input mutation rejection.",
+        "Bind every compiled local path-dependency manifest/source tree, factor-base compile-time lock, and exact Cargo dep-info JSON/SQL asset; reject committed or untracked drift and any unregistered repository-local compiler input.",
+        "Rebuild all four release examples from the new pushed source commit after merging the upstream direct clock_gettime declaration, then replace every affected source, binary, protocol, and custody identity before any registered execution."
+      ],
+      "supersedes_fields": [
+        "version",
+        "arms[*].instrument.commit",
+        "arms[*].instrument.binary_sha256",
+        "arms[*].instrument.flags.ladder_binary_sha256",
+        "arms[*].instrument.flags.analyzer_binary_sha256",
+        "arms[*].instrument.flags.report_binary_sha256",
+        "arms[*].instrument.flags.ladder_source_sha256",
+        "arms[*].instrument.flags.closure_source_sha256",
+        "arms[*].instrument.flags.analyzer_source_sha256",
+        "arms[*].instrument.flags.report_source_sha256",
+        "analysis_plan.script.sha256",
+        "variable_ledger.factors.source_build_and_caps.how",
+        "freeze"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "0a4c78928ead71060d3d65cf7b32bb34a78e89c4cbf463627fad3ceed311c192",
-    "commit": "a52f8e5a6e977dda20f1fc7add5ba48c543ecca6",
-    "frozen_at": "2026-11-01T23:18:40Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }

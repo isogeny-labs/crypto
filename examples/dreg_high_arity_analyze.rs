@@ -19,7 +19,7 @@
 use serde::Serialize;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::env;
 use std::fs;
 use std::io::Read;
@@ -208,6 +208,36 @@ fn parse_json_lines(path: &Path) -> Result<Vec<Value>, String> {
 
 fn sha256_bytes(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
+}
+
+fn validate_binary_manifest_text(text: &str, expected: [(&str, &str); 4]) -> Result<(), String> {
+    if !text.ends_with('\n') {
+        return Err("binary manifest lacks its canonical terminal newline".into());
+    }
+    let rows: Vec<_> = text.lines().collect();
+    if rows.len() != expected.len() {
+        return Err(format!(
+            "binary manifest has {} rows, expected exactly {}",
+            rows.len(),
+            expected.len()
+        ));
+    }
+    for (index, (line, (expected_label, expected_hash))) in rows.iter().zip(expected).enumerate() {
+        let fields: Vec<_> = line.split_whitespace().collect();
+        if fields.len() != 2
+            || !is_lower_hex(fields[0], 64)
+            || *line != format!("{}  {}", fields[0], fields[1])
+        {
+            return Err(format!(
+                "binary manifest row {} is malformed or noncanonical",
+                index + 1
+            ));
+        }
+        if fields[1] != expected_label || fields[0] != expected_hash {
+            return Err(format!("binary manifest mismatch for {expected_label}"));
+        }
+    }
+    Ok(())
 }
 
 fn require_regular_file(path: &Path) -> Result<fs::Metadata, String> {
@@ -636,7 +666,12 @@ impl FrozenContext {
     fn load(draw_dir: &Path) -> Result<Self, String> {
         let protocol_path = fs::canonicalize(study_file(draw_dir, "protocol.json"))
             .map_err(|e| format!("resolve frozen protocol: {e}"))?;
-        let binary_manifest_path = fs::canonicalize(study_file(draw_dir, "binary.sha256"))
+        let binary_manifest_input = study_file(draw_dir, "binary.sha256");
+        let binary_manifest_metadata = require_regular_file(&binary_manifest_input)?;
+        if binary_manifest_metadata.len() > 4096 {
+            return Err("frozen binary manifest is unexpectedly large".into());
+        }
+        let binary_manifest_path = fs::canonicalize(&binary_manifest_input)
             .map_err(|e| format!("resolve frozen binary manifest: {e}"))?;
         let protocol_text = fs::read_to_string(&protocol_path)
             .map_err(|e| format!("{}: {e}", protocol_path.display()))?;
@@ -758,33 +793,15 @@ impl FrozenContext {
         let manifest_text = fs::read_to_string(&binary_manifest_path)
             .map_err(|e| format!("{}: {e}", binary_manifest_path.display()))?;
         let binary_manifest_sha256 = sha256_bytes(manifest_text.as_bytes());
-        let mut manifest = BTreeMap::new();
-        for (line_no, line) in manifest_text.lines().enumerate() {
-            if line.trim().is_empty() {
-                continue;
-            }
-            let fields: Vec<_> = line.split_whitespace().collect();
-            if fields.len() != 2 || !is_lower_hex(fields[0], 64) {
-                return Err(format!(
-                    "{}:{}: malformed binary manifest row",
-                    binary_manifest_path.display(),
-                    line_no + 1
-                ));
-            }
-            if manifest.insert(fields[1], fields[0]).is_some() {
-                return Err(format!("duplicate binary manifest label {}", fields[1]));
-            }
-        }
-        for (label, expected) in [
-            ("dreg_ladder", ladder_sha256.as_str()),
-            ("dreg_closure", closure_sha256.as_str()),
-            ("dreg_high_arity_analyze", analyzer_sha256.as_str()),
-            ("dreg_high_arity_report", report_sha256.as_str()),
-        ] {
-            if manifest.get(label).copied() != Some(expected) {
-                return Err(format!("binary manifest mismatch for {label}"));
-            }
-        }
+        validate_binary_manifest_text(
+            &manifest_text,
+            [
+                ("dreg_ladder", ladder_sha256.as_str()),
+                ("dreg_closure", closure_sha256.as_str()),
+                ("dreg_high_arity_analyze", analyzer_sha256.as_str()),
+                ("dreg_high_arity_report", report_sha256.as_str()),
+            ],
+        )?;
         let current_exe = env::current_exe().map_err(|e| format!("current executable: {e}"))?;
         if sha256_file(&current_exe)? != analyzer_sha256 {
             return Err("running analyzer binary differs from the frozen manifest".into());
@@ -2135,8 +2152,7 @@ fn scan_rows(v: &Value) -> Result<Vec<&Value>, String> {
         .get("scan")
         .and_then(Value::as_array)
         .ok_or_else(|| "missing scan array".to_string())?;
-    let mut expected = 3u64;
-    for step in scan {
+    for (expected, step) in (3u64..).zip(scan.iter()) {
         if expected > 4 {
             return Err("scan extends past the registered degree four".into());
         }
@@ -2167,7 +2183,6 @@ fn scan_rows(v: &Value) -> Result<Vec<&Value>, String> {
                 "degree {expected} has no numeric diagnostic seconds field"
             ));
         }
-        expected += 1;
     }
     let implied_measured_to = scan.last().map_or(2, |s| field_u64(s, "degree").unwrap());
     if field_u64(v, "measured_to") != Some(implied_measured_to) {
@@ -3019,6 +3034,73 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn binary_manifest_fixture() -> (String, [String; 4]) {
+        let hashes = [
+            "1".repeat(64),
+            "2".repeat(64),
+            "3".repeat(64),
+            "4".repeat(64),
+        ];
+        let text = format!(
+            "{}  dreg_ladder\n{}  dreg_closure\n{}  dreg_high_arity_analyze\n{}  dreg_high_arity_report\n",
+            hashes[0], hashes[1], hashes[2], hashes[3]
+        );
+        (text, hashes)
+    }
+
+    #[test]
+    fn binary_manifest_accepts_only_the_canonical_ordered_four_rows() {
+        let (text, hashes) = binary_manifest_fixture();
+        let expected = [
+            ("dreg_ladder", hashes[0].as_str()),
+            ("dreg_closure", hashes[1].as_str()),
+            ("dreg_high_arity_analyze", hashes[2].as_str()),
+            ("dreg_high_arity_report", hashes[3].as_str()),
+        ];
+        validate_binary_manifest_text(&text, expected).expect("canonical manifest");
+
+        let reordered = format!(
+            "{}  dreg_closure\n{}  dreg_ladder\n{}  dreg_high_arity_analyze\n{}  dreg_high_arity_report\n",
+            hashes[1], hashes[0], hashes[2], hashes[3]
+        );
+        assert!(validate_binary_manifest_text(&reordered, expected).is_err());
+
+        let duplicate = text.replace("dreg_closure", "dreg_ladder");
+        assert!(validate_binary_manifest_text(&duplicate, expected).is_err());
+
+        let wrong_hash = text.replacen(&hashes[0], &"0".repeat(64), 1);
+        assert!(validate_binary_manifest_text(&wrong_hash, expected).is_err());
+    }
+
+    #[test]
+    fn binary_manifest_rejects_noncanonical_rows_and_file_shape() {
+        let (text, hashes) = binary_manifest_fixture();
+        let expected = [
+            ("dreg_ladder", hashes[0].as_str()),
+            ("dreg_closure", hashes[1].as_str()),
+            ("dreg_high_arity_analyze", hashes[2].as_str()),
+            ("dreg_high_arity_report", hashes[3].as_str()),
+        ];
+
+        assert!(validate_binary_manifest_text(text.trim_end(), expected).is_err());
+        assert!(validate_binary_manifest_text(&format!("{text}\n"), expected).is_err());
+        assert!(validate_binary_manifest_text(
+            &text.replacen("  dreg_ladder", " dreg_ladder", 1),
+            expected,
+        )
+        .is_err());
+        assert!(validate_binary_manifest_text(
+            &text.replacen(&hashes[0], &"A".repeat(64), 1),
+            expected,
+        )
+        .is_err());
+        assert!(validate_binary_manifest_text(
+            &format!("{text}{}  extra\n", "5".repeat(64)),
+            expected,
+        )
+        .is_err());
+    }
 
     #[test]
     fn provenance_summary_serializes_explicit_frozen_bindings_or_nulls() {
