@@ -2139,6 +2139,10 @@ pub struct Spec {
     pub qj: Div<E2>,
     /// `F_p` multiplications spent building the instance's transfer.
     pub transfer_muls: u64,
+    /// Factor-base line `x = a·s + b` (`a = t²`), when the model of `H` was
+    /// moved by [`search_fb_line`]: `(a, b, t)`.  `None` is the plain model,
+    /// factor base `{x ∈ F_p}`.  `gj`, `qj` are on the moved model.
+    pub line: Option<(E2, E2, E2)>,
 }
 
 /// Per-thread contexts: the tower, the cover, and the `Re`/`Im` tables.
@@ -2156,7 +2160,10 @@ impl Ctx {
     }
     pub fn with_trace(spec: &Spec, trace: bool) -> Ctx {
         let f = Fq3::new(spec.p);
-        let cov = Cover::new(&f, &spec.alpha).expect("cover");
+        let mut cov = Cover::new(&f, &spec.alpha).expect("cover");
+        if let Some((a, b, _)) = spec.line {
+            cov.hx = line_poly(&f.f, &cov.hx, &a, &b);
+        }
         let reim = ReIm::new(spec.p, f.f.w);
         f.reset_muls();
         Ctx {
@@ -2224,6 +2231,7 @@ pub fn generate_spec(p: u64, seed: u64) -> Spec {
             gj,
             qj,
             transfer_muls,
+            line: None,
         };
     }
 }
@@ -2258,6 +2266,7 @@ pub fn spec_from_curve(p: u64, alpha: E6, l: u64, g: PtE6, q: PtE6, d: u64) -> O
         gj,
         qj,
         transfer_muls,
+        line: None,
     })
 }
 
@@ -2293,6 +2302,157 @@ pub fn factor_base(ctx: &Ctx, rng: &mut StdRng) -> Vec<BaseEl> {
         });
     }
     out
+}
+
+// ── Choosing the factor-base line ─────────────────────────────────────────
+//
+// The decomposition test asks for the sextic's six roots to lie in an
+// `F_p`-line of `F_q`.  Nothing ties the line to `F_p` itself: under
+// `x = a·s + b` (`a = t²` a square of `F_q`, so that `y = t⁷·y′` keeps the
+// model monic and over `F_q`, not its twist) the curve `H` becomes
+// `H′ : y′² = h(a s + b)/a⁷`, isomorphic over `F_q`, and the factor base
+// `{x ∈ F_p}` of `H′` is the factor base `{x ∈ a·F_p + b}` of `H`.  The test
+// is the same six quadrics in six unknowns.  What changes is the base's
+// size `B` (the abscissae whose `h` is a non-zero square), and the residuals
+// a run needs scale as `B · (p/2B)⁶ = B^{−5}` (rate `≈ (2B/p)⁶/720`, `B + 1`
+// relations).  `B` fluctuates by `≈ √p/2` from line to line, so a search
+// over lines buys a factor `(1 + k/√p)⁵` for a `k`-sigma line, and every
+// multiplication of the search is charged.
+
+/// `h(a x + b) / lc`, made monic (`lc` the leading coefficient of `h(ax+b)`).
+pub fn line_poly(f: &Fq, h: &[E2], a: &E2, b: &E2) -> Poly<E2> {
+    let lin = [*b, *a];
+    let mut r: Poly<E2> = vec![*h.last().expect("non-zero polynomial")];
+    for c in h.iter().rev().skip(1) {
+        r = pmul(f, &r, &lin);
+        r[0] = f.add(&r[0], c);
+    }
+    let lc = *r.last().unwrap();
+    let il = f.inv(&lc);
+    pscale(f, &r, &il)
+}
+
+/// The divisor `(u, v)` of `H` on `H′`: `u′ = u(a s + b)` made monic,
+/// `v′ = v(a s + b)/t⁷`.
+pub fn line_div(f: &Fq, d: &Div<E2>, a: &E2, b: &E2, t: &E2) -> Div<E2> {
+    let u = if d.u.len() <= 1 {
+        d.u.clone()
+    } else {
+        line_poly(f, &d.u, a, b)
+    };
+    let mut v: Poly<E2> = Vec::new();
+    if !d.v.is_empty() {
+        let lin = [*b, *a];
+        v = vec![*d.v.last().unwrap()];
+        for c in d.v.iter().rev().skip(1) {
+            v = pmul(f, &v, &lin);
+            v[0] = f.add(&v[0], c);
+        }
+        let t2 = f.mul(t, t);
+        let t7 = f.mul(&f.mul(&f.mul(&t2, &t2), &t2), t);
+        v = pscale(f, &v, &f.inv(&t7));
+        while v.last() == Some(&E2::ZERO) {
+            v.pop();
+        }
+    }
+    Div { u, v }
+}
+
+/// What a factor-base line search did, for the run record.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct LineSearch {
+    /// Lines tried, the plain line `a = 1, b = 0` first.
+    pub candidates: u64,
+    /// `B` of the plain line and of the chosen line.
+    pub b_plain: usize,
+    pub b_best: usize,
+    /// Index of the chosen line among the candidates (0: the plain line).
+    pub best_index: u64,
+    /// Every `F_p` multiplication of the search, the move of `G`, `Q` included.
+    pub muls: u64,
+}
+
+/// `#{s ∈ F_p : h′(s) a non-zero square of F_q}` for monic `h′ ∈ F_q[x]`.
+/// Squareness through the norm: `z ∈ F_q^×` is a square iff `N(z) = z₀² − ω z₁²`
+/// is a square of `F_p^×`, read from a table of the squares of `F_p` built
+/// once.  Charged: Horner at an `F_p` point (two products per step) and the
+/// norm (three); the table lookup is a native operation.
+fn line_count(f: &Fq, hp: &[E2], qr: &[bool]) -> usize {
+    let p = f.p;
+    let deg = hp.len() - 1;
+    let mut cnt = 0usize;
+    for s in 0..p {
+        let mut acc = hp[deg];
+        for k in (0..deg).rev() {
+            acc = E2([
+                am(mm(acc.0[0], s, p), hp[k].0[0], p),
+                am(mm(acc.0[1], s, p), hp[k].0[1], p),
+            ]);
+        }
+        let n = sm(mm(acc.0[0], acc.0[0], p), mm(mm(acc.0[1], acc.0[1], p), f.w, p), p);
+        if n != 0 && qr[n as usize] {
+            cnt += 1;
+        }
+    }
+    f.count_public(p * (2 * deg as u64 + 3));
+    cnt
+}
+
+/// Search `n` lines `a·F_p + b` (`a = t²`, `t`, `b` uniform from the seed's
+/// stream; the plain line first) for the largest factor base, and move the
+/// instance to the best one.  The returned spec has `line` set and `gj`,
+/// `qj` on the moved model; logarithms are unchanged (an isomorphism).
+pub fn search_fb_line(spec: &Spec, n: u64, seed: u64) -> (Spec, LineSearch) {
+    let f = Fq::new(spec.p);
+    let p = spec.p;
+    let f3 = Fq3::new(p);
+    let cov = Cover::new(&f3, &spec.alpha).expect("cover");
+    let h = cov.hx.clone();
+    f.reset_muls();
+    let mut qr = vec![false; p as usize];
+    for x in 1..p {
+        qr[mm(x, x, p) as usize] = true;
+    }
+    f.count_public((p - 1) / 2);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xFB_11AE);
+    let mut best = (0usize, 0u64, E2::ONE, E2::ZERO, E2::ONE);
+    let mut b_plain = 0;
+    for i in 0..n.max(1) {
+        let (t, b) = if i == 0 {
+            (E2::ONE, E2::ZERO)
+        } else {
+            loop {
+                let t = f.random(&mut rng);
+                if t != E2::ZERO {
+                    break (t, f.random(&mut rng));
+                }
+            }
+        };
+        let a = f.mul(&t, &t);
+        let hp = if i == 0 { h.clone() } else { line_poly(&f, &h, &a, &b) };
+        let c = line_count(&f, &hp, &qr);
+        if i == 0 {
+            b_plain = c;
+        }
+        if c > best.0 {
+            best = (c, i, a, b, t);
+        }
+    }
+    let (b_best, best_index, a, b, t) = best;
+    let mut out = spec.clone();
+    if best_index != 0 {
+        out.gj = line_div(&f, &spec.gj, &a, &b, &t);
+        out.qj = line_div(&f, &spec.qj, &a, &b, &t);
+        out.line = Some((a, b, t));
+    }
+    let rep = LineSearch {
+        candidates: n.max(1),
+        b_plain,
+        b_best,
+        best_index,
+        muls: f.muls(),
+    };
+    (out, rep)
 }
 
 /// `R = Σ ε_i B_i` over six distinct base elements, `ε_i = ±1`.
@@ -3235,6 +3395,9 @@ pub fn run_cover_ccov_mode(
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct CoverDlpReport {
+    /// Factor-base line search (`JV_FB_LINE=n`; `None` when off), its
+    /// multiplications inside `setup_muls`.
+    pub fb_line: Option<LineSearch>,
     pub p: u64,
     pub seed: u64,
     pub l: u64,
@@ -3366,8 +3529,22 @@ pub fn run_cover_dlp_mode(
     };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
+    // Opt-in: JV_FB_LINE=n searches n factor-base lines and moves the
+    // instance to the largest base (unset or 0: the plain model, unchanged).
+    let line_n: u64 = std::env::var("JV_FB_LINE")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
+    let (spec, fb_line) = if line_n > 0 {
+        let (s2, rep) = search_fb_line(&spec, line_n, seed);
+        (s2, Some(rep))
+    } else {
+        (spec, None)
+    };
+    let line_muls = fb_line.as_ref().map_or(0, |r| r.muls);
     let ctx = Ctx::with_trace(&spec, trace);
     let jac = ctx.jac();
+    assert!(jac.is_valid(&spec.gj) && jac.is_valid(&spec.qj), "moved divisors on H'");
     let l = spec.l;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x3D1F6);
     let (c_e, c_j) = unit_costs(&spec, &ctx);
@@ -3389,9 +3566,10 @@ pub fn run_cover_dlp_mode(
     let mut a = rng.gen_range(0..l);
     let mut b = rng.gen_range(1..l);
     let mut r = jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128));
-    let setup_muls = ctx.f.muls() + spec.transfer_muls;
+    let setup_muls = ctx.f.muls() + spec.transfer_muls + line_muls;
     ctx.f.reset_muls();
     let mut rep = CoverDlpReport {
+        fb_line,
         p,
         seed,
         l,
