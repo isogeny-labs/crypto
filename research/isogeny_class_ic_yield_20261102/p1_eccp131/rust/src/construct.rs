@@ -549,3 +549,42 @@ pub fn cmd_jsoncmp(args: &[String]) {
         std::process::exit(1);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hex_dec_round_trip() {
+        for h in ["0x0", "0x1", "0xff", P_HEX, N_HEX, "0x10000000000000000", "0xffffffffffffffffffffffff"] {
+            assert_eq!(dec_to_hex(&hex_to_dec(h)), h);
+        }
+        assert_eq!(hex_to_dec(P_HEX), "1550031797834347859248576414813139942411");
+    }
+
+    #[test]
+    fn icv1_identity_of_e0_matches_scripts_curve_id_py() {
+        // values committed in neighbours.json (produced by scripts/curve_id.py prime_id)
+        let id = prime_id(
+            &hex_to_dec(P_HEX),
+            &hex_to_dec(A_HEX),
+            &hex_to_dec(B_HEX),
+            &hex_to_dec(N_HEX),
+            "424712279079156405453899315082070930793",
+            TRACE,
+        );
+        assert_eq!(id.slug, "icv1-fp131-t29529377007934231835-9681b699");
+        assert_eq!(id.model_sha256, "9681b699f2f5930f691df383d9b98f9772e19796959cbd68b34f6f8bf47ef4c6");
+        assert_eq!(
+            id.icv1,
+            "ICV1:fp-1550031797834347859248576414813139942411:29529377007934231835:1550031797834347859219047037805205710577:424712279079156405453899315082070930793:unk:unk:r:9681b699f2f5"
+        );
+    }
+
+    #[test]
+    fn json_layout_is_python_indent_1() {
+        let j = obj(vec![("a", int(1)), ("b", J::Arr(vec![s("x"), J::Bool(true)])), ("c", obj(vec![])), ("d", J::Arr(vec![]))]);
+        assert_eq!(j.dump(), "{\n \"a\": 1,\n \"b\": [\n  \"x\",\n  true\n ],\n \"c\": {},\n \"d\": []\n}");
+        assert_eq!(jsonv::parse(&j.dump()).unwrap(), j);
+    }
+}

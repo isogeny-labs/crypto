@@ -1,7 +1,9 @@
 # P3 protocol: ECC2K-130 isogeny class, IC yield / Dreg (preregistered, predicted null)
 
 Status: DRAFT for the director to freeze (`protocol.json`, hash, commit not yet made). Study: `../DESIGN.md`.
-Date of draft: 2026-11-02. Harness: `harness/` (Rust, `p3h`). No Python (AGENTS.md).
+Date of draft: 2026-11-02. Revision 2 (same day, before any data of the full run): C2 redefined as a minimum over a declared
+presentation family including b-adapted presentations (arms `badapt`, `bsparse`, `nbadapt`, sections 1, 4, 6), the n=43 cost
+estimate corrected (section 7). Revision 1 (C2 = "gap vanishes with random V") is withdrawn, see section 1. Harness: `harness/` (Rust, `p3h`). No Python (AGENTS.md).
 
 ## 1. Question and claim classes
 
@@ -15,7 +17,24 @@ differences: none beyond presentation effects of the standard subspace (b = 1 vs
 Claims each outcome would license (class: comparative/statistical, needs controls):
 - C1 (null): "within the measured cells, the per-curve Dreg distribution of class curves lies inside the random-b null
   and Frobenius orbits are exchangeable". Licensed only if the positive control detects its planted effect (section 4).
-- C2 (presentation): "the E0 vs floor Dreg gap with standard V is a presentation effect" (zero gap with random V).
+- C2 (presentation, family-minimised): "over the declared presentation family F (section 4: the standard V in several moduli,
+  and V = span(1,g,..,g^(k-1)) in the b-adapted presentations, where the modulus is the minimal polynomial of g and b is
+  mapped to its image), the minimum over F of a floor curve's Dreg and F4 time equals E0's minimum over the same family F,
+  with E0 minimised by the same procedure". This replaces revision 1 ("zero gap with random V"), which could not test the
+  claim: with a random V the presentation is not adapted to b, a floor curve's b stays dense in every random modulus, while
+  b = 1 is fixed by every field isomorphism and is the first basis vector of every power basis. An attacker chooses the
+  presentation (min over presentations is what is paid, as in the prior d_reg 8 vs 10-11 refutation, `cryptanalysis/
+  experiments/ecc2k130-isogeny-class/REPORT.md` section 8 and `gaps/G5-*`: V = span{b^j} and span{(b+1)^j}), so both sides are
+  minimised over F. Licensed only if the instrument checks pass and the positive control for the presentation effect is
+  seen (standard V, n=131, k=6, E0 Dreg 6 vs floor Dreg 7).
+- C2' (what a surviving gap would mean): if a gap survives the minimum over F, in Dreg by at least one whole degree in every
+  attempt or in F4 time outside the A/A band, it is attributed to **b in F_2** (E0 is the only curve of the class with b in
+  F_2, i.e. the Koblitz structure: b fixed by every field isomorphism and by Frobenius), not to the isogeny class or the
+  level: the descended system depends on the curve only through b, so a floor curve is, to this instrument, a curve with a
+  generic b of its orbit. That reading is checked by `nbadapt` (random dense b with the same b-adapted presentation must
+  give the floor curves' values, so "floor = generic" holds). C2' is a structural statement about E0 and says nothing about
+  the 262 level-263 curves, which stay at the generic cost; it is not a speedup (no end-to-end S, no gap to rho). "No gap
+  inside F" is not "no presentation achieves a gap": F is finite and declared.
 - C3 (yield): at n=43 yield is not observable (expected count per attempt ~ 2^(3k-n)); only the exact count is reported, and
   the claim is "no curve differs from the Poisson prediction", with the stated power limit.
 A null is a recorded result, not an improvement over the IC baseline (CLAUDE.md success criterion). Gaps to matched rho are
@@ -67,11 +86,30 @@ numeric count; the field isomorphisms between presentations preserve arithmetic.
 | iso | isomorphic-model control: Frobenius conjugate instance (b^2, V^2, x_R^2); must give identical dreg/solutions/refuted (instrument invariance; expected 100% identical) |
 | aa | A/A: the main instance repeated; counts must be identical, time ratio gives the noise floor |
 | stdv | presentation control: V = span(1,z,..,z^(k-1)) in the base modulus and in `--presentations` other irreducible moduli (b and x_R mapped by the field isomorphism); the same curve in different polynomial bases. Effect of b = 1's short presentation shows here; minimum over presentations is the P3b headline |
+| badapt | b-adapted presentation. Floor curve: g = b, modulus M_g = minimal polynomial of b over F_2 (degree n: n is prime and b is not in F_2), so b maps to z (weight 1, degree 1). V = span(1,g,..,g^(k-1)), i.e. the standard V of that presentation; x_R and b are mapped by the field isomorphism F_{M0} -> F_{M_g} (change of basis to the powers of g, computed by Gauss-Jordan on the n x n matrix of g^i). This is the presentation of the prior work's `powerb` cell (V = span{b^j}). E0: b = 1 is fixed by every isomorphism and its minimal polynomial z+1 has degree 1, so there is no adapted modulus; E0 uses the borrowed generators g = b of the first curve of each of the two (n=131) or first two (n=43) floor orbits, so that E0 is measured in exactly the presentations the first floor curves use. |
+| bsparse | the b-sparse family F_b, 6 presentations per curve, each a generator g of F_{2^n} (any g outside F_2 generates it, n prime): g in {b, b+1, 1/b (= j, since b*j = 1), b^3, b^(1/3) (exponent (2^(n+1)-1)/3, so b = g^3), b^2+b}. Recorded per row: the image of b in the power basis of g (Hamming weight `b_w`, degree `b_deg`), the modulus weight `mg_w`, and `sel` = 1 on the lexicographic minimum of (weight, degree) over F_b (g = b: (1,1); g = b+1: (2,1); g = b^(1/3): (1,3); the others are dense, weight 64-75 / degree 129-130 at n=131). E0: F = {z, the 2 borrowed generators, 3 seeded random generators}, b image 1 (weight 1, degree 0) in all. Dreg and time are then minimised over the family (analysis section "presentation-family minima"). The conjugates b^(2^i) give the same modulus (same minimal polynomial) and b -> z, so they are not extra presentations. |
+| nbadapt | control for C2': random dense b (the null population, 8 curves) with g = b, same V = span(1,z,..) in M_b. Must reproduce the floor curves' badapt values; if it does not, "a floor curve is a generic dense-b curve" fails and C2' cannot be read. |
 | planted | positive control (detector power): three liftable abscissae drawn from V, x_R = x(P1+P2+P3) on the actual curve; the planted point must satisfy all equations (`planted_ok`), solver must find it (`planted_found`, `--solve`), and the refutation Dreg must NOT refute (outcome differs from main). Expected detection: planted_ok = 1 on 100% and solutions >= 1 |
 | m=2 | m=2 control (n=43) with the same arms |
 
 Known effect that the detector must see (positive control for the presentation claim, already seen in smoke): standard V at
-n=131, k=6: E0 Dreg 6 vs floor curve A000 Dreg 7, over three presentations.
+n=131, k=6: E0 Dreg 6 vs floor curves Dreg 7, in the base modulus and two other moduli (4 floor curves x 3 presentations).
+Smoke of the b-adapted arms at the same cell (`smoke/p3b_bp.*`, section 7a): the floor curves reach Dreg 6 in the presentations
+where b is a power of g (b = g, g^3, g^(-1)) or g + 1, and Dreg 7 in the dense-image presentations (b^3, b^2+b); E0 is 6 in all.
+Presentation properties that decide how the family is read: (i) at n=131, k=6 the Dreg of a floor curve follows whether b
+is a Laurent monomial or binomial in g, not the Hamming weight of the image: g = 1/b has b = g^(-1) with a dense image
+(weight 64-66) and still Dreg 6, so `sel` (minimum weight) is recorded but the family minimum is what is analysed; (ii) the
+modulus of a b-adapted presentation is dense (weight `mg_w` 59-75) whereas E0 in the base modulus has weight 5, which makes
+the system build (`build_s`, field multiplications in the modulus) several times cheaper for E0 in z; the F4 time `dreg_s`
+does not depend on the modulus weight in the smoke. Time comparisons for C2 therefore use `dreg_s` (and `build_s` only
+between presentations of equal `mg_w`); both are reported.
+
+Sanity check of the isomorphism (`p3h isocheck`, output `smoke/isocheck.txt`): for random b at n = 13, 17, 19, 43, 131 and the
+first four members of F_b, (a) M_g is irreducible, (b) the map is a ring isomorphism (product and sum of random elements),
+(c) g maps to z, (d) the exact ordered solution count of the m=3 system (chained Artin-Schreier count for n < 64, numeric
+for n=131) with V_g = span(1,g,..) in the base field equals the count in the g-presentation with the standard V, for a random x_R
+and for a planted x_R (count >= 1; the planted point, which has the same coefficient vector, satisfies every equation of the
+mapped system), k = 3..8; and (e) the same for the m=2 count at n=13, k=7. Any FAIL voids the b-adapted arms.
 
 Seeds: all derived from `--seed 20261102` and (n, m, k, attempt, curve) via `derive`, never chosen after a look.
 Blinding: `p3h analyze` hides arm names behind codes unless `--unmask`; unmask only after this protocol is frozen and the
@@ -101,8 +139,29 @@ Metric families: dreg (k = 3,4,5,6 cells), time ratio, solution count. For each 
    interval over attempts) and an equivalence statement: all |difference| < 0.5 degree (a half of the integer step). Rejection
    is only reported if the count (not rank) differs by at least one whole degree in every attempt, which is then flagged exact
    (Dreg is an integer and the instance is paired, so a constant whole-degree shift in all attempts is a deterministic effect).
-3. E0 vs floor with standard V: reported as a presentation effect if the gap vanishes with random V (C2).
-4. Times: ratio to the A/A interval of the same run; ranks are only read for ratios outside A/A.
+3. E0 vs floor, C2 (family minima; this replaces "gap vanishes with random V"). Per cell (n, k), curve c and attempt a:
+   D(c,a) = min over the presentations of F_c of Dreg (arms stdv, badapt, bsparse pooled; F_E0 as in section 4, E0 also gets the
+   stdv presentations), and T(c,a) = min over F_c of `dreg_s` (F4 time; `build_s` is reported separately, see section 4 on the
+   modulus weight). Gap(c) = mean_a D(c,a) - mean_a D(E0,a), percentile-bootstrap 95% interval over attempts (paired: same
+   V-free instance data, same x_R); time ratio T(c)/T(E0) against the A/A band of the run. Floor curves are pooled by orbit
+   (inference unit = orbit, 2 at n=131, 6 at n=43).
+   - Outcome N (null, C2 supported): |Gap| < 0.5 degree for every orbit and the T ratio inside the A/A band, with the
+     single-presentation (stdv) gap present in the same run (positive control seen). Reported: "the E0 vs floor gap under
+     standard V is a presentation effect; after minimising over F both sides coincide". The smoke at n=131, k=5,6 is of this
+     type (Gap 0, floor Dreg 6 in the adapted presentations).
+   - Outcome G (gap survives): Gap >= 1 whole degree in every attempt of every floor orbit, or the T ratio outside the A/A
+     band in the same direction for every orbit. Reported as a real E0 advantage of the instrument, and read only through C2':
+     a genuine b-in-F_2 (Koblitz) structural effect, since the family already contains the b-adapted presentations that remove
+     the "b is short in the polynomial basis" explanation; it is not an isogeny or level effect (the floor curves differ from
+     E0 in b only), and it does not transfer to the 262 level-263 curves. Before reporting G: `nbadapt` must equal the floor
+     curves (else the floor curves are not generic dense-b curves and C2' is unreadable), the isocheck must pass, and the gap
+     must not vanish in a presentation added after the fact (a larger F is a dated amendment, both reported).
+   - Outcome U (undetermined): cells that capshit or `atleast` (n=43 k=5, n=131 k>=7) are reported as bounds ("Dreg > dmax"),
+     never as a gap.
+   Not an improvement over the index-calculus baseline in either outcome (no S, no rho gap).
+4. Times: ratio to the A/A interval of the same run; ranks are only read for ratios outside A/A. Wall clocks of runs that
+   shared a host (smoke) varied by up to 2.8x for identical counts (n=43 k=4: 10.6-23.4 s), so only a run alone on its cores
+   (isolab-eks) is read, and counts (Dreg, rows, cols) are primary.
 5. Yield: observed counts vs Poisson(lambda_hat) with lambda_hat the pooled mean; per-curve exact Poisson tail, Bonferroni over 7.
 What does not count: changing N, k, dmax, metric, null or thresholds after data; any change is a dated amendment, both versions reported.
 
