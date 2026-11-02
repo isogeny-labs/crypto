@@ -23,8 +23,8 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | L0 isolation stated (counted exact, clock descriptive) | verified complete | section 1 and 3; P1 A1 section 14, P2 A1 and 10.1, P3 A1 |
 | Deferred cells stated (P1 tier 2, P2 36/40-bit, P3a-Y) | verified complete | sections 1 and 8 |
 | P1 ECCp-131 tier 1, arm-ratio strip plot | complete at tier-1 scope (tier 2 deferred) | section 5, figure 2, `p1_eccp131/runs/tier1_analysis.json` |
-| P2 per-cell yield per curve, A/A band, planted control | partial: 6 of 12 run-scope cells finished | section 6, figure 3, `p2_prime_analogues/runs/<cell>/analysis.json` |
-| P3 Dreg per curve and presentation family, E0 highlighted, standard V versus b-adapted | partial: 10 of 16 cards completed (receipt); more output present | section 7, figures 4 and 5, `p3_ecc2k130/full/` |
+| P2 per-cell yield per curve, A/A band, planted control | partial: 10 of 12 run-scope cells finished | section 6, figure 3, `p2_prime_analogues/runs/<cell>/analysis.json` |
+| P3 Dreg per curve and presentation family, E0 highlighted, standard V versus b-adapted | partial: 16 of 16 cards completed (receipt); more output present | section 7, figures 4 and 5, `p3_ecc2k130/full/` |
 | Class-structure diagram (ECC2K-130 volcano levels beside ECCp-131 crater) | verified complete (structure from DESIGN.md) | section 3, figure 1 |
 | Generator, REPORT.md, REPORT.typ, REPORT.pdf, SVGs | see section 9 | `report/` |
 
@@ -53,9 +53,13 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | P2 c24A_m2 | ecbench isolation level recorded on rows: L1: 93, L2: 6435 | audit: OK, 8160 records, 12 replays; in-session A/A: counts identical 2176/2176 |
 | P2 c24A_m3 | ecbench isolation level recorded on rows: L1: 352, L2: 12704 | audit: OK, 16320 records, 12 replays; in-session A/A: counts identical 4352/4352 |
 | P2 c24B_m2 | ecbench isolation level recorded on rows: L1: 175, L2: 14609 | audit: OK, 18480 records, 12 replays; in-session A/A: counts identical 4928/4928 |
+| P2 c24B_m3 | ecbench isolation level recorded on rows: L1: 1761, L2: 27807 | audit: OK, 36960 records, 12 replays; in-session A/A: counts identical 9856/9856 |
+| P2 c28A_m2 | ecbench isolation level recorded on rows: L1: 1050, L2: 5478 | audit: OK, 8160 records, 12 replays; in-session A/A: counts identical 2176/2176 |
 | P2 c28A_m3 | ecbench isolation level recorded on rows: L1: 316, L2: 6212 | audit: OK, 8160 records, 12 replays; in-session A/A: counts identical 2176/2176 |
+| P2 c28B_m3 | ecbench isolation level recorded on rows: L1: 14784 | audit: OK, 18480 records, 12 replays; in-session A/A: counts identical 4928/4928 |
 | P2 c32A_m2 | ecbench isolation level recorded on rows: L1: 4352 | audit: OK, 5440 records, 12 replays; in-session A/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A/A used) |
 | P2 c32A_m3 | ecbench isolation level recorded on rows: L1: 1002, L2: 3350 | audit: OK, 5440 records, 12 replays; in-session A/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A/A used) |
+| P2 c32B_m3 | ecbench isolation level recorded on rows: L1: 3019, L2: 6837 | audit: OK, 12320 records, 12 replays; in-session A/A: not run (dropped at 32 bits, PROTOCOL 4; round-parity A/A used) |
 
 
 ## 4. Method in one paragraph per part
@@ -146,11 +150,11 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | class | m = 2 | m = 3 | class facts (from a finished cell) |
 |---|---|---|---|
 | c24A | finished (128 curves) | finished (128 curves) | p 2^23.70, D -84171, h 128 |
-| c24B | finished (300 curves) | pending | p 2^23.72, D -414651, h 300 |
-| c28A | pending | finished (128 curves) | p 2^27.31, D -84171, h 128 |
-| c28B | pending | pending | - |
+| c24B | finished (300 curves) | finished (300 curves) | p 2^23.72, D -414651, h 300 |
+| c28A | finished (128 curves) | finished (128 curves) | p 2^27.31, D -84171, h 128 |
+| c28B | pending | finished (300 curves) | p 2^27.86, D -414651, h 300 |
 | c32A | finished (128 curves) | finished (128 curves) | p 2^31.94, D -84171, h 128 |
-| c32B | pending | pending | - |
+| c32B | pending | finished (300 curves) | p 2^31.91, D -414651, h 300 |
 | c36A | not run (deferred) | not run (deferred) | - |
 | c36B | not run (deferred) | not run (deferred) | - |
 | c40A | not run (deferred) | not run (deferred) | - |
@@ -167,9 +171,13 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | c24A_m2 | 0.0199 | -0.0103 / 0.074 | 0.9005 | 2.71 (3.54) p 0.5847 | 1.081 (1.115) | 0.0322 / 0.0336 | 1.195 / 1.00 | 0.471 | none |
 | c24A_m3 | 0.0330 | -0.0049 / 0.038 | 0.8961 | 2.31 (3.52) p 0.9285 | 1.130 (1.183) | 0.0484 / 0.0481 | 1.180 / 0.38 | 0.827 | power < 0.9 |
 | c24B_m2 | 0.0198 | -0.0052 / 0.073 | 0.8296 | 2.63 (3.77) p 0.9135 | 1.097 (1.126) | 0.0316 / 0.0167 | 1.200 / 0.99 | 0.572 | none |
+| c24B_m3 | 0.0340 | 0.0014 / 0.041 | 0.2814 | 2.75 (3.78) p 0.8266 | 1.156 (1.199) | 0.0528 / 0.0361 | 1.177 / 0.84 | 0.421 | power < 0.9 |
+| c28A_m2 | 0.0199 | 0.0143 / 0.103 | 0.0540 | 3.24 (3.56) p 0.1489 | 1.115 (1.114) | 0.0347 / 0.0202 | 1.196 / 1.00 | 0.450 | none |
 | c28A_m3 | 0.0329 | 0.0045 / 0.093 | 0.2884 | 3.14 (3.55) p 0.2019 | 1.156 (1.172) | 0.0525 / 0.0430 | 1.196 / 1.00 | 0.090 | none |
+| c28B_m3 | 0.0330 | 0.0062 / 0.085 | 0.1134 | 3.24 (3.75) p 0.2859 | 1.140 (1.173) | 0.0446 / 0.0445 | 1.189 / 1.00 | 0.193 | none |
 | c32A_m2 | 0.0010 | -0.0076 / 0.080 | 0.8186 | 3.64 (3.56) p 0.0360 | 1.109 (1.117) | 0.0326 / 0.0261 | 1.200 / 1.00 | 0.512 | none |
 | c32A_m3 | 0.0330 | 0.0117 / 0.102 | 0.0795 | 4.15 (3.53) p 0.0005 | 1.126 (1.115) | 0.0370 / 0.0230 | 1.194 / 1.00 | 0.133 | max\|z\| p < 0.0025 |
+| c32B_m3 | 0.0329 | -0.0009 / 0.078 | 0.5282 | 3.24 (3.76) p 0.2989 | 1.117 (1.125) | 0.0377 / 0.0278 | 1.195 / 1.00 | 0.449 | none |
 
 **Observation to carry into the reading.** Cells whose last column lists a trigger are the ones the main session must read against the isomorphic-model control (presentation effect of the factor-base rule) before calling anything a curve effect. Cells that list `power < 0.9` are "not informative at 20%", never reported as nulls (PROTOCOL section 4).
 
@@ -188,14 +196,14 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 | a-ctrl-k4-s1 | P3a controls and C2 family, k=4, attempt 1 | p3a_ctrl_k4.s1: 183 rows | completed (receipt) |
 | a-main-k4-s0 | P3a main, k=4, attempt 0 | p3a_main_k4.s0: 259 rows | completed (receipt) |
 | a-main-k4-s1 | P3a main, k=4, attempt 1 | p3a_main_k4.s1: 259 rows | completed (receipt) |
-| b-badapt | P3b b-adapted presentations, n=131, k=3..6 | p3b_badapt: 542 rows | running or partial (output present, no receipt) |
-| b-bsparse | P3b b-sparse and nbadapt, n=131, k=5,6 | p3b_bsparse: absent | pending |
-| b-main-k5-s0 | P3b random-V main, k=5, attempt 0 | p3b_main_k5.s0: absent | pending |
-| b-main-k5-s1 | P3b random-V main, k=5, attempt 1 | p3b_main_k5.s1: absent | pending |
+| b-badapt | P3b b-adapted presentations, n=131, k=3..6 | p3b_badapt: 2112 rows | completed (receipt) |
+| b-bsparse | P3b b-sparse and nbadapt, n=131, k=5,6 | p3b_bsparse: 200 rows | completed (receipt) |
+| b-main-k5-s0 | P3b random-V main, k=5, attempt 0 | p3b_main_k5.s0: 263 rows | completed (receipt) |
+| b-main-k5-s1 | P3b random-V main, k=5, attempt 1 | p3b_main_k5.s1: 263 rows | completed (receipt) |
 | b-ctrl | P3b controls, CTRL131, k=3,4,5 | p3b_ctrl: 216 rows | completed (receipt) |
 | b-main-k34 | P3b random-V main, k=3,4 | p3b_main_k34: 1052 rows | completed (receipt) |
-| b-stdv-s0 | P3b standard V, curves 0..131 (E0 and orbit A) | p3b_stdv.s0a: 528 rows; p3b_stdv.s0b: 451 rows; p3b_stdv.s0c: absent | running or partial (output present, no receipt) |
-| b-stdv-s1 | P3b standard V, curves 132..262 (orbit B) | p3b_stdv.s1a: absent; p3b_stdv.s1b: absent; p3b_stdv.s1c: absent | pending |
+| b-stdv-s0 | P3b standard V, curves 0..131 (E0 and orbit A) | p3b_stdv.s0a: 528 rows; p3b_stdv.s0b: 528 rows; p3b_stdv.s0c: 528 rows | completed (receipt) |
+| b-stdv-s1 | P3b standard V, curves 132..262 (orbit B) | p3b_stdv.s1a: 516 rows; p3b_stdv.s1b: 528 rows; p3b_stdv.s1c: 528 rows | completed (receipt) |
 
 *PROTOCOL 6.1 instrument checks, recounted from the recorded rows (same (k, attempt, curve) key, same shard file). A cell with an identity below 100% is void by the protocol. Planted rows whose `outcome` is `atleast` are bounds and are not Dreg values.*
 
@@ -219,14 +227,14 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 
 | cell | orbit | standard V only: floor-curve mean of min Dreg against E0 | family minimum (arms present): floor-curve mean against E0 | family arms with rows | family status |
 |---|---|---|---|---|---|
-| n=131, k=3 | A | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=3 | B | pending | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=4 | A | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 88 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=4 | B | pending | 6.000 (range 6 to 6; 10 curve(s)); E0 6; difference 0.000 | stdv, badapt | incomplete, arms pending: bsparse |
-| n=131, k=5 | A | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 87 curve(s)); E0 6; difference 0.000 | stdv | incomplete, arms pending: badapt, bsparse |
-| n=131, k=5 | B | pending | pending | stdv | incomplete, arms pending: badapt, bsparse |
-| n=131, k=6 | A | 7.000 (range 7 to 7; 78 curve(s)); E0 6; difference 1.000 | 7.000 (range 7 to 7; 78 curve(s)); E0 6; difference 1.000 | stdv | incomplete, arms pending: badapt, bsparse |
-| n=131, k=6 | B | pending | pending | stdv | incomplete, arms pending: badapt, bsparse |
+| n=131, k=3 | A | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=131, k=3 | B | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=131, k=4 | A | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=131, k=4 | B | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=131, k=5 | A | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=131, k=5 | B | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=131, k=6 | A | 7.000 (range 7 to 7; 131 curve(s)); E0 6; difference 1.000 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
+| n=131, k=6 | B | 6.977 (range 6 to 7; 131 curve(s)); E0 6; difference 0.977 | 6.000 (range 6 to 6; 131 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
 | n=43, k=3 | O0 | 6.333 (range 6 to 7; 3 curve(s)); E0 6; difference 0.333 | 6.000 (range 6 to 6; 3 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
 | n=43, k=3 | O1 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
 | n=43, k=3 | O2 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | 6.000 (range 6 to 6; 1 curve(s)); E0 6; difference 0.000 | stdv, badapt, bsparse | all three family arms have rows (curve coverage in figures 4 and 5) |
@@ -242,14 +250,16 @@ Question (user, 2026-11-02): across the isogeny classes of ECC2K-130 and ECCp-13
 
 The preregistered reading is C2: after minimising over the declared presentation family F on both sides, E0 and the floor curves coincide, with the single-presentation (standard V) gap present as the positive control (standard V, n = 131, k = 6: E0 Dreg 6 against floor Dreg 7). Where the table shows the single-presentation gap and an incomplete family, only the positive control is visible so far. A surviving gap would be read only as a statement about b in F_2 (E0 alone has b = 1), not about the isogeny class, and is not a speedup (no end-to-end S, no rho gap).
 
+Main-session reading of the frozen pooled analyses (masked first, unmasked after the freeze; p3_ecc2k130/RESULTS.md): outcome N. At n = 131, k = 5 and 6 the presentation-family minimum is Dreg 6 for E0 and for all 262 level-263 curves on both attempts; the b-adapted presentation alone gives 6 on every curve, and random-b controls match. Random V: Dreg and matrix shape identical to E0 on every class curve at n = 131 (k = 3, 4); at n = 43 Dreg is identical and one target of 20 shows b-dependent column counts with E0 in the modal shape.
+
 
 ## 8. Deferred and pending
 
 - **Not run (deferred), P1 tier 2:** config `m2t4`, 39 arms, 8 plus 2 targets (about 6.3 CPU-hours). In the preregistered design, no data taken under protocol version 1 amendment A1. Needs a further amendment before running.
 - **Not run (deferred), P2 at 36 and 40 bits:** c36A_m2, c36A_m3, c36B_m2, c36B_m3, c40A_m2, c40A_m3, c40B_m2, c40B_m3 (8 cells). In the population and the preregistration; no data taken under amendment A1.
 - **Not run (deferred), P3a-Y:** n = 43, k = 13 yield line (about 19.4 CPU-hours); claim C3 (yield against the Poisson prediction) is not run, and the `solutions` column of the cells that did run is descriptive.
-- **Pending at generation time, P2:** c24B_m3, c28A_m2, c28B_m2, c28B_m3, c32B_m2, c32B_m3.
-- **Pending or partial at generation time, P3:** b-badapt (running), b-bsparse (pending), b-main-k5-s0 (pending), b-main-k5-s1 (pending), b-stdv-s0 (running), b-stdv-s1 (pending).
+- **Pending at generation time, P2:** c28B_m2, c32B_m2.
+- **Pending or partial at generation time, P3:** none.
 - Statements about pending cells are not made. In particular the C2 outcome (N or G) is open until the b-adapted and b-sparse arms and the remaining standard-V shards finish.
 
 
@@ -276,24 +286,39 @@ Rerun from the repository root: `research/isogeny_class_ic_yield_20261102/report
 | `p2_prime_analogues/runs/c24A_m3/audit.json` | `5fde2045b1ee7f20` |
 | `p2_prime_analogues/runs/c24B_m2/analysis.json` | `bd9cae34ea36de6e` |
 | `p2_prime_analogues/runs/c24B_m2/audit.json` | `b13fa242a0337a28` |
+| `p2_prime_analogues/runs/c24B_m3/analysis.json` | `40a5e5944275d87c` |
+| `p2_prime_analogues/runs/c24B_m3/audit.json` | `28c25dc4762f0aaa` |
+| `p2_prime_analogues/runs/c28A_m2/analysis.json` | `01e919a90cfd2725` |
+| `p2_prime_analogues/runs/c28A_m2/audit.json` | `b7b9447ece6d7693` |
 | `p2_prime_analogues/runs/c28A_m3/analysis.json` | `017d0ca14e8795c9` |
 | `p2_prime_analogues/runs/c28A_m3/audit.json` | `002d0164ac54045d` |
+| `p2_prime_analogues/runs/c28B_m3/analysis.json` | `1765c53edc0276c3` |
+| `p2_prime_analogues/runs/c28B_m3/audit.json` | `f27c9e54faf6b29b` |
 | `p2_prime_analogues/runs/c32A_m2/analysis.json` | `dba868b529f5322f` |
 | `p2_prime_analogues/runs/c32A_m2/audit.json` | `af60cc5c2c3c00c2` |
 | `p2_prime_analogues/runs/c32A_m3/analysis.json` | `b4e907dd0328bc41` |
 | `p2_prime_analogues/runs/c32A_m3/audit.json` | `9906464becf9e795` |
+| `p2_prime_analogues/runs/c32B_m3/analysis.json` | `2330be8d60844005` |
+| `p2_prime_analogues/runs/c32B_m3/audit.json` | `3d394c5f8f2912ab` |
 | `p3_ecc2k130/data/ecc2k130_curves.tsv` | `ee987b52191581be` |
-| `p3_ecc2k130/full/p3a_ctrl_k3.jsonl.gz` | `d5d056ae539a7e00` |
+| `p3_ecc2k130/full/p3a_ctrl_k3.jsonl` | `f136198871fd2e0f` |
 | `p3_ecc2k130/full/p3a_ctrl_k4.s0.jsonl` | `38b5aa5f790b7d98` |
 | `p3_ecc2k130/full/p3a_ctrl_k4.s1.jsonl` | `df920701d2ff3636` |
-| `p3_ecc2k130/full/p3a_m2.jsonl.gz` | `236fe640c9f8d15d` |
-| `p3_ecc2k130/full/p3a_main_k3.jsonl.gz` | `2708eb9df5e349d5` |
+| `p3_ecc2k130/full/p3a_m2.jsonl` | `d4aba33321e915e2` |
+| `p3_ecc2k130/full/p3a_main_k3.jsonl` | `5a74f7c788b3afb7` |
 | `p3_ecc2k130/full/p3a_main_k4.s0.jsonl` | `ed54f2385dd64492` |
 | `p3_ecc2k130/full/p3a_main_k4.s1.jsonl` | `483f319d6657d46e` |
 | `p3_ecc2k130/full/p3a_main_k5.jsonl` | `e231989e04918260` |
-| `p3_ecc2k130/full/p3b_badapt.jsonl` | `5c414e98479a548e` |
+| `p3_ecc2k130/full/p3b_badapt.jsonl` | `e4f3f7a44ab6293f` |
+| `p3_ecc2k130/full/p3b_bsparse.jsonl` | `4529006fc66b534e` |
 | `p3_ecc2k130/full/p3b_ctrl.jsonl` | `db555205a315ce34` |
 | `p3_ecc2k130/full/p3b_main_k34.jsonl` | `027f656372a38aec` |
+| `p3_ecc2k130/full/p3b_main_k5.s0.jsonl` | `0d349d7892f14204` |
+| `p3_ecc2k130/full/p3b_main_k5.s1.jsonl` | `7d242d7bb016e554` |
 | `p3_ecc2k130/full/p3b_stdv.s0a.jsonl` | `12726d01e4e2b785` |
-| `p3_ecc2k130/full/p3b_stdv.s0b.jsonl` | `a418b0b518f5a82a` |
+| `p3_ecc2k130/full/p3b_stdv.s0b.jsonl` | `685559ff5d06aadc` |
+| `p3_ecc2k130/full/p3b_stdv.s0c.jsonl` | `38501eaddf81c628` |
+| `p3_ecc2k130/full/p3b_stdv.s1a.jsonl` | `51afd98ab060ba64` |
+| `p3_ecc2k130/full/p3b_stdv.s1b.jsonl` | `48a22d0c68af26e4` |
+| `p3_ecc2k130/full/p3b_stdv.s1c.jsonl` | `eb937a8bd2bcb6c2` |
 

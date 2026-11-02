@@ -1110,8 +1110,11 @@ fn load_p3(study: &Path, inp: &mut Inputs) -> P3 {
     let full = study.join("p3_ecc2k130/full");
     let mut p3 = P3 { rows: vec![], stem_rows: BTreeMap::new(), stem_unparsed: BTreeMap::new(), card_state: vec![] };
     for card in p3_cards() {
-        let receipt = study.join(format!("cards/CARD-isogeny-ic-yield-p3-{}-20261102-1.receipt.json", card.tag));
-        let has_receipt = read_json(&receipt).map(|j| j.get("status").s() == Some("completed")).unwrap_or(false);
+        // A card may be reissued (-2 after a mis-sized timeout, TIMEOUT_NOTE.md): any completed revision counts.
+        let has_receipt = (1..=9).any(|rev| {
+            let receipt = study.join(format!("cards/CARD-isogeny-ic-yield-p3-{}-20261102-{}.receipt.json", card.tag, rev));
+            read_json(&receipt).map(|j| j.get("status").s() == Some("completed")).unwrap_or(false)
+        });
         let mut stems = Vec::new();
         let mut any = false;
         for st in &card.stems {
@@ -1768,7 +1771,8 @@ fn main() {
             let fam = get(&fam_arms);
             let std_only = get(&["stdv"]);
             let present: Vec<&str> = fam_arms.iter().cloned().filter(|a| p3.rows.iter().any(|r| r.n == n && r.k == k && r.arm == *a)).collect();
-            let missing: Vec<&str> = fam_arms.iter().cloned().filter(|a| !present.contains(a)).collect();
+            // bsparse runs at n=131 only for k=5,6 by design (PROTOCOL.md section 5); it is not pending at k=3,4.
+            let missing: Vec<&str> = fam_arms.iter().cloned().filter(|a| !present.contains(a) && !(n == 131 && k < 5 && *a == "bsparse")).collect();
             let e0f = fam.get(&0).map(|x| x.0);
             let e0s = std_only.get(&0).map(|x| x.0);
             let orbits: BTreeSet<String> = p3.rows.iter().filter(|r| r.n == n && r.curve < 100000 && r.orbit != "crater").map(|r| r.orbit.clone()).collect();
@@ -1798,6 +1802,9 @@ fn main() {
     }
     d.table_w(&["cell", "orbit", "standard V only: floor-curve mean of min Dreg against E0", "family minimum (arms present): floor-curve mean against E0", "family arms with rows", "family status"], grows.into_iter().map(|mut r| { r.truncate(6); r }).collect(), vec!["0.7fr", "0.5fr", "2.2fr", "2.2fr", "1fr", "1.2fr"], "Descriptive recorded-value summary, attempt 0 only; n = 43 family cells are k = 3 and 4 only (PROTOCOL A1) (the one attempt common to every family arm). Per curve: the minimum recorded Dreg over the presentations of the arms listed; per orbit: mean, range and count over curves, against E0 under the same procedure. This is not the frozen bootstrap analysis (`p3h analyze`, archived under report/data/p3_analysis/) and not PROTOCOL 6.3 outcome N or G: that reading needs the b-adapted and b-sparse arms to be complete, and cells marked incomplete must not be read as a family-minimum gap.");
     d.p("The preregistered reading is C2: after minimising over the declared presentation family F on both sides, E0 and the floor curves coincide, with the single-presentation (standard V) gap present as the positive control (standard V, n = 131, k = 6: E0 Dreg 6 against floor Dreg 7). Where the table shows the single-presentation gap and an incomplete family, only the positive control is visible so far. A surviving gap would be read only as a statement about b in F_2 (E0 alone has b = 1), not about the isogeny class, and is not a speedup (no end-to-end S, no rho gap).");
+    if study.join("p3_ecc2k130/RESULTS.md").exists() {
+        d.p("Main-session reading of the frozen pooled analyses (masked first, unmasked after the freeze; p3_ecc2k130/RESULTS.md): outcome N. At n = 131, k = 5 and 6 the presentation-family minimum is Dreg 6 for E0 and for all 262 level-263 curves on both attempts; the b-adapted presentation alone gives 6 on every curve, and random-b controls match. Random V: Dreg and matrix shape identical to E0 on every class curve at n = 131 (k = 3, 4); at n = 43 Dreg is identical and one target of 20 shows b-dependent column counts with E0 in the modal shape.");
+    }
 
     // ---------------- 8 deferred and pending
     d.h(1, "8. Deferred and pending");
