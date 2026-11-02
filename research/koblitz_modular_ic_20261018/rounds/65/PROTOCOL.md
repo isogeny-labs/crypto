@@ -39,3 +39,21 @@ to their hashes before data. Preserve full logs, partial output and
 rejections. Use the existing checkpoint gate. No EKS, Diem, freezer,
 new Conductor claim, delegation, merge or retarget. Manual contract
 checks are not canonical schema validation.
+
+## Version 2: reconstruct the first PID lattice from accepted kernel
+`first-frobenius65-01` passes the complete160-class square map:
+241 binary remainder rows, rank80, kernel dimension80 and whole-field
+polynomial checks for every survivor. Its three saved bundles are
+content-hashed donors. A new `LATTICE65.sing` reads the saved quotient
+basis and full kernel without rerunning the accepted producer. Form
+`J=[G,QK]` in the trace-dual polynomial coordinates, compute its complete
+univariate module standard basis `N`, and require quotient length80,
+exactly32 basis columns and both module inclusions. Transport
+`V1=G^-1 N` to rational O coordinates, check both inverse products and
+that the inverse inclusion `O -> V1` has polynomial coefficients.
+Check the square of every one of the32 V1 basis columns lies in the
+trace dual using the original32 order-square columns. Reject an altered
+inverse. Save both polynomial and rational basis/inclusion/square bundles.
+This proves the first lattice step; it does not assert stabilization
+or the final integral closure. The original local caps and strict error
+gate remain unchanged. No accepted producer is rerun for this step.
