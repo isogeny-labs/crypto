@@ -1317,6 +1317,117 @@ fn sweep_figure(dirs: &[String]) -> String {
     s
 }
 
+/// Quotient support of a factor-base membership model on the k-bit
+/// miniature (algebraic-track comparison): physical points, classes after
+/// torsion compression (`[8]P`), after signed compression (`±[8]P`), the
+/// distinct projected 2-sums `M` (targets covered, both signs) and
+/// `λ = M/ℓ`; also the overstated count that takes every physical pair as
+/// a candidate.  Forms:
+/// - `xw`: Weierstrass abscissa in `[0, 2^t)` (the `bits` oracle's base);
+/// - `xm`: Montgomery abscissa in `[0, 2^t)`;
+/// - `w`: the T₀-invariant `w = x_M + 1/x_M` in `[0, 2^t)` (the
+///   x-coordinate of the 2-isogenous curve `E/⟨T₀⟩`, up to `+A`);
+/// - `isogeny`: PKM's isogeny tower (`prime-isogeny:t,seed=0`);
+/// - `kummer`: `μ_(2^t)` in the Weierstrass abscissa (needs `2^t | p − 1`).
+fn support(k: u32, form: &str, t: u32) -> Value {
+    use std::collections::HashSet;
+    let m = build_miniature(k);
+    let (w, shift, p, r) = (m.weier, m.shift, m.p, m.r);
+    let mont = Mont { p, a: m.a_mont };
+    let span = 1u64 << t;
+    // Weierstrass abscissae of the base.
+    let xs: Vec<u64> = match form {
+        "xw" => (0..span).collect(),
+        "xm" => (0..span).map(|u| addm(u, shift, p)).collect(),
+        "w" => {
+            let mut v = Vec::new();
+            for wv in 0..span {
+                // x² − w x + 1 = 0
+                let disc = subm(mulm(wv, wv, p), 4, p);
+                if let Some(sq) = sqrtm(disc, p) {
+                    let i2 = invm(2, p);
+                    for x in [mulm(addm(wv, sq, p), i2, p), mulm(subm(wv, sq, p), i2, p)] {
+                        v.push(addm(x, shift, p));
+                    }
+                }
+            }
+            v.sort_unstable();
+            v.dedup();
+            v
+        }
+        "isogeny" => {
+            let mut ops = crypto_lib::cryptanalysis::ic_boundary::GroupOps::default();
+            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(p, t, 0, &mut ops)
+                .expect("isogeny tower")
+                .v
+        }
+        "kummer" => {
+            if (p - 1) % span != 0 {
+                return json!({"k": k, "form": form, "t": t, "error": format!("2^{t} does not divide p - 1")});
+            }
+            let g = (2..p).find(|&g| powm(g, (p - 1) / 2, p) == p - 1).unwrap();
+            let z = powm(g, (p - 1) / span, p);
+            (0..span).map(|j| powm(z, j, p)).collect()
+        }
+        o => panic!("form is xw, xm, w, isogeny or kummer, not {o}"),
+    };
+    let _ = mont;
+    let mut physical = Vec::new();
+    for &x in &xs {
+        if let Some(y) = sqrtm(w.rhs(x), p) {
+            physical.push(Pt { x, y, inf: false });
+            if y != 0 {
+                physical.push(Pt {
+                    x,
+                    y: p - y,
+                    inf: false,
+                });
+            }
+        }
+    }
+    let mut tors: HashSet<(u64, u64)> = HashSet::new();
+    let mut signed: Vec<Pt> = Vec::new();
+    let mut seen_x = HashSet::new();
+    for q in &physical {
+        let e = w.mul(*q, 8);
+        if e.inf {
+            continue;
+        }
+        tors.insert((e.x, e.y));
+        if seen_x.insert(e.x) {
+            signed.push(e);
+        }
+    }
+    let mut d = HashSet::new();
+    for i in 0..signed.len() {
+        for j in i..signed.len() {
+            for s in [
+                w.add(signed[i], signed[j]),
+                w.add(signed[i], w.neg(signed[j])),
+            ] {
+                if !s.inf {
+                    d.insert(s.x);
+                }
+            }
+        }
+    }
+    let mm = 2 * d.len() as u64;
+    let n_phys = physical.len() as u64;
+    let naive = n_phys * (n_phys + 1) / 2;
+    json!({
+        "k": k, "form": form, "t": t, "interval_or_tower_size": span, "abscissae": xs.len(),
+        "physical_points": n_phys,
+        "classes_torsion_compressed": tors.len(),
+        "classes_signed": signed.len(),
+        "M_projected_2sums": mm,
+        "lambda": mm as f64 / r as f64,
+        "M_naive_physical_pairs": naive,
+        "lambda_naive": naive as f64 / r as f64,
+        "naive_overstatement": naive as f64 / mm.max(1) as f64,
+        "membership_tower_vars_per_summand": t,
+    })
+}
+
 /// Base size `N_a = round(0.63·r^{1/3})`: the lab's validated prime-order
 /// optimum (`docs/ic/LEADERBOARD.md`, prime-field baseline: N = 162, 407,
 /// 1024 at 24, 28, 32 bits is 0.63·n^{1/3}) scaled to the subgroup.
@@ -1456,6 +1567,15 @@ fn main() {
         "sweep-figure" => {
             // sweep-figure <out.svg> <train_session_dir>...
             std::fs::write(&args[2], sweep_figure(&args[3..])).unwrap();
+        }
+        "support" => {
+            // support <k> <form> <t>
+            let k: u32 = args[2].parse().unwrap();
+            let t: u32 = args[4].parse().unwrap();
+            println!(
+                "{}",
+                serde_json::to_string(&support(k, &args[3], t)).unwrap()
+            );
         }
         "summarise" => {
             // summarise <out_prefix> <session_dir>...

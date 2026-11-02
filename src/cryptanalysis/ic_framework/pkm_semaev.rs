@@ -202,13 +202,38 @@ struct Prepared {
     v: Vec<u64>,
 }
 
+/// How each summand's abscissa is tied to its `t` tower variables
+/// `y_(i,0) … y_(i,t−1)`, i.e. how factor-base membership is imposed.
+#[derive(Clone, Debug)]
+pub enum Membership {
+    /// `x = g·y_0`, `y_j² = y_(j+1)`, `y_(t−1)² = 1`: `V = g·μ_(2^t)`, which
+    /// needs `2^t | p − 1` (PKM's Kummer form).
+    Kummer,
+    /// PKM's isogeny form: `x = y_0`, `y_(j+1) = y_j + τ_j/(y_j − ξ_j)` (a
+    /// Vélu 2-isogeny x-map), `y_t = c`, cleared of denominators:
+    /// `y_j² = y_j·y_(j+1) − ξ_j·y_(j+1) + ξ_j·y_j − τ_j` and, at the top,
+    /// `y_(t−1)² = (c + ξ)·y_(t−1) − cξ − τ`.  No condition on `p`.
+    /// `v` is the zero set `x(R' + ⟨Q⟩)` of `prime-isogeny`.
+    Isogeny {
+        v: Vec<u64>,
+        steps: Vec<(u64, u64)>,
+        c: u64,
+    },
+    /// Interval by bits: `x = lo + Σ_j 2^j·b_j`, `b_j² = b_j` (each bit a
+    /// top-level tower variable): `V = [lo, lo + 2^t)`.  No condition on `p`.
+    Bits { lo: u64 },
+}
+
 /// The oracle.  Built by the harness with the base's `t` and `g`, which it
 /// reads from the `prime-kummer` spec; `prepare` checks that every
-/// abscissa of the base is in `V` and refuses any other base.
+/// abscissa of the base is in `V` and refuses any other base.  The
+/// `prime-isogeny` base and an interval base (`bits=T`) select the other
+/// [`Membership`] forms.
 pub struct PkmSemaevOracle {
     m: u32,
     t: u32,
     g: u64,
+    membership: Membership,
     mode: PkmMode,
     engine: PkmEngine,
     max_degree: u32,
@@ -233,6 +258,7 @@ impl PkmSemaevOracle {
             m,
             t,
             g,
+            membership: Membership::Kummer,
             mode: PkmMode::Chain,
             engine: PkmEngine::F4,
             max_degree: 12,
@@ -252,6 +278,21 @@ impl PkmSemaevOracle {
             dataset_trace: false,
             dataset_artifact: None,
         }
+    }
+
+    /// `m` summands on PKM's isogeny tower (`prime-isogeny:t=T`): `v` its
+    /// zero set, `steps` the `(ξ_j, τ_j)` of the chain, `c = x(Φ(R'))`.
+    pub fn new_isogeny(m: u32, t: u32, v: Vec<u64>, steps: Vec<(u64, u64)>, c: u64) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::Isogeny { v, steps, c };
+        o
+    }
+
+    /// `m` summands with abscissae in `[lo, lo + 2^t)`, written in bits.
+    pub fn new_bits(m: u32, t: u32, lo: u64) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::Bits { lo };
+        o
     }
 
     /// A wall-clock budget per F4 call (the harness's
@@ -352,6 +393,22 @@ impl PkmSemaevOracle {
 
     /// Build the ring and the system with `x_R` as a variable, then split
     /// by powers of `x_R`.
+    fn finish_prepare(&mut self, curve: &PrimeCurve, check_mults: u64) -> Result<(), String> {
+        let prep = self.build_system(curve);
+        let n_vars = prep.ring.n_vars();
+        let mut degrees = prep.degrees.clone();
+        degrees.extend(std::iter::repeat_n(2, prep.tower_eqs));
+        self.shape = Some(SystemShape {
+            n_vars,
+            n_equations: prep.eqs.len() + prep.tower_eqs,
+            degrees,
+            semi_regular_degree: None,
+        });
+        self.setup_mults = check_mults;
+        self.prepared = Some(prep);
+        Ok(())
+    }
+
     fn build_system(&self, curve: &PrimeCurve) -> Prepared {
         let p = curve.p;
         let (a, b) = (curve.a % p, curve.b % p);
@@ -364,7 +421,17 @@ impl PkmSemaevOracle {
         };
         let n = n_t + n_free + 1; // last variable: x_R
         let xr_var = n - 1;
-        let x = |i: usize| Pol::var(n, i * t).scale(self.g, p);
+        let x = |i: usize| match &self.membership {
+            Membership::Kummer => Pol::var(n, i * t).scale(self.g, p),
+            Membership::Isogeny { .. } => Pol::var(n, i * t),
+            Membership::Bits { lo } => {
+                let mut acc = Pol::constant(n, lo % p, p);
+                for j in 0..t {
+                    acc = acc.add(&Pol::var(n, i * t + j).scale((1u64 << j) % p, p), p);
+                }
+                acc
+            }
+        };
         let xr = Pol::var(n, xr_var);
         let raw: Vec<Pol> = match (self.mode, m) {
             (PkmMode::Full, 2) => vec![s3(&x(0), &x(1), &xr, a, b, p)],
@@ -384,6 +451,37 @@ impl PkmSemaevOracle {
         for i in 0..m {
             for j in 0..t {
                 let top = j + 1 == t;
+                if let Membership::Isogeny { steps, c, .. } = &self.membership {
+                    let (xi, tau) = (steps[j].0 % p, steps[j].1 % p);
+                    rules.push(if top {
+                        SquareRule {
+                            next: None,
+                            a: 0,
+                            b: 0,
+                            c: addm(*c % p, xi, p),
+                            d: subm(0, addm(mulm(*c % p, xi, p), tau, p), p),
+                        }
+                    } else {
+                        SquareRule {
+                            next: Some((i * t + j + 1) as u8),
+                            a: 1,
+                            b: subm(0, xi, p),
+                            c: xi,
+                            d: subm(0, tau, p),
+                        }
+                    });
+                    continue;
+                }
+                if let Membership::Bits { .. } = &self.membership {
+                    rules.push(SquareRule {
+                        next: None,
+                        a: 0,
+                        b: 0,
+                        c: 1,
+                        d: 0,
+                    });
+                    continue;
+                }
                 rules.push(if top {
                     SquareRule {
                         next: None,
@@ -432,13 +530,20 @@ impl PkmSemaevOracle {
                     .collect()
             })
             .collect();
-        let zeta = primitive_two_power_root(p, self.t).expect("checked in prepare");
-        let mut v = Vec::with_capacity(1 << t);
-        let mut z = self.g % p;
-        for _ in 0..(1u64 << t) {
-            v.push(z);
-            z = mulm(z, zeta, p);
-        }
+        let v = match &self.membership {
+            Membership::Kummer => {
+                let zeta = primitive_two_power_root(p, self.t).expect("checked in prepare");
+                let mut v = Vec::with_capacity(1 << t);
+                let mut z = self.g % p;
+                for _ in 0..(1u64 << t) {
+                    v.push(z);
+                    z = mulm(z, zeta, p);
+                }
+                v
+            }
+            Membership::Isogeny { v, .. } => v.clone(),
+            Membership::Bits { lo } => (0..(1u64 << t)).map(|k| (lo + k) % p).collect(),
+        };
         Prepared {
             ring,
             eqs,
@@ -558,12 +663,20 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
     }
 
     fn describe(&self, params: &Params) -> String {
+        let tower = match &self.membership {
+            Membership::Kummer => {
+                format!("the base's Kummer tower (x/g)^(2^t) = 1, g = {}", self.g)
+            }
+            Membership::Isogeny { .. } => {
+                "the base's Vélu 2-isogeny tower (PKM isogeny form)".into()
+            }
+            Membership::Bits { lo } => format!("bits: x = {lo} + Σ 2^j b_j, b_j² = b_j"),
+        };
         format!(
-            "Semaev S_(m+1) over F_p with each x_i on the base's Kummer tower (x/g)^(2^t) = 1 \
-             (PKM), m = {}, t = {}, g = {}, mode {}, engine {}",
+            "Semaev S_(m+1) over F_p with each x_i on {} (PKM), m = {}, t = {}, mode {}, engine {}",
+            tower,
             self.m,
             self.t,
-            self.g,
             params
                 .get("mode")
                 .unwrap_or(if self.m >= 3 { "chain" } else { "full" }),
@@ -595,6 +708,11 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "crosscheck",
                 "1 to grid-check every F4 refutation (diagnostic, not charged)",
             ),
+            (
+                "bits",
+                "on a base other than prime-kummer/prime-isogeny: write membership in [lo, lo + 2^bits) as bits b_j² = b_j",
+            ),
+            ("lo", "left end of the bit interval, default 0"),
         ]
     }
 
@@ -611,6 +729,38 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         if p >= 1 << 31 {
             return Err("pkm-semaev: the tower engine needs p < 2^31".into());
         }
+        let mut check_mults = 0u64;
+        match &self.membership {
+            Membership::Kummer => {}
+            Membership::Isogeny { v, steps, .. } => {
+                if steps.len() != self.t as usize || v.len() != 1usize << self.t {
+                    return Err(
+                        "pkm-semaev: the isogeny tower does not have t steps and 2^t zeros".into(),
+                    );
+                }
+                let set: HashSet<u64> = v.iter().copied().collect();
+                if let Some(x) = fb.abscissa_list.iter().find(|x| !set.contains(x)) {
+                    return Err(format!(
+                        "pkm-semaev: abscissa {x} of the base is not a zero of the isogeny tower"
+                    ));
+                }
+                return self.finish_prepare(curve, 0);
+            }
+            Membership::Bits { lo } => {
+                let span = 1u64 << self.t;
+                if let Some(x) = fb
+                    .abscissa_list
+                    .iter()
+                    .find(|&&x| (x + p - lo % p) % p >= span)
+                {
+                    return Err(format!(
+                        "pkm-semaev: abscissa {x} of the base is outside [{lo}, {lo} + 2^{})",
+                        self.t
+                    ));
+                }
+                return self.finish_prepare(curve, 0);
+            }
+        }
         primitive_two_power_root(p, self.t)
             .ok_or_else(|| format!("pkm-semaev: 2^{} does not divide p − 1", self.t))?;
         // The base must be this tower: every abscissa x has (x/g)^(2^t) = 1.
@@ -619,7 +769,6 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             return Err("pkm-semaev: g must be non-zero".into());
         }
         let ginv = crate::cryptanalysis::residual_walk::pow_mod(g, p - 2, p);
-        let mut check_mults = 0u64;
         for &x in &fb.abscissa_list {
             let mut y = mulm(x, ginv, p);
             for _ in 0..self.t {
@@ -634,19 +783,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 ));
             }
         }
-        let prep = self.build_system(curve);
-        let n_vars = prep.ring.n_vars();
-        let mut degrees = prep.degrees.clone();
-        degrees.extend(std::iter::repeat_n(2, prep.tower_eqs));
-        self.shape = Some(SystemShape {
-            n_vars,
-            n_equations: prep.eqs.len() + prep.tower_eqs,
-            degrees,
-            semi_regular_degree: None,
-        });
-        self.setup_mults = check_mults;
-        self.prepared = Some(prep);
-        Ok(())
+        self.finish_prepare(curve, check_mults)
     }
 
     fn setup_native(&self) -> BTreeMap<String, u64> {
@@ -1021,6 +1158,123 @@ mod tests {
             0
         );
         assert!(n["pkm_system_fp_mults_uncharged"] > 0);
+    }
+
+    /// F4 on a membership form against the grid and the exact set of
+    /// decomposable points, on random and planted targets, `m = 2`.
+    fn agrees_with_grid(
+        inst: &PrimeInstance,
+        fb: &FactorBase<PrimePoint>,
+        make: &dyn Fn() -> PkmSemaevOracle,
+        label: &str,
+    ) {
+        let curve = &inst.curve;
+        let decomposable = decomposable_points(curve, fb, 2, &mut GroupOps::default());
+        let prep = |spec: &str| {
+            let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+            let mut o = make();
+            o.prepare(&ctx(inst), fb, &params, &mut GroupOps::default())
+                .unwrap_or_else(|e| panic!("{label}: prepare: {e}"));
+            o
+        };
+        let mut f4 = prep("m=2,crosscheck=1");
+        let mut grid = prep("m=2,engine=exhaustive");
+        let mut rng = StdRng::seed_from_u64(29);
+        let g = inst.generator_point();
+        let mut hits = 0;
+        for k in 0..32u64 {
+            let target = if k % 3 == 0 {
+                let idx: Vec<usize> = (0..2).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                sum(curve, fb, &idx)
+            } else {
+                curve.mul(&mut GroupOps::default(), g, rng.gen_range(1..inst.r))
+            };
+            if target.infinity {
+                continue;
+            }
+            let run = |o: &mut PkmSemaevOracle| {
+                let got = o.decompose(
+                    &ctx(inst),
+                    fb,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    target,
+                );
+                if let Some(idx) = &got {
+                    assert_eq!(
+                        sum(curve, fb, idx),
+                        target,
+                        "{label}: relation sums to the target"
+                    );
+                }
+                got.is_some()
+            };
+            let (a, c) = (run(&mut f4), run(&mut grid));
+            assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
+            assert_eq!(
+                c,
+                decomposable.contains(&curve.key(&target)),
+                "{label}: target {k}"
+            );
+            hits += usize::from(c);
+        }
+        assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+        let n = f4.relation_counters();
+        assert_eq!(
+            n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
+            0,
+            "{label}"
+        );
+        assert!(
+            f4.solver_totals().unwrap().ops > 0,
+            "{label}: F4 work is counted"
+        );
+    }
+
+    /// PKM's isogeny form (no condition on p): the oracle's tower rules are
+    /// the base's Vélu chain, and F4 matches the grid.
+    #[test]
+    fn isogeny_tower_form_agrees_with_grid() {
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        let inst = instance();
+        let t = 4;
+        let b = PrimeIsogenyBase { instance: &inst };
+        let mut params = Params::default();
+        params.set("t", t.to_string());
+        let fb = b
+            .build(&ctx(&inst), &params, &mut GroupOps::default())
+            .expect("isogeny base");
+        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        // Every zero of the rules is a zero of the chain: L(x) = c on V.
+        for &x in &tower.v {
+            assert_eq!(tower.eval(x), Some(tower.c));
+        }
+        let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+        let (v, c) = (tower.v.clone(), tower.c);
+        agrees_with_grid(
+            &inst,
+            &fb,
+            &|| PkmSemaevOracle::new_isogeny(2, t, v.clone(), steps.clone(), c),
+            "isogeny",
+        );
+    }
+
+    /// The bit form: an interval base `[0, 2^t)` written as `Σ 2^j b_j`,
+    /// `b_j² = b_j`; F4 matches the grid, and a base outside the interval is
+    /// refused.
+    #[test]
+    fn bit_interval_form_agrees_with_grid() {
+        use crate::cryptanalysis::ic_boundary::prime_factor_base;
+        let inst = instance();
+        let fb = prime_factor_base(&inst, 6);
+        let max = *fb.abscissa_list.iter().max().unwrap();
+        let t = 64 - max.leading_zeros();
+        agrees_with_grid(&inst, &fb, &|| PkmSemaevOracle::new_bits(2, t, 0), "bits");
+        let (_, params) = Params::parse_spec("pkm-semaev:m=2").unwrap();
+        let mut narrow = PkmSemaevOracle::new_bits(2, t - 1, 0);
+        assert!(narrow
+            .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+            .is_err());
     }
 
     /// The oracle refuses a base that is not its tower.
