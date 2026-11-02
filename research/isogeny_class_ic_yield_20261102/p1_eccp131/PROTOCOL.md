@@ -16,7 +16,8 @@ leaderboard or `benchmarks/README.md`.
 
 Across the 28 curves of ECCp-131's class that can be built (E0 and the 27 Elkies
 l-neighbours, l <= 150), do the algebraic parameters of the decomposition system
-(degree of regularity / solving degree, first fall degree, Macaulay matrix size and rank
+(the Macaulay/XL closure degree `D_solve` of this study's engine, which is **not** F4's solving degree or a
+degree of regularity (section 4); first fall degree, Macaulay matrix size and rank
 profile, field-operation count and CPU time of the solver) and the per-trial relation yield
 differ from curve to curve beyond what presentation and noise explain?
 
@@ -26,7 +27,7 @@ differ from curve to curve beyond what presentation and noise explain?
 |:--|:--|:--|:--|
 | C1 | The 27 neighbours, their isogenies and the transported planted DLP are correct: kernel degree (l-1)/2, x-map degrees (l, l-1), homomorphism on random points, `#E' = n`, image of the generator has order n, `phi(kP) = k phi(P)` | exact computation | `neighbours.json` checks (all 27 pass), re-derived in `p1_eccp131 make-targets` |
 | C2 | Full-width per-trial yield of any fixed-size factor base is the same formula on every curve of the class and is astronomically small; it is **predicted analytically, not observed** (section 3) | heuristic estimate (analytic) | formula, section 3 |
-| C3 | For the PKM isogeny-tower factor base and the Semaev systems at m = 2 (t = 3, 4) and m = 3 (t = 2), the refutation/solving degree, first fall degree, rank profile and operation count of the transported-target systems on the 27 neighbours are inside the A/A band of E0 | comparative / statistical | this experiment (sections 5-9) |
+| C3 | For the PKM isogeny-tower factor base and the Semaev systems at m = 2 (t = 3, 4) and m = 3 (t = 2), the Macaulay/XL closure degree `D_solve` (refutation degree for null targets; not F4's solving degree), first fall degree, rank profile and operation count of the transported-target systems on the 27 neighbours are inside the A/A band of E0 | comparative / statistical | this experiment (sections 5-9) |
 | C4 | The instrument can see an algebraic change: adding a known quadric to a planted system lowers D_solve; and a planted decomposition is found with `n_standard_monomials = K` (the exact solution count) on every curve | comparative (positive control) | `ladder` and `planted` rows |
 | C5 | Any statement about ECCp-131 itself at full width (p ~ 2^131, a real factor base) | out of scope | "not established" |
 
@@ -100,16 +101,16 @@ monomial; with the tower leading terms `u_j^2`), keeps the new pivots, and recor
 fall), zero reductions, non-zeros held, field multiplications, row operations, CPU time, and the
 **staircase** of leading monomials (number of standard monomials `n_std`, variables with a pure power).
 It is **not** F4 (no critical pairs, no symbolic preprocessing selection) and **not** a
-Groebner basis engine; its D is the Macaulay degree at which the criteria below hold. On the 147 mirror systems of
-`CROSSCHECK.md` (primes < 2^32, where `f4_fp` runs) it was strictly above F4's top step degree every time (an observation on
-these shapes; no theorem, degree falls make the two incomparable). No claim about F4 time is made. Cross-checked against `f4_fp`
+Groebner basis engine; its D is the Macaulay degree at which the criteria below hold (the XL/Macaulay closure degree, `D_solve`; it must never be reported as F4's solving degree). On the 147 mirror systems of
+`CROSSCHECK.md` (primes < 2^32, where `f4_fp` runs) `D_solve` was strictly above F4's top step degree on 147 / 147 systems (an observation on
+these shapes; no theorem, degree falls make the two incomparable), so it is a closure degree above F4's, not F4's solving degree. No claim about F4 time is made. Cross-checked against `f4_fp`
 (`CROSSCHECK.md`, `crosscheck/`), with the limits listed there and in section 12.
 
 **Metrics (all defined per attempt; counted metrics first, the clock last).**
 
 | metric | definition |
 |:--|:--|
-| `D_solve` | first D at which `n_std = K` (K = exact number of solutions over the closure, enumerated from V) and every variable has a pure power as a leading monomial; for `K = 0` it is the **refutation degree**: first D with the constant 1 as a leading monomial |
+| `D_solve` | the **XL/Macaulay closure degree** of this engine (not F4's solving degree, not a degree of regularity): first D at which `n_std = K` (K = exact number of solutions over the closure, enumerated from V) and every variable has a pure power as a leading monomial; for `K = 0` it is the **refutation degree**: first D with the constant 1 as a leading monomial |
 | `first_fall_degree_obs` | first D at which a new pivot has leading degree < D |
 | `D_semiregular_ref` | first non-positive coefficient of `prod(1 - z^{d_i}) / (1 - z)^N` (reference only) |
 | `final_rows`, `final_cols`, `final_rank`, `rank_profile_by_leading_degree` | Macaulay matrix size and rank at D_solve |
@@ -303,3 +304,67 @@ Outputs: `runs/tier{1,2}_rows.jsonl` (one JSON row per attempt plus a header wit
 hashes, binary hash, host), `runs/tier{1,2}_analysis.json`, `.txt`, and the mask key
 (`*.key.json`, opened after the analysis is frozen). Export to the unified
 `experiment.export/v1` is the director's step.
+
+## 14. AMENDMENT A1 (2026-11-02, filed before any data): local route, tier 1 only, L0, two workers
+
+Status: filed before any measurement of this protocol. `runs/` did not exist when this was filed; `smoke/` (section 11)
+and `crosscheck/` are instrument tests, not data. Protocol record: `protocol.json` (`experiment.protocol/v1`, version 1,
+frozen together with this amendment; amendment id `A1-local-tier1-l0-20261102` is listed in its `amendments`).
+Sections 1 to 13 are the design as written for tiers 1 and 2 on isolab-eks; where section 14 differs, section 14 governs.
+
+What changes.
+
+- **Run scope: tier 1 only.** Configs `m2t3` and `m3t2`, 58 arms, 32 null targets, 8 planted targets, 3 reps, 27 random
+  curves, seed 20261102, `--dcap 12 --max-cols 60000 --budget-s 120`, kinds `null,planted,ladder`: exactly the arguments
+  of `run_full.sh tier1`. About 3.5 CPU-hours (m2t3 2,370 s + m3t2 10,350 s = 12,720 s thread CPU, section 10).
+- **Deferred, not dropped: tier 2** (`m2t4`, 39 arms, 8 + 2 targets, about 6.3 CPU-hours). It stays in the preregistered
+  design (sections 5, 7, 10); **no data are taken for it under this protocol version**; it is reported as "not run
+  (deferred)", never filled. Running it later needs a further amendment that says whether it precedes its data. The
+  multiplicity family of section 8 stays 108 tests (27 neighbours x 4 primary metrics, level 0.9995, 40,000 resamples), unchanged.
+- **Route: local, no isolab-eks, no ecbench.** P1 does not use `ecbench` and takes no host lock. Isolation level **L0** on
+  a **loaded** host: the 4-core sandbox also runs the P2 ecbench cells one at a time (worktree `/home/user/crypto-p2run`),
+  and other agent sessions.
+- **Workers: 2** (`WORKERS=2` in `run_full.sh`; the original design said 4), to leave cores to the P2 cells. The job list
+  and its order are built before any worker starts and do not depend on the worker count; counted metrics do not depend
+  on it either. Estimated wall with 2 uncontended workers: about 1.75 h; on the loaded host it is longer. The card
+  timeout is 21,600 s; a timeout is a stop, not a result.
+- **Clock descriptive only.** `cpu_s` (thread CPU time) and `wall_s` of every row are taken at L0 on a loaded host, with
+  co-tenants sharing caches and cores, so they are **descriptive only**; they decide nothing. The counted metrics decide:
+  `D_solve`, `first_fall_degree_obs`, rank profile, `final_rows`, `final_cols`, `final_rank`, `field_mults`, `row_ops`,
+  `n_standard_monomials_final`, `status`. `analyze` still prints the `cpu_s` ratios and their intervals; they are
+  reported with this label and a class effect on `cpu_s` alone is never claimed (section 8's decision rule applies to
+  the counted metrics only). `--budget-s 120` is a **wall** limit inside the engine: a row stopped by it on the
+  loaded host is `cap_time`, is kept, and the 5% rule of section 9 applies unchanged.
+- **Primary metrics (clarification, no design change).** Section 8 speaks of "4 primary metrics" without naming them;
+  they are the four of claim C3: `D_solve`, `first_fall_degree_obs`, rank profile (`final_rank`) and operation count
+  (`field_mults`). The other metrics of the section 8 list are secondary.
+- **Wording.** `D_solve` is the XL/Macaulay closure degree of this study's engine. On the 147 comparable mirror systems of
+  `CROSSCHECK.md` it is strictly above F4's top step degree, so it is not F4's solving degree and not a degree of
+  regularity, and no statement in a report may call it that. The text of sections 1, 2, 4 was reworded accordingly
+  before the freeze (no change of definition, metric or rule).
+- **Instrument pin.** The binary is built with `cargo build --release --locked` from `rust/` in a dedicated detached
+  worktree (`/home/user/crypto-p1run`) at the commit named in the task card; its sha256 and the sha256 of
+  `targets.json`, `tower.json`, `neighbours.json`, `run_full.sh` and this file are bound by the card. The run consumes the
+  committed `targets.json` and `tower.json` (`--targets`, `--tower`); it does not call libpari, so `P1_LIBPARI` is not
+  needed for the run (it is needed only to rebuild inputs, section 13).
+- **Analysis** (not part of the run card): after the run, `p1_eccp131 analyze --rows runs/tier1_rows.jsonl --out
+  runs/tier1_analysis.json --boot 40000 --level 0.9995 --mask`, the line of `run_full.sh analyze`, with the frozen
+  `rust/src/analyze.rs`. (`run_full.sh analyze` itself exits 1 while `tier2_rows.jsonl` does not exist, so the
+  binary is called directly.)
+- **Unchanged.** Question, claims C1 to C5, arms, controls, targets, seeds, N, caps, thresholds, the A/A and random-curve
+  nulls, the decision rule, the stopping rule, the analysis source.
+
+Hashes at the freeze (sha256).
+
+| file | hash |
+|:--|:--|
+| `protocol.json` (full file) | `310459117118db0f15ab62f7d1126c48cc4e3d590dfe99caf9fccd54643ade78` |
+| `protocol.json` canonical freeze hash (`freeze.protocol_sha256`) | `7bf084c220c9af62eeb3f807f1d3365bee12ebb82cbf1f80ae24cc80889eeee5` |
+| `rust/src/analyze.rs` (frozen analysis, unchanged) | `df8a7e93612d88db6900f319a70de184ce1346a8d84a123f4fbc5a01d6352178` |
+| `run_full.sh` (adds the `WORKERS` variable, default 4) | `4f5065b22cf76f2e2edf52cbace37d7520693f96ea9bc57fb70a4e5c5c1c8b89` |
+| `targets.json` | `95a71df2493f7cdc91c64eac12637b58dfaa7af064300875705cc7d369fe05ff` |
+| `tower.json` | `b82248b83e987e6b375ea1c15e5cc41b346894097c24e97cb2b6e01ef01a19d9` |
+| `neighbours.json` | `0b654414221c62c88cedbcc63d0e2cca2ab88a12d4aa4cc8f6c6b9084a4dd805` |
+
+The binary hash is not in `protocol.json` (it is built at the pin, after this commit); it is bound by the task card and
+written into the header of every run.
