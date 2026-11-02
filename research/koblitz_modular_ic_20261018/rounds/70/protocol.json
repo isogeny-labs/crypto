@@ -1,26 +1,110 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R70-SIXTH-FROBENIUS",
-  "version": 1,
+  "version": 2,
   "goal": "test both classes of V5/O and reconstruct the sixth descending Frobenius lattice",
-  "claims": [{"id": "sixth_frobenius70", "class": "exact_computation", "statement": "The complete two-class square-preimage kernel defines a checked rank32 sixth PID lattice; zero square rank with quotient length zero certifies stabilization"}],
+  "claims": [
+    {
+      "id": "sixth_frobenius70",
+      "class": "exact_computation",
+      "statement": "The complete two-class square-preimage kernel defines a checked rank32 sixth PID lattice; zero square rank with quotient length zero certifies stabilization"
+    }
+  ],
   "arms": {
     "reference": "R69 sealed polynomial and field fifth-lattice bases; R52 full source multiplication table",
     "candidate": "complete module kbase, rational denominator-remainder square map, full binary kernel and PID lattice",
-    "positive": ["both quotient classes", "all 32 source square columns", "both V5 inverse products", "every remainder reconstruction", "all kernel products", "all 32 new basis squares"],
-    "negative": ["altered nonzero kernel rejected when applicable", "changed inverse rejected"],
-    "baseline": {"not_applicable_reason": "exact algebra"},
-    "A_A": {"not_applicable_reason": "complete deterministic quotient"}
+    "positive": [
+      "both quotient classes",
+      "all 32 source square columns",
+      "both V5 inverse products",
+      "every remainder reconstruction",
+      "all kernel products",
+      "all 32 new basis squares",
+      "explicit nonzero 2-by-2 rank minor when kernel zero",
+      "V6=O field identity and all 32 old-order basis squares"
+    ],
+    "negative": [
+      "altered nonzero kernel rejected when applicable",
+      "changed inverse rejected"
+    ],
+    "baseline": {
+      "not_applicable_reason": "exact algebra"
+    },
+    "A_A": {
+      "not_applicable_reason": "complete deterministic quotient"
+    }
   },
-  "variables": {"fixed": ["rank32 affine source", "complete two-class quotient", "all 32 source squares", "1200sec/4GiB", "one Singular/FLINT thread", "one math job"], "measured": ["binary rows/rank/nullity", "new quotient length", "basis-square checks", "exit/errors/UTC/hashes"], "statistical": "not applicable"},
-  "randomization": {"method": "fixed", "reason": "complete quotient", "seeds": [70]},
-  "blinding": {"method": "none", "reason": "exact algebra"},
-  "sample_size": {"instances": 1, "replicates": 1, "warmups": 0, "power": "not applicable"},
-  "metrics": ["full two-class square map", "binary row/rank/nullity", "V6/O quotient length", "32 basis-square checks"],
-  "execution": {"launcher": "REPLAY_CAS.sh sixth-frobenius70-01 SIXTH_FROBENIUS70.sing SIXTH_FROBENIUS70_ALL_CHECKS_PASS", "backend": "original manually authorized local Singular", "timeout_seconds": 1200, "virtual_KiB": 4194304, "threads": 1, "seed": 70, "CPU_affinity": "not pinned", "queue": "one math job at a time; R69 terminal and published", "source_gate": "copied source/protocol/driver bytes match Git; all donor hashes", "checkpoint": "existing checkpoint gate; immutable raw copies"},
-  "stopping": {"accept": "exit0/exact marker/no whitespace-question-mark errors and every assertion", "failure": "retain partials/errors/caps; repair under fresh revision without narrowing both classes"},
-  "analysis": {"kind": "complete exact quotient, binary rational-remainder kernel and reconstructed lattice", "comparative": false},
+  "variables": {
+    "fixed": [
+      "rank32 affine source",
+      "complete two-class quotient",
+      "all 32 source squares",
+      "1200sec/4GiB",
+      "one Singular/FLINT thread",
+      "one math job"
+    ],
+    "measured": [
+      "binary rows/rank/nullity",
+      "new quotient length",
+      "basis-square checks",
+      "exit/errors/UTC/hashes"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "complete quotient",
+    "seeds": [
+      70
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exact algebra"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "not applicable"
+  },
+  "metrics": [
+    "full two-class square map",
+    "binary row/rank/nullity",
+    "V6/O quotient length",
+    "32 basis-square checks"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh sixth-frobenius70-02 SIXTH_FROBENIUS70.sing SIXTH_FROBENIUS70_ALL_CHECKS_PASS",
+    "backend": "original manually authorized local Singular",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 70,
+    "CPU_affinity": "not pinned",
+    "queue": "one math job at a time; R69 terminal and published",
+    "source_gate": "copied source/protocol/driver bytes match Git; all donor hashes",
+    "checkpoint": "existing checkpoint gate; immutable raw copies"
+  },
+  "stopping": {
+    "accept": "exit0/exact marker/no whitespace-question-mark errors and every assertion",
+    "failure": "retain partials/errors/caps; repair under fresh revision without narrowing both classes"
+  },
+  "analysis": {
+    "kind": "complete exact quotient, binary rational-remainder kernel and reconstructed lattice",
+    "comparative": false
+  },
   "scope": "sixth affine Frobenius step; normalization only if equality and source hypotheses checked",
-  "literature": [{"url": "https://www.math.purdue.edu/~iswanso/intclSinghSwanson.pdf", "use": "descending Frobenius normalization theorem"}],
-  "validation_note": "canonical schema/checker unavailable in selected index; manual contract and source-byte checks only"
+  "literature": [
+    {
+      "url": "https://www.math.purdue.edu/~iswanso/intclSinghSwanson.pdf",
+      "use": "descending Frobenius normalization theorem"
+    }
+  ],
+  "validation_note": "canonical schema/checker unavailable in selected index; manual contract and source-byte checks only",
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "First full two-class attempt has binary rank2 and zero survivors but is rejected for zero-column matrix errors despite a late marker. Add an explicit rank-two minor and zero-kernel branch before empty matrix construction; preserve the rejected raw attempt and run a fresh full two-class attempt.",
+    "rejected_attempt": "sixth-frobenius70-01"
+  }
 }

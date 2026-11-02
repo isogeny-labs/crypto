@@ -92,6 +92,41 @@ write(kernelOut70,"ring sixthBinary70=2,(u),dp;short=0;");
 dump70(kernelOut70,"numeratorRows70",numeratorRows70);dump70(kernelOut70,"denominatorRows70",denominatorRows70);
 dump70(kernelOut70,"remainderRows70",remainderRows70);dump70(kernelOut70,"binaryMap70",binaryMap70);
 write(kernelOut70,"int rank70="+string(rank70)+";int kernelDimension70="+string(kernelDimension70)+";");
+if(kernelDimension70==0){
+ require70(rank70==2,"FROB70_ZERO_KERNEL_FULL_RANK");
+ int witnessRowA70=0;int witnessRowB70=0;
+ for(i70=1;i70<=rows70+1;i70++){for(j70=i70+1;j70<=rows70+1;j70++){
+  if(witnessRowA70==0 && binaryMap70[i70,1]*binaryMap70[j70,2]+binaryMap70[i70,2]*binaryMap70[j70,1]==1){witnessRowA70=i70;witnessRowB70=j70;}
+ }}
+ require70(witnessRowA70>0 && witnessRowB70>witnessRowA70,"FROB70_EXPLICIT_RANK_TWO_MINOR");
+ write(kernelOut70,"int witnessRowA70="+string(witnessRowA70)+";int witnessRowB70="+string(witnessRowB70)+";");close(kernelOut70);
+ map polyToBinary70=fifthLatticePolynomial69,u;
+ matrix basisV670=polyToBinary70(inclusion70);
+ require70(nrows(basisV670)==32 && ncols(basisV670)==32 && det(basisV670)!=0,"FROB70_ZERO_KERNEL_ORDER_BASIS");
+ require70(vdim(std(module(basisV670)))==2,"FROB70_ZERO_KERNEL_OLD_QUOTIENT");
+ link polynomialOut70="ASCII:w sixth-lattice-polynomial70.sing";open(polynomialOut70);
+ write(polynomialOut70,"ring sixthLatticePolynomial70=2,(u),dp;short=0;");
+ dump70(polynomialOut70,"inclusion70",basisV670);dump70(polynomialOut70,"basisV670",basisV670);close(polynomialOut70);
+ setring fifthLatticeField69;
+ matrix V6coordinates70=V5coordinates69*inclusionField70;
+ matrix V6inverse70=unitmat(32);
+ require70(V6coordinates70==unitmat(32) && V6coordinates70*V6inverse70==unitmat(32) && V6inverse70*V6coordinates70==unitmat(32),"FROB70_ZERO_KERNEL_V6_EQUALS_ORDER");
+ for(i70=1;i70<=32;i70++){for(j70=1;j70<=32;j70++){
+  if(square70[i70,j70]!=0){coefficient70=leadcoef(square70[i70,j70]);require70(denominator(coefficient70)==1,"FROB70_ALL_ORDER_BASIS_SQUARES_IN_ORDER");}
+ }}
+ matrix squareInV570=V5inverse69*square70;
+ for(i70=1;i70<=32;i70++){for(j70=1;j70<=32;j70++){
+  if(squareInV570[i70,j70]!=0){coefficient70=leadcoef(squareInV570[i70,j70]);require70(denominator(coefficient70)==1,"FROB70_ALL_ORDER_BASIS_SQUARES_IN_V5");}
+ }}
+ matrix changedInverse70=V6inverse70;changedInverse70[1,1]=changedInverse70[1,1]+1;
+ require70(V6coordinates70*changedInverse70!=unitmat(32),"FROB70_ZERO_KERNEL_CHANGED_INVERSE_REJECTED");
+ link fieldOut70="ASCII:w sixth-lattice-field70.sing";open(fieldOut70);
+ write(fieldOut70,"ring sixthLatticeField70=(2,u),(q),dp;short=0;");
+ dump70(fieldOut70,"V6coordinates70",V6coordinates70);dump70(fieldOut70,"V6inverse70",V6inverse70);
+ dump70(fieldOut70,"squareInV570",squareInV570);close(fieldOut70);
+ print("FROB70_RESULT order_rank=32 old_quotient=2 square_columns=2 binary_rows="+string(rows70)+" square_rank=2 survivor_dimension=0 new_quotient_length=2 new_order_quotient=0 rational_nonzero_entries="+string(nonzero70)+" sixth_basis_columns=32 rank_witness_rows="+string(witnessRowA70)+","+string(witnessRowB70)+" stabilized_order=1 changed_kernel_rejected=na changed_inverse_rejected=1");
+ print("SIXTH_FROBENIUS70_ALL_CHECKS_PASS");quit;
+}
 matrix kernelBasis70=matrix(syz(module(binaryMap70)));
 require70(nrows(kernelBasis70)==2 && ncols(kernelBasis70)==kernelDimension70 && mat_rk(kernelBasis70)==kernelDimension70,"FROB70_COMPLETE_KERNEL_DIMENSION");
 require70(binaryMap70*kernelBasis70==matrix(0,rows70+1,kernelDimension70),"FROB70_ALL_KERNEL_PRODUCTS");

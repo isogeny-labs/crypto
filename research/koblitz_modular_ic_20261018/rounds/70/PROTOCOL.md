@@ -36,3 +36,17 @@ apply the Singh--Swanson fixed-point theorem only after source field,
 trace-dual and conductor hypotheses are audited. Proper branches,
 divisors, level-77 maps and order-11 action are separate. Exact finite
 algebra has no statistical baseline or A/A.
+
+## Version 2 zero-kernel repair, frozen before the second attempt
+
+`sixth-frobenius70-01` is rejected despite a late marker: Singular
+reported a zero-column matrix conversion error after the full two-class
+binary map had rank two. Preserve that raw attempt. The amended source
+branches on kernel dimension zero before constructing an empty matrix.
+It requires an explicit nonzero 2-by-2 binary minor, checks that the old
+order basis in `V5` has quotient length two, verifies its field-coordinate
+matrix is the identity, checks all 32 source basis squares in the old
+order and `V5`, and rejects a changed inverse. It saves the full binary
+map and explicit zero-kernel/old-order basis bundles. No previous
+accepted producer is rerun; this is a fresh full two-class attempt with
+the same resource caps and strict error gate.
