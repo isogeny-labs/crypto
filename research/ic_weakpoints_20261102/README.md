@@ -49,6 +49,7 @@ than a dense Macaulay solve.
 cd research/ic_weakpoints_20261102/tool && cargo build --release && ./target/release/ic-weakpoints selftest
 cd .. && ./run_all.sh                       # frozen arms A2, A3, Y, P -> data/*.jsonl
 tool/target/release/ic-weakpoints yield --p 251 --curves 4 --targets 6000 --seed 20261103   # Y2 (and p=509)
+gunzip -k data/*.jsonl.gz    # records over 64 KiB are committed gzipped (artifact-store policy)
 tool/target/release/ic-weakpoints summarize data > data/summary.jsonl
 ```
 Graphs: `reports/run-20261102T1639Z/plots.py` lays out the summary JSONL only (no statistics computed in Python).
