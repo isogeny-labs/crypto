@@ -162,3 +162,38 @@ elim_degree = 65,536, `planted_root_of_eliminant` and `planted_coordinates_recov
 **What may not be said** (adds to §8).
 - An F4 stage improvement is not a pipeline improvement.
 - A U3 or U1P pass at one prime is a screen.
+
+### A2 (2026-11-02, after U3_4111; committed and pushed before any A2 cell)
+
+**What U3_4111 showed** (`results/A1/U3_4111`).
+- Every gate passed: D = 65,536, stab_fail = 0, planted point recovered.
+- F4 CPU was 12,082, the same as A0. The basis has the same shape as W0's: t = 4,920 chains,
+  longest 37, 306M terms.
+- c = 12,291 + 134 + 4,186 = 16,611 CPU-s, against the 11,275 bar. So U3 is no improvement, and
+  under A1 U3 is not run at the larger primes.
+- Reading: the shear gives back the whole F4 gain. U1's gain comes from w² being a leading
+  monomial, and the bw finish needs a variable with long chains.
+
+**A2 arm U4.** The U1 polynomials unchanged, with only the variable order changed to
+s1,s2,s3,s4,w,s5. s5 is last, so it is the eliminating variable.
+- w² stays the leading monomial of the quadric, which is the structure behind U1's F4 gain.
+- The chains are counted in s5.
+- s5 = ∏u_i², and it separates the points if no two solutions share it.
+- **Dev check at m = 3** (order s1,s2,w,s3; p = 4111 and 262231): stab_fail = 0, D = 16,
+  planted point recovered (`dev/m3_*_u4`).
+- **Run.** The bw pipeline exactly as U3 (`run_a2.sh`). The planted point is reordered to
+  match. The gates are those of U3.
+
+**Order change.** The A1 queue is stopped at the end of the cell then running (A0_262231). The
+cell it had started next is moved, unrun, to `results/A1/_aborted_*`. Then U4_4111 runs, then
+the remaining A1 cells in their A1 order.
+
+**Decision rules.** The A1 whole-solve rule applies to U4: c ≤ 11,275, 12,549 and
+15,011 CPU-s at 4111, 262231 and 33554371. If U4_4111 passes, U4_262231 and U4_33554371 run
+(`run_a2.sh`) after the A1 cells. A pipeline improvement, and so a ratchet, needs all three
+primes.
+
+**Prediction.** V1 and V2 showed that the variable order does not move F4 for W0, so U4's F4 is
+predicted within ±25 % of U1's 4,729. With a finish of about 4,300 CPU-s, c is predicted at
+about 9,000–10,500. That passes the 4111 bar by a margin smaller than the ±2,000 A/A spread
+read in the bw study.
