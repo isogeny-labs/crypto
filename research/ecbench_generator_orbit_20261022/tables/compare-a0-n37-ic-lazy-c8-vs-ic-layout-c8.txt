@@ -1,0 +1,25 @@
+ops (ok): ic-lazy-c8 / ic-layout-c8 = 1.0205 [1.018, 1.023] (cluster) over 48 pairs on 16 workloads, 1 curve(s); wall: admitted median 1.0204 [1.013, 1.031]
+measurement quality: 0 / 100; paired attempts 48, verified 48, admitted 0; levels {"L0": 48}; p95 foreign busy unknown%, p95 run queue 0.25%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+| curve | log2 r | workloads | ic-lazy-c8 / ic-layout-c8 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m37-tm534059-32aad96b | 27.78 | 16 | 1.0205 | [1.0183, 1.0232] | cluster |
+
+| workload | curve | log2 r | ic-layout-c8 mean S | ic-lazy-c8 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W003b9f1da879 | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.2354 | 1.2563 | 1.0170 |
+| W01508b7b1c8f | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.2305 | 1.2514 | 1.0170 |
+| W096f5ff7397f | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.6781 | 0.6989 | 1.0307 |
+| W144b08e877fe | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.9722 | 0.9930 | 1.0215 |
+| W4b978c4ed733 | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.0354 | 1.0563 | 1.0202 |
+| W4c4a5cb96a91 | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.9954 | 1.0162 | 1.0209 |
+| W51b0a069445c | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.8841 | 0.9049 | 1.0236 |
+| W62448d1b9961 | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.9758 | 0.9966 | 1.0213 |
+| W70e6ba239bc9 | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.1144 | 1.1354 | 1.0188 |
+| W8f6f6fe8fb99 | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.4490 | 1.4698 | 1.0144 |
+| W93aa6acfaef5 | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.8340 | 0.8548 | 1.0250 |
+| Wc31866ba643c | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.6748 | 0.6956 | 1.0308 |
+| Wcb0c1bdd36f6 | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.0381 | 1.0589 | 1.0200 |
+| Wcc98bd68b34c | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.1245 | 1.1453 | 1.0186 |
+| Wcf37aa8ceede | icv1-f2m37-tm534059-32aad96b | 27.78 | 0.8983 | 0.9190 | 1.0231 |
+| Wf212dcd76b02 | icv1-f2m37-tm534059-32aad96b | 27.78 | 1.0909 | 1.1117 | 1.0191 |

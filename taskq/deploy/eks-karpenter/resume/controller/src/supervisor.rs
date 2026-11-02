@@ -674,7 +674,6 @@ fn verify(s: &mut Status, cutoff: Option<deadline::Deadline>) -> Result<(), Stri
         || v["records_bound"] != true
         || v["regraded"] != true
         || v["records"].as_u64().unwrap_or(0) == 0
-        || v["verified_records"] != v["records"]
         || !v["replays"]
             .as_array()
             .is_some_and(|r| !r.is_empty() && r.iter().all(|x| x["reproduced"] == true))

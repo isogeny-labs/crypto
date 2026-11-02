@@ -1,0 +1,123 @@
+# Relation-information accounting and Kummer source contracts
+
+This source-only audit reuses existing implementations and reviews. It introduces no new scientific execution, theorem certification, cohort result or cost ratio. Full scope remains 1,260 targets.
+
+The critical join is physical execution -> signed labelled divisor -> accepted relation -> target-relevant rank -> charged total work. Existing helpers cover several joins locally; the contracts below specify the remaining composition obligations.
+
+## C1-physical-cost-partition
+
+**Existing evidence.** archive_target emits setup_checks_field and constructor_field repeatedly for seven retained cases. Its explicit metadata says these copies are nonadditive and aggregate once per physical archive_row. Analysis already groups setup by physical row and reports no consistency errors.
+
+**Unproved or unbound transition.** No complete timing or cost denominator. Constructors contain Ring primality and allocation work outside field counters; input parsing, curve construction, hashing, memory, comparisons and square-root nonresidue search also need their own accounting. This is retained-coordinate input, not a naturally generated production stream.
+
+**Concrete contract.** For immutable input archive hash H, let P=(H,archive_row). Require exactly one setup and constructor record per P, identical repeated metadata, and one disposition per (P,case_index). Total charged work is sum_P setup(P)+constructor(P) plus all disjoint per-case intervals and declared run-global work. Never sum copied setup on each case; never equate target_index with physical identity across archives. Preserve failure, skipped, poisoned and post-terminal dispositions with explicit charged/non-production reason.
+
+**Next source/proof work.** Write schema-level bijection and disjoint-interval checker contract against existing ledger, not a replacement aggregate.
+
+Sources: archive:855-881, archive_entry:2, accounting.
+
+## C2-production-prefix-information
+
+**Existing evidence.** information computes rank(A), rank([A b]), rank([A b c]); consistent iff full rank equals augmented-target rank; target determined iff consistent and rank gain one. Adapter validates then normalizes and flips only final RHS column. Independent sign review exists.
+
+**Unproved or unbound transition.** The diagnostic performs six rank computations through two information calls and mutates thread-local arithmetic counters. It has no production prefix completeness bridge, emitted-stream custody or policy experiment.
+
+**Concrete contract.** For each production row identity, bind curve/target/ring, physical source event, accepted signed factors, source labels and exact augmented sign convention. Prefix export must be bijective with accepted preterminal events and preserve rejected/duplicate dispositions separately. Compute offline diagnostic after snapshotting production counters; either isolate diagnostic counters or account them as a distinct analysis phase. At each prefix target information is consistency AND rank([A b])-rank(A)=1, not total rank or cycle count.
+
+**Next source/proof work.** Specify adapter for actual retained emitted prefixes and count boundary; reuse existing rank and sign routines.
+
+Sources: information:34-56, adapter:1-26, adapter_review.
+
+## C3-duplicate-label-invariant
+
+**Existing evidence.** Signed coefficient-difference lemma and independent 12-case review exist. Native Labels stores first sign-normalized pair and suppresses duplicate graph edges. Candidate is verified against Q.
+
+**Unproved or unbound transition.** Labels::ingest accepts D without checking validity or D=aG+bQ. Constructor checks rG=rQ=0 but not Q in <G>. Retained harness supplies the stronger equality with planted-scalar setup; prospective production must establish it from initialized and propagated labels.
+
+**Concrete contract.** In fixed target context with ord(G)=prime r, Q=kG and D=aG+bQ, canonical key/sign must satisfy sigma D=C and both labels normalize by sigma. Preserve first pair unchanged. Equal keys imply delta_a+delta_b*k=0; db=0 forces da=0, else verified candidate is -da/db. Closure theorem must connect every actual transition to the label invariant; rQ=0 alone is not the subgroup premise.
+
+**Next source/proof work.** Formalize native table-state preservation and caller-to-ingest label transport; do not redo the existing elementary duplicate lemma as if new.
+
+Sources: duplicate:1-22, archive:863-879, lemma, lemma_review.
+
+## C4-original-G-transition-closure
+
+**Existing evidence.** advance implements geometric step, optional validation, then signed fallback only if geometric step returns None. Original-G fixture has 63 transitions per arm and candidate63 exact recoveries.
+
+**Unproved or unbound transition.** When validate_transition=false and geometric step returns Some, no internal full signed validation executes. Finite fixture excludes successful repair and Delta-zero branches. Signed fallback can return None after validity/projection failure; thus universal total closure is not proved.
+
+**Concrete contract.** Define Adj(k,kp,a,b): both nonzero valid Kummer representatives of D=aG+bQ and D+G, with canonical labels and rG=rQ=0. Under explicit projection/chart/repair domain, advance Some must preserve Adj at (2a+choice mod r,2b mod r); choice in {0,1}. Separately characterize every None and prove retry policy preserves target identity and charges abandoned work. Word arithmetic requires bound ensuring 2a+choice and 2b do not overflow (r<=2^63 suffices for a,b<r).
+
+**Next source/proof work.** Prove source-return soundness branch by branch before claiming total closure; enumerate chart-domain predicates as preconditions rather than assuming fallback always succeeds.
+
+Sources: transition:235-324, original_status.
+
+## C5-signed-lift-uniqueness
+
+**Existing evidence.** lift dispatches general recovery, D_zero exceptional search, Delta_zero lift and degree-one boundary lift. Boundary implementation filters candidate validity and two projective equalities and returns only a unique candidate.
+
+**Unproved or unbound transition.** Kernel connection from projective equality to unique signed Jacobian value is not supplied by fixture counts. Ambiguous torsion anchors, invalid/singular charts and no-match outputs remain explicit cases.
+
+**Concrete contract.** Given valid anchor G and neighbor pair (kappa(D),kappa(D+G)), prove each Some result equals D under the exact chart and sign-uniqueness assumptions; prove zero/ambiguous/no-match outputs are classified without treating projection equality alone as sign equality. General and exceptional implementations need separate source bindings; preserve actual nonsquare/singular failures.
+
+**Next source/proof work.** Bind existing boundary and original-G reviews to precise sufficient uniqueness premises; prove one shared result interface across recovery branches.
+
+Sources: transition:175-219, original_status.
+
+## C6-graph-to-group-and-terminal
+
+**Existing evidence.** Graph adapter factors recovered split degree-two D, assigns canonical signs and checks factor sum in fixtures. Independent dense elimination checked emitted prefixes; synthetic terminal controls exist. Graph review explicitly reports zero geometric terminal returns.
+
+**Unproved or unbound transition.** A compatible F_r scalar coordinate for every factor-base point class is not established by ord(G)=r. Geometric graph terminal/duplicate/repeated-root branches were not exercised in that fixture. Verification-on-return is not a proof of target extraction completeness.
+
+**Concrete contract.** Supply an actual homomorphism phi from the subgroup generated by all relevant divisor classes to F_r with phi(G)=1 and phi(Q)=k, or restrict points to a justified subgroup/projection. Then prove every inserted su*Xu+sv*Xv=a+b*k row follows from D=aG+bQ and factor decomposition. Prove signed union-find potential invariant and that a nonzero eliminated target coefficient yields k; preserve zero-information cycles and consistency failures.
+
+**Next source/proof work.** Identify the precise group-model/projection premise from existing construction and state the graph invariant against it; do not infer it from r-torsion tests.
+
+Sources: graph:10-16, graph_review, lemma.
+
+## Accounting boundary
+
+{
+  "identity": "(input_archive_sha256, physical_archive_row, case_index)",
+  "setup_once": [
+    "setup_checks_field",
+    "constructor_field"
+  ],
+  "per_case_disjoint": [
+    "label_reference_field",
+    "eligibility_field",
+    "key_reference_field",
+    "adapter.field",
+    "adapter scalar_after minus scalar_before",
+    "graph.processing_field",
+    "graph factor_verification_field",
+    "graph ring_after minus ring_before",
+    "terminal_reference_field"
+  ],
+  "nonadditive_or_external": [
+    "setup copies repeated on each case",
+    "graph state snapshots",
+    "walk/recovery custom counters may overlap field counts; require mapping before sums",
+    "dense reference work and offline rank work",
+    "host/runtime elapsed and memory not inferred from field counters"
+  ],
+  "scope": "All intervals reflect the fixed retained harness. Production-vs-reference split needs frozen protocol; all actual incurred costs remain preserved."
+}
+
+## Immutable source bindings
+
+- archive: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/src/pruned.rs`; SHA256 `e77db9e741da1d74b3dad97bf8f52c1128d4ac9e61eb0ea8dd62ddc923c21fcf`.
+- archive_entry: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/src/check.rs`; SHA256 `1f685079ab2ec640c271538db81b4a1d4a08fa7784424eeec07ba3efee636385`.
+- duplicate: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/src/duplicate.rs`; SHA256 `33e74627a4b513b932e10b65f52fb5952ff8bc0473b3e0e76366689dc2494fd9`.
+- accounting: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/analysis.json`; SHA256 `7024ed785cade871769b90a8d983a7e1828ccc59289c0f1225091a7a98f33fef`.
+- graph: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-graph-integration/src/graph.rs`; SHA256 `a612c5f4f2bea7c2573d147e4e54bfd2775fcf4057d2b11dd3ccf9cc63c58093`.
+- transition: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-original-gstep/src/pruned.rs`; SHA256 `149d55205b5edd872610350a2ddb7bf872d248f0e46f131b0091d618d33c6e5e`.
+- lemma: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-target-rank/LEMMA.md`; SHA256 `2a0d9c3a61941e6a066213e32890a0f5416098cc5b97f13dcbe0d5e23be83a20`.
+- lemma_review: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-target-rank-review/status.json`; SHA256 `38eaf142ca7e732b7759c47d28b6f19be783a61c2e24bc64b488243b9e01955b`.
+- graph_review: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-graph-review/REVIEW.md`; SHA256 `4830a8ec0a321a070fbddc5adb20cde532d824d5417643edc9bb54f9d261a236`.
+- adapter: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/relation-adapter/src/lib.rs`; SHA256 `5c576f9675df206f463dee8169b860876b98c618f51b406323a35c7ed8423120`.
+- adapter_review: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/relation-adapter-review/REVIEW.md`; SHA256 `d647ec25ae718a2c87dcbebf0b471162cef146b6a4f7bf4fcac7261484af70bf`.
+- information: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/five-followups/rank-information/src/lib.rs`; SHA256 `602b0ebc368df64b3fdc019c3d2fed05ce3f12d437c8d297d4a8af3a37911f68`.
+- original_status: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-original-gstep/status.json`; SHA256 `9c209baec29d03c45855f24fdb305ad32a9f236af213483c7f9916abeca29b70`.
+- duplicate_status: `/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/status.json`; SHA256 `9d18f55aec8d72f817da624cdd3d9ba6e7e578380eceae5d02eefe9d4f439d38`.

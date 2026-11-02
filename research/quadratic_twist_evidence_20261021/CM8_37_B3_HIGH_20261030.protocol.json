@@ -1,0 +1,387 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "QT-CM8-F37-B3-upper-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_evidence_20261021",
+  "authors": [
+    "Codex PR2381 research continuation"
+  ],
+  "links": {
+    "spec": "CM8_37_B3_HIGH_20261030_PROTOCOL.md",
+    "prior": "reports/cm8-37-b3-20261030/README.md",
+    "source": "Sageisogenyblob972f41162b3b237a216a3f1a53b1386e301ac2c6"
+  },
+  "question": "After the observed cap8 admission boundary,do fresh caps9..12 on ALL336F37size-three arms permit actual-source useful-rank/lower-requested-cap gains over the complete0..12 source frontier?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The existing actual F37 odd-subgroup source reduction is reused under its explicit hypotheses;native transfer is revalidated.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "All1344newconfigs/24192newattempts independentlyreplay;combined0..12analysis uses3024priorpinnedprofiles with explicitold/new provenance.",
+      "class": "exact_computation",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "cpp",
+      "role": "reference",
+      "description": "F37 actual-map plus full size-three frontier native path",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "c++",
+            "-std=c++17",
+            "-O2",
+            "native/cm8-37-b3-high.cpp",
+            "-lcrypto",
+            "-o",
+            "SCRATCH/producer"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "scope": "all336F37arms,1encoding,4caps,18separatetargets"
+      }
+    },
+    {
+      "id": "rust",
+      "role": "candidate",
+      "description": "F37 actual-map plus full size-three frontier native path",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "native/cm8-37-b3-high-audit/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "scope": "all336F37arms,1encoding,4caps,18separatetargets"
+      }
+    },
+    {
+      "id": "domain",
+      "role": "control_positive",
+      "description": "F37 actual-map plus full size-three frontier native path",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "native/cm8-37-b3-high-audit/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "CARGO_BUILD_JOBS": "2"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "scope": "all336F37arms,1encoding,4caps,18separatetargets"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exhaustive deterministic integer/modular arithmetic, no stochastic/timing comparison or noise claim; independent reconstruction is the check."
+    },
+    "positive": {
+      "present": true,
+      "arm": "domain",
+      "expected_detection": "Native false inverse9D differs on all18nonzero sources;complete transfer/composition/addition and capped-case controls checked.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Entire declared prime population is enumerated, including every failure; no sampled null or statistical detector."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "arm_encoding_budget",
+        "levels": [
+          "all336size3F37arms",
+          "original/reduced",
+          "9..12"
+        ]
+      },
+      {
+        "name": "implementation",
+        "levels": [
+          "C++",
+          "Rust"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "input order",
+        "treatment": "fixed",
+        "value": "lexicographic",
+        "how": "Freshcaps9..12,ALL336size-threeF37arms,oneencoding,1344configs/24192attempts;old0..8fixedpinnedreference3024profiles,notfreshdata;combined0..12comparison21464352pairs."
+      },
+      {
+        "name": "implementation",
+        "treatment": "crossed",
+        "value": "C++ andRust",
+        "how": "independent ordered/unordered pair construction and modular elimination"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "host/toolchain recorded diagnostically, no time claims"
+      },
+      {
+        "name": "source bindings",
+        "treatment": "fixed",
+        "how": "committed source and old frozen JSON SHA256 checked by both native paths"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-check",
+        "arms": [
+          "cpp",
+          "rust"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "absolute",
+        "threshold": "all1344configurations and actual transfer independently replayed"
+      }
+    ],
+    "aa_not_applicable": "Exact deterministic census; no timing/noise claim.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Complete deterministic census; clock is not a metric.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        2381
+      ],
+      "nonce": null,
+      "note": "No randomness consumed; fixed dummy run identifier only."
+    },
+    "instance_sampling": {
+      "rule": "FullfixedF37size3cohort84canonicalpoliciespercurve plus36matched/pullbackeach,18targets perconfig.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact outputs/arithmetic, all input rows public, no discretionary statistical classification.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exhaustive fixed population, no p-value/test/power; rank losses retained rather than inferred absent from a sample."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 0,
+      "threads": 1,
+      "estimated_total_seconds": 600,
+      "measured_on": "No pilot or timing estimate measured;600sec is the hard command budget,not a performance estimate."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "configurations",
+        "name": "fully retained arm/encoding/cap configurations",
+        "unit": "configurations",
+        "kind": "exact",
+        "definition": "336arms*1encoding*4caps,allblocked/cappedretained",
+        "source": "index.json.configurations",
+        "aggregation": "sum",
+        "resolution": "1configuration",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "configurations",
+      "source_targets",
+      "blocked_setups",
+      "verified_recoveries"
+    ],
+    "record": [
+      "binary_sha256",
+      "cpu_model",
+      "kernel_release",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "none",
+    "placement": {
+      "cpus": 2,
+      "spot": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "application",
+      "interval_seconds": 600,
+      "grace_seconds": 30,
+      "restore_validation": "manifest_sha256",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Allfixedtransferand1344configurations/24192targets or600sec percommand;window16:36–17:36UTC.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any scientific source correction gets new committed revision and complete affected rerun; preserve failed original.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Source/input/semantic mismatch fails verification, never accepted as a scientific null.",
+    "A theorem failing elaboration/axiom gate is unproved; retain source/log."
+  ],
+  "decision_rule": {
+    "text": "Record all outcomes;finite rank/degree result admitted only with independent exact replay and public-setup/original-source verification;no speed,regularity or stationary-yield inference.",
+    "comparison_ids": [
+      "C-check"
+    ],
+    "threshold": "exact independent reconstruction",
+    "statistic": "certified query ranks,degreecap,blocked setups and original-source answers",
+    "interval": "none; exhaustive finite population",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "per-query rank/cap comparisons across all policies",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "refuted_within_scope",
+      "inconclusive",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quadratic_twist_evidence_20261021/native/cm8-37-b3-high-audit/main.rs",
+      "sha256": "842c80f0e91bf98d845ed6c7e1a2cdcb6d08871bdc0a4f52c864b5aec9f35692"
+    },
+    "inputs": [
+      "CM8_37_B3_HIGH_20261030_PROTOCOL.md",
+      "CM8_37_B3_HIGH_20261030_COMPATIBILITY.json",
+      "pinnedprior0..8cases/index.json,audit/protocol/source",
+      "fixed F37 E7,19/T28,33 and actualcyclic19source route"
+    ],
+    "outputs": [
+      "transfer.json",
+      "transfer-audit.json",
+      "cases/index.json",
+      "audit.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "accepted query/recovery counts by cap/encoding/role;all policies retained"
+    ],
+    "report_dir": "reports/cm8-37-b3-high-20261030"
+  },
+  "inadmissible": [
+    "Use exhaustive reference roots to terminate a capped candidate.",
+    "Treat cap as no roots or blocked setup as a win.",
+    "Hide expanded witnesses or use target labels/public logs without admissible setup.",
+    "Infer intrinsic regularity,stationary yield or calibrated speed from this finite named-solver budget."
+  ],
+  "literature": [
+    {
+      "ref": "crypto-autoresearcher:knowledge/findings/KN-FIND-007.md",
+      "provenance": "retrieved",
+      "claim": "Known raw-decomposition double count does not establish row independence.",
+      "verified_by": "git show pinned atlas; no novelty claim for raw conservation."
+    },
+    {
+      "ref": "reports/uniform-20261029/README.md",
+      "provenance": "internal",
+      "claim": "Fixed96actual curve/subgroup arm inputs and point/certificate provenance.",
+      "verified_by": "read frozen source and both old native paths."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "6c11655aee552ac50346cac7dbeafc3fe0eee68dfc3bb802748348d71d77f340",
+    "commit": "64aa8e192f72dfec6ce4bd0411470ef2f1c9f269",
+    "frozen_at": "2026-10-30T16:52:26Z",
+    "filed_before_affected_data": true
+  }
+}

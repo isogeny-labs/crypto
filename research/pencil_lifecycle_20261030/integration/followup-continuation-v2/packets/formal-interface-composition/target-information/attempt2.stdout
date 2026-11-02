@@ -1,0 +1,38 @@
+/var/tmp/pencil-target-information-formal-20261101-v1/source/Information.lean:13:55: error: unsolved goals
+K : Type u_1
+V : Type u_2
+W : Type u_3
+inst✝⁴ : Field K
+inst✝³ : AddCommGroup V
+inst✝² : Module K V
+inst✝¹ : AddCommGroup W
+inst✝ : Module K W
+A : V →ₗ[K] W
+b c : W
+x h : V
+k l : K
+hx : A x + k • b + c = 0
+hh : A h = b
+⊢ A x + (k • b - l • b) + l • b + c = A x + k • b + c
+/var/tmp/pencil-target-information-formal-20261101-v1/source/Information.lean:13:79: warning: This simp argument is unused:
+  add_sub_assoc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [sub_smul, sub_add_cancel]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-target-information-formal-20261101-v1/source/Information.lean:13:94: warning: This simp argument is unused:
+  sub_add_cancel
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [sub_smul, add_sub_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-target-information-formal-20261101-v1/source/Information.lean:48:55: warning: Try `simp at h` instead of `simpa using h`
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+'TargetInformation.shift_solution' depends on axioms: [propext, sorryAx, Quot.sound]
+'TargetInformation.in_range_all_targets' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'TargetInformation.unequal_solutions_range' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TargetInformation.outside_range_unique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TargetInformation.unique_iff_outside_range' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

@@ -1,0 +1,1086 @@
+{
+  "schema": "ecdlp.claim-corpus/v1",
+  "version": "2026-11-01",
+  "title": "ECDLP theorem, reduction, bound, attack, and open-obligation corpus",
+  "fragments": ["corpus-extension.json", "galbraith-promotions.json"],
+  "scope": {
+    "statement": "Classical and quantum ECDLP claims that determine what is proved, what is only model-relative, which curve families admit faster attacks, and which proof obligations remain live in this repository.",
+    "completeness": "The claim graph is a curated load-bearing backbone, not a flat exhaustive bibliography. The companion Galbraith inventory exhaustively indexes the numbered results and sections in that book, while this graph promotes the results that change an ECDLP, CDH, DDH, transfer, or protocol-security dependency.",
+    "reduction_direction": "For an edge A reduces_to B, an algorithm for B is sufficient to solve A. For hardness_implies, hardness of the source problem implies hardness of the destination problem."
+  },
+  "sources": [
+    {
+      "id": "S-SHOUP-1997",
+      "title": "Lower Bounds for Discrete Logarithms and Related Problems",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Victor Shoup, EUROCRYPT 1997, LNCS 1233, pp. 256-266.",
+      "url": "https://doi.org/10.1007/3-540-69053-0_18",
+      "sha256": "23490869d0a025360a642d754b953f2d589b73466b4a9e0ad183bcaf6e293e42",
+      "notes": "Publisher PDF read. Theorem 1 gives success O(m^2/p) for generic DLP, with p the largest prime divisor of the group order."
+    },
+    {
+      "id": "S-CGK-2018",
+      "title": "The Discrete-Logarithm Problem with Preprocessing",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Henry Corrigan-Gibbs and Dmitry Kogan, EUROCRYPT 2018, LNCS 10820.",
+      "url": "https://doi.org/10.1007/978-3-319-78375-8_14",
+      "sha256": "6f0e25d98b5c85bf6281b40486aa782ae7a2d20ee002927b143adacdacb5e578",
+      "notes": "Publisher PDF read. Theorem 2 is the advice/online-time lower bound; Theorem 10 prices preprocessing time."
+    },
+    {
+      "id": "S-POHLIG-HELLMAN-1978",
+      "title": "An Improved Algorithm for Computing Logarithms over GF(p) and Its Cryptographic Significance",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Stephen Pohlig and Martin Hellman, IEEE Transactions on Information Theory 24(1), 1978.",
+      "url": "https://doi.org/10.1109/TIT.1978.1055817",
+      "sha256": "d857091b2dba22780c43a8d167ed159c17e004f96aa8f63178ae03d2e8d09eab",
+      "notes": "Author-hosted scan read. The algorithm decomposes the logarithm modulo prime-power factors and recombines by CRT."
+    },
+    {
+      "id": "S-POLLARD-1978",
+      "title": "Monte Carlo Methods for Index Computation (mod p)",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "John M. Pollard, Mathematics of Computation 32(143), 1978, pp. 918-924.",
+      "url": "https://doi.org/10.1090/S0025-5718-1978-0491431-9",
+      "notes": "Direct publisher PDF was inaccessible in this environment; the repository's portfolio and bibliography were read."
+    },
+    {
+      "id": "S-SMART-1999",
+      "title": "The Discrete Logarithm Problem on Elliptic Curves of Trace One",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Nigel P. Smart, Journal of Cryptology 12, 1999, pp. 193-196.",
+      "url": "https://doi.org/10.1007/s001459900052",
+      "sha256": "2e8de8b6009c7631f3ac9f32fa5886154674d7acafcdb56d72a1859b69241274",
+      "notes": "Publisher PDF read. The attack covers E/F_p with #E(F_p)=p and uses p-adic lifting."
+    },
+    {
+      "id": "S-MOV-1993",
+      "title": "Reducing Elliptic Curve Logarithms to Logarithms in a Finite Field",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Alfred Menezes, Tatsuaki Okamoto, and Scott Vanstone, IEEE Transactions on Information Theory 39(5), 1993.",
+      "url": "https://doi.org/10.1109/18.259647",
+      "notes": "Primary PDF was inaccessible. The reduction and its supersingular scope were cross-checked in Smart 1999 and repository sources."
+    },
+    {
+      "id": "S-GHS-2002",
+      "title": "Constructive and Destructive Facets of Weil Descent on Elliptic Curves",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Pierrick Gaudry, Florian Hess, and Nigel P. Smart, Journal of Cryptology 15, 2002, pp. 19-46.",
+      "url": "https://doi.org/10.1007/s00145-001-0011-x",
+      "sha256": "2d72118c82e155b809a884415c4b5b19f17b154e17c25d05c5f15343bf54736e",
+      "notes": "Publisher PDF read. Theorem 1 is conditional on the transfer map's kernel not containing the large prime subgroup and fixes extension degree n."
+    },
+    {
+      "id": "S-SEMAEV-2004",
+      "title": "Summation Polynomials and the Discrete Logarithm Problem on Elliptic Curves",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Igor Semaev, Cryptology ePrint Archive 2004/031.",
+      "url": "https://eprint.iacr.org/2004/031",
+      "notes": "The ePrint PDF returned HTTP 403. The defining property was checked in Diem 2011 and the repository's formal S3 work."
+    },
+    {
+      "id": "S-DIEM-2011",
+      "title": "On the Discrete Logarithm Problem in Elliptic Curves",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Claus Diem, Compositio Mathematica 147(1), 2011, pp. 75-104.",
+      "url": "https://doi.org/10.1112/S0010437X10005075",
+      "sha256": "74902b5816cd550aa57e180c60fb5bc60b64d93c8ce9f2019a53ca30a934a58a",
+      "notes": "Publisher PDF read. The main theorem gives expected time exp(O(max(log q,n^2))) for E/F_(q^n), with the paper's input conventions."
+    },
+    {
+      "id": "S-SHOR-1997",
+      "title": "Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Peter W. Shor, SIAM Journal on Computing 26(5), 1997, pp. 1484-1509.",
+      "url": "https://doi.org/10.1137/S0097539795293172",
+      "sha256": "96ba03bbfa27ea6a9ab5f1795cb62166948a6de4d8da84f9f43044bb5ab58838",
+      "notes": "arXiv author version read. The paper gives polynomial-time quantum discrete-log algorithms for finite abelian groups."
+    },
+    {
+      "id": "S-JMV-2005",
+      "title": "Do All Elliptic Curves of the Same Order Have the Same Difficulty of Discrete Log?",
+      "kind": "primary_publication",
+      "verification": "secondary_only",
+      "citation": "David Jao, Stephen D. Miller, and Ramarathnam Venkatesan, ASIACRYPT 2005.",
+      "url": "https://doi.org/10.1007/11593447_2",
+      "notes": "Scope checked through the repository's theorem audit: random reducibility inside the same endomorphism ring under GRH, not across arbitrary volcano levels."
+    },
+    {
+      "id": "S-BOUND-CONTRACT",
+      "title": "Bounds and frontiers",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "Repository measurement contract for ecbench.bound/v1 and ecbench.frontier/v2.",
+      "repository_path": "docs/bounds/README.md",
+      "notes": "Explicitly states that an ECBND record is a scoped measurement, not a mathematical lower bound."
+    },
+    {
+      "id": "S-SCOPED-BOUNDARIES",
+      "title": "Scoped Boundaries for Elliptic-Curve Index Calculus",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "Internal research draft and proof map, not independently reviewed.",
+      "repository_path": "papers/ecdlp-boundaries-20261018/README.md",
+      "notes": "Supplies qualified internal statements for generic simulation, yield conservation, and isogeny-oracle models."
+    },
+    {
+      "id": "S-SYNTHESIS",
+      "title": "Index calculus leads next steps",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "Cross-repository synthesis of theorem, heuristic, measurement, and integrity boundaries.",
+      "repository_path": "reports/Index calculus leads next steps.md",
+      "notes": "Used as an index into primary repository evidence, not as a replacement for it."
+    },
+    {
+      "id": "S-ISOGENY-FIBERS",
+      "title": "Isogeny Fibers, Hidden Geometric Structure, and ECDLP Hardness Discrepancies",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "Internal theorem audit with later corrections and withdrawn transport-oracle claim.",
+      "repository_path": "RESEARCH_ISOGENY_FIBERS_ECDLP.md",
+      "notes": "Only statements that survive the later correction sections are used."
+    },
+    {
+      "id": "S-KOBLITZ-PROGRAM",
+      "title": "Koblitz index-calculus programme",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "Repository structural classifications and ECC2K-130 boundary analysis.",
+      "repository_path": "RESEARCH_KOBLITZ_INDEX_CALCULUS.md",
+      "notes": "Provides the prime-degree Frobenius-module classification used by the active programme."
+    },
+    {
+      "id": "S-PRIME-PROGRAM",
+      "title": "Prime-field breakthrough programme",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "Repository programme note separating generic table and algebraic factor-base routes.",
+      "repository_path": "RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md",
+      "notes": "Defines the solution-count falsifier and algebraic-oracle escape route."
+    },
+    {
+      "id": "S-METHOD-CLASSIFICATION",
+      "title": "Prime IC per-oracle track classification",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "Current per-oracle ruling for algebraic and generic-decomposition tracks.",
+      "repository_path": "research/prime_ic_program_20261029/ruling/classification.json",
+      "notes": "Used to start, not finish, the concrete generic-interface audit."
+    },
+    {
+      "id": "S-LEAD-ATLAS",
+      "title": "ECDLP lead atlas",
+      "kind": "lead_index",
+      "verification": "repository_read",
+      "citation": "Cross-repository lead index, reviewed through 2026-10-30.",
+      "url": "https://github.com/isogeny-labs/crypto-autoresearcher/blob/7e12aa99c3c652fc3918ed43c04617343345fb11/knowledge/leads/ecdlp/README.md",
+      "notes": "At this session's start: 154 leads, 2,178/2,185 mapped records, with changes pending review."
+    },
+    {
+      "id": "S-FRONTIER-2026",
+      "title": "Established ecbench ECDLP frontier",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "Current measured upper-bound and frontier records.",
+      "repository_path": "docs/bounds/frontier.json",
+      "notes": "Contains measured method costs and admissibility, not problem lower bounds."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "PROB-ECDLP",
+      "label": "Elliptic-curve discrete logarithm problem",
+      "kind": "definition",
+      "status": "definition",
+      "model": "mathematical",
+      "statement": "Given a finite-field elliptic curve, a prime-order subgroup generated by P, and Q in the subgroup, recover x modulo r such that Q=[x]P.",
+      "scope": "The curve model, field, subgroup order r, cofactor, generator, target distribution, and available auxiliary information are part of the instance.",
+      "assumptions": ["P has known prime order r", "Q lies in <P>"],
+      "source_refs": [],
+      "tags": ["foundation", "problem"]
+    },
+    {
+      "id": "ASM-CLASSICAL-ECDLP",
+      "label": "Named-curve classical ECDLP hardness assumption",
+      "kind": "assumption",
+      "status": "assumed",
+      "model": "classical_unrestricted",
+      "statement": "No feasible classical algorithm recovers a random scalar for the specified curve and subgroup within the declared resource bound.",
+      "scope": "This is parameterized by a named curve/subgroup and a resource model; it is not a theorem implied by generic-group lower bounds.",
+      "assumptions": ["The instance excludes known weak families", "The implementation does not leak the scalar", "The adversary is classical"],
+      "source_refs": [],
+      "tags": ["assumption", "classical"],
+      "non_implications": ["Does not by itself imply CDH hardness", "Does not by itself imply DDH hardness", "Does not survive a scalable fault-tolerant quantum computer"]
+    },
+    {
+      "id": "PROB-CDH",
+      "label": "Computational Diffie-Hellman",
+      "kind": "definition",
+      "status": "definition",
+      "model": "mathematical",
+      "statement": "Given P, [a]P, and [b]P in a cyclic subgroup, compute [ab]P.",
+      "scope": "The distribution and subgroup are part of the problem definition.",
+      "assumptions": [],
+      "source_refs": [],
+      "tags": ["foundation", "problem"]
+    },
+    {
+      "id": "PROB-DDH",
+      "label": "Decisional Diffie-Hellman",
+      "kind": "definition",
+      "status": "definition",
+      "model": "mathematical",
+      "statement": "Given P, [a]P, [b]P, and R, decide whether R=[ab]P or is sampled from the comparison distribution.",
+      "scope": "Pairings or other efficiently computable invariants can make DDH easy even when CDH and ECDLP remain apparently hard.",
+      "assumptions": [],
+      "source_refs": [],
+      "tags": ["foundation", "problem", "gap-dh"]
+    },
+    {
+      "id": "RED-CDH-DLP",
+      "label": "CDH reduces to ECDLP",
+      "kind": "reduction",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "An ECDLP oracle recovers a and then computes [a]([b]P), so CDH is no harder than ECDLP.",
+      "scope": "Black-box polynomial-time reduction in the same cyclic subgroup.",
+      "assumptions": ["The ECDLP oracle applies to the supplied subgroup"],
+      "source_refs": ["S-SHOUP-1997"],
+      "tags": ["reduction", "assumption-lattice"]
+    },
+    {
+      "id": "RED-DDH-CDH",
+      "label": "DDH reduces to CDH",
+      "kind": "reduction",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "A CDH oracle computes [ab]P and compares it with R, so DDH is no harder than CDH.",
+      "scope": "The comparison must use the same group and target distribution.",
+      "assumptions": [],
+      "source_refs": ["S-CGK-2018"],
+      "tags": ["reduction", "assumption-lattice"]
+    },
+    {
+      "id": "THEOREM-RANDOM-SELF-REDUCTION",
+      "label": "Prime-order DLP random self-reducibility",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "An average-case DLP solver on a prime-order cyclic group can be blinded to obtain a solver for every instance with essentially the same success probability and only logarithmic overhead.",
+      "scope": "Prime-order cyclic groups; the exact preprocessing variant fixes the group labeling and generator as in Corrigan-Gibbs--Kogan Lemma 3.",
+      "assumptions": ["Uniform random blinding scalar", "Prime subgroup order"],
+      "source_refs": ["S-CGK-2018"],
+      "tags": ["average-case", "worst-case", "blinding"]
+    },
+    {
+      "id": "ALG-POHLIG-HELLMAN",
+      "label": "Pohlig-Hellman order decomposition",
+      "kind": "algorithmic_upper_bound",
+      "status": "algorithm",
+      "model": "classical_unrestricted",
+      "statement": "DLP in a cyclic group of composite order reduces to DLPs in its prime-power order components and recombination by the Chinese remainder theorem.",
+      "scope": "Security is controlled by the largest hard prime-order component, not by the total group order alone.",
+      "assumptions": ["The group order factorization is known or computed"],
+      "source_refs": ["S-POHLIG-HELLMAN-1978"],
+      "tags": ["algorithm", "group-order", "smoothness"]
+    },
+    {
+      "id": "ALG-BSGS",
+      "label": "Baby-step giant-step",
+      "kind": "algorithmic_upper_bound",
+      "status": "algorithm",
+      "model": "classical_unrestricted",
+      "statement": "A generic meet-in-the-middle algorithm solves DLP in O(sqrt(r)) group operations and O(sqrt(r)) stored group elements.",
+      "scope": "Prime-order subgroup of size r; constants and representations affect concrete cost.",
+      "assumptions": ["Equality testing and group operations are available"],
+      "source_refs": ["S-BOUND-CONTRACT"],
+      "tags": ["algorithm", "generic", "time-memory"]
+    },
+    {
+      "id": "ALG-POLLARD-RHO",
+      "label": "Pollard rho collision search",
+      "kind": "algorithmic_upper_bound",
+      "status": "algorithm",
+      "model": "classical_unrestricted",
+      "statement": "Under the random-walk heuristic, rho solves prime-order DLP in expected O(sqrt(r)) group operations with negligible per-walker memory.",
+      "scope": "The familiar sqrt(pi r/2) constant is an idealized collision model, not a universal implementation theorem.",
+      "assumptions": ["The iteration behaves sufficiently like a random mapping", "Degenerate collisions and cycles are handled"],
+      "source_refs": ["S-POLLARD-1978", "S-BOUND-CONTRACT"],
+      "tags": ["algorithm", "generic", "collision-search"],
+      "formula": "T = O(sqrt(r))"
+    },
+    {
+      "id": "ALG-RHO-AUTOMORPHISM",
+      "label": "Automorphism-folded rho",
+      "kind": "algorithmic_upper_bound",
+      "status": "algorithm",
+      "model": "classical_unrestricted",
+      "statement": "Efficiently computable automorphisms with known scalar action can quotient the collision space and improve rho by an automorphism-dependent constant.",
+      "scope": "The automorphism must preserve the subgroup and be accounted for on every compared method; fruitless cycles can erase the naive gain.",
+      "assumptions": ["Known scalar eigenvalue on the subgroup", "Efficient canonicalization", "Correct cycle handling"],
+      "source_refs": ["S-KOBLITZ-PROGRAM"],
+      "tags": ["algorithm", "automorphism", "constant-factor"]
+    },
+    {
+      "id": "LB-SHOUP-DLP",
+      "label": "Shoup generic DLP lower bound",
+      "kind": "model_lower_bound",
+      "status": "proved_external",
+      "model": "generic_group",
+      "statement": "For a randomly encoded cyclic group whose order has largest prime divisor p, a generic algorithm making m oracle queries succeeds at DLP with probability O(m^2/p).",
+      "scope": "Random encoding/generic oracle model. It does not cover algorithms exploiting coordinates, special representations, pairings, p-adic lifts, or algebraic equations.",
+      "assumptions": ["Random injective encoding", "Only the declared generic group oracle and equality are exposed"],
+      "source_refs": ["S-SHOUP-1997"],
+      "tags": ["lower-bound", "generic-group"],
+      "formula": "success = O(m^2/p); constant success => m = Omega(sqrt(p))"
+    },
+    {
+      "id": "LB-SHOUP-CDH",
+      "label": "Shoup generic CDH lower bound",
+      "kind": "model_lower_bound",
+      "status": "proved_external",
+      "model": "generic_group",
+      "statement": "The same generic-polynomial method yields an Omega(sqrt(p)) query lower bound for CDH at constant success when p is the relevant large prime divisor.",
+      "scope": "Generic group model; not a statement that CDH and DLP are equivalent for concrete coordinate representations.",
+      "assumptions": ["Shoup's generic encoding model"],
+      "source_refs": ["S-SHOUP-1997"],
+      "tags": ["lower-bound", "generic-group", "cdh"]
+    },
+    {
+      "id": "LB-CGK-ADVICE",
+      "label": "Generic preprocessing advice tradeoff",
+      "kind": "model_lower_bound",
+      "status": "proved_external",
+      "model": "generic_group_preprocessing",
+      "statement": "For prime order N, a generic DLP algorithm with an S-bit group-specific advice string, at most T online oracle queries, and success epsilon satisfies S T^2 = soft-Omega(epsilon N).",
+      "scope": "The paper's random-labeling generic model. S counts advice bits; preprocessing computation is ignored by this theorem and priced separately by another theorem.",
+      "assumptions": ["Prime-order group", "Generic preprocessing and online algorithms", "Group-specific advice independent of the target"],
+      "source_refs": ["S-CGK-2018"],
+      "tags": ["lower-bound", "generic-group", "preprocessing"],
+      "formula": "S T^2 = soft-Omega(epsilon N)"
+    },
+    {
+      "id": "LB-CGK-PREPROCESS-TIME",
+      "label": "Generic preprocessing-time tradeoff",
+      "kind": "model_lower_bound",
+      "status": "proved_external",
+      "model": "generic_group_preprocessing",
+      "statement": "If generic group-specific preprocessing takes P operations, online time is T, and success is epsilon, then P T + T^2 = Omega(epsilon N).",
+      "scope": "Same generic preprocessing model; this prices computation used to produce advice, not only stored advice length.",
+      "assumptions": ["Prime-order group", "Generic preprocessing and online algorithms"],
+      "source_refs": ["S-CGK-2018"],
+      "tags": ["lower-bound", "generic-group", "preprocessing-time"],
+      "formula": "P T + T^2 = Omega(epsilon N)"
+    },
+    {
+      "id": "ATTACK-SMART-TRACE-ONE",
+      "label": "Smart anomalous-curve attack",
+      "kind": "conditional_attack",
+      "status": "proved_external",
+      "model": "curve_family_restricted",
+      "statement": "For E/F_p with #E(F_p)=p, p-adic lifting and the elliptic logarithm recover the discrete log in polynomial time; Smart describes linear time in the basic group-operation measure used there.",
+      "scope": "Anomalous/trace-one prime-field curves only. A noncanonical lift succeeds except with probability 1/p and can be retried.",
+      "assumptions": ["#E(F_p)=p", "The curve order is known", "p-adic arithmetic is available"],
+      "source_refs": ["S-SMART-1999"],
+      "tags": ["attack", "anomalous", "p-adic"]
+    },
+    {
+      "id": "ATTACK-MOV-PAIRING",
+      "label": "MOV pairing transfer",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "When the subgroup embeds through a nondegenerate pairing into a low-degree finite-field multiplicative group, ECDLP reduces to finite-field DLP.",
+      "scope": "Applicable when the embedding degree is small enough and the target-field DLP is easier; classically important for supersingular and other pairing-friendly cases.",
+      "assumptions": ["A computable nondegenerate pairing", "Small embedding degree", "Subgroup order divides the target multiplicative group"],
+      "source_refs": ["S-MOV-1993", "S-SMART-1999"],
+      "tags": ["attack", "pairing", "embedding-degree"]
+    },
+    {
+      "id": "ATTACK-GHS-WEIL-DESCENT",
+      "label": "GHS Weil-descent attack",
+      "kind": "conditional_attack",
+      "status": "proved_external",
+      "model": "curve_family_restricted",
+      "statement": "For the paper's characteristic-two composite-extension families and fixed n>=4, ECDLP in the large prime subgroup is solvable in O(q^(2+epsilon)) under the stated nonvanishing-kernel condition on the transfer map.",
+      "scope": "Special extension fields and curves satisfying the paper's conditions. The constant has very bad n-dependence and the kernel hypothesis is explicit.",
+      "assumptions": ["Characteristic two", "Fixed composite extension structure", "The transfer map does not kill the large prime subgroup"],
+      "source_refs": ["S-GHS-2002"],
+      "tags": ["attack", "weil-descent", "binary-extension"],
+      "formula": "T = O(q^(2+epsilon)) for fixed n"
+    },
+    {
+      "id": "THEOREM-SEMAEV-SUMMATION",
+      "label": "Semaev summation-polynomial criterion",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "The recursively defined summation polynomial vanishes exactly when compatible curve points with the supplied x-coordinates have signed sum equal to the identity, subject to the paper's field and multiplicity conventions.",
+      "scope": "An algebraic encoding of a point-sum existence condition. It is not a complexity bound for solving the resulting polynomial system.",
+      "assumptions": ["Nonsingular elliptic curve", "The relevant x-coordinates lie in an algebraic closure", "Exceptional and repeated-point cases use the stated conventions"],
+      "source_refs": ["S-DIEM-2011", "S-SEMAEV-2004"],
+      "tags": ["algebraic", "summation-polynomial", "encoding"]
+    },
+    {
+      "id": "ATTACK-DIEM-EXTENSION",
+      "label": "Diem extension-field index calculus",
+      "kind": "algorithmic_upper_bound",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "For E over F_(q^n), Diem gives a randomized algorithm with expected running time exp(O(max(log q,n^2))) in the paper's asymptotic input model.",
+      "scope": "This yields subexponential families when n grows in the specified relation to log q. It is not a subexponential algorithm for fixed prime-field curves such as P-256 or secp256k1.",
+      "assumptions": ["The input is represented as in the theorem", "Randomized expected-time computation", "Extension-field parameter regime"],
+      "source_refs": ["S-DIEM-2011"],
+      "tags": ["attack", "index-calculus", "extension-field"],
+      "formula": "T = exp(O(max(log q, n^2)))"
+    },
+    {
+      "id": "ATTACK-SHOR-QUANTUM",
+      "label": "Shor quantum discrete-log algorithm",
+      "kind": "algorithmic_upper_bound",
+      "status": "proved_external",
+      "model": "quantum",
+      "statement": "Discrete logarithms in finite abelian groups, including elliptic-curve subgroups, are solvable in time polynomial in the input length on a fault-tolerant quantum computer.",
+      "scope": "Asymptotic quantum circuit model; concrete logical-qubit, gate, error-correction, and wall-time costs are separate engineering questions.",
+      "assumptions": ["Scalable fault-tolerant quantum computation", "Efficient reversible group operations", "Sufficient precision and coherent execution"],
+      "source_refs": ["S-SHOR-1997"],
+      "tags": ["attack", "quantum"]
+    },
+    {
+      "id": "FACT-MEASURED-BOUND",
+      "label": "ECBND records are measured upper bounds",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "An ecbench.bound/v1 record is the measured cost of one method configuration on a declared domain, with intervals and admissibility; it is not a lower bound on ECDLP.",
+      "scope": "Toy, medium, and cryptographic tiers do not transfer automatically; each record is bound to its sessions, unit, curve family, and evidence.",
+      "assumptions": ["The record validates and its cited sessions/audits exist"],
+      "source_refs": ["S-BOUND-CONTRACT", "S-FRONTIER-2026"],
+      "tags": ["measurement", "upper-bound", "evidence-vocabulary"]
+    },
+    {
+      "id": "BRIDGE-GENERIC-TABLE",
+      "label": "Conditional generic simulation of table decomposition",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "generic_group",
+      "statement": "A decomposition computation whose setup and online phases use only generic group operations, public scalar actions, equality, and charged table lookup can be simulated in the generic interface.",
+      "scope": "Conditional schema only. Representation-dependent indexing must be bookkeeping and must not reveal a coordinate predicate; no concrete pipeline is covered until its full interface is audited.",
+      "assumptions": ["All advice is built generically or its extra information is modeled", "Every online predicate is generically simulable", "Advice and lookup costs are charged"],
+      "source_refs": ["S-SCOPED-BOUNDARIES"],
+      "tags": ["internal-theorem", "generic-bridge", "table-decomposition"]
+    },
+    {
+      "id": "THEOREM-YIELD-CONSERVATION",
+      "label": "Mean decomposition-yield conservation",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "A double-counting argument fixes the mean ordered decomposition multiplicity over the full target domain for a fixed factor-base size and arity.",
+      "scope": "Controls mean multiplicity, not variance, rank, search cost, specialization behavior, or the cost of recognizing a decomposition.",
+      "assumptions": ["The sum map and target averaging domain are exactly the ones in the theorem", "Ordered tuples use the stated convention"],
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-SYNTHESIS"],
+      "tags": ["internal-theorem", "double-counting", "index-calculus"]
+    },
+    {
+      "id": "LB-ISOGENY-GENERIC",
+      "label": "Isogeny-augmented generic lower bound",
+      "kind": "model_lower_bound",
+      "status": "proved_internal_unreviewed",
+      "model": "generic_group",
+      "statement": "With independent random encodings for prime-order subgroups and public scalar action for each isogeny, isogeny-oracle queries preserve linear formal expressions and retain birthday-order DLP hardness.",
+      "scope": "Generic subgroup interface only. Coordinate access, map construction cost, pairings, p-adic lifts, and arbitrary coordinate-generated points are outside the theorem.",
+      "assumptions": ["Prime subgroup order", "Independent random encodings", "Known scalar action of each map", "No coordinate predicates"],
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-ISOGENY-FIBERS"],
+      "tags": ["internal-theorem", "isogeny", "generic-group"]
+    },
+    {
+      "id": "THEOREM-JMV-ISOGENY-REDUCTION",
+      "label": "JMV random reduction within an isogeny stratum",
+      "kind": "reduction",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "Under GRH, random reducibility relates ECDLP instances on curves with the same endomorphism ring through an expander walk.",
+      "scope": "Does not give a free reduction across arbitrary conductor gaps or a concrete same-cost solver across all curves of the same order.",
+      "assumptions": ["GRH", "Same endomorphism ring/appropriate isogeny stratum", "The reduction's walk and map costs are charged"],
+      "source_refs": ["S-JMV-2005", "S-ISOGENY-FIBERS"],
+      "tags": ["isogeny", "reduction", "grh"]
+    },
+    {
+      "id": "THEOREM-FROB-SUBSPACES-131",
+      "label": "Frobenius-stable subspaces at n=131",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "For the degree-131 binary extension used by ECC2K-130, Frobenius-stable F_2-subspaces have dimensions 0, 1, 130, or 131.",
+      "scope": "Uses the factorization of X^131-1 over F_2 and ord_131(2)=130; it obstructs intermediate-size invariant linear factor bases, not arbitrary nonlinear bases.",
+      "assumptions": ["The subspace is F_2-linear and Frobenius-stable", "Field degree is exactly 131"],
+      "source_refs": ["S-KOBLITZ-PROGRAM", "S-SYNTHESIS"],
+      "tags": ["ecc2k130", "frobenius", "classification"]
+    },
+    {
+      "id": "THEOREM-GHS-GENUS-131",
+      "label": "GHS genus classification at n=131",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "curve_family_restricted",
+      "statement": "The repository's GHS analysis for the ECC2K-130 degree-131 setting yields only genus 1, 2^130-1, or 2^130 in the classified construction.",
+      "scope": "Obstructs that GHS construction for the exact prime extension degree; it is not a theorem that every possible cover or Jacobian transfer has huge genus.",
+      "assumptions": ["The classified GHS construction", "Field degree exactly 131"],
+      "source_refs": ["S-KOBLITZ-PROGRAM", "S-SYNTHESIS"],
+      "tags": ["ecc2k130", "ghs", "genus"]
+    },
+    {
+      "id": "MEASURED-CURRENT-FRONTIER",
+      "label": "Current measured classical frontier",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "The repository records scoped, validated costs for generic algorithms and index-calculus variants; these identify the best measured method on shared toy/medium domains and expose missing coverage.",
+      "scope": "The frontier is per exact domain and evidence class. It cannot establish asymptotic hardness or transfer a toy result to a cryptographic curve.",
+      "assumptions": ["Each entry is compared only on shared sizes and axes", "Admissibility and validation state are respected"],
+      "source_refs": ["S-FRONTIER-2026", "S-BOUND-CONTRACT"],
+      "tags": ["measurement", "frontier"]
+    },
+    {
+      "id": "GAP-UNCONDITIONAL-CLASSICAL",
+      "label": "No unconditional classical ECDLP lower bound",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "statement": "No known theorem proves a superpolynomial classical lower bound for ECDLP on a named standard elliptic curve in the unrestricted computation model.",
+      "scope": "This is a statement about the present proof boundary, not evidence that a faster algorithm exists.",
+      "assumptions": [],
+      "source_refs": ["S-SHOUP-1997", "S-CGK-2018", "S-SYNTHESIS"],
+      "tags": ["open", "complexity-theory"]
+    },
+    {
+      "id": "GAP-COORDINATE-ALGEBRAIC",
+      "label": "Coordinate-algebraic escape from generic bounds",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "Shoup and Corrigan-Gibbs--Kogan do not rule out an algorithm that uses curve coordinates, low-degree membership predicates, polynomial systems, pairings, or other representation-specific structure.",
+      "scope": "Every proposed escape must still price relation yield, system construction, solving, lifting, linear algebra, target descent, and verification.",
+      "assumptions": [],
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-PRIME-PROGRAM", "S-SYNTHESIS"],
+      "tags": ["open", "algebraic-oracle"]
+    },
+    {
+      "id": "GAP-AUTOMORPHISM-PREPROCESS",
+      "label": "Preprocessing bounds with automorphism quotients",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "generic_group_preprocessing",
+      "statement": "Applying the preprocessing tradeoff after quotienting by efficiently computable automorphisms needs an explicit oracle model and orbit accounting; replacing N by an effective orbit count is not automatic.",
+      "scope": "Covers the proof bridge between known scalar actions, quotient encodings, advice size, and online queries.",
+      "assumptions": [],
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-CGK-2018"],
+      "tags": ["open", "automorphism", "preprocessing"]
+    },
+    {
+      "id": "GAP-PKM-SOLVING-DEGREE",
+      "label": "Prime-field PKM solving-degree growth",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "It is unresolved whether the solving degree of the PKM tower systems remains bounded or resumes growth beyond the measured N<=18/20 frontier.",
+      "scope": "A bounded degree would only establish a live asymptotic route after solution counts, constants, and complete pipeline costs are also controlled.",
+      "assumptions": [],
+      "source_refs": ["S-SYNTHESIS", "S-PRIME-PROGRAM"],
+      "tags": ["open", "prime-field", "groebner", "solving-degree"]
+    },
+    {
+      "id": "GAP-BINARY-M4-DEGREE",
+      "label": "Binary m=4 Weil-descent degree growth",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "The m=4 degree behavior for prime-degree binary fields is measured only at small dimensions and does not determine the degree at n=83 or n=131.",
+      "scope": "The gap includes both a mathematical growth law and conversion from solver work to the same unit as the reference algorithm.",
+      "assumptions": [],
+      "source_refs": ["S-SYNTHESIS", "S-KOBLITZ-PROGRAM"],
+      "tags": ["open", "binary", "weil-descent", "solving-degree"]
+    },
+    {
+      "id": "GAP-TRANSPORT-ORACLE-SIM",
+      "label": "Coordinate transport-oracle simulation",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "An exact same-cost simulation theorem for coordinate-aware transport oracles on arbitrary factor-base points has not been proved; the earlier internal claim was withdrawn.",
+      "scope": "Requires explicit algebraic representations, quantifier order, allowed point generation, map evaluation cost, and a same-input reduction.",
+      "assumptions": [],
+      "source_refs": ["S-ISOGENY-FIBERS", "S-SCOPED-BOUNDARIES"],
+      "tags": ["open", "isogeny", "coordinate-oracle"]
+    },
+    {
+      "id": "GAP-QUANTUM-RESOURCES",
+      "label": "Concrete fault-tolerant quantum resources",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "quantum",
+      "statement": "Shor settles asymptotic quantum tractability, while concrete resources for a named curve depend on reversible arithmetic, error correction, architecture, and failure probability.",
+      "scope": "An engineering/resource-estimation question, not a remaining asymptotic hardness assumption against quantum algorithms.",
+      "assumptions": [],
+      "source_refs": ["S-SHOR-1997", "S-LEAD-ATLAS"],
+      "tags": ["open", "quantum", "resources"]
+    },
+    {
+      "id": "CONCLUSION-SPECIFIC-CURVE",
+      "label": "Specific-curve hardness remains assumption-based",
+      "kind": "assumption",
+      "status": "assumed",
+      "model": "classical_unrestricted",
+      "statement": "After order checks and known special-family attacks are excluded, generic lower bounds and the absence of a known faster coordinate attack support parameter selection but do not prove unrestricted classical hardness for the named curve.",
+      "scope": "The conclusion must be restated for each curve, subgroup, auxiliary-information model, preprocessing allowance, and adversary class.",
+      "assumptions": ["No applicable special-family transfer", "No implementation leakage", "No undiscovered non-generic algorithm"],
+      "source_refs": ["S-SHOUP-1997", "S-CGK-2018", "S-SYNTHESIS"],
+      "tags": ["assumption", "interpretation"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-001",
+      "from": "ASM-CLASSICAL-ECDLP",
+      "to": "PROB-ECDLP",
+      "relation": "defines",
+      "statement": "The hardness assumption is a resource-bounded claim about a concrete ECDLP instance distribution.",
+      "source_refs": []
+    },
+    {
+      "id": "E-002",
+      "from": "PROB-CDH",
+      "to": "PROB-ECDLP",
+      "relation": "reduces_to",
+      "statement": "A DLP solver gives the exponent needed to compute the CDH output.",
+      "source_refs": ["S-SHOUP-1997"]
+    },
+    {
+      "id": "E-003",
+      "from": "PROB-DDH",
+      "to": "PROB-CDH",
+      "relation": "reduces_to",
+      "statement": "A CDH solver computes the candidate shared point for comparison.",
+      "source_refs": ["S-CGK-2018"]
+    },
+    {
+      "id": "E-004",
+      "from": "PROB-DDH",
+      "to": "PROB-CDH",
+      "relation": "hardness_implies",
+      "statement": "If DDH is hard in a group, CDH must also be hard there.",
+      "source_refs": []
+    },
+    {
+      "id": "E-005",
+      "from": "PROB-CDH",
+      "to": "PROB-ECDLP",
+      "relation": "hardness_implies",
+      "statement": "If CDH is hard in a group, ECDLP must also be hard there.",
+      "source_refs": []
+    },
+    {
+      "id": "E-006",
+      "from": "THEOREM-RANDOM-SELF-REDUCTION",
+      "to": "PROB-ECDLP",
+      "relation": "qualifies",
+      "statement": "For prime-order groups, random-instance success transfers to every instance under blinding.",
+      "source_refs": ["S-CGK-2018"]
+    },
+    {
+      "id": "E-007",
+      "from": "ALG-POHLIG-HELLMAN",
+      "to": "PROB-ECDLP",
+      "relation": "upper_bounds",
+      "statement": "Composite-order ECDLP decomposes to its prime-power components.",
+      "source_refs": ["S-POHLIG-HELLMAN-1978"]
+    },
+    {
+      "id": "E-008",
+      "from": "ALG-BSGS",
+      "to": "PROB-ECDLP",
+      "relation": "upper_bounds",
+      "statement": "Generic square-root time and memory upper bound.",
+      "source_refs": ["S-BOUND-CONTRACT"]
+    },
+    {
+      "id": "E-009",
+      "from": "ALG-POLLARD-RHO",
+      "to": "PROB-ECDLP",
+      "relation": "upper_bounds",
+      "statement": "Generic square-root expected-work upper bound under the random-walk heuristic.",
+      "source_refs": ["S-POLLARD-1978"]
+    },
+    {
+      "id": "E-010",
+      "from": "ALG-RHO-AUTOMORPHISM",
+      "to": "ALG-POLLARD-RHO",
+      "relation": "qualifies",
+      "statement": "Known automorphisms change constants and the effective collision quotient, not automatically the exponent.",
+      "source_refs": ["S-KOBLITZ-PROGRAM"]
+    },
+    {
+      "id": "E-011",
+      "from": "LB-SHOUP-DLP",
+      "to": "PROB-ECDLP",
+      "relation": "lower_bounds",
+      "statement": "Square-root lower bound inside Shoup's generic model.",
+      "source_refs": ["S-SHOUP-1997"]
+    },
+    {
+      "id": "E-012",
+      "from": "LB-SHOUP-CDH",
+      "to": "PROB-CDH",
+      "relation": "lower_bounds",
+      "statement": "Square-root lower bound for generic CDH at constant success.",
+      "source_refs": ["S-SHOUP-1997"]
+    },
+    {
+      "id": "E-013",
+      "from": "LB-CGK-ADVICE",
+      "to": "PROB-ECDLP",
+      "relation": "lower_bounds",
+      "statement": "Advice/online-time lower bound in the generic preprocessing model.",
+      "source_refs": ["S-CGK-2018"]
+    },
+    {
+      "id": "E-014",
+      "from": "LB-CGK-PREPROCESS-TIME",
+      "to": "PROB-ECDLP",
+      "relation": "lower_bounds",
+      "statement": "Preprocessing-work/online-time lower bound in the same model.",
+      "source_refs": ["S-CGK-2018"]
+    },
+    {
+      "id": "E-015",
+      "from": "ATTACK-SMART-TRACE-ONE",
+      "to": "PROB-ECDLP",
+      "relation": "attacks_when",
+      "statement": "Applies when #E(F_p)=p.",
+      "source_refs": ["S-SMART-1999"]
+    },
+    {
+      "id": "E-016",
+      "from": "ATTACK-MOV-PAIRING",
+      "to": "PROB-ECDLP",
+      "relation": "attacks_when",
+      "statement": "Applies when a pairing embeds the subgroup into an easier low-degree finite-field DLP.",
+      "source_refs": ["S-MOV-1993", "S-SMART-1999"]
+    },
+    {
+      "id": "E-017",
+      "from": "ATTACK-MOV-PAIRING",
+      "to": "PROB-DDH",
+      "relation": "upper_bounds",
+      "statement": "A suitable efficiently computable pairing can decide DDH without solving ECDLP, demonstrating the gap-DH separation in pairing groups.",
+      "source_refs": ["S-MOV-1993"]
+    },
+    {
+      "id": "E-018",
+      "from": "ATTACK-GHS-WEIL-DESCENT",
+      "to": "PROB-ECDLP",
+      "relation": "attacks_when",
+      "statement": "Applies to the classified characteristic-two extension families and a non-killed subgroup image.",
+      "source_refs": ["S-GHS-2002"]
+    },
+    {
+      "id": "E-019",
+      "from": "THEOREM-SEMAEV-SUMMATION",
+      "to": "ATTACK-DIEM-EXTENSION",
+      "relation": "enables",
+      "statement": "Summation polynomials provide the algebraic point-decomposition system used by the algorithm.",
+      "source_refs": ["S-DIEM-2011"]
+    },
+    {
+      "id": "E-020",
+      "from": "ATTACK-DIEM-EXTENSION",
+      "to": "PROB-ECDLP",
+      "relation": "upper_bounds",
+      "statement": "Gives an unrestricted-in-instance expected-time upper bound for the paper's extension-field parameterization.",
+      "source_refs": ["S-DIEM-2011"]
+    },
+    {
+      "id": "E-021",
+      "from": "ATTACK-SHOR-QUANTUM",
+      "to": "PROB-ECDLP",
+      "relation": "upper_bounds",
+      "statement": "Polynomial-time quantum upper bound.",
+      "source_refs": ["S-SHOR-1997"]
+    },
+    {
+      "id": "E-022",
+      "from": "FACT-MEASURED-BOUND",
+      "to": "MEASURED-CURRENT-FRONTIER",
+      "relation": "defines",
+      "statement": "The frontier is constructed from scoped measured method bounds.",
+      "source_refs": ["S-BOUND-CONTRACT", "S-FRONTIER-2026"]
+    },
+    {
+      "id": "E-023",
+      "from": "MEASURED-CURRENT-FRONTIER",
+      "to": "PROB-ECDLP",
+      "relation": "measures",
+      "statement": "Measures known algorithms on declared finite domains; it does not lower-bound the problem.",
+      "source_refs": ["S-FRONTIER-2026"]
+    },
+    {
+      "id": "E-024",
+      "from": "BRIDGE-GENERIC-TABLE",
+      "to": "LB-SHOUP-DLP",
+      "relation": "model_bridge",
+      "statement": "If a concrete table-decomposition pipeline satisfies the schema, Shoup's model-relative lower bound applies to its online generic interface.",
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-SHOUP-1997"]
+    },
+    {
+      "id": "E-025",
+      "from": "BRIDGE-GENERIC-TABLE",
+      "to": "LB-CGK-ADVICE",
+      "relation": "model_bridge",
+      "statement": "If its advice construction and target independence match the preprocessing model, the advice/online tradeoff applies.",
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-CGK-2018"]
+    },
+    {
+      "id": "E-026",
+      "from": "GAP-COORDINATE-ALGEBRAIC",
+      "to": "LB-SHOUP-DLP",
+      "relation": "does_not_cover",
+      "statement": "Coordinate and polynomial predicates are outside Shoup's declared oracle interface.",
+      "source_refs": ["S-SHOUP-1997", "S-SCOPED-BOUNDARIES"]
+    },
+    {
+      "id": "E-027",
+      "from": "GAP-COORDINATE-ALGEBRAIC",
+      "to": "LB-CGK-ADVICE",
+      "relation": "does_not_cover",
+      "statement": "The generic preprocessing lower bound does not automatically cover representation-specific algebraic advice or predicates.",
+      "source_refs": ["S-CGK-2018", "S-SCOPED-BOUNDARIES"]
+    },
+    {
+      "id": "E-028",
+      "from": "THEOREM-YIELD-CONSERVATION",
+      "to": "GAP-COORDINATE-ALGEBRAIC",
+      "relation": "qualifies",
+      "statement": "Mean yield conservation narrows the opportunity to variance, recognizability, rank, solver cost, or exceptional specialization; it does not close the algebraic route.",
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-SYNTHESIS"]
+    },
+    {
+      "id": "E-029",
+      "from": "LB-ISOGENY-GENERIC",
+      "to": "PROB-ECDLP",
+      "relation": "lower_bounds",
+      "statement": "Birthday-order lower bound in the isogeny-augmented generic subgroup model.",
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-ISOGENY-FIBERS"]
+    },
+    {
+      "id": "E-030",
+      "from": "THEOREM-JMV-ISOGENY-REDUCTION",
+      "to": "PROB-ECDLP",
+      "relation": "qualifies",
+      "statement": "Supports random reducibility only within its GRH and endomorphism-ring scope.",
+      "source_refs": ["S-JMV-2005", "S-ISOGENY-FIBERS"]
+    },
+    {
+      "id": "E-031",
+      "from": "GAP-TRANSPORT-ORACLE-SIM",
+      "to": "LB-ISOGENY-GENERIC",
+      "relation": "does_not_cover",
+      "statement": "The generic isogeny theorem does not settle arbitrary coordinate-aware point generation and transport.",
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-ISOGENY-FIBERS"]
+    },
+    {
+      "id": "E-032",
+      "from": "THEOREM-FROB-SUBSPACES-131",
+      "to": "GAP-BINARY-M4-DEGREE",
+      "relation": "qualifies",
+      "statement": "Rules out intermediate-dimensional Frobenius-stable linear bases at n=131 but leaves nonlinear and non-invariant bases and solver-degree behavior open.",
+      "source_refs": ["S-KOBLITZ-PROGRAM", "S-SYNTHESIS"]
+    },
+    {
+      "id": "E-033",
+      "from": "THEOREM-GHS-GENUS-131",
+      "to": "ATTACK-GHS-WEIL-DESCENT",
+      "relation": "obstructs",
+      "statement": "The classified GHS route produces unusably large genus for the exact degree-131 challenge setting.",
+      "source_refs": ["S-KOBLITZ-PROGRAM", "S-SYNTHESIS"]
+    },
+    {
+      "id": "E-034",
+      "from": "GAP-AUTOMORPHISM-PREPROCESS",
+      "to": "LB-CGK-ADVICE",
+      "relation": "leaves_open",
+      "statement": "An automorphism-aware model bridge is required before using an effective orbit count in the theorem.",
+      "source_refs": ["S-SCOPED-BOUNDARIES", "S-CGK-2018"]
+    },
+    {
+      "id": "E-035",
+      "from": "GAP-PKM-SOLVING-DEGREE",
+      "to": "GAP-COORDINATE-ALGEBRAIC",
+      "relation": "instantiates",
+      "statement": "PKM tower degree growth is a concrete prime-field algebraic-oracle escape question.",
+      "source_refs": ["S-SYNTHESIS", "S-PRIME-PROGRAM"]
+    },
+    {
+      "id": "E-036",
+      "from": "GAP-BINARY-M4-DEGREE",
+      "to": "GAP-COORDINATE-ALGEBRAIC",
+      "relation": "instantiates",
+      "statement": "Binary Weil-descent degree growth is a concrete algebraic-coordinate question outside generic lower bounds.",
+      "source_refs": ["S-SYNTHESIS", "S-KOBLITZ-PROGRAM"]
+    },
+    {
+      "id": "E-037",
+      "from": "GAP-QUANTUM-RESOURCES",
+      "to": "ATTACK-SHOR-QUANTUM",
+      "relation": "qualifies",
+      "statement": "Concrete resources remain open even though asymptotic quantum tractability is settled.",
+      "source_refs": ["S-SHOR-1997", "S-LEAD-ATLAS"]
+    },
+    {
+      "id": "E-038",
+      "from": "GAP-UNCONDITIONAL-CLASSICAL",
+      "to": "CONCLUSION-SPECIFIC-CURVE",
+      "relation": "leaves_open",
+      "statement": "The absence of an unrestricted lower bound is why named-curve classical security remains assumption-based.",
+      "source_refs": ["S-SHOUP-1997", "S-CGK-2018"]
+    },
+    {
+      "id": "E-039",
+      "from": "LB-SHOUP-DLP",
+      "to": "CONCLUSION-SPECIFIC-CURVE",
+      "relation": "qualifies",
+      "statement": "Provides rigorous evidence only for generic algorithms.",
+      "source_refs": ["S-SHOUP-1997"]
+    },
+    {
+      "id": "E-040",
+      "from": "LB-CGK-ADVICE",
+      "to": "CONCLUSION-SPECIFIC-CURVE",
+      "relation": "qualifies",
+      "statement": "Provides rigorous evidence against generic preprocessing attacks in its advice model.",
+      "source_refs": ["S-CGK-2018"]
+    },
+    {
+      "id": "E-041",
+      "from": "ATTACK-SMART-TRACE-ONE",
+      "to": "CONCLUSION-SPECIFIC-CURVE",
+      "relation": "conditions",
+      "statement": "A named curve must exclude the anomalous-order condition.",
+      "source_refs": ["S-SMART-1999"]
+    },
+    {
+      "id": "E-042",
+      "from": "ATTACK-MOV-PAIRING",
+      "to": "CONCLUSION-SPECIFIC-CURVE",
+      "relation": "conditions",
+      "statement": "A named curve must have an adequately large embedding degree after target-field DLP pricing.",
+      "source_refs": ["S-MOV-1993"]
+    },
+    {
+      "id": "E-043",
+      "from": "ALG-POHLIG-HELLMAN",
+      "to": "CONCLUSION-SPECIFIC-CURVE",
+      "relation": "conditions",
+      "statement": "Security must be stated for the large prime subgroup, not the full curve order alone.",
+      "source_refs": ["S-POHLIG-HELLMAN-1978"]
+    },
+    {
+      "id": "E-044",
+      "from": "ATTACK-SHOR-QUANTUM",
+      "to": "ASM-CLASSICAL-ECDLP",
+      "relation": "qualifies",
+      "statement": "The classical qualifier is essential because the asymptotic quantum problem is polynomial-time.",
+      "source_refs": ["S-SHOR-1997"]
+    }
+  ],
+  "research_targets": [
+    {
+      "id": "RT-GENERIC-BRIDGE",
+      "label": "Concrete generic-interface audit",
+      "status": "working",
+      "priority": 1,
+      "objective": "For every method currently classified as generic decomposition, enumerate setup and online operations and prove or refute that each coordinate key/predicate is generically simulable under the Shoup/CGK interfaces.",
+      "depends_on": ["BRIDGE-GENERIC-TABLE", "GAP-COORDINATE-ALGEBRAIC", "MEASURED-CURRENT-FRONTIER"],
+      "acceptance": "A method-by-method matrix names every non-group operation, advice dependency, lookup semantics, and charged counter; each method is covered by a proved simulation statement or is reclassified with the exact escaping predicate.",
+      "next_step": "Trace the live generic-decomposition methods from classification.json into the ecbench registry and group implementation, starting with prime subtract, prime MITM/pair-table, and Koblitz compact-orbit methods.",
+      "source_refs": ["S-METHOD-CLASSIFICATION", "S-SCOPED-BOUNDARIES", "S-CGK-2018", "S-SHOUP-1997"]
+    },
+    {
+      "id": "RT-ALGEBRAIC-SOLUTION-COUNT",
+      "label": "Algebraic factor-base solution-count falsifier",
+      "status": "ready",
+      "priority": 2,
+      "objective": "Compute or prove the algebraic-closure solution count for membership-constrained Semaev systems and compare it with B^(m-1).",
+      "depends_on": ["GAP-COORDINATE-ALGEBRAIC", "THEOREM-SEMAEV-SUMMATION", "THEOREM-YIELD-CONSERVATION"],
+      "acceptance": "Exact counts or certified degrees for PKM, Dickson, subgroup, and random-control bases across the frozen small ladder, with the count convention and multiplicity stated.",
+      "next_step": "Port the existing proposed census to a native producer and freeze the m=2,3 toy ladder before execution.",
+      "source_refs": ["S-PRIME-PROGRAM", "S-SYNTHESIS"]
+    },
+    {
+      "id": "RT-PKM-DEGREE",
+      "label": "PKM solving-degree growth",
+      "status": "open",
+      "priority": 3,
+      "objective": "Determine whether the observed solving-degree plateau survives at N=21,24,27 and reconcile it with Hilbert-series predictions.",
+      "depends_on": ["GAP-PKM-SOLVING-DEGREE"],
+      "acceptance": "At least three independent systems per rung, actual solver degree, peak memory, retained failures, and a checked Hilbert-series predictor that agrees on prior rungs.",
+      "next_step": "Materialize the current native system exporter and design an EKS-compatible high-memory run; do not infer bounded degree from the existing plateau.",
+      "source_refs": ["S-SYNTHESIS", "S-PRIME-PROGRAM"]
+    },
+    {
+      "id": "RT-BINARY-M4-DEGREE",
+      "label": "Prime-degree binary m=4 degree ladder",
+      "status": "open",
+      "priority": 4,
+      "objective": "Extend exact m=4 Weil-descent degree measurements and calibrate solver work into the same unit as the matched generic reference.",
+      "depends_on": ["GAP-BINARY-M4-DEGREE", "THEOREM-FROB-SUBSPACES-131"],
+      "acceptance": "Matched representations, three or more larger degree cells, exact closure/solver degree, memory, and an independently checked work-unit conversion.",
+      "next_step": "Audit the current G2 equivariant-F4 and m=4 system exporters before freezing cells; the lead atlas changed since review, so collision-check the latest records first.",
+      "source_refs": ["S-SYNTHESIS", "S-KOBLITZ-PROGRAM", "S-LEAD-ATLAS"]
+    },
+    {
+      "id": "RT-TRANSPORT-SIM",
+      "label": "Coordinate transport-oracle theorem",
+      "status": "open",
+      "priority": 5,
+      "objective": "Prove a same-input, same-cost simulation theorem for the largest defensible coordinate-aware transport interface, or construct a concrete counterexample interface.",
+      "depends_on": ["GAP-TRANSPORT-ORACLE-SIM", "LB-ISOGENY-GENERIC"],
+      "acceptance": "Explicit quantifier order, allowed algebraic representations, point-generation rules, map costs, and a proof or counterexample checked against the withdrawn claim.",
+      "next_step": "Start from the R6.8 counterexample boundary and separate transport of received points from transport of newly coordinate-generated factor-base points.",
+      "source_refs": ["S-ISOGENY-FIBERS", "S-SCOPED-BOUNDARIES"]
+    },
+    {
+      "id": "RT-AUTOMORPHISM-PREPROCESS",
+      "label": "Automorphism-aware preprocessing model",
+      "status": "open",
+      "priority": 6,
+      "objective": "State and prove the preprocessing tradeoff for a generic group augmented with a finite known-scalar automorphism action, including advice units and orbit stabilizers.",
+      "depends_on": ["GAP-AUTOMORPHISM-PREPROCESS", "LB-CGK-ADVICE", "ALG-RHO-AUTOMORPHISM"],
+      "acceptance": "A theorem with explicit oracle semantics and success probability, or a reduction to the original CGK model that accounts for the encoding of orbit representatives.",
+      "next_step": "Write the finite-action oracle and attempt a reduction with N replaced only after proving the orbit/stabilizer distribution.",
+      "source_refs": ["S-CGK-2018", "S-SCOPED-BOUNDARIES", "S-KOBLITZ-PROGRAM"]
+    },
+    {
+      "id": "RT-QUANTUM-RESOURCES",
+      "label": "Named-curve fault-tolerant resource ladder",
+      "status": "open",
+      "priority": 7,
+      "objective": "Reduce concrete reversible point-addition, inversion, and error-correction resources for named curves without confusing resource improvements with restored asymptotic hardness.",
+      "depends_on": ["GAP-QUANTUM-RESOURCES", "ATTACK-SHOR-QUANTUM"],
+      "acceptance": "Verified reversible circuits, full-input correctness, logical resource accounting, and architecture/error-rate assumptions for each estimate.",
+      "next_step": "Continue the lead-atlas safegcd/jump-GCD inversion target on the existing secp256k1 circuit baseline.",
+      "source_refs": ["S-SHOR-1997", "S-LEAD-ATLAS"]
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+import Inversion
+set_option autoImplicit false
+namespace FastBatch
+open PencilWordRefinement WideModPow
+
+def product (p n s : UInt64) : UInt64 := (n*s)%p
+def both (p n s : UInt64) : UInt64 := inverseGenerator p (product p n s)
+def ni (p n s : UInt64) : UInt64 := (both p n s*s)%p
+def si (p n s : UInt64) : UInt64 := (both p n s*n)%p
+
+theorem guarded_product (p n s : UInt64) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31)
+ (hnc : n.toNat<p.toNat) (hsc : s.toNat<p.toNat) (hn : n≠0) (hs : s≠0) :
+ (product p n s).toNat<p.toNat ∧ product p n s ≠ 0 ∧
+ ((product p n s).toNat : ZMod p.toNat)=(n.toNat : ZMod p.toNat)*(s.toNat : ZMod p.toNat) := by
+ have hd := uint64_mul_decode p n s hb hnc hsc
+ have hnc0 := canonical_word_nonzero p n (by omega) hnc hn
+ have hsc0 := canonical_word_nonzero p s (by omega) hsc hs
+ refine ⟨uint64_mul_canonical p n s (by omega),?_,hd⟩
+ intro hz
+ change product p n s = 0 at hz
+ change ((product p n s).toNat : ZMod p.toNat)=_ at hd
+ rw [hz] at hd
+ have h : (n.toNat : ZMod p.toNat)*(s.toNat : ZMod p.toNat)=0 := by simpa using hd.symm
+ exact (mul_ne_zero hnc0 hsc0) h
+
+theorem field_batch {K : Type*} [Field K] (n s : K) (hn : n≠0) (hs : s≠0) :
+ (n*s)⁻¹*s=n⁻¹ ∧ (n*s)⁻¹*n=s⁻¹ := by
+ constructor
+ · rw [mul_inv_rev]
+   calc
+    _=n⁻¹*(s⁻¹*s) := by ring
+    _=n⁻¹ := by rw [inv_mul_cancel₀ hs,mul_one]
+ · rw [mul_inv_rev,mul_assoc,inv_mul_cancel₀ hn,mul_one]
+
+theorem batch_decode (p n s : UInt64) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31)
+ (hnc : n.toNat<p.toNat) (hsc : s.toNat<p.toNat) (hn : n≠0) (hs : s≠0) :
+ product p n s ≠ 0 ∧ (both p n s).toNat<p.toNat ∧
+ (ni p n s).toNat<p.toNat ∧ (si p n s).toNat<p.toNat ∧
+ ((both p n s).toNat : ZMod p.toNat)=
+ ((n.toNat : ZMod p.toNat)*(s.toNat : ZMod p.toNat))⁻¹ ∧
+ ((ni p n s).toNat : ZMod p.toNat)=(n.toNat : ZMod p.toNat)⁻¹ ∧
+ ((si p n s).toNat : ZMod p.toNat)=(s.toNat : ZMod p.toNat)⁻¹ := by
+ obtain ⟨hpc,hpn,hpd⟩ := guarded_product p n s hp hb hnc hsc hn hs
+ have hbc := (generator_product p (product p n s) (by omega) hpc hpn).1
+ have hbd := generator_decode p (product p n s) (by omega) hpc hpn
+ change (both p n s).toNat<p.toNat at hbc
+ change ((both p n s).toNat : ZMod p.toNat)=_ at hbd
+ rw [hpd] at hbd
+ have hni := uint64_mul_decode p (both p n s) s hb hbc hsc
+ have hsi := uint64_mul_decode p (both p n s) n hb hbc hnc
+ rw [hbd] at hni hsi
+ obtain ⟨hfni,hfsi⟩ := field_batch (n.toNat : ZMod p.toNat) (s.toNat : ZMod p.toNat)
+  (canonical_word_nonzero p n (by omega) hnc hn) (canonical_word_nonzero p s (by omega) hsc hs)
+ exact ⟨hpn,hbc,uint64_mul_canonical p _ _ (by omega),uint64_mul_canonical p _ _ (by omega),
+ hbd,hni.trans hfni,hsi.trans hfsi⟩
+end FastBatch
