@@ -1,0 +1,277 @@
+{
+  "aa_in_session_identical_relation_counts": {
+    "identical": 320,
+    "note": "ecbench derives one algorithm seed per (workload, round) shared by every arm, so the in-session A/A arm reproduces the counts exactly (determinism check) and differs only in wall; the yield A/A is the round-parity split below",
+    "pairs": 320
+  },
+  "aa_online_wall_log_ratio": {
+    "mean": -0.015695300914013093,
+    "n": 256,
+    "sd": 0.21943226342190825
+  },
+  "bootstrap": 2000,
+  "class": "c24A",
+  "class_facts": {
+    "D": -84171,
+    "h": 128,
+    "log2_p": 23.70142841181955,
+    "n": 13633453,
+    "p": 13640833
+  },
+  "isolation_levels_of_rows": {
+    "L1": 960
+  },
+  "m": 2,
+  "metrics": {
+    "online_wall_ns_per_attempt": {
+      "aa_round_halves": {
+        "curves": 16,
+        "max_ratio": 1.2151018822964081,
+        "median_abs_log_ratio": 0.07724820025151671,
+        "q95_abs_log_ratio": 0.19370160844995402,
+        "sd_log_ratio": 0.10107799496834437
+      },
+      "cells_per_curve": 16.0,
+      "curve_mean_cv": 0.06498273350421493,
+      "curves": 16,
+      "grand_mean": 405.5199325045186,
+      "icc_bootstrap_median": 0.0911824581875378,
+      "icc_bootstrap_upper95": 0.18853105994687466,
+      "icc_clipped": 0.03896340335550256,
+      "icc_perm_null_q95": 0.04264813557692306,
+      "icc_perm_p": 0.06746626686656672,
+      "icc_raw": 0.03896340335550256,
+      "isomorphic_model_control": {
+        "max_ratio": 1.1519223894008368,
+        "median_abs_log_ratio": 0.14095997485245873,
+        "note": "a u-scaling changes x to u^2 x and so the smallest-abscissa factor base; the same curve under another model is the presentation noise",
+        "pairs": 4,
+        "rms_log_ratio": 0.10280038631428925
+      },
+      "max_abs_z": 2.547713319290284,
+      "max_abs_z_perm_null_q95": 3.28899742319942,
+      "max_abs_z_perm_p": 0.22638680659670166,
+      "max_over_min": 1.2556665042006867,
+      "max_over_min_perm_null_q95": 1.2806791820416008,
+      "max_over_min_perm_p": 0.12293853073463268,
+      "sigma2_between": 273.2237226272822,
+      "sigma2_within": 6739.092941150409
+    },
+    "rel_gae_per_attempt": {
+      "aa_round_halves": {
+        "curves": 16,
+        "max_ratio": 1.0103536401563966,
+        "median_abs_log_ratio": 0.0029100679388558777,
+        "q95_abs_log_ratio": 0.009806978143944996,
+        "sd_log_ratio": 0.005082352700479162
+      },
+      "cells_per_curve": 16.0,
+      "curve_mean_cv": 0.002958925420188117,
+      "curves": 16,
+      "grand_mean": 1.153760103926097,
+      "icc_bootstrap_median": 0.0742771444438416,
+      "icc_bootstrap_upper95": 0.17147162579634384,
+      "icc_clipped": 0.023045636254811815,
+      "icc_perm_null_q95": 0.038594644086508555,
+      "icc_perm_p": 0.14492753623188406,
+      "icc_raw": 0.023045636254811815,
+      "isomorphic_model_control": {
+        "max_ratio": 1.0073024125209127,
+        "median_abs_log_ratio": 0.0042761913302136875,
+        "note": "a u-scaling changes x to u^2 x and so the smallest-abscissa factor base; the same curve under another model is the presentation noise",
+        "pairs": 4,
+        "rms_log_ratio": 0.004557463484999228
+      },
+      "max_abs_z": 3.0554856239452226,
+      "max_abs_z_perm_null_q95": 2.9298691832705264,
+      "max_abs_z_perm_p": 0.03298350824587706,
+      "max_over_min": 1.0121977877847244,
+      "max_over_min_perm_null_q95": 1.0121915233119851,
+      "max_over_min_perm_p": 0.050474762618690654,
+      "sigma2_between": 3.1934821550906145e-6,
+      "sigma2_within": 0.0001353786153900067
+    },
+    "yield": {
+      "aa_round_halves": {
+        "curves": 16,
+        "max_ratio": 1.067232375979112,
+        "median_abs_log_ratio": 0.02602377342130551,
+        "q95_abs_log_ratio": 0.054134522814871605,
+        "sd_log_ratio": 0.03469830795029033
+      },
+      "cells_per_curve": 16.0,
+      "curve_mean_cv": 0.015123517628798645,
+      "curves": 16,
+      "grand_mean": 0.01996545210362485,
+      "icc_bootstrap_median": 0.03542069524787216,
+      "icc_bootstrap_upper95": 0.10019388123952566,
+      "icc_clipped": 0.0,
+      "icc_perm_null_q95": 0.04025630017085759,
+      "icc_perm_p": 0.8295852073963018,
+      "icc_raw": -0.022530291599234167,
+      "isomorphic_model_control": {
+        "max_ratio": 1.089970009996668,
+        "median_abs_log_ratio": 0.02873125804048106,
+        "note": "a u-scaling changes x to u^2 x and so the smallest-abscissa factor base; the same curve under another model is the presentation noise",
+        "pairs": 4,
+        "rms_log_ratio": 0.04584719454839558
+      },
+      "max_abs_z": 1.6862175181979162,
+      "max_abs_z_perm_null_q95": 2.962416086448111,
+      "max_abs_z_perm_p": 0.7626186906546727,
+      "max_over_min": 1.0502882767456758,
+      "max_over_min_perm_null_q95": 1.0941408821593153,
+      "max_over_min_perm_p": 0.889055472263868,
+      "positive_control": {
+        "detect_icc_gt_null_q95": 1.0,
+        "detect_max_abs_z_gt_null_q95": 1.0,
+        "detect_max_over_min_gt_null_q95": 1.0,
+        "note": "null thresholds are the 95th percentile of the cell-permutation null of the unplanted data",
+        "planted_curve_trials": 200,
+        "planted_effect_pc_over_main_median": 1.19454770755886
+      },
+      "sigma2_between": -4.964354726706049e-8,
+      "sigma2_within": 2.2530569850562076e-6
+    }
+  },
+  "outcome_status_of_rows": {
+    "exhausted": 960
+  },
+  "per_curve": [
+    {
+      "attempts": 159344.0,
+      "curve": 0,
+      "j": 82590,
+      "pooled_yield": 0.020145094889045086,
+      "relations": 3210.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 1,
+      "j": 174643,
+      "pooled_yield": 0.019994477357164375,
+      "relations": 3186.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 2,
+      "j": 182816,
+      "pooled_yield": 0.020000753087659404,
+      "relations": 3187.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 3,
+      "j": 290747,
+      "pooled_yield": 0.01971206948488804,
+      "relations": 3141.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 4,
+      "j": 338761,
+      "pooled_yield": 0.019599106335977508,
+      "relations": 3123.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 5,
+      "j": 383863,
+      "pooled_yield": 0.019900341399738928,
+      "relations": 3171.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 6,
+      "j": 730915,
+      "pooled_yield": 0.019705793754393013,
+      "relations": 3140.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 7,
+      "j": 876115,
+      "pooled_yield": 0.020176473541520232,
+      "relations": 3215.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 8,
+      "j": 993814,
+      "pooled_yield": 0.020578120293202128,
+      "relations": 3279.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 9,
+      "j": 1102395,
+      "pooled_yield": 0.020258058037955617,
+      "relations": 3228.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 10,
+      "j": 1182326,
+      "pooled_yield": 0.01974344813736319,
+      "relations": 3146.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 11,
+      "j": 1316869,
+      "pooled_yield": 0.019850135555778692,
+      "relations": 3163.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 30,
+      "j": 3113716,
+      "pooled_yield": 0.01987523847775881,
+      "relations": 3167.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 73,
+      "j": 7695860,
+      "pooled_yield": 0.019787378250828398,
+      "relations": 3153.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 95,
+      "j": 9855939,
+      "pooled_yield": 0.02052791444924189,
+      "relations": 3271.0,
+      "setup_gae_mean": 274170.0
+    },
+    {
+      "attempts": 159344.0,
+      "curve": 112,
+      "j": 11674867,
+      "pooled_yield": 0.01959283060548248,
+      "relations": 3122.0,
+      "setup_gae_mean": 274170.0
+    }
+  ],
+  "permutations": 2000,
+  "plants": 200,
+  "schema": "p2.analysis/v1",
+  "seed": 20261102,
+  "sessions": [
+    "smoke/session_m2"
+  ]
+}
