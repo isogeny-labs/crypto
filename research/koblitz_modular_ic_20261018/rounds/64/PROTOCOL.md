@@ -1,0 +1,31 @@
+# R64 exact coordinate bridge, frozen before data
+
+Test the proposed map from the R53 compact PID order to the actual R61
+degree-32 field: `z=1/u`, old `V=v/u²`, and old `lambda=l`. Read the full
+R53 old source equations, all 32 R51 compact basis columns and denominator,
+and the actual R61 source ideal from their accepted raw files. Require
+actual quotient degree32. Map and reduce both old equations against that
+actual ideal; change the quadratic coordinate by `1/u` and require failure.
+
+Map every one of 32 compact basis columns, including its full denominator,
+to an actual source function. Extract all 32 canonical coefficient columns,
+prove full rank32 and both inverse products, and reject an altered column.
+Preserve a complete source-bound serialized bundle before the terminal
+marker. No subset, coefficient-box, sampled fiber or assumed lambda
+identification substitutes for the two source equations and all 32 basis
+functions. A failed map is a result requiring diagnosis, not proof that no
+other coordinate map exists.
+
+The original local math scope applies: one Singular/FLINT thread, one math
+job, 1200 seconds, 4 GiB virtual, deterministic seed64. Exit0, exact marker,
+and no whitespace-question-mark error line are jointly necessary.
+Preserve full raw output and rejected attempts. Freeze source, protocol,
+drivers and hashed donor manifest in Git before data; all copies must bind
+to the historical Git revision. Use the existing checkpoint gate. No EKS,
+Diem, freezer, new Conductor claim, delegation, merge or retarget.
+
+This experiment proves a generic source-field bridge only if the checks
+pass. Affine integral closure, both proper charts, local valuations,
+polarization and subgroup transfer remain separate. After a successful
+bridge, run the complete descending Frobenius normalization prescribed in
+NORMALIZATION-LEAD.md with the R61 trace Gram and multiplication table.
