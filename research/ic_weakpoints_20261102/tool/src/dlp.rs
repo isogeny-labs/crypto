@@ -227,6 +227,9 @@ pub fn run(args: &[String]) {
                             if e.reached_at.is_none() && e.full.len() >= e.target {
                                 e.reached_at = Some(trials);
                             }
+                            if e.square_at.is_none() && e.full.len() >= e.cut + 1 {
+                                e.square_at = Some(trials);
+                            }
                         }
                     }
                 }

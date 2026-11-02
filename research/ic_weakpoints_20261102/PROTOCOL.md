@@ -73,3 +73,14 @@ every arm-L record field for field apart from the new field (determinism replay;
 kept in `data/dlp_run1/`). Exponents and the derived model are refitted on `T_square`; the `T` fits
 stay in the summary under `"metric":"T"`. Predictions (a)-(d) are re-tested on `T_square` unchanged.
 Falsified as before; additionally the replay fails on any differing pre-existing field.
+
+### Amendment 3a (2026-11-02, after the first rerun, before the second)
+The first Amendment-3 rerun (18:10-19:14Z) was void: the `T_square` check was not applied by the code
+edit (every value null), and the replay against `data/dlp_run1/` differed in operation counters only
+(`la_dense_mults` in 43 of 150 records, `merge_ops` in 1; every T, rank, consistency and k identical).
+Cause: `decompose3` returned decompositions in `HashSet` order, which is randomised per process, so the
+row insertion order inside one trial varied. Fix: the decompositions are sorted before use, and the
+`T_square` check is applied. Two runs of `dlp --p 127 --curves 1` are now byte-identical. The rerun
+records were discarded (no information beyond the counts above). The replay criterion is narrowed:
+T, reached, trials_run, decomps_seen, partials_in, full_rows, rank, consistent and k_correct must match
+`data/dlp_run1/`; the operation counters may differ in run 1 because of the old ordering.

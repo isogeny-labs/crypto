@@ -165,7 +165,8 @@ fn decompose3(c: &Curve, fb: &Fb, r: &Pt, rng: &mut Rng) -> (Vec<Decomp>, u64) {
             }
         }
     }
-    let v: Vec<Decomp> = out.into_iter().collect();
+    let mut v: Vec<Decomp> = out.into_iter().collect();
+    v.sort(); // Amendment 3a: HashSet order is randomised per process; sort for a deterministic row order
     for d in &v {
         let mut acc: Pt = None;
         for &(i, s) in d {
