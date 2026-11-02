@@ -43,6 +43,8 @@ struct Elim {
     ops: u64, // mod-ell multiplications spent merging
     target: usize,
     reached_at: Option<u64>,
+    square_at: Option<u64>, // trial at which full rows first reach cut + 1 (Amendment 3)
+    cut: usize,
     partial_in: u64,
 }
 
@@ -182,7 +184,7 @@ pub fn run(args: &[String]) {
             .iter()
             .map(|&cut| {
                 (0..3)
-                    .map(|v| Elim { max_lp: v, ell, piv: HashMap::new(), full: vec![], ops: 0, target: cut + 1 + extra, reached_at: None, partial_in: 0 })
+                    .map(|v| Elim { max_lp: v, ell, piv: HashMap::new(), full: vec![], ops: 0, target: cut + 1 + extra, reached_at: None, square_at: None, cut, partial_in: 0 })
                     .collect()
             })
             .collect();
@@ -250,8 +252,8 @@ pub fn run(args: &[String]) {
                     })
                     .collect();
                 println!(
-                    "{{\"exp\":\"dlp\",\"p\":{},\"curve\":{},\"ell\":{},\"h\":{},\"F\":{},\"r\":{:.4},\"cut\":{},\"lp\":{},\"target\":{},\"reached\":{},\"T\":{},\"trials_run\":{},\"decomps_seen\":{},\"partials_in\":{},\"pivots_left\":{},\"full_rows\":{},\"nnz\":{},\"mean_row_weight\":{:.3},\"merge_ops\":{},\"rank\":{},\"consistent\":{},\"k_correct\":{},\"la_dense_mults\":{},\"la_sparse_model\":{:.0},\"c3\":{:.0},\"rho_negmap\":{:.1},\"ratio_w\":[{}]}}",
-                    p, ci, ell, h, nfb, RS[ri], cut, e.max_lp, e.target, e.reached_at.is_some(), t, trials, decomps,
+                    "{{\"exp\":\"dlp\",\"p\":{},\"curve\":{},\"ell\":{},\"h\":{},\"F\":{},\"r\":{:.4},\"cut\":{},\"lp\":{},\"target\":{},\"reached\":{},\"T\":{},\"T_square\":{},\"trials_run\":{},\"decomps_seen\":{},\"partials_in\":{},\"pivots_left\":{},\"full_rows\":{},\"nnz\":{},\"mean_row_weight\":{:.3},\"merge_ops\":{},\"rank\":{},\"consistent\":{},\"k_correct\":{},\"la_dense_mults\":{},\"la_sparse_model\":{:.0},\"c3\":{:.0},\"rho_negmap\":{:.1},\"ratio_w\":[{}]}}",
+                    p, ci, ell, h, nfb, RS[ri], cut, e.max_lp, e.target, e.reached_at.is_some(), t, e.square_at.map_or("null".into(), |x| x.to_string()), trials, decomps,
                     e.partial_in, e.piv.len(), e.full.len(), nnz, nnz as f64 / rows.len().max(1) as f64, e.ops,
                     rank, cons, k.map_or("null".into(), |kk| (kk == k_secret && c.mul(kk, &g) == q).to_string()),
                     la, la_sparse, c3, rho_neg, band.join(",")

@@ -61,3 +61,15 @@ trial exponent is <= 1.4 (theory 4/3, Gaudry-Thome-Theriault-Diem), below rho's 
 (c) every reached cell recovers log Q; (d) merged 2LP rows are heavier than 0LP rows but by < 3x.
 Falsified: (b) if the fitted 2LP exponent at r = 2/3 exceeds 1.5; (c) by any wrong or undetermined k.
 Exponents are least-squares slopes of log T on log p over reached cells (curves averaged in log).
+
+## Amendment 3 (2026-11-02, after arm L, before any new data): square-system trial count
+Arm L stopped each variant at |FB_r| + 21 full rows. At small p the fixed +20 margin dominates the
+target (p = 127, r = 2/3: 34 rows for 13 columns), so T grows more slowly than |FB_r| and every
+exponent fitted on T is biased low. This was noticed from the fits (2LP at r = 2/3: 1.12 +- 0.03 against
+the theoretical 4/3), and is a design flaw, not a finding.
+Change: `dlp` also records `T_square`, the trial at which full rows first reach |FB_r| + 1. The walk,
+seeds and stopping rule are unchanged, so rerunning the arm-L commands (`run_dlp.sh`) must reproduce
+every arm-L record field for field apart from the new field (determinism replay; the arm-L records are
+kept in `data/dlp_run1/`). Exponents and the derived model are refitted on `T_square`; the `T` fits
+stay in the summary under `"metric":"T"`. Predictions (a)-(d) are re-tested on `T_square` unchanged.
+Falsified as before; additionally the replay fails on any differing pre-existing field.
