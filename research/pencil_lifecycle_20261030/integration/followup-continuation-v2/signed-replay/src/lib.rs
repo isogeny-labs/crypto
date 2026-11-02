@@ -6,7 +6,10 @@ use serde::{
     Deserialize, Deserializer, Serialize,
 };
 use serde_json::{json, Value};
-use std::{collections::BTreeMap, fmt};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fmt,
+};
 
 // Reject duplicate keys at every nesting depth rather than accepting last-wins JSON.
 struct Unique(Value);
@@ -275,11 +278,22 @@ pub fn replay_jsonl(
     let (mut attempts, mut duplicates, mut continuation) = (0u64, 0u64, 0u64);
     let mut group = BTreeMap::<u64, bool>::new();
     let mut group_closed = true;
+    let mut must_restart = false;
+    let mut walk_restart_pending = false;
+    let mut jump_indices = BTreeSet::new();
     let mut recovered = None;
     let mut terminal = false;
     for (sequence, e) in records.iter().enumerate().skip(1) {
         require(!terminal, "post-terminal record")?;
         let kind = e["kind"].as_str().ok_or("event kind")?;
+        require(
+            !must_restart || (kind == "restart" && e["reason"] == "chosen_duplicate"),
+            "missing required chosen-duplicate restart",
+        )?;
+        require(
+            !walk_restart_pending || kind == "candidate",
+            "walk restart must precede a candidate",
+        )?;
         require(
             recovered.is_none() || kind == "terminal",
             "post-recovery record",
@@ -303,6 +317,8 @@ pub fn replay_jsonl(
                 if next == continuation + 1 {
                     require(group_closed, "missing choice")?;
                     group.clear();
+                    jump_indices.clear();
+                    walk_restart_pending = false;
                     group_closed = false;
                     continuation = next;
                 } else {
@@ -313,6 +329,10 @@ pub fn replay_jsonl(
                 require(
                     num(e, "attempt")? == attempts && attempts <= cap && num(e, "jump_index")? < 16,
                     "candidate identity or cap",
+                )?;
+                require(
+                    jump_indices.insert(num(e, "jump_index")?),
+                    "repeated jump index in continuation",
                 )?;
                 let a = num(e, "a")?;
                 let b = num(e, "b")?;
@@ -521,12 +541,17 @@ pub fn replay_jsonl(
                         && num(e, "continuation")? == continuation,
                     "choice order",
                 )?;
+                require(
+                    group.len() == 2 || attempts == cap,
+                    "choice before both candidates or cap",
+                )?;
                 let selected = num(e, "selected_attempt")?;
                 require(
                     group.get(&selected) == Some(&boolean(e, "repeated")?),
                     "choice reference",
                 )?;
                 group_closed = true;
+                must_restart = boolean(e, "repeated")?;
             }
             "restart" => {
                 keys(
@@ -551,6 +576,16 @@ pub fn replay_jsonl(
                         || (e["reason"] == "chosen_duplicate" && c == continuation),
                     "restart reason or continuation",
                 )?;
+                if e["reason"] == "chosen_duplicate" {
+                    require(must_restart, "unsolicited chosen-duplicate restart")?;
+                    must_restart = false;
+                } else {
+                    require(
+                        !must_restart && attempts < cap,
+                        "walk restart outside active continuation",
+                    )?;
+                    walk_restart_pending = true;
+                }
                 require(num(e, "a")? < r && num(e, "b")? < r, "restart label domain")?;
                 divisor(&e["divisor"], p)?;
             }
