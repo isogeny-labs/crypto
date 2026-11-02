@@ -33,31 +33,35 @@ cp -a "$tmp/artifact" "$tmp/wrong-binary"
 jq '.ecbench_sha256="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"' \
   "$tmp/wrong-binary/isolab-image.json" > "$tmp/changed"
 mv "$tmp/changed" "$tmp/wrong-binary/isolab-image.json"
-if "$here/verify-publication-receipt" "$tmp/wrong-binary" "$tmp/rejected.json" 2>/dev/null; then
+if "$here/verify-publication-receipt" "$tmp/wrong-binary" "$tmp/rejected.json" 2>"$tmp/error"; then
   echo 'wrong binary hash was accepted' >&2
   exit 1
 fi
+grep -qx 'publication receipt rejected: image_ecbench_sha256' "$tmp/error"
 
 cp -a "$tmp/artifact" "$tmp/extra-file"
 printf 'unexpected\n' > "$tmp/extra-file/private.log"
-if "$here/verify-publication-receipt" "$tmp/extra-file" "$tmp/rejected.json" 2>/dev/null; then
+if "$here/verify-publication-receipt" "$tmp/extra-file" "$tmp/rejected.json" 2>"$tmp/error"; then
   echo 'unexpected artifact file was accepted' >&2
   exit 1
 fi
+grep -qx 'publication receipt rejected: artifact_file_count' "$tmp/error"
 
 cp -a "$tmp/artifact" "$tmp/symlink"
 ln -s isolab-image.json "$tmp/symlink/alias.json"
-if "$here/verify-publication-receipt" "$tmp/symlink" "$tmp/rejected.json" 2>/dev/null; then
+if "$here/verify-publication-receipt" "$tmp/symlink" "$tmp/rejected.json" 2>"$tmp/error"; then
   echo 'artifact symlink was accepted' >&2
   exit 1
 fi
+grep -qx 'publication receipt rejected: artifact_object_types' "$tmp/error"
 
 cp -a "$tmp/artifact" "$tmp/wrong-digest"
 jq '.image_uri |= sub("3f571d";"af571d")' "$tmp/wrong-digest/isolab-image.json" > "$tmp/changed"
 mv "$tmp/changed" "$tmp/wrong-digest/isolab-image.json"
-if "$here/verify-publication-receipt" "$tmp/wrong-digest" "$tmp/rejected.json" 2>/dev/null; then
+if "$here/verify-publication-receipt" "$tmp/wrong-digest" "$tmp/rejected.json" 2>"$tmp/error"; then
   echo 'wrong image digest was accepted' >&2
   exit 1
 fi
+grep -qx 'publication receipt rejected: image_digest' "$tmp/error"
 
 echo 'Publication receipt fixture accepted only the fixed source, binary, image, metadata and two-file artifact'
