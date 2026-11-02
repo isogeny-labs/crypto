@@ -1760,7 +1760,12 @@ mod tests {
     /// the brute-force `E[h]` (every point killed by `h`).
     fn cofactor_instance() -> (PrimeInstance, Vec<PrimePoint>) {
         let p = 10_007u64;
-        let is_prime = |n: u64| n > 1 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0);
+        let is_prime = |n: u64| {
+            n > 1
+                && (2..)
+                    .take_while(|d| d * d <= n)
+                    .all(|d| !n.is_multiple_of(d))
+        };
         for b in 1..p {
             let curve = PrimeCurve { p, a: p - 3, b };
             let mut pts = vec![];
@@ -1777,7 +1782,7 @@ mod tests {
             }
             let n = pts.len() as u64 + 1;
             for h in [8u64, 4] {
-                if n % h != 0 || !is_prime(n / h) || n / h < 500 {
+                if !n.is_multiple_of(h) || !is_prime(n / h) || n / h < 500 {
                     continue;
                 }
                 let r = n / h;
