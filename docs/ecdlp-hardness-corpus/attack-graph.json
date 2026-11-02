@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 536,
-    "frontier": 327,
+    "nodes": 541,
+    "frontier": 330,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -17,19 +17,19 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 88,
-      "measured": 22,
-      "proved_internal_unreviewed": 44,
-      "open": 46,
+      "measured": 24,
+      "proved_internal_unreviewed": 47,
+      "open": 45,
       "heuristic": 71,
-      "refuted": 19,
+      "refuted": 20,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 503,
-      "kernel_checked": 28,
+      "none": 504,
+      "kernel_checked": 29,
       "stated_open": 3,
       "lean_written_unchecked": 1,
-      "native_exact": 1
+      "native_exact": 4
     }
   },
   "frontier": [
@@ -861,6 +861,10 @@
         {
           "from": "CEX-NAGAO-LEMMA4-F2",
           "relation": "refutes"
+        },
+        {
+          "from": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+          "relation": "qualifies"
         }
       ]
     },
@@ -1705,6 +1709,10 @@
         },
         {
           "from": "HEUR-FIRST-FALL-DEGREE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
           "relation": "qualifies"
         }
       ]
@@ -2589,6 +2597,23 @@
       ]
     },
     {
+      "id": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
+      "label": "Semaev: first fall degree of S_3(x1,x2,z) systems 'always 4'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-SP-SEMAEV15-T2-TRACE",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "CLAIM-SP-SEMAEV15-FFDA-T2",
       "label": "Semaev 2015 FFDA instance: d_F4 <= first fall degree on t = 2 systems",
       "status": "refuted",
@@ -2837,25 +2862,6 @@
         {
           "from": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
           "relation": "obstructs"
-        }
-      ]
-    },
-    {
-      "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
-      "label": "Is d_F(inside) - d'_F bounded?",
-      "status": "open",
-      "formal": "none",
-      "action": "prove or refute",
-      "impact": 0,
-      "downstream": [],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-FAKE-GAP-INSIDE"
-      ],
-      "pressure": [
-        {
-          "from": "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
-          "relation": "qualifies"
         }
       ]
     },
@@ -4848,6 +4854,30 @@
       "pressure": []
     },
     {
+      "id": "CEX-INSIDE-GAP-N1-FAMILY",
+      "label": "n = 1: {X^k, X^k+1} has inside gap k - 1",
+      "status": "proved_internal_unreviewed",
+      "formal": "native_exact",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-INSIDE-GAP-THREE",
+      "label": "{XYW+XY+W, XZW+XW+1}: d_F(inside) = 4, d'_F = 1",
+      "status": "proved_internal_unreviewed",
+      "formal": "native_exact",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-LEMMA4-REVERSE-R",
       "label": "Witness R {X, X^2+X}: d_F = 2, no fake fall",
       "status": "proved_internal_unreviewed",
@@ -4950,9 +4980,9 @@
     },
     {
       "id": "CEX-SP-SEMAEV15-T2-TRACE",
-      "label": "Trace identity gives d_ff = 2 < d_F4 = 4 on Semaev's t = 2 rows",
+      "label": "Trace identity: d_ff = 2 on Semaev's t = 2 rows (checked); solver needs 2 or 3",
       "status": "proved_internal_unreviewed",
-      "formal": "none",
+      "formal": "native_exact",
       "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
@@ -4960,7 +4990,12 @@
       "research_targets": [
         "RT-SP-T2-TRACE-CHECK"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "MEAS-SEMAEV-T2-MACAULAY",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",
@@ -4973,6 +5008,33 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "label": "Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-FAKE-GAP-INSIDE"
+      ],
+      "pressure": [
+        {
+          "from": "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-INSIDE-GAP-THREE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-INSIDE-GAP-N1-FAMILY",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "LB-GG-AHP-GEOMETRIC",
