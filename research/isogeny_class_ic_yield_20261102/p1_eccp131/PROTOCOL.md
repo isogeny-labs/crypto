@@ -91,7 +91,7 @@ budget (see section 10). The correctness of S3 is checked in the run: for plante
 point sum is computed with elliptic-curve arithmetic and the planted assignment is asserted to
 zero every equation.
 
-**Solver (disclosure, per the coordinator's note).** No honest 131-bit F_p Groebner/Dreg formulation exists in the repository: `f4_fp`, `pkm_tower_pilot` and `prime_tower` stop at p < 2^63, and the prime `ic.pipeline` has no F4 stage (pair-table MITM at m = 2|3). The formulation below is the repository's own PKM system (tower + S3) written down at 131 bits with a **new** engine; it is not repo code and not what the repo's prime IC does per attempt. Measuring the repo's `ecbench run` method `ic.pipeline` (prime_explicit, prime-abscissa, `mitm:m=2|3`) on the 28 curves is a different instrument, **not done here** (open item; the p2 builder's `p2tool` pattern applies). The repository's `f4_fp` is limited to `p < 2^63`, so it cannot run at `p ~ 2^131`. The
+**Solver (disclosure, per the coordinator's note).** No honest 131-bit F_p Groebner/Dreg formulation exists in the repository: `f4_fp` stops at p < 2^32 (it panics above; corrected 2026-11-02, this text said 2^63), `pkm_tower_pilot` and `prime_tower` at p < 2^63, and the prime `ic.pipeline` has no F4 stage (pair-table MITM at m = 2|3). The formulation below is the repository's own PKM system (tower + S3) written down at 131 bits with a **new** engine; it is not repo code and not what the repo's prime IC does per attempt. Measuring the repo's `ecbench run` method `ic.pipeline` (prime_explicit, prime-abscissa, `mitm:m=2|3`) on the 28 curves is a different instrument, **not done here** (open item; the p2 builder's `p2tool` pattern applies). The repository's `f4_fp` is limited to `p < 2^32`, so it cannot run at `p ~ 2^131`. The
 engine here (`rust/src/engine.rs`, `fp.rs`) is an incremental **Macaulay-matrix (XL-style) sparse
 echelon** over a 3x64-bit Montgomery `F_p`: for degree D = 2, 3, ... it adds the rows `mu * f_i` with
 `deg(mu f_i) = D`, reduces each against the echelon rows held (degrevlex, leading column = largest
@@ -100,9 +100,10 @@ monomial; with the tower leading terms `u_j^2`), keeps the new pivots, and recor
 fall), zero reductions, non-zeros held, field multiplications, row operations, CPU time, and the
 **staircase** of leading monomials (number of standard monomials `n_std`, variables with a pure power).
 It is **not** F4 (no critical pairs, no symbolic preprocessing selection) and **not** a
-Groebner basis engine; its D is the Macaulay degree at which the criteria below hold, an upper bound
-on F4's degree on the same system. No claim about F4 time is made. Not done: a cross-check against
-the repo's `f4_fp` at a small prime on a mirror tower (listed in section 12).
+Groebner basis engine; its D is the Macaulay degree at which the criteria below hold. On the 147 mirror systems of
+`CROSSCHECK.md` (primes < 2^32, where `f4_fp` runs) it was strictly above F4's top step degree every time (an observation on
+these shapes; no theorem, degree falls make the two incomparable). No claim about F4 time is made. Cross-checked against `f4_fp`
+(`CROSSCHECK.md`, `crosscheck/`), with the limits listed there and in section 12.
 
 **Metrics (all defined per attempt; counted metrics first, the clock last).**
 
@@ -244,10 +245,11 @@ configurations.
 
 * No claim at full width: the systems are toy towers (|V| <= 16), m <= 3; D_solve at toy size
   does not extrapolate.
-* The engine is not F4 and was not cross-checked against `f4_fp`. Its correctness rests on
-  `selftest`, the per-row planted-point check, `n_std = K` on every solved planted row, and the
-  independent enumeration of K. A mirror-tower comparison with `f4_fp` at a 30-bit prime and a
-  Magma/msolve comparison (AGENTS.md §15) are **not done**.
+* The engine is not F4. Its correctness rests on `selftest`, the per-row planted-point check, `n_std = K` on every solved
+  planted row, the independent enumeration of K, and the follow-up cross-check (`CROSSCHECK.md`, 2026-11-02): on 252 mirror
+  systems at primes 2^14..2^61-1 no disagreement with an independent dense Macaulay elimination (688 degree profiles), the exact
+  solution enumeration, or `f4_fp` (solution sets, quotient dimension, inconsistency; 147 systems, p < 2^32 only: `f4_fp` panics
+  at p >= 2^32). Not done: F4 above 2^32 (`f4_tower_generic` not wired), a Magma/msolve comparison (AGENTS.md §15).
 * m3t3 (10 unknowns), m = 4 and larger towers are out of budget.
 * Time is a secondary metric; every neighbour's isogeny cost (phi evaluation, build time per
   neighbour in `neighbours.json`, 0.00-9.2 s) is a **transport cost**, reported separately and not
