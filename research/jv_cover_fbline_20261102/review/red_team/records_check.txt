@@ -110,3 +110,34 @@ search natives per (line, point): k = 1 (square-table lookup) or 3 (lookup, zero
   p=1601 k=1: search natives/sqrt(l) 0.0511; w=0: U1 0.548 U2 1.318; w=0.1: U1 0.572 U2 0.730; w=1: U1 0.584 U2 0.604;
   p=1601 k=3: search natives/sqrt(l) 0.1534; w=0: U1 0.548 U2 1.318; w=0.1: U1 0.576 U2 0.736; w=1: U1 0.590 U2 0.610;
   p=1601: cover geo-mean S 0.5111; tuned rho/harness rho = 0.4161; cover must shrink its F_p-mult count by x1.318 (tau* = 0.759) to reach the tuned negation rho
+
+## 7. Census (line_census_*.txt): fair speed-up per prime, decay with p, crossover under the decaying gain (model)
+replication of b_plain/b_best/best_index on all 9: true; j(E) in F_p2 or F_p3 on any instance: false
+fair expected speed-up in S (E over the plain line's B, max of 65536, search charged): geo-mean x1.710; per prime x1.757 / x1.709 / x1.666
+plain-line percentiles among all lines: [0.18, 0.511, 0.738, 0.691, 0.573, 0.119, 0.034, 0.835, 0.88] (mean 0.507; uniform expects 0.5 +- 0.096)
+exhaustive search over all p(p+1)/2 square-direction lines would add x1.075 (geo-mean; range x1.025-x1.111)
+d ln G / d ln p = -0.260 (G = fair residual speed-up); line-arm S/rho slope = -2.10 - (-0.260) = -1.840 (model)
+  anchored at p=1301: U1 0.791 -> p* at slope -2.10: 1163; at slope -1.84: 1145 (model)
+  anchored at p=1301: U2 1.900 -> p* at slope -2.10: 1766; at slope -1.84: 1844 (model)
+  anchored at p=1451: U1 0.660 -> p* at slope -2.10: 1190; at slope -1.84: 1157 (model)
+  anchored at p=1451: U2 1.585 -> p* at slope -2.10: 1807; at slope -1.84: 1864 (model)
+  anchored at p=1601: U1 0.548 -> p* at slope -2.10: 1203; at slope -1.84: 1155 (model)
+  anchored at p=1601: U2 1.318 -> p* at slope -2.10: 1826; at slope -1.84: 1860 (model)
+gain model (1 + k/sqrt p)^5 with k = 4.29 (n = 65536): p=2039 x1.574, p=1e4 x1.234, p=1e5 x1.070 (model: the lever decays as p grows)
+
+## 8. EXPLORATORY pilot (not frozen, not evidence): line search on the jv_sieve route, p = 1511, seeds 17-24, JV_LIN=sparse --stop 64
+plain arm reproduces the V2 record's total_muls on 16/16 (seed, n) rows
+  Pareto: line-search Nagao arm S at p=1301 0.7371 vs jv_sieve S at p=1511 (V2 sparse, n=16, mean) 0.00615 -> x119.9; vs sieve S+ (adds, lookups charged) 0.02478 -> x29.7; sieve base mean 756 (same F_p-abscissa base)
+  Pareto: line-search Nagao arm S at p=1451 0.6148 vs jv_sieve S at p=1511 (V2 sparse, n=16, mean) 0.00615 -> x100.0; vs sieve S+ (adds, lookups charged) 0.02478 -> x24.8; sieve base mean 756 (same F_p-abscissa base)
+  Pareto: line-search Nagao arm S at p=1601 0.5111 vs jv_sieve S at p=1511 (V2 sparse, n=16, mean) 0.00615 -> x83.1; vs sieve S+ (adds, lookups charged) 0.02478 -> x20.6; sieve base mean 756 (same F_p-abscissa base)
+  n_lines 65536: 8 seeds, all correct true; route-only ratio 0.571 [0.490, 0.664] (x1.75); search-charged ratio 1.082 [0.930, 1.259] (x0.92); search share of the line arm 46.9% (t(7) 95%)
+  n_lines 4096: 8 seeds, all correct true; route-only ratio 0.670 [0.554, 0.812] (x1.49); search-charged ratio 0.702 [0.579, 0.850] (x1.42); search share of the line arm 4.5% (t(7) 95%)
+
+## 9. F_p additions: sensitivity of U1/U2 (MODEL: cover additions = r_c x cover multiplications, not emitted)
+rho F_p additions per step 45.2 (emitted); rho step = 331 harness / 137.7 tuned F_p mults
+  p=1301: [r_c 0.5 add/mul price 0.1: U1 0.819 U2 1.932] [r_c 0.5 add/mul price 0.3: U1 0.874 U2 1.990] [r_c 1 add/mul price 0.1: U1 0.858 U2 2.024] [r_c 1 add/mul price 0.3: U1 0.987 U2 2.249]
+  p=1301 (5a literal, additions priced as native ops, r_c = 1): w=0: U1 0.79; w=0.1: U1 3.94; w=1: U1 4.38;
+  p=1451: [r_c 0.5 add/mul price 0.1: U1 0.683 U2 1.611] [r_c 0.5 add/mul price 0.3: U1 0.729 U2 1.659] [r_c 1 add/mul price 0.1: U1 0.716 U2 1.688] [r_c 1 add/mul price 0.3: U1 0.824 U2 1.876]
+  p=1451 (5a literal, additions priced as native ops, r_c = 1): w=0: U1 0.66; w=0.1: U1 3.28; w=1: U1 3.66;
+  p=1601: [r_c 0.5 add/mul price 0.1: U1 0.568 U2 1.340] [r_c 0.5 add/mul price 0.3: U1 0.606 U2 1.380] [r_c 1 add/mul price 0.1: U1 0.595 U2 1.403] [r_c 1 add/mul price 0.3: U1 0.685 U2 1.560]
+  p=1601 (5a literal, additions priced as native ops, r_c = 1): w=0: U1 0.55; w=0.1: U1 2.73; w=1: U1 3.04;
