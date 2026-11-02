@@ -1428,6 +1428,122 @@ fn support(k: u32, form: &str, t: u32) -> Value {
     })
 }
 
+/// Stage measurement for the algebraic track (ladder protocol, Amendment 2,
+/// Q-D): the `pkm-semaev` oracle, called directly on `targets` random
+/// subgroup points of the k-bit miniature, with the bits form (and `guess`)
+/// or the isogeny form at height t.  Reports F4 calls, multiply-adds, the
+/// solving degree, undecided systems and hits; a hit is a relation the
+/// oracle returned, re-checked here by summing the points.
+fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
+    use crypto_lib::cryptanalysis::ic_boundary::{
+        prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
+    };
+    use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::stages::{
+        DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params,
+    };
+    let m = build_miniature(k);
+    let inst = PrimeInstance {
+        name: format!("c25519-mini-k{k}"),
+        curve: PrimeCurve {
+            p: m.p,
+            a: m.weier.a,
+            b: m.weier.b,
+        },
+        group_order: m.order,
+        r: m.r,
+        cofactor: 8,
+        generator: (m.g.x, m.g.y),
+    };
+    let ctx = InstanceCtx {
+        group: &inst.curve,
+        generator: inst.generator_point(),
+        target: inst.generator_point(),
+        r: inst.r,
+        cofactor: inst.cofactor,
+        group_order: inst.group_order,
+        name: inst.name.clone(),
+        field_degree: None,
+    };
+    let span = 1u64 << t;
+    let (fb, mut oracle) = match form {
+        "bits" => {
+            // The prime-abscissa base of every abscissa in [0, 2^t) on the curve.
+            let n = (0..span)
+                .filter(|&x| sqrtm(m.weier.rhs(x), m.p).is_some())
+                .count();
+            let fb = prime_factor_base(&inst, n);
+            assert!(fb.abscissa_list.iter().all(|&x| x < span));
+            (fb, PkmSemaevOracle::new_bits(2, t, 0))
+        }
+        "isogeny" => {
+            let mut params = Params::default();
+            params.set("t", t.to_string());
+            let fb = PrimeIsogenyBase { instance: &inst }
+                .build(&ctx, &params, &mut GroupOps::default())
+                .expect("isogeny base");
+            let tower = isogeny_tower(m.p, t, 0, &mut GroupOps::default()).expect("tower");
+            let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+            (
+                fb,
+                PkmSemaevOracle::new_isogeny(2, t, tower.v.clone(), steps, tower.c),
+            )
+        }
+        o => panic!("form is bits or isogeny, not {o}"),
+    };
+    let spec = if guess > 0 {
+        format!("pkm-semaev:m=2,mode=full,guess={guess}")
+    } else {
+        "pkm-semaev:m=2,mode=full".to_string()
+    };
+    let (_, params) = Params::parse_spec(&spec).unwrap();
+    oracle
+        .prepare(&ctx, &fb, &params, &mut GroupOps::default())
+        .expect("prepare");
+    let started = std::time::Instant::now();
+    let mut st = seed;
+    let (mut done, mut hits, mut verified) = (0u64, 0u64, 0u64);
+    for _ in 0..targets {
+        if started.elapsed().as_secs() >= cap_s {
+            break;
+        }
+        st = st
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        let a = 1 + (st >> 11) % (m.r - 1);
+        let mut ops = GroupOps::default();
+        let target = inst.curve.mul(&mut ops, ctx.generator, a);
+        if target.infinity {
+            continue;
+        }
+        let mut ctr = OracleCounters::default();
+        if let Some(idx) = oracle.decompose(&ctx, &fb, &mut ops, &mut ctr, target) {
+            hits += 1;
+            let s = idx.iter().fold(inst.curve.identity(), |acc, &i| {
+                inst.curve.add(&mut GroupOps::default(), acc, fb.points[i])
+            });
+            if s == target {
+                verified += 1;
+            }
+        }
+        done += 1;
+    }
+    let tot = oracle.solver_totals().unwrap_or_default();
+    let native = oracle.relation_counters();
+    let per_target = tot.ops as f64 / done.max(1) as f64;
+    json!({
+        "k": k, "form": form, "t": t, "guess": guess, "columns": fb.columns,
+        "targets_done": done, "targets_requested": targets, "capped": done < targets,
+        "wall_s": started.elapsed().as_secs_f64(),
+        "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
+        "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
+        "hits": hits, "hits_verified": verified,
+        "hit_rate": hits as f64 / done.max(1) as f64,
+        "native": native,
+    })
+}
+
 /// Base size `N_a = round(0.63·r^{1/3})`: the lab's validated prime-order
 /// optimum (`docs/ic/LEADERBOARD.md`, prime-field baseline: N = 162, 407,
 /// 1024 at 24, 28, 32 bits is 0.63·n^{1/3}) scaled to the subgroup.
@@ -1575,6 +1691,19 @@ fn main() {
             println!(
                 "{}",
                 serde_json::to_string(&support(k, &args[3], t)).unwrap()
+            );
+        }
+        "f4cost" => {
+            // f4cost <k> <bits|isogeny> <t> <guess> <targets> <seed> [cap_s]
+            let k: u32 = args[2].parse().unwrap();
+            let t: u32 = args[4].parse().unwrap();
+            let g: u32 = args[5].parse().unwrap();
+            let n: u64 = args[6].parse().unwrap();
+            let seed: u64 = args[7].parse().unwrap();
+            let cap: u64 = args.get(8).map_or(600, |v| v.parse().unwrap());
+            println!(
+                "{}",
+                serde_json::to_string(&f4cost(k, &args[3], t, g, n, seed, cap)).unwrap()
             );
         }
         "summarise" => {
