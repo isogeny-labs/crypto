@@ -48,3 +48,52 @@ The cheapest route for this class is the JV12 §3.2 **sieve** variant (`jv_sieve
   - **Result:** the sieve route's S and S⁺ divided by rho, with the §5a band.
 
 Both run on the local 4-core box, the same host as the earlier arms. The counted-operation metrics do not depend on the host, so running in parallel changes wall times only. Each lead leaves a README, graph and PDF in its own study directory. Neither adds a leaderboard row until a validator writes `VALIDATION.json`.
+
+## Outcomes (2026-11-02, both leads run)
+
+### A: line search on the sieve route (`research/jv_sieve_fbline_20261102/`)
+
+**Design.** Frozen with `PROTOCOL.md`, `run.sh` and `rule.txt`, hashed at 19:29Z. They were committed unchanged in 73582ce306, by which time only arm-P and H runs at p = 1009 existed.
+
+**Controls (all pass).**
+- C1: plain = V2 bit-for-bit on 48/48.
+- C2: the null control.
+- C3: table and Horner agree.
+- 192/192 runs correct.
+
+**Paired ratio arm/plain, pooled over 48 instances** (95% bootstrap):
+
+| arm | S (muls, search charged) | S⁺ (adds and lookups charged) |
+|---|---|---|
+| H (n = 4096) | **0.623 [0.562, 0.689]** (×1.61) | 0.550 (×1.82) |
+| U (table, n = 32768) | 0.600 | **0.525 [0.491, 0.561]** (×1.90) |
+| T (table, exhaustive) | 0.560 (×1.79) | 0.800, and > 1 at p = 1823 |
+
+- **Cheapest arm:** the exhaustive search T wins in multiplications only. Its lookups cost too much in S⁺ and in the §5a band, so U is the arm to use.
+- **Decay with p:** the gain falls as p grows (H: 0.495 / 0.644 / 0.759 at p = 1009 / 1511 / 1823), as the B model predicts.
+
+### B: matched negation rho at p = 1511 (`research/jv_sieve_negrho_20261102/`)
+
+**Reference.** 16 runs on V2 seeds 17–24. They are homogeneous with #3278's 126 runs, so the reference is the pooled 142.
+
+**Plain sieve route against that rho** (V2 records, seeds 17–24):
+
+| | U1 | U2 |
+|---|---|---|
+| S/rho | 0.0065 [0.0055, 0.0080] | 0.0156 |
+| S⁺/rho | 0.027 | 0.065 |
+
+The route is below rho at every §5a weight.
+
+### Combined (derived, product of two measured ratios at p = 1511; not a single measured run)
+
+| | U1 | U2 |
+|---|---|---|
+| sieve route with line search, S/rho | ≈ 0.0065 × 0.644 ≈ **0.0042** (about ×240 below rho) | ≈ 0.010 |
+| arm U, S⁺/rho | ≈ 0.027 × 0.525 ≈ 0.014 | ≈ 0.034 (about ×29 below rho) |
+
+### Next round
+
+1. **Validator and red team on A and B.**
+2. **Lead L8: cut the sieve route's additions.** Line enumeration and the sieve dominate S⁺.
+3. **Combine the two measurements.** Run one study with the matched rho and the line-search arm on the same instances, instead of multiplying ratios.
