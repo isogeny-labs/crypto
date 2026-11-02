@@ -1300,7 +1300,7 @@
       "status": "refuted",
       "model": "algebraic_coordinate",
       "statement": "Semaev's first-fall-degree assumption 'd_F4 <= d_ff' (Section 4.4), applied to his own t = 2 systems, i.e. the Weil descent of S_3(x_1, x_2, z) with x_1, x_2 in V = {polynomials in alpha of degree < k} over F_{2^n}, curve Y^2 + XY = X^3 + AX^2 + B. Semaev argues d_ff = 4 for S_3 with three variables, cites a bound 5 for S_3(x_1,x_2,z) and says 'the experiments show it is always 4 again'.",
-      "scope": "Refuted as a statement about first fall degree: Kosters-Yeo's trace identity gives first fall degree 2 on these systems while Semaev's own tables measure d_F4 = 4 on t = 2 rows. The separate empirical bound d_F4 <= 4 (Assumption 1) is not touched by this.",
+      "scope": "Refuted as a statement about these systems. The first fall degree is 2 on every instance (exact trace certificate, 200 instances, research/semaev_t2_trace_20261102), while Semaev's Table 2 reports d_F4 = 4; and, independently of Magma, the Macaulay degree needed to prove inconsistency is 3 > 2 on 46 of the 200 instances (2 on the rest, never 4). The separate empirical bound d_F4 <= 4 (Assumption 1) is not touched.",
       "assumptions": [
         "Semaev's definition of first fall degree (Section 4.4)",
         "Boolean system with field equations"
@@ -1323,12 +1323,12 @@
     },
     {
       "id": "CEX-SP-SEMAEV15-T2-TRACE",
-      "label": "Trace identity gives d_ff = 2 < d_F4 = 4 on Semaev's t = 2 rows",
+      "label": "Trace identity: d_ff = 2 on Semaev's t = 2 rows (checked); solver needs 2 or 3",
       "kind": "structural_theorem",
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
       "statement": "Kosters-Yeo Cor. 4.11: for ordinary E/F_{2^n} (here a_1 = 1, a_2 = A) and P not 2-torsion, sum_j Tr(alpha_j / b^2) [T]_j = Tr((x(P)+A)) + sum_j Tr(alpha_j)(X_1j + X_2j) in the Boolean ring, where [T]_j are the degree-2 coordinate polynomials of S_3(X_1,X_2,x(P)). Restricting X_1, X_2 to Semaev's V (which contains 1, and Tr(1) = n mod 2 = 1 for odd n) leaves a nonzero affine-linear right side, so a degree-2 combination falls to degree <= 1: d_ff = 2 on Semaev's t = 2 systems for odd n, unless the coordinate polynomials degenerate. Semaev's Table 2 reports d_F4 = 4 at (n,m,t) = (15,4,2), (15,5,2), (16,4,2), (19,3,2), (21,3,2); for the odd-n rows d_F4 = 4 > 2 = d_ff, so 'd_F4 <= d_ff' fails there.",
-      "scope": "Corpus inference combining a published theorem (KY Cor. 4.11) with published measurements (Semaev Table 2); not yet checked by computation. RT-SP-T2-TRACE-CHECK states the exact check.",
+      "scope": "Checked natively 2026-11-02 (research/semaev_t2_trace_20261102): d_ff = 2 on all 200 instances (cells (15,4), (15,5), (16,4), (19,3), (21,3); two field polynomials each; 20 random (z, B)), with Tr(z^-2 S_3) = Tr(x_1) + Tr(x_2) + Tr(B z^-2) verified exactly. Correction to the original inference: the d_F4 = 4 it compared against is Magma's reported step degree; the Macaulay degree at which 1 enters the span is 2 (154) or 3 (46), never 4.",
       "assumptions": [
         "n odd",
         "Weierstrass form Y^2 + XY = X^3 + AX^2 + B with B != 0 (ordinary)",
@@ -1350,9 +1350,14 @@
       ],
       "evidence_class": "counterexample",
       "formal": {
-        "state": "none",
-        "artifacts": [],
-        "notes": "A native exact check (Boolean descent at n = 15, 19, 21 with Semaev's V, reading the first fall degree) would make this native_exact."
+        "state": "native_exact",
+        "artifacts": [
+          {
+            "path": "research/semaev_t2_trace_20261102/semaev_t2_trace.py",
+            "decl": "run"
+          }
+        ],
+        "notes": "Exact F_{2^n} and Boolean-ring computation; the trace certificate and every Macaulay-degree-of-1 combination are recomputed from scratch. Not in Lean (needs finite-field theory beyond the core encodings)."
       }
     },
     {
@@ -2448,16 +2453,16 @@
     {
       "id": "RT-SP-T2-TRACE-CHECK",
       "label": "Confirm d_ff = 2 vs d_F4 = 4 on Semaev's t = 2 rows",
-      "status": "ready",
+      "status": "working",
       "priority": 1,
-      "objective": "Turn CEX-SP-SEMAEV15-T2-TRACE from a corpus inference into native exact evidence: build Semaev's t = 2 Boolean systems (Weil descent of S_3(x1,x2,z), V = span{1, alpha, ..., alpha^(k-1)}, curve Y^2+XY = X^3+AX^2+B) at (n,m) = (15,4), (15,5), (19,3), (21,3), evaluate the KY trace combination and read the first fall degree and the F4 maximal degree.",
+      "objective": "Done 2026-11-02 for t = 2 (research/semaev_t2_trace_20261102): d_ff = 2 on 200/200 with exact trace certificates; Macaulay degree of 1 is 2 or 3, never 4. Remaining: the t = 3..m rows (S_3 chains with auxiliary variables), where Semaev's d_ff = 4 argument applies to t - 2 equations.",
       "depends_on": [
         "CEX-SP-SEMAEV15-T2-TRACE",
         "CLAIM-SP-SEMAEV15-FFDA-T2",
         "HEUR-SP-SEMAEV15-ASSUMPTION1"
       ],
       "acceptance": "For each cell and >= 20 random z: an explicit degree-2 combination of the coordinate equations equal to a nonzero polynomial of degree <= 1 (certificate), plus the solver's maximal step degree; formal.state native_exact.",
-      "next_step": "Write a small Sage/Magma or native F_2 linear-algebra script computing sum_j Tr(alpha_j/b^2)[T]_j restricted to V and checking it is nonzero.",
+      "next_step": "Extend semaev_t2_trace.py to the chain system (4) for t = 3 at (n, m) = (15, 4), (16, 4), (19, 3) and read d_ff and the Macaulay degree of 1.",
       "source_refs": [
         "S-KOSTERS-YEO-2015",
         "S-SP-SEMAEV-2015"
