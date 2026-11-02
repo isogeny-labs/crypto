@@ -31,3 +31,14 @@ the exact marker and zero whitespace-question-mark error lines.
 Preserve failed attempts and freeze repairs under a new source revision
 and attempt ID. No EKS, Diem, freezer, Conductor claim, merge or PR
 retarget. No statistical baseline, A/A or power claim applies.
+
+## Version 2 integer-entry repair, frozen before attempt 02
+
+`degree-five-local74-01` is rejected despite exit 0 and a late marker.
+The complete six-primitive route reached `degreeCounts74[residue,1]++`,
+which Singular rejects for an `intmat` entry; subsequent checks and
+the marker are invalid. Preserve the raw attempt. Replace that increment
+with explicit assignment and use Singular's tested integer `div`
+operator to remove benign division warnings. The full cohort, source
+data, mathematical checks and resource caps are unchanged. Run a fresh
+attempt from this committed source revision.

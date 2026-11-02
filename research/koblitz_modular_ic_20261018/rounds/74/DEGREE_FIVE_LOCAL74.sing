@@ -51,8 +51,8 @@ intmat primitiveMasks74[6][1];intmat primitiveRanks74[6][1];intmat primitiveDegr
 for(mask74=1;mask74<=63;mask74++){
  bits74=mask74;vector74=matrix(0,32,1);
  for(j74=1;j74<=6;j74++){
-  if(bits74!=2*(bits74/2)){for(i74=1;i74<=32;i74++){vector74[i74,1]=vector74[i74,1]+selected74[i74,j74];}}
-  bits74=bits74/2;
+  if(bits74!=2*(bits74 div 2)){for(i74=1;i74<=32;i74++){vector74[i74,1]=vector74[i74,1]+selected74[i74,j74];}}
+  bits74=bits74 div 2;
  }
  require74(bits74==0 && vector74!=matrix(0,32,1),"LOCAL74_ALL_63_NONZERO_FIXED_VECTORS");
  for(i74=1;i74<=32;i74++){squareVector74[i74,1]=vector74[i74,1]^2;idempotents74[i74,mask74]=vector74[i74,1];}
@@ -76,11 +76,11 @@ for(mask74=1;mask74<=63;mask74++){
  if(primitive74==1){
   primitiveCount74++;require74(primitiveCount74<=6,"LOCAL74_TOO_MANY_PRIMITIVES");
   localRank74=mat_rk(operator74);residue74=mat_rk(relative73*operator74);
-  require74(residue74>=1 && residue74<=14 && localRank74>0 && localRank74==(localRank74/residue74)*residue74,"LOCAL74_INTEGRAL_LOCAL_LENGTH");
-  e74=localRank74/residue74;
-  require74(e74>=1 && e74!=2*(e74/2),"LOCAL74_ALL_TAME_ODD_INDICES");
+  require74(residue74>=1 && residue74<=14 && localRank74>0 && localRank74==(localRank74 div residue74)*residue74,"LOCAL74_INTEGRAL_LOCAL_LENGTH");
+  e74=localRank74 div residue74;
+  require74(e74>=1 && e74!=2*(e74 div 2),"LOCAL74_ALL_TAME_ODD_INDICES");
   if(residue74==14){require74(e74==1,"LOCAL74_DEGREE_FOURTEEN_UNRAMIFIED");}
-  degreeCounts74[residue74,1]++;
+  degreeCounts74[residue74,1]=degreeCounts74[residue74,1]+1;
   primitiveMasks74[primitiveCount74,1]=mask74;primitiveRanks74[primitiveCount74,1]=localRank74;
   primitiveDegrees74[primitiveCount74,1]=residue74;primitiveIndices74[primitiveCount74,1]=e74;
   lengthSum74=lengthSum74+localRank74;budget74=budget74+residue74*(e74-1);
