@@ -1,0 +1,53 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R65-FIRST-TRACE-DUAL-FROBENIUS",
+  "version": 1,
+  "goal": "compute the complete first Frobenius normalization step on the source-bound rank32 affine order",
+  "claims": [
+    {
+      "id": "first_frobenius65",
+      "class": "exact_computation",
+      "statement": "The exact160-dimensional trace-dual quotient has a complete binary square-survivor kernel, with every input class, rational denominator row, and surviving whole-field coordinate checked"
+    }
+  ],
+  "arms": {
+    "reference": "R53 exact discriminant, R61 full Gram/inverse, R52 all528 products, R64 generic source bridge",
+    "candidate": "complete module kbase and denominator-remainder binary square map",
+    "positive": ["all160 quotient classes", "all32 square columns", "both Gram inverse products", "every binary row reconstruction", "all kernel and whole-field survivor products"],
+    "negative": ["changed kernel rejected when square rank and survivor dimension are both nonzero"],
+    "baseline": {"not_applicable_reason": "exact algebra, no performance comparison"},
+    "A_A": {"not_applicable_reason": "deterministic complete quotient"}
+  },
+  "variables": {
+    "fixed": ["rank32 affine order", "complete160-dimensional quotient", "all32 square columns", "1200sec/4GiB", "one Singular/FLINT thread", "one mathematical job"],
+    "measured": ["exact discriminant", "module quotient length", "rational nonzero entries", "binary rows/rank/nullity", "all whole-field survivors", "exit/errors/UTC/hashes"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method": "fixed", "reason": "complete deterministic quotient", "seeds": [65]},
+  "blinding": {"method": "none", "reason": "exact algebra"},
+  "sample_size": {"instances": 1, "replicates": 1, "warmups": 0, "power": "not applicable"},
+  "metrics": ["discriminant degree160", "quotient length160", "all160 square columns", "complete binary rows and rank", "full survivor dimension", "all whole-field survivor checks"],
+  "execution": {
+    "launcher": "REPLAY_CAS.sh first-frobenius65-01 FIRST_FROBENIUS65.sing FIRST_FROBENIUS65_ALL_CHECKS_PASS",
+    "backend": "original manually authorized local Singular",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 65,
+    "CPU_affinity": "not pinned",
+    "queue": "one mathematical job at a time; R64 terminal and published",
+    "source_gate": "copied source/protocol/driver bytes match Git; all donor hashes",
+    "checkpoint": "existing checkpoint gate; immutable raw copies"
+  },
+  "stopping": {
+    "accept": "exit0/exact marker/no whitespace-question-mark errors and every assertion",
+    "failure": "retain all partials/errors/caps; repair under fresh source revision without narrowing160 classes"
+  },
+  "analysis": {"kind": "complete exact finite quotient and binary rational-remainder kernel", "comparative": false},
+  "scope": "first affine Frobenius lattice step only; full PID iteration/proper normalization and maps remain subsequent",
+  "literature": [
+    {"url": "https://www.math.purdue.edu/~iswanso/intclSinghSwanson.pdf", "use": "descending Frobenius normalization theorem"},
+    {"url": "https://www.singular.uni-kl.de/index.php/singular.pdf", "use": "std/kbase/vdim/reduce complete finite module quotient"}
+  ],
+  "validation_note": "canonical schema/checker unavailable in selected index; manual contract and source-byte checks only"
+}
