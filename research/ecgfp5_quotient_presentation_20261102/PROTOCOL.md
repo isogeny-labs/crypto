@@ -260,7 +260,27 @@ planted point recovered, `check_points` all_satisfy.
 - G1 point estimate about 44.3–44.6 bits, with the band still straddling CLOSE (2^46) on its
   upper side.
 
-**What may not be said** (adds to §8).
+**What may not be said** (adds to §8; A3).
 - U5 changes the factor base to u ∈ F_p. A U5 ratchet is a ratchet of the u presentation of the
   same decomposition problem on the same curve and prime. It is not a statement about the
   x-subline system, and it is not an end-to-end ECDLP cost.
+
+### A4 (2026-11-03, after U5_4111; committed and pushed before any A4 cell)
+
+**Why.**
+- A container restart (about 01:14Z) killed the first U5_4111 attempt. The queue was restarted
+  at 01:16Z (`results/a3_restart.*`).
+- Every A3 cell runs after the restart. The host reports the same class (Intel Xeon @ 2.80 GHz,
+  4 vCPU, 15.7 GiB), but the physical machine may differ.
+- U5_4111's F4 was 3,844 CPU-s against U1's 4,729 before the restart (−19 %). That is within
+  the ±25 % A/A tolerance, but large enough to read.
+
+**A4 cells.** These run after the A3 queue (U5 at three primes, then U1P_4111), with `run_a1.sh`
+and the same commands as A1:
+- `A0_4111`: W0's `quot.ms`, F4 only. This is the post-restart A/A against A0 (12,744).
+- `U1F_4111`: the U1 system, F4 only. This is the post-restart A/A against U1 (4,729).
+
+**Use.** A4 changes no decision rule. The A3 bars are absolute: the merged bw baseline / 1.5.
+The report states each A3 c and its ratio to the baseline both as measured and corrected by
+the post-restart drift of A0. If the corrected ratio at any prime falls below 1.5×, the
+report says so.
