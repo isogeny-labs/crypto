@@ -212,3 +212,15 @@ small inverses and lifts; public pivot/terminal selection remains external.
 See `DERIVATION.md` and the inspected `reports/design/report.pdf`. Five Python
 sources parse; source/pattern/power preservation and checker separation are
 static audits. Numerical/corruption/heap/performance trials: zero.
+
+### Character-signature exclusion and sparse selection (2026-11-03)
+
+`feature-signature-selection/` derives the agreement bound K=min(r,2^q+q)
+for every function of q shifted quadratic characters. K<r analytically excludes
+X; otherwise the precheck is inconclusive. A bounded supplied-point stream
+constructs sparse cubic feature-annihilation witnesses by retaining independent
+feature rows. Under independent uniform sampling in the strict regime, expected
+offers are at most (m+1)r/(r-K). No random sampler or field sweep is launched.
+The saved F479 width-15 failure and retained recovery panels are outside the
+strict regime. See the derivation and inspected PDF. Six Python files parse;
+dependency/import checks are static. All numerical trials remain zero.
