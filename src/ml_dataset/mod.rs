@@ -2906,7 +2906,11 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                 manifest.config.family.as_str(),
                 "prime" | "binary" | "koblitz"
             )
-            || manifest.config.m != 2
+            || (if binary_root {
+                manifest.config.m != 2
+            } else {
+                !(2..=15).contains(&manifest.config.m)
+            })
             || root_certificates.len() != 1
             || root_certificates[0].role != expected_root_role
             || root_certificates[0].encoding != "json")
@@ -2917,7 +2921,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             "prime-root"
         };
         return Err(format!(
-            "{kind} certificate lacks its unique public family/root/m2 domain"
+            "{kind} certificate lacks its unique public family/root/arity domain"
         ));
     }
     let root_certificate: Option<Value> = root_certificates
