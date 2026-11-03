@@ -3382,6 +3382,30 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
 mod tests {
     use super::*;
 
+    #[test]
+    fn two_large_prime_cycle_closes_over_small_columns() {
+        let mut lp = LargePrimes {
+            max_large: 2,
+            small_permille: 500,
+            small_cols: 2,
+            ..LargePrimes::default()
+        };
+        let r = 101;
+        let (stored, first_ops) = lp.feed(&[(0, 1), (2, 1), (3, 1)], 10, 1, r);
+        assert!(stored.is_none());
+        assert_eq!(first_ops, 0);
+
+        let (closed, second_ops) = lp.feed(&[(1, 1), (2, 1), (3, 1)], 20, 2, r);
+        let closed = closed.expect("the repeated two-large-prime edge closes a cycle");
+        assert_eq!(closed.columns, vec![(0, 100), (1, 1)]);
+        assert_eq!((closed.a, closed.b), (10, 1));
+        assert!(second_ops > 0);
+        assert_eq!(lp.counts.get("lp_decompositions_2_large"), Some(&2));
+        assert_eq!(lp.counts.get("lp_stored_2_large"), Some(&1));
+        assert_eq!(lp.counts.get("lp_full_merged"), Some(&1));
+        assert_eq!(lp.counts.get("lp_merges"), Some(&1));
+    }
+
     fn random_point(c: &CurveB, rng: &mut StdRng) -> PtB {
         loop {
             let x = c.f.random(rng);
