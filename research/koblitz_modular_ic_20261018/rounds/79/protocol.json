@@ -1,7 +1,7 @@
 {
   "schema":"experiment.protocol/v1",
   "id":"KOBLITZ-R79-CANDIDATE-U0-FIBERS",
-  "version":1,
+  "version":2,
   "goal":"probe the rejected R50 candidate normal ring only at the two u=0 fibers",
   "claims":[{"id":"candidate_fiber79","class":"exact_computation","statement":"specialized candidate quotient dimensions and source-model containment at y=0,1"}],
   "arms":{"reference":"rejected R50 finite-u normalP candidate and accepted R78 source fiber","candidate":"p=0 specialized 400-relation candidate quotients","positive":["characteristic-two and source-map shapes","both finite quotient dimensions","both source equations reduce to zero","dimensions sum to 32"],"negative":[],"baseline":{"not_applicable_reason":"exact candidate diagnostic"},"A_A":{"not_applicable_reason":"deterministic quotient"}},
@@ -10,7 +10,8 @@
   "blinding":{"method":"none","reason":"exact algebra"},
   "sample_size":{"instances":2,"replicates":1,"warmups":0,"power":"not applicable"},
   "metrics":["candidate quotient dimensions","source containment checks"],
-  "execution":{"launcher":"REPLAY_CAS.sh candidate-u0-79-01 CANDIDATE_U0_79.sing CANDIDATE_U0_79_ALL_CHECKS_PASS","backend":"authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":79,"queue":"one math job at a time","source_gate":"frozen Git bytes and donor hashes","checkpoint":"existing checkpoint gate; immutable raw copy"},
+  "execution":{"launcher":"REPLAY_CAS.sh candidate-u0-79-02 CANDIDATE_U0_79.sing CANDIDATE_U0_79_ALL_CHECKS_PASS","backend":"authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":79,"queue":"one math job at a time","source_gate":"frozen Git bytes and donor hashes","checkpoint":"existing checkpoint gate; immutable raw copy"},
   "stopping":{"accept":"exit0, exact marker, zero native errors, both dimensions sum to 32 and all assertions","failure":"retain raw failure/timeout, freeze repair before new ID"},
-  "analysis":{"method":"exact specialized candidate quotient dimensions and source containment","scope":"rejected R50 candidate diagnostic only; no normalization certification"}
+  "analysis":{"method":"exact specialized candidate quotient dimensions and source containment","scope":"rejected R50 candidate diagnostic only; no normalization certification"},
+  "amendment":"Version 2 before attempt 02 repairs only the Singular base-ideal constructor syntax; attempt 01 is retained as rejected before dimension computation."
 }

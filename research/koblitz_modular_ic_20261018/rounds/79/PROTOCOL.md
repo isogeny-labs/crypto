@@ -19,3 +19,12 @@ verify committed source/protocol/driver bytes and all donor hashes.
 Accept only exit 0, exact marker, zero native whitespace-question-mark
 errors, and all assertions. Preserve timeouts/failures; freeze repairs
 before a fresh attempt ID. No comparative or statistical claim.
+
+## Version 2 constructor syntax repair, before attempt 02
+
+Attempt `candidate-u0-79-01` emitted Singular parser errors at the
+nested `ideal(specialized79,p,y)` constructor before computing either
+quotient dimension. Exit code zero and a printed marker do not override
+the strict error-line gate; retain the rejected raw log. Declare the
+two base ideals explicitly and pass each to `std`. No input relation,
+quotient target, resource cap or acceptance condition changes.
