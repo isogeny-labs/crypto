@@ -253,3 +253,7 @@ inspected PDF. Factor reload solving remains a separate unchecked operation.
 `feature-decoder-binding/` binds the verified repaired coefficients to the byte-preserved original decoder. Three receipted local test methods cover four recorded sign-oracle fixtures, strict sign validation and mutation isolation, and persisted-factor reload reproducing the full-field verified program. These are recorded API checks; fresh source cases remain zero. See its derivation, report, receipt and complete-cohort validation plan.
 
 This publication preserves the completed standalone Python source snapshot and receipts as historical evidence under the repository language policy. It is not a native execution deliverable. Further algorithm execution-path development must use a native implementation retaining these contracts and fixtures.
+
+## Native sign-mask evaluator
+
+`feature-native-signmask/` replaces coefficient-by-sign multiplication with support-zero and negative-parity masks in dependency-free Rust. All3 native unit methods passed, including the saved polynomial on all479 field inputs against direct multiplication and X. For that477-term program,1291 field multiplications become zero;16 oracle calls and477 terms remain. This is a derived operation count, not a timing claim. Width<=64 and modulus<=u64::MAX/2 are explicit. See its derivation, source locks, native test receipt and inspected report. The constructor does not certify primality or the supplied polynomial identity.
