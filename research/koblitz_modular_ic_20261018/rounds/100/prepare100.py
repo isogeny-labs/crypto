@@ -44,7 +44,7 @@ def main() -> None:
     if match is None or match.group(2) != "x^2608":
         raise ValueError("unexpected R99 norm shape")
     numerator = parse_polynomial(match.group(1))
-    if len(numerator) != 73 or max(numerator) != 1968 or 0 not in numerator:
+    if len(numerator) != 74 or max(numerator) != 1968 or 0 not in numerator:
         raise ValueError("unexpected numerator terms")
     if any(e % 16 for e in numerator):
         raise ValueError("numerator is not a sixteenth power")
@@ -53,7 +53,7 @@ def main() -> None:
         raise ValueError("Frobenius power mismatch")
     output.mkdir(parents=True, exist_ok=True)
     (output / "root.sing").write_text(f"poly root100={render(root)};\npoly numerator100={render(numerator)};\n")
-    (output / "root.json").write_text(json.dumps({"source_sha256": EXPECTED, "numerator_degree": 1968, "numerator_terms": 73, "root_degree": 123, "root_terms": 73, "root_expression": render(root), "denominator_expression": "x^2608"}, indent=2, sort_keys=True) + "\n")
+    (output / "root.json").write_text(json.dumps({"source_sha256": EXPECTED, "numerator_degree": 1968, "numerator_terms": 74, "root_degree": 123, "root_terms": 74, "root_expression": render(root), "denominator_expression": "x^2608"}, indent=2, sort_keys=True) + "\n")
 
 
 if __name__ == "__main__":

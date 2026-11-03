@@ -1,7 +1,7 @@
 # R100: factor the actual R99 norm numerator Frobenius root
 
 Bind to R99's exact `norm99.sing` by SHA-256. Parse every term and check
-that the degree-1968, 73-term numerator has all exponents divisible by 16.
+that the degree-1968, 74-term numerator has all exponents divisible by 16.
 Construct the unique degree-123 root and verify in Singular over F2[x]
 that its sixteenth power is the actual numerator. Factor the root, check
 every factor and exponent, the full product, total degree 123, and a
@@ -13,6 +13,10 @@ memory, 120 seconds. Freeze this source and protocol in Git before the
 run; retain any failure. No statistical or timing comparison. R99's raw
 archive and exact norm output are committed source provenance. The default
 EKS image lacks the pinned CAS, so use the existing local-CAS exception.
+
+Amendment 02: attempt 01 stopped in preparation because its expected count
+was 73 x-terms and missed the constant term. The actual numerator has 74
+terms. See `FAILURE-01.md`; this correction is frozen before rerun.
 
 This result determines the finite zero support of the displayed lambda
 monogenic discriminant norm on `D(x)`. It does not give normalized branch

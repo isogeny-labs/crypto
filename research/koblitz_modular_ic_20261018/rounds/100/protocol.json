@@ -1,7 +1,7 @@
 {
   "schema":"experiment.protocol/v1",
   "id":"KOBLITZ-R100-MARKED23-LAMBDA-ROOT-FACTOR",
-  "version":1,
+  "version":2,
   "goal":"verify the Frobenius root of the R99 lambda norm numerator and factor it exactly over F2[x]",
   "claims":[{"id":"lambda_root_factor100","class":"exact_computation","statement":"the R99 numerator is a sixteenth power and its degree-123 root has a complete F2[x] factorization"}],
   "arms":{"reference":"R99 exact norm output bound by SHA-256","candidate":"Python root extraction and Singular factorization","positive":["root sixteenth-power identity","full factor product"],"negative":["changed factor product rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
@@ -11,6 +11,6 @@
   "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
   "metrics":["root degree","factor count","full product","replay identity"],
   "execution":{"backend":"pinned local Singular","backend_reason":"default EKS image lacks pinned CAS","timeout_seconds_per_program":120,"virtual_KiB_native":2097152,"threads":1,"seed":100,"queue":"one serial exact factorization","source_gate":"committed checker/protocol and R99 norm hash","checkpoint":"retain raw output and logs"},
-  "stopping":{"accept":"exit zero, exact marker, zero native errors, full product and fresh replay","failure":"retain and amend under new attempt"},
+  "stopping":{"accept":"exit zero, exact marker, zero native errors, full product and fresh replay","failure":"retain and amend under new attempt; attempt 01 preparation rejected the off-by-one term count"},
   "analysis":{"method":"Frobenius root extraction and exact F2[x] factorization","scope":"finite zero support of displayed lambda monogenic discriminant norm on D(x); no normalized branch claim"}
 }
