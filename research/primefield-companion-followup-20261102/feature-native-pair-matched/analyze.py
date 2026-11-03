@@ -101,7 +101,7 @@ def analyze(raw, protocol_sha256, producer_exit):
     elif all(dominates(p,-1) for p in pairs):
         verdict = 'counted_pareto_regression'
     else:
-        verdict = 'counted_tradeoff_or_mixed' 
+        verdict = 'counted_tradeoff_or_mixed'
     return dict(schema='native-pair-seed-analysis/v1', verdict=verdict, protocol_sha256=protocol_sha256,
                 raw_sha256=hashlib.sha256(raw).hexdigest(), query_rows=24, setup_prepare_rows=6,
                 aa_exact=True, pairs=pairs, field_products_sum_delta=sum(p['delta']['field_products'] for p in pairs),
