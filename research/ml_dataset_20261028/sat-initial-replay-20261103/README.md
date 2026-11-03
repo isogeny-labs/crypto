@@ -11,3 +11,5 @@ The previous 27-test batch deferred that historical test. Its prior cap-based de
 Full release-library validation is pending. This code supplies internal components; SAT CLI dispatch and causal export are still incomplete. An initial-prefix check is not whole-search completion or an exact fall-degree measurement.
 
 Terminal focused logs, receipts, source manifest and scope correction are archived in the URI recorded in `s3.receipt.json`, with fresh download, byte equality and contained-hash verification. No new scientific cloud job or campaign was launched.
+
+The full requested dataset scope and remaining solver/population gaps are tracked separately in [the coverage audit](../coverage-audit-20261103/REQUIREMENTS.md). This component does not replace those requirements.
