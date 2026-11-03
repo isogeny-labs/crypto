@@ -130,7 +130,7 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SolverCost, SolverTotals,
     SystemShape,
 };
-use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
+use crypto_lib::cryptanalysis::koblitz_fast::{BatchScratch, FastPoint};
 use crypto_lib::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, parse_linear_harvest, set_linear_harvest, FieldStructure, LinearHarvest,
     SolveStats, SolverEngine,
@@ -494,6 +494,54 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
     e
 }
 
+/// First and largest batch of `R − P_k` sums [`scan_rests`] forms with one
+/// field inversion.  The first is short so a target that hits early does
+/// not pay for a long batch; the cap bounds the work past a hit.
+const REST_BATCH_FIRST: usize = 16;
+const REST_BATCH_MAX: usize = 128;
+
+/// Visit `R − P_k` for `t = 0..len`, `k = (start + t) mod |F|`, in that
+/// order, until `visit` returns a value.
+///
+/// The sums are formed `REST_BATCH_FIRST`-then-doubling at a time by
+/// `FastCurve::add_many`, which shares one field inversion across a batch (Montgomery's trick),
+/// where one `g.add` per `k` pays an inversion each.  The values are
+/// those of `g.add`.  The ledger is charged exactly as a loop of `g.add`
+/// charges it: one group addition for each `k` the caller is shown, and
+/// none for a sum formed past the hit and never shown.
+fn scan_rests<T>(
+    g: &BinaryGroup<'_>,
+    fb: &FactorBase<FastPoint>,
+    ops: &mut GroupOps,
+    point: FastPoint,
+    start: usize,
+    len: usize,
+    mut visit: impl FnMut(usize, FastPoint, &mut GroupOps) -> Option<T>,
+) -> Option<T> {
+    let n = fb.points.len();
+    let mut scratch = BatchScratch::default();
+    let mut negated: Vec<FastPoint> = Vec::new();
+    let mut rests: Vec<FastPoint> = Vec::new();
+    let mut t = 0usize;
+    let mut batch = REST_BATCH_FIRST;
+    while t < len {
+        let take = batch.min(len - t);
+        negated.clear();
+        negated.extend((t..t + take).map(|u| g.neg(fb.points[(start + u) % n])));
+        rests.clear();
+        g.0.add_many(point, &negated, &mut rests, &mut scratch);
+        for (offset, &rest) in rests.iter().enumerate() {
+            ops.adds += 1;
+            if let Some(found) = visit((start + t + offset) % n, rest, ops) {
+                return Some(found);
+            }
+        }
+        t += take;
+        batch = (batch * 2).min(REST_BATCH_MAX);
+    }
+    None
+}
+
 /// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic|f6-ic-pair,degree=D,node_budget=N[,linear_harvest=H]`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
@@ -613,11 +661,10 @@ impl<'i> Pdp3KoblitzOracle<'i> {
                 } else {
                     (0, n)
                 };
-                for t in 0..len {
-                    let k = (start + t) % n;
-                    let rest = g.add(ops, point, g.neg(fb.points[k]));
+                let table_mismatches = &mut self.table_mismatches;
+                scan_rests(g, fb, ops, point, start, len, |k, rest, ops| {
                     if g.is_identity(&rest) {
-                        continue;
+                        return None;
                     }
                     counters.lookups += 1;
                     table.pairs_for(rest, &mut pairs);
@@ -628,11 +675,11 @@ impl<'i> Pdp3KoblitzOracle<'i> {
                             found.sort_unstable();
                             return Some(found);
                         }
-                        self.table_mismatches += 1;
+                        *table_mismatches += 1;
                         counters.frobfold_mismatches += 1;
                     }
-                }
-                None
+                    None
+                })
             }
             _ => None,
         }
@@ -660,19 +707,15 @@ impl<'i> Pdp3KoblitzOracle<'i> {
         }
         let len = self.scan_window_len.max(1).min(n);
         let start = (point.x as usize) % n;
-        for t in 0..len {
-            let k = (start + t) % n;
-            let rest = g.add(ops, point, g.neg(fb.points[k]));
+        scan_rests(g, fb, ops, point, start, len, |k, rest, ops| {
             if g.is_identity(&rest) {
-                continue;
+                return None;
             }
-            if let Some((i, j)) = table.probe(g, fb, ops, &mut counters.lookups, rest) {
-                let mut found = vec![i, j, k];
-                found.sort_unstable();
-                return Some(found);
-            }
-        }
-        None
+            let (i, j) = table.probe(g, fb, ops, &mut counters.lookups, rest)?;
+            let mut found = vec![i, j, k];
+            found.sort_unstable();
+            Some(found)
+        })
     }
 }
 
