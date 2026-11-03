@@ -124,4 +124,4 @@ target sets.
 - Measurement quality is 0/100 for wall time (L0); every claim here is in
   counted units.
 - Conductor and the AWS CLI are absent: no S3 checkpoint and no EKS route.
-- The replay audit is `ecbench/verify.json`.
+- Replay audit (`ecbench/verify.json`): 48 records, 48 verified, 8 nonce-selected replays reproduced exactly, 0 problems.
