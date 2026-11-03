@@ -305,3 +305,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Matched monic runner construction
 
 [feature-native-matched](feature-native-matched/README.md) adds a compiled single-binary baseline/candidate/A-A runner, seven reversible candidate modules and three new arithmetic hooks. Source mapping and build checks pass; no comparison rows have been collected. Strict analysis, protocol binding/preflight and admission remain next. See the inspected [report](feature-native-matched/report.pdf).
+
+## Strict matched-panel analysis
+
+[feature-native-panel-analysis](feature-native-panel-analysis/README.md) validates complete ordered receipts, numeric and stage contracts, recovery metadata and every A/A counter. Five synthetic test methods plus CLI persistence checks pass. The revised draft binds the published binary and analysis hashes and validates with zero findings; preflight and admission remain before freeze/execution. No cryptographic panel was run.
