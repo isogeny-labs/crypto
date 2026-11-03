@@ -79,6 +79,9 @@ digraph ecdlp_claims {
     "DEF-WD-GHS-MAGIC-NUMBER" [label="DEF-WD-GHS-MAGIC-NUMBER\\nGHS magic number m(b) and type of b\\nm(b) = dim_F2 Span{(1, sqrt(sigma^i b))}", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
     "DEF-SP-SUMMATION-POLYNOMIAL" [label="DEF-SP-SUMMATION-POLYNOMIAL\\nSemaev summation polynomials f_m (recursive definition)", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
     "DEF-SP-DIEM-CONDITION-27" [label="DEF-SP-DIEM-CONDITION-27\\nDiem's Condition 2.7 on the covering phi", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "CLAIM-PA-SCHNORR-ANY-TWO" [label="CLAIM-PA-SCHNORR-ANY-TWO\\n'Any two accepting Schnorr-like transcripts reveal the witness'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "ASM-PA-FS-CHALLENGE-INDEPENDENCE" [label="ASM-PA-FS-CHALLENGE-INDEPENDENCE\\nFiat-Shamir-derived batching challenges act as independent uniform challenges", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
+    "ASM-XEDNI-HAZARD-RECURRENCE" [label="ASM-XEDNI-HAZARD-RECURRENCE\\nAdaptive xedni trials satisfy a history-uniform conditional-hazard recurrence", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
   }
   subgraph cluster_bounds {
     label="Rigorous model bounds and structural theorems"; color="#cad5df"; style="rounded";
@@ -292,6 +295,16 @@ digraph ecdlp_claims {
     "GAP-FAKE-GAP-INSIDE-BOUNDED" [label="GAP-FAKE-GAP-INSIDE-BOUNDED\\nInside gap: at most 3 for n >= 2 (tight), unbounded for n = 1\\nn >= 2: d_F(inside) <= 4, gap <= 3", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CEX-INSIDE-GAP-THREE" [label="CEX-INSIDE-GAP-THREE\\n{XYW+XY+W, XZW+XW+1}: d_F(inside) = 4, d'_F = 1", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CEX-INSIDE-GAP-N1-FAMILY" [label="CEX-INSIDE-GAP-N1-FAMILY\\nn = 1: {X^k, X^k+1} has inside gap k - 1", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-PA-MOD-ALIAS" [label="CLAIM-PA-MOD-ALIAS\\n'Equality in ZMod q is equality of the represented integers'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-PA-MOD-ALIAS" [label="CEX-PA-MOD-ALIAS\\nModulus alias and bounded repair (Lean, sibling)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-PA-SUBGROUP-AMBIENT" [label="CLAIM-PA-SUBGROUP-AMBIENT\\n'An accepted ambient group element is a scalar multiple in the intended subgroup'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-PA-SUBGROUP-AMBIENT" [label="CEX-PA-SUBGROUP-AMBIENT\\nAmbient membership does not imply designated-subgroup membership (Lean, sibling)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-PA-BATCH-ADAPTIVE" [label="CLAIM-PA-BATCH-ADAPTIVE\\n'Random-linear-combination batching fails with probability <= d/|F| even against adaptive errors'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-PA-BATCH-ADAPTIVE" [label="CEX-PA-BATCH-ADAPTIVE\\nAdaptive RLC cancellation and fixed-error count (Lean, sibling)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-PA-POLY-FUNCTION" [label="CLAIM-PA-POLY-FUNCTION\\n'Polynomials equal at every field point are equal as formal polynomials'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-PA-POLY-FUNCTION" [label="CEX-PA-POLY-FUNCTION\\nNonzero polynomial with zero function (Lean, sibling)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CEX-PA-SCHNORR-SAME-CHALLENGE" [label="CEX-PA-SCHNORR-SAME-CHALLENGE\\nSchnorr extraction countermodels: equal challenges; nonunit difference over ZMod 4", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-PA-SCHNORR-SS" [label="THM-PA-SCHNORR-SS\\nSchnorr special soundness under exact fork hypotheses (Lean, sibling)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -407,6 +420,7 @@ digraph ecdlp_claims {
     "COND-SP-HPST-SYMMETRIZED-PRIME-DEGREE" [label="COND-SP-HPST-SYMMETRIZED-PRIME-DEGREE\\nHPST 2013: symmetrized FPPR for prime-degree binary fields", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
     "COND-SP-SEMAEV15-COMPLEXITY" [label="COND-SP-SEMAEV15-COMPLEXITY\\nSemaev 2015: binary ECDLP in 2^(c sqrt(n ln n)), c ~ 1.69\\nT ~ 2^(c sqrt(n ln n)); first stage m! 2^(n/m) n^(4 omega); second 2^(2k)", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
     "COND-SP-KARABINA-PDP" [label="COND-SP-KARABINA-PDP\\nKarabina 2015: S_3-split PDP with constant D_reg extrapolation\\nT ~ 2^31 2^(n/5) n^12 + 2^(2n/5) (m = 5, D_reg = 4)", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
+    "COND-PA-FS-BATCH-SOUNDNESS" [label="COND-PA-FS-BATCH-SOUNDNESS\\nFiat-Shamir RLC batch verification fails with probability <= d/|F|", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
   }
   subgraph cluster_evidence {
     label="Measured and heuristic evidence"; color="#cad5df"; style="rounded";
@@ -557,6 +571,29 @@ digraph ecdlp_claims {
     "GAP-SP-BOUNDED-ROOT-SUMPOLY" [label="GAP-SP-BOUNDED-ROOT-SUMPOLY\\nSmall-coordinate roots of summation polynomials over F_p", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-SP-JV-CONJECTURE" [label="GAP-SP-JV-CONJECTURE\\nJoux-Vitse Conjecture on the summation morphism C^(n-1) -> W(E)", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-SP-DEGREE-GROWTH-SPLIT-SYSTEMS" [label="GAP-SP-DEGREE-GROWTH-SPLIT-SYSTEMS\\nGrowth law of the solving degree of split summation systems", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-ONE-SHOT-REPEAT" [label="GAP-PA-ONE-SHOT-REPEAT\\nOne-shot success bound versus geometric waiting time", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-COFACTOR" [label="GAP-PA-COFACTOR\\nCofactor clearing as a uniform projection", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-FS-ZERO-HASH" [label="GAP-PA-FS-ZERO-HASH\\n'Special soundness implies Fiat-Shamir security'", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-PEDERSEN-RELATION" [label="GAP-PA-PEDERSEN-RELATION\\n'Independent generators' read as literal linear independence", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-ZK-SEPARATION" [label="GAP-PA-ZK-SEPARATION\\nCompleteness, zero knowledge, soundness and proof of knowledge are distinct", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-DLP-CDH-DDH-DIRECTION" [label="GAP-PA-DLP-CDH-DDH-DIRECTION\\nDLP, CDH and DDH are not interchangeable", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-EXCEPTIONAL-FORMULAS" [label="GAP-PA-EXCEPTIONAL-FORMULAS\\nExceptional cases of elliptic-curve addition formulas", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-INVALID-CURVE-PATHS" [label="GAP-PA-INVALID-CURVE-PATHS\\nInvalid-curve and twist input paths", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-FS-TRANSCRIPT-ENCODING" [label="GAP-PA-FS-TRANSCRIPT-ENCODING\\nFiat-Shamir transcript encoding", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-KZG-TRAPDOOR-DEGREE" [label="GAP-PA-KZG-TRAPDOOR-DEGREE\\nKZG trapdoor and degree boundaries", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-KZG-BATCHING" [label="GAP-PA-KZG-BATCHING\\nKZG batch opening boundaries", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-PLONK-PRODUCTS" [label="GAP-PA-PLONK-PRODUCTS\\nPLONK permutation and lookup product premises", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-CIRCUIT-EC-REFINEMENT" [label="GAP-PA-CIRCUIT-EC-REFINEMENT\\nIn-circuit elliptic-curve arithmetic refinement", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-RSR-EXACT-SUBGROUP" [label="GAP-PA-RSR-EXACT-SUBGROUP\\nECDLP random self-reducibility over the exact subgroup", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-RHO-SEPARATION" [label="GAP-PA-RHO-SEPARATION\\nSeparate rho correctness, collision time and collision usefulness", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-HASH-TO-CURVE" [label="GAP-PA-HASH-TO-CURVE\\nHash-to-curve contracts (RFC 9380)", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-CONCRETE-MULTIUSER" [label="GAP-PA-CONCRETE-MULTIUSER\\nConcrete and multi-user security accounting", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-GGM-TRANSPARENT-ENCODING" [label="GAP-PA-GGM-TRANSPARENT-ENCODING\\nGeneric-group lower bounds versus transparent encodings", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-FORKING-LEMMA" [label="GAP-PA-FORKING-LEMMA\\nFinite random-oracle game semantics for the forking lemma", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-MODEL-BOUNDARIES" [label="GAP-PA-MODEL-BOUNDARIES\\nROM, AGM, KEA, q-SDH and QROM as named models", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-SNARK-DEFINITIONS" [label="GAP-PA-SNARK-DEFINITIONS\\nSNARK definitions as separate games", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-FULL-KZG-GROTH-PLONK" [label="GAP-PA-FULL-KZG-GROTH-PLONK\\nEnd-to-end KZG, Groth16 and PLONK", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PA-CURVE-SELECTION" [label="GAP-PA-CURVE-SELECTION\\nCurve-selection assumptions with exact curve and subgroup identities", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -1467,4 +1504,38 @@ digraph ecdlp_claims {
   "MEAS-SEMAEV-T2-MACAULAY" -> "CEX-SP-SEMAEV15-T2-TRACE" [label="qualifies", color="#66788a", style="dashed"];
   "MEAS-SEMAEV-T2-MACAULAY" -> "HEUR-SP-SEMAEV15-ASSUMPTION1" [label="measures", color="#66788a", style="solid"];
   "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" -> "HEUR-SP-SEMAEV15-ASSUMPTION1" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-MOD-ALIAS" -> "CLAIM-PA-MOD-ALIAS" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-SUBGROUP-AMBIENT" -> "CLAIM-PA-SUBGROUP-AMBIENT" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-BATCH-ADAPTIVE" -> "CLAIM-PA-BATCH-ADAPTIVE" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-POLY-FUNCTION" -> "CLAIM-PA-POLY-FUNCTION" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-SCHNORR-SAME-CHALLENGE" -> "CLAIM-PA-SCHNORR-ANY-TWO" [label="refutes", color="#a33a3a", style="solid"];
+  "THM-PA-SCHNORR-SS" -> "RED-SCHNORR-ROM" [label="enables", color="#66788a", style="solid"];
+  "CEX-PA-SUBGROUP-AMBIENT" -> "RED-SCHNORR-ROM" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-FS-ZERO-HASH" -> "RED-SCHNORR-ROM" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-FORKING-LEMMA" -> "RED-SCHNORR-ROM" [label="leaves_open", color="#66788a", style="dashed"];
+  "CEX-PA-SUBGROUP-AMBIENT" -> "BOUNDARY-INVALID-CURVE" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-INVALID-CURVE-PATHS" -> "BOUNDARY-INVALID-CURVE" [label="leaves_open", color="#66788a", style="dashed"];
+  "GAP-PA-INVALID-CURVE-PATHS" -> "STD-BK-SEC1-VALIDATION" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-RSR-EXACT-SUBGROUP" -> "THEOREM-RANDOM-SELF-REDUCTION" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-SUBGROUP-AMBIENT" -> "THEOREM-RANDOM-SELF-REDUCTION" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-COFACTOR" -> "DEF-SUBGROUP-COFACTOR" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-COFACTOR" -> "CLAIM-BK-SEC1-COFACTOR-CDH" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-DLP-CDH-DDH-DIRECTION" -> "ASM-BK-GG-CDH-ONLY-VIA-DLP" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-DLP-CDH-DDH-DIRECTION" -> "RED-MAURER-AUXILIARY-CURVE" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-GGM-TRANSPARENT-ENCODING" -> "LB-SHOUP-DLP" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-GGM-TRANSPARENT-ENCODING" -> "CLAIM-BK-GG-BSGS-OPTIMAL" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-MODEL-BOUNDARIES" -> "RED-GG-FKL-AGM-CDH-DL" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-MODEL-BOUNDARIES" -> "CLAIM-GG-FKL-AGM-TO-GGM" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-RHO-SEPARATION" -> "HEUR-RHO-RANDOM-MAPPING" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-CURVE-SELECTION" -> "STANDARD-CURVE-EXCLUSIONS" [label="qualifies", color="#66788a", style="dashed"];
+  "ASM-XEDNI-HAZARD-RECURRENCE" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
+  "GAP-PA-ONE-SHOT-REPEAT" -> "ASM-XEDNI-HAZARD-RECURRENCE" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-BATCH-ADAPTIVE" -> "COND-PA-FS-BATCH-SOUNDNESS" [label="enables", color="#66788a", style="solid"];
+  "ASM-PA-FS-CHALLENGE-INDEPENDENCE" -> "COND-PA-FS-BATCH-SOUNDNESS" [label="conditions", color="#66788a", style="solid"];
+  "GAP-PA-FS-TRANSCRIPT-ENCODING" -> "COND-PA-FS-BATCH-SOUNDNESS" [label="leaves_open", color="#66788a", style="dashed"];
+  "GAP-PA-KZG-BATCHING" -> "COND-PA-FS-BATCH-SOUNDNESS" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-POLY-FUNCTION" -> "CLAIM-NAGAO-LEMMA4" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-PEDERSEN-RELATION" -> "PROB-ECDLP" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-CONCRETE-MULTIUSER" -> "ALG-BK-MULTI-TARGET-AMORTIZED" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PA-HASH-TO-CURVE" -> "DEF-SUBGROUP-COFACTOR" [label="qualifies", color="#66788a", style="dashed"];
 }
