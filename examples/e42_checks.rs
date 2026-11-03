@@ -17,8 +17,14 @@
 //!   call whose clean solution set is non-empty.
 //! - Clean W against A counted (the identity itself) on the same calls.
 //!
+//! E42b (§9.56): `--salt` sets the stream (hex; default E42's `E42C0001`,
+//! E42b's `E42C0002`); `g2_245_holds` is the kill (every per-call check),
+//! `g2_246_holds` the descriptive G0 count `[200, 300]` per call; E42's
+//! `g2_231_holds` (with §9.54's `[900, 960]`) is kept for the record.
+//!
 //! ```text
 //! RAYON_NUM_THREADS=1 ./e42_checks --calls 32 --json experiments/49_macaulay_tails/checks.json
+//! RAYON_NUM_THREADS=1 ./e42_checks --calls 32 --salt E42C0002 --json experiments/49_macaulay_tails/checks_b.json
 //! ```
 
 use std::collections::HashMap;
@@ -35,6 +41,14 @@ use rand::{Rng, SeedableRng};
 use serde_json::json;
 
 const SALT: u64 = 0xE42C_0001;
+
+fn salt_arg(args: &[String]) -> u64 {
+    args.iter()
+        .position(|a| a == "--salt")
+        .and_then(|i| args.get(i + 1))
+        .map(|v| u64::from_str_radix(v.trim_start_matches("0x"), 16).expect("hex salt"))
+        .unwrap_or(SALT)
+}
 
 type Out = (
     Option<Vec<[u64; 4]>>,
@@ -58,6 +72,7 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let per_curve: usize = arg(&args, "--calls", 32);
     let json_out: String = arg(&args, "--json", String::new());
+    let salt = salt_arg(&args);
     let mut rows = Vec::new();
     let (mut total, mut ident, mut p1, mut p2, mut nonempty, mut pert) =
         (0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
@@ -71,8 +86,8 @@ fn main() {
             let _fb = klein_base_with(&ki, false, &mut rng).expect("base");
             let pcurve = inst.curve();
             let pre = SymmetrisedV4::precompute(&ki, &pcurve, &mut rng, 8).expect("precompute");
-            let mut rng = StdRng::seed_from_u64(seed ^ SALT);
-            let sseed = seed ^ SALT;
+            let mut rng = StdRng::seed_from_u64(seed ^ salt);
+            let sseed = seed ^ salt;
             let n = inst.n;
             let (mut calls, mut residuals) = (0usize, 0u64);
             let (mut c_id, mut c_p1, mut c_p2, mut c_ne, mut c_pert) = (0, 0, 0, 0, 0);
@@ -222,15 +237,22 @@ fn main() {
         }
     }
     let g0_mean = g0_reallocs as f64 / total.max(1) as f64;
-    let v = json!({"stream_salt": SALT, "calls": total, "w_equals_a_counted": ident,
+    let kill_ok = p1 == total
+        && p2 == total
+        && pert == nonempty
+        && ident == total
+        && w_ctr == total
+        && g0_id == total
+        && g0_ctr == total;
+    let v = json!({"stream_salt": salt, "calls": total, "w_equals_a_counted": ident,
         "w_counter_ok": w_ctr, "w_reallocs": w_reallocs,
         "p1_detected": p1, "p2_detected": p2,
         "g0_equals_a_counted": g0_id, "g0_counter_ok": g0_ctr, "g0_reallocs": g0_reallocs,
         "g0_reallocs_per_call": g0_mean,
         "nonempty": nonempty, "perturbed_changed": pert,
-        "g2_231_holds": p1 == total && p2 == total && pert == nonempty && ident == total
-            && w_ctr == total && g0_id == total && g0_ctr == total
-            && (900.0..=960.0).contains(&g0_mean),
+        "g2_231_holds": kill_ok && (900.0..=960.0).contains(&g0_mean),
+        "g2_245_holds": kill_ok,
+        "g2_246_holds": (200.0..=300.0).contains(&g0_mean),
         "curves": rows});
     eprintln!("total: {v}");
     if !json_out.is_empty() {
