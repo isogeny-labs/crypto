@@ -8552,14 +8552,7 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
     touch: impl Fn(&G::Elt),
     line_guard: bool,
 ) -> PipelineOutcome {
-    // The guard holds one key per walk point, up to `max_trials`: sized for
-    // that from the start (to at most 2^22 keys), it never rehashes, where
-    // growing from 2^12 rehashed every key about twice.  Same set.
-    let capacity = if targets.is_guarded() {
-        usize::try_from(max_trials.clamp(1 << 12, 1 << 22)).unwrap_or(1 << 22)
-    } else {
-        0
-    };
+    let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
         collect_and_solve_relations_scaled_touching(
             g,
