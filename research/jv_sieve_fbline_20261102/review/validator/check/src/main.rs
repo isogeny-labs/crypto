@@ -625,6 +625,60 @@ fn main() {
     println!("  table w=0 at n=2^19: {j19a:.4} (k capped at L) / {j19b:.4} (k uncapped); n=2^20: {j20a:.4} / {j20b:.4}");
     head.insert("rule".into(), Value::Object(rule));
     head.insert("replays".into(), Value::Array(replays));
+    // ---- the producer's analysis.txt numbers against the recomputation
+    println!("\n# Producer analysis/analysis.txt vs validator recomputation (points: rounding tolerance; intervals: Monte Carlo)");
+    {
+        let txt = fs::read_to_string(format!("{root}/research/jv_sieve_fbline_20261102/analysis/analysis.txt")).unwrap();
+        let num = |s: &str| -> f64 { s.trim_matches(|c: char| !(c.is_ascii_digit() || c == '.' || c == '-')).parse::<f64>().unwrap() };
+        let mut gate = Vec::new();
+        let (mut worst_pt, mut worst_ci): (f64, f64) = (0.0, 0.0);
+        let mut npt = 0;
+        for arm in ["H", "T", "U"] {
+            let start = txt.find(&format!("### Arm {arm} against P")).unwrap();
+            let sec = &txt[start..];
+            let sec = &sec[..sec[4..].find("###").map_or(sec.len(), |i| i + 4)];
+            for (prefix, metric) in [("  S  (muls", "S"), ("  S+ (muls", "S+"), ("    w = 0:", "band_w0"), ("    w = 0.1:", "band_w0.1"), ("    w = 1:", "band_w1")] {
+                let line = sec.lines().find(|l| l.starts_with(prefix)).unwrap();
+                let t: Vec<&str> = line.split_whitespace().collect();
+                let mine = &head[arm][metric];
+                let mut pairs: Vec<(String, f64, f64, f64, f64)> = Vec::new(); // (where, claimed pt, lo, hi, decimals)
+                if metric == "S" || metric == "S+" {
+                    for (i, tok) in t.iter().enumerate() {
+                        for (w, key) in [("p=1009", "p1009"), ("p=1511", "p1511"), ("p=1823", "p1823"), ("pooled", "pooled")] {
+                            if *tok == w {
+                                pairs.push((key.into(), num(t[i + 1]), num(t[i + 2]), num(t[i + 3]), 4.0));
+                            }
+                        }
+                    }
+                } else {
+                    let i = t.iter().position(|x| *x == "pooled").unwrap();
+                    pairs.push(("pooled".into(), num(t[i + 1]), num(t[i + 2]), num(t[i + 3]), 4.0));
+                    let j = t.iter().position(|x| *x == "prime").unwrap();
+                    for (k, key) in ["p1009", "p1511", "p1823"].iter().enumerate() {
+                        let a = t[j + 1 + 2 * k];
+                        let b = t[j + 2 + 2 * k];
+                        let (lo, hi) = b.trim_matches(|c| c == '[' || c == ']').split_once(',').unwrap();
+                        pairs.push((key.to_string(), num(a), num(lo), num(hi), 3.0));
+                    }
+                }
+                for (key, pt, lo, hi, dec) in pairs {
+                    let m = mine[&key].as_array().unwrap();
+                    let (mp, ml, mh) = (m[0].as_f64().unwrap(), m[1].as_f64().unwrap(), m[2].as_f64().unwrap());
+                    let tol = 0.5 * 10f64.powf(-dec) + 1e-12;
+                    worst_pt = worst_pt.max((mp - pt).abs() / tol);
+                    worst_ci = worst_ci.max((ml - lo).abs()).max((mh - hi).abs());
+                    npt += 1;
+                    gate.push(json!({"name": format!("{arm} {metric} {key} (analysis.txt, {dec} decimals)"), "claimed": pt, "recomputed": mp, "rel_tol": tol / pt}));
+                }
+            }
+        }
+        let ok = worst_pt <= 1.0;
+        println!("  [{}] {npt} point estimates within half a unit of the last printed decimal (worst {worst_pt:.3} of the tolerance); interval endpoints differ by at most {worst_ci:.4} (independent bootstrap streams)", if ok { "ok" } else { "FAIL" });
+        if !ok {
+            fails.push("analysis.txt point estimates differ".into());
+        }
+        head.insert("gate_headline".into(), Value::Array(gate));
+    }
     head.insert("failures".into(), json!(fails));
     println!("\n# Failures: {}", if fails.is_empty() { "none".to_string() } else { fails.join(" | ") });
     fs::write(&outp, serde_json::to_string_pretty(&Value::Object(head)).unwrap()).unwrap();
