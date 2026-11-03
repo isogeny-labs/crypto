@@ -22,3 +22,7 @@ measurement submission. Preserve all original curves and arms.
 Protocol tooling and controlled-experiment skill absent in current checkout;
 canonical protocol tool/schema/example retrieved read-only into external cache.
 No native run yet, no cloud job, no original evidence mutation.
+
+## Checked construction and publication
+
+Four native methods pass once;60 filtered. Ten source hashes pass. Protocol draft validates with zero findings after system-jsonschema and enum corrections; failure logs retained. No comparison execution or cloud job. Shared daily log is held by T1522, so this local handoff is authoritative for this component. Next matched instrumentation/runner and protocol freeze/admission.

@@ -297,3 +297,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Native stage accounting
 
 [feature-native-accounting/DERIVATION.md](feature-native-accounting/DERIVATION.md) instruments all seven native layers with exact reversible source mapping. Eight receipts match unchanged recovery; three checks pass. Separate setup/preparation/query/verifier records identify polynomial remainder work and allocations as concrete next targets. Unit inversions are distinguished; no timing weights or peak-memory claim.
+
+## Monic remainder specialization
+
+[feature-native-monic/DERIVATION.md](feature-native-monic/DERIVATION.md) preserves Newton/Karatsuba/tree structure while using unit series starts, low remainder reconstruction and Horner leaves. Four correctness methods pass, including84 remainder cases and8 complete recoveries. The cost-comparison protocol is a validated draft, not frozen or executed.
