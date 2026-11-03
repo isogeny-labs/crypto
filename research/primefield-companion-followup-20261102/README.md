@@ -236,3 +236,14 @@ result. Constructing its old-feature coefficients remains next. Five bounded
 local exact/software test methods passed, including F7 checks for the preceding
 coefficient and signature primitives. No cloud run or performance comparison.
 See the exact packet, independent check, test receipt, derivation and inspected PDF.
+
+### Explicit corrected-span program (2026-11-03)
+
+`feature-consistent-repair/` constructs the missing old-feature coefficients.
+The published polynomial has476 nonzero cubic terms at offsets0..14 plus
+405chi(X+15), and its identity with X passes independent square-set checking
+at all479 points. The representative-only uncorrected fit fails exactly at
+the two omitted mates,173/440. A reusable rectangular reference factor and
+full coefficient program are preserved; no timing or recovery-panel claim.
+See `certificate/program.json`, `check_certificate.py`, the exact receipt and
+inspected PDF. Factor reload solving remains a separate unchecked operation.
