@@ -309,3 +309,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Strict matched-panel analysis
 
 [feature-native-panel-analysis](feature-native-panel-analysis/README.md) validates complete ordered receipts, numeric and stage contracts, recovery metadata and every A/A counter. Five synthetic test methods plus CLI persistence checks pass. The revised draft binds the published binary and analysis hashes and validates with zero findings; preflight and admission remain before freeze/execution. No cryptographic panel was run.
+
+## Truncated polynomial products
+
+[feature-native-low-product](feature-native-low-product/README.md) adds a low-coefficient Karatsuba product and routes five Newton/quotient/remainder callsites through it. All66 native methods pass, including936 dual-reference low-product cases and8 complete recoveries. Source locks pass; derivation and inspected report retained. No counted comparison or timing panel; previous matched binary/protocol unchanged.
