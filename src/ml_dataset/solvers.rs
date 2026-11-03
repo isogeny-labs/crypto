@@ -3650,7 +3650,7 @@ mod tests {
         for mutation in 0..4 {
             let mut changed = config.clone();
             match mutation {
-                0 => changed.solver = "f4".into(),
+                0 => changed.solver = "f5".into(),
                 1 => changed.degree_bound = 8,
                 2 => changed.work_limit = 0,
                 _ => changed.m = 3,
