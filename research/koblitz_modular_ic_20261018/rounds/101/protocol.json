@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R101-MARKED23-X1-FIBER",
+  "version":1,
+  "goal":"derive the displayed degree-112 monogenic source-order fiber at x=1 and factor its two base-point lambda polynomials",
+  "claims":[{"id":"x1_fiber101","class":"exact_computation","statement":"the actual R51 source specializes at x=1 to a checked additive-lambda equation and factored fibers above y=0 and y=1"}],
+  "arms":{"reference":"R51/R63 accepted degree-112 triangular donor","candidate":"exhaustive source-bound x=1 coefficient specialization and Singular factorization","positive":["f51(1,y)=y^7+y^3","lambda derivative equals l-linear coefficient","both full factor products"],"negative":["changed-product rejection for both fibers"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R51 donor SHA-256","F2 characteristic","one Singular thread","120-second timeout","2 GiB cap"],"measured":["specialized coefficients","factor polynomials and exponents","fresh replay"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation","seeds":[101]},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["specialized polynomial terms","two fiber factor products","fresh replay"],
+  "execution":{"backend":"source-bound Python and pinned local Singular","backend_reason":"default EKS image lacks pinned CAS","timeout_seconds_per_program":120,"virtual_KiB_native":2097152,"threads":1,"seed":101,"queue":"one serial exact computation","source_gate":"committed source/protocol and donor hash","checkpoint":"retain raw attempts and outputs"},
+  "stopping":{"accept":"source hash, exhaustive source parse, native exit zero and exact marker, zero native errors, full products, fresh replay","failure":"retain attempt and amend before rerun"},
+  "analysis":{"method":"specialize coefficient numerators modulo x+1 and factor both l-fibers","scope":"displayed monogenic source-order fiber at x=1; no normalized branch count"}
+}

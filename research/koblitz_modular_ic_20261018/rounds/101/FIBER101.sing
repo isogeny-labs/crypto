@@ -1,0 +1,33 @@
+proc require101(int ok,string tag){if(!ok){print("FIBER101_FATAL "+tag);exit;}}
+ring fiberRing101=2,(l,y),dp;short=0;
+execute(read("specialization101.sing"));
+intvec lambdaWeight101=1,0;intvec baseWeight101=0,1;
+require101(f101==y^7+y^3 && deg(f101,baseWeight101)==7,"ACTUAL_BASE_X1");
+require101(deg(G101,lambdaWeight101)==16 && leadcoef(G101)==1,"ACTUAL_LAMBDA_X1_MONIC");
+require101(diff(G101,l)==C101 && C101!=0,"SOURCE_ADDITIVE_DERIVATIVE");
+poly g0_101=subst(G101,y,0);poly g1_101=subst(G101,y,1);
+require101(subst(g0_101,y,0)==g0_101 && subst(g1_101,y,0)==g1_101,"FIBERS_UNIVARIATE");
+list fac0_101=factorize(g0_101,2);list fac1_101=factorize(g1_101,2);
+ideal factors0_101=fac0_101[1];intvec exponents0_101=fac0_101[2];
+ideal factors1_101=fac1_101[1];intvec exponents1_101=fac1_101[2];
+poly product0_101=1;poly product1_101=1;int i101;
+link output101="ASCII:w fiber101.sing";open(output101);
+write(output101,"poly f101="+string(f101)+";poly G101="+string(G101)+";poly C101="+string(C101)+";");
+write(output101,"poly g0_101="+string(g0_101)+";poly g1_101="+string(g1_101)+";");
+write(output101,"ideal factors0_101;intvec exponents0_101;ideal factors1_101;intvec exponents1_101;");
+for(i101=1;i101<=size(factors0_101);i101++){
+ product0_101=product0_101*factors0_101[i101]^exponents0_101[i101];
+ write(output101,"factors0_101["+string(i101)+"]="+string(factors0_101[i101])+";exponents0_101["+string(i101)+"]="+string(exponents0_101[i101])+";");
+ print("FIBER101_Y0_FACTOR index="+string(i101)+" degree="+string(deg(factors0_101[i101],lambdaWeight101))+" exponent="+string(exponents0_101[i101])+" polynomial="+string(factors0_101[i101]));
+}
+for(i101=1;i101<=size(factors1_101);i101++){
+ product1_101=product1_101*factors1_101[i101]^exponents1_101[i101];
+ write(output101,"factors1_101["+string(i101)+"]="+string(factors1_101[i101])+";exponents1_101["+string(i101)+"]="+string(exponents1_101[i101])+";");
+ print("FIBER101_Y1_FACTOR index="+string(i101)+" degree="+string(deg(factors1_101[i101],lambdaWeight101))+" exponent="+string(exponents1_101[i101])+" polynomial="+string(factors1_101[i101]));
+}
+close(output101);
+require101(product0_101==g0_101 && product1_101==g1_101,"COMPLETE_BOTH_FACTOR_PRODUCTS");
+require101(product0_101+1!=g0_101 && product1_101+1!=g1_101,"CHANGED_PRODUCTS_REJECTED");
+print("FIBER101_RESULT base_y0_multiplicity=3 base_y1_multiplicity=4 y0_factors="+string(size(factors0_101))+" y1_factors="+string(size(factors1_101)));
+print("FIBER101_ALL_CHECKS_PASS");
+quit;
