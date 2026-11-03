@@ -11559,7 +11559,11 @@ mod tests {
                 for a in [(x % u64::from(m)) as u32, m - 1, 1, 0, m / 2] {
                     let a = a % m;
                     #[cfg(target_arch = "x86_64")]
-                    assert_eq!(super::euclid_u32_x86(m, a), super::euclid_u32(m, a), "euclid({m}, {a})");
+                    assert_eq!(
+                        super::euclid_u32_x86(m, a),
+                        super::euclid_u32(m, a),
+                        "euclid({m}, {a})"
+                    );
                     let b = (x >> 32) % u64::from(m);
                     let a = u64::from(a);
                     assert_eq!(
