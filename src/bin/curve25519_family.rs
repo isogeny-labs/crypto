@@ -1653,8 +1653,18 @@ fn f4cost_m(
             let n = (0..span)
                 .filter(|&x| sqrtm(m.weier.rhs(x), m.p).is_some())
                 .count();
-            let fb = prime_factor_base(&inst, n);
+            // `prime_factor_base` scans from x = 1, so when x = 0 carries a
+            // point (b a square) it would take one abscissa past 2^t; build
+            // the interval [0, 2^t) directly then. Otherwise keep the
+            // original builder, so published cells replay byte-identically.
+            let fb = if sqrtm(m.weier.rhs(0), m.p).is_some() {
+                use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::bits_factor_base;
+                bits_factor_base(&inst, t, 0)
+            } else {
+                prime_factor_base(&inst, n)
+            };
             assert!(fb.abscissa_list.iter().all(|&x| x < span));
+            assert_eq!(fb.abscissa_list.len(), n);
             (fb, PkmSemaevOracle::new_bits(nsum, t, 0))
         }
         "edwards-bits" => {
