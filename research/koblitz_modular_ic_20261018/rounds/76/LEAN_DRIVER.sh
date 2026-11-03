@@ -3,17 +3,17 @@ set -euo pipefail
 here=${1:?round};raw=${2:?raw};attempt=${3:?attempt}
 repo=$(git -C "$here" rev-parse --show-toplevel)
 build="/var/tmp/koblitz-r76-$attempt";[ ! -e "$build" ];mkdir -p "$build"
-cp "$raw/FiveFiber76.lean" "$build/"
+cp "$raw/Quadratic76.lean" "$build/"
 cp "$repo/tools/lean/AuditAxioms.lean" "$raw/";cp "$raw/AuditAxioms.lean" "$build/"
 git -C "$repo" rev-parse HEAD > "$raw/source-revision.txt"
 python3 - "$here" "$raw" "$repo" <<'PY'
 from pathlib import Path
 import hashlib,subprocess,sys
 h,r,repo=map(Path,sys.argv[1:]);rev=(r/'source-revision.txt').read_text().strip()
-for local,source in [('driver.sh','LEAN_DRIVER.sh'),('launcher.sh','REPLAY_LEAN.sh'),('FiveFiber76.lean','lean/FiveFiber76.lean'),('LEAN-PROTOCOL.md','LEAN-PROTOCOL.md')]:
+for local,source in [('driver.sh','LEAN_DRIVER.sh'),('launcher.sh','REPLAY_LEAN.sh'),('Quadratic76.lean','lean/Quadratic76.lean'),('LEAN-PROTOCOL.md','LEAN-PROTOCOL.md')]:
  assert subprocess.check_output(['git','show',rev+':'+str((h/source).relative_to(repo))],cwd=repo)==(r/local).read_bytes(),source
 assert subprocess.check_output(['git','show',rev+':tools/lean/AuditAxioms.lean'],cwd=repo)==(r/'AuditAxioms.lean').read_bytes()
-(r/'source.sha256').write_text(''.join(hashlib.sha256((r/n).read_bytes()).hexdigest()+'  '+n+'\n' for n in ['driver.sh','launcher.sh','FiveFiber76.lean','AuditAxioms.lean','LEAN-PROTOCOL.md']))
+(r/'source.sha256').write_text(''.join(hashlib.sha256((r/n).read_bytes()).hexdigest()+'  '+n+'\n' for n in ['driver.sh','launcher.sh','Quadratic76.lean','AuditAxioms.lean','LEAN-PROTOCOL.md']))
 PY
 "$repo/scripts/checkpoint.sh" gate > "$raw/gate.log" 2>&1
 deps=$(awk 'NR!=10' "$here/../51/source-data/proof-cache-roots51.txt" | paste -sd ':' -)
@@ -26,11 +26,11 @@ git -C /home/ec2-user/crypto-modular-ic/research/koblitz_modular_ic_20261018/lea
 ulimit -v > "$raw/virtual-limit.txt"
 [ "$(cat "$raw/virtual-limit.txt")" = unlimited ]
 set +e
-(cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 -o FiveFiber76.olean FiveFiber76.lean) > "$raw/compile.log" 2>&1
+(cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 -o Quadratic76.olean Quadratic76.lean) > "$raw/compile.log" 2>&1
 rc=$?;printf '%s\n' "$rc" > "$raw/compile.exit"
 if [ "$rc" = 0 ];then
- cp "$build/FiveFiber76.olean" "$raw/"
- (cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 --run AuditAxioms.lean FiveFiber76) > "$raw/audit.log" 2>&1
+ cp "$build/Quadratic76.olean" "$raw/"
+ (cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 --run AuditAxioms.lean Quadratic76) > "$raw/audit.log" 2>&1
  rc=$?;printf '%s\n' "$rc" > "$raw/audit.exit"
 fi
 exit "$rc"

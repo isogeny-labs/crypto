@@ -15,3 +15,11 @@ totals. The native R76 source relation, primitive mask assignments,
 Eisenstein/etale local arguments, and field-theoretic interpretation
 are premises outside this Lean file. A prior interactive Lean compile
 was only a syntax/proof preflight and is not the archival audit.
+
+## Version 2 launcher filename repair, before archival attempt 02
+
+Attempt `quadratic-lean76-01` stopped before compilation: the copied
+driver requested the nonexistent `FiveFiber76.lean` after a mechanical
+rename. Retain its partial raw directory and failure receipt. Replace
+that filename with `Quadratic76.lean` throughout the driver; theorem
+statements, proofs, pinned toolchain and acceptance gates are unchanged.
