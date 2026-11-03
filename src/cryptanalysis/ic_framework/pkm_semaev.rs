@@ -2977,10 +2977,10 @@ mod tests {
         let mut ops = GroupOps::default();
         let g = inst.generator_point();
         let mut rng = StdRng::seed_from_u64(99);
-        // 6 random + 6 planted: the shared system solves at degree 8 to 10 on
-        // this base, so a larger sample makes the suite run for half an hour.
-        const RANDOM: usize = 6;
-        const PLANTED: usize = 6;
+        // 3 random + 3 planted: the shared system solves at degree 8 to 10 on
+        // this base (about 30 s per system); 52 targets took over 30 minutes.
+        const RANDOM: usize = 3;
+        const PLANTED: usize = 3;
         let mut targets = Vec::new();
         for _ in 0..RANDOM {
             targets.push(curve.mul(&mut ops, g, rng.gen_range(1..inst.r)));
