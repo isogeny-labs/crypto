@@ -887,6 +887,9 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `experiments/36_handover_ladder/summary.json` — sha256 `342fe7c9f0b1d120…`
 - `experiments/37_solver_b_pivot_count/summary.json` — sha256 `d95a3ce1c2032805…`
 - `experiments/38_twist24_cheap_rep/summary.json` — sha256 `0f8ebdeecee3c4a7…`
+- `experiments/47_macaulay_entries/summary.json` — sha256 `c878e26ce3064774…`
+- `experiments/48_twist24_shortfall/summary.json` — sha256 `041270b2abc1233e…`
+- `experiments/46_pivot_rules_confirm3/summary.json` — sha256 `79aa1095c052299d…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/ecbench_generator_orbit_20261022/figures/summary.json` — sha256 `c4f567d49a2875e7…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
@@ -1160,4 +1163,35 @@ Solver B's pivot selection counted (E33, accounting). E31 left solver B's pivot-
 | B″ (counted estimate) | S_X / rho | 4.12e+03–2.61e+05 | 2.03e+04–1.33e+06 | 9.58e+04–7.01e+06 | X behind across the band |
 
 A cheaper order-24 walk on E18's j = 0 curves (E34, reference correction; not shown as a row). A class representative that compares one coordinate of the twelve candidates first makes the order-24 walk cheaper than both order-6 walks, pooled, at every weight (1.563 / 1.254 / 1.126 against E29's order-6 walk at 0 / 0.1 / 1 GAE; 1.505 / 1.167 / 1.026 against an equally cheap order-6 walk, the last within sampling noise). E18's ψ-arm distances to rho therefore lengthen by 1.63×, 1.25× and 1.13× and the modelled handover moves 2.8, 1.3 and 0.7 bits later. Independently replayed byte for byte from a fresh build (validator report: pass), but it compares rho walks only and has no index-calculus arm, so like E29 it cannot pass the validation gate (note §9.38 and §9.39). Read the [report](../../research/e34_twist24_cheap_rep_20261031/REPORT.pdf), [summary](../../experiments/38_twist24_cheap_rep/summary.json) and [validator report](../../research/e34_twist24_cheap_rep_20261031/validator-report.json).
+
+Macaulay rows stored from their lead (E40, component speed-up of the chain solve's matrix build). Solver A builds every Macaulay row over all 448 columns, 176,064 cells per call, and 41.6 % of them lie left of each row's lead, where the echelon and the normal forms never read. Variant V stores each row from its lead on (102,826–102,827 cells per call) with exactly A's arithmetic and pays 22,340–22,489 counted offset operations per call. Field multiplications are identical, so V equals A at 0 GAE; with the cell traffic priced at the band V is cheaper than A by 1.2518–1.2618× at 0.1 GAE and 1.3629–1.3807× at 1 GAE on all 32 rows, and cheaper than E25 at every weight. That is the registered weak rank (equal at 0, strictly ahead at 0.1 and 1); the size of the gain depends on pricing one cell at 0.1 or 1 GAE (at 0.01 GAE per cell it would be about 1.06×). It moves no row of tables A–C and no 0-GAE S value. Rho is ahead of every row at every weight: on the closest row V is 6,000×, 15,821× and 61,697× the matched walk (iii), A 6,000×, 19,939× and 85,056×. Class: engineering (a native-work constant), validated (independent rebuild and replay, 466 recomputed figures, gate valid; note §9.50 and §9.51). Read the [report](../../research/e40_macaulay_entries_20261102/REPORT.pdf), [summary](../../experiments/47_macaulay_entries/summary.json) and [validation](../../research/e40_macaulay_entries_20261102/VALIDATION.json).
+
+| ratio (32 rows) | 0 GAE | 0.1 GAE | 1 GAE |
+|:--|--:|--:|--:|
+| S_A / S_V | 1.0000 | 1.2518–1.2618 | 1.3629–1.3807 |
+| S_E25 / S_V | 2.5054–2.5766 | 1.7455–1.8033 | 1.4105–1.4558 |
+| S_A / S_V, lead scans priced (σ1) | 1.0000 | 1.6024–1.6217 | 1.8572–1.8921 |
+| S_A / S_V, structural work priced (σ4) | 1.0000 | 1.2362–1.2449 | 1.3312–1.3461 |
+| S_V / rho (distance remaining) | 6,000–197,861 | 15,821–541,270 | 61,697–2,362,608 |
+| S_A / rho | 6,000–197,861 | 19,939–679,973 | 85,056–3,236,952 |
+
+Pivot rules F, S and H in the chain solve (E39, engineering of the echelon; third pre-registered confirmation). E31's ranked solver A orders each pivot bucket by a counted rule; F takes the first row to arrive (no selection work), S a fixed per-call order from each equation's support, H takes F where an untouched row exists and S otherwise. On fresh target streams over E25's 20 GLS rows and E24's 12 rows, each of F, S and H is ahead of A and of E25 at 0, 0.1 and 1 GAE on all 32 rows; against B″ the order is unresolved, and the negative-control rule L is behind A everywhere. E36 and E37 measured the same effect but voided the rank on a failed control, and E38 stopped at its pilot; E39 registered controls that touch rows the solve reads, and every gating control passed. The gain is in the solve's own multiplications (F: 1.46–1.54× fewer at 0 GAE) and shrinks to about 1.2 % at 1 GAE, where the Macaulay build dominates (E40 above attacks that part). Rho is ahead of every row at every weight: F is 5,184–232,416× rho at 0 GAE and 94,020–5,622,167× at 1 GAE across the rows, A 7,911–347,433× and 95,225–5,689,946×. Class: engineering, validated (independent rebuild and replay of 31 runs, 7,286 summary values recomputed, gate valid; six errata, none changing a verdict; note §9.48 and §9.49). Read the [report](../../research/e39_pivot_rules_confirm3_20261102/REPORT.pdf), [summary](../../experiments/46_pivot_rules_confirm3/summary.json) and [validation](../../research/e39_pivot_rules_confirm3_20261102/VALIDATION.json).
+
+| rule X | against | 0 GAE | 0.1 GAE | 1 GAE | order across the band |
+|:--|:--|--:|--:|--:|:--|
+| F (first arrival) | A | 1.4572–1.5372 | 1.0937–1.1064 | 1.0115–1.0130 | ahead across the band (32/32/32 of 32 rows ahead) |
+| F (first arrival) | E25 | 3.6261–3.9454 | 1.5202–1.5809 | 1.0439–1.0676 | ahead across the band (32/32/32 of 32 rows ahead) |
+| F (first arrival) | B″ (E33) | 0.9518–0.9883 | 1.0457–1.0557 | 1.0668–1.0704 | unresolved (0/32/32 of 32 rows ahead) |
+| S (static order) | A | 1.4017–1.4492 | 1.0825–1.0908 | 1.0077–1.0086 | ahead across the band (32/32/32 of 32 rows ahead) |
+| S (static order) | E25 | 3.4879–3.7190 | 1.5047–1.5585 | 1.0400–1.0631 | ahead across the band (32/32/32 of 32 rows ahead) |
+| S (static order) | B″ (E33) | 0.9134–0.9317 | 1.0350–1.0408 | 1.0628–1.0658 | unresolved (0/32/32 of 32 rows ahead) |
+| H (F, else S) | A | 1.4971–1.5415 | 1.0957–1.1028 | 1.0076–1.0083 | ahead across the band (32/32/32 of 32 rows ahead) |
+| H (F, else S) | E25 | 3.7253–3.9570 | 1.5229–1.5757 | 1.0399–1.0627 | ahead across the band (32/32/32 of 32 rows ahead) |
+| H (F, else S) | B″ (E33) | 0.9773–0.9910 | 1.0476–1.0523 | 1.0627–1.0655 | unresolved (0/32/32 of 32 rows ahead) |
+| B″ (E33) | A | 1.5299–1.5582 | 1.0459–1.0480 | 0.9464–0.9482 | unresolved (32/32/0 of 32 rows ahead) |
+| L (last arrival, negative control) | A | 0.7103–0.7246 | 0.9006–0.9053 | 0.9856–0.9863 | behind across the band (0/0/0 of 32 rows ahead) |
+| L (last arrival, negative control) | E25 | 1.7775–1.8598 | 1.2531–1.2934 | 1.0173–1.0395 | ahead across the band (32/32/32 of 32 rows ahead) |
+| L (last arrival, negative control) | B″ (E33) | 0.4574–0.4669 | 0.8603–0.8638 | 1.0396–1.0422 | unresolved (0/0/32 of 32 rows ahead) |
+
+The order-24 shortfall was noise (E41, reference correction; not shown as a row). E34's apparent step shortfall of the order-24 walk is two sampling errors in opposite directions; on 512 fresh walks per arm both walks run at their ideal step count, and a 32-jump table fix is not resolved. Re-measured, the order-24 reference on E18's j = 0 curves is stronger than E34 reported: 1.761 / 1.418 / 1.275 against E29's order-6 walk and 1.696 / 1.320 / 1.162 against the cheap order-6 walk at 0 / 0.1 / 1 GAE (the band-ranked order-24 arm), so E18's ψ-row distances to rho lengthen by those factors; the GLS rows above are unchanged (order 24 does not apply there). Independently replayed byte for byte (validator report: pass, six errata), but like E34 it compares rho walks only and cannot pass the validation gate (note §9.52 and §9.53). Read the [report](../../research/e41_twist24_shortfall_20261102/REPORT.pdf), [summary](../../experiments/48_twist24_shortfall/summary.json) and [validator report](../../research/e41_twist24_shortfall_20261102/validator-report.json).
 

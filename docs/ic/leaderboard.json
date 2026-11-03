@@ -186,6 +186,18 @@
    "path": "experiments/38_twist24_cheap_rep/summary.json",
    "sha256": "0f8ebdeecee3c4a700361478436cb0272533d3b02bc0e84a00e734b7d43a77fa"
   },
+  "glv_e40": {
+   "path": "experiments/47_macaulay_entries/summary.json",
+   "sha256": "c878e26ce30647743b6ab5f35280842353c7c401301435a44321f258b584ccc9"
+  },
+  "glv_e41": {
+   "path": "experiments/48_twist24_shortfall/summary.json",
+   "sha256": "041270b2abc1233e2570f6f46d89b27855b278ca29ce7e8221c7282075057438"
+  },
+  "glv_e39": {
+   "path": "experiments/46_pivot_rules_confirm3/summary.json",
+   "sha256": "79aa1095c052299d418580286ef11855ff8cccc96b06f629cb74f77f5e53450f"
+  },
   "lazy_members": {
    "path": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
    "sha256": "c86743775097e0e17e264d878021e30ce34c9231d572c1b16a679526d208b372"
@@ -314686,6 +314698,568 @@
    "report": "research/e34_twist24_cheap_rep_20261031/REPORT.pdf",
    "validator_report": "research/e34_twist24_cheap_rep_20261031/validator-report.json",
    "certificate": "research/e34_twist24_cheap_rep_20261031/replay-certificate.json"
+  },
+  "e40": {
+   "source": "experiments/47_macaulay_entries/summary.json",
+   "report": "research/e40_macaulay_entries_20261102/REPORT.pdf",
+   "validation": "research/e40_macaulay_entries_20261102/VALIDATION.json",
+   "rows": 32,
+   "bands": {
+    "a_over_v": [
+     [
+      1.0,
+      1.0
+     ],
+     [
+      1.25182685043,
+      1.26177610472
+     ],
+     [
+      1.36287842734,
+      1.38068330191
+     ]
+    ],
+    "e25_over_v": [
+     [
+      2.50541847039,
+      2.57658051405
+     ],
+     [
+      1.74554568783,
+      1.80325681945
+     ],
+     [
+      1.41045405399,
+      1.45576688398
+     ]
+    ],
+    "a_over_v_sigma1": [
+     [
+      1.0,
+      1.0
+     ],
+     [
+      1.60237108858,
+      1.62168782556
+     ],
+     [
+      1.85715205857,
+      1.89212399453
+     ]
+    ],
+    "a_over_v_sigma4": [
+     [
+      1.0,
+      1.0
+     ],
+     [
+      1.2361610588,
+      1.24494396971
+     ],
+     [
+      1.33121797782,
+      1.34609700093
+     ]
+    ],
+    "v_over_rho": [
+     [
+      6000.20495383,
+      197861.128881
+     ],
+     [
+      15820.5992525,
+      541269.928117
+     ],
+     [
+      61696.6720935,
+      2362608.23611
+     ]
+    ],
+    "a_over_rho": [
+     [
+      6000.20495383,
+      197861.128881
+     ],
+     [
+      19939.2262104,
+      679973.052242
+     ],
+     [
+      85055.5071913,
+      3236951.54758
+     ]
+    ]
+   },
+   "cells_v": [
+    102825.977823,
+    102827.0
+   ],
+   "offset_ops": [
+    22339.84,
+    22489.352
+   ]
+  },
+  "e41": {
+   "source": "experiments/48_twist24_shortfall/summary.json",
+   "report": "research/e41_twist24_shortfall_20261102/REPORT.pdf",
+   "validator_report": "research/e41_twist24_shortfall_20261102/validator-report.json"
+  },
+  "e39": {
+   "source": "experiments/46_pivot_rules_confirm3/summary.json",
+   "report": "research/e39_pivot_rules_confirm3_20261102/REPORT.pdf",
+   "validation": "research/e39_pivot_rules_confirm3_20261102/VALIDATION.json",
+   "ranks": [
+    {
+     "x": "chain-fifo",
+     "reference": "chain-counted",
+     "order": "X ahead across the band",
+     "ranges": [
+      [
+       1.45724527158,
+       1.53718817945
+      ],
+      [
+       1.09372074772,
+       1.10643696289
+      ],
+      [
+       1.01149202457,
+       1.01295401064
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-fifo",
+     "reference": "macaulay",
+     "order": "X ahead across the band",
+     "ranges": [
+      [
+       3.62606753032,
+       3.94544706576
+      ],
+      [
+       1.52023270585,
+       1.58087760309
+      ],
+      [
+       1.04389590487,
+       1.06762557003
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-fifo",
+     "reference": "chain-sparsest-est",
+     "order": "unresolved",
+     "ranges": [
+      [
+       0.95180735113,
+       0.988347515701
+      ],
+      [
+       1.0457050663,
+       1.05573449839
+      ],
+      [
+       1.06678223095,
+       1.0703645299
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      0,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-static",
+     "reference": "chain-counted",
+     "order": "X ahead across the band",
+     "ranges": [
+      [
+       1.40173411899,
+       1.44923145634
+      ],
+      [
+       1.08251366861,
+       1.09077385669
+      ],
+      [
+       1.00772639201,
+       1.00862331268
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-static",
+     "reference": "macaulay",
+     "order": "X ahead across the band",
+     "ranges": [
+      [
+       3.48793897235,
+       3.71904760806
+      ],
+      [
+       1.50465526689,
+       1.55845629927
+      ],
+      [
+       1.04000963754,
+       1.06305862889
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-static",
+     "reference": "chain-sparsest-est",
+     "order": "unresolved",
+     "ranges": [
+      [
+       0.913353991228,
+       0.931671699185
+      ],
+      [
+       1.0349899917,
+       1.04078455605
+      ],
+      [
+       1.06281076127,
+       1.0657908066
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      0,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-fifo-static",
+     "reference": "chain-counted",
+     "order": "X ahead across the band",
+     "ranges": [
+      [
+       1.49712352779,
+       1.54153923651
+      ],
+      [
+       1.09565487856,
+       1.1028086856
+      ],
+      [
+       1.00760209541,
+       1.00831139216
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-fifo-static",
+     "reference": "macaulay",
+     "order": "X ahead across the band",
+     "ranges": [
+      [
+       3.72529670802,
+       3.95703210546
+      ],
+      [
+       1.52292107852,
+       1.57566256923
+      ],
+      [
+       1.03988135901,
+       1.06273108312
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-fifo-static",
+     "reference": "chain-sparsest-est",
+     "order": "unresolved",
+     "ranges": [
+      [
+       0.977312322758,
+       0.991013873984
+      ],
+      [
+       1.04755428642,
+       1.0522678383
+      ],
+      [
+       1.06267967037,
+       1.06546120683
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      0,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-sparsest-est",
+     "reference": "chain-counted",
+     "order": "unresolved",
+     "ranges": [
+      [
+       1.52987591426,
+       1.55821861354
+      ],
+      [
+       1.04591704006,
+       1.04803040201
+      ],
+      [
+       0.946361430807,
+       0.948171046746
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      0
+     ]
+    },
+    {
+     "x": "chain-sparsest-est",
+     "reference": "macaulay",
+     "order": "unresolved",
+     "ranges": [
+      [
+       3.8067945639,
+       4.00829934148
+      ],
+      [
+       1.45378726263,
+       1.49741966896
+      ],
+      [
+       0.978546393617,
+       0.997443941531
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      0
+     ]
+    },
+    {
+     "x": "chain-lifo",
+     "reference": "chain-counted",
+     "order": "X behind across the band",
+     "ranges": [
+      [
+       0.710272140643,
+       0.724554948201
+      ],
+      [
+       0.900559930704,
+       0.905258438638
+      ],
+      [
+       0.985611396969,
+       0.986278043321
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "x": "chain-lifo",
+     "reference": "macaulay",
+     "order": "X ahead across the band",
+     "ranges": [
+      [
+       1.77752111459,
+       1.85977703655
+      ],
+      [
+       1.2531198844,
+       1.29343364208
+      ],
+      [
+       1.01730613504,
+       1.03950983672
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      32,
+      32,
+      32
+     ]
+    },
+    {
+     "x": "chain-lifo",
+     "reference": "chain-sparsest-est",
+     "order": "unresolved",
+     "ranges": [
+      [
+       0.457430384921,
+       0.466933816561
+      ],
+      [
+       0.860327445035,
+       0.863774978316
+      ],
+      [
+       1.03960950822,
+       1.04217634261
+      ]
+     ],
+     "rows": 32,
+     "rows_x_ahead": [
+      0,
+      0,
+      32
+     ]
+    }
+   ],
+   "rho": {
+    "chain-counted": [
+     [
+      7911.49776979,
+      347432.819999
+     ],
+     [
+      26237.9945422,
+      1194952.67665
+     ],
+     [
+      95224.644646,
+      5689946.35511
+     ]
+    ],
+    "macaulay": [
+     [
+      20321.6580241,
+      882770.247516
+     ],
+     [
+      37465.9638968,
+      1684256.88478
+     ],
+     [
+      100231.296214,
+      5935104.03559
+     ]
+    ],
+    "chain-fifo": [
+     [
+      5183.9637185,
+      232416.384421
+     ],
+     [
+      23742.0662061,
+      1087429.80636
+     ],
+     [
+      94020.1860548,
+      5622167.13019
+     ]
+    ],
+    "chain-static": [
+     [
+      5483.08094376,
+      243477.868488
+     ],
+     [
+      24071.9380463,
+      1100255.40863
+     ],
+     [
+      94418.0700885,
+      5644349.09163
+     ]
+    ],
+    "chain-fifo-static": [
+     [
+      5154.11869594,
+      227923.909399
+     ],
+     [
+      23806.3765572,
+      1087334.8726
+     ],
+     [
+      94445.4091705,
+      5645395.44956
+     ]
+    ],
+    "chain-sparsest-est": [
+     [
+      5101.22225069,
+      223874.017543
+     ],
+     [
+      25040.0894104,
+      1141242.17973
+     ],
+     [
+      100606.00197,
+      6006690.53176
+     ]
+    ],
+    "chain-lifo": [
+     [
+      10943.328778,
+      487565.740118
+     ],
+     [
+      29010.0223286,
+      1325955.63911
+     ],
+     [
+      96562.340378,
+      5772526.73297
+     ]
+    ]
+   }
   }
  },
  "prime_base_size_component": {
