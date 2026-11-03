@@ -2513,7 +2513,17 @@ fn cell_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
 /// Keep the exported outcome labels no stronger than the certificate's terminal
 /// state. This also runs during hash-only verification as a consistency check;
 /// mathematical replay remains the separate `replay` gate below.
-fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(), String> {
+fn verify_prime_root_outcome(outcome: &Value, certificate: &Value, m: usize) -> Result<(), String> {
+    let chain = (3..=15).contains(&m);
+    if chain {
+        if certificate["strategy"] != "prime-affine-s3-chain-prefix-root/v1"
+            || certificate["m"] != m
+        {
+            return Err("prime-root chain certificate strategy or arity differs".into());
+        }
+    } else if m != 2 || !certificate["strategy"].is_null() || !certificate["m"].is_null() {
+        return Err("prime-root m=2 certificate contains chain metadata".into());
+    }
     verify_root_outcome(outcome, certificate, solvers::PRIME_ROOT_CERTIFICATE_SCOPE)?;
     let queries = certificate["queries"]
         .as_array()
@@ -2670,11 +2680,17 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
     if (found && censored) || (censored && all_queries) || (!found && !censored && !all_queries) {
         return Err("inconsistent prime-root aggregate termination".into());
     }
+    let chain = scope == solvers::PRIME_ROOT_CERTIFICATE_SCOPE
+        && certificate["strategy"] == "prime-affine-s3-chain-prefix-root/v1";
     let infinity_prefix = certificate["infinity_prefix_encountered"].as_bool();
-    if certificate["strategy"] == "prime-affine-s3-chain-prefix-root/v1"
-        && infinity_prefix.is_none()
-    {
+    if chain && infinity_prefix.is_none() {
         return Err("prime-root chain certificate lacks affine-infinity result".into());
+    }
+    if !chain
+        && (!certificate["infinity_prefix_encountered"].is_null()
+            || !outcome["root_termination_cause"].is_null())
+    {
+        return Err("non-chain root certificate contains chain termination metadata".into());
     }
     if infinity_prefix == Some(true) && (!censored || found) {
         return Err("inconsistent affine-infinity termination".into());
@@ -2957,7 +2973,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         if binary_root {
             verify_binary_root_outcome(&manifest.outcome, certificate)?;
         } else {
-            verify_prime_root_outcome(&manifest.outcome, certificate)?;
+            verify_prime_root_outcome(&manifest.outcome, certificate, manifest.config.m)?;
         }
         verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, binary_root, false)?;
     }
@@ -4322,7 +4338,7 @@ mod tests {
                 false,
             ),
         ] {
-            let certificate = json!({"strategy":"prime-affine-s3-chain-prefix-root/v1",
+            let certificate = json!({"strategy":"prime-affine-s3-chain-prefix-root/v1","m":3,
                 "found_pdp":found,"censored":censored,
                 "queries":[],"charged_work":0,
                 "infinity_prefix_encountered":infinity,
@@ -4336,13 +4352,13 @@ mod tests {
                 "root_termination_cause":cause,"counters":{
                     "aggregate_root_field_and_group_work":0,"root_solver_calls":0,
                     "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
-            verify_prime_root_outcome(&outcome, &certificate).unwrap();
+            verify_prime_root_outcome(&outcome, &certificate, 3).unwrap();
             let mut missing_infinity = certificate.clone();
             missing_infinity
                 .as_object_mut()
                 .unwrap()
                 .remove("infinity_prefix_encountered");
-            assert!(verify_prime_root_outcome(&outcome, &missing_infinity).is_err());
+            assert!(verify_prime_root_outcome(&outcome, &missing_infinity, 3).is_err());
             for field in [
                 "root_execution_trace_complete_verified",
                 "root_total_operation_count_verified",
@@ -4354,7 +4370,7 @@ mod tests {
                 let mut bad = outcome.clone();
                 bad[field] = json!(true);
                 assert!(
-                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    verify_prime_root_outcome(&bad, &certificate, 3).is_err(),
                     "{field}"
                 );
             }
@@ -4371,11 +4387,35 @@ mod tests {
                 let mut bad = outcome.clone();
                 bad[field] = value;
                 assert!(
-                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    verify_prime_root_outcome(&bad, &certificate, 3).is_err(),
                     "{field}"
                 );
             }
         }
+    }
+
+    #[test]
+    fn prime_root_m2_rejects_injected_affine_infinity_label() {
+        let certificate = json!({"found_pdp":false,"censored":true,
+            "queries":[],"charged_work":0,"root_queries_completed":false,
+            "execution_trace_complete_verified":false,"total_operation_count_verified":false});
+        let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
+            "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
+            "trace_complete":false,"scalar_recovered_without_witness":false,
+            "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
+            "pdp_witness_verified":false,"solver_completed":false,"status":"budget_exhausted",
+            "counters":{"aggregate_root_field_and_group_work":0,"root_solver_calls":0,
+                "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
+        verify_prime_root_outcome(&outcome, &certificate, 2).unwrap();
+        let mut injected_certificate = certificate.clone();
+        let mut injected_outcome = outcome.clone();
+        injected_certificate["infinity_prefix_encountered"] = json!(true);
+        injected_outcome["status"] = json!("partial");
+        injected_outcome["root_termination_cause"] = json!("affine_infinity_prefix");
+        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
+        injected_certificate["strategy"] = json!("prime-affine-s3-chain-prefix-root/v1");
+        injected_certificate["m"] = json!(3);
+        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
     }
 
     #[test]

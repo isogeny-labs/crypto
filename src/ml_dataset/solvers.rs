@@ -3214,6 +3214,9 @@ pub(super) fn verify_prime_root_artifact(
         || public["n"] != config.n
         || public["twist"] != config.twist
         || artifact["schema"] != "ml-dataset.prime-root-certificates/v1"
+        || !artifact["strategy"].is_null()
+        || !artifact["m"].is_null()
+        || !artifact["infinity_prefix_encountered"].is_null()
         || artifact["target"] != public["target"]
         || artifact["requested_work_limit"] != config.work_limit
         || artifact["distinct_root_certificates_verified"] != true
