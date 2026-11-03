@@ -1,0 +1,40 @@
+proc require97(int ok,string tag){if(!ok){print("DISCRIMINANT97_FATAL "+tag);exit;}}
+execute(read("marked23-field51.sing"));
+string donorF97=string(f23);
+ring polyRing97=2,(x,y),dp;
+execute("poly f97="+donorF97+";");
+intvec weightX97=1,0;intvec weightY97=0,1;
+require97(deg(f97,weightY97)==7 && leadcoef(f97)==1,"MONIC_DEGREE7_SOURCE");
+poly f0_97=subst(f97,x,0);
+poly f1_97=subst(f97,x,1);
+require97(f0_97==y^4*(y+1)^3,"X0_SPECIALIZATION");
+require97(f1_97==y^3*(y+1)^4,"X1_SPECIALIZATION");
+poly derivative97=diff(f97,y);
+require97(derivative97!=0,"SEPARABLE_GENERIC_SOURCE");
+poly disc97=resultant(f97,derivative97,y);
+require97(disc97!=0 && subst(disc97,y,0)==disc97,"NONZERO_UNIVARIATE_RESULTANT");
+require97(subst(disc97,x,0)==0 && subst(disc97,x,1)==0,"BOTH_REPEATED_FIBERS_DETECTED");
+list factorization97=factorize(disc97,2);
+ideal factors97=factorization97[1];intvec exponents97=factorization97[2];
+require97(size(factors97)==size(exponents97),"FACTOR_SHAPE");
+poly product97=1;int index97;int total97=0;
+for(index97=1;index97<=size(factors97);index97++){
+ require97(deg(factors97[index97],weightY97)==0 && exponents97[index97]>0,"BAD_FACTOR");
+ product97=product97*factors97[index97]^exponents97[index97];
+ total97=total97+deg(factors97[index97],weightX97)*exponents97[index97];
+ print("DISCRIMINANT97_FACTOR index="+string(index97)+" degree="+string(deg(factors97[index97],weightX97))+" multiplicity="+string(exponents97[index97])+" polynomial="+string(factors97[index97]));
+}
+require97(product97==disc97 && total97==deg(disc97,weightX97),"FULL_FACTOR_PRODUCT");
+require97(product97+1!=disc97,"CORRUPTED_FACTOR_PRODUCT_ACCEPTED");
+link out97="ASCII:w discriminant97.sing";open(out97);
+write(out97,"poly f97="+string(f97)+";");
+write(out97,"poly derivative97="+string(derivative97)+";");
+write(out97,"poly disc97="+string(disc97)+";");
+write(out97,"ideal factors97;intvec exponents97;");
+for(index97=1;index97<=size(factors97);index97++){
+ write(out97,"factors97["+string(index97)+"]="+string(factors97[index97])+";exponents97["+string(index97)+"]="+string(exponents97[index97])+";");
+}
+close(out97);
+print("DISCRIMINANT97_RESULT source_degree=7 discriminant_degree="+string(deg(disc97,weightX97))+" factors="+string(size(factors97))+" complete=1");
+print("DISCRIMINANT97_ALL_CHECKS_PASS");
+quit;
