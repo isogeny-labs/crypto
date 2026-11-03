@@ -8,7 +8,7 @@ The composed source passed 33 exact tests, including real n23/m3/factor-base-siz
 
 The previous 27-test batch deferred that historical test. Its prior cap-based deferral rationale did not apply to the test's separate replay policy; the complete 33-test run now executes and passes it.
 
-Full release-library validation is pending. This code supplies internal components; SAT CLI dispatch and causal export are still incomplete. An initial-prefix check is not whole-search completion or an exact fall-degree measurement.
+Full release-library validation passed: 6,129 passed, 0 failed, 125 ignored, 0 filtered out; source remained unchanged. The exact command and terminal log digest are in `full-library.receipt.json`, and the complete validation archive has verified S3 readback in `full-library-s3.receipt.json`. This code supplies internal components; SAT CLI dispatch and causal export are still incomplete. An initial-prefix check is not whole-search completion or an exact fall-degree measurement.
 
 Terminal focused logs, receipts, source manifest and scope correction are archived in the URI recorded in `s3.receipt.json`, with fresh download, byte equality and contained-hash verification. No new scientific cloud job or campaign was launched.
 
