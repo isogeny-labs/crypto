@@ -58,3 +58,31 @@ selection among parameterisations is free while algebraic restriction is not.
   single solve.
 - Rho remains ahead on every track. The distance remaining is reported, not
   gated.
+
+## Addendum T5 (frozen before its session): end-to-end ecbench, k = 20
+
+Census and R1–R4 are done (R1, R2, R3 and R4 held). At the incumbent cell,
+seed 1093 (log-free selected) covers 528 points against seed 0's 172. In the
+engine its F4 mul-adds/target are 0.991×, with the same degree (5) and terms
+(16).
+
+- **Session.** `ecbench/spec.json`:
+  - same curve and arms as `curve25519_algebraic_ecbench_20261102`
+    (`rho-neg`, `proj-a`, `pkm-iso-t6-g4` at seed 0), plus
+    `pkm-iso-t6-g4-s1093` (`prime-isogeny:t=6,seed=1093`, same oracle);
+  - fresh `target_seed` 2026110340, 6 public targets, 1 round;
+  - full solves with the DLP verified by ecbench;
+  - S at w = 0, 0.1 and 1 from `ecbench band`.
+- **V1.** The s1093 arm verifies 6/6.
+- **V2.** Mean S of s1093 ÷ the seed-0 arm is ≤ 0.6 at w = 0.1 and at w = 1
+  (≈ 1/3 predicted from the coverage ratio).
+- **V3.** Mean S of s1093 < the seed-0 arm at w = 0.
+- **V4 (scope).** Both algebraic arms stay behind `proj-a` and `rho-neg` at
+  w = 0.1 and 1. A change of band order against `proj-a` at w = 0 is
+  reported, but no ranking is claimed from w = 0 alone.
+- **Search cost, charged separately.** ecbench does not see the seed search.
+  The K = 2000 search at k = 20, t = 6 cost 1.35·10⁷ group operations
+  (`analysis/summary.json`). That is about 3.7·10⁴ in S (÷ √r = 362.2),
+  which dominates one solve. The s1093 arm's S is therefore reported twice:
+  without the search, as an amortised per-curve precomputation, and with it
+  charged to the single target.
