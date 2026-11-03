@@ -268,3 +268,52 @@ part of the $80 cap (about $24.50 already spent).
   covers the whole lifetime, plus the other pods running on the account.
   The previous pod was most likely deleted when the balance ran out.
 - **Reading:** outcomes are read as in §C1.
+
+## Amendment 7 (2026-11-03, after Amendment 6's out-of-memory runs, before these runs): C1 with the incremental engine, resumable
+
+Amendment 6's dense runs aborted at about 424 GB resident under a 471 GB
+address-space cap, so this amendment moves C1 to the incremental engine.
+
+**Engine.**
+- `pe_closure`, `partial` mode, low-first, batch 64, no variable
+  restriction (the registered L2 order).
+- Degree 5, m = 3 (19, 7), draws 0 then 3, the same committed draws file
+  (`a6bf7f15…`).
+- The engine holds at most one row per column plus one chunk: about
+  73 GB at 760,099 columns.
+
+**Surviving a lost pod.**
+- **Checkpoints.** `pe_closure_checkpointed` saves its whole state at
+  consistent points, at most every 30 min: basis, pivots, queue,
+  completion flag, seed position and counters. The file is written to
+  `.tmp`, fsynced and renamed. A run resumed from a checkpoint ends
+  exactly where an uninterrupted one does.
+  - Unit test: `resumed_run_equals_uninterrupted_run`.
+  - End to end, on m = 4 (11, 5) draw 8 at degree 4, both a capped run and
+    a SIGKILLed run, once resumed, match the uninterrupted run on every
+    counter.
+  - A checkpoint from another system or option set is refused.
+- **Network volume.** Inputs, checkpoints and records live on a RunPod
+  network volume in EU-RO-1.
+  - A replacement pod attached to that volume finds the hash-verified
+    inputs and restarts the job by itself (`pod/upload_launch.py`, the
+    `RESUMING_FROM_VOLUME` path).
+  - `pod/job_pe.sh` skips finished draws and resumes started ones.
+- **Watchdog.** The launching session checks in hourly. If the pod is gone
+  before the job is done, it relaunches onto the same volume, within the
+  budget.
+
+**Budget.**
+- Host: `cpu3m-32-256` ($1.76/h). The engine needs about 80 GB, so the
+  280 GB floor of the dense engine does not apply.
+- Total pod lifetime across relaunches: at most 27 h, about $47.50, plus
+  the volume (200 GB, about $0.50 a day).
+- Total C1 spend stays inside the owner's $80 cap, with about $27 spent
+  before this amendment.
+- When the budget runs out first, the checkpoints remain on the volume, and
+  the run continues only with a new budget.
+
+**Reading.** As in §C1:
+- refuted at 5;
+- saturated without refuting (degree at least 6);
+- not finished, which is unmeasured.

@@ -10,8 +10,16 @@ API key or token is ever on the pod. Plumbing only; the RunPod call is
 `research/dreg_closure_m4l6_20261018/pod/launch.py`'s `call` (key via curl
 stdin config).
 
-  upload_launch.py run --name NAME --vcpu 64 --flavors cpu3m --max-seconds N FILE...
+  upload_launch.py volume --name NAME --size GB --dc DC
+  upload_launch.py run --name NAME --vcpu 64 --flavors cpu3m --max-seconds N
+                       [--volume-id ID --dc DC] FILE...
   upload_launch.py push ID NONCE FILE...
+
+With `--volume-id`, /workspace is a RunPod network volume: inputs, records
+and checkpoints outlive the pod. A replacement pod on the same volume finds
+the verified inputs there and restarts `job.sh` itself, without an upload,
+so a job that resumes from its checkpoints continues where the lost pod
+stopped.
 """
 import argparse, hashlib, json, os, secrets, subprocess, sys, time
 
@@ -39,10 +47,21 @@ class H(http.server.SimpleHTTPRequestHandler):
         with lock:
             got[parts[1]] = True
             if len(got) == len(EXPECT) and not os.path.exists(IN + "/STARTED"):
-                open(IN + "/STARTED", "w").close()
-                subprocess.Popen(["setsid", "bash", IN + "/job.sh"], stdout=open(OUT + "/job.log", "a"),
-                                 stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
+                start_job()
+def start_job():
+    open(IN + "/STARTED", "w").close()
+    subprocess.Popen(["setsid", "bash", IN + "/job.sh"], stdout=open(OUT + "/job.log", "a"),
+                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
+def present(name):
+    p = os.path.join(IN, name)
+    return os.path.exists(p) and hashlib.sha256(open(p, "rb").read()).hexdigest() == EXPECT[name]
 with open(OUT + "/STATUS", "a") as f: f.write("RECEIVER_UP\n")
+if all(present(n) for n in EXPECT):
+    # A replacement pod on a persistent volume: the verified inputs are
+    # already here, so resume the job without an upload.
+    with open(OUT + "/STATUS", "a") as f: f.write("RESUMING_FROM_VOLUME\n")
+    got.update({n: True for n in EXPECT})
+    start_job()
 http.server.ThreadingHTTPServer(("0.0.0.0", 8000), H).serve_forever()
 '''
 
@@ -71,11 +90,21 @@ def run(a):
                 "POD_MAX_SECONDS": str(a.max_seconds), **dict(kv.split("=", 1) for kv in a.env)},
         "computeType": "CPU", "cpuFlavorIds": a.flavors.split(","), "vcpuCount": a.vcpu,
     }
+    if a.volume_id:
+        body.update({"networkVolumeId": a.volume_id, "volumeMountPath": "/workspace",
+                     "dataCenterIds": [a.dc]})
     r = launch.call("POST", "/pods", body)
     if not isinstance(r, dict) or "id" not in r:
         sys.exit(f"pod not created: {json.dumps(r)[:600]}")
     print(json.dumps({k: r.get(k) for k in ("id", "name", "vcpuCount", "memoryInGb", "costPerHr", "machineId")}))
     print(json.dumps({"nonce": nonce, "expect": expect}))
+
+
+def volume(a):
+    r = launch.call("POST", "/networkvolumes", {"name": a.name, "size": a.size, "dataCenterId": a.dc})
+    if not isinstance(r, dict) or "id" not in r:
+        sys.exit(f"volume not created: {json.dumps(r)[:600]}")
+    print(json.dumps(r))
 
 
 def push(a):
@@ -98,7 +127,12 @@ s = sub.add_parser("run")
 s.add_argument("--name", required=True); s.add_argument("--vcpu", type=int, default=64)
 s.add_argument("--flavors", default="cpu3m"); s.add_argument("--disk", type=int, default=40)
 s.add_argument("--max-seconds", type=int, required=True); s.add_argument("--env", action="append", default=[])
+s.add_argument("--volume-id"); s.add_argument("--dc")
 s.add_argument("files", nargs="+")
+s = sub.add_parser("volume"); s.add_argument("--name", required=True)
+s.add_argument("--size", type=int, required=True); s.add_argument("--dc", required=True)
 s = sub.add_parser("push"); s.add_argument("id"); s.add_argument("nonce"); s.add_argument("files", nargs="+")
 a = ap.parse_args()
-{"run": run, "push": push}[a.cmd](a)
+if a.cmd == "run" and bool(a.volume_id) != bool(a.dc):
+    sys.exit("--volume-id and --dc go together")
+{"run": run, "push": push, "volume": volume}[a.cmd](a)
