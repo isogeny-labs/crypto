@@ -6059,3 +6059,177 @@ the tails is closed by its own index work: only `36 %` of the tail is ever nonze
 the reserve slack (`≈ 10,200` cells; a tighter static rule trades slack against re-allocation copies, see Stage 0's
 `k = 1`); the per-update fill check (`≈ 4,200`, the largest added cost); the `≈ 12,600` fill-extent cells on rows
 outside the dependency closure (a trace ceiling); the `≈ 46,000` interior zeros, which no contiguous format drops.
+
+### 9.58 E43 pre-registration: do F (first-arrival pivots) and V/W (row storage) compose? Arms FV (`chain-fifo-profile`) and FW (`chain-fifo-tails`), every added operation charged
+
+*Registered 2026-11-03, before any E43 code or run.*  **Numbering:** E42/E42b own §9.54–§9.57 and G2.230–G2.257; E43
+takes §9.58 (this registration), §9.59 (results) and G2.258–G2.274; records `experiments/50_compose_fw/`, report
+`research/e43_compose_fw_20261103/`.  **What is tested.**  Three ranked changes to the `k = 4` GLS/`V₄` chain solve act on
+different things.  F (`chain-fifo`, E39 §9.49, validated) changes *which* row of each bucket pivots: `S_A/S_F` `1.457`–`1.537`
+/ `1.094`–`1.106` / `1.0115`–`1.0130` at `0` / `0.1` / `1` GAE.  V (`chain-profile`, E40 §9.51, validated) stores each
+Macaulay row from its lead: equal to A at `0` GAE, `1.25`–`1.26×` / `1.36`–`1.38×` ahead at `0.1` / `1`.  W (`chain-tails`,
+E42b §9.57, validation running) reserves V's rows to the block after their build end: `1.022`–`1.023×` / `1.032`–`1.034×`
+ahead of V at `0.1` / `1`, equal at `0`.  F changes the multiplications and leaves the cells; V and W change the cells and
+leave the multiplications.  If the effects add, FV and FW carry F's multiplications and V's (W's) cells.  They might not:
+F changes the fill pattern (which rows are updated, by which pivot rows, how far each row's lead drifts), and W's reserve
+rule (`k = 2`) was fitted on A's pivot order, so FW's re-allocations can rise.  **Class, fixed in advance:** a composed
+arm with F's arithmetic and outputs and V's (W's) storage, every operation it adds charged, is *engineering* (constants on
+the echelon and the build of the `k = 4` solve).  Composition is an improvement only where it is measured and ranked by
+the rule below; a relabelling of F's, V's or W's work would be accounting and is not proposed.  **Atlas check.**
+`tools/lead_atlas.py --brief` (crypto-autoresearcher, reviewed 2026-10-29; 213 crypto paths changed since, E39–E42 among
+them) and `--match` on the composition: no lead covers it; nearest `LEAD-ICP-prime-ic-constant-engineering` (open;
+constant engineering, under which E39–E42 fall).  In this note: E39 (F), E40 (V), E42/E42b (W); no composition of a pivot
+rule with a storage change was tried.
+
+**Arms (fixed).**  A (`chain-counted`), F (`chain-fifo`), V (`chain-profile`), W (`chain-tails`), FV (`chain-fifo-profile`,
+new), FW (`chain-fifo-tails`, new), E25 (`macaulay`), all with `--karatsuba`, and the matched rho, walk (iii) (E27's on the
+GLS rows, `experiments/32_walk_karatsuba/summary.json`; E37's on E24's curves,
+`experiments/44_pivot_rules_confirm/walk_e24.json`; walks do not depend on the target stream).  **FV, fixed:** V's build
+and V's echelon on tails (`macaulay_profile::build_profile`, `echelon_profile`) with one change: the bucket of each column
+is not sorted, so the pivot is the bucket's first arrival — E36's F rule (`chain_pivot_rules::ArrivalRule::Fifo`), whose
+arrival order is the same bookkeeping (rows filed at build in index order, updated rows re-filed in update order).  **FW,
+fixed:** W's build and echelon (`macaulay_tails::build_tails`, `echelon_tails`: the `B₂` reserve, the fill check, the
+`B₁` re-allocation) with the same one change.  New code behind new solver names; no existing solver's code path, count or
+output may change.
+
+**Pricing (fixed; exactly the conventions the E39, E40 and E42b records use and the E39/E40 validators accepted).**
+`S_X(g) = total_muls + 97 g · K_X`, `g ∈ {0, 0.1, 1}`, GAE `= 97` `F_p` multiplications, with `K_A = K_E25 =
+macaulay_entries`, `K_F = macaulay_entries + pivot_selection_ops` (F's selection work is `0` exactly: E39 G2.194), `K_V =
+K_FV = macaulay_stored_entries + profile_offset_ops`, `K_W = K_FW = macaulay_stored_entries + profile_offset_ops +
+tail_extent_ops`; `rho(g) = rho + 97 g · steps`.  FV and FW are charged V's and W's counters unchanged: V's offset operations
+(two per built row, one per coefficient write, one per row placed in its first bucket (E40 validator erratum E2), one per
+pivot normalisation, two per row update, one per pivot row read by the reachability pass and per normal-form
+substitution); W's stored cells (every buffer it allocates, a re-allocation's new buffer counted in full, copied cells
+included) and `tail_extent_ops` (one per support term of each equation that builds rows, two per built row, one per pivot
+normalisation, one per row update, one per re-allocation).  On a fallback call every chain arm is charged A's `2 · rows ·
+cols` and keeps its attempt's offset and tail operations (E40, E42).  **Unpriced counters, every arm (listed):** lead-scan
+reads; the dense-update cell traffic; the per-call structural work common to every arm (§9.50's σ4 list); memory.  σ1
+prices the lead scans for every arm, σ4 the structural work for every arm.  Python plots recorded values only; every
+number, including the predictions' arithmetic below (done from the committed records), is computed outside Python and
+recomputed by the Rust tables example.
+
+**Rows and streams (fixed; every comparison paired on one fresh stream).**  *End to end:* every arm on the 20 GLS rows
+(`quartic_pipeline_gls`, E25's ten curves × the pipeline's arms A, B) and the 12 E24 rows (`quartic_pipeline_v4`),
+`--rho-runs 16 --max-residuals 5000000 --karatsuba --stream-salt E43E0001`, `RAYON_NUM_THREADS=4`.  *Stage A:* E25's ten
+curves (`generate_gls_klein_instance(p, seed, 16)`, `p ∈ {101, 149, 197, 269, 397}`, `seed ∈ {1, 2}`), base and precompute
+from E25's stream, then the first 1,000 targets of stream `seed ^ 0xE43A_0001` per curve (10,000 calls, per-target seeds as
+E37's Stage A), one thread; per call existing (E25), A counted, F, V, W, FV, FW from the same per-target seed.  *Controls:*
+E25's ten curves, 32 calls each (320) on `seed ^ 0xE43C_0001`.  *Negative control:* FW and W on the 20 GLS rows with
+`--stream-salt E43E0002` (FW′, W′).  None of these salts was used before (no record, script or example uses a `0xE43…` stream).
+
+**Identity (fixed).**  *Stage A, every call:* every solver returns the existing solver's solutions, degree, outcome and
+decomposition set; FV and FW return F's fallback flag, every phase count (`weil`, `triangularise`, `echelon`, `nf`,
+`charpoly`, `roots`, `eigenvector`, `verify`, `total`) and pivot digest (A counted, V and W return A counted's, as before);
+FV's stored cells equal V's on every call without fallback (the build is V's); FV's lead-scan reads equal F's minus
+`Σ_r lead_r` exactly; FW's offset operations equal FV's; FW's cells before any re-allocation equal W's; FW's stored-cell
+counter equals its final row lengths plus the buffers its re-allocations discarded; `tail_FW − tail_W = (U_F − U_A) +
+(R_FW − R_W)` exactly (`U` the row updates, `R` the re-allocations); FW's lead-scan reads `≤` FV's.  *End to end:* every
+F, V, W, FV, FW record equals the same row's A record outside `*_ms`, wall times, `solver`, `solve_muls`, `total_muls`,
+`call`, `ratio`, `pivot_selection`, `pivot_selection_ops`, `lead_scan_reads`, `macaulay_stored_entries`,
+`profile_offset_ops`, `tail_extent_ops` (the same relations, logs and walks); FV and FW records equal F's outside `*_ms`,
+wall times, `solver`, `lead_scan_reads` and the three storage fields (so `total_muls` is F's); FW equals FV outside those
+and `macaulay_stored_entries`, `tail_extent_ops` (`profile_offset_ops` equal).  *Existing configurations:* under the E43
+binaries, E42's nine (E40's seven; V on GLS `p = 101` s2 and E24 `p = 101` s1, `E37E0001`) and W (`chain-tails
+--karatsuba`, `E37E0001`, GLS `p = 101` s2 and E24 `p = 101` s1) against E42b's stored records: 11 configurations
+identical as canonical JSON without timing keys.
+
+**Controls (fixed; `e43_checks`, 320 calls).**  *Broken compositions (positive, each must be caught on 320/320):* (PC1,
+rule lost) the storage echelons with A's sorted buckets, i.e. V and W in place of FV and FW, judged by the identity
+against F (fallback flag, phases, digest); E39 measured F's digest `≠` A's on 320/320 control calls and every Stage A call
+was contested, so a lost rule is visible on every call; (PC2, storage lost under F) FV with the lead cell dropped (E40's P1
+under F) and FW with rows capped at their build end and the fill check off (E42's P1 under F), judged by the identity
+against F; (PC3, count lost under F) FV's and FW's stored-cell counters short by one per row (E40's and E42's P2 under F),
+judged by the measured-length checks.  *Growth path under F (must pass):* FW with rows capped at their build end and the
+fill check on (E42's G0 under F) equals F and passes the counter check on 320/320.  *Perturbed coefficient (E31's):* one
+coefficient of one equation moved by one changes FV's and FW's solution sets on every call with a non-empty clean set.
+*Components' existing controls, reused:* `e39_checks` (salt `E39C0001`), `e40_checks` (E40's v2 control run) and
+`e42_checks` (`--salt E42C0002`, E42b's) built at the E43 commit reproduce `experiments/46_pivot_rules_confirm3/checks.json`,
+`experiments/47_macaulay_entries/checks.json` and `experiments/49_macaulay_tails/checks_b.json` byte for byte (the
+components' controls still run and pass on the E43 code).  *Negative (FW against FW′):* FW′ on `E43E0002` against FW on
+`E43E0001` through the same tables and rank rule (unpaired across streams), and FW′ against W′ (paired on `E43E0002`).
+
+**Predictions: additivity, and how the bands were derived.**  Per call, `S_X(g) = C_X + 97 g K_X`.  Additivity means
+`C_FV = C_FW = C_F` exactly (by construction; checked by the identity), `K_FV = K_V + δ_FV`, `K_FW = K_W + δ_FW` with the
+interactions `δ` small.  The only F-dependent terms in V's and W's counters are: two offset operations and one tail
+operation per row update, one tail operation and one new buffer per re-allocation, and one offset operation per pivot row
+read by the reachability pass and the normal forms.  Hence `δ_FV = 2ΔU + Δreads` and `δ_FW = δ_FV + ΔU + ΔR + Δcells`,
+with `ΔU = U_F − U_A`, `ΔR = R_FW − R_W`, `Δcells` the new-buffer cells of the extra re-allocations.  *What the records
+give:* `ΔU` = `+14`…`+29` per call (E39 Stage A, `upd` of `chain-fifo` against `chain-lowest-e36`, per curve), so `2ΔU ≤ 58`.
+`Δreads` is not in any record (no E36–E42 record counts F's reads); V's reads are `≈ 1,100`–`1,400` a call (V's `22,333`–`22,489`
+offset operations less its other terms), and F's later phases are `≈ 11 %` cheaper than A's (E39 Stage A: `C − echelon`
+`216.6·10³` → `192.3·10³`), so the reads are expected to fall; registered bound `|Δreads| ≤ 1,400`, hence `|δ_FV| ≤ 1,500`.
+*The additive point predictions* below put `δ = 0` and use the committed E37-stream records, which hold A, F, V and W on
+one stream (`experiments/44_pivot_rules_confirm/e2e/` A, F, E25; E40's V; E42b's W; 32 rows):
+`S_FV^add = C_F + 97 g K_V`, `S_FW^add = C_F + 97 g K_W`; Stage A from E39's `C_A/C_F` per curve and E42b's Stage A cells.
+The bands widen the additive values by `|δ| ≤ 1,500` cells a call (`±1.2 %` of `S` at `1` GAE, `±0.9 %` at `0.1`) and by the
+stream-to-stream spread E39 measured (G2.202).  **Margins that decide the orders:** at `1` GAE, W's charged cells are
+`≈ 4,300` a call below V's (= FV's under additivity), worth `97 × 4,300 ≈ 4.2·10⁵`, against F's saving `C_A − C_F ≈ 2.1·10⁵`
+(`2,144`–`2,391` cells-equivalent a call by curve); so **W stays ahead of FV at `1` GAE** (`S_W/S_FV ≈ 0.984`–`0.986`), and
+**FW is ahead of W at `1` GAE only while `δ_FW < (C_A − C_F)/97 ≈ 2,100`–`2,400` a call** (the break-even, per row).
+
+**W's re-allocations under F's pivot order (derivation and uncertainty).**  Weights `(2, 2, 1, 1)`, four equations of
+weighted degree `4`, Macaulay degree `11`.  A row of equation `i` built with lead in weighted-degree block `D_r` ends in
+block `D_r − sᵢ` (`sᵢ = dgᵢ − δᵢ`, the equation's degree spread; `sᵢ = 4` when the equation has a constant term) and is
+reserved through block `D_r − sᵢ − 1`.  An update at column `c` (block `D_c`) by a never-updated pivot row of equation `j`
+fills at most to block `D_c − s_j`; a pivot that was itself updated can end further right.  With equal spreads, an
+overflow therefore needs `D_c ≤ D_r − 2`: the row's lead has drifted two or more degree blocks from where it was built, or
+its pivot carries fill.  After a re-allocation to `B₁` of the new end, the next overflow needs one more block of drift.
+Under A, W re-allocates `6.07`–`6.53` times a call (E42b Stage A), the old buffers averaging `≈ 78` cells (Stage 0
+`k = 2`: `420`–`563` copied cells for `6`–`7` re-allocations), i.e. short rows near the right end.  F moves the count two
+ways, and no record measures either: (a) F pivots the bucket's first arrival, a never-updated row whenever one is present
+(this is why its pivots are sparser and its echelon `1.5×` cheaper), so pivot ends sit at their build end more often:
+fewer overflows; (b) the rows F leaves unpivoted are the already-updated ones, which arrive after the originals and lose
+again, so drift concentrates on fewer rows that travel further: more overflows.  The total update count barely moves
+(`ΔU ≤ 29`).  **Registered prediction (descriptive, not a kill):** FW's mean re-allocations per call in `[3, 60]` on every
+curve, point estimate `10`–`25` (direction: up from W's `6.3`), with low confidence because (a) and (b) are not separately
+measured; FW's stored cells per clean call (W's build plus the new buffers) descriptive, expected `[9.25, 9.60]·10⁴`.  The
+consequence is stated in advance: each extra re-allocation costs its new buffer (`≈ 80`–`300` cells) and one tail operation,
+so **FW loses its `1`-GAE lead over W if it re-allocates more than `≈ 10`–`30` times a call beyond W's**, or if `Δreads`
+is large and positive.  G0 under F (caps at the build end, fill check on): re-allocations descriptive, `[150, 500]` a call
+(A: `246.3`, E42b).  E42 was killed by a mis-derived count; no re-allocation count is a kill here.
+
+**Ranking (fixed).**  Against A, V, E25: the ordinary rule (strictly cheaper at `0`, `0.1` and `1` GAE on every row).
+Against F: FV and FW have F's multiplications by construction, so `S(0)` is equal and the weak rule applies (equal at `0`,
+strictly ahead at `0.1` and `1` on every row; reported as **ahead of F at `0.1` and `1` GAE, equal at `0`**).  Against W:
+the ordinary rule; otherwise *unresolved* (or behind) as measured.  FW against FV: the weak rule.  **Strong rank (the
+task's definition: strictly ahead at all three weights against each of A, V, W and F on every row) is predicted not to be
+met by any composed arm, by construction: at `0` GAE a composed arm equals F.**  The attainable rank is registered as the
+**composition rank**: strictly ahead of A, V, W and E25 at all three weights and weakly ahead of F, on all 32 rows.  An
+end-to-end order is never inferred from Stage A; nothing is ranked if G2.258 or G2.259 fails.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.258 | identity (**kill**) | every identity clause above, on every Stage A call, every end-to-end record and the 11 existing configurations | any failure (E43 stops; no rank) |
+| G2.259 | controls (**kill**) | PC1, PC2 (FV, FW), PC3 (FV, FW) caught on 320/320 each; G0 under F = F and counter 320/320; FV, FW = F on 320/320; perturbed coefficient on every non-empty call; the three component control runs reproduce byte for byte | any miss (E43 stops) |
+| G2.260 | G0 re-allocations under F (descriptive) | `[150, 500]` per call (mean) | outside (reported, not a kill) |
+| G2.261 | FW re-allocations under F (descriptive) | `[3, 60]` per call (mean, every curve; point `10`–`25`); stored cells per clean call `[9.25, 9.60]·10⁴` | outside (reported, not a kill) |
+| G2.262 | FV's counters (Stage A) | stored = V's on every clean call; offset ops `[2.08, 2.40]·10⁴` (mean); lead scans `[5.7, 6.1]·10³`; `δ_FV` in `[−1,500, +1,500]` per call | outside |
+| G2.263 | FW's counters (Stage A) | offset ops = FV's; pre-re-allocation cells = W's; tail ops `[5.48, 5.60]·10³` (mean); `tail_FW − tail_W = ΔU + ΔR` on every call | outside (the equalities are G2.258) |
+| G2.264 | Stage A bands (means, every curve; **kill** if FV or FW is behind A at any weight, differs from F at `0` GAE, or is behind F at `0.1` or `1` on any curve) | FV: `S_A/S_FV` `[1.44, 1.56]` / `[1.37, 1.46]` / `[1.35, 1.42]`; `S_F/S_FV` `1` / `[1.25, 1.32]` / `[1.33, 1.40]`; `S_V/S_FV` `[1.44, 1.56]` / `[1.10, 1.16]` / `[1.004, 1.030]`; `S_W/S_FV` `[1.44, 1.56]` / `[1.08, 1.13]` / `[0.972, 0.997]`.  FW: `S_A/S_FW` `[1.44, 1.56]` / `[1.40, 1.50]` / `[1.39, 1.47]`; `S_F/S_FW` `1` / `[1.28, 1.36]` / `[1.38, 1.45]`; `S_V/S_FW` `[1.44, 1.56]` / `[1.13, 1.19]` / `[1.035, 1.065]`; `S_W/S_FW` `[1.44, 1.56]` / `[1.10, 1.16]` / `[1.004, 1.030]`; `S_FV/S_FW` `1` / `[1.010, 1.040]` / `[1.015, 1.050]` | outside (reported); kill |
+| G2.265 | end to end, FV (32 rows) | `S_A/S_FV` `[1.44, 1.56]` / `[1.38, 1.46]` / `[1.36, 1.43]`; `S_F/S_FV` `1` / `[1.26, 1.32]` / `[1.35, 1.41]`; `S_V/S_FV` `[1.44, 1.56]` / `[1.10, 1.16]` / `[1.004, 1.030]`; `S_W/S_FV` `[1.44, 1.56]` / `[1.08, 1.13]` / `[0.972, 0.997]` (W ahead of FV at `1` GAE on every row); `S_E25/S_FV` `[3.5, 4.1]` / `[1.92, 2.09]` / `[1.41, 1.50]` | outside |
+| G2.266 | end to end, FW (32 rows) | `S_A/S_FW` `[1.44, 1.56]` / `[1.41, 1.50]` / `[1.40, 1.48]`; `S_F/S_FW` `1` / `[1.29, 1.36]` / `[1.39, 1.46]`; `S_V/S_FW` `[1.44, 1.56]` / `[1.13, 1.19]` / `[1.035, 1.065]`; `S_W/S_FW` `[1.44, 1.56]` / `[1.10, 1.16]` / `[1.004, 1.030]`; `S_E25/S_FW` `[3.5, 4.1]` / `[1.97, 2.14]` / `[1.46, 1.55]` | outside |
+| G2.267 | additivity, end to end (per row) | `δ_FV` per call in `[−1,500, +1,500]`; `δ_FW` per call below the row's break-even `(C_A − C_F)/(97 · calls)`; `S_FV/S_FW` `1` / `[1.010, 1.040]` / `[1.015, 1.050]` | outside (reported; FW's break-even decides its order against W, not this row) |
+| G2.268 | the components on the fresh stream (A/A replication) | `S_A/S_F` in E39's G2.197 bands `[1.43, 1.57]` / `[1.085, 1.115]` / `[1.010, 1.015]`; `S_A/S_V` in G2.210's `1` / `[1.18, 1.38]` / `[1.28, 1.48]`; `S_V/S_W` in G2.251's `1` / `[1.015, 1.035]` / `[1.02, 1.05]` | outside |
+| G2.269 | strong rank (strict at all three weights against A, V, W and F) | **not met** by FV or FW: `S_FX(0) = S_F(0)` on every row (equal `total_muls`) | a composed arm strictly cheaper than F at `0` GAE (would contradict the identity) |
+| G2.270 | composition rank | FW: ahead of A, V, W and E25 at every weight and weakly ahead of F, on all 32 rows (holds if `δ_FW` stays under break-even); FV: ahead of A, V, E25 at every weight, weakly ahead of F, **unresolved against W** (behind at `1` GAE on every row) | FW behind or unresolved against W on any row (FW then not composition-ranked); FV ahead of W at `1` GAE on every row (would contradict additivity) |
+| G2.271 | distance to the matched rho | rho ahead of every row of every arm at every weight; `S_FW/rho` at `1` GAE `= (S_W/rho)/[1.004, 1.030]` per row; at `0` GAE `S_FW/rho = S_F/rho` | any row below rho |
+| G2.272 | σ1, σ4 (every arm) | no order of FV or FW against A, F, V, W or E25 changes | an order changes |
+| G2.273 | negative control | FW′ is **not** ranked against FW (its order differs across rows); FW′ against W′ (paired) inside G2.266's `S_W/S_FW` bands on 20/20 rows; FW′ = W′ outside the vs-A fields | FW′ ranked; outside |
+| G2.274 | health | every log recovered and every walk correct; the same fallback calls for A, F, V, W, FV, FW on every row (Stage A and end to end); unsolved `≤ 0.1 %` of calls | outside |
+
+**Order of runs and stop rule.**  Build (one clean export of the commit carrying the E43 code; binaries pinned by
+sha256) → identity of the existing configurations and component control replays (G2.258, G2.259) → `e43_checks`
+(G2.259–G2.260) → Stage A (G2.258, G2.261–G2.264) → end to end on `E43E0001` (G2.265–G2.272, G2.274) → FW′, W′ on
+`E43E0002` (G2.273).  If a kill fires, E43 stops there; any later run is a disclosed deviation, descriptive only.
+**Host and build.**  The shared 4-vCPU container; isolab-eks is unreachable and `conductor` is not installed: local
+runs, **operation counts only, no wall-time claim.**  `cargo build --release -j 2` under the shared build lock, target in
+`/dev/shm`, never release unit tests; long runs restart-safe (atomic per record, complete records skipped).  The
+leaderboard, `benchmarks/` and the validation gate are not touched here.
+
+**What it would say.**  If G2.258–G2.259 hold and G2.270 holds for FW: F's pivot rule and W's storage compose — FW keeps
+F's `1.46`–`1.54×` multiplication cut at `0` GAE and W's cells at the positive weights, strictly ahead of A, V and W at all
+three weights and of F at `0.1` and `1` GAE: the first arm in this line ahead of every ranked component except at the one
+point (F at `0` GAE) where it is F.  If FW's re-allocations under F push `δ_FW` past the break-even, FW is unresolved
+against W at `1` GAE and the components do not compose for the storage lever that was fitted on A's order — reported as
+such, with the measured count.  FV is predicted to stay behind W at `1` GAE (the storage lever is larger than F's at that
+weight).  Either way the rows stay `≳ 10³`–`10⁶×` from the matched rho.
