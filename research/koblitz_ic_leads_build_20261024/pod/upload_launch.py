@@ -15,11 +15,13 @@ stdin config).
                        [--volume-id ID --dc DC] FILE...
   upload_launch.py push ID NONCE FILE...
 
-With `--volume-id`, /workspace is a RunPod network volume: inputs, records
-and checkpoints outlive the pod. A replacement pod on the same volume finds
-the verified inputs there and restarts `job.sh` itself, without an upload,
-so a job that resumes from its checkpoints continues where the lost pod
-stopped.
+With `--volume-id` (GPU pods; RunPod CPU pods refuse network volumes) or
+`--pod-volume GB`, /workspace persists: inputs, records and checkpoints
+outlive the container. A pod volume survives a container restart and a pod
+stop/start, not termination. A network volume also survives termination.
+On boot, the receiver finds the verified inputs there and restarts
+`job.sh` itself, without an upload, so a job that resumes from its
+checkpoints continues where it stopped.
 """
 import argparse, hashlib, json, os, secrets, subprocess, sys, time
 
@@ -93,6 +95,12 @@ def run(a):
     if a.volume_id:
         body.update({"networkVolumeId": a.volume_id, "volumeMountPath": "/workspace",
                      "dataCenterIds": [a.dc]})
+    elif a.pod_volume:
+        # A pod volume: it survives container restarts and pod stop/start,
+        # not termination. RunPod CPU pods take no network volume.
+        body.update({"volumeInGb": a.pod_volume, "volumeMountPath": "/workspace"})
+    if a.dc and not a.volume_id:
+        body["dataCenterIds"] = [a.dc]
     r = launch.call("POST", "/pods", body)
     if not isinstance(r, dict) or "id" not in r:
         sys.exit(f"pod not created: {json.dumps(r)[:600]}")
@@ -127,12 +135,12 @@ s = sub.add_parser("run")
 s.add_argument("--name", required=True); s.add_argument("--vcpu", type=int, default=64)
 s.add_argument("--flavors", default="cpu3m"); s.add_argument("--disk", type=int, default=40)
 s.add_argument("--max-seconds", type=int, required=True); s.add_argument("--env", action="append", default=[])
-s.add_argument("--volume-id"); s.add_argument("--dc")
+s.add_argument("--volume-id"); s.add_argument("--dc"); s.add_argument("--pod-volume", type=int)
 s.add_argument("files", nargs="+")
 s = sub.add_parser("volume"); s.add_argument("--name", required=True)
 s.add_argument("--size", type=int, required=True); s.add_argument("--dc", required=True)
 s = sub.add_parser("push"); s.add_argument("id"); s.add_argument("nonce"); s.add_argument("files", nargs="+")
 a = ap.parse_args()
-if a.cmd == "run" and bool(a.volume_id) != bool(a.dc):
-    sys.exit("--volume-id and --dc go together")
+if a.cmd == "run" and a.volume_id and not a.dc:
+    sys.exit("--volume-id needs --dc")
 {"run": run, "push": push, "volume": volume}[a.cmd](a)

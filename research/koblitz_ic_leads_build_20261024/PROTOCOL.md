@@ -317,3 +317,25 @@ address-space cap, so this amendment moves C1 to the incremental engine.
 - refuted at 5;
 - saturated without refuting (degree at least 6);
 - not finished, which is unmeasured.
+
+**Amendment 7a (2026-11-03, at launch, before any C1 output).** RunPod
+refused a network volume on CPU pods ("no longer any instances available"
+with a volume; the same pod without one launched). Two changes follow.
+
+- **Persistence.** It is a 200 GB pod volume at `/workspace` instead.
+  - **What it survives:** a container restart and a pod stop/start.
+    On start, the receiver resumes from the verified inputs and the
+    checkpoint.
+  - **What it does not survive:** termination of the pod. The watchdog
+    restarts a stopped pod. A deleted pod loses its checkpoints, which
+    was the cause of the earlier loss, a zero balance; the balance is now
+    about $197.
+  - **What would fix that:** off-host copies need S3 credentials, which
+    this session does not hold.
+- **Host.** `cpu5m-32-256` at $2.08/h, the only stocked 256 GB shape.
+  - Pod `r2ttfdddgd1zdp` started draw 0 at 18:32:30Z. Its uploads were
+    hash-verified: `pe_closure` `5fdb71c1…`, the draws file and
+    `job_pe.sh`.
+  - The lifetime cap is 82,000 s (about $47.50). Across restarts, the
+    total pod time stays within that budget.
+
