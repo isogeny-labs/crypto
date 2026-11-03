@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""Recompute the fixed-base N83 first-fall coverage index from saved records."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from collections import Counter
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[5]
+STUDY = ROOT / "research/n83_candidate_pdp_20261028"
+EVIDENCE = STUDY / "evidence/n83-factorbase-variants"
+OUT = Path(__file__).resolve().parent / "coverage.json"
+PROTOCOL = STUDY / "protocol-pdp-factorbase-v2.json"
+EXPECTED_PROTOCOL_ID = "N83-FACTOR-BASE-PDP-FFD-LFD-20261031-V2"
+EXPECTED_PROTOCOL_SHA256 = "50cd6f8213789de2dfd54a3b33a067ed87cc0def761b7c98769be3e19aee47a9"
+LEGACY_SUMMARIES = {
+    "spike27": "r27-attempt-07/first-fall-20261031T1725Z/first-fall-summary.json",
+    "spike28": "r28-attempt-01/first-fall-20261031T1715Z/first-fall-summary.json",
+    "spike30": "r30-attempt-01/first-fall-20261031T1700Z/first-fall-summary.json",
+    "spike31": "r31-attempt-01/first-fall-20261031T1610Z/first-fall-summary.json",
+    "spike32": "r32-attempt-01/first-fall-20261031T1630Z/first-fall-summary.json",
+    "spike33": "r33-attempt-01/first-fall-20261031T1640Z/first-fall-summary.json",
+}
+COMBINED = EVIDENCE / "candidate-fall-20261102/combined-144/combined-summary.json"
+CUSTODY = EVIDENCE / "candidate-fall-20261102/combined-144/S3-CUSTODY-complete.json"
+LFD_SUMMARY = STUDY / "evidence/degree4-propagation/summary.json"
+EXPECTED_CANDIDATES = [f"spike{i}" for i in range(27, 40)]
+
+
+def digest(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def load(path: Path) -> dict:
+    return json.loads(path.read_text())
+
+
+def source_record(path: Path, rows: int) -> dict:
+    return {"path": path.relative_to(ROOT).as_posix(), "bytes": path.stat().st_size,
+            "sha256": digest(path), "rows": rows}
+
+
+def build() -> dict:
+    protocol = load(PROTOCOL)
+    assert protocol["protocol_id"] == EXPECTED_PROTOCOL_ID
+    assert protocol["freeze"]["protocol_sha256"] == EXPECTED_PROTOCOL_SHA256
+    planned = protocol["sample_size"]["instances"]
+    assert planned == 624
+
+    sources = []
+    rows_by_candidate: dict[str, list[dict]] = {}
+    for candidate, relative in LEGACY_SUMMARIES.items():
+        path = EVIDENCE / relative
+        summary = load(path)
+        assert summary["candidate_id"] == candidate
+        assert summary["protocol_id"] == EXPECTED_PROTOCOL_ID
+        assert summary["protocol_sha256"] == EXPECTED_PROTOCOL_SHA256
+        assert summary["planned_cases"] == summary["attempted_cases"] == 48
+        assert summary["completed_certificates"] == summary["replay_verified"] == 48
+        assert len(summary["rows"]) == 48
+        rows_by_candidate[candidate] = [dict(row, candidate_id=candidate) for row in summary["rows"]]
+        sources.append(source_record(path, len(summary["rows"])))
+
+    combined = load(COMBINED)
+    assert combined["protocol_id"] == EXPECTED_PROTOCOL_ID
+    assert combined["protocol_freeze_sha256"] == EXPECTED_PROTOCOL_SHA256
+    assert combined["systems_planned"] == combined["systems_attempted"] == 144
+    assert combined["certificates_produced"] == combined["fresh_replays_verified"] == 144
+    assert len(combined["rows"]) == 144
+    sources.append(source_record(COMBINED, len(combined["rows"])))
+    for row in combined["rows"]:
+        rows_by_candidate.setdefault(row["candidate_id"], []).append(row)
+
+    candidate_records = []
+    all_rows = []
+    for candidate in sorted(rows_by_candidate):
+        rows = rows_by_candidate[candidate]
+        keys = [(row["family"], row["m"], row["target_kind"]) for row in rows]
+        assert len(rows) == 48 and len(set(keys)) == 48
+        assert set(row["m"] for row in rows) == set(range(2, 10))
+        assert set(row["family"] for row in rows) == {"koblitz", "binary", "prime"}
+        assert set(row["target_kind"] for row in rows) == {"natural", "planted"}
+        assert all(row.get("last_fall_degree") is None for row in rows)
+        status_counts = Counter(row["status"] for row in rows)
+        replay_count = sum(bool(row.get("replay_verified", row.get("replay", {}).get("verified"))) for row in rows)
+        ffd_counts = Counter((row.get("family"), row.get("first_fall_degree"),
+                              row.get("first_fall_lower_bound")) for row in rows)
+        candidate_records.append({
+            "candidate_id": candidate,
+            "systems": len(rows),
+            "replay_verified": replay_count,
+            "status_counts": dict(sorted(status_counts.items())),
+            "first_fall_by_family": {
+                family: {
+                    "rows": sum(count for (fam, _, _), count in ffd_counts.items() if fam == family),
+                    "outcomes": [
+                        {"degree": degree, "lower_bound": lower_bound, "count": count}
+                        for (fam, degree, lower_bound), count in sorted(
+                            ffd_counts.items(), key=lambda item: str(item[0])) if fam == family
+                    ],
+                }
+                for family in ("koblitz", "binary", "prime")
+            },
+            "exact_lfd_rows": sum(row.get("last_fall_degree") is not None for row in rows),
+        })
+        all_rows.extend(rows)
+
+    covered = len(all_rows)
+    assert covered == 432
+    assert set(rows_by_candidate) == {"spike27", "spike28", "spike30", "spike31", "spike32", "spike33",
+                                     "spike35", "spike36", "spike37"}
+    assert len({(r.get("candidate_id"), r["id"]) for r in all_rows}) == covered
+    total_ffd = Counter((r["family"], r.get("first_fall_degree"), r.get("first_fall_lower_bound")) for r in all_rows)
+    assert total_ffd == Counter({("koblitz", 2, 2): 144, ("binary", 2, 2): 144, ("prime", None, 5): 144})
+
+    custody = load(CUSTODY)
+    archive = custody["canonical_archive"]
+    assert archive["full_s3_readback_verified"] is True
+    assert archive["sha256"] == archive["readback_sha256"]
+    sources.append(source_record(CUSTODY, 0))
+    lfd_summary = load(LFD_SUMMARY)
+    assert lfd_summary["verified_cases"] == len(lfd_summary["rows"]) == 12
+    assert all(row["verified"] and row["replay_exit_code"] == 0 for row in lfd_summary["rows"])
+    assert all(row["last_fall_degree"] is None and row["last_fall_upper_bound"] is None
+               and not row["contains_one"] and not row["exhaustive_affine_completion"]
+               for row in lfd_summary["rows"])
+    assert all(row["inherited_last_fall_lower_bound"] == 4 for row in lfd_summary["rows"])
+    sources.append(source_record(LFD_SUMMARY, len(lfd_summary["rows"])))
+    return {
+        "schema": "n83.fixed-base-first-fall-coverage/v1",
+        "scope": "Fixed factor-base coordinates spike27 through spike39; 48 systems per candidate, m2-9, three families, natural/planted targets.",
+        "protocol": {
+            "id": EXPECTED_PROTOCOL_ID,
+            "freeze_sha256": EXPECTED_PROTOCOL_SHA256,
+            "planned_systems": planned,
+            "source_commit": protocol["freeze"]["commit"],
+        },
+        "coverage": {
+            "systems_planned": planned,
+            "systems_with_first_fall_records": covered,
+            "candidate_groups_covered": sorted(rows_by_candidate),
+            "candidate_groups_uncovered": [c for c in EXPECTED_CANDIDATES if c not in rows_by_candidate],
+            "uncovered_systems": planned - covered,
+            "known_complete_base_unlabeled_candidates": ["spike29", "spike38", "spike39"],
+            "candidate_missing_factor_base": "spike34",
+        },
+        "first_fall_outcomes": {
+            "rows": covered,
+            "replay_verified": sum(bool(r.get("replay_verified", r.get("replay", {}).get("verified"))) for r in all_rows),
+            "by_family": {
+                "koblitz": {"rows": 144, "exact_degree_2": 144},
+                "binary": {"rows": 144, "exact_degree_2": 144},
+                "prime": {"rows": 144, "exact_degree": 0, "lower_bound_5": 144},
+            },
+            "candidate_specific_outcome_variation_within_family": False,
+            "interpretation": "The observed FFD labels do not separate the nine covered bases within a family; they cannot train an elite-base model for degree-of-regularity reduction.",
+        },
+        "last_fall_degree": {
+            "exact_rows": 0,
+            "unknown_rows": covered,
+            "candidate_first_fall_panel": "The 432 candidate first-fall certificates do not establish LFD.",
+            "related_restricted_propagation_panel": {
+                "verified_m3_cases": 12,
+                "inherited_strict_lower_bound_4_cases": 12,
+                "global_upper_certificates": 0,
+                "exact_lfd_certificates": 0,
+                "scope": "Restricted V4 consequence propagation; no unrestricted V4 closure or higher-fall inference.",
+                "summary": LFD_SUMMARY.relative_to(ROOT).as_posix(),
+                "report": "research/n83_candidate_pdp_20261028/reports/run-20261029T1907Z/report.md",
+            },
+            "related_panel_report": "research/n83_candidate_pdp_20261028/reports/run-20261029T1907Z/report.md",
+        },
+        "degree_of_regularity": {
+            "measured_in_this_panel": False,
+            "top_form_proxies_are_separate": True,
+            "model_lead_from_top_form_proxies": False,
+        },
+        "s3_archive_for_spike35_to_spike37_panel": {
+            "key": archive["key"],
+            "bytes": archive["bytes"],
+            "sha256": archive["sha256"],
+            "full_readback_verified": archive["full_s3_readback_verified"],
+            "scope": custody["scope"],
+            "source_system_payloads_in_archive": archive["excludes_source_system_payloads"] is False,
+            "custody_record": CUSTODY.relative_to(ROOT).as_posix(),
+        },
+        "candidate_groups": candidate_records,
+        "source_files": sources,
+        "file_structure": {
+            "per_candidate_summaries": "Six 48-row first-fall summaries are linked by source path and hash.",
+            "spike35_spike37_panel": "One 144-row combined summary is linked by source path and hash; attempt-01 and attempt-02 records remain preserved separately.",
+            "spike35_spike37_raw_case_archive": "The canonical 144-case S3 archive and custody record are referenced without copying raw case files into this coverage index; source system payloads are stored separately.",
+            "other_candidate_archives": "The six earlier candidate summaries retain their own evidence directories and S3 persistence references; this index records each summary's hash instead of flattening those attempts.",
+        },
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true", help="compare the recomputed index with coverage.json")
+    args = parser.parse_args()
+    result = build()
+    rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
+    if args.check:
+        if not OUT.is_file() or OUT.read_text() != rendered:
+            print("coverage.json differs from recomputed source summaries")
+            return 1
+        print(f"PASS: {len(result['source_files'])} source objects; {result['coverage']['systems_with_first_fall_records']}/624 rows; 0 exact LFD")
+        return 0
+    OUT.write_text(rendered)
+    print(f"wrote {OUT.relative_to(ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
