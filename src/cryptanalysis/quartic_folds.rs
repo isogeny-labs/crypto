@@ -2175,6 +2175,11 @@ pub struct K4PipelineReport {
     pub macaulay_stored_entries: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile_offset_ops: Option<u64>,
+    /// E42 (§9.54): W's tail operations (support scans, reserve lookups,
+    /// pivot ends, fill checks, re-allocations), every call; absent for every
+    /// other solver.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tail_extent_ops: Option<u64>,
 }
 
 /// One target's trip through the solve, priced by its own counters.
@@ -2206,6 +2211,8 @@ struct TargetOut {
     /// E40: stored Macaulay cells and offset operations (profile solver).
     stored: u64,
     offset_ops: u64,
+    /// E42: W's tail operations.
+    tail_ops: u64,
 }
 
 /// Decompose `r` over the base by the weighted `D₄` solve at degree 26:
@@ -2309,6 +2316,7 @@ fn d4_decompose(
         pivot: [0; 4],
         stored: 0,
         offset_ops: 0,
+        tail_ops: 0,
     }
 }
 
@@ -2447,7 +2455,7 @@ fn collect_and_solve(
     let (mut targets_decomposed, mut rows_readded, mut rows_readd_failures) = (0u64, 0u64, 0u64);
     let (mut gen_muls, mut weil_muls, mut solve_muls) = (0u64, 0u64, 0u64);
     let (mut lift_muls, mut check_muls, mut entries) = (0u64, 0u64, 0u64);
-    let (mut stored, mut offset_ops) = (0u64, 0u64);
+    let (mut stored, mut offset_ops, mut tail_ops) = (0u64, 0u64, 0u64);
     let mut solve_ms = 0.0;
     let threads = rayon::current_num_threads().max(1);
     let salt = stream_salt();
@@ -2501,6 +2509,7 @@ fn collect_and_solve(
             entries += o.entries;
             stored += o.stored;
             offset_ops += o.offset_ops;
+            tail_ops += o.tail_ops;
             solve_ms += o.ms;
             rational += o.rational as u64;
             lifted += o.lifted as u64;
@@ -2591,9 +2600,13 @@ fn collect_and_solve(
     let counted = solver
         .and_then(super::klein_v4::V4Solver::parse)
         .is_some_and(|v| v.counts_pivots());
-    let profile = solver
+    let tails = solver
         .and_then(super::klein_v4::V4Solver::parse)
-        .is_some_and(|v| v == super::klein_v4::V4Solver::ChainProfile);
+        .is_some_and(|v| v == super::klein_v4::V4Solver::ChainTails);
+    let profile = tails
+        || solver
+            .and_then(super::klein_v4::V4Solver::parse)
+            .is_some_and(|v| v == super::klein_v4::V4Solver::ChainProfile);
     Ok(K4PipelineReport {
         p,
         seed,
@@ -2651,6 +2664,7 @@ fn collect_and_solve(
         trace_learning: None,
         macaulay_stored_entries: profile.then_some(stored),
         profile_offset_ops: profile.then_some(offset_ops),
+        tail_extent_ops: tails.then_some(tail_ops),
     })
 }
 
@@ -3199,6 +3213,7 @@ fn v4_decompose(
         pivot: [0; 4],
         stored: 0,
         offset_ops: 0,
+        tail_ops: 0,
     };
     let before = c.f.muls();
     let Some(z_r) = ki.z_of_x(&c.f, &r.x) else {
@@ -3283,7 +3298,10 @@ fn v4_decompose(
         ],
         // E40: a fallback call is charged A's convention, so the profile
         // gains nothing there.
-        stored: if solver == kv::V4Solver::ChainProfile {
+        stored: if matches!(
+            solver,
+            kv::V4Solver::ChainProfile | kv::V4Solver::ChainTails
+        ) {
             if fallback {
                 st.rows as u64 * st.cols as u64 * 2
             } else {
@@ -3293,6 +3311,7 @@ fn v4_decompose(
             0
         },
         offset_ops: st.profile_offset_ops,
+        tail_ops: st.tail_extent_ops,
     }
 }
 

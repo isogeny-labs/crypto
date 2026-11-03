@@ -1376,6 +1376,11 @@ pub struct QuarticSolve {
     /// offset); zero and absent for every other solver.
     #[serde(skip_serializing_if = "is_zero")]
     pub profile_offset_ops: u64,
+    /// E42 (§9.54): native operations W's reserved tails add (support
+    /// scans, reserve lookups, pivot ends, fill checks, re-allocations);
+    /// zero and absent for every other solver.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub tail_extent_ops: u64,
 }
 
 fn is_zero(v: &u64) -> bool {
