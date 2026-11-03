@@ -1,0 +1,31 @@
+{
+  "recorded_at": "2026-11-03T22:45:47.731264+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-bitplanes/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-bitplanes-20261103/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-bitplanes-20261103/tests",
+        "--test-threads=1"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 33,
+  "binary_sha256": "c25ec6dc788c57dd5f5e8e8387a22f4ef9b42e088234e140e32cd3ce415d766f",
+  "comparative_panel": false
+}
