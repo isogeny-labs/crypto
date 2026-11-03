@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "id": "KOBLITZ-R98-MARKED23-LAMBDA-DENOMINATORS",
-  "version": 1,
+  "version": 2,
   "goal": "audit the finite pole support of the actual degree-16 lambda equation in the accepted degree-112 marked-23 source",
   "claims": [{"id":"lambda_denominators98","class":"exact_computation","statement":"every denominator token in G51 is a power of x, with a checked maximal exponent"}],
   "arms": {"reference":"R51/R63 source-bound donor","candidate":"exhaustive slash-position denominator scanner","positive":["source-hash match","nonempty denominator list"],"negative":["planted x+1 denominator rejection"],"baseline":{"not_applicable_reason":"exact source audit"},"A_A":{"not_applicable_reason":"deterministic exact source audit"}},
@@ -11,6 +11,6 @@
   "sample_size": {"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
   "metrics": ["denominator count","maximum exponent","corruption rejection","fresh replay"],
   "execution": {"backend":"source-bound local Python 3","backend_reason":"exact source text audit requires no remote compute","timeout_seconds_per_program":30,"threads":1,"seed":98,"queue":"one serial source audit","source_gate":"commit protocol and checker before execution","checkpoint":"immutable donor hash and committed result"},
-  "stopping": {"accept":"source hash, exhaustive scan, planted corruption rejected, fresh byte-identical replay","failure":"retain failure and amend with a new attempt"},
+  "stopping": {"accept":"source hash, exhaustive scan, planted corruption rejected, fresh byte-identical replay","failure":"retain failure and amend with a new attempt; attempt 01 failed to plant the mutation inside G51"},
   "analysis": {"method":"scan all division tokens in G51 and verify syntactic power-of-x denominators","scope":"finite pole support of displayed lambda monogenic equation; not normalized ramification"}
 }

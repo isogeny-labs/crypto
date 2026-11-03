@@ -49,8 +49,12 @@ def main() -> None:
     result["donor_sha256"] = actual_hash
     result["donor_bytes"] = len(data)
     # The negative control must traverse the same scan and be rejected.
-    corrupted = data.decode("ascii").replace("/(x^161)", "/(x+1)", 1)
-    if corrupted == data.decode("ascii"):
+    source = data.decode("ascii")
+    corrupted = ASSIGNMENT.sub(
+        lambda match: match.group(0).replace("/(x^161)", "/(x+1)", 1),
+        source,
+    )
+    if corrupted == source:
         raise ValueError("negative control was not planted")
     try:
         audit(corrupted)
