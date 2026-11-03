@@ -313,3 +313,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Truncated polynomial products
 
 [feature-native-low-product](feature-native-low-product/README.md) adds a low-coefficient Karatsuba product and routes five Newton/quotient/remainder callsites through it. All66 native methods pass, including936 dual-reference low-product cases and8 complete recoveries. Source locks pass; derivation and inspected report retained. No counted comparison or timing panel; previous matched binary/protocol unchanged.
+
+## Isolated low-product accounting
+
+[feature-native-low-matched](feature-native-low-matched/README.md) uses monic baseline/A-A and truncated monic candidate. Six non-polynomial modules are byte-identical; seven reverse transforms and29 dependency hashes pass. Two selected instrument tests pass,85 filtered: triangular leaf hooks and all8 recovery receipts. Separate source/binary/analysis-bound draft validates; no comparison panel or cloud job.
