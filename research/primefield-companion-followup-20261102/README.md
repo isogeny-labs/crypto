@@ -247,3 +247,9 @@ the two omitted mates,173/440. A reusable rectangular reference factor and
 full coefficient program are preserved; no timing or recovery-panel claim.
 See `certificate/program.json`, `check_certificate.py`, the exact receipt and
 inspected PDF. Factor reload solving remains a separate unchecked operation.
+
+## Preserved decoder binding
+
+`feature-decoder-binding/` binds the verified repaired coefficients to the byte-preserved original decoder. Three receipted local test methods cover four recorded sign-oracle fixtures, strict sign validation and mutation isolation, and persisted-factor reload reproducing the full-field verified program. These are recorded API checks; fresh source cases remain zero. See its derivation, report, receipt and complete-cohort validation plan.
+
+This publication preserves the completed standalone Python source snapshot and receipts as historical evidence under the repository language policy. It is not a native execution deliverable. Further algorithm execution-path development must use a native implementation retaining these contracts and fixtures.
