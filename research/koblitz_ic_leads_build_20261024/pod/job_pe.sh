@@ -27,7 +27,7 @@ for k in $DRAWS; do
   [ -f "$CK/d$k.ckpt" ] && log "pe5 d$k: resuming from checkpoint ($(stat -c %s "$CK/d$k.ckpt") bytes)"
   log "pe5 d$k: start"
   s=$(date +%s)
-  (cd "$IN" && /usr/bin/time -v ./pe_closure --draws m3-19-7.jsonl --draw "$k" --degree 5 \
+  (cd "$IN" && ./pe_closure --draws m3-19-7.jsonl --draw "$k" --degree 5 \
       --mode partial --batch 64 --max-cols 1200000 \
       --checkpoint "$CK/d$k.ckpt" --checkpoint-every "${CKPT_EVERY:-1800}") \
     > "$rec.tmp" 2>> "$R/pe5-m3-19-7.d$k.log"
