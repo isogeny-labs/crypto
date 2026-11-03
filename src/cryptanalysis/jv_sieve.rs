@@ -1789,9 +1789,10 @@ fn sieve_batch(
     out
 }
 
-/// `name` unset, or set to anything but `0`.
+/// Opt-in: `name` set to anything but `0` (unset: off, so the default route
+/// stays bit-identical to the records made before these switches existed).
 fn adds_switch(name: &str) -> bool {
-    std::env::var(name).map_or(true, |v| v != "0")
+    std::env::var(name).is_ok_and(|v| v != "0")
 }
 
 /// The route with the sieve: relations among factor-base points by the
