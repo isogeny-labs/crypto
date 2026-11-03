@@ -63,3 +63,40 @@ cargo run --release --example pkm_aux_seed_panel -- --p 14680063 \
 cargo run --release --example pkm_aux_seed_panel -- --p 14680063 \
   --t 8,10,12,14 --seeds 16 --family z2xz8 --out panel_z2xz8.jsonl
 ```
+
+## Addendum: the wide backend, and the 61-bit data point (same day)
+
+`pkm_aux_seed_panel --wide` runs the same panel on the `FpWide<1>`
+backend through `prime_tower_wide::isogeny_tower_wide` — the multi-limb
+construction behind the P-192 runs
+(`research/pkm_isogeny_wide_p192_20261101/`).  Two panels, 16 seeds per
+`(t)`, family `any`:
+
+**Cross-check at the same prime `p = 14,680,063`** (wide1 against the u64
+plug-in above; the rng streams differ, so this is a statistical, not
+per-seed, comparison):
+
+| backend | t | mean tried | tried/2^t | GAE/curve |
+|:--|--:|--:|--:|--:|
+| u64 | 8, 10, 12 | 221, 434, 5,075 | 0.87, 0.42, 1.24 | 50, 40, 35 |
+| wide1 | 8, 10, 12 | 188, 542, 3,463 | 0.74, 0.53, 0.85 | 52, 42, 37 |
+
+Indistinguishable at this seed count (the spread is two to three orders
+of magnitude): the wide search is the same instrument.
+
+**The top of the u64 range, `p = 2^61 − 1`** (`panel_wide1_p61.jsonl`):
+
+| t | mean tried | tried/2^t | GAE/curve | mean wall |
+|--:|--:|--:|--:|--:|
+| 8 | 156.0 | 0.609 | 11,030 | 2.4 s |
+| 10 | 898.1 | 0.877 | 5,231 | 6.4 s |
+| 12 | 1,859.8 | 0.454 | 2,624 | 8.8 s |
+
+Reading: the per-curve cost has risen from ≈ 35–50 GAE at 14.7M to ≈
+2.6–11k GAE at 2^61, consistent with the `Θ(p^{1/4})` Mestre/BSGS cost
+(`2^{15}` at 61 bits, with the table split shifting in `t`).  A whole
+build stays practical (≤ 9 s).  Extrapolated to P-192, `2^{45}`–`2^{48}`
+GAE per accepted curve — the recorded caveat of
+`prime_tower_wide`: at NIST size the ordinary search is an instrument
+for small primes; the supersingular auxiliary curve (no search) is the
+route, as `research/pkm_supersingular_aux_20261015/` concluded.
