@@ -87,3 +87,22 @@ dropped and the 2-descent claim goes to an errata note.
   target abscissa only differs) are claims for a later engine step.
 - This is not a leaderboard row. The algebraic track's distance to rho is
   unchanged by a census.
+
+## Addendum A (frozen before its runs): T2 engine cost, k = 20
+
+The exploratory engine pilot in `engine_pilot/` (square-bits at lo = 0,
+compared with the parent's bits at lo = 0) showed F4 mul-adds/target rising
+2.1–5.1× for T2: solving degree 6 → 9 and terms 256 → 961 at t = 5, G = 0.
+That eats most of the 2× coverage.
+
+- **Confirmation.** k = 20, G = 3, t ∈ {4, 5}, 100 targets, seed
+  2026111500 + t. Compare:
+  - `bits@L` at the frame-only selected plain frame from `data/k20.json`:
+    L = 797820 (t = 4), L = 233902 (t = 5);
+  - `square-bits@L` at the **oracle-best** T2 frame from the same file:
+    L = 984071 (t = 4), L = 414271 (t = 5). This choice is deliberately
+    favourable to T2.
+- **E1 (prediction from the pilot).** T2's F4 mul-adds per relation (at exact
+  coverage) is ≥ the plain frame's in both cells. Then T2 is closed in the
+  bit-encoded F4 form. If T2 is cheaper in either cell, T2 stays open and goes
+  to a full confirmation.
