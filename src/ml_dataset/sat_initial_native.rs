@@ -1,5 +1,7 @@
 //! Actual native Solver installation and fresh-observer capture. This stage
 //! deliberately exposes no solve method: search-prefix admission comes next.
+#[path = "sat_initial_checkpoint.rs"]
+pub(in crate::ml_dataset::solvers) mod checkpoint;
 #[path = "sat_initial_packed.rs"]
 mod packed;
 use super::*;
@@ -100,8 +102,10 @@ fn quote(
 
 /// All original evidence remains owned across native or capture failure.
 struct Evidence<'a> {
-    original: &'a VerifiedWorkerOriginal<'a>,
+    original: Option<&'a VerifiedWorkerOriginal<'a>>,
+    original_hashes: ([u8; 32], [u8; 32]),
     binding: [u8; 32],
+    launch_sha256: [u8; 32],
     math: Math,
     checked: Option<provenance::CheckedMap>,
     unchecked: Option<provenance::Map>,
@@ -433,6 +437,7 @@ impl<'a> NativeInitial<'a> {
             original,
             budget,
             binding,
+            launch_sha256,
             math,
             checked,
             retained_unchecked,
@@ -466,8 +471,10 @@ impl<'a> NativeInitial<'a> {
         }));
         let mut stage = Self {
             evidence: Evidence {
-                original,
+                original_hashes: (original.public_sha256, original.factor_base_sha256),
+                original: Some(original),
                 binding,
+                launch_sha256,
                 math,
                 checked,
                 unchecked: retained_unchecked,
@@ -1230,5 +1237,44 @@ mod tests {
         assert!(state.seal_ack.is_none());
         assert!(!state.events.is_empty());
         assert_eq!(solver.stats.decisions, 0);
+    }
+}
+
+impl NativeInitial<'_> {
+    /// Move every owned native/evidence buffer. No clone, allocation, new budget,
+    /// observer or sink. Fixed original hashes survive the ended borrowed token.
+    pub(super) fn detach(self) -> NativeInitial<'static> {
+        let Evidence {
+            original: _,
+            original_hashes,
+            binding,
+            launch_sha256,
+            math,
+            checked,
+            unchecked,
+            pattern,
+            map_bytes,
+            map_ack,
+            publication_attempted,
+            map_published,
+        } = self.evidence;
+        NativeInitial {
+            evidence: Evidence {
+                original: None,
+                original_hashes,
+                binding,
+                launch_sha256,
+                math,
+                checked,
+                unchecked,
+                pattern,
+                map_bytes,
+                map_ack,
+                publication_attempted,
+                map_published,
+            },
+            shared: self.shared,
+            solver: self.solver,
+        }
     }
 }

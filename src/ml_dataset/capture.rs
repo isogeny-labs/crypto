@@ -2033,6 +2033,62 @@ pub(super) fn verify_live_committed_prefix_visit(
     limits: &CaptureLimits,
     visit: &mut impl FnMut(&[u8]) -> Result<(), String>,
 ) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit_bound(cell_dir, binding, limits, None, &mut |phase, line| {
+        if phase == RecordPhase::Authenticated {
+            visit(line)
+        } else {
+            Ok(())
+        }
+    })
+}
+
+/// Read-only replay pinned to the caller's already admitted exact head.
+/// Check before any stream read/record parse, so a larger substituted head
+/// cannot consume work or allocations outside that caller's admitted prefix.
+pub(super) fn verify_live_committed_prefix_visit_at_head(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: &CommittedHead,
+    visit: &mut impl FnMut(&[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit_bound(
+        cell_dir,
+        binding,
+        limits,
+        Some(expected),
+        &mut |phase, line| {
+            if phase == RecordPhase::Authenticated {
+                visit(line)
+            } else {
+                Ok(())
+            }
+        },
+    )
+}
+/// BeforeRecordDecode occurs after exact head and record-size checks, before
+/// any EventRecord allocation. No observation is accepted until full traversal.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum RecordPhase {
+    BeforeRecordDecode,
+    Authenticated,
+}
+pub(super) fn verify_live_committed_prefix_visit_at_head_preflight(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: &CommittedHead,
+    visit: &mut impl FnMut(RecordPhase, &[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit_bound(cell_dir, binding, limits, Some(expected), visit)
+}
+fn verify_live_committed_prefix_visit_bound(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: Option<&CommittedHead>,
+    visit: &mut impl FnMut(RecordPhase, &[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
     binding.validate()?;
     limits.validate()?;
     let cell = storage::root_dir(cell_dir, false)?;
@@ -2048,6 +2104,9 @@ pub(super) fn verify_live_committed_prefix_visit(
         return Ok(None);
     }
     let head: CommittedHead = read_json(&live, "committed.json", limits.metadata_reserve_bytes)?;
+    if expected.is_some_and(|admitted| admitted != &head) {
+        return Err("capture head differs from admitted replay endpoint".into());
+    }
     let mut cursor = CaptureCursor::initial(binding)?;
     validate_head(&head, binding, &cursor)?;
     if head.byte_end > limits.max_stream_bytes
@@ -2077,13 +2136,14 @@ pub(super) fn verify_live_committed_prefix_visit(
         if cursor.event_count >= head.event_count || line.len() as u64 > limits.max_event_bytes {
             return Err("committed event exceeds configured record bounds".into());
         }
+        visit(RecordPhase::BeforeRecordDecode, &line)?;
         let (hash, payload) = check_record(
             &line,
             &binding_sha,
             cursor.event_count + 1,
             &cursor.last_event_sha256,
         )?;
-        visit(&line)?;
+        visit(RecordPhase::Authenticated, &line)?;
         cursor.event_count += 1;
         cursor.byte_end += line.len() as u64;
         cursor.last_event_sha256 = hash;
@@ -2446,6 +2506,129 @@ pub fn verify_captured_delta(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn real_head_preparse_refusal_prevents_authenticated_visit_and_retains_raw() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        emitter.event(&json!({"kind":"probe","value":1})).unwrap();
+        let head = emitter.head.clone();
+        let mut raw = Vec::new();
+        let mut authenticated = 0;
+        let failed = verify_live_committed_prefix_visit_at_head_preflight(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &head,
+            &mut |phase, line| {
+                if phase == RecordPhase::BeforeRecordDecode {
+                    raw.extend_from_slice(line);
+                    return Err("fixture preparse admission refused".into());
+                }
+                authenticated += 1;
+                Ok(())
+            },
+        );
+        assert!(matches!(failed, Err(ref e) if e == "fixture preparse admission refused"));
+        assert!(!raw.is_empty());
+        assert_eq!(authenticated, 0);
+        let mut phases = Vec::new();
+        verify_live_committed_prefix_visit_at_head_preflight(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &head,
+            &mut |phase, _| {
+                phases.push(phase);
+                Ok(())
+            },
+        )
+        .unwrap()
+        .unwrap();
+        assert!(phases == [RecordPhase::BeforeRecordDecode, RecordPhase::Authenticated]);
+    }
+    #[test]
+    fn replay_head_is_bound_before_any_substituted_prefix_visit() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        emitter.event(&json!({"kind":"probe","value":1})).unwrap();
+        let a = emitter.head.clone();
+        let mut visited = 0;
+        verify_live_committed_prefix_visit_at_head(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &a,
+            &mut |_| {
+                visited += 1;
+                Ok(())
+            },
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(visited, 1);
+        for field in 0..5 {
+            let mut other = a.clone();
+            match field {
+                0 => other.byte_end += 1,
+                1 => other.event_count += 1,
+                2 => other.last_event_sha256 = "9".repeat(64),
+                3 => other.payload_count += 1,
+                _ => other.payload_bytes += 1,
+            }
+            let mut calls = 0;
+            let result = verify_live_committed_prefix_visit_at_head(
+                &f.cell(),
+                &binding(),
+                &limits(),
+                &other,
+                &mut |_| {
+                    calls += 1;
+                    Ok(())
+                },
+            );
+            assert!(result.is_err());
+            assert_eq!(calls, 0);
+        }
+        emitter.event(&json!({"kind":"probe","value":2})).unwrap();
+        let mut calls = 0;
+        // B is now on disk. A callback which restores A must never be reached.
+        let result = verify_live_committed_prefix_visit_at_head(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &a,
+            &mut |_| {
+                calls += 1;
+                fs::write(
+                    f.live().join("committed.json"),
+                    serde_json::to_vec(&a).unwrap(),
+                )
+                .map_err(|e| e.to_string())?;
+                Ok(())
+            },
+        );
+        assert!(result.is_err());
+        assert_eq!(calls, 0);
+        fs::write(
+            f.live().join("committed.json"),
+            serde_json::to_vec(&a).unwrap(),
+        )
+        .unwrap();
+        let mut restored = 0;
+        verify_live_committed_prefix_visit_at_head(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &a,
+            &mut |_| {
+                restored += 1;
+                Ok(())
+            },
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(restored, 1);
+    }
 
     struct Fixture(PathBuf);
     impl Fixture {

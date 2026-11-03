@@ -1,0 +1,473 @@
+{
+  "schema": "exact-sat-structural-runtime-inventory/v1",
+  "source_composite_manifest": "14b4d3a80ebe5a555a3e44c1d7f68edfa2492e1d5723b3b51467854d1f82004d",
+  "parents": {
+    "/home/ec2-user/ml-dataset-resume-20261029/sat-composite-focused-test-inventory-20261102/TESTS.json": "ee79426f77bf762e6663c69a39c87408cffb351f2b4f4c6369c957ac071adcca",
+    "/home/ec2-user/ml-dataset-resume-20261029/sat-structural-moves-composite-20261102/TESTS.json": "74541a57726dab1d58ed5d5ac6b22bb07a99781ac8fca2ee3949494c30a02b1c"
+  },
+  "tests": [
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::transcript::tests::imported_real_native_snapshot_round_trip_and_mutation_controls",
+      "source_path": "src/ml_dataset/sat_initial_replay.rs",
+      "source_sha256": "1e8efcd860c992f84f45c4328733e665eb79f2d1ce1ca24a42d4fd613f6b578f",
+      "scope": "component",
+      "justification": "Independent imported transcript roundtrip and semantic mutation checks, separate from central read admission.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::transcript::tests::imported_real_native_snapshot_round_trip_and_mutation_controls",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::tests::actual_construction_matches_legacy_formula_and_rejects_resealed_mutations",
+      "source_path": "src/cryptanalysis/binary_semaev_chain_provenance.rs",
+      "source_sha256": "5910083bbf7c442455d1e60881ce59eb966710c50f0f533bd8a2f259326fda58",
+      "scope": "component",
+      "justification": "Original-map mathematical equivalence, resealed mutation refusal and retained charged failure.",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::tests::actual_construction_matches_legacy_formula_and_rejects_resealed_mutations",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::tests::tiny_field_formula_has_exact_scalar_s3_meaning",
+      "source_path": "src/cryptanalysis/binary_semaev_chain_provenance.rs",
+      "source_sha256": "5910083bbf7c442455d1e60881ce59eb966710c50f0f533bd8a2f259326fda58",
+      "scope": "component",
+      "justification": "Original-map mathematical equivalence, resealed mutation refusal and retained charged failure.",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::tests::tiny_field_formula_has_exact_scalar_s3_meaning",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::tests::final_refusal_retains_complete_untrusted_map",
+      "source_path": "src/cryptanalysis/binary_semaev_chain_provenance.rs",
+      "source_sha256": "5910083bbf7c442455d1e60881ce59eb966710c50f0f533bd8a2f259326fda58",
+      "scope": "component",
+      "justification": "Original-map mathematical equivalence, resealed mutation refusal and retained charged failure.",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::tests::final_refusal_retains_complete_untrusted_map",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::tests::validation_refusals_pay_original_owner_and_actual_incidence_quote",
+      "source_path": "src/cryptanalysis/binary_semaev_chain_provenance.rs",
+      "source_sha256": "5910083bbf7c442455d1e60881ce59eb966710c50f0f533bd8a2f259326fda58",
+      "scope": "component",
+      "justification": "Original-map mathematical equivalence, resealed mutation refusal and retained charged failure.",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::tests::validation_refusals_pay_original_owner_and_actual_incidence_quote",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::tests::actual_map_exact_round_trip_and_corruption_retention",
+      "source_path": "src/cryptanalysis/binary_semaev_chain_gate_wire.rs",
+      "source_sha256": "5c4cdddf6d69ea6c07424f15545cbdc80c2657dbc767239f9093a6b732d67ff8",
+      "scope": "component",
+      "justification": "Current typed compact-map roundtrip/corruption controls, before pending structural decoder.",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::tests::actual_map_exact_round_trip_and_corruption_retention",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::capture::tests::replay_head_is_bound_before_any_substituted_prefix_visit",
+      "source_path": "src/ml_dataset/capture.rs",
+      "source_sha256": "6740703f491b4b7253d9e50d3d02301025fb13fc1527a82bb0b4d84b4728482d",
+      "scope": "component",
+      "justification": "Actual emitter substitution/ABA guard before visitor reads.",
+      "argv_suffix": [
+        "ml_dataset::capture::tests::replay_head_is_bound_before_any_substituted_prefix_visit",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::endpoint_tests::exact_endpoint_rejects_each_semantic_substitution",
+      "source_path": "src/ml_dataset/sat_initial_central.rs",
+      "source_sha256": "20747be7dd497c2c50db7e9c79e392505df53ac93ea68ed948e5d709f39057a3",
+      "scope": "component",
+      "justification": "Exact visited endpoint, ABA and pre-allocation admission controls.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::endpoint_tests::exact_endpoint_rejects_each_semantic_substitution",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::endpoint_tests::aba_restored_head_cannot_certify_visited_b",
+      "source_path": "src/ml_dataset/sat_initial_central.rs",
+      "source_sha256": "20747be7dd497c2c50db7e9c79e392505df53ac93ea68ed948e5d709f39057a3",
+      "scope": "component",
+      "justification": "Exact visited endpoint, ABA and pre-allocation admission controls.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::endpoint_tests::aba_restored_head_cannot_certify_visited_b",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::endpoint_tests::refusal_precedes_pending_line_or_payload_materialization",
+      "source_path": "src/ml_dataset/sat_initial_central.rs",
+      "source_sha256": "20747be7dd497c2c50db7e9c79e392505df53ac93ea68ed948e5d709f39057a3",
+      "scope": "component",
+      "justification": "Exact visited endpoint, ABA and pre-allocation admission controls.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::endpoint_tests::refusal_precedes_pending_line_or_payload_materialization",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::tests::admitted_replay_refusal_is_cumulative_and_sticky",
+      "source_path": "src/ml_dataset/sat_initial_central.rs",
+      "source_sha256": "20747be7dd497c2c50db7e9c79e392505df53ac93ea68ed948e5d709f39057a3",
+      "scope": "component",
+      "justification": "Central cumulative shared replay ledger and bounded launch representation.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::tests::admitted_replay_refusal_is_cumulative_and_sticky",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::tests::launch_canonical_hash_has_a_real_hard_cap",
+      "source_path": "src/ml_dataset/sat_initial_central.rs",
+      "source_sha256": "20747be7dd497c2c50db7e9c79e392505df53ac93ea68ed948e5d709f39057a3",
+      "scope": "component",
+      "justification": "Central cumulative shared replay ledger and bounded launch representation.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::tests::launch_canonical_hash_has_a_real_hard_cap",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::map_path_tests::canonical_pattern_is_only_expectation_not_map_authority",
+      "source_path": "src/ml_dataset/sat_initial_central.rs",
+      "source_sha256": "20747be7dd497c2c50db7e9c79e392505df53ac93ea68ed948e5d709f39057a3",
+      "scope": "component",
+      "justification": "Strict filename grammar; mathematical map authority remains independent.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::map_path_tests::canonical_pattern_is_only_expectation_not_map_authority",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::retained_read::tests::exact_length_sentinel_and_partial_error_preserve_buffer",
+      "source_path": "src/ml_dataset/sat_initial_read.rs",
+      "source_sha256": "761b6a22461880eda7cb683221fe32c2824887cc1332c454bdd124f63a973a56",
+      "scope": "component",
+      "justification": "Exact length plus sentinel, short/error retention and actual-length admission rather than cap-sized allocation.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::retained_read::tests::exact_length_sentinel_and_partial_error_preserve_buffer",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::retained_read::tests::actual_small_file_charges_actual_length_not_cap_and_refusal_retains_owner",
+      "source_path": "src/ml_dataset/sat_initial_read.rs",
+      "source_sha256": "761b6a22461880eda7cb683221fe32c2824887cc1332c454bdd124f63a973a56",
+      "scope": "component",
+      "justification": "Exact length plus sentinel, short/error retention and actual-length admission rather than cap-sized allocation.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::retained_read::tests::actual_small_file_charges_actual_length_not_cap_and_refusal_retains_owner",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::original_math::tests::scalar_schedule_matches_actual_binary_loop",
+      "source_path": "src/ml_dataset/sat_original_math_preflight.rs",
+      "source_sha256": "3ee986c51ccf9d75603959a7ca16390e792e6ce505120dbc12e8939098fde563",
+      "scope": "component",
+      "justification": "Independent exact scalar schedule count; does not measure inherited work tariff.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::original_math::tests::scalar_schedule_matches_actual_binary_loop",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::original_math::actual_original_tests::bounded_actual_legacy_originals_match_full_reconstruction_both_twists",
+      "source_path": "src/ml_dataset/sat_original_math_preflight.rs",
+      "source_sha256": "3ee986c51ccf9d75603959a7ca16390e792e6ce505120dbc12e8939098fde563",
+      "scope": "extended existing strict positive; actual move-materialization equality before original reconstruction",
+      "justification": "Genuine both-twist Legacy reconstruction; zero coordinate/lift bounds, deadline and counter mutation refusal; standalone original-math budget only.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::original_math::actual_original_tests::bounded_actual_legacy_originals_match_full_reconstruction_both_twists",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::ledger::tests::joined_monotone_and_no_inferred_legacy_success",
+      "source_path": "src/ml_dataset/sat_producer_ledger.rs",
+      "source_sha256": "81096fabe3bdadc0e25cee11fa963e54bb9acf476c15613d76e843dbe3576ba2",
+      "scope": "component",
+      "justification": "Same ledger implementation compiled under replay and producer; sticky/cumulative joins and maximum checkpoint envelope.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::ledger::tests::joined_monotone_and_no_inferred_legacy_success",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::ledger::tests::actual_maximum_capture_envelope_fits_prepayment",
+      "source_path": "src/ml_dataset/sat_producer_ledger.rs",
+      "source_sha256": "81096fabe3bdadc0e25cee11fa963e54bb9acf476c15613d76e843dbe3576ba2",
+      "scope": "component",
+      "justification": "Same ledger implementation compiled under replay and producer; sticky/cumulative joins and maximum checkpoint envelope.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::ledger::tests::actual_maximum_capture_envelope_fits_prepayment",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::checkpoint::ledger::tests::joined_monotone_and_no_inferred_legacy_success",
+      "source_path": "src/ml_dataset/sat_producer_ledger.rs",
+      "source_sha256": "81096fabe3bdadc0e25cee11fa963e54bb9acf476c15613d76e843dbe3576ba2",
+      "scope": "component",
+      "justification": "Same ledger implementation compiled under replay and producer; sticky/cumulative joins and maximum checkpoint envelope.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::checkpoint::ledger::tests::joined_monotone_and_no_inferred_legacy_success",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::checkpoint::ledger::tests::actual_maximum_capture_envelope_fits_prepayment",
+      "source_path": "src/ml_dataset/sat_producer_ledger.rs",
+      "source_sha256": "81096fabe3bdadc0e25cee11fa963e54bb9acf476c15613d76e843dbe3576ba2",
+      "scope": "component",
+      "justification": "Same ledger implementation compiled under replay and producer; sticky/cumulative joins and maximum checkpoint envelope.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::checkpoint::ledger::tests::actual_maximum_capture_envelope_fits_prepayment",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::actual_capture_head_failure_retains_accepted_native_and_encoded_tail",
+      "source_path": "src/ml_dataset/sat_initial_native.rs",
+      "source_sha256": "7f40ca6c440e3d4ad1ca6119a987ba2f1dc50692f2c2ac1db5b1abe405f3d1b0",
+      "scope": "component",
+      "justification": "Actual native/capture failures retain paid prefix; mutation prevents success marker.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::actual_capture_head_failure_retains_accepted_native_and_encoded_tail",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::prepaid_pending_event_survives_original_deadline_or_work_stop",
+      "source_path": "src/ml_dataset/sat_initial_native.rs",
+      "source_sha256": "7f40ca6c440e3d4ad1ca6119a987ba2f1dc50692f2c2ac1db5b1abe405f3d1b0",
+      "scope": "component",
+      "justification": "Actual native/capture failures retain paid prefix; mutation prevents success marker.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::prepaid_pending_event_survives_original_deadline_or_work_stop",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::real_native_snapshot_mutation_refuses_marker_and_preserves_owned_prefix",
+      "source_path": "src/ml_dataset/sat_initial_native.rs",
+      "source_sha256": "7f40ca6c440e3d4ad1ca6119a987ba2f1dc50692f2c2ac1db5b1abe405f3d1b0",
+      "scope": "component",
+      "justification": "Actual native/capture failures retain paid prefix; mutation prevents success marker.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::real_native_snapshot_mutation_refuses_marker_and_preserves_owned_prefix",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::worker::shared_receipt_tests::maximum_closed_parent_outcome_fits_admitted_bound",
+      "source_path": "src/ml_dataset/sat_initial_worker.rs",
+      "source_sha256": "40a886c1cfefbd47bfc6935763059b178ebbe3b5fa076f76538e4d9e2e67be34",
+      "scope": "component",
+      "justification": "Closed 512-byte result envelope control.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::worker::shared_receipt_tests::maximum_closed_parent_outcome_fits_admitted_bound",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::worker::shared_receipt_tests::real_compact_shared_receipt_preserves_original_owner_and_caps",
+      "source_path": "src/ml_dataset/sat_initial_worker.rs",
+      "source_sha256": "40a886c1cfefbd47bfc6935763059b178ebbe3b5fa076f76538e4d9e2e67be34",
+      "scope": "required_positive_producer",
+      "justification": "Genuine both-twist same-budget producer checkpoint, owner detach, one-shot outcome and no duplicate capture publication. Does not invoke central historical replay.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::worker::shared_receipt_tests::real_compact_shared_receipt_preserves_original_owner_and_caps",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::requested_profile_owner_map_native_snapshot_chain_requires_real_success",
+      "source_path": "src/ml_dataset/sat_initial_native.rs",
+      "source_sha256": "7f40ca6c440e3d4ad1ca6119a987ba2f1dc50692f2c2ac1db5b1abe405f3d1b0",
+      "scope": "required_positive_producer",
+      "justification": "Unchanged genuine original-cap native producer positive, separate from full historical replay.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::initial_native::tests::requested_profile_owner_map_native_snapshot_chain_requires_real_success",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::tests::requested_profile_persisted_initial_and_ledger_require_real_success",
+      "source_path": "src/ml_dataset/sat_initial_central.rs",
+      "source_sha256": "20747be7dd497c2c50db7e9c79e392505df53ac93ea68ed948e5d709f39057a3",
+      "scope": "required central correctness positive: unchanged original producer caps; separate historical replay allowance1e12 work/8e9 bytes",
+      "justification": "Actual original-cap producer capture plus authenticated historical replay under an independently authorized generous Policy (1,000,000,000,000 work and8,000,000,000 bytes). Tests correctness, not64Mi-work/16Mi-byte replay fit. Earlier deferral was real, but its old16Mi no-fit rationale did not apply to this exact test.",
+      "argv_suffix": [
+        "ml_dataset::solvers::koblitz_m3::sat_original_owner::central::tests::requested_profile_persisted_initial_and_ledger_require_real_success",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::semantic_shapes_and_malformed_controls",
+      "scope": "new structural scanner control",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::semantic_shapes_and_malformed_controls",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false,
+      "source_path": "src/cryptanalysis/binary_semaev_chain_json_shape.rs",
+      "justification": "new structural scanner control",
+      "source_sha256": "be9612eb177e4db012e665274010bb26be49d3bae04e51c67233b32ae5ee9ad6"
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::deadline_checks_cover_long_escape_digit_and_space_tokens",
+      "scope": "new structural scanner control",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::deadline_checks_cover_long_escape_digit_and_space_tokens",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false,
+      "source_path": "src/cryptanalysis/binary_semaev_chain_json_shape.rs",
+      "justification": "new structural scanner control",
+      "source_sha256": "be9612eb177e4db012e665274010bb26be49d3bae04e51c67233b32ae5ee9ad6"
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::explicit_stack_stays_fixed_and_nested_controls_match_serde",
+      "scope": "new structural scanner control",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::explicit_stack_stays_fixed_and_nested_controls_match_serde",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false,
+      "source_path": "src/cryptanalysis/binary_semaev_chain_json_shape.rs",
+      "justification": "new structural scanner control",
+      "source_sha256": "be9612eb177e4db012e665274010bb26be49d3bae04e51c67233b32ae5ee9ad6"
+    },
+    {
+      "filter": "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::deep_and_string_heavy_shapes_remain_bounded",
+      "scope": "new structural scanner control",
+      "argv_suffix": [
+        "cryptanalysis::binary_semaev_chain_sat::provenance::gate_wire::json_shape::tests::deep_and_string_heavy_shapes_remain_bounded",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false,
+      "source_path": "src/cryptanalysis/binary_semaev_chain_json_shape.rs",
+      "justification": "new structural scanner control",
+      "source_sha256": "be9612eb177e4db012e665274010bb26be49d3bae04e51c67233b32ae5ee9ad6"
+    },
+    {
+      "filter": "ml_dataset::capture::tests::real_head_preparse_refusal_prevents_authenticated_visit_and_retains_raw",
+      "scope": "new real capture predecode refusal control",
+      "argv_suffix": [
+        "ml_dataset::capture::tests::real_head_preparse_refusal_prevents_authenticated_visit_and_retains_raw",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "executed": false,
+      "source_path": "src/ml_dataset/capture.rs",
+      "justification": "new real capture predecode refusal control",
+      "source_sha256": "6740703f491b4b7253d9e50d3d02301025fb13fc1527a82bb0b4d84b4728482d"
+    }
+  ],
+  "scope_correction": "Same33 filters/assertions. Central test uses independent1e12work/8e9byte historical replay policy; original producer caps unchanged. Earlier test was deferred, notfailed; old16Mi subtotal did not justify predicting this test failure."
+}

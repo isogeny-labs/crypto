@@ -1,6 +1,8 @@
 //! Lossless gate-only JSON wire. The insertion formula is a deterministic
 //! expansion; decoded maps still pass the independent original checker.
 use super::*;
+#[path = "binary_semaev_chain_json_shape.rs"]
+pub(crate) mod json_shape;
 const SCHEMA: &str = "binary-chain-original-gate-wire/v1";
 #[derive(Serialize)]
 pub struct Encoded<'a> {
@@ -93,6 +95,26 @@ pub fn decode_checked<'a>(
         }
         let mut total = Quote { work: 0, bytes: 0 };
         let len = u64::try_from(raw.len()).map_err(|_| Error::Cap)?;
+        // The raw owner already belongs to the caller. Pay a separate scan and
+        // bounded recursion stack before structural inspection; preserve the
+        // existing 256/byte typed-parse work tariff afterward.
+        reserve(
+            admission,
+            &mut total,
+            limits,
+            len.checked_mul(8)
+                .and_then(|v| v.checked_add(1024))
+                .ok_or(Error::Cap)?,
+            32768,
+        )?;
+        let shape = json_shape::inspect(raw, || {
+            admission.check().map_err(|_| json_shape::Error::Admission)
+        })
+        .map_err(|e| match e {
+            json_shape::Error::Admission => Error::Admission,
+            _ => Error::Semantics,
+        })?;
+        let parsed_owner_bytes = shape.owner_bytes().map_err(|_| Error::Cap)?;
         reserve(
             admission,
             &mut total,
@@ -100,7 +122,7 @@ pub fn decode_checked<'a>(
             len.checked_mul(256)
                 .and_then(|v| v.checked_add(1024))
                 .ok_or(Error::Cap)?,
-            len.checked_mul(128).ok_or(Error::Cap)?,
+            parsed_owner_bytes,
         )?;
         let d: Decoded = serde_json::from_slice(raw).map_err(|_| Error::Semantics)?;
         let schema_ok = d.schema == SCHEMA;
@@ -331,8 +353,18 @@ mod tests {
                         assert!(err.retained.is_some());
                     }
                 }
-                let mut ledger = Ledger {
+                let mut scan_only = Ledger {
                     refuse_at: Some(2),
+                    ..Ledger::default()
+                };
+                let denied =
+                    decode_checked(&raw, &original, decode_caps, caps, &mut scan_only).unwrap_err();
+                assert_eq!(denied.raw, raw.as_slice());
+                assert!(denied.retained.is_none());
+                assert_eq!(scan_only.bytes, 32768);
+                assert!(scan_only.work > 0);
+                let mut ledger = Ledger {
+                    refuse_at: Some(3),
                     ..Ledger::default()
                 };
                 let failed =
