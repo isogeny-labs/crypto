@@ -36,3 +36,8 @@ for k in $DRAWS; do
   if [ "$rc" = 0 ] && [ -s "$rec.tmp" ]; then mv "$rec.tmp" "$rec"; else status "PE5 d$k FAILED rc=$rc"; fi
 done
 status DONE
+# Serve the results for SERVE_SECONDS, then end the container (budget). The
+# records and checkpoints stay on the volume.
+sleep "${SERVE_SECONDS:-2700}"
+echo "$(date -u +%FT%TZ) serving window over" >> "$OUT/STATUS"
+kill -TERM 1
