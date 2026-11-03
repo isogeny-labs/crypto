@@ -806,7 +806,7 @@ pub fn run_f2m4<S: RhoScalar>(
             name: "wiedemann".into(),
             rows: found,
             rank: rank as u64,
-            dependent: 0,
+            dependent: narrow_matrix.as_ref().map_or(0, RelationSolver::dependent),
             work,
             work_unit: "row_ops".into(),
             cost: la,
@@ -963,6 +963,10 @@ mod tests {
                 wide.report.decomposition.targets_tried
             );
             assert_eq!(one.linear_algebra.work, wide.report.linear_algebra.work);
+            assert_eq!(
+                one.linear_algebra.dependent, wide.report.linear_algebra.dependent,
+                "lp {lp}"
+            );
             assert_eq!(
                 one.decomposition.cost.native,
                 wide.report.decomposition.cost.native
