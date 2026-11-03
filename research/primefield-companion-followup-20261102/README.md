@@ -224,3 +224,15 @@ offers are at most (m+1)r/(r-K). No random sampler or field sweep is launched.
 The saved F479 width-15 failure and retained recovery panels are outside the
 strict regime. See the derivation and inspected PDF. Six Python files parse;
 dependency/import checks are static. All numerical trials remain zero.
+
+### Saved character fibers and targeted repair (2026-11-03)
+
+`feature-fiber-repair/` isolates two normalized pair differences from the saved
+F479 width-15 duals. Independent singleton checks prove no function of the old
+characters can represent X, regardless of degree. New shift15 and old shift1
+give a rank-two projected repair with target coefficients [405,0]. Thus
+X-405*chi(X+15) lies in the old cubic span conditional on the preserved rank477
+result. Constructing its old-feature coefficients remains next. Five bounded
+local exact/software test methods passed, including F7 checks for the preceding
+coefficient and signature primitives. No cloud run or performance comparison.
+See the exact packet, independent check, test receipt, derivation and inspected PDF.
