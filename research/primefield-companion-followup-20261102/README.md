@@ -273,3 +273,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Native mixed-stride shared window
 
 `feature-native-window/` preserves identity/prepared-P/generated projective initialization and mixed stride updates, then converts all finite lanes once. Four native unit methods pass, including exact agreement with1426 saved slots and64 public shifts across O,P,2P,-P windows. Extra public-prefix validation is charged separately. Prepared state is immutable and curve-borrowed. See source/fixture locks, projection script, receipts and inspected report. The production API currently consumes public shifted points; a next cost-reduction candidate is generating those points projectively and converting them alongside the grid lanes. That candidate is not implemented or measured here.
+
+## Joint conversion of generated shifts and grid lanes
+
+`feature-native-joint-window/` now takes Q and prefix length, generating shifts projectively and co-converting them with the grid. Three native methods pass:64 generated public points and1426 golden slots agree; target product/inversion assertions pass. On O/P/2P/-P, inversions15/16/16/14 become1 each, with296/321/330/298 additional products including new point checks. Setup/additions/native overhead remain outside this arithmetic table; no elapsed-time claim. See its chart, report, original counts and receipts. Shared daily log was reserved by another task; component SESSION.md preserves the handoff.
