@@ -495,6 +495,7 @@ instances. Atlas collision status is from `tools/lead_atlas.py --match` run toda
   ternary packet variant already built by the lab is an internal adaptation and did not improve the
   exponent (`prime_tensor_variants_20261030`).
 - **Linear-vertex discounts inside D.1:** none (black-box vertices).
+- **Clustering loophole** (added 2026-11-02): closed; derivation with heuristic steps labelled in `notes/clustering_closure.md` (planted-leak companion: `notes/planted_leak.md`).
 
 ## 7. Recommended order
 
