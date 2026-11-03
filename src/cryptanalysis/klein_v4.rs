@@ -1290,6 +1290,7 @@ pub(crate) fn build_echelon(
             ech
         }
         Pivot::Profile(_) => unreachable!("the profile build is macaulay_profile::build_profile"),
+        Pivot::Tails(_) => unreachable!("the tails build is macaulay_tails::build_tails"),
     };
     st.echelon_muls += ech_muls;
     st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
@@ -1498,6 +1499,9 @@ pub enum V4Solver {
     ChainLifo,
     /// E40 (§9.50) V: A counted on rows stored from their lead.
     ChainProfile,
+    /// E42 (§9.54) W: V with each row reserved to the block after its
+    /// build end, grown on overflow.
+    ChainTails,
 }
 
 /// The echelon's pivot rule in the chain solve: E31's (uncounted) or E33's
@@ -1521,6 +1525,9 @@ pub enum Pivot {
     /// E40 (§9.50): A's counted rule on rows stored from their lead
     /// ([`super::macaulay_profile`]).
     Profile(super::macaulay_profile::ProfileCheck),
+    /// E42 (§9.54): V's rows reserved to the fill
+    /// ([`super::macaulay_tails`]).
+    Tails(super::macaulay_tails::TailsCheck),
 }
 
 impl V4Solver {
@@ -1540,6 +1547,7 @@ impl V4Solver {
             "chain-est-k2" => Some(V4Solver::ChainEstK2),
             "chain-lifo" => Some(V4Solver::ChainLifo),
             "chain-profile" => Some(V4Solver::ChainProfile),
+            "chain-tails" => Some(V4Solver::ChainTails),
             _ => None,
         }
     }
@@ -1559,6 +1567,7 @@ impl V4Solver {
             V4Solver::ChainEstK2 => "chain-est-k2",
             V4Solver::ChainLifo => "chain-lifo",
             V4Solver::ChainProfile => "chain-profile",
+            V4Solver::ChainTails => "chain-tails",
         }
     }
     /// E33: the solver emits its pivot-selection work.
@@ -1576,6 +1585,7 @@ impl V4Solver {
                 | V4Solver::ChainEstK2
                 | V4Solver::ChainLifo
                 | V4Solver::ChainProfile
+                | V4Solver::ChainTails
         )
     }
     /// The chain solve's pivot rule for this solver (`Macaulay` has none
@@ -1602,6 +1612,7 @@ impl V4Solver {
             V4Solver::ChainEstK2 => rule(ArrivalRule::EstimateK2),
             V4Solver::ChainLifo => rule(ArrivalRule::Lifo),
             V4Solver::ChainProfile => Pivot::Profile(Default::default()),
+            V4Solver::ChainTails => Pivot::Tails(Default::default()),
         }
     }
 }
@@ -1981,6 +1992,7 @@ fn chain_at(
 ) -> Result<Vec<[u64; 4]>, String> {
     let b = match pivot {
         Pivot::Profile(check) => super::macaulay_profile::build_profile(comps, d, p, st, check)?,
+        Pivot::Tails(check) => super::macaulay_tails::build_tails(comps, d, p, st, check)?,
         _ => build_echelon(comps, d, p, st, true, pivot)?,
     };
     let dim = b.standard.len();
@@ -2136,6 +2148,7 @@ pub fn solve_weighted_chain_with(
             st.pivot_digest = spent.pivot_digest;
             st.macaulay_stored_entries += spent.macaulay_stored_entries;
             st.profile_offset_ops += spent.profile_offset_ops;
+            st.tail_extent_ops += spent.tail_extent_ops;
             st.build_ms += spent.build_ms;
             st.echelon_ms += spent.echelon_ms;
             st.nf_ms += spent.nf_ms;
@@ -2187,7 +2200,8 @@ pub fn solve_v4(
         | V4Solver::ChainFifoStatic
         | V4Solver::ChainEstK2
         | V4Solver::ChainLifo
-        | V4Solver::ChainProfile => {
+        | V4Solver::ChainProfile
+        | V4Solver::ChainTails => {
             let (s, d, info) =
                 solve_weighted_chain_with(comps, MACAULAY_BOUND, p, rng, st, solver.pivot());
             (s, d, info.fell_back)
