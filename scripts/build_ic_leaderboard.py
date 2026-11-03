@@ -99,6 +99,7 @@ SOURCES = {
     "glv_e34": "experiments/38_twist24_cheap_rep/summary.json",
     "glv_e40": "experiments/47_macaulay_entries/summary.json",
     "glv_e41": "experiments/48_twist24_shortfall/summary.json",
+    "glv_e39": "experiments/46_pivot_rules_confirm3/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "generator_orbit": "research/ecbench_generator_orbit_20261022/figures/summary.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
@@ -1009,6 +1010,17 @@ def k4_v4_component() -> dict:
     if e41.get("experiment") not in ("e41", "E41") or e41_val.get("status") != "pass":
         raise SystemExit("review the E41 summary and its validator report before updating the leaderboard")
     b40 = e40["bands"]
+    e39 = load(SOURCES["glv_e39"])
+    e39_study = "research/e39_pivot_rules_confirm3_20261102"
+    if (e39.get("experiment") != "e39" or e39.get("e2e_identity_ok") is not True
+            or not all(ok for _, ok in e39["verdict_checks"]["G2.201_rank_with_gates"])
+            or gate.check_evidence_dir(REPO / e39_study, REPO)):
+        raise SystemExit("review the E39 pivot-rule summary and its VALIDATION.json before updating the leaderboard")
+    rho39 = {}
+    for r in e39["rho_ranges"]:
+        cur = rho39.setdefault(r["x"], [[float("inf"), 0.0] for _ in range(3)])
+        for i in range(3):
+            cur[i] = [min(cur[i][0], r["ranges"][i][0]), max(cur[i][1], r["ranges"][i][1])]
     return {**sm, "source": SOURCES["glv_k4"],
             "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
             "gls": {**gls, "source": SOURCES["glv_gls"],
@@ -1087,7 +1099,13 @@ def k4_v4_component() -> dict:
                                    max(z["v_ops"] for z in e40["stage_a"])]},
             "e41": {"source": SOURCES["glv_e41"],
                     "report": f"{e41_study}/REPORT.pdf",
-                    "validator_report": f"{e41_study}/validator-report.json"}}
+                    "validator_report": f"{e41_study}/validator-report.json"},
+            "e39": {"source": SOURCES["glv_e39"],
+                    "report": f"{e39_study}/REPORT.pdf",
+                    "validation": f"{e39_study}/VALIDATION.json",
+                    "ranks": [{k2: r[k2] for k2 in ("x", "reference", "order", "ranges", "rows", "rows_x_ahead")}
+                              for r in e39["ranks"] if r["set"] == "all"],
+                    "rho": rho39}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -3555,6 +3573,11 @@ def markdown(doc: dict) -> str:
           f"[validation](../../{e40['validation']}).", "",
           "| " + " | ".join(t["e40_head"]) + " |", "|:--|--:|--:|--:|"]
     L += ["| " + " | ".join(r) + " |" for r in t["e40_rows"]]
+    e39 = k["e39"]
+    L += ["", t["e39"] + f" Read the [report](../../{e39['report']}), [summary](../../{e39['source']}) and "
+          f"[validation](../../{e39['validation']}).", "",
+          "| " + " | ".join(t["e39_head"]) + " |", "|:--|:--|--:|--:|--:|:--|"]
+    L += ["| " + " | ".join(r) + " |" for r in t["e39_rows"]]
     L += ["", t["e41"] + f" Read the [report](../../{k['e41']['report']}), [summary](../../{k['e41']['source']}) "
           f"and [validator report](../../{k['e41']['validator_report']}).", ""]
     return "\n".join(L) + "\n"
@@ -3639,7 +3662,31 @@ def glv_e32_e34_text(k: dict) -> dict:
            "are unchanged (order 24 does not apply there). Independently replayed byte for byte (validator report: "
            "pass, six errata), but like E34 it compares rho walks only and cannot pass the validation gate (note "
            "§9.52 and §9.53).")
-    return {"e32": e32, "e32_head": ["p", "log₂ n", "curves", "median D (0 GAE)", "median D (0.1)", "median D (1)",
+    g39 = k["e39"]
+    NM = {"chain-fifo": "F (first arrival)", "chain-static": "S (static order)", "chain-fifo-static": "H (F, else S)",
+          "chain-sparsest-est": "B″ (E33)", "chain-lifo": "L (last arrival, negative control)",
+          "chain-counted": "A", "macaulay": "E25"}
+    e39_rows = [[NM[r["x"]], NM[r["reference"]]] + [rg(x) for x in r["ranges"]]
+                + [r["order"].replace("X ", "") + f" ({'/'.join(str(n) for n in r['rows_x_ahead'])} of {r['rows']} rows ahead)"]
+                for r in g39["ranks"] if r["x"] != "chain-sparsest-est" or r["reference"] == "chain-counted"]
+    f_rho, a_rho = g39["rho"]["chain-fifo"], g39["rho"]["chain-counted"]
+    e39 = ("Pivot rules F, S and H in the chain solve (E39, engineering of the echelon; third pre-registered "
+           "confirmation). E31's ranked solver A orders each pivot bucket by a counted rule; F takes the first row to "
+           "arrive (no selection work), S a fixed per-call order from each equation's support, H takes F where an "
+           "untouched row exists and S otherwise. On fresh target streams over E25's 20 GLS rows and E24's 12 rows, "
+           "each of F, S and H is ahead of A and of E25 at 0, 0.1 and 1 GAE on all 32 rows; against B″ the order is "
+           "unresolved, and the negative-control rule L is behind A everywhere. E36 and E37 measured the same effect "
+           "but voided the rank on a failed control, and E38 stopped at its pilot; E39 registered controls that touch "
+           "rows the solve reads, and every gating control passed. The gain is in the solve's own multiplications "
+           "(F: 1.46–1.54× fewer at 0 GAE) and shrinks to about 1.2 % at 1 GAE, where the Macaulay build dominates "
+           "(E40 above attacks that part). Rho is ahead of every row at every weight: F is {f0} rho at 0 GAE and "
+           "{f2} at 1 GAE across the rows, A {a0} and {a2}. Class: engineering, validated (independent rebuild and "
+           "replay of 31 runs, 7,286 summary values recomputed, gate valid; six errata, none changing a verdict; note "
+           "§9.48 and §9.49)."
+           ).format(f0=rg(f_rho[0]) + "×", f2=rg(f_rho[2]) + "×", a0=rg(a_rho[0]) + "×", a2=rg(a_rho[2]) + "×")
+    return {"e39": e39, "e39_head": ["rule X", "against", "0 GAE", "0.1 GAE", "1 GAE", "order across the band"],
+            "e39_rows": e39_rows,
+            "e32": e32, "e32_head": ["p", "log₂ n", "curves", "median D (0 GAE)", "median D (0.1)", "median D (1)",
                                      "D range (0 GAE)"],
             "e32_rows": e32_rows, "e33": e33,
             "e33_head": ["solver", "ratio", "0 GAE", "0.1 GAE", "1 GAE", "rank across the band"],
@@ -5024,6 +5071,13 @@ def page(doc: dict, standalone: bool) -> str:
         P.append("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>")
     P.append('</tbody></table></div>' + gh(k["e40"]["source"], 'Frozen study summary') + ' · '
              + gh(k["e40"]["validation"], 'Validation') + ' · ' + gh(k["e40"]["report"], 'Report'))
+    P.append('<h3>Pivot rules F, S and H (E39)</h3><p>' + esc(t["e39"]) + '</p>'
+             '<div class="scroll"><table><thead><tr>'
+             + "".join(f"<th>{esc(c)}</th>" for c in t["e39_head"]) + '</tr></thead><tbody>')
+    for r in t["e39_rows"]:
+        P.append("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>")
+    P.append('</tbody></table></div>' + gh(k["e39"]["source"], 'Frozen study summary') + ' · '
+             + gh(k["e39"]["validation"], 'Validation') + ' · ' + gh(k["e39"]["report"], 'Report'))
     P.append('<h3>The order-24 shortfall was noise (E41, not shown as a row)</h3><p>' + esc(t["e41"]) + '</p>'
              + gh(k["e41"]["source"], 'Frozen study summary') + ' · '
              + gh(k["e41"]["validator_report"], 'Validator report') + '</section>')
