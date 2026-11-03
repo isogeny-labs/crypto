@@ -1,0 +1,1083 @@
+{
+ "schema": "validator-report/v1 (validation-gate/v1 companion)",
+ "status": "insufficient_evidence",
+ "disposition": "insufficient_evidence",
+ "independent": true,
+ "validator": "validator subagent (core tier, claude-opus-5-5), not the producer",
+ "date": "2026-11-03",
+ "validated_commit": "75f70b5ae5e071c1a2288621d946a56e519274cd",
+ "tree_state": "dispatch-time tree was moving: README.md and engine/ were untracked when validation began, then committed (7470f1ed34), merged (75f70b5ae5), then 54ef4e9326 added REPORT.pdf/REPORT.typ/scripts/build_report.py. Validated from 75f70b5ae5 (clean); every validated file is byte-identical at 54ef4e9326. REPORT.pdf/REPORT.typ were not validated (REPORT.typ repeats errata E1-E3).",
+ "recompute_agrees": "124/127 headline numbers within rel_tol; the 3 disagreements are errata E2 and E3",
+ "per_claim": {
+  "P5 engine component at k=20 (F4 mul-adds per relation at exact coverage 0.212x at t=5, 0.300x at t=6; per-target ratio 1.000/0.993/1.000; equal degree and terms)": "validated: recomputed, replayed field-identical, coverage and the one relation independently verified",
+  "k=20 exact coverage (bits 12/42/162, edwards 10/58/206, L=976503 t=5 198 with 24 cols, L=908172 t=6 536 with 42 cols)": "validated",
+  "P1, P2, P4 verdicts and the census table": "arithmetic validated from confirm/k*.json; verdicts held on the curves actually run",
+  "P3 failed at k=18 t=7 (1.459)": "arithmetic validated; but k=18 is not a family-rule curve (E1)",
+  "held-out confirmation on the family-rule curves of PROTOCOL.md": "insufficient_evidence: k=18 and k=22 family-rule curves (A=78, A=43186) were never measured",
+  "distance remaining to rho": "not supported as stated (E2)"
+ },
+ "requirements": [
+  {
+   "id": "R1",
+   "requirement": "protocol frozen before any confirm/ or engine/ file",
+   "result": "pass",
+   "evidence": "PROTOCOL.md added in 6a800b1513, unchanged to 54ef4e9326; every confirm/ and engine/ file first added in descendants 5ea87e8518, 77780be327, 7470f1ed34; scripts/frame_census.py unchanged since 6a800b1513. Git proves commit order, not compute order."
+  },
+  {
+   "id": "R2",
+   "requirement": "data integrity",
+   "result": "pass",
+   "evidence": "local confirm/k{16..24}.json hash to confirm/SHA256SUMS, confirm/.artifacts.json and the git blobs at 5ea87e8518; pilot_k20.json hashes to ceef2188...7094 (pilot/.artifacts.json, git blob at 6a800b1513); engine/*.json hash to engine/SHA256SUMS"
+  },
+  {
+   "id": "R3",
+   "requirement": "k=20 exact coverage recomputed independently",
+   "result": "pass",
+   "evidence": "short-Weierstrass affine arithmetic, Tonelli-Shanks, every unordered signed pair added and tested with literal [r]R = O: bits 12/42/162, edwards 10/58/206, L976503 t5 198 (24 cols), L908172 t6 536 (42 cols)"
+  },
+  {
+   "id": "R4",
+   "requirement": "curves are the PROTOCOL's family-rule miniatures",
+   "result": "fail",
+   "evidence": "own family-rule implementation and `curve25519_family family 16,18,20,22,24` agree: k=16 A=1058, k=18 A=78 (r=32887), k=20 A=926, k=22 A=43186 (r=524731), k=24 A=318. confirm/ used k=18 A=54 (r=32719 < 2^15) and k=22 A=894 (r=524047 < 2^19): exactly the rule without its r > 2^(k-3) clause (smallest A otherwise). All five used curves verified #E=8r, r prime, cyclic. Not disclosed in README."
+  },
+  {
+   "id": "R5",
+   "requirement": "P1-P4 verdicts re-derived from confirm/k*.json with own code",
+   "result": "pass",
+   "evidence": "P1 50/50 inside (robust to 4 percentile definitions); P2 0.9856-1.0145 in the 20 cells with mean >= 50; P3 fails only at k=18 t=7 (1.4588), other 11 in 1.556-4.478; P4 23/25 equal to oracle best, min 0.9919. summary.json agrees field-by-field (0 mismatches). 'ties broken by cols' is direction-ambiguous; the alternative changes only k=16 t=5 (186 vs 188, verdicts unchanged)."
+  },
+  {
+   "id": "R6",
+   "requirement": "spot-check census rows by independent recompute",
+   "result": "pass",
+   "evidence": "nonce e1f2eb025f730445: 20 random rows per curve (100), literal method: 100/100 match cols, covered and J; plus every fixed, selected and oracle-best frame of all 25 cells (100): 100/100 match cols and covered; J differs in 6 bits_lo0 rows (E4)"
+  },
+  {
+   "id": "R7",
+   "requirement": "engine replay with the recorded binary",
+   "result": "pass",
+   "evidence": "binary sha256 0459a725...b4c5 matches engine/binary.sha256; 6/6 cells field-identical ignoring wall_s (see replay-certificate.json)"
+  },
+  {
+   "id": "R8",
+   "requirement": "relation certificate re-verified independently",
+   "result": "pass (reconstructed)",
+   "evidence": "the producer recorded none; validator rebuilt the targets and found target 95 = [16836]G = P_i + P_j in the frame t=6 cell, and 0 covered targets in the other cells, matching the engine's hits"
+  },
+  {
+   "id": "R9",
+   "requirement": "every README table number supported by the data",
+   "result": "fail (errata)",
+   "evidence": "census table 50/50 values, P5 table 36/36 values and the predictions table agree, except E2 and E3"
+  },
+  {
+   "id": "R10",
+   "requirement": "matched rho reference in the same unit and process (gate item 3)",
+   "result": "not available",
+   "evidence": "rho-neg k=20 (curve25519_ic_baseline_20261102, session ECBS1hd6199244a727, curve icv1-fp20-tm1050-4295f05e = the k=20 miniature) gives S = 1.511/1.619/2.585 at w = 0/0.1/1, 48/48 verified. The component is in F4 mul-adds per relation from curve25519_family f4cost; no same-unit IC S exists for it, so gae_band ic values are not filled in"
+  },
+  {
+   "id": "R11",
+   "requirement": "reproducibility bindings",
+   "result": "partial",
+   "evidence": "seeds, command lines and data hashes recorded; binary not bound to a commit; no Conductor task, S3 resume push or EKS route (disclosed under README 'Deviations'); stray third-party typst-0.0.0.tar.gz committed in the study directory"
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "where": "README 'Census (exact, five family miniatures; k = 16, 18, 22, 24 held out)'; REPORT.typ line 37",
+   "text": "k=18 (A=54) and k=22 (A=894) are not family-rule curves (the rule's r > 2^(k-3) clause was dropped); the family-rule curves are A=78 and A=43186. P3's only failure (k=18 t=7) is on an off-rule curve."
+  },
+  {
+   "id": "E2",
+   "where": "README 'Costs and scope'; REPORT.typ line 106",
+   "text": "'distance remaining to rho on this track is still about 10^4-10^5x at w >= 0.1' is the distance to the generic baseline (1.35e5/4.71 = 2.9e4 at w=0.1; 8.2e5/4.71 = 1.7e5 at w=1). To matched rho-neg it is 1.79e6/1.619/4.71 = 2.3e5 (w=0.1) and 1.79e7/2.585/4.71 = 1.5e6 (w=1). It also carries a bits-form m=2 gain over to the pkm-iso-t6-g4 arm without labelling that as an extrapolation."
+  },
+  {
+   "id": "E3",
+   "where": "README predictions table P2; REPORT.typ line 95",
+   "text": "'0.986-1.018': over the P2 cells (mean covered >= 50) the range is 0.986-1.015; 1.018 is k=24 t=4 (mean 19), outside P2's scope. Verdict unchanged."
+  },
+  {
+   "id": "E4",
+   "where": "scripts/frame_census.py coverage() (J)",
+   "text": "the signed array [L, -L mod n] holds the 2-torsion point T (log n/2) twice, so J counts each T + s pair twice. Affects bits_lo0 at k=18 t>=5 and k=24 t>=7 (+8, +10, +22, +52, +18, +34) and 25 translation frames containing x = A/3. None was near a cell's max J, so no selected frame and no verdict changes. covered (deduplicated) is unaffected."
+  },
+  {
+   "id": "E5",
+   "where": "README P5 table column 'F4 mul-adds / relation'",
+   "text": "derived as mul-adds/target / coverage_exact (the engine's muladds_per_relation_at_exact_coverage), not a measured yield (1 relation in 600 targets); the header should say 'at exact coverage', as PROTOCOL P5 does."
+  },
+  {
+   "id": "E6",
+   "where": "PROTOCOL.md Selection",
+   "text": "'ties broken by cols' gives no direction; the producer used more cols first. Only k=16 t=5 depends on it (188 vs 186)."
+  },
+  {
+   "id": "E7",
+   "where": "study directory",
+   "text": "typst-0.0.0.tar.gz (a third-party source archive of the typst Python bindings) is committed in the evidence directory; it is not evidence."
+  },
+  {
+   "id": "E8",
+   "where": "README 'rho solve at k = 20 takes about 10^3 group operations'",
+   "text": "order of magnitude only: the matched rho-neg gives 1.511*sqrt(131203) = 547 (w=0) to 936 (w=1) GAE per solve. Not wrong at the stated precision."
+  }
+ ],
+ "validator_code": {
+  "location": "validator scratchpad (not committed; only the three gate files were authorised)",
+  "sha256": {
+   "vcov.py": "6437f95092553b5e6b0828128b87ac219a1e8e83918ccd16f50e9f1d6e3ba5e0",
+   "item1.py": "101a6f07b528860bd365f1e7fbf8659e7a3cda957a66cea6b42cc86a4d3d5bd4",
+   "p14.py": "144131c2a0c36f18b663a7804c9b567545b3898d180ab6ed0dbce1afd53e5438",
+   "spot.py": "e76bde4cf768656d956ab057c4f71a93d95fc056c403284eee98ee8ea7e88951",
+   "family_hits.py": "9d3869a5374fb697da4af8fc18341ae2907bd1533b073b09d32b861d49e33627",
+   "relaxed.py": "b6d26e4f07a4a17e072b8d38eab77896f6aaa31b38dbb14adcb1e9d6429ddfe3",
+   "assemble.py": "04228570f79cc9feaf3c96be2c60cd7c2a8cbfa160bb7128c4a02a7fbff31635"
+  },
+  "independence": "no import or copy of frame_census.py or analyse.py; Weierstrass rather than Montgomery formulas, Tonelli-Shanks rather than the p=5 mod 8 root, no log table, literal [r]R = O membership test"
+ },
+ "spot_check_nonce": "e1f2eb025f730445",
+ "raw_data": [
+  {
+   "path": "PROTOCOL.md",
+   "sha256": "54430872390c18244f8b5c3f9d1d98da32a63a5ec06a5a675e589e2ab64bb1d1"
+  },
+  {
+   "path": "README.md",
+   "sha256": "eb8e20473aaef9625c8e19d679bb9180161db2f49361dd9796905c22c8d0e563"
+  },
+  {
+   "path": "analysis/summary.json",
+   "sha256": "4667d29c069a4715c67ee0a7535e15e10dace78c888953317a164512e5787713"
+  },
+  {
+   "path": "pilot/pilot_k20.json",
+   "sha256": "ceef2188819d9a28f51de20e9874a9cffdfcdd69fcf00e9e3ac93972ac947094"
+  },
+  {
+   "path": "scripts/run_confirm.sh",
+   "sha256": "c8350d7fc5ac91bdcc02942db32e2cd0e1dc1909aa244c61b83ef7f4f037d2bc"
+  },
+  {
+   "path": "scripts/run_engine.sh",
+   "sha256": "b49f0dd5640706cd171cc7cfab05e2ce68fd0bf9406dd3a2ef34b2d0e72a865c"
+  },
+  {
+   "path": "confirm/k16.json",
+   "sha256": "e9fca6dac94e08772abae4468b7110e20cff5ba3e749c6aae3e89ba5c7c8cc8f"
+  },
+  {
+   "path": "confirm/k18.json",
+   "sha256": "860f04a9f8ef2ce6d95dc0853ef5589d21492e747691e1e0e64d373d319d4f60"
+  },
+  {
+   "path": "confirm/k20.json",
+   "sha256": "e76181a8c73d814012ec84f3c18c9b2e811fd7f09e786ebe991cd0709ddfa097"
+  },
+  {
+   "path": "confirm/k22.json",
+   "sha256": "b9f083f4f214e10fe9ca156ca637c67140d4b32f0c452024461f058ebbab1bf4"
+  },
+  {
+   "path": "confirm/k24.json",
+   "sha256": "ca71f0d35976bfd89dd5b0db821c1af945862674f14d4850e853592574131f9b"
+  },
+  {
+   "path": "confirm/SHA256SUMS",
+   "sha256": "e987537f9a81cf2cd016c6d7748c4cccec71fa8bbe4d1c345907302a8a55cf31"
+  },
+  {
+   "path": "confirm/.artifacts.json",
+   "sha256": "448aff40a371152e0c1eda086a06267e8eb7620ad613b0a9c2fce9066e620a3e"
+  },
+  {
+   "path": "engine/binary.sha256",
+   "sha256": "0441122c4155c0e97fc986becec18b0e75a8e8f9fae974a0fc5ed0fbd550e427"
+  },
+  {
+   "path": "engine/SHA256SUMS",
+   "sha256": "60877ea228bff082b921b5bb9f5bf4a4658ccf11e799723d4f2bdb66c4bb80a8"
+  },
+  {
+   "path": "engine/bits_t5_g3.json",
+   "sha256": "924b40111799c29d81ca5fe8bf216b1b2b245c92bd9c98b53ef0e4a320d8dcb2"
+  },
+  {
+   "path": "engine/frame_t5_g3.json",
+   "sha256": "b0696451c4b82a93cc8603dcb8f57a08354c6722c6fa0f7a058e5d73ffcc3601"
+  },
+  {
+   "path": "engine/bits_t6_g3.json",
+   "sha256": "156de8d24587ba77d4bd76d6b019a03f25fa0cafc097501183649eed86246f11"
+  },
+  {
+   "path": "engine/frame_t6_g3.json",
+   "sha256": "0e5c1be4c584719d3ede5baffde9486c951e916379609c480ed7a50ee552811a"
+  },
+  {
+   "path": "engine/bits_t5_g0.json",
+   "sha256": "2ecf32210c161e2509a0ab1c7db71fa863efd6cc04665fcb99a3086f73de856f"
+  },
+  {
+   "path": "engine/frame_t5_g0.json",
+   "sha256": "08efc4d103f3aa34e7f3a3b34380cf5c9be42b9c7116c12a0dac7bc4d9d28352"
+  },
+  {
+   "path": "../curve25519_ic_baseline_20261102/analysis/band-k20.txt",
+   "sha256": "4d737174c6ae78d536c099cb12c1fcadaebbac1ae7c1ce646d28afb635d71805"
+  },
+  {
+   "path": "../curve25519_ic_baseline_20261102/analysis/table-k20.md",
+   "sha256": "dcd178d3e0175e63dcdc1f37eed5afe1ab4968a96a93d6ad1ec6266c0292a66f"
+  },
+  {
+   "path": "../curve25519_algebraic_ecbench_20261102/analysis/band_s1.txt",
+   "sha256": "6da98f0d748b7408545c7211629db900649c652e85db741459f626416365793e"
+  },
+  {
+   "path": "../curve25519_edwards_semaev_20261102/cells/bits_t5_g3.json",
+   "sha256": "483b207a2b3fb6814b1f951748f53cef93de3cd88e6212b751b715422c29d05d"
+  },
+  {
+   "path": "../curve25519_edwards_semaev_20261102/cells/bits_t6_g3.json",
+   "sha256": "0c1587bacac1e08a6742e02d7952918e90a154c5e83be967fbea5c913b56e91e"
+  },
+  {
+   "path": "../curve25519_edwards_semaev_20261102/cells/bits_t5_g0.json",
+   "sha256": "ea450f9a2304f6dc66ab1ebea8ab73ffa90400f2f6f71bab83ebf12c8f9750d0"
+  }
+ ],
+ "headline": [
+  {
+   "name": "k20 covered bits_lo0_t4",
+   "claimed": 12,
+   "recomputed": 12,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 covered bits_lo0_t5",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 covered bits_lo0_t6",
+   "claimed": 162,
+   "recomputed": 162,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 covered edwards_t4",
+   "claimed": 10,
+   "recomputed": 10,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 covered edwards_t5",
+   "claimed": 58,
+   "recomputed": 58,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 covered edwards_t6",
+   "claimed": 206,
+   "recomputed": 206,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 covered L976503_t5",
+   "claimed": 198,
+   "recomputed": 198,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 covered L908172_t6",
+   "claimed": 536,
+   "recomputed": 536,
+   "rel_tol": 1e-09,
+   "source": "PROTOCOL.md pilot calibration / dispatch"
+  },
+  {
+   "name": "k20 cols L976503 t5",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "k20 cols L908172 t6",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "census k16 t4 selected/bits_lo0",
+   "claimed": 12.0,
+   "recomputed": 12.0,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t4 selected/mean",
+   "claimed": 3.75,
+   "recomputed": 3.751954142782699,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t5 selected/bits_lo0",
+   "claimed": 3.03,
+   "recomputed": 3.032258064516129,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t5 selected/mean",
+   "claimed": 2.66,
+   "recomputed": 2.6648522991438455,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t6 selected/bits_lo0",
+   "claimed": 2.32,
+   "recomputed": 2.322314049586777,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t6 selected/mean",
+   "claimed": 2.13,
+   "recomputed": 2.1265887926500247,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t7 selected/bits_lo0",
+   "claimed": 1.67,
+   "recomputed": 1.6727272727272726,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t7 selected/mean",
+   "claimed": 1.49,
+   "recomputed": 1.4893554591656575,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t8 selected/bits_lo0",
+   "claimed": 1.33,
+   "recomputed": 1.3341538461538462,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k16 t8 selected/mean",
+   "claimed": 1.32,
+   "recomputed": 1.324393676020197,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t4 selected/bits_lo0",
+   "claimed": 3.82,
+   "recomputed": 3.8181818181818183,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t4 selected/mean",
+   "claimed": 4.46,
+   "recomputed": 4.46120346274364,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t5 selected/bits_lo0",
+   "claimed": 1.85,
+   "recomputed": 1.8518518518518519,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t5 selected/mean",
+   "claimed": 2.85,
+   "recomputed": 2.848718788724771,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t6 selected/bits_lo0",
+   "claimed": 2.46,
+   "recomputed": 2.4601769911504423,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t6 selected/mean",
+   "claimed": 2.09,
+   "recomputed": 2.085114681307472,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t7 selected/bits_lo0",
+   "claimed": 1.46,
+   "recomputed": 1.4587813620071686,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t7 selected/mean",
+   "claimed": 1.58,
+   "recomputed": 1.575825977704192,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t8 selected/bits_lo0",
+   "claimed": 1.32,
+   "recomputed": 1.3238827486785198,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k18 t8 selected/mean",
+   "claimed": 1.43,
+   "recomputed": 1.4272962243222675,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t4 selected/bits_lo0",
+   "claimed": 5.33,
+   "recomputed": 5.333333333333333,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t4 selected/mean",
+   "claimed": 3.38,
+   "recomputed": 3.3808769149498152,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t5 selected/bits_lo0",
+   "claimed": 4.71,
+   "recomputed": 4.714285714285714,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t5 selected/mean",
+   "claimed": 2.84,
+   "recomputed": 2.837651914698464,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t6 selected/bits_lo0",
+   "claimed": 3.31,
+   "recomputed": 3.308641975308642,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t6 selected/mean",
+   "claimed": 1.98,
+   "recomputed": 1.97750951860925,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t7 selected/bits_lo0",
+   "claimed": 2.14,
+   "recomputed": 2.1383495145631066,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t7 selected/mean",
+   "claimed": 1.68,
+   "recomputed": 1.6801257901215851,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t8 selected/bits_lo0",
+   "claimed": 1.75,
+   "recomputed": 1.7455329636475663,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k20 t8 selected/mean",
+   "claimed": 1.38,
+   "recomputed": 1.3842680114865415,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t4 selected/bits_lo0",
+   "claimed": 4.57,
+   "recomputed": 4.571428571428571,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t4 selected/mean",
+   "claimed": 3.31,
+   "recomputed": 3.3105731429753775,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t5 selected/bits_lo0",
+   "claimed": 4.48,
+   "recomputed": 4.478260869565218,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t5 selected/mean",
+   "claimed": 2.94,
+   "recomputed": 2.941974550491995,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t6 selected/bits_lo0",
+   "claimed": 2.43,
+   "recomputed": 2.4299065420560746,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t6 selected/mean",
+   "claimed": 1.95,
+   "recomputed": 1.9497635911645712,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t7 selected/bits_lo0",
+   "claimed": 1.74,
+   "recomputed": 1.7370517928286853,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t7 selected/mean",
+   "claimed": 1.67,
+   "recomputed": 1.6659645543114954,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t8 selected/bits_lo0",
+   "claimed": 1.32,
+   "recomputed": 1.323454699407282,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k22 t8 selected/mean",
+   "claimed": 1.52,
+   "recomputed": 1.5181670100268958,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t4 selected/bits_lo0",
+   "claimed": 4.3,
+   "recomputed": 4.3,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t4 selected/mean",
+   "claimed": 4.45,
+   "recomputed": 4.451345755693581,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t5 selected/bits_lo0",
+   "claimed": 3.14,
+   "recomputed": 3.1379310344827585,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t5 selected/mean",
+   "claimed": 2.62,
+   "recomputed": 2.6184789802319224,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t6 selected/bits_lo0",
+   "claimed": 2.02,
+   "recomputed": 2.0211267605633805,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t6 selected/mean",
+   "claimed": 2.16,
+   "recomputed": 2.155455668585548,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t7 selected/bits_lo0",
+   "claimed": 1.56,
+   "recomputed": 1.5559502664298401,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t7 selected/mean",
+   "claimed": 1.68,
+   "recomputed": 1.6774154015839704,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t8 selected/bits_lo0",
+   "claimed": 1.45,
+   "recomputed": 1.451841359773371,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "census k24 t8 selected/mean",
+   "claimed": 1.49,
+   "recomputed": 1.4885288881100671,
+   "rel_tol": 0.004,
+   "source": "README census table"
+  },
+  {
+   "name": "P1 cells inside central 98%",
+   "claimed": 50,
+   "recomputed": 50,
+   "rel_tol": 1e-09,
+   "source": "README predictions"
+  },
+  {
+   "name": "P2 trans/mobius min (cells mean>=50)",
+   "claimed": 0.986,
+   "recomputed": 0.9855517107381433,
+   "rel_tol": 0.0005,
+   "source": "README predictions"
+  },
+  {
+   "name": "P2 trans/mobius max (cells mean>=50)",
+   "claimed": 1.018,
+   "recomputed": 1.0145227016560214,
+   "rel_tol": 0.0005,
+   "source": "README predictions (erratum: 1.018 is k=24 t=4, mean 19, outside P2 scope)"
+  },
+  {
+   "name": "P3 k18 t7 selected/bits_lo0",
+   "claimed": 1.459,
+   "recomputed": 1.4587813620071686,
+   "rel_tol": 0.0005,
+   "source": "README predictions"
+  },
+  {
+   "name": "P3 other 11 cells min",
+   "claimed": 1.56,
+   "recomputed": 1.5559502664298401,
+   "rel_tol": 0.004
+  },
+  {
+   "name": "P3 other 11 cells max",
+   "claimed": 4.48,
+   "recomputed": 4.478260869565218,
+   "rel_tol": 0.004
+  },
+  {
+   "name": "P3 k18 t7 bits_lo0 percentile",
+   "claimed": 0.68,
+   "recomputed": 0.6795,
+   "rel_tol": 0.01
+  },
+  {
+   "name": "P4 cells selected == oracle best",
+   "claimed": 23,
+   "recomputed": 23,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P4 min selected/oracle (claimed >= 0.99)",
+   "claimed": 0.99,
+   "recomputed": 0.9919137466307277,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "k20 selected L t5",
+   "claimed": 976503,
+   "recomputed": 976503,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "k20 selected L t6",
+   "claimed": 908172,
+   "recomputed": 908172,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g3 cols",
+   "claimed": 11,
+   "recomputed": 11,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g3 covered",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g3 max degree",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g3 terms",
+   "claimed": 64,
+   "recomputed": 64.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g3 muladds/target",
+   "claimed": 3036911.76,
+   "recomputed": 3036911.76,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g3 muladds/relation at exact coverage",
+   "claimed": 9487000000.0,
+   "recomputed": 9486950801.125713,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 frame_t5_g3 cols",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g3 covered",
+   "claimed": 198,
+   "recomputed": 198,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g3 max degree",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g3 terms",
+   "claimed": 64,
+   "recomputed": 64.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g3 muladds/target",
+   "claimed": 3036916.11,
+   "recomputed": 3036916.11,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g3 muladds/relation at exact coverage",
+   "claimed": 2012000000.0,
+   "recomputed": 2012386385.7592423,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 bits_t6_g3 cols",
+   "claimed": 25,
+   "recomputed": 25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t6_g3 covered",
+   "claimed": 162,
+   "recomputed": 162,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t6_g3 max degree",
+   "claimed": 6,
+   "recomputed": 6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t6_g3 terms",
+   "claimed": 154,
+   "recomputed": 154.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t6_g3 muladds/target",
+   "claimed": 172425384.63,
+   "recomputed": 172425384.63,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t6_g3 muladds/relation at exact coverage",
+   "claimed": 139600000000.0,
+   "recomputed": 139646467528.45612,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 frame_t6_g3 cols",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t6_g3 covered",
+   "claimed": 536,
+   "recomputed": 536,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t6_g3 max degree",
+   "claimed": 6,
+   "recomputed": 6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t6_g3 terms",
+   "claimed": 154,
+   "recomputed": 154.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t6_g3 muladds/target",
+   "claimed": 171133755.53,
+   "recomputed": 171133755.53,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t6_g3 muladds/relation at exact coverage",
+   "claimed": 41890000000.0,
+   "recomputed": 41890414415.676476,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 bits_t5_g0 cols",
+   "claimed": 11,
+   "recomputed": 11,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g0 covered",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g0 max degree",
+   "claimed": 6,
+   "recomputed": 6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g0 terms",
+   "claimed": 256,
+   "recomputed": 256.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g0 muladds/target",
+   "claimed": 127284344.31,
+   "recomputed": 127284344.31,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 bits_t5_g0 muladds/relation at exact coverage",
+   "claimed": 397600000000.0,
+   "recomputed": 397621138726.30786,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 frame_t5_g0 cols",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g0 covered",
+   "claimed": 198,
+   "recomputed": 198,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g0 max degree",
+   "claimed": 6,
+   "recomputed": 6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g0 terms",
+   "claimed": 256,
+   "recomputed": 256.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g0 muladds/target",
+   "claimed": 127284307.74,
+   "recomputed": 127284307.74,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "P5 frame_t5_g0 muladds/relation at exact coverage",
+   "claimed": 84340000000.0,
+   "recomputed": 84343853678.84454,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 t5 G3 per-relation ratio",
+   "claimed": 0.212,
+   "recomputed": 0.21212151595857906,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "P5 t6 G3 per-relation ratio",
+   "claimed": 0.3,
+   "recomputed": 0.29997475165020093,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "P5 t5 G0 per-relation ratio",
+   "claimed": 0.212,
+   "recomputed": 0.21212115117677494,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "P5 t5 G3 per-target ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0000014323761584,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 t6 G3 per-target ratio",
+   "claimed": 0.993,
+   "recomputed": 0.9925090548426402,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "P5 t5 G0 per-target ratio",
+   "claimed": 1.0,
+   "recomputed": 0.9999997126905104,
+   "rel_tol": 0.0006
+  },
+  {
+   "name": "headline fall t5 (x)",
+   "claimed": 4.71,
+   "recomputed": 4.714278961664926,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "headline fall t6 (x)",
+   "claimed": 3.33,
+   "recomputed": 3.3336138941656497,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "relations found in frame t6 cell (independent target reconstruction)",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "relations found bits_t5 (independent target reconstruction)",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "relations found frame_t5 (independent target reconstruction)",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "relations found bits_t6 (independent target reconstruction)",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "frame search group ops k20 t6",
+   "claimed": 1600000.0,
+   "recomputed": 1640171.5344757733,
+   "rel_tol": 0.03
+  },
+  {
+   "name": "one relation F4 work k20 t6 frame (muladds)",
+   "claimed": 40000000000.0,
+   "recomputed": 41890414415.676476,
+   "rel_tol": 0.05
+  },
+  {
+   "name": "rho solve k20 group ops (matched rho-neg, w=0)",
+   "claimed": 1000.0,
+   "recomputed": 547.3137350396022,
+   "rel_tol": 1.0,
+   "source": "README \"about 10^3\" (order of magnitude; recomputed 547 at w=0, 936 at w=1)"
+  },
+  {
+   "name": "generic baseline proj-a / rho-neg k20 (w=0)",
+   "claimed": 7.8,
+   "recomputed": 7.784910655195236,
+   "rel_tol": 0.003,
+   "source": "curve25519_ic_baseline_20261102/analysis/band-k20.txt"
+  },
+  {
+   "name": "algebraic vs generic baseline w=0",
+   "claimed": 2.6,
+   "recomputed": 2.580836860957343,
+   "rel_tol": 0.01
+  },
+  {
+   "name": "algebraic vs generic baseline w=0.1",
+   "claimed": 140000.0,
+   "recomputed": 135226.1666540871,
+   "rel_tol": 0.04
+  },
+  {
+   "name": "distance remaining to rho w=0.1 after best frame gain (claimed upper end of 10^4-10^5)",
+   "claimed": 100000.0,
+   "recomputed": 234736.0392729377,
+   "rel_tol": 0.5,
+   "source": "erratum: matched rho-neg S(w=0.1)=1.619; 10^4-10^5 is the distance to the generic baseline (2.9e4 at w=0.1), not to rho; also an unlabelled carry-over of a bits-form gain to the pkm-iso-t6-g4 arm"
+  },
+  {
+   "name": "distance remaining to rho w=1 after best frame gain (claimed upper end of 10^4-10^5)",
+   "claimed": 100000.0,
+   "recomputed": 1470141.5677909234,
+   "rel_tol": 0.5,
+   "source": "erratum, as above"
+  }
+ ]
+}

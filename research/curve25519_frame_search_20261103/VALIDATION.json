@@ -1,0 +1,40 @@
+{
+ "schema": "validation-gate/v1",
+ "note": "Algebraic-track component result (P5, k=20), not a leaderboard table A-C row; no row slug exists, so 'rows' is omitted. Validator disposition: insufficient_evidence (validator-report.json).",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "fce5bc99f45f41b942104e4ff3df6f8d25304dd3849b94c450877ffa9bb3d63d"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "6ac4c484852b7bb49c375d5faaed4471013efe5ed9e0e24aacc8f56b841a518d"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md names no rho reference for this component (it cites curve25519_algebraic_ecbench_20261102 for the track distance). Reference used, as dispatched: curve25519_ic_baseline_20261102 rho-neg at k=20, ecbench session ECBS1hd6199244a727, curve icv1-fp20-tm1050-4295f05e (p=1048573, a=63700, b=872826, G=(349837,122): the same k=20 miniature), 48/48 verified, source ../curve25519_ic_baseline_20261102/analysis/band-k20.txt",
+  "unit": "rho: S = (GAE + w x unpriced native ops)/sqrt(r); component: F4 multiply-adds per relation at exact coverage. NOT the same unit",
+  "binary_or_process": "rho: ecbench (curve25519_ic_baseline_20261102 session); component: curve25519_family f4cost, sha256 0459a725394163e619287f86d2071c5f0f6376c155226254a65edb292f11b4c5. NOT the same binary",
+  "matches_protocol": false,
+  "strongest_available": true,
+  "strongest_available_basis": "j != 0, 1728 (a, b != 0) over a prime field: Aut = {+-1} and there is no Frobenius endomorphism to fold, so negation is the strongest",
+  "same_unit": false,
+  "same_binary_or_process": false,
+  "gae_band": {
+   "0": {
+    "ic": null,
+    "rho": 1.511
+   },
+   "0.1": {
+    "ic": null,
+    "rho": 1.619
+   },
+   "1": {
+    "ic": null,
+    "rho": 2.585
+   }
+  },
+  "gae_band_note": "ic is null because no same-unit whole-solve S exists for this component measurement; it is not invented. The nearest algebraic whole-solve arm (pkm-iso-t6-g4, curve25519_algebraic_ecbench_20261102) has S = 31.703 / 1.79e6 / 1.79e7, a different configuration than the bits form measured here.",
+  "order_holds_across_band": true,
+  "order_note": "rho-neg ahead of the algebraic track at every weight; a 3.3-4.7x F4 cut cannot flip it (w=0 S of the algebraic arm has no F4 term; at w=0.1 and 1 the remaining gap is 2.3e5x and 1.5e6x)"
+ }
+}

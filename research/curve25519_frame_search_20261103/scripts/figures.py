@@ -82,11 +82,14 @@ for ax, key, lab in ((axs[0], "gain_vs_bits_lo0", "selected / bits_lo0"),
     ax.text(4.02, 1.5 * 1.04, "P3 threshold 1.5", fontsize=8)
     ax.text(4.02, 1.0 * 1.04, "1 (no gain)", fontsize=8, color="gray")
 axs[0].set_ylabel("coverage ratio (log scale)")
-f = cell[(18, 7)]["gain_vs_bits_lo0"]
-axs[0].annotate(f"P3 fail: k=18, t=7\n{f:.3f}", xy=(7, f), xytext=(5.6, 1.1),
+# the failed P3 cell(s): held-out k, t in 5..7, gain < 1.5 (read from the data)
+fails = [(k, t) for (k, t), c in cell.items() if k != 20 and 5 <= t <= 7 and c["gain_vs_bits_lo0"] < 1.5]
+FK, FT = fails[0]
+f = cell[(FK, FT)]["gain_vs_bits_lo0"]
+axs[0].annotate(f"P3 fail: k={FK}, t={FT}\n{f:.3f}", xy=(FT, f), xytext=(FT + 0.6, 1.1),
                 fontsize=8.5, arrowprops=dict(arrowstyle="->"),
                 bbox=dict(boxstyle="round", fc="white", ec="#c00"))
-axs[0].plot([7], [f], "o", ms=11, mfc="none", mec="#c00", mew=1.8)
+axs[0].plot([FT], [f], "o", ms=11, mfc="none", mec="#c00", mew=1.8)
 axs[1].legend(fontsize=8, loc="upper right")
 fig.suptitle("Gain of the selected frame in exact m=2 subgroup coverage vs t", fontsize=12)
 fig.tight_layout(rect=(0, 0.04, 1, 0.95))
