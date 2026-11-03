@@ -3631,7 +3631,7 @@ mod tests {
         }
     }
     #[test]
-    fn dynamic_original_rejects_unbound_or_different_profile_limits() {
+    fn dynamic_original_rejects_out_of_profile_or_unbound_inputs() {
         let config = CaseConfig {
             family: "prime".into(),
             n: 47,
@@ -3651,7 +3651,7 @@ mod tests {
             let mut changed = config.clone();
             match mutation {
                 0 => changed.solver = "f5".into(),
-                1 => changed.degree_bound = 8,
+                1 => changed.degree_bound = 13,
                 2 => changed.work_limit = 0,
                 _ => changed.m = 3,
             }
