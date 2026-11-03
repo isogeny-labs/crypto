@@ -2670,13 +2670,38 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
     if (found && censored) || (censored && all_queries) || (!found && !censored && !all_queries) {
         return Err("inconsistent prime-root aggregate termination".into());
     }
+    let infinity_prefix = certificate["infinity_prefix_encountered"].as_bool();
+    if certificate["strategy"] == "prime-affine-s3-chain-prefix-root/v1"
+        && infinity_prefix.is_none()
+    {
+        return Err("prime-root chain certificate lacks affine-infinity result".into());
+    }
+    if infinity_prefix == Some(true) && (!censored || found) {
+        return Err("inconsistent affine-infinity termination".into());
+    }
     let expected_status = if found {
         "verified"
+    } else if infinity_prefix == Some(true) {
+        "partial"
     } else if censored {
         "budget_exhausted"
     } else {
         "partial"
     };
+    if let Some(infinity_prefix) = infinity_prefix {
+        let cause = if found {
+            "found_pdp"
+        } else if infinity_prefix {
+            "affine_infinity_prefix"
+        } else if censored {
+            "work_or_trace_cap"
+        } else {
+            "affine_prefixes_exhausted"
+        };
+        if outcome["root_termination_cause"] != cause {
+            return Err("prime-root termination cause differs from certificate".into());
+        }
+    }
     if outcome["root_execution_trace_complete_verified"] != false
         || outcome["root_total_operation_count_verified"] != false
         || outcome["trace_complete"] != false
@@ -4266,24 +4291,58 @@ mod tests {
 
     #[test]
     fn prime_root_outcome_contract_covers_found_exhausted_and_censored() {
-        for (found, censored, all_queries, status, completed) in [
-            (true, false, false, "verified", true),
-            (true, false, true, "verified", true),
-            (false, false, true, "partial", true),
-            (false, true, false, "budget_exhausted", false),
+        for (found, censored, all_queries, infinity, status, cause, completed) in [
+            (true, false, false, false, "verified", "found_pdp", true),
+            (true, false, true, false, "verified", "found_pdp", true),
+            (
+                false,
+                false,
+                true,
+                false,
+                "partial",
+                "affine_prefixes_exhausted",
+                true,
+            ),
+            (
+                false,
+                true,
+                false,
+                false,
+                "budget_exhausted",
+                "work_or_trace_cap",
+                false,
+            ),
+            (
+                false,
+                true,
+                false,
+                true,
+                "partial",
+                "affine_infinity_prefix",
+                false,
+            ),
         ] {
-            let certificate = json!({"found_pdp":found,"censored":censored,
+            let certificate = json!({"strategy":"prime-affine-s3-chain-prefix-root/v1",
+                "found_pdp":found,"censored":censored,
                 "queries":[],"charged_work":0,
+                "infinity_prefix_encountered":infinity,
                 "root_queries_completed":all_queries,"execution_trace_complete_verified":false,
                 "total_operation_count_verified":false});
             let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
                 "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
                 "trace_complete":false,"scalar_recovered_without_witness":false,
                 "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
-                "pdp_witness_verified":found,"solver_completed":completed,"status":status,"counters":{
+                "pdp_witness_verified":found,"solver_completed":completed,"status":status,
+                "root_termination_cause":cause,"counters":{
                     "aggregate_root_field_and_group_work":0,"root_solver_calls":0,
                     "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
             verify_prime_root_outcome(&outcome, &certificate).unwrap();
+            let mut missing_infinity = certificate.clone();
+            missing_infinity
+                .as_object_mut()
+                .unwrap()
+                .remove("infinity_prefix_encountered");
+            assert!(verify_prime_root_outcome(&outcome, &missing_infinity).is_err());
             for field in [
                 "root_execution_trace_complete_verified",
                 "root_total_operation_count_verified",
@@ -4303,6 +4362,7 @@ mod tests {
                 ("pdp_witness_verified", json!(!found)),
                 ("solver_completed", json!(!completed)),
                 ("status", json!("unsupported")),
+                ("root_termination_cause", json!("work_or_trace_cap_typo")),
                 (
                     "root_certificate_scope",
                     json!("full execution trace verified"),

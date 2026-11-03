@@ -3160,6 +3160,15 @@ fn prime_root_chain_solve(
     data.outcome["root_execution_trace_complete_verified"] = json!(false);
     data.outcome["root_total_operation_count_verified"] = json!(false);
     data.outcome["strategy"] = json!("prime-affine-s3-chain-prefix-root/v1");
+    data.outcome["root_termination_cause"] = json!(if found.is_some() {
+        "found_pdp"
+    } else if infinity_prefix {
+        "affine_infinity_prefix"
+    } else if censored {
+        "work_or_trace_cap"
+    } else {
+        "affine_prefixes_exhausted"
+    });
     data.outcome["trace_gaps"] = json!([
         "Native root events are not a restorable process checkpoint",
         "Infinity-prefix branches are outside the affine encoding"
@@ -3167,7 +3176,11 @@ fn prime_root_chain_solve(
     if let Some(witness) = found {
         set_witness(&mut data, group, &witness, target)?;
     } else if censored {
-        data.outcome["status"] = json!("budget_exhausted");
+        data.outcome["status"] = json!(if infinity_prefix {
+            "partial"
+        } else {
+            "budget_exhausted"
+        });
         data.outcome["reason"] = json!(if infinity_prefix {
             "Affine S3 prefix reached infinity"
         } else {

@@ -30,7 +30,9 @@ and terminal state. The existing root-call and selected root-state artifacts
 are retained. Replay reconstructs the public domain, prefix sum, polynomial,
 native root certificate, bounded lift, and aggregate cost. A prefix whose sum
 is infinity stops with explicit censoring because the affine S3 branch does
-not describe it. An exhausted affine search is only an encoding-relative
+not describe it. Its outcome is `partial` with
+`root_termination_cause=affine_infinity_prefix`, distinct from a work or trace
+cap's `budget_exhausted` outcome. An exhausted affine search is only an encoding-relative
 observation; it is not a proof of a global absence of decomposition, ECDLP
 recovery, or a first/last fall-degree result.
 
