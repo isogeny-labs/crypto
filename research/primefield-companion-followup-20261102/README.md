@@ -321,3 +321,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Division-free sign normalization
 
 [feature-native-ratio-sign](feature-native-ratio-sign/README.md) consumes homogeneous source ratios directly in sign-only APIs while preserving raw-value division. All106 native methods pass, including1944 predicate triples,3888 rescalings and8 complete recoveries;24 prebuild source/data locks pass. The local algebra removes one final inversion and product per finite sign; no complete-cost panel. Proof and inspected report included; old comparison identities unchanged.
+
+## Homogeneous seed propagation
+
+[feature-native-pair-seeds](feature-native-pair-seeds/README.md) retains seed numerator/denominator pairs through recurrence and source evaluation. All148 native tests pass, including20736 independently rescaled recurrence cases,9 scaled-source cases and8 complete recoveries;27 prebuild hashes pass. Raw scalar source and recovery code are unchanged. Derived local update6 products/no inverse versus4 products/1 inverse; consumer denominator work and doubled seed storage remain to be compared. No comparative panel.
