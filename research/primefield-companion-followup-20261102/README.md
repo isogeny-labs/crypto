@@ -317,3 +317,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Isolated low-product accounting
 
 [feature-native-low-matched](feature-native-low-matched/README.md) uses monic baseline/A-A and truncated monic candidate. Six non-polynomial modules are byte-identical; seven reverse transforms and29 dependency hashes pass. Two selected instrument tests pass,85 filtered: triangular leaf hooks and all8 recovery receipts. Separate source/binary/analysis-bound draft validates; no comparison panel or cloud job.
+
+## Division-free sign normalization
+
+[feature-native-ratio-sign](feature-native-ratio-sign/README.md) consumes homogeneous source ratios directly in sign-only APIs while preserving raw-value division. All106 native methods pass, including1944 predicate triples,3888 rescalings and8 complete recoveries;24 prebuild source/data locks pass. The local algebra removes one final inversion and product per finite sign; no complete-cost panel. Proof and inspected report included; old comparison identities unchanged.
