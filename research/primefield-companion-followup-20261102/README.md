@@ -269,3 +269,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Native prescribed source grid
 
 `feature-native-grid/` ports the original known-multiplier Jacobian grid and one-inversion affine batch. Three unit methods pass: all71 saved slots of the three original public setups match labels/projective/affine/inverse-Z values, independent affine multiplication agrees, and exceptional/invalid cases pass. Conversion uses7N-3 field products and one inversion excluding group/setup work, as in the original. This exposes individual-grid conversion; projective-only and mixed-stride shared-window paths remain next. See its source/input locks, projection script, native receipt and inspected report.
+
+## Native mixed-stride shared window
+
+`feature-native-window/` preserves identity/prepared-P/generated projective initialization and mixed stride updates, then converts all finite lanes once. Four native unit methods pass, including exact agreement with1426 saved slots and64 public shifts across O,P,2P,-P windows. Extra public-prefix validation is charged separately. Prepared state is immutable and curve-borrowed. See source/fixture locks, projection script, receipts and inspected report. The production API currently consumes public shifted points; a next cost-reduction candidate is generating those points projectively and converting them alongside the grid lanes. That candidate is not implemented or measured here.
