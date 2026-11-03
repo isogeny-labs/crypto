@@ -531,7 +531,8 @@ fn main() {
         let (mut anchor, mut alog) = fresh(&mut c, &mut next);
         let mut anchors_used = 0u64;
         let recovered: u64;
-        let (mut rels2, mut rels3, mut closed_by) = (0u64, 0u64, 0u8);
+        let (mut rels2, mut rels3) = (0u64, 0u64);
+        let closed_by: u8;
         let mut sstate: u64 =
             seed ^ (ti as u64).wrapping_mul(0xa24baed4963ee407) ^ 0x1234_5678_9abc_def1;
         let mut samp = || -> f64 {
@@ -544,7 +545,7 @@ fn main() {
         };
         // Add one relation (terms, right side `lg`, source 2 or 3); stop when it gives t.
         macro_rules! process {
-            ($terms:expr, $lg:expr, $src:expr) => {{
+            ($lbl:lifetime, $terms:expr, $lg:expr, $src:expr) => {{
                 let terms: Vec<(u32, i64)> = $terms;
                 c.relations += 1;
                 if $src == 2u8 {
@@ -558,7 +559,7 @@ fn main() {
                         if cv.mul(Some(g), t, &mut scratch) == Some(target) {
                             recovered = t;
                             closed_by = $src;
-                            break 'outer;
+                            break $lbl;
                         }
                         bad_t += 1;
                     } else if da != 0 {
@@ -581,7 +582,7 @@ fn main() {
                         let mut terms: Vec<(u32, i64)> =
                             rel.terms.iter().map(|&(kk, e)| (kk, e)).collect();
                         merge_terms(&mut terms);
-                        process!(terms, lg, 2u8);
+                        process!('outer, terms, lg, 2u8);
                     }
                     // Source B: sampled 2 + 1 relations.
                     if qfrac > 0.0 {
@@ -610,7 +611,7 @@ fn main() {
                                     }
                                 }
                                 for terms in batch {
-                                    process!(terms, lg, 3u8);
+                                    process!('outer, terms, lg, 3u8);
                                 }
                             }
                         }
