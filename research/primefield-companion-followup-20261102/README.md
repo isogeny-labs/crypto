@@ -289,3 +289,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Shared source seeds and retained preparation
 
 [feature-native-shared-seeds/DERIVATION.md](feature-native-shared-seeds/DERIVATION.md) adds borrowed immutable prepared state, four seed anchors and the original outer seed recurrence. Five fixed F509 windows match all 80 signs and 78 finite direct phases; recorded direct calls are 0/0/1/0/2. Reuse on three original curves and two tiny tail-branch fixtures passes. Costs retain recurrence inversions and all downstream work. Decoder binding is next.
+
+## Fresh native verified recovery
+
+[feature-native-recovery/DERIVATION.md](feature-native-recovery/DERIVATION.md) binds shared fresh source signs to the repaired native program and verifies every candidate by independent affine multiplication. Eight fixed public targets, including the four repair-fiber points, recover exactly; deleting the repair term fails verification. Three methods pass once. Complete-cost instrumentation and original full cohort remain next.
