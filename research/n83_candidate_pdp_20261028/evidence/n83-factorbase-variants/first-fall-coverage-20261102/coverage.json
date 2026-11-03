@@ -398,10 +398,12 @@
     "source_availability": {
       "spike29": {
         "affine_dreg_rows": 0,
+        "frozen_v2_source_binding_audit_sha256": "91c6a10c3b60c419a4f7ba50e8f084f6a5af23a868e39f11542d78a2dfb2823d",
+        "frozen_v2_source_hashes_bound_to_top_form_replay": true,
         "pdp_input_manifest_sha256": "1ab7f5d2238c48892a1d905022a76460c9570068586a5fb57684bb301f96e4ee",
         "pdp_system_files_locally_present": 48,
         "prior_top_form_certificates_replayed": 48,
-        "source_binding_note": "The existing PDP source set is indexed by its own manifest; it has not yet been checked against a V2 first-fall case index.",
+        "source_binding_note": "All 48 saved PDP source hashes are bound to the frozen V2 spike29 family arms and fresh top-form replay hashes; no V2 first-fall certificates have been produced for these rows.",
         "v2_first_fall_rows": 0
       },
       "spike34": {
@@ -442,7 +444,7 @@
     "per_candidate_summaries": "Six 48-row first-fall summaries are linked by source path and hash.",
     "spike35_spike37_panel": "One 144-row combined summary is linked by source path and hash; attempt-01 and attempt-02 records remain preserved separately.",
     "spike35_spike37_raw_case_archive": "The canonical 144-case S3 archive and custody record are referenced without copying raw case files into this coverage index; source system payloads are stored separately.",
-    "unlabelled_source_availability": "source_availability distinguishes existing spike29 PDP system files, spike38/spike39 base and failed top-form preflights, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels."
+    "unlabelled_source_availability": "source_availability distinguishes the protocol-bound but still unlabelled spike29 PDP systems, spike38/spike39 bases with failed top-form attempts, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels."
   },
   "first_fall_outcomes": {
     "by_family": {
@@ -575,6 +577,18 @@
       "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/top-form/attempt-01/replay-summary.json",
       "rows": 48,
       "sha256": "32a2f09c9926c6a831d7110f3d19fa36f52a48799df67f4db3bd12740c5d8a0c"
+    },
+    {
+      "bytes": 22705,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/source-binding-audit-20261103/audit.json",
+      "rows": 48,
+      "sha256": "91c6a10c3b60c419a4f7ba50e8f084f6a5af23a868e39f11542d78a2dfb2823d"
+    },
+    {
+      "bytes": 1170,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/source-binding-audit-20261103/FILE_LAYOUT.json",
+      "rows": 0,
+      "sha256": "956f0abae4b8340fda89bd2e86abc080742e225863bfcfdbe5cfc9868b27bf65"
     },
     {
       "bytes": 1618,

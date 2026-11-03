@@ -29,6 +29,7 @@ CUSTODY = EVIDENCE / "candidate-fall-20261102/combined-144/S3-CUSTODY-complete.j
 LFD_SUMMARY = STUDY / "evidence/degree4-propagation/summary.json"
 R29_INPUT_DIR = EVIDENCE / "r29-attempt-02/pdp-inputs/attempt-02/candidate-structure"
 R29_TOP_DIR = EVIDENCE / "r29-attempt-02/top-form/attempt-01"
+R29_BINDING_DIR = EVIDENCE / "r29-attempt-02/source-binding-audit-20261103"
 R38_TOP_DIR = EVIDENCE / "r38-attempt-01/top-form-20261101T2015Z"
 R39_TOP_DIR = EVIDENCE / "r39-attempt-01/top-form-20261101T2045Z"
 EXPECTED_CANDIDATES = [f"spike{i}" for i in range(27, 40)]
@@ -160,11 +161,22 @@ def build() -> dict:
     assert r29_top_run["replay_all_verified"] is True
     assert r29_top_replay["all_verified"] is True and len(r29_top_replay["rows"]) == 48
     assert not (EVIDENCE / "r29-attempt-02/first-fall").exists()
+    r29_binding = load(R29_BINDING_DIR / "audit.json")
+    assert r29_binding["schema"] == "n83.r29-pdp-source-binding-audit/v1"
+    assert r29_binding["protocol"]["id"] == EXPECTED_PROTOCOL_ID
+    assert r29_binding["protocol"]["frozen_protocol_sha256"] == EXPECTED_PROTOCOL_SHA256
+    assert r29_binding["factor_base"]["complete"] is True
+    assert r29_binding["factor_base"]["same_base_for_m"] == list(range(2, 10))
+    assert r29_binding["pdp_inputs"]["rows"] == 48
+    assert r29_binding["top_form_replay_binding"]["rows"] == 48
+    assert r29_binding["top_form_replay_binding"]["source_hashes_match"] is True
     sources.extend([
         source_record(r29_inputs_path, len(r29_inputs)),
         source_record(r29_manifest_path, len(r29_system_paths)),
         source_record(R29_TOP_DIR / "run.json", 48),
         source_record(R29_TOP_DIR / "replay-summary.json", 48),
+        source_record(R29_BINDING_DIR / "audit.json", 48),
+        source_record(R29_BINDING_DIR / "FILE_LAYOUT.json", 0),
     ])
 
     r38_preflight = load(R38_TOP_DIR / "preflight.json")
@@ -210,9 +222,11 @@ def build() -> dict:
                     "pdp_system_files_locally_present": 48,
                     "pdp_input_manifest_sha256": digest(r29_manifest_path),
                     "prior_top_form_certificates_replayed": 48,
+                    "frozen_v2_source_binding_audit_sha256": digest(R29_BINDING_DIR / "audit.json"),
+                    "frozen_v2_source_hashes_bound_to_top_form_replay": True,
                     "v2_first_fall_rows": 0,
                     "affine_dreg_rows": 0,
-                    "source_binding_note": "The existing PDP source set is indexed by its own manifest; it has not yet been checked against a V2 first-fall case index.",
+                    "source_binding_note": "All 48 saved PDP source hashes are bound to the frozen V2 spike29 family arms and fresh top-form replay hashes; no V2 first-fall certificates have been produced for these rows.",
                 },
                 "spike38": {
                     "complete_factor_base_index": True,
@@ -286,7 +300,7 @@ def build() -> dict:
             "spike35_spike37_panel": "One 144-row combined summary is linked by source path and hash; attempt-01 and attempt-02 records remain preserved separately.",
             "spike35_spike37_raw_case_archive": "The canonical 144-case S3 archive and custody record are referenced without copying raw case files into this coverage index; source system payloads are stored separately.",
             "other_candidate_archives": "The six earlier candidate summaries retain their own evidence directories and S3 persistence references; this index records each summary's hash instead of flattening those attempts.",
-            "unlabelled_source_availability": "source_availability distinguishes existing spike29 PDP system files, spike38/spike39 base and failed top-form preflights, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels.",
+            "unlabelled_source_availability": "source_availability distinguishes the protocol-bound but still unlabelled spike29 PDP systems, spike38/spike39 bases with failed top-form attempts, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels.",
         },
     }
 
