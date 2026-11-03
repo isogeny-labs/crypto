@@ -451,12 +451,43 @@ pub fn bits_factor_base(
     t: u32,
     lo: u64,
 ) -> FactorBase<PrimePoint> {
+    let p = inst.curve.p;
+    let xs: Vec<u64> = (0..(1u64 << t)).map(|k| (lo % p + k) % p).collect();
+    abscissa_factor_base(inst, xs, format!("x in [{lo}, {lo} + 2^{t})"))
+}
+
+/// `x = w² + s` for `w ∈ [lo, lo + 2^t)` (the `square-bits` grid).
+pub fn square_abscissae(p: u64, t: u32, lo: u64, s: u64) -> Vec<u64> {
+    (0..(1u64 << t))
+        .map(|k| {
+            let w = (lo % p + k) % p;
+            addm(mulm(w, w, p), s % p, p)
+        })
+        .collect()
+}
+
+/// The 2-descent base: every point with `x = w² + A/3`, `w ∈ [lo, lo + 2^t)`.
+pub fn square_bits_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    t: u32,
+    lo: u64,
+    shift: u64,
+) -> FactorBase<PrimePoint> {
+    let xs = square_abscissae(inst.curve.p, t, lo, shift);
+    abscissa_factor_base(inst, xs, format!("x = w² + A/3, w in [{lo}, {lo} + 2^{t})"))
+}
+
+/// One column per abscissa in `xs` that carries a point, both signs.
+fn abscissa_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    mut xs: Vec<u64>,
+    label: String,
+) -> FactorBase<PrimePoint> {
     let curve = &inst.curve;
     let p = curve.p;
-    let mut xs: Vec<u64> = (0..(1u64 << t)).map(|k| (lo % p + k) % p).collect();
     xs.sort_unstable();
     xs.dedup();
-    let mut fb = FactorBase::empty(format!("x in [{lo}, {lo} + 2^{t})"));
+    let mut fb = FactorBase::empty(label);
     for x in xs {
         let rhs = curve.rhs(x);
         let Some(y) = curve.sqrt(rhs) else { continue };
@@ -596,6 +627,14 @@ pub enum Membership {
     /// `prepare`.  A solution `(w_1, …, w_m)` is lifted back to points over
     /// each `w_i` (the two roots `z`, `d/z`) and re-added.
     T0Bits { lo: u64, q: Option<T0Quotient> },
+    /// 2-descent-filtered interval: `u = w²`, `w = lo + Σ_j 2^j b_j`,
+    /// `b_j² = b_j`, `x_W = u + s` (`s = x_W(T₀) = A/3`, `None` until
+    /// `prepare`).  On a Montgomery curve whose only rational 2-torsion
+    /// point is `T₀ = (0,0)`, `u(P)` is a square exactly when
+    /// `P ∈ 2E(F_p)`, so every base point lies in an even cofactor coset
+    /// (research/curve25519_torsion_leads_20261103).  Each `x_i` has degree
+    /// 2 in its `w_i`, so `S₃` has degree 4 per summand in the bits.
+    SquareBits { lo: u64, shift: Option<u64> },
 }
 
 /// The oracle.  Built by the harness with the base's `t` and `g`, which it
@@ -700,6 +739,13 @@ impl PkmSemaevOracle {
         o
     }
 
+    /// `m` summands with `x = (lo + Σ 2^j b_j)² + A/3` (the 2-descent base).
+    pub fn new_square_bits(m: u32, t: u32, lo: u64) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::SquareBits { lo, shift: None };
+        o
+    }
+
     /// `m` summands with the T₀-invariant `w ∈ [lo, lo + 2^t)` written in bits.
     pub fn new_t0_bits(m: u32, t: u32, lo: u64) -> Self {
         let mut o = Self::new(m, t, 1);
@@ -746,6 +792,11 @@ impl PkmSemaevOracle {
             _ if spec.oracle_params.get("t0_bits").is_some() => Self::new_t0_bits(
                 m,
                 spec.oracle_params.u64("t0_bits")? as u32,
+                spec.oracle_params.u64_or("lo", 0)?,
+            ),
+            _ if spec.oracle_params.get("square_bits").is_some() => Self::new_square_bits(
+                m,
+                spec.oracle_params.u64("square_bits")? as u32,
                 spec.oracle_params.u64_or("lo", 0)?,
             ),
             _ if spec.oracle_params.get("edwards_bits").is_some() => {
@@ -1076,9 +1127,10 @@ impl PkmSemaevOracle {
             Membership::Isogeny { .. } => Pol::var(n, i * t),
             Membership::Bits { .. }
             | Membership::EdwardsBits { .. }
-            | Membership::T0Bits { .. } => {
+            | Membership::T0Bits { .. }
+            | Membership::SquareBits { .. } => {
                 let lo = &match &self.membership {
-                    Membership::Bits { lo } => *lo,
+                    Membership::Bits { lo } | Membership::SquareBits { lo, .. } => *lo,
                     // w = lo + Σ 2^j b_j, entered at x = w + s of the quotient
                     Membership::T0Bits { lo, q } => {
                         (lo + q.expect("t0 quotient resolved in prepare").s) % p
@@ -1093,6 +1145,11 @@ impl PkmSemaevOracle {
                 let mut acc = Pol::constant(n, base, p);
                 for j in 0..free_bits {
                     acc = acc.add(&Pol::var(n, i * t + j).scale((1u64 << j) % p, p), p);
+                }
+                if let Membership::SquareBits { shift, .. } = &self.membership {
+                    // x = w² + s, s = x_W(T₀)
+                    let s = shift.expect("square-bits shift resolved in prepare") % p;
+                    acc = acc.mul(&acc, p).add(&Pol::constant(n, s, p), p);
                 }
                 acc
             }
@@ -1190,7 +1247,8 @@ impl PkmSemaevOracle {
                 }
                 if let Membership::Bits { .. }
                 | Membership::EdwardsBits { .. }
-                | Membership::T0Bits { .. } = &self.membership
+                | Membership::T0Bits { .. }
+                | Membership::SquareBits { .. } = &self.membership
                 {
                     rules.push(SquareRule {
                         next: None,
@@ -1265,6 +1323,9 @@ impl PkmSemaevOracle {
                 None => v.clone(),
             },
             Membership::Bits { lo } => (0..(1u64 << t)).map(|k| (lo + k) % p).collect(),
+            Membership::SquareBits { lo, shift } => {
+                square_abscissae(p, self.t, *lo, shift.expect("resolved in prepare"))
+            }
             Membership::EdwardsBits { shift } => {
                 edwards_abscissae(p, self.t, shift.expect("resolved in prepare") % p)
             }
@@ -1454,6 +1515,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "the base's Vélu 2-isogeny tower (PKM isogeny form)".into()
             }
             Membership::Bits { lo } => format!("bits: x = {lo} + Σ 2^j b_j, b_j² = b_j"),
+            Membership::SquareBits { lo, .. } => format!(
+                "2-descent bits: x = ({lo} + Σ 2^j b_j)² + A/3, b_j² = b_j (base in 2E(F_p))"
+            ),
             Membership::EdwardsBits { .. } => {
                 "Edwards bits: x = (1 + y)/(1 − y) + A/3, y = Σ 2^j b_j, b_j² = b_j".into()
             }
@@ -1565,6 +1629,21 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
             return self.finish_prepare(curve, 0);
         }
+        if let Membership::SquareBits { lo, shift } = self.membership {
+            let s = match shift {
+                Some(s) => s,
+                None => edwards_shift(curve)?,
+            };
+            self.membership = Membership::SquareBits { lo, shift: Some(s) };
+            let set: HashSet<u64> = square_abscissae(p, self.t, lo, s).into_iter().collect();
+            if let Some(x) = fb.abscissa_list.iter().find(|x| !set.contains(x)) {
+                return Err(format!(
+                    "pkm-semaev: abscissa {x} of the base is not (w² + A/3) for w in [{lo}, {lo} + 2^{})",
+                    self.t
+                ));
+            }
+            return self.finish_prepare(curve, 0);
+        }
         if let Membership::T0Bits { lo, .. } = self.membership {
             // s = x_W(T₀): the unique rational root of the cubic.  Every base
             // abscissa must lie over a w in the interval; the map w → the
@@ -1607,6 +1686,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             Membership::Kummer => {}
             Membership::T0Bits { .. } => unreachable!("handled above"),
             Membership::EdwardsBits { .. } => unreachable!("handled above"),
+            Membership::SquareBits { .. } => unreachable!("handled above"),
             Membership::Isogeny { v, steps, .. } => {
                 if steps.len() != self.t as usize || v.len() != 1usize << self.t {
                     return Err(
