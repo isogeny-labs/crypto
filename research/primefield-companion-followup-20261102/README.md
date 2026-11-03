@@ -261,3 +261,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Native normalization and division core
 
 `feature-native-division/` ports the original public-point division recurrences and invariant-differential jets to dependency-free Rust. One native invocation passed3 methods: saved normalization seeds on all3 original generators,9 saved division values, Ward addition identities in value and derivative, and domain controls. A point-bound cache supports reuse across requests. Value-only requests currently compute derivatives too; no total-cost saving is claimed. The original kernel is preserved as text for review. Geometry and resultant stages remain to port before the full source is executable natively.
+
+## Scalar-only native source values
+
+`feature-native-value-division/` supplies a separate ValueDivision for source calls that already have a normalization seed. Its production path constructs no derivatives; use the prior jet engine when phase/derivatives are needed. Three selected native tests pass, with three historical reference tests filtered out:9 saved values, agreement at original generators and negatives through fixed indices including u64::MAX, parity and domain controls. Six products per new nonbase recurrence value is a derived count excluding setup and map overhead, not timing. Separate caches do not share setup. See its receipt, derivation and inspected report.
