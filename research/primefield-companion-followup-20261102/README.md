@@ -301,3 +301,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Monic remainder specialization
 
 [feature-native-monic/DERIVATION.md](feature-native-monic/DERIVATION.md) preserves Newton/Karatsuba/tree structure while using unit series starts, low remainder reconstruction and Horner leaves. Four correctness methods pass, including84 remainder cases and8 complete recoveries. The cost-comparison protocol is a validated draft, not frozen or executed.
+
+## Matched monic runner construction
+
+[feature-native-matched](feature-native-matched/README.md) adds a compiled single-binary baseline/candidate/A-A runner, seven reversible candidate modules and three new arithmetic hooks. Source mapping and build checks pass; no comparison rows have been collected. Strict analysis, protocol binding/preflight and admission remain next. See the inspected [report](feature-native-matched/report.pdf).
