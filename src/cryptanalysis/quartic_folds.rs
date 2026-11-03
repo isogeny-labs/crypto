@@ -2600,13 +2600,25 @@ fn collect_and_solve(
     let counted = solver
         .and_then(super::klein_v4::V4Solver::parse)
         .is_some_and(|v| v.counts_pivots());
+    // E43 (§9.58): FV and FW emit V's and W's fields.
     let tails = solver
         .and_then(super::klein_v4::V4Solver::parse)
-        .is_some_and(|v| v == super::klein_v4::V4Solver::ChainTails);
+        .is_some_and(|v| {
+            matches!(
+                v,
+                super::klein_v4::V4Solver::ChainTails | super::klein_v4::V4Solver::ChainFifoTails
+            )
+        });
     let profile = tails
         || solver
             .and_then(super::klein_v4::V4Solver::parse)
-            .is_some_and(|v| v == super::klein_v4::V4Solver::ChainProfile);
+            .is_some_and(|v| {
+                matches!(
+                    v,
+                    super::klein_v4::V4Solver::ChainProfile
+                        | super::klein_v4::V4Solver::ChainFifoProfile
+                )
+            });
     Ok(K4PipelineReport {
         p,
         seed,
@@ -3300,7 +3312,10 @@ fn v4_decompose(
         // gains nothing there.
         stored: if matches!(
             solver,
-            kv::V4Solver::ChainProfile | kv::V4Solver::ChainTails
+            kv::V4Solver::ChainProfile
+                | kv::V4Solver::ChainTails
+                | kv::V4Solver::ChainFifoProfile
+                | kv::V4Solver::ChainFifoTails
         ) {
             if fallback {
                 st.rows as u64 * st.cols as u64 * 2
