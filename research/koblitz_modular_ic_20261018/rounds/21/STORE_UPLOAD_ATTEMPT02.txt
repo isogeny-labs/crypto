@@ -1,0 +1,38 @@
+# Artifact access attempt02
+
+2026-10-24 America/Los_Angeles (2026-10-25 UTC).
+User-supplied artifact credentials were used only in the command environment.
+No credential value is included here or stored in the repository.
+
+1. Native ecbench store push, same archive/name/provenance as attempt01,
+   without --replace: exit2; HeadObject403.
+2. AWS STS GetCallerIdentity: exit0; supplied credentials authenticate.
+   Principal identifiers are omitted from the published receipt.
+3. Read-only HeadObject on an existing indexed object: exit254;403.
+4. Conditional checksum-protected PutObject on the exact sealed archive:
+
+   aws s3api put-object --bucket crypto-autoresearcher
+     --key store/sha256/e9/e9c89a33a4cf96ae075e015e02829d0ad40165634c0317d40d5c2091ed576fa2
+     --body research/koblitz_modular_ic_20261018/rounds/21/validation-runs.tar.xz
+     --if-none-match '*' --checksum-algorithm SHA256
+     --checksum-sha256 BASE64_OF_COMMITTED_SHA256 --output json
+
+   exit254; AccessDenied. The checksum is the base64 encoding of the
+   32-byte digest in validation-runs.tar.xz.sha256. No overwrite was possible.
+
+No successful upload,store index change,fresh remote pull,permission change
+or remote deletion occurred. This confirms an authorization failure at the
+configured bucket/prefix despite valid authentication. The intended bucket/
+prefix or GetObject/PutObject and prefix-scoped ListBucket access is needed.
+
+Native push error:
+ecbench: aws head-object failed (exit status: 254): aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 also answers 403 for an absent key when the caller lacks s3:ListBucket; check the credentials and the bucket policy)
+
+Conditional PUT error:
+aws: [ERROR]: An error occurred (AccessDenied) when calling the PutObject operation: Access Denied
+
+Correction after the user identified the intended destination:
+these failures were against crypto-autoresearcher,the wrong bucket for the
+artifact credentials. The same credentials successfully published and
+retrieved the archive from setec-astronomy-artifacts/store. No permission
+expansion was needed. See ARTIFACT_PUBLICATION.json.

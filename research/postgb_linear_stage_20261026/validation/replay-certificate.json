@@ -1,0 +1,394 @@
+{
+  "checks": [
+    {
+      "check": "R3-C replay: every row equals the recorded row in every non-timing field (sols, muls, give-up, fallback, fast-arm counters)",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "dlp_sparse_p53_s1: every non-timing field equals R3-D1 (57 compared), and the instance line is byte-identical",
+      "detail": {},
+      "ok": true
+    },
+    {
+      "check": "dlp_fast_p53_s1: every non-timing field equals R3-D2 (57 compared), and the instance line is byte-identical",
+      "detail": {},
+      "ok": true
+    },
+    {
+      "check": "every nonce-sampled R3-C system was replayed",
+      "detail": [],
+      "ok": true
+    },
+    {
+      "check": "one nonce-chosen R3-D instance per arm was replayed",
+      "detail": [
+        "dlp_fast_p53_s1",
+        "dlp_sparse_p53_s1"
+      ],
+      "ok": true
+    },
+    {
+      "check": "scalars: all 8 R3-D instances verified by the validator's own arithmetic, the validator's replay dumps identical",
+      "detail": {
+        "own_dumps_identical": true,
+        "r3_verified": 8
+      },
+      "ok": true
+    }
+  ],
+  "independence": "replayed by the validator with the pinned R3 binaries (copies whose sha256 match the cards' binds); nonce drawn by the validator after the snapshot commit; comparison and scalar arithmetic in the validator's own Rust (validation/vtool), sharing no code with the repository",
+  "independent": true,
+  "nonce": "390ee4d7e27df3970a4bddaa8a10b09ea36962f5d9e9f12e81fdf86330c1faac",
+  "nonce_drawn_utc": "2026-10-27T09:00:14Z",
+  "pins": {
+    "jv_cover": "a49184b0c25ae27538f083999459ca9c4cc88abf4f9c99cc06b007253b5feb85",
+    "postgb_la_bench": "06351d89429a1d50d5026e9bfe99c7299e25e3d15b0024b1c0b7cda4d686444b"
+  },
+  "previous_round": "round 1 (snapshot e9bf8737a3) replayed R2 with Python tooling (validation/replay/, historical; superseded by this certificate)",
+  "problems": [],
+  "runs": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned-r3/postgb_la_bench",
+        "--families",
+        "jv-nagao,gaudry-s4,gaudry-d4,gaudry-s5,dense",
+        "--per",
+        "8",
+        "--reps",
+        "1",
+        "--arms",
+        "sparse,fast",
+        "--json",
+        "research/postgb_linear_stage_20261026/validation/round2/out/r3c_full.json"
+      ],
+      "binary_sha256": "06351d89429a1d50d5026e9bfe99c7299e25e3d15b0024b1c0b7cda4d686444b",
+      "compared_with": "research/postgb_linear_stage_20261026/runs/R3-C.json",
+      "cwd": "/home/user/crypto",
+      "end_utc": "2026-10-27T09:17:32Z",
+      "env": [
+        ""
+      ],
+      "exit_code": 0,
+      "matched": "253/253 systems equal in every non-timing field (n, p, delta, agree, planted, per arm: sols, muls, gave_up, fallback, and the fast arm's krylov/bm/nf/roots/readout muls, delta, dense_cols, functionals_tried, nnz, nf_rows, roots); muls equal on 253/253; the 14 nonce-sampled systems: 14 equal",
+      "mismatching_systems": [],
+      "name": "r3c_full",
+      "ok": true,
+      "outputs": {
+        "research/postgb_linear_stage_20261026/validation/round2/out/r3c_full.json": "a06f911a19061f9fbb0fb36e86a57bdb8c6a4ff1b6719a0d33310d47ef4bbfb3",
+        "research/postgb_linear_stage_20261026/validation/round2/out/r3c_full.stderr": "8964eabd0daeb28501afdcaf0b3d54f73712bd3d800e9c6f960d687fc83c6a95",
+        "research/postgb_linear_stage_20261026/validation/round2/out/r3c_full.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run_by": "validator",
+      "sampled_systems_equal": 14,
+      "start_utc": "2026-10-27T09:00:37Z"
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned-r3/jv_cover",
+        "--exp",
+        "dlp",
+        "--sizes",
+        "53",
+        "--seeds",
+        "1",
+        "--rho-runs",
+        "4",
+        "--check-every",
+        "64",
+        "--json",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_sparse_p53_s1.json"
+      ],
+      "binary_sha256": "a49184b0c25ae27538f083999459ca9c4cc88abf4f9c99cc06b007253b5feb85",
+      "compared_with": "research/postgb_linear_stage_20261026/runs/R3-D1.json and R3-D1.instances.jsonl",
+      "cwd": "/home/user/crypto",
+      "end_utc": "2026-10-27T09:19:31Z",
+      "env": [
+        "JV_LIN=sparse",
+        "JV_RHO_NEG=1",
+        "JV_DUMP_INSTANCE=research/postgb_linear_stage_20261026/validation/round2/out/dlp_sparse_p53_s1.instances.jsonl"
+      ],
+      "exit_code": 0,
+      "key": [
+        53,
+        1
+      ],
+      "matched": "0 of 57 non-timing fields differ (incl. lin_muls, relations, S, the 4 rho and 4 rho_neg runs); instance dump line byte-identical: true",
+      "name": "dlp_sparse_p53_s1",
+      "ok": true,
+      "outputs": {
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_sparse_p53_s1.instances.jsonl": "15c20a645d742abffbdc39a176277db86e5fd38431d18f31da96b0433303ffe0",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_sparse_p53_s1.json": "aba38d776c32699e128775f33cfe0764d745c0388ab670926e74d15e09fc5c36",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_sparse_p53_s1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_sparse_p53_s1.stdout": "cd0e7fe43003fbb1742a4a4f4df55e337d3cf1e0b0e5e00e03879eab8f449945"
+      },
+      "required": {
+        "correct": [
+          true,
+          true
+        ],
+        "lin_muls": [
+          4032563426,
+          4032563426
+        ],
+        "relations": [
+          31,
+          31
+        ],
+        "rho_equal": true,
+        "rho_neg_equal": true,
+        "s": [
+          731.5903153798725,
+          731.5903153798725
+        ],
+        "solved": [
+          true,
+          true
+        ]
+      },
+      "run_by": "validator",
+      "start_utc": "2026-10-27T09:13:58Z",
+      "timing_not_compared": {
+        "f4_ms": [
+          189397.6116630007,
+          173965.19611200044
+        ],
+        "lin_ms": [
+          117218.15951400012,
+          109240.0876729994
+        ],
+        "wall_ms": [
+          332171.03476,
+          333402.468187
+        ]
+      }
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned-r3/jv_cover",
+        "--exp",
+        "dlp",
+        "--sizes",
+        "53",
+        "--seeds",
+        "1",
+        "--rho-runs",
+        "4",
+        "--check-every",
+        "64",
+        "--json",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_fast_p53_s1.json"
+      ],
+      "binary_sha256": "a49184b0c25ae27538f083999459ca9c4cc88abf4f9c99cc06b007253b5feb85",
+      "compared_with": "research/postgb_linear_stage_20261026/runs/R3-D2.json and R3-D2.instances.jsonl",
+      "cwd": "/home/user/crypto",
+      "end_utc": "2026-10-27T09:24:47Z",
+      "env": [
+        "JV_LIN=fast",
+        "JV_RHO_NEG=1",
+        "JV_DUMP_INSTANCE=research/postgb_linear_stage_20261026/validation/round2/out/dlp_fast_p53_s1.instances.jsonl"
+      ],
+      "exit_code": 0,
+      "key": [
+        53,
+        1
+      ],
+      "matched": "0 of 57 non-timing fields differ (incl. lin_muls, relations, S, the 4 rho and 4 rho_neg runs); instance dump line byte-identical: true",
+      "name": "dlp_fast_p53_s1",
+      "ok": true,
+      "outputs": {
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_fast_p53_s1.instances.jsonl": "8612126bfc0f055e09e2b09b858a3dc77ab439940f8a74828afac42a8d602e18",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_fast_p53_s1.json": "ed14a8a507857607ded1d5ffb270f7efa4e6295963487fb4f77758c56e1b482a",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_fast_p53_s1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "research/postgb_linear_stage_20261026/validation/round2/out/dlp_fast_p53_s1.stdout": "93e000f7031705ba5c7a6ce3012752d264555554a31a4e903c587d72603a01c7"
+      },
+      "required": {
+        "correct": [
+          true,
+          true
+        ],
+        "lin_muls": [
+          3922354568,
+          3922354568
+        ],
+        "relations": [
+          31,
+          31
+        ],
+        "rho_equal": true,
+        "rho_neg_equal": true,
+        "s": [
+          727.1174163750129,
+          727.1174163750129
+        ],
+        "solved": [
+          true,
+          true
+        ]
+      },
+      "run_by": "validator",
+      "start_utc": "2026-10-27T09:19:31Z",
+      "timing_not_compared": {
+        "f4_ms": [
+          154312.95762999862,
+          154202.8287450011
+        ],
+        "lin_ms": [
+          17793.01070800004,
+          17931.169804999925
+        ],
+        "wall_ms": [
+          315139.751781,
+          318510.501714
+        ]
+      }
+    }
+  ],
+  "sampling": {
+    "dlp_instances": [
+      {
+        "JV_LIN": "sparse",
+        "card": "R3-D1",
+        "p": 53,
+        "seed": 1
+      },
+      {
+        "JV_LIN": "fast",
+        "card": "R3-D2",
+        "p": 53,
+        "seed": 1
+      }
+    ],
+    "k_per_family": {
+      "dense": 4,
+      "gaudry-d4": 3,
+      "gaudry-s4": 3,
+      "gaudry-s5": 1,
+      "jv-nagao": 3
+    },
+    "nonce": "390ee4d7e27df3970a4bddaa8a10b09ea36962f5d9e9f12e81fdf86330c1faac",
+    "procedure": "R3-C systems: within each family, ordered by sha256(nonce:R3-C:family:label), the first k taken. R3-D: per card, the (p, seed) with the smallest sha256(nonce:card:p:seed).",
+    "reached_by": "the full R3-C card command (one process, every family), so every system keeps its recorded index si and its counts are comparable exactly",
+    "sampled_systems": [
+      {
+        "delta": 64,
+        "family": "jv-nagao",
+        "label": "p53-3",
+        "p": 53,
+        "si": 3
+      },
+      {
+        "delta": 64,
+        "family": "jv-nagao",
+        "label": "p101-9c",
+        "p": 101,
+        "si": 21
+      },
+      {
+        "delta": 64,
+        "family": "jv-nagao",
+        "label": "p53-7",
+        "p": 53,
+        "si": 7
+      },
+      {
+        "delta": 64,
+        "family": "gaudry-s4",
+        "label": "p1039-2",
+        "p": 1039,
+        "si": 58
+      },
+      {
+        "delta": 64,
+        "family": "gaudry-s4",
+        "label": "p1039-6",
+        "p": 1039,
+        "si": 62
+      },
+      {
+        "delta": 64,
+        "family": "gaudry-s4",
+        "label": "p8191-1",
+        "p": 8191,
+        "si": 65
+      },
+      {
+        "delta": 512,
+        "family": "gaudry-d4",
+        "label": "p4093-3",
+        "p": 4093,
+        "si": 91
+      },
+      {
+        "delta": 512,
+        "family": "gaudry-d4",
+        "label": "p1033-1",
+        "p": 1033,
+        "si": 81
+      },
+      {
+        "delta": 512,
+        "family": "gaudry-d4",
+        "label": "p4093-5",
+        "p": 4093,
+        "si": 93
+      },
+      {
+        "delta": 4096,
+        "family": "gaudry-s5",
+        "label": "p13-0",
+        "p": 13,
+        "si": 96
+      },
+      {
+        "delta": 729,
+        "family": "dense",
+        "label": "n6-d3-p32-2",
+        "p": 4294967291,
+        "si": 234
+      },
+      {
+        "delta": 32,
+        "family": "dense",
+        "label": "n5-d2-p31-0",
+        "p": 2147483647,
+        "si": 193
+      },
+      {
+        "delta": 64,
+        "family": "dense",
+        "label": "n3-d4-p32-0",
+        "p": 4294967291,
+        "si": 133
+      },
+      {
+        "delta": 64,
+        "family": "dense",
+        "label": "n6-d2-p16-0",
+        "p": 65521,
+        "si": 217
+      }
+    ]
+  },
+  "scalar_check_used": "validation/vtool verify-scalars: own F_p, F_{p^2}, F_{p^6} and curve arithmetic. For each of the 8 R3-D instances (and the 8 round-1 dumps, and the validator's own replay dumps): w a non-residue and s a non-cube (Euler and exhaustive root search), curve non-singular, G and Q on it, l prime (Miller-Rabin and trial division), G != O, l G = O, dd G = Q, dd = d; self-tests and negative controls. Ties: each dumped (p, seed, l) is its R3-D row's; R3 dumps byte-identical to the round-1 dumps and to the validator's replay dumps.",
+  "scalar_verification": {
+    "instances_total": 18,
+    "instances_verified": 18,
+    "path": "validation/round2/scalar-verification.json",
+    "sha256": "74bfc5b897dedaa68c894cbe73e54cbd945b9d4841862ae9557876a747686a88"
+  },
+  "scalars_verified": true,
+  "schema": "postgb-la-replay-certificate/v2",
+  "snapshot_commit": "6f356f71ef8b5392fe27da22170b914e37109390",
+  "status": "verified",
+  "tool": {
+    "crate": "validation/vtool",
+    "sources_sha256": {
+      "validation/vtool/src/main.rs": "820664477f280009bbaf696dc8788129c5d17b95100dca364fa46c27c99c3068",
+      "validation/vtool/src/recompute.rs": "16a87e6a22b43d0f91abafd327b8b47f8f47863f83c563ff0ae505aab88a0ced",
+      "validation/vtool/src/replay.rs": "c2971b1a5f0e65e7e4c37500ce91dd4c9e55d1c6dd024e0f3a1a2671ec10f077",
+      "validation/vtool/src/scalars.rs": "f3c4f55dd4040565bd406d84a5b9d319ae28a6e10b1dafa06134e2c9ba269428",
+      "validation/vtool/src/util.rs": "efdde3bcddb8d4594f4db83b2afc939ab7ecaa265e9aeaa69face3b8fe55d94d"
+    }
+  }
+}

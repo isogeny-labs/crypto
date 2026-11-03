@@ -1,0 +1,57 @@
+proc invF31(poly a,ideal q){
+ ideal z=q,a;if(std(z)[1]!=1){ERROR("FROB31_NONUNIT");}
+ matrix w=lift(z,ideal(1));poly v=reduce(w[nrows(w),1],q);
+ if(reduce(a*v+1,q)!=0){ERROR("FROB31_INVERSE_CERTIFICATE");}return(v);
+}
+proc deckF31(list p,ideal q){
+ poly b=p[1];poly c=p[2];poly l=p[3];poly n=p[4];poly a=1+c;
+ poly s=reduce(b*invF31(c,q)+a,q);poly v=reduce(s*(a+s),q);
+ poly iu=invF31(reduce(b*c*invF31(v,q),q),q);
+ return(list(reduce(v*iu^2,q),reduce(1+a*iu,q),
+ reduce((l+s)*iu,q),reduce((l*b+n+b*c)*iu^3,q)));
+}
+proc eqF31(list p,list z){int i;for(i=1;i<=4;i++){if(p[i]!=z[i]){return(0);}}return(1);}
+proc squareF31(list p,ideal q){list z;int i;for(i=1;i<=4;i++){z[i]=reduce(p[i]^2,q);}return(z);}
+proc closedF31(int root,int twist,poly L,number b,number c,poly l,poly n,int d){
+ list fac=factorize(L);poly product=1;int f;int i;int j;int k;
+ for(f=1;f<=size(fac[1]);f++){product=product*fac[1][f]^fac[2][f];}
+ if(product!=L || gcd(L,diff(L,Z))!=1){ERROR("FROB31_INCOMPLETE_QUADRATIC");}
+ for(f=1;f<=size(fac[1]);f++){
+  if(deg(fac[1][f])>0){
+   ideal q=std(ideal(fac[1][f]));list p=list(poly(b),poly(c),reduce(l,q),reduce(n,q));
+   list deck;deck[1]=p;
+   for(i=2;i<=10;i++){deck[i]=deckF31(deck[i-1],q);}
+   if(eqF31(deckF31(deck[10],q),p)==0){ERROR("FROB31_DECK_PERIOD");}
+   intvec cls=0,0,0,0,0,0,0,0,0,0;int classes;intvec weights=0,0,0,0,0,0,0,0,0,0;
+   intvec periods=0,0,0,0,0,0,0,0,0,0;
+   for(i=1;i<=10;i++){
+    if(cls[i]==0){
+     classes++;list point=deck[i];int period;
+     for(k=1;k<=2*d;k++){
+      for(j=1;j<=10;j++){if(eqF31(point,deck[j])==1){
+       if(cls[j]!=0 && cls[j]!=classes){ERROR("FROB31_CLASS_CONFLICT");}cls[j]=classes;
+      }}
+      point=squareF31(point,q);
+      if(eqF31(point,deck[i])==1){period=k;break;}
+     }
+     if(period==0){ERROR("FROB31_PERIOD_CAP");}periods[classes]=period;
+    }
+   }
+   for(i=0;i<5;i++){
+    j=2*i+1;k=(2*i+5)%10+1;
+    weights[cls[j]]=weights[cls[j]]-1;weights[cls[k]]=weights[cls[k]]+1;
+   }
+   weights[cls[1]]=weights[cls[1]]+5;weights[cls[6]]=weights[cls[6]]-5;
+   int total;int support;
+   for(i=1;i<=classes;i++){
+    total=total+weights[i];if(weights[i]!=0){support++;}
+    if(periods[i]!=periods[1]){ERROR("FROB31_DEGREE_NOT_DECK_INVARIANT");}
+   }
+   if(total!=0){ERROR("FROB31_AUGMENTATION");}
+   print("FROB31_RESULT root="+string(root)+" twist="+string(twist)+" factor="+string(f)+
+    " factor_degree="+string(deg(fac[1][f]))+" source_degree="+string(periods[1])+
+    " deck_closed_classes="+string(classes)+" formal_support="+string(support));
+   print("FROB31_CLASSES");cls;print("FROB31_WEIGHTS");weights;
+  }
+ }
+}

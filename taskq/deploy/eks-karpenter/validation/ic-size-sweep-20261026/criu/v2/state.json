@@ -1,0 +1,110 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "ic-criu-n32-20261026-v2",
+    "deadline_unix_seconds": 1793051274,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:5a12f51fa0e287f8024e66d2880549f71af56dfa397c9f0fc2f7f3d7affa221d",
+    "spec": {
+      "arms": [
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg",
+          "role": "reference"
+        },
+        {
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=32",
+              "oracle": "mitm:negation_folded=1"
+            }
+          },
+          "name": "ic-mitm",
+          "role": "candidate"
+        },
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg-aa",
+          "role": "control"
+        }
+      ],
+      "description": "One-target IC pipeline versus matched rho; infrastructure and correctness validation, no speed claim.",
+      "label": "IC curve-size sweep n32, public synthetic one-target fixture",
+      "measurement": {
+        "isolation_required": "L2",
+        "order": "alternate",
+        "rounds": 5,
+        "seed": 1,
+        "timeout_seconds": 120,
+        "warmup": 1
+      },
+      "schema": "ecbench.spec/v1",
+      "workloads": {
+        "curves": [
+          {
+            "bits": 32,
+            "kind": "prime_search",
+            "seed": 59297
+          }
+        ],
+        "target_seed": 20261002,
+        "targets_per_curve": 1
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 30,
+    "max_restores": 2
+  },
+  "request_sha256": "7054e8b6f99cf495849c5c4bcf345b8272ea39fb7a3cf60d936c4b357a57a432",
+  "owner_build": "isolab-recovery-controller:53f0e723-7f05-424b-a675-a28da5791e4f",
+  "phase": "failed",
+  "attempt": 0,
+  "restores": 0,
+  "next_generation": 2,
+  "checkpoint_generation": 2,
+  "current_pod_uid": "d2052e7b-2014-4277-be57-8836c7474373",
+  "current_instance": "i-057eb873f7bf5d271",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [],
+  "generations": [
+    {
+      "number": 1,
+      "request_sha256": "7054e8b6f99cf495849c5c4bcf345b8272ea39fb7a3cf60d936c4b357a57a432",
+      "snapshot_name": "ic-criu-n32-20261026-v2-g1",
+      "snapshot_id": "snap-0217af1b08dbe69a6",
+      "archive_key": "recovery/runs/ic-criu-n32-20261026-v2/generations/g1/checkpoint.tar",
+      "archive_version": "NBEF4ZKHU3QbYVVI4uR_sH5GeRjiSQj3",
+      "archive_sha256": "352374427ca56857fddbd83a53437f31984c32f3e03662a195b9d6cd61ef33f3",
+      "manifest_sha256": "4f0e5fc16d202c0497fda94c1d1fefd56a6a6793271bb563f7cfa32035ef8429",
+      "archive_bytes": 644280320,
+      "source_instance": "i-057eb873f7bf5d271",
+      "source_pod_uid": "d2052e7b-2014-4277-be57-8836c7474373",
+      "committed_unix_seconds": 1793048918,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    }
+  ],
+  "last_checkpoint_at": 1793048918,
+  "selected_generation": null,
+  "failure": "native computation replay not admitted",
+  "benchmark_job": null,
+  "benchmark_uid": null,
+  "benchmark_manifest": null,
+  "benchmark_create_attempted": false
+}

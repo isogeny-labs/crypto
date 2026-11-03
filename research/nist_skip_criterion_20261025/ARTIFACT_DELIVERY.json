@@ -1,0 +1,46 @@
+{
+  "kind": "nist-skip-artifact-delivery/v1",
+  "repository": "isogeny-labs/crypto",
+  "pull_request": 2378,
+  "status": "S3 upload and full-object read-back verified",
+  "reason": "Six existing payloads were uploaded unchanged using the repository artifact tool; every remote payload was downloaded and SHA-256 checked.",
+  "artifacts": {
+    "REPORT.pdf": {
+      "bytes": 710832,
+      "sha256": "54b90bfbb62f8f3597eee45f03fec17628018dc941d19f4db542eb1729a5af92",
+      "local_delivery_path": "/workspace/nist-skipped-curve-criterion.pdf",
+      "uploaded": true,
+      "remote_object_verified": true,
+      "s3_object": "s3://setec-astronomy-artifacts/store/sha256/54/54b90bfbb62f8f3597eee45f03fec17628018dc941d19f4db542eb1729a5af92",
+      "full_object_get_sha256_verified": true
+    },
+    "evidence/runs.tar.xz": {
+      "bytes": 486208,
+      "sha256": "5648ce3936fc5919847a42b17fcba2270d8c22f0de322ce703763efffc95ad61",
+      "local_delivery_path": "/workspace/nist-skip-criterion-evidence.zip",
+      "uploaded": true,
+      "remote_object_verified": true,
+      "s3_object": "s3://setec-astronomy-artifacts/store/sha256/56/5648ce3936fc5919847a42b17fcba2270d8c22f0de322ce703763efffc95ad61",
+      "full_object_get_sha256_verified": true
+    },
+    "reports/rule-fit.png": {
+      "bytes": 113710,
+      "sha256": "f46079c00e826542f433c537c02cccccfba03b14d095df5f5aaccb8a07d3c895",
+      "local_delivery_path": "/workspace/nist-skip-criterion-evidence.zip",
+      "uploaded": true,
+      "remote_object_verified": true,
+      "s3_object": "s3://setec-astronomy-artifacts/store/sha256/f4/f46079c00e826542f433c537c02cccccfba03b14d095df5f5aaccb8a07d3c895",
+      "full_object_get_sha256_verified": true
+    }
+  },
+  "credential_checks": "Credentials supplied outside the repository; no values retained in these records.",
+  "verification_date_utc": "2026-10-26",
+  "history": [
+    {
+      "status": "local delivery verified; S3 upload blocked by unavailable credentials",
+      "reason": "A temporary AWS CLI was installed. Standard AWS identity and artifact-tool checks could not locate credentials; no upload or remote-object verification completed.",
+      "credential_checks": "validation/artifact-store-checks.txt"
+    }
+  ],
+  "verification_records": "validation/artifact-delivery-20261026/"
+}

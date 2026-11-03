@@ -1,0 +1,86 @@
+{
+  "id": "IDC1h5b1912d4dba97ee6",
+  "independence": "native issuer;128 additional parsed checks;source-bound kernel theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound20.lean",
+    "sha256": "41cd9733920e238cbc360446239c0479e7e13943719fa8f0625e3297a0269e6e"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610240102,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": 1,
+                  "op": "const"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "q",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": "y",
+          "op": "var"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "infinity-coordinate-clearing",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": 1,
+                  "op": "const"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "y",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": "q",
+          "op": "var"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "KoblitzRound20.coordinate_ratio_clearing",
+    "variables": [
+      "x",
+      "y",
+      "q"
+    ]
+  },
+  "value_digest": "76f9a72c8506e1556b34dab579c93f51877baa16bfcdb13ed31a6200f09ecbef"
+}

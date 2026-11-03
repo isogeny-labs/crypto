@@ -1,0 +1,1 @@
+Rendered the one-page Typst PDF and inspected its PNG at 110 dpi. The root/zombie/rejection diagram, failed scope, source identity, retained evidence and unresolved live qualification are legible without clipping. No benchmark result or performance claim is implied.

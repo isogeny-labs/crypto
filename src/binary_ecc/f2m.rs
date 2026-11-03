@@ -344,6 +344,7 @@ impl F2mElement {
 
     /// `self + other` = bitwise XOR.
     pub fn add(&self, other: &Self) -> Self {
+        super::operation_tally::tick(self.m, "add");
         debug_assert_eq!(self.m, other.m);
         let mut out = self.clone();
         for (a, b) in out.bits.iter_mut().zip(other.bits.iter()) {
@@ -354,6 +355,7 @@ impl F2mElement {
 
     /// `self += other` in place (XOR), without allocating.
     pub fn add_assign(&mut self, other: &Self) {
+        super::operation_tally::tick(self.m, "add");
         debug_assert_eq!(self.m, other.m);
         for (a, b) in self.bits.iter_mut().zip(other.bits.iter()) {
             *a ^= *b;
@@ -458,6 +460,7 @@ impl F2mElement {
     /// Bit-for-bit equal to [`Self::schoolbook_mul`] and
     /// [`Self::karatsuba_mul`], which are kept as independent references.
     pub fn mul(&self, other: &Self, irreducible: &IrreduciblePoly) -> Self {
+        super::operation_tally::tick(self.m, "mul");
         debug_assert_eq!(self.m, other.m);
         let m = self.m;
         let nw = self.bits.len().max(other.bits.len());
@@ -476,6 +479,7 @@ impl F2mElement {
     /// goes to bit `2i` of the result, other bits zero.  Then
     /// reduce mod `m(z)`.
     pub fn square(&self, irreducible: &IrreduciblePoly) -> Self {
+        super::operation_tally::tick(self.m, "square");
         let m = self.m;
         let nw = self.bits.len();
         let mut out = Self::zero(m);
@@ -498,6 +502,7 @@ impl F2mElement {
         if k == 0 {
             return acc;
         }
+        super::operation_tally::tick_n(self.m, "square", u64::from(k));
         let nw = acc.bits.len();
         with_scratch(2 * nw + 1, |sq| {
             for _ in 0..k {
@@ -529,6 +534,7 @@ impl F2mElement {
     ///   2. Combine `b_k`'s per the binary expansion of `m − 1`.
     ///   3. Final squaring: result = `(combined)²`.
     pub fn flt_inverse(&self, irreducible: &IrreduciblePoly) -> Option<Self> {
+        super::operation_tally::tick(self.m, "inverse_informational");
         if self.is_zero() {
             return None;
         }
@@ -1442,6 +1448,26 @@ mod tests {
                 F2mElement::one(m)
             );
         }
+    }
+
+    #[test]
+    fn operation_tally_counts_batched_squares_and_inversion_internals() {
+        let irr = IrreduciblePoly {
+            degree: 7,
+            low_terms: vec![0, 1],
+        };
+        let a = F2mElement::from_bit_positions(&[0, 1, 3], 7);
+        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+        let _ = a.square_k_times(5, &irr);
+        let counts = tally.finish();
+        assert_eq!(counts.get("f2m7_square"), Some(&5));
+
+        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+        let _ = a.flt_inverse(&irr).unwrap();
+        let counts = tally.finish();
+        assert_eq!(counts.get("f2m7_inverse_informational"), Some(&1));
+        assert!(counts.get("f2m7_mul").is_some_and(|count| *count > 0));
+        assert!(counts.get("f2m7_square").is_some_and(|count| *count > 1));
     }
 
     /// Inversion round-trips at every field size.

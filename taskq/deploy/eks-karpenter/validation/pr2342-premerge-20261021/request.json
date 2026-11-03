@@ -1,0 +1,113 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "pr2342-abe6b1b52f-premerge-20261021",
+    "instance_type": "m8a.2xlarge",
+    "seconds": 900,
+    "memory": "4Gi",
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "EKS L2 validation: all methods and A/A on the registered 20-bit fixture",
+      "description": "Isolation and correctness validation, not an algorithm performance claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 20,
+            "seed": 59297
+          }
+        ],
+        "targets_per_curve": 2,
+        "target_seed": 20261002
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-plain",
+          "role": "baseline",
+          "method": {
+            "id": "rho.plain"
+          }
+        },
+        {
+          "name": "rho-frozen",
+          "role": "baseline",
+          "method": {
+            "id": "rho.frozen_reference"
+          }
+        },
+        {
+          "name": "bsgs",
+          "role": "candidate",
+          "method": {
+            "id": "bsgs.textbook"
+          }
+        },
+        {
+          "name": "bsgs-il",
+          "role": "candidate",
+          "method": {
+            "id": "bsgs.interleaved"
+          }
+        },
+        {
+          "name": "bsgs-neg",
+          "role": "candidate",
+          "method": {
+            "id": "bsgs.negation"
+          }
+        },
+        {
+          "name": "kangaroo",
+          "role": "candidate",
+          "method": {
+            "id": "kangaroo.vow"
+          }
+        },
+        {
+          "name": "ic-mitm",
+          "role": "candidate",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=32",
+              "oracle": "mitm:negation_folded=1"
+            }
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 5,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 1,
+        "isolation_required": "L2",
+        "timeout_seconds": 120
+      }
+    },
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:bf31fa75550f3ff3d916a05d338ff839f31714a8aa3912e443213879324bce8e",
+      "source_revision": "e862ee96a5d1109ef284a8ddf8e21528d2f988af",
+      "ecbench_sha256": "3958d37e00925c52f69036f908086fd48cb5216f6ee66272a225e3f674b1472b"
+    }
+  },
+  "provenance": {
+    "harness": "premerge-review-validation",
+    "source_revision": "e862ee96a5d1109ef284a8ddf8e21528d2f988af",
+    "workflow_revision": "abe6b1b52fe976a05b9382655be21b2db2af2034",
+    "run_url": "https://github.com/aburan28/crypto/actions/runs/39527210297"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "isolab.eks.resumable/v1",
+  "run_name": "replace-with-unique-run-name",
+  "deadline_unix_seconds": 0,
+  "build": {
+    "image_uri": "REPLACE_WITH_TESTED_ECR_IMAGE_AT_SHA256_DIGEST",
+    "source_revision": "REPLACE_WITH_40_HEX_SOURCE_COMMIT",
+    "ecbench_sha256": "REPLACE_WITH_64_HEX_BINARY_SHA256"
+  },
+  "runtime_image_uri": "REPLACE_WITH_PUBLISH_RUNTIME_OUTPUT_IMAGE_AT_SHA256_DIGEST",
+  "spec": {
+    "schema": "ecbench.spec/v1",
+    "label": "Public recovery qualification",
+    "description": "Computation progress followed by a separate fresh L2 epoch; no speed claim",
+    "workloads": {
+      "curves": [{"kind": "prime_search", "bits": 32, "seed": 59297}],
+      "targets_per_curve": 2,
+      "target_seed": 20261002
+    },
+    "arms": [
+      {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+      {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}},
+      {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+    ],
+    "measurement": {
+      "rounds": 5,
+      "warmup": 1,
+      "order": "alternate",
+      "seed": 1,
+      "isolation_required": "L2",
+      "timeout_seconds": 120
+    }
+  },
+  "instance_type": "c8a.2xlarge",
+  "checkpoint_interval_seconds": 120,
+  "max_restores": 2
+}

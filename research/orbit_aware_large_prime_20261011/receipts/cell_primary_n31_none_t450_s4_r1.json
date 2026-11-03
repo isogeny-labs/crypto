@@ -1,0 +1,202 @@
+{
+  "arm": "none",
+  "cpu_instance_ns": 792924,
+  "cpu_process_ns": 51179746128,
+  "curve": {
+    "a": 0,
+    "b": 1,
+    "cofactor": 1492,
+    "group_order": 2147574356,
+    "name": "icv1-f2m31-tm90707-c95f16f5",
+    "r": 1439393
+  },
+  "n": 31,
+  "peak_rss_bytes": 220725248,
+  "planted_log": 461501,
+  "recovered_matches_planted": null,
+  "rep": 1,
+  "report": {
+    "config": {
+      "envelope_dimension": 10,
+      "large_prime_graph": "filter",
+      "max_large_primes": 0,
+      "max_states": 3000000,
+      "max_trials": 450,
+      "seed": 4,
+      "small_dimension": 7,
+      "summands": 4
+    },
+    "counters": {
+      "accepted_relations": 2,
+      "combination_states_uncharged": 1109862,
+      "decompositions": 2,
+      "eliminated_full_relations": 0,
+      "independent_rows": 2,
+      "lp_merge_ops_uncharged": 0,
+      "lp_pivots": 0,
+      "matrix_rank": 2,
+      "mitm_lookups_uncharged": 248680628,
+      "rejected_large_prime_count": 0,
+      "relation_histogram": [
+        2,
+        0,
+        0,
+        0
+      ],
+      "row_ops_uncharged": 12,
+      "trials": 450
+    },
+    "exhausted": true,
+    "factor_base": {
+      "columns": 525,
+      "large_columns": 460,
+      "raw_points": 1053,
+      "small_columns": 65,
+      "small_raw_points": 133
+    },
+    "filter_pipeline": {
+      "complete_relations": 2,
+      "cpu_ns": {
+        "audit": 8445,
+        "collect": 50505144213,
+        "filter": 13367,
+        "replay": 21172,
+        "setup": 436209158
+      },
+      "dependent_verified": 0,
+      "filter": {
+        "complete_relations": 2,
+        "core_large_vertices": 0,
+        "core_relations": 0,
+        "cycles_closed": 0,
+        "duplicate_relations": 0,
+        "input_large_vertices": 0,
+        "input_relations": 2,
+        "merges": 0,
+        "peeled_relations": 0,
+        "pivots": 0,
+        "rejected_fill": 0
+      },
+      "graph": "filter",
+      "independent_verified": 2,
+      "partial_audit_failed": 0,
+      "partials_by_class": [
+        2,
+        0,
+        0
+      ],
+      "rank": 2,
+      "replay_failed_curve": 0,
+      "replay_failed_linear": 0,
+      "replays_failed": 0,
+      "replays_verified": 2
+    },
+    "mitm": {
+      "left_states": 554931,
+      "left_terms": 2,
+      "right_states": 554931,
+      "right_terms": 2
+    },
+    "phase_group_ops": {
+      "factor_base": {
+        "adds": 5265,
+        "doubles": 10530,
+        "scalar_mults": 1053
+      },
+      "oracle_setup": {
+        "adds": 1111968,
+        "doubles": 0,
+        "scalar_mults": 0
+      },
+      "relations": {
+        "adds": 248689241,
+        "doubles": 16661,
+        "scalar_mults": 900
+      },
+      "verification": {
+        "adds": 8,
+        "doubles": 0,
+        "scalar_mults": 0
+      }
+    },
+    "recovered": null,
+    "relation_samples": [
+      {
+        "a": 1344503,
+        "b": 1041100,
+        "class": "full",
+        "columns": [
+          [
+            3,
+            1
+          ],
+          [
+            8,
+            1439392
+          ],
+          [
+            16,
+            1439392
+          ],
+          [
+            21,
+            1439392
+          ],
+          [
+            65,
+            1223240
+          ]
+        ],
+        "raw_terms": [
+          92,
+          95,
+          37,
+          63
+        ],
+        "trial": 107
+      },
+      {
+        "a": 483334,
+        "b": 942276,
+        "class": "full",
+        "columns": [
+          [
+            15,
+            1
+          ],
+          [
+            22,
+            1439392
+          ],
+          [
+            26,
+            1
+          ],
+          [
+            36,
+            1
+          ],
+          [
+            65,
+            411169
+          ]
+        ],
+        "raw_terms": [
+          80,
+          83,
+          32,
+          49
+        ],
+        "trial": 220
+      }
+    ],
+    "solve_wall_ns": 51308909963,
+    "verification_performed": true,
+    "verified_fast": false,
+    "verified_independent": false
+  },
+  "schema": "orbit-lp-cell/v1",
+  "seed": 4,
+  "series": "primary",
+  "wall_ns": 51547951496
+}

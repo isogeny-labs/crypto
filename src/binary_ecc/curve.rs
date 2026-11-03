@@ -33,6 +33,7 @@
 //! **classical reference** here.
 
 use super::f2m::{F2mElement, IrreduciblePoly};
+use crate::cryptanalysis::group_op_count;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use std::collections::HashMap;
@@ -74,9 +75,7 @@ impl BinaryCurve {
                 "ecc2k-130" => (131, &[0, 1, 2, 13],
                     "0000000000000000000000000000000000", "0000000000000000000000000000000001", "051C99BFA6F18DE467C80C23B98C7994AA", "042EA2D112ECEC71FCF7E000D7EFC978BD",
                     "06C997F3E7F2C66A4A5D2FDA13756A37B1", "04A38D11829D32D347BD0C0F584D546E9A", "200000000000000004D4FDD5703A3F269", "04"),
-                "ecc2-131" => (131, &[0, 1, 2, 13],
-                    "07EBCB7EECC296A1C4A1A14F2C9E44352E", "00610B0A57C73649AD0093BDD622A61D81", "00439CBC8DC73AA981030D5BC57B331663", "014904C07D4F25A16C2DE036D60B762BD4",
-                    "0602339C5DB0E9C694AC8908528C51C440", "04F7B99169FA1A0F2737813742B1588CB8", "0400000000000000026ABB991FE311FE83", "02"),
+                "ecc2-131" | "ecc2-130" => return crate::ecc::certicom::binary_challenge(name),
                 "ecc2k-163" => (163, &[0, 1, 2, 8],
                     "000000000000000000000000000000000000000001", "1", "02091945E42080CD9CBCF14A7107D8BC55CDD65EA9", "063315693833774294A39CF6F8C175D02B8E6A5587",
                     "007530EE864EDCF4A31C85AA17C197FFF5CAFECAE1", "075DB1E80D7C4A92C7BBB79EAE3EC545F8A31CFA6B", "04000000000000000000020108A2E0CC0D99F8A5EF", "02"),
@@ -783,10 +782,12 @@ pub fn point_add(curve: &BinaryCurve, p1: &BinaryPoint, p2: &BinaryPoint) -> Bin
                 // x₁ = x₂.  Either P + P (double) or P + (-P) = O.
                 if y1.add(y2) == *x1 {
                     // y₂ = y₁ + x₁ ⇒ P₂ = -P₁.
+                    group_op_count::count_adds(1);
                     return BinaryPoint::Infinity;
                 }
                 return point_double(curve, p1);
             }
+            group_op_count::count_adds(1);
             let irr = &curve.irreducible;
             let num = y1.add(y2);
             let den = x1.add(x2);
@@ -810,6 +811,7 @@ pub fn point_double(curve: &BinaryCurve, p: &BinaryPoint) -> BinaryPoint {
     match p {
         BinaryPoint::Infinity => BinaryPoint::Infinity,
         BinaryPoint::Affine { x: x1, y: y1 } => {
+            group_op_count::count_doubles(1);
             let irr = &curve.irreducible;
             if x1.is_zero() {
                 return BinaryPoint::Infinity;
@@ -835,6 +837,7 @@ pub fn scalar_mul(curve: &BinaryCurve, p: &BinaryPoint, k: &BigUint) -> BinaryPo
     if k.is_zero() {
         return BinaryPoint::Infinity;
     }
+    group_op_count::count_scalar_mults(1);
     let bits = k.bits();
     let mut result = BinaryPoint::Infinity;
     for i in (0..bits).rev() {

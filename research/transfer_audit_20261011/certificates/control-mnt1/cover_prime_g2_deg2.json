@@ -1,0 +1,245 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation only",
+    "equivalence_class_size": 2,
+    "log2_cost_of_one_group_operation": 15.056,
+    "log2_group_operations": 77.514,
+    "log2_r": 155.376,
+    "log2_total": 92.57,
+    "log2_total_negation_only": 92.57
+  },
+  "candidate": {
+    "id": "cover:prime_g2_deg2",
+    "label": "same-field genus-2 cover H -> E of degree 2 over F_p, v^2 = F(u^2 + c)",
+    "transfer_type": "genus_cover"
+  },
+  "carried": true,
+  "checks": [
+    {
+      "evidence": "some c in {0,1,2,3} has F(c) != 0 (a cubic has at most 3 roots), so H: v^2 = F(u^2 + c) is a genus-2 curve with a degree-2 map to E",
+      "name": "construction_point_c_exists",
+      "result": "PASS"
+    },
+    {
+      "evidence": "x^3+ax+b has 0 root(s) in F_p, so #E(F_p)[2] = 1; #E is odd",
+      "name": "two_torsion_matches_order_parity",
+      "result": "PASS"
+    },
+    {
+      "evidence": "H has two rational points at infinity (even-degree model); the repository's Mumford arithmetic is for one point at infinity (problems/prime-cover-balanced-jacobian-and-induced-maps-missing.md)",
+      "name": "executable_pullback_and_jacobian_arithmetic",
+      "result": "NOT_RUN"
+    }
+  ],
+  "costs": {
+    "destination_solver": "RhoOnJacobian",
+    "log2_baseline": 92.57,
+    "log2_cost_ratio": 4.042,
+    "log2_total": 96.612,
+    "repo_ratio_log2": -4.042,
+    "rows": [
+      {
+        "formula": "choose c: at most 4 evaluations of a cubic, about 12 field multiplications",
+        "log2": 15.319,
+        "phase": "map_construction",
+        "status": "modeled"
+      },
+      {
+        "formula": "g elliptic operations over the source field: log2 g + log2(10 * M(source_bits)); a lower bound, the conorm-norm formulas are not implemented",
+        "log2": 16.056,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "the cheapest destination solver is not index calculus on the Jacobian",
+        "log2": null,
+        "phase": "relation_collection",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "see relation_collection",
+        "log2": null,
+        "phase": "linear_algebra",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "RhoOnJacobian: CostModel::jacobian_destination; phases not split by the model",
+        "log2": 96.612,
+        "phase": "destination_solve_unsplit",
+        "status": "modeled"
+      },
+      {
+        "formula": "the discrete logarithm of the image is the logarithm of the source (homomorphism), so recovery is free; one scalar multiplication on E verifies it: log2(1.5 log2 r) + log2(op)",
+        "log2": 22.921,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnJacobian",
+        96.612
+      ],
+      [
+        "HyperellipticIndexCalculus",
+        190.963
+      ],
+      [
+        "EngeGaudrySmoothness",
+        349.099
+      ]
+    ],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "prime",
+    "field": {
+      "a": "818416342594888291485044088811640789053085789975506",
+      "b": "666070443323978349780035881803413282865714842057992",
+      "degree": 1,
+      "kind": "prime",
+      "log2_size": 169.28,
+      "model": "y^2=x^3+a*x+b",
+      "p": "908761003790427908077548955758380356675829026531247"
+    },
+    "instance_checks": [
+      {
+        "evidence": "p passes Miller-Rabin (Probable), 4a^3+27b^2 != 0 mod p",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2 = x^3+ax+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Probable); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits record read from the committed docs/curves/traits.json (order and trace equal the instance's); a live curve_traits::compute of this curve takes minutes",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "mnt/mnt1",
+    "registered": true,
+    "slug": "icv1-fp170-tm52213820118540299389901413-869d5d3c",
+    "subgroup": {
+      "cofactor": "15337",
+      "generator": [
+        "0x25a3ae778f7ef6586abae5acde21e54b6c64edf33d0",
+        "0x5b4ace33aa53c670ce35535d6c273698a182da557d"
+      ],
+      "order": "908761003790427908077549007972200475216128416432661",
+      "r": "59252852825873893726123036315589781262054405453",
+      "r_log2": 155.376,
+      "trace": "-52213820118540299389901413"
+    }
+  },
+  "evaluation": {
+    "reason": "the priced total is 4.0 bits above the matched baseline",
+    "status": "excluded"
+  },
+  "executed": null,
+  "invariants": {
+    "c": 0,
+    "catalog_cover_row": {
+      "exists": true,
+      "file": "docs/curves/covers.json",
+      "status": "verified_over_declared_field",
+      "subfield_descent": "not_tested",
+      "subgroup_transfer": "not_tested"
+    },
+    "crosscheck_jacobian_transfers": {
+      "delta_bits": 0.0,
+      "file": "docs/curves/jacobian-transfers.json",
+      "note": "a wiring check of the frozen formulas, not independent validation: this tool calls the repository's cost functions, so agreement shows the inputs were passed through, not that the formulas are right. The repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
+      "repo_log2_total": 96.612,
+      "reported_total_is_lower_by_class_discount_bits": null,
+      "route_kind": "same_field_cover",
+      "this_log2_total": 96.612,
+      "within_0_002_bits": true
+    },
+    "degree": 2,
+    "destination": "Jac(H)(F_p), genus 2",
+    "genus": 2,
+    "ic_leading_exponent_in_log2_q": 1.0,
+    "rational_two_torsion": {
+      "E(Fp)[2]_order": 1,
+      "cubic_roots_in_Fp": 0,
+      "galois_action_on_E[2]": "cyclic of order 3 (irreducible cubic)",
+      "gluing_note": "a (2,2)-gluing of E with E' needs an anti-isometry E[2] ~ E'[2] of Galois modules; with irreducible cubic it needs E' with the same splitting field. Not constructed here."
+    },
+    "rho_leading_exponent_in_log2_q": 0.459
+  },
+  "lead_class": "boundary",
+  "map": {
+    "construction_status": "arithmetic, not executed",
+    "degrees": {
+      "c": 0,
+      "cover_degree": 2,
+      "genus": 2
+    },
+    "destination": "Jac(H)(F_p), genus 2, two points at infinity",
+    "explicit_formulas": "(x, y) = (u^2 + c, v)",
+    "field_of_definition": "F_p",
+    "source": "E(F_p)",
+    "type": "pullback phi^*: E(F_p) -> Jac(H)(F_p)"
+  },
+  "notes": [],
+  "obligations": {
+    "computational_advantage": "refuted",
+    "existence": "supported",
+    "explicit_construction": "supported",
+    "map_correctness": "unknown",
+    "scaling_support": "unknown",
+    "subgroup_preservation": "supported"
+  },
+  "open_obligations": [
+    "checked arithmetic and pullback/norm maps for the two-infinity genus-2 model, with composition and independent replay (problems/prime-cover-balanced-jacobian-and-induced-maps-missing.md)",
+    "exact-order and image-order certificates for the catalog binding (problems/catalog-cover-subgroup-certificates-incomplete.md)",
+    "(2,2)-correspondence (gluing) candidates from the E[2] Galois structure: not evaluated"
+  ],
+  "references": [
+    "docs/curves/COVERS.md (prime characteristic greater than 3)",
+    "crypto-autoresearcher ledger IDEA-20261009-275a14"
+  ],
+  "schema": "transfer-audit/certificate/v2",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "r is odd",
+        "name": "gcd(2,r)=1",
+        "result": "PASS"
+      },
+      {
+        "evidence": "see construction_point_c_exists",
+        "name": "cover_exists",
+        "result": "PASS"
+      }
+    ],
+    "argument": "for a degree-2 morphism phi: H -> E the composite phi_* phi^* is multiplication by 2; r is an odd prime, so [2] is invertible on <G> and phi^* is injective on <G>. The identity is a theorem; the induced maps are not executed here",
+    "executed": null,
+    "image_order": null,
+    "kernel_meets_subgroup": false,
+    "method": "arithmetic: phi_* phi^* = [2] on Pic^0(E) and gcd(2, r) = 1",
+    "status": "arithmetic"
+  },
+  "tool": "transfer-audit/2",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "the map is not constructed (existence or construction missing)",
+    "priced route costs 2^4.0 times the matched baseline or more"
+  ]
+}

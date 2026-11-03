@@ -1,0 +1,56 @@
+{
+  "schema": "independent-source-review/v1",
+  "created_utc": "2026-10-29T23:30:00Z",
+  "reviewer_lane": "/root/ci_audit",
+  "scope": "Read-only corrected-source review of native_canonical_export; public synthetic mathematical software only",
+  "reviewed_adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
+  "corrected_source_manifest": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/review-fixes-source-files.sha256",
+    "sha256": "6a1cfa53e9e490022090a81f6b4a745edaaaabd6aaaef0bca369e54af00be05d"
+  },
+  "producer_validation": {
+    "receipt_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+    "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
+    "test_log_sha256": "8cbcfd0d790c4f4a91e4866540dbc9cb4cf4f1df67500e683d16dae744b30e83",
+    "clippy_log_sha256": "532d4127b1dd878759c3048f4390b8910c7af8f2a7faf9ae0048e73017103cd2",
+    "observed_result": "40 passed, 0 failed; fmt and strict clippy passed",
+    "production_fixture": "1260 planned workloads and 22680 slots, zero solver records; deterministic native replay and two native-output mutations exercised"
+  },
+  "independent_scratch": {
+    "path": "/tmp/native-canonical-export-correction-review.Fw3cU7",
+    "source_manifest_sha256": "0d50d53d7f1140ee65414da22732795395307ef972a1479256cdad9b39036686",
+    "source_identity": "Reviewed lib.rs, main.rs, output_contract.rs, production_replay.rs, unit_contracts and Cargo files exactly match the producer final manifest hashes",
+    "command": "for t in missing_planted_stays_failed malformed_counters_rejected omitted_planned_warmups_rejected retry_and_generation_bounds backend_mutations_individually_rejected native_required_inventory_cannot_be_omitted; do cargo +1.99.1 test --release --locked --lib unit_contracts::$t -- --exact; done",
+    "result": "6 selected tests passed, 0 failed",
+    "log_path": "/tmp/native-canonical-export-correction-review.Fw3cU7/targeted-negative-recheck.log",
+    "log_sha256": "423e2e86beeb1b6e378c7e2899bb6c578b2deb0a77b152c44cff1606ab3b0878",
+    "after_hash_check_path": "/tmp/native-canonical-export-correction-review.Fw3cU7/SOURCE_HASH_CHECK.after.log",
+    "after_hash_check_sha256": "4e29294a30e86ad850fb65bcc64fbd2c3401bdbdd82bf2f02839e75fb6257cb5",
+    "source_unchanged": true
+  },
+  "original_review": {
+    "record_path": "/tmp/native-canonical-export-independent-review-08e8ab38d.json",
+    "record_sha256": "5a895272f2abc7e8ae7a4bad3ea9df7b2e14a3fbb7fc22778f1ebefcf59b2db7",
+    "reproducer_patch_sha256": "6c3426a8de62a47b76d2a010da8c5fa37fdb45aae57c538a5747051fa9bbe730"
+  },
+  "finding_closure": [
+    {"id":"NCX-01","status":"closed_in_corrected_source","evidence":"verified requires matches_planted == true; independent missing_planted_stays_failed passed"},
+    {"id":"NCX-02","status":"closed_for_source_linked_software_replay","evidence":"mandatory exact provenance set, build receipt and binary pins; all 13 linked source bytes checked against protocol; public package/check_export call deterministic native aggregate replay and require exact Value equality; producer full-plan mutation test passed"},
+    {"id":"NCX-03","status":"closed_in_corrected_source","evidence":"plan enforces per-workload/per-arm measured and warmup counts and shared round identities; independent omitted_planned_warmups_rejected passed; missing warmup records remain explicit shortfalls"},
+    {"id":"NCX-04","status":"closed_in_corrected_source","evidence":"hash-bound packaging request is attached and check_export reconstructs the complete export; independent backend_mutations_individually_rejected passed for qualification, expected slots, missing slots, diagnostics and native analysis digest"},
+    {"id":"NCX-05","status":"closed_in_corrected_source","evidence":"record counters must be an object of nonnegative JSON integers or decimal digit strings; independent malformed_counters_rejected passed"},
+    {"id":"NCX-06","status":"closed_in_corrected_source","evidence":"attempt count is bounded by protocol retries; restore cap is selected only for an explicitly active computation epoch; committed generation and zero-restore invariants enforced; independent retry_and_generation_bounds passed"},
+    {"id":"NCX-S1","status":"closed_for_source_linked_software_replay","evidence":"native prices, streams, pair rows, controls, plan observations and AA flags are no longer trusted as summaries; exact source-linked aggregate replay must reproduce the entire native output"},
+    {"id":"NCX-S2","status":"closed_for_source_linked_software_replay","evidence":"public replay has no callback bypass; package_with/check_export_with are private and only unit tests substitute the replay callback; public package/check_export always use replay_analysis"}
+  ],
+  "corrected_source_findings": [],
+  "boundaries": [
+    "This establishes deterministic source-linked software replay, not an independent mathematical implementation or theorem.",
+    "The full 1260-workload production fixture contains all planned slots but zero solver records; its exact price cells are therefore null/partial and it does not execute the empirical instrument.",
+    "No cohort, solver, cloud job or experimental trial was executed by this review.",
+    "No original analysis binary execution, runtime-image identity, clock qualification, cost-ratio qualification or scientific verdict is established here.",
+    "The six targeted checks use a private unit-only replay callback to isolate packaging validators; the separate public production test is the evidence that runtime APIs cannot bypass deterministic native replay.",
+    "A future export still requires protocol binding to the final adapter hash and independent evidence review of actual records."
+  ],
+  "conclusion": "No remaining major silent count, binding, missing-slot, counter, or attempt/restore defect was found in the corrected source within the reviewed software-packaging scope."
+}

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Prepare direct Linux x64 workflow jobs for opt-in ARC routing.
 
-The repository variables are empty by default, so edited jobs continue to use
-their original GitHub-hosted labels until a tested workflow is explicitly added.
+The repository variables are empty by default, so edited jobs run on
+`ubuntu-latest` until a tested workflow is explicitly added to
+`CRYPTO_EKS_WORKFLOWS` (Spot `crypto-eks-linux`) or
+`CRYPTO_EKS_HIGHMEM_WORKFLOWS` (Spot `crypto-eks-highmem`).
 """
 
 from __future__ import annotations
@@ -15,42 +17,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 WORKFLOWS = ROOT / ".github" / "workflows"
 DIRECT = re.compile(r"^(\s*runs-on:) (ubuntu-24\.04|ubuntu-latest)(\s*)$", re.M)
-# Workflows whose exact bytes are pinned by sealed or frozen research evidence.
-# Rewriting runs-on changes those bytes and breaks the pin (c1897c2c7 did so
-# for the second group), so they keep their original GitHub-hosted labels.
+# ic-dashboard.yml drives a real Chrome; the ARC runner image has none.
+# ecc2k130-pdp-difficulty-protocol.yml is hashed by SOURCE_LOCK.json and SOURCE_CHECK.json
+# under research/notes/ecc2k130/pdp_difficulty_features_20261001; rewriting it breaks verify.py.
 SEALED = {
     "weak-curve-lean.yml",
     "weak-curve-conjectures.yml",
-    "ecc2k130-dag-linux-v2-outcome-replay.yml",
-    "ecc2k130-factor-base-orbit-holdouts.yml",
-    "ecc2k130-leaf-m10-support.yml",
-    "ecc2k130-m10-capacity-once.yml",
-    "ecc2k130-m3-base-selector-source.yml",
-    "ecc2k130-m3-four-policy.yml",
-    "ecc2k130-n13-oaware-sat-benchmark.yml",
-    "ecc2k130-n13-s5-fullpoint-control.yml",
-    "ecc2k130-n13-s5-solver-panel.yml",
-    "ecc2k130-n19-s6-fullpoint-exporter.yml",
-    "ecc2k130-native-fullpoint-edge.yml",
-    "ecc2k130-native-m3-chain.yml",
-    "ecc2k130-oaware-sparse-dense-sat.yml",
-    "ecc2k130-phase-charged-successor-design.yml",
-    "ecc2k130-rotated-nearthreshold-slot.yml",
-    "ecc2k130-rotated-phase-selector.yml",
-    "ecc2k130-rotated-slot-placement.yml",
-    "ecc2k130-rotated-solver-admission.yml",
-    "ecc2k130-s3-sparse-cnf.yml",
-    "ecc2k130-s3-sparse-n19-growth.yml",
-    "ecc2k130-s3-sparse-n19-linear-replay.yml",
-    "ecc2k130-symbolic-dag-dimacs-gate.yml",
-    "ecc2k130-symbolic-dag-dimacs-linux-preparation.yml",
-    "ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml",
-    "ecc2k130-symbolic-dag-dimacs-linux-v2-measure.yml",
-    "ecc2k130-symbolic-dag-fullpoint.yml",
-    "ecc2k130-symbolic-oaware-width-gate.yml",
-    "endomorphism-search.yml",
-    "n53-target-cyclic-rank.yml",
-    "p192-geometry-collector-lean.yml",
+    "ic-dashboard.yml",
+    "ecc2k130-pdp-difficulty-protocol.yml",
+    # docs/curves/cover-transfer-assessments.json pins both by SHA-256.
+    "release.yml",
+    "curve-covers.yml",
 }
 TRUSTED = (
     "(github.event_name == 'push' || github.event_name == 'schedule' || "

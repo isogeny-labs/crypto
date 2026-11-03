@@ -43,7 +43,7 @@ fn main() {
     }
     for (n, mut v) in native {
         v.sort_unstable();
-        med.insert(n, v[(v.len() + 1) / 2 - 1] as f64);
+        med.insert(n, v[v.len().div_ceil(2) - 1] as f64);
     }
     let fit: Vec<(f64, f64)> = med
         .iter()

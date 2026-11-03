@@ -1,0 +1,82 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-fall-degree-e12-20261027-2
+experiment_id: fall_degree_bounds_20261008
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 83e8e94e4d89c34b2b764d3d5dd554a4dcb878af
+receipt: research/fall_degree_bounds_20261008/e12/launch_receipt2/CARD-fall-degree-e12-20261027-2.receipt.json
+binds:
+- path: research/fall_degree_bounds_20261008/PREREGISTRATION.md
+  sha256: d4d4361e3824eb1ec932a6b57d237008309ee3cd3fc3ffde0443b37afd6db6c2
+- path: research/fall_degree_bounds_20261008/e12/run_par.sh
+  sha256: 311a42fbde842e8fe64d3674e62b22e00b991630cab4029971af7bc4575ae1eb
+- path: research/fall_degree_bounds_20261008/e12/run_window.sh
+  sha256: 3a55b05e722dca620374bfeda5359976b700a995ded7f15547f79e3e06707b91
+- path: research/fall_degree_bounds_20261008/e12/run_lean.sh
+  sha256: 3e8a971bbfc8f5d5493d13fb7cfff5685f21613ae18d57a5a969e8047d56cb23
+- path: research/fall_degree_bounds_20261008/e12/source_paths.txt
+  sha256: 23d78e6e05ad4e6feb9f15cd80e087723534a18057835c390d3c20da5e8da6fe
+- path: research/fall_degree_bounds_20261008/e10/aws_env.sh
+  sha256: 40bab1d68bf44393d5c5fd9ce9ed3cddf34acf8448123655a043c704602b2ff9
+- path: taskq/deploy/ephemeral/ephemeral
+  sha256: 4e3484166dd1d7ad828f05396db20a3f855948e05891ab291c37084d7de02b2c
+- path: taskq/deploy/ephemeral/runner.sh
+  sha256: fd34641e061c77f9b09583f5e79d57bd145242b7e616ca4d57c1c5731c16ccd1
+must_not_exist:
+- research/fall_degree_bounds_20261008/e12/launch_receipt2/
+commands:
+- id: relaunch-e12a
+  argv:
+  - bash
+  - research/fall_degree_bounds_20261008/e10/aws_env.sh
+  - taskq/deploy/ephemeral/ephemeral
+  - run
+  - --detach
+  - --no-source
+  - --type
+  - r6a.8xlarge
+  - --toolchain
+  - rust
+  - --ttl
+  - 48h
+  - --name
+  - fd-e12a-deg5-20261027-r2
+  - --
+  - set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo "4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >"$EPHEMERAL_OUT/source_commit"; KEEP=2 CMAX=5 research/fall_degree_bounds_20261008/e12/run_par.sh "$EPHEMERAL_OUT" 3:21:7
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12a.stdout
+  stderr: research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12a.stderr
+- id: relaunch-e12c
+  argv:
+  - bash
+  - research/fall_degree_bounds_20261008/e10/aws_env.sh
+  - taskq/deploy/ephemeral/ephemeral
+  - run
+  - --detach
+  - --no-source
+  - --type
+  - r7i.4xlarge
+  - --toolchain
+  - rust
+  - --ttl
+  - 48h
+  - --name
+  - fd-e12c-window-20261027-r2
+  - --
+  - set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo "4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >"$EPHEMERAL_OUT/source_commit"; research/fall_degree_bounds_20261008/e12/run_window.sh "$EPHEMERAL_OUT" 4:28:7
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12c.stdout
+  stderr: research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12c.stderr
+bus_address: executor-mechanical-fall-degree-e12
+background: false
+write_scope:
+- research/fall_degree_bounds_20261008/e12/launch_receipt2/
+stop_when:
+- A command exits nonzero or reaches its timeout; the tool stops, nothing is retried, and the executor returns the tool output verbatim.
+- The tool exits 2 (refused to start); return `refused` with the IMPEDIMENT line.
+notes: The source tarball s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz has sha256 4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f and each job verifies it before extracting. The two commands start detached jobs and print one job id each into the stdout files under the receipt directory. The executor runs no other command, does not wait for the jobs and does not fetch their outputs. These two commands are the single Amendment 11 relaunches after Spot reclaim of jobs 20261027-145039-fd-e12a-deg5-20261027-5247f6 and 20261027-145209-fd-e12c-window-20261027-998acd.

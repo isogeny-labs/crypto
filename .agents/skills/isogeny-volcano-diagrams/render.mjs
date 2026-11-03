@@ -6,6 +6,16 @@ import {pathToFileURL} from 'node:url';
 const need=(ok,msg)=>{if(!ok)throw Error(msg);};
 const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const fmt=x=>Number(x).toLocaleString('en-US',{maximumSignificantDigits:7});
+function rangeText(range){
+  if(!range)return 'no measured values';
+  let labels=range.map(fmt);
+  for(let precision=8;range[0]!==range[1]&&labels[0]===labels[1]&&precision<=17;precision++)
+    labels=range.map(x=>Number(x).toLocaleString('en-US',{maximumSignificantDigits:precision}));
+  let result=labels.join(' to ');
+  const span=range[1]-range[0],scale=Math.max(Math.abs(range[0]),Math.abs(range[1]));
+  if(span>0&&scale>0&&span/scale<1e-5)result+=' · span '+fmt(span)+' ('+(100*span/scale).toExponential(2)+'% of scale)';
+  return result;
+}
 export function render(data){
   need(data&&Array.isArray(data.nodes)&&data.nodes.length>0,'nonempty nodes required');
   need(Array.isArray(data.edges),'edges required');
@@ -35,7 +45,7 @@ export function render(data){
   if(data.metric){need(typeof data.metric.unit==='string'&&typeof data.metric.boundary==='string'&&typeof data.metric.statistic==='string','metric units, statistic and boundary required');const vs=nodes.map(n=>n.value).filter(x=>x!==null);range=data.range??(vs.length?[Math.min(...vs),Math.max(...vs)]:null);if(range){need(range.length===2&&range.every(Number.isFinite)&&range[0]<=range[1],'invalid color range');need(vs.every(x=>x>=range[0]&&x<=range[1]),'measurement outside shared color range');}}
   const fill=n=>{if(!data.metric)return ['#b9dfed','#8bc8dd','#5bacc8','#3085aa','#155f87'][levels.indexOf(n.level)%5];if(n.value===null)return 'url(#missing)';const t=range[0]===range[1]?.5:(n.value-range[0])/(range[1]-range[0]);return `rgb(${Math.round(225-195*t)},${Math.round(241-135*t)},${Math.round(249-105*t)})`;};
   let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(data.title??'Isogeny volcano')}"><defs><pattern id="missing" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#eef2f5"/><path d="M0 7L7 0" stroke="#9aaab5"/></pattern><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10" fill="#647e90"/></marker></defs><rect width="${width}" height="${height}" fill="white"/><g font-family="sans-serif" fill="#183b50"><text x="25" y="34" font-size="23">${esc(data.title??'Isogeny volcano')}</text><text x="25" y="62" font-size="15">${esc(data.run_id)} · ${nodes.length} vertices · ${data.edges.length} directed maps · ${levels.length} recorded levels</text>`;
-  const legend=data.metric?`${data.metric.label} · ${data.metric.statistic} · ${data.metric.unit} · ${range?fmt(range[0])+' to '+fmt(range[1]):'no measured values'}`:'Categorical level colors; no performance values';
+  const legend=data.metric?`${data.metric.label} · ${data.metric.statistic} · ${data.metric.unit} · ${rangeText(range)}`:'Categorical level colors; no performance values';
   svg+=`<text x="25" y="89" font-size="15">${esc(legend)}</text><text x="25" y="113" font-size="13">${esc(data.metric?.boundary??'Exact topology from supplied records')} · Hatched = missing · Dashed map = unverified</text>`;
   for(const [j,l]of levels.entries())svg+=`<rect x="15" y="${140+j*180}" width="${width-30}" height="160" rx="10" fill="#f3f6f9"/><text x="30" y="${163+j*180}" font-size="14">Level ${l} · ${layers.get(l).length} vertices</text>`;
   const multiplicity=new Map();
@@ -56,3 +66,4 @@ export function write(data,out){need(!fs.existsSync(out),'refuse output overwrit
   const manifest={schema:'isogeny-volcano-diagram/v1',run_id:data.run_id,node_count:result.nodes,directed_edge_count:result.edges,recorded_levels:result.levels,color_range:result.range,source_sha256:crypto.createHash('sha256').update(graph).digest('hex'),missing_nodes:data.metric?data.nodes.filter(n=>n.value===null).length:0,all_vertices_and_maps_retained:true,pdf_inspection_required:true};fs.writeFileSync(path.join(out,'render_manifest.json'),JSON.stringify(manifest,null,2)+'\n');return manifest;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){need(process.argv.length===4,'usage: node render.mjs INPUT.json NEW_OUTPUT_DIRECTORY');console.log(JSON.stringify(write(JSON.parse(fs.readFileSync(process.argv[2])),process.argv[3])));}
+

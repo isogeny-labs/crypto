@@ -1,0 +1,67 @@
+name: Quotient calibration native preflight
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/quotient_calibration_20261025/**'
+      - '.github/workflows/quotient-calibration-preflight.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/quotient_calibration_20261025/**'
+      - '.github/workflows/quotient-calibration-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quotient-calibration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .artifacts
+            research/quotient_calibration_20261025
+            tools/artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/quotient_calibration_20261025
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - name: Formatting
+        run: cargo fmt --manifest-path research/quotient_calibration_20261025/native/Cargo.toml -- --check
+      - name: Native correctness and negative controls
+        run: cargo test --release --locked --manifest-path research/quotient_calibration_20261025/native/Cargo.toml
+      - name: Strict Clippy
+        run: cargo clippy --release --locked --manifest-path research/quotient_calibration_20261025/native/Cargo.toml --all-targets -- -D warnings
+      - name: Replay frozen source outputs
+        run: |
+          cargo run --release --locked --manifest-path research/quotient_calibration_20261025/native/Cargo.toml -- --output "$RUNNER_TEMP/native-preflight.json"
+          cmp "$RUNNER_TEMP/native-preflight.json" research/quotient_calibration_20261025/reports/run-20261025T1845Z/native-preflight.json

@@ -1,0 +1,1398 @@
+{
+ "schema": "ic-replay-plan/v1",
+ "note": "Sessions whose counters the leaderboard cites, replayed by .github/workflows/ic-leaderboard-replay.yml with `ecbench verify`.  `expect` is what a replay on current main must show: `identical` (every replay reproduces) or `drift` (some replay differs, with the reason and the evidence).  The workflow fails when an `identical` session drifts (new drift), when a `drift` session becomes identical (a stale entry), and when a cited session is missing from this file.  `replay` is `all` or a number of measured runs. Provisional operational candidate: added expectations are strict identical and await actual current native receipts; this file is not an accepted research result. Current drift pins bind every differing (seq,record_id,detail) exactly; any changed failure, extra failure, or healed drift fails. Historical evidence is retained. Complete full-roster validation remains pending.",
+ "sessions": [
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n13",
+   "replay": "all",
+   "expect": "identical",
+   "reason": "Current native binary fully reproduces all 72 eligible records. The prior drift expectation and its evidence remain under previous_expectation; no historical recording is rewritten.",
+   "evidence": "research/leaderboard_rigor_20261021/bisect/summary.jsonl",
+   "previous_expectation": {
+    "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n13",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "inherited-F4 and F6-IC counters changed after the session was recorded; replays 72/72 at the recording commit 03ac2e467 and 24/72 from main 16e74770d; good at 7ab28103d; main did not compile in between, so the first changing commit is not isolated (bisect.log); #1646 word-wise inherited-F4 rewrite is in the window",
+    "evidence": "research/leaderboard_rigor_20261021/bisect/summary.jsonl"
+   },
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "93226d9cd00fed476a1628d4e32f38c2c2b7c896dfd1bb8684c0bc4de4123521",
+    "replayed": 72,
+    "reproduced": 72,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt; final all-session union remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0000.native-audit.json.gz"
+   }
+  },
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n19",
+   "replay": "all",
+   "expect": "identical",
+   "reason": "Current native binary fully reproduces all 72 eligible records. The prior drift expectation and its evidence remain under previous_expectation; no historical recording is rewritten.",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all",
+   "previous_expectation": {
+    "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n19",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "same counters as n13",
+    "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"
+   },
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "0c34f486e0d9cb5a2f79ef1680043c8699d836b050435ecfbf4399899270c7cb",
+    "replayed": 72,
+    "reproduced": 72,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt; final all-session union remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0001.native-audit.json.gz"
+   }
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/K13",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "Current native full replay reproduces 16/48 eligible records. Expected counter differences are pinned by every exact sequence, record identity and native detail; any different or healed failure is rejected.",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all",
+   "expected_drift": [
+    {
+     "seq": 2,
+     "record_id": "ECR1h6debc4e0cf7b",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 3,
+     "record_id": "ECR1h70969bc21b1a",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 4,
+     "record_id": "ECR1hc15ae52d5ea6",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 5,
+     "record_id": "ECR1hb53a80205aee",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 8,
+     "record_id": "ECR1h33e9121ee2c2",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 9,
+     "record_id": "ECR1hc0e6339f2e31",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 10,
+     "record_id": "ECR1h1595ee14a8e4",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 11,
+     "record_id": "ECR1h345d1c516a09",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 14,
+     "record_id": "ECR1h7ea26264d7bb",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 15,
+     "record_id": "ECR1h0ccda73c221e",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 16,
+     "record_id": "ECR1hc72d0a60a97c",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 17,
+     "record_id": "ECR1hb27f02c53fa4",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 20,
+     "record_id": "ECR1hfc8aae0751dd",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 21,
+     "record_id": "ECR1h60cc80b1c569",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 22,
+     "record_id": "ECR1hb276bc036459",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 23,
+     "record_id": "ECR1hdf7650671ac9",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 26,
+     "record_id": "ECR1hb8a2e8d46e0e",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 27,
+     "record_id": "ECR1hc999595f30a4",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 28,
+     "record_id": "ECR1h15dfbff7863d",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 29,
+     "record_id": "ECR1h2bf94fbd2a92",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 32,
+     "record_id": "ECR1h6c6709373b05",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 33,
+     "record_id": "ECR1hec4f23d64078",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 34,
+     "record_id": "ECR1h7e7cf7b9d311",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 35,
+     "record_id": "ECR1h0510fb8f4b33",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 38,
+     "record_id": "ECR1h220a2f08faa6",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 39,
+     "record_id": "ECR1h33f0aa4d08b4",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 40,
+     "record_id": "ECR1ha9114eca0d72",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 41,
+     "record_id": "ECR1h02e4b83950d7",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 44,
+     "record_id": "ECR1h2441c835261c",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 45,
+     "record_id": "ECR1h8baf8168e579",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 46,
+     "record_id": "ECR1h95aba5c460da",
+     "detail": "differs in total_gae, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 47,
+     "record_id": "ECR1hfed0c9392ac1",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    }
+   ],
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "07b31769174f8e7b261f7191b533849cbaf99e1629bbe9c7ef98f3498d02d634",
+    "replayed": 48,
+    "reproduced": 16,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt; final all-session union remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0002.native-audit.json.gz"
+   }
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/K19",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "Current native full replay reproduces 16/32 eligible records. Expected counter differences are pinned by every exact sequence, record identity and native detail; any different or healed failure is rejected.",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all",
+   "expected_drift": [
+    {
+     "seq": 2,
+     "record_id": "ECR1h429d741e2b33",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 3,
+     "record_id": "ECR1hc5afcce673f9",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 6,
+     "record_id": "ECR1h55ccf7bc4724",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 7,
+     "record_id": "ECR1hb0821db5d0e7",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 10,
+     "record_id": "ECR1h282362f2a962",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 11,
+     "record_id": "ECR1hc08e5474ece4",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 14,
+     "record_id": "ECR1hae5af6eb5ed2",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 15,
+     "record_id": "ECR1h1383d29064ba",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 18,
+     "record_id": "ECR1he1c2c6459dbd",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 19,
+     "record_id": "ECR1h512b96b496e9",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 22,
+     "record_id": "ECR1hbda922df4486",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 23,
+     "record_id": "ECR1hdec10619bfb4",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 26,
+     "record_id": "ECR1h1d7d3a4b41c1",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 27,
+     "record_id": "ECR1h79609c2ae1d4",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 30,
+     "record_id": "ECR1ha956b67feb9e",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 31,
+     "record_id": "ECR1hb2df5e762390",
+     "detail": "differs in phase counts"
+    }
+   ],
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "0b85ec1a5400ff5118e8ae901862078658ffa17e5c356d6a0700bdc5f5dbc47a",
+    "replayed": 32,
+    "reproduced": 16,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt; final all-session union remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0003.native-audit.json.gz"
+   }
+  },
+  {
+   "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13",
+   "replay": "all",
+   "expect": "identical",
+   "reason": "Current native binary fully reproduces all 168 eligible records. The prior drift expectation and its evidence remain under previous_expectation; no historical recording is rewritten.",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all",
+   "previous_expectation": {
+    "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "pre-#2043 recording (2245b75, lazy inherited-F4 specialisation charge, no accounting version): the inherited-F4 arms differ under the eager version-2 charge that is the method identity (owner, 2026-10-28), and the root-finder arms lack the two oracle_setup outcome counters added by c8bd952c4; the rho rows reproduce. Replayable only by its recording binary; re-recorded under version 2 as claim-n13-v2",
+    "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"
+   },
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "8b1a7aa25ce3354c7625cce96eff3b1ea6ac868f23feb35362a5b5632e83e84f",
+    "replayed": 168,
+    "reproduced": 168,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt; final all-session union remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0004.native-audit.json.gz"
+   }
+  },
+  {
+   "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2",
+   "replay": "all",
+   "expect": "drift",
+   "evidence": "research/ecbench_rootfind_engine_20261012/audits/audit-claim-n13-v2-run1.json",
+   "previous_expectation": {
+    "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2",
+    "replay": "all",
+    "expect": "identical",
+    "evidence": "research/ecbench_rootfind_engine_20261012/audits/audit-claim-n13-v2-run1.json"
+   },
+   "expected_drift": [
+    {
+     "seq": 60,
+     "record_id": "ECR1h7e3d4a22e112",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 67,
+     "record_id": "ECR1h85802949e566",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 74,
+     "record_id": "ECR1h74c3fb511b08",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 81,
+     "record_id": "ECR1h2ab16f5b3706",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 88,
+     "record_id": "ECR1h01ee7712822b",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 95,
+     "record_id": "ECR1hcf830ae450bb",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 102,
+     "record_id": "ECR1h36af329958ef",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 109,
+     "record_id": "ECR1h60533aecbfcd",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 114,
+     "record_id": "ECR1he0ac39ccd9a4",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 121,
+     "record_id": "ECR1hcfa810dc0120",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 128,
+     "record_id": "ECR1ha2e23c24ad1a",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 135,
+     "record_id": "ECR1hf1906d854189",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 142,
+     "record_id": "ECR1h844fdf489b60",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 149,
+     "record_id": "ECR1hcd7c9f820ec5",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 156,
+     "record_id": "ECR1h70b68f9e997d",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 163,
+     "record_id": "ECR1h53736f13dd6b",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 172,
+     "record_id": "ECR1h9a5a601eb31c",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 179,
+     "record_id": "ECR1ha0272a5dc1e1",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 186,
+     "record_id": "ECR1hbf6f5a371db7",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 193,
+     "record_id": "ECR1h0fabedc4517a",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 200,
+     "record_id": "ECR1h6cd480622772",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 207,
+     "record_id": "ECR1hf7906e6f1c81",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 214,
+     "record_id": "ECR1h4ddbc19f7d9a",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    },
+    {
+     "seq": 221,
+     "record_id": "ECR1he5bf43d4fd5e",
+     "detail": "differs in total_gae, phase counts, phase gae"
+    }
+   ],
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "fc8767d1c2d79eb4c812bf010bce13746b527b4c87ce936ec015e49d0882264d",
+    "replayed": 168,
+    "reproduced": 144,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt; final all-session union remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0005.native-audit.json.gz"
+   },
+   "reason": "Current native full replay reproduces 144/168 eligible records. Expected counter differences are pinned by every exact sequence, record identity and native detail; any different or healed failure is rejected."
+  },
+  {
+   "dir": "research/ecbench_n37_rank_columns_20261004/sessions/mac_arm64_l0_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n37_k8_k16_20261004/sessions/mac_arm64_l0_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n37_online_ir_20261004/sessions/mac_arm64_l0_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0-02",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_conductor_gap_20261012/sessions/ell8209-q29",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_conductor_gap_20261012/sessions/ell131101-q37",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ic_oracle_setup_blocked_20261020/sessions/A-1k-8k",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ic_oracle_setup_blocked_20261020/sessions/B-16k-r2",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n7",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "zero_replay_probe": {
+    "schema": "ic-static-zero-replay/v1",
+    "session_id": "ECBS1h302934ff99ed",
+    "records": 96,
+    "planned_executions": 96,
+    "verified_records": 0,
+    "files": {
+     "host.json": "1c7f0072d0316cb06268f508818d937ce2e4ae4b52c2d4169f8b2e6e67eb659b",
+     "plan.json": "192cc790de7498736c15c1a810f6513458b3bfd53c73eb9618135e3de55d0966",
+     "records.jsonl": "09199b94cd84e0f3998fac744f50c83397cf493337dc8c2120d6159b2cb6e47a",
+     "session.json": "3b45eb0274b54e28ddcc1d1ef5f82ef5ce2f86766e25ac2ab271847c88d8c77f",
+     "spec.json": "ecc2e4e6142a4fb5d099ceeb83751bd303fae00e788d051f39a37310a1d889e8"
+    },
+    "reason": "Existing audit.rs FAILED_OUTCOME_REPLAY_EXEMPT: historical n7 exhausted outcomes count different phase work under current code. All96 original records are exhausted; the native positive-replay probe reports0 eligible candidates. Static integrity only; no solved scalar or reproduced replay is claimed.",
+    "evidence": {
+     "path": "reports/ci-repair-integration-20261029/replay-expectation-evidence/f6-n7-static-zero-native-probe.json",
+     "sha256": "f0cc6374b1ff9b1ab61c18104dac46d75b4b47e0169a6d2d42f32f8fe0315d3a",
+     "auditor_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646"
+    }
+   }
+  },
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n23",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "Preserved native source6f reproduces48/72 eligible records. Exactly24 ic.pipeline records show the complete pinned non-scalar accounting/pricing/metadata discrepancy; recovered and exhaustion match. Every failing identity and complete detail are pinned. This remains drift; no frozen record is rewritten. New-source native verification remains pending.",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "previous_expectation": {
+    "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n23",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+    "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   },
+   "expected_drift": [
+    {
+     "seq": 24,
+     "record_id": "ECR1h594c966d0648",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 27,
+     "record_id": "ECR1hfdf588292463",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 30,
+     "record_id": "ECR1hab1882b9d0ee",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 33,
+     "record_id": "ECR1he4d8a589d9eb",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 36,
+     "record_id": "ECR1hcfe1a760e9ef",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 39,
+     "record_id": "ECR1hd050d0cfa743",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 42,
+     "record_id": "ECR1h5a4941e1448f",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 45,
+     "record_id": "ECR1hf4b5d0ab5e6c",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 50,
+     "record_id": "ECR1h294598786fbc",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 53,
+     "record_id": "ECR1h3e333c7d5b61",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 56,
+     "record_id": "ECR1hc76ed82e608a",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 59,
+     "record_id": "ECR1h893b6b10ee28",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 62,
+     "record_id": "ECR1h1807ced60f4d",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 65,
+     "record_id": "ECR1h0b0db4093a3f",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 68,
+     "record_id": "ECR1h5ec0dc22d1c4",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 71,
+     "record_id": "ECR1h314c23bc1fed",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 72,
+     "record_id": "ECR1h0dfbf9230292",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 75,
+     "record_id": "ECR1hef85a5b1f448",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 78,
+     "record_id": "ECR1h055bea5c542b",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 81,
+     "record_id": "ECR1h8476b3a8f81a",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 84,
+     "record_id": "ECR1h1d02672c32db",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 87,
+     "record_id": "ECR1h46ad178d7464",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 90,
+     "record_id": "ECR1hbfe23bd512f9",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 93,
+     "record_id": "ECR1hff4df551ad40",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    }
+   ],
+   "current_replay_evidence": {
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "replayed": 72,
+    "reproduced": 48,
+    "derived_summary": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0017.derived-union.json.gz",
+    "native_member_index": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0017.native-member-index.json",
+    "status": "Actual72 single-record native receipts; derived union explicitly is not a native full-session receipt."
+   }
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R13",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "Current pinned native binary reproduces32/40 eligible records; exactly8 sealed records differ only in phase counts. Every identity and detail is pinned; the original expectation and evidence remain preserved. New-source native verification remains pending.",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "previous_expectation": {
+    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R13",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "8 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+    "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   },
+   "expected_drift": [
+    {
+     "seq": 4,
+     "record_id": "ECR1hb30daa2f0ebf",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 9,
+     "record_id": "ECR1h15f9a18d5126",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 14,
+     "record_id": "ECR1h7b2189b2e2f9",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 19,
+     "record_id": "ECR1h7ac07bcbe012",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 24,
+     "record_id": "ECR1h21b77bd73641",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 29,
+     "record_id": "ECR1h8f684f4cb463",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 34,
+     "record_id": "ECR1h1428a4defe17",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 39,
+     "record_id": "ECR1h33b11fa4aefb",
+     "detail": "differs in phase counts"
+    }
+   ],
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "d9f767bc1e508d1098bc1faf6838247e9f3d55a602844be4a7fe829e64ced7d7",
+    "replayed": 40,
+    "reproduced": 32,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt with actual exit1 from phase counts only; final all-session/current-source verification remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0018.native-audit.json.gz"
+   }
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R19",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "Current pinned native binary reproduces8/24 eligible records; exactly16 sealed records differ only in phase counts. Every identity and detail is pinned; the original expectation and evidence remain preserved. New-source native verification remains pending.",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "previous_expectation": {
+    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R19",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+    "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   },
+   "expected_drift": [
+    {
+     "seq": 1,
+     "record_id": "ECR1hf933221b0462",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 2,
+     "record_id": "ECR1h2c64790ea266",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 4,
+     "record_id": "ECR1hb1c19e72be25",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 5,
+     "record_id": "ECR1hbaaa56f463ae",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 7,
+     "record_id": "ECR1h135e3ff5d897",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 8,
+     "record_id": "ECR1h146e1c05e418",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 10,
+     "record_id": "ECR1h29d0be066602",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 11,
+     "record_id": "ECR1h2ed3372cfa09",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 13,
+     "record_id": "ECR1hf4acb9641377",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 14,
+     "record_id": "ECR1hbc00736c35a4",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 16,
+     "record_id": "ECR1hb6d700dfa8cd",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 17,
+     "record_id": "ECR1h815890e4159b",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 19,
+     "record_id": "ECR1h7dd7aaf8d810",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 20,
+     "record_id": "ECR1h986844ecb357",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 22,
+     "record_id": "ECR1he9b9044bab56",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 23,
+     "record_id": "ECR1hfa63b94779dd",
+     "detail": "differs in phase counts"
+    }
+   ],
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "dd796d56e9033e37ee7d8d55e59a2fa62b819650bc6eca3fafcd72c15a6b3015",
+    "replayed": 24,
+    "reproduced": 8,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt with actual exit1 from phase counts only; final all-session/current-source verification remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0019.native-audit.json.gz"
+   }
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/X19",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "zero_replay_probe": {
+    "schema": "ic-static-zero-replay/v1",
+    "session_id": "ECBS1h9453f8e9b41e",
+    "records": 4,
+    "planned_executions": 4,
+    "verified_records": 0,
+    "files": {
+     "host.json": "19665073449c01791efd4e403963ea16ee4e22915e30d874f1b49de55a86365d",
+     "plan.json": "ca08a03ae34528191bdd9649c54187ef09095fcfffcef1955e8706efd2c6c513",
+     "records.jsonl": "d8ed4827910c4e3e05e269e99363ef12b25ac4c0f0a920973f0031f020beb795",
+     "session.json": "035b48dc8d6b95727754b776d28320c5324af5dfe43bec0d49b9f9617fa36408",
+     "spec.json": "320ce8249dd94b9ec6fe9bbb234a23cf97a518d8aecd9e655f896867d306ff60"
+    },
+    "reason": "All four original X19 outcomes are host timeouts with deterministic=false. The existing native registry excludes these from replay; the positive-replay probe reports0 candidates with every static check true. Static integrity only; no reproduced replay or solved scalar is claimed.",
+    "evidence": {
+     "path": "reports/ci-repair-integration-20261029/replay-expectation-evidence/X19-static-zero-native-probe.json",
+     "sha256": "a8adcb5d4290b0930df822281197b79d0df055b0fc0af2723d7a9c7da620f585",
+     "auditor_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646"
+    }
+   }
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P16",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P17",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P18",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P19",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P20",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P21",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P22",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P23",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P24",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P25",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P26",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P27",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P28",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P29",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P30",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P31",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P32",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P33",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P34",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P35",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P36",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P37",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P38",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P39",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/holdout-P40",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P16",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P16-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P17",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P18",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P18-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P19",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P20",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P21",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P21-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P22",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P22-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P23",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P23-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P24",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P24-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P24-rf3-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P25",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P25-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P25-rf3-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P26",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P26-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P27",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P27-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P28",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext3",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P29",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P30",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P31",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P31-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P32",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P33",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P34",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P34-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P35",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P35-pair-ext1",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P36",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P37",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P38",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P39",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/bitop_ladder_20261019/sessions/train-P40",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n13",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n19",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n23",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n31",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n37",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a0-n41",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a1-n17",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ecbench_lazy_orbit_members_20261018/sessions/a1-n29",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ic_planner_validation_20261020/sessions/c24",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ic_planner_validation_20261020/sessions/c28",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ic_planner_validation_20261020/sessions/c30",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ic_planner_validation_20261020/sessions/r24",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ic_planner_validation_20261020/sessions/r26",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/ic_planner_validation_20261020/sessions/r28",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b12_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b12_pin_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b12_pin_reg_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b24_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b24_pin_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b24_pin_reg_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b36_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b36_pin_l0",
+   "replay": "all",
+   "expect": "identical"
+  },
+  {
+   "dir": "research/twist_index_calculus_20261020/sessions/ecbench_b36_pin_reg_l0",
+   "replay": "all",
+   "expect": "identical"
+  }
+ ],
+ "require_pinned_drift": true,
+ "pinned_drift_completion": {
+  "status": "All historical drift identities and details pinned from actual native source6f; new-source validation remains pending.",
+  "unpinned_historical_drift": [],
+  "requirement": "New, changed or healed drift fails. Existing source6f receipts never qualify a changed native binary."
+ }
+}

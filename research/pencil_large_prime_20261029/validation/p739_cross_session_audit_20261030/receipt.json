@@ -1,0 +1,58 @@
+{
+  "schema": "p739-cross-session-audit-receipt/v2",
+  "created_utc": "2026-10-30T01:30:54Z",
+  "source": {
+    "lib_rs_sha256": "47a969754e4a1738071a6a0ebbd7e57cd14227d4ec8ba9230e814cd1c8428a5f",
+    "main_rs_sha256": "c0fe105069bf2560c23e3cfd3f113e1ec8c11b45140a86e722742cf4ca2d4374",
+    "request_sha256": "f0b80461e9b61dd98ec444ae6b82bf96778dbe8f99c632328c570eead43517d5"
+  },
+  "validation": {
+    "fmt_exit_code": 0,
+    "tests_exit_code": 0,
+    "native_tests_passed": 13,
+    "native_tests_failed": 0,
+    "tests_stdout_sha256": "12d3d2111158e56c446a6caa674a318ccff367e50d38ce2e260180de24193141",
+    "clippy_exit_code": 0,
+    "clippy_stderr_sha256": "f513ab699798aab93ad9daa6ce920647774b120941d85809b1c42932e5894a9f",
+    "comparator_exit_code": 0,
+    "comparator_stdout_sha256": "a25d09a207895a130cf94dfd204a5958f927e8798d96eedcefd279bb4af44e28",
+    "pdflatex_exit_code": 0,
+    "pdflatex_stdout_sha256": "768b394a69441a203472aaebf522a3a08d33b95b6db8a8ffa4d2e0295053fb6a",
+    "pdf_pages": 1,
+    "pdf_visual_inspection": "legible; labels, counts, hashes, provenance and limitations visible"
+  },
+  "outputs": {
+    "audit_json_sha256": "875caa536442f34d1577b76abe3694b167fa4fe189583c9dbf283e6aa5404113",
+    "row_mapping_json_sha256": "25f17d6add0bacedcfe593a837a4edc7ae5e9770a9097b785858700bf55c1019",
+    "equivalence_svg_sha256": "85cbb6e08a580bcd7347bd58a97f70844ff70c72e99767c243f0a9ea5501abd2",
+    "report_tex_sha256": "a5e261b2b446ec927f97130249a0c89c64a28353813c0143da0d39a9a719acf1",
+    "report_pdf_sha256": "feb588490327ce8d242ec7e372c291ec30c0c2f87515056818b87c366dd0411f"
+  },
+  "result": {
+    "mapped_records": 1080,
+    "measured_records": 900,
+    "warmup_records": 180,
+    "allowed_and_observed_difference_paths": 76,
+    "disallowed_differences": 0,
+    "deterministic_projection_sha256": "91338d7abcda1144d949d64d827de81d874ca49d07a2b536cd803f42ff78a3e1",
+    "all_non_wall_record_content_equal": false,
+    "new_solver_executions": 0,
+    "new_measurements": 0
+  },
+  "independent_source_review": {
+    "sha256": "9ceed7d15680d5e6c9697f3b4110e25a73093f90f55c7da7df02c6cdf46a3f09",
+    "status": "clean for scoped retained-session deterministic solver/outcome/operation-accounting consistency; not independent implementation evidence"
+  },
+  "history": {
+    "historical_v1_manifest_sha256": "b36d1ccf175c04da4592c6744cb21fe6e7e7abbe46afe82d905302a2eb905cc9",
+    "first_failure_stderr_sha256": "c7a5b52de67510fbc9d9fb8a9e33f339b744d8d14de41c9b0219fb56b8bc0ed4",
+    "second_failure_stderr_sha256": "ffae03691003da0a55ed68d56e45067456f3cdb8bb28d7a7fa9eb5b80e95aa7e"
+  },
+  "limits": [
+    "Same measurement binary on both sessions.",
+    "Timing and process-resource observations excluded; no timing or complete-resource equality.",
+    "Warmups statically audited and cross-session compared but not replay candidates.",
+    "Fresh audit is version-bound and post-session; separate auditor principal/process is not established.",
+    "No protocol admission, cohort reuse authority, ratio qualification or scientific verdict."
+  ]
+}

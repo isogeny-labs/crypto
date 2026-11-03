@@ -1,0 +1,30 @@
+{
+  "apiVersion": "snapshot.storage.k8s.io/v1",
+  "kind": "VolumeSnapshotContent",
+  "metadata": {
+    "name": "snapcontent-4c8bc29f-dac4-4ca1-ad68-de469a252967"
+  },
+  "spec": {
+    "deletionPolicy": "Retain",
+    "driver": "ebs.csi.aws.com",
+    "source": {
+      "volumeHandle": "vol-0d33a6691905307f1"
+    },
+    "sourceVolumeMode": "Filesystem",
+    "volumeSnapshotClassName": "isolab-ebs-checkpoints",
+    "volumeSnapshotRef": {
+      "apiVersion": "snapshot.storage.k8s.io/v1",
+      "kind": "VolumeSnapshot",
+      "name": "resume-process-probe-generation-1",
+      "namespace": "isolab-recovery-system",
+      "resourceVersion": "697496",
+      "uid": "4c8bc29f-dac4-4ca1-ad68-de469a252967"
+    }
+  },
+  "status": {
+    "creationTime": 1792559635643000000,
+    "readyToUse": true,
+    "restoreSize": 4294967296,
+    "snapshotHandle": "snap-030a4d1ca8390aa4a"
+  }
+}

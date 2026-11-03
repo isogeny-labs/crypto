@@ -1,0 +1,24 @@
+[package]
+name = "pencil-symbolic-graph"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+five-leads-study = { path = "../five_leads_e2e_20261019/native", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
+
+[features]
+reporting = ["dep:serde", "dep:serde_json"]
+producer = ["dep:five-leads-study", "reporting"]
+
+[[bin]]
+name = "pencil-symbolic"
+path = "src/bin/pencil_symbolic.rs"
+required-features = ["producer"]

@@ -34,6 +34,17 @@ fn call(args: &[&str]) -> Output {
 fn value(path: &Path) -> Value {
     serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
 }
+fn complete_event_recorded(path: &Path, expected: &str) -> bool {
+    fs::read_to_string(path)
+        .map(|contents| {
+            contents.split_inclusive('\n').any(|line| {
+                line.strip_suffix('\n')
+                    .and_then(|record| serde_json::from_str::<Value>(record).ok())
+                    .is_some_and(|event| event["event"].as_str() == Some(expected))
+            })
+        })
+        .unwrap_or(false)
+}
 fn plan(temp: &Temp, prime: bool) -> PathBuf {
     let p = temp.0.join("plan.json");
     assert!(call(&[
@@ -188,17 +199,15 @@ fn interrupted_attempt_is_retained_and_resume_obeys_the_hard_deadline() {
         .unwrap();
     let began = Instant::now();
     while began.elapsed() < Duration::from_secs(10) {
-        if fs::read_to_string(dir.join("events.jsonl"))
-            .unwrap_or_default()
-            .contains("worker_started")
-        {
+        if complete_event_recorded(&dir.join("events.jsonl"), "worker_started") {
             break;
         }
         std::thread::sleep(Duration::from_millis(10));
     }
-    assert!(fs::read_to_string(dir.join("events.jsonl"))
-        .unwrap()
-        .contains("worker_started"));
+    assert!(complete_event_recorded(
+        &dir.join("events.jsonl"),
+        "worker_started"
+    ));
     child.kill().unwrap();
     child.wait().unwrap();
     let first = attempt(&dir);
@@ -330,17 +339,15 @@ fn a_second_supervisor_cannot_write_into_an_active_run() {
     );
     let began = Instant::now();
     while began.elapsed() < Duration::from_secs(10) {
-        if fs::read_to_string(dir.join("events.jsonl"))
-            .unwrap_or_default()
-            .contains("worker_started")
-        {
+        if complete_event_recorded(&dir.join("events.jsonl"), "worker_started") {
             break;
         }
         std::thread::sleep(Duration::from_millis(10));
     }
-    assert!(fs::read_to_string(dir.join("events.jsonl"))
-        .unwrap()
-        .contains("worker_started"));
+    assert!(complete_event_recorded(
+        &dir.join("events.jsonl"),
+        "worker_started"
+    ));
     let manifest = fs::read(dir.join("manifest.json")).unwrap();
     let second = call(&["run", "--out", dir.to_str().unwrap(), "--resume"]);
     assert!(!second.status.success());

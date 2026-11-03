@@ -78,8 +78,8 @@
     "domain": "Prime extension degree d∈{2,3,5,7}, odd characteristic",
     "recognition": "Match a published case and realize its equations and covering conditions for the exact model.",
     "witness": "Defining equations, smoothness/genus, cover map, Jacobian isogeny, selected subgroup injection, and cost.",
-    "construction": "Choose one of 36 published cases, instantiate parameters over the finite field, and certify each geometric gate.",
-    "status": "published_case_metadata_imported",
+    "construction": "Choose one of 36 published cases, instantiate parameters over the finite field, and certify each geometric gate. For d=3 (cubic GHS, m=2 plane-quartic type) the repository has executed the transfer and a relation-collection index calculus on synthetic GHS-weak instances E0/F_(q^3) with 4|#E0, q=223..262111: canonical Pic^0 class keys (research/quartic_pic_canonical_20261018) and reported arithmetic M-equivalent IC/rho cost 0.122 [0.10,0.16] against a matched plain rho at q=262111, below it for q>=4051 (research/quartic_n4_20261019). That study's unpriced hash work and stronger-rho comparisons remain outside this cost claim; this ratio is not a wall-time speedup. No registry curve is assessed; a danger claim still needs the exact curve's one-target cost.",
+    "status": "published_case_metadata_imported_d3_transfer_and_ic_executed_synthetic_only",
     "source": "Iijima–Momose–Chao (2015)",
     "url": "https://eprint.iacr.org/2015/805.pdf"
   },
@@ -136,12 +136,12 @@
     "name": "Index-calculus relation support and rank",
     "method": "Fixed-base capacity and ordinary-query feasibility",
     "domain": "A selected subgroup with a frozen factor base, summand policy, and target-query law",
-    "recognition": "For B actual usable classes and unordered positive m-sums with repetition, support has at most binomial(B+m-1,m) targets. Under a uniform accepted set of size A, hit probability is at most min(1,support/A); a filter may change A but cannot enlarge fixed support. Measure useful rank separately.",
-    "witness": "Curve/subgroup and base identities, actual usable B, exact summand and sign policy, certified or bounded accepted-set size A, rejected and accepted attempts, independently verified relations, novel rank per query, matrix and target costs, and a matched one-target reference.",
-    "construction": "Freeze the curve and base, prove the support cap for the exact combination policy, construct known-scalar ordinary queries, and measure accepted-query relation yield and useful rank. Enlarge the usable base or change the relation mechanism when capacity is insufficient.",
+    "recognition": "For B actual usable classes and unordered positive m-sums with repetition, support has at most binomial(B+m-1,m) targets. A uniform accepted set of size A gives hit probability at most min(1,support/A). For a finite seeded nonuniform law with at most M preimage seeds per accepted target, supported accepted seed mass is at most binomial(B+m-1,m)*M; divide by attempted or accepted seed mass for the corresponding hit probability. Measure useful rank separately.",
+    "witness": "Curve/subgroup and base identities, actual usable B, exact summand and sign policy, frozen seed domain and known-scalar query map, accepted-set or accepted-mass denominator, a certified maximum target preimage multiplicity M when nonuniform, rejected and accepted attempts, independently verified relations, novel rank per query, matrix and target costs, and a matched one-target reference.",
+    "construction": "Freeze the curve, base and finite-seed query law; prove the fixed-base support cap and a sampler preimage bound or accepted-set size, then measure known-scalar ordinary-query relation yield and useful rank. Enlarge the usable base or change the relation mechanism when capacity is insufficient.",
     "status": "exact_p192_fixed_base_capacity_and_zero_rank_instance",
-    "source": "P-192 Type I local certificate (2026)",
-    "url": "https://github.com/aburan28/crypto/blob/029e0bb2c7b1543af9a0647457adcaef8f20e7d0/research/p192_extension_cover_20261012/BRANCH_CONTINUATION.md"
+    "source": "WeakCurves relation-support theorem and P-192 Type I certificate (2026)",
+    "url": "https://github.com/aburan28/crypto/blob/main/research/weak_curve_leaderboard_20261012/lean/WeightedSupport.lean"
   },
   {
     "id": "ic_divisor_support_geometry",

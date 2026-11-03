@@ -400,7 +400,10 @@ pub fn phi_exact(l: u32) -> Option<ModularPolynomial> {
     let len = top + CHECK + 1;
     let n = len + 1;
     let sigma = |k: u32, m: usize| -> BigInt {
-        (1..=m).filter(|d| m % d == 0).map(|d| BigInt::from(d).pow(k)).sum()
+        (1..=m)
+            .filter(|d| m.is_multiple_of(*d))
+            .map(|d| BigInt::from(d).pow(k))
+            .sum()
     };
     let mul = |a: &[BigInt], b: &[BigInt], cut: usize| -> Vec<BigInt> {
         let mut out = vec![BigInt::zero(); cut];
@@ -493,7 +496,11 @@ pub fn phi_exact(l: u32) -> Option<ModularPolynomial> {
     coeffs.insert((lu as u32, lu as u32), BigInt::from(-1));
     for idx in 0..len {
         let pole = top as isize - idx as isize;
-        let slot = if pole >= 0 { by_pole[pole as usize] } else { None };
+        let slot = if pole >= 0 {
+            by_pole[pole as usize]
+        } else {
+            None
+        };
         match slot {
             Some((a, b)) => {
                 let c = -r[idx].clone();
@@ -515,7 +522,10 @@ pub fn phi_exact(l: u32) -> Option<ModularPolynomial> {
             }
         }
     }
-    Some(ModularPolynomial { l: l as u64, coeffs })
+    Some(ModularPolynomial {
+        l: l as u64,
+        coeffs,
+    })
 }
 
 #[cfg(test)]
@@ -573,7 +583,11 @@ mod tests {
                         _ => 0,
                     };
                     let c = ex.coeff(i, j);
-                    assert_eq!((c - BigInt::from(want)) % &lb, BigInt::zero(), "Φ_{l} ({i},{j})");
+                    assert_eq!(
+                        (c - BigInt::from(want)) % &lb,
+                        BigInt::zero(),
+                        "Φ_{l} ({i},{j})"
+                    );
                 }
             }
         }

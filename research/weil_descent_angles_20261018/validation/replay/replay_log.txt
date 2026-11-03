@@ -1,0 +1,33 @@
+itemF__b24 mode=control env=N2_SIZES=24 rc=0 wall=0s
+itemF__b20 mode=control env=N2_SIZES=20 rc=0 wall=0s
+itemOJ__b20 mode=run env=N2_SIZES=20 rc=0 wall=0s
+itemOJ__b28 mode=run env=N2_SIZES=28 rc=0 wall=2s
+itemOJ__b32 mode=run env=N2_SIZES=32 rc=0 wall=8s
+H4__b32 mode=memsweep env=N2_SIZES=32 rc=0 wall=1s
+H4__b36 mode=memsweep env=N2_SIZES=36 rc=0 wall=4s
+H2__b32_h1 mode=glue env=N2_SIZES=32 N2_HS=1 rc=0 wall=1s
+H2__b36_h1 mode=glue env=N2_SIZES=36 N2_HS=1 rc=0 wall=2s
+H2__b40_h4 mode=glue env=N2_SIZES=40 N2_HS=4 rc=0 wall=21s
+H2__gluecheck mode=gluecheck env= rc=0 wall=1s
+H1__b32_h96 mode=hsweep env=N2_SIZES=32 N2_HS=96 rc=0 wall=3s
+H1__b36_h16 mode=hsweep env=N2_SIZES=36 N2_HS=16 rc=0 wall=5s
+H1__b40_h12 mode=hsweep env=N2_SIZES=40 N2_HS=12 rc=0 wall=30s
+H6__b44_c2 mode=run env=N2_SIZES=44 N2_CS=2 rc=0 wall=241s
+SUPP_itemOJ__b40 mode=run env=N2_SIZES=40 rc=0 wall=180s
+ALLDONE
+SUPP_itemF__b28 mode=control env=N2_SIZES=28 rc=0 wall=0s
+SUPP_itemF__b32 mode=control env=N2_SIZES=32 rc=0 wall=3s
+SUPP_itemF__b36 mode=control env=N2_SIZES=36 rc=0 wall=14s
+SUPP_itemF__b40 mode=control env=N2_SIZES=40 rc=0 wall=57s
+SUPP_itemOJ__b24 mode=run env=N2_SIZES=24 rc=0 wall=1s
+SUPP_itemOJ__b36 mode=run env=N2_SIZES=36 rc=0 wall=41s
+SUPP_H2__b28_h1 mode=glue env=N2_SIZES=28 N2_HS=1 rc=0 wall=0s
+SUPP_H2__b28_h4 mode=glue env=N2_SIZES=28 N2_HS=4 rc=0 wall=0s
+SUPP_H2__b32_h4 mode=glue env=N2_SIZES=32 N2_HS=4 rc=0 wall=1s
+SUPP_H2__b36_h4 mode=glue env=N2_SIZES=36 N2_HS=4 rc=0 wall=5s
+SUPP_H2__b40_h1 mode=glue env=N2_SIZES=40 N2_HS=1 rc=0 wall=12s
+SUPP_H1__b32_rest mode=hsweep env=N2_SIZES=32 N2_HS=4,8,12,16,24,32,48,64,128 rc=0 wall=51s
+SUPP_H1__b36_rest mode=hsweep env=N2_SIZES=36 N2_HS=4,8,12,24,32,48,64,96,128 rc=0 wall=51s
+SUPP_H1__b40_rest mode=hsweep env=N2_SIZES=40 N2_HS=4,8,16,24,32,48,64,96,128 rc=0 wall=230s
+SUPP_H6__b48_c2 mode=run env=N2_SIZES=48 N2_CS=2 rc=0 wall=1282s
+ALLDONE2

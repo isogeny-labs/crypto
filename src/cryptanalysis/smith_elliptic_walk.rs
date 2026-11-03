@@ -1619,7 +1619,22 @@ pub struct WalkResult {
     /// Distinct Smith signatures seen on the JV-weak hits (per hit, max).
     pub max_distinct_sigs: u64,
     pub hits_all_fail: u64,
+    /// Which cap censored the walk: `"nodes"`, `"steps"` or `"wall"`
+    /// (empty when not censored).
+    pub censor_cause: String,
+    /// Distinct j-invariants among tested nodes (diagnostic, not costed),
+    /// counted up to `DISTINCT_J_CAP`.
+    pub distinct_j: u64,
+    pub distinct_j_saturated: bool,
 }
+
+/// Cap on the distinct-j diagnostic set of one walk (memory bound).
+pub const DISTINCT_J_CAP: usize = 4_000_000;
+/// Trap rule (amendment 2026-10-25): censor a walk that has tested at least
+/// `TRAP_MIN_NODES` nodes but seen at most `TRAP_MAX_DISTINCT` distinct
+/// j-invariants.
+pub const TRAP_MIN_NODES: u64 = 200_000;
+pub const TRAP_MAX_DISTINCT: u64 = 1_000;
 
 /// Test a JV-weak node: try its explicit models until one passes Smith.
 /// Returns `(passed, models_tried, smith_calls, smith_ns, distinct signatures)`.
@@ -1691,6 +1706,7 @@ pub fn walk(
     let mut res = WalkResult::default();
     let mut cur = start;
     let mut skip_test = !test_start;
+    let mut seen_j: HashSet<El> = HashSet::new();
     loop {
         if !skip_test {
             let t0 = std::time::Instant::now();
@@ -1702,6 +1718,21 @@ pub fn walk(
             res.cost_test.invs += k.invs.get() - i0;
             res.cost_test.ns += t0.elapsed().as_nanos();
             res.nodes_tested += 1;
+            // Diagnostic (amendment 2026-10-25), outside the cost counters:
+            // distinct j-invariants among tested nodes, so retests of a closed
+            // component are distinguishable from new curves.
+            if seen_j.len() < DISTINCT_J_CAP {
+                let (m1, i1) = (k.mults.get(), k.invs.get());
+                let a3 = k.mulf(&k.mul(&k.mul(&cur.a, &cur.a), &cur.a), 4);
+                let den = k.add(&a3, &k.mulf(&k.mul(&cur.b, &cur.b), 27));
+                let j = k.mul(&a3, &k.inv(&den));
+                seen_j.insert(j);
+                k.mults.set(m1);
+                k.invs.set(i1);
+                res.distinct_j = seen_j.len() as u64;
+            } else {
+                res.distinct_j_saturated = true;
+            }
             if hit {
                 let (passed, tried, calls, sm_ns, dsig) =
                     test_models(k, &cur, rng, stop_on_pass, &mut res.cost_descent);
@@ -1723,8 +1754,25 @@ pub fn walk(
             }
         }
         skip_test = false;
-        if res.nodes_tested >= max_nodes || wall.elapsed().as_nanos() >= max_ns {
+        // Step cap (amendment 2026-10-25): a reflection loop between nodes
+        // that are never retested does not advance `nodes_tested`, so steps
+        // are also capped at four times the node cap; any cap censors.
+        let cause = if res.nodes_tested >= max_nodes {
+            "nodes"
+        } else if res.steps >= max_nodes.saturating_mul(4) {
+            "steps"
+        } else if wall.elapsed().as_nanos() >= max_ns {
+            "wall"
+        } else if res.nodes_tested >= TRAP_MIN_NODES && res.distinct_j <= TRAP_MAX_DISTINCT {
+            // Amendment 2026-10-25: the walk keeps retesting a closed set of
+            // at most TRAP_MAX_DISTINCT classes; it is censored as trapped.
+            "trapped"
+        } else {
+            ""
+        };
+        if !cause.is_empty() {
             res.censored = true;
+            res.censor_cause = cause.to_string();
             break;
         }
         let t0 = std::time::Instant::now();
@@ -1734,6 +1782,14 @@ pub fn walk(
             Some((nx, _)) => {
                 cur = nx;
                 res.steps += 1;
+            }
+            None if cur.back.is_none() => {
+                // Amendment 2026-10-25: the start node has no neighbour with
+                // full rational 2-torsion at all (an isolated node of the
+                // walk graph). The walk cannot move; it is censored.
+                res.censored = true;
+                res.censor_cause = "isolated".to_string();
+                break;
             }
             None => {
                 // Dead end: both forward neighbours lack full 2-torsion. Take
@@ -1990,31 +2046,64 @@ mod tests {
 
     #[test]
     fn step_matches_scan_and_keeps_trace() {
-        let p = 11;
-        let k = Fp3::new(p);
-        let tab = Tables::new(&k);
-        let mut rng = sp::SplitMix64(6);
-        let mut moved = 0;
-        for _ in 0..30 {
-            let node = random_full2_start(&k, &mut rng);
-            let n0 = count_ec(&k, &tab, &node.a, &node.b);
-            if let Some((nx, _)) = step(&k, &node, &mut rng) {
-                // the claimed roots are roots, and distinct
-                for r in &nx.roots {
-                    let v = k.add(&k.add(&k.mul(&k.mul(r, r), r), &k.mul(&nx.a, r)), &nx.b);
-                    assert_eq!(v, ZERO);
+        // p = 11 (q = 3 mod 4) and, since 2026-10-25, p = 13 (q = 1 mod 4,
+        // where Tonelli-Shanks iterates and the walk branches).
+        for p in [11u64, 13] {
+            let k = Fp3::new(p);
+            let tab = Tables::new(&k);
+            let mut rng = sp::SplitMix64(6);
+            let mut moved = 0;
+            for _ in 0..30 {
+                let node = random_full2_start(&k, &mut rng);
+                let n0 = count_ec(&k, &tab, &node.a, &node.b);
+                if let Some((nx, _)) = step(&k, &node, &mut rng) {
+                    // the claimed roots are roots, and distinct
+                    for r in &nx.roots {
+                        let v = k.add(&k.add(&k.mul(&k.mul(r, r), r), &k.mul(&nx.a, r)), &nx.b);
+                        assert_eq!(v, ZERO);
+                    }
+                    assert_ne!(nx.roots[0], nx.roots[1]);
+                    assert_eq!(count_ec(&k, &tab, &nx.a, &nx.b), n0);
+                    let mut sc = roots_cubic_scan(&k, &nx.a, &nx.b);
+                    let mut ro = nx.roots.to_vec();
+                    sc.sort();
+                    ro.sort();
+                    assert_eq!(sc, ro);
+                    moved += 1;
                 }
-                assert_ne!(nx.roots[0], nx.roots[1]);
-                assert_eq!(count_ec(&k, &tab, &nx.a, &nx.b), n0);
-                let mut sc = roots_cubic_scan(&k, &nx.a, &nx.b);
-                let mut ro = nx.roots.to_vec();
-                sc.sort();
-                ro.sort();
-                assert_eq!(sc, ro);
-                moved += 1;
+            }
+            assert!(moved > 5, "p = {p}");
+        }
+    }
+
+    #[test]
+    fn admissible_forward_steps_follow_the_sign_of_minus_one() {
+        // prod_i (r_i - r_j)(r_i - r_l) = -(discriminant of the roots), so the
+        // number of i with a square value is 2 when q = 3 mod 4 (a node
+        // has exactly one forward edge besides its dual) and 1 or 3 when
+        // q = 1 mod 4 (a leaf or a branching node).
+        for (p, one_mod_4) in [(11u64, false), (19, false), (13, true), (17, true)] {
+            let k = Fp3::new(p);
+            let mut rng = sp::SplitMix64(p);
+            for _ in 0..200 {
+                let node = random_full2_start(&k, &mut rng);
+                let sq = (0..3)
+                    .filter(|&i| {
+                        let (j, l) = ((i + 1) % 3, (i + 2) % 3);
+                        let v = k.mul(
+                            &k.sub(&node.roots[i], &node.roots[j]),
+                            &k.sub(&node.roots[i], &node.roots[l]),
+                        );
+                        k.chi(&v) == 1
+                    })
+                    .count();
+                if one_mod_4 {
+                    assert!(sq == 1 || sq == 3, "p {p}: {sq}");
+                } else {
+                    assert!(sq == 0 || sq == 2, "p {p}: {sq}");
+                }
             }
         }
-        assert!(moved > 5);
     }
 
     #[test]
@@ -2105,6 +2194,46 @@ mod tests {
         let r = walk(&k, start, &mut rng, 200_000, u128::MAX, false, true);
         assert!(r.passed && !r.censored, "{r:?}");
         assert!(r.jv_weak_hits == 1);
+    }
+
+    #[test]
+    fn walk_step_cap_bounds_reflection_loops() {
+        // Seeds 0 and 7 can reflect between nodes without retesting them
+        // (the 2026-10-19 diagnostic). With no wall budget, the walk must
+        // still stop, by a pass or by the node or step cap.
+        let k = Fp3::new(61);
+        for seed in [0u64, 7] {
+            let mut rng = sp::SplitMix64(seed);
+            let start = random_full2_start(&k, &mut rng);
+            let r = walk(&k, start, &mut rng, 1_000, u128::MAX, false, true);
+            assert!(r.passed || r.censored, "seed {seed}: {r:?}");
+            assert!(
+                r.steps <= 4_000 && r.nodes_tested <= 1_000,
+                "seed {seed}: {r:?}"
+            );
+            assert!(r.passed || r.censor_cause == "nodes" || r.censor_cause == "steps");
+        }
+    }
+
+    #[test]
+    fn walk_censors_isolated_starts_instead_of_panicking() {
+        // A random full-2-torsion start whose three 2-neighbours all lack
+        // full 2-torsion cannot move (arm B pilot, 2026-10-25, panicked).
+        // Such starts exist only when q = 3 mod 4 (see the sign test above),
+        // so use p = 59.
+        let k = Fp3::new(59);
+        let mut isolated = 0;
+        for seed in 0u64..300 {
+            let mut rng = sp::SplitMix64(seed);
+            let start = random_full2_start(&k, &mut rng);
+            let r = walk(&k, start, &mut rng, 500, u128::MAX, false, true);
+            assert!(r.passed || r.censored, "seed {seed}: {r:?}");
+            if r.censor_cause == "isolated" {
+                isolated += 1;
+                assert_eq!((r.steps, r.nodes_tested), (0, 1), "seed {seed}: {r:?}");
+            }
+        }
+        assert!(isolated > 0, "no isolated start among 300 seeds");
     }
 
     #[test]

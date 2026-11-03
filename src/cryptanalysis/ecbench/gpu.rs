@@ -1215,8 +1215,16 @@ mod lock_and_capsule_tests {
     }
 
     fn options(d: &Path, lock: &str) -> GpuOptions {
+        let _true_binary = ["/usr/bin/true", "/bin/true"]
+            .into_iter()
+            .find(|path| Path::new(path).is_file())
+            .expect("system true executable");
+        let true_binary = ["/bin/true", "/usr/bin/true"]
+            .into_iter()
+            .find(|path| Path::new(path).is_file())
+            .expect("a no-output true executable is required for the test");
         GpuOptions {
-            binary: PathBuf::from("/bin/true"),
+            binary: PathBuf::from(true_binary),
             out: d.join("out"),
             mode: "rho".into(),
             args: vec![],
@@ -1241,7 +1249,7 @@ mod lock_and_capsule_tests {
     fn a_gpu_stage_writes_a_host_capsule_the_receipt_binds() {
         let d = tmp("capsule");
         let lock = d.join("lock").display().to_string();
-        // /bin/true has no device self-test output: the stage stops at
+        // The true executable has no device self-test output: the stage stops at
         // `selftest_failed`, after the lock and the capsule.
         let receipt = run(&options(&d, &lock)).unwrap();
         assert_eq!(receipt.status, "selftest_failed");

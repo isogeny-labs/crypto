@@ -1,0 +1,58 @@
+{
+  "anchor_k": 4405,
+  "anchor_peak_rss_bytes": 22356250624,
+  "anchor_unattributed_overhead_bytes": 613387096,
+  "bloom_formula": "next_power_of_two(16*request80)/8",
+  "examples": [
+    {
+      "bloom_bytes": 2147483648,
+      "k": 4405,
+      "projected_rss_bytes": 22356250624,
+      "request80": 1006586550,
+      "states_upper": 805269240,
+      "table_bytes": 10737418240,
+      "table_slots": 2147483648
+    },
+    {
+      "bloom_bytes": 2147483648,
+      "k": 4406,
+      "projected_rss_bytes": 22360272851,
+      "request80": 1007043622,
+      "states_upper": 805634897,
+      "table_bytes": 10737418240,
+      "table_slots": 2147483648
+    },
+    {
+      "bloom_bytes": 2147483648,
+      "k": 4500,
+      "projected_rss_bytes": 22742438734,
+      "request80": 1050471563,
+      "states_upper": 840377250,
+      "table_bytes": 10737418240,
+      "table_slots": 2147483648
+    },
+    {
+      "bloom_bytes": 2147483648,
+      "k": 4549,
+      "projected_rss_bytes": 22944851560,
+      "request80": 1073473020,
+      "states_upper": 858778416,
+      "table_bytes": 10737418240,
+      "table_slots": 2147483648
+    },
+    {
+      "bloom_bytes": 4294967296,
+      "k": 4550,
+      "projected_rss_bytes": 35833907147,
+      "request80": 1073945032,
+      "states_upper": 859156025,
+      "table_bytes": 21474836480,
+      "table_slots": 4294967296
+    }
+  ],
+  "max_k_same_table_and_bloom": 4549,
+  "schema": "n83.indexed5-load80-capacity-projection/v1",
+  "slot_formula": "next_power_of_two(2*ceil(5*states_upper/4))",
+  "source_sha256": "4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507",
+  "status": "PROJECTION_ONLY"
+}

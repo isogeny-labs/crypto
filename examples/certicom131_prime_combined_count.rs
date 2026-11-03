@@ -77,7 +77,7 @@ impl Sqrt {
     fn new(f: Fp) -> Self {
         let mut q = f.0 - 1;
         let mut s = 0;
-        while q % 2 == 0 {
+        while q.is_multiple_of(2) {
             q /= 2;
             s += 1;
         }
@@ -102,7 +102,7 @@ impl Sqrt {
         }
         let (mut m, mut c) = (self.s, self.z);
         let mut t = f.pow(a, self.q);
-        let mut r = f.pow(a, (self.q + 1) / 2);
+        let mut r = f.pow(a, self.q.div_ceil(2));
         while t != 1 {
             let mut i = 0;
             let mut tt = t;
@@ -201,7 +201,7 @@ fn is_prime_u64(n: u64) -> bool {
     }
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             return false;
         }
         d += 1;
@@ -288,10 +288,11 @@ fn main() {
             // A subgroup of non-2-power order d | p - 1 with d near B.
             let mut d_best = 0u64;
             for d in (bsz / 2)..=(bsz * 2) {
-                if (p - 1) % d == 0 && !d.is_power_of_two() {
-                    if d_best == 0 || d.abs_diff(bsz) < d_best.abs_diff(bsz) {
-                        d_best = d;
-                    }
+                if (p - 1) % d == 0
+                    && !d.is_power_of_two()
+                    && (d_best == 0 || d.abs_diff(bsz) < d_best.abs_diff(bsz))
+                {
+                    d_best = d;
                 }
             }
             let sub: Option<Vec<u64>> = (d_best > 0).then(|| {
@@ -300,7 +301,7 @@ fn main() {
                     let w = f.pow(gen, (p - 1) / d_best);
                     // exact order d_best: check against prime factors.
                     let ok = (2..=d_best)
-                        .filter(|q| d_best % q == 0 && is_prime_u64(*q))
+                        .filter(|q| d_best.is_multiple_of(*q) && is_prime_u64(*q))
                         .all(|q| f.pow(w, d_best / q) != 1);
                     if ok {
                         break w;

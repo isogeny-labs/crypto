@@ -27,6 +27,7 @@
 //!   here can only cost performance, never soundness.
 
 use crate::binary_ecc::{BinaryPoint, IrreduciblePoly};
+use crate::cryptanalysis::group_op_count;
 use crate::cryptanalysis::semaev_decomp::{Gf2, Gf2_128};
 
 /// Affine point on a binary curve with single-word coordinates.
@@ -79,10 +80,12 @@ impl FastBinaryCurve {
             (Some((x1, y1)), Some((x2, y2))) => {
                 if x1 == x2 {
                     if (y1 ^ y2) == x1 {
+                        group_op_count::count_adds(1);
                         return None;
                     }
                     return self.double(x1, y1);
                 }
+                group_op_count::count_adds(1);
                 let gf = &self.gf;
                 let dx = x1 ^ x2;
                 let dy = y1 ^ y2;
@@ -97,6 +100,7 @@ impl FastBinaryCurve {
 
     /// Exact affine doubling, bit-identical to `point_double`.
     pub fn double(&self, x1: u64, y1: u64) -> FastPoint {
+        group_op_count::count_doubles(1);
         if x1 == 0 {
             return None;
         }
@@ -150,6 +154,7 @@ impl FastBinaryCurve {
         if k.bits() == 0 {
             return None;
         }
+        group_op_count::count_scalar_mults(1);
         let mut result: FastPoint = None;
         for i in (0..k.bits()).rev() {
             result = match result {
@@ -184,6 +189,8 @@ impl FastBinaryCurve {
                 _ => {}
             }
         }
+        // One doubling per finite point, as `double` counts it.
+        group_op_count::count_doubles(points.iter().filter(|p| p.is_some()).count() as u64);
         if xs.is_empty() {
             return out;
         }
@@ -280,6 +287,8 @@ impl FastBinaryCurve {
         if dxs.is_empty() {
             return out;
         }
+        // The generic pairs; the special ones went through `add`.
+        group_op_count::count_adds(idx.len() as u64);
         let mut scratch = Vec::new();
         self.gf.batch_inv(&mut dxs, &mut scratch);
         // dxs[k] is now 1/(x1^x2) for the k-th generic pair.
@@ -480,10 +489,12 @@ impl FastBinaryCurve128 {
             (Some((x1, y1)), Some((x2, y2))) => {
                 if x1 == x2 {
                     if (y1 ^ y2) == x1 {
+                        group_op_count::count_adds(1);
                         return None;
                     }
                     return self.double(x1, y1);
                 }
+                group_op_count::count_adds(1);
                 let gf = &self.gf;
                 let dx = x1 ^ x2;
                 let dy = y1 ^ y2;
@@ -498,6 +509,7 @@ impl FastBinaryCurve128 {
 
     /// Exact affine doubling, bit-identical to `point_double`.
     pub fn double(&self, x1: u128, y1: u128) -> FastPoint128 {
+        group_op_count::count_doubles(1);
         if x1 == 0 {
             return None;
         }
@@ -545,6 +557,7 @@ impl FastBinaryCurve128 {
         if k.bits() == 0 {
             return None;
         }
+        group_op_count::count_scalar_mults(1);
         let mut result: FastPoint128 = None;
         for i in (0..k.bits()).rev() {
             result = match result {
@@ -580,6 +593,8 @@ impl FastBinaryCurve128 {
         if dxs.is_empty() {
             return out;
         }
+        // The generic pairs; the special ones went through `add`.
+        group_op_count::count_adds(indices.len() as u64);
         let mut scratch = Vec::new();
         self.gf.batch_inv(&mut dxs, &mut scratch);
         for (t, &k) in indices.iter().enumerate() {

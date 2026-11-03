@@ -1,0 +1,20 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: same-field Jacobian image implementations",
+  "description": "Tiny Koblitz image fixture for destination rho, BSGS, and their field-operation tallies. Destination units are not source GAE.",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 0, "n": 7}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010321,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-strong-reference", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "rho-strong-aa", "role": "control", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "image-rho3", "role": "baseline", "method": {"id": "jacobian_image.rho3"}},
+    {"name": "image-bsgs", "role": "candidate", "method": {"id": "jacobian_image.bsgs"}},
+    {"name": "image-rho3-field", "role": "candidate", "method": {"id": "jacobian_image.rho3_field_tally"}},
+    {"name": "image-bsgs-field", "role": "candidate", "method": {"id": "jacobian_image.bsgs_field_tally"}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010322, "isolation_required": "L2", "timeout_seconds": 90}
+}

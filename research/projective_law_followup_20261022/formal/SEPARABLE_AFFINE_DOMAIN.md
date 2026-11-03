@@ -1,0 +1,9 @@
+# Separable quintic affine and projective-point domain
+
+For any field `K` and the actual monic quintic `f = X^5 + a3 X^3 + a2 X^2 + a1 X + a0`, the checked Lean theorem derives a simple prime factor from `f.Separable`. It applies the earlier Eisenstein result to prove that the actual affine coordinate ring is a domain, as are its localization at a rational curve point and the corresponding weighted-Proj point stalk. No factor witness is supplied as an additional hypothesis. No characteristic restriction is needed for this domain result.
+
+The [PDF proof note](SEPARABLE_AFFINE_DOMAIN.pdf), [SVG dependency graph](separable-affine-domain.svg), and [standardized CSV gate table](separable-affine-domain.csv) present the exact boundary. The [Lean source](Common22SeparableAffineDomain.lean), [direct compiler and axiom log](separable-affine-domain-lean.log), and [vector figure PDF](separable-affine-domain-figure.pdf) are included for review. The [TeX source](SEPARABLE_AFFINE_DOMAIN.tex) reproduces the report.
+
+The direct pinned Lean 4.34.1 compilation exited zero against Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612`. All seven `#print axioms` outputs contain only `propext`, `Classical.choice`, and `Quot.sound`; no `sorryAx`. Two style-linter warnings about `letI` are nonfatal. Source SHA-256: `897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602`.
+
+The proof uses `Polynomial.exists_monic_irreducible_factor`, `Separable.squarefree`, `MvPolynomial.uniqueAlgEquiv`, and the existing checked `Common22AffineOddDomain` Eisenstein theorem. The ring domain is only one prerequisite for the local order result. Principality of the nonbranch point ideal, an actual DVR, formula-specific norm transport, global principal-divisor/Pic0 transport, and correspondence with compiled Rust semantics remain open. This packet contains no performance result.

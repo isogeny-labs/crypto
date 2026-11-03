@@ -17,6 +17,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
     SolverEngine,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible;
+use crypto_lib::cryptanalysis::pq_groebner_f2::masks_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -45,7 +46,7 @@ fn solve(sys: &[F2BoolPoly], nv: usize) -> (Vec<u64>, f64, u64, usize, bool) {
     let cpu = tcpu() - c0;
     roots.sort_unstable();
     (
-        roots,
+        masks_low64(&roots),
         cpu,
         f4_word_ops_thread() - w0,
         st.splits,

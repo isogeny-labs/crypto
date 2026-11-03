@@ -1,0 +1,36 @@
+import TwistGroupMap
+
+/-! Exact Frobenius eigenspaces for the explicit short-model twist image. -/
+namespace TwistEigenspace
+
+open WeierstrassCurve.Affine TwistEmbedding TwistGroupMap
+
+variable {k K : Type*} [Field k] [Fintype k] [Field K] [Algebra k K]
+  [DecidableEq k] [DecidableEq K]
+
+theorem frobenius_fixed_iff (z : K) :
+    FiniteField.frobeniusAlgHom k K z = z ↔ ∃ x : k, algebraMap k K x = z := by
+  constructor
+  · intro hz
+    let p : Polynomial k := Polynomial.X ^ Fintype.card k - Polynomial.X
+    have hp : p.roots.card = p.natDegree := by
+      rw [FiniteField.X_pow_card_sub_X_natDegree_eq k Fintype.one_lt_card,
+        FiniteField.roots_X_pow_card_sub_X]
+      simp
+    have hm := Polynomial.roots_map_of_injective_of_card_eq_natDegree
+      (p := p) (algebraMap k K).injective hp
+    have hzroot : z ∈ (p.map (algebraMap k K)).roots := by
+      rw [Polynomial.mem_roots]
+      · simpa [p, Polynomial.IsRoot, FiniteField.coe_frobeniusAlgHom] using
+          sub_eq_zero.mpr hz
+      · simpa [p] using
+          FiniteField.X_pow_card_sub_X_ne_zero K (p := Fintype.card k) Fintype.one_lt_card
+    rw [← hm, FiniteField.roots_X_pow_card_sub_X] at hzroot
+    obtain ⟨x, _, hx⟩ := Multiset.mem_map.mp hzroot
+    exact ⟨x, hx⟩
+  · rintro ⟨x, rfl⟩
+    simp
+
+#print axioms frobenius_fixed_iff
+
+end TwistEigenspace

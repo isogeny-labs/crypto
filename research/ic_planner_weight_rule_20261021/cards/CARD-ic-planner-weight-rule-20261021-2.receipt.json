@@ -1,0 +1,173 @@
+{
+  "card_id": "CARD-ic-planner-weight-rule-20261021-2",
+  "card_path": "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.yaml",
+  "card_sha256": "303dfb069dc957c81f38a34de5a5a4b0147e335d607461cb5d68f969e91103f8",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_weight_rule_20261021/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.554,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-clean",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.554,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import glob,sys; sys.exit(1 if glob.glob('research/ic_planner_weight_rule_20261021/sessions/B-*') else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.048,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sessions-absent",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.048,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-record",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8682b1cf5c156a59d86d54c99c8251f24a3a39d0e4b9b1f8be70b26dff5b2edd",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   36G  3.7G  91% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.045,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run-h21",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.045,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_planner_weight_rule_20261021/specs/B-h21.json",
+        "--out",
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21",
+        "--cpus",
+        "auto",
+        "--wait",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 2,
+          "seconds": 2.925,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 2,
+      "id": "run-h21",
+      "index": 5,
+      "outputs": {
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/host.json": null,
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/plan.json": null,
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/records.jsonl": null,
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/session.json": null,
+        "research/ic_planner_weight_rule_20261021/sessions/B-h21/spec.json": null
+      },
+      "seconds": 2.925,
+      "stderr_sha256": "09a13c2a4a9567012f453df360064a45be4cb29181cc3d4e77a60ea4dbab8090",
+      "stderr_tail": [
+        "ecbench: host is not quiet (PSI cpu some avg10 6.02 > 5.00); wait, or pass --allow-busy to record runs below L2"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 23,
+  "commit": "66f1642d1c04fb4fc236aacfbe746e2ebb639a87",
+  "dirty_after": [
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.disk-start.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stderr",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.run-h21.stdout",
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.yaml"
+  ],
+  "dirty_before": [
+    "research/ic_planner_weight_rule_20261021/cards/CARD-ic-planner-weight-rule-20261021-2.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 5"
+}

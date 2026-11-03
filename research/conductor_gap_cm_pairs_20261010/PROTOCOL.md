@@ -60,7 +60,9 @@ overstate the theorem's scope. `lean/GenericInvariance.lean` covers
 algorithms whose control flow depends only on group-operation outcomes
 (equality answers) and a random tape, which is BSGS-type algorithms. The rho
 and kangaroo that ecbench runs choose each step by hashing the point
-representation (`mix(g.key(&pos))`, `src/cryptanalysis/ecbench/generic.rs:275`;
+representation (`mix(g.key(&pos))` in the step loop of `kangaroo` in
+`src/cryptanalysis/ecbench/generic.rs`, line 309 at commit 57fa35852, line
+275 at 11aa00591; re-cited 2026-10-28, SHF-20261028-0f3f64 PPN-7;
 `TunedWalker::index` in `src/cryptanalysis/ic_boundary.rs`), so the theorem
 does not cover them. The sheriff case gives a toy illustration, not run on
 ecbench: on `Z_1019` against its isomorphic image in `F_2039^*`, a

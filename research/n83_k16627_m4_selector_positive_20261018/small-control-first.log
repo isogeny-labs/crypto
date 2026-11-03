@@ -1,0 +1,31 @@
+   Compiling crypto v0.1.0 (/private/tmp/crypto-n83-k16627-progress)
+error[E0599]: no method named `add` found for struct `binary_ecc::curve::BinaryCurve` in the current scope
+    --> src/cryptanalysis/binary_semaev_chain_sat.rs:1135:43
+     |
+1135 |                     lifted_sum = kc.curve.add(&lifted_sum, lifted);
+     |                                           ^^^ method not found in `binary_ecc::curve::BinaryCurve`
+     |
+    ::: src/binary_ecc/curve.rs:43:1
+     |
+  43 | pub struct BinaryCurve {
+     | ---------------------- method `add` not found for this struct
+     |
+     = help: items from traits can only be used if the trait is implemented and in scope
+     = note: the following traits define an item `add`, perhaps you need to implement one of them:
+             candidate #1: `FieldArith`
+             candidate #2: `bsgs_fast::FieldOps`
+             candidate #3: `claw::ClawGroup`
+             candidate #4: `ecdlp_nist::group::EcdlpGroup`
+             candidate #5: `ext_curve::ExtField`
+             candidate #6: `fp_backend::PrimeField`
+             candidate #7: `hwcost::kernel::Arith`
+             candidate #8: `ic_boundary::CountedGroup`
+             candidate #9: `jv_cover::Fld`
+             candidate #10: `koblitz_sparse_la::ModWord`
+             candidate #11: `torsion::Field`
+             candidate #12: `Add`
+             candidate #13: `anstyle_parse::CharAccumulator`
+             candidate #14: `combine::error::ParseError`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `crypto` (lib test) due to 1 previous error

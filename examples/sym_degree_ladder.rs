@@ -22,6 +22,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
 use crypto_lib::cryptanalysis::koblitz_symmetrised::{
     build_symmetrised_factor_base_from_basis, build_symmetrised_system,
 };
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_from64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
@@ -34,7 +35,7 @@ const M: usize = 3;
 fn eval(p: &F2BoolPoly, a: u64) -> bool {
     p.terms
         .iter()
-        .fold(false, |acc, t| acc ^ (t.mask & a == t.mask))
+        .fold(false, |acc, t| acc ^ (t.mask & mask_from64(a) == t.mask))
 }
 
 fn roots(polys: &[F2BoolPoly], n_vars: usize) -> u64 {

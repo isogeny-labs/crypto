@@ -6,9 +6,9 @@ eight of nine targets; its [P-256 checkpoint](../../research/nist_skipped_curve_
 is the remaining 444-bit composite lineage. R03 corrected a native restore
 failure; its validated compact master checkpoint is the fallback input.
 R04 preserves a selected sieving job. The card now selects the newer
-[R05 relation checkpoint](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/README.md),
+[R06 relation checkpoint](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R06-20261023/README.md),
 which requires actual artifact-store publication before ready promotion.
-R03/R04 fallback archives omit R05's relations and are not equivalent resumes.
+Older fallback archives omit R06's added relations and are not equivalent resumes.
 The [native timeout correction](../../research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/README.md)
 and a binary-bound passing native control are required by the checked wrapper.
 This card is a later allocation, never a claim that
@@ -20,7 +20,7 @@ factor partition; no split leaves the complete factorization unresolved.
 Progress in native state is recorded separately from the arithmetic result.
 
 Before ready promotion, pin the merged implementation, publish and bind
-the R05 checkpoint and checksum, select a compatible AVX2/BMI2 host and lab,
+the R06 checkpoint and checksum, select a compatible AVX2/BMI2 host and lab,
 and verify the fixed input. Build the recorded two-line native patch and
 run the bounded original-versus-patched controls on that host. Set
 `YAFU_PATCHED_BIN` and `YAFU_TIMEOUT_CONTROL_DIR` to the actual validated
@@ -48,3 +48,8 @@ A verified partial partition does not meet that mathematical exit condition.
 The [open obstruction](../../problems/nist-extension-twist-composite-cofactors.md)
 retains the unmet requirement. Historical skip reasons and curve security
 are outside this factorization experiment's conclusions.
+
+R07 filters a separate copy and produces no matrix. That copy contains
+appended free relations; use R06's original state for collection. The
+separate local R08 run has its own frozen two-hour protocol and does not
+queue or promote this distributed card.

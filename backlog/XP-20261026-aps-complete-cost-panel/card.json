@@ -1,0 +1,65 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261026-aps-complete-cost-panel",
+  "title": "Complete-cost validation of APS single-relation extensions",
+  "created": "2026-10-26",
+  "authors": ["APS native implementation review"],
+  "status": "blocked",
+  "status_note": "Bounded correctness code and tests exist. This panel is not runnable, frozen, published to cairn, funded or scheduled. The named future runner and replay verifier do not exist yet.",
+  "blocked_on": [
+    "problem:problems/aps-single-relation-complete-cost.md complete native accounting, export adapter, replay and ladder support are missing",
+    "note: choose and freeze a schema-valid experiment.protocol/v1 and independent analysis with held-out inputs, controls and sample size",
+    "note: checkpoint upload credential absent from this session; complete resume, push and gate before any experiment"
+  ],
+  "links": {
+    "lead": "research/ecdlp_leads_20261018/README.md#l4-audit-of-unchecked-prime-field-ic-algorithms",
+    "notes": [
+      "research/aps_extensions_20261026/README.md",
+      "research/aps_extensions_20261026/TRACKER.md",
+      "research/aps_extensions_20261026/PROTOCOL_PLAN.md",
+      "problems/rootfinding-complete-cost-calibration.md"
+    ],
+    "prs": []
+  },
+  "question": "Do fixed labels, unordered divisor selection, sparse orbit bases, covering partitions or hybrid presentations reduce complete verified APS cost against the matched native baseline?",
+  "decision_value": "A held-out reduction in complete cold cost, including setup and failed attempts, establishes an IC improvement and chooses the next baseline. A null, failed, budget-exhausted or price-sensitive result is retained and does not promote a winner. Tiny correctness tests alone do not decide this comparison.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/aps-extensions-20261026",
+    "build": [["cargo", "build", "--release", "--locked", "--bin", "aps_complete_cost_panel"]]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 8,
+    "disk_gb": 10,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Provisional resource ceilings only, not a runtime estimate. No sample count or cost pilot has been frozen. README.md records what must be derived before ready."
+  },
+  "run": {
+    "argv": ["target/release/aps_complete_cost_panel", "--protocol", "backlog/XP-20261026-aps-complete-cost-panel/protocol.json", "--out", "{out}"],
+    "env": {"RAYON_NUM_THREADS": "1"},
+    "timeout_per_shard_s": 14400
+  },
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "experiment.export/v1 plus native ecbench records; adapter not implemented",
+    "verify": [],
+    "land": "research/aps_extensions_20261026/reports"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Blocked tracking card only. The future runner is deliberately named but unimplemented. No task, lease, objective, instance or reward is posted.",
+    "space": "TBD",
+    "tasks": ["XP-20261026-aps-complete-cost-panel"],
+    "ttl_s": 86400,
+    "env": {"name": "crypto-aps-complete-cost-pending", "recipe": "Pin merged code, compiler, native runner, independent verifier and external solver after the accounting gap is fixed; no runnable environment is claimed."},
+    "exec": {"cpus": 1, "memory_mb": 8192, "timeout_s": 14400, "sandbox": "auto", "publish": "runs/XP-20261026-aps-complete-cost-panel"},
+    "funding": {"units": 0, "rationale": "Blocked and not posted. Like the existing draft prime-base-oracle tuning card, propose no queue reward until protocol, costs and verifier exist; reviewer sets priority when making it ready."}
+  },
+  "owner_hint": "Native prime-field index-calculus lane"
+}

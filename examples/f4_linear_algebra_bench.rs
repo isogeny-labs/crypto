@@ -1,4 +1,5 @@
 //! Matched native S3 harness; identical source is built against both revisions.
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, masks_low64};
 use crypto_lib::{
     binary_ecc::F2mElement,
     cryptanalysis::{
@@ -52,9 +53,9 @@ fn main() {
         found.sort_unstable();
         let start = Instant::now();
         let truth: Vec<_> = (0..1u64 << sys.n_vars)
-            .filter(|&x| sys.equations.iter().all(|p| p.eval(x) == 0))
+            .filter(|&x| sys.equations.iter().all(|p| p.eval(mask_from64(x)) == 0))
             .collect();
-        let correct = found == truth && !stats.exhausted;
+        let correct = masks_low64(&found) == truth && !stats.exhausted;
         let verification_ns = start.elapsed().as_nanos();
         let start = Instant::now();
         let (rows, xors) = matrix_f4_f2_counted(&sys.equations, sys.n_vars, 3).unwrap();

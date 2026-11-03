@@ -1,0 +1,143 @@
+{
+  "schema": "ghs-subgroup-weil-audit/v1",
+  "criterion": "If prime r > floor((1+sqrt(2^s))^(2g)), every map from the r-subgroup into Jac(C)(GF(2^s)) has zero image.",
+  "cases": [
+    {
+      "absolute_degree": 6,
+      "screen_file": "screen-n6-a0-b20.json",
+      "verified_source_receipt": "exact-n6-a0-b32-direct.json",
+      "source": {
+        "modulus": "0x43",
+        "a": "0",
+        "b": "32",
+        "subgroup_order": 19
+      },
+      "rows": [
+        {
+          "base_degree": 3,
+          "genus": 2,
+          "profiles": 14,
+          "jacobian_order_upper_bound": 214,
+          "subgroup_order": 19,
+          "status": "order_bound_allows_only"
+        }
+      ],
+      "excluded_profiles": 0,
+      "remaining_profiles": 14
+    },
+    {
+      "absolute_degree": 8,
+      "screen_file": "screen-n8-a0-b20.json",
+      "verified_source_receipt": "exact-n8-a0-b32-direct.json",
+      "source": {
+        "modulus": "0x11b",
+        "a": "0",
+        "b": "32",
+        "subgroup_order": 67
+      },
+      "rows": [
+        {
+          "base_degree": 4,
+          "genus": 2,
+          "profiles": 30,
+          "jacobian_order_upper_bound": 625,
+          "subgroup_order": 67,
+          "status": "order_bound_allows_only"
+        }
+      ],
+      "excluded_profiles": 0,
+      "remaining_profiles": 30
+    },
+    {
+      "absolute_degree": 10,
+      "screen_file": "screen-n10-a0-b20.json",
+      "verified_source_receipt": "exact-n10-a0-b32-direct.json",
+      "source": {
+        "modulus": "0x409",
+        "a": "0",
+        "b": "32",
+        "subgroup_order": 43
+      },
+      "rows": [
+        {
+          "base_degree": 5,
+          "genus": 2,
+          "profiles": 62,
+          "jacobian_order_upper_bound": 1963,
+          "subgroup_order": 43,
+          "status": "order_bound_allows_only"
+        }
+      ],
+      "excluded_profiles": 0,
+      "remaining_profiles": 62
+    },
+    {
+      "absolute_degree": 12,
+      "screen_file": "leads-n12-a1-b200-g2.json",
+      "verified_source_receipt": "exact-n12-a1-b512-direct.json",
+      "source": {
+        "modulus": "0x1009",
+        "a": "1",
+        "b": "512",
+        "subgroup_order": 199
+      },
+      "rows": [
+        {
+          "base_degree": 2,
+          "genus": 2,
+          "profiles": 6,
+          "jacobian_order_upper_bound": 81,
+          "subgroup_order": 199,
+          "status": "excluded_by_weil_bound"
+        },
+        {
+          "base_degree": 4,
+          "genus": 1,
+          "profiles": 15,
+          "jacobian_order_upper_bound": 25,
+          "subgroup_order": 199,
+          "status": "excluded_by_weil_bound"
+        },
+        {
+          "base_degree": 6,
+          "genus": 2,
+          "profiles": 126,
+          "jacobian_order_upper_bound": 6561,
+          "subgroup_order": 199,
+          "status": "order_bound_allows_only"
+        }
+      ],
+      "excluded_profiles": 21,
+      "remaining_profiles": 126,
+      "excluded_c": {
+        "2": [
+          "0x1",
+          "0x9",
+          "0x48",
+          "0x49",
+          "0x201",
+          "0x208"
+        ],
+        "4": [
+          "0x1",
+          "0x8",
+          "0x9",
+          "0x40",
+          "0x41",
+          "0x48",
+          "0x49",
+          "0x200",
+          "0x201",
+          "0x208",
+          "0x209",
+          "0x240",
+          "0x241",
+          "0x248",
+          "0x249"
+        ]
+      }
+    }
+  ],
+  "excluded_profiles": 21,
+  "remaining_profiles": 232
+}

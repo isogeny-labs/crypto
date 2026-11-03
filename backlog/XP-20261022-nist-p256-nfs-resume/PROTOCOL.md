@@ -31,9 +31,9 @@ Require the existing genuine-GNFS known-answer and checkpoint-resume
 controls, plus checkpoint checksum verification and fixed-input comparison.
 Per-thread-only polynomial state is insufficient: require the R03
 native-recognized master checkpoint or a later validated checkpoint. Refuse
-a silent restart. Bind the R05 relation checkpoint and its checksum at
+a silent restart. Bind the R06 relation checkpoint and its checksum at
 execution; it currently awaits required artifact-store publication. Older
-R03/R04 checkpoints omit the subsequently collected relations and are not
+R03/R04/R05 checkpoints omit subsequent relations and are not
 equivalent resumptions. Before ready promotion, run the separate bounded
 native timeout controls on the selected host. Require a passing summary
 bound to the exact patched binary hash. The checked resume wrapper installs
@@ -43,6 +43,12 @@ unpatched executable stored in a restored checkpoint must not silently win
 over the validated binary. A prepare-only control must replay successfully
 before the actual allocation. No ready promotion or later run is claimed
 by this prerequisite update.
+
+R07's filtering copy appends free relations and is not the collection
+checkpoint. Its completed filter leaves 92 singleton survivors and no
+matrix. Resume R06's unchanged original state. The separate local R08
+allocation has its own 7200-second native limit; this distributed card
+remains unqueued with the 1800-second limit above.
 Treat every native factor label as a hint. The independent verifier is
 pinned to both the fixture-derived whole target and this literal residual;
 it checks exact products and retained PARI prime certificates. Partial

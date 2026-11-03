@@ -1,0 +1,56 @@
+{
+  "schema": "pencil-resource-authorization/v1",
+  "id": "first-gate-four-hour-envelope-20261029",
+  "authority": "explicit_user_reply_with_recorded_coordinator_interpretation",
+  "question_item_id": [
+    "request_user_input_async",
+    "call_bf4170be60934683aacf50844484812c",
+    0
+  ],
+  "clock_observed_utc": "2026-10-29T23:32:22Z",
+  "scope": {
+    "stage": "first_gate_only",
+    "prepared_spec": "gate-p739.json",
+    "base_prime": 739,
+    "target_count": 60,
+    "targets": "all60 prescribed targets retained; incomplete targets and outcomes remain explicit",
+    "cumulative_worker_execution_elapsed_cap_seconds": 14400,
+    "absolute_deadline_utc": "2026-10-30T03:32:22Z",
+    "per_execution_timeout_seconds": 3600,
+    "matrix_coefficient_cap": 25000000
+  },
+  "interpretation": "Four-hour total first-gate execution budget with a fixed deadline four hours after the recorded clock observation. This is elapsed worker execution accounting, not a dollar or vCPU price ceiling.",
+  "accounting": {
+    "aggregation": "Sum worker-execution elapsed seconds across all attempts; concurrent workers consume additive elapsed budget",
+    "includes": [
+      "candidate executions",
+      "reference and A/A controls",
+      "warmups",
+      "retries",
+      "recovery",
+      "fresh validation"
+    ],
+    "stop_rule": "Stop admission or work when cumulative14400worker-seconds or fixed UTCdeadline is reached, whichever comes first; enforce remaining budget on each admitted execution",
+    "missing_policy": "Retain the full60-target plan and record missing, capped or interrupted outcomes; do not replace the denominator with survivors"
+  },
+  "unchanged": {
+    "full1260_research_objective": true,
+    "scientific_controls_and_seeds": true,
+    "prepared_specs": true,
+    "empirical_instrument": true,
+    "per_execution3600second_limit": true,
+    "first_gate25000000coefficient_limit": true,
+    "legacy_Diem_deadline": true
+  },
+  "not_granted": [
+    "deadline reset for legacy Diem or other work",
+    "full-cohort or later-gate resource envelope",
+    "dollar or vCPU pricing claim",
+    "IAM or controller administration",
+    "runtime or image publication",
+    "protocol freeze",
+    "independent evidence review",
+    "experiment launch"
+  ],
+  "transcript_included": false
+}

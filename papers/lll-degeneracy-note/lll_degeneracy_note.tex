@@ -76,7 +76,16 @@ orthogonalising a row ``subtracts nearly equal 53-bit quantities, and
 the residual swamps the true component''. That mechanism is
 unsupported. With our scaling, the P-521 diagonal $n^2/2^{542}$ rounds
 to exactly $2^{500}$ in \texttt{f64}, so the subtraction described is
-exact on the initial basis, and the residual-dominates condition also
+exact on the initial basis\footnote{Correction (2026-10-28,
+\texttt{sheriff} case \texttt{SHF-20261028-0f3f64}, PPN-2): this
+holds because the conversion is correctly rounded. The locked
+\texttt{num-bigint} 0.4.8 \texttt{to\_f64} keeps the top 64 bits with
+a round-to-odd sticky bit and then rounds to nearest. Our scaled
+conversion first truncates 22 low bits of the 1042-bit $n^2$, far below
+the 53-bit significand. A truncating BigInt-to-\texttt{f64}
+conversion would instead give $2^{500}(1-2^{-53})$ and a residual of
+$2^{447}$. This was checked by reading the source, not by a committed
+run.}, and the residual-dominates condition also
 holds for P-256, brainpoolP256r1 and brainpoolP384r1, which recover.
 The sentence is withdrawn; the measured result (scaled \texttt{f64}
 0 of 3 distinct seed pairs at P-521, 2048-bit fixed point 3 of 3)

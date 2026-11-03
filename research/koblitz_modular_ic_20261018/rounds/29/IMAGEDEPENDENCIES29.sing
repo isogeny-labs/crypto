@@ -1,0 +1,29 @@
+// Input each actual selected pair, originalDegree29, imageCase29, functionKind29.
+if(firstX==0 || firstX==1 || firstX^2+firstX+1==0 || secondX==0 || secondX==1 || secondX^2+secondX+1==0){ERROR("selected ordinary pair meets cusp/SS exceptional x support");}
+if((secondX^3+secondX+1==0 || secondX^3+secondX^2+1==0) && secondY*(secondX^2+secondX+1)==secondX+1){ERROR("selected second image is a nonrational cusp");}
+number originalX29=firstX;number originalY29=firstY;
+number translatedX29=1/firstX;
+number translatedY29=(firstY+firstX+1)/(firstX^2)+1;
+if(translatedY29^2+translatedX29*translatedY29+translatedX29^3+translatedX29^2+1!=0){ERROR("actual rational2torsion translation control failed");}
+if(1/translatedX29!=firstX || (translatedY29+translatedX29+1)/(translatedX29^2)+1!=firstY){ERROR("rational2torsion translation involution failed");}
+// Actual corrupted second ordinate is rejected independently by the curve.
+if((secondY+1)^2+secondX*(secondY+1)+secondX^3+secondX^2+1==0){ERROR("corrupted actual image escaped curve detector");}
+intvec offsets29=-1,-1,-1,-1;int step29;
+for(step29=0;step29<originalDegree29;step29++){
+ if(originalX29==secondX && originalY29==secondY){offsets29[1]=step29;}
+ if(originalX29==secondX && originalY29+originalX29==secondY){offsets29[2]=step29;}
+ if(translatedX29==secondX && translatedY29==secondY){offsets29[3]=step29;}
+ if(translatedX29==secondX && translatedY29+translatedX29==secondY){offsets29[4]=step29;}
+ originalX29=originalX29^2;originalY29=originalY29^2;
+ translatedX29=translatedX29^2;translatedY29=translatedY29^2;
+}
+if(originalX29!=firstX || originalY29!=firstY){ERROR("first image fullFrobenius orbit did not close");}
+print("IMAGEDEPENDENCIES29_CASE "+string(imageCase29)+" degree="+string(originalDegree29)+" id,neg,T,negT offsets");offsets29;
+number fx29=firstX;number fy29=firstY;number sx29=secondX;number sy29=secondY;
+for(step29=0;step29<5;step29++){
+ if(fy29^2+fx29*fy29+fx29^3+fx29^2+1!=0 || sy29^2+sx29*sy29+sx29^3+sx29^2+1!=0){ERROR("five coefficient-descent curve checks failed");}
+ if(functionKind29==1 && fy29*sy29!=1){ERROR("five product-plus-one conjugates failed");}
+ if(functionKind29==2 && fx29*sy29!=1){ERROR("five asymmetric-plus-one conjugates failed");}
+ fx29=fx29^2;fy29=fy29^2;sx29=sx29^2;sy29=sy29^2;
+}
+print("IMAGEDEPENDENCIES29_FIVE_CONJUGATE_BINDINGS_PASS");

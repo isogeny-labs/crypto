@@ -1,0 +1,23 @@
+--- release-tested/diagnostics.rs
++++ lint-corrected/diagnostics.rs
+@@ -364,9 +364,10 @@
+     context.validate()?;
+     let record: Value = serde_json::from_slice(sealed_record).map_err(|e| e.to_string())?;
+     reject_duplicate_keys(std::str::from_utf8(sealed_record).map_err(|e| e.to_string())?)?;
++    let expected_seed = context.identity.seed.to_string();
+     if record["session_id"] != context.identity.session
+         || record["seq"].as_u64() != Some(context.identity.execution)
+-        || record["algorithm_seed"] != context.identity.seed.to_string()
++        || record["algorithm_seed"].as_str() != Some(expected_seed.as_str())
+         || record["binary_sha256"] != context.identity.binary_sha256
+     {
+         return Err("diagnostic record association mismatch".into());
+@@ -388,7 +389,7 @@
+     }
+     let mut paths: Vec<PathBuf> = Vec::new();
+     for entry in fs::read_dir(&leaf).map_err(|e| e.to_string())? {
+-        if paths.len() >= MAX_FILES + 1 {
++        if paths.len() > MAX_FILES {
+             return Err("diagnostic directory entry cap".into());
+         }
+         paths.push(entry.map_err(|e| e.to_string())?.path());

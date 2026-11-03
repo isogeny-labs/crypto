@@ -1,0 +1,11 @@
+{
+  "schema": "joint-image-source-reconciliation/v1",
+  "run": "uniform-zero-v2",
+  "recorded_head_at_launcher": "f2ab4b4636c07f87929b5852ab9ae8967ba1d5fe",
+  "matching_committed_source": "ca9f7f418561b828ede2849e7125a5803d5e6066",
+  "uniform_module_sha256": "1aad7d0ed52081edb3874c5d1255c73c5b6280237e23932d5dc069ef071c9fb2",
+  "native_main_sha256": "2099c8720d14a0187e24a7d3bea2626144b18a8554f30c66113ef0f13d4273df",
+  "source_manifest_check": "All seven recorded source hashes pass sha256sum -c after compilation. The actual compiled source includes the corrected array query encoding and integration test.",
+  "explanation": "The guarded launcher captured HEAD before the commit recording the already present source fix finished. Its per-file source hashes bind the real input. The later matching commit is recorded without rewriting the original HEAD or hash receipt.",
+  "scope": "Source provenance addendum only; no scientific phase repeated and no result inferred from source validation."
+}

@@ -1,0 +1,185 @@
+=== E5 analysis: cells loaded 24, bootstrap resamples 2000 (setrand(31337), stratified by cell, percentile 95%) ===
+--- per-cell table (arm b inst : trials ok / n / Marm / index / meanT / R [CI] / M,S,I per step / mean wasted / us per step)
+a0 b20 i1 : trials 8/8 ok 8 n=939487 Marm=939487 idx=1 meanT=1206.1 R=1.244 [0.859, 1.622] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=4.664
+a0 b20 i2 : trials 8/8 ok 8 n=802007 Marm=802007 idx=1 meanT=1008.8 R=1.126 [0.880, 1.334] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=4.585
+a0 b24 i1 : trials 8/8 ok 8 n=10529767 Marm=10529767 idx=1 meanT=4411.5 R=1.359 [0.925, 1.862] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=3.825
+a0 b24 i2 : trials 8/8 ok 8 n=13767389 Marm=13767389 idx=1 meanT=4689.6 R=1.264 [0.956, 1.541] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=3.598
+a1 b20 i1 : trials 8/8 ok 8 n=939487 Marm=469743 idx=1 meanT=970.4 R=1.416 [0.975, 2.009] M/S/I per step=2.083/1.055/1.028 wasted=0.000 us/step=5.024
+a1 b20 i2 : trials 8/8 ok 8 n=802007 Marm=401003 idx=1 meanT=1742.6 R=2.752 [1.857, 3.684] M/S/I per step=2.057/1.038/1.019 wasted=0.000 us/step=4.232
+a1 b24 i1 : trials 8/8 ok 8 n=10529767 Marm=5264883 idx=1 meanT=10820.9 R=4.716 [2.851, 6.898] M/S/I per step=2.030/1.020/1.010 wasted=0.000 us/step=3.373
+a1 b24 i2 : trials 8/8 ok 8 n=13767389 Marm=6883694 idx=1 meanT=11372.1 R=4.334 [2.778, 5.950] M/S/I per step=2.029/1.019/1.010 wasted=0.000 us/step=3.935
+cross b20 i1 : trials 4/4 ok 0 n=939487 Marm=469743 idx=1 meanT=20561.0 R=30.000 [30.000, 30.000] M/S/I per step=21.380/11.931/1.000 wasted=101.500 us/step=13.363
+kmix b20 i1 : trials 8/8 ok 8 n=939487 Marm=469743 idx=1 meanT=883.4 R=1.289 [0.969, 1.639] M/S/I per step=21.454/11.974/1.000 wasted=0.000 us/step=13.160
+kmix b20 i2 : trials 8/8 ok 8 n=802007 Marm=401003 idx=1 meanT=943.4 R=1.490 [1.009, 1.930] M/S/I per step=21.407/11.947/1.000 wasted=0.000 us/step=11.660
+kmix b24 i1 : trials 8/8 ok 8 n=10529767 Marm=5264883 idx=1 meanT=1893.8 R=0.825 [0.475, 1.307] M/S/I per step=21.478/11.988/1.000 wasted=0.000 us/step=16.304
+kmix b24 i2 : trials 8/8 ok 8 n=13767389 Marm=6883694 idx=1 meanT=3659.3 R=1.395 [1.018, 1.883] M/S/I per step=21.538/12.022/1.000 wasted=0.000 us/step=14.006
+kpure b20 i1 : trials 8/8 ok 8 n=939487 Marm=469743 idx=1 meanT=1738.3 R=2.536 [1.490, 3.920] M/S/I per step=21.272/11.870/1.000 wasted=1.625 us/step=12.369
+kpure b20 i2 : trials 8/8 ok 8 n=802007 Marm=401003 idx=1 meanT=1642.1 R=2.593 [1.802, 3.467] M/S/I per step=21.339/11.908/1.000 wasted=0.750 us/step=12.864
+kpure b24 i1 : trials 8/8 ok 8 n=10529767 Marm=5264883 idx=1 meanT=3325.9 R=1.449 [1.183, 1.693] M/S/I per step=21.499/11.999/1.000 wasted=0.500 us/step=12.403
+kpure b24 i2 : trials 8/8 ok 8 n=13767389 Marm=6883694 idx=1 meanT=6753.4 R=2.574 [1.682, 3.485] M/S/I per step=21.532/12.018/1.000 wasted=1.500 us/step=11.827
+kpureT b20 i1 : trials 8/8 ok 8 n=1881641 Marm=940820 idx=1 meanT=1707.6 R=1.761 [1.474, 2.045] M/S/I per step=21.326/11.900/1.000 wasted=1.000 us/step=17.495
+kpureT b20 i2 : trials 8/8 ok 8 n=534851 Marm=267425 idx=1 meanT=1450.6 R=2.805 [2.369, 3.370] M/S/I per step=21.471/11.984/1.000 wasted=1.500 us/step=13.270
+kpureT b24 i1 : trials 8/8 ok 8 n=10529803 Marm=5264901 idx=1 meanT=3687.6 R=1.607 [1.108, 2.120] M/S/I per step=21.515/12.009/1.000 wasted=0.625 us/step=13.457
+kpureT b24 i2 : trials 8/8 ok 8 n=9181511 Marm=4590755 idx=1 meanT=5126.6 R=2.393 [1.784, 3.042] M/S/I per step=21.482/11.990/1.000 wasted=0.500 us/step=11.362
+nc1 b24 i1 : trials 8/8 ok 0 n=10529767 Marm=1754961 idx=3 meanT=52989.0 R=39.999 [39.999, 39.999] M/S/I per step=53.374/30.214/1.000 wasted=185.375 us/step=25.522
+pc1 b24 i1 : trials 8/8 ok 8 n=10529767 Marm=1754961 idx=3 meanT=1872.1 R=1.413 [0.874, 1.940] M/S/I per step=53.864/30.494/1.000 wasted=0.250 us/step=25.038
+pc1 b24 i2 : NO TRIALS RECORDED (expected 8)
+--- pooled R per (arm,b) over good instances
+Rb kpure b20 : 2.565 [1.878, 3.389]
+Rb kpure b24 : 2.012 [1.537, 2.490]
+Rb kmix b20 : 1.389 [1.104, 1.663]
+Rb kmix b24 : 1.110 [0.828, 1.431]
+Rb a0 b20 : 1.185 [0.953, 1.402]
+Rb a0 b24 : 1.312 [1.038, 1.597]
+Rb a1 b20 : 2.084 [1.549, 2.628]
+Rb a1 b24 : 4.525 [3.317, 5.898]
+Rb kpureT b20 : 2.283 [2.003, 2.589]
+Rb kpureT b24 : 2.000 [1.588, 2.398]
+Rge24 kpure : 2.012 [1.537, 2.490]   Rge28 : NA
+Rge24 kmix : 1.110 [0.828, 1.431]   Rge28 : NA
+Rge24 a0 : 1.312 [1.038, 1.597]   Rge28 : NA
+Rge24 a1 : 4.525 [3.317, 5.898]   Rge28 : NA
+Rge24 kpureT : 2.000 [1.588, 2.398]   Rge28 : NA
+--- slopes of log2(mean T) on b and on log2 n
+slope kpure : 0.372 [0.245, 0.509]   vs log2 n : 0.404 [0.266, 0.546]
+slope kmix : 0.382 [0.246, 0.511]   vs log2 n : 0.412 [0.277, 0.543]
+slope a0 : 0.511 [0.408, 0.613]   vs log2 n : 0.538 [0.434, 0.643]
+slope a1 : 0.773 [0.623, 0.908]   vs log2 n : 0.804 [0.648, 0.942]
+slope kpureT : 0.367 [0.269, 0.447]   vs log2 n : 0.399 [0.290, 0.486]
+--- step ratios (normalised by sqrt n, good cells)
+SR kpure/a0 b>=28 : NA   b32 NA b36 NA b40 NA
+SR kpure/a1 b>=28 : NA   b32 NA b36 NA b40 NA
+SR kmix/a0 b>=28 : NA   b32 NA b36 NA b40 NA
+SR kmix/a1 b>=28 : NA   b32 NA b36 NA b40 NA
+SR a1/a0 b>=28 : NA   b32 NA b36 NA b40 NA
+SR kpure/kmix b>=28 : NA   b32 NA b36 NA b40 NA
+--- cost ratios K/A (b>=28 pooled); counted cost = M + w S + rho I
+CR kpure/a0 rho=3 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kpure/a0 rho=10 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kpure/a0 rho=30 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kpure/a0 rho=100 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kpure/a1 rho=3 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kpure/a1 rho=10 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kpure/a1 rho=30 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kpure/a1 rho=100 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a0 rho=3 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a0 rho=10 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a0 rho=30 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a0 rho=100 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a1 rho=3 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a1 rho=10 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a1 rho=30 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+CR kmix/a1 rho=100 w0.8 : NA  w1.0 : NA  [sens. xADD=3M] : NA
+--- cost ratios per b at w=0.8 (F5 uses rho=3, A1)
+CRb kpure/a0 b32 rho=3 : NA
+CRb kpure/a0 b32 rho=10 : NA
+CRb kpure/a0 b32 rho=30 : NA
+CRb kpure/a0 b32 rho=100 : NA
+CRb kpure/a0 b36 rho=3 : NA
+CRb kpure/a0 b36 rho=10 : NA
+CRb kpure/a0 b36 rho=30 : NA
+CRb kpure/a0 b36 rho=100 : NA
+CRb kpure/a0 b40 rho=3 : NA
+CRb kpure/a0 b40 rho=10 : NA
+CRb kpure/a0 b40 rho=30 : NA
+CRb kpure/a0 b40 rho=100 : NA
+CRb kpure/a1 b32 rho=3 : NA
+CRb kpure/a1 b32 rho=10 : NA
+CRb kpure/a1 b32 rho=30 : NA
+CRb kpure/a1 b32 rho=100 : NA
+CRb kpure/a1 b36 rho=3 : NA
+CRb kpure/a1 b36 rho=10 : NA
+CRb kpure/a1 b36 rho=30 : NA
+CRb kpure/a1 b36 rho=100 : NA
+CRb kpure/a1 b40 rho=3 : NA
+CRb kpure/a1 b40 rho=10 : NA
+CRb kpure/a1 b40 rho=30 : NA
+CRb kpure/a1 b40 rho=100 : NA
+CRb kmix/a0 b32 rho=3 : NA
+CRb kmix/a0 b32 rho=10 : NA
+CRb kmix/a0 b32 rho=30 : NA
+CRb kmix/a0 b32 rho=100 : NA
+CRb kmix/a0 b36 rho=3 : NA
+CRb kmix/a0 b36 rho=10 : NA
+CRb kmix/a0 b36 rho=30 : NA
+CRb kmix/a0 b36 rho=100 : NA
+CRb kmix/a0 b40 rho=3 : NA
+CRb kmix/a0 b40 rho=10 : NA
+CRb kmix/a0 b40 rho=30 : NA
+CRb kmix/a0 b40 rho=100 : NA
+CRb kmix/a1 b32 rho=3 : NA
+CRb kmix/a1 b32 rho=10 : NA
+CRb kmix/a1 b32 rho=30 : NA
+CRb kmix/a1 b32 rho=100 : NA
+CRb kmix/a1 b36 rho=3 : NA
+CRb kmix/a1 b36 rho=10 : NA
+CRb kmix/a1 b36 rho=30 : NA
+CRb kmix/a1 b36 rho=100 : NA
+CRb kmix/a1 b40 rho=3 : NA
+CRb kmix/a1 b40 rho=10 : NA
+CRb kmix/a1 b40 rho=30 : NA
+CRb kmix/a1 b40 rho=100 : NA
+--- NC3 (A0 inst1/inst2 normalised mean T ratio)
+NC3 b20 : 1.105 [0.737, 1.596]  contains 1
+NC3 b24 : 1.076 [0.698, 1.631]  contains 1
+NC3 b28 : NA  EXCLUDES 1
+NC3 b32 : NA  EXCLUDES 1
+NC3 b36 : NA  EXCLUDES 1
+NC3 b40 : NA  EXCLUDES 1
+--- PC4 (A0 raw mean T ratio b+4 / b, expected 4, band [3.0, 5.3])
+PC4 24->28 : NA
+PC4 28->32 : NA
+PC4 32->36 : NA
+PC4 36->40 : NA
+--- F3 twist/E normalised R ratio
+F3 RT/RE ge28 : NA
+F3 RT/RE b28 : NA
+F3 RT/RE b32 : NA
+F3 RT/RE b36 : NA
+F3 RT/RE b40 : NA
+--- exact checks (raw/identity.txt, raw/exhaustive.txt)
+LADDER: x on E 6054, x on E' 5946, ladder-vs-ellmul tests 624000, mismatches 0, infinity cases consistent 0
+NC4: tests 24000, true a verified 24000, wrong a+1 accepted 0 (special a with 2a+1=0 mod n: 0)
+CLASSES curve 1: p=4643 A=3912 x with f!=0 4642 step evaluations 37120 class crossings 0 E-only comps 2 E'-only comps 2 mixed comps 0
+CLASSES curve 2: p=6221 A=2113 x with f!=0 6218 step evaluations 49678 class crossings 0 E-only comps 1 E'-only comps 2 mixed comps 0
+CLASSES curve 3: p=6101 A=5113 x with f!=0 6098 step evaluations 48762 class crossings 0 E-only comps 3 E'-only comps 2 mixed comps 0
+PC1 SB   : n=829 |H|=828 N=414 index=1 in-set a=828 orbit-vs-+-H mismatches=0 closure-vs-znlog mismatches=0
+PC1 SB   walks: 400/400 verified (budget 4069 steps, N=414, dpbits 3); out-of-set a walked 0 solved 0
+PC1 SIDX : n=829 |H|=276 N=138 index=3 in-set a=276 orbit-vs-+-H mismatches=0 closure-vs-znlog mismatches=0
+PC1 SIDX walks: 165/274 verified (budget 2349 steps, N=138, dpbits 3, total trails 4027, DPs 1147, steps 457232); out-of-set a walked 100 solved 0
+PC2: orbit-size checks 60, mismatches (N vs ellmul-orbit vs ladder-BFS) 0
+--- PC5 counter identity, NC1, NC2, PC3
+PC5: trials checked 180, counter/histogram mismatches 0 (A arms: successful trials with T != adds+degenerate doublings: 0)
+NC1: cells 1, trials 8, cross-side x matches 0, verified solves 0
+NC2: cross cells 1, trials 4, E-vs-E' x matches 0, verified solves 0
+PC3 pc1 b24 i1: 8/8 verified (N=1754961)
+PC3 pc1 b24 i2: 0/0 verified (N=2)
+SKIPPED degenerate cell pc1 b24 i2 : N=2
+--- ideal-chain step cost (SB multipliers, S = 0.8 M)
+ideal chain: mean differential ops/step 4.000, mean M 14.625 + 1 (conversion), mean S 8.000, M-equiv excl. I (S=0.8) 22.025
+ladder (analytic) : mean ops/step 6.000, mean M 20.500 + 1, mean S 12.000, M-equiv excl. I (S=0.8) 31.100
+--- measured per-step counters (K arms, SB, E; pooled over all trials and cells)
+STEPCOST kpure : M/step 21.467 (cell range 21.272-21.532), S/step 11.981 (11.870-12.018), I/step 1.000 ; predicted 21.5 M, 12 S, 1 I ; dev M -0.154% S -0.158%
+STEPCOST kmix : M/step 21.496 (cell range 21.407-21.538), S/step 11.998 (11.947-12.022), I/step 1.000 ; predicted 21.5 M, 12 S, 1 I ; dev M -0.019% S -0.020%
+STEPCOST kpureT : M/step 21.468 (cell range 21.326-21.515), S/step 11.982 (11.900-12.009), I/step 1.000 ; predicted 21.5 M, 12 S, 1 I ; dev M -0.147% S -0.150%
+STEPCOST a0 : M/step 2.000, S/step 1.000, I/step 1.000 ; predicted 2 M, 1 S, 1 I (+ doublings)
+STEPCOST a1 : M/step 2.033, S/step 1.022, I/step 1.011 ; predicted 2 M, 1 S, 1 I (+ doublings)
+=== VERDICTS per PREREGISTRATION section 8 ===
+H1/F1: F1 TRIGGERED: ["PC1 S_idx walk recovery 165/274 < 98%"]   [exact orbit/exhaustive mismatches: 0]
+H2/F2: kpure cells (b>=24, good) with R CI entirely outside [1.4,3.0]: 0  []
+       slope kpure: 0.372 [0.245, 0.509] ; inside [0.40,0.60]: NO
+       SR|kpure/a0|ge28 = NA band [0.8000000000000000000000000000,1.300000000000000000000000000] : not entirely outside
+       SR|kmix/a0|ge28 = NA band [0.5500000000000000000000000000,0.9000000000000000000000000000] : not entirely outside
+       SR|kmix/a1|ge28 = NA band [0.7500000000000000000000000000,1.150000000000000000000000000] : not entirely outside
+H3/F3: ladder mismatches 0 of 624000; class crossings 0, mixed components 0; cross-curve x matches 0 in 4 trials; F3 twist ratio b>=28 NA
+H4/F4: measured kpure per-step M 21.467 (pred 21.5) S 11.981 (pred 12) I 1.000; relative deviation M -0.154%, S -0.158% (F4 if |dev| > 3%)
+       kmix/a0 cost ratio at rho=3 (w=0.8, b>=28): NA  not an improvement
+       kmix/a1 cost ratio at rho=3 (w=0.8, b>=28): NA  not an improvement
+       ordering kpure vs a0 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [0, 0, 0, 0]  => UNRANKED across the band
+       ordering kpure vs a1 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [0, 0, 0, 0]  => UNRANKED across the band
+       ordering kmix vs a0 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [0, 0, 0, 0]  => UNRANKED across the band
+       ordering kmix vs a1 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [0, 0, 0, 0]  => UNRANKED across the band
+H5/F5: kmix/a1 at rho=3 (w=0.8) per b: b32 NA b36 NA b40 NA  => CI entirely below 1 at all of b32,36,40: NO
+H5/F5: kpure/a1 at rho=3 (w=0.8) per b: b32 NA b36 NA b40 NA  => CI entirely below 1 at all of b32,36,40: NO
+H5 headline (no improvement over matched A1): NOT falsified
+wrote dev/out/summary.csv dev/out/costs.csv dev/out/results.json

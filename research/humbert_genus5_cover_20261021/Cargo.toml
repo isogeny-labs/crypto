@@ -1,0 +1,16 @@
+[package]
+name = "humbert-genus5-cover"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "humbert"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+debug = false
+opt-level = 3
+
+[workspace]

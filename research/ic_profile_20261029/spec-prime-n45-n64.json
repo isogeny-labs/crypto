@@ -1,0 +1,20 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "IC speed test: N=45 baseline vs N=64 candidate, 20-bit prime field",
+  "description": "Frozen before the run. One session on the latest main ecbench: the 20-bit prime-field IC baseline (prime-abscissa:size=45) against the candidate factor base (size=64), both with mitm:negation_folded=1, plus a matched rho reference and an A/A control. Public synthetic curve; no security claim. Decision rule in research/ic_profile_20261029/README.md: N=64 replaces N=45 only if the 95% upper bound of the paired S ratio is below 1 at every weight in the §5a band.",
+  "workloads": {
+    "curves": [
+      {"kind": "prime_search", "bits": 20, "seed": 59297}
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261029,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "ic-n45", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=45", "oracle": "mitm:negation_folded=1", "max_trials": "1410236"}}},
+    {"name": "ic-n64", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=64", "oracle": "mitm:negation_folded=1", "max_trials": "1410236"}}},
+    {"name": "ic-n45-aa", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=45", "oracle": "mitm:negation_folded=1", "max_trials": "1410236"}}}
+  ],
+  "measurement": {"rounds": 5, "warmup": 1, "order": "alternate", "seed": 20261029, "isolation_required": "L2", "timeout_seconds": 1800}
+}

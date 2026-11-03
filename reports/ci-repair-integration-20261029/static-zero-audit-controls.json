@@ -1,0 +1,70 @@
+{
+  "at": "2026-10-30T00:09:26.703382+00:00",
+  "runtime_source": "cc05edf3a24f500a3e120b2fb5ead709b0354f46",
+  "metadata_sources": {
+    "scripts/ic_audit/replay_native.jq": "a1ea71a7dbe553352dbb7bf196a7b6f4ee3cfce3e70c3f95af0328b9387739e0",
+    "scripts/ic_audit/replay_partition.sh": "a2654acedaaa988277aa7b15d5354db2bfb6b9d9ea9203c531be4bb0662fa725",
+    "scripts/ic_audit/check_replay_partitions.sh": "c4e32e4ba7aeda23384e4c18db0d33686478d61ef905bb75bab6a96eed96712c",
+    "scripts/ic_audit/replay_plan.sh": "a8d4ebe8a8cdab8a80a1ebd9343dc2b5576ad1586bb119778ae9c9beba482300",
+    "scripts/ic_audit/test_replay_partitions.sh": "5484d6be73a3de904d7febc4e619bffc064680e981cc330aa9420352eef7a3b2",
+    "docs/ic/validation/replay-plan.json": "0a7db69e2c9dc107ed4521477954a5b5baee436246b1366df882bb9b232face5"
+  },
+  "controls": {
+    "partition_controls": {
+      "passed": 138,
+      "log": "current-static-zero-partition-controls-v2-20261030.log",
+      "sha256": "f916bea5f25f04ac15ada4f8f602c22c1bc0bca21530076b6ab12fd62a80552e"
+    },
+    "original_serial_controls": {
+      "passed": 30,
+      "log": "current-static-zero-serial-controls-20261030.log",
+      "sha256": "75be979b051bf2aaacf69c2932351f7b6659cfcf3588c939c0d594cd046317d6"
+    },
+    "path_controls": {
+      "passed": 16,
+      "log": "current-path-controls-20261030.log",
+      "sha256": "25d718152414a917d6eb4a014d599eff20a2b538451c2591d104ace11b9de0dd"
+    },
+    "sparse_component_controls": {
+      "passed": 4,
+      "log": "current-sparse-component-controls-20261030.log",
+      "sha256": "80144f3bf12d071a1497821467ab02765712cb11da3f547a5e2b5cf79f938e9a"
+    },
+    "parser_controls": {
+      "passed": 8,
+      "log": "current-board-parser-controls-20261030.log",
+      "sha256": "f32b3b14f5a2126bdbcd26cde29e6adee182b61e2587619277f39870f04badaf"
+    },
+    "catalog_snapshot_controls": {
+      "passed": 6,
+      "log": "current-catalog-snapshot-controls-20261030.log",
+      "sha256": "54e3ac9a94697cc8d2878cf80693b2c258849bb138975d599bde6bf7423e46e2"
+    },
+    "browser_discovery_controls": {
+      "passed": 4,
+      "log": "current-browser-discovery-controls-20261030.log",
+      "sha256": "a2574fc08d0a2610b9dff9b5486a2b69e3424bfacd717932ea70ad623c616bda"
+    },
+    "browser_cost_controls": {
+      "passed": 2,
+      "log": "current-browser-cost-controls-restored-20261030.log",
+      "sha256": "3c4156491f73c3934d264ea55a431a04cffa1ab0a00818786f49631ce3c45504"
+    },
+    "site_python_controls": {
+      "passed": 51,
+      "log": "current-site-python-controls-20261030.log",
+      "sha256": "6076b8ab6537882fbfbed88020fedde78c803415316f0657fc6400b2c632d2b0"
+    },
+    "site_js_panels": {
+      "passed": 2,
+      "log": "current-site-controls-20261030.log"
+    }
+  },
+  "static_only_session": "ECBS1h302934ff99ed",
+  "native_authority": "Actual pinned source6f442242 positive-replay probe:96records/96planned/0verified/0candidates; all16 staticchecks true; exact five-file map bound in plan. No scalar/replay success claimed.",
+  "admission": "Every partition must contain matching current-binary native static probe with actual exit0; strict ordinary nonempty native predicate preserved; unmarked/changed/positive-candidate/failed-static cases refused. Serial path uses the same strict special predicate.",
+  "library_status": "Corrected dataset216passed/0failed/1existing ignored; full5516 library still active, no final result yet.",
+  "roster_status": "115entries preserved; workers0/3 passed n7 static-only and are replaying n23; workers1/2 still shared-rank. No whole-roster success.",
+  "views": "IC and browser currentness pass; path trigger corrected to cover all1196inputs; regenerated assessment changes exactly one src/cryptanalysis/mod.rs SHA only, no scientific fields.",
+  "plan_format_note": "The original one-space JSON indentation is preserved; semantic content unchanged by formatting follow-up. Earlier source-bound plan hash remains the launch hash for running workers."
+}

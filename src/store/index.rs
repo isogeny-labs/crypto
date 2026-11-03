@@ -8,12 +8,16 @@
 //! point at different content than it was written for.
 
 use std::collections::BTreeMap;
-use std::fs;
+use std::fs::{self, OpenOptions};
+use std::io::Write;
 use std::path::Path;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 
 pub const SCHEMA: &str = "crypto.store-index/v1";
+static NEXT_TMP: AtomicU64 = AtomicU64::new(0);
 
 /// What a name pointed at before `push --replace` moved it. Kept, not
 /// deleted: a superseded figure stays visible as the "was".
@@ -118,9 +122,26 @@ impl Index {
         }
         let mut text = serde_json::to_string_pretty(self).map_err(|e| e.to_string())?;
         text.push('\n');
-        let tmp = path.with_extension(format!("json.tmp{}", std::process::id()));
-        fs::write(&tmp, text).map_err(|e| format!("{}: {e}", tmp.display()))?;
-        fs::rename(&tmp, path).map_err(|e| format!("{}: {e}", path.display()))
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|t| t.as_nanos())
+            .unwrap_or(0);
+        let tmp = path.with_extension(format!(
+            "json.tmp{}.{}.{}",
+            std::process::id(),
+            nanos,
+            NEXT_TMP.fetch_add(1, Ordering::Relaxed)
+        ));
+        let write_result = (|| {
+            let mut file = OpenOptions::new().write(true).create_new(true).open(&tmp)?;
+            file.write_all(text.as_bytes())?;
+            file.sync_all()?;
+            fs::rename(&tmp, path)
+        })();
+        if write_result.is_err() {
+            let _ = fs::remove_file(&tmp);
+        }
+        write_result.map_err(|e| format!("{}: {e}", path.display()))
     }
 
     /// Find an entry by exact name.

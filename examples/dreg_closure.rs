@@ -1,10 +1,11 @@
 //! XL against MutantXL closure on committed refutation-degree draws.
 //!
-//! Every refutation degree the ladder studies record is XL's: the first
-//! degree whose plain Macaulay row space contains `1`.  This replays the
-//! committed unsatisfiable draws (same subspace basis, same `x(R)`, same
-//! field) and scans each degree twice, plain and saturated under
-//! MutantXL's fixed-degree step ([`closure_refutation_scan`]).
+//! The ladder's resolution degree can mean either that the plain Macaulay row
+//! space contains `1` or that every occurring variable is pinned; its
+//! `refuted` flag distinguishes the two.  This replays the committed
+//! unsatisfiable draws (same subspace basis, same `x(R)`, same field) and
+//! scans each degree twice, plain and saturated under MutantXL's fixed-degree
+//! step ([`closure_refutation_scan`]).
 //!
 //! ```sh
 //! cargo run --release --example dreg_closure -- --max-cols 70000 \
@@ -12,11 +13,20 @@
 //! ```
 //!
 //! One JSON line per unsatisfiable draw on stdout.  The scan runs from
-//! degree 3 up to the draw's committed XL degree (its resolved degree, or
-//! the degree its `≥D` bound was measured to), stops early once the closure
-//! refutes, and builds no degree whose matrix could have more than
+//! degree 3 up to the draw's committed resolution degree (or the degree its
+//! `≥D` bound was measured to), stops early once the closure refutes, and
+//! builds no degree whose matrix could have more than
 //! `--max-cols` columns (`C(N,≤D)`): the dense basis costs about the cube
 //! of that.  Degrees not built are unmeasured, never refutations.
+//!
+//! `--checkpoint-dir DIR` (or `DREG_CKPT_DIR`) makes the dense scan resumable:
+//! its state is saved between closure rounds, every `DREG_CKPT_SECONDS`
+//! (default 900) and on SIGTERM/SIGINT, in `manifest-sha256-v1` generations.
+//! A run started again on the same directory continues from the newest valid
+//! generation, and a stop exits with status 143 after saving.  One directory
+//! belongs to one draw.  The `secs` of a resumed degree sums the compute of
+//! every segment, so it is not a cold measurement; the line records
+//! `checkpoint_segments`.  Only the dense scan checkpoints (not `--sparse`).
 //!
 //! `--satisfiable` is the soundness control: it replays the committed
 //! *satisfiable* draws instead, builds every degree from 3 to 5 that fits
@@ -24,12 +34,15 @@
 //! refuting a system with a solution is an instrument failure.
 
 use crypto_lib::binary_ecc::F2mElement;
+use crypto_lib::cryptanalysis::closure_checkpoint::{
+    closure_refutation_scan_checkpointed, ScanEnd, Store,
+};
 use crypto_lib::cryptanalysis::koblitz_bench::{
     closure_refutation_scan, sparse_closure_refutes, ClosureDegree,
 };
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, mask_low64, F2BoolMono, F2BoolPoly};
 use num_bigint::BigUint;
 use serde_json::Value;
 
@@ -43,6 +56,82 @@ fn monomials_up_to(n_vars: u64, d: u32) -> f64 {
         binom = binom * (n_vars - i) as f64 / (i + 1) as f64;
     }
     total
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct CommittedXlPlan {
+    /// An exact resolution degree or the first degree not covered by an
+    /// `at_least` lower bound.  `None` means the ladder stopped on a resource
+    /// cap and established no degree identity.
+    degree: Option<u32>,
+    /// The committed record resolved exactly at `degree`, rather than merely
+    /// establishing a lower bound through the degrees below it.
+    resolved: bool,
+    /// Exact resolution was by the constant `1` (an XL refutation), rather
+    /// than by pinning every occurring variable.
+    xl_refuted: bool,
+    ceiling: u32,
+}
+
+/// Interpret the ladder outcome without turning its resource cap into a
+/// mathematical statement.  A capped draw is still exactly UNSAT (the exact
+/// solution count is separate), so an explicitly bounded fresh scan is
+/// admissible.  Without `--to`, however, there is no principled ceiling to
+/// infer from a cap.
+fn committed_xl_plan(outcome: &Value, to: Option<u32>) -> Result<CommittedXlPlan, String> {
+    let kind = outcome["kind"]
+        .as_str()
+        .ok_or_else(|| "committed outcome has no kind".to_string())?;
+    let (degree, resolved, xl_refuted) = match kind {
+        "resolved" => {
+            let degree = outcome["degree"]
+                .as_u64()
+                .ok_or_else(|| "resolved outcome has no degree".to_string())?
+                as u32;
+            let refuted = outcome["refuted"]
+                .as_bool()
+                .ok_or_else(|| "resolved outcome has no Boolean refuted flag".to_string())?;
+            (Some(degree), true, refuted)
+        }
+        "at_least" => (
+            Some(
+                outcome["degree"]
+                    .as_u64()
+                    .ok_or_else(|| "at_least outcome has no degree".to_string())?
+                    as u32,
+            ),
+            false,
+            false,
+        ),
+        "caps_hit" => (None, false, false),
+        _ => return Err(format!("unsupported unsatisfiable outcome kind {kind:?}")),
+    };
+    let ceiling = match (to, kind, degree) {
+        (Some(d), _, _) => d,
+        (None, "resolved", Some(d)) => d,
+        (None, "at_least", Some(d)) if d > 0 => d - 1,
+        (None, "caps_hit", None) => {
+            return Err("caps_hit outcome requires an explicit --to degree".to_string())
+        }
+        _ => return Err("committed outcome has an invalid degree".to_string()),
+    };
+    Ok(CommittedXlPlan {
+        degree,
+        resolved,
+        xl_refuted,
+        ceiling,
+    })
+}
+
+const CHECKPOINT_INVALID_EXIT: i32 = 125;
+
+fn checkpoint_error(context: &str, error: &std::io::Error) -> String {
+    format!("checkpoint invalid during {context}: {error}")
+}
+
+fn exit_checkpoint_error(context: &str, error: &std::io::Error) -> ! {
+    eprintln!("{}", checkpoint_error(context, error));
+    std::process::exit(CHECKPOINT_INVALID_EXIT)
 }
 
 fn degree_json(d: &ClosureDegree) -> String {
@@ -72,10 +161,10 @@ fn specialise(p: &F2BoolPoly, fixes: &[(usize, bool)]) -> F2BoolPoly {
                 if !b {
                     continue 'term;
                 }
-                m &= !(1u64 << v);
+                m &= mask_from64(!(1u64 << v));
             }
         }
-        masks.push(m);
+        masks.push(mask_low64(m));
     }
     masks.sort_unstable();
     let mut kept: Vec<u64> = Vec::new();
@@ -87,8 +176,33 @@ fn specialise(p: &F2BoolPoly, fixes: &[(usize, bool)]) -> F2BoolPoly {
         }
     }
     F2BoolPoly {
-        terms: kept.into_iter().map(|mask| F2BoolMono { mask }).collect(),
+        terms: kept
+            .into_iter()
+            .map(|mask| F2BoolMono {
+                mask: mask_from64(mask),
+            })
+            .collect(),
         n_vars: p.n_vars,
+    }
+}
+
+/// The closure scan of one degree range, resumable when a store is given.
+/// A requested stop exits with 143 after the state is saved.
+fn scan_range(
+    store: &mut Option<Store>,
+    sys: &[F2BoolPoly],
+    n_vars: usize,
+    d_min: u32,
+    d_max: u32,
+) -> Vec<ClosureDegree> {
+    let Some(store) = store else {
+        return closure_refutation_scan(sys, n_vars, d_min, d_max);
+    };
+    let end = closure_refutation_scan_checkpointed(sys, n_vars, d_min, d_max, store)
+        .unwrap_or_else(|error| exit_checkpoint_error("scan or restore", &error));
+    match end {
+        ScanEnd::Done(v) => v,
+        ScanEnd::Interrupted => std::process::exit(143),
     }
 }
 
@@ -100,6 +214,26 @@ fn main() {
             .and_then(|i| args.get(i + 1))
             .cloned()
     };
+    let mut store = match flag("--checkpoint-dir") {
+        Some(d) => {
+            let secs = std::env::var("DREG_CKPT_SECONDS")
+                .ok()
+                .and_then(|s| s.parse().ok());
+            Store::open(
+                std::path::Path::new(&d),
+                std::time::Duration::from_secs(secs.unwrap_or(900)),
+            )
+            .map(Some)
+        }
+        None => Store::from_env(),
+    }
+    .unwrap_or_else(|error| exit_checkpoint_error("store open", &error));
+    if let Some(store) = store.as_mut() {
+        Store::install_signal_handlers();
+        let env_num = |name: &str| std::env::var(name).ok().and_then(|s| s.parse().ok());
+        store.stop_after_rounds = env_num("DREG_CKPT_STOP_AFTER_ROUNDS").map(|n| n as u32);
+        store.stop_after_words = env_num("DREG_CKPT_STOP_AFTER_WORDS");
+    }
     let max_cols: f64 = flag("--max-cols").map_or(70_000.0, |v| v.parse().expect("--max-cols"));
     let satisfiable = args.iter().any(|a| a == "--satisfiable");
     // `--to D`: scan to degree D whatever the committed outcome, for fresh
@@ -129,6 +263,7 @@ fn main() {
             .collect()
     });
     let valued = [
+        "--checkpoint-dir",
         "--max-cols",
         "--to",
         "--draw",
@@ -185,14 +320,30 @@ fn main() {
                     .filter(|p| !p.terms.is_empty())
                     .collect();
             }
-            let fixed_json = format!(
-                "[{}]",
-                fixes
-                    .iter()
-                    .map(|(v, b)| format!("[{v},{}]", *b as u8))
-                    .collect::<Vec<_>>()
-                    .join(",")
-            );
+            // The engine's columns run over the variables that occur, so the
+            // cap is read against those: every variable occurs unspecialised.
+            let occurring = sys
+                .equations
+                .iter()
+                .flat_map(|p| p.terms.iter())
+                .fold(0u64, |acc, t| acc | t.mask)
+                .count_ones() as u64;
+            // Keep an unspecialised replay byte-compatible in its algebraic
+            // fields with the historical identity row.  The optional field
+            // is present only when this is genuinely a different,
+            // specialised system.
+            let fixed_json = if fixes.is_empty() {
+                String::new()
+            } else {
+                format!(
+                    r#","fixed":[{}]"#,
+                    fixes
+                        .iter()
+                        .map(|(v, b)| format!("[{v},{}]", *b as u8))
+                        .collect::<Vec<_>>()
+                        .join(",")
+                )
+            };
             if let Some(d) = sparse {
                 let started = std::time::Instant::now();
                 let got = sparse_closure_refutes(&sys.equations, sys.n_vars, d, max_entries);
@@ -205,7 +356,7 @@ fn main() {
                     None => r#""capped":true"#.to_string(),
                 };
                 println!(
-                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"engine":"sparse","degree":{d},"max_entries":{max_entries},{body},"secs":{secs:.3}}}"#,
+                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{}{fixed_json},"engine":"sparse","degree":{d},"max_entries":{max_entries},{body},"secs":{secs:.3}}}"#,
                     v["cell"].as_str().unwrap_or(""),
                     v["draw"],
                     sys.n_vars,
@@ -217,16 +368,19 @@ fn main() {
                 );
                 continue;
             }
+            let ck = store.as_ref().map_or(String::new(), |s| {
+                format!(r#","checkpoint_segments":{}"#, s.segments())
+            });
             if satisfiable {
                 let mut scan = Vec::new();
-                for d in (3..=to.unwrap_or(5))
-                    .take_while(|&d| monomials_up_to(sys.n_vars as u64, d) <= max_cols)
+                for d in
+                    (3..=to.unwrap_or(5)).take_while(|&d| monomials_up_to(occurring, d) <= max_cols)
                 {
-                    scan.extend(closure_refutation_scan(&sys.equations, sys.n_vars, d, d));
+                    scan.extend(scan_range(&mut store, &sys.equations, sys.n_vars, d, d));
                 }
                 let unsound = scan.iter().any(|d| d.xl_refuted || d.closure_refuted);
                 println!(
-                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"solutions":{},"refuted_satisfiable":{unsound},"measured_to":{},"max_cols":{max_cols},"scan":[{}]}}"#,
+                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"solutions":{},"refuted_satisfiable":{unsound}{ck},"measured_to":{},"max_cols":{max_cols},"scan":[{}]}}"#,
                     v["cell"].as_str().unwrap_or(""),
                     v["draw"],
                     sys.n_vars,
@@ -237,30 +391,44 @@ fn main() {
                 );
                 continue;
             }
-            // The committed XL degree: resolved at `D`, or `≥D` (built to D−1).
-            let committed = v["outcome"]["degree"].as_u64().expect("committed degree") as u32;
-            let xl_known = v["outcome"]["kind"] == "resolved";
-            let ceiling = to.unwrap_or(if xl_known { committed } else { committed - 1 });
-            let top = (3..=ceiling)
-                .take_while(|&d| monomials_up_to(sys.n_vars as u64, d) <= max_cols)
+            // A resolved outcome fixes the resolution degree, but only a
+            // true `refuted` flag fixes an XL constant-1 refutation.  A false
+            // flag means every occurring variable was pinned at that degree.
+            // `at_least D` covers degrees below D.  `caps_hit` fixes no degree
+            // at all, but its exact-zero solution count still permits a fresh
+            // explicit `--to D` scan without an XL identity assertion.
+            let committed = committed_xl_plan(&v["outcome"], to)
+                .unwrap_or_else(|e| panic!("{file} draw {}: {e}", v["draw"]));
+            let top = (3..=committed.ceiling)
+                .take_while(|&d| monomials_up_to(occurring, d) <= max_cols)
                 .last()
                 .unwrap_or(2);
             let mut scan = Vec::new();
             for d in 3..=top {
-                let one = closure_refutation_scan(&sys.equations, sys.n_vars, d, d);
+                let one = scan_range(&mut store, &sys.equations, sys.n_vars, d, d);
                 let Some(step) = one.into_iter().next() else {
                     break;
                 };
-                // XL identity: the plain basis refutes exactly at the
-                // committed degree, never below it.  Past a `≥D` bound the
-                // committed record says nothing, and XL is a new reading.
-                if fixes.is_empty() && (d < committed || xl_known) {
-                    assert_eq!(
-                        step.xl_refuted,
-                        xl_known && d >= committed,
-                        "{file} draw {}: XL at degree {d} disagrees with the committed outcome",
-                        v["draw"]
-                    );
+                // XL identity: below an exact resolution degree the plain
+                // basis did not refute.  At that degree it refuted iff the
+                // committed `refuted` flag is true; a true refutation persists
+                // at later degrees.  A pinning-only resolution says nothing
+                // about XL after its exact degree.  Past a `≥D` bound the
+                // committed record likewise says nothing.
+                if let Some(committed_degree) = committed.degree {
+                    let identity_applies = if committed.resolved {
+                        d <= committed_degree || committed.xl_refuted
+                    } else {
+                        d < committed_degree
+                    };
+                    if fixes.is_empty() && identity_applies {
+                        assert_eq!(
+                            step.xl_refuted,
+                            committed.xl_refuted && d >= committed_degree,
+                            "{file} draw {}: XL at degree {d} disagrees with the committed outcome",
+                            v["draw"]
+                        );
+                    }
                 }
                 let done = step.closure_refuted;
                 scan.push(step);
@@ -273,7 +441,7 @@ fn main() {
             let show = |x: Option<u32>| x.map_or("null".to_string(), |d| d.to_string());
             let measured_to = scan.last().map(|d| d.degree).unwrap_or(2);
             println!(
-                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"fixed":{fixed_json},"xl_degree":{},"closure_degree":{},"measured_to":{measured_to},"max_cols":{max_cols},"scan":[{}]}}"#,
+                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{}{fixed_json},"xl_degree":{},"closure_degree":{},"measured_to":{measured_to}{ck},"max_cols":{max_cols},"scan":[{}]}}"#,
                 v["cell"].as_str().unwrap_or(""),
                 v["draw"],
                 sys.n_vars,
@@ -295,5 +463,76 @@ fn main() {
         if let Some(l) = status.lines().find(|l| l.starts_with("VmHWM:")) {
             eprintln!("peak {l}");
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn capped_unsat_needs_an_explicit_scan_ceiling() {
+        let capped = json!({"kind": "caps_hit", "built": 2});
+        assert!(committed_xl_plan(&capped, None).is_err());
+        assert_eq!(
+            committed_xl_plan(&capped, Some(4)).unwrap(),
+            CommittedXlPlan {
+                degree: None,
+                resolved: false,
+                xl_refuted: false,
+                ceiling: 4,
+            }
+        );
+    }
+
+    #[test]
+    fn resolved_refutation_and_pinning_identities_are_distinct() {
+        assert_eq!(
+            committed_xl_plan(
+                &json!({"kind": "resolved", "degree": 4, "refuted": true}),
+                None
+            )
+            .unwrap(),
+            CommittedXlPlan {
+                degree: Some(4),
+                resolved: true,
+                xl_refuted: true,
+                ceiling: 4,
+            }
+        );
+        assert_eq!(
+            committed_xl_plan(
+                &json!({"kind": "resolved", "degree": 4, "refuted": false}),
+                None
+            )
+            .unwrap(),
+            CommittedXlPlan {
+                degree: Some(4),
+                resolved: true,
+                xl_refuted: false,
+                ceiling: 4,
+            }
+        );
+        assert!(committed_xl_plan(&json!({"kind": "resolved", "degree": 4}), None).is_err());
+        assert_eq!(
+            committed_xl_plan(&json!({"kind": "at_least", "degree": 4}), None).unwrap(),
+            CommittedXlPlan {
+                degree: Some(4),
+                resolved: false,
+                xl_refuted: false,
+                ceiling: 3,
+            }
+        );
+    }
+
+    #[test]
+    fn checkpoint_errors_have_a_stable_nonpanic_contract() {
+        let error = std::io::Error::new(std::io::ErrorKind::InvalidData, "wrong system");
+        assert_eq!(
+            checkpoint_error("scan or restore", &error),
+            "checkpoint invalid during scan or restore: wrong system"
+        );
+        assert_eq!(CHECKPOINT_INVALID_EXIT, 125);
     }
 }

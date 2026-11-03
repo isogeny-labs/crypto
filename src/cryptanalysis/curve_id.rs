@@ -385,6 +385,23 @@ pub fn normalise(name: &str) -> String {
         .collect()
 }
 
+/// Prepare the alias table for lookups.  The measured `ecbench` child
+/// calls this before its solve marker, so that nothing a solve looks up by
+/// name (an index-calculus method finds its calibration row this way) is
+/// paid for inside the measured interval.
+///
+/// Lookups read the table's text by binary search ([`resolve_key`]), so
+/// there is nothing to parse: the table has grown to 3.6 MB and 42,000
+/// names, and building the map from it cost 197 million instructions in
+/// every child (2026-11-01, Callgrind), 150 times the 20-bit rho solve the
+/// child was started for.  What remains to prepare is locating the
+/// `"aliases"` object, a few bytes into the text.  The map is still built
+/// on the escape path (a name JSON would escape) and in the tests that
+/// check the search against it.
+pub fn warm() {
+    let _ = alias_text();
+}
+
 /// Every name the registry knows, normalised, mapped to its curve's slug.
 fn aliases() -> &'static HashMap<String, String> {
     static MAP: OnceLock<HashMap<String, String>> = OnceLock::new();
@@ -404,7 +421,9 @@ fn aliases() -> &'static HashMap<String, String> {
 /// standard name or a registered legacy spelling.  `None` when the
 /// registry does not know the name.
 pub fn resolve(name: &str) -> Option<&'static str> {
-    aliases().get(&normalise(name)).map(String::as_str)
+    // By binary search over the table's text; the map is consulted only
+    // for a key the search cannot read exactly, so the answer is the map's.
+    resolve_key(&normalise(name))
 }
 
 /// Whether two names denote one curve: equal as written, or resolved by
@@ -417,6 +436,88 @@ pub fn same_curve(a: &str, b: &str) -> bool {
     let ra = resolve(a).or_else(|| a.starts_with("icv1-").then_some(a));
     let rb = resolve(b).or_else(|| b.starts_with("icv1-").then_some(b));
     matches!((ra, rb), (Some(x), Some(y)) if x == y)
+}
+
+// A measured ecbench child is a fresh process that asks one question of
+// the alias table: which of a frozen report's names is this instance.
+// Building the map for that parses 2.8 MB of JSON (about 150 million
+// instructions, 97% of an IC child), so `find_same_curve` reads the
+// generated text instead.  It is `json.dumps(indent=0)` of an object sorted
+// by name, one `"<name>": "<slug>",` per line (`scripts/curve_id.py`,
+// `alias_map_text`), so a name is found by binary search over the lines.
+// Anything the search cannot read exactly (a name JSON would escape, or an
+// escaped name met on the way) goes to the map, so every answer is the
+// map's.
+
+/// The `"aliases"` object of the alias table, from the newline before its
+/// first entry.
+fn alias_text() -> &'static str {
+    const OPEN: &str = "\"aliases\": {";
+    ALIASES
+        .find(OPEN)
+        .map_or("", |i| &ALIASES[i + OPEN.len()..])
+}
+
+/// [`resolve`] of one normalised name, by binary search over the lines
+/// of the table's text.
+fn resolve_key(key: &str) -> Option<&'static str> {
+    let verbatim = |s: &str| !s.chars().any(|c| c == '"' || c == '\\' || c.is_control());
+    let map = || aliases().get(key).map(String::as_str);
+    if key.is_empty() || !verbatim(key) {
+        return map();
+    }
+    let text = alias_text();
+    // Every entry that can match starts in [lo, hi), just after a newline.
+    let (mut lo, mut hi) = (0, text.len());
+    while lo < hi {
+        let mid = (lo + hi) / 2;
+        let Some(nl) = text[mid.max(1) - 1..].find('\n') else {
+            hi = mid;
+            continue;
+        };
+        let start = mid.max(1) - 1 + nl + 1;
+        if start >= hi {
+            hi = mid;
+            continue;
+        }
+        let Some(name) = text[start..]
+            .strip_prefix('"')
+            .and_then(|t| t.split('"').next())
+        else {
+            hi = start; // the closing brace: past the last entry
+            continue;
+        };
+        if !verbatim(name) || name.contains('\\') {
+            return map();
+        }
+        match name.cmp(key) {
+            std::cmp::Ordering::Less => lo = start + 1,
+            std::cmp::Ordering::Greater => hi = start,
+            std::cmp::Ordering::Equal => {
+                let rest = &text[start + name.len() + 2..];
+                let value = rest.strip_prefix(": \"")?;
+                return value.split('"').next();
+            }
+        }
+    }
+    None
+}
+
+/// The first `(name, value)` whose name denotes the same curve as
+/// `instance`, in the sense of [`same_curve`], without building the alias
+/// map: one binary search per name.
+pub fn find_same_curve<'n, T>(
+    instance: &str,
+    candidates: impl IntoIterator<Item = (&'n str, T)>,
+) -> Option<T> {
+    fn resolved(name: &str) -> Option<&str> {
+        resolve_key(&normalise(name)).or_else(|| name.starts_with("icv1-").then_some(name))
+    }
+    let target = resolved(instance);
+    candidates.into_iter().find_map(|(name, value)| {
+        let hit = name == instance || (target.is_some() && resolved(name) == target);
+        hit.then_some(value)
+    })
 }
 
 /// The degree of the binary field a curve name carries: `m` of an ICV1
@@ -434,4 +535,76 @@ pub fn binary_degree(name: &str) -> Option<u32> {
     }
     let at = name.find("-n")? + 2;
     digits(&name[at..])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The binary search agrees with the map on every name the table
+    /// holds, the first and last included, on names it does not hold
+    /// (before the first, after the last, between two), and on names JSON
+    /// would escape.
+    #[test]
+    fn the_binary_search_agrees_with_the_map() {
+        let map = aliases();
+        assert!(map.len() > 1000, "alias table has {} names", map.len());
+        let mut keys: Vec<&String> = map.keys().collect();
+        keys.sort();
+        for key in &keys {
+            assert_eq!(resolve_key(key), map.get(*key).map(String::as_str), "{key}");
+            let between = format!("{key}~");
+            assert_eq!(resolve_key(&between), map.get(&between).map(String::as_str));
+        }
+        for key in [
+            "",
+            "no-such-curve",
+            "icv1-fp20-t0-00000000",
+            "a\"b",
+            "a\\b",
+            "secp256k",
+            "!",
+            "~~~~",
+            "0",
+        ] {
+            assert_eq!(
+                resolve_key(key),
+                map.get(key).map(String::as_str),
+                "{key:?}"
+            );
+        }
+    }
+
+    /// `find_same_curve` returns what a search with [`same_curve`] returns,
+    /// for every row of the pinned calibration table against instances
+    /// named every way the table and the registry name them.
+    #[test]
+    fn find_same_curve_is_same_curve() {
+        let doc: serde_json::Value =
+            serde_json::from_str(include_str!("../../docs/ic/calibration.json")).unwrap();
+        let rows: Vec<&str> = doc["instances"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .filter_map(|k| k.split_once('/').map(|(_, n)| n))
+            .collect();
+        let mut instances: Vec<String> = rows.iter().map(|r| r.to_string()).collect();
+        instances.extend(rows.iter().filter_map(|r| resolve(r).map(str::to_string)));
+        instances.extend(rows.iter().map(|r| r.to_uppercase()));
+        instances.extend(
+            [
+                "icv1-fp20-t0-00000000",
+                "unknown curve",
+                "",
+                "secp256k1",
+                "P-256",
+            ]
+            .map(str::to_string),
+        );
+        for instance in &instances {
+            let expected = rows.iter().position(|r| same_curve(r, instance));
+            let found = find_same_curve(instance, rows.iter().enumerate().map(|(i, r)| (*r, i)));
+            assert_eq!(found, expected, "{instance:?}");
+        }
+    }
 }

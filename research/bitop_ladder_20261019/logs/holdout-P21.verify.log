@@ -1,0 +1,52 @@
+receipt sha256 f33668a7382a4316b8d4dabc091fbe96e4ea1a6d13dd8eda49f9095565553442
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1h09e6225dfe2e",
+  "session_status": "complete",
+  "records_bound": true,
+  "ok": true,
+  "problems": [],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": true,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+  },
+  "records": 560,
+  "verified_records": 560,
+  "regraded": true,
+  "replays": [
+    {
+      "seq": 0,
+      "record_id": "ECR1hf97c8942cdd6",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 280,
+      "record_id": "ECR1hb3031549df9b",
+      "reproduced": true,
+      "detail": "identical"
+    }
+  ],
+  "files": {
+    "host.json": "78d23c980671c2a2ee01fa820a96c287ca6a9b67f0031cd91120ca73aeb1b4f8",
+    "plan.json": "de4e8e798e0f1b717c12eb323e4ecab024bbb18475f5236ca6efc16dfffa19c5",
+    "records.jsonl": "df8c2dac18e89cb4adfabc1b90640fd12ac216407ff7b427940c4e8afa5f22c4",
+    "session.json": "920915bc248f5d9f36f26b5351ce367e3b415b49568a3f901bf7fa0d5827b1d1",
+    "spec.json": "7e1b81d0cd90a53ab3c965133d69f614fddd1ebdde5959188be892a05438e469"
+  },
+  "auditor_binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+  "auditor_env_class_id": "ECBENV2he1389885ccd0",
+  "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+  "audited_unix_ms": 1792453620484
+}
+audit OK: 560 records, 560 verified, 2 replays reproduced, 0 problems

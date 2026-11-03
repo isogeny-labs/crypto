@@ -1,0 +1,27 @@
+Round fourteen. Full-width DP rho: plain, folded with a passive cycle window, folded with an active one (40 seeds from 0xc0ffee; walk ops are means per run).
+ g    p         N    plain   passive  cycle %    active    act/pl  S plain  S active  fruit %  ok
+ 2   41      1321       50        36     2.2%        47     0.935    1.385     1.295    29.3%   y
+ 2   61      1399       46        35     2.6%        50     1.082    1.240     1.341    32.0%   y
+ 2  101      4663       85        60     1.9%        86     1.012    1.244     1.259    20.7%   y
+ 2  151      7949      114        80     9.3%       114     0.998    1.284     1.281    15.7%   y
+ 2  211     11813      182       104     6.9%       116     0.639    1.676     1.070    11.0%   y
+ 2  251     61667      325       325    19.5%       285     0.877    1.308     1.148     5.2%   y
+ 3   23      6299      106        96     4.0%       110     1.037    1.340     1.389    12.0%   y
+ 3   31      7333      113        74     5.1%        94     0.830    1.317     1.093    15.6%   y
+ 3   41      6679      109        76     3.6%       100     0.921    1.333     1.228    15.0%   y
+ 3   61    124459      491       358     7.2%       369     0.752    1.390     1.045     4.5%   y
+ 3  101    364747      896       965    32.4%       642     0.717    1.484     1.063     3.8%   y
+ 3  151   1180351     1583      2688    56.1%      1023     0.646    1.457     0.942     4.0%   y
+ 3  211   4620611     2604     10375    71.6%      2556     0.981    1.212     1.189     3.9%   y
+ 4   17      5639      101        72     1.5%        93     0.924    1.346     1.243    16.0%   y
+ 4   23     30223      224       158     1.0%       181     0.808    1.286     1.039     6.8%   y
+ 4   31    239753      630       996    40.1%       561     0.889    1.287     1.145     4.5%   y
+ 4   41    333041      766       932    35.7%       594     0.775    1.327     1.029     4.0%   y
+ 4   61  16790591     6069     25173    78.1%      4164     0.686    1.481     1.016     3.8%   y
+
+C14-1 (passive cycle share on the two largest rows >= 50%: ["78.1%", "71.6%"]; passive arm reproduces round thirteen: yes) -> HOLDS
+C14-2 (active median folded/plain walk ops, N >= 1e5, 7 rows): 0.752 (<= 0.80) -> HOLDS
+C14-3 (active median folded S_walk, N >= 1e5): 1.045 (<= 1.05) -> HOLDS
+C14-4 (active fruitless share <= 10% on every row: max 32.0%; every run verified: yes) -> FALSIFIED
+Unpriced native work of the window: up to 32 hash comparisons per step.
+Ideal S_walk: plain 1.2533, folded 0.8862, ratio 0.7071.

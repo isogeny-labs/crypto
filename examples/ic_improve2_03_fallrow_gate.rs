@@ -32,7 +32,9 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_standard_subspace_factor_base, decomposition_solver_equations, find_irreducible,
     KoblitzCurve,
 };
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{
+    mask_from64, mask_low64, masks_low64, F2BoolMono, F2BoolPoly,
+};
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -83,7 +85,7 @@ fn solve_full(eqs: &[F2BoolPoly], nv: usize) -> Arm {
     roots.sort_unstable();
     roots.dedup();
     Arm {
-        roots,
+        roots: masks_low64(&roots),
         cpu,
         splits: st.splits,
         reductions: st.reductions,
@@ -106,7 +108,7 @@ fn poly_degree(p: &F2BoolPoly) -> u32 {
 }
 
 fn support(p: &F2BoolPoly) -> u64 {
-    p.terms.iter().fold(0u64, |a, t| a | t.mask)
+    p.terms.iter().fold(0u64, |a, t| a | mask_low64(t.mask))
 }
 
 /// Degree-fall rows of the degree-3 Macaulay pass (the reduced rows whose
@@ -209,7 +211,7 @@ fn deferred(eqs: &[F2BoolPoly], nv: usize, k: usize) -> (Arm, usize) {
         extra += falls.len();
         let mut leaf = with_falls(&sub, &falls);
         for (i, &v) in vars.iter().enumerate() {
-            let mut monos = vec![F2BoolMono::from_mask(1u64 << v)];
+            let mut monos = vec![F2BoolMono::from_mask(mask_from64(1u64 << v))];
             if bits >> i & 1 == 1 {
                 monos.push(F2BoolMono::from_mask(0));
             }
@@ -1040,7 +1042,7 @@ fn to_u64(p: &Poly, nv: usize) -> F2BoolPoly {
         .iter()
         .map(|m| {
             assert!(m[1] == 0 && m[2] == 0, "gauge system exceeds 64 unknowns");
-            F2BoolMono::from_mask(m[0])
+            F2BoolMono::from_mask(mask_from64(m[0]))
         })
         .collect();
     F2BoolPoly::from_monos(monos, nv)

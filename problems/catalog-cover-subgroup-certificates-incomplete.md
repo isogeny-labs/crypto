@@ -103,8 +103,42 @@ comparison.
 - **Recheck trigger:** new exact-order proofs, completed catalog binary
   certificates, or a balanced prime-cover transfer implementation.
 
+## 2026-10-27: live geometry and dated assessment scopes
+
+The live registry now has 20,592 map rows and 994 EC1 representations. Native
+geometry regeneration preserves every old map and adds 4,801 rows; the additions
+include six binary and nine extension-field EC1 representations. Geometry
+verification supplies no missing subgroup-transfer certificate.
+
+The separately dated transfer assessment explicitly binds catalog commit
+`728304718cb0ab6df70da620a908a5f76f175293`: 15,791 maps, 15,789 covers, 557 fields
+and 979 EC1 representations. Its original profiles, memberships, supported and
+unknown statuses, and independent semantic digests remain unchanged. The
+4,801 new maps and 15 new EC1 representations fall outside that assessment;
+they inherit no old transfer-support result.
+
+The next coverage task is to bind a new assessment to the enlarged registry,
+enumerate those exact new map and subgroup identities, and obtain or explicitly
+leave unknown each required source-order, induced-map, image/kernel and recovery
+receipt. Existing certificates must retain their exact identity scope. Merely
+copying the earlier profile counts or relabelling geometry as transfer evidence
+does not satisfy this obligation. The historical counts below remain their
+original dated observations.
+
 ## Resolution and history
 
 Unresolved. Classifying every tuple, including an explicit `unknown`, fulfills
 the assessment inventory but does not supply the certificates required to
 resolve this problem.
+
+- 2026-10-26 (additive): [`transfer-audit`](../research/transfer_audit_20261011/RESULTS.md) executes the
+  generator path of the binary genus-3 cover for four registered curves (sect113r1, ECC2K-130, K-163,
+  B-163) and four toy Koblitz curves: `phi^*(G)` has exact order `r` in `Jac(H)(F_q)` by Cantor
+  arithmetic (`[r]phi^*(G) = O`, `phi^*(G) != O`, `r` prime), with additivity on 4 sample pairs,
+  scalar equivariance on 3 scalars and the `[3]` push-pull witness
+  (`certificates/*/cover_binary_g3_deg3.json`, status `verified`). This is image-order and kernel
+  evidence for those four EC1 generators only; the order of `<G>` is the registry's claimed order
+  validated by `[r]G = O`, primality of `r` and two annihilated random points, not a point-count
+  proof; the arbitrary-class norm and recovery remain open, and the 129 other binary and all 530
+  prime bindings are untouched. Still unresolved.
+

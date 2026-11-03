@@ -1,0 +1,18 @@
+ephemeral: job 20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f
+ephemeral:   r6a.8xlarge spot i-0f1e979a30bc4f52b (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 48h (terminates by 2026-10-30T02:18:31Z)
+ephemeral:   command: set -euo pipefail
+mkdir -p /work/fall-degree-source
+cd /work/fall-degree-source
+aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz source.tgz --only-show-errors
+echo '4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  source.tgz' | sha256sum -c -
+tar xzf source.tgz
+rm source.tgz
+printf '%s\n' 371035216942660c4615dfbb88d85a14afaf5c16 >"$EPHEMERAL_OUT/source_commit"
+printf '%s\n' "$E12_PROTOCOL_SHA256" >"$EPHEMERAL_OUT/protocol_sha256"
+printf '%s\n' "$E12_PROTOCOL_COMMIT" >"$EPHEMERAL_OUT/protocol_commit"
+case "$E12_PART" in
+  a) KEEP=2 CMAX=5 bash research/fall_degree_bounds_20261008/e12/run_par.sh "$EPHEMERAL_OUT" 3:21:7 ;;
+  c) bash research/fall_degree_bounds_20261008/e12/run_window.sh "$EPHEMERAL_OUT" 4:28:7 ;;
+  *) exit 2 ;;
+esac
+ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f/

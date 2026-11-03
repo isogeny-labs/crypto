@@ -1,0 +1,608 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "frozen plan/protocol",
+      "native runner receipts",
+      "cell manifests",
+      "Git custody checkpoints",
+      "S3 readback receipts"
+    ],
+    "outputs": [
+      "16-row official export",
+      "native status counts",
+      "artifact and scalar labels",
+      "archive audit and report"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "Four fixed generator/key instances for Koblitz n47 m4 f6 on the untwisted curve; one attempt per shard and no timing comparison.",
+      "id": "koblitz47-m4-f6-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 4,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "koblitz",
+        "field_size_bits": 47,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103104,
+        "shard_count": 16,
+        "shard_indices": "native mixed-radix indices 0..15",
+        "solver": "f6",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed generator/key instances for Koblitz n47 m4 enumerate on the untwisted curve; one attempt per shard and no timing comparison.",
+      "id": "koblitz47-m4-enumerate-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 4,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "koblitz",
+        "field_size_bits": 47,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103104,
+        "shard_count": 16,
+        "shard_indices": "native mixed-radix indices 0..15",
+        "solver": "enumerate",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed generator/key instances for Koblitz n47 m4 f6 on the twisted curve; one attempt per shard and no timing comparison.",
+      "id": "koblitz47-m4-f6-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 4,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "koblitz",
+        "field_size_bits": 47,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103104,
+        "shard_count": 16,
+        "shard_indices": "native mixed-radix indices 0..15",
+        "solver": "f6",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed generator/key instances for Koblitz n47 m4 enumerate on the twisted curve; one attempt per shard and no timing comparison.",
+      "id": "koblitz47-m4-enumerate-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 4,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "koblitz",
+        "field_size_bits": 47,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103104,
+        "shard_count": 16,
+        "shard_indices": "native mixed-radix indices 0..15",
+        "solver": "enumerate",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "ML dataset Koblitz47 F6 and enumeration campaign"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "fixed-population-accounting",
+      "text": "All 16 fixed plan indices have at most one native attempt; censored, failed, unsupported and interrupted cells remain in the denominator."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "f6-four-sum-capture",
+      "text": "A completed F6WidePairIndex m4 cell retains a hash-checked bounded signed pair table; any positive PDP witness requires independent group replay. The adapter is geometric four-sum, not general Groebner F6."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "enumeration-capture",
+      "text": "A completed enumeration cell retains its counted visited transitions and bounded finite-domain outcome; a budget stop does not certify no decomposition."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "scalar-label",
+      "text": "An ECDLP scalar label is promoted only after native independent recovery and generator-target group replay."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "custody",
+      "text": "Each attempted shard retains native verify, report and strict export statuses, a restricted archive and fresh S3 archive and pointer readback receipts; failures remain counted."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Absolute software coverage, replay and custody; no comparative performance claim or timing-effect inference.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Exact accounting of the fixed selected population; no detector false-positive or null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Any positive PDP witness or independently recovered ECDLP scalar requires native mathematical replay; this fixed-population pilot makes no detector-sensitivity claim.",
+      "present": false
+    }
+  },
+  "created": "2026-10-31",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: exact fixed-population accounting without inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact counts by method, twist, generator/key and native status; verified F6 pair domains, enumeration traces, independently replayed scalar labels and S3 custody",
+    "text": "Account all 16 fixed cells. Promote only verified method and scalar labels. Retain all timeouts, unsupported, partial and construction failures. Durable requires fresh S3 readback/hash match.",
+    "verdict_vocabulary": [
+      "verified_f6_pdp_and_durable",
+      "f6_pair_domain_retained_and_durable",
+      "verified_ecdlp_and_durable",
+      "verified_custody_pending",
+      "failed",
+      "timed_out",
+      "interrupted",
+      "invalid_receipt",
+      "unattempted"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": 1,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "immediate_s3_custody": true,
+      "local_only": true,
+      "local_xfs_output": true,
+      "one_shard_at_a_time": true,
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 90
+  },
+  "extensions": {
+    "ml_dataset_koblitz47_m4_f6_enum": {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "export_mapping": {
+        "arms": "method by twist",
+        "instance_ids": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "rows_expected": 16,
+        "twist_identity_note": "Methods share public input within twist/generator/key; opposite twists are distinct."
+      },
+      "label_scope": "bounded F6/enumeration artifacts; scalar only after independent replay",
+      "no_cloud_worker_submission": true,
+      "output_filesystem": "xfs",
+      "output_root": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz47-m4-f6-enum-20261031",
+      "plan_axes": {
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "families": [
+          "koblitz"
+        ],
+        "generators": 2,
+        "keys": 2,
+        "m": [
+          4
+        ],
+        "n": [
+          47
+        ],
+        "seed": 2026103104,
+        "solvers": [
+          "f6",
+          "enumerate"
+        ],
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 20000
+      },
+      "planned_cells": 16,
+      "s3_content_addressed_prefix": "s3://setec-astronomy-artifacts/store/sha256",
+      "s3_logical_name_namespace": "restricted/ml-dataset-koblitz47-m4-f6-enum-20261031",
+      "schema": "ml-dataset.koblitz47-m4-f6-enum-pilot/v1",
+      "selected_shards": "0..15 inclusive",
+      "shard_count": 16,
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262"
+    }
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "870863bc14307c4cb57bb06e44ad118bbd8fab33c6670e7681aa8694ce38e9be",
+    "commit": "6a443778d26fd69ab4bd0840873e815b913913f7",
+    "frozen_at": "2026-10-31T09:21:20Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "replacing a seed or shard after failure",
+    "rerunning an attempted shard",
+    "dropping failed, timed-out or interrupted attempts",
+    "using restricted witnesses as public ML features",
+    "promoting missing S3 readback as durable",
+    "claiming F6 is a general Groebner algorithm",
+    "promoting a bounded negative as an exhaustive no-decomposition result",
+    "claiming timing advantage or exact fall degree from this fixed population"
+  ],
+  "invalidation_rules": [
+    "Pinned binary, plan or protocol digest changes invalidate new admission.",
+    "Existing attempt marker or live worker blocks another attempt for that shard.",
+    "Failed native verify prevents method or scalar promotion.",
+    "Missing fresh S3 GET/hash match prevents durability promotion."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and freeze/checker contract",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Native Koblitz n47 m4 F6/enumeration capability",
+      "provenance": "internal",
+      "ref": "src/ml_dataset/solvers.rs:330-338; src/ml_dataset/curves.rs:687-730",
+      "verified_by": "source inspection and pinned native capabilities; per-cell construction still checked"
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "plan/protocol SHA-256 before/after",
+      "shard index",
+      "argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes",
+      "native verify/report/export status",
+      "archive SHA-256 and bytes",
+      "S3 PUT and fresh GET receipt",
+      "solver and twist",
+      "F6 geometric finite-domain verification status",
+      "independent ECDLP scalar-recovery status"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Native verify passes and the retained manifest contains the declared F6 pair-domain or counted enumeration transition artifact.",
+        "id": "method-artifact-verified",
+        "kind": "exact",
+        "name": "Verified method artifact",
+        "resolution": "1",
+        "source": "native cell manifest and dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Restricted archive and custody pointer pass S3 PUT and fresh GET byte-equality/hash checks.",
+        "id": "durable-cell",
+        "kind": "exact",
+        "name": "Durable cell",
+        "resolution": "1",
+        "source": "content-addressed S3 archive and pointer receipts",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate timeout process spawn through wait; includes parent and cell work, excludes runner receipt writes. Operational diagnostic only.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-KOBLITZ47-M4-F6-ENUM-20261031",
+  "question": "Can all 16 fixed Koblitz n47 m4 F6/enumeration cells across two generators, two keys and both twists retain exact native outcomes and durable custody?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Fixed mixed-radix order pairs F6 and enumeration on each public input; no timing-effect comparison.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact receipt and hash validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Fixed seed and lexicographic generator/key indices g0k0, g0k1, g1k0, g1k1. Each method pair shares one public input within a twist; all 16 outcomes are retained."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Native plan seed fixed before data; one curve seed index0.",
+      "seeds": [
+        2026103104
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 4,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "Four generator/key instance IDs per solver-by-twist arm; 16 fixed native cells. Exact accounting only, no inferential effect or power claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 90.0,
+      "fixed_seconds": 10.0,
+      "measured_on": "Per-cell planning allowance under a 90s outer cap; 16 cells imply at most 1440s generate-only, not measured timing. Finalization and custody have separate caps.",
+      "per_sample_seconds": 80.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All 16 plan indices0..15, at most one new native attempt each; retain every outcome without replacement."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each generate has30s inner and90s outer cap; finite finalization and S3 stage caps. Stop on failed custody and resume finalization only; require at least8GiB XFS free before new attempt. Overall campaign3h ceiling."
+    }
+  ],
+  "study_dir": "research/ml_dataset_koblitz47_m4_f6_enum_20261031",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "koblitz47-m4-f6-untwisted",
+          "koblitz47-m4-enumerate-untwisted",
+          "koblitz47-m4-f6-twisted",
+          "koblitz47-m4-enumerate-twisted"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "All 16 indices accounted; method labels require native replay and durable labels require S3 fresh readback."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Pinned clean source c41bec15, binary SHA b8e0881e, per-attempt hash checks.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Koblitz n47 m4, F6/enumeration, two generators, two keys, both twists.",
+        "name": "curve-and-method",
+        "treatment": "crossed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1 and one native command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Shared host context retained; no timing-effect inference.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "30s inner cell and 90s outer runner cap.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "All 16 frozen indices retained regardless of outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      },
+      {
+        "how": "XFS output with 8GiB free-space floor and restricted S3 custody.",
+        "name": "filesystem",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 2
+}

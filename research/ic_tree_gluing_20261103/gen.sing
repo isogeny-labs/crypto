@@ -1,0 +1,466 @@
+// gen.sing -- tree-glued / caterpillar / full-symmetric PDP polynomial systems
+// for msolve, native Singular port of the pilot generator gen.py (arms C, T, F).
+//
+// Usage:   Singular -q gen.sing
+//   OUTDIR  (env, default below)  directory for the msolve inputs
+//   SRCDIR  (env, default below)  directory holding instances.txt
+//
+// No randomness is drawn here: the instances (curve, target x(R), planted
+// summands w_i and planted partial sums) are read from instances.txt.
+// Output per instance (m,t,k) and arm: m<m>_t<t>_k<k>_<arm>.ms
+//   line 1: comma separated variable names      line 2: prime 786433
+//   then:   polynomials separated by ",\n" (coefficients in 0..p-1)
+// Every system is checked on the planted assignment (chain variables computed
+// here); any nonzero equation aborts the script (non-zero exit status).
+//
+// Arms (variable order and equations exactly as in gen.py):
+//   C  per-root Kummer chains + caterpillar S3 chain
+//   T  cherries (s,q) with the degree-2 remainder chain, glued by S3
+//   F  m=3: S4 = Res_X(S3(x1,x2,X), S3(X,x3,xR)) rewritten in e1,e2,e3
+//      with the degree-3 remainder chain
+//      m=4 (round 2): S5 = Res_X(S4(x1,x2,x3,X), S3(X,x4,xR)) with xR fixed,
+//      rewritten in e1..e4, with the degree-4 remainder chain
+//   S  (round 2) separator-fixed tree: the T system plus X_c = planted value
+//      for every internal partial sum (m=3: X1; m=4: X1, X2)
+//   CELLS (env, optional): space separated cell names (e.g. "m4_t4_k0_F");
+//      when set, only those systems are written. Round-1 output is unchanged.
+
+string OUTDIR = system("getenv", "OUTDIR");
+if (OUTDIR == "") { OUTDIR = "/tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/ms_sing"; }
+string SRCDIR = system("getenv", "SRCDIR");
+if (SRCDIR == "") { SRCDIR = "/home/user/crypto/research/ic_tree_gluing_20261103"; }
+
+short = 0;
+int PRIME = 786433;
+
+// ------------------------------------------------------------ small helpers
+proc die(string msg)
+{
+  print("ERROR: " + msg);
+  system("sh", "kill -TERM $PPID");   // Singular cannot set an exit status; this does
+}
+
+// 1-based position of name s in list L of strings (= ring variable index)
+proc ix(string s, list L)
+{
+  int i;
+  for (i = 1; i <= size(L); i++) { if (L[i] == s) { return(i); } }
+  die("unknown variable " + s);
+  return(0);
+}
+
+// whitespace separated integers -> intvec
+proc ints(string line)
+{
+  string csv = ""; string ch; int i; int prevsep = 1;
+  for (i = 1; i <= size(line); i++)
+  {
+    ch = line[i, 1];
+    if (ch == " ") { if (prevsep == 0) { csv = csv + ","; prevsep = 1; } }
+    else { csv = csv + ch; prevsep = 0; }
+  }
+  if (prevsep == 1 and size(csv) > 0) { csv = csv[1, size(csv) - 1]; }
+  execute("intvec iv = " + csv + ";");
+  return(iv);
+}
+
+// ------------------------------------------------------- variable-name lists
+proc kn(string nme, int t)     // Kummer chain variables nme u1..u(t-1)
+{
+  list L; int j;
+  for (j = 1; j < t; j++) { L[j] = nme + "u" + string(j); }
+  return(L);
+}
+
+proc mn(string nme, int k, int t)   // remainder-chain variables, levels with 2^j >= k
+{
+  list L; int j; int i;
+  for (j = 1; j < t; j++)
+  {
+    if (2^j >= k)
+    {
+      for (i = 0; i < k; i++) { L[size(L) + 1] = nme + "r" + string(j) + "_" + string(i); }
+    }
+  }
+  return(L);
+}
+
+proc armnames(string arm, int m, int t)   // "T" (the remainder-chain variable) is var(1)
+{
+  list L; int i; int c;
+  L[1] = "T";
+  if (arm == "C")
+  {
+    for (i = 1; i <= m; i++) { L[size(L) + 1] = "w" + string(i); }
+    for (i = 0; i < m; i++) { L = L + kn("c" + string(i), t); }
+    for (i = 1; i <= m - 2; i++) { L[size(L) + 1] = "X" + string(i); }
+  }
+  if (arm == "T" or arm == "S")
+  {
+    for (c = 0; c < m div 2; c++)
+    {
+      L[size(L) + 1] = "s" + string(c);
+      L[size(L) + 1] = "q" + string(c);
+      L = L + mn("h" + string(c), 2, t);
+    }
+    if (m == 3) { L[size(L) + 1] = "w3"; L = L + kn("c2", t); L[size(L) + 1] = "X1"; }
+    if (m == 4) { L[size(L) + 1] = "X1"; L[size(L) + 1] = "X2"; }
+  }
+  if (arm == "F")
+  {
+    for (i = 1; i <= m; i++) { L[size(L) + 1] = "e" + string(i); }
+    L = L + mn("f", m, t);
+  }
+  return(L);
+}
+
+// ------------------------------------------------------------- polynomials
+proc S3(poly x1, poly x2, poly x3, poly a, poly b)
+{
+  return((x1 - x2)^2 * x3^2 - 2 * ((x1 + x2) * (x1 * x2 + a) + 2 * b) * x3
+         + (x1 * x2 - a)^2 - 4 * b * (x1 + x2));
+}
+
+proc S3sym(poly s, poly q, poly x3, poly a, poly b)   // S3 with (x1+x2, x1*x2) = (s, q)
+{
+  return((s^2 - 4 * q) * x3^2 - 2 * (s * (q + a) + 2 * b) * x3 + (q - a)^2 - 4 * b * s);
+}
+
+// per-root Kummer chain: u1 = w^2, u_{j+1} = u_j^2, u_{t-1}^2 = 1
+proc kchain(string nme, poly w, int t, list nm)
+{
+  ideal E; int j; int ne = 0; poly prev = w; poly u;
+  for (j = 1; j < t; j++)
+  {
+    u = var(ix(nme + "u" + string(j), nm));
+    ne++; E[ne] = u - prev^2; prev = u;
+  }
+  ne++; E[ne] = prev^2 - 1;
+  return(E);
+}
+
+// remainder chain T^(2^j) mod Q, Q = T^k - e1 T^(k-1) + e2 T^(k-2) - ...; es = (e1..ek)
+proc mchain(string nme, ideal es, int k, int t, list nm)
+{
+  poly T = var(1); poly Q = T^k; int i; int j; int ne = 0;
+  for (i = 0; i < k; i++) { Q = Q + (-1)^(i + 1) * es[i + 1] * T^(k - 1 - i); }
+  ideal G = std(ideal(Q));
+  poly R = T; poly Rn; poly Rsym; poly df; ideal E; matrix M;
+  for (j = 1; j <= t; j++)
+  {
+    Rn = reduce(R^2, G);
+    if (j < t and 2^j < k) { R = T^(2^j); }   // already reduced: no variables
+    else
+    {
+      if (j == t) { df = Rn - 1; }
+      else
+      {
+        Rsym = 0;
+        for (i = 0; i < k; i++) { Rsym = Rsym + var(ix(nme + "r" + string(j) + "_" + string(i), nm)) * T^i; }
+        df = Rn - Rsym;
+      }
+      M = coeffs(df, T);
+      for (i = nrows(M); i >= 1; i--) { if (M[i, 1] != 0) { ne++; E[ne] = M[i, 1]; } }
+      R = Rsym;
+    }
+  }
+  return(E);
+}
+
+// planted values of the remainder-chain variables for the given roots
+proc plantM(string nme, int k, int t, ideal roots, list nm, ideal vals)
+{
+  poly T = var(1); poly Qn = 1; int i; int j; poly rm; matrix M;
+  for (i = 1; i <= k; i++) { Qn = Qn * (T - roots[i]); }
+  ideal G = std(ideal(Qn));
+  for (j = 1; j < t; j++)
+  {
+    if (2^j >= k)
+    {
+      rm = reduce(T^(2^j), G); M = coeffs(rm, T);
+      for (i = 0; i < k; i++)
+      {
+        if (i + 1 <= nrows(M)) { vals[ix(nme + "r" + string(j) + "_" + string(i), nm)] = M[i + 1, 1]; }
+        else { vals[ix(nme + "r" + string(j) + "_" + string(i), nm)] = 0; }
+      }
+    }
+  }
+  return(vals);
+}
+
+proc plantK(string nme, poly w, int t, list nm, ideal vals)
+{
+  poly v = w; int j;
+  for (j = 1; j < t; j++) { v = v^2; vals[ix(nme + "u" + string(j), nm)] = v; }
+  return(vals);
+}
+
+proc extend(list EQ, ideal E)
+{
+  int i;
+  for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
+  return(EQ);
+}
+
+// msolve text of one polynomial: terms in the ring's (lex) order, coefficients in 0..p-1
+proc fmtpoly(poly f)
+{
+  string s = ""; int i; int ci; poly mo;
+  if (f == 0) { return("0"); }
+  for (i = 1; i <= size(f); i++)
+  {
+    ci = int(leadcoef(f[i]));
+    if (ci < 0) { ci = ci + 786433; }
+    mo = leadmonom(f[i]);
+    if (i > 1) { s = s + "+"; }
+    if (mo == 1) { s = s + string(ci); }
+    else { s = s + string(ci) + "*" + string(mo); }
+  }
+  return(s);
+}
+
+// ------------------------------------------------------------- one cell, one arm
+// rec = m t k xR w_1..w_m cat_1..cat_(m-2) tree_1..tree_(m div 2, m>=3)
+proc cell(string arm, intvec rec, int A, int B, int G, string OUT, string S4str)
+{
+  int m = rec[1]; int t = rec[2]; int k = rec[3]; int i; int c; int kk;
+  list nm = armnames(arm, m, t);
+  string vl = "";
+  for (i = 1; i <= size(nm); i++) { if (i > 1) { vl = vl + ","; } vl = vl + nm[i]; }
+  execute("ring R = 786433,(" + vl + "),lp;");
+  int n = size(nm);
+  poly pa = A; poly pb = B; poly pg = G; poly xR = rec[4];
+  poly pw; list W; for (i = 1; i <= m; i++) { pw = rec[4 + i]; W[i] = pw; }
+  list CAT; for (i = 1; i <= m - 2; i++) { pw = rec[4 + m + i]; CAT[i] = pw; }
+  list TREE; int nt = 0; if (m >= 3) { nt = m div 2; }
+  for (i = 1; i <= nt; i++) { pw = rec[4 + m + (m - 2) + i]; TREE[i] = pw; }
+  list EQ; ideal E; ideal vals; vals[n] = 0; list DONE; poly v1; poly v2;
+  poly left; poly right; poly outp; ideal es; ideal rt; poly s4;
+
+  if (arm == "C")
+  {
+    for (i = 0; i < m; i++)
+    {
+      E = kchain("c" + string(i), var(ix("w" + string(i + 1), nm)), t, nm);
+      EQ = extend(EQ, E);
+    }
+    left = pg * var(ix("w1", nm));
+    for (kk = 1; kk < m; kk++)
+    {
+      right = pg * var(ix("w" + string(kk + 1), nm));
+      if (kk < m - 1) { outp = var(ix("X" + string(kk), nm)); } else { outp = xR; }
+      EQ[size(EQ) + 1] = S3(left, right, outp, pa, pb);
+      left = outp;
+    }
+    for (i = 1; i <= m; i++)
+    {
+      vals[ix("w" + string(i), nm)] = W[i]; DONE[size(DONE) + 1] = "w" + string(i);
+      vals = plantK("c" + string(i - 1), W[i], t, nm, vals); DONE = DONE + kn("c" + string(i - 1), t);
+    }
+    for (i = 1; i <= m - 2; i++) { vals[ix("X" + string(i), nm)] = CAT[i]; DONE[size(DONE) + 1] = "X" + string(i); }
+  }
+
+  if (arm == "T" or arm == "S")
+  {
+    for (c = 0; c < m div 2; c++)
+    {
+      es = var(ix("s" + string(c), nm)), var(ix("q" + string(c), nm));
+      E = mchain("h" + string(c), es, 2, t, nm);
+      EQ = extend(EQ, E);
+    }
+    if (m == 2)
+    {
+      EQ[size(EQ) + 1] = S3sym(pg * var(ix("s0", nm)), pg * pg * var(ix("q0", nm)), xR, pa, pb);
+    }
+    if (m == 3)
+    {
+      E = kchain("c2", var(ix("w3", nm)), t, nm); EQ = extend(EQ, E);
+      EQ[size(EQ) + 1] = S3sym(pg * var(ix("s0", nm)), pg * pg * var(ix("q0", nm)), var(ix("X1", nm)), pa, pb);
+      EQ[size(EQ) + 1] = S3(var(ix("X1", nm)), pg * var(ix("w3", nm)), xR, pa, pb);
+    }
+    if (m == 4)
+    {
+      EQ[size(EQ) + 1] = S3sym(pg * var(ix("s0", nm)), pg * pg * var(ix("q0", nm)), var(ix("X1", nm)), pa, pb);
+      EQ[size(EQ) + 1] = S3sym(pg * var(ix("s1", nm)), pg * pg * var(ix("q1", nm)), var(ix("X2", nm)), pa, pb);
+      EQ[size(EQ) + 1] = S3(var(ix("X1", nm)), var(ix("X2", nm)), xR, pa, pb);
+    }
+    for (c = 0; c < m div 2; c++)
+    {
+      v1 = W[2 * c + 1]; v2 = W[2 * c + 2];
+      vals[ix("s" + string(c), nm)] = v1 + v2; DONE[size(DONE) + 1] = "s" + string(c);
+      vals[ix("q" + string(c), nm)] = v1 * v2; DONE[size(DONE) + 1] = "q" + string(c);
+      rt = v1, v2;
+      vals = plantM("h" + string(c), 2, t, rt, nm, vals); DONE = DONE + mn("h" + string(c), 2, t);
+    }
+    if (m == 3)
+    {
+      vals[ix("w3", nm)] = W[3]; DONE[size(DONE) + 1] = "w3";
+      vals = plantK("c2", W[3], t, nm, vals); DONE = DONE + kn("c2", t);
+      vals[ix("X1", nm)] = TREE[1]; DONE[size(DONE) + 1] = "X1";
+    }
+    if (m == 4)
+    {
+      vals[ix("X1", nm)] = TREE[1]; DONE[size(DONE) + 1] = "X1";
+      vals[ix("X2", nm)] = TREE[2]; DONE[size(DONE) + 1] = "X2";
+    }
+    if (arm == "S")   // separators fixed to their planted values
+    {
+      if (m == 2) { die("S arm needs m >= 3"); }
+      EQ[size(EQ) + 1] = var(ix("X1", nm)) - TREE[1];
+      if (m == 4) { EQ[size(EQ) + 1] = var(ix("X2", nm)) - TREE[2]; }
+    }
+  }
+
+  if (arm == "F" and m == 3)
+  {
+    es = var(ix("e1", nm)), var(ix("e2", nm)), var(ix("e3", nm));
+    E = mchain("f", es, 3, t, nm); EQ = extend(EQ, E);
+    // S4 (in E1,E2,E3,xr from the string) with E_i -> g^i e_i and xr -> xR
+    ring Bl = 786433,(E1,E2,E3,xr),dp;
+    execute("poly sB = " + S4str + ";");
+    setring R;
+    map phi = Bl, pg * var(ix("e1", nm)), pg^2 * var(ix("e2", nm)), pg^3 * var(ix("e3", nm)), xR;
+    s4 = phi(sB);
+    EQ[size(EQ) + 1] = s4;
+    vals[ix("e1", nm)] = W[1] + W[2] + W[3]; DONE[size(DONE) + 1] = "e1";
+    vals[ix("e2", nm)] = W[1] * W[2] + W[1] * W[3] + W[2] * W[3]; DONE[size(DONE) + 1] = "e2";
+    vals[ix("e3", nm)] = W[1] * W[2] * W[3]; DONE[size(DONE) + 1] = "e3";
+    rt = W[1], W[2], W[3];
+    vals = plantM("f", 3, t, rt, nm, vals); DONE = DONE + mn("f", 3, t);
+  }
+
+  if (arm == "F" and m == 4)
+  {
+    es = var(ix("e1", nm)), var(ix("e2", nm)), var(ix("e3", nm)), var(ix("e4", nm));
+    E = mchain("f", es, 4, t, nm); EQ = extend(EQ, E);
+    // S5 with xR fixed: Res_X(S4(x1,x2,x3,X), S3(X,x4,xR)), S4 = Res_Y(S3(x1,x2,Y), S3(Y,x3,X)),
+    // rewritten in E1..E4 by reduction modulo the symmetric-function ideal.
+    ring B5 = 786433,(x1,x2,x3,x4,X,Y,E1,E2,E3,E4),(dp(6),dp(4));
+    poly qa = A; poly qb = B; poly qr = rec[4];
+    poly S4x = resultant(S3(x1, x2, Y, qa, qb), S3(Y, x3, X, qa, qb), Y);
+    poly S5 = resultant(S4x, S3(X, x4, qr, qa, qb), X);
+    ideal Isym = E1 - (x1 + x2 + x3 + x4),
+                 E2 - (x1*x2 + x1*x3 + x1*x4 + x2*x3 + x2*x4 + x3*x4),
+                 E3 - (x1*x2*x3 + x1*x2*x4 + x1*x3*x4 + x2*x3*x4),
+                 E4 - x1*x2*x3*x4;
+    poly S5s = reduce(S5, std(Isym));
+    if (S5s == 0) { die("S5 vanished"); }
+    if (deg(S5s, intvec(1,1,1,1,1,1,0,0,0,0)) > 0) { die("S5 not symmetric?"); }
+    setring R;
+    map phi5 = B5, 0, 0, 0, 0, 0, 0, pg * var(ix("e1", nm)), pg^2 * var(ix("e2", nm)),
+                   pg^3 * var(ix("e3", nm)), pg^4 * var(ix("e4", nm));
+    s4 = phi5(S5s);
+    EQ[size(EQ) + 1] = s4;
+    vals[ix("e1", nm)] = W[1] + W[2] + W[3] + W[4]; DONE[size(DONE) + 1] = "e1";
+    vals[ix("e2", nm)] = W[1]*W[2] + W[1]*W[3] + W[1]*W[4] + W[2]*W[3] + W[2]*W[4] + W[3]*W[4];
+    DONE[size(DONE) + 1] = "e2";
+    vals[ix("e3", nm)] = W[1]*W[2]*W[3] + W[1]*W[2]*W[4] + W[1]*W[3]*W[4] + W[2]*W[3]*W[4];
+    DONE[size(DONE) + 1] = "e3";
+    vals[ix("e4", nm)] = W[1]*W[2]*W[3]*W[4]; DONE[size(DONE) + 1] = "e4";
+    rt = W[1], W[2], W[3], W[4];
+    vals = plantM("f", 4, t, rt, nm, vals); DONE = DONE + mn("f", 4, t);
+  }
+
+  // every generator assigned exactly once
+  if (size(DONE) != n - 1) { die("planted assignment incomplete for " + OUT); }
+  for (i = 2; i <= n; i++) { if (ix(nm[i], DONE) == 0) { die("unassigned " + nm[i]); } }
+  if (ncols(vals) != n) { die("bad assignment vector"); }
+
+  // planted check: substitute into every equation
+  map ev = R, vals; poly ei; poly vv;
+  for (i = 1; i <= size(EQ); i++)
+  {
+    if (EQ[i] == 0) { die("zero equation " + string(i) + " in " + OUT); }
+    ei = EQ[i]; vv = ev(ei);
+    if (vv != 0) { die("planted check failed arm=" + arm + " m=" + string(m) + " t=" + string(t) + " eq=" + string(i)); }
+  }
+
+  // write the msolve input
+  string txt = "";
+  for (i = 2; i <= n; i++) { if (i > 2) { txt = txt + ","; } txt = txt + nm[i]; }
+  txt = txt + newline + string(786433) + newline;
+  for (i = 1; i <= size(EQ); i++)
+  {
+    if (i > 1) { txt = txt + "," + newline; }
+    txt = txt + fmtpoly(EQ[i]);
+  }
+  write(":w " + OUT, txt);   // write() appends the final newline
+  print("m=" + string(m) + " t=" + string(t) + " k=" + string(k) + " " + arm + ": N=" + string(n - 1)
+        + " eqs=" + string(size(EQ)) + " plant ok");
+  return(0);
+}
+
+// ------------------------------------------------------------- read instances
+string IT = read(SRCDIR + "/instances.txt");
+list LINES; string cur = ""; string chh; int ii;
+for (ii = 1; ii <= size(IT); ii++)
+{
+  chh = IT[ii, 1];
+  if (chh == newline) { LINES[size(LINES) + 1] = cur; cur = ""; }
+  else { cur = cur + chh; }
+}
+if (cur != "") { LINES[size(LINES) + 1] = cur; }
+
+list RECS; intvec CURVE; int havecurve = 0;
+for (ii = 1; ii <= size(LINES); ii++)
+{
+  if (size(LINES[ii]) > 0)
+  {
+    if (LINES[ii][1, 1] != "#")
+    {
+      if (havecurve == 0) { CURVE = ints(LINES[ii]); havecurve = 1; }
+      else { RECS[size(RECS) + 1] = ints(LINES[ii]); }
+    }
+  }
+}
+if (havecurve == 0) { die("no curve line in instances.txt"); }
+if (CURVE[1] != PRIME) { die("instances.txt prime is not 786433"); }
+int CA = CURVE[2]; int CB = CURVE[3]; int CG = CURVE[4];
+
+system("sh", "mkdir -p " + OUTDIR);
+
+// ------------------------------------------------------------- S4 (arm F), once
+string S4str = "";
+int needF = 0;
+for (ii = 1; ii <= size(RECS); ii++) { if (RECS[ii][1] == 3) { needF = 1; } }
+if (needF)
+{
+  ring Bq = 786433,(x1,x2,x3,X,xr,E1,E2,E3),(dp(3),dp(5));
+  poly qa = CA; poly qb = CB;
+  poly S4 = resultant(S3(x1, x2, X, qa, qb), S3(X, x3, xr, qa, qb), X);
+  ideal Isym = E1 - (x1 + x2 + x3), E2 - (x1*x2 + x1*x3 + x2*x3), E3 - x1*x2*x3;
+  ideal GI = std(Isym);
+  poly S4s = reduce(S4, GI);
+  if (S4s == 0) { die("S4 vanished"); }
+  if (deg(S4s, intvec(1,1,1,0,0,0,0,0)) > 0) { die("S4 not symmetric?"); }
+  if (deg(S4s, intvec(0,0,0,1,0,0,0,0)) > 0) { die("X left in S4"); }
+  S4str = string(S4s);
+}
+
+// ------------------------------------------------------------- generate
+int jj; int rc; int ncells = 0; list ARMS; intvec rv; string arm0; string cname;
+string CELLS = system("getenv", "CELLS");
+for (ii = 1; ii <= size(RECS); ii++)
+{
+  rv = RECS[ii];
+  ARMS = list("C", "T");
+  if (rv[1] == 3) { ARMS = list("C", "T", "F"); }
+  if (CELLS != "")   // round 2: S arm, F at m=4, only the named cells
+  {
+    ARMS = list("C", "T", "F");
+    if (rv[1] >= 3) { ARMS = list("C", "T", "F", "S"); }
+  }
+
+  for (jj = 1; jj <= size(ARMS); jj++)
+  {
+    arm0 = ARMS[jj];
+    cname = "m" + string(rv[1]) + "_t" + string(rv[2]) + "_k" + string(rv[3]) + "_" + arm0;
+    if (CELLS == "" or find(" " + CELLS + " ", " " + cname + " ") > 0)
+    {
+      rc = cell(arm0, rv, CA, CB, CG, OUTDIR + "/" + cname + ".ms", S4str);
+      ncells++;
+    }
+  }
+}
+print("wrote " + string(ncells) + " systems to " + OUTDIR);
+quit;

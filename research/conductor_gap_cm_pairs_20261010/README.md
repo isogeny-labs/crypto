@@ -1,7 +1,14 @@
 # Conductor-gap CM pairs: crater vs floor curves with a certified large gap
 
 **Status: constructed, Sage-verified, measured (five ecbench sessions,
-2026-10-10). Result: no implemented method sees the gap; see §5.**
+2026-10-10). Result: no implemented method shows a reproducible conductor
+effect, pending the rho re-test at ℓ = 8209 under a fresh measurement
+seed; see §5.**
+
+*Correction (2026-10-28, sheriff case SHF-20261028-0f3f64, PPN-1): this
+banner used to read "no implemented method sees the gap", the conclusion
+§5 withdrew on 2026-10-17 (SHF-20261017-e4d7f6, L-N2). It now carries the
+same qualification as §5.*
 
 ## 1. Why these pairs
 
@@ -85,7 +92,9 @@ Provable now, with Mathlib and no curve-specific library:
   crater and floor curves are both cyclic of order `N`, so BSGS cannot see
   the conductor. **It does not cover the rho and kangaroo that ecbench
   runs.** They choose each step by hashing the point's representation
-  (`mix(g.key(&pos))` in the kangaroo, `src/cryptanalysis/ecbench/generic.rs:275`;
+  (`mix(g.key(&pos))` in the step loop of `kangaroo` in
+  `src/cryptanalysis/ecbench/generic.rs`, line 309 at commit 57fa35852,
+  line 275 at 11aa00591;
   `mix(self.g.key(x))` in the rho walk, `TunedWalker::index` in
   `src/cryptanalysis/ic_boundary.rs`). That is outside the theorem's model.
   Sheriff case SHF-20261016-3caa6f (finding L5) gives a toy demonstration,
@@ -93,6 +102,9 @@ Provable now, with Mathlib and no curve-specific library:
   representation-hashing r-adding walk had a different cost on 197 of 200
   transported instances, while BSGS had a different transcript on 0 of 200.
   For rho and kangaroo, `S = 1` is the expected null, not a theorem.
+  (Re-cited 2026-10-28, sheriff case SHF-20261028-0f3f64, PPN-7: the
+  kangaroo hash was cited as `generic.rs:275` with no commit; it is now
+  cited by symbol with a commit-pinned line.)
   (Corrected 2026-10-16. Earlier text said the theorem covers rho and the
   kangaroo.)
 - **The transfer bound** (the formal shape of Jao–Miller–Venkatesan), in

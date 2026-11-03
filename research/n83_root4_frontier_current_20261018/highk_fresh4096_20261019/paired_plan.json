@@ -1,0 +1,15 @@
+{
+  "acceptance": "both arms producer PASS and independently replay all 4096 scalars, four-point relations, phase sums, exact source/flags/base identities; preserve failures and unknown aggregate",
+  "arms_order": [
+    "k4300_wide3",
+    "k4405_wide3"
+  ],
+  "claim_scope": "local correctness and timing diagnostic only; no Tier 1 or rho speedup selection",
+  "point_count": 4096,
+  "primary_diagnostic": "paired mean of target_ms in fixture order, k4405 minus k4300",
+  "schema": "n83.wide3-fresh4096-paired-plan/v1",
+  "selected_online_candidate_id": null,
+  "status": "FROZEN_BEFORE_RUN",
+  "target_sha256": "281a088cc49658973375ab88359d65a3b4d51d2819a297872b5fe5da01783895",
+  "uncertainty": "two-sided 99 percent moving-block bootstrap, circular contiguous blocks of 64 fixture indices, 20000 resamples, PCG64 seed 20261019"
+}

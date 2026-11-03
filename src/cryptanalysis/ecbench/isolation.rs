@@ -18,6 +18,9 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+/// Checked native PMU lifecycle; legacy counters below retain their API.
+pub mod checked;
+
 /// One logical CPU's place in the machine.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CpuPlace {
@@ -394,9 +397,12 @@ pub fn plan_cpus(
 /// take, so a session and those tools never time at once.
 pub const DEFAULT_LOCK: &str = "/tmp/crypto-bench.lock";
 
-/// An exclusive `flock`, held until dropped.
+/// An exclusive `flock`, owned by the acquiring process until dropped.
+/// An inherited descriptor is not an ownership transfer to a forked child.
 pub struct BenchLock {
     _file: std::fs::File,
+    #[cfg(unix)]
+    owner_pid: libc::pid_t,
     pub path: String,
 }
 
@@ -417,9 +423,13 @@ impl BenchLock {
                 if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 {
                     break;
                 }
+                let error = std::io::Error::last_os_error();
+                if error.kind() != std::io::ErrorKind::WouldBlock {
+                    return Err(format!("cannot lock {path}: {error}"));
+                }
                 if !wait {
                     return Err(format!(
-                        "another benchmark holds {path}; pass --wait to queue behind it"
+                        "another benchmark holds {path}; pass --wait to queue behind it: {error}"
                     ));
                 }
                 if let Some(sig) = crate::cryptanalysis::ecbench::signals::interrupted() {
@@ -432,8 +442,34 @@ impl BenchLock {
         }
         Ok(Self {
             _file: file,
+            #[cfg(unix)]
+            // SAFETY: getpid has no preconditions.
+            owner_pid: unsafe { libc::getpid() },
             path: path.to_string(),
         })
+    }
+}
+
+impl BenchLock {
+    fn release_owner_lock(&self) {
+        #[cfg(unix)]
+        {
+            use std::os::unix::io::AsRawFd;
+            // A child dropping its inherited guard must not unlock the owner.
+            // SAFETY: getpid has no preconditions; _file still owns its fd.
+            if unsafe { libc::getpid() } == self.owner_pid {
+                // Release the shared open-file-description lock even if an
+                // unrelated concurrent child has not yet exec'd/closed its fd.
+                // Drop cannot report errors; File closure remains the fallback.
+                let _ = unsafe { libc::flock(self._file.as_raw_fd(), libc::LOCK_UN) };
+            }
+        }
+    }
+}
+
+impl Drop for BenchLock {
+    fn drop(&mut self) {
+        self.release_owner_lock();
     }
 }
 
@@ -1840,7 +1876,8 @@ mod counter_tests {
         let d = b.since(&a);
         assert_eq!(d.device, 3);
         assert_eq!(d.local_timer, 4);
-        assert_eq!(d.non_tick(), 3 + 0 + 6);
+        // device 3 + ipi_other 0 + softirq_work 6
+        assert_eq!(d.non_tick(), 3 + 6);
         // Counters that went backwards (a CPU hot-unplugged) saturate.
         assert_eq!(a.since(&b), IrqCounts::default());
         // The live counters parse on this machine.

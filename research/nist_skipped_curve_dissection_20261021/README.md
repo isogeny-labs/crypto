@@ -27,13 +27,24 @@ grouping into local pieces pass native PARI checks.
 The [native timeout diagnostic](factorization/native-timeout-diagnostic-20261023/README.md)
 reproduces the unpatched tool's exit 139 and validates its two-line printf
 fix in bounded full-tool controls. The later resume card now requires the
-checked executable and the R05 relation checkpoint; it remains unqueued.
+checked executable and the latest completed relation checkpoint; it remains unqueued.
 
-[R06](factorization/rounds/R06-20261023/README.md) is a separate local
-1800-second continuation with that validated binary and the saved relations.
-Its dated 2026-10-23 01:43:40 UTC observation records two active native
-workers. Final status, archive and post-run replay remain pending until
-that actual bounded worker terminates.
+[R06](factorization/rounds/R06-20261023/README.md) finished cleanly at its
+native limit with exit 0 and 1,427,642 additional raw relations. Its saved
+main file contains 4,592,399 lines; fresh certificate/product replay and
+canonical archive restoration pass. No new factor was found.
+
+[R07](factorization/rounds/R07-20261025/README.md) completes native filtering
+on an independent copy. After duplicate removal, 4,518,304 unique relations
+including generated free relations reduce to 92 singleton survivors. No
+matrix is produced. The original checkpoint remains unchanged. FactorDB
+still lists the exact residual as `C` in the October 25 response.
+
+[R08](factorization/rounds/R08-20261025/README.md) is a separate, actual
+two-hour local continuation from the unmodified R06 state. Its dated
+2026-10-25 06:07:37 UTC observation records two active workers and 614,231
+new raw relations for that allocation. Final R08 status, archive and replay
+remain pending until termination. PR #2379 has merged; this is its follow-up.
 
 The [23-job runner](../../backlog/XP-20261021-nist-skipped-curves/README.md)
 and manual workflow remain available for a fresh upstream run. This study

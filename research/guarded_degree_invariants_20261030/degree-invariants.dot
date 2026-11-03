@@ -1,0 +1,19 @@
+digraph degrees {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", nodesep=0.28, ranksep=0.45];
+  node [shape=box, style="rounded,filled", fillcolor="#f2f5fa", color="#405269", fontname="Helvetica", fontsize=10];
+  edge [color="#405269", arrowsize=0.65];
+  raw [label="Actual six raw inputs\nprime or ordinary binary"];
+  point [label="All top forms vanish at\nu=1; x=y=z=v=0"];
+  witness [label="u^d survives for every d\nNo finite BFS regularity", fillcolor="#fbe8de"];
+  raw -> point -> witness;
+  prime [label="Original prime UNSAT hypotheses\nPublished exact last fall = 5"];
+  solve [label="Unit ideal: basis in V(F,d)\niff 1 is in V(F,d)\nExact closed solving degree = 5", fillcolor="#dff2e6"];
+  prime -> solve;
+  fields [label="Add all five field equations\nHighest forms t^q; q > 1"];
+  bound [label="Every monomial past 5(q-1)\nis divisible by a field top\nBFS regularity <= 5(q-1)+1", fillcolor="#dff2e6"];
+  fields -> bound;
+  sharp [label="Prime p > 3 implies p >= 5\nNo field input enters degree < 5\nExact last / closed solving = 5", fillcolor="#dff2e6"];
+  prime -> sharp;
+  fields -> sharp;
+  fields -> witness [style=dashed,label="raw witness does not transfer",fontsize=8,dir=none];
+}

@@ -1,0 +1,37 @@
+{
+  "kind": "nist-skip-search-sources/v1",
+  "retrieved_date_utc": "2026-10-25",
+  "parameter_files": [
+    {
+      "url": "https://github.com/emanjon/share/blob/main/ecdsa_skipped_curves.txt",
+      "local": "sources/ecdsa_skipped_curves.txt",
+      "sha256": "5f264d33f75eb35d59c6cfe5b88e049f40adff99a9cad1524737e72d2e755e27",
+      "scope": "19 eligible curves in the four streams containing skips"
+    },
+    {
+      "url": "https://github.com/FiloSottile/mostly-harmless/blob/main/seeds/seeds.go",
+      "local": "sources/seeds.go.txt",
+      "sha256": "c4ce329773b4a3cb815c29a95d8fd1012a066f5e3daa5d05c60a8eb76085e4fa",
+      "scope": "independent enumeration specification and published seed positions"
+    },
+    {
+      "repository_path": "docs/curves/standards/parameters.json",
+      "base_commit": "43e01b10e0e5ec6bb74a1cd24f283ef006da586d",
+      "git_blob": "a036c6bcc2b3fc332c60494c87226466d990b2d7",
+      "sha256": "587e8e12872df19e64d94a8302bd24082ca981e432d536544707fe13a9c3ea59",
+      "scope": "actual published coefficients and P-384/P-521 control parameters",
+      "upstream_commit": "77fe6e3585ca2c2225b59d7df24b7c775437276f"
+    }
+  ],
+  "primary_discussion": [
+    "https://www.anthropic.com/research/ecdsa-curve-origins",
+    "https://words.filippo.io/seeds-solved/"
+  ],
+  "factor_hints": {
+    "service": "https://factordb.com/api",
+    "queries": "eight exact public integer targets that timed out; raw responses in the evidence archive",
+    "accepted_after_native_prime_and_product_checks": 4,
+    "rejected_composite_residual_responses": 4
+  },
+  "classification_limit": "Labels are recorded public choices, not recovered historical decision logs."
+}

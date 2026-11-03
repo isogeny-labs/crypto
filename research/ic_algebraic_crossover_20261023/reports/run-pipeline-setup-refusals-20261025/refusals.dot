@@ -1,0 +1,6 @@
+digraph G {
+  graph [rankdir=LR]; node [shape=box,style="rounded,filled",fillcolor="#f7e6d1",fontname="Helvetica"];
+  k [label="K0 n=17 constructor"]; p [label="No usable prime subgroup"]; s [label="No session or cost"];
+  a [label="Sparse-checkout refresh"]; b [label="Tracked inputs removed"]; c [label="Queued batch refused\nbefore measurement"];
+  k -> p -> s; a -> b -> c;
+}

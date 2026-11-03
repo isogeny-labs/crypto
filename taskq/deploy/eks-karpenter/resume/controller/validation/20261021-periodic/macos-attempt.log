@@ -1,0 +1,61 @@
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling typenum v1.20.1
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.190
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling generic-array v0.14.7
+   Compiling syn v3.0.9
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling serde_derive v1.0.229
+   Compiling isolab-eks-recovery v0.1.0 (/Volumes/T7/pr-repair-20261019/crypto-2377-periodic-fix/taskq/deploy/eks-karpenter/resume/controller)
+error[E0425]: cannot find function `syncfs` in crate `libc`
+   --> src/supervisor.rs:207:23
+    |
+207 |     if unsafe { libc::syncfs(f.as_raw_fd()) } != 0 {
+    |                       ^^^^^^ help: a function with a similar name exists: `sync`
+    |
+   ::: /Users/adamburan/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.190/src/unix/bsd/mod.rs:733:5
+    |
+733 |     pub fn sync();
+    |     -------------- similarly named function `sync` defined here
+
+error[E0425]: cannot find function `prctl` in crate `libc`
+   --> src/supervisor.rs:295:26
+    |
+295 |                 if libc::prctl(libc::PR_CAPBSET_DROP, cap, 0, 0, 0) != 0
+    |                          ^^^^^ not found in `libc`
+
+error[E0425]: cannot find value `PR_CAPBSET_DROP` in crate `libc`
+   --> src/supervisor.rs:295:38
+    |
+295 |                 if libc::prctl(libc::PR_CAPBSET_DROP, cap, 0, 0, 0) != 0
+    |                                      ^^^^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `prctl` in crate `libc`
+   --> src/supervisor.rs:304:26
+    |
+304 |                 || libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0
+    |                          ^^^^^ not found in `libc`
+
+error[E0425]: cannot find value `PR_SET_NO_NEW_PRIVS` in crate `libc`
+   --> src/supervisor.rs:304:38
+    |
+304 |                 || libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0
+    |                                      ^^^^^^^^^^^^^^^^^^^ not found in `libc`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `isolab-eks-recovery` (lib) due to 5 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `isolab-eks-recovery` (lib test) due to 5 previous errors

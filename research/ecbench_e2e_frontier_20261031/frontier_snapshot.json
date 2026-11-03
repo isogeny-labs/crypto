@@ -1,0 +1,149 @@
+{
+  "schema": "ecbench.frontier-snapshot/v1",
+  "as_of": "2026-10-31",
+  "source_commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+  "evidence_binding": "This is a presentation snapshot. Every performance row remains bound to the source, binary, domain, and unit of its cited study; the snapshot commit does not relabel historical measurements.",
+  "registry": {
+    "methods": 74,
+    "nested_solver_backends": 11,
+    "families": {
+      "ic": 31,
+      "rho_or_transfer": 32,
+      "bsgs": 7,
+      "kangaroo": 2,
+      "claw": 2
+    }
+  },
+  "boundary_markers": [
+    {
+      "label": "GHS-weak DL, q=2097091",
+      "domain": "restricted GHS-weak E0/Fq3",
+      "ratio": 0.00523,
+      "reference": "matched negation-map rho",
+      "unit": "Fq-multiplication equivalents",
+      "evidence": "restricted-family counted E2E"
+    },
+    {
+      "label": "GHS-weak B0, q=4051",
+      "domain": "restricted GHS-weak E0/Fq3",
+      "ratio": 0.735,
+      "ci95": [0.662, 0.816],
+      "reference": "matched plain rho",
+      "unit": "Fq-multiplication equivalents",
+      "evidence": "restricted-family counted E2E"
+    },
+    {
+      "label": "Koblitz generator-orbit, n=29, c=1",
+      "domain": "Koblitz one-column fixed setup",
+      "ratio": 0.366,
+      "ci95": [
+        0.241,
+        0.523
+      ],
+      "reference": "same-target rho-frob",
+      "unit": "S pricing band panel",
+      "evidence": "Frobenius-folded BSGS engineering crossover; not scaling IC"
+    },
+    {
+      "label": "Inherited F4, random m=19",
+      "domain": "generic random binary",
+      "ratio": 2.28,
+      "reference": "same-target rho.negation",
+      "unit": "lower-bound S",
+      "evidence": "cross-family E2E diagnostic"
+    },
+    {
+      "label": "Residual collector, prime 36-bit",
+      "domain": "generic prime",
+      "ratio": 2.59,
+      "reference": "same-target rho.negation",
+      "unit": "S",
+      "evidence": "one-target cold leaderboard point"
+    },
+    {
+      "label": "Koblitz descent, best admitted",
+      "domain": "generic Koblitz",
+      "ratio": 3.43,
+      "reference": "same-target rho",
+      "unit": "source-local batched-addition unit",
+      "evidence": "table A"
+    },
+    {
+      "label": "Prime P20 N=45, w=0",
+      "domain": "generic prime",
+      "ratio": 7.95,
+      "ci95": [7.31, 8.64],
+      "reference": "same-session rho.negation",
+      "unit": "S, w=0",
+      "evidence": "second-host validated engineering row"
+    },
+    {
+      "label": "Prime rootfind m=3, 16-bit",
+      "domain": "generic prime",
+      "ratio": 10.1,
+      "reference": "rho.negation",
+      "unit": "bitop/v1",
+      "evidence": "generic root-finding track"
+    }
+  ],
+  "prime_bitop_ladder": {
+    "bits": [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
+    "rho_neg": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "bsgs_neg": [0.558, 0.66, 0.689, 0.868, 0.792, 0.808, 0.853, 0.972, 0.96, 0.934, 0.997, 1.1, 1.06, 1.02, 1.19, 1.05, 1.03, 1.03, 1.09, 1.21, 1.2, 1.04, 1.14, 1.04, 1.04],
+    "kangaroo": [1.23, 1.45, 1.4, 2.42, 2.05, 1.39, 1.94, 1.9, 2.07, 3.35, 2.71, 2.07, 2.33, 1.96, 2.34, 2.2, 1.94, 2.41, 2.16, 3.55, 2.14, 2.63, 2.04, 2.66, 2.29],
+    "ic_pair_rule": [6.23, 7.56, 7.34, 9.45, 9.43, 9.43, 10.5, 11.8, 14.1, 15.1, 17.2, 19.7, 23, 22.8, 28.9, 29.7, 32.1, 37, 42.7, 52.5, 58.7, 51.4, 67.3, 69.5, 78.3],
+    "ic_rootfind_m3_rule": [10.1, 13.7, 14.4, 18.6, 21, 21.5, 24.3, 32.7, 36.5, 41, 47.8, 59.1, 69.7, null, null, null, null, null, null, null, null, null, null, null, null]
+  },
+  "prime_p20_factor_base": {
+    "incumbent_n": 32,
+    "selected_n": 45,
+    "weights": [0, 0.1, 1],
+    "selected_over_incumbent": [0.836, 0.817, 0.746],
+    "selected_over_incumbent_ci95": [[0.806, 0.866], [0.786, 0.847], [0.714, 0.779]],
+    "selected_over_rho": [7.95, 8.24, 9.62],
+    "selected_over_rho_ci95": [[7.31, 8.64], [7.56, 8.97], [8.77, 10.55]],
+    "original_records_matched": 1008,
+    "second_host_records_verified": 2016
+  },
+  "f4_f5_f6": {
+    "cells": ["K13", "R13", "K19", "R19"],
+    "f5_over_f4_word_work": [0.6465, 0.6414, null, null],
+    "f6_saving_log2_inherited_over_f6": [0.291, 0.302, 0.359, 0.372],
+    "relation_wall_inherited_over_f6": [1.86, 1.78, 1.73, 1.84],
+    "f6_over_inherited_s": [68.8, 64.6, 1303.2, 1352.6],
+    "inherited_over_rho_neg": [7.21, 5.89, 3.77, 2.28],
+    "f6_over_rho_neg": [509.8, 399.1, 4883, 2774]
+  },
+  "rho_optimization": {
+    "optimized_over_archived_callgrind_ir": 0.804582,
+    "optimized_over_same_binary_legacy_ir": 0.802155,
+    "speedup_over_same_binary_legacy": 1.246642,
+    "canonicalization_share_before": 0.5391,
+    "canonicalization_share_after": 0.4248,
+    "verified_executions": 864,
+    "measured_replays_identical": 720,
+    "gae_ratio": 1.0,
+    "l2_wall_status": "unknown"
+  },
+  "ghs_weak": {
+    "scope": "E0/Fq3 with #E0(K)=4*ell; not generic, not standard curves",
+    "b0_plain_w0": [
+      {"q": 223, "ratio": 4.22},
+      {"q": 499, "ratio": 2.75},
+      {"q": 991, "ratio": 1.69},
+      {"q": 2011, "ratio": 1.08},
+      {"q": 4051, "ratio": 0.735},
+      {"q": 8191, "ratio": 0.477},
+      {"q": 16363, "ratio": 0.384},
+      {"q": 32719, "ratio": 0.334},
+      {"q": 65479, "ratio": 0.222},
+      {"q": 131071, "ratio": 0.186},
+      {"q": 262111, "ratio": 0.122}
+    ],
+    "n4v2_dl": {
+      "q": 2097091,
+      "over_plain_rho_w0": 0.00456,
+      "over_negation_rho_w0": 0.00523
+    }
+  }
+}

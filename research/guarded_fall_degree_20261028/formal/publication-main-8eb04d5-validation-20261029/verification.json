@@ -1,0 +1,52 @@
+{
+  "schema": "lean-publication-integration-verification/v1",
+  "verification_date": "2026-10-29",
+  "completed_utc": "2026-10-29T20:21:41.427Z",
+  "purpose": "Complete PR 2859 publication after journal-only main overlap; mandatory development verification, no scientific experiment",
+  "validation_commit": "b2df7653e28b3c75701b89c58e74e5e4adf50069",
+  "main_integration_commit": "b2df7653e28b3c75701b89c58e74e5e4adf50069",
+  "integrated_main": "8eb04d5e97a157072190892a29435c373b13ecc4",
+  "source_bindings": {
+    "src": "c26ce4c9fb05224445f2af924ec5ff2409983c6d",
+    "cargo_toml": "37727ebbd8370f6604d842d2b421078bae46a08e",
+    "cargo_lock": "54dcf6ba8d4fac7aa670870730448a9bd18ec319"
+  },
+  "prior_successful_library_receipts": [
+    "../publication-main-refresh-20261029/verification.json",
+    "../publication-integration-20261029/verification.json",
+    "../complete-exact-pair-validation/verification.json"
+  ],
+  "proof_preservation": {
+    "guarded_study_tree_at_both_heads": "2228b36e616d8a1f9aa2a7cbae4f0829c5b8454a",
+    "predecessor": "35da1987e973089f87391f37c3cc041b50fac968",
+    "all_prior_source_receipt_and_fixture_bytes_unchanged": true,
+    "source_recheck": "proof-source-recheck.log",
+    "exit_code": 0,
+    "log_sha256": "c1b56adc1c044b0d0694699a9be77dacf94e6fcc8e1ff238691d5db44117ab99"
+  },
+  "library": {
+    "command": "RAYON_NUM_THREADS=8 cargo test --release --lib --locked -- --test-threads=1",
+    "exit_code": 0,
+    "declared_outer_tests": 5446,
+    "passed": 5323,
+    "failed": 0,
+    "ignored": 123,
+    "measured": 0,
+    "filtered_out": 0,
+    "seconds_reported_by_test_runner": 1905.68,
+    "binary": "target/release/deps/crypto_lib-736382a8cfddd63f",
+    "binary_sha256": "bbf8a67a09f0f1e41c4ab82ad7a489a9986388b4f38f9144d84af35ae6b58737",
+    "raw_bytes": 473665,
+    "raw_sha256": "0267c048a99185c3dd991a864bbe96f21fc2750e942a8fd47d53ac0fee65869f",
+    "lossless_archive_bytes": 75436,
+    "lossless_archive_sha256": "577ae9a38d5ea0da28832dbdf7a2fc960522777f146985fd0ffd8a1a722f319a",
+    "archive_round_trip_verified": true,
+    "raw_retention": "Full development log/archive retained locally at /workspace/scratch/lean-complete-final-integration-20261029/library.log.xz; no scientific result is inferred",
+    "committed_excerpt": "library-summary.txt",
+    "performance_claim": false
+  },
+  "prior_interrupted_attempt": "../publication-main-refresh-20261029/interrupted.json and interrupted-library.log.xz preserve complete SIGKILL attempt; not a pass",
+  "fresh_kernel_replays": "The thirteen prior fresh kernel replays remain bound to unchanged sources/dependencies; no new replay is claimed.",
+  "scientific_experiment": false,
+  "performance_claim": false
+}

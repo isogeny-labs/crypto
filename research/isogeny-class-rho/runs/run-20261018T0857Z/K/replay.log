@@ -1,0 +1,25 @@
+rho: 19 arms x 5 trials = 95 solves (dp_bits 8, r 32)
+
+class mode: 19 arms, 95 solves, all correct (k = 351291982913, n = 549756390943); expected sqrt(pi n/2) = 929277
+arm           kind               min it     mean it      max it  mean ms    ns/op   ratio      z
+v0            isogenous          464254      697832      919882   346.29    495.5   0.751  -2.36
+v1            isogenous          281300     1060320     1528346   506.44    492.8   1.141   0.59
+v2            isogenous          493042     1343438     2568833   661.28    504.0   1.446   1.20
+v3            isogenous          529427      722776      829967   334.62    463.0   0.778  -2.63
+v4            isogenous          450538      963098     1529061   548.64    546.1   1.036   0.14
+v5            isogenous          427457      871426     1207852   412.94    478.6   0.938  -0.42
+v6            isogenous          262188     1117542     1580200   530.64    470.2   1.203   0.80
+v7            isogenous          143386      988717     1235686   515.78    534.2   1.064   0.26
+v11           isogenous          108001      693707     1516738   394.20    570.5   0.747  -1.09
+v16           isogenous          400359      786135     1153194   377.09    479.2   0.846  -1.03
+v20           isogenous          542481     1057610     1599079   521.94    493.8   1.138   0.70
+rep0          iso-control        416724      779282     1519100   365.10    465.8   0.839  -0.78
+rep1          iso-control        305137      812003     1469805   410.98    494.9   0.874  -0.61
+rep2          iso-control        412802      960341     1858490   712.59    749.3   1.033   0.09
+aa            aa-replica         383678      585735      934583   335.02    587.1   0.630  -3.10
+plant-neg     plant              429385      742083     1404162   395.47    541.6   0.799  -1.05
+plant-r4      plant              164295     1078435     2107584   507.92    475.6   1.161   0.41
+fold-frob     fold                60798      145549      245462   289.84   1905.5   0.157 -10.97
+fold-frobneg  fold                 5481      128547      224320   255.07   1951.0   0.138 -11.30
+Kruskal-Wallis H = 10.13 (df 10, p = 0.430); ANOVA F = 0.986 (p = 0.470), variance ratio 0.986; max |z| = 2.63, Bonferroni z_crit = 2.84, flagged: Array []
+wrote research/isogeny-class-rho/runs/run-20261018T0857Z/K/replay

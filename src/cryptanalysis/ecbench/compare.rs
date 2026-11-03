@@ -297,12 +297,29 @@ pub struct WallResult {
     pub ci_method: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dof: Option<f64>,
-    /// End to end: `Σ solve_wall_B / Σ solve_wall_A` and its linearised
-    /// interval.  Carries the work variance; secondary.
+    /// Historical name for `Σ solve_wall_B / Σ solve_wall_A` and its
+    /// linearised interval. Carries the work variance; secondary. This is the
+    /// algorithm solve interval, not the complete cold method or process.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_wall_ratio: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_wall_ci95: Option<(f64, f64)>,
+    /// Complete cold method call: setup, solve, in-child verification and
+    /// report completion, excluding workload construction and process launch.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ratio: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ci95: Option<(f64, f64)>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ci95_bootstrap: Option<(f64, f64)>,
+    /// Fork-to-reap process wall time, including workload reconstruction and
+    /// process overhead. This is the broadest end-to-end practicality figure.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ratio: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ci95: Option<(f64, f64)>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ci95_bootstrap: Option<(f64, f64)>,
     /// The two compared arms run one method: this comparison is itself an
     /// A/A control and has nothing to correct.
     #[serde(default)]
@@ -359,6 +376,10 @@ fn yes() -> bool {
 pub struct Comparison {
     pub schema: String,
     pub comparison_id: String,
+    /// GAE per native operation used to price this comparison. When absent,
+    /// recorded S values are used.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pricing_weight: Option<f64>,
     /// The deterministic bootstrap seed. Historical v1 files did not store
     /// it and remain readable; calibration requires a recorded seed.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -522,6 +543,23 @@ fn ratio_of_sums(pairs: impl Iterator<Item = (f64, f64)>) -> Option<f64> {
     (n > 0 && sa > 0.0).then(|| sb / sa)
 }
 
+/// Target-clustered paired percentile bootstrap of a ratio of sums. It
+/// resamples workloads and their rounds while always keeping each arm's two
+/// observations together.
+fn paired_ratio_bootstrap(
+    by_workload: &BTreeMap<String, Vec<(f64, f64)>>,
+    resamples: usize,
+    seed: u64,
+) -> Option<(f64, f64)> {
+    let strata: Vec<Vec<(f64, f64)>> = by_workload.values().cloned().collect();
+    let stat = |sample: &[Vec<(f64, f64)>]| ratio_of_sums(sample.iter().flatten().copied());
+    if strata.len() >= 2 {
+        cluster_bootstrap_ci(&strata, resamples, seed, stat)
+    } else {
+        bootstrap_ci(&strata, resamples, seed, stat)
+    }
+}
+
 fn pair_ratio(pairs: impl Iterator<Item = Pair>) -> Option<f64> {
     ratio_of_sums(pairs.map(|p| (p.a, p.b)))
 }
@@ -599,17 +637,47 @@ fn priced_pair(ra: &Record, rb: &Record) -> Vec<(Option<f64>, Option<f64>)> {
         .collect()
 }
 
-fn match_pairs(ma: &[&Record], mb: &[&Record]) -> Matched {
+fn run_s(r: &Record, weight: f64) -> Result<Option<f64>, String> {
+    let s = priced_s(r, weight)?;
+    if s.is_some_and(|s| !s.is_finite() || s < 0.0) {
+        return Err("pricing produced a non-finite or negative S value".into());
+    }
+    Ok(s)
+}
+
+fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Matched, String> {
     let (ca, cb) = (arm_censor(ma), arm_censor(mb));
     let key = |r: &Record| (r.workload.workload_id.clone(), r.round);
-    let a: BTreeMap<(String, u32), (&Record, f64, bool)> = ma
-        .iter()
-        .filter_map(|r| run_cost(r, &ca).map(|(s, c)| (key(r), (*r, s, c))))
-        .collect();
-    let b: BTreeMap<(String, u32), (&Record, f64, bool)> = mb
-        .iter()
-        .filter_map(|r| run_cost(r, &cb).map(|(s, c)| (key(r), (*r, s, c))))
-        .collect();
+    let mut a: BTreeMap<(String, u32), (&Record, f64, bool)> = BTreeMap::new();
+    let mut b: BTreeMap<(String, u32), (&Record, f64, bool)> = BTreeMap::new();
+    let mut a_unpriced = 0usize;
+    let mut b_unpriced = 0usize;
+
+    for r in ma {
+        let cost = match weight {
+            Some(w) if r.counts() => run_s(r, w)?.map(|s| (s, false)),
+            Some(_) => None,
+            None => run_cost(r, &ca),
+        };
+        if let Some((s, censored)) = cost {
+            a.insert(key(r), (*r, s, censored));
+        } else if weight.is_some() && r.counts() {
+            a_unpriced += 1;
+        }
+    }
+    for r in mb {
+        let cost = match weight {
+            Some(w) if r.counts() => run_s(r, w)?.map(|s| (s, false)),
+            Some(_) => None,
+            None => run_cost(r, &cb),
+        };
+        if let Some((s, censored)) = cost {
+            b.insert(key(r), (*r, s, censored));
+        } else if weight.is_some() && r.counts() {
+            b_unpriced += 1;
+        }
+    }
+
     let mut by_workload: BTreeMap<String, Vec<Pair>> = BTreeMap::new();
     let mut same_seeds = true;
     for (k, (ra, sa, ca)) in &a {
@@ -630,12 +698,28 @@ fn match_pairs(ma: &[&Record], mb: &[&Record]) -> Matched {
         }
     }
     let paired: usize = by_workload.values().map(|v| v.len()).sum();
-    let unpaired = (a.len() - paired) as u64 + (b.len() - paired) as u64;
-    Matched {
+    let unpaired = (a.len() - paired) as u64
+        + (b.len() - paired) as u64
+        + a_unpriced as u64
+        + b_unpriced as u64;
+    Ok(Matched {
         by_workload,
         unpaired,
         same_seeds,
+    })
+}
+
+fn validate_weighted_totals(matched: &Matched) -> Result<(), String> {
+    let mut a = 0.0;
+    let mut b = 0.0;
+    for pair in matched.by_workload.values().flatten() {
+        a += pair.a;
+        b += pair.b;
     }
+    if !a.is_finite() || !b.is_finite() {
+        return Err("pricing overflowed the total comparison cost".into());
+    }
+    Ok(())
 }
 
 /// The direction in which a censored comparison bounds the true ratio: a
@@ -793,7 +877,20 @@ pub fn compare(
     resamples: usize,
     seed: u64,
 ) -> Result<Comparison, String> {
-    compare_with(
+    compare_weighted(a_dir, a_arm, b_dir, b_arm, resamples, seed, None)
+}
+
+/// Compare with a priced operation weight, retaining all current comparison options.
+pub fn compare_weighted(
+    a_dir: &Path,
+    a_arm: &str,
+    b_dir: Option<&Path>,
+    b_arm: &str,
+    resamples: usize,
+    seed: u64,
+    weight: Option<f64>,
+) -> Result<Comparison, String> {
+    compare_weighted_with(
         a_dir,
         a_arm,
         b_dir,
@@ -803,10 +900,11 @@ pub fn compare(
             seed,
             allow_interrupted: false,
         },
+        weight,
     )
 }
 
-/// [`compare`] with options.
+/// Compare with options.
 pub fn compare_with(
     a_dir: &Path,
     a_arm: &str,
@@ -814,6 +912,19 @@ pub fn compare_with(
     b_arm: &str,
     opts: &CompareOptions,
 ) -> Result<Comparison, String> {
+    compare_weighted_with(a_dir, a_arm, b_dir, b_arm, opts, None)
+}
+
+/// Compare with options and an optional GAE-per-native-operation price.
+pub fn compare_weighted_with(
+    a_dir: &Path,
+    a_arm: &str,
+    b_dir: Option<&Path>,
+    b_arm: &str,
+    opts: &CompareOptions,
+    weight: Option<f64>,
+) -> Result<Comparison, String> {
+    validate_pricing_weight(weight)?;
     let sa = read_session(a_dir)?;
     let ra = read_records(a_dir)?;
     let (sb, rb) = match b_dir {
@@ -827,7 +938,14 @@ pub fn compare_with(
         .as_ref()
         .map(|s| s.measurement.isolation_required)
         .unwrap_or(Level::L2);
-    compare_loaded(&sa, &ra, &sb, &rb, a_arm, b_arm, required, opts)
+    compare_loaded_weighted(&sa, &ra, &sb, &rb, a_arm, b_arm, required, opts, weight)
+}
+
+fn validate_pricing_weight(weight: Option<f64>) -> Result<(), String> {
+    if weight.is_some_and(|w| !w.is_finite() || w < 0.0) {
+        return Err("pricing weight must be finite and nonnegative".into());
+    }
+    Ok(())
 }
 
 /// [`compare_with`] on sessions and records already read; `required` is the
@@ -843,6 +961,23 @@ pub fn compare_loaded(
     required: Level,
     opts: &CompareOptions,
 ) -> Result<Comparison, String> {
+    compare_loaded_weighted(sa, ra, sb, rb, a_arm, b_arm, required, opts, None)
+}
+
+/// compare_loaded with an optional pricing weight.
+#[allow(clippy::too_many_arguments)]
+pub fn compare_loaded_weighted(
+    sa: &Session,
+    ra: &[Record],
+    sb: &Session,
+    rb: &[Record],
+    a_arm: &str,
+    b_arm: &str,
+    required: Level,
+    opts: &CompareOptions,
+    weight: Option<f64>,
+) -> Result<Comparison, String> {
+    validate_pricing_weight(weight)?;
     let (resamples, seed) = (opts.resamples, opts.seed);
     let same_session = sa.session_id == sb.session_id;
     if same_session && a_arm == b_arm {
@@ -886,7 +1021,10 @@ pub fn compare_loaded(
         return Err("the arms report different units".into());
     }
 
-    let matched = match_pairs(&ma, &mb);
+    let matched = match_pairs(&ma, &mb, weight)?;
+    if weight.is_some() {
+        validate_weighted_totals(&matched)?;
+    }
     let workload_of: BTreeMap<&str, &Record> = ma
         .iter()
         .map(|r| (r.workload.workload_id.as_str(), *r))
@@ -1019,32 +1157,34 @@ pub fn compare_loaded(
         opts.allow_interrupted,
     );
     let ids = |extra: bool| {
-        short_id(
-            "ECC1",
-            &if extra {
-                json!({
-                    "schema": COMPARISON_SCHEMA_V2,
-                    "a": [a.session_id, a.arm, a.method_id],
-                    "b": [b.session_id, b.arm, b.method_id],
-                    "resamples": resamples,
-                    "seed": seed.to_string(),
-                    "allow_interrupted": opts.allow_interrupted,
-                })
-            } else {
-                json!({
-                    "a": [a.session_id, a.arm, a.method_id],
-                    "b": [b.session_id, b.arm, b.method_id],
-                    "resamples": resamples,
-                    "seed": seed.to_string(),
-                })
-            },
-        )
+        let mut identity = if extra {
+            json!({
+                "schema": COMPARISON_SCHEMA_V2,
+                "a": [a.session_id, a.arm, a.method_id],
+                "b": [b.session_id, b.arm, b.method_id],
+                "resamples": resamples,
+                "seed": seed.to_string(),
+                "allow_interrupted": opts.allow_interrupted,
+            })
+        } else {
+            json!({
+                "a": [a.session_id, a.arm, a.method_id],
+                "b": [b.session_id, b.arm, b.method_id],
+                "resamples": resamples,
+                "seed": seed.to_string(),
+            })
+        };
+        if let Some(w) = weight {
+            identity["pricing_weight"] = json!(w.to_string());
+        }
+        short_id("ECC1", &identity)
     };
     let (comparison_id, _) = ids(true)?;
     let (legacy_id, _) = ids(false)?;
     Ok(Comparison {
         schema: COMPARISON_SCHEMA_V2.into(),
         comparison_id,
+        pricing_weight: weight,
         resample_seed: Some(seed),
         a,
         b,
@@ -1054,7 +1194,7 @@ pub fn compare_loaded(
         wall,
         quality: Some(quality),
         verdict,
-        legacy_comparison_id: Some(legacy_id),
+        legacy_comparison_id: weight.is_none().then_some(legacy_id),
         a_session_status: Some(sa.status.clone()),
         b_session_status: Some(sb.status.clone()),
         allow_interrupted: opts.allow_interrupted,
@@ -1338,6 +1478,14 @@ struct WallData {
     all: Vec<WallPair>,
     /// Pairs where both runs earned `required`.
     admitted: Vec<WallPair>,
+    all_method_call: Vec<(f64, f64)>,
+    admitted_method_call: Vec<(f64, f64)>,
+    all_method_call_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    admitted_method_call_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    all_process: Vec<(f64, f64)>,
+    admitted_process: Vec<(f64, f64)>,
+    all_process_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    admitted_process_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
     pairs: u64,
     below: u64,
 }
@@ -1355,10 +1503,18 @@ fn wall_data(recs: &[Record], a: &str, b: &str, required: Level) -> WallData {
     let mut d = WallData {
         all: Vec::new(),
         admitted: Vec::new(),
+        all_method_call: Vec::new(),
+        admitted_method_call: Vec::new(),
+        all_method_call_by_workload: BTreeMap::new(),
+        admitted_method_call_by_workload: BTreeMap::new(),
+        all_process: Vec::new(),
+        admitted_process: Vec::new(),
+        all_process_by_workload: BTreeMap::new(),
+        admitted_process_by_workload: BTreeMap::new(),
         pairs: 0,
         below: 0,
     };
-    for (_, (ra, rb)) in by {
+    for ((workload, _round), (ra, rb)) in by {
         let (Some(ra), Some(rb)) = (ra, rb) else {
             continue;
         };
@@ -1369,6 +1525,37 @@ fn wall_data(recs: &[Record], a: &str, b: &str, required: Level) -> WallData {
         let below = ra.isolation.level < required || rb.isolation.level < required;
         if below {
             d.below += 1;
+        }
+        let process = (
+            ra.time.process_wall_ns as f64,
+            rb.time.process_wall_ns as f64,
+        );
+        d.all_process.push(process);
+        d.all_process_by_workload
+            .entry(workload.clone())
+            .or_default()
+            .push(process);
+        if !below {
+            d.admitted_process.push(process);
+            d.admitted_process_by_workload
+                .entry(workload.clone())
+                .or_default()
+                .push(process);
+        }
+        if let (Some(a), Some(b)) = (ra.time.method_call_wall_ns, rb.time.method_call_wall_ns) {
+            let method_call = (a as f64, b as f64);
+            d.all_method_call.push(method_call);
+            d.all_method_call_by_workload
+                .entry(workload.clone())
+                .or_default()
+                .push(method_call);
+            if !below {
+                d.admitted_method_call.push(method_call);
+                d.admitted_method_call_by_workload
+                    .entry(workload)
+                    .or_default()
+                    .push(method_call);
+            }
         }
         if let (true, Some(ga), Some(gb)) = (ta > 0 && tb > 0, ra.cost.total_gae, rb.cost.total_gae)
         {
@@ -1526,6 +1713,12 @@ fn wall_compare(
         dof: None,
         total_wall_ratio: None,
         total_wall_ci95: None,
+        method_call_wall_ratio: None,
+        method_call_wall_ci95: None,
+        method_call_wall_ci95_bootstrap: None,
+        process_wall_ratio: None,
+        process_wall_ci95: None,
+        process_wall_ci95_bootstrap: None,
         self_aa: false,
         aa_selection: None,
         aa_ratio: None,
@@ -1560,6 +1753,24 @@ fn wall_compare(
         w.ns_per_gae_a = Some(f.ns_per_gae_a);
         w.ns_per_gae_b = Some(f.ns_per_gae_b);
     }
+    if let Some(ratio) = linearised_ratio(&data.all_method_call) {
+        w.method_call_wall_ratio = Some(ratio.estimate);
+        w.method_call_wall_ci95 = ratio.ci95_log();
+    }
+    w.method_call_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.all_method_call_by_workload,
+        resamples,
+        seed ^ 0x4D45_5448_4F44,
+    );
+    if let Some(ratio) = linearised_ratio(&data.all_process) {
+        w.process_wall_ratio = Some(ratio.estimate);
+        w.process_wall_ci95 = ratio.ci95_log();
+    }
+    w.process_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.all_process_by_workload,
+        resamples,
+        seed ^ 0x5052_4F43_4553_53,
+    );
     if data.below > 0 {
         w.reasons.push(format!(
             "{} of {} pairs did not reach {}",
@@ -1591,6 +1802,24 @@ fn wall_compare(
     w.dof = Some(fig.ratio.df);
     w.total_wall_ratio = fig.total.map(|t| t.estimate);
     w.total_wall_ci95 = fig.total.and_then(|t| t.ci95_log());
+    if let Some(ratio) = linearised_ratio(&data.admitted_method_call) {
+        w.method_call_wall_ratio = Some(ratio.estimate);
+        w.method_call_wall_ci95 = ratio.ci95_log();
+    }
+    w.method_call_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.admitted_method_call_by_workload,
+        resamples,
+        seed ^ 0x4D45_5448_4F44,
+    );
+    if let Some(ratio) = linearised_ratio(&data.admitted_process) {
+        w.process_wall_ratio = Some(ratio.estimate);
+        w.process_wall_ci95 = ratio.ci95_log();
+    }
+    w.process_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.admitted_process_by_workload,
+        resamples,
+        seed ^ 0x5052_4F43_4553_53,
+    );
 
     // The noise floor and bias correction.
     let mut arms: BTreeMap<String, (String, String)> = BTreeMap::new();
@@ -1807,6 +2036,7 @@ mod tests {
         } else {
             json!(wall_ns)
         });
+        v["time"]["method_call_wall_ns"] = json!(wall_ns + 500_000);
         v["time"]["process_wall_ns"] = json!(wall_ns + 1_000_000);
         v["algorithm_seed"] = json!(format!("{round}"));
         let mut r: Record = serde_json::from_value(v).unwrap();
@@ -2172,6 +2402,16 @@ mod tests {
         let aa = c.wall.aa_ratio.unwrap();
         assert!((aa - 1.02).abs() < 0.02, "A/A ratio {aa}");
         assert!(c.wall.corrected_ratio.is_some());
+        assert!(c.wall.method_call_wall_ratio.is_some());
+        assert!(c.wall.method_call_wall_ci95.is_some());
+        assert!(c.wall.method_call_wall_ci95_bootstrap.is_some());
+        assert!(c.wall.process_wall_ratio.is_some());
+        assert!(c.wall.process_wall_ci95.is_some());
+        assert!(c.wall.process_wall_ci95_bootstrap.is_some());
+        assert!(
+            c.wall.process_wall_ratio.unwrap() < c.wall.total_wall_ratio.unwrap(),
+            "the fixed process overhead attenuates B/A"
+        );
         assert!(c.wall.legacy_ci95.is_some());
         assert!(c.wall.median_ratio.is_some());
         assert!(c.verdict.contains("INDICATIVE"), "{}", c.verdict);
@@ -2262,5 +2502,139 @@ mod tests {
         assert!(v1.admissible);
         assert!(v1.ops.ci95_bootstrap.is_none() && v1.ops.bound.is_none());
         assert!(v1.wall.ratio_b_over_a.is_none());
+    }
+    #[test]
+    fn weighted_comparison_prices_verified_pairs_and_records_weight_identity() {
+        let mut a = rec(
+            "A",
+            "M1",
+            "reference",
+            "W00",
+            1,
+            "verified",
+            Some(10.0),
+            1_000,
+        );
+        let mut b = rec(
+            "B",
+            "M2",
+            "candidate",
+            "W00",
+            1,
+            "verified",
+            Some(20.0),
+            2_000,
+        );
+        for r in [&mut a, &mut b] {
+            r.cost.unpriced.push("custom_native".into());
+            r.counters.insert("custom_native".into(), 10);
+        }
+        let session = session("weighted-test", "complete");
+        let records = vec![a, b];
+        let opts = CompareOptions {
+            resamples: 50,
+            seed: 1,
+            allow_interrupted: false,
+        };
+        let unweighted = compare_loaded_weighted(
+            &session,
+            &records,
+            &session,
+            &records,
+            "A",
+            "B",
+            Level::L2,
+            &opts,
+            None,
+        )
+        .unwrap();
+        let zero = compare_loaded_weighted(
+            &session,
+            &records,
+            &session,
+            &records,
+            "A",
+            "B",
+            Level::L2,
+            &opts,
+            Some(0.0),
+        )
+        .unwrap();
+        let one = compare_loaded_weighted(
+            &session,
+            &records,
+            &session,
+            &records,
+            "A",
+            "B",
+            Level::L2,
+            &opts,
+            Some(1.0),
+        )
+        .unwrap();
+
+        assert_eq!(unweighted.pricing_weight, None);
+        assert_eq!(zero.pricing_weight, Some(0.0));
+        assert_eq!(one.pricing_weight, Some(1.0));
+        assert_ne!(unweighted.comparison_id, zero.comparison_id);
+        assert_ne!(zero.comparison_id, one.comparison_id);
+        assert!(unweighted.legacy_comparison_id.is_some());
+        assert!(zero.legacy_comparison_id.is_none());
+        assert!(one.legacy_comparison_id.is_none());
+        assert!(one.workloads[0].a_mean_s.unwrap() > zero.workloads[0].a_mean_s.unwrap());
+    }
+
+    #[test]
+    fn weighted_comparison_rejects_negative_or_nonfinite_weights() {
+        assert!(validate_pricing_weight(Some(-0.1)).is_err());
+        assert!(validate_pricing_weight(Some(f64::NAN)).is_err());
+        assert!(validate_pricing_weight(Some(f64::INFINITY)).is_err());
+        assert!(validate_pricing_weight(Some(0.0)).is_ok());
+    }
+
+    #[test]
+    fn unpriceable_weighted_runs_count_as_unpaired_on_both_arms() {
+        let mut a = rec(
+            "A",
+            "M1",
+            "reference",
+            "W00",
+            1,
+            "verified",
+            Some(10.0),
+            1_000,
+        );
+        let mut b = rec(
+            "B",
+            "M2",
+            "candidate",
+            "W00",
+            1,
+            "verified",
+            Some(20.0),
+            2_000,
+        );
+        a.cost.total_gae = None;
+        b.cost.total_gae = None;
+        let matched = match_pairs(&[&a], &[&b], Some(1.0)).unwrap();
+        assert_eq!(matched.unpaired, 2);
+        assert!(matched.by_workload.is_empty());
+    }
+
+    #[test]
+    fn weighted_cost_overflow_is_rejected() {
+        let mut r = rec(
+            "A",
+            "M1",
+            "reference",
+            "W00",
+            1,
+            "verified",
+            Some(10.0),
+            1_000,
+        );
+        r.cost.unpriced.push("custom_native".into());
+        r.counters.insert("custom_native".into(), 2);
+        assert!(run_s(&r, f64::MAX).is_err());
     }
 }

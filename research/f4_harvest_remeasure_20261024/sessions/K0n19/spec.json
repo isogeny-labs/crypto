@@ -1,0 +1,94 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "harvest re-measure icv1-f2m19-t797-b6cf2467: root linear-row harvest off / default / gpv at m=3, off / default at m=2 (control)",
+ "description": "Preregistered in PROTOCOL.md of this directory before any session of this study existed. Same inherited-F4 engine, same base, same targets in every IC arm; the arms differ only in the linear_harvest method parameter. Counts only; no wall-time claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 19
+   }
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 202610241901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "f4-m3-off",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=7",
+     "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192,linear_harvest=off",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "f4-m3-default",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=7",
+     "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192,linear_harvest=default",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "f4-m3-gpv",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=7",
+     "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192,linear_harvest=gpv",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "f4-m2-off",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=7",
+     "oracle": "pdp3-koblitz:m=2,engine=inherited-f4,degree=3,node_budget=8192,linear_harvest=off",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "f4-m2-default",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=7",
+     "oracle": "pdp3-koblitz:m=2,engine=inherited-f4,degree=3,node_budget=8192,linear_harvest=default",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate_measured",
+  "seed": 202610241902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

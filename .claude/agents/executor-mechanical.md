@@ -18,6 +18,12 @@ relayed unchanged by the main session as the text `python3
 tools/task_card.py prompt <card>` printed. Your output is an observation,
 never a result claim.
 
+Default x86 experiment cards submit to Iso Lab on EKS Spot (AGENTS.md §9a).
+AWS authentication comes from the executor process. Run only the frozen card:
+do not replace the launcher with a local benchmark, change the requested image,
+request keys, or resubmit a timed-out launch. Missing access or a failing step
+is returned through the existing receipt and output without changing the card.
+
 The card format (`crypto.autoresearch.mechanical-task-card.v1`) and
 `tools/task_card.py` are the same in aburan28/crypto-autoresearcher, crypto
 and cryptanalysis, so a card written in any of them runs the same way here.

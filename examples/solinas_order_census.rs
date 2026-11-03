@@ -49,7 +49,7 @@ fn is_prime(n: u64) -> bool {
         return false;
     }
     for p in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % p == 0 {
+        if n.is_multiple_of(p) {
             return n == p;
         }
     }
@@ -85,7 +85,7 @@ fn model2() -> Vec<[f64; NB]> {
             for c in 0..MOD2 {
                 for d in 0..MOD2 {
                     let det = (a * d + MOD2 * MOD2 - b * c % MOD2) % MOD2;
-                    if det % 2 == 0 {
+                    if det.is_multiple_of(2) {
                         continue;
                     }
                     let tr = (a + d) % MOD2;
@@ -135,7 +135,13 @@ fn model_l(l: u64) -> Vec<f64> {
         }
     }
     (0..l as usize)
-        .map(|d| if tot[d] > 0 { hit[d] as f64 / tot[d] as f64 } else { 0.0 })
+        .map(|d| {
+            if tot[d] > 0 {
+                hit[d] as f64 / tot[d] as f64
+            } else {
+                0.0
+            }
+        })
         .collect()
 }
 
@@ -228,7 +234,11 @@ fn chi2(obs: &[u64; NB], prob: &[f64; NB], n: u64) -> (f64, usize) {
             *le += ae;
         }
     }
-    let stat: f64 = o.iter().zip(e.iter()).map(|(o, e)| (o - e) * (o - e) / e).sum();
+    let stat: f64 = o
+        .iter()
+        .zip(e.iter())
+        .map(|(o, e)| (o - e) * (o - e) / e)
+        .sum();
     (stat, o.len().saturating_sub(1))
 }
 
@@ -303,12 +313,16 @@ fn census(p: u64, curves: u64, seed: u64) -> ([u64; NB], u64, u64, u64) {
             }
         }
         let order = (p as i64 + 1 + s) as u64;
-        let v = if order == 0 { J } else { order.trailing_zeros().min(J) };
+        let v = if order == 0 {
+            J
+        } else {
+            order.trailing_zeros().min(J)
+        };
         obs[v as usize] += 1;
-        if order % 3 == 0 {
+        if order.is_multiple_of(3) {
             h3 += 1;
         }
-        if order % 5 == 0 {
+        if order.is_multiple_of(5) {
             h5 += 1;
         }
         done += 1;
@@ -436,7 +450,7 @@ fn main() {
         let mut got = 0;
         while got < nulls {
             let lo = 1u64 << (n - 1);
-            let cand = lo + splitmix(&mut rs) % lo | 1;
+            let cand = (lo + splitmix(&mut rs) % lo) | 1;
             if is_prime(cand) && !seen.contains(&cand) {
                 seen.insert(cand);
                 jobs.push(("generic", shape, n, k, cand, splitmix(&mut rs)));
@@ -455,7 +469,9 @@ fn main() {
         let (m2, m3, m5) = (m2.clone(), m3.clone(), m5.clone());
         hs.push(thread::spawn(move || loop {
             let job = queue.lock().unwrap().pop();
-            let Some((role, shape, n, k, p, s)) = job else { break };
+            let Some((role, shape, n, k, p, s)) = job else {
+                break;
+            };
             let row = analyse(role, shape, n, k, p, curves, s, &m2, &m3, &m5);
             eprintln!("done {} p={} ({} bits)", role, p, n);
             results.lock().unwrap().push(row);
@@ -484,7 +500,10 @@ fn main() {
     let alpha = 0.01;
     let tests_f1 = rows.len() * 3; // F1, F3, F4 per prime
     let thr = alpha / tests_f1 as f64;
-    println!("alpha={} Bonferroni over {} F1/F3/F4 tests: threshold {:.3e}", alpha, tests_f1, thr);
+    println!(
+        "alpha={} Bonferroni over {} F1/F3/F4 tests: threshold {:.3e}",
+        alpha, tests_f1, thr
+    );
     for role in ["target", "residue-matched", "generic"] {
         let sel: Vec<&PrimeRow> = rows.iter().filter(|r| r.role == role).collect();
         let rej = |f: fn(&PrimeRow) -> f64| sel.iter().filter(|r| f(r) < thr).count();

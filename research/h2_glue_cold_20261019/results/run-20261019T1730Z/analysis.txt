@@ -1,0 +1,101 @@
+targets 320, instances 16, unverified rows 0
+A/A exact replay (Rr == R, all counters, 320 targets): True
+replay pass: 192 rows re-run, identical counters: True
+A/A independent (Rp/R) over 36 combos: ratio range [1.0225, 1.0228], all CIs contain 1: True, pass (strict |r-1|<0.03: True; CI-only: True; rule in force A1 CI-only): True
+positive control (plain/neg rho) ratio range [1.394, 1.410], all CI > 1: True
+rho calibration mean steps/(0.886 sqrt ell): {36: 1.0602863897772852, 40: 1.022994654480241}, pass: True
+ALL CONTROLS PASS: True
+equal-memory rho choice d* per instance: {'36/0': 2, '36/1': 2, '36/2': 2, '36/3': 2, '36/4': 2, '36/5': 2, '36/6': 2, '36/7': 2, '40/0': 2, '40/1': 2, '40/2': 2, '40/3': 2, '40/4': 2, '40/5': 2, '40/6': 2, '40/7': 2}
+
+cell (S/M, I/M): J/comparator ratio [95% CI] at nu=0 | 0.1 | 1 -> verdict
+  (0.0, 1): 1.939 [1.773,2.130] | 1.986 [1.820,2.171] | 2.204 [2.019,2.411] -> rho-wins
+  (0.0, 10): 1.491 [1.363,1.639] | 1.613 [1.478,1.763] | 2.053 [1.880,2.246] -> rho-wins
+  (0.0, 100): 1.075 [0.982,1.182] | 1.270 [1.161,1.396] | 1.914 [1.753,2.094] -> unresolved
+  (0.0, 1000): 0.996 [0.910,1.095] | 1.206 [1.101,1.325] | 1.888 [1.729,2.065] -> unresolved
+  (0.5, 1): 1.780 [1.628,1.956] | 1.855 [1.700,2.028] | 2.151 [1.970,2.353] -> rho-wins
+  (0.5, 10): 1.443 [1.319,1.586] | 1.573 [1.442,1.720] | 2.037 [1.866,2.228] -> rho-wins
+  (0.5, 100): 1.074 [0.981,1.180] | 1.269 [1.159,1.395] | 1.913 [1.752,2.093] -> unresolved
+  (0.5, 1000): 0.996 [0.910,1.095] | 1.206 [1.101,1.325] | 1.887 [1.729,2.065] -> unresolved
+  (1.0, 1): 1.667 [1.524,1.832] | 1.762 [1.615,1.925] | 2.113 [1.935,2.311] -> rho-wins
+  (1.0, 10): 1.403 [1.282,1.542] | 1.541 [1.412,1.684] | 2.024 [1.854,2.214] -> rho-wins
+  (1.0, 100): 1.072 [0.980,1.178] | 1.268 [1.158,1.393] | 1.913 [1.752,2.093] -> unresolved
+  (1.0, 1000): 0.996 [0.910,1.095] | 1.205 [1.101,1.325] | 1.887 [1.729,2.065] -> unresolved
+
+cells: rho-wins 6, IC-wins 0, unresolved 6; DECISION: SCOPE the <=22M+I genus-2 addition
+
+J/R (default negation rho only), nu=0.1:
+  (0.0, 1): 1.986 [1.820,2.171]
+  (0.0, 10): 1.613 [1.478,1.763]
+  (0.0, 100): 1.268 [1.162,1.386]
+  (0.0, 1000): 1.203 [1.102,1.315]
+  (0.5, 1): 1.855 [1.700,2.028]
+  (0.5, 10): 1.573 [1.442,1.720]
+  (0.5, 100): 1.267 [1.161,1.385]
+  (0.5, 1000): 1.203 [1.102,1.315]
+  (1.0, 1): 1.762 [1.615,1.925]
+  (1.0, 10): 1.541 [1.412,1.684]
+  (1.0, 100): 1.266 [1.160,1.384]
+  (1.0, 1000): 1.203 [1.102,1.315]
+
+break-even Jacobian addition cost (M-equivalent, nu=0.1) vs measured backend cost:
+  backend: Jacobian add 34.00M + 7.00S + 1.000I ; E(F_p^2) add 9.00M + 4.00S + 1.000I
+  (0.0, 1): measured 35.0M-eq, break-even 10.0M-eq (= 0.29 x measured), other J cost share 0.30
+  (0.0, 10): measured 44.0M-eq, break-even 14.6M-eq (= 0.33 x measured), other J cost share 0.43
+  (0.0, 100): measured 134.0M-eq, break-even 59.9M-eq (= 0.45 x measured), other J cost share 0.62
+  (0.0, 1000): measured 1034.0M-eq, break-even 513.2M-eq (= 0.50 x measured), other J cost share 0.66
+  (0.5, 1): measured 38.5M-eq, break-even 12.5M-eq (= 0.32 x measured), other J cost share 0.32
+  (0.5, 10): measured 47.5M-eq, break-even 17.1M-eq (= 0.36 x measured), other J cost share 0.43
+  (0.5, 100): measured 137.5M-eq, break-even 62.4M-eq (= 0.45 x measured), other J cost share 0.61
+  (0.5, 1000): measured 1037.5M-eq, break-even 515.7M-eq (= 0.50 x measured), other J cost share 0.66
+  (1.0, 1): measured 42.0M-eq, break-even 15.0M-eq (= 0.36 x measured), other J cost share 0.33
+  (1.0, 10): measured 51.0M-eq, break-even 19.6M-eq (= 0.38 x measured), other J cost share 0.43
+  (1.0, 100): measured 141.0M-eq, break-even 64.9M-eq (= 0.46 x measured), other J cost share 0.61
+  (1.0, 1000): measured 1041.0M-eq, break-even 518.2M-eq (= 0.50 x measured), other J cost share 0.66
+
+SECONDARY (not for the decision): tally of rho-wins / IC-wins / unresolved cells, and range of J/cmp at nu=0.1
+  primary (Legendre = I): rho-wins 6, IC-wins 0, unresolved 6; J/cmp at nu=0.1 in [1.205, 1.986]
+  Legendre = 0: rho-wins 6, IC-wins 0, unresolved 6; J/cmp at nu=0.1 in [0.811, 1.946]
+  Legendre = 30M: rho-wins 6, IC-wins 0, unresolved 6; J/cmp at nu=0.1 in [0.823, 3.131]
+  hyp: add = 22M+I, Legendre = I: rho-wins 3, IC-wins 0, unresolved 9; J/cmp at nu=0.1 in [1.198, 1.512]
+  hyp: add = 22M+I, Legendre = 0: rho-wins 2, IC-wins 0, unresolved 10; J/cmp at nu=0.1 in [0.805, 1.473]
+
+break-even Jacobian addition cost c* (M-equivalents) at which J == comparator, by nu; negative = even a free addition loses
+  (S/M 0.0, I/M 1): c* = 15.3 | 10.0 | -40.0   measured 35.0, 22M+I = 23
+  (S/M 0.0, I/M 10): c* = 24.6 | 14.6 | -80.5   measured 44.0, 22M+I = 32
+  (S/M 0.0, I/M 100): c* = 117.1 | 59.9 | -485.3   measured 134.0, 22M+I = 122
+  (S/M 0.0, I/M 1000): c* = 1041.8 | 513.2 | -4532.7   measured 1034.0, 22M+I = 1022
+  (S/M 0.5, I/M 1): c* = 18.9 | 12.5 | -47.6   measured 38.5, 22M+I = 23
+  (S/M 0.5, I/M 10): c* = 28.1 | 17.1 | -88.0   measured 47.5, 22M+I = 32
+  (S/M 0.5, I/M 100): c* = 120.6 | 62.4 | -492.8   measured 137.5, 22M+I = 122
+  (S/M 0.5, I/M 1000): c* = 1045.4 | 515.7 | -4540.2   measured 1037.5, 22M+I = 1022
+  (S/M 1.0, I/M 1): c* = 22.4 | 15.0 | -55.1   measured 42.0, 22M+I = 23
+  (S/M 1.0, I/M 10): c* = 31.7 | 19.6 | -95.6   measured 51.0, 22M+I = 32
+  (S/M 1.0, I/M 100): c* = 124.1 | 64.9 | -500.3   measured 141.0, 22M+I = 122
+  (S/M 1.0, I/M 1000): c* = 1048.9 | 518.2 | -4547.8   measured 1041.0, 22M+I = 1022
+
+time x memory (mean per target; cost at S/M=0.5, I/M=10, nu=0.1 in units of p):
+ bits 36:
+      J: steps/sqrt(l) 0.449  words/p 1.5719  cost/p 37.82
+     D0: steps/sqrt(l) 0.871  words/p 3.4565  cost/p 24.95
+     D2: steps/sqrt(l) 0.901  words/p 0.8938  cost/p 24.36
+     D4: steps/sqrt(l) 0.933  words/p 0.2311  cost/p 24.82
+     D6: steps/sqrt(l) 0.914  words/p 0.0566  cost/p 24.22
+     D8: steps/sqrt(l) 0.911  words/p 0.0140  cost/p 23.78
+    D10: steps/sqrt(l) 0.897  words/p 0.0035  cost/p 23.25
+    D12: steps/sqrt(l) 0.969  words/p 0.0009  cost/p 25.02
+      R: steps/sqrt(l) 0.939  words/p 0.0146  cost/p 24.50
+     Pl: steps/sqrt(l) 1.163  words/p 0.0182  cost/p 30.19
+ bits 40:
+      J: steps/sqrt(l) 0.439  words/p 1.5368  cost/p 36.56
+     D0: steps/sqrt(l) 0.892  words/p 3.5395  cost/p 25.18
+     D2: steps/sqrt(l) 0.869  words/p 0.8621  cost/p 23.16
+     D4: steps/sqrt(l) 0.903  words/p 0.2239  cost/p 23.68
+     D6: steps/sqrt(l) 0.941  words/p 0.0582  cost/p 24.55
+     D8: steps/sqrt(l) 0.906  words/p 0.0140  cost/p 23.27
+    D10: steps/sqrt(l) 0.878  words/p 0.0034  cost/p 22.36
+    D12: steps/sqrt(l) 0.958  words/p 0.0009  cost/p 24.32
+      R: steps/sqrt(l) 0.906  words/p 0.0070  cost/p 23.14
+     Pl: steps/sqrt(l) 1.313  words/p 0.0102  cost/p 33.42
+
+wall seconds per target (descriptive, shared VM, threaded): R=0.23, Rp=0.24, J=0.34, Pl=0.30
+wall A/A Rp/R = 1.0832 (no wall ranking is claimed)

@@ -34,6 +34,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
     solving_degree_from, sym_semaev_s3, FieldStructure, SymElement,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_from64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use crypto_lib::cryptanalysis::semaev_decomp::Gf2;
 use num_bigint::BigUint;
@@ -733,7 +734,7 @@ fn selftest() {
             for bases in [[&v, &v, &v], [&v, &w, &v]] {
                 let (eqs, nv) = system_m3(&f, [bases[0], bases[1], bases[2]], x_r, 1);
                 let ex = (0..1u64 << nv)
-                    .filter(|&p| eqs.iter().all(|e| e.eval(p) == 0))
+                    .filter(|&p| eqs.iter().all(|e| e.eval(mask_from64(p)) == 0))
                     .count() as u64;
                 let c = count_m3(&f, [bases[0], bases[1], bases[2]], x_r, 1);
                 assert_eq!(ex, c, "m=3 count n={n} l={l}");
@@ -758,7 +759,7 @@ fn selftest() {
                     .iter()
                     .all(|e| e.terms.iter().all(|m| m.mask.count_ones() <= 2)));
                 let ex = (0..1u64 << nv)
-                    .filter(|&p| eqs.iter().all(|e| e.eval(p) == 0))
+                    .filter(|&p| eqs.iter().all(|e| e.eval(mask_from64(p)) == 0))
                     .count() as u64;
                 assert_eq!(
                     ex,

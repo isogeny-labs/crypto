@@ -1,0 +1,64 @@
+// Append to frozen original CM22 circuit prefix and saved closure declaration.
+LIB "primdec.lib";
+ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal registeredUnits=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
+ring zb=(2,a),(v),lp;
+minpoly=a5+a4+a3+a2+1;
+number ua=a;
+poly rn=(ua+1)*v+1;
+poly cn=rn+ua^3;
+poly bp=rn*cn/ua^7;
+poly cp=cn/ua^4;
+poly ec=v2+v+ua^3+ua;
+poly de=bp+cp*(1+cp)^3;
+poly selector=gcd(ec,de);
+print("BEGIN_Z23_FIBER");
+print("BASE_POINT_SELECTOR");selector;
+if(deg(selector)!=1){ERROR("Z5 selector is not unique");}
+number vv=leadcoef(subst(selector,v,0))/leadcoef(selector);
+number bb=leadcoef(subst(bp,v,vv));
+number cc=leadcoef(subst(cp,v,vv));
+print("SELECTED_V_B_C");vv;bb;cc;
+print("BASE_POINT_AND_DISCRIMINANT_RESIDUALS");subst(ec,v,vv);bb+cc*(1+cc)^3;
+if(subst(ec,v,vv)!=0 || bb+cc*(1+cc)^3!=0){ERROR("wrong Z5 point");}
+ring zz=(2,a),(n,l),lp;
+minpoly=a5+a4+a3+a2+1;
+number bz=imap(zb,bb);
+number cz=imap(zb,cc);
+map sp=r,n,l,bz,cz;
+ideal oz=sp(original);
+ideal czIdeal=sp(source);
+ideal uz=sp(registeredUnits);
+ideal O=std(oz);
+ideal C=std(czIdeal);
+print("ORIGINAL_FIBER_BASIS_DIMENSION_LENGTH");O;dim(O);vdim(O);
+print("CLOSURE_FIBER_BASIS_DIMENSION_LENGTH");C;dim(C);vdim(C);
+print("ORIGINAL_REGISTERED_UNIT_ENTRIES");uz;
+int k;
+for(k=1;k<=size(uz);k++){
+  print("ORIGINAL_UNIT_"+string(k)+"_VANISHING_LENGTH");
+  vdim(std(O+ideal(uz[k])));
+  print("CLOSURE_UNIT_"+string(k)+"_VANISHING_LENGTH");
+  vdim(std(C+ideal(uz[k])));
+}
+if(dim(C)!=0 || dim(O)!=0){ERROR("Z5 fiber not zero dimensional");}
+print("ORIGINAL_PRIMARY_DECOMPOSITION");
+list od=primdecGTZ(O);od;
+print("CLOSURE_PRIMARY_DECOMPOSITION");
+list cd=primdecGTZ(C);cd;
+ideal oi=ideal(1);ideal ci=ideal(1);
+for(k=1;k<=size(od);k++){
+  print("ORIGINAL_COMPONENT_"+string(k)+"_PRIMARY_RADICAL_LENGTHS");
+  vdim(std(od[k][1]));vdim(std(od[k][2]));
+  oi=intersect(oi,od[k][1]);
+}
+for(k=1;k<=size(cd);k++){
+  print("CLOSURE_COMPONENT_"+string(k)+"_PRIMARY_RADICAL_LENGTHS");
+  vdim(std(cd[k][1]));vdim(std(cd[k][2]));
+  ci=intersect(ci,cd[k][1]);
+}
+print("PRIMARY_INTERSECTION_RESIDUALS");
+reduce(std(oi),O);reduce(O,std(oi));reduce(std(ci),C);reduce(C,std(ci));
+if(size(reduce(std(oi),O))!=0 || size(reduce(O,std(oi)))!=0 || size(reduce(std(ci),C))!=0 || size(reduce(C,std(ci)))!=0){ERROR("decomposition verification failed");}
+print("Z23_ALL_FIBER_CHECKS_PASS");
+print("END_Z23_FIBER");quit;

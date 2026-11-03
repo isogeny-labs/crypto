@@ -90,6 +90,15 @@ establish why a candidate was skipped.
 
 ## Resolution and history
 
+2026-10-26: R08's two-hour allocation is confirmed finished at
+2026-10-25 07:52:38 UTC with native exit 0 and no new factor. The saved
+collection file has 10,441,117 raw rows. Fresh product/prime replay remains
+partial with the same 444-bit residual; FactorDB still has no proper split.
+The [completion explanation](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/reports/completion-20261026T2122Z/REPORT.md)
+and [prospective filtering submission](../backlog/XP-20261026-nist-p256-checkpoint-filter/README.md)
+distinguish raw collection from R07's older 92-survivor result. New filtering
+and matrix rank remain unverified. No collection process remains running.
+
 2026-10-21: PARI completed six targets. ECM found additional prime factors
 of all three remaining target lineages. All 100 final B1=3000000 curves
 per residual completed without a new factor. Unresolved.
@@ -137,10 +146,21 @@ products and that their pieces only group whole local pieces. Seven
 original targets are more completely factored locally and two partitions
 agree. This does not establish novelty or explain the historical skip.
 
-R06: a separate local 1800-second continuation uses the validated patched
-binary and R05's main relation checkpoint. Checksums and arithmetic replay
-pass before compute; the inherited worker output is retained outside the
-active state. The [dated observation](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R06-20261023/OBSERVATION.json)
-records two running native workers at 2026-10-23 01:43:40 UTC. Final status,
-archive and post-run replay remain pending until termination; no new
-factor or completed factorization is claimed.
+R06: the separate local 1800-second continuation finishes at its native
+limit with exit 0 on October 23, adding 1,427,642 raw relations for a main
+file total of 4,592,399 lines. The corrected timeout messages print without
+the earlier crash. Post-run certificate/product and common-root checks,
+fresh archive restoration and canonical repack pass; no factor is found.
+
+R07: native filtering completes on an independent copy. It rejects one
+composite-factor row, adds 78,556 free relations and removes 152,650
+duplicates. Its 4,518,304 unique relations reduce to 92 singleton survivors,
+with no matrix prerequisite. More lattice relations are needed by this
+configuration. The original R06 source and its exact prefix remain intact.
+The first parse-only failed command and its corrected invocation are retained.
+
+R08: the [dated observation](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/OBSERVATION.json)
+records a separate 7200-second local continuation running with two workers
+at 2026-10-25 06:07:37 UTC. It uses the unfiltered R06 state and validated
+patched binary. Final status, archive and replay remain pending until
+termination. No complete factorization or future running status is implied.

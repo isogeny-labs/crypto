@@ -15,6 +15,7 @@
 
 mod algebra;
 mod arms;
+#[allow(dead_code)]
 mod bitslice;
 mod bskernel;
 mod bspairs;
@@ -25,6 +26,7 @@ mod group;
 mod kernel;
 #[cfg(target_arch = "x86_64")]
 mod lanes_x86;
+mod mitm;
 
 use arms::Arm;
 use common::*;
@@ -213,13 +215,15 @@ fn cmd_time(args: &[String]) {
     let pairs = arm.pairs_total() * calls;
     let label = arg_s(args, "--label").unwrap_or_default();
     let line = format!(
-        "{{\"label\":\"{label}\",\"arm\":\"{arm_name}\",\"l\":{},\"n\":{},\"targets\":{},\"passes\":{passes},\"pairs_per_target\":{},\"pairs\":{pairs},\"secs\":{secs:.6},\"setup_secs\":{setup_secs:.6},\"ns_per_pair\":{:.3},\"ns_per_target\":{:.1},\"kernel\":\"{}\"}}",
+        "{{\"label\":\"{label}\",\"arm\":\"{arm_name}\",\"l\":{},\"n\":{},\"targets\":{},\"passes\":{passes},\"pairs_per_target\":{},\"pairs\":{pairs},\"secs\":{secs:.6},\"setup_secs\":{setup_secs:.6},\"ns_per_pair\":{:.3},\"ns_per_target\":{:.1},\"table_keys\":{},\"table_bytes\":{},\"kernel\":\"{}\"}}",
         rung.l,
         rung.n,
         refuted.len(),
         arm.pairs_total(),
         secs * 1e9 / pairs as f64,
         secs * 1e9 / calls as f64,
+        arm.aux().0,
+        arm.aux().1,
         rung.gf.kernel_name()
     );
     println!("{line}");

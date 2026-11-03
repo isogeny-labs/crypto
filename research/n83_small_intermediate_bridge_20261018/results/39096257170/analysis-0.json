@@ -1,0 +1,859 @@
+{
+  "affinity": "Cpus_allowed_list:\t0-3",
+  "host": {
+    "git_sha": "77c8ebe307c047c78a7f66f6a7f41a0efef60584",
+    "github_run_attempt": "1",
+    "github_run_id": "39096257170",
+    "lscpu_json": "{\n   \"lscpu\": [\n      {\n         \"field\": \"Architecture:\",\n         \"data\": \"x86_64\"\n      },{\n         \"field\": \"CPU op-mode(s):\",\n         \"data\": \"32-bit, 64-bit\"\n      },{\n         \"field\": \"Address sizes:\",\n         \"data\": \"48 bits physical, 48 bits virtual\"\n      },{\n         \"field\": \"Byte Order:\",\n         \"data\": \"Little Endian\"\n      },{\n         \"field\": \"CPU(s):\",\n         \"data\": \"4\"\n      },{\n         \"field\": \"On-line CPU(s) list:\",\n         \"data\": \"0-3\"\n      },{\n         \"field\": \"Vendor ID:\",\n         \"data\": \"AuthenticAMD\"\n      },{\n         \"field\": \"Model name:\",\n         \"data\": \"AMD EPYC 7763 64-Core Processor\"\n      },{\n         \"field\": \"CPU family:\",\n         \"data\": \"25\"\n      },{\n         \"field\": \"Model:\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Thread(s) per core:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"Core(s) per socket:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"Socket(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Stepping:\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"BogoMIPS:\",\n         \"data\": \"4890.85\"\n      },{\n         \"field\": \"Flags:\",\n         \"data\": \"fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\"\n      },{\n         \"field\": \"Virtualization:\",\n         \"data\": \"AMD-V\"\n      },{\n         \"field\": \"Hypervisor vendor:\",\n         \"data\": \"Microsoft\"\n      },{\n         \"field\": \"Virtualization type:\",\n         \"data\": \"full\"\n      },{\n         \"field\": \"L1d cache:\",\n         \"data\": \"64 KiB (2 instances)\"\n      },{\n         \"field\": \"L1i cache:\",\n         \"data\": \"64 KiB (2 instances)\"\n      },{\n         \"field\": \"L2 cache:\",\n         \"data\": \"1 MiB (2 instances)\"\n      },{\n         \"field\": \"L3 cache:\",\n         \"data\": \"32 MiB (1 instance)\"\n      },{\n         \"field\": \"NUMA node(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"NUMA node0 CPU(s):\",\n         \"data\": \"0-3\"\n      },{\n         \"field\": \"Vulnerability Gather data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Ghostwrite:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Indirect target selection:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Itlb multihit:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability L1tf:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Meltdown:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mmio stale data:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Old microcode:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Reg file data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Retbleed:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Spec rstack overflow:\",\n         \"data\": \"Vulnerable: Safe RET, no microcode\"\n      },{\n         \"field\": \"Vulnerability Spec store bypass:\",\n         \"data\": \"Vulnerable\"\n      },{\n         \"field\": \"Vulnerability Spectre v1:\",\n         \"data\": \"Mitigation; usercopy/swapgs barriers and __user pointer sanitization\"\n      },{\n         \"field\": \"Vulnerability Spectre v2:\",\n         \"data\": \"Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\"\n      },{\n         \"field\": \"Vulnerability Srbds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Tsa:\",\n         \"data\": \"Vulnerable: No microcode\"\n      },{\n         \"field\": \"Vulnerability Tsx async abort:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Vmscape:\",\n         \"data\": \"Not affected\"\n      }\n   ]\n}\n",
+    "recorded_unix_ms": 1792298685192,
+    "runner_name": "GitHub Actions 1000338501",
+    "schema": "n83.native-bridge-host/v1",
+    "stratum": 0,
+    "system_before": {
+      "cgroup_member": "/system.slice/hosted-compute-agent.service",
+      "cpu_max": "max 100000\n",
+      "cpu_stat": "usage_usec 670852881\nuser_usec 645625190\nsystem_usec 25227690\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+      "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+      "memory_max": "max\n",
+      "pressure_cpu": "some avg10=0.14 avg60=0.46 avg300=0.96 total=7936251\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure_memory": "some avg10=0.00 avg60=0.00 avg300=0.00 total=11481\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=8007\n",
+      "proc_stat": "cpu  65851 1 4034 119767 5468 0 164 0 0 0\ncpu0 19261 0 865 27377 1180 0 70 0 0 0\ncpu1 14773 0 1357 31222 1441 0 58 0 0 0\ncpu2 14406 1 912 31735 1698 0 18 0 0 0\ncpu3 17409 0 899 29432 1148 0 16 0 0 0\nintr 1539119 0 0 0 0 838 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3024 188894 25675 20819 17194 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\nctxt 861128\nbtime 1792298192\nprocesses 4645\nprocs_running 1\nprocs_blocked 0\nsoftirq 611827 0 33245 34 250577 11 0 56953 182330 0 88677\n",
+      "self_status": "Name:\tn83_bridge_run\nUmask:\t0022\nState:\tR (running)\nTgid:\t4639\nNgid:\t0\nPid:\t4639\nPPid:\t4638\nTracerPid:\t0\nUid:\t1001\t1001\t1001\t1001\nGid:\t1001\t1001\t1001\t1001\nFDSize:\t256\nGroups:\t4 100 118 999 1001 \nNStgid:\t4639\nNSpid:\t4639\nNSpgid:\t2057\nNSsid:\t2057\nKthread:\t0\nVmPeak:\t    5056 kB\nVmSize:\t    4472 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    2652 kB\nVmRSS:\t    2524 kB\nRssAnon:\t     192 kB\nRssFile:\t    2332 kB\nRssShmem:\t       0 kB\nVmData:\t     236 kB\nVmStk:\t     136 kB\nVmExe:\t     484 kB\nVmLib:\t    1896 kB\nVmPTE:\t      48 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/63838\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t0000000000000440\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\talways enabled\nCpus_allowed:\tf\nCpus_allowed_list:\t0-3\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t7\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n"
+    }
+  },
+  "point_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "rows": [
+    {
+      "calibration_after_ms": [
+        720.699862,
+        722.232539,
+        721.952861
+      ],
+      "calibration_before_ms": [
+        724.092976,
+        725.498372,
+        720.641424
+      ],
+      "calibration_medians_ms": [
+        724.092976,
+        721.952861
+      ],
+      "calibration_relative_spread": 0.0029599545813014734,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 116965.744647,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          99183,
+          120331,
+          15030,
+          94685
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 5.436174,
+        "target_phase_sum_ms": 5.435282999999999
+      },
+      "ic_child_wall_ms": 117198.648861,
+      "k": 1107,
+      "point_index": 0,
+      "rho": {
+        "child_wall_ms": 3562.348823,
+        "online_ms": 3271.831287,
+        "peak_rss_bytes": 31031296,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aW4ef1b36890f3R1",
+      "target": [
+        "4432730634765955966018177",
+        "4332717222640579290356636"
+      ],
+      "workload_id": "4ef1b36890f3"
+    },
+    {
+      "calibration_after_ms": [
+        721.727556,
+        721.350568,
+        720.33838
+      ],
+      "calibration_before_ms": [
+        721.36049,
+        720.168868,
+        720.448535
+      ],
+      "calibration_medians_ms": [
+        720.448535,
+        721.350568
+      ],
+      "calibration_relative_spread": 0.0012512603151480259,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 262239.503104,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          241604,
+          307417,
+          102793,
+          253310
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 30.312631,
+        "target_phase_sum_ms": 30.311999
+      },
+      "ic_child_wall_ms": 262895.803719,
+      "k": 2304,
+      "point_index": 0,
+      "rho": {
+        "child_wall_ms": 2559.439022,
+        "online_ms": 2313.158006,
+        "peak_rss_bytes": 30994432,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1W4ef1b36890f3R1",
+      "target": [
+        "4432730634765955966018177",
+        "4332717222640579290356636"
+      ],
+      "workload_id": "4ef1b36890f3"
+    },
+    {
+      "calibration_after_ms": [
+        722.853714,
+        721.370479,
+        720.322383
+      ],
+      "calibration_before_ms": [
+        726.129636,
+        721.264543,
+        720.87368
+      ],
+      "calibration_medians_ms": [
+        721.264543,
+        721.370479
+      ],
+      "calibration_relative_spread": 0.0001468645892890883,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 116630.29205300001,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          137,
+          76945,
+          37285,
+          73842
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 60.632028,
+        "target_phase_sum_ms": 60.631366
+      },
+      "ic_child_wall_ms": 116822.13400199999,
+      "k": 1107,
+      "point_index": 1,
+      "rho": {
+        "child_wall_ms": 2508.422137,
+        "online_ms": 2254.4665,
+        "peak_rss_bytes": 31027200,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aW1ee0cfa1213bR1",
+      "target": [
+        "6801941138487603400534500",
+        "6113889091242542605652569"
+      ],
+      "workload_id": "1ee0cfa1213b"
+    },
+    {
+      "calibration_after_ms": [
+        724.358732,
+        720.978414,
+        721.124881
+      ],
+      "calibration_before_ms": [
+        720.411587,
+        722.926805,
+        720.694618
+      ],
+      "calibration_medians_ms": [
+        720.694618,
+        721.124881
+      ],
+      "calibration_relative_spread": 0.0005968333765750634,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 249681.61820700002,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          34068,
+          198280,
+          253977,
+          356918
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 45.692512,
+        "target_phase_sum_ms": 45.69183199999999
+      },
+      "ic_child_wall_ms": 250087.752165,
+      "k": 2304,
+      "point_index": 1,
+      "rho": {
+        "child_wall_ms": 3560.917772,
+        "online_ms": 3277.588728,
+        "peak_rss_bytes": 31039488,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1W1ee0cfa1213bR1",
+      "target": [
+        "6801941138487603400534500",
+        "6113889091242542605652569"
+      ],
+      "workload_id": "1ee0cfa1213b"
+    },
+    {
+      "calibration_after_ms": [
+        721.719106,
+        722.718011,
+        720.704644
+      ],
+      "calibration_before_ms": [
+        720.642924,
+        720.962705,
+        722.750369
+      ],
+      "calibration_medians_ms": [
+        720.962705,
+        721.719106
+      ],
+      "calibration_relative_spread": 0.0010486040570175078,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 115933.177878,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          111541,
+          148654,
+          71465,
+          109684
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 63.18534100000001,
+        "target_phase_sum_ms": 63.184610000000006
+      },
+      "ic_child_wall_ms": 116132.415551,
+      "k": 1107,
+      "point_index": 2,
+      "rho": {
+        "child_wall_ms": 4866.83241,
+        "online_ms": 4584.772095,
+        "peak_rss_bytes": 56451072,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aWd64e262cf588R1",
+      "target": [
+        "7705005373899201294251758",
+        "4132834092260862880574090"
+      ],
+      "workload_id": "d64e262cf588"
+    },
+    {
+      "calibration_after_ms": [
+        723.923963,
+        719.958015,
+        723.720392
+      ],
+      "calibration_before_ms": [
+        722.361141,
+        721.426077,
+        720.973251
+      ],
+      "calibration_medians_ms": [
+        721.426077,
+        723.720392
+      ],
+      "calibration_relative_spread": 0.0031752006446621067,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 247340.50940399998,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          42537,
+          307102,
+          124986,
+          301079
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 1.853977,
+        "target_phase_sum_ms": 1.853256
+      },
+      "ic_child_wall_ms": 247740.134457,
+      "k": 2304,
+      "point_index": 2,
+      "rho": {
+        "child_wall_ms": 2057.88837,
+        "online_ms": 1763.053183,
+        "peak_rss_bytes": 18251776,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1Wd64e262cf588R1",
+      "target": [
+        "7705005373899201294251758",
+        "4132834092260862880574090"
+      ],
+      "workload_id": "d64e262cf588"
+    },
+    {
+      "calibration_after_ms": [
+        720.915592,
+        720.030272,
+        720.267477
+      ],
+      "calibration_before_ms": [
+        721.051826,
+        720.545468,
+        722.098796
+      ],
+      "calibration_medians_ms": [
+        721.051826,
+        720.267477
+      ],
+      "calibration_relative_spread": 0.0010883764594943751,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 117677.581952,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          18495,
+          64624,
+          135723,
+          155282
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 15.485368,
+        "target_phase_sum_ms": 15.484722999999999
+      },
+      "ic_child_wall_ms": 117850.833448,
+      "k": 1107,
+      "point_index": 3,
+      "rho": {
+        "child_wall_ms": 3209.505193,
+        "online_ms": 2951.56741,
+        "peak_rss_bytes": 31023104,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aW4ea2907cbcf0R1",
+      "target": [
+        "3749576048801150692993602",
+        "6590968234188204573518656"
+      ],
+      "workload_id": "4ea2907cbcf0"
+    },
+    {
+      "calibration_after_ms": [
+        723.197587,
+        721.531162,
+        720.585258
+      ],
+      "calibration_before_ms": [
+        721.424786,
+        721.034003,
+        719.852617
+      ],
+      "calibration_medians_ms": [
+        721.034003,
+        721.531162
+      ],
+      "calibration_relative_spread": 0.0006892707685756582,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 248188.451935,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          10490,
+          144911,
+          299276,
+          339011
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 9.479422,
+        "target_phase_sum_ms": 9.478721000000002
+      },
+      "ic_child_wall_ms": 248615.87743499997,
+      "k": 2304,
+      "point_index": 3,
+      "rho": {
+        "child_wall_ms": 4764.414178,
+        "online_ms": 4473.187822,
+        "peak_rss_bytes": 56410112,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1W4ea2907cbcf0R1",
+      "target": [
+        "3749576048801150692993602",
+        "6590968234188204573518656"
+      ],
+      "workload_id": "4ea2907cbcf0"
+    },
+    {
+      "calibration_after_ms": [
+        724.670188,
+        721.263756,
+        722.870891
+      ],
+      "calibration_before_ms": [
+        720.506613,
+        725.257956,
+        721.089604
+      ],
+      "calibration_medians_ms": [
+        721.089604,
+        722.870891
+      ],
+      "calibration_relative_spread": 0.0024672240080917452,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 116501.170207,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          19520,
+          45616,
+          3534,
+          51188
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 128.809448,
+        "target_phase_sum_ms": 128.808827
+      },
+      "ic_child_wall_ms": 116705.84587599999,
+      "k": 1107,
+      "point_index": 4,
+      "rho": {
+        "child_wall_ms": 3813.028322,
+        "online_ms": 3529.924916,
+        "peak_rss_bytes": 31023104,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aW501380079319R1",
+      "target": [
+        "9598943669457076363249209",
+        "7481392430574414068507714"
+      ],
+      "workload_id": "501380079319"
+    },
+    {
+      "calibration_after_ms": [
+        731.107027,
+        719.911858,
+        721.856608
+      ],
+      "calibration_before_ms": [
+        720.747059,
+        722.815463,
+        722.279829
+      ],
+      "calibration_medians_ms": [
+        722.279829,
+        721.856608
+      ],
+      "calibration_relative_spread": 0.000586123290232997,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 248451.846224,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          94987,
+          270210,
+          107383,
+          217580
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 7.632713,
+        "target_phase_sum_ms": 7.632051999999999
+      },
+      "ic_child_wall_ms": 248865.28133499998,
+      "k": 2304,
+      "point_index": 4,
+      "rho": {
+        "child_wall_ms": 2910.53041,
+        "online_ms": 2660.731259,
+        "peak_rss_bytes": 31010816,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1W501380079319R1",
+      "target": [
+        "9598943669457076363249209",
+        "7481392430574414068507714"
+      ],
+      "workload_id": "501380079319"
+    },
+    {
+      "calibration_after_ms": [
+        722.035633,
+        721.315482,
+        720.885065
+      ],
+      "calibration_before_ms": [
+        721.408217,
+        720.040032,
+        722.392675
+      ],
+      "calibration_medians_ms": [
+        721.408217,
+        721.315482
+      ],
+      "calibration_relative_spread": 0.00012855545391586654,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 116392.344772,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          55259,
+          126784,
+          24779,
+          81119
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 72.431293,
+        "target_phase_sum_ms": 72.430542
+      },
+      "ic_child_wall_ms": 116603.933221,
+      "k": 1107,
+      "point_index": 5,
+      "rho": {
+        "child_wall_ms": 3111.178501,
+        "online_ms": 2826.452666,
+        "peak_rss_bytes": 30961664,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aW14d07cb1fdc0R1",
+      "target": [
+        "4054780311771608489626814",
+        "7431862087892341190467216"
+      ],
+      "workload_id": "14d07cb1fdc0"
+    },
+    {
+      "calibration_after_ms": [
+        721.800555,
+        720.583443,
+        719.945925
+      ],
+      "calibration_before_ms": [
+        719.882133,
+        721.62239,
+        719.945366
+      ],
+      "calibration_medians_ms": [
+        719.945366,
+        720.583443
+      ],
+      "calibration_relative_spread": 0.0008858927305215081,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 248597.495906,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          154319,
+          304032,
+          123427,
+          228129
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 30.633374,
+        "target_phase_sum_ms": 30.632801999999998
+      },
+      "ic_child_wall_ms": 249024.60209200002,
+      "k": 2304,
+      "point_index": 5,
+      "rho": {
+        "child_wall_ms": 2810.3949749999997,
+        "online_ms": 2562.870159,
+        "peak_rss_bytes": 31014912,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1W14d07cb1fdc0R1",
+      "target": [
+        "4054780311771608489626814",
+        "7431862087892341190467216"
+      ],
+      "workload_id": "14d07cb1fdc0"
+    },
+    {
+      "calibration_after_ms": [
+        720.267571,
+        724.017672,
+        720.685977
+      ],
+      "calibration_before_ms": [
+        721.45806,
+        720.704066,
+        721.932347
+      ],
+      "calibration_medians_ms": [
+        721.45806,
+        720.685977
+      ],
+      "calibration_relative_spread": 0.001070743254753084,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 116154.32966599999,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          42028,
+          82859,
+          49251,
+          138840
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 217.147873,
+        "target_phase_sum_ms": 217.14711
+      },
+      "ic_child_wall_ms": 116363.11102099999,
+      "k": 1107,
+      "point_index": 6,
+      "rho": {
+        "child_wall_ms": 1605.9456779999998,
+        "online_ms": 1340.723366,
+        "peak_rss_bytes": 18227200,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aWa7aeb223e75eR1",
+      "target": [
+        "6849849463457165309598774",
+        "4377153526641615706096317"
+      ],
+      "workload_id": "a7aeb223e75e"
+    },
+    {
+      "calibration_after_ms": [
+        723.177127,
+        721.70028,
+        720.633466
+      ],
+      "calibration_before_ms": [
+        719.90357,
+        720.273216,
+        721.476229
+      ],
+      "calibration_medians_ms": [
+        720.273216,
+        721.70028
+      ],
+      "calibration_relative_spread": 0.0019793207072926295,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 248551.301855,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          40332,
+          163294,
+          147209,
+          283476
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 8.194701,
+        "target_phase_sum_ms": 8.193990000000001
+      },
+      "ic_child_wall_ms": 248968.01473599998,
+      "k": 2304,
+      "point_index": 6,
+      "rho": {
+        "child_wall_ms": 1455.339988,
+        "online_ms": 1204.260294,
+        "peak_rss_bytes": 18169856,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1Wa7aeb223e75eR1",
+      "target": [
+        "6849849463457165309598774",
+        "4377153526641615706096317"
+      ],
+      "workload_id": "a7aeb223e75e"
+    },
+    {
+      "calibration_after_ms": [
+        721.418109,
+        721.628764,
+        721.879413
+      ],
+      "calibration_before_ms": [
+        720.248108,
+        721.226164,
+        720.641126
+      ],
+      "calibration_medians_ms": [
+        720.641126,
+        721.628764
+      ],
+      "calibration_relative_spread": 0.0013695605889686303,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "ic": {
+        "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+        "cold_process_ms": 116890.79791899999,
+        "k": 1107,
+        "ordered_base_dump_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+        "rank": 1107,
+        "relation_indices": [
+          58978,
+          151510,
+          145286,
+          175966
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 136.541043,
+        "target_phase_sum_ms": 136.540333
+      },
+      "ic_child_wall_ms": 117094.43293200001,
+      "k": 1107,
+      "point_index": 7,
+      "rho": {
+        "child_wall_ms": 1907.471593,
+        "online_ms": 1632.621934,
+        "peak_rss_bytes": 18243584,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40aWa3bed5842933R1",
+      "target": [
+        "4846303573530248601821147",
+        "6528669192151429785952221"
+      ],
+      "workload_id": "a3bed5842933"
+    },
+    {
+      "calibration_after_ms": [
+        722.239996,
+        719.963923,
+        719.767216
+      ],
+      "calibration_before_ms": [
+        721.587492,
+        721.74341,
+        720.584547
+      ],
+      "calibration_medians_ms": [
+        721.587492,
+        719.963923
+      ],
+      "calibration_relative_spread": 0.00225253013261407,
+      "calibration_status": "PASS_10_PERCENT",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "ic": {
+        "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+        "cold_process_ms": 249533.15661900002,
+        "k": 2304,
+        "ordered_base_dump_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+        "rank": 2304,
+        "relation_indices": [
+          216023,
+          345859,
+          9014,
+          286126
+        ],
+        "schema": "n83.native-bridge-ic-replay/v1",
+        "status": "PASS_INDEPENDENT_REPLAY",
+        "target_online_ms": 1.0890330000000001,
+        "target_phase_sum_ms": 1.0883429999999998
+      },
+      "ic_child_wall_ms": 249941.027171,
+      "k": 2304,
+      "point_index": 7,
+      "rho": {
+        "child_wall_ms": 3862.903239,
+        "online_ms": 3600.665578,
+        "peak_rss_bytes": 30945280,
+        "status": "PASS_INDEPENDENT_REPLAY"
+      },
+      "run_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1Wa3bed5842933R1",
+      "target": [
+        "4846303573530248601821147",
+        "6528669192151429785952221"
+      ],
+      "workload_id": "a3bed5842933"
+    }
+  ],
+  "schema": "n83.native-bridge-stratum-analysis/v1",
+  "source_sha256": "8109fb33374ce2aa66c6a5a0b6e144d3b0143168ac756f9e0bd70af60a911829",
+  "status": "PASS_TIER1",
+  "steal_jiffies_after": 0,
+  "steal_jiffies_before": 0,
+  "stratum": 0,
+  "targets_sha256": "b673f493e3fe5d64d4b9217e5ca882637c6d29b352e190cd168ea030e3fe47b8"
+}

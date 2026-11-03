@@ -1,8 +1,8 @@
 # Lean proof map
 
 The proof artifacts are `lean/PrimeExamples.lean`,
-`lean/OakleyOrders.lean`, `lean/MinimalPairingField.lean`, and
-`lean/RelationSupport.lean`. Their shared `lean-toolchain`,
+`lean/OakleyOrders.lean`, `lean/OakleyPrimality.lean`, `lean/MinimalPairingField.lean`,
+`lean/RelationSupport.lean`, and `lean/WeightedSupport.lean`. Their shared `lean-toolchain`,
 `lakefile.toml` and manifest pin Lean 4.34.1 and Mathlib commit
 `d13f23b723b8a846827a245b89c10fc7d3f11612`. The declaration
 `affineCount` is the finite sum of all
@@ -19,6 +19,7 @@ solutions to `y²=x³+ax+b (mod p)` for `0≤x,y<p`.
 | All three selected points satisfy the curve equation | `anomalous_point_on_curve`, `smooth_point_on_curve`, `pairing_point_on_curve` | Exact modular arithmetic, checked |
 | The selected pairing order divides the group order | `pairing_selected_order_divides_group_order` | Divisibility arithmetic, checked |
 | Oakley Groups 3 and 4 have RFC order decompositions `12r` and `4r` | `oakley3_full_order_factor`, `oakley4_full_order_factor` | Exact arithmetic on RFC-declared integers, checked; the RFC point counts themselves are hypotheses/source data |
+| The RFC subgroup orders `oakley3Prime` (152 bits) and `oakley4Prime` (183 bits) are prime | `oakley3Prime_prime`, `oakley4Prime_prime` in [OakleyPrimality.lean](lean/OakleyPrimality.lean); generic step `Pratt.pratt`, correctness of the modular-power loop `Pratt.powModAux_cast` | **Verification status: PENDING.** The Lean module has not yet been built; the retained `lake build`, `leanchecker --fresh` and `#print axioms` output from CI is still to be attached here. Design: Pratt certificates (18 recursive certificates; factors below `2^20` by Mathlib `norm_num`) to be checked by the Lean kernel with `decide +kernel`, reduced to Mathlib's `lucas_primality`; no `native_decide`. Certificate data `validation/oakley_pratt_certificates.json` is independently verified by the Rust checker `src/bin/check_pratt_certificates.rs` (passed locally: 18 certificates, 49 primes), which does not verify the Lean declarations. Primality of the integers only; that they are the RFC curves' point orders remains source data |
 | Their field degrees factor as `5·31` and `5·37` | `oakley3_extension_factor`, `oakley4_extension_factor` | Exact arithmetic, checked |
 | Type II at magic number five has formula genus 16 | `oakley_type_ii_genus_formula` | Conditional formula arithmetic, checked; the binary-field trace and Type II classification are separately computed by the transfer registry |
 | Multiplying a point of order `c·r` by `c` yields order `r` | `selected_order_of_generator`; Oakley corollaries `oakley3_selected_order`, `oakley4_selected_order` | Generic additive-group theorem with the exact published point-order premise, checked |
@@ -28,6 +29,8 @@ solutions to `y²=x³+ax+b (mod p)` for `0≤x,y<p`.
 | Conditioning on an accepted target set cannot enlarge that fixed-base support | `conditioned_relation_support_bound` | For any finite accepted subset of `A` under the same target map; exact intersection cap, checked |
 | A known-scalar anchor collision determines the unknown logarithm contribution; two representations of one target determine a difference equation | `P192ExtensionCover.scalar_anchor_collision_equation`, `P192ExtensionCover.repeated_target_relation_equation` in [ScalarAnchor.lean](../p192_extension_cover_20261012/lean/ScalarAnchor.lean) | Checked for an additive-group homomorphism and explicit known-log identities. Both use only `propext`; exact P-192 target-set disjointness is native and independently combinatorial, not a concrete Lean finite-field instance. |
 | One private fresh logarithm per generated equation leaves every old assignment feasible | `P192ExtensionCover.private_columns_extend`, `P192ExtensionCover.private_columns_preserve_old_feasibility` in [AdaptiveBase.lean](../p192_extension_cover_20261012/lean/AdaptiveBase.lean) | Checked for any additive commutative group and arbitrary old-column row expressions with unit private columns. The 64 concrete P-192 equations, distinct points, and old-support nonintersection are native and independently replayed. |
+| A finite seeded query law places at most `binomial(B+m-1,m) · M` seed weight on the fixed-base support when every target has at most `M` preimage seeds | `weighted_relation_support_bound` | For any natural-number target weight and any target map `Sym (Fin B) m → A`; no uniformity assumption; checked |
+| The same preimage-weight cap holds after a geometric acceptance filter | `conditioned_weighted_relation_support_bound` | For any finite accepted subset of `A`, with the `M` bound needed only inside that subset; checked |
 
 The relation-support declarations count combinations with repetition before
 any curve-specific group law. Instantiating `target` with a genus-three
@@ -37,6 +40,19 @@ probability bound `min(1, binomial(B+m-1,m)/|accepted|)` additionally assumes
 uniform sampling of a nonempty finite accepted set. Neither theorem proves
 that a particular query is a relation or that the resulting matrix has useful
 rank; the P-192 replay measures those separately.
+
+The weighted declarations replace uniformity by a finite-seed input law:
+`weight(a)` is the number of sampler seeds producing target class `a`.
+If `N>0` seeds are equally likely and every accepted class has at most `M`
+preimage seeds, the supported accepted seed mass is at most
+`binomial(B+m-1,m)·M`, so its hit probability per attempted seed is at most
+that quantity divided by `N`. For a query conditioned on acceptance, use
+the total accepted seed mass as the denominator instead. A per-query
+conditional bound of this form can be applied
+at each adaptive step, but the Lean declarations here prove the one-query
+finite-sum bound; they do not formalize a stochastic process or certify `M`
+for a particular curve sampler. The fixed-base map, exact query law, seed
+domain, and measured relation rank remain separate obligations.
 
 The native Rust genus-128 GHS receipt is an exact-integer computation of irreducible and
 smooth monic-polynomial counts followed by the declared floating-point cost
@@ -63,7 +79,11 @@ their exact parameter and generator checks are replayed by
 static-DH or the SIDH key-recovery algorithm.
 
 For the Oakley curves, the Lean subgroup theorem is conditional on the RFC
-generator-order premise. The independent checked Sage replay verifies that
+generator-order premise. Primality of the two subgroup orders is proposed
+to be proved by `oakley3Prime_prime` and `oakley4Prime_prime` (Pratt
+certificates, added 2026-10-29 after the CFSG exposure audit; kernel check
+pending CI, see the table row), and the certificate data is independently
+checked. They do not prove that either integer is the order of an RFC point. The independent checked Sage replay verifies that
 premise for the RFC points over both specified binary fields, subject to the
 RFC's full curve order. The GHS magic-number calculation, genus formula,
 cover construction, subgroup map and attack-cost argument are not formalized

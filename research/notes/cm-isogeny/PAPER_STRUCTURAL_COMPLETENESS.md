@@ -107,8 +107,11 @@ This paper does the systematic version of that audit:
 The result is, predictably, a null: every direction is closed.
 The value lies in the **completeness** of the closure — the
 theorem turns a folklore claim ("ECDLP is hard for prime-field
-ECC") into a rigorously decomposable, mechanically verifiable
-structural statement.
+ECC") into a structural statement argued by case analysis over seven
+blocks (proof sketches in §8, not yet independently reviewed; nothing
+in it is machine-checked). *(Correction, 2026-10-28, sheriff case
+SHF-20261028-0f3f64, PPN-4: this sentence used to call the statement
+"rigorously decomposable, mechanically verifiable".)*
 
 ## 2. Setup: isogeny graphs of CM curves
 
@@ -683,8 +686,14 @@ not a proof of cryptanalytic finality.
 ### 10.1 Code artefacts
 
 All scripts in [`secp256k1_cm_audit/`](../../../secp256k1_cm_audit) are
-PARI/GP 2.17+ scripts with committed expected outputs.  Total
-runtime: ~3 minutes on an M-series Mac.
+PARI/GP 2.17+ scripts. Each script listed below has a committed
+`*_output.expected.txt`; for `vfcg_experiment.gp` the file is
+`vfcg_output.expected.txt`. No automated check compares them with fresh
+runs, and no runtime is recorded. LOC are `wc -l` counts at commit
+`57fa35852`. *(Correction, 2026-10-28, sheriff case SHF-20261028-0f3f64,
+PPN-3: this paragraph used to claim "~3 minutes on an M-series Mac", for
+which no record exists. It also gave `multi_curve_audit.gp` as 274 LOC
+and the total as ~2580. The full 16-script table is in the LaTeX paper.)*
 
 | File                                  | Block(s) implemented                            | LOC  |
 |---------------------------------------|--------------------------------------------------|-----:|
@@ -697,8 +706,8 @@ runtime: ~3 minutes on an M-series Mac.
 | `cover_complexity.gp`                 | B5, B6 (DLP cost across genera)                 | 165  |
 | `supersingular_reductions.gp`         | B7 (V4 closure)                                  | 171  |
 | `p256_comparison.gp`                  | §7 cross-curve (secp256k1 vs P-256)             | 283  |
-| `multi_curve_audit.gp`                | §7 four-curve full audit                         | 274  |
-| **Total**                             |                                                  | **~2580** |
+| `multi_curve_audit.gp`                | §7 four-curve full audit                         | 239  |
+| **Total**                             |                                                  | **2386** |
 
 ### 10.2 How to verify
 

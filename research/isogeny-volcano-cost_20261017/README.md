@@ -66,6 +66,14 @@ factor base, is covered.
 
 ## Controls
 
+> **Erratum (2026-10-24).** The binary that wrote the crater-automorphism
+> sessions (`7da27ec3…`) left the class set-up out of each `rho.cubic` /
+> `rho.quartic` total (25–31 GAE per solve). Corrected with ecbench `compare`,
+> the j = 0 control is 0.716 [0.598, 0.857] (0.697 as recorded with the same
+> `compare`). The j = 1728 control is 0.723 [0.621, 0.843] (0.707). Both still
+> exclude 1, and j = 1728 still covers √(1/2). See
+> [`../class_setup_impact_20261024/`](../class_setup_impact_20261024/README.md).
+
 | control | measured | predicted | verdict |
 |:--|:--|:--|:--|
 | planted IC: factor base 33 vs 32 points, yield ratio matched over 3,200 workloads | 1.0613 [1.0583, 1.0644] | (33/32)² ≈ 1.063 | detected; instrument sees +6% |

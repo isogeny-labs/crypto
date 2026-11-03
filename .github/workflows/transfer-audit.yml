@@ -1,0 +1,129 @@
+name: transfer-audit
+on:
+  # The path filter is deliberately narrow: runner starvation from broad PR
+  # filters jammed the account's hosted-runner pool (PR #1624).  It lists the
+  # files the audit's output depends on and nothing wider: the tool, its
+  # study directory, the modules `transfer_audit` names, and the modules those
+  # run on the audit path (the `curve-traits.yml` list for the trait record,
+  # `binary_velu` for the sect113r1 replay, `sha256` for index.json).  Not
+  # listed on purpose: Cargo.toml and Cargo.lock (every dependency bump would
+  # start a ~14-minute build), and the F9 control's modules
+  # (hyperelliptic_ic_bench, hyperelliptic_index_calculus, prime_hyperelliptic),
+  # which only `suite --measure-ic` runs and `check` skips.
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/bin/transfer_audit.rs'
+      - 'src/bin/transfer_audit/**'
+      - 'research/transfer_audit_20261011/**'
+      - 'src/cryptanalysis/jacobian_transfer/**'
+      - 'src/cryptanalysis/ec_trapdoor.rs'
+      - 'src/cryptanalysis/ghs_screen.rs'
+      - 'src/cryptanalysis/ghs_transport.rs'
+      - 'src/cryptanalysis/ghs_descent.rs'
+      - 'src/cryptanalysis/binary_semaev.rs'
+      - 'src/cryptanalysis/binary_velu.rs'
+      - 'src/cryptanalysis/binary_isogeny.rs'
+      - 'src/cryptanalysis/quasi_subfield.rs'
+      - 'src/cryptanalysis/ecc2k130_guard.rs'
+      - 'src/cryptanalysis/curve_traits/**'
+      - 'src/cryptanalysis/curve_id.rs'
+      - 'src/cryptanalysis/curve_aliases.json'
+      - 'src/cryptanalysis/isogeny_class_search.rs'
+      - 'src/cryptanalysis/semaev_decomp.rs'
+      - 'src/cryptanalysis/isogeny_degree_search.rs'
+      - 'src/cryptanalysis/isogeny_degree_search/**'
+      - 'src/cryptanalysis/sect113r1_audit.rs'
+      - 'src/binary_ecc/**'
+      - 'src/isogeny/class_group.rs'
+      - 'src/ecc/curve.rs'
+      - 'src/ecc/field.rs'
+      - 'src/ecc/point.rs'
+      - 'src/hash/sha256.rs'
+      - 'src/bls12_381/mod.rs'
+      - 'src/bls12_381/fq.rs'
+      - 'src/ct_bignum.rs'
+      - 'docs/curves/registry.json'
+      - 'docs/curves/jacobian-transfers.json'
+      - 'docs/curves/covers.json'
+      - 'docs/curves/factor-hints.txt'
+      - 'docs/curves/traits.json'
+      - '.github/workflows/transfer-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/bin/transfer_audit.rs'
+      - 'src/bin/transfer_audit/**'
+      - 'research/transfer_audit_20261011/**'
+      - '.github/workflows/transfer-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  audit:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|transfer-audit.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|transfer-audit.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    # The first PR run took 14 min 5 s on a cold cache (run 40263665257: 12 min 56 s
+    # in the unit-test step, which compiles the library; the checks are seconds).
+    # 25 is the routine PR budget enforced by .github/scripts/check-pr-budgets.py.
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/factor-base/
+            /.github/scripts/
+            /Cargo.toml
+            /tools/factor-base/
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /Cargo.lock
+            /build.rs
+            /.cargo/
+            /rust-toolchain*
+            /rustfmt.toml
+            /clippy.toml
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
+            /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /docs/curves/registry.json
+            /docs/curves/jacobian-transfers.json
+            /docs/curves/covers.json
+            /docs/curves/factor-hints.txt
+            /docs/curves/traits.json
+            /research/transfer_audit_20261011/
+      - name: Materialize compile-time fixture inputs
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - uses: Swatinem/rust-cache@v2
+      - name: Unit tests (certificate, subgroup checker, magic number, pairing, verdict, cost)
+        run: cargo test --release --bin transfer-audit
+      - run: cargo build --release --bin transfer-audit
+      - name: The committed certificates regenerate byte-identically
+        run: ./target/release/transfer-audit check --certs research/transfer_audit_20261011/certificates
+      - name: The report builds from the committed certificates
+        run: ./target/release/transfer-audit report --certs research/transfer_audit_20261011/certificates --out /tmp/transfer-audit-report
+      - name: The committed tables, CSV and figures are current
+        run: |
+          for f in RESULTS_TABLE.md RESULTS_SUMMARY.md cost_ratio.csv cost_ratio.svg cost_ratio_toy.svg cost_ratio_controls.svg pipeline.svg; do
+            diff research/transfer_audit_20261011/$f /tmp/transfer-audit-report/$f
+          done
+      - name: A tampered certificate is rejected
+        run: |
+          cp -r research/transfer_audit_20261011/certificates /tmp/tampered
+          f=$(ls /tmp/tampered/sect113r1/ghs_l_1.json)
+          sed -i '0,/"magic_number": 113,/s//"magic_number": 112,/' "$f"
+          if cmp -s "$f" research/transfer_audit_20261011/certificates/sect113r1/ghs_l_1.json; then
+            echo 'the edit did not apply'; exit 1
+          fi
+          if ./target/release/transfer-audit check --certs /tmp/tampered; then
+            exit 1
+          fi

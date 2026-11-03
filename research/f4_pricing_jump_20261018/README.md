@@ -86,7 +86,7 @@ only)`, so the match failed. The term was priced at wall time instead, and
 `ecbench` (`methods.rs`, `ic_report`) removes wall-priced solver terms and
 lists them as `solver_word_XORs_(…)_uncharged` with `lower_bound: true`.
 The commit matches by prefix (`is_word_xor_op_unit`), so the pinned ratio in
-`docs/ic/calibration.json` now applies. For `koblitz/icv1-f2m13-t181-515ee569` that
+`docs/ic/calibration.json` now applies. For `icv1-f2m13-t181-515ee569` that
 ratio is 0.002304 GAE per word XOR, unchanged since before `2245b75`.
 
 Evidence that this is accounting only. Across this merge, every F4 row has
@@ -165,11 +165,11 @@ statistic in the leaderboard JSON.
 
 | source session | arm | n | archived mean S (LB) | main mean S | main lower bound? | main session |
 |---|---|---:|---:|---:|---|---|
-| ladder n13 (icv1-f2m13-t181-515ee569) | ic-f4 | 24 | 16.27 | **488.89** | no | `ECBS1hbb2585335b05` |
+| ladder n13 (`icv1-f2m13-t181-515ee569`) | ic-f4 | 24 | 16.27 | **488.89** | no | `ECBS1hbb2585335b05` |
 | ladder n13 | ic-f6 | 24 | 861.0 | **1,182.3** | no | ″ |
 | ladder n13 | rho-strong | 24 | 22.02 | 22.02 | (rho) | ″ |
 | ladder n19 | ic-f4 | 24 | 4.916 | 4.916 | yes | `ECBS1h5f87c0957b1c` |
-| ladder n23 (icv1-f2m23-t5197-69e76b73) | ic-f4 | 24 | 2.134 | **9,479.7** | no | `ECBS1h580ef089f568 (F4 arm and rho only)` |
+| ladder n23 (`icv1-f2m23-t5197-69e76b73`) | ic-f4 | 24 | 2.134 | **9,479.7** | no | `ECBS1h580ef089f568 (F4 arm and rho only)` |
 | cross-family K13 | inherited-f4 | 8 | 16.49 | **634.12** | no | `ECBS1h4badc043049a` |
 | cross-family K13 | f6-ic | 8 | 1,161.1 | **1,572.1** | no | ″ |
 | cross-family K13 | matrix-f4 | 8 | 16.44 | **113,830** | no | ″ |
@@ -195,7 +195,7 @@ Two hazards follow, and both are accounting:
    with a pinned `ns_per_word_xor`. That includes the archived frontier
    session `ECBS1hfd5bf1885227`.
 2. **Across curves.** On today's binary, the same engine is fully priced on
-   curves with a pinned ratio (here icv1-f2m13-t181-515ee569 and icv1-f2m23-t5197-69e76b73) and still a lower
+   curves with a pinned ratio (here `icv1-f2m13-t181-515ee569` and `icv1-f2m23-t5197-69e76b73`) and still a lower
    bound on the others (K19 = `icv1-f2m19-t797`, R13, R19). A ladder that
    mixes them compares a complete count with a lower bound. Each record says
    which it is (`lower_bound`, `unpriced`).
@@ -240,3 +240,14 @@ which excludes word XORs on those curves.
   the reduced spec): `2245b75` `ECBS1hbe337273061b`, main `ECBS1h3d02b5ea6bf7`.
 - Conductor: the control plane could not be started (port 8080 in use), and
   its MCP endpoint later returned 401. No task card was taken.
+
+## `plan.json` restored (2026-10-21)
+
+The 12 committed sessions (`records/*`, `leaderboard_rerun/*`) were first
+committed without their `plan.json`. As a result, `ecbench verify` (CI job
+`evidence_audit_pr`) stopped with `No such file or directory`. Each plan is
+a pure function of its committed `spec.json`. I rebuilt them with
+`ecbench plan --spec <dir>/spec.json --doc > <dir>/plan.json`, which writes
+the same bytes `ecbench run` writes. All 12 hash to the `plan_sha256` that
+their `session.json` already pinned. None of the other files changed. Each
+session now passes `ecbench verify --replay 0 --allow-interrupted`.

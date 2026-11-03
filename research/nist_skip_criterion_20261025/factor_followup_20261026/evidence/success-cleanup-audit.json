@@ -1,0 +1,17 @@
+{
+  "kind": "native-backend-success-cleanup-audit/v1",
+  "source": "https://github.com/bbuhrow/yafu/blob/c7d90283972820f99b3b4920bfc1eff05c1f6342/factor/nfs/nfs.c",
+  "source_sha256": "1500626b5d6eca326cd13581fe22f0a1f408883451b45c21a81cb69240bc8b5f",
+  "entry_lines": [
+    1070,
+    1110
+  ],
+  "observed_backend_exit": 0,
+  "final_relation_and_matrix_scratch_retained": false,
+  "reason": "Pinned native NFS_STATE_CLEANUP removes these files after complete factor extraction, before the launcher regains control.",
+  "last_fully_retained_pool": "backend-progress-002.tar.zst: native17,831,805 raw relations",
+  "final_native_reported_raw_relations": 26716780,
+  "independent_full_target_prime_product_admission": "runs/p521-plus-proof-015/admission.json",
+  "mathematical_factorization_requires_final_scratch": false,
+  "independent_full_gnfs_replay_performed": false
+}

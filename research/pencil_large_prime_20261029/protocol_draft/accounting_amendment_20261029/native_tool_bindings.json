@@ -1,0 +1,66 @@
+{
+  "canonical_export": {
+    "receipt": "../../native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+    "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
+    "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
+    "source_manifest": {
+      "path": "validation/review-fixes-source-files.sha256",
+      "sha256": "6a1cfa53e9e490022090a81f6b4a745edaaaabd6aaaef0bca369e54af00be05d"
+    },
+    "software_tests": 40,
+    "test_scopes": {
+      "command": "cargo +1.99.1 test --release --locked",
+      "passed": 40,
+      "failed": 0,
+      "ignored": 0,
+      "private_unit_contracts": 37,
+      "native_protocol_cli": 1,
+      "historical_digest_semantics": 1,
+      "production_full_denominator_replay": 1,
+      "production_seconds": 205.38,
+      "log": "validation/review-fixes-final-tests.log",
+      "sha256": "8cbcfd0d790c4f4a91e4866540dbc9cb4cf4f1df67500e683d16dae744b30e83"
+    },
+    "independent_corrected_source_review": {
+      "path": "../../validation/native_export_correction_fc96a3d1/review.json",
+      "sha256": "ed436aef0cbe8ea7f380767bcade130ded56c54de875950bf6c80a081ad65927",
+      "scope": "Software packaging and deterministic source-linked replay only; not independent mathematical implementation or empirical qualification"
+    }
+  },
+  "preparation": {
+    "receipt": "../../native_preparation/validation/receipt.json",
+    "receipt_sha256": "46843c028008698dc4eaa47370191904cf274791402d8953e23868e725d62ea3",
+    "source_files": {
+      "Cargo.toml": "0d5fafc970dbb9b9d9fea33fcd0344c130c7184f732858b26fa1b2290c0a200e",
+      "Cargo.lock": "22228eb5115c49911bc588d440baf7528eba4a6dd69eda763598b52308225726",
+      "README.md": "028fa02346a36a8f9a1fd7f2ae1f43b1802e263d41f736dcda82228404641642",
+      "src/lib.rs": "2f7d71644f0e8f1ea48a3c10cb840dc3ece761ae29721920550b83156d8bb45a",
+      "src/main.rs": "42b328416d52f0416ed700446fd0f948a5a6d2da75aba9ba30985b9861bb0eed"
+    },
+    "binary_sha256": "11fb2aa25fe7cd737271c4a13236c0ae9be0346a437b776d3acaa8e4a1890360",
+    "software_tests": 3,
+    "current_instrument": {
+      "path_at_validation": "/home/ec2-user/pencil-build-40938439022/ecbench",
+      "sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+      "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+      "build_info_sha256": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5"
+    },
+    "execution_boundary": {
+      "ecbench_subcommand": "plan --doc",
+      "solver_executions_performed": 0,
+      "cohorts_launched": 0,
+      "cloud_jobs_launched": 0
+    }
+  },
+  "review_report": {
+    "receipt": "../../native_review_report/validation-layout.json",
+    "receipt_sha256": "37da6488934ed19fb48102e16de777a0c7935519f36245bd31399e4708864023",
+    "source_files": {
+      "src/lib.rs": "80762786c36dcb56a3148b38e70974375432425f240087af786d65f10cceeeba",
+      "src/main.rs": "08a18c3648ae4581949e811d8f5d185052ef17c8a96e443173131d9864dfd895",
+      "Cargo.lock": "48a5ed9c7e282b9cd62f1ef17a0cf970a635028fb624c2b89d4897d17be2326e"
+    },
+    "software_tests": 8
+  },
+  "boundary": "Native tooling validation and preparation only; no solver runs, empirical price qualification, freeze or launch authorization"
+}

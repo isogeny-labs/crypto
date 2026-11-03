@@ -1,0 +1,48 @@
+/var/tmp/pencil-same-root-composition-20261101-v1/attempt1/snapshot/SameRoot.lean:37:12: error: Application type mismatch: The argument
+  hv.left
+has type
+  Represents s.graph value k
+but is expected to have type
+  Represents (anchor s root a b).1.graph value k
+in the application
+  And.intro hv.left
+/var/tmp/pencil-same-root-composition-20261101-v1/attempt1/snapshot/SameRoot.lean:37:21: error: Application type mismatch: The argument
+  True.intro
+has type
+  True
+but is expected to have type
+  Safe (anchor s root a b).2 k
+in the application
+  And.intro True.intro
+/var/tmp/pencil-same-root-composition-20261101-v1/attempt1/snapshot/SameRoot.lean:46:11: error: Application type mismatch: The argument
+  hv
+has type
+  Valid s value k
+but is expected to have type
+  Valid (anchor s root a b).1 value k
+in the application
+  And.intro hv
+/var/tmp/pencil-same-root-composition-20261101-v1/attempt1/snapshot/SameRoot.lean:46:17: error: Application type mismatch: The argument
+  rfl
+has type
+  ?m.97 = ?m.97
+but is expected to have type
+  (anchor s root a b).1.graph = s.graph
+in the application
+  ⟨?m.95, rfl⟩
+/var/tmp/pencil-same-root-composition-20261101-v1/attempt1/snapshot/SameRoot.lean:63:11: error: Application type mismatch: The argument
+  hv
+has type
+  Valid s value k
+but is expected to have type
+  Valid (sameRoot s root cu cv a b).1 value k
+in the application
+  And.intro hv
+/var/tmp/pencil-same-root-composition-20261101-v1/attempt1/snapshot/SameRoot.lean:63:17: error: Application type mismatch: The argument
+  rfl
+has type
+  ?m.96 = ?m.96
+but is expected to have type
+  (sameRoot s root cu cv a b).1.graph = s.graph
+in the application
+  ⟨?m.94, rfl⟩

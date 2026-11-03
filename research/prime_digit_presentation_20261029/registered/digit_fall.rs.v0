@@ -1,0 +1,850 @@
+//! Native first/last fall degrees (Huang-Kosters-Yeo convention) of the base-2
+//! digit presentation of the prime-field Semaev system, and of its controls.
+//!
+//! Study: `research/prime_digit_presentation_20261029/` (PROTOCOL.md).  Std only.
+//!
+//! The ring is `B = F_p[a_1..a_n]/(a_i^2 - a_i)` (digit presentation, `n = m s`)
+//! or, for the plain control, `F_p[x1,x2]/(x_i^p - x_i)`.  Both are function
+//! algebras on a finite grid, so the ideal `(f)` is radical and equals `I(S)` for
+//! the zero set `S` of `f` on the grid; `dim(I ∩ R_{<=c})` is read off the
+//! evaluation rank, as in `examples/hky_last_fall_degree.rs` (the F_2 engine
+//! whose conventions this file ports to F_p, line for line):
+//!
+//! - rows `m·f` with `deg m + deg f <= c`, one variable at a time, a product
+//!   that leaves degree `<= c` is skipped (`times_var` returns None);
+//! - `V_{F,c}` = mutant closure: every row of degree `< c` is multiplied by
+//!   every variable;
+//! - `e0` = first `c` with `dim V_{F,c} = dim(I ∩ R_{<=c})` and `c >= DG`;
+//!   `d_last` = least `c <= e0` from which every `c' in [c, e0]` agrees;
+//! - operational first fall `ffd` = first `c` where the plain Macaulay space
+//!   gains a row of degree `< c` beyond the previous plain dimension.
+//!
+//! Build: `rustc -O digit_fall.rs -o digit_fall`.
+//! Run:   `digit_fall digit --m 2 --s 4 --arm U --draws 4 --seed 1 --cmax 12 --threads 4`
+//!        `digit_fall plain --p 13 --draws 2 --seed 1 --cmax 40`
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::time::Instant;
+
+// ------------------------------------------------------------------ basics
+
+struct Rng(u64);
+impl Rng {
+    fn next(&mut self) -> u64 {
+        self.0 = self.0.wrapping_add(0x9E3779B97F4A7C15);
+        let mut z = self.0;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58476D1CE4E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D049BB133111EB);
+        z ^ (z >> 31)
+    }
+    fn below(&mut self, n: u64) -> u64 {
+        self.next() % n
+    }
+}
+
+fn is_prime(n: u32) -> bool {
+    if n < 2 {
+        return false;
+    }
+    let mut i = 2;
+    while i * i <= n {
+        if n % i == 0 {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+fn powmod(mut b: u64, mut e: u64, p: u64) -> u64 {
+    let mut r = 1 % p;
+    b %= p;
+    while e > 0 {
+        if e & 1 == 1 {
+            r = r * b % p;
+        }
+        b = b * b % p;
+        e >>= 1;
+    }
+    r
+}
+fn inv(a: u64, p: u64) -> u64 {
+    powmod(a, p - 2, p)
+}
+fn random_prime(rng: &mut Rng, lo: u32, hi: u32) -> u32 {
+    loop {
+        let c = lo + rng.below((hi - lo) as u64) as u32;
+        if c > 3 && is_prime(c) {
+            return c;
+        }
+    }
+}
+
+// ------------------------------------------------------------------ curve
+
+#[derive(Clone, Copy)]
+struct Curve {
+    p: u32,
+    a: u32,
+    b: u32,
+}
+impl Curve {
+    fn rhs(&self, x: u32) -> u32 {
+        let p = self.p as u64;
+        let x = x as u64;
+        ((x * x % p * x + self.a as u64 * x + self.b as u64) % p) as u32
+    }
+    fn sqrt(&self, v: u32) -> Option<u32> {
+        (0..self.p).find(|&y| (y as u64 * y as u64) % self.p as u64 == v as u64)
+    }
+    /// affine addition; None for the point at infinity
+    fn add(&self, p1: (u32, u32), p2: (u32, u32)) -> Option<(u32, u32)> {
+        let p = self.p as u64;
+        let (x1, y1, x2, y2) = (p1.0 as u64, p1.1 as u64, p2.0 as u64, p2.1 as u64);
+        let lam = if x1 == x2 {
+            if (y1 + y2) % p == 0 {
+                return None;
+            }
+            (3 * x1 % p * x1 + self.a as u64) % p * inv(2 * y1 % p, p) % p
+        } else {
+            (y2 + p - y1) % p * inv((x2 + p - x1) % p, p) % p
+        };
+        let x3 = (lam * lam % p + 2 * p - x1 - x2) % p;
+        let y3 = (lam * ((x1 + p - x3) % p) % p + p - y1) % p;
+        Some((x3 as u32, y3 as u32))
+    }
+}
+fn new_curve(rng: &mut Rng, p: u32) -> Curve {
+    loop {
+        let a = rng.below(p as u64) as u32;
+        let b = rng.below(p as u64) as u32;
+        let pp = p as u64;
+        let disc = (4 * powmod(a as u64, 3, pp) + 27 * (b as u64 * b as u64 % pp)) % pp;
+        if disc != 0 {
+            return Curve { p, a, b };
+        }
+    }
+}
+
+// ------------------------------------------------------------------ sparse polys
+
+#[derive(Clone, Copy)]
+struct Par {
+    p: u32,
+    nv: usize,
+    base: u32,
+    bits: u32,
+}
+type Poly = Vec<(u64, u32)>;
+
+fn exp_of(key: u64, i: usize, par: &Par) -> u32 {
+    ((key >> (i as u32 * par.bits)) & ((1u64 << par.bits) - 1)) as u32
+}
+fn deg_of(key: u64, par: &Par) -> u32 {
+    if par.base == 2 {
+        key.count_ones()
+    } else {
+        (0..par.nv).map(|i| exp_of(key, i, par)).sum()
+    }
+}
+fn kmul(k1: u64, k2: u64, par: &Par) -> u64 {
+    if par.base == 2 {
+        return k1 | k2;
+    }
+    let mut out = 0u64;
+    for i in 0..par.nv {
+        let mut e = exp_of(k1, i, par) + exp_of(k2, i, par);
+        if e >= par.base {
+            e = (e - 1) % (par.base - 1) + 1;
+        }
+        out |= (e as u64) << (i as u32 * par.bits);
+    }
+    out
+}
+fn finish(acc: HashMap<u64, u64>, par: &Par) -> Poly {
+    let p = par.p as u64;
+    let mut v: Poly = acc
+        .into_iter()
+        .map(|(k, c)| (k, (c % p) as u32))
+        .filter(|&(_, c)| c != 0)
+        .collect();
+    v.sort_unstable();
+    v
+}
+fn padd(a: &Poly, b: &Poly, par: &Par) -> Poly {
+    let mut acc: HashMap<u64, u64> = HashMap::new();
+    for &(k, c) in a.iter().chain(b.iter()) {
+        *acc.entry(k).or_insert(0) += c as u64;
+    }
+    finish(acc, par)
+}
+fn pscale(a: &Poly, s: i64, par: &Par) -> Poly {
+    let p = par.p as i64;
+    let s = ((s % p) + p) % p;
+    let mut acc: HashMap<u64, u64> = HashMap::new();
+    for &(k, c) in a {
+        *acc.entry(k).or_insert(0) += (c as i64 * s % p) as u64;
+    }
+    finish(acc, par)
+}
+fn psub(a: &Poly, b: &Poly, par: &Par) -> Poly {
+    padd(a, &pscale(b, -1, par), par)
+}
+fn pmul(a: &Poly, b: &Poly, par: &Par) -> Poly {
+    let mut acc: HashMap<u64, u64> = HashMap::new();
+    for &(k1, c1) in a {
+        for &(k2, c2) in b {
+            *acc.entry(kmul(k1, k2, par)).or_insert(0) += c1 as u64 * c2 as u64;
+        }
+    }
+    finish(acc, par)
+}
+fn pconst(c: i64, par: &Par) -> Poly {
+    let p = par.p as i64;
+    let c = ((c % p) + p) % p;
+    if c == 0 {
+        vec![]
+    } else {
+        vec![(0, c as u32)]
+    }
+}
+fn pdeg(f: &Poly, par: &Par) -> u32 {
+    f.iter().map(|&(k, _)| deg_of(k, par)).max().unwrap_or(0)
+}
+
+/// `S3(xa, xb, x) = c2 x^2 + c1 x + c0` coefficients as polynomials in (xa, xb).
+fn coef3(xa: &Poly, xb: &Poly, cv: &Curve, par: &Par) -> (Poly, Poly, Poly) {
+    let d = psub(xa, xb, par);
+    let c2 = pmul(&d, &d, par);
+    let x12 = pmul(xa, xb, par);
+    let sum = padd(xa, xb, par);
+    let t = padd(&pmul(&sum, &padd(&x12, &pconst(cv.a as i64, par), par), par), &pconst(2 * cv.b as i64, par), par);
+    let c1 = pscale(&t, -2, par);
+    let u = psub(&x12, &pconst(cv.a as i64, par), par);
+    let c0 = psub(&pmul(&u, &u, par), &pscale(&sum, 4 * cv.b as i64, par), par);
+    (c2, c1, c0)
+}
+fn s3_poly(x1: &Poly, x2: &Poly, x3: &Poly, cv: &Curve, par: &Par) -> Poly {
+    let (c2, c1, c0) = coef3(x1, x2, cv, par);
+    let t = padd(&pmul(&c2, &pmul(x3, x3, par), par), &pmul(&c1, x3, par), par);
+    padd(&t, &c0, par)
+}
+/// `S4(x1,x2,x3,xr) = Res_u(S3(x1,x2,u), S3(u,x3,xr))`
+fn s4_poly(x1: &Poly, x2: &Poly, x3: &Poly, xr: &Poly, cv: &Curve, par: &Par) -> Poly {
+    let (a2, a1, a0) = coef3(x1, x2, cv, par);
+    let (b2, b1, b0) = coef3(x3, xr, cv, par);
+    let m = |x: &Poly, y: &Poly| pmul(x, y, par);
+    let t1 = psub(&m(&a2, &b0), &m(&a0, &b2), par);
+    let t2 = psub(&m(&a2, &b1), &m(&a1, &b2), par);
+    let t3 = psub(&m(&a1, &b0), &m(&a0, &b1), par);
+    psub(&m(&t1, &t1), &m(&t2, &t3), par)
+}
+
+// ------------------------------------------------------------------ ring
+
+const NONE: u32 = u32::MAX;
+struct Ring {
+    par: Par,
+    c: u32,
+    monos: Vec<u64>,
+    deg: Vec<u32>,
+    index: HashMap<u64, u32>,
+    next: Vec<Vec<u32>>, // next[i][col]
+}
+impl Ring {
+    fn new(par: Par, c: u32) -> Ring {
+        let mut monos: Vec<(u32, u64)> = vec![];
+        fn rec(i: usize, left: u32, key: u64, par: &Par, out: &mut Vec<(u32, u64)>, c: u32) {
+            if i == par.nv {
+                out.push((c - left, key));
+                return;
+            }
+            let mut e = 0;
+            while e < par.base && e <= left {
+                rec(i + 1, left - e, key | ((e as u64) << (i as u32 * par.bits)), par, out, c);
+                e += 1;
+            }
+        }
+        rec(0, c, 0, &par, &mut monos, c);
+        monos.sort_unstable();
+        let deg: Vec<u32> = monos.iter().map(|m| m.0).collect();
+        let monos: Vec<u64> = monos.iter().map(|m| m.1).collect();
+        let index: HashMap<u64, u32> = monos.iter().enumerate().map(|(i, &m)| (m, i as u32)).collect();
+        let mut next = vec![vec![NONE; monos.len()]; par.nv];
+        for (col, &key) in monos.iter().enumerate() {
+            for i in 0..par.nv {
+                let e = exp_of(key, i, &par);
+                let e2 = if e + 1 == par.base { 1 } else { e + 1 };
+                let nd = deg[col] - e + e2;
+                if nd > c {
+                    continue;
+                }
+                let nk = (key & !(((1u64 << par.bits) - 1) << (i as u32 * par.bits))) | ((e2 as u64) << (i as u32 * par.bits));
+                next[i][col] = index[&nk];
+            }
+        }
+        Ring { par, c, monos, deg, index, next }
+    }
+    /// `x_i · row`; None if some term leaves degree `<= c`.
+    fn times_var(&self, row: &[(u32, u32)], i: usize) -> Option<Vec<(u32, u32)>> {
+        let p = self.par.p as u64;
+        let mut acc: HashMap<u32, u64> = HashMap::with_capacity(row.len());
+        for &(col, co) in row {
+            let t = self.next[i][col as usize];
+            if t == NONE {
+                return None;
+            }
+            *acc.entry(t).or_insert(0) += co as u64;
+        }
+        let mut v: Vec<(u32, u32)> = acc.into_iter().map(|(k, c)| (k, (c % p) as u32)).filter(|&(_, c)| c != 0).collect();
+        v.sort_unstable();
+        Some(v)
+    }
+}
+
+// ------------------------------------------------------------------ echelon over F_p
+
+struct Ech {
+    p: u32,
+    cols: usize,
+    piv: Vec<u32>, // col -> row index or NONE
+    rows: Vec<Vec<u16>>,
+    npiv: usize,
+}
+impl Ech {
+    fn new(cols: usize, p: u32) -> Ech {
+        Ech { p, cols, piv: vec![NONE; cols], rows: vec![], npiv: 0 }
+    }
+    /// reduce and insert; returns the new row's leading column if it was new
+    fn insert(&mut self, sparse: &[(u32, u32)]) -> Option<usize> {
+        let p = self.p;
+        let mut acc = vec![0u32; self.cols];
+        for &(c, v) in sparse {
+            acc[c as usize] = v;
+        }
+        let mut top = self.cols;
+        let mut ops = 0u32;
+        loop {
+            let mut t = None;
+            for j in (0..top).rev() {
+                if acc[j] % p != 0 {
+                    t = Some(j);
+                    break;
+                }
+            }
+            let t = match t {
+                None => return None,
+                Some(t) => t,
+            };
+            let c = acc[t] % p;
+            let ri = self.piv[t];
+            if ri == NONE {
+                let ic = inv(c as u64, p as u64) as u32;
+                let row: Vec<u16> = acc[..=t].iter().map(|&x| ((x % p) as u64 * ic as u64 % p as u64) as u16).collect();
+                self.piv[t] = self.rows.len() as u32;
+                self.rows.push(row);
+                self.npiv += 1;
+                return Some(t);
+            }
+            let k = p - c;
+            let row = &self.rows[ri as usize];
+            for (x, &y) in acc[..row.len()].iter_mut().zip(row.iter()) {
+                *x += k * y as u32;
+            }
+            ops += 1;
+            if ops % 128 == 0 {
+                for x in acc[..=t].iter_mut() {
+                    *x %= p;
+                }
+            }
+            top = t;
+        }
+    }
+    fn sparse_row(&self, t: usize) -> Vec<(u32, u32)> {
+        let row = &self.rows[self.piv[t] as usize];
+        row.iter().enumerate().filter(|(_, &v)| v != 0).map(|(j, &v)| (j as u32, v as u32)).collect()
+    }
+}
+
+struct Closure {
+    plain: usize,
+    plain_low: usize,
+    closed: usize,
+}
+fn closure(f: &Poly, ring: &Ring, delta: u32, target: usize) -> Closure {
+    let par = ring.par;
+    let c = ring.c;
+    let cols = ring.monos.len();
+    let mut ech = Ech::new(cols, par.p);
+    let mut low: Vec<usize> = vec![];
+    if delta <= c {
+        let base: Vec<(u32, u32)> = f.iter().map(|&(k, co)| (ring.index[&k], co)).collect();
+        for mc in 0..cols {
+            if ring.deg[mc] > c - delta {
+                continue;
+            }
+            let mut row = base.clone();
+            let mut ok = true;
+            'v: for i in 0..par.nv {
+                for _ in 0..exp_of(ring.monos[mc], i, &par) {
+                    match ring.times_var(&row, i) {
+                        Some(r) => row = r,
+                        None => {
+                            ok = false;
+                            break 'v;
+                        }
+                    }
+                }
+            }
+            if ok {
+                if let Some(t) = ech.insert(&row) {
+                    if ring.deg[t] < c {
+                        low.push(t);
+                    }
+                }
+            }
+        }
+    }
+    let plain = ech.npiv;
+    let plain_low = (0..cols).filter(|&t| ech.piv[t] != NONE && ring.deg[t] < c).count();
+    let mut queue = low;
+    while let Some(t) = queue.pop() {
+        if ech.npiv >= target {
+            break;
+        }
+        if ech.piv[0] != NONE {
+            return Closure { plain, plain_low, closed: cols.min(target) };
+        }
+        let row = ech.sparse_row(t);
+        for i in 0..par.nv {
+            if let Some(pr) = ring.times_var(&row, i) {
+                if let Some(t2) = ech.insert(&pr) {
+                    if ring.deg[t2] < c {
+                        queue.push(t2);
+                    }
+                }
+            }
+        }
+    }
+    if ech.piv[0] != NONE {
+        return Closure { plain, plain_low, closed: cols.min(target) };
+    }
+    Closure { plain, plain_low, closed: ech.npiv }
+}
+
+// ------------------------------------------------------------------ ideal side
+
+fn eval_mono(key: u64, pt: u64, par: &Par) -> u32 {
+    if par.base == 2 {
+        return ((key & !pt) == 0) as u32;
+    }
+    let p = par.p as u64;
+    let mut r = 1u64;
+    for i in 0..par.nv {
+        let e = exp_of(key, i, par);
+        if e > 0 {
+            let v = exp_of(pt, i, par) as u64; // point values share the packing
+            r = r * powmod(v, e as u64, p) % p;
+        }
+    }
+    r as u32
+}
+
+/// `(dim I∩R_{<=c} for c = 0..=cmax, DG, max standard degree)`
+fn ideal_side(ring: &Ring, sols: &[u64]) -> (Vec<usize>, u32, u32) {
+    let par = ring.par;
+    let p = par.p;
+    let cmax = ring.c;
+    let cols = ring.monos.len();
+    let ns = sols.len();
+    let mut standard = vec![false; cols];
+    if ns > 0 {
+        let mut basis: Vec<(usize, Vec<u32>)> = vec![]; // (pivot position, normalized vector)
+        for col in 0..cols {
+            let mut v: Vec<u32> = sols.iter().map(|&pt| eval_mono(ring.monos[col], pt, &par)).collect();
+            for (pos, b) in &basis {
+                let c = v[*pos];
+                if c != 0 {
+                    let k = p - c;
+                    for (x, &y) in v.iter_mut().zip(b.iter()) {
+                        *x = (*x + k * y) % p;
+                    }
+                }
+            }
+            if let Some(pos) = v.iter().position(|&x| x != 0) {
+                let ic = inv(v[pos] as u64, p as u64) as u32;
+                for x in v.iter_mut() {
+                    *x = (*x as u64 * ic as u64 % p as u64) as u32;
+                }
+                basis.push((pos, v));
+                standard[col] = true;
+            }
+        }
+    }
+    let dims: Vec<usize> = (0..=cmax)
+        .map(|c| {
+            (0..cols).filter(|&j| ring.deg[j] <= c).count() - (0..cols).filter(|&j| ring.deg[j] <= c && standard[j]).count()
+        })
+        .collect();
+    if ns == 0 {
+        return (dims, 0, 0);
+    }
+    let max_std = (0..cols).filter(|&j| standard[j]).map(|j| ring.deg[j]).max().unwrap_or(0);
+    // minimal non-standard monomials: all proper divisors standard (field-equation leaders ignored)
+    let mut dg = 0;
+    for col in 0..cols {
+        if standard[col] || ring.deg[col] > max_std + 1 {
+            continue;
+        }
+        let mut minimal = true;
+        for i in 0..par.nv {
+            let e = exp_of(ring.monos[col], i, &par);
+            if e >= 1 {
+                let dk = ring.monos[col] - (1u64 << (i as u32 * par.bits));
+                if !standard[ring.index[&dk] as usize] {
+                    minimal = false;
+                    break;
+                }
+            }
+        }
+        if minimal {
+            dg = dg.max(ring.deg[col]);
+        }
+    }
+    (dims, dg, max_std)
+}
+
+struct Measure {
+    ffd: Option<u32>,
+    d_last: Option<u32>,
+    e0: Option<u32>,
+    dg: u32,
+    nsol: usize,
+    secs: f64,
+    censored: bool,
+    plain_low: Vec<usize>,
+}
+fn measure(f: &Poly, par: Par, sols: &[u64], cmax: u32) -> Measure {
+    let t0 = Instant::now();
+    let delta = pdeg(f, &par);
+    let top = Ring::new(par, cmax);
+    let (idim, dg, max_std) = ideal_side(&top, sols);
+    drop(top);
+    let mut ffd = None;
+    let mut prev_plain = 0usize;
+    let mut e0 = None;
+    let mut clo: HashMap<u32, usize> = HashMap::new();
+    let mut lows = vec![];
+    for c in 2..=cmax {
+        let ring = Ring::new(par, c);
+        let r = closure(f, &ring, delta, idim[c as usize]);
+        if ffd.is_none() && r.plain_low > prev_plain {
+            ffd = Some(c);
+        }
+        prev_plain = r.plain;
+        lows.push(r.plain_low);
+        clo.insert(c, r.closed);
+        if e0.is_none() && r.closed == idim[c as usize] && c >= dg {
+            e0 = Some(c);
+            break;
+        }
+    }
+    let d_last = e0.map(|e| {
+        let mut dl = e;
+        for c in (2..e).rev() {
+            if clo.get(&c) == Some(&idim[c as usize]) {
+                dl = c;
+            } else {
+                break;
+            }
+        }
+        dl
+    });
+    Measure {
+        ffd,
+        d_last,
+        e0,
+        dg,
+        nsol: sols.len(),
+        secs: t0.elapsed().as_secs_f64(),
+        censored: e0.is_none() || max_std + 1 > cmax,
+        plain_low: lows,
+    }
+}
+
+// ------------------------------------------------------------------ zero sets
+
+fn zeros_boolean(f: &Poly, n: usize, p: u32) -> Vec<u64> {
+    let mut val = vec![0u32; 1 << n];
+    for &(k, c) in f {
+        val[k as usize] = c;
+    }
+    for i in 0..n {
+        for m in 0..(1usize << n) {
+            if m >> i & 1 == 1 {
+                val[m] = (val[m] + val[m ^ (1 << i)]) % p;
+            }
+        }
+    }
+    (0..(1usize << n)).filter(|&m| val[m] == 0).map(|m| m as u64).collect()
+}
+fn zeros_plain(f: &Poly, par: &Par) -> Vec<u64> {
+    let p = par.p as u64;
+    let mut out = vec![];
+    for v1 in 0..par.p as u64 {
+        for v2 in 0..par.p as u64 {
+            let pt = v1 | (v2 << par.bits);
+            let s: u64 = f.iter().map(|&(k, c)| c as u64 * eval_mono(k, pt, par) as u64 % p).sum::<u64>() % p;
+            if s == 0 {
+                out.push(pt);
+            }
+        }
+    }
+    out
+}
+
+// ------------------------------------------------------------------ digit panel
+
+fn linear_form(block: usize, s: usize, par: &Par) -> Poly {
+    let p = par.p as u64;
+    (0..s).map(|i| (1u64 << (block * s + i), ((1u64 << i) % p) as u32)).collect()
+}
+
+struct Draw {
+    line: String,
+}
+fn digit_draw(m: usize, s: usize, arm: &str, seed: u64, cmax: u32, closure_on: bool) -> Draw {
+    let mut rng = Rng(seed);
+    let n = m * s;
+    let b = ((2 * s + 1).min(11)) as u32; // p in (2^b, 2^(b+1)), always p > 2^s
+    let p = random_prime(&mut rng, 1 << b, 1 << (b + 1));
+    let cv = new_curve(&mut rng, p);
+    let par = Par { p, nv: n, base: 2, bits: 1 };
+    let ell: Vec<Poly> = (0..m).map(|k| linear_form(k, s, &par)).collect();
+    let build = |xr: u32| -> Poly {
+        let xrp = pconst(xr as i64, &par);
+        if m == 2 {
+            s3_poly(&ell[0], &ell[1], &xrp, &cv, &par)
+        } else {
+            s4_poly(&ell[0], &ell[1], &ell[2], &xrp, &cv, &par)
+        }
+    };
+    let mut planted: Option<Vec<u32>> = None;
+    let pick_planted = |rng: &mut Rng| -> Option<(u32, Vec<u32>)> {
+        // m digit-block values with points on E; target = x(P1 ± P2 ± ...)
+        loop {
+            let vals: Vec<u32> = (0..m).map(|_| rng.below(1 << s) as u32).collect();
+            let mut acc: Option<(u32, u32)> = None;
+            let mut okp = true;
+            for &v in &vals {
+                let y = match cv.sqrt(cv.rhs(v)) {
+                    Some(y) if y != 0 => y,
+                    _ => {
+                        okp = false;
+                        break;
+                    }
+                };
+                let pt = (v, if rng.below(2) == 0 { y } else { p - y });
+                acc = match acc {
+                    None => Some(pt),
+                    Some(q) => match cv.add(q, pt) {
+                        Some(r) => Some(r),
+                        None => {
+                            okp = false;
+                            break;
+                        }
+                    },
+                };
+            }
+            if okp {
+                if let Some(r) = acc {
+                    return Some((r.0, vals));
+                }
+            }
+        }
+    };
+    let (f, sols, kind) = match arm {
+        "P" => {
+            let (xr, vals) = pick_planted(&mut rng).unwrap();
+            planted = Some(vals);
+            let f = build(xr);
+            let sols = zeros_boolean(&f, n, p);
+            (f, sols, format!("planted xr={xr}"))
+        }
+        _ => {
+            // unsat target (U) or its nulls: search an unsatisfiable system
+            let mut tries = 0;
+            loop {
+                tries += 1;
+                if tries > 4000 {
+                    return Draw { line: format!("{{\"error\":\"no unsat instance\",\"m\":{m},\"s\":{s},\"p\":{p}}}") };
+                }
+                let xr = rng.below(p as u64) as u32;
+                if cv.sqrt(cv.rhs(xr)).map_or(true, |y| y == 0) {
+                    continue;
+                }
+                let real = build(xr);
+                let f = match arm {
+                    "U" => real,
+                    "Usupp" => {
+                        let mut g: Poly = real.iter().map(|&(k, _)| (k, 1 + rng.below(p as u64 - 1) as u32)).collect();
+                        g.sort_unstable();
+                        g
+                    }
+                    "Ublock" => {
+                        // product of random forms on the support of ell_k^e (plus the constant), e = 2^(m-1)
+                        let e = 1usize << (m - 1);
+                        let mut prod = pconst(1, &par);
+                        for k in 0..m {
+                            let mut pw = pconst(1, &par);
+                            for _ in 0..e {
+                                pw = pmul(&pw, &ell[k], &par);
+                            }
+                            let mut q: Poly = pw.iter().map(|&(kk, _)| (kk, 1 + rng.below(p as u64 - 1) as u32)).collect();
+                            q.push((0, 1 + rng.below(p as u64 - 1) as u32)); // constant term: the support of ell^e has none, and q(0) = 0 would make every null satisfiable
+                            q.sort_unstable();
+                            prod = pmul(&prod, &q, &par);
+                        }
+                        prod
+                    }
+                    _ => panic!("arm"),
+                };
+                let sols = zeros_boolean(&f, n, p);
+                if sols.is_empty() {
+                    break (f, sols, format!("unsat xr={xr}"));
+                }
+            }
+        }
+    };
+    let delta = pdeg(&f, &par);
+    let dn = ((n as u32 + delta) / 2) + 1;
+    let e = 1u32 << (m - 1);
+    let law = if (s as u32) >= e { m as u32 * e + (s as u32 - e) / 2 + 1 } else { 0 };
+    let r = if closure_on {
+        measure(&f, par, &sols, cmax)
+    } else {
+        // first fall only: Macaulay spaces, no mutant closure, no ideal side
+        let t0 = Instant::now();
+        let mut ffd = None;
+        let mut prev = 0usize;
+        let mut lows = vec![];
+        for c in 2..=cmax {
+            let ring = Ring::new(par, c);
+            let r = closure(&f, &ring, delta, 0);
+            if ffd.is_none() && r.plain_low > prev {
+                ffd = Some(c);
+            }
+            prev = r.plain;
+            lows.push(r.plain_low);
+            if ffd.is_some() {
+                break;
+            }
+        }
+        Measure { ffd, d_last: None, e0: None, dg: 0, nsol: sols.len(), secs: t0.elapsed().as_secs_f64(), censored: ffd.is_none(), plain_low: lows }
+    };
+    let cols_dl = r.d_last.map(|d| (0..=d as usize).map(|j| binom(n, j)).sum::<u128>());
+    let js = |o: Option<u32>| o.map_or("null".to_string(), |v| v.to_string());
+    let line = format!(
+        "{{\"schema\":\"digit_fall/v1\",\"m\":{m},\"s\":{s},\"n\":{n},\"arm\":\"{arm}\",\"seed\":{seed},\"p\":{p},\"a\":{},\"b\":{},\"kind\":\"{kind}\",\"planted\":{},\"delta\":{delta},\"nsol\":{},\"DG\":{},\"ffd\":{},\"d_last\":{},\"e0\":{},\"law_ffd\":{law},\"D_null\":{dn},\"cols_at_dlast\":{},\"closure\":{closure_on},\"censored\":{},\"secs\":{:.1}}}",
+        cv.a,
+        cv.b,
+        planted.map_or("null".to_string(), |v| format!("{v:?}")),
+        r.nsol,
+        r.dg,
+        js(r.ffd),
+        js(r.d_last),
+        js(r.e0),
+        cols_dl.map_or("null".to_string(), |v| v.to_string()),
+        r.censored,
+        r.secs
+    );
+    let _ = r.plain_low;
+    Draw { line }
+}
+fn binom(n: usize, k: usize) -> u128 {
+    if k > n {
+        return 0;
+    }
+    let mut r: u128 = 1;
+    for i in 0..k {
+        r = r * (n - i) as u128 / (i + 1) as u128;
+    }
+    r
+}
+
+// ------------------------------------------------------------------ plain control
+
+fn plain_draw(p: u32, seed: u64, cmax: u32) -> String {
+    let mut rng = Rng(seed);
+    let cv = new_curve(&mut rng, p);
+    let bits = 32 - (p - 1).leading_zeros();
+    let par = Par { p, nv: 2, base: p, bits };
+    let x1 = vec![(1u64, 1u32)];
+    let x2 = vec![(1u64 << bits, 1u32)];
+    let xr = loop {
+        let v = rng.below(p as u64) as u32;
+        if cv.sqrt(cv.rhs(v)).map_or(false, |y| y != 0) {
+            break v;
+        }
+    };
+    let f = s3_poly(&x1, &x2, &pconst(xr as i64, &par), &cv, &par);
+    let sols = zeros_plain(&f, &par);
+    let r = measure(&f, par, &sols, cmax);
+    let js = |o: Option<u32>| o.map_or("null".to_string(), |v| v.to_string());
+    format!(
+        "{{\"schema\":\"digit_fall/v1\",\"arm\":\"plain\",\"p\":{p},\"seed\":{seed},\"a\":{},\"b\":{},\"xr\":{xr},\"delta\":{},\"nsol\":{},\"DG\":{},\"ffd\":{},\"d_last\":{},\"e0\":{},\"cols_full\":{},\"censored\":{},\"secs\":{:.1}}}",
+        cv.a,
+        cv.b,
+        pdeg(&f, &par),
+        r.nsol,
+        r.dg,
+        js(r.ffd),
+        js(r.d_last),
+        js(r.e0),
+        (p as u64) * (p as u64),
+        r.censored,
+        r.secs
+    )
+}
+
+// ------------------------------------------------------------------ main
+
+fn arg<T: std::str::FromStr>(args: &[String], name: &str, default: T) -> T {
+    args.iter().position(|a| a == name).and_then(|i| args.get(i + 1)).and_then(|v| v.parse().ok()).unwrap_or(default)
+}
+fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let cmd = args.first().map(String::as_str).unwrap_or("");
+    let draws: usize = arg(&args, "--draws", 1);
+    let seed: u64 = arg(&args, "--seed", 1);
+    let cmax: u32 = arg(&args, "--cmax", 12);
+    let threads: usize = arg(&args, "--threads", 1);
+    let next = AtomicUsize::new(0);
+    let out = std::sync::Mutex::new(Vec::<(usize, String)>::new());
+    let job = |idx: usize| -> String {
+        let sd = seed.wrapping_mul(1_000_003).wrapping_add(idx as u64 * 7919 + 1);
+        match cmd {
+            "digit" => {
+                let m: usize = arg(&args, "--m", 2);
+                let s: usize = arg(&args, "--s", 3);
+                let arm: String = arg(&args, "--arm", "U".to_string());
+                let first_only: bool = arg(&args, "--first-fall-only", false);
+                digit_draw(m, s, &arm, sd, cmax, !first_only).line
+            }
+            "plain" => plain_draw(arg(&args, "--p", 13), sd, cmax),
+            _ => panic!("usage: digit_fall digit|plain ..."),
+        }
+    };
+    std::thread::scope(|sc| {
+        for _ in 0..threads.max(1) {
+            sc.spawn(|| loop {
+                let i = next.fetch_add(1, Ordering::SeqCst);
+                if i >= draws {
+                    break;
+                }
+                let line = job(i);
+                println!("{line}");
+                out.lock().unwrap().push((i, line));
+            });
+        }
+    });
+}

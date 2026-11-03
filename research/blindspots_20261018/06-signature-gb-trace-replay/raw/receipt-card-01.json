@@ -1,0 +1,243 @@
+{
+  "card_id": "CARD-BLINDSPOT-06-01",
+  "card_path": "research/blindspots_20261018/06-signature-gb-trace-replay/card-01.yaml",
+  "card_sha256": "8394fb2a19e926ef001fde681bf551ee6466da01e600dc3f92b1cba891ff6daa",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-06/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-06/card-01/b06",
+        "examples/blindspots_06_signature_gb.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.636,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.636,
+      "stderr_sha256": "cc067d4b0e2d533532efe944c5bda81f98d34a14eb918073ec4fa424ca6aeefd",
+      "stderr_tail": [
+        "",
+        "warning: fields `ratios`, `bounds`, `zero_r`, and `sym_r` are never read",
+        "    --> examples/blindspots_06_signature_gb.rs:3039:5",
+        "     |",
+        "3036 | struct ArmCell {",
+        "     |        ------- fields in this struct",
+        "...",
+        "3039 |     ratios: Vec<f64>, // exact ratios (both refuted)",
+        "     |     ^^^^^^",
+        "3040 |     bounds: Vec<f64>, // upper bounds for the censored targets",
+        "     |     ^^^^^^",
+        "...",
+        "3044 |     zero_r: f64,",
+        "     |     ^^^^^^",
+        "...",
+        "3047 |     sym_r: f64,",
+        "     |     ^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-06/card-01/b06",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 107.969,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 107.969,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "924228756eae4fd37338630677226273489473bdfa9b0ea2fe379608827e2487",
+      "stdout_tail": [
+        "orders ok: key = plain grevlex; rk = key on squarefree, multiplicative, degree-first with squares",
+        "toy (m,n,l)=(3, 5, 2) nv=11: 3 unsat, 3 sat systems, all engines agree",
+        "toy (m,n,l)=(4, 4, 1) nv=12: 3 unsat, 3 sat systems, all engines agree",
+        "toy (m,n,l)=(2, 7, 3) nv=6: 3 unsat, 3 sat systems, all engines agree",
+        "toy (m,n,l)=(3, 6, 3) nv=15: 3 unsat, 3 sat systems, all engines agree",
+        "toy (m,n,l)=(4, 5, 2) nv=18: 3 unsat, 3 sat systems, all engines agree",
+        "toy (m,n,l)=(3, 7, 3) nv=16: 3 unsat, 3 sat systems, all engines agree",
+        "toy (m,n,l)=(2, 9, 5) nv=10: 3 unsat, 3 sat systems, all engines agree",
+        "systems: 60 unsat, 72 sat; engines f4, sig, sig0 and each criterion alone agree (refutation, standard monomials = brute force, vanishing, identical reduced bases)",
+        "criteria fired in sig over the selftest: K0 107115944 K1 5278789 K2 161226124 K3 602 K4 1738182 singular 85285",
+        "replays: 980 run, 120 own-trace replays of unsat systems refuted without fallback, 619 fell back (never a wrong verdict)",
+        "SELFTEST OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-06/card-01/b06",
+        "xcheck",
+        "--draws",
+        "research/blindspots_20261018/05-elimination-orders/draws.tsv",
+        "--ref",
+        "research/blindspots_20261018/05-elimination-orders/raw/card-02-main-c17-4-3.stdout.log",
+        "--cell",
+        "c17-4-3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.488,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "xcheck",
+      "index": 4,
+      "outputs": {},
+      "seconds": 5.488,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5d2a41b8ca78874c5b9ebc1190a446028ec2aa85f3835c32209ef262658ab2d0",
+      "stdout_tail": [
+        "c17-4-3 target 0: committed touches 251772306 here 251772306 IDENTICAL",
+        "c17-4-3 target 1: committed touches 341047593 here 341047593 IDENTICAL",
+        "c17-4-3 target 2: committed touches 348513255 here 348513255 IDENTICAL",
+        "c17-4-3 target 3: committed touches 249875306 here 249875306 IDENTICAL",
+        "c17-4-3 target 4: committed touches 252431093 here 252431093 IDENTICAL",
+        "c17-4-3 target 5: committed touches 241450898 here 241450898 IDENTICAL",
+        "c17-4-3 target 6: committed touches 253086291 here 253086291 IDENTICAL",
+        "c17-4-3 target 7: committed touches 345110873 here 345110873 IDENTICAL",
+        "xcheck c17-4-3: 8 committed item 05 grevlex rows, 0 differ",
+        "XCHECK OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-06/card-01/b06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-06/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "58d7200fc34437b98a6c9f6fbd046b1161effe6b",
+  "dirty_after": [
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-01-selftest.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-01-selftest.stdout.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-01-xcheck.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-01-xcheck.stdout.log"
+  ],
+  "dirty_before": [
+    "examples/blindspots_08_learned_branching.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

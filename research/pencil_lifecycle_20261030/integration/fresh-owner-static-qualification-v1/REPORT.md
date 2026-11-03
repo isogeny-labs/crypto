@@ -1,0 +1,11 @@
+# Offline fresh-owner static qualification
+
+One exact-source fresh-owner-only build completed successfully. No existing qualifying static artifact was found: the retained earlier debug executable has a GNU interpreter and was not reused as musl evidence. No concurrent fresh-owner build was active. Existing root V8 build was left untouched.
+
+The packaging script actually specifies Rust1.99.1, x86_64-unknown-linux-musl, release, two jobs and RUSTFLAGS=-C target-cpu=x86-64. The exact pinned toolchain has the musl target installed; default stable's target list alone would have incorrectly suggested absence. No tool or dependency installation occurred. cargo was locked and offline with a private target directory and240-second ceiling.
+
+BUILD-RECEIPT.json binds command, source manifest and toolchain. The resulting932760-byte binary SHA256 is66be334c57c2536fc33c741e877638090ab8a26cd11f42f53ef9d31cdae1cfaa. ELF inspection confirms x86-64, no INTERP and no dynamic NEEDED entry. The755 bundle copy has the same digest. Package scripts pass bash syntax checking. Source main SHAe7fc190e20634b8d2b0b87ed44cb239102f5abd8f620fe6564fa5ad6ff2bf153 matches the frozen reviewed native owner. Existing test fixture binary was not built or packaged by the --bin selection.
+
+Remaining concrete packaging gaps: this private source snapshot is not a clean committed whole-repository release; the script's Git revision/clean-tree prerequisite remains for actual release. The full matching static ecbench bundle and combined build-info.json were not produced here. Dockerfile installation and actual AL2023/task-image execution have not been tested. No image build/push, registry digest/readback, mounted downward-API qualification, or publisher AWS integration was performed. The local metadata deliberately has no image URI and does not masquerade as production build-info. The reviewed publisher's legacy three-field image receipt and separate owner sidecar remain source-qualified only.
+
+This is offline packaging/software evidence, not an experiment, runtime admission, scientific result, worker-cost measurement or deadline extension. Original25200seconds and2026-10-30T22:08:40Z remain unchanged. The static binary was inspected as data and never executed during this task.

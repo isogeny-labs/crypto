@@ -2,7 +2,7 @@
 //! queries that group curves by them or rank curves by likeness to one.
 //!
 //! ```text
-//! curve_traits build                       # registry + sources + hints → docs/curves/traits.json
+//! curve_traits build                       # catalog rows + sources + hints → docs/curves/traits.json
 //! curve_traits check                       # the committed file is current
 //! curve_traits unfactored                  # composites the budget left, for the hint script
 //! curve_traits show ECC2K-130              # one curve's record
@@ -23,9 +23,11 @@ use crypto_lib::cryptanalysis::curve_traits::{
 };
 
 const REGISTRY: &str = "docs/curves/registry.json";
+const CATALOG: &str = crypto_lib::cryptanalysis::cover_catalog::MANIFEST_PATH;
 const TRAITS: &str = "docs/curves/traits.json";
 const HINTS: &str = "docs/curves/factor-hints.txt";
 const SOURCES: &str = "docs/curves/trait-sources.json";
+const CERTIFICATES: &str = "docs/curves/level-certificates.json";
 
 fn read(path: &str) -> Result<Input, String> {
     Ok(Input {
@@ -34,9 +36,9 @@ fn read(path: &str) -> Result<Input, String> {
     })
 }
 
-/// Build from the registry, the hints and every source the manifest
-/// names, each read from its repository-relative path.
-fn build(registry: &str, budget: u64) -> Result<(TraitFile, Factoring), String> {
+/// Build from the registry rows the catalog names, the hints and every
+/// source the manifest names, each read from its repository-relative path.
+fn build(registry: &str, catalog: &str, budget: u64) -> Result<(TraitFile, Factoring), String> {
     let manifest = read(SOURCES)?;
     let files = read_manifest(&manifest.text)?
         .iter()
@@ -44,7 +46,9 @@ fn build(registry: &str, budget: u64) -> Result<(TraitFile, Factoring), String> 
         .collect::<Result<Vec<_>, _>>()?;
     TraitFile::build_from(
         &read(registry)?,
+        &read(catalog)?,
         Some(&read(HINTS)?),
+        Some(&read(CERTIFICATES)?),
         Some(&manifest),
         &files,
         budget,
@@ -62,10 +66,14 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
-    /// Derive every curve's traits from the registry and write the file.
+    /// Derive the traits of every catalog curve (and every source curve)
+    /// and write the file.
     Build {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
+        /// The manifest naming the registry rows to derive.
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value = TRAITS)]
         out: String,
         /// Pollard-rho iterations per composite.
@@ -76,6 +84,8 @@ enum Cmd {
     Check {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value = TRAITS)]
         traits: String,
     },
@@ -128,6 +138,8 @@ enum Cmd {
     Unfactored {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value_t = DEFAULT_BUDGET)]
         budget: u64,
     },
@@ -292,19 +304,24 @@ fn run(cli: Cli) -> Result<bool, String> {
     match cli.cmd {
         Cmd::Build {
             registry,
+            catalog,
             out,
             budget,
         } => {
-            let (file, _) = build(&registry, budget)?;
+            let (file, _) = build(&registry, &catalog, budget)?;
             std::fs::write(&out, file.to_json()).map_err(|e| format!("{out}: {e}"))?;
             eprintln!("wrote {} curves to {out}", file.curves.len());
             Ok(true)
         }
-        Cmd::Check { registry, traits } => {
+        Cmd::Check {
+            registry,
+            catalog,
+            traits,
+        } => {
             let committed =
                 std::fs::read_to_string(&traits).map_err(|e| format!("{traits}: {e}"))?;
             let budget = load(&traits)?.factor_budget;
-            let fresh = build(&registry, budget)?.0.to_json();
+            let fresh = build(&registry, &catalog, budget)?.0.to_json();
             if fresh == committed {
                 eprintln!("{traits} is current");
                 return Ok(true);
@@ -435,8 +452,12 @@ fn run(cli: Cli) -> Result<bool, String> {
             }
             Ok(true)
         }
-        Cmd::Unfactored { registry, budget } => {
-            let (_, fx) = build(&registry, budget)?;
+        Cmd::Unfactored {
+            registry,
+            catalog,
+            budget,
+        } => {
+            let (_, fx) = build(&registry, &catalog, budget)?;
             for c in fx.leftovers() {
                 println!("{c}");
             }

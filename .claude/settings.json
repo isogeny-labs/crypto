@@ -21,6 +21,16 @@
           }
         ],
         "matcher": "Edit|Write|MultiEdit|NotebookEdit"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/checkpoint-hook.sh",
+            "timeout": 120
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -52,6 +62,24 @@
             "type": "command"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/checkpoint-hook.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/relay.py --runtime claude session-start",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
@@ -63,7 +91,46 @@
             "type": "command"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/relay.py --runtime claude snapshot",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/checkpoint-hook.sh",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/relay.py --runtime claude snapshot",
+            "timeout": 120
+          }
+        ]
       }
     ]
+  },
+  "sandbox": {
+    "network": {
+      "allowedDomains": [
+        "setec-astronomy-artifacts.s3.us-east-2.amazonaws.com"
+      ]
+    }
   }
 }

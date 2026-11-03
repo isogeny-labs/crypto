@@ -1,0 +1,127 @@
+{
+  "schema": "secant-fixture-formalization/v1",
+  "date": "2026-10-31",
+  "requested_goal": "One checked theorem connecting concrete F17 complete splitting, actual generator zeroes, signed group relations and canonical homogeneous degree 5 to 3",
+  "curve_slug": "icv1-fp5-tm1-a77cc6af",
+  "factor_base": "FB1hed5b19904cc8",
+  "inherited_registry_status": "registered=false; unchanged",
+  "concrete_model": {
+    "field": "ZMod 17",
+    "A": 2,
+    "B": 2,
+    "graph_coefficients_low_to_high": [
+      9,
+      9,
+      4
+    ],
+    "abscissae": [
+      5,
+      6,
+      10,
+      16
+    ]
+  },
+  "theorem": "FixtureGroupDegree.exact_relations_and_degree",
+  "invariant": "FirstVanishing of quotient by ideal of actual canonical highest homogeneous forms",
+  "proof_degrees": {
+    "secant": 3,
+    "inherited_dense_comparator": 5
+  },
+  "semantics": "Root iff actual signed base-pair relation, all finite nonsingular targets, all four sign branches; identity inverse pairs separate",
+  "lean": {
+    "toolchain": "leanprover/lean4:v4.19.0",
+    "version": "Lean 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release",
+    "binary_sha256": "92c3d35b5bfaa5e0fea413a775d504cf46cd95e1345df61c2274f76779e7e023",
+    "mathlib_revision": "c44e0c8ee63ca166450922a373c7409c5d26b00b"
+  },
+  "validation": {
+    "command": "env PATH=/workspace/prime-degree-lean/bin:$PATH LEAN_NUM_THREADS=4 bash verify.sh verification/final",
+    "exit_code": 0,
+    "input_hashes": 30,
+    "source_modules": 14,
+    "transitively_audited_declarations": 159,
+    "audit_failures": 0,
+    "native_trust": 0,
+    "foundations": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "warnings_as_errors": "passed for new source",
+    "lean4checker_fresh": "unavailable; not claimed",
+    "cache_download_preflight": "not claimed"
+  },
+  "prior_group_recheck": {
+    "published_source_build": "passed",
+    "warnings_as_errors": "all three modules passed",
+    "audited_declarations": 22,
+    "audit_failures": 0,
+    "native_trust": 0,
+    "recovered_original_source_matches_published": true
+  },
+  "development": {
+    "failed_builds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "successful_first_complete_build": 8,
+    "final_verify_exit_code": 0,
+    "archive": "verification/development-records.tar.gz",
+    "archive_sha256": "5050496b647efd33e5e7df4bd994789888ea2e4f62c3f9fac3a9fc5affb4dc74",
+    "deterministic_repack": "byte-identical",
+    "original_prior_log_recovered": "verification/recovered-prior-build03.log"
+  },
+  "rendering": {
+    "renderer": "Typst 0.15.0",
+    "pdf": "reports/report.pdf",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "inspection_render_dpi": 100,
+    "pdfinfo_suspects": false,
+    "shared_body_and_diagram_font": "DejaVu Sans"
+  },
+  "evidence": {
+    "dependencies": "verification/dependencies.json",
+    "input_hashes": "verification/inputs.sha256",
+    "full_audit": "verification/final/axioms.log",
+    "build": "verification/final/build.log",
+    "warnings": "verification/final/warnings.log",
+    "status": "verification/final/status.json"
+  },
+  "scope_limits": [
+    "No new numerical degree or cost measurement",
+    "No affine F4 solving-degree claim",
+    "No independent new dense-to-group equivalence theorem",
+    "No group-order or registry proof added",
+    "No workflow, auditor or native-trust change",
+    "Prior sealed proof and experiment records unchanged"
+  ],
+  "requirement_status": {
+    "published_group_recheck": "verified complete",
+    "concrete_complete_split": "verified complete",
+    "actual_generator_evaluation_bridge": "verified complete",
+    "exact_group_relations": "verified complete",
+    "combined_canonical_degree_theorem": "verified complete",
+    "all_signs_and_identity": "verified complete",
+    "full_axiom_audit": "verified complete",
+    "inspected_illustrated_report": "verified complete",
+    "pr": "publication pending"
+  },
+  "selected_hashes": {
+    "FixtureGroupDegree.lean": "e5f7aad2b05e9dfb5007390107679e2c4366b13dbf2185bc7ceb28f02ce68097",
+    "lakefile.toml": "a098eb0efb600afe9c22edfd140687356514888806f72e2b4928e96097275816",
+    "lake-manifest.json": "4d8f6c1845879a2054662fedd14417a9df06517f4309bd6f8d98b64681522047",
+    "lean-toolchain": "55e97be96000b5e9e290c9e74482e5e317861499a5540353ce845471bded8cea",
+    "verify.sh": "f28842483902d3bbdf07b82f273877b680a06700c7a8944c4d4207f7d3c1faa2",
+    "verification/inputs.sha256": "8e762eb1f9bb910afe029e4e40dab4a283c8f4bbc068b9dcb09c9e8f37b9e7d1",
+    "verification/final/axioms.log": "fffcc749e299b3b80c9f1951e9526fc81c90d45a66688e4a530e3373e6b81f36",
+    "reports/report.pdf": "2f937ca6aebb088b51739b8249a748432de9245b4c569f58c4291db9133a1dd4",
+    "reports/bridge.svg": "3319580e91ff71a8c74867a411c60ce17a5656ca40f19aedff63e5447f246544",
+    "identity.json": "351440f4f73b76219129751bee979ab880e0878568ff5fa861de42be1f48d1c3"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h0808f60fce83a05e",
+  "statement": {
+    "name": "inverse_guard_divided_difference",
+    "source": "research/guarded_fall_degree_20261028/formal/FallDegreeIdentities.lean: FallDegreeIdentities.inverse_guard_divided_difference; specialization gx=d*q, gy=0",
+    "variables": [
+      "v",
+      "d",
+      "q"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "v"
+            },
+            {
+              "op": "var",
+              "args": "d"
+            },
+            {
+              "op": "var",
+              "args": "q"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "q"
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "v"
+                      },
+                      {
+                        "op": "var",
+                        "args": "d"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "const",
+                      "args": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "var",
+      "args": "q"
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261030,
+  "value_digest": "1c11fb558c4f66a59ee77f6fdd956a33e97fd481171773b8021574fe861e698a",
+  "independence": "native issue/check with statement-bound points and a domain-separated extra stream; not an independent-host or Lean-prover invocation",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/guarded_fall_degree_20261028/formal/FallDegreeIdentities.lean",
+    "sha256": "7aa8afec68e132b490bb256e168df6e62dbdb5bf2ac3118aa66e92cd55fce661"
+  }
+}
