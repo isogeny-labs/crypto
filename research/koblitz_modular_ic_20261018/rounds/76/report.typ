@@ -7,4 +7,4 @@ The accepted full-table calculation classifies all six rational omitted branches
 
 The quadratic equation is Eisenstein at $z=0$. At $z+1$ it is etale, and $R+1=(z+1)(V+z^2+z+1)$ with norm of the second factor $z+1$. The source norms are $N(R)=z$ and $N(R+1)=(z+1)^3$, so these are the complete finite zero supports. Each row has residue degree two; total finite zero degrees are 96 for $b$ and 80 for $c$. The proper pole divisors have these total degrees, while individual orders at infinity remain to be resolved.
 
-One native attempt passed exit 0, exact marker, zero-error, six source-byte pins and five donor hashes. The chart is derived from that attempt and the stated valuation argument; Lean identity-check status is recorded separately.
+One native attempt passed exit 0, exact marker, zero-error, six source-byte pins and five donor hashes. The pinned Lean compile and axiom audit passed three authored norm/degree theorems with zero failing and zero trusted. A failed launcher attempt before compilation is retained. The local valuation bridge is stated in CM.md.

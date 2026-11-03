@@ -51,6 +51,11 @@ degree checks. On the proper normalization, the total pole degrees
 are consequently 96 and 80; the infinity branches and individual pole
 orders still require their chart.
 
-The Lean file `lean/Quadratic76.lean` expresses the two characteristic-two
-norm expansions and the weighted degree arithmetic. Its compilation
-status is recorded separately from the accepted native run.
+The Lean file `lean/Quadratic76.lean` proves the two characteristic-two
+norm expansions and the weighted degree arithmetic. Its pinned archival
+compile and axiom audit passed: three authored theorems, zero failing
+and zero trusted. One earlier launcher attempt stopped before compilation
+on a wrong copied filename; its partial raw directory and exact failure
+receipt are retained. Lean does not prove the source equation, primitive
+mask assignment, or local valuation-theoretic bridge; those are tied to
+the native source checks and the arguments above.

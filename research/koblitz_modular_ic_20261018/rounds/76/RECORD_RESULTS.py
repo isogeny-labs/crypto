@@ -6,7 +6,8 @@ import hashlib, json, re, subprocess
 h = Path(__file__).resolve().parent
 repo = h.parents[3]
 raw = h / 'runs/quadratic76-01'
-assert sorted(p.name for p in (h / 'runs').iterdir() if p.is_dir()) == ['quadratic76-01']
+assert sorted(p.name for p in (h / 'runs').iterdir() if p.is_dir()) == [
+    'quadratic-lean76-01', 'quadratic-lean76-02', 'quadratic76-01']
 digest = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
 revision = (raw / 'source-revision.txt').read_text().strip()
 log = (raw / 'native.log').read_text().splitlines()
