@@ -2977,12 +2977,16 @@ mod tests {
         let mut ops = GroupOps::default();
         let g = inst.generator_point();
         let mut rng = StdRng::seed_from_u64(99);
+        // 6 random + 6 planted: the shared system solves at degree 8 to 10 on
+        // this base, so a larger sample makes the suite run for half an hour.
+        const RANDOM: usize = 6;
+        const PLANTED: usize = 6;
         let mut targets = Vec::new();
-        for _ in 0..40 {
+        for _ in 0..RANDOM {
             targets.push(curve.mul(&mut ops, g, rng.gen_range(1..inst.r)));
         }
         let mut planted = 0;
-        while planted < 12 {
+        while planted < PLANTED {
             let (i, j) = (
                 rng.gen_range(0..fb.points.len()),
                 rng.gen_range(0..fb.points.len()),
@@ -3001,7 +3005,7 @@ mod tests {
                 let s = curve.add(&mut ops, target, kk);
                 decomposable.contains(&curve.key(&s))
             });
-            if n >= 40 {
+            if n >= RANDOM {
                 assert!(truth, "planted target {n} is lift-decomposable");
             }
             let run = |o: &mut PkmSemaevOracle| {
