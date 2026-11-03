@@ -1584,7 +1584,9 @@ fn f4cost_m(
                 PkmSemaevOracle::new_isogeny(nsum, t, tower.v.clone(), steps, tower.c),
             )
         }
-        o => panic!("form is bits[@lo], square-bits[@lo], edwards-bits, t0-bits[@lo] or isogeny, not {o}"),
+        o => panic!(
+            "form is bits[@lo], square-bits[@lo], edwards-bits, t0-bits[@lo] or isogeny, not {o}"
+        ),
     };
     let mut spec = if guess > 0 {
         format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
