@@ -285,3 +285,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Native normalized source integration
 
 [feature-native-source/DERIVATION.md](feature-native-source/DERIVATION.md) joins phase, value division, joint geometry and product-tree resultant with exact homogeneous recurrence, partial tails and calibration. Three integration methods pass: three original raw records and three public identity-crossing windows. Phase sharing and retained stride setup are next; complete costs and full cohort remain separate.
+
+## Shared source seeds and retained preparation
+
+[feature-native-shared-seeds/DERIVATION.md](feature-native-shared-seeds/DERIVATION.md) adds borrowed immutable prepared state, four seed anchors and the original outer seed recurrence. Five fixed F509 windows match all 80 signs and 78 finite direct phases; recorded direct calls are 0/0/1/0/2. Reuse on three original curves and two tiny tail-branch fixtures passes. Costs retain recurrence inversions and all downstream work. Decoder binding is next.

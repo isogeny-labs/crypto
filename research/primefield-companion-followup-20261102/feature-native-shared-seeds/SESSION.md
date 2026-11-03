@@ -11,3 +11,19 @@ Run fixed integration checks; bind the shared source to native decoder and add c
 
 ## Errors (what went wrong, how it was handled)
 No cloud submission or infrastructure change. Prior source files remain immutable.
+
+## Checks completed
+
+### What was done (commands, files, features)
+Three methods pass once; 80 F509 signs and 78 finite phase references agree. Original-three-curve reuse and two tiny branch fixtures pass. Eight source/dependency hashes and original driver hash pass. Counts project directly from retained raw log.
+
+### Decisions made (and why)
+Report logical seed methods and derived four-products/one-inversion step only; retain all other costs. Fixed pretest source hashes bind bytes while Git commit completion lagged execution on shared storage.
+
+### Open threads (unfinished, pick up next time)
+Bind repaired native decoder and measure complete cost. The s=0,epsilon=0 raw branch still needs explicit numerical coverage.
+
+### Errors (what went wrong, how it was handled)
+No test/build failures; inherited unused geometry-field warning retained. No repeated attempt, original artifact mutation or cloud submission.
+
+Publication: one-page report rendered and inspected. Shared daily-log scope became available and was claimed as T-1494 to append the current and preceding component handoffs.
