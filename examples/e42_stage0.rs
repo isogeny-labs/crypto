@@ -10,7 +10,7 @@
 //! the per-lead-degree and fill-arrival sums.
 //!
 //! ```text
-//! ./e42_stage0 --targets 200 --json experiments/49_macaulay_tails/stage0.json
+//! ./e42_stage0 --targets 200 --json experiments/49_macaulay_tails/stage0_v2.json
 //! ```
 
 use crypto_lib::cryptanalysis::klein_v4::{v4_system, SymmetrisedV4, MACAULAY_BOUND};
@@ -72,9 +72,33 @@ fn summarise(set: &str, p: u64, seed: u64, calls: &[TailStage0]) -> Value {
             ge[k] += c.growth_events_by_bin[k];
         }
     }
+    let n = calls.len() as f64;
+    let mean3 = |g: fn(&TailStage0) -> [u64; 3]| -> [f64; 3] {
+        let mut t = [0u64; 3];
+        for c in calls {
+            for (x, y) in t.iter_mut().zip(g(c)) {
+                *x += y;
+            }
+        }
+        t.map(|x| x as f64 / n)
+    };
+    let max3 = |g: fn(&TailStage0) -> [u64; 3]| -> [u64; 3] {
+        let mut t = [0u64; 3];
+        for c in calls {
+            for (x, y) in t.iter_mut().zip(g(c)) {
+                *x = (*x).max(y);
+            }
+        }
+        t
+    };
     json!({
         "set": set, "p": p, "seed": seed, "calls": calls.len(),
         "fields": fields,
+        "reserve_cells_mean": mean3(|c| c.reserve_cells),
+        "reserve_reallocs_mean": mean3(|c| c.reserve_reallocs),
+        "reserve_reallocs_max": max3(|c| c.reserve_reallocs),
+        "reserve_copy_cells_mean": mean3(|c| c.reserve_copy_cells),
+        "reserve_realloc_rows_mean": mean3(|c| c.reserve_realloc_rows),
         "by_lead_degree_sum": by,
         "growth_cells_by_bin_sum": gc,
         "growth_events_by_bin_sum": ge,
@@ -141,7 +165,10 @@ fn main() {
                 let v = summarise(set, p, seed, &calls);
                 let fm = |k: &str| v["fields"][k]["mean"].as_f64().unwrap_or(f64::NAN);
                 eprintln!(
-                    "{set} p={p} s={seed}: tail {:.0} build-extent {:.0} final-extent {:.0} ever-extent {:.0} | ever-nz {:.0} final-nz {:.0} | touched V {:.0} G {:.0} | updates {:.0} dense {:.0} | growth ev {:.0} cells {:.0} copy {:.0} from-c {:.0} rows {:.1} max {:.0} first {:.0} | merge-lb {:.0} | end!=TM {:.0} zero-coef {:.0} | ok {}",
+                    "{set} p={p} s={seed}: reserve cells {} reallocs {} (max {}) copies {} | overflow copies {:.0} splits {:.0} | out-of-order cols {:.0}\n    tail {:.0} build-extent {:.0} final-extent {:.0} ever-extent {:.0} | ever-nz {:.0} final-nz {:.0} | touched V {:.0} G {:.0} | updates {:.0} dense {:.0} | growth ev {:.0} cells {:.0} copy {:.0} from-c {:.0} rows {:.1} max {:.0} first {:.0} | merge-lb {:.0} | end!=TM {:.0} zero-coef {:.0} | ok {}",
+                    v["reserve_cells_mean"], v["reserve_reallocs_mean"], v["reserve_reallocs_max"],
+                    v["reserve_copy_cells_mean"], fm("overflow_copy_cells"),
+                    fm("overflow_split_updates"), fm("columns_out_of_degree_order"),
                     fm("tail_cells"), fm("build_extent_cells"), fm("final_extent_cells"),
                     fm("ever_extent_cells"), fm("ever_nonzero_cells"), fm("final_nonzero_cells"),
                     fm("touched_v"), fm("touched_g"), fm("updates"), fm("dense_updates"),

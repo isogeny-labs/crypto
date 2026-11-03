@@ -102,6 +102,24 @@ pub struct TailStage0 {
     /// extents.
     pub dependency_rows: u64,
     pub outside_dependency_final_cells: u64,
+    /// Static reserves (v2): each row allocated at build to `cap_k`, `k = 0`
+    /// its build end, `k = 1` the end of the weighted-degree block holding its
+    /// build end, `k = 2` the end of the next block; an update whose pivot
+    /// ends beyond `cap_k` re-allocates the row to the end of the block
+    /// holding the new end (copying the old cells).  Per `k`: cells allocated
+    /// `Σ (cap − lead)` (re-allocations included), re-allocations, cells
+    /// copied, rows that ever re-allocate.
+    pub reserve_cells: [u64; 3],
+    pub reserve_reallocs: [u64; 3],
+    pub reserve_copy_cells: [u64; 3],
+    pub reserve_realloc_rows: [u64; 3],
+    /// Two segments (v2): the build range plus an overflow grown exactly;
+    /// cells an overflow growth copies (`Σ (old end − end⁰)`), and updates of
+    /// a row that already holds an overflow (a split of the update).
+    pub overflow_copy_cells: u64,
+    pub overflow_split_updates: u64,
+    /// Columns out of weighted-degree order (expected 0) and the block sizes.
+    pub columns_out_of_degree_order: u64,
     /// Per weighted degree of the lead monomial: `[rows, tail, build extent,
     /// final extent, ever nonzero]`.
     pub by_lead_degree: Vec<[u64; 5]>,
@@ -120,6 +138,30 @@ pub fn stage0_tails(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<T
     s.cols = ncols as u64;
     let col_index: HashMap<[u8; 4], usize> =
         cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
+    // One past the last column of each column's weighted-degree block.
+    let mut block_end = vec![ncols; ncols];
+    for j in (0..ncols.saturating_sub(1)).rev() {
+        let (a, b) = (wdeg(&cols[j]), wdeg(&cols[j + 1]));
+        if a < b {
+            s.columns_out_of_degree_order += 1;
+        }
+        block_end[j] = if a == b { block_end[j + 1] } else { j + 1 };
+    }
+    let reserve = |k: usize, e: usize| -> usize {
+        // e = one past the row's last stored column (≥ 1).
+        match k {
+            0 => e,
+            1 => block_end[e - 1],
+            _ => {
+                let b = block_end[e - 1];
+                if b < ncols {
+                    block_end[b]
+                } else {
+                    b
+                }
+            }
+        }
+    };
     let mut tri = 0u64;
     let (comps, leads) = triangularise(comps, p, &mut tri);
     let divides = |lm: &[u8; 4], m: &[u8; 4]| (0..4).all(|k| lm[k] <= m[k]);
@@ -183,6 +225,11 @@ pub fn stage0_tails(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<T
     let build_end = end.clone();
     // Cells G has allocated per row (a pivot's truncation frees none).
     let mut alloc = end.clone();
+    let mut cap: Vec<[usize; 3]> = end
+        .iter()
+        .map(|&e| core::array::from_fn(|k| reserve(k, e)))
+        .collect();
+    let mut reallocated = vec![[false; 3]; nrows];
     let mut ever: Vec<Vec<bool>> = rows
         .iter()
         .map(|r| r.iter().map(|&x| x != 0).collect())
@@ -244,12 +291,24 @@ pub fn stage0_tails(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<T
             s.updates += 1;
             by[r].push(pr as u32);
             let row_nnz = rows[r][c..].iter().filter(|&&x| x != 0).count();
+            if end[r] > build_end[r] {
+                s.overflow_split_updates += 1;
+            }
+            for k in 0..3 {
+                if pend > cap[r][k] {
+                    s.reserve_reallocs[k] += 1;
+                    s.reserve_copy_cells[k] += (cap[r][k] - lead[r]) as u64;
+                    reallocated[r][k] = true;
+                    cap[r][k] = reserve(k.min(1), pend);
+                }
+            }
             s.sparse_merge_lower_bound += (row_nnz + nz.len()) as u64;
             if pend > end[r] {
                 s.growth_events += 1;
                 growths[r] += 1;
                 s.growth_cells += (pend - end[r]) as u64;
                 s.growth_copy_keep_lead += (end[r] - lead[r]) as u64;
+                s.overflow_copy_cells += (end[r] - build_end[r]) as u64;
                 s.growth_realloc_from_c += (pend - c) as u64;
                 s.growth_cells_by_bin[bin(c)] += (pend - end[r]) as u64;
                 s.growth_events_by_bin[bin(c)] += 1;
@@ -428,6 +487,10 @@ pub fn stage0_tails(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<T
         s.tail_cells += tail;
         s.build_extent_cells += (build_end[r] - l) as u64;
         s.final_extent_cells += (alloc[r] - l) as u64;
+        for k in 0..3 {
+            s.reserve_cells[k] += (cap[r][k] - l) as u64;
+            s.reserve_realloc_rows[k] += u64::from(reallocated[r][k]);
+        }
         s.ever_extent_cells += (maxnz - l) as u64;
         s.ever_nonzero_cells += ev;
         s.final_nonzero_cells += rows[r][l..].iter().filter(|&&x| x != 0).count() as u64;
