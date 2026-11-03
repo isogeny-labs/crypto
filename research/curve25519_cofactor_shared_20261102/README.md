@@ -100,8 +100,8 @@ Per-relation cost at exact coverage (last-but-one column of the table), lifts=1 
 
 ## Tests
 
-`cargo test --release --lib pkm_semaev`: TESTLINE
-`cargo clippy --release --lib --bin curve25519_family -- -D warnings`: CLIPLINE. rustfmt applied to the two changed `.rs` files (after the binary was frozen; formatting only, the frozen binary was built from the unformatted source with the same code).
+`cargo test --release --lib pkm_semaev`: `test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 6086 filtered out; finished in 1087.90s` (run by the coordinator after the agent was stopped by a container restart, with the new test reduced to 3 random + 3 planted targets, see deviation 10).
+`cargo clippy --release --lib --bin curve25519_family -- -D warnings`: exit 0 (only the environmental unknown-lint warning). rustfmt applied to the two changed `.rs` files (after the binary was frozen; formatting only, the frozen binary was built from the unformatted source with the same code).
 
 ## Deviations and incidents (all of them)
 
@@ -116,3 +116,10 @@ Per-relation cost at exact coverage (last-but-one column of the table), lifts=1 
 9. Not done: a larger-target supplementary run, k > 20, m = 3, the tower design, trace on lifts=1, matched-rho distance (out of scope by instruction).
 
 Report PDF: [REPORT.pdf](REPORT.pdf).
+10. **Test sample reduced (coordinator).** The agent's run of the suite was cut short by two container restarts. With the original 40 random + 12 planted targets, the new test `shared_lift_system_matches_lifts_one_and_the_brute_force_fiber` ran for over 30 minutes, and with 6 + 6 it took 998 s on its own. The shared system solves at degree 8 to 10 on the test's F_10007 base, about 30 s per system. The test now uses 3 random + 3 planted targets and keeps all three shared arms (plain, guess=1, trace=1) and every assertion. That is a smaller sample, not a weaker check per target. The measurement binary was built before this test-only change.
+
+## Coordinator review (main session, 2026-11-03)
+
+- **Clean negative.** One shared system per target is 31–628× dearer than 8 separate systems in F4 multiply-adds, in all five of lead 2's cells, at equal base size, with the same verdicts. The degree rises by 2 to 5, and that is what drives the cost: treating X as a free variable of degree 8 makes the ideal much harder than eight specialised ideals. The F4 trace recovers 2.3–3.4× of it, which is nowhere near the gap.
+- **Scope.** This is X as a free variable constrained by P_R. The tower presentation of X (an 8-isogeny chain with degree-2 relations) is the untried alternative and is listed as open, not refuted.
+- **Test cost.** The new test costs about 10 minutes of the `pkm_semaev` suite even at 6 targets. That is the price of exercising the shared system at all on a cofactor curve small enough to brute-force.

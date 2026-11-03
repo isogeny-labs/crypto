@@ -20,8 +20,8 @@ Per-relation cost at exact coverage (last-but-one column of the table), lifts=1 
 
 ## Tests
 
-`cargo test --release --lib pkm_semaev`: TESTLINE
-`cargo clippy --release --lib --bin curve25519_family -- -D warnings`: CLIPLINE. rustfmt applied to the two changed `.rs` files (after the binary was frozen; formatting only, the frozen binary was built from the unformatted source with the same code).
+`cargo test --release --lib pkm_semaev`: `test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 6086 filtered out; finished in 1087.90s` (run by the coordinator after the agent was stopped by a container restart, with the new test reduced to 3 random + 3 planted targets, see deviation 10).
+`cargo clippy --release --lib --bin curve25519_family -- -D warnings`: exit 0 (only the environmental unknown-lint warning). rustfmt applied to the two changed `.rs` files (after the binary was frozen; formatting only, the frozen binary was built from the unformatted source with the same code).
 
 ## Deviations and incidents (all of them)
 
