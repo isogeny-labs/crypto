@@ -494,7 +494,7 @@ fn main() {
 }
 
 fn graph(series: &Vec<Vec<Vec<Vec<Vec<f64>>>>>, pts: &Vec<Vec<Vec<Vec<f64>>>>, prim: usize, by_p: &[Vec<Run>], r126: &[Run], th: f64, refname: &str) -> String {
-    let (w, h) = (1040.0, 1180.0);
+    let (w, h) = (1040.0, 1330.0);
     let mut s = String::new();
     let _ = write!(s, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"{h}\" viewBox=\"0 0 {w} {h}\" font-family=\"DejaVu Sans, Arial, sans-serif\" font-size=\"12\"><rect width=\"{w}\" height=\"{h}\" fill=\"#ffffff\"/>");
     let _ = write!(s, "<text x=\"20\" y=\"26\" font-size=\"16\" font-weight=\"bold\">Line-search sieve route vs matched negation rho, same instances (reference: {refname})</text>");
@@ -526,6 +526,7 @@ fn graph(series: &Vec<Vec<Vec<Vec<Vec<f64>>>>>, pts: &Vec<Vec<Vec<Vec<f64>>>>, p
         }
         y += 4.0 * 52.0 + 52.0;
     }
+    y += 30.0;
     // legend
     for (i, nm) in ["P plain", "H Horner n=4096", "U table n=32768"].iter().enumerate() {
         let _ = write!(s, "<circle cx=\"{}\" cy=\"{}\" r=\"5\" fill=\"{}\"/><text x=\"{}\" y=\"{}\">{nm}</text>", 40.0 + i as f64 * 200.0, y - 20.0, cols[i], 52.0 + i as f64 * 200.0, y - 16.0);
