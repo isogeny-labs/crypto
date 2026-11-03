@@ -1,0 +1,21 @@
+proc require96r(int ok,string tag){if(!ok){print("REPLAY96_FATAL "+tag);exit;}}
+execute(read("marked23-field51.sing"));
+string donorF96r=string(f23);
+ring replayRing96=2,(x,y),dp;
+execute("poly donorF96r="+donorF96r+";");
+execute(read("discriminant96.sing"));
+require96r(f96==donorF96r,"SOURCE_BINDING");
+require96r(derivative96==diff(f96,y),"DERIVATIVE_BINDING");
+require96r(disc96==resultant(f96,derivative96,y),"RESULTANT_RECOMPUTE");
+require96r(subst(f96,x,0)==y^4*(y+1)^3 && subst(f96,x,1)==y^3*(y+1)^4,"SPECIALIZATIONS");
+poly reconstructed96r=1;int i96r;int degree96r=0;
+for(i96r=1;i96r<=size(factors96);i96r++){
+ require96r(deg(factors96[i96r],y)==0 && exponents96[i96r]>0,"FACTOR_SHAPE");
+ reconstructed96r=reconstructed96r*factors96[i96r]^exponents96[i96r];
+ degree96r=degree96r+deg(factors96[i96r],x)*exponents96[i96r];
+}
+require96r(reconstructed96r==disc96 && degree96r==deg(disc96,x),"COMPLETE_FACTOR_PRODUCT");
+require96r(reconstructed96r+1!=disc96,"CORRUPTION_DETECTED");
+print("REPLAY96_RESULT degree="+string(deg(disc96,x))+" factors="+string(size(factors96))+" full_product=1");
+print("REPLAY96_ALL_CHECKS_PASS");
+quit;
