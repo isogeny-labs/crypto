@@ -277,3 +277,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Joint conversion of generated shifts and grid lanes
 
 `feature-native-joint-window/` now takes Q and prefix length, generating shifts projectively and co-converting them with the grid. Three native methods pass:64 generated public points and1426 golden slots agree; target product/inversion assertions pass. On O/P/2P/-P, inversions15/16/16/14 become1 each, with296/321/330/298 additional products including new point checks. Setup/additions/native overhead remain outside this arithmetic table; no elapsed-time claim. See its chart, report, original counts and receipts. Shared daily log was reserved by another task; component SESSION.md preserves the handoff.
+
+## Native polynomial engine
+
+[feature-native-polynomial/DERIVATION.md](feature-native-polynomial/DERIVATION.md) ports the original cutoff-12/Karatsuba, Newton division and product/remainder-tree source path. Four bounded Rust methods pass, including three original resultants and partial values, independent schoolbook/long-division controls and ordered multipoint checks. Exact receipts and an editable PDF report accompany the source. Normalized-source integration remains next.
