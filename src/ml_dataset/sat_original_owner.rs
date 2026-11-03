@@ -76,6 +76,7 @@ pub(super) struct OriginalOwner<'a> {
     original: &'a VerifiedWorkerOriginal<'a>,
     budget: Budget,
     binding: [u8; 32],
+    launch_sha256: [u8; 32],
     math: Math,
     checked: Option<provenance::CheckedMap>,
     retained_unchecked: Option<provenance::Map>,
@@ -134,7 +135,7 @@ fn field(value: u64, n: u32) -> F2mElement {
 
 fn decode_into(
     token: &VerifiedWorkerOriginal<'_>,
-    budget: &mut Budget,
+    budget: &mut impl DecodeBudget,
     state: &mut DecodedParts,
 ) -> Result<(), Stop> {
     // Length/shape-only admission precedes content scans and allocation. Existing
@@ -286,7 +287,7 @@ impl<'a> OriginalOwner<'a> {
             decoded: DecodedParts::default(),
             stage: AdmissionStage::Reservation,
         };
-        let admitted = (|| -> Result<[u8; 32], (AdmissionStage, Stop)> {
+        let admitted = (|| -> Result<([u8; 32], [u8; 32]), (AdmissionStage, Stop)> {
             let input_work = original
                 .public_bytes
                 .checked_add(original.factor_base_bytes)
@@ -322,14 +323,28 @@ impl<'a> OriginalOwner<'a> {
                 .budget
                 .check(Instant::now())
                 .map_err(|s| (AdmissionStage::FinalDeadline, s))?;
-            Ok(hash.finalize().into())
+            // Hash the actual admitted execution context without an encoded Vec.
+            // Each write is reserved before hashing; state stays in this frame.
+            let mut launch_writer = LaunchHash {
+                budget: &mut frame.budget,
+                hash: Sha256::new(),
+                bytes: 0,
+            };
+            serde_json::to_writer(&mut launch_writer, &context.launch)
+                .map_err(|_| (AdmissionStage::BindingDigest, Stop::Serialization))?;
+            let launch_sha256 = launch_writer.hash.finalize().into();
+            frame
+                .budget
+                .check(Instant::now())
+                .map_err(|s| (AdmissionStage::FinalDeadline, s))?;
+            Ok((hash.finalize().into(), launch_sha256))
         })();
         match admitted {
             Err((stage, stop)) => {
                 frame.stop(stage, stop);
                 Err(AdmissionFailure::Retained(frame))
             }
-            Ok(binding) => {
+            Ok((binding, launch_sha256)) => {
                 // No fallible operation after moving the complete math owner.
                 let math = frame
                     .decoded
@@ -340,6 +355,7 @@ impl<'a> OriginalOwner<'a> {
                     original,
                     budget: frame.budget,
                     binding,
+                    launch_sha256,
                     math,
                     checked: None,
                     retained_unchecked: None,
@@ -888,3 +904,52 @@ mod tests {
 
 #[path = "sat_initial_native.rs"]
 mod initial_native;
+
+// Canonical typed LaunchContext hash, bounded and prepaid before mutation.
+struct LaunchHash<'a> {
+    budget: &'a mut Budget,
+    hash: Sha256,
+    bytes: usize,
+}
+impl std::io::Write for LaunchHash<'_> {
+    fn write(&mut self, b: &[u8]) -> std::io::Result<usize> {
+        let n = self
+            .bytes
+            .checked_add(b.len())
+            .filter(|n| *n <= 2048)
+            .ok_or_else(|| std::io::Error::from(std::io::ErrorKind::WriteZero))?;
+        self.budget
+            .reserve_checking((b.len() as u64) * 8, 0, Instant::now())
+            .map_err(|_| std::io::Error::from(std::io::ErrorKind::Other))?;
+        self.hash.update(b);
+        self.bytes = n;
+        Ok(b.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
+// Read-only historical replay uses the same decoder with its own cumulative
+// replay admission. This never changes a producer Budget or original deadline.
+trait DecodeBudget {
+    fn reserve_checking(&mut self, work: u64, bytes: u64, now: Instant) -> Result<(), Stop>;
+    fn check(&mut self, now: Instant) -> Result<(), Stop>;
+    fn fail<T>(&mut self, stop: Stop) -> Result<T, Stop>;
+}
+impl DecodeBudget for Budget {
+    fn reserve_checking(&mut self, w: u64, b: u64, n: Instant) -> Result<(), Stop> {
+        Budget::reserve_checking(self, w, b, n)
+    }
+    fn check(&mut self, n: Instant) -> Result<(), Stop> {
+        Budget::check(self, n)
+    }
+    fn fail<T>(&mut self, s: Stop) -> Result<T, Stop> {
+        Budget::fail(self, s)
+    }
+}
+#[path = "sat_initial_central.rs"]
+pub(in crate::ml_dataset::solvers) mod central;
+
+#[path = "sat_initial_worker.rs"]
+pub(in crate::ml_dataset::solvers) mod worker;

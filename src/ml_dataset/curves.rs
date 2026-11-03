@@ -1518,6 +1518,22 @@ pub fn verify_factor_base_config(
     public: &Value,
     base: &Value,
 ) -> Result<(), String> {
+    verify_factor_base_config_inner(config, public, base, None)
+}
+pub(super) fn verify_factor_base_config_bounded(
+    config: &CaseConfig,
+    public: &Value,
+    base: &Value,
+    bounds: super::factor_bases::ReplayBounds,
+) -> Result<(), String> {
+    verify_factor_base_config_inner(config, public, base, Some(bounds))
+}
+fn verify_factor_base_config_inner(
+    config: &CaseConfig,
+    public: &Value,
+    base: &Value,
+    bounds: Option<super::factor_bases::ReplayBounds>,
+) -> Result<(), String> {
     if base["requested_size"].as_u64() != Some(config.factor_base_size as u64)
         || public["n"].as_u64() != Some(config.n as u64)
         || public["m"].as_u64() != Some(config.m as u64)
@@ -1543,7 +1559,10 @@ pub fn verify_factor_base_config(
         }
         _ => return Err("factor-base schema differs from frozen policy version".into()),
     }
-    verify_factor_base(public, base)
+    match bounds {
+        Some(b) => super::factor_bases::verify_bounded(public, base, b),
+        None => verify_factor_base(public, base),
+    }
 }
 
 #[cfg(test)]
@@ -1551,7 +1570,7 @@ mod tests {
     use super::*;
     fn config(family: &str, n: u32, twist: bool) -> CaseConfig {
         CaseConfig {
-                        channels: None,
+            channels: None,
             family: family.into(),
             n,
             m: 2,

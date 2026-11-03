@@ -173,6 +173,16 @@ pub(super) fn build(
     seed: u64,
     reference: bool,
 ) -> Result<(Value, Vec<Value>), String> {
+    build_inner(public, policy, requested, seed, reference, None)
+}
+fn build_inner(
+    public: &Value,
+    policy: &FactorBasePolicy,
+    requested: usize,
+    seed: u64,
+    reference: bool,
+    bounds: Option<ReplayBounds>,
+) -> Result<(Value, Vec<Value>), String> {
     let n: u32 = public["n"]
         .as_u64()
         .and_then(|n| n.try_into().ok())
@@ -220,6 +230,9 @@ pub(super) fn build(
     let mut counters = Counters::default();
     // r^2 | #E bounds r <= sqrt(#E), so this diagnostic has a bounded
     // baby table even at n=61; public-order verification precedes replay.
+    if bounds.is_some() && h.is_multiple_of(r) {
+        return Err("bounded original replay has no admitted noncyclic table".into());
+    }
     let diagnostic = if h.is_multiple_of(r) {
         if r > 1u64 << 32 {
             return Err("cyclic membership diagnostic exceeds word-field bound".into());
@@ -253,6 +266,14 @@ pub(super) fn build(
         false
     };
 
+    if let Some(b) = bounds {
+        b.check_time()?;
+        if !matches!(policy, FactorBasePolicy::Legacy {})
+            || (requested as u64 * 32 + 128).min(c.q()) - 1 > b.units
+        {
+            return Err("bounded original replay unit shape".into());
+        }
+    }
     let (candidate_limit, units, finite_domain) = match policy {
         FactorBasePolicy::Legacy {} => {
             let end = (requested as u64 * 32 + 128).min(c.q());
@@ -310,9 +331,21 @@ pub(super) fn build(
             let mut pending_seen = HashSet::new();
             let mut rows = Vec::new();
             for &x in xs {
+                if let Some(b) = bounds {
+                    b.check_time()?;
+                    if counters.candidate_coordinates >= b.coordinates {
+                        return Err("bounded original replay coordinate cutoff".into());
+                    }
+                }
                 counters.candidate_coordinates += 1;
                 let mut lifts = Vec::new();
                 for input in c.lift(x) {
+                    if let Some(b) = bounds {
+                        b.check_time()?;
+                        if counters.lifted_points >= b.lifts {
+                            return Err("bounded original replay lift cutoff".into());
+                        }
+                    }
                     counters.lifted_points += 1;
                     let (point, multiplier) = if projected {
                         counters.projection_candidates += 1;
@@ -334,11 +367,16 @@ pub(super) fn build(
                         pending.push((point, log));
                         None
                     };
-                    lifts.push(json!({"lifted":curves::point_json(input),"point":curves::point_json(point),
+                    let mut lift = json!({"lifted":null,"point":null,
                         "projection_multiplier":multiplier.to_string(),"cyclic_subgroup_member":member,
-                        "accepted":rejection.is_none(),"rejection":rejection}));
+                        "accepted":rejection.is_none(),"rejection":rejection});
+                    lift["lifted"] = curves::point_json(input);
+                    lift["point"] = curves::point_json(point);
+                    lifts.push(lift);
                 }
-                rows.push(json!({"x":x.to_string(),"lifts":lifts}));
+                let mut row = json!({"x":x.to_string(),"lifts":null});
+                row["lifts"] = Value::Array(lifts);
+                rows.push(row);
             }
             // Atomic sign/Frobenius units: retain all points of a processed
             // unit or none, including when a resource bound stops construction.
@@ -362,7 +400,9 @@ pub(super) fn build(
                 hit_point_cap = true;
                 exhausted_units = false;
             }
-            candidates.push(json!({"unit":unit_index,"admitted":admitted,"coordinates":rows}));
+            let mut unit = json!({"unit":unit_index,"admitted":admitted,"coordinates":null});
+            unit["coordinates"] = Value::Array(rows);
+            candidates.push(unit);
             if !admitted {
                 break;
             }
@@ -408,6 +448,9 @@ pub(super) fn build(
     };
     let mut orbits = Vec::new();
     for &p in &points {
+        if let Some(b) = bounds {
+            b.check_time()?;
+        }
         let mut orbit = Vec::new();
         let mut next = p;
         for _ in 0..action_order {
@@ -423,23 +466,30 @@ pub(super) fn build(
         if next != p {
             return Err("point Frobenius orbit did not close".into());
         }
-        orbits.push(json!({"stabilizer_size":action_order as usize / orbit.len(),"points":orbit,"closed":true}));
+        let mut row = json!({"stabilizer_size":action_order as usize / orbit.len(),"points":null,"closed":true});
+        row["points"] = Value::Array(orbit);
+        orbits.push(row);
     }
-    Ok((
-        json!({"schema":"ml-ecdlp-factor-base/v2","rule":policy.name(),"policy":policy,
-        "points":points.iter().copied().map(curves::point_json).collect::<Vec<_>>(),
+    let mut assembled = json!({"schema":"ml-ecdlp-factor-base/v2","rule":policy.name(),"policy":policy,
+        "points":null,
         "requested_size":requested,"actual_size":points.len(),"point_cap":POINT_CAP,
         "size_policy":if finite_domain {"complete declared coordinate domain intersected with cyclic subgroup, or explicit capped prefix of whole symmetry units; requested_size is not a truncation rule"} else {"stop after whole sign unit reaches requested_size or subgroup cardinality; otherwise capped"},
         "subgroup_treatment":if projected {"prime-primary-projected-image"} else {"literal-coordinate-domain-intersection"},
         "negation_closed":true,"negation_action":negation,"frobenius_action":frobenius,
-        "frobenius_power":k,"frobenius_closed":frobenius.iter().all(Option::is_some),"orbits":orbits,
+        "frobenius_power":k,"frobenius_closed":frobenius.iter().all(Option::is_some),"orbits":null,
         "construction_status":status,"unsupported_reason":reason,
         "coordinate_domain_complete":domain_complete,
         "declared_coordinate_count":if finite_domain && !unsupported {Some(total_coordinates)} else {None},
-        "construction_candidates":candidates,"construction_counters":counters.json(),
+        "construction_candidates":null,"construction_counters":null,
         "construction_context":{"sampling_seed":seed.to_string(),"sampling_algorithm":if matches!(policy,FactorBasePolicy::SampledXProjectedControl{..}) {"rand-StdRng-gen_range-with-replacement-v1"} else {"not-used-by-this-policy"},"seed_access":"restricted provenance; not a model feature"},
         "cyclic_membership_method":if membership.diagnostic.is_some(){"bounded-bsgs-diagnostic"}else{"unique-prime-subgroup"},
-        "known_log_features":false}),
+        "known_log_features":false});
+    assembled["points"] = Value::Array(points.iter().copied().map(curves::point_json).collect());
+    assembled["orbits"] = Value::Array(orbits);
+    assembled["construction_candidates"] = Value::Array(candidates);
+    assembled["construction_counters"] = counters.json();
+    Ok((
+        assembled,
         private_logs.into_iter().map(|v| json!(v)).collect(),
     ))
 }
@@ -448,8 +498,21 @@ pub(super) fn build(
 /// diagnostic logarithms drive reconstruction; generic group arithmetic checks
 /// the equation and subgroup tests, and every metadata field is compared.
 pub(super) fn verify(public: &Value, base: &Value) -> Result<(), String> {
+    verify_inner(public, base, None)
+}
+pub(super) fn verify_bounded(
+    public: &Value,
+    base: &Value,
+    bounds: ReplayBounds,
+) -> Result<(), String> {
+    verify_inner(public, base, Some(bounds))
+}
+fn verify_inner(public: &Value, base: &Value, bounds: Option<ReplayBounds>) -> Result<(), String> {
     if base["schema"] != "ml-ecdlp-factor-base/v2" {
         return Err("invalid policy base schema".into());
+    }
+    if let Some(b) = bounds {
+        b.check_time()?;
     }
     curves::verify_public(public)?;
     let policy: FactorBasePolicy =
@@ -462,7 +525,10 @@ pub(super) fn verify(public: &Value, base: &Value) -> Result<(), String> {
         &base["construction_context"]["sampling_seed"],
         "policy sampling seed",
     )?;
-    let (expected, _) = build(public, &policy, requested, seed, true)?;
+    if let Some(b) = bounds {
+        b.check_time()?;
+    }
+    let (expected, _) = build_inner(public, &policy, requested, seed, true, bounds)?;
     if expected != *base {
         return Err("factor-base policy construction or metadata replay mismatch".into());
     }
@@ -474,7 +540,7 @@ mod tests {
     use super::*;
     fn config(family: &str, n: u32, twist: bool) -> CaseConfig {
         CaseConfig {
-                        channels: None,
+            channels: None,
             family: family.into(),
             n,
             m: 2,
@@ -858,4 +924,365 @@ mod tests {
         )
         .is_err());
     }
+}
+
+/// Bound independently pre-admitted reconstruction, not saved success counters.
+#[derive(Clone, Copy)]
+pub(super) struct ReplayBounds {
+    pub coordinates: u64,
+    pub lifts: u64,
+    pub units: u64,
+    pub deadline: std::time::Instant,
+}
+impl ReplayBounds {
+    fn check_time(&self) -> Result<(), String> {
+        if std::time::Instant::now() >= self.deadline {
+            Err("bounded original replay deadline".into())
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[cfg(test)]
+fn build_inner_legacy_materialization(
+    public: &Value,
+    policy: &FactorBasePolicy,
+    requested: usize,
+    seed: u64,
+    reference: bool,
+    bounds: Option<ReplayBounds>,
+) -> Result<(Value, Vec<Value>), String> {
+    let n: u32 = public["n"]
+        .as_u64()
+        .and_then(|n| n.try_into().ok())
+        .ok_or("invalid field size")?;
+    policy.validate(n)?;
+    if !(1..=POINT_CAP).contains(&requested) {
+        return Err("requested factor base outside 1..4096".into());
+    }
+    let c = curves::arithmetic(public)?;
+    let r = curves::number(&public["curve"]["subgroup_order"], "subgroup order")?;
+    let order = curves::number(&public["curve"]["group_order"], "group order")?;
+    let h = curves::number(&public["curve"]["cofactor"], "cofactor")?;
+    if r <= 2 || order == 0 || order % r != 0 || order / r != h {
+        return Err("invalid factor-base subgroup arithmetic".into());
+    }
+    let generator = curves::point_words(&public["generator"])?;
+    let k: u32 = public["symmetry"]["frobenius_power"]
+        .as_u64()
+        .and_then(|v| v.try_into().ok())
+        .ok_or("invalid Frobenius power")?;
+    let expected_k = match &c {
+        Arithmetic::Prime(_) => 1,
+        Arithmetic::Binary { fast, b } => (1..=n)
+            .find(|&d| {
+                n.is_multiple_of(d)
+                    && fast.gf.sqr_k(fast.a, d) == fast.a
+                    && fast.gf.sqr_k(*b, d) == *b
+            })
+            .ok_or("coefficient field missing")?,
+    };
+    if k != expected_k || public["symmetry"]["coefficient_field_degree"].as_u64() != Some(k as u64)
+    {
+        return Err("factor-base Frobenius does not match coefficient field".into());
+    }
+    let binary_policy = matches!(
+        policy,
+        FactorBasePolicy::BinarySubspaceIntersection { .. }
+            | FactorBasePolicy::BinaryFrobeniusUnionIntersection { .. }
+    );
+    let union = matches!(
+        policy,
+        FactorBasePolicy::BinaryFrobeniusUnionIntersection { .. }
+    );
+    let projected = !binary_policy;
+    let mut counters = Counters::default();
+    // r^2 | #E bounds r <= sqrt(#E), so this diagnostic has a bounded
+    // baby table even at n=61; public-order verification precedes replay.
+    if bounds.is_some() && h.is_multiple_of(r) {
+        return Err("bounded original replay has no admitted noncyclic table".into());
+    }
+    let diagnostic = if h.is_multiple_of(r) {
+        if r > 1u64 << 32 {
+            return Err("cyclic membership diagnostic exceeds word-field bound".into());
+        }
+        Some(CyclicMembership::new_with_reference(
+            &c, generator, r, reference,
+        ))
+    } else {
+        None
+    };
+    counters.membership_baby_add_calls = diagnostic.as_ref().map_or(0, |d| d.stride);
+    let membership = Membership {
+        c: &c,
+        g: generator,
+        r,
+        diagnostic,
+        reference,
+    };
+    let mut reason = None;
+    let unsupported = if binary_policy && matches!(&c, Arithmetic::Prime(_)) {
+        reason = Some("binary coordinate policy is not defined over a prime field");
+        true
+    } else if union
+        && !membership
+            .check(c.frobenius(generator, k), &mut counters)?
+            .0
+    {
+        reason = Some("model Frobenius does not preserve the selected cyclic subgroup");
+        true
+    } else {
+        false
+    };
+
+    if let Some(b) = bounds {
+        b.check_time()?;
+        if !matches!(policy, FactorBasePolicy::Legacy {})
+            || (requested as u64 * 32 + 128).min(c.q()) - 1 > b.units
+        {
+            return Err("bounded original replay unit shape".into());
+        }
+    }
+    let (candidate_limit, units, finite_domain) = match policy {
+        FactorBasePolicy::Legacy {} => {
+            let end = (requested as u64 * 32 + 128).min(c.q());
+            (
+                end - 1,
+                (1..end).map(|x| vec![x]).collect::<Vec<_>>(),
+                false,
+            )
+        }
+        FactorBasePolicy::SampledXProjectedControl { candidate_limit } => {
+            let mut rng = StdRng::seed_from_u64(seed);
+            counters.sampling_draws = *candidate_limit;
+            // Sampling is with replacement; duplicate draws are visible and
+            // charged. Each draw is uniform on all field coordinates.
+            (
+                *candidate_limit,
+                (0..*candidate_limit)
+                    .map(|_| vec![rng.gen_range(0..c.q())])
+                    .collect(),
+                false,
+            )
+        }
+        FactorBasePolicy::BinarySubspaceIntersection {
+            basis,
+            candidate_limit,
+        }
+        | FactorBasePolicy::BinaryFrobeniusUnionIntersection {
+            basis,
+            candidate_limit,
+        } => (
+            *candidate_limit,
+            if unsupported {
+                Vec::new()
+            } else {
+                coordinate_units(&c, basis, union, k, &mut counters)?
+            },
+            true,
+        ),
+    };
+    let total_coordinates: usize = units.iter().map(Vec::len).sum();
+    let mut points = Vec::<WPoint>::new();
+    let mut seen = HashSet::new();
+    let mut candidates = Vec::new();
+    let mut private_logs = Vec::new();
+    let mut exhausted_units = !unsupported;
+    let mut hit_point_cap = false;
+    let mut fulfilled = false;
+    if !unsupported {
+        for (unit_index, xs) in units.iter().enumerate() {
+            if counters.candidate_coordinates + xs.len() as u64 > candidate_limit {
+                exhausted_units = false;
+                break;
+            }
+            let mut pending = Vec::<(WPoint, Option<u64>)>::new();
+            let mut pending_seen = HashSet::new();
+            let mut rows = Vec::new();
+            for &x in xs {
+                if let Some(b) = bounds {
+                    b.check_time()?;
+                    if counters.candidate_coordinates >= b.coordinates {
+                        return Err("bounded original replay coordinate cutoff".into());
+                    }
+                }
+                counters.candidate_coordinates += 1;
+                let mut lifts = Vec::new();
+                for input in c.lift(x) {
+                    if let Some(b) = bounds {
+                        b.check_time()?;
+                        if counters.lifted_points >= b.lifts {
+                            return Err("bounded original replay lift cutoff".into());
+                        }
+                    }
+                    counters.lifted_points += 1;
+                    let (point, multiplier) = if projected {
+                        counters.projection_candidates += 1;
+                        curves::prime_projection(&c, input, order, r, reference)
+                    } else {
+                        (input, 1)
+                    };
+                    let (member, log) = membership.check(point, &mut counters)?;
+                    let rejection = if point.is_none() {
+                        counters.rejected_identity += 1;
+                        Some("identity")
+                    } else if !member {
+                        counters.rejected_wrong_subgroup += 1;
+                        Some("wrong_cyclic_subgroup")
+                    } else if seen.contains(&point) || !pending_seen.insert(point) {
+                        counters.rejected_duplicate += 1;
+                        Some("duplicate")
+                    } else {
+                        pending.push((point, log));
+                        None
+                    };
+                    lifts.push(json!({"lifted":curves::point_json(input),"point":curves::point_json(point),
+                        "projection_multiplier":multiplier.to_string(),"cyclic_subgroup_member":member,
+                        "accepted":rejection.is_none(),"rejection":rejection}));
+                }
+                rows.push(json!({"x":x.to_string(),"lifts":lifts}));
+            }
+            // Atomic sign/Frobenius units: retain all points of a processed
+            // unit or none, including when a resource bound stops construction.
+            let admitted = points.len() + pending.len() <= POINT_CAP;
+            if admitted {
+                for (p, log) in pending {
+                    seen.insert(p);
+                    points.push(p);
+                    private_logs.push(log.map(|x| x.to_string()));
+                }
+            } else {
+                counters.rejected_point_cap += pending.len() as u64;
+                for row in &mut rows {
+                    for lift in row["lifts"].as_array_mut().expect("built array") {
+                        if lift["accepted"] == true {
+                            lift["accepted"] = json!(false);
+                            lift["rejection"] = json!("point_cap");
+                        }
+                    }
+                }
+                hit_point_cap = true;
+                exhausted_units = false;
+            }
+            candidates.push(json!({"unit":unit_index,"admitted":admitted,"coordinates":rows}));
+            if !admitted {
+                break;
+            }
+            if !finite_domain && (points.len() >= requested || points.len() as u64 == r - 1) {
+                fulfilled = true;
+                exhausted_units = unit_index + 1 == units.len();
+                break;
+            }
+        }
+    }
+    if finite_domain && counters.candidate_coordinates < total_coordinates as u64 {
+        exhausted_units = false;
+    }
+    let domain_complete = finite_domain && exhausted_units && !hit_point_cap && !unsupported;
+    let status = if unsupported {
+        "unsupported"
+    } else if domain_complete || fulfilled {
+        "complete"
+    } else {
+        "capped"
+    };
+    let lookup: HashMap<_, _> = points
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(i, p)| (p, i))
+        .collect();
+    let negation: Vec<_> = points
+        .iter()
+        .map(|&p| lookup.get(&c.neg(p)).copied())
+        .collect();
+    let frobenius: Vec<_> = points
+        .iter()
+        .map(|&p| lookup.get(&c.frobenius(p, k)).copied())
+        .collect();
+    if negation.iter().any(Option::is_none) || (union && frobenius.iter().any(Option::is_none)) {
+        return Err("construction violated its atomic symmetry units".into());
+    }
+    let action_order = if matches!(&c, Arithmetic::Prime(_)) {
+        1
+    } else {
+        n / k
+    };
+    let mut orbits = Vec::new();
+    for &p in &points {
+        if let Some(b) = bounds {
+            b.check_time()?;
+        }
+        let mut orbit = Vec::new();
+        let mut next = p;
+        for _ in 0..action_order {
+            if !c.on_curve(next) {
+                return Err("Frobenius left the model".into());
+            }
+            orbit.push(curves::point_json(next));
+            next = c.frobenius(next, k);
+            if next == p {
+                break;
+            }
+        }
+        if next != p {
+            return Err("point Frobenius orbit did not close".into());
+        }
+        orbits.push(json!({"stabilizer_size":action_order as usize / orbit.len(),"points":orbit,"closed":true}));
+    }
+    Ok((
+        json!({"schema":"ml-ecdlp-factor-base/v2","rule":policy.name(),"policy":policy,
+        "points":points.iter().copied().map(curves::point_json).collect::<Vec<_>>(),
+        "requested_size":requested,"actual_size":points.len(),"point_cap":POINT_CAP,
+        "size_policy":if finite_domain {"complete declared coordinate domain intersected with cyclic subgroup, or explicit capped prefix of whole symmetry units; requested_size is not a truncation rule"} else {"stop after whole sign unit reaches requested_size or subgroup cardinality; otherwise capped"},
+        "subgroup_treatment":if projected {"prime-primary-projected-image"} else {"literal-coordinate-domain-intersection"},
+        "negation_closed":true,"negation_action":negation,"frobenius_action":frobenius,
+        "frobenius_power":k,"frobenius_closed":frobenius.iter().all(Option::is_some),"orbits":orbits,
+        "construction_status":status,"unsupported_reason":reason,
+        "coordinate_domain_complete":domain_complete,
+        "declared_coordinate_count":if finite_domain && !unsupported {Some(total_coordinates)} else {None},
+        "construction_candidates":candidates,"construction_counters":counters.json(),
+        "construction_context":{"sampling_seed":seed.to_string(),"sampling_algorithm":if matches!(policy,FactorBasePolicy::SampledXProjectedControl{..}) {"rand-StdRng-gen_range-with-replacement-v1"} else {"not-used-by-this-policy"},"seed_access":"restricted provenance; not a model feature"},
+        "cyclic_membership_method":if membership.diagnostic.is_some(){"bounded-bsgs-diagnostic"}else{"unique-prime-subgroup"},
+        "known_log_features":false}),
+        private_logs.into_iter().map(|v| json!(v)).collect(),
+    ))
+}
+
+#[cfg(test)]
+pub(super) fn assert_move_materialization_eq(
+    config: &CaseConfig,
+    case: &crate::ml_dataset::types::CaseData,
+) {
+    let policy = config.factor_base_policy.as_ref().unwrap();
+    let seed = sampling_seed(config);
+    let old = build_inner_legacy_materialization(
+        &case.public_instance,
+        policy,
+        config.factor_base_size,
+        seed,
+        true,
+        None,
+    )
+    .unwrap();
+    let new = build_inner(
+        &case.public_instance,
+        policy,
+        config.factor_base_size,
+        seed,
+        true,
+        None,
+    )
+    .unwrap();
+    assert_eq!(
+        new, old,
+        "every nested field, array order and private-log slot must match"
+    );
+    assert_eq!(
+        serde_json::to_vec(&new.0).unwrap(),
+        serde_json::to_vec(&old.0).unwrap(),
+        "canonical public bytes and therefore their SHA256 must be identical"
+    );
+    assert_eq!(new.0, case.factor_base);
 }

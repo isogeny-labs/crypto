@@ -104,6 +104,14 @@ impl From<Error> for BuildFailure {
     }
 }
 impl CheckedMap {
+    /// Identity join for a transcript authenticated against the same originals.
+    pub fn original_binding(&self) -> [u8; 32] {
+        self.0.identity.binding
+    }
+    pub fn pattern(&self) -> u32 {
+        self.0.identity.pattern
+    }
+
     pub fn variables(&self) -> u32 {
         self.0.variables
     }
@@ -1132,5 +1140,23 @@ mod tests {
             })
         ));
         assert_eq!(refusal.reserved.len(), 1); // paid before validating either code.
+    }
+}
+
+/// Import without rerunning the producer or cloning its raw map. Decoding must
+/// already have been bounded and charged by the caller. On refusal the decoded
+/// map remains owned in BuildFailure; deserialization alone never mints a seal.
+pub fn check_imported(
+    original: &Original<'_>,
+    map: Map,
+    limits: Limits,
+    admission: &mut impl Admission,
+) -> Result<CheckedMap, BuildFailure> {
+    match verify_original(original, &map, limits, admission) {
+        Ok(()) => Ok(CheckedMap(map)),
+        Err(reason) => Err(BuildFailure {
+            reason,
+            retained: Some(map),
+        }),
     }
 }
