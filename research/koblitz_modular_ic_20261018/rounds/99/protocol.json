@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R99-MARKED23-LAMBDA-NORM",
+  "version":1,
+  "goal":"compute the exact lambda derivative resultant norm for the accepted degree-112 marked-23 triangular source",
+  "claims":[{"id":"lambda_norm99","class":"exact_computation","statement":"the actual degree-16 lambda equation has a nonzero derivative resultant and nonzero norm over the degree-7 base"}],
+  "arms":{"reference":"R51/R63 actual triangular source","candidate":"exact two-stage resultant in pinned Singular","positive":["degree-7/16 monic source checks","nonzero derivative/resultants"],"negative":["elimination of n,l,y checks"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact algebra"}},
+  "variables":{"fixed":["R51 donor SHA-256","one Singular thread","seed 99","300-second timeout","6 GiB virtual-memory cap"],"measured":["exit status","native errors","stage markers","exact rational norm"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation","seeds":[99]},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["resultant existence","norm numerator/denominator characters","exact output"],
+  "execution":{"backend":"authorized pinned local Singular","backend_reason":"default EKS image lacks pinned CAS","timeout_seconds_per_program":300,"virtual_KiB_native":6291456,"threads":1,"seed":99,"queue":"one serial CAS job","source_gate":"committed source/protocol and donor hash","checkpoint":"retain immutable raw copy and logs"},
+  "stopping":{"accept":"exit zero, exact marker, no native errors, nonempty exact norm output","failure":"retain raw failure and plan new attempt"},
+  "analysis":{"method":"two successive exact resultants in the source coefficient field","scope":"candidate finite non-etale fibers of the displayed lambda monogenic order on D(x); no normalized branch claim"}
+}

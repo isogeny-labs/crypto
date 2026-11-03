@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R77-QUADRATIC-INFINITY-NORMS",
+  "version":1,
+  "goal":"check exact quadratic infinity norm identities that determine b,c orders",
+  "claims":[{"id":"infinity_norms77","class":"exact_computation","statement":"the quadratic infinity equation is etale with B norm t^5 and B+t^3 norm t^3(1+t)^3"}],
+  "arms":{"reference":"R76 quadratic source equation and Tate definitions","candidate":"cleared infinity coordinates t,U,B and exact conjugate norms","positive":["derivative one","two distinct roots","both norm identities"],"negative":["wrong t^4 norm rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"complete symbolic identity"}},
+  "variables":{"fixed":["quadratic infinity algebra","one thread","1200 seconds","4 GiB virtual"],"measured":["identity checks","native exit/errors/hashes"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"deterministic algebra","seeds":[77]},
+  "blinding":{"method":"none","reason":"exact identities"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["derivative","two norm identities","negative control"],
+  "execution":{"launcher":"REPLAY_CAS.sh infinity77-01 INFINITY77.sing INFINITY77_ALL_CHECKS_PASS","backend":"authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":77,"queue":"one math job at a time","source_gate":"frozen Git bytes and all donor hashes","checkpoint":"existing checkpoint gate; immutable raw copy"},
+  "stopping":{"accept":"exit0, exact marker, zero native error lines and all assertions","failure":"retain failed raw attempt; freeze repair before next ID"},
+  "analysis":{"method":"DVR orders from exact conjugate norms and etale split","scope":"quadratic infinity places and weighted degree-32 b,c divisors; individual degree-32 branches still unknown"}
+}

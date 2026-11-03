@@ -1,0 +1,24 @@
+proc require84(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../50/runs/normal-relative-finite50-01/selected-prime50.sing"));
+execute(read("../../../50/runs/normal-relative-finite50-01/fractional-module50.sing"));
+require84(char(basering)==2 && nvars(basering)==3 && size(module50)==27,"CAND84_SOURCE_MODULE_SHAPE");
+list moduleStrings84;int k84;
+for(k84=1;k84<=27;k84++){moduleStrings84[k84]=string(module50[k84]);}
+execute(read("../../../50/runs/normal-relative-finite50-01/normalization50.sing"));
+require84(char(basering)==2 && npars(basering)==0 && nvars(basering)==22 && size(norid)==400,"CAND84_CANDIDATE_SHAPE");
+require84(size(normap)==3 && normap[1]==x && normap[2]==y && normap[3]==p,"CAND84_LITERAL_SOURCE_MAP");
+intvec index84=2,6,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25;
+poly denominator84;execute("denominator84="+moduleStrings84[27]+";");
+int i84;poly numerator84;poly residual84;
+print("CAND84_STAGE loaded=1 module_strings=27 full_std_invoked=0");
+for(i84=1;i84<=19;i84++){
+ k84=index84[i84];
+ require84(string(var(i84))=="T("+string(k84)+")","CAND84_SURVIVING_VARIABLE_ORDER");
+ execute("numerator84="+moduleStrings84[k84]+";");
+ residual84=reduce(denominator84*var(i84)+numerator84,norid);
+ if(residual84!=0){print("CAND84_INCONCLUSIVE index="+string(k84)+" nonzero_remainder=1");quit;}
+ print("CAND84_FRACTION index="+string(k84)+" coordinate="+string(i84)+" zero_remainder=1");
+}
+print("CAND84_RESULT direct_positive_memberships=19 full_std_invoked=0 candidate_only=1");
+print("CANDIDATE_DIRECT84_ALL_CHECKS_PASS");
+quit;

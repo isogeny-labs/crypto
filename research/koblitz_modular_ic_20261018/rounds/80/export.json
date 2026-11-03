@@ -1,0 +1,31 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R80-CANDIDATE-REDUCED-U0",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "candidate-v0-80-01",
+      "path": "runs/candidate-v0-80-01/protocol.json",
+      "sha256": "85570621f13526fcf35ee836fdb81bcaf4849ef5b22e49f1b9ee52b1d898014e",
+      "frozen_revision": "e36e270644285b0e240ba8d8b3ac97a855bc426a"
+    },
+    {
+      "attempt": "candidate-v1-80-01",
+      "path": "runs/candidate-v1-80-01/protocol.json",
+      "sha256": "85570621f13526fcf35ee836fdb81bcaf4849ef5b22e49f1b9ee52b1d898014e",
+      "frozen_revision": "e36e270644285b0e240ba8d8b3ac97a855bc426a"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "10efb1ca0935f6a5b740257d4acee355c317a196fe29b0195d170d8089988f0c"
+  },
+  "flow": {
+    "accepted": 2,
+    "rejected": 0,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual contract/source-byte checks only",
+  "notes": "Both rejected-candidate fibers have length 16, reduced dimension 4 and two degree-2 prime quotients; no normality claim."
+}
