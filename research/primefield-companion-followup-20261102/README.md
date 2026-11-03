@@ -325,3 +325,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Homogeneous seed propagation
 
 [feature-native-pair-seeds](feature-native-pair-seeds/README.md) retains seed numerator/denominator pairs through recurrence and source evaluation. All148 native tests pass, including20736 independently rescaled recurrence cases,9 scaled-source cases and8 complete recoveries;27 prebuild hashes pass. Raw scalar source and recovery code are unchanged. Derived local update6 products/no inverse versus4 products/1 inverse; consumer denominator work and doubled seed storage remain to be compared. No comparative panel.
+
+## Matched homogeneous-source accounting
+
+[feature-native-pair-matched](feature-native-pair-matched/README.md) instruments scalar ratio-sign and homogeneous sources under one meter.14 maps reverse exactly,6 non-source modules are byte-identical,31 dependencies locked. Native8-target stage/recovery contract passes (1 method,80 filtered);6 synthetic analysis methods pass. New draft reports product/inversion Pareto relations and symbolic break-even weights, not total speed. No comparative rows/cloud job; preflight/admission remain.
