@@ -25,7 +25,7 @@ Written after `research/curve25519_frame_search_20261103` (#3359).
 | T5 | Make frame selection the `pkm-semaev` default; re-price `curve25519_algebraic_ecbench` end-to-end | ecbench |
 | T6 | Edwards t = 5, G = 0 per-target 0.646× outlier, over more seeds | engine, minutes |
 | T7 | FGHR-style symmetrisation under T0 (x ↦ 1/x) on a frame-selected base; the T0 closure doubled yield on bits | engine |
-| T8 | 4E / 8E filtering through the halving tower (u of [2]Q, degree 4): the cosets are concentrated further, at the price of polynomial degree | after T2's engine cost |
+| T8 | 4E / 8E filtering through the halving tower (u of [2]Q, degree 4): the cosets are concentrated further, at the price of polynomial degree | **deprioritised**: T2 already loses at degree 2 in w; degree 4 is worse |
 
 Closed (not pursued): coordinate model choice (#3359), Hessian, Jacobi
 intersection and Huff (not defined over F_p for cyclic Z/8), E[8]-invariant
