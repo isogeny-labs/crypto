@@ -1155,8 +1155,10 @@ pub fn roots_by_incidence(
             lookups += 1;
         }
     }
-    // bitop/v1: the membership test of every step
-    super::jv_bitops::words(lookups);
+    // bitop/v1: per step the slot index `b1·p + b0` (a product and a sum,
+    // two word operations) and the membership test (one); per mark or
+    // unmark the index (two) and the store (one)
+    super::jv_bitops::words(3 * lookups);
     (out, adds, lookups)
 }
 
@@ -1184,6 +1186,8 @@ fn value_array(ring: &FpRing, poly: &[u64], adds: &mut u64) -> Vec<u64> {
 }
 
 pub fn shared_for_b(ring: &FpRing, line: &Line, adds: &mut u64) -> SharedB {
+    // bitop/v1: the store (index and write) of both arrays' p entries
+    super::jv_bitops::words(4 * ring.p);
     SharedB {
         re: value_array(ring, &line.p3, adds),
         n4: value_array(ring, &line.p4, adds),
@@ -1379,8 +1383,9 @@ pub fn sieve_line(
     flush(&mut pending, ctr, &mut hits, &mut cost);
     cost.muls += ring.muls() - m0;
     // bitop/v1: the factor-base test of every x, and per root the counter's
-    // tag compare, its increment and the threshold compare
-    super::jv_bitops::words(cost.steps + 3 * cost.lookups);
+    // tag compare, its increment and the threshold compare; per read of a
+    // shared array its index and load
+    super::jv_bitops::words(cost.steps + 3 * cost.lookups + 2 * cost.shared_reads);
     if let Some(out) = all_counts {
         out.clear();
         out.resize(p as usize, 0);
@@ -1967,6 +1972,9 @@ pub fn run_cover_sieve_dlp_on(
                         (b[0].0[0], b[0].0[1])
                     })
                     .collect();
+                // bitop/v1: the index decomposition of each B (a scramble
+                // product, a sum, a reduction, two divisions), repeated here
+                super::jv_bitops::words(6 * bs.len() as u64);
                 let (roots, ad, lk) = roots_by_incidence(p, nu, &bs, &mut slot);
                 rep.enum_adds += ad;
                 rep.enum_lookups += lk;

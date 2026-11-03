@@ -66,6 +66,26 @@ fn natives(v: &Value) -> f64 {
 fn cost_w(v: &Value, w: f64) -> f64 {
     u(v, "total_muls") as f64 + w * f(v, "c_add_e") * natives(v)
 }
+/// MODEL: bitop/v1 proxy in units of one 11-bit field multiplication
+/// (docs/units/BITOPS.md at b = 11: mul 1485, add 143 = 0.096, word op 0.043).
+/// `la_w` weights the linear-algebra multiplications (mod l, 58 bits: 40542/1485 = 27.3).
+/// Words follow the record's counters: sieve steps + 3 per counter update + 2 per shared read;
+/// enumeration: p per evaluation-based root search (old), 3 per incidence step, 6 per hinted B,
+/// 4p per shared B; the line search's lookups at 3 words.
+fn proxy(v: &Value, la_w: f64) -> (f64, f64, f64) {
+    let p = u(v, "p") as f64;
+    let fbu = |k: &str| v.get("fb_line").and_then(|x| x.get(k)).and_then(|x| x.as_u64()).unwrap_or(0) as f64;
+    let muls = u(v, "total_muls") as f64 + (la_w - 1.0) * u(v, "la_muls") as f64;
+    let adds = (u(v, "sieve_adds") + u(v, "enum_adds")) as f64 + fbu("adds");
+    let words = u(v, "sieve_steps") as f64 + 3.0 * u(v, "sieve_lookups") as f64 + 2.0 * u(v, "sieve_shared_reads") as f64
+        + (u(v, "bs") - u(v, "inc_hinted_bs")) as f64 * p + 3.0 * u(v, "enum_lookups") as f64 + 6.0 * u(v, "inc_hinted_bs") as f64
+        + 4.0 * p * u(v, "shared_bs") as f64 + 3.0 * fbu("lookups");
+    (muls, 0.096 * adds, 0.043 * words)
+}
+fn proxy_total(v: &Value, la_w: f64) -> f64 {
+    let (a, b, c) = proxy(v, la_w);
+    a + b + c
+}
 fn strip(v: &Value, drop: &[&str]) -> Value {
     let mut c = v.clone();
     for k in drop {
@@ -152,6 +172,9 @@ fn main() {
         s: Vec<Vec<f64>>,
         sp: Vec<Vec<f64>>,
         band: Vec<Vec<Vec<f64>>>,
+        px: Vec<Vec<f64>>,
+        pxl: Vec<Vec<f64>>,
+        removed: (f64, f64, f64, f64),
     }
     let mut cmps: Vec<Cmp> = vec![];
     let mut all_ok = true;
@@ -161,11 +184,11 @@ fn main() {
             continue;
         }
         let (nd, od) = (arm(new), arm(old));
-        let mut cm = Cmp { label: format!("{new}/{old}"), s: vec![], sp: vec![], band: vec![vec![vec![]; 3]; 3] };
+        let mut cm = Cmp { label: format!("{new}/{old}"), s: vec![], sp: vec![], band: vec![vec![vec![]; 3]; 3], px: vec![], pxl: vec![], removed: (0.0, 0.0, 0.0, 0.0) };
         // control: outcome fields identical, accounting identities
         let (mut same, mut ident, mut nonneg) = (0, 0, 0);
         for pi in 0..3 {
-            let (mut sr, mut spr) = (vec![], vec![]);
+            let (mut sr, mut spr, mut pxr, mut pxlr) = (vec![], vec![], vec![], vec![]);
             for (y, x) in nd[pi].iter().zip(&od[pi]) {
                 assert_eq!(u(x, "seed"), u(y, "seed"));
                 all_ok &= ok(y);
@@ -195,12 +218,20 @@ fn main() {
                 if tot_new == tot_old {
                     nonneg += 1; // search natives equal (identity of total_plus)
                 }
+                pxr.push(proxy_total(y, 1.0) / proxy_total(x, 1.0));
+                pxlr.push(proxy_total(y, 27.3) / proxy_total(x, 27.3));
+                cm.removed.0 += proxy_total(x, 1.0);
+                cm.removed.1 += proxy_total(y, 1.0);
+                cm.removed.2 += proxy_total(x, 27.3);
+                cm.removed.3 += proxy_total(y, 27.3);
                 sr.push(s_of(y) / s_of(x));
                 spr.push(sp_of(y) / sp_of(x));
                 for (wi, &w) in BAND.iter().enumerate() {
                     cm.band[pi][wi].push(cost_w(y, w) / cost_w(x, w));
                 }
             }
+            cm.px.push(pxr);
+            cm.pxl.push(pxlr);
             cm.s.push(sr);
             cm.sp.push(spr);
         }
@@ -228,6 +259,17 @@ fn main() {
             write!(line, " pooled {g:.4} [{lo:.4}, {hi:.4}]").unwrap();
             say!("{line}");
         }
+        for (name, series) in [("bitop/v1 proxy, LA muls at 1 (MODEL)", &cm.px), ("bitop/v1 proxy, LA muls at 27.3 (MODEL)", &cm.pxl)] {
+            let mut line = format!("  {name}:");
+            for (pi, &p) in PRIMES.iter().enumerate() {
+                let (g, lo, hi) = boot(&[series[pi].clone()], &mut rng);
+                write!(line, " p={p} {g:.4} [{lo:.4}, {hi:.4}];").unwrap();
+            }
+            let (g, lo, hi) = boot(series, &mut rng);
+            write!(line, " pooled {g:.4} [{lo:.4}, {hi:.4}]").unwrap();
+            say!("{line}");
+        }
+        say!("  share of the summed proxy removed (MODEL): LA at 1: {:.1}%; LA at 27.3: {:.1}%", 100.0 * (1.0 - cm.removed.1 / cm.removed.0), 100.0 * (1.0 - cm.removed.3 / cm.removed.2));
         say!("  band (w GAE per emitted native op; 1 GAE = c_add_e muls):");
         for (wi, &w) in BAND.iter().enumerate() {
             let strata: Vec<Vec<f64>> = (0..3).map(|pi| cm.band[pi][wi].clone()).collect();
@@ -275,6 +317,19 @@ fn main() {
                 m(&|r| u(r, "enum_adds") as f64 / u(r, "bs") as f64), m(&|r| (u(r, "enum_adds") + u(r, "enum_lookups")) as f64 / u(r, "bs") as f64),
                 m(&|r| u(r, "sieve_adds") as f64 / u(r, "lines") as f64), m(&|r| (u(r, "sieve_adds") + u(r, "sieve_shared_reads")) as f64 / u(r, "lines") as f64),
                 m(&|r| u(r, "inc_hinted_bs") as f64), m(&|r| u(r, "shared_bs") as f64)).unwrap();
+        }
+    }
+    writeln!(t, "\nbitop/v1 proxy composition (MODEL), share of the arm's summed proxy: muls (LA at 1) | muls (LA at 27.3) | adds | word ops\n").unwrap();
+    writeln!(t, "| arm | p | muls, LA 1 | adds | words | muls, LA 27.3 | adds | words | of which LA muls (27.3) |").unwrap();
+    writeln!(t, "|--|--|--|--|--|--|--|--|--|").unwrap();
+    for a in &arms {
+        let d = arm(a);
+        for (pi, &p) in PRIMES.iter().enumerate() {
+            let sum = |la: f64, i: usize| d[pi].iter().map(|r| { let q = proxy(r, la); [q.0, q.1, q.2][i] }).sum::<f64>();
+            let t1 = sum(1.0, 0) + sum(1.0, 1) + sum(1.0, 2);
+            let t2 = sum(27.3, 0) + sum(27.3, 1) + sum(27.3, 2);
+            let la: f64 = d[pi].iter().map(|r| 27.3 * u(r, "la_muls") as f64).sum();
+            writeln!(t, "| {a} | {p} | {:.1}% | {:.1}% | {:.1}% | {:.1}% | {:.1}% | {:.1}% | {:.1}% |", 100.0 * sum(1.0, 0) / t1, 100.0 * sum(1.0, 1) / t1, 100.0 * sum(1.0, 2) / t1, 100.0 * sum(27.3, 0) / t2, 100.0 * sum(27.3, 1) / t2, 100.0 * sum(27.3, 2) / t2, 100.0 * la / t2).unwrap();
         }
     }
     std::fs::create_dir_all(out).unwrap();
