@@ -21,6 +21,12 @@
 //!
 //! Additive.  In `klein_v4` the dense path is unchanged; `chain_quotient`
 //! reads a row through its offset (zero for dense rows).
+//!
+//! E43 (§9.58): [`BucketOrder`] selects the pivot of each column's bucket in
+//! the storage echelons: `Lowest` (A's rule; V and W, unchanged) or `Fifo`
+//! (E36's F, the bucket's first arrival: FV `chain-fifo-profile` and FW
+//! `chain-fifo-tails`).  Nothing else changes; the existing entry points keep
+//! `Lowest`.
 
 use std::collections::{HashMap, HashSet};
 use std::time::Instant;
@@ -393,6 +399,20 @@ pub fn stage0(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<Stage0>
 
 // ── E40 V: the profile build and echelon (§9.50) ─────────────────────────
 
+/// E43 (§9.58): which row of a column's bucket becomes the pivot in the
+/// storage echelons ([`echelon_profile`], `macaulay_tails::echelon_tails`).
+/// Rows are filed in index order at build and re-filed in update order, the
+/// arrival order of E36's echelon; `Fifo` takes the first arrival (no sort,
+/// no selection work), `Lowest` sorts the bucket (A's rule, as before).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub enum BucketOrder {
+    /// A's rule (E33's `Lowest`): V and W.
+    #[default]
+    Lowest,
+    /// E36's F (`ArrivalRule::Fifo`): FV and FW.
+    Fifo,
+}
+
 /// Positive controls for V (all off by default; nothing here is charged).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ProfileCheck {
@@ -403,18 +423,20 @@ pub struct ProfileCheck {
     pub undercount: bool,
 }
 
-/// E33's counted echelon with A's rule (`Lowest`) on rows stored from
-/// `offs[r]` on (`rows[r][k]` is column `offs[r] + k`).  The same buckets,
+/// E33's counted echelon with A's rule (`Lowest`; E43: or F's, `order`) on
+/// rows stored from `offs[r]` on (`rows[r][k]` is column `offs[r] + k`).  The same buckets,
 /// pivots, normalisations, branch rule, updates, multiplications, lead scans
 /// after updates and digest as `echelon_by_lead_counted(…, Lowest, …)` on the
 /// dense rows; the first lead scan starts at the offset.  `ops` counts each
 /// use of an offset: one per row placed in its first bucket, one per pivot
 /// normalisation, two per row update.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn echelon_profile(
     mut rows: Vec<Vec<u16>>,
     offs: &[u32],
     ncols: usize,
     p: u32,
+    order: BucketOrder,
     muls: &mut u64,
     work: &mut PivotWork,
     ops: &mut u64,
@@ -443,7 +465,9 @@ pub(crate) fn echelon_profile(
         if b.is_empty() {
             continue;
         }
-        b.sort_unstable();
+        if order == BucketOrder::Lowest {
+            b.sort_unstable();
+        }
         if b.len() > 1 {
             work.contested += 1;
         }
@@ -527,6 +551,19 @@ pub(crate) fn build_profile(
     st: &mut QuarticSolve,
     check: ProfileCheck,
 ) -> Result<Built, String> {
+    build_profile_ordered(comps, d, p, st, check, BucketOrder::Lowest)
+}
+
+/// [`build_profile`] with the bucket order of the echelon (E43: `Fifo` is
+/// FV, `chain-fifo-profile`).
+pub(crate) fn build_profile_ordered(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    st: &mut QuarticSolve,
+    check: ProfileCheck,
+    order: BucketOrder,
+) -> Result<Built, String> {
     assert!(p < 1 << 15, "rows are u16 and products must fit u32");
     let t0 = Instant::now();
     st.equation_degree = EQUATION_WDEG as u8;
@@ -599,6 +636,7 @@ pub(crate) fn build_profile(
         &offs,
         ncols,
         p as u32,
+        order,
         &mut ech_muls,
         &mut w,
         &mut ops,
@@ -651,8 +689,19 @@ pub fn profile_measure(
     p: u64,
     check: ProfileCheck,
 ) -> Option<ProfileMeasure> {
+    profile_measure_ordered(comps, d, p, check, BucketOrder::Lowest)
+}
+
+/// [`profile_measure`] with the echelon's bucket order (E43).
+pub fn profile_measure_ordered(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    check: ProfileCheck,
+    order: BucketOrder,
+) -> Option<ProfileMeasure> {
     let mut st = QuarticSolve::default();
-    let b = build_profile(comps, d, p, &mut st, check).ok()?;
+    let b = build_profile_ordered(comps, d, p, &mut st, check, order).ok()?;
     Some(ProfileMeasure {
         counter: st.macaulay_stored_entries,
         measured: b.ech.rows.iter().map(|r| r.len() as u64).sum(),

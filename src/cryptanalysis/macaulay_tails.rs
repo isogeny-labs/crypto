@@ -13,6 +13,10 @@
 //! reachability/normal-form reads touch, and a lower bound on a sparse
 //! format's index work.  It is a diagnostic: nothing here is charged to any
 //! solve.
+//!
+//! E43 (§9.58): W's echelon takes a [`BucketOrder`]; `Fifo` is FW
+//! (`chain-fifo-tails`), E36's first-arrival pivots on W's storage.  W and
+//! the existing entry points keep A's order.
 
 use std::collections::HashMap;
 
@@ -21,6 +25,7 @@ use serde::Serialize;
 use super::gaudry_cubic::am;
 use super::gaudry_quartic::{echelon_by_lead_counted, PivotCheck, PivotRule, PivotWork};
 use super::klein_v4::{triangularise, wdeg, weighted_monomials_desc};
+pub use super::macaulay_profile::BucketOrder;
 use super::residual_walk::inv_mod;
 
 /// `klein_v4`'s `EIG_VAR`.
@@ -528,11 +533,14 @@ pub struct TailsCheck {
 
 /// W's re-allocations: how many, and the cells of the buffers they
 /// discarded (the counter check: stored = final lengths + discarded).
+/// E43: also the row updates (uncharged here; each is charged as its fill
+/// check in `tail_extent_ops`).
 #[derive(Clone, Copy, Debug, Default, Serialize)]
 pub struct TailsWork {
     pub reallocs: u64,
     pub discarded: u64,
     pub new_cells: u64,
+    pub updates: u64,
 }
 
 /// `cnt_ge[e]`: columns of weighted degree `≥ e` (`e ≤ d + 1`), i.e. one past
@@ -557,12 +565,15 @@ fn degree_ends(cols: &[[u8; 4]], d: u16) -> Vec<usize> {
 /// re-allocation, the row grown to the end of the weighted-degree block
 /// holding the pivot's end (`grow_to`), its new buffer's cells added to
 /// `new_cells`.
+/// E43: `order` selects the pivot of each bucket (`Lowest`, A's rule, for W;
+/// `Fifo`, E36's F, for FW).
 #[allow(clippy::too_many_arguments)]
 fn echelon_tails(
     mut rows: Vec<Vec<u16>>,
     offs: &[u32],
     ncols: usize,
     p: u32,
+    order: BucketOrder,
     grow_to: &dyn Fn(usize) -> usize,
     no_fill: bool,
     muls: &mut u64,
@@ -604,7 +615,9 @@ fn echelon_tails(
         if b.is_empty() {
             continue;
         }
-        b.sort_unstable();
+        if order == BucketOrder::Lowest {
+            b.sort_unstable();
+        }
         if b.len() > 1 {
             work.contested += 1;
         }
@@ -632,6 +645,7 @@ fn echelon_tails(
             .collect();
         *muls += (others.len() * nz.len()) as u64;
         *ops += 2 * others.len() as u64;
+        tw.updates += others.len() as u64;
         // W: the fill check, and a re-allocation on overflow.
         for (r, row, _, _) in others.iter_mut() {
             *tops += 1;
@@ -713,7 +727,28 @@ pub(crate) fn build_tails(
     st: &mut super::gaudry_quartic::QuarticSolve,
     check: TailsCheck,
 ) -> Result<super::klein_v4::Built, String> {
-    build_tails_with(comps, d, p, st, check, &mut TailsWork::default())
+    build_tails_with(
+        comps,
+        d,
+        p,
+        st,
+        check,
+        BucketOrder::Lowest,
+        &mut TailsWork::default(),
+    )
+}
+
+/// [`build_tails`] with the bucket order of the echelon (E43: `Fifo` is FW,
+/// `chain-fifo-tails`).
+pub(crate) fn build_tails_ordered(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    st: &mut super::gaudry_quartic::QuarticSolve,
+    check: TailsCheck,
+    order: BucketOrder,
+) -> Result<super::klein_v4::Built, String> {
+    build_tails_with(comps, d, p, st, check, order, &mut TailsWork::default())
 }
 
 fn build_tails_with(
@@ -722,6 +757,7 @@ fn build_tails_with(
     p: u64,
     st: &mut super::gaudry_quartic::QuarticSolve,
     check: TailsCheck,
+    order: BucketOrder,
     tw: &mut TailsWork,
 ) -> Result<super::klein_v4::Built, String> {
     use super::klein_v4::EQUATION_WDEG;
@@ -813,6 +849,7 @@ fn build_tails_with(
         &offs,
         ncols,
         p as u32,
+        order,
         &grow_to,
         check.no_fill,
         &mut ech_muls,
@@ -880,15 +917,39 @@ pub fn tails_measure(
     p: u64,
     check: TailsCheck,
 ) -> Option<TailsMeasure> {
+    tails_measure_ordered(comps, d, p, check, BucketOrder::Lowest).map(|m| m.measure)
+}
+
+/// E43 (§9.58): [`tails_measure`] under a bucket order, with the row
+/// updates and the cells allocated at build (counter − re-allocations' new
+/// buffers).
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+pub struct OrderedTailsMeasure {
+    pub measure: TailsMeasure,
+    pub updates: u64,
+    pub built_cells: u64,
+}
+
+pub fn tails_measure_ordered(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    check: TailsCheck,
+    order: BucketOrder,
+) -> Option<OrderedTailsMeasure> {
     let mut st = super::gaudry_quartic::QuarticSolve::default();
     let mut tw = TailsWork::default();
-    let b = build_tails_with(comps, d, p, &mut st, check, &mut tw).ok()?;
-    Some(TailsMeasure {
-        counter: st.macaulay_stored_entries,
-        final_lengths: b.ech.rows.iter().map(|r| r.len() as u64).sum(),
-        discarded: tw.discarded,
-        reallocs: tw.reallocs,
-        tail_ops: st.tail_extent_ops,
-        offset_ops: st.profile_offset_ops,
+    let b = build_tails_with(comps, d, p, &mut st, check, order, &mut tw).ok()?;
+    Some(OrderedTailsMeasure {
+        measure: TailsMeasure {
+            counter: st.macaulay_stored_entries,
+            final_lengths: b.ech.rows.iter().map(|r| r.len() as u64).sum(),
+            discarded: tw.discarded,
+            reallocs: tw.reallocs,
+            tail_ops: st.tail_extent_ops,
+            offset_ops: st.profile_offset_ops,
+        },
+        updates: tw.updates,
+        built_cells: st.macaulay_stored_entries - tw.new_cells,
     })
 }
