@@ -191,6 +191,21 @@ for (const e of corpus.edges) {
 const relOrder = { obstructs: 0, does_not_cover: 1, qualifies: 2 };
 obstructions.sort((a, b) => relOrder[a.relation] - relOrder[b.relation] || b.impact - a.impact || a.edge.localeCompare(b.edge));
 
+// 5c. Route closures on weak support. An `obstructs` edge closes an attack route. If the
+// obstructing claim rests on an assumed, heuristic or open claim, breaking that support
+// reopens the route; this is the direction that matters for finding faster attacks, and it
+// is invisible to impact (obstructions usually support nothing downstream).
+const closures = [];
+for (const e of corpus.edges) {
+  if (e.relation !== "obstructs") continue;
+  const anc = ancestors(e.from);
+  const weakSupport = [...anc].filter(id => weak(id)).sort();
+  if (weak(e.from)) weakSupport.unshift(e.from);
+  if (!weakSupport.length) continue;
+  closures.push({ edge: e.id, obstruction: e.from, obstruction_status: nodes.get(e.from).status, closed_route: e.to, closed_status: nodes.get(e.to).status, weak_support: weakSupport.map(id => ({ id, status: nodes.get(id).status })), statement: e.statement });
+}
+closures.sort((a, b) => a.weak_support.length - b.weak_support.length || a.edge.localeCompare(b.edge));
+
 // 6. Author-flagged fragility.
 const flagged = corpus.nodes
   .filter(n => (n.failure_modes ?? []).length >= 4 && n.status !== "refuted" && !established(n.id))
@@ -245,11 +260,11 @@ const out = {
   corpus_version: corpus.version,
   counts: {
     nodes: corpus.nodes.length, status_inflation: inflation.length, model_scope_leaps: leaps.length,
-    contagious_sources: contagion.length, hidden_assumption_clusters: hidden.length, unwired_dependences: unwired.length,
+    contagious_sources: contagion.length, hidden_assumption_clusters: hidden.length, unwired_dependences: unwired.length, route_closures_on_weak_support: closures.length,
     live_obstructions: obstructions.length, author_flagged: flagged.length, attack_queue: attackQueue.length, hygiene_queue: hygieneQueue.length
   },
   status_inflation: inflation, model_scope_leaps: leaps, source_contagion: contagion,
-  hidden_assumptions: hidden, unwired_dependences: unwired, live_obstructions: obstructions, author_flagged: flagged, attack_queue: attackQueue, hygiene_queue: hygieneQueue
+  hidden_assumptions: hidden, unwired_dependences: unwired, route_closures_on_weak_support: closures, live_obstructions: obstructions, author_flagged: flagged, attack_queue: attackQueue, hygiene_queue: hygieneQueue
 };
 const json = JSON.stringify(out, null, 2) + "\n";
 
@@ -312,6 +327,13 @@ md.push("", "## 5b. Unwired dependences", "",
   "| heuristic | node (status) | assumption text | node impact |", "|---|---|---|---|");
 for (const u of unwired) md.push(`| \`${u.heuristic}\` | \`${u.node}\` (${u.status}) | ${u.assumption.replace(/\|/g, "\\|")} | ${u.impact} |`);
 
+md.push("", "## 5c. Route closures on weak support", "",
+  "An `obstructs` edge closes an attack route. These obstructions rest on an assumed,",
+  "heuristic or open claim (or are one). Breaking that support reopens the route: the",
+  "attack direction, which impact does not measure. Fewest weak supports first.", "",
+  "| edge | obstruction (status) | closed route | weak support |", "|---|---|---|---|");
+for (const c of closures) md.push(`| ${c.edge} | \`${c.obstruction}\` (${c.obstruction_status}) | \`${c.closed_route}\` | ${c.weak_support.map(w => `\`${w.id}\` (${w.status})`).join(", ")} |`);
+
 md.push("", "## 6. Live obstructions", "",
   "An established claim obstructs, qualifies or bounds the scope of a claim that is still",
   "load-bearing. `obstructs` rows are the sharpest: the obstruction is proved and the",
@@ -363,4 +385,4 @@ if (check) {
   fs.writeFileSync(mdPath, mdText);
   fs.writeFileSync(svgPath, svgText);
 }
-console.log(`weakness: ${inflation.length} inflated, ${leaps.length} scope leaps, ${contagion.length} contagious sources, ${hidden.length} hidden assumptions, ${unwired.length} unwired, ${obstructions.length} live pressure edges, ${attackQueue.length} attack + ${hygieneQueue.length} hygiene`);
+console.log(`weakness: ${inflation.length} inflated, ${leaps.length} scope leaps, ${contagion.length} contagious sources, ${hidden.length} hidden assumptions, ${unwired.length} unwired, ${closures.length} route closures on weak support, ${obstructions.length} live pressure edges, ${attackQueue.length} attack + ${hygieneQueue.length} hygiene`);

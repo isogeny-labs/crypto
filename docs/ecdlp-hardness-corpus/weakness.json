@@ -2,16 +2,17 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 541,
+    "nodes": 578,
     "status_inflation": 17,
     "model_scope_leaps": 9,
-    "contagious_sources": 19,
-    "hidden_assumption_clusters": 17,
+    "contagious_sources": 20,
+    "hidden_assumption_clusters": 18,
     "unwired_dependences": 11,
+    "route_closures_on_weak_support": 16,
     "live_obstructions": 49,
     "author_flagged": 8,
-    "attack_queue": 219,
-    "hygiene_queue": 91
+    "attack_queue": 245,
+    "hygiene_queue": 97
   },
   "status_inflation": [
     {
@@ -850,6 +851,45 @@
       ]
     },
     {
+      "source": "S-PA-LEAN",
+      "title": "Five-target Lean discharge and semantic review packet (sibling repository)",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-PA-MOD-ALIAS",
+        "CLAIM-PA-SUBGROUP-AMBIENT",
+        "CLAIM-PA-BATCH-ADAPTIVE",
+        "CLAIM-PA-POLY-FUNCTION"
+      ],
+      "refuted_fraction": 0.444,
+      "exposed": [
+        {
+          "id": "CEX-PA-BATCH-ADAPTIVE",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "THM-PA-SCHNORR-SS",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "CEX-PA-MOD-ALIAS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-POLY-FUNCTION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-SUBGROUP-AMBIENT",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        }
+      ]
+    },
+    {
       "source": "S-XT-CWZ-2014",
       "title": "Traps to the BGJT-algorithm for discrete logarithms",
       "verification": "primary_read",
@@ -1025,14 +1065,16 @@
         "LB-ISOGENY-GENERIC",
         "THEOREM-SUPERSINGULAR-SMALL-K",
         "THM-RP-TWIST-MIXED-RELATION",
-        "MEAS-XT-ECC2K130-EMBEDDING-DEGREE"
+        "MEAS-XT-ECC2K130-EMBEDDING-DEGREE",
+        "THM-PA-SCHNORR-SS"
       ],
       "texts": [
         "Prime subgroup order",
         "Prime-order group",
         "r is a prime subgroup order coprime to q",
         "odd annihilator (odd prime subgroup order)",
-        "Correct subgroup order r"
+        "Correct subgroup order r",
+        "Prime-order subgroup"
       ],
       "established_users": [
         "THEOREM-RANDOM-SELF-REDUCTION",
@@ -1041,7 +1083,7 @@
         "THEOREM-SUPERSINGULAR-SMALL-K",
         "MEAS-XT-ECC2K130-EMBEDDING-DEGREE"
       ],
-      "total_impact": 6
+      "total_impact": 7
     },
     {
       "nodes": [
@@ -1249,6 +1291,22 @@
     },
     {
       "nodes": [
+        "RED-SCHNORR-ROM",
+        "THM-GG-KMPT-RHO-OPTIMAL",
+        "ASM-PA-FS-CHALLENGE-INDEPENDENCE"
+      ],
+      "texts": [
+        "Random-oracle model",
+        "random-oracle partition",
+        "Random-oracle or equivalent hash model"
+      ],
+      "established_users": [
+        "THM-GG-KMPT-RHO-OPTIMAL"
+      ],
+      "total_impact": 1
+    },
+    {
+      "nodes": [
         "COND-PF-EP-BETA-THRESHOLD",
         "FACT-PF-EP-LINEARIZED-NO-GAIN",
         "FACT-PF-MM-TRINOMIAL-NO-GAIN"
@@ -1365,6 +1423,244 @@
       "status": "conditional",
       "assumption": "Relation and rank heuristics hold",
       "impact": 0
+    }
+  ],
+  "route_closures_on_weak_support": [
+    {
+      "edge": "E-GG-067",
+      "obstruction": "HEUR-GG-DGM-CYCLE-RATES",
+      "obstruction_status": "heuristic",
+      "closed_route": "THM-GG-EQUIV-CLASS-RHO",
+      "closed_status": "conditional",
+      "weak_support": [
+        {
+          "id": "HEUR-GG-DGM-CYCLE-RATES",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "With classes the 2-cycle rate is 1/(N_C n_S) per step, so fruitless cycles appear regularly unless handled; the theorem ignores them."
+    },
+    {
+      "edge": "E-GG-069",
+      "obstruction": "HEUR-GG-DGM-CYCLE-RATES",
+      "obstruction_status": "heuristic",
+      "closed_route": "ALG-GG-WZ-NEGATION",
+      "closed_status": "conditional",
+      "weak_support": [
+        {
+          "id": "HEUR-GG-DGM-CYCLE-RATES",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "4-cycles at Theta(1/r^2) are not handled by the Wiener-Zuccherato rule, so walks cycle within Theta(r^2) steps."
+    },
+    {
+      "edge": "E-PF-004",
+      "obstruction": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+      "obstruction_status": "heuristic",
+      "closed_route": "GAP-PF-PRIME-RELATION-SEARCH",
+      "closed_status": "open",
+      "weak_support": [
+        {
+          "id": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Without a subspace the extension-field relation-search route is unavailable, which is why the prime case has no algorithm with a cost estimate."
+    },
+    {
+      "edge": "E-PF-043",
+      "obstruction": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "obstruction_status": "conditional",
+      "closed_route": "DEF-PF-SEMAEV-SMALL-X-BASE",
+      "closed_status": "definition",
+      "weak_support": [
+        {
+          "id": "HEUR-PF-YYTK-STATISTICAL",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Semaev's naive method with a dense factor-base polynomial cannot beat generic methods when solved by Gröbner bases (conditionally)."
+    },
+    {
+      "edge": "E-PF-057",
+      "obstruction": "COND-PF-KY-FFA-REDUCTIO",
+      "obstruction_status": "conditional",
+      "closed_route": "HEUR-FIRST-FALL-DEGREE",
+      "closed_status": "heuristic",
+      "weak_support": [
+        {
+          "id": "ASM-PF-KY-CURVE-CONSTRUCTION",
+          "status": "assumed"
+        }
+      ],
+      "statement": "An assumption that bounds the solving degree by a constant first fall degree regardless of the number of variables would decide an NP-complete problem in polynomial time."
+    },
+    {
+      "edge": "E-PF-080",
+      "obstruction": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "obstruction_status": "conditional",
+      "closed_route": "COND-PF-HKPYY-COMPLEXITY",
+      "closed_status": "conditional",
+      "weak_support": [
+        {
+          "id": "HEUR-DECOMPOSITION-PROBABILITY",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "No linearized QSP makes the QSP algorithm beat generic algorithms under its own cost estimate."
+    },
+    {
+      "edge": "E-PF-083",
+      "obstruction": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+      "obstruction_status": "conditional",
+      "closed_route": "COND-PF-HKPYY-COMPLEXITY",
+      "closed_status": "conditional",
+      "weak_support": [
+        {
+          "id": "HEUR-DECOMPOSITION-PROBABILITY",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Split linearized trinomials beat brute force but not generic algorithms."
+    },
+    {
+      "edge": "E-WD-014",
+      "obstruction": "COND-WD-MQ-PRIME-N-FAILS",
+      "obstruction_status": "conditional",
+      "closed_route": "ATTACK-GHS-WEIL-DESCENT",
+      "closed_status": "proved_external",
+      "weak_support": [
+        {
+          "id": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "For prime N in [160, 600] the GHS construction yields no useful cover."
+    },
+    {
+      "edge": "E-WD-034",
+      "obstruction": "COND-WD-KMPS-INEFFECTIVE",
+      "obstruction_status": "conditional",
+      "closed_route": "ATTACK-GHS-WEIL-DESCENT",
+      "closed_status": "proved_external",
+      "weak_support": [
+        {
+          "id": "HEUR-RELATION-RANK",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Asymptotically, (g)GHS is almost never faster than the best non-descent solver."
+    },
+    {
+      "edge": "E-XT-003",
+      "obstruction": "HEUR-XT-MILLER-HEIGHT",
+      "obstruction_status": "heuristic",
+      "closed_route": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "closed_status": "definition",
+      "weak_support": [
+        {
+          "id": "HEUR-XT-MILLER-HEIGHT",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Few small-height points in E~(Q) force exponentially large lifts of random points (heuristic)."
+    },
+    {
+      "edge": "E-XT-009",
+      "obstruction": "OBS-XT-LIFT-BOUNDED-RANK",
+      "obstruction_status": "conditional",
+      "closed_route": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "closed_status": "definition",
+      "weak_support": [
+        {
+          "id": "HEUR-XT-PPVW-BOUNDED-RANK",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Under bounded rank, no lift of a growing number of random points to bounded height exists."
+    },
+    {
+      "edge": "E-XT-021",
+      "obstruction": "HEUR-XT-EASY-LIFT-DEPENDENCE",
+      "obstruction_status": "heuristic",
+      "closed_route": "DEF-XEDNI-CALCULUS",
+      "closed_status": "definition",
+      "weak_support": [
+        {
+          "id": "HEUR-XT-EASY-LIFT-DEPENDENCE",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Simultaneously lifted points are almost never dependent, so xedni rarely yields a relation."
+    },
+    {
+      "edge": "XL-001",
+      "obstruction": "COND-PF-KY-FFA-REDUCTIO",
+      "obstruction_status": "conditional",
+      "closed_route": "COND-NAGAO-2015-COMPLEXITY",
+      "closed_status": "conditional",
+      "weak_support": [
+        {
+          "id": "ASM-PF-KY-CURVE-CONSTRUCTION",
+          "status": "assumed"
+        }
+      ],
+      "statement": "Kosters-Yeo: an unrestricted first-fall-degree assumption would decide an NP-complete evaluation problem; Nagao's estimate assumes the same first-fall behaviour."
+    },
+    {
+      "edge": "E-RP-045",
+      "obstruction": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "obstruction_status": "conditional",
+      "closed_route": "GAP-END-TO-END-IC-EXPONENT",
+      "closed_status": "open",
+      "weak_support": [
+        {
+          "id": "HEUR-DECOMPOSITION-PROBABILITY",
+          "status": "heuristic"
+        },
+        {
+          "id": "HEUR-RELATION-RANK",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "No base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters."
+    },
+    {
+      "edge": "E-XT-005",
+      "obstruction": "HEUR-XT-SS-ANALYSIS",
+      "obstruction_status": "heuristic",
+      "closed_route": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "closed_status": "definition",
+      "weak_support": [
+        {
+          "id": "HEUR-XT-SS-ANALYSIS",
+          "status": "heuristic"
+        },
+        {
+          "id": "HEUR-XT-MILLER-HEIGHT",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "The natural lifted index calculus is estimated to be slower than brute force."
+    },
+    {
+      "edge": "EX-068",
+      "obstruction": "OBSTRUCTION-XEDNI-HEIGHT",
+      "obstruction_status": "proved_external",
+      "closed_route": "DEF-XEDNI-CALCULUS",
+      "closed_status": "definition",
+      "weak_support": [
+        {
+          "id": "ASM-XEDNI-HAZARD-RECURRENCE",
+          "status": "assumed"
+        },
+        {
+          "id": "CONJ-XT-LANG-HEIGHT",
+          "status": "open"
+        }
+      ],
+      "statement": "Bounded dependence coefficients make a random reduced tuple useful with only order-1/p probability under the theorem's assumptions."
     }
   ],
   "live_obstructions": [
@@ -3646,6 +3942,34 @@
       "score": 0.5
     },
     {
+      "id": "ASM-PA-FS-CHALLENGE-INDEPENDENCE",
+      "label": "Fiat-Shamir-derived batching challenges act as independent uniform challenges",
+      "status": "assumed",
+      "model": "classical_unrestricted",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.3,
+      "cost": "reduction",
+      "action": "narrow the scope or reduce to a weaker assumption",
+      "score": 0.475
+    },
+    {
+      "id": "ASM-XEDNI-HAZARD-RECURRENCE",
+      "label": "Adaptive xedni trials satisfy a history-uniform conditional-hazard recurrence",
+      "status": "assumed",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.3,
+      "cost": "reduction",
+      "action": "narrow the scope or reduce to a weaker assumption",
+      "score": 0.475
+    },
+    {
       "id": "STD-BK-SAFECURVES-RHO",
       "label": "SafeCurves rho rule: l >= 2^200 (0.886 sqrt l > 2^100)",
       "status": "assumed",
@@ -3958,6 +4282,20 @@
       "label": "Petit-Quisquater subexponential binary ECDLP: 2^{c n^{2/3} log n}",
       "status": "conditional",
       "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.45,
+      "cost": "discharge conditions",
+      "action": "attack the weakest condition first; each condition is its own node",
+      "score": 0.45
+    },
+    {
+      "id": "COND-PA-FS-BATCH-SOUNDNESS",
+      "label": "Fiat-Shamir RLC batch verification fails with probability <= d/|F|",
+      "status": "conditional",
+      "model": "classical_unrestricted",
       "impact": 0,
       "inflates": 0,
       "contagion": 0,
@@ -4518,6 +4856,328 @@
       "label": "Multi-target/nonuniform security conversion",
       "status": "open",
       "model": "generic_group_preprocessing",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-CIRCUIT-EC-REFINEMENT",
+      "label": "In-circuit elliptic-curve arithmetic refinement",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-COFACTOR",
+      "label": "Cofactor clearing as a uniform projection",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-CONCRETE-MULTIUSER",
+      "label": "Concrete and multi-user security accounting",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-CURVE-SELECTION",
+      "label": "Curve-selection assumptions with exact curve and subgroup identities",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-DLP-CDH-DDH-DIRECTION",
+      "label": "DLP, CDH and DDH are not interchangeable",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-EXCEPTIONAL-FORMULAS",
+      "label": "Exceptional cases of elliptic-curve addition formulas",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-FORKING-LEMMA",
+      "label": "Finite random-oracle game semantics for the forking lemma",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-FS-TRANSCRIPT-ENCODING",
+      "label": "Fiat-Shamir transcript encoding",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-FS-ZERO-HASH",
+      "label": "'Special soundness implies Fiat-Shamir security'",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-FULL-KZG-GROTH-PLONK",
+      "label": "End-to-end KZG, Groth16 and PLONK",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-GGM-TRANSPARENT-ENCODING",
+      "label": "Generic-group lower bounds versus transparent encodings",
+      "status": "open",
+      "model": "generic_group",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-HASH-TO-CURVE",
+      "label": "Hash-to-curve contracts (RFC 9380)",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-INVALID-CURVE-PATHS",
+      "label": "Invalid-curve and twist input paths",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-KZG-BATCHING",
+      "label": "KZG batch opening boundaries",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-KZG-TRAPDOOR-DEGREE",
+      "label": "KZG trapdoor and degree boundaries",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-MODEL-BOUNDARIES",
+      "label": "ROM, AGM, KEA, q-SDH and QROM as named models",
+      "status": "open",
+      "model": "generic_group",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-ONE-SHOT-REPEAT",
+      "label": "One-shot success bound versus geometric waiting time",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-PEDERSEN-RELATION",
+      "label": "'Independent generators' read as literal linear independence",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-PLONK-PRODUCTS",
+      "label": "PLONK permutation and lookup product premises",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-RHO-SEPARATION",
+      "label": "Separate rho correctness, collision time and collision usefulness",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-RSR-EXACT-SUBGROUP",
+      "label": "ECDLP random self-reducibility over the exact subgroup",
+      "status": "open",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-SNARK-DEFINITIONS",
+      "label": "SNARK definitions as separate games",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.35
+    },
+    {
+      "id": "GAP-PA-ZK-SEPARATION",
+      "label": "Completeness, zero knowledge, soundness and proof of knowledge are distinct",
+      "status": "open",
+      "model": "mathematical",
       "impact": 0,
       "inflates": 0,
       "contagion": 0,
@@ -5328,6 +5988,34 @@
       "score": 1.426
     },
     {
+      "id": "CEX-PA-BATCH-ADAPTIVE",
+      "label": "Adaptive RLC cancellation and fixed-error count (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "review",
+      "action": "independent review; formalise the finite core",
+      "score": 1.36
+    },
+    {
+      "id": "THM-PA-SCHNORR-SS",
+      "label": "Schnorr special soundness under exact fork hypotheses (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "review",
+      "action": "independent review; formalise the finite core",
+      "score": 1.36
+    },
+    {
       "id": "THM-RP-S3-LINEAR-HALF-TRACE",
       "label": "S3 is F_2-linear in (e1,e2): linearized half-trace two-point PDP (A-PDP8)",
       "status": "proved_internal_unreviewed",
@@ -5444,6 +6132,48 @@
       "label": "{YZ + 1, XZ + X + 1}: d_F(inside) = 3, d'_F = 1",
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "review",
+      "action": "independent review; formalise the finite core",
+      "score": 0.936
+    },
+    {
+      "id": "CEX-PA-MOD-ALIAS",
+      "label": "Modulus alias and bounded repair (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "review",
+      "action": "independent review; formalise the finite core",
+      "score": 0.936
+    },
+    {
+      "id": "CEX-PA-POLY-FUNCTION",
+      "label": "Nonzero polynomial with zero function (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "review",
+      "action": "independent review; formalise the finite core",
+      "score": 0.936
+    },
+    {
+      "id": "CEX-PA-SUBGROUP-AMBIENT",
+      "label": "Ambient membership does not imply designated-subgroup membership (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
       "impact": 0,
       "inflates": 0,
       "contagion": 1,
@@ -5808,6 +6538,20 @@
       "label": "{XYW+XY+W, XZW+XW+1}: d_F(inside) = 4, d'_F = 1",
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "review",
+      "action": "independent review; formalise the finite core",
+      "score": 0.8
+    },
+    {
+      "id": "CEX-PA-SCHNORR-SAME-CHALLENGE",
+      "label": "Schnorr extraction countermodels: equal challenges; nonunit difference over ZMod 4",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
       "impact": 0,
       "inflates": 0,
       "contagion": 0,

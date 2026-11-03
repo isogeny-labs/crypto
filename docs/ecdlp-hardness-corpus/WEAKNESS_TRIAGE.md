@@ -3,7 +3,8 @@
 **Question.** Where is the claim graph that supports ECDLP hardness weakest, and which
 weak points can be broken cheaply enough to attack first?
 
-**Scope.** The assembled corpus (version 2026-11-01: 541 claims, 909 edges, 233 sources),
+**Scope.** The assembled corpus (version 2026-11-01: 578 claims, 943 edges, 235 sources,
+including the protocol-layer port of W7),
 read through `weakness.mjs`, plus the repository sources the corpus cites. Nothing here
 changes a claim's status or edges; every proposed change is listed as an action. The
 generated companion is [`WEAKNESSES.md`](WEAKNESSES.md) (all rows) with
@@ -18,15 +19,16 @@ pass does not see:
 | status inflation | proved / algorithm / measured claims whose support closure reaches an open, heuristic or assumed claim | 17 |
 | unwired dependence | a claim's own assumption text invokes a heuristic node with no edge to it | 11 |
 | live obstruction | an established claim `obstructs` / `qualifies` / `does_not_cover` a claim that still supports others | 49 (17 `obstructs`) |
-| hidden shared assumption | the same assumption text on 3+ nodes, never a node itself | 17 clusters |
-| source contagion | a primary source with a refuted claim and other live claims | 19 sources |
+| route closure on weak support | an `obstructs` edge (a closed attack route) whose obstruction rests on an assumed, heuristic or open claim | 16 |
+| hidden shared assumption | the same assumption text on 3+ nodes, never a node itself | 18 clusters |
+| source contagion | a primary source with a refuted claim and other live claims | 20 sources |
 | model-scope leap | generic-model or measured claim supporting a broader one without `model_bridge` | 9 |
 
-It then ranks the 219 attackable claims by impact × breakability, where breakability is
+It then ranks the 245 attackable claims by impact × breakability, where breakability is
 the expected cost of a decisive result: a heuristic with a stated formula in an
 algebraic model can be checked exactly on small fields; an open literature conjecture
 cannot. Established `obstructs` edges multiply the score. Reading a primary text or
-auditing a kernel-checked statement goes in a separate hygiene queue (91 claims): cheap,
+auditing a kernel-checked statement goes in a separate hygiene queue (97 claims): cheap,
 but it rarely overturns anything. **The scores are a triage heuristic, not evidence.**
 
 ![Attack queue, top 20 (weakness-queue.svg)](weakness-queue.svg)
@@ -189,6 +191,82 @@ now reports any new occurrence.
   standards or the concrete rho algorithm. That is the honest, well-known generic-to-concrete
   step, and the repository's matched-rho measurements control it.
 
+## W7. The protocol-layer corpus, ported and cross-linked
+
+**What.** `protocol-attack-corpus.json` ports the sibling repository's cryptographic
+assumption attack corpus (crypto-autoresearcher
+`research/cryptographic_assumption_attack_corpus_20261101/`, pinned at commit `00435557`)
+into this schema: 37 nodes, 34 edges, 2 research targets.
+
+- **The finished five.** Each becomes a refuted overbroad claim plus the counterexample or
+  repair that refutes it, carrying the sibling's Lean theorem names (all five passed the
+  sibling's semantic review). Their Lean files live in the sibling, so no `formal` block is
+  recorded here, and their status stays `proved_internal_unreviewed` for this corpus.
+- **The queue.** The Priority 0–2 queue becomes 23 open obligations.
+
+**Read (cross-links).** The sibling's Lean results now attach to the ECDLP claims whose own
+assumption text they discharge or qualify:
+
+- `RED-SCHNORR-ROM` lists "Correct subgroup validation" and "Reduction obtains two
+  related accepting transcripts"; the SUBGROUP countermodel qualifies the first and the
+  Schnorr special-soundness theorem enables the second.
+- SUBGROUP also qualifies `BOUNDARY-INVALID-CURVE` and `THEOREM-RANDOM-SELF-REDUCTION`.
+- The queue items qualify `LB-SHOUP-DLP` (transparent encodings), the AGM transfer claims,
+  `HEUR-RHO-RANDOM-MAPPING`, `STANDARD-CURVE-EXCLUSIONS`, the cofactor and CDH nodes.
+- POLY-FUNCTION qualifies `CLAIM-NAGAO-LEMMA4`. The true/fake fall-degree gap is the
+  formal-versus-function gap: Xⱼ² + Xⱼ vanishes as a function on F₂ but not formally,
+  which is exactly why reducing modulo the field equations changes the degree.
+
+**Promoted assumption.** `OBSTRUCTION-XEDNI-HEIGHT` listed "a history-uniform
+conditional-hazard recurrence for adaptive trials" as free text. It is now the node
+`ASM-XEDNI-HAZARD-RECURRENCE` (assumed), conditioning the obstruction. The protocol
+corpus's ONE-SHOT-REPEAT item qualifies it: a one-shot bound alone does not give a
+geometric waiting time under correlated or adaptive trials. `RT-PA-XEDNI-HAZARD` asks for
+either the recurrence for the JKSST selected-lift process or an adaptive countermodel.
+
+**Exact (new lens: route closures on weak support).** Impact counts what *rests on* a
+claim, so it cannot see the value of breaking an obstruction, which usually supports
+nothing downstream. Breaking an obstruction's support **reopens an attack route**, which
+is the direction that matters for beating rho. `weakness.mjs` now lists every `obstructs`
+edge whose obstruction rests on an assumed, heuristic or open claim: 16. Read by route:
+
+- **Xedni is closed twice, both times softly.** `HEUR-XT-EASY-LIFT-DEPENDENCE`
+  (heuristic, Silverman's Masser-based argument), and `OBSTRUCTION-XEDNI-HEIGHT`, which
+  rests on Lang's conjecture and the hazard recurrence.
+- **Lifted index calculus is closed by three heuristics.** Miller's height argument, PPVW
+  bounded rank, and the Silverman–Suzuki analysis.
+- **The naive prime-field Semaev method is closed** by YYTK's lower bound, conditional on
+  their statistical Conjecture 10, which was validated only up to about 25-bit primes. The
+  closure's scope already excludes PKM towers, APS partitions and non-Gröbner solvers.
+- **Quasi-subfield-polynomial routes are closed** by "no gain" results resting on
+  `HEUR-DECOMPOSITION-PROBABILITY`, the yield heuristic of W3.
+- **The prime-field relation search** (`GAP-PF-PRIME-RELATION-SEARCH`) is closed by
+  `HEUR-PF-NO-SUBFIELD-OBSTRUCTION`, labelled heuristic.
+- **Rank-only closures are not reopenings.** The GHS (KMPS) and two-summand closures rest
+  on `HEUR-RELATION-RANK`; per W2, removing that heuristic *strengthens* them.
+
+**Derived (strengthens a closure, so it saves effort).** One tempting escape from
+`HEUR-PF-NO-SUBFIELD-OBSTRUCTION` fails. Base-change E/F_p to F_{p^n}, decompose a target
+R in E(F_p) over points whose x-coordinates lie in an F_p-subspace V of F_{p^n}, and pull
+the relation back with the trace: nR = Σ Tr(Pᵢ). The pulled-back factor base Tr(F') has
+about p^{dim V} ≥ p elements, the size of the whole group, while rho needs about √p.
+Any subspace-based factor base therefore fails on prime fields by a dimension count, not by
+heuristic. A prime-field escape needs a factor base that is *not* a subspace image (small
+integers, composed rational maps, random sets), which is where the corpus already places
+PKM and APS.
+
+**Attack.** Order the reopenings by how cheaply each support can be tested:
+
+1. YYTK Conjecture 10, an exact statistic on summation polynomials, re-measured well past
+   25 bits.
+2. The hazard recurrence for adaptive lift selection: a Lean separation first, then the
+   JKSST process.
+3. The easy-lift dependence probability: an exact count on small families against the
+   claimed below-1/p rate.
+
+The three lifting heuristics over Q are deep (height and rank conjectures) and are not
+cheap targets.
+
 ## Recommended order of attack
 
 | # | target | kind of result | cost | what changes if it lands |
@@ -199,8 +277,10 @@ now reports any new occurrence.
 | 4 | W3: prime-field yield census, full histogram, scaling in p | exact measurement | low–medium | every prime-field yield estimate is checked or corrected |
 | 5 | W1: degree-2 Macaulay rank census, then the lower-bound proof | census, then proof | medium | PQ Assumption 2 refuted for m = 2; the FFDA rows retire |
 | 6 | `RT-SP-SEMAEV-A1-N45` | exact F4 run | low | Semaev 2015 Assumption 1 settled at the measured scale |
+| 7 | W7: YYTK Conjecture 10 past 25 bits | exact census | low–medium | the naive prime-field Semaev closure is confirmed, or the route reopens |
+| 8 | W7: `RT-PA-XEDNI-HAZARD` | Lean separation, then the JKSST process | medium | the xedni waiting-time obstruction is closed, or the route reopens |
 
-Items 1, 2 and 3 are corpus and proof work, not experiment runs. Items 4–6 are runs and go
+Items 1, 2, 3 and 8 are corpus and proof work, not experiment runs. Items 4–7 are runs and go
 through the repository's experiment route (protocol, resume checkpoint, native code,
 validation gate) before any number enters the corpus.
 
