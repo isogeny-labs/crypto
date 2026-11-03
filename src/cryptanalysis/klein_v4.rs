@@ -1289,8 +1289,12 @@ pub(crate) fn build_echelon(
             st.pivot_digest = w.digest;
             ech
         }
-        Pivot::Profile(_) => unreachable!("the profile build is macaulay_profile::build_profile"),
-        Pivot::Tails(_) => unreachable!("the tails build is macaulay_tails::build_tails"),
+        Pivot::Profile(_) | Pivot::ProfileOrdered(..) => {
+            unreachable!("the profile build is macaulay_profile::build_profile")
+        }
+        Pivot::Tails(_) | Pivot::TailsOrdered(..) => {
+            unreachable!("the tails build is macaulay_tails::build_tails")
+        }
     };
     st.echelon_muls += ech_muls;
     st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
@@ -1502,6 +1506,10 @@ pub enum V4Solver {
     /// E42 (§9.54) W: V with each row reserved to the block after its
     /// build end, grown on overflow.
     ChainTails,
+    /// E43 (§9.58) FV: V's storage with F's first-arrival pivots.
+    ChainFifoProfile,
+    /// E43 (§9.58) FW: W's storage with F's first-arrival pivots.
+    ChainFifoTails,
 }
 
 /// The echelon's pivot rule in the chain solve: E31's (uncounted) or E33's
@@ -1528,6 +1536,16 @@ pub enum Pivot {
     /// E42 (§9.54): V's rows reserved to the fill
     /// ([`super::macaulay_tails`]).
     Tails(super::macaulay_tails::TailsCheck),
+    /// E43 (§9.58): V's storage with a bucket order (`Fifo`: FV).
+    ProfileOrdered(
+        super::macaulay_profile::ProfileCheck,
+        super::macaulay_profile::BucketOrder,
+    ),
+    /// E43 (§9.58): W's storage with a bucket order (`Fifo`: FW).
+    TailsOrdered(
+        super::macaulay_tails::TailsCheck,
+        super::macaulay_profile::BucketOrder,
+    ),
 }
 
 impl V4Solver {
@@ -1548,6 +1566,8 @@ impl V4Solver {
             "chain-lifo" => Some(V4Solver::ChainLifo),
             "chain-profile" => Some(V4Solver::ChainProfile),
             "chain-tails" => Some(V4Solver::ChainTails),
+            "chain-fifo-profile" => Some(V4Solver::ChainFifoProfile),
+            "chain-fifo-tails" => Some(V4Solver::ChainFifoTails),
             _ => None,
         }
     }
@@ -1568,6 +1588,8 @@ impl V4Solver {
             V4Solver::ChainLifo => "chain-lifo",
             V4Solver::ChainProfile => "chain-profile",
             V4Solver::ChainTails => "chain-tails",
+            V4Solver::ChainFifoProfile => "chain-fifo-profile",
+            V4Solver::ChainFifoTails => "chain-fifo-tails",
         }
     }
     /// E33: the solver emits its pivot-selection work.
@@ -1586,6 +1608,8 @@ impl V4Solver {
                 | V4Solver::ChainLifo
                 | V4Solver::ChainProfile
                 | V4Solver::ChainTails
+                | V4Solver::ChainFifoProfile
+                | V4Solver::ChainFifoTails
         )
     }
     /// The chain solve's pivot rule for this solver (`Macaulay` has none
@@ -1613,6 +1637,14 @@ impl V4Solver {
             V4Solver::ChainLifo => rule(ArrivalRule::Lifo),
             V4Solver::ChainProfile => Pivot::Profile(Default::default()),
             V4Solver::ChainTails => Pivot::Tails(Default::default()),
+            V4Solver::ChainFifoProfile => Pivot::ProfileOrdered(
+                Default::default(),
+                super::macaulay_profile::BucketOrder::Fifo,
+            ),
+            V4Solver::ChainFifoTails => Pivot::TailsOrdered(
+                Default::default(),
+                super::macaulay_profile::BucketOrder::Fifo,
+            ),
         }
     }
 }
@@ -1993,6 +2025,12 @@ fn chain_at(
     let b = match pivot {
         Pivot::Profile(check) => super::macaulay_profile::build_profile(comps, d, p, st, check)?,
         Pivot::Tails(check) => super::macaulay_tails::build_tails(comps, d, p, st, check)?,
+        Pivot::ProfileOrdered(check, order) => {
+            super::macaulay_profile::build_profile_ordered(comps, d, p, st, check, order)?
+        }
+        Pivot::TailsOrdered(check, order) => {
+            super::macaulay_tails::build_tails_ordered(comps, d, p, st, check, order)?
+        }
         _ => build_echelon(comps, d, p, st, true, pivot)?,
     };
     let dim = b.standard.len();
@@ -2201,7 +2239,9 @@ pub fn solve_v4(
         | V4Solver::ChainEstK2
         | V4Solver::ChainLifo
         | V4Solver::ChainProfile
-        | V4Solver::ChainTails => {
+        | V4Solver::ChainTails
+        | V4Solver::ChainFifoProfile
+        | V4Solver::ChainFifoTails => {
             let (s, d, info) =
                 solve_weighted_chain_with(comps, MACAULAY_BOUND, p, rng, st, solver.pivot());
             (s, d, info.fell_back)
