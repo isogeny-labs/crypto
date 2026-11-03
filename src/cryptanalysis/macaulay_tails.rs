@@ -510,3 +510,385 @@ pub fn stage0_tails(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<T
     }
     Some(s)
 }
+
+// ── E42 W: rows reserved to the fill (§9.54) ─────────────────────────────
+
+/// Controls for W (all off by default; nothing here is charged).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct TailsCheck {
+    /// G0 (growth path, must pass): every row capped at its build end, so
+    /// the fill check re-allocates on every call.
+    pub exact_caps: bool,
+    /// P1 (broken W, with `exact_caps`): the fill check off, so fill beyond
+    /// a row's stored end is dropped.
+    pub no_fill: bool,
+    /// P2 (broken count): the stored-cell counter short by one per row.
+    pub undercount: bool,
+}
+
+/// W's re-allocations: how many, and the cells of the buffers they
+/// discarded (the counter check: stored = final lengths + discarded).
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+pub struct TailsWork {
+    pub reallocs: u64,
+    pub discarded: u64,
+    pub new_cells: u64,
+}
+
+/// `cnt_ge[e]`: columns of weighted degree `≥ e` (`e ≤ d + 1`), i.e. one past
+/// the last column of degree `e` (the columns are in degree-first order).
+fn degree_ends(cols: &[[u8; 4]], d: u16) -> Vec<usize> {
+    let mut cnt = vec![0usize; d as usize + 2];
+    for m in cols {
+        cnt[wdeg(m) as usize] += 1;
+    }
+    for e in (0..=d as usize).rev() {
+        cnt[e] += cnt[e + 1];
+    }
+    cnt
+}
+
+/// V's echelon (`macaulay_profile::echelon_profile`: the same buckets,
+/// pivots, normalisations, branch rule, updates, multiplications, lead
+/// scans after updates, digest and offset operations) on rows stored on
+/// `[offs[r], offs[r] + rows[r].len())`.  W's additions, each charged to
+/// `tops`: one per pivot normalisation (the pivot's end, from its nonzero
+/// list) and one per row update (the fill check); on overflow one per
+/// re-allocation, the row grown to the end of the weighted-degree block
+/// holding the pivot's end (`grow_to`), its new buffer's cells added to
+/// `new_cells`.
+#[allow(clippy::too_many_arguments)]
+fn echelon_tails(
+    mut rows: Vec<Vec<u16>>,
+    offs: &[u32],
+    ncols: usize,
+    p: u32,
+    grow_to: &dyn Fn(usize) -> usize,
+    no_fill: bool,
+    muls: &mut u64,
+    work: &mut PivotWork,
+    ops: &mut u64,
+    tops: &mut u64,
+    tw: &mut TailsWork,
+) -> super::gaudry_quartic::Echelon {
+    use rayon::prelude::*;
+    let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); ncols];
+    let mut zero_rows = 0usize;
+    let mut zero_ids: Vec<u32> = Vec::new();
+    for (r, row) in rows.iter().enumerate() {
+        match row.iter().position(|&x| x != 0) {
+            Some(k) => {
+                work.lead_scan += k as u64 + 1;
+                *ops += 1;
+                buckets[offs[r] as usize + k].push(r as u32);
+            }
+            None => {
+                work.lead_scan += row.len() as u64;
+                zero_rows += 1;
+                zero_ids.push(r as u32);
+            }
+        }
+    }
+    let fnv = |h: u64, x: u64| -> u64 {
+        let mut h = h;
+        for b in x.to_le_bytes() {
+            h ^= u64::from(b);
+            h = h.wrapping_mul(0x0000_0100_0000_01B3);
+        }
+        h
+    };
+    let mut digest = 0xCBF2_9CE4_8422_2325u64;
+    let mut pivot_row = vec![u32::MAX; ncols];
+    for c in 0..ncols {
+        let mut b = std::mem::take(&mut buckets[c]);
+        if b.is_empty() {
+            continue;
+        }
+        b.sort_unstable();
+        if b.len() > 1 {
+            work.contested += 1;
+        }
+        let pr = b[0] as usize;
+        digest = fnv(fnv(digest, c as u64), pr as u64);
+        let mut piv = std::mem::take(&mut rows[pr]);
+        let op = c - offs[pr] as usize;
+        *ops += 1;
+        let inv = inv_mod(u64::from(piv[op]), u64::from(p)) as u32;
+        let mut nz: Vec<u32> = Vec::new();
+        for (k, x) in piv[op..].iter_mut().enumerate() {
+            if *x != 0 {
+                *x = ((u32::from(*x) * inv) % p) as u16;
+                nz.push(k as u32);
+            }
+        }
+        *muls += nz.len() as u64;
+        // W: the pivot's end, from its nonzero list.
+        let pend = c + nz.last().map_or(1, |&k| k as usize + 1);
+        *tops += 1;
+        let dense = nz.len() * 8 > ncols - c;
+        let mut others: Vec<(u32, Vec<u16>, Option<usize>, u64)> = b[1..]
+            .iter()
+            .map(|&r| (r, std::mem::take(&mut rows[r as usize]), None, 0))
+            .collect();
+        *muls += (others.len() * nz.len()) as u64;
+        *ops += 2 * others.len() as u64;
+        // W: the fill check, and a re-allocation on overflow.
+        for (r, row, _, _) in others.iter_mut() {
+            *tops += 1;
+            let off = offs[*r as usize] as usize;
+            if pend > off + row.len() && !no_fill {
+                let mut grown = vec![0u16; grow_to(pend) - off];
+                grown[..row.len()].copy_from_slice(row);
+                tw.reallocs += 1;
+                tw.discarded += row.len() as u64;
+                tw.new_cells += grown.len() as u64;
+                *tops += 1;
+                *row = grown;
+            }
+        }
+        let ps = &piv[op..pend - offs[pr] as usize];
+        let nzr = &nz;
+        others.par_iter_mut().for_each(|(r, row, lead, scan)| {
+            let rs = &mut row[c - offs[*r as usize] as usize..];
+            let f = u32::from(rs[0]);
+            if dense {
+                super::gaudry_quartic::axpy(rs, ps, f, p);
+            } else if no_fill {
+                // P1 only: fill beyond the row's end is dropped.
+                let nf = p - f;
+                for &k in nzr {
+                    let k = k as usize;
+                    if k < rs.len() {
+                        rs[k] = ((u32::from(rs[k]) + nf * u32::from(ps[k])) % p) as u16;
+                    }
+                }
+            } else {
+                let nf = p - f;
+                for &k in nzr {
+                    let k = k as usize;
+                    rs[k] = ((u32::from(rs[k]) + nf * u32::from(ps[k])) % p) as u16;
+                }
+            }
+            *lead = rs[1..].iter().position(|&x| x != 0).map(|k| k + c + 1);
+            *scan = match *lead {
+                Some(l) => (l - c) as u64,
+                None => (rs.len() - 1) as u64,
+            };
+        });
+        for (r, row, lead, scan) in others {
+            work.lead_scan += scan;
+            rows[r as usize] = row;
+            match lead {
+                Some(l) => buckets[l].push(r),
+                None => {
+                    zero_rows += 1;
+                    zero_ids.push(r);
+                }
+            }
+        }
+        rows[pr] = piv;
+        pivot_row[c] = pr as u32;
+    }
+    work.digest = digest;
+    zero_ids.sort_unstable();
+    super::gaudry_quartic::Echelon {
+        rows,
+        pivot_row,
+        zero_rows,
+        zero_ids,
+    }
+}
+
+/// W's build (§9.54): `macaulay_profile::build_profile` with each row
+/// allocated from its lead to `B₂(δᵢ + wdeg(shift))` (the end of the
+/// weighted-degree block after the one holding its build end), and
+/// [`echelon_tails`].  The same `st` fields as V, plus
+/// `macaulay_stored_entries` (every buffer's cells) and `tail_extent_ops`
+/// (per equation one per support term, per built row two, then the
+/// echelon's).
+pub(crate) fn build_tails(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    st: &mut super::gaudry_quartic::QuarticSolve,
+    check: TailsCheck,
+) -> Result<super::klein_v4::Built, String> {
+    build_tails_with(comps, d, p, st, check, &mut TailsWork::default())
+}
+
+fn build_tails_with(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    st: &mut super::gaudry_quartic::QuarticSolve,
+    check: TailsCheck,
+    tw: &mut TailsWork,
+) -> Result<super::klein_v4::Built, String> {
+    use super::klein_v4::EQUATION_WDEG;
+    use std::time::Instant;
+    assert!(p < 1 << 15, "rows are u16 and products must fit u32");
+    let t0 = Instant::now();
+    st.equation_degree = EQUATION_WDEG as u8;
+    st.macaulay_degree = d as u8;
+    let cols = weighted_monomials_desc(d);
+    let ncols = cols.len();
+    let col_index: HashMap<[u8; 4], usize> =
+        cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
+    let ends = degree_ends(&cols, d);
+    let mut tri = 0u64;
+    let (comps, leads) = triangularise(comps, p, &mut tri);
+    st.triangularise_muls += tri;
+    let divides = |lm: &[u8; 4], m: &[u8; 4]| (0..4).all(|k| lm[k] <= m[k]);
+    let mut rows: Vec<Vec<u16>> = Vec::new();
+    let mut offs: Vec<u32> = Vec::new();
+    let mut ops = 0u64;
+    let mut tops = 0u64;
+    for (i, comp) in comps.iter().enumerate() {
+        let Some(dg) = comp
+            .iter()
+            .filter(|(_, &v)| v != 0)
+            .map(|(m, _)| wdeg(m))
+            .max()
+        else {
+            continue;
+        };
+        if dg > d {
+            return Err("an equation above the Macaulay degree".into());
+        }
+        let lm = leads[i].expect("a nonzero equation has a lead");
+        // W: the least weighted degree of the support (one per term), and
+        // for the controls the trailing monomial.
+        tops += comp.len() as u64;
+        let nzs = comp.iter().filter(|(_, &v)| v % p != 0).map(|(m, _)| *m);
+        let delta = nzs.clone().map(|m| wdeg(&m)).min().expect("nonzero");
+        let tm = nzs.max_by_key(|m| col_index[m]).expect("nonzero");
+        for sh in weighted_monomials_desc(d - dg) {
+            if leads
+                .iter()
+                .take(i)
+                .any(|lm| lm.is_some_and(|lm| divides(&lm, &sh)))
+            {
+                continue;
+            }
+            let lead: [u8; 4] = core::array::from_fn(|k| lm[k] + sh[k]);
+            let start = col_index[&lead];
+            ops += 2;
+            // W: the shift's degree and the B₂ lookup.
+            tops += 2;
+            let cap = if check.exact_caps {
+                let t: [u8; 4] = core::array::from_fn(|k| tm[k] + sh[k]);
+                col_index[&t] + 1
+            } else {
+                let e = (delta + wdeg(&sh)) as usize;
+                ends[e.saturating_sub(1)]
+            };
+            let mut row = vec![0u16; cap - start];
+            for (&e, &c) in comp {
+                let m: [u8; 4] = core::array::from_fn(|k| e[k] + sh[k]);
+                let ci = col_index[&m];
+                ops += 1;
+                if c % p == 0 && ci >= cap {
+                    // A zero coefficient beyond the reserve (none observed).
+                    continue;
+                }
+                let k = ci - start;
+                row[k] = am(u64::from(row[k]), c, p) as u16;
+            }
+            rows.push(row);
+            offs.push(start as u32);
+        }
+    }
+    let built: u64 = rows.iter().map(|r| r.len() as u64).sum();
+    let nrows = rows.len() as u64;
+    st.rows = rows.len();
+    st.cols = ncols;
+    st.build_ms += t0.elapsed().as_secs_f64() * 1e3;
+    let t1 = Instant::now();
+    let mut ech_muls = 0u64;
+    let mut w = PivotWork::default();
+    // One past the last column of the block holding column `e − 1`.
+    let grow_to = |e: usize| ends[wdeg(&cols[e - 1]) as usize];
+    let ech = echelon_tails(
+        rows,
+        &offs,
+        ncols,
+        p as u32,
+        &grow_to,
+        check.no_fill,
+        &mut ech_muls,
+        &mut w,
+        &mut ops,
+        &mut tops,
+        tw,
+    );
+    let stored = built + tw.new_cells;
+    st.macaulay_stored_entries += if check.undercount {
+        stored - nrows
+    } else {
+        stored
+    };
+    st.profile_offset_ops += ops;
+    st.tail_extent_ops += tops;
+    st.pivot_init_ops += w.init;
+    st.pivot_compare_ops += w.compare;
+    st.pivot_update_ops += w.update;
+    st.lead_scan_reads += w.lead_scan;
+    st.pivot_count_mismatches += w.count_mismatches;
+    st.pivot_digest = w.digest;
+    st.echelon_muls += ech_muls;
+    st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
+    st.zero_rows = ech.zero_rows;
+    st.pivots = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
+    let is_std: Vec<bool> = (0..ncols)
+        .map(|c| ech.pivot_row[c] == u32::MAX && wdeg(&cols[c]) < d)
+        .collect();
+    let standard: Vec<usize> = (0..ncols).filter(|&c| is_std[c]).collect();
+    st.dim = standard.len();
+    let mut std_index = vec![u32::MAX; ncols];
+    for (i, &c) in standard.iter().enumerate() {
+        std_index[c] = i as u32;
+    }
+    Ok(super::klein_v4::Built {
+        cols,
+        col_index,
+        comps,
+        ech,
+        is_std,
+        standard,
+        std_index,
+        offs,
+    })
+}
+
+/// The stored-cell check of §9.54 on one call (nothing charged): W's
+/// counter, the final lengths of its rows, the cells of the buffers its
+/// re-allocations discarded (counter = final + discarded), the
+/// re-allocations, and its tail and offset operations.
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+pub struct TailsMeasure {
+    pub counter: u64,
+    pub final_lengths: u64,
+    pub discarded: u64,
+    pub reallocs: u64,
+    pub tail_ops: u64,
+    pub offset_ops: u64,
+}
+
+pub fn tails_measure(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    check: TailsCheck,
+) -> Option<TailsMeasure> {
+    let mut st = super::gaudry_quartic::QuarticSolve::default();
+    let mut tw = TailsWork::default();
+    let b = build_tails_with(comps, d, p, &mut st, check, &mut tw).ok()?;
+    Some(TailsMeasure {
+        counter: st.macaulay_stored_entries,
+        final_lengths: b.ech.rows.iter().map(|r| r.len() as u64).sum(),
+        discarded: tw.discarded,
+        reallocs: tw.reallocs,
+        tail_ops: st.tail_extent_ops,
+        offset_ops: st.profile_offset_ops,
+    })
+}
