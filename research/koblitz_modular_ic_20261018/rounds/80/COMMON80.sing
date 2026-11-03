@@ -1,0 +1,34 @@
+LIB "primdec.lib";
+proc require80(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../50/runs/normal-relative-finite50-01/normalization50.sing"));
+require80(char(basering)==2 && npars(basering)==0 && nvars(basering)==22,"CAND80_COEFFICIENT_AND_RING_SHAPE");
+require80(size(norid)==400 && size(normap)==3 && normap[1]==x && normap[2]==y && normap[3]==p,"CAND80_SAVED_SOURCE_MAP");
+ideal specialized80=subst(norid,p,0);
+ideal base80;
+if(component80==0){base80=specialized80,p,y;}
+else{base80=specialized80,p,y+1;}
+ideal full80=std(base80);
+require80(vdim(full80)==16,"CAND80_COMPLETE_COMPONENT_LENGTH");
+if(component80==0){require80(reduce(x^16+x^8+1,full80)==0,"CAND80_ZERO_SOURCE_FACTOR");}
+else{require80(reduce(x^16,full80)==0,"CAND80_ONE_SOURCE_FACTOR");}
+print("CAND80_STAGE component="+string(component80)+" full_dim=16 radical_begin=1");
+ideal radical80=radical(full80);
+ideal reduced80=std(radical80);
+int reducedDim80=vdim(reduced80);
+require80(reducedDim80>=1 && reducedDim80<=16,"CAND80_REDUCED_DIMENSION_RANGE");
+print("CAND80_STAGE component="+string(component80)+" reduced_dim="+string(reducedDim80)+" primes_begin=1");
+list primes80=minAssGTZ(reduced80);
+int branch80;int degree80;int sum80=0;int count80=size(primes80);
+require80(count80>=1 && count80<=16,"CAND80_PRIME_COUNT_RANGE");
+for(branch80=1;branch80<=count80;branch80++){
+ ideal prime80=std(primes80[branch80]);
+ degree80=vdim(prime80);
+ require80(degree80>=1 && degree80<=16,"CAND80_PRIME_DEGREE_RANGE");
+ sum80=sum80+degree80;
+ print("CAND80_PRIME component="+string(component80)+" index="+string(branch80)+" residue_degree="+string(degree80));
+}
+require80(sum80==reducedDim80,"CAND80_COMPLETE_PRIME_DEGREE_SUM");
+print("CAND80_RESULT component="+string(component80)+" full_dim=16 reduced_dim="+string(reducedDim80)+" prime_count="+string(count80)+" prime_degree_sum="+string(sum80)+" candidate_only=1");
+if(component80==0){print("CANDIDATE_V0_80_ALL_CHECKS_PASS");}
+else{print("CANDIDATE_V1_80_ALL_CHECKS_PASS");}
+quit;
