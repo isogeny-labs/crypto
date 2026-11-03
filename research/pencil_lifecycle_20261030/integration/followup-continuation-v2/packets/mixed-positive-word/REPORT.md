@@ -1,0 +1,11 @@
+# Positive shared-support distinct-other word composition
+
+`positive_word_preserves` derives original word y nonzero, a successful conditional Some return, canonical payload, nonzero output weights and normalized Mumford validity. Premises are original normalized valid inputs, canonical coordinates/coefficients, four nonzero input weights, prime 5 <= p < 2^31, and literal outer K-zero, cancellation-false and distinct-other guards. Positive ordinate equality and intermediate validity are derived through reviewed PositiveDistinct, not assumed.
+
+The packet models the exact xz2 word tree and composes previously reviewed literal WordMixed, WordDoubling and WordGeneric payloads. `positiveWordDispatch` is a restriction to this branch: its None results outside the selected branch are markers, not production outcomes for cancellation/common/tripling. The main theorem additionally derives original word y != 0, matching the doubling degree-two extraction condition. Counter/compiler/class-sum and repeated-support tripling are separate scopes. Retained Field mapping requires n=1 and tables=None and does not assert historical Cargo linkage is currently buildable.
+
+Main attempt7, full fixture controls6 and separate readback pass. Four declarations have only standard propext, Classical.choice and Quot.sound axioms. The full finite-field fixture uses p7, a=(0,1,2,2), b=(5,0,0,3,3,2), curve coefficients (1,6,0,0), explicit original divisibility witnesses and the full theorem. Boundary controls cover zero-y cancellation, repeated support exclusion and noncanonical input rejection. No smoothness assertion is needed for these polynomial fixtures.
+
+Attempts1-5 retain split/instance/heartbeat failures, including two 120-second caps. An explicit abstract validity transport helper removes nested-value elaboration; no premise was weakened. Controls1-4 retain finite-field simplification failures. Earlier passing versions and final strengthening to expose y!=0 remain preserved. Independent review is pending; no scientific trial or cost measurement was run. Cost ratio is null.
+
+Replay in a private copy using check.py WordPositive <fresh-tag>, then Controls and Readback. Each call is bounded120seconds and uses existing pinned Lean/dependency objects. Source hashes and native receipts are included; report.pdf was rendered and visually inspected as one page.

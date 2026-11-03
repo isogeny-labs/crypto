@@ -1341,6 +1341,11 @@ pub fn sieve_core(rels: &[SparseRel], ncols: usize) -> Option<super::gaudry_cubi
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SieveDlpReport {
+    /// Factor-base line search (`JV_FB_LINE=n`, `JV_FB_LINE_MODE`); its
+    /// multiplications are inside `setup_muls`, its additions and lookups in
+    /// `total_plus`.  Absent when off, so the default record is unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fb_line: Option<super::jv_cover::LineSearch>,
     pub p: u64,
     pub seed: u64,
     pub l: u64,
@@ -1574,7 +1579,11 @@ pub fn run_cover_sieve_dlp_on(
 ) -> SieveDlpReport {
     use super::jv_bitops::{enter, Phase};
     let start = Instant::now();
-    let spec = spec.clone();
+    // Opt-in: JV_FB_LINE=n moves the instance to the best of n factor-base
+    // lines before any context is built (unset: the plain model, unchanged).
+    let (spec, fb_line) = super::jv_cover::fb_line_from_env(spec, seed);
+    let line_muls = fb_line.as_ref().map_or(0, |r| r.muls);
+    let line_native = fb_line.as_ref().map_or(0, |r| r.adds + r.lookups);
     let p = spec.p;
     let ctx = {
         let _g = enter(Phase::Model);
@@ -1602,6 +1611,7 @@ pub fn run_cover_sieve_dlp_on(
     let mut m = m_override.unwrap_or(9);
     let fact = |m: usize| (1..=m).map(|k| k as f64).product::<f64>();
     let mut rep = SieveDlpReport {
+        fb_line,
         p,
         seed,
         l,
@@ -1630,7 +1640,7 @@ pub fn run_cover_sieve_dlp_on(
     let mut a = rng.gen_range(0..l);
     let mut b = rng.gen_range(1..l);
     let mut r = jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128));
-    rep.setup_muls = ctx.f.muls() + spec.transfer_muls;
+    rep.setup_muls = ctx.f.muls() + spec.transfer_muls + line_muls;
     drop(stream_guard);
     ctx.f.reset_muls();
     // ── the relation phase: the sieve over the lines, in the run's order of B
@@ -1927,7 +1937,8 @@ pub fn run_cover_sieve_dlp_on(
         / full_rels.len().max(1) as f64;
     rep.total_muls =
         rep.setup_muls + rep.base_muls + rep.relation_muls + rep.descent_muls + rep.la_muls;
-    rep.total_plus = rep.total_muls + rep.sieve_adds + rep.sieve_lookups + rep.enum_adds;
+    rep.total_plus =
+        rep.total_muls + rep.sieve_adds + rep.sieve_lookups + rep.enum_adds + line_native;
     let sqrt_l = (l as f64).sqrt();
     rep.s = rep.total_muls as f64 / (c_e * sqrt_l);
     rep.s_plus = rep.total_plus as f64 / (c_e * sqrt_l);

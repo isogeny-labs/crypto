@@ -1,0 +1,122 @@
+{
+  "card_id": "CARD-BLINDSPOT-09-01",
+  "card_path": "research/blindspots_20261018/09-learned-f4-policy/card-01.yaml",
+  "card_sha256": "4d6a8f5a68852024cafb1d8d5b5b4cd58c4466177b5b158567ec6527677fedd1",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-09/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-09/card-01/b09",
+        "examples/blindspots_09_learned_f4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.88,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 9.88,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-01/b09",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": null,
+          "seconds": 62.057,
+          "timed_out": true
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": null,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 62.057,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2c2080e4289aeba88901598df4a3992e9b875a72446cb8e2f2502b5d2dd3b205",
+      "stdout_tail": [
+        "PASS monomial-order mkey vs grevlex_greater on 20000 pairs",
+        "PASS cell-7-3-3 280 runs; sat 24 unsat 16; wrong 0; basis differs 0",
+        "PASS cell-8-3-3 280 runs; sat 16 unsat 24; wrong 0; basis differs 0"
+      ],
+      "succeeded": false,
+      "timed_out": true
+    }
+  ],
+  "commands_total": 14,
+  "commit": "a85e78ddcf77151f1de5b09bfab869250ecd02e7",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-18-b-cell4-t6.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-18-b-cell4-t6.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-18.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-01-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-01-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/selftest.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/selftest.txt"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-18-b-cell4-t6.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-18-b-cell4-t6.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-18.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 3"
+}

@@ -1,0 +1,4 @@
+# Graph find gate repair
+The new gate returns the failing Lean process status and writes each invocation into a fresh private directory. Find, Controls and Readback replayed with native exits 0 and gate 0; the deliberate false equality has native exit 1 and gate exit 1. All invocation bindings remained unchanged. All three mathematical source files match the original packet byte-for-byte. No original evidence was rewritten.
+
+Each invocation snapshots inputs, compiles outputs locally, records commands and stdout/stderr, atomically publishes a terminal receipt, and propagates timeout/exception/binding failures. The helper can run other named modules. Existing historical wrappers that merely broke their loops cannot use shell exit as evidence; individual native receipts and actual readbacks remain authoritative. No broad historical rerun was performed. Independent review of this repair remains pending publication.

@@ -1,0 +1,37 @@
+{
+  "schema": "ic-weak-assumptions-evidence/v1",
+  "created": "2026-11-02",
+  "pkm_m4_random_f4": {
+    "cells": [
+      {"N": 8, "rows": 2, "completed": 2, "degree_min": 6, "degree_max": 6, "max_cols": 1049, "max_nnz": 210573, "max_muladds": 48447128, "zero_dim_true": 2, "inconsistent_true": 2},
+      {"N": 12, "rows": 2, "completed": 2, "degree_min": 7, "degree_max": 7, "max_cols": 9452, "max_nnz": 29901444, "max_muladds": 85477602933, "zero_dim_true": 2, "inconsistent_true": 2},
+      {"N": 16, "rows": 2, "completed": 2, "degree_min": 7, "degree_max": 7, "max_cols": 76837, "max_nnz": 1085689604, "max_muladds": 27048206854510, "zero_dim_true": 2, "inconsistent_true": 2}
+    ],
+    "planted_geometry": [
+      {"N": 8, "targets": 2, "planted_ok": 2, "zero_dim_true": 2, "inconsistent_true": 0, "basis_len": 28},
+      {"N": 12, "targets": 2, "planted_ok": 2, "zero_dim_true": 2, "inconsistent_true": 0, "basis_len": 49}
+    ],
+    "interpretation": "random rows certify unit-ideal refutations; planted rows are the bounded positive geometry controls"
+  },
+  "prime_m2_yield_rank_control": {
+    "selection": "method.family == ic and arm suffix -subtract; MITM duplicates the same relation population and is excluded",
+    "cells": [
+      {"bits": 16, "r": 53117, "B": 16, "runs": 4, "trials": 4437, "hits": 45, "rows": 45, "rank": 45, "dependent": 0, "observed_rate": 0.010141987829614604, "mean_model_rate": 0.009639098593670577, "ratio_to_mean": 1.052171811612576},
+      {"bits": 16, "r": 53117, "B": 32, "runs": 4, "trials": 1705, "hits": 72, "rows": 72, "rank": 72, "dependent": 0, "observed_rate": 0.04222873900293255, "mean_model_rate": 0.03855639437468231, "ratio_to_mean": 1.0952460593841642},
+      {"bits": 16, "r": 53117, "B": 64, "runs": 4, "trials": 928, "hits": 144, "rows": 144, "rank": 144, "dependent": 0, "observed_rate": 0.15517241379310345, "mean_model_rate": 0.15422557749872923, "ratio_to_mean": 1.0061392948545258},
+      {"bits": 18, "r": 212437, "B": 16, "runs": 4, "trials": 21187, "hits": 39, "rows": 39, "rank": 39, "dependent": 0, "observed_rate": 0.0018407514041629302, "mean_model_rate": 0.0024101262962666578, "ratio_to_mean": 0.7637572383714071},
+      {"bits": 18, "r": 212437, "B": 32, "runs": 4, "trials": 9391, "hits": 88, "rows": 88, "rank": 88, "dependent": 0, "observed_rate": 0.009370674049621979, "mean_model_rate": 0.009640505185066631, "ratio_to_mean": 0.9720106850974338},
+      {"bits": 18, "r": 212437, "B": 64, "runs": 4, "trials": 4108, "hits": 145, "rows": 145, "rank": 145, "dependent": 0, "observed_rate": 0.035296981499513144, "mean_model_rate": 0.038562020740266524, "ratio_to_mean": 0.9153301829604583},
+      {"bits": 20, "r": 562427, "B": 16, "runs": 4, "trials": 50576, "hits": 51, "rows": 51, "rank": 51, "dependent": 0, "observed_rate": 0.0010083834229674153, "mean_model_rate": 0.0009103403641717059, "ratio_to_mean": 1.1076993426353408},
+      {"bits": 20, "r": 562427, "B": 32, "runs": 4, "trials": 27445, "hits": 100, "rows": 100, "rank": 100, "dependent": 0, "observed_rate": 0.0036436509382401167, "mean_model_rate": 0.0036413614566868234, "ratio_to_mean": 1.0006287432820187},
+      {"bits": 20, "r": 562427, "B": 64, "runs": 4, "trials": 10639, "hits": 158, "rows": 158, "rank": 158, "dependent": 0, "observed_rate": 0.014851019832691043, "mean_model_rate": 0.014565445826747294, "ratio_to_mean": 1.019606266045035}
+    ],
+    "totals": {"runs": 36, "trials": 130416, "hits": 842, "rows": 842, "rank": 842, "dependent": 0},
+    "limitations": [
+      "2B^2/r is a leading hit-rate model here, not an exact identity between mean decomposition count and probability of at least one decomposition",
+      "adaptive recovery stopping prevents an unconditional target-count variance estimate",
+      "early independent rows do not establish full factor-base rank",
+      "this is a generic m=2 control, not evidence for an algebraic m=3 or m=4 oracle"
+    ]
+  }
+}

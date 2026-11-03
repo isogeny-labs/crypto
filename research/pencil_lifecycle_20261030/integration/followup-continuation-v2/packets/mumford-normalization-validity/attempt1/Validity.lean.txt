@@ -1,0 +1,42 @@
+import Transport
+set_option autoImplicit false
+namespace MumfordValidity
+open Polynomial MumfordNormalization
+variable {K : Type*} [Field K]
+
+theorem affine_degree (a b : K) (ha : a≠0) : (affine a b).degree=1 := by
+ exact degree_C_mul_X_add_C ha
+
+theorem affine_natDegree (a b : K) (ha : a≠0) : (affine a b).natDegree=1 := by
+ exact natDegree_C_mul_X_add_C ha
+
+theorem affine_leading (a b : K) (ha : a≠0) : (affine a b).leadingCoeff=a := by
+ exact leadingCoeff_C_mul_X_add_C ha
+
+theorem degree_transport (n : ℕ) (a b : K) (ha : a≠0) (p : K[X]) :
+ (T n a b p).degree=p.degree := by
+ rw [T,degree_C_mul (inv_ne_zero (pow_ne_zero n ha)),degree_comp]
+ · rw [affine_degree a b ha,mul_one]
+ · rw [affine_degree a b ha]; exact zero_lt_one
+
+theorem natDegree_transport (n : ℕ) (a b : K) (ha : a≠0) (p : K[X]) :
+ (T n a b p).natDegree=p.natDegree := by
+ rw [T,natDegree_C_mul (inv_ne_zero (pow_ne_zero n ha)),natDegree_comp,affine_natDegree a b ha,mul_one]
+
+theorem monic_transport (a b : K) (ha : a≠0) (u : K[X]) (hu : u.Monic) :
+ (T u.natDegree a b u).Monic := by
+ change (T u.natDegree a b u).leadingCoeff=1
+ rw [T,leadingCoeff_mul,leadingCoeff_C,leadingCoeff_comp]
+ · rw [hu,affine_leading a b ha,one_mul,inv_mul_cancel₀ (pow_ne_zero _ ha)]
+ · rw [affine_natDegree a b ha]; exact one_ne_zero
+
+def Valid (f u v : K[X]) : Prop :=
+ u.Monic ∧ u.natDegree≤2 ∧ v.degree<u.degree ∧ u∣f-v^2
+
+theorem valid_transport (a b : K) (ha : a≠0) (f u v : K[X]) (h : Valid f u v) :
+ Valid (T 6 a b f) (T u.natDegree a b u) (T 3 a b v) := by
+ obtain ⟨hm,hd,hv,hc⟩:=h
+ refine ⟨monic_transport a b ha u hm,?_,?_,congruence_transport a b ha u.natDegree f u v hc⟩
+ · rwa [natDegree_transport _ a b ha]
+ · rwa [degree_transport _ a b ha,degree_transport _ a b ha]
+end MumfordValidity

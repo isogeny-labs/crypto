@@ -1,4 +1,4 @@
-//! SMT-LIB 2 point-decomposition oracle: cvc5, Z3, or any SMT-LIB solver
+//! SMT-LIB 2 point-decomposition oracle: cvc5, Z3, Primo, or any SMT-LIB solver
 //! on the Weil-descended Semaev systems the native CDCL+XOR path
 //! ([`crate::cryptanalysis::koblitz_index_calculus::sat_decompose`]) and
 //! the WDSat oracle ([`crate::cryptanalysis::wdsat_oracle`]) already solve.
@@ -168,14 +168,19 @@ fn blocking_assertion(model: &[bool], encoding: SmtEncoding) -> String {
     s
 }
 
-/// Write the system as a complete SMT-LIB 2 script: declarations, one
-/// assertion per row, any blocking assertions, `check-sat`, and a
-/// `get-value` over every variable so the model is read back in order.
-pub fn format_smtlib(
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ModelQuery {
+    Values,
+    Model,
+}
+
+/// Write the system as a complete SMT-LIB 2 script.
+fn format_smtlib_with_query(
     n_vars: u32,
     rows: &[AnfRow],
     blocked: &[Vec<bool>],
     encoding: SmtEncoding,
+    model_query: ModelQuery,
 ) -> String {
     let mut s = String::new();
     s.push_str("(set-option :produce-models true)\n");
@@ -197,15 +202,51 @@ pub fn format_smtlib(
         s.push_str(&blocking_assertion(model, encoding));
         s.push('\n');
     }
-    s.push_str("(check-sat)\n(get-value (");
-    for i in 0..n_vars {
-        if i > 0 {
-            s.push(' ');
+    s.push_str("(check-sat)\n");
+    match model_query {
+        ModelQuery::Values => {
+            s.push_str("(get-value (");
+            for i in 0..n_vars {
+                if i > 0 {
+                    s.push(' ');
+                }
+                s.push_str(&var_name(i));
+            }
+            s.push_str("))\n");
         }
-        s.push_str(&var_name(i));
+        ModelQuery::Model => s.push_str("(get-model)\n"),
     }
-    s.push_str("))\n(exit)\n");
+    s.push_str("(exit)\n");
     s
+}
+
+/// Write a script using the broadly supported `get-value` model query.
+pub fn format_smtlib(
+    n_vars: u32,
+    rows: &[AnfRow],
+    blocked: &[Vec<bool>],
+    encoding: SmtEncoding,
+) -> String {
+    format_smtlib_with_query(n_vars, rows, blocked, encoding, ModelQuery::Values)
+}
+
+/// Write a script with the model query supported by `kind`.
+///
+/// Primo supports `get-model`, but not `get-value`; the other backends keep
+/// the existing ordered `get-value` query.
+pub fn format_smtlib_for_solver(
+    n_vars: u32,
+    rows: &[AnfRow],
+    blocked: &[Vec<bool>],
+    encoding: SmtEncoding,
+    kind: SmtSolverKind,
+) -> String {
+    let model_query = if kind == SmtSolverKind::Primo {
+        ModelQuery::Model
+    } else {
+        ModelQuery::Values
+    };
+    format_smtlib_with_query(n_vars, rows, blocked, encoding, model_query)
 }
 
 /// Which solver is being driven; fixes the command line and where the
@@ -214,6 +255,8 @@ pub fn format_smtlib(
 pub enum SmtSolverKind {
     Cvc5,
     Z3,
+    /// Primo's Boolean `QF_UF` route. Bit-vectors are not supported.
+    Primo,
     /// Any SMT-LIB 2 solver given its full argument list.
     Generic,
 }
@@ -224,6 +267,7 @@ impl SmtSolverKind {
         match name.trim().to_ascii_lowercase().as_str() {
             "cvc5" => Some(Self::Cvc5),
             "z3" => Some(Self::Z3),
+            "primo" => Some(Self::Primo),
             "generic" | "smtlib" => Some(Self::Generic),
             _ => None,
         }
@@ -234,6 +278,7 @@ impl SmtSolverKind {
         match self {
             Self::Cvc5 => "cvc5",
             Self::Z3 => "z3",
+            Self::Primo => "primo",
             Self::Generic => "generic",
         }
     }
@@ -247,8 +292,14 @@ impl SmtSolverKind {
                 .map(|s| s.to_string())
                 .collect(),
             Self::Z3 => ["-smt2", "-st"].iter().map(|s| s.to_string()).collect(),
+            Self::Primo => vec!["--quiet".to_string()],
             Self::Generic => Vec::new(),
         }
+    }
+
+    /// Whether this solver kind implements the selected encoding.
+    pub fn supports_encoding(self, encoding: SmtEncoding) -> bool {
+        self != Self::Primo || encoding == SmtEncoding::Bool
     }
 }
 
@@ -316,8 +367,10 @@ pub enum SmtVerdict {
     Unknown,
 }
 
-/// Read the `get-value` answer: every `(xK v)` pair with `v` in
-/// `true/false/#b1/#b0`.  Returns `None` unless all `n_vars` are present.
+/// Read `get-value` pairs or typed Boolean `get-model` definitions.
+///
+/// Values may be `true/false/#b1/#b0`. Returns `None` unless all `n_vars`
+/// are present.
 pub fn parse_smt_model(stdout: &str, n_vars: usize) -> Option<Vec<bool>> {
     let flat = stdout.replace(['(', ')'], " ");
     let tokens: Vec<&str> = flat.split_whitespace().collect();
@@ -328,16 +381,24 @@ pub fn parse_smt_model(stdout: &str, n_vars: usize) -> Option<Vec<bool>> {
             .strip_prefix('x')
             .and_then(|t| t.parse::<usize>().ok())
         {
-            let value = match tokens[i + 1] {
+            let direct_value = match tokens[i + 1] {
                 "true" | "#b1" => Some(true),
                 "false" | "#b0" => Some(false),
                 _ => None,
             };
-            if let Some(v) = value {
+            let typed_bool_value = (tokens[i + 1] == "Bool")
+                .then(|| tokens.get(i + 2))
+                .flatten()
+                .and_then(|value| match *value {
+                    "true" => Some(true),
+                    "false" => Some(false),
+                    _ => None,
+                });
+            if let Some(v) = direct_value.or(typed_bool_value) {
                 if idx < n_vars {
                     model[idx] = Some(v);
                 }
-                i += 2;
+                i += if direct_value.is_some() { 2 } else { 3 };
                 continue;
             }
         }
@@ -601,6 +662,16 @@ pub fn smt_decompose_detailed(
 ) {
     let mut stats = SatDecompositionStats::default();
     let mut report = SmtDecompositionReport::default();
+    if !options.kind.supports_encoding(options.encoding) {
+        stats.exhausted = true;
+        stats.unsupported = true;
+        report.error = Some(format!(
+            "{} does not support the {} encoding",
+            options.kind.name(),
+            options.encoding.name()
+        ));
+        return (None, stats, report);
+    }
     let x_r = match target {
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => {
@@ -636,7 +707,13 @@ pub fn smt_decompose_detailed(
             stats.exhausted = true;
             break;
         }
-        let script = format_smtlib(sys.n_vars as u32, &rows, &blocked, options.encoding);
+        let script = format_smtlib_for_solver(
+            sys.n_vars as u32,
+            &rows,
+            &blocked,
+            options.encoding,
+            options.kind,
+        );
         stats.solver_calls += 1;
         report.calls += 1;
         let run = match run_smt(&script, blocked.len(), options) {
@@ -824,6 +901,20 @@ mod tests {
     }
 
     #[test]
+    fn primo_script_and_typed_bool_model_are_supported() {
+        let rows = vec![row(&[&[0]], true), row(&[&[1]], false)];
+        let script =
+            format_smtlib_for_solver(2, &rows, &[], SmtEncoding::Bool, SmtSolverKind::Primo);
+        assert!(script.contains("(get-model)"));
+        assert!(!script.contains("(get-value"));
+        let out =
+            "sat\n(model\n  (define-fun x1 () Bool false)\n  (define-fun x0 () Bool true)\n)\n";
+        assert_eq!(parse_smt_model(out, 2), Some(vec![true, false]));
+        assert!(SmtSolverKind::Primo.supports_encoding(SmtEncoding::Bool));
+        assert!(!SmtSolverKind::Primo.supports_encoding(SmtEncoding::BitVec1));
+    }
+
+    #[test]
     fn verdict_follows_first_status_line() {
         assert_eq!(parse_smt_stdout("unsat\n", 2), SmtVerdict::Unsat);
         assert_eq!(parse_smt_stdout("unknown\n", 2), SmtVerdict::Unknown);
@@ -876,7 +967,7 @@ mod tests {
         options.timeout = Duration::from_secs(60);
         let mut blocked = Vec::new();
         loop {
-            let script = format_smtlib(4, &rows, &blocked, encoding);
+            let script = format_smtlib_for_solver(4, &rows, &blocked, encoding, kind);
             let run = run_smt(&script, blocked.len(), &options).expect("solver runs");
             match parse_smt_stdout(&run.stdout, 4) {
                 SmtVerdict::Sat(model) => {
@@ -916,5 +1007,10 @@ mod tests {
     #[test]
     fn z3_round_trip_bv1() {
         solver_round_trip(SmtSolverKind::Z3, SmtEncoding::BitVec1);
+    }
+
+    #[test]
+    fn primo_round_trip_bool() {
+        solver_round_trip(SmtSolverKind::Primo, SmtEncoding::Bool);
     }
 }

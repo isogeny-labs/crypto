@@ -281,13 +281,15 @@ jobs:
           # Every session directory by schema, plus any session.json or
           # records.jsonl removed or renamed anywhere (a deleted session
           # is no longer listed at HEAD).
+          # Artifact-store ignore rules are generated checkout metadata;
+          # session capsules, pointers and recorded bytes remain frozen.
           changed=$( {
             git diff --name-only --no-renames --diff-filter=MDRT "$BASE" HEAD -- \
               'research/ecbench_*/sessions' \
               'research/ghs_curve_comparison_20261009/sessions' \
               'research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions' \
               'research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions' \
-              "${sessions[@]}"
+              "${sessions[@]}" ':(exclude)**/.gitignore'
             git diff --name-only --no-renames --diff-filter=DR "$BASE" HEAD -- \
               '*/session.json' '*/records.jsonl'
           } | sort -u)

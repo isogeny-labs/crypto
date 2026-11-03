@@ -1,0 +1,47 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-06-05-r2
+experiment_id: BLINDSPOT-06
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/06-signature-gb-trace-replay/raw/receipt-card-05-r2.json
+binds:
+  - {path: examples/blindspots_06_signature_gb.rs, sha256: 48a39c343ff7abee7fb38bb9a0790d10e353c7b71a0eb5b9209ad60425f45dbc}
+  - {path: research/blindspots_20261018/06-signature-gb-trace-replay/draws.tsv, sha256: 1233ede00169e7d427d1953ef6b97c93ff147b16e8b2b38aad80c0fea6fe4184}
+commands:
+  - id: make-bin-dir
+    argv: ["mkdir", "-p", "target/blindspots-06/card-05-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "target-cpu=native", "-o", "target/blindspots-06/card-05-r2/b06", "examples/blindspots_06_signature_gb.rs"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-05-r2-build.stdout.log
+    stderr: research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-05-r2-build.stderr.log
+  - id: sig-c15-5-3-b
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-06/card-05-r2/b06", "run", "--draws", "research/blindspots_20261018/06-signature-gb-trace-replay/draws.tsv", "--cell", "c15-5-3", "--targets", "8-15", "--arms", "f4,sig", "--touch-ratio", "2", "--sig-time-limit", "25", "--time-limit", "90", "--total-limit", "220"]
+    timeout_seconds: 260
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-05-r2-sig-c15-5-3-b.stdout.log
+    stderr: research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-05-r2-sig-c15-5-3-b.stderr.log
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-06/card-05-r2/b06"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-06/card-05-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-06
+background: false
+write_scope:
+  - research/blindspots_20261018/06-signature-gb-trace-replay/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

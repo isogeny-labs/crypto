@@ -62,6 +62,25 @@ async fn migrate_import_and_query() {
         assert!(r.problems.is_empty(), "walk problems: {:?}", r.problems);
     }
     import::traits::import(&ctx).await.unwrap();
+    import::derive::import(&ctx).await.unwrap();
+    let enrich = import::enrich::import(&ctx).await.unwrap();
+    assert!(enrich.problems.is_empty(), "enrich problems: {:?}", enrich.problems);
+    assert_eq!(enrich.counts.get("class_polynomial_curve_checks_failed"), Some(&0));
+    assert!(enrich.counts["class_polynomial_curve_checks_passed"] > 0);
+    assert!(enrich.counts["division_polynomials"] > 80_000);
+    assert!(enrich.counts["glv_lattices"] > 0);
+    for r in [
+        import::results::leaderboard(&ctx).await.unwrap(),
+        import::results::progress(&ctx).await.unwrap(),
+        import::results::boundary(&ctx).await.unwrap(),
+        import::results::benchmarks(&ctx).await.unwrap(),
+    ] {
+        assert!(r.problems.is_empty(), "results problems: {:?}", r.problems);
+    }
+    let session = "research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z";
+    let eb = import::ecbench::import_dirs(&ctx, &[session]).await.unwrap();
+    assert_eq!(eb.counts.get("sessions"), Some(&1));
+    assert!(eb.counts["runs"] > 500);
     // Idempotent: a second registry import adds nothing.
     let again = import::registry::import(&ctx).await.unwrap();
     assert_eq!(again.counts.get("curves"), Some(&0));
@@ -116,4 +135,54 @@ async fn migrate_import_and_query() {
     );
     let (s, _) = post(&app, "/v1/evidence", r#"{}"#).await;
     assert_eq!(s, StatusCode::FORBIDDEN);
+
+    // secp256k1: GLV eigenvalue verified on the generator, lattice stored
+    let (s, endo) = get(&app, "/v1/curves/secp256k1/endomorphisms").await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(endo["endomorphisms"].as_array().unwrap().iter().any(|e| e["kind"] == "glv" && !e["eigenvalue"].is_null()));
+    assert_eq!(endo["scalar_decompositions"].as_array().unwrap().len(), 1);
+
+    // Measured results: every leaderboard row resolves to a curve, families carry units
+    let (s, board) = get(&app, "/v1/ic/leaderboard?family=A&recipes=true").await;
+    assert_eq!(s, StatusCode::OK);
+    let rows = board["rows"].as_array().unwrap();
+    assert!(
+        !rows.is_empty()
+            && rows.iter().all(|r| !r["curve_id"].is_null() && r["best_ratio_rho"].as_f64().unwrap() > 0.0)
+    );
+    assert!(rows[0]["recipes"].as_array().unwrap().iter().any(|r| r["is_best"] == true));
+    assert_eq!(board["families"].as_array().unwrap().len(), 3);
+    let (s, prog) = get(&app, "/v1/ic/progress?series=ec-cold").await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(prog["series"][0]["points"].as_array().unwrap().len() > 5);
+    let (s, bench) = get(&app, "/v1/benchmarks?listed=admitted&limit=5").await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(bench["total"].as_i64().unwrap() > 50);
+    let (s, sess) = get(&app, "/v1/ecbench/sessions/ECBS1hffaa276d8a5c").await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(sess["arms"].as_array().unwrap().iter().any(|a| a["verified"].as_i64().unwrap() > 0));
+    let (s, meas) = get(&app, &format!("/v1/curves/{}/measurements", rows[0]["curve_slug"].as_str().unwrap())).await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(!meas["ic_leaderboard"].as_array().unwrap().is_empty());
+
+    // MCP: handshake, tool list, a tool call routed to the REST API
+    let (s, init) = post(
+        &app,
+        "/mcp",
+        r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{}}}"#,
+    )
+    .await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(init["result"]["protocolVersion"], "2025-06-18");
+    let (_, list) = post(&app, "/mcp", r#"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#).await;
+    assert_eq!(list["result"]["tools"].as_array().unwrap().len(), 11);
+    let (_, call) = post(
+        &app,
+        "/mcp",
+        r#"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"ecdb_get_curve","arguments":{"ref":"P-256"}}}"#,
+    )
+    .await;
+    assert_eq!(call["result"]["isError"], false);
+    let doc: Value = serde_json::from_str(call["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
+    assert!(doc["standards"].to_string().contains("P-256"));
 }

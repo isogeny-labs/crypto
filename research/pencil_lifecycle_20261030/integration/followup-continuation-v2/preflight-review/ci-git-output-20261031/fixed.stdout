@@ -1,0 +1,104 @@
+TAP version 13
+# materialized 1 compile-time inputs
+# ::warning::CI scope comparison unavailable; running all checks (Command failed: git fetch --no-tags --depth=1 origin ffffffffffffffffffffffffffffffffffffffff)
+# ::warning::CI scope comparison unavailable; running all checks (Command failed: git diff --name-only -z --no-renames d3af4857c5a3ded60855a0d64bbad6ce3521598a missing-ref --)
+# materialized 2 compile-time inputs
+# materialized 1 compile-time inputs
+# materialized 1 compile-time inputs
+# ::warning::CI scope comparison unavailable; running all checks (missing Rust source dependency in examples/check.rs: research/study/reference.rs)
+# ::warning::CI scope comparison unavailable; running all checks (missing Rust source dependency in research/study/reference.rs: research/study/render.inc)
+# ::warning::CI scope comparison unavailable; running all checks (missing Rust source dependency in research/study/reference.rs: research/study/arithmetic.rs)
+# materialized 2 compile-time inputs
+# Subtest: a cold root checkout resolves path crates and their embedded inputs
+ok 1 - a cold root checkout resolves path crates and their embedded inputs
+  ---
+  duration_ms: 1028.425411
+  type: 'test'
+  ...
+# Subtest: prose does not run compilers, profiling or CodeQL
+ok 2 - prose does not run compilers, profiling or CodeQL
+  ---
+  duration_ms: 1.82528
+  type: 'test'
+  ...
+# Subtest: crates and languages select their own checks
+ok 3 - crates and languages select their own checks
+  ---
+  duration_ms: 0.355121
+  type: 'test'
+  ...
+# Subtest: dependencies, workflow edits and frozen evidence remain applicable
+ok 4 - dependencies, workflow edits and frozen evidence remain applicable
+  ---
+  duration_ms: 0.248849
+  type: 'test'
+  ...
+# Subtest: staged Rust release inputs select the Rust package lane
+ok 5 - staged Rust release inputs select the Rust package lane
+  ---
+  duration_ms: 0.247497
+  type: 'test'
+  ...
+# Subtest: volcano-cli, a path dependency of the root crate, selects the root lanes
+ok 6 - volcano-cli, a path dependency of the root crate, selects the root lanes
+  ---
+  duration_ms: 0.113345
+  type: 'test'
+  ...
+# Subtest: real git diffs include renames, deletes, unusual names and over 300 files
+ok 7 - real git diffs include renames, deletes, unusual names and over 300 files
+  ---
+  duration_ms: 243.239839
+  type: 'test'
+  ...
+# Subtest: sparse compilation restores only embedded inputs, preserving archived files off disk
+ok 8 - sparse compilation restores only embedded inputs, preserving archived files off disk
+  ---
+  duration_ms: 281.127262
+  type: 'test'
+  ...
+# Subtest: new Cargo targets and source modules survive sparse checkouts without loading archives
+ok 9 - new Cargo targets and source modules survive sparse checkouts without loading archives
+  ---
+  duration_ms: 432.687384
+  type: 'test'
+  ...
+# Subtest: external Rust path modules and includes are followed recursively
+ok 10 - external Rust path modules and includes are followed recursively
+  ---
+  duration_ms: 537.360475
+  type: 'test'
+  ...
+# Subtest: shared factor-base crate selects root compilation and release checks
+ok 11 - shared factor-base crate selects root compilation and release checks
+  ---
+  duration_ms: 0.260296
+  type: 'test'
+  ...
+# Subtest: path dependencies of the root crate are materialized, transitively
+ok 12 - path dependencies of the root crate are materialized, transitively
+  ---
+  duration_ms: 189.104702
+  type: 'test'
+  ...
+# Subtest: large tracked path lists preserve source discovery beyond 16 MiB
+ok 13 - large tracked path lists preserve source discovery beyond 16 MiB
+  ---
+  duration_ms: 450.405822
+  type: 'test'
+  ...
+# Subtest: failed Git commands propagate and remove their temporary output
+ok 14 - failed Git commands propagate and remove their temporary output
+  ---
+  duration_ms: 37.456266
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3260.952354

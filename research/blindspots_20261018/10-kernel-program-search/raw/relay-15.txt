@@ -1,0 +1,53 @@
+```
+card: CARD-BLINDSPOT-10-15-r2 (sha256 6d559103e9082efa37177a96df2e9065f982f44cf99d7d160fb4f2e6834b2dd3)
+commit: 380698b002a1ecd54928f518ce000984084c1e80
+receipt: research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-15-r2.json sha256 0fa5e4d1a06df83c87589548425a10c93d3108dce5a1665e8291142790fd5994
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-10/card-15-r2"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-10/card-15-r2/b10", "examples/blindspots_10_kernel_search.rs"] exit 0 (6.68 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (finalists-n31): ["prlimit", "--as=4294967296", "target/blindspots-10/card-15-r2/b10", "finalists", "--n", "31", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"] exit 0 (0.004 s) succeeded
+  stdout sha256 9f86775cba2559857a7d771b750bda67d2e3bef7961ec49aff2bd80454ae4f01; last 1 lines:
+    {"b":{"idx":94,"genes":[22,1,0,0,1,1,0,2,1,0],"name":"affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0","q01_train":3.143458e2,"start_q01":4.162218e3,"evaluations":256,"infinite_fitness":10,"families_visited":21,"curve":[[1,4.162218e3],[2,3.236700e3],[4,3.204135e3],[8,7.744119e2],[16,6.695728e2],[32,6.608179e2],[64,3.434846e2],[128,3.143458e2],[256,3.143458e2]]},"c":{"idx":216,"genes":[21,1,0,0,0,0,1,4,0,0],"name":"affine-aligned-s1|lift1|stop0|root0|q0|sqt0|pm1|ab4|bt0|gc0","q01_train":3.620940e2,"start_q01":2.744779e3,"evaluations":256,"infinite_fitness":72,"families_visited":24,"curve":[[1,2.744779e3],[2,6.537287e2],[4,6.537287e2],[8,6.537287e2],[16,6.327502e2],[32,6.327502e2],[64,6.238039e2],[128,5.029295e2],[256,3.620940e2]]},"p":{"idx":64,"genes":[22,1,0,0,1,1,0,2,1,0],"name":"affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0","q01_train":3.143458e2,"start_q01":1.550499e4,"evaluations":256,"infinite_fitness":5,"families_visited":19,"curve":[[1,1.550499e4],[2,3.289697e3],[4,1.216286e3],[8,7.625871e2],[16,6.136539e2],[32,6.136539e2],[64,3.434846e2],[128,3.143458e2],[256,3.143458e2]]}}
+command 4 (finalists-n37): ["prlimit", "--as=4294967296", "target/blindspots-10/card-15-r2/b10", "finalists", "--n", "37", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"] exit 0 (0.003 s) succeeded
+  stdout sha256 58525a25f24bdac6fe9a3f4f7d9db0312b0819b076bce53bdfa2e406c77116d9; last 1 lines:
+    {"b":{"idx":79,"genes":[21,1,1,0,1,1,0,4,1,0],"name":"affine-aligned-s1|lift1|stop1|root0|q1|sqt1|pm0|ab4|bt1|gc0","q01_train":3.317597e2,"start_q01":3.264153e3,"evaluations":256,"infinite_fitness":10,"families_visited":20,"curve":[[1,3.264153e3],[2,3.157111e3],[4,3.157111e3],[8,3.154686e3],[16,4.229599e2],[32,4.198403e2],[64,4.176935e2],[128,3.317597e2],[256,3.317597e2]]},"c":{"idx":158,"genes":[21,1,0,1,0,1,0,4,1,0],"name":"affine-aligned-s1|lift1|stop0|root1|q0|sqt1|pm0|ab4|bt1|gc0","q01_train":5.284214e2,"start_q01":null,"evaluations":256,"infinite_fitness":89,"families_visited":24,"curve":[[1,null],[2,null],[4,1.686299e3],[8,1.686299e3],[16,9.661699e2],[32,6.553592e2],[64,6.553592e2],[128,6.553592e2],[256,5.284214e2]]}}
+command 5 (finalists-n41): ["prlimit", "--as=4294967296", "target/blindspots-10/card-15-r2/b10", "finalists", "--n", "41", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"] exit 0 (0.003 s) succeeded
+  stdout sha256 6092cbe334c1a612b55d023d1f646927a0fb59dccf6e8bb5fca46d646967052b; last 1 lines:
+    {"b":{"idx":174,"genes":[21,1,1,0,1,1,0,4,1,0],"name":"affine-aligned-s1|lift1|stop1|root0|q1|sqt1|pm0|ab4|bt1|gc0","q01_train":1.951113e2,"start_q01":3.663416e3,"evaluations":256,"infinite_fitness":2,"families_visited":19,"curve":[[1,3.663416e3],[2,3.663416e3],[4,8.903829e2],[8,8.886038e2],[16,6.132856e2],[32,3.026085e2],[64,2.967317e2],[128,2.964127e2],[256,1.951113e2]]},"c":{"idx":56,"genes":[21,1,0,1,1,1,1,4,2,0],"name":"affine-aligned-s1|lift1|stop0|root1|q1|sqt1|pm1|ab4|bt2|gc0","q01_train":3.895027e2,"start_q01":null,"evaluations":256,"infinite_fitness":82,"families_visited":24,"curve":[[1,null],[2,9.995369e3],[4,1.380888e3],[8,1.380888e3],[16,1.276567e3],[32,6.162674e2],[64,3.895027e2],[128,3.895027e2],[256,3.895027e2]]}}
+command 6 (heldout-n41): ["prlimit", "--as=4294967296", "target/blindspots-10/card-15-r2/b10", "heldout", "--n", "41", "--ell", "9", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state", "--out", "research/blindspots_20261018/10-kernel-program-search/raw-r2/heldout-n41.jsonl"] exit 0 (46.481 s) succeeded
+  stdout sha256 180816af044208d915709fb3166af194d4fad0cc1d4046ce01d09a15e629306a; last 4 lines:
+    heldout n=41 A   sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab0|bt0|gc0          q0=3.4670e3 q01=3.6634e3 q1=5.4312e3 phi=1.000 b_r=252 30521ms
+    heldout n=41 A1  sub-low|lift1|stop1|root0|q0|sqt0|pm0|ab0|bt0|gc0          q0=8.4342e2 q01=8.9113e2 q1=1.3205e3 phi=1.000 b_r=252 7456ms
+    heldout n=41 B   affine-aligned-s1|lift1|stop1|root0|q1|sqt1|pm0|ab4|bt1|gc0 q0=2.9125e2 q01=3.0855e2 q1=4.6423e2 phi=0.336 b_r=275 2838ms
+    heldout n=41 C   affine-aligned-s1|lift1|stop0|root1|q1|sqt1|pm1|ab4|bt2|gc0 q0=5.8021e2 q01=6.1596e2 q1=9.3773e2 phi=0.336 b_r=275 5659ms
+  output research/blindspots_20261018/10-kernel-program-search/raw-r2/heldout-n41.jsonl: 39a9ac1cbcc1cb40e3833fb0a09c03ff82a40a0cbc6128d249645b204876c664
+command 7 (conserve-17-6): ["prlimit", "--as=4294967296", "target/blindspots-10/card-15-r2/b10", "conserve", "--n", "17", "--ell", "6", "--targets", "4000", "--families", "1", "--out", "research/blindspots_20261018/10-kernel-program-search/raw-r2/conserve-17-6.jsonl", "--states", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"] exit 0 (52.469 s) succeeded
+  stdout sha256 16e9096a522b29a99578a611be7cafb38c3cc1fee2fb95335f19dd7dfb61f802; last 20 lines:
+    conserve exact-coset4-s2          b_r= 33 found=1166/4000 rate=0.2915 kappa=1.0503e-4 core/target=66060 W(w=0.1)=7.9792e6
+    conserve exact-ham                b_r= 31 found= 831/4000 rate=0.2077 kappa=1.0663e-4 core/target=59251 W(w=0.1)=9.7189e6
+    conserve exact-ham-shift          b_r= 26 found= 955/4000 rate=0.2387 kappa=1.1189e-4 core/target=34347 W(w=0.1)=4.1111e6
+    conserve exact-geom-s1            b_r= 34 found=1365/4000 rate=0.3412 kappa=1.0648e-4 core/target=69125 W(w=0.1)=7.5712e6
+    conserve exact-geom-s2            b_r= 32 found=1174/4000 rate=0.2935 kappa=1.0030e-4 core/target=59921 W(w=0.1)=7.1817e6
+    conserve exact-geom-s3            b_r= 34 found=1295/4000 rate=0.3237 kappa=1.0836e-4 core/target=70412 W(w=0.1)=8.1290e6
+    conserve exact-geom-s4            b_r= 15 found= 148/4000 rate=0.0370 kappa=1.1565e-4 core/target=8450 W(w=0.1)=3.7632e6
+    conserve exact-affine-rand-s1     b_r= 29 found= 852/4000 rate=0.2130 kappa=1.0543e-4 core/target=39380 W(w=0.1)=5.6695e6
+    conserve exact-affine-rand-s2     b_r= 27 found= 704/4000 rate=0.1760 kappa=1.0341e-4 core/target=35318 W(w=0.1)=5.7289e6
+    conserve exact-affine-aligned-s1  b_r= 30 found=1612/4000 rate=0.4030 kappa=1.0400e-4 core/target=35879 W(w=0.1)=2.8244e6
+    conserve exact-affine-aligned-s2  b_r= 31 found=1873/4000 rate=0.4682 kappa=1.1576e-4 core/target=35951 W(w=0.1)=2.5170e6
+    conserve exact-affine-anti        b_r= 22 found=   0/4000 rate=0.0000 kappa=NaN core/target=26585 W(w=0.1)=2.4731e9
+    conserve A                        b_r= 32 found=1101/4000 rate=0.2752 kappa=1.0524e-4 core/target=187421 W(w=0.1)=2.3003e7
+    conserve B-n31                    b_r= 31 found=1717/4000 rate=0.4293 kappa=1.0279e-4 core/target=29128 W(w=0.1)=2.2302e6
+    conserve C-n31                    b_r= 30 found= 688/4000 rate=0.1720 kappa=3.8053e-5 core/target=11601 W(w=0.1)=2.1375e6
+    conserve P-n31                    b_r= 31 found=1717/4000 rate=0.4293 kappa=1.0279e-4 core/target=29128 W(w=0.1)=2.2302e6
+    conserve B-n37                    b_r= 30 found= 688/4000 rate=0.1720 kappa=3.8053e-5 core/target=10775 W(w=0.1)=1.9913e6
+    conserve C-n37                    b_r= 30 found= 688/4000 rate=0.1720 kappa=3.8053e-5 core/target=16464 W(w=0.1)=3.0735e6
+    conserve B-n41                    b_r= 30 found= 688/4000 rate=0.1720 kappa=3.8053e-5 core/target=10775 W(w=0.1)=1.9913e6
+    conserve C-n41                    b_r= 30 found= 688/4000 rate=0.1720 kappa=3.8053e-5 core/target=18770 W(w=0.1)=3.4844e6
+  output research/blindspots_20261018/10-kernel-program-search/raw-r2/conserve-17-6.jsonl: 68316d1e95cf01ac82d7823bb5e21ed77adfc80faae7b10d2a89c61b7b044fd6
+command 8 (remove-bin): ["rm", "-f", "target/blindspots-10/card-15-r2/b10"] exit 0 (0.007 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 9 (remove-bin-dir): ["rmdir", "target/blindspots-10/card-15-r2"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```

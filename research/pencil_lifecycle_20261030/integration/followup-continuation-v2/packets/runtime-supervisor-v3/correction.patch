@@ -1,0 +1,44 @@
+--- v2/supervise.py
++++ v3/supervise.py
+@@ -28,7 +28,7 @@
+  require(re.fullmatch('sha256:[0-9a-f]{64}',args.image_id),'image ID shape')
+  require(re.fullmatch('[0-9a-f]{64}',args.binary_sha256),'binary hash shape')
+  out=P(args.receipts);require(out.is_absolute() and not out.exists(),'fresh absolute receipts required');out.mkdir(mode=0o700)
+- start=time.monotonic();deadline=start+300;work_deadline=deadline-30;seq=0;owned=None;pending=None;failure=None;clean=False;passed=[];pids_observations=[];active_deadline=None;unreaped_client=False
++ start=time.monotonic();deadline=start+300;work_deadline=deadline-30;seq=0;owned=None;pending=None;failure=None;clean=False;passed=[];pids_observations=[];active_deadline=None;unreaped_client=False;pending_signal=None
+  config=out/'empty-docker-config';config.mkdir(mode=0o700)
+  binding_raw=P(args.binding).read_bytes();binding=strict(binding_raw)
+  # All external joins must be filled and independently reviewed before admission.
+@@ -60,6 +60,7 @@
+  env={'PATH':'/usr/bin:/bin','HOME':str(config),'LANG':'C'}
+  def command(label,argv,cap=20,cleanup=False,limit=2*1024**2,inspect=False):
+   nonlocal seq,unreaped_client
++  if pending_signal is not None and not cleanup:raise Stop('deferred supervisor signal '+str(pending_signal))
+   stop=deadline if cleanup else work_deadline
+   if active_deadline is not None and not cleanup:stop=min(stop,active_deadline)
+   remaining=stop-time.monotonic();require(remaining>2,'deadline reserve exhausted')
+@@ -68,9 +69,12 @@
+    # Inspection bytes never have a named persistent raw file. Failure leaves only hash/size.
+    so=tempfile.TemporaryFile(mode='w+b') if inspect else (d/'stdout').open('w+b')
+    se=(d/'stderr').open('wb')
++   # Mark uncertain ownership BEFORE launch; never infer no child from an interrupted constructor.
++   unreaped_client=True
+    proc=subprocess.Popen(argv,stdout=so,stderr=se,env=env,start_new_session=True)
+-   unreaped_client=True
++   if pending_signal is not None and not cleanup:raise Stop('deferred supervisor signal '+str(pending_signal))
+    while proc.poll() is None:
++    if pending_signal is not None and not cleanup:raise Stop('deferred supervisor signal '+str(pending_signal))
+     if time.monotonic()-t>=timeout or os.fstat(so.fileno()).st_size>limit or os.fstat(se.fileno()).st_size>2*1024**2:
+      raise Stop('client timeout/output cap; container ownership must reconcile')
+     time.sleep(.03)
+@@ -184,7 +188,9 @@
+   else:require(strict(raw)==strict((FIX/'expected-report.json').read_bytes()),'positive report mismatch')
+   rc,diff,_=cli('diff-'+case,'diff',owned);require(rc==0 and not diff.strip(),'unexpected writable-layer change')
+   cleanup_one();passed.append(case)
+- def interrupted(signum,frame):raise Stop('supervisor signal '+str(signum))
++ def interrupted(signum,frame):
++  nonlocal pending_signal
++  pending_signal=signum  # Defer raising until Popen ownership is recorded.
+  signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
+  try:
+   before=fixture_snapshot();(out/'bindings.json').write_bytes(binding_raw)

@@ -1,0 +1,101 @@
+{
+  "schema": "software-validation-summary/v1",
+  "observed_utc": "2026-10-30T21:42:21.497558+00:00",
+  "source_commit": "57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa",
+  "all_checks_passed": true,
+  "library": {
+    "passed": 5782,
+    "failed": 0,
+    "ignored": 125
+  },
+  "owner_intake_cli_passed": 4,
+  "example_tests_defined": 0,
+  "strict_clippy_passed": true,
+  "scientific_execution": false,
+  "receipts": {
+    "full-library-release-v11": {
+      "source_commit": "57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--release",
+        "--lib",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=2",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-30T21:01:41Z",
+      "ended_utc": "2026-10-30T21:33:01Z",
+      "source_manifest": "validation-source-hashes-v11.json",
+      "source_manifest_sha256": "f6944b055f4d735292efeeb141bb5d3097d4c264d7cf68f826a752be109657a4",
+      "scientific_cohort_execution": false,
+      "purpose": "software regression; known-answer fixtures only",
+      "logs": {
+        "stdout": "76d31e0c8694cd5b6a7d1026563b2d181c0f9d4be9e3e308b75662a8415e799e",
+        "stderr": "e66288aac5cb150d85f4727d830901dc2db999ded7cb6bafff5266c22735707e"
+      }
+    },
+    "intake-example-release-v11": {
+      "source_commit": "57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--release",
+        "--bin",
+        "ecbench_owner_closure",
+        "--example",
+        "ecbench_child_overhead",
+        "-j",
+        "2",
+        "--",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-30T21:33:01Z",
+      "ended_utc": "2026-10-30T21:40:29Z",
+      "source_manifest": "validation-source-hashes-v11.json",
+      "source_manifest_sha256": "f6944b055f4d735292efeeb141bb5d3097d4c264d7cf68f826a752be109657a4",
+      "scientific_cohort_execution": false,
+      "purpose": "software regression; known-answer fixtures only",
+      "logs": {
+        "stdout": "aeb47d923097d9e643d21f51e469edcdb226409947d5f4881fffff31c1171487",
+        "stderr": "4b9fcc2e4cbb640505ea233b5e08ffefa101631c84eced5dc6a1c34a55552e73"
+      }
+    },
+    "library-clippy-v11": {
+      "source_commit": "57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--lib",
+        "--bin",
+        "ecbench_owner_closure",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-30T21:40:29Z",
+      "ended_utc": "2026-10-30T21:42:00Z",
+      "source_manifest": "validation-source-hashes-v11.json",
+      "source_manifest_sha256": "f6944b055f4d735292efeeb141bb5d3097d4c264d7cf68f826a752be109657a4",
+      "scientific_cohort_execution": false,
+      "purpose": "software regression; known-answer fixtures only",
+      "logs": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "55f1b6af3a6e032906589eb53bb208b7e3b4948d08d1908554c82e7a4e8989e4"
+      }
+    }
+  }
+}
