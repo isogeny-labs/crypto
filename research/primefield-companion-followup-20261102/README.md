@@ -200,3 +200,15 @@ Seven Python files parse; four complete AST substitution audits cover driver, se
 ### Constructor-bound root diagonal pivot
 
 `feature-root-pivot/` adds a public-constructor solve entry. One fixed weight tuple feeds source and diagonal; generator snapshots and independent compression verification bind a root-only scalar proposal. Its queried column must match the predicted nonzero diagonal. All-zero diagonals use the ordinary selector. Separate RootSelection carries an empty zero prefix and unknown first column, avoiding false skipped-column provenance. The binding is consumed before children. Two full static integration audits pass; six Python sources parse; report inspected. Numerical/corruption/heap/performance trials zero. Costs include snapshots/checker/setup; changed pivots require equation-based validation. Source `ad5439372ce969521f19069d5b75e0a6303511c5`.
+
+### Feature-coefficient Schur construction (2026-11-03)
+
+`feature-coefficient-schur/` adds exact supplied-point scalar/pair updates to
+the fixed character-feature coefficient matrix and residual RHS, sparse dual
+lifts, a sufficient pointwise terminal and an independent all-feature certificate
+checker. It uses no r-row array; state is O(m^2)=O(q^6), and no claim that this
+is always smaller than r is made. Derived schedules include evaluations,
+small inverses and lifts; public pivot/terminal selection remains external.
+See `DERIVATION.md` and the inspected `reports/design/report.pdf`. Five Python
+sources parse; source/pattern/power preservation and checker separation are
+static audits. Numerical/corruption/heap/performance trials: zero.
