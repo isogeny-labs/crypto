@@ -440,6 +440,56 @@ pub fn t0_abscissae(curve: &PrimeCurve, q: &T0Quotient, t: u32, lo: u64) -> Vec<
 /// invariant `w = z + d/z` lies in `[lo, lo + 2^t)`.  It is closed under
 /// `T₀` and `−`: up to four points per `w` (`±P`, `±(P + T₀)`).  Laid out
 /// like `edwards_factor_base`.
+/// The `bits:lo=LO` base: every point whose short-Weierstrass abscissa is in
+/// the frame `[lo, lo + 2^t)` (mod p), one column per abscissa, both signs.
+/// `lo` is a translation frame on the x-line; every degree-2 coordinate is a
+/// Möbius frame of x (`coordinate_search.rs`), and the Semaev system has the
+/// same degree and size in every translation frame, so the frame only
+/// changes which points (and which cofactor cosets) the base holds.
+pub fn bits_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    t: u32,
+    lo: u64,
+) -> FactorBase<PrimePoint> {
+    let curve = &inst.curve;
+    let p = curve.p;
+    let mut xs: Vec<u64> = (0..(1u64 << t)).map(|k| (lo % p + k) % p).collect();
+    xs.sort_unstable();
+    xs.dedup();
+    let mut fb = FactorBase::empty(format!("x in [{lo}, {lo} + 2^{t})"));
+    for x in xs {
+        let rhs = curve.rhs(x);
+        let Some(y) = curve.sqrt(rhs) else { continue };
+        let y = if y == 0 { 0 } else { y.min(p - y) };
+        let pt = PrimePoint::affine(x, y);
+        let qn = curve.neg(pt);
+        let col = fb.abscissae;
+        let i = fb.points.len();
+        fb.points.push(pt);
+        fb.col_of.push(col);
+        fb.coef_of.push(1);
+        if qn != pt {
+            fb.points.push(qn);
+            fb.col_of.push(col);
+            fb.coef_of.push(inst.r - 1);
+            fb.neg_index.push(i + 1);
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i, i + 1]);
+        } else {
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i]);
+        }
+        fb.abscissae += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, pt) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(pt), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb
+}
+
 pub fn t0_factor_base(
     inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
     q: &T0Quotient,
