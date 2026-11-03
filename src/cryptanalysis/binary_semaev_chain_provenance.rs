@@ -8,6 +8,9 @@ pub mod gate_wire;
 #[path = "binary_semaev_chain_initial.rs"]
 pub mod initial;
 use serde::{Deserialize, Serialize};
+/// Bounded equations over the independently checked auxiliary-wire map.
+#[path = "checked_boolean_equations.rs"]
+pub mod boolean_equations;
 
 /// The caller supplies authenticated originals; the dataset binding is opaque
 /// here and must be minted by its existing verified-original owner.
