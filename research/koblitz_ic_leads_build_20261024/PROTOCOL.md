@@ -339,3 +339,34 @@ with a volume; the same pod without one launched). Two changes follow.
   - The lifetime cap is 82,000 s (about $47.50). Across restarts, the
     total pod time stays within that budget.
 
+**Amendment 7b (2026-11-03, after pod `r2ttfdddgd1zdp`, before its rerun).**
+That pod's first checkpoint, 23.4 GB written at 19:02:54Z (about 246k
+basis rows after 30 min), succeeded. The second hit "No space left on
+device", because `/workspace` was the 40 GB container disk.
+
+- **No volume on CPU pods.** A 2-vCPU probe pod with `volumeInGb: 50`
+  showed CPU pods mount no pod volume at all: only the overlay root of
+  `--disk` size.
+- **No GPU fallback today.** Every GPU type with at least 120 GB of system
+  RAM was refused in every volume-capable data center (probes created and
+  deleted within seconds).
+- **The failure.** The save failure panicked and killed draw 0 after
+  3,650 s. The job then started draw 3. The pod was terminated, at about
+  $2.25.
+
+**Changes.**
+1. **A failed checkpoint save is non-fatal.** It logs a warning, removes
+   the partial `.tmp` file and keeps computing. The previous checkpoint
+   stays valid.
+2. **`job_pe.sh` checks the disk before starting.** It records `df` and
+   the mount table, and refuses to start when the free space plus the
+   checkpoints already present is under 160 GB.
+3. **A failed draw is retried in place,** up to 3 times, from its
+   checkpoint. A draw that still fails stops the job instead of moving on.
+4. **Host.** A 32-vCPU, 256 GB CPU pod with a 200 GB container disk. Its
+   state survives a process crash or OOM kill through the in-place retry,
+   but not a pod stop or deletion. The watchdog checks the account balance,
+   the earlier cause of a deletion, every hour.
+5. **Budget.** The Amendment 7 budget is unchanged. What remains of it,
+   about $45, caps the new pod's lifetime.
+

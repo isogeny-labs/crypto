@@ -736,8 +736,18 @@ pub fn pe_closure_checkpointed(
     let mut maybe_save = |e: &Engine, st: &dyn Fn() -> Saved| {
         if let Some(c) = ckpt {
             if last_save.elapsed() >= c.every {
-                save_checkpoint(e, c, &fp, &st())
-                    .unwrap_or_else(|err| panic!("checkpoint {}: {err}", c.path.display()));
+                // A failed save (a full disk, say) must not cost the run:
+                // the previous checkpoint is still intact, because the new
+                // one only replaces it by rename after a complete write.
+                if let Err(err) = save_checkpoint(e, c, &fp, &st()) {
+                    eprintln!(
+                        "checkpoint {}: save failed, continuing: {err}",
+                        c.path.display()
+                    );
+                    let mut tmp = c.path.clone().into_os_string();
+                    tmp.push(".tmp");
+                    let _ = std::fs::remove_file(std::path::PathBuf::from(tmp));
+                }
                 last_save = Instant::now();
             }
         }

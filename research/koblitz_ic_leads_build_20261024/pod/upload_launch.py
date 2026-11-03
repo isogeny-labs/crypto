@@ -15,10 +15,11 @@ stdin config).
                        [--volume-id ID --dc DC] FILE...
   upload_launch.py push ID NONCE FILE...
 
-With `--volume-id` (GPU pods; RunPod CPU pods refuse network volumes) or
-`--pod-volume GB`, /workspace persists: inputs, records and checkpoints
-outlive the container. A pod volume survives a container restart and a pod
-stop/start, not termination. A network volume also survives termination.
+With `--volume-id` (GPU pods only: RunPod CPU pods refuse network volumes),
+/workspace is a network volume and inputs, records and checkpoints outlive
+the pod. `--pod-volume GB` asks for a pod volume, but a probe on 2026-11-03
+showed CPU pods mount none (only the container disk, `--disk`), so on a
+CPU pod state survives a process crash, not a pod stop or termination.
 On boot, the receiver finds the verified inputs there and restarts
 `job.sh` itself, without an upload, so a job that resumes from its
 checkpoints continues where it stopped.
@@ -96,8 +97,8 @@ def run(a):
         body.update({"networkVolumeId": a.volume_id, "volumeMountPath": "/workspace",
                      "dataCenterIds": [a.dc]})
     elif a.pod_volume:
-        # A pod volume: it survives container restarts and pod stop/start,
-        # not termination. RunPod CPU pods take no network volume.
+        # A pod volume (GPU pods). CPU pods silently mount none: their
+        # /workspace is the container disk.
         body.update({"volumeInGb": a.pod_volume, "volumeMountPath": "/workspace"})
     if a.dc and not a.volume_id:
         body["dataCenterIds"] = [a.dc]
