@@ -40,7 +40,7 @@ Every solver returns the existing solver's outputs on every call, and the same c
   [F], [E25], [3.626–3.945], [1.520–1.581], [1.0439–1.0676], [F ahead everywhere],
   [F], [B″], [0.952–0.988], [1.046–1.056], [1.0668–1.0704], [unresolved],
   [S], [A], [1.402–1.449], [1.0825–1.0908], [1.0077–1.0086], [S ahead everywhere],
-  [S], [E25], [3.488–3.719], [1.505–1.559], [1.0400–1.0631], [S ahead everywhere],
+  [S], [E25], [3.488–3.719], [1.505–1.558], [1.0400–1.0631], [S ahead everywhere],
   [S], [B″], [0.913–0.932], [1.035–1.041], [1.0628–1.0658], [unresolved],
   [H], [A], [1.497–1.542], [1.0957–1.1028], [1.0076–1.0083], [H ahead everywhere],
   [H], [E25], [3.725–3.957], [1.523–1.576], [1.0399–1.0627], [H ahead everywhere],

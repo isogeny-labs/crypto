@@ -5615,7 +5615,7 @@ a pivot row F chose at a contested read column with the structure provably intac
 | F | E25 | `3.626`–`3.945` | `1.520`–`1.581` | `1.0439`–`1.0676` | F ahead on 32/32; same under σ1–σ3 |
 | F | B″ | `0.952`–`0.988` | `1.046`–`1.056` | `1.0668`–`1.0704` | unresolved (B″ ahead at `0`) |
 | S | A | `1.4017`–`1.4492` | `1.0825`–`1.0908` | `1.0077`–`1.0086` | S ahead on 32/32; same under σ1–σ3 |
-| S | E25 | `3.488`–`3.719` | `1.505`–`1.559` | `1.0400`–`1.0631` | S ahead on 32/32 |
+| S | E25 | `3.488`–`3.719` | `1.505`–`1.558` | `1.0400`–`1.0631` | S ahead on 32/32 |
 | S | B″ | `0.913`–`0.932` | `1.035`–`1.041` | `1.0628`–`1.0658` | unresolved |
 | H | A | `1.4971`–`1.5415` | `1.0957`–`1.1028` | `1.0076`–`1.0083` | H ahead on 32/32; same under σ1–σ3 |
 | H | E25 | `3.725`–`3.957` | `1.523`–`1.576` | `1.0399`–`1.0627` | H ahead on 32/32 |
@@ -5629,8 +5629,8 @@ a pivot row F chose at a contested read column with the structure provably intac
 row at every weight): F `5.18·10³`–`2.32·10⁵` (`0`), `2.37·10⁴`–`1.09·10⁶` (`0.1`), `9.40·10⁴`–`5.62·10⁶` (`1` GAE); S
 `5.48·10³`–`2.43·10⁵`, `2.41·10⁴`–`1.10·10⁶`, `9.44·10⁴`–`5.64·10⁶`; H `5.15·10³`–`2.28·10⁵`, `2.38·10⁴`–`1.09·10⁶`,
 `9.44·10⁴`–`5.65·10⁶`; A `7.91·10³`–`3.47·10⁵`, `2.62·10⁴`–`1.19·10⁶`, `9.52·10⁴`–`5.69·10⁶`; E25 `2.03·10⁴`–`8.83·10⁵`,
-`3.75·10⁴`–`1.68·10⁶`, `1.00·10⁵`–`5.94·10⁶`; B″ `5.10·10³`–`2.24·10⁵`, `2.50·10⁴`–`1.16·10⁶`, `1.01·10⁵`–`6.01·10⁶`; L
-`1.09·10⁴`–`4.88·10⁵`, `2.90·10⁴`–`1.35·10⁶`, `9.66·10⁴`–`5.77·10⁶`.
+`3.75·10⁴`–`1.68·10⁶`, `1.00·10⁵`–`5.94·10⁶`; B″ `5.10·10³`–`2.24·10⁵`, `2.50·10⁴`–`1.14·10⁶`, `1.01·10⁵`–`6.01·10⁶`; L
+`1.09·10⁴`–`4.88·10⁵`, `2.90·10⁴`–`1.33·10⁶`, `9.66·10⁴`–`5.77·10⁶`.
 
 **Distance to the matched rho, every row** (`S_X / rho` at `0` and `1` GAE; `0.1` GAE and the E25, B″, L columns per row in
 `tables.md`):
@@ -5679,7 +5679,7 @@ fresh stream draws a different number of targets and residuals), the paired rati
 | id | result | verdict |
 |:--|:--|:--|
 | G2.190 | every primary passed P1; no fallback used; C_F^post aimed 80/80 | **holds** |
-| G2.191 | 21/21 binary clauses; Stage A 10,000/10,000 for every solver, same fallback calls; 128/128 end-to-end records equal A's by the field rule | **holds** |
+| G2.191 | 21/21 binary clauses; Stage A 10,000/10,000 for every solver, same fallback calls; 160/160 end-to-end records (32 rows × 5 arms) equal A's by the field rule | **holds** |
 | G2.192 | gating controls 320/320 positive; non-empty detection `0.990`, `0.995`, `1.000`, `0.995` (gate `0.96`); perturbation 194/194; digests 320/320 | **holds** |
 | G2.193 | C_F `P_ext` 320/320, strict 0/320; C_F^post aimed 320/320, `P_post`, `P`/`T` intact and first diff at `r*` on 320/320 | **holds** |
 | G2.194 | F, L `0`; S `511.9`–`512.7`; H − S `333.95`–`334.00` | **holds** |
@@ -5702,9 +5702,15 @@ multiplications for F at `0` GAE and `S_A/S_F` `1.0115`–`1.0130` at `1` GAE (a
 of `S`.  At `1` GAE F is the cheapest of the three; at `0` GAE H is.  None of F, S, H is ranked against B″ (B″ ahead at `0`
 GAE, behind at `0.1` and `1`).  **Distance remaining:** rho is ahead of every row of every arm at every weight; the closest
 row (GLS `p = 397` seed 1 arm B) has F at `5.18·10³×` rho at `0` GAE (A `7.91·10³×`) and `1.11·10⁵×` at `1` GAE (A
-`1.12·10⁵×`); on E24's curves `p = 397` seed 1 has F at `5.37·10³×` and `9.40·10⁴×`.  **Not done (main session):**
-independent validation, the replay certificate and `VALIDATION.json` of the validation gate, the IC leaderboard and
-`benchmarks/`; until then the rows render as unvalidated.  Wall times were not measured.
+`1.12·10⁵×`); on E24's curves `p = 397` seed 1 has F at `5.37·10³×` and `9.40·10⁴×`.  **Validated (2026-11-03):** independent rebuild and replay (31/31 runs, 1,037,565 fields identical), recompute
+(7,286 summary values, 0 disagreements) and gate `valid` (`research/e39_pivot_rules_confirm3_20261102/VALIDATION.json`).  Wall times were not measured.
+
+**Erratum (independent validation, 2026-11-03).** Corrected in place above: (E1) the end-to-end identity count is
+160/160 records (32 rows × 5 arms), not 128/128; (E2) S against E25 at `0.1` GAE, upper end `1.558`, not `1.559` (also in
+`REPORT.typ`); (E3) B″'s distance to rho at `0.1` GAE, upper end `1.14·10⁶`, not `1.16·10⁶`; (E4) L's at `0.1` GAE,
+`1.33·10⁶`, not `1.35·10⁶`.  (E5) "non-empty detection ≥ `0.990`" is a rounded minimum: 192/194 = `0.98969`, still above the
+`0.96` gate.  (E6) the identity check is unchanged with the call count also required equal across arms.  None changes a
+verdict.  Validator report: `research/e39_pivot_rules_confirm3_20261102/validator-report.json`.
 
 ### 9.54 E42 pre-registration: V's stored tails reserved to the fill instead of the last column (W, `chain-tails`), every added operation charged
 
