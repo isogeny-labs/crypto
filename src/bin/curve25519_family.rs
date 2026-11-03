@@ -1534,6 +1534,12 @@ fn f4cost_m(
             let fb = t0_factor_base(&inst, &q, t, t0_lo);
             (fb, PkmSemaevOracle::new_t0_bits(nsum, t, t0_lo))
         }
+        "bits" if t0_lo != 0 => {
+            // `bits@LO`: the translation frame x in [LO, LO + 2^t) (mod p).
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::bits_factor_base;
+            let fb = bits_factor_base(&inst, t, t0_lo);
+            (fb, PkmSemaevOracle::new_bits(nsum, t, t0_lo))
+        }
         "bits" => {
             // The prime-abscissa base of every abscissa in [0, 2^t) on the curve.
             let n = (0..span)
@@ -1567,7 +1573,7 @@ fn f4cost_m(
                 PkmSemaevOracle::new_isogeny(nsum, t, tower.v.clone(), steps, tower.c),
             )
         }
-        o => panic!("form is bits, edwards-bits, t0-bits[@lo] or isogeny, not {o}"),
+        o => panic!("form is bits[@lo], edwards-bits, t0-bits[@lo] or isogeny, not {o}"),
     };
     let mut spec = if guess > 0 {
         format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
