@@ -1,0 +1,44 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R93-PRINCIPAL-OVERLAP",
+  "version": 1,
+  "goal": "bind the accepted rank-32 chart algebra to explicit principal-open overlap units",
+  "claims": [{"id":"overlap_units93","class":"exact_computation","statement":"seven source functions have polynomial rank-32 coordinates and both overlap units map to 1/u under the accepted rational charts"}],
+  "arms": {
+    "reference": "R50 algebra, R88 inverse identities and R91 64 generator images",
+    "candidate": "exact overlap-unit and module-membership certificates",
+    "positive": ["seven full module products", "polynomial and field identities", "forward and reverse unit images"],
+    "negative": ["corrupted module coordinate", "corrupted forward unit equality"],
+    "baseline": {"not_applicable_reason":"exact algebra"},
+    "A_A": {"not_applicable_reason":"deterministic exhaustive identities"}
+  },
+  "variables": {
+    "fixed": ["F2 source field degree 32", "R50 basis", "seven named functions", "one Singular thread", "1200 seconds", "4 GiB virtual memory"],
+    "measured": ["donor and binary hashes", "seven membership columns", "224 polynomial coordinates", "unit identities", "native exit and errors"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method":"fixed","reason":"exact identities","seeds":[93]},
+  "blinding": {"method":"none","reason":"exact identities"},
+  "sample_size": {"instances":7,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics": ["seven full module products", "224 polynomial coordinates", "two mapped overlap units", "two negative controls"],
+  "execution": {
+    "launchers": ["REPLAY_CAS.sh overlap93-01 OVERLAP93.sing OVERLAP93_ALL_CHECKS_PASS"],
+    "backend":"authorized local Singular",
+    "backend_reason":"pinned native CAS continuation; digest-pinned EKS Singular image unavailable",
+    "timeout_seconds_per_program":1200,
+    "virtual_KiB_native":4194304,
+    "threads":1,
+    "seed":93,
+    "queue":"one serial exact-algebra job",
+    "source_gate":"committed Git bytes and SHA-256/byte-count donors",
+    "checkpoint":"existing checkpoint gate and immutable raw copy"
+  },
+  "stopping": {
+    "accept":"exit zero, exact marker, no native errors, all identities and 224 coordinates, export and fresh replay",
+    "failure":"retain raw and freeze repair under new attempt ID"
+  },
+  "analysis": {
+    "method":"polynomial identities, source-field images and rank-32 PID embedding",
+    "scope":"principal-open unit bridge; proper boundary and modular-factor action remain separate"
+  }
+}
