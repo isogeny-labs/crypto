@@ -197,3 +197,70 @@ primes.
 predicted within ±25 % of U1's 4,729. With a finish of about 4,300 CPU-s, c is predicted at
 about 9,000–10,500. That passes the 4111 bar by a margin smaller than the ±2,000 A/A spread
 read in the bw study.
+
+### A3 (2026-11-03, after U4_4111 and the U1F replication; committed and pushed before any A3 cell)
+
+**What the A1 and A2 cells showed.**
+- **U4 (s5 eliminating).** F4 12,403 CPU-s, c = 16,679: no improvement. Its basis has W0's
+  shape.
+- **U1F (u-ring, w last, F4 only).** A0/U1F = 2.85× at p = 262231 (5,230 vs 14,888) and 2.72× at
+  33554371 (4,834 vs 13,127), with the generator gates passed. With 2.69× at 4111, this is the A1
+  F4 stage improvement at all three primes.
+- **So the F4 gain exists only in U1's own basis.** Every leading monomial is a pure
+  s-monomial, except w² (from w² − s5). The staircase is S × {1, w}, with |S| = 32,768.
+- **s-stability.** In S, every one of the 2,460 monomials m with s5·m ∉ S has s5·m as a
+  leading monomial. This holds at 262231 and 33554371 (from U1F's `lm.out`, by
+  `stair_u1.py` logic).
+- **So multiplication by w can be read straight off the reduced basis.** w·m = (w m), and
+  w·(w m) = NF(s5 m). That normal form is a chain head (a unit entry) or the negated tail of
+  one of 2,460 basis elements (a dense row). The bw finish's operator had 4,920 dense columns.
+
+**A3 arm U5.** The U1 system unchanged (U1's `gen/` at 4111; regenerated with seed 1 at the
+other primes, generator gates as U1). Whole solve:
+1. `msolve -v 2 -t 4 -g 2` into a FIFO, with the same caps.
+2. `src/hnfsolve_u.cpp --dump-P` checks the structure: every chain is {m, w m}, the element
+   with LM w² is w² − s5, no other LM contains w, and s-stability holds. If any check fails it
+   exits 3. Otherwise it writes the HNFP2 dump.
+3. `src/bwfinish_u.cpp --b 128 --threads 4 --seed 1 --planted`. This is the merged bwfinish
+   with the operator replaced by shift + unit axpys + one (D × 2,460)(2,460 × b) GEMM. Points
+   come from a 2,460 × 2,460 kernel per rational root, using u(s5 m) = w0²·u(m). The generator,
+   determinant and root code is unchanged.
+4. `src/check_points.py`: every reported point satisfies every equation of the system.
+
+**Dev check at m = 3, p = 4111 and 262231** (`dev/m3_*_u5`): structure checks pass (5 unit
+rows, 3 dense rows), D = 16, the planted point is recovered, and all points satisfy the system.
+
+**Measurement.** c = msolve process CPU + hnfsolve_u CPU (parse + staircase + dump) +
+bwfinish_u `total_cpu_s`, as in the bw study.
+
+**Gates.** All exit codes 0, no cap stop, U1's generator gates, elim_degree = D = 65,536,
+planted point recovered, `check_points` all_satisfy.
+
+**Decision rules.**
+- A whole-solve improvement at a prime is c ≤ 11,275, 12,549 or 15,011 CPU-s (bw baseline / 1.5
+  at 4111, 262231 and 33554371).
+- At all three primes with every gate passed, it is a **pipeline improvement and the new
+  per-system baseline (ratchet)**.
+- At one or two primes, it is a screen.
+- G1 is reported for each c, as in the bw study.
+
+**Order.** Run as in A2's order change.
+1. The A1 queue stops at the end of U2_4111.
+2. U5_4111, U5_262231 and U5_33554371 run (`run_a3.sh`).
+3. U1P_4111 runs last, as in A1.
+
+**Predictions.**
+- F4 is as U1/U1F (4,700–5,300 CPU-s).
+- Printing the basis adds under 400 CPU-s, because it has half of W0's 306M terms.
+- The sequence costs about half of the bw finish's (one limb about 1,800 CPU-s, two limbs
+  about 3,300). With the generator, determinant and points, the finish is about 2,300 (one limb)
+  or 3,800 (two limbs).
+- So c ≈ 7,000–8,000 CPU-s at 4111 and 262231, and ≈ 8,500–9,500 at 33554371. That is
+  2.0–2.4× under the ratcheted baseline, and an improvement at all three primes.
+- G1 point estimate about 44.3–44.6 bits, with the band still straddling CLOSE (2^46) on its
+  upper side.
+
+**What may not be said** (adds to §8).
+- U5 changes the factor base to u ∈ F_p. A U5 ratchet is a ratchet of the u presentation of the
+  same decomposition problem on the same curve and prime. It is not a statement about the
+  x-subline system, and it is not an end-to-end ECDLP cost.
