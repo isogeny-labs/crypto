@@ -1,0 +1,87 @@
+proc require92(int ok,string tag){if(!ok){print("RR92_FATAL "+tag);exit;}}
+string saved92=read("rr-pid50.sing");
+int start92=find(saved92,"ring inverseBaseCertificate50=");
+require92(start92>0,"PID_HEADER");
+execute(saved92[start92,size(saved92)-start92+1]);
+setring inverseBaseCertificate50;
+matrix B092=matrix(basis50);
+matrix S092=sourceLift50;
+poly F092=commonDenominator50;
+require92(nrows(B092)==32 && ncols(B092)==32 && normalizationIndex50==376,"PID_SHAPE");
+execute(read("relative-infinity50.sing"));
+ring field92=(2,u),(l,v),dp;
+map relativeMap92=relativeInfinity50,l,v,u;
+ideal I92=std(relativeMap92(relativeInfinityIdeal50));
+require92(vdim(I92)==32,"SOURCE_FIELD_DIMENSION");
+qring Q92=I92;
+map pidMap92=inverseBaseCertificate50,u;
+matrix B92=pidMap92(B092);
+matrix S92=pidMap92(S092);
+poly F92=pidMap92(F092);
+matrix identity92[32][32];int r92;int c92;
+for(r92=1;r92<=32;r92++){identity92[r92,r92]=1;}
+require92(B92*S92==F92*identity92,"SOURCE_EMBEDDING_PRODUCT");
+poly invF92=lift(F92,1)[1,1];
+require92(reduce(F92*invF92,std(0))==1,"DENOMINATOR_INVERSE");
+ideal tPowers92;ideal monomials92;ideal generators92;
+tPowers92[1]=1;
+for(r92=2;r92<=16;r92++){tPowers92[r92]=reduce(tPowers92[r92-1]*l,std(0));}
+for(r92=1;r92<=32;r92++){
+ monomials92[r92]=tPowers92[((r92-1)%16)+1];
+ if(r92>16){monomials92[r92]=reduce(monomials92[r92]*v,std(0));}
+}
+poly numerator92;
+for(c92=1;c92<=32;c92++){
+ numerator92=0;
+ for(r92=1;r92<=32;r92++){
+  if(B92[r92,c92]!=0){numerator92=reduce(numerator92+B92[r92,c92]*monomials92[r92],std(0));}
+ }
+ generators92[c92]=reduce(numerator92*invF92,std(0));
+}
+matrix unitPower92[32][1];matrix unitCoords92[32][1];
+unitPower92[1,1]=1;unitCoords92=S92*unitPower92;
+require92(B92*unitCoords92==F92*unitPower92,"UNIT_FULL_PRODUCT");
+for(r92=1;r92<=32;r92++){
+ require92(unitCoords92[r92,1]==leadcoef(unitCoords92[r92,1]) && denominator(leadcoef(unitCoords92[r92,1]))==1,"UNIT_NOT_POLYNOMIAL");
+}
+link out92="ASCII:w multiplication92.sing";open(out92);
+write(out92,"matrix unitC92[32][1];matrix productC92[32][528];matrix productW92[32][528];intvec pairA92;intvec pairB92;");
+for(r92=1;r92<=32;r92++){write(out92,"unitC92["+string(r92)+",1]="+string(unitCoords92[r92,1])+";");}
+int a92;int b92;int pair92=0;int pos92;intvec exp92;
+poly current92;poly remaining92;poly reconstructed92;
+vector powerVector92;matrix powerMatrix92[32][1];matrix coords92[32][1];matrix bad92[32][1];
+for(a92=1;a92<=32;a92++){
+ for(b92=a92;b92<=32;b92++){
+  pair92=pair92+1;
+  current92=reduce(generators92[a92]*generators92[b92],std(0));
+  remaining92=current92;reconstructed92=0;powerVector92=0;
+  while(remaining92!=0){
+   exp92=leadexp(remaining92);
+   require92(exp92[1]<16 && exp92[2]<2,"NONSTANDARD_FIELD_REMAINDER_PAIR_"+string(pair92));
+   pos92=exp92[1]+16*exp92[2]+1;
+   powerVector92=powerVector92+leadcoef(remaining92)*gen(pos92);
+   reconstructed92=reconstructed92+leadcoef(remaining92)*l^exp92[1]*v^exp92[2];
+   remaining92=remaining92-lead(remaining92);
+  }
+  require92(reduce(reconstructed92+current92,std(0))==0,"RECONSTRUCTION_PAIR_"+string(pair92));
+  for(r92=1;r92<=32;r92++){powerMatrix92[r92,1]=powerVector92[r92];}
+  require92(nrows(powerMatrix92)==32 && ncols(powerMatrix92)==1,"POWER_MATRIX_SHAPE_PAIR_"+string(pair92));
+  coords92=S92*powerMatrix92;
+  require92(B92*coords92==F92*powerMatrix92,"FULL_PRODUCT_PAIR_"+string(pair92));
+  for(r92=1;r92<=32;r92++){
+   require92(coords92[r92,1]==leadcoef(coords92[r92,1]) && denominator(leadcoef(coords92[r92,1]))==1,"NONPOLYNOMIAL_PAIR_"+string(pair92)+"_ROW_"+string(r92));
+  }
+  bad92=coords92;bad92[1,1]=bad92[1,1]+1;
+  require92(B92*bad92!=F92*powerMatrix92,"CORRUPTION_UNDETECTED_PAIR_"+string(pair92));
+  write(out92,"pairA92["+string(pair92)+"]="+string(a92)+";pairB92["+string(pair92)+"]="+string(b92)+";");
+  for(r92=1;r92<=32;r92++){
+   write(out92,"productC92["+string(r92)+","+string(pair92)+"]="+string(coords92[r92,1])+";productW92["+string(r92)+","+string(pair92)+"]="+string(powerVector92[r92])+";");
+  }
+  print("RR92_PAIR index="+string(pair92)+" a="+string(a92)+" b="+string(b92)+" full_product=1 polynomial=1 corruption_rejected=1");
+ }
+}
+close(out92);
+require92(pair92==528,"PAIR_COUNT");
+print("RR92_RESULT unit=1 pairs=528 full_products=528 polynomial_coordinates=16896 corruption_rejections=528 certificate_exported=1");
+print("MULTIPLY92_ALL_CHECKS_PASS");
+quit;
