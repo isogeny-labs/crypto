@@ -27,6 +27,10 @@ LEGACY_SUMMARIES = {
 COMBINED = EVIDENCE / "candidate-fall-20261102/combined-144/combined-summary.json"
 CUSTODY = EVIDENCE / "candidate-fall-20261102/combined-144/S3-CUSTODY-complete.json"
 LFD_SUMMARY = STUDY / "evidence/degree4-propagation/summary.json"
+R29_INPUT_DIR = EVIDENCE / "r29-attempt-02/pdp-inputs/attempt-02/candidate-structure"
+R29_TOP_DIR = EVIDENCE / "r29-attempt-02/top-form/attempt-01"
+R38_TOP_DIR = EVIDENCE / "r38-attempt-01/top-form-20261101T2015Z"
+R39_TOP_DIR = EVIDENCE / "r39-attempt-01/top-form-20261101T2045Z"
 EXPECTED_CANDIDATES = [f"spike{i}" for i in range(27, 40)]
 
 
@@ -133,6 +137,57 @@ def build() -> dict:
                for row in lfd_summary["rows"])
     assert all(row["inherited_last_fall_lower_bound"] == 4 for row in lfd_summary["rows"])
     sources.append(source_record(LFD_SUMMARY, len(lfd_summary["rows"])))
+
+    # Inventory extant sources and terminal records for the unlabelled groups.
+    # This checks metadata and file presence only; it never interprets top-form
+    # Dreg as affine Dreg or as an FFD/LFD result.
+    r29_inputs_path = R29_INPUT_DIR / "inputs.json"
+    r29_manifest_path = R29_INPUT_DIR / "manifest.sha256"
+    r29_inputs = load(r29_inputs_path)
+    assert len(r29_inputs) == 48
+    assert Counter(row["family"] for row in r29_inputs) == Counter(
+        {"koblitz": 16, "binary": 16, "prime": 16})
+    r29_system_paths = [R29_INPUT_DIR / row["id"] / "system.sing" for row in r29_inputs]
+    assert all(path.is_file() for path in r29_system_paths)
+    r29_manifest_paths = {
+        line.split(None, 1)[1].lstrip("*")
+        for line in r29_manifest_path.read_text().splitlines() if line.strip()
+    }
+    assert all(f"{row['id']}/system.sing" in r29_manifest_paths for row in r29_inputs)
+    r29_top_run = load(R29_TOP_DIR / "run.json")
+    r29_top_replay = load(R29_TOP_DIR / "replay-summary.json")
+    assert r29_top_run["rows"] == r29_top_run["replay_rows"] == 48
+    assert r29_top_run["replay_all_verified"] is True
+    assert r29_top_replay["all_verified"] is True and len(r29_top_replay["rows"]) == 48
+    assert not (EVIDENCE / "r29-attempt-02/first-fall").exists()
+    sources.extend([
+        source_record(r29_inputs_path, len(r29_inputs)),
+        source_record(r29_manifest_path, len(r29_system_paths)),
+        source_record(R29_TOP_DIR / "run.json", 48),
+        source_record(R29_TOP_DIR / "replay-summary.json", 48),
+    ])
+
+    r38_preflight = load(R38_TOP_DIR / "preflight.json")
+    r38_terminal = load(R38_TOP_DIR / "terminal.json")
+    assert r38_preflight["candidate_id"] == "spike38" and r38_preflight["systems"] == 48
+    assert r38_preflight["complete_base_index"] is True
+    assert r38_terminal["candidate_id"] == "spike38" and r38_terminal["exit_code"] == 1
+    assert not (R38_TOP_DIR / "certificates" / "summary.json").exists()
+    r39_preflight = load(R39_TOP_DIR / "preflight.json")
+    r39_terminal = load(R39_TOP_DIR / "terminal.json")
+    r39_failure = load(R39_TOP_DIR / "failure.json")
+    assert r39_preflight["candidate_id"] == "spike39" and r39_preflight["systems"] == 48
+    assert r39_terminal["candidate_id"] == "spike39" and r39_terminal["exit_code"] == 1
+    assert "aws s3 ls" in r39_failure["failing_command"]
+    assert not (R39_TOP_DIR / "certificates" / "summary.json").exists()
+    sources.extend([
+        source_record(R38_TOP_DIR / "preflight.json", 48),
+        source_record(R38_TOP_DIR / "terminal.json", 0),
+        source_record(R39_TOP_DIR / "preflight.json", 48),
+        source_record(R39_TOP_DIR / "terminal.json", 0),
+        source_record(R39_TOP_DIR / "failure.json", 0),
+    ])
+
     return {
         "schema": "n83.fixed-base-first-fall-coverage/v1",
         "scope": "Fixed factor-base coordinates spike27 through spike39; 48 systems per candidate, m2-9, three families, natural/planted targets.",
@@ -150,6 +205,39 @@ def build() -> dict:
             "uncovered_systems": planned - covered,
             "known_complete_base_unlabeled_candidates": ["spike29", "spike38", "spike39"],
             "candidate_missing_factor_base": "spike34",
+            "source_availability": {
+                "spike29": {
+                    "pdp_system_files_locally_present": 48,
+                    "pdp_input_manifest_sha256": digest(r29_manifest_path),
+                    "prior_top_form_certificates_replayed": 48,
+                    "v2_first_fall_rows": 0,
+                    "affine_dreg_rows": 0,
+                    "source_binding_note": "The existing PDP source set is indexed by its own manifest; it has not yet been checked against a V2 first-fall case index.",
+                },
+                "spike38": {
+                    "complete_factor_base_index": True,
+                    "top_form_preflight_systems": 48,
+                    "top_form_terminal_exit_code": 1,
+                    "top_form_certificate_summary_present": False,
+                    "v2_first_fall_rows": 0,
+                    "affine_dreg_rows": 0,
+                },
+                "spike39": {
+                    "complete_factor_base_index": True,
+                    "top_form_preflight_systems": 48,
+                    "top_form_terminal_exit_code": 1,
+                    "top_form_failure": "aws s3 ls failed before data production",
+                    "top_form_certificate_summary_present": False,
+                    "v2_first_fall_rows": 0,
+                    "affine_dreg_rows": 0,
+                },
+                "spike34": {
+                    "complete_factor_base": False,
+                    "pdp_system_files_locally_present": 0,
+                    "v2_first_fall_rows": 0,
+                    "affine_dreg_rows": 0,
+                },
+            },
         },
         "first_fall_outcomes": {
             "rows": covered,
@@ -198,6 +286,7 @@ def build() -> dict:
             "spike35_spike37_panel": "One 144-row combined summary is linked by source path and hash; attempt-01 and attempt-02 records remain preserved separately.",
             "spike35_spike37_raw_case_archive": "The canonical 144-case S3 archive and custody record are referenced without copying raw case files into this coverage index; source system payloads are stored separately.",
             "other_candidate_archives": "The six earlier candidate summaries retain their own evidence directories and S3 persistence references; this index records each summary's hash instead of flattening those attempts.",
+            "unlabelled_source_availability": "source_availability distinguishes existing spike29 PDP system files, spike38/spike39 base and failed top-form preflights, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels.",
         },
     }
 

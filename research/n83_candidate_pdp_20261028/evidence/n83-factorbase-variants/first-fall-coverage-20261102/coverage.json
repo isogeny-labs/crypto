@@ -395,6 +395,39 @@
       "spike38",
       "spike39"
     ],
+    "source_availability": {
+      "spike29": {
+        "affine_dreg_rows": 0,
+        "pdp_input_manifest_sha256": "1ab7f5d2238c48892a1d905022a76460c9570068586a5fb57684bb301f96e4ee",
+        "pdp_system_files_locally_present": 48,
+        "prior_top_form_certificates_replayed": 48,
+        "source_binding_note": "The existing PDP source set is indexed by its own manifest; it has not yet been checked against a V2 first-fall case index.",
+        "v2_first_fall_rows": 0
+      },
+      "spike34": {
+        "affine_dreg_rows": 0,
+        "complete_factor_base": false,
+        "pdp_system_files_locally_present": 0,
+        "v2_first_fall_rows": 0
+      },
+      "spike38": {
+        "affine_dreg_rows": 0,
+        "complete_factor_base_index": true,
+        "top_form_certificate_summary_present": false,
+        "top_form_preflight_systems": 48,
+        "top_form_terminal_exit_code": 1,
+        "v2_first_fall_rows": 0
+      },
+      "spike39": {
+        "affine_dreg_rows": 0,
+        "complete_factor_base_index": true,
+        "top_form_certificate_summary_present": false,
+        "top_form_failure": "aws s3 ls failed before data production",
+        "top_form_preflight_systems": 48,
+        "top_form_terminal_exit_code": 1,
+        "v2_first_fall_rows": 0
+      }
+    },
     "systems_planned": 624,
     "systems_with_first_fall_records": 432,
     "uncovered_systems": 192
@@ -408,7 +441,8 @@
     "other_candidate_archives": "The six earlier candidate summaries retain their own evidence directories and S3 persistence references; this index records each summary's hash instead of flattening those attempts.",
     "per_candidate_summaries": "Six 48-row first-fall summaries are linked by source path and hash.",
     "spike35_spike37_panel": "One 144-row combined summary is linked by source path and hash; attempt-01 and attempt-02 records remain preserved separately.",
-    "spike35_spike37_raw_case_archive": "The canonical 144-case S3 archive and custody record are referenced without copying raw case files into this coverage index; source system payloads are stored separately."
+    "spike35_spike37_raw_case_archive": "The canonical 144-case S3 archive and custody record are referenced without copying raw case files into this coverage index; source system payloads are stored separately.",
+    "unlabelled_source_availability": "source_availability distinguishes existing spike29 PDP system files, spike38/spike39 base and failed top-form preflights, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels."
   },
   "first_fall_outcomes": {
     "by_family": {
@@ -517,6 +551,60 @@
       "path": "research/n83_candidate_pdp_20261028/evidence/degree4-propagation/summary.json",
       "rows": 12,
       "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+    },
+    {
+      "bytes": 238262,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/pdp-inputs/attempt-02/candidate-structure/inputs.json",
+      "rows": 48,
+      "sha256": "7a86f4271c5b3641c4f3090743ab3d938f34a34a9d6a167547be676d562d7bd1"
+    },
+    {
+      "bytes": 9424,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/pdp-inputs/attempt-02/candidate-structure/manifest.sha256",
+      "rows": 48,
+      "sha256": "1ab7f5d2238c48892a1d905022a76460c9570068586a5fb57684bb301f96e4ee"
+    },
+    {
+      "bytes": 922,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/top-form/attempt-01/run.json",
+      "rows": 48,
+      "sha256": "113b6b9e81107266dc8dee74b32c91df1e90f574bc614f699f1d9ac269a303a4"
+    },
+    {
+      "bytes": 23397,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/top-form/attempt-01/replay-summary.json",
+      "rows": 48,
+      "sha256": "32a2f09c9926c6a831d7110f3d19fa36f52a48799df67f4db3bd12740c5d8a0c"
+    },
+    {
+      "bytes": 1618,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r38-attempt-01/top-form-20261101T2015Z/preflight.json",
+      "rows": 48,
+      "sha256": "727fba3b7ad939415e9cbec95a61b34795657559fba9f0a997d9a8f271fd0cba"
+    },
+    {
+      "bytes": 203,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r38-attempt-01/top-form-20261101T2015Z/terminal.json",
+      "rows": 0,
+      "sha256": "d714886f5b8a696400e9a65b07693487d47e5796fc5d945508089ac3d6702304"
+    },
+    {
+      "bytes": 1172,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r39-attempt-01/top-form-20261101T2045Z/preflight.json",
+      "rows": 48,
+      "sha256": "6b9861792e2a1e61144fd8c22e0fa3e6164c72bbc1e4516dcbc0cf3dca1e59d6"
+    },
+    {
+      "bytes": 203,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r39-attempt-01/top-form-20261101T2045Z/terminal.json",
+      "rows": 0,
+      "sha256": "3a095b5c1ba0451a5a1c90e537c20d9f86b0cbdd39d1478ea5c8201f0ccb0adb"
+    },
+    {
+      "bytes": 240,
+      "path": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r39-attempt-01/top-form-20261101T2045Z/failure.json",
+      "rows": 0,
+      "sha256": "0c821a56b3aead72fa3523a918724e2b325c4e6dcc86caded77d8b938e15d8a5"
     }
   ]
 }
