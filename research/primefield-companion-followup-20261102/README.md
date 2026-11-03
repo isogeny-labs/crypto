@@ -293,3 +293,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Fresh native verified recovery
 
 [feature-native-recovery/DERIVATION.md](feature-native-recovery/DERIVATION.md) binds shared fresh source signs to the repaired native program and verifies every candidate by independent affine multiplication. Eight fixed public targets, including the four repair-fiber points, recover exactly; deleting the repair term fails verification. Three methods pass once. Complete-cost instrumentation and original full cohort remain next.
+
+## Native stage accounting
+
+[feature-native-accounting/DERIVATION.md](feature-native-accounting/DERIVATION.md) instruments all seven native layers with exact reversible source mapping. Eight receipts match unchanged recovery; three checks pass. Separate setup/preparation/query/verifier records identify polynomial remainder work and allocations as concrete next targets. Unit inversions are distinguished; no timing weights or peak-memory claim.
