@@ -17,7 +17,7 @@ def main():
     manifest = json.loads((root / 'publication-manifest.json').read_text())
     entries = list(manifest['entries'])
     for component in ('companion-generator-compression', 'companion-rank-solver',
-                      'companion-cached-pivot', 'companion-border-cache', 'companion-compact-lift', 'companion-shared-border', 'companion-metric-pivot', 'companion-metric-solver', 'companion-paired-transport', 'companion-metric-views', 'companion-zero-prefix', 'companion-zero-delete', 'companion-selected-reuse', 'feature-diagonal-events', 'feature-root-pivot', 'feature-coefficient-schur', 'feature-signature-selection', 'feature-fiber-repair', 'feature-consistent-repair', 'feature-decoder-binding', 'feature-native-signmask'):
+                      'companion-cached-pivot', 'companion-border-cache', 'companion-compact-lift', 'companion-shared-border', 'companion-metric-pivot', 'companion-metric-solver', 'companion-paired-transport', 'companion-metric-views', 'companion-zero-prefix', 'companion-zero-delete', 'companion-selected-reuse', 'feature-diagonal-events', 'feature-root-pivot', 'feature-coefficient-schur', 'feature-signature-selection', 'feature-fiber-repair', 'feature-consistent-repair', 'feature-decoder-binding', 'feature-native-signmask', 'feature-native-division'):
         extension = root / component / 'publication.json'
         if extension.exists():
             added = json.loads(extension.read_text())

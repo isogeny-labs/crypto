@@ -257,3 +257,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Native sign-mask evaluator
 
 `feature-native-signmask/` replaces coefficient-by-sign multiplication with support-zero and negative-parity masks in dependency-free Rust. All3 native unit methods passed, including the saved polynomial on all479 field inputs against direct multiplication and X. For that477-term program,1291 field multiplications become zero;16 oracle calls and477 terms remain. This is a derived operation count, not a timing claim. Width<=64 and modulus<=u64::MAX/2 are explicit. See its derivation, source locks, native test receipt and inspected report. The constructor does not certify primality or the supplied polynomial identity.
+
+## Native normalization and division core
+
+`feature-native-division/` ports the original public-point division recurrences and invariant-differential jets to dependency-free Rust. One native invocation passed3 methods: saved normalization seeds on all3 original generators,9 saved division values, Ward addition identities in value and derivative, and domain controls. A point-bound cache supports reuse across requests. Value-only requests currently compute derivatives too; no total-cost saving is claimed. The original kernel is preserved as text for review. Geometry and resultant stages remain to port before the full source is executable natively.
