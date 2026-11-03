@@ -110,14 +110,16 @@ instrument at these sizes, which is what the ladder measures.
 at `N = 20 … 24`): the isogeny staircase at a NIST prime rises with
 `N` exactly as at small primes.
 
-### m = 3 (rows_m3_isogeny.jsonl, in flight)
+### m = 3 (rows_m3_isogeny.jsonl, rows_m3_isogeny_t6.jsonl)
 
 | t | N | D | columns | wall |
 |--:|--:|--:|--:|--:|
 | 4 | 12 | 6 | 5,088 | 18 s |
-| 5 | 15 | (running) | | |
-| 6 | 18 | (running) | | |
+| 5 | 15 | **7** | 31,855 | 3,590 s |
+| 6 | 18 | (running, `run_m3_t6.log`) | | |
 
 `m = 3` starts one degree above `m = 2` (`D = 6` at `N = 12` against
-`D = 5`), as the small-prime ladders do; the `m = 3, N = 21` gate cell is
-beyond this machine's memory at P-192 as at `p₀`.
+`D = 5`) and reaches **`D = 7` at `N = 15`** — matching the small-prime
+`m = 3` staircase exactly (`D = 6, 6, 7, 7` at `N = 9 … 18`, the
+mega-pass lever-4 reading) at a NIST prime.  The `m = 3, N = 21` gate
+cell is beyond this machine's memory at P-192 as at `p₀`.
