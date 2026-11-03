@@ -5615,7 +5615,7 @@ a pivot row F chose at a contested read column with the structure provably intac
 | F | E25 | `3.626`–`3.945` | `1.520`–`1.581` | `1.0439`–`1.0676` | F ahead on 32/32; same under σ1–σ3 |
 | F | B″ | `0.952`–`0.988` | `1.046`–`1.056` | `1.0668`–`1.0704` | unresolved (B″ ahead at `0`) |
 | S | A | `1.4017`–`1.4492` | `1.0825`–`1.0908` | `1.0077`–`1.0086` | S ahead on 32/32; same under σ1–σ3 |
-| S | E25 | `3.488`–`3.719` | `1.505`–`1.559` | `1.0400`–`1.0631` | S ahead on 32/32 |
+| S | E25 | `3.488`–`3.719` | `1.505`–`1.558` | `1.0400`–`1.0631` | S ahead on 32/32 |
 | S | B″ | `0.913`–`0.932` | `1.035`–`1.041` | `1.0628`–`1.0658` | unresolved |
 | H | A | `1.4971`–`1.5415` | `1.0957`–`1.1028` | `1.0076`–`1.0083` | H ahead on 32/32; same under σ1–σ3 |
 | H | E25 | `3.725`–`3.957` | `1.523`–`1.576` | `1.0399`–`1.0627` | H ahead on 32/32 |
@@ -5629,8 +5629,8 @@ a pivot row F chose at a contested read column with the structure provably intac
 row at every weight): F `5.18·10³`–`2.32·10⁵` (`0`), `2.37·10⁴`–`1.09·10⁶` (`0.1`), `9.40·10⁴`–`5.62·10⁶` (`1` GAE); S
 `5.48·10³`–`2.43·10⁵`, `2.41·10⁴`–`1.10·10⁶`, `9.44·10⁴`–`5.64·10⁶`; H `5.15·10³`–`2.28·10⁵`, `2.38·10⁴`–`1.09·10⁶`,
 `9.44·10⁴`–`5.65·10⁶`; A `7.91·10³`–`3.47·10⁵`, `2.62·10⁴`–`1.19·10⁶`, `9.52·10⁴`–`5.69·10⁶`; E25 `2.03·10⁴`–`8.83·10⁵`,
-`3.75·10⁴`–`1.68·10⁶`, `1.00·10⁵`–`5.94·10⁶`; B″ `5.10·10³`–`2.24·10⁵`, `2.50·10⁴`–`1.16·10⁶`, `1.01·10⁵`–`6.01·10⁶`; L
-`1.09·10⁴`–`4.88·10⁵`, `2.90·10⁴`–`1.35·10⁶`, `9.66·10⁴`–`5.77·10⁶`.
+`3.75·10⁴`–`1.68·10⁶`, `1.00·10⁵`–`5.94·10⁶`; B″ `5.10·10³`–`2.24·10⁵`, `2.50·10⁴`–`1.14·10⁶`, `1.01·10⁵`–`6.01·10⁶`; L
+`1.09·10⁴`–`4.88·10⁵`, `2.90·10⁴`–`1.33·10⁶`, `9.66·10⁴`–`5.77·10⁶`.
 
 **Distance to the matched rho, every row** (`S_X / rho` at `0` and `1` GAE; `0.1` GAE and the E25, B″, L columns per row in
 `tables.md`):
@@ -5679,7 +5679,7 @@ fresh stream draws a different number of targets and residuals), the paired rati
 | id | result | verdict |
 |:--|:--|:--|
 | G2.190 | every primary passed P1; no fallback used; C_F^post aimed 80/80 | **holds** |
-| G2.191 | 21/21 binary clauses; Stage A 10,000/10,000 for every solver, same fallback calls; 128/128 end-to-end records equal A's by the field rule | **holds** |
+| G2.191 | 21/21 binary clauses; Stage A 10,000/10,000 for every solver, same fallback calls; 160/160 end-to-end records (32 rows × 5 arms) equal A's by the field rule | **holds** |
 | G2.192 | gating controls 320/320 positive; non-empty detection `0.990`, `0.995`, `1.000`, `0.995` (gate `0.96`); perturbation 194/194; digests 320/320 | **holds** |
 | G2.193 | C_F `P_ext` 320/320, strict 0/320; C_F^post aimed 320/320, `P_post`, `P`/`T` intact and first diff at `r*` on 320/320 | **holds** |
 | G2.194 | F, L `0`; S `511.9`–`512.7`; H − S `333.95`–`334.00` | **holds** |
@@ -5702,6 +5702,235 @@ multiplications for F at `0` GAE and `S_A/S_F` `1.0115`–`1.0130` at `1` GAE (a
 of `S`.  At `1` GAE F is the cheapest of the three; at `0` GAE H is.  None of F, S, H is ranked against B″ (B″ ahead at `0`
 GAE, behind at `0.1` and `1`).  **Distance remaining:** rho is ahead of every row of every arm at every weight; the closest
 row (GLS `p = 397` seed 1 arm B) has F at `5.18·10³×` rho at `0` GAE (A `7.91·10³×`) and `1.11·10⁵×` at `1` GAE (A
-`1.12·10⁵×`); on E24's curves `p = 397` seed 1 has F at `5.37·10³×` and `9.40·10⁴×`.  **Not done (main session):**
-independent validation, the replay certificate and `VALIDATION.json` of the validation gate, the IC leaderboard and
-`benchmarks/`; until then the rows render as unvalidated.  Wall times were not measured.
+`1.12·10⁵×`); on E24's curves `p = 397` seed 1 has F at `5.37·10³×` and `9.40·10⁴×`.  **Validated (2026-11-03):** independent rebuild and replay (31/31 runs, 1,037,565 fields identical), recompute
+(7,286 summary values, 0 disagreements) and gate `valid` (`research/e39_pivot_rules_confirm3_20261102/VALIDATION.json`).  Wall times were not measured.
+
+**Erratum (independent validation, 2026-11-03).** Corrected in place above: (E1) the end-to-end identity count is
+160/160 records (32 rows × 5 arms), not 128/128; (E2) S against E25 at `0.1` GAE, upper end `1.558`, not `1.559` (also in
+`REPORT.typ`); (E3) B″'s distance to rho at `0.1` GAE, upper end `1.14·10⁶`, not `1.16·10⁶`; (E4) L's at `0.1` GAE,
+`1.33·10⁶`, not `1.35·10⁶`.  (E5) "non-empty detection ≥ `0.990`" is a rounded minimum: 192/194 = `0.98969`, still above the
+`0.96` gate.  (E6) the identity check is unchanged with the call count also required equal across arms.  None changes a
+verdict.  Validator report: `research/e39_pivot_rules_confirm3_20261102/validator-report.json`.
+
+### 9.54 E42 pre-registration: V's stored tails reserved to the fill instead of the last column (W, `chain-tails`), every added operation charged
+
+*Registered 2026-11-03, after the Stage 0 counts below and before any W solver code or run.*  **Numbering:** E39 owns
+§9.48–§9.49 and G2.190–G2.203, E40 §9.50–§9.51 and G2.204–G2.215, E41 §9.52–§9.53 and G2.216–G2.229; E42 takes §9.54
+(this registration), §9.55 (results) and G2.230–G2.243; records `experiments/49_macaulay_tails/`, report
+`research/e42_macaulay_tails_20261103/`.  **Motivation.**  §9.51: after V the stored tails, `Σ_r (cols − lead_r) ≈
+102,827` cells a call, are `≈ 78 %` of `S_V` at `1` GAE.  §9.51 named three levers: the tails themselves (sparse rows, or
+rows grown as fill reaches them), rows the normal forms do not depend on, and the fill-free right end of high-degree rows.
+**Baseline:** V (`chain-profile`, E40, ranked ahead of A at `0.1` and `1` GAE, equal at `0`).  **Class, fixed in
+advance:** a variant with V's (= A's) arithmetic and outputs that stores fewer cells, every operation it adds charged, is
+*engineering* (a data-structure constant on the build of the `k = 4` solve).  It cannot move `S` at `0` GAE and is
+ranked only as stated under "Ranking".  Re-pricing work V already does would be accounting and is not proposed.
+
+**Stage 0 (counts only; done before this registration).**  Instrument `src/cryptanalysis/macaulay_tails.rs`
+(`stage0_tails`) and `examples/e42_stage0.rs`: it rebuilds each call's rows exactly as `build_profile` does and replays
+A's echelon (E33's `Lowest`: the same buckets, pivots, dense/sparse rule) on them, charging nothing; the replay
+reproduced `echelon_by_lead_counted`'s pivots and rows on every call.  v1 `9b061b9710` (binary sha256 `9693cc91…6f56`),
+v2 `38eac2b3ea` (adds static reserves and two-segment counts; sha256 `551b105e…9c75`), both built from clean exports
+(`experiments/49_macaulay_tails/export.sh`: 447 paths, 4,643 files, 0 blob mismatches).  200 calls on each of E25's ten
+GLS curves and E24's twelve curves (4,400 calls; stream `seed ^ 0xE42D_0000`; `stage0{,_v2}.{json,log}`).  Per call,
+ranges of the 22 curve means (ranges over all calls in brackets):
+
+| V's tail, per call | count |
+|:--|--:|
+| stored tail `Σ_r (cols − lead_r)` (V) | `102,825`–`102,831` |
+| build extent: each row to its last coefficient `= col(TM(fᵢ)·shift)` (`TM` the trailing monomial; `0` exceptions) | `81,300`–`81,400` |
+| final extent: grown on each update to the pivot row's last nonzero (`G`) | `82,737`–`82,801` |
+| oracle extent: to the rightmost column ever nonzero | equal to `G` on every curve |
+| **right end never nonzero** (tail − final extent) | `≈ 20,050` (`19.5 %`) |
+| tail cells ever nonzero / nonzero after the echelon | `36,775`–`36,893` / `31,348`–`31,658` |
+| tail cells V's build, echelon and reachability pass touch / under `G` | all `102,8xx` / `= G`'s extent |
+| row updates (dense branch) / growth events / growth cells | `4,180`–`4,216` (`3,395`–`3,443`) / `924`–`930` / `1,401`–`1,481` |
+| rows that grow; most growths of one row | `200`–`201`; `15` (`25`) |
+| growth cells by update column (eighths of `cols`, all calls) | `0.62`, `0.97`, `1.31`, `0.90`, `1.07`, `0.77`, `0.52`, `0.11` (`·10⁶`) |
+| cells copied by exact growth (re-allocate each time) | `2.00·10⁵`–`2.02·10⁵` |
+| static reserve to the end of the build end's weighted-degree block (`k = 1`): cells / re-allocations / copied | `86,138`–`86,202` / `59`–`62` / `8,120`–`8,721` |
+| reserve to the end of the next block (`k = 2`): cells / re-allocations / copied | `92,475`–`92,540` / `6.0`–`7.0` / `420`–`563` |
+| two segments (build range + an exactly grown overflow): overflow copies / split updates | `5,544`–`5,964` / `3,703`–`3,737` |
+| sparse rows: lower bound on merge index work, `Σ_updates (nnz_row(≥c) + nnz_pivot)` | `9.79·10⁵`–`9.97·10⁵` |
+| `G`'s cells on rows outside the normal forms' dependency closure | `12,557`–`12,599` |
+| dense-update cells the `axpy` runs over: V `Σ(cols − c)` / `G` `Σ(pivot end − c)` (unpriced, every arm) | `7.45·10⁵`–`7.58·10⁵` / `6.05·10⁵`–`6.15·10⁵` |
+
+**Which lever is real.**  (a) *Sparse rows:* only `36 %` of the tail is ever nonzero, but a sparse row's update is a
+merge, and its index work alone (`≥ 9.8·10⁵` a call) is `≈ 8×` V's whole priced build (`≈ 1.25·10⁵`): **closed**.
+(b) *Rows grown only as fill reaches them:* fill is small and late-arriving but frequent — `≈ 926` growth events a call,
+spread over the whole echelon, adding only `1.4 %` to the build extent.  A row stored exactly to its fill and
+re-allocated on growth copies `≈ 2·10⁵` cells a call (`2×` the tail): **closed** as stated.  The real content of (b) is
+the right end: `19.5 %` of V's tail is never nonzero, and `98 %` of the final extent is known at build (the column of
+`TM·shift`; the monomial order is multiplicative).  Every contiguous variant needs a fill check on each row update
+(`≈ 4,200` a call, charged).  Measured totals per call (cells + copies + the checks and lookups listed below): `k = 1`
+`≈ 100.1·10³`, two segments `≈ 98.6·10³` (with a split per update, before the splits its normal-form reads would add),
+**`k = 2` `≈ 98.5·10³`**, exact growth `≈ 2.9·10⁵`; V `≈ 102.8·10³`.  `k = 2` and two segments are within `0.1 %`;
+`k = 2` is taken because it is the lower and leaves every reader of a row unchanged.  (c) *Rows outside the dependency closure:* `≈ 12,600` cells under `G` (`16,100` under V);
+dropping them needs the staircase in advance (a shape trace, E21/E35's caveats): a ceiling, **not proposed**.  The lever
+is (b′): **reserve each row to the end of the weighted-degree block after the one holding its build end, and grow only on
+overflow**.  It is a small lever: the predicted gain is `≈ 4,400` charged operations a call (`≈ 3.5 %` of V's charged
+cells and operations).  The choice of `k = 2` was made on Stage 0's stream; Stage A and the end-to-end rows use fresh
+or registered streams.  **Atlas check.**  `tools/lead_atlas.py --brief` / `--match` (crypto-autoresearcher, reviewed
+2026-10-29; 213 crypto paths changed since, E40's among them): no lead covers the storage of the G2 `V₄` chain solve's
+Macaulay rows; nearest are `LEAD-ICP-prime-ic-constant-engineering` (open; constant engineering, under which E42 falls)
+and `LEAD-ICB-orbit-linear-algebra` (the relation matrix, not this solve).  In this note: E40 (§9.50–§9.51, the prefix);
+E21/E35 (shape traces, closed or not ranked).  Lever (b′) is none of these.
+
+**Variant W (`chain-tails`), fixed.**  V with one change of storage: each built row is allocated from its lead to
+`cap_r = B₂(δᵢ + wdeg(shift))`, where `δᵢ` is the least weighted degree in equation `i`'s nonzero support and `B₂(e)` is
+one past the last column of weighted degree `e − 1` (`cols` if `e ≤ 0`; a 12-entry table per degree `d`), i.e. the end
+of the block after the one holding the row's build end.  The echelon is V's (`echelon_profile`'s buckets, pivots,
+normalisation, branch rule `|nz|·8 > cols − c`, multiplications, digest); at each pivot normalisation the pivot's end
+`e_p = (last nonzero) + 1` is read from its nonzero list; before each row update the fill check `e_p > len_r` runs, and
+on overflow the row is re-allocated (its full old buffer copied, offset unchanged) to `B₁(e_p)` (one past the end of the
+block holding column `e_p − 1`); the dense `axpy` runs over `[c, e_p)`, the sparse update over the pivot's nonzeros, and
+lead scans after an update stop at the row's stored end.  The reachability pass and normal forms read a pivot row through
+its offset to its stored end (`chain_quotient` unchanged: cells beyond a row's end are zero).  Everything after, and the
+fallback (the existing solver, dense), are A's.  New code behind a new solver name; no existing solver's code path, count
+or output may change.  **Charged native operations of W (per call), each at `97 g`:** (i) *stored cells*
+`macaulay_stored_entries` = the cells of every buffer W allocates for a row: `Σ_r (cap_r − lead_r)` plus, per
+re-allocation, the new buffer's full length (copied cells included); on a fallback call A's `2 · rows · cols` replaces
+it (as V); (ii) *offset operations* `profile_offset_ops`, V's convention unchanged (they must equal V's on every call);
+(iii) *tail operations* `tail_extent_ops` (new field, emitted only for W): per equation that builds rows one per support
+term (the least-degree scan), per built row two (the shift's degree and the `B₂` lookup), per pivot normalisation one
+(its end), per row update one (the fill check), per re-allocation one; a fallback keeps the attempt's (ii) and (iii).
+**Band:** `S_W(g) = total_muls + 97 g (macaulay_stored_entries + profile_offset_ops + tail_extent_ops)`; `S_V`, `S_A`,
+`S_E25` and `rho(g)` as §9.50, `g ∈ {0, 0.1, 1}`.  **Unpriced counters, every arm (listed, not used for ranks):**
+lead-scan reads (W `≤` V); dense-update cell traffic (W `≈ 6.1·10⁵`, V `≈ 7.5·10⁵` a call; unpriced for every arm since
+E24); the per-call structural work common to A, V, W and E25 (§9.50's σ4 list); memory.  σ1 prices the lead scans for
+every arm, σ4 the structural work for every arm.
+
+**Arms and rows (fixed).**  V (`chain-profile`), W (`chain-tails`), A (`chain-counted`), E25 (`macaulay`), all with
+`--karatsuba`, and the matched rho, walk (iii) (E27's on the GLS rows, `experiments/32_walk_karatsuba/summary.json`;
+E37's on E24's curves, `experiments/44_pivot_rules_confirm/walk_e24.json`).  *End to end, paired:* W on E37's stream
+(`--stream-salt E37E0001`, `--rho-runs 16 --max-residuals 5000000`, `RAYON_NUM_THREADS=4`) on the 20 GLS rows
+(`quartic_pipeline_gls`, E25's ten curves × arms A, B) and the 12 E24 rows (`quartic_pipeline_v4`), compared with E40's
+stored V records (`experiments/47_macaulay_entries/e2e/`) and E37's A and E25 records of the same rows and stream.
+*Stage A:* E25's ten curves, base and precompute from E25's stream, the first 1,000 targets of stream
+`seed ^ 0xE42A_0001` per curve (10,000 calls), one thread; per call existing, A counted, V and W from the same
+per-target seed.
+
+**Identity (fixed).**  *Stage A, every call:* W returns A counted's (and V's) solutions, degree, outcome, decomposition
+set, fallback flag, every phase count and pivot digest; W's offset operations equal V's; W's stored-cell counter equals
+the measured `Σ` of its final row lengths plus the lengths of the buffers its re-allocations discarded; W's lead-scan
+reads are `≤` V's.  *End to end:* every W record equals E40's V record of the same row in every field except the solver
+tag, wall times, `lead_scan_reads`, `macaulay_stored_entries` and `tail_extent_ops` (so `total_muls`, relations, logs,
+walks and `profile_offset_ops` are equal), and equals E37's A record outside those fields and `profile_offset_ops`.
+*Existing configurations:* under the E42 binary, E40's seven configurations (§9.51) reproduce E40's references (wall times
+aside), and `chain-profile --karatsuba` with `--stream-salt E37E0001` (GLS `p = 101` seed 2; E24 `p = 101` seed 1) equals
+E40's stored V records outside wall times.
+
+**Controls (fixed).**  `e42_checks`, E25's ten curves, 32 calls each (320) on stream `seed ^ 0xE42C_0001`.
+*Positive P1 (broken W):* rows capped at their build end (`B₀`) and the fill check off, so fill beyond a row's end is
+dropped; detected when the Stage A identity fails against A counted; must be detected on 320/320.  *Positive P2 (broken
+count):* the stored-cell counter short by one per row; detected by the measured-length check; 320/320.  *Growth-path
+control G0 (must pass):* rows capped at their build end with the fill check on (`≈ 926` re-allocations a call), so W's
+re-allocation path, rare under `B₂`, runs on every call; G0 must equal A counted and pass the counter check on 320/320,
+with `[900, 960]` re-allocations per call (mean).  *Perturbed coefficient (E31's):* one coefficient of one equation moved
+by one changes W's solution set on every call with a non-empty clean set.  *Negative N (V against V′ on another
+stream):* V rerun on the 20 GLS rows with `--stream-salt E42E0002` (V′), compared with E40's V on E37's stream through
+the same tables and rank rule; and W on `E42E0002` (W′) against V′, paired.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.230 | identity (**kill**) | every identity check above holds on every Stage A call, every end-to-end record and every existing configuration | any failure (E42 stops; W negative) |
+| G2.231 | controls (**kill**) | P1 320/320, P2 320/320, G0 passes 320/320, perturbed coefficient on every non-empty call | any miss (E42 stops) |
+| G2.232 | W's stored cells per clean call (Stage A) | `[9.25, 9.35]·10⁴` on every curve; re-allocations per call (mean) `[4, 10]` | outside |
+| G2.233 | W's tail operations per call (Stage A mean) | `[5.3, 5.7]·10³`; offset operations equal V's exactly | outside |
+| G2.234 | per call, `S_V / S_W` (Stage A means, every curve) | exactly `1` at `0` GAE; `[1.015, 1.035]` at `0.1`; `[1.02, 1.05]` at `1` GAE.  **Kill** if `≤ 1.005` at `1` GAE on any curve or W is behind V at any weight on any curve (E42 stops before end to end) | outside; kill |
+| G2.235 | lead scans (σ1 input) | W's lead-scan reads `≤` V's on every call | any call above |
+| G2.236 | end to end, `S_V / S_W`, 32 rows | `1` exactly at `0` GAE; `[1.015, 1.035]` at `0.1`; `[1.02, 1.05]` at `1` GAE; W never behind V | outside; W behind V at any weight on any row |
+| G2.237 | end to end, `S_A / S_W` and `S_E25 / S_W`, 32 rows | `S_A/S_W`: `1` at `0`, `[1.27, 1.31]` at `0.1`, `[1.38, 1.45]` at `1`; `S_E25/S_W`: E40's `S_E25/S_V` at `0` exactly, `[1.77, 1.87]` at `0.1`, `[1.43, 1.53]` at `1` GAE | outside; any row `≤ 1` at a positive weight |
+| G2.238 | distance to rho (`S_W / rho`, walk (iii)) | rho ahead of every row at every weight; at `1` GAE `S_W / rho = (S_V / rho) / [1.02, 1.05]` | any row below rho |
+| G2.239 | σ1 and σ4 (every arm) | no order against V, A or E25 changes | an order changes |
+| G2.240 | negative control N | V′ is **not** ranked against V (its order differs across rows); W′ against V′ (paired) reproduces G2.236's bands and W′ equals V′ outside the allowed fields | V′ ranked; W′ outside G2.236's bands |
+| G2.241 | fallbacks | W falls back on exactly V's (= A's) calls | any difference |
+| G2.242 | slack of the reserve (Stage A calls, Stage 0's replay run on the same systems) | W's stored cells exceed the replay's fill extent `G` by `[9, 11]·10³` per clean call (mean, every curve) | outside |
+| G2.243 | dense-update cell traffic (unpriced, listed; the same replay) | `G`'s `axpy` cells `[5.9, 6.3]·10⁵` a call, V's `[7.3, 7.7]·10⁵` | outside (no rank depends on it) |
+
+**Ranking (fixed).**  W is ranked ahead of V if G2.230–G2.231 hold, `S_W(0) = S_V(0)` exactly and `S_W(g) < S_V(g)` at
+`g = 0.1` and `1` on every one of the 32 rows: W is then never behind V in the band and strictly ahead at both positive
+weights, reported as **ahead of V at `0.1` and `1` GAE, equal at `0` GAE** — not as an improvement at `0` GAE.  Against A
+the same weak rule; against E25 the ordinary rule (ahead at all three weights on every row).  Anything else is reported,
+unranked.  An end-to-end order is never inferred from Stage A.
+
+**What it would say.**  If the predictions hold, the chain solve's Macaulay rows stop at the block after their last
+coefficient instead of the last column: `≈ 9,800` fewer cells a call against `≈ 5,500` charged checks and lookups, so
+`S` falls `≈ 2–3 %` at `0.1` GAE and `≈ 3–4 %` at `1` GAE against V, nothing at `0` GAE.  It is a small, priced lever; the
+large one in the tails (sparse storage) is closed by its own index work.  Remaining after W: `≈ 82,800` cells of fill
+extent, of which `≈ 12,600` are rows outside the dependency closure (a trace-shaped ceiling), and `≈ 46,000` interior
+zeros that no contiguous format can drop.  Python only plots recorded values; every number comes from the Rust examples.
+Host: the 4-vCPU container shared with other agents, local runs (isolab-eks unreachable), operation counts only, no
+wall-time claim.  Leaderboard, `benchmarks/` and the validation gate are not touched here; if W is ranked the main session
+arranges independent validation.
+
+### 9.55 E42 measured: the controls kill fired on a mis-registered growth-control count (G0 re-allocated `≈ 246` times a call, registered `[900, 960]`); every correctness control passed 320/320; E42 stops, W not ranked by E42
+
+*2026-11-03.*  Pre-registration §9.54 (`e37d72e172`, pushed in the branch head before any W code).  Code `3858929530`
+(`macaulay_tails::{build_tails, echelon_tails}`, `QuarticSolve::tail_extent_ops`), `673433fef5` (the `klein_v4` hook,
+committed alone: `Pivot::Tails`, `V4Solver::ChainTails` = `chain-tails`), `efc700b36d` (record field `tail_extent_ops`,
+W only), `6dfe52f95e` (harness).  Binaries from a clean export of `6dfe52f95e` (447 paths, 4,645 files, 0 blob
+mismatches), sha256 in `experiments/49_macaulay_tails/binary_sha256.txt`.  Run: `e42_checks --calls 32` (320 calls,
+stream `seed ^ 0xE42C_0001`; `checks.{json,log}`), the first registered step.  Local, operation counts only.
+
+| control | result | registered |
+|:--|:--|:--|
+| W = A counted (outputs, fallback, phases, digest) | 320/320 | 320/320 |
+| W's counter = final lengths + discarded buffers | 320/320 (W re-allocations `5.9`–`6.4` a call) | — |
+| P1 (caps at the build end, fill check off) detected | 320/320 | 320/320 |
+| P2 (counter short by one per row) detected | 320/320 | 320/320 |
+| G0 (caps at the build end, fill check on) = A counted; counter | 320/320; 320/320 | 320/320 |
+| **G0 re-allocations per call (mean)** | **`241`–`247` per curve (`245.6` over 320 calls)** | **`[900, 960]`** |
+| perturbed coefficient changed the solution set | 190/190 non-empty | every non-empty |
+
+**Verdict.**  G2.231 as registered is **falsified**: the G0 clause "`[900, 960]` re-allocations per call" fails, and
+`e42_checks` (committed before the run) folds it into `g2_231_holds = false`.  The kill fires and **E42 stops: no
+Stage A, no end to end, W is not ranked by E42.**  *Why the number was wrong:* §9.54 took `≈ 926` from Stage 0's `k = 0`
+counter, which re-grows a row exactly to the pivot's end on every overflow; W's registered overflow rule (which G0 uses)
+re-grows to the end of the block holding the pivot's end (`B₁`), so later fill inside that block needs no further
+re-allocation.  The prediction was mis-derived; the control did what it was for (W's re-allocation path ran
+`≈ 246` times on every call, and G0 still equalled A and passed the counter check on 320/320).  Taking the per-call
+reading of the table ("G0 passes 320/320") instead would be a post-hoc choice of the favourable reading, so it is not
+taken.  Nothing else was run under §9.54.  The ranking question is carried by the successor registration E42b (§9.56),
+registered before any Stage A or end-to-end data exist, with this count corrected and the controls rerun on a fresh
+stream.
+
+### 9.56 E42b pre-registration: W against V once more, with the growth-control count derived from W's own overflow rule and the controls on a fresh stream
+
+*Registered 2026-11-03, after E42's kill (§9.55) and before any Stage A, end-to-end or E42b control run.*  **Numbering:**
+E42b takes §9.56 (this registration), §9.57 (results) and G2.244–G2.257; records stay in
+`experiments/49_macaulay_tails/` (E42b's files carry `_b` where E42 already wrote one), report
+`research/e42_macaulay_tails_20261103/`.  **What changes against §9.54, and nothing else:** (1) G0's re-allocation count
+is predicted from W's overflow rule, `[200, 300]` per call (mean; E42 measured `241`–`247` per curve on stream
+`seed ^ 0xE42C_0001`), and is a descriptive check, not a kill: the G0 kill is its per-call identity and counter check;
+(2) the controls run on a fresh stream, `seed ^ 0xE42C_0002`, with the same harness given that stream (`--salt`) and the
+same detection rules; (3) the binaries for Stage A and end to end are E42's, built before any run from a clean export of
+`6dfe52f95e` (sha256 in `binary_sha256.txt`); only `e42_checks` and `e42_tables` are rebuilt for the stream argument and
+the E42b ids.  Variant W, Stage 0, the lever, the atlas check, the arms, the rows (32 end-to-end rows on E37's stream
+paired with E40's V and E37's A and E25 records; Stage A on stream `seed ^ 0xE42A_0001`, never run), the identity
+checks, P1, P2, the perturbed coefficient, the negative control (V′, W′ on `E42E0002`, never run), the pricing (§9.54's
+`S_W(g) = total_muls + 97 g (macaulay_stored_entries + profile_offset_ops + tail_extent_ops)`), the unpriced counters,
+σ1, σ4 and the ranking rule are §9.54's, unchanged.
+
+| id | §9.54 id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|:--|
+| G2.244 | G2.230 | identity (**kill**) | as G2.230 | any failure (E42b stops; W negative) |
+| G2.245 | G2.231 | controls (**kill**) | P1 320/320, P2 320/320, G0 = A counted and counter check 320/320, W = A counted 320/320, perturbed coefficient on every non-empty call | any miss (E42b stops) |
+| G2.246 | — | G0 re-allocations per call (mean, descriptive) | `[200, 300]` | outside (reported, not a kill) |
+| G2.247 | G2.232 | W's stored cells per clean call; re-allocations | `[9.25, 9.35]·10⁴`; `[4, 10]` | outside |
+| G2.248 | G2.233 | W's tail operations; offset operations = V's | `[5.3, 5.7]·10³`; equal on every call | outside |
+| G2.249 | G2.234 | Stage A `S_V / S_W` (**kill** as G2.234) | `1` / `[1.015, 1.035]` / `[1.02, 1.05]`; kill if `≤ 1.005` at `1` GAE or W behind V at any weight on any curve | outside; kill |
+| G2.250 | G2.235 | lead scans | W `≤` V on every call | any call above |
+| G2.251 | G2.236 | end to end `S_V / S_W`, 32 rows | `1` / `[1.015, 1.035]` / `[1.02, 1.05]`; never behind | outside; behind |
+| G2.252 | G2.237 | end to end `S_A / S_W`, `S_E25 / S_W` | `1` / `[1.27, 1.31]` / `[1.38, 1.45]`; E40's `S_E25/S_V` at `0` / `[1.77, 1.87]` / `[1.43, 1.53]` | outside; any row `≤ 1` at a positive weight |
+| G2.253 | G2.238 | distance to rho | rho ahead of every row at every weight | any row below rho |
+| G2.254 | G2.239 | σ1, σ4 | no order changes | an order changes |
+| G2.255 | G2.240 | negative control | V′ not ranked against V; W′/V′ in G2.251's bands; W′ = V′ outside the allowed fields | V′ ranked; outside |
+| G2.256 | G2.241 | fallbacks | W on exactly V's (= A's) calls | any difference |
+| G2.257 | G2.242–G2.243 | reserve slack; `axpy` cells (listed) | slack `[9, 11]·10³`; `G` `[5.9, 6.3]·10⁵`, V `[7.3, 7.7]·10⁵` | outside |
+
+**Ranking (fixed, §9.54's).**  W is ranked ahead of V if G2.244–G2.245 hold, `S_W(0) = S_V(0)` exactly and `S_W(g) <
+S_V(g)` at `g = 0.1` and `1` on every one of the 32 rows — reported as **ahead of V at `0.1` and `1` GAE, equal at `0`
+GAE**.  Against A the same weak rule; against E25 the ordinary rule.  An end-to-end order is never inferred from Stage A.
+**Disclosure.**  E42b exists because E42's own control-count prediction was wrong, not because any ranking data were
+seen: none had been taken.  The only E42 data seen are the 320 control calls on stream `0xE42C_0001` (all correctness
+checks passed), and E42b does not reuse them for any verdict.
