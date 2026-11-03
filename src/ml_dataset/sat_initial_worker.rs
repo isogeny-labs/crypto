@@ -21,6 +21,11 @@ pub(in crate::ml_dataset::solvers) fn eligibility(c: &CaseConfig) -> Eligibility
     {
         return Eligibility::Absent;
     }
+    // V1 requests retain their frozen historical unsupported disposition.
+    // Activation must be explicit in original plan/protocol bytes before entry.
+    if c.channels.as_ref().is_some_and(|r| r.schema != "crypto.ml-dataset.channel-requests/v2") {
+        return Eligibility::Unsupported;
+    }
     if c.solver == "sat" && profile(&c.family, c.n, c.m) {
         Eligibility::Requested
     } else {
@@ -329,6 +334,10 @@ impl Custody {
     /// Bounded parent outcome is allocated only under the prior REPORT reservation.
     /// The checkpoint is the sole terminal capture receipt; parent result.json
     /// finalization retains its existing root-owned metadata scope.
+    #[cfg(test)]
+    pub(in crate::ml_dataset::solvers) fn original_ledger_for_control(&self) -> Option<(u64,u64,u64,Option<Stop>)> {
+        self.budget.as_ref().map(|b|(b.native_work_limit,b.checking_work,b.adapter_bytes,b.stopped))
+    }
     pub(in crate::ml_dataset::solvers) fn outcome(&mut self) -> Option<Value> {
         if !self.report_admitted || self.report_taken {
             return None;
@@ -401,9 +410,13 @@ mod shared_receipt_tests {
                     checked: 1
                 }
             );
-            let mut custody = prepared.detach();
             let before = std::fs::read(f.root.join("live/committed.json")).unwrap();
-            let outcome = custody.outcome().expect("admitted compact parent outcome");
+            let transport = solvers::WorkerSolveOutput::from_sat_custody(prepared.detach());
+            let (data, stored, mut residual) = transport.into_parts();
+            assert!(stored.is_empty(), "shared receipt must not be republished");
+            assert!(!residual.sat_report_unavailable());
+            let mut custody = residual.sat.take().expect("retained actual SAT owner");
+            let outcome = data.outcome;
             assert_eq!(outcome["initial_checked"], true);
             assert_eq!(outcome["solver_completed"], false);
             assert!(serde_json::to_vec(&outcome).unwrap().len() <= REPORT_CAP);
@@ -419,6 +432,15 @@ mod shared_receipt_tests {
             let head: capture::CommittedHead = serde_json::from_slice(&before).unwrap();
             assert_eq!(outcome["checkpoint_sequence"], head.event_count);
             assert_eq!(outcome["checkpoint_sha256"], head.last_event_sha256);
+            // A second extraction cannot synthesize an unpaid report; its real
+            // owner still transfers through the same parent custody channel.
+            let unavailable = solvers::WorkerSolveOutput::from_sat_custody(custody);
+            let (empty, stored, residual) = unavailable.into_parts();
+            assert!(empty.outcome.is_null());
+            assert!(empty.artifacts.is_empty() && stored.is_empty());
+            assert!(residual.sat_report_unavailable());
+            assert!(residual.sat.is_some());
+            assert_eq!(before, std::fs::read(f.root.join("live/committed.json")).unwrap());
         }
     }
     #[test]

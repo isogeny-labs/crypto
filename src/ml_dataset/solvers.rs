@@ -368,6 +368,9 @@ pub(super) fn verify_and_store_worker_originals<'a>(
 #[derive(Default)]
 pub(super) struct WorkerResidualCustody {
     items: Vec<WorkerResidualArtifact>,
+    // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
+    sat: Option<koblitz_m3::sat_original_owner::worker::Custody>,
+    sat_report_unavailable: bool,
 }
 pub(super) struct WorkerResidualArtifact {
     path: &'static str,
@@ -386,7 +389,7 @@ impl WorkerResidualCustody {
         items
             .try_reserve_exact(Self::CAPACITY)
             .map_err(|e| e.to_string())?;
-        Ok(Self { items })
+        Ok(Self { items, sat: None, sat_report_unavailable: false })
     }
     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
@@ -394,6 +397,9 @@ impl WorkerResidualCustody {
         }
         self.items.push(item);
         Ok(())
+    }
+    pub(super) fn sat_report_unavailable(&self) -> bool {
+        self.sat_report_unavailable
     }
     pub(super) fn has_untransferred_roots(&self) -> bool {
         self.items.iter().any(|a| a.untransferred_root.is_some())
@@ -412,6 +418,19 @@ impl WorkerSolveOutput {
             data,
             stored: Vec::new(),
             residual: WorkerResidualCustody::default(),
+        }
+    }
+    fn from_sat_custody(mut custody: koblitz_m3::sat_original_owner::worker::Custody) -> Self {
+        // None creates no producer reporting allocation. Parent adopts custody
+        // before using its own existing error-reporting path.
+        let outcome = custody.outcome();
+        let unavailable = outcome.is_none();
+        Self {
+            data: SolverData { outcome: outcome.unwrap_or(Value::Null), artifacts: Vec::new() },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                items: Vec::new(), sat: Some(custody), sat_report_unavailable: unavailable,
+            },
         }
     }
     pub(super) fn into_parts(
@@ -608,14 +627,116 @@ pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<V
             reason:if eligible {super::types::ChannelDispositionReason::RequiresActualOriginalShapeAndRetainedRow} else {super::types::ChannelDispositionReason::OutsideOrdinaryN3Profile},
             execution_verified:false,training_export_admitted:false}
     });
-    let sat=c.sat_initial.as_ref().map(|r|super::types::ChannelDisposition {request:r.clone(),
-        status:super::types::ChannelDispositionStatus::Unsupported,
-        reason:super::types::ChannelDispositionReason::SatCentralWorkerReplayNotIntegrated,
-        execution_verified:false,training_export_admitted:false});
+    let sat=c.sat_initial.as_ref().map(|r| {
+        let eligible=koblitz_m3::sat_original_owner::worker::eligibility(config)
+            == koblitz_m3::sat_original_owner::worker::Eligibility::Requested;
+        super::types::ChannelDisposition {request:r.clone(),
+            status:if eligible {super::types::ChannelDispositionStatus::Requested} else {super::types::ChannelDispositionStatus::Unsupported},
+            reason:if c.schema == "crypto.ml-dataset.channel-requests/v1" {super::types::ChannelDispositionReason::SatCentralWorkerReplayNotIntegrated} else if eligible {super::types::ChannelDispositionReason::RequiresActualSatInitialReplay} else {super::types::ChannelDispositionReason::OutsideSatInitialProfile},
+            execution_verified:false,training_export_admitted:false}
+    });
     Ok(Some(serde_json::to_value(super::types::RequestedChannelDispositions {
         schema:"crypto.ml-dataset.requested-channels/v1".into(),boolean_consequence:boolean,sat_initial:sat,
     }).map_err(|e|e.to_string())?))
 }
+/// Historical replay allowance explicitly supplied by an authorized caller.
+/// These counters/deadline are independent of original producer execution.
+pub(super) struct SatReplayPolicy {
+    pub work: u64,
+    pub bytes: u64,
+    pub deadline: Instant,
+    pub stream_bytes: u64,
+    pub payload_bytes: u64,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum SatReplayVerdict {
+    CheckedInitial,
+    CheckedPrefixOnly,
+    Incomplete,
+    Unknown,
+    Rejected,
+}
+#[allow(clippy::large_enum_variant)]
+enum SatReplayOwner {
+    Terminal(koblitz_m3::sat_original_owner::central::TerminalVerified),
+    Outcome(koblitz_m3::sat_original_owner::central::Outcome),
+    Failed(koblitz_m3::sat_original_owner::central::Failed),
+}
+/// Must remain owned by the replay caller across all later errors/publication.
+/// There is deliberately no causal export or training-positive conversion.
+pub(super) struct SatReplayCustody {
+    owner: SatReplayOwner,
+    verdict: SatReplayVerdict,
+}
+impl SatReplayCustody {
+    pub(super) fn verdict(&self) -> SatReplayVerdict { self.verdict }
+    pub(super) fn retained_slot_bytes() -> usize { std::mem::size_of::<Self>() }
+    pub(super) fn charged(&self)->(u64,u64) {
+        match &self.owner {
+            SatReplayOwner::Terminal(t)=>t.usage(),
+            SatReplayOwner::Outcome(koblitz_m3::sat_original_owner::central::Outcome::IncompleteMissingProducerLedger(f)
+                |koblitz_m3::sat_original_owner::central::Outcome::UnknownOriginalMath(f))=>f.usage(),
+            SatReplayOwner::Outcome(koblitz_m3::sat_original_owner::central::Outcome::Verified(_))=>unreachable!("verified seal always joins terminal"),
+            SatReplayOwner::Failed(f)=>f.frame.usage(),
+        }
+    }
+    pub(super) fn revalidate(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact])->SatReplayVerdict {
+        if !matches!(self.verdict,SatReplayVerdict::CheckedInitial|SatReplayVerdict::CheckedPrefixOnly) { return self.verdict; }
+        match &mut self.owner {
+            SatReplayOwner::Terminal(t)=>if t.revalidate(dir,config,outcome,artifacts).is_err(){self.verdict=SatReplayVerdict::Rejected;},
+            _=>self.verdict=SatReplayVerdict::Rejected,
+        }
+        self.verdict
+    }
+}
+pub(super) fn needs_sat_initial_replay(config: &CaseConfig, outcome: &Value, artifacts: &[super::types::Artifact]) -> bool {
+    koblitz_m3::sat_original_owner::worker::eligibility(config)
+        == koblitz_m3::sat_original_owner::worker::Eligibility::Requested
+        || outcome["adapter_id"] == "sat-initial-v1"
+        || outcome["strategy"] == "sat-initial-v1"
+        || outcome.get("initial_checked").is_some()
+        || artifacts.iter().any(|a| a.role == "sat-original-gate-map"
+            || a.path.starts_with("live/payloads/sat-original-pattern-")
+            || a.path.starts_with("payloads/sat-original-pattern-"))
+}
+fn sat_terminal_overclaims(outcome: &Value) -> bool {
+    outcome["initial_checked"] == true || outcome["solver_completed"] == true
+        || outcome["scalar_recovered_without_witness"] == true
+        || outcome["ecdlp_pipeline_completed"] == true || outcome["status"] == "verified"
+}
+pub(super) fn verify_sat_initial_cell(
+    dir: &Path, config: &CaseConfig, outcome: &Value,
+    artifacts: &[super::types::Artifact], policy: SatReplayPolicy,
+) -> SatReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    let result = central::verify(dir, config, artifacts, central::Policy {
+        work: policy.work, bytes: policy.bytes, deadline: policy.deadline,
+        stream_bytes: policy.stream_bytes, payload_bytes: policy.payload_bytes,
+    });
+    match result {
+        Ok(central::Outcome::Verified(seal)) => match seal.join_terminal(dir, config, outcome, artifacts) {
+            Ok(joined) => SatReplayCustody {
+                verdict: if joined.declared_initial { SatReplayVerdict::CheckedInitial } else { SatReplayVerdict::CheckedPrefixOnly },
+                owner: SatReplayOwner::Terminal(joined),
+            },
+            Err(failed) => SatReplayCustody { owner: SatReplayOwner::Failed(failed), verdict: SatReplayVerdict::Rejected },
+        },
+        Ok(retained @ central::Outcome::IncompleteMissingProducerLedger(_)) => SatReplayCustody {
+            owner: SatReplayOwner::Outcome(retained),
+            verdict: if sat_terminal_overclaims(outcome) {
+                SatReplayVerdict::Rejected
+            } else { SatReplayVerdict::Incomplete },
+        },
+        Ok(retained @ central::Outcome::UnknownOriginalMath(_)) => SatReplayCustody {
+            owner: SatReplayOwner::Outcome(retained),
+            verdict: if sat_terminal_overclaims(outcome) {
+                SatReplayVerdict::Rejected
+            } else { SatReplayVerdict::Unknown },
+        },
+        Err(failed) => SatReplayCustody { owner: SatReplayOwner::Failed(failed), verdict: SatReplayVerdict::Rejected },
+    }
+}
+
 pub(super) fn verify_requested_channel_disposition(config:&CaseConfig,outcome:&Value)->Result<(),String>{
     match requested_channel_disposition(config)? {
         Some(expected) if outcome.get("requested_channels")==Some(&expected)=>Ok(()),
@@ -638,6 +759,21 @@ pub(super) fn solve_with_verified_worker_originals(
     original.matches_bound(config, case, directory, &binding)?;
     if context.is_some_and(|c| c.launch.binding != binding) {
         return Err("verified worker originals differ from execution attempt".into());
+    }
+    // Optional initial channel owns one original-budget pattern. Once selected,
+    // no partial or refused attempt can fall through to the legacy SAT solver.
+    if koblitz_m3::sat_original_owner::worker::eligibility(config)
+        == koblitz_m3::sat_original_owner::worker::Eligibility::Requested
+    {
+        let context = context.ok_or("SAT initial requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live solver sink".into());
+        }
+        let sink = CaptureEmitter::create(directory, binding, limits.clone())?;
+        let prepared = koblitz_m3::sat_original_owner::worker::prepare(
+            original, case, context, sink, &limits,
+        );
+        return Ok(WorkerSolveOutput::from_sat_custody(prepared.detach()));
     }
     if config.family == "binary" && config.m == 3 && matches!(config.solver.as_str(), "f4" | "f5") {
         if !ordinary_worker_profile(config, case) {
@@ -6411,6 +6547,18 @@ mod verified_worker_original_tests {
                 "binary",
                 degree_bound,
             );
+            Self::finish_original_capture_setup(fixture)
+        }
+        pub(super) fn with_sat_initial_shape(n: u32, twist: bool) -> Self {
+            Self::with_sat_initial_work(n, twist, 16384)
+        }
+        pub(super) fn with_sat_initial_work(n: u32, twist: bool, work_limit: u64) -> Self {
+            let channels = serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v2", "sat_initial":{"mode":"capture_and_check_initial"}})).unwrap();
+            let fixture = Self::with_family_policy_channels(n, twist, 4, "sat", work_limit, true, false,
+                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}), "binary", 3, Some(channels));
+            Self::finish_original_capture_setup(fixture)
+        }
+        fn finish_original_capture_setup(fixture: Self) -> Self {
             // Test-only supervisor setup: these are the original frozen attempt
             // and trace limits, not permission to activate ordinary dispatch.
             dataset::telemetry::checked::install_policy(&fixture.root).unwrap();
@@ -6453,6 +6601,15 @@ mod verified_worker_original_tests {
             family: &str,
             degree_bound: u32,
         ) -> Self {
+            Self::with_family_policy_channels(n, twist, factor_base_size, solver, work_limit,
+                execution_required, positive_control, policy, family, degree_bound, None)
+        }
+        fn with_family_policy_channels(
+            n: u32, twist: bool, factor_base_size: usize, solver: &str, work_limit: u64,
+            execution_required: bool, positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>, family: &str,
+            degree_bound: u32, channels: Option<crate::ml_dataset::types::ChannelRequests>,
+        ) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -6473,13 +6630,16 @@ mod verified_worker_original_tests {
                     "root_failure_rule":"conflicting raw pdp-witness.json before producer entry"
                 });
             }
+            if let Some(request) = &channels {
+                protocol["extensions"]["dataset_channels"] = serde_json::to_value(request).unwrap();
+            }
             let body = dataset::protocol_canonical_bytes(&protocol).unwrap();
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-31T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
-                                channels: None,
+                channels: channels.clone(),
                 factor_base_policies: policy.clone().into_iter().collect(),
-                schema: if policy.is_some() {
+                schema: if channels.is_some() { "crypto.ml-dataset.plan/v3" } else if policy.is_some() {
                     "crypto.ml-dataset.plan/v2"
                 } else {
                     "crypto.ml-dataset.plan/v1"
@@ -6941,3 +7101,191 @@ mod requested_channel_tests {
         assert!(verify_requested_channel_disposition(&c,&json!({"requested_channels":null})).is_err());
     }
 }
+
+#[cfg(test)]
+mod sat_initial_dispatch_replay_tests {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, capture, storage, telemetry};
+    fn policy() -> SatReplayPolicy {
+        // Explicit software-control historical replay allowance. This creates
+        // no producer authority and changes no producer cap or original deadline.
+        SatReplayPolicy { work: 1_000_000_000_000, bytes: 8_000_000_000,
+            deadline: Instant::now() + Duration::from_secs(120),
+            stream_bytes: 16 * 1024 * 1024, payload_bytes: 16 * 1024 * 1024 }
+    }
+    #[test]
+    fn requested_sat_dispatch_receipt_and_replay_require_genuine_both_twist_success() {
+        for twist in [false, true] {
+            let f = verified_worker_original_tests::Fixture::with_sat_initial_shape(23, twist);
+            dataset::execution::create(&f.root).unwrap();
+            let mut artifacts = Vec::new();
+            let case = telemetry::measured(&f.root, &mut artifacts, "curve-construction", || dataset::curves::generate(&f.config)).unwrap();
+            let token = verify_and_store_worker_originals(&f.config, &case, &f.root, Some(&f.binding), &mut artifacts).unwrap();
+            let context = dataset::execution::admit(&f.root).unwrap().unwrap();
+            let (_, caps) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+            let output = solve_with_verified_worker_originals(&f.config, &case, &f.root.join("live"), f.binding.clone(), caps, Some(&context), &token).unwrap();
+            let (data, stored, residual) = output.into_parts();
+            assert!(!residual.sat_report_unavailable());
+            assert!(residual.sat.is_some());
+            assert!(stored.is_empty());
+            assert_eq!(data.outcome["initial_checked"], true, "actual original-budget dispatch must finish initial gate");
+            assert_eq!(data.outcome["patterns_total"], 2);
+            assert_eq!(data.outcome["patterns_checked"], 1);
+            artifacts.push(storage::write_json(&f.root, "result.json", "solver-outcome", &data.outcome).unwrap());
+            for (path, role) in dataset::CAPTURE_CONTEXT.into_iter().chain([(dataset::execution::PATH, dataset::execution::ROLE)]) {
+                let (sha256, bytes) = crate::store::hash_file(&f.root.join(path)).unwrap();
+                artifacts.push(dataset::types::Artifact { path: path.into(), role: role.into(), encoding: "json".into(), sha256, bytes });
+            }
+            let head = fs::read(f.root.join("live/committed.json")).unwrap();
+            assert!(needs_sat_initial_replay(&f.config, &data.outcome, &artifacts));
+            let actual_head: capture::CommittedHead = serde_json::from_slice(&head).unwrap();
+            assert!(koblitz_m3::sat_original_owner::central::check_terminal_fields_for_control(&f.config, &data.outcome, &actual_head));
+            for (field, replacement) in [
+                ("pattern", json!(1)), ("patterns_total", json!(3)), ("patterns_checked", json!(2)),
+                ("checkpoint_sequence", json!(actual_head.event_count + 1)),
+                ("checkpoint_sha256", json!("0".repeat(64))), ("first_stop", json!("Work")),
+                ("solver_completed", json!(true)), ("initial_checked", json!(false)),
+            ] {
+                let mut changed = data.outcome.clone(); changed[field] = replacement;
+                assert!(!koblitz_m3::sat_original_owner::central::check_terminal_fields_for_control(&f.config, &changed, &actual_head), "field {field}");
+            }
+            let mut checked = verify_sat_initial_cell(&f.root, &f.config, &data.outcome, &artifacts, policy());
+            assert_eq!(checked.verdict(), SatReplayVerdict::CheckedInitial);
+            assert!(matches!(checked.owner, SatReplayOwner::Terminal(_)));
+            let before_repeat=checked.charged();
+            assert_eq!(checked.revalidate(&f.root,&f.config,&data.outcome,&artifacts),SatReplayVerdict::CheckedInitial);
+            let after_repeat=checked.charged();
+            assert!(after_repeat.0>before_repeat.0 && after_repeat.1>before_repeat.1);
+            // The committed head stays A while the actual map payload changes.
+            // A cache of manifest/head alone would incorrectly accept this.
+            let map_path=f.root.join("live/payloads/sat-original-pattern-0.gate.json");
+            let saved=fs::read(&map_path).unwrap();
+            let mut changed=saved.clone();changed[0]^=1;fs::write(&map_path,&changed).unwrap();
+            assert_eq!(head,fs::read(f.root.join("live/committed.json")).unwrap());
+            assert_eq!(checked.revalidate(&f.root,&f.config,&data.outcome,&artifacts),SatReplayVerdict::Rejected);
+            let stopped=checked.charged();
+            fs::write(&map_path,&saved).unwrap();
+            assert_eq!(checked.revalidate(&f.root,&f.config,&data.outcome,&artifacts),SatReplayVerdict::Rejected);
+            assert_eq!(checked.charged(),stopped,"restoring bytes cannot reset failed owner");
+            assert!(matches!(&checked.owner,SatReplayOwner::Terminal(_)),"failure keeps prior checked frame and new raw evidence");
+            assert_eq!(head, fs::read(f.root.join("live/committed.json")).unwrap());
+            let mut forged = data.outcome.clone();
+            forged["patterns_checked"] = serde_json::json!(2);
+            let refused = verify_sat_initial_cell(&f.root, &f.config, &forged, &artifacts, policy());
+            assert_eq!(refused.verdict(), SatReplayVerdict::Rejected);
+            match &refused.owner {
+                SatReplayOwner::Failed(failure) => assert!(failure.frame.has_checked_map()),
+                _ => panic!("terminal rejection must retain mathematical owner"),
+            }
+            let mut exhausted = policy(); exhausted.work = 1;
+            let refused = verify_sat_initial_cell(&f.root, &f.config, &data.outcome, &artifacts, exhausted);
+            assert_eq!(refused.verdict(), SatReplayVerdict::Rejected);
+            assert!(matches!(refused.owner, SatReplayOwner::Failed(_)));
+            assert_eq!(head, fs::read(f.root.join("live/committed.json")).unwrap());
+        }
+    }
+    #[test]
+    fn reserved_sat_payload_triggers_replay_without_request_or_outcome_labels() {
+        let f = verified_worker_original_tests::Fixture::with_ordinary_runtime_shape(23, false, "sat");
+        assert!(!needs_sat_initial_replay(&f.config, &Value::Null, &[]));
+        let a = dataset::types::Artifact { path: "live/payloads/sat-original-pattern-0.gate.json".into(), role: "stripped".into(), encoding: "json".into(), sha256: "0".repeat(64), bytes: 0 };
+        assert!(needs_sat_initial_replay(&f.config, &Value::Null, &[a]));
+    }
+}
+
+#[cfg(test)]
+mod sat_versioned_activation_controls {
+    use super::*;
+    #[test]
+    fn delivered_four_cell_v1_metadata_remains_exact_and_does_not_dispatch_sat() {
+        let protocol: Value = serde_json::from_str(include_str!("testdata/sat_channel_v1/protocol.json")).unwrap();
+        for (config, manifest) in [
+            (include_str!("testdata/sat_channel_v1/cell0-config.json"),include_str!("testdata/sat_channel_v1/cell0-manifest.json")),
+            (include_str!("testdata/sat_channel_v1/cell1-config.json"),include_str!("testdata/sat_channel_v1/cell1-manifest.json")),
+            (include_str!("testdata/sat_channel_v1/cell2-config.json"),include_str!("testdata/sat_channel_v1/cell2-manifest.json")),
+            (include_str!("testdata/sat_channel_v1/cell3-config.json"),include_str!("testdata/sat_channel_v1/cell3-manifest.json")),
+        ] {
+            let original: CaseConfig=serde_json::from_str(config).unwrap();
+            let m:Value=serde_json::from_str(manifest).unwrap();
+            assert_eq!(serde_json::to_value(&original).unwrap(),m["config"]);
+            assert_eq!(protocol["extensions"]["dataset_channels"],m["config"]["channels"]);
+            let actual=requested_channel_disposition(&original).unwrap().unwrap();
+            assert_eq!(actual,m["outcome"]["requested_channels"]);
+            verify_requested_channel_disposition(&original,&m["outcome"]).unwrap();
+            assert!(!needs_sat_initial_replay(&original,&m["outcome"],&[]));
+            // Historical eligible SAT also remains unsupported, rather than
+            // silently changing meaning when a newer binary sees v1 bytes.
+            let mut eligible=original.clone();eligible.solver="sat".into();
+            let old=requested_channel_disposition(&eligible).unwrap().unwrap();
+            assert_eq!(old["sat_initial"],actual["sat_initial"]);
+            assert_eq!(koblitz_m3::sat_original_owner::worker::eligibility(&eligible),koblitz_m3::sat_original_owner::worker::Eligibility::Unsupported);
+            let before=serde_json::to_vec(&eligible).unwrap();
+            eligible.channels.as_mut().unwrap().schema="crypto.ml-dataset.channel-requests/v2".into();
+            eligible.channels.as_ref().unwrap().validate().unwrap();
+            assert_ne!(serde_json::to_vec(&eligible).unwrap(),before);
+            assert_eq!(requested_channel_disposition(&eligible).unwrap().unwrap()["sat_initial"]["status"],"requested");
+            assert!(needs_sat_initial_replay(&eligible,&Value::Null,&[]));
+        }
+    }
+    #[test]
+    fn every_success_claim_is_rejected_without_complete_initial_evidence() {
+        for (field,value) in [("initial_checked",json!(true)),("solver_completed",json!(true)),
+            ("scalar_recovered_without_witness",json!(true)),("ecdlp_pipeline_completed",json!(true)),("status",json!("verified"))] {
+            let mut v=json!({"status":"partial","solver_completed":false});v[field]=value;
+            assert!(sat_terminal_overclaims(&v),"field {field}");
+        }
+        assert!(!sat_terminal_overclaims(&json!({"status":"partial","solver_completed":false,"initial_checked":false})));
+    }
+}
+
+#[cfg(test)]
+mod sat_report_admission_failure_controls {
+    use super::*;
+    use crate::ml_dataset::{self as dataset,storage,telemetry};
+    #[test]
+    fn frozen_low_original_cap_refuses_report_and_retains_owner_through_parent_errors() {
+        // Source-bound negative arm; never replaces either positive fixture cap.
+        let f=verified_worker_original_tests::Fixture::with_sat_initial_work(23,false,332);
+        dataset::execution::create(&f.root).unwrap();
+        let mut artifacts=Vec::new();
+        let case=telemetry::measured(&f.root,&mut artifacts,"curve-construction",||dataset::curves::generate(&f.config)).unwrap();
+        let token=verify_and_store_worker_originals(&f.config,&case,&f.root,Some(&f.binding),&mut artifacts).unwrap();
+        assert_eq!(token.public_bytes,2849,"source-frozen input quote changed");
+        assert_eq!(token.factor_base_bytes,4906,"source-frozen input quote changed");
+        assert_eq!(case.factor_base["points"].as_array().unwrap().len(),4);
+        let context=dataset::execution::admit(&f.root).unwrap().unwrap();
+        let launch_len=serde_json::to_vec(&context.launch).unwrap().len();
+        assert!((850..=888).contains(&launch_len));
+        let (_,caps)=dataset::admit_capture_context(&f.root).unwrap().unwrap();
+        let output=solve_with_verified_worker_originals(&f.config,&case,&f.root.join("live"),f.binding.clone(),caps,Some(&context),&token).unwrap();
+        let c=output.residual.sat.as_ref().expect("actual refused SAT owner");
+        assert_eq!(c.stage,koblitz_m3::sat_original_owner::worker::Stage::ReportAdmission);
+        assert!(!c.report_admitted);
+        let before=c.original_ledger_for_control().expect("paid original owner retained");
+        assert_eq!(before.0,339968);
+        assert_eq!(before.1,325472+8*launch_len as u64);
+        assert_eq!(before.3,Some(koblitz_m3::Stop::Work));
+        assert!(before.2>2*1024*1024);
+        assert!(output.data.outcome.is_null());
+        let head=fs::read(f.root.join("live/committed.json")).unwrap();
+        let mut retained=WorkerResidualCustody::default();
+        let failed=dataset::finish_retained_worker_output(&f.root,&mut artifacts,output,Err("injected terminal telemetry failure".into()),&mut retained);
+        assert!(failed.is_err());
+        assert_eq!(retained.sat.as_ref().unwrap().original_ledger_for_control(),Some(before));
+        // Genuine failed parent writes after transfer cannot erase that owner.
+        fs::create_dir(f.root.join("result.json")).unwrap();
+        assert!(storage::write_json(&f.root,"result.json","solver-outcome",&json!({"status":"error"})).is_err());
+        fs::create_dir(f.root.join("worker-artifacts.json")).unwrap();
+        assert!(storage::write_json(&f.root,"worker-artifacts.json","artifact-registry",&artifacts).is_err());
+        assert_eq!(retained.sat.as_ref().unwrap().original_ledger_for_control(),Some(before));
+        assert_eq!(head,fs::read(f.root.join("live/committed.json")).unwrap());
+    }
+}
+
+#[cfg(test)]
+#[path = "sat_paid_report_telemetry_control.rs"]
+mod sat_paid_report_telemetry_control;
+
+#[cfg(test)]
+#[path = "sat_initial_branch_controls.rs"]
+mod sat_initial_branch_controls;

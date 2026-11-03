@@ -1,4 +1,5 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
+pub mod custody;
 pub mod budget;
 pub mod capture;
 pub mod curves;
@@ -33,12 +34,19 @@ use types::{Artifact, CaseConfig, FactorBasePolicy};
 
 #[derive(Args)]
 pub struct DatasetArgs {
+    /// Independently authorized finite historical SAT replay allowance.
+    #[arg(long, global=true, requires="sat_replay_receipt")]
+    pub sat_replay_policy: Option<PathBuf>,
+    #[arg(long, global=true, requires="sat_replay_policy")]
+    pub sat_replay_receipt: Option<PathBuf>,
     #[command(subcommand)]
     pub command: DatasetCommand,
 }
 
 #[derive(Subcommand)]
 pub enum DatasetCommand {
+    /// Create, verify, publish or restore a restricted full-run custody bundle.
+    Custody(custody::CustodyArgs),
     /// Validate a delivered launch grant and start the frozen bounded worker.
     Start {
         #[arg(long)]
@@ -64,6 +72,7 @@ pub enum DatasetCommand {
     Verify {
         #[arg(long)]
         out: PathBuf,
+
     },
     /// Count recorded outcomes without rerunning any solver.
     Status {
@@ -992,7 +1001,11 @@ fn fetch_budget_object(
 }
 
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
+    sat_replay_caller::invoke(args, || run_dispatch(args))
+}
+fn run_dispatch(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
+        DatasetCommand::Custody(a)=>println!("{}",custody::run(a)?),
         DatasetCommand::Start { resume } => {
             let outcome = startup_gate::start(*resume).map_err(|e| e.to_string())?;
             println!(
@@ -1089,9 +1102,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             );
         }
         DatasetCommand::Worker { config, out } => worker(&read_json(config)?, out)?,
-        DatasetCommand::Verify { out } => {
-            println!("{}", verify_run(out, true)?);
-        }
+        DatasetCommand::Verify { out } => { println!("{}",verify_run(out,true)?); }
         DatasetCommand::Status { out } => {
             println!("{}", verify_run(out, false)?);
         }
@@ -1421,6 +1432,18 @@ fn adopt_worker_solver_artifacts(
 
 /// Preserve native retained evidence when post-operation telemetry fails.
 /// Generic legacy failures retain their existing error behavior.
+fn finish_retained_worker_output(
+    out: &Path, registry: &mut Vec<Artifact>, output: solvers::WorkerSolveOutput,
+    measurement: Result<(), String>, retained: &mut solvers::WorkerResidualCustody,
+) -> Result<Value, String> {
+    let (data, stored, residual) = output.into_parts();
+    *retained = residual;
+    if retained.sat_report_unavailable() {
+        return Err("SAT initial terminal report was not admitted or already consumed".into());
+    }
+    finish_worker_solver_artifacts(out, registry, data, stored, measurement)
+}
+
 fn finish_worker_solver_artifacts(
     out: &Path,
     registry: &mut Vec<Artifact>,
@@ -1532,9 +1555,7 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                     .unwrap_or_else(|| "solver returned no output".into()))
             }
         };
-        let (data, stored, residual) = solved.into_parts();
-        retained_solver_custody = residual;
-        finish_worker_solver_artifacts(&out, &mut registry, data, stored, measurement)
+        finish_retained_worker_output(&out, &mut registry, solved, measurement, &mut retained_solver_custody)
     })();
     let mut outcome = match result {
         Ok(v) => v,
@@ -1729,6 +1750,8 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         "trace_mib":a.trace_mib,"execution_context_required":cfg!(target_os = "linux"),"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
     let result = (|| {
+        // Gate independently authorized replay before dispatch, not after generating evidence.
+        sat_replay_caller::authorize_generation(&plan, &binding)?;
         storage::write_json(&out, "run.json", "run-binding", &binding)?;
         storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
         storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
@@ -1759,6 +1782,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                     "cell {index} has an incomplete attempt; reconcile it before retrying"
                 ));
             }
+            sat_replay_caller::authorize_cell_dispatch(index, &config)?;
             let scope = cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
             fs::create_dir(&dir).map_err(|e| e.to_string())?;
             sync_dir(&cells)?;
@@ -2691,7 +2715,13 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
 fn verify_cell(dir:&Path,replay:bool)->Result<CellManifest,String>{
     verify_cell_with_boolean_projection(dir,replay,false).map(|(m,_)|m)
 }
+#[path = "sat_replay_caller.rs"]
+mod sat_replay_caller;
 fn verify_cell_with_boolean_projection(dir:&Path,replay:bool,project:bool)
+    ->Result<(CellManifest,Option<solvers::BooleanProjection>),String>{
+    sat_replay_caller::with_current(|session| verify_cell_with_replay_session(dir,replay,project,session))
+}
+fn verify_cell_with_replay_session(dir:&Path,replay:bool,project:bool,sat_session:Option<&mut sat_replay_caller::Session>)
     ->Result<(CellManifest,Option<solvers::BooleanProjection>),String>{
     let mut boolean_projection=None;
     checked_directory(dir, false)?;
@@ -2729,6 +2759,10 @@ fn verify_cell_with_boolean_projection(dir:&Path,replay:bool,project:bool)
         return Err("cell provenance differs from frozen plan".into());
     }
     solvers::verify_requested_channel_disposition(&manifest.config, &manifest.outcome)?;
+    if solvers::needs_sat_initial_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
+        let session=sat_session.ok_or("explicit independently bounded SAT replay policy required")?;
+        session.verify(dir,&manifest)?;
+    }
     // Bind the original cell before admitting any specialized replay claim.
     let dynamic_replay = solvers::verify_dynamic_cell(
         dir,
@@ -3159,7 +3193,7 @@ fn verify_run(root: &Path, replay: bool) -> Result<Value, String> {
     let mut known_answer_cells = 0usize;
     let mut independently_solved_cells = 0usize;
     for dir in completed_cells(root)? {
-        let m = verify_cell(&dir, replay)?;
+        let m = verify_cell_with_boolean_projection(&dir,replay,false)?.0;
         if m.plan_sha256 != hash
             || m.config != plan.cell(m.cell_index)?
             || m.cell_index % shard_count != shard_index
@@ -7329,7 +7363,7 @@ mod channel_plan_tests {
         fs::create_dir(&path).unwrap();
         let request_path=path.join("request.json");let plan_path=path.join("plan.json");
         fs::write(&request_path,serde_json::to_vec(&request()).unwrap()).unwrap();
-        run(&DatasetArgs{command:DatasetCommand::Plan(PlanArgs{
+        run(&DatasetArgs{sat_replay_policy:None,sat_replay_receipt:None,command:DatasetCommand::Plan(PlanArgs{
             channels:Some(request_path),out:plan_path.clone(),n:"23-31,47-61".into(),m:"2-15".into(),
             families:"binary,koblitz,prime".into(),solvers:"f4,f5,sat".into(),curve_seeds:1,generators:1,keys:1,
             seed:20261027,factor_base_size:4,factor_base_policies:None,degree_bound:3,work_limit:16384,

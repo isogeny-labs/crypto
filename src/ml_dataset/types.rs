@@ -107,7 +107,8 @@ pub(super) fn present_channels<'de,D:serde::Deserializer<'de>>(d:D)->Result<Opti
 }
 impl ChannelRequests {
     pub fn validate(&self)->Result<(),String>{
-        if self.schema != "crypto.ml-dataset.channel-requests/v1" || (self.boolean_consequence.is_none() && self.sat_initial.is_none()) {
+        if !matches!(self.schema.as_str(), "crypto.ml-dataset.channel-requests/v1" | "crypto.ml-dataset.channel-requests/v2") || (self.boolean_consequence.is_none() && self.sat_initial.is_none())
+            || (self.schema == "crypto.ml-dataset.channel-requests/v2" && self.sat_initial.is_none()) {
             return Err("unknown or empty channel request".into());
         }
         if matches!(self.boolean_consequence,Some(BooleanRequest::Produce{row_index}) if row_index>7) {
@@ -272,6 +273,7 @@ pub enum ChannelDispositionStatus { Requested, Unsupported }
 pub enum ChannelDispositionReason {
     RequiresActualOriginalShapeAndRetainedRow, OutsideOrdinaryN3Profile,
     SatCentralWorkerReplayNotIntegrated,
+    RequiresActualSatInitialReplay, OutsideSatInitialProfile,
 }
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(deny_unknown_fields)]
@@ -303,12 +305,15 @@ mod channel_tests {
             r#"{"channels":null}"#,
             r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1"}}"#,
             r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","sat_initial":null}}"#,
-            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v2","sat_initial":{"mode":"capture_and_check_initial"}}}"#,
+            r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v3","sat_initial":{"mode":"capture_and_check_initial"}}}"#,
             r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","boolean_consequence":{"mode":"produce","row_index":8}}}"#,
             r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","boolean_consequence":{"mode":"produce","row_index":0,"row_index":1}}}"#,
             r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","sat_initial":{"mode":"capture_and_check_initial","extra":true}}}"#,
         ] { assert!(serde_json::from_str::<Envelope>(bad).is_err(),"{bad}"); }
         let c:Envelope=serde_json::from_str(r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v1","boolean_consequence":{"mode":"produce","row_index":0},"sat_initial":{"mode":"capture_and_check_initial"}}}"#).unwrap();
         c.channels.unwrap().validate().unwrap();
+        let activated:Envelope=serde_json::from_str(r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v2","sat_initial":{"mode":"capture_and_check_initial"}}}"#).unwrap();
+        assert_eq!(activated.channels.unwrap().schema,"crypto.ml-dataset.channel-requests/v2");
+        assert!(serde_json::from_str::<Envelope>(r#"{"channels":{"schema":"crypto.ml-dataset.channel-requests/v2","boolean_consequence":{"mode":"produce","row_index":0}}}"#).is_err());
     }
 }
