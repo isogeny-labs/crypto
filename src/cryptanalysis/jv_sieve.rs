@@ -577,13 +577,29 @@ impl FpRing {
         targets: &[usize],
         rng: &mut StdRng,
     ) -> Vec<(FpPoly, usize)> {
+        self.factor_lazy_hint(a, targets, rng, None)
+    }
+    /// [`FpRing::factor_lazy`] with the distinct `F_p` roots of `a` already
+    /// known (`roots`, ascending): the evaluation-based root search is then
+    /// skipped when `a` is squarefree, and runs as before otherwise.
+    pub fn factor_lazy_hint(
+        &self,
+        a: &[u64],
+        targets: &[usize],
+        rng: &mut StdRng,
+        roots: Option<&[u64]>,
+    ) -> Vec<(FpPoly, usize)> {
         let sq = self.squarefree(a);
         if sq.len() != 1 || sq[0].1 != 1 {
             return self.factor(a, rng);
         }
         let mut out: Vec<(FpPoly, usize)> = Vec::new();
         let mut rest = sq.into_iter().next().unwrap().0;
-        for r in self.roots_by_table(&rest) {
+        let found = match roots {
+            Some(r) => r.to_vec(),
+            None => self.roots_by_table(&rest),
+        };
+        for r in found {
             super::jv_bitops::hook_adds(self.p, 1);
             let lin = vec![(self.p - r) % self.p, 1];
             rest = self.exact_div(&rest, &lin);
@@ -939,6 +955,20 @@ pub fn lines_for_b_with(
     rng: &mut StdRng,
     lazy: bool,
 ) -> Vec<Line> {
+    lines_for_b_hint(ring, fq, setup, b, rng, lazy, None)
+}
+
+/// [`lines_for_b_with`] given the ascending `F_p` roots of `G = Im(B²h)`
+/// (from [`roots_by_incidence`]); the same lines, without the root search.
+pub fn lines_for_b_hint(
+    ring: &FpRing,
+    fq: &Fq,
+    setup: &SieveSetup,
+    b: &[E2],
+    rng: &mut StdRng,
+    lazy: bool,
+    roots: Option<&[u64]>,
+) -> Vec<Line> {
     let p = setup.p;
     if b.is_empty() {
         return Vec::new();
@@ -960,7 +990,7 @@ pub fn lines_for_b_with(
     }
     let factors = if lazy {
         let targets: Vec<usize> = (lo..=hi.min(dg)).collect();
-        ring.factor_lazy(&g, &targets, rng)
+        ring.factor_lazy_hint(&g, &targets, rng, roots)
     } else {
         ring.factor(&g, rng)
     };
@@ -1002,6 +1032,164 @@ pub fn lines_for_b_with(
     out
 }
 
+// ── Root search of G = Im(B²h) by incidence (m = 9) ─────────────────────
+
+/// For `m = 9` (`B = x + b₀ + b₁t`, `U = x + b₀`, `V = b₁`) and `b₁ ≠ 0`,
+/// `G(x) = (U² + ωV²) h₁(x) + 2UV h₀(x)` vanishes exactly when `U = νV` for
+/// a root `ν` of `ν² + 2R(x)ν + ω`, `R = h₀/h₁` (when `h₁(x) = 0`, when
+/// `U = 0`).  So each `x` is a pair of lines `b₀ = νb₁ − x` in the
+/// `(b₀, b₁)` plane, and the roots of `G` for a set of `B`'s are the
+/// incidences of the set with the lines.  Built once per run.
+pub struct NuLines {
+    /// `(x, ν)`, ascending in `x`.
+    pub lines: Vec<(u64, u64)>,
+    /// Some `x` is a root of `h` itself (a root of every `G`): not handled,
+    /// the caller falls back to the evaluation-based search.
+    pub degenerate: bool,
+    /// `F_p` multiplications spent on the table.
+    pub muls: u64,
+}
+
+pub fn nu_lines(setup: &SieveSetup) -> NuLines {
+    let p = setup.p;
+    let pu = p as usize;
+    let ring = FpRing::new(p);
+    let h0v: Vec<u64> = (0..p).map(|x| ring.eval(&setup.h0, x)).collect();
+    let h1v: Vec<u64> = (0..p).map(|x| ring.eval(&setup.h1, x)).collect();
+    let nz: Vec<usize> = (0..pu).filter(|&x| h1v[x] != 0).collect();
+    // Montgomery batch inversion of the non-zero h₁(x)
+    let mut pre = Vec::with_capacity(nz.len());
+    let mut acc = 1u64;
+    for &x in &nz {
+        pre.push(acc);
+        acc = mm(acc, h1v[x], p);
+    }
+    let mut inv = inv_mod(acc, p);
+    let mut inv_of = vec![0u64; pu];
+    for (i, &x) in nz.iter().enumerate().rev() {
+        inv_of[x] = mm(inv, pre[i], p);
+        inv = mm(inv, h1v[x], p);
+    }
+    let mut muls = ring.muls() + 3 * nz.len().saturating_sub(1) as u64 + INV_COST;
+    let mut lines = Vec::new();
+    let mut degenerate = false;
+    for x in 0..p {
+        let xi = x as usize;
+        if h1v[xi] == 0 {
+            if h0v[xi] == 0 {
+                degenerate = true;
+            } else {
+                lines.push((x, 0));
+            }
+            continue;
+        }
+        let r = mm(h0v[xi], inv_of[xi], p);
+        let disc = sm(mm(r, r, p), setup.w % p, p);
+        muls += 2;
+        let sq = setup.sqrt[disc as usize];
+        if sq == u64::MAX {
+            continue;
+        }
+        let neg_r = sm(0, r, p);
+        lines.push((x, am(neg_r, sq, p)));
+        if sq != 0 {
+            lines.push((x, sm(neg_r, sq, p)));
+        }
+    }
+    NuLines {
+        lines,
+        degenerate,
+        muls,
+    }
+}
+
+/// The ascending `F_p` roots of `G` for each `B = (b₀, b₁)` of `bs` (`None`
+/// when `b₁ = 0`: the caller searches by evaluation), by walking each line
+/// `b₀ = νb₁ − x` over `b₁` with one addition and one table lookup per step.
+/// `slot` is scratch of `p²` zeros, returned zeroed.  Returns the roots and
+/// the additions and lookups spent (marking and unmarking a `B` is a lookup
+/// each).
+pub fn roots_by_incidence(
+    p: u64,
+    nu: &NuLines,
+    bs: &[(u64, u64)],
+    slot: &mut Vec<u32>,
+) -> (Vec<Option<Vec<u64>>>, u64, u64) {
+    let pu = p as usize;
+    if slot.len() != pu * pu {
+        *slot = vec![0u32; pu * pu];
+    }
+    let (mut adds, mut lookups) = (0u64, 0u64);
+    let mut out: Vec<Option<Vec<u64>>> = bs
+        .iter()
+        .map(|&(_, b1)| if b1 == 0 { None } else { Some(Vec::new()) })
+        .collect();
+    for (i, &(b0, b1)) in bs.iter().enumerate() {
+        if b1 != 0 {
+            slot[b1 as usize * pu + b0 as usize] = i as u32 + 1;
+            lookups += 1;
+        }
+    }
+    for &(x, v) in &nu.lines {
+        let mut b0 = (p - x) % p;
+        adds += 1;
+        for b1 in 1..pu {
+            b0 += v;
+            if b0 >= p {
+                b0 -= p;
+            }
+            adds += 1;
+            lookups += 1;
+            let o = slot[b1 * pu + b0 as usize];
+            if o != 0 {
+                let r = out[o as usize - 1].as_mut().unwrap();
+                if r.last() != Some(&x) {
+                    r.push(x);
+                }
+            }
+        }
+    }
+    for &(b0, b1) in bs {
+        if b1 != 0 {
+            slot[b1 as usize * pu + b0 as usize] = 0;
+            lookups += 1;
+        }
+    }
+    // bitop/v1: the membership test of every step
+    super::jv_bitops::words(lookups);
+    (out, adds, lookups)
+}
+
+/// `P₃` and `N(B)` at every `x ∈ F_p`, shared by the lines of one `B`.
+pub struct SharedB {
+    re: Vec<u64>,
+    n4: Vec<u64>,
+}
+
+/// `poly(x)` for every `x ∈ F_p` by forward differences (the same table and
+/// advances as [`sieve_line`], `adds` counting each).
+fn value_array(ring: &FpRing, poly: &[u64], adds: &mut u64) -> Vec<u64> {
+    let p = ring.p;
+    let mut t = difference_table(ring, poly, adds);
+    let d = t.len() - 1;
+    let mut out = Vec::with_capacity(p as usize);
+    for _ in 0..p {
+        out.push(t[0]);
+        for k in 0..d {
+            t[k] = am(t[k], t[k + 1], p);
+        }
+        *adds += d as u64;
+    }
+    out
+}
+
+pub fn shared_for_b(ring: &FpRing, line: &Line, adds: &mut u64) -> SharedB {
+    SharedB {
+        re: value_array(ring, &line.p3, adds),
+        n4: value_array(ring, &line.p4, adds),
+    }
+}
+
 /// Counters indexed by `s`, tagged by line so that no reset is needed.
 pub struct Counters {
     tag: Vec<u32>,
@@ -1031,6 +1219,8 @@ pub struct SieveCost {
     /// Counter updates (one per root).
     pub lookups: u64,
     pub roots: u64,
+    /// Reads of the arrays shared by the lines of one `B` (two per base step).
+    pub shared_reads: u64,
 }
 
 /// Forward-difference table of `P` at `x = 0`: `Δ^k P(0)`, `k = 0..deg`.
@@ -1059,6 +1249,7 @@ pub fn sieve_line(
     line: &Line,
     ctr: &mut Counters,
     all_counts: Option<&mut Vec<u8>>,
+    shared: Option<&SharedB>,
 ) -> (Vec<u64>, SieveCost) {
     let p = setup.p;
     let m = setup.m as u8;
@@ -1076,8 +1267,14 @@ pub fn sieve_line(
     //   s = (Re(x) ± N(B)(x)·ρ(x)) / (2a)
     // and the tables advanced are P₂ = ωA₁′², P₃ = Re(B²h), P₄ = N(B).
     let mut t2 = difference_table(ring, &line.p2, &mut cost.adds);
-    let mut t3 = difference_table(ring, &line.p3, &mut cost.adds);
-    let mut t4 = difference_table(ring, &line.p4, &mut cost.adds);
+    let (mut t3, mut t4) = if shared.is_some() {
+        (Vec::new(), Vec::new())
+    } else {
+        (
+            difference_table(ring, &line.p3, &mut cost.adds),
+            difference_table(ring, &line.p4, &mut cost.adds),
+        )
+    };
     let mut hits: Vec<u64> = Vec::new();
     // (Re, r, 2a) of the base steps, inverted in batches
     let mut pending: Vec<(u64, u64, u64)> = Vec::with_capacity(256);
@@ -1134,8 +1331,14 @@ pub fn sieve_line(
         if setup.in_base[x as usize] {
             cost.base_steps += 1;
             let a = t2[0];
-            let re = t3[0];
-            let r = mm(t4[0], setup.rho[x as usize], p);
+            let (re, n4) = match shared {
+                Some(sh) => {
+                    cost.shared_reads += 2;
+                    (sh.re[x as usize], sh.n4[x as usize])
+                }
+                None => (t3[0], t4[0]),
+            };
+            let r = mm(n4, setup.rho[x as usize], p);
             cost.muls += 1;
             if a == 0 {
                 if re != 0 {
@@ -1163,6 +1366,9 @@ pub fn sieve_line(
         }
         // advance the difference tables to x + 1
         for t in [&mut t2, &mut t3, &mut t4] {
+            if t.is_empty() {
+                continue;
+            }
             let d = t.len() - 1;
             for k in 0..d {
                 t[k] = am(t[k], t[k + 1], p);
@@ -1388,6 +1594,17 @@ pub struct SieveDlpReport {
     pub enum_muls: u64,
     /// Additions of the enumeration's root search by evaluation.
     pub enum_adds: u64,
+    /// Lookups of the enumeration's root search by incidence (zero when off).
+    #[serde(default)]
+    pub enum_lookups: u64,
+    /// Reads of the arrays shared by the lines of one `B` (zero when off).
+    #[serde(default)]
+    pub sieve_shared_reads: u64,
+    /// B's whose root search used the incidence scan, and B's with shared arrays.
+    #[serde(default)]
+    pub inc_hinted_bs: u64,
+    #[serde(default)]
+    pub shared_bs: u64,
     pub sieve_muls: u64,
     pub sieve_adds: u64,
     pub sieve_lookups: u64,
@@ -1463,6 +1680,10 @@ struct BatchOut {
     verify_muls: u64,
     verified: u64,
     failed: u64,
+    /// B's whose root search was answered by the incidence scan.
+    hinted_bs: u64,
+    /// B's with two or more lines, whose `P₃`, `N(B)` arrays were shared.
+    shared_bs: u64,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1474,6 +1695,8 @@ fn sieve_batch(
     scramble: u128,
     ks: std::ops::Range<u128>,
     seed: u64,
+    hints: Option<&[Option<Vec<u64>>]>,
+    share: bool,
 ) -> BatchOut {
     let ctx = Ctx::new(spec);
     let fq = &ctx.f.f;
@@ -1495,26 +1718,45 @@ fn sieve_batch(
         verify_muls: 0,
         verified: 0,
         failed: 0,
+        hinted_bs: 0,
+        shared_bs: 0,
     };
     let mut rng =
         StdRng::seed_from_u64(seed ^ (ks.start as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+    let k0 = ks.start;
     for k in ks {
         out.bs += 1;
         let b = b_from_index(&setup, k, scramble);
         fq.reset_muls();
         ring.reset();
-        let lines = lines_for_b(&ring, fq, &setup, &b, &mut rng);
+        let hint = hints.and_then(|h| h[(k - k0) as usize].as_deref());
+        out.hinted_bs += hint.is_some() as u64;
+        let lines = lines_for_b_hint(&ring, fq, &setup, &b, &mut rng, true, hint);
         out.enum_muls += fq.muls() + ring.muls();
         out.enum_adds += ring.adds();
+        // the lines of one B share P₃ = Re(B²h) and N(B): their values at
+        // every x, computed once
+        let shared = if share && lines.len() >= 2 {
+            let m0 = ring.muls();
+            let mut ad = 0u64;
+            let sh = shared_for_b(&ring, &lines[0], &mut ad);
+            out.cost.adds += ad;
+            out.cost.muls += ring.muls() - m0;
+            out.shared_bs += 1;
+            Some(sh)
+        } else {
+            None
+        };
         for (li, line) in lines.iter().enumerate() {
             out.lines += 1;
-            let (hits, cost) = sieve_line(&ring, &setup, line, &mut ctr, None);
+            let (hits, cost) = sieve_line(&ring, &setup, line, &mut ctr, None, shared.as_ref());
             out.cost.steps += cost.steps;
             out.cost.base_steps += cost.base_steps;
             out.cost.muls += cost.muls;
             out.cost.adds += cost.adds;
             out.cost.lookups += cost.lookups;
             out.cost.roots += cost.roots;
+            out.cost.shared_reads += cost.shared_reads;
             for s in hits {
                 out.hits += 1;
                 fq.reset_muls();
@@ -1540,6 +1782,11 @@ fn sieve_batch(
         }
     }
     out
+}
+
+/// `name` unset, or set to anything but `0`.
+fn adds_switch(name: &str) -> bool {
+    std::env::var(name).map_or(true, |v| v != "0")
 }
 
 /// The route with the sieve: relations among factor-base points by the
@@ -1658,6 +1905,8 @@ pub fn run_cover_sieve_dlp_on(
     let mut scramble = scramble_for(m);
     let mut space = b_space(&setup);
     let mut next_k: u128 = 0;
+    let mut nu_cache: Option<NuLines> = None;
+    let mut slot: Vec<u32> = Vec::new();
     let mut sieve_rows: Vec<SparseRel> = Vec::new();
     let mut sieve_rels: Vec<SieveRel> = Vec::new();
     let mut seen: std::collections::HashSet<Vec<(usize, i8)>> = std::collections::HashSet::new();
@@ -1698,9 +1947,49 @@ pub fn run_cover_sieve_dlp_on(
             .filter(|r| r.start < r.end)
             .collect();
         next_k = ranges.last().map(|r| r.end).unwrap_or(space);
-        let outs: Vec<BatchOut> = ranges
+        // opt-out switches of the two add-saving changes (default on)
+        let inc_on = adds_switch("JV_ADDS_INC") && m == 9 && setup.m == 9;
+        let share_on = adds_switch("JV_ADDS_SHARE");
+        let mut roots_all: Vec<Option<Vec<u64>>> = Vec::new();
+        if inc_on {
+            if nu_cache.is_none() {
+                let nu = nu_lines(&setup);
+                rep.table_muls += nu.muls;
+                nu_cache = Some(nu);
+            }
+            let nu = nu_cache.as_ref().unwrap();
+            if !nu.degenerate {
+                let bs: Vec<(u64, u64)> = ranges
+                    .iter()
+                    .flat_map(|r| r.clone())
+                    .map(|k| {
+                        let b = b_from_index(&setup, k, scramble);
+                        (b[0].0[0], b[0].0[1])
+                    })
+                    .collect();
+                let (roots, ad, lk) = roots_by_incidence(p, nu, &bs, &mut slot);
+                rep.enum_adds += ad;
+                rep.enum_lookups += lk;
+                roots_all = roots;
+            }
+        }
+        let mut off = 0usize;
+        let jobs: Vec<(std::ops::Range<u128>, Option<&[Option<Vec<u64>>]>)> = ranges
+            .into_iter()
+            .map(|r| {
+                let n = (r.end - r.start) as usize;
+                let h = if roots_all.is_empty() {
+                    None
+                } else {
+                    Some(&roots_all[off..off + n])
+                };
+                off += n;
+                (r, h)
+            })
+            .collect();
+        let outs: Vec<BatchOut> = jobs
             .into_par_iter()
-            .map(|ks| sieve_batch(&spec, &base, &by_x, m, scramble, ks, seed))
+            .map(|(ks, h)| sieve_batch(&spec, &base, &by_x, m, scramble, ks, seed, h, share_on))
             .collect();
         if rep.per_m.last().map(|e| e.0) != Some(m) {
             rep.per_m.push((m, 0, 0, 0, 0));
@@ -1717,6 +2006,9 @@ pub fn run_cover_sieve_dlp_on(
             rep.sieve_muls += o.cost.muls;
             rep.sieve_adds += o.cost.adds;
             rep.sieve_lookups += o.cost.lookups;
+            rep.sieve_shared_reads += o.cost.shared_reads;
+            rep.inc_hinted_bs += o.hinted_bs;
+            rep.shared_bs += o.shared_bs;
             rep.roots += o.cost.roots;
             rep.hits += o.hits;
             rep.false_hits += o.false_hits;
@@ -1937,8 +2229,13 @@ pub fn run_cover_sieve_dlp_on(
         / full_rels.len().max(1) as f64;
     rep.total_muls =
         rep.setup_muls + rep.base_muls + rep.relation_muls + rep.descent_muls + rep.la_muls;
-    rep.total_plus =
-        rep.total_muls + rep.sieve_adds + rep.sieve_lookups + rep.enum_adds + line_native;
+    rep.total_plus = rep.total_muls
+        + rep.sieve_adds
+        + rep.sieve_lookups
+        + rep.enum_adds
+        + rep.enum_lookups
+        + rep.sieve_shared_reads
+        + line_native;
     let sqrt_l = (l as f64).sqrt();
     rep.s = rep.total_muls as f64 / (c_e * sqrt_l);
     rep.s_plus = rep.total_plus as f64 / (c_e * sqrt_l);
@@ -2119,7 +2416,8 @@ mod tests {
                 for line in lines_for_b(&ring, fq, &setup, &b, &mut rng) {
                     lines_seen += 1;
                     let mut counts = Vec::new();
-                    let (hits, _) = sieve_line(&ring, &setup, &line, &mut ctr, Some(&mut counts));
+                    let (hits, _) =
+                        sieve_line(&ring, &setup, &line, &mut ctr, Some(&mut counts), None);
                     for s in 1..p {
                         let f = line_poly(&ring, &line, s);
                         // an x where A₀ and B share a root is a root of F(·, s) for
@@ -2162,7 +2460,7 @@ mod tests {
             k += 1;
             for line in lines_for_b(&ring, fq, &setup, &b, &mut rng) {
                 lines += 1;
-                let (hits, _) = sieve_line(&ring, &setup, &line, &mut ctr, None);
+                let (hits, _) = sieve_line(&ring, &setup, &line, &mut ctr, None, None);
                 for s in hits {
                     match relation_from_hit(&ring, fq, &setup, &base, &by_x, &line, s, &mut rng) {
                         None => false_hits += 1,
@@ -2289,6 +2587,118 @@ mod tests {
             );
             assert!(lazy_muls < full_muls, "the lazy enumeration is cheaper");
         }
+    }
+
+    #[test]
+    fn incidence_finds_exactly_the_roots_of_g() {
+        // every B = (b0, b1) of F_p², b1 != 0: the incidence scan's roots are
+        // the evaluation search's roots of G = Im(B²h), ascending
+        for (p, seed) in [(53u64, 2u64), (101, 3), (103, 7)] {
+            let (_spec, ctx, base, _) = small_instance(p, seed);
+            let fq = &ctx.f.f;
+            let setup = sieve_setup(fq, &ctx.cov.hx, &base, 9);
+            let nu = nu_lines(&setup);
+            if nu.degenerate {
+                continue;
+            }
+            let ring = FpRing::new(p);
+            let mut bs = Vec::new();
+            for b1 in 0..p {
+                for b0 in 0..p {
+                    bs.push((b0, b1));
+                }
+            }
+            let mut slot = Vec::new();
+            let (roots, adds, lookups) = roots_by_incidence(p, &nu, &bs, &mut slot);
+            assert!(slot.iter().all(|&v| v == 0), "scratch returned zeroed");
+            assert!(adds > 0 && lookups > 0);
+            let mut checked = 0;
+            for (i, &(b0, b1)) in bs.iter().enumerate() {
+                if b1 == 0 {
+                    assert!(roots[i].is_none());
+                    continue;
+                }
+                let b = vec![E2([b0, b1]), E2::ONE];
+                let b2h = pmul(fq, &pmul(fq, &b, &b), &setup.h);
+                let g: FpPoly = trim(b2h.iter().map(|c| c.0[1]).collect());
+                if g.is_empty() {
+                    continue;
+                }
+                assert_eq!(
+                    roots[i].as_ref().unwrap(),
+                    &ring.roots_by_table(&g),
+                    "p = {p}, B = ({b0}, {b1})"
+                );
+                checked += 1;
+            }
+            assert!(checked > (p * p) as usize / 2);
+        }
+    }
+
+    #[test]
+    fn hinted_lines_and_shared_arrays_change_nothing_but_the_count() {
+        // the same lines, in the same order, from the same rng; the same hits
+        // and the same relations from a line sieved alone and with the
+        // arrays shared by its B
+        let p = 1009u64;
+        let (_spec, ctx, base, _) = small_instance(p, 1);
+        let fq = &ctx.f.f;
+        let setup = sieve_setup(fq, &ctx.cov.hx, &base, 9);
+        let nu = nu_lines(&setup);
+        assert!(!nu.degenerate);
+        let ring = FpRing::new(p);
+        let mut rng0 = StdRng::seed_from_u64(5);
+        let scr = coprime_scramble(b_space(&setup), &mut rng0);
+        let ks = 0..1500u128;
+        let bs: Vec<(u64, u64)> = ks
+            .clone()
+            .map(|k| {
+                let b = b_from_index(&setup, k, scr);
+                (b[0].0[0], b[0].0[1])
+            })
+            .collect();
+        let mut slot = Vec::new();
+        let (roots, _, _) = roots_by_incidence(p, &nu, &bs, &mut slot);
+        let mut ctr = Counters::new(p);
+        let (mut multi, mut hits_seen) = (0, 0);
+        for k in ks {
+            let b = b_from_index(&setup, k, scr);
+            let mut r1 = StdRng::seed_from_u64(k as u64);
+            let mut r2 = StdRng::seed_from_u64(k as u64);
+            ring.reset();
+            let plain = lines_for_b_with(&ring, fq, &setup, &b, &mut r1, true);
+            let (m1, a1) = (ring.muls(), ring.adds());
+            ring.reset();
+            let hint = roots[k as usize].as_deref();
+            let hinted = lines_for_b_hint(&ring, fq, &setup, &b, &mut r2, true, hint);
+            let (m2, a2) = (ring.muls(), ring.adds());
+            let key = |l: &Line| (l.a0.clone(), l.a1.clone());
+            assert_eq!(
+                plain.iter().map(key).collect::<Vec<_>>(),
+                hinted.iter().map(key).collect::<Vec<_>>(),
+                "B #{k}"
+            );
+            if hint.is_some() {
+                assert!(m2 <= m1 && a2 <= a1, "the hint never costs more");
+            }
+            if plain.len() >= 2 {
+                multi += 1;
+                let mut ad = 0;
+                let sh = shared_for_b(&ring, &plain[0], &mut ad);
+                for line in &plain {
+                    let (h0, c0) = sieve_line(&ring, &setup, line, &mut ctr, None, None);
+                    let (h1, c1) = sieve_line(&ring, &setup, line, &mut ctr, None, Some(&sh));
+                    assert_eq!(h0, h1);
+                    hits_seen += h0.len();
+                    assert_eq!(c0.roots, c1.roots);
+                    assert_eq!(c0.lookups, c1.lookups);
+                    assert_eq!(c1.shared_reads, 2 * c1.base_steps);
+                    assert!(c1.adds < c0.adds && c1.muls <= c0.muls);
+                }
+            }
+        }
+        assert!(multi >= 5, "{multi} B's with two or more lines");
+        eprintln!("{multi} multi-line B's, {hits_seen} hits compared");
     }
 
     #[test]
