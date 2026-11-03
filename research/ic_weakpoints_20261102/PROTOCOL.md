@@ -47,3 +47,40 @@ Follow-up arm Y2, fresh seed base 20261103 (independent curves and targets):
 Decision rule: the deficit is real if the pooled Y2 full ratio at phi = 1/2 has a 95% CI excluding 1
 in the same direction; otherwise the frozen-arm deviation is recorded as noise. Y and Y2 are reported
 separately, then pooled.
+
+## Amendment 2 (2026-11-02, before any data): large-prime variation, arm L
+Tool subcommand `dlp` (`tool/src/dlp.rs`). One relation stream per curve; factor base FB_r = the first
+ceil(F p^(r-1)) x-classes (F = all x-classes in F_p, so |FB_r| ~ p^r / 2), r in {1, 5/6, 3/4, 2/3, 1/2}.
+Variants on the same stream: 0LP (full relations only), 1LP (merge relations with one point outside
+FB_r), 2LP (also two, eliminated as graph cycles). Each variant stops at |FB_r| + 21 full rows, which are
+solved mod ell; log Q checked against the planted k. Trial cap 40 p (censored cells reported as such).
+Arms: `dlp --p P --curves 2 --seed 20261104` for P in 127 251 509 1021; P = 2039 as two processes
+(`--c0 0 --curves 1`, `--c0 1 --curves 1`).
+Predictions: (a) 0LP trials T ~ p^(3-2r) (from the measured phi^3 yield); (b) at r = 2/3 the 2LP
+trial exponent is <= 1.4 (theory 4/3, Gaudry-Thome-Theriault-Diem), below rho's 1.5, while 0LP is 5/3;
+(c) every reached cell recovers log Q; (d) merged 2LP rows are heavier than 0LP rows but by < 3x.
+Falsified: (b) if the fitted 2LP exponent at r = 2/3 exceeds 1.5; (c) by any wrong or undetermined k.
+Exponents are least-squares slopes of log T on log p over reached cells (curves averaged in log).
+
+## Amendment 3 (2026-11-02, after arm L, before any new data): square-system trial count
+Arm L stopped each variant at |FB_r| + 21 full rows. At small p the fixed +20 margin dominates the
+target (p = 127, r = 2/3: 34 rows for 13 columns), so T grows more slowly than |FB_r| and every
+exponent fitted on T is biased low. This was noticed from the fits (2LP at r = 2/3: 1.12 +- 0.03 against
+the theoretical 4/3), and is a design flaw, not a finding.
+Change: `dlp` also records `T_square`, the trial at which full rows first reach |FB_r| + 1. The walk,
+seeds and stopping rule are unchanged, so rerunning the arm-L commands (`run_dlp.sh`) must reproduce
+every arm-L record field for field apart from the new field (determinism replay; the arm-L records are
+kept in `data/dlp_run1/`). Exponents and the derived model are refitted on `T_square`; the `T` fits
+stay in the summary under `"metric":"T"`. Predictions (a)-(d) are re-tested on `T_square` unchanged.
+Falsified as before; additionally the replay fails on any differing pre-existing field.
+
+### Amendment 3a (2026-11-02, after the first rerun, before the second)
+The first Amendment-3 rerun (18:10-19:14Z) was void: the `T_square` check was not applied by the code
+edit (every value null), and the replay against `data/dlp_run1/` differed in operation counters only
+(`la_dense_mults` in 43 of 150 records, `merge_ops` in 1; every T, rank, consistency and k identical).
+Cause: `decompose3` returned decompositions in `HashSet` order, which is randomised per process, so the
+row insertion order inside one trial varied. Fix: the decompositions are sorted before use, and the
+`T_square` check is applied. Two runs of `dlp --p 127 --curves 1` are now byte-identical. The rerun
+records were discarded (no information beyond the counts above). The replay criterion is narrowed:
+T, reached, trials_run, decomps_seen, partials_in, full_rows, rank, consistent and k_correct must match
+`data/dlp_run1/`; the operation counters may differ in run 1 because of the old ordering.

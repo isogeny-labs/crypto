@@ -781,6 +781,44 @@ pub struct TowerF4Options {
     /// then reduces to zero, and no pivot changes. On by default; off
     /// reproduces the elimination row for row, multiply-adds included.
     pub full_rank_exit: bool,
+    /// Learn an [`F4Trace`]: on a run that ends in a refutation, record for
+    /// each step the S-rows that gave a new pivot (and the promoted rows),
+    /// and the leading monomials of the new elements. Costs nothing in
+    /// multiply-adds; the result is [`TowerF4Report::learned`].
+    pub record_trace: bool,
+    /// Replay a learned trace on another specialisation of the same system
+    /// shape: each step reduces only the recorded rows (and only the
+    /// reducers they reach), and stops with a failure as soon as the new
+    /// elements' leads differ from the trace's. Only a refutation (`1` in
+    /// the ideal) is a result of a replay; it is sound whatever the trace
+    /// was learned on, because every row computed lies in the ideal. A
+    /// replay that does not refute has not decided anything.
+    pub replay: Option<Arc<F4Trace>>,
+}
+
+/// What an F4 run that ended in a refutation learned about its system
+/// shape: per step, which rows to reduce. See [`TowerF4Options::replay`].
+#[derive(Clone, Debug, Default)]
+pub struct F4Trace {
+    pub steps: Vec<TraceStep>,
+}
+
+/// One step of an [`F4Trace`].
+#[derive(Clone, Debug, Default)]
+pub struct TraceStep {
+    pub degree: u32,
+    /// `(multiplier, element)` of the rows kept: S-rows that gave a pivot,
+    /// and the S-rows promoted to reducers.
+    pub kept: std::collections::HashSet<(Mono, u32)>,
+    /// Leading monomials of the step's new elements, ascending.
+    pub fresh_lms: Vec<Mono>,
+}
+
+impl F4Trace {
+    /// Rows kept over all steps (a measure of the trace's size).
+    pub fn kept_rows(&self) -> usize {
+        self.steps.iter().map(|s| s.kept.len()).sum()
+    }
 }
 
 impl TowerF4Options {
@@ -795,6 +833,8 @@ impl TowerF4Options {
             on_stop: None,
             on_sig_step: None,
             full_rank_exit: true,
+            record_trace: false,
+            replay: None,
         }
     }
     pub fn on_step(mut self, f: fn(usize, &StepTrace)) -> Self {
@@ -911,6 +951,13 @@ pub struct TowerF4Report {
     /// entries (`dense_entries`). The basis fields are those before the
     /// step, and `pairs_left` counts the step's pairs again.
     pub stopped_step: Option<StepTrace>,
+    /// With [`TowerF4Options::record_trace`] and a refutation: the trace.
+    pub learned: Option<F4Trace>,
+    /// With [`TowerF4Options::replay`]: why the replay stopped without a
+    /// refutation (a replay that refuted leaves `None` and `inconsistent`).
+    pub replay_failure: Option<&'static str>,
+    /// For a lead mismatch: (step, new elements found, new elements in the trace).
+    pub replay_mismatch: Option<(usize, usize, usize)>,
 }
 
 // ── Sparse rows and the two eliminations ─────────────────────────────
@@ -1294,6 +1341,11 @@ struct ElimStats {
     /// Time spent on `B'`, and on the S-rows and their echelon.
     ms_reducers: f64,
     ms_residues: f64,
+    /// Input: form `B'` only for the reducers the S-rows reach, directly or
+    /// through other reducers (a replay; the plain run forms all of it).
+    prune_reducers: bool,
+    /// Output: the S-rows (indices) that gave a new pivot, in order.
+    useful: Vec<u32>,
 }
 
 /// Forms row `k` of a set of rows on demand.
@@ -1382,6 +1434,29 @@ fn eliminate(
         pos[k as usize] = i as u32;
     }
     let mut bred: Vec<Vec<u32>> = vec![Vec::new(); n_piv];
+    // A replay forms `B'` only for the reducers its S-rows reach.
+    let needed: Option<Vec<bool>> = st.prune_reducers.then(|| {
+        let mut need = vec![false; n_piv];
+        let mut work: Vec<u32> = Vec::new();
+        let mark = |row: &Row, from: usize, need: &mut Vec<bool>, work: &mut Vec<u32>| {
+            for &c in &row.cols[from..] {
+                if q_of[c as usize] == NONE {
+                    let j = pivot_of[c as usize];
+                    if !need[j as usize] {
+                        need[j as usize] = true;
+                        work.push(j);
+                    }
+                }
+            }
+        };
+        for k in 0..n_s {
+            mark(&s_row(k), 0, &mut need, &mut work);
+        }
+        while let Some(j) = work.pop() {
+            mark(&piv_row(j as usize), 1, &mut need, &mut work);
+        }
+        need
+    });
     const BLOCK: usize = 64;
     for (b, block) in order.chunks(BLOCK).enumerate() {
         let first = (b * BLOCK) as u32;
@@ -1393,8 +1468,8 @@ fn eliminate(
                 let mut acc = vec![0u64; nq - s0];
                 let mut later = Vec::new();
                 let mut work = 0u64;
-                if past() {
-                    return (acc, later, work);
+                if past() || needed.as_ref().is_some_and(|n| !n[k as usize]) {
+                    return (Vec::new(), later, work);
                 }
                 let row = piv_row(k as usize);
                 debug_assert_eq!(row.cols[0], piv_leads[k as usize]);
@@ -1564,6 +1639,7 @@ fn eliminate(
                 .collect();
             let at = new_leads.partition_point(|&m| m < l as u32);
             new_leads.insert(at, l as u32);
+            st.useful.push(rows[i] as u32);
             if leads.len() + new_leads.len() == nq {
                 st.full_rank_after = Some(done + i + 1);
             }
@@ -2067,6 +2143,7 @@ fn f4_tower_cached(
     let inputs: Vec<RPoly> = input.iter().filter(|p| !p.is_empty()).cloned().collect();
     if inputs.iter().any(|p| p.is_unit()) {
         rep.inconsistent = true;
+        rep.learned = opts.record_trace.then(F4Trace::default);
         rep.basis = unit();
         return finish(rep);
     }
@@ -2110,6 +2187,7 @@ fn f4_tower_cached(
     };
     if start.iter().any(|p| p.is_unit()) {
         rep.inconsistent = true;
+        rep.learned = opts.record_trace.then(F4Trace::default);
         rep.basis = unit();
         return finish(rep);
     }
@@ -2128,6 +2206,7 @@ fn f4_tower_cached(
     }
     // (solving_degree_max, max_cols_to_solution, steps_to_solution)
     let mut learned = (0u32, 0usize, 0usize);
+    let mut trace_steps: Vec<TraceStep> = Vec::new();
     let mut max_cols_so_far = 0usize;
 
     let active_basis = |s: &State| -> Vec<RPoly> {
@@ -2194,6 +2273,28 @@ fn f4_tower_cached(
                     }
                 }
             }
+        }
+        // Replay: keep only the rows the trace kept at this step. The lcm
+        // columns stay as they are: a column of `lcm_cols` is never searched
+        // for a reducer, and the row promoted there (kept) is what leads it;
+        // dropping a column whose promoted row is a tower product would send
+        // it to the reducer search and change the matrix.
+        let rstep: Option<&TraceStep> = match &opts.replay {
+            None => None,
+            Some(trace) => match trace.steps.get(rep.steps - 1) {
+                None => {
+                    rep.replay_failure = Some("trace exhausted");
+                    break;
+                }
+                Some(ts) if ts.degree != d => {
+                    rep.replay_failure = Some("step degree differs");
+                    break;
+                }
+                Some(ts) => Some(ts),
+            },
+        };
+        if let Some(ts) = rstep {
+            jobs.retain(|j| ts.kept.contains(j));
         }
         rep.critical_pairs_reduced += tr.critical_pairs as u64;
         rep.tower_pairs_reduced += tr.tower_pairs as u64;
@@ -2375,7 +2476,10 @@ fn f4_tower_cached(
         };
         let s_row = |k: usize| form(&s_list[k]);
         let piv_leads: Vec<u32> = piv.iter().map(|d| col_of[&d.lead]).collect();
-        let mut st = ElimStats::default();
+        let mut st = ElimStats {
+            prune_reducers: rstep.is_some(),
+            ..Default::default()
+        };
         let result = eliminate(
             fp,
             n_cols,
@@ -2448,7 +2552,38 @@ fn f4_tower_cached(
             learned = (learned.0.max(d), max_cols_so_far, rep.steps);
             rep.last_productive_degree = d;
         }
-        if fresh.iter().any(|p| p.lm() == ONE) {
+        let refuted = fresh.iter().any(|p| p.lm() == ONE);
+        let mut fresh_lms: Vec<Mono> = Vec::new();
+        if opts.record_trace || rstep.is_some() {
+            fresh_lms = fresh.iter().map(|p| p.lm()).collect();
+            fresh_lms.sort_unstable();
+        }
+        if opts.record_trace {
+            let mut kept: std::collections::HashSet<(Mono, u32)> = st
+                .useful
+                .iter()
+                .map(|&k| (s_list[k as usize].mult, s_list[k as usize].g))
+                .collect();
+            kept.extend(piv[n_reducers..].iter().map(|d| (d.mult, d.g)));
+            trace_steps.push(TraceStep {
+                degree: d,
+                kept,
+                fresh_lms: fresh_lms.clone(),
+            });
+        }
+        if let Some(ts) = rstep {
+            // A refutation stands on its own; anything else must follow the
+            // trace, or the replay stops.
+            if !refuted && fresh_lms != ts.fresh_lms {
+                rep.replay_failure = Some("new leads differ from the trace");
+                rep.replay_mismatch = Some((rep.steps, fresh_lms.len(), ts.fresh_lms.len()));
+                break;
+            }
+        }
+        if refuted {
+            if opts.record_trace {
+                rep.learned = Some(F4Trace { steps: trace_steps });
+            }
             rep.inconsistent = true;
             rep.basis = unit();
             record(&mut rep, learned);
