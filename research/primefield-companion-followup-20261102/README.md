@@ -281,3 +281,7 @@ This publication preserves the completed standalone Python source snapshot and r
 ## Native polynomial engine
 
 [feature-native-polynomial/DERIVATION.md](feature-native-polynomial/DERIVATION.md) ports the original cutoff-12/Karatsuba, Newton division and product/remainder-tree source path. Four bounded Rust methods pass, including three original resultants and partial values, independent schoolbook/long-division controls and ordered multipoint checks. Exact receipts and an editable PDF report accompany the source. Normalized-source integration remains next.
+
+## Native normalized source integration
+
+[feature-native-source/DERIVATION.md](feature-native-source/DERIVATION.md) joins phase, value division, joint geometry and product-tree resultant with exact homogeneous recurrence, partial tails and calibration. Three integration methods pass: three original raw records and three public identity-crossing windows. Phase sharing and retained stride setup are next; complete costs and full cohort remain separate.

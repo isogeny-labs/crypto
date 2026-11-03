@@ -11,3 +11,19 @@ Run fixed integration checks; connect outer seed propagation and decoder, then c
 
 ## Errors (what went wrong, how it was handled)
 No new cloud work. One guessed component path absent; used actual native-window and decoder-binding paths.
+
+## Checked integration
+
+### What was done (commands, files, features)
+One native build and filtered invocation exit0, three integration methods pass. Three saved raw records and three identity-crossing windows agree. Six source/dependency hashes and five original inputs pass.
+
+### Decisions made (and why)
+Source commit completed after tests due shared-filesystem latency; receipt binds frozen pretest hashes and records the ordering. No repeat commit or test was launched.
+
+### Open threads (unfinished, pick up next time)
+Outer seed propagation, retained prepared strides, native decoder integration and complete costs. Add numerical no-partial/no-singleton coverage.
+
+### Errors (what went wrong, how it was handled)
+No build/test failure; one unused diagnostic-field warning retained. No cloud job or original cohort change.
+
+Daily-log scope readback: T-1487 holds docs/session-logs/2026-11-03.md; no edit attempted. One-page PDF rendered and inspected.
