@@ -1,33 +1,48 @@
 {
  "schema": "validator-report/v1 (validation-gate/v1 companion)",
- "status": "insufficient_evidence",
- "disposition": "insufficient_evidence",
+ "status": "errata_open",
+ "disposition": "validated",
+ "disposition_scope": "the measured claims: k=20 coverage, P1-P4 on the protocol's five family-rule curves, P5 engine component (replayed). Not a pass of the gate: three reporting errata are open (E9-E11) and the rho reference cannot be matched in unit or process for a component result (R10).",
  "independent": true,
  "validator": "validator subagent (core tier, claude-opus-5-5), not the producer",
  "date": "2026-11-03",
- "validated_commit": "75f70b5ae5e071c1a2288621d946a56e519274cd",
- "tree_state": "dispatch-time tree was moving: README.md and engine/ were untracked when validation began, then committed (7470f1ed34), merged (75f70b5ae5), then 54ef4e9326 added REPORT.pdf/REPORT.typ/scripts/build_report.py. Validated from 75f70b5ae5 (clean); every validated file is byte-identical at 54ef4e9326. REPORT.pdf/REPORT.typ were not validated (REPORT.typ repeats errata E1-E3).",
- "recompute_agrees": "124/127 headline numbers within rel_tol; the 3 disagreements are errata E2 and E3",
+ "validated_commit": "c7d5d5b3b622ae67b6d8813dd2e2653e97486639",
+ "tree_state": "clean at c7d5d5b3b6 apart from this file and VALIDATION.json (updated by the validator, not committed); local branch equals origin/claude/curve25519-index-calculus-i674j4",
+ "history": [
+  {
+   "pass": "initial",
+   "commit": "75f70b5ae5e071c1a2288621d946a56e519274cd",
+   "disposition": "insufficient_evidence",
+   "reason": "E1: k=18 and k=22 were off-rule curves; E2 distance to rho unsupported; no same-unit rho reference"
+  },
+  {
+   "pass": "re-check (narrow: E1 fix, P1-P4, README revisions)",
+   "commit": "c7d5d5b3b622ae67b6d8813dd2e2653e97486639",
+   "disposition": "validated (measured claims), status errata_open"
+  }
+ ],
+ "recompute_agrees": "136/137 headline numbers within rel_tol; the disagreement is E9",
  "per_claim": {
-  "P5 engine component at k=20 (F4 mul-adds per relation at exact coverage 0.212x at t=5, 0.300x at t=6; per-target ratio 1.000/0.993/1.000; equal degree and terms)": "validated: recomputed, replayed field-identical, coverage and the one relation independently verified",
-  "k=20 exact coverage (bits 12/42/162, edwards 10/58/206, L=976503 t=5 198 with 24 cols, L=908172 t=6 536 with 42 cols)": "validated",
-  "P1, P2, P4 verdicts and the census table": "arithmetic validated from confirm/k*.json; verdicts held on the curves actually run",
-  "P3 failed at k=18 t=7 (1.459)": "arithmetic validated; but k=18 is not a family-rule curve (E1)",
-  "held-out confirmation on the family-rule curves of PROTOCOL.md": "insufficient_evidence: k=18 and k=22 family-rule curves (A=78, A=43186) were never measured",
-  "distance remaining to rho": "not supported as stated (E2)"
+  "P5 engine component at k=20 (0.212x at t=5, 0.300x at t=6 F4 mul-adds per relation at exact coverage)": "validated (engine/ unchanged since the replay; replay-certificate.json still applies)",
+  "k=20 exact coverage": "validated",
+  "P1 held": "validated (49/50 or 50/50 by definition; threshold 45)",
+  "P2 held, 0.986-1.012": "validated",
+  "P3 failed at k=22 t=5 (1.32x)": "validated as a failure; 'P3 was mis-specified' is post-hoc interpretation, correctly kept separate from the verdict",
+  "P4 held": "validated",
+  "projection to the PKM isogeny arm": "labelled projection, not measured; arithmetic agrees at 'about' precision"
  },
  "requirements": [
   {
    "id": "R1",
    "requirement": "protocol frozen before any confirm/ or engine/ file",
    "result": "pass",
-   "evidence": "PROTOCOL.md added in 6a800b1513, unchanged to 54ef4e9326; every confirm/ and engine/ file first added in descendants 5ea87e8518, 77780be327, 7470f1ed34; scripts/frame_census.py unchanged since 6a800b1513. Git proves commit order, not compute order."
+   "evidence": "PROTOCOL.md added in 6a800b1513, unchanged to 54ef4e9326; every confirm/ and engine/ file first added in descendants 5ea87e8518, 77780be327, 7470f1ed34; scripts/frame_census.py unchanged since 6a800b1513. Git proves commit order, not compute order.; PROTOCOL.md and scripts/frame_census.py still unchanged at c7d5d5b3b6"
   },
   {
    "id": "R2",
    "requirement": "data integrity",
-   "result": "pass",
-   "evidence": "local confirm/k{16..24}.json hash to confirm/SHA256SUMS, confirm/.artifacts.json and the git blobs at 5ea87e8518; pilot_k20.json hashes to ceef2188...7094 (pilot/.artifacts.json, git blob at 6a800b1513); engine/*.json hash to engine/SHA256SUMS"
+   "result": "pass (manifest defect E10)",
+   "evidence": "confirm/k{16..24}.json hash to confirm/SHA256SUMS (sha256sum -c OK); new k18/k22 equal their git blobs at c7d5d5b3b6 (dc89654f..., 76bf7826...); confirm_offrule/k18,k22 equal the old hashes 860f04a9..., b9f083f4.... But confirm/.artifacts.json still pins the old k18/k22 hashes (E10)."
   },
   {
    "id": "R3",
@@ -38,20 +53,20 @@
   {
    "id": "R4",
    "requirement": "curves are the PROTOCOL's family-rule miniatures",
-   "result": "fail",
-   "evidence": "own family-rule implementation and `curve25519_family family 16,18,20,22,24` agree: k=16 A=1058, k=18 A=78 (r=32887), k=20 A=926, k=22 A=43186 (r=524731), k=24 A=318. confirm/ used k=18 A=54 (r=32719 < 2^15) and k=22 A=894 (r=524047 < 2^19): exactly the rule without its r > 2^(k-3) clause (smallest A otherwise). All five used curves verified #E=8r, r prime, cyclic. Not disclosed in README."
+   "result": "pass (fixed in c7d5d5b3b6)",
+   "evidence": "confirm/k18.json: p=262133 A=78 n=263096 r=32887 seed 20261121; confirm/k22.json: p=4194301 A=43186 n=4197848 r=524731 seed 20261125; K=2000; equal to the validator's own family-rule output and `curve25519_family family`. Run by scripts/run_confirm_rulefix.sh with the frozen instrument (frame_census.py unchanged since 6a800b1513)."
   },
   {
    "id": "R5",
    "requirement": "P1-P4 verdicts re-derived from confirm/k*.json with own code",
    "result": "pass",
-   "evidence": "P1 50/50 inside (robust to 4 percentile definitions); P2 0.9856-1.0145 in the 20 cells with mean >= 50; P3 fails only at k=18 t=7 (1.4588), other 11 in 1.556-4.478; P4 23/25 equal to oracle best, min 0.9919. summary.json agrees field-by-field (0 mismatches). 'ties broken by cols' is direction-ambiguous; the alternative changes only k=16 t=5 (186 vs 188, verdicts unchanged)."
+   "evidence": "P1 held: 49/50 with the interpolated (numpy default) 1st/99th percentile, as summary.json; 50/50 under a rank-tail reading (k=22 t=5 bits_lo0=148: 20/2000 frames above it, 0 equal; q99=146.04). P2 0.9856-1.0122 over the 20 cells with mean >= 50. P3 fails only at k=22 t=5 (1.3243; bits_lo0 at the 99th percentile; 2.81x vs mean); other 11 in 1.555-3.138. P4 23/25 equal, min 0.9919. summary.json: 0 field mismatches."
   },
   {
    "id": "R6",
    "requirement": "spot-check census rows by independent recompute",
    "result": "pass",
-   "evidence": "nonce e1f2eb025f730445: 20 random rows per curve (100), literal method: 100/100 match cols, covered and J; plus every fixed, selected and oracle-best frame of all 25 cells (100): 100/100 match cols and covered; J differs in 6 bits_lo0 rows (E4)"
+   "evidence": "first pass (nonce e1f2eb025f730445) 200/200 on cols and covered for k=16,20,24 rows and the old curves; re-check nonce 22f573e786cca756: 20 random rows per new curve (40), literal [r]R = O method, 40/40 match cols, covered and J; bits_lo0, edwards_bits, selected and oracle-best at t=4..8 on both new curves (40) match cols and covered 40/40; J differs only for bits_lo0 at k=18 t>=5 (+6, +6, +16, +32), which is E4 (x(T) = A/3 = 26)."
   },
   {
    "id": "R7",
@@ -68,14 +83,14 @@
   {
    "id": "R9",
    "requirement": "every README table number supported by the data",
-   "result": "fail (errata)",
-   "evidence": "census table 50/50 values, P5 table 36/36 values and the predictions table agree, except E2 and E3"
+   "result": "fail (errata E9-E11)",
+   "evidence": "136/137 headline numbers agree: census table (with A column) 55/55, P5 table 36/36, P2, P3, P4, rho ops and the labelled projection agree; the P1 count disagrees with summary.json (E9)"
   },
   {
    "id": "R10",
    "requirement": "matched rho reference in the same unit and process (gate item 3)",
    "result": "not available",
-   "evidence": "rho-neg k=20 (curve25519_ic_baseline_20261102, session ECBS1hd6199244a727, curve icv1-fp20-tm1050-4295f05e = the k=20 miniature) gives S = 1.511/1.619/2.585 at w = 0/0.1/1, 48/48 verified. The component is in F4 mul-adds per relation from curve25519_family f4cost; no same-unit IC S exists for it, so gae_band ic values are not filled in"
+   "evidence": "rho-neg k=20 (curve25519_ic_baseline_20261102, session ECBS1hd6199244a727, curve icv1-fp20-tm1050-4295f05e = the k=20 miniature) gives S = 1.511/1.619/2.585 at w = 0/0.1/1, 48/48 verified. The component is in F4 mul-adds per relation from curve25519_family f4cost; no same-unit IC S exists for it, so gae_band ic values are not filled in. Unchanged by the E1 fix: the gate cannot pass for a component result without a same-unit rho row."
   },
   {
    "id": "R11",
@@ -88,42 +103,68 @@
   {
    "id": "E1",
    "where": "README 'Census (exact, five family miniatures; k = 16, 18, 22, 24 held out)'; REPORT.typ line 37",
-   "text": "k=18 (A=54) and k=22 (A=894) are not family-rule curves (the rule's r > 2^(k-3) clause was dropped); the family-rule curves are A=78 and A=43186. P3's only failure (k=18 t=7) is on an off-rule curve."
+   "text": "k=18 (A=54) and k=22 (A=894) are not family-rule curves (the rule's r > 2^(k-3) clause was dropped); the family-rule curves are A=78 and A=43186. P3's only failure (k=18 t=7) is on an off-rule curve.",
+   "status": "fixed in c7d5d5b3b6 (curves rerun; wording issue E11)"
   },
   {
    "id": "E2",
    "where": "README 'Costs and scope'; REPORT.typ line 106",
-   "text": "'distance remaining to rho on this track is still about 10^4-10^5x at w >= 0.1' is the distance to the generic baseline (1.35e5/4.71 = 2.9e4 at w=0.1; 8.2e5/4.71 = 1.7e5 at w=1). To matched rho-neg it is 1.79e6/1.619/4.71 = 2.3e5 (w=0.1) and 1.79e7/2.585/4.71 = 1.5e6 (w=1). It also carries a bits-form m=2 gain over to the pkm-iso-t6-g4 arm without labelling that as an extrapolation."
+   "text": "'distance remaining to rho on this track is still about 10^4-10^5x at w >= 0.1' is the distance to the generic baseline (1.35e5/4.71 = 2.9e4 at w=0.1; 8.2e5/4.71 = 1.7e5 at w=1). To matched rho-neg it is 1.79e6/1.619/4.71 = 2.3e5 (w=0.1) and 1.79e7/2.585/4.71 = 1.5e6 (w=1). It also carries a bits-form m=2 gain over to the pkm-iso-t6-g4 arm without labelling that as an extrapolation.",
+   "status": "fixed (measured gaps stated vs session rho-neg; projection labelled and untested)"
   },
   {
    "id": "E3",
    "where": "README predictions table P2; REPORT.typ line 95",
-   "text": "'0.986-1.018': over the P2 cells (mean covered >= 50) the range is 0.986-1.015; 1.018 is k=24 t=4 (mean 19), outside P2's scope. Verdict unchanged."
+   "text": "'0.986-1.018': over the P2 cells (mean covered >= 50) the range is 0.986-1.015; 1.018 is k=24 t=4 (mean 19), outside P2's scope. Verdict unchanged.",
+   "status": "fixed (0.986-1.012 over P2's scope)"
   },
   {
    "id": "E4",
    "where": "scripts/frame_census.py coverage() (J)",
-   "text": "the signed array [L, -L mod n] holds the 2-torsion point T (log n/2) twice, so J counts each T + s pair twice. Affects bits_lo0 at k=18 t>=5 and k=24 t>=7 (+8, +10, +22, +52, +18, +34) and 25 translation frames containing x = A/3. None was near a cell's max J, so no selected frame and no verdict changes. covered (deduplicated) is unaffected."
+   "text": "the signed array [L, -L mod n] holds the 2-torsion point T (log n/2) twice, so J counts each T + s pair twice. Affects bits_lo0 at k=18 t>=5 and k=24 t>=7 (+8, +10, +22, +52, +18, +34) and 25 translation frames containing x = A/3. None was near a cell's max J, so no selected frame and no verdict changes. covered (deduplicated) is unaffected.",
+   "status": "disclosed in README; instrument unchanged (frozen), still present, no verdict impact"
   },
   {
    "id": "E5",
    "where": "README P5 table column 'F4 mul-adds / relation'",
-   "text": "derived as mul-adds/target / coverage_exact (the engine's muladds_per_relation_at_exact_coverage), not a measured yield (1 relation in 600 targets); the header should say 'at exact coverage', as PROTOCOL P5 does."
+   "text": "derived as mul-adds/target / coverage_exact (the engine's muladds_per_relation_at_exact_coverage), not a measured yield (1 relation in 600 targets); the header should say 'at exact coverage', as PROTOCOL P5 does.",
+   "status": "fixed (column labelled derived)"
   },
   {
    "id": "E6",
    "where": "PROTOCOL.md Selection",
-   "text": "'ties broken by cols' gives no direction; the producer used more cols first. Only k=16 t=5 depends on it (188 vs 186)."
+   "text": "'ties broken by cols' gives no direction; the producer used more cols first. Only k=16 t=5 depends on it (188 vs 186).",
+   "status": "disclosed (highest J, then highest cols, then lowest L)"
   },
   {
    "id": "E7",
    "where": "study directory",
-   "text": "typst-0.0.0.tar.gz (a third-party source archive of the typst Python bindings) is committed in the evidence directory; it is not evidence."
+   "text": "typst-0.0.0.tar.gz (a third-party source archive of the typst Python bindings) is committed in the evidence directory; it is not evidence.",
+   "status": "fixed (typst-0.0.0.tar.gz deleted in c7d5d5b3b6; not listed in README errata)"
   },
   {
    "id": "E8",
    "where": "README 'rho solve at k = 20 takes about 10^3 group operations'",
-   "text": "order of magnitude only: the matched rho-neg gives 1.511*sqrt(131203) = 547 (w=0) to 936 (w=1) GAE per solve. Not wrong at the stated precision."
+   "text": "order of magnitude only: the matched rho-neg gives 1.511*sqrt(131203) = 547 (w=0) to 936 (w=1) GAE per solve. Not wrong at the stated precision.",
+   "status": "fixed (547-936)"
+  },
+  {
+   "id": "E9",
+   "status": "open",
+   "where": "README predictions table P1 and Answer (line 23: 'All 50/50 cells')",
+   "text": "README says 50/50; its cited source analysis/summary.json says P1_inside = 49 (k=22 t=5 bits_lo0 = 148 is above the interpolated q99 = 146.04). 50/50 holds only under a rank-tail reading (exactly 1.0% of frames above). The verdict (>= 45) holds either way; the count must name its definition or follow summary.json."
+  },
+  {
+   "id": "E10",
+   "status": "open",
+   "where": "confirm/.artifacts.json, confirm/.gitignore, README lines 60-61, confirm_offrule/",
+   "text": "the new confirm/k18.json and k22.json (2.65 MB, 2.74 MB) and confirm_offrule/k18.json, k22.json (2.66 MB, 2.73 MB) are committed to git despite .gitignore and AGENTS.md section 13 (data files over 1 MiB go to the store); confirm/.artifacts.json still pins the old k18/k22 hashes, so `artifacts verify` would fail; README's 'in the artifact store, with the sha256 values in ... .artifacts.json' is false for k18/k22. No .artifacts.json in confirm_offrule/. The `size` check may fail."
+  },
+  {
+   "id": "E11",
+   "status": "open",
+   "where": "README 'Deviations and validator errata', E1",
+   "text": "'a reimplementation of the family rule that dropped two clauses: A^2 - 4 non-square, and r > 2^(k-3)': both off-rule curves do have A^2 - 4 non-square (verified), and they are exactly the smallest A meeting every clause except r > 2^(k-3). Only that clause is violated. Also, E2 and E7 are fixed but not listed."
   }
  ],
  "validator_code": {
@@ -132,14 +173,20 @@
    "vcov.py": "6437f95092553b5e6b0828128b87ac219a1e8e83918ccd16f50e9f1d6e3ba5e0",
    "item1.py": "101a6f07b528860bd365f1e7fbf8659e7a3cda957a66cea6b42cc86a4d3d5bd4",
    "p14.py": "144131c2a0c36f18b663a7804c9b567545b3898d180ab6ed0dbce1afd53e5438",
+   "p14b.py": "3b68409779b89b02fb01c107e8c680f2a35fd3b92dadd8c682d0568b7e006a37",
    "spot.py": "e76bde4cf768656d956ab057c4f71a93d95fc056c403284eee98ee8ea7e88951",
+   "spot2.py": "90be71e5635e9b9c2ca05d568ba67341ae31a3a0f37678a5dd161665dc20f86c",
    "family_hits.py": "9d3869a5374fb697da4af8fc18341ae2907bd1533b073b09d32b861d49e33627",
    "relaxed.py": "b6d26e4f07a4a17e072b8d38eab77896f6aaa31b38dbb14adcb1e9d6429ddfe3",
-   "assemble.py": "04228570f79cc9feaf3c96be2c60cd7c2a8cbfa160bb7128c4a02a7fbff31635"
+   "assemble.py": "04228570f79cc9feaf3c96be2c60cd7c2a8cbfa160bb7128c4a02a7fbff31635",
+   "assemble2.py": "0019154977e245656edf1e9fb0daeecc09946132db3c80742a54a998453519de"
   },
   "independence": "no import or copy of frame_census.py or analyse.py; Weierstrass rather than Montgomery formulas, Tonelli-Shanks rather than the p=5 mod 8 root, no log table, literal [r]R = O membership test"
  },
- "spot_check_nonce": "e1f2eb025f730445",
+ "spot_check_nonce": [
+  "e1f2eb025f730445",
+  "22f573e786cca756"
+ ],
  "raw_data": [
   {
    "path": "PROTOCOL.md",
@@ -147,11 +194,11 @@
   },
   {
    "path": "README.md",
-   "sha256": "eb8e20473aaef9625c8e19d679bb9180161db2f49361dd9796905c22c8d0e563"
+   "sha256": "b030a162fa30d145ebf8e72c6dc0765d16feba43f3e419692be5dcaa2b2a312a"
   },
   {
    "path": "analysis/summary.json",
-   "sha256": "4667d29c069a4715c67ee0a7535e15e10dace78c888953317a164512e5787713"
+   "sha256": "753be4c0c6a5c33923155a50968a5f4d9e96092433ea7df56a33c8cfa5a6d1a2"
   },
   {
    "path": "pilot/pilot_k20.json",
@@ -171,7 +218,7 @@
   },
   {
    "path": "confirm/k18.json",
-   "sha256": "860f04a9f8ef2ce6d95dc0853ef5589d21492e747691e1e0e64d373d319d4f60"
+   "sha256": "dc89654ff79d08c6ac8569be095dae3288bf573778fc2b830b34105111b78c23"
   },
   {
    "path": "confirm/k20.json",
@@ -179,7 +226,7 @@
   },
   {
    "path": "confirm/k22.json",
-   "sha256": "b9f083f4f214e10fe9ca156ca637c67140d4b32f0c452024461f058ebbab1bf4"
+   "sha256": "76bf782622a3ae37cde3286b96758822c935448b32d9637e7d8a5cbf328fe992"
   },
   {
    "path": "confirm/k24.json",
@@ -187,7 +234,7 @@
   },
   {
    "path": "confirm/SHA256SUMS",
-   "sha256": "e987537f9a81cf2cd016c6d7748c4cccec71fa8bbe4d1c345907302a8a55cf31"
+   "sha256": "2710d0894160eef5fc6137664aa107381166bee30c627468d41ff80349bde42e"
   },
   {
    "path": "confirm/.artifacts.json",
@@ -248,6 +295,18 @@
   {
    "path": "../curve25519_edwards_semaev_20261102/cells/bits_t5_g0.json",
    "sha256": "ea450f9a2304f6dc66ab1ebea8ab73ffa90400f2f6f71bab83ebf12c8f9750d0"
+  },
+  {
+   "path": "confirm_offrule/k18.json",
+   "sha256": "860f04a9f8ef2ce6d95dc0853ef5589d21492e747691e1e0e64d373d319d4f60"
+  },
+  {
+   "path": "confirm_offrule/k22.json",
+   "sha256": "b9f083f4f214e10fe9ca156ca637c67140d4b32f0c452024461f058ebbab1bf4"
+  },
+  {
+   "path": "scripts/run_confirm_rulefix.sh",
+   "sha256": "179eae029aba851a19aa738bf26bb8daea5be45ae8914c20149c430f52b5a0d4"
   }
  ],
  "headline": [
@@ -317,6 +376,12 @@
    "name": "k20 cols L908172 t6",
    "claimed": 42,
    "recomputed": 42,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "census k16 A column",
+   "claimed": 1058,
+   "recomputed": 1058,
    "rel_tol": 1e-09
   },
   {
@@ -390,74 +455,86 @@
    "source": "README census table"
   },
   {
+   "name": "census k18 A column",
+   "claimed": 78,
+   "recomputed": 78,
+   "rel_tol": 1e-09
+  },
+  {
    "name": "census k18 t4 selected/bits_lo0",
-   "claimed": 3.82,
-   "recomputed": 3.8181818181818183,
+   "claimed": 5.38,
+   "recomputed": 5.375,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t4 selected/mean",
-   "claimed": 4.46,
-   "recomputed": 4.46120346274364,
+   "claimed": 4.53,
+   "recomputed": 4.529892020015802,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t5 selected/bits_lo0",
-   "claimed": 1.85,
-   "recomputed": 1.8518518518518519,
+   "claimed": 3.07,
+   "recomputed": 3.0689655172413794,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t5 selected/mean",
-   "claimed": 2.85,
-   "recomputed": 2.848718788724771,
+   "claimed": 2.53,
+   "recomputed": 2.5253600056749663,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t6 selected/bits_lo0",
-   "claimed": 2.46,
-   "recomputed": 2.4601769911504423,
+   "claimed": 2.02,
+   "recomputed": 2.0232558139534884,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t6 selected/mean",
-   "claimed": 2.09,
-   "recomputed": 2.085114681307472,
+   "claimed": 1.95,
+   "recomputed": 1.9452207937395192,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t7 selected/bits_lo0",
-   "claimed": 1.46,
-   "recomputed": 1.4587813620071686,
+   "claimed": 1.56,
+   "recomputed": 1.5551470588235294,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t7 selected/mean",
-   "claimed": 1.58,
-   "recomputed": 1.575825977704192,
+   "claimed": 1.63,
+   "recomputed": 1.6268636338287639,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t8 selected/bits_lo0",
-   "claimed": 1.32,
-   "recomputed": 1.3238827486785198,
+   "claimed": 1.34,
+   "recomputed": 1.3398300849575213,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k18 t8 selected/mean",
-   "claimed": 1.43,
-   "recomputed": 1.4272962243222675,
+   "claimed": 1.36,
+   "recomputed": 1.3639160517555522,
    "rel_tol": 0.004,
    "source": "README census table"
+  },
+  {
+   "name": "census k20 A column",
+   "claimed": 926,
+   "recomputed": 926,
+   "rel_tol": 1e-09
   },
   {
    "name": "census k20 t4 selected/bits_lo0",
@@ -530,74 +607,86 @@
    "source": "README census table"
   },
   {
+   "name": "census k22 A column",
+   "claimed": 43186,
+   "recomputed": 43186,
+   "rel_tol": 1e-09
+  },
+  {
    "name": "census k22 t4 selected/bits_lo0",
-   "claimed": 4.57,
-   "recomputed": 4.571428571428571,
+   "claimed": 4.78,
+   "recomputed": 4.777777777777778,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t4 selected/mean",
-   "claimed": 3.31,
-   "recomputed": 3.3105731429753775,
+   "claimed": 4.62,
+   "recomputed": 4.617201760979276,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t5 selected/bits_lo0",
-   "claimed": 4.48,
-   "recomputed": 4.478260869565218,
+   "claimed": 1.32,
+   "recomputed": 1.3243243243243243,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t5 selected/mean",
-   "claimed": 2.94,
-   "recomputed": 2.941974550491995,
+   "claimed": 2.81,
+   "recomputed": 2.8084655174884294,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t6 selected/bits_lo0",
-   "claimed": 2.43,
-   "recomputed": 2.4299065420560746,
+   "claimed": 1.66,
+   "recomputed": 1.6604938271604939,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t6 selected/mean",
-   "claimed": 1.95,
-   "recomputed": 1.9497635911645712,
+   "claimed": 1.98,
+   "recomputed": 1.981904986443475,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t7 selected/bits_lo0",
-   "claimed": 1.74,
-   "recomputed": 1.7370517928286853,
+   "claimed": 1.82,
+   "recomputed": 1.8216432865731462,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t7 selected/mean",
-   "claimed": 1.67,
-   "recomputed": 1.6659645543114954,
+   "claimed": 1.72,
+   "recomputed": 1.7167171231673712,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t8 selected/bits_lo0",
-   "claimed": 1.32,
-   "recomputed": 1.323454699407282,
+   "claimed": 1.57,
+   "recomputed": 1.567907995618839,
    "rel_tol": 0.004,
    "source": "README census table"
   },
   {
    "name": "census k22 t8 selected/mean",
-   "claimed": 1.52,
-   "recomputed": 1.5181670100268958,
+   "claimed": 1.38,
+   "recomputed": 1.384832193696571,
    "rel_tol": 0.004,
    "source": "README census table"
+  },
+  {
+   "name": "census k24 A column",
+   "claimed": 318,
+   "recomputed": 318,
+   "rel_tol": 1e-09
   },
   {
    "name": "census k24 t4 selected/bits_lo0",
@@ -670,11 +759,11 @@
    "source": "README census table"
   },
   {
-   "name": "P1 cells inside central 98%",
+   "name": "P1 cells inside central 98% (numpy linear percentile, as analysis/summary.json P1_inside)",
    "claimed": 50,
-   "recomputed": 50,
+   "recomputed": 49,
    "rel_tol": 1e-09,
-   "source": "README predictions"
+   "source": "README predictions (erratum E9: summary.json says 49; 50 only under a rank-tail reading)"
   },
   {
    "name": "P2 trans/mobius min (cells mean>=50)",
@@ -685,35 +774,41 @@
   },
   {
    "name": "P2 trans/mobius max (cells mean>=50)",
-   "claimed": 1.018,
-   "recomputed": 1.0145227016560214,
-   "rel_tol": 0.0005,
-   "source": "README predictions (erratum: 1.018 is k=24 t=4, mean 19, outside P2 scope)"
-  },
-  {
-   "name": "P3 k18 t7 selected/bits_lo0",
-   "claimed": 1.459,
-   "recomputed": 1.4587813620071686,
+   "claimed": 1.012,
+   "recomputed": 1.0122173623802353,
    "rel_tol": 0.0005,
    "source": "README predictions"
   },
   {
+   "name": "P3 k22 t5 selected/bits_lo0",
+   "claimed": 1.32,
+   "recomputed": 1.3243243243243243,
+   "rel_tol": 0.004,
+   "source": "README predictions"
+  },
+  {
+   "name": "P3 k22 t5 selected/mean",
+   "claimed": 2.81,
+   "recomputed": 2.8084655174884294,
+   "rel_tol": 0.004
+  },
+  {
    "name": "P3 other 11 cells min",
    "claimed": 1.56,
-   "recomputed": 1.5559502664298401,
+   "recomputed": 1.5551470588235294,
    "rel_tol": 0.004
   },
   {
    "name": "P3 other 11 cells max",
-   "claimed": 4.48,
-   "recomputed": 4.478260869565218,
+   "claimed": 3.14,
+   "recomputed": 3.1379310344827585,
    "rel_tol": 0.004
   },
   {
-   "name": "P3 k18 t7 bits_lo0 percentile",
-   "claimed": 0.68,
-   "recomputed": 0.6795,
-   "rel_tol": 0.01
+   "name": "P3 k22 t5 bits_lo0 percentile",
+   "claimed": 0.99,
+   "recomputed": 0.99,
+   "rel_tol": 0.002
   },
   {
    "name": "P4 cells selected == oracle best",
@@ -1041,10 +1136,15 @@
   },
   {
    "name": "rho solve k20 group ops (matched rho-neg, w=0)",
-   "claimed": 1000.0,
+   "claimed": 547,
    "recomputed": 547.3137350396022,
-   "rel_tol": 1.0,
-   "source": "README \"about 10^3\" (order of magnitude; recomputed 547 at w=0, 936 at w=1)"
+   "rel_tol": 0.002
+  },
+  {
+   "name": "rho solve k20 group ops (matched rho-neg, w=1)",
+   "claimed": 936,
+   "recomputed": 936.3375281782739,
+   "rel_tol": 0.002
   },
   {
    "name": "generic baseline proj-a / rho-neg k20 (w=0)",
@@ -1066,18 +1166,37 @@
    "rel_tol": 0.04
   },
   {
-   "name": "distance remaining to rho w=0.1 after best frame gain (claimed upper end of 10^4-10^5)",
-   "claimed": 100000.0,
-   "recomputed": 234736.0392729377,
-   "rel_tol": 0.5,
-   "source": "erratum: matched rho-neg S(w=0.1)=1.619; 10^4-10^5 is the distance to the generic baseline (2.9e4 at w=0.1), not to rho; also an unlabelled carry-over of a bits-form gain to the pkm-iso-t6-g4 arm"
+   "name": "algebraic vs session rho-neg w=0",
+   "claimed": 18,
+   "recomputed": 18.178325688073393,
+   "rel_tol": 0.02,
+   "source": "band_s1.txt rho-neg 1.744/1.876/3.061"
   },
   {
-   "name": "distance remaining to rho w=1 after best frame gain (claimed upper end of 10^4-10^5)",
-   "claimed": 100000.0,
+   "name": "algebraic vs session rho-neg w=0.1",
+   "claimed": 960000.0,
+   "recomputed": 955016.7814498935,
+   "rel_tol": 0.01
+  },
+  {
+   "name": "algebraic vs session rho-neg w=1",
+   "claimed": 5900000.0,
+   "recomputed": 5852933.517151258,
+   "rel_tol": 0.01
+  },
+  {
+   "name": "projection (labelled, not measured): behind rho-neg at w=0.1 after 4.71x cut",
+   "claimed": 200000.0,
+   "recomputed": 202578.70340239134,
+   "rel_tol": 0.25,
+   "source": "README projection, \"about\"; vs matched rho 1.619 it is 2.35e5; at a 3.33x cut 2.9e5-3.3e5"
+  },
+  {
+   "name": "projection (labelled, not measured): behind rho-neg at w=1 after 4.71x cut",
+   "claimed": 1500000.0,
    "recomputed": 1470141.5677909234,
-   "rel_tol": 0.5,
-   "source": "erratum, as above"
+   "rel_tol": 0.25,
+   "source": "README projection, \"about\"; vs session rho 3.061 it is 1.24e6; at a 3.33x cut 1.8e6-2.1e6"
   }
  ]
 }

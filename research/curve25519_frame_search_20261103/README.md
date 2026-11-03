@@ -20,8 +20,7 @@ projective, Edwards, …) yield more relations for Curve25519 index calculus?
    - Hessian, twisted Hessian, Jacobi intersection and Huff models are not
      defined over F_p for this family, since #E = 8r with cyclic Z/8.
    - Over 2,000 + 2,000 random frames per (curve, t), Weierstrass `bits lo=0`
-     and Edwards y are typical draws. All 50/50 cells are inside the central
-     98% (P1).
+     and Edwards y are typical draws. 49/50 cells are inside the central 98% (P1).
    - Translation and Möbius frames have the same distribution (P2).
    - Edwards "beat" Weierstrass in `curve25519_edwards_semaev_20261102` only
      because `lo = 0` was a below-average draw on that curve.
@@ -91,7 +90,7 @@ branch.
 
 | | outcome |
 |:--|:--|
-| P1 no model effect | **held**, 50/50 cells inside 1–99% (the k = 22, t = 5 `bits lo=0` sits at the 99th percentile, still inside) |
+| P1 no model effect | **held**, 49/50 cells inside the 1–99% band (≥ 45 required); the one outside is k = 22, t = 5 `bits lo=0`, at the 99th percentile |
 | P2 translation ≡ Möbius | **held**, 0.986–1.012 over the cells in scope (mean covered ≥ 50) |
 | P3 ≥ 1.5× vs `bits lo=0` at t = 5–7, held-out curves | **failed** in 1 of 12 cells: k = 22, t = 5 gives 1.32×. There `lo = 0` was itself a lucky draw (99th percentile). Against the mean frame the gain is 2.81×. The other 11 cells give 1.56–3.14×. P3 was mis-specified: it compares against one random draw, which is sometimes lucky. The gain over the mean frame is the curve-independent statistic. |
 | P4 log-free selector suffices | **held**: equal to the oracle-best frame in 23/25 cells, ≥ 0.99 in all |
@@ -141,8 +140,10 @@ python3 scripts/figures.py      # needs matplotlib
 ## Deviations and validator errata
 
 - **E1, the curves.** The first confirmation run used k = 18, A = 54 and
-  k = 22, A = 894 from a reimplementation of the family rule that dropped two
-  clauses: A² − 4 non-square, and r > 2^(k−3). Those curves are
+  k = 22, A = 894 from a reimplementation of the family rule that dropped the
+  clause r > 2^(k−3). Its A² − 4 check tested only for zero, not for a
+  non-square, but the curves it chose happened to satisfy the non-square
+  clause anyway. Those curves are
   curve25519-shaped (cyclic Z/8, #E' = 4r') but are not the curves the
   protocol names. The independent validator caught this.
   - The same frozen instrument and seeds were then run on the rule's curves
@@ -158,8 +159,14 @@ python3 scripts/figures.py      # needs matplotlib
 - **E6:** the selection rule's tie-break is "highest J, then highest cols, then
   lowest L" (`scripts/analyse.py`). The protocol did not state its direction.
 - **E8:** the rho operation count was corrected.
-- **Validation gate: not passed** (`VALIDATION.json`, verdict
-  insufficient_evidence, given before the E1 fix). There is no same-unit rho
+- **E9–E11** (validator re-check at `c7d5d5b3b6`):
+  - E9: the P1 count is restated as 49/50, from `analysis/summary.json`.
+  - E10: the data files were moved to the artifact store, with the manifests
+    matching `SHA256SUMS`.
+  - E11: the E1 wording was corrected.
+  - The re-check validates the measured claims on the rule curves.
+- **Validation gate: not passed** (`VALIDATION.json`, updated after the E1
+  re-check). There is no same-unit rho
   row for a component result. So no leaderboard or `benchmarks/` row is made,
   as the claim scope already said.
 
