@@ -1462,7 +1462,7 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 #[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
     f4cost_m(
-        k, form, t, guess, targets, seed, cap_s, 2, "full", false, None, false,
+        k, form, t, guess, targets, seed, cap_s, 2, "full", 0, None, false,
     )
 }
 
@@ -1480,7 +1480,7 @@ fn f4cost_m(
     cap_s: u64,
     nsum: u32,
     mode: &str,
-    lifts: bool,
+    lifts: u8,
     max_nnz: Option<u64>,
     trace: bool,
 ) -> Value {
@@ -1574,8 +1574,8 @@ fn f4cost_m(
     } else {
         format!("pkm-semaev:m={nsum},mode={mode}")
     };
-    if lifts {
-        spec.push_str(",lifts=1");
+    if lifts > 0 {
+        spec.push_str(&format!(",lifts={lifts}"));
     }
     if let Some(n) = max_nnz {
         spec.push_str(&format!(",max_nnz={n}"));
@@ -1614,7 +1614,7 @@ fn f4cost_m(
             // The pipeline writes rows over [h]P, so a lift R + K (K in E[h])
             // is accepted when the projected sums agree; without lifts the
             // sum must be R itself.
-            let ok = if lifts {
+            let ok = if lifts > 0 {
                 let mut o = GroupOps::default();
                 inst.curve.mul(&mut o, s, inst.cofactor)
                     == inst.curve.mul(&mut o, target, inst.cofactor)
@@ -1703,6 +1703,35 @@ fn f4cost_m(
         })
         .count();
     let coverage = covered as f64 / m.r as f64;
+    // Projected coverage: distinct targets R in the subgroup with R + K a sum of
+    // two base points for some K in E[h], i.e. distinct [h]S over the sums S
+    // (what an ideal lift oracle sees).
+    let covered_projected = {
+        use crypto_lib::cryptanalysis::ic_boundary::PrimePoint;
+        let mut set = std::collections::HashSet::new();
+        for &key in &all {
+            if key == 0 {
+                continue;
+            }
+            let x = (key >> 1) - 1;
+            let y = sqrtm(m.weier.rhs(x), m.p).expect("on the curve");
+            for yy in [y, m.p - y] {
+                let q = PrimePoint {
+                    x,
+                    y: yy,
+                    infinity: false,
+                };
+                if inst.curve.key(&q) == key {
+                    let pr = inst.curve.mul(&mut GroupOps::default(), q, inst.cofactor);
+                    if !pr.infinity {
+                        set.insert(inst.curve.key(&pr));
+                    }
+                    break;
+                }
+            }
+        }
+        set.len()
+    };
     let mut out = json!({
         "coverage_exact": coverage, "covered_points": covered, "covered_points_all_cosets": all.len(),
         "muladds_per_relation_at_exact_coverage": if coverage > 0.0 { Some(per_target / coverage) } else { None },
@@ -1714,7 +1743,7 @@ fn f4cost_m(
         "wall_s": started.elapsed().as_secs_f64(),
         "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
         "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
-        "lifts": lifts, "trace": trace, "hits_exact": exact,
+        "lifts": lifts > 0, "lifts_mode": lifts, "trace": trace, "hits_exact": exact,
         "trace_learn_muladds": learn_muladds,
         "amortised_muladds_per_target": (learn_muladds + tot.ops) as f64 / done.max(1) as f64,
         "calls_per_target": tot.calls as f64 / done.max(1) as f64,
@@ -1728,6 +1757,10 @@ fn f4cost_m(
         "native": native,
     });
     out["solver_extra"] = json!(tot.extra);
+    out["covered_projected_points"] = json!(covered_projected);
+    out["coverage_projected"] = json!(covered_projected as f64 / m.r as f64);
+    out["solving_degree_mean"] =
+        json!(tot.solving_degree_sum as f64 / tot.calls_with_a_degree.max(1) as f64);
     out["planted_done"] = json!(p_done);
     out["planted_hits"] = json!(p_hits);
     out["planted_exact"] = json!(p_exact);
@@ -1937,7 +1970,7 @@ fn main() {
             }
         }
         "f4cost" => {
-            // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz|-] [trace 0|1]
+            // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1|2] [max_nnz|-] [trace 0|1]
             let k: u32 = args[2].parse().unwrap();
             let t: u32 = args[4].parse().unwrap();
             let g: u32 = args[5].parse().unwrap();
@@ -1947,7 +1980,8 @@ fn main() {
             // Optional: <m> <mode> (default 2 full, the original measurement).
             let nsum: u32 = args.get(9).map_or(2, |v| v.parse().unwrap());
             let mode = args.get(10).map_or("full", String::as_str);
-            let lifts = args.get(11).is_some_and(|v| v == "1");
+            let lifts: u8 = args.get(11).map_or(0, |v| v.parse().unwrap());
+            assert!(lifts <= 2, "lifts is 0, 1 or 2");
             // Position 12: max_nnz ("-" for none); position 13: F4 trace
             // (learn once per branch system, replay per target).
             let max_nnz: Option<u64> = args
