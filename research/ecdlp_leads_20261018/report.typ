@@ -46,7 +46,9 @@ closed on paper while drafting.
   $<= 3$ over $FF_2$ (measured). $T_n$ factors appear only at $n = 3$ and $n = 5$. The $n = 5$ case is
   one plane quartic with a genus-11 cover carrying $T_5$ for $a = 0$. A screen of every genus-4 curve
   plus a point-count lemma closes K-283 as well. The route is now closed for ECC2K-130, K-163, K-233
-  and K-283. K-409 and K-571 need bases of genus $>= 5$.
+  and K-283. A screen of every genus-5 curve (7,829 curves, 4,339 $L$-polynomials) finds no cover with
+  $lambda = plus.minus 1$ at $n = 409$ or $571$ and excludes order 4 at $n = 409$; order 3 leaves 20
+  $L$-polynomials (40 curves) at K-409 and 12 (19 curves) at K-571 open.
 + *Random-b binary curves: only the cover question is new here.* A random-b curve does not lift to
   a Q-curve, so the Koblitz mechanisms do not transfer (derived sketch). LMFDB shows genus-5
   Jacobians realising $op("Res")_(FF_32\/FF_2)(E)$ for $t_5 in {-9, -7, -5, -3}$, where GHS gives
@@ -60,7 +62,7 @@ closed on paper while drafting.
   inset: 4pt,
   align: left,
   [*\#*], [*family*], [*lead*], [*status*], [*first experiment*], [*kill criterion*],
-  [L8], [Koblitz], [Étale route: $D\/FF_2$ with an order-$n$ automorphism and an $FF_2$-map to $E$; its twist contains $E times T_n$, genus $1 + n(g_0 - 1)$], [measured ($g_0 <= 3$; genus 4 screened): hits at $n = 3, 5$; closed for ECC2K-130, K-163, K-233, K-283], [genus-5 bases with $409 | P_B (lambda)$, $op("ord") lambda <= 3$, for K-409], [no genus-5 $B$ passes at $n = 409$],
+  [L8], [Koblitz], [Étale route: $D\/FF_2$ with an order-$n$ automorphism and an $FF_2$-map to $E$; its twist contains $E times T_n$, genus $1 + n(g_0 - 1)$], [measured ($g_0 <= 3$; genus 4 screened): hits at $n = 3, 5$; closed for ECC2K-130, K-163, K-233, K-283], [twisted $L$ over $FF_8$ for the 59 genus-5 candidates with $op("ord") lambda = 3$ (K-409, K-571; genus 5 screened)], [no genus-5 $B$ passes the order-3 screen at $n = 409$],
   [L6], [Koblitz], [Modular twists: $(f_E ⊗ chi) mod 2 ∼ T_n$ for every $n$], [derived], [smallest curve containing $A_(f ⊗ chi)$ for $n = 3, 5, 7, 11$], [genus grows faster than $c(n) n$],
   [L10], [binary], [Genus-$n$ Jacobians realising $op("Res")(E)$, beyond GHS], [sourced at $n = 3, 5$ (LMFDB: genus-5 Jacobians for $t_5 in {-9, -7, -5, -3}$)], [explicit map $C -> E$ over $FF_32$ from the genus-5 census; then $n = 7$], [no explicit map, or none at $n = 7$],
   [L9], [Koblitz and binary], [Certified lower bounds on the cover genus], [derived (partial); $(a = 0, n = 5)$ at genus 5 excluded (LMFDB)], [Howe's test on $T_n$; point-count positivity], [(produces bounds)],
@@ -153,13 +155,24 @@ time.
       $L$-polynomial sets match Xarles's census).
     - The order-3 twist is excluded by a point-count lemma (derived). With $op("ord") lambda = g_0 - 1$,
       $\#D(FF_(2^k)) = \#B(FF_(2^k)) + k t_k equiv 0 mod n$, and for $a = 0$, $t_3 = 5 > 0$.
-  - K-409 and K-571 need $g_0 >= 5$.
+  - K-409 ($g_0 <= 5$) and K-571 ($<= 7$): genus 4 is closed for both. The genus-5 screen
+    (run-20261103T2209Z) covers all 7,829 genus-5 curves over $FF_2$ and leaves both open at $g_0 = 5$.
+    - Hyperelliptic and trigonal families enumerated independently (measured): 393,216 models give
+      the stack count 512, 67,608 quintics singular at one point give 2,817, with the same $L$-sets as
+      Dragutinović's lists. The 3,905 complete intersections are sourced: counts recounted and equal,
+      smoothness not re-tested. The union has 4,339 distinct $L$-polynomials, as in the census.
+    - No genus-5 curve has $n | L(plus.minus 1)$ for $n = 409, 571$. Order 4 at 409 is excluded by the
+      lemma ($k = 4 = g_0 - 1$, $t_4 = 1 > 0$; derived).
+    - Order 3 is not excluded (20 $L$-polynomials, 40 curves, at 409; 12, 19 curves, at 571): the
+      Prym's spectrum is only forced to contain the $mu_3$-closure of $T_n$'s, so the lemma does not apply.
 
 #figure(image("reports/run-20261018T2129Z/hits-by-n.svg", width: 100%), caption: [Run run-20261018T2129Z: characters tested and characters with a $T_n$ factor, per $n$, over every genus-2 and genus-3 curve over $FF_2$. Recorded values; see the run report.])
 
 #figure(image("reports/run-20261018T2129Z/reach.svg", width: 100%), caption: [Run run-20261018T2129Z: odd primes dividing $L_B (plus.minus 1)$ over every genus-2 and genus-3 curve over $FF_2$, against the deployed Koblitz sizes and the base genus each budget allows. Recorded values plus the derived budget.])
 
 #figure(image("reports/run-20261018T2144Z/reach.svg", width: 100%), caption: [Run run-20261018T2144Z: odd primes dividing $L_B (plus.minus 1)$ over every genus-4 curve over $FF_2$, and the order-3 twist candidates, against the deployed sizes whose budget allows $g_0 = 4$. Recorded values plus the derived budget.])
+
+#figure(image("reports/run-20261103T2209Z/reach.svg", width: 100%), caption: [Run run-20261103T2209Z: odd primes dividing $L_B (plus.minus 1)$ over every genus-5 curve over $FF_2$, with the order-3 candidates (open) and order-4 candidates (excluded), against the deployed sizes whose budget allows $g_0 >= 5$. Recorded values plus the derived budget.])
 
 = Closed on paper while drafting
 
@@ -195,8 +208,8 @@ time.
     genus-5 census).
 - Still blocked by a captcha: $t_5 in {-1, 1, 3, 5}$, the two $n = 7$ trace-zero classes, and
   $t_3 = 5$ (already excluded by point counts).
-- L8 covers bases of genus $<= 3$, and genus 4 by the screen. Not yet run: genus-5 and larger bases
-  (K-409, K-571); small-$n$ hits of twisted ($lambda = -1$) genus-3 covers; ramified and non-cyclic covers. The
+- L8 covers bases of genus $<= 3$, and genus 4 and 5 by the screen. Not yet run: the twisted $L$-function
+  over $FF_8$ for the 59 genus-5 order-3 candidates (K-409, K-571), and genus 6 and 7 bases for K-571; small-$n$ hits of twisted ($lambda = -1$) genus-3 covers; ramified and non-cyclic covers. The
   $n = 5$ genus-11 cover has no equations or certificate yet.
 - The novelty audit against the cover-attack literature (Diem, Scholten, Hess, Ekedahl–Serre,
   Elkies) is owed before any of L6–L10 is called new.
