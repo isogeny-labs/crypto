@@ -78,3 +78,46 @@ cargo run --release --example pkm_tower_pilot -- --builder wide \
   --p P-192 --engine generic --verify \
   --out research/pkm_isogeny_wide_p192_20261101/rows_m2_isogeny_verified.jsonl
 ```
+
+## Addendum (later the same day): yield, the m = 2 staircase, and m = 3
+
+Three further runs on the same instrument (`--builder wide --kinds
+isogeny`, supersingular auxiliary curve, `--verify`):
+
+### Random-target yield (rows_m2_isogeny_random.jsonl)
+
+4 random targets per cell, `t = 4 … 8` (`N = 8 … 16`), 20 systems:
+**0 of 20 decompose** — every system is the unit ideal, proved at
+`D = 5` (the same degree as a solvable system at that cell), 0.0–10.7 s
+per proof, all verified.  This is what the arithmetic predicts at a toy
+tower on a NIST prime: a random point is a sum of `m` factor-base
+points with probability ≈ `|V|^m/(m!·p)`, here `2^{16}/2^{192}` at its
+best — so **random-relation collection at P-192 needs the PKM-optimal
+tower size (`t ≈ 39` at `m = 4`, `|V| ≈ (m!·r·T)^{1/(m+1)}`), not toy
+`t`**; planted (decomposition-oracle) systems are the right solver-axis
+instrument at these sizes, which is what the ladder measures.
+
+### The m = 2 staircase further (rows_m2_isogeny_t9_12.jsonl, in flight)
+
+| t | N | D | columns | wall |
+|--:|--:|--:|--:|--:|
+| 9 | 18 | 5 | 13,009 | 88 s |
+| 10 | 20 | **6** | 35,157 | 469 s |
+| 11 | 22 | (running) | | |
+| 12 | 24 | (running) | | |
+
+`D = 6` at `N = 20` at P-192 matches the Kummer ladder at `p₀` (`D = 6`
+at `N = 20 … 24`): the isogeny staircase at a NIST prime rises with
+`N` exactly as at small primes.
+
+### m = 3 (rows_m3_isogeny.jsonl, in flight)
+
+| t | N | D | columns | wall |
+|--:|--:|--:|--:|--:|
+| 4 | 12 | 6 | 5,088 | 18 s |
+| 5 | 15 | (running) | | |
+| 6 | 18 | (running) | | |
+
+`m = 3` starts one degree above `m = 2` (`D = 6` at `N = 12` against
+`D = 5`), as the small-prime ladders do; the `m = 3, N = 21` gate cell is
+beyond this machine's memory at P-192 as at `p₀`.
