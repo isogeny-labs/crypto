@@ -103,12 +103,26 @@ instrument at these sizes, which is what the ladder measures.
 |--:|--:|--:|--:|--:|
 | 9 | 18 | 5 | 13,009 | 88 s |
 | 10 | 20 | **6** | 35,157 | 469 s |
-| 11 | 22 | (running) | | |
+| 11 | 22 | **6** | 63,073 | 4,559 s |
 | 12 | 24 | (running) | | |
 
-`D = 6` at `N = 20` at P-192 matches the Kummer ladder at `p₀` (`D = 6`
-at `N = 20 … 24`): the isogeny staircase at a NIST prime rises with
-`N` exactly as at small primes.
+`D = 6` at `N = 20` and `N = 22` at P-192 matches the Kummer ladder at
+`p₀` (`D = 6` at `N = 20 … 24`): the isogeny staircase at a NIST prime
+rises with `N` exactly as at small primes.
+
+### m = 4 (rows_m4_isogeny.jsonl, in flight)
+
+The NEGATIVE-plateau family (`D ≥ 8` at `m = 4, N = 20` at small
+primes) at a NIST prime:
+
+| t | N | D | columns | wall |
+|--:|--:|--:|--:|--:|
+| 3 | 12 | **7** | 9,453 | 52 s |
+| 4 | 16 | (running) | | |
+| 5 | 20 | (running) | | |
+
+`m = 4` starts one degree above `m = 3` (`D = 7` at `N = 12`), the
+same m-ordering as at small primes (5 / 6 / 7 at `N = 12`).
 
 ### m = 3 (rows_m3_isogeny.jsonl, rows_m3_isogeny_t6.jsonl)
 
