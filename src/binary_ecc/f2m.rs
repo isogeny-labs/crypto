@@ -462,6 +462,10 @@ impl F2mElement {
     pub fn mul(&self, other: &Self, irreducible: &IrreduciblePoly) -> Self {
         super::operation_tally::tick(self.m, "mul");
         debug_assert_eq!(self.m, other.m);
+        #[cfg(target_arch = "x86_64")]
+        if let Some(out) = fixed::mul(self, other, irreducible) {
+            return out;
+        }
         let m = self.m;
         let nw = self.bits.len().max(other.bits.len());
         let mut out = Self::zero(m);
@@ -480,6 +484,10 @@ impl F2mElement {
     /// reduce mod `m(z)`.
     pub fn square(&self, irreducible: &IrreduciblePoly) -> Self {
         super::operation_tally::tick(self.m, "square");
+        #[cfg(target_arch = "x86_64")]
+        if let Some(out) = fixed::square_k(self, 1, irreducible) {
+            return out;
+        }
         let m = self.m;
         let nw = self.bits.len();
         let mut out = Self::zero(m);
@@ -503,6 +511,10 @@ impl F2mElement {
             return acc;
         }
         super::operation_tally::tick_n(self.m, "square", u64::from(k));
+        #[cfg(target_arch = "x86_64")]
+        if let Some(out) = fixed::square_k(self, k, irreducible) {
+            return out;
+        }
         let nw = acc.bits.len();
         with_scratch(2 * nw + 1, |sq| {
             for _ in 0..k {
@@ -1054,6 +1066,288 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
     mul_words_hw_body!(a, b, out)
 }
 
+/// **Fused fixed-width multiply and square** for two- to four-word fields
+/// whose reduction polynomial `z^m + r(z)` has `deg r < 128`, `m ≥ deg r +
+/// 64` and `m > 2 deg r` (F_2^113, F_2^131, B-163, B-233, …): the product,
+/// the reduction and the mask in one `pclmulqdq` function on `[u64; N]`
+/// registers, with no slice, scratch buffer or call between them.
+///
+/// The reduction is two rounds rather than one fold a word: `hi = v >> m`
+/// is at most `m − 1` bits, so `hi · r` is `N` independent carry-less
+/// products added into `v mod z^m`; what that spills at or above `z^m` is
+/// under `deg r` bits and one more product folds it below `z^m`, since
+/// `2 deg r − 2 < m`.  The word-by-word fold is a chain of `≈ 2N`
+/// dependent products; this is two, which is where most of a
+/// latency-bound multiply went.
+///
+/// The remainder modulo `z^m + r` is unique, so the result is the generic
+/// path's bit for bit (tested against `schoolbook_mul` below).  Operands
+/// with bits at or above `z^m` — which no arithmetic here produces — take
+/// the generic path, so even those answers are unchanged.
+#[cfg(target_arch = "x86_64")]
+mod fixed {
+    use super::{has_hw_clmul, F2mElement, IrreduciblePoly};
+    use std::arch::x86_64::*;
+
+    /// `r = r1·z^64 + r`: one word for most fields, two for B-233's `z^74 + 1`.
+    #[derive(Clone, Copy)]
+    struct Plan {
+        m: usize,
+        r: u64,
+        r1: u64,
+    }
+
+    /// The plan for `irreducible` at the operands' width, or `None` where
+    /// the generic path must run.
+    #[inline(always)]
+    fn plan(m: u32, words: usize, irreducible: &IrreduciblePoly) -> Option<Plan> {
+        if irreducible.degree != m || !(2..=4).contains(&words) || words != m.div_ceil(64) as usize {
+            return None;
+        }
+        let terms = &irreducible.low_terms;
+        if terms.len() > 8 {
+            return None;
+        }
+        let (mut r, mut r1) = (0u64, 0u64);
+        for &t in terms {
+            match t {
+                0..=63 => r |= 1u64 << t,
+                64..=127 => r1 |= 1u64 << (t - 64),
+                _ => return None,
+            }
+        }
+        let t_max = if r1 != 0 {
+            127 - r1.leading_zeros() as usize
+        } else {
+            63 - r.leading_zeros() as usize
+        };
+        // Round two must land below z^m: 2·deg r − 2 < m.
+        if (m as usize) < t_max + 64 || (m as usize) <= 2 * t_max || !has_hw_clmul() {
+            return None;
+        }
+        Some(Plan { m: m as usize, r, r1 })
+    }
+
+    /// Whether the top word holds no bit at or above `z^m`.
+    #[inline(always)]
+    fn reduced(words: &[u64], m: u32) -> bool {
+        let s = m % 64;
+        s == 0 || words[words.len() - 1] >> s == 0
+    }
+
+    #[inline(always)]
+    fn element(m: u32, words: &[u64]) -> F2mElement {
+        let mut out = F2mElement::zero(m);
+        out.bits.copy_from_slice(words);
+        out
+    }
+
+    pub(super) fn mul(a: &F2mElement, b: &F2mElement, irreducible: &IrreduciblePoly) -> Option<F2mElement> {
+        let (x, y) = (&*a.bits, &*b.bits);
+        if x.len() != y.len() || a.m != b.m {
+            return None;
+        }
+        let p = plan(a.m, x.len(), irreducible)?;
+        if !reduced(x, a.m) || !reduced(y, a.m) {
+            return None;
+        }
+        // SAFETY: `plan` checked the CPU has `pclmulqdq`; the lengths match N.
+        let out = unsafe {
+            match x.len() {
+                2 => element(a.m, &mul_n::<2, 4>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                3 => element(a.m, &mul_n::<3, 6>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                _ => element(a.m, &mul_n::<4, 8>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+            }
+        };
+        Some(out)
+    }
+
+    /// `a^(2^k)`, `k ≥ 1`.
+    pub(super) fn square_k(a: &F2mElement, k: u32, irreducible: &IrreduciblePoly) -> Option<F2mElement> {
+        let x = &*a.bits;
+        let p = plan(a.m, x.len(), irreducible)?;
+        if !reduced(x, a.m) {
+            return None;
+        }
+        // SAFETY: as in `mul`.
+        let out = unsafe {
+            match x.len() {
+                2 => element(a.m, &square_n::<2, 4>(x.try_into().unwrap(), k, p)),
+                3 => element(a.m, &square_n::<3, 6>(x.try_into().unwrap(), k, p)),
+                _ => element(a.m, &square_n::<4, 8>(x.try_into().unwrap(), k, p)),
+            }
+        };
+        Some(out)
+    }
+
+    #[target_feature(enable = "pclmulqdq")]
+    #[inline]
+    unsafe fn clmul(a: u64, b: u64) -> (u64, u64) {
+        let z = _mm_clmulepi64_si128::<0x00>(_mm_set_epi64x(0, a as i64), _mm_set_epi64x(0, b as i64));
+        (
+            _mm_cvtsi128_si64(z) as u64,
+            _mm_cvtsi128_si64(_mm_srli_si128::<8>(z)) as u64,
+        )
+    }
+
+    /// `v mod (z^m + r)` for a product `v` of two reduced operands
+    /// (degree at most `2m − 2`), as the low `N` words.
+    #[target_feature(enable = "pclmulqdq")]
+    #[inline]
+    unsafe fn reduce<const N: usize, const W: usize>(v: &[u64; W], p: Plan) -> [u64; N] {
+        if p.r1 != 0 {
+            return reduce_wide_r::<N, W>(v, p);
+        }
+        let q = p.m / 64;
+        let s = (p.m % 64) as u32;
+        let low_mask = if s == 0 { u64::MAX } else { (1u64 << s) - 1 };
+        let mut t = [0u64; N];
+        t.copy_from_slice(&v[..N]);
+        // Round one: `hi = v >> m`, at most m − 1 bits, times r.
+        let mut carry = 0u64;
+        for (k, tk) in t.iter_mut().enumerate() {
+            let lo = v.get(q + k).copied().unwrap_or(0);
+            let hi_word = if s == 0 {
+                lo
+            } else {
+                (lo >> s) | (v.get(q + k + 1).copied().unwrap_or(0) << (64 - s))
+            };
+            if k == N - 1 && s != 0 {
+                *tk &= low_mask;
+            }
+            let (plo, phi) = clmul(hi_word, p.r);
+            *tk ^= plo ^ carry;
+            carry = phi;
+        }
+        // Round two: the fewer than deg r bits now at or above z^m.
+        let top = if s == 0 {
+            carry
+        } else {
+            let top = (t[N - 1] >> s) | (carry << (64 - s));
+            t[N - 1] &= low_mask;
+            top
+        };
+        let (plo, phi) = clmul(top, p.r);
+        t[0] ^= plo;
+        t[1] ^= phi;
+        t
+    }
+
+    /// `u[k..] ^= x · r` for a two-word `r`.
+    #[target_feature(enable = "pclmulqdq")]
+    #[inline]
+    unsafe fn add_mul_r(u: &mut [u64], k: usize, x: u64, p: Plan) {
+        let (lo, hi) = clmul(x, p.r);
+        u[k] ^= lo;
+        u[k + 1] ^= hi;
+        let (lo, hi) = clmul(x, p.r1);
+        u[k + 1] ^= lo;
+        u[k + 2] ^= hi;
+    }
+
+    /// Word `k` of `v >> m`.
+    #[inline(always)]
+    fn shr_word(v: &[u64], m: usize, k: usize) -> u64 {
+        let q = m / 64 + k;
+        let s = (m % 64) as u32;
+        let a = v.get(q).copied().unwrap_or(0);
+        if s == 0 {
+            a
+        } else {
+            (a >> s) | (v.get(q + 1).copied().unwrap_or(0) << (64 - s))
+        }
+    }
+
+    /// [`reduce`] for `deg r ≥ 64`: the same two rounds, each product
+    /// two carry-less multiplies a word, and round two's spill (under
+    /// `deg r` bits) up to two words.
+    #[target_feature(enable = "pclmulqdq")]
+    #[inline]
+    unsafe fn reduce_wide_r<const N: usize, const W: usize>(v: &[u64; W], p: Plan) -> [u64; N] {
+        let m = p.m;
+        let q = m / 64;
+        let s = m % 64;
+        // N low words and three of room for the spill.
+        let mut u = [0u64; 7];
+        u[..N].copy_from_slice(&v[..N]);
+        if s != 0 {
+            u[N - 1] &= (1u64 << s) - 1;
+        }
+        for k in 0..N {
+            add_mul_r(&mut u, k, shr_word(v, m, k), p);
+        }
+        let (t0, t1) = (shr_word(&u, m, 0), shr_word(&u, m, 1));
+        if s != 0 {
+            u[q] &= (1u64 << s) - 1;
+        } else {
+            u[q] = 0;
+        }
+        for w in u.iter_mut().skip(q + 1) {
+            *w = 0;
+        }
+        add_mul_r(&mut u, 0, t0, p);
+        add_mul_r(&mut u, 1, t1, p);
+        let mut out = [0u64; N];
+        out.copy_from_slice(&u[..N]);
+        out
+    }
+
+    #[target_feature(enable = "pclmulqdq")]
+    unsafe fn mul_n<const N: usize, const W: usize>(a: &[u64; N], b: &[u64; N], p: Plan) -> [u64; N] {
+        let mut v = [0u64; W];
+        if N == 2 {
+            let p0 = clmul(a[0], b[0]);
+            let p2 = clmul(a[1], b[1]);
+            let c = clmul(a[0] ^ a[1], b[0] ^ b[1]);
+            let p1 = (c.0 ^ p0.0 ^ p2.0, c.1 ^ p0.1 ^ p2.1);
+            v[0] = p0.0;
+            v[1] = p0.1 ^ p1.0;
+            v[2] = p1.1 ^ p2.0;
+            v[3] = p2.1;
+        } else if N == 3 {
+            let p0 = clmul(a[0], b[0]);
+            let p2 = clmul(a[1], b[1]);
+            let p4 = clmul(a[2], b[2]);
+            let q01 = clmul(a[0] ^ a[1], b[0] ^ b[1]);
+            let q12 = clmul(a[1] ^ a[2], b[1] ^ b[2]);
+            let q02 = clmul(a[0] ^ a[2], b[0] ^ b[2]);
+            let p1 = (q01.0 ^ p0.0 ^ p2.0, q01.1 ^ p0.1 ^ p2.1);
+            let p3 = (q12.0 ^ p2.0 ^ p4.0, q12.1 ^ p2.1 ^ p4.1);
+            let pm = (q02.0 ^ p0.0 ^ p4.0 ^ p2.0, q02.1 ^ p0.1 ^ p4.1 ^ p2.1);
+            v[0] = p0.0;
+            v[1] = p0.1 ^ p1.0;
+            v[2] = p1.1 ^ pm.0;
+            v[3] = pm.1 ^ p3.0;
+            v[4] = p3.1 ^ p4.0;
+            v[5] = p4.1;
+        } else {
+            for i in 0..N {
+                for j in 0..N {
+                    let (lo, hi) = clmul(a[i], b[j]);
+                    v[i + j] ^= lo;
+                    v[i + j + 1] ^= hi;
+                }
+            }
+        }
+        reduce::<N, W>(&v, p)
+    }
+
+    #[target_feature(enable = "pclmulqdq")]
+    unsafe fn square_n<const N: usize, const W: usize>(a: &[u64; N], k: u32, p: Plan) -> [u64; N] {
+        let mut x = *a;
+        for _ in 0..k {
+            let mut v = [0u64; W];
+            for i in 0..N {
+                let (lo, hi) = clmul(x[i], x[i]);
+                v[2 * i] = lo;
+                v[2 * i + 1] = hi;
+            }
+            x = reduce::<N, W>(&v, p);
+        }
+        x
+    }
+}
+
 /// Reduce `value` modulo `m(z)` in place, a whole word at a time.
 ///
 /// Each word `w` at or above `z^m` stands for `w · z^{64i}`, and since
@@ -1367,6 +1661,66 @@ mod tests {
         *s ^= *s >> 7;
         *s ^= *s << 17;
         *s
+    }
+
+    /// The fused fixed-width kernel (`fixed`) against the bit-serial
+    /// reference: every two- to four-word field it takes, `m` a multiple
+    /// of 64 included (its round-one shift is zero), dense and sparse
+    /// operands, squares and `square_k_times` chains.  Operands carrying
+    /// bits above `z^m` must fall back and still agree.
+    #[test]
+    fn fixed_width_kernel_matches_schoolbook() {
+        let mut s = 0x0123_4567_89AB_CDEFu64;
+        let fields = vec![
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_127(),
+            IrreduciblePoly::deg_131(),
+            IrreduciblePoly::deg_163(),
+            IrreduciblePoly::deg_193(),
+            IrreduciblePoly { degree: 128, low_terms: vec![0, 1, 2, 7] },
+            IrreduciblePoly { degree: 192, low_terms: vec![0, 1, 2, 7] },
+            IrreduciblePoly { degree: 256, low_terms: vec![0, 2, 5, 10] },
+            IrreduciblePoly { degree: 200, low_terms: vec![0, 1, 63, 136 - 100] },
+            IrreduciblePoly { degree: 130, low_terms: vec![0, 66] },
+            IrreduciblePoly::deg_233(),
+            IrreduciblePoly { degree: 192, low_terms: vec![0, 5, 64, 90] },
+            IrreduciblePoly { degree: 256, low_terms: vec![0, 1, 100, 127] },
+        ];
+        for irr in &fields {
+            let m = irr.degree;
+            for t in 0..2000 {
+                let a = random_elem(&mut s, m);
+                let b = if t % 5 == 0 {
+                    F2mElement::from_words(&vec![u64::MAX; m.div_ceil(64) as usize], m)
+                } else {
+                    random_elem(&mut s, m)
+                };
+                assert_eq!(a.mul(&b, irr), a.schoolbook_mul(&b, irr), "mul, m = {m}");
+                assert_eq!(a.square(irr), a.schoolbook_mul(&a, irr), "square, m = {m}");
+                let mut want = a.clone();
+                for _ in 0..(t % 7) + 1 {
+                    want = want.schoolbook_mul(&want, irr);
+                }
+                assert_eq!(a.square_k_times((t % 7) + 1, irr), want, "square_k, m = {m}");
+            }
+            // Unreduced operands (bits above z^m): the generic path, same answers as before.
+            if m % 64 != 0 {
+                let n = m.div_ceil(64) as usize;
+                let mut a = random_elem(&mut s, m);
+                if let Words::Inline { w, .. } = &mut a.bits {
+                    w[n - 1] |= 1u64 << 63;
+                }
+                let b = random_elem(&mut s, m);
+                let mut generic = F2mElement::zero(m);
+                with_scratch(2 * n + 1, |prod| {
+                    mul_words_into(&a.bits, &b.bits, prod);
+                    reduce_words(prod, irr);
+                    generic.bits.copy_from_slice(&prod[..n]);
+                });
+                generic.mask_in_place();
+                assert_eq!(a.mul(&b, irr), generic, "unreduced mul, m = {m}");
+            }
+        }
     }
 
     fn random_elem(s: &mut u64, m: u32) -> F2mElement {
