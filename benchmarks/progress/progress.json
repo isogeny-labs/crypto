@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0509Z-c25519-autolab-r13-k20",
+  "latest_record": "20261104T0511Z-c25519-autolab-r14-k28",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 10,
+    "measured": 11,
     "open": 0
   },
   "repo": "crypto",
@@ -106,11 +106,11 @@
     {
       "better": "lower",
       "first": 10.939468556478129,
-      "latest": 7.444768388348348,
+      "latest": 7.33,
       "latest_derived": {
-        "improvement_vs_first_percent": 31.9458,
-        "improvement_vs_previous_percent": 31.8205,
-        "value_over_reference": 7.784986
+        "improvement_vs_first_percent": 32.9949,
+        "improvement_vs_previous_percent": 1.5416,
+        "value_over_reference": 6.737132
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -160,6 +160,22 @@
           "spread": null,
           "summary": "ic_autolab round 8, k = 28: ksum:m=4 N = 18 S(w=0) 7.44 vs incumbent 10.98, matched rho 0.96 (distance 11.5x -> 7.8x)",
           "value": 7.444768388348348
+        },
+        {
+          "commit": "f8459a0ea555",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 32.9949,
+            "improvement_vs_previous_percent": 1.5416,
+            "value_over_reference": 6.737132
+          },
+          "n": 32,
+          "record": "20261104T0511Z-c25519-autolab-r14-k28",
+          "reference": 1.088,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 14, k = 28 train screen: no challenger; ksum4f-n18 has no table collisions on this base",
+          "value": 7.33
         }
       ],
       "problem": "ic:curve25519-family-k28",
