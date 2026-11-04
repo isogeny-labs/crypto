@@ -94,6 +94,10 @@ total cost rises) is caught by the band. Distance to rho,
 The class names are labels of this rule, not claims; a round's outcome is
 cited by its claim record [pcc:unverified].
 
+## Owner ruling on the baby-step giant-step boundary (2026-11-04)
+
+The owner ruled on 2026-11-04 that the C = 2 seed arms (`wsum2*`, `wwalk*`) and the `wwalk` arms with known-log G jumps (`g=1,grow=2`) count as index-calculus results under the decision rule above. Rows marked "classification pending an owner ruling" in the table below are settled by this ruling and keep their claim records unchanged. The owner also set the next direction: a structure search for curve-specific levers (`ideas/STRUCTURE-R4.md`), because table-and-probe designs are bounded near the generic floor.
+
 ## Rounds
 
 | round | track | sizes | outcome | report |
