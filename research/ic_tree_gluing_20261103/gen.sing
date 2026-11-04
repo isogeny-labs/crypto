@@ -115,6 +115,19 @@ proc armnames(string arm, int m, int t)   // "T" (the remainder-chain variable) 
       L[size(L) + 1] = "X1"; L[size(L) + 1] = "X2"; L[size(L) + 1] = "X3"; L[size(L) + 1] = "Y";
     }
   }
+  if (arm == "Y")   // round 5: chord (function) coupling for the first pair, m = 3
+  {
+    L[size(L) + 1] = "w1"; L = L + kn("c0", t); L[size(L) + 1] = "w2"; L = L + kn("c1", t);
+    L[size(L) + 1] = "y1"; L[size(L) + 1] = "y2"; L[size(L) + 1] = "lam"; L[size(L) + 1] = "X1";
+    L[size(L) + 1] = "w3"; L = L + kn("c2", t);
+  }
+  if (arm == "L")   // round 5: fat leaf (triple, symmetric) + single leaf, m = 4
+  {
+    L[size(L) + 1] = "e1"; L[size(L) + 1] = "e2"; L[size(L) + 1] = "e3";
+    L = L + mn("f", 3, t);
+    L[size(L) + 1] = "w4"; L = L + kn("c3", t);
+    L[size(L) + 1] = "X1";
+  }
   if (arm == "G")   // round 3: two cherries, separators eliminated (m = 4)
   {
     for (c = 0; c < 2; c++)
@@ -358,6 +371,66 @@ proc cell(string arm, intvec rec, int A, int B, int G, string OUT, string S4str)
     }
   }
 
+  if (arm == "Y")   // round 5: y-coordinates and slope for the pair (P1, P2); x-only root
+  {
+    if (m != 3) { die("Y arm needs m = 3"); }
+    poly x1p = pg * var(ix("w1", nm)); poly x2p = pg * var(ix("w2", nm)); poly x3p = pg * var(ix("w3", nm));
+    E = kchain("c0", var(ix("w1", nm)), t, nm); EQ = extend(EQ, E);
+    E = kchain("c1", var(ix("w2", nm)), t, nm); EQ = extend(EQ, E);
+    E = kchain("c2", var(ix("w3", nm)), t, nm); EQ = extend(EQ, E);
+    EQ[size(EQ) + 1] = var(ix("y1", nm))^2 - (x1p^3 + pa * x1p + pb);
+    EQ[size(EQ) + 1] = var(ix("y2", nm))^2 - (x2p^3 + pa * x2p + pb);
+    EQ[size(EQ) + 1] = var(ix("lam", nm)) * (x2p - x1p) - (var(ix("y2", nm)) - var(ix("y1", nm)));
+    EQ[size(EQ) + 1] = var(ix("X1", nm)) - var(ix("lam", nm))^2 + x1p + x2p;
+    EQ[size(EQ) + 1] = S3(var(ix("X1", nm)), x3p, xR, pa, pb);
+    for (i = 1; i <= 3; i++)
+    {
+      vals[ix("w" + string(i), nm)] = W[i]; DONE[size(DONE) + 1] = "w" + string(i);
+      vals = plantK("c" + string(i - 1), W[i], t, nm, vals); DONE = DONE + kn("c" + string(i - 1), t);
+    }
+    // planted y-signs: the combination whose chord sum has abscissa x(P1 + P2) = TREE[1]
+    number nx1 = number(G) * number(W[1]); number nx2 = number(G) * number(W[2]);
+    list RT; int jy; poly fy; list FY; number r1; number r2; number ly; number Xy; int okY = 0;
+    for (jy = 1; jy <= 2; jy++)
+    {
+      if (jy == 1) { fy = var(1)^2 - (nx1^3 + number(A) * nx1 + number(B)); } else { fy = var(1)^2 - (nx2^3 + number(A) * nx2 + number(B)); }
+      FY = factorize(fy); RT[jy] = 0;
+      for (i = 1; i <= size(FY[1]); i++) { if (deg(FY[1][i]) == 1) { RT[jy] = -number(jet(FY[1][i], 0)) / leadcoef(FY[1][i]); } }
+    }
+    for (i = 0; i < 4; i++)
+    {
+      r1 = RT[1]; r2 = RT[2]; if (i mod 2 == 1) { r1 = -r1; } if (i div 2 == 1) { r2 = -r2; }
+      ly = (r2 - r1) / (nx2 - nx1); Xy = ly^2 - nx1 - nx2;
+      if (okY == 0 and Xy == leadcoef(TREE[1])) { okY = 1;
+        vals[ix("y1", nm)] = r1; vals[ix("y2", nm)] = r2; vals[ix("lam", nm)] = ly; vals[ix("X1", nm)] = Xy; }
+    }
+    if (okY == 0) { die("no y-signs reproduce the planted cherry sum"); }
+    DONE[size(DONE) + 1] = "y1"; DONE[size(DONE) + 1] = "y2"; DONE[size(DONE) + 1] = "lam"; DONE[size(DONE) + 1] = "X1";
+  }
+
+  if (arm == "L")   // round 5: S4sym(e1,e2,e3; X1) for the triple P1+P2+P3, then S3(X1, x4, xR)
+  {
+    if (m != 4) { die("L arm needs m = 4"); }
+    es = var(ix("e1", nm)), var(ix("e2", nm)), var(ix("e3", nm));
+    E = mchain("f", es, 3, t, nm); EQ = extend(EQ, E);
+    E = kchain("c3", var(ix("w4", nm)), t, nm); EQ = extend(EQ, E);
+    ring BlL = 786433,(E1,E2,E3,xr),dp;
+    execute("poly sL = " + S4str + ";");
+    setring R;
+    map phiL = BlL, pg * var(ix("e1", nm)), pg^2 * var(ix("e2", nm)), pg^3 * var(ix("e3", nm)), var(ix("X1", nm));
+    s4 = phiL(sL);
+    EQ[size(EQ) + 1] = s4;
+    EQ[size(EQ) + 1] = S3(var(ix("X1", nm)), pg * var(ix("w4", nm)), xR, pa, pb);
+    vals[ix("e1", nm)] = W[1] + W[2] + W[3]; DONE[size(DONE) + 1] = "e1";
+    vals[ix("e2", nm)] = W[1] * W[2] + W[1] * W[3] + W[2] * W[3]; DONE[size(DONE) + 1] = "e2";
+    vals[ix("e3", nm)] = W[1] * W[2] * W[3]; DONE[size(DONE) + 1] = "e3";
+    rt = W[1], W[2], W[3];
+    vals = plantM("f", 3, t, rt, nm, vals); DONE = DONE + mn("f", 3, t);
+    vals[ix("w4", nm)] = W[4]; DONE[size(DONE) + 1] = "w4";
+    vals = plantK("c3", W[4], t, nm, vals); DONE = DONE + kn("c3", t);
+    vals[ix("X1", nm)] = CAT[2]; DONE[size(DONE) + 1] = "X1";   // x(P1 + P2 + P3)
+  }
+
   if (arm == "G")   // round 3: S5 in the two cherries' (s, q), separators eliminated
   {
     if (m != 4) { die("G arm needs m = 4"); }
@@ -529,7 +602,7 @@ for (ii = 1; ii <= size(RECS); ii++)
   if (CELLS != "")   // round 2: S arm, F at m=4, only the named cells
   {
     ARMS = list("C", "T", "F");
-    if (rv[1] >= 3) { ARMS = list("C", "T", "F", "S", "G"); }
+    if (rv[1] >= 3) { ARMS = list("C", "T", "F", "S", "G", "L", "Y"); }
   }
 
   for (jj = 1; jj <= size(ARMS); jj++)
