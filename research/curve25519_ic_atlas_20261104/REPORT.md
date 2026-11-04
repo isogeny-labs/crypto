@@ -208,8 +208,7 @@ subgroup target iff c_i ± c_j ≡ 0 (mod 8).
 Public targets; every run verified by ecbench against the planted
 scalar. T5 ran 1 measured round (6 runs per arm), T9 and T12 ran 2
 (32 per arm). Replay audits: T5 8/8 and T9 16/16 reproduced with 0
-problems; T12's audit runs one replay per chunk and is in progress
-(10 of 16 chunks done at validation time, all OK).
+problems; T12 one replay per chunk, 16/16 reproduced with 0 problems.
 
 | session | targets | arm | S (w=0) | S (w=0.1) | S (w=1) |
 |:--|--:|:--|--:|--:|--:|
@@ -332,8 +331,8 @@ Ideas considered and not pursued, with the reason:
   study's, and T4-rep later reproduced the T4/T5 engine cells exactly, but
   no validator report exists for them.
 - This atlas: `validator-report.json`, pass_with_errata (E1–E8 applied).
-- Pending validation: T11 (chunked session running), T12 (replay audit
-  in progress; band and paired compares done), wave 4.
+- Pending validation: T11 (chunked session running), T12 (audit complete;
+  independent validator running), wave 4.
 - No study here passes the leaderboard validation gate: component results
   have no same-unit rho row, by design.
 

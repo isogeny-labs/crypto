@@ -76,7 +76,7 @@ Paired ratios, winner ÷ comparator (K = 16 targets, linearised t, 95%):
 
 | | prediction | outcome |
 |:--|:--|:--|
-| Q1 | the winner verifies 32/32; the replay audit reports 0 problems | **held**: 32/32, AUDIT_RESULT |
+| Q1 | the winner verifies 32/32; the replay audit reports 0 problems | **held**: 32/32; `ecbench verify --replay 1` on each of the 16 chunks: 160 records verified, 16 replays reproduced, 0 problems (`ecbench/verify/`) |
 | Q2 | S(winner)/S(seed 0) ≤ 0.15 at w = 0.1 and 1, upper bound < 1 | **held**: 0.0578, upper 0.0716 |
 | Q3 | S(winner)/S(seed 1308) ≤ 0.25 at w = 0.1 and 1, upper bound < 1 | **held**: 0.128, upper 0.169 |
 | Q4 | the order flips at w = 0: S(winner)/S(seed 1308) ≥ 1.2 | **held**: 1.588 |
