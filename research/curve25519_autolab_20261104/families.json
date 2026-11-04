@@ -95,7 +95,8 @@
           "params": {
             "targets": "stride"
           },
-          "note": "ksum:m=3 with the stride target stream instead of the jump walk (ideas/PROPOSALS.md P1: the walk's 16 jumps cost two scalar multiplications each); default_f is the k = 20 incumbent's N / N_a"
+          "note": "ksum:m=3 with the stride target stream instead of the jump walk (ideas/PROPOSALS.md P1: the walk's 16 jumps cost two scalar multiplications each); default_f is the k = 20 incumbent's N / N_a Disabled after round 12: P1 falsified (stride 1.081x the walk at k = 24).",
+          "enabled": false
         },
         {
           "id": "ksum4s",
@@ -105,7 +106,8 @@
           "params": {
             "targets": "stride"
           },
-          "note": "ksum:m=4 with the stride target stream (P1); default_f is the k = 24 incumbent's N / N_a"
+          "note": "ksum:m=4 with the stride target stream (P1); default_f is the k = 24 incumbent's N / N_a Disabled after round 12: P1 falsified (stride 1.081x the walk at k = 24).",
+          "enabled": false
         },
         {
           "id": "ksum3f",
