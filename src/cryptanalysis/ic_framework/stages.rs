@@ -334,6 +334,18 @@ pub trait DecompositionOracle<G: CountedGroup> {
 /// Totals an algebraic oracle accumulates over its solver calls.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SolverTotals {
+    /// Advisory degree-of-regularity forecast over the calls seen so far
+    /// (`crate::cryptanalysis::dreg_forecast`), fed by
+    /// [`absorb_outcome`](Self::absorb_outcome).  Built at the first call
+    /// that reports a degree: a capped engine's cap (`extra["max_degree"]`)
+    /// is the censoring bound, an uncapped one gets the Boolean ring's own
+    /// ceiling, the variable count.  An engine that reports no degree at
+    /// all (SAT, exhaustive search) leaves it `None` and says why in
+    /// `forecast_unavailable`.  Never priced, never a stopping rule.
+    #[serde(skip)]
+    pub forecaster: Option<crate::cryptanalysis::dreg_forecast::Forecaster>,
+    #[serde(skip)]
+    pub forecast_unavailable: Option<String>,
     pub solver: String,
     pub calls: u64,
     pub ops: u64,
@@ -405,6 +417,73 @@ impl SolverTotals {
                 *entry += v;
             }
         }
+    }
+
+    /// [`absorb`](Self::absorb), then feed the degree-of-regularity
+    /// forecaster with what the call decided: `found` is whether the
+    /// solve produced a decomposition.  A decided call observes its
+    /// solving degree (the engine's, or else the highest degree it
+    /// built); a budget-exceeded call is right-censored at the highest
+    /// degree built.  A call that reports neither degree is counted in
+    /// the totals but not in the forecast.
+    pub fn absorb_outcome(
+        &mut self,
+        shape: &SystemShape,
+        cost: Option<&SolverCost>,
+        budget_exceeded: bool,
+        found: bool,
+    ) {
+        use crate::cryptanalysis::dreg_forecast::{Forecaster, Outcome, SolveObservation};
+        self.absorb(shape, cost, budget_exceeded);
+        let Some(c) = cost else {
+            return;
+        };
+        let exhausted = budget_exceeded || c.timed_out;
+        let degree = c.solving_degree.or(c.degree_reached);
+        if self.forecaster.is_none() && self.forecast_unavailable.is_none() {
+            let cap = c
+                .extra
+                .get("max_degree")
+                .copied()
+                .filter(|b| *b > 0 && *b <= u64::from(u32::MAX))
+                .map(|b| b as u32);
+            if cap.is_none() && degree.is_none() {
+                self.forecast_unavailable = Some(
+                    "the solver reports neither a degree cap (`max_degree`) nor a solving degree: no degree-of-regularity forecast".into(),
+                );
+                return;
+            }
+            // An uncapped engine (a full Gröbner basis) is bounded by the
+            // Boolean ring's own ceiling, the variable count.
+            let bound = cap.unwrap_or_else(|| shape.n_vars.clamp(1, u32::MAX as usize) as u32);
+            let mut f = Forecaster::new(bound).with_work_unit(&c.op_unit);
+            f.set_shape(crate::cryptanalysis::dreg_forecast::SystemShape {
+                variables: shape.n_vars,
+                equation_degrees: shape.degrees.iter().copied().filter(|d| *d > 0).collect(),
+                boolean: true,
+            });
+            self.forecaster = Some(f);
+        }
+        let Some(f) = self.forecaster.as_mut() else {
+            return;
+        };
+        if degree.is_none() {
+            return;
+        }
+        f.observe(SolveObservation {
+            outcome: if exhausted {
+                Outcome::Exhausted
+            } else if found {
+                Outcome::Decomposed
+            } else {
+                Outcome::Refuted
+            },
+            solving_degree: degree,
+            censored_above: c.degree_reached.unwrap_or(0),
+            work: c.ops,
+            relation_phase: true,
+            relation: found,
+        });
     }
 
     pub fn solving_degree_mean(&self) -> Option<f64> {
@@ -742,6 +821,91 @@ mod tests {
         late.absorb(&shape, Some(&cost(false)), false);
         late.absorb(&shape, Some(&cost(true)), false);
         assert!(!late.extra.contains_key("bitop_complete"));
+    }
+
+    /// `absorb_outcome` builds the degree-of-regularity forecaster from the
+    /// engine's degree cap, observes decided and censored calls, and leaves
+    /// an engine without a cap with a stated reason instead of a forecast.
+    #[test]
+    fn absorb_outcome_feeds_the_degree_forecaster_or_says_why_not() {
+        use crate::cryptanalysis::dreg_forecast::Outcome;
+        let shape = SystemShape {
+            n_vars: 6,
+            n_equations: 6,
+            degrees: vec![2; 6],
+            semi_regular_degree: Some(3),
+        };
+        let cost = |built: u32, exhausted: bool| {
+            let mut c = SolverCost {
+                ops: 100,
+                op_unit: "word XORs (elimination only)".into(),
+                degree_reached: Some(built),
+                timed_out: exhausted,
+                ..Default::default()
+            };
+            c.extra.insert("max_degree".into(), 3);
+            c
+        };
+        let mut t = SolverTotals::default();
+        t.absorb_outcome(&shape, Some(&cost(2, false)), false, true);
+        t.absorb_outcome(&shape, Some(&cost(2, false)), false, false);
+        t.absorb_outcome(&shape, Some(&cost(3, true)), true, false);
+        // A call without a degree is totalled but not observed.
+        let mut bare = cost(2, false);
+        bare.degree_reached = None;
+        t.absorb_outcome(&shape, Some(&bare), false, true);
+        assert_eq!(t.calls, 4);
+        let f = t.forecaster.as_ref().expect("forecaster from max_degree");
+        let obs = f.observations();
+        assert_eq!(obs.len(), 3);
+        assert_eq!(obs[0].outcome, Outcome::Decomposed);
+        assert!(obs[0].relation);
+        assert_eq!(obs[1].outcome, Outcome::Refuted);
+        assert_eq!(obs[2].outcome, Outcome::Exhausted);
+        assert_eq!(obs[2].censored_above, 3);
+        let fc = f.forecast();
+        assert_eq!(fc.degree_bound, 3);
+        assert_eq!(fc.semi_regular_degree, Some(3));
+        assert_eq!(fc.shape.as_ref().map(|s| s.variables), Some(6));
+        assert_eq!(fc.decided, 2);
+        assert_eq!(fc.censored, 1);
+        assert!(t.forecast_unavailable.is_none());
+
+        // An uncapped engine that reports its solving degree is bounded by
+        // the ring's ceiling, the variable count.
+        let mut uncapped = SolverTotals::default();
+        let full = SolverCost {
+            ops: 9,
+            op_unit: "word XORs (elimination only)".into(),
+            degree_reached: Some(4),
+            solving_degree: Some(3),
+            ..Default::default()
+        };
+        uncapped.absorb_outcome(&shape, Some(&full), false, true);
+        let fc = uncapped.forecaster.as_ref().unwrap().forecast();
+        assert_eq!(fc.degree_bound, 6);
+        assert_eq!(fc.all_targets.decided, 1);
+        assert_eq!(
+            uncapped.forecaster.as_ref().unwrap().observations()[0].solving_degree,
+            Some(3)
+        );
+
+        let mut sat = SolverTotals::default();
+        let conflicts = SolverCost {
+            ops: 7,
+            op_unit: "conflicts".into(),
+            ..Default::default()
+        };
+        sat.absorb_outcome(&shape, Some(&conflicts), false, false);
+        assert!(sat.forecaster.is_none());
+        assert!(sat
+            .forecast_unavailable
+            .as_deref()
+            .is_some_and(|s| s.contains("max_degree")));
+        // Plain `absorb` never starts a forecast.
+        let mut plain = SolverTotals::default();
+        plain.absorb(&shape, Some(&cost(2, false)), false);
+        assert!(plain.forecaster.is_none() && plain.forecast_unavailable.is_none());
     }
 
     #[test]

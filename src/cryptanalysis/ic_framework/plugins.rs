@@ -3443,7 +3443,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
             let shape = system.shape();
             let verdict = self.harness.solve(&system);
             let exceeded = matches!(verdict, SolverVerdict::BudgetExceeded);
-            self.totals.absorb(&shape, self.harness.cost(), exceeded);
+            let found = matches!(&verdict, SolverVerdict::Solved(s) if !s.is_empty());
+            self.totals
+                .absorb_outcome(&shape, self.harness.cost(), exceeded, found);
             // The descent, the copy, and two shape computations (here and
             // in the harness).
             charge_system_build(&mut self.totals.extra, &system, &shape, 2);
@@ -3867,7 +3869,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
             timed_out: !out.complete,
             extra,
         };
-        self.totals.absorb(shape, Some(&cost), !out.complete);
+        self.totals
+            .absorb_outcome(shape, Some(&cost), !out.complete, out.relation.is_some());
         let indices = out.relation?;
         // Re-lift through the framework so the sign resolution is charged
         // exactly as it is for the x-frame oracle.  `T` (x = 0) is a base
@@ -4197,7 +4200,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
             timed_out: exhausted,
             extra,
         };
-        self.totals.absorb(&shape, Some(&cost), exhausted);
+        self.totals
+            .absorb_outcome(&shape, Some(&cost), exhausted, relation.is_some());
         let Some(indices) = relation else {
             call.outcome = if exhausted { "budget" } else { "refuted" };
             self.record(call);

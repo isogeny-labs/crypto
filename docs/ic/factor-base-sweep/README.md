@@ -217,6 +217,11 @@ Where it appears:
 statement about the observed solving-degree distribution of this solver
 procedure on this cell's probes, not an algebraic certificate.
 
+The same forecaster runs inside the ecbench `ic.pipeline` (every algebraic
+oracle's solver calls, written on the record's `solver` block) and the N83
+summand sweep cell (`examples/n83_msweep_cell.rs`, Gröbner engines); see
+[FRAMEWORK.md](../FRAMEWORK.md), "Degree-of-regularity forecast".
+
 ## Records, resume and verification
 
 ```sh
