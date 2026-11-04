@@ -46,6 +46,22 @@ Infinitely many such `n` refute the literal reading.
 - Kousidis–Wiemers' reading `D_reg = m² − m + 1 + o(1)`, which is 3 at `m = 2` and
   needs solving degree ≥ 4.
 
+## Round 3: the last Lemma 4 cell, and protocol countermodels
+
+| module | theorem | result |
+|---|---|---|
+| `NagaoLiteralInside` | `fake_fall_to_true_fall`, `lemma4_literal_inside` | Literal `≥` reading, field equations inside, any field and any system: every fake fall is a true fall at the same degree, so `d_F ≤ d'_F`. The fourth (reading × placement) cell is a theorem; the other three are refuted. |
+| `ProtocolCountermodels` | `zero_hash_forgery` | Constant-zero challenges accept `(sP, 0, s)` for every key: special soundness does not give Fiat–Shamir security. |
+| | `pedersen_alternate_opening` | `H = tG` gives `commit(m, r) = commit(m + t, r − 1)`. |
+| | `cofactor_kills_subgroup`, `cofactor_bijective` | In Z/9 the cofactor 3 annihilates the order-3 subgroup; for `r ∤ h` cofactor multiplication is a bijection. |
+| | `pairing_decides_ddh` | A nondegenerate pairing decides DDH with one evaluation. |
+| | `ambient_blinding_leaves_subgroup`, `subgroup_blinding_bijective` | Ambient blinding leaves the prime subgroup; subgroup blinding is a bijection. |
+| | `always_accept_complete_unsound` | Complete and simulatable does not imply sound. |
+
+The round also **withdraws** a claim of the earlier triage. The dimension count bounds the
+subspace factor base `|F'|`, not its trace image `|Tr(F')|`, so the trace pull-back escape
+from the prime-field closure is open again (`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`).
+
 ## What changes in the corpus
 
 - **`HEUR-RELATION-RANK` (W2).** The left-kernel method needs no rank
@@ -66,7 +82,8 @@ Infinitely many such `n` refute the literal reading.
 
 The W2 and W7 results are recorded in
 [`docs/ecdlp-hardness-corpus/lean-weakness-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-weakness-20261104.json); W1 in
-[`lean-pq2-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-pq2-20261104.json).
+[`lean-pq2-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-pq2-20261104.json); round 3 in
+[`lean-round3-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-round3-20261104.json).
 
 ## Verification
 
