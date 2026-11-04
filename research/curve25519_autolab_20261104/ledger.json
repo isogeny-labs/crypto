@@ -270,6 +270,12 @@
       "source": "round-011/train",
       "target_seed": 2026121424,
       "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "round-012/train",
+      "target_seed": 2026122424,
+      "targets": 32
     }
   ],
   "family": "curve25519",
@@ -521,6 +527,15 @@
     {
       "dir": "round-011",
       "round": 11,
+      "sizes": [
+        24
+      ],
+      "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-012",
+      "round": 12,
       "sizes": [
         24
       ],
@@ -2847,7 +2862,70 @@
       "stage": "train",
       "status": "verified",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=17,scan_cap=272",
+        "family": "ksum3",
+        "n": 17,
+        "name": "ksum3-n17",
+        "oracle": "ksum:m=3"
+      },
+      "round": 12,
+      "s": [
+        7.931489037782345,
+        8.860571799988671,
+        17.22231665984561
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=28,scan_cap=448",
+        "family": "ksum3s",
+        "n": 28,
+        "name": "ksum3s-n28",
+        "oracle": "ksum:m=3",
+        "params": {
+          "targets": "stride"
+        }
+      },
+      "round": 12,
+      "s": [
+        12.16434975984219,
+        12.641924357417917,
+        16.940095735599463
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+        "family": "ksum4s",
+        "n": 12,
+        "name": "ksum4s-n12",
+        "oracle": "ksum:m=4",
+        "params": {
+          "targets": "stride"
+        }
+      },
+      "round": 12,
+      "s": [
+        7.413073432230425,
+        8.175846741921854,
+        15.040806529144737
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-04T04:38:07Z"
+  "updated": "2026-11-04T04:45:48Z"
 }

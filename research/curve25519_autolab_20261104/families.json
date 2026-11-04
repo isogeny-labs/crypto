@@ -87,6 +87,25 @@
           "oracle": "mitm-prime-blocked:m=2",
           "default_f": 1.0,
           "note": "blocked prime pair table"
+        },
+        {
+          "id": "ksum3s",
+          "oracle": "ksum:m=3",
+          "default_f": 0.344,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "ksum:m=3 with the stride target stream instead of the jump walk (ideas/PROPOSALS.md P1: the walk's 16 jumps cost two scalar multiplications each); default_f is the k = 20 incumbent's N / N_a"
+        },
+        {
+          "id": "ksum4s",
+          "oracle": "ksum:m=4",
+          "default_f": 0.148,
+          "n_min": 6,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "ksum:m=4 with the stride target stream (P1); default_f is the k = 24 incumbent's N / N_a"
         }
       ]
     },

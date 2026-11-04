@@ -227,14 +227,30 @@ struct ArmConfig {
     n: u64,
     factor_base: String,
     oracle: String,
+    /// Further `ic.pipeline` parameters (for example `targets=stride`);
+    /// empty for the factor-base and oracle families.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    params: BTreeMap<String, String>,
 }
 
 impl ArmConfig {
+    /// The configuration's identity: factor base, and the oracle together
+    /// with any further pipeline parameters.
     fn key(&self) -> (String, String) {
-        (self.factor_base.clone(), self.oracle.clone())
+        let mut o = self.oracle.clone();
+        for (k, v) in &self.params {
+            o += &format!("|{k}={v}");
+        }
+        (self.factor_base.clone(), o)
     }
     fn method(&self) -> Value {
-        json!({"id": "ic.pipeline", "params": {"factor_base": self.factor_base, "oracle": self.oracle}})
+        let mut params = serde_json::Map::new();
+        params.insert("factor_base".into(), json!(self.factor_base));
+        params.insert("oracle".into(), json!(self.oracle));
+        for (k, v) in &self.params {
+            params.insert(k.clone(), json!(v));
+        }
+        json!({"id": "ic.pipeline", "params": params})
     }
 }
 
@@ -363,6 +379,9 @@ struct Family {
     /// than summands); the track's `n_min` applies when absent.
     #[serde(default)]
     n_min: Option<u64>,
+    /// Further `ic.pipeline` parameters every arm of the family carries.
+    #[serde(default)]
+    params: BTreeMap<String, String>,
 }
 
 fn default_true() -> bool {
@@ -391,6 +410,7 @@ impl TrackFamilies {
                 .replace("{n}", &n.to_string())
                 .replace("{scan}", &(self.scan_factor * n).to_string()),
             oracle: fam.oracle.clone(),
+            params: fam.params.clone(),
         }
     }
     fn family(&self, id: &str) -> Option<&Family> {
@@ -3159,6 +3179,30 @@ mod tests {
             p.iter().any(|x| x.arm.name == "ksum4-n37"),
             "{:?}",
             p.iter().map(|x| x.arm.name.clone()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn family_params_reach_the_method_and_the_identity() {
+        let mut tf = families();
+        let mut f = tf.family("ksum3").unwrap().clone();
+        f.id = "ksum3s".into();
+        f.params.insert("targets".into(), "stride".into());
+        tf.families.push(f);
+        let plain = tf.arm(tf.family("ksum3").unwrap(), 11);
+        let stride = tf.arm(tf.family("ksum3s").unwrap(), 11);
+        assert_eq!(stride.method()["params"]["targets"], "stride");
+        assert!(plain.method()["params"].get("targets").is_none());
+        assert_ne!(
+            plain.key(),
+            stride.key(),
+            "same base and oracle, different target stream: different configurations"
+        );
+        let back: ArmConfig =
+            serde_json::from_value(serde_json::to_value(&plain).unwrap()).unwrap();
+        assert_eq!(
+            back, plain,
+            "an arm without params round-trips (older ledgers have none)"
         );
     }
 
