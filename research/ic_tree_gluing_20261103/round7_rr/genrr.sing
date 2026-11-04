@@ -1,0 +1,306 @@
+// genrr.sing -- Riemann-Roch norm-divisibility (RR) systems for msolve,
+// on the planted instances of ../instances.txt (m = 3) and ../instances_r3.txt (m = 5).
+//
+// Construction (research/prime_one_shot_20261029/README.md, "The selected construction",
+// remainder membership, odd arity m = 2h-1), in the scaled coordinate x = g*W:
+//   unknowns  A(X) = X^h + a_(h-1) X^(h-1) + .. + a_0          (monic, degree h)
+//             C(X) = c_(h-2) X^(h-2) + .. + c_0                 (degree <= h-2)
+//             U(W) = W^m + u_(m-1) W^(m-1) + .. + u_0           (monic, roots w_i = x_i/g)
+//             tower: V_0 = W; V_(j-1)^2 = Q_j U + V_j (j = 1..t); V_t = 1  (W^(2^t) = 1 mod U)
+//             V_j = sum r<j>_i W^i (degree <= m-1), Q_j = sum q<j>_i W^i.
+//             Levels where V_(j-1)^2 = W^(2^j) has degree < m carry no variables (V_j = W^(2^j)),
+//             as in gen.sing's remainder chain for arm T.
+//   equations coeffs_X of  A^2 - f C^2 - (X - x_R) * g^m U(X/g)  (f = X^3 + aX + b)
+//             A(x_R) - y_R C(x_R)
+//             coeffs_W of every tower identity.
+// RRSAT=1 (env) appends the prototype's chart conditions as polynomial witnesses:
+//   s*U(x_R/g) - 1 (target not a residual abscissa) and Bezout S*U + T*C = 1 (U, C coprime),
+//   deg S <= h-3 (S = 0 for h = 2, then T is a constant), deg T <= m-1.
+// Planted check: every equation is evaluated at the planted assignment; failure aborts.
+// Usage: OUTDIR=... Singular -q genrr.sing
+
+string OUTDIR = system("getenv", "OUTDIR");
+if (OUTDIR == "") { OUTDIR = "/tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/rr/ms"; }
+string SRCDIR = "/home/user/crypto/research/ic_tree_gluing_20261103";
+string SATS = system("getenv", "RRSAT");
+int SAT = 0; if (SATS == "1") { SAT = 1; }
+short = 0;
+
+proc die(string msg)
+{
+  print("ERROR: " + msg);
+  system("sh", "kill -TERM $PPID");
+}
+
+proc ints(string line)
+{
+  string csv = ""; string ch; int i; int prevsep = 1;
+  for (i = 1; i <= size(line); i++)
+  {
+    ch = line[i, 1];
+    if (ch == " ") { if (prevsep == 0) { csv = csv + ","; prevsep = 1; } }
+    else { csv = csv + ch; prevsep = 0; }
+  }
+  if (prevsep == 1 and size(csv) > 0) { csv = csv[1, size(csv) - 1]; }
+  execute("intvec iv = " + csv + ";");
+  return(iv);
+}
+
+proc readrecs(string fn)
+{
+  string IT = read(fn); list LINES; string cur = ""; string chh; int ii;
+  for (ii = 1; ii <= size(IT); ii++)
+  {
+    chh = IT[ii, 1];
+    if (chh == newline) { LINES[size(LINES) + 1] = cur; cur = ""; } else { cur = cur + chh; }
+  }
+  if (cur != "") { LINES[size(LINES) + 1] = cur; }
+  list RECS;
+  for (ii = 1; ii <= size(LINES); ii++)
+  {
+    if (size(LINES[ii]) > 0) { if (LINES[ii][1, 1] != "#") { RECS[size(RECS) + 1] = ints(LINES[ii]); } }
+  }
+  return(RECS);   // RECS[1] = curve line
+}
+
+proc ix(string s, list L)
+{
+  int i;
+  for (i = 1; i <= size(L); i++) { if (L[i] == s) { return(i); } }
+  die("unknown variable " + s);
+  return(0);
+}
+
+proc fmtpoly(poly f)
+{
+  string s = ""; int i; int ci; poly mo;
+  if (f == 0) { return("0"); }
+  for (i = 1; i <= size(f); i++)
+  {
+    ci = int(leadcoef(f[i]));
+    if (ci < 0) { ci = ci + 786433; }
+    mo = leadmonom(f[i]);
+    if (i > 1) { s = s + "+"; }
+    if (mo == 1) { s = s + string(ci); } else { s = s + string(ci) + "*" + string(mo); }
+  }
+  return(s);
+}
+
+// coefficient of Z^i of a polynomial in Z only (constants in the other variables allowed)
+proc cz(poly P, poly Z, int i)
+{
+  matrix M = coeffs(P, Z);
+  if (i + 1 <= nrows(M)) { return(M[i + 1, 1]); }
+  return(0);
+}
+
+proc fx(number x, number a, number b) { return(x^3 + a * x + b); }
+proc sqr(number v, poly Z)
+{
+  list FY = factorize(Z^2 - v); int ii;
+  for (ii = 1; ii <= size(FY[1]); ii++)
+  {
+    if (deg(FY[1][ii]) == 1) { return(-number(jet(FY[1][ii], 0)) / leadcoef(FY[1][ii])); }
+  }
+  return(number(0));
+}
+
+// ------------------------------------------------------------- one cell
+proc rrcell(intvec cv, intvec rec, string OUT)
+{
+  int m = rec[1]; int t = rec[2]; int k = rec[3]; int h = (m + 1) div 2;
+  int i; int j; int pat; int dQ; int known; int degprev;
+  // variable names
+  list nm;
+  for (i = 0; i < h; i++) { nm[size(nm) + 1] = "a" + string(i); }
+  for (i = 0; i <= h - 2; i++) { nm[size(nm) + 1] = "c" + string(i); }
+  for (i = 0; i < m; i++) { nm[size(nm) + 1] = "u" + string(i); }
+  list QD; list HASR;   // per level: number of Q coefficients (0 = trivial level), has V_j variables
+  known = 1; degprev = 1;
+  for (j = 1; j <= t; j++)
+  {
+    if (known == 1 and 2 * degprev < m and j < t) { QD[j] = 0; HASR[j] = 0; degprev = 2 * degprev; }
+    else
+    {
+      if (known == 1) { dQ = 2 * degprev - m; } else { dQ = m - 2; }
+      QD[j] = dQ + 1;
+      for (i = 0; i <= dQ; i++) { nm[size(nm) + 1] = "q" + string(j) + "_" + string(i); }
+      if (j < t) { HASR[j] = 1; for (i = 0; i < m; i++) { nm[size(nm) + 1] = "r" + string(j) + "_" + string(i); } }
+      else { HASR[j] = 0; }
+      known = 0;
+    }
+  }
+  if (SAT == 1)
+  {
+    nm[size(nm) + 1] = "sR";
+    for (i = 0; i <= h - 3; i++) { nm[size(nm) + 1] = "bs" + string(i); }
+    for (i = 0; i < m; i++) { nm[size(nm) + 1] = "bt" + string(i); }
+  }
+  int n = size(nm);
+  string vl = "";
+  for (i = 1; i <= n; i++) { vl = vl + nm[i] + ","; }
+  vl = vl + "Z";
+  execute("ring R = 786433,(" + vl + "),lp;");
+  poly Z = var(n + 1);
+  number pa = cv[2]; number pb = cv[3]; number pg = cv[4];
+  number xR = rec[4];
+  list W; list XS; for (i = 1; i <= m; i++) { W[i] = number(rec[4 + i]); XS[i] = pg * W[i]; }
+
+  // ---- y-coordinates and signs
+  number yR = sqr(fx(xR, pa, pb), Z);
+  if (yR == 0 or yR^2 != fx(xR, pa, pb)) { die("x_R not on curve"); }
+  list YS;
+  for (i = 1; i <= m; i++)
+  {
+    YS[i] = sqr(fx(XS[i], pa, pb), Z);
+    if (YS[i]^2 != fx(XS[i], pa, pb) or YS[i] == 0) { die("summand not on curve"); }
+  }
+  list SG; int nmatch = 0; number sx; number sy; number yi; number lam; number nx; int bad;
+  for (pat = 0; pat < 2^m; pat++)
+  {
+    sx = XS[1]; sy = YS[1]; if (pat mod 2 == 1) { sy = -sy; }
+    bad = 0;
+    for (i = 2; i <= m; i++)
+    {
+      yi = YS[i]; if ((pat div 2^(i - 1)) mod 2 == 1) { yi = -yi; }
+      if (bad == 0 and sx == XS[i]) { bad = 1; }
+      if (bad == 0) { lam = (yi - sy) / (XS[i] - sx); nx = lam^2 - sx - XS[i];
+      sy = lam * (sx - nx) - sy; sx = nx; }
+    }
+    if (bad == 0 and sx == xR and sy == yR)
+    {
+      nmatch++;
+      for (i = 1; i <= m; i++) { SG[i] = YS[i]; if ((pat div 2^(i - 1)) mod 2 == 1) { SG[i] = -YS[i]; } }
+    }
+  }
+  if (nmatch != 1) { die("sign patterns matching R: " + string(nmatch)); }
+
+  // ---- unknown polynomials
+  poly Ap = Z^h; for (i = 0; i < h; i++) { Ap = Ap + var(ix("a" + string(i), nm)) * Z^i; }
+  poly Cp = 0;   for (i = 0; i <= h - 2; i++) { Cp = Cp + var(ix("c" + string(i), nm)) * Z^i; }
+  poly Uw = Z^m; for (i = 0; i < m; i++) { Uw = Uw + var(ix("u" + string(i), nm)) * Z^i; }
+  poly Ux = Z^m; for (i = 0; i < m; i++) { Ux = Ux + var(ix("u" + string(i), nm)) * pg^(m - i) * Z^i; }
+  poly Fp = Z^3 + pa * Z + pb;
+  list EQ; matrix M; poly df;
+  df = Ap^2 - Fp * Cp^2 - (Z - xR) * Ux;
+  M = coeffs(df, Z);
+  for (i = nrows(M); i >= 1; i--) { if (M[i, 1] != 0) { EQ[size(EQ) + 1] = M[i, 1]; } }
+  int nnorm = size(EQ);
+  EQ[size(EQ) + 1] = subst(Ap, Z, xR) - yR * subst(Cp, Z, xR);
+  poly Vp = Z; poly Sq; poly Qp; poly Vj;
+  for (j = 1; j <= t; j++)
+  {
+    Sq = Vp^2;
+    if (QD[j] == 0) { Vp = Sq; }
+    else
+    {
+      Qp = 0; for (i = 0; i < QD[j]; i++) { Qp = Qp + var(ix("q" + string(j) + "_" + string(i), nm)) * Z^i; }
+      if (HASR[j] == 1) { Vj = 0; for (i = 0; i < m; i++) { Vj = Vj + var(ix("r" + string(j) + "_" + string(i), nm)) * Z^i; } }
+      else { Vj = 1; }
+      df = Sq - Qp * Uw - Vj; M = coeffs(df, Z);
+      for (i = nrows(M); i >= 1; i--) { if (M[i, 1] != 0) { EQ[size(EQ) + 1] = M[i, 1]; } }
+      Vp = Vj;
+    }
+  }
+  if (SAT == 1)
+  {
+    EQ[size(EQ) + 1] = var(ix("sR", nm)) * subst(Uw, Z, xR / pg) - 1;
+    poly Sb = 0; for (i = 0; i <= h - 3; i++) { Sb = Sb + var(ix("bs" + string(i), nm)) * Z^i; }
+    poly Tb = 0; for (i = 0; i < m; i++) { Tb = Tb + var(ix("bt" + string(i), nm)) * Z^i; }
+    // Bezout in X: S(X) * g^m U(X/g) + T(X) * C(X) = 1 ; with h = 2, C is a constant: T = t0 only matters
+    if (h == 2) { Tb = var(ix("bt0", nm)); for (i = 1; i < m; i++) { EQ[size(EQ) + 1] = var(ix("bt" + string(i), nm)); } }
+    df = Sb * Ux + Tb * Cp - 1; M = coeffs(df, Z);
+    for (i = nrows(M); i >= 1; i--) { if (M[i, 1] != 0) { EQ[size(EQ) + 1] = M[i, 1]; } }
+  }
+
+  // ---- planted assignment
+  ideal vals; vals[n + 1] = Z;
+  // A, C by interpolation: A(x_i) + C(x_i) y_i = 0, A(x_R) - y_R C(x_R) = 0
+  ideal L;
+  for (i = 1; i <= m; i++) { L[i] = subst(Ap, Z, XS[i]) + SG[i] * subst(Cp, Z, XS[i]); }
+  L[m + 1] = subst(Ap, Z, xR) - yR * subst(Cp, Z, xR);
+  ideal GL = std(L);
+  if (size(GL) != 2 * h - 1 or deg(GL[1]) != 1) { die("A,C interpolation not unique or inconsistent"); }
+  poly nf;
+  for (i = 0; i < h; i++) { nf = reduce(var(ix("a" + string(i), nm)), GL); vals[ix("a" + string(i), nm)] = nf; }
+  for (i = 0; i <= h - 2; i++) { nf = reduce(var(ix("c" + string(i), nm)), GL); vals[ix("c" + string(i), nm)] = nf; }
+  poly Uwp = 1; for (i = 1; i <= m; i++) { Uwp = Uwp * (Z - W[i]); }
+  for (i = 0; i < m; i++) { vals[ix("u" + string(i), nm)] = cz(Uwp, Z, i); }
+  ideal GU = std(ideal(Uwp)); list DV;
+  Vp = Z;
+  for (j = 1; j <= t; j++)
+  {
+    Sq = Vp^2;
+    if (QD[j] == 0) { Vp = Sq; }
+    else
+    {
+      Vj = reduce(Sq, GU);
+      DV = division(Sq - Vj, ideal(Uwp));
+      if (DV[2][1] != 0) { die("tower division not exact"); }
+      Qp = DV[1][1, 1];
+      for (i = 0; i < QD[j]; i++) { vals[ix("q" + string(j) + "_" + string(i), nm)] = cz(Qp, Z, i); }
+      if (HASR[j] == 1) { for (i = 0; i < m; i++) { vals[ix("r" + string(j) + "_" + string(i), nm)] = cz(Vj, Z, i); } }
+      else { if (Vj != 1) { die("planted U does not divide W^d - 1"); } }
+      Vp = Vj;
+    }
+  }
+  if (SAT == 1)
+  {
+    vals[ix("sR", nm)] = 1 / leadcoef(subst(Uwp, Z, xR / pg));
+    // Bezout witness: with h = 2, C = c0 constant, T = 1/c0
+    if (h == 2) { vals[ix("bt0", nm)] = 1 / leadcoef(vals[ix("c0", nm)]); for (i = 1; i < m; i++) { vals[ix("bt" + string(i), nm)] = 0; } }
+    else
+    {
+      // solve S*Ux + T*C = 1 at the planted values for the witness coefficients (linear)
+      map pv0 = R, vals; ideal LB; poly e;
+      df = Sb * Ux + Tb * Cp - 1; df = pv0(df); M = coeffs(df, Z);
+      for (i = 1; i <= nrows(M); i++) { LB[size(LB) + 1] = M[i, 1]; }
+      // add the variables not involved to keep it zero-dimensional: none expected
+      ideal GB2 = std(LB);
+      for (i = 0; i <= h - 3; i++) { nf = reduce(var(ix("bs" + string(i), nm)), GB2); vals[ix("bs" + string(i), nm)] = nf; }
+      for (i = 0; i < m; i++) { nf = reduce(var(ix("bt" + string(i), nm)), GB2); vals[ix("bt" + string(i), nm)] = nf; }
+    }
+  }
+  for (i = 1; i <= n; i++) { if (vals[i] != 0) { if (deg(vals[i]) > 0) { die("planted value not constant: " + nm[i]); } } }
+  // planted U from the norm identity must be prod (W - w_i)
+  map pv = R, vals; poly chk;
+  poly pA = pv(Ap); poly pC = pv(Cp); poly pU = pv(Ux);
+  chk = pA^2 - Fp * pC^2 - (Z - xR) * pU;
+  if (chk != 0) { die("norm identity fails at planted A, C, U"); }
+  for (i = 1; i <= size(EQ); i++)
+  {
+    if (EQ[i] == 0) { die("zero equation"); }
+    chk = EQ[i]; chk = pv(chk);
+    if (chk != 0) { die("planted check failed eq " + string(i) + " in " + OUT); }
+  }
+  int maxdeg = 0; for (i = 1; i <= size(EQ); i++) { if (deg(EQ[i]) > maxdeg) { maxdeg = deg(EQ[i]); } }
+  string txt = "";
+  for (i = 1; i <= n; i++) { if (i > 1) { txt = txt + ","; } txt = txt + nm[i]; }
+  txt = txt + newline + "786433" + newline;
+  for (i = 1; i <= size(EQ); i++) { if (i > 1) { txt = txt + "," + newline; } txt = txt + fmtpoly(EQ[i]); }
+  write(":w " + OUT, txt);
+  print("m=" + string(m) + " t=" + string(t) + " k=" + string(k) + " RR sat=" + string(SAT) + ": N=" + string(n)
+        + " eqs=" + string(size(EQ)) + " (norm " + string(nnorm) + "+1) maxdeg=" + string(maxdeg)
+        + " yR=" + string(yR) + " plant ok -> " + OUT);
+  return(0);
+}
+
+system("sh", "mkdir -p " + OUTDIR);
+list R1 = readrecs(SRCDIR + "/instances.txt");
+list R3 = readrecs(SRCDIR + "/instances_r3.txt");
+intvec CV = R1[1];
+if (CV[1] != 786433) { die("prime"); }
+if (CV != R3[1]) { die("curve lines differ"); }
+string suf = "RR"; if (SAT == 1) { suf = "RRs"; }
+int ii; intvec rv;
+for (ii = 2; ii <= size(R1); ii++)
+{
+  rv = R1[ii];
+  if (rv[1] == 3 and rv[3] == 0) { rrcell(CV, rv, OUTDIR + "/m3_t" + string(rv[2]) + "_k0_" + suf + ".ms"); }
+}
+for (ii = 2; ii <= size(R3); ii++)
+{
+  rv = R3[ii];
+  if (rv[1] == 5 and rv[3] == 0) { rrcell(CV, rv, OUTDIR + "/m5_t" + string(rv[2]) + "_k0_" + suf + ".ms"); }
+}
+quit;
