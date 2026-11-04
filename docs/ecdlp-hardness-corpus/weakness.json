@@ -2,7 +2,7 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 583,
+    "nodes": 585,
     "status_inflation": 17,
     "model_scope_leaps": 9,
     "contagious_sources": 21,
@@ -11,8 +11,8 @@
     "route_closures_on_weak_support": 16,
     "live_obstructions": 49,
     "author_flagged": 8,
-    "attack_queue": 246,
-    "hygiene_queue": 100
+    "attack_queue": 247,
+    "hygiene_queue": 101
   },
   "status_inflation": [
     {
@@ -896,7 +896,7 @@
       "refuted": [
         "CLAIM-MARGINAL-IMPLIES-HAZARD"
       ],
-      "refuted_fraction": 0.2,
+      "refuted_fraction": 0.143,
       "exposed": [
         {
           "id": "ASM-XEDNI-TRIAL-MARGINAL",
@@ -914,7 +914,17 @@
           "impact": 0
         },
         {
+          "id": "GAP-PQ2-M2-RANK-CENSUS",
+          "status": "open",
+          "impact": 0
+        },
+        {
           "id": "THM-LEFT-KERNEL-RELATIONS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-SD-DEGREE2-CRITERION",
           "status": "proved_internal_unreviewed",
           "impact": 0
         }
@@ -4759,6 +4769,20 @@
       "score": 0.409
     },
     {
+      "id": "GAP-PQ2-M2-RANK-CENSUS",
+      "label": "Does r2 < k hold on m = 2 descended S_3 instances for infinitely many n?",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.409
+    },
+    {
       "id": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
       "label": "No lower bound for target-field DLP cost exists",
       "status": "open",
@@ -6907,6 +6931,20 @@
       "label": "Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-SD-DEGREE2-CRITERION",
+      "label": "Solving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
       "impact": 0,
       "inflates": 0,
       "contagion": 1,
