@@ -111,7 +111,21 @@ In particular it is at least g*(2^a-1). More sharply,
 F_(2a)=Theta(((3+sqrt(5))/2)^a)=Theta(L^log2((3+sqrt(5))/2)).
 The exponent of L is about 1.388. For fixed g>0 this exceeds the O(L) degree
 allowance of a constant-factor version of the original recovery budget.
-Increasing multiplicities cannot repair this degree cost. Changing anchors,
+Increasing multiplicities cannot repair this degree cost under the stated
+requirement on ALL a levels. The source actually retains only u<a levels:
+for anchors j=0,...,u-1 the same theorem gives g*F_(2u), not g*F_(2a).
+In D.4, a=2*sum_(h<=d)u_h, so a>=2u and this necessary diagonal degree cost
+can fit within O(L). Thus the all-a-level obstruction does NOT exclude a
+useful retained-level variant of the source recursion.
+
+Nor is diagonal gain sufficient. For example L=8, t=2 (i=1), x=0,y=1 is
+a valid crossing pair with equal bit1. Its delta=1 enables no guarded
+anchor, so that entry stays unchanged for ANY schedule. Refining the masks
+or adding factors requires a new proof of crossing modes; masks for j>i
+also vary within a source tile of stride2^(i+1). Charging the resulting
+tile or moment refinements is unresolved.
+
+Changing anchors,
 using matrix cancellations, optimizing rank rather than every entry, or
 using a different recovery budget is outside this obstruction.
 

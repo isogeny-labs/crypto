@@ -98,7 +98,10 @@ A [repeated-anchor follow-up](../research/prime_pole_anchor_20261030/repeated/RE
 extends the fixed odd-anchor gain to k bits at added degree k, without
 changing the source moment index. It also charges a specific attempt to
 boost every valuation level: guarded scalar anchor products require added
-degree at least g*F_(2a) to gain g in each tested diagonal linear coefficient.
+degree at least g*F_(2a) to gain g in each diagonal linear coefficient across
+all a levels (or g*F_(2u) for the source's retained u levels). The latter
+can fit the source's O(L) degree budget. Diagonal gains do not cover all
+crossings: L8,t2,x0,y1 is unchanged by every guarded anchor schedule.
 The general abstract suffix-budget lower bound is Lean-proved; its valuation
 bridge is written, with exact native controls. This is a family-specific
 degree obstruction, not nonexistence of a nonscalar completion or an improved

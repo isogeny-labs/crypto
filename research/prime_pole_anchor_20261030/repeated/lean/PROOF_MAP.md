@@ -14,6 +14,9 @@ statement is hidden inside this definition.
   This is the main sharp necessary budget inequality, with a simultaneous
   induction that proves the structural implication from every suffix
   constraint. It is not a finite arithmetic lookup certificate.
+  The length is the number of required levels: a when requiring all packet
+  levels, but u for the source's retained levels. Substituting a for u in
+  a claimed obstruction to that actual recursion would be unjustified.
 
 The written rational anchor-valuation bridge, node preservation, polynomial
 degree, optimal-schedule equality construction, Fibonacci asymptotics,
