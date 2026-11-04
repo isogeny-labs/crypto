@@ -1,5 +1,30 @@
 # Arity-completion runs blocked at the launch gates (AWS identity, checkpoint token, budget)
 
+## Additional affected study: atlas/carry/rank, 2026-11-04
+
+The [atlas/carry/rank instrument](../research/curve25519_atlas_carry_rank_20261104/README.md)
+reuses this launch obstruction. In this separate Codex environment,
+`aws sts get-caller-identity` reports no credentials, rather than the historical
+invalid-token errors below; GitHub access works. Checkpoint and identity output
+are retained in that study's `checks/` directory [pcc:unverified].
+
+The GitHub `isolab-experiment.yml` route builds ecbench and its fresh-owner
+binary, not the study's C++/GMP instrument. An authenticated custom-image
+command route, successful S3 checkpoint, canonical machine protocol and
+general solver-model replay are prerequisites to its prospective EKS panel.
+The code and local functional checks do not complete those experiments.
+Its proposed limit is USD 5 including build and failed work, four vCPUs,
+4 GiB, 900 seconds per job and zero retries. No paid study job was launched
+[pcc:unverified]. Do not create another account, broaden OIDC trust or run the
+stock validation fixture to bypass this gap.
+
+Exit criteria for this added work: passing checkpoint gate on the published
+study source, source-bound custom image containing the frozen solvers and
+replay, authenticated command submission, and recorded budget headroom.
+Then execute the unchanged [prospective protocol](../research/curve25519_atlas_carry_rank_20261104/PROTOCOL.md)
+and retain every query outcome. This addition does not change the scientific
+status or original acceptance criteria of either study.
+
 - **Status:** `open`
 - **Kind:** access/tool limit; resource limit (budget gate); separate from any
   mathematical obstruction
