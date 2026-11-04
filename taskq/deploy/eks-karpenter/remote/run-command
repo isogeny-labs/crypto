@@ -7,6 +7,8 @@
 # S3 results, not from this bounded launcher. Self-contained on purpose: the
 # deployed launcher zip does not carry this file.
 set -euo pipefail
+# The override buildspec does not put the launcher source's bin/ on PATH.
+export PATH="${CODEBUILD_SRC_DIR:+$CODEBUILD_SRC_DIR/bin:}$PATH"
 here=$(cd "$(dirname "$0")" && pwd)
 : "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${AWS_REGION:?}" "${ISOLAB_REQUEST_KEY:?}"
 repository=${ISOLAB_IMAGE_REPOSITORY:-104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks}

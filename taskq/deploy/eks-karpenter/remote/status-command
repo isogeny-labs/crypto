@@ -3,6 +3,8 @@
 # request: reads one Job's state, pods, events and log tails, lists its S3
 # result prefix, and uploads the receipt. Read-only; self-contained.
 set -euo pipefail
+# The override buildspec does not put the launcher source's bin/ on PATH.
+export PATH="${CODEBUILD_SRC_DIR:+$CODEBUILD_SRC_DIR/bin:}$PATH"
 : "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${AWS_REGION:?}" "${ISOLAB_REQUEST_KEY:?}"
 [[ "$ISOLAB_REQUEST_KEY" =~ ^inputs/requests/([a-f0-9]{64})\.json$ ]] || { echo 'Invalid request key' >&2; exit 2; }
 request_hash=${BASH_REMATCH[1]}
