@@ -1,0 +1,193 @@
+{
+  "branch": "claude/sparse-la-target-pin-20261104",
+  "closed_utc": "2026-11-04T07:40:45+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/examples/sparse_la_stage",
+        "--weights",
+        "2,3,4,6,8",
+        "--sizes",
+        "128,256,512,1024",
+        "--seeds",
+        "3",
+        "--arms",
+        "structured-gauss,igfr,pin-wiedemann,pin-wiedemann-every,sparse-cado,sparse-cado+counted,filter+lanczos+counted"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T06:36:21+00:00",
+      "wall_s": 531.547
+    }
+  ],
+  "commit": "33bf99c1a02d20ea7ab82740fe4125b0c4f19b79",
+  "commit_dirty": true,
+  "created_utc": "2026-11-04T06:36:09+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261104-sparse-la-target-pin"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T0636Z-sparse-la-stage",
+  "metrics": [
+    {
+      "baseline": 2109853.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w3_n1025_structured-gauss",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 3, 1025 columns; baseline = structured-gauss",
+      "reference": 2109853.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 2109853.0
+    },
+    {
+      "baseline": 2109853.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w3_n1025_pin-wiedemann-every",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 3, 1025 columns; baseline = structured-gauss",
+      "reference": 2109853.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 428201412.0
+    },
+    {
+      "baseline": 2109853.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w3_n1025_pin-wiedemann",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 3, 1025 columns; baseline = structured-gauss",
+      "reference": 2109853.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 14007161.0
+    },
+    {
+      "baseline": 2109853.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w3_n1025_sparse-cado",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 3, 1025 columns; baseline = structured-gauss",
+      "reference": 2109853.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 172470.0
+    },
+    {
+      "baseline": 2109853.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w3_n1025_filter_lanczos_counted",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 3, 1025 columns; baseline = structured-gauss",
+      "reference": 2109853.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 115207.0
+    },
+    {
+      "baseline": 12585418.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w4_n1025_structured-gauss",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 4, 1025 columns; baseline = structured-gauss",
+      "reference": 12585418.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 12585418.0
+    },
+    {
+      "baseline": 12585418.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w4_n1025_pin-wiedemann-every",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 4, 1025 columns; baseline = structured-gauss",
+      "reference": 12585418.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 2131204531.0
+    },
+    {
+      "baseline": 12585418.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w4_n1025_pin-wiedemann",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 4, 1025 columns; baseline = structured-gauss",
+      "reference": 12585418.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 27733335.0
+    },
+    {
+      "baseline": 12585418.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w4_n1025_sparse-cado",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 4, 1025 columns; baseline = structured-gauss",
+      "reference": 12585418.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 4890368.0
+    },
+    {
+      "baseline": 12585418.0,
+      "better": "lower",
+      "n": 3,
+      "name": "stage_row_ops_w4_n1025_filter_lanczos_counted",
+      "note": "counted row_ops, median of 3 seeds, planted system weight 4, 1025 columns; baseline = structured-gauss",
+      "reference": 12585418.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "fmul",
+      "value": 3342737.0
+    }
+  ],
+  "problem": "kernel:sparse_la_relation_matrix_stage",
+  "raw": [
+    {
+      "bytes": 79356,
+      "path": "research/sparse_la_target_pin_20261104/results/stage-a.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/39/39b233ca6818981ac2d42f550c18b54d233ffa462ec24f0df780c3e8bd25c665",
+      "sha256": "39b233ca6818981ac2d42f550c18b54d233ffa462ec24f0df780c3e8bd25c665",
+      "uploaded": false
+    },
+    {
+      "bytes": 58187,
+      "path": "research/sparse_la_target_pin_20261104/results/stage-a-summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c8/c864c76182ab7b5340013abdc00171f127d2a91905a845134718a0a032dc996b",
+      "sha256": "c864c76182ab7b5340013abdc00171f127d2a91905a845134718a0a032dc996b",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261104-sparse-la-target-pin/report.pdf",
+    "png": [
+      "benchmarks/20261104-sparse-la-target-pin/stage_ops_over_sg.png"
+    ],
+    "svg": [
+      "benchmarks/20261104-sparse-la-target-pin/stage_ops_over_sg.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "sparse-la-stage",
+  "status": "measured",
+  "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+  "validation": null
+}
