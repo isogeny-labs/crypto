@@ -3,10 +3,13 @@
 **Question.** Where is the claim graph that supports ECDLP hardness weakest, and which
 weak points can be broken cheaply enough to attack first?
 
-**Scope.** The assembled corpus (version 2026-11-01: 578 claims, 943 edges, 235 sources,
-including the protocol-layer port of W7),
-read through `weakness.mjs`, plus the repository sources the corpus cites. Nothing here
-changes a claim's status or edges; every proposed change is listed as an action. The
+**Scope.** The assembled corpus (version 2026-11-01: 583 claims, 950 edges, 236 sources,
+including the protocol-layer port of W7 and the Lean results of 2026-11-04),
+read through `weakness.mjs`, plus the repository sources the corpus cites. W1–W7 change no
+existing claim's status; proposed edits are listed as actions. The Lean round of
+2026-11-04 adds kernel-checked nodes, refutes one inference
+(`CLAIM-MARGINAL-IMPLIES-HAZARD`) and moves the xedni waiting-time edge onto the
+weaker per-trial marginal assumption. The
 generated companion is [`WEAKNESSES.md`](WEAKNESSES.md) (all rows) with
 [`weakness.json`](weakness.json) and [`weakness-queue.svg`](weakness-queue.svg).
 
@@ -21,14 +24,14 @@ pass does not see:
 | live obstruction | an established claim `obstructs` / `qualifies` / `does_not_cover` a claim that still supports others | 49 (17 `obstructs`) |
 | route closure on weak support | an `obstructs` edge (a closed attack route) whose obstruction rests on an assumed, heuristic or open claim | 16 |
 | hidden shared assumption | the same assumption text on 3+ nodes, never a node itself | 18 clusters |
-| source contagion | a primary source with a refuted claim and other live claims | 20 sources |
+| source contagion | a primary source with a refuted claim and other live claims | 21 sources |
 | model-scope leap | generic-model or measured claim supporting a broader one without `model_bridge` | 9 |
 
-It then ranks the 245 attackable claims by impact × breakability, where breakability is
+It then ranks the 246 attackable claims by impact × breakability, where breakability is
 the expected cost of a decisive result: a heuristic with a stated formula in an
 algebraic model can be checked exactly on small fields; an open literature conjecture
 cannot. Established `obstructs` edges multiply the score. Reading a primary text or
-auditing a kernel-checked statement goes in a separate hygiene queue (97 claims): cheap,
+auditing a kernel-checked statement goes in a separate hygiene queue (100 claims): cheap,
 but it rarely overturns anything. **The scores are a triage heuristic, not evidence.**
 
 ![Attack queue, top 20 (weakness-queue.svg)](weakness-queue.svg)
@@ -267,18 +270,57 @@ PKM and APS.
 The three lifting heuristics over Q are deep (height and rank conjectures) and are not
 cheap targets.
 
+## Lean results, 2026-11-04
+
+Lean project [`research/ecdlp_weakness_lean_20261104/lean`](../../research/ecdlp_weakness_lean_20261104/README.md)
+(Lean v4.34.1, Mathlib v4.34.1). All ten theorems depend only on `propext`,
+`Classical.choice` and `Quot.sound` (`AxiomAudit.lean`). The repository proof gate
+re-checks them in CI.
+
+**W2 is kernel-checked: `THM-LEFT-KERNEL-RELATIONS`.**
+
+- **Existence (`exists_left_kernel`).** More relations than factor-base columns give a
+  nonzero left-kernel vector for *every* relation matrix. No rank hypothesis is used.
+- **Recovery (`left_kernel_recovers`).** That vector recovers the logarithm whenever its
+  b-weight is nonzero.
+- **Exact failure count (`card_bad_pairs`).** If the vector is any nonzero-valued function
+  of the relation points alone, exactly q^(2n−1) of the q^(2n) hidden pairs (a, b) fail:
+  density exactly 1/q.
+
+`HEUR-RELATION-RANK`, `HEUR-BK-GG-RIGHT-KERNEL-RANK` and the "enough independent
+relations" assumption of `ALG-SPARSE-LINEAR-ALGEBRA` are now qualified by it. The
+corpus still lists the old support edge from the rank heuristic into
+`ALG-SPARSE-LINEAR-ALGEBRA`. Re-wiring the rigorous Weil-descent chain (removing 4
+inflation rows) is a separate, reviewable edit.
+
+**W7 is kernel-checked: the xedni hazard recurrence is unnecessary.**
+
+- **Repair (`THM-HAZARD-MARGINAL-SUFFICES`).** If each trial succeeds with marginal
+  probability at most ε, then E[min τ N] ≥ N/2 whenever Nε ≤ ½. This is the JKSST
+  audit's waiting-time conclusion without its conditional-hazard recurrence.
+- **Separation (`CEX-HAZARD-SEPARATION`).** A three-outcome model has every marginal
+  ≤ 1/3, yet the recurrence fails (4/9 > 1/3), so `CLAIM-MARGINAL-IMPLIES-HAZARD` is
+  refuted.
+- **Rewiring.** `OBSTRUCTION-XEDNI-HEIGHT` now rests on the weaker
+  `ASM-XEDNI-TRIAL-MARGINAL`: each adaptive trial, as actually run, succeeds with
+  marginal probability O(1/p).
+
+This **strengthens** the xedni closure rather than reopening it. The remaining bridge
+is whether adaptive lift selection can raise a single trial's marginal above the
+one-shot bound.
+
 ## Recommended order of attack
 
 | # | target | kind of result | cost | what changes if it lands |
 |---|---|---|---|---|
-| 1 | W2: left-kernel lemma + Lean core; re-wire; narrow rank heuristic | proof | low | 4 inflation rows resolved; rank heuristic confined to the multi-target regime |
+| 1 | W2: re-wire the rigorous Weil-descent chain to `THM-LEFT-KERNEL-RELATIONS` (Lean core done 2026-11-04) | corpus edit | low | 4 inflation rows resolved; rank heuristic confined to the multi-target regime |
 | 2 | W5: add the 11 missing edges | corpus fix | trivial | true impact of the top frontier nodes becomes visible |
 | 3 | W4: fix the ic-negative wording; census the open cell | correction + exact census | low | the Lemma 4 refutation becomes reading-complete |
 | 4 | W3: prime-field yield census, full histogram, scaling in p | exact measurement | low–medium | every prime-field yield estimate is checked or corrected |
 | 5 | W1: degree-2 Macaulay rank census, then the lower-bound proof | census, then proof | medium | PQ Assumption 2 refuted for m = 2; the FFDA rows retire |
 | 6 | `RT-SP-SEMAEV-A1-N45` | exact F4 run | low | Semaev 2015 Assumption 1 settled at the measured scale |
 | 7 | W7: YYTK Conjecture 10 past 25 bits | exact census | low–medium | the naive prime-field Semaev closure is confirmed, or the route reopens |
-| 8 | W7: `RT-PA-XEDNI-HAZARD` | Lean separation, then the JKSST process | medium | the xedni waiting-time obstruction is closed, or the route reopens |
+| 8 | W7: per-trial marginal bound for adaptive xedni lift selection (`ASM-XEDNI-TRIAL-MARGINAL`; the separation and repair are done in Lean) | proof or countermodel | medium | the xedni waiting-time step is closed, or adaptive selection reopens the route |
 
 Items 1, 2, 3 and 8 are corpus and proof work, not experiment runs. Items 4–7 are runs and go
 through the repository's experiment route (protocol, resume checkpoint, native code,
