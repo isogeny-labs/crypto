@@ -43,7 +43,7 @@ root-table parity point. Kill: K4 and K5 both supported.
 4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-Round 34 (k = 20..32; wwalkG x 0.3..0.5, 8/32 jumps) running under benchrec record in scratchpad rec34, branch claude/curve25519-autolab-r34 (stacked on PR #3411).
+Round 34 done (null; PCC-20261104-2631da). wwalk g=1 grow=2 at its optimum; holdout noise about +-12% at 32 targets x 2.
 Panel: ksum4 at extrapolated N = 37 and neighbours 19/26/52/74; ksum3 transfer N = 176/246; mitm-prime-batch / blocked exploration.
 Branch claude/curve25519-ic-autolab-round4 (PR #3392). After it: add-raw, metric (incumbent S at k = 32, matched rho), close the record, claim, commit.
 
