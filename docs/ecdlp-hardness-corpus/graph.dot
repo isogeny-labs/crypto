@@ -550,6 +550,7 @@ digraph ecdlp_claims {
     "MEAS-RANK-DEFICIT-CENSUS" [label="MEAS-RANK-DEFICIT-CENSUS\\nRight-kernel relation matrices: Delta = 10 does not give full rank (10 curves, 5 samples)", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
     "MEAS-TRACE-PULLBACK-CENSUS" [label="MEAS-TRACE-PULLBACK-CENSUS\\nTrace images of one-dimensional subspace factor bases are at least 0.32 of E(F_p)", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
     "MEAS-EXT-DECOMP-CENSUS" [label="MEAS-EXT-DECOMP-CENSUS\\nn-fold decomposition over F_{q^n}: 0.70-0.99 of 1/n! at n = 2, 3; premise fails for subfield curves", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
+    "MEAS-PQ2-DLIN-CENSUS" [label="MEAS-PQ2-DLIN-CENSUS\\nm = 2 descended S3: iterated degree-3 closure misses the linear consequences for n = 15 and 17-44", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
   }
   subgraph cluster_open {
     label="Open proof and attack surfaces"; color="#cad5df"; style="rounded";
@@ -1606,4 +1607,7 @@ digraph ecdlp_claims {
   "MEAS-RANK-DEFICIT-CENSUS" -> "HEUR-RELATION-RANK" [label="measures", color="#66788a", style="solid"];
   "MEAS-TRACE-PULLBACK-CENSUS" -> "GAP-PF-TRACE-PULLBACK-FACTOR-BASE" [label="qualifies", color="#66788a", style="dashed"];
   "MEAS-EXT-DECOMP-CENSUS" -> "HEUR-BK-GG-DECOMP-PROPORTION" [label="measures", color="#66788a", style="solid"];
+  "MEAS-PQ2-DLIN-CENSUS" -> "HEUR-GB-PQ-ASSUMPTION-2" [label="obstructs", color="#a33a3a", style="solid"];
+  "MEAS-PQ2-DLIN-CENSUS" -> "GAP-PQ2-M2-RANK-CENSUS" [label="measures", color="#66788a", style="solid"];
+  "THM-SD-SUBSPACE-CRITERION" -> "MEAS-PQ2-DLIN-CENSUS" [label="conditions", color="#66788a", style="solid"];
 }

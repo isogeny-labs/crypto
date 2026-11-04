@@ -55,4 +55,52 @@ property of F4 stated above, which is not formalised.
 
 ## Results
 
-RESULTS_PLACEHOLDER
+All counts are unverified assertions: no signed validator report exists yet [pcc:unverified].
+
+**Main sweep.** It ran n = 8 to 47, three instances per n, 119 instances in all. It
+was stopped during n = 47, where enumerating Z takes about six minutes per instance,
+before the binary wrote its own JSON. `log_to_json.py` copies every instance line of
+`results/run.log` into `results/pq2_rank.json` and `.csv` and recomputes nothing.
+n = 48 to 56 were not reached.
+
+| n | instances | iterated degree 3 reaches k | d_iter | d_lin |
+|---|---|---|---|---|
+| 8–14 | 21 | 21 | 3 | 4 (20), >4 (1) |
+| 15 | 3 | 0 (iter3 = 1) | 4 (iter4 = k) | >4 |
+| 16 | 3 | 3 | 3 | >4 |
+| 17–20 | 12 | 0 (iter3 = 1) | >3 | >4 |
+| 21–44 | 72 | 0 (iter3 = 1) | >3 | >3 |
+| 45–47 | 8 | not run | – | >3 |
+
+At every n, low2 = 1, and low3 = 1 for every n ≥ 9. The value of k lies between N − 7 and N.
+
+**Degree 4 beyond n = 16.** A separate sweep at n = 17 to 20 (`results/iter4_n17_20/`)
+has fresh instances, because the random stream starts at n = 17. Iterated degree 3
+gives 1 and iterated degree 4 gives exactly k on all 12 instances, so d_iter = 4 there.
+`results/iter4_n21_24/` does the same at n = 21 to 24 with the same outcome on all 12
+instances. Across both sweeps, d_iter = 4 on 24 of 24 instances from n = 17 to 24.
+
+**Independent cross-check.** `crosscheck/` recomputes the closure by naive full
+saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
+on five dumped instances at n = 14 to 18, at degree 3 and at degree 4.
+
+**Reproducibility.** A rerun with the same seed and arguments for n = 8 to 40
+(`results/rerun_n8_40/`) reproduces the main log line for line, timings aside. Its
+JSON also carries |F'| for `HEUR-BK-GG-FACTOR-BASE-SIZE`. Over its 99 instances |F'|/|V| ranges from
+0.84 to 1.31 with mean 1.021, and from 0.997 to 1.004 for n ≥ 30, so `|F| ≈ |V|`
+holds on this range [pcc:unverified].
+
+**Reading.**
+
+* Literal Assumption 2 says the solver degree equals the first fall degree, which is 2.
+  It fails on all 119 instances: d_iter ≥ 3 everywhere.
+* The Kousidis–Wiemers reading predicts 3 + o(1). Every instance with 17 ≤ n ≤ 44 needs
+  an iterated degree above 3, and the 24 instances measured at n = 17 to 24 need exactly 4.
+  A finite range cannot refute an o(1) statement. It does show that the asymptotic value 3
+  is not reached anywhere from n = 17 to 44.
+* These numbers are lower bounds on F4's maximal step degree, valid only under the
+  containment property, which is not formalised. For the one-shot Caminata–Gorla solving
+  degree, the bound d_lin ≤ sd is kernel-checked in `SubspaceCriterion`.
+* Direction: the measured degree sits above the value the subexponential binary-curve
+  heuristics assume. This weakens the support for those heuristics. It does not support
+  a subexponential algorithm.

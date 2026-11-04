@@ -374,3 +374,40 @@ frames at t = 5). It writes `selection/frames.json` (sha256
 - **Environment.** Shared 4-core host; other wave-3 leads may run at the
   same time. The counts are deterministic given the seeds, so load affects
   only wall time.
+
+
+## Addendum C (frozen before any chunk data): restart-safe chunked sessions, 2026-11-04
+
+**Why.**
+- The container restarted at about 01:30Z and again at about 02:22Z. Each
+  restart killed the running ecbench session, and ecbench cannot resume a
+  session.
+- ecbench also serialises sessions through `/tmp/crypto-bench.lock`, so a
+  2–4 h session cannot finish within one container lifetime.
+- No killed session is cited.
+
+**Change** (only how the frozen design is executed; the arms, rounds, order,
+timeouts, curve, oracle and predictions are unchanged):
+- `scripts/chunked_run.py` splits the frozen `ecbench/spec.json` into chunks
+  of one target each (all arms, same rounds and order). Each chunk is a
+  complete, audit-valid session.
+- Chunk c uses `target_seed` = frozen base + c and measurement seed = frozen
+  base + c.
+- A complete chunk is skipped on re-launch. A killed chunk is moved to
+  `interrupted/` with its `session.json` renamed, and re-run from scratch.
+- `--allow-busy` is kept, because the host is shared. S is a counted unit,
+  and no wall-time claim is made.
+
+**Analysis on the pooled chunks:**
+- `ecbench band --dir <all chunk dirs> --ranks` at w = 0, 0.1 and 1.
+- The frozen paired ratios use `scripts/pooled_compare.py`. It implements the
+  ops interval of `ecbench compare`: per-workload totals over rounds, ratio of
+  sums, linearised t with df = K − 1.
+  - On the single complete T9 session it reproduces `ecbench compare` to 6
+    decimals for s1308/seed 0 and s1308/s1093 at w = 0, 0.1 and 1. That is
+    the positive control.
+- `ecbench verify --replay 1` on every chunk.
+
+**Decision rules:** the frozen predictions, decided on these pooled
+quantities.
+- Previous T11 attempts (none cited): attempt 1 was refused by the busy preflight; attempt 2 (17/84) and attempt 3 (s2, 13/84) were killed by container restarts. Both are kept under data/interrupted_attempt2 and data/interrupted_attempt3 with session.json renamed.

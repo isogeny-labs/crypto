@@ -1,0 +1,88 @@
+mkdir -p /tmp/nist-journal-final-20261104
+g++ -I/workspace/tools/sage_skeleton_env/include -O2 -std=c++17 -Wall -Wextra -Werror -pedantic journal_check.cpp -o /tmp/nist-journal-final-20261104/journal_check -L/workspace/tools/sage_skeleton_env/lib -Wl,-rpath,/workspace/tools/sage_skeleton_env/lib -l:libpari-gmp-tls.so.9 -lgmpxx -lgmp -lcrypto
+g++ -I/workspace/tools/sage_skeleton_env/include -O2 -std=c++17 -Wall -Wextra -Werror -pedantic sampler_resume.cpp -o /tmp/nist-journal-final-20261104/sampler_resume -L/workspace/tools/sage_skeleton_env/lib -Wl,-rpath,/workspace/tools/sage_skeleton_env/lib -l:libpari-gmp-tls.so.9 -lgmpxx -lgmp -lcrypto
+g++ -I/workspace/tools/sage_skeleton_env/include -O2 -std=c++17 -Wall -Wextra -Werror -pedantic journal_tests.cpp -o /tmp/nist-journal-final-20261104/journal_tests -L/workspace/tools/sage_skeleton_env/lib -Wl,-rpath,/workspace/tools/sage_skeleton_env/lib -l:libpari-gmp-tls.so.9 -lgmpxx -lgmp -lcrypto
+/tmp/nist-journal-final-20261104/journal_tests ../strict_elkies_20261029/inputs.tsv /tmp/nist-journal-final-20261104/fixtures
+ok 1 - 21 frozen seed/root/primality and independent multiplier fixtures
+ok 2 - counter encoding, leading-zero seeds, 160-bit wrap and field separation
+ok 3 - frozen cohort SHA-256 and production field lookup
+ok 4 - bounded exhaustive toy oracle and complete producer A/A bytes
+ok 5 - positive
+# refusal changed-seed: seed derivation
+ok 6 - changed-seed
+# refusal changed-c: expanded coefficient
+ok 7 - changed-c
+# refusal changed-b: coefficient root
+ok 8 - changed-b
+# refusal changed-n: full point count
+ok 9 - changed-n
+# refusal changed-status: order rejection/acceptance disposition
+ok 10 - changed-status
+# refusal index-gap: field/index gap or reorder
+ok 11 - index-gap
+# refusal wrong-field: field/index gap or reorder
+ok 12 - wrong-field
+# refusal changed-point: point equation
+ok 13 - changed-point
+# refusal changed-split: splitting profile
+ok 14 - changed-split
+# refusal changed-ramified: splitting profile
+ok 15 - changed-ramified
+# refusal wrong-ordinal: accepted field/ordinal/index
+ok 16 - wrong-ordinal
+# refusal accepted-binding: accepted/attempt binding
+ok 17 - accepted-binding
+# refusal reordered-attempts: field/index gap or reorder
+ok 18 - reordered-attempts
+# refusal duplicate-attempt: field/index gap or reorder
+ok 19 - duplicate-attempt
+# refusal missing-middle-acceptance: accepted field/ordinal/index
+ok 20 - missing-middle-acceptance
+# refusal extra-acceptance: extra/unmatched accepted row
+ok 21 - extra-acceptance
+# refusal attempt-after-target: records beyond target-th accepted curve
+ok 22 - attempt-after-target
+# refusal trailing-empty-cell: empty cell
+ok 23 - trailing-empty-cell
+# refusal noncanonical-counter: noncanonical decimal
+ok 24 - noncanonical-counter
+# refusal prime-labelled-early-abort: early-abort composite order
+ok 25 - prime-labelled-early-abort
+ok 26 - composite-full-order-replay
+# refusal strict-orphan-refusal: missing accepted row
+ok 27 - strict-orphan-refusal
+ok 28 - inspect-orphan
+ok 29 - inspect-torn-acceptance
+# refusal strict-torn-acceptance-refusal: unterminated journal row
+ok 30 - strict-torn-acceptance-refusal
+ok 31 - inspect-prefix
+ok 32 - inspect-torn-attempt
+# refusal strict-torn-attempt-refusal: unterminated journal row
+ok 33 - strict-torn-attempt-refusal
+# refusal orphan-followed-by-attempt: orphan followed by partial attempt
+ok 34 - orphan-followed-by-attempt
+ok 35 - inspect-empty-prefix
+# refusal oversized-row: oversized journal row
+ok 36 - oversized-row
+ok 37 - changed-cohort-pin
+ok 38 - recovery-positive
+ok 39 - recovery-inspect-orphan
+ok 40 - recovery-inspect-torn-acceptance
+ok 41 - recovery-inspect-prefix
+ok 42 - recovery-inspect-torn-attempt
+ok 43 - recovery-inspect-empty-prefix
+ok 44 - fresh-wrapper-matches-frozen-producer
+ok 45 - worker-refuses-existing-output
+ok 46 - worker-refuses-corrupt-source-before-output
+# controls=46 toy_attempts=86 toy_accepted=3 baseline_accepted=0 signed_verification=false
+bash ./test-cli.sh /tmp/nist-journal-final-20261104
+{"schema":"nist-journal-check/v1","mode":"inspect","status":"incomplete","order_replay":"ellcard-all-mapped","bits":192,"p":"6277101735386680763835789423207666416083908700390324961279","nonce":"0000000000000000000000000000000000000000000000000000000000000000","target":10,"cohort_sha256":"f425dc7c323bdbe6660fc599d1c625e1851a0e30d2a83d38a1c62d35e002f8fe","attempts":0,"accepted":0,"next_index":0,"replay_last_accepted":false,"attempt_prefix_bytes":29,"accepted_prefix_bytes":58,"attempt_tail_bytes":0,"accepted_tail_bytes":0,"attempts_bytes":29,"attempts_sha256":"7a0bb6134db47d3c3dba9cf7a4d61238c5496d3c1434bfba5934ebf9205ac1e4","accepted_bytes":58,"accepted_sha256":"e5ab44c6db0a9b0817f7c8dfd14408f66242566206ce6327bc6732b9f935c234","mutated_inputs":false,"production_qualified":false,"signed_verification":false}
+ok CLI refusal incomplete exit=1: REFUSED: accepted target incomplete
+ok CLI refusal toy-field exit=1: REFUSED: six frozen fields
+ok CLI refusal target exit=1: REFUSED: protocol pilot or primary target
+ok CLI refusal format exit=1: REFUSED: format must be sampler-v1
+ok CLI refusal acknowledgement exit=1: FAIL: explicit checkpoint acknowledgement
+Operational errors are not curve rejections.
+ok CLI refusal worker-toy-field exit=1: FAIL: six frozen fields
+Operational errors are not curve rejections.
+CLI controls complete: one empty-prefix inspection, six refusals, no sampler launch
