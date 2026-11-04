@@ -25,7 +25,7 @@ signed validator report. [pcc:unverified]
 See [`pq2_rank/README.md`](pq2_rank/README.md) and `figures/pq2_dlin.svg`,
 `figures/pq2_low_vs_k.svg`.
 
-PQ2_SECTION_PLACEHOLDER
+Results pending: the census was still running when this revision was committed; the numbers follow in the next commit.
 
 ## pf_yield: the prime-field yield heuristic, with the convention fixed
 

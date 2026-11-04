@@ -347,7 +347,7 @@ Native exact censuses in
 and four Lean modules. Census numbers are unverified assertions (no signed validator
 report) [pcc:unverified]; the Lean results have pcc claim records pending CI signing.
 
-- **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** PQ2_TRIAGE_PLACEHOLDER
+- **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** Census pending at this revision; numbers follow.
   The criterion behind it is `THM-SD-SUBSPACE-CRITERION` (Lean): a Gröbner basis
   inside the degree-d Macaulay row space supplies at most dim(rowspace ∩ P₁) linear
   leading monomials, so `d_lin ≤ sd`. The `|Z| = 1` case of the bridge `k = N` is

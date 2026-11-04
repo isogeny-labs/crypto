@@ -24,24 +24,23 @@ remove or sharpen individual supports.
   columns: (auto, auto, auto, auto),
   align: left,
   [\#], [target], [instrument], [outcome],
-  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [PQ2_OUTCOME_PLACEHOLDER],
+  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [pending (census running at commit time)],
   [2], [degree-2 criterion generalised], [Lean `SubspaceCriterion`], [$d_"lin" <= "sd"$ for any Macaulay degree; kernel-checked],
   [3], [`HEUR-DECOMPOSITION-PROBABILITY` (prime field)], [`pf_yield` census], [zero class = Poisson once unordered; variance 1.45× Poisson for negation-closed bases],
   [4], [mean of the yield heuristic], [Lean `MeanCount`], [mean $|F|^m / |G|$ is a theorem],
   [5], [`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`], [`trace_pullback` census], [no dim-1 subspace of $FF_(p^2)$ has a trace image below $0.32 dot \#E(FF_p)$],
   [6], [`HEUR-BK-GG-DECOMP-PROPORTION` (1/n!)], [`ext_decomp` census], [0.70--0.99 of $1/n!$ at n = 2, 3; premise fails for subfield curves],
   [7], [overbroad Shoup reading, "BSGS optimal"], [Lean `TransparentEncoding`], [refuted: identity encoding gives the log with zero group operations],
-  [8], [`HEUR-BK-GG-FACTOR-BASE-SIZE` ($|F| approx |V|$)], [`pq2_rank` census], [FSIZE_PLACEHOLDER],
+  [8], [`HEUR-BK-GG-FACTOR-BASE-SIZE` ($|F| approx |V|$)], [`pq2_rank` census], [pending],
   [9], [bridge $k = N - "affdim"(Z)$, case $|Z| = 1$], [Lean `BooleanNullstellensatz`], [unique zero puts every $X_i - z_i$ in the ideal; kernel-checked],
   [10], [`HEUR-PF-PKM-RANK-DELTA` ($Delta = 10$)], [`rank_deficit` census], [$Delta = 10$ gives full rank in all samples on 2 of 10 curves; deficits 1--3 persist],
 )
 
 == pq2_rank
 
-PQ2_REPORT_PLACEHOLDER
+Results pending; the census was still running when this revision was committed.
 
-#figure(image("figures/pq2_low_vs_k.svg", width: 100%), caption: [Linear polynomials reachable at Macaulay degree d against the number k of linear consequences, 3 instances per n.])
-#figure(image("figures/pq2_dlin.svg", width: 100%), caption: [$d_"lin"$ per instance.])
+// pq2 figures are added with the results.
 
 == pf_yield
 
