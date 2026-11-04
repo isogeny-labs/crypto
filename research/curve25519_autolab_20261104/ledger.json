@@ -168,6 +168,18 @@
       "source": "round-002/holdout",
       "target_seed": 2026112924,
       "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-003/train",
+      "target_seed": 2026113420,
+      "targets": 16
+    },
+    {
+      "size": 24,
+      "source": "round-003/train",
+      "target_seed": 2026113424,
+      "targets": 16
     }
   ],
   "family": "curve25519",
@@ -243,7 +255,7 @@
         20,
         24
       ],
-      "status": "frozen",
+      "status": "ratcheted",
       "track": "generic"
     }
   ],
@@ -837,7 +849,235 @@
       "stage": "holdout",
       "status": "improvement",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=6,scan_cap=96",
+        "family": "ksum4",
+        "n": 6,
+        "name": "ksum4-n6",
+        "oracle": "ksum:m=4"
+      },
+      "round": 3,
+      "s": [
+        17.165694278292136,
+        19.58542840921829,
+        41.36303558755369
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=7,scan_cap=112",
+        "family": "ksum4",
+        "n": 7,
+        "name": "ksum4-n7",
+        "oracle": "ksum:m=4"
+      },
+      "round": 3,
+      "s": [
+        10.952439028533167,
+        12.120239065478618,
+        22.630439397987665
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=10,scan_cap=160",
+        "family": "ksum4",
+        "n": 10,
+        "name": "ksum4-n10",
+        "oracle": "ksum:m=4"
+      },
+      "round": 3,
+      "s": [
+        10.285026123257602,
+        10.593023030164762,
+        13.364995192329163
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+        "family": "mitm2",
+        "n": 16,
+        "name": "mitm2-n16",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "round": 3,
+      "s": [
+        14.139559962696792,
+        15.860719148354423,
+        31.351151819273127
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+        "family": "rfmitm2",
+        "n": 32,
+        "name": "rfmitm2-n32",
+        "oracle": "rootfind-mitm:m=2"
+      },
+      "round": 3,
+      "s": [
+        11.253706591255794,
+        12.039417916349588,
+        19.11081984219374
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+        "family": "rfpairs3",
+        "n": 11,
+        "name": "rfpairs3-n11",
+        "oracle": "rootfind-pairs:m=3"
+      },
+      "round": 3,
+      "s": [
+        609.1471374747728,
+        665.1054649188737,
+        1168.7304119157827
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=17,scan_cap=272",
+        "family": "ksum4",
+        "n": 17,
+        "name": "ksum4-n17",
+        "oracle": "ksum:m=4"
+      },
+      "round": 3,
+      "s": [
+        16.93640586802197,
+        17.12239245646622,
+        18.796271752464484
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+        "family": "ksum4",
+        "n": 8,
+        "name": "ksum4-n8",
+        "oracle": "ksum:m=4"
+      },
+      "round": 3,
+      "s": [
+        14.828390994449498,
+        17.387933453008237,
+        40.4238155800369
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=6,scan_cap=96",
+        "family": "ksum4",
+        "n": 6,
+        "name": "ksum4-n6",
+        "oracle": "ksum:m=4"
+      },
+      "round": 3,
+      "s": [
+        42.568340722270925,
+        50.707338418215635,
+        123.95831768171797
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=24,scan_cap=384",
+        "family": "ksum4",
+        "n": 24,
+        "name": "ksum4-n24",
+        "oracle": "ksum:m=4"
+      },
+      "round": 3,
+      "s": [
+        66.0980436533028,
+        66.25707478807564,
+        67.68835500103127
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=81,scan_cap=1296",
+        "family": "rfmitm2",
+        "n": 81,
+        "name": "rfmitm2-n81",
+        "oracle": "rootfind-mitm:m=2"
+      },
+      "round": 3,
+      "s": [
+        12.170219022889437,
+        13.209212366924664,
+        22.560152463241685
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=28,scan_cap=448",
+        "family": "rfpairs3",
+        "n": 28,
+        "name": "rfpairs3-n28",
+        "oracle": "rootfind-pairs:m=3"
+      },
+      "round": 3,
+      "s": [
+        2127.3388179666904,
+        2332.8273059976273,
+        4182.22369827606
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-04T02:44:38Z"
+  "updated": "2026-11-04T02:45:11Z"
 }

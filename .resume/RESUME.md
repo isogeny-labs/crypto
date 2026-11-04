@@ -32,15 +32,14 @@ local route (`ic_autolab run --cpus auto --allow-busy`), `verify --replay 8`.
 - Committed and pushed on this branch; PR to open.
 
 ## Next steps
+0. Round 3 done (no challenger). The k = 20/24 generic search is near saturated for existing
+   oracles; next lever: k = 28, 32 rounds (incumbents there are still m = 2), then source changes.
 1. Open the PR, subscribe, land it (artifact-autofix moves records.jsonl to S3).
 2. Round 3: `ic_autolab loop --rounds 1 --sizes 20,24` (ksum4 neighbourhood at k = 24, ksum5 at N >= 8, rootfind families); then k = 28, 32.
 3. Second-host replay of the k = 24 ratchet before any leaderboard mention; the algebraic track with `--train-targets 6`.
 
 ## Runs in flight
-Round 3 via `ic_autolab loop --rounds 1 --track generic --sizes 20,24 --cpus auto --allow-busy --replay 8`
-(output under research/curve25519_autolab_20261104/round-003/). If the session dies,
-rerun `ic_autolab run --round 3 --stage <train|holdout>`: a complete session is adopted,
-never rerun; then select / run holdout / assess / ratchet / report by hand.
+None (round 3 complete: no challenger at k = 20 or 24).
 
 ## Stop and success conditions
 - Success: every step of round 1 runs end to end with every session verified; the classification and ledger update follow the frozen rule whatever the outcome (improvement, null or regression are all valid).
