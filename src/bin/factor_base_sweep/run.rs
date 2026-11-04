@@ -1,4 +1,6 @@
+use super::forecast;
 use super::model::{digest, read, write_new, Candidate, Plan, Request, Result};
+use crypto_lib::cryptanalysis::dreg_forecast::{json_approx_eq, Advice};
 use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
 use serde_json::{json, Value};
 use std::{
@@ -73,11 +75,20 @@ impl Log {
             match event {
                 "solver"=>eprintln!("Info:Solver:{id}: {} vars={} step={} D={} matrix={}x{} productive_D={} field_muls={} elapsed_ms={}",data["event"],data["variables"],data["step"],data["degree"],data["rows"],data["columns"],data["productive_degree"],data["field_multiplications"],data["elapsed_ms"]),
                 "trial"=>eprintln!("Info:{}:{id}: {} {}/{} status={} verified={} refuted={} exhausted={} rank={}/{} {:.3} verified/s rolling={:.3}/s independent={}/s phase_ETA~{}s rank_ETA~{}s provisional{}{}",if data["phase"]=="train"{"Relation collection"}else{"Decomposition"},data["phase"],data["trial"],data["total"],data["status"],data["verified"],data["refuted"],data["exhausted"],data["independent_rank"],data["columns"],data["verified_decompositions_per_second"].as_f64().unwrap_or(0.0),data["rolling_verified_per_second"].as_f64().unwrap_or(0.0),optional_number(&data["independent_relations_per_second"]),optional_number(&data["eta_seconds_provisional"]),optional_number(&data["rank_completion_eta_seconds_provisional"]),data.get("observed_rate_ratio_to_baseline").map(|v|format!(" observed baseline relation-stage ratio={}x",v["ratio"])).unwrap_or_default(),data.get("observed_rate_ratio_to_previous").map(|v|format!(" previous={}x (provisional; not end-to-end)",v["ratio"])).unwrap_or_default()),
+                "forecast"=>eprintln!("Info:Regularity forecast:{id}: solves={} relations={} D_reg~{} band95=[{},{}] P(D>{})={:.2} semi_regular={} yield={:.3} E[work/solve]~{} remaining_work~{} hope(x1,x10,x100)={} advice={} (advisory forecast; not certified; the candidate keeps its budget)",data["solves"],data["relations"],text(&data["predicted_degree_of_regularity"]),text(&data["band_95"][0]),text(&data["band_95"][1]),data["degree_bound"],data["p_exceeds_bound"].as_f64().unwrap_or(1.0),data["semi_regular_degree"],data["relation_yield"].as_f64().unwrap_or(0.0),optional_sci(&data["expected_work_per_solve"]),optional_sci(&data["projected_remaining_work"]),data["hope_ratio_band"].as_array().map(|b|b.iter().map(|h|optional_sci(&h["rho_floor_over_projected_relation_phase"])).collect::<Vec<_>>().join(",")).unwrap_or_else(||"unknown".into()),text(&data["advice"])),
                 _=>eprintln!("Info:{event}:{id}: {data}"),
             }
         }
         Ok(())
     }
+}
+fn text(v: &Value) -> String {
+    v.as_str().map_or_else(|| v.to_string(), str::to_owned)
+}
+fn optional_sci(v: &Value) -> String {
+    v.as_f64()
+        .map(|x| format!("{x:.3e}"))
+        .unwrap_or_else(|| "unknown".into())
 }
 fn optional_number(v: &Value) -> String {
     v.as_f64()
@@ -505,6 +516,23 @@ pub fn run(
             (attempt, done)
         };
         let mut item = json!({"id":id,"label":c.label,"outcome":done["outcome"],"attempt":attempt});
+        // The supervisor recomputes the forecast from the attempt's records,
+        // for interrupted attempts too, and checks a completed worker's copy.
+        match forecast::from_attempt(&attempt) {
+            Ok(Some((replayed, view))) => {
+                item["forecast"] = view;
+                if done["outcome"] == "completed" {
+                    let result: Value = read(&attempt.join("result.json"))?;
+                    item["forecast_replay_matches_worker"] = json!(json_approx_eq(
+                        &serde_json::to_value(&replayed).map_err(|e| e.to_string())?,
+                        &result["degree_of_regularity_forecast"],
+                        1e-9
+                    ));
+                }
+            }
+            Ok(None) => item["forecast"] = Value::Null,
+            Err(e) => item["forecast_error"] = json!(e),
+        }
         if done["outcome"] == "completed" {
             let result: Value = read(&attempt.join("result.json"))?;
             let key = serde_json::to_string(&c.curve).map_err(|e| e.to_string())?;
@@ -532,7 +560,8 @@ pub fn run(
         }
         results.push(item);
     }
-    let mut summary = json!({"schema":"factor_base_sweep.summary/v1","candidates":results,"comparison":"diagnostic observations only; no total-cost winner without complete symmetric native pricing","full_pipeline_speedup":null,"certified_degree_of_regularity":null});
+    let triage = ranking(&results);
+    let mut summary = json!({"schema":"factor_base_sweep.summary/v1","candidates":results,"triage":triage,"comparison":"diagnostic observations only; no total-cost winner without complete symmetric native pricing","full_pipeline_speedup":null,"certified_degree_of_regularity":null});
     let mut index = 1;
     loop {
         let name = format!("summary-{index:04}.json");
@@ -546,6 +575,93 @@ pub fn run(
     }
     log.event(None,"complete",json!({"candidates":plan.candidates.len(),"summary":format!("summary-{index:04}.json"),"status":"bounded sweep finished; inspect per-candidate outcomes"}))?;
     Ok(summary)
+}
+
+fn advice_of(view: &Value) -> Option<Advice> {
+    serde_json::from_value(view["advice"].clone()).ok()
+}
+fn degree_key(view: &Value) -> u64 {
+    let bound = view["degree_bound"].as_u64().unwrap_or(0);
+    match view["predicted_degree_of_regularity"].as_str() {
+        Some(s) if s.starts_with('>') => bound + 1,
+        Some(s) => s.parse().unwrap_or(bound + 1),
+        None => bound + 2,
+    }
+}
+/// Advisory ranking of candidate items that carry a compact forecast:
+/// promising first, then by predicted degree, then by projected work.
+pub fn ranking(items: &[Value]) -> Value {
+    let mut rows: Vec<Value> = items
+        .iter()
+        .filter(|item| item["forecast"].is_object())
+        .map(|item| {
+            let f = &item["forecast"];
+            json!({"id":item["id"],"label":item["label"],"outcome":item["outcome"],"attempt":item["attempt"],"advice":f["advice"],"advice_reasons":f["advice_reasons"],"predicted_degree_of_regularity":f["predicted_degree_of_regularity"],"band_95":f["band_95"],"p_exceeds_bound":f["p_exceeds_bound"],"semi_regular_degree":f["semi_regular_degree"],"structural_gain":f["structural_gain"],"solves":f["solves"],"relations":f["relations"],"relation_yield":f["relation_yield"],"projected_relation_phase_work":f["projected_relation_phase_work"],"hope_ratio_band":f["hope_ratio_band"],"records_read":f["records_read"],"records_unreadable":f["records_unreadable"]})
+        })
+        .collect();
+    rows.sort_by(|a, b| {
+        let rank = |v: &Value| advice_of(v).map_or(u8::MAX, forecast::advice_rank);
+        let work = |v: &Value| {
+            v["projected_relation_phase_work"]
+                .as_f64()
+                .unwrap_or(f64::INFINITY)
+        };
+        rank(a)
+            .cmp(&rank(b))
+            .then(degree_key(a).cmp(&degree_key(b)))
+            .then(work(a).total_cmp(&work(b)))
+            .then_with(|| a["id"].as_str().cmp(&b["id"].as_str()))
+    });
+    json!({"schema":"factor_base_sweep.triage/v1","rows":rows,"order":"advice (promising, undecided, doubtful, hopeless at bound), then predicted degree of regularity, then projected relation-phase work","advisory":"forecasts of the observed solving-degree distribution from the solves so far; not certified degrees of regularity; no candidate was stopped, skipped or shortened on this basis","certified_degree_of_regularity":null,"full_pipeline_speedup":null})
+}
+
+/// Rank every attempt of a run directory from its records on disk.  Takes
+/// no lock, so it can read beside a live sweep; records still being
+/// written are counted as unreadable, never guessed.
+pub fn triage(dir: &Path) -> Result<Value> {
+    let manifest: Value = read(&dir.join("manifest.json"))?;
+    if manifest["schema"] != "factor_base_sweep.run/v1" {
+        return Err("invalid run manifest".into());
+    }
+    let plan: Plan = serde_json::from_value(manifest["plan"].clone()).map_err(|e| e.to_string())?;
+    plan.validate()?;
+    let mut items = Vec::new();
+    for c in &plan.candidates {
+        let id = c.id()?;
+        let root = dir.join("candidates").join(&id);
+        if !root.is_dir() {
+            continue;
+        }
+        let mut attempts: Vec<_> = fs::read_dir(&root)
+            .map_err(|e| e.to_string())?
+            .map(|v| v.map(|x| x.path()))
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .map_err(|e| e.to_string())?;
+        attempts.sort();
+        for attempt in attempts {
+            if !attempt.join("request.json").is_file() {
+                continue;
+            }
+            let outcome = read::<Value>(&attempt.join("complete.json"))
+                .map(|done| done["outcome"].clone())
+                .unwrap_or_else(|_| json!("in_progress_or_interrupted"));
+            let mut item = json!({"id":id,"label":c.label,"outcome":outcome,"attempt":attempt});
+            match forecast::from_attempt(&attempt) {
+                Ok(Some((_, view))) => item["forecast"] = view,
+                Ok(None) => item["forecast"] = Value::Null,
+                Err(e) => item["forecast_error"] = json!(e),
+            }
+            items.push(item);
+        }
+    }
+    let mut out = ranking(&items);
+    out["run"] = json!(dir);
+    out["attempts_without_forecast"] = json!(items
+        .iter()
+        .filter(|i| !i["forecast"].is_object())
+        .map(|i| json!({"id":i["id"],"attempt":i["attempt"],"error":i["forecast_error"]}))
+        .collect::<Vec<_>>());
+    Ok(out)
 }
 
 pub fn verify(dir: &Path) -> Result<Value> {
@@ -592,6 +708,42 @@ pub fn verify(dir: &Path) -> Result<Value> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn triage_ranking_orders_promising_low_degree_cheap_first() {
+        let item = |id: &str, advice: &str, degree: &str, work: f64| json!({"id":id,"label":id,"outcome":"completed","attempt":"a","forecast":{"advice":advice,"degree_bound":8,"predicted_degree_of_regularity":degree,"projected_relation_phase_work":work}});
+        let items = vec![
+            item("hopeless", "hopeless_at_bound", ">8", 1.0),
+            item("doubtful", "doubtful", "3", 1.0),
+            item("promising-slow", "promising", "4", 9.0),
+            item("promising-fast", "promising", "4", 2.0),
+            item("promising-low", "promising", "3", 50.0),
+            item("undecided", "undecided", "5", 1.0),
+            json!({"id":"no-forecast","forecast":null}),
+        ];
+        let out = ranking(&items);
+        let ids: Vec<_> = out["rows"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r["id"].as_str().unwrap().to_string())
+            .collect();
+        assert_eq!(
+            ids,
+            [
+                "promising-low",
+                "promising-fast",
+                "promising-slow",
+                "undecided",
+                "doubtful",
+                "hopeless"
+            ]
+        );
+        assert!(out["certified_degree_of_regularity"].is_null());
+        assert!(out["advisory"]
+            .as_str()
+            .unwrap()
+            .contains("no candidate was stopped"));
+    }
     #[test]
     fn provisional_comparison_requires_the_same_probe_prefix_and_positive_reference() {
         let reference = Observation {

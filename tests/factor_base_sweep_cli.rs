@@ -112,6 +112,52 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert_eq!(result["trials"][0]["witness_verified"], true);
         assert!(result["certified_degree_of_regularity"].is_null());
         assert!(result["full_pipeline_speedup"].is_null());
+        // The advisory degree-of-regularity forecast travels with the result,
+        // every trial record carries its running view, the supervisor's
+        // independent replay from the records matches the worker's copy, and
+        // the run summary ranks candidates without having stopped any.
+        let forecast = &result["degree_of_regularity_forecast"];
+        assert_eq!(forecast["schema"], "dreg_forecast/v1", "{result}");
+        assert_eq!(forecast["solves"], 6);
+        assert!(forecast["certified_degree_of_regularity"].is_null());
+        assert!(forecast["all_targets"]["predicted_degree_label"].is_string());
+        assert!(
+            forecast["cost"]["hope_ratio_band"]
+                .as_array()
+                .unwrap()
+                .len()
+                == 3
+        );
+        assert!(result["trials"][6]["forecast"]["advice"].is_string());
+        assert_eq!(
+            result["trials"][6]["independent_rank"],
+            forecast["cost"]["rank"]
+        );
+        let candidate = &summary["candidates"][0];
+        assert_eq!(
+            candidate["forecast_replay_matches_worker"], true,
+            "{candidate}"
+        );
+        assert_eq!(candidate["forecast"]["solves"], 6);
+        assert_eq!(summary["triage"]["rows"].as_array().unwrap().len(), 1);
+        assert!(summary["triage"]["certified_degree_of_regularity"].is_null());
+        let triage_out = t.0.join(format!("triage-{prime}.json"));
+        let triaged = call(&[
+            "triage",
+            "--run",
+            dir.to_str().unwrap(),
+            "--out",
+            triage_out.to_str().unwrap(),
+        ]);
+        assert!(
+            triaged.status.success(),
+            "{}",
+            String::from_utf8_lossy(&triaged.stderr)
+        );
+        let triage = value(&triage_out);
+        assert_eq!(triage["schema"], "factor_base_sweep.triage/v1");
+        assert_eq!(triage["rows"][0]["solves"], 6);
+        assert_eq!(triage["rows"][0]["advice"], candidate["forecast"]["advice"]);
         let checked = call(&["verify", "--run", dir.to_str().unwrap()]);
         assert!(
             checked.status.success(),
@@ -122,6 +168,8 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert!(events.contains("solve_begin"));
         assert!(events.contains("rolling_verified_per_second"));
         assert!(events.contains("observed_solving_degree"));
+        assert!(events.contains("\"event\":\"forecast\""));
+        assert!(events.contains("predicted_degree_of_regularity"));
         let resumed = call(&["run", "--out", dir.to_str().unwrap(), "--resume"]);
         assert!(
             resumed.status.success(),
