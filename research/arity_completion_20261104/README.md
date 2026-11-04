@@ -49,9 +49,25 @@ the resume note pushed. The authoring container's STS call returns
 ## Development smokes (not evidence)
 
 Release builds of `pkm_tower_pilot` and `n83_msweep_cell` were made in this
-container after the freezes, and one toy cell per family was run only to
-confirm the command lines execute (L0, no isolation, no `/usr/bin/time`).
+container after the freezes (`CARGO_TARGET_DIR=/dev/shm/crypto-target`,
+`--release --locked`; binary sha256 in each `smoke/binary.sha256`). The
+smokes below ran at L0 (no isolation, no `/usr/bin/time`, shared VM) only to
+confirm the frozen command lines execute and to time the Koblitz preflight.
 Their outputs live under `*/smoke/` and are excluded from every analysis.
+
+| study | command (frozen, except as noted) | exit | wall | what it showed |
+|---|---|---|---|---|
+| prime_tower_m5 | t = 2 Kummer cell, `--budget 360` instead of 7200 (allowed by `execution.placement.local_smoke`) | 0 | 2.1 s | two random targets at (m = 5, t = 2, N = 10) finished, `solving_degree_max` 6, not timed out, not oversize, peak 66 MB |
+| koblitz_m5_m6 | preflight cell (m = 5, k0n23, `union:2`, `chain-s3-orbit`, 4 trials, cap 600 s) | 124 | 600.0 s | capped with no record written: the cell prints one JSON line at the end, and the chained-S3 engines carry a conflict budget (200,000) but no wall budget, so the cap is the only bound on a query |
+| koblitz_m5_m6 | negative-control command (m = 2, same curve, base, engine, trials, cap) | see `smoke/negative-k0n23-m2-s2-orbit.meta` | | instrument check: the same binary decides the m = 2 cell |
+
+The prime-tower smoke used the protocol seed (0x504B4D54), so its two rows are a
+preview of the frozen t = 2 cell; the frozen cell still runs on the isolab
+route and the analysis excludes `smoke/`. The Koblitz preflight result went
+into `koblitz_m5_m6/protocol.json` `sample_size.preflight_runtime` as the
+protocol specifies: fixed cost 0 (nothing is written before the first query
+finishes), per-cell cost at the cap, estimated total 110400 CPU-s, the
+worst case already stated there.
 
 ## dreg v4 (the solving-degree half)
 
