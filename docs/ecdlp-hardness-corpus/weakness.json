@@ -2,17 +2,17 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 585,
+    "nodes": 598,
     "status_inflation": 17,
     "model_scope_leaps": 9,
     "contagious_sources": 21,
-    "hidden_assumption_clusters": 18,
+    "hidden_assumption_clusters": 19,
     "unwired_dependences": 11,
     "route_closures_on_weak_support": 16,
     "live_obstructions": 49,
     "author_flagged": 8,
-    "attack_queue": 247,
-    "hygiene_queue": 101
+    "attack_queue": 248,
+    "hygiene_queue": 108
   },
   "status_inflation": [
     {
@@ -894,9 +894,14 @@
       "title": "Lean attacks on two weak points of the ECDLP hardness graph",
       "verification": "repository_read",
       "refuted": [
-        "CLAIM-MARGINAL-IMPLIES-HAZARD"
+        "CLAIM-MARGINAL-IMPLIES-HAZARD",
+        "CLAIM-PA-SS-IMPLIES-FS",
+        "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING",
+        "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP",
+        "CLAIM-PA-AMBIENT-BLINDING",
+        "CLAIM-PA-ZK-IMPLIES-SOUND"
       ],
-      "refuted_fraction": 0.143,
+      "refuted_fraction": 0.3,
       "exposed": [
         {
           "id": "ASM-XEDNI-TRIAL-MARGINAL",
@@ -914,12 +919,52 @@
           "impact": 0
         },
         {
+          "id": "CEX-PA-ALWAYS-ACCEPT",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-AMBIENT-BLINDING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-COFACTOR-ZMOD9",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-ZERO-HASH-FORGERY",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
+          "status": "open",
+          "impact": 0
+        },
+        {
           "id": "GAP-PQ2-M2-RANK-CENSUS",
           "status": "open",
           "impact": 0
         },
         {
           "id": "THM-LEFT-KERNEL-RELATIONS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-PA-PAIRING-DECIDES-DDH",
           "status": "proved_internal_unreviewed",
           "impact": 0
         },
@@ -1089,11 +1134,13 @@
         "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
         "CEX-FAKE-GAP-INSIDE-YZ",
         "CEX-INSIDE-GAP-THREE",
-        "CEX-INSIDE-GAP-N1-FAMILY"
+        "CEX-INSIDE-GAP-N1-FAMILY",
+        "THM-NAGAO-LEMMA4-LITERAL-INSIDE"
       ],
       "texts": [
         "Equality reading of Definitions 5 and 6",
-        "Equality reading"
+        "Equality reading",
+        "Literal >= reading of Definitions 5 and 6"
       ],
       "established_users": [],
       "total_impact": 2
@@ -1281,6 +1328,20 @@
         "RED-ISOGENY-DLP-TRANSPORT"
       ],
       "total_impact": 17
+    },
+    {
+      "nodes": [
+        "ATTACK-MOV-PAIRING",
+        "RED-PAIRING-CO-DDH",
+        "THM-PA-PAIRING-DECIDES-DDH"
+      ],
+      "texts": [
+        "A computable nondegenerate pairing",
+        "Efficient nondegenerate pairing",
+        "Nondegenerate symmetric pairing"
+      ],
+      "established_users": [],
+      "total_impact": 6
     },
     {
       "nodes": [
@@ -4769,6 +4830,20 @@
       "score": 0.409
     },
     {
+      "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
+      "label": "Can a trace-pulled-back subspace factor base be small?",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.409
+    },
+    {
       "id": "GAP-PQ2-M2-RANK-CENSUS",
       "label": "Does r2 < k hold on m = 2 descended S_3 instances for infinitely many n?",
       "status": "open",
@@ -6899,6 +6974,76 @@
       "score": 0.702
     },
     {
+      "id": "CEX-PA-ALWAYS-ACCEPT",
+      "label": "Always-accept protocol: complete, simulatable, unsound (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-AMBIENT-BLINDING",
+      "label": "Ambient blinding leaves the subgroup; subgroup blinding is a bijection (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-COFACTOR-ZMOD9",
+      "label": "In Z/9, cofactor 3 kills the order-3 subgroup; coprime cofactors are bijective (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+      "label": "H = tG gives commit(m, r) = commit(m + t, r - 1) (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-ZERO-HASH-FORGERY",
+      "label": "Constant-zero challenge: (sP, 0, s) verifies for every key (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
       "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
       "label": "Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1",
       "status": "proved_internal_unreviewed",
@@ -6915,6 +7060,34 @@
     {
       "id": "THM-LEFT-KERNEL-RELATIONS",
       "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
+      "label": "Nagao Lemma 4 holds in the literal >=, field-equations-inside cell (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-PA-PAIRING-DECIDES-DDH",
+      "label": "A nondegenerate pairing decides DDH with one evaluation (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
       "impact": 0,
