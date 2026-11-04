@@ -6,7 +6,7 @@ Registered 2026-11-04 as a draft (`protocol.json`, schema `experiment.protocol/v
 
 What is the F4 closure degree D, and what is the cost, of the PKM prime-field tower factor base at arity m = 5 at N = 10, 15 and 20, for the Kummer and isogeny towers over p1 = 2013265921? This arity was never measured; the arity review has m = 2, 3, 4 only.
 
-Neighbours (*recorded*): m = 2 D = 4 (N 2..8), 5 (N 10..18), 6 (N 20, 22); m = 3 D = 6, 6, 7, 7 at N = 9, 12, 15, 18 and >= 8 at N = 21 (died at 99.6 GiB); m = 4 D = 6, 7, 7, >= 8 at N = 8, 12, 16, 20; D independent of prime and tower kind over 82 cells. m = 4 costs: N = 8 1.5-2.7 s; N = 12 595-1242 s, 477 MB; N = 16 `f4_fp_tower` 55.5 min, 8.06 GB; N = 20 msolve died at the 5 GB cap after 3 degree-8 rounds. Sources: `research/ic_next10_20261014/03-pkm-degree/README.md` sections 2.1-2.2 and `results.csv`; `research/pkm_m3_n21_msolve_20261018/RESULTS.md`; arity review `research/factor_base_arity_review_20261024/README.md` section 1.2 (m = 2, 3, 4 only).
+Neighbours (*recorded*): m = 2 Kummer D = 4 (N 2..10), 5 (N 12..18) (corrected by AM1; v1 read "4 (N 2..8), 5 (N 10..18)", which is the isogeny tower's boundary), 6 (N 20, 22); m = 3 D = 6, 6, 7, 7 at N = 9, 12, 15, 18 and >= 8 at N = 21 (died at 99.6 GiB); m = 4 D = 6, 7, 7, >= 8 at N = 8, 12, 16, 20; D independent of prime and tower kind over 82 cells. m = 4 costs: N = 8 1.5-2.7 s; N = 12 595-1242 s, 477 MB; N = 16 `f4_fp_tower` 55.5 min, 8.06 GB; N = 20 msolve died at the 5 GB cap after 3 degree-8 rounds. Sources: `research/ic_next10_20261014/03-pkm-degree/README.md` sections 2.1-2.2 and `results.csv`; `research/pkm_m3_n21_msolve_20261018/RESULTS.md`; arity review `research/factor_base_arity_review_20261024/README.md` section 1.2 (m = 2, 3, 4 only).
 
 ## Instrument
 
@@ -51,7 +51,7 @@ The five claims in `protocol.json` map as: C1 = P1, P2; C2 = P3; C3 = P4; C4 = P
 
 - **Positive**: re-run the recorded m = 4, N = 8 Kummer cell (D = 6, 1.5-2.7 s) and the m = 3, N = 15 Kummer cell (D = 7) with the same binary; require identical D and rows identical to the recorded rows in every field except `ms` and `wall_s` (the pilot prints no system dump, so the exported system is compared through its curve, tower, `x_r`, `input_degrees` and `basis_len` fields). Any difference voids the binary and all m = 5 rows.
 - **A/A**: the two random targets of a cell are independent draws and must give the same D (the within-cell A/A); registered as arms `aa-target0` and `aa-target1` on the m = 4, N = 8 cell, and checked on every m = 5 cell by `analyze.py`.
-- **Negative**: m = 2, N = 10 (D = 5, known) as the null-chain comparison; any other D stops the study.
+- **Negative**: m = 2, N = 10 (Kummer D = 4, known; v1 read 5, corrected by amendment AM1) as the null-chain comparison; any other D stops the study.
 
 ## Variable ledger and comparisons
 
@@ -75,7 +75,7 @@ Backend: isolab-eks on EKS Spot per AGENTS.md section 9a (registered as `isolab-
 
 - (budget) Each cell has a wall budget of 7200 s (t = 2, 3) or 86400 s (t = 4) and a memory cap by prlimit --as of 8 GiB (t = 2, 3) or 120 GiB (t = 4, only on a host with that memory). A wall or memory stop is inconclusive_cap, not evidence.
 - (preregistered_sequential) Stop the t = 4 cells if a t = 3 cell exceeds its cap.
-- (invalidation) Run the three controls first. If the m = 4 N = 8 or m = 3 N = 15 control differs from its recorded D or rows, or the m = 2 N = 10 negative control does not give D = 5, stop and run no m = 5 cell.
+- (invalidation) Run the three controls first. If the m = 4 N = 8 or m = 3 N = 15 control differs from its recorded D or rows, or the m = 2 N = 10 negative control does not give D = 4 (AM1; v1 read 5), stop and run no m = 5 cell.
 - (fixed_n) Run each cell once per process (--t-min T --max-t-m4 T); 12 target rows plus controls, no extra cells.
 
 ## Decision rule
@@ -106,3 +106,15 @@ None.
 - `research/ic_next10_20261014/03-pkm-degree/README.md`: Sections 2.1-2.2 and results.csv give the m = 2, 3, 4 degrees and costs used as predictions and controls; D independent of prime and tower kind over 82 cells.
 - `research/pkm_m3_n21_msolve_20261018/RESULTS.md`: m = 3, N = 21 died at 99.6 GiB with D >= 8; msolve at m = 4, N = 20 died at a 5 GB cap after 3 degree-8 rounds.
 - `research/pkm_tower_round3_20260925/README.md`: Source of the command-line flag style for the tower engine.
+
+## Amendment AM1 (2026-11-04, version 2, filed before any m = 5 data)
+
+v1 set the m = 2, N = 10 Kummer negative control to a recorded D = 5. The
+records it cites give 4: `research/pkm_tower_round2_20260925/runs/XV1-m2-tower-null.jsonl`
+(p = 786433) and `XV5-kummer-m2-p32.jsonl` (p = 3221225473) both record
+`solving_degree_max` 4 on the two random targets of the Kummer m = 2, t = 5
+cell; D = 5 at N = 10 is the isogeny tower's value, and the Kummer chain
+reaches 5 at N = 12. Attempt 1 on Iso Lab EKS measured 4, 4 at p1 and
+stopped before any m = 5 cell, as v1 required; the two positive controls
+reproduced 6, 6 and 7, 7. Only the expected value of that control changes;
+claims, predictions, cells, commands, caps, seeds and `analyze.py` do not.
