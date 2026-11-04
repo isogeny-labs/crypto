@@ -16,3 +16,12 @@ Not a Spot loss: prime a2's kummer-m5-t3 ended at 20:53.93 wall with
 "memory allocation of 162324 bytes failed", peak RSS 8292560 kB, signal 6,
 under `prlimit --as=8589934592`: the protocol's 8 GiB memory cap
 (inconclusive_cap), reached during degree-7 steps (step 61: nnz 410038654).
+| i-014d409ba4d1a916b | c8i.2xlarge (unpinned pick) | 19:04:57Z | instance-terminated-no-capacity | 19:23:22Z | prime main a4 (b942b4a9; host "Intel(R) Xeon(R) 6975P-C") |
+
+Prime a4 resumed the curated records, skipped the five finished cells and
+started `isogeny-m5-t2` at 19:05:46Z; the node was reclaimed before the cell
+wrote any output (`cells/isogeny-m5-t2.{jsonl,time}` 0 bytes at 19:25:27Z).
+That cell has now been lost to infrastructure twice (a2, a4), which is the
+prime-tower protocol's `retries.max_attempts` = 2 under the per-cell reading
+(README deviation 6). No further prime-tower attempt is launched without an
+owner decision. Koblitz a4 (m7i.2xlarge) was still Pending at 20:05Z.
