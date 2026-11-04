@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0412Z-c25519-autolab-r4-k32",
+  "latest_record": "20261104T0414Z-c25519-autolab-r5-k32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 0,
     "invalid": 0,
-    "measured": 2,
+    "measured": 3,
     "open": 0
   },
   "repo": "crypto",
@@ -43,10 +43,11 @@
     {
       "better": "lower",
       "first": 24.137681139442055,
-      "latest": 24.137681139442055,
+      "latest": 8.296358105096902,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 28.582714
+        "improvement_vs_first_percent": 65.629,
+        "improvement_vs_previous_percent": 65.629,
+        "value_over_reference": 9.10209
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -64,6 +65,22 @@
           "spread": null,
           "summary": "ic_autolab round 4, k = 32 train screen: incumbent mitm2-n512 S(w=0) 24.14 vs matched rho 0.84; no candidate below it (ksum4 N = 53-106 at 4.4x-72x); recorded after the run with a fresh replay audit",
           "value": 24.137681139442055
+        },
+        {
+          "commit": "fafd6d1ce992",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 65.629,
+            "improvement_vs_previous_percent": 65.629,
+            "value_over_reference": 9.10209
+          },
+          "n": 64,
+          "record": "20261104T0414Z-c25519-autolab-r5-k32",
+          "reference": 0.9114783469263799,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 5, k = 32 holdout: ksum:m=4 N = 26 S(w=0) 8.30 vs incumbent 23.60, matched rho 0.91 (distance 25.9x -> 9.1x)",
+          "value": 8.296358105096902
         }
       ],
       "problem": "ic:curve25519-family-k32",
