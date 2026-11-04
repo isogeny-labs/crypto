@@ -78,6 +78,14 @@ pub const COMPUTE_DIR: &str = "/work/compute";
 fn one() -> u32 {
     1
 }
+pub const DEFAULT_PVC_GIB: u32 = 8;
+pub const MAX_PVC_GIB: u32 = 64;
+fn default_pvc_gib() -> u32 {
+    DEFAULT_PVC_GIB
+}
+fn is_default_pvc_gib(n: &u32) -> bool {
+    *n == DEFAULT_PVC_GIB
+}
 fn is_one(n: &u32) -> bool {
     *n == 1
 }
@@ -98,6 +106,12 @@ pub struct CommandMode {
     pub threads: u32,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub binaries: BTreeMap<String, String>,
+    /// Computation PVC size in GiB, 8..64. Explicit 8 canonicalizes to omission.
+    #[serde(
+        default = "default_pvc_gib",
+        skip_serializing_if = "is_default_pvc_gib"
+    )]
+    pub pvc_gib: u32,
 }
 
 fn plain_text(s: &str) -> bool {
@@ -152,6 +166,9 @@ impl CommandMode {
         }
         if !(1..=4).contains(&self.threads) {
             return Err("command threads must be 1..4".into());
+        }
+        if !(DEFAULT_PVC_GIB..=MAX_PVC_GIB).contains(&self.pvc_gib) {
+            return Err("command pvc_gib must be 8..64".into());
         }
         if self.binaries.len() > MAX_COMMAND_BINARIES
             || !self
@@ -365,6 +382,10 @@ impl Request {
     pub fn is_command(&self) -> bool {
         self.command.is_some()
     }
+    /// Computation PVC size: always 8 GiB for ecbench; command.pvc_gib otherwise.
+    pub fn pvc_gib(&self) -> u32 {
+        self.command.as_ref().map_or(DEFAULT_PVC_GIB, |c| c.pvc_gib)
+    }
 
     pub fn hash(&self) -> String {
         digest(&serde_json::to_vec(self).expect("serializable request"))
@@ -422,6 +443,7 @@ pub fn command_fixture() -> Request {
         outputs: "/work/compute/out".into(),
         threads: 2,
         binaries: BTreeMap::from([("/opt/study/bin/prime-tower".into(), "f".repeat(64))]),
+        pvc_gib: DEFAULT_PVC_GIB,
     });
     request
 }
@@ -935,5 +957,46 @@ mod tests {
             .as_array()
             .unwrap()
             .contains(&serde_json::json!("spec")));
+    }
+    #[test]
+    fn command_pvc_gib_is_bounded_and_default_keeps_hash() {
+        let base = command_fixture();
+        let v = serde_json::to_value(&base).unwrap();
+        assert!(
+            v["command"].get("pvc_gib").is_none(),
+            "default 8 is omitted"
+        );
+        let mut explicit = v.clone();
+        explicit["command"]["pvc_gib"] = serde_json::json!(8);
+        let eight = Request::parse(&serde_json::to_vec(&explicit).unwrap()).unwrap();
+        assert_eq!(eight.hash(), base.hash());
+        assert_eq!(eight.pvc_gib(), 8);
+        for gib in [9, 32, 64] {
+            explicit["command"]["pvc_gib"] = serde_json::json!(gib);
+            let r = Request::parse(&serde_json::to_vec(&explicit).unwrap()).unwrap();
+            assert_eq!(r.pvc_gib(), gib);
+            assert_ne!(r.hash(), base.hash());
+            assert_eq!(serde_json::to_value(&r).unwrap()["command"]["pvc_gib"], gib);
+        }
+        for gib in [
+            serde_json::json!(7),
+            serde_json::json!(65),
+            serde_json::json!(0),
+            serde_json::json!("16"),
+            Value::Null,
+        ] {
+            explicit["command"]["pvc_gib"] = gib;
+            assert!(Request::parse(&serde_json::to_vec(&explicit).unwrap()).is_err());
+        }
+        assert_eq!(fixture().pvc_gib(), 8);
+        let mut ecbench = serde_json::to_value(fixture()).unwrap();
+        ecbench["pvc_gib"] = serde_json::json!(16);
+        assert!(Request::parse(&serde_json::to_vec(&ecbench).unwrap()).is_err());
+        let schema: Value =
+            serde_json::from_str(include_str!("../../request.schema.json")).unwrap();
+        let p = &schema["properties"]["command"]["properties"]["pvc_gib"];
+        assert_eq!(p["minimum"], DEFAULT_PVC_GIB);
+        assert_eq!(p["maximum"], MAX_PVC_GIB);
+        assert_eq!(p["default"], DEFAULT_PVC_GIB);
     }
 }

@@ -682,20 +682,24 @@ fn computation_owner_matches(observed: &Value, intended: &Value) -> Result<(), S
 fn provision(s: &State) -> Result<Value, String> {
     let reservation = campaign_admit(s, crate::campaign::Epoch::Computation)?;
     let req = &s.request;
-    let name = basename(s);
     ensure(
         NAMESPACE,
         &json!({"apiVersion":"v1","kind":"ConfigMap","metadata":metadata(&format!("{}-request",req.run_name),req),"immutable":true,"data":{"request.json":serde_json::to_string(req).map_err(error)?}}),
         req,
     )?;
-    let mut pvc = json!({"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":metadata(&name,req),"spec":{"accessModes":["ReadWriteOnce"],"storageClassName":"gp3","resources":{"requests":{"storage":"8Gi"}}}});
-    if let Some(number) = s.selected_generation {
-        let g = s
-            .generations
-            .iter()
-            .find(|g| g.number == number)
-            .ok_or("missing selected generation")?;
-        pvc["spec"]["dataSource"] = json!({"name":g.snapshot_name,"kind":"VolumeSnapshot","apiGroup":"snapshot.storage.k8s.io"});
+    let pvc = computation_pvc(s)?;
+    if req.is_command() {
+        if let Some(source) = pvc["spec"]["dataSource"]["name"].as_str() {
+            // The clone uses the same immutable request size as its source PVC.
+            // Refuse only a parseable snapshot restoreSize that does not fit.
+            let snapshot = get(NAMESPACE, "volumesnapshot", source)?
+                .ok_or("selected command-mode VolumeSnapshot missing")?;
+            if let Some(size) = snapshot["status"]["restoreSize"].as_str() {
+                if restore_size_fits(size, req.pvc_gib()) == Some(false) {
+                    return Err("command PVC is smaller than its checkpoint snapshot".into());
+                }
+            }
+        }
     }
     ensure(NAMESPACE, &pvc, req)?;
     let remaining = req
@@ -716,6 +720,35 @@ fn provision(s: &State) -> Result<Value, String> {
         computation_owner_matches(&observed, &manifest)?;
     }
     Ok(observed)
+}
+/// Computation PVC for this attempt. ecbench keeps the fixed 8Gi manifest;
+/// command mode uses command.pvc_gib for the first and every cloned PVC.
+fn computation_pvc(s: &State) -> Result<Value, String> {
+    let req = &s.request;
+    let storage = format!("{}Gi", req.pvc_gib());
+    let mut pvc = json!({"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":metadata(&basename(s),req),"spec":{"accessModes":["ReadWriteOnce"],"storageClassName":"gp3","resources":{"requests":{"storage":storage}}}});
+    if let Some(number) = s.selected_generation {
+        let g = s
+            .generations
+            .iter()
+            .find(|g| g.number == number)
+            .ok_or("missing selected generation")?;
+        pvc["spec"]["dataSource"] = json!({"name":g.snapshot_name,"kind":"VolumeSnapshot","apiGroup":"snapshot.storage.k8s.io"});
+    }
+    Ok(pvc)
+}
+/// Some(fits) for a Gi/Mi/Ki or plain-byte quantity; None when unparseable
+/// (Kubernetes then enforces the bound itself).
+fn restore_size_fits(quantity: &str, gib: u32) -> Option<bool> {
+    let units: [(&str, u64); 4] = [("Gi", 1 << 30), ("Mi", 1 << 20), ("Ki", 1 << 10), ("", 1)];
+    let (digits, scale) = units
+        .iter()
+        .find_map(|(suffix, scale)| quantity.strip_suffix(suffix).map(|d| (d, *scale)))?;
+    if digits.is_empty() || !digits.bytes().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    let bytes = digits.parse::<u64>().ok()?.checked_mul(scale)?;
+    Some(bytes <= u64::from(gib) << 30)
 }
 fn computation_pod(s: &State, remaining: u64) -> Value {
     let req = &s.request;
@@ -974,6 +1007,18 @@ fn checkpoint(stored: &mut Stored, st: &Status, dir: &Path) -> Result<(), String
     }
     if let Some(g) = s.generations.iter().find(|g| g.number == n) {
         rpc(s, "continue", n, Some(g.manifest_sha256.clone()))?;
+        // Command mode only: generation n is committed and saved, so PVC-local
+        // directories older than the two newest committed ones may go. S3
+        // archives and EBS snapshots are never touched.
+        if let Some((newest, manifest)) = s.prune_target(n) {
+            save(
+                &dir.join(format!("prune-request-g{newest}.json")),
+                &json!({"schema":"isolab.recovery.prune-request/v1","request_sha256":s.request_sha256,
+                    "attempt":s.attempt,"newest_committed":newest,"manifest_sha256":manifest,
+                    "keep":[newest.saturating_sub(1),newest],"at":now()}),
+            )?;
+            rpc(s, "prune", newest, Some(manifest))?;
+        }
         s.finish_checkpoint();
         stored.save()?;
         return Ok(());
@@ -2609,5 +2654,58 @@ mod command_mode_tests {
         let mut v = serde_json::to_value(&seal).unwrap();
         v["extra"] = json!(1);
         assert!(check_command_seal(&serde_json::to_vec(&v).unwrap(), &sums, &rr, 3, 7).is_err());
+    }
+    #[test]
+    fn computation_pvc_size_is_fixed_for_ecbench_and_bound_for_command_mode() {
+        fn with_clone(mut s: State) -> State {
+            s.selected_generation = Some(1);
+            s.generations = vec![crate::model::Generation {
+                number: 1,
+                request_sha256: s.request_sha256.clone(),
+                snapshot_name: format!("{}-g1", s.request.run_name),
+                snapshot_id: "snap-1".into(),
+                archive_key: "k".into(),
+                archive_version: "v".into(),
+                archive_sha256: "e".repeat(64),
+                manifest_sha256: "d".repeat(64),
+                archive_bytes: 1,
+                source_instance: "i-1".into(),
+                source_pod_uid: "p".into(),
+                committed_unix_seconds: 1,
+                snapshot_ready: true,
+                encrypted: true,
+                readback_verified: true,
+            }];
+            s
+        }
+        // ecbench: byte-identical to the former inline manifest.
+        let e = State::new(crate::contract::fixture(), "t".into(), 1000).unwrap();
+        let legacy = json!({"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":metadata(&basename(&e),&e.request),"spec":{"accessModes":["ReadWriteOnce"],"storageClassName":"gp3","resources":{"requests":{"storage":"8Gi"}}}});
+        assert_eq!(
+            serde_json::to_vec(&computation_pvc(&e).unwrap()).unwrap(),
+            serde_json::to_vec(&legacy).unwrap()
+        );
+        let clone = computation_pvc(&with_clone(e)).unwrap();
+        assert_eq!(clone["spec"]["resources"]["requests"]["storage"], "8Gi");
+        assert_eq!(clone["spec"]["dataSource"]["name"], "test-recovery-g1");
+        // command: default 8 and explicit 32, first and cloned PVCs alike.
+        for (gib, storage) in [(8, "8Gi"), (32, "32Gi"), (64, "64Gi")] {
+            let mut req = crate::contract::command_fixture();
+            req.command.as_mut().unwrap().pvc_gib = gib;
+            let s = State::new(req, "t".into(), 1000).unwrap();
+            let first = computation_pvc(&s).unwrap();
+            assert_eq!(first["spec"]["resources"]["requests"]["storage"], storage);
+            assert!(first["spec"].get("dataSource").is_none());
+            let clone = computation_pvc(&with_clone(s)).unwrap();
+            assert_eq!(clone["spec"]["resources"]["requests"]["storage"], storage);
+            assert_eq!(clone["spec"]["dataSource"]["kind"], "VolumeSnapshot");
+        }
+        assert_eq!(restore_size_fits("32Gi", 32), Some(true));
+        assert_eq!(restore_size_fits("33Gi", 32), Some(false));
+        assert_eq!(restore_size_fits("8589934592", 8), Some(true));
+        assert_eq!(restore_size_fits("8589934593", 8), Some(false));
+        assert_eq!(restore_size_fits("8192Mi", 8), Some(true));
+        assert_eq!(restore_size_fits("8G", 8), None);
+        assert_eq!(restore_size_fits("Gi", 8), None);
     }
 }

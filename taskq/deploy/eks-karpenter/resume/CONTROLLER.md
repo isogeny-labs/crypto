@@ -91,7 +91,8 @@ ecbench computation with a trusted native command:
   "argv": ["/opt/study/launch/job-prime-tower-criu.sh", "main"],
   "outputs": "/work/compute/out",
   "threads": 4,
-  "binaries": {"/opt/study/bin/prime-tower": "<sha256>"}
+  "binaries": {"/opt/study/bin/prime-tower": "<sha256>"},
+  "pvc_gib": 32
 }
 ```
 
@@ -107,6 +108,10 @@ ecbench computation with a trusted native command:
 - `threads`: 1..4, default 1; explicit 1 canonicalizes to omission.
 - `spec` must be absent or null. `diagnostic_transport`, `worker_campaign` and
   `fresh_owner` are rejected, since each binds an ecbench spec or a fresh epoch.
+- `pvc_gib`: optional computation PVC size, 8..64 GiB, default 8; explicit 8
+  canonicalizes to omission. Every attempt's PVC uses it, including PVCs cloned
+  from a checkpoint snapshot, so a clone is never smaller than its source; a
+  parseable snapshot `restoreSize` larger than it is refused. ecbench PVCs stay 8Gi.
 - `max_restores` may be 1..50 with `command`; ecbench requests keep 1..5.
 
 The supervisor verifies `argv[0]` and every listed binary at admission of each
@@ -122,6 +127,24 @@ computation-only seccomp filter (perf_event_open returns EPERM) after the
 privilege drop; CRIU 4.2.1 cannot dump perf descriptors and the restore
 credential check requires seccomp filter mode. Checkpoint, generation commit,
 fencing, restore, deadline and restore-budget logic are the ecbench code paths.
+
+**Generation pruning (command mode only).** Each generation's CRIU image lives
+on the PVC under `/work/generations/gN`. Once generation `n` is fully
+committed (snapshot ready, S3 archive uploaded and read back, state saved) and
+the controller resumes the process, it sends a `prune` operation for `n`
+carrying the committed manifest hash. The supervisor deletes `gK` for every
+`K < n-1` from the live PVC and keeps `g(n-1)` and `gn`, which are the two most
+recent committed generations: commit numbers are contiguous, since a commit
+requires `number == next_generation`. It refuses, deleting nothing, when the
+manifest hash differs from the committed one, `gn` is absent, or any newer,
+uncommitted directory exists. S3 archives and EBS snapshots are never touched;
+restores always clone a snapshot, which still contains the restored
+generation's own directory. The controller records `prune-request-gN.json` in
+its receipts and the supervisor writes `/work/control/attempt-A/prune-gN.json`
+(existing, kept, pruned with bytes, errors, refusal). A failed or refused prune
+never stops the computation. Because pruning follows the snapshot, the PVC
+holds three generations during a dump (two otherwise) while prunes succeed;
+a refused prune leaves older directories until a later one succeeds. ecbench requests never prune.
 
 When the root process exits, its exit code is recorded whatever its value and
 is never retried. There is no native replay and no fresh L2 benchmark epoch.
@@ -163,12 +186,18 @@ What payloads must satisfy (not checked, and not qualified):
 - Stay in the launched process tree: a daemonized or double-forked descendant
   is reparented to the supervisor, is not dumped, and is lost on restore.
 - No GPU, perf, io_uring or other descriptor CRIU 4.2.1 cannot dump.
-- Fit the 8 GiB PVC: each generation keeps its full CRIU image under
-  `/work/generations` and the supervisor does not prune older generations, so
-  disk use grows with resident memory times the number of checkpoints.
+- Fit the PVC (`pvc_gib`): outputs, `tmp`, logs and up to three CRIU images.
+  Each image is roughly the process tree's resident memory.
 - Leave enough of the original deadline after the command exits for the
   sealed files to be copied and uploaded before the Pod's deadline. The
   deadline still applies to the completion transition.
+
+**Shared controller slot.** The recovery CodeBuild project admits one
+controller at a time (`ConcurrentBuildLimit: 1`, `QueuedTimeoutInMinutes: 10`,
+`TimeoutInMinutes: 1500` in `bridge.yaml`). A 15-hour command run holds the
+controller's single CodeBuild slot for its whole duration: every other
+recovery submission, including other users' ecbench runs, that waits more
+than 10 minutes in the queue fails to start.
 
 This is a trusted-workload feature. The privileged supervisor is not a sandbox
 for untrusted code; `argv` and `binaries` must name reviewed programs.

@@ -246,6 +246,24 @@ impl State {
         self.phase = Phase::Restoring;
         Ok(())
     }
+    /// Command mode only: the generation whose commit permits PVC-local
+    /// pruning, with its committed manifest hash. `n` must be the newest
+    /// committed generation and nothing newer may be pending. Committed numbers
+    /// are contiguous (commit requires number == next_generation), so keeping
+    /// n-1 and n keeps exactly the two most recent committed generations.
+    pub fn prune_target(&self, n: u64) -> Option<(u64, String)> {
+        if !self.request.is_command() {
+            return None;
+        }
+        let newest = self.generations.iter().max_by_key(|g| g.number)?;
+        if newest.number != n
+            || n.checked_add(1) != Some(self.next_generation)
+            || !newest.eligible(&self.request_sha256)
+        {
+            return None;
+        }
+        Some((n, newest.manifest_sha256.clone()))
+    }
     pub fn begin_benchmark(&mut self, native_replay_ok: bool) -> Result<(), String> {
         if self.phase != Phase::VerifyingComputation || !native_replay_ok {
             return Err("native computation verification is required".into());
@@ -494,5 +512,41 @@ mod tests {
         s.current_instance = Some("i-next".into());
         s.confirm_terminated("i-next", Some("terminated")).unwrap();
         assert!(s.begin_restore(1, 1300).is_err(), "budget exhausted");
+    }
+    #[test]
+    fn prune_targets_only_the_newest_committed_command_generation() {
+        let mut s = State::new(crate::contract::command_fixture(), "p".into(), 1000).unwrap();
+        s.current_instance = Some("i-old".into());
+        s.current_pod_uid = Some("pod-old".into());
+        s.phase = Phase::Running;
+        assert!(s.prune_target(1).is_none(), "nothing committed");
+        s.begin_checkpoint().unwrap();
+        assert!(s.prune_target(1).is_none(), "intent is not a commit");
+        s.commit(generation(&s)).unwrap();
+        assert_eq!(s.prune_target(1), Some((1, "d".repeat(64))));
+        s.finish_checkpoint();
+        s.phase = Phase::Running;
+        s.begin_checkpoint().unwrap();
+        // Generation 2 is pending: generation 1 is no longer the right target,
+        // and generation 2 is not committed.
+        assert_eq!(s.next_generation, 2);
+        assert!(s.prune_target(2).is_none());
+        s.commit(generation(&s)).unwrap();
+        assert_eq!(s.prune_target(2).map(|t| t.0), Some(2));
+        assert!(
+            s.prune_target(1).is_none(),
+            "an older generation is not newest"
+        );
+        let mut bad = s.clone();
+        bad.generations.last_mut().unwrap().readback_verified = false;
+        assert!(bad.prune_target(2).is_none());
+        // ecbench requests never prune, even with identical committed state.
+        let mut e = s.clone();
+        e.request = crate::contract::fixture();
+        e.request_sha256 = e.request.hash();
+        for g in &mut e.generations {
+            g.request_sha256 = e.request_sha256.clone();
+        }
+        assert!(e.prune_target(2).is_none());
     }
 }

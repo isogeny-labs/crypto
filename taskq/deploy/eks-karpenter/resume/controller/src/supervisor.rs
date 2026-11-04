@@ -53,6 +53,7 @@ impl Operation {
             "restore",
             "verify",
             "seal",
+            "prune",
             "stop",
         ]
         .contains(&self.action.as_str())
@@ -1007,6 +1008,105 @@ fn seal(req: &Request, s: &mut Status) -> Result<(), String> {
     s.phase = "sealed".into();
     Ok(())
 }
+/// Generations to delete from the live PVC once `newest` is committed: every
+/// `gK` with K < newest-1. Refused when `newest` is absent or any newer
+/// (uncommitted) generation directory exists.
+fn prune_plan(existing: &[u64], newest: u64) -> Result<Vec<u64>, String> {
+    if newest == 0 || !existing.contains(&newest) {
+        return Err("newest committed generation is absent on the PVC".into());
+    }
+    if existing.iter().any(|k| *k > newest) {
+        return Err("a newer generation exists and is not committed".into());
+    }
+    let mut prune: Vec<u64> = existing
+        .iter()
+        .copied()
+        .filter(|k| *k < newest - 1)
+        .collect();
+    prune.sort_unstable();
+    prune.dedup();
+    Ok(prune)
+}
+fn tree_bytes(path: &Path) -> u64 {
+    let Ok(meta) = fs::symlink_metadata(path) else {
+        return 0;
+    };
+    if !meta.is_dir() {
+        return meta.len();
+    }
+    fs::read_dir(path)
+        .map(|entries| {
+            entries
+                .filter_map(Result::ok)
+                .map(|e| tree_bytes(&e.path()))
+                .sum()
+        })
+        .unwrap_or(0)
+}
+/// Delete PVC-local generation directories older than the two newest committed
+/// ones. Never touches S3 or EBS. Every outcome, including a refusal, is a
+/// receipt; housekeeping never fails the computation.
+fn prune_generations(dir: &Path, newest: u64, expected_manifest: Option<&str>) -> Value {
+    let mut existing = Vec::new();
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.filter_map(Result::ok) {
+            let name = entry.file_name();
+            let number = name
+                .to_str()
+                .and_then(|n| n.strip_prefix('g'))
+                .filter(|d| !d.is_empty() && d.bytes().all(|c| c.is_ascii_digit()))
+                .and_then(|d| d.parse::<u64>().ok());
+            let is_dir = fs::symlink_metadata(entry.path()).is_ok_and(|m| m.is_dir());
+            if let (Some(number), true) = (number, is_dir) {
+                existing.push(number);
+            }
+        }
+    }
+    existing.sort_unstable();
+    let manifest = sha_file(&dir.join(format!("g{newest}/manifest.json"))).map(|v| v.0);
+    let plan = if expected_manifest.is_none() || manifest.as_deref().ok() != expected_manifest {
+        Err("newest generation manifest is not the committed manifest".to_string())
+    } else {
+        prune_plan(&existing, newest)
+    };
+    let (mut pruned, mut errors) = (Vec::new(), Vec::new());
+    if let Ok(plan) = &plan {
+        for k in plan {
+            let path = dir.join(format!("g{k}"));
+            let bytes = tree_bytes(&path);
+            match fs::remove_dir_all(&path) {
+                Ok(()) => pruned.push(json!({"generation":k,"bytes":bytes})),
+                Err(e) => errors.push(json!({"generation":k,"error":error(e)})),
+            }
+        }
+    }
+    json!({"schema":"isolab.recovery.generation-prune/v1","newest_committed":newest,
+        "existing_before":existing,"kept":existing.iter().filter(|k| **k + 1 >= newest).collect::<Vec<_>>(),
+        "pruned":pruned,"errors":errors,"refused":plan.err(),
+        "scope":"PVC-local /work/generations only; S3 archives and EBS snapshots untouched"})
+}
+fn prune(
+    req: &Request,
+    s: &Status,
+    newest: u64,
+    expected_manifest: Option<&str>,
+) -> Result<(), String> {
+    if !req.is_command() {
+        return Err("generation pruning is command mode only".into());
+    }
+    let mut receipt = prune_generations(
+        &Path::new(ROOT).join("generations"),
+        newest,
+        expected_manifest,
+    );
+    receipt["request_sha256"] = json!(req.hash());
+    receipt["attempt"] = json!(s.attempt);
+    receipt["at"] = json!(now());
+    save(
+        &attempt_dir(s.attempt).join(format!("prune-g{newest}.json")),
+        &receipt,
+    )
+}
 pub fn rpc(attempt: u32, bytes: &[u8]) -> Result<(), String> {
     let op: Operation = serde_json::from_slice(bytes).map_err(error)?;
     if op.attempt != attempt {
@@ -1202,6 +1302,7 @@ pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
                     }
                     "verify" => verify(&mut s, req.worker_campaign.as_ref().map(|_| cutoff)),
                     "seal" => seal(&req, &mut s),
+                    "prune" => prune(&req, &s, op.generation, op.manifest_sha256.as_deref()),
                     "stop" => {
                         if let Some(pid) = s.pid {
                             unsafe { libc::kill(-pid, libc::SIGKILL) };
@@ -1659,5 +1760,94 @@ mod command_mode_tests {
             assert!(!sealable_path(bad), "{bad:?}");
         }
         fs::remove_dir_all(&root).unwrap();
+    }
+    #[test]
+    fn prune_plan_keeps_exactly_the_latest_two_committed() {
+        assert_eq!(prune_plan(&[1], 1), Ok(vec![]));
+        assert_eq!(prune_plan(&[1, 2], 2), Ok(vec![]));
+        assert_eq!(prune_plan(&[1, 2, 3], 3), Ok(vec![1]));
+        assert_eq!(prune_plan(&[1, 2, 3, 4, 5], 5), Ok(vec![1, 2, 3]));
+        // A clone restored from an older snapshot keeps its own older directory.
+        assert_eq!(prune_plan(&[3, 6], 6), Ok(vec![3]));
+        assert!(prune_plan(&[1, 2, 3], 2).is_err(), "uncommitted g3 exists");
+        assert!(prune_plan(&[1, 2], 3).is_err(), "newest absent");
+        assert!(prune_plan(&[], 0).is_err());
+    }
+    #[test]
+    fn prune_generations_deletes_only_old_local_directories() {
+        use std::os::unix::fs::symlink;
+        let dir = std::env::temp_dir().join(format!("prune-gen-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        let other = std::env::temp_dir().join(format!("prune-target-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&other);
+        fs::create_dir_all(other.join("keep")).unwrap();
+        for k in 1..=5 {
+            fs::create_dir_all(dir.join(format!("g{k}/dump"))).unwrap();
+            fs::write(dir.join(format!("g{k}/dump/pages.img")), vec![0u8; 10 * k]).unwrap();
+            fs::write(dir.join(format!("g{k}/manifest.json")), format!("m{k}")).unwrap();
+        }
+        fs::write(dir.join("notes"), b"x").unwrap();
+        symlink(&other, dir.join("g0")).unwrap();
+        let m5 = crate::contract::digest(b"m5");
+        // Wrong or missing manifest: nothing is deleted.
+        for expected in [None, Some("0".repeat(64))] {
+            let r = prune_generations(&dir, 5, expected.as_deref());
+            assert!(r["refused"].is_string());
+            assert_eq!(r["pruned"], json!([]));
+            assert!(dir.join("g1").exists());
+        }
+        // Uncommitted newer generation present: nothing is deleted.
+        fs::create_dir(dir.join("g6")).unwrap();
+        let r = prune_generations(&dir, 5, Some(&m5));
+        assert!(r["refused"].as_str().unwrap().contains("not committed"));
+        assert!(dir.join("g1").exists());
+        fs::remove_dir(dir.join("g6")).unwrap();
+        let r = prune_generations(&dir, 5, Some(&m5));
+        assert!(r["refused"].is_null());
+        assert_eq!(r["kept"], json!([4, 5]));
+        assert_eq!(
+            r["pruned"],
+            json!([{"generation":1,"bytes":12},{"generation":2,"bytes":22},{"generation":3,"bytes":32}])
+        );
+        for k in 1..=3 {
+            assert!(!dir.join(format!("g{k}")).exists());
+        }
+        for k in 4..=5 {
+            assert!(dir.join(format!("g{k}/dump/pages.img")).exists());
+        }
+        assert!(dir.join("notes").exists());
+        assert!(
+            other.join("keep").exists(),
+            "symlinked g0 is never followed"
+        );
+        // Idempotent repeat.
+        let again = prune_generations(&dir, 5, Some(&m5));
+        assert_eq!(again["pruned"], json!([]));
+        fs::remove_dir_all(&dir).unwrap();
+        fs::remove_dir_all(&other).unwrap();
+    }
+    #[test]
+    fn prune_is_never_executed_for_ecbench_requests() {
+        let req = crate::contract::fixture();
+        let s = Status {
+            request_sha256: req.hash(),
+            attempt: 0,
+            phase: "running".into(),
+            pid: None,
+            starttime: None,
+            generation: Some(5),
+            exit_code: None,
+            error: None,
+            updated: 0,
+        };
+        assert!(prune(&req, &s, 5, Some(&"d".repeat(64))).is_err());
+        let op = Operation {
+            request_sha256: req.hash(),
+            attempt: 0,
+            action: "prune".into(),
+            generation: 5,
+            manifest_sha256: None,
+        };
+        assert_eq!(op.id().unwrap(), format!("prune-{:020}", 5));
     }
 }
