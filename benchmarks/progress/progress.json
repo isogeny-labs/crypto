@@ -1,16 +1,45 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0801Z-c25519-autolab-r26-k28-32",
+  "latest_record": "20261104T0835Z-c25519-autolab-r28-k20-32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 23,
+    "measured": 25,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
   "series": [
+    {
+      "better": "lower",
+      "first": 2.5745780660849693,
+      "latest": 2.5745780660849693,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.760123
+      },
+      "metric": "s_w0_incumbent_k20",
+      "points": [
+        {
+          "commit": "aeb70e6d36bf",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.760123
+          },
+          "n": 64,
+          "record": "20261104T0835Z-c25519-autolab-r28-k20-32",
+          "reference": 1.4627264868788148,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 28, k = 20/32: stride-generator probes ratchet k = 20 (S 2.57 vs 5.00, rho 1.46, 1.76x); k = 32 no challenger",
+          "value": 2.5745780660849693
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
     {
       "better": "lower",
       "first": 8.34775146090461,
@@ -103,6 +132,64 @@
         }
       ],
       "problem": "ic:curve25519-family-k20",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.5841804164533992,
+      "latest": 2.5841804164533992,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 2.030433
+      },
+      "metric": "s_w0_incumbent_k24",
+      "points": [
+        {
+          "commit": "434c90658ecc",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 2.030433
+          },
+          "n": 64,
+          "record": "20261104T0832Z-c25519-autolab-r27-k24-28",
+          "reference": 1.2727237979880799,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 27, k = 24/28: stride-generator probes on the C = 2 box (PROPOSALS-R3 P1) ratchet both: S(w=0) 2.58 vs 3.12 (rho 1.27) and 2.37 vs 2.51 (rho 0.99)",
+          "value": 2.5841804164533992
+        }
+      ],
+      "problem": "ic:curve25519-family-k24-28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.373170296174791,
+      "latest": 2.373170296174791,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 2.386529
+      },
+      "metric": "s_w0_incumbent_k28",
+      "points": [
+        {
+          "commit": "434c90658ecc",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 2.386529
+          },
+          "n": 64,
+          "record": "20261104T0832Z-c25519-autolab-r27-k24-28",
+          "reference": 0.9944024921020728,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 27, k = 24/28: stride-generator probes on the C = 2 box (PROPOSALS-R3 P1) ratchet both: S(w=0) 2.58 vs 3.12 (rho 1.27) and 2.37 vs 2.51 (rho 0.99)",
+          "value": 2.373170296174791
+        }
+      ],
+      "problem": "ic:curve25519-family-k24-28",
       "unit": "S"
     },
     {
