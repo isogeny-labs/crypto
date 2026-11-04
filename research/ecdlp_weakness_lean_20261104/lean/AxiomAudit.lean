@@ -23,3 +23,16 @@ import WeaknessLean
 #print axioms SolvingDegreeBound.Toy.one_not_mem
 #print axioms SolvingDegreeBound.Toy.rank_top
 #print axioms SolvingDegreeBound.Toy.toy_solving_degree_ge_three
+#print axioms NagaoLiteralInside.fdeg_spec
+#print axioms NagaoLiteralInside.fdeg_le
+#print axioms NagaoLiteralInside.fdeg_of_mem
+#print axioms NagaoLiteralInside.fake_fall_to_true_fall
+#print axioms NagaoLiteralInside.lemma4_literal_inside
+#print axioms ProtocolCountermodels.zero_hash_forgery
+#print axioms ProtocolCountermodels.pedersen_alternate_opening
+#print axioms ProtocolCountermodels.cofactor_kills_subgroup
+#print axioms ProtocolCountermodels.cofactor_bijective
+#print axioms ProtocolCountermodels.pairing_decides_ddh
+#print axioms ProtocolCountermodels.ambient_blinding_leaves_subgroup
+#print axioms ProtocolCountermodels.subgroup_blinding_bijective
+#print axioms ProtocolCountermodels.always_accept_complete_unsound
