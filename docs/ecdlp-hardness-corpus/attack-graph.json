@@ -7,7 +7,7 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 607,
+    "nodes": 608,
     "frontier": 392,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
@@ -17,7 +17,7 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 89,
-      "measured": 28,
+      "measured": 29,
       "proved_internal_unreviewed": 68,
       "open": 70,
       "heuristic": 71,
@@ -25,7 +25,7 @@
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 555,
+      "none": 556,
       "kernel_checked": 44,
       "stated_open": 3,
       "lean_written_unchecked": 1,
@@ -612,6 +612,10 @@
         {
           "from": "THM-SD-SUBSPACE-CRITERION",
           "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-PQ2-DLIN-CENSUS",
+          "relation": "obstructs"
         }
       ]
     },
@@ -2522,6 +2526,20 @@
       "impact": 1,
       "downstream": [
         "COND-BINARY-WEIL-DESCENT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-SD-SUBSPACE-CRITERION",
+      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "MEAS-PQ2-DLIN-CENSUS"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -6575,18 +6593,6 @@
     {
       "id": "THM-SD-DEGREE2-CRITERION",
       "label": "Solving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)",
-      "status": "proved_internal_unreviewed",
-      "formal": "kernel_checked",
-      "action": "independent review, then kernel-check",
-      "impact": 0,
-      "downstream": [],
-      "depends_citations": [],
-      "research_targets": [],
-      "pressure": []
-    },
-    {
-      "id": "THM-SD-SUBSPACE-CRITERION",
-      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
       "action": "independent review, then kernel-check",

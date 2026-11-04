@@ -207,7 +207,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), prime-interval:t=T[,lo=L] (every point with x in [L, L + 2^T), the whole scan charged; pkm-semaev reads bits=T,lo=L from it), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
         },
         ParamDecl {
             name: "oracle",
@@ -5804,6 +5804,9 @@ fn prime_base_for<'a>(
         "cm-multiplier" => Box::new(CmMultiplierBase { instance: inst }),
         "prime-kummer" => Box::new(PrimeKummerBase { instance: inst }),
         "prime-isogeny" => Box::new(PrimeIsogenyBase { instance: inst }),
+        "prime-interval" => Box::new(
+            crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase { instance: inst },
+        ),
         "cm-scalar-orbit" => Box::new(CmOrbitBase { instance: inst }),
         "known-log" => Box::new(crate::cryptanalysis::ic_framework::plugins::KnownLogBase),
         other => match prime_plugins().and_then(|p| (p.base)(other, inst)) {
@@ -7453,6 +7456,8 @@ pub fn dump_factor_base(
             let multiplier = CmMultiplierBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let interval =
+                crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase { instance: i };
             let plugin_base = prime_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "explicit-x" => &explicit,
@@ -7462,6 +7467,7 @@ pub fn dump_factor_base(
                 "cm-multiplier" => &multiplier,
                 "prime-kummer" => &kummer,
                 "prime-isogeny" => &isogeny,
+                "prime-interval" => &interval,
                 other => match plugin_base.as_deref() {
                     Some(b) => b,
                     None => {

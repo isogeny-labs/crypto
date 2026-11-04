@@ -15,7 +15,7 @@ in-code self-tests); `plots.py` only lays out recorded values.
 Attack ten theorems and assumptions that hold up ECDLP hardness, and run the
 $r_2$-versus-$k$ rank census that the earlier triage left as the step toward
 refuting Petit--Quisquater Assumption 2. The owner's aim is to find out whether a
-subexponential algorithm is possible. Nothing here proves one exists; the results
+subexponential algorithm is possible. Nothing here shows that one exists; the results
 remove or sharpen individual supports.
 
 == The ten attacks
@@ -24,23 +24,33 @@ remove or sharpen individual supports.
   columns: (auto, auto, auto, auto),
   align: left,
   [\#], [target], [instrument], [outcome],
-  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [pending (census running at commit time)],
+  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [literal reading fails on all 119 instances; iterated degree > 3 for n = 15 and 17--44, exactly 4 on 24 fresh instances at n = 17--24],
   [2], [degree-2 criterion generalised], [Lean `SubspaceCriterion`], [$d_"lin" <= "sd"$ for any Macaulay degree; kernel-checked],
   [3], [`HEUR-DECOMPOSITION-PROBABILITY` (prime field)], [`pf_yield` census], [zero class = Poisson once unordered; variance 1.45× Poisson for negation-closed bases],
   [4], [mean of the yield heuristic], [Lean `MeanCount`], [mean $|F|^m / |G|$ is a theorem],
   [5], [`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`], [`trace_pullback` census], [no dim-1 subspace of $FF_(p^2)$ has a trace image below $0.32 dot \#E(FF_p)$],
   [6], [`HEUR-BK-GG-DECOMP-PROPORTION` (1/n!)], [`ext_decomp` census], [0.70--0.99 of $1/n!$ at n = 2, 3; premise fails for subfield curves],
   [7], [overbroad Shoup reading, "BSGS optimal"], [Lean `TransparentEncoding`], [refuted: identity encoding gives the log with zero group operations],
-  [8], [`HEUR-BK-GG-FACTOR-BASE-SIZE` ($|F| approx |V|$)], [`pq2_rank` census], [pending],
+  [8], [`HEUR-BK-GG-FACTOR-BASE-SIZE` ($|F| approx |V|$)], [`pq2_rank` census], [supported: $|F'|/|V|$ in 0.84--1.31 over 99 instances, 0.997--1.004 for $n >= 30$],
   [9], [bridge $k = N - "affdim"(Z)$, case $|Z| = 1$], [Lean `BooleanNullstellensatz`], [unique zero puts every $X_i - z_i$ in the ideal; kernel-checked],
   [10], [`HEUR-PF-PKM-RANK-DELTA` ($Delta = 10$)], [`rank_deficit` census], [$Delta = 10$ gives full rank in all samples on 2 of 10 curves; deficits 1--3 persist],
 )
 
 == pq2_rank
 
-Results pending; the census was still running when this revision was committed.
+#figure(image("figures/pq2_dlin.svg", width: 100%), caption: [Degree lower bounds per instance. d_iter: least degree whose iterated closure reaches all k linear consequences. d_lin: the same for the one-shot Macaulay matrix.])
 
-// pq2 figures are added with the results.
+#figure(image("figures/pq2_low_vs_k.svg", width: 100%), caption: [Dimension of the degree-≤1 part of each row space against k.])
+
+119 instances, n = 8 to 47, three per n; the sweep stopped during n = 47. The iterated degree-3
+closure reaches k for every n ≤ 14 and at n = 16, and reaches only 1 at n = 15 and on all
+84 instances from n = 17 to 44. Fresh degree-4 sweeps at n = 17 to 24 reach k on all
+24 instances. So the first fall degree 2 is never the solver degree, and the value 3 of
+the Kousidis--Wiemers reading is not reached from n = 17 to 44. An independent naive
+saturation in Python agrees with the Rust closure on five instances, and a same-seed rerun
+reproduces the log. The bound on F4 holds under the unformalised containment property;
+$d_"lin" <= "sd"$ is kernel-checked. The direction cuts against the subexponential
+binary-curve heuristics. [pcc:unverified]
 
 == pf_yield
 

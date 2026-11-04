@@ -1613,10 +1613,22 @@ fn f4cost_m(
         field_degree: None,
     };
     let span = 1u64 << t;
-    // `t0-bits@LO`: the T₀-invariant interval [LO, LO + 2^t) (LO default 0).
-    let (form_name, t0_lo) = match form.split_once('@') {
-        Some((f, lo)) => (f, lo.parse::<u64>().expect("form@lo: lo is an integer")),
-        None => (form, 0),
+    // `t0-bits@LO`: the T₀-invariant interval [LO, LO + 2^t) (LO default 0);
+    // `digits@LO:c1;…;ct` carries its digit list after the frame.
+    let (form_name, t0_lo, digits) = match form.split_once('@') {
+        Some((f, rest)) => {
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::parse_digits;
+            let (lo, digits) = match rest.split_once(':') {
+                Some((lo, list)) => (lo, Some(parse_digits(list).expect("digits@LO:c1;...;ct"))),
+                None => (rest, None),
+            };
+            (
+                f,
+                lo.parse::<u64>().expect("form@lo: lo is an integer"),
+                digits,
+            )
+        }
+        None => (form, 0, None),
     };
     let (fb, mut oracle) = match form_name {
         "t0-bits" => {
@@ -1641,6 +1653,19 @@ fn f4cost_m(
             assert_eq!(shift, m.shift);
             let fb = square_bits_factor_base(&inst, t, t0_lo, shift);
             (fb, PkmSemaevOracle::new_square_bits(nsum, t, t0_lo))
+        }
+        "digits" => {
+            // `digits@LO:c1;…;ct`: x = LO + Σ c_j b_j over the 2^t subset sums
+            // (L14 digit-set frames); t is the digit count.
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::digits_factor_base;
+            let digits = digits.expect("digits@LO:c1;...;ct names the digits");
+            assert_eq!(
+                digits.len(),
+                t as usize,
+                "digits: t must equal the digit count"
+            );
+            let fb = digits_factor_base(&inst, t0_lo, &digits);
+            (fb, PkmSemaevOracle::new_digits(nsum, t, t0_lo, digits))
         }
         "bits" if t0_lo != 0 => {
             // `bits@LO`: the translation frame x in [LO, LO + 2^t) (mod p).
@@ -1695,7 +1720,8 @@ fn f4cost_m(
             )
         }
         o => panic!(
-            "form is bits[@lo], square-bits[@lo], edwards-bits, t0-bits[@lo] or isogeny, not {o}"
+            "form is bits[@lo], digits@lo:c1;…;ct, square-bits[@lo], edwards-bits, t0-bits[@lo] or \
+             isogeny, not {o}"
         ),
     };
     let mut spec = if guess > 0 {
@@ -2072,7 +2098,7 @@ fn main() {
             iso_census(k, t, args[4].parse().unwrap(), args[5].parse().unwrap());
         }
         "f4cost" => {
-            // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz|-] [trace 0|1]
+            // f4cost <k> <bits|digits@LO:c1;..;ct|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz|-] [trace 0|1]
             let k: u32 = args[2].parse().unwrap();
             let t: u32 = args[4].parse().unwrap();
             let g: u32 = args[5].parse().unwrap();

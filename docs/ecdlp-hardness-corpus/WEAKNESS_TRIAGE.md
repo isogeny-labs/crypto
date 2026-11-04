@@ -347,7 +347,13 @@ Native exact censuses in
 and four Lean modules. Census numbers are unverified assertions (no signed validator
 report) [pcc:unverified]; the Lean results have pcc claim records pending CI signing.
 
-- **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** Census pending at this revision; numbers follow.
+- **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** 119 instances, n = 8 to 47 [pcc:unverified].
+  The iterated degree-3 closure reaches all k linear consequences for n ≤ 14 and n = 16,
+  and only 1 of them at n = 15 and on all 84 instances from n = 17 to 44. Degree 4 reaches
+  k on 24 of 24 fresh instances at n = 17 to 24. The literal reading (degree 2) fails
+  everywhere, and the Kousidis–Wiemers value 3 is not reached from n = 17 to 44
+  (`MEAS-PQ2-DLIN-CENSUS` obstructs `HEUR-GB-PQ-ASSUMPTION-2`). This cuts against the
+  subexponential binary-curve heuristics.
   The criterion behind it is `THM-SD-SUBSPACE-CRITERION` (Lean): a Gröbner basis
   inside the degree-d Macaulay row space supplies at most dim(rowspace ∩ P₁) linear
   leading monomials, so `d_lin ≤ sd`. The `|Z| = 1` case of the bridge `k = N` is
