@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Any AWS-authenticated harness can use this; no Kubernetes network route needed.
 # Like launch-remote, but for isolab.eks.command-request/v1 (submit one command
-# Job, bounded wait) and isolab.eks.command-status/v1 (read one Job's state).
+# Job, bounded wait), isolab.eks.command-status/v1 (read one Job's state) and
+# isolab.eks.command-delete/v1 (delete one labelled Job whose UID matches).
 # The matching script (run-command or status-command) is uploaded by sha256 and
 # executed by the deployed launcher through current-run-request-buildspec.yml.
 set -euo pipefail
@@ -16,6 +17,7 @@ schema=$(jq -r .schema "$1")
 case "$schema" in
   isolab.eks.command-request/v1) run_request="$here/run-command"; wait_seconds=$(jq -r '.job.wait_seconds // 0' "$1") ;;
   isolab.eks.command-status/v1)  run_request="$here/status-command"; wait_seconds=0 ;;
+  isolab.eks.command-delete/v1)  run_request="$here/delete-command"; wait_seconds=0 ;;
   *) echo "Unsupported request schema: $schema" >&2; exit 2 ;;
 esac
 jq -S . "$1" > "$output/request.json"
@@ -67,5 +69,7 @@ case "$schema" in
     jq -e --slurpfile request "$output/request.json" '
       (.state=="submitted" or .state=="active" or .state=="succeeded") and .job_name==$request[0].job.job_name
       and (.job_uid|length)>0' "$output/result.json" >/dev/null ;;
+  isolab.eks.command-delete/v1)
+    jq -e '.state=="deleted" or .state=="missing"' "$output/result.json" >/dev/null ;;
   *) jq -e '.state!="launcher_failed"' "$output/result.json" >/dev/null ;;
 esac

@@ -84,4 +84,21 @@ jq -n --arg digest "$status_digest" '{schema:"isolab.eks.command-status-result/v
 "$here/launch-remote-command" "$tmp/status.json" > "$tmp/status.out"
 [[ -f "$tmp/s3/fixture-bucket/inputs/requests/$status_sha.run-request" ]]
 jq -e --arg sha "$status_sha" '(.environmentVariablesOverride|map({(.name):.value})|add).ISOLAB_RUN_REQUEST_SHA256==$sha and .timeoutInMinutesOverride==20' "$tmp/start.json" >/dev/null
+# A delete request selects delete-command; its validator rejects a missing UID.
+awk "/^jq -e 'type==\"object\"/{sub(/^jq -e '/,\"\");f=1} f{print} f&&/\\\$receipt_dir\/request.json/{exit}" "$here/delete-command" \
+  | sed '$d' > "$tmp/delete.jq"
+[[ -s "$tmp/delete.jq" ]]
+jq -n '{schema:"isolab.eks.command-delete/v1",job_name:"arity-test",job_uid:"11111111-2222-3333-4444-555555555555",reason:"pending on capacity"}' > "$tmp/delete.json"
+jq -e -f "$tmp/delete.jq" "$tmp/delete.json" >/dev/null
+! jq -e -f "$tmp/delete.jq" <<< '{"schema":"isolab.eks.command-delete/v1","job_name":"arity-test","reason":"x"}' >/dev/null 2>&1
+delete_digest=$(jq -S . "$tmp/delete.json" | sha256sum | cut -d ' ' -f1)
+delete_sha=$(sha256sum "$here/delete-command" | cut -d ' ' -f1)
+jq -n --arg digest "$delete_digest" '{schema:"isolab.eks.command-delete-result/v1",state:"deleted",job_name:"arity-test",request_sha256:$digest,exit_code:0}' \
+  > "$tmp/s3/fixture-bucket/runs/arity-test/launcher/cmd-test-1/result.json"
+"$here/launch-remote-command" "$tmp/delete.json" > "$tmp/delete.out"
+[[ -f "$tmp/s3/fixture-bucket/inputs/requests/$delete_sha.run-request" ]]
+jq -e --arg sha "$delete_sha" '(.environmentVariablesOverride|map({(.name):.value})|add).ISOLAB_RUN_REQUEST_SHA256==$sha' "$tmp/start.json" >/dev/null
+jq '.state="refused_uid_mismatch"' "$tmp/s3/fixture-bucket/runs/arity-test/launcher/cmd-test-1/result.json" > "$tmp/r.json"
+mv "$tmp/r.json" "$tmp/s3/fixture-bucket/runs/arity-test/launcher/cmd-test-1/result.json"
+if "$here/launch-remote-command" "$tmp/delete.json" >/dev/null 2>&1; then echo 'refused delete accepted' >&2; exit 1; fi
 echo 'launch-remote-command contract OK'
