@@ -2,8 +2,8 @@
 
 **Class.** (1) Exploratory engine measurement in counted units (F4 multiply-adds from
 `curve25519_family f4cost`), decided; (2) end-to-end chunked ecbench of the algebraic PKM arm with
-and without trace replay, **launched by the frozen runner and still in flight when this report was
-written** (see "Status of the end-to-end stage"). Neither is a leaderboard row. Rho remains ahead on
+and without trace replay, launched by the frozen runner, in flight when this report was first written
+and **decided in the addendum of 2026-11-04T15:36Z** (P7–P10 held; trace ÷ plain = 0.474 end to end). Neither is a leaderboard row. Rho remains ahead on
 every track; the distance remaining is stated, not gated.
 
 Protocol: [PROTOCOL.md](PROTOCOL.md), frozen with `scripts/` at `5a800bb3d06c69b32f32195c3aebccdfb3fee31e`
@@ -64,7 +64,7 @@ Verdicts and trace counters, every cell, trace 1 against trace 0:
 | P4 | branches_learned = 2^G, untraced = 0, replays > 0, fallbacks/replays ≤ 0.01 in every cell | **held**: 16/16 (8/8 at G = 3) learned, 0 untraced, 0 fallbacks over 1,600 (800) replays, all refuted |
 | P5 | learn ≤ 8·mpt(plain) and ≤ 1% of E₀(plain) in every cell | **held**: learn = 1.000·mpt(plain) in every cell (winner 52,816 = exactly one try per branch, 16 × 3,301); learn/E₀ ≤ 1.05·10⁻⁴ |
 | P6 | trace-0 mpt = T10 value within 10⁻⁶ relative; cols/covered = census | **held**: relative deviation 0.0 in all four cells (52,816.0; 177,112.0; 710,095.08; 710,094.0); census matched. `max_nnz = -` reproduces T10's `3·10⁷` counts exactly |
-| P7–P10 | end-to-end (verification 16/16 + replay audit; S(trace)/S(plain) ≤ 0.6 at w = 0.1 and 1 with upper 95% < 1, also hand-charged; w = 0 identity; band ranks) | **pending**: the end-to-end ecbench chunks are still running; no result is claimed (below) |
+| P7–P10 | end-to-end (verification 16/16 + replay audit; S(trace)/S(plain) ≤ 0.6 at w = 0.1 and 1 with upper 95% < 1, also hand-charged; w = 0 identity; band ranks) | **held** (addendum 2026-11-04T15:36Z below): 16/16 both arms, 8/8 replays rc = 0; ratio 0.4742 [0.47418, 0.47425] at w = 0.1, 0.4741 at w = 1, hand-charged 0.4744 / 0.4742; w = 0 identity exact in all 16 pairs; both PKM arms behind proj-a and rho-neg at every w |
 
 Exploratory point guess, not a rule: ρ_win in [0.15, 0.35] -> **missed** (0.472). The refutation
 trace replays about half of the plain F4 work, not a fifth; `kept_rows` is 768 of the winner's
@@ -172,3 +172,43 @@ Source: `validator-report.json` (pass_with_errata, 2026-11-04T06:50:00Z). Engine
 - **Erratum 3 (frozen ecbench files not in commit 5a800bb3), disclosed, not fixable here.** ecbench/spec.json and ecbench/plan_design_check.txt, README.md and data/ are in no commit (git-excluded); their freeze rests on mtime 06:07Z and the identical sha256 of data/ecbench/spec.frozen.json (ed9ad013725655601b05e6d824a84bc65b23dc8a479b9ee218345e04bd0fb2a5).
 - **Erratum 4 (P7-P10), applied (status statement).** P7-P10 are pending: the end-to-end chunks are still running (c00 was queued behind /tmp/crypto-bench.lock at validation time). They are neither held nor failed and no end-to-end number is claimed. data/SHA256SUMS was hand-written over the partial tree and will be rewritten by the runner; this README must get a dated addendum when the chunks land.
 - **Erratum 5 (process deviations), disclosed, not fixable here.** No isolab-eks route, resume checkpoint, Conductor check, session log or visual report (already listed under Deviations); they do not affect the counted-unit engine measurement.
+
+## Addendum, 2026-11-04T15:36Z: end-to-end stage decided (P7–P10)
+
+The frozen runner completed after two container restarts (`data/run.log`; `data/ALL_DONE` at
+15:35:58Z). The 8 chunks finished at 09:19:48Z. The first verify pass was killed after c00 and
+the post-chunk stage was rerun unchanged at 15:30Z. No chunk was interrupted. Numbers below are
+verbatim from `data/ecbench/{verify/rc.txt, band_pooled.txt, pooled_compare.jsonl, learn_charge.json}`.
+
+| | rule | outcome |
+|:--|:--|:--|
+| P7 | both PKM arms verify 16/16; every chunk's `verify --replay 1` exits 0 | **held**: 16/16 and 16/16; c00–c07 rc = 0, every receipt `ok: true`, `problems: []` |
+| P8 | S(trace)/S(plain) ≤ 0.6 at w = 0.1 and 1, upper 95 % < 1; also hand-charged | **held**: **0.47421 [0.47418, 0.47425]** at w = 0.1, **0.47409 [0.47406, 0.47411]** at w = 1, 8/8 workloads won; hand-charged (learning added) 0.47437 and 0.47425 |
+| P9 | w = 0: `total_gae` and recovered scalar identical in every pair (seeds paired) | **held**: `seeds_paired = true`, `P9_all_pairs_gae_and_scalar_equal = true`; ratio 1.000 [1.000, 1.000] |
+| P10 | both PKM arms behind proj-a and rho-neg at every w; report trace-to-rho distance at w = 0.1 | **held**: band ranks rho-neg < proj-a < both PKM arms at w = 0, 0.1, 1 |
+
+Band (pooled, 16 runs per arm, √r = 362.22):
+
+| arm | S(w = 0) | S(w = 0.1) | S(w = 1) |
+|:--|--:|--:|--:|
+| pkm-iso-t5-g4-s1307 (plain) | 24.72 | 92,456.0 | 924,337.5 |
+| pkm-iso-t5-g4-s1307-trace | 24.72 | 43,843.9 | 438,216.7 |
+| proj-a | 11.85 | 12.73 | 20.64 |
+| rho-neg | 1.557 | 1.668 | 2.673 |
+
+**Distance remaining** for the trace arm (pooled ratio trace ÷ reference, 95 % interval):
+rho-neg **2.63·10⁴× [1.52·10⁴, 4.54·10⁴]** at w = 0.1 (model 2.9·10⁴×), 1.64·10⁵× at w = 1,
+15.9× [9.8, 25.7] at w = 0; proj-a 3.44·10³× at w = 0.1, 2.12·10⁴× at w = 1, 2.09× at w = 0.
+Rho remains ahead.
+
+Reading:
+- The engine's ρ_win = 0.4717 carries end to end as 0.474: F4 work per solve falls by 2.11× at
+  w ≥ 0.1, with the same walk, relations and recovered scalars (w = 0 identity exact). This is a
+  measured improvement over the T12 incumbent arm at matched curve, frame and targets.
+- Trace counters (summed over 16 runs): 1,615,843 replays, 1,615,620 refuted, 223 fallbacks to
+  plain F4 (1.4·10⁻⁴ of replays; 222 of them "new leads differ from the trace"); the fallbacks
+  cost 775,268 plain mul-adds in all and are inside the measured S. Learning ran once per branch
+  per run (256 = 16 × 16), 52,816 mul-adds per run, which ecbench does not price; the
+  hand-charged ratios above include it.
+- The plain arm's S here (92,456 at w = 0.1) is below T12's 100,277 because the targets differ
+  (8 workloads × 2 rounds here, 16 workloads in T12, 6 in common); only the paired ratio is compared.
