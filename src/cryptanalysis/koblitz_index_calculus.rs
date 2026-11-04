@@ -5349,7 +5349,17 @@ impl PairSumTable {
         let runs = rayon::current_num_threads().clamp(1, rows.max(1));
         let per_run = rows.div_ceil(runs);
         let harvest = harvest && rows <= 1 << 12 && row_lens.iter().all(|&len| len < 1 << 20);
-        let streams: Vec<(Vec<Vec<u64>>, Vec<Vec<u32>>, Vec<Vec<u32>>)> = (0..runs)
+        //
+        // **No stored words.**  A stream keeps each pair's hash and nothing
+        // else: the stored word is a function of the hash, and of the
+        // orbit on a tagged table, so it is formed again when the pair is
+        // placed.  The orbit is one value for a whole row callback, so a
+        // tagged stream keeps it run-length coded, `(first index, orbit)`
+        // each time it changes — a few hundred entries where a word a
+        // pair was millions.  That is 8 bytes a pair instead of 12, a third
+        // of the build's largest transient, and the table is unchanged.
+        #[allow(clippy::type_complexity)]
+        let streams: Vec<(Vec<Vec<u64>>, Vec<Vec<(u32, u32)>>, Vec<Vec<u32>>)> = (0..runs)
             .into_par_iter()
             .map(|run| {
                 let here = (run * per_run).min(rows)..((run + 1) * per_run).min(rows);
@@ -5358,7 +5368,7 @@ impl PairSumTable {
                 let mean = row_lens[here.clone()].iter().sum::<usize>() / parts;
                 let room = mean + 6 * (mean as f64).sqrt() as usize + 16;
                 let mut hs: Vec<Vec<u64>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
-                let mut ws: Vec<Vec<u32>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
+                let mut orbit_runs: Vec<Vec<(u32, u32)>> = (0..parts).map(|_| Vec::new()).collect();
                 let mut ids: Vec<Vec<u32>> = (0..parts)
                     .map(|_| Vec::with_capacity(if harvest { room } else { 0 }))
                     .collect();
@@ -5367,19 +5377,17 @@ impl PairSumTable {
                         for (at, &key) in keys.iter().enumerate() {
                             let h = pair_filter_hash(key);
                             let p = (h >> part_shift) as usize;
+                            if tagged && orbit_runs[p].last().is_none_or(|&(_, o)| o != orbit) {
+                                orbit_runs[p].push((hs[p].len() as u32, orbit));
+                            }
                             hs[p].push(h);
-                            ws[p].push(if tagged {
-                                Self::tagged_rest_from_hash(h, orbit)
-                            } else {
-                                Self::compact_rest_from_hash(h)
-                            });
                             if harvest {
                                 ids[p].push((r as u32) << 20 | (start + at) as u32);
                             }
                         }
                     });
                 }
-                (hs, ws, ids)
+                (hs, orbit_runs, ids)
             })
             .collect();
         let mut part_start = vec![0usize; parts + 1];
@@ -5410,14 +5418,14 @@ impl PairSumTable {
         // This bounds the extra filter copies; it is not an RSS limit for
         // the builder's other buffers or the allocator itself.
         let stream_bytes = streams.capacity() as u128
-            * std::mem::size_of::<(Vec<Vec<u64>>, Vec<Vec<u32>>)>() as u128
+            * std::mem::size_of::<(Vec<Vec<u64>>, Vec<Vec<(u32, u32)>>)>() as u128
             + streams
                 .iter()
-                .map(|(hs, ws, ids)| {
+                .map(|(hs, ors, ids)| {
                     hs.capacity() as u128 * std::mem::size_of::<Vec<u64>>() as u128
-                        + ws.capacity() as u128 * std::mem::size_of::<Vec<u32>>() as u128
+                        + ors.capacity() as u128 * std::mem::size_of::<Vec<(u32, u32)>>() as u128
                         + hs.iter().map(|v| v.capacity() as u128 * 8).sum::<u128>()
-                        + ws.iter().map(|v| v.capacity() as u128 * 4).sum::<u128>()
+                        + ors.iter().map(|v| v.capacity() as u128 * 8).sum::<u128>()
                         + ids.iter().map(|v| v.capacity() as u128 * 4).sum::<u128>()
                 })
                 .sum::<u128>();
@@ -5459,12 +5467,26 @@ impl PairSumTable {
                         *slot = next;
                         next += n;
                     }
-                    for (hs, ws, ids) in &streams {
-                        let (hs, ws, ids) = (&hs[p], &ws[p], &ids[p]);
-                        for (i, (&h, &w)) in hs.iter().zip(ws).enumerate() {
+                    for (hs, ors, ids) in &streams {
+                        let (hs, ors, ids) = (&hs[p], &ors[p], &ids[p]);
+                        // The orbit run holding pair `i` on a tagged table.
+                        let (mut next_run, mut orbit) = (0usize, 0u32);
+                        for (i, &h) in hs.iter().enumerate() {
                             if let Some(&ahead) = hs.get(i + FILL_AHEAD) {
                                 prefetch(&present[filter_slot(ahead, present_mask, 0).0]);
                             }
+                            let w = if tagged {
+                                while let Some(&(first, o)) = ors.get(next_run) {
+                                    if first as usize > i {
+                                        break;
+                                    }
+                                    orbit = o;
+                                    next_run += 1;
+                                }
+                                Self::tagged_rest_from_hash(h, orbit)
+                            } else {
+                                Self::compact_rest_from_hash(h)
+                            };
                             let b = (h >> bucket_shift) as usize - first;
                             // SAFETY: partition `p` owns
                             // `rests[part_start[p]..part_start[p + 1]]`, and
