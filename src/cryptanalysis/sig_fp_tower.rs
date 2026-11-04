@@ -620,6 +620,10 @@ pub fn sig_f4_tower_with(
 ) -> SigReport {
     ring.check();
     assert!(
+        opts.weights.is_none_or(|w| w.is_unit()),
+        "sig_fp_tower: weighted gradings are only implemented in f4_fp_tower"
+    );
+    assert!(
         so.steps != Steps::PolynomialDegree || so.rewrite == Rewrite::Ratio,
         "steps by polynomial degree need the ratio rewrite order"
     );
@@ -1097,7 +1101,7 @@ fn src_elem(src: Source) -> Option<u32> {
 }
 
 fn mul_elem(ring: &TowerRing, fp: Fp, e: &SElem, t: Mono) -> RPoly {
-    ring.mul_terms_fp(fp, e.terms(), e.pos.len(), t)
+    ring.mul_terms_fp(fp, e.terms(), e.pos.len(), t, super::f4_fp_tower::TowerWeights::UNIT)
 }
 
 /// The leading monomials of the elements that no other leading monomial
