@@ -320,7 +320,7 @@ exponent. No 255-bit statement is made or implied.
 | L10 | scaling exponent across k | done: r^1.03, optimal t = 4 (validated) |
 | L11 | odd Kummer base μ_d | wave 4, design only |
 | L12 | F4 trace replay on the winner | done: 0.474 end to end (validated) |
-| L13 | grid-limit control | done: F4 42× above grid; pair table 2.4–3.3× behind proj-a; P4, P8 failed (validation running) |
+| L13 | grid-limit control | done: F4 42× above grid at w ≥ 0.1; pair table 2.4–3.3× behind proj-a; P4, P8 failed (validated) |
 | L14 | digit-set frames | done: greedy 2.1–2.2× coverage; L15 engine 0.48×/0.44× per relation (validated) |
 | T13 | t = 4 candidate + trace end to end | done: 0.284× the T12 winner at w ≥ 0.1 (validation running) |
 
@@ -358,7 +358,7 @@ Ideas considered and not pursued, with the reason:
 - This atlas: `validator-report.json`, pass_with_errata (E1–E8 applied).
 - Validated after the first draft: T11 (post-data), T12, L10, L12 (both
   stages), L14, L15, all pass_with_errata with errata applied.
-- Pending validation: L13 and T13 (independent validators running).
+- Pending validation: T13 (replay stage finishing, then an independent validator).
 - No study here passes the leaderboard validation gate: component results
   have no same-unit rho row, by design.
 
@@ -380,9 +380,8 @@ Ideas considered and not pursued, with the reason:
 
 Protocols frozen together at `5a800bb3d0` before any data
 (`research/curve25519_leads_wave4_20261104`). Status at the time of
-writing: L10, L12 (both stages), L14 and L15 independently validated,
-pass_with_errata with errata applied; L13 and T13 complete, validators
-running; L11 is design only.
+writing: L10, L12 (both stages), L13, L14 and L15 independently validated,
+pass_with_errata with errata applied; T13 complete, validation pending; L11 is design only.
 
 ### 11.1 L10: the exponent (validated)
 
@@ -429,7 +428,7 @@ to 0.4744. Distance to rho-neg at w = 0.1: 2.63·10⁴× [1.52·10⁴,
 replay failures). Counted units only: solver wall time is 0.95×, not
 0.47×.
 
-### 11.3 L13: the grid-limit control (done; validation running)
+### 11.3 L13: the grid-limit control (validated)
 
 Five arms on the winner's own base, 16 one-target chunks, 32 runs each,
 all verified. 6 of 8 predictions held.
@@ -444,14 +443,16 @@ all verified. 6 of 8 predictions held.
   fixed, the 22-column isogeny base loses to the 32-column projected
   base. The grid is 2.28× / 194× / 1,181× behind proj-a.
 - P4 failed on its per-pair clause: GAE(mitm) − GAE(grid) is 437–489,
-  not 506 ± 2 × relations, because the table arm's relations phase
-  charges 17–69 GAE less. P8 failed as the frozen-rule defect: the grid
+  not 506 ± 2 × relations, because the grid and F4 arms pay about 4 extra
+  lift additions per relation that the table's signed probe does not. P8 failed as the frozen-rule defect: the grid
   count is exactly 1,248 × solver calls in 32/32 runs, not 1,248 × trials.
   Neither is retuned.
 
-The consequence for the algebraic track: no solver improvement on this
-base can overtake proj-a, whose w = 0 floor is already 2.3× below. Only a
-base with more coverage per column can.
+The consequence for the algebraic track: none of the three m = 2 oracles
+on this base (t = 5, seed 1307, k = 20) overtakes proj-a, and no oracle can
+go below the w = 0 row, already 2.3× behind. The preregistered model puts
+the cause in the base's coverage per column (measured trials per relation
+10.1× proj-a's); this run does not isolate it. Validated pass_with_errata.
 
 ### 11.4 L14: digit-set frames (census validated; lead open)
 
