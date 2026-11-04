@@ -1,0 +1,87 @@
+{
+  "schema": "native-ecbench.ledger-fork-custody/v1",
+  "parents": {
+    "branch": {
+      "revision": "b3ce573b3df1c2ece0113b90f2c3a375493f9ad6",
+      "files": {
+        "ledger": {
+          "source_path": "pcc/ledger.jsonl",
+          "snapshot": "branch-ledger.gz",
+          "bytes": 38058,
+          "sha256": "a0ea4b466a01dec060c3a0b464dfdfdfa1591fca678809edef5a383da7044841",
+          "gzip_sha256": "87a85d8f867f7f8c37649f45f0f37841ff605ed9120732754329ddae0dcd3c56"
+        },
+        "journal": {
+          "source_path": "docs/session-logs/2026-11-04.md",
+          "snapshot": "branch-journal.gz",
+          "bytes": 117067,
+          "sha256": "2e565b6073c624668c58ee9c45626531ad1be6f9d0d6c89d1a9dfea46b452251",
+          "gzip_sha256": "a7d8835c932f9a94a8e3d9c5b2e1545db3ecbf6e448d3f744b14165cb5c47e59"
+        }
+      }
+    },
+    "main": {
+      "revision": "eab6ed334715504767bee9b7c60f1ba72b789182",
+      "files": {
+        "ledger": {
+          "source_path": "pcc/ledger.jsonl",
+          "snapshot": "main-ledger.gz",
+          "bytes": 37254,
+          "sha256": "dd73a93bbbe60484ec7fba3e614cf252c99f2711e1ad74690a41f09ce3e682dd",
+          "gzip_sha256": "1067d93a8b61771ca8d688513d4dbf50c19c3e3325ce74f41248d8222c4ec70c"
+        },
+        "journal": {
+          "source_path": "docs/session-logs/2026-11-04.md",
+          "snapshot": "main-journal.gz",
+          "bytes": 131554,
+          "sha256": "4ea40fb001a602df3d70554dbdab9e592168c59ee2a6f9c12360abba6653d5fe",
+          "gzip_sha256": "6e21cf14a3d7139db3fbecffc9c9c64bd1ce00d671350749d99ddbaf206d95c6"
+        }
+      }
+    }
+  },
+  "shared_prefix_rows": 81,
+  "branch_rows": 86,
+  "main_rows": 84,
+  "affected_unsigned_branch_claims": [
+    {
+      "id": "PCC-20261104-9259df",
+      "path": "pcc/claims/PCC-20261104-9259df.json",
+      "sha256": "53a98938d43025f55ee2eebd1bd854a3c793466a77e2dab14ee85784d2c77693",
+      "kind": "statement",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261104-9bb71e",
+      "path": "pcc/claims/PCC-20261104-9bb71e.json",
+      "sha256": "a8869bef4b3f176f04e1920ada58e4b159e57c1d8e1a42c1868397bf0d790f31",
+      "kind": "statement",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261104-d06cd6",
+      "path": "pcc/claims/PCC-20261104-d06cd6.json",
+      "sha256": "1957be3b6f384252c7e3241ae6e7b6293378cacbb84650f1fd621b3229c4bb60",
+      "kind": "statement",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261104-f78364",
+      "path": "pcc/claims/PCC-20261104-f78364.json",
+      "sha256": "f086f7e1579849d86afd62b880746302625070861463eed5e2861da0c3c8c154",
+      "kind": "statement",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261104-4c290a",
+      "path": "pcc/claims/PCC-20261104-4c290a.json",
+      "sha256": "1315c24e9d7660cdf10764d8783c9b1e81176c351255d7bcbfec81d328227df2",
+      "kind": "statement",
+      "standing": "unverified"
+    }
+  ],
+  "protected_files_modified": false,
+  "reconciliation_executed": false,
+  "copilot_request": "https://github.com/isogeny-labs/crypto/pull/2984#issuecomment-6638594871",
+  "policy": "AGENTS.md lines173-176 and836-837; no canonical ledger replacement without explicit owner exception or a documented approved import mechanism."
+}
