@@ -225,6 +225,7 @@ pub mod hyperelliptic_index_calculus;
 pub mod hyperelliptic_word;
 pub mod ic_boundary;
 pub mod ic_corpus;
+pub mod dreg_forecast;
 pub mod ic_descent_degrees;
 pub mod ic_engine;
 pub mod ic_framework;
