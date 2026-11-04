@@ -462,6 +462,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "ic.hashed_native_v1",
+        NativeGrid,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
         "ic.known_log_mitm2_v1",
         NativeAdaptive,
         DiagnosticOnly,
@@ -571,8 +577,18 @@ const POLICIES: &[PolicyDecl] = &[
     ),
 ];
 
-fn parameter_role(name: &str) -> Option<ParameterRole> {
+fn parameter_role(method: &str, name: &str) -> Option<ParameterRole> {
     use ParameterRole::*;
+    if method == "ic.hashed_native_v1" {
+        return Some(match name {
+            "backend" | "m" | "threshold" | "derive_last" | "smallest_first" | "cache_entries"
+            | "outer_multiplier" => Knob,
+            "trials" | "columns" | "steps" | "vector" | "bits" | "rank" | "slices" | "attempts" => {
+                ResourceEnvelope
+            }
+            _ => return None,
+        });
+    }
     Some(match name {
         "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
         "batch" => WorkloadScope,
@@ -697,7 +713,7 @@ fn profile(method: &'static MethodDecl) -> Result<MethodProfile<'static>, String
         .params
         .iter()
         .map(|p| {
-            let role = parameter_role(p.name).ok_or_else(|| {
+            let role = parameter_role(method.id, p.name).ok_or_else(|| {
                 format!(
                     "method `{}` parameter `{}` has no optimization role",
                     method.id, p.name
@@ -966,7 +982,7 @@ fn audit_spec(path: &Path, stage: Stage) -> Result<(Spec, SpecAudit), String> {
                 methods::resolve(&candidate.method),
             ) {
                 for key in baseline_method.params.keys() {
-                    if parameter_role(key) != Some(ParameterRole::Knob)
+                    if parameter_role(&candidate.method.id, key) != Some(ParameterRole::Knob)
                         && baseline_method.params.get(key) != candidate_method.params.get(key)
                     {
                         errors.push(format!(
@@ -1169,6 +1185,28 @@ mod tests {
     }
 
     #[test]
+    fn native_backend_choice_is_a_knob_and_resource_limits_stay_out_of_the_grid() {
+        let profiles = profiles().unwrap();
+        let profile = profiles
+            .iter()
+            .find(|p| p.id == "ic.hashed_native_v1")
+            .unwrap();
+        assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
+        assert_eq!(profile.claim_scope, ClaimScope::DiagnosticOnly);
+        let roles: BTreeMap<_, _> = profile
+            .parameters
+            .iter()
+            .map(|p| (p.name, p.role))
+            .collect();
+        assert_eq!(roles["backend"], ParameterRole::Knob);
+        for name in [
+            "trials", "columns", "steps", "vector", "bits", "rank", "slices", "attempts",
+        ] {
+            assert_eq!(roles[name], ParameterRole::ResourceEnvelope, "{name}");
+        }
+    }
+
+    #[test]
     fn every_native_solver_and_nested_engine_is_in_the_inventory() {
         let nested = nested_algorithms();
         let keys: BTreeSet<_> = nested.iter().map(|a| a.key.as_str()).collect();
@@ -1206,7 +1244,10 @@ mod tests {
             "base_seed",
             "rank_seed",
         ] {
-            assert_ne!(parameter_role(name), Some(ParameterRole::Knob));
+            assert_ne!(
+                parameter_role("rho.negation", name),
+                Some(ParameterRole::Knob)
+            );
         }
     }
 }

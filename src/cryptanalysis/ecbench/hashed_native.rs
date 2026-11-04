@@ -323,15 +323,16 @@ pub fn solve(
             ))
         }
     };
+    let online_start_phase = snapshot.online_start_phase;
     let online=snapshot.online_wall_ns.map(|wall_ns|{
         let mut phases_ns=snapshot.online_phases_ns;
         let mut zero_phases=BTreeMap::new();
         for name in ["target_query","target_PDP","target_relation_check","target_descent","target_recovery_check"] {
             if !phases_ns.contains_key(name){phases_ns.insert(name.into(),0);zero_phases.insert(name.into(),"stage not entered; no separate descent is used".into());}
         }
-        OnlineWindow{wall_ns,phases_ns,zero_phases,start_event:"first target-dependent relation query after initial bases are ready".into(),
-            stop_event:"native solve return after scalar and certificate replay, or explicit failure".into(),included_stages:vec!["all attempts and seed retries".into(),"decomposition".into(),"elimination".into(),"internal replay".into()],
-            mapping:"relation_target and target-caused base restarts -> query; relation_search -> PDP; relation_check -> check; elimination/final replay -> recovery; no descent".into()}
+        OnlineWindow{wall_ns,phases_ns,zero_phases,start_event:"target subgroup validation after initial reusable preparation".into(),
+            stop_event:"native solve return after scalar and certificate replay, or explicit failure".into(),included_stages:vec!["target validation".into(),"all attempts and seed retries".into(),"decomposition".into(),"elimination".into(),"internal replay".into()],
+            mapping:"target_validation, relation_target and target-caused base restarts -> query; relation_search -> PDP; relation_check -> check; elimination/final replay -> recovery; no descent".into()}
     });
     let source = BTreeMap::from([
         ("adapter", sha256_hex(include_bytes!("hashed_native.rs"))),
@@ -451,7 +452,8 @@ pub fn solve(
         online,
         detail: json!({
             "implementation":"crates/hashed-ecdl-tensor", "native_sources":source,"backend":backend,"error":error,
-            "cost_scope":"cold one-target; online begins at first query; all failures/restarts/internal replay included",
+            "online_start_phase":online_start_phase,
+            "cost_scope":"cold one-target; online begins before target validation after reusable preparation; all failures/restarts/internal replay included",
             "charge":"all native prime group calls, including identities; meter-step attempts remain unpriced diagnostics, not a complete arithmetic price",
             "limitations":"prime cofactor-one small-field adapter; no 131-bit workload support, no sub-rho claim; width limits are unknown results"
         }),
@@ -517,6 +519,7 @@ mod tests {
             let b = solve(&method, &inst, PrimePoint::affine(3, 3), 701).unwrap();
             assert_eq!(a.recovered, Some(3));
             assert!(!a.exhausted);
+            assert_eq!(a.detail["online_start_phase"], "target_validation");
             assert_eq!(stable(&a), stable(&b));
             let online = a.online.as_ref().unwrap();
             assert_eq!(online.phases_ns.values().sum::<u64>(), online.wall_ns);

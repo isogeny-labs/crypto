@@ -3,7 +3,9 @@
 The request is to run the implemented algorithm end to end and establish
 where it completes, exhausts its budgets, and spends its work. This is the
 actual native crate, not ECBench's separate `ic.tensor_contraction_v1` port.
-No scientific session has been launched at this engineering checkpoint.
+The [2026-11-04 continuation](resume-20261104/README.md) addresses the online
+accounting review and prepares a new pre-data source freeze. Its producer
+development observations have unverified PCC standing. [pcc:unverified]
 
 ## Implementation and verification
 
@@ -24,12 +26,14 @@ The clock includes native observation overhead; it does not establish an
 uninstrumented implementation's speed. The runner checks returned scalars
 using its separate word-field arithmetic and replays deterministic results.
 
-The online boundary is the first labelled relation query after initial bases
-are ready; earlier curve/target checks remain cold setup, and later retries
-remain inside online. Partial base/collector initialization shares a cold
-stage. Source-identity/record bookkeeping and the runner's verification are
-harness costs, separately retained from the native solve interval. A killed
-child may have missing native counters; its work is unknown rather than zero.
+The corrected online boundary begins before target subgroup validation, after
+initial reusable preparation. Initial bases/indexes are cold preparation;
+later retries remain inside online. Partial collection follows the same
+boundary after reusable base-policy checks. Input normalization, source-record
+bookkeeping and runner verification retain their cold/harness scope. A killed
+child may have missing counters; those are unknown rather than zero. The older
+v2 ordering left target subgroup validation in setup; its records are not
+used to establish the corrected interval. [pcc:unverified]
 
 The matched development suites pass 90 native tests in crypto and 96 in the
 binding integration. Controls compare the entire partial certificate, final
@@ -147,7 +151,7 @@ protocol schema/checker in crypto-autoresearcher, and Iso Lab's
 decomposition is not a new algebraic sub-rho theorem. The literal source
 packet/recursion guards, frozen evidence and leaderboard graphs are unchanged.
 
-Active protocol **v2** is frozen against complete source commit
+Historical protocol **v2** was frozen against complete source commit
 `0c80eded0a095c4be39e58a9e18823baa1c64c92`, before scientific data. Canonical
 protocol hash is `7c190b2d666fe3c1d648d085457cf81ef0b87c96d81454a575a69c415c126e2e`.
 The publication inventory caught two already-tested checkpoint helpers missing
@@ -156,5 +160,9 @@ from the first staged commit; they were committed before upload. The earlier
 superseded before data rather than rewritten. Amendment A1 changes source
 publication binding only: the algorithm, panel, seeds, controls, resources and
 analysis are unchanged. The following commit records frozen metadata only;
-its native and runner/control source hashes remain equal. Exact input-file
-hashes are in [frozen-input-files.sha256](frozen-input-files.sha256).
+its native and runner/control source hashes remained equal. Its historical
+input-file hashes are in [frozen-input-files.sha256](frozen-input-files.sha256)
+and apply to that pinned revision. The unchanged v2 bytes are now preserved in
+[the v2 archive](protocol.v2.superseded-before-data.json). Active v3 retains the
+cohort and controls and adds the corrected online boundary and current cost,
+publication, benchmark-record and PCC custody requirements before data.

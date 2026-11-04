@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
-  "protocol_id": "HASHED-NATIVE-ECBENCH-20261030-FEASIBILITY-v2",
-  "version": 2,
+  "protocol_id": "HASHED-NATIVE-ECBENCH-20261030-FEASIBILITY-v3",
+  "version": 3,
   "created": "2026-10-30",
   "repository": "crypto",
   "study_dir": "research/hashed_ecdl_ecbench_20261030",
@@ -13,7 +13,9 @@
     "source": "Actual crates/hashed-ecdl-tensor through ic.hashed_native_v1; commit/image/binary/spec identities must be authenticated in checkpoint and Iso Lab receipts before execution.",
     "prior_frozen_study": "research/hashed_ecdl_speed_20261029/PROTOCOL.md (separate; not replaced)",
     "implementation": "src/cryptanalysis/ecbench/hashed_native.rs",
-    "superseded_protocol": "research/hashed_ecdl_ecbench_20261030/protocol.v1.superseded-before-data.json"
+    "superseded_protocol": "research/hashed_ecdl_ecbench_20261030/protocol.v2.superseded-before-data.json",
+    "resume_report": "research/hashed_ecdl_ecbench_20261030/resume-20261104/README.md",
+    "launch_plan": "research/hashed_ecdl_ecbench_20261030/resume-20261104/launch-plan.json"
   },
   "question": "Which native hashed-base backends complete independently verified one-target solves within fixed work/resource budgets on four registered small prime curves, and in which exclusive phase do incomplete attempts stop, alongside matched rho and bundled IC references?",
   "claims": [
@@ -766,7 +768,20 @@
     "placement": {
       "instance_type": "c8a.2xlarge",
       "cpus": 4,
-      "spot": true
+      "spot": true,
+      "memory_gib": 4,
+      "cost_controls": {
+        "currency": "USD",
+        "dollar_ceiling": 10,
+        "account_daily_threshold": 25,
+        "concurrency": 1,
+        "maximum_build_invocations": 2,
+        "maximum_measurement_attempts": 1,
+        "current_account_headroom": null,
+        "current_lane_headroom": null,
+        "charged_and_reserved_costs": null,
+        "policy": "STOP before a cloud build if current account/lane charged and reserved headroom or prices are unavailable. Include build, image publication, queue/idle, failures, storage and transfer. No pool/quota/budget increase or alternate-provider workaround."
+      }
     },
     "measurement_class": "measurement",
     "timeout_seconds": 1800,
@@ -897,13 +912,32 @@
         "version",
         "protocol_id"
       ]
+    },
+    {
+      "id": "A2-online-validation-current-controls",
+      "filed": "2026-11-04",
+      "filed_before_affected_data": true,
+      "reason": "Target subgroup validation was outside the previous online window. Correct the ordering and boundary, adopt current source plus required publication/budget/benchmark-record/PCC custody, and preserve frozen v1/v2 unchanged before any affected measurement.",
+      "changes": [
+        "Initial reusable preparation precedes target subgroup validation; online begins before that check and retains later retries and replay. Preserve full cold work and classify limits as unknown.",
+        "Bind the current combined source and exact launch/publication plan in the next freeze; retain all original curves, public targets, seeds, 9 arms, controls, 1 warmup, 5 measured rounds and 1728 planned attempts.",
+        "Record a finite USD10 cloud ceiling, maximum two build invocations for the maintained publish-only/measurement path, and one original 1800-second measurement attempt with zero automatic retries. Current account/lane headroom including charged/reserved cost is required before any cloud build; unknown stops launch.",
+        "Apply current benchmark-record/progress and proof-carrying-claim rules. Producer development observations remain unverified without a signed verdict; no measured runtime prediction is introduced."
+      ],
+      "supersedes_fields": [
+        "freeze.commit",
+        "version",
+        "protocol_id",
+        "execution.placement",
+        "online accounting boundary"
+      ]
     }
   ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "7c190b2d666fe3c1d648d085457cf81ef0b87c96d81454a575a69c415c126e2e",
-    "commit": "0c80eded0a095c4be39e58a9e18823baa1c64c92",
-    "frozen_at": "2026-10-30T17:20:32Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
   }
 }

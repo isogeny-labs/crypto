@@ -4,7 +4,7 @@
 - **Kind:** correctness/complexity validation, conditional external theorem
 - **Affected work:** [native implementation](../docs/hashed-ecdl.md)
 - **Next action owner:** unassigned independent reviewer
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-04
 
 ## Problem
 
@@ -77,6 +77,21 @@ reconsidered. A practical timing study is a separate requested experiment with
 the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
+
+2026-11-04 native ECBench continuation: explicit user authorization resumes
+the separate [native study](../research/hashed_ecdl_ecbench_20261030/resume-20261104/README.md).
+The target-validation accounting correction and optimization registry integration
+are producer development assertions, PCC-20261104-9bb71e and
+PCC-20261104-d06cd6, with unverified standing. The original fixed 1,728-attempt
+panel remains pre-data; frozen v1/v2 evidence stays unchanged. Current account
+and lane charged/reserved headroom and prices are unavailable, so no cloud build
+or scientific job has started. An existing authorized runner/connection name was
+requested, without requesting credentials. Acceptance requires a timestamped
+current budget readout within the finite USD10 study envelope, publication of
+the exact frozen source, actual fresh S3 checkpoint/readback, and authenticated
+admission of that exact native image. Retain original build/job IDs, zero
+automatic retries and every failed/interrupted outcome. This execution gap is
+separate from the independent general audit above. [pcc:unverified]
 
 2026-10-30 native ECBench integration: the
 [new study](../research/hashed_ecdl_ecbench_20261030/README.md) supplies an actual
