@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0425Z-c25519-autolab-r8-k28",
+  "latest_record": "20261104T0428Z-c25519-autolab-r10-k32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 6,
+    "measured": 7,
     "open": 0
   },
   "repo": "crypto",
@@ -105,11 +105,11 @@
     {
       "better": "lower",
       "first": 24.137681139442055,
-      "latest": 8.296358105096902,
+      "latest": 8.429559999651605,
       "latest_derived": {
-        "improvement_vs_first_percent": 65.629,
-        "improvement_vs_previous_percent": 65.629,
-        "value_over_reference": 9.10209
+        "improvement_vs_first_percent": 65.0772,
+        "improvement_vs_previous_percent": -1.6055,
+        "value_over_reference": 8.535218
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -143,6 +143,22 @@
           "spread": null,
           "summary": "ic_autolab round 5, k = 32 holdout: ksum:m=4 N = 26 S(w=0) 8.30 vs incumbent 23.60, matched rho 0.91 (distance 25.9x -> 9.1x)",
           "value": 8.296358105096902
+        },
+        {
+          "commit": "bb4c6c0ef164",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 65.0772,
+            "improvement_vs_previous_percent": -1.6055,
+            "value_over_reference": 8.535218
+          },
+          "n": 64,
+          "record": "20261104T0428Z-c25519-autolab-r10-k32",
+          "reference": 0.9876208815504086,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 10, k = 32: null; ksum4-n22 0.889 of the incumbent at w = 0 but 1.202 at w = 1; incumbent ksum4-n26 kept",
+          "value": 8.429559999651605
         }
       ],
       "problem": "ic:curve25519-family-k32",

@@ -106,10 +106,12 @@ cited by its claim record [pcc:unverified].
 | 6 | generic | 28 | null: `ksum4-n15` costs 0.616 [0.593, 0.641] of the incumbent at w = 0 but 1.092 [1.039, 1.149] at w = 1 (holdout `ECBS1h584855d3a3bb`), so the band does not order it and `ksum4-n21` stays; `ksum3-n35` 8.91 vs 10.87 in train, also higher at w = 1 [pcc:unverified] | [round-006](round-006/README.md), [PDF](round-006/REPORT.pdf) |
 | 7 | generic | 20 | regression: the train leader `ksum4-n8` (8.18 vs 9.31) costs 1.026 [0.966, 1.090] of `ksum3-n11` on the fresh holdout `ECBS1ha3ed7f4ce6e6`, band `inc < sel`; a winner's-curse selection on 16 targets, kept on record. `ksum4-n9` and `ksum5-n8` were lower only at w = 1 in train [pcc:unverified] | [round-007](round-007/README.md), [PDF](round-007/REPORT.pdf) |
 | 8 | generic | 28 | `ksum4-n18` replaces `ksum4-n21` under the frozen rule (32 train targets; the finer N grid): holdout `ECBS1hc8e87821dc40`, paired sel / inc 0.678 [0.666, 0.691] at w = 0, 0.869 at w = 1, band `sel < inc`; S 10.98 to 7.44, distance to rho 11.5x to 7.8x [pcc:unverified] | [round-008](round-008/README.md), [PDF](round-008/REPORT.pdf) |
+| 9 | generic | 32 | censored: stopped after 10 train records because the panel held `rootfind-pairs:m=3` at N = 179 (see round-009/STOPPED.md); four dominated families disabled | [round-009](round-009/STOPPED.md) |
+| 10 | generic | 32 | null: `ksum4-n22` costs 0.889 [0.869, 0.910] of `ksum4-n26` at w = 0 but 1.202 at w = 1 (holdout `ECBS1h572a148f6fbf`), band unresolved; the same counted-work vs lookups trade as round 6 [pcc:unverified] | [round-010](round-010/README.md), [PDF](round-010/REPORT.pdf) |
 
 Claim records (AGENTS.md "Sabotage is assumed: proof-carrying claims"): round 1
 `PCC-20261104-6ca5d2`, round 2 `PCC-20261104-fa70c6`, round 3
-`PCC-20261104-31cd98`, round 4 `PCC-20261104-6c0998`, round 5 `PCC-20261104-0213f5`, round 6 `PCC-20261104-249a57`, round 7 `PCC-20261104-15a1d6`, round 8 `PCC-20261104-ff48c0`, all `statement` claims with standing `unverified` until a
+`PCC-20261104-31cd98`, round 4 `PCC-20261104-6c0998`, round 5 `PCC-20261104-0213f5`, round 6 `PCC-20261104-249a57`, round 7 `PCC-20261104-15a1d6`, round 8 `PCC-20261104-ff48c0`, round 10 `PCC-20261104-87cbc0`, all `statement` claims with standing `unverified` until a
 second host signs a replay and a validator signs a recompute [pcc:unverified].
 
 The ledger (`ledger.json`, `history`) carries every ratchet with its delta and
