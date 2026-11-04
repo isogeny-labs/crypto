@@ -272,6 +272,7 @@ fn execute<G: CountedGroup>(
     // Advisory degree-of-regularity forecast, updated after every solve and
     // written beside the measurement.  It never shortens the candidate.
     let mut forecaster = forecast::forecaster(req, dump, r, h);
+    let mut admitted_rows = 0usize;
     let mut records = Vec::new();
     let mut total_ops = 0;
     let mut stats = BTreeMap::new();
@@ -421,6 +422,8 @@ fn execute<G: CountedGroup>(
                     let rhs = (scalar as u128 * h as u128 % r as u128) as u64;
                     let rank_before = rows.rank();
                     rows.add_row(row.clone(), rhs);
+                    admitted_rows += 1;
+                    forecaster.observe_linear_algebra(admitted_rows, rows.row_ops);
                     if rows.inconsistent != 0 {
                         return Err(
                             "verified point relations produced an inconsistent projected matrix"
