@@ -25,8 +25,8 @@ audit ledger is [audit-map.json](audit-map.json). [pcc:unverified]
 Primary text: OpenAI, *The Exponential Time Hypothesis is False*, Appendix
 D.1 and D.4.5-D.4.7. The current publisher path's last-change commit is
 [`42907c9e`](https://github.com/openai/math/tree/42907c9e999cc00d6abe7a50bfc1023250edd1b9/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026).
-Its PDF blob matches the cached text used here, also available at the older
-implementation pin `7ef5c0cc`. The theorem permits an exponential entry-work
+Its PDF blob matches the cached PDF used to extract the reviewed text, also
+available at the older implementation pin `7ef5c0cc`. The theorem permits an exponential entry-work
 allowance, rather than requiring each entry to take polynomial time.
 The child-entry argument uses bounded affine row products and fixed creation
 descriptions; the total-call argument prices entry evaluations separately.

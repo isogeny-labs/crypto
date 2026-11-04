@@ -16,7 +16,7 @@ checks and interpretations in this record are producer assertions.
   research/hashed_ecdl_entry_cost_20261104/render_report.py`, exit0. Graphviz
   and Typst0.15.0 lay out recorded text and a dependency diagram only.
   Python performs document rendering/metadata work, not crypto computation.
-- `pdfinfo`:3 A4 pages,67851bytes, PDF1.7, unencrypted. All final pages were
+- `pdfinfo`:3 A4 pages,67853bytes, PDF1.7, unencrypted. All final pages were
   rasterized with `pdftoppm -scale-to1250 -png` and visually inspected:
   labels, tables, source identifiers and the four next steps are legible.
   Source and generated Typst/SVG/PDF are included. [pcc:unverified]
@@ -57,3 +57,8 @@ in inherited entries. New report prose has zero findings. Those older entries
 were not edited. Initial staging refused the new study outside sparse patterns;
 added its exact path to sparse checkout, then staged the same files. Neither
 case changed validation policy or research data. [pcc:unverified]
+
+Publication review clarified that the publisher PDF blob matches the cached
+PDF, whose extracted text was reviewed. Re-rendered the three-page document
+(67853bytes) and inspected all pages again; the earlier draft was67851bytes.
+This wording change does not alter the source observations. [pcc:unverified]
