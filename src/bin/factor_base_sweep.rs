@@ -3,6 +3,8 @@
 mod audit;
 #[path = "factor_base_sweep/engine.rs"]
 mod engine;
+#[path = "factor_base_sweep/forecast.rs"]
+mod forecast;
 #[path = "factor_base_sweep/model.rs"]
 mod model;
 #[path = "factor_base_sweep/polynomials.rs"]
@@ -120,6 +122,16 @@ enum Action {
         #[arg(long)]
         run: PathBuf,
     },
+    /// Rank a run's candidates by their degree-of-regularity forecast and
+    /// projected relation-phase cost, from the records on disk (complete or
+    /// still running). Advisory: it starts, stops or skips nothing.
+    Triage {
+        #[arg(long)]
+        run: PathBuf,
+        /// Also write the ranking to a new file.
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
     #[command(hide = true)]
     Worker {
         #[arg(long)]
@@ -217,6 +229,13 @@ fn dispatch() -> Result<()> {
             println!("{}", out.display());
         }
         Action::Verify { run } => println!("{}", run::verify(&run)?),
+        Action::Triage { run, out } => {
+            let ranking = run::triage(&run)?;
+            if let Some(out) = out {
+                model::write_new(&out, &ranking)?;
+            }
+            println!("{ranking}");
+        }
         Action::Worker { attempt } => {
             let request = model::read(&attempt.join("request.json"))?;
             engine::run(&request, &attempt)?;
