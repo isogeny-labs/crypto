@@ -1,0 +1,22 @@
+{
+  "schema": "isolab.eks.resumable/v1",
+  "run_name": "replace-with-unique-run-name",
+  "deadline_unix_seconds": 0,
+  "build": {
+    "image_uri": "REPLACE_WITH_TESTED_ECR_IMAGE_AT_SHA256_DIGEST",
+    "source_revision": "REPLACE_WITH_40_HEX_SOURCE_COMMIT",
+    "ecbench_sha256": "REPLACE_WITH_64_HEX_SHA256_OF_ARGV0_INSIDE_THE_IMAGE"
+  },
+  "runtime_image_uri": "REPLACE_WITH_PUBLISH_RUNTIME_OUTPUT_IMAGE_AT_SHA256_DIGEST",
+  "instance_type": "c8a.2xlarge",
+  "checkpoint_interval_seconds": 600,
+  "max_restores": 50,
+  "command": {
+    "argv": ["/opt/study/launch/job-prime-tower-criu.sh", "main"],
+    "outputs": "/work/compute/out",
+    "threads": 4,
+    "binaries": {
+      "/opt/study/bin/prime-tower": "REPLACE_WITH_64_HEX_SHA256_OF_THIS_IMAGE_FILE"
+    }
+  }
+}

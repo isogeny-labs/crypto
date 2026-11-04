@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 
 pub const ACCOUNT: &str = "104186811093";
 pub const REGION: &str = "us-east-2";
@@ -46,6 +47,9 @@ pub struct Request {
     pub deadline_unix_seconds: u64,
     pub build: Build,
     pub runtime_image_uri: String,
+    /// Original ecbench spec. Absent or null only in command mode; an ecbench
+    /// spec is always an object, so legacy request bytes and hashes are unchanged.
+    #[serde(default, skip_serializing_if = "Value::is_null")]
     pub spec: Value,
     pub instance_type: String,
     pub checkpoint_interval_seconds: u64,
@@ -59,6 +63,112 @@ pub struct Request {
     pub worker_campaign: Option<crate::campaign::Binding>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fresh_owner: Option<FreshOwnerAdmission>,
+    /// Trusted native command instead of ecbench. Absent for every ecbench request.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub command: Option<CommandMode>,
+}
+
+pub const MAX_COMMAND_ARGS: usize = 64;
+pub const MAX_COMMAND_ARG_BYTES: usize = 4096;
+pub const MAX_COMMAND_BINARIES: usize = 32;
+pub const MAX_COMMAND_RESTORES: u32 = 50;
+pub const MAX_ECBENCH_RESTORES: u32 = 5;
+pub const COMPUTE_DIR: &str = "/work/compute";
+
+fn one() -> u32 {
+    1
+}
+fn is_one(n: &u32) -> bool {
+    *n == 1
+}
+
+/// Command mode: the supervisor execs `argv` (UID 1000, no capabilities,
+/// computation-only perf filter) instead of `isolab-criu-progress` + ecbench.
+/// `build.ecbench_sha256` binds the SHA-256 of the image file `argv[0]`; each
+/// `binaries` entry binds one more absolute image path (for example the native
+/// program a launcher script execs). Both are verified before launch and restore.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommandMode {
+    pub argv: Vec<String>,
+    /// Directory under /work/compute uploaded after the command exits.
+    pub outputs: String,
+    /// RAYON_NUM_THREADS for the payload, 1..4. Explicit 1 canonicalizes to omission.
+    #[serde(default = "one", skip_serializing_if = "is_one")]
+    pub threads: u32,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub binaries: BTreeMap<String, String>,
+}
+
+fn plain_text(s: &str) -> bool {
+    s.len() <= MAX_COMMAND_ARG_BYTES && !s.bytes().any(|c| c == 0 || c == b'\n' || c == b'\r')
+}
+/// Absolute, normalized (no `.`/`..`/empty components, no trailing slash) path.
+fn normalized_absolute(s: &str) -> bool {
+    plain_text(s)
+        && s.len() > 1
+        && s.starts_with('/')
+        && !s.ends_with('/')
+        && s[1..]
+            .split('/')
+            .all(|c| !c.is_empty() && c != "." && c != "..")
+}
+/// Image paths only: never the payload-writable PVC, the request mount or
+/// kernel/device/temporary filesystems.
+fn image_path(s: &str) -> bool {
+    normalized_absolute(s)
+        && !["/work", "/request", "/proc", "/sys", "/dev", "/tmp"]
+            .iter()
+            .any(|root| s == *root || s.starts_with(&format!("{root}/")))
+}
+
+impl CommandMode {
+    pub fn validate(&self, argv0_sha256: &str) -> Result<(), String> {
+        if self.argv.is_empty() || self.argv.len() > MAX_COMMAND_ARGS {
+            return Err("command argv must have 1..64 entries".into());
+        }
+        if !self.argv.iter().all(|a| plain_text(a)) {
+            return Err(
+                "command arguments must be at most 4096 bytes without NUL or newline".into(),
+            );
+        }
+        if !image_path(&self.argv[0]) {
+            return Err(
+                "command argv[0] must be a normalized absolute path inside the image".into(),
+            );
+        }
+        if !hex(argv0_sha256, 64) {
+            return Err("command mode binds argv[0] by build.ecbench_sha256".into());
+        }
+        let relative = self
+            .outputs
+            .strip_prefix(COMPUTE_DIR)
+            .and_then(|r| r.strip_prefix('/'))
+            .filter(|_| normalized_absolute(&self.outputs))
+            .ok_or("command outputs must be a normalized directory under /work/compute")?;
+        let first = relative.split('/').next().unwrap_or("");
+        if ["tmp", "run.stdout", "run.stderr"].contains(&first) {
+            return Err("command outputs may not be tmp, run.stdout or run.stderr".into());
+        }
+        if !(1..=4).contains(&self.threads) {
+            return Err("command threads must be 1..4".into());
+        }
+        if self.binaries.len() > MAX_COMMAND_BINARIES
+            || !self
+                .binaries
+                .iter()
+                .all(|(path, sha)| image_path(path) && hex(sha, 64) && *path != self.argv[0])
+        {
+            return Err("command binaries must be at most 32 image paths other than argv[0] with SHA-256 digests".into());
+        }
+        Ok(())
+    }
+    /// Path of the outputs directory relative to /work/compute.
+    pub fn outputs_relative(&self) -> &str {
+        self.outputs
+            .strip_prefix("/work/compute/")
+            .unwrap_or(&self.outputs)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -180,8 +290,11 @@ impl Request {
         if self.instance_type != "c8a.2xlarge" {
             return Err("recovery currently qualifies only c8a.2xlarge; ordinary fresh v1 jobs retain broader placement".into());
         }
+        if let Some(command) = &self.command {
+            return self.validate_command(command);
+        }
         if !(30..=900).contains(&self.checkpoint_interval_seconds)
-            || !(1..=5).contains(&self.max_restores)
+            || !(1..=MAX_ECBENCH_RESTORES).contains(&self.max_restores)
         {
             return Err("checkpoint interval must be 30..900 seconds and max_restores 1..5".into());
         }
@@ -225,6 +338,34 @@ impl Request {
         Ok(())
     }
 
+    // Command mode never enters the ecbench spec, campaign, diagnostic or fresh
+    // owner paths: each is bound to an ecbench spec and a fresh L2 epoch.
+    fn validate_command(&self, command: &CommandMode) -> Result<(), String> {
+        if !(30..=900).contains(&self.checkpoint_interval_seconds)
+            || !(1..=MAX_COMMAND_RESTORES).contains(&self.max_restores)
+        {
+            return Err(
+                "checkpoint interval must be 30..900 seconds and command max_restores 1..50".into(),
+            );
+        }
+        if !self.spec.is_null() {
+            return Err("command mode requires spec to be absent or null".into());
+        }
+        if self.diagnostic_transport.is_some()
+            || self.worker_campaign.is_some()
+            || self.fresh_owner.is_some()
+        {
+            return Err(
+                "command mode admits no diagnostic transport, worker campaign or fresh owner"
+                    .into(),
+            );
+        }
+        command.validate(&self.build.ecbench_sha256)
+    }
+    pub fn is_command(&self) -> bool {
+        self.command.is_some()
+    }
+
     pub fn hash(&self) -> String {
         digest(&serde_json::to_vec(self).expect("serializable request"))
     }
@@ -264,7 +405,25 @@ pub fn fixture() -> Request {
         diagnostic_transport: None,
         fresh_owner: None,
         worker_campaign: None,
+        command: None,
     }
+}
+
+#[cfg(test)]
+pub fn command_fixture() -> Request {
+    let mut request = fixture();
+    request.spec = Value::Null;
+    request.max_restores = 40;
+    request.command = Some(CommandMode {
+        argv: vec![
+            "/opt/study/launch/job-prime-tower-criu.sh".into(),
+            "main".into(),
+        ],
+        outputs: "/work/compute/out".into(),
+        threads: 2,
+        binaries: BTreeMap::from([("/opt/study/bin/prime-tower".into(), "f".repeat(64))]),
+    });
+    request
 }
 
 #[cfg(test)]
@@ -461,5 +620,320 @@ mod tests {
         assert!(r.validate().is_ok());
         r.fresh_owner.as_mut().unwrap().stop_utc_seconds = r.deadline_unix_seconds + 1;
         assert!(r.validate().is_err());
+    }
+
+    #[test]
+    fn recorded_ecbench_request_keeps_its_submitted_hash_and_bytes() {
+        // Real periodic-B request and its controller submission receipt.
+        let raw = include_bytes!("../../validation/20261022-periodic/attempt-b/request.json");
+        let receipt: Value = serde_json::from_slice(include_bytes!(
+            "../../validation/20261022-periodic/attempt-b/submission.json"
+        ))
+        .unwrap();
+        let req = Request::parse(raw).unwrap();
+        assert!(req.command.is_none());
+        assert_eq!(req.hash(), receipt["request_sha256"]);
+        // Same content as the recorded bytes, and no command-mode field appears.
+        assert_eq!(
+            serde_json::to_value(&req).unwrap(),
+            serde_json::from_slice::<Value>(raw).unwrap()
+        );
+        let serialized = serde_json::to_value(&req).unwrap();
+        for absent in ["command", "threads"] {
+            assert!(serialized.get(absent).is_none());
+        }
+        // Explicit null command is the same legacy request.
+        let mut v: Value = serde_json::from_slice(raw).unwrap();
+        v["command"] = Value::Null;
+        assert_eq!(
+            Request::parse(&serde_json::to_vec(&v).unwrap())
+                .unwrap()
+                .hash(),
+            req.hash()
+        );
+    }
+    #[test]
+    fn ecbench_requests_reject_command_only_fields_and_keep_restore_bounds() {
+        let mut r = fixture();
+        for n in [1, 5] {
+            r.max_restores = n;
+            assert!(r.validate().is_ok());
+        }
+        for n in [0, 6, 50] {
+            r.max_restores = n;
+            assert!(r.validate().is_err());
+        }
+        let mut v = serde_json::to_value(fixture()).unwrap();
+        v["threads"] = serde_json::json!(2);
+        assert!(Request::parse(&serde_json::to_vec(&v).unwrap()).is_err());
+        let mut v = serde_json::to_value(fixture()).unwrap();
+        v.as_object_mut().unwrap().remove("spec");
+        assert!(Request::parse(&serde_json::to_vec(&v).unwrap()).is_err());
+    }
+    #[test]
+    fn command_request_accepts_the_documented_shape_and_example() {
+        let r = command_fixture();
+        r.validate().unwrap();
+        let bytes = serde_json::to_vec(&r).unwrap();
+        let v: Value = serde_json::from_slice(&bytes).unwrap();
+        assert!(v.get("spec").is_none(), "null spec is omitted");
+        assert_eq!(v["command"]["threads"], 2);
+        let parsed = Request::parse(&bytes).unwrap();
+        assert_eq!(parsed, r);
+        assert_eq!(parsed.hash(), r.hash());
+        // Explicit null spec and absent spec are one identity.
+        let mut with_null = v.clone();
+        with_null["spec"] = Value::Null;
+        assert_eq!(
+            Request::parse(&serde_json::to_vec(&with_null).unwrap())
+                .unwrap()
+                .hash(),
+            r.hash()
+        );
+        // Default threads=1 canonicalizes to omission.
+        let mut default = v.clone();
+        default["command"]["threads"] = serde_json::json!(1);
+        let one = Request::parse(&serde_json::to_vec(&default).unwrap()).unwrap();
+        default["command"]
+            .as_object_mut()
+            .unwrap()
+            .remove("threads");
+        let omitted = Request::parse(&serde_json::to_vec(&default).unwrap()).unwrap();
+        assert_eq!(one.hash(), omitted.hash());
+        assert_eq!(omitted.command.as_ref().unwrap().threads, 1);
+        assert!(serde_json::to_value(&omitted).unwrap()["command"]
+            .get("threads")
+            .is_none());
+        assert_ne!(one.hash(), r.hash());
+        // The checked-in example differs only in placeholder identities.
+        let mut example: Value =
+            serde_json::from_str(include_str!("../../request.command.example.json")).unwrap();
+        example["build"] = serde_json::to_value(&r.build).unwrap();
+        example["runtime_image_uri"] = Value::String(r.runtime_image_uri.clone());
+        example["command"]["binaries"] =
+            serde_json::json!({"/opt/study/bin/prime-tower":"f".repeat(64)});
+        let example = Request::parse(&serde_json::to_vec(&example).unwrap()).unwrap();
+        assert!(example.is_command());
+    }
+    #[test]
+    fn command_request_rejects_invalid_shapes() {
+        type Mutation = Box<dyn Fn(&mut Request)>;
+        let bad: Vec<(&str, Mutation)> = vec![
+            (
+                "empty argv",
+                Box::new(|r| r.command.as_mut().unwrap().argv.clear()),
+            ),
+            (
+                "65 args",
+                Box::new(|r| r.command.as_mut().unwrap().argv.resize(65, "x".into())),
+            ),
+            (
+                "relative argv0",
+                Box::new(|r| r.command.as_mut().unwrap().argv[0] = "bin/run".into()),
+            ),
+            (
+                "dotdot argv0",
+                Box::new(|r| r.command.as_mut().unwrap().argv[0] = "/opt/../bin/sh".into()),
+            ),
+            (
+                "trailing slash",
+                Box::new(|r| r.command.as_mut().unwrap().argv[0] = "/opt/run/".into()),
+            ),
+            (
+                "pvc argv0",
+                Box::new(|r| r.command.as_mut().unwrap().argv[0] = "/work/compute/run".into()),
+            ),
+            (
+                "request argv0",
+                Box::new(|r| r.command.as_mut().unwrap().argv[0] = "/request/x".into()),
+            ),
+            (
+                "tmp argv0",
+                Box::new(|r| r.command.as_mut().unwrap().argv[0] = "/tmp/x".into()),
+            ),
+            (
+                "NUL arg",
+                Box::new(|r| r.command.as_mut().unwrap().argv[1] = "a\0b".into()),
+            ),
+            (
+                "newline arg",
+                Box::new(|r| r.command.as_mut().unwrap().argv[1] = "a\nb".into()),
+            ),
+            (
+                "CR arg",
+                Box::new(|r| r.command.as_mut().unwrap().argv[1] = "a\rb".into()),
+            ),
+            (
+                "long arg",
+                Box::new(|r| r.command.as_mut().unwrap().argv[1] = "a".repeat(4097)),
+            ),
+            (
+                "outputs outside",
+                Box::new(|r| r.command.as_mut().unwrap().outputs = "/work/out".into()),
+            ),
+            (
+                "outputs root",
+                Box::new(|r| r.command.as_mut().unwrap().outputs = "/work/compute".into()),
+            ),
+            (
+                "outputs prefix",
+                Box::new(|r| r.command.as_mut().unwrap().outputs = "/work/computex/out".into()),
+            ),
+            (
+                "outputs dotdot",
+                Box::new(|r| {
+                    r.command.as_mut().unwrap().outputs = "/work/compute/../control".into()
+                }),
+            ),
+            (
+                "outputs tmp",
+                Box::new(|r| r.command.as_mut().unwrap().outputs = "/work/compute/tmp/out".into()),
+            ),
+            (
+                "outputs stdout",
+                Box::new(|r| {
+                    r.command.as_mut().unwrap().outputs = "/work/compute/run.stdout".into()
+                }),
+            ),
+            (
+                "outputs slash",
+                Box::new(|r| r.command.as_mut().unwrap().outputs = "/work/compute/out/".into()),
+            ),
+            (
+                "threads 0",
+                Box::new(|r| r.command.as_mut().unwrap().threads = 0),
+            ),
+            (
+                "threads 5",
+                Box::new(|r| r.command.as_mut().unwrap().threads = 5),
+            ),
+            (
+                "binary hash",
+                Box::new(|r| {
+                    r.command
+                        .as_mut()
+                        .unwrap()
+                        .binaries
+                        .insert("/opt/x".into(), "F".repeat(64));
+                }),
+            ),
+            (
+                "binary path",
+                Box::new(|r| {
+                    r.command
+                        .as_mut()
+                        .unwrap()
+                        .binaries
+                        .insert("/work/x".into(), "f".repeat(64));
+                }),
+            ),
+            (
+                "binary argv0",
+                Box::new(|r| {
+                    let a = r.command.as_ref().unwrap().argv[0].clone();
+                    r.command
+                        .as_mut()
+                        .unwrap()
+                        .binaries
+                        .insert(a, "f".repeat(64));
+                }),
+            ),
+            (
+                "33 binaries",
+                Box::new(|r| {
+                    for n in 0..33 {
+                        r.command
+                            .as_mut()
+                            .unwrap()
+                            .binaries
+                            .insert(format!("/opt/b{n}"), "f".repeat(64));
+                    }
+                }),
+            ),
+            ("spec and command", Box::new(|r| r.spec = fixture().spec)),
+            (
+                "empty spec object",
+                Box::new(|r| r.spec = serde_json::json!({})),
+            ),
+            (
+                "diagnostics",
+                Box::new(|r| r.diagnostic_transport = diagnostic_fixture().diagnostic_transport),
+            ),
+            (
+                "fresh owner",
+                Box::new(|r| {
+                    r.fresh_owner = Some(FreshOwnerAdmission {
+                        schema: "isolab.fresh-owner-admission/v1".into(),
+                        binary_sha256: "e".repeat(64),
+                        stop_utc_seconds: 4000,
+                    })
+                }),
+            ),
+            (
+                "argv0 hash",
+                Box::new(|r| r.build.ecbench_sha256 = "x".repeat(64)),
+            ),
+            (
+                "instance",
+                Box::new(|r| r.instance_type = "m8a.2xlarge".into()),
+            ),
+            (
+                "unpinned image",
+                Box::new(|r| r.build.image_uri = format!("{REPOSITORY}:latest")),
+            ),
+        ];
+        for (name, mutate) in bad {
+            let mut r = command_fixture();
+            mutate(&mut r);
+            assert!(r.validate().is_err(), "{name} was accepted");
+        }
+        let mut v = serde_json::to_value(command_fixture()).unwrap();
+        v["command"]["env"] = serde_json::json!({"A":"B"});
+        assert!(Request::parse(&serde_json::to_vec(&v).unwrap()).is_err());
+        let mut v = serde_json::to_value(command_fixture()).unwrap();
+        v["command"]["argv"] = serde_json::json!(["/opt/run", 7]);
+        assert!(Request::parse(&serde_json::to_vec(&v).unwrap()).is_err());
+    }
+    #[test]
+    fn max_restores_bounds_depend_on_mode() {
+        let mut r = command_fixture();
+        for n in [1, 5, 6, 50] {
+            r.max_restores = n;
+            assert!(r.validate().is_ok(), "{n}");
+        }
+        for n in [0, 51] {
+            r.max_restores = n;
+            assert!(r.validate().is_err(), "{n}");
+        }
+        let mut e = fixture();
+        e.max_restores = 6;
+        assert!(e.validate().is_err());
+        for interval in [29, 901] {
+            let mut r = command_fixture();
+            r.checkpoint_interval_seconds = interval;
+            assert!(r.validate().is_err());
+        }
+    }
+    #[test]
+    fn schema_command_bounds_match_native_contract() {
+        let schema: Value =
+            serde_json::from_str(include_str!("../../request.schema.json")).unwrap();
+        let c = &schema["properties"]["command"];
+        assert_eq!(c["properties"]["argv"]["minItems"], 1);
+        assert_eq!(c["properties"]["argv"]["maxItems"], MAX_COMMAND_ARGS);
+        assert_eq!(c["properties"]["threads"]["minimum"], 1);
+        assert_eq!(c["properties"]["threads"]["maximum"], 4);
+        assert_eq!(
+            c["properties"]["binaries"]["maxProperties"],
+            MAX_COMMAND_BINARIES
+        );
+        assert_eq!(
+            schema["properties"]["max_restores"]["maximum"],
+            MAX_COMMAND_RESTORES
+        );
+        assert!(!schema["required"]
+            .as_array()
+            .unwrap()
+            .contains(&serde_json::json!("spec")));
     }
 }

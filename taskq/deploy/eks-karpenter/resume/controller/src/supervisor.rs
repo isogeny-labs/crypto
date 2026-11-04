@@ -52,6 +52,7 @@ impl Operation {
             "continue",
             "restore",
             "verify",
+            "seal",
             "stop",
         ]
         .contains(&self.action.as_str())
@@ -65,8 +66,12 @@ impl Operation {
 pub struct Runtime {
     pub kernel: String,
     pub cpu_identity: Vec<String>,
+    /// ecbench, or argv[0] in command mode (both bound by build.ecbench_sha256).
     pub ecbench_sha256: String,
     pub tools: BTreeMap<String, String>,
+    /// Command mode `binaries`; omitted for ecbench, preserving manifest bytes.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub payload_binaries: BTreeMap<String, String>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Manifest {
@@ -144,7 +149,36 @@ fn tree(pid: i32) -> Result<Vec<i32>, String> {
     }
     Ok(out)
 }
-fn runtime() -> Result<Runtime, String> {
+/// Executable the request binds with build.ecbench_sha256.
+fn payload_executable(req: &Request) -> &str {
+    req.command.as_ref().map_or(ECBENCH, |c| c.argv[0].as_str())
+}
+fn payload_hashes(req: &Request) -> Result<(String, BTreeMap<String, String>), String> {
+    let main = sha_file(Path::new(payload_executable(req)))?.0;
+    let mut binaries = BTreeMap::new();
+    for path in req.command.iter().flat_map(|c| c.binaries.keys()) {
+        binaries.insert(path.clone(), sha_file(Path::new(path))?.0);
+    }
+    Ok((main, binaries))
+}
+/// Checked at supervisor admission; command mode checks again immediately
+/// before launch and before CRIU restore.
+pub(crate) fn verify_payload_identity(req: &Request) -> Result<(), String> {
+    let (main, binaries) = payload_hashes(req)?;
+    match &req.command {
+        None if main != req.build.ecbench_sha256 => {
+            Err("ecbench binary hash does not match request".into())
+        }
+        Some(_) if main != req.build.ecbench_sha256 => {
+            Err("command argv[0] hash does not match build.ecbench_sha256".into())
+        }
+        Some(c) if binaries != c.binaries => {
+            Err("command binary hashes do not match request".into())
+        }
+        _ => Ok(()),
+    }
+}
+fn runtime(req: &Request) -> Result<Runtime, String> {
     let cpu = fs::read_to_string("/proc/cpuinfo").map_err(error)?;
     let first = cpu.split("\n\n").next().unwrap_or("");
     let identity = first
@@ -160,14 +194,16 @@ fn runtime() -> Result<Runtime, String> {
     for name in ["criu", "isolab-criu-progress", "isolab-eks-recovery"] {
         tools.insert(name.into(), sha_file(&Path::new(BIN).join(name))?.0);
     }
+    let (ecbench_sha256, payload_binaries) = payload_hashes(req)?;
     Ok(Runtime {
         kernel: fs::read_to_string("/proc/sys/kernel/osrelease")
             .map_err(error)?
             .trim()
             .into(),
         cpu_identity: identity,
-        ecbench_sha256: sha_file(Path::new(ECBENCH))?.0,
+        ecbench_sha256,
         tools,
+        payload_binaries,
     })
 }
 fn criu() -> Command {
@@ -285,9 +321,27 @@ fn launch(req: &Request, s: &mut Status, cutoff: deadline::Deadline) -> Result<(
     if Path::new("/work/compute").exists() {
         return Err("computation already exists; never restart from zero".into());
     }
+    if req.is_command() {
+        verify_payload_identity(req)?;
+    }
     fs::create_dir("/work/compute").map_err(error)?;
     fs::create_dir("/work/compute/tmp").map_err(error)?;
-    save(Path::new("/work/compute/original-spec.json"), &req.spec)?;
+    let mut owned: Vec<PathBuf> = vec!["/work/compute".into(), "/work/compute/tmp".into()];
+    match &req.command {
+        None => {
+            save(Path::new("/work/compute/original-spec.json"), &req.spec)?;
+            owned.push("/work/compute/original-spec.json".into());
+        }
+        Some(command) => {
+            // Create every outputs component so the UID-1000 payload owns it.
+            let mut path = PathBuf::from("/work/compute");
+            for part in command.outputs_relative().split('/') {
+                path.push(part);
+                fs::create_dir(&path).map_err(error)?;
+                owned.push(path.clone());
+            }
+        }
+    }
     prepare_diagnostic_launch(req)?;
     // Keep payload PIDs away from CRIU and kubectl exec's short-lived helpers on a
     // fresh restore namespace. No restore is allowed if any saved PID is occupied.
@@ -301,12 +355,8 @@ fn launch(req: &Request, s: &mut Status, cutoff: deadline::Deadline) -> Result<(
         }
         unsafe { libc::waitpid(pid, std::ptr::null_mut(), 0) };
     }
-    for p in [
-        "/work/compute",
-        "/work/compute/tmp",
-        "/work/compute/original-spec.json",
-    ] {
-        let p = std::ffi::CString::new(p).unwrap();
+    for p in &owned {
+        let p = std::ffi::CString::new(p.as_os_str().as_encoded_bytes()).map_err(error)?;
         if unsafe { libc::chown(p.as_ptr(), 1000, 1000) } != 0 {
             return Err(error(std::io::Error::last_os_error()));
         }
@@ -315,20 +365,52 @@ fn launch(req: &Request, s: &mut Status, cutoff: deadline::Deadline) -> Result<(
     save(&status_path(s.attempt), s)?;
     let stdout = File::create("/work/compute/run.stdout").map_err(error)?;
     let stderr = File::create("/work/compute/run.stderr").map_err(error)?;
-    let mut cmd = Command::new(format!("{BIN}/isolab-criu-progress"));
-    cmd.args([
-        ECBENCH,
-        "/work/compute/original-spec.json",
-        "/work/compute/session",
-    ])
-    .current_dir("/work/compute")
-    .env_clear()
-    .env("PATH", "/usr/local/bin:/usr/bin:/bin")
-    .env("HOME", "/work/compute")
-    .env("TMPDIR", "/work/compute/tmp")
-    .stdin(Stdio::null())
-    .stdout(stdout)
-    .stderr(stderr);
+    let mut cmd = payload_command(req);
+    cmd.stdin(Stdio::null()).stdout(stdout).stderr(stderr);
+    drop_payload_privileges(&mut cmd);
+    if req.is_command() {
+        // The progress launcher installs this for ecbench; a command payload
+        // gets the same computation-only filter after its privileges drop.
+        deny_perf_after_privilege_drop(&mut cmd);
+    }
+    if req.worker_campaign.is_some() {
+        deadline::check(cutoff)?;
+    }
+    let child = cmd.spawn().map_err(error)?;
+    s.pid = Some(child.id() as i32);
+    s.starttime = Some(starttime(child.id() as i32)?);
+    s.phase = "running".into();
+    Ok(())
+}
+/// The computational payload's exact argv/env/cwd. Stdio and credential
+/// changes are applied by `launch`; this function spawns nothing.
+fn payload_command(req: &Request) -> Command {
+    let mut cmd = match &req.command {
+        None => {
+            let mut cmd = Command::new(format!("{BIN}/isolab-criu-progress"));
+            cmd.args([
+                ECBENCH,
+                "/work/compute/original-spec.json",
+                "/work/compute/session",
+            ]);
+            cmd
+        }
+        Some(command) => {
+            let mut cmd = Command::new(&command.argv[0]);
+            cmd.args(&command.argv[1..]);
+            cmd
+        }
+    };
+    cmd.current_dir("/work/compute")
+        .env_clear()
+        .env("PATH", "/usr/local/bin:/usr/bin:/bin")
+        .env("HOME", "/work/compute")
+        .env("TMPDIR", "/work/compute/tmp");
+    if let Some(command) = &req.command {
+        cmd.env("ISOLAB_OUTPUT_DIR", &command.outputs)
+            .env("ISOLAB_CRIU", "1")
+            .env("RAYON_NUM_THREADS", command.threads.to_string());
+    }
     if let Some(transport) = &req.diagnostic_transport {
         cmd.args([
             "--diagnostic-launch",
@@ -339,15 +421,72 @@ fn launch(req: &Request, s: &mut Status, cutoff: deadline::Deadline) -> Result<(
             &transport.computation.spec_bytes_sha256,
         ]);
     }
-    drop_payload_privileges(&mut cmd);
-    if req.worker_campaign.is_some() {
-        deadline::check(cutoff)?;
+    cmd
+}
+// Same BPF program as progress/src/main.rs deny_perf(): CRIU 4.2.1 rejects
+// perf_event descriptors and credentials() requires seccomp filter mode 2.
+const PERF_FILTER: [libc::sock_filter; 7] = [
+    libc::sock_filter {
+        code: 0x20,
+        jt: 0,
+        jf: 0,
+        k: 4,
+    }, // seccomp_data.arch
+    libc::sock_filter {
+        code: 0x15,
+        jt: 1,
+        jf: 0,
+        k: 0xc000003e,
+    },
+    libc::sock_filter {
+        code: 0x06,
+        jt: 0,
+        jf: 0,
+        k: 0x80000000,
+    }, // KILL_PROCESS
+    libc::sock_filter {
+        code: 0x20,
+        jt: 0,
+        jf: 0,
+        k: 0,
+    }, // syscall number
+    libc::sock_filter {
+        code: 0x15,
+        jt: 0,
+        jf: 1,
+        k: libc::SYS_perf_event_open as u32,
+    },
+    libc::sock_filter {
+        code: 0x06,
+        jt: 0,
+        jf: 0,
+        k: 0x00050000 | libc::EPERM as u32,
+    },
+    libc::sock_filter {
+        code: 0x06,
+        jt: 0,
+        jf: 0,
+        k: 0x7fff0000,
+    }, // ALLOW
+];
+/// Async-signal-safe: no allocation; requires no_new_privs already set.
+fn install_perf_filter() -> std::io::Result<()> {
+    let mut filter = PERF_FILTER;
+    let program = libc::sock_fprog {
+        len: filter.len() as u16,
+        filter: filter.as_mut_ptr(),
+    };
+    // SAFETY: valid BPF program with checked architecture; copied by the kernel.
+    if unsafe { libc::prctl(libc::PR_SET_SECCOMP, 2, &program as *const libc::sock_fprog) } != 0 {
+        return Err(std::io::Error::last_os_error());
     }
-    let child = cmd.spawn().map_err(error)?;
-    s.pid = Some(child.id() as i32);
-    s.starttime = Some(starttime(child.id() as i32)?);
-    s.phase = "running".into();
     Ok(())
+}
+fn deny_perf_after_privilege_drop(cmd: &mut Command) {
+    // SAFETY: registered after drop_payload_privileges, so NNP is set first.
+    unsafe {
+        cmd.pre_exec(install_perf_filter);
+    }
 }
 fn drop_payload_privileges(cmd: &mut Command) {
     // SAFETY: pre_exec only invokes async-signal-safe credential/session syscalls.
@@ -381,7 +520,9 @@ fn checkpoint(
 ) -> Result<(), String> {
     // Completion can race the controller's last status read. Preserve the
     // successful computation instead of treating this as a failed checkpoint.
-    if s.phase == "completed" && s.exit_code == Some(0) {
+    if s.phase == "completed"
+        && (s.exit_code == Some(0) || (req.is_command() && s.exit_code.is_some()))
+    {
         return Ok(());
     }
     if s.phase != "running" {
@@ -481,7 +622,7 @@ fn checkpoint(
         schema: "isolab.criu.generation/v1".into(),
         request_sha256: req.hash(),
         generation: n,
-        runtime: runtime()?,
+        runtime: runtime(req)?,
         root_pid: pid,
         pids,
         files: entries,
@@ -502,8 +643,8 @@ fn checkpoint_completion(
     }
     match owner.poll(req, s, None)? {
         None => Ok(false),
-        Some(0) => {
-            s.exit_code = Some(0);
+        Some(code) if code == 0 || req.is_command() => {
+            s.exit_code = Some(code);
             s.phase = "completed".into();
             Ok(true)
         }
@@ -542,10 +683,17 @@ fn restore(
     if m.schema != "isolab.criu.generation/v1"
         || m.request_sha256 != req.hash()
         || m.generation != n
-        || m.runtime != runtime()?
+        || m.runtime != runtime(req)?
         || m.runtime.ecbench_sha256 != req.build.ecbench_sha256
+        || req
+            .command
+            .as_ref()
+            .is_some_and(|c| m.runtime.payload_binaries != c.binaries)
     {
         return Err("checkpoint request/runtime identity mismatch".into());
+    }
+    if req.is_command() {
+        verify_payload_identity(req)?;
     }
     for (file, expected) in &m.files {
         let p = Path::new(file);
@@ -684,6 +832,181 @@ fn verify(s: &mut Status, cutoff: Option<deadline::Deadline>) -> Result<(), Stri
     s.phase = "verified".into();
     Ok(())
 }
+/// Supervisor phase after the payload root is reaped. ecbench requires exit 0
+/// for native replay; command mode records ANY exit as completed (never
+/// retried), unless the supervisor already failed and killed the payload.
+fn completion_phase(req: &Request, current: &str, code: i32) -> &'static str {
+    match &req.command {
+        None if code == 0 => "completed",
+        None => "failed",
+        Some(_) if current == "failed" => "failed",
+        Some(_) => "completed",
+    }
+}
+
+pub const MAX_SEALED_FILES: usize = 1024;
+/// S3 single PUT bound; larger outputs stay on the retained PVC, listed as skipped.
+pub const MAX_SEALED_FILE_BYTES: u64 = 5 * 1024 * 1024 * 1024;
+const MAX_SEALED_PATH_BYTES: usize = 900;
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SealedFile {
+    /// Relative to /work/compute, e.g. `out/result.json` or `run.stdout`.
+    pub path: String,
+    pub sha256: String,
+    pub bytes: u64,
+}
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SkippedEntry {
+    pub path: String,
+    pub reason: String,
+}
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommandSeal {
+    pub schema: String,
+    pub request_sha256: String,
+    pub attempt: u32,
+    pub exit_code: i32,
+    pub outputs: String,
+    pub files: Vec<SealedFile>,
+    pub skipped: Vec<SkippedEntry>,
+    pub sha256sums_sha256: String,
+}
+/// Name accepted for upload: UTF-8 relative path, normalized, no control
+/// characters that would break SHA256SUMS lines or S3 keys.
+pub(crate) fn sealable_path(path: &str) -> bool {
+    !path.is_empty()
+        && path.len() <= MAX_SEALED_PATH_BYTES
+        && !path.starts_with('/')
+        && !path.bytes().any(|c| c < 0x20 || c == 0x7f || c == b'\\')
+        && path
+            .split('/')
+            .all(|c| !c.is_empty() && c != "." && c != "..")
+}
+pub(crate) fn sha256sums(files: &[SealedFile]) -> Vec<u8> {
+    files
+        .iter()
+        .map(|f| format!("{}  {}\n", f.sha256, f.path))
+        .collect::<String>()
+        .into_bytes()
+}
+fn seal_walk(
+    root: &Path,
+    rel: &str,
+    files: &mut Vec<SealedFile>,
+    skipped: &mut Vec<SkippedEntry>,
+) -> Result<(), String> {
+    let full = root.join(rel);
+    let meta = match fs::symlink_metadata(&full) {
+        Ok(meta) => meta,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            skipped.push(SkippedEntry {
+                path: rel.into(),
+                reason: "absent".into(),
+            });
+            return Ok(());
+        }
+        Err(e) => return Err(error(e)),
+    };
+    let kind = meta.file_type();
+    if kind.is_dir() {
+        let mut names = Vec::new();
+        for entry in fs::read_dir(&full).map_err(error)? {
+            names.push(entry.map_err(error)?.file_name());
+        }
+        names.sort();
+        for name in names {
+            match name.to_str() {
+                Some(name) => seal_walk(root, &format!("{rel}/{name}"), files, skipped)?,
+                None => skipped.push(SkippedEntry {
+                    path: format!("{rel}/{}", name.to_string_lossy()),
+                    reason: "non-UTF-8 name".into(),
+                }),
+            }
+        }
+    } else if !kind.is_file() {
+        skipped.push(SkippedEntry {
+            path: rel.into(),
+            reason: "not a regular file or directory".into(),
+        });
+    } else if !sealable_path(rel) {
+        skipped.push(SkippedEntry {
+            path: rel.into(),
+            reason: "unsupported path name".into(),
+        });
+    } else if meta.len() > MAX_SEALED_FILE_BYTES {
+        skipped.push(SkippedEntry {
+            path: rel.into(),
+            reason: "exceeds 5 GiB single-object bound".into(),
+        });
+    } else {
+        if files.len() >= MAX_SEALED_FILES {
+            return Err("command outputs exceed 1024 files; retained on the PVC only".into());
+        }
+        let (sha256, bytes) = sha_file(&full)?;
+        files.push(SealedFile {
+            path: rel.into(),
+            sha256,
+            bytes,
+        });
+    }
+    Ok(())
+}
+/// Hash the outputs tree (no symlink is followed) plus run.stdout/run.stderr.
+pub(crate) fn seal_tree(
+    root: &Path,
+    outputs: &str,
+) -> Result<(Vec<SealedFile>, Vec<SkippedEntry>), String> {
+    let (mut files, mut skipped) = (Vec::new(), Vec::new());
+    seal_walk(root, outputs, &mut files, &mut skipped)?;
+    for log in ["run.stdout", "run.stderr"] {
+        seal_walk(root, log, &mut files, &mut skipped)?;
+    }
+    files.sort_by(|a, b| a.path.cmp(&b.path));
+    Ok((files, skipped))
+}
+fn seal_dir(attempt: u32) -> PathBuf {
+    attempt_dir(attempt).join("command")
+}
+/// Command mode replacement for native replay: freeze and hash the outputs.
+fn seal(req: &Request, s: &mut Status) -> Result<(), String> {
+    let command = req.command.as_ref().ok_or("seal is command mode only")?;
+    if s.phase == "sealed" {
+        return Ok(());
+    }
+    let exit_code = s.exit_code.ok_or("command exit code missing")?;
+    if s.phase != "completed" {
+        return Err("seal requires a completed command".into());
+    }
+    // The root was reaped; no remaining member of its process group may write
+    // after hashing. (Same group kill the supervisor uses on failure.)
+    if let Some(pid) = s.pid {
+        unsafe { libc::kill(-pid, libc::SIGKILL) };
+    }
+    let (files, skipped) = seal_tree(Path::new("/work/compute"), command.outputs_relative())?;
+    let sums = sha256sums(&files);
+    let dir = seal_dir(s.attempt);
+    fs::create_dir_all(&dir).map_err(error)?;
+    atomic(&dir.join("SHA256SUMS"), &sums)?;
+    save(
+        &dir.join("seal.json"),
+        &CommandSeal {
+            schema: "isolab.recovery.command-seal/v1".into(),
+            request_sha256: req.hash(),
+            attempt: s.attempt,
+            exit_code,
+            outputs: command.outputs.clone(),
+            files,
+            skipped,
+            sha256sums_sha256: crate::contract::digest(&sums),
+        },
+    )?;
+    sync_work()?;
+    s.phase = "sealed".into();
+    Ok(())
+}
 pub fn rpc(attempt: u32, bytes: &[u8]) -> Result<(), String> {
     let op: Operation = serde_json::from_slice(bytes).map_err(error)?;
     if op.attempt != attempt {
@@ -785,9 +1108,10 @@ pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
         let namespace = std::env::var("ISOLAB_COMPUTATION_PRIVATE_PID_NAMESPACE").map_err(error)?;
         deadline::install_namespace_backstop(cutoff, &namespace)?;
     }
-    if runtime()?.ecbench_sha256 != req.build.ecbench_sha256 {
-        return Err("ecbench binary hash does not match request".into());
-    }
+    // Full runtime identity first (tools, kernel, CPU), as before; then the
+    // request-bound payload hashes (ecbench, or argv[0] plus binaries).
+    runtime(&req)?;
+    verify_payload_identity(&req)?;
     let dir = attempt_dir(attempt);
     if dir.exists() {
         return Err("attempt already exists: supervisor may not restart an attempt".into());
@@ -830,7 +1154,7 @@ pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
         match owner.poll(&req, &s, None) {
             Ok(Some(code)) => {
                 s.exit_code = Some(code);
-                s.phase = if code == 0 { "completed" } else { "failed" }.into();
+                s.phase = completion_phase(&req, &s.phase, code).into();
             }
             Ok(None) => {}
             Err(error) => eprintln!("owner observation: {error}"),
@@ -873,7 +1197,11 @@ pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
                         op.manifest_sha256.as_deref(),
                         cutoff,
                     ),
+                    "verify" if req.is_command() => {
+                        Err("command mode has no native replay; seal its outputs".into())
+                    }
                     "verify" => verify(&mut s, req.worker_campaign.as_ref().map(|_| cutoff)),
+                    "seal" => seal(&req, &mut s),
                     "stop" => {
                         if let Some(pid) = s.pid {
                             unsafe { libc::kill(-pid, libc::SIGKILL) };
@@ -1066,5 +1394,270 @@ mod absolute_binding_tests {
             Some(&crate::contract::digest(raw.as_bytes()))
         )
         .is_err());
+    }
+}
+
+#[cfg(test)]
+mod command_mode_tests {
+    use super::*;
+    use std::ffi::OsStr;
+    fn args(cmd: &Command) -> Vec<&OsStr> {
+        cmd.get_args().collect()
+    }
+    fn envs(cmd: &Command) -> BTreeMap<String, String> {
+        cmd.get_envs()
+            .map(|(k, v)| {
+                (
+                    k.to_string_lossy().into_owned(),
+                    v.unwrap().to_string_lossy().into_owned(),
+                )
+            })
+            .collect()
+    }
+    fn base_env() -> BTreeMap<String, String> {
+        BTreeMap::from([
+            ("PATH".into(), "/usr/local/bin:/usr/bin:/bin".into()),
+            ("HOME".into(), "/work/compute".into()),
+            ("TMPDIR".into(), "/work/compute/tmp".into()),
+        ])
+    }
+    #[test]
+    fn ecbench_launch_argv_and_environment_are_unchanged() {
+        let req = crate::contract::fixture();
+        let cmd = payload_command(&req);
+        assert_eq!(
+            cmd.get_program(),
+            OsStr::new("/opt/isolab/recovery/isolab-criu-progress")
+        );
+        assert_eq!(
+            args(&cmd),
+            [
+                "/usr/local/bin/ecbench",
+                "/work/compute/original-spec.json",
+                "/work/compute/session"
+            ]
+        );
+        assert_eq!(cmd.get_current_dir(), Some(Path::new("/work/compute")));
+        assert_eq!(envs(&cmd), base_env());
+        let mut diagnostic = req.clone();
+        diagnostic.diagnostic_transport = Some(crate::contract::DiagnosticTransport {
+            schema: "isolab.diagnostic-transport/v1".into(),
+            computation: crate::contract::DiagnosticLaunchBytes {
+                raw_json: "{}".into(),
+                sha256: "1".repeat(64),
+                spec_bytes_sha256: "2".repeat(64),
+            },
+            fresh: crate::contract::DiagnosticLaunchBytes {
+                raw_json: "{}".into(),
+                sha256: "3".repeat(64),
+                spec_bytes_sha256: "4".repeat(64),
+            },
+        });
+        let cmd = payload_command(&diagnostic);
+        let (one, two) = ("1".repeat(64), "2".repeat(64));
+        assert_eq!(
+            args(&cmd)[3..],
+            [
+                "--diagnostic-launch",
+                "/work/diagnostic-input/computation-launch.json",
+                "--diagnostic-launch-sha256",
+                one.as_str(),
+                "--diagnostic-spec-sha256",
+                two.as_str()
+            ]
+        );
+    }
+    #[test]
+    fn command_launch_execs_argv_with_bound_environment() {
+        let req = crate::contract::command_fixture();
+        let cmd = payload_command(&req);
+        assert_eq!(
+            cmd.get_program(),
+            OsStr::new("/opt/study/launch/job-prime-tower-criu.sh")
+        );
+        assert_eq!(args(&cmd), ["main"]);
+        assert_eq!(cmd.get_current_dir(), Some(Path::new("/work/compute")));
+        let mut expected = base_env();
+        expected.insert("ISOLAB_OUTPUT_DIR".into(), "/work/compute/out".into());
+        expected.insert("ISOLAB_CRIU".into(), "1".into());
+        expected.insert("RAYON_NUM_THREADS".into(), "2".into());
+        assert_eq!(envs(&cmd), expected);
+        let mut single = req.clone();
+        let c = single.command.as_mut().unwrap();
+        c.argv.truncate(1);
+        c.threads = 1;
+        let cmd = payload_command(&single);
+        assert!(args(&cmd).is_empty());
+        assert_eq!(envs(&cmd)["RAYON_NUM_THREADS"], "1");
+    }
+    #[test]
+    fn command_completion_records_any_exit_but_ecbench_requires_zero() {
+        let ecbench = crate::contract::fixture();
+        let command = crate::contract::command_fixture();
+        assert_eq!(completion_phase(&ecbench, "running", 0), "completed");
+        assert_eq!(completion_phase(&ecbench, "running", 3), "failed");
+        assert_eq!(completion_phase(&command, "running", 0), "completed");
+        assert_eq!(completion_phase(&command, "running", 3), "completed");
+        assert_eq!(completion_phase(&command, "running", 137), "completed");
+        // A supervisor-killed payload stays failed; its exit is not a result.
+        assert_eq!(completion_phase(&command, "failed", 137), "failed");
+        let mut s = Status {
+            request_sha256: command.hash(),
+            attempt: 0,
+            phase: "completed".into(),
+            pid: None,
+            starttime: None,
+            generation: None,
+            exit_code: Some(3),
+            error: None,
+            updated: 0,
+        };
+        // A late checkpoint request does not turn a nonzero command exit into failure.
+        checkpoint(
+            &command,
+            &mut s,
+            1,
+            &mut owner_observation::Owner::begin(),
+            deadline::Deadline::utc_only(command.deadline_unix_seconds),
+        )
+        .unwrap();
+        assert_eq!(s.phase, "completed");
+        assert!(s.generation.is_none());
+        let op = Operation {
+            request_sha256: command.hash(),
+            attempt: 0,
+            action: "seal".into(),
+            generation: 0,
+            manifest_sha256: None,
+        };
+        assert_eq!(op.id().unwrap(), format!("seal-{:020}", 0));
+        // Seal is refused outside command mode and before completion.
+        assert!(seal(&ecbench, &mut s.clone()).is_err());
+        s.phase = "running".into();
+        assert!(seal(&command, &mut s).is_err());
+    }
+    #[test]
+    fn argv0_and_listed_binaries_are_hash_verified() {
+        let sh = sha_file(Path::new("/bin/sh")).unwrap().0;
+        let sleep = sha_file(Path::new("/bin/sleep")).unwrap().0;
+        let mut req = crate::contract::command_fixture();
+        req.build.ecbench_sha256 = sh.clone();
+        let c = req.command.as_mut().unwrap();
+        c.argv[0] = "/bin/sh".into();
+        c.binaries = BTreeMap::from([("/bin/sleep".into(), sleep.clone())]);
+        req.validate().unwrap();
+        verify_payload_identity(&req).unwrap();
+        let (main, binaries) = payload_hashes(&req).unwrap();
+        assert_eq!(main, sh);
+        assert_eq!(binaries["/bin/sleep"], sleep);
+        let mut wrong = req.clone();
+        wrong.build.ecbench_sha256 = "0".repeat(64);
+        assert!(verify_payload_identity(&wrong)
+            .unwrap_err()
+            .contains("argv[0]"));
+        let mut wrong = req.clone();
+        wrong
+            .command
+            .as_mut()
+            .unwrap()
+            .binaries
+            .insert("/bin/sleep".into(), "0".repeat(64));
+        assert!(verify_payload_identity(&wrong).is_err());
+        let mut missing = req.clone();
+        missing
+            .command
+            .as_mut()
+            .unwrap()
+            .binaries
+            .insert("/opt/absent/binary".into(), "0".repeat(64));
+        assert!(verify_payload_identity(&missing).is_err());
+        // The ecbench path still hashes the fixed ecbench location only.
+        let mut ecbench = crate::contract::fixture();
+        ecbench.build.ecbench_sha256 = sh;
+        assert_eq!(payload_executable(&ecbench), ECBENCH);
+        assert!(payload_hashes(&ecbench).map_or(true, |(_, b)| b.is_empty()));
+    }
+    #[test]
+    fn manifest_runtime_bytes_are_unchanged_without_command_binaries() {
+        let runtime = Runtime {
+            kernel: "k".into(),
+            cpu_identity: vec!["vendor_id: x".into()],
+            ecbench_sha256: "a".repeat(64),
+            tools: BTreeMap::from([("criu".into(), "b".repeat(64))]),
+            payload_binaries: BTreeMap::new(),
+        };
+        let legacy = format!(
+            r#"{{"kernel":"k","cpu_identity":["vendor_id: x"],"ecbench_sha256":"{}","tools":{{"criu":"{}"}}}}"#,
+            "a".repeat(64),
+            "b".repeat(64)
+        );
+        assert_eq!(serde_json::to_string(&runtime).unwrap(), legacy);
+        assert_eq!(serde_json::from_str::<Runtime>(&legacy).unwrap(), runtime);
+    }
+    #[test]
+    #[cfg(target_arch = "x86_64")]
+    fn command_perf_filter_denies_perf_and_reports_seccomp_filter_mode() {
+        let pid = unsafe { libc::fork() };
+        assert!(pid >= 0);
+        if pid == 0 {
+            let nnp = unsafe { libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) } == 0;
+            if !nnp || install_perf_filter().is_err() {
+                unsafe { libc::_exit(2) }
+            }
+            let rc = unsafe {
+                libc::syscall(
+                    libc::SYS_perf_event_open,
+                    std::ptr::null::<u8>(),
+                    0,
+                    -1,
+                    -1,
+                    0,
+                )
+            };
+            let denied =
+                rc == -1 && std::io::Error::last_os_error().raw_os_error() == Some(libc::EPERM);
+            let mode = unsafe { libc::prctl(libc::PR_GET_SECCOMP, 0, 0, 0, 0) };
+            unsafe { libc::_exit(if denied && mode == 2 { 0 } else { 3 }) }
+        }
+        let mut status = 0;
+        assert_eq!(unsafe { libc::waitpid(pid, &mut status, 0) }, pid);
+        assert_eq!(status, 0);
+    }
+    #[test]
+    fn seal_hashes_outputs_and_logs_without_following_links() {
+        use std::os::unix::fs::symlink;
+        let root = std::env::temp_dir().join(format!("command-seal-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&root);
+        fs::create_dir_all(root.join("out/nested")).unwrap();
+        fs::write(root.join("out/b.txt"), b"bee").unwrap();
+        fs::write(root.join("out/nested/a.json"), b"{}").unwrap();
+        fs::write(root.join("out/bad\nname"), b"x").unwrap();
+        fs::write(root.join("secret"), b"not an output").unwrap();
+        symlink("../secret", root.join("out/link")).unwrap();
+        fs::write(root.join("run.stdout"), b"stdout").unwrap();
+        fs::write(root.join("unlisted"), b"z").unwrap();
+        let (files, skipped) = seal_tree(&root, "out").unwrap();
+        let paths: Vec<_> = files.iter().map(|f| f.path.as_str()).collect();
+        assert_eq!(paths, ["out/b.txt", "out/nested/a.json", "run.stdout"]);
+        assert_eq!(files[0].sha256, crate::contract::digest(b"bee"));
+        assert_eq!(files[0].bytes, 3);
+        let reasons: BTreeMap<_, _> = skipped
+            .iter()
+            .map(|s| (s.path.as_str(), s.reason.as_str()))
+            .collect();
+        assert_eq!(reasons["out/link"], "not a regular file or directory");
+        assert_eq!(reasons["out/bad\nname"], "unsupported path name");
+        assert_eq!(reasons["run.stderr"], "absent");
+        let sums = String::from_utf8(sha256sums(&files)).unwrap();
+        assert_eq!(sums.lines().count(), 3);
+        assert!(sums.starts_with(&format!("{}  out/b.txt\n", crate::contract::digest(b"bee"))));
+        // An absent outputs directory is recorded, not an error.
+        let (files, skipped) = seal_tree(&root, "missing").unwrap();
+        assert_eq!(files.len(), 1);
+        assert_eq!(skipped[0].path, "missing");
+        for bad in ["", "/abs", "a/../b", "a//b", "./a", "a\\b", "tab\tname"] {
+            assert!(!sealable_path(bad), "{bad:?}");
+        }
+        fs::remove_dir_all(&root).unwrap();
     }
 }
