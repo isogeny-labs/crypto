@@ -15,7 +15,7 @@ in-code self-tests); `plots.py` only lays out recorded values.
 Attack ten theorems and assumptions that hold up ECDLP hardness, and run the
 $r_2$-versus-$k$ rank census that the earlier triage left as the step toward
 refuting Petit--Quisquater Assumption 2. The owner's aim is to find out whether a
-subexponential algorithm is possible. Nothing here proves one exists; the results
+subexponential algorithm is possible. Nothing here shows that one exists; the results
 remove or sharpen individual supports.
 
 == The ten attacks
@@ -24,7 +24,7 @@ remove or sharpen individual supports.
   columns: (auto, auto, auto, auto),
   align: left,
   [\#], [target], [instrument], [outcome],
-  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [pending (census running at commit time)],
+  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [literal reading fails on all 119 instances; iterated degree > 3 for n = 15 and 17--44, exactly 4 at n = 17--20],
   [2], [degree-2 criterion generalised], [Lean `SubspaceCriterion`], [$d_"lin" <= "sd"$ for any Macaulay degree; kernel-checked],
   [3], [`HEUR-DECOMPOSITION-PROBABILITY` (prime field)], [`pf_yield` census], [zero class = Poisson once unordered; variance 1.45× Poisson for negation-closed bases],
   [4], [mean of the yield heuristic], [Lean `MeanCount`], [mean $|F|^m / |G|$ is a theorem],
@@ -38,9 +38,19 @@ remove or sharpen individual supports.
 
 == pq2_rank
 
-Results pending; the census was still running when this revision was committed.
+#figure(image("figures/pq2_dlin.svg", width: 100%), caption: [Degree lower bounds per instance. d_iter: least degree whose iterated closure reaches all k linear consequences. d_lin: the same for the one-shot Macaulay matrix.])
 
-// pq2 figures are added with the results.
+#figure(image("figures/pq2_low_vs_k.svg", width: 100%), caption: [Dimension of the degree-≤1 part of each row space against k.])
+
+119 instances, n = 8 to 47, three per n; the sweep stopped during n = 47. The iterated degree-3
+closure reaches k for every n ≤ 14 and at n = 16, and reaches only 1 at n = 15 and on all
+84 instances from n = 17 to 44. A fresh degree-4 sweep at n = 17 to 20 reaches k on all
+12 instances. So the first fall degree 2 is never the solver degree, and the value 3 of
+the Kousidis--Wiemers reading is not reached from n = 17 to 44. An independent naive
+saturation in Python agrees with the Rust closure on five instances, and a same-seed rerun
+reproduces the log. The bound on F4 holds under the unformalised containment property;
+$d_"lin" <= "sd"$ is kernel-checked. The direction cuts against the subexponential
+binary-curve heuristics. [pcc:unverified]
 
 == pf_yield
 

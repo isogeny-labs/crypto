@@ -25,7 +25,16 @@ signed validator report. [pcc:unverified]
 See [`pq2_rank/README.md`](pq2_rank/README.md) and `figures/pq2_dlin.svg`,
 `figures/pq2_low_vs_k.svg`.
 
-Results pending: the census was still running when this revision was committed; the numbers follow in the next commit.
+![pq2_dlin](figures/pq2_dlin.svg)
+
+The sweep covers 119 instances, n = 8 to 47. All counts are unverified assertions [pcc:unverified].
+The iterated degree-3 closure reaches all k linear consequences for every instance with n ≤ 14
+and at n = 16. At n = 15 and at every n from 17 to 44 (87 instances) it reaches only 1.
+A fresh degree-4 sweep at n = 17 to 20 reaches k on all 12 instances, so the iterated degree
+there is exactly 4. Literal Assumption 2 (degree 2) fails on every instance. The
+Kousidis–Wiemers value 3 is not reached anywhere from n = 17 to 44. An independent Python
+closure agrees with the Rust one, and a same-seed rerun reproduces the log. Details:
+[`pq2_rank/README.md`](pq2_rank/README.md).
 
 ## pf_yield: the prime-field yield heuristic, with the convention fixed
 

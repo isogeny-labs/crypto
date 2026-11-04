@@ -141,6 +141,20 @@
       "source_locations": ["research/ecdlp_weakness_census_20261104/ext_decomp/README.md"],
       "tags": ["extension-field", "yield", "census"],
       "evidence_class": "measurement"
+    },
+    {
+      "id": "MEAS-PQ2-DLIN-CENSUS",
+      "label": "m = 2 descended S3: iterated degree-3 closure misses the linear consequences for n = 15 and 17-44",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Weil-descended third summation polynomial systems over F_{2^n} (ordinary binary curves, random subspace factor base of dimension ceil(n/2), field equations included), 119 instances for n = 8 to 47. The degree-d closure of the generators (every multiple within degree d of each new polynomial, until the rank is stable) reaches all k = N - affdim(Z) linear consequences at d = 3 for every n <= 14 and n = 16, and reaches only 1 of them at n = 15 and on all 84 instances with 17 <= n <= 44. On 12 fresh instances at n = 17 to 20 the degree-4 closure reaches k. The one-shot Macaulay matrix reaches 1 linear polynomial at degree 2 on every instance.",
+      "scope": "Finite range n <= 47; lower bounds on F4's maximal step degree under the containment of F4's output in the degree-D closure, which is not formalised; the one-shot bound d_lin <= sd is THM-SD-SUBSPACE-CRITERION. Cannot refute an asymptotic o(1) statement.",
+      "assumptions": [],
+      "source_refs": ["S-CENSUS-ROUND4"],
+      "source_locations": ["research/ecdlp_weakness_census_20261104/pq2_rank/README.md"],
+      "tags": ["groebner", "summation-polynomial", "solving-degree", "census"],
+      "evidence_class": "measurement"
     }
   ],
   "edges": [
@@ -155,6 +169,9 @@
     { "id": "R4-009", "from": "MEAS-RANK-DEFICIT-CENSUS", "to": "HEUR-PF-PKM-RANK-DELTA", "relation": "obstructs", "statement": "Delta = 10 left a rank deficit in at least one of 5 samples on 8 of 10 small curves.", "source_refs": ["S-CENSUS-ROUND4"] },
     { "id": "R4-010", "from": "MEAS-RANK-DEFICIT-CENSUS", "to": "HEUR-RELATION-RANK", "relation": "measures", "statement": "Rank deficit as a function of surplus in the right-kernel regime.", "source_refs": ["S-CENSUS-ROUND4"] },
     { "id": "R4-011", "from": "MEAS-TRACE-PULLBACK-CENSUS", "to": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE", "relation": "qualifies", "statement": "No one-dimensional subspace of F_{p^2} gives a small trace image on the tested curves.", "source_refs": ["S-CENSUS-ROUND4"] },
-    { "id": "R4-012", "from": "MEAS-EXT-DECOMP-CENSUS", "to": "HEUR-BK-GG-DECOMP-PROPORTION", "relation": "measures", "statement": "0.70-0.99 of 1/n! at n = 2, 3 for curves with F_{q^n} coefficients; the premise fails for subfield curves.", "source_refs": ["S-CENSUS-ROUND4"] }
+    { "id": "R4-012", "from": "MEAS-EXT-DECOMP-CENSUS", "to": "HEUR-BK-GG-DECOMP-PROPORTION", "relation": "measures", "statement": "0.70-0.99 of 1/n! at n = 2, 3 for curves with F_{q^n} coefficients; the premise fails for subfield curves.", "source_refs": ["S-CENSUS-ROUND4"] },
+    { "id": "R4-013", "from": "MEAS-PQ2-DLIN-CENSUS", "to": "HEUR-GB-PQ-ASSUMPTION-2", "relation": "obstructs", "statement": "The solver degree is never the first fall degree 2, and the Kousidis-Wiemers value 3 is not reached for 17 <= n <= 44; exactly 4 at n = 17 to 20.", "source_refs": ["S-CENSUS-ROUND4"] },
+    { "id": "R4-014", "from": "MEAS-PQ2-DLIN-CENSUS", "to": "GAP-PQ2-M2-RANK-CENSUS", "relation": "measures", "statement": "Runs the rank census this gap asked for, with the iterated closure as the F4 proxy.", "source_refs": ["S-CENSUS-ROUND4"] },
+    { "id": "R4-015", "from": "THM-SD-SUBSPACE-CRITERION", "to": "MEAS-PQ2-DLIN-CENSUS", "relation": "conditions", "statement": "The criterion turns each low_d < k count into a degree lower bound.", "source_refs": ["S-CENSUS-ROUND4"] }
   ]
 }
