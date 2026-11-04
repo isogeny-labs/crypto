@@ -2,6 +2,8 @@
 
 Protocol: [PROTOCOL.md](PROTOCOL.md), frozen 2026-11-04T02:44:38Z at git `9a3b129f9dde3557e84c784a5bed33c6fceb048c`; route `local`. Counted GAE only (deterministic, host independent); no wall-time claim; development loop, no validation-gate row. Loop home: [`../`](../README.md); ledger: [`../ledger.json`](../ledger.json).
 
+Claim record: `PCC-20261104-31cd98` (`python3 tools/pcc/pcc.py standing PCC-20261104-31cd98`). Until a signed replay and recompute exist, this round's outcome is an unverified assertion [pcc:unverified].
+
 ## Outcome
 
 | k | class | sel | sel / inc at w = 0 [95%] | w = 0.1 | w = 1 | band | S sel (w = 0 / 0.1 / 1) | S inc | S rho-neg | distance sel / rho |

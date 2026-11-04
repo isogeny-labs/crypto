@@ -2236,6 +2236,30 @@ fn ratchet_svg(ledger: &Ledger, track: &str) -> String {
     s
 }
 
+/// The newest pcc claim whose statement names this round
+/// (`ic_autolab round N ...`), read from `pcc/claims/` under the working
+/// directory (the repository root).
+fn find_claim(round: u64) -> Option<String> {
+    let prefix = format!("ic_autolab round {round} ");
+    let mut found: Vec<(String, String)> = std::fs::read_dir("pcc/claims")
+        .ok()?
+        .filter_map(|e| e.ok())
+        .filter_map(|e| {
+            let v = read_json(&e.path()).ok()?;
+            let statement = v["statement"].as_str()?;
+            let id = v["id"].as_str().or_else(|| v["claim_id"].as_str())?;
+            statement.starts_with(&prefix).then(|| {
+                (
+                    v["created_at"].as_str().unwrap_or("").to_string(),
+                    id.to_string(),
+                )
+            })
+        })
+        .collect();
+    found.sort();
+    found.pop().map(|(_, id)| id)
+}
+
 fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     let ledger = load_ledger(home)?;
     let dir = round_dir(home, round);
@@ -2258,6 +2282,19 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
         manifest["git_head"].as_str().unwrap_or("unknown"),
         manifest["route"].as_str().unwrap_or("")
     );
+    // The round's claim record (AGENTS.md "Sabotage is assumed"): cited by id
+    // with an explicit unverified tag; `pcc standing` is the only source for
+    // a stronger word.
+    match find_claim(round) {
+        Some(id) => {
+            md += &format!(
+                "Claim record: `{id}` (`python3 tools/pcc/pcc.py standing {id}`). Until a signed replay and recompute exist, this round's outcome is an unverified assertion [pcc:unverified].\n\n"
+            )
+        }
+        None => {
+            md += "Claim record: none yet. Record one with `python3 tools/pcc/pcc.py claim new` before citing this round; until then its outcome is an unverified assertion [pcc:unverified].\n\n"
+        }
+    }
     // Outcome first.
     md += "## Outcome\n\n";
     if let Some(res) = &result {

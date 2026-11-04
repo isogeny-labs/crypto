@@ -7,8 +7,11 @@ ledger carries the ratchet. Development evidence only: no round is a leaderboard
 or `benchmarks/README.md` row until it passes the validation gate.
 
 The driver is native (`src/bin/ic_autolab.rs`; AGENTS.md "Implementation
-language: no Python"). Every measurement is an ecbench session: verified
-solves, exact replays, the §5a pricing band, paired comparisons. The driver
+language: no Python"). Every measurement is an ecbench session: each solve
+checked against its target by ecbench, same-host replays, the §5a pricing
+band, paired comparisons. Under AGENTS.md "Sabotage is assumed" these are the
+producer's own checks; a round's result is cited by its pcc claim id with its
+standing (see Rounds). The driver
 writes specs, calls `ecbench`, reads its JSON back, classifies under the rule
 frozen in each round's `PROTOCOL.md`, and keeps `ledger.json`. It computes no
 ECDLP result itself.
@@ -88,6 +91,8 @@ containing 1; **regression** if the interval is above 1 or the band orders
 `inc < sel`; **null** otherwise. Relabelling (a headline count falls while
 total cost rises) is caught by the band. Distance to rho,
 `S(sel) / S(rho-neg)` at each weight, is reported as the distance remaining.
+The class names are labels of this rule, not claims; a round's outcome is
+cited by its claim record [pcc:unverified].
 
 ## Rounds
 
@@ -96,6 +101,11 @@ total cost rises) is caught by the band. Distance to rho,
 | 1 | generic | 20, 24 | no challenger at either size: the `ksum3` incumbents (N = 11, 20) beat their N neighbourhood and the `mitm2` / `mitm3` exploration arms in train | [round-001](round-001/README.md), [PDF](round-001/REPORT.pdf) |
 | 2 | generic | 20, 24 | k = 24: **improvement**, `ksum4-n12` (`ksum:m=4`, N = 12) replaces `ksum3-n20`: paired sel / inc 0.917 [0.879, 0.957] at w = 0 (0.911 at w = 0.1, 0.880 at w = 1), band `sel < inc`, A/A exactly 1, 480/480 holdout runs verified (session `ECBS1h32d89e6cb3e5`); distance to rho 6.5x -> 6.0x. k = 20: no challenger (`ksum4-n5` 3.9x worse, `ksum5-n4` exhausted on 16/16 runs, `mitm2` refinements worse) | [round-002](round-002/README.md), [PDF](round-002/REPORT.pdf) |
 | 3 | generic | 20, 24 | no challenger at either size. k = 20: the cross-size transfer of `ksum:m=4` came closest (`ksum4-n10` 10.29 vs inc 8.70 at w = 0, but 13.37 vs 15.56 at w = 1; band unresolved), `ksum4-n7` 10.95, `rootfind-mitm:m=2` 11.25. k = 24: `ksum4-n12` is a sharp optimum (N = 8 at 2.3x, N = 17 at 2.6x, N = 6 and 24 far worse); `rootfind-mitm:m=2` 12.17; `rootfind-pairs:m=3` costs 70x (k = 20) and 320x (k = 24) the incumbent | [round-003](round-003/README.md), [PDF](round-003/REPORT.pdf) |
+
+Claim records (AGENTS.md "Sabotage is assumed: proof-carrying claims"): round 1
+`PCC-20261104-6ca5d2`, round 2 `PCC-20261104-fa70c6`, round 3
+`PCC-20261104-31cd98`, all `statement` claims with standing `unverified` until a
+second host signs a replay and a validator signs a recompute [pcc:unverified].
 
 The ledger (`ledger.json`, `history`) carries every ratchet with its delta and
 evidence; `trials` holds every arm ever measured (31 after round 3) and
@@ -114,6 +124,6 @@ evidence; `trials` holds every arm ever measured (31 after round 3) and
   (a new oracle, a new table layout, linear-algebra or walk changes) are the
   next lever and need their own build and family entry.
 - `ic sweep` (docs/ic/SWEEPER.md) is the TPE search over planted instances;
-  this loop is the frozen-protocol, verified-public-target confirmation that
+  this loop is the frozen-protocol confirmation on fresh public targets that
   a sweep's hypothesis has to pass. The two can be chained: sweep to propose,
   this loop to confirm and ratchet.
