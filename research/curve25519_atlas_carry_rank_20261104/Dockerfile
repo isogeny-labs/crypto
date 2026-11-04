@@ -7,12 +7,13 @@ RUN --mount=type=secret,id=proxy_ca,required=true \
     && python3 -m venv /opt/z3 \
     && PIP_CERT=/run/secrets/proxy_ca /opt/z3/bin/pip install --no-cache-dir --only-binary=:all: z3-solver==5.3.3.0
 WORKDIR /source
-COPY Makefile study.cpp curve25519_fixture.hpp bv_lowering.hpp openssl_replay.cpp ./
-COPY control/Cargo.toml control/Cargo.lock ./control/
-COPY control/src ./control/src/
-RUN test "${#SOURCE_REVISION}" = 40 && ! printf '%s' "$SOURCE_REVISION" | grep -q '[^0-9a-f]'
-RUN make build OUT=/source/study SOURCE_REVISION="$SOURCE_REVISION" SOURCE_DIRTY=0
+# .dockerignore restricts this copy to the native source and locked crate.
+# One source layer avoids duplicating the large builder on VFS backends.
+COPY . ./
 RUN --mount=type=secret,id=proxy_ca,required=true \
+    test "${#SOURCE_REVISION}" = 40 && ! printf '%s' "$SOURCE_REVISION" | grep -q '[^0-9a-f]' \
+    && make build OUT=/source/study SOURCE_REVISION="$SOURCE_REVISION" SOURCE_DIRTY=0 \
+    && \
     CARGO_HTTP_CAINFO=/run/secrets/proxy_ca cargo build --locked --release --manifest-path control/Cargo.toml
 
 FROM debian:bookworm-slim@sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3
