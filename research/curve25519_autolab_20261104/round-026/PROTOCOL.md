@@ -68,3 +68,10 @@ An improvement makes `sel` the incumbent of its track and size in `ledger.json`,
 Route: `local`. Counted GAE, deterministic and host-independent; no wall-time claim. Isolation level earned is recorded per session and does not change the counts. This is a development loop: no round reaches the IC leaderboard or `benchmarks/README.md` without the validation gate (replay certificate on a second host class, validator report, matched rho with the band; `docs/VALIDATION_GATE.md`).
 
 Exposures excluded: 70 target seeds already used on this family (ledger exposures); the seeds above are new.
+
+## Amendment: selection (2026-11-04T08:03:23Z, after train, before holdout)
+
+- k = 28: selected `wsum2-b50-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wsum:coef=50,free=1`), train mean S = 2.505 / 2.784 / 5.290 against `inc` 2.640 / 2.870 / 4.939; Pareto alternative at w = 1: `wsum2-b75-n2`. Holdout spec `specs/holdout-k28.json`, `target_seed` 2026136928.
+- k = 32: no candidate below `inc` (2.581 / 2.833 / 5.100) at w = 0 on the train targets; no challenger, no holdout.
+
+Holdout spec sha256: {"holdout-k28":"47ab0979adb37bf964276089da0cfccbed49033403b7625527218036ef9b02e6"}

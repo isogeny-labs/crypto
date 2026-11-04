@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0756Z-c25519-autolab-r25-k20",
+  "latest_record": "20261104T0801Z-c25519-autolab-r26-k28-32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 22,
+    "measured": 23,
     "open": 0
   },
   "repo": "crypto",
@@ -197,6 +197,35 @@
         }
       ],
       "problem": "ic:curve25519-family-k24",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.579777912430277,
+      "latest": 2.579777912430277,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 2.58911
+      },
+      "metric": "s_w0_incumbent",
+      "points": [
+        {
+          "commit": "49addad3c9f5",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 2.58911
+          },
+          "n": 64,
+          "record": "20261104T0801Z-c25519-autolab-r26-k28-32",
+          "reference": 0.9963957691476318,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 26, k = 28/32: C = 2 B-grid refinement 45..140 finds no improvement (k = 28 regression 1.066, k = 32 no challenger); method at its model optimum",
+          "value": 2.579777912430277
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
       "unit": "S"
     },
     {
