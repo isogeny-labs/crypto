@@ -100,3 +100,40 @@ An archive-based original-source regression and a local reverse-patch copy both
 reproduced the same omitted-scalar failure; the local copy's tracked blobs were
 compared with the original Git object identities before adding the control.
 The failed original ordering is retained, not counted as a passing test. [pcc:unverified]
+
+## Broad combined-code status before driver upload
+
+Producer status PCC-20261104-f78364 has unverified standing. The release
+library invocation reports **5,987 passed, 27 failed and 130 existing
+ignored cases**. It uses the exact pre-policy source bound in
+`broad-run-command.json`; nested child libtest summaries are not added. After
+restoring exact historical inputs, the non-policy failed-case reruns report
+19 passes and six remaining failures. Two other failures were the missing
+native optimization policy; the five fresh current-source policy controls now
+pass. Three current adapter controls also pass. There is no single all-green
+broad invocation or full-suite pass claim. [pcc:unverified]
+
+The six remaining cases comprise four non-adapter assertions and two diagnostic
+clock failures reporting `No such file or directory`. A separate exact main
+worktree is compiling those controls; their classification remains pending.
+Current CLI debug unit tests report15 passes and1 existing ignore; integration
+and the final release build remain pending at this upload. [pcc:unverified]
+
+First debug links ended with SIGBUS while the32GiB overlay was99%full. Removed
+only this task's reproducible compiler caches, retained the failed output and
+disk snapshots, and retried local debug links with `--strip-debug`. The copied
+linker wrapper is retained. An extra full debug namespace was interrupted as
+redundant after the required broad release invocation completed; its partial
+log is retained without a pass claim. Final release qualification uses the
+standard linker and maintained release profile. [pcc:unverified]
+
+Library follow-up1397 is merged as8d054f8843b73d0e2a07c4b1266d93db740cfd0b.
+Its expected second parent, recomputed merge tree and main reachability match;
+`mirror-1397-merge-custody.json` records the actual first parent rather than
+assuming the PR metadata's older base SHA. Tracking that PR ends here.
+
+The frozen v3 protocol hash is
+`dcbd69ecce95a742c3f026ce7a839b676b7a31305e596255689167f97e18c58c`,
+bound to source commit43ec7065133fc6727382ed744c7c86380170c984.
+`frozen-input-files.v3.sha256` names the active inputs; the original manifest
+continues to apply at its historical revision. No scientific job was launched.
