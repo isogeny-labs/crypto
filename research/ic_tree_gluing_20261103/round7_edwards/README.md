@@ -134,3 +134,282 @@ The host was shared, though E1 and the T references ran under identical caps one
   timeouts. No run reached 1,200 s.
 - One target per cell. The E instances are not the Weierstrass instances (different curve),
   so the cells match in (m, t) and the targets are random, not identical.
+
+## Round 7b: arm E1Q, quotient of E1 by the 2-torsion translations
+
+### Prediction E1Q (written 2026-11-04T06:23:04Z, after generating the E1Q systems, before any E1Q run)
+
+The E1Q systems (construction below) have all node equations of total degree 2, and the
+remainder-tower equations of degree 3. The max input degree is 3, against 4 in E1 and T. Each
+tower has one level fewer (W = w² ∈ μ_(2^(t−1))), so N is 12, 15, 17, 21, against E1's 13, 16,
+18, 22.
+
+1. **D_E1Q ≤ D_E1 − 1 in every cell** (the coordinator's expectation is "same or one lower";
+   mine leans to strictly lower): m = 3 gives D ∈ {4, 5} at t = 4, 5; m = 4, t = 4 gives
+   D ∈ {5, 6}. If D does not drop, the reading is that the excess degree is in the coupling's
+   correspondence structure and not in its sign redundancy.
+2. **Quotient dimension = E1's / 2^(m−1):** 12/4 = 3 at m = 3 and 48/8 = 6 at m = 4. These equal
+   T's, since the cherry swap remains.
+3. **Widest matrix smaller than E1's** by at least 2× in every finished cell. m = 4, t = 5 finishes
+   within 2 GiB (E1 did not).
+
+### Construction of E1Q (`gen7.sing`, `armE1Q`)
+
+- **Group.** S3E = SI(v1², v2², v3²) − 2(a−d)·v1v2v3, where
+  SI(A, B, C) = d·ABC − d(AB + AC + BC) + a(A + B + C) − a. Singular checks this identity
+  symbolically (`logs/genq.out`).
+- In the tree, give each node n its three incident coordinates: two children and the
+  parent's separator, or v_R at the root. Let G be the group of sign vectors e on all leaf
+  and separator coordinates with e_a·e_b·e_X = 1 at every node, where e_R = 1 because v_R is
+  known. G acts by translating the leaf points by the 2-torsion point (0, −1); the separators
+  then follow. |G| = 2^(m−1): the leaf signs e_1, …, e_(m−1) are free, and the node
+  constraints then fix every separator sign and the last leaf sign.
+- **Invariant variables.**
+  - Per cherry: S = W₁ + W₂ and Q = W₁W₂, where W_i = w_i² ∈ μ_(2^(t−1)). They get the
+    degree-2 remainder tower of depth t−1. V₁ + V₂ = g²S and V₁V₂ = g⁴Q.
+  - Per separator: Y = X².
+  - Per node: one signed product p (cherry: p = v₁v₂X; m = 3 root: p = X·v₃; m = 4 root:
+    p = X₁X₂).
+  - The last leaf at m = 3 has W₃ = w₃² with a Kummer chain of depth t−1.
+- **Node equations.** For node (A, B, C) with product π:
+  SI(A, B, C) − 2(a−d)·π = 0 and π² = A·B·C. Both have total degree 2. At the root,
+  C = v_R² and π = v_R·p, with p² = A·B.
+
+**Faithfulness (proof sketch).**
+- *Forward.* Every E1 solution maps to an E1Q solution. The map is polynomial; SI(V) − 2(a−d)π
+  is S3E; π² = ABC holds by definition; and w ∈ μ_(2^t) implies w² ∈ μ_(2^(t−1)).
+- *Lifting.* Every E1Q solution with all W, Y nonzero lifts to exactly |G| = 2^(m−1) E1
+  solutions, one orbit of G.
+  - Pick square roots w₁, w₂ of the cherry's W₁ ≠ W₂. Any square root of an element of
+    μ_(2^(t−1)) lies in μ_(2^t), so these are factor-base points.
+  - There are 4 unordered lifts {w₁, w₂} of {W₁, W₂}.
+  - Set X = p/(g²w₁w₂). Then X² = p²/(g⁴Q) = Y, and the cherry's S3E holds because
+    SI − 2(a−d)·v₁v₂X = SI − 2(a−d)·p = 0.
+  - At m = 3, w₃ = p₂/(gX) is forced. Then w₃² = p₂²/(g²Y) = W₃, and the root S3E holds.
+    That gives 4 lifts.
+  - At m = 4, the two cherries give 16 choices. The root condition X₁X₂ = p_r keeps exactly
+    half, because flipping the sign of w₁ flips X₁. That gives 8 lifts.
+  - Distinct lifts of one point are distinct E1 points (different (s, ·) or X), and G maps
+    lifts to lifts. So the solution count divides exactly by 2^(m−1) on the nondegenerate
+    locus.
+  - On the planted relation W ≠ 0 holds by construction, and Y ≠ 0 because the planted
+    partial sums have v ≠ 0. The measured qdims (below) agree.
+- *Planted check.* `writesys` evaluates every E1Q equation at the planted values
+  (W_i = w_i², Y_c = X_c², p from the actual signed v's) before writing (`logs/genq.out`).
+  The other 12 systems are byte-identical to the first generation (sha256 compared).
+
+### Result E1Q [pcc:unverified]
+
+Same engine, caps (1 thread, 2 GiB, 1,200 s) and host as above. Same planted targets as E1.
+
+| m | t | N: E1Q / E1 / T | input deg | D: E1Q | D: E1 | D: T | widest: E1Q / E1 / T | wall s: E1Q / E1 / T | qdim: E1Q / E1 / T |
+|--:|--:|--|--:|--:|--:|--:|--|--|--|
+| 3 | 4 | 12 / 13 / 13 | 3 | **5** | 6 | 6 | 1,521 / 6,971 / 7,077 | 0.07 / 1.8 / 3.7 | 3 / 12 / 3 |
+| 3 | 5 | 15 / 16 / 16 | 3 | **5** | 6 | 6 | 5,455 / 24,792 / 23,720 | 2.1 / 120 / 587 | 3 / 12 / 3 |
+| 4 | 4 | 17 / 18 / 18 | 3 | **5** | 7 | 7 | 5,796 / 21,795 / 25,742 | 2.5 / 60 / 697 (6 GiB; 634 s to the 2 GiB cap) | 6 / 48 / 6 |
+| 4 | 5 | 21 / 22 / 22 | 3 | ≥ 6 (2 GiB cap at 75 s) | ≥ 7 (cap) | ≥ 7 (round 2, 2,400 s) | ≥ 47,623 / ≥ 91,279 / ≥ 218,583 | 75 / 61 / 2,400 | — |
+
+**Prediction check E1Q.**
+1. D lower: confirmed and exceeded. D drops by 1 at m = 3 and by **2** at m = 4, t = 4.
+   That cell sits at the top of my range and below the coordinator's "same or one lower".
+2. The quotient dimension divides by exactly 2^(m−1) (12 → 3, 48 → 6): confirmed.
+3. Widest at least 2× smaller: confirmed (3.8–4.6×).
+4. "m4 t5 finishes in 2 GiB": falsified. The hash table overflowed in degree 5–6 after a
+   degree-6 round had been selected, so D ≥ 6.
+
+### Reading E1Q [pcc:unverified]
+
+- **First measured drop in D for the glued tree.** Against the cherry floor (D = 4), the
+  coupling excess E falls from 2 to 1 at m = 3 and from 3 to 1 at m = 4, t = 4.
+  - At m = 4, D_E1Q = 5 is below T's 7 and the full-symmetric F's 8 at the same arity. At
+    m = 3 it equals F's 5.
+  - The cost falls with it: at m = 4, t = 4, 2.5 s against 60 s for E1 and 697 s for T
+    (round 1). At m = 3, t = 5, 2.1 s against 587 s for T on the same host.
+- **Mechanism.**
+  - Once the 2-torsion sign redundancy is quotiented, each 2-to-2 node becomes a *pair* of
+    quadrics in invariant coordinates: a linear equation in the signed product plus its norm
+    equation. The input degree drops from 4 to 3.
+  - The towers lose one level, because w² ∈ μ_(2^(t−1)).
+  - This is the tree analogue of the FGHR use of the (Z/2)^(m−1) action. It needs a rational
+    2-torsion point whose translation acts as v → −v, which every twisted Edwards curve has.
+- **Fair-base caveat.**
+  - The base at t has 2^t v-values but only 2^(t−1) classes modulo T2. Relations modulo
+    2-torsion are harmless in the prime-order subgroup, so the effective factor base of E1Q
+    at t has the size of T's at t−1.
+  - The equal-effective-base comparison is E1Q(t = 5) against T(t = 4): D 5 vs 6 at m = 3,
+    and 5,455 vs 7,077 columns.
+  - At m = 4 the equal-base cell E1Q(t = 5) was capped at D ≥ 6, so D 5 vs 7 at t = 4 is
+    *not* yet an equal-base comparison. Deciding it needs E1Q m4 t5 with more than 2 GiB.
+- **Not yet a success claim.** These are stage diagnostics of the solver axis. No pipeline is
+  priced and there is no S or rho comparison. There is one target per cell, the timings come
+  from a shared host, and the result is unverified.
+- **Next.**
+  - E1Q at m = 4, t = 5 and m = 5, 6 on a larger memory cap, to measure the arity slope of E.
+  - A Weierstrass control with a rational 2-torsion point, to test whether the gain comes
+    from the 2-torsion quotient or from the Edwards model.
+  - A second target per cell.
+
+## Round 7c: Montgomery control on the same group, equal-base comparison, second target
+
+### Prediction 7c (written 2026-11-04T06:41:00Z, after generating the 7c systems, before any 7c run)
+
+Arms (construction below):
+- **TW:** the x-only cherry tree on the Montgomery model of the same curve.
+- **TQ:** its 2-torsion quotient, in ξ = x + 1/x.
+- **E1, E1Q at t = 3:** for the equal-base cells.
+- **k = 1 targets:** for E1, E1Q, TW and TQ.
+
+1. **TW: D = D_T** (6 at m = 3, t = 4, 5). The Montgomery S3M is the short-Weierstrass S3 after
+   an affine change of x, so TW is arm T on a different curve and base.
+2. **TQ: D = 6 at m = 3**, the same as TW, with no drop. TQ's node relation S3Q is again a
+   bidegree-(2,2,2), total-degree-4 summation polynomial: it is the x-only S3 of the
+   2-isogenous curve. Quotienting by T2 in the x-line does not split the node into quadrics,
+   as E1Q's signed product does. If TQ has D = 5, the quotient alone explains E1Q, and this
+   prediction is falsified.
+3. **Equal base.**
+   - E1 at t = 3: D = 6 at m = 3 and D = 7 at m = 4, the same as at t = 4. The base-size
+     effect is nil.
+   - E1Q at t = 3: D = 5 at m = 3, and D = 5 at m = 4.
+   - So E1Q's drop is explained by the encoding (the Edwards v² coordinate with signed node
+     products), not by the base size.
+4. **Second target:** k = 1 gives the same D as k = 0 in every cell that finishes.
+5. **m = 4, t = 5:** TW and TQ hit the 2 GiB cap (D ≥ 7, D ≥ 6). m = 4 at t = 4 cannot be
+   built for TW and TQ, because the closed Montgomery base has only 3 classes {x, 1/x}.
+
+### Construction 7c (`gen7.sing` arms TW, TQ; `basesize.sing`; `inst7w.sing`)
+
+- **Same group, Montgomery model.** B·y² = x³ + A·x² + x with A = 2(a+d)/(a−d) = 629,144 and
+  B = 4/(a−d) = 629,146, through x = (1+v)/(1−v) and y = x/u. The Edwards T2 = (0, −1) maps
+  to (0, 0), and translation by it is x → 1/x.
+- **S3M.** Eliminating y gives S3M = (x₁x₂ + x₁x₃ + x₂x₃ − 1)² − 4x₁x₂x₃(x₁ + x₂ + x₃ + A), after
+  dropping a spurious (x₁−x₂)² factor; it equals this closed form. Singular checks
+  x₁²x₂²·S3M(1/x₁, 1/x₂, x₃) = S3M. S3M is the short-Weierstrass S3 after an affine change of
+  x, so TW is arm T on this curve.
+- **Base.** x = w ∈ μ_(2^t), x ≠ ±1. This base is closed under x → 1/x (the only Kummer
+  cosets closed under inversion lie in μ_(2^(t+1)); the other coset was not larger).
+- **TW:** cherry (s, q) of x's with arm T's remainder towers; nodes S3Msym and S3M.
+- **TQ:** the quotient by T2 in the x-line, with ξ = x + 1/x (the 2-isogeny x-map up to an
+  affine map).
+  - Node relation S3Q is the eliminant of x₁, x₂, x₃ from S3M and x_i² − ξ_i x_i + 1. Its
+    nontrivial factor has degree 2 in each ξ and total degree 4: it is the x-only S3 of the
+    quotient curve.
+  - Base membership: ξ = z + 1/z with z^(2^t) = 1 ⟺ D_(2^t)(ξ) = 2. This is enforced by a
+    Dickson tower (R_j = R_(j−1)² − 2 mod the cherry quadratic) of the same depth as T's tower.
+  - TQ identifies all 2^m translations of the leaves by T2, and also R with R + T2.
+- **Planting.** Montgomery planted points are drawn on their own LCG stream (seed SEED7 + 1).
+  They are moved to Edwards to be summed, and moved back. Every TW/TQ system passed the planted
+  check.
+- **Why the instances are not "transported".** The Edwards planted points have
+  v ∈ 2·μ_(2^t). Their Montgomery images x = (1+v)/(1−v) lie in no Kummer coset of x, so they
+  are not in TW's base. TW and TQ therefore plant fresh points on the same group.
+- **k = 1:** SEED7 = 0xED7A1105, files tagged `_k1`. k = 0 at t = 3: CELLS7 = "3 3 4 3".
+- **Base sizes** (`basesize.sing`). A *class* is a base point up to ±P, and up to T2 where
+  the base is closed under it.
+
+  | t | T (round-1 curve): x-values = classes | E1/E1Q: v-values / classes | TW/TQ: x-values / classes |
+  |--:|--:|--:|--:|
+  | 3 | 2 | 8 / 4 | 4 / 2 |
+  | 4 | 5 | 14 / 7 | 6 / 3 |
+  | 5 | 13 | 24 / 12 | 12 / 6 |
+
+  Consequences:
+  - T at t = 3 cannot be built for m ≥ 3 (2 usable abscissas; `logs/r7c/inst.out`).
+  - TW/TQ cannot be built at m = 4, t ≤ 4, or at m = 3, t = 3.
+  - **Correction to the round-7b caveat.** E1 and E1Q at the same t use the *same* point set;
+    the quotient changes the encoding, not the base. By class count, E1Q(t) is already
+    comparable to T(t): 7 vs 5 classes at t = 4, and 12 vs 13 at t = 5. The "t − 1"
+    comparison gives E1Q a *larger* base than the arm it is compared with.
+
+### Result 7c [pcc:unverified]
+
+Same engine and caps (1 thread, 2 GiB, 1,200 s), one run at a time. "≥" marks the 2 GiB
+hash-table cap (exit 139). The k = 1 cells reproduce k = 0's D and width in every cell.
+
+| cell | T (round 1) | E1 | E1Q | TW | TQ |
+|---|---|---|---|---|---|
+| m3 t3 | not buildable | **5** (874; 0.07 s; qdim 12) | **4** (206; 0.08 s; 3) | not buildable | not buildable |
+| m3 t4 k0 | 6 (7,077; 3.7 s; 3) | 6 (6,971; 1.8 s; 12) | 5 (1,521; 0.07 s; 3) | **6** (7,067; 3.6 s; 12) | **6** (7,137; 3.8 s; 9) |
+| m3 t4 k1 | 6 (7,077; round 1) | 6 (6,971; 1.3 s; 12) | 5 (1,521; 0.10 s; 3) | 6 (7,067; 3.9 s; 12) | 6 (7,137; 3.9 s; 9) |
+| m3 t5 k0 | 6 (23,720; 587 s; 3) | 6 (24,792; 120 s; 12) | 5 (5,455; 2.1 s; 3) | **6** (23,708; 527 s; 12) | **6** (23,980; 537 s; 9) |
+| m3 t5 k1 | 6 (23,720; round 1) | 6 (24,792; 130 s; 12) | 5 (5,455; 2.2 s; 3) | 6 (23,708; 493 s; 12) | 6 (23,980; 544 s; 9) |
+| m4 t3 | not buildable | **6** (2,178; 0.25 s; 48) | **4** (519; 0.02 s; 6) | not buildable | not buildable |
+| m4 t4 k0 | 7 (25,742; 697 s at 6 GiB) | 7 (21,795; 60 s; 48) | 5 (5,796; 2.5 s; 6) | not buildable | not buildable |
+| m4 t4 k1 | — | 7 (21,795; 61 s; 48) | 5 (5,796; 2.5 s; 6) | not buildable | not buildable |
+| m4 t5 k0 | ≥ 7 (round 2) | ≥ 7 | ≥ 6 | ≥ 7 (≥ 92,134) | ≥ 7 (≥ 94,250) |
+| m4 t5 k1 | — | ≥ 7 | ≥ 6 | ≥ 7 | ≥ 7 |
+
+Entries are D (widest; wall; qdim). TQ's quotient dimension is 9, against TW's 12. TQ merges
+all leaf translations and R with R + T2, so the orbit structure differs from E1Q's. I have not
+derived the 9.
+
+**Equal-factor-base view,** as the coordinator defined it (E1Q at t against E1 and T at t − 1):
+
+| m | t | D: E1Q(t) | D: E1(t−1) | D: T(t−1) |
+|--:|--:|--:|--:|--:|
+| 3 | 4 | 5 | 5 | not buildable |
+| 3 | 5 | 5 | 6 | 6 |
+| 4 | 4 | 5 | 6 | not buildable |
+| 4 | 5 | ≥ 6 | 7 | 7 |
+
+**Prediction check 7c.**
+1. D_TW = D_T: confirmed (6, 6). TW's widths match T's (23,708 vs 23,720) and so do its times
+   (527 s vs 587 s).
+2. D_TQ = 6 with no drop: confirmed at m = 3, t = 4, 5. TQ is no narrower or faster than TW.
+3. E1 at t = 3 has the same D as at t = 4: **falsified**. E1(t=3) has D 5 (m = 3) and 6 (m = 4),
+   one below its t = 4 values. E1Q(t=3) has D = 4 at both m. A smaller base lowers D by about
+   1 at t = 3 for both arms.
+4. k = 1 gives the same D as k = 0: confirmed in all 10 comparable cells.
+5. The m = 4, t = 5 cells hit the cap (TW, TQ ≥ 7): confirmed. m = 4, t = 4 cannot be built for
+   TW/TQ: confirmed.
+
+### Reading 7c [pcc:unverified]
+
+- **The base size does not explain E1Q's drop.**
+  - At equal t, E1 and E1Q have the identical point set, and E1Q is 1 below E1 at m = 3 and 2
+    below at m = 4.
+  - By class count, E1Q(t=4) (7 classes) has D = 5 against T(t=4) (5 classes) at D = 6.
+    E1Q(t=5) (12 classes) has D = 5 against T(t=5) (13 classes) at D = 6. A comparable or larger
+    base has a lower D.
+  - The coordinator's t − 1 comparison ties at m = 3, t = 4 (E1Q(4) = E1(3) = 5). But E1(t=3)
+    has only 4 classes against E1Q(t=4)'s 7, and at t = 3 a smaller base does lower D by 1.
+    E1Q itself drops to 4 at t = 3, so at every common t, E1Q stays strictly below E1.
+- **The quotient alone does not explain it.**
+  - TQ quotients the same T2 action on the same group. It gives D = 6 = TW at m = 3, t = 4, 5,
+    with the same widths and times.
+  - Quotienting in the x-line by the isogeny map ξ = x + 1/x leaves a node relation of total
+    degree 4, the x-only S3 of the quotient curve. That is the same shape as before, so F4
+    sees the same degree.
+- **The Edwards model alone does not explain it.** E1 has the same D as T and TW at every
+  common cell. It only lowers the constant, through sparser matrices.
+- **What explains it is the combination,** which needs a coordinate in which T2 acts
+  *linearly*: v → −v.
+  - Then the quotient keeps the sign information polynomially, as one signed product per node
+    (p = v·v′·X).
+  - Each node splits into two quadrics: SI(squares) − 2(a−d)·p = 0 and p² = product of
+    squares.
+  - In Montgomery x, T2 acts by x → 1/x. The available polynomial invariant ξ = x + 1/x
+    discards the sign, and gives the "squared" relation S3Q of degree 4.
+  - Any twisted Edwards (or Montgomery) curve has such a linear coordinate: v = (x−1)/(x+1).
+    The ingredient is "rational 2-torsion plus a coordinate where it acts as negation, plus
+    signed products", not "Edwards addition" as such.
+  - I did not build a Montgomery arm with v-type invariants. It would be E1Q after the Möbius
+    change v = (x−1)/(x+1), so it is not an independent control.
+- **Limits.**
+  - One curve.
+  - m ≤ 4, and the m = 4, t = 5 equal-base cell is capped at 2 GiB (E1Q ≥ 6 vs E1/T/TW/TQ ≥ 7):
+    undecided.
+  - Wall times come from a shared host, as ordering only.
+  - The TQ quotient dimension 9 is not explained.
+
+### Deviations 7c
+
+- Instances could not be transported through the birational map (see construction). TW and TQ
+  use fresh planted points on the same group.
+- T on the round-1 curve at t = 3 and TW/TQ at m = 4, t = 4 are not buildable (too few base
+  classes). I did not search for a new Weierstrass curve; the "same group" was kept instead.
+- No k = 1 for T at m = 4, t = 4. Its k = 0 run needs more than 2 GiB (it died at 634 s).
+  Round 1's k = 1 T logs are used for m = 3.
+- The README, `gen7.sing`, `inst7w.sing` and `basesize.sing` were edited while the coordinator
+  committed in-progress snapshots. One edit was lost to a concurrent checkout at 06:29 and was
+  re-applied. The 16 round-7/7b systems regenerate byte-identically (sha256 compared after the
+  7c changes).
