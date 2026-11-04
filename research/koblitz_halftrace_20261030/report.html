@@ -22,9 +22,10 @@ The original full release suite completed with 5447 passes, zero failures and
 123 existing ignored tests; the original feature's final-source filters and strict Clippy passed separately.
 Later parser failures remain retained under <code>development/</code>.
 External merge507829726f repairs the parser; fresh locked cache12/12 and
-ordered-lift1/1 rechecks pass. E2E and full-library rechecks are pending.
-Two resource-publication failures reproduce on this host, which lacks required
-Linux time-namespace interfaces; the full suite is not passing.
+ordered-lift1/1 and E2E2/2 rechecks pass. The full-library attempt ended without
+a parent summary; two resource-publication failures reproduce on this host,
+which lacks required Linux time-namespace interfaces. Its partial raw log is
+retained; no completed full-suite pass or interruption cause is inferred.
 Its CI library Clippy and size passed;
 gate/artifacts failed. A narrow checkout-path repair addresses the artifact
 wiring mismatch without adding credentials. Development elapsed times are not

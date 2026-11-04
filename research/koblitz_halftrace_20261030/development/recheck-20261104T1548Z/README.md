@@ -7,12 +7,13 @@ create another main merge. The earlier parser failure is repaired in that source
 was edited during this check-in.
 
 Local cache12/12 and ordered-lift1/1 rechecks passed; their exact logs are
-cached.txt and ordered.txt. E2E and full-library rechecks remain pending. The
+cached.txt and ordered.txt. E2E subsequently passed2/2; full-library attempt2
+ended without a parent summary or exit receipt. The
 full suite has two reproduced failures in diagnostic resource publication,
 whose source matches current main. `reap-reproduce.txt` is the exact isolated
 module result: two passed, two failed. This host lacks `/proc/self/ns/time`
 and `/proc/self/timens_offsets`, required by DiagnosticSessionClock::begin.
-The full parent suite is still running; it cannot be reported as passed. The
+The parent result is unavailable and cannot be reported as passed. The
 historical passing suite and earlier parser failures remain in their original
 records. `ci-inspection.json` and the CI log excerpts identify exact-head
 size/gate/artifacts outcomes and the unrelated benchmark-row failure.
@@ -29,8 +30,11 @@ and formatting passed; the actionlint process emitted no output.
 
 The first detached full-library attempt left only a Cargo-lock wait message
 and no live driver or terminal receipt. Its log is retained separately and it
-is not a completed suite. The second attempt runs in retained exec session34529;
-the parent result must be collected before reporting the full suite as passed.
+is not a completed suite. The second attempt's exec handle is now unavailable,
+and its cargo/test processes are defunct. Its sole one-pass summary is from a
+nested child, not the5937-test parent. The interruption cause is unknown. See
+[the additive closure outcome](closure-20261104T1707Z/) for exact E2E output and
+the complete partial-parent archive. No unchanged suite was restarted.
 
 Sources checked: repository artifact-wiring and checkpoint implementations,
 the pinned actions/checkout README's `path` contract, the preserved SEC1 point

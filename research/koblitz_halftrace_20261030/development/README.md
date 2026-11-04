@@ -43,14 +43,18 @@ hashes; older failure logs and passing results remain unchanged.
 
 The 4 November recheck uses the already-published external merge507829726f.
 That source repairs the parser failure and retains the cache implementation.
-Native cache12/12 and ordered-lift1/1 rechecks pass; E2E and full-library rechecks
-remain pending. No old pass is substituted for their results.
+Native cache12/12, ordered-lift1/1 and E2E2/2 rechecks pass. Full-library attempt2
+ended without a parent summary or exit receipt; no old pass is substituted.
 See [the new follow-up](recheck-20261104T1548Z/).
 Two full-suite resource-publication tests failed and reproduce separately
 (two passes/two failures in that module) because this host lacks the Linux
 time-namespace interfaces required by the upstream diagnostic clock. The
-source equals current main. The full parent result is still pending; no test
-was suppressed and no unrelated source fallback was added.
+source equals the inspected main. The parent result is unavailable, not passing;
+no test was suppressed and no unrelated source fallback was added. The
+[additive outcome](recheck-20261104T1548Z/closure-20261104T1707Z/) retains the
+raw E2E log and complete partial-parent output in a deterministic54,340-byte
+archive with SHA-256, under the raw-run archive policy. Its nested one-pass
+summary is not the5937-test parent result. The interruption cause remains unknown.
 The attributable artifact-wiring mismatch is repaired by an isolated metadata
 checkout path. A focused administrative check uses the existing generator and
 the three store paths named by CI; it reproduces the published-head mismatch,

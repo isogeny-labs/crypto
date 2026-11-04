@@ -10,7 +10,7 @@ Updated 2026-11-04 · Engineering implementation candidate · Generic decomposit
   All build/experiment jobs were skipped. No native speed ratio is claimed.
 ]
 
-#image("pipeline.svg", width: 94%)
+#image("pipeline.svg", width: 90%)
 
 == Implementation
 Lazy, curve-local byte tables evaluate the existing odd-degree halftrace. The
@@ -25,9 +25,10 @@ ignored*. The original feature's final-source cached/ordered tests, both native
 E2E examples and strict library Clippy passed separately. The suite predates the parity
 lint cleanup. Later parser failures remain retained under `development/`.
 External merge507829726f repairs the parser; fresh locked cache12/12 and
-ordered-lift1/1 rechecks pass. E2E and full-library rechecks are pending.
-Two resource-publication failures reproduce on this host, which lacks required
-Linux time-namespace interfaces; the full suite is not passing.
+ordered-lift1/1 and E2E2/2 rechecks pass. The full-library attempt ended without
+a parent summary; two resource-publication failures reproduce on this host,
+which lacks required Linux time-namespace interfaces. Its partial raw log is
+retained; no completed full-suite pass or interruption cause is inferred.
 Its CI library Clippy passed, size passed,
 and gate/artifacts failed. A narrow checkout-path repair addresses the artifact
 wiring mismatch without adding credentials. Test times are not benchmarks.

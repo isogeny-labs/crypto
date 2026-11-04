@@ -55,7 +55,7 @@ development checks; their elapsed times are not performance evidence.
 | --- | --- |
 | Existing Rust baseline and source identity | built before source edits; [BASELINE.txt](BASELINE.txt) |
 | Rust cache and factor-base integration | implemented; no Python execution path |
-| Native correctness and regression gates | original suite: 5,447 passed, zero failed, 123 existing ignored; source507829726f cache tests12/12 and ordered-lift1/1 pass; E2E/full-library rechecks pending; earlier parser failures retained |
+| Native correctness and regression gates | original suite: 5,447 passed, zero failed, 123 existing ignored; source507829726f cache tests12/12, ordered-lift1/1 and E2E2/2 pass; later full-library attempt incomplete with two observed host-interface failures |
 | Prospective native comparison protocol | [protocol.json](protocol.json) frozen before data; canonical schema/hash and corrupted-hash negative check pass |
 | Source-resume checkpoint preparation | [failed Actions receipt](development/checkpoint-actions-receipt.json); no uploader secret; all experiment jobs skipped |
 | Matched native end-to-end measurement | not run; [access blocker](../../problems/native-koblitz-measurement-access.md) |
@@ -86,15 +86,20 @@ older passing checks are not presented as a pass of that merged source.
 On 4 November, fast-forwarded to the already-published external merge
 `507829726fbc731543f4527348b55c5e479242c9`. It contains the upstream parser
 repair and preserves the cache implementation and example. Fresh locked cache
-tests12/12 and ordered-lift1/1 pass. E2E and full-library rechecks remain pending.
-Current-head CI reports size success, gate failure on an unrelated
+tests12/12, ordered-lift1/1 and E2E2/2 pass.
+CI at native source507829726f reports size success, gate failure on an unrelated
 benchmark-row disposition and artifacts failure on the checkpoint checkout's
 wiring. The narrow workflow repair gives the metadata-only checkout its own
 path and explicit working directory, without adding artifact credentials.
 The full suite has reported two resource-publication failures, reproduced in
 isolation: this development host lacks `/proc/self/ns/time` and
 `/proc/self/timens_offsets`, required by the unchanged upstream diagnostic
-clock. The suite is still running; it is not a passing current-source result.
+clock. At the 17:07 check, the parent process had ended without a parent summary
+or exit receipt; its interruption cause is unknown. The one-pass summary in the
+partial log belongs to a nested child. No full-suite pass is claimed and no
+unchanged suite was restarted. The additive [outcome](development/recheck-20261104T1548Z/closure-20261104T1707Z/)
+retains the complete E2E log and an exact deterministic archive of the partial
+parent output.
 The source-bound follow-up is in [development/recheck-20261104T1548Z/](development/recheck-20261104T1548Z/).
 
 [Implementation and execution-status diagram](pipeline.svg).
