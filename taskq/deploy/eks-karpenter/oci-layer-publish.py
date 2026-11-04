@@ -264,9 +264,14 @@ def main():
     if bhost == "public.ecr.aws":
         bpw = sh(["aws", "ecr-public", "get-login-password", "--region", "us-east-1"])
     tpw = sh(["aws", "ecr", "get-login-password", "--region", tregion])
+    if bhost == thost:
+        # Private base in the target registry (e.g. a study image under a runtime layer).
+        bpw = tpw
     src = Registry(bhost, brepo, bpw)
     dst = Registry(thost, trepo, tpw, push=True)
     dst.authz = dst.basic()
+    if bhost == thost:
+        src.authz = src.basic()
 
     body, ctype = src.get_manifest(btag)
     m = json.loads(body)
