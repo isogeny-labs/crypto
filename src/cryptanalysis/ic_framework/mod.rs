@@ -786,6 +786,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             extra: t.extra.clone(),
             forecaster: t.forecaster.clone().map(|mut f| {
                 f.set_relation_state(fb.columns, outcome.rank as usize);
+                f.set_linear_algebra_total(outcome.relations_found as usize, work, work_unit);
                 f
             }),
             forecast_unavailable: t.forecast_unavailable.clone(),

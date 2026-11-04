@@ -1,0 +1,61 @@
+module
+public import Mathlib.Algebra.BigOperators.Group.List.Basic
+public import Mathlib.Data.Nat.Fib.Basic
+public import Mathlib.Tactic.Linarith
+public section
+namespace AnchorBudget
+
+/-- Weighted suffix penalty, with coefficients 1,2,... . -/
+def penalty : List ℕ → ℕ
+  | [] => 0
+  | m :: ms => m + penalty ms + ms.sum
+
+/-- Lower levels are at the head. These are the explicit anchor inequalities,
+not assumptions that a faster ECDLP algorithm exists. -/
+inductive Feasible (g : ℕ) : List ℕ → Prop
+  | nil : Feasible g []
+  | cons {ms : List ℕ} (m : ℕ) : Feasible g ms →
+      g + penalty ms ≤ m → Feasible g (m :: ms)
+
+theorem penalty_ge_sum (ms : List ℕ) : ms.sum ≤ penalty ms := by
+  induction ms with
+  | nil => simp [penalty]
+  | cons m ms ih => simp only [List.sum_cons, penalty]; omega
+
+/-- General degree-budget lower bound; the analytic valuation-to-inequality
+bridge is a written proof, not formalized by this declaration. -/
+theorem mass_bound {g : ℕ} {ms : List ℕ} (h : Feasible g ms) :
+    2 ^ ms.length * g ≤ ms.sum + g := by
+  induction h with
+  | nil => simp
+  | @cons ms m h hm ih =>
+    have hp := penalty_ge_sum ms
+    simp only [List.length_cons, List.sum_cons, pow_succ]
+    nlinarith
+
+/-- The sharper necessary mass for these inequalities is Fibonacci-sized. -/
+theorem fibonacci_bound {g : ℕ} {ms : List ℕ} (h : Feasible g ms) :
+    Nat.fib (2 * ms.length) * g ≤ ms.sum ∧
+    Nat.fib (2 * ms.length + 1) * g ≤ penalty ms + g := by
+  induction h with
+  | nil => simp [penalty]
+  | @cons ms m h hm ih =>
+    rcases ih with ⟨hs, hp⟩
+    have h2 : Nat.fib (2 * (ms.length + 1)) =
+        Nat.fib (2 * ms.length) + Nat.fib (2 * ms.length + 1) := by
+      rw [show 2 * (ms.length + 1) = 2 * ms.length + 2 by omega,
+        Nat.fib_add_two]
+    have h3 : Nat.fib (2 * (ms.length + 1) + 1) =
+        Nat.fib (2 * ms.length + 1) + Nat.fib (2 * (ms.length + 1)) := by
+      rw [show 2 * (ms.length + 1) + 1 = (2 * ms.length + 1) + 2 by omega,
+        Nat.fib_add_two]
+      congr 1
+      congr 1
+      omega
+    simp only [List.length_cons, List.sum_cons, penalty, h2, h3]
+    constructor <;> nlinarith
+
+end AnchorBudget
+#print axioms AnchorBudget.penalty_ge_sum
+#print axioms AnchorBudget.mass_bound
+#print axioms AnchorBudget.fibonacci_bound

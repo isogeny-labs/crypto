@@ -158,6 +158,68 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert_eq!(triage["schema"], "factor_base_sweep.triage/v1");
         assert_eq!(triage["rows"][0]["solves"], 6);
         assert_eq!(triage["rows"][0]["advice"], candidate["forecast"]["advice"]);
+        // Linear algebra is charged beside the solver work on the training
+        // rows, and the next plan comes from the triage without running.
+        if forecast["relations"].as_u64().unwrap() > 0 {
+            assert!(
+                forecast["cost"]["linear_algebra"]["observed_rows"]
+                    .as_u64()
+                    .unwrap()
+                    >= 1
+            );
+            assert!(
+                forecast["cost"]["projected_relation_phase_work_with_linear_algebra"].is_number()
+            );
+        } else {
+            assert!(forecast["cost"]["linear_algebra"].is_null());
+        }
+        let next_plan = t.0.join(format!("next-{prime}.json"));
+        let refined = call(&[
+            "refine",
+            "--run",
+            dir.to_str().unwrap(),
+            "--out",
+            next_plan.to_str().unwrap(),
+            "--drop",
+            "hopeless_at_bound",
+            "--seed-count",
+            "2",
+        ]);
+        assert!(
+            refined.status.success(),
+            "{}",
+            String::from_utf8_lossy(&refined.stderr)
+        );
+        let next = value(&next_plan);
+        assert_eq!(next["schema"], "factor_base_sweep/v1");
+        assert_eq!(
+            next["candidates"].as_array().unwrap().len(),
+            if prime { 1 } else { 2 }
+        );
+        assert_eq!(next["train"], 4, "budgets are inherited");
+        let provenance = value(&t.0.join(format!("next-{prime}.refine.json")));
+        assert_eq!(provenance["schema"], "factor_base_sweep.refine/v1");
+        assert_eq!(provenance["kept"].as_array().unwrap().len(), 1);
+        assert!(provenance["advisory"]
+            .as_str()
+            .unwrap()
+            .contains("nothing was run"));
+        // The refined plan is a valid plan for a new run directory.
+        assert!(call(&[
+            "plan",
+            "--out",
+            t.0.join(format!("unused-{prime}.json")).to_str().unwrap()
+        ])
+        .status
+        .success());
+        let bad = call(&[
+            "refine",
+            "--run",
+            dir.to_str().unwrap(),
+            "--out",
+            next_plan.to_str().unwrap(),
+        ]);
+        assert!(!bad.status.success(), "write-once output");
         let checked = call(&["verify", "--run", dir.to_str().unwrap()]);
         assert!(
             checked.status.success(),
