@@ -1,47 +1,57 @@
-# Resume: crypto @ claude/elliptic-curves-graph-weaknesses-fw42m4 (2026-11-04)
+# Resume: crypto @ main (2026-11-04) — arity completion runs on isolab-eks
 
 ## Goal
-Attack the assumptions that hold up ECDLP hardness in
-`docs/ecdlp-hardness-corpus/` with exact native censuses and Lean theorems.
-Study directories: `research/ecdlp_weakness_lean_20261104/` (Lean, rounds 1-3
-merged in PRs #3379, #3385, #3390) and
-`research/ecdlp_weakness_census_20261104/` (this round's Rust censuses).
-Owner's framing: find out whether a subexponential algorithm is possible by
-removing or weakening the obstructions; no result here proves one exists.
+Execute the two frozen, merged protocols of `research/arity_completion_20261104/`
+(prime towers m = 5 at t = 2,3,4; Koblitz chained-S3 m = 5,6 on n = 23..41 and
+n = 83 with the 1800 s cap) on Iso Lab EKS, with the owner's AWS identity
+(`coreuser`, account 104186811093), and report P1–P5 and K1–K7 through the
+frozen `analyze.py` scripts. Owner (2026-11-04 07:26Z): "Run it on isolab now".
 
-## Leads / hypotheses (this round)
-1. `pq2_rank`: Petit-Quisquater Assumption 2 at m = 2. For the Weil-descended
-   S_3 system over F_{2^n} (factor-base subspace of dim ceil(n/2)), compute
-   d_lin = least Macaulay degree d at which the degree-<=1 part of the row
-   space has dimension k = N - affdim(Z). sd >= d_lin by the Lean criterion
-   (`SolvingDegreeBound`, generalised to any subspace). Prediction under the
-   literal reading: d_lin = 2; under Kousidis-Wiemers: d_lin <= 3 eventually.
-   Kill for the assumption on the tested range: d_lin >= 4 at every n >= n0.
-2. `pf_yield`: prime-field m = 2 decomposition yield vs 1 - exp(-B^2/r), full
-   histogram vs Poisson, every target enumerated.
-3. `trace_pullback`: size of Tr(F'_V) for dim-1 F_p-subspaces V of F_{p^2};
-   decomposable fraction over Tr(F'_V) vs generic prediction.
-4. `ext_decomp`: decomposable proportion over F_{q^n} with factor base x in F_q
-   vs 1/n!.
-5. `rank_deficit`: right-kernel relation-matrix rank deficit vs surplus Delta
-   on small-x factor bases (PKM Delta = 10).
-Lean: subspace criterion, mean-count identity, Shoup transparent-encoding
-countermodel, Boolean Nullstellensatz bridge (unique solution => linear
-consequences in the ideal).
+## Lead / hypothesis
+No new hypothesis: the preregistered claims in
+`research/arity_completion_20261104/{prime_tower_m5,koblitz_m5_m6}/protocol.json`
+(frozen at 1fd6ece55f and 4fa25efc0e). Preflight expectation (AM1): the orbit
+engine caps at m >= 5; chain-s3 is the engine whose negative control decides.
+
+## Spec
+- Protocols, cards, grid, run_shard.sh: `research/arity_completion_20261104/`.
+- Route (selected this session): CodeBuild bridge
+  `taskq/deploy/eks-karpenter/remote/launch-remote` cannot run arbitrary
+  commands (ecbench only), and the EKS API admits only two CIDRs, so a
+  command-job launcher (`remote/run-command`, `remote/launch-remote-command`,
+  `remote/current-run-command-buildspec.yml`) is being added on a branch, plus a
+  study image (ubuntu 24.04 + the two example binaries built at main, `bc`,
+  `time`, aws CLI v2) pushed to `104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks`
+  by digest with a daemon-less OCI pusher.
+- Jobs: Koblitz shards m2/m5/m6 on `cpu-l2-spot` (submit-job --isolation-profile l2,
+  cpu 4, c8a.2xlarge), seconds 9900/50700/50700; prime-tower controls, t2-t3
+  (8 GiB class, standard), t4 (120 GiB, only if t3 decided). Results upload to
+  `s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/` every 60 s
+  and at exit; no L2 admission exists for command jobs, so seconds are
+  diagnostic only (Koblitz invalidation rule 6).
+- Budget: daily budgets show USD 93.9 (isolab-daily-cost-100, limit 200) and
+  37.5 (spot-experiments-daily-25, limit 200) actual; monthly 379 of 1000.
+  Ceiling for this campaign: USD 40 (c8a.2xlarge spot ≈ 0.16 USD/h × 3 shards ×
+  14 h ≈ 7; r-class 128 GiB host 24 h ≈ 15; CodeBuild minutes ≈ 1).
 
 ## State
-- Lean rounds 1-3 merged; 13 pcc claims recorded (standing unverified: the
-  main sign job has no PCC_SIGNING_KEY).
-- Censuses: exact computations run locally (seconds to minutes each); no
-  timing is measured, so no benchmark record is opened. isolab-eks not used:
-  no AWS identity in this container (same as earlier sessions).
-- Checkpoint push: expected to fail here (no upload token); RESUME.md written
-  locally before the runs.
+- 07:36Z checkpoint pushed (crypto/main/20261104T073616Z-91a3524dfd6a); identity verified.
+- Launcher extension and study image in progress on branch claude/arity-run-20261104;
+  no Job submitted yet.
+
+## Runs in flight
+None yet (07:40Z). Builds: `/dev/shm/crypto-target/release/examples/{pkm_tower_pilot,n83_msweep_cell}`.
+
+## Stop and success conditions
+- Success: every submitted shard/card job uploads `job-exit.json` (exit 0) and
+  its records; `analyze.py` of each study runs on the downloaded `raw/`;
+  verdicts reported per claim with caps as censored.
+- Stop: a card gate fails (controls mismatch, m2 process_error), a job is lost
+  to Spot twice (max 3 infrastructure attempts per protocol), or the USD 40
+  ceiling is reached. Never raise a cap or change a frozen file.
 
 ## Next steps
-1. Run each census crate (`cargo run --release` in its directory), results to
-   `results/*.json` + README table.
-2. Report + SVG graphs + PDF per census (research-visuals), corpus fragment,
-   pcc claims (kind measurement/theorem), PR with auto-merge.
-3. If d_lin >= 4 holds on the tested range, qualify HEUR-GB-PQ-ASSUMPTION-2
-   accordingly (not refuted: finite range).
+1. Finish launcher extension + tests; commit/push branch `claude/arity-run-20261104`.
+2. Build and push the study image; record digest and binary sha256s.
+3. Director compiles launch cards (one per job) binding request JSON, launcher
+   scripts and image digest; executor runs them; collect via S3 + status runs.
