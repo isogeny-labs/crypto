@@ -26,7 +26,11 @@ None of this moves an index-calculus (IC) cost, a leaderboard row or the distanc
 - #strong[C1 itself is still unmeasured] (Amendments 2 and 4). The owner approved four draws plus a control on RunPod, capped at \$80. Three pods ran:
   - two never ran the job, because the repository is now private and the pod could not fetch its boot script;
   - the third verified its uploaded binary and started draw 0 at 06:51Z, then was deleted before any record was fetched.
-  - About \$4 was spent on the first two pods and at most about \$20 on the third. The degree-5 question at ℓ \= 7 stays open.
+  - About \$4 was spent on the first two pods and at most about \$20 on the third.
+  - #strong[The fourth pod (Amendment 6, 2026-11-03, `runs/c1/`, measured).] It ran draws 0 and 3 to completion of the attempt. On 64 vCPU and 512 GB, the dense engine aborted on both with an allocation failure (exit 134) under the 471 GB address-space cap, after 6.5 and 6.1 min, at 424 GB and 423 GB resident.
+    - The dense engine\'s 217 GB projection was low by more than 2×.
+    - Allocation failures are unmeasured, never evidence about the degree.
+    - That pod cost about \$2.80. The degree-5 question at ℓ \= 7 stays open, and dense C1 needs more than 512 GB.
 - #strong[L1, λ-coordinate bases, is closed in full.] Every identity holds on both Koblitz curves over four fields (b \= 1). It also holds on three random b ≠ 1 per field over F\_{2^11} and F\_{2^13}, and for subspaces that contain `1`, where A \= B exactly. In all, 182 subspaces.
 - #strong[L3, Agreeing–Gluing, is the pair-table meet-in-the-middle in every order.]
   - #strong[m \= 3:] root solves fit 2^(2ℓ).
@@ -173,7 +177,8 @@ None of this moves an index-calculus (IC) cost, a leaderboard row or the distanc
   + Pods `hd6s92ssyztxjh` and `cwacs7yb5zj1hh` booted and idled at 0% CPU. The repository is private, so the pod\'s unauthenticated fetch of its boot script returned 404. Both were terminated, at about \$4.10.
   + Amendment 4 replaced the clone with a hash-checked upload (`pod/upload_launch.py`, `pod/job.sh`). Pod `z9n7f7mm4p0zc9` accepted the binary (`9d72c7a4…`), the draws and the job script. It started draw 0 at 06:51Z with a 471 GB address-space cap.
   + By 12:19Z the pod no longer existed in the account: the API returned `null`, and it was absent from the pod list. No record was fetched before it disappeared.
-- #strong[Status.] C1 remains unmeasured. A capped or lost run is never evidence about the degree.
+  + Amendment 6: pod `6vk9f9esz2w9sr` (2026-11-03) ran draws 0 and 3. The dense engine aborted on both, with `memory allocation of 94976 bytes failed` under the 471 GB `prlimit --as` cap. The peaks were 424,485,864 KB and 422,759,320 KB resident after 389 s and 367 s (`runs/c1/`). That is more than 2× the 217 GB projection.
+- #strong[Status.] C1 remains unmeasured. A capped, lost or out-of-memory run is never evidence about the degree.
 
 #strong[What L2 changes.] Nothing in the cost rows. As an instrument it lowers C1\'s memory requirement from the dense engine\'s projected 217 GB to about 73 GB. On m \= 4 (11, 5), MXL\'s restriction lowers the degree-4 peak echelon by 1.7–2.0× more.
 
@@ -274,7 +279,7 @@ None of this moves an index-calculus (IC) cost, a leaderboard row or the distanc
   - `docs/ic/leaderboard.json`
 
 == 7. Next step
-- #strong[C1 is the one open measurement.] Rerun it with the Amendment 4 uploader on a host with at least 280 GB, fetching each draw\'s record as soon as it is written. The open question is whether the closure degree at m \= 3, ℓ \= 7 is 5.
+- #strong[C1 is the one open measurement.] The open question is whether the closure degree at m \= 3, ℓ \= 7 is 5. The dense engine needs more than 471 GB of address space, so the realistic route is the incremental engine (`pe_closure`, at most about 73 GB). On a 64-core host its word-XOR count suggests on the order of 13–50 h per draw. Run it with the Amendment 4 uploader, fetching each record as it lands.
 - #strong[The incremental engine at degree 5.] It fits in about 73 GB. MXL\'s restriction may lower that further on m \= 4, but not on m \= 3.
 - #strong[The lead as a whole.] L1–L4 are closed. None of them gives an IC improvement, so the next index-calculus improvement has to come from a lead outside this set.
 
