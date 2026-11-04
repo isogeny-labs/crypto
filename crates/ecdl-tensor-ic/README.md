@@ -21,7 +21,7 @@ does not share code with it.
 | 1. Factor-base selection | `relation.rs` `new_factor_bases`, `new_affine_factor_bases`, `new_windowed_factor_bases` | m random hashed membership predicates, each with \|F_i\| ≈ (2r)^(1/m). There is no notion of smoothness. The default hash is keyed SHA-256. The gadget path uses a random affine hash, A ∈ F_i iff (α_i x + β_i y + γ_i) mod p < U_i, because that is cheap to check with low-degree gadgets. A coordinate window can be added: A ∈ F_i iff x(A) < p>>k as well (see below). |
 | 2. Relation finding | `relation.rs` `relation_network`, `tensor.rs` | `[u]P+[v]Q = A_1+…+A_m` is encoded as a Boolean tensor network with (2m−1)(2b+1) edges. |
 | Counting → search | `tensor.rs` `find_witness` | Self-reduction fixes one bit at a time, so any **counting** solver works. |
-| 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by Gaussian elimination |
+| 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by sparse Gaussian elimination (`left_kernel_vector_sparse`, used by the solver); `left_kernel_vector` is the dense reference |
 | 4. Extraction | `solver.rs` | ξ = −U/V, always checked against `[ξ]P == Q`; an unverified answer is never returned. |
 
 Relation search has two elimination orders. The default contracts the

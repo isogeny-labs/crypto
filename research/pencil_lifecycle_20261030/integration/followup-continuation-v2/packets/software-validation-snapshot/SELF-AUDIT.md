@@ -1,0 +1,7 @@
+# Producer self-audit
+
+The reviewer here authored the diagnostic: this is not independent review. Source and existing receipts were checked without repeating execution. All manifest and preexecution source/plan hashes match. The child signals readiness only after fstat verifies the inherited descriptor; it waits on the second pipe before closing it. Parent closes its own descriptor before the positive acquisition, then signals child closure and waits for exit before the negative acquisition. The exact errno 11 is retained. Baseline reacquisition succeeds. The reported controls and exit zero match raw stdout/receipt.
+
+The diagnostic uses Python POSIX fork/flock and a temporary file, not the Rust BenchLock API. It establishes the inherited-descriptor mechanism but does not establish the cause of the original Rust failure. FD_CLOEXEC is recorded; no exec is performed. An internal alarm bounds the process and an outer timeout bounds the invocation. A failed assertion inside the try block attempts child kill/reap; abrupt alarm termination is not claimed to provide that finally cleanup. This successful execution did reap the child with exit zero. No repeated tests or repairs were performed for this audit.
+
+The PDF and SVG summarize a point-in-time software validation state. Full-library failure remains present. Reduced-concurrency and additional root checks are pending in this snapshot; later results require an additive update.

@@ -1,0 +1,1 @@
+env LC_ALL=C timeout --verbose --signal=INT --kill-after=30s 7260 ./yafu -threads 2 -lathreads 2 -seed 20261022 -gnfs -xover 81 -ggnfsT 7200 -ggnfs_dir /workspace/.tools/yafu-r02/factor/lasieve5_64/bin/ -job nfs.job -o nfs.dat -logfile factor.log -session session.log -R -pbatch 120 < /workspace/nist-factor-R08-20261025/nfs/skipped_256_876-twist2/attempt-1/expression.txt

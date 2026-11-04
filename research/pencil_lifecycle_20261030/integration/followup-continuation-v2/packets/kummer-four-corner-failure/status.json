@@ -1,0 +1,155 @@
+{
+  "schema": "research.software-construction/v1",
+  "exit_code": 101,
+  "cases": 84,
+  "transitions": 252,
+  "matched_corners": 1008,
+  "exact_signed_recoveries": 251,
+  "failures": [
+    {
+      "p": 739,
+      "exception_index": 20,
+      "row": {
+        "choice": 1,
+        "corner_matches": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "counts": {
+          "recovery": {
+            "field": {
+              "bit_ops": 0,
+              "ec_adds": 0,
+              "field_adds": 0,
+              "i": 0,
+              "jac_adds": 0,
+              "m": 0,
+              "s": 0,
+              "sqrt_calls": 0
+            },
+            "signed": {
+              "a": 260,
+              "i": 21,
+              "m": 320
+            },
+            "walk": {
+              "a": 0,
+              "i": 0,
+              "m": 0
+            }
+          },
+          "transition": {
+            "field": {
+              "bit_ops": 0,
+              "ec_adds": 0,
+              "field_adds": 0,
+              "i": 0,
+              "jac_adds": 0,
+              "m": 0,
+              "s": 0,
+              "sqrt_calls": 0
+            },
+            "signed": {
+              "a": 0,
+              "i": 0,
+              "m": 0
+            },
+            "walk": {
+              "a": 432,
+              "i": 33,
+              "m": 337
+            }
+          },
+          "verification": {
+            "field": {
+              "bit_ops": 0,
+              "ec_adds": 0,
+              "field_adds": 906,
+              "i": 20,
+              "jac_adds": 8,
+              "m": 493,
+              "s": 5,
+              "sqrt_calls": 0
+            },
+            "signed": {
+              "a": 0,
+              "i": 0,
+              "m": 0
+            },
+            "walk": {
+              "a": 140,
+              "i": 0,
+              "m": 264
+            }
+          }
+        },
+        "evaluated": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "expected": {
+          "degree": 2,
+          "u": [
+            512,
+            518,
+            1
+          ],
+          "v": [
+            263,
+            393
+          ]
+        },
+        "grid": [
+          [
+            637,
+            69,
+            156,
+            731
+          ],
+          [
+            294,
+            427,
+            117,
+            271
+          ],
+          [
+            251,
+            105,
+            105,
+            470
+          ],
+          [
+            425,
+            705,
+            368,
+            333
+          ]
+        ],
+        "labels": [
+          1,
+          4
+        ],
+        "pass": false,
+        "recovered": null,
+        "recovery_status": "Delta_zero",
+        "recovery_tested": 0,
+        "roots": [
+          null,
+          16,
+          null,
+          null
+        ],
+        "signed_ok": false,
+        "status": "checked",
+        "step": 1
+      }
+    }
+  ],
+  "recovery_neighbour": "propagated grid entry2",
+  "oracle_expected_divisor_input": false,
+  "scientific_execution": false
+}

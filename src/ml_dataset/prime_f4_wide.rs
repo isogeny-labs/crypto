@@ -41,22 +41,22 @@ struct Input {
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-struct Limits {
-    work: u64,
-    bytes: u64,
-    rows: usize,
-    columns: usize,
-    basis: usize,
-    pairs: usize,
-    steps: usize,
-    events: usize,
-    encoded_bytes: usize,
-    domain_tests: u64,
-    group_adds: u64,
-    degree: u32,
+pub(super) struct Limits {
+    pub(super) work: u64,
+    pub(super) bytes: u64,
+    pub(super) rows: usize,
+    pub(super) columns: usize,
+    pub(super) basis: usize,
+    pub(super) pairs: usize,
+    pub(super) steps: usize,
+    pub(super) events: usize,
+    pub(super) encoded_bytes: usize,
+    pub(super) domain_tests: u64,
+    pub(super) group_adds: u64,
+    pub(super) degree: u32,
 }
 impl Limits {
-    fn derive(config: &CaseConfig, launch: &LaunchContext) -> Result<Self, String> {
+    pub(super) fn derive(config: &CaseConfig, launch: &LaunchContext) -> Result<Self, String> {
         let hard = BoundedF4Limits::default();
         let work = config
             .work_limit
@@ -88,7 +88,7 @@ impl Limits {
             degree: config.degree_bound.min(12),
         })
     }
-    fn native(&self) -> BoundedF4Limits {
+    pub(super) fn native(&self) -> BoundedF4Limits {
         BoundedF4Limits {
             work: self.work,
             bytes: self.bytes,
@@ -103,11 +103,11 @@ impl Limits {
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-struct Event {
-    boundary: String,
-    sequence: usize,
-    work_reserved: u64,
-    bytes_reserved: u64,
+pub(super) struct Event {
+    pub(super) boundary: String,
+    pub(super) sequence: usize,
+    pub(super) work_reserved: u64,
+    pub(super) bytes_reserved: u64,
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -159,65 +159,65 @@ struct ResultRecord {
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
-struct NativeStep {
-    degree: u32,
-    critical_pairs: usize,
-    tower_pairs: usize,
-    s_rows: usize,
-    reducer_rows: usize,
-    promoted_rows: usize,
-    cols: usize,
-    nnz: u64,
-    residual_rows: usize,
-    residual_cols: usize,
-    full_rank_after: Option<usize>,
-    skipped_rows: usize,
-    dense_entries: u64,
-    fresh: usize,
-    fresh_min_degree: u32,
-    muladds: u64,
-    basis_active: usize,
-    basis_kept: usize,
-    basis_entries: u64,
-    pairs_left: usize,
-    ms: f64,
-    ms_rows: f64,
-    ms_reduce: f64,
-    ms_echelon: f64,
-    ms_update: f64,
+pub(super) struct NativeStep {
+    pub(super) degree: u32,
+    pub(super) critical_pairs: usize,
+    pub(super) tower_pairs: usize,
+    pub(super) s_rows: usize,
+    pub(super) reducer_rows: usize,
+    pub(super) promoted_rows: usize,
+    pub(super) cols: usize,
+    pub(super) nnz: u64,
+    pub(super) residual_rows: usize,
+    pub(super) residual_cols: usize,
+    pub(super) full_rank_after: Option<usize>,
+    pub(super) skipped_rows: usize,
+    pub(super) dense_entries: u64,
+    pub(super) fresh: usize,
+    pub(super) fresh_min_degree: u32,
+    pub(super) muladds: u64,
+    pub(super) basis_active: usize,
+    pub(super) basis_kept: usize,
+    pub(super) basis_entries: u64,
+    pub(super) pairs_left: usize,
+    pub(super) ms: f64,
+    pub(super) ms_rows: f64,
+    pub(super) ms_reduce: f64,
+    pub(super) ms_echelon: f64,
+    pub(super) ms_update: f64,
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
-struct NativeStatistics {
-    inconsistent: bool,
-    degree_reached: u32,
-    solving_degree_max: u32,
-    last_productive_degree: u32,
-    max_cols_to_solution: usize,
-    steps_to_solution: usize,
-    steps: usize,
-    max_rows: usize,
-    max_cols: usize,
-    max_nnz: u64,
-    max_residual_rows: usize,
-    rows_skipped: u64,
-    max_dense_entries: u64,
-    muladds: u64,
-    critical_pairs_reduced: u64,
-    tower_pairs_reduced: u64,
-    pairs_product_skipped: u64,
-    pairs_chain_skipped: u64,
-    reducer_rows: u64,
-    pairs_above_bound: usize,
-    staircase_at_stop: Option<usize>,
-    timed_out: bool,
-    oversize: bool,
-    ms: f64,
-    trace: Vec<NativeStep>,
-    stopped_step: Option<NativeStep>,
+pub(super) struct NativeStatistics {
+    pub(super) inconsistent: bool,
+    pub(super) degree_reached: u32,
+    pub(super) solving_degree_max: u32,
+    pub(super) last_productive_degree: u32,
+    pub(super) max_cols_to_solution: usize,
+    pub(super) steps_to_solution: usize,
+    pub(super) steps: usize,
+    pub(super) max_rows: usize,
+    pub(super) max_cols: usize,
+    pub(super) max_nnz: u64,
+    pub(super) max_residual_rows: usize,
+    pub(super) rows_skipped: u64,
+    pub(super) max_dense_entries: u64,
+    pub(super) muladds: u64,
+    pub(super) critical_pairs_reduced: u64,
+    pub(super) tower_pairs_reduced: u64,
+    pub(super) pairs_product_skipped: u64,
+    pub(super) pairs_chain_skipped: u64,
+    pub(super) reducer_rows: u64,
+    pub(super) pairs_above_bound: usize,
+    pub(super) staircase_at_stop: Option<usize>,
+    pub(super) timed_out: bool,
+    pub(super) oversize: bool,
+    pub(super) ms: f64,
+    pub(super) trace: Vec<NativeStep>,
+    pub(super) stopped_step: Option<NativeStep>,
 }
 
-fn number(s: &str) -> Result<u64, String> {
+pub(super) fn number(s: &str) -> Result<u64, String> {
     let n = s.parse::<u64>().map_err(|_| "invalid canonical u64")?;
     if n.to_string() != s {
         return Err("noncanonical integer".into());
@@ -334,7 +334,7 @@ fn eval(poly: &Poly, x: &[u64; 2], p: u64) -> Result<u64, String> {
     }
     sum.to_u64().ok_or_else(|| "evaluation exceeds u64".into())
 }
-fn encoded<T: Serialize>(value: &T, cap: usize) -> Result<Vec<u8>, String> {
+pub(super) fn encoded<T: Serialize>(value: &T, cap: usize) -> Result<Vec<u8>, String> {
     let mut writer = LimitedJsonWriter {
         bytes: vec![],
         limit: cap,
@@ -342,7 +342,7 @@ fn encoded<T: Serialize>(value: &T, cap: usize) -> Result<Vec<u8>, String> {
     serde_json::to_writer(&mut writer, value).map_err(|e| e.to_string())?;
     Ok(writer.bytes)
 }
-fn push<T: Serialize>(
+pub(super) fn push<T: Serialize>(
     data: &mut SolverData,
     path: &str,
     role: &str,
@@ -358,7 +358,7 @@ fn push<T: Serialize>(
     });
     Ok(())
 }
-fn stop_name(stop: &BoundedF4Stop) -> &'static str {
+pub(super) fn stop_name(stop: &BoundedF4Stop) -> &'static str {
     match stop {
         BoundedF4Stop::Complete => "complete",
         BoundedF4Stop::UnitDerived => "unit_derived",
@@ -787,7 +787,7 @@ pub(super) fn solve(
     Ok(data)
 }
 
-fn artifact<'a>(
+pub(super) fn artifact<'a>(
     artifacts: &'a [super::super::types::Artifact],
     path: &str,
     role: &str,
@@ -848,7 +848,7 @@ fn verify_byte_admission(
     }
     Ok(())
 }
-fn read_bounded(dir: &Path, path: &str, cap: usize) -> Result<Vec<u8>, String> {
+pub(super) fn read_bounded(dir: &Path, path: &str, cap: usize) -> Result<Vec<u8>, String> {
     use std::io::Read;
     let path = dir.join(path);
     let m = fs::symlink_metadata(&path).map_err(|e| e.to_string())?;
@@ -874,7 +874,7 @@ fn read_typed<T: for<'de> Deserialize<'de>>(
     serde_json::from_slice(&read_bounded(dir, path, admitted_file_cap(path, limits))?)
         .map_err(|e| e.to_string())
 }
-fn verify_censored_outcome(outcome: &Value) -> Result<(), String> {
+pub(super) fn verify_censored_outcome(outcome: &Value) -> Result<(), String> {
     if outcome["solver_completed"] != false
         || [
             "pdp_witness_verified",
@@ -891,7 +891,7 @@ fn verify_censored_outcome(outcome: &Value) -> Result<(), String> {
     }
     Ok(())
 }
-fn verify_unproved_claims(outcome: &Value) -> Result<(), String> {
+pub(super) fn verify_unproved_claims(outcome: &Value) -> Result<(), String> {
     for key in [
         "trace_complete",
         "execution_trace_complete_verified",

@@ -1,0 +1,45 @@
+{
+  "schema": "ic_profile/speed-test/v1",
+  "created": "2026-10-30",
+  "question": "Does prime-abscissa:size=64 lower whole-pipeline S against size=45 at 20 bits, on the latest main ecbench?",
+  "answer": "No. Paired median S ratio n64/n45 = 1.089, n = 40 pairs.",
+  "spec": "research/ic_profile_20261029/spec-prime-n45-n64.json",
+  "binary": {
+    "ecbench_sha256": "ce9868bbe3066b481aed52c85a69272ada7cfb427edfb942ad42a7d23f39d538",
+    "source_revision": "9edcbe736982eb7a8f10f9705b060cf1d8d9acd3",
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:3accbd751fe38a780432c6b1eab980c146f22301601d1bf3838fde09ecca6173"
+  },
+  "admission": {
+    "wall_time": "refused: solves are 186.9 us, under the L2 1.0 ms minimum (181/192 L1 in the second session, 176/192 in the first)",
+    "counted_units": "valid: GAE counts are deterministic; rho and n45 medians are identical to the 2026-10-19 binary session, so nothing in the accounting changed",
+    "status": "counts-only comparison; no wall-time claim"
+  },
+  "runs": [
+    {
+      "job_name": "gh-41008826427-1",
+      "records_uri": "s3://isolab-results-104186811093-us-east-2/runs/gh-41008826427-1/348d9aa4-5d82-4d80-994f-d8f0c87ea3e5/session/records.jsonl",
+      "records": 192,
+      "outcomes": "verified 192/192"
+    },
+    {
+      "job_name": "crypto-ic-n64-admit-20261030",
+      "records_uri": "s3://isolab-results-104186811093-us-east-2/runs/crypto-ic-n64-admit-20261030/cf025633-3f66-4834-aa1c-326a33f7262c/session/records.jsonl",
+      "records": 192,
+      "outcomes": "verified 192/192",
+      "note": "same image and spec, rerun only to test wall-time admission; refused for the same sub-millisecond reason"
+    }
+  ],
+  "S_median": {
+    "rho-neg": 1.077,
+    "ic-n45": 9.929,
+    "ic-n64": 10.794,
+    "ic-n45-aa": 9.929
+  },
+  "paired_ratio_n64_over_n45": {"n": 40, "median": 1.089, "min": 0.744, "max": 1.437},
+  "ic_phase_median_gae": {
+    "n45": {"oracle_setup": 2070, "relations": 5348, "verify": 26},
+    "n64": {"oracle_setup": 4160, "relations": 3907, "verify": 26}
+  },
+  "mechanism": "the larger base pays off in the relation phase (-27% GAE) and loses more in setup (+109%); at one target per cold solve it is a net 8.9% loss",
+  "correction": "an earlier version of README.md said XP-20261016 measured size=64 at 0.818/0.798/0.726 of size=45. That ratio was size=45 against size=32. XP-20261029-p20-large-n records N=64 vs N=45 as mixed (lower at w=1, higher at w=0.1) and never held out; this run is that missing holdout at w=0, and it loses."
+}

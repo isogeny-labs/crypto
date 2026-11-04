@@ -1,0 +1,96 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-15-M01
+experiment_id: BLINDSPOT-15
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Item 15 addendum M (PROTOCOL-ADDENDUM-matched-rho.md): b = 20, curve 1, IC arms plus 16 rho walks in one process
+
+receipt: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m01.json
+must_not_exist:
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stdout.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stderr.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stdout.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stderr.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2at8.txt
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2star.txt
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w4x4at8.txt
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-l4at8.txt
+binds:
+  - {path: research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs, sha256: 79a821504c5b7a4639470d8e04dfd35fc6ad1a91d34bacee466461f36811e991}
+  - {path: research/blindspots_20261018/15-genus3-la-exponent/orders.csv, sha256: d31864a01ff8aff7f1ef6e0a2649e52fa9a25dabec8852f3a9e4c5e4e6ddf235}
+  - {path: research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl, sha256: 5257584e2ec6e1079f6f3a5ec4c4c1a1cd3c75e5376683600e2e9e3ccf151bfc}
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b", "research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs"]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stdout.log
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stderr.log
+  - id: run-b20-c1-matched
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b", "--bits", "20", "--curve", "1", "--kappa", "1.3059", "--cx", "8", "--streams", "r2", "--las", "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebl4@8", "--orders", "research/blindspots_20261018/15-genus3-la-exponent/orders.csv", "--no-c1", "--no-gp-check", "--arms", "ic2lp,rho", "--rho-targets", "16", "--rho-r", "64", "--out", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl"]
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stdout.log
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stderr.log
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl]
+  - id: gate-w2at8
+    argv: ["research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b", "gate", "r2:lpsgebw2@8", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl", "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2at8.txt
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2at8.txt]
+  - id: gate-w2star
+    argv: ["research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b", "gate", "r2:lpsgebw2*", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl", "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2star.txt
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2star.txt]
+  - id: gate-w4x4at8
+    argv: ["research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b", "gate", "r2:lpsgebw4x4@8", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl", "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w4x4at8.txt
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w4x4at8.txt]
+  - id: gate-l4at8
+    argv: ["research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b", "gate", "r2:lpsgebl4@8", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl", "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-l4at8.txt
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-l4at8.txt]
+  - id: remove-bin
+    argv: ["rm", "-f", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1/b15b"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+  - id: remove-bin-dir
+    argv: ["rmdir", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c1"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+
+bus_address: executor-mechanical-blindspot-15-m01
+background: true
+write_scope:
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+  - The printed lines of any command whose id starts with gate- do not include a line that begins with GATE OK.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with run_in_background true and timeout 7200000, and return the printed summary after the tool exits."

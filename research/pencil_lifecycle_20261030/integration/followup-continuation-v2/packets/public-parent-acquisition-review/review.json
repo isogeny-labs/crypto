@@ -1,0 +1,20 @@
+{
+  "schema": "software.source-review/v1",
+  "producer_manifest_sha256": "a33716194c9b572d16926014caf755e841c835174d04baaae76ee52b42160459",
+  "source_sha256": "79a61c5b6915f42e36c83a0f5ea8ddd485aee143977083f79b4804edb27cd472",
+  "status": "accepted_for_bounded_local_preparation",
+  "execution_performed": false,
+  "observations": [
+    "Fixed immutable public reference; no login, push or AWS API.",
+    "Existing image preinspection avoids duplicate acquisition.",
+    "One explicit pull only after exact missing-image response; maximum 240 client seconds within shared 300-second supervision.",
+    "Sanitized existing local Unix-socket route and pinned Docker client.",
+    "Platform, RepoDigest, image ID and empty OnBuild verified after acquisition.",
+    "Signal flags and uncertain launch ownership retained; client termination does not assert daemon cancellation.",
+    "Ambiguity retains state and prohibits automatic retry; no broad cleanup."
+  ],
+  "limitations": [
+    "Daemon operations may outlive a terminated client; receipt records uncertain acquisition.",
+    "This is source review, not runtime qualification, scientific admission or publication."
+  ]
+}

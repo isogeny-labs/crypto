@@ -1,0 +1,137 @@
+{
+  "schema": "research.component-progress/v1",
+  "snapshot_utc": "2026-10-31T03:35:40.836728+00:00",
+  "new_measurements": 0,
+  "scientific_cost_ratio": null,
+  "cohort_completion_inferred": false,
+  "components": [
+    {
+      "id": "SameUComposition",
+      "status": "independently_reviewed_scoped",
+      "scope": "Field-valued source same-u mixed route from original normalized valid inputs, crossed support, earlier guard exclusions, four nonzero weights, IsCoprime f f derivative and2!=0; derives nonzero slope/extracted ordinate, valid extracted point and valid doubled output.",
+      "payload_scope": "specific mixed branch only",
+      "producer_status_preserved": "compiled_pending_independent_review",
+      "review": "/var/tmp/pencil-sameu-composition-review-20261031-v1/review.json"
+    },
+    {
+      "id": "WordSameU",
+      "status": "independently_reviewed_scoped",
+      "scope": "UInt64 literal expression/ordered restricted dispatch composition; prime5<=p<2^31,12 canonical coordinates,4 canonical coefficients, four nonzero weights and original field/global conditions. Field.n1/tablesNone.",
+      "review_bindings": 82,
+      "review_final_checks": 5,
+      "review_added_boundary_assertions": 4,
+      "limits": [
+        "No compiler/counter correspondence",
+        "None is a restriction marker for other branches",
+        "No full group-law or full degree2+2 dispatch claim"
+      ],
+      "review": "/var/tmp/pencil-sameu-word-independent-review-20261031-v1/review.json"
+    },
+    {
+      "id": "corrected_source_software",
+      "source_revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+      "status": "four_checks_passed",
+      "checks": [
+        {
+          "stage": "gpu-touched",
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/gpu-touched/receipt.json",
+          "sha256": "702ee26bcffff186cab0060fa05731795be6cffab5291144d42397cb94f2d7b3",
+          "exit_code": 0,
+          "sources_unchanged": true,
+          "ended_utc": "2026-10-31T02:36:05.012955+00:00"
+        },
+        {
+          "stage": "full-lib",
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/full-lib/receipt.json",
+          "sha256": "61e07350b245d51112ef33c3aef6012ffef83a4e5588bdcb5b7b8923b37578ba",
+          "exit_code": 0,
+          "sources_unchanged": true,
+          "ended_utc": "2026-10-31T02:49:47.281257+00:00"
+        },
+        {
+          "stage": "maintained-clippy",
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/maintained-clippy/receipt.json",
+          "sha256": "22720639d3b70018f366d878c7b2acf04550b28f3ff4355c0c795cd12856e949",
+          "exit_code": 0,
+          "sources_unchanged": true,
+          "ended_utc": "2026-10-31T03:09:06.343930+00:00"
+        },
+        {
+          "stage": "ecbench-build",
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/owner-lock-software-checks/ecbench-build/receipt.json",
+          "sha256": "c58f96770a4a51f19f5cd1f7948908d860bb2340fbd46b7668ff89c8a95a2956",
+          "exit_code": 0,
+          "sources_unchanged": true,
+          "ended_utc": "2026-10-31T03:16:43.384131+00:00"
+        }
+      ],
+      "full_lib": {
+        "passed": 5793,
+        "failed": 0,
+        "ignored": 128
+      },
+      "gpu_touched": {
+        "passed": 8,
+        "failed": 0
+      },
+      "earlier_failure": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/final-software-checks/full-lib/receipt.json",
+        "exit_code": 101,
+        "sources_unchanged": true,
+        "ended_utc": "2026-10-31T00:47:18.341477+00:00"
+      }
+    },
+    {
+      "id": "final_static_binary",
+      "status": "built_and_provenance_reviewed",
+      "source_revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+      "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+      "build_exit": 0,
+      "build_end_unix": 1793417032.5076349,
+      "image_qualified": false,
+      "bundled_musl_upstream_revision": "unestablished",
+      "review": "/var/tmp/pencil-final-musl-provenance-independent-review-20261031-v1/review.json"
+    },
+    {
+      "id": "assembly",
+      "snapshot": {
+        "status": "terminal_receipt_available_not_independently_reviewed_by_this_aggregate",
+        "receipt": "/var/tmp/pencil-copy-only-assembly-execution-20261031-v1/receipt.json",
+        "sha256": "02ca899cf41f9b2f247dbf3708956c8dbc370fbe7847e7d3e162328be66a56e9",
+        "recorded_status": "assembly_uncertain"
+      },
+      "root_owned": true,
+      "qualification": "not inferred",
+      "root_execution_status": "assembly_uncertain",
+      "failure": "PermissionError: [Errno 13] Permission denied: '/var/tmp/pencil-copy-only-assembly-execution-20261031-v1/base.iid'",
+      "base_client_exit": 0,
+      "observed_base_image_id": "sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476",
+      "runtime_build_attempted": false,
+      "qualification_performed": false,
+      "automatic_retry": false,
+      "next_action": "Independent reconciliation of existing base before a prospective adopt-existing-base recovery; no duplicate base build."
+    },
+    {
+      "id": "continuation",
+      "status": "plans_and_sources_reconciled_accounting_unresolved",
+      "targets": 1260,
+      "slots": 22680,
+      "warmups": 3780,
+      "separate_gate_slots": 18,
+      "worker_ceiling_seconds": 25200,
+      "remaining_worker_seconds": null,
+      "absolute_deadline_utc": "2026-10-31T06:00:00Z",
+      "authorization": "planning_only",
+      "remote_owner_closed": false,
+      "new_execution_admitted": false,
+      "known_C1": {
+        "records": 7,
+        "measured": 4,
+        "pencil_timeouts": 2,
+        "pencil_verified": 0,
+        "missing_slots": 11
+      },
+      "ledger": "/var/tmp/pencil-continuation-reconciliation-20261031-v1/remaining-binding-ledger.json"
+    }
+  ]
+}

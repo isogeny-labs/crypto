@@ -1,0 +1,10 @@
+tests/cpu_accounting.cpp: In lambda function:
+tests/cpu_accounting.cpp:182:7: error: inconsistent deduction for ‘auto’: ‘std::__cxx11::basic_string<char>’ and then ‘std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> >’
+  182 |       auto text = read(where / "phases"), v = fields(text);
+      |       ^~~~
+tests/cpu_accounting.cpp: In lambda function:
+tests/cpu_accounting.cpp:235:7: error: inconsistent deduction for ‘auto’: ‘std::__cxx11::basic_string<char>’ and then ‘std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> >’
+  235 |       auto text = phase_cpu_fields(before, after), v = fields(text);
+      |       ^~~~
+make: *** [Makefile:26: /workspace/native-smallroot-cpu-build-dc4016-1/cpu-accounting] Error 1
+make: *** Waiting for unfinished jobs....

@@ -52,6 +52,74 @@ pub struct Request {
     pub max_restores: u32,
     #[serde(default, skip_serializing_if = "Memory::is_default")]
     pub memory: Memory,
+    /// Optional opaque launches, independently frozen for computation-L0/fresh-L2.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diagnostic_transport: Option<DiagnosticTransport>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_campaign: Option<crate::campaign::Binding>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fresh_owner: Option<FreshOwnerAdmission>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FreshOwnerAdmission {
+    pub schema: String,
+    pub binary_sha256: String,
+    /// Immutable process stop, never later than the original request deadline.
+    pub stop_utc_seconds: u64,
+}
+
+pub const MAX_DIAGNOSTIC_LAUNCH_BYTES: usize = 65_536;
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DiagnosticLaunchBytes {
+    pub raw_json: String,
+    pub sha256: String,
+    /// Exact emitted spec-file bytes, NOT ecbench's identity-view digest.
+    pub spec_bytes_sha256: String,
+}
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DiagnosticTransport {
+    pub schema: String,
+    pub computation: DiagnosticLaunchBytes,
+    pub fresh: DiagnosticLaunchBytes,
+}
+impl DiagnosticTransport {
+    pub fn validate(&self, original: &Value) -> Result<(), String> {
+        if self.schema != "isolab.diagnostic-transport/v1" {
+            return Err("unsupported diagnostic transport".into());
+        }
+        for launch in [&self.computation, &self.fresh] {
+            if launch.raw_json.is_empty()
+                || launch.raw_json.len() > MAX_DIAGNOSTIC_LAUNCH_BYTES
+                || !hex(&launch.sha256, 64)
+                || digest(launch.raw_json.as_bytes()) != launch.sha256
+                || !hex(&launch.spec_bytes_sha256, 64)
+            {
+                return Err("diagnostic raw launch byte/hash bound invalid".into());
+            }
+        }
+        // Verification against independently supplied frozen values, never mutation
+        // of either opaque launch or its internal expected_spec_sha256 binding.
+        if !original.is_object() || !original["measurement"].is_object() {
+            return Err("diagnostic transport requires a spec measurement object".into());
+        }
+        let mut computation = original.clone();
+        computation["measurement"]["isolation_required"] = serde_json::json!("L0");
+        computation["label"] =
+            serde_json::json!("CRIU computation only: all timing invalid for benchmark admission");
+        let computation = serde_json::to_vec_pretty(&computation).map_err(|e| e.to_string())?;
+        let mut fresh = serde_json::to_vec(original).map_err(|e| e.to_string())?;
+        fresh.push(b'\n'); // Existing fresh wrapper's printf '%s\n'.
+        if digest(&computation) != self.computation.spec_bytes_sha256
+            || digest(&fresh) != self.fresh.spec_bytes_sha256
+        {
+            return Err("separately frozen computation/fresh spec-byte binding mismatch".into());
+        }
+        Ok(())
+    }
 }
 
 pub fn hex(s: &str, n: usize) -> bool {
@@ -137,6 +205,23 @@ impl Request {
         {
             return Err("the original benchmark spec must require L2, warmup, five rounds, reference and A/A control".into());
         }
+        if let Some(binding) = &self.worker_campaign {
+            let spec_hash = digest(&serde_json::to_vec(&self.spec).map_err(|e| e.to_string())?);
+            binding.validate(&spec_hash, self.deadline_unix_seconds)?;
+        }
+        if let Some(transport) = &self.diagnostic_transport {
+            transport.validate(&self.spec)?;
+        }
+        if let Some(owner) = &self.fresh_owner {
+            if owner.schema != "isolab.fresh-owner-admission/v1"
+                || !hex(&owner.binary_sha256, 64)
+                || self.diagnostic_transport.is_none()
+                || owner.stop_utc_seconds == 0
+                || owner.stop_utc_seconds > self.deadline_unix_seconds
+            {
+                return Err("invalid explicit fresh owner admission".into());
+            }
+        }
         Ok(())
     }
 
@@ -176,12 +261,78 @@ pub fn fixture() -> Request {
         checkpoint_interval_seconds: 60,
         max_restores: 2,
         memory: Memory::default(),
+        diagnostic_transport: None,
+        fresh_owner: None,
+        worker_campaign: None,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn diagnostic_fixture() -> Request {
+        let mut request = fixture();
+        let mut computation = request.spec.clone();
+        computation["measurement"]["isolation_required"] = serde_json::json!("L0");
+        computation["label"] =
+            serde_json::json!("CRIU computation only: all timing invalid for benchmark admission");
+        let mut fresh = serde_json::to_vec(&request.spec).unwrap();
+        fresh.push(b'\n');
+        let raw = "{ \"opaque_launch_fixture\": true }\n".to_owned();
+        let launch = DiagnosticLaunchBytes {
+            sha256: digest(raw.as_bytes()),
+            raw_json: raw,
+            spec_bytes_sha256: digest(&fresh),
+        };
+        request.diagnostic_transport = Some(DiagnosticTransport {
+            schema: "isolab.diagnostic-transport/v1".into(),
+            computation: DiagnosticLaunchBytes {
+                spec_bytes_sha256: digest(&serde_json::to_vec_pretty(&computation).unwrap()),
+                ..launch.clone()
+            },
+            fresh: launch,
+        });
+        request
+    }
+    #[test]
+    fn diagnostic_transport_preserves_raw_bytes_and_separate_spec_bindings() {
+        let request = diagnostic_fixture();
+        let bytes = serde_json::to_vec(&request).unwrap();
+        let parsed = Request::parse(&bytes).unwrap();
+        assert_eq!(parsed.diagnostic_transport, request.diagnostic_transport);
+        assert_ne!(request.hash(), fixture().hash());
+        let mut wrong = request.clone();
+        let t = wrong.diagnostic_transport.as_mut().unwrap();
+        t.computation.spec_bytes_sha256 = t.fresh.spec_bytes_sha256.clone();
+        assert!(wrong.validate().is_err());
+        let mut wrong = request.clone();
+        wrong
+            .diagnostic_transport
+            .as_mut()
+            .unwrap()
+            .fresh
+            .raw_json
+            .push(' ');
+        assert!(wrong.validate().is_err());
+        assert!(request
+            .diagnostic_transport
+            .as_ref()
+            .unwrap()
+            .validate(&Value::Null)
+            .is_err());
+    }
+    #[test]
+    fn diagnostic_transport_retains_total_request_cap() {
+        let mut request = diagnostic_fixture();
+        let t = request.diagnostic_transport.as_mut().unwrap();
+        for launch in [&mut t.fresh, &mut t.computation] {
+            launch.raw_json = " ".repeat(40_000);
+            launch.sha256 = digest(launch.raw_json.as_bytes());
+        }
+        let bytes = serde_json::to_vec(&request).unwrap();
+        assert!(bytes.len() > 65_536);
+        assert!(Request::parse(&bytes).is_err());
+    }
     #[test]
     fn memory_preserves_legacy_request_bytes_and_binds_explicit_eight_gib() {
         // Exact pre-memory serialization layout, independent of Request's fields.
@@ -291,5 +442,24 @@ mod tests {
         assert!(fixture().validate_new_deadline(1000).is_ok());
         assert!(fixture().validate_new_deadline(5001).is_err());
         assert!(fixture().validate_new_deadline(4999).is_err());
+    }
+    #[test]
+    fn fresh_owner_requires_diagnostics_and_original_deadline() {
+        let mut r = fixture();
+        r.fresh_owner = Some(FreshOwnerAdmission {
+            schema: "isolab.fresh-owner-admission/v1".into(),
+            binary_sha256: "e".repeat(64),
+            stop_utc_seconds: 4000,
+        });
+        assert!(r.validate().is_err());
+        let mut r = diagnostic_fixture();
+        r.fresh_owner = Some(FreshOwnerAdmission {
+            schema: "isolab.fresh-owner-admission/v1".into(),
+            binary_sha256: "e".repeat(64),
+            stop_utc_seconds: 4000,
+        });
+        assert!(r.validate().is_ok());
+        r.fresh_owner.as_mut().unwrap().stop_utc_seconds = r.deadline_unix_seconds + 1;
+        assert!(r.validate().is_err());
     }
 }

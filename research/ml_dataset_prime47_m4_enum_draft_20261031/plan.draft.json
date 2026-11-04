@@ -1,0 +1,45 @@
+{
+  "schema": "design.crypto.ml-dataset.plan-draft/v1",
+  "launch_authorized": false,
+  "freeze_state": "unfrozen",
+  "protocol_sha256": null,
+  "seed": null,
+  "source_commit": null,
+  "binary_sha256": null,
+  "prime_modulus": null,
+  "base_group_order": null,
+  "twist_group_order": null,
+  "family": "prime",
+  "field_size_bits": 47,
+  "arity": 4,
+  "solver": "enumerate",
+  "curve_seeds": 1,
+  "generators": 1,
+  "keys": 1,
+  "degree_bound": 3,
+  "factor_base_size_requested": 3,
+  "factor_base_size_actual": null,
+  "factor_base_policy": null,
+  "work_limit_transitions": 4096,
+  "seconds_per_case": 90,
+  "outer_generate_timeout_seconds": 180,
+  "memory_mib": 2048,
+  "trace_mib": 64,
+  "minimum_free_disk_gib": 8,
+  "campaign_wall_ceiling_seconds": 7200,
+  "split_rule": "canonical-curve-twist-pair-component-sha256-v1",
+  "cells": [
+    {
+      "id": "prime47-m04-untwisted",
+      "twist": false,
+      "status": "planned_only"
+    },
+    {
+      "id": "prime47-m04-twisted",
+      "twist": true,
+      "status": "planned_only"
+    }
+  ],
+  "planned_cells": 2,
+  "attempted_cells": 0
+}

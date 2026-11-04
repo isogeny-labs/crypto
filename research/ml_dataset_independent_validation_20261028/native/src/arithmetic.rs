@@ -68,7 +68,7 @@ fn pow_mod(mut base: u64, mut exponent: u64, modulus: u64) -> u64 {
     result
 }
 
-fn is_prime(n: u64) -> bool {
+pub(crate) fn is_prime(n: u64) -> bool {
     // The first twelve prime bases are deterministic throughout u64: the least
     // composite passing all twelve is 318665857834031151167461 > 2^64
     // (Sorenson--Webster, Theorem 1.1). This is not a probable-prime-only check.
@@ -368,7 +368,7 @@ impl Curve {
         Ok(Some((x3, f.sub(f.mul(slope, f.sub(x1, x3)), y1))))
     }
 
-    fn mul(&self, mut point: Point, mut scalar: u64) -> Result<Point> {
+    pub(crate) fn mul(&self, mut point: Point, mut scalar: u64) -> Result<Point> {
         ensure!(self.on_curve(point), "cannot multiply off-curve point");
         let mut result = None;
         while scalar != 0 {

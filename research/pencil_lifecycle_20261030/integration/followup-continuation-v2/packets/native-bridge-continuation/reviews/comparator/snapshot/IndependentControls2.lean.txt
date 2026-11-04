@@ -1,0 +1,19 @@
+import Comparator
+open ProjectiveComparator
+instance : Fact (Nat.Prime 17) := ⟨by decide⟩
+def x : V (ZMod 17) := fun i => if i=0 then 2 else if i=1 then 3 else if i=2 then 0 else 4
+def y : V (ZMod 17) := fun i => if i=0 then 6 else if i=1 then 9 else if i=2 then 0 else 12
+def z : V (ZMod 17) := fun i => if i=0 then 6 else if i=1 then 9 else if i=2 then 1 else 12
+def last : V (ZMod 17) := fun i => if i=0 then 0 else if i=1 then 0 else if i=2 then 0 else 3
+theorem nonunit_pivot : same x y := by unfold same x y; decide
+theorem finite16_true : ((List.finRange 4).all fun i=> (List.finRange 4).all fun j=>x i*y j==x j*y i)=true := by decide
+theorem finite16_false : ((List.finRange 4).all fun i=> (List.finRange 4).all fun j=>x i*z j==x j*z i)=false := by decide
+theorem nonproportional : ¬same x z := by unfold same x z; decide
+theorem final_coordinate : same last (fun i=>5*last i) := by unfold same last; decide
+theorem zero_finite16 : ((List.finRange 4).all fun i=> (List.finRange 4).all fun j=>(0 : ZMod 17)*x j==(0 : ZMod 17)*x i)=true := by decide
+#print axioms nonunit_pivot
+#print axioms finite16_true
+#print axioms finite16_false
+#print axioms nonproportional
+#print axioms final_coordinate
+#print axioms zero_finite16

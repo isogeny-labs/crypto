@@ -1,7 +1,7 @@
 # Lean proof map
 
 The proof artifacts are `lean/PrimeExamples.lean`,
-`lean/OakleyOrders.lean`, `lean/MinimalPairingField.lean`,
+`lean/OakleyOrders.lean`, `lean/OakleyPrimality.lean`, `lean/MinimalPairingField.lean`,
 `lean/RelationSupport.lean`, and `lean/WeightedSupport.lean`. Their shared `lean-toolchain`,
 `lakefile.toml` and manifest pin Lean 4.34.1 and Mathlib commit
 `d13f23b723b8a846827a245b89c10fc7d3f11612`. The declaration
@@ -19,6 +19,7 @@ solutions to `y²=x³+ax+b (mod p)` for `0≤x,y<p`.
 | All three selected points satisfy the curve equation | `anomalous_point_on_curve`, `smooth_point_on_curve`, `pairing_point_on_curve` | Exact modular arithmetic, checked |
 | The selected pairing order divides the group order | `pairing_selected_order_divides_group_order` | Divisibility arithmetic, checked |
 | Oakley Groups 3 and 4 have RFC order decompositions `12r` and `4r` | `oakley3_full_order_factor`, `oakley4_full_order_factor` | Exact arithmetic on RFC-declared integers, checked; the RFC point counts themselves are hypotheses/source data |
+| The RFC subgroup orders `oakley3Prime` (152 bits) and `oakley4Prime` (183 bits) are prime | `oakley3Prime_prime`, `oakley4Prime_prime` in [OakleyPrimality.lean](lean/OakleyPrimality.lean); generic step `Pratt.pratt`, correctness of the modular-power loop `Pratt.powModAux_cast` | **Verification status: PENDING.** The Lean module has not yet been built; the retained `lake build`, `leanchecker --fresh` and `#print axioms` output from CI is still to be attached here. Design: Pratt certificates (18 recursive certificates; factors below `2^20` by Mathlib `norm_num`) to be checked by the Lean kernel with `decide +kernel`, reduced to Mathlib's `lucas_primality`; no `native_decide`. Certificate data `validation/oakley_pratt_certificates.json` is independently verified by the Rust checker `src/bin/check_pratt_certificates.rs` (passed locally: 18 certificates, 49 primes), which does not verify the Lean declarations. Primality of the integers only; that they are the RFC curves' point orders remains source data |
 | Their field degrees factor as `5·31` and `5·37` | `oakley3_extension_factor`, `oakley4_extension_factor` | Exact arithmetic, checked |
 | Type II at magic number five has formula genus 16 | `oakley_type_ii_genus_formula` | Conditional formula arithmetic, checked; the binary-field trace and Type II classification are separately computed by the transfer registry |
 | Multiplying a point of order `c·r` by `c` yields order `r` | `selected_order_of_generator`; Oakley corollaries `oakley3_selected_order`, `oakley4_selected_order` | Generic additive-group theorem with the exact published point-order premise, checked |
@@ -78,7 +79,11 @@ their exact parameter and generator checks are replayed by
 static-DH or the SIDH key-recovery algorithm.
 
 For the Oakley curves, the Lean subgroup theorem is conditional on the RFC
-generator-order premise. The independent checked Sage replay verifies that
+generator-order premise. Primality of the two subgroup orders is proposed
+to be proved by `oakley3Prime_prime` and `oakley4Prime_prime` (Pratt
+certificates, added 2026-10-29 after the CFSG exposure audit; kernel check
+pending CI, see the table row), and the certificate data is independently
+checked. They do not prove that either integer is the order of an RFC point. The independent checked Sage replay verifies that
 premise for the RFC points over both specified binary fields, subject to the
 RFC's full curve order. The GHS magic-number calculation, genus formula,
 cover construction, subgroup map and attack-cost argument are not formalized

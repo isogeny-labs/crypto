@@ -344,10 +344,10 @@ fn byte_encode(f: &Poly, d: usize) -> Vec<u8> {
     let mut out = vec![0u8; 32 * d];
     for (i, &c) in f.0.iter().enumerate() {
         for b in 0..d {
-            if (c >> b) & 1 == 1 {
-                let bit_index = i * d + b;
-                out[bit_index / 8] |= 1 << (bit_index % 8);
-            }
+            // Coefficients can be secret (including the recovered message in
+            // K-PKE.Decrypt). Visit the same output byte for zero and one bits.
+            let bit_index = i * d + b;
+            out[bit_index / 8] |= (((c >> b) & 1) as u8) << (bit_index % 8);
         }
     }
     out
@@ -760,6 +760,40 @@ mod tests {
     const KAT768_DEC_C_MOD: &str = "38e6d9f5e24cc216630e8b9fcc01fd6e724dd31b55c22c76bc3f4f3a151f6369e313acefecc22b11bdec684c3e7d6dcb7656586cd41c553bd3fb730d17768f89ab9f51a2b18ca3dced1ea271148f23bb02948f6c38343d33d1de3e2ddbe507df7a96d2c6123b9c75e4f96fea0e8f3a048ab0870ed63e94e5a45db461d7eabc338f66f0aa5d939b1f1da50e1172fe01682a29563b2d25b06da0910f782da04b7c69bb5796897f48c338044d702b1819c04327b21eb3ce9c2a5533e20dff5b18eb1310a05cb46cccdfbddc0f2e9c348a03f02e01a7425a2a75d97427e570d4c20ce3ec0c27c6228c5076119211e6599a6aa300ad952fe05ac0059a7cdb80a20d6fd91d8d6c1ea05d56098e387e1cabdad4968ab37d6dc4d26e0cfa953b7eeb6044aa2c52a73f700090d970ec5461e1b4563cdd94d8e79e730ae41a9a1ce7a43e49735450df09e3111dc2c35560c90f8c98cf3d5235a17679cc7dedc0bc71933b9f4623436294d06f2f072b31ec9c9b803e8d8d6a7e6d1fc4556b704aec6a7c82262a1f2a31eab9de97416349b7cd7dc34333b8e40e928f94c4dd19eb762ce02a6bef2d503db5fc57894e7cf236821274a79262a05527f079d4d0e513fd9a786d826b667c0656681f13eb2599590ad9854c9e5378d8defc5d688b861bf5be6847d475d435f8ac78e3f5a3ed162c6d7534a8faaf8366c12b095cc1c4724d12da31b32f229c3ccb328f28e1ac46c48bae3c9608feee472430aa40f9906aebfeb7650788582b60404586805ce870fbca22cad8ff251e6a61384ae1092282d87eefefeaff9dca2e4b6b1fe7920e860de8b2232dda16933323462b1433ec7c2e236b1eb15c0a79dcb264537c42b6818c8d2bff3afda6deead3fd3493afc799d5a74f2718c15d959819b6a5e8be3e580edcea1a8f96683c7ee318e704f312f9efc26ce0fdaaa6a389930514a1c97ac0d8dce8516ec8bcc15e5c6436ab49b819d004ccaa90398ad1c13bb5c2fe9a537a9f6c29692de939f3c9e87f6732bc85456f3e596d86988b69a4cc813aadf1ec0a2e7d10f60822cc415276a204cd2c1844ddbdfac8d910c5384a5ed2c8d9b8160a5b74bb3efcfe7484b4742cbce861800993d68eb9431f40d495428f9eabe3cc530ab7a9410fcabcd1c9cfae431e652af9ee19eae0f5433def0cba53936e3369bf479a5287b5fd271d0b9f0c294b759dc59f8b0b470d9bf98eb496ee1149abac53ca0665d64c16e0069b654ec376c66c456adc29bf1f6dcae4afc020b9783d3f85c48c479e583c477e2218061b9b82efd0a6a9c9440014b22f9458719191e4baa1b90c30789974efca17c8dd78cb09eddee078bfcf5b44b21c7559b9b29a06532d416cf83d3c205e06f0402f89a88e24135948e3a8bdb9dc2e9cd99919cd69b41a51a6211bf2589fd457be77ca4bca6c97da0dcaa1f4ddb886315137212e93877fc8c23e4260a7dfe9679458876026a6044663c42231a1ab5d1ba9dd7bb05e236b80ad48cb9fae69da66dddbba337090849f4b6916e2";
     const KAT768_DEC_K_MOD: &str =
         "9652336bb52a7ad8f781e6d8c00e798fefa7071211d39fc9987779727fd9270c";
+
+    #[test]
+    fn byte_encode_places_every_bit_in_little_endian_order() {
+        // One-hot inputs exercise every coefficient/byte boundary for every
+        // width in FIPS 203 Algorithm 5, including widths not used by ML-KEM.
+        for d in 1..=12 {
+            let mut f = Poly::zero();
+            for i in 0..N {
+                for b in 0..d {
+                    f.0[i] = 1 << b;
+                    let mut expected = vec![0u8; 32 * d];
+                    let bit = i * d + b;
+                    expected[bit / 8] = 1 << (bit % 8);
+                    assert_eq!(byte_encode(&f, d), expected, "d={d} i={i} b={b}");
+                }
+                f.0[i] = 0;
+            }
+        }
+    }
+
+    #[test]
+    fn byte_encode_handles_zero_and_dense_canonical_coefficients() {
+        for d in 1..=12 {
+            assert_eq!(byte_encode(&Poly::zero(), d), vec![0; 32 * d]);
+            if d < 12 {
+                let f = Poly([(1 << d) - 1; N]);
+                assert_eq!(byte_encode(&f, d), vec![0xff; 32 * d]);
+            } else {
+                // Two coefficients equal to q-1 = 0xd00 pack as 00 0d d0.
+                let f = Poly([(Q - 1) as u16; N]);
+                assert_eq!(byte_encode(&f, d), [0x00, 0x0d, 0xd0].repeat(N / 2));
+            }
+        }
+    }
 
     #[test]
     fn ntt_roundtrip() {

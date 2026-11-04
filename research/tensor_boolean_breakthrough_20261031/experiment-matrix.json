@@ -1,0 +1,139 @@
+{
+  "schema": "tensor_boolean.experiment_matrix/v1",
+  "created": "2026-10-31",
+  "status": "design_only_no_affected_data",
+  "repository_baseline": "e3741fd5bbcc1f52a86be609587e7cf4ceeef566",
+  "objective": "Find and falsify a composable invariant that lowers exact Boolean tensor contraction cost for the hashed prime-field ECDLP network.",
+  "execution_order": ["E0", "E1", "E1S", "E2", "E3", "E4", "E5"],
+  "experiments": [
+    {
+      "id": "E0",
+      "name": "canonical_ir_equivalence_and_mutation_gate",
+      "kind": "exact_computation",
+      "depends_on": [],
+      "hypothesis": "A stable typed IR can round-trip every compared network without changing semantic counts, interfaces, witnesses, pins, or predicate parameters.",
+      "treatment": "serialize_import_rebuild",
+      "controls": {
+        "aa": "original IR serialized twice in independent processes",
+        "positive": "known tiny arithmetic and copy networks",
+        "negative": ["edge_endpoint_swap", "interface_permutation", "predicate_parameter_bit_flip", "predicate_port_reversal", "dropped_pin"]
+      },
+      "instances": "all production predicate tags plus exhaustive tiny composed fixtures",
+      "primary_metrics": ["total_count", "all_interface_prefix_counts", "least_interface_witness", "model_multiplicity", "canonical_sha256"],
+      "advance": "all exact values equal and every mutation detected",
+      "falsifier": "any unexplained semantic difference or undetected declared mutation",
+      "claim_limit": "validates the instrument only"
+    },
+    {
+      "id": "E1",
+      "name": "boundary_tensor_rank_census",
+      "kind": "controlled_comparative",
+      "depends_on": ["E0"],
+      "hypothesis": "Natural hashed networks have lower normalized balanced boundary-flattening rank than topology-preserving rewired nulls.",
+      "treatment": "natural_global_wiring_vs_interior_rewired_wiring",
+      "controls": {
+        "aa": "fresh-process reimport of identical IR",
+        "positive": "analytically rank-1/rank-2/rank-4 copy networks",
+        "negative": "degree-preserving edge swaps within frozen cut classes, preserving local predicates, edges, interface, pins, cut width and per-vertex cut degree; conditioned and unconditioned panels"
+      },
+      "draft_ladder": {"factor_base_bits": [6, 8, 10, 12], "slots": [2, 3, 4], "pairs_per_cell": 16},
+      "primary_metrics": ["exact_integer_rank", "normalized_log_rank", "rank_storage_entries", "boundary_support"],
+      "advance": "registered paired rank and slope gaps on held-out cells with >=90% exact-rank completion",
+      "falsifier": "equivalence interval around zero with passing controls and >=90% completion",
+      "claim_limit": "finite-size mechanism lead, not subexponential complexity"
+    },
+    {
+      "id": "E1S",
+      "name": "sat_bdd_mechanism_triangulation",
+      "kind": "controlled_comparative",
+      "depends_on": ["E1_advanced"],
+      "hypothesis": "The boundary-rank signature found in E1 predicts lower complete search work for at least two exact Boolean solver representations on the same natural/null pairs.",
+      "treatment": "natural_global_wiring_vs_paired_rewired_wiring_within_each_frozen_solver_bundle",
+      "controls": {
+        "aa": "byte-identical solver input and seed in a fresh process",
+        "positive": "unit-propagation and bounded-width families with hidden verified models",
+        "negative": "the conditioned and unconditioned E1 rewired nulls",
+        "sham": "variable and clause renaming with canonical inverse map"
+      },
+      "solver_bundles": ["parsimonious_cnf_cadical", "cnf_xor_cryptominisat", "ordered_bdd_exact_elimination"],
+      "instances": "the frozen E1 pairs only; no solver-specific instance selection",
+      "primary_metrics": ["verified_status", "complete_retired_instructions", "decisions", "conflicts", "propagations", "learned_bytes", "bdd_peak_nodes", "peak_rss_bytes"],
+      "advance": "natural/null complete-work ratio <=0.8 with corrected interval below 1 on the three largest sizes in two solver bundles, plus held-out rank/log-work association lower interval >=0.4",
+      "falsifier": "effect is within A/A/sham spread, changes sign across bundles, or has no held-out association with exact rank",
+      "claim_limit": "nominates only the tested solver/encoding bundles; does not establish a generic SAT advantage"
+    },
+    {
+      "id": "E2",
+      "name": "local_fourier_partition_rank_census",
+      "kind": "controlled_exact_structure",
+      "depends_on": ["E1_advanced"],
+      "hypothesis": "The E1 gap is explained by a stable low-dimensional basis for repeated arithmetic/hash blocks and composes across blocks.",
+      "treatment": "boolean_standard_basis_vs_registered_fourier_or_partition_basis",
+      "controls": {
+        "aa": "port-permuted equivalent block with canonical inverse permutation",
+        "positive": "copy, XOR, ripple-carry, and separable tensors with known spectra",
+        "negative": "arity- and acceptance-weight-matched random truth tables under the bounded arity cap"
+      },
+      "draft_ladder": {"word_bits": [1, 2, 4, 8], "block_compositions": [1, 2, 4, 8]},
+      "primary_metrics": ["certified_partition_rank", "nonzero_fourier_coefficients", "composed_factor_dimension", "predicted_exact_operations"],
+      "advance": "a checked composition certificate predicts >=20% lower exact operations on four held-out sizes and the null does not",
+      "falsifier": "rank saturates the ambient dimension under repeated composition or no global bound follows",
+      "claim_limit": "local low rank alone is insufficient"
+    },
+    {
+      "id": "E3",
+      "name": "certified_rewrite_and_order_search",
+      "kind": "train_holdout_search",
+      "depends_on": ["E2_advanced"],
+      "hypothesis": "Certified rewrites and contraction orders can expose the registered invariant and improve held-out exact work growth.",
+      "treatment": "registered_rewrite_search_vs_current_direct_functional_min_fill_and_tiny_optimum",
+      "controls": {
+        "aa": "search disabled but full candidate replay path enabled",
+        "positive": "network family with a planted eliminable equality and known superior order",
+        "negative": "matched rewired E1 nulls"
+      },
+      "search_space": ["constant_propagation", "equality_elimination", "port_fusion", "word_block_fusion", "selector_factoring", "slot_symmetry", "algebraic_pre_elimination", "contraction_order"],
+      "primary_metrics": ["exact_operations", "maximum_live_states", "coefficient_bit_growth", "equivalence_certificate_status"],
+      "advance": ">=2x exact-operation and live-state improvement on all three largest holdout sizes plus lower growth slope",
+      "falsifier": "training gains disappear on holdout or any candidate lacks an exact equivalence certificate",
+      "claim_limit": "constant-factor gain is engineering, not a new mechanism"
+    },
+    {
+      "id": "E4",
+      "name": "structure_specific_exact_contraction_engine",
+      "kind": "controlled_comparative",
+      "depends_on": ["E3_advanced"],
+      "hypothesis": "A rank/Fourier-aware exact message engine lowers complete exact work and memory on the same canonical instances.",
+      "treatment": "structure_specific_engine_vs_best_exact_baseline",
+      "controls": {
+        "aa": "baseline wrapper duplicated in a fresh process",
+        "positive": "registered low-rank synthetic family",
+        "negative": "matched E1 rewired nulls",
+        "external": "fastest available exact tensor, BDD, or #SAT implementation accepting the same instances"
+      },
+      "primary_metrics": ["exact_semiring_operations", "bit_operations_or_precision_band", "peak_bytes", "verified_count_and_witness"],
+      "secondary_metrics": ["retired_instructions", "complete_wall_seconds"],
+      "advance": ">=2x exact operations and peak memory on the two largest held-out sizes, every output equal, and lower growth slope",
+      "falsifier": "advantage is within A/A spread, vanishes when setup/precision is charged, or fails on null/holdout",
+      "claim_limit": "no asymptotic claim from four sizes"
+    },
+    {
+      "id": "E5",
+      "name": "end_to_end_relation_oracle_gate",
+      "kind": "complete_pipeline",
+      "depends_on": ["E4_advanced"],
+      "hypothesis": "The registered invariant reduces complete verified relation-collection work after all failures, extraction, replay, and linear algebra are charged.",
+      "treatment": "new_relation_oracle_vs_best_existing_exact_oracle_and_pollard_rho_reference",
+      "controls": {
+        "aa": "identical oracle rerun with fresh process layout",
+        "positive": "planted relations hidden from the oracle",
+        "negative": "same-size instances without the registered invariant"
+      },
+      "primary_metrics": ["verified_relations_per_complete_work", "failed_targets", "setup_work", "extraction_and_replay_work", "linear_algebra_work", "peak_bytes"],
+      "pricing_band": [0.0, 0.1, 1.0],
+      "advance": "complete-pipeline improvement on four increasing sizes and one unseen target family",
+      "falsifier": "local contraction gain is erased by relation yield, retries, verification, or linear algebra",
+      "claim_limit": "cryptanalytic progress only; asymptotic ECDLP claims require a proved family bound"
+    }
+  ]
+}

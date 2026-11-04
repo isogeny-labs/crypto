@@ -1,0 +1,20 @@
+warning[E0602]: unknown lint: `clippy::chunks_exact_to_as_chunks`
+  |
+  = note: requested on the command line with `-A clippy::chunks_exact_to_as_chunks`
+  = note: `#[warn(unknown_lints)]` on by default
+
+warning: manual implementation of `.is_multiple_of()`
+   --> src/cryptanalysis/modular_polynomial.rs:403:28
+    |
+403 |         (1..=m).filter(|d| m % d == 0).map(|d| BigInt::from(d).pow(k)).sum()
+    |                            ^^^^^^^^^^ help: replace with: `m.is_multiple_of(*d)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.97.0/index.html#manual_is_multiple_of
+    = note: `#[warn(clippy::manual_is_multiple_of)]` on by default
+
+For more information about this error, try `rustc --explain E0602`.
+warning: `crypto` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p crypto -- ` to apply 1 suggestion)
+    Checking crypto v0.1.0 (/home/user/ps7wt)
+warning: `crypto` (example "pdp_ps7") generated 1 warning (1 duplicate)
+    Finished `release` profile [optimized] target(s) in 1.10s
+clippy exit 0; warnings located in examples/pdp_ps7 or pdp_speedup: 0

@@ -1,0 +1,102 @@
+{
+  "observed_rows": 4,
+  "warmups": 3,
+  "measured": 1,
+  "by_status": [
+    {
+      "status": "timeout",
+      "count": 1
+    },
+    {
+      "status": "verified",
+      "count": 3
+    }
+  ],
+  "rows": [
+    {
+      "record_id": "ECR1hc433070a0dfa",
+      "session_id": "ECBS1hf8b5deac05ae",
+      "seq": 0,
+      "arm": "rho",
+      "round": 0,
+      "warmup": true,
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "family": "rho",
+        "params": {
+          "trial_cap": "18668300"
+        },
+        "method_id": "ECM1h67454689882b",
+        "method_sha256": "67454689882b28d509ee64a8afc4882fab1b4f672670f2da66c0ad13756cb34f",
+        "entry": "three_leads::solve_rho"
+      },
+      "algorithm_seed": "3449432149853347341",
+      "outcome_status": "verified",
+      "error": null
+    },
+    {
+      "record_id": "ECR1h06a081858b58",
+      "session_id": "ECBS1hf8b5deac05ae",
+      "seq": 1,
+      "arm": "rho_AA",
+      "round": 0,
+      "warmup": true,
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "family": "rho",
+        "params": {
+          "trial_cap": "18668300"
+        },
+        "method_id": "ECM1h67454689882b",
+        "method_sha256": "67454689882b28d509ee64a8afc4882fab1b4f672670f2da66c0ad13756cb34f",
+        "entry": "three_leads::solve_rho"
+      },
+      "algorithm_seed": "3449432149853347341",
+      "outcome_status": "verified",
+      "error": null
+    },
+    {
+      "record_id": "ECR1h438b9ba3dfc0",
+      "session_id": "ECBS1hf8b5deac05ae",
+      "seq": 2,
+      "arm": "pencil",
+      "round": 0,
+      "warmup": true,
+      "method": {
+        "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+        "family": "ic",
+        "params": {
+          "matrix_coefficient_cap": "25000000",
+          "small_denominator": "8"
+        },
+        "method_id": "ECM1h187cc5c6d747",
+        "method_sha256": "187cc5c6d747a3b25cfd9708e970b511886a46c49b5db9fd3b09ce5b8a7fc983",
+        "entry": "three_leads::pencil::solve"
+      },
+      "algorithm_seed": "3449432149853347341",
+      "outcome_status": "timeout",
+      "error": "watchdog expired"
+    },
+    {
+      "record_id": "ECR1ha36228f66009",
+      "session_id": "ECBS1hf8b5deac05ae",
+      "seq": 3,
+      "arm": "rho",
+      "round": 1,
+      "warmup": false,
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "family": "rho",
+        "params": {
+          "trial_cap": "18668300"
+        },
+        "method_id": "ECM1h67454689882b",
+        "method_sha256": "67454689882b28d509ee64a8afc4882fab1b4f672670f2da66c0ad13756cb34f",
+        "entry": "three_leads::solve_rho"
+      },
+      "algorithm_seed": "6083824998165220716",
+      "outcome_status": "verified",
+      "error": null
+    }
+  ]
+}

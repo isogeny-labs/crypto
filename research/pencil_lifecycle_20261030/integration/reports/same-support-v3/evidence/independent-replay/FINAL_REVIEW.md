@@ -1,0 +1,15 @@
+# Independent final review
+
+Verdict: PASS, scoped to literal weighted field-polynomial validity implying exclusion of sameUMixedZeroSlope in the Lean abstract classifier.
+
+The semantic review was frozen before any compiler invocation; see SOURCE_REVIEW.md and FROZEN_SHA256SUMS. The blind statement-only derivation and controls were frozen separately at /var/tmp/weighted-fidelity-blind-FJBciYGF/BLIND.md before receiving candidate source.
+
+Candidate commit: 957dd4c86b2a8b9416e4c62c6ad1f2eb51dcbee5. WeightedSameSupport.lean SHA256: 459d112522ace37aed602a51294fb9d30357114c47db1916d591ab5b0686e722. Exact statement checked independently against normalization, common f, nonzero weights, characteristic, cross Q/R equality, literal S/T powers and orientation, and classifier priority.
+
+Machine replay: freshly rebuilt ProjectiveLawBoundary, RuntimeSemantics, SameSupport, SameSupportClassifier and WeightedSameSupport from pinned source; all exit 0. Separate IndependentCheck.lean #check/#print axioms process exit 0. All six inspected theorem/helper declarations depend only on propext, Classical.choice and Quot.sound; no sorryAx or custom axiom reported. Version command reports Lean 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release. Every compilation used -j1 -M4096 with external timeout 120s. LEAN_PATH was exactly the fresh directory plus mirror/deps. No producer project object directory was used.
+
+Native outcomes are preserved in outcomes.json with argv, time and exit status; stdout/stderr are separate per command. Existing RuntimeSemantics source emitted deprecated if_pos/if_neg warnings. WeightedSameSupport emitted unused/unreachable ring tactic warnings at line 13; these do not affect the accepted theorem. Other compiler errors: none. An initial Python hashing driver failed before compiler execution because this Python lacks hashlib.file_digest. replay-attempt1.py and driver-attempt1.json preserve that failure; the corrected driver uses sha256(read_bytes()). Candidate source remained unchanged.
+
+Dependency evidence: DEPENDENCY_SHA256SUMS hashes 13785 files in the admitted dependency object mirror, DEPENDENCY_SOURCE_SHA256SUMS hashes 2757 source-mirror files, TOOLCHAIN_SHA256SUMS identifies the executable, and the exact pinned lake-manifest.json/toolchain are retained. Dependency libraries are reused from the authorized local mirror rather than rebuilt; fresh rebuild covers all five project modules. The manifest pins mathlib d13f23b723b8a846827a245b89c10fc7d3f11612. File hashing records the actual local dependency bytes; it is not an independent upstream reproduction of that dependency build.
+
+Scope remains as frozen: mathematical polynomial/field theorem and manually defined classifier. No Rust translation or compiled-program equivalence, concrete geometric addition theorem, or cloud/scientific execution was undertaken. No mathematical semantic flaw found in the reviewed theorem or its necessary local dependency chain.

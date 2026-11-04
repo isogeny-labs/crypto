@@ -1,5 +1,5 @@
 use anyhow::{bail, ensure, Context, Result};
-use ml_dataset_independent_consumer::{audit, common, transport};
+use ml_dataset_independent_consumer::{audit, common, partial, transport};
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -7,8 +7,11 @@ const HELP: &str = "Independent native saved-dataset consumer\n\
   dataset-consumer audit --run DIR [--arithmetic] [--expected-run-sha256 SHA] [--native-verifier BIN]\n\
   dataset-consumer export --run DIR --out FILE [--arithmetic] [--native-verifier BIN | --allow-unreplayed-preview]\n\
   dataset-consumer fetch --receipt FILE --expected-sha256 SHA --out NEW_DIR\n\
+  dataset-consumer partial-restore --anchor FILE --expected-sha256 SHA --objects DIR --out NEW_DIR\n\
+  dataset-consumer partial-audit --restore DIR --expected-anchor-sha256 SHA\n\
+  dataset-consumer partial-fetch --anchor FILE --expected-sha256 SHA --out NEW_DIR\n\
   dataset-consumer certificate --public FILE --base FILE --config FILE --certificate FILE --role ROLE\n\
-Independent arithmetic checks positive equations and completed distinct-root sets, excluding UNSAT, cost, subgroup orders and fall degrees.\n\
+Independent arithmetic checks positive equations, completed distinct-root sets and generic-v2 supplied source/filter/rank certificates; excludes UNSAT, total cost, full group orders, construction completeness and fall degrees.\n\
 Fetch reads the canonical S3 bucket and does not create a compute worker.\n";
 
 fn run() -> Result<()> {
@@ -37,6 +40,9 @@ fn run() -> Result<()> {
             "--allow-unreplayed-preview",
         ],
         "fetch" => &["--receipt", "--expected-sha256", "--out"],
+        "partial-restore" => &["--anchor", "--expected-sha256", "--objects", "--out"],
+        "partial-audit" => &["--restore", "--expected-anchor-sha256"],
+        "partial-fetch" => &["--anchor", "--expected-sha256", "--out"],
         "certificate" => &["--public", "--base", "--config", "--certificate", "--role"],
         _ => bail!("unknown command {command}"),
     };
@@ -64,7 +70,25 @@ fn run() -> Result<()> {
             .map(String::as_str)
             .with_context(|| format!("missing {key}"))
     };
-    let report = if command == "fetch" {
+    let report = if command == "partial-restore" {
+        partial::restore_local(
+            Path::new(required("--anchor")?),
+            required("--expected-sha256")?,
+            Path::new(required("--objects")?),
+            Path::new(required("--out")?),
+        )?
+    } else if command == "partial-audit" {
+        partial::audit_restored(
+            Path::new(required("--restore")?),
+            required("--expected-anchor-sha256")?,
+        )?
+    } else if command == "partial-fetch" {
+        partial::fetch_remote(
+            Path::new(required("--anchor")?),
+            required("--expected-sha256")?,
+            Path::new(required("--out")?),
+        )?
+    } else if command == "fetch" {
         transport::fetch_cell(
             Path::new(required("--receipt")?),
             required("--expected-sha256")?,
@@ -102,7 +126,11 @@ fn run() -> Result<()> {
         }
         report
     };
-    println!("{}", serde_json::to_string_pretty(&report)?);
+    if command.starts_with("partial-") {
+        partial::print_report(&report)?;
+    } else {
+        println!("{}", serde_json::to_string_pretty(&report)?);
+    }
     Ok(())
 }
 

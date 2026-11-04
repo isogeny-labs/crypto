@@ -1,0 +1,44 @@
+import WordComparator
+import Repair
+set_option autoImplicit false
+namespace RowFold
+open WordComparator
+abbrev Mat := Fin 4 → Fin 4 → UInt64
+def add (p a b : UInt64) := (a+b)%p
+def step (p : UInt64) (m : Mat) (x : V) (i j : Fin 4) (v : UInt64) := add p v (mul p (m i j) (x j))
+def linear (p : UInt64) (m : Mat) (x : V) : V := fun i =>
+ (List.finRange 4).foldl (fun v j => step p m x i j v) 0
+def dm (p : UInt64) (m : Mat) : RepairClosure.Mat (ZMod p.toNat) := fun i j => (m i j).toNat
+theorem add_bound (p a b : Nat) (hp:p≤2^32) (ha:a<p) (hb:b<p) : a+b<2^64 := by omega
+theorem add_canonical (p a b : UInt64) (hp:0<p.toNat) : (add p a b).toNat<p.toNat := by
+ rw [add,UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+theorem add_decode (p a b : UInt64) (hp:p.toNat≤2^32) (ha:a.toNat<p.toNat) (hb:b.toNat<p.toNat) :
+ ((add p a b).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)+(b.toNat : ZMod p.toNat) := by
+ simp only [add,UInt64.toNat_mod,UInt64.toNat_add,Nat.mod_eq_of_lt (add_bound _ _ _ hp ha hb),ZMod.natCast_mod,Nat.cast_add]
+theorem fold_contract (p : UInt64) (m : Mat) (x : V) (i : Fin 4)
+ (hp:0<p.toNat) (hb:p.toNat≤2^32) (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x)
+ (js:List (Fin 4)) (v:UInt64) (hv:v.toNat<p.toNat) :
+ let out:=js.foldl (fun v j=>step p m x i j v) v
+ out.toNat<p.toNat ∧ (out.toNat:ZMod p.toNat)=(v.toNat:ZMod p.toNat)+ (js.map (fun j=>(m i j).toNat*(x j).toNat)).sum := by
+ induction js generalizing v with
+ | nil => simp
+ | cons j js ih =>
+   have hc:=add_canonical p v (mul p (m i j) (x j)) hp
+   have hd:=add_decode p v (mul p (m i j) (x j)) hb hv (mul_canonical _ _ _ hp)
+   rw [mul_decode _ _ _ hb (hm i j) (hx j)] at hd
+   have ht:=ih (step p m x i j v) hc
+   refine ⟨ht.1, ?_⟩
+   simp only [List.foldl_cons,List.map_cons,List.sum_cons,Nat.cast_add,Nat.cast_mul]
+   rw [ht.2]
+   change ((add p v (mul p (m i j) (x j))).toNat:ZMod p.toNat)+_=_
+   rw [hd]; ring
+theorem linear_canonical (p:UInt64) (m:Mat) (x:V) (hp:0<p.toNat) (hb:p.toNat≤2^32)
+ (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x) : canonical p (linear p m x) := by
+ intro i; exact (fold_contract p m x i hp hb hm hx (List.finRange 4) 0 hp).1
+theorem linear_decode (p:UInt64) [Fact p.toNat.Prime] (m:Mat) (x:V) (hp:0<p.toNat) (hb:p.toNat≤2^32)
+ (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x) :
+ decode p (linear p m x)=RepairClosure.linear (dm p m) (decode p x) := by
+ funext i
+ have h:=(fold_contract p m x i hp hb hm hx (List.finRange 4) 0 hp).2
+ simpa [linear,decode,RepairClosure.linear,dm,List.finRange,List.ofFn_succ,Fin.sum_univ_succ,add_assoc] using h
+end RowFold

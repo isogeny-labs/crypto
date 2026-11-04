@@ -1,0 +1,87 @@
+
+def sameUWordDispatch (p a0 a1 a2 a3 : UInt64) (a b : WeightedWord) : Option WeightedWord :=
+ let ca := crossWords p a b
+ let cb := crossWords p b a
+ if ca.q=cb.q ∧ ca.r=cb.r then
+  if ca.s=wordNeg p cb.s ∧ ca.t=wordNeg p cb.t then none
+  else if ca.s=cb.s ∧ ca.t=cb.t then none
+  else if (samePointWords p a b).k=0 then none
+  else some (dblWordPayload p a0 a1 a2 a3 (samePointWords p a b).point)
+ else none
+
+attribute [local irreducible] crossWords samePointWords dblWordPayload
+
+theorem same_u_word_preserves (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31) (a0 a1 a2 a3 : UInt64) (a b : WeightedWord)
+ (h0 : a0.toNat<p.toNat) (h1 : a1.toNat<p.toNat) (h2 : a2.toNat<p.toNat) (h3 : a3.toNat<p.toNat)
+ (ha : a.canonical p) (hb : b.canonical p)
+ (haz : a.z≠0) (haw : a.w≠0) (hbz : b.z≠0) (hbw : b.w≠0)
+ (hva : a.normalizedValid p (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)))
+ (hvb : b.normalizedValid p (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)))
+ (hq : (crossWords p a b).q=(crossWords p b a).q)
+ (hr : (crossWords p a b).r=(crossWords p b a).r)
+ (hni : ¬((crossWords p a b).s=wordNeg p (crossWords p b a).s ∧
+          (crossWords p a b).t=wordNeg p (crossWords p b a).t))
+ (hne : ¬((crossWords p a b).s=(crossWords p b a).s ∧ (crossWords p a b).t=(crossWords p b a).t))
+ (hg : Polynomial.IsCoprime (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat))
+  (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)).derivative) :
+ let d := (samePointWords p a b).point
+ let c := dblWordPayload p a0 a1 a2 a3 d
+ (samePointWords p a b).k≠0 ∧ d.canonical p ∧ d.y≠0 ∧
+ sameUWordDispatch p a0 a1 a2 a3 a b=some c ∧ c.canonical p ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid p (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)) := by
+ have hp : 0<p.toNat := by omega
+ obtain ⟨aqc,arc,asc,atc,aqd,ard,asd,atd⟩ := cross_word_decode p hfive hbound a b ha hb
+ obtain ⟨bqc,brc,bsc,btc,bqd,brd,bsd,btd⟩ := cross_word_decode p hfive hbound b a hb ha
+ obtain ⟨kc,pc,kd,pd⟩ := same_point_decode p hfive hbound a b ha hb
+ have eqw (u v : UInt64) (hu : u.toNat<p.toNat) (hv : v.toNat<p.toNat) :
+  u=v ↔ (u.toNat:ZMod p.toNat)=(v.toNat:ZMod p.toNat) := by
+  rw [←UInt64.toNat_inj]
+  exact (canonical_equality p.toNat u.toNat v.toNat hu hv).symm
+ have fq : SameUZeroSlope.crossQ (a.decodeTwo p) (b.decodeTwo p)=SameUZeroSlope.crossQ (b.decodeTwo p) (a.decodeTwo p) := by
+  rw [←aqd,←bqd,hq]
+ have fr : SameUZeroSlope.crossR (a.decodeTwo p) (b.decodeTwo p)=SameUZeroSlope.crossR (b.decodeTwo p) (a.decodeTwo p) := by
+  rw [←ard,←brd,hr]
+ have ns := wordNeg_composition p (crossWords p b a).s hp bsc
+ have nt := wordNeg_composition p (crossWords p b a).t hp btc
+ have fni : ¬(SameUZeroSlope.crossS (a.decodeTwo p) (b.decodeTwo p)= -SameUZeroSlope.crossS (b.decodeTwo p) (a.decodeTwo p) ∧
+              SameUZeroSlope.crossT (a.decodeTwo p) (b.decodeTwo p)= -SameUZeroSlope.crossT (b.decodeTwo p) (a.decodeTwo p)) := by
+  rintro ⟨hs,ht⟩;apply hni
+  constructor
+  · apply (eqw _ _ asc ns.1).mpr
+    rw [asd,ns.2,bsd];exact hs
+  · apply (eqw _ _ atc nt.1).mpr
+    rw [atd,nt.2,btd];exact ht
+ have fne : ¬(SameUZeroSlope.crossS (a.decodeTwo p) (b.decodeTwo p)=SameUZeroSlope.crossS (b.decodeTwo p) (a.decodeTwo p) ∧
+              SameUZeroSlope.crossT (a.decodeTwo p) (b.decodeTwo p)=SameUZeroSlope.crossT (b.decodeTwo p) (a.decodeTwo p)) := by
+  rintro ⟨hs,ht⟩;apply hne
+  constructor
+  · apply (eqw _ _ asc bsc).mpr;rw [asd,bsd];exact hs
+  · apply (eqw _ _ atc btc).mpr;rw [atd,btd];exact ht
+ have az := canonical_word_nonzero p a.z hp ha.2.2.2.2.1 haz
+ have aw := canonical_word_nonzero p a.w hp ha.2.2.2.2.2 haw
+ have bz := canonical_word_nonzero p b.z hp hb.2.2.2.2.1 hbz
+ have bw := canonical_word_nonzero p b.w hp hb.2.2.2.2.2 hbw
+ have two : (2:ZMod p.toNat)≠0 := by
+  have tt := canonical_word_nonzero p (2:UInt64) hp (by change 2<p.toNat;omega) (by decide)
+  simpa using tt
+ obtain ⟨fk,_,pz,pw,py,pv,oz,ow,ov⟩ := SameUComposition.source_same_u_mixed
+  (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)
+  (a.decodeTwo p) (b.decodeTwo p) az aw bz bw hva hvb fq fr fni fne hg two
+ have kw : (samePointWords p a b).k≠0 := by
+  intro hz;apply fk;rw [←kd,hz];simp
+ have yw : (samePointWords p a b).point.y≠0 := by
+  intro hy;apply py;rw [←pd]
+  change (((samePointWords p a b).point.y.toNat:ZMod p.toNat))=0
+  rw [hy];simp
+ obtain ⟨cc,cd⟩ := doubled_decode p hfive hbound a0 a1 a2 a3 (samePointWords p a b).point h0 h1 h2 h3 pc
+ rw [pd] at cd
+ refine ⟨kw,pc,yw,?_,cc,?_,?_,?_⟩
+ · simp [sameUWordDispatch,hq,hr,hni,hne,kw]
+ · intro hz;apply oz;rw [←cd]
+   change (((dblWordPayload p a0 a1 a2 a3 (samePointWords p a b).point).z.toNat:ZMod p.toNat))=0
+   rw [hz];simp
+ · intro hw;apply ow;rw [←cd]
+   change (((dblWordPayload p a0 a1 a2 a3 (samePointWords p a b).point).w.toNat:ZMod p.toNat))=0
+   rw [hw];simp
+ · exact positive_valid_transport p _ _ _ cd ov

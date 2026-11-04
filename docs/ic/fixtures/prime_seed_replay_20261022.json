@@ -1,0 +1,135 @@
+{
+  "date_utc": "2026-10-22T09:02:25.252916+00:00",
+  "runs": [
+    {
+      "binary": "ic",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 11,
+        "trials_per_relation_median": 3.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 77
+      },
+      "replay_pass": true,
+      "route": false,
+      "route_receipt": null,
+      "scalar": "190"
+    },
+    {
+      "binary": "ic",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 10,
+        "trials_per_relation_median": 2.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 81
+      },
+      "replay_pass": true,
+      "route": true,
+      "route_receipt": {
+        "counted_curve_order": 281,
+        "destination": {
+          "a": 268,
+          "b": 85,
+          "generator": [
+            23,
+            114
+          ],
+          "target": [
+            3,
+            118
+          ]
+        },
+        "edges_verified": 2,
+        "homomorphism_checks": 2,
+        "hops": 1,
+        "nodes_verified": 3,
+        "route_file_sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+        "route_id": "IW1E11h1h1a619f4ab250",
+        "subgroup_verified": true
+      },
+      "scalar": "190"
+    },
+    {
+      "binary": "icx",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 11,
+        "trials_per_relation_median": 3.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 77
+      },
+      "replay_pass": true,
+      "route": false,
+      "route_receipt": null,
+      "scalar": "190"
+    },
+    {
+      "binary": "icx",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 10,
+        "trials_per_relation_median": 2.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 81
+      },
+      "replay_pass": true,
+      "route": true,
+      "route_receipt": {
+        "counted_curve_order": 281,
+        "destination": {
+          "a": 268,
+          "b": 85,
+          "generator": [
+            23,
+            114
+          ],
+          "target": [
+            3,
+            118
+          ]
+        },
+        "edges_verified": 2,
+        "homomorphism_checks": 2,
+        "hops": 1,
+        "nodes_verified": 3,
+        "route_file_sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+        "route_id": "IW1E11h1h1a619f4ab250",
+        "subgroup_verified": true
+      },
+      "scalar": "190"
+    }
+  ],
+  "schema": "crypto.prime-ic-seed-replay/v1",
+  "seed": 42,
+  "source_parent_commit": "702c8cfdc56635c62c8242fa323acee7b3fff5f4",
+  "target": {
+    "a": 1,
+    "b": 19,
+    "expected_scalar": "190",
+    "generator": [
+      3,
+      7
+    ],
+    "n": 281,
+    "p": 271,
+    "target": [
+      231,
+      54
+    ]
+  },
+  "validation": {
+    "release_ic_binary": "33 passed; 0 failed",
+    "release_icx_binary": "20 passed; 0 failed",
+    "release_library": "4488 passed; 0 failed; 119 ignored; four test threads",
+    "replay_comparison": "scalar, verification, route presence, and all relation counters; timing fields excluded"
+  }
+}

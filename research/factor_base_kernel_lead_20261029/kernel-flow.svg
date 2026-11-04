@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="780" viewBox="0 0 1100 780">
+<rect width="1100" height="780" fill="#f6f8fb"/>
+<style>text{font-family:DejaVu Sans,sans-serif;fill:#172536}.title{font-size:29px;font-weight:700}.head{font-size:23px;font-weight:700}.body{font-size:19px}.small{font-size:17px}.box{fill:white;stroke:#9fb2c5;stroke-width:2}.arrow{stroke:#315d83;stroke-width:3;fill:none;marker-end:url(#a)}</style>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0L0 6L9 3Z" fill="#315d83"/></marker></defs>
+<text x="45" y="49" class="title">Proposed native symmetric m=2 path</text>
+<text x="45" y="79" class="body">Known formulation; native transfer and complete cost remain untested</text>
+<rect x="45" y="112" width="470" height="120" rx="13" class="box"/>
+<text x="65" y="148" class="head">Exact base + product profile</text>
+<text x="65" y="178" class="body">Original signed inventory; V and V²</text>
+<text x="65" y="207" class="small">FSP1 subspace identity is not FB1 identity</text>
+<rect x="585" y="112" width="470" height="120" rx="13" class="box"/>
+<text x="605" y="148" class="head">Actual target linear system</text>
+<text x="605" y="178" class="body">Build, reduce, record consistency + nullity</text>
+<text x="605" y="207" class="small">Charge assembly and elimination on every query</text>
+<path d="M515 172H575" class="arrow"/>
+<rect x="585" y="285" width="470" height="130" rx="13" class="box"/>
+<text x="605" y="322" class="head">Consistent affine candidates</text>
+<text x="605" y="353" class="body">Bounded enumeration, then quadratic splitting</text>
+<text x="605" y="383" class="small">Cap hit = unresolved; fallback work is charged</text>
+<path d="M820 232V275" class="arrow"/>
+<rect x="45" y="285" width="470" height="130" rx="13" class="box"/>
+<text x="65" y="322" class="head">Verified original points</text>
+<text x="65" y="353" class="body">Roots in V and exact inventory; signs checked</text>
+<text x="65" y="383" class="small">Repeat roots, subgroup and actual point sum</text>
+<path d="M585 350H525" class="arrow"/>
+<rect x="45" y="473" width="470" height="130" rx="13" class="box"/>
+<text x="65" y="510" class="head">Useful independent relations</text>
+<text x="65" y="541" class="body">Same column map; retain dependent rows</text>
+<text x="65" y="571" class="small">Separate training / fresh holdout / controls</text>
+<path d="M280 415V463" class="arrow"/>
+<rect x="585" y="473" width="470" height="130" rx="13" fill="#e6eff7" stroke="#315d83" stroke-width="2"/>
+<text x="605" y="510" class="head">Complete stage comparison</text>
+<text x="605" y="541" class="body">Charge every phase, including failed attempts</text>
+<text x="605" y="571" class="small">Missing prices or zero rank: winner unknown</text>
+<path d="M515 538H575" class="arrow"/>
+<text x="45" y="657" class="body">Inconsistent system: branch rejection only. A symmetric root alone is not a relation.</text>
+<text x="45" y="690" class="body">No measured speedup, certified regularity, m≥3, wide-field or end-to-end claim.</text>
+<text x="45" y="733" class="small">Source: 2026-10-29 literature/code audit · see README.md and LITERATURE.md</text>
+</svg>

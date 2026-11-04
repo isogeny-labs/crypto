@@ -1,0 +1,14 @@
+card: CARD-BLINDSPOT-01-11 (sha256 22e60af907cffd1ddb63b5d82b5f2a9e8bac5c0b6a1fd79ed31f56ac5c7e1d60)
+commit: f70fa23827dec96cd92a5dfacad84e5e6afae771
+receipt: research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-11.json sha256 9f37c03de0239b8378d8d9b9d14b386ccd9ec350695e9e26b5ffb85663f1c89e
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-01/card-11"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "target/blindspots-01/card-11/b01", "examples/blindspots_01_fp2_gaudry.rs"] exit 0 (8.783 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (summarize): ["prlimit", "--as=4294967296", "target/blindspots-01/card-11/b01", "summarize", "--dir", "research/blindspots_20261018/01-fp2-gaudry-k2/raw", "--out", "research/blindspots_20261018/01-fp2-gaudry-k2/raw/summary.json"] exit 0 (0.172 s) succeeded
+  stdout sha256 025be8a45ed43b31ccd1f7b4b4deb0d732caf6954a0a8507fe7da16bfe22a7e0; last 1 lines:
+    summary written: 945 rows from 32 files
+  output research/blindspots_20261018/01-fp2-gaudry-k2/raw/summary.json: 254fff9626fbde104b8c1f031645482596889177ff42d2fdde04c2dcd48356da
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-01/card-11/b01"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

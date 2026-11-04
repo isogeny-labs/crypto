@@ -1,4 +1,4 @@
-# K4-CHAR2-REPLICATION-20261029 (draft)
+# K4-CHAR2-REPLICATION-20261029
 
 **Question.** On k=4 characteristic-two curves E/F_{2^{4m'}} (Gaudry D4, binary oracle), is index calculus below the strongest legitimate rho in counted F_q multiplications at m=16 and m=17, across the pricing band, with 8 fresh targets per arm?
 
@@ -8,8 +8,8 @@
 - C3 (comparative): rho-neg reproduces the old records within the A/A spread (regression control).
 
 **Arms.**
-- `ic-wied` (candidate): gaudry-d4-bin, plain Wiedemann, macaulay=11, frobenius=1, sparsest=1, replay=1, unchanged binary
-- `rho-strong` (reference): negation-map rho, distinguished points, batched inversion, canonicalisation charged (new; ecbench-extend)
+- `ic-wied` (candidate): `ic.pipeline` + `bin-t-line` + `gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1`, `linalg=wiedemann`
+- `rho-strong` (reference): `rho.negation_strong` (`lanes=64`, `dp_bits=auto`): negation-map rho, distinguished points, Montgomery-batched inversion, canonicalisation charged; every phase in counted F_q multiplications / `fq_muls_per_add`
 - `rho-neg` (baseline): the existing rho.negation, regression control against old records
 - `rho-neg-aa` (control_aa): rho.negation under a second arm name: the A/A noise floor
 
@@ -25,9 +25,17 @@
 - quoting the m=17 killed-run ratio
 - reading a weak-family crossover as a statement about prime-order or deployed curves
 
-## Before freeze
+## Instrument and files
 
-- Prerequisite: rho-strong: negation-map rho with distinguished points, batched (Montgomery) inversion and charged canonicalisation, added with the ecbench-extend skill before freeze
-- `python3 ../crypto-autoresearcher/tools/experiment_protocol.py validate protocol.json` (passes with 0 findings as drafted, 2026-10-29)
-- `... freeze protocol.json --commit auto --filed-before-affected-data`, commit, then `seeds --all`
+- Method: `rho.negation_strong`, registered in `src/cryptanalysis/ecbench/methods.rs`, walk in `src/cryptanalysis/ecbench/negation_strong.rs`; charge documented in `docs/ecbench/README.md` §7.
+- Spec: [`spec.json`](spec.json): 32 `f2m4_torsion` curves (the listed seeds, `max_cofactor` 16), one target each, four arms, one round, shuffled arm order, no warm-up round (an ecbench warm-up round repeats every workload).
+- Analysis: `examples/k4_replication_decide.rs` (sha256 in `protocol.json`): `cargo run --release --example k4_replication_decide -- SESSION_DIR...`. `estimate.py` in the red-team study is a wall-time estimate, not the decision rule, so it is not the analysis.
+
+## Open prerequisite
+
+The frozen instrument refuses m = 16 and 17: `f2m4_torsion` and `gaudry_quartic_bin` take m <= 15 (u16 F_q elements, points packed in 4m <= 60 bits). The red team's m = 17 records came from commit `e403626c`, which is not in this repository. Widening the tower is an instrument change filed as an amendment before any m >= 16 row (invalidation rule in `protocol.json`).
+
+## Before the run
+
+- `python3 ../crypto-autoresearcher/tools/experiment_protocol.py validate protocol.json`
 - Fill `.resume/RESUME.md` (`scripts/checkpoint.sh init`); the experiment director compiles the frozen record into a card

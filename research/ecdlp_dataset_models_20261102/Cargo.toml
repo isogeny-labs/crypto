@@ -1,0 +1,18 @@
+[package]
+name = "ecdlp-dataset-models"
+version = "0.1.0"
+edition = "2021"
+description = "Development pipeline for the ECDLP/PDP dataset resource/success models (training-protocol-20261101): audit, join, grouped training and evaluation"
+publish = false
+
+# Standalone research crate: its own lockfile; reads the native exporter's files, never the crypto crate's internals.
+[workspace]
+
+[dependencies]
+serde_json = "1"
+rand = { version = "0.8", features = ["small_rng"] }
+sha2 = "0.10"
+
+[profile.release]
+opt-level = 3
+debug = "line-tables-only"

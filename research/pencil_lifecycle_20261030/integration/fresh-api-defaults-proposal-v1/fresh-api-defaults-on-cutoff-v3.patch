@@ -1,0 +1,108 @@
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
+@@ -1008,6 +1008,41 @@
+     })?;
+     stored.save()?; // Commit BEFORE resuming the stopped writer.
+     Ok(())
++}
++// Pin only the Kubernetes ObjectFieldSelector API default. This keeps exact
++// owner env/volume comparisons valid after API round-trip without dropping keys.
++fn pin_fresh_selector_defaults(manifest: &mut Value) {
++    let spec = &mut manifest["spec"]["template"]["spec"];
++    if let Some(containers) = spec["containers"].as_array_mut() {
++        for container in containers {
++            if let Some(env) = container["env"].as_array_mut() {
++                for entry in env {
++                    if let Some(selector) = entry
++                        .get_mut("valueFrom")
++                        .and_then(|v| v.get_mut("fieldRef"))
++                        .and_then(Value::as_object_mut)
++                    {
++                        selector.entry("apiVersion").or_insert_with(|| json!("v1"));
++                    }
++                }
++            }
++        }
++    }
++    if let Some(volumes) = spec["volumes"].as_array_mut() {
++        for volume in volumes {
++            if let Some(items) = volume
++                .get_mut("downwardAPI")
++                .and_then(|v| v.get_mut("items"))
++                .and_then(Value::as_array_mut)
++            {
++                for item in items {
++                    if let Some(selector) = item["fieldRef"].as_object_mut() {
++                        selector.entry("apiVersion").or_insert_with(|| json!("v1"));
++                    }
++                }
++            }
++        }
++    }
+ }
+ fn manifest_job(s: &State, remaining: u64) -> Result<Value, String> {
+     let deploy = std::env::var("ISOLAB_DEPLOY_DIR").map_err(error)?;
+@@ -1101,6 +1136,9 @@
+             env.push(json!({"name":name,"value":value}));
+         }
+         env.push(json!({"name":"ISOLAB_OWNER_JOB_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.labels['batch.kubernetes.io/controller-uid']"}}}));
++    }
++    if s.request.fresh_owner.is_some() {
++        pin_fresh_selector_defaults(&mut v);
+     }
+     Ok(v)
+ }
+@@ -2237,4 +2275,52 @@
+             env_with_fieldref_default(&extra)
+         );
+     }
+-}
++    #[test]
++    fn fresh_api_roundtrip_preserves_exact_identity_comparison() {
++        let mut intended = json!({"spec":{"template":{"spec":{
++            "containers":[{"env":[
++                {"name":"POD_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.uid"}}},
++                {"name":"NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},
++                {"name":"ISOLAB_OWNER_JOB_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.labels['batch.kubernetes.io/controller-uid']"}}},
++                {"name":"ISOLAB_OWNER_REQUEST_SHA256","value":"pinned-request"}
++            ]}],
++            "volumes":[{"name":"work","emptyDir":{"sizeLimit":"8Gi"}},
++                {"name":"diagnostic-input","downwardAPI":{"defaultMode":292,"items":[
++                    {"path":"fresh-launch.json","fieldRef":{"fieldPath":"metadata.annotations['isolab.dev/diagnostic-fresh-launch']"}}
++                ]}}]
++        }}}});
++        let mut observed = intended.clone();
++        // Explicit shape produced by ObjectFieldSelector API defaulting.
++        for i in 0..3 {
++            observed["spec"]["template"]["spec"]["containers"][0]["env"][i]["valueFrom"]
++                ["fieldRef"]["apiVersion"] = json!("v1");
++        }
++        observed["spec"]["template"]["spec"]["volumes"][1]["downwardAPI"]["items"][0]["fieldRef"]
++            ["apiVersion"] = json!("v1");
++        assert_ne!(intended, observed);
++        pin_fresh_selector_defaults(&mut intended);
++        assert_eq!(intended, observed);
++        let once = intended.clone();
++        pin_fresh_selector_defaults(&mut intended);
++        assert_eq!(intended, once);
++        for pointer in [
++            "/spec/template/spec/containers/0/env/0/valueFrom/fieldRef/fieldPath",
++            "/spec/template/spec/containers/0/env/0/valueFrom/fieldRef/apiVersion",
++            "/spec/template/spec/containers/0/env/3/value",
++            "/spec/template/spec/volumes/1/downwardAPI/defaultMode",
++            "/spec/template/spec/volumes/1/downwardAPI/items/0/fieldRef/fieldPath",
++        ] {
++            let mut changed = observed.clone();
++            *changed.pointer_mut(pointer).unwrap() = json!("different");
++            pin_fresh_selector_defaults(&mut changed);
++            assert_ne!(changed, intended, "mutation must remain visible: {pointer}");
++        }
++        let mut extra = observed;
++        extra["spec"]["template"]["spec"]["volumes"]
++            .as_array_mut()
++            .unwrap()
++            .push(json!({"name":"injected","emptyDir":{}}));
++        pin_fresh_selector_defaults(&mut extra);
++        assert_ne!(extra, intended);
++    }
++}
