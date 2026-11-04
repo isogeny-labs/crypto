@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0428Z-c25519-autolab-r10-k32",
+  "latest_record": "20261104T0437Z-c25519-autolab-r11-k24",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 7,
+    "measured": 8,
     "open": 0
   },
   "repo": "crypto",
@@ -38,6 +38,35 @@
         }
       ],
       "problem": "ic:curve25519-family-k20",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.607,
+      "latest": 6.607,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.760244
+      },
+      "metric": "s_w0_incumbent",
+      "points": [
+        {
+          "commit": "2c0d54ecc8ea",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.760244
+          },
+          "n": 32,
+          "record": "20261104T0437Z-c25519-autolab-r11-k24",
+          "reference": 1.147,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 11, k = 24 train screen: incumbent ksum4-n12 S(w=0) 6.61 vs matched rho 1.15; no candidate below it (ksum4-n10 6.96)",
+          "value": 6.607
+        }
+      ],
+      "problem": "ic:curve25519-family-k24",
       "unit": "S"
     },
     {
