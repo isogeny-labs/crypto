@@ -428,9 +428,14 @@ identical to `bits`. Exact census at k = 20:
   spread 1.19–1.49× depending on the starting lo.
 - Where it lands: the bits form's per-target F4 cost is 17–64× the
   isogeny form's at equal (t, G), so a digit-set bits arm models about
-  6.9× behind the T10 winner at (5, 3). Engine confirmation needs a
-  `digits@LO:c1;…;ct` membership (same bit variables, per-bit
-  coefficients), being implemented as L15.
+  6.9× behind the T10 winner at (5, 3).
+- **L15 (engine, all five predictions held):** with `Membership::Digits`
+  (`b847203692`) the greedy sets keep the `bits` system exactly (same
+  degree and terms, per-target cost within 1–3%) and deliver their census
+  coverage, so F4 work per relation falls 0.48× (t = 5) and 0.44× (t = 6)
+  against the best translation frame. At matched (t = 5, G = 4) the digit
+  set stays 10.5× behind the isogeny winner (per-target 1,375,663 against
+  52,816 mul-adds).
 
 ### 11.5 L11: odd Kummer base (design only)
 
@@ -444,6 +449,6 @@ go/no-go rule before any engine work; nothing was measured.
 - **T13 (next end-to-end, protocol frozen):** t = 4, G = 3, seed 1193 at
   k = 20, plain and with trace replay, against T12's winner. Modelled
   0.49× the winner at w ≥ 0.1 (0.23× with trace), dearer at w = 0.
-- **L15:** `digits` membership in the engine, then confirm L14.
+- **L15:** done (above); the bits arm is now ~12× below its 2026-11-02 per-relation cost at t = 5, still 10.5× behind the tower.
 - The exponent result bounds all of this: constant-factor gains on a
   track whose exponent is 1.03 against rho's 0.5.
