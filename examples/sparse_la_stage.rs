@@ -21,7 +21,7 @@
 //! ```
 use std::time::Instant;
 
-use crypto_lib::cryptanalysis::ic_boundary::{RelationSolver, RowStatus};
+use crypto_lib::cryptanalysis::ic_boundary::RowStatus;
 use crypto_lib::cryptanalysis::ic_framework::linalg::matrix_by_name;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
