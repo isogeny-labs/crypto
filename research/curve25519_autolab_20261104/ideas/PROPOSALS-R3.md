@@ -456,3 +456,10 @@ record's exit criteria.
 - Did not read session records, so P1's Stage 0 and the excess attribution are unchecked.
 - No Lean proof was written; the obligations are named per proposal. No `problems/` file, ledger or result
   was edited.
+
+## Outcomes (2026-11-04)
+
+- P1 (stride-generator probes): ratcheted k = 20, 24, 28 in rounds 27 and 28. It lost at k = 32 because the seeds always satisfy a short relation w·S = [m]G, which repeats hits along lines and gives dependent rows (test `wsum_stride_dependence_tests`). Rounds 29 and 30 showed that any arithmetic-progression probe stream clusters its hits the same way [pcc:unverified].
+- P2 (walk-built table, `wwalk`): ratcheted k = 24, 28, 32 in round 31. The extension with known-log G jumps grown to rank-2 seed rows (`g=1,grow=2`) ratcheted them again in round 33, to S 1.67, 1.57, 1.52 (1.43x to 1.55x matched rho) [pcc:unverified].
+- P3 (interleaved table and probes over one map, `wwalk ... interleave=1`): falsified in a unit trend before any ecbench round. On train-k32, 16 runs per arm, S was 2.15 / 2.10 / 2.11 at walk-to-probe ratio 1 / 2 / 4, against 1.77 for the static `g=1,grow=2` table. With unknown seeds, a hit counts only once both seed logs are pinned, so probes made during the interleave are mostly wasted. The code was not merged.
+- P4 (multi-target amortisation): not tried.
