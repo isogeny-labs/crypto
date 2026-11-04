@@ -2,14 +2,14 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 607,
+    "nodes": 608,
     "status_inflation": 17,
     "model_scope_leaps": 9,
     "contagious_sources": 21,
     "hidden_assumption_clusters": 19,
     "unwired_dependences": 11,
     "route_closures_on_weak_support": 16,
-    "live_obstructions": 51,
+    "live_obstructions": 52,
     "author_flagged": 8,
     "attack_queue": 248,
     "hygiene_queue": 112
@@ -851,45 +851,6 @@
       ]
     },
     {
-      "source": "S-PA-LEAN",
-      "title": "Five-target Lean discharge and semantic review packet (sibling repository)",
-      "verification": "repository_read",
-      "refuted": [
-        "CLAIM-PA-MOD-ALIAS",
-        "CLAIM-PA-SUBGROUP-AMBIENT",
-        "CLAIM-PA-BATCH-ADAPTIVE",
-        "CLAIM-PA-POLY-FUNCTION"
-      ],
-      "refuted_fraction": 0.444,
-      "exposed": [
-        {
-          "id": "CEX-PA-BATCH-ADAPTIVE",
-          "status": "proved_internal_unreviewed",
-          "impact": 1
-        },
-        {
-          "id": "THM-PA-SCHNORR-SS",
-          "status": "proved_internal_unreviewed",
-          "impact": 1
-        },
-        {
-          "id": "CEX-PA-MOD-ALIAS",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-POLY-FUNCTION",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-SUBGROUP-AMBIENT",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        }
-      ]
-    },
-    {
       "source": "S-WEAKNESS-LEAN",
       "title": "Lean attacks on two weak points of the ECDLP hardness graph",
       "verification": "repository_read",
@@ -911,6 +872,11 @@
         },
         {
           "id": "THM-HAZARD-MARGINAL-SUFFICES",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "THM-SD-SUBSPACE-CRITERION",
           "status": "proved_internal_unreviewed",
           "impact": 1
         },
@@ -988,9 +954,43 @@
           "id": "THM-SD-DEGREE2-CRITERION",
           "status": "proved_internal_unreviewed",
           "impact": 0
+        }
+      ]
+    },
+    {
+      "source": "S-PA-LEAN",
+      "title": "Five-target Lean discharge and semantic review packet (sibling repository)",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-PA-MOD-ALIAS",
+        "CLAIM-PA-SUBGROUP-AMBIENT",
+        "CLAIM-PA-BATCH-ADAPTIVE",
+        "CLAIM-PA-POLY-FUNCTION"
+      ],
+      "refuted_fraction": 0.444,
+      "exposed": [
+        {
+          "id": "CEX-PA-BATCH-ADAPTIVE",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
         },
         {
-          "id": "THM-SD-SUBSPACE-CRITERION",
+          "id": "THM-PA-SCHNORR-SS",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "CEX-PA-MOD-ALIAS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-POLY-FUNCTION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-SUBGROUP-AMBIENT",
           "status": "proved_internal_unreviewed",
           "impact": 0
         }
@@ -1870,6 +1870,16 @@
       "statement": "Delta = 10 left a rank deficit in at least one of 5 samples on 8 of 10 small curves."
     },
     {
+      "edge": "R4-013",
+      "relation": "obstructs",
+      "from": "MEAS-PQ2-DLIN-CENSUS",
+      "from_status": "measured",
+      "to": "HEUR-GB-PQ-ASSUMPTION-2",
+      "to_status": "heuristic",
+      "impact": 3,
+      "statement": "The solver degree is never the first fall degree 2, and the Kousidis-Wiemers value 3 is not reached for 17 <= n <= 44; exactly 4 on 24 fresh instances at n = 17 to 24."
+    },
+    {
       "edge": "XL-002",
       "relation": "obstructs",
       "from": "OBS-SP-KY-SEMAEV-N45",
@@ -2428,11 +2438,11 @@
       "impact": 3,
       "inflates": 0,
       "contagion": 0,
-      "obstructed": 4,
+      "obstructed": 5,
       "breakability": 0.5,
       "cost": "measurement",
       "action": "measure on a scaling family without censoring",
-      "score": 3.877
+      "score": 4.627
     },
     {
       "id": "HEUR-DECOMPOSITION-PROBABILITY",
@@ -6315,6 +6325,20 @@
       "score": 1.02
     },
     {
+      "id": "THM-SD-SUBSPACE-CRITERION",
+      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 1.02
+    },
+    {
       "id": "THM-RP-FF-HANDBOOK",
       "label": "Finite-field handbook facts (cyclic multiplicative group, Frobenius, trace/norm surjectivity) in Lean",
       "status": "proved_internal_unreviewed",
@@ -7199,20 +7223,6 @@
     {
       "id": "THM-SD-DEGREE2-CRITERION",
       "label": "Solving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)",
-      "status": "proved_internal_unreviewed",
-      "model": "algebraic_coordinate",
-      "impact": 0,
-      "inflates": 0,
-      "contagion": 1,
-      "obstructed": 0,
-      "breakability": 0.6,
-      "cost": "review",
-      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
-      "score": 0.702
-    },
-    {
-      "id": "THM-SD-SUBSPACE-CRITERION",
-      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
       "impact": 0,

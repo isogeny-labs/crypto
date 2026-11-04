@@ -207,12 +207,12 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), prime-interval:t=T[,lo=L] (every point with x in [L, L + 2^T), the whole scan charged; pkm-semaev reads bits=T,lo=L from it), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
         },
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae: a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae: a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -5757,7 +5757,14 @@ fn solve_tensor_contraction(
 
 fn pipeline_spec(m: &ResolvedMethod, seed: u64) -> Result<(PipelineSpec, String, String), String> {
     let (fb_name, fb_params) = Params::parse_spec(&m.params["factor_base"])?;
-    let (or_name, or_params) = Params::parse_spec(&m.params["oracle"])?;
+    let (or_name, mut or_params) = Params::parse_spec(&m.params["oracle"])?;
+    // `seed=run` on an oracle that draws a random table (wwalk) ties the
+    // table to the run's own seed, so a holdout resamples the table as
+    // well as the probes. Explicit numeric seeds, and arms without one,
+    // keep their fixed table and replay unchanged.
+    if or_params.get("seed") == Some("run") {
+        or_params.set("seed", seed.to_string());
+    }
     let solver = m.params["solver"].clone();
     let (solver_name, solver_params) = if solver.is_empty() {
         (None, Params::default())
@@ -5797,6 +5804,9 @@ fn prime_base_for<'a>(
         "cm-multiplier" => Box::new(CmMultiplierBase { instance: inst }),
         "prime-kummer" => Box::new(PrimeKummerBase { instance: inst }),
         "prime-isogeny" => Box::new(PrimeIsogenyBase { instance: inst }),
+        "prime-interval" => Box::new(
+            crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase { instance: inst },
+        ),
         "cm-scalar-orbit" => Box::new(CmOrbitBase { instance: inst }),
         "known-log" => Box::new(crate::cryptanalysis::ic_framework::plugins::KnownLogBase),
         other => match prime_plugins().and_then(|p| (p.base)(other, inst)) {
@@ -7446,6 +7456,8 @@ pub fn dump_factor_base(
             let multiplier = CmMultiplierBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let interval =
+                crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase { instance: i };
             let plugin_base = prime_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "explicit-x" => &explicit,
@@ -7455,6 +7467,7 @@ pub fn dump_factor_base(
                 "cm-multiplier" => &multiplier,
                 "prime-kummer" => &kummer,
                 "prime-isogeny" => &isogeny,
+                "prime-interval" => &interval,
                 other => match plugin_base.as_deref() {
                     Some(b) => b,
                     None => {
