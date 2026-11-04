@@ -2,8 +2,10 @@
   PlantedLeak.lean -- arithmetic behind notes/planted_leak.md (companion to
   IcTensorRoute.ladder_rule; that file is untouched).
 
-  Build:
-    cd /Volumes/SSD990-2/crypto-autoresearcher/formal && lake env lean <this file>
+  Build (library root `PlantedLeak` in this folder's lakefile.toml):
+    lake build PlantedLeak            # from research/ic_prime_eth_leads_20261031/lean
+    tools/lean/proof-gate.sh research/ic_prime_eth_leads_20261031/lean   # build + axiom audit
+  (First built off-repo with `lake env lean`; see build_PlantedLeak.txt.)
 
   Fact 1.  A group homomorphism ZMod N ->+ ZMod M is trivial when gcd(N, M) = 1.
            So on a cyclic group of PRIME order N, a nonzero "character" into Z/M exists

@@ -85,6 +85,11 @@ matched rho reference (with the §5a band), named by the evidence directory's
 [`AGENTS.md`](AGENTS.md), "Standing workflow rules"; schema:
 [`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md).
 
+Sabotage is assumed (owner, 2026-11-04): every producer, this session included,
+may be sabotaging the work. Cite a result by its pcc claim id and standing, or
+label it an unverified assertion. CI runs `python3 tools/pcc/pcc.py canary` and
+`ledger verify`. Rule: [`AGENTS.md`](AGENTS.md), "Sabotage is assumed: proof-carrying claims".
+
 Before making code changes, obtain or attach to a Conductor task. Run
 `conductor check --summary "…" --scope path:…` first — if someone already holds
 those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`

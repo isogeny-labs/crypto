@@ -140,3 +140,20 @@ Fixing the partial-sum separators brings D to 4 in every cell, so the excess
 degree is caused by the elliptic coupling, not the towers. On the same engine
 at m = 4, t = 4, F has D = 8 against T's 7, but F is 65× faster. At m = 4,
 t = 5 both arms were cut off (D_F ≥ 8, D_T ≥ 7).
+
+## Round 3 (2026-11-03/04)
+
+See [`round3/README.md`](round3/README.md). With every partial sum fixed, the
+floor holds to m = 6 (D_S = 4). The coupling excess E = D_T − 4 is at least 5 at
+m = 5 and at least 6 at m = 6, exactly on the pre-registered limits, so the kill
+test is undecided on a 15 GB host. Eliminating the separators by resultants (G)
+raises the input degree to 16, and G is dominated.
+
+## Round 4 (2026-11-04)
+
+See [`round4/README.md`](round4/README.md). Natural weights do not rescue the
+glued arm. The cherry-swap split leaves D unchanged and widens the matrices.
+The tree's implied cost law would beat rho only somewhere between about 2^500
+and 2^6000 bits; at 256 bits it is at least 28 bits short even under the most
+optimistic row. The big-host run of the kill test is specified in
+`round4/BIGHOST.md` but blocked on credentials and the job contract.
