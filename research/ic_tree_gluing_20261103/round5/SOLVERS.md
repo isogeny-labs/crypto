@@ -121,8 +121,8 @@ each tower level about 0.5.
 So a real improvement has to change those two slopes. The candidates are:
 - a node relation of degree < 4, which x-only coordinates cannot give;
 - a coupling that is a function rather than a 2-to-2 correspondence (y-coordinate
-  or slope encodings), which doubles the solution count and has not been
-  measured here;
+  or slope encodings). Test Y measured it afterwards: same D at t = 4, a steeper
+  t-slope, and 5–20× the cost (`README.md`);
 - leaving the summation-polynomial framework altogether.
 
 No idea tried in rounds 1–5 changes either slope.
