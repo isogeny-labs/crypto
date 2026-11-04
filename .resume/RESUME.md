@@ -50,3 +50,17 @@ Stop: per-cell caps in the protocols; Part A stops at a given m after two
 consecutive n cap; t = 4 prime cells do not run if t = 3 caps. Success is any
 decided cell with a verified planted control; the preregistered kill criteria
 close the respective m >= 5 lines. No cap is raised after the freezes.
+
+# Round 5 (2026-11-04, written before any round-5 run): solver side
+
+## Derived first (no runs; awk on recorded logs)
+- Cost model with LA exponent ω from 1.0 to 2.0: beating rho at 2^256 needs ω ≤ ~1.3 and β = 0.
+- Effective sparse-LA exponent of the recorded msolve matrices: 2.41–2.72. Sparsity does not get there.
+
+## Test H: character-hybrid on the separators
+Branch on the quadratic character of each separator, adding X_c = n_j·z_c² with n_j ∈ {1, a non-square}:
+2 branches per separator.
+- Cells: T at m3 t4 (D = 6, 3.7 s), m3 t5 (D = 6, 512 s) and m4 t4 (D = 7, 697 s). Run the planted (true) branch and one false branch each.
+- Prediction (Elekes–Szabó reading): D_H = D_T in the true branch (no degree drop), and the false branch costs about the same time.
+- Win condition: D drops by ≥ 1 per guessed bit, or total time over all branches < T's time.
+- Runs: msolve 1 thread, 1800 s cap, 6 GiB.
