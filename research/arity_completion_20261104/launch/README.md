@@ -121,3 +121,21 @@ decides; CodeBuild minutes). Budgets at 07:30Z: isolab-daily-cost-100 actual
    8 GiB address space), so host speed can only move a cell across the wall
    cap, which is reported with the cell's host model. Koblitz stays pinned
    (its 600 s wall caps depend on core speed) and waits for capacity.
+
+## CRIU/EBS command mode (2026-11-04 20:40Z, owner's choice of route)
+
+After five Spot losses the owner chose the lab's CRIU/EBS resumable route.
+The recovery controller gains a command mode on this branch
+(`taskq/deploy/eks-karpenter/resume/CONTROLLER.md`, "Command mode"): it execs a
+trusted argv inside the study image under the same checkpoint, restore and
+fencing machinery, prunes PVC-local generations to the latest two, and uploads
+the outputs directory with a hash manifest when the command exits; no native
+replay or fresh L2 epoch. `job-lib.sh` gains `ISOLAB_CRIU=1` behaviour for it:
+no network calls inside the checkpointed tree (no S3 sync, no STS), a local
+resume directory baked into the image, the final log line written before the
+hash manifest, and a TERM trap so a terminated pod records exit 143. The S3
+mode is otherwise unchanged. `job-criu-qual.sh` is the qualification payload:
+the prime-tower control ctl-m3-n15-kummer, whose restored rows must equal the
+recorded ones (timing fields excepted) after an induced worker loss. Command
+mode has no live qualification until that run passes; no study cell runs on it
+before then.
