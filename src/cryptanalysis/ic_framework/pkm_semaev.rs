@@ -456,6 +456,91 @@ pub fn bits_factor_base(
     abscissa_factor_base(inst, xs, format!("x in [{lo}, {lo} + 2^{t})"))
 }
 
+/// The harness base `prime-interval:t=T[,lo=L]`: every point with
+/// `x ∈ [L, L + 2^T)` (mod p), one column an abscissa, both signs, in
+/// ascending x.  The point set is [`bits_factor_base`]'s, so the base and
+/// `pkm-semaev`'s bits membership cannot drift apart.  The whole interval
+/// scan is charged like `prime_factor_base`: `2^T` abscissae scanned, one
+/// Legendre symbol each, a square root per carrier, and the index build.
+pub struct PrimeIntervalBase<'i> {
+    pub instance: &'i crate::cryptanalysis::ic_boundary::PrimeInstance,
+}
+
+impl PrimeIntervalBase<'_> {
+    /// The `(t, lo)` of a `prime-interval` spec, checked against `p`.
+    pub fn interval(params: &Params, p: u64) -> Result<(u32, u64), String> {
+        if let Some(k) = params.0.keys().find(|k| !matches!(k.as_str(), "t" | "lo")) {
+            return Err(format!(
+                "prime-interval: unknown parameter `{k}` (takes t, lo)"
+            ));
+        }
+        let t = params.u64("t")?;
+        if t == 0 || t >= 64 || (1u64 << t) >= p {
+            return Err(format!(
+                "prime-interval: t must satisfy 1 <= t and 2^t < p = {p}"
+            ));
+        }
+        let lo = params.u64_or("lo", 0)?;
+        if lo >= p {
+            return Err(format!("prime-interval: lo must satisfy 0 <= lo < p = {p}"));
+        }
+        Ok((t as u32, lo))
+    }
+}
+
+impl super::stages::FactorBaseBuilder<PrimeCurve> for PrimeIntervalBase<'_> {
+    fn name(&self) -> &str {
+        "prime-interval"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "every point with x in [lo, lo + 2^t) mod p, t = {}, lo = {}, one column an abscissa",
+            params.get("t").unwrap_or("?"),
+            params.get("lo").unwrap_or("0")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "t",
+                "interval width 2^t (2^t < p); pkm-semaev reads it as bits=t",
+            ),
+            ("lo", "left end of the interval, 0 <= lo < p, default 0"),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let start = Instant::now();
+        let curve = &self.instance.curve;
+        let p = curve.p;
+        let (t, lo) = Self::interval(params, p)?;
+        let scanned = 1u64 << t;
+        let sqrts = (0..scanned)
+            .filter(|&k| curve.legendre(curve.rhs((lo + k) % p)) >= 0)
+            .count() as u64;
+        if sqrts == 0 {
+            return Err(format!(
+                "prime-interval: no abscissa in [{lo}, {lo} + 2^{t}) carries a point"
+            ));
+        }
+        let mut fb = bits_factor_base(self.instance, t, lo);
+        let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
+        crate::cryptanalysis::ic_boundary::count_index_build(&mut fb, a + n, a);
+        fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+        fb.cost.count("abscissae_scanned", scanned);
+        fb.cost.count("legendre_symbols", scanned);
+        fb.cost.count("sqrt_solves", sqrts);
+        Ok(fb)
+    }
+}
+
 /// `x = w² + s` for `w ∈ [lo, lo + 2^t)` (the `square-bits` grid).
 pub fn square_abscissae(p: u64, t: u32, lo: u64, s: u64) -> Vec<u64> {
     (0..(1u64 << t))
@@ -783,6 +868,23 @@ impl PkmSemaevOracle {
                 };
                 let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
                 Self::new_isogeny(m, t, tower.v.clone(), steps, tower.c)
+            }
+            "prime-interval" => {
+                let (t, lo) = PrimeIntervalBase::interval(fb, inst.curve.p)?;
+                let op = &spec.oracle_params;
+                if op.get("bits").is_some() && op.u64("bits")? != u64::from(t) {
+                    return Err(format!(
+                        "pkm-semaev: bits={} disagrees with the base's prime-interval t={t}",
+                        op.u64("bits")?
+                    ));
+                }
+                if op.get("lo").is_some() && op.u64("lo")? != lo {
+                    return Err(format!(
+                        "pkm-semaev: lo={} disagrees with the base's prime-interval lo={lo}",
+                        op.u64("lo")?
+                    ));
+                }
+                Self::new_bits(m, t, lo)
             }
             _ if spec.oracle_params.get("bits").is_some() => Self::new_bits(
                 m,
@@ -2825,6 +2927,235 @@ mod tests {
             ..Default::default()
         };
         assert!(PkmSemaevOracle::from_spec(2, &spec, &inst).is_err());
+    }
+
+    /// The k = 20 Curve25519-family miniature of the T11 protocol
+    /// (research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base).
+    fn prime_interval_k20() -> PrimeInstance {
+        PrimeInstance {
+            name: "c25519-k20".into(),
+            curve: PrimeCurve {
+                p: 1_048_573,
+                a: 63_700,
+                b: 872_826,
+            },
+            group_order: 1_049_624,
+            r: 131_203,
+            cofactor: 8,
+            generator: (349_837, 122),
+        }
+    }
+
+    fn prime_interval_ctx(inst: &PrimeInstance) -> InstanceCtx<'_, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: inst.generator_point(),
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn prime_interval_build(
+        inst: &PrimeInstance,
+        spec: &str,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let (_, params) = Params::parse_spec(spec).unwrap();
+        PrimeIntervalBase { instance: inst }.build(
+            &prime_interval_ctx(inst),
+            &params,
+            &mut GroupOps::default(),
+        )
+    }
+
+    /// The frozen abscissa lists of `selection/frames.json` (t = 5).
+    const PRIME_INTERVAL_FRAMES: [(u64, &[u64]); 3] = [
+        (0, &[1, 2, 3, 8, 10, 11, 15, 18, 21, 22, 27]),
+        (
+            976_503,
+            &[
+                976503, 976504, 976505, 976507, 976508, 976509, 976512, 976513, 976515, 976516,
+                976517, 976518, 976519, 976520, 976521, 976523, 976524, 976525, 976526, 976528,
+                976529, 976531, 976532, 976534,
+            ],
+        ),
+        (
+            541_434,
+            &[
+                541434, 541436, 541437, 541439, 541442, 541444, 541445, 541446, 541450, 541454,
+                541456, 541459, 541461, 541463, 541464, 541465,
+            ],
+        ),
+    ];
+
+    /// U1: the three frozen frames, column for column `bits_factor_base`.
+    #[test]
+    fn prime_interval_u1_frames_equal_bits_factor_base() {
+        let inst = prime_interval_k20();
+        for (lo, xs) in PRIME_INTERVAL_FRAMES {
+            let fb = prime_interval_build(&inst, &format!("prime-interval:t=5,lo={lo}")).unwrap();
+            assert_eq!(fb.columns, xs.len(), "lo = {lo}");
+            assert_eq!(fb.abscissa_list, xs.to_vec(), "lo = {lo}");
+            let bits = bits_factor_base(&inst, 5, lo);
+            assert_eq!(fb.points, bits.points, "lo = {lo}");
+            assert_eq!(fb.col_of, bits.col_of, "lo = {lo}");
+            assert_eq!(fb.coef_of, bits.coef_of, "lo = {lo}");
+        }
+        assert_eq!(PRIME_INTERVAL_FRAMES.map(|(_, xs)| xs.len()), [11, 24, 16]);
+    }
+
+    /// U2: lo = 0 is `prime-abscissa:below=32` (x = 0 carries no point).
+    #[test]
+    fn prime_interval_u2_lo0_equals_prime_abscissa_below() {
+        use crate::cryptanalysis::ic_framework::plugins::PrimeAbscissaBase;
+        let inst = prime_interval_k20();
+        let c = &inst.curve;
+        assert_eq!(c.legendre(c.rhs(0)), -1, "x = 0 carries no point");
+        let fb = prime_interval_build(&inst, "prime-interval:t=5,lo=0").unwrap();
+        let (_, below) = Params::parse_spec("prime-abscissa:below=32").unwrap();
+        let naive = PrimeAbscissaBase { instance: &inst }
+            .build(&prime_interval_ctx(&inst), &below, &mut GroupOps::default())
+            .unwrap();
+        let keys = |f: &FactorBase<PrimePoint>| {
+            let mut k: Vec<u64> = f.points.iter().map(|q| c.key(q)).collect();
+            k.sort_unstable();
+            k
+        };
+        assert_eq!(keys(&fb), keys(&naive));
+        assert_eq!(fb.columns, naive.columns);
+        assert_eq!(fb.abscissa_list, naive.abscissa_list);
+    }
+
+    /// U3 and U4: lo = 976503 is `explicit-x` on its 24 carriers, and the
+    /// whole interval scan is charged.
+    #[test]
+    fn prime_interval_u3_u4_explicit_x_and_charging() {
+        use crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase;
+        let inst = prime_interval_k20();
+        let (lo, xs) = PRIME_INTERVAL_FRAMES[1];
+        let fb = prime_interval_build(&inst, &format!("prime-interval:t=5,lo={lo}")).unwrap();
+        let list: Vec<String> = xs.iter().map(|x| x.to_string()).collect();
+        let (_, ex) = Params::parse_spec(&format!("explicit-x:xs={}", list.join(";"))).unwrap();
+        let explicit = PrimeExplicitXBase
+            .build(&prime_interval_ctx(&inst), &ex, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(fb.points, explicit.points);
+        assert_eq!(fb.col_of, explicit.col_of);
+        assert_eq!(fb.coef_of, explicit.coef_of);
+        assert_eq!(fb.columns, explicit.columns);
+        assert_eq!(fb.cost.get("abscissae_scanned"), 32);
+        assert_eq!(fb.cost.get("legendre_symbols"), 32);
+        assert_eq!(fb.cost.get("sqrt_solves"), 24);
+        assert_eq!(
+            fb.cost.work_native.get("counted:base_index_builds"),
+            Some(&1)
+        );
+    }
+
+    /// U5: malformed specs and an oracle that disagrees with the base are
+    /// refused; the same parameters given twice are accepted.
+    #[test]
+    fn prime_interval_u5_rejections() {
+        use crate::cryptanalysis::ic_framework::stages::Targets;
+        use crate::cryptanalysis::ic_framework::PipelineSpec;
+        let inst = prime_interval_k20();
+        for bad in [
+            "prime-interval",
+            "prime-interval:lo=5",
+            "prime-interval:t=0",
+            "prime-interval:t=20",
+            "prime-interval:t=64",
+            "prime-interval:t=5,lo=1048573",
+            "prime-interval:t=5,size=3",
+        ] {
+            assert!(prime_interval_build(&inst, bad).is_err(), "{bad}");
+        }
+        // A width-2 interval of the small fixture with no carrier.
+        let small = small_prime_order_instance();
+        let c = &small.curve;
+        let lo = (0..c.p - 1)
+            .find(|&x| c.legendre(c.rhs(x)) < 0 && c.legendre(c.rhs(x + 1)) < 0)
+            .expect("two consecutive non-carriers");
+        let err = prime_interval_build(&small, &format!("prime-interval:t=1,lo={lo}"));
+        assert!(err.is_err());
+
+        let spec = |fb: &str, or: &str| {
+            let (factor_base, factor_base_params) = Params::parse_spec(fb).unwrap();
+            let (oracle, oracle_params) = Params::parse_spec(or).unwrap();
+            PipelineSpec {
+                factor_base,
+                factor_base_params,
+                oracle,
+                oracle_params,
+                targets: Targets::Random,
+                ..Default::default()
+            }
+        };
+        for (fb, or, ok) in [
+            ("prime-interval:t=5", "pkm-semaev:m=2,bits=4", false),
+            ("prime-interval:t=5,lo=0", "pkm-semaev:m=2,lo=1", false),
+            (
+                "prime-interval:t=5,lo=976503",
+                "pkm-semaev:m=2,bits=5,lo=976503",
+                true,
+            ),
+            (
+                "prime-interval:t=5,lo=976503",
+                "pkm-semaev:m=2,mode=full,guess=3",
+                true,
+            ),
+            ("prime-interval:t=5,lo=7,x=1", "pkm-semaev:m=2", false),
+        ] {
+            let got = PkmSemaevOracle::from_spec(2, &spec(fb, or), &inst);
+            assert_eq!(got.is_ok(), ok, "{fb} with {or}");
+        }
+    }
+
+    /// U6: an end-to-end pipeline solve on the small prime fixture through
+    /// `from_spec`, with the interval read from the base.
+    #[test]
+    fn prime_interval_u6_pipeline_solves() {
+        use crate::cryptanalysis::ic_boundary::Calibration;
+        use crate::cryptanalysis::ic_framework::stages::Targets;
+        use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+        let inst = small_prime_order_instance();
+        let curve = &inst.curve;
+        let mut ops = GroupOps::default();
+        let planted = 1 + 7919 % (inst.r - 1);
+        let target = curve.mul(&mut ops, inst.generator_point(), planted);
+        let mut ictx = prime_interval_ctx(&inst);
+        ictx.target = target;
+        let fb_spec = "prime-interval:t=5,lo=500";
+        let (factor_base, factor_base_params) = Params::parse_spec(fb_spec).unwrap();
+        let (oracle, oracle_params) =
+            Params::parse_spec("pkm-semaev:m=2,mode=full,guess=1").unwrap();
+        let spec = PipelineSpec {
+            factor_base,
+            factor_base_params,
+            oracle,
+            oracle_params,
+            targets: Targets::Random,
+            linalg: "incremental-gauss".into(),
+            max_trials: 20_000,
+            seed: 11,
+            ..Default::default()
+        };
+        let mut o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
+        let report = run_pipeline(
+            &ictx,
+            &spec,
+            &PrimeIntervalBase { instance: &inst },
+            &mut o,
+            planted,
+            &Calibration::default(),
+            Some(1.0),
+        )
+        .unwrap_or_else(|e| panic!("{fb_spec}: {e}"));
+        assert!(report.verified, "{report:?}");
+        assert_eq!(report.recovered, Some(planted));
     }
 
     /// A small Montgomery miniature `y² = x³ + A x² + x` over `p ≡ 5 (8)`
