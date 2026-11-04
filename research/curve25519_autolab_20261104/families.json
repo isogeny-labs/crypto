@@ -1,6 +1,6 @@
 {
   "schema": "ic_autolab.families/v1",
-  "note": "Candidate families per track. Each family is one ecbench ic.pipeline oracle string on the track's factor-base template; the searched knob is N (the base size, {n}; {scan} = scan_factor x N). Every family here is an existing lab method; a new family that needs code is a source change and gets its own round after the build. default_f sets the first base size as a fraction of N_a = round(0.63 r^(1/3)). Disable a family rather than deleting it, so the history stays readable. A family's own n_min (when set) overrides the track's: a k-sum table needs more base points than summands.",
+  "note": "Candidate families per track. Each family is one ecbench ic.pipeline oracle string on the track's factor-base template; the searched knob is N (the base size, {n}; {scan} = scan_factor x N). Every family here is an existing lab method; a new family that needs code is a source change and gets its own round after the build. default_f sets the first base size as a fraction of N_a = round(0.63 r^(1/3)). Disable a family rather than deleting it, so the history stays readable. A family's own n_min (when set) overrides the track's: a k-sum table needs more base points than summands. The generic n_grid gained 0.85 and 1.2 after round 6 (the optimum sat between grid points).",
   "tracks": {
     "generic": {
       "factor_base": "prime-projected-abscissa:size={n},scan_cap={scan}",
@@ -8,6 +8,8 @@
       "n_grid": [
         0.5,
         0.7,
+        0.85,
+        1.2,
         1.4,
         2.0
       ],
@@ -30,7 +32,8 @@
           "id": "mitm3",
           "oracle": "mitm:m=3,negation_folded=1",
           "default_f": 0.5,
-          "note": "m = 3 meet in the middle; worse than inc at every N in the m = 3 study (kept as an alternative, never re-proposed where tried)"
+          "note": "m = 3 meet in the middle; worse than inc at every N in the m = 3 study (kept as an alternative, never re-proposed where tried) Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "ksum4",
@@ -56,19 +59,22 @@
           "id": "rfpairs3",
           "oracle": "rootfind-pairs:m=3",
           "default_f": 0.35,
-          "note": "root-finding pairs at m = 3"
+          "note": "root-finding pairs at m = 3 Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "rfsub2",
           "oracle": "rootfind-subtract:m=2",
           "default_f": 1.0,
-          "note": "root-finding subtract at m = 2"
+          "note": "root-finding subtract at m = 2 Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "sub2",
           "oracle": "subtract",
           "default_f": 1.0,
-          "note": "plain subtract-and-test oracle"
+          "note": "plain subtract-and-test oracle Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "mitmbatch",
@@ -81,6 +87,1234 @@
           "oracle": "mitm-prime-blocked:m=2",
           "default_f": 1.0,
           "note": "blocked prime pair table"
+        },
+        {
+          "id": "ksum3s",
+          "oracle": "ksum:m=3",
+          "default_f": 0.344,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "ksum:m=3 with the stride target stream instead of the jump walk (ideas/PROPOSALS.md P1: the walk's 16 jumps cost two scalar multiplications each); default_f is the k = 20 incumbent's N / N_a Disabled after round 12: P1 falsified (stride 1.081x the walk at k = 24).",
+          "enabled": false
+        },
+        {
+          "id": "ksum4s",
+          "oracle": "ksum:m=4",
+          "default_f": 0.148,
+          "n_min": 6,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "ksum:m=4 with the stride target stream (P1); default_f is the k = 24 incumbent's N / N_a Disabled after round 12: P1 falsified (stride 1.081x the walk at k = 24).",
+          "enabled": false
+        },
+        {
+          "id": "ksum3f",
+          "oracle": "ksum:m=3,free=1",
+          "default_f": 0.344,
+          "note": "k-sum table whose build-time key collisions are verified and used as target-free relations (ideas/PROPOSALS.md P2; KSumTable::free_rows)",
+          "start_from": "ksum3"
+        },
+        {
+          "id": "ksum4f",
+          "oracle": "ksum:m=4,free=1",
+          "default_f": 0.148,
+          "note": "k-sum table whose build-time key collisions are verified and used as target-free relations (ideas/PROPOSALS.md P2; KSumTable::free_rows)",
+          "n_min": 6,
+          "start_from": "ksum4"
+        },
+        {
+          "id": "ksum5f",
+          "oracle": "ksum:m=5,free=1",
+          "default_f": 0.08,
+          "note": "k-sum table whose build-time key collisions are verified and used as target-free relations (ideas/PROPOSALS.md P2; KSumTable::free_rows)",
+          "n_min": 8,
+          "start_from": "ksum5"
+        },
+        {
+          "id": "wsum-b4",
+          "oracle": "wsum:coef=4,free=1",
+          "default_f": 0.0001,
+          "n_min": 4,
+          "note": "coefficient-box table over C seeds with |e_c| <= 4 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 4 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such",
+          "n_max": 4
+        },
+        {
+          "id": "wsum-b5",
+          "oracle": "wsum:coef=5,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "note": "coefficient-box table over C seeds with |e_c| <= 5 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 3 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such",
+          "n_max": 4
+        },
+        {
+          "id": "wsum-b12",
+          "oracle": "wsum:coef=12,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "note": "coefficient-box table over C seeds with |e_c| <= 12 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 3 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such",
+          "n_max": 4
+        },
+        {
+          "id": "wsum-b20",
+          "oracle": "wsum:coef=20,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "note": "coefficient-box table over C seeds with |e_c| <= 20 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 3 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such",
+          "n_max": 4
+        },
+        {
+          "id": "wsum-b8",
+          "oracle": "wsum:coef=8,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 8; added after rounds 16-18 to refine the bound between the tried values"
+        },
+        {
+          "id": "wsum-b16",
+          "oracle": "wsum:coef=16,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 16; added after rounds 16-18 to refine the bound between the tried values"
+        },
+        {
+          "id": "wsum-b24",
+          "oracle": "wsum:coef=24,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 24; added after rounds 16-18 to refine the bound between the tried values"
+        },
+        {
+          "id": "wsum-b30",
+          "oracle": "wsum:coef=30,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 30; added after rounds 16-18 to refine the bound between the tried values"
+        },
+        {
+          "id": "wsum2-b30",
+          "oracle": "wsum:coef=30,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 30 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such"
+        },
+        {
+          "id": "wsum2-b60",
+          "oracle": "wsum:coef=60,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 60 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such"
+        },
+        {
+          "id": "wsum2-b120",
+          "oracle": "wsum:coef=120,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 120 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such"
+        },
+        {
+          "id": "wsum2-b200",
+          "oracle": "wsum:coef=200,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 200 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such"
+        },
+        {
+          "id": "wsum2-b15",
+          "oracle": "wsum:coef=15,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 15 (SYNTHESIS.md R2); at the baby-step giant-step boundary, classification pending"
+        },
+        {
+          "id": "wsum2-b20",
+          "oracle": "wsum:coef=20,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 20 (SYNTHESIS.md R2); at the baby-step giant-step boundary, classification pending"
+        },
+        {
+          "id": "wsum2-b40",
+          "oracle": "wsum:coef=40,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 40 (SYNTHESIS.md R2); at the baby-step giant-step boundary, classification pending"
+        },
+        {
+          "id": "wsum2-b45",
+          "oracle": "wsum:coef=45,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 45 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such; grid refinement between the measured optima (best B about 0.47 r^(1/4) at k = 20..32)"
+        },
+        {
+          "id": "wsum2-b50",
+          "oracle": "wsum:coef=50,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 50 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such; grid refinement between the measured optima (best B about 0.47 r^(1/4) at k = 20..32)"
+        },
+        {
+          "id": "wsum2-b75",
+          "oracle": "wsum:coef=75,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 75 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such; grid refinement between the measured optima (best B about 0.47 r^(1/4) at k = 20..32)"
+        },
+        {
+          "id": "wsum2-b90",
+          "oracle": "wsum:coef=90,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 90 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such; grid refinement between the measured optima (best B about 0.47 r^(1/4) at k = 20..32)"
+        },
+        {
+          "id": "wsum2-b100",
+          "oracle": "wsum:coef=100,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 100 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such; grid refinement between the measured optima (best B about 0.47 r^(1/4) at k = 20..32)"
+        },
+        {
+          "id": "wsum2-b140",
+          "oracle": "wsum:coef=140,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 140 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such; grid refinement between the measured optima (best B about 0.47 r^(1/4) at k = 20..32)"
+        },
+        {
+          "id": "wsum2-b160",
+          "oracle": "wsum:coef=160,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "coefficient box over C = 2 seeds, |e_c| <= 160 (ideas/SYNTHESIS.md R2). At the baby-step giant-step boundary: classification pending an owner ruling; any ratchet from this family is labelled as such; grid refinement between the measured optima (best B about 0.47 r^(1/4) at k = 20..32)"
+        },
+        {
+          "id": "wsum2g-b20",
+          "oracle": "wsum:coef=20,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=20 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b30",
+          "oracle": "wsum:coef=30,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=30 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b45",
+          "oracle": "wsum:coef=45,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=45 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b60",
+          "oracle": "wsum:coef=60,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=60 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b90",
+          "oracle": "wsum:coef=90,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=90 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b120",
+          "oracle": "wsum:coef=120,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=120 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b10",
+          "oracle": "wsum:coef=10,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=10 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b15",
+          "oracle": "wsum:coef=15,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=15 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b160",
+          "oracle": "wsum:coef=160,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=160 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2g-b180",
+          "oracle": "wsum:coef=180,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wsum:coef=180 over C = 2 seeds with probes R = Q + [k]G (targets=stride-generator: no walk set-up). ideas/PROPOSALS-R3.md P1. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wsum2s-b15",
+          "oracle": "wsum:coef=15,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "wsum:coef=15 over C = 2 seeds with probes R <- R + S, S = [s]G + [t]Q drawn once (targets=stride). Avoids the stride-generator clone rows: the seeds always have a short relation w.S = [m]G, so Q + [k]G hits repeat along e + t w (test wsum_stride_dependence_tests). At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 29: rows repeat along short seed relations",
+          "enabled": false
+        },
+        {
+          "id": "wsum2s-b30",
+          "oracle": "wsum:coef=30,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "wsum:coef=30 over C = 2 seeds with probes R <- R + S, S = [s]G + [t]Q drawn once (targets=stride). Avoids the stride-generator clone rows: the seeds always have a short relation w.S = [m]G, so Q + [k]G hits repeat along e + t w (test wsum_stride_dependence_tests). At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 29: rows repeat along short seed relations",
+          "enabled": false
+        },
+        {
+          "id": "wsum2s-b45",
+          "oracle": "wsum:coef=45,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "wsum:coef=45 over C = 2 seeds with probes R <- R + S, S = [s]G + [t]Q drawn once (targets=stride). Avoids the stride-generator clone rows: the seeds always have a short relation w.S = [m]G, so Q + [k]G hits repeat along e + t w (test wsum_stride_dependence_tests). At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 29: rows repeat along short seed relations",
+          "enabled": false
+        },
+        {
+          "id": "wsum2s-b60",
+          "oracle": "wsum:coef=60,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "wsum:coef=60 over C = 2 seeds with probes R <- R + S, S = [s]G + [t]Q drawn once (targets=stride). Avoids the stride-generator clone rows: the seeds always have a short relation w.S = [m]G, so Q + [k]G hits repeat along e + t w (test wsum_stride_dependence_tests). At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 29: rows repeat along short seed relations",
+          "enabled": false
+        },
+        {
+          "id": "wsum2s-b90",
+          "oracle": "wsum:coef=90,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "wsum:coef=90 over C = 2 seeds with probes R <- R + S, S = [s]G + [t]Q drawn once (targets=stride). Avoids the stride-generator clone rows: the seeds always have a short relation w.S = [m]G, so Q + [k]G hits repeat along e + t w (test wsum_stride_dependence_tests). At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 29: rows repeat along short seed relations",
+          "enabled": false
+        },
+        {
+          "id": "wsum2s-b120",
+          "oracle": "wsum:coef=120,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "wsum:coef=120 over C = 2 seeds with probes R <- R + S, S = [s]G + [t]Q drawn once (targets=stride). Avoids the stride-generator clone rows: the seeds always have a short relation w.S = [m]G, so Q + [k]G hits repeat along e + t w (test wsum_stride_dependence_tests). At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 29: rows repeat along short seed relations",
+          "enabled": false
+        },
+        {
+          "id": "wsum2s-b160",
+          "oracle": "wsum:coef=160,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "wsum:coef=160 over C = 2 seeds with probes R <- R + S, S = [s]G + [t]Q drawn once (targets=stride). Avoids the stride-generator clone rows: the seeds always have a short relation w.S = [m]G, so Q + [k]G hits repeat along e + t w (test wsum_stride_dependence_tests). At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 29: rows repeat along short seed relations",
+          "enabled": false
+        },
+        {
+          "id": "wsum2r-b30",
+          "oracle": "wsum:coef=30,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-renew"
+          },
+          "note": "wsum:coef=30 over C = 2 seeds with probes R <- R + S and S renewed after every relation (targets=stride-renew): a new stride per relation breaks the clone lines of round 29. At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 30: hits cluster on seed-relation lines",
+          "enabled": false
+        },
+        {
+          "id": "wsum2r-b45",
+          "oracle": "wsum:coef=45,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-renew"
+          },
+          "note": "wsum:coef=45 over C = 2 seeds with probes R <- R + S and S renewed after every relation (targets=stride-renew): a new stride per relation breaks the clone lines of round 29. At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 30: hits cluster on seed-relation lines",
+          "enabled": false
+        },
+        {
+          "id": "wsum2r-b60",
+          "oracle": "wsum:coef=60,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-renew"
+          },
+          "note": "wsum:coef=60 over C = 2 seeds with probes R <- R + S and S renewed after every relation (targets=stride-renew): a new stride per relation breaks the clone lines of round 29. At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 30: hits cluster on seed-relation lines",
+          "enabled": false
+        },
+        {
+          "id": "wsum2r-b90",
+          "oracle": "wsum:coef=90,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-renew"
+          },
+          "note": "wsum:coef=90 over C = 2 seeds with probes R <- R + S and S renewed after every relation (targets=stride-renew): a new stride per relation breaks the clone lines of round 29. At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 30: hits cluster on seed-relation lines",
+          "enabled": false
+        },
+        {
+          "id": "wsum2r-b120",
+          "oracle": "wsum:coef=120,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-renew"
+          },
+          "note": "wsum:coef=120 over C = 2 seeds with probes R <- R + S and S renewed after every relation (targets=stride-renew): a new stride per relation breaks the clone lines of round 29. At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 30: hits cluster on seed-relation lines",
+          "enabled": false
+        },
+        {
+          "id": "wsum2r-b160",
+          "oracle": "wsum:coef=160,free=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-renew"
+          },
+          "note": "wsum:coef=160 over C = 2 seeds with probes R <- R + S and S renewed after every relation (targets=stride-renew): a new stride per relation breaks the clone lines of round 29. At the baby-step giant-step boundary: classification pending an owner ruling. Disabled after round 30: hits cluster on seed-relation lines",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x08",
+          "oracle": "wwalk:x=0.8",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.8 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x08",
+          "oracle": "wwalk:x=0.8",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.8 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x08-grow",
+          "oracle": "wwalk:x=0.8,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.8 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x08-grow",
+          "oracle": "wwalk:x=0.8,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.8 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x10",
+          "oracle": "wwalk:x=1.0",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.0 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x10",
+          "oracle": "wwalk:x=1.0",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.0 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x10-grow",
+          "oracle": "wwalk:x=1.0,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.0 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x10-grow",
+          "oracle": "wwalk:x=1.0,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.0 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x12",
+          "oracle": "wwalk:x=1.2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.2 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x12",
+          "oracle": "wwalk:x=1.2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.2 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x12-grow",
+          "oracle": "wwalk:x=1.2,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.2 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x12-grow",
+          "oracle": "wwalk:x=1.2,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.2 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x15",
+          "oracle": "wwalk:x=1.5",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.5 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x15",
+          "oracle": "wwalk:x=1.5",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.5 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x15-grow",
+          "oracle": "wwalk:x=1.5,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.5 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x15-grow",
+          "oracle": "wwalk:x=1.5,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 1.5 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x05",
+          "oracle": "wwalk:x=0.5",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.5 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x05",
+          "oracle": "wwalk:x=0.5",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.5 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x05-grow",
+          "oracle": "wwalk:x=0.5,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.5 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x05-grow",
+          "oracle": "wwalk:x=0.5,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.5 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x06",
+          "oracle": "wwalk:x=0.6",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.6 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x06",
+          "oracle": "wwalk:x=0.6",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.6 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x06-grow",
+          "oracle": "wwalk:x=0.6,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.6 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x06-grow",
+          "oracle": "wwalk:x=0.6,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.6 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x07",
+          "oracle": "wwalk:x=0.7",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.7 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x07",
+          "oracle": "wwalk:x=0.7",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.7 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x07-grow",
+          "oracle": "wwalk:x=0.7,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.7 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x07-grow",
+          "oracle": "wwalk:x=0.7,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.7 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x09",
+          "oracle": "wwalk:x=0.9",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.9 sqrt(r) entries whose verified key collisions give target-free seed rows, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x09",
+          "oracle": "wwalk:x=0.9",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.9 sqrt(r) entries whose verified key collisions give target-free seed rows, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalk-x09-grow",
+          "oracle": "wwalk:x=0.9,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.9 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkg-x09-grow",
+          "oracle": "wwalk:x=0.9,grow=1",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "P2 (ideas/PROPOSALS-R3.md): C = 2 seeds, table built as a 16-jump random walk of T = 0.9 sqrt(r) entries whose verified key collisions give target-free seed rows, grown to the first row (cap 2T), stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x06",
+          "oracle": "wwalk:x=0.6,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x06",
+          "oracle": "wwalk:x=0.6,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x07",
+          "oracle": "wwalk:x=0.7,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.7, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x07",
+          "oracle": "wwalk:x=0.7,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.7, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x08",
+          "oracle": "wwalk:x=0.8,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.8, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x08",
+          "oracle": "wwalk:x=0.8,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.8, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x09",
+          "oracle": "wwalk:x=0.9,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x09",
+          "oracle": "wwalk:x=0.9,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x10",
+          "oracle": "wwalk:x=1.0,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.0, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x10",
+          "oracle": "wwalk:x=1.0,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.0, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x12",
+          "oracle": "wwalk:x=1.2,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.2, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x12",
+          "oracle": "wwalk:x=1.2,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.2, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x03",
+          "oracle": "wwalk:x=0.3,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.3, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x04",
+          "oracle": "wwalk:x=0.4,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.4, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x05",
+          "oracle": "wwalk:x=0.5,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.5, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x06-j8",
+          "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, 8 jumps, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x09-j8",
+          "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, 8 jumps, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x06-j32",
+          "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, 32 jumps, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkG-x09-j32",
+          "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, 32 jumps, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x03",
+          "oracle": "wwalk:x=0.3,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.3, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x04",
+          "oracle": "wwalk:x=0.4,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.4, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x05",
+          "oracle": "wwalk:x=0.5,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.5, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x06-j8",
+          "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, 8 jumps, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x09-j8",
+          "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, 8 jumps, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x06-j32",
+          "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, 32 jumps, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x09-j32",
+          "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, 32 jumps, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling",
+          "enabled": false
+        },
+        {
+          "id": "wwalkGg-x09-sr",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run (re-baseline PCC-20261104-d91a51)"
+        },
+        {
+          "id": "wwalkG-x06-sr",
+          "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run (re-baseline PCC-20261104-d91a51)"
+        },
+        {
+          "id": "wwalkG-x05-sr",
+          "oracle": "wwalk:x=0.5,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.5, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkG-x07-sr",
+          "oracle": "wwalk:x=0.7,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.7, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkG-x08-sr",
+          "oracle": "wwalk:x=0.8,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.8, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkG-x10-sr",
+          "oracle": "wwalk:x=1.0,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.0, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkG-x12-sr",
+          "oracle": "wwalk:x=1.2,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.2, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkG-x15-sr",
+          "oracle": "wwalk:x=1.5,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.5, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkGg-x05-sr",
+          "oracle": "wwalk:x=0.5,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.5, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkGg-x07-sr",
+          "oracle": "wwalk:x=0.7,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.7, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkGg-x08-sr",
+          "oracle": "wwalk:x=0.8,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.8, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkGg-x10-sr",
+          "oracle": "wwalk:x=1.0,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.0, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkGg-x12-sr",
+          "oracle": "wwalk:x=1.2,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.2, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
+        },
+        {
+          "id": "wwalkGg-x15-sr",
+          "oracle": "wwalk:x=1.5,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 1.5, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run"
         }
       ]
     },

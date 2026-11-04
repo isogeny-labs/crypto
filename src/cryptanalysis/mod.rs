@@ -216,6 +216,7 @@ pub mod hashed_ecdl;
 /// Toy index calculus with tensor-contraction relation finding
 /// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
 pub use ecdl_tensor_ic as tensor_ic;
+pub mod dreg_forecast;
 pub mod hilbert_class_poly;
 pub mod hky_fp_tower;
 pub mod hnp_ecdsa;

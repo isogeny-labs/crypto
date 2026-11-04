@@ -157,3 +157,19 @@ The tree's implied cost law would beat rho only somewhere between about 2^500
 and 2^6000 bits; at 256 bits it is at least 28 bits short even under the most
 optimistic row. The big-host run of the kill test is specified in
 `round4/BIGHOST.md` but blocked on credentials and the job contract.
+
+## Rounds 6–7 (2026-11-04)
+
+The round-6 long run of the deciding cell m5 t4 ran out of memory at 14.5 GiB
+after 4,046 s, still in degree 9, so P2 at m = 5 stays undecided
+[pcc:unverified] (`round6/README.md`). The consolidated status is in
+[`STATUS.md`](STATUS.md). The obstruction is tracked as
+[`problems/tree-glued-pdp-separator-coupling.md`](../../problems/tree-glued-pdp-separator-coupling.md).
+
+## Round 7 (2026-11-04)
+
+See [`round7/README.md`](round7/README.md). The 2-torsion quotient in the
+Edwards v-coordinate lowers the coupling excess by 1–2 at m = 3, 4, and the
+lowering holds at t = 5. The Riemann–Roch system has lower D than the tree at
+m = 3 and is undecided at m = 5. The covers and list-decoding tests are
+closed, and the memory-lean F4 does not fit on 15 GB [pcc:unverified].

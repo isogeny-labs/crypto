@@ -36,3 +36,12 @@ import WeaknessLean
 #print axioms ProtocolCountermodels.ambient_blinding_leaves_subgroup
 #print axioms ProtocolCountermodels.subgroup_blinding_bijective
 #print axioms ProtocolCountermodels.always_accept_complete_unsound
+#print axioms SolvingDegreeBound.linear_count_of_gb_in_subspace
+#print axioms SolvingDegreeBound.no_gb_in_rows_of_low_lt
+#print axioms MeanCount.sum_card_reps
+#print axioms MeanCount.mean_reps
+#print axioms TransparentEncoding.dlog_identity_encoding
+#print axioms TransparentEncoding.zero_operation_dlog
+#print axioms BooleanNullstellensatz.mem_fieldIdeal_of_eval_zero
+#print axioms BooleanNullstellensatz.indicator_mem
+#print axioms BooleanNullstellensatz.linear_mem_of_unique_zero

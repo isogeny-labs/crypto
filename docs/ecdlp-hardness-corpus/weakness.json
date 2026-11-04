@@ -2,17 +2,17 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 598,
+    "nodes": 608,
     "status_inflation": 17,
     "model_scope_leaps": 9,
     "contagious_sources": 21,
     "hidden_assumption_clusters": 19,
     "unwired_dependences": 11,
     "route_closures_on_weak_support": 16,
-    "live_obstructions": 49,
+    "live_obstructions": 52,
     "author_flagged": 8,
     "attack_queue": 248,
-    "hygiene_queue": 108
+    "hygiene_queue": 112
   },
   "status_inflation": [
     {
@@ -851,45 +851,6 @@
       ]
     },
     {
-      "source": "S-PA-LEAN",
-      "title": "Five-target Lean discharge and semantic review packet (sibling repository)",
-      "verification": "repository_read",
-      "refuted": [
-        "CLAIM-PA-MOD-ALIAS",
-        "CLAIM-PA-SUBGROUP-AMBIENT",
-        "CLAIM-PA-BATCH-ADAPTIVE",
-        "CLAIM-PA-POLY-FUNCTION"
-      ],
-      "refuted_fraction": 0.444,
-      "exposed": [
-        {
-          "id": "CEX-PA-BATCH-ADAPTIVE",
-          "status": "proved_internal_unreviewed",
-          "impact": 1
-        },
-        {
-          "id": "THM-PA-SCHNORR-SS",
-          "status": "proved_internal_unreviewed",
-          "impact": 1
-        },
-        {
-          "id": "CEX-PA-MOD-ALIAS",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-POLY-FUNCTION",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-SUBGROUP-AMBIENT",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        }
-      ]
-    },
-    {
       "source": "S-WEAKNESS-LEAN",
       "title": "Lean attacks on two weak points of the ECDLP hardness graph",
       "verification": "repository_read",
@@ -899,9 +860,10 @@
         "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING",
         "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP",
         "CLAIM-PA-AMBIENT-BLINDING",
-        "CLAIM-PA-ZK-IMPLIES-SOUND"
+        "CLAIM-PA-ZK-IMPLIES-SOUND",
+        "CLAIM-SHOUP-ALL-ALGORITHMS"
       ],
-      "refuted_fraction": 0.3,
+      "refuted_fraction": 0.28,
       "exposed": [
         {
           "id": "ASM-XEDNI-TRIAL-MARGINAL",
@@ -910,6 +872,11 @@
         },
         {
           "id": "THM-HAZARD-MARGINAL-SUFFICES",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "THM-SD-SUBSPACE-CRITERION",
           "status": "proved_internal_unreviewed",
           "impact": 1
         },
@@ -944,6 +911,11 @@
           "impact": 0
         },
         {
+          "id": "CEX-TRANSPARENT-ENCODING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
           "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
           "status": "open",
           "impact": 0
@@ -954,7 +926,17 @@
           "impact": 0
         },
         {
+          "id": "THM-BOOLEAN-NSS-UNIQUE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
           "id": "THM-LEFT-KERNEL-RELATIONS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-MEAN-COUNT-IDENTITY",
           "status": "proved_internal_unreviewed",
           "impact": 0
         },
@@ -970,6 +952,45 @@
         },
         {
           "id": "THM-SD-DEGREE2-CRITERION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        }
+      ]
+    },
+    {
+      "source": "S-PA-LEAN",
+      "title": "Five-target Lean discharge and semantic review packet (sibling repository)",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-PA-MOD-ALIAS",
+        "CLAIM-PA-SUBGROUP-AMBIENT",
+        "CLAIM-PA-BATCH-ADAPTIVE",
+        "CLAIM-PA-POLY-FUNCTION"
+      ],
+      "refuted_fraction": 0.444,
+      "exposed": [
+        {
+          "id": "CEX-PA-BATCH-ADAPTIVE",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "THM-PA-SCHNORR-SS",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "CEX-PA-MOD-ALIAS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-POLY-FUNCTION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-SUBGROUP-AMBIENT",
           "status": "proved_internal_unreviewed",
           "impact": 0
         }
@@ -1839,6 +1860,26 @@
       "statement": "At m = 2, D_ff = 2 and D_reg rises from 4 to 5 between n = 36 and 37, i.e. D_reg - D_ff is not o(1)-close at fixed value and is moving with n."
     },
     {
+      "edge": "R4-009",
+      "relation": "obstructs",
+      "from": "MEAS-RANK-DEFICIT-CENSUS",
+      "from_status": "measured",
+      "to": "HEUR-PF-PKM-RANK-DELTA",
+      "to_status": "heuristic",
+      "impact": 3,
+      "statement": "Delta = 10 left a rank deficit in at least one of 5 samples on 8 of 10 small curves."
+    },
+    {
+      "edge": "R4-013",
+      "relation": "obstructs",
+      "from": "MEAS-PQ2-DLIN-CENSUS",
+      "from_status": "measured",
+      "to": "HEUR-GB-PQ-ASSUMPTION-2",
+      "to_status": "heuristic",
+      "impact": 3,
+      "statement": "The solver degree is never the first fall degree 2, and the Kousidis-Wiemers value 3 is not reached for 17 <= n <= 44; exactly 4 on 24 fresh instances at n = 17 to 24."
+    },
+    {
       "edge": "XL-002",
       "relation": "obstructs",
       "from": "OBS-SP-KY-SEMAEV-N45",
@@ -1947,6 +1988,16 @@
       "to_status": "heuristic",
       "impact": 13,
       "statement": "The measured rate follows the exact count 16 C(|F|,6)/l, not the asymptotic 1/(ng)!; small bases are 3-30% below the asymptotic rate."
+    },
+    {
+      "edge": "R4-008",
+      "relation": "qualifies",
+      "from": "MEAS-PF-YIELD-CENSUS",
+      "from_status": "measured",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "to_status": "heuristic",
+      "impact": 13,
+      "statement": "Zero class matches Poisson once the unordered convention is used; the variance is 1.45x Poisson for negation-closed bases."
     },
     {
       "edge": "E-SP-086",
@@ -2387,11 +2438,11 @@
       "impact": 3,
       "inflates": 0,
       "contagion": 0,
-      "obstructed": 4,
+      "obstructed": 5,
       "breakability": 0.5,
       "cost": "measurement",
       "action": "measure on a scaling family without censoring",
-      "score": 3.877
+      "score": 4.627
     },
     {
       "id": "HEUR-DECOMPOSITION-PROBABILITY",
@@ -2434,6 +2485,20 @@
       "cost": "exact small-field census",
       "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
       "score": 1.858
+    },
+    {
+      "id": "HEUR-PF-PKM-RANK-DELTA",
+      "label": "PKM: Delta = 10 surplus relations suffice",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 3,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 1,
+      "breakability": 0.5,
+      "cost": "measurement",
+      "action": "measure on a scaling family without censoring",
+      "score": 1.794
     },
     {
       "id": "HEUR-XT-NFS-SMOOTHNESS",
@@ -2616,20 +2681,6 @@
       "cost": "measurement",
       "action": "measure on a scaling family without censoring",
       "score": 1.23
-    },
-    {
-      "id": "HEUR-PF-PKM-RANK-DELTA",
-      "label": "PKM: Delta = 10 surplus relations suffice",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 3,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.5,
-      "cost": "measurement",
-      "action": "measure on a scaling family without censoring",
-      "score": 1.161
     },
     {
       "id": "HEUR-PF-PKM-SOLUTION-COUNT",
@@ -6274,6 +6325,20 @@
       "score": 1.02
     },
     {
+      "id": "THM-SD-SUBSPACE-CRITERION",
+      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 1.02
+    },
+    {
       "id": "THM-RP-FF-HANDBOOK",
       "label": "Finite-field handbook facts (cyclic multiplicative group, Frobenius, trace/norm surjectivity) in Lean",
       "status": "proved_internal_unreviewed",
@@ -7044,6 +7109,20 @@
       "score": 0.702
     },
     {
+      "id": "CEX-TRANSPARENT-ENCODING",
+      "label": "Z/r with the identity encoding: the logarithm is the encoding (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
       "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
       "label": "Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1",
       "status": "proved_internal_unreviewed",
@@ -7058,8 +7137,36 @@
       "score": 0.702
     },
     {
+      "id": "THM-BOOLEAN-NSS-UNIQUE",
+      "label": "Unique F_2-solution puts every X_i - z_i in the ideal (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
       "id": "THM-LEFT-KERNEL-RELATIONS",
       "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-MEAN-COUNT-IDENTITY",
+      "label": "Mean ordered representation count is exactly |F|^m / |G| (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
       "impact": 0,

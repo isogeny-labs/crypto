@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 598,
-    "frontier": 387,
+    "nodes": 608,
+    "frontier": 392,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -17,16 +17,16 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 89,
-      "measured": 24,
-      "proved_internal_unreviewed": 64,
+      "measured": 29,
+      "proved_internal_unreviewed": 68,
       "open": 70,
       "heuristic": 71,
-      "refuted": 31,
+      "refuted": 32,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 550,
-      "kernel_checked": 40,
+      "none": 556,
+      "kernel_checked": 44,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 4
@@ -79,6 +79,14 @@
         },
         {
           "from": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-MEAN-COUNT-IDENTITY",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-PF-YIELD-CENSUS",
           "relation": "qualifies"
         }
       ]
@@ -600,6 +608,14 @@
         {
           "from": "THM-SD-DEGREE2-CRITERION",
           "relation": "qualifies"
+        },
+        {
+          "from": "THM-SD-SUBSPACE-CRITERION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-PQ2-DLIN-CENSUS",
+          "relation": "obstructs"
         }
       ]
     },
@@ -638,7 +654,12 @@
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "MEAS-RANK-DEFICIT-CENSUS",
+          "relation": "obstructs"
+        }
+      ]
     },
     {
       "id": "HEUR-PF-PKM-SOLUTION-COUNT",
@@ -2511,6 +2532,20 @@
       "pressure": []
     },
     {
+      "id": "THM-SD-SUBSPACE-CRITERION",
+      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "MEAS-PQ2-DLIN-CENSUS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "THM-SP-DIEM13-THM2",
       "label": "Diem 2013 Theorem 2: e^(O(max(log q, n sqrt(log q), n^(3/2))))",
       "status": "proved_external_unread",
@@ -2897,6 +2932,23 @@
       "pressure": [
         {
           "from": "CEX-PA-ALWAYS-ACCEPT",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-SHOUP-ALL-ALGORITHMS",
+      "label": "'Every algorithm needs Omega(sqrt r) group operations for DLP in a prime-order group'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-TRANSPARENT-ENCODING",
           "relation": "refutes"
         }
       ]
@@ -3489,7 +3541,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-TRANSPARENT-ENCODING",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PA-HASH-TO-CURVE",
@@ -3754,7 +3811,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "MEAS-TRACE-PULLBACK-CENSUS",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PKM-SOLVING-DEGREE",
@@ -3790,7 +3852,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-BOOLEAN-NSS-UNIQUE",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PROTOCOL-ASSUMPTION-MAPPING",
@@ -5845,6 +5912,18 @@
       ]
     },
     {
+      "id": "CEX-TRANSPARENT-ENCODING",
+      "label": "Z/r with the identity encoding: the logarithm is the encoding (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",
       "label": "Only l = p torsion leaks through E(Z/p^2)",
       "status": "proved_internal_unreviewed",
@@ -6131,6 +6210,18 @@
       "pressure": []
     },
     {
+      "id": "THM-BOOLEAN-NSS-UNIQUE",
+      "label": "Unique F_2-solution puts every X_i - z_i in the ideal (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "THM-GB-SEMAEV-TENTI-2DREG",
       "label": "Semaev-Tenti: two-phase solving degree <= 2 d_reg - 2 with field equations",
       "status": "proved_external_unread",
@@ -6191,6 +6282,18 @@
     {
       "id": "THM-LEFT-KERNEL-RELATIONS",
       "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-MEAN-COUNT-IDENTITY",
+      "label": "Mean ordered representation count is exactly |F|^m / |G| (Lean)",
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
       "action": "independent review, then kernel-check",

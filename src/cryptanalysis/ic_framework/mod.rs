@@ -218,6 +218,15 @@ pub struct SolverReport {
     /// solver exploited.
     pub degree_over_bound: Option<f64>,
     pub extra: std::collections::BTreeMap<String, u64>,
+    /// The advisory degree-of-regularity forecaster over the run's solver
+    /// calls, with the relation matrix's columns and rank set; the
+    /// consumer (ecbench) prices its hope band with the curve's
+    /// automorphism fold and writes the forecast.  Not serialised here.
+    #[serde(skip)]
+    pub forecaster: Option<crate::cryptanalysis::dreg_forecast::Forecaster>,
+    /// Why no forecaster exists, when the oracle's solver gave none.
+    #[serde(skip)]
+    pub forecast_unavailable: Option<String>,
 }
 
 /// What the relation matrix did.
@@ -775,6 +784,12 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             semi_regular_degree: t.semi_regular_degree(),
             degree_over_bound: t.degree_over_bound(),
             extra: t.extra.clone(),
+            forecaster: t.forecaster.clone().map(|mut f| {
+                f.set_relation_state(fb.columns, outcome.rank as usize);
+                f.set_linear_algebra_total(outcome.relations_found as usize, work, work_unit);
+                f
+            }),
+            forecast_unavailable: t.forecast_unavailable.clone(),
         }
     });
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;

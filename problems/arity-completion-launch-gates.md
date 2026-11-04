@@ -117,3 +117,39 @@ runs are replayed and audited.
   still fails STS and S3 with the key it holds; route audit added (GitHub
   route is ecbench-only, arbitrary commands need `isolab_k8s_run` plus a
   custom image). Still open.
+
+## Update 2026-11-04 20:10Z: launched; now blocked on Spot capacity and the retry budget
+
+The identity gate cleared at 07:26Z (`coreuser`, account 104186811093) and both
+studies were launched through the new command-Job route
+(`research/arity_completion_20261104/launch/README.md`, PRs #3421, #3429).
+What ran is in `launch/receipts/attempts/`; what blocks the rest:
+
+- **Spot nodes live 10–21 minutes.** Five pods were lost to
+  `instance-terminated-no-capacity` on c8a.2xlarge (3) and c8i.2xlarge (1)
+  Spot, and m8a.2xlarge and m7i.2xlarge Spot requests were refused outright
+  (`UnfulfillableCapacity`); placement scores 1–3 of 10 across every 8- and
+  16-vCPU candidate (`launch/receipts/attempts/SPOT-LOSSES.md`).
+- **Retry budget.** The prime-tower cell `isogeny-m5-t2` has been lost to
+  infrastructure twice, the protocol's `max_attempts` = 2 (per cell).
+  Koblitz's m = 5/6 shards have not started (attempt 4 Pending on capacity).
+
+What would unblock it (owner decisions, none taken):
+
+- [ ] Allow on-demand capacity for these two Jobs (the Iso Lab pools are
+  Spot-only by policy, `SpotOnlyEC2Launch`), at roughly USD 0.4/h per 8-vCPU
+  node; the Koblitz worst case is about 17 h and the prime tower about 12 h
+  plus t = 4.
+- [ ] Or route them through the CRIU/EBS resumable contract
+  (`isolab.eks.resumable/v1`, `.claude/skills/isolab-eks/references/recovery.md`),
+  which preserves computation across Spot loss; it needs the command Jobs
+  adapted to that contract.
+- [ ] Or wait for Spot capacity and file a protocol amendment raising the
+  prime tower's per-cell infrastructure retry limit before the next attempt.
+
+Results so far (exact, every file matched its SHA256SUMS): ten Koblitz m = 2
+negative controls (chain-s3 4/4 proved_unsat on each of k0n23, k1n29, k0n31,
+k0n37, k0n41; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
+prime-tower controls under protocol v2 (D 6, 7, 4); kummer-m5-t2 D = 6;
+kummer-m5-t3 capped at 8 GiB (inconclusive_cap). Verdicts await each study's
+`analyze.py` and the director's assessment.
