@@ -131,6 +131,34 @@
           "note": "k-sum table whose build-time key collisions are verified and used as target-free relations (ideas/PROPOSALS.md P2; KSumTable::free_rows)",
           "n_min": 8,
           "start_from": "ksum5"
+        },
+        {
+          "id": "wsum-b4",
+          "oracle": "wsum:coef=4,free=1",
+          "default_f": 0.0001,
+          "n_min": 4,
+          "note": "coefficient-box table over C seeds with |e_c| <= 4 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 4 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such"
+        },
+        {
+          "id": "wsum-b5",
+          "oracle": "wsum:coef=5,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "note": "coefficient-box table over C seeds with |e_c| <= 5 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 3 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such"
+        },
+        {
+          "id": "wsum-b12",
+          "oracle": "wsum:coef=12,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "note": "coefficient-box table over C seeds with |e_c| <= 12 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 3 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such"
+        },
+        {
+          "id": "wsum-b20",
+          "oracle": "wsum:coef=20,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "note": "coefficient-box table over C seeds with |e_c| <= 20 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 3 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such"
         }
       ]
     },
