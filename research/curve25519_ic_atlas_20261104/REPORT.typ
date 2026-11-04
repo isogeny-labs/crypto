@@ -349,8 +349,8 @@ symmetry.
   [identical],
   [per relation 1.49·10⁸ (t \= 4, 6.5× lower), 2.01·10⁹ (t \= 5, 4.7×
   lower)],
-  [validated (`curve25519_frame_search_20261103`); end-to-end pricing
-  needs T11’s `prime-interval` base (pending)],
+  [validated (`curve25519_frame_search_20261103`); end to end with T11’s
+  `prime-interval` base: 0.437 \[0.300, 0.637\] vs lo \= 0 (validated)],
   [Edwards-y interval],
   [y ∈ \[0, 2^t)],
   [(frame)],
@@ -593,7 +593,7 @@ good to 10–20%.
 single target the searches lose at w \= 0 and still win at w ≥ 0.1;
 amortised over targets on the same curve they are negligible.
 
-#strong[Distance remaining, best algebraic arm now (T13 targets):] t \=
+#strong[Distance remaining, best F4 arm at w ≥ 0.1 (T13 targets):] t \=
 4, G \= 3, seed 1193 with trace replay is 27.9× behind rho-neg at w \=
 0, #strong[1.83·10⁴× \[1.55·10⁴, 2.15·10⁴\] at w \= 0.1], 1.13·10⁵× at w
 \= 1. At w \= 0 the T12 winner stays the better algebraic arm (17.8×
@@ -704,7 +704,7 @@ and fits the exponent. No 255-bit statement is made or implied.
   (validated)],
   [T13],
   [t \= 4 candidate + trace end to end],
-  [done: 0.284× the T12 winner at w ≥ 0.1 (validation running)],
+  [done: 0.284× the T12 winner at w ≥ 0.1 (validated)],
 )
 ]
 
@@ -747,8 +747,8 @@ Ideas considered and not pursued, with the reason:
   applied).
 - Validated after the first draft: T11 (post-data), T12, L10, L12 (both
   stages), L14, L15, all pass\_with\_errata with errata applied.
-- Pending validation: T13 (replay stage finishing, then an independent
-  validator).
+- Validated last: T13, pass\_with\_errata. No study in this atlas is
+  pending validation.
 - No study here passes the leaderboard validation gate: component
   results have no same-unit rho row, by design.
 
@@ -776,9 +776,8 @@ sets, odd Kummer
 <wave-4-2026-11-04-scaling-trace-replay-grid-limit-digit-sets-odd-kummer>
 Protocols frozen together at `5a800bb3d0` before any data
 (`research/curve25519_leads_wave4_20261104`). Status at the time of
-writing: L10, L12 (both stages), L13, L14 and L15 independently
-validated, pass\_with\_errata with errata applied; T13 complete,
-validation pending; L11 is design only.
+writing: L10, L12 (both stages), L13, L14, L15 and T13 independently
+validated, pass\_with\_errata with errata applied; L11 is design only.
 
 === 11.1 L10: the exponent (validated)
 <l10-the-exponent-validated>
@@ -890,12 +889,14 @@ go/no-go rule before any engine work; nothing was measured.
 
 === 11.6 What wave 4 changes in the lead list
 <what-wave-4-changes-in-the-lead-list>
-- #strong[T13 (done; validation running):] t \= 4, G \= 3, seed 1193 at
-  k \= 20, all six predictions held. Plain t \= 4 is 0.598 \[0.509,
-  0.704\] the T12 winner at w ≥ 0.1, against the model’s 0.49. With
-  trace replay (0.4740) it is #strong[0.2837 \[0.2413, 0.3335\]], the
-  best algebraic arm so far: 1.83·10⁴× behind rho-neg at w \= 0.1. At w
-  \= 0 it is 1.567× dearer than the winner, as predicted.
+- #strong[T13 (validated):] t \= 4, G \= 3, seed 1193 at k \= 20, all
+  six predictions held. Plain t \= 4 is 0.598 \[0.509, 0.704\] the T12
+  winner at w ≥ 0.1, against the model’s 0.49. With trace replay
+  (0.4740) it is #strong[0.2837 \[0.2413, 0.3335\]], the best F4 arm so
+  far at w ≥ 0.1: 1.83·10⁴× behind rho-neg at w \= 0.1. At w \= 0 it is
+  1.567× dearer than the winner, as predicted, so the band leaves the
+  pair unresolved. Counted units only: solver wall time is 0.869×.
+  Validated pass\_with\_errata.
 - #strong[L15:] done (above); at (t, G) \= (5, 3) the digit set is 12.4×
   below the `lo = 0` bits control per relation (derived) and 6.2× per
   solve, still 10.5× behind the tower (validated pass\_with\_errata).

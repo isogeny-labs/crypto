@@ -164,7 +164,7 @@ not from symmetry.
 |:--|:--|:--|:--|:--|:--|
 | `prime-projected-abscissa` + `mitm` (generic baseline `proj-a`) | smallest x, projected by 8 | size N | none (pair table) | S = 12.05 / 12.93 / 20.83 at w = 0 / 0.1 / 1 (T5 session), 8.3–8.5× rho-neg there; 7.0–7.2× in `curve25519_algebraic_ecbench_20261102` | the baseline. Coverage sits at the pairs/r ceiling, so no coordinate lever exists here |
 | x-interval, lo = 0 (`bits`) | x ∈ [0, 2^t) | — | t bits per summand, b² = b | per relation 9.71·10⁸ (t = 4), 9.49·10⁹ (t = 5), G = 3 | the old algebraic reference |
-| x-interval, selected frame (`bits@L`) | x ∈ [L, L + 2^t) | L, chosen by argmax J (log-free) | identical | per relation 1.49·10⁸ (t = 4, 6.5× lower), 2.01·10⁹ (t = 5, 4.7× lower) | validated (`curve25519_frame_search_20261103`); end-to-end pricing needs T11's `prime-interval` base (pending) |
+| x-interval, selected frame (`bits@L`) | x ∈ [L, L + 2^t) | L, chosen by argmax J (log-free) | identical | per relation 1.49·10⁸ (t = 4, 6.5× lower), 2.01·10⁹ (t = 5, 4.7× lower) | validated (`curve25519_frame_search_20261103`); end to end with T11's `prime-interval` base: 0.437 [0.300, 0.637] vs lo = 0 (validated) |
 | Edwards-y interval | y ∈ [0, 2^t) | (frame) | same | equal to bits except the t = 5, G = 0 anomaly | a frame |
 | T₀-interval (`t0-bits@L`) | u + 1/u ∈ [L, L + 2^t) | L | same degree | selected: 0.951× / 0.934× the best bits frame per relation (t = 4, 5), 1.25× at t = 6 | closed (T7) |
 | 2-descent (`square-bits@L`) | x = w² + A/3, w ∈ [L, L + 2^t) | L | degree 4 per summand | 1.28× / 1.71× dearer than selected bits | closed (T2) |
@@ -254,7 +254,7 @@ w = 0 (1.59). T9's model 0.497 against 0.5605. The model is good to
 single target the searches lose at w = 0 and still win at w ≥ 0.1;
 amortised over targets on the same curve they are negligible.
 
-**Distance remaining, best algebraic arm now (T13 targets):** t = 4,
+**Distance remaining, best F4 arm at w ≥ 0.1 (T13 targets):** t = 4,
 G = 3, seed 1193 with trace replay is 27.9× behind rho-neg at w = 0,
 **1.83·10⁴× [1.55·10⁴, 2.15·10⁴] at w = 0.1**, 1.13·10⁵× at w = 1. At
 w = 0 the T12 winner stays the better algebraic arm (17.8× behind
@@ -322,7 +322,7 @@ exponent. No 255-bit statement is made or implied.
 | L12 | F4 trace replay on the winner | done: 0.474 end to end (validated) |
 | L13 | grid-limit control | done: F4 42× above grid at w ≥ 0.1; pair table 2.4–3.3× behind proj-a; P4, P8 failed (validated) |
 | L14 | digit-set frames | done: greedy 2.1–2.2× coverage; L15 engine 0.48×/0.44× per relation (validated) |
-| T13 | t = 4 candidate + trace end to end | done: 0.284× the T12 winner at w ≥ 0.1 (validation running) |
+| T13 | t = 4 candidate + trace end to end | done: 0.284× the T12 winner at w ≥ 0.1 (validated) |
 
 Ideas considered and not pursued, with the reason:
 
@@ -358,7 +358,7 @@ Ideas considered and not pursued, with the reason:
 - This atlas: `validator-report.json`, pass_with_errata (E1–E8 applied).
 - Validated after the first draft: T11 (post-data), T12, L10, L12 (both
   stages), L14, L15, all pass_with_errata with errata applied.
-- Pending validation: T13 (replay stage finishing, then an independent validator).
+- Validated last: T13, pass_with_errata. No study in this atlas is pending validation.
 - No study here passes the leaderboard validation gate: component results
   have no same-unit rho row, by design.
 
@@ -380,8 +380,8 @@ Ideas considered and not pursued, with the reason:
 
 Protocols frozen together at `5a800bb3d0` before any data
 (`research/curve25519_leads_wave4_20261104`). Status at the time of
-writing: L10, L12 (both stages), L13, L14 and L15 independently validated,
-pass_with_errata with errata applied; T13 complete, validation pending; L11 is design only.
+writing: L10, L12 (both stages), L13, L14, L15 and T13 independently validated,
+pass_with_errata with errata applied; L11 is design only.
 
 ### 11.1 L10: the exponent (validated)
 
@@ -491,12 +491,14 @@ go/no-go rule before any engine work; nothing was measured.
 
 ### 11.6 What wave 4 changes in the lead list
 
-- **T13 (done; validation running):** t = 4, G = 3, seed 1193 at k = 20,
+- **T13 (validated):** t = 4, G = 3, seed 1193 at k = 20,
   all six predictions held. Plain t = 4 is 0.598 [0.509, 0.704] the T12
   winner at w ≥ 0.1, against the model's 0.49. With trace replay (0.4740)
-  it is **0.2837 [0.2413, 0.3335]**, the best algebraic arm so far:
+  it is **0.2837 [0.2413, 0.3335]**, the best F4 arm so far at w ≥ 0.1:
   1.83·10⁴× behind rho-neg at w = 0.1. At w = 0 it is 1.567× dearer than
-  the winner, as predicted.
+  the winner, as predicted, so the band leaves the pair unresolved.
+  Counted units only: solver wall time is 0.869×. Validated
+  pass_with_errata.
 - **L15:** done (above); at (t, G) = (5, 3) the digit set is 12.4× below the `lo = 0` bits control per relation (derived) and 6.2× per solve, still 10.5× behind the tower (validated pass_with_errata).
 - The exponent result bounds all of this: constant-factor gains on a
   track whose exponent is 1.03 against rho's 0.5.

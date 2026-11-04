@@ -103,8 +103,8 @@ w = 0.1 and 2.28× ahead at w = 0.
   presumably killed by a container restart while c08 was starting; the logs do not establish
   this. c08 ran from scratch after the relaunch, and no partial chunk is cited. All 16 chunks were complete at 16:12:55Z, and `ALL_DONE` was written at
   16:14:50Z.
-- From 15:29Z, L13 and T13 chunks ran at the same time as each other. S is in counted units, so
-  this does not change any number; no wall-time claim is made.
+- L13, T13 and L12 sessions were serialised by `/tmp/crypto-bench.lock`; no two sessions
+  overlapped (T13 validator, E4). S is in counted units; no wall-time claim is made.
 - `analysis/decide.py` was written after the freeze, outside `scripts/`, before any data
   existed. It encodes §4 verbatim; its P8 test reproduces the frozen rule's defect on purpose.
 - Conductor and the AWS CLI are absent in this container: no S3 resume checkpoint was pushed,

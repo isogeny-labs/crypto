@@ -15,8 +15,10 @@ chunk `records.jsonl`.
 
 - **t = 4 with trace replay costs 0.284× the T12 winner at w ≥ 0.1.** The pooled paired ratio
   S(t4-trace)/S(t5 winner) is **0.2837 [0.2413, 0.3335]** at w = 0.1 and 0.2834 at w = 1, with
-  16 of 16 workloads won. That is a 3.5× measured reduction in counted F4 work per solve on the
-  algebraic track, against T12's incumbent arm, on the same curve and targets.
+  16 of 16 workloads won. That is a 3.5× measured reduction in counted F4 work per solve, against
+  T12's winner arm (t = 5, G = 4, seed 1307), on the same curve and targets. It is a counted-unit
+  result: recorded solver wall time is 0.869× plain for the trace arm, not 0.474× (diagnostic
+  only, busy host).
 - The two ingredients compose. The t = 4 base alone gives **0.598 [0.509, 0.704]**, against the
   model's 0.49. Trace replay on that base gives **0.4740**, matching L12's 0.474 at t = 5.
 - **At w = 0 the order flips, as predicted.** The t = 4 arms cost **1.567× [1.359, 1.807]** the
@@ -57,7 +59,8 @@ Ratios are pooled paired ratios with 95 % intervals (K = 16 workloads, 32 pairs)
 | t4 (plain) | proj-a | 3.76× | 5.19·10³× | 3.21·10⁴× |
 
 The t4-trace arm against proj-a follows from the same ratios: about 2.5·10³× at w = 0.1.
-For comparison, T12's winner was 6.06·10⁴× behind rho-neg at w = 0.1. Rho remains ahead.
+For comparison, T12's winner is 6.44·10⁴× behind rho-neg at w = 0.1 on these targets (6.06·10⁴×
+in T12's own session). Rho remains ahead.
 
 ## Costs not in the band
 
@@ -67,10 +70,12 @@ For comparison, T12's winner was 6.06·10⁴× behind rho-neg at w = 0.1. Rho re
 - **Trace fallbacks.** 292 fallbacks to plain F4 over 3,462,640 replays, 8.4·10⁻⁵, summed over
   32 runs. Their plain F4 work is inside the measured S.
 - **Seed search.** Choosing seed 1193 among 2,000 tower seeds at t = 4 took 4.00·10⁶ group
-  operations (`curve25519_isogeny_seed_20261103/analysis/summary.json`). That is 1.10·10⁴ in S
+  operations (`curve25519_isogeny_seed_20261103/analysis/summary.json`). That is 1.11·10⁴ in S
   when charged to a single target, and it vanishes when amortised over targets on the same curve.
-  The winner's seed 1307 carries an analogous t = 5 search. Charged to one target, the search
-  dominates every PKM arm at w = 0.
+  The winner's seed 1307 came from a t = 5 search of 6.94·10⁶ group operations, 1.91·10⁴ in S.
+  Charged to one target, each search dominates its PKM arm at w = 0. With both charged, t4 ÷
+  winner is 0.579, 0.595 and 0.598 at w = 0, 0.1 and 1 (validator), so t = 4 is then cheaper at
+  every weight.
 
 ## Reading
 
@@ -79,16 +84,20 @@ For comparison, T12's winner was 6.06·10⁴× behind rho-neg at w = 0.1. Rho re
   proportional to mpt × columns / covered.
 - L10 found t = 4 optimal at every k on the engine. This run is its end-to-end confirmation at
   k = 20, and trace replay carries over unchanged to a different (t, G).
-- The new best algebraic arm at k = 20 is t = 4, G = 3, seed 1193 with trace replay. It is still
-  1.83·10⁴× behind rho-neg at w = 0.1, and 27.9× behind at w = 0, where T12's winner is 17.8×
-  behind. L13 shows the base, not the solver, sets the w = 0 floor.
+- At w ≥ 0.1, t = 4, G = 3, seed 1193 with trace replay is the best F4 (`pkm-semaev`) arm
+  measured at k = 20. It is not the best algebraic-base arm overall: L13's pair table on the
+  t = 5 isogeny base costs S = 32.3 at w = 0.1, against 31,361 here. The band calls it
+  unresolved against the T12 winner, which is 1.567× cheaper at w = 0. It is still 1.83·10⁴×
+  behind rho-neg at w = 0.1, and 27.9× behind at w = 0, where the winner is 17.8× behind. L13's
+  "the base sets the w = 0 floor" was measured at t = 5 only.
 
 ## Run record and deviations
 
 - Chunks ran from the T13 launch until 16:17:33Z (`ecbench/chunks/driver.log`), relaunched after
-  container restarts. Chunk c07 was rerun from scratch after the 15:27Z restart, and no partial
-  chunk is cited. From 15:29Z the L13 chunks ran at the same time. S is a counted unit, so this
-  changes no number; no wall-time claim is made.
+  container restarts. Chunk c07 was rerun from scratch after the 15:27Z restart; its 2-record
+  partial copy in `interrupted/` equals the rerun's counts and seeds and is not cited. T13, L12
+  and L13 sessions were serialised by `/tmp/crypto-bench.lock` and alternated from 08:10Z; no
+  two sessions overlapped (validator).
 - Conductor and the AWS CLI are absent in this container: no S3 resume checkpoint was pushed,
   and the run was local rather than on EKS.
 
@@ -98,3 +107,22 @@ For comparison, T12's winner was 6.06·10⁴× behind rho-neg at w = 0.1. Rho re
 `ecbench/spec.json`, `plan.txt`, `binary.sha256`; `ecbench/chunks/c00…c15` (sessions, `specs/`,
 `driver.log`); `ecbench/band_pooled.{txt,json}`, `pooled_compare.jsonl`, `verify/cNN.{json,txt}`;
 `ecbench/SHA256SUMS`.
+
+## Validation (2026-11-04)
+
+`validator-report.json`: **pass_with_errata**, disposition validated at `612076d520`. Band and all
+18 pooled ratios recomputed in exact rational arithmetic (agreement to 4·10⁻¹⁴); R1–R6 decided
+independently and held. R2 to full precision: 0.5984141 at w = 0.1 and 0.5981895 at w = 1, so it
+holds with margins of 0.26 % and 0.30 % under the frozen ratio-of-totals rule; the interval
+[0.509, 0.704] contains 0.6 and the per-workload median ratio is 0.626. 160/160 certificates;
+15 extra replays identical, 5 of them t4-trace. Errata applied above: E1 (rank scoped to the F4
+arm at w ≥ 0.1), E2 (wall time 0.869×), E3 (6.44·10⁴× on these targets), E4 (sessions
+serialised), E6 (seed-search accounting). Disclosed here:
+- E5: `ecbench/plan.txt` lists the unchunked spec's workloads; chunks use target_seed + c, so
+  only 1 of its 16 workload ids ran.
+- E7: sessions record `git_commit` null and the binary's build commit is not recorded; it is
+  bound by sha256 only. `SHA256SUMS` omits `plan.txt`, `band_pooled.txt`, `driver.log`,
+  `chunks/specs/` and this README.
+- E8: the 16 `records.jsonl` files (about 104 KiB) are in git, as in T12. T13's graph and PDF are
+  in the atlas (`research/curve25519_ic_atlas_20261104/figures/algebraic_progress.*`,
+  `REPORT.pdf`). There is no benchmark record, because this is not a `benchmarks/` entry.
