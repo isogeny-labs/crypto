@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="1000" viewBox="0 0 900 1000" font-family="Helvetica, Arial, sans-serif" font-size="12">
 <rect width="900" height="1000" fill="white"/>
 <text x="60" y="30" font-size="18" font-weight="bold">Benchmark progress: crypto</text>
-<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 0, measured 32, invalid 0, censored 1.</text>
+<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 0, measured 33, invalid 0, censored 1.</text>
 <text x="60" y="84" font-weight="bold">Cumulative gain vs first record, unit S (derived, %)</text>
 <rect x="60" y="94" width="560" height="220" fill="none" stroke="#999"/>
 <line x1="60" y1="314.0" x2="620" y2="314.0" stroke="#eee"/>
@@ -58,41 +58,50 @@
 <circle cx="340.0" cy="285.3" r="4" fill="#167f73"><title>20261104T0954Z-c25519-autolab-r29-k24-32: 2.768 S (n=32)</title></circle>
 <rect x="636" y="227" width="10" height="10" fill="#167f73"/>
 <text x="650" y="236">ic:curve25519-family-k24-32 · best</text>
-<polyline fill="none" stroke="#637bad" stroke-width="2" points="340.0,285.3 340.0,292.6 340.0,214.9 340.0,199.7 340.0,189.2"/>
-<circle cx="340.0" cy="285.3" r="4" fill="#637bad"><title>20261104T0437Z-c25519-autolab-r11-k24: 6.607 S (n=32)</title></circle>
-<circle cx="340.0" cy="292.6" r="4" fill="#637bad"><title>20261104T0445Z-c25519-autolab-r12-k24: 6.857 S (n=32)</title></circle>
-<circle cx="340.0" cy="214.9" r="4" fill="#637bad"><title>20261104T0645Z-c25519-autolab-r17-k24: 4.2007 S (n=64)</title></circle>
-<circle cx="340.0" cy="199.7" r="4" fill="#637bad"><title>20261104T0722Z-c25519-autolab-r20-k24: 3.678 S (n=64)</title></circle>
-<circle cx="340.0" cy="189.2" r="4" fill="#637bad"><title>20261104T0755Z-c25519-autolab-r24-k24: 3.3182 S (n=64)</title></circle>
+<circle cx="340.0" cy="285.3" r="4" fill="#637bad"><title>20261104T1602Z-c25519-rebaseline-seedrun: 2.1055 S (n=64)</title></circle>
 <rect x="636" y="243" width="10" height="10" fill="#637bad"/>
-<text x="650" y="252">ic:curve25519-family-k24 · s_w0_in</text>
-<circle cx="340.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261104T0801Z-c25519-autolab-r26-k28-32: 2.5798 S (n=64)</title></circle>
+<text x="650" y="252">ic:curve25519-family-k24-32 · s_w0</text>
+<circle cx="340.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8835 S (n=64)</title></circle>
 <rect x="636" y="259" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="268">ic:curve25519-family-k28-32 · s_w0</text>
-<circle cx="340.0" cy="285.3" r="4" fill="#93a1a4"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.969 S (n=16)</title></circle>
+<text x="650" y="268">ic:curve25519-family-k24-32 · s_w0</text>
+<circle cx="340.0" cy="285.3" r="4" fill="#93a1a4"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8423 S (n=64)</title></circle>
 <rect x="636" y="275" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="284">ic:curve25519-family-k28-32 · s_w0</text>
-<circle cx="340.0" cy="285.3" r="4" fill="#69879e"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.781 S (n=16)</title></circle>
+<text x="650" y="284">ic:curve25519-family-k24-32 · s_w0</text>
+<polyline fill="none" stroke="#69879e" stroke-width="2" points="340.0,285.3 340.0,292.6 340.0,214.9 340.0,199.7 340.0,189.2"/>
+<circle cx="340.0" cy="285.3" r="4" fill="#69879e"><title>20261104T0437Z-c25519-autolab-r11-k24: 6.607 S (n=32)</title></circle>
+<circle cx="340.0" cy="292.6" r="4" fill="#69879e"><title>20261104T0445Z-c25519-autolab-r12-k24: 6.857 S (n=32)</title></circle>
+<circle cx="340.0" cy="214.9" r="4" fill="#69879e"><title>20261104T0645Z-c25519-autolab-r17-k24: 4.2007 S (n=64)</title></circle>
+<circle cx="340.0" cy="199.7" r="4" fill="#69879e"><title>20261104T0722Z-c25519-autolab-r20-k24: 3.678 S (n=64)</title></circle>
+<circle cx="340.0" cy="189.2" r="4" fill="#69879e"><title>20261104T0755Z-c25519-autolab-r24-k24: 3.3182 S (n=64)</title></circle>
 <rect x="636" y="291" width="10" height="10" fill="#69879e"/>
-<text x="650" y="300">ic:curve25519-family-k28-32 · s_w0</text>
-<polyline fill="none" stroke="#b05c5c" stroke-width="2" points="340.0,285.3 340.0,284.9 340.0,223.6 340.0,221.6 340.0,225.7 340.0,144.2 340.0,137.6"/>
-<circle cx="340.0" cy="285.3" r="4" fill="#b05c5c"><title>20261104T0411Z-c25519-autolab-r4-k28: 10.9395 S (n=64)</title></circle>
-<circle cx="340.0" cy="284.9" r="4" fill="#b05c5c"><title>20261104T0421Z-c25519-autolab-r6-k28: 10.9194 S (n=64)</title></circle>
-<circle cx="340.0" cy="223.6" r="4" fill="#b05c5c"><title>20261104T0425Z-c25519-autolab-r8-k28: 7.4448 S (n=64)</title></circle>
-<circle cx="340.0" cy="221.6" r="4" fill="#b05c5c"><title>20261104T0511Z-c25519-autolab-r14-k28: 7.33 S (n=32)</title></circle>
-<circle cx="340.0" cy="225.7" r="4" fill="#b05c5c"><title>20261104T0513Z-c25519-autolab-r15-k28: 7.5644 S (n=64)</title></circle>
-<circle cx="340.0" cy="144.2" r="4" fill="#b05c5c"><title>20261104T0646Z-c25519-autolab-r18-k28: 2.9493 S (n=64)</title></circle>
-<circle cx="340.0" cy="137.6" r="4" fill="#b05c5c"><title>20261104T0754Z-c25519-autolab-r23-k28: 2.576 S (n=64)</title></circle>
+<text x="650" y="300">ic:curve25519-family-k24 · s_w0_in</text>
+<circle cx="340.0" cy="285.3" r="4" fill="#b05c5c"><title>20261104T0801Z-c25519-autolab-r26-k28-32: 2.5798 S (n=64)</title></circle>
 <rect x="636" y="307" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="316">ic:curve25519-family-k28 · s_w0_in</text>
-<polyline fill="none" stroke="#5c8a3a" stroke-width="2" points="340.0,285.3 340.0,158.5 340.0,159.6 340.0,115.7 340.0,112.3"/>
-<circle cx="340.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261104T0412Z-c25519-autolab-r4-k32: 24.1377 S (n=16)</title></circle>
-<circle cx="340.0" cy="158.5" r="4" fill="#5c8a3a"><title>20261104T0414Z-c25519-autolab-r5-k32: 8.2964 S (n=64)</title></circle>
-<circle cx="340.0" cy="159.6" r="4" fill="#5c8a3a"><title>20261104T0428Z-c25519-autolab-r10-k32: 8.4296 S (n=64)</title></circle>
-<circle cx="340.0" cy="115.7" r="4" fill="#5c8a3a"><title>20261104T0648Z-c25519-autolab-r19-k32: 2.9369 S (n=64)</title></circle>
-<circle cx="340.0" cy="112.3" r="4" fill="#5c8a3a"><title>20261104T0750Z-c25519-autolab-r22-k32: 2.519 S (n=64)</title></circle>
+<text x="650" y="316">ic:curve25519-family-k28-32 · s_w0</text>
+<circle cx="340.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.969 S (n=16)</title></circle>
 <rect x="636" y="323" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="332">ic:curve25519-family-k32 · s_w0_in</text>
+<text x="650" y="332">ic:curve25519-family-k28-32 · s_w0</text>
+<circle cx="340.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.781 S (n=16)</title></circle>
+<rect x="636" y="339" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="348">ic:curve25519-family-k28-32 · s_w0</text>
+<polyline fill="none" stroke="#167f73" stroke-width="2" points="340.0,285.3 340.0,284.9 340.0,223.6 340.0,221.6 340.0,225.7 340.0,144.2 340.0,137.6"/>
+<circle cx="340.0" cy="285.3" r="4" fill="#167f73"><title>20261104T0411Z-c25519-autolab-r4-k28: 10.9395 S (n=64)</title></circle>
+<circle cx="340.0" cy="284.9" r="4" fill="#167f73"><title>20261104T0421Z-c25519-autolab-r6-k28: 10.9194 S (n=64)</title></circle>
+<circle cx="340.0" cy="223.6" r="4" fill="#167f73"><title>20261104T0425Z-c25519-autolab-r8-k28: 7.4448 S (n=64)</title></circle>
+<circle cx="340.0" cy="221.6" r="4" fill="#167f73"><title>20261104T0511Z-c25519-autolab-r14-k28: 7.33 S (n=32)</title></circle>
+<circle cx="340.0" cy="225.7" r="4" fill="#167f73"><title>20261104T0513Z-c25519-autolab-r15-k28: 7.5644 S (n=64)</title></circle>
+<circle cx="340.0" cy="144.2" r="4" fill="#167f73"><title>20261104T0646Z-c25519-autolab-r18-k28: 2.9493 S (n=64)</title></circle>
+<circle cx="340.0" cy="137.6" r="4" fill="#167f73"><title>20261104T0754Z-c25519-autolab-r23-k28: 2.576 S (n=64)</title></circle>
+<rect x="636" y="355" width="10" height="10" fill="#167f73"/>
+<text x="650" y="364">ic:curve25519-family-k28 · s_w0_in</text>
+<polyline fill="none" stroke="#637bad" stroke-width="2" points="340.0,285.3 340.0,158.5 340.0,159.6 340.0,115.7 340.0,112.3"/>
+<circle cx="340.0" cy="285.3" r="4" fill="#637bad"><title>20261104T0412Z-c25519-autolab-r4-k32: 24.1377 S (n=16)</title></circle>
+<circle cx="340.0" cy="158.5" r="4" fill="#637bad"><title>20261104T0414Z-c25519-autolab-r5-k32: 8.2964 S (n=64)</title></circle>
+<circle cx="340.0" cy="159.6" r="4" fill="#637bad"><title>20261104T0428Z-c25519-autolab-r10-k32: 8.4296 S (n=64)</title></circle>
+<circle cx="340.0" cy="115.7" r="4" fill="#637bad"><title>20261104T0648Z-c25519-autolab-r19-k32: 2.9369 S (n=64)</title></circle>
+<circle cx="340.0" cy="112.3" r="4" fill="#637bad"><title>20261104T0750Z-c25519-autolab-r22-k32: 2.519 S (n=64)</title></circle>
+<rect x="636" y="371" width="10" height="10" fill="#637bad"/>
+<text x="650" y="380">ic:curve25519-family-k32 · s_w0_in</text>
 <text x="60" y="394" font-weight="bold">Distance remaining: value / reference (1.0 = parity; derived)</text>
 <rect x="60" y="404" width="560" height="220" fill="none" stroke="#999"/>
 <line x1="60" y1="624.0" x2="620" y2="624.0" stroke="#eee"/>
@@ -142,41 +151,50 @@
 <circle cx="340.0" cy="574.3" r="4" fill="#5c8a3a"><title>20261104T0832Z-c25519-autolab-r27-k24-28: 2.3732 S (n=64)</title></circle>
 <rect x="636" y="505" width="10" height="10" fill="#5c8a3a"/>
 <text x="650" y="514">ic:curve25519-family-k24-28 · s_w0</text>
-<polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="340.0,520.4 340.0,522.8 340.0,552.6 340.0,559.4 340.0,566.4"/>
-<circle cx="340.0" cy="520.4" r="4" fill="#8a5ca8"><title>20261104T0437Z-c25519-autolab-r11-k24: 6.607 S (n=32)</title></circle>
-<circle cx="340.0" cy="522.8" r="4" fill="#8a5ca8"><title>20261104T0445Z-c25519-autolab-r12-k24: 6.857 S (n=32)</title></circle>
-<circle cx="340.0" cy="552.6" r="4" fill="#8a5ca8"><title>20261104T0645Z-c25519-autolab-r17-k24: 4.2007 S (n=64)</title></circle>
-<circle cx="340.0" cy="559.4" r="4" fill="#8a5ca8"><title>20261104T0722Z-c25519-autolab-r20-k24: 3.678 S (n=64)</title></circle>
-<circle cx="340.0" cy="566.4" r="4" fill="#8a5ca8"><title>20261104T0755Z-c25519-autolab-r24-k24: 3.3182 S (n=64)</title></circle>
+<circle cx="340.0" cy="586.9" r="4" fill="#8a5ca8"><title>20261104T1602Z-c25519-rebaseline-seedrun: 2.1055 S (n=64)</title></circle>
 <rect x="636" y="521" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="530">ic:curve25519-family-k24 · s_w0_in</text>
-<circle cx="340.0" cy="569.3" r="4" fill="#167f73"><title>20261104T0801Z-c25519-autolab-r26-k28-32: 2.5798 S (n=64)</title></circle>
+<text x="650" y="530">ic:curve25519-family-k24-32 · s_w0</text>
+<circle cx="340.0" cy="591.0" r="4" fill="#167f73"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8835 S (n=64)</title></circle>
 <rect x="636" y="537" width="10" height="10" fill="#167f73"/>
-<text x="650" y="546">ic:curve25519-family-k28-32 · s_w0</text>
-<circle cx="340.0" cy="589.6" r="4" fill="#637bad"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.969 S (n=16)</title></circle>
+<text x="650" y="546">ic:curve25519-family-k24-32 · s_w0</text>
+<circle cx="340.0" cy="590.8" r="4" fill="#637bad"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8423 S (n=64)</title></circle>
 <rect x="636" y="553" width="10" height="10" fill="#637bad"/>
-<text x="650" y="562">ic:curve25519-family-k28-32 · s_w0</text>
-<circle cx="340.0" cy="590.8" r="4" fill="#aa8b5b"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.781 S (n=16)</title></circle>
+<text x="650" y="562">ic:curve25519-family-k24-32 · s_w0</text>
+<polyline fill="none" stroke="#aa8b5b" stroke-width="2" points="340.0,520.4 340.0,522.8 340.0,552.6 340.0,559.4 340.0,566.4"/>
+<circle cx="340.0" cy="520.4" r="4" fill="#aa8b5b"><title>20261104T0437Z-c25519-autolab-r11-k24: 6.607 S (n=32)</title></circle>
+<circle cx="340.0" cy="522.8" r="4" fill="#aa8b5b"><title>20261104T0445Z-c25519-autolab-r12-k24: 6.857 S (n=32)</title></circle>
+<circle cx="340.0" cy="552.6" r="4" fill="#aa8b5b"><title>20261104T0645Z-c25519-autolab-r17-k24: 4.2007 S (n=64)</title></circle>
+<circle cx="340.0" cy="559.4" r="4" fill="#aa8b5b"><title>20261104T0722Z-c25519-autolab-r20-k24: 3.678 S (n=64)</title></circle>
+<circle cx="340.0" cy="566.4" r="4" fill="#aa8b5b"><title>20261104T0755Z-c25519-autolab-r24-k24: 3.3182 S (n=64)</title></circle>
 <rect x="636" y="569" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="578">ic:curve25519-family-k28-32 · s_w0</text>
-<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="340.0,482.0 340.0,483.7 340.0,501.9 340.0,510.8 340.0,510.5 340.0,560.2 340.0,565.4"/>
-<circle cx="340.0" cy="482.0" r="4" fill="#93a1a4"><title>20261104T0411Z-c25519-autolab-r4-k28: 10.9395 S (n=64)</title></circle>
-<circle cx="340.0" cy="483.7" r="4" fill="#93a1a4"><title>20261104T0421Z-c25519-autolab-r6-k28: 10.9194 S (n=64)</title></circle>
-<circle cx="340.0" cy="501.9" r="4" fill="#93a1a4"><title>20261104T0425Z-c25519-autolab-r8-k28: 7.4448 S (n=64)</title></circle>
-<circle cx="340.0" cy="510.8" r="4" fill="#93a1a4"><title>20261104T0511Z-c25519-autolab-r14-k28: 7.33 S (n=32)</title></circle>
-<circle cx="340.0" cy="510.5" r="4" fill="#93a1a4"><title>20261104T0513Z-c25519-autolab-r15-k28: 7.5644 S (n=64)</title></circle>
-<circle cx="340.0" cy="560.2" r="4" fill="#93a1a4"><title>20261104T0646Z-c25519-autolab-r18-k28: 2.9493 S (n=64)</title></circle>
-<circle cx="340.0" cy="565.4" r="4" fill="#93a1a4"><title>20261104T0754Z-c25519-autolab-r23-k28: 2.576 S (n=64)</title></circle>
+<text x="650" y="578">ic:curve25519-family-k24 · s_w0_in</text>
+<circle cx="340.0" cy="569.3" r="4" fill="#93a1a4"><title>20261104T0801Z-c25519-autolab-r26-k28-32: 2.5798 S (n=64)</title></circle>
 <rect x="636" y="585" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="594">ic:curve25519-family-k28 · s_w0_in</text>
-<polyline fill="none" stroke="#69879e" stroke-width="2" points="340.0,422.3 340.0,492.4 340.0,496.3 340.0,557.8 340.0,565.7"/>
-<circle cx="340.0" cy="422.3" r="4" fill="#69879e"><title>20261104T0412Z-c25519-autolab-r4-k32: 24.1377 S (n=16)</title></circle>
-<circle cx="340.0" cy="492.4" r="4" fill="#69879e"><title>20261104T0414Z-c25519-autolab-r5-k32: 8.2964 S (n=64)</title></circle>
-<circle cx="340.0" cy="496.3" r="4" fill="#69879e"><title>20261104T0428Z-c25519-autolab-r10-k32: 8.4296 S (n=64)</title></circle>
-<circle cx="340.0" cy="557.8" r="4" fill="#69879e"><title>20261104T0648Z-c25519-autolab-r19-k32: 2.9369 S (n=64)</title></circle>
-<circle cx="340.0" cy="565.7" r="4" fill="#69879e"><title>20261104T0750Z-c25519-autolab-r22-k32: 2.519 S (n=64)</title></circle>
+<text x="650" y="594">ic:curve25519-family-k28-32 · s_w0</text>
+<circle cx="340.0" cy="589.6" r="4" fill="#69879e"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.969 S (n=16)</title></circle>
 <rect x="636" y="601" width="10" height="10" fill="#69879e"/>
-<text x="650" y="610">ic:curve25519-family-k32 · s_w0_in</text>
+<text x="650" y="610">ic:curve25519-family-k28-32 · s_w0</text>
+<circle cx="340.0" cy="590.8" r="4" fill="#b05c5c"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.781 S (n=16)</title></circle>
+<rect x="636" y="617" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="626">ic:curve25519-family-k28-32 · s_w0</text>
+<polyline fill="none" stroke="#5c8a3a" stroke-width="2" points="340.0,482.0 340.0,483.7 340.0,501.9 340.0,510.8 340.0,510.5 340.0,560.2 340.0,565.4"/>
+<circle cx="340.0" cy="482.0" r="4" fill="#5c8a3a"><title>20261104T0411Z-c25519-autolab-r4-k28: 10.9395 S (n=64)</title></circle>
+<circle cx="340.0" cy="483.7" r="4" fill="#5c8a3a"><title>20261104T0421Z-c25519-autolab-r6-k28: 10.9194 S (n=64)</title></circle>
+<circle cx="340.0" cy="501.9" r="4" fill="#5c8a3a"><title>20261104T0425Z-c25519-autolab-r8-k28: 7.4448 S (n=64)</title></circle>
+<circle cx="340.0" cy="510.8" r="4" fill="#5c8a3a"><title>20261104T0511Z-c25519-autolab-r14-k28: 7.33 S (n=32)</title></circle>
+<circle cx="340.0" cy="510.5" r="4" fill="#5c8a3a"><title>20261104T0513Z-c25519-autolab-r15-k28: 7.5644 S (n=64)</title></circle>
+<circle cx="340.0" cy="560.2" r="4" fill="#5c8a3a"><title>20261104T0646Z-c25519-autolab-r18-k28: 2.9493 S (n=64)</title></circle>
+<circle cx="340.0" cy="565.4" r="4" fill="#5c8a3a"><title>20261104T0754Z-c25519-autolab-r23-k28: 2.576 S (n=64)</title></circle>
+<rect x="636" y="633" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="642">ic:curve25519-family-k28 · s_w0_in</text>
+<polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="340.0,422.3 340.0,492.4 340.0,496.3 340.0,557.8 340.0,565.7"/>
+<circle cx="340.0" cy="422.3" r="4" fill="#8a5ca8"><title>20261104T0412Z-c25519-autolab-r4-k32: 24.1377 S (n=16)</title></circle>
+<circle cx="340.0" cy="492.4" r="4" fill="#8a5ca8"><title>20261104T0414Z-c25519-autolab-r5-k32: 8.2964 S (n=64)</title></circle>
+<circle cx="340.0" cy="496.3" r="4" fill="#8a5ca8"><title>20261104T0428Z-c25519-autolab-r10-k32: 8.4296 S (n=64)</title></circle>
+<circle cx="340.0" cy="557.8" r="4" fill="#8a5ca8"><title>20261104T0648Z-c25519-autolab-r19-k32: 2.9369 S (n=64)</title></circle>
+<circle cx="340.0" cy="565.7" r="4" fill="#8a5ca8"><title>20261104T0750Z-c25519-autolab-r22-k32: 2.519 S (n=64)</title></circle>
+<rect x="636" y="649" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="658">ic:curve25519-family-k32 · s_w0_in</text>
 <text x="60" y="704" font-weight="bold">Series in unit ratio: gain vs first record (derived, %)</text>
 <rect x="60" y="714" width="560" height="220" fill="none" stroke="#999"/>
 <line x1="60" y1="934.0" x2="620" y2="934.0" stroke="#eee"/>

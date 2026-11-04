@@ -1504,7 +1504,8 @@
     "Generic track k = 20, 24: ksum:m=3 on the projected base, the m = 3 study's holdout improvement (0.758 [0.716, 0.802] and 0.596 [0.575, 0.619] at w = 0, band sel < inc). k = 28, 32: the baseline study's proj-a mitm (the m = 3 arm was null at k = 28; k = 32 was never screened at m = 3).",
     "Algebraic track k = 20: the PKM isogeny tower with the J-selected seed 1093 (T4/T5), the cheapest algebraic arm in every measured cell; band s1093 < seed 0 at every weight, paired interval includes 1.",
     "Exposures list every ecbench target_seed used on this family so far (baseline, ratchet round 1, m = 3, algebraic ecbench, isogeny seed T5, frame and torsion leads), so a round never reuses a target seed.",
-    "Round 9 (k = 32) was stopped by the operator after 10 train records because its panel held rootfind-pairs:m=3 at N = 179; the round is censored, not assessed, and its target seeds count as exposed."
+    "Round 9 (k = 32) was stopped by the operator after 10 train records because its panel held rootfind-pairs:m=3 at N = 179; the round is censored, not assessed, and its target seeds count as exposed.",
+    "2026-11-04: Re-baseline PCC-20261104-d91a51: generic incumbents at k = 24, 28, 32 moved to their seed=run arms (fresh wwalk table per run); see rebaseline-seedrun/README.md"
   ],
   "rounds": [
     {
@@ -1988,114 +1989,90 @@
       "24": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalkGg-x09",
+          "family": "wwalkGg-x09-sr",
           "n": 2,
-          "name": "wwalkGg-x09-n2",
-          "oracle": "wwalk:x=0.9,g=1,grow=2",
+          "name": "wwalkGg-x09-sr-n2",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
-          "band_verdict": "sel < inc",
-          "binary_sha256": "737fb5b0901bda2c34a6a059032aa91fb76b1cfe656a4146c21c9778c5127c2e",
-          "ci95_w0": [
-            0.6096449340566146,
-            0.8525976841513606
-          ],
-          "dir": "round-033",
-          "paired_ratio_w0": 0.7209589856096382,
-          "round": 33,
+          "dir": "rebaseline-seedrun",
+          "session_id": "ECBS1h01111fac5089",
+          "claim": "PCC-20261104-d91a51",
           "route": "local",
-          "session_id": "ECBS1h05c72414c6d4",
-          "spec_sha256": "eaa6e01a15267db316c1e5183a39b8f495a25fcadd7dea3473de9087c0a99a23",
-          "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "43de56f9cde7f622ed22f2e0b24b44b140d2ff22a101f9a64fef6acd568b93a7"
+          "validation_gate": "none (development evidence)",
+          "note": "re-baseline of wwalkGg-x09-n2: same oracle with seed=run (fresh table per run); fixed-table S 1.723 was a favourable draw"
         },
         "rho_s": [
-          1.1710582360501856,
-          1.2764427960990838,
-          2.2249038365391622
+          1.0841845116817346,
+          1.1808202015008287,
+          2.050541409872676
         ],
         "s": [
-          1.6734952045194382,
-          1.7178491390547963,
-          2.1170345498730194
+          2.105468649162268,
+          2.1480283586153517,
+          2.5310657436931066
         ],
         "since_round": 33
       },
       "28": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalkGg-x09",
+          "family": "wwalkGg-x09-sr",
           "n": 2,
-          "name": "wwalkGg-x09-n2",
-          "oracle": "wwalk:x=0.9,g=1,grow=2",
+          "name": "wwalkGg-x09-sr-n2",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
-          "band_verdict": "sel < inc",
-          "binary_sha256": "737fb5b0901bda2c34a6a059032aa91fb76b1cfe656a4146c21c9778c5127c2e",
-          "ci95_w0": [
-            0.672688235398497,
-            0.9396258310365021
-          ],
-          "dir": "round-033",
-          "paired_ratio_w0": 0.795031598249271,
-          "round": 33,
+          "dir": "rebaseline-seedrun",
+          "session_id": "ECBS1hc425b2d81514",
+          "claim": "PCC-20261104-d91a51",
           "route": "local",
-          "session_id": "ECBS1hba478ffc1d23",
-          "spec_sha256": "b27a7024ee9edb111b8eeb44b8666f95eb96603f117e4bd219978fedd3406c7a",
-          "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "3435de2920cad08d48385589d5ac7048b6a179315ed97a2abf2eeb1de3685281"
+          "validation_gate": "none (development evidence)",
+          "note": "re-baseline of wwalkGg-x09-n2: same oracle with seed=run (fresh table per run); fixed-table S 1.616 was a favourable draw"
         },
         "rho_s": [
-          1.051843395975189,
-          1.1505947643228311,
-          2.0393570794516065
+          1.0375047481075381,
+          1.134755359556467,
+          2.0100108625968223
         ],
         "s": [
-          1.571748849781295,
-          1.6107124260862111,
-          1.9613846128304555
+          1.8834768805111894,
+          1.9260790640345884,
+          2.3094987157451885
         ],
         "since_round": 33
       },
       "32": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalkG-x06",
+          "family": "wwalkG-x06-sr",
           "n": 2,
-          "name": "wwalkG-x06-n2",
-          "oracle": "wwalk:x=0.6,g=1,grow=2"
+          "name": "wwalkG-x06-sr-n2",
+          "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run"
         },
         "evidence": {
-          "band_verdict": "sel < inc",
-          "binary_sha256": "737fb5b0901bda2c34a6a059032aa91fb76b1cfe656a4146c21c9778c5127c2e",
-          "ci95_w0": [
-            0.6483846820004528,
-            0.7875031729776572
-          ],
-          "dir": "round-033",
-          "paired_ratio_w0": 0.7145662981035878,
-          "round": 33,
+          "dir": "rebaseline-seedrun",
+          "session_id": "ECBS1h472e3dd7d7e2",
+          "claim": "PCC-20261104-d91a51",
           "route": "local",
-          "session_id": "ECBS1h8b22612ef731",
-          "spec_sha256": "37dda3e9acbc9cc3d12f69e2a9ccec8b16d13de7c6243aacad645ddea30bbfce",
-          "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "71c7bf0c4bcbb0e46f155285b7c71dc81d7ce125bf0e79a18fa49f90fa95407c"
+          "validation_gate": "none (development evidence)",
+          "note": "re-baseline of wwalkG-x06-n2: same oracle with seed=run (fresh table per run); fixed-table S 1.606 was a favourable draw"
         },
         "rho_s": [
-          0.9750633042812593,
-          1.0708943694741935,
-          1.933373956210599
+          1.010478342570442,
+          1.1098430218031168,
+          2.0041251348971967
         ],
         "s": [
-          1.51519557395628,
-          1.6245101539840512,
-          2.6083413742340005
+          1.8423102792691786,
+          1.9320765242126474,
+          2.7399727287038655
         ],
         "since_round": 33
       }

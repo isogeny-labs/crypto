@@ -1156,6 +1156,25 @@
             "targets": "stride-generator"
           },
           "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, 32 jumps, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling"
+        },
+        {
+          "id": "wwalkGg-x09-sr",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.9, stride-generator probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run (re-baseline PCC-20261104-d91a51)"
+        },
+        {
+          "id": "wwalkG-x06-sr",
+          "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "note": "wwalk with known-log G in every jump (g=1) grown to rank-2 seed rows (grow=2, cap 3T): both seed logs pinned by table collisions, one probe hit solves; x = 0.6, walk probes. At the baby-step giant-step boundary: classification pending an owner ruling; seed=run: a fresh walk table per run (re-baseline PCC-20261104-d91a51)"
         }
       ]
     },
