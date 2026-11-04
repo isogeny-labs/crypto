@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 583,
-    "frontier": 372,
+    "nodes": 585,
+    "frontier": 374,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -18,15 +18,15 @@
       "algorithm": 12,
       "conditional": 89,
       "measured": 24,
-      "proved_internal_unreviewed": 56,
-      "open": 68,
+      "proved_internal_unreviewed": 57,
+      "open": 69,
       "heuristic": 71,
       "refuted": 26,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 543,
-      "kernel_checked": 32,
+      "none": 544,
+      "kernel_checked": 33,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 4
@@ -266,6 +266,10 @@
         },
         {
           "from": "THM-SP-KY-SUMPOLY-NP-COMPLETE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-SD-DEGREE2-CRITERION",
           "relation": "qualifies"
         }
       ]
@@ -592,6 +596,10 @@
         {
           "from": "OBS-SP-KY-SEMAEV-N45",
           "relation": "obstructs"
+        },
+        {
+          "from": "THM-SD-DEGREE2-CRITERION",
+          "relation": "qualifies"
         }
       ]
     },
@@ -3637,6 +3645,18 @@
       ]
     },
     {
+      "id": "GAP-PQ2-M2-RANK-CENSUS",
+      "label": "Does r2 < k hold on m = 2 descended S_3 instances for infinitely many n?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "GAP-PROTOCOL-ASSUMPTION-MAPPING",
       "label": "Protocol-to-problem assumption mapping",
       "status": "open",
@@ -6234,6 +6254,18 @@
     {
       "id": "THM-SALIZZONI-EX39-EXACT",
       "label": "Salizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-SD-DEGREE2-CRITERION",
+      "label": "Solving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)",
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
       "action": "independent review, then kernel-check",

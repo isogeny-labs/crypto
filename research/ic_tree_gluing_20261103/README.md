@@ -148,3 +148,12 @@ floor holds to m = 6 (D_S = 4). The coupling excess E = D_T − 4 is at least 5 
 m = 5 and at least 6 at m = 6, exactly on the pre-registered limits, so the kill
 test is undecided on a 15 GB host. Eliminating the separators by resultants (G)
 raises the input degree to 16, and G is dominated.
+
+## Round 4 (2026-11-04)
+
+See [`round4/README.md`](round4/README.md). Natural weights do not rescue the
+glued arm. The cherry-swap split leaves D unchanged and widens the matrices.
+The tree's implied cost law would beat rho only somewhere between about 2^500
+and 2^6000 bits; at 256 bits it is at least 28 bits short even under the most
+optimistic row. The big-host run of the kill test is specified in
+`round4/BIGHOST.md` but blocked on credentials and the job contract.

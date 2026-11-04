@@ -69,6 +69,18 @@ Macaulay span that provably misses a polynomial the reduced Gröbner basis needs
 census of the degree-2 Macaulay rank against n over F₂ would show whether the gap is
 uniform before the proof is attempted.
 
+**Lean (2026-11-04): `THM-SD-DEGREE2-CRITERION`.** The lower-bound step is now
+kernel-checked as a general criterion. Suppose a Gröbner basis lies in the span of
+degree-2 generators (solving degree ≤ 2). Then the degree-2 span must already contain
+as many independent linear polynomials (`r₂`) as the ideal has linear consequences
+(`k`). So any m = 2 instance with `r₂ < k` has solving degree ≥ 3 = D_ff + 1, and
+infinitely many such `n` refute the literal reading. Kosters–Yeo give `r₂ ≥ 1`,
+generically 1.
+
+The remaining step is a finite rank census per instance (`GAP-PQ2-M2-RANK-CENSUS`),
+not a proof. Kousidis–Wiemers' reading (3 + o(1) at m = 2) needs solving degree ≥ 4
+and is not addressed.
+
 **Effect on the baseline.** None directly. This retracts projected IC costs that were
 never the measured baseline. It matters because it removes a whole family of
 "conditional subexponential" rows from the menu of routes worth funding.
@@ -317,7 +329,7 @@ one-shot bound.
 | 2 | W5: add the 11 missing edges | corpus fix | trivial | true impact of the top frontier nodes becomes visible |
 | 3 | W4: fix the ic-negative wording; census the open cell | correction + exact census | low | the Lemma 4 refutation becomes reading-complete |
 | 4 | W3: prime-field yield census, full histogram, scaling in p | exact measurement | low–medium | every prime-field yield estimate is checked or corrected |
-| 5 | W1: degree-2 Macaulay rank census, then the lower-bound proof | census, then proof | medium | PQ Assumption 2 refuted for m = 2; the FFDA rows retire |
+| 5 | W1: `r₂` vs `k` rank census on m = 2 descended S₃ instances (criterion kernel-checked 2026-11-04) | exact census | low | literal PQ Assumption 2 refuted for m = 2 if `r₂ < k` persists; the FFDA rows retire |
 | 6 | `RT-SP-SEMAEV-A1-N45` | exact F4 run | low | Semaev 2015 Assumption 1 settled at the measured scale |
 | 7 | W7: YYTK Conjecture 10 past 25 bits | exact census | low–medium | the naive prime-field Semaev closure is confirmed, or the route reopens |
 | 8 | W7: per-trial marginal bound for adaptive xedni lift selection (`ASM-XEDNI-TRIAL-MARGINAL`; the separation and repair are done in Lean) | proof or countermodel | medium | the xedni waiting-time step is closed, or adaptive selection reopens the route |
