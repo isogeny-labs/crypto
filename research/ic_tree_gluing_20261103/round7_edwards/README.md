@@ -248,3 +248,30 @@ Same engine, caps (1 thread, 2 GiB, 1,200 s) and host as above. Same planted tar
   - A Weierstrass control with a rational 2-torsion point, to test whether the gain comes
     from the 2-torsion quotient or from the Edwards model.
   - A second target per cell.
+
+## Round 7c: Montgomery control on the same group, equal-base comparison, second target
+
+### Prediction 7c (written 2026-11-04T06:41:00Z, after generating the 7c systems, before any 7c run)
+
+Arms (construction below):
+- **TW:** the x-only cherry tree on the Montgomery model of the same curve.
+- **TQ:** its 2-torsion quotient, in ξ = x + 1/x.
+- **E1, E1Q at t = 3:** for the equal-base cells.
+- **k = 1 targets:** for E1, E1Q, TW and TQ.
+
+1. **TW: D = D_T** (6 at m = 3, t = 4, 5). The Montgomery S3M is the short-Weierstrass S3 after
+   an affine change of x, so TW is arm T on a different curve and base.
+2. **TQ: D = 6 at m = 3**, the same as TW, with no drop. TQ's node relation S3Q is again a
+   bidegree-(2,2,2), total-degree-4 summation polynomial: it is the x-only S3 of the
+   2-isogenous curve. Quotienting by T2 in the x-line does not split the node into quadrics,
+   as E1Q's signed product does. If TQ has D = 5, the quotient alone explains E1Q, and this
+   prediction is falsified.
+3. **Equal base.**
+   - E1 at t = 3: D = 6 at m = 3 and D = 7 at m = 4, the same as at t = 4. The base-size
+     effect is nil.
+   - E1Q at t = 3: D = 5 at m = 3, and D = 5 at m = 4.
+   - So E1Q's drop is explained by the encoding (the Edwards v² coordinate with signed node
+     products), not by the base size.
+4. **Second target:** k = 1 gives the same D as k = 0 in every cell that finishes.
+5. **m = 4, t = 5:** TW and TQ hit the 2 GiB cap (D ≥ 7, D ≥ 6). m = 4 at t = 4 cannot be
+   built for TW and TQ, because the closed Montgomery base has only 3 classes {x, 1/x}.
