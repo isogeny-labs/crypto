@@ -32,21 +32,27 @@ argument; `run_shard.sh` and `job-prime-tower.sh` skip records that exist
 
 ## Source identity of the instruments
 
-`main` changed `examples/n83_msweep_cell.rs` (105 lines: the Gröbner engines
-feed the degree-of-regularity forecaster; chain-s3 engines gain a field) and
-16 `src/cryptanalysis/*` files after the freezes, so a `main` build is not
-the frozen instrument. The image tagged `arity-20261104-6ee6a1df26be`
-(digest 66bf6053…) holds `main` 91a3524dfd binaries and is **not used**: a
-first "frozen" rebuild attempt compiled the `main` checkout by mistake (its
-dep-info names `/home/user/crypto/...`; `build-frozen-4fa25efc0e.log` is that
-attempt's log and its identical hashes are the proof of the mistake). The
-instruments are rebuilt from the frozen commit 4fa25efc0e (identical
-`src/`, `examples/`, `Cargo.*` to the prime-tower freeze 1fd6ece55f) in a
-worktree inside the repository, by `--manifest-path`, and published as a new
-image; `image.json`, the requests and this section are updated with the
-resulting digest and binary sha256s before any launch. Pods record
-`binary.sha256` at start, and `build-info.json` in the image names the
-frozen commit.
+`main` changed `examples/n83_msweep_cell.rs` (the Gröbner engines feed the
+degree-of-regularity forecaster) and 16 `src/cryptanalysis/*` files after the
+freezes, so a `main` build is not the frozen instrument. The instruments are
+built from the **frozen commit 4fa25efc0e** (identical `src/`, `examples/`,
+`Cargo.*` to the prime-tower freeze 1fd6ece55f) in a detached sparse worktree
+by `cargo build --manifest-path`; the dep-info files name only
+`.frozen-src/...` paths and the forecaster strings are absent.
+
+| build | pkm_tower_pilot | n83_msweep_cell | used |
+|---|---|---|---|
+| `main` 91a3524dfd (image `arity-20261104-6ee6a1df26be`, sha256:66bf6053…) | b243a62c… | 63470982… | no |
+| frozen worktree, 08:27Z (`build-frozen-4fa25efc0e-worktree.log`) | 69d0f090… | 424382e5… | no (lost with the container) |
+| frozen worktree, 15:41Z (`build-frozen-4fa25efc0e-rebuild.log`) | 5b6d8c9c91f36f471e16251db5aa41de836805cf1a9553355622cc7adac78a0b | bdf52eee79a68e06eb1f26d74b506dd422f82d3bd2cd36898eba5a07f12ebe1b | **yes**, image `arity-20261104-frozen-4fa25efc0e23` |
+
+The two frozen builds are not bit-identical although source, toolchain,
+lockfile, flags and path are the same; no build script or timestamp is
+embedded, so the difference is ordinary non-reproducible code generation
+(not investigated further). The binary hash therefore identifies the
+artifact that ran, not the source; source identity rests on the build log's
+dep-info and the commit. `image.json` carries both, and every pod records
+`binary.sha256` at start.
 
 ## Deviations recorded before launch (no frozen file changes)
 
