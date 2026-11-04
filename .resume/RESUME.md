@@ -9,12 +9,13 @@ band, the success-criterion classification and the ratchet. Native driver
 `src/bin/ic_autolab.rs`; home `research/curve25519_autolab_20261104/`.
 
 ## Lead / hypothesis
-Round 1 (generic track, k = 20 and 24): the incumbents are `ksum:m=3` at
-N = 11 and N = 20 (m = 3 study). Candidates: the ksum3 base-size
-neighbourhood (0.5, 0.7, 1.4, 2.0 x N) and two exploration families
-(`mitm2` at N_a, `ksum4` at 0.15 N_a). Prediction: the ksum3 optimum is near
-the grid boundary found by the m = 3 study, so a neighbour may win at k = 24;
-ksum4 is the first m = 4 arm on this family and has no prior.
+Round 3 (generic, k = 20 and 24). k = 24: the `ksum:m=4` neighbourhood of the new
+incumbent N = 12 (N = 6, 8, 17, 24), plus exploration `rootfind-mitm:m=2` and
+`rootfind-pairs:m=3`. k = 20: cross-size transfer of `ksum:m=4` at the k = 24
+incumbent's N / N_a = 0.148 (N = 6, 7, 10), `mitm2-n16`, and the same two rootfind
+explorations. Prediction: if the m = 4 optimum is a fixed fraction of N_a, k = 20
+gains nothing (N = 5 was 3.9x worse); if it needs a minimum absolute N for the
+4-sum table to cover, N = 7-10 can beat ksum3-n11.
 
 ## Spec
 `research/curve25519_autolab_20261104/round-001/{PROTOCOL.md,specs/train-k20.json,specs/train-k24.json,MANIFEST.json}`.
@@ -36,7 +37,10 @@ local route (`ic_autolab run --cpus auto --allow-busy`), `verify --replay 8`.
 3. Second-host replay of the k = 24 ratchet before any leaderboard mention; the algebraic track with `--train-targets 6`.
 
 ## Runs in flight
-None (rounds 1 and 2 complete).
+Round 3 via `ic_autolab loop --rounds 1 --track generic --sizes 20,24 --cpus auto --allow-busy --replay 8`
+(output under research/curve25519_autolab_20261104/round-003/). If the session dies,
+rerun `ic_autolab run --round 3 --stage <train|holdout>`: a complete session is adopted,
+never rerun; then select / run holdout / assess / ratchet / report by hand.
 
 ## Stop and success conditions
 - Success: every step of round 1 runs end to end with every session verified; the classification and ledger update follow the frozen rule whatever the outcome (improvement, null or regression are all valid).

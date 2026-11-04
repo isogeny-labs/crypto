@@ -593,6 +593,11 @@ struct Proposal {
 /// already tried at this size (the ledger's trials and the incumbent):
 ///
 /// 1. the incumbent family's base-size neighbourhood, nearest factors first;
+/// 1b. cross-size transfer: the incumbent family of every other size (nearest
+///    in log2 r first), when it differs from this size's, at the same
+///    scale-relative base size N / N_a and its grid neighbours (a winner at
+///    one size is a hypothesis at the next; the knob is scale-relative, as in
+///    `ic sweep`);
 /// 2. refinement of alternatives: families already tried at this size whose
 ///    best verified S(0) is within 1.5x of the incumbent get their best base
 ///    size moved by the two nearest grid factors (the Pareto alternatives
@@ -629,6 +634,47 @@ fn propose_size(
                 push(
                     arm,
                     format!("incumbent neighbourhood: N = {f} x {}", inc.arm.n),
+                    &mut out,
+                );
+            }
+        }
+    }
+
+    // 1b. cross-size transfer of other sizes' incumbent families.
+    if let Some(sizes) = ledger.tracks.get(track) {
+        let mut others: Vec<(f64, u32, &Incumbent)> = sizes
+            .iter()
+            .filter_map(|(k2, inc2)| {
+                let k2: u32 = k2.parse().ok()?;
+                let s2 = ledger.size(k2).ok()?;
+                (k2 != k && inc2.arm.family != inc.arm.family)
+                    .then(|| ((s2.log2_r - size.log2_r).abs(), k2, inc2))
+            })
+            .collect();
+        others.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap().then(a.1.cmp(&b.1)));
+        for (_, k2, inc2) in others {
+            let Some(fam) = tf.family(&inc2.arm.family).filter(|f| f.enabled) else {
+                continue;
+            };
+            let n_a2 = ledger.size(k2)?.n_a as f64;
+            let frac = inc2.arm.n as f64 / n_a2;
+            let n0 = (frac * size.n_a as f64).round().max(1.0) as u64;
+            push(
+                tf.arm(fam, n0),
+                format!(
+                    "cross-size transfer: {} is the k = {k2} incumbent at N / N_a = {frac:.3}",
+                    inc2.arm.name
+                ),
+                &mut out,
+            );
+            for f in &grid {
+                let n = ((n0 as f64) * f).round() as u64;
+                push(
+                    tf.arm(fam, n),
+                    format!(
+                        "cross-size transfer neighbourhood: N = {f} x {n0} ({} from k = {k2})",
+                        inc2.arm.family
+                    ),
                     &mut out,
                 );
             }
@@ -2924,6 +2970,58 @@ mod tests {
             "with a family floor the family is explored again at a new N: {:?}",
             p.iter().map(|x| x.arm.name.clone()).collect::<Vec<_>>()
         );
+    }
+
+    #[test]
+    fn another_sizes_incumbent_family_transfers_at_the_same_relative_n() {
+        let mut l = ledger();
+        let tf = families();
+        l.sizes.insert(
+            "24".into(),
+            SizeInfo {
+                k: 24,
+                r: 2097349,
+                log2_r: 21.0,
+                n_a: 81,
+                curve: json!({}),
+            },
+        );
+        let win = tf.arm(tf.family("ksum4").unwrap(), 12);
+        l.tracks.get_mut("generic").unwrap().insert(
+            "24".into(),
+            Incumbent {
+                arm: win,
+                s: [7.0, 7.5, 12.3],
+                rho_s: [1.2, 1.3, 2.2],
+                evidence: json!({}),
+                since_round: 2,
+            },
+        );
+        // ksum4 at N = 5 was tried at k = 20 (verified, far worse).
+        l.trials.push(Trial {
+            round: 2,
+            stage: "train".into(),
+            size: 20,
+            track: "generic".into(),
+            arm: tf.arm(tf.family("ksum4").unwrap(), 5),
+            s: Some([34.0, 40.0, 92.0]),
+            status: "verified".into(),
+        });
+        let p = propose_size(&l, &tf, "generic", 20, 8, 2).unwrap();
+        let names: Vec<_> = p.iter().map(|x| x.arm.name.as_str()).collect();
+        // N0 = round(12/81 * 32) = 5 (tried); neighbours 1.4 x 5 = 7, 2 x 5 = 10;
+        // 0.7 and 0.5 x 5 fall below the track floor 4 and clamp to it.
+        assert!(
+            names.contains(&"ksum4-n7") && names.contains(&"ksum4-n10"),
+            "{names:?}"
+        );
+        assert!(
+            !names.contains(&"ksum4-n5"),
+            "a tried configuration is never repeated"
+        );
+        let i = names.iter().position(|n| *n == "ksum4-n7").unwrap();
+        let j = names.iter().position(|n| n.starts_with("mitm2")).unwrap();
+        assert!(i < j, "transfer comes before exploration: {names:?}");
     }
 
     #[test]
