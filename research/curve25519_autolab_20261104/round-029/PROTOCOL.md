@@ -80,3 +80,11 @@ An improvement makes `sel` the incumbent of its track and size in `ledger.json`,
 Route: `local`. Counted GAE, deterministic and host-independent; no wall-time claim. Isolation level earned is recorded per session and does not change the counts. This is a development loop: no round reaches the IC leaderboard or `benchmarks/README.md` without the validation gate (replay certificate on a second host class, validator report, matched rho with the band; `docs/VALIDATION_GATE.md`).
 
 Exposures excluded: 80 target seeds already used on this family (ledger exposures); the seeds above are new.
+
+## Amendment: selection (2026-11-04T09:58:10Z, after train, before holdout)
+
+- k = 24: no candidate below `inc` (2.886 / 3.043 / 4.460) at w = 0 on the train targets; no challenger, no holdout.
+- k = 28: no candidate below `inc` (2.296 / 2.398 / 3.317) at w = 0 on the train targets; no challenger, no holdout.
+- k = 32: no candidate below `inc` (2.408 / 2.625 / 4.584) at w = 0 on the train targets; no challenger, no holdout.
+
+Holdout spec sha256: {}
