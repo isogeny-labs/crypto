@@ -163,6 +163,38 @@
           "n_min": 3,
           "note": "coefficient-box table over C seeds with |e_c| <= 20 (ideas/PROPOSALS.md P3); N is the seed count C; default_f is below every size's floor so the first arm sits at the model's C = 3 (n_min); generic-decomposition track; at C <= 2 the method is a baby-step giant-step and is reported as such",
           "n_max": 4
+        },
+        {
+          "id": "wsum-b8",
+          "oracle": "wsum:coef=8,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 8; added after rounds 16-18 to refine the bound between the tried values"
+        },
+        {
+          "id": "wsum-b16",
+          "oracle": "wsum:coef=16,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 16; added after rounds 16-18 to refine the bound between the tried values"
+        },
+        {
+          "id": "wsum-b24",
+          "oracle": "wsum:coef=24,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 24; added after rounds 16-18 to refine the bound between the tried values"
+        },
+        {
+          "id": "wsum-b30",
+          "oracle": "wsum:coef=30,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "coefficient box, |e_c| <= 30; added after rounds 16-18 to refine the bound between the tried values"
         }
       ]
     },
