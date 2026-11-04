@@ -19,6 +19,7 @@ the policy back to the lane:
               scored by the same ingest; the results become episodes
     fit       episodes -> capability registry (.delphi-loop/registry.json)
     route     `delphi route -family F -json`, answered from the registry
+    export    episodes -> `delphi.episode.v1` JSONL for `delphi learn` (stdout or -o FILE)
 
 `tools/delphi_loop/delphi` is a drop-in `$DELPHI`: it answers `route` here and
 passes every other subcommand to the real delphi binary, so
@@ -60,6 +61,8 @@ STAGE_FAMILY = dict(tc.FAMILY)                                    # compile -> c
 LABELS = ("accepted", "rejected", "refused", "spec_error")
 BATCH_DISCOUNT = 0.5                                              # Delphi runs on batch APIs: half list price
 REVIEW_KEY = "review"
+DELPHI_EPISODE_SCHEMA = "delphi.episode.v1"
+DELPHI_USAGE_KEYS = ("input_tokens", "output_tokens", "cache_write_tokens", "cache_read_tokens")
 
 
 class LoopError(Exception):
@@ -107,6 +110,33 @@ def write_episodes(episodes: dict[str, dict], repo: Path = REPO) -> Path:
     tmp.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows), encoding="utf-8")
     tmp.replace(path)
     return path
+
+
+def delphi_row(row: dict) -> dict:
+    """One loop episode as a `delphi.episode.v1` row (review and usage only when present)."""
+    out: dict[str, Any] = {"schema": DELPHI_EPISODE_SCHEMA, "id": row["id"], "family": row["family"],
+                           "target": row["target"], "label": row["label"]}
+    if row.get("review") is not None:
+        out["review"] = float(row["review"])
+    usage = {k: row["usage"][k] for k in DELPHI_USAGE_KEYS if (row.get("usage") or {}).get(k)}
+    if usage:
+        out["usage"] = usage
+    out.update({k: row[k] for k in ("group", "call", "source", "observed_at")})
+    return out
+
+
+def export_episodes(repo: Path = REPO, out: Path | None = None,
+                    say=lambda m: print(m, file=sys.stderr)) -> int:
+    rows = sorted(read_episodes(repo).values(), key=lambda r: (r["group"], r["call"]))
+    text = "".join(json.dumps(delphi_row(r), sort_keys=True) + "\n" for r in rows)
+    if out is None:
+        sys.stdout.write(text)
+    else:
+        tmp = out.with_name(out.name + ".tmp")
+        tmp.write_text(text, encoding="utf-8")
+        tmp.replace(out)
+    say(f"EXPORT {len(rows)} episodes -> {out if out else 'stdout'}")
+    return 0
 
 
 def _state(repo: Path, name: str) -> dict[str, Any]:
@@ -247,9 +277,11 @@ def call_cost(row: dict, prices: dict[str, Any]) -> float | None:
     if not usage or model not in prices:
         return None
     p = prices[model]
+    # Delphi results spell the cache counts cache_read_tokens / cache_write_tokens; the
+    # Anthropic API spells them cache_read_input_tokens / cache_creation_input_tokens.
     tokens = {"input": usage.get("input_tokens", 0), "output": usage.get("output_tokens", 0),
-              "cache_read": usage.get("cache_read_input_tokens", 0),
-              "cache_write_5m": usage.get("cache_creation_input_tokens", 0)}
+              "cache_read": usage.get("cache_read_tokens") or usage.get("cache_read_input_tokens", 0),
+              "cache_write_5m": usage.get("cache_write_tokens") or usage.get("cache_creation_input_tokens", 0)}
     return BATCH_DISCOUNT * sum(p.get(k, 0.0) * n for k, n in tokens.items()) / 1e6
 
 
@@ -579,6 +611,8 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--name")
             p.add_argument("--yes-upload-text", action="store_true", required=True,
                            help="required: datasets carry prompt and reply text")
+    x = sub.add_parser("export", help="episodes -> delphi.episode.v1 JSONL for `delphi learn`")
+    x.add_argument("-o", "--output", type=Path, help="write atomically to FILE (default stdout)")
     e = sub.add_parser("eval", help="replay accepted prompts on a candidate target (paid model calls)")
     e.add_argument("--family", required=True, choices=sorted(STAGE_FAMILY.values()))
     e.add_argument("--target", required=True, help="provider:model@effort")
@@ -599,6 +633,8 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(answer, sort_keys=True) if args.json else
                   answer.get("error") or f"{answer['route']['choice']}  ({answer['route']['basis']})")
             return 1 if "error" in answer else 0
+        if args.command == "export":
+            return export_episodes(repo, args.output)
         if args.command == "eval":
             return evaluate(args.family, args.target, args.limit, repo)
         client, project = langsmith_client(), project_name(args.project)
