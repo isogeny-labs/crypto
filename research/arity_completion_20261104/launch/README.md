@@ -113,3 +113,11 @@ decides; CodeBuild minutes). Budgets at 07:30Z: isolab-daily-cost-100 actual
    the wall cap. Prime-tower controls, kummer-m5-t2 and kummer-m5-t3 ran on
    EPYC 9R45; the remaining isogeny cells run on the m7i host, and their host
    model is reported with them.
+9. **Prime-tower attempt 4 unpinned (2026-11-04 19:05Z).** The Koblitz
+   attempt-4 pod also stayed Pending on m7i.2xlarge ("no instance type met all
+   requirements" after Spot refusals), so 8-vCPU Spot capacity in us-east-2 is
+   the constraint, not one type. The prime-tower Job carries no instance-type
+   pin: its outcomes are exact closure degrees and fixed caps (7200 s wall,
+   8 GiB address space), so host speed can only move a cell across the wall
+   cap, which is reported with the cell's host model. Koblitz stays pinned
+   (its 600 s wall caps depend on core speed) and waits for capacity.
