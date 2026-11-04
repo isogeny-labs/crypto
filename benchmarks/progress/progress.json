@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T1209Z-c25519-autolab-r33-k20-32",
+  "latest_record": "20261104T1213Z-c25519-autolab-r34-k20-32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 30,
+    "measured": 31,
     "open": 0
   },
   "repo": "crypto",
@@ -36,6 +36,36 @@
           ],
           "summary": "ic_autolab round 32: wwalk x refinement 0.5..0.9 ratchets nothing (k = 20 regression, k = 24/28 null, k = 32 no challenger)",
           "value": 0.93749694761621
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8801935379062955,
+      "latest": 0.8801935379062955,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_w0_k32",
+      "points": [
+        {
+          "commit": "60c8be2dd30e",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 64,
+          "record": "20261104T1213Z-c25519-autolab-r34-k20-32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7405346515660564,
+            1.0461909682870443
+          ],
+          "summary": "ic_autolab round 34: wwalk g=1 grow=2 x and jump-count variants ratchet nothing (nulls at k = 20, 28, 32)",
+          "value": 0.8801935379062955
         }
       ],
       "problem": "ic:curve25519-family-k20-32",
