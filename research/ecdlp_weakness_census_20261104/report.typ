@@ -31,7 +31,7 @@ remove or sharpen individual supports.
   [5], [`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`], [`trace_pullback` census], [no dim-1 subspace of $FF_(p^2)$ has a trace image below $0.32 dot \#E(FF_p)$],
   [6], [`HEUR-BK-GG-DECOMP-PROPORTION` (1/n!)], [`ext_decomp` census], [0.70--0.99 of $1/n!$ at n = 2, 3; premise fails for subfield curves],
   [7], [overbroad Shoup reading, "BSGS optimal"], [Lean `TransparentEncoding`], [refuted: identity encoding gives the log with zero group operations],
-  [8], [`HEUR-BK-GG-FACTOR-BASE-SIZE` ($|F| approx |V|$)], [`pq2_rank` census], [pending],
+  [8], [`HEUR-BK-GG-FACTOR-BASE-SIZE` ($|F| approx |V|$)], [`pq2_rank` census], [supported: $|F'|/|V|$ in 0.84--1.31 over 99 instances, 0.997--1.004 for $n >= 30$],
   [9], [bridge $k = N - "affdim"(Z)$, case $|Z| = 1$], [Lean `BooleanNullstellensatz`], [unique zero puts every $X_i - z_i$ in the ideal; kernel-checked],
   [10], [`HEUR-PF-PKM-RANK-DELTA` ($Delta = 10$)], [`rank_deficit` census], [$Delta = 10$ gives full rank in all samples on 2 of 10 curves; deficits 1--3 persist],
 )

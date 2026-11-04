@@ -85,7 +85,9 @@ on five dumped instances at n = 14 to 18, at degree 3 and at degree 4.
 
 **Reproducibility.** A rerun with the same seed and arguments for n = 8 to 40
 (`results/rerun_n8_40/`) reproduces the main log line for line, timings aside. Its
-JSON also carries |F'| for `HEUR-BK-GG-FACTOR-BASE-SIZE`.
+JSON also carries |F'| for `HEUR-BK-GG-FACTOR-BASE-SIZE`. Over its 99 instances |F'|/|V| ranges from
+0.84 to 1.31 with mean 1.021, and from 0.997 to 1.004 for n ≥ 30, so `|F| ≈ |V|`
+holds on this range [pcc:unverified].
 
 **Reading.**
 
