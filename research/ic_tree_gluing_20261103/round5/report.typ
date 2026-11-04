@@ -14,6 +14,11 @@ Y), written before their runs · analysis
 #link("round5.svg")[`round5.svg`] · PDF
 #link("report.pdf")[`report.pdf`]
 
+#strong[Standing:] every result below is an unverified assertion
+\[pcc:unverified\]. The statement claims are PCC-20261104-a3748e (test
+H), PCC-20261104-ff49ef (test L), PCC-20261104-34eb1e (test Y) and
+PCC-20261104-1f5a1d (the derivation). None has a signed verdict.
+
 #strong[Class: derived bounds plus stage diagnostics.] No pipeline is
 priced and no leaderboard row changes. Engine: msolve 0.6.5, p \=
 786433, target k \= 0.
@@ -24,7 +29,7 @@ The question was whether a better #emph[solver], rather than a better
 encoding, could close the gap. None of the options does at 256 bits.
 `SOLVERS.md` has the derivations.
 
-+ #strong[Faster Macaulay is not enough (derived).]
++ #strong[Faster Macaulay is not enough (derived)] \[pcc:unverified\].
   - Beating rho at 2^256 needs ω ≲ 1.3 #strong[and] a solving degree
     flat in the tower depth.
   - With the measured depth slope, even ω \= 1 gives a ratio of 1.35.
@@ -70,16 +75,16 @@ encoding, could close the gap. None of the options does at 256 bits.
     has D \= 6 in 512 s. The function coupling therefore has the
     #emph[steeper] t-slope.
 
-#strong[Reading.] Of the solver families, only Gröbner bases compress,
-because their D stays far below the separators\' domain sizes. Their
-cost is set by two slopes: about +1.5 per summand and about +0.5 per
-tower level, both coming from the couplings. Encoding the couplings
-differently (lifting, eliminating, fattening, function form), branching
-on cheap separator properties, and speeding up the linear algebra each
-leave the slopes unchanged or make them worse. An improvement on this
-line has to come from a node relation of degree below 4, which x-only
-coordinates cannot give, or from outside the summation-polynomial
-framework.
+#strong[Reading] \[pcc:unverified\]. Of the solver families, only
+Gröbner bases compress, because their D stays far below the separators\'
+domain sizes. Their cost is set by two slopes: about +1.5 per summand
+and about +0.5 per tower level, both coming from the couplings. Encoding
+the couplings differently (lifting, eliminating, fattening, function
+form), branching on cheap separator properties, and speeding up the
+linear algebra each leave the slopes unchanged or make them worse. An
+improvement on this line has to come from a node relation of degree
+below 4, which x-only coordinates cannot give, or from outside the
+summation-polynomial framework.
 
 #image("round5.svg")
 
@@ -212,6 +217,7 @@ why the obvious ones cannot
 <round-5-the-solver-side--what-a-faster-solver-would-have-to-do-and-why-the-obvious-ones-cannot>
 2026-11-04 · follow-up to
 #link("../round4/README.md")[`../round4/README.md`] and
+\[pcc:unverified\]
 #link("../round4/CROSSOVER.md")[`../round4/CROSSOVER.md`]. Question:
 rounds 1–4 show that no encoding change lowers the tree\'s cost. Is
 there a solver whose cost is not the dense Macaulay size: SAT, faster or
@@ -224,8 +230,8 @@ is priced.
 == 1. What \"faster Macaulay\" would have to achieve (derived)
 <1-what-faster-macaulay-would-have-to-achieve-derived>
 This is the round-4 cost model, with the linear-algebra exponent ω swept
-from the information floor (1, linear in matrix size) up. Cost is log₂
-cost / log₂ √p at the best m; below 1 beats rho.
+from \[pcc:unverified\] the information floor (1, linear in matrix size)
+up. Cost is log₂ cost / log₂ √p at the best m; below 1 beats rho.
 
 #align(center)[#table(
   columns: 3,
@@ -287,10 +293,10 @@ row), which gives an effective exponent log(cols²·w)/log(cols) between
 == 2. Three barriers for solvers that avoid Macaulay matrices
 <2-three-barriers-for-solvers-that-avoid-macaulay-matrices>
 #strong[(a) Enumeration-type solvers: SAT/CDCL branching,
-meet-in-the-middle, dynamic programming over the tree, exact
-tensor-network contraction.] #emph[Counting bound (proved).] In any
-decomposition tree, the root\'s two children carry partial sums from
-sets A and B. Covering a random target R requires R ∈ A + B, hence
+meet-in-the-middle, \[pcc:unverified\] dynamic programming over the
+tree, exact tensor-network contraction.] #emph[Counting bound (proved).]
+In any decomposition tree, the root\'s two children carry partial sums
+from sets A and B. Covering a random target R requires R ∈ A + B, hence
 |A|·|B| ≳ p up to the symmetry factor, and therefore max(|A|, |B|) ≳ √p.
 
 A solver that decides a separator by its value has to range over at
@@ -385,7 +391,7 @@ Its price is the Macaulay size, which grows because each added summand
 adds about 1.5 to D and each tower level about 0.5.
 
 So a real improvement has to change those two slopes. The candidates
-are:
+are: \[pcc:unverified\]
 
 - a node relation of degree \< 4, which x-only coordinates cannot give;
 - a coupling that is a function rather than a 2-to-2 correspondence

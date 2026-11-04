@@ -1,6 +1,6 @@
 # Round 5: the solver side — what a faster solver would have to do, and why the obvious ones cannot
 
-2026-11-04 · follow-up to [`../round4/README.md`](../round4/README.md) and
+2026-11-04 · follow-up to [`../round4/README.md`](../round4/README.md) and [pcc:unverified]
 [`../round4/CROSSOVER.md`](../round4/CROSSOVER.md). Question: rounds 1–4 show
 that no encoding change lowers the tree's cost. Is there a solver whose cost is
 not the dense Macaulay size: SAT, faster or sparse Macaulay linear algebra,
@@ -11,7 +11,7 @@ pipeline is priced.
 
 ## 1. What "faster Macaulay" would have to achieve (derived)
 
-This is the round-4 cost model, with the linear-algebra exponent ω swept from
+This is the round-4 cost model, with the linear-algebra exponent ω swept from [pcc:unverified]
 the information floor (1, linear in matrix size) up. Cost is log₂ cost / log₂ √p
 at the best m; below 1 beats rho.
 
@@ -42,7 +42,7 @@ gives an effective exponent log(cols²·w)/log(cols) between 2.41 and 2.72:
 
 ## 2. Three barriers for solvers that avoid Macaulay matrices
 
-**(a) Enumeration-type solvers: SAT/CDCL branching, meet-in-the-middle,
+**(a) Enumeration-type solvers: SAT/CDCL branching, meet-in-the-middle, [pcc:unverified]
 dynamic programming over the tree, exact tensor-network contraction.**
 *Counting bound (proved).* In any decomposition tree, the root's two children
 carry partial sums from sets A and B. Covering a random target R requires
@@ -118,7 +118,7 @@ up as D being far below the separators' domain sizes. Its price is the
 Macaulay size, which grows because each added summand adds about 1.5 to D and
 each tower level about 0.5.
 
-So a real improvement has to change those two slopes. The candidates are:
+So a real improvement has to change those two slopes. The candidates are: [pcc:unverified]
 - a node relation of degree < 4, which x-only coordinates cannot give;
 - a coupling that is a function rather than a 2-to-2 correspondence (y-coordinate
   or slope encodings). Test Y measured it afterwards: same D at t = 4, a steeper

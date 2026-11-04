@@ -8,6 +8,8 @@ written before their runs · analysis [`SOLVERS.md`](SOLVERS.md) · generator
 [`rows.tsv`](rows.tsv) · graph [`round5.svg`](round5.svg) · PDF
 [`report.pdf`](report.pdf)
 
+**Standing:** every result below is an unverified assertion [pcc:unverified]. The statement claims are PCC-20261104-a3748e (test H), PCC-20261104-ff49ef (test L), PCC-20261104-34eb1e (test Y) and PCC-20261104-1f5a1d (the derivation). None has a signed verdict.
+
 **Class: derived bounds plus stage diagnostics.** No pipeline is priced and no
 leaderboard row changes. Engine: msolve 0.6.5, p = 786433, target k = 0.
 
@@ -17,7 +19,7 @@ The question was whether a better *solver*, rather than a better encoding,
 could close the gap. None of the options does at 256 bits. `SOLVERS.md` has
 the derivations.
 
-1. **Faster Macaulay is not enough (derived).**
+1. **Faster Macaulay is not enough (derived)** [pcc:unverified].
    - Beating rho at 2^256 needs ω ≲ 1.3 **and** a solving degree flat in the
      tower depth.
    - With the measured depth slope, even ω = 1 gives a ratio of 1.35.
@@ -57,7 +59,7 @@ the derivations.
    - At t = 5, Yv selects degree 7 and is cut off at 1,800 s, while T has
      D = 6 in 512 s. The function coupling therefore has the *steeper* t-slope.
 
-**Reading.** Of the solver families, only Gröbner bases compress, because their
+**Reading** [pcc:unverified]. Of the solver families, only Gröbner bases compress, because their
 D stays far below the separators' domain sizes. Their cost is set by two
 slopes: about +1.5 per summand and about +0.5 per tower level, both coming from
 the couplings. Encoding the couplings differently (lifting, eliminating,
