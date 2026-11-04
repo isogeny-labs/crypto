@@ -593,16 +593,16 @@ struct Proposal {
 /// already tried at this size (the ledger's trials and the incumbent):
 ///
 /// 1. the incumbent family's base-size neighbourhood, nearest factors first;
-/// 1b. cross-size transfer: the incumbent family of every other size (nearest
+/// 2. cross-size transfer: the incumbent family of every other size (nearest
 ///    in log2 r first), when it differs from this size's, at the same
 ///    scale-relative base size N / N_a and its grid neighbours (a winner at
 ///    one size is a hypothesis at the next; the knob is scale-relative, as in
 ///    `ic sweep`);
-/// 2. refinement of alternatives: families already tried at this size whose
+/// 3. refinement of alternatives: families already tried at this size whose
 ///    best verified S(0) is within 1.5x of the incumbent get their best base
 ///    size moved by the two nearest grid factors (the Pareto alternatives
 ///    the autolab keeps so that one lucky family does not close the search);
-/// 3. exploration slots: families never tried at this size, those with the
+/// 4. exploration slots: families never tried at this size, those with the
 ///    fewest trials anywhere first, at `default_f * N_a`.
 fn propose_size(
     ledger: &Ledger,
@@ -640,7 +640,7 @@ fn propose_size(
         }
     }
 
-    // 1b. cross-size transfer of other sizes' incumbent families.
+    // 2. cross-size transfer of other sizes' incumbent families.
     if let Some(sizes) = ledger.tracks.get(track) {
         let mut others: Vec<(f64, u32, &Incumbent)> = sizes
             .iter()
@@ -681,7 +681,7 @@ fn propose_size(
         }
     }
 
-    // 2. alternatives: best verified trial per other family at this size.
+    // 3. alternatives: best verified trial per other family at this size.
     let mut best: BTreeMap<String, (f64, u64)> = BTreeMap::new();
     for t in ledger
         .trials
@@ -719,7 +719,7 @@ fn propose_size(
         }
     }
 
-    // 3. exploration: untried families, least-tried anywhere first.
+    // 4. exploration: untried families, least-tried anywhere first.
     let mut untried: Vec<(usize, usize, &Family)> =
         tf.families
             .iter()
@@ -3056,7 +3056,7 @@ mod tests {
             "generic",
             size,
             &inc,
-            &[c.clone()],
+            std::slice::from_ref(&c),
             7,
             16,
             1,
