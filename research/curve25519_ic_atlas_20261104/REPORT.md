@@ -90,7 +90,7 @@ below-average draw on that curve.
 **What does work: choosing the frame.** The F4 system is identical in
 every frame. Choosing lo per (curve, t) by the log-free coset count J
 (read from [r]P) raises coverage 2.5–2.8× (t = 5), about 2× (t = 6),
-1.6–1.7× (t = 7) over the mean frame, at unchanged per-target cost; in
+1.5–1.7× (t = 7) over the mean frame, at unchanged per-target cost; in
 the engine the F4 work per relation fell 4.71× (t = 5) and 3.33× (t = 6)
 against lo = 0 at k = 20.
 
@@ -162,9 +162,9 @@ not from symmetry.
 
 | family | membership | free parameter | F4 system shape | best measured at k = 20 | status |
 |:--|:--|:--|:--|:--|:--|
-| `prime-projected-abscissa` + `mitm` (generic baseline `proj-a`) | smallest x, projected by 8 | size N | none (pair table) | S = 12.05 / 12.93 / 20.83 at w = 0 / 0.1 / 1 (T5 session); 7.0–8.5× rho-neg | the baseline. Coverage sits at the pairs/r ceiling, so no coordinate lever exists here |
+| `prime-projected-abscissa` + `mitm` (generic baseline `proj-a`) | smallest x, projected by 8 | size N | none (pair table) | S = 12.05 / 12.93 / 20.83 at w = 0 / 0.1 / 1 (T5 session), 8.3–8.5× rho-neg there; 7.0–7.2× in `curve25519_algebraic_ecbench_20261102` | the baseline. Coverage sits at the pairs/r ceiling, so no coordinate lever exists here |
 | x-interval, lo = 0 (`bits`) | x ∈ [0, 2^t) | — | t bits per summand, b² = b | per relation 9.71·10⁸ (t = 4), 9.49·10⁹ (t = 5), G = 3 | the old algebraic reference |
-| x-interval, selected frame (`bits@L`) | x ∈ [L, L + 2^t) | L, chosen by argmax J (log-free) | identical | per relation 1.49·10⁸ (t = 4, 6.5× lower), 2.02·10⁹ (t = 5, 4.7× lower) | validated (`curve25519_frame_search_20261103`); end-to-end pricing needs T11's `prime-interval` base (pending) |
+| x-interval, selected frame (`bits@L`) | x ∈ [L, L + 2^t) | L, chosen by argmax J (log-free) | identical | per relation 1.49·10⁸ (t = 4, 6.5× lower), 2.01·10⁹ (t = 5, 4.7× lower) | validated (`curve25519_frame_search_20261103`); end-to-end pricing needs T11's `prime-interval` base (pending) |
 | Edwards-y interval | y ∈ [0, 2^t) | (frame) | same | equal to bits except the t = 5, G = 0 anomaly | a frame |
 | T₀-interval (`t0-bits@L`) | u + 1/u ∈ [L, L + 2^t) | L | same degree | selected: 0.951× / 0.934× the best bits frame per relation (t = 4, 5), 1.25× at t = 6 | closed (T7) |
 | 2-descent (`square-bits@L`) | x = w² + A/3, w ∈ [L, L + 2^t) | L | degree 4 per summand | 1.28× / 1.71× dearer than selected bits | closed (T2) |
@@ -181,16 +181,21 @@ Write c(P) ∈ Z/8 for the cofactor coset of a base point, read off [r]P
 without any discrete log. A pair P_i ± P_j is a usable relation for a
 subgroup target iff c_i ± c_j ≡ 0 (mod 8).
 
-- Uniform cosets cancel with probability 14/64 ≈ 0.22 (sign-folded).
+- For a signed pair of uniformly random cosets, P(c_a ± c_b ≡ 0) =
+  14/64 ≈ 0.22. The census counts something different: covered subgroup
+  points (±R counted separately) over unordered column pairs
+  (n(n+1)/2). On that denominator a uniform base gives about 0.50
+  (seed 0: 172/325 = 0.53, seed 1093: 528/1081 = 0.49).
 - Selection pushes this up. For seed 1308 at t = 6, 498 covered points
-  out of 36·37/2 = 666 signed pairs: 0.75.
+  over 36·37/2 = 666 column pairs: 0.75, that is 1.5× the uniform value
+  on the same denominator (validator E4).
 - The selectors used: J = number of cancelling pairs (frames, seeds);
   J/columns (T9) because end-to-end cost ∝ columns × r / coverage. J/cols
   picked the best seed of all 2,000 in 14 of 15 (k, t) cells.
 - Filtering a base to a single coset class cannot help: keeping only
-  coset 4 (or only 0) keeps about 1/8 of the columns for a cancellation
-  probability of 1, which is worse than a selected base's 0.75 on 8× the
-  columns (cost ∝ 1/(columns × p_cancel)).
+  coset 4 (or only 0) keeps about 1/8 of the columns and makes every pair
+  cancel (at most 2× the selected base's 0.75 on this denominator), which
+  loses to keeping 8× the columns (cost ∝ 1/(columns × p_cancel)).
 - Restricting cosets *algebraically* (2-descent, T₀ quotient) raises the
   polynomial degree and loses; *selecting* among parameterisations with an
   unchanged system wins. That is the lesson of waves 1–3.
@@ -200,8 +205,11 @@ subgroup target iff c_i ± c_j ≡ 0 (mod 8).
 
 ## 6. End-to-end ledger at k = 20 (full discrete-log solves, ecbench)
 
-All sessions: 2 measured rounds, public targets, every run verified by
-ecbench against the planted scalar, replay audits with 0 problems.
+Public targets; every run verified by ecbench against the planted
+scalar. T5 ran 1 measured round (6 runs per arm), T9 and T12 ran 2
+(32 per arm). Replay audits: T5 8/8 and T9 16/16 reproduced with 0
+problems; T12's audit runs one replay per chunk and is in progress
+(10 of 16 chunks done at validation time, all OK).
 
 | session | targets | arm | S (w=0) | S (w=0.1) | S (w=1) |
 |:--|--:|:--|--:|--:|--:|
@@ -260,9 +268,11 @@ constant.
 
 ## 8. Scaling
 
-At fixed (t, G), columns, covered and mpt do not depend on k (T4-rep,
-T6, T10), so E = columns × r × mpt / covered is linear in r, against
-rho's √r. The algebraic track at m = 2 can only beat exponent 1 if the
+At fixed (t, G), mpt does not depend on k (T4-rep, T6, T10), and the
+*distribution* of columns and covered over seeds at fixed t does not
+either (the selected values vary by curve, 28/198 … 39/364 at t = 6), so
+E = columns × r × mpt / covered is linear in r up to that spread,
+against rho's √r. The algebraic track at m = 2 can only beat exponent 1 if the
 optimal t grows with k and mpt(t, G) grows slower than coverage. At
 k = 20 the optimal t is 5 and mpt jumps 13× from (5, 4) to (6, 4). Lead
 L10 (wave 4) measures the optimum at k = 16, 18, 22, 24 and fits the
@@ -314,10 +324,16 @@ Ideas considered and not pursued, with the reason:
 ## 10. Validation state
 
 - Independently validated (`validator-report.json` in each directory):
-  frame search, torsion leads, isogeny seed (T4/T5), wave 2 (T3, T6, T7,
-  T4-rep), wave 3 T9 and T10. All pass_with_errata, errata applied.
-- Pending validation: T11 (session re-running), T12 (replay audit queued
-  behind the ecbench lock; band and paired compares done), wave 4.
+  frame search (disposition `validated`, after an `errata_open` pass whose
+  E1 reran the census on the family-rule curves), wave 2 (T3, T6, T7,
+  T4-rep) and wave 3 (T9, T10), all pass_with_errata with errata applied.
+- Not independently validated: the torsion leads (T1–T3 census) and the
+  isogeny-seed study (T4/T5). Their census instruments are the frame
+  study's, and T4-rep later reproduced the T4/T5 engine cells exactly, but
+  no validator report exists for them.
+- This atlas: `validator-report.json`, pass_with_errata (E1–E8 applied).
+- Pending validation: T11 (chunked session running), T12 (replay audit
+  in progress; band and paired compares done), wave 4.
 - No study here passes the leaderboard validation gate: component results
   have no same-unit rho row, by design.
 
