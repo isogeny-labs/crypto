@@ -41,7 +41,7 @@ Ratios are pooled paired ratios with 95 % intervals (K = 16 workloads, 32 pairs)
 
 | | rule | outcome |
 |:--|:--|:--|
-| R1 | every arm 32/32 verified; every chunk's replay audit 0 problems | **held**: 32/32 verified in all five arms; 16/16 chunk receipts `ok: true`, 0 problems, every replay `identical`. The replays fall on runs of all arms |
+| R1 | every arm 32/32 verified; every chunk's replay audit 0 problems | **held**: 32/32 verified in all five arms; 16/16 chunk receipts `ok: true`, 0 problems, every replay `identical`. The 16 replays cover rho-neg 4, proj-a 3, t4 plain 5 and the winner 4 runs; **no t4-trace run was replayed** |
 | R2 | S(t4)/S(winner) ≤ 0.6 at w = 0.1 and 1, upper 95 % < 1 (point 0.49) | **held**: 0.59841 [0.50903, 0.70350] at w = 0.1, 0.59819 [0.50883, 0.70324] at w = 1; 16/16 workloads. The point 0.49 missed: measured / model = 1.22 |
 | R3 | S(t4)/S(winner) ≥ 1.2 at w = 0 (point 1.47) | **held**: 1.5668 [1.3586, 1.8070]; the winner is cheaper on 14 of 16 workloads |
 | R4 | S(t4-trace)/S(t4) ≤ 0.6 at w = 0.1 and 1, upper < 1 (point 0.47–0.57) | **held**: 0.47403 [0.47402, 0.47404] at w = 0.1, 0.47371 at w = 1; 16/16 |
