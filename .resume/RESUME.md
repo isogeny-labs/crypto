@@ -43,7 +43,7 @@ root-table parity point. Kill: K4 and K5 both supported.
 4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-R4-I1 done (PCC-20261104-c97d81): seed-averaged wwalk g=1 grow=2 is 1.82x-1.86x rho. Next: make holdouts resample oracle seeds (mix run seed into wwalk seed), then resume structure levers from ideas/STRUCTURE-R4.md.
+Re-baseline (k = 24, 28, 32; incumbent fixed table vs seed=run) running under benchrec record in scratchpad recrb, branch claude/curve25519-autolab-ruling (PR #3416).
 Panel: ksum4 at extrapolated N = 37 and neighbours 19/26/52/74; ksum3 transfer N = 176/246; mitm-prime-batch / blocked exploration.
 Branch claude/curve25519-ic-autolab-round4 (PR #3392). After it: add-raw, metric (incumbent S at k = 32, matched rho), close the record, claim, commit.
 
