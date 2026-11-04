@@ -815,9 +815,40 @@ pub(crate) fn fast_map<V>(capacity: usize) -> FastMap<V> {
 #[inline]
 pub(crate) fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     if m <= u64::from(u32::MAX) && a < m && b < m {
-        (a * b) % m
+        mulmod_u32(a, b, m)
     } else {
         ((a as u128 * b as u128) % m as u128) as u64
+    }
+}
+
+/// `a·b mod m` for `a, b < m < 2³²`.  The product fits 64 bits and its
+/// quotient by `m` is below `m`, so on x86-64 one 64-by-32-bit `div`
+/// gives the remainder.  The compiler's `(a * b) % m` divides by a 64-bit
+/// register instead, after testing at run time whether both operands fit
+/// 32 bits (they rarely do).  The same remainder either way.
+#[inline]
+fn mulmod_u32(a: u64, b: u64, m: u64) -> u64 {
+    let prod = a * b;
+    #[cfg(target_arch = "x86_64")]
+    {
+        let rem: u32;
+        // SAFETY: `div` faults only on a zero divisor or a quotient that
+        // overflows 32 bits; `m > a ≥ 0` is nonzero and the quotient
+        // `a·b / m < b < m < 2³²`.
+        unsafe {
+            std::arch::asm!(
+                "div {m:e}",
+                m = in(reg) m as u32,
+                inout("eax") prod as u32 => _,
+                inout("edx") (prod >> 32) as u32 => rem,
+                options(pure, nomem, nostack),
+            );
+        }
+        u64::from(rem)
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        prod % m
     }
 }
 
@@ -917,9 +948,24 @@ fn invmod_u32(a: u32, m: u32) -> Option<u32> {
     // parity of the step count, which is the sign, is which half stops.
     // The same quotients and remainders in the same order, so the same
     // inverse; a third of the instructions of the swapping loop.
+    #[cfg(target_arch = "x86_64")]
+    let (gcd, t, neg) = euclid_u32_x86(m, a);
+    #[cfg(not(target_arch = "x86_64"))]
+    let (gcd, t, neg) = euclid_u32(m, a);
+    if gcd != 1 {
+        return None;
+    }
+    Some(if neg { (m - t) % m } else { t % m })
+}
+
+/// The extended Euclid loop of [`invmod_u32`]: `(gcd, t, neg)` with
+/// `t·a ≡ ±gcd (mod m)`, the sign `−` when `neg`.
+#[cfg_attr(target_arch = "x86_64", allow(dead_code))]
+#[inline]
+fn euclid_u32(m: u32, a: u32) -> (u32, u32, bool) {
     let (mut r0, mut r1) = (m, a);
     let (mut t0, mut t1) = (0u32, 1u32);
-    let (gcd, t, neg) = loop {
+    loop {
         if r1 == 0 {
             break (r0, t0, true);
         }
@@ -932,11 +978,70 @@ fn invmod_u32(a: u32, m: u32) -> Option<u32> {
         let q = r1 / r0;
         r1 -= q * r0;
         t1 += q * t0;
-    };
-    if gcd != 1 {
-        return None;
     }
-    Some(if neg { (m - t) % m } else { t % m })
+}
+
+/// [`euclid_u32`] in x86-64 assembly, step for step: the same quotients,
+/// remainders and coefficients, so the same `(gcd, t, neg)`.  Written out
+/// because the compiler folds the two halves of the Rust loop back into
+/// one swapping loop with a sign flag (thirteen instructions a step, as
+/// the 2026-11-03 disassembly of `PrimeCurve::add_raw` shows); here a step
+/// is the division, the coefficient update and the test, eight
+/// instructions.  `div` takes `edx:eax`; the remainder comes back in
+/// `edx`.
+#[cfg(target_arch = "x86_64")]
+#[inline]
+fn euclid_u32_x86(m: u32, a: u32) -> (u32, u32, bool) {
+    let (mut r0, mut r1, mut t0, mut t1) = (m, a, 0u32, 1u32);
+    let neg: u32;
+    // SAFETY: every `div` divides by a remainder just tested nonzero
+    // (`r1` at entry and after half B, `r0` after half A), with `edx`
+    // cleared, so the quotient fits 32 bits.  The coefficient updates do
+    // not overflow: every magnitude stays at most `m` (`invmod_u64`).
+    unsafe {
+        std::arch::asm!(
+            "test {r1:e}, {r1:e}",
+            "jz 3f",
+            "2:",
+            // half A: q = r0 / r1, r0 = r0 mod r1, t0 += q t1
+            "mov eax, {r0:e}",
+            "xor edx, edx",
+            "div {r1:e}",
+            "mov {r0:e}, edx",
+            "imul eax, {t1:e}",
+            "add {t0:e}, eax",
+            "test edx, edx",
+            "jz 4f",
+            // half B: q = r1 / r0, r1 = r1 mod r0, t1 += q t0
+            "mov eax, {r1:e}",
+            "xor edx, edx",
+            "div {r0:e}",
+            "mov {r1:e}, edx",
+            "imul eax, {t0:e}",
+            "add {t1:e}, eax",
+            "test edx, edx",
+            "jnz 2b",
+            "3:",
+            "mov {neg:e}, 1",
+            "jmp 5f",
+            "4:",
+            "xor {neg:e}, {neg:e}",
+            "5:",
+            r0 = inout(reg) r0,
+            r1 = inout(reg) r1,
+            t0 = inout(reg) t0,
+            t1 = inout(reg) t1,
+            neg = out(reg) neg,
+            out("eax") _,
+            out("edx") _,
+            options(pure, nomem, nostack),
+        );
+    }
+    if neg != 0 {
+        (r0, t0, true)
+    } else {
+        (r1, t1, false)
+    }
 }
 
 // ── Incremental Gauss–Jordan over Z/rZ ─────────────────────────────
@@ -11423,6 +11528,48 @@ mod tests {
                         super::invmod(a, m),
                         super::invmod_u64(a, m),
                         "invmod({a}, {m})"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn euclid_asm_and_32_bit_mulmod_match_the_portable_forms() {
+        // The x86-64 Euclid loop against the Rust one, step results and
+        // sign included, and the 64-by-32-bit `div` against the 128-bit
+        // remainder, on moduli at the 32-bit edge, primes and composites.
+        let mut x = 0x2545_F491_4F6C_DD1Du64;
+        for m in [
+            1u32,
+            2,
+            3,
+            65_521,
+            3_852_015_119,
+            4_294_967_291,
+            4_294_967_295,
+            4_294_967_294,
+            1 << 31,
+            (1 << 31) - 1,
+        ] {
+            for _ in 0..4096 {
+                x ^= x << 13;
+                x ^= x >> 7;
+                x ^= x << 17;
+                for a in [(x % u64::from(m)) as u32, m - 1, 1, 0, m / 2] {
+                    let a = a % m;
+                    #[cfg(target_arch = "x86_64")]
+                    assert_eq!(
+                        super::euclid_u32_x86(m, a),
+                        super::euclid_u32(m, a),
+                        "euclid({m}, {a})"
+                    );
+                    let b = (x >> 32) % u64::from(m);
+                    let a = u64::from(a);
+                    assert_eq!(
+                        super::mulmod_u32(a, b, u64::from(m)),
+                        ((u128::from(a) * u128::from(b)) % u128::from(m)) as u64,
+                        "mulmod({a}, {b}, {m})"
                     );
                 }
             }
