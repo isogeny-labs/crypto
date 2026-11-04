@@ -523,7 +523,7 @@ fn fingerprint(
             h.update(&s.to_le_bytes())
         }
     };
-    h.update(&opts.seed_degree.map_or(u32::MAX, |d| d).to_le_bytes());
+    h.update(&opts.seed_degree.unwrap_or(u32::MAX).to_le_bytes());
     h.update(&[opts.restrict_vars as u8]);
     h.update(&(system.len() as u64).to_le_bytes());
     for p in system {

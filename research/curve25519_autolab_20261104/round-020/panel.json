@@ -1,0 +1,117 @@
+{
+  "created": "2026-11-04T07:22:27Z",
+  "round": 20,
+  "rules": {
+    "exploration_slots": 6,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f",
+      "wsum-b4",
+      "wsum-b5",
+      "wsum-b12",
+      "wsum-b20",
+      "wsum-b8",
+      "wsum-b16",
+      "wsum-b24",
+      "wsum-b30"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b16",
+            "n": 3,
+            "name": "wsum-b16-n3",
+            "oracle": "wsum:coef=16,free=1"
+          },
+          "reason": "exploration: family wsum-b16 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b24",
+            "n": 3,
+            "name": "wsum-b24-n3",
+            "oracle": "wsum:coef=24,free=1"
+          },
+          "reason": "exploration: family wsum-b24 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b30",
+            "n": 3,
+            "name": "wsum-b30-n3",
+            "oracle": "wsum:coef=30,free=1"
+          },
+          "reason": "exploration: family wsum-b30 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+            "family": "ksum5f",
+            "n": 8,
+            "name": "ksum5f-n8",
+            "oracle": "ksum:m=5,free=1"
+          },
+          "reason": "exploration: family ksum5f untried at k = 24, at its parent ksum5's best N = 6"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=20,scan_cap=320",
+            "family": "ksum3f",
+            "n": 20,
+            "name": "ksum3f-n20",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "reason": "exploration: family ksum3f untried at k = 24, at its parent ksum3's best N = 20"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=4,scan_cap=64",
+        "family": "wsum-b4",
+        "n": 4,
+        "name": "wsum-b4-n4",
+        "oracle": "wsum:coef=4,free=1"
+      },
+      "incumbent_s": [
+        4.200687666164818,
+        4.43340178817089,
+        6.527828886225522
+      ],
+      "tried_before": 31
+    }
+  },
+  "track": "generic"
+}
