@@ -1,0 +1,372 @@
+// gen7.sing -- round 7: tree-glued PDP systems on a twisted Edwards curve (native Singular).
+//
+//   curve   a*u^2 + v^2 = 1 + d*u^2*v^2 over F_786433, a = 1, d = 11 (nonsquare: complete law),
+//           #E = 4 * 196873 (curve.sing; re-checked here by scalar multiplication)
+//   base    points with v = g*w, w in mu_(2^t)  (v is negation invariant: -(u,v) = (-u,v))
+//   arms    E1  v-only cherry tree: (s,q) of each cherry's w's with the degree-2 remainder
+//               chain (as arm T), glued by the Edwards 3-summation polynomial S3E in v
+//           E1S E1 with every internal separator X_c fixed to its planted value (floor control)
+//           E2  full-coordinate tree: leaves (u_i, w_i), v_i = g*w_i, curve equation, per-leaf
+//               Kummer chain on w_i; internal nodes (U_c, V_c) by the two cleared addition-law
+//               equations; root node = R (both coordinates known)
+//   cells   (m,t) in CELLS7 (env, default "3 4 3 5 4 4 4 5"), one planted target each
+//   output  OUTDIR7 (env) / m<m>_t<t>_<arm>.ms ; msolve format; planted check before writing
+// Helpers kn, mn, kchain, mchain, plantM, plantK, fmtpoly are copied from ../gen.sing.
+// Randomness: LCG (as ../inst.sing) with seed 0xED7A1104.
+LIB "general.lib";
+short = 0;
+string OUTDIR = system("getenv", "OUTDIR7");
+if (OUTDIR == "") { OUTDIR = "/tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/edw/ms"; }
+string CELLSTR = system("getenv", "CELLS7");
+if (CELLSTR == "") { CELLSTR = "3 4 3 5 4 4 4 5"; }
+int rcmk = system("sh", "mkdir -p " + OUTDIR);
+int P = 786433; int CA = 1; int CD = 11; bigint ORD = 787492; int RPR = 196873;
+
+proc die(string msg) { print("ERROR: " + msg); system("sh", "kill -TERM $PPID"); quit; }
+proc ix(string s, list L)
+{
+  int i;
+  for (i = 1; i <= size(L); i++) { if (L[i] == s) { return(i); } }
+  return(0);
+}
+proc kn(string nme, int t)
+{
+  list L; int j;
+  for (j = 1; j < t; j++) { L[j] = nme + "u" + string(j); }
+  return(L);
+}
+proc mn(string nme, int k, int t)
+{
+  list L; int j; int i;
+  for (j = 1; j < t; j++)
+  {
+    if (2^j >= k) { for (i = 0; i < k; i++) { L[size(L) + 1] = nme + "r" + string(j) + "_" + string(i); } }
+  }
+  return(L);
+}
+proc kchain(string nme, poly w, int t, list nm)
+{
+  ideal E; int j; int ne = 0; poly prev = w; poly u;
+  for (j = 1; j < t; j++) { u = var(ix(nme + "u" + string(j), nm)); ne++; E[ne] = u - prev^2; prev = u; }
+  ne++; E[ne] = prev^2 - 1;
+  return(E);
+}
+proc mchain(string nme, ideal es, int k, int t, list nm)
+{
+  poly T = var(1); poly Q = T^k; int i; int j; int ne = 0;
+  for (i = 0; i < k; i++) { Q = Q + (-1)^(i + 1) * es[i + 1] * T^(k - 1 - i); }
+  ideal G = std(ideal(Q));
+  poly R = T; poly Rn; poly Rsym; poly df; ideal E; matrix M;
+  for (j = 1; j <= t; j++)
+  {
+    Rn = reduce(R^2, G);
+    if (j < t and 2^j < k) { R = T^(2^j); }
+    else
+    {
+      if (j == t) { df = Rn - 1; }
+      else
+      {
+        Rsym = 0;
+        for (i = 0; i < k; i++) { Rsym = Rsym + var(ix(nme + "r" + string(j) + "_" + string(i), nm)) * T^i; }
+        df = Rn - Rsym;
+      }
+      M = coeffs(df, T);
+      for (i = nrows(M); i >= 1; i--) { if (M[i, 1] != 0) { ne++; E[ne] = M[i, 1]; } }
+      R = Rsym;
+    }
+  }
+  return(E);
+}
+proc plantM(string nme, int k, int t, ideal roots, list nm, ideal vals)
+{
+  poly T = var(1); poly Qn = 1; int i; int j; poly rm; matrix M;
+  for (i = 1; i <= k; i++) { Qn = Qn * (T - roots[i]); }
+  ideal G = std(ideal(Qn));
+  for (j = 1; j < t; j++)
+  {
+    if (2^j >= k)
+    {
+      rm = reduce(T^(2^j), G); M = coeffs(rm, T);
+      for (i = 0; i < k; i++)
+      {
+        if (i + 1 <= nrows(M)) { vals[ix(nme + "r" + string(j) + "_" + string(i), nm)] = M[i + 1, 1]; }
+        else { vals[ix(nme + "r" + string(j) + "_" + string(i), nm)] = 0; }
+      }
+    }
+  }
+  return(vals);
+}
+proc plantK(string nme, poly w, int t, list nm, ideal vals)
+{
+  poly v = w; int j;
+  for (j = 1; j < t; j++) { v = v^2; vals[ix(nme + "u" + string(j), nm)] = v; }
+  return(vals);
+}
+proc fmtpoly(poly f)
+{
+  string s = ""; int i; int ci; poly mo;
+  if (f == 0) { return("0"); }
+  for (i = 1; i <= size(f); i++)
+  {
+    ci = int(leadcoef(f[i])); if (ci < 0) { ci = ci + 786433; }
+    mo = leadmonom(f[i]);
+    if (i > 1) { s = s + "+"; }
+    if (mo == 1) { s = s + string(ci); } else { s = s + string(ci) + "*" + string(mo); }
+  }
+  return(s);
+}
+
+// ---------------------------------------------------------------- S3E by elimination
+ring RE = 786433, (u1, u2, u3, v1, v2, v3), dp;
+poly ea = CA; poly ed = CD;
+ideal IE = ea*u1^2 + v1^2 - 1 - ed*u1^2*v1^2,
+           ea*u2^2 + v2^2 - 1 - ed*u2^2*v2^2,
+           u3*(1 + ed*u1*u2*v1*v2) - (u1*v2 + u2*v1),
+           v3*(1 - ed*u1*u2*v1*v2) - (v1*v2 - ea*u1*u2);
+ideal EL = eliminate(IE, u1*u2*u3);
+if (size(EL) != 1) { print(EL); die("elimination of u is not principal"); }
+// the eliminant carries the spurious factor(s) of the denominator locus 1 -+ d u1 u2 v1 v2 = 0;
+// keep the irreducible factor that has degree 2 in v3
+list FE = factorize(EL[1]); int fe; poly S3el = 0;
+for (fe = 1; fe <= size(FE[1]); fe++)
+{
+  print("  eliminant factor: " + string(FE[1][fe]) + " ^" + string(FE[2][fe]));
+  if (deg(FE[1][fe], intvec(0,0,0,0,0,1)) == 2) { S3el = FE[1][fe]; }
+}
+if (S3el == 0) { die("no degree-2 factor in v3"); }
+S3el = S3el / leadcoef(S3el);
+poly S3cf = ed*v1^2*v2^2*v3^2 - ed*(v1^2*v2^2 + v1^2*v3^2 + v2^2*v3^2) + ea*(v1^2 + v2^2 + v3^2)
+            - 2*(ea - ed)*v1*v2*v3 - ea;
+poly S3n = S3cf / leadcoef(S3cf);
+if (S3el != S3n) { print(S3el); die("S3E closed form mismatch"); }
+print("S3E (elimination of u1,u2,u3) = closed form: " + string(S3cf));
+print("S3E degree in v1: " + string(deg(S3cf, intvec(0,0,0,1,0,0))) + ", total degree " + string(deg(S3cf)));
+// symmetric cherry form S3Esym(s, q, X): reduce S3E(v1, v2, X) modulo s - v1 - v2, q - v1 v2
+ring RS = 786433, (v1, v2, Sv, Sq, SX), (dp(2), dp(3));
+poly ea = CA; poly ed = CD;
+poly S3x = ed*v1^2*v2^2*SX^2 - ed*(v1^2*v2^2 + v1^2*SX^2 + v2^2*SX^2) + ea*(v1^2 + v2^2 + SX^2)
+           - 2*(ea - ed)*v1*v2*SX - ea;
+poly S3s = reduce(S3x, std(ideal(Sv - v1 - v2, Sq - v1*v2)));
+if (deg(S3s, intvec(1,1,0,0,0)) > 0) { die("S3E not symmetric"); }
+print("S3Esym(s,q,X) = " + string(S3s) + "   (total degree " + string(deg(S3s)) + ")");
+string S3Sstr = string(S3s);
+
+// ---------------------------------------------------------------- Edwards arithmetic
+ring r = 786433, z, dp;
+number a = CA; number d = CD;
+proc oncurve(list Pp) { return(a*Pp[1]^2 + Pp[2]^2 - 1 - d*Pp[1]^2*Pp[2]^2 == 0); }
+proc eadd(list Pp, list Qq)
+{
+  number t1 = d*Pp[1]*Qq[1]*Pp[2]*Qq[2];
+  if (1 + t1 == 0 or 1 - t1 == 0) { die("addition law denominator vanished"); }
+  return(list((Pp[1]*Qq[2] + Qq[1]*Pp[2]) / (1 + t1), (Pp[2]*Qq[2] - a*Pp[1]*Qq[1]) / (1 - t1)));
+}
+proc emul(bigint n, list Pp)
+{
+  list Rr = list(number(0), number(1)); list Bb = Pp;
+  while (n > 0) { if (n mod 2 == 1) { Rr = eadd(Rr, Bb); } Bb = eadd(Bb, Bb); n = n div 2; }
+  return(Rr);
+}
+proc isid(list Pp) { return(Pp[1] == 0 and Pp[2] == 1); }
+proc issq(number c) { if (c == 0) { return(0); } return(c^393216 == 1); }
+proc sqrtp(number c)
+{
+  list F = factorize(z^2 - c); int i; poly h;
+  for (i = 1; i <= size(F[1]); i++) { h = F[1][i]; if (deg(h) == 1) { return(-number(jet(h, 0)) / leadcoef(h)); } }
+  die("no square root");
+}
+proc nint(number n) { int v = int(n); if (v < 0) { v = v + 786433; } return(v); }
+bigint ST = 3984216324;      // 0xED7A1104
+proc lcg() { ST = (ST * bigint(1103515245) + bigint(12345)) mod bigint(2147483648); return(ST); }
+proc rnd(int n) { bigint v = lcg(); bigint q = v div bigint(65536); return(int(q mod bigint(n))); }
+
+// group order check: a point Q with 4Q != O and r*(4Q) = O gives r | #E, and 4r is the only
+// multiple of r = 196873 in the Hasse interval, so #E = 4r
+list Q0; number qv; number qu2; int jq;
+for (jq = 2; jq < 50; jq++)
+{
+  qv = jq; qu2 = (1 - qv^2) / (a - d*qv^2);
+  if (issq(qu2)) { Q0 = list(sqrtp(qu2), qv); if (!isid(emul(4, Q0))) { break; } }
+}
+if (!oncurve(Q0)) { die("Q0 not on curve"); }
+list Q4 = emul(4, Q0);
+if (isid(Q4) or !isid(emul(RPR, Q4))) { die("order check failed"); }
+if (!isid(emul(ORD, Q0))) { die("#E*Q != O"); }
+print("order check: Q0=(" + string(Q0[1]) + "," + string(Q0[2]) + "), 4Q0 != O, " + string(RPR)
+      + "*(4Q0) = O, #E*Q0 = O  =>  #E = 4*" + string(RPR) + " = " + string(ORD));
+
+// ---------------------------------------------------------------- base offset g
+// usable exponent j: v = g*zeta^j with u^2 = (1-v^2)/(a-d v^2) a nonzero square; classes j mod 2^(t-1)
+proc usable(number g, int t)
+{
+  int D = 2^t; number zt = number(5)^(786432 div D);   // 5 is a nonsquare: zt has order exactly D
+  if (zt^(D div 2) != -1) { die("zeta order"); }
+  list U; int j; number v;
+  for (j = 0; j < D; j++) { v = g*zt^j; if (v != 1 and v != -1) { if (issq((1 - v^2)/(a - d*v^2))) { U[size(U) + 1] = j; } } }
+  return(U);
+}
+int gi; number g; list U4;
+for (gi = 2; gi < 200; gi++) { g = gi; U4 = usable(g, 4); if (size(U4) >= 10) { break; } }
+print("g = " + string(g) + ": usable exponents at t=4: " + string(size(U4)) + " (of 16), at t=5: "
+      + string(size(usable(g, 5))) + " (of 32)");
+int GG = nint(g);
+
+// ---------------------------------------------------------------- one system
+proc writesys(list nm, list EQ, ideal vals, string OUT, string tag)
+{
+  int i; int n = size(nm);
+  map ev = basering, vals; poly ei;
+  for (i = 1; i <= size(EQ); i++)
+  {
+    if (EQ[i] == 0) { die("zero equation in " + OUT); }
+    ei = EQ[i];
+    if (ev(ei) != 0) { die("planted check failed " + tag + " eq=" + string(i)); }
+  }
+  string txt = "";
+  for (i = 2; i <= n; i++) { if (i > 2) { txt = txt + ","; } txt = txt + nm[i]; }
+  txt = txt + newline + string(786433) + newline;
+  int maxd = 0;
+  for (i = 1; i <= size(EQ); i++) { if (i > 1) { txt = txt + "," + newline; } txt = txt + fmtpoly(EQ[i]); if (deg(EQ[i]) > maxd) { maxd = deg(EQ[i]); } }
+  write(":w " + OUT, txt);
+  print(tag + ": N=" + string(n - 1) + " eqs=" + string(size(EQ)) + " maxdeg=" + string(maxd) + " plant ok -> " + OUT);
+}
+
+proc S3E(poly x1, poly x2, poly x3, poly pa, poly pd)
+{
+  return(pd*x1^2*x2^2*x3^2 - pd*(x1^2*x2^2 + x1^2*x3^2 + x2^2*x3^2) + pa*(x1^2 + x2^2 + x3^2)
+         - 2*(pa - pd)*x1*x2*x3 - pa);
+}
+proc addeq(poly x1, poly y1, poly x2, poly y2, poly X, poly Y, poly pa, poly pd)
+{
+  return(list(X*(1 + pd*x1*x2*y1*y2) - (x1*y2 + x2*y1), Y*(1 - pd*x1*x2*y1*y2) - (y1*y2 - pa*x1*x2)));
+}
+// arm E1 / E1S. W: list of w_i (int reps); XS: planted separators (ints); vR int
+proc armE1(string arm, int m, int t, list W, list XS, int vR, string S3Sstr, int GG)
+{
+  list nm = "T"; int c; int i;
+  for (c = 0; c < m div 2; c++) { nm = nm + list("s" + string(c), "q" + string(c)) + mn("h" + string(c), 2, t); }
+  if (m == 3) { nm = nm + list("w3") + kn("c2", t) + list("X1"); }
+  if (m == 4) { nm = nm + list("X1", "X2"); }
+  string vl = ""; for (i = 1; i <= size(nm); i++) { if (i > 1) { vl = vl + ","; } vl = vl + nm[i]; }
+  execute("ring R1 = 786433,(" + vl + "),lp;");
+  ring RB = 786433, (v1, v2, Sv, Sq, SX), (dp(2), dp(3));
+  execute("poly sb = " + S3Sstr + ";");
+  setring R1;
+  poly pa = CA; poly pd = CD; poly pg = GG; list EQ; ideal es; ideal E; ideal vals; vals[size(nm)] = 0; ideal rt;
+  map ph;
+  for (c = 0; c < m div 2; c++)
+  {
+    es = var(ix("s" + string(c), nm)), var(ix("q" + string(c), nm));
+    E = mchain("h" + string(c), es, 2, t, nm); for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
+    ph = RB, 0, 0, pg*var(ix("s" + string(c), nm)), pg^2*var(ix("q" + string(c), nm)), var(ix("X" + string(c + 1), nm));
+    EQ[size(EQ) + 1] = ph(sb);
+    vals[ix("s" + string(c), nm)] = W[2*c + 1] + W[2*c + 2];
+    vals[ix("q" + string(c), nm)] = W[2*c + 1] * W[2*c + 2];
+    rt = W[2*c + 1], W[2*c + 2];
+    vals = plantM("h" + string(c), 2, t, rt, nm, vals);
+    vals[ix("X" + string(c + 1), nm)] = XS[c + 1];
+  }
+  if (m == 3)
+  {
+    E = kchain("c2", var(ix("w3", nm)), t, nm); for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
+    EQ[size(EQ) + 1] = S3E(var(ix("X1", nm)), pg*var(ix("w3", nm)), vR, pa, pd);
+    vals[ix("w3", nm)] = W[3]; vals = plantK("c2", W[3], t, nm, vals);
+  }
+  if (m == 4) { EQ[size(EQ) + 1] = S3E(var(ix("X1", nm)), var(ix("X2", nm)), vR, pa, pd); }
+  if (arm == "E1S") { for (c = 1; c <= m div 2; c++) { EQ[size(EQ) + 1] = var(ix("X" + string(c), nm)) - XS[c]; } }
+  writesys(nm, EQ, vals, OUTDIR + "/m" + string(m) + "_t" + string(t) + "_" + arm + ".ms",
+           "m=" + string(m) + " t=" + string(t) + " " + arm);
+}
+
+// arm E2. UL: leaf u_i; W: leaf w_i; NU, NV: planted internal nodes; uR, vR
+proc armE2(int m, int t, list UL, list W, list NU, list NV, int uR, int vR, int GG)
+{
+  list nm = "T"; int i; int c;
+  for (i = 1; i <= m; i++) { nm = nm + list("u" + string(i), "w" + string(i)) + kn("c" + string(i - 1), t); }
+  for (c = 1; c <= m div 2; c++) { nm = nm + list("U" + string(c), "V" + string(c)); }
+  string vl = ""; for (i = 1; i <= size(nm); i++) { if (i > 1) { vl = vl + ","; } vl = vl + nm[i]; }
+  execute("ring R2 = 786433,(" + vl + "),lp;");
+  poly pa = CA; poly pd = CD; poly pg = GG; list EQ; ideal E; ideal vals; vals[size(nm)] = 0;
+  poly uu; poly vv;
+  for (i = 1; i <= m; i++)
+  {
+    uu = var(ix("u" + string(i), nm)); vv = pg*var(ix("w" + string(i), nm));
+    EQ[size(EQ) + 1] = pa*uu^2 + vv^2 - 1 - pd*uu^2*vv^2;
+    E = kchain("c" + string(i - 1), var(ix("w" + string(i), nm)), t, nm); for (c = 1; c <= size(E); c++) { EQ[size(EQ) + 1] = E[c]; }
+    vals[ix("u" + string(i), nm)] = UL[i]; vals[ix("w" + string(i), nm)] = W[i];
+    vals = plantK("c" + string(i - 1), W[i], t, nm, vals);
+  }
+  list L2; poly Uc; poly Vc;
+  for (c = 1; c <= m div 2; c++)
+  {
+    Uc = var(ix("U" + string(c), nm)); Vc = var(ix("V" + string(c), nm));
+    L2 = addeq(var(ix("u" + string(2*c - 1), nm)), pg*var(ix("w" + string(2*c - 1), nm)),
+               var(ix("u" + string(2*c), nm)), pg*var(ix("w" + string(2*c), nm)), Uc, Vc, pa, pd);
+    EQ = EQ + L2;
+    vals[ix("U" + string(c), nm)] = NU[c]; vals[ix("V" + string(c), nm)] = NV[c];
+  }
+  if (m == 3) { L2 = addeq(var(ix("U1", nm)), var(ix("V1", nm)), var(ix("u3", nm)), pg*var(ix("w3", nm)), uR, vR, pa, pd); }
+  if (m == 4) { L2 = addeq(var(ix("U1", nm)), var(ix("V1", nm)), var(ix("U2", nm)), var(ix("V2", nm)), uR, vR, pa, pd); }
+  EQ = EQ + L2;
+  writesys(nm, EQ, vals, OUTDIR + "/m" + string(m) + "_t" + string(t) + "_E2.ms",
+           "m=" + string(m) + " t=" + string(t) + " E2");
+}
+
+// ---------------------------------------------------------------- instances and systems
+intvec CV = 0; list CTOK; string tk = ""; int ii; string chh;
+for (ii = 1; ii <= size(CELLSTR); ii++)
+{
+  chh = CELLSTR[ii, 1];
+  if (chh == " ") { if (tk != "") { CTOK[size(CTOK) + 1] = tk; tk = ""; } } else { tk = tk + chh; }
+}
+if (tk != "") { CTOK[size(CTOK) + 1] = tk; }
+string INST = "# round-7 planted instances (gen7.sing, LCG seed 0xED7A1104): a=1 d=11 g=" + string(GG) + newline
+  + "# m t vR uR | w_i (v_i = g*w_i) | u_i | separators v(P_(2c-1)+P_(2c)) | node u's" + newline;
+int m; int t; int D; number zt; list U; list JS; int j; int ok; int tries; int i; int c;
+list PTS; list W; list UL; list XS; list NU; list NV; list Rp; list Pc; intvec used; number v; number u;
+for (ii = 1; ii + 1 <= size(CTOK); ii = ii + 2)
+{
+  execute("m = " + CTOK[ii] + "; t = " + CTOK[ii + 1] + ";");
+  D = 2^t; zt = number(5)^(786432 div D); U = usable(g, t);
+  ok = 0;
+  for (tries = 1; tries <= 500 and ok == 0; tries++)
+  {
+    JS = list(); kill used; intvec used; used[D div 2] = 0;
+    while (size(JS) < m)
+    {
+      j = U[rnd(size(U)) + 1];
+      if (used[(j mod (D div 2)) + 1] == 0) { used[(j mod (D div 2)) + 1] = 1; JS[size(JS) + 1] = j; }
+    }
+    PTS = list(); W = list(); UL = list();
+    for (i = 1; i <= m; i++)
+    {
+      v = g*zt^JS[i]; u = sqrtp((1 - v^2)/(a - d*v^2)); if (rnd(2) == 1) { u = -u; }
+      PTS[i] = list(u, v); if (!oncurve(PTS[i])) { die("leaf off curve"); }
+      W[i] = nint(zt^JS[i]); UL[i] = nint(u);
+    }
+    ok = 1; XS = list(); NU = list(); NV = list();
+    for (c = 1; c <= m div 2; c++)
+    {
+      Pc = eadd(PTS[2*c - 1], PTS[2*c]);
+      if (Pc[1] == 0 or Pc[2] == 0) { ok = 0; }
+      XS[c] = nint(Pc[2]); NU[c] = nint(Pc[1]); NV[c] = nint(Pc[2]);
+    }
+    if (m == 3) { Rp = eadd(eadd(PTS[1], PTS[2]), PTS[3]); }
+    if (m == 4) { Rp = eadd(eadd(PTS[1], PTS[2]), eadd(PTS[3], PTS[4])); }
+    if (Rp[1] == 0 or Rp[2] == 0) { ok = 0; }
+  }
+  if (ok == 0) { die("no plant"); }
+  string rec = string(m) + " " + string(t) + " " + string(nint(Rp[2])) + " " + string(nint(Rp[1])) + " |";
+  for (i = 1; i <= m; i++) { rec = rec + " " + string(W[i]); } rec = rec + " |";
+  for (i = 1; i <= m; i++) { rec = rec + " " + string(UL[i]); } rec = rec + " |";
+  for (c = 1; c <= m div 2; c++) { rec = rec + " " + string(XS[c]); } rec = rec + " |";
+  for (c = 1; c <= m div 2; c++) { rec = rec + " " + string(NU[c]); }
+  INST = INST + rec + newline;
+  print("instance m=" + string(m) + " t=" + string(t) + " tries=" + string(tries - 1) + ": " + rec);
+  armE1("E1", m, t, W, XS, nint(Rp[2]), S3Sstr, GG);
+  armE1("E1S", m, t, W, XS, nint(Rp[2]), S3Sstr, GG);
+  armE2(m, t, UL, W, NU, NV, nint(Rp[1]), nint(Rp[2]), GG);
+  setring r;
+}
+write(":w " + OUTDIR + "/instances7.txt", INST[1, size(INST) - 1]);
+quit;
