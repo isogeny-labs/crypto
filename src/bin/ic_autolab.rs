@@ -405,7 +405,7 @@ struct TrackFamilies {
 
 impl TrackFamilies {
     fn arm(&self, fam: &Family, n: u64) -> ArmConfig {
-        let n = n.clamp(fam.n_min.unwrap_or(self.n_min).max(self.n_min), self.n_max);
+        let n = n.clamp(fam.n_min.unwrap_or(self.n_min), self.n_max);
         ArmConfig {
             name: format!("{}-n{n}", fam.id),
             family: fam.id.clone(),
