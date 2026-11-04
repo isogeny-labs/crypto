@@ -101,7 +101,7 @@ reproduced the same omitted-scalar failure; the local copy's tracked blobs were
 compared with the original Git object identities before adding the control.
 The failed original ordering is retained, not counted as a passing test. [pcc:unverified]
 
-## Broad combined-code status before driver upload
+## Broad combined-code development checkpoint
 
 Producer status PCC-20261104-f78364 has unverified standing. The release
 library invocation reports **5,987 passed, 27 failed and 130 existing
@@ -117,7 +117,7 @@ The six remaining cases comprise four non-adapter assertions and two diagnostic
 clock failures reporting `No such file or directory`. A separate exact main
 worktree is compiling those controls; their classification remains pending.
 Current CLI debug unit tests report15 passes and1 existing ignore; integration
-and the final release build remain pending at this upload. [pcc:unverified]
+and the final release build remain pending at this development checkpoint. [pcc:unverified]
 
 First debug links ended with SIGBUS while the32GiB overlay was99%full. Removed
 only this task's reproducible compiler caches, retained the failed output and
@@ -137,3 +137,22 @@ The frozen v3 protocol hash is
 bound to source commit43ec7065133fc6727382ed744c7c86380170c984.
 `frozen-input-files.v3.sha256` names the active inputs; the original manifest
 continues to apply at its historical revision. No scientific job was launched.
+
+## Baseline comparison and cache isolation
+
+All six remaining failures reproduce on exact main2d746d05: four non-adapter
+assertions plus the same two diagnostic-clock ENOENT cases. The five implicated
+source files compare byte-identical between main and the driver.
+`main-baseline-six-controls.txt.gz`, its JSON identity record and
+`remaining-failure-source-identities.json` retain the evidence. This does not
+turn the full invocation into a pass. [pcc:unverified]
+
+The baseline build shared a release target directory and overwrote the branch's
+native library cache. A subsequent branch compile consequently saw main's
+missing metrics/options exports. Invalidated all seven active local path
+packages and started a clean branch release rebuild; do not share this target
+with another worktree again. Original and baseline binary hashes were captured
+separately before cache cleanup; original failed-case replays preceded the
+baseline overwrite. No source or frozen input changed. The redundant debug
+integration attempt was interrupted with partial output retained, to finish
+qualification under the maintained release profile. [pcc:unverified]
