@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0445Z-c25519-autolab-r12-k24",
+  "latest_record": "20261104T0509Z-c25519-autolab-r13-k20",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 9,
+    "measured": 10,
     "open": 0
   },
   "repo": "crypto",
@@ -14,10 +14,11 @@
     {
       "better": "lower",
       "first": 8.34775146090461,
-      "latest": 8.34775146090461,
+      "latest": 8.797582237547164,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 4.646848
+        "improvement_vs_first_percent": -5.3886,
+        "improvement_vs_previous_percent": -5.3886,
+        "value_over_reference": 5.556355
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -35,6 +36,22 @@
           "spread": null,
           "summary": "ic_autolab round 7, k = 20: regression; train leader ksum4-n8 costs 1.026 of the incumbent on the fresh holdout; ksum3-n11 kept",
           "value": 8.34775146090461
+        },
+        {
+          "commit": "cbbedb92c5f1",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": -5.3886,
+            "improvement_vs_previous_percent": -5.3886,
+            "value_over_reference": 5.556355
+          },
+          "n": 64,
+          "record": "20261104T0509Z-c25519-autolab-r13-k20",
+          "reference": 1.5833370403399365,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 13, k = 20: null; free-rows ksum4f-n8 0.971 [0.931, 1.012] of the incumbent, band sel < inc, interval spans 1",
+          "value": 8.797582237547164
         }
       ],
       "problem": "ic:curve25519-family-k20",

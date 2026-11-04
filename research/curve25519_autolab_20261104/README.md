@@ -110,10 +110,11 @@ cited by its claim record [pcc:unverified].
 | 10 | generic | 32 | null: `ksum4-n22` costs 0.889 [0.869, 0.910] of `ksum4-n26` at w = 0 but 1.202 at w = 1 (holdout `ECBS1h572a148f6fbf`), band unresolved; the same counted-work vs lookups trade as round 6 [pcc:unverified] | [round-010](round-010/README.md), [PDF](round-010/REPORT.pdf) |
 | 11 | generic | 24 | no challenger on 32 train targets: `ksum4-n12` 6.61, `ksum4-n10` 6.96, `ksum3-n20` 7.82, `ksum4-n14` 9.00 [pcc:unverified] | [round-011](round-011/README.md), [PDF](round-011/REPORT.pdf) |
 | 12 | generic | 24 | no challenger; tests proposal P1 (`targets=stride`): the incumbent configuration on the stride stream costs 7.41 vs 6.86 on the jump walk (1.08x), so P1's predicted 0.84 is falsified [pcc:unverified] | [round-012](round-012/README.md), [PDF](round-012/REPORT.pdf) |
+| 13 | generic | 20 | null: the first free-rows arm `ksum4f-n8` (`ksum:m=4,free=1`) costs 0.971 [0.931, 1.012] of `ksum3-n11` on holdout `ECBS1ha91af1cc9a88`, band `sel < inc`, interval spans 1; in train free rows took ksum4 at N = 8 below the incumbent (8.28 vs 9.04) and ksum5 at N = 8 to the lowest w = 1 cost (13.40) [pcc:unverified] | [round-013](round-013/README.md), [PDF](round-013/REPORT.pdf) |
 
 Claim records (AGENTS.md "Sabotage is assumed: proof-carrying claims"): round 1
 `PCC-20261104-6ca5d2`, round 2 `PCC-20261104-fa70c6`, round 3
-`PCC-20261104-31cd98`, round 4 `PCC-20261104-6c0998`, round 5 `PCC-20261104-0213f5`, round 6 `PCC-20261104-249a57`, round 7 `PCC-20261104-15a1d6`, round 8 `PCC-20261104-ff48c0`, round 10 `PCC-20261104-87cbc0`, round 11 `PCC-20261104-f74cbc`, round 12 `PCC-20261104-4afdff`, all `statement` claims with standing `unverified` until a
+`PCC-20261104-31cd98`, round 4 `PCC-20261104-6c0998`, round 5 `PCC-20261104-0213f5`, round 6 `PCC-20261104-249a57`, round 7 `PCC-20261104-15a1d6`, round 8 `PCC-20261104-ff48c0`, round 10 `PCC-20261104-87cbc0`, round 11 `PCC-20261104-f74cbc`, round 12 `PCC-20261104-4afdff`, round 13 `PCC-20261104-342ea5`, all `statement` claims with standing `unverified` until a
 second host signs a replay and a validator signs a recompute [pcc:unverified].
 
 The ledger (`ledger.json`, `history`) carries every ratchet with its delta and
