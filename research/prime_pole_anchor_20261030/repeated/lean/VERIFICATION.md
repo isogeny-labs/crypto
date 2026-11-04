@@ -33,8 +33,17 @@ Both outputs match replay.log exactly. The executable hash is recorded in
 ../binary.sha256. This is a separate rebuild and replay of the same checker,
 not an independently implemented mathematical proof or an ECDLP solve.
 
-No Rust source, manifest, lockfile or library input is changed. Those inputs
-still match aaab886ec25b8cd5a54c97ca75c916b5f7dbb0ef. The existing affected
-Rust receipt (429 passing tests and 1 default ignored across two disjoint
-filters) is reused with its exact scope, not described as a new full-suite
-run; see ../../../prime_common_kernel_20261030/receipts/ROOT-VALIDATION.md.
+This PR changes no Rust source, manifest, lockfile or library input relative
+to its main base. The pre-merge development checkout matched
+aaab886ec25b8cd5a54c97ca75c916b5f7dbb0ef and used its existing affected-area
+receipt (429 passing tests and 1 default ignored across two disjoint filters).
+After merging current main to resolve a session-log add/add conflict, that
+historical receipt is not a fresh validation of the newer upstream Rust
+inputs. No new full-library run is claimed; current-head CI remains pending.
+See ../../../prime_common_kernel_20261030/receipts/ROOT-VALIDATION.md.
+
+Current-main claim policy also applies: theorem record PCC-20261104-a2d3c8
+binds the exact Fibonacci declaration; observation record PCC-20261104-90a003
+records the producer's unit outcomes. Both have standing unverified until
+a trusted signed verdict exists. Local proof checks and replay outputs are
+producer evidence, not signed execution verification. [pcc:unverified]

@@ -16,13 +16,13 @@ statement is hidden inside this definition.
   constraint. It is not a finite arithmetic lookup certificate.
   The length is the number of required levels: a when requiring all packet
   levels, but u for the source's retained levels. Substituting a for u in
-  a claimed obstruction to that actual recursion would be unjustified.
+  a claimed obstruction to that actual recursion would be unjustified. [pcc:unverified]
 
 The written rational anchor-valuation bridge, node preservation, polynomial
 degree, optimal-schedule equality construction, Fibonacci asymptotics,
 moment identity, chart integrality and all global algorithm statements are
 NOT Lean-proved here. The native finite checks do not discharge those
-unformalized general claims.
+unformalized general claims. [pcc:unverified]
 
 Pinned Lean4.35.0, CryptoLean148f5dc389b341401e06d76abe7783c4ccf42f2e,
 Mathlibcfc55fc58714a59dc06e6e79edc6d1d95140d3c2. Transitive pins are in
@@ -35,3 +35,4 @@ after a congruence step had already solved its goal; its inferred sorryAx
 diagnostic is FAILED evidence, not an accepted proof. Its source is retained
 as attempt-003.lean.txt. Build004, actual gate, and fresh replay statuses
 are reported in VERIFICATION.md after their executions finish.
+ [pcc:unverified]

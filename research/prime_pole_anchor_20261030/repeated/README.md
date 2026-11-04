@@ -1,9 +1,15 @@
 # Repeated anchors: gains and an all-level degree cost
 
+Claim records: `PCC-20261104-a2d3c8` (exact abstract Fibonacci theorem) and
+`PCC-20261104-90a003` (producer-reported native observations). Their current
+standing is **unverified** under the newly merged main-branch claim policy;
+local Lean checks and replay are evidence, not a trusted signed verdict.
+[pcc:unverified]
+
 2026-11-04. Follow-up to the [single-anchor certificate](../README.md).
 **No novel sub-exponential prime-field ECDLP algorithm, improved exponent,
 or measured speedup is established.** This note analyzes a specified family
-of completions, not every possible H in W_base+C H.
+of completions, not every possible H in W_base+C H. [pcc:unverified]
 
 ## Sources and requested scope
 
@@ -24,7 +30,7 @@ are not claimed as new mathematics.
 | Extend the selected nonscalar jet completion | An explicit repeated-anchor family below |
 | Exact empirical validation | Fixed native development certificates in PROTOCOL.md and replay.log |
 | Full mathematical/formal certification | Written family analysis; Lean proves the abstract necessary budget only |
-| Global recursive integration and total cost | Not implemented; no timing or end-to-end claim |
+| Global recursive integration and total cost | Not implemented; no timing or end-to-end claim | [pcc:unverified]
 
 ## Repeating the odd anchor
 
@@ -41,7 +47,7 @@ This is a genuine completion: ((1-T)^k-(1-delta)^k)/(T-delta) is an integral
 polynomial. Therefore W^(k)-B is C/C'(0) times a polynomial with odd denominator.
 The source chart divisibility of C/C'(0) proves chart integrality of the
 correction. At an odd-node chart each coefficient of (1-T)^k is divisible
-by 2^k, so the sharper original odd crossing content improves by at least k.
+by 2^k, so the sharper original odd crossing content improves by at least k. [pcc:unverified]
 
 For y=y0+2j, d=T-y0+x and e=1-y0+x, the j^b coefficient is
 
@@ -60,7 +66,7 @@ odd-node multiplicity lower bound 3ML alone suffices when k<=L+1.
 Larger k requires explicit additional recovery headroom. This is a degree
 sufficiency calculation, not a completed precision or runtime audit.
 Only level zero receives this new guarantee, so even k growing with L does
-not by itself improve the recursion's worst-level asymptotic bound.
+not by itself improve the recursion's worst-level asymptotic bound. [pcc:unverified]
 
 ## Trying to gain at every level
 
@@ -149,7 +155,7 @@ For g=1, the exact minimum added degrees at L=2,4,8,16,32,64,128,256 are
 The [Lean proof map](lean/PROOF_MAP.md) distinguishes the abstract all-length
 budget theorem from the unformalized valuation-to-schedule bridge. Failed
 builds and their diagnostics are preserved. No faster ECDLP conclusion follows
-from passing those proofs or native units.
+from passing those proofs or native units. [pcc:unverified]
 
 ## Next discriminating obligation
 
@@ -160,3 +166,4 @@ degree, precision and entry costs. Fewer scalar summands or an odd-level
 valuation gain alone does not establish that factorization. The original
 two-axis common-kernel problem remains open. See the
 [problem record](../../../problems/correlated-packet-common-kernel.md).
+ [pcc:unverified]
