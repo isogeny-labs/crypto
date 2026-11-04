@@ -12,11 +12,12 @@ pooled_compare.jsonl, identity_check.json, verify/rc.txt}`.
 
 ## Headline
 
-- **The F4 winner sits 42× above its own grid limit.** On the same 22-column isogeny base, the
+- **The F4 winner sits 42× above its own grid limit at w ≥ 0.1** (at w = 0 the two are identical). On the same 22-column isogeny base, the
   exhaustive grid oracle makes the same decisions (identical trials, relations and GAE in all 32
   pairs) for 0.0238 of the F4 arm's S at w = 0.1 and 0.0236 at w = 1 (point prediction 0.0245).
 - **The generic pair table sits a further 76× below the grid at w = 0.1** (0.0131) and 356× at
-  w = 1 (0.0028). At w = 0 it costs 4.7 % more (its 506 table additions).
+  w = 1 (0.0028). At w = 0 it costs 4.7 % more: its 506 table additions, net of about 44 lift
+  additions per run that the grid and F4 arms pay and the table does not.
 - **Even the cheapest oracle on this base loses to proj-a at every weight.** With the oracle held
   fixed (pair table vs proj-a's table), S(mitm on the isogeny base)/S(proj-a) = 2.39 to 3.32. The
   22-column unprojected base, not the solver, is what keeps the algebraic track behind the
@@ -53,14 +54,19 @@ Ratios are pooled paired ratios B ÷ A with 95 % intervals (K = 16 workloads, 32
 
 - **P8.** In all 32 grid runs `pkm_grid_fp_mults_uncharged` is exactly 1,248 × `solver_calls`.
   `solver_calls` is trials minus `repeated_targets_skipped`. For example, c00 round 0 has
-  10,147,488 = 1,248 × 8,131, with 8,415 trials and 284 skipped. PROTOCOL.md §1 states the
-  quantity correctly as "1,248 per consistent system". The §4 rule used trials, which is a defect
-  in the frozen rule, found only after data. The grid's work is still priced exactly once by the
+  10,147,488 = 1,248 × 8,131, with 8,415 trials and 284 skipped. The invariant is per oracle call.
+  PROTOCOL.md §1 says "1,248 per consistent system" and §4 uses trials. The design-stage validator
+  flagged the §4 denominator at 06:55Z, before any data; the rule was left frozen and is reported
+  as failed. The grid's work is still priced exactly once by the
   band, which is what P8 was meant to check.
 - **P4.** The table arm's `oracle_setup` phase is 506 GAE as modelled. Its `relations` phase,
   however, charges 17–69 GAE fewer than the grid arm's on the same trials. That puts mitm minus
-  grid at 437–489 instead of 506 ± 2 × relations. The mechanism behind the per-relation-phase
-  difference is not established here. The ratio clauses, which carry P4's content, held.
+  grid at 437–489 instead of 506 ± 2 × relations. Mechanism (validator, from source): after the
+  grid or F4 step returns abscissae, `lift_abscissae` re-adds sign combinations on the counted
+  ledger, about 5 charged additions per relation, while the pair-table probe returns the signed
+  pair and charges 1. The predicted net is 4.0 per relation, and 3.97 ± 0.12 was measured
+  (1,422 additions over 358 relations). The same cost is in the F4 arm, which is why
+  GAE(grid) = GAE(F4) exactly. The ratio clauses, which carry P4's content, held.
 
 ## Distance remaining (pooled ratio arm ÷ rho-neg, 95 % interval)
 
@@ -78,20 +84,24 @@ w = 0.1 and 2.28× ahead at w = 0.
 
 - The solver is not the main problem at w = 0, and it is the whole problem at w > 0. At w = 0 the
   F4, grid and table arms cost the same group operations, and all three are 2.3–2.4× behind
-  proj-a. That gap belongs to the base, with 22 columns and coverage 210/r, against proj-a's
-  projected 32-column base. At w ≥ 0.1, F4 costs 42× its own grid and about 3,200× the table.
-- So no algebraic engine on this base can beat proj-a. Its floor is the w = 0 row, already 2.3×
-  behind. An improvement on the algebraic track has to change the base's coverage per column,
-  not only the solver. L12's trace replay (0.474×) closes about one fifth of the decades between
-  F4 and its grid limit.
+  proj-a. The preregistered model attributes that gap to the base, with 22 columns and coverage
+  210/r, against proj-a's projected 32-column base. This run does not isolate the cause; the
+  measured trials per relation are 650.4 against proj-a's 64.4, 10.1× against the model's 9.3×.
+  At w ≥ 0.1, F4 costs 42× its own grid, about 3,200× the table at w = 0.1 and 15,100× at w = 1.
+- So none of the three m = 2 oracles measured here on this base (t = 5, seed 1307, k = 20)
+  beats proj-a, and an oracle cannot go below the w = 0 row, already 2.3× behind. An improvement
+  on the algebraic track has to change the base's coverage per column, not only the solver.
+  Cross-lead arithmetic: L12's trace replay (0.474×, its own session) closes about one fifth of
+  the decades between F4 and its grid limit.
 
 ## Run record and deviations
 
 - Launched 06:37:02Z. The run waited behind `/tmp/crypto-bench.lock` (T11, L12) and was
   relaunched after container restarts (`data/env.txt`, two launches). Chunks c00–c07 were
-  complete before the 15:27Z restart. The chunk running then was rerun from scratch by the
-  frozen driver; its partial directory was not kept, and `interrupted/` is empty. No partial
-  chunk is cited. All 16 chunks were complete at 16:12:55Z, and `ALL_DONE` was written at
+  complete by 09:17:53Z. `driver.log` has no entry between then and the 15:29:54Z relaunch, and
+  no c08 session directory existed at the relaunch, so `interrupted/` is empty. The driver was
+  presumably killed by a container restart while c08 was starting; the logs do not establish
+  this. c08 ran from scratch after the relaunch, and no partial chunk is cited. All 16 chunks were complete at 16:12:55Z, and `ALL_DONE` was written at
   16:14:50Z.
 - From 15:29Z, L13 and T13 chunks ran at the same time as each other. S is in counted units, so
   this does not change any number; no wall-time claim is made.
@@ -107,3 +117,20 @@ w = 0.1 and 2.28× ahead at w = 0.
 (`decide.py`, `verdicts.json`). `data/ecbench/chunks/c00…c15` (sessions), `band_pooled.{txt,json}`,
 `pooled_compare.jsonl`, `identity_check.json`, `verify/cNN.{json,txt}`, `verify/rc.txt`;
 `data/SHA256SUMS`; `data/run.log`, `data/env.txt`.
+
+## Validation (2026-11-04)
+
+`validator-report.json`: **pass_with_errata**, disposition validated at `fd6a650cb2`. Band and all
+27 pooled ratio rows recomputed with independent code (agreement to 10⁻¹⁴); P1–P8 decided
+independently, with the same verdicts; 160/160 certificates; extra replays identical (c01 grid
+and mitm in both rounds; c15 all 10 runs, including both F4 runs). Errata applied above: E2 (P8
+history), E3 (P4 mechanism), E4 (scope of the proj-a claim; trials per relation 10.1×), E5
+(cross-lead arithmetic), E6 (15,100× at w = 1), E7 (net table cost at w = 0), E8 (42× at
+w ≥ 0.1), E9 (run-record gap). Disclosed here:
+- E1: `data/SHA256SUMS` verifies 158 of 161. `env.txt`, `run.log` and `run.out` each had a final
+  line appended after the sums were written and match without it; `ALL_DONE` is not listed.
+- E10: `ecbench/spec.json` was first committed at 07:13:56Z, after the freeze commit, but its
+  sha256 is pinned in the frozen PROTOCOL.md and matches. The `records.jsonl` files (about 96 KB)
+  are committed in git, as T12's are. Sessions record `git_commit` null, so the instrument is
+  bound by sha256 only. Only the final scalar is certified; relation-level certificates are not
+  exported.
