@@ -91,7 +91,14 @@ total cost rises) is caught by the band. Distance to rho,
 
 ## Rounds
 
-See `ledger.json` (`rounds`, `history`) and each `round-NNN/README.md`.
+| round | track | sizes | outcome | report |
+|--:|:--|:--|:--|:--|
+| 1 | generic | 20, 24 | no challenger at either size: the `ksum3` incumbents (N = 11, 20) beat their N neighbourhood and the `mitm2` / `mitm3` exploration arms in train | [round-001](round-001/README.md), [PDF](round-001/REPORT.pdf) |
+| 2 | generic | 20, 24 | k = 24: **improvement**, `ksum4-n12` (`ksum:m=4`, N = 12) replaces `ksum3-n20`: paired sel / inc 0.917 [0.879, 0.957] at w = 0 (0.911 at w = 0.1, 0.880 at w = 1), band `sel < inc`, A/A exactly 1, 480/480 holdout runs verified (session `ECBS1h32d89e6cb3e5`); distance to rho 6.5x -> 6.0x. k = 20: no challenger (`ksum4-n5` 3.9x worse, `ksum5-n4` exhausted on 16/16 runs, `mitm2` refinements worse) | [round-002](round-002/README.md), [PDF](round-002/REPORT.pdf) |
+
+The ledger (`ledger.json`, `history`) carries every ratchet with its delta and
+evidence; `trials` holds every arm ever measured (19 after round 2) and
+`exposures` every target seed (28).
 
 ![ratchet](ratchet.svg)
 

@@ -54,7 +54,7 @@ Classes follow the protocol's decision rule. Distance to rho is the distance rem
 | k | incumbent | since round | S (w = 0 / 0.1 / 1) | distance to rho |
 |--:|:--|--:|:--|:--|
 | 20 | `ksum3-n11` (`prime-projected-abscissa:size=11,scan_cap=176` + `ksum:m=3`) | 0 | 8.987 / 9.710 / 16.217 | 5.7x / 5.7x / 6.0x |
-| 24 | `ksum3-n20` (`prime-projected-abscissa:size=20,scan_cap=320` + `ksum:m=3`) | 0 | 7.554 / 8.173 / 13.745 | 6.5x / 6.4x / 6.2x |
+| 24 | `ksum4-n12` (`prime-projected-abscissa:size=12,scan_cap=192` + `ksum:m=4`) | 2 | 6.985 / 7.514 / 12.271 | 6.0x / 5.9x / 5.6x |
 | 28 | `mitm2-n203` (`prime-projected-abscissa:size=203,scan_cap=3248` + `mitm:negation_folded=1`) | 0 | 16.057 / 17.564 / 31.130 | 16.6x / 16.6x / 16.7x |
 | 32 | `mitm2-n512` (`prime-projected-abscissa:size=512,scan_cap=8192` + `mitm:negation_folded=1`) | 0 | 23.310 / 25.520 / 45.410 | 24.7x / 24.6x / 24.3x |
 
