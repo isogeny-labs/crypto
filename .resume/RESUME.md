@@ -43,7 +43,9 @@ root-table parity point. Kill: K4 and K5 both supported.
 4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-None. Nothing has been launched anywhere.
+Round 5 (k = 32 only), launched under benchrec: `python3 tools/benchrec.py run <record> -- ./target/release/ic_autolab ... loop --rounds 1 --track generic --sizes 32 --max-candidates 9 --cpus auto --allow-busy --replay 8`.
+Panel: ksum4 at extrapolated N = 37 and neighbours 19/26/52/74; ksum3 transfer N = 176/246; mitm-prime-batch / blocked exploration.
+Branch claude/curve25519-ic-autolab-round4 (PR #3392). After it: add-raw, metric (incumbent S at k = 32, matched rho), close the record, claim, commit.
 
 ## Stop and success conditions
 Stop: per-cell caps in the protocols; Part A stops at a given m after two
