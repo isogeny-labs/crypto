@@ -29,7 +29,7 @@ own terms.
 
 ## Evidence and uncertainty
 
-- **Observed:** `aws sts get-caller-identity` →
+- **Observed:** `scripts/checkpoint.sh push` on this branch (2026-11-04 00:43Z) → `InvalidAccessKeyId: The AWS Access Key Id you provided does not exist in our records` on `PutObject` to `s3://setec-astronomy-artifacts/checkpoints/crypto/claude__arity-completion-20261104/…`, so `checkpoint.sh gate` returns 2 and the hook blocks launchers; `aws sts get-caller-identity` →
   `InvalidClientTokenId` (2026-11-03 20:16Z and 2026-11-04 00:20Z, this
   container); `scripts/checkpoint.sh status` → `RESUME.md: NOT READY`, `last
   push: stale or none`; `artifacts.py push` of two report PDFs → `403` on
