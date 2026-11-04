@@ -46,6 +46,18 @@ the resume note pushed. The authoring container's STS call returns
    against `research/ic_next10_20261014/03-pkm-degree/results.csv` is the
    director's assessment step, as the card report says.
 
+6. **Shard stops.** `koblitz_m5_m6/run_shard.sh` records a capped cell
+   (`process_cap`) or a failed one (`process_error`) and exits 0, so a shard
+   card's exit code enforces none of the protocol's invalidation stops. The
+   m5 and m6 cards gate only on the m2 card's receipt (`status: completed`,
+   no `process_error` record); every other stop (failed positive control,
+   A/A mismatch, process-capped negative control) is the director's assessment
+   through `analyze.py` after the shard, which can only invalidate, never
+   extend, a cell.
+7. **Koblitz output directories.** Shard records go to `raw/shard<m>/`, the
+   directory the frozen `analysis_plan.inputs` and PROTOCOL.md name; the
+   write-once gates glob the same directories.
+
 ## Development smokes (not evidence)
 
 Release builds of `pkm_tower_pilot` and `n83_msweep_cell` were made in this
