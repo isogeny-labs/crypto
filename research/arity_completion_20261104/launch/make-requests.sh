@@ -8,7 +8,9 @@ set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../../.." && pwd)
 image=$(jq -er .image_uri "$here/image.json")
-rev=$(git -C "$root" rev-parse HEAD)
+# The instruments' source: the frozen commit the image binaries were built from.
+rev=$(jq -er .source_revision "$here/image.json")
+[[ "$rev" =~ ^[a-f0-9]{40}$ ]]
 kob_sha=$(jq -er .freeze.protocol_sha256 "$here/../koblitz_m5_m6/protocol.json")
 pt_sha=$(jq -er .freeze.protocol_sha256 "$here/../prime_tower_m5/protocol.json")
 stamp=${ARITY_RUN_STAMP:-20261104}

@@ -16,7 +16,7 @@ fixed CIDRs only and this container has no Docker daemon, so:
   published to `isolab/tasks` by digest with
   `taskq/deploy/eks-karpenter/oci-layer-publish.py` (no daemon). Receipt:
   `image.json`.
-- **Jobs** (`make-requests.sh` writes `request-*.json`):
+- **Jobs** (`make-requests.sh` writes `request-*.json`; `provenance.source_revision` is the image's source commit from `image.json`, the frozen 4fa25efc0e, not the launching checkout):
 
 | job | command | pool | cpu / memory | deadline | what |
 |---|---|---|---|---|---|
