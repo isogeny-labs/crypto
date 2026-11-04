@@ -43,7 +43,7 @@ root-table parity point. Kill: K4 and K5 both supported.
 4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-Round 24 (k = 24, C = 2 boxes, R2) under benchrec record in scratchpad rec24, PR #3404.
+Round 25 (k = 20, C = 2 boxes, R2) done: wsum2-b15-n2 ratchets k = 20 (0.895), claim PCC-20261104-f461bc, record closed. Next: decide round 26 (all four sizes now C = 2 incumbents; the C = 2 floor is about 1.875x rho).
 Panel: ksum4 at extrapolated N = 37 and neighbours 19/26/52/74; ksum3 transfer N = 176/246; mitm-prime-batch / blocked exploration.
 Branch claude/curve25519-ic-autolab-round4 (PR #3392). After it: add-raw, metric (incumbent S at k = 32, matched rho), close the record, claim, commit.
 

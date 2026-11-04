@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0755Z-c25519-autolab-r24-k24",
+  "latest_record": "20261104T0756Z-c25519-autolab-r25-k20",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 21,
+    "measured": 22,
     "open": 0
   },
   "repo": "crypto",
@@ -14,11 +14,11 @@
     {
       "better": "lower",
       "first": 8.34775146090461,
-      "latest": 5.489,
+      "latest": 4.859837469057013,
       "latest_derived": {
-        "improvement_vs_first_percent": 34.2458,
-        "improvement_vs_previous_percent": -1.9504,
-        "value_over_reference": 3.734014
+        "improvement_vs_first_percent": 41.7827,
+        "improvement_vs_previous_percent": 11.4622,
+        "value_over_reference": 3.235618
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -84,6 +84,22 @@
           "spread": null,
           "summary": "ic_autolab round 21, k = 20 train screen: no challenger; wsum-b5-n3 is the box optimum (B = 8 at 9.47)",
           "value": 5.489
+        },
+        {
+          "commit": "59a8d6377c9a",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 41.7827,
+            "improvement_vs_previous_percent": 11.4622,
+            "value_over_reference": 3.235618
+          },
+          "n": 64,
+          "record": "20261104T0756Z-c25519-autolab-r25-k20",
+          "reference": 1.501980994621884,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 25, k = 20: C = 2 box (B = 15) S(w=0) 4.86 vs incumbent 5.43, matched rho 1.50; at the BSGS boundary, classification pending",
+          "value": 4.859837469057013
         }
       ],
       "problem": "ic:curve25519-family-k20",
