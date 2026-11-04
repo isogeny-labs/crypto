@@ -97,3 +97,11 @@ Branch on the quadratic character of each separator, adding X_c = n_j·z_c² wit
   - Improvement only if the widest matrix is also below T's (≥ 999,374 cut off).
   - D_RR ≥ 9 means no gain at m = 5.
   - Cut off again: undecided.
+
+## Round 7e: E1Q at m4 t5 (written before the run)
+- Edwards 2-torsion-quotient tree, input round7_edwards m4_t5_E1Q.ms (sha256 5592ad57…f099).
+- Runs alone after RR m5 t4 exits, with a 13 GiB cap and 7,200 s.
+- Reading:
+  - D_E1Q(4,5) finishes ≤ 6 (T and E1 are ≥ 7 there): the excess stays at least 1 below T at m = 4 as t grows.
+  - D = 7: the quotient's gain at m = 4 vanishes at t = 5.
+  - Cut off again: undecided.
