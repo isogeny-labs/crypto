@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# Any AWS-authenticated harness can use this; no Kubernetes network route needed.
+# Like launch-remote, but for isolab.eks.command-request/v1 (submit one command
+# Job, bounded wait) and isolab.eks.command-status/v1 (read one Job's state).
+# The matching script (run-command or status-command) is uploaded by sha256 and
+# executed by the deployed launcher through current-run-request-buildspec.yml.
+set -euo pipefail
+[[ $# == 1 ]] || { echo 'Usage: launch-remote-command REQUEST.json' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+: "${ISOLAB_BUCKET:?}" "${ISOLAB_CODEBUILD_PROJECT:?}" "${AWS_REGION:?}"
+output=${ISOLAB_CLIENT_OUTPUT:-isolab-launch-output}
+mkdir -p "$output"
+schema=$(jq -r .schema "$1")
+case "$schema" in
+  isolab.eks.command-request/v1) run_request="$here/run-command"; wait_seconds=$(jq -r '.job.wait_seconds // 0' "$1") ;;
+  isolab.eks.command-status/v1)  run_request="$here/status-command"; wait_seconds=0 ;;
+  *) echo "Unsupported request schema: $schema" >&2; exit 2 ;;
+esac
+jq -S . "$1" > "$output/request.json"
+digest=$(sha256sum "$output/request.json" | cut -d ' ' -f1)
+key="inputs/requests/$digest.json"
+aws s3 cp "$output/request.json" "s3://$ISOLAB_BUCKET/$key" --only-show-errors
+buildspec="$here/current-run-request-buildspec.yml"
+run_request_sha=$(sha256sum "$run_request" | cut -d ' ' -f1)
+buildspec_sha=$(sha256sum "$buildspec" | cut -d ' ' -f1)
+aws s3 cp "$run_request" "s3://$ISOLAB_BUCKET/inputs/requests/$run_request_sha.run-request" --only-show-errors
+aws s3 cp "$buildspec" "s3://$ISOLAB_BUCKET/inputs/requests/$buildspec_sha.buildspec.yml" --only-show-errors
+buildspec_arn="arn:aws:s3:::$ISOLAB_BUCKET/inputs/requests/$buildspec_sha.buildspec.yml"
+# A status read may repeat; a submission must not: the token binds request, script and buildspec,
+# and for status requests also the minute of the call.
+salt=''
+[[ "$schema" == isolab.eks.command-status/v1 ]] && salt=$(date -u +%Y%m%d%H%M)
+token=$(printf '%s\n%s\n%s\n%s\n' "$digest" "$run_request_sha" "$buildspec_sha" "$salt" | sha256sum | cut -d ' ' -f1)
+timeout_minutes=$(( (wait_seconds + 59) / 60 + 20 ))
+(( timeout_minutes > 100 )) && timeout_minutes=100
+jq -n --arg project "$ISOLAB_CODEBUILD_PROJECT" --arg key "$key" --arg token "$token" \
+  --arg run_request_sha "$run_request_sha" --arg buildspec "$buildspec_arn" --argjson minutes "$timeout_minutes" \
+  '{projectName:$project,idempotencyToken:$token,timeoutInMinutesOverride:$minutes,
+    buildspecOverride:$buildspec,environmentVariablesOverride:[
+      {name:"ISOLAB_REQUEST_KEY",value:$key,type:"PLAINTEXT"},
+      {name:"ISOLAB_RUN_REQUEST_SHA256",value:$run_request_sha,type:"PLAINTEXT"}]}' \
+  > "$output/start-request.json"
+# Do not retry an ambiguous StartBuild failure automatically. Inspect by job name.
+aws codebuild start-build --cli-input-json "file://$output/start-request.json" > "$output/build-start.json"
+build_id=$(jq -er .build.id "$output/build-start.json")
+printf 'Launcher: %s\n' "$build_id"
+deadline=$((SECONDS + wait_seconds + 1500))
+while (( SECONDS < deadline )); do
+  aws codebuild batch-get-builds --ids "$build_id" > "$output/build.json"
+  status=$(jq -er '.builds[0].buildStatus' "$output/build.json")
+  [[ "$status" != IN_PROGRESS ]] && break
+  sleep 15
+done
+job=$(jq -r '.job.job_name // .job_name' "$output/request.json")
+launch_id=${build_id##*:}
+uri="s3://$ISOLAB_BUCKET/runs/$job/launcher/$launch_id/"
+printf 'Launcher receipts: %s\n' "$uri"
+aws s3 cp "${uri}result.json" "$output/result.json" --only-show-errors \
+  || { echo 'No final receipt; inspect the saved build status and CloudWatch logs' >&2; exit 25; }
+cat "$output/result.json"
+[[ "$status" == SUCCEEDED ]] || exit 26
+jq -e --arg digest "$digest" '.request_sha256==$digest' "$output/result.json" >/dev/null
+case "$schema" in
+  isolab.eks.command-request/v1)
+    jq -e --slurpfile request "$output/request.json" '
+      (.state=="submitted" or .state=="active" or .state=="succeeded") and .job_name==$request[0].job.job_name
+      and (.job_uid|length)>0' "$output/result.json" >/dev/null ;;
+  *) jq -e '.state!="launcher_failed"' "$output/result.json" >/dev/null ;;
+esac

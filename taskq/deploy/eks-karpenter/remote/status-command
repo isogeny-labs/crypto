@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Runs inside the VPC launcher (CodeBuild) for an isolab.eks.command-status/v1
+# request: reads one Job's state, pods, events and log tails, lists its S3
+# result prefix, and uploads the receipt. Read-only; self-contained.
+set -euo pipefail
+: "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${AWS_REGION:?}" "${ISOLAB_REQUEST_KEY:?}"
+[[ "$ISOLAB_REQUEST_KEY" =~ ^inputs/requests/([a-f0-9]{64})\.json$ ]] || { echo 'Invalid request key' >&2; exit 2; }
+request_hash=${BASH_REMATCH[1]}
+receipt_dir=$(mktemp -d)
+aws s3 cp "s3://$ISOLAB_BUCKET/$ISOLAB_REQUEST_KEY" "$receipt_dir/request.json" --only-show-errors
+printf '%s  %s\n' "$request_hash" "$receipt_dir/request.json" | sha256sum -c - >/dev/null
+jq -e 'type=="object" and (keys-["schema","job_name","log_tail_lines"]|length)==0
+  and .schema=="isolab.eks.command-status/v1"
+  and (.job_name|type)=="string" and (.job_name|test("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")) and (.job_name|length)<=55
+  and ((.log_tail_lines // 200)|IN(range(1;5001)))' "$receipt_dir/request.json" >/dev/null \
+  || { echo 'Invalid isolab.eks.command-status/v1 request' >&2; exit 2; }
+job=$(jq -r .job_name "$receipt_dir/request.json")
+tail_lines=$(jq -r '.log_tail_lines // 200' "$receipt_dir/request.json")
+launch_id=${CODEBUILD_BUILD_ID:-local-$(date -u +%Y%m%dT%H%M%SZ)}
+launch_id=${launch_id##*:}
+receipt_uri="s3://$ISOLAB_BUCKET/runs/$job/launcher/$launch_id/"
+state=launcher_failed job_uid=''
+finish() {
+  exit_code=$?
+  trap - EXIT
+  set +e
+  jq -n --arg state "$state" --arg job "$job" --arg job_uid "$job_uid" --arg receipts "$receipt_uri" \
+    --arg request_sha256 "$request_hash" --arg launcher "${CODEBUILD_BUILD_ID:-local}" --argjson exit_code "$exit_code" \
+    --slurpfile pods <(jq -c '[.items[]? | {name:.metadata.name,uid:.metadata.uid,phase:.status.phase,node:.spec.nodeName,
+        started:.status.startTime,exit_code:(.status.containerStatuses[0].state.terminated.exitCode // null),
+        reason:(.status.containerStatuses[0].state.terminated.reason // .status.containerStatuses[0].state.waiting.reason // null)}]' \
+        "$receipt_dir/pods.json" 2>/dev/null || echo '[]') \
+    --slurpfile objects <(jq -c '[.Contents[]? | {key:.Key,size:.Size,modified:.LastModified}]' "$receipt_dir/objects.json" 2>/dev/null || echo '[]') \
+    '{schema:"isolab.eks.command-status-result/v1",state:$state,job_name:$job,job_uid:$job_uid,pods:$pods[0],
+      results_objects:$objects[0],receipt_uri:$receipts,request_sha256:$request_sha256,launcher:$launcher,exit_code:$exit_code}' \
+    > "$receipt_dir/result.json"
+  if ! aws s3 cp "$receipt_dir/" "$receipt_uri" --recursive --only-show-errors; then exit 91; fi
+  cat "$receipt_dir/result.json"
+  exit "$exit_code"
+}
+trap finish EXIT
+export KUBECONFIG="$receipt_dir/../kubeconfig-$launch_id"
+aws eks update-kubeconfig --name "$ISOLAB_CLUSTER" --region "$AWS_REGION" --alias isolab --kubeconfig "$KUBECONFIG" > "$receipt_dir/kubeconfig-setup.log"
+kube=(kubectl --kubeconfig "$KUBECONFIG" --context isolab -n isolab --request-timeout=30s)
+aws s3api list-objects-v2 --bucket "$ISOLAB_BUCKET" --prefix "runs/$job/" --max-keys 1000 --output json > "$receipt_dir/objects.json" || echo '{}' > "$receipt_dir/objects.json"
+if ! "${kube[@]}" get job "$job" -o json > "$receipt_dir/job.json" 2> "$receipt_dir/job.stderr"; then
+  state=missing; exit 0
+fi
+job_uid=$(jq -r .metadata.uid "$receipt_dir/job.json")
+"${kube[@]}" get pods -l "job-name=$job" -o json > "$receipt_dir/pods.json" 2>/dev/null || echo '{"items":[]}' > "$receipt_dir/pods.json"
+"${kube[@]}" get events --field-selector "involvedObject.name=$job" -o json > "$receipt_dir/events-job.json" 2>/dev/null || true
+for pod in $(jq -r '.items[].metadata.name' "$receipt_dir/pods.json"); do
+  "${kube[@]}" get events --field-selector "involvedObject.name=$pod" -o json > "$receipt_dir/events-$pod.json" 2>/dev/null || true
+  "${kube[@]}" logs "$pod" --tail="$tail_lines" > "$receipt_dir/logs-$pod.txt" 2>&1 || true
+done
+if jq -e '.status.conditions[]? | select(.type=="Complete" and .status=="True")' "$receipt_dir/job.json" >/dev/null; then state=succeeded
+elif jq -e '.status.conditions[]? | select(.type=="Failed" and .status=="True")' "$receipt_dir/job.json" >/dev/null; then state=failed
+elif jq -e '(.status.active // 0) > 0' "$receipt_dir/job.json" >/dev/null; then state=active
+else state=pending; fi
+exit 0

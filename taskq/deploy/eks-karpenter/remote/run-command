@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# Runs inside the VPC launcher (CodeBuild), fetched by sha256 through
+# current-run-request-buildspec.yml like run-request. Submits ONE command Job
+# (isolab.eks.command-request/v1) to the isolab namespace through bin/submit-job
+# and records its identity; waits at most job.wait_seconds for a terminal state.
+# A long experiment is therefore observed later with status-command and its
+# S3 results, not from this bounded launcher. Self-contained on purpose: the
+# deployed launcher zip does not carry this file.
+set -euo pipefail
+here=$(cd "$(dirname "$0")" && pwd)
+: "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${AWS_REGION:?}" "${ISOLAB_REQUEST_KEY:?}"
+repository=${ISOLAB_IMAGE_REPOSITORY:-104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks}
+[[ "$ISOLAB_REQUEST_KEY" =~ ^inputs/requests/([a-f0-9]{64})\.json$ ]] || { echo 'Invalid request key' >&2; exit 2; }
+request_hash=${BASH_REMATCH[1]}
+receipt_dir=$(mktemp -d)
+aws s3 cp "s3://$ISOLAB_BUCKET/$ISOLAB_REQUEST_KEY" "$receipt_dir/request.json" --only-show-errors
+printf '%s  %s\n' "$request_hash" "$receipt_dir/request.json" | sha256sum -c - >/dev/null
+[[ $(wc -c < "$receipt_dir/request.json") -le 65536 ]]
+jq -e --arg repository "$repository" '
+  type=="object" and (keys-["schema","job","provenance"]|length)==0
+  and .schema=="isolab.eks.command-request/v1"
+  and (.job|type)=="object"
+  and (.job|keys-["job_name","image","command","cpu","memory","seconds","isolation_profile","instance_type","retries","wait_seconds"]|length)==0
+  and (.job.job_name|type)=="string" and (.job.job_name|test("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")) and (.job.job_name|length)<=55
+  and (.job.image|type)=="string" and (.job.image|split("@sha256:")[0])==$repository
+  and (.job.image|length)==($repository|length)+72 and (.job.image|test("@sha256:[a-f0-9]{64}$"))
+  and (.job.command|type)=="array" and (.job.command|length)>=1 and (.job.command|length)<=256
+  and all(.job.command[]; type=="string" and length>=1 and length<=8192 and ((test("[\n\r]") or contains("\u0000"))|not))
+  and ((.job.cpu // 2)|IN(2,4,6,8,10,12,14,16,18,20,22,24,26,28))
+  and ((.job.memory // "4Gi")|type)=="string" and ((.job.memory // "4Gi")|test("^[1-9][0-9]*(Mi|Gi)$"))
+  and ((.job.seconds // 3600)|type)=="number" and ((.job.seconds // 3600)|floor)==(.job.seconds // 3600)
+  and (.job.seconds // 3600)>=1 and (.job.seconds // 3600)<=604800
+  and ((.job.isolation_profile // "standard")|IN("standard","l2"))
+  and ((.job.instance_type // "")|type)=="string" and ((.job.instance_type // "")|test("^$|^[a-z][a-z0-9-]*\\.[a-z0-9]+$"))
+  and ((.job.retries // 0)==0)
+  and ((.job.wait_seconds // 0)|type)=="number" and ((.job.wait_seconds // 0)|floor)==(.job.wait_seconds // 0)
+  and (.job.wait_seconds // 0)>=0 and (.job.wait_seconds // 0)<=3000
+  and (.provenance|type)=="object"
+  and (.provenance|keys-["harness","source_revision","study","protocol_sha256","note"]|length)==0
+  and (.provenance.source_revision|type)=="string" and (.provenance.source_revision|test("^[a-f0-9]{40}$"))
+  and all(.provenance[]; type=="string" and length<=2048)
+' "$receipt_dir/request.json" >/dev/null || { echo 'Invalid isolab.eks.command-request/v1 request' >&2; exit 2; }
+job=$(jq -r .job.job_name "$receipt_dir/request.json")
+launch_id=${CODEBUILD_BUILD_ID:-local-$(date -u +%Y%m%dT%H%M%SZ)}
+launch_id=${launch_id##*:}
+receipt_uri="s3://$ISOLAB_BUCKET/runs/$job/launcher/$launch_id/"
+job_uid='' state=launcher_failed manifest_sha=''
+finish() {
+  exit_code=$?
+  trap - EXIT
+  set +e
+  jq -n --arg state "$state" --arg job "$job" --arg job_uid "$job_uid" --arg receipts "$receipt_uri" \
+    --arg request_sha256 "$request_hash" --arg launcher "${CODEBUILD_BUILD_ID:-local}" \
+    --arg manifest_sha256 "$manifest_sha" --arg results_prefix "s3://$ISOLAB_BUCKET/runs/$job/" \
+    --argjson exit_code "$exit_code" \
+    --slurpfile pods <(jq -c '[.items[]? | {uid:.metadata.uid,phase:.status.phase,node:.spec.nodeName,
+        exit_code:(.status.containerStatuses[0].state.terminated.exitCode // null)}]' "$receipt_dir/pods.json" 2>/dev/null || echo '[]') \
+    '{schema:"isolab.eks.command-result/v1",state:$state,job_name:$job,job_uid:$job_uid,pods:$pods[0],
+      results_prefix:$results_prefix,receipt_uri:$receipts,request_sha256:$request_sha256,
+      manifest_sha256:$manifest_sha256,launcher:$launcher,exit_code:$exit_code}' > "$receipt_dir/result.json"
+  if ! aws s3 cp "$receipt_dir/" "$receipt_uri" --recursive --only-show-errors; then exit 91; fi
+  cat "$receipt_dir/result.json"
+  exit "$exit_code"
+}
+trap finish EXIT
+export KUBECONFIG="$receipt_dir/../kubeconfig-$launch_id"
+export ISOLAB_KUBE_CONTEXT=isolab
+aws eks update-kubeconfig --name "$ISOLAB_CLUSTER" --region "$AWS_REGION" --alias "$ISOLAB_KUBE_CONTEXT" \
+  --kubeconfig "$KUBECONFIG" > "$receipt_dir/kubeconfig-setup.log"
+"$here/check-ready" > "$receipt_dir/readiness.json"
+kube=(kubectl --kubeconfig "$KUBECONFIG" --context "$ISOLAB_KUBE_CONTEXT" -n isolab --request-timeout=30s)
+# Write-once by name: an existing Job of this name is never replaced or retried here.
+if "${kube[@]}" get job "$job" -o json > "$receipt_dir/existing-job.json" 2>/dev/null; then
+  state=job_exists; exit 27
+fi
+rm -f "$receipt_dir/existing-job.json"
+mapfile -t command < <(jq -r '.job.command[]' "$receipt_dir/request.json")
+args=(--image "$(jq -r .job.image "$receipt_dir/request.json")" --name "$job"
+      --cpu "$(jq -r '.job.cpu // 2' "$receipt_dir/request.json")"
+      --memory "$(jq -r '.job.memory // "4Gi"' "$receipt_dir/request.json")"
+      --seconds "$(jq -r '.job.seconds // 3600' "$receipt_dir/request.json")" --retries 0
+      --isolation-profile "$(jq -r '.job.isolation_profile // "standard"' "$receipt_dir/request.json")")
+instance_type=$(jq -r '.job.instance_type // ""' "$receipt_dir/request.json")
+[[ -n "$instance_type" ]] && args+=(--instance-type "$instance_type")
+submit-job "${args[@]}" --dry-run -- "${command[@]}" > "$receipt_dir/manifest.json"
+manifest_sha=$(sha256sum "$receipt_dir/manifest.json" | cut -d ' ' -f1)
+"${kube[@]}" create -f "$receipt_dir/manifest.json" -o json > "$receipt_dir/job.json"
+job_uid=$(jq -er .metadata.uid "$receipt_dir/job.json")
+state=submitted
+wait_seconds=$(jq -r '.job.wait_seconds // 0' "$receipt_dir/request.json")
+deadline=$((SECONDS + wait_seconds))
+while (( SECONDS < deadline )); do
+  "${kube[@]}" get job "$job" -o json > "$receipt_dir/status.json"
+  [[ $(jq -r .metadata.uid "$receipt_dir/status.json") == "$job_uid" ]] || { state=identity_mismatch; exit 21; }
+  if jq -e '.status.conditions[]? | select(.type=="Complete" and .status=="True")' "$receipt_dir/status.json" >/dev/null; then state=succeeded; break; fi
+  if jq -e '.status.conditions[]? | select(.type=="Failed" and .status=="True")' "$receipt_dir/status.json" >/dev/null; then state=failed; break; fi
+  state=active
+  sleep 15
+done
+"${kube[@]}" get pods -l "job-name=$job" -o json > "$receipt_dir/pods.json" 2>/dev/null || echo '{"items":[]}' > "$receipt_dir/pods.json"
+"${kube[@]}" get events --field-selector "involvedObject.kind=Job,involvedObject.name=$job" -o json > "$receipt_dir/events.json" 2>/dev/null || true
+if [[ "$state" == succeeded || "$state" == failed ]]; then
+  for pod in $(jq -r '.items[].metadata.name' "$receipt_dir/pods.json"); do
+    "${kube[@]}" logs "$pod" --tail=400 > "$receipt_dir/logs-$pod.txt" 2>&1 || true
+  done
+fi
+[[ "$state" == submitted || "$state" == active || "$state" == succeeded ]]
