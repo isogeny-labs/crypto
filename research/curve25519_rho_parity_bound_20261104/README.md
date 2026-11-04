@@ -65,6 +65,10 @@ convergence near 1.8× rho: it is the F = 2 collision floor, not an implementati
   must hold across the band (AGENTS.md §5a). The best such oracle measured here, F4 with trace replay
   on the t = 4 isogeny base (T13), is 1.83·10⁴× behind rho at w = 0.1. Its modelled cost scales as
   r^1.03 against rho's r^0.5 (L10), so the gap widens with curve size.
+- **Algebraic oracles, screened.** [ALGEBRAIC_SCREEN.md](ALGEBRAIC_SCREEN.md) puts every known
+  family against this budget at k = 20. The smallest gap is an m = 2 full-coverage base of 256
+  points with one root-find per base point: 265× at w = 0.1 and 1.6·10³× at w = 1. Parity would
+  need about 3 native operations per trial at w = 1 [pcc:unverified].
 - **Structure.** The autolab's structure search (`curve25519_autolab_20261104/ideas/STRUCTURE-R4.md`)
   found that every structure of these curves either helps rho equally, acts outside the order-r
   subgroup, or is priced as native work.
