@@ -30,6 +30,19 @@ by a new request whose command carries the lost pod's prefix as the resume
 argument; `run_shard.sh` and `job-prime-tower.sh` skip records that exist
 (the protocols allow infrastructure retries only).
 
+## Source identity of the instruments
+
+The binaries in the image are built from the **frozen commit 4fa25efc0e**
+(the Koblitz freeze; the prime-tower freeze 1fd6ece55f has identical
+`src/`, `examples/` and `Cargo.*`) in a detached worktree, not from `main`:
+after the freezes, `main` changed `examples/n83_msweep_cell.rs` and the IC
+framework (babdb87aa2 "Feed the degree-of-regularity forecaster from
+ic.pipeline and n83_msweep_cell", and others), so a `main` build is not the
+frozen instrument. `image.json` and `/opt/study/build-info.json` in the image
+record the source commit and both binary sha256s; a first image built from
+`main` 91a3524dfd (tag `arity-20261104-6ee6a1df26be`) was superseded for this
+reason and is not used.
+
 ## Deviations recorded before launch (no frozen file changes)
 
 1. **No L2 admission for command Jobs.** The ecbench path's L2 gate, native
