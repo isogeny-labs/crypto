@@ -288,6 +288,12 @@
       "source": "round-013/holdout",
       "target_seed": 2026123920,
       "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "round-014/train",
+      "target_seed": 2026124428,
+      "targets": 32
     }
   ],
   "family": "curve25519",
@@ -559,6 +565,15 @@
       "round": 13,
       "sizes": [
         20
+      ],
+      "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-014",
+      "round": 14,
+      "sizes": [
+        28
       ],
       "status": "ratcheted",
       "track": "generic"
@@ -3136,7 +3151,178 @@
       "stage": "holdout",
       "status": "null",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+        "family": "ksum4",
+        "n": 22,
+        "name": "ksum4-n22",
+        "oracle": "ksum:m=4"
+      },
+      "round": 14,
+      "s": [
+        12.653667934821167,
+        12.885915729148486,
+        14.97614587809441
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+        "family": "ksum4",
+        "n": 13,
+        "name": "ksum4-n13",
+        "oracle": "ksum:m=4"
+      },
+      "round": 14,
+      "s": [
+        8.719920850465495,
+        10.137560523915457,
+        22.896317584965118
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=9,scan_cap=144",
+        "family": "ksum4",
+        "n": 9,
+        "name": "ksum4-n9",
+        "oracle": "ksum:m=4"
+      },
+      "round": 14,
+      "s": [
+        30.305536052527984,
+        36.22256898239954,
+        89.47586535124354
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=36,scan_cap=576",
+        "family": "ksum4",
+        "n": 36,
+        "name": "ksum4-n36",
+        "oracle": "ksum:m=4"
+      },
+      "round": 14,
+      "s": [
+        87.17295874524035,
+        87.28299626939548,
+        88.27333398679166
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=26,scan_cap=416",
+        "family": "ksum3",
+        "n": 26,
+        "name": "ksum3-n26",
+        "oracle": "ksum:m=3"
+      },
+      "round": 14,
+      "s": [
+        9.258558792879734,
+        10.636000083216313,
+        23.032971696245525
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=36,scan_cap=576",
+        "family": "ksum3",
+        "n": 36,
+        "name": "ksum3-n36",
+        "oracle": "ksum:m=3"
+      },
+      "round": 14,
+      "s": [
+        8.876076170188927,
+        9.550282305969443,
+        15.61813752799409
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=30,scan_cap=480",
+        "family": "ksum3f",
+        "n": 30,
+        "name": "ksum3f-n30",
+        "oracle": "ksum:m=3,free=1"
+      },
+      "round": 14,
+      "s": [
+        8.20760819081805,
+        9.174410673858702,
+        17.87563302122455
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+        "family": "ksum5f",
+        "n": 16,
+        "name": "ksum5f-n16",
+        "oracle": "ksum:m=5,free=1"
+      },
+      "round": 14,
+      "s": [
+        15.922129809648661,
+        16.06811860726097,
+        17.382017785771723
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+        "family": "ksum4f",
+        "n": 18,
+        "name": "ksum4f-n18",
+        "oracle": "ksum:m=4,free=1"
+      },
+      "round": 14,
+      "s": [
+        7.3296869831713005,
+        7.772059084704043,
+        11.753407998498739
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-04T05:10:24Z"
+  "updated": "2026-11-04T05:12:07Z"
 }
