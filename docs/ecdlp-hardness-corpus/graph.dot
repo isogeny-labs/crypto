@@ -83,6 +83,8 @@ digraph ecdlp_claims {
     "ASM-PA-FS-CHALLENGE-INDEPENDENCE" [label="ASM-PA-FS-CHALLENGE-INDEPENDENCE\\nFiat-Shamir-derived batching challenges act as independent uniform challenges", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
     "ASM-XEDNI-HAZARD-RECURRENCE" [label="ASM-XEDNI-HAZARD-RECURRENCE\\nAdaptive xedni trials satisfy a history-uniform conditional-hazard recurrence", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
     "ASM-XEDNI-TRIAL-MARGINAL" [label="ASM-XEDNI-TRIAL-MARGINAL\\nEach adaptive xedni trial, as run, succeeds with marginal probability O(1/p)", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
+    "CLAIM-PA-SS-IMPLIES-FS" [label="CLAIM-PA-SS-IMPLIES-FS\\n'Special soundness implies Fiat-Shamir security'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CLAIM-PA-AMBIENT-BLINDING" [label="CLAIM-PA-AMBIENT-BLINDING\\n'Blinding by any group element preserves a subgroup DLP instance'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
   }
   subgraph cluster_bounds {
     label="Rigorous model bounds and structural theorems"; color="#cad5df"; style="rounded";
@@ -311,6 +313,16 @@ digraph ecdlp_claims {
     "CLAIM-MARGINAL-IMPLIES-HAZARD" [label="CLAIM-MARGINAL-IMPLIES-HAZARD\\n'Per-trial success bounds give the conditional-hazard recurrence'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "CEX-HAZARD-SEPARATION" [label="CEX-HAZARD-SEPARATION\\nThree-point model: marginals <= 1/3, hazard recurrence fails (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-SD-DEGREE2-CRITERION" [label="THM-SD-DEGREE2-CRITERION\\nSolving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-NAGAO-LEMMA4-LITERAL-INSIDE" [label="THM-NAGAO-LEMMA4-LITERAL-INSIDE\\nNagao Lemma 4 holds in the literal >=, field-equations-inside cell (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CEX-PA-ZERO-HASH-FORGERY" [label="CEX-PA-ZERO-HASH-FORGERY\\nConstant-zero challenge: (sP, 0, s) verifies for every key (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING" [label="CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING\\n'Pedersen commitments with independent generators are binding unconditionally'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-PA-PEDERSEN-ALTERNATE-OPENING" [label="CEX-PA-PEDERSEN-ALTERNATE-OPENING\\nH = tG gives commit(m, r) = commit(m + t, r - 1) (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP" [label="CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP\\n'Cofactor clearing maps onto the prime subgroup bijectively'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-PA-COFACTOR-ZMOD9" [label="CEX-PA-COFACTOR-ZMOD9\\nIn Z/9, cofactor 3 kills the order-3 subgroup; coprime cofactors are bijective (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-PA-PAIRING-DECIDES-DDH" [label="THM-PA-PAIRING-DECIDES-DDH\\nA nondegenerate pairing decides DDH with one evaluation (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CEX-PA-AMBIENT-BLINDING" [label="CEX-PA-AMBIENT-BLINDING\\nAmbient blinding leaves the subgroup; subgroup blinding is a bijection (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-PA-ZK-IMPLIES-SOUND" [label="CLAIM-PA-ZK-IMPLIES-SOUND\\n'Complete, zero-knowledge protocols are sound'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-PA-ALWAYS-ACCEPT" [label="CEX-PA-ALWAYS-ACCEPT\\nAlways-accept protocol: complete, simulatable, unsound (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -601,6 +613,7 @@ digraph ecdlp_claims {
     "GAP-PA-FULL-KZG-GROTH-PLONK" [label="GAP-PA-FULL-KZG-GROTH-PLONK\\nEnd-to-end KZG, Groth16 and PLONK", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PA-CURVE-SELECTION" [label="GAP-PA-CURVE-SELECTION\\nCurve-selection assumptions with exact curve and subgroup identities", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PQ2-M2-RANK-CENSUS" [label="GAP-PQ2-M2-RANK-CENSUS\\nDoes r2 < k hold on m = 2 descended S_3 instances for infinitely many n?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PF-TRACE-PULLBACK-FACTOR-BASE" [label="GAP-PF-TRACE-PULLBACK-FACTOR-BASE\\nCan a trace-pulled-back subspace factor base be small?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -1555,4 +1568,21 @@ digraph ecdlp_claims {
   "THM-SD-DEGREE2-CRITERION" -> "HEUR-GB-PQ-ASSUMPTION-2" [label="qualifies", color="#66788a", style="dashed"];
   "THM-SD-DEGREE2-CRITERION" -> "HEUR-FIRST-FALL-DEGREE" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-PQ2-M2-RANK-CENSUS" -> "HEUR-GB-PQ-ASSUMPTION-2" [label="leaves_open", color="#66788a", style="dashed"];
+  "THM-NAGAO-LEMMA4-LITERAL-INSIDE" -> "CLAIM-NAGAO-LEMMA4" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-ZERO-HASH-FORGERY" -> "CLAIM-PA-SS-IMPLIES-FS" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-ZERO-HASH-FORGERY" -> "GAP-PA-FS-ZERO-HASH" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-ZERO-HASH-FORGERY" -> "RED-SCHNORR-ROM" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-PEDERSEN-ALTERNATE-OPENING" -> "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-PEDERSEN-ALTERNATE-OPENING" -> "GAP-PA-PEDERSEN-RELATION" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-COFACTOR-ZMOD9" -> "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-COFACTOR-ZMOD9" -> "GAP-PA-COFACTOR" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-COFACTOR-ZMOD9" -> "DEF-SUBGROUP-COFACTOR" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-PA-PAIRING-DECIDES-DDH" -> "GAP-PA-DLP-CDH-DDH-DIRECTION" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-PA-PAIRING-DECIDES-DDH" -> "RED-PAIRING-CO-DDH" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-AMBIENT-BLINDING" -> "CLAIM-PA-AMBIENT-BLINDING" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-AMBIENT-BLINDING" -> "THEOREM-RANDOM-SELF-REDUCTION" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-AMBIENT-BLINDING" -> "GAP-PA-RSR-EXACT-SUBGROUP" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-PA-ALWAYS-ACCEPT" -> "CLAIM-PA-ZK-IMPLIES-SOUND" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-PA-ALWAYS-ACCEPT" -> "GAP-PA-ZK-SEPARATION" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PF-TRACE-PULLBACK-FACTOR-BASE" -> "HEUR-PF-NO-SUBFIELD-OBSTRUCTION" [label="leaves_open", color="#66788a", style="dashed"];
 }
