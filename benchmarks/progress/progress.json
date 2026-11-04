@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0423Z-c25519-autolab-r7-k20",
+  "latest_record": "20261104T0425Z-c25519-autolab-r8-k28",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 0,
     "invalid": 0,
-    "measured": 5,
+    "measured": 6,
     "open": 0
   },
   "repo": "crypto",
@@ -43,11 +43,11 @@
     {
       "better": "lower",
       "first": 10.939468556478129,
-      "latest": 10.91936046395492,
+      "latest": 7.444768388348348,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.1838,
-        "improvement_vs_previous_percent": 0.1838,
-        "value_over_reference": 10.483347
+        "improvement_vs_first_percent": 31.9458,
+        "improvement_vs_previous_percent": 31.8205,
+        "value_over_reference": 7.784986
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -81,6 +81,22 @@
           "spread": null,
           "summary": "ic_autolab round 6, k = 28: null; ksum4-n15 0.616 of the incumbent at w = 0 but 1.092 at w = 1, so the band does not order it; incumbent ksum4-n21 kept",
           "value": 10.91936046395492
+        },
+        {
+          "commit": "ebe86a2d6dbe",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 31.9458,
+            "improvement_vs_previous_percent": 31.8205,
+            "value_over_reference": 7.784986
+          },
+          "n": 64,
+          "record": "20261104T0425Z-c25519-autolab-r8-k28",
+          "reference": 0.9562982636546874,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 8, k = 28: ksum:m=4 N = 18 S(w=0) 7.44 vs incumbent 10.98, matched rho 0.96 (distance 11.5x -> 7.8x)",
+          "value": 7.444768388348348
         }
       ],
       "problem": "ic:curve25519-family-k28",
