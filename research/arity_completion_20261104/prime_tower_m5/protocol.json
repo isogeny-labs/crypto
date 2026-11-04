@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ARITY-COMPLETION-PRIME-TOWER-M5-20261104",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-04",
   "repository": "crypto",
   "study_dir": "research/arity_completion_20261104/prime_tower_m5",
@@ -395,7 +395,7 @@
     {
       "id": "ctl-m2-n10",
       "role": "control_negative",
-      "description": "Null-chain comparison at m = 2, N = 10 (recorded D = 5): the arity-2 chain where the degree is known.",
+      "description": "Null-chain comparison at m = 2, N = 10 (recorded Kummer D = 4; amendment AM1): the arity-2 chain where the degree is known.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -433,7 +433,7 @@
         "m": 2,
         "t": 5,
         "N": 10,
-        "expected_D": 5
+        "expected_D": 4
       }
     },
     {
@@ -541,7 +541,7 @@
       "present": true,
       "arm": "ctl-m2-n10",
       "null_population": {
-        "description": "The arity-2 null chain at N = 10 (recorded D = 5), the same instrument on a case with known degree.",
+        "description": "The arity-2 null chain at N = 10 (recorded Kummer D = 4; amendment AM1), the same instrument on a case with known degree.",
         "generator": "pkm_tower_pilot --kinds kummer --m 2 --t-min 5 --max-t 5 --controls tower, two random targets",
         "n": 2,
         "why_n": "Two random targets as in every cell; the degree is exact so one agreeing cell is enough to fail the null gate.",
@@ -851,7 +851,7 @@
       "preregistered": true
     },
     {
-      "rule": "Run the three controls first. If the m = 4 N = 8 or m = 3 N = 15 control differs from its recorded D or rows, or the m = 2 N = 10 negative control does not give D = 5, stop and run no m = 5 cell.",
+      "rule": "Run the three controls first. If the m = 4 N = 8 or m = 3 N = 15 control differs from its recorded D or rows, or the m = 2 N = 10 negative control does not give D = 4 (amendment AM1; v1 read 5), stop and run no m = 5 cell.",
       "kind": "invalidation",
       "preregistered": true
     },
@@ -940,12 +940,30 @@
       "verified_by": "Read 2026-11-04."
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "AM1-negative-control-degree",
+      "filed": "2026-11-04",
+      "filed_before_affected_data": true,
+      "reason": "The v1 protocol gave the m = 2, N = 10 Kummer negative control a recorded D = 5. The cited records give 4: research/pkm_tower_round2_20260925/runs/XV1-m2-tower-null.jsonl (p = 786433) and XV5-kummer-m2-p32.jsonl (p = 3221225473) record solving_degree_max = 4 on both random targets of the Kummer m = 2, t = 5 (N = 10) cell; D = 5 at N = 10 is the isogeny tower's value in XV1, and the Kummer chain reaches D = 5 at N = 12 (research/ic_next10_20261014/03-pkm-degree/f4_committed.csv). Attempt 1 on Iso Lab EKS (Job arity-prime-m5-main-20261104, pod eed0517c) measured D = 4, 4 at p1 and stopped before any m = 5 cell, as v1 required. The two positive controls reproduced their recorded D (m = 4 N = 8: 6, 6; m = 3 N = 15: 7, 7). No m = 5 row exists.",
+      "changes": [
+        "Negative control ctl-m2-n10 expected D: 5 -> 4 (arms[ctl-m2-n10].parameters.expected_D, its description, controls.negative.null_population.description, the invalidation stopping rule).",
+        "No claim, prediction, arm, cell, command, cap, seed or analysis script changes. The m = 5 predictions P1-P5 and the kill criterion are unchanged.",
+        "Execution: the three control cells of attempt 1 are reused (the job script skips existing cells on resume) and the verdict is recomputed with the corrected value; the job script inside the study image changes only in that value and in a reporting fix to cell-exits.jsonl class strings."
+      ],
+      "supersedes_fields": [
+        "arms[ctl-m2-n10].parameters.expected_D",
+        "arms[ctl-m2-n10].description",
+        "controls.negative.null_population.description",
+        "stopping_rules[invalidation]"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "2b82eecd46c9e9023cb2d5e1ec01a31d28647355decbd39653fffe81c7058a19",
-    "commit": "1fd6ece55faf55d1a03bcce186f5b830267a2589",
-    "frozen_at": "2026-11-04T00:37:38Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
   }
 }

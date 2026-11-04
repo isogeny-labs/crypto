@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Prime-tower m = 5 study (protocol prime_tower_m5, frozen 1fd6ece55f).
+# Prime-tower m = 5 study (protocol prime_tower_m5 v2: frozen 1fd6ece55f, amendment AM1
+# corrects the m = 2 N = 10 negative control to the recorded Kummer D = 4).
 # Mode "main": the three positive-control cells, the controls verdict gate, then
 # the four m = 5 cells at t = 2 and t = 3 (Kummer and isogeny), sequentially,
 # each the frozen command of CARD-arity-prime-m5-controls / -t2-t3 with the
@@ -23,8 +24,9 @@ pilot() { # name limit_bytes timeout_s budget_s args...
     --planted 0 --random 2 --ladder-t none "$@" --budget "$budget" --max-nnz 2000000000 --trace \
     --out "$C/$name.jsonl" 2> "$C/$name.time"
   local rc=$?
-  printf '{"cell":"%s","exit":%s,"class":"%s"}\n' "$name" "$rc" \
-    "$([ "$rc" -eq 0 ] && echo complete || { [ "$rc" = 124 ] || [ "$rc" = 134 ] || [ "$rc" = 137 ]; } && echo inconclusive_cap || echo error)" >> "$OUT/cell-exits.jsonl"
+  local class=error
+  case "$rc" in 0) class=complete ;; 124|134|137) class=inconclusive_cap ;; esac
+  printf '{"cell":"%s","exit":%s,"class":"%s"}\n' "$name" "$rc" "$class" >> "$OUT/cell-exits.jsonl"
   log "cell $name exit $rc"
   case "$rc" in 0|124|134|137) return 0 ;; *) return "$rc" ;; esac
 }
@@ -32,7 +34,7 @@ controls_verdict() {
   python3 - "$C" <<'PY' > "$OUT/controls-verdict.txt"; echo $?
 import json, sys
 C = sys.argv[1]
-want = [('ctl-m4-n8-kummer', 4, 8, 6), ('ctl-m3-n15-kummer', 3, 15, 7), ('ctl-m2-n10-kummer', 2, 10, 5)]
+want = [('ctl-m4-n8-kummer', 4, 8, 6), ('ctl-m3-n15-kummer', 3, 15, 7), ('ctl-m2-n10-kummer', 2, 10, 4)]
 bad = 0
 for cell, m, n, d in want:
     rows = []
