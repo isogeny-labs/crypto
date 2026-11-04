@@ -50,6 +50,7 @@ digraph attack_graph {
   "CLAIM-PA-SS-IMPLIES-FS" [label="CLAIM-PA-SS-IMPLIES-FS\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-PA-SUBGROUP-AMBIENT" [label="CLAIM-PA-SUBGROUP-AMBIENT\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-PA-ZK-IMPLIES-SOUND" [label="CLAIM-PA-ZK-IMPLIES-SOUND\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-SHOUP-ALL-ALGORITHMS" [label="CLAIM-SHOUP-ALL-ALGORITHMS\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" [label="CLAIM-SP-SEMAEV15-DFF-ALWAYS-4\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-SP-SEMAEV15-FFDA-T2" [label="CLAIM-SP-SEMAEV15-FFDA-T2\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-XT-AMOR-F2-1223-128BIT" [label="CLAIM-XT-AMOR-F2-1223-128BIT\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
@@ -367,4 +368,6 @@ digraph attack_graph {
   "CEX-PA-AMBIENT-BLINDING" -> "CLAIM-PA-AMBIENT-BLINDING" [label="refutes", color="#a33a3a", penwidth=2];
   "CEX-PA-ALWAYS-ACCEPT" [fillcolor="#dff4e5", color="#257942"];
   "CEX-PA-ALWAYS-ACCEPT" -> "CLAIM-PA-ZK-IMPLIES-SOUND" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-TRANSPARENT-ENCODING" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-TRANSPARENT-ENCODING" -> "CLAIM-SHOUP-ALL-ALGORITHMS" [label="refutes", color="#a33a3a", penwidth=2];
 }

@@ -323,6 +323,11 @@ digraph ecdlp_claims {
     "CEX-PA-AMBIENT-BLINDING" [label="CEX-PA-AMBIENT-BLINDING\\nAmbient blinding leaves the subgroup; subgroup blinding is a bijection (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CLAIM-PA-ZK-IMPLIES-SOUND" [label="CLAIM-PA-ZK-IMPLIES-SOUND\\n'Complete, zero-knowledge protocols are sound'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "CEX-PA-ALWAYS-ACCEPT" [label="CEX-PA-ALWAYS-ACCEPT\\nAlways-accept protocol: complete, simulatable, unsound (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-SD-SUBSPACE-CRITERION" [label="THM-SD-SUBSPACE-CRITERION\\nLinear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-BOOLEAN-NSS-UNIQUE" [label="THM-BOOLEAN-NSS-UNIQUE\\nUnique F_2-solution puts every X_i - z_i in the ideal (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-MEAN-COUNT-IDENTITY" [label="THM-MEAN-COUNT-IDENTITY\\nMean ordered representation count is exactly |F|^m / |G| (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-SHOUP-ALL-ALGORITHMS" [label="CLAIM-SHOUP-ALL-ALGORITHMS\\n'Every algorithm needs Omega(sqrt r) group operations for DLP in a prime-order group'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-TRANSPARENT-ENCODING" [label="CEX-TRANSPARENT-ENCODING\\nZ/r with the identity encoding: the logarithm is the encoding (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -541,6 +546,10 @@ digraph ecdlp_claims {
     "MEAS-INSIDE-GAP-N4" [label="MEAS-INSIDE-GAP-N4\\nInside gap census n = 2, 3, 4: maxima 1, 2, 3", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
     "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" [label="CLAIM-SP-SEMAEV15-DFF-ALWAYS-4\\nSemaev: first fall degree of S_3(x1,x2,z) systems 'always 4'\\nd_ff(S_3(x_1, x_2, z)) = 4\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "MEAS-SEMAEV-T2-MACAULAY" [label="MEAS-SEMAEV-T2-MACAULAY\\nSemaev t = 2 rows: degree needed to prove no solution is 2 or 3", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
+    "MEAS-PF-YIELD-CENSUS" [label="MEAS-PF-YIELD-CENSUS\\nPrime-field m = 2 yield census: Poisson(mu/2) zero class, 1.45x dispersion for negation-closed bases", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
+    "MEAS-RANK-DEFICIT-CENSUS" [label="MEAS-RANK-DEFICIT-CENSUS\\nRight-kernel relation matrices: Delta = 10 does not give full rank (10 curves, 5 samples)", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
+    "MEAS-TRACE-PULLBACK-CENSUS" [label="MEAS-TRACE-PULLBACK-CENSUS\\nTrace images of one-dimensional subspace factor bases are at least 0.32 of E(F_p)", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
+    "MEAS-EXT-DECOMP-CENSUS" [label="MEAS-EXT-DECOMP-CENSUS\\nn-fold decomposition over F_{q^n}: 0.70-0.99 of 1/n! at n = 2, 3; premise fails for subfield curves", fillcolor="#ece7fb", color="#6047a8", style="rounded,filled"];
   }
   subgraph cluster_open {
     label="Open proof and attack surfaces"; color="#cad5df"; style="rounded";
@@ -1585,4 +1594,16 @@ digraph ecdlp_claims {
   "CEX-PA-ALWAYS-ACCEPT" -> "CLAIM-PA-ZK-IMPLIES-SOUND" [label="refutes", color="#a33a3a", style="solid"];
   "CEX-PA-ALWAYS-ACCEPT" -> "GAP-PA-ZK-SEPARATION" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-PF-TRACE-PULLBACK-FACTOR-BASE" -> "HEUR-PF-NO-SUBFIELD-OBSTRUCTION" [label="leaves_open", color="#66788a", style="dashed"];
+  "THM-SD-SUBSPACE-CRITERION" -> "HEUR-GB-PQ-ASSUMPTION-2" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-BOOLEAN-NSS-UNIQUE" -> "GAP-PQ2-M2-RANK-CENSUS" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-MEAN-COUNT-IDENTITY" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-TRANSPARENT-ENCODING" -> "CLAIM-SHOUP-ALL-ALGORITHMS" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-TRANSPARENT-ENCODING" -> "LB-SHOUP-DLP" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-TRANSPARENT-ENCODING" -> "CLAIM-BK-GG-BSGS-OPTIMAL" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-TRANSPARENT-ENCODING" -> "GAP-PA-GGM-TRANSPARENT-ENCODING" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-PF-YIELD-CENSUS" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-RANK-DEFICIT-CENSUS" -> "HEUR-PF-PKM-RANK-DELTA" [label="obstructs", color="#a33a3a", style="solid"];
+  "MEAS-RANK-DEFICIT-CENSUS" -> "HEUR-RELATION-RANK" [label="measures", color="#66788a", style="solid"];
+  "MEAS-TRACE-PULLBACK-CENSUS" -> "GAP-PF-TRACE-PULLBACK-FACTOR-BASE" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-EXT-DECOMP-CENSUS" -> "HEUR-BK-GG-DECOMP-PROPORTION" [label="measures", color="#66788a", style="solid"];
 }

@@ -1,7 +1,7 @@
 # Weak points in the ECDLP hardness corpus: triage, 2026-11-03
 
 **Question.** Where is the claim graph that supports ECDLP hardness weakest, and which
-weak points can be broken cheaply enough to attack first?
+weak points can be broken cheaply enough to attack first? [pcc:unverified]
 
 **Scope.** The assembled corpus (version 2026-11-01: 583 claims, 950 edges, 236 sources,
 including the protocol-layer port of W7 and the Lean results of 2026-11-04),
@@ -170,7 +170,7 @@ footnote. (c) Settle the open cell (literal `≥`, field equations inside): **do
 Lean). A fake fall lifts to a true fall at the same degree once its sum is replaced by a
 least-degree representative modulo the field equations, which are generators in this
 placement. The reading axis is now complete: refuted in 3 cells, proved in the 4th. (d) Do
-the PDF transcription, because which cell Nagao meant decides which verdict applies.
+the PDF transcription, because which cell Nagao meant decides which verdict applies. [pcc:unverified]
 
 ## W5. Eleven unwired dependences understate the top frontier nodes
 
@@ -207,7 +207,7 @@ now reports any new occurrence.
   refuted claim and live siblings (listed in `WEAKNESSES.md` §4).
 - **Model-scope leaps (exact).** All nine are generic-model rho heuristics feeding
   standards or the concrete rho algorithm. That is the honest, well-known generic-to-concrete
-  step, and the repository's matched-rho measurements control it.
+  step, and the repository's matched-rho measurements control it. [pcc:unverified]
 
 ## W7. The protocol-layer corpus, ported and cross-linked
 
@@ -338,7 +338,40 @@ refutes five of the overbroad claims the ported protocol corpus lists as open:
   blinding is a bijection;
 - "complete + zero knowledge ⇒ sound": the always-accept protocol.
 
-It also proves that a nondegenerate pairing decides DDH with one evaluation.
+It also proves that a nondegenerate pairing decides DDH with one evaluation. [pcc:unverified]
+
+## Round 4 (2026-11-04): censuses and four more theorems
+
+Native exact censuses in
+[`research/ecdlp_weakness_census_20261104/`](../../research/ecdlp_weakness_census_20261104/README.md)
+and four Lean modules. Census numbers are unverified assertions (no signed validator
+report) [pcc:unverified]; the Lean results have pcc claim records pending CI signing.
+
+- **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** PQ2_TRIAGE_PLACEHOLDER
+  The criterion behind it is `THM-SD-SUBSPACE-CRITERION` (Lean): a Gröbner basis
+  inside the degree-d Macaulay row space supplies at most dim(rowspace ∩ P₁) linear
+  leading monomials, so `d_lin ≤ sd`. The `|Z| = 1` case of the bridge `k = N` is
+  `THM-BOOLEAN-NSS-UNIQUE` (Lean).
+- **W2, relation rank in the right-kernel regime (`rank_deficit`).** With negation
+  pairs merged, Δ = 10 surplus relations gave full rank in all five samples on 2 of 10
+  curves (p ≤ 16001); deficits of 1–3 persist at Δ = 10 and up to 2 at Δ = 40. PKM's
+  "Δ = 10 suffices" is contradicted at these sizes (`MEAS-RANK-DEFICIT-CENSUS`
+  obstructs `HEUR-PF-PKM-RANK-DELTA`).
+- **W3, decomposition yield (`pf_yield`).** The mean is now a theorem
+  (`THM-MEAN-COUNT-IDENTITY`). With unordered pairs the zero class matches
+  1 − exp(−μ/2) within about 1%; the variance is 1.45× Poisson for every base closed
+  under negation and 0.97–0.99× for a base that is not. The heuristic's shape is
+  right for the zero class and wrong for the variance, for the bases index calculus
+  uses.
+- **W7, trace pull-back (`trace_pullback`).** Over F_{p²}, no one-dimensional
+  subspace gives a trace image below 0.32·#E(F_p); the lead
+  `GAP-PF-TRACE-PULLBACK-FACTOR-BASE` is narrowed to higher degrees and dimensions.
+- **Extension-field 1/n! (`ext_decomp`).** 0.70–0.99 of 1/n! at n = 2, 3 for curves
+  with F_{qⁿ} coefficients; for curves defined over F_q the premise fails (factor base
+  = E(F_q)), a hypothesis the survey node should carry.
+- **Shoup's bound (`TransparentEncoding`).** `CLAIM-SHOUP-ALL-ALGORITHMS` ("every
+  algorithm needs Ω(√r)") is refuted by the identity encoding of Z/r; `LB-SHOUP-DLP`
+  and "BSGS is optimal by Shoup" are qualified as generic-model statements.
 
 ## Recommended order of attack
 
