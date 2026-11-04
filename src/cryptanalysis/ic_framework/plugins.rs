@@ -4766,3 +4766,198 @@ mod explicit_subspace_tests {
         }
     }
 }
+
+/// Why `wsum` with `targets=stride-generator` meets dependent rows that
+/// `targets=walk` does not: the hits of the progression `R_k = Q + [k]G`
+/// are not independent box entries.  Whenever a short seed relation
+/// `w·S = [m]G` holds (`w` a difference of two box points, `m` a small
+/// integer, here found by the test and not assumed), `R_k = T_e` gives
+/// `R_{k+m} = T_{e+w}`: the hit repeats `m` steps later, on the line
+/// `e + t·w`, with `b = 1` in every row.  Rows `(e, −1 | k)` on one line
+/// are rank 2.  A walk row carries a random `b`, which breaks the line.
+/// The dependence is arithmetic, not a row-handling defect.
+#[cfg(test)]
+mod wsum_stride_dependence_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        Calibration, CountedGroup, PrimeCurve, PrimeInstance, PrimePoint, WSumTable,
+    };
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    /// The `train-k32` curve of the round-28 session: `r = 536884639`,
+    /// cofactor 8, `log2 r = 29`.
+    fn instance() -> PrimeInstance {
+        PrimeInstance {
+            name: "train-k32".into(),
+            curve: PrimeCurve {
+                p: 4294967197,
+                a: 1173263412,
+                b: 337904346,
+            },
+            group_order: 4295077112,
+            r: 536884639,
+            cofactor: 8,
+            generator: (1431665017, 592057774),
+        }
+    }
+
+    fn ctx<'a>(inst: &'a PrimeInstance, q: PrimePoint) -> InstanceCtx<'a, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn base_params() -> Params {
+        Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=32")
+            .unwrap()
+            .1
+    }
+
+    fn dependent_runs(inst: &PrimeInstance, targets: Targets, runs: u64) -> (u64, u64) {
+        let (mut dependent, mut found) = (0, 0);
+        for s in 0..runs {
+            let mut ops = GroupOps::default();
+            let q = inst
+                .curve
+                .mul(&mut ops, inst.generator_point(), 12345 + 7919 * s);
+            let spec = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: base_params(),
+                oracle: "wsum".into(),
+                oracle_params: Params::parse_spec("wsum:coef=120,free=1").unwrap().1,
+                targets,
+                linalg: "incremental-gauss".into(),
+                max_trials: 5_000_000,
+                seed: s,
+                ..Default::default()
+            };
+            let rep = run_pipeline(
+                &ctx(inst, q),
+                &spec,
+                &PrimeProjectedAbscissaBase { instance: inst },
+                &mut WSumOracle::<PrimePoint>::new(),
+                u64::MAX,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            )
+            .unwrap();
+            dependent += u64::from(rep.linear_algebra.dependent > 0);
+            found += rep.decomposition.relations_found;
+        }
+        (dependent, found)
+    }
+
+    #[test]
+    fn stride_generator_hits_repeat_along_a_short_seed_relation() {
+        let inst = instance();
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let mut build_ctx_ops = GroupOps::default();
+        let fb = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, gen), &base_params(), &mut build_ctx_ops)
+            .unwrap();
+        let table = WSumTable::build(g, &fb, 120, true).unwrap();
+
+        // Hits of Q + [k]G: (k, e) with e·S = R_k, four hits per target.
+        let mut runs: Vec<Vec<(u64, Vec<i64>)>> = Vec::new();
+        for s in 0..12u64 {
+            let q = g.mul(&mut ops, gen, 12345 + 7919 * s);
+            let (mut hits, mut point, mut lookups) = (Vec::new(), q, 0u64);
+            for k in 0..400_000u64 {
+                if k > 0 {
+                    point = g.add(&mut ops, point, gen);
+                }
+                if g.is_identity(&point) {
+                    continue;
+                }
+                if let Some(summands) = table.probe(g, &fb, &mut ops, &mut lookups, point) {
+                    // Recover e from the signed summands: +1 per seed
+                    // index, −1 per negated one (seeds sit at even index).
+                    let mut e = vec![0i64; table.c];
+                    for i in summands {
+                        e[fb.col_of[i]] += if i % 2 == 0 { 1 } else { -1 };
+                    }
+                    hits.push((k, e));
+                    if hits.len() == 4 {
+                        break;
+                    }
+                }
+            }
+            runs.push(hits);
+        }
+
+        // Every pair of hits obeys (e' − e)·S = [k' − k]G, by group
+        // arithmetic, with no logarithm known.
+        let seeds = |e: &[i64], ops: &mut GroupOps| {
+            let mut acc = g.identity();
+            for (c, &ec) in e.iter().enumerate() {
+                let p = fb.points[fb.col_of.iter().position(|&x| x == c).unwrap()];
+                let t = g.mul(ops, p, ec.unsigned_abs());
+                acc = g.add(ops, acc, if ec < 0 { g.neg(t) } else { t });
+            }
+            acc
+        };
+        let mut progressions = 0;
+        for hits in &runs {
+            for i in 0..hits.len() {
+                for j in i + 1..hits.len() {
+                    let (ki, ei) = &hits[i];
+                    let (kj, ej) = &hits[j];
+                    let w: Vec<i64> = ei.iter().zip(ej).map(|(a, b)| b - a).collect();
+                    let lhs = seeds(&w, &mut ops);
+                    let rhs = g.mul(&mut ops, gen, kj - ki);
+                    assert_eq!(lhs, rhs, "(e'−e)·S = [Δk]G must hold");
+                }
+            }
+            // A progression: three hits k, k+m, k+2m on the line e + t·w.
+            for i in 0..hits.len().saturating_sub(2) {
+                let ((k0, e0), (k1, e1), (k2, e2)) = (&hits[i], &hits[i + 1], &hits[i + 2]);
+                if k1 - k0 == k2 - k1 {
+                    let w0: Vec<i64> = e0.iter().zip(e1).map(|(a, b)| b - a).collect();
+                    let w1: Vec<i64> = e1.iter().zip(e2).map(|(a, b)| b - a).collect();
+                    assert_eq!(w0, w1, "equal Δk, equal Δe: the hits are collinear");
+                    // The relation both rows reveal: w·S = [m]G, m small.
+                    eprintln!("progression m={} w={:?} e0={:?}", k1 - k0, w0, e0);
+                    progressions += 1;
+                }
+            }
+        }
+        for (s, hits) in runs.iter().enumerate() {
+            let rows: Vec<String> = hits
+                .iter()
+                .map(|(k, e)| format!("(e1,e2,a,b)=({},{},{},1)", e[0], e[1], k))
+                .collect();
+            eprintln!("target {s}: {}", rows.join(" "));
+        }
+        assert!(
+            progressions > 0,
+            "the curve's seeds have a short relation w·S = [m]G, so some target has a progression"
+        );
+    }
+
+    #[test]
+    fn stride_generator_runs_are_dependent_and_walk_runs_are_not() {
+        let inst = instance();
+        let (walk_dep, walk_found) = dependent_runs(&inst, Targets::Walk, 8);
+        let (stride_dep, stride_found) = dependent_runs(&inst, Targets::StrideGenerator, 8);
+        eprintln!("walk: dependent runs {walk_dep}/8, relations {walk_found}");
+        eprintln!("stride-generator: dependent runs {stride_dep}/8, relations {stride_found}");
+        assert_eq!(walk_dep, 0, "random (a, b) rows are independent");
+        assert_eq!(walk_found, 8 * 3);
+        assert!(stride_dep >= 1, "progression rows are collinear");
+        assert!(stride_found > walk_found);
+    }
+}
