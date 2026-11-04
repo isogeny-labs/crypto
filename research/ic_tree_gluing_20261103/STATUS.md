@@ -58,7 +58,9 @@ All [pcc:unverified]:
   tree, glued, fat-leaf and chord encodings; character branching of
   separators; sparse or faster linear algebra as the lever.
 - **Remaining routes:**
-  - a node relation of degree < 4, which x-only coordinates cannot give;
-    round 7 tests twisted-Edwards nodes;
+  - a node relation of degree < 4, which x-only coordinates cannot give.
+    Round 7 found that Edwards nodes alone do not lower D, but the 2-torsion
+    quotient in the Edwards v-coordinate lowers the coupling excess by 1–2 at
+    m = 3, 4 [pcc:unverified] (`round7/README.md`);
   - a memory-lean F4 to decide P2 (round 7);
   - directions outside summation polynomials (round 7).
