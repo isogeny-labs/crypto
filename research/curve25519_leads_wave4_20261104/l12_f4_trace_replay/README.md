@@ -84,7 +84,7 @@ whose S_plain at ρ = 1 is 100,642, 0.36 % above the measured T12 S_plain 100,27
 projections; see the errata section. Modelled distance to rho-neg at w = 0.1: 6.06·10⁴ × 0.4717 ≈ **2.9·10⁴×** (2.86·10⁴–2.87·10⁴ under either model). This is a
 projection; the measured value comes from the ecbench stage.
 
-## Status of the end-to-end stage (written 2026-11-04T06:35Z)
+## Status of the end-to-end stage (written 2026-11-04T06:35Z; superseded by the addendum at the end)
 
 - `data/engine/GATE` = `open`, so `run.sh` proceeded as frozen: `ecbench plan --spec ecbench/spec.json`
   accepted the spec (`data/ecbench/plan.txt`, 64 executions, trace arm resolved as
@@ -175,9 +175,9 @@ Source: `validator-report.json` (pass_with_errata, 2026-11-04T06:50:00Z). Engine
 
 ## Addendum, 2026-11-04T15:36Z: end-to-end stage decided (P7–P10)
 
-The frozen runner completed after two container restarts (`data/run.log`; `data/ALL_DONE` at
-15:35:58Z). The 8 chunks finished at 09:19:48Z. The first verify pass was killed after c00 and
-the post-chunk stage was rerun unchanged at 15:30Z. No chunk was interrupted. Numbers below are
+The frozen runner completed after one relaunch (`data/run.log`, `data/env.txt`: two launches;
+`data/ALL_DONE` at 15:35:58Z). The 8 chunks finished at 09:19:48Z. The first post-chunk pass left
+only `verify/c00.txt` when the container restarted; the stage was rerun unchanged at 15:30Z. No chunk was interrupted. Numbers below are
 verbatim from `data/ecbench/{verify/rc.txt, band_pooled.txt, pooled_compare.jsonl, learn_charge.json}`.
 
 | | rule | outcome |
@@ -197,18 +197,43 @@ Band (pooled, 16 runs per arm, √r = 362.22):
 | rho-neg | 1.557 | 1.668 | 2.673 |
 
 **Distance remaining** for the trace arm (pooled ratio trace ÷ reference, 95 % interval):
-rho-neg **2.63·10⁴× [1.52·10⁴, 4.54·10⁴]** at w = 0.1 (model 2.9·10⁴×), 1.64·10⁵× at w = 1,
+rho-neg **2.63·10⁴× [1.52·10⁴, 4.54·10⁴]** at w = 0.1 (model 2.9·10⁴×, built on T12's plain
+distance 6.06·10⁴; the same-session plain distance is 5.54·10⁴× [3.2·10⁴, 9.6·10⁴], and
+5.54·10⁴ × 0.4742 = 2.63·10⁴, so the gap to the model is the workload sample), 1.64·10⁵× at w = 1,
 15.9× [9.8, 25.7] at w = 0; proj-a 3.44·10³× at w = 0.1, 2.12·10⁴× at w = 1, 2.09× at w = 0.
 Rho remains ahead.
 
 Reading:
-- The engine's ρ_win = 0.4717 carries end to end as 0.474: F4 work per solve falls by 2.11× at
-  w ≥ 0.1, with the same walk, relations and recovered scalars (w = 0 identity exact). This is a
-  measured improvement over the T12 incumbent arm at matched curve, frame and targets.
+- The engine's ρ_win = 0.4717 carries end to end as 0.474: counted F4 work per solve falls by
+  2.11× at w ≥ 0.1, with the same walk, relations and recovered scalars (w = 0 identity exact; the
+  band calls the pair "unresolved inside the band" because w = 0 is a tie). This is a measured
+  improvement in counted units over the T12 winner arm (t = 5, G = 4, seed 1307) at matched curve,
+  frame and targets. It is not a wall-clock claim: solver wall time is 0.952 trace ÷ plain on this
+  host (diagnostic only).
 - Trace counters (summed over 16 runs): 1,615,843 replays, 1,615,620 refuted, 223 fallbacks to
-  plain F4 (1.4·10⁻⁴ of replays; 222 of them "new leads differ from the trace"); the fallbacks
+  plain F4 (1.4·10⁻⁴ of replays; 222 of them "new leads differ from the trace"). 164 of the 223 are
+  the decomposable systems, which must fall back to produce the relation; only 59 are genuine
+  replay failures (3.7·10⁻⁵ of refutable systems); the fallbacks
   cost 775,268 plain mul-adds in all and are inside the measured S. Learning ran once per branch
   per run (256 = 16 × 16), 52,816 mul-adds per run, which ecbench does not price; the
   hand-charged ratios above include it.
 - The plain arm's S here (92,456 at w = 0.1) is below T12's 100,277 because the targets differ
   (8 workloads × 2 rounds here, 16 workloads in T12, 6 in common); only the paired ratio is compared.
+  On the 6 common workloads the plain, rho-neg and proj-a runs are bit-identical to T12's, and
+  plain S(w = 0.1) is 92,624.1 in both sessions (validator).
+
+Validation of the end-to-end stage (`validator-report.json`, `end_to_end_stage`): **pass_with_errata**,
+validated at `a611a7bdec`. Every number above recomputed from `records.jsonl` with independent code;
+64/64 certificates recovered·G = target; five extra replays (3 plain, 2 trace; c05, c07) identical.
+Errata applied above: E1 (one relaunch), E2 (T12 winner, not incumbent), E3 (model distance), E6
+(06:35Z section marked superseded), E7 (counted units only; w = 0 tie; wall time 0.952), E10
+(59 genuine fallbacks). Disclosed here:
+- E4: the producer's replay audit covers 8 of 64 runs (trace 3, rho-neg 5, none of plain PKM or
+  proj-a); the validator's five replays cover both PKM arms.
+- E5: `data/SHA256SUMS` was written by the frozen `finish()` before it appended the last line of
+  `env.txt`, `run.log` and `run.out`; those three fail `sha256sum -c` and match without their last
+  line. `ALL_DONE` is not listed.
+- E8: unpriced native counters per arm (16 runs, totals): rho-neg 6,471; proj-a 50,907; plain PKM
+  5,356,866,681; trace PKM 2,539,547,286, plus 845,056 learning mul-adds charged by hand.
+- E9: `ecbench/spec.json` first reached git at `8d1257cead`, after launch (its hash is in the
+  frozen runner's env record); the `records.jsonl` files (80–82 KB) are committed in git, as T12's.
