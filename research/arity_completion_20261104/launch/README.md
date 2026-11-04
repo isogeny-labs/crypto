@@ -32,24 +32,21 @@ argument; `run_shard.sh` and `job-prime-tower.sh` skip records that exist
 
 ## Source identity of the instruments
 
-The image's binaries were built from the `main` checkout 91a3524dfd. After the
-freezes `main` changed `src/cryptanalysis/*` (16 files, e.g. babdb87aa2), so
-the same two examples were rebuilt from the **frozen commit 4fa25efc0e** (the
-Koblitz freeze; the prime-tower freeze 1fd6ece55f has identical `src/`,
-`examples/` and `Cargo.*`) in a detached worktree with a fresh target
-directory (`build-frozen-4fa25efc0e.log`). Both builds produce byte-identical
-binaries:
-
-| binary | sha256 (main 91a3524dfd build = frozen 4fa25efc0e build) |
-|---|---|
-| `pkm_tower_pilot` | `b243a62cbcd8e0ef418bdc32daafee8388f69fedf884e1c2109ea2aabcfefa0d` |
-| `n83_msweep_cell` | `63470982ebdbf39bcfcddaeac90ade40407c0b0637c8ae8b01a192a4c6855553` |
-
-The examples themselves did not change between the freeze and `main`, and the
-changed library modules are not linked into them. The image therefore carries
-the frozen instruments by content; `/opt/study/build-info.json` inside it
-names the `main` checkout as the build source and these hashes bind it to the
-frozen build. Pods record `binary.sha256` at start for the same check.
+`main` changed `examples/n83_msweep_cell.rs` (105 lines: the Gröbner engines
+feed the degree-of-regularity forecaster; chain-s3 engines gain a field) and
+16 `src/cryptanalysis/*` files after the freezes, so a `main` build is not
+the frozen instrument. The image tagged `arity-20261104-6ee6a1df26be`
+(digest 66bf6053…) holds `main` 91a3524dfd binaries and is **not used**: a
+first "frozen" rebuild attempt compiled the `main` checkout by mistake (its
+dep-info names `/home/user/crypto/...`; `build-frozen-4fa25efc0e.log` is that
+attempt's log and its identical hashes are the proof of the mistake). The
+instruments are rebuilt from the frozen commit 4fa25efc0e (identical
+`src/`, `examples/`, `Cargo.*` to the prime-tower freeze 1fd6ece55f) in a
+worktree inside the repository, by `--manifest-path`, and published as a new
+image; `image.json`, the requests and this section are updated with the
+resulting digest and binary sha256s before any launch. Pods record
+`binary.sha256` at start, and `build-info.json` in the image names the
+frozen commit.
 
 ## Deviations recorded before launch (no frozen file changes)
 
