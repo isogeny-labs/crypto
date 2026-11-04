@@ -337,6 +337,98 @@ proc armE1Q(int m, int t, list W, list XS, int vR, int GG)
            "m=" + string(m) + " t=" + string(t) + " E1Q");
 }
 
+// round 7c: Dickson towers. Cherry: R_0 = T, R_j = R_(j-1)^2 - 2 mod Q (R_j = D_(2^j) of the roots),
+// variables for R_1..R_(t-1), final R_(t-1)^2 - 4 = 0 mod Q (D_(2^t) = 2  <=>  z^(2^t) = 1)
+proc dchain(string nme, ideal es, int t, list nm)
+{
+  poly T = var(1); poly Q = T^2 - es[1]*T + es[2]; ideal G = std(ideal(Q));
+  poly R = T; poly Rn; poly Rsym; poly df; ideal E; matrix M; int j; int i; int ne = 0;
+  for (j = 1; j <= t; j++)
+  {
+    Rn = reduce(R^2 - 2, G);
+    if (j == t) { df = Rn - 2; }
+    else
+    {
+      Rsym = var(ix(nme + "r" + string(j) + "_1", nm))*T + var(ix(nme + "r" + string(j) + "_0", nm));
+      df = Rn - Rsym;
+    }
+    M = coeffs(df, T);
+    for (i = nrows(M); i >= 1; i--) { if (M[i, 1] != 0) { ne++; E[ne] = M[i, 1]; } }
+    R = Rsym;
+  }
+  return(E);
+}
+proc plantD(string nme, int t, ideal roots, list nm, ideal vals)
+{
+  poly T = var(1); ideal G = std(ideal((T - roots[1])*(T - roots[2]))); poly R = T; int j; matrix M; int i;
+  for (j = 1; j < t; j++)
+  {
+    R = reduce(R^2 - 2, G); M = coeffs(R, T);
+    for (i = 0; i < 2; i++)
+    {
+      if (i + 1 <= nrows(M)) { vals[ix(nme + "r" + string(j) + "_" + string(i), nm)] = M[i + 1, 1]; }
+      else { vals[ix(nme + "r" + string(j) + "_" + string(i), nm)] = 0; }
+    }
+  }
+  return(vals);
+}
+proc dkchain(string nme, poly w, int t, list nm)   // z_j = z_(j-1)^2 - 2, z_(t-1)^2 - 4 = 0
+{
+  ideal E; int j; int ne = 0; poly prev = w; poly u;
+  for (j = 1; j < t; j++) { u = var(ix(nme + "u" + string(j), nm)); ne++; E[ne] = u - (prev^2 - 2); prev = u; }
+  ne++; E[ne] = prev^2 - 4;
+  return(E);
+}
+proc plantDK(string nme, poly w, int t, list nm, ideal vals)
+{
+  poly v = w; int j;
+  for (j = 1; j < t; j++) { v = v^2 - 2; vals[ix(nme + "u" + string(j), nm)] = v; }
+  return(vals);
+}
+// arm TW (x-only Montgomery, Kummer towers) or TQ (quotient xi, Dickson towers).
+// LF: leaf coordinates (x_i or xi_i); XS: separators; RT: root coordinate
+proc armM(string arm, int m, int t, list LF, list XS, int RT, string Sfull, string Ssym)
+{
+  list nm = "T"; int c; int i;
+  for (c = 0; c < m div 2; c++) { nm = nm + list("s" + string(c), "q" + string(c)) + mn("h" + string(c), 2, t); }
+  if (m == 3) { nm = nm + list("w3") + kn("c2", t) + list("X1"); }
+  if (m == 4) { nm = nm + list("X1", "X2"); }
+  string vl = ""; for (i = 1; i <= size(nm); i++) { if (i > 1) { vl = vl + ","; } vl = vl + nm[i]; }
+  execute("ring RW = 786433,(" + vl + "),lp;");
+  ring RBs = 786433, (x1, x2, Sv, Sq, SX), (dp(2), dp(3));
+  execute("poly fsym = " + Ssym + ";");
+  ring RBf = 786433, (x1, x2, x3), dp;
+  execute("poly ffull = " + rename3(Sfull, "k1", "k2", "k3", "x1", "x2", "x3") + ";");
+  setring RW;
+  list EQ; ideal es; ideal E; ideal vals; vals[size(nm)] = 0; ideal rt; map ph; poly pRT = RT;
+  list Lp; for (i = 1; i <= m; i++) { Lp[i] = poly(LF[i]); }
+  for (c = 0; c < m div 2; c++)
+  {
+    es = var(ix("s" + string(c), nm)), var(ix("q" + string(c), nm));
+    if (arm == "TW") { E = mchain("h" + string(c), es, 2, t, nm); } else { E = dchain("h" + string(c), es, t, nm); }
+    for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
+    ph = RBs, 0, 0, var(ix("s" + string(c), nm)), var(ix("q" + string(c), nm)), var(ix("X" + string(c + 1), nm));
+    EQ[size(EQ) + 1] = ph(fsym);
+    vals[ix("s" + string(c), nm)] = Lp[2*c + 1] + Lp[2*c + 2];
+    vals[ix("q" + string(c), nm)] = Lp[2*c + 1] * Lp[2*c + 2];
+    rt = Lp[2*c + 1], Lp[2*c + 2];
+    if (arm == "TW") { vals = plantM("h" + string(c), 2, t, rt, nm, vals); } else { vals = plantD("h" + string(c), t, rt, nm, vals); }
+    vals[ix("X" + string(c + 1), nm)] = XS[c + 1];
+  }
+  if (m == 3)
+  {
+    if (arm == "TW") { E = kchain("c2", var(ix("w3", nm)), t, nm); } else { E = dkchain("c2", var(ix("w3", nm)), t, nm); }
+    for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
+    ph = RBf, var(ix("X1", nm)), var(ix("w3", nm)), pRT;
+    EQ[size(EQ) + 1] = ph(ffull);
+    vals[ix("w3", nm)] = Lp[3];
+    if (arm == "TW") { vals = plantK("c2", Lp[3], t, nm, vals); } else { vals = plantDK("c2", Lp[3], t, nm, vals); }
+  }
+  if (m == 4) { ph = RBf, var(ix("X1", nm)), var(ix("X2", nm)), pRT; EQ[size(EQ) + 1] = ph(ffull); }
+  writesys(nm, EQ, vals, OUTDIR + "/m" + string(m) + "_t" + string(t) + TAG + "_" + arm + ".ms",
+           "m=" + string(m) + " t=" + string(t) + " " + arm);
+}
+
 // arm E2. UL: leaf u_i; W: leaf w_i; NU, NV: planted internal nodes; uR, vR
 proc armE2(int m, int t, list UL, list W, list NU, list NV, int uR, int vR, int GG)
 {
@@ -381,6 +473,8 @@ for (ii = 1; ii <= size(CELLSTR); ii++)
 if (tk != "") { CTOK[size(CTOK) + 1] = tk; }
 string INST = "# round-7 planted instances (gen7.sing, LCG seed 0xED7A1104): a=1 d=11 g=" + string(GG) + newline
   + "# m t vR uR | w_i (v_i = g*w_i) | u_i | separators v(P_(2c-1)+P_(2c)) | node u's" + newline;
+list UM; list XM; list XSM; list LW; list LQ; list SW; list SQ2; number xRM;
+number nmA = MA; number nmB = MB;
 string rec; int m; int t; int D; number zt; list U; list JS; int j; int ok; int tries; int i; int c;
 list PTS; list W; list UL; list XS; list NU; list NV; list Rp; list Pc; intvec used; number v; number u;
 for (ii = 1; ii + 1 <= size(CTOK); ii = ii + 2)
@@ -422,11 +516,61 @@ for (ii = 1; ii + 1 <= size(CTOK); ii = ii + 2)
   for (c = 1; c <= m div 2; c++) { rec = rec + " " + string(NU[c]); }
   INST = INST + rec + newline;
   print("instance m=" + string(m) + " t=" + string(t) + " tries=" + string(tries - 1) + ": " + rec);
-  armE1("E1", m, t, W, XS, nint(Rp[2]), S3Sstr, GG);
-  armE1("E1S", m, t, W, XS, nint(Rp[2]), S3Sstr, GG);
-  armE2(m, t, UL, W, NU, NV, nint(Rp[1]), nint(Rp[2]), GG);
-  armE1Q(m, t, W, XS, nint(Rp[2]), GG);
+  if (find(ARMS, " E1 ")) { armE1("E1", m, t, W, XS, nint(Rp[2]), S3Sstr, GG); }
+  if (find(ARMS, " E1S ")) { armE1("E1S", m, t, W, XS, nint(Rp[2]), S3Sstr, GG); }
+  if (find(ARMS, " E2 ")) { armE2(m, t, UL, W, NU, NV, nint(Rp[1]), nint(Rp[2]), GG); }
+  if (find(ARMS, " E1Q ")) { armE1Q(m, t, W, XS, nint(Rp[2]), GG); }
+  setring r;
+  if (find(ARMS, " TW ") or find(ARMS, " TQ "))
+  {
+    // Montgomery instance on the same group: x in mu_(2^t), classes {x, 1/x}, own LCG stream
+    UM = list();
+    for (j = 0; j < D; j++)
+    {
+      v = zt^j;
+      if (v != 1 and v != -1) { if (issq((v^3 + nmA*v^2 + v)/nmB)) { UM[size(UM) + 1] = j; } }
+    }
+    ok = 0;
+    for (tries = 1; tries <= 500 and ok == 0; tries++)
+    {
+      JS = list(); kill used; intvec used; used[D] = 0;
+      while (size(JS) < m)
+      {
+        j = UM[rndM(size(UM)) + 1];
+        if (used[j + 1] == 0 and used[((D - j) mod D) + 1] == 0) { used[j + 1] = 1; JS[size(JS) + 1] = j; }
+      }
+      PTS = list(); XM = list();
+      for (i = 1; i <= m; i++)
+      {
+        v = zt^JS[i]; u = sqrtp((v^3 + nmA*v^2 + v)/nmB); if (rndM(2) == 1) { u = -u; }
+        if (nmB*u^2 != v^3 + nmA*v^2 + v) { die("Montgomery leaf off curve"); }
+        PTS[i] = list(v/u, (v - 1)/(v + 1)); if (!oncurve(PTS[i])) { die("birational image off the Edwards curve"); }
+        XM[i] = v;
+      }
+      ok = 1; XSM = list();
+      for (c = 1; c <= m div 2; c++)
+      {
+        Pc = eadd(PTS[2*c - 1], PTS[2*c]);
+        if (Pc[2] == 1 or Pc[2] == -1) { ok = 0; } else { XSM[c] = (1 + Pc[2])/(1 - Pc[2]); }
+      }
+      if (m == 3) { Rp = eadd(eadd(PTS[1], PTS[2]), PTS[3]); }
+      if (m == 4) { Rp = eadd(eadd(PTS[1], PTS[2]), eadd(PTS[3], PTS[4])); }
+      if (Rp[2] == 1 or Rp[2] == -1) { ok = 0; }
+    }
+    if (ok == 0) { die("no Montgomery plant"); }
+    xRM = (1 + Rp[2])/(1 - Rp[2]);
+    LW = list(); LQ = list(); SW = list(); SQ2 = list();
+    for (i = 1; i <= m; i++) { LW[i] = nint(XM[i]); LQ[i] = nint(XM[i] + 1/XM[i]); }
+    for (c = 1; c <= m div 2; c++) { SW[c] = nint(XSM[c]); SQ2[c] = nint(XSM[c] + 1/XSM[c]); }
+    rec = "M " + string(m) + " " + string(t) + " xR=" + string(nint(xRM)) + " | x_i:";
+    for (i = 1; i <= m; i++) { rec = rec + " " + string(LW[i]); } rec = rec + " | sep x:";
+    for (c = 1; c <= m div 2; c++) { rec = rec + " " + string(SW[c]); }
+    INST = INST + rec + newline;
+    print("Montgomery instance tries=" + string(tries - 1) + ": " + rec);
+    if (find(ARMS, " TW ")) { armM("TW", m, t, LW, SW, nint(xRM), S3Mstr, S3Msym); }
+    if (find(ARMS, " TQ ")) { armM("TQ", m, t, LQ, SQ2, nint(xRM + 1/xRM), S3Qstr, S3Qsym); }
+  }
   setring r;
 }
-write(":w " + OUTDIR + "/instances7.txt", INST[1, size(INST) - 1]);
+write(":w " + OUTDIR + "/instances7" + TAG + ".txt", INST[1, size(INST) - 1]);
 quit;
