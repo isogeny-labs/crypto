@@ -80,3 +80,22 @@ Ceiling USD 40 for this campaign (c8a.2xlarge Spot ≈ 0.16 USD/h × ≤ 17 h;
 cpu-spot ≤ 12 h at 10Gi; a 128 GiB host ≤ 48 h at ≈ 0.5 USD/h only if t3
 decides; CodeBuild minutes). Budgets at 07:30Z: isolab-daily-cost-100 actual
 93.9 of 200; spot-experiments-daily-25 actual 37.5 of 200; monthly 379 of 1000.
+
+## Deviations recorded before attempt 3 (2026-11-04 17:58Z; no frozen file changes)
+
+5. **Host type c8a.2xlarge -> m8a.2xlarge.** Three pods were lost within
+   10–21 minutes to `instance-terminated-no-capacity` on c8a.2xlarge Spot
+   (`receipts/attempts/SPOT-LOSSES.md`); its placement score is 1 of 10,
+   m8a.2xlarge's 2. m8a is the same AMD EPYC 5th-generation core family; every
+   pod records `/proc/cpuinfo`'s model in `host.txt`, so the analysis can
+   split records by host model. Wall caps depend on core speed, so a cell's
+   cap outcome is reported with its host model.
+6. **Attempt limit per cell.** The protocols' `retries.max_attempts`
+   (infrastructure only) is counted per cell: a retry resumes every finished
+   record and re-runs only the cell that was in flight. No cell has had more
+   than two attempts.
+7. **Curated prime-tower resume source.** `job-prime-tower.sh` skips a cell
+   whose `.jsonl` exists, and an interrupted cell leaves an empty one; attempt
+   3 resumes from `runs/arity-prime-m5-main-20261104-a2/resume-for-a3/`, a copy
+   of attempt 2's pod prefix without `cells/isogeny-m5-t2.*`. The capped
+   `kummer-m5-t3` (exit 134, 8 GiB) keeps its records and is not re-run.
