@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0513Z-c25519-autolab-r15-k28",
+  "latest_record": "20261104T0642Z-c25519-autolab-r16-k20",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 12,
+    "measured": 13,
     "open": 0
   },
   "repo": "crypto",
@@ -14,11 +14,11 @@
     {
       "better": "lower",
       "first": 8.34775146090461,
-      "latest": 8.797582237547164,
+      "latest": 5.38399298948122,
       "latest_derived": {
-        "improvement_vs_first_percent": -5.3886,
-        "improvement_vs_previous_percent": -5.3886,
-        "value_over_reference": 5.556355
+        "improvement_vs_first_percent": 35.5037,
+        "improvement_vs_previous_percent": 38.8014,
+        "value_over_reference": 3.620888
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -52,6 +52,22 @@
           "spread": null,
           "summary": "ic_autolab round 13, k = 20: null; free-rows ksum4f-n8 0.971 [0.931, 1.012] of the incumbent, band sel < inc, interval spans 1",
           "value": 8.797582237547164
+        },
+        {
+          "commit": "1d09988e20cc",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 35.5037,
+            "improvement_vs_previous_percent": 38.8014,
+            "value_over_reference": 3.620888
+          },
+          "n": 64,
+          "record": "20261104T0642Z-c25519-autolab-r16-k20",
+          "reference": 1.4869262438500916,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 16, k = 20: wsum coefficient box (C = 3, B = 5) S(w=0) 5.38 vs incumbent 8.89, matched rho 1.49 (distance 6.0x -> 3.6x)",
+          "value": 5.38399298948122
         }
       ],
       "problem": "ic:curve25519-family-k20",
