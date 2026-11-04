@@ -1,0 +1,208 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-arity-prime-m5-t2-t3
+experiment_id: ARITY-COMPLETION-PRIME-TOWER-M5-20261104
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/arity_completion_20261104/prime_tower_m5/receipts/CARD-arity-prime-m5-t2-t3.receipt.json
+binds:
+- path: research/arity_completion_20261104/prime_tower_m5/protocol.json
+  sha256: 5fd11a55265e9bc5ce6c81c5f5674a1e6d914e0ea6540cb2493599e4ef79b68d
+- path: research/arity_completion_20261104/prime_tower_m5/PROTOCOL.md
+  sha256: f657d6e04816a3648affeda59416c885beaaab478e8f9b651c598899fae08d01
+- path: research/arity_completion_20261104/prime_tower_m5/analyze.py
+  sha256: 7909f55246f7a20f080e0a06b9407d1bea5a70e8ab9d20e46a4ceeb13dc1a65e
+must_not_exist:
+- research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.jsonl
+- research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.time
+- research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.jsonl
+- research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.time
+- research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.jsonl
+- research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.time
+- research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.jsonl
+- research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.time
+commands:
+- id: controls-verdict
+  argv:
+  - python3
+  - -c
+  - "import json, sys\nwant = [('ctl-m4-n8-kummer', 4, 8, 6), ('ctl-m3-n15-kummer', 3, 15, 7), ('ctl-m2-n10-kummer', 2, 10, 5)]\nbad = 0\nfor cell, m, n, d in want:\n    rows = []\n    try:\n        for ln in open('research/arity_completion_20261104/prime_tower_m5/cells/' + cell + '.jsonl').read().splitlines():\n            r = json.loads(ln)\n            if isinstance(r, dict) and r.get('m') == m and r.get('N') == n and r.get('kind') == 'kummer':\n                rows.append(r)\n    except OSError:\n        pass\n    ok = len(rows) != 0 and all((not r.get('timed_out')) and (not r.get('oversize')) and r.get('solving_degree_max') == d for r in rows)\n    print('control', cell, 'rows', len(rows), 'recorded D', d, 'ok' if ok else 'MISMATCH')\n    bad += 0 if ok else 1\nsys.exit(1 if bad else 0)\n"
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: kummer-m5-t2
+  argv:
+  - prlimit
+  - --as=8589934592
+  - timeout
+  - '7500'
+  - /usr/bin/time
+  - -v
+  - target/release/examples/pkm_tower_pilot
+  - --engine
+  - tower
+  - --p
+  - '2013265921'
+  - --kinds
+  - kummer
+  - --controls
+  - tower
+  - --planted
+  - '0'
+  - --random
+  - '2'
+  - --ladder-t
+  - none
+  - --m
+  - '5'
+  - --t-min
+  - '2'
+  - --max-t-m4
+  - '2'
+  - --budget
+  - '7200'
+  - --max-nnz
+  - '2000000000'
+  - --trace
+  - --out
+  - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.jsonl
+  timeout_seconds: 7500
+  success_exit_codes:
+  - 0
+  stderr: research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.time
+  outputs:
+  - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.jsonl
+- id: kummer-m5-t3
+  argv:
+  - prlimit
+  - --as=8589934592
+  - timeout
+  - '7500'
+  - /usr/bin/time
+  - -v
+  - target/release/examples/pkm_tower_pilot
+  - --engine
+  - tower
+  - --p
+  - '2013265921'
+  - --kinds
+  - kummer
+  - --controls
+  - tower
+  - --planted
+  - '0'
+  - --random
+  - '2'
+  - --ladder-t
+  - none
+  - --m
+  - '5'
+  - --t-min
+  - '3'
+  - --max-t-m4
+  - '3'
+  - --budget
+  - '7200'
+  - --max-nnz
+  - '2000000000'
+  - --trace
+  - --out
+  - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.jsonl
+  timeout_seconds: 7500
+  success_exit_codes:
+  - 0
+  stderr: research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.time
+  outputs:
+  - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.jsonl
+- id: isogeny-m5-t2
+  argv:
+  - prlimit
+  - --as=8589934592
+  - timeout
+  - '7500'
+  - /usr/bin/time
+  - -v
+  - target/release/examples/pkm_tower_pilot
+  - --engine
+  - tower
+  - --p
+  - '2013265921'
+  - --kinds
+  - isogeny
+  - --controls
+  - tower
+  - --planted
+  - '0'
+  - --random
+  - '2'
+  - --ladder-t
+  - none
+  - --m
+  - '5'
+  - --t-min
+  - '2'
+  - --max-t-m4
+  - '2'
+  - --budget
+  - '7200'
+  - --max-nnz
+  - '2000000000'
+  - --trace
+  - --out
+  - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.jsonl
+  timeout_seconds: 7500
+  success_exit_codes:
+  - 0
+  stderr: research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.time
+  outputs:
+  - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.jsonl
+- id: isogeny-m5-t3
+  argv:
+  - prlimit
+  - --as=8589934592
+  - timeout
+  - '7500'
+  - /usr/bin/time
+  - -v
+  - target/release/examples/pkm_tower_pilot
+  - --engine
+  - tower
+  - --p
+  - '2013265921'
+  - --kinds
+  - isogeny
+  - --controls
+  - tower
+  - --planted
+  - '0'
+  - --random
+  - '2'
+  - --ladder-t
+  - none
+  - --m
+  - '5'
+  - --t-min
+  - '3'
+  - --max-t-m4
+  - '3'
+  - --budget
+  - '7200'
+  - --max-nnz
+  - '2000000000'
+  - --trace
+  - --out
+  - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.jsonl
+  timeout_seconds: 7500
+  success_exit_codes:
+  - 0
+  stderr: research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.time
+  outputs:
+  - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.jsonl
+bus_address: executor-mechanical-arity-prime-m5-t2-t3
+background: true
+write_scope:
+- research/arity_completion_20261104/prime_tower_m5/
+stop_when:
+- Any command in the card exits with a status other than 0, or times out.
+- The controls-verdict command exits with status 1, meaning a control cell differs from its recorded D or is missing; run no m = 5 cell.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'
