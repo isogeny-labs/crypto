@@ -132,3 +132,11 @@ T run with a 2,400 s budget ran with at most two other jobs.
    internal S₃ by a planted known X and measure how much D drops.
 4. **Wreath-complete T:** also quotient the root swap at m = 4
    (S₂ ≀ S₂ = D₄, leaving 3 copies instead of 6).
+
+## Round 2 (2026-11-03)
+
+See [`round2/README.md`](round2/README.md), which covers next steps 1–3 above.
+Fixing the partial-sum separators brings D to 4 in every cell, so the excess
+degree is caused by the elliptic coupling, not the towers. On the same engine
+at m = 4, t = 4, F has D = 8 against T's 7, but F is 65× faster. At m = 4,
+t = 5 both arms were cut off (D_F ≥ 8, D_T ≥ 7).

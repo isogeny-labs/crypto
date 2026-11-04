@@ -1,35 +1,48 @@
-# Resume: crypto @ claude/index-calculus-ecdlp-symmetry-65jh09
+# Resume: crypto @ claude/index-calculus-ecdlp-symmetry-65jh09 (round 2, 2026-11-03)
 
 ## Goal
-User request (2026-11-03): run a deep research loop on prime-field ECDLP index
-calculus. Find a connection to a seemingly unrelated field, use it to find a
-factor-base symmetry that lowers the degree of regularity, and make sure it is
-new (not a repeat of the lab's tried lines). Treat the IC steps together.
+Follow-ups to PR #3361 (research/ic_tree_gluing_20261103, merged): the next
+steps listed in its README, run in a new run directory `round2/`.
 
-## Lead / hypothesis
-Two connections, both new to the lab (grep found no Elekes/Ritt/toric fiber
-product/phylogenetic hits):
-1. Barrier: Ritt's theorem on commuting maps (complex dynamics) and
-   Elekes–Szabó (incidence combinatorics) imply a dichotomy. A factor-base
-   structure either commutes with the group law (an isogeny coset, which
-   degenerates to IC on E/K) or does not interact with S_{m+1} at all.
-2. Constructive: phylogenetic group-based tree models / toric fiber products.
-   Pair the summands into "cherries" of a balanced binary tree, encode each
-   cherry symmetrically (s, q), and glue the cherries by S3. This quotients
-   the Sylow-2 wreath symmetry (S2)^{m/2} while keeping every input at degree <= 4.
-   Prediction (from the gluing analogy): the solving degree D is flatter in the
-   arity m than the caterpillar chain's. Kill: tree D >= caterpillar D in every cell.
+## Pre-registered predictions (written before any round-2 run)
+1. Same engine (msolve), m=4: F (S5 in e1..e4) has D >= 8 (input degree 8).
+   T has D = 7 at t=4 (already measured). Prediction: D_F - D_T >= 1 at t=4 and t=5.
+   F's widest matrix and time are lower than T's at t=4, as the lab's f4_fp record suggests.
+2. Conjecture B (separators drive t-growth). Arm S = T plus X_c = planted
+   value. Prediction: D_S equals the m=2 cherry D (4) at every t, while D_T
+   grows. Falsified if D_S grows with t like D_T does, which would mean the
+   membership towers, not the separators, drive the growth.
+3. T t-slope, m=3, t=6, 2400 s, uncontended: D_T = 7 (it selected 7 before the earlier 600 s cut-off).
 
 ## Spec
-research/ic_tree_gluing_20261103/gen.py builds the systems and checks each one
-on a planted on-curve decomposition. run.sh runs msolve 0.6.5 (-g 2 -t 1 -v 2).
-Cells: p=786433, m in {2,3,4}, t in {3..7}, 2 targets per cell. Arms: C
-(caterpillar), T (tree), F (full symmetric S4(e), m=3 only).
+gen.sing gains arm S (m=3,4) and arm F for m=4 (S5 by resultant, numeric xR).
+Runs: msolve -g 2 -t 1 -v 2, 1800 s cap (2400 s for the m=3 t=6 T cell), 3 jobs max on 4 cores.
+Cells: m4 t4 k0 {F,S}; m4 t5 k0 {F,T,S}; m3 t4..6 k0 {S}; m3 t6 k0 T (long).
 
-## State (2026-11-03)
-- gen.py written; every planted check passes for all cells (m=2 t>=3, m=3/4 t>=4).
-- Next: run msolve, parse D / last productive degree / widest matrix, then the
-  report, graph and PDF, then the PR.
+## State
+- Branch reset on main ca1c550507 (after the #3361 merge).
 
-## Resume command
-python3 research/ic_tree_gluing_20261103/gen.py OUT && bash research/ic_tree_gluing_20261103/run.sh OUT
+# Round 3 (2026-11-03, written before any round-3 run)
+
+## Items
+1. Arity scaling of the tree. Run arms T and S at m = 5 and 6, t = 4 and 5.
+   - m = 5: cherries (1,2),(3,4) plus leaf 5; X1, X2, then Y = x(X1 ⊕ X2); root S3(Y, x5, xR).
+   - m = 6: cherries (1,2),(3,4),(5,6); X1, X2, X3; Y from X1, X2; root S3(Y, X3, xR).
+   - The coupling excess is E(m,t) = D_T − D_S. It measures 0, 2, 3 at m = 2, 3, 4 (t = 4).
+2. Glued arm G at m = 4. Eliminate X1 and X2 by resultants:
+   G = Res_X1(S3sym(c0, X1), Res_X2(S3sym(c1, X2), S3(X1, X2, xR))),
+   plus both cherries' degree-2 remainder chains. G is S5 in pair coordinates, invariant
+   under S2 ≀ S2. Run it at m = 4, t = 4, 5 (and m = 3 analogue not needed).
+
+## Pre-registered predictions
+- P1: D_S = 4 at m = 5 and 6, as at m = 3 and 4.
+- P2 (kill test): E(5,4) ≤ 5 and E(6,4) ≤ 6, i.e. at most linear, slope ≤ 1 from m = 4.
+  If E(6,4) > 6 (or T at m = 6, t = 4 is cut off above degree 10), the tree does not meet D = O(m) and this line closes.
+- P3: at m = 4, t = 4, G has D in [7, 8] and a widest matrix below T's 25,742 columns.
+  G beats F (10.7 s, 13,503 columns) only if its time is < 10.7 s; I expect it not to (50/50 at best).
+
+## Spec
+- inst.sing: deterministic planted instances for m = 5, 6 (LCG with a fixed seed, no Python),
+  written to instances_r3.txt. Seed 0x7EE51103, curve line from instances.txt.
+- gen.sing: arms T and S for m = 5, 6; arm G for m = 4; env INSTFILE.
+- Runs: msolve -g 2 -t 1, 1800 s cap, at most 2 jobs, 6 GiB each.

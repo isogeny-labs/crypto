@@ -39,6 +39,11 @@ digraph attack_graph {
   "CLAIM-GG-FKL-AGM-TO-GGM" [label="CLAIM-GG-FKL-AGM-TO-GGM\nconditional · impact 0", fillcolor="#fde2e2", color="#526575"];
   "CLAIM-LEMMA4-REVERSE-GENERAL" [label="CLAIM-LEMMA4-REVERSE-GENERAL\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-NAGAO-LEMMA4" [label="CLAIM-NAGAO-LEMMA4\nrefuted · impact 2", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-PA-BATCH-ADAPTIVE" [label="CLAIM-PA-BATCH-ADAPTIVE\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-PA-MOD-ALIAS" [label="CLAIM-PA-MOD-ALIAS\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-PA-POLY-FUNCTION" [label="CLAIM-PA-POLY-FUNCTION\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-PA-SCHNORR-ANY-TWO" [label="CLAIM-PA-SCHNORR-ANY-TWO\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-PA-SUBGROUP-AMBIENT" [label="CLAIM-PA-SUBGROUP-AMBIENT\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" [label="CLAIM-SP-SEMAEV15-DFF-ALWAYS-4\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-SP-SEMAEV15-FFDA-T2" [label="CLAIM-SP-SEMAEV15-FFDA-T2\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-XT-AMOR-F2-1223-128BIT" [label="CLAIM-XT-AMOR-F2-1223-128BIT\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
@@ -334,4 +339,14 @@ digraph attack_graph {
   "CEX-FAKE-GAP-INSIDE-YZ" -> "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE" [label="refutes", color="#a33a3a", penwidth=2];
   "CEX-SP-SEMAEV15-T2-TRACE" [fillcolor="#dff4e5", color="#257942"];
   "CEX-SP-SEMAEV15-T2-TRACE" -> "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-PA-MOD-ALIAS" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-PA-MOD-ALIAS" -> "CLAIM-PA-MOD-ALIAS" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-PA-SUBGROUP-AMBIENT" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-PA-SUBGROUP-AMBIENT" -> "CLAIM-PA-SUBGROUP-AMBIENT" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-PA-BATCH-ADAPTIVE" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-PA-BATCH-ADAPTIVE" -> "CLAIM-PA-BATCH-ADAPTIVE" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-PA-POLY-FUNCTION" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-PA-POLY-FUNCTION" -> "CLAIM-PA-POLY-FUNCTION" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-PA-SCHNORR-SAME-CHALLENGE" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-PA-SCHNORR-SAME-CHALLENGE" -> "CLAIM-PA-SCHNORR-ANY-TWO" [label="refutes", color="#a33a3a", penwidth=2];
 }
