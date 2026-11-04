@@ -449,6 +449,6 @@ go/no-go rule before any engine work; nothing was measured.
 - **T13 (next end-to-end, protocol frozen):** t = 4, G = 3, seed 1193 at
   k = 20, plain and with trace replay, against T12's winner. Modelled
   0.49× the winner at w ≥ 0.1 (0.23× with trace), dearer at w = 0.
-- **L15:** done (above); the bits arm is now ~12× below its 2026-11-02 per-relation cost at t = 5, still 10.5× behind the tower.
+- **L15:** done (above); at (t, G) = (5, 3) the digit set is 12.4× below the `lo = 0` bits control per relation (derived) and 6.2× per solve, still 10.5× behind the tower (validated pass_with_errata).
 - The exponent result bounds all of this: constant-factor gains on a
   track whose exponent is 1.03 against rho's 0.5.
