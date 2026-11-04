@@ -67,7 +67,8 @@ Paired ratios, winner ÷ comparator (K = 16 targets, linearised t, 95%):
 | rho-neg | 17.1 [13.3, 22.0] | 6.06e4 [4.55e4, 8.07e4] | 3.78e5 [2.79e5, 5.13e5] | 0/16 |
 
 **Band ranks:**
-- winner < seed 0 at every weight;
+- winner < seed 0 at every weight (band point verdict; the paired w = 0
+  interval [0.721, 1.013] includes 1);
 - winner vs seed 1308 is unresolved inside the band, because the order flips
   at w = 0;
 - proj-a and rho-neg are ahead of every PKM arm at every weight.
@@ -83,7 +84,8 @@ Paired ratios, winner ÷ comparator (K = 16 targets, linearised t, 95%):
 | Q5 | every PKM arm stays behind proj-a and rho-neg at w = 0.1 and 1 | **held** |
 
 **Against the T10 model:**
-- Winner ÷ seed 0 measured 0.0578 against a modelled 0.054 (1.07×).
+- Winner ÷ seed 0 measured 0.0578 against a modelled 0.054 (1.08× with the
+  exact model).
 - Winner ÷ seed 1308 measured 0.128 against 0.108 (1.19×).
 - At w = 0, winner ÷ seed 1308 measured 1.59 against the columns/coverage
   model's 1.45.
@@ -95,8 +97,9 @@ Paired ratios, winner ÷ comparator (K = 16 targets, linearised t, 95%):
   incumbent** and **7.8× cheaper than the T9 seed** at w ≥ 0.1. It is
   cheaper on every one of the 16 targets.
 - The gain comes from the F4 work per target: t = 5 with G = 4 solves 16
-  small systems of about 52,816 mul-adds each per target, against about
-  710,094 for t = 6, G = 4.
+  small branch systems per target for 52,816 mul-adds in total per target
+  (measured 51,207 per trial in this session), against about 710,094 for
+  t = 6, G = 4.
 - At w = 0 (F4 free), the smaller t = 5 base needs more trials per relation
   (columns/covered 0.105 against 0.072), so seed 1308 is ahead there. This is
   the order flip predicted in Q4.
@@ -104,7 +107,7 @@ Paired ratios, winner ÷ comparator (K = 16 targets, linearised t, 95%):
 ## Costs: per-curve precomputation, charged and amortised
 
 - The seed search for the winner was 2,000 tower builds plus the [r]P
-  selector at t = 5: 6.94·10⁶ group operations, which is 1.92·10⁴ in S.
+  selector at t = 5: 6.94·10⁶ group operations, which is 1.91·10⁴ in S.
 - The T10 G sweep was an engine measurement. It is a design-time cost, not
   part of a solve, and is not charged.
 
@@ -131,3 +134,24 @@ operations, so charging both searches favours the winner further.
   wall-time claim is made.
 - Conductor and the AWS CLI are absent, so there is no S3 checkpoint.
 - The research-visuals graph and PDF are not yet produced.
+
+## Validator errata (applied)
+
+Independent validation: pass_with_errata (`validator-report.json`,
+`replay-certificate.json`: `verify --replay 2` on c00, c09, c12, 6/6
+identical, 0 problems; all 160 discrete logs re-verified with the
+validator's own curve arithmetic; every band, ratio, interval and distance
+reproduced to ≤ 1e-14).
+
+- E1: "16 systems of about 52,816 mul-adds each" corrected; 52,816 is the
+  per-target total.
+- E2: the search alone is 1.91·10⁴ in S, not 1.92·10⁴.
+- E3: the §5a per-arm unpriced native counters are listed in
+  `validator-report.json`; the band table above already prices them at
+  w = 0, 0.1 and 1.
+- E4: the session records `git_commit`/`git_dirty` as null; the binary is
+  bound by its hash (`ecbench/binary.sha256`) only.
+- E5: the w = 0 "winner < seed 0" verdict is a band point verdict; the
+  paired interval includes 1.
+- E6: model ratio 1.07× → 1.08× with the exact model.
+- E7: no research-visuals graph or PDF for this study yet (disclosed).
