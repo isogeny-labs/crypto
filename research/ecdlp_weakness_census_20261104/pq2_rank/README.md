@@ -77,7 +77,8 @@ At every n, low2 = 1, and low3 = 1 for every n ≥ 9. The value of k lies betwee
 **Degree 4 beyond n = 16.** A separate sweep at n = 17 to 20 (`results/iter4_n17_20/`)
 has fresh instances, because the random stream starts at n = 17. Iterated degree 3
 gives 1 and iterated degree 4 gives exactly k on all 12 instances, so d_iter = 4 there.
-`results/iter4_n21_24/` extends this to n = 21 to 24 (see below).
+`results/iter4_n21_24/` does the same at n = 21 to 24 with the same outcome on all 12
+instances. Across both sweeps, d_iter = 4 on 24 of 24 instances from n = 17 to 24.
 
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
@@ -94,7 +95,7 @@ holds on this range [pcc:unverified].
 * Literal Assumption 2 says the solver degree equals the first fall degree, which is 2.
   It fails on all 119 instances: d_iter ≥ 3 everywhere.
 * The Kousidis–Wiemers reading predicts 3 + o(1). Every instance with 17 ≤ n ≤ 44 needs
-  an iterated degree above 3, and the 12 instances measured at n = 17 to 20 need exactly 4.
+  an iterated degree above 3, and the 24 instances measured at n = 17 to 24 need exactly 4.
   A finite range cannot refute an o(1) statement. It does show that the asymptotic value 3
   is not reached anywhere from n = 17 to 44.
 * These numbers are lower bounds on F4's maximal step degree, valid only under the
