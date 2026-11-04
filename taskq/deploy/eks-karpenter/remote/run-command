@@ -25,7 +25,7 @@ jq -e --arg repository "$repository" '
   and (.job.image|type)=="string" and (.job.image|split("@sha256:")[0])==$repository
   and (.job.image|length)==($repository|length)+72 and (.job.image|test("@sha256:[a-f0-9]{64}$"))
   and (.job.command|type)=="array" and (.job.command|length)>=1 and (.job.command|length)<=256
-  and all(.job.command[]; type=="string" and length>=1 and length<=8192 and ((test("[\n\r]") or contains("\u0000"))|not))
+  and all(.job.command[]; type=="string" and length>=1 and length<=8192 and (test("[\n\r]")|not) and (explode|any(.==0)|not))
   and ((.job.cpu // 2)|IN(2,4,6,8,10,12,14,16,18,20,22,24,26,28))
   and ((.job.memory // "4Gi")|type)=="string" and ((.job.memory // "4Gi")|test("^[1-9][0-9]*(Mi|Gi)$"))
   and ((.job.seconds // 3600)|type)=="number" and ((.job.seconds // 3600)|floor)==(.job.seconds // 3600)
