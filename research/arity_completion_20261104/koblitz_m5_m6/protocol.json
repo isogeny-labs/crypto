@@ -27,18 +27,19 @@
   "claims": [
     {
       "id": "K1",
-      "text": "At n = 23 (k0n23), the m = 5 and m = 6 public cells with the union:2 base decide (all four queries SAT or proved UNSAT) inside the 600 s process cap.",
+      "text": "For each engine (chain-s3-orbit and chain-s3), at n = 23 (k0n23) the m = 5 and m = 6 public union:2 cells decide (all four queries SAT or proved UNSAT) inside the 600 s process cap.",
       "class": "exact_computation",
       "decided_by": [
         "C-cells-A",
-        "C-positive"
+        "C-positive",
+        "C-engine"
       ],
       "if_supported": "The chained-S3 union-base line produces its first measured m >= 5 decided cells; their seconds per query are the first price of the line, to be compared with the m = 4 root-table figure.",
-      "if_not_supported": "Falsified: at the smallest registered curve the m >= 5 chained line does not decide inside 600 s with a single-threaded process; the line is capped at every larger n by monotone cost (K2) and K2/K4 are read accordingly."
+      "if_not_supported": "Falsified for an engine if either of its two k0n23 cells caps or is undecided: at the smallest registered curve that engine does not decide m >= 5 inside 600 s single-threaded, and K2/K4 are read accordingly. The two engines are reported separately; the claim holds only if it holds for both."
     },
     {
       "id": "K2",
-      "text": "Decided-query seconds grow at least geometrically with n at fixed (m, S), such that every m = 6 public cell at n = 37 and n = 41 (S = 2, 3) hits the 600 s cap.",
+      "text": "For each engine, decided-query seconds grow at least geometrically with n at fixed (m, S), such that every m = 6 public cell at n = 37 and n = 41 (S = 2, 3) hits the 600 s cap.",
       "class": "comparative",
       "decided_by": [
         "C-n-scaling"
@@ -48,44 +49,47 @@
     },
     {
       "id": "K3",
-      "text": "In every decided planted cell the planted relation is recovered: four of four queries return a witness that is re-added in the curve group and equals the target.",
+      "text": "In every decided planted cell, for both engines, the planted relation is recovered: every query returns a witness that is re-added in the curve group and equals the target (4 of 4 in Part A, 1 of 1 in Part B).",
       "class": "exact_computation",
       "decided_by": [
         "C-positive"
       ],
       "if_supported": "The instrument finds a relation that exists at each decided planted cell; public verdicts there are informative.",
-      "if_not_supported": "Any decided planted cell with a proved_unsat verdict or fewer than four verified witnesses invalidates that cell's planted and public records and the engine at that (m, n, S); K4 and K5 are then not evaluable for it."
+      "if_not_supported": "Any decided planted cell with a proved_unsat verdict or an unverified witness invalidates that cell's planted and public records and that engine at that (m, n, S); K4 and K5 are then not evaluable for it."
     },
     {
       "id": "K4",
-      "text": "At n = 83 (n83k1, a = 1 pinned fixture) every m = 5 and m = 6 public cell (S = 2, 3) stays undecided at the 1800 s cell cap; the tenfold lift does not change the n83_msweep verdict.",
+      "text": "At n = 83 (n83k1, a = 1 pinned fixture), for each engine, every m = 5 and m = 6 public cell (S = 2, 3) stays undecided at the 1800 s cap, which with one query per cell process is a per-query cap; the tenfold lift does not change the n83_msweep verdict.",
       "class": "exact_computation",
       "decided_by": [
         "C-cells-B",
-        "C-lift-n83"
+        "C-lift-n83",
+        "C-engine"
       ],
       "if_supported": "The n = 83 m >= 5 chained line is capped at 1800 s as at 180 s; with K5 this is the kill criterion.",
       "if_not_supported": "Falsified by any decided n = 83 public cell at m = 5 or 6: the 180 s verdict was a cap artefact and the line stays open at n = 83."
     },
     {
       "id": "K5",
-      "text": "No decided public cell at n >= 31 (Part A) or at n = 83 (Part B) has seconds per decided query below 188 s, the m = 4 root-table parity threshold (n83 K1107 complete DLPs took 175-188 s), so the m >= 5 chained line stays behind m = 4.",
+      "text": "For each engine, no decided public cell at n >= 31 (Part A) or at n = 83 (Part B) has seconds per decided query below 188 s, the m = 4 root-table parity threshold (n83 K1107 complete DLPs took 175-188 s), so the m >= 5 chained line stays behind m = 4. Stated plainly: Part A keeps 4 trials under a 600 s process cap, so a decided Part A cell proves at most 150 s per query; a decided Part A cell at n >= 31 therefore falsifies K5 by construction, and otherwise K5 stays untested on capped cells (a cap is a censored observation, not a cost above 188 s). Part B runs one query per process under 1800 s, so a Part B cell is the only place a per-query cost above 188 s can be observed.",
       "class": "comparative",
       "decided_by": [
         "C-cells-A",
-        "C-cells-B"
+        "C-cells-B",
+        "C-engine"
       ],
-      "if_supported": "No measured m >= 5 chained cell undercuts one m = 4 root-table DLP. When no cell at n >= 31 decides, K5 holds vacuously and is reported as such.",
-      "if_not_supported": "Falsified by any decided public cell at n >= 31 with seconds per query below 188 s (a Part A cell that decides at n >= 31 does so, because four queries fit in 600 s, i.e. at most 150 s per query): the line then has a measured improvement over the m = 4 parity point and is reported as the distance remaining, not as a pass."
+      "if_supported": "No decided m >= 5 chained cell undercuts one m = 4 root-table DLP. When no cell at n >= 31 decides, K5 holds vacuously and is reported as such: capped Part A cells show only that four queries together exceed 600 s, which does not test 188 s.",
+      "if_not_supported": "Falsified by any decided public cell at n >= 31 with seconds per query below 188 s; every decided Part A cell at n >= 31 does so (at most 150 s per query), so Part A decisions at n >= 31 falsify K5 by construction. The line then has a measured improvement over the m = 4 parity point and is reported as the distance remaining, not as a pass."
     },
     {
       "id": "K6",
-      "text": "Kill criterion for the high-arity Koblitz line: K4 and K5 both supported, with K3 not falsified.",
+      "text": "Kill criterion for the high-arity Koblitz line: K4 and K5 both supported for both engines, with K3 not falsified.",
       "class": "exact_computation",
       "decided_by": [
         "C-cells-B",
         "C-cells-A",
-        "C-positive"
+        "C-positive",
+        "C-engine"
       ],
       "if_supported": "The high-arity Koblitz chained-S3 line is closed at these parameters (verdict kill_high_arity_koblitz_line).",
       "if_not_supported": "The line stays open (line_stays_open); a falsified K3 gives not_evaluable_instrument_invalid."
@@ -101,7 +105,7 @@
     {
       "id": "A-public",
       "role": "candidate",
-      "description": "Part A measurement: public probes R = [a]G (4 per cell), chain-s3-orbit, m in {5, 6} x union:S for S in {2, 3} x curves k0n23, k1n29, k0n31, k0n37, k0n41 (a = 0 except n = 29, a = 1), 20 cells, 600 s process cap each, family koblitzA.",
+      "description": "Part A measurement: public probes R = [a]G (4 per cell), engines chain-s3-orbit and chain-s3, m in {5, 6} x union:S for S in {2, 3} x curves k0n23, k1n29, k0n31, k0n37, k0n41 (a = 0 except n = 29, a = 1), 40 cells, 600 s process cap each (4 trials per process, so a decided cell is at most 150 s per query), family koblitzA.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -116,7 +120,7 @@
         ],
         "binary_sha256": null,
         "flags": {
-          "engine": "chain-s3-orbit (library sat_decompose_chained_s3_any_m, orbit domain on, ordered off)",
+          "engine": "chain-s3-orbit and chain-s3 (library sat_decompose_chained_s3_any_m; orbit domain on for chain-s3-orbit, off for chain-s3; ordered off)",
           "ChainS3Limits": "max_variables 4000000; max_domain_clauses 50000000; max_models 64; conflict_budget 200000",
           "trials": "4",
           "seed": "8609517",
@@ -150,13 +154,18 @@
           "k0n41"
         ],
         "cell_timeout_s": 600,
-        "cells": 20
+        "cells": 40,
+        "engines": [
+          "chain-s3-orbit",
+          "chain-s3"
+        ],
+        "trials": 4
       }
     },
     {
       "id": "A-planted",
       "role": "control_positive",
-      "description": "Positive control for Part A: the same 20 cells with planted targets (sum of m random base points), 4 per cell; the planted relation must be recovered.",
+      "description": "Positive control for Part A: the same 40 cells (both engines) with planted targets (sum of m random base points), 4 per cell; the planted relation must be recovered.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -171,7 +180,7 @@
         ],
         "binary_sha256": null,
         "flags": {
-          "engine": "chain-s3-orbit (library sat_decompose_chained_s3_any_m, orbit domain on, ordered off)",
+          "engine": "chain-s3-orbit and chain-s3 (library sat_decompose_chained_s3_any_m; orbit domain on for chain-s3-orbit, off for chain-s3; ordered off)",
           "ChainS3Limits": "max_variables 4000000; max_domain_clauses 50000000; max_models 64; conflict_budget 200000",
           "trials": "4",
           "seed": "8609517",
@@ -205,14 +214,19 @@
           "k0n41"
         ],
         "cell_timeout_s": 600,
-        "cells": 20
+        "cells": 40,
+        "engines": [
+          "chain-s3-orbit",
+          "chain-s3"
+        ],
+        "trials": 4
       },
       "same_instrument_as": "A-public"
     },
     {
       "id": "A-aa",
       "role": "control_aa",
-      "description": "A/A for Part A: the 20 public cells run a second time with identical arguments (same binary, seed, host class) as separate records of family aa; outcomes must agree exactly, seconds are compared as a noise floor.",
+      "description": "A/A for Part A: the 40 public cells (both engines) run a second time with identical arguments (same binary, seed, host class) as separate records of family aa; outcomes must agree exactly, seconds are compared as a noise floor.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -227,7 +241,7 @@
         ],
         "binary_sha256": null,
         "flags": {
-          "engine": "chain-s3-orbit (library sat_decompose_chained_s3_any_m, orbit domain on, ordered off)",
+          "engine": "chain-s3-orbit and chain-s3 (library sat_decompose_chained_s3_any_m; orbit domain on for chain-s3-orbit, off for chain-s3; ordered off)",
           "ChainS3Limits": "max_variables 4000000; max_domain_clauses 50000000; max_models 64; conflict_budget 200000",
           "trials": "4",
           "seed": "8609517",
@@ -261,7 +275,12 @@
           "k0n41"
         ],
         "cell_timeout_s": 600,
-        "cells": 20
+        "cells": 40,
+        "engines": [
+          "chain-s3-orbit",
+          "chain-s3"
+        ],
+        "trials": 4
       },
       "same_instrument_as": "A-public"
     },
@@ -283,7 +302,7 @@
         ],
         "binary_sha256": null,
         "flags": {
-          "engine": "chain-s3-orbit (library sat_decompose_chained_s3_any_m, orbit domain on, ordered off)",
+          "engine": "chain-s3-orbit and chain-s3",
           "ChainS3Limits": "max_variables 4000000; max_domain_clauses 50000000; max_models 64; conflict_budget 200000",
           "trials": "4",
           "seed": "8609517",
@@ -319,14 +338,15 @@
           "k0n41"
         ],
         "cell_timeout_s": 600,
-        "cells": 10
+        "cells": 10,
+        "trials": 4
       },
       "same_instrument_as": "A-public"
     },
     {
       "id": "B-public",
       "role": "candidate",
-      "description": "Part B lift: the n83_msweep cells re-run with the cap lifted from 180 s to 1800 s: n83k1 (KoblitzCurve::known_n83_k1, a = 1), chain-s3-orbit, m in {5, 6} x union:S, S in {2, 3}, public, 4 cells, family liftB.",
+      "description": "Part B lift: the n83_msweep cells re-run with the cap lifted from 180 s to 1800 s and ONE trial per process (so the cap is per query): n83k1 (KoblitzCurve::known_n83_k1, a = 1), engines chain-s3-orbit and chain-s3, m in {5, 6} x union:S, S in {2, 3}, public, 8 cells, family liftB.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -341,9 +361,9 @@
         ],
         "binary_sha256": null,
         "flags": {
-          "engine": "chain-s3-orbit (library sat_decompose_chained_s3_any_m, orbit domain on, ordered off)",
+          "engine": "chain-s3-orbit and chain-s3 (library sat_decompose_chained_s3_any_m; orbit domain on for chain-s3-orbit, off for chain-s3; ordered off)",
           "ChainS3Limits": "max_variables 4000000; max_domain_clauses 50000000; max_models 64; conflict_budget 200000",
-          "trials": "4",
+          "trials": "1 (one query per process, so the 1800 s cap is a per-query cap)",
           "seed": "8609517",
           "per_query_ms": "10000 (not read by the chain engines; the query is bounded by conflict_budget and the process cap)",
           "factor_base": "union:S = Frobenius-union base on span(1, z, ..., z^(S-1)) in the ambient basis",
@@ -371,14 +391,19 @@
           "n83k1"
         ],
         "cell_timeout_s": 1800,
-        "cells": 4
+        "cells": 8,
+        "engines": [
+          "chain-s3-orbit",
+          "chain-s3"
+        ],
+        "trials": 1
       },
       "same_instrument_as": "A-public"
     },
     {
       "id": "B-planted",
       "role": "control_positive",
-      "description": "Positive control for Part B: the same four cells with planted targets, 1800 s cap.",
+      "description": "Positive control for Part B: the same eight cells (both engines) with a planted target, one trial, 1800 s cap.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -393,9 +418,9 @@
         ],
         "binary_sha256": null,
         "flags": {
-          "engine": "chain-s3-orbit (library sat_decompose_chained_s3_any_m, orbit domain on, ordered off)",
+          "engine": "chain-s3-orbit and chain-s3 (library sat_decompose_chained_s3_any_m; orbit domain on for chain-s3-orbit, off for chain-s3; ordered off)",
           "ChainS3Limits": "max_variables 4000000; max_domain_clauses 50000000; max_models 64; conflict_budget 200000",
-          "trials": "4",
+          "trials": "1 (one query per process, so the 1800 s cap is a per-query cap)",
           "seed": "8609517",
           "per_query_ms": "10000 (not read by the chain engines; the query is bounded by conflict_budget and the process cap)",
           "factor_base": "union:S = Frobenius-union base on span(1, z, ..., z^(S-1)) in the ambient basis",
@@ -423,14 +448,19 @@
           "n83k1"
         ],
         "cell_timeout_s": 1800,
-        "cells": 4
+        "cells": 8,
+        "engines": [
+          "chain-s3-orbit",
+          "chain-s3"
+        ],
+        "trials": 1
       },
       "same_instrument_as": "A-public"
     },
     {
       "id": "B-neg-m2",
       "role": "control_negative",
-      "description": "Known-decidable baseline at n = 83: m = 2, union:2, public, engines chain-s3-orbit and chain-s3, 1800 s cap (2 cells). The n83 record decided chain-s3 at 17.3 s per query; chain-s3-orbit hit the 180 s cap there and is measured here for the first time at 1800 s.",
+      "description": "Known-decidable baseline at n = 83: m = 2, union:2, public, engines chain-s3-orbit and chain-s3, one trial per process, 1800 s cap (2 cells). The n83 record decided chain-s3 at 17.3 s per query (mean of 4); chain-s3-orbit hit the 180 s cap there.",
       "instrument": {
         "repo": "crypto",
         "commit": null,
@@ -445,9 +475,9 @@
         ],
         "binary_sha256": null,
         "flags": {
-          "engine": "chain-s3-orbit (library sat_decompose_chained_s3_any_m, orbit domain on, ordered off)",
+          "engine": "chain-s3-orbit and chain-s3",
           "ChainS3Limits": "max_variables 4000000; max_domain_clauses 50000000; max_models 64; conflict_budget 200000",
-          "trials": "4",
+          "trials": "1 (one query per process, so the 1800 s cap is a per-query cap)",
           "seed": "8609517",
           "per_query_ms": "10000 (not read by the chain engines; the query is bounded by conflict_budget and the process cap)",
           "factor_base": "union:S = Frobenius-union base on span(1, z, ..., z^(S-1)) in the ambient basis",
@@ -477,7 +507,8 @@
           "n83k1"
         ],
         "cell_timeout_s": 1800,
-        "cells": 2
+        "cells": 2,
+        "trials": 1
       },
       "same_instrument_as": "A-public"
     },
@@ -560,6 +591,13 @@
         ]
       },
       {
+        "name": "engine",
+        "levels": [
+          "chain-s3-orbit",
+          "chain-s3"
+        ]
+      },
+      {
         "name": "n (curve)",
         "levels": [
           "k0n23",
@@ -587,23 +625,23 @@
       {
         "name": "part (cell_timeout_s)",
         "levels": [
-          "A: 600",
-          "B: 1800"
+          "A: 600 s per process, 4 trials",
+          "B: 1800 s per process, 1 trial"
         ]
       }
     ],
     "factors": [
       {
-        "name": "engine",
+        "name": "engine family and its domain",
         "treatment": "fixed",
-        "value": "chain-s3-orbit",
-        "how": "Every measured and A/A cell passes chain-s3-orbit. Negative-control cells also run chain-s3 because the 17.3 s record is a chain-s3 figure."
+        "value": "two levels are crossed (see independent); everything else about the encoding is shared",
+        "how": "chain-s3 is the explicit-domain encoding the n83 record decided at m = 2; chain-s3-orbit is the signed-Frobenius orbit-domain encoding that capped there. Both read the same limits."
       },
       {
         "name": "trials",
         "treatment": "fixed",
-        "value": 4,
-        "how": "TRIALS = 4 in every grid row; the n83 planted rows used 2, so planted n83 rows are not like-for-like with the record."
+        "value": "4 in Part A and the Part A negatives; 1 in Part B (liftB and the n83 negative)",
+        "how": "TRIALS is the grid trials column. Part B uses 1 so the 1800 s process cap is a per-query cap; Part A keeps 4 under a 600 s process cap, so a decided Part A cell is at most 150 s per query (factor-base time excluded). The n83 planted rows used 2 trials and the public rows 4, so Part B is not like-for-like with the record on trial count."
       },
       {
         "name": "seed and probe stream",
@@ -645,7 +683,7 @@
         "name": "cell_timeout_s",
         "treatment": "fixed",
         "value": "600 (Part A), 1800 (Part B)",
-        "how": "Per cell process, all four trials together, applied by timeout --kill-after=5. A decided cell therefore has mean seconds per query at most cap / 4 (150 s, 450 s) minus factor-base time."
+        "how": "Per cell process (timeout --kill-after=5). Part A: four trials share 600 s, so a decided cell has mean seconds per query at most 150 s. Part B: one trial per process, so 1800 s bounds one query."
       },
       {
         "name": "instance parity between modes",
@@ -660,13 +698,25 @@
     ],
     "comparisons": [
       {
+        "id": "C-engine",
+        "arms": [
+          "A-public",
+          "B-public"
+        ],
+        "differs_in": [
+          "engine"
+        ],
+        "design": "one_factor",
+        "reason": "At each (m, n, S): outcome class and seconds per decided query of chain-s3 versus chain-s3-orbit, ratio where both decide. Claims K1 to K6 are read per engine; this comparison reports the pair."
+      },
+      {
         "id": "C-cells-A",
         "arms": [
           "A-public"
         ],
         "differs_in": [],
         "design": "absolute",
-        "threshold": "Exact outcome per Part A cell: decided_sat, decided_unsat, decided_mixed, undecided or capped; K1 reads n = 23, K5 reads seconds per query against 188 s at n >= 31."
+        "threshold": "Exact outcome per Part A cell, per engine: decided_sat, decided_unsat, decided_mixed, undecided or capped; K1 reads n = 23, K5 reads seconds per query against 188 s at n >= 31 (a decided cell is at most 150 s per query by the cap)."
       },
       {
         "id": "C-cells-B",
@@ -675,7 +725,7 @@
         ],
         "differs_in": [],
         "design": "absolute",
-        "threshold": "Exact outcome per Part B cell at the 1800 s cap; K4 needs all four undecided or capped, K5 reads seconds per query against 188 s."
+        "threshold": "Exact outcome per Part B cell (one query, 1800 s cap), per engine; K4 needs all eight undecided or capped (four per engine), K5 reads seconds per query against 188 s."
       },
       {
         "id": "C-m5-vs-m6",
@@ -711,7 +761,7 @@
           "host class and threads"
         ],
         "design": "confounded",
-        "reason": "The 180 s record was run on another host and commit; only the cap is intended to differ. Read as a descriptive comparison of outcome (capped at 180 s versus decided or capped at 1800 s). The orbit union:2 m = 5, 6 cells have a 180 s record; orbit union:3 has none (the record's union:3 cells are chain-s3), so S = 3 is compared with chain-s3 union:3."
+        "reason": "The 180 s record was run on another host and commit; only the cap is intended to differ. Read as a descriptive comparison of outcome (capped at 180 s versus decided or capped at 1800 s). The orbit union:2 m = 5, 6 cells have a 180 s record; orbit union:3 has none (the record's union:3 cells are chain-s3), so S = 3 is compared with chain-s3 union:3. Part B uses one trial per process while the record's public cells used four."
       },
       {
         "id": "C-positive",
@@ -721,7 +771,7 @@
         ],
         "differs_in": [],
         "design": "absolute",
-        "threshold": "Every planted cell that completes returns four verified witnesses (K3)."
+        "threshold": "Every planted cell that completes returns only verified witnesses (K3), per engine."
       },
       {
         "id": "C-aa",
@@ -778,14 +828,14 @@
       "tests_in_family": 5,
       "correction": "other",
       "passes": true,
-      "note": "Per-cell exact classification of four fixed queries; K1-K5 are threshold readings of exact cell outcomes, not sampled tests, so no power calculation applies. The one resolution limit: with four queries a cell's seconds per query is a mean over four, and the cap bounds it at cap/4 minus factor-base time for a decided cell."
+      "note": "Per-cell exact classification of four fixed queries; K1-K5 are threshold readings of exact cell outcomes, not sampled tests, so no power calculation applies. The one resolution limit: with four queries a cell's seconds per query is a mean over four, and the cap bounds it at cap/4 minus factor-base time for a decided cell. Part B has one query per cell."
     },
     "preflight_runtime": {
       "fixed_seconds": null,
       "per_sample_seconds": null,
       "threads": 1,
       "estimated_total_seconds": null,
-      "measured_on": "To be filled by the preflight: one development smoke of the (m = 5, n = 23 = k0n23, S = 2) public cell with the frozen command, output discarded, labelled not evidence, used only to confirm the command runs and to record preflight_runtime. Worst-case total if every cell hit its cap: 60000 CPU-seconds (Part A 42000, Part B 18000); the stopping rule can only lower it."
+      "measured_on": "To be filled by the preflight: one development smoke of the (m = 5, n = 23 = k0n23, S = 2) public cell, engine chain-s3-orbit with the frozen command, output discarded, labelled not evidence, used only to confirm the command runs and to record preflight_runtime. Worst-case total if every cell hit its cap: 110400 CPU-seconds (Part A 78000, Part B 32400); the stopping rule can only lower it."
     }
   },
   "metrics": {
@@ -795,7 +845,7 @@
         "name": "Cell decided",
         "unit": "boolean per cell",
         "kind": "exact",
-        "definition": "True iff the cell process exited 0 with a complete record and decided_fraction = 1 (every one of the four queries returned witness or proved_unsat). Classes: decided_sat (4 witnesses), decided_unsat (4 proved_unsat), decided_mixed, undecided (complete record, some query incomplete, unresolved, unsupported or invalid_model), capped (process_cap: killed at the cell cap), skipped_stopping_rule, process_error.",
+        "definition": "True iff the cell process exited 0 with a complete record and decided_fraction = 1 (every query of the cell (four in Part A, one in Part B) returned witness or proved_unsat). Classes: decided_sat (all witnesses), decided_unsat (all proved_unsat), decided_mixed, undecided (complete record, some query incomplete, unresolved, unsupported or invalid_model), capped (process_cap: killed at the cell cap), skipped_stopping_rule, process_error.",
         "source": "raw/shard*/<family>__<curve>__m<M>__union-<S>__<engine>__<probes>.json: status, outcomes, decided_fraction, relations, verified_relations",
         "aggregation": "per_row",
         "resolution": "one cell",
@@ -806,7 +856,7 @@
         "name": "Seconds per decided query",
         "unit": "seconds",
         "kind": "timed",
-        "definition": "collection_seconds / trials for a decided cell (mean over its four queries, factor-base construction excluded); not defined for capped or undecided cells, whose cap time is never reported as a cost. median_seconds_per_trial is carried as the spread.",
+        "definition": "collection_seconds / trials for a decided cell (mean over its queries: four in Part A, one in Part B, factor-base construction excluded); not defined for capped or undecided cells, whose cap time is never reported as a cost. median_seconds_per_trial is carried as the spread.",
         "source": "cell JSON seconds_per_trial, median_seconds_per_trial, collection_seconds, factor_base_seconds",
         "aggregation": "per_row",
         "resolution": "1e-3 s",
@@ -904,17 +954,17 @@
       "minimum_memory_bytes": 8589934592,
       "memory_note": "Placeholder pending the preflight peak RSS; the chain encoding at m = 6, n = 83 has 105908 variables.",
       "campaign_usd_ceiling": null,
-      "campaign_usd_ceiling_note": "To be set by the experiment director in the launch request before any spend (AGENTS.md section 9a); worst case 60000 CPU-seconds, about 16.7 vCPU-hours, plus build and idle.",
+      "campaign_usd_ceiling_note": "To be set by the experiment director in the launch request before any spend (AGENTS.md section 9a); worst case 110400 CPU-seconds, about 30.7 vCPU-hours, plus build and idle.",
       "absolute_deadline_utc": null,
-      "worst_case_cpu_seconds": 60000,
+      "worst_case_cpu_seconds": 110400,
       "worst_case_seconds_per_shard": {
         "m2": 9600,
-        "m5": 25200,
-        "m6": 25200
+        "m5": 50400,
+        "m6": 50400
       }
     },
     "measurement_class": "measurement",
-    "timeout_seconds": 28800,
+    "timeout_seconds": 57600,
     "checkpoint": {
       "policy": "none",
       "interval_seconds": null,
@@ -932,7 +982,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "Fixed grid: 80 cells in grid.tsv (Part A: 20 public + 20 planted + 20 A/A + 10 negative; Part B: 4 public + 4 planted + 2 negative), one fresh single-threaded process each, 4 trials, seed 8609517; the cell caps are 600 s (Part A, negatives at n <= 41) and 1800 s (Part B).",
+      "rule": "Fixed grid: 148 cells in grid.tsv (Part A, both engines: 40 public + 40 planted + 40 A/A + 10 negative; Part B, both engines: 8 public + 8 planted + 2 negative), one fresh single-threaded process each, seed 8609517; 4 trials in Part A and 1 trial in Part B; cell caps 600 s (Part A, negatives at n <= 41) and 1800 s (Part B).",
       "kind": "fixed_n",
       "preregistered": true
     },
@@ -942,7 +992,7 @@
       "preregistered": true
     },
     {
-      "rule": "Part A stopping rule, per m: curves run in the order k0n23, k1n29, k0n31, k0n37, k0n41; once all four public cells (S = 2, 3 at the two previous curves) are capped or skipped, every Part A cell of that m (public, planted, A/A) at the next curve is recorded as skipped_stopping_rule and not run. Part B and the negatives are never skipped.",
+      "rule": "Part A stopping rule, per m and per engine: curves run in the order k0n23, k1n29, k0n31, k0n37, k0n41; once all four public cells (S = 2, 3 at the two previous curves, same engine) are capped or skipped, every Part A cell of that m and engine (public, planted, A/A) at the next curve is recorded as skipped_stopping_rule and not run. Part B and the negatives are never skipped.",
       "kind": "preregistered_sequential",
       "preregistered": true
     },
@@ -962,15 +1012,16 @@
     "A process_error (exit other than 0, 124, 137) is an invalid cell, not a cap."
   ],
   "decision_rule": {
-    "text": "Each cell receives one exact class (decided_sat, decided_unsat, decided_mixed, undecided, capped, skipped_stopping_rule, invalid_control, process_error). K1 to K5 are read from those classes against the thresholds written in the claims (K1: the two k0n23 union:2 public cells decide; K2: all m = 6 public cells at n = 37 and 41 capped and a positive log-slope between decided n; K3: every completed planted cell has four verified witnesses; K4: all four n83k1 public cells undecided or capped; K5: no decided public cell at n >= 31 under 188 s). The kill criterion fires when K4 and K5 are both supported and K3 is not falsified. A capped cell is a censored observation, never a cost.",
+    "text": "Each cell receives one exact class (decided_sat, decided_unsat, decided_mixed, undecided, capped, skipped_stopping_rule, invalid_control, process_error). K1 to K5 are read per engine from those classes against the thresholds in the claims (K1: the two k0n23 union:2 public cells decide; K2: all m = 6 public cells at n = 37 and 41 capped and a positive log-slope between decided n; K3: every completed planted cell has only verified witnesses; K4: all four n83k1 public cells undecided or capped; K5: no decided public cell at n >= 31 under 188 s). Plainly on K5: Part A keeps TRIALS = 4 under a 600 s process cap, so a decided Part A cell proves at most 150 s per query and any decided Part A cell at n >= 31 falsifies K5 by construction; otherwise K5 stays untested on capped cells, because a cap is a censored observation and says nothing against 188 s. Only Part B (one query per process, 1800 s) can observe a per-query cost above 188 s. The kill criterion fires when, for both engines, K4 and K5 are supported and K3 is not falsified. A capped cell is never a cost.",
     "comparison_ids": [
       "C-cells-A",
       "C-cells-B",
+      "C-engine",
       "C-n-scaling",
       "C-m5-vs-m6",
       "C-positive"
     ],
-    "threshold": "Per cell: decided = four of four queries decided inside the cap. Parity threshold 188 s per query (largest m = 4 root-table DLP of the n83 record). Observation caps 600 s (Part A) and 1800 s (Part B).",
+    "threshold": "Per cell: decided = every query of the cell decided inside the cap. Parity threshold 188 s per query (largest m = 4 root-table DLP of the n83 record). Observation caps: 600 s per Part A process (4 queries, so at most 150 s per query) and 1800 s per Part B process (1 query).",
     "statistic": "Exact per-cell outcome class and, for decided cells, mean and median seconds per query; ratio of seconds per decided query to 188 s as the distance from the m = 4 root-table parity point.",
     "interval": "No sampling interval; four fixed queries per cell, exact outcomes.",
     "multiple_comparison_correction": "other",
@@ -1030,7 +1081,8 @@
     "Reading seconds from a run without native L2 admission as timing evidence.",
     "Reading a cell as informative about arity when its planted control missed or its negative control is undecided.",
     "Presenting these relation-collection cells as a complete-DLP result, a leaderboard row or a speed-up over rho (K7).",
-    "Treating a Part A decided cell at n >= 31 as a pass without stating its distance to the 188 s parity point."
+    "Treating a Part A decided cell at n >= 31 as a pass without stating its distance to the 188 s parity point.",
+    "Reading a capped Part A cell as evidence that a query exceeds 188 s: four queries share the 600 s cap."
   ],
   "literature": [
     {
