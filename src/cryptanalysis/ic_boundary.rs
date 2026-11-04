@@ -5479,7 +5479,7 @@ pub struct FactorBase<E> {
 /// and `x_index` (and any lookup that pairs a point with its negative),
 /// `negations` point negations, and the sort of `abscissa_list` at
 /// `⌈log₂(a + 1)⌉` compares an abscissa plus the copy out of the map.
-fn count_index_build<E>(fb: &mut FactorBase<E>, inserts: u64, negations: u64) {
+pub(crate) fn count_index_build<E>(fb: &mut FactorBase<E>, inserts: u64, negations: u64) {
     let a = fb.abscissa_list.len() as u64;
     let depth = u64::from(64 - a.leading_zeros());
     fb.cost.work("index_inserts", inserts);
