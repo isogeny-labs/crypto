@@ -99,3 +99,17 @@ decides; CodeBuild minutes). Budgets at 07:30Z: isolab-daily-cost-100 actual
    3 resumes from `runs/arity-prime-m5-main-20261104-a2/resume-for-a3/`, a copy
    of attempt 2's pod prefix without `cells/isogeny-m5-t2.*`. The capped
    `kummer-m5-t3` (exit 134, 8 GiB) keeps its records and is not re-run.
+8. **Host type for attempt 4 (2026-11-04 18:50Z).** Both attempt-3 pods stayed
+   Pending for 45 and 33 minutes: EC2 refused m8a.2xlarge Spot
+   (`InsufficientCapacityError … UnfulfillableCapacity`); placement scores at
+   18:43Z: m8a.2xlarge 1, c8a 2, m7i.2xlarge 2, c7i 2, r6i.2xlarge 3,
+   m7i.4xlarge 3. The two pending Jobs were deleted through the new
+   `remote/delete-command` (name and UID matched; no record existed; receipts
+   in `receipts/deletes/`). Attempt 4 pins Koblitz to m7i.2xlarge (the L2
+   pool's 8-vCPU limit; Intel Sapphire Rapids) and the prime tower to
+   m7i.4xlarge (cpu-spot). No m = 5 or m = 6 Koblitz cell has run, so every
+   one of them runs on one host model; all ten m = 2 controls ran on AMD EPYC
+   9R45 and were decided by the conflict budget or in under a second, not by
+   the wall cap. Prime-tower controls, kummer-m5-t2 and kummer-m5-t3 ran on
+   EPYC 9R45; the remaining isogeny cells run on the m7i host, and their host
+   model is reported with them.
