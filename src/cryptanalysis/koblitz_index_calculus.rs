@@ -5287,24 +5287,6 @@ impl PairSumTable {
     /// it, the build keys every pair twice (count, then fill) in place.
     const FOLD_PARTITION_BYTES: u128 = 2 << 30;
 
-    /// One filter becomes the retained table filter. Bound additional
-    /// worker copies by the temporary budget left after the stream buffers,
-    /// instead of multiplying a potentially large filter by every CPU.
-    fn fold_filter_runs(
-        parts: usize,
-        threads: usize,
-        stream_bytes: u128,
-        filter_words: usize,
-    ) -> usize {
-        let filter_bytes = filter_words as u128 * std::mem::size_of::<u64>() as u128;
-        let extra_copies =
-            Self::FOLD_PARTITION_BYTES.saturating_sub(stream_bytes) / filter_bytes.max(1);
-        threads
-            .max(1)
-            .min(parts)
-            .min((extra_copies + 1).min(usize::MAX as u128) as usize)
-    }
-
     /// The folded table's buckets, words and presence filter from rows
     /// keyed once.  Each pair's `(hash, word)` goes straight into one of
     /// 256 coarse partitions by the hash's top bits — appended to that
@@ -5397,45 +5379,12 @@ impl PairSumTable {
         }
         let total = part_start[parts];
         // 2. Each partition counting-sorted into its own bucket range.
-        //
-        // **The filter.**  A pair's filter word comes from its hash's low
-        // bits and its partition from the top ones, so a partition's
-        // filter bits land anywhere in a filter of megabytes, a miss
-        // each.  An atomic OR there is a locked read-modify-write that
-        // waits out its miss before the next can start, and it was most
-        // of this step.  Instead the partitions are cut into contiguous
-        // runs, one a thread, and each run sets a filter of its own with
-        // plain ORs, the word `FILL_AHEAD` pairs on prefetched so the
-        // misses overlap; the runs' filters are ORed together at the end.
-        // At one thread there is one run, and its filter is the filter.
-        // Every bit is set either way, so the filter is the same.
         const FILL_AHEAD: usize = 16;
         let filter_bits = filter_bits_for(total);
         let present_mask = (1u64 << filter_bits) - 1;
         let filter_words = (1usize << filter_bits) / 64;
         let per_part = buckets / parts;
-        // Capacity, not length: skewed partitions can grow their streams.
-        // This bounds the extra filter copies; it is not an RSS limit for
-        // the builder's other buffers or the allocator itself.
-        let stream_bytes = streams.capacity() as u128
-            * std::mem::size_of::<(Vec<Vec<u64>>, Vec<Vec<(u32, u32)>>)>() as u128
-            + streams
-                .iter()
-                .map(|(hs, ors, ids)| {
-                    hs.capacity() as u128 * std::mem::size_of::<Vec<u64>>() as u128
-                        + ors.capacity() as u128 * std::mem::size_of::<Vec<(u32, u32)>>() as u128
-                        + hs.iter().map(|v| v.capacity() as u128 * 8).sum::<u128>()
-                        + ors.iter().map(|v| v.capacity() as u128 * 8).sum::<u128>()
-                        + ids.iter().map(|v| v.capacity() as u128 * 4).sum::<u128>()
-                })
-                .sum::<u128>();
-        let fill_runs = Self::fold_filter_runs(
-            parts,
-            rayon::current_num_threads(),
-            stream_bytes,
-            filter_words,
-        );
-        let parts_per_run = parts.div_ceil(fill_runs);
+        let parts_per_run = parts.div_ceil(rayon::current_num_threads().clamp(1, parts));
         let mut bucket_start = vec![0u32; buckets + 1];
         let mut rests = vec![0u32; total];
         let rp = rests.as_mut_ptr() as usize;
@@ -5446,11 +5395,10 @@ impl PairSumTable {
             sorted_hash.as_mut_ptr() as usize,
             sorted_id.as_mut_ptr() as usize,
         );
-        let filters: Vec<Vec<u64>> = bucket_start[..buckets]
+        bucket_start[..buckets]
             .par_chunks_mut(per_part * parts_per_run)
             .enumerate()
-            .map(|(run, run_starts)| {
-                let mut present = vec![0u64; filter_words];
+            .for_each(|(run, run_starts)| {
                 for (k, starts) in run_starts.chunks_mut(per_part).enumerate() {
                     let p = run * parts_per_run + k;
                     let first = p * per_part;
@@ -5472,9 +5420,6 @@ impl PairSumTable {
                         // The orbit run holding pair `i` on a tagged table.
                         let (mut next_run, mut orbit) = (0usize, 0u32);
                         for (i, &h) in hs.iter().enumerate() {
-                            if let Some(&ahead) = hs.get(i + FILL_AHEAD) {
-                                prefetch(&present[filter_slot(ahead, present_mask, 0).0]);
-                            }
                             let w = if tagged {
                                 while let Some(&(first, o)) = ors.get(next_run) {
                                     if first as usize > i {
@@ -5501,24 +5446,57 @@ impl PairSumTable {
                                 }
                             }
                             at[b] += 1;
-                            let (word, bits) = filter_slot(h, present_mask, FILTER_EXTRA);
-                            present[word] |= bits;
                         }
                     }
                 }
-                present
-            })
-            .collect();
+            });
         bucket_start[buckets] = total as u32;
-        let present = filters
-            .into_iter()
-            .reduce(|mut all, run| {
-                for (a, r) in all.iter_mut().zip(&run) {
-                    *a |= r;
+        // 3. **The filter**, one copy.  A pair's filter word comes from its
+        // hash's low bits and its partition from the top ones, so the
+        // partitions' bits land anywhere in a filter of megabytes.  An
+        // atomic OR is a locked read-modify-write that waits out its miss,
+        // and a private filter a thread, ORed together after, costs a
+        // filter-sized buffer a thread.  Instead the filter is cut into
+        // contiguous word ranges, one a thread (at most eight, which bounds
+        // the extra stream reads), and each thread reads every hash and
+        // sets only the bits in its own range, with plain ORs and the word
+        // `FILL_AHEAD` hashes on prefetched.  Every bit is set exactly as
+        // before, so the filter is the same.
+        let mut present = vec![0u64; filter_words];
+        let shards = rayon::current_num_threads().clamp(1, 8).min(filter_words.max(1));
+        let per_shard = filter_words.div_ceil(shards).max(1);
+        present
+            .par_chunks_mut(per_shard)
+            .enumerate()
+            .for_each(|(c, shard)| {
+                let lo = c * per_shard;
+                let len = shard.len();
+                // A hash outside this range ORs into a small sink instead
+                // of branching: with two shards the test is a coin flip,
+                // and a mispredict a pair cost more than the store.  The
+                // sink rotates so its stores do not chain on one word.
+                let mut sink = [0u64; 8];
+                let (base, sink_ptr) = (shard.as_mut_ptr(), sink.as_mut_ptr());
+                for (hs, _, _) in &streams {
+                    for hs in hs {
+                        for (i, &h) in hs.iter().enumerate() {
+                            if let Some(&ahead) = hs.get(i + FILL_AHEAD) {
+                                let k = filter_slot(ahead, present_mask, 0).0.wrapping_sub(lo);
+                                prefetch(&shard[k.min(len - 1)]);
+                            }
+                            let (word, bits) = filter_slot(h, present_mask, FILTER_EXTRA);
+                            let k = word.wrapping_sub(lo);
+                            // SAFETY: `k < len` indexes the shard; otherwise
+                            // the pointer is into `sink`, `i & 7 < 8`.
+                            unsafe {
+                                let dst = if k < len { base.add(k) } else { sink_ptr.add(i & 7) };
+                                *dst |= bits;
+                            }
+                        }
+                    }
                 }
-                all
-            })
-            .unwrap_or_else(|| vec![0u64; filter_words]);
+                std::hint::black_box(sink);
+            });
         // Two pairs of one bucket with one hash: one canonical key twice.
         // The hash of key 0 (the point at infinity) is not a sum of two
         // base points in any useful sense, and every row has one.
@@ -19637,24 +19615,6 @@ mod tests {
                 assert_eq!(x, y, "K_{a}/2^{n} bucket {b}");
             }
         }
-    }
-
-    #[test]
-    fn partition_filter_copies_respect_remaining_temporary_budget() {
-        let budget = PairSumTable::FOLD_PARTITION_BYTES;
-        let filter_bytes = 256u128 << 20;
-        let words = (filter_bytes / 8) as usize;
-        // At this width the previous 128-worker allocation used 32 GiB
-        // just for the filters. Only one extra copy fits beside streams.
-        let streams = budget - filter_bytes;
-        let runs = PairSumTable::fold_filter_runs(256, 128, streams, words);
-        assert_eq!(runs, 2);
-        assert!(streams + (runs - 1) as u128 * filter_bytes <= budget);
-        for streams in [budget, budget + 1, budget + filter_bytes] {
-            assert_eq!(PairSumTable::fold_filter_runs(256, 128, streams, words), 1);
-        }
-        assert_eq!(PairSumTable::fold_filter_runs(256, 1, 0, words), 1);
-        assert_eq!(PairSumTable::fold_filter_runs(3, 128, 0, words), 3);
     }
 
     #[test]
