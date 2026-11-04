@@ -17,6 +17,12 @@
 #include "curve25519_fixture.hpp"
 #include "bv_lowering.hpp"
 using I = std::int64_t;
+#ifndef ATLAS_SOURCE_REVISION
+#define ATLAS_SOURCE_REVISION "unbound"
+#endif
+#ifndef ATLAS_SOURCE_DIRTY
+#define ATLAS_SOURCE_DIRTY 1
+#endif
 void require(bool b, const std::string& s) { if (!b) throw std::runtime_error(s); }
 I mod(I a, I p) { I r=a%p; return r<0?r+p:r; }
 std::string integer(I x) { return x<0?"(- "+std::to_string(-x)+")":std::to_string(x); }
@@ -412,12 +418,14 @@ void self_test() {
 void run(I p,std::size_t n,std::size_t count,std::uint64_t seed,const std::filesystem::path& out,bool use_bv=false) {
     require(count>0 && count<=128,"target count must be in [1,128]");
     require(!std::filesystem::exists(out),"output already exists; use a fresh run directory");
+    std::string revision=ATLAS_SOURCE_REVISION;
+    require(revision.size()==40 && std::all_of(revision.begin(),revision.end(),[](char c){return (c>='0'&&c<='9')||(c>='a'&&c<='f');}),"run requires a source-bound build");
     Fixture f(p);auto arms=atlas(f,n,seed);auto scalars=target_scalars(f.ell,count,seed);
     std::vector<Point> train,hold;
     for(std::size_t i=0;i<count;++i) {train.push_back(f.e.mul(scalars[i],f.g));hold.push_back(f.e.mul(scalars[count+i],f.g));}
     std::filesystem::create_directories(out);std::ofstream rows(out/"generic.csv");
     std::ofstream config(out/"configuration.json");
-    config<<"{\"schema\":\"atlas.input/v1\",\"p\":"<<p<<",\"columns\":"<<n<<",\"targets_per_panel\":"<<count<<",\"seed\":"<<seed<<",\"codec\":\""<<(use_bv?"bv":"nia")<<"\"}\n";
+    config<<"{\"schema\":\"atlas.input/v1\",\"p\":"<<p<<",\"columns\":"<<n<<",\"targets_per_panel\":"<<count<<",\"seed\":"<<seed<<",\"codec\":\""<<(use_bv?"bv":"nia")<<"\",\"source_revision\":\""<<revision<<"\",\"source_dirty\":"<<(ATLAS_SOURCE_DIRTY?"true":"false")<<"}\n";
     rows<<"arm,p,group_order,ell,columns,panel,targets,pair_probes,hits,coefficient_rank\n";
     std::ofstream queries(out/"queries.tsv");queries<<"file\tarm\tencoding\tp\ta\tb\tell\tbase\tx\ty\tinf\texpected\n";
     std::size_t selected=0;Stats best;

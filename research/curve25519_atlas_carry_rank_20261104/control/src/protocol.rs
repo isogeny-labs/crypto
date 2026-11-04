@@ -1,21 +1,37 @@
 use super::*;
 pub fn draft(p: u64, seed: u64, count: u64, unit: bool) -> Value {
-    let mut arms=vec![];
-    let instrument=json!({"repo":"crypto","commit":null,"build":[["make","build"]],"binary_sha256":null,"threads":1,"flags":{"solver":"Z3 5.3.3","codec":"bounded_bv","timeout_seconds":"30"},"env":{}});
-    for base in ["source","same_support","target_native","mixed","random","positive"] {
-        for encoding in ["mod","carry"] {
-            let id=format!("{base}-{encoding}");
-            let role=if base=="source"&&encoding=="mod"{"reference"}else if base=="random"{"control_negative"}else if base=="positive"{"control_positive"}else{"candidate"};
+    let mut arms = vec![];
+    let instrument = json!({"repo":"crypto","commit":null,"build":[["make","build"]],"binary_sha256":null,"threads":1,"flags":{"solver":"Z3 5.3.3","codec":"bounded_bv","timeout_seconds":"30"},"env":{}});
+    for base in [
+        "source",
+        "same_support",
+        "target_native",
+        "mixed",
+        "random",
+        "positive",
+    ] {
+        for encoding in ["mod", "carry"] {
+            let id = format!("{base}-{encoding}");
+            let role = if base == "source" && encoding == "mod" {
+                "reference"
+            } else if base == "random" {
+                "control_negative"
+            } else if base == "positive" {
+                "control_positive"
+            } else {
+                "candidate"
+            };
             arms.push(json!({"id":id,"role":role,"description":format!("{base} support, {encoding} bounded multiplication encoding"),"instrument":instrument,"same_instrument_as":if id=="source-mod"{None}else{Some("source-mod")},"parameters":{"base":base,"encoding":encoding,"p":p,"seed":seed,"columns":if unit{3}else{8}}}));
         }
     }
     arms.push(json!({"id":"source-aa-mod","role":"control_aa","description":"Byte-identical source-mod query in a fresh solver process","instrument":instrument,"same_instrument_as":"source-mod","parameters":{"p":p,"seed":seed}}));
-    let comp=vec![
+    let comp = vec![
         json!({"id":"C-isogeny","arms":["source-mod","same_support-mod"],"differs_in":["curve_representation"],"design":"one_factor"}),
         json!({"id":"C-carry","arms":["source-mod","source-carry"],"differs_in":["multiplication_encoding"],"design":"one_factor"}),
         json!({"id":"C-shape","arms":["source-mod","mixed-mod"],"differs_in":["base_support"],"design":"one_factor"}),
-        json!({"id":"C-aa","arms":["source-mod","source-aa-mod"],"differs_in":["invocation"],"design":"aa"})];
-    let mut value=json!({
+        json!({"id":"C-aa","arms":["source-mod","source-aa-mod"],"differs_in":["invocation"],"design":"aa"}),
+    ];
+    let mut value = json!({
         "schema":"experiment.protocol/v1","protocol_id":if unit{"EXAMPLE-ATLAS-runner-unit".into()}else{format!("ATLAS-p{p}-seed{seed}")},"version":1,"created":"2026-11-04","repository":"crypto","study_dir":"research/curve25519_atlas_carry_rank_20261104",
         "question":"On the fixed miniature cell, do matched representation/support arms change Z3 resource units while every result agrees with the native signed three-sum reference? This is a component comparison, not full IC cost.",
         "links":{"scope":if unit{"Local development fixture; no performance or scientific promotion"}else{"One cell of the original 2029/8173/32749, seeds 13/29/47/71 panel; other cells stay required"}},
@@ -35,11 +51,13 @@ pub fn draft(p: u64, seed: u64, count: u64, unit: bool) -> Value {
         "freeze":{"status":"draft","protocol_sha256":null,"commit":null,"frozen_at":null,"filed_before_affected_data":null}
     });
     if unit {
-        value["claims"][1]["class"]=json!("out_of_scope");
-        value["claims"][1]["decided_by"]=json!([]);
-        value["claims"][1]["text"]=json!("No comparative or performance inference from this local format/integration example.");
-        value["sample_size"]["preflight_runtime"]["estimated_total_seconds"]=json!(600);
-        value["analysis_plan"]["frozen_before_data"]=json!(true);
+        value["claims"][1]["class"] = json!("out_of_scope");
+        value["claims"][1]["decided_by"] = json!([]);
+        value["claims"][1]["text"] = json!(
+            "No comparative or performance inference from this local format/integration example."
+        );
+        value["sample_size"]["preflight_runtime"]["estimated_total_seconds"] = json!(600);
+        value["analysis_plan"]["frozen_before_data"] = json!(true);
         value["decision_rule"]["text"]=json!("Local exact integration example only; no scientific performance decision. The 600-second value is a test budget, not a measured runtime estimate.");
     }
     value

@@ -3,6 +3,9 @@
 #pragma once
 #include <gmpxx.h>
 #include <stdexcept>
+#include <array>
+#include <memory>
+#include <openssl/evp.h>
 namespace actual25519 {
 using B=mpz_class;
 struct P {B x=0,y=0;bool inf=true;bool operator==(const P&)const=default;};
@@ -46,6 +49,17 @@ inline void curve25519_fixture() {
         check(e.phi(q)==quotient.mul(k,image),"Curve25519 transport scalar fixture");
         check(e.dual(e.phi(q))==e.mul(2,q),"Curve25519 dual fixture");
         check(e.mul(inverse2,e.dual(e.phi(q)))==q,"Curve25519 inverse subgroup transport");
+    }
+    for(unsigned pattern:{0U,31U,255U}) {
+        std::array<unsigned char,32> scalar{};
+        for(std::size_t i=0;i<scalar.size();++i)scalar[i]=static_cast<unsigned char>(pattern+i);
+        scalar[0]&=248;scalar[31]&=127;scalar[31]|=64;
+        std::unique_ptr<EVP_PKEY,decltype(&EVP_PKEY_free)> key(EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519,nullptr,scalar.data(),scalar.size()),EVP_PKEY_free);
+        check(static_cast<bool>(key),"OpenSSL X25519 fixture key");
+        std::array<unsigned char,32> encoded{};std::size_t size=encoded.size();
+        check(EVP_PKEY_get_raw_public_key(key.get(),encoded.data(),&size)==1 && size==32,"OpenSSL X25519 fixture output");
+        B n,x;mpz_import(n.get_mpz_t(),scalar.size(),-1,1,0,0,scalar.data());mpz_import(x.get_mpz_t(),encoded.size(),-1,1,0,0,encoded.data());
+        P q=e.mul(n,g);check(!q.inf && q.x==x,"GMP/OpenSSL X25519 scalar fixture mismatch");
     }
     B trace=p+1-8*ell,disc=trace*trace-4*p;
     check(trace==B("-221938542218978828286815502327069187962"),"RFC trace fixture");
