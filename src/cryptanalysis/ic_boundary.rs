@@ -7726,6 +7726,19 @@ const WWALK_MIN_JUMPS: usize = 2;
 const WWALK_MAX_JUMPS: usize = 64;
 const WWALK_MAX_X: f64 = 4.0;
 
+/// Options of a [`WalkTable`] beyond the classic two-seed walk.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct WalkOpts {
+    /// `g=1`: every jump also carries `[γ_j]G`, `γ_j` uniform in `[1, r)`,
+    /// and every entry tracks its `G`-coefficient `z` modulo `r`.
+    pub g_jumps: bool,
+    /// `0`: no growth.  `1`: after `T` entries keep walking until the first
+    /// verified free row, at most `2T` entries.  `2` (needs `g_jumps`):
+    /// keep walking until the verified free rows have full rank over the
+    /// seed columns (both seed logs pinned), at most `3T` entries.
+    pub grow: u8,
+}
+
 /// **A random-jump walk table over two seed points** (`wwalk`, proposal
 /// P2 of `research/curve25519_autolab_20261104/ideas/PROPOSALS-R3.md`).
 ///
@@ -7747,28 +7760,43 @@ const WWALK_MAX_X: f64 = 4.0;
 /// after `T` entries the walk is extended, every step charged, until the
 /// first verified row, and never beyond `2T` entries.
 ///
+/// **With `g_jumps`** (`g=1`) the jumps are `J_j = [α_j]P1 + [β_j]P2 +
+/// [γ_j]G` and `E_t = u_t·P1 + v_t·P2 + z_t·G`, `z_t = Σ γ mod r`.  A
+/// collision `E_t = ±E_s` is then an *affine* relation
+/// `du·s1 + dv·s2 = −dz (mod r)` (`du = u_t ∓ u_s`, `dz = z_t ∓ z_s`, in
+/// the loop's convention `Σ coef·x = h·(a + b·d)` it is the row
+/// `Relation::Row { a: −dz, b: 0 }`), and a probe hit
+/// `target = ±E_t` is `Row { columns: ±(u, v), a: a ∓ z, b }`.  `[γ_j]G`
+/// is built from the doubled multiples `[2^i]G`, like the seeds'.
+///
 /// Charging.  Everything below is a counted group operation, split over
 /// three ledgers that sum to `build_ops`: `setup_ops` (the doubled seed
-/// multiples `[2^i]P_c` and the jump points built from them), `walk_ops`
-/// (one addition per walk step, identity results included) and
+/// (and `G`) multiples `[2^i]P_c` and the jump points built from them),
+/// `walk_ops` (one addition per walk step, identity results included) and
 /// `verify_ops` (every recomputation of an entry from its coefficients,
 /// from the same doubled multiples).  Hash inserts and lookups are not
 /// group operations; they are counted beside them like `wsum`'s.
 pub struct WalkTable<E> {
     /// Key (abscissa and sign bit, shifted) → `(u << 32) | v`.
     map: FastMap<u64>,
-    /// Base index of the two seeds.
+    /// With `g_jumps`: the same key → `z` modulo `r`.
+    zmap: FastMap<u64>,
+    /// Base index of the two seeds, and their relation columns.
     seeds: [usize; 2],
-    /// `pows[c][i] = [2^i]P_c`, `None` for the identity.
-    pows: [Vec<Option<E>>; 2],
+    seed_cols: [usize; 2],
+    /// `pows[c][i] = [2^i]P_c` (`c = 2`: `G`), `None` for the identity.
+    pows: [Vec<Option<E>>; 3],
     /// Entries asked for (`T`), the cap with growth, and the jump bound.
     pub t: u64,
     pub t_max: u64,
     pub w: u64,
     pub jumps: usize,
     pub grow: bool,
+    pub opts: WalkOpts,
     /// Jump coefficient pairs, for the report.
     pub jump_coefs: Vec<(u64, u64)>,
+    /// The jumps' `G`-coefficients (empty without `g_jumps`).
+    pub jump_gammas: Vec<u64>,
     /// Walk steps taken (additions charged), `≥ t`, `≤ t_max`.
     pub steps: u64,
     /// Steps beyond `T` taken by growth.
@@ -7787,18 +7815,26 @@ pub struct WalkTable<E> {
     pub index_lookups: u64,
     /// Key collisions found (coefficient pairs, kept then new).
     pub collisions: Vec<(u64, u64)>,
+    /// The two entries' `z` of each collision (zeros without `g_jumps`).
+    pub collision_z: Vec<(u64, u64)>,
     /// Collisions recomputed and found to be `±` each other.
     pub verified_collisions: u64,
     /// The verified rows, as `(column, coef)` lists modulo `r`.
     pub rows: Vec<Vec<(usize, u64)>>,
+    /// The `a` of each row (`Relation::Row { a, b: 0 }`): zero without
+    /// `g_jumps`, `−dz mod r` with.
+    pub row_consts: Vec<u64>,
     /// Collisions whose row cancelled to zero modulo `r` (dropped).
     pub zero_rows: u64,
+    /// Of those, rows with nothing left on the columns but a nonzero
+    /// constant (an inconsistent equation; must stay zero).
+    pub inconsistent_rows: u64,
 }
 
 impl<E: Copy + PartialEq> WalkTable<E> {
-    /// Build the walk table.  `x` is the table size in units of `√r`,
-    /// `seed` seeds the jump and step stream (mixed with the seeds' keys,
-    /// so every base walks its own path).
+    /// Build the classic walk table (no `G` jumps).  `x` is the table size
+    /// in units of `√r`, `seed` seeds the jump and step stream (mixed with
+    /// the seeds' keys, so every base walks its own path).
     pub fn build<G: CountedGroup<Elt = E>>(
         g: &G,
         fb: &FactorBase<G::Elt>,
@@ -7806,6 +7842,34 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         x: f64,
         jumps: usize,
         grow: bool,
+        seed: u64,
+    ) -> Result<Self, String> {
+        Self::build_with(
+            g,
+            None,
+            fb,
+            r,
+            x,
+            jumps,
+            WalkOpts {
+                g_jumps: false,
+                grow: u8::from(grow),
+            },
+            seed,
+        )
+    }
+
+    /// Build the walk table with [`WalkOpts`]; `generator` is the curve
+    /// generator `G` (log 1), needed with `g_jumps`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_with<G: CountedGroup<Elt = E>>(
+        g: &G,
+        generator: Option<E>,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        x: f64,
+        jumps: usize,
+        opts: WalkOpts,
         seed: u64,
     ) -> Result<Self, String> {
         if !(x > 0.0 && x <= WWALK_MAX_X) {
@@ -7822,13 +7886,29 @@ impl<E: Copy + PartialEq> WalkTable<E> {
                 fb.abscissa_list.len()
             ));
         }
+        if opts.grow > 2 {
+            return Err(format!("wwalk: grow is 0, 1 or 2, not {}", opts.grow));
+        }
+        if opts.grow == 2 && !opts.g_jumps {
+            return Err("wwalk: grow=2 needs g=1 (without G the free rows are homogeneous)".into());
+        }
+        let gen = if opts.g_jumps {
+            let q = generator.ok_or_else(|| "wwalk: g=1 needs the generator".to_string())?;
+            if g.is_identity(&q) {
+                return Err("wwalk: g=1 with an identity generator".into());
+            }
+            Some(q)
+        } else {
+            None
+        };
+        let grow = opts.grow > 0;
         let t = (x * (r as f64).sqrt()).round() as u64;
         if t < 2 {
             return Err(format!(
                 "wwalk: x={x} gives a table of {t} entries at r={r}"
             ));
         }
-        let t_max = if grow { 2 * t } else { t };
+        let t_max = t * (1 + u64::from(opts.grow));
         if t_max > WWALK_MAX_ENTRIES {
             return Err(format!(
                 "wwalk: {t_max} entries exceed the 2^26 table limit (x={x}, r={r})"
@@ -7849,10 +7929,11 @@ impl<E: Copy + PartialEq> WalkTable<E> {
                 .get(&a)
                 .expect("every listed abscissa is indexed")[0]
         });
+        let seed_cols = [fb.col_of[seeds[0]], fb.col_of[seeds[1]]];
         let p = [fb.points[seeds[0]], fb.points[seeds[1]]];
         let nbits = (64 - bound.leading_zeros()) as usize;
         let mut setup_ops = GroupOps::default();
-        let mut pows: [Vec<Option<E>>; 2] = [Vec::new(), Vec::new()];
+        let mut pows: [Vec<Option<E>>; 3] = [Vec::new(), Vec::new(), Vec::new()];
         for c in 0..2 {
             let mut cur = (!g.is_identity(&p[c])).then_some(p[c]);
             pows[c].push(cur);
@@ -7863,16 +7944,36 @@ impl<E: Copy + PartialEq> WalkTable<E> {
                 pows[c].push(cur);
             }
         }
+        if let Some(q) = gen {
+            // z < r: bits of r − 1.
+            let gbits = (64 - (r - 1).leading_zeros()).max(1) as usize;
+            let mut cur = Some(q);
+            pows[2].push(cur);
+            for _ in 1..gbits {
+                cur = cur
+                    .map(|q| g.double(&mut setup_ops, q))
+                    .filter(|q| !g.is_identity(q));
+                pows[2].push(cur);
+            }
+        }
         let mut table = Self {
             map: fast_map(t_max as usize + 1),
+            zmap: if opts.g_jumps {
+                fast_map(t_max as usize + 1)
+            } else {
+                fast_map(0)
+            },
             seeds,
+            seed_cols,
             pows,
             t,
             t_max,
             w,
             jumps,
             grow,
+            opts,
             jump_coefs: Vec::new(),
+            jump_gammas: Vec::new(),
             steps: 0,
             grown_steps: 0,
             entries: 0,
@@ -7885,15 +7986,18 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             identities_skipped: 0,
             index_lookups: 2,
             collisions: Vec::new(),
+            collision_z: Vec::new(),
             verified_collisions: 0,
             rows: Vec::new(),
+            row_consts: Vec::new(),
             zero_rows: 0,
+            inconsistent_rows: 0,
         };
         let mut rng = StdRng::seed_from_u64(
             seed ^ mix(g.key(&p[0])).rotate_left(21) ^ mix(g.key(&p[1]) ^ 0x57A1_C0DE),
         );
         // Jump points: an identity jump would make steps free, so redraw.
-        let mut jump_pts: Vec<(E, u64, u64)> = Vec::with_capacity(jumps);
+        let mut jump_pts: Vec<(E, u64, u64, u64)> = Vec::with_capacity(jumps);
         let mut tries = 0u32;
         while jump_pts.len() < jumps {
             tries += 1;
@@ -7901,60 +8005,85 @@ impl<E: Copy + PartialEq> WalkTable<E> {
                 return Err("wwalk: could not draw non-identity jump points".into());
             }
             let (al, be) = (rng.gen_range(1..=w), rng.gen_range(1..=w));
+            let ga = if opts.g_jumps { rng.gen_range(1..r) } else { 0 };
             let mut ops = table.setup_ops;
-            let pt = table.eval(g, &mut ops, al, be);
+            let pt = table.eval(g, &mut ops, al, be, ga);
             table.setup_ops = ops;
             if let Some(pt) = pt {
-                jump_pts.push((pt, al, be));
+                jump_pts.push((pt, al, be, ga));
                 table.jump_coefs.push((al, be));
+                if opts.g_jumps {
+                    table.jump_gammas.push(ga);
+                }
             }
         }
         // The walk.
         let mut e = p[0];
-        let (mut u, mut v) = (1u64, 0u64);
+        let mut uvz = (1u64, 0u64, 0u64);
         let mut walk_ops = GroupOps::default();
         let mut verify_ops = GroupOps::default();
         let step = |table: &mut Self,
                     e: &mut E,
-                    u: &mut u64,
-                    v: &mut u64,
+                    uvz: &mut (u64, u64, u64),
                     walk_ops: &mut GroupOps,
                     rng: &mut StdRng|
          -> Option<(u64, u64)> {
-            let (jp, al, be) = jump_pts[rng.gen_range(0..jumps)];
+            let (jp, al, be, ga) = jump_pts[rng.gen_range(0..jumps)];
             *e = g.add(walk_ops, *e, jp);
-            *u += al;
-            *v += be;
+            uvz.0 += al;
+            uvz.1 += be;
+            uvz.2 = ((uvz.2 as u128 + ga as u128) % r as u128) as u64;
             table.steps += 1;
             if g.is_identity(e) {
                 table.identities_skipped += 1;
                 return None;
             }
-            let packed = (*u << 32) | *v;
+            let packed = (uvz.0 << 32) | uvz.1;
             table.insert_attempts += 1;
-            match table.map.entry(g.key(e) >> 1) {
+            let key = g.key(e) >> 1;
+            match table.map.entry(key) {
                 std::collections::hash_map::Entry::Vacant(slot) => {
                     slot.insert(packed);
+                    if table.opts.g_jumps {
+                        table.zmap.insert(key, uvz.2);
+                    }
                     None
                 }
                 std::collections::hash_map::Entry::Occupied(o) => {
                     let kept = *o.get();
                     table.collisions.push((kept, packed));
+                    let kz = if table.opts.g_jumps {
+                        table.zmap[&key]
+                    } else {
+                        0
+                    };
+                    table.collision_z.push((kz, uvz.2));
                     Some((kept, packed))
                 }
             }
         };
         for _ in 0..t {
-            step(&mut table, &mut e, &mut u, &mut v, &mut walk_ops, &mut rng);
+            step(&mut table, &mut e, &mut uvz, &mut walk_ops, &mut rng);
         }
         let mut checked = 0usize;
         table.verify_pending(g, fb, r, &mut verify_ops, &mut checked);
         if grow {
-            while table.rows.is_empty() && table.steps < t_max {
-                let found = step(&mut table, &mut e, &mut u, &mut v, &mut walk_ops, &mut rng);
+            let want_rank = if opts.grow >= 2 {
+                if table.seed_cols[0] == table.seed_cols[1] {
+                    1
+                } else {
+                    2
+                }
+            } else {
+                1
+            };
+            let mut rank = table.seed_rank(r);
+            while rank < want_rank && table.steps < t_max {
+                let found = step(&mut table, &mut e, &mut uvz, &mut walk_ops, &mut rng);
                 table.grown_steps += 1;
                 if found.is_some() {
                     table.verify_pending(g, fb, r, &mut verify_ops, &mut checked);
+                    rank = table.seed_rank(r);
                 }
             }
         }
@@ -7968,17 +8097,55 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         Ok(table)
     }
 
-    /// `[α]P1 + [β]P2` from the doubled multiples, each addition charged;
-    /// `None` for the identity.
+    /// Rank over the seed columns of the verified rows (their coefficient
+    /// vectors modulo the prime `r`; the constants play no part).
+    pub fn seed_rank(&self, r: u64) -> usize {
+        let cols: Vec<usize> = if self.seed_cols[0] == self.seed_cols[1] {
+            vec![self.seed_cols[0]]
+        } else {
+            self.seed_cols.to_vec()
+        };
+        let mut basis: Vec<Vec<u64>> = Vec::new();
+        for row in &self.rows {
+            let mut vec: Vec<u64> = cols
+                .iter()
+                .map(|c| {
+                    row.iter()
+                        .find(|&&(rc, _)| rc == *c)
+                        .map_or(0, |&(_, x)| x % r)
+                })
+                .collect();
+            for b in &basis {
+                let lead = b
+                    .iter()
+                    .position(|&x| x != 0)
+                    .expect("basis rows are nonzero");
+                if vec[lead] != 0 {
+                    let f = mulmod(vec[lead], invmod(b[lead], r).expect("prime r"), r);
+                    for (vi, bi) in vec.iter_mut().zip(b) {
+                        *vi = (*vi + r - mulmod(f, *bi, r)) % r;
+                    }
+                }
+            }
+            if vec.iter().any(|&x| x != 0) {
+                basis.push(vec);
+            }
+        }
+        basis.len()
+    }
+
+    /// `[α]P1 + [β]P2 + [z]G` from the doubled multiples, each addition
+    /// charged; `None` for the identity.  `z = 0` skips the `G` part.
     fn eval<G: CountedGroup<Elt = E>>(
         &self,
         g: &G,
         ops: &mut GroupOps,
         al: u64,
         be: u64,
+        z: u64,
     ) -> Option<E> {
         let mut s: Option<E> = None;
-        for (c, k) in [al, be].into_iter().enumerate() {
+        for (c, k) in [al, be, z].into_iter().enumerate() {
             for i in 0..64 {
                 if (k >> i) & 1 == 0 {
                     continue;
@@ -8009,9 +8176,10 @@ impl<E: Copy + PartialEq> WalkTable<E> {
     ) {
         while *checked < self.collisions.len() {
             let (p1, p2) = self.collisions[*checked];
+            let (z1, z2) = self.collision_z[*checked];
             *checked += 1;
             let ((u1, v1), (u2, v2)) = (Self::unpack(p1), Self::unpack(p2));
-            let (s1, s2) = (self.eval(g, ops, u1, v1), self.eval(g, ops, u2, v2));
+            let (s1, s2) = (self.eval(g, ops, u1, v1, z1), self.eval(g, ops, u2, v2, z2));
             let (Some(s1), Some(s2)) = (s1, s2) else {
                 continue;
             };
@@ -8032,10 +8200,17 @@ impl<E: Copy + PartialEq> WalkTable<E> {
                 *slot = ((*slot as u128 + val as u128) % r as u128) as u64;
             }
             let row: Vec<(usize, u64)> = acc.into_iter().filter(|&(_, x)| x != 0).collect();
+            // u·P1 + v·P2 + z·G summed with sign: the G part is
+            // (z1 + sign·z2)·G, so the affine row's constant is its
+            // negation.
+            let dz = (z1 as i128 + sign as i128 * z2 as i128).rem_euclid(r as i128) as u64;
+            let konst = (r - dz) % r;
             if row.is_empty() {
                 self.zero_rows += 1;
+                self.inconsistent_rows += u64::from(konst != 0);
             } else {
                 self.rows.push(row);
+                self.row_consts.push(konst);
             }
         }
     }
@@ -8043,7 +8218,8 @@ impl<E: Copy + PartialEq> WalkTable<E> {
     /// One lookup: if the table holds `±target`, the sign (`+1` for
     /// `target = E`, `−1` for `−E`) and the coefficient pair `(u, v)` with
     /// `target = sign·(u·P1 + v·P2)`.  The stored entry is recomputed from
-    /// its coefficients (charged to `ops`) to confirm the key match.
+    /// its coefficients (charged to `ops`) to confirm the key match.  For a
+    /// table with `g_jumps` use [`WalkTable::probe_z`].
     pub fn probe<G: CountedGroup<Elt = E>>(
         &self,
         g: &G,
@@ -8051,14 +8227,34 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         lookups: &mut u64,
         target: E,
     ) -> Option<(i8, u64, u64)> {
+        debug_assert!(!self.opts.g_jumps, "probe drops z: use probe_z");
+        self.probe_z(g, ops, lookups, target)
+            .map(|(s, u, v, _)| (s, u, v))
+    }
+
+    /// [`WalkTable::probe`] with the entry's `G`-coefficient:
+    /// `target = sign·(u·P1 + v·P2 + z·G)`.
+    pub fn probe_z<G: CountedGroup<Elt = E>>(
+        &self,
+        g: &G,
+        ops: &mut GroupOps,
+        lookups: &mut u64,
+        target: E,
+    ) -> Option<(i8, u64, u64, u64)> {
         *lookups += 1;
-        let packed = *self.map.get(&(g.key(&target) >> 1))?;
+        let key = g.key(&target) >> 1;
+        let packed = *self.map.get(&key)?;
+        let z = if self.opts.g_jumps {
+            self.zmap[&key]
+        } else {
+            0
+        };
         let (u, v) = Self::unpack(packed);
-        let s = self.eval(g, ops, u, v)?;
+        let s = self.eval(g, ops, u, v, z)?;
         if s == target {
-            Some((1, u, v))
+            Some((1, u, v, z))
         } else if s == g.neg(target) {
-            Some((-1, u, v))
+            Some((-1, u, v, z))
         } else {
             None
         }
@@ -8085,6 +8281,18 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             *slot = ((*slot as u128 + val) % r as u128) as u64;
         }
         acc.into_iter().filter(|&(_, x)| x != 0).collect()
+    }
+
+    /// The `a` of a probe hit's row for a trial `(a, b)`: with
+    /// `target = a·G + b·Q = sign·(u·P1 + v·P2 + z·G)` the columns carry
+    /// `sign·(u, v)` and the constant is `a − sign·z (mod r)`.
+    pub fn hit_const(r: u64, a: u64, sign: i8, z: u64) -> u64 {
+        let (a, z) = (a % r, z % r);
+        if sign > 0 {
+            ((a as u128 + r as u128 - z as u128) % r as u128) as u64
+        } else {
+            ((a as u128 + z as u128) % r as u128) as u64
+        }
     }
 
     /// The build's work beside its group operations, for `bitop/v1`.
@@ -15779,5 +15987,150 @@ mod wwalk_table_tests {
         assert!(WalkTable::build(g, &fb, r, 1.0, 65, false, 0).is_err());
         assert!(WalkTable::build(g, &prime_factor_base(&inst, 3), r, 1.0, 16, false, 0).is_err());
         assert!(WalkTable::build(g, &fb, 1 << 60, 1.0, 16, false, 0).is_err());
+    }
+
+    /// `wwalk` with `g=1`: free rows are affine equations in the true logs
+    /// (`Σ coef·x = h·a` with `Row { a, b: 0 }`, the relation loop's
+    /// `h·a + h·b·d = Σ coef·x`), probe answers rebuild the target, and
+    /// `grow=2` ends with two independent rows.
+    #[test]
+    fn wwalk_g_jumps_rows_are_affine_and_grow_two_reaches_rank_two() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let r = inst.r;
+        let h = inst.cofactor;
+        let gen = inst.generator_point();
+        let log = logs(&inst);
+        let mut cops = GroupOps::default();
+        // The loop's unknown of a column is log(h·P)/coef.
+        let log_of = |p: &PrimePoint, cops: &mut GroupOps| -> u64 {
+            let hp = g.mul(cops, *p, h);
+            if g.is_identity(&hp) {
+                0
+            } else {
+                log[&g.key(&hp)]
+            }
+        };
+        let fb = prime_factor_base(&inst, 2);
+        let mut col_log = vec![None; fb.columns];
+        for (i, p) in fb.points.iter().enumerate() {
+            let inv = invmod(fb.coef_of[i] % r, r).unwrap();
+            let l = ((log_of(p, &mut cops) as u128 * inv as u128) % r as u128) as u64;
+            let slot = col_log[fb.col_of[i]].get_or_insert(l);
+            assert_eq!(*slot, l);
+        }
+        let dot = |row: &[(usize, u64)]| {
+            row.iter().fold(0u128, |s, &(col, v)| {
+                (s + v as u128 * col_log[col].unwrap() as u128) % r as u128
+            })
+        };
+        let (mut rank2, mut capped, mut total_rows) = (0, 0, 0u64);
+        for (x, jumps, grow, seed) in [
+            (2.0, 16usize, 0u8, 0u64),
+            (1.0, 8, 1, 1),
+            (1.5, 16, 2, 2),
+            (1.5, 16, 2, 3),
+            (1.5, 16, 2, 4),
+            (1.0, 16, 2, 5),
+            (1.0, 16, 2, 6),
+            (1.0, 16, 2, 7),
+        ] {
+            let opts = WalkOpts {
+                g_jumps: true,
+                grow,
+            };
+            let t = WalkTable::build_with(g, Some(gen), &fb, r, x, jumps, opts, seed).unwrap();
+            // (a) charging: one addition a step; doublings are the seeds'
+            // and G's doubled multiples; the ledgers sum.
+            assert_eq!(t.walk_ops.adds, t.steps);
+            assert_eq!(t.walk_ops.doubles, 0);
+            assert_eq!(t.verify_ops.doubles, 0);
+            assert_eq!(t.jump_gammas.len(), jumps);
+            assert!(t.jump_gammas.iter().all(|&ga| (1..r).contains(&ga)));
+            let nbits = u64::from(64 - (1 + t.t_max * t.w).leading_zeros());
+            let gbits = u64::from(64 - (r - 1).leading_zeros());
+            assert!(t.setup_ops.doubles <= 2 * (nbits - 1) + (gbits - 1));
+            assert!(t.setup_ops.doubles >= (nbits - 1) + (gbits - 1));
+            let mut sum = t.setup_ops;
+            sum.merge(t.walk_ops);
+            sum.merge(t.verify_ops);
+            assert_eq!(sum.adds, t.build_ops.adds);
+            assert_eq!(sum.doubles, t.build_ops.doubles);
+            assert_eq!(t.t_max, t.t * (1 + u64::from(grow)));
+            assert!(t.steps >= t.t && t.steps <= t.t_max);
+            assert_eq!(t.inconsistent_rows, 0);
+            assert_eq!(t.rows.len(), t.row_consts.len());
+            // (b) every probe answer reproduces its target, through the
+            // group and through the columns plus the constant.
+            let (p1, p2) = (fb.points[t.seeds[0]], fb.points[t.seeds[1]]);
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            let mut hits = 0;
+            for k in 1..r {
+                let target = g.mul(&mut ops, gen, k);
+                if let Some((sign, u, v, z)) = t.probe_z(g, &mut ops, &mut lookups, target) {
+                    let a = g.mul(&mut ops, p1, u);
+                    let b = g.mul(&mut ops, p2, v);
+                    let c = g.mul(&mut ops, gen, z);
+                    let ab = g.add(&mut ops, a, b);
+                    let s = g.add(&mut ops, ab, c);
+                    assert_eq!(if sign > 0 { s } else { g.neg(s) }, target, "x={x} k={k}");
+                    let cols = t.hit_columns(&fb, r, sign, u, v);
+                    let konst = WalkTable::<PrimePoint>::hit_const(r, k, sign, z);
+                    assert_eq!(
+                        dot(&cols),
+                        (h as u128 * konst as u128) % r as u128,
+                        "x={x} k={k}: hit row"
+                    );
+                    hits += 1;
+                }
+            }
+            assert_eq!(
+                hits,
+                2 * t.entries,
+                "x={x}: every stored orbit is hit twice"
+            );
+            // (c) free rows hold as affine equations under the true logs.
+            assert_eq!(t.rows.len() as u64 + t.zero_rows, t.verified_collisions);
+            for (row, &konst) in t.rows.iter().zip(&t.row_consts) {
+                assert_eq!(
+                    dot(row),
+                    (h as u128 * konst as u128) % r as u128,
+                    "x={x}: row {row:?} const {konst}"
+                );
+            }
+            total_rows += t.rows.len() as u64;
+            // (d) grow=2 stops at rank 2 or at 3T.
+            if grow == 2 {
+                if t.seed_rank(r) == 2 {
+                    rank2 += 1;
+                    assert!(t.rows.len() >= 2);
+                } else {
+                    assert_eq!(t.steps, t.t_max, "stopped below rank 2 before the cap");
+                    capped += 1;
+                }
+            }
+        }
+        eprintln!(
+            "wwalk g=1 small curve: rows {total_rows}, grow=2 rank-2 {rank2}, capped {capped}"
+        );
+        assert!(total_rows > 0);
+        assert!(rank2 >= 3, "grow=2 should usually reach rank 2");
+        // Refusals.
+        let bad = WalkOpts {
+            g_jumps: false,
+            grow: 2,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, bad, 0).is_err());
+        let no_gen = WalkOpts {
+            g_jumps: true,
+            grow: 0,
+        };
+        assert!(WalkTable::build_with(g, None, &fb, r, 1.0, 16, no_gen, 0).is_err());
+        let three = WalkOpts {
+            g_jumps: true,
+            grow: 3,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, three, 0).is_err());
     }
 }

@@ -564,6 +564,90 @@
       "source": "round-031/holdout",
       "target_seed": 2026141932,
       "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-032/train",
+      "target_seed": 2026142420,
+      "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "round-032/train",
+      "target_seed": 2026142424,
+      "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "round-032/train",
+      "target_seed": 2026142428,
+      "targets": 32
+    },
+    {
+      "size": 32,
+      "source": "round-032/train",
+      "target_seed": 2026142432,
+      "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-032/holdout",
+      "target_seed": 2026142920,
+      "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "round-032/holdout",
+      "target_seed": 2026142924,
+      "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "round-032/holdout",
+      "target_seed": 2026142928,
+      "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-033/train",
+      "target_seed": 2026143420,
+      "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "round-033/train",
+      "target_seed": 2026143424,
+      "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "round-033/train",
+      "target_seed": 2026143428,
+      "targets": 32
+    },
+    {
+      "size": 32,
+      "source": "round-033/train",
+      "target_seed": 2026143432,
+      "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "round-033/holdout",
+      "target_seed": 2026143924,
+      "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "round-033/holdout",
+      "target_seed": 2026143928,
+      "targets": 32
+    },
+    {
+      "size": 32,
+      "source": "round-033/holdout",
+      "target_seed": 2026143932,
+      "targets": 32
     }
   ],
   "family": "curve25519",
@@ -1253,6 +1337,123 @@
         "oracle": "wwalk:x=1.0"
       },
       "track": "generic"
+    },
+    {
+      "ci95": [
+        0.6096449340566146,
+        0.8525976841513606
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x08-grow",
+        "n": 2,
+        "name": "wwalkg-x08-grow-n2",
+        "oracle": "wwalk:x=0.8,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.7209589856096382,
+      "round": 33,
+      "s_from": [
+        2.1637944506942914,
+        2.2429065062462166,
+        2.9549150062135494
+      ],
+      "s_to": [
+        1.6734952045194382,
+        1.7178491390547963,
+        2.1170345498730194
+      ],
+      "session": "ECBS1h05c72414c6d4",
+      "size": 24,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic"
+    },
+    {
+      "ci95": [
+        0.672688235398497,
+        0.9396258310365021
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x08",
+        "n": 2,
+        "name": "wwalkg-x08-n2",
+        "oracle": "wwalk:x=0.8",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.795031598249271,
+      "round": 33,
+      "s_from": [
+        1.9210982989570122,
+        2.029106402748029,
+        3.001179336867195
+      ],
+      "s_to": [
+        1.571748849781295,
+        1.6107124260862111,
+        1.9613846128304555
+      ],
+      "session": "ECBS1hba478ffc1d23",
+      "size": 28,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic"
+    },
+    {
+      "ci95": [
+        0.6483846820004528,
+        0.7875031729776572
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x10",
+        "n": 2,
+        "name": "wwalk-x10-n2",
+        "oracle": "wwalk:x=1.0"
+      },
+      "ratio": 0.7145662981035878,
+      "round": 33,
+      "s_from": [
+        2.1099514840315168,
+        2.3163940892115056,
+        4.1743775358313995
+      ],
+      "s_to": [
+        1.51519557395628,
+        1.6245101539840512,
+        2.6083413742340005
+      ],
+      "session": "ECBS1h8b22612ef731",
+      "size": 32,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06",
+        "n": 2,
+        "name": "wwalkG-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2"
+      },
+      "track": "generic"
     }
   ],
   "notes": [
@@ -1556,6 +1757,30 @@
       ],
       "status": "ratcheted",
       "track": "generic"
+    },
+    {
+      "dir": "round-032",
+      "round": 32,
+      "sizes": [
+        20,
+        24,
+        28,
+        32
+      ],
+      "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-033",
+      "round": 33,
+      "sizes": [
+        20,
+        24,
+        28,
+        32
+      ],
+      "status": "ratcheted",
+      "track": "generic"
     }
   ],
   "schema": "ic_autolab.ledger/v1",
@@ -1709,116 +1934,116 @@
       "24": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalkg-x08-grow",
+          "family": "wwalkGg-x09",
           "n": 2,
-          "name": "wwalkg-x08-grow-n2",
-          "oracle": "wwalk:x=0.8,grow=1",
+          "name": "wwalkGg-x09-n2",
+          "oracle": "wwalk:x=0.9,g=1,grow=2",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
           "band_verdict": "sel < inc",
-          "binary_sha256": "9f3a25b151d9868419ec86574451424a506f06c9bf8e5d790b44d48428feb4eb",
+          "binary_sha256": "737fb5b0901bda2c34a6a059032aa91fb76b1cfe656a4146c21c9778c5127c2e",
           "ci95_w0": [
-            0.7022933686163911,
-            0.8835560673941852
+            0.6096449340566146,
+            0.8525976841513606
           ],
-          "dir": "round-031",
-          "paired_ratio_w0": 0.7877281046983873,
-          "round": 31,
+          "dir": "round-033",
+          "paired_ratio_w0": 0.7209589856096382,
+          "round": 33,
           "route": "local",
-          "session_id": "ECBS1h74e92e8a400c",
-          "spec_sha256": "00c4e366a7574287b662f34f2b6b9f1b7d155297c532339815a1cdc82119d68e",
+          "session_id": "ECBS1h05c72414c6d4",
+          "spec_sha256": "eaa6e01a15267db316c1e5183a39b8f495a25fcadd7dea3473de9087c0a99a23",
           "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "6f94145bfcc2e1fe79e609866b1cf4942d8b3d51f389d29687786d19eb7613a4"
+          "verify_receipt_sha256": "43de56f9cde7f622ed22f2e0b24b44b140d2ff22a101f9a64fef6acd568b93a7"
         },
         "rho_s": [
-          1.2237197671781557,
-          1.3342884832825725,
-          2.329406928222325
+          1.1710582360501856,
+          1.2764427960990838,
+          2.2249038365391622
         ],
         "s": [
-          2.1637944506942914,
-          2.2429065062462166,
-          2.9549150062135494
+          1.6734952045194382,
+          1.7178491390547963,
+          2.1170345498730194
         ],
-        "since_round": 31
+        "since_round": 33
       },
       "28": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalkg-x08",
+          "family": "wwalkGg-x09",
           "n": 2,
-          "name": "wwalkg-x08-n2",
-          "oracle": "wwalk:x=0.8",
+          "name": "wwalkGg-x09-n2",
+          "oracle": "wwalk:x=0.9,g=1,grow=2",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
           "band_verdict": "sel < inc",
-          "binary_sha256": "9f3a25b151d9868419ec86574451424a506f06c9bf8e5d790b44d48428feb4eb",
+          "binary_sha256": "737fb5b0901bda2c34a6a059032aa91fb76b1cfe656a4146c21c9778c5127c2e",
           "ci95_w0": [
-            0.7576105028610624,
-            0.9620822917851166
+            0.672688235398497,
+            0.9396258310365021
           ],
-          "dir": "round-031",
-          "paired_ratio_w0": 0.8537468294951648,
-          "round": 31,
+          "dir": "round-033",
+          "paired_ratio_w0": 0.795031598249271,
+          "round": 33,
           "route": "local",
-          "session_id": "ECBS1h9970d0e17516",
-          "spec_sha256": "d8df2134b990aa1be295fadef3ab65abaa3d250e44d98200c8f254640a67d056",
+          "session_id": "ECBS1hba478ffc1d23",
+          "spec_sha256": "b27a7024ee9edb111b8eeb44b8666f95eb96603f117e4bd219978fedd3406c7a",
           "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "1d0d7c8e529cea8d7d26b263e8049b44779c10ba7840fa3309bec2bf0f69626f"
+          "verify_receipt_sha256": "3435de2920cad08d48385589d5ac7048b6a179315ed97a2abf2eeb1de3685281"
         },
         "rho_s": [
-          0.9320741484365967,
-          1.0188218891308516,
-          1.799551555379144
+          1.051843395975189,
+          1.1505947643228311,
+          2.0393570794516065
         ],
         "s": [
-          1.9210982989570122,
-          2.029106402748029,
-          3.001179336867195
+          1.571748849781295,
+          1.6107124260862111,
+          1.9613846128304555
         ],
-        "since_round": 31
+        "since_round": 33
       },
       "32": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalk-x10",
+          "family": "wwalkG-x06",
           "n": 2,
-          "name": "wwalk-x10-n2",
-          "oracle": "wwalk:x=1.0"
+          "name": "wwalkG-x06-n2",
+          "oracle": "wwalk:x=0.6,g=1,grow=2"
         },
         "evidence": {
           "band_verdict": "sel < inc",
-          "binary_sha256": "9f3a25b151d9868419ec86574451424a506f06c9bf8e5d790b44d48428feb4eb",
+          "binary_sha256": "737fb5b0901bda2c34a6a059032aa91fb76b1cfe656a4146c21c9778c5127c2e",
           "ci95_w0": [
-            0.7075820840525178,
-            0.920792875505898
+            0.6483846820004528,
+            0.7875031729776572
           ],
-          "dir": "round-031",
-          "paired_ratio_w0": 0.8071781351295227,
-          "round": 31,
+          "dir": "round-033",
+          "paired_ratio_w0": 0.7145662981035878,
+          "round": 33,
           "route": "local",
-          "session_id": "ECBS1hedd879993025",
-          "spec_sha256": "2dc40272e7c5cb7b67ac5f8fa17918638d8751220804cf6b1e096b36dc6b4278",
+          "session_id": "ECBS1h8b22612ef731",
+          "spec_sha256": "37dda3e9acbc9cc3d12f69e2a9ccec8b16d13de7c6243aacad645ddea30bbfce",
           "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "0bcb9ac6dcafcac392ee7e88bb0d8a428bed45746e66f5813978aae783f90299"
+          "verify_receipt_sha256": "71c7bf0c4bcbb0e46f155285b7c71dc81d7ce125bf0e79a18fa49f90fa95407c"
         },
         "rho_s": [
-          0.8720597463857237,
-          0.9575921416414921,
-          1.72738369894341
+          0.9750633042812593,
+          1.0708943694741935,
+          1.933373956210599
         ],
         "s": [
-          2.1099514840315168,
-          2.3163940892115056,
-          4.1743775358313995
+          1.51519557395628,
+          1.6245101539840512,
+          2.6083413742340005
         ],
-        "since_round": 31
+        "since_round": 33
       }
     }
   },
@@ -8681,7 +8906,2432 @@
       "stage": "holdout",
       "status": "improvement",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05",
+        "n": 2,
+        "name": "wwalk-x05-n2",
+        "oracle": "wwalk:x=0.5"
+      },
+      "round": 32,
+      "s": [
+        6.229215873786375,
+        6.763344627386624,
+        11.570503409788866
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05",
+        "n": 2,
+        "name": "wwalkg-x05-n2",
+        "oracle": "wwalk:x=0.5",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.9748855719701344,
+        4.290543578410442,
+        7.1314656363732185
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05-grow",
+        "n": 2,
+        "name": "wwalk-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1"
+      },
+      "round": 32,
+      "s": [
+        4.939597452372323,
+        5.194699988516236,
+        7.49062281381145
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05-grow",
+        "n": 2,
+        "name": "wwalkg-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.9193275450768423,
+        3.0777604638007374,
+        4.50365673231578
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06",
+        "n": 2,
+        "name": "wwalk-x06-n2",
+        "oracle": "wwalk:x=0.6"
+      },
+      "round": 32,
+      "s": [
+        5.157438401935507,
+        5.5094607490652745,
+        8.677661873233175
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06",
+        "n": 2,
+        "name": "wwalkg-x06-n2",
+        "oracle": "wwalk:x=0.6",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.931576202987671,
+        4.230039872300082,
+        6.916212896111775
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06-grow",
+        "n": 2,
+        "name": "wwalk-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1"
+      },
+      "round": 32,
+      "s": [
+        4.534283875719713,
+        4.683968647003723,
+        6.031131588559811
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06-grow",
+        "n": 2,
+        "name": "wwalkg-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.6187501715013455,
+        2.7306815964372952,
+        3.7380644208608507
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07",
+        "n": 2,
+        "name": "wwalk-x07-n2",
+        "oracle": "wwalk:x=0.7"
+      },
+      "round": 32,
+      "s": [
+        5.621935697954591,
+        6.025023414607705,
+        9.652812864485718
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07",
+        "n": 2,
+        "name": "wwalkg-x07-n2",
+        "oracle": "wwalk:x=0.7",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.1541644023881257,
+        3.3640250399376086,
+        5.252770777882958
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07-grow",
+        "n": 2,
+        "name": "wwalk-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1"
+      },
+      "round": 32,
+      "s": [
+        4.809841892711718,
+        5.0366984380092985,
+        7.078407345687531
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07-grow",
+        "n": 2,
+        "name": "wwalkg-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.409277765347123,
+        2.517171583772357,
+        3.488215949599472
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09",
+        "n": 2,
+        "name": "wwalk-x09-n2",
+        "oracle": "wwalk:x=0.9"
+      },
+      "round": 32,
+      "s": [
+        4.71174876017574,
+        4.910945975402052,
+        6.703720912438854
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09",
+        "n": 2,
+        "name": "wwalkg-x09-n2",
+        "oracle": "wwalk:x=0.9",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.3717487304718814,
+        2.4676332577370386,
+        3.3305940031234575
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09-grow",
+        "n": 2,
+        "name": "wwalk-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1"
+      },
+      "round": 32,
+      "s": [
+        4.7172702733527885,
+        4.916467488579098,
+        6.709242425615902
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09-grow",
+        "n": 2,
+        "name": "wwalkg-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.3772702436489275,
+        2.473154770914086,
+        3.336115516300503
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05",
+        "n": 2,
+        "name": "wwalk-x05-n2",
+        "oracle": "wwalk:x=0.5"
+      },
+      "round": 32,
+      "s": [
+        4.704624317655336,
+        5.340077775567429,
+        11.059158896776282
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05",
+        "n": 2,
+        "name": "wwalkg-x05-n2",
+        "oracle": "wwalk:x=0.5",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.7574935715787228,
+        4.071414989731894,
+        6.896707753110442
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05-grow",
+        "n": 2,
+        "name": "wwalk-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1"
+      },
+      "round": 32,
+      "s": [
+        3.163014906315226,
+        3.424807774212733,
+        5.780943585290298
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05-grow",
+        "n": 2,
+        "name": "wwalkg-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.5607249424373766,
+        2.7046103576041114,
+        3.9995790941047176
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06",
+        "n": 2,
+        "name": "wwalk-x06-n2",
+        "oracle": "wwalk:x=0.6"
+      },
+      "round": 32,
+      "s": [
+        4.174427029662981,
+        4.6940639598048834,
+        9.370796331082014
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06",
+        "n": 2,
+        "name": "wwalkg-x06-n2",
+        "oracle": "wwalk:x=0.6",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.137272145964613,
+        3.3795518720473203,
+        5.560069406791673
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06-grow",
+        "n": 2,
+        "name": "wwalk-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.919159973605868,
+        3.106948339492934,
+        4.797043632476517
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06-grow",
+        "n": 2,
+        "name": "wwalkg-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.148624995097911,
+        2.2368430396422583,
+        3.03080544054138
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07",
+        "n": 2,
+        "name": "wwalk-x07-n2",
+        "oracle": "wwalk:x=0.7"
+      },
+      "round": 32,
+      "s": [
+        2.8742773738327996,
+        3.1311655230147206,
+        5.443158865652013
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07",
+        "n": 2,
+        "name": "wwalkg-x07-n2",
+        "oracle": "wwalk:x=0.7",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.4314716863601222,
+        2.5905891338248432,
+        4.02264616100732
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07-grow",
+        "n": 2,
+        "name": "wwalk-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.8756583769027397,
+        3.1325465260846608,
+        5.444539868721954
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07-grow",
+        "n": 2,
+        "name": "wwalkg-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.4328526894300637,
+        2.591970136894783,
+        4.024027164077261
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09",
+        "n": 2,
+        "name": "wwalk-x09-n2",
+        "oracle": "wwalk:x=0.9"
+      },
+      "round": 32,
+      "s": [
+        3.5385614286471996,
+        3.886794299636506,
+        7.020890138540256
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09",
+        "n": 2,
+        "name": "wwalkg-x09-n2",
+        "oracle": "wwalk:x=0.9",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.4314501081871547,
+        2.57222395081193,
+        3.8391885344348973
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09-grow",
+        "n": 2,
+        "name": "wwalk-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.922892997529302,
+        3.134784182621424,
+        5.041804848450521
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09-grow",
+        "n": 2,
+        "name": "wwalkg-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.04867489791096,
+        2.139443482500103,
+        2.956360743802394
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05",
+        "n": 2,
+        "name": "wwalk-x05-n2",
+        "oracle": "wwalk:x=0.5"
+      },
+      "round": 32,
+      "s": [
+        3.639907299046818,
+        4.2087443327431835,
+        9.328277636010476
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05",
+        "n": 2,
+        "name": "wwalkg-x05-n2",
+        "oracle": "wwalk:x=0.5",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.8121652763642815,
+        4.139687397849219,
+        7.087386491213662
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05-grow",
+        "n": 2,
+        "name": "wwalk-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.496392039813946,
+        2.7447009538915923,
+        4.979481180590409
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05-grow",
+        "n": 2,
+        "name": "wwalkg-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.753004207013446,
+        2.9245393179598547,
+        4.468355316477532
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06",
+        "n": 2,
+        "name": "wwalk-x06-n2",
+        "oracle": "wwalk:x=0.6"
+      },
+      "round": 32,
+      "s": [
+        2.762201872406352,
+        3.138754293591926,
+        6.52772608426209
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06",
+        "n": 2,
+        "name": "wwalkg-x06-n2",
+        "oracle": "wwalk:x=0.6",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.2001085346089133,
+        2.356032429203105,
+        3.759347480550826
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06-grow",
+        "n": 2,
+        "name": "wwalk-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.762547122016408,
+        3.139099543201982,
+        6.528071333872146
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06-grow",
+        "n": 2,
+        "name": "wwalkg-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.2004537842189698,
+        2.3563776788131614,
+        3.7596927301608822
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07",
+        "n": 2,
+        "name": "wwalk-x07-n2",
+        "oracle": "wwalk:x=0.7"
+      },
+      "round": 32,
+      "s": [
+        2.870685773316229,
+        3.250327099606775,
+        6.667099036221692
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07",
+        "n": 2,
+        "name": "wwalkg-x07-n2",
+        "oracle": "wwalk:x=0.7",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.8677943078320065,
+        3.080738872789575,
+        4.99723995740768
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07-grow",
+        "n": 2,
+        "name": "wwalk-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.132240013607065,
+        2.3527223485666906,
+        4.337063363203311
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07-grow",
+        "n": 2,
+        "name": "wwalkg-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.115285021038207,
+        2.2458373849133864,
+        3.420808659789997
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09",
+        "n": 2,
+        "name": "wwalk-x09-n2",
+        "oracle": "wwalk:x=0.9"
+      },
+      "round": 32,
+      "s": [
+        2.288050083720442,
+        2.5139107602617243,
+        4.546656849133269
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09",
+        "n": 2,
+        "name": "wwalkg-x09-n2",
+        "oracle": "wwalk:x=0.9",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.0208592526878095,
+        2.1290016801552407,
+        3.1022835273621188
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09-grow",
+        "n": 2,
+        "name": "wwalk-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.288395333330498,
+        2.5142560098717803,
+        4.547002098743325
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09-grow",
+        "n": 2,
+        "name": "wwalkg-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.021204502297866,
+        2.1293469297652967,
+        3.1026287769721757
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05",
+        "n": 2,
+        "name": "wwalk-x05-n2",
+        "oracle": "wwalk:x=0.5"
+      },
+      "round": 32,
+      "s": [
+        3.2029725312325117,
+        3.7263649610337604,
+        8.436896829245006
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05",
+        "n": 2,
+        "name": "wwalkg-x05-n2",
+        "oracle": "wwalk:x=0.5",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.3637340662883872,
+        3.6489789416882035,
+        6.216182820286548
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x05-grow",
+        "n": 2,
+        "name": "wwalk-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.11002228983182,
+        2.342269360874589,
+        4.432493000259509
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x05-grow",
+        "n": 2,
+        "name": "wwalkg-x05-grow-n2",
+        "oracle": "wwalk:x=0.5,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        1.9990540909135213,
+        2.110520762665961,
+        3.1137208084379187
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06",
+        "n": 2,
+        "name": "wwalk-x06-n2",
+        "oracle": "wwalk:x=0.6"
+      },
+      "round": 32,
+      "s": [
+        2.2569193748472225,
+        2.572628142374394,
+        5.414007050118937
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06",
+        "n": 2,
+        "name": "wwalkg-x06-n2",
+        "oracle": "wwalk:x=0.6",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.180962958326851,
+        2.3377932204816583,
+        3.7492655798749324
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x06-grow",
+        "n": 2,
+        "name": "wwalk-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.2570056904894984,
+        2.5727144580166694,
+        5.414093365761213
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x06-grow",
+        "n": 2,
+        "name": "wwalkg-x06-grow-n2",
+        "oracle": "wwalk:x=0.6,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.181049273969126,
+        2.3378795361239346,
+        3.7493518955172074
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07",
+        "n": 2,
+        "name": "wwalk-x07-n2",
+        "oracle": "wwalk:x=0.7"
+      },
+      "round": 32,
+      "s": [
+        3.078288237283898,
+        3.537086895661175,
+        7.666274821056664
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07",
+        "n": 2,
+        "name": "wwalkg-x07-n2",
+        "oracle": "wwalk:x=0.7",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        3.242629174130379,
+        3.495703130708655,
+        5.773368739913134
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x07-grow",
+        "n": 2,
+        "name": "wwalk-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.02542082226481,
+        2.205985458417893,
+        3.8310671837956365
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x07-grow",
+        "n": 2,
+        "name": "wwalkg-x07-grow-n2",
+        "oracle": "wwalk:x=0.7,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.1379615842908137,
+        2.245789512248584,
+        3.2162408638685207
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09",
+        "n": 2,
+        "name": "wwalk-x09-n2",
+        "oracle": "wwalk:x=0.9"
+      },
+      "round": 32,
+      "s": [
+        2.0869557831156516,
+        2.308918210513124,
+        4.3065800570903825
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09",
+        "n": 2,
+        "name": "wwalkg-x09-n2",
+        "oracle": "wwalk:x=0.9",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        1.9011209026607054,
+        1.9998947243483682,
+        2.8888591195373317
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalk-x09-grow",
+        "n": 2,
+        "name": "wwalk-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1"
+      },
+      "round": 32,
+      "s": [
+        2.087042098757927,
+        2.3090045261554,
+        4.306666372732657
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09-grow",
+        "n": 2,
+        "name": "wwalkg-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        1.9012072183029805,
+        1.9999810399906424,
+        2.888945435179607
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09",
+        "n": 2,
+        "name": "wwalkg-x09-n2",
+        "oracle": "wwalk:x=0.9",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.8077757241718153,
+        2.947090403520183,
+        4.200922517655497
+      ],
+      "size": 20,
+      "stage": "holdout",
+      "status": "regression",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09-grow",
+        "n": 2,
+        "name": "wwalkg-x09-grow-n2",
+        "oracle": "wwalk:x=0.9,grow=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.0710730414515597,
+        2.1639498135396598,
+        2.9998407623325574
+      ],
+      "size": 24,
+      "stage": "holdout",
+      "status": "null",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkg-x09",
+        "n": 2,
+        "name": "wwalkg-x09-n2",
+        "oracle": "wwalk:x=0.9",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 32,
+      "s": [
+        2.0801504786898217,
+        2.1942053057294664,
+        3.2206987490862726
+      ],
+      "size": 28,
+      "stage": "holdout",
+      "status": "null",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06",
+        "n": 2,
+        "name": "wwalkG-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        5.491144854573288,
+        5.603913133850136,
+        6.618827647341757
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x06",
+        "n": 2,
+        "name": "wwalkGg-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        3.3111824333604005,
+        3.370167723347073,
+        3.9010353332271297
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x07",
+        "n": 2,
+        "name": "wwalkG-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        5.265711824391665,
+        5.3384663878635985,
+        5.993257459111004
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x07",
+        "n": 2,
+        "name": "wwalkGg-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        3.1046433310814847,
+        3.144527636421311,
+        3.503486384479743
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x08",
+        "n": 2,
+        "name": "wwalkG-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        5.5419600305308,
+        5.6001602303626115,
+        6.123962028848914
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x08",
+        "n": 2,
+        "name": "wwalkGg-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        3.3255901318067567,
+        3.352084767692244,
+        3.590536490661625
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x09",
+        "n": 2,
+        "name": "wwalkG-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        5.7284836475429195,
+        5.792697120319109,
+        6.370618375304816
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        3.4779493860358994,
+        3.506117730603179,
+        3.7596328317086907
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x10",
+        "n": 2,
+        "name": "wwalkG-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        4.65394541910353,
+        4.7426606066028665,
+        5.541097294096886
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x10",
+        "n": 2,
+        "name": "wwalkGg-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        2.5951974668555033,
+        2.654424323043672,
+        3.1874660287371905
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x12",
+        "n": 2,
+        "name": "wwalkG-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        4.885245057035765,
+        4.976582963294199,
+        5.7986241196200945
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x12",
+        "n": 2,
+        "name": "wwalkGg-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        2.6259108839028276,
+        2.6673308600950194,
+        3.0401106458247473
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06",
+        "n": 2,
+        "name": "wwalkG-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        3.1455150080383225,
+        3.2322355273787022,
+        4.012720201442123
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x06",
+        "n": 2,
+        "name": "wwalkGg-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        2.2817191659634375,
+        2.308012169724729,
+        2.5446492035763484
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x07",
+        "n": 2,
+        "name": "wwalkG-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.441419224098288,
+        2.517119770504003,
+        3.1984246881554212
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x07",
+        "n": 2,
+        "name": "wwalkGg-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.8466384644132414,
+        1.8941536012883864,
+        2.321789833164684
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x08",
+        "n": 2,
+        "name": "wwalkG-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        3.1880887433038354,
+        3.2273955431820207,
+        3.58115674208568
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x08",
+        "n": 2,
+        "name": "wwalkGg-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        2.5861224520205037,
+        2.6141891815997487,
+        2.866789747812965
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x09",
+        "n": 2,
+        "name": "wwalkG-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.554014130644384,
+        2.6784921370438592,
+        3.7987941946391333
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.6849747925383196,
+        1.7304443186161138,
+        2.1396700533162654
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x10",
+        "n": 2,
+        "name": "wwalkG-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        3.594750991055409,
+        3.6430148905325366,
+        4.077389985826685
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x10",
+        "n": 2,
+        "name": "wwalkGg-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        2.855676988734536,
+        2.874562205715974,
+        3.044529158548915
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x12",
+        "n": 2,
+        "name": "wwalkG-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.6146272185109964,
+        2.688964024385143,
+        3.357995277252465
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x12",
+        "n": 2,
+        "name": "wwalkGg-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.9668288878440112,
+        2.0085977572578235,
+        2.384517581982142
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06",
+        "n": 2,
+        "name": "wwalkG-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.6521535592009067,
+        2.7615502137673706,
+        3.7461201048655437
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x06",
+        "n": 2,
+        "name": "wwalkGg-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        2.385000489844375,
+        2.4342956607302266,
+        2.8779521987028827
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x07",
+        "n": 2,
+        "name": "wwalkG-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.0625751157278933,
+        2.135228580544116,
+        2.7891097638901146
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x07",
+        "n": 2,
+        "name": "wwalkGg-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.851821806889152,
+        1.8881690384928604,
+        2.2152941229262337
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x08",
+        "n": 2,
+        "name": "wwalkG-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.202616988806979,
+        2.272026725646219,
+        2.8967143571993796
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x08",
+        "n": 2,
+        "name": "wwalkGg-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.934773420230335,
+        1.9637393230615425,
+        2.2244324485424114
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x09",
+        "n": 2,
+        "name": "wwalkG-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        1.9903801855500276,
+        2.1091778791078206,
+        3.1783571211279615
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.6438736511321181,
+        1.6900583388123682,
+        2.1057205279346163
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x10",
+        "n": 2,
+        "name": "wwalkG-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        1.9826606200501746,
+        2.0452716368338844,
+        2.6087707878872703
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x10",
+        "n": 2,
+        "name": "wwalkGg-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.812927280506247,
+        1.8481902125533727,
+        2.165556600977499
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x12",
+        "n": 2,
+        "name": "wwalkG-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.1299797075662283,
+        2.2496162497859555,
+        3.3263451297635
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x12",
+        "n": 2,
+        "name": "wwalkGg-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.8070742207107617,
+        1.8559162514834138,
+        2.29549452843728
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06",
+        "n": 2,
+        "name": "wwalkG-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        1.3358316693081613,
+        1.4093488597251091,
+        2.0710035734776437
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x06",
+        "n": 2,
+        "name": "wwalkGg-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.37461166896417,
+        1.421366424757273,
+        1.8421592268951972
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x07",
+        "n": 2,
+        "name": "wwalkG-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        1.7010183162740302,
+        1.77336997578388,
+        2.4245349113725236
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x07",
+        "n": 2,
+        "name": "wwalkGg-x07-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.6077448240221717,
+        1.6406919092832353,
+        1.9372156766328064
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x08",
+        "n": 2,
+        "name": "wwalkG-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        1.5574996794445604,
+        1.6374785397631542,
+        2.3572882826304955
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x08",
+        "n": 2,
+        "name": "wwalkGg-x08-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.5661811449027832,
+        1.613162883861432,
+        2.0359985344892695
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x09",
+        "n": 2,
+        "name": "wwalkG-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.2553602985586245,
+        2.301510305383036,
+        2.716860366802737
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        2.289913529106965,
+        2.3225264109905934,
+        2.6160423479432513
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x10",
+        "n": 2,
+        "name": "wwalkG-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        1.6830619653169425,
+        1.7587220764215665,
+        2.4396630763631837
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x10",
+        "n": 2,
+        "name": "wwalkGg-x10-n2",
+        "oracle": "wwalk:x=1.0,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.718427102375434,
+        1.7658857352576542,
+        2.1930134311976315
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x12",
+        "n": 2,
+        "name": "wwalkG-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        2.0773828389145543,
+        2.1507364342157524,
+        2.8109187919265373
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x12",
+        "n": 2,
+        "name": "wwalkGg-x12-n2",
+        "oracle": "wwalk:x=1.2,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.875969333710823,
+        1.8986244924442734,
+        2.1025209210453304
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.6734952045194382,
+        1.7178491390547963,
+        2.1170345498730194
+      ],
+      "size": 24,
+      "stage": "holdout",
+      "status": "improvement",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 33,
+      "s": [
+        1.571748849781295,
+        1.6107124260862111,
+        1.9613846128304555
+      ],
+      "size": 28,
+      "stage": "holdout",
+      "status": "improvement",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06",
+        "n": 2,
+        "name": "wwalkG-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2"
+      },
+      "round": 33,
+      "s": [
+        1.51519557395628,
+        1.6245101539840512,
+        2.6083413742340005
+      ],
+      "size": 32,
+      "stage": "holdout",
+      "status": "improvement",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-04T11:16:56Z"
+  "updated": "2026-11-04T12:11:47Z"
 }

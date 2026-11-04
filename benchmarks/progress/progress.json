@@ -1,16 +1,46 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T1114Z-c25519-autolab-r31-k20-32",
+  "latest_record": "20261104T1209Z-c25519-autolab-r33-k20-32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 28,
+    "measured": 30,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
   "series": [
+    {
+      "better": "lower",
+      "first": 0.93749694761621,
+      "latest": 0.93749694761621,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_w0_k24",
+      "points": [
+        {
+          "commit": "e550ab2c1ed1",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 64,
+          "record": "20261104T1119Z-c25519-autolab-r32-k20-32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8192820929497201,
+            1.0727691162214268
+          ],
+          "summary": "ic_autolab round 32: wwalk x refinement 0.5..0.9 ratchets nothing (k = 20 regression, k = 24/28 null, k = 32 no challenger)",
+          "value": 0.93749694761621
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "ratio"
+    },
     {
       "better": "lower",
       "first": 2.5745780660849693,
@@ -43,10 +73,11 @@
     {
       "better": "lower",
       "first": 2.1637944506942914,
-      "latest": 2.1637944506942914,
+      "latest": 1.6734952045194382,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 1.768211
+        "improvement_vs_first_percent": 22.6592,
+        "improvement_vs_previous_percent": 22.6592,
+        "value_over_reference": 1.429045
       },
       "metric": "s_w0_incumbent_k24",
       "points": [
@@ -64,6 +95,22 @@
           "spread": null,
           "summary": "ic_autolab round 31: wwalk (P2) ratchets k = 24/28/32 to S 2.16/1.92/2.11 (1.77x/2.06x/2.42x rho); k = 20 null",
           "value": 2.1637944506942914
+        },
+        {
+          "commit": "c0f400c927e0",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 22.6592,
+            "improvement_vs_previous_percent": 22.6592,
+            "value_over_reference": 1.429045
+          },
+          "n": 64,
+          "record": "20261104T1209Z-c25519-autolab-r33-k20-32",
+          "reference": 1.1710582360501856,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 33: wwalk g=1 grow=2 ratchets k = 24/28/32 to S 1.67/1.57/1.52 (1.43x/1.49x/1.55x rho)",
+          "value": 1.6734952045194382
         }
       ],
       "problem": "ic:curve25519-family-k20-32",
@@ -72,10 +119,11 @@
     {
       "better": "lower",
       "first": 1.9210982989570122,
-      "latest": 1.9210982989570122,
+      "latest": 1.571748849781295,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 2.0611
+        "improvement_vs_first_percent": 18.1849,
+        "improvement_vs_previous_percent": 18.1849,
+        "value_over_reference": 1.49428
       },
       "metric": "s_w0_incumbent_k28",
       "points": [
@@ -93,6 +141,22 @@
           "spread": null,
           "summary": "ic_autolab round 31: wwalk (P2) ratchets k = 24/28/32 to S 2.16/1.92/2.11 (1.77x/2.06x/2.42x rho); k = 20 null",
           "value": 1.9210982989570122
+        },
+        {
+          "commit": "c0f400c927e0",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 18.1849,
+            "improvement_vs_previous_percent": 18.1849,
+            "value_over_reference": 1.49428
+          },
+          "n": 64,
+          "record": "20261104T1209Z-c25519-autolab-r33-k20-32",
+          "reference": 1.051843395975189,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 33: wwalk g=1 grow=2 ratchets k = 24/28/32 to S 1.67/1.57/1.52 (1.43x/1.49x/1.55x rho)",
+          "value": 1.571748849781295
         }
       ],
       "problem": "ic:curve25519-family-k20-32",
@@ -101,10 +165,11 @@
     {
       "better": "lower",
       "first": 2.1099514840315168,
-      "latest": 2.1099514840315168,
+      "latest": 1.51519557395628,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 2.419503
+        "improvement_vs_first_percent": 28.1881,
+        "improvement_vs_previous_percent": 28.1881,
+        "value_over_reference": 1.553946
       },
       "metric": "s_w0_incumbent_k32",
       "points": [
@@ -122,6 +187,22 @@
           "spread": null,
           "summary": "ic_autolab round 31: wwalk (P2) ratchets k = 24/28/32 to S 2.16/1.92/2.11 (1.77x/2.06x/2.42x rho); k = 20 null",
           "value": 2.1099514840315168
+        },
+        {
+          "commit": "c0f400c927e0",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 28.1881,
+            "improvement_vs_previous_percent": 28.1881,
+            "value_over_reference": 1.553946
+          },
+          "n": 64,
+          "record": "20261104T1209Z-c25519-autolab-r33-k20-32",
+          "reference": 0.9750633042812593,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 33: wwalk g=1 grow=2 ratchets k = 24/28/32 to S 1.67/1.57/1.52 (1.43x/1.49x/1.55x rho)",
+          "value": 1.51519557395628
         }
       ],
       "problem": "ic:curve25519-family-k20-32",

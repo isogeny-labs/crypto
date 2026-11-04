@@ -62,7 +62,7 @@ use crate::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
     prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
     CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
-    PrimeCurve, PrimeInstance, PrimePoint, Relation, WSumTable, WalkTable,
+    PrimeCurve, PrimeInstance, PrimePoint, Relation, WSumTable, WalkOpts, WalkTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::FastPoint;
@@ -2605,7 +2605,8 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         &[
             ("x", "table size in units of √r, T = round(x·√r), x in (0, 4] (required)"),
             ("jumps", "jump count, 2 to 64 (default 16); J_j = [α_j]P1 + [β_j]P2, α_j, β_j uniform in [1, round(1.2·√T)]"),
-            ("grow", "1: after T entries keep extending the walk (charged) until the first verified free row, at most 2T entries (default 0)"),
+            ("grow", "1: after T entries keep extending the walk (charged) until the first verified free row, at most 2T entries; 2 (needs g=1): until two independent verified rows pin both seed logs, at most 3T (default 0)"),
+            ("g", "1: every jump also carries [γ_j]G, γ_j uniform in [1, r), and entries track z mod r; a collision is the affine row du·s1 + dv·s2 = −dz (default 0)"),
             ("seed", "seed of the jump and step stream, mixed with the two seeds' keys (default 0)"),
         ]
     }
@@ -2629,7 +2630,29 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         let seed = params
             .u64_or("seed", 0)
             .map_err(|e| format!("wwalk: {e}"))?;
-        let table = WalkTable::build(ctx.group, fb, ctx.r, x, jumps, params.flag("grow"), seed)?;
+        let grow = match params.get("grow") {
+            None => 0u8,
+            Some("true" | "yes") => 1,
+            Some(v) => v
+                .parse::<u8>()
+                .ok()
+                .filter(|g| *g <= 2)
+                .ok_or_else(|| format!("wwalk: grow is 0, 1 or 2, not `{v}`"))?,
+        };
+        let opts = WalkOpts {
+            g_jumps: params.flag("g"),
+            grow,
+        };
+        let table = WalkTable::build_with(
+            ctx.group,
+            Some(ctx.generator),
+            fb,
+            ctx.r,
+            x,
+            jumps,
+            opts,
+            seed,
+        )?;
         self.free_pending = true;
         self.free_checked = table.collisions.len() as u64;
         self.free_emitted = table.rows.len() as u64;
@@ -2678,15 +2701,25 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         };
         if self.free_pending {
             self.free_pending = false;
-            out.extend(table.rows.iter().map(|columns| Relation::Row {
-                columns: columns.clone(),
-                a: 0,
-                b: 0,
-            }));
+            // `Σ coef·x = h·(a + b·d)` with `b = 0`: a collision's affine
+            // row `du·s1 + dv·s2 = −dz` carries `a = −dz` (zero without
+            // `g=1`).
+            out.extend(
+                table
+                    .rows
+                    .iter()
+                    .zip(&table.row_consts)
+                    .map(|(columns, &konst)| Relation::Row {
+                        columns: columns.clone(),
+                        a: konst,
+                        b: 0,
+                    }),
+            );
         }
-        if let Some((sign, u, v)) = table.probe(ctx.group, ops, &mut counters.lookups, point) {
+        if let Some((sign, u, v, z)) = table.probe_z(ctx.group, ops, &mut counters.lookups, point) {
             let columns = table.hit_columns(fb, ctx.r, sign, u, v);
             self.probe_hits += 1;
+            let a = WalkTable::<G::Elt>::hit_const(ctx.r, a, sign, z);
             out.push(Relation::Row { columns, a, b });
         }
         out
@@ -5248,6 +5281,137 @@ mod wwalk_pipeline_tests {
                 } else if spec.contains("0.6") {
                     assert!(no_row > 0, "{label}: the no-free-row path never exercised");
                 }
+            }
+        }
+    }
+
+    /// One run in full: the report beside the oracle's counters.
+    struct Full {
+        verified: bool,
+        free_rows: u64,
+        hits: u64,
+        rows_used: u64,
+        steps: u64,
+        t: u64,
+        rank2: bool,
+        gae: f64,
+        setup_gae: f64,
+        s: f64,
+    }
+
+    fn run_full(inst: &PrimeInstance, targets: Targets, spec: &str, s: u64) -> Full {
+        let planted = 12345 + 7919 * s;
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+        let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+        let ps = PipelineSpec {
+            factor_base: "prime-projected-abscissa".into(),
+            factor_base_params: base_params(32),
+            oracle: name,
+            oracle_params,
+            targets,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut oracle = WWalkOracle::<PrimePoint>::new();
+        let rep = run_pipeline(
+            &ctx(inst, q),
+            &ps,
+            &PrimeProjectedAbscissaBase { instance: inst },
+            &mut oracle,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+        let table = oracle.table().unwrap();
+        Full {
+            verified: rep.verified && rep.recovered == Some(planted),
+            free_rows: ctr["free_rows_emitted"],
+            hits: ctr["probe_hits"],
+            rows_used: rep.linear_algebra.rows,
+            steps: table.steps,
+            t: table.t,
+            rank2: table.seed_rank(inst.r) == 2,
+            gae: rep.total_gae,
+            setup_gae: rep.decomposition.setup.gae,
+            s: rep.s,
+        }
+    }
+
+    /// `g=1,grow=2`: both seed logs are pinned by the free rows, so one
+    /// probe hit solves the target, with walk and stride-generator targets.
+    /// A row `Relation::Row { a != 0, b: 0 }` is read by the loop as
+    /// `Σ coef·x = h·a`, which this recovery (cofactor 8) confirms.
+    #[test]
+    fn wwalk_g_grow2_recovers_with_one_probe_hit() {
+        let inst = instance();
+        for (targets, label) in [
+            (Targets::Walk, "walk"),
+            (Targets::StrideGenerator, "stride-generator"),
+        ] {
+            let (mut rank2, mut hits1, n) = (0, 0, 16);
+            for s in 0..n {
+                let f = run_full(&inst, targets, "wwalk:x=1.0,g=1,grow=2", s);
+                assert!(f.verified, "{label} s={s}: planted log not recovered");
+                if f.rank2 {
+                    rank2 += 1;
+                    assert_eq!(f.hits, 1, "{label} s={s}: rank-2 rows, {} hits", f.hits);
+                    assert!(f.free_rows >= 2);
+                    hits1 += 1;
+                } else {
+                    // Capped at 3T below rank 2: more hits needed.
+                    assert_eq!(f.steps, 3 * f.t);
+                    assert!(f.hits >= 2, "{label} s={s}: {} hits", f.hits);
+                }
+            }
+            eprintln!("{label} wwalk:x=1.0,g=1,grow=2: rank-2 tables {rank2}/{n}, solved by one hit {hits1}");
+            assert!(rank2 >= n / 2);
+        }
+    }
+
+    /// The trend before an ecbench round: `g=0,grow=1` against
+    /// `g=1,grow=2`, 16 runs each at x in {0.8, 1.0, 1.2}.
+    #[test]
+    fn wwalk_g_trend_report() {
+        let inst = instance();
+        let sqrt_r = (inst.r as f64).sqrt();
+        let n = 16u64;
+        eprintln!("spec | mean rows used | mean hits | mean steps/sqrt(r) | mean GAE | mean build GAE | S=GAE/sqrt(r)");
+        for x in ["0.8", "1.0", "1.2"] {
+            for spec in [
+                format!("wwalk:x={x},grow=1"),
+                format!("wwalk:x={x},g=1,grow=2"),
+            ] {
+                let (mut rows, mut hits, mut steps, mut gae, mut setup, mut s_sum) =
+                    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                for s in 0..n {
+                    let f = run_full(&inst, Targets::Walk, &spec, s);
+                    assert!(f.verified, "{spec} s={s}");
+                    rows += f.rows_used as f64;
+                    hits += f.hits as f64;
+                    steps += f.steps as f64 / sqrt_r;
+                    gae += f.gae;
+                    setup += f.setup_gae;
+                    s_sum += f.s;
+                }
+                let n = n as f64;
+                eprintln!(
+                    "{spec} | {:.2} | {:.2} | {:.3} | {:.0} | {:.0} | {:.3}",
+                    rows / n,
+                    hits / n,
+                    steps / n,
+                    gae / n,
+                    setup / n,
+                    s_sum / n
+                );
             }
         }
     }
