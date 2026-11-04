@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0750Z-c25519-autolab-r22-k32",
+  "latest_record": "20261104T0754Z-c25519-autolab-r23-k28",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 19,
+    "measured": 20,
     "open": 0
   },
   "repo": "crypto",
@@ -170,11 +170,11 @@
     {
       "better": "lower",
       "first": 10.939468556478129,
-      "latest": 2.9492570322298226,
+      "latest": 2.5760233229209155,
       "latest_derived": {
-        "improvement_vs_first_percent": 73.0402,
-        "improvement_vs_previous_percent": 61.0114,
-        "value_over_reference": 3.005073
+        "improvement_vs_first_percent": 76.452,
+        "improvement_vs_previous_percent": 12.6552,
+        "value_over_reference": 2.757235
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -272,6 +272,22 @@
           "spread": null,
           "summary": "ic_autolab round 18, k = 28: wsum coefficient box (C = 3, B = 12) S(w=0) 2.95 vs incumbent 7.43, matched rho 0.98 (distance 7.6x -> 3.0x)",
           "value": 2.9492570322298226
+        },
+        {
+          "commit": "3f80e412cef6",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 76.452,
+            "improvement_vs_previous_percent": 12.6552,
+            "value_over_reference": 2.757235
+          },
+          "n": 64,
+          "record": "20261104T0754Z-c25519-autolab-r23-k28",
+          "reference": 0.9342778119632842,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 23, k = 28: C = 2 box (B = 60) S(w=0) 2.5760233229209155 vs incumbent 3.033967260772229, matched rho 0.9342778119632842; at the BSGS boundary, classification pending",
+          "value": 2.5760233229209155
         }
       ],
       "problem": "ic:curve25519-family-k28",
