@@ -260,9 +260,9 @@ proc armE1(string arm, int m, int t, list W, list XS, int vR, string S3Sstr, int
     E = mchain("h" + string(c), es, 2, t, nm); for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
     ph = RB, 0, 0, pg*var(ix("s" + string(c), nm)), pg^2*var(ix("q" + string(c), nm)), var(ix("X" + string(c + 1), nm));
     EQ[size(EQ) + 1] = ph(sb);
-    vals[ix("s" + string(c), nm)] = W[2*c + 1] + W[2*c + 2];
-    vals[ix("q" + string(c), nm)] = W[2*c + 1] * W[2*c + 2];
-    rt = W[2*c + 1], W[2*c + 2];
+    vals[ix("s" + string(c), nm)] = poly(W[2*c + 1]) + poly(W[2*c + 2]);
+    vals[ix("q" + string(c), nm)] = poly(W[2*c + 1]) * poly(W[2*c + 2]);
+    rt = poly(W[2*c + 1]), poly(W[2*c + 2]);
     vals = plantM("h" + string(c), 2, t, rt, nm, vals);
     vals[ix("X" + string(c + 1), nm)] = XS[c + 1];
   }
@@ -322,7 +322,7 @@ for (ii = 1; ii <= size(CELLSTR); ii++)
 if (tk != "") { CTOK[size(CTOK) + 1] = tk; }
 string INST = "# round-7 planted instances (gen7.sing, LCG seed 0xED7A1104): a=1 d=11 g=" + string(GG) + newline
   + "# m t vR uR | w_i (v_i = g*w_i) | u_i | separators v(P_(2c-1)+P_(2c)) | node u's" + newline;
-int m; int t; int D; number zt; list U; list JS; int j; int ok; int tries; int i; int c;
+string rec; int m; int t; int D; number zt; list U; list JS; int j; int ok; int tries; int i; int c;
 list PTS; list W; list UL; list XS; list NU; list NV; list Rp; list Pc; intvec used; number v; number u;
 for (ii = 1; ii + 1 <= size(CTOK); ii = ii + 2)
 {
@@ -356,7 +356,7 @@ for (ii = 1; ii + 1 <= size(CTOK); ii = ii + 2)
     if (Rp[1] == 0 or Rp[2] == 0) { ok = 0; }
   }
   if (ok == 0) { die("no plant"); }
-  string rec = string(m) + " " + string(t) + " " + string(nint(Rp[2])) + " " + string(nint(Rp[1])) + " |";
+  rec = string(m) + " " + string(t) + " " + string(nint(Rp[2])) + " " + string(nint(Rp[1])) + " |";
   for (i = 1; i <= m; i++) { rec = rec + " " + string(W[i]); } rec = rec + " |";
   for (i = 1; i <= m; i++) { rec = rec + " " + string(UL[i]); } rec = rec + " |";
   for (c = 1; c <= m div 2; c++) { rec = rec + " " + string(XS[c]); } rec = rec + " |";
