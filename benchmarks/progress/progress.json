@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0414Z-c25519-autolab-r5-k32",
+  "latest_record": "20261104T0421Z-c25519-autolab-r6-k28",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 0,
     "invalid": 0,
-    "measured": 3,
+    "measured": 4,
     "open": 0
   },
   "repo": "crypto",
@@ -14,10 +14,11 @@
     {
       "better": "lower",
       "first": 10.939468556478129,
-      "latest": 10.939468556478129,
+      "latest": 10.91936046395492,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 10.77435
+        "improvement_vs_first_percent": 0.1838,
+        "improvement_vs_previous_percent": 0.1838,
+        "value_over_reference": 10.483347
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -35,6 +36,22 @@
           "spread": null,
           "summary": "ic_autolab round 4, k = 28 holdout ECBS1h4fa56ebd629d: ksum:m=4 N = 21 S(w=0) 10.94 vs incumbent 16.74, matched rho 1.02; recorded after the run with a fresh replay audit (the rule arrived mid-round)",
           "value": 10.939468556478129
+        },
+        {
+          "commit": "3164ea861251",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.1838,
+            "improvement_vs_previous_percent": 0.1838,
+            "value_over_reference": 10.483347
+          },
+          "n": 64,
+          "record": "20261104T0421Z-c25519-autolab-r6-k28",
+          "reference": 1.0415911009140644,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 6, k = 28: null; ksum4-n15 0.616 of the incumbent at w = 0 but 1.092 at w = 1, so the band does not order it; incumbent ksum4-n21 kept",
+          "value": 10.91936046395492
         }
       ],
       "problem": "ic:curve25519-family-k28",
