@@ -46,18 +46,20 @@ fig.tight_layout(rect=(0, .03, 1, .95)); save(fig, "ledger_k20")
 pts = [("2026-11-02", "algebraic ecbench\n(best arm)", 9.55e5, "curve25519_algebraic_ecbench_20261102"),
        ("2026-11-03", "T5 seed 1093\n(its own 6 targets)", 6.9e5, "T5 ECBS1h405f20219036"),
        ("2026-11-03", "T9 seed 1308", 4.73e5, "T9, wave 3"),
-       ("2026-11-04", "T12 winner\nt5 G4 seed 1307", 6.06e4, "T12, 16 targets")]
+       ("2026-11-04", "T12 winner\nt5 G4 seed 1307", 6.06e4, "T12, 16 targets"),
+       ("2026-11-04", "winner + trace\nreplay (L12)", 2.63e4, "L12, 8 targets"),
+       ("2026-11-04", "t4 G3 seed 1193\n+ trace (T13)", 1.83e4, "T13, 16 targets")]
 fig, ax = plt.subplots(figsize=(9, 5))
 xs = range(len(pts)); ys = [p[2] for p in pts]
 ax.plot(xs, ys, "-o", color=WIN, lw=2)
 for x, p in zip(xs, pts):
     ax.annotate(f"{p[2]:.3g}x\n{p[1]}\n{p[0]}", (x, p[2]), textcoords="offset points", xytext=(0, 12), ha="center", fontsize=8)
-ax.set_yscale("log"); ax.set_ylim(2e4, 5e6); ax.set_xlim(-.5, 3.5)
+ax.set_yscale("log"); ax.set_ylim(8e3, 5e6); ax.set_xlim(-.5, len(pts) - .5)
 ax.set_xticks(list(xs)); ax.set_xticklabels([p[3] for p in pts], fontsize=7, rotation=10)
 ax.set_ylabel("best algebraic arm / rho-neg, S at w = 0.1"); ax.grid(alpha=.3)
 ax.set_title("Algebraic track: distance remaining to rho-neg at w = 0.1 (rho-neg = 1x)")
-ax.text(.5, -.3, "Target sets differ between points (6, 16 and 16 targets, different sessions); not a paired series.", transform=ax.transAxes, ha="center", fontsize=8)
-fig.text(.01, -.06, "Source: REPORT.md sections 6 and 4; band_pooled.json (T12), curve25519_isogeny_seed_20261103/ecbench/band.json (T5).", fontsize=7, color="#444")
+ax.text(.5, -.3, "Target sets differ between points (6, 16, 16, 8 and 16 targets, different sessions); not a paired series.", transform=ax.transAxes, ha="center", fontsize=8)
+fig.text(.01, -.06, "Source: REPORT.md sections 6 and 11; pooled_compare.jsonl (T12, L12, T13), curve25519_isogeny_seed_20261103/ecbench/band.json (T5).", fontsize=7, color="#444")
 fig.tight_layout(); save(fig, "algebraic_progress")
 
 # ---- Fig 3
@@ -65,16 +67,17 @@ C = {"closed": "#c9c9c9", "done": "#8fcf9a", "running": "#f2d16b", "design": "#a
 leads = [("coordinates\n#3359", "closed", "selection is\nthe lever"), ("T1", "closed", "1.00-1.12x"), ("T2", "closed", "degree\npenalty"),
  ("T3", "closed", "m=3 too dear"), ("T4/T5", "done", "0.641\n[0.379, 1.084]"), ("T6", "closed", "real, useless\nat best cells"),
  ("T7", "closed", ""), ("T8", "design", "deprioritised\n(degree)"), ("T9", "done", "0.5605\n[0.421, 0.747]"),
- ("T10", "done", "t5 G4 seed 1307\nmodelled 18.65x"), ("T11", "running", "code merged;\nsession re-running"),
- ("T12", "done", "0.0578\n[0.047, 0.072]"), ("L10", "running", "wave 4"), ("L11", "design", "wave 4\ndesign only"),
- ("L12", "running", "wave 4"), ("L13", "running", "wave 4"), ("L14", "running", "wave 4\ncensus running")]
+ ("T10", "done", "t5 G4 seed 1307\nmodelled 18.65x"), ("T11", "done", "0.437\n[0.300, 0.637]"),
+ ("T12", "done", "0.0578\n[0.047, 0.072]"), ("L10", "done", "r^1.03;\noptimal t = 4"), ("L11", "design", "wave 4\ndesign only"),
+ ("L12", "done", "trace 0.474\nend to end"), ("L13", "done", "F4 42x above\nits grid"), ("L14", "done", "greedy digits\n2.1-2.2x coverage"),
+ ("L15", "done", "0.48x / 0.44x\nper relation"), ("T13", "done", "t4 + trace\n0.284x winner")]
 fig, ax = plt.subplots(figsize=(11, 6.2)); cols = 6
 for i, (n, s, t) in enumerate(leads):
     r, c = divmod(i, cols)
     ax.add_patch(Rectangle((c, -r), .94, .9, color=C[s], ec="black", lw=.6))
     ax.text(c + .47, -r + .68, n, ha="center", va="center", fontsize=10, weight="bold")
     ax.text(c + .47, -r + .28, t, ha="center", va="center", fontsize=8)
-ax.set_xlim(-.05, cols); ax.set_ylim(-2.7, 1.0); ax.axis("off")
+ax.set_xlim(-.05, cols); ax.set_ylim(-3.7, 1.0); ax.axis("off")
 ax.legend(handles=[Patch(color=C["closed"], label="closed"), Patch(color=C["done"], label="done"),
                    Patch(color=C["running"], label="running"), Patch(color=C["design"], label="design-only / deprioritised")],
           loc="lower center", ncol=4, bbox_to_anchor=(.5, -.02), frameon=False)

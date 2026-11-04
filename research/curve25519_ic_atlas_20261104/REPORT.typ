@@ -446,8 +446,7 @@ subgroup target iff c\_i ± c\_j ≡ 0 (mod 8).
 Public targets; every run verified by ecbench against the planted
 scalar. T5 ran 1 measured round (6 runs per arm), T9 and T12 ran 2 (32
 per arm). Replay audits: T5 8/8 and T9 16/16 reproduced with 0 problems;
-T12’s audit runs one replay per chunk and is in progress (10 of 16
-chunks done at validation time, all OK).
+T12 one replay per chunk, 16/16 reproduced with 0 problems.
 
 #align(center)[#table(
   columns: 6,
@@ -520,8 +519,63 @@ chunks done at validation time, all OK).
   [26.404],
   [#strong[1.003e5]],
   [#strong[1.003e6]],
+  [L12 (8 chunks, wave 4)],
+  [8],
+  [winner plain],
+  [24.716],
+  [9.246e4],
+  [9.243e5],
+  [],
+  [],
+  [winner + trace replay],
+  [24.716],
+  [#strong[4.384e4]],
+  [4.382e5],
+  [L13 (16 chunks, wave 4)],
+  [16],
+  [winner F4],
+  [27.036],
+  [1.034e5],
+  [1.033e6],
+  [],
+  [],
+  [grid on the winner’s base],
+  [27.036],
+  [2,462.7],
+  [24,383.6],
+  [],
+  [],
+  [pair table on the winner’s base],
+  [28.310],
+  [32.33],
+  [68.50],
+  [T13 (16 chunks, wave 4)],
+  [16],
+  [winner (t5 G4 s1307)],
+  [28.491],
+  [1.106e5],
+  [1.105e6],
+  [],
+  [],
+  [pkm-iso t4 G3 seed 1193],
+  [44.640],
+  [6.616e4],
+  [6.612e5],
+  [],
+  [],
+  [#strong[t4 G3 seed 1193 + trace replay]],
+  [44.640],
+  [#strong[3.136e4]],
+  [#strong[3.132e5]],
 )
 ]
+
+Wave-4 paired ratios (pooled, 95 % intervals): L12 trace ÷ plain \=
+0.4742 \[0.47418, 0.47425\] at w \= 0.1, exactly 1 at w \= 0. T13 t4 ÷
+winner \= 0.598 \[0.509, 0.704\] at w \= 0.1 and 1.567 at w \= 0;
+t4-trace ÷ t4 \= 0.4740; #strong[t4-trace ÷ winner \= 0.2837 \[0.2413,
+0.3335\] at w ≥ 0.1]. L13 grid ÷ F4 \= 0.0238; pair table ÷ grid \=
+0.0131 (w \= 0.1).
 
 Paired ratios in T12 (K \= 16, linearised t): winner ÷ seed 0 \= 0.0578
 \[0.0466, 0.0716\] at w ≥ 0.1 (cheaper on 16/16 targets); winner ÷ seed
@@ -539,10 +593,16 @@ good to 10–20%.
 single target the searches lose at w \= 0 and still win at w ≥ 0.1;
 amortised over targets on the same curve they are negligible.
 
-#strong[Distance remaining (T12 targets):] the best algebraic arm is
-17.1× behind rho-neg at w \= 0, #strong[6.06·10⁴× at w \= 0.1],
-3.78·10⁵× at w \= 1; and 2.09× / 7.36·10³× / 4.45·10⁴× behind the
-generic baseline. For comparison, on their own target sets: the
+#strong[Distance remaining, best algebraic arm now (T13 targets):] t \=
+4, G \= 3, seed 1193 with trace replay is 27.9× behind rho-neg at w \=
+0, #strong[1.83·10⁴× \[1.55·10⁴, 2.15·10⁴\] at w \= 0.1], 1.13·10⁵× at w
+\= 1. At w \= 0 the T12 winner stays the better algebraic arm (17.8×
+behind rho-neg on T13’s targets).
+
+#strong[Distance remaining (T12 targets, before wave 4):] the best
+algebraic arm is 17.1× behind rho-neg at w \= 0, #strong[6.06·10⁴× at w
+\= 0.1], 3.78·10⁵× at w \= 1; and 2.09× / 7.36·10³× / 4.45·10⁴× behind
+the generic baseline. For comparison, on their own target sets: the
 2026-11-02 best algebraic arm was 9.55·10⁵× behind rho-neg at w \= 0.1
 (`curve25519_algebraic_ecbench_20261102`), T5’s seed 1093 6.9·10⁵×, and
 T9’s seed 1308 4.73·10⁵× (`wave3/t9_seed_per_column/README.md`). The
@@ -561,10 +621,13 @@ multiplications per target from the grid code. So the best F4 arm is
 still roughly 40× above brute force on its own factor base, and the
 generic pair table (`proj-a`) is 7.4·10³× ahead of it at w \= 0.1. The
 joint (t, G, seed) optimisation has moved the F4 track #emph[toward] the
-grid limit, not past it. Lead L13 (wave 4) measures this end-to-end with
-`engine=exhaustive` and `mitm` on the winner’s base. Until the algebraic
-track beats its own grid, its value is in how it scales, not in its
-constant.
+grid limit, not past it. Lead L13 (wave 4) measured this end to end with
+`engine=exhaustive` and `mitm` on the winner’s base: grid ÷ F4 \= 0.0238
+at w \= 0.1, so the F4 arm is 42× above its grid. The pair table is
+another 76× below the grid, and is still 2.4–3.3× behind proj-a at every
+weight. On this base no oracle reaches proj-a; the 22-column base sets
+the floor (§11.3). Until the algebraic track beats its own grid, its
+value is in how it scales, not in its constant.
 
 == 8. Scaling
 <scaling>
@@ -617,26 +680,31 @@ and fits the exponent. No 255-bit statement is made or implied.
   [done: t \= 5, G \= 4, seed 1307, modelled 18.65×],
   [T11],
   [`prime-interval` base in ecbench],
-  [code merged (`2993713af8`); chunked session re-running after
-  container restarts],
+  [done: selected frame 0.437 \[0.300, 0.637\] vs lo \= 0; 7.71× behind
+  iso seed 1093 (validated)],
   [T12],
   [T10 winner end-to-end],
   [done: 0.0578 \[0.047, 0.072\] vs seed 0],
   [L10],
   [scaling exponent across k],
-  [wave 4, running],
+  [done: r^1.03, optimal t \= 4 (validated)],
   [L11],
   [odd Kummer base μ\_d],
   [wave 4, design only],
   [L12],
   [F4 trace replay on the winner],
-  [wave 4, running],
+  [done: 0.474 end to end (validated)],
   [L13],
   [grid-limit control],
-  [wave 4, running],
+  [done: F4 42× above grid at w ≥ 0.1; pair table 2.4–3.3× behind
+  proj-a; P4, P8 failed (validated)],
   [L14],
   [digit-set frames],
-  [wave 4, census running],
+  [done: greedy 2.1–2.2× coverage; L15 engine 0.48×/0.44× per relation
+  (validated)],
+  [T13],
+  [t \= 4 candidate + trace end to end],
+  [done: 0.284× the T12 winner at w ≥ 0.1 (validation running)],
 )
 ]
 
@@ -677,8 +745,10 @@ Ideas considered and not pursued, with the reason:
   but no validator report exists for them.
 - This atlas: `validator-report.json`, pass\_with\_errata (E1–E8
   applied).
-- Pending validation: T11 (chunked session running), T12 (replay audit
-  in progress; band and paired compares done), wave 4.
+- Validated after the first draft: T11 (post-data), T12, L10, L12 (both
+  stages), L14, L15, all pass\_with\_errata with errata applied.
+- Pending validation: T13 (replay stage finishing, then an independent
+  validator).
 - No study here passes the leaderboard validation gate: component
   results have no same-unit rho row, by design.
 
@@ -700,3 +770,134 @@ Ideas considered and not pursued, with the reason:
   `src/cryptanalysis/coordinate_search.rs`
 - `src/cryptanalysis/ic_framework/pkm_semaev.rs` (forms, T₀ identity
   tests, grid engine)
+
+== 11. Wave 4 (2026-11-04): scaling, trace replay, grid limit, digit
+sets, odd Kummer
+<wave-4-2026-11-04-scaling-trace-replay-grid-limit-digit-sets-odd-kummer>
+Protocols frozen together at `5a800bb3d0` before any data
+(`research/curve25519_leads_wave4_20261104`). Status at the time of
+writing: L10, L12 (both stages), L13, L14 and L15 independently
+validated, pass\_with\_errata with errata applied; T13 complete,
+validation pending; L11 is design only.
+
+=== 11.1 L10: the exponent (validated)
+<l10-the-exponent-validated>
+40 engine cells, k ∈ {16, 18, 20, 22, 24} × t ∈ {4, 5, 6, 7} at G \= t −
+1 with the J/columns seed, plus controls. All seven predictions held.
+
+- #strong[mpt is k-invariant to the digit] in every hit-free cell:
+  17,592 (t \= 4, G \= 3), 52,816 (5, 4), 146,464 (6, 5), about 4.2·10⁵
+  (7, 6). Seed changes it by \< 2%.
+- #strong[The optimal t is 4 at every k], with t \= 5 second at
+  1.7–2.5×. T10 had scanned t ≥ 5 only, so its winner (t \= 5, G \= 4)
+  is not the optimum. The next end-to-end candidate is #strong[t \= 4, G
+  \= 3] with the J/columns seed (1193 at k \= 20: 8 columns, 52
+  covered), modelled 2.04× below T12’s winner.
+- #strong[E\_best(k) ∝ r^1.03] (frozen analysis 1.0297; 1.0315 with the
+  validator’s per-target native-work correction). Per step in t the
+  ratio columns × mpt / covered grows 1.6–2.5×, so beating exponent 1
+  would need coverage to grow 8–19× per step against the measured 2–5×.
+- #strong[The gap to rho grows as r^0.53]: in the F4-phase model,
+  1.5·10⁴× (k \= 16) to 2.8·10⁵× (k \= 24) at w \= 0.1, with rho’s S
+  fixed at 1.5 (a conservative bound; T12 measured 1.65 at w \= 0.1).
+- Errata: the protocol carried r₁₈ \= 32,719 instead of 32,887 (0.5%, no
+  verdict changes); the frozen script priced native work per 100 targets
+  instead of per target (b moves 1.0297 → 1.0315).
+
+This is the atlas’s main structural result: on this family, m \= 2
+algebraic index calculus with F4 scales #emph[worse] than rho by a
+factor that itself grows like √r, whatever frame, seed or guess depth is
+chosen.
+
+=== 11.2 L12: F4 trace replay (validated, both stages)
+<l12-f4-trace-replay-validated-both-stages>
+Learning one refutation trace per branch system and replaying it per
+target cuts the winner’s per-target F4 work #strong[0.4717×] (24,912
+against 52,816 mul-adds) with identical verdicts, zero fallbacks, and a
+learning cost of exactly one plain target. At (t \= 6, G \= 4) the ratio
+is 0.454 for both seeds; at (5, 3) it is 0.566, so the frozen "≤ 0.5 in
+every cell" rule failed there. End to end (8 targets × 2 rounds, four
+arms), all four predictions held: S(trace)/S(plain) \= #strong[0.4742
+\[0.47418, 0.47425\]] at w \= 0.1 and 0.4741 at w \= 1, with the walk,
+relations and recovered scalars identical (w \= 0 ratio exactly 1).
+Charging the unpriced learning by hand moves it to 0.4744. Distance to
+rho-neg at w \= 0.1: 2.63·10⁴× \[1.52·10⁴, 4.54·10⁴\]. Of 1.6·10⁶
+replays, 223 fell back to plain F4 (59 genuine replay failures). Counted
+units only: solver wall time is 0.95×, not 0.47×.
+
+=== 11.3 L13: the grid-limit control (validated)
+<l13-the-grid-limit-control-validated>
+Five arms on the winner’s own base, 16 one-target chunks, 32 runs each,
+all verified. 6 of 8 predictions held.
+
+- #strong[grid ÷ F4 \= 0.0238 \[0.02382, 0.02384\]] at w \= 0.1 (frozen
+  point 0.0245), with identical trials, relations and GAE in all 32
+  pairs. The best F4 arm is 42× above its own brute-force limit.
+- Pair table ÷ grid \= 0.0131 at w \= 0.1 and 0.0028 at w \= 1; 1.047 at
+  w \= 0 (its 506 table additions).
+- #strong[Even the pair table on this base loses to proj-a at every
+  weight: 2.39× / 2.54× / 3.32×] at w \= 0 / 0.1 / 1. With the oracle
+  held fixed, the 22-column isogeny base loses to the 32-column
+  projected base. The grid is 2.28× / 194× / 1,181× behind proj-a.
+- P4 failed on its per-pair clause: GAE(mitm) − GAE(grid) is 437–489,
+  not 506 ± 2 × relations, because the grid and F4 arms pay about 4
+  extra lift additions per relation that the table’s signed probe does
+  not. P8 failed as the frozen-rule defect: the grid count is exactly
+  1,248 × solver calls in 32/32 runs, not 1,248 × trials. Neither is
+  retuned.
+
+The consequence for the algebraic track: none of the three m \= 2
+oracles on this base (t \= 5, seed 1307, k \= 20) overtakes proj-a, and
+no oracle can go below the w \= 0 row, already 2.3× behind. The
+preregistered model puts the cause in the base’s coverage per column
+(measured trials per relation 10.1× proj-a’s); this run does not isolate
+it. Validated pass\_with\_errata.
+
+=== 11.4 L14: digit-set frames (census validated; lead open)
+<l14-digit-set-frames-census-validated-lead-open>
+x \= lo + Σ c\_j b\_j with arbitrary digits c\_j keeps the F4 system
+identical to `bits`. Exact census at k \= 20:
+
+- Random digit sets and random translation frames have the same coverage
+  distribution (mean ratios 0.985–1.015; the max-ratio rule failed at t
+  \= 5 on one outlying translation frame).
+- #strong[A greedy digit choice (B \= 2,000 candidates per digit,
+  selected by J) covers 522 points on 22 columns at t \= 5 and 1,268 on
+  43 at t \= 6, against 248 and 570 for the best of 2,000 translation
+  frames: 2.1× and 2.2×] (rule ≥ 1.3×; the point prediction of 1.1–1.45×
+  failed on the high side).
+- Mechanism (exploratory): the greedy builds an additive tower inside a
+  single cofactor coset (16 of 22 points in coset 0 at t \= 5), so
+  covered/column is 2.3–2.5× the best translation frame. Replicates
+  spread 1.19–1.49× depending on the starting lo.
+- Where it lands: the bits form’s per-target F4 cost is 17–64× the
+  isogeny form’s at equal (t, G), so a digit-set bits arm models about
+  6.9× behind the T10 winner at (5, 3).
+- #strong[L15 (engine, all five predictions held):] with
+  `Membership::Digits` (`b847203692`) the greedy sets keep the `bits`
+  system exactly (same degree and terms, per-target cost within 1–3%)
+  and deliver their census coverage, so F4 work per relation falls 0.48×
+  (t \= 5) and 0.44× (t \= 6) against the best translation frame. At
+  matched (t \= 5, G \= 4) the digit set stays 10.5× behind the isogeny
+  winner (per-target 1,375,663 against 52,816 mul-adds).
+
+=== 11.5 L11: odd Kummer base (design only)
+<l11-odd-kummer-base-design-only>
+p − 1 \= 4 × 3³ × 7 × 19 × 73 at k \= 20 gives multiplicative subgroups
+μ\_d of odd order. A base x ∈ g·μ\_d needs odd-degree power rules the
+tower engine lacks. The design specifies the census to run first and a
+go/no-go rule before any engine work; nothing was measured.
+
+=== 11.6 What wave 4 changes in the lead list
+<what-wave-4-changes-in-the-lead-list>
+- #strong[T13 (done; validation running):] t \= 4, G \= 3, seed 1193 at
+  k \= 20, all six predictions held. Plain t \= 4 is 0.598 \[0.509,
+  0.704\] the T12 winner at w ≥ 0.1, against the model’s 0.49. With
+  trace replay (0.4740) it is #strong[0.2837 \[0.2413, 0.3335\]], the
+  best algebraic arm so far: 1.83·10⁴× behind rho-neg at w \= 0.1. At w
+  \= 0 it is 1.567× dearer than the winner, as predicted.
+- #strong[L15:] done (above); at (t, G) \= (5, 3) the digit set is 12.4×
+  below the `lo = 0` bits control per relation (derived) and 6.2× per
+  solve, still 10.5× behind the tower (validated pass\_with\_errata).
+- The exponent result bounds all of this: constant-factor gains on a
+  track whose exponent is 1.03 against rho’s 0.5.
