@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0648Z-c25519-autolab-r19-k32",
+  "latest_record": "20261104T0722Z-c25519-autolab-r20-k24",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 16,
+    "measured": 17,
     "open": 0
   },
   "repo": "crypto",
@@ -76,11 +76,11 @@
     {
       "better": "lower",
       "first": 6.607,
-      "latest": 4.200687666164818,
+      "latest": 3.6780211605382345,
       "latest_derived": {
-        "improvement_vs_first_percent": 36.4206,
-        "improvement_vs_previous_percent": 38.7387,
-        "value_over_reference": 3.402036
+        "improvement_vs_first_percent": 44.3314,
+        "improvement_vs_previous_percent": 12.4424,
+        "value_over_reference": 3.041568
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -130,6 +130,22 @@
           "spread": null,
           "summary": "ic_autolab round 17, k = 24: wsum coefficient box (C = 4, B = 4) S(w=0) 4.200687666164818 vs incumbent 6.780045360959911, matched rho 1.2347570026511967",
           "value": 4.200687666164818
+        },
+        {
+          "commit": "5958e283372a",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 44.3314,
+            "improvement_vs_previous_percent": 12.4424,
+            "value_over_reference": 3.041568
+          },
+          "n": 64,
+          "record": "20261104T0722Z-c25519-autolab-r20-k24",
+          "reference": 1.209251602203231,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 20, k = 24: wsum C = 3, B = 8 S(w=0) 3.68 vs incumbent 4.17, matched rho 1.21 (distance 3.45x -> 3.04x)",
+          "value": 3.6780211605382345
         }
       ],
       "problem": "ic:curve25519-family-k24",
