@@ -32,7 +32,8 @@
           "id": "mitm3",
           "oracle": "mitm:m=3,negation_folded=1",
           "default_f": 0.5,
-          "note": "m = 3 meet in the middle; worse than inc at every N in the m = 3 study (kept as an alternative, never re-proposed where tried)"
+          "note": "m = 3 meet in the middle; worse than inc at every N in the m = 3 study (kept as an alternative, never re-proposed where tried) Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "ksum4",
@@ -58,19 +59,22 @@
           "id": "rfpairs3",
           "oracle": "rootfind-pairs:m=3",
           "default_f": 0.35,
-          "note": "root-finding pairs at m = 3"
+          "note": "root-finding pairs at m = 3 Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "rfsub2",
           "oracle": "rootfind-subtract:m=2",
           "default_f": 1.0,
-          "note": "root-finding subtract at m = 2"
+          "note": "root-finding subtract at m = 2 Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "sub2",
           "oracle": "subtract",
           "default_f": 1.0,
-          "note": "plain subtract-and-test oracle"
+          "note": "plain subtract-and-test oracle Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "mitmbatch",

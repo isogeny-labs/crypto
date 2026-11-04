@@ -246,6 +246,12 @@
       "source": "round-008/holdout",
       "target_seed": 2026118928,
       "targets": 32
+    },
+    {
+      "size": 32,
+      "target_seed": 2026119432,
+      "targets": 32,
+      "source": "round-009/train (censored)"
     }
   ],
   "family": "curve25519",
@@ -396,7 +402,8 @@
     "Incumbents are the best verified arm per track and size under the success criterion (AGENTS.md); none has passed the validation gate, so none is a leaderboard or benchmarks row.",
     "Generic track k = 20, 24: ksum:m=3 on the projected base, the m = 3 study's holdout improvement (0.758 [0.716, 0.802] and 0.596 [0.575, 0.619] at w = 0, band sel < inc). k = 28, 32: the baseline study's proj-a mitm (the m = 3 arm was null at k = 28; k = 32 was never screened at m = 3).",
     "Algebraic track k = 20: the PKM isogeny tower with the J-selected seed 1093 (T4/T5), the cheapest algebraic arm in every measured cell; band s1093 < seed 0 at every weight, paired interval includes 1.",
-    "Exposures list every ecbench target_seed used on this family so far (baseline, ratchet round 1, m = 3, algebraic ecbench, isogeny seed T5, frame and torsion leads), so a round never reuses a target seed."
+    "Exposures list every ecbench target_seed used on this family so far (baseline, ratchet round 1, m = 3, algebraic ecbench, isogeny seed T5, frame and torsion leads), so a round never reuses a target seed.",
+    "Round 9 (k = 32) was stopped by the operator after 10 train records because its panel held rootfind-pairs:m=3 at N = 179; the round is censored, not assessed, and its target seeds count as exposed."
   ],
   "rounds": [
     {
@@ -473,6 +480,15 @@
         28
       ],
       "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-009",
+      "round": 9,
+      "sizes": [
+        32
+      ],
+      "status": "censored (stopped before assessment; see round-009/STOPPED.md)",
       "track": "generic"
     }
   ],
@@ -2436,5 +2452,5 @@
       "track": "generic"
     }
   ],
-  "updated": "2026-11-04T04:26:54Z"
+  "updated": "2026-11-04T04:27:51Z"
 }
