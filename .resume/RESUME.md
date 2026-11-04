@@ -75,3 +75,10 @@ Branch on the quadratic character of each separator, adding X_c = n_j·z_c² wit
 - That is 1 separator against T's 2 separators (X1, X2) with a symmetric root.
 - Prediction (excess ∝ number of separators): D_L(4,4) ≤ 6 < D_T = 7.
 - Falsified if D_L ≥ 7. Cells: m4 at t4 and t5, k0.
+
+## Test Y (function coupling, written before any Y run)
+- m = 3, first cherry by chord: per-root Kummer chains for w1 and w2; y1, y2 with y_i² = f(g·w_i); slope lam with lam·(x2 − x1) = y2 − y1; X1 = lam² − x1 − x2.
+- Then the x-only root S3(X1, g·w3, xR) with leaf 3 on a Kummer chain.
+- The coupling is a function of the inputs (no 2-to-2 correspondence). Solutions are not quotiented: ordered pair × signs.
+- Prediction: D_Y ≥ D_T (6 at t = 4), since lost symmetry and degree-3 curve equations offset the determinism. Win condition: D_Y ≤ 5 at t = 4 or 5.
+- Cells: m3 at t4 and t5, k0.
