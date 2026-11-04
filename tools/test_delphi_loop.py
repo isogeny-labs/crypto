@@ -24,6 +24,7 @@ import task_card as tc  # noqa: E402
 
 SONNET, HAIKU, OPUS = ("anthropic:claude-sonnet-5-5@high", "anthropic:claude-haiku-5-5@high",
                        "anthropic:claude-opus-5-5@high")
+FREE = "openrouter:openrouter/free"
 USAGE = {"input_tokens": 20000, "output_tokens": 2000}
 
 try:
@@ -161,7 +162,7 @@ class LoopTest(unittest.TestCase):
         r = loop.route(reg, "card-compile")["route"]
         self.assertEqual(r["choice"], HAIKU)
         self.assertEqual(r["escalation"], [SONNET, OPUS])
-        h = reg["families"]["card-compile"]["targets"][0]
+        h = reg["families"]["card-compile"]["targets"][1]
         self.assertGreater(h["lcb"], 0.8)
         self.assertAlmostEqual(h["usd_per_call"], 0.5 * (20000 * 0.10 + 2000 * 0.50) / 1e6)
 
@@ -176,7 +177,46 @@ class LoopTest(unittest.TestCase):
         picks = {loop.route(reg, "assess", "thompson", rng=random.Random(s))["route"]["choice"] for s in range(50)}
         self.assertIn(HAIKU, picks)
         self.assertEqual(loop.route(reg, "nope")["error"][:6], "family")
-        self.assertIn("error", loop.route(reg, "assess", free="local"))
+        self.assertEqual(loop.route(reg, "assess", free="local")["route"]["choice"], FREE)
+
+    def test_free_selects_only_the_free_target(self):
+        reg = loop.fit([], self.config)
+        r = loop.route(reg, "card-compile", "thompson", free="public", rng=random.Random(0))["route"]
+        self.assertEqual((r["choice"], r["escalation"]), (FREE, []))
+        self.assertEqual(loop.route(reg, "assess", free="public")["route"]["choice"], FREE)
+        reg["families"]["assess"]["targets"][0]["alpha"] = 200.0   # a draw that clears the threshold
+        r = loop.route(reg, "assess", "thompson", free="public", rng=random.Random(1))["route"]
+        self.assertEqual(r["choice"], FREE)
+        self.assertIn("draw", r["basis"])
+
+    def test_export_delphi_episode_rows(self):
+        os.environ["DELPHI_LOOP_HOME"] = str(self.repo / ".delphi-loop")
+        base = {"schema": loop.EPISODE_SCHEMA, "family": "card-compile", "target": HAIKU, "label": "accepted",
+                "source": "lane", "observed_at": "2026-11-04T00:00:00+00:00", "stage": "compile", "attempt": 0}
+        eps = {
+            "b": {**base, "id": "id-b", "group": "runs/b.lane", "call": "compile", "review": 1.0,
+                  "usage": {"input_tokens": 20000, "output_tokens": 0, "cache_write_tokens": 5,
+                            "cache_read_tokens": None, "stop": "x"}},
+            "a": {**base, "id": "id-a", "group": "runs/a.lane", "call": "compile", "label": "refused",
+                  "usage": None, "review": None},
+        }
+        loop.write_episodes({r["id"]: r for r in eps.values()}, self.repo)
+        out = self.repo / "x.jsonl"
+        loop.export_episodes(self.repo, out, say=self.quiet)
+        self.assertFalse(out.with_name("x.jsonl.tmp").exists())
+        rows = [json.loads(line) for line in out.read_text().splitlines()]
+        self.assertEqual([r["id"] for r in rows], ["id-a", "id-b"])
+        self.assertEqual(rows[0], {"schema": "delphi.episode.v1", "id": "id-a", "family": "card-compile",
+                                   "target": HAIKU, "label": "refused", "group": "runs/a.lane",
+                                   "call": "compile", "source": "lane",
+                                   "observed_at": "2026-11-04T00:00:00+00:00"})
+        self.assertEqual(rows[1]["review"], 1.0)
+        self.assertEqual(rows[1]["usage"], {"input_tokens": 20000, "cache_write_tokens": 5})
+        self.assertNotIn("stage", rows[1])
+        proc = subprocess.run([sys.executable, str(HERE / "delphi_loop" / "loop.py"), "--repo", str(self.repo),
+                               "export"], capture_output=True, text=True, check=True)
+        self.assertEqual(proc.stdout, out.read_text())
+        self.assertTrue(proc.stderr.startswith("EXPORT 2 episodes"))
 
     def test_review_overrides_and_push_pull_dataset(self):
         write_lane(self.repo, "a", {"compile": call(HAIKU, sha="a1"), "assess": call(HAIKU, sha="a2")},
@@ -230,8 +270,8 @@ class LoopTest(unittest.TestCase):
         self.assertEqual(plan["choice"], HAIKU)
         self.assertEqual(plan["escalation"], [SONNET, OPUS])
         self.assertIn("delphi-loop exploit", plan["basis"])
-        with self.assertRaises(tc.CardError):
-            tc.route_for("assess", {"delphi": str(HERE / "delphi_loop" / "delphi"), "free": "local"})
+        free = tc.route_for("assess", {"delphi": str(HERE / "delphi_loop" / "delphi"), "free": "local"})
+        self.assertEqual((free["choice"], free["escalation"]), (FREE, []))
 
 
 if __name__ == "__main__":

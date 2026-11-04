@@ -17,6 +17,35 @@ W2 (relation rank) and W7 (xedni waiting time). Lean project:
 | `HazardSeparation` | `truncated_expectation_ge_half_horizon_of_marginals` | With `Nε ≤ 1/2`, `E[min τ N] ≥ N/2`, the conclusion of `JKSSTExpectedTrials.truncated_expectation_ge_half_horizon` **without** its conditional-hazard recurrence. |
 | `HazardSeparation` | `marginals_U`, `marginals_do_not_give_hazard`, `wait_U` | Separation: three equally likely outcomes, outcome `k` succeeding at trial `k+1`. Every trial's marginal is `≤ 1/3`, the recurrence `(1−1/3)·s(n) ≤ s(n+1)` fails at `n = 1` (`4/9 > 1/3`), and the wait is still `E[min τ 3] = 2`. |
 
+## Petit–Quisquater Assumption 2 (W1): `SolvingDegreeBound`
+
+| theorem | result |
+|---|---|
+| `linear_count_of_gb_in_span` | If a Gröbner basis (degree-compatible order) of `⟨F⟩` lies in `span_K F` and `1 ∉ ⟨F⟩`, the `k` ideal elements with distinct leading variables force `k` independent elements of degree ≤ 1 in `span_K F`. |
+| `low_add_top_le_card` | `dim(span_K F ∩ deg ≤ 1) + rank(top₂ F) ≤ |F|` (rank–nullity). |
+| `solving_degree_ge_three` | If `k + rank(top₂ F) > |F|`, no Gröbner basis lies in `span_K F`: for degree-2 generators (field equations included) the solving degree is ≥ 3. |
+| `Toy.toy_solving_degree_ge_three` | Non-vacuity: `F = {x₀²+x₀, x₁²+x₁, x₀x₁+x₀+x₁}` over F₂ (`k = 2`, rank 3, `|F| = 3`). |
+| `not_tendsto_of_frequently_gap` | An integer gap ≥ 1 infinitely often is not `o(1)`. |
+
+**What this does to the assumption.** At `m = 2` the first fall degree is 2 for
+every `n` (Kosters–Yeo), so the literal reading predicts solving degree 2. With
+`n` descended equations, `N` bit variables and `N` field equations, the criterion
+says solving degree 2 needs `r₂ ≥ k`. Here `r₂` is the number of independent linear
+polynomials in the degree-2 span (Kosters–Yeo: `r₂ ≥ 1`, generically 1), and `k` is
+the number of independent linear consequences (`k ≥ N − affdim(Z)` for solution set
+`Z`). Any instance with `r₂ < k` therefore has solving degree ≥ 3 = D_ff + 1.
+Infinitely many such `n` refute the literal reading.
+
+**Not established here** (`GAP-PQ2-M2-RANK-CENSUS`):
+
+- That `r₂ < k` holds on actual descended `S₃` instances for infinitely many `n`.
+  This is a finite rank check per instance, cheap far beyond the `n ≤ 48` Gröbner
+  computations.
+- The Nullstellensatz step giving `k`.
+- That PQ's "maximal degree reached" is the Caminata–Gorla solving degree.
+- Kousidis–Wiemers' reading `D_reg = m² − m + 1 + o(1)`, which is 3 at `m = 2` and
+  needs solving degree ≥ 4.
+
 ## What changes in the corpus
 
 - **`HEUR-RELATION-RANK` (W2).** The left-kernel method needs no rank
@@ -35,8 +64,9 @@ W2 (relation rank) and W7 (xedni waiting time). Lean project:
   adaptive trial actually run**, a weaker and more natural premise. This
   strengthens the obstruction; it does not reopen xedni.
 
-Both results are recorded in
-[`docs/ecdlp-hardness-corpus/lean-weakness-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-weakness-20261104.json).
+The W2 and W7 results are recorded in
+[`docs/ecdlp-hardness-corpus/lean-weakness-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-weakness-20261104.json); W1 in
+[`lean-pq2-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-pq2-20261104.json).
 
 ## Verification
 
