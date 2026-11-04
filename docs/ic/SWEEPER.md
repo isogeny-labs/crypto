@@ -265,6 +265,17 @@ ratios, so the search space is the same on every rung. Absolute caps
   Treat a projected objective as a hypothesis and read the per-rung ratios
   beside it; a confidence interval on the slope is future work.
 
+## From a sweep to a ratchet
+
+A sweep's objective is a hypothesis on planted instances. The frozen-protocol
+confirmation on fresh public targets, with the matched rho, the A/A control
+and the band, is `ic_autolab` (`src/bin/ic_autolab.rs`): per curve family a
+ledger of incumbents per track and size, a candidate panel, a train screen,
+one challenger per size on a fresh holdout, the success-criterion
+classification and the ratchet. The first family is the Curve25519
+miniatures: `research/curve25519_autolab_20261104/README.md`. Chain them:
+sweep to propose, the loop to confirm and ratchet.
+
 ## Files
 
 | path | what |

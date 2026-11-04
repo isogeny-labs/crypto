@@ -163,11 +163,14 @@ repository source for the refutation (`S-IC-NEGATIVE`), still says "under that l
 reading the lemma holds only vacuously". The boundaries section also notes that a final
 publication "still owes a fresh PDF-level transcription of both definitions".
 
-**Actions.** (a) Correct the ic-negative wording to the boundaries table. (b) Record the
-reading as a parameter of `CLAIM-NAGAO-LEMMA4` (refuted in 3 of 4 cells) instead of a
-footnote. (c) Run the existing exact census on the one open cell (literal `≥`, field
-equations inside). (d) Do the PDF transcription, because the refutation is only as good
-as the reading.
+**Actions.** (a) Correct the ic-negative wording to the boundaries table (done
+2026-11-04). (b) Record the reading as a parameter of `CLAIM-NAGAO-LEMMA4` instead of a
+footnote. (c) Settle the open cell (literal `≥`, field equations inside): **done
+2026-11-04, and it is a theorem, not a counterexample** (`THM-NAGAO-LEMMA4-LITERAL-INSIDE`,
+Lean). A fake fall lifts to a true fall at the same degree once its sum is replaced by a
+least-degree representative modulo the field equations, which are generators in this
+placement. The reading axis is now complete: refuted in 3 cells, proved in the 4th. (d) Do
+the PDF transcription, because which cell Nagao meant decides which verdict applies.
 
 ## W5. Eleven unwired dependences understate the top frontier nodes
 
@@ -260,15 +263,17 @@ edge whose obstruction rests on an assumed, heuristic or open claim: 16. Read by
 - **Rank-only closures are not reopenings.** The GHS (KMPS) and two-summand closures rest
   on `HEUR-RELATION-RANK`; per W2, removing that heuristic *strengthens* them.
 
-**Derived (strengthens a closure, so it saves effort).** One tempting escape from
-`HEUR-PF-NO-SUBFIELD-OBSTRUCTION` fails. Base-change E/F_p to F_{p^n}, decompose a target
-R in E(F_p) over points whose x-coordinates lie in an F_p-subspace V of F_{p^n}, and pull
-the relation back with the trace: nR = Σ Tr(Pᵢ). The pulled-back factor base Tr(F') has
-about p^{dim V} ≥ p elements, the size of the whole group, while rho needs about √p.
-Any subspace-based factor base therefore fails on prime fields by a dimension count, not by
-heuristic. A prime-field escape needs a factor base that is *not* a subspace image (small
-integers, composed rational maps, random sets), which is where the corpus already places
-PKM and APS.
+**Withdrawn 2026-11-04 (was "derived"): the trace pull-back is not ruled out.** An earlier
+version said one escape from `HEUR-PF-NO-SUBFIELD-OBSTRUCTION` fails by a dimension count.
+The escape: base-change E/F_p to F_{p^n}, decompose a target R ∈ E(F_p) over the points F'
+whose x-coordinates lie in an F_p-subspace V, and pull back with the trace (nR = Σ Tr(Pᵢ)).
+
+The count gives |F'| ≈ p^{dim V} ≥ p. But the factor base used over F_p is Tr(F'), and
+the trace on points is many-to-one, so the count says nothing about |Tr(F')|. Generic V
+is expected to give |Tr(F')| near #E(F_p), and then the route fails. No argument here
+excludes a special V with a small trace image and plentiful decompositions.
+
+The question is now the open lead `GAP-PF-TRACE-PULLBACK-FACTOR-BASE`.
 
 **Attack.** Order the reopenings by how cheaply each support can be tested:
 
@@ -285,7 +290,7 @@ cheap targets.
 ## Lean results, 2026-11-04
 
 Lean project [`research/ecdlp_weakness_lean_20261104/lean`](../../research/ecdlp_weakness_lean_20261104/README.md)
-(Lean v4.34.1, Mathlib v4.34.1). All ten theorems depend only on `propext`,
+(Lean v4.34.1, Mathlib v4.34.1). Every theorem in the project (35 audited after round 3) depends only on `propext`,
 `Classical.choice` and `Quot.sound` (`AxiomAudit.lean`). The repository proof gate
 re-checks them in CI.
 
@@ -321,18 +326,33 @@ This **strengthens** the xedni closure rather than reopening it. The remaining b
 is whether adaptive lift selection can raise a single trial's marginal above the
 one-shot bound.
 
+**Round 3 (same day): protocol-layer countermodels.** `ProtocolCountermodels.lean`
+refutes five of the overbroad claims the ported protocol corpus lists as open:
+
+- "special soundness ⇒ Fiat–Shamir security": a constant-zero challenge accepts
+  (sP, 0, s) for every key;
+- unconditional Pedersen binding: a known H = tG gives a second opening;
+- cofactor clearing as a bijection on the subgroup: 3 annihilates the order-3 subgroup
+  of Z/9, and coprime cofactors are bijective;
+- ambient blinding in random self-reduction: it leaves the subgroup, while subgroup
+  blinding is a bijection;
+- "complete + zero knowledge ⇒ sound": the always-accept protocol.
+
+It also proves that a nondegenerate pairing decides DDH with one evaluation.
+
 ## Recommended order of attack
 
 | # | target | kind of result | cost | what changes if it lands |
 |---|---|---|---|---|
 | 1 | W2: re-wire the rigorous Weil-descent chain to `THM-LEFT-KERNEL-RELATIONS` (Lean core done 2026-11-04) | corpus edit | low | 4 inflation rows resolved; rank heuristic confined to the multi-target regime |
 | 2 | W5: add the 11 missing edges | corpus fix | trivial | true impact of the top frontier nodes becomes visible |
-| 3 | W4: fix the ic-negative wording; census the open cell | correction + exact census | low | the Lemma 4 refutation becomes reading-complete |
+| 3 | W4: transcribe Nagao's Definitions 5–6 from the PDF (wording fixed and open cell proved 2026-11-04) | source reading | low | decides which of the four now-settled cells is Nagao's |
 | 4 | W3: prime-field yield census, full histogram, scaling in p | exact measurement | low–medium | every prime-field yield estimate is checked or corrected |
 | 5 | W1: `r₂` vs `k` rank census on m = 2 descended S₃ instances (criterion kernel-checked 2026-11-04) | exact census | low | literal PQ Assumption 2 refuted for m = 2 if `r₂ < k` persists; the FFDA rows retire |
 | 6 | `RT-SP-SEMAEV-A1-N45` | exact F4 run | low | Semaev 2015 Assumption 1 settled at the measured scale |
 | 7 | W7: YYTK Conjecture 10 past 25 bits | exact census | low–medium | the naive prime-field Semaev closure is confirmed, or the route reopens |
 | 8 | W7: per-trial marginal bound for adaptive xedni lift selection (`ASM-XEDNI-TRIAL-MARGINAL`; the separation and repair are done in Lean) | proof or countermodel | medium | the xedni waiting-time step is closed, or adaptive selection reopens the route |
+| 9 | W7: `GAP-PF-TRACE-PULLBACK-FACTOR-BASE`: trace-image size of subspace factor bases on small p | exact census | low | the withdrawn closure is restored, or a prime-field lead opens |
 
 Items 1, 2, 3 and 8 are corpus and proof work, not experiment runs. Items 4–7 are runs and go
 through the repository's experiment route (protocol, resume checkpoint, native code,

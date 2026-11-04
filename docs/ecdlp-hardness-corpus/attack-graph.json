@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 585,
-    "frontier": 374,
+    "nodes": 598,
+    "frontier": 387,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -18,15 +18,15 @@
       "algorithm": 12,
       "conditional": 89,
       "measured": 24,
-      "proved_internal_unreviewed": 57,
-      "open": 69,
+      "proved_internal_unreviewed": 64,
+      "open": 70,
       "heuristic": 71,
-      "refuted": 26,
+      "refuted": 31,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 544,
-      "kernel_checked": 33,
+      "none": 550,
+      "kernel_checked": 40,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 4
@@ -884,6 +884,10 @@
         },
         {
           "from": "CEX-PA-POLY-FUNCTION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
           "relation": "qualifies"
         }
       ]
@@ -2270,7 +2274,12 @@
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-PA-PAIRING-DECIDES-DDH",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "STANDARD-CURVE-EXCLUSIONS",
@@ -2723,6 +2732,23 @@
       ]
     },
     {
+      "id": "CLAIM-PA-AMBIENT-BLINDING",
+      "label": "'Blinding by any group element preserves a subgroup DLP instance'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-AMBIENT-BLINDING",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "CLAIM-PA-BATCH-ADAPTIVE",
       "label": "'Random-linear-combination batching fails with probability <= d/|F| even against adaptive errors'",
       "status": "refuted",
@@ -2740,6 +2766,23 @@
       ]
     },
     {
+      "id": "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP",
+      "label": "'Cofactor clearing maps onto the prime subgroup bijectively'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-COFACTOR-ZMOD9",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "CLAIM-PA-MOD-ALIAS",
       "label": "'Equality in ZMod q is equality of the represented integers'",
       "status": "refuted",
@@ -2752,6 +2795,23 @@
       "pressure": [
         {
           "from": "CEX-PA-MOD-ALIAS",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING",
+      "label": "'Pedersen commitments with independent generators are binding unconditionally'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
           "relation": "refutes"
         }
       ]
@@ -2791,6 +2851,23 @@
       ]
     },
     {
+      "id": "CLAIM-PA-SS-IMPLIES-FS",
+      "label": "'Special soundness implies Fiat-Shamir security'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-ZERO-HASH-FORGERY",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "CLAIM-PA-SUBGROUP-AMBIENT",
       "label": "'An accepted ambient group element is a scalar multiple in the intended subgroup'",
       "status": "refuted",
@@ -2803,6 +2880,23 @@
       "pressure": [
         {
           "from": "CEX-PA-SUBGROUP-AMBIENT",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-ZK-IMPLIES-SOUND",
+      "label": "'Complete, zero-knowledge protocols are sound'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-ALWAYS-ACCEPT",
           "relation": "refutes"
         }
       ]
@@ -3268,7 +3362,12 @@
       "research_targets": [
         "RT-PA-PROTOCOL-QUEUE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-PA-COFACTOR-ZMOD9",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PA-CONCRETE-MULTIUSER",
@@ -3306,7 +3405,12 @@
       "research_targets": [
         "RT-PA-PROTOCOL-QUEUE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-PA-PAIRING-DECIDES-DDH",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PA-EXCEPTIONAL-FORMULAS",
@@ -3356,7 +3460,12 @@
       "research_targets": [
         "RT-PA-PROTOCOL-QUEUE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-PA-ZERO-HASH-FORGERY",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PA-FULL-KZG-GROTH-PLONK",
@@ -3474,7 +3583,12 @@
       "research_targets": [
         "RT-PA-PROTOCOL-QUEUE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PA-PLONK-PRODUCTS",
@@ -3510,7 +3624,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-PA-AMBIENT-BLINDING",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PA-SNARK-DEFINITIONS",
@@ -3536,7 +3655,12 @@
       "research_targets": [
         "RT-PA-PROTOCOL-QUEUE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-PA-ALWAYS-ACCEPT",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PF-DEDICATED-ROOT-FINDER",
@@ -3618,6 +3742,18 @@
         "RT-PF-CSTEP-T14",
         "RT-PF-PROVE-HT-OR-BOUNDED"
       ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
+      "label": "Can a trace-pulled-back subspace factor base be small?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
     },
     {
@@ -5338,6 +5474,10 @@
         {
           "from": "GAP-PA-FS-ZERO-HASH",
           "relation": "qualifies"
+        },
+        {
+          "from": "CEX-PA-ZERO-HASH-FORGERY",
+          "relation": "qualifies"
         }
       ]
     },
@@ -5504,10 +5644,58 @@
       "pressure": []
     },
     {
+      "id": "CEX-PA-ALWAYS-ACCEPT",
+      "label": "Always-accept protocol: complete, simulatable, unsound (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-AMBIENT-BLINDING",
+      "label": "Ambient blinding leaves the subgroup; subgroup blinding is a bijection (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-COFACTOR-ZMOD9",
+      "label": "In Z/9, cofactor 3 kills the order-3 subgroup; coprime cofactors are bijective (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-PA-MOD-ALIAS",
       "label": "Modulus alias and bounded repair (Lean, sibling)",
       "status": "proved_internal_unreviewed",
       "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+      "label": "H = tG gives commit(m, r) = commit(m + t, r - 1) (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
       "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
@@ -5544,6 +5732,18 @@
       "label": "Ambient membership does not imply designated-subgroup membership (Lean, sibling)",
       "status": "proved_internal_unreviewed",
       "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-ZERO-HASH-FORGERY",
+      "label": "Constant-zero challenge: (sP, 0, s) verifies for every key (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
       "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
@@ -5991,6 +6191,30 @@
     {
       "id": "THM-LEFT-KERNEL-RELATIONS",
       "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
+      "label": "Nagao Lemma 4 holds in the literal >=, field-equations-inside cell (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-PA-PAIRING-DECIDES-DDH",
+      "label": "A nondegenerate pairing decides DDH with one evaluation (Lean)",
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
       "action": "independent review, then kernel-check",
