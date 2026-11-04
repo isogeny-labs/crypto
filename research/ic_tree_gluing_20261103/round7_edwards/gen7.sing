@@ -9,6 +9,11 @@
 //           E2  full-coordinate tree: leaves (u_i, w_i), v_i = g*w_i, curve equation, per-leaf
 //               Kummer chain on w_i; internal nodes (U_c, V_c) by the two cleared addition-law
 //               equations; root node = R (both coordinates known)
+//           E1Q E1 quotiented by the 2-torsion translations (0,-1): variables are the invariants
+//               of the sign group {e : e1 e2 eX = 1 at every node}: squares (W_i = w_i^2 in
+//               mu_(2^(t-1)), Y_c = X_c^2) and one signed product per node (p_c = v v' X_c;
+//               root: p = X v3 (m=3) or X1 X2 (m=4), with v_R known). Each node is
+//               SI(A,B,C) - 2(a-d) pi = 0 and pi^2 = A B C, SI the invariant form of S3E.
 //   cells   (m,t) in CELLS7 (env, default "3 4 3 5 4 4 4 5"), one planted target each
 //   output  OUTDIR7 (env) / m<m>_t<t>_<arm>.ms ; msolve format; planted check before writing
 // Helpers kn, mn, kchain, mchain, plantM, plantK, fmtpoly are copied from ../gen.sing.
@@ -140,6 +145,10 @@ poly S3cf = ed*v1^2*v2^2*v3^2 - ed*(v1^2*v2^2 + v1^2*v3^2 + v2^2*v3^2) + ea*(v1^
 poly S3n = S3cf / leadcoef(S3cf);
 if (S3el != S3n) { print(S3el); die("S3E closed form mismatch"); }
 print("S3E (elimination of u1,u2,u3) = closed form: " + string(S3cf));
+poly SIv = ed*v1^2*v2^2*v3^2 - ed*(v1^2*v2^2 + v1^2*v3^2 + v2^2*v3^2) + ea*(v1^2 + v2^2 + v3^2) - ea
+           - 2*(ea - ed)*(v1*v2*v3);
+if (SIv != S3cf) { die("invariant form SI(v^2) - 2(a-d) v1 v2 v3 != S3E"); }
+print("E1Q: S3E = SI(v1^2, v2^2, v3^2) - 2(a-d) v1 v2 v3 checked (SI = d ABC - d(AB+AC+BC) + a(A+B+C) - a)");
 print("S3E degree in v1: " + string(deg(S3cf, intvec(0,0,0,1,0,0))) + ", total degree " + string(deg(S3cf)));
 // symmetric cherry form S3Esym(s, q, X): reduce S3E(v1, v2, X) modulo s - v1 - v2, q - v1 v2
 ring RS = 786433, (v1, v2, Sv, Sq, SX), (dp(2), dp(3));
@@ -278,6 +287,56 @@ proc armE1(string arm, int m, int t, list W, list XS, int vR, string S3Sstr, int
            "m=" + string(m) + " t=" + string(t) + " " + arm);
 }
 
+// arm E1Q (quotient by the even-sign group). W: w_i; XS: planted separators; vR
+// SI(A,B,C) = d ABC - d (AB + AC + BC) + a (A + B + C) - a ; S3E(v) = SI(v1^2,v2^2,v3^2) - 2(a-d) v1 v2 v3
+proc armE1Q(int m, int t, list W, list XS, int vR, int GG)
+{
+  list nm = "T"; int c; int i;
+  for (c = 0; c < m div 2; c++) { nm = nm + list("S" + string(c), "Q" + string(c)) + mn("g" + string(c), 2, t - 1); }
+  if (m == 3) { nm = nm + list("W3") + kn("k2", t - 1) + list("Y1", "p1", "p2"); }
+  if (m == 4) { nm = nm + list("Y1", "Y2", "p1", "p2", "pr"); }
+  string vl = ""; for (i = 1; i <= size(nm); i++) { if (i > 1) { vl = vl + ","; } vl = vl + nm[i]; }
+  execute("ring RQ = 786433,(" + vl + "),lp;");
+  poly pa = CA; poly pd = CD; poly pg = GG; poly pvR = vR; list EQ; ideal es; ideal E; ideal vals; vals[size(nm)] = 0; ideal rt;
+  poly Sc; poly Qc; poly Yc; poly Pc; poly g2 = pg^2; poly g4 = pg^4; poly VR = pvR^2;
+  list Wp; for (i = 1; i <= m; i++) { Wp[i] = poly(W[i]); }
+  list Xp; for (c = 1; c <= m div 2; c++) { Xp[c] = poly(XS[c]); }
+  for (c = 0; c < m div 2; c++)
+  {
+    Sc = var(ix("S" + string(c), nm)); Qc = var(ix("Q" + string(c), nm));
+    Yc = var(ix("Y" + string(c + 1), nm)); Pc = var(ix("p" + string(c + 1), nm));
+    es = Sc, Qc;
+    E = mchain("g" + string(c), es, 2, t - 1, nm); for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
+    // cherry node: V1 + V2 = g^2 S, V1 V2 = g^4 Q, VX = Y
+    EQ[size(EQ) + 1] = pd*g4*Qc*Yc - pd*(g4*Qc + g2*Sc*Yc) + pa*(g2*Sc + Yc) - pa - 2*(pa - pd)*Pc;
+    EQ[size(EQ) + 1] = Pc^2 - g4*Qc*Yc;
+    vals[ix("S" + string(c), nm)] = Wp[2*c + 1]^2 + Wp[2*c + 2]^2;
+    vals[ix("Q" + string(c), nm)] = Wp[2*c + 1]^2 * Wp[2*c + 2]^2;
+    rt = Wp[2*c + 1]^2, Wp[2*c + 2]^2;
+    vals = plantM("g" + string(c), 2, t - 1, rt, nm, vals);
+    vals[ix("Y" + string(c + 1), nm)] = Xp[c + 1]^2;
+    vals[ix("p" + string(c + 1), nm)] = pg*Wp[2*c + 1] * pg*Wp[2*c + 2] * Xp[c + 1];
+  }
+  poly A; poly B; poly Pr;
+  if (m == 3)
+  {
+    E = kchain("k2", var(ix("W3", nm)), t - 1, nm); for (i = 1; i <= size(E); i++) { EQ[size(EQ) + 1] = E[i]; }
+    A = var(ix("Y1", nm)); B = g2*var(ix("W3", nm)); Pr = var(ix("p2", nm));
+    vals[ix("W3", nm)] = Wp[3]^2; vals = plantK("k2", Wp[3]^2, t - 1, nm, vals);
+    vals[ix("p2", nm)] = Xp[1] * pg*Wp[3];
+  }
+  if (m == 4)
+  {
+    A = var(ix("Y1", nm)); B = var(ix("Y2", nm)); Pr = var(ix("pr", nm));
+    vals[ix("pr", nm)] = Xp[1] * Xp[2];
+  }
+  // root node (v_R known): pi = v_R * Pr
+  EQ[size(EQ) + 1] = pd*A*B*VR - pd*(A*B + A*VR + B*VR) + pa*(A + B + VR) - pa - 2*(pa - pd)*pvR*Pr;
+  EQ[size(EQ) + 1] = Pr^2 - A*B;
+  writesys(nm, EQ, vals, OUTDIR + "/m" + string(m) + "_t" + string(t) + "_E1Q.ms",
+           "m=" + string(m) + " t=" + string(t) + " E1Q");
+}
+
 // arm E2. UL: leaf u_i; W: leaf w_i; NU, NV: planted internal nodes; uR, vR
 proc armE2(int m, int t, list UL, list W, list NU, list NV, int uR, int vR, int GG)
 {
@@ -366,6 +425,7 @@ for (ii = 1; ii + 1 <= size(CTOK); ii = ii + 2)
   armE1("E1", m, t, W, XS, nint(Rp[2]), S3Sstr, GG);
   armE1("E1S", m, t, W, XS, nint(Rp[2]), S3Sstr, GG);
   armE2(m, t, UL, W, NU, NV, nint(Rp[1]), nint(Rp[2]), GG);
+  armE1Q(m, t, W, XS, nint(Rp[2]), GG);
   setring r;
 }
 write(":w " + OUTDIR + "/instances7.txt", INST[1, size(INST) - 1]);

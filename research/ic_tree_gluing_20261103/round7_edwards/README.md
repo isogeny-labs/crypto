@@ -134,3 +134,117 @@ The host was shared, though E1 and the T references ran under identical caps one
   timeouts. No run reached 1,200 s.
 - One target per cell. The E instances are not the Weierstrass instances (different curve),
   so the cells match in (m, t) and the targets are random, not identical.
+
+## Round 7b: arm E1Q, quotient of E1 by the 2-torsion translations
+
+### Prediction E1Q (written 2026-11-04T06:23:04Z, after generating the E1Q systems, before any E1Q run)
+
+The E1Q systems (construction below) have all node equations of total degree 2, and the
+remainder-tower equations of degree 3. The max input degree is 3, against 4 in E1 and T. Each
+tower has one level fewer (W = w² ∈ μ_(2^(t−1))), so N is 12, 15, 17, 21, against E1's 13, 16,
+18, 22.
+
+1. **D_E1Q ≤ D_E1 − 1 in every cell** (the coordinator's expectation is "same or one lower";
+   mine leans to strictly lower): m = 3 gives D ∈ {4, 5} at t = 4, 5; m = 4, t = 4 gives
+   D ∈ {5, 6}. If D does not drop, the reading is that the excess degree is in the coupling's
+   correspondence structure and not in its sign redundancy.
+2. **Quotient dimension = E1's / 2^(m−1):** 12/4 = 3 at m = 3 and 48/8 = 6 at m = 4. These equal
+   T's, since the cherry swap remains.
+3. **Widest matrix smaller than E1's** by at least 2× in every finished cell. m = 4, t = 5 finishes
+   within 2 GiB (E1 did not).
+
+### Construction of E1Q (`gen7.sing`, `armE1Q`)
+
+- **Group.** S3E = SI(v1², v2², v3²) − 2(a−d)·v1v2v3, where
+  SI(A, B, C) = d·ABC − d(AB + AC + BC) + a(A + B + C) − a. Singular checks this identity
+  symbolically (`logs/genq.out`).
+- In the tree, give each node n its three incident coordinates: two children and the
+  parent's separator, or v_R at the root. Let G be the group of sign vectors e on all leaf
+  and separator coordinates with e_a·e_b·e_X = 1 at every node, where e_R = 1 because v_R is
+  known. G acts by translating the leaf points by the 2-torsion point (0, −1); the separators
+  then follow. |G| = 2^(m−1): the leaf signs e_1, …, e_(m−1) are free, and the node
+  constraints then fix every separator sign and the last leaf sign.
+- **Invariant variables.**
+  - Per cherry: S = W₁ + W₂ and Q = W₁W₂, where W_i = w_i² ∈ μ_(2^(t−1)). They get the
+    degree-2 remainder tower of depth t−1. V₁ + V₂ = g²S and V₁V₂ = g⁴Q.
+  - Per separator: Y = X².
+  - Per node: one signed product p (cherry: p = v₁v₂X; m = 3 root: p = X·v₃; m = 4 root:
+    p = X₁X₂).
+  - The last leaf at m = 3 has W₃ = w₃² with a Kummer chain of depth t−1.
+- **Node equations.** For node (A, B, C) with product π:
+  SI(A, B, C) − 2(a−d)·π = 0 and π² = A·B·C. Both have total degree 2. At the root,
+  C = v_R² and π = v_R·p, with p² = A·B.
+
+**Faithfulness (proof sketch).**
+- *Forward.* Every E1 solution maps to an E1Q solution. The map is polynomial; SI(V) − 2(a−d)π
+  is S3E; π² = ABC holds by definition; and w ∈ μ_(2^t) implies w² ∈ μ_(2^(t−1)).
+- *Lifting.* Every E1Q solution with all W, Y nonzero lifts to exactly |G| = 2^(m−1) E1
+  solutions, one orbit of G.
+  - Pick square roots w₁, w₂ of the cherry's W₁ ≠ W₂. Any square root of an element of
+    μ_(2^(t−1)) lies in μ_(2^t), so these are factor-base points.
+  - There are 4 unordered lifts {w₁, w₂} of {W₁, W₂}.
+  - Set X = p/(g²w₁w₂). Then X² = p²/(g⁴Q) = Y, and the cherry's S3E holds because
+    SI − 2(a−d)·v₁v₂X = SI − 2(a−d)·p = 0.
+  - At m = 3, w₃ = p₂/(gX) is forced. Then w₃² = p₂²/(g²Y) = W₃, and the root S3E holds.
+    That gives 4 lifts.
+  - At m = 4, the two cherries give 16 choices. The root condition X₁X₂ = p_r keeps exactly
+    half, because flipping the sign of w₁ flips X₁. That gives 8 lifts.
+  - Distinct lifts of one point are distinct E1 points (different (s, ·) or X), and G maps
+    lifts to lifts. So the solution count divides exactly by 2^(m−1) on the nondegenerate
+    locus.
+  - On the planted relation W ≠ 0 holds by construction, and Y ≠ 0 because the planted
+    partial sums have v ≠ 0. The measured qdims (below) agree.
+- *Planted check.* `writesys` evaluates every E1Q equation at the planted values
+  (W_i = w_i², Y_c = X_c², p from the actual signed v's) before writing (`logs/genq.out`).
+  The other 12 systems are byte-identical to the first generation (sha256 compared).
+
+### Result E1Q [pcc:unverified]
+
+Same engine, caps (1 thread, 2 GiB, 1,200 s) and host as above. Same planted targets as E1.
+
+| m | t | N: E1Q / E1 / T | input deg | D: E1Q | D: E1 | D: T | widest: E1Q / E1 / T | wall s: E1Q / E1 / T | qdim: E1Q / E1 / T |
+|--:|--:|--|--:|--:|--:|--:|--|--|--|
+| 3 | 4 | 12 / 13 / 13 | 3 | **5** | 6 | 6 | 1,521 / 6,971 / 7,077 | 0.07 / 1.8 / 3.7 | 3 / 12 / 3 |
+| 3 | 5 | 15 / 16 / 16 | 3 | **5** | 6 | 6 | 5,455 / 24,792 / 23,720 | 2.1 / 120 / 587 | 3 / 12 / 3 |
+| 4 | 4 | 17 / 18 / 18 | 3 | **5** | 7 | 7 | 5,796 / 21,795 / 25,742 | 2.5 / 60 / 697 (6 GiB; 634 s to the 2 GiB cap) | 6 / 48 / 6 |
+| 4 | 5 | 21 / 22 / 22 | 3 | ≥ 6 (2 GiB cap at 75 s) | ≥ 7 (cap) | ≥ 7 (round 2, 2,400 s) | ≥ 47,623 / ≥ 91,279 / ≥ 218,583 | 75 / 61 / 2,400 | — |
+
+**Prediction check E1Q.**
+1. D lower: confirmed and exceeded. D drops by 1 at m = 3 and by **2** at m = 4, t = 4.
+   That cell sits at the top of my range and below the coordinator's "same or one lower".
+2. The quotient dimension divides by exactly 2^(m−1) (12 → 3, 48 → 6): confirmed.
+3. Widest at least 2× smaller: confirmed (3.8–4.6×).
+4. "m4 t5 finishes in 2 GiB": falsified. The hash table overflowed in degree 5–6 after a
+   degree-6 round had been selected, so D ≥ 6.
+
+### Reading E1Q [pcc:unverified]
+
+- **First measured drop in D for the glued tree.** Against the cherry floor (D = 4), the
+  coupling excess E falls from 2 to 1 at m = 3 and from 3 to 1 at m = 4, t = 4.
+  - At m = 4, D_E1Q = 5 is below T's 7 and the full-symmetric F's 8 at the same arity. At
+    m = 3 it equals F's 5.
+  - The cost falls with it: at m = 4, t = 4, 2.5 s against 60 s for E1 and 697 s for T
+    (round 1). At m = 3, t = 5, 2.1 s against 587 s for T on the same host.
+- **Mechanism.**
+  - Once the 2-torsion sign redundancy is quotiented, each 2-to-2 node becomes a *pair* of
+    quadrics in invariant coordinates: a linear equation in the signed product plus its norm
+    equation. The input degree drops from 4 to 3.
+  - The towers lose one level, because w² ∈ μ_(2^(t−1)).
+  - This is the tree analogue of the FGHR use of the (Z/2)^(m−1) action. It needs a rational
+    2-torsion point whose translation acts as v → −v, which every twisted Edwards curve has.
+- **Fair-base caveat.**
+  - The base at t has 2^t v-values but only 2^(t−1) classes modulo T2. Relations modulo
+    2-torsion are harmless in the prime-order subgroup, so the effective factor base of E1Q
+    at t has the size of T's at t−1.
+  - The equal-effective-base comparison is E1Q(t = 5) against T(t = 4): D 5 vs 6 at m = 3,
+    and 5,455 vs 7,077 columns.
+  - At m = 4 the equal-base cell E1Q(t = 5) was capped at D ≥ 6, so D 5 vs 7 at t = 4 is
+    *not* yet an equal-base comparison. Deciding it needs E1Q m4 t5 with more than 2 GiB.
+- **Not yet a success claim.** These are stage diagnostics of the solver axis. No pipeline is
+  priced and there is no S or rho comparison. There is one target per cell, the timings come
+  from a shared host, and the result is unverified.
+- **Next.**
+  - E1Q at m = 4, t = 5 and m = 5, 6 on a larger memory cap, to measure the arity slope of E.
+  - A Weierstrass control with a rational 2-torsion point, to test whether the gain comes
+    from the 2-torsion quotient or from the Edwards model.
+  - A second target per cell.
