@@ -379,6 +379,10 @@ struct Family {
     /// than summands); the track's `n_min` applies when absent.
     #[serde(default)]
     n_min: Option<u64>,
+    /// A family's own ceiling on N (a coefficient box grows by its bound,
+    /// not by its seed count); the track's `n_max` applies when absent.
+    #[serde(default)]
+    n_max: Option<u64>,
     /// Further `ic.pipeline` parameters every arm of the family carries.
     #[serde(default)]
     params: BTreeMap<String, String>,
@@ -405,7 +409,10 @@ struct TrackFamilies {
 
 impl TrackFamilies {
     fn arm(&self, fam: &Family, n: u64) -> ArmConfig {
-        let n = n.clamp(fam.n_min.unwrap_or(self.n_min).max(self.n_min), self.n_max);
+        let n = n.clamp(
+            fam.n_min.unwrap_or(self.n_min),
+            fam.n_max.unwrap_or(self.n_max),
+        );
         ArmConfig {
             name: format!("{}-n{n}", fam.id),
             family: fam.id.clone(),

@@ -7401,6 +7401,404 @@ impl KSumTable {
     }
 }
 
+/// Largest seed count and coefficient bound a [`WSumTable`] builds, and
+/// the largest number of entries it agrees to try.
+const WSUM_MAX_C: usize = 8;
+const WSUM_MAX_B: u64 = 255;
+const WSUM_MAX_ENTRIES: u64 = 1 << 26;
+
+/// **A coefficient-box table over `C` seed points** (`wsum`, proposal P3):
+/// every `Σ_c e_c·P_c` with `e ∈ {−B..B}^C`, `e ≠ 0`, one entry per
+/// negation orbit (the first non-zero coefficient positive), keyed by the
+/// sum's abscissa as [`KSumTable`] is.  The seeds are the base's `C`
+/// distinct abscissae, one point apiece.  A relation then touches only
+/// `C` columns, a coefficient `e` being the seed's index repeated `|e|`
+/// times (its negative's for `e < 0`).
+///
+/// Built depth-first, coordinate by coordinate, from `[μ]P_c` for
+/// `μ = 1..B` (`B − 1` additions a seed, charged): each non-zero
+/// coefficient on a non-identity partial sum is one addition, reused by
+/// every completion below it.  Sums equal to the identity are skipped.
+pub struct WSumTable<E> {
+    /// The coefficient vector of each kept sum, `bits` bits a digit
+    /// `e_c + B`.
+    map: FastMap<u64>,
+    pub c: usize,
+    pub b: u64,
+    bits: u32,
+    /// Base index of each seed (the first point above its abscissa).
+    seeds: Vec<usize>,
+    /// `multiples[c][μ − 1] = [μ]P_c`, `None` for the identity.
+    multiples: Vec<Vec<Option<E>>>,
+    pub entries: u64,
+    pub build_ops: GroupOps,
+    pub build_wall_ns: u64,
+    /// Inserts tried during the build, kept or not.
+    pub insert_attempts: u64,
+    /// Full sums equal to the identity, not inserted.
+    pub identities_skipped: u64,
+    /// `x_index` reads of the build, one per abscissa.
+    pub index_lookups: u64,
+    /// When set, colliding inserts are kept as `(kept, new)` packed
+    /// coefficient vectors; [`WSumTable::free_rows`] verifies them.
+    pub keep_collisions: bool,
+    pub collisions: Vec<(u64, u64)>,
+}
+
+impl<E: Copy + PartialEq> WSumTable<E> {
+    /// Build the table of every `Σ e_c·P_c` with `|e_c| ≤ b` over the
+    /// base's abscissae.  With `keep_collisions`, every insert whose key is
+    /// already taken is kept; the table and its cost are identical either
+    /// way.
+    pub fn build<G: CountedGroup<Elt = E>>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        b: u64,
+        keep_collisions: bool,
+    ) -> Result<Self, String> {
+        let c = fb.abscissa_list.len();
+        if c == 0 {
+            return Err("wsum: the base has no points".into());
+        }
+        if c > WSUM_MAX_C {
+            return Err(format!(
+                "wsum: at most {WSUM_MAX_C} seeds (base abscissae); the base has {c}"
+            ));
+        }
+        if !(1..=WSUM_MAX_B).contains(&b) {
+            return Err(format!("wsum: coef is from 1 to {WSUM_MAX_B}, not {b}"));
+        }
+        let width = 2 * b + 1;
+        let bits = 64 - width.leading_zeros();
+        if c as u32 * bits > 64 {
+            return Err(format!(
+                "wsum: {c} coefficients of {bits} bits (coef={b}) do not fit in 64 bits"
+            ));
+        }
+        let estimate = (0..c)
+            .try_fold(1u64, |t, _| t.checked_mul(width))
+            .map(|t| (t - 1) / 2)
+            .filter(|&t| t <= WSUM_MAX_ENTRIES)
+            .ok_or_else(|| {
+                format!("wsum: ((2·{b}+1)^{c} − 1)/2 entries exceeds the 2^26 table limit")
+            })?;
+        let start = Instant::now();
+        let seeds: Vec<usize> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed")[0])
+            .collect();
+        let mut build_ops = GroupOps::default();
+        let mut mults: Vec<Vec<Option<G::Elt>>> = Vec::with_capacity(c);
+        for &j in &seeds {
+            let p = fb.points[j];
+            let mut row: Vec<Option<G::Elt>> = Vec::with_capacity(b as usize);
+            row.push((!g.is_identity(&p)).then_some(p));
+            for _ in 1..b {
+                let prev = *row.last().expect("non-empty");
+                let next = match prev {
+                    None => Some(p),
+                    Some(q) => Some(g.add(&mut build_ops, q, p)),
+                };
+                row.push(next.filter(|s| !g.is_identity(s)));
+            }
+            mults.push(row);
+        }
+        let mut t = Self {
+            map: fast_map(estimate as usize + 1),
+            c,
+            b,
+            bits,
+            seeds,
+            multiples: Vec::new(),
+            entries: 0,
+            build_ops,
+            build_wall_ns: 0,
+            insert_attempts: 0,
+            identities_skipped: 0,
+            index_lookups: c as u64,
+            keep_collisions,
+            collisions: Vec::new(),
+        };
+        let mut digits = vec![0i64; c];
+        t.extend(g, &mults, 0, None, true, &mut digits);
+        t.multiples = mults;
+        t.entries = t.map.len() as u64;
+        t.build_wall_ns = start.elapsed().as_nanos() as u64;
+        Ok(t)
+    }
+
+    /// `±[|e|]P_c`, `None` for the identity or `e = 0`.
+    fn term<G: CountedGroup<Elt = E>>(
+        g: &G,
+        mults: &[Vec<Option<E>>],
+        c: usize,
+        e: i64,
+    ) -> Option<G::Elt> {
+        if e == 0 {
+            return None;
+        }
+        let m = mults[c][(e.unsigned_abs() - 1) as usize]?;
+        Some(if e < 0 { g.neg(m) } else { m })
+    }
+
+    fn plus<G: CountedGroup<Elt = E>>(
+        g: &G,
+        ops: &mut GroupOps,
+        a: Option<G::Elt>,
+        t: Option<G::Elt>,
+    ) -> Option<G::Elt> {
+        match (a, t) {
+            (None, x) | (x, None) => x,
+            (Some(p), Some(q)) => Some(g.add(ops, p, q)).filter(|s| !g.is_identity(s)),
+        }
+    }
+
+    fn extend<G: CountedGroup<Elt = E>>(
+        &mut self,
+        g: &G,
+        mults: &[Vec<Option<E>>],
+        depth: usize,
+        partial: Option<G::Elt>,
+        leading: bool,
+        digits: &mut [i64],
+    ) {
+        let b = self.b as i64;
+        let lo = if leading { 0 } else { -b };
+        let last = depth + 1 == self.c;
+        for e in lo..=b {
+            digits[depth] = e;
+            let s = Self::plus(
+                g,
+                &mut self.build_ops,
+                partial,
+                Self::term(g, mults, depth, e),
+            );
+            let still_leading = leading && e == 0;
+            if last {
+                if still_leading {
+                    continue;
+                }
+                let Some(s) = s else {
+                    self.identities_skipped += 1;
+                    continue;
+                };
+                let packed = self.pack(digits);
+                match self.map.entry(g.key(&s) >> 1) {
+                    std::collections::hash_map::Entry::Vacant(v) => {
+                        v.insert(packed);
+                    }
+                    std::collections::hash_map::Entry::Occupied(o) => {
+                        if self.keep_collisions {
+                            self.collisions.push((*o.get(), packed));
+                        }
+                    }
+                }
+                self.insert_attempts += 1;
+            } else {
+                self.extend(g, mults, depth + 1, s, still_leading, digits);
+            }
+        }
+        digits[depth] = 0;
+    }
+
+    fn pack(&self, digits: &[i64]) -> u64 {
+        digits
+            .iter()
+            .rev()
+            .fold(0u64, |w, &e| (w << self.bits) | (e + self.b as i64) as u64)
+    }
+
+    /// The coefficient vector a packed entry holds.
+    pub fn unpack(&self, packed: u64) -> Vec<i64> {
+        let mask = (1u64 << self.bits) - 1;
+        (0..self.c)
+            .map(|d| ((packed >> (d as u32 * self.bits)) & mask) as i64 - self.b as i64)
+            .collect()
+    }
+
+    /// `Σ e_c·P_c` from the multiples, each addition charged to `ops`.
+    pub fn evaluate<G: CountedGroup<Elt = E>>(&self, g: &G, ops: &mut GroupOps, e: &[i64]) -> E {
+        let mut s = None;
+        for (c, &ec) in e.iter().enumerate() {
+            s = Self::plus(g, ops, s, Self::term(g, &self.multiples, c, ec));
+        }
+        s.unwrap_or_else(|| g.identity())
+    }
+
+    /// The signed base indices of `e`: the seed's index repeated `e_c`
+    /// times, or its negative's `|e_c|` times.
+    pub fn summands(&self, fb: &FactorBase<E>, e: &[i64]) -> Vec<usize> {
+        let mut out = Vec::new();
+        for (c, &ec) in e.iter().enumerate() {
+            let j = self.seeds[c];
+            let i = if ec < 0 { fb.neg_index[j] } else { j };
+            out.extend(std::iter::repeat_n(i, ec.unsigned_abs() as usize));
+        }
+        out
+    }
+
+    /// The build's work beside its group operations, for `bitop/v1`.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        if self.insert_attempts > 0 {
+            out.insert("table_insert_attempts".to_string(), self.insert_attempts);
+        }
+        if self.index_lookups > 0 {
+            out.insert("lookups".to_string(), self.index_lookups);
+        }
+        out
+    }
+
+    /// The relations among the seed logs hidden in the build's key
+    /// collisions: both sums recomputed (charged to `ops`); equal sums
+    /// give `Σ (e1_c − e2_c)·coef_c = 0`, opposite ones `Σ (e1_c +
+    /// e2_c)·coef_c = 0`, as `(column, coef)` lists modulo `r`.  A key
+    /// match that is neither, and a row that cancels to zero, is dropped.
+    /// Returns the rows and the number of pairs checked.
+    pub fn free_rows<G: CountedGroup<Elt = E>>(
+        &self,
+        g: &G,
+        fb: &FactorBase<E>,
+        r: u64,
+        ops: &mut GroupOps,
+    ) -> (Vec<Vec<(usize, u64)>>, u64) {
+        let mut rows = Vec::new();
+        for &(p1, p2) in &self.collisions {
+            let (e1, e2) = (self.unpack(p1), self.unpack(p2));
+            let (s1, s2) = (self.evaluate(g, ops, &e1), self.evaluate(g, ops, &e2));
+            let sign: i64 = if s1 == s2 {
+                -1
+            } else if s1 == g.neg(s2) {
+                1
+            } else {
+                continue;
+            };
+            let mut acc: BTreeMap<usize, u64> = BTreeMap::new();
+            for c in 0..self.c {
+                let e = e1[c] + sign * e2[c];
+                if e == 0 {
+                    continue;
+                }
+                let j = self.seeds[c];
+                let em = e.rem_euclid(r as i64) as u128;
+                let v = (em * (fb.coef_of[j] % r) as u128 % r as u128) as u64;
+                let slot = acc.entry(fb.col_of[j]).or_insert(0);
+                *slot = ((*slot as u128 + v as u128) % r as u128) as u64;
+            }
+            let row: Vec<(usize, u64)> = acc.into_iter().filter(|&(_, x)| x != 0).collect();
+            if !row.is_empty() {
+                rows.push(row);
+            }
+        }
+        (rows, self.collisions.len() as u64)
+    }
+
+    /// Signed base indices, with repetition, summing to `target`, if the
+    /// table holds `±target`: one lookup, and the stored sum rebuilt from
+    /// the multiples (at most `C − 1` additions) to confirm a key match.
+    pub fn probe<G: CountedGroup<Elt = E>>(
+        &self,
+        g: &G,
+        fb: &FactorBase<E>,
+        ops: &mut GroupOps,
+        lookups: &mut u64,
+        target: G::Elt,
+    ) -> Option<Vec<usize>> {
+        *lookups += 1;
+        let packed = *self.map.get(&(g.key(&target) >> 1))?;
+        let mut e = self.unpack(packed);
+        let s = self.evaluate(g, ops, &e);
+        if s == target {
+            Some(self.summands(fb, &e))
+        } else if s == g.neg(target) {
+            e.iter_mut().for_each(|x| *x = -*x);
+            Some(self.summands(fb, &e))
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod wsum_table_tests {
+    use super::*;
+
+    /// True logs of every subgroup point of a tiny curve, by brute force.
+    fn logs(inst: &PrimeInstance) -> HashMap<u64, u64> {
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let mut out = HashMap::new();
+        let mut p = gen;
+        for k in 1..inst.r {
+            out.insert(g.key(&p), k);
+            p = g.add(&mut ops, p, gen);
+        }
+        out
+    }
+
+    #[test]
+    fn wsum_table_counts_probes_and_free_rows() {
+        let inst = prime_instance_for(10, 3);
+        let g = &inst.curve;
+        let r = inst.r;
+        let log = logs(&inst);
+        let log_of = |p: &PrimePoint| -> u64 {
+            if g.is_identity(p) {
+                0
+            } else {
+                log[&g.key(p)]
+            }
+        };
+        for (c, b) in [(3usize, 5u64), (4, 3), (2, 40)] {
+            let fb = prime_factor_base(&inst, c);
+            assert_eq!(fb.abscissa_list.len(), c);
+            let t = WSumTable::build(g, &fb, b, true).unwrap();
+            // (a) every orbit of the box tried once, identities skipped.
+            let box_orbits = ((2 * b + 1).pow(c as u32) - 1) / 2;
+            assert_eq!(t.insert_attempts + t.identities_skipped, box_orbits);
+            assert_eq!(t.entries + t.collisions.len() as u64, t.insert_attempts);
+            // (b) probe answers sum to their targets.
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            let mut hits = 0;
+            for k in 1..r {
+                let target = g.mul(&mut ops, inst.generator_point(), k);
+                if let Some(s) = t.probe(g, &fb, &mut ops, &mut lookups, target) {
+                    let mut acc = fb.points[s[0]];
+                    for &i in &s[1..] {
+                        acc = g.add(&mut ops, acc, fb.points[i]);
+                    }
+                    assert_eq!(acc, target, "c={c} b={b} k={k}");
+                    hits += 1;
+                }
+            }
+            assert_eq!(lookups, r - 1);
+            assert!(hits > 0, "c={c} b={b}: no probe hit");
+            // (c) free rows hold under the true logs.
+            let mut col_log = vec![None; fb.columns];
+            for (i, p) in fb.points.iter().enumerate() {
+                let inv = invmod(fb.coef_of[i] % r, r).unwrap();
+                let l = ((log_of(p) as u128 * inv as u128) % r as u128) as u64;
+                let slot = col_log[fb.col_of[i]].get_or_insert(l);
+                assert_eq!(*slot, l);
+            }
+            let (rows, checked) = t.free_rows(g, &fb, r, &mut ops);
+            assert_eq!(checked, t.collisions.len() as u64);
+            assert!(!rows.is_empty(), "c={c} b={b}: no free rows");
+            for row in &rows {
+                let s = row.iter().fold(0u128, |s, &(col, v)| {
+                    (s + v as u128 * col_log[col].unwrap() as u128) % r as u128
+                });
+                assert_eq!(s, 0, "c={c} b={b}: row {row:?} fails");
+            }
+        }
+        let fb = prime_factor_base(&inst, 9);
+        assert!(WSumTable::build(g, &fb, 1, false).is_err());
+    }
+}
+
 /// Bits of a table entry that hold the second index; the rotation that
 /// canonicalised the entry's sum sits above them.
 const FROB_INDEX_BITS: u32 = 26;
