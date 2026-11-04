@@ -62,7 +62,7 @@ use crate::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
     prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
     CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
-    PrimeCurve, PrimeInstance, PrimePoint, Relation, WSumTable,
+    PrimeCurve, PrimeInstance, PrimePoint, Relation, WSumTable, WalkTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::FastPoint;
@@ -2538,6 +2538,169 @@ impl<G: CountedGroup> DecompositionOracle<G> for WSumOracle<G::Elt> {
     }
 }
 
+/// One probe per target into a random-jump walk table over the base's two
+/// seeds ([`WalkTable`], proposal P2): `E_t = E_{t−1} + J_{h_t}` for
+/// `T = round(x·√r)` steps, so a relation has only two unknown columns and
+/// the table's own key collisions are target-free rows over them.
+///
+/// Parameters: `x` (table size in units of `√r`, in `(0, 4]`), `jumps`
+/// (default 16, 2 to 64), `grow` (1: extend the walk, charged, until the
+/// first verified free row, capped at `2·T` entries; default 0), `seed`
+/// (default 0, mixed with the seeds' keys).  The verified free rows are
+/// handed to the relation loop once, with the first trial, as
+/// `Relation::Row { a: 0, b: 0 }`.  A probe hit `±E_t` is a
+/// `Relation::Row` with the trial's own `(a, b)` and the columns
+/// `(±u_t, ±v_t)`: the (large) coefficients are never expanded into
+/// repeated summands, so [`DecompositionOracle::decompose`] has no
+/// `Summands` form to return and answers `None`.
+pub struct WWalkOracle<E> {
+    table: Option<WalkTable<E>>,
+    free_pending: bool,
+    free_checked: u64,
+    free_emitted: u64,
+    probe_hits: u64,
+}
+
+impl<E> WWalkOracle<E> {
+    pub fn new() -> Self {
+        Self {
+            table: None,
+            free_pending: false,
+            free_checked: 0,
+            free_emitted: 0,
+            probe_hits: 0,
+        }
+    }
+
+    /// The table of the last `prepare`, for reports and tests.
+    pub fn table(&self) -> Option<&WalkTable<E>> {
+        self.table.as_ref()
+    }
+}
+
+impl<E> Default for WWalkOracle<E> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
+    fn name(&self) -> &str {
+        "wwalk"
+    }
+
+    fn summands(&self) -> u32 {
+        // Distinct columns a relation touches: one per seed.
+        2
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "a table of x·√r steps of a random-jump walk E_t = E_(t-1) + J_h over the base's two \
+         abscissae, one entry per negation orbit, probed once per target; its key collisions \
+         are target-free rows over the two seed columns"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("x", "table size in units of √r, T = round(x·√r), x in (0, 4] (required)"),
+            ("jumps", "jump count, 2 to 64 (default 16); J_j = [α_j]P1 + [β_j]P2, α_j, β_j uniform in [1, round(1.2·√T)]"),
+            ("grow", "1: after T entries keep extending the walk (charged) until the first verified free row, at most 2T entries (default 0)"),
+            ("seed", "seed of the jump and step stream, mixed with the two seeds' keys (default 0)"),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let x: f64 = params
+            .get("x")
+            .ok_or_else(|| "wwalk: missing parameter `x`".to_string())?
+            .parse()
+            .map_err(|_| format!("wwalk: parameter `x` is not a number: `{}`", params.0["x"]))?;
+        let jumps = params
+            .u64_or("jumps", 16)
+            .map_err(|e| format!("wwalk: {e}"))?;
+        let jumps = usize::try_from(jumps).map_err(|_| "wwalk: jumps too large".to_string())?;
+        let seed = params
+            .u64_or("seed", 0)
+            .map_err(|e| format!("wwalk: {e}"))?;
+        let table = WalkTable::build(ctx.group, fb, ctx.r, x, jumps, params.flag("grow"), seed)?;
+        self.free_pending = true;
+        self.free_checked = table.collisions.len() as u64;
+        self.free_emitted = table.rows.len() as u64;
+        self.probe_hits = 0;
+        // The walk, the jump set-up and the row verification are part of
+        // the pipeline's cost.
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(WalkTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        _ctx: &InstanceCtx<G>,
+        _fb: &FactorBase<G::Elt>,
+        _ops: &mut GroupOps,
+        _counters: &mut OracleCounters,
+        _point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        None
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        a: u64,
+        b: u64,
+    ) -> Vec<Relation> {
+        let mut out = Vec::new();
+        let Some(table) = self.table.as_ref() else {
+            return out;
+        };
+        if self.free_pending {
+            self.free_pending = false;
+            out.extend(table.rows.iter().map(|columns| Relation::Row {
+                columns: columns.clone(),
+                a: 0,
+                b: 0,
+            }));
+        }
+        if let Some((sign, u, v)) = table.probe(ctx.group, ops, &mut counters.lookups, point) {
+            let columns = table.hit_columns(fb, ctx.r, sign, u, v);
+            self.probe_hits += 1;
+            out.push(Relation::Row { columns, a, b });
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        let mut m = BTreeMap::new();
+        m.insert("free_collisions_checked".to_string(), self.free_checked);
+        m.insert("free_rows_emitted".to_string(), self.free_emitted);
+        m.insert("probe_hits".to_string(), self.probe_hits);
+        m
+    }
+}
+
 /// The two-summand prime MITM search with the same probe and table keys as
 /// `mitm`, but a batched-inversion, x-only table construction.  The
 /// `blocked` form (`mitm-prime-blocked`) builds the same table in
@@ -4959,5 +5122,181 @@ mod wsum_stride_dependence_tests {
         assert_eq!(walk_found, 8 * 3);
         assert!(stride_dep >= 1, "progression rows are collinear");
         assert!(stride_found > walk_found);
+    }
+}
+
+/// `wwalk` end to end on the `train-k32` curve: the planted logarithm is
+/// recovered with walk targets and with stride-generator targets, the
+/// free rows hold, and the fraction of bases with a verified free row is
+/// reported against the proposal's `1 − exp(−x²)`.
+#[cfg(test)]
+mod wwalk_pipeline_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{Calibration, PrimeCurve, PrimeInstance, PrimePoint};
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    fn instance() -> PrimeInstance {
+        PrimeInstance {
+            name: "train-k32".into(),
+            curve: PrimeCurve {
+                p: 4294967197,
+                a: 1173263412,
+                b: 337904346,
+            },
+            group_order: 4295077112,
+            r: 536884639,
+            cofactor: 8,
+            generator: (1431665017, 592057774),
+        }
+    }
+
+    fn ctx<'a>(inst: &'a PrimeInstance, q: PrimePoint) -> InstanceCtx<'a, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn base_params(scan: u64) -> Params {
+        Params::parse_spec(&format!("prime-projected-abscissa:size=2,scan_cap={scan}"))
+            .unwrap()
+            .1
+    }
+
+    /// One run: (verified, free rows emitted, probe hits, steps grown).
+    /// The oracle's own seed is `s`, so every run walks another path over
+    /// the same two seeds.
+    fn run(inst: &PrimeInstance, targets: Targets, spec: &str, s: u64) -> (bool, u64, u64, u64) {
+        let planted = 12345 + 7919 * s;
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+        let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+        let ps = PipelineSpec {
+            factor_base: "prime-projected-abscissa".into(),
+            factor_base_params: base_params(32),
+            oracle: name,
+            oracle_params,
+            targets,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut oracle = WWalkOracle::<PrimePoint>::new();
+        let rep = run_pipeline(
+            &ctx(inst, q),
+            &ps,
+            &PrimeProjectedAbscissaBase { instance: inst },
+            &mut oracle,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+        (
+            rep.verified && rep.recovered == Some(planted),
+            ctr["free_rows_emitted"],
+            ctr["probe_hits"],
+            oracle.table().unwrap().grown_steps,
+        )
+    }
+
+    #[test]
+    fn wwalk_recovers_the_planted_log_with_walk_and_stride_targets() {
+        let inst = instance();
+        for (targets, label) in [
+            (Targets::Walk, "walk"),
+            (Targets::StrideGenerator, "stride-generator"),
+        ] {
+            for spec in ["wwalk:x=1.2", "wwalk:x=0.6", "wwalk:x=0.6,grow=1"] {
+                let (mut ok, mut rows, mut hits, mut grown, mut no_row) = (0, 0, 0, 0, 0);
+                let n = 16;
+                for s in 0..n {
+                    let (verified, free, probe_hits, g) = run(&inst, targets, spec, s);
+                    assert!(verified, "{label} {spec} s={s}: planted log not recovered");
+                    ok += 1;
+                    rows += free;
+                    hits += probe_hits;
+                    grown += u64::from(g > 0);
+                    no_row += u64::from(free == 0);
+                    // With a free row two hits pin the log; without, three.
+                    assert!(
+                        probe_hits >= if free > 0 { 2 } else { 3 },
+                        "{label} {spec} s={s}: {probe_hits} hits with {free} free rows"
+                    );
+                }
+                eprintln!(
+                    "{label} {spec}: recovered {ok}/{n}, runs without a free row {no_row}, \
+                     free rows {rows}, mean hits {:.2}, runs that grew {grown}",
+                    hits as f64 / n as f64
+                );
+                assert_eq!(ok, n);
+                if spec.contains("grow") {
+                    assert!(grown > 0, "{label}: growth never exercised");
+                } else if spec.contains("0.6") {
+                    assert!(no_row > 0, "{label}: the no-free-row path never exercised");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn wwalk_free_row_fraction_against_the_proposal() {
+        use crate::cryptanalysis::ic_boundary::WalkTable;
+        let inst = instance();
+        let g = &inst.curve;
+        let mut cap_ops = GroupOps::default();
+        let fb = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(
+                &ctx(&inst, inst.generator_point()),
+                &base_params(32),
+                &mut cap_ops,
+            )
+            .unwrap();
+        for x in [0.6f64, 1.2] {
+            let (mut bases, mut with_row, mut rows) = (0u64, 0u64, 0u64);
+            for s in 0..300u64 {
+                // The same two seeds, another walk (jumps and steps) each time.
+                let t = WalkTable::build(g, &fb, inst.r, x, 16, false, s).unwrap();
+                bases += 1;
+                with_row += u64::from(!t.rows.is_empty());
+                rows += t.rows.len() as u64;
+                // Every row holds as a group equation: recompute the
+                // collision from scratch is done inside `build`; here, the
+                // count must agree with the verified collisions.
+                assert_eq!(t.rows.len() as u64 + t.zero_rows, t.verified_collisions);
+            }
+            let pred = 1.0 - (-x * x).exp();
+            // The grown walk from the same x0: how far it goes to a row.
+            let (mut g_rows, mut g_steps) = (0u64, 0u64);
+            for s in 0..300u64 {
+                let t = WalkTable::build(g, &fb, inst.r, x, 16, true, s).unwrap();
+                g_rows += u64::from(!t.rows.is_empty());
+                g_steps += t.steps;
+            }
+            eprintln!(
+                "x0={x} grow: fraction with a row {:.3} (cap 2x0), mean steps/T0 {:.3}",
+                g_rows as f64 / 300.0,
+                g_steps as f64 / 300.0 / (x * (inst.r as f64).sqrt()).round()
+            );
+            eprintln!(
+                "x={x}: walks {bases} over one seed pair, fraction with a verified free row {:.3} (prediction 1-exp(-x^2) = {pred:.3}), mean rows {:.3} (x^2 = {:.3})",
+                with_row as f64 / bases as f64,
+                rows as f64 / bases as f64,
+                x * x
+            );
+        }
     }
 }
