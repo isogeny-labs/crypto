@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0723Z-c25519-autolab-r21-k20",
+  "latest_record": "20261104T0750Z-c25519-autolab-r22-k32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 18,
+    "measured": 19,
     "open": 0
   },
   "repo": "crypto",
@@ -280,11 +280,11 @@
     {
       "better": "lower",
       "first": 24.137681139442055,
-      "latest": 2.936903215236922,
+      "latest": 2.5189790595227413,
       "latest_derived": {
-        "improvement_vs_first_percent": 87.8327,
-        "improvement_vs_previous_percent": 65.1595,
-        "value_over_reference": 3.126654
+        "improvement_vs_first_percent": 89.5641,
+        "improvement_vs_previous_percent": 14.2301,
+        "value_over_reference": 2.745313
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -350,6 +350,22 @@
           "spread": null,
           "summary": "ic_autolab round 19, k = 32: wsum coefficient box (C = 3, B = 20) S(w=0) 2.936903215236922 vs incumbent 8.384363645806141, matched rho 0.9393117698553943",
           "value": 2.936903215236922
+        },
+        {
+          "commit": "15ae5647cbdf",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 89.5641,
+            "improvement_vs_previous_percent": 14.2301,
+            "value_over_reference": 2.745313
+          },
+          "n": 64,
+          "record": "20261104T0750Z-c25519-autolab-r22-k32",
+          "reference": 0.9175561819562819,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 22, k = 32: C = 2 box (B = 120) S(w=0) 2.5189790595227413 vs incumbent 3.0057008281760855, matched rho 0.9175561819562819; at the BSGS boundary, classification pending",
+          "value": 2.5189790595227413
         }
       ],
       "problem": "ic:curve25519-family-k32",
