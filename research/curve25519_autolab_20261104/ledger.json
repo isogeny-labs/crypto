@@ -1,0 +1,647 @@
+{
+  "created": "2026-11-04T01:43:20Z",
+  "exposures": [
+    {
+      "size": 20,
+      "source": "research/curve25519_ic_baseline_20261102 (k20)",
+      "target_seed": 2026110221,
+      "targets": 24
+    },
+    {
+      "size": 24,
+      "source": "research/curve25519_ic_baseline_20261102 (k24)",
+      "target_seed": 2026110225,
+      "targets": 24
+    },
+    {
+      "size": 28,
+      "source": "research/curve25519_ic_baseline_20261102 (k28)",
+      "target_seed": 2026110229,
+      "targets": 24
+    },
+    {
+      "size": 32,
+      "source": "research/curve25519_ic_baseline_20261102 (k32)",
+      "target_seed": 2026110233,
+      "targets": 24
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_ic_ratchet_20261102 (pkm smoke)",
+      "target_seed": 2026110231,
+      "targets": 1
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_isogeny_seed_20261103 (T5) and curve25519_algebraic_ecbench_20261102",
+      "target_seed": 2026110340,
+      "targets": 6
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_ic_ratchet_20261102 (train k20)",
+      "target_seed": 2026110420,
+      "targets": 16
+    },
+    {
+      "size": 24,
+      "source": "research/curve25519_ic_ratchet_20261102 (train k24)",
+      "target_seed": 2026110424,
+      "targets": 16
+    },
+    {
+      "size": 28,
+      "source": "research/curve25519_ic_ratchet_20261102 (train k28)",
+      "target_seed": 2026110428,
+      "targets": 16
+    },
+    {
+      "size": 32,
+      "source": "research/curve25519_ic_ratchet_20261102 (train k32)",
+      "target_seed": 2026110432,
+      "targets": 16
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_ic_ratchet_20261102 (holdout k20)",
+      "target_seed": 2026110520,
+      "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "research/curve25519_ic_ratchet_20261102 (holdout k24)",
+      "target_seed": 2026110524,
+      "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "research/curve25519_ic_ratchet_20261102 (holdout k28)",
+      "target_seed": 2026110528,
+      "targets": 32
+    },
+    {
+      "size": 32,
+      "source": "research/curve25519_ic_ratchet_20261102 (holdout k32)",
+      "target_seed": 2026110532,
+      "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_ic_ratchet_20261102 (pkm-smoke-k20)",
+      "target_seed": 2026110620,
+      "targets": 1
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_algebraic_ladder_20261102 (smoke-k20)",
+      "target_seed": 2026110799,
+      "targets": 1
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_algebraic_ladder_20261102 (e2e-bits-t3-g2-k20)",
+      "target_seed": 2026110900,
+      "targets": 1
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_m3_generic_20261102 (train k20)",
+      "target_seed": 2026111020,
+      "targets": 16
+    },
+    {
+      "size": 24,
+      "source": "research/curve25519_m3_generic_20261102 (train k24)",
+      "target_seed": 2026111024,
+      "targets": 16
+    },
+    {
+      "size": 28,
+      "source": "research/curve25519_m3_generic_20261102 (train k28)",
+      "target_seed": 2026111028,
+      "targets": 16
+    },
+    {
+      "size": 20,
+      "source": "research/curve25519_m3_generic_20261102 (holdout k20)",
+      "target_seed": 2026111120,
+      "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "research/curve25519_m3_generic_20261102 (holdout k24)",
+      "target_seed": 2026111124,
+      "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "research/curve25519_m3_generic_20261102 (holdout k28)",
+      "target_seed": 2026111128,
+      "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-001/train",
+      "target_seed": 2026111420,
+      "targets": 16
+    },
+    {
+      "size": 24,
+      "source": "round-001/train",
+      "target_seed": 2026111424,
+      "targets": 16
+    }
+  ],
+  "family": "curve25519",
+  "history": [],
+  "notes": [
+    "Seeded 2026-11-04 from the frozen Curve25519-family studies; every value below is copied from a committed README or session record and names its source.",
+    "Incumbents are the best verified arm per track and size under the success criterion (AGENTS.md); none has passed the validation gate, so none is a leaderboard or benchmarks row.",
+    "Generic track k = 20, 24: ksum:m=3 on the projected base, the m = 3 study's holdout improvement (0.758 [0.716, 0.802] and 0.596 [0.575, 0.619] at w = 0, band sel < inc). k = 28, 32: the baseline study's proj-a mitm (the m = 3 arm was null at k = 28; k = 32 was never screened at m = 3).",
+    "Algebraic track k = 20: the PKM isogeny tower with the J-selected seed 1093 (T4/T5), the cheapest algebraic arm in every measured cell; band s1093 < seed 0 at every weight, paired interval includes 1.",
+    "Exposures list every ecbench target_seed used on this family so far (baseline, ratchet round 1, m = 3, algebraic ecbench, isogeny seed T5, frame and torsion leads), so a round never reuses a target seed."
+  ],
+  "rounds": [
+    {
+      "dir": "round-001",
+      "round": 1,
+      "sizes": [
+        20,
+        24
+      ],
+      "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-002",
+      "round": 2,
+      "sizes": [
+        20,
+        24
+      ],
+      "status": "frozen",
+      "track": "generic"
+    }
+  ],
+  "schema": "ic_autolab.ledger/v1",
+  "sizes": {
+    "20": {
+      "curve": {
+        "a": 63700,
+        "b": 872826,
+        "group_order": 1049624,
+        "gx": 349837,
+        "gy": 122,
+        "kind": "prime_explicit",
+        "p": 1048573,
+        "r": 131203
+      },
+      "k": 20,
+      "log2_r": 17.00144118246934,
+      "n_a": 32,
+      "r": 131203
+    },
+    "24": {
+      "curve": {
+        "a": 16743506,
+        "b": 2381926,
+        "group_order": 16778792,
+        "gx": 109,
+        "gy": 3123379,
+        "kind": "prime_explicit",
+        "p": 16777213,
+        "r": 2097349
+      },
+      "k": 24,
+      "log2_r": 21.000135515964004,
+      "n_a": 81,
+      "r": 2097349
+    },
+    "28": {
+      "curve": {
+        "a": 169487139,
+        "b": 71222779,
+        "group_order": 268462472,
+        "gx": 178958571,
+        "gy": 19523146,
+        "kind": "prime_explicit",
+        "p": 268435157,
+        "r": 33557809
+      },
+      "k": 28,
+      "log2_r": 25.000145189047025,
+      "n_a": 203,
+      "r": 33557809
+    },
+    "32": {
+      "curve": {
+        "a": 1173263412,
+        "b": 337904346,
+        "group_order": 4295077112,
+        "gx": 1431665017,
+        "gy": 592057774,
+        "kind": "prime_explicit",
+        "p": 4294967197,
+        "r": 536884639
+      },
+      "k": 32,
+      "log2_r": 29.00003688711981,
+      "n_a": 512,
+      "r": 536884639
+    }
+  },
+  "tracks": {
+    "algebraic": {
+      "20": {
+        "arm": {
+          "factor_base": "prime-isogeny:t=6,seed=1093",
+          "family": "pkm-iso-g4",
+          "n": 6,
+          "name": "pkm-iso-t6-g4-s1093",
+          "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+        },
+        "evidence": {
+          "band_verdict": "pkm-iso-t6-g4-s1093 < pkm-iso-t6-g4 at every weight (6 targets; interval includes 1)",
+          "ci95_w0": [
+            0.57,
+            1.373
+          ],
+          "ci95_w0.1": [
+            0.379,
+            1.084
+          ],
+          "note": "S at w = 0.1 and 1 are 1.073e6 and 1.073e7 as published (three significant figures)",
+          "paired_ratio_w0": 0.885,
+          "paired_ratio_w0.1": 0.641,
+          "predecessor": "pkm-iso-t6-g4 seed 0 (research/curve25519_algebraic_ecbench_20261102)",
+          "session_id": "ECBS1h405f20219036",
+          "study": "research/curve25519_isogeny_seed_20261103 (T4/T5)",
+          "validation_gate": "none (development evidence)"
+        },
+        "rho_s": [
+          1.447,
+          1.547,
+          2.448
+        ],
+        "s": [
+          26.448,
+          1073000.0,
+          10730000.0
+        ],
+        "since_round": 0
+      }
+    },
+    "generic": {
+      "20": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+          "family": "ksum3",
+          "n": 11,
+          "name": "ksum3-n11",
+          "oracle": "ksum:m=3"
+        },
+        "evidence": {
+          "band_verdict": "sel < inc",
+          "ci95_w0": [
+            0.716,
+            0.802
+          ],
+          "paired_ratio_w0": 0.758,
+          "predecessor": "proj-a mitm:negation_folded=1 N=32 (research/curve25519_ic_baseline_20261102)",
+          "session_dir": "research/curve25519_m3_generic_20261102/sessions/holdout-k20",
+          "session_id": "ECBS1h1ef647e99682",
+          "study": "research/curve25519_m3_generic_20261102",
+          "validation_gate": "none (development evidence)"
+        },
+        "rho_s": [
+          1.578,
+          1.693,
+          2.724
+        ],
+        "s": [
+          8.987,
+          9.71,
+          16.217
+        ],
+        "since_round": 0
+      },
+      "24": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=20,scan_cap=320",
+          "family": "ksum3",
+          "n": 20,
+          "name": "ksum3-n20",
+          "oracle": "ksum:m=3"
+        },
+        "evidence": {
+          "band_verdict": "sel < inc",
+          "ci95_w0": [
+            0.575,
+            0.619
+          ],
+          "paired_ratio_w0": 0.596,
+          "predecessor": "proj-a mitm:negation_folded=1 N=81 (research/curve25519_ic_baseline_20261102)",
+          "session_dir": "research/curve25519_m3_generic_20261102/sessions/holdout-k24",
+          "session_id": "ECBS1h13b9b19d03f6",
+          "study": "research/curve25519_m3_generic_20261102",
+          "validation_gate": "none (development evidence)"
+        },
+        "rho_s": [
+          1.169,
+          1.275,
+          2.221
+        ],
+        "s": [
+          7.554,
+          8.173,
+          13.745
+        ],
+        "since_round": 0
+      },
+      "28": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=203,scan_cap=3248",
+          "family": "mitm2",
+          "n": 203,
+          "name": "mitm2-n203",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "evidence": {
+          "note": "ksum3-n51 was null at k = 28 (1.061 [1.033, 1.090] at w = 0, 0.672 at w = 1; band unresolved)",
+          "session_dir": "research/curve25519_m3_generic_20261102/sessions/holdout-k28",
+          "session_id": "ECBS1hafd22cf58f98",
+          "study": "research/curve25519_ic_baseline_20261102 (baseline arm proj-a); S from research/curve25519_m3_generic_20261102 holdout-k28 where it is the inc arm",
+          "validation_gate": "none (development evidence)"
+        },
+        "rho_s": [
+          0.965,
+          1.055,
+          1.864
+        ],
+        "s": [
+          16.057,
+          17.564,
+          31.13
+        ],
+        "since_round": 0
+      },
+      "32": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+          "family": "mitm2",
+          "n": 512,
+          "name": "mitm2-n512",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "evidence": {
+          "session_dir": "research/curve25519_ic_baseline_20261102/sessions/k32",
+          "session_id": "ECBS1h1c4978d3e652",
+          "study": "research/curve25519_ic_baseline_20261102 (baseline arm proj-a, chosen in sample among four recipes)",
+          "validation_gate": "none (development evidence)"
+        },
+        "rho_s": [
+          0.944,
+          1.037,
+          1.871
+        ],
+        "s": [
+          23.31,
+          25.52,
+          45.41
+        ],
+        "since_round": 0
+      }
+    }
+  },
+  "trials": [
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=15,scan_cap=240",
+        "family": "ksum3",
+        "n": 15,
+        "name": "ksum3-n15",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        10.551784228623688,
+        10.993108424027852,
+        14.965026182665326
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+        "family": "ksum3",
+        "n": 8,
+        "name": "ksum3-n8",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        12.69706464519325,
+        14.226178700661716,
+        27.988205199877914
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=6,scan_cap=96",
+        "family": "ksum3",
+        "n": 6,
+        "name": "ksum3-n6",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        23.251437083118677,
+        26.893668740900406,
+        59.67375366093596
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+        "family": "ksum3",
+        "n": 22,
+        "name": "ksum3-n22",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        22.729481540600954,
+        23.086585405326474,
+        26.30052018785613
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+        "family": "mitm2",
+        "n": 32,
+        "name": "mitm2-n32",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "round": 1,
+      "s": [
+        11.170021157166177,
+        11.971882908302833,
+        19.188638668532743
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+        "family": "mitm3",
+        "n": 16,
+        "name": "mitm3-n16",
+        "oracle": "mitm:m=3,negation_folded=1"
+      },
+      "round": 1,
+      "s": [
+        36.2273381437528,
+        39.56005447850369,
+        69.55450149126165
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=28,scan_cap=448",
+        "family": "ksum3",
+        "n": 28,
+        "name": "ksum3-n28",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        12.330199597272868,
+        12.699298561522058,
+        16.021189239764762
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=14,scan_cap=224",
+        "family": "ksum3",
+        "n": 14,
+        "name": "ksum3-n14",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        10.354804174760629,
+        11.90781549269694,
+        25.884917354123704
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=10,scan_cap=160",
+        "family": "ksum3",
+        "n": 10,
+        "name": "ksum3-n10",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        19.881438071016255,
+        23.47633147801325,
+        55.83037214098622
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=40,scan_cap=640",
+        "family": "ksum3",
+        "n": 40,
+        "name": "ksum3-n40",
+        "oracle": "ksum:m=3"
+      },
+      "round": 1,
+      "s": [
+        30.596511421647644,
+        30.878723714624606,
+        33.41863435141722
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=81,scan_cap=1296",
+        "family": "mitm2",
+        "n": 81,
+        "name": "mitm2-n81",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "round": 1,
+      "s": [
+        12.815708489048866,
+        13.988844703155852,
+        24.547070630118736
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=41,scan_cap=656",
+        "family": "mitm3",
+        "n": 41,
+        "name": "mitm3-n41",
+        "oracle": "mitm:m=3,negation_folded=1"
+      },
+      "round": 1,
+      "s": [
+        51.9954992411449,
+        57.06562328379839,
+        102.69673966767982
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    }
+  ],
+  "updated": "2026-11-04T02:11:15Z"
+}
