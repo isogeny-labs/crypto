@@ -15,9 +15,9 @@ Y), written before their runs · analysis
 #link("report.pdf")[`report.pdf`]
 
 #strong[Standing:] every result below is an unverified assertion
-\[pcc:unverified\]. The statement claims are PCC-20261104-a3748e (test
-H), PCC-20261104-ff49ef (test L), PCC-20261104-34eb1e (test Y) and
-PCC-20261104-1f5a1d (the derivation). None has a signed verdict.
+\[pcc:unverified\]. The statement claims are PCC-20261104-3d6b6c (test
+H), PCC-20261104-785e08 (test L), PCC-20261104-5d4597 (test Y) and
+PCC-20261104-e899a0 (the derivation). None has a signed verdict.
 
 #strong[Class: derived bounds plus stage diagnostics.] No pipeline is
 priced and no leaderboard row changes. Engine: msolve 0.6.5, p \=

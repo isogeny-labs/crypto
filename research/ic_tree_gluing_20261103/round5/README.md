@@ -8,7 +8,7 @@ written before their runs · analysis [`SOLVERS.md`](SOLVERS.md) · generator
 [`rows.tsv`](rows.tsv) · graph [`round5.svg`](round5.svg) · PDF
 [`report.pdf`](report.pdf)
 
-**Standing:** every result below is an unverified assertion [pcc:unverified]. The statement claims are PCC-20261104-a3748e (test H), PCC-20261104-ff49ef (test L), PCC-20261104-34eb1e (test Y) and PCC-20261104-1f5a1d (the derivation). None has a signed verdict.
+**Standing:** every result below is an unverified assertion [pcc:unverified]. The statement claims are PCC-20261104-3d6b6c (test H), PCC-20261104-785e08 (test L), PCC-20261104-5d4597 (test Y) and PCC-20261104-e899a0 (the derivation). None has a signed verdict.
 
 **Class: derived bounds plus stage diagnostics.** No pipeline is priced and no
 leaderboard row changes. Engine: msolve 0.6.5, p = 786433, target k = 0.
