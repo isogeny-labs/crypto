@@ -589,13 +589,42 @@ struct Proposal {
     reason: String,
 }
 
+/// Least-squares fit of ln N on log2 r over the sizes (other than `k`) where
+/// `family` is the incumbent: `(intercept, slope, points)`, when there are at
+/// least two such sizes.
+fn family_fit(ledger: &Ledger, track: &str, family: &str, k: u32) -> Option<(f64, f64, usize)> {
+    let pts: Vec<(f64, f64)> = ledger
+        .tracks
+        .get(track)?
+        .iter()
+        .filter_map(|(k2, inc)| {
+            let k2: u32 = k2.parse().ok()?;
+            (k2 != k && inc.arm.family == family)
+                .then(|| Some((ledger.size(k2).ok()?.log2_r, (inc.arm.n as f64).ln())))?
+        })
+        .collect();
+    if pts.len() < 2 {
+        return None;
+    }
+    let n = pts.len() as f64;
+    let mx = pts.iter().map(|p| p.0).sum::<f64>() / n;
+    let my = pts.iter().map(|p| p.1).sum::<f64>() / n;
+    let sxx: f64 = pts.iter().map(|p| (p.0 - mx).powi(2)).sum();
+    if sxx == 0.0 {
+        return None;
+    }
+    let b = pts.iter().map(|p| (p.0 - mx) * (p.1 - my)).sum::<f64>() / sxx;
+    Some((my - b * mx, b, pts.len()))
+}
+
 /// Candidate arms for one size. Order of priority, each skipping anything
 /// already tried at this size (the ledger's trials and the incumbent):
 ///
 /// 1. the incumbent family's base-size neighbourhood, nearest factors first;
 /// 2. cross-size transfer: the incumbent family of every other size (nearest
-///    in log2 r first), when it differs from this size's, at the same
-///    scale-relative base size N / N_a and its grid neighbours (a winner at
+///    in log2 r first), when it differs from this size's, at N extrapolated
+///    along the family's own incumbents when it holds two or more sizes,
+///    else at the same N / N_a, and its grid neighbours (a winner at
 ///    one size is a hypothesis at the next; the knob is scale-relative, as in
 ///    `ic sweep`);
 /// 3. refinement of alternatives: families already tried at this size whose
@@ -658,15 +687,26 @@ fn propose_size(
             };
             let n_a2 = ledger.size(k2)?.n_a as f64;
             let frac = inc2.arm.n as f64 / n_a2;
-            let n0 = (frac * size.n_a as f64).round().max(1.0) as u64;
-            push(
-                tf.arm(fam, n0),
-                format!(
-                    "cross-size transfer: {} is the k = {k2} incumbent at N / N_a = {frac:.3}",
-                    inc2.arm.name
+            // With the family incumbent at two or more sizes, extrapolate N
+            // along its own incumbents (least squares of ln N on log2 r);
+            // otherwise hold N / N_a fixed.
+            let (n0, why) = match family_fit(ledger, track, &inc2.arm.family, k) {
+                Some((a, b, pts)) => (
+                    (a + b * size.log2_r).exp().round().max(1.0) as u64,
+                    format!(
+                        "cross-size transfer: {} is incumbent at {pts} sizes; ln N fitted on log2 r (slope {b:.3}) and extrapolated",
+                        inc2.arm.family
+                    ),
                 ),
-                &mut out,
-            );
+                None => (
+                    (frac * size.n_a as f64).round().max(1.0) as u64,
+                    format!(
+                        "cross-size transfer: {} is the k = {k2} incumbent at N / N_a = {frac:.3}",
+                        inc2.arm.name
+                    ),
+                ),
+            };
+            push(tf.arm(fam, n0), why, &mut out);
             for f in &grid {
                 let n = ((n0 as f64) * f).round() as u64;
                 push(
@@ -3059,6 +3099,67 @@ mod tests {
         let i = names.iter().position(|n| *n == "ksum4-n7").unwrap();
         let j = names.iter().position(|n| n.starts_with("mitm2")).unwrap();
         assert!(i < j, "transfer comes before exploration: {names:?}");
+    }
+
+    #[test]
+    fn a_family_incumbent_at_two_sizes_extrapolates_n_by_its_own_fit() {
+        let mut l = ledger();
+        let tf = families();
+        for (k, r, l2, na, n) in [
+            (24u32, 2097349u64, 21.0, 81u64, 12u64),
+            (28, 33557809, 25.0, 203, 21),
+        ] {
+            l.sizes.insert(
+                k.to_string(),
+                SizeInfo {
+                    k,
+                    r,
+                    log2_r: l2,
+                    n_a: na,
+                    curve: json!({}),
+                },
+            );
+            l.tracks.get_mut("generic").unwrap().insert(
+                k.to_string(),
+                Incumbent {
+                    arm: tf.arm(tf.family("ksum4").unwrap(), n),
+                    s: [1.0; 3],
+                    rho_s: [1.0; 3],
+                    evidence: json!({}),
+                    since_round: 2,
+                },
+            );
+        }
+        l.sizes.insert(
+            "32".into(),
+            SizeInfo {
+                k: 32,
+                r: 536884639,
+                log2_r: 29.0,
+                n_a: 512,
+                curve: json!({}),
+            },
+        );
+        l.tracks.get_mut("generic").unwrap().insert(
+            "32".into(),
+            Incumbent {
+                arm: tf.arm(tf.family("mitm2").unwrap(), 512),
+                s: [24.0; 3],
+                rho_s: [1.0; 3],
+                evidence: json!({}),
+                since_round: 0,
+            },
+        );
+        let (a, b, pts) = family_fit(&l, "generic", "ksum4", 32).unwrap();
+        assert_eq!(pts, 2);
+        let n32 = (a + b * 29.0).exp().round() as u64;
+        assert_eq!(n32, 37, "12 at 21 bits, 21 at 25 bits -> 37 at 29 bits");
+        let p = propose_size(&l, &tf, "generic", 32, 12, 0).unwrap();
+        assert!(
+            p.iter().any(|x| x.arm.name == "ksum4-n37"),
+            "{:?}",
+            p.iter().map(|x| x.arm.name.clone()).collect::<Vec<_>>()
+        );
     }
 
     #[test]
