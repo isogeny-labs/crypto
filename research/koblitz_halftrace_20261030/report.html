@@ -2,7 +2,7 @@
 <title>Native Koblitz cached lifting — implementation status</title>
 <style>@page{size:A4;margin:16mm}body{font:12px/1.5 sans-serif;color:#182332}h1{font-size:23px}h2{font-size:15px}img{width:100%}code{font-size:10px;overflow-wrap:anywhere}.status{padding:12px;background:#fff0dc}li{margin-bottom:5px}a{color:#165c7b}</style>
 <h1>Native Koblitz cached lifting</h1>
-<p>2026-10-30 · Engineering implementation candidate · Generic decomposition track</p>
+<p>Updated 2026-11-04 · Engineering implementation candidate · Generic decomposition track</p>
 <p class="status"><b>Measurement pending.</b> The native baseline was built before edits.
 The session's mandatory S3 checkpoint upload failed because no approved uploader
 is configured. Actions preparation run 41082358257 also failed because its upload
@@ -19,9 +19,16 @@ the generic field definition, check cache sharing and field separation, and test
 scope restoration. The existing point-order test includes generic coefficients.
 A native integration fixture compares two- and three-summand known-answer solves.
 The original full release suite completed with 5447 passes, zero failures and
-123 existing ignored tests; final-source filters and strict Clippy pass separately.
-Later main merges expose successive upstream syntax errors and are not validated by those
-older passes. Development elapsed times are not performance measurements.</p>
+123 existing ignored tests; the original feature's final-source filters and strict Clippy passed separately.
+Later parser failures remain retained under <code>development/</code>.
+External merge507829726f repairs the parser; fresh locked cache12/12 and
+ordered-lift1/1 rechecks pass. E2E and full-library rechecks are pending.
+Two resource-publication failures reproduce on this host, which lacks required
+Linux time-namespace interfaces; the full suite is not passing.
+Its CI library Clippy and size passed;
+gate/artifacts failed. A narrow checkout-path repair addresses the artifact
+wiring mismatch without adding credentials. Development elapsed times are not
+performance measurements.</p>
 <h2>Frozen measurement and limits</h2>
 <p>The spec uses eight independent one-target workloads on the existing registered
 degree-31 Koblitz curve, matched baseline/candidate bases and strong-rho and IC

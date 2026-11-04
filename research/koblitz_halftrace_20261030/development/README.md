@@ -41,6 +41,23 @@ and E2E rechecks did not run after that compile failure. See the new immutable
 [receipt](recheck-20261030T1641Z/receipt.json), exact gzip compiler log and source
 hashes; older failure logs and passing results remain unchanged.
 
+The 4 November recheck uses the already-published external merge507829726f.
+That source repairs the parser failure and retains the cache implementation.
+Native cache12/12 and ordered-lift1/1 rechecks pass; E2E and full-library rechecks
+remain pending. No old pass is substituted for their results.
+See [the new follow-up](recheck-20261104T1548Z/).
+Two full-suite resource-publication tests failed and reproduce separately
+(two passes/two failures in that module) because this host lacks the Linux
+time-namespace interfaces required by the upstream diagnostic clock. The
+source equals current main. The full parent result is still pending; no test
+was suppressed and no unrelated source fallback was added.
+The attributable artifact-wiring mismatch is repaired by an isolated metadata
+checkout path. A focused administrative check uses the existing generator and
+the three store paths named by CI; it reproduces the published-head mismatch,
+and the upstream and repaired workflow match the generator. This is not a full
+artifact-store admission. Full-store discovery attempts were interrupted while
+hydrating unrelated promisor manifests. Actionlint passes on the repair.
+
 Earlier development attempts are retained, including sparse-checkout omissions
 and the first Clippy failure. Tracked fixture files were restored from the
 baseline commit; no tests were disabled or rewritten. Full-tree cargo fmt finds

@@ -34,7 +34,16 @@ recheck failed on an unclosed delimiter in binary_semaev_chain_sat.rs, identical
 to upstream; ordered/E2E rechecks were not attempted after compilation failed.
 Separate receipt and source hashes are in development/recheck-20261030T1641Z/.
 No unrelated fix or test suppression was applied. No scientific run has
-started, and no speedup is claimed. Auto-merge is paused for the unresolved P1
+started, and no speedup is claimed. On 4 November, fast-forwarded to the external
+merge507829726fbc731543f4527348b55c5e479242c9. That source contains the upstream
+parser repair; fresh cache12/12 and ordered-lift1/1 rechecks pass. E2E and the
+full-library recheck remain pending.
+The full suite has two reproduced resource-publication failures: this host lacks
+/proc/self/ns/time and /proc/self/timens_offsets required by the diagnostic
+clock. Its source equals current main; no test was disabled or source patched.
+The parent suite is still running and must not be called passing. Original
+results remain historical. Source-bound follow-up: development/recheck-20261104T1548Z/.
+Auto-merge was found re-enabled externally and paused again for the unresolved P1
 requirement to retain a matched native comparison. Local checkpoint transport
 has no credentials. Checkpoint-only Actions run41082358257 at preparation
 source1e6c9a434058f274ddb559c72a81bc279ec3f1cf failed because its approved upload
@@ -53,8 +62,14 @@ Update this PR's report, request resolution of the P1 only with actual evidence,
 and verify current-head gate/size/artifacts checks before merge.
 
 ## Runs in flight
-None. The preparation is terminal failed. No scientific EKS request, Job UID,
-data export or result receipt exists. Local development checks have finished;
+No scientific run. The preparation is terminal failed. No scientific EKS request,
+Job UID, data export or result receipt exists. Native development rechecks on
+source507829726f: cache/ordered completed; E2E in progress in exec session73044, logs
+/tmp/crypto-halftrace-nov4-{cached,ordered,e2e}.log; full release library exec
+session34529, /tmp/crypto-halftrace-nov4-full-library-attempt2.log and exit status
+/tmp/crypto-halftrace-nov4/full-library-attempt2.exit. A first detached driver
+exited without a result and was retained separately, not counted as a completed
+suite. Collect only an actual parent suite summary as the final result. The
 complete original suite is /tmp/crypto-native-lib-tests-final.log. Later failed
 checks are /tmp/crypto-halftrace-followup-*.log. The two raw development archives
 are ignored locally pending authorized artifact-store upload, with separate hashes.

@@ -72,12 +72,15 @@ jobs:
         with:
           ref: ${{ inputs.source_revision }}
           persist-credentials: false
+          # Metadata-only source; this checkout reads no artifact-store payloads.
+          path: checkpoint-source
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /scripts/
             /${{ steps.request.outputs.study_dir }}/
       - name: Upload the source-pinned resume checkpoint
         shell: bash
+        working-directory: ${{ github.workspace }}/checkpoint-source
         env:
           CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
           STUDY_DIR: ${{ steps.request.outputs.study_dir }}

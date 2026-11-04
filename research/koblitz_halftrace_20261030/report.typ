@@ -1,8 +1,8 @@
-#set page(paper: "a4", margin: 16mm)
-#set text(size: 9.5pt, font: "DejaVu Sans")
+#set page(paper: "a4", margin: 15mm)
+#set text(size: 9.2pt, font: "DejaVu Sans")
 #set heading(numbering: none)
 = Native Koblitz cached lifting
-2026-10-30 · Engineering implementation candidate · Generic decomposition track
+Updated 2026-11-04 · Engineering implementation candidate · Generic decomposition track
 
 #block(fill: rgb("fff0dc"), inset: 10pt, radius: 4pt)[
   *Measurement blocked.* Local checkpoint upload lacks an approved uploader.
@@ -10,7 +10,7 @@
   All build/experiment jobs were skipped. No native speed ratio is claimed.
 ]
 
-#image("pipeline.svg", width: 100%)
+#image("pipeline.svg", width: 94%)
 
 == Implementation
 Lazy, curve-local byte tables evaluate the existing odd-degree halftrace. The
@@ -21,11 +21,16 @@ tables are shared by clones. No field-wide table or new Python path is introduce
 
 == Verification and accounting
 The original release suite completed: *5447 passed, zero failed, 123 existing
-ignored*. Final-source cached/ordered tests, both native E2E examples and strict
-library Clippy pass separately. The suite predates only the documented parity
-lint cleanup. Later main merges preserve the cache but expose successive upstream
-parser errors; the latest is in binary_semaev_chain_sat.rs. Exact source
-scope and failures are retained under `development/`. Test times are not benchmarks.
+ignored*. The original feature's final-source cached/ordered tests, both native
+E2E examples and strict library Clippy passed separately. The suite predates the parity
+lint cleanup. Later parser failures remain retained under `development/`.
+External merge507829726f repairs the parser; fresh locked cache12/12 and
+ordered-lift1/1 rechecks pass. E2E and full-library rechecks are pending.
+Two resource-publication failures reproduce on this host, which lacks required
+Linux time-namespace interfaces; the full suite is not passing.
+Its CI library Clippy passed, size passed,
+and gate/artifacts failed. A narrow checkout-path repair addresses the artifact
+wiring mismatch without adding credentials. Test times are not benchmarks.
 
 The frozen comparison has eight independent one-target workloads, the same
 base and seed in both arms, strong-rho and IC A/A controls, six alternating

@@ -55,7 +55,7 @@ development checks; their elapsed times are not performance evidence.
 | --- | --- |
 | Existing Rust baseline and source identity | built before source edits; [BASELINE.txt](BASELINE.txt) |
 | Rust cache and factor-base integration | implemented; no Python execution path |
-| Native correctness and regression gates | original suite: 5,447 passed, zero failed, 123 existing ignored; final-source filters/E2E/Clippy pass; later merged-main checks hit a retained base syntax error |
+| Native correctness and regression gates | original suite: 5,447 passed, zero failed, 123 existing ignored; source507829726f cache tests12/12 and ordered-lift1/1 pass; E2E/full-library rechecks pending; earlier parser failures retained |
 | Prospective native comparison protocol | [protocol.json](protocol.json) frozen before data; canonical schema/hash and corrupted-hash negative check pass |
 | Source-resume checkpoint preparation | [failed Actions receipt](development/checkpoint-actions-receipt.json); no uploader secret; all experiment jobs skipped |
 | Matched native end-to-end measurement | not run; [access blocker](../../problems/native-koblitz-measurement-access.md) |
@@ -82,6 +82,20 @@ The 16:41 UTC upstream integration repaired the previously observed methods.rs
 error, then a fresh check found another upstream parse error in
 binary_semaev_chain_sat.rs. Its source-bound failure is retained separately;
 older passing checks are not presented as a pass of that merged source.
+
+On 4 November, fast-forwarded to the already-published external merge
+`507829726fbc731543f4527348b55c5e479242c9`. It contains the upstream parser
+repair and preserves the cache implementation and example. Fresh locked cache
+tests12/12 and ordered-lift1/1 pass. E2E and full-library rechecks remain pending.
+Current-head CI reports size success, gate failure on an unrelated
+benchmark-row disposition and artifacts failure on the checkpoint checkout's
+wiring. The narrow workflow repair gives the metadata-only checkout its own
+path and explicit working directory, without adding artifact credentials.
+The full suite has reported two resource-publication failures, reproduced in
+isolation: this development host lacks `/proc/self/ns/time` and
+`/proc/self/timens_offsets`, required by the unchanged upstream diagnostic
+clock. The suite is still running; it is not a passing current-source result.
+The source-bound follow-up is in [development/recheck-20261104T1548Z/](development/recheck-20261104T1548Z/).
 
 [Implementation and execution-status diagram](pipeline.svg).
 [Printable report](report.pdf), built from [report.typ](report.typ); an
