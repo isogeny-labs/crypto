@@ -2,9 +2,9 @@ digraph ecdlp_overview {
   graph [rankdir=LR, bgcolor="white", pad=0.2, nodesep=0.45, ranksep=0.8, fontname="DejaVu Sans", fontsize=16, labelloc=t, label="ECDLP hardness corpus — logical layers"];
   node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.10"];
   edge [fontname="DejaVu Sans", fontsize=9, color="#66788a", arrowsize=0.8];
-  "foundation" [label="Definitions, assumptions, reductions\\n141 claims", fillcolor="#e8eef5", color="#526575"];
+  "foundation" [label="Definitions, assumptions, reductions\\n145 claims", fillcolor="#e8eef5", color="#526575"];
   "generic" [label="Generic algorithms and model bounds\\n63 claims", fillcolor="#dff4e5", color="#526575"];
-  "algebraic" [label="Coordinate / index-calculus route\\n209 claims", fillcolor="#f4e8fb", color="#526575"];
+  "algebraic" [label="Coordinate / index-calculus route\\n210 claims", fillcolor="#f4e8fb", color="#526575"];
   "special" [label="Special-family and pairing attacks\\n68 claims", fillcolor="#fde2e2", color="#526575"];
   "quantum" [label="Quantum algorithms and resources\\n5 claims", fillcolor="#e6f1ff", color="#526575"];
   "evidence" [label="Measured repository evidence\\n24 claims", fillcolor="#ece7fb", color="#526575"];
@@ -18,10 +18,10 @@ digraph ecdlp_overview {
   "evidence" -> "generic" [label="1 typed edges"];
   "evidence" -> "open" [label="10 typed edges"];
   "evidence" -> "special" [label="4 typed edges"];
-  "foundation" -> "algebraic" [label="43 typed edges"];
+  "foundation" -> "algebraic" [label="47 typed edges"];
   "foundation" -> "evidence" [label="3 typed edges"];
   "foundation" -> "generic" [label="6 typed edges"];
-  "foundation" -> "open" [label="17 typed edges"];
+  "foundation" -> "open" [label="18 typed edges"];
   "foundation" -> "special" [label="33 typed edges"];
   "generic" -> "evidence" [label="1 typed edges"];
   "generic" -> "foundation" [label="34 typed edges"];

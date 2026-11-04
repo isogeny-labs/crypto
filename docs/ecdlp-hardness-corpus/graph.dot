@@ -82,6 +82,7 @@ digraph ecdlp_claims {
     "CLAIM-PA-SCHNORR-ANY-TWO" [label="CLAIM-PA-SCHNORR-ANY-TWO\\n'Any two accepting Schnorr-like transcripts reveal the witness'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "ASM-PA-FS-CHALLENGE-INDEPENDENCE" [label="ASM-PA-FS-CHALLENGE-INDEPENDENCE\\nFiat-Shamir-derived batching challenges act as independent uniform challenges", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
     "ASM-XEDNI-HAZARD-RECURRENCE" [label="ASM-XEDNI-HAZARD-RECURRENCE\\nAdaptive xedni trials satisfy a history-uniform conditional-hazard recurrence", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
+    "ASM-XEDNI-TRIAL-MARGINAL" [label="ASM-XEDNI-TRIAL-MARGINAL\\nEach adaptive xedni trial, as run, succeeds with marginal probability O(1/p)", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
   }
   subgraph cluster_bounds {
     label="Rigorous model bounds and structural theorems"; color="#cad5df"; style="rounded";
@@ -305,6 +306,10 @@ digraph ecdlp_claims {
     "CEX-PA-POLY-FUNCTION" [label="CEX-PA-POLY-FUNCTION\\nNonzero polynomial with zero function (Lean, sibling)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CEX-PA-SCHNORR-SAME-CHALLENGE" [label="CEX-PA-SCHNORR-SAME-CHALLENGE\\nSchnorr extraction countermodels: equal challenges; nonunit difference over ZMod 4", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-PA-SCHNORR-SS" [label="THM-PA-SCHNORR-SS\\nSchnorr special soundness under exact fork hypotheses (Lean, sibling)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-LEFT-KERNEL-RELATIONS" [label="THM-LEFT-KERNEL-RELATIONS\\nLeft-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-HAZARD-MARGINAL-SUFFICES" [label="THM-HAZARD-MARGINAL-SUFFICES\\nPer-trial marginal bounds give the linear waiting time (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-MARGINAL-IMPLIES-HAZARD" [label="CLAIM-MARGINAL-IMPLIES-HAZARD\\n'Per-trial success bounds give the conditional-hazard recurrence'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-HAZARD-SEPARATION" [label="CEX-HAZARD-SEPARATION\\nThree-point model: marginals <= 1/3, hazard recurrence fails (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -1528,7 +1533,7 @@ digraph ecdlp_claims {
   "GAP-PA-MODEL-BOUNDARIES" -> "CLAIM-GG-FKL-AGM-TO-GGM" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-PA-RHO-SEPARATION" -> "HEUR-RHO-RANDOM-MAPPING" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-PA-CURVE-SELECTION" -> "STANDARD-CURVE-EXCLUSIONS" [label="qualifies", color="#66788a", style="dashed"];
-  "ASM-XEDNI-HAZARD-RECURRENCE" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
+  "ASM-XEDNI-TRIAL-MARGINAL" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
   "GAP-PA-ONE-SHOT-REPEAT" -> "ASM-XEDNI-HAZARD-RECURRENCE" [label="qualifies", color="#66788a", style="dashed"];
   "CEX-PA-BATCH-ADAPTIVE" -> "COND-PA-FS-BATCH-SOUNDNESS" [label="enables", color="#66788a", style="solid"];
   "ASM-PA-FS-CHALLENGE-INDEPENDENCE" -> "COND-PA-FS-BATCH-SOUNDNESS" [label="conditions", color="#66788a", style="solid"];
@@ -1538,4 +1543,11 @@ digraph ecdlp_claims {
   "GAP-PA-PEDERSEN-RELATION" -> "PROB-ECDLP" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-PA-CONCRETE-MULTIUSER" -> "ALG-BK-MULTI-TARGET-AMORTIZED" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-PA-HASH-TO-CURVE" -> "DEF-SUBGROUP-COFACTOR" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-LEFT-KERNEL-RELATIONS" -> "HEUR-RELATION-RANK" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-LEFT-KERNEL-RELATIONS" -> "HEUR-BK-GG-RIGHT-KERNEL-RANK" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-LEFT-KERNEL-RELATIONS" -> "ALG-SPARSE-LINEAR-ALGEBRA" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-HAZARD-SEPARATION" -> "CLAIM-MARGINAL-IMPLIES-HAZARD" [label="refutes", color="#a33a3a", style="solid"];
+  "THM-HAZARD-MARGINAL-SUFFICES" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="enables", color="#66788a", style="solid"];
+  "THM-HAZARD-MARGINAL-SUFFICES" -> "ASM-XEDNI-HAZARD-RECURRENCE" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-HAZARD-SEPARATION" -> "GAP-PA-ONE-SHOT-REPEAT" [label="qualifies", color="#66788a", style="dashed"];
 }

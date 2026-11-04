@@ -7,26 +7,26 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 578,
-    "frontier": 367,
+    "nodes": 583,
+    "frontier": 372,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
       "definition": 43,
-      "assumed": 17,
+      "assumed": 18,
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 89,
       "measured": 24,
-      "proved_internal_unreviewed": 53,
+      "proved_internal_unreviewed": 56,
       "open": 68,
       "heuristic": 71,
-      "refuted": 25,
+      "refuted": 26,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 541,
-      "kernel_checked": 29,
+      "none": 543,
+      "kernel_checked": 32,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 4
@@ -111,6 +111,10 @@
         },
         {
           "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-LEFT-KERNEL-RELATIONS",
           "relation": "qualifies"
         }
       ]
@@ -1449,7 +1453,12 @@
       "research_targets": [
         "RT-BK-BOOK-INVENTORY"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-LEFT-KERNEL-RELATIONS",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "HEUR-GB-SEMIREG-ASSUMPTION",
@@ -1937,8 +1946,8 @@
       "pressure": []
     },
     {
-      "id": "ASM-XEDNI-HAZARD-RECURRENCE",
-      "label": "Adaptive xedni trials satisfy a history-uniform conditional-hazard recurrence",
+      "id": "ASM-XEDNI-TRIAL-MARGINAL",
+      "label": "Each adaptive xedni trial, as run, succeeds with marginal probability O(1/p)",
       "status": "assumed",
       "formal": "none",
       "action": "assumption: narrow its scope or reduce it to a weaker one",
@@ -1947,15 +1956,8 @@
         "OBSTRUCTION-XEDNI-HEIGHT"
       ],
       "depends_citations": [],
-      "research_targets": [
-        "RT-PA-XEDNI-HAZARD"
-      ],
-      "pressure": [
-        {
-          "from": "GAP-PA-ONE-SHOT-REPEAT",
-          "relation": "qualifies"
-        }
-      ]
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "STD-BK-SAFECURVES-RHO",
@@ -2378,6 +2380,20 @@
       "pressure": []
     },
     {
+      "id": "THM-HAZARD-MARGINAL-SUFFICES",
+      "label": "Per-trial marginal bounds give the linear waiting time (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "OBSTRUCTION-XEDNI-HEIGHT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "THM-PA-SCHNORR-SS",
       "label": "Schnorr special soundness under exact fork hypotheses (Lean, sibling)",
       "status": "proved_internal_unreviewed",
@@ -2677,6 +2693,23 @@
       "pressure": [
         {
           "from": "CEX-LEMMA4-REVERSE-R",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-MARGINAL-IMPLIES-HAZARD",
+      "label": "'Per-trial success bounds give the conditional-hazard recurrence'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-HAZARD-SEPARATION",
           "relation": "refutes"
         }
       ]
@@ -3414,7 +3447,12 @@
         "RT-PA-XEDNI-HAZARD",
         "RT-PA-PROTOCOL-QUEUE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-HAZARD-SEPARATION",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-PA-PEDERSEN-RELATION",
@@ -4181,6 +4219,29 @@
         },
         {
           "from": "GAP-MULTITARGET-NONUNIFORM",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "ASM-XEDNI-HAZARD-RECURRENCE",
+      "label": "Adaptive xedni trials satisfy a history-uniform conditional-hazard recurrence",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-XEDNI-HAZARD"
+      ],
+      "pressure": [
+        {
+          "from": "GAP-PA-ONE-SHOT-REPEAT",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-HAZARD-MARGINAL-SUFFICES",
           "relation": "qualifies"
         }
       ]
@@ -5360,6 +5421,18 @@
       "pressure": []
     },
     {
+      "id": "CEX-HAZARD-SEPARATION",
+      "label": "Three-point model: marginals <= 1/3, hazard recurrence fails (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-INSIDE-GAP-N1-FAMILY",
       "label": "n = 1: {X^k, X^k+1} has inside gap k - 1",
       "status": "proved_internal_unreviewed",
@@ -5889,6 +5962,18 @@
       "status": "proved_external_unread",
       "formal": "none",
       "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-LEFT-KERNEL-RELATIONS",
+      "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
       "depends_citations": [],
