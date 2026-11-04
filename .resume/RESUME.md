@@ -39,7 +39,9 @@ local route (`ic_autolab run --cpus auto --allow-busy`), `verify --replay 8`.
 3. Second-host replay of the k = 24 ratchet before any leaderboard mention; the algebraic track with `--train-targets 6`.
 
 ## Runs in flight
-None (round 3 complete: no challenger at k = 20 or 24).
+Round 4 (goal: keep running the loop toward rho parity): `ic_autolab loop --rounds 1 --track generic --sizes 28,32 --max-candidates 9 --cpus auto --allow-busy --replay 8`.
+Panel: mitm2 N-neighbourhood, ksum4 cross-size transfer (k28 N = 21/30/42, k32 N = 53/76/106), rootfind-subtract, subtract.
+If interrupted: `ic_autolab run --round 4 --stage train` adopts complete sessions; then select/run holdout/assess/ratchet/report.
 
 ## Stop and success conditions
 - Success: every step of round 1 runs end to end with every session verified; the classification and ledger update follow the frozen rule whatever the outcome (improvement, null or regression are all valid).
