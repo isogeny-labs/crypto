@@ -73,3 +73,39 @@ priced across the §5a band?
 - Conductor and the AWS CLI are absent, so the run is local with no S3
   checkpoint. A container restart kills in-flight runs; a killed session is
   re-run from scratch, never resumed or cited as partial.
+
+
+## Addendum C (frozen before any chunk data): restart-safe chunked sessions, 2026-11-04
+
+**Why.**
+- The container restarted at about 01:30Z and again at about 02:22Z. Each
+  restart killed the running ecbench session, and ecbench cannot resume a
+  session.
+- ecbench also serialises sessions through `/tmp/crypto-bench.lock`, so a
+  2–4 h session cannot finish within one container lifetime.
+- No killed session is cited.
+
+**Change** (only how the frozen design is executed; the arms, rounds, order,
+timeouts, curve, oracle and predictions are unchanged):
+- `scripts/chunked_run.py` splits the frozen `ecbench/spec.json` into chunks
+  of one target each (all arms, same rounds and order). Each chunk is a
+  complete, audit-valid session.
+- Chunk c uses `target_seed` = frozen base + c and measurement seed = frozen
+  base + c.
+- A complete chunk is skipped on re-launch. A killed chunk is moved to
+  `interrupted/` with its `session.json` renamed, and re-run from scratch.
+- `--allow-busy` is kept, because the host is shared. S is a counted unit,
+  and no wall-time claim is made.
+
+**Analysis on the pooled chunks:**
+- `ecbench band --dir <all chunk dirs> --ranks` at w = 0, 0.1 and 1.
+- The frozen paired ratios use `scripts/pooled_compare.py`. It implements the
+  ops interval of `ecbench compare`: per-workload totals over rounds, ratio of
+  sums, linearised t with df = K − 1.
+  - On the single complete T9 session it reproduces `ecbench compare` to 6
+    decimals for s1308/seed 0 and s1308/s1093 at w = 0, 0.1 and 1. That is
+    the positive control.
+- `ecbench verify --replay 1` on every chunk.
+
+**Decision rules:** the frozen predictions, decided on these pooled
+quantities.
