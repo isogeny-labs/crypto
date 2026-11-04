@@ -155,7 +155,7 @@ t "ledger: header table" grep -qF '| round | claim | goal status | claims verifi
 t "ledger: round 1 row" grep -qF '| 1 | Filter F halves the sieve cost | proof_verified | 1/2 | supported | continue | 0.12 |' "$led"
 t "ledger: round 2 row" grep -qF '| 2 | Run on EKS | needs_review | 0/0 | blocked | stop | 0.05 |' "$led"
 t "ledger: rounds in order" bash -c '[ "$(grep -n "^| 1 |" "$1" | cut -d: -f1)" -lt "$(grep -n "^| 2 |" "$1" | cut -d: -f1)" ]' _ "$led"
-t "ledger: goal from newest, pipe escaped" grep -qF 'Goal: Find a faster relation filter \| test' "$led"
+t "ledger: goal from newest, pipe escaped" grep -qF 'Goal, as given to the program [pcc:unverified]: Find a faster relation filter \| test' "$led"
 t "ledger: learned paragraph" grep -qF 'Filter works on the toy case.' "$led"
 log=$wb/docs/session-logs/$today.md
 t "session log: file header" grep -qxF "# Session log — $today" "$log"
@@ -176,6 +176,15 @@ t "rerun: session-log entry not duplicated" bash -c '[ "$(grep -cF "round 2: blo
 t "rerun: problem history appended" bash -c '[ "$(grep -c "write-back ran again" "$1")" -eq 1 ]' _ "$prob"
 rc=0; wbrun "$tmp/r3.json" >/dev/null 2>&1 || rc=$?
 t "writeback: minimal record does not break" test "$rc" -eq 0
+# The written prose must pass the repository's proof-carrying-claims lint
+# (AGENTS.md "Sabotage is assumed"): every paragraph with a strong-claim word
+# carries [pcc:unverified], because nothing a program writes is validated.
+pcc=$(git -C "$here" rev-parse --show-toplevel 2>/dev/null)/tools/pcc/pcc.py
+if [ -f "$pcc" ]; then
+  for f in "$led" "$log" "$prob"; do
+    t "pcc lint-prose: $(basename "$f")" bash -c 'python3 "$1" lint-prose --stdin <"$2"' _ "$pcc" "$f"
+  done
+fi
 
 # ---- make-tools-json -------------------------------------------------------
 rc=0; tj=$(DELPHI_TOOLS_ROOT=$real_root "$here/make-tools-json" 2>/dev/null) || rc=$?
