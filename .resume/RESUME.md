@@ -43,7 +43,7 @@ root-table parity point. Kill: K4 and K5 both supported.
 4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-Round 28 done (PCC-20261104-d87806): k = 20 ratchet to S 2.57 (1.76x rho); k = 32 stride-generator worse than walk (2.88 vs 2.43): investigate. Next: P2 walk-built table (code).
+Round 29 (k = 24, 28, 32; wsum2s targets=stride, avoiding stride-generator clone rows) running under benchrec record in scratchpad rec29, branch claude/curve25519-autolab-r29. PR #3406 merged.
 Panel: ksum4 at extrapolated N = 37 and neighbours 19/26/52/74; ksum3 transfer N = 176/246; mitm-prime-batch / blocked exploration.
 Branch claude/curve25519-ic-autolab-round4 (PR #3392). After it: add-raw, metric (incumbent S at k = 32, matched rho), close the record, claim, commit.
 
