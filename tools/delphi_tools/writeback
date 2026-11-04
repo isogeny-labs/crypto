@@ -8,7 +8,10 @@
 set -euo pipefail
 
 command -v jq >/dev/null || { echo "writeback: jq not on PATH" >&2; exit 3; }
-[ $# -eq 1 ] && [ -f "$1" ] || { echo "usage: writeback <round-record.json>" >&2; exit 2; }
+if [ $# -ne 1 ] || [ ! -f "$1" ]; then
+  echo "usage: writeback <round-record.json>" >&2
+  exit 2
+fi
 rec=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
 
 root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
