@@ -25,7 +25,8 @@ use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFami
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
     find_prime_order_curve, generic_floor_ops, koblitz_floor_instance, koblitz_instance,
-    random_binary_instance, rho_reference, rho_reference_negation, roster_prime_instance,
+    curve25519_family_instance, random_binary_instance, rho_reference, rho_reference_negation,
+    roster_prime_instance,
     signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps,
     PinOutcome, PrimeInstance, RhoResult,
 };
@@ -92,7 +93,9 @@ pub struct BenchArgs {
     /// roster's curve at that size; `j0`, `j1728`, `d7` and `d8` generate
     /// a CM curve of that family (order certified against the Cornacchia
     /// candidates, deterministic in `--seed`) so that `glv-orbit` has an
-    /// automorphism group to fold by.
+    /// automorphism group to fold by.  `curve25519` takes the committed
+    /// Curve25519-family miniature at that size (20, 24, 28, 32 bits):
+    /// `p ≡ 5 (mod 8)`, `#E = 8r`, `#E' = 4r'`, smallest Montgomery `A`.
     #[arg(long, default_value = "generic")]
     pub family: String,
     /// Binary-field instance of this field degree (random curve).
@@ -1005,15 +1008,26 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
                 ArchiveInstance::Binary(i) => Instance::Binary(*i),
             }
         }
-        "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
-            CmFamily::Generic => roster_prime_instance(degree)
-                .or_else(|| {
-                    (8..=32)
-                        .contains(&degree)
-                        .then(|| find_prime_order_curve(degree, args.seed))
-                })
-                .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
-            family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
+        "prime" => Instance::Prime(if args.family == "curve25519" {
+            // The Curve25519-family miniatures keep Curve25519's structure
+            // (p ≡ 5 mod 8, #E = 8r, #E' = 4r', smallest Montgomery A) at a
+            // field size the u64 engine can hold.
+            curve25519_family_instance(degree).ok_or_else(|| {
+                format!(
+                    "no Curve25519-family miniature at {degree} bits (the committed ones are 20, 24, 28, 32)"
+                )
+            })?
+        } else {
+            match CmFamily::parse(&args.family)? {
+                CmFamily::Generic => roster_prime_instance(degree)
+                    .or_else(|| {
+                        (8..=32)
+                            .contains(&degree)
+                            .then(|| find_prime_order_curve(degree, args.seed))
+                    })
+                    .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
+                family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
+            }
         }),
         "char2" => Instance::Binary(
             random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
