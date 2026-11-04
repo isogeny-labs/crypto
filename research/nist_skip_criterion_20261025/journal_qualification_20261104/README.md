@@ -74,7 +74,7 @@ make BUILD_DIR=/tmp/nist-journal-build test
 ```
 
 For distribution PARI development packages use `PARI_ROOT=/usr
-PARI_LDLIBS=-lpari`. The dedicated PR workflow installs the native libraries
+PARI_LDLIBS=-lpari`. The dedicated main/manual workflow installs the native libraries
 and runs only the bounded development controls. It has no cloud credentials.
 
 Interfaces (these lines do not launch anything):
@@ -116,3 +116,9 @@ has no proof kind. They are not admitted measurement or execution proofs.
 PCC's separate sabotage canary returned 56/56 expected classes. Rust library
 tests and native backlog validation exited 127 because their commands are
 absent locally; CI admission remains pending. [pcc:unverified]
+
+Publication note: the original MANIFEST.sha256 is the immutable receipt for
+commit 2432e77f9b4bdc8f5f7565650476a62b5ad733c6. The workflow trigger was then
+corrected to main push/manual dispatch under the current repository policy;
+CURRENT-MANIFEST.sha256 gives current file bindings. All native code and raw
+control bytes are unchanged. See PUBLICATION.md for PR and conflict state.

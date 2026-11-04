@@ -1,12 +1,13 @@
 name: NIST journal development controls
 on:
-  pull_request:
+  push:
     branches: [main]
     paths:
       - research/nist_skip_criterion_20261025/journal_qualification_20261104/**
       - research/nist_skip_criterion_20261025/random_curve_validation_20261029/sampler.cpp
       - research/nist_skip_criterion_20261025/strict_elkies_20261029/inputs.tsv
       - .github/workflows/nist-journal-development.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
