@@ -4,7 +4,8 @@
 [`koblitz_ic_new_leads_20261018`](../koblitz_ic_new_leads_20261018/README.md)
 are now built natively in Rust and measured under a protocol frozen before
 any run ([`PROTOCOL.md`](PROTOCOL.md)). Amendment 1 is post hoc.
-Amendments 2–5 were each frozen before the runs they govern.
+Amendments 2–7 were each frozen before the runs they govern. C1, the
+degree-5 cell, is measured on draws 0 and 3 (Amendment 7, 2026-11-04).
 
 The owner asked for every lead to be closed exhaustively, so the study does
 more than the one path built first:
@@ -43,24 +44,31 @@ or **reported**.
   - **Degree 4, measured in the same engine.** 1.3–2.8 GB resident
     against 1.9–4.2 GB for the full order.
   - **Degree 5 at C1 (m = 3, n = 19, ℓ = 7), derived.** About 73 GB.
-- **C1 itself is still unmeasured** (Amendments 2 and 4). The owner
-  approved four draws plus a control on RunPod, capped at $80. Three pods
-  ran:
-  - two never ran the job, because the repository is now private and the
-    pod could not fetch its boot script;
-  - the third verified its uploaded binary and started draw 0 at
-    06:51Z, then was deleted before any record was fetched.
-  - About $4 was spent on the first two pods and at most about $20 on the
-    third.
-  - **The fourth pod (Amendment 6, 2026-11-03, `runs/c1/`, measured).**
-    It ran draws 0 and 3 to completion of the attempt. On 64 vCPU and
-    512 GB, the dense engine aborted on both with an allocation failure
-    (exit 134) under the 471 GB address-space cap, after 6.5 and 6.1 min,
-    at 424 GB and 423 GB resident.
-    - The dense engine's 217 GB projection was low by more than 2×.
-    - Allocation failures are unmeasured, never evidence about the degree.
-    - That pod cost about $2.80. The degree-5 question at ℓ = 7 stays open,
-      and dense C1 needs more than 512 GB.
+- **C1 is measured: both draws refute at degree 5** (Amendment 7,
+  `runs/c1pe/`, measured). On m = 3 (19, 7), draws 0 and 3, the
+  incremental engine (`pe_closure`, partial, low-first, batch 64) found
+  `1` in the degree-5 closure. So the closure degree of each draw is 5.
+  - **Draw 0:** 607,530 of 760,099 columns (0.80) at refutation;
+    31,632 s; 52.6 GB peak resident.
+  - **Draw 3:** 606,973 columns (0.80); 31,888 s; 52.5 GB.
+  - **Host:** 32 vCPU AMD EPYC 9965, 128 GB, RunPod `cpu3g-32-128`.
+  - **Against the dense engine on the same draws:** it aborted at 424 GB
+    and 423 GB resident (Amendment 6). That is about 8× more memory than
+    the incremental engine's measured peak, at which the dense engine had
+    not finished.
+  - **Reading (§C1).** This supports the degree-5 rows of
+    `RESEARCH_ECC2K130_DESCENT_DEGREE.md` at ℓ = 7, on one cell (m = 3),
+    not m = 4. It does not change an IC cost row.
+  - **Not run:** draws 5 and 7 and the satisfiable control (the owner
+    chose draws 0 and 3, Amendment 6).
+  - **Cost:** C1 cost about $53 of the owner's $80 cap, across six pods.
+    Only the last measured. Of the others:
+    - two could not fetch from the private repository;
+    - one was lost at a zero balance;
+    - one ran the dense engine out of memory;
+    - one filled its 40 GB disk.
+  - **Storage:** records, logs, inputs and hourly snapshots are in
+    `s3://setec-astronomy-artifacts/research/koblitz_ic_leads_build_20261024/runs/`.
 - **L1, λ-coordinate bases, is closed in full.** Every identity holds on
   both Koblitz curves over four fields (b = 1). It also holds on three
   random b ≠ 1 per field over F_{2^11} and F_{2^13}, and for subspaces
@@ -209,7 +217,7 @@ restricted, batch 64, against the registered order (G1):
 Right: low-first, unrestricted (G1) against restricted, per draw. Source:
 `runs/a3o-*`, `a3b-*`, `a5r-*`, `g1-*.jsonl`.*
 
-**C1, the decisive degree-5 cell (Amendments 1, 2 and 4; unmeasured).**
+**C1, the decisive degree-5 cell (Amendments 1, 2, 4, 6 and 7; measured on draws 0 and 3).**
 
 - **Memory bound (derived).** The engine holds at most one row per column,
   plus one absorb chunk and one expansion batch. At degree 5 with 40
@@ -235,12 +243,38 @@ Right: low-first, unrestricted (G1) against restricted, per draw. Source:
      bytes failed` under the 471 GB `prlimit --as` cap. The peaks were
      424,485,864 KB and 422,759,320 KB resident after 389 s and 367 s
      (`runs/c1/`). That is more than 2× the 217 GB projection.
-- **Status.** C1 remains unmeasured. A capped, lost or out-of-memory run
-  is never evidence about the degree.
+  5. Amendment 7 moved C1 to `pe_closure` with resumable checkpoints.
+     Pod `r2ttfdddgd1zdp` lost draw 0 to a full 40 GB container disk
+     after 3,650 s (Amendment 7b). Pod `pq0fqgnznf39am` (`cpu3g-32-128`,
+     170 GB disk) ran draw 0 from 19:55:55Z and draw 3 from 04:43:09Z,
+     each from start without a resume, and both exited 0
+     (`runs/c1pe/queue.log`). Uploaded binary `8cc3e84d…`, draws
+     `a6bf7f15…` (`runs/c1pe/host.txt`).
+- **Result (measured).**
 
-**What L2 changes.** Nothing in the cost rows. As an instrument it lowers
-C1's memory requirement from the dense engine's projected 217 GB to about
-73 GB. On m = 4 (11, 5), MXL's restriction lowers the degree-4 peak
+  | draw | refuted at 5 | peak basis rows | fraction of 760,099 | expanded | products | word XORs | s | peak RSS |
+  |--:|:-:|--:|--:|--:|--:|--:|--:|--:|
+  | 0 | yes | 607,530 | 0.799 | 42,432 | 1,697,279 | 3.38·10^13 | 31,632 | 52.6 GB |
+  | 3 | yes | 606,973 | 0.799 | 42,368 | 1,694,718 | 3.37·10^13 | 31,888 | 52.5 GB |
+
+  - Both records say `saturated: true` and `capped: false`.
+  - The closure degree of draws 0 and 3 is 5 (§C1).
+  - As at degree 4, `1` enters only once the basis holds about 0.8 of
+    the column space, so the L2 falsifier (≥ 0.5) fires at degree 5 too.
+  - The measured peak, 52.6 GB, is below the derived 73 GB bound.
+
+![C1 degree 5](figures/c1_degree5.svg)
+
+*Figure 3. Left: peak resident memory of the dense engine (aborted) and the
+incremental engine (refuted) on the same draws. Right: draw 3's basis size
+from its checkpoints. The pod's progress file was first saved at 07:30Z, so
+the first segment has no interior points. Source: `runs/c1pe/`,
+`runs/c1/`.*
+
+
+**What L2 changes.** Nothing in the cost rows. As an instrument it made C1
+measurable. It refuted both draws at 52.6 GB peak, where the dense engine
+aborted at 424 GB, and its projection had been 217 GB. On m = 4 (11, 5), MXL's restriction lowers the degree-4 peak
 echelon by 1.7–2.0× more.
 
 ## 3. L1: λ-coordinate bases (verified)
@@ -308,7 +342,7 @@ echelon by 1.7–2.0× more.
 
 ![L3 root solves](figures/l3_root_solves.svg)
 
-*Figure 3. Mean root solves per target over four draws. Source:
+*Figure 4. Mean root solves per target over four draws. Source:
 `runs/l3-gluing.jsonl`, `runs/l3-gluing-a3.jsonl`.*
 
 ## 5. L4: proved solving-degree bounds (measured bound, closed)
@@ -354,7 +388,7 @@ echelon by 1.7–2.0× more.
 
 ![L4 bounds](figures/l4_bounds.svg)
 
-*Figure 4. Source: `runs/l4-bounds.jsonl`, `runs/l4-bounds-a3.jsonl`.*
+*Figure 5. Source: `runs/l4-bounds.jsonl`, `runs/l4-bounds-a3.jsonl`.*
 
 ## 6. Deviations and limits
 
@@ -370,9 +404,16 @@ echelon by 1.7–2.0× more.
   - finished records were committed unchanged;
   - empty partial records were deleted;
   - the runner resumed with the same binary (`runs/queue*.log`).
-- **C1 is unmeasured.** The third pod was deleted outside this session's
-  control before its records were fetched, at a cost of at most about
-  $24.50 in total. No C1 statement in this report rests on a run.
+- **C1 on two of the four registered draws.** The owner chose draws 0 and
+  3 (Amendment 6). The satisfiable control was dropped with Amendment 1,
+  so the degree-5 instrument has no positive control at this cell. The
+  degree-4 controls (`control-*.jsonl`) and the unit tests cover the
+  engine.
+- **Lost and failed C1 pods.** Three pods ran no measurement:
+  - one deleted at a zero balance before its record was fetched;
+  - two failed on a private-repository fetch.
+  One more lost draw 0 to a full disk (Amendment 7b). Each is reported,
+  and none is read as evidence about the degree.
 - **The Macaulay row cap.** The Amendment 3 runner first hit
   `koblitz_groebner`'s default 20,000-row Macaulay cap, which left four
   full-order runs unbuilt. Those records were deleted and rerun with the
@@ -398,15 +439,13 @@ echelon by 1.7–2.0× more.
 
 ## 7. Next step
 
-- **C1 is the one open measurement.** The open question is whether the
-  closure degree at m = 3, ℓ = 7 is 5. The dense engine needs more than
-  471 GB of address space, so the realistic route is the incremental
-  engine (`pe_closure`, at most about 73 GB). On a 64-core host its
-  word-XOR count suggests on the order of 13–50 h per draw. Run it with
-  the Amendment 4 uploader, fetching each record as it lands.
-- **The incremental engine at degree 5.** It fits in about 73 GB.
-  MXL's restriction may lower that further on m = 4, but not on m = 3.
-- **The lead as a whole.** L1–L4 are closed. None of them gives an IC
+- **C1 is measured on draws 0 and 3: degree 5 at m = 3, ℓ = 7.** The
+  remaining C1 draws (5 and 7) would each take about 9 h and about $12 on
+  the same host, with the same job (`pod/job_pe.sh`, `DRAWS="5 7"`).
+- **The incremental engine is the degree-5 instrument.** It refuted in
+  52.6 GB where the dense engine could not finish in 471 GB. The next
+  closure measurement at m = 4 or larger ℓ should start from it.
+- **The lead as a whole.** L1–L4 are closed, and C1 is measured. None of them gives an IC
   improvement, so the next index-calculus improvement has to come from a
   lead outside this set.
 
@@ -419,7 +458,7 @@ bash research/koblitz_ic_leads_build_20261024/run.sh OUTDIR       # G1, controls
 bash research/koblitz_ic_leads_build_20261024/run_a3.sh OUTDIR    # Amendment 3
 bash research/koblitz_ic_leads_build_20261024/run_a5.sh OUTDIR    # Amendment 5
 target/release/examples/koblitz_ic_leads_bench lambda|lambda-general|gluing|bounds|census
-python3 research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run ...   # C1 (Amendment 4)
+python3 research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --disk 170 ... pe_closure m3-19-7.jsonl job.sh   # C1 (Amendment 7; job.sh = pod/job_pe.sh)
 (cd research/koblitz_ic_leads_build_20261024/figures && python3 plot.py)
 sh research/koblitz_ic_leads_build_20261024/build.sh               # report.pdf
 ```
