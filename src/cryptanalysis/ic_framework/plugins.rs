@@ -62,7 +62,7 @@ use crate::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
     prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
     CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
-    PrimeCurve, PrimeInstance, PrimePoint, Relation,
+    PrimeCurve, PrimeInstance, PrimePoint, Relation, WSumTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::FastPoint;
@@ -2404,6 +2404,140 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     }
 }
 
+/// One probe per target into a coefficient-box table over the base's
+/// `C` abscissae ([`WSumTable`], proposal P3): every `Σ e_c·P_c` with
+/// `|e_c| ≤ coef`, so a relation has only `C` unknown columns.
+pub struct WSumOracle<E> {
+    table: Option<WSumTable<E>>,
+    /// `free=1`: the build's key collisions are verified and handed to
+    /// the relation loop as target-free rows, once, with the first trial.
+    free: bool,
+    free_pending: bool,
+    free_checked: u64,
+    free_emitted: u64,
+}
+
+impl<E> WSumOracle<E> {
+    pub fn new() -> Self {
+        Self {
+            table: None,
+            free: false,
+            free_pending: false,
+            free_checked: 0,
+            free_emitted: 0,
+        }
+    }
+}
+
+impl<E> Default for WSumOracle<E> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<G: CountedGroup> DecompositionOracle<G> for WSumOracle<G::Elt> {
+    fn name(&self) -> &str {
+        "wsum"
+    }
+
+    fn summands(&self) -> u32 {
+        // Distinct columns a relation touches: one per seed.
+        self.table.as_ref().map_or(1, |t| t.c as u32)
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "a table of every Σ e_c·P_c over the base's abscissae with |e_c| ≤ coef, \
+         one entry per negation orbit, probed once per target"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("coef", "coefficient bound B, 1 to 255 (C ≤ 8 seeds, ((2B+1)^C − 1)/2 ≤ 2^26)"),
+            ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let b = params.u64("coef").map_err(|e| format!("wsum: {e}"))?;
+        self.free = params.flag("free");
+        self.free_pending = self.free;
+        let table = WSumTable::build(ctx.group, fb, b, self.free)?;
+        // The table's construction (multiples included) is part of the
+        // pipeline's cost.
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(WSumTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        table.probe(ctx.group, fb, ops, &mut counters.lookups, point)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        _a: u64,
+        _b: u64,
+    ) -> Vec<Relation> {
+        let mut out = Vec::new();
+        if self.free_pending {
+            self.free_pending = false;
+            if let Some(table) = self.table.as_ref() {
+                let (rows, checked) = table.free_rows(ctx.group, fb, ctx.r, ops);
+                self.free_checked = checked;
+                self.free_emitted = rows.len() as u64;
+                out.extend(rows.into_iter().map(|columns| Relation::Row {
+                    columns,
+                    a: 0,
+                    b: 0,
+                }));
+            }
+        }
+        if let Some(summands) = self.decompose(ctx, fb, ops, counters, point) {
+            out.push(Relation::Summands(summands));
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        let mut m = BTreeMap::new();
+        if self.free {
+            m.insert("free_collisions_checked".to_string(), self.free_checked);
+            m.insert("free_rows_emitted".to_string(), self.free_emitted);
+        }
+        m
+    }
+}
+
 /// The two-summand prime MITM search with the same probe and table keys as
 /// `mitm`, but a batched-inversion, x-only table construction.  The
 /// `blocked` form (`mitm-prime-blocked`) builds the same table in
@@ -3443,7 +3577,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
             let shape = system.shape();
             let verdict = self.harness.solve(&system);
             let exceeded = matches!(verdict, SolverVerdict::BudgetExceeded);
-            self.totals.absorb(&shape, self.harness.cost(), exceeded);
+            let found = matches!(&verdict, SolverVerdict::Solved(s) if !s.is_empty());
+            self.totals
+                .absorb_outcome(&shape, self.harness.cost(), exceeded, found);
             // The descent, the copy, and two shape computations (here and
             // in the harness).
             charge_system_build(&mut self.totals.extra, &system, &shape, 2);
@@ -3867,7 +4003,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
             timed_out: !out.complete,
             extra,
         };
-        self.totals.absorb(shape, Some(&cost), !out.complete);
+        self.totals
+            .absorb_outcome(shape, Some(&cost), !out.complete, out.relation.is_some());
         let indices = out.relation?;
         // Re-lift through the framework so the sign resolution is charged
         // exactly as it is for the x-frame oracle.  `T` (x = 0) is a base
@@ -4197,7 +4334,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
             timed_out: exhausted,
             extra,
         };
-        self.totals.absorb(&shape, Some(&cost), exhausted);
+        self.totals
+            .absorb_outcome(&shape, Some(&cost), exhausted, relation.is_some());
         let Some(indices) = relation else {
             call.outcome = if exhausted { "budget" } else { "refuted" };
             self.record(call);
@@ -4626,5 +4764,200 @@ mod explicit_subspace_tests {
                 "accepted invalid recipe: {recipe}"
             );
         }
+    }
+}
+
+/// Why `wsum` with `targets=stride-generator` meets dependent rows that
+/// `targets=walk` does not: the hits of the progression `R_k = Q + [k]G`
+/// are not independent box entries.  Whenever a short seed relation
+/// `w·S = [m]G` holds (`w` a difference of two box points, `m` a small
+/// integer, here found by the test and not assumed), `R_k = T_e` gives
+/// `R_{k+m} = T_{e+w}`: the hit repeats `m` steps later, on the line
+/// `e + t·w`, with `b = 1` in every row.  Rows `(e, −1 | k)` on one line
+/// are rank 2.  A walk row carries a random `b`, which breaks the line.
+/// The dependence is arithmetic, not a row-handling defect.
+#[cfg(test)]
+mod wsum_stride_dependence_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        Calibration, CountedGroup, PrimeCurve, PrimeInstance, PrimePoint, WSumTable,
+    };
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    /// The `train-k32` curve of the round-28 session: `r = 536884639`,
+    /// cofactor 8, `log2 r = 29`.
+    fn instance() -> PrimeInstance {
+        PrimeInstance {
+            name: "train-k32".into(),
+            curve: PrimeCurve {
+                p: 4294967197,
+                a: 1173263412,
+                b: 337904346,
+            },
+            group_order: 4295077112,
+            r: 536884639,
+            cofactor: 8,
+            generator: (1431665017, 592057774),
+        }
+    }
+
+    fn ctx<'a>(inst: &'a PrimeInstance, q: PrimePoint) -> InstanceCtx<'a, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn base_params() -> Params {
+        Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=32")
+            .unwrap()
+            .1
+    }
+
+    fn dependent_runs(inst: &PrimeInstance, targets: Targets, runs: u64) -> (u64, u64) {
+        let (mut dependent, mut found) = (0, 0);
+        for s in 0..runs {
+            let mut ops = GroupOps::default();
+            let q = inst
+                .curve
+                .mul(&mut ops, inst.generator_point(), 12345 + 7919 * s);
+            let spec = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: base_params(),
+                oracle: "wsum".into(),
+                oracle_params: Params::parse_spec("wsum:coef=120,free=1").unwrap().1,
+                targets,
+                linalg: "incremental-gauss".into(),
+                max_trials: 5_000_000,
+                seed: s,
+                ..Default::default()
+            };
+            let rep = run_pipeline(
+                &ctx(inst, q),
+                &spec,
+                &PrimeProjectedAbscissaBase { instance: inst },
+                &mut WSumOracle::<PrimePoint>::new(),
+                u64::MAX,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            )
+            .unwrap();
+            dependent += u64::from(rep.linear_algebra.dependent > 0);
+            found += rep.decomposition.relations_found;
+        }
+        (dependent, found)
+    }
+
+    #[test]
+    fn stride_generator_hits_repeat_along_a_short_seed_relation() {
+        let inst = instance();
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let mut build_ctx_ops = GroupOps::default();
+        let fb = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, gen), &base_params(), &mut build_ctx_ops)
+            .unwrap();
+        let table = WSumTable::build(g, &fb, 120, true).unwrap();
+
+        // Hits of Q + [k]G: (k, e) with e·S = R_k, four hits per target.
+        let mut runs: Vec<Vec<(u64, Vec<i64>)>> = Vec::new();
+        for s in 0..12u64 {
+            let q = g.mul(&mut ops, gen, 12345 + 7919 * s);
+            let (mut hits, mut point, mut lookups) = (Vec::new(), q, 0u64);
+            for k in 0..400_000u64 {
+                if k > 0 {
+                    point = g.add(&mut ops, point, gen);
+                }
+                if g.is_identity(&point) {
+                    continue;
+                }
+                if let Some(summands) = table.probe(g, &fb, &mut ops, &mut lookups, point) {
+                    // Recover e from the signed summands: +1 per seed
+                    // index, −1 per negated one (seeds sit at even index).
+                    let mut e = vec![0i64; table.c];
+                    for i in summands {
+                        e[fb.col_of[i]] += if i % 2 == 0 { 1 } else { -1 };
+                    }
+                    hits.push((k, e));
+                    if hits.len() == 4 {
+                        break;
+                    }
+                }
+            }
+            runs.push(hits);
+        }
+
+        // Every pair of hits obeys (e' − e)·S = [k' − k]G, by group
+        // arithmetic, with no logarithm known.
+        let seeds = |e: &[i64], ops: &mut GroupOps| {
+            let mut acc = g.identity();
+            for (c, &ec) in e.iter().enumerate() {
+                let p = fb.points[fb.col_of.iter().position(|&x| x == c).unwrap()];
+                let t = g.mul(ops, p, ec.unsigned_abs());
+                acc = g.add(ops, acc, if ec < 0 { g.neg(t) } else { t });
+            }
+            acc
+        };
+        let mut progressions = 0;
+        for hits in &runs {
+            for i in 0..hits.len() {
+                for j in i + 1..hits.len() {
+                    let (ki, ei) = &hits[i];
+                    let (kj, ej) = &hits[j];
+                    let w: Vec<i64> = ei.iter().zip(ej).map(|(a, b)| b - a).collect();
+                    let lhs = seeds(&w, &mut ops);
+                    let rhs = g.mul(&mut ops, gen, kj - ki);
+                    assert_eq!(lhs, rhs, "(e'−e)·S = [Δk]G must hold");
+                }
+            }
+            // A progression: three hits k, k+m, k+2m on the line e + t·w.
+            for i in 0..hits.len().saturating_sub(2) {
+                let ((k0, e0), (k1, e1), (k2, e2)) = (&hits[i], &hits[i + 1], &hits[i + 2]);
+                if k1 - k0 == k2 - k1 {
+                    let w0: Vec<i64> = e0.iter().zip(e1).map(|(a, b)| b - a).collect();
+                    let w1: Vec<i64> = e1.iter().zip(e2).map(|(a, b)| b - a).collect();
+                    assert_eq!(w0, w1, "equal Δk, equal Δe: the hits are collinear");
+                    // The relation both rows reveal: w·S = [m]G, m small.
+                    eprintln!("progression m={} w={:?} e0={:?}", k1 - k0, w0, e0);
+                    progressions += 1;
+                }
+            }
+        }
+        for (s, hits) in runs.iter().enumerate() {
+            let rows: Vec<String> = hits
+                .iter()
+                .map(|(k, e)| format!("(e1,e2,a,b)=({},{},{},1)", e[0], e[1], k))
+                .collect();
+            eprintln!("target {s}: {}", rows.join(" "));
+        }
+        assert!(
+            progressions > 0,
+            "the curve's seeds have a short relation w·S = [m]G, so some target has a progression"
+        );
+    }
+
+    #[test]
+    fn stride_generator_runs_are_dependent_and_walk_runs_are_not() {
+        let inst = instance();
+        let (walk_dep, walk_found) = dependent_runs(&inst, Targets::Walk, 8);
+        let (stride_dep, stride_found) = dependent_runs(&inst, Targets::StrideGenerator, 8);
+        eprintln!("walk: dependent runs {walk_dep}/8, relations {walk_found}");
+        eprintln!("stride-generator: dependent runs {stride_dep}/8, relations {stride_found}");
+        assert_eq!(walk_dep, 0, "random (a, b) rows are independent");
+        assert_eq!(walk_found, 8 * 3);
+        assert!(stride_dep >= 1, "progression rows are collinear");
+        assert!(stride_found > walk_found);
     }
 }

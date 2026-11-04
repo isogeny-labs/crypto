@@ -186,6 +186,18 @@ additions (`A = 2n` on a Koblitz curve, 2 elsewhere) it reports the
 and verification are not in the projection, and the band is not a §5a
 comparison or a speedup claim.
 
+The relation matrix is charged beside the solver work: after every admitted
+training row the forecaster records the matrix's cumulative multiply-subtracts
+(`IncrementalGauss` row operations), fits the work of the `k`-th row as
+`a + b·k` from the increments (incremental elimination costs more as the rank
+grows; a single total is read as linear growth through the origin), and sums
+it over the rows still missing and over `columns + 1` rows. Its unit differs
+from the solver's, so the combined totals
+(`projected_relation_phase_work_with_linear_algebra`,
+`hope_ratio_band_with_linear_algebra`) price one row operation at a recorded
+`price_in_solver_units` (default one), an assumption the record names. The
+advice reads the combined band when linear algebra was observed.
+
 `advice` is given after four real solves: `hopeless_at_bound` when even the
 optimistic edge of the band puts the median above `--max-degree`; `doubtful`
 when the projected relation phase exceeds the rho floor even at 100
@@ -212,10 +224,26 @@ Where it appears:
   records on disk, at any time, including beside a live sweep. It takes no
   lock and launches nothing; records still being written are counted as
   unreadable, never guessed.
+- `factor-base-sweep refine --run DIR --out next.json [--drop
+  hopeless_at_bound,doubtful] [--seed-count K] [--dimensions 3,4] [budget
+  flags]`: the next plan from the triage. A candidate whose latest attempt
+  was inapplicable, or whose forecast has at least four solves and an advice
+  in `--drop`, is dropped; the rest are kept and expanded over consecutive
+  seeds and the dimensions given; budgets are inherited unless the tuning
+  flags change them. The provenance (`next.refine.json`) lists every kept and
+  dropped candidate with its advice and reasons. It runs nothing and fails,
+  rather than writing an empty plan, when it would drop everything. The
+  `dreg-triage` skill (`.agents/skills/dreg-triage/SKILL.md`) describes the
+  plan → run → triage → refine loop under the repository's rules.
 
 `certified_degree_of_regularity` stays null everywhere. The forecast is a
 statement about the observed solving-degree distribution of this solver
 procedure on this cell's probes, not an algebraic certificate.
+
+The same forecaster runs inside the ecbench `ic.pipeline` (every algebraic
+oracle's solver calls, written on the record's `solver` block) and the N83
+summand sweep cell (`examples/n83_msweep_cell.rs`, Gröbner engines); see
+[FRAMEWORK.md](../FRAMEWORK.md), "Degree-of-regularity forecast".
 
 ## Records, resume and verification
 

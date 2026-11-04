@@ -55,9 +55,17 @@
 //! cost, would otherwise dominate the expectation.  Against the generic
 //! (rho) floor in group additions, the ratio is reported at 1, 10 and 100
 //! field multiplications per group addition, and the advice ranks only
-//! where the order holds across that band (AGENTS.md §5a).  Linear algebra
-//! is not in the projection; the row operations are reported separately
-//! by the sweep.
+//! where the order holds across that band (AGENTS.md §5a).
+//!
+//! Linear algebra is charged beside the solver work when the caller reports
+//! it ([`Forecaster::observe_linear_algebra`] after every admitted row, or
+//! [`Forecaster::set_linear_algebra_total`] once): the work of the `k`-th
+//! row is fitted as `a + b·k` (incremental elimination costs more as the
+//! rank grows) and summed over the rows still missing and over the whole
+//! phase.  Its unit differs from the solver's, so the combined projection
+//! prices one row operation at [`Forecaster::set_linear_algebra_price`]
+//! solver units (default one), names that assumption, and the advice reads
+//! the combined band when linear algebra was observed.
 //!
 //! ## Advice
 //!
@@ -257,6 +265,38 @@ pub struct CostProjection {
     /// [`PRICE_BAND`]; above one means the relation phase undercuts rho at
     /// that price.
     pub hope_ratio_band: Vec<[f64; 2]>,
+    /// The relation matrix's cost, when the caller reported it.
+    pub linear_algebra: Option<LinearAlgebraProjection>,
+    /// Solver work plus linear algebra priced into the solver's unit, for
+    /// the remaining rows and for the whole phase; `None` without linear
+    /// algebra observations.
+    pub projected_remaining_work_with_linear_algebra: Option<f64>,
+    pub projected_relation_phase_work_with_linear_algebra: Option<f64>,
+    /// The hope band on the combined work; empty without linear algebra.
+    pub hope_ratio_band_with_linear_algebra: Vec<[f64; 2]>,
+    pub scope: String,
+}
+
+/// The relation matrix's work: observed so far and projected to the end of
+/// the relation phase.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct LinearAlgebraProjection {
+    pub unit: String,
+    /// Rows admitted so far and the work they cost, cumulative.
+    pub observed_rows: usize,
+    pub observed_work: u64,
+    pub mean_work_per_row: Option<f64>,
+    /// Work of the `k`-th row modelled as `intercept + slope·k`.
+    pub work_per_row_intercept: f64,
+    pub work_per_row_slope: f64,
+    /// `least squares over N increments`, `mean over N increments` or
+    /// `linear growth through the origin from one total`.
+    pub model: String,
+    pub projected_remaining_work: Option<f64>,
+    /// Work of `columns + 1` rows under the model.
+    pub projected_phase_work: Option<f64>,
+    /// Solver units one row operation is priced at in the combined totals.
+    pub price_in_solver_units: f64,
     pub scope: String,
 }
 
@@ -321,6 +361,10 @@ pub struct Forecaster {
     rho_floor: Option<f64>,
     heuristic_yield: Option<f64>,
     work_unit: String,
+    /// `(rows admitted, cumulative work)` after each admitted row.
+    linear_algebra: Vec<(usize, u64)>,
+    linear_algebra_unit: String,
+    linear_algebra_price: f64,
 }
 
 fn label(d: Option<u32>, bound: u32) -> String {
@@ -455,6 +499,42 @@ impl Forecaster {
             rho_floor: None,
             heuristic_yield: None,
             work_unit: "solver field multiplications".into(),
+            linear_algebra: Vec::new(),
+            linear_algebra_unit: "relation-matrix row operations".into(),
+            linear_algebra_price: 1.0,
+        }
+    }
+    /// Name the unit the relation matrix's work is counted in.
+    pub fn set_linear_algebra_unit(&mut self, unit: &str) {
+        self.linear_algebra_unit = unit.into();
+    }
+    /// Solver units one row operation is priced at in the combined totals
+    /// (default one).  An assumption, recorded on the projection.
+    pub fn set_linear_algebra_price(&mut self, solver_units_per_row_operation: f64) {
+        if solver_units_per_row_operation.is_finite() && solver_units_per_row_operation >= 0.0 {
+            self.linear_algebra_price = solver_units_per_row_operation;
+        }
+    }
+    /// Record the matrix's cumulative work after its `rows`-th admitted
+    /// row.  Call after every row; the per-row fit comes from the increments.
+    pub fn observe_linear_algebra(&mut self, rows: usize, cumulative_work: u64) {
+        if rows == 0 {
+            return;
+        }
+        if let Some(&(last_rows, last_work)) = self.linear_algebra.last() {
+            if rows <= last_rows || cumulative_work < last_work {
+                return;
+            }
+        }
+        self.linear_algebra.push((rows, cumulative_work));
+    }
+    /// Record the matrix's total work for `rows` admitted rows, when the
+    /// caller has only the total (a batch elimination after collection).
+    pub fn set_linear_algebra_total(&mut self, rows: usize, work: u64, unit: &str) {
+        self.linear_algebra.clear();
+        self.linear_algebra_unit = unit.into();
+        if rows > 0 {
+            self.linear_algebra.push((rows, work));
         }
     }
     /// Name the unit `work` is counted in.
@@ -589,6 +669,72 @@ impl Forecaster {
         (table, Some(expected))
     }
 
+    /// The relation matrix's work so far and its projection to the end of
+    /// the phase, from the increments between successive observations.
+    fn linear_algebra_projection(&self) -> Option<LinearAlgebraProjection> {
+        let points = &self.linear_algebra;
+        let &(rows, work) = points.last()?;
+        // Increments: the work of each row index between two observations,
+        // spread evenly when an observation covers several rows.
+        let mut increments: Vec<(f64, f64)> = Vec::new();
+        let mut previous = (0usize, 0u64);
+        for &(r, w) in points {
+            let span = r.saturating_sub(previous.0);
+            if span > 0 {
+                let each = w.saturating_sub(previous.1) as f64 / span as f64;
+                for k in previous.0 + 1..=r {
+                    increments.push((k as f64, each));
+                }
+            }
+            previous = (r, w);
+        }
+        let (intercept, slope, model) = if points.len() == 1 {
+            // One total: incremental elimination grows with the rank, so a
+            // single total is read as linear growth through the origin.
+            let n = rows as f64;
+            (
+                0.0,
+                2.0 * work as f64 / (n * (n + 1.0)),
+                "linear growth through the origin from one total".to_string(),
+            )
+        } else if increments.len() >= 3 {
+            let n = increments.len() as f64;
+            let mx = increments.iter().map(|p| p.0).sum::<f64>() / n;
+            let my = increments.iter().map(|p| p.1).sum::<f64>() / n;
+            let sxx: f64 = increments.iter().map(|p| (p.0 - mx).powi(2)).sum();
+            let sxy: f64 = increments.iter().map(|p| (p.0 - mx) * (p.1 - my)).sum();
+            let slope = if sxx > 0.0 { (sxy / sxx).max(0.0) } else { 0.0 };
+            (
+                (my - slope * mx).max(0.0),
+                slope,
+                format!("least squares over {} increments", increments.len()),
+            )
+        } else {
+            let my = increments.iter().map(|p| p.1).sum::<f64>() / increments.len().max(1) as f64;
+            (
+                my,
+                0.0,
+                format!("mean over {} increments", increments.len()),
+            )
+        };
+        let row_work = |k: usize| (intercept + slope * k as f64).max(0.0);
+        let sum = |from: usize, to: usize| -> f64 { (from..=to).map(row_work).sum() };
+        let remaining = (self.columns > rows).then(|| sum(rows + 1, self.columns));
+        Some(LinearAlgebraProjection {
+            unit: self.linear_algebra_unit.clone(),
+            observed_rows: rows,
+            observed_work: work,
+            mean_work_per_row: (rows > 0).then(|| work as f64 / rows as f64),
+            work_per_row_intercept: intercept,
+            work_per_row_slope: slope,
+            model,
+            projected_remaining_work: remaining.or(Some(0.0)),
+            projected_phase_work: Some(sum(1, self.columns + 1)),
+            price_in_solver_units: self.linear_algebra_price,
+            scope: "work of the k-th admitted row modelled as intercept + slope·k from the observed increments, summed over the rows still missing and over columns + 1 rows; priced into the solver's unit at the recorded price, an assumption, not a measurement".into(),
+        })
+    }
+
     /// The forecast from everything observed so far.
     pub fn forecast(&self) -> Forecast {
         let semi_regular = self.shape.as_ref().and_then(|s| s.semi_regular_degree());
@@ -651,13 +797,25 @@ impl Forecaster {
         let phase_work = expected_work
             .map(|w| (self.columns as f64 + 1.0) / relation_yield * w)
             .filter(|w| w.is_finite());
-        let hope: Vec<[f64; 2]> = match (self.rho_floor, phase_work) {
-            (Some(rho), Some(work)) if work > 0.0 => PRICE_BAND
-                .iter()
-                .map(|&price| [price, rho * price / work])
-                .collect(),
-            _ => Vec::new(),
+        let band = |work: Option<f64>| -> Vec<[f64; 2]> {
+            match (self.rho_floor, work) {
+                (Some(rho), Some(work)) if work > 0.0 => PRICE_BAND
+                    .iter()
+                    .map(|&price| [price, rho * price / work])
+                    .collect(),
+                _ => Vec::new(),
+            }
         };
+        let hope = band(phase_work);
+        let linear_algebra = self.linear_algebra_projection();
+        let la_price = self.linear_algebra_price;
+        let remaining_with_la = linear_algebra
+            .as_ref()
+            .and_then(|la| Some(remaining_work? + la_price * la.projected_remaining_work?));
+        let phase_with_la = linear_algebra
+            .as_ref()
+            .and_then(|la| Some(phase_work? + la_price * la.projected_phase_work?));
+        let hope_with_la = band(phase_with_la);
         let cost = CostProjection {
             unit: self.work_unit.clone(),
             work_by_degree,
@@ -675,7 +833,17 @@ impl Forecaster {
             projected_relation_phase_work: phase_work,
             rho_floor_group_additions: self.rho_floor,
             hope_ratio_band: hope.clone(),
-            scope: "projection from observed solver work and relation yield at the forecast degree distribution; excludes linear algebra, system construction, inventory and verification; rho floor in group additions priced at 1, 10 and 100 multiplications; provisional, not a §5a comparison or a speedup claim".into(),
+            linear_algebra,
+            projected_remaining_work_with_linear_algebra: remaining_with_la,
+            projected_relation_phase_work_with_linear_algebra: phase_with_la,
+            hope_ratio_band_with_linear_algebra: hope_with_la.clone(),
+            scope: "projection from observed solver work and relation yield at the forecast degree distribution; linear algebra charged from its own observations at the recorded price when reported, else excluded; system construction, inventory and verification excluded; rho floor in group additions priced at 1, 10 and 100 multiplications; provisional, not a §5a comparison or a speedup claim".into(),
+        };
+        // Advice reads the combined band when linear algebra was observed.
+        let (hope, hope_basis) = if hope_with_la.is_empty() {
+            (hope, "solver work only")
+        } else {
+            (hope_with_la, "solver work plus priced linear algebra")
         };
         let mut trace = Vec::new();
         for o in self
@@ -713,7 +881,7 @@ impl Forecaster {
             let low = hope.first().map(|h| h[1]);
             let high = hope.last().map(|h| h[1]);
             if high.is_some_and(|h| h < 1.0) {
-                reasons.push("projected relation-phase work exceeds the rho floor even with group additions priced at 100 multiplications".into());
+                reasons.push(format!("projected relation-phase work ({hope_basis}) exceeds the rho floor even with group additions priced at 100 multiplications"));
                 Advice::Doubtful
             } else if structural_gain == Some(false) {
                 reasons.push(format!(
@@ -724,7 +892,7 @@ impl Forecaster {
                 ));
                 Advice::Doubtful
             } else if low.is_some_and(|h| h > 1.0) {
-                reasons.push("projected relation-phase work undercuts the rho floor even with group additions priced at one multiplication".into());
+                reasons.push(format!("projected relation-phase work ({hope_basis}) undercuts the rho floor even with group additions priced at one multiplication"));
                 Advice::Promising
             } else {
                 reasons.push("order against the rho floor changes across the price band, or no floor was supplied".into());
@@ -1048,6 +1216,112 @@ mod tests {
         // … but the expected work is the observed mean, not an extrapolated tail.
         assert!((fc.cost.expected_work_per_solve.unwrap() - 400.0).abs() < 1e-9);
         assert!(fc.cost.charged_distribution.contains("prior excluded"));
+    }
+
+    #[test]
+    fn linear_algebra_is_charged_from_its_increments_and_enters_the_combined_band() {
+        let mut f = Forecaster::new(6);
+        f.prior_weight = 0.0;
+        f.set_shape(quadratic_shape(4, false));
+        f.set_relation_state(10, 4);
+        f.set_rho_floor_group_additions(1.0e6);
+        for k in 0..4usize {
+            f.observe(decided(Outcome::Decomposed, 3, 100, true));
+            // Row k costs 10·k units: cumulative 10, 30, 60, 100.
+            f.observe_linear_algebra(k + 1, (10 * (k + 1) * (k + 2) / 2) as u64);
+        }
+        let fc = f.forecast();
+        let la = fc
+            .cost
+            .linear_algebra
+            .as_ref()
+            .expect("linear algebra observed");
+        assert_eq!(la.observed_rows, 4);
+        assert_eq!(la.observed_work, 100);
+        assert!(la.model.starts_with("least squares"), "{}", la.model);
+        assert!(
+            (la.work_per_row_slope - 10.0).abs() < 1e-9,
+            "{}",
+            la.work_per_row_slope
+        );
+        assert!(la.work_per_row_intercept.abs() < 1e-9);
+        // Rows 5..=10 at 10·k: 10·(5+…+10) = 450; rows 1..=11: 10·66 = 660.
+        assert!((la.projected_remaining_work.unwrap() - 450.0).abs() < 1e-6);
+        assert!((la.projected_phase_work.unwrap() - 660.0).abs() < 1e-6);
+        // Solver: yield 4.5/5 = 0.9, 100 per solve: phase 11/0.9·100; the
+        // combined totals add the priced rows.
+        let solver_phase = fc.cost.projected_relation_phase_work.unwrap();
+        assert!((solver_phase - 11.0 / 0.9 * 100.0).abs() < 1e-6);
+        assert!(
+            (fc.cost
+                .projected_relation_phase_work_with_linear_algebra
+                .unwrap()
+                - (solver_phase + 660.0))
+                .abs()
+                < 1e-6
+        );
+        assert!(
+            (fc.cost
+                .projected_remaining_work_with_linear_algebra
+                .unwrap()
+                - (fc.cost.projected_remaining_work.unwrap() + 450.0))
+                .abs()
+                < 1e-6
+        );
+        assert_eq!(fc.cost.hope_ratio_band_with_linear_algebra.len(), 3);
+        assert!(fc.cost.hope_ratio_band_with_linear_algebra[0][1] < fc.cost.hope_ratio_band[0][1]);
+        assert!(fc.advice_reasons[0].contains("priced linear algebra"));
+        // A price changes only the combined totals.
+        f.set_linear_algebra_price(0.5);
+        let half = f.forecast();
+        assert!(
+            (half
+                .cost
+                .projected_relation_phase_work_with_linear_algebra
+                .unwrap()
+                - (solver_phase + 330.0))
+                .abs()
+                < 1e-6
+        );
+        assert_eq!(
+            half.cost.projected_relation_phase_work,
+            fc.cost.projected_relation_phase_work
+        );
+        // Out-of-order or regressing observations are ignored.
+        f.observe_linear_algebra(3, 1);
+        f.observe_linear_algebra(4, 50);
+        assert_eq!(f.forecast().cost.linear_algebra.unwrap().observed_work, 100);
+    }
+
+    #[test]
+    fn one_linear_algebra_total_reads_as_linear_growth_and_none_leaves_the_band_alone() {
+        let mut f = Forecaster::new(6);
+        f.prior_weight = 0.0;
+        f.set_relation_state(10, 5);
+        f.set_rho_floor_group_additions(1.0e6);
+        for _ in 0..5 {
+            f.observe(decided(Outcome::Decomposed, 3, 100, true));
+        }
+        let bare = f.forecast();
+        assert!(bare.cost.linear_algebra.is_none());
+        assert!(bare.cost.hope_ratio_band_with_linear_algebra.is_empty());
+        assert!(bare
+            .cost
+            .projected_relation_phase_work_with_linear_algebra
+            .is_none());
+        assert!(bare.advice_reasons[0].contains("solver work only"));
+        // 5 rows cost 150 in total: slope 2·150/(5·6) = 10, through the origin.
+        f.set_linear_algebra_total(5, 150, "multiply-subtracts mod r");
+        let fc = f.forecast();
+        let la = fc.cost.linear_algebra.as_ref().unwrap();
+        assert_eq!(la.unit, "multiply-subtracts mod r");
+        assert!(la.model.contains("one total"));
+        assert!((la.work_per_row_slope - 10.0).abs() < 1e-9);
+        assert!(
+            (la.projected_remaining_work.unwrap() - 10.0 * (6 + 7 + 8 + 9 + 10) as f64).abs()
+                < 1e-6
+        );
+        assert!((la.projected_phase_work.unwrap() - 660.0).abs() < 1e-6);
     }
 
     #[test]

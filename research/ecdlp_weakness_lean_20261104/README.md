@@ -62,6 +62,15 @@ The round also **withdraws** a claim of the earlier triage. The dimension count 
 subspace factor base `|F'|`, not its trace image `|Tr(F')|`, so the trace pull-back escape
 from the prime-field closure is open again (`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`).
 
+## Round 4: subspace criterion, counting identity, transparent encoding, Boolean Nullstellensatz
+
+| module | theorem | result |
+|---|---|---|
+| `SubspaceCriterion` | `linear_count_of_gb_in_subspace`, `no_gb_in_rows_of_low_lt` | The degree-2 criterion generalised to any finite-dimensional subspace: a Gröbner basis inside the span of the Macaulay rows of degree ≤ d supplies at most `dim(rowspace ∩ P_{≤1})` linear leading monomials, so `d_lin` (least `d` with that dimension ≥ k) is a lower bound on the solving degree. This is what the `pq2_rank` census computes. |
+| `MeanCount` | `sum_card_reps`, `mean_reps` | Ordered representation counts sum to `|F|^m`: the mean of `HEUR-DECOMPOSITION-PROBABILITY` is a theorem, the shape is the heuristic. |
+| `TransparentEncoding` | `dlog_identity_encoding`, `zero_operation_dlog` | With a transparent encoding the logarithm is the encoding: Shoup's Ω(√r) is relative to random encodings, not a statement about every algorithm. |
+| `BooleanNullstellensatz` | `mem_fieldIdeal_of_eval_zero`, `linear_mem_of_unique_zero` | Over F₂ with the field equations adjoined: vanishing on all of F₂^N means lying in the field-equation ideal; a unique common zero `z` puts every `X_i − z_i` in the ideal. This is the `|Z| = 1` case of the bridge `k = N − affdim(Z)` used by the census. |
+
 ## What changes in the corpus
 
 - **`HEUR-RELATION-RANK` (W2).** The left-kernel method needs no rank
@@ -83,7 +92,8 @@ from the prime-field closure is open again (`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`)
 The W2 and W7 results are recorded in
 [`docs/ecdlp-hardness-corpus/lean-weakness-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-weakness-20261104.json); W1 in
 [`lean-pq2-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-pq2-20261104.json); round 3 in
-[`lean-round3-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-round3-20261104.json).
+[`lean-round3-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-round3-20261104.json); round 4 (with the censuses) in
+[`lean-round4-20261104.json`](../../docs/ecdlp-hardness-corpus/lean-round4-20261104.json).
 
 ## Verification
 
