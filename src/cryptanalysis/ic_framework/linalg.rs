@@ -708,6 +708,364 @@ fn berlekamp_massey<S: RhoScalar>(s: &[S], m: S, ops: &mut u64) -> Vec<S> {
     c
 }
 
+/// Singleton peeling for [`PinWiedemann`]: the rows and columns that can
+/// matter to the unit vector of column `keep`.
+///
+/// A non-`keep` column that exactly one stored row touches forces that
+/// row's coefficient to zero in any combination of rows that equals the
+/// unit vector, so the row is dropped, and dropping it can leave further
+/// columns with one row; the loop repeats.  Columns no row touches drop
+/// out with weight 0.  Returns the kept row indices and kept columns, in
+/// increasing order.
+fn peel_core(rows: &[Vec<(u32, u64)>], weight: &[u32], keep: usize) -> (Vec<usize>, Vec<usize>) {
+    let cols = weight.len();
+    let mut weight = weight.to_vec();
+    let mut row_alive = vec![true; rows.len()];
+    let mut rows_of: Vec<Vec<usize>> = vec![Vec::new(); cols];
+    for (i, row) in rows.iter().enumerate() {
+        for &(c, _) in row {
+            rows_of[c as usize].push(i);
+        }
+    }
+    let mut queue: Vec<usize> = (0..cols).filter(|&c| c != keep && weight[c] == 1).collect();
+    while let Some(c) = queue.pop() {
+        if weight[c] != 1 {
+            continue;
+        }
+        let Some(&i) = rows_of[c].iter().find(|&&i| row_alive[i]) else {
+            continue;
+        };
+        row_alive[i] = false;
+        for &(c2, _) in &rows[i] {
+            let c2 = c2 as usize;
+            weight[c2] -= 1;
+            if c2 != keep && weight[c2] == 1 {
+                queue.push(c2);
+            }
+        }
+    }
+    let kept_rows = (0..rows.len()).filter(|&i| row_alive[i]).collect();
+    let kept_cols = (0..cols).filter(|&c| weight[c] > 0).collect();
+    (kept_rows, kept_cols)
+}
+
+/// Target-pinned sparse solve by Wiedemann's method: the sparse
+/// counterpart of the target-pinned default, which stops as soon as the
+/// target column is determined, long before the rows reach full column
+/// rank.
+///
+/// The target column `t` is determined by the stored rows `R x = a`
+/// exactly when the unit vector `e_t` lies in the row space of `R`.  With
+/// `A = Rᵀ D R` (`D` a random non-zero diagonal) the row space and the
+/// range of `A` coincide except with probability about `n/r`, so one
+/// attempt solves `A z = e_t` by the Krylov method:
+///
+/// 1. **Peel** the singleton columns ([`peel_core`]); this is exact.
+/// 2. **Sequence.** `s_i = e_tᵀ Aⁱ e_t` for `i < 2n`, by `n` products,
+///    in doubling chunks: Berlekamp–Massey runs when the chunk ends and
+///    the attempt stops as soon as the recurrence length `ℓ` satisfies
+///    `2ℓ + 2 ≤` the terms so far, so a small Krylov space costs a small
+///    number of products.
+/// 3. **Solve.** If `f(0) ≠ 0` for the minimal polynomial `f`, set
+///    `z = −f(0)⁻¹ Σ_{j≥1} f_j A^{j−1} e_t` and check `A z = e_t`
+///    exactly.  `f(0) = 0` means `e_t` has a component in the kernel of
+///    `A`: not pinned yet.
+/// 4. **Value.** For any solution `x` of `R x = a`,
+///    `x_t = e_tᵀ x = (A z)ᵀ x = (D R z)ᵀ (R x) = zᵀ Rᵀ D a`, so the
+///    value is a dot product with `b' = Rᵀ D a`.  The pin is therefore
+///    certified by the exact check of step 3 alone: no second seed, no
+///    rank claim.  The relation loop's `[d]G = Q` check still runs.
+///
+/// A failed attempt (not yet pinned, or an unlucky `D`) only delays the
+/// answer.  The next attempt waits `⌈ops / relation_ops⌉` more rows, `ops`
+/// being what the failed attempt cost, so the work spent on attempts stays
+/// proportional to the work of collecting the rows that come between them;
+/// `relation_ops = 0` attempts after every row, which reads the exact pin
+/// row of the echelon methods.
+///
+/// Work is counted in the dense matrices' unit, one `row_op` per
+/// multiplication modulo `r`: the products, the dot products,
+/// Berlekamp–Massey, the back-substitution, the check and the value, failed
+/// attempts included, plus one per non-zero for converting each arriving
+/// row.
+pub struct PinWiedemann {
+    modulus: u64,
+    cols: usize,
+    rows: Vec<Vec<(u32, u64)>>,
+    rhs: Vec<u64>,
+    weight: Vec<u32>,
+    relation_ops: u64,
+    state: RefCell<PinState>,
+}
+
+#[derive(Default)]
+struct PinState {
+    row_ops: u64,
+    attempts: u64,
+    failed_attempts: u64,
+    products: u64,
+    next_attempt_rows: usize,
+    cached: Option<(usize, u64, usize)>,
+    core_rows: usize,
+    core_cols: usize,
+}
+
+impl PinWiedemann {
+    pub fn new(cols: usize, modulus: u64, relation_ops: u64) -> Self {
+        Self {
+            modulus,
+            cols,
+            rows: Vec::new(),
+            rhs: Vec::new(),
+            weight: vec![0; cols],
+            relation_ops,
+            state: RefCell::new(PinState::default()),
+        }
+    }
+
+    /// `(attempts, failed attempts, products, core rows, core columns)`.
+    pub fn stats(&self) -> (u64, u64, usize, usize, u64) {
+        let s = self.state.borrow();
+        (
+            s.attempts,
+            s.failed_attempts,
+            s.core_rows,
+            s.core_cols,
+            s.products,
+        )
+    }
+
+    fn gap_after(&self, ops: u64) -> usize {
+        if self.relation_ops == 0 {
+            1
+        } else {
+            (ops.div_ceil(self.relation_ops)).max(1) as usize
+        }
+    }
+
+    /// The value of `col` once the stored rows determine it.
+    pub fn pin_value(&self, col: usize) -> Option<u64> {
+        let mut st = self.state.borrow_mut();
+        if let Some((c, v, at)) = st.cached {
+            if c == col && at == self.rows.len() {
+                return Some(v);
+            }
+        }
+        if self.weight[col] == 0 || self.rows.len() < st.next_attempt_rows {
+            return None;
+        }
+        let before = st.row_ops;
+        match self.attempt(col, &mut st) {
+            Some(v) => {
+                st.cached = Some((col, v, self.rows.len()));
+                Some(v)
+            }
+            None => {
+                st.failed_attempts += 1;
+                let spent = st.row_ops - before;
+                st.next_attempt_rows = self.rows.len() + self.gap_after(spent);
+                None
+            }
+        }
+    }
+
+    fn attempt(&self, target: usize, st: &mut PinState) -> Option<u64> {
+        let m = self.modulus;
+        let (rows, cols) = peel_core(&self.rows, &self.weight, target);
+        st.core_rows = rows.len();
+        st.core_cols = cols.len();
+        let n = cols.len();
+        let ti = cols.iter().position(|&c| c == target)?;
+        st.attempts += 1;
+        let mut ops = 0u64;
+        let mut index = vec![usize::MAX; self.cols];
+        for (j, &c) in cols.iter().enumerate() {
+            index[c] = j;
+        }
+        let r: Vec<Vec<(usize, u64)>> = rows
+            .iter()
+            .map(|&i| {
+                self.rows[i]
+                    .iter()
+                    .map(|&(c, v)| (index[c as usize], v))
+                    .collect()
+            })
+            .collect();
+        let a: Vec<u64> = rows.iter().map(|&i| self.rhs[i]).collect();
+        // Deterministic randomness: replays must reproduce every count.
+        let mut seed = 0x9e37_79b9_7f4a_7c15u64 ^ st.attempts.wrapping_mul(0xbf58_476d_1ce4_e5b9);
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let d: Vec<u64> = (0..r.len()).map(|_| 1 + next() % (m - 1)).collect();
+        let mul = |x: u64, y: u64| mulmod(x, y, m);
+        let add = |x: u64, y: u64| {
+            let s = x as u128 + y as u128;
+            (if s >= m as u128 { s - m as u128 } else { s }) as u64
+        };
+        // y = Rᵀ D (R x)
+        let apply = |x: &[u64], ops: &mut u64, products: &mut u64| -> Vec<u64> {
+            *products += 1;
+            let mut y = vec![0u64; n];
+            for (row, &di) in r.iter().zip(&d) {
+                let mut t = 0u64;
+                for &(j, v) in row {
+                    t = add(t, mul(v, x[j]));
+                }
+                *ops += row.len() as u64;
+                if t == 0 {
+                    continue;
+                }
+                let t = mul(t, di);
+                *ops += 1;
+                for &(j, v) in row {
+                    y[j] = add(y[j], mul(v, t));
+                }
+                *ops += row.len() as u64;
+            }
+            y
+        };
+        let dot = |x: &[u64], y: &[u64], ops: &mut u64| -> u64 {
+            *ops += n as u64;
+            x.iter()
+                .zip(y)
+                .fold(0u64, |acc, (&p, &q)| add(acc, mul(p, q)))
+        };
+        let mut products = 0u64;
+        let mut e = vec![0u64; n];
+        e[ti] = 1;
+        let mut seq: Vec<u64> = Vec::with_capacity(2 * n);
+        let mut w = e.clone();
+        let mut check_at = 1usize;
+        let mut j = 0usize;
+        let conn = loop {
+            let nxt = apply(&w, &mut ops, &mut products);
+            seq.push(dot(&w, &w, &mut ops));
+            seq.push(dot(&w, &nxt, &mut ops));
+            w = nxt;
+            j += 1;
+            if j == check_at || j == n {
+                let c = berlekamp_massey::<u64>(&seq, m, &mut ops);
+                let l = c.len() - 1;
+                if 2 * l + 2 <= seq.len() || j == n {
+                    break c;
+                }
+                check_at = (check_at * 2).min(n);
+            }
+        };
+        let l = conn.len() - 1;
+        let outcome = (|| {
+            if l == 0 || conn[l] == 0 {
+                return None;
+            }
+            let f0_inv = fermat_inv(conn[l], m)?;
+            let mut z = vec![0u64; n];
+            let mut w = e.clone();
+            for jj in 1..=l {
+                let fj = conn[l - jj];
+                if fj != 0 {
+                    for (zi, &wi) in z.iter_mut().zip(&w) {
+                        *zi = add(*zi, mul(fj, wi));
+                    }
+                    ops += n as u64;
+                }
+                if jj < l {
+                    w = apply(&w, &mut ops, &mut products);
+                }
+            }
+            let scale = submod(0, f0_inv, m);
+            for zi in z.iter_mut() {
+                *zi = mul(*zi, scale);
+            }
+            ops += n as u64;
+            // The exact check A z = e_t: the certificate of the pin.
+            let az = apply(&z, &mut ops, &mut products);
+            if az != e {
+                return None;
+            }
+            // x_t = zᵀ Rᵀ D a.
+            let mut value = 0u64;
+            for ((row, &di), &ai) in r.iter().zip(&d).zip(&a) {
+                let t = mul(di, ai);
+                let mut rz = 0u64;
+                for &(jx, v) in row {
+                    rz = add(rz, mul(v, z[jx]));
+                }
+                value = add(value, mul(rz, t));
+                ops += row.len() as u64 + 2;
+            }
+            Some(value)
+        })();
+        st.row_ops += ops;
+        st.products += products;
+        outcome
+    }
+}
+
+/// `v⁻¹ mod m` for a prime `m`, by Fermat's little theorem.
+fn fermat_inv(v: u64, m: u64) -> Option<u64> {
+    if v.is_multiple_of(m) {
+        return None;
+    }
+    let (mut base, mut e, mut acc) = (v % m, m - 2, 1u64);
+    while e > 0 {
+        if e & 1 == 1 {
+            acc = mulmod(acc, base, m);
+        }
+        base = mulmod(base, base, m);
+        e >>= 1;
+    }
+    Some(acc)
+}
+
+impl RelationSolver for PinWiedemann {
+    fn add_row(&mut self, dense: Vec<u64>, rhs: u64) -> RowStatus {
+        let m = self.modulus;
+        debug_assert_eq!(dense.len(), self.cols);
+        let entries: Vec<(u32, u64)> = dense
+            .iter()
+            .enumerate()
+            .filter(|(_, &v)| !v.is_multiple_of(m))
+            .map(|(c, &v)| (c as u32, v % m))
+            .collect();
+        self.state.get_mut().row_ops += entries.len() as u64;
+        if entries.is_empty() {
+            return if rhs.is_multiple_of(m) {
+                RowStatus::Dependent
+            } else {
+                RowStatus::Inconsistent
+            };
+        }
+        for &(c, _) in &entries {
+            self.weight[c as usize] += 1;
+        }
+        self.rows.push(entries);
+        self.rhs.push(rhs % m);
+        RowStatus::Independent
+    }
+
+    fn pinned(&self, col: usize) -> Option<u64> {
+        self.pin_value(col)
+    }
+
+    /// A placeholder, as for the other deferred solvers: the method tracks
+    /// no rank.
+    fn rank(&self) -> usize {
+        self.rows.len().min(self.cols.saturating_sub(1))
+    }
+
+    fn dependent(&self) -> u64 {
+        0
+    }
+
+    fn work(&self) -> (u64, &'static str) {
+        (self.state.borrow().row_ops, "row_ops")
+    }
+}
+
 /// The large-matrix pipeline of `koblitz_sparse_la` behind the
 /// incremental contract: CADO-NFS-style filtering
 /// ([`FilterOptions::cado`]: duplicates, singletons, clique purge,
@@ -741,6 +1099,9 @@ pub struct SparseCado {
     cols: usize,
     filter: FilterOptions,
     core: SparseCoreSolver,
+    /// Charge the `block × block` arithmetic of the Krylov core too (the
+    /// `+counted` names); off, `row_ops` is what recorded sessions hold.
+    count_block: bool,
     state: RefCell<SparseCadoState>,
 }
 
@@ -785,6 +1146,7 @@ impl SparseCado {
             cols,
             filter,
             core,
+            count_block: false,
             state: RefCell::new(SparseCadoState {
                 rows: SparseRows::for_modulus(&BigUint::from(modulus))
                     .expect("a prime modulus of at most 256 bits"),
@@ -798,6 +1160,13 @@ impl SparseCado {
                 attempts: 0,
             }),
         }
+    }
+
+    /// The same solver, charging the Krylov core's `block × block`
+    /// multiplications as well ([`SparseSolveOptions::count_block_arithmetic`]).
+    pub fn counted(mut self) -> Self {
+        self.count_block = true;
+        self
     }
 
     /// Solves tried so far.
@@ -816,6 +1185,7 @@ impl SparseCado {
                 filter: self.filter,
                 solver: self.core,
                 seed,
+                count_block_arithmetic: self.count_block,
                 ..SparseSolveOptions::default()
             };
             st.attempts += 1;
@@ -939,6 +1309,34 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
         "sparse reduced row echelon maintained as rows arrive, pivot on the lightest column; one row_op per non-zero multiply-subtract, so the two are comparable",
     ),
     (
+        "sparse-cado+counted",
+        "sparse-cado with the block x block multiplications of the Krylov core charged as well (projection, approximant basis, Z f products); the same relations and answer, a larger row_ops; an accounting change",
+    ),
+    (
+        "filter+wiedemann+counted",
+        "filter+wiedemann with the block x block multiplications charged (accounting change; same as sparse-cado+counted)",
+    ),
+    (
+        "filter+lanczos+counted",
+        "filter+lanczos with the Lanczos recurrences charged (Gram products, lanes x lanes inverse and products, block updates, diagonal scaling); accounting change",
+    ),
+    (
+        "wiedemann+counted",
+        "wiedemann (no filter) with the block x block multiplications charged; accounting change",
+    ),
+    (
+        "lanczos+counted",
+        "lanczos (no filter) with the Lanczos recurrences charged; accounting change",
+    ),
+    (
+        "pin-wiedemann",
+        "sparse target-pinned solve: singleton peeling, then Wiedemann on A = RᵀDR to test whether the target's unit vector is in the row space (A z = e_t, exact check); attempts spaced by the work of the last failed one (one relation ~ 16384 row_ops); stops when the target is pinned, like the echelon methods; one row_op per modular multiplication, Berlekamp-Massey and failed attempts included",
+    ),
+    (
+        "pin-wiedemann-every",
+        "pin-wiedemann with an attempt after every row: reads the exact pin row of the echelon methods; a diagnostic for the relation count, not for the work",
+    ),
+    (
         "sparse-cado",
         "batch CADO-style filter (clique purge, Markowitz/spanning-tree merge) then block Wiedemann, re-solved as relations arrive; full-rank completion, answer certified by two independently seeded solves; one row_op per entry multiply-subtract",
     ),
@@ -964,7 +1362,7 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
 /// pipeline runs them under the full-rank completion rule.
 pub fn is_deferred_sparse(name: &str) -> bool {
     matches!(
-        name,
+        name.strip_suffix("+counted").unwrap_or(name),
         "sparse-cado" | "filter+wiedemann" | "filter+lanczos" | "wiedemann" | "lanczos"
     )
 }
@@ -982,6 +1380,8 @@ pub fn matrix_by_name(
             Ok(Box::new(IncrementalGauss::new(cols, modulus)))
         }
         "structured-gauss" => Ok(Box::new(StructuredGauss::new(cols, modulus))),
+        "pin-wiedemann" => Ok(Box::new(PinWiedemann::new(cols, modulus, 16_384))),
+        "pin-wiedemann-every" => Ok(Box::new(PinWiedemann::new(cols, modulus, 0))),
         "sparse-cado" | "filter+wiedemann" => Ok(Box::new(SparseCado::new(cols, modulus))),
         "filter+lanczos" => Ok(Box::new(SparseCado::with_core(
             cols,
@@ -1001,6 +1401,18 @@ pub fn matrix_by_name(
             SparseCoreSolver::BlockLanczos,
             false,
         ))),
+        "sparse-cado+counted" | "filter+wiedemann+counted" => {
+            Ok(Box::new(SparseCado::new(cols, modulus).counted()))
+        }
+        "filter+lanczos+counted" => Ok(Box::new(
+            SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, true).counted(),
+        )),
+        "wiedemann+counted" => Ok(Box::new(
+            SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockWiedemann, false).counted(),
+        )),
+        "lanczos+counted" => Ok(Box::new(
+            SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, false).counted(),
+        )),
         other => Err(format!(
             "unknown relation matrix `{other}`; known: {}",
             MATRIX_NAMES
@@ -1309,6 +1721,145 @@ mod tests {
         }
     }
 
+    /// Random sparse rows of a planted system, `weight` non-zeros each.
+    fn planted_rows_weight(
+        rng: &mut StdRng,
+        cols: usize,
+        count: usize,
+        weight: usize,
+        modulus: u64,
+        x: &[u64],
+    ) -> Vec<(Vec<u64>, u64)> {
+        (0..count)
+            .map(|_| {
+                let mut row = vec![0u64; cols];
+                for _ in 0..weight {
+                    row[rng.gen_range(0..cols)] = rng.gen_range(1..modulus);
+                }
+                let rhs = row.iter().zip(x).fold(0u64, |acc, (&a, &b)| {
+                    addmod(acc, mulmod(a, b, modulus), modulus)
+                });
+                (row, rhs)
+            })
+            .collect()
+    }
+
+    /// The target-pinned sparse solve pins the target at exactly the row the
+    /// echelon method does when it attempts after every row, never earlier
+    /// when its attempts are spaced, and with the planted value; the pin is
+    /// certified by the exact check `A z = e_t`, not by a rank claim.
+    #[test]
+    fn pin_wiedemann_pins_at_the_echelon_row() {
+        for (k, &modulus) in [4_294_967_291u64, (1u64 << 61) - 1].iter().enumerate() {
+            for &(cols, weight) in &[(40usize, 2usize), (60, 3), (90, 4), (150, 3)] {
+                let mut rng = StdRng::seed_from_u64(20261104 + k as u64 * 977 + cols as u64);
+                let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+                let rows = planted_rows_weight(&mut rng, cols, 4 * cols, weight, modulus, &x);
+                let target = cols - 1;
+                let first_pin = |name: &str| -> (usize, u64, u64) {
+                    let mut m = matrix_by_name(name, cols, modulus).unwrap();
+                    for (i, (row, rhs)) in rows.iter().enumerate() {
+                        assert!(!matches!(
+                            m.add_row(row.clone(), *rhs),
+                            RowStatus::Inconsistent
+                        ));
+                        if let Some(v) = m.pinned(target) {
+                            return (i + 1, v, m.work().0);
+                        }
+                    }
+                    panic!("{name}: never pinned cols={cols} weight={weight} p={modulus}");
+                };
+                let (ref_rows, ref_val, _) = first_pin("structured-gauss");
+                assert_eq!(ref_val, x[target], "reference value");
+                let (every_rows, every_val, every_ops) = first_pin("pin-wiedemann-every");
+                assert_eq!(
+                    every_rows, ref_rows,
+                    "every-row attempts pin at the echelon row (cols={cols} weight={weight} p={modulus})"
+                );
+                assert_eq!(every_val, x[target]);
+                assert!(every_ops > 0);
+                let (spaced_rows, spaced_val, _) = first_pin("pin-wiedemann");
+                assert!(spaced_rows >= ref_rows, "spaced attempts cannot pin early");
+                assert_eq!(spaced_val, x[target]);
+            }
+        }
+    }
+
+    /// Negative control for the pin test: when no stored row touches the
+    /// target column, or the rows touching it only ever combine to a
+    /// multiple of the unit vector plus another column, the target is not
+    /// determined and neither `pin-wiedemann` variant may claim a pin.
+    #[test]
+    fn pin_wiedemann_never_pins_an_undetermined_target() {
+        let modulus = 4_294_967_291u64;
+        let cols = 40usize;
+        let mut rng = StdRng::seed_from_u64(77);
+        let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+        let target = cols - 1;
+        for name in ["pin-wiedemann", "pin-wiedemann-every"] {
+            // Rows that never touch the target.
+            let mut m = matrix_by_name(name, cols, modulus).unwrap();
+            for (row, rhs) in
+                planted_rows_weight(&mut rng, cols - 1, 200, 3, modulus, &x[..cols - 1])
+            {
+                let mut full = row;
+                full.push(0);
+                m.add_row(full, rhs);
+                assert_eq!(m.pinned(target), None, "{name}: untouched target");
+            }
+            // Every row carries the target and one shared base column, so
+            // the base part never cancels: rank-deficient in the target.
+            let mut m = matrix_by_name(name, cols, modulus).unwrap();
+            let mut row = vec![0u64; cols];
+            row[0] = rng.gen_range(1..modulus);
+            row[target] = rng.gen_range(1..modulus);
+            let rhs = addmod(
+                mulmod(row[0], x[0], modulus),
+                mulmod(row[target], x[target], modulus),
+                modulus,
+            );
+            // Two rows over the same two columns do determine both, so
+            // stop feeding before that can happen: one row only.
+            m.add_row(row, rhs);
+            assert_eq!(m.pinned(target), None, "{name}: one row over two columns");
+        }
+    }
+
+    /// The `+counted` names run the same solver on the same rows and return
+    /// the same solution; they differ only in charging the Krylov core's
+    /// `block x block` multiplications, so their `row_ops` is larger.
+    #[test]
+    fn counted_variants_charge_more_for_the_same_answer() {
+        let modulus = 4_294_967_291u64;
+        let cols = 90usize;
+        let mut rng = StdRng::seed_from_u64(20261104);
+        let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+        let rows = planted_rows(&mut rng, cols, 3 * cols, modulus, &x);
+        for name in DEFERRED {
+            let run = |name: &str| {
+                let mut m = matrix_by_name(name, cols, modulus).unwrap();
+                let mut fed = 0usize;
+                while m.pinned(cols - 1).is_none() {
+                    let (row, rhs) = &rows[fed];
+                    m.add_row(row.clone(), *rhs);
+                    fed += 1;
+                }
+                let sol: Vec<u64> = (0..cols).map(|c| m.pinned(c).unwrap()).collect();
+                (sol, m.work().0, fed)
+            };
+            let counted = format!("{name}+counted");
+            assert!(is_deferred_sparse(&counted));
+            let (sol, ops, fed) = run(name);
+            let (sol_c, ops_c, fed_c) = run(&counted);
+            assert_eq!(
+                (sol_c, fed_c),
+                (sol, fed),
+                "{counted}: same answer, same rows"
+            );
+            assert!(ops_c > ops, "{counted}: {ops_c} must exceed {ops}");
+        }
+    }
+
     #[test]
     fn the_registry_resolves_every_matrix_it_advertises() {
         for (name, _) in MATRIX_NAMES {
@@ -1319,7 +1870,7 @@ mod tests {
             assert_eq!(
                 is_deferred_sparse(name),
                 matches!(
-                    *name,
+                    name.strip_suffix("+counted").unwrap_or(name),
                     "sparse-cado" | "filter+wiedemann" | "filter+lanczos" | "wiedemann" | "lanczos"
                 )
             );

@@ -5,7 +5,7 @@
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 31,
+    "measured": 32,
     "open": 0
   },
   "repo": "crypto",
@@ -786,6 +786,296 @@
       ],
       "problem": "ic:curve25519-family-k32",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 115207.0,
+      "latest": 115207.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.054604
+      },
+      "metric": "stage_row_ops_w3_n1025_filter_lanczos_counted",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.054604
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 2109853.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 115207.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 428201412.0,
+      "latest": 428201412.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 202.953197
+      },
+      "metric": "stage_row_ops_w3_n1025_pin-wiedemann-every",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 202.953197
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 2109853.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 428201412.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 14007161.0,
+      "latest": 14007161.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.638927
+      },
+      "metric": "stage_row_ops_w3_n1025_pin-wiedemann",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.638927
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 2109853.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 14007161.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 172470.0,
+      "latest": 172470.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.081745
+      },
+      "metric": "stage_row_ops_w3_n1025_sparse-cado",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.081745
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 2109853.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 172470.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 2109853.0,
+      "latest": 2109853.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.0
+      },
+      "metric": "stage_row_ops_w3_n1025_structured-gauss",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.0
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 2109853.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 2109853.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 3342737.0,
+      "latest": 3342737.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.265604
+      },
+      "metric": "stage_row_ops_w4_n1025_filter_lanczos_counted",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.265604
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 12585418.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 3342737.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 2131204531.0,
+      "latest": 2131204531.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 169.339193
+      },
+      "metric": "stage_row_ops_w4_n1025_pin-wiedemann-every",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 169.339193
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 12585418.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 2131204531.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 27733335.0,
+      "latest": 27733335.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 2.203609
+      },
+      "metric": "stage_row_ops_w4_n1025_pin-wiedemann",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 2.203609
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 12585418.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 27733335.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 4890368.0,
+      "latest": 4890368.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.388574
+      },
+      "metric": "stage_row_ops_w4_n1025_sparse-cado",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.388574
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 12585418.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 4890368.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 12585418.0,
+      "latest": 12585418.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.0
+      },
+      "metric": "stage_row_ops_w4_n1025_structured-gauss",
+      "points": [
+        {
+          "commit": "33bf99c1a02d",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.0
+          },
+          "n": 3,
+          "record": "20261104T0636Z-sparse-la-stage",
+          "reference": 12585418.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "Stage diagnostic of the relation-matrix solvers on 420 planted systems (weights 2-8, 128-1024 base columns, 3 seeds): the target-pin solver pins at structured-gauss's exact row but costs 99-212x its counted row_ops (every-row attempts); the spaced variant overshoots relations up to 2.21x; filtered deferred solvers cost 0.05-0.37x at weights 3-4, 1025 columns. NOTE: launched without the resume checkpoint (the hook was passed by an empty-reason CHECKPOINT_SKIP by mistake; this container cannot upload one). Counts are deterministic and replayable.",
+          "value": 12585418.0
+        }
+      ],
+      "problem": "kernel:sparse_la_relation_matrix_stage",
+      "unit": "fmul"
     }
   ],
   "units": {

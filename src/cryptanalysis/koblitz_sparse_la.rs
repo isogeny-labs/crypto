@@ -2698,6 +2698,13 @@ pub struct BlockWiedemannReport {
     pub extra_steps: usize,
     /// Matrix–block products performed in total.
     pub products: usize,
+    /// Multiplications of the `block × block` arithmetic that
+    /// [`SparseSolveReport::row_ops`] leaves out: the projection `X Mᵗ Y`,
+    /// the approximant basis and the `Z f` products.  Never serialised, so
+    /// recorded reports keep their exact JSON; added to `row_ops` only under
+    /// [`SparseSolveOptions::count_block_arithmetic`].
+    #[serde(skip)]
+    pub block_ops: u64,
 }
 
 /// One column of the approximant basis: `f` (coefficients over the `n`
@@ -2713,11 +2720,27 @@ struct BasisColumn<W: ModWord> {
 /// with shift `(0ⁿ, 1ᵐ)`: every column `[f; g]` satisfies
 /// `a·f + g ≡ 0 (mod λ^L)` with `deg f ≤ δ`, `deg g ≤ δ − 1`, hence the
 /// block recurrence `Σ_{k≤δ} S_{s−k} f_k = 0` for `δ ≤ s < L`.
+// Kept as the reference implementation for the shifted approximant basis;
+// callers currently use the incremental path.
+#[allow(dead_code)]
 fn minimal_approximant_basis<W: ModWord>(
     seq: &[Vec<W>],
     m: usize,
     n: usize,
     modulus: W::Modulus,
+) -> Vec<BasisColumn<W>> {
+    minimal_approximant_basis_counted(seq, m, n, modulus, &mut 0)
+}
+
+/// [`minimal_approximant_basis`], adding to `ops` one per multiplication
+/// (or multiply-subtract) of a residue: the column reductions, the pivot
+/// inversions (one each) and the pivot normalisations.
+fn minimal_approximant_basis_counted<W: ModWord>(
+    seq: &[Vec<W>],
+    m: usize,
+    n: usize,
+    modulus: W::Modulus,
+    ops: &mut u64,
 ) -> Vec<BasisColumn<W>> {
     let md = &modulus;
     let big_l = seq.len();
@@ -2780,6 +2803,7 @@ fn minimal_approximant_basis<W: ModWord>(
                     }
                 }
                 let span = t * m..big_l * m;
+                *ops += (pp.f.len() * n + span.len()) as u64;
                 for (a, &b) in pj.residual[span.clone()].iter_mut().zip(&pp.residual[span]) {
                     *a = W::fixed_sub_from(&c, *a, b, md);
                 }
@@ -2789,9 +2813,11 @@ fn minimal_approximant_basis<W: ModWord>(
                 let inv = cols[j].residual[t * m + row]
                     .inv(md)
                     .expect("prime modulus");
+                *ops += 1;
                 if inv != W::one() {
                     let inv = W::fixed(inv, md);
                     let col = &mut cols[j];
+                    *ops += (col.f.len() * n + (big_l - t) * m) as u64;
                     for fk in col.f.iter_mut() {
                         for a in fk.iter_mut() {
                             *a = W::fixed_mul(&inv, *a, md);
@@ -2905,6 +2931,7 @@ pub fn block_wiedemann_kernel<W: ModWord>(
             }
         }
         seq.push(s);
+        report.block_ops += (m * big_n * n) as u64;
         if t + 1 < big_l {
             op.apply(&v, n, &mut w);
             report.products += 1;
@@ -2912,7 +2939,9 @@ pub fn block_wiedemann_kernel<W: ModWord>(
         }
     }
 
-    let basis = minimal_approximant_basis(&seq, m, n, modulus);
+    let mut basis_ops = 0u64;
+    let basis = minimal_approximant_basis_counted(&seq, m, n, modulus, &mut basis_ops);
+    report.block_ops += basis_ops;
     let mut order: Vec<usize> = (0..basis.len()).collect();
     order.sort_by_key(|&j| basis[j].delta);
     drop(y);
@@ -2948,10 +2977,12 @@ pub fn block_wiedemann_kernel<W: ModWord>(
         // gives M^{δ−e+1} u = 0, so some Mⁱu below that is in the kernel.
         let mut u = vec![W::zero(); big_n];
         z_times(&col.f[0], &mut u);
+        report.block_ops += (big_n * n) as u64;
         for fk in &col.f[1..=e] {
             op.apply(&u, 1, &mut buf);
             report.products += 1;
             z_times(fk, &mut u);
+            report.block_ops += (big_n * n) as u64;
             for (a, &b) in u.iter_mut().zip(&buf) {
                 *a = a.add(b, md);
             }
@@ -3006,6 +3037,13 @@ pub struct BlockLanczosReport {
     pub iterations: usize,
     /// Applications of the original sparse matrix or its transpose.
     pub sparse_products: usize,
+    /// Multiplications of the block recurrences that
+    /// [`SparseSolveReport::row_ops`] leaves out (Gram products, the
+    /// `lanes × lanes` inverse and products, the block updates and the
+    /// diagonal scaling).  Never serialised; see
+    /// [`BlockWiedemannReport::block_ops`].
+    #[serde(skip)]
+    pub block_ops: u64,
 }
 
 /// The symmetric, nonsingular (when `A` is nonsingular) congruence
@@ -3210,6 +3248,11 @@ pub fn block_lanczos_solve<W: ModWord>(
     }
     let mut residual = vec![W::zero(); dimension * lanes];
     normal.rhs(&right, lanes, &mut residual);
+    let (nl, l2, l3) = (
+        (dimension * lanes) as u64,
+        (dimension * lanes * lanes) as u64,
+        (lanes * lanes * lanes) as u64,
+    );
     let mut direction = residual.clone();
     let mut solution = vec![W::zero(); dimension * lanes];
     let mut image = vec![W::zero(); dimension * lanes];
@@ -3218,12 +3261,17 @@ pub fn block_lanczos_solve<W: ModWord>(
         dimension,
         block_size: lanes,
         sparse_products: 1,
+        block_ops: nl,
         ..BlockLanczosReport::default()
     };
     let limit = dimension.div_ceil(lanes) + options.margin.max(2);
     for iteration in 0..limit {
         normal.apply(&direction, lanes, &mut image, &mut scratch);
         report.sparse_products += 2;
+        // The diagonal scaling of the normal operator, the two Gram
+        // products, the `lanes × lanes` inverse (an elimination on
+        // `lanes × 2·lanes`), the product and the two block updates.
+        report.block_ops += nl + 2 * l2 + 2 * l3 + l3 + 2 * l2;
         let h = block_gram(&direction, &image, dimension, lanes, modulus);
         let h_inverse = small_inverse(&h, lanes, modulus)?;
         let projected = block_gram(&direction, &residual, dimension, lanes, modulus);
@@ -3262,6 +3310,7 @@ pub fn block_lanczos_solve<W: ModWord>(
         }
         // P_new = R_new - P H^{-1} (A P)^T R_new. This makes the new
         // block A-conjugate to the previous direction block.
+        report.block_ops += l2 + l3 + l2;
         let cross = block_gram(&image, &residual, dimension, lanes, modulus);
         let beta = small_product(&h_inverse, &cross, lanes, modulus);
         let mut next_direction = residual.clone();
@@ -3312,6 +3361,11 @@ pub struct SparseSolveOptions {
     /// Independent `(fold, X, Y)` draws before giving up.
     pub attempts: usize,
     pub seed: u64,
+    /// Add the `block × block` multiplications of the Krylov core (see
+    /// [`BlockWiedemannReport::block_ops`]) to [`SparseSolveReport::row_ops`].
+    /// Off by default, so recorded counts replay unchanged.
+    #[serde(skip_serializing_if = "is_default")]
+    pub count_block_arithmetic: bool,
 }
 
 impl Default for SparseSolveOptions {
@@ -3325,6 +3379,7 @@ impl Default for SparseSolveOptions {
             fold: 3,
             attempts: 3,
             seed: 0x5350_4152_5345_4c41,
+            count_block_arithmetic: false,
         }
     }
 }
@@ -3482,6 +3537,9 @@ pub fn solve_sparse_system<W: ModWord>(
                     };
                     report.row_ops +=
                         (wr.products * wr.block_n) as u64 * (square_nonzeros + square.len() as u64);
+                    if opts.count_block_arithmetic {
+                        report.row_ops += wr.block_ops;
+                    }
                     report.wiedemann = Some(wr);
                     let t = z[core_cols];
                     let Some(inv) = (!t.is_zero()).then(|| t.inv(m)).flatten() else {
@@ -3495,6 +3553,9 @@ pub fn solve_sparse_system<W: ModWord>(
                         continue;
                     };
                     report.row_ops += (lr.sparse_products * lr.block_size) as u64 * square_nonzeros;
+                    if opts.count_block_arithmetic {
+                        report.row_ops += lr.block_ops;
+                    }
                     report.lanczos = Some(lr);
                     x
                 }
