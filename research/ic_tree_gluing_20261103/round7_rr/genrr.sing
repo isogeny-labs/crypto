@@ -252,6 +252,8 @@ proc rrcell(intvec cv, intvec rec, string OUT)
     else
     {
       // solve S*Ux + T*C = 1 at the planted values for the witness coefficients (linear)
+      for (i = 0; i <= h - 3; i++) { vals[ix("bs" + string(i), nm)] = var(ix("bs" + string(i), nm)); }
+      for (i = 0; i < m; i++) { vals[ix("bt" + string(i), nm)] = var(ix("bt" + string(i), nm)); }
       map pv0 = R, vals; ideal LB; poly e;
       df = Sb * Ux + Tb * Cp - 1; df = pv0(df); M = coeffs(df, Z);
       for (i = 1; i <= nrows(M); i++) { LB[size(LB) + 1] = M[i, 1]; }
