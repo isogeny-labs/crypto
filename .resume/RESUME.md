@@ -64,3 +64,14 @@ Branch on the quadratic character of each separator, adding X_c = n_j·z_c² wit
 - Prediction (Elekes–Szabó reading): D_H = D_T in the true branch (no degree drop), and the false branch costs about the same time.
 - Win condition: D drops by ≥ 1 per guessed bit, or total time over all branches < T's time.
 - Runs: msolve 1 thread, 1800 s cap, 6 GiB.
+
+## Round 5, test H outcome (recorded before test L)
+- At m3 t4, Htrue and Hfalse match T exactly (D = 6, widest 7,077), each with quotient dimension 6 (z ↦ −z).
+- Reason: over F̄_p every X is c·z²; F_p-rationality is not a low-degree algebraic constraint.
+- m3 t5 was stopped at 42 s, still on T's matrices; m4 t4 was not run.
+
+## Test L (fat-leaf tree, written before any L run)
+- m = 4 as one triple (S4sym in e1, e2, e3 with output X1, degree-3 remainder chain) plus one leaf (Kummer chain), root S3(X1, x4, xR).
+- That is 1 separator against T's 2 separators (X1, X2) with a symmetric root.
+- Prediction (excess ∝ number of separators): D_L(4,4) ≤ 6 < D_T = 7.
+- Falsified if D_L ≥ 7. Cells: m4 at t4 and t5, k0.
