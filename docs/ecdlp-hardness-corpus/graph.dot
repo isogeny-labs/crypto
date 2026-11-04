@@ -310,6 +310,7 @@ digraph ecdlp_claims {
     "THM-HAZARD-MARGINAL-SUFFICES" [label="THM-HAZARD-MARGINAL-SUFFICES\\nPer-trial marginal bounds give the linear waiting time (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CLAIM-MARGINAL-IMPLIES-HAZARD" [label="CLAIM-MARGINAL-IMPLIES-HAZARD\\n'Per-trial success bounds give the conditional-hazard recurrence'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "CEX-HAZARD-SEPARATION" [label="CEX-HAZARD-SEPARATION\\nThree-point model: marginals <= 1/3, hazard recurrence fails (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-SD-DEGREE2-CRITERION" [label="THM-SD-DEGREE2-CRITERION\\nSolving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -599,6 +600,7 @@ digraph ecdlp_claims {
     "GAP-PA-SNARK-DEFINITIONS" [label="GAP-PA-SNARK-DEFINITIONS\\nSNARK definitions as separate games", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PA-FULL-KZG-GROTH-PLONK" [label="GAP-PA-FULL-KZG-GROTH-PLONK\\nEnd-to-end KZG, Groth16 and PLONK", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PA-CURVE-SELECTION" [label="GAP-PA-CURVE-SELECTION\\nCurve-selection assumptions with exact curve and subgroup identities", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PQ2-M2-RANK-CENSUS" [label="GAP-PQ2-M2-RANK-CENSUS\\nDoes r2 < k hold on m = 2 descended S_3 instances for infinitely many n?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -1550,4 +1552,7 @@ digraph ecdlp_claims {
   "THM-HAZARD-MARGINAL-SUFFICES" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="enables", color="#66788a", style="solid"];
   "THM-HAZARD-MARGINAL-SUFFICES" -> "ASM-XEDNI-HAZARD-RECURRENCE" [label="qualifies", color="#66788a", style="dashed"];
   "CEX-HAZARD-SEPARATION" -> "GAP-PA-ONE-SHOT-REPEAT" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-SD-DEGREE2-CRITERION" -> "HEUR-GB-PQ-ASSUMPTION-2" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-SD-DEGREE2-CRITERION" -> "HEUR-FIRST-FALL-DEGREE" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-PQ2-M2-RANK-CENSUS" -> "HEUR-GB-PQ-ASSUMPTION-2" [label="leaves_open", color="#66788a", style="dashed"];
 }

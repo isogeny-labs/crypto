@@ -10,3 +10,16 @@ import WeaknessLean
 #print axioms HazardSeparation.marginals_U
 #print axioms HazardSeparation.marginals_do_not_give_hazard
 #print axioms HazardSeparation.wait_U
+#print axioms SolvingDegreeBound.le_single_one
+#print axioms SolvingDegreeBound.totalDegree_le_one_of_degree_single
+#print axioms SolvingDegreeBound.linearIndependent_of_degree_injective
+#print axioms SolvingDegreeBound.linear_count_of_gb_in_span
+#print axioms SolvingDegreeBound.low_add_top_le_card
+#print axioms SolvingDegreeBound.solving_degree_ge_three
+#print axioms SolvingDegreeBound.not_tendsto_of_frequently_gap
+#print axioms SolvingDegreeBound.degLex_degCompat
+#print axioms SolvingDegreeBound.Toy.X0_mem
+#print axioms SolvingDegreeBound.Toy.X1_mem
+#print axioms SolvingDegreeBound.Toy.one_not_mem
+#print axioms SolvingDegreeBound.Toy.rank_top
+#print axioms SolvingDegreeBound.Toy.toy_solving_degree_ge_three
