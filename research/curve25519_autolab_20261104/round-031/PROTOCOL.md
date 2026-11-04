@@ -106,3 +106,12 @@ An improvement makes `sel` the incumbent of its track and size in `ledger.json`,
 Route: `local`. Counted GAE, deterministic and host-independent; no wall-time claim. Isolation level earned is recorded per session and does not change the counts. This is a development loop: no round reaches the IC leaderboard or `benchmarks/README.md` without the validation gate (replay certificate on a second host class, validator report, matched rho with the band; `docs/VALIDATION_GATE.md`).
 
 Exposures excluded: 86 target seeds already used on this family (ledger exposures); the seeds above are new.
+
+## Amendment: selection (2026-11-04T11:16:03Z, after train, before holdout)
+
+- k = 20: selected `wwalkg-x12-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wwalk:x=1.2`), train mean S = 2.569 / 2.661 / 3.490 against `inc` 2.581 / 2.698 / 3.752; Pareto alternative at w = 1: `wwalkg-x12-n2`. Holdout spec `specs/holdout-k20.json`, `target_seed` 2026141920.
+- k = 24: selected `wwalkg-x08-grow-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wwalk:x=0.8,grow=1`), train mean S = 2.093 / 2.165 / 2.813 against `inc` 2.670 / 2.806 / 4.027; Pareto alternative at w = 1: `wwalkg-x08-grow-n2`. Holdout spec `specs/holdout-k24.json`, `target_seed` 2026141924.
+- k = 28: selected `wwalkg-x08-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wwalk:x=0.8`), train mean S = 1.831 / 1.930 / 2.820 against `inc` 2.291 / 2.393 / 3.308; Pareto alternative at w = 1: `wwalkg-x08-n2`. Holdout spec `specs/holdout-k28.json`, `target_seed` 2026141928.
+- k = 32: selected `wwalk-x10-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wwalk:x=1.0`), train mean S = 2.051 / 2.246 / 3.998 against `inc` 2.535 / 2.778 / 4.962; Pareto alternative at w = 1: `wwalkg-x08-grow-n2`. Holdout spec `specs/holdout-k32.json`, `target_seed` 2026141932.
+
+Holdout spec sha256: {"holdout-k20":"cc61053dd714d1391e755f6c0c4b6dcd7794fc66062337c0fd9bc976d9976cbf","holdout-k24":"00c4e366a7574287b662f34f2b6b9f1b7d155297c532339815a1cdc82119d68e","holdout-k28":"d8df2134b990aa1be295fadef3ab65abaa3d250e44d98200c8f254640a67d056","holdout-k32":"2dc40272e7c5cb7b67ac5f8fa17918638d8751220804cf6b1e096b36dc6b4278"}
