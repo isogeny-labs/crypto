@@ -1,7 +1,7 @@
 # Weak points in the ECDLP hardness corpus: triage, 2026-11-03
 
 **Question.** Where is the claim graph that supports ECDLP hardness weakest, and which
-weak points can be broken cheaply enough to attack first?
+weak points can be broken cheaply enough to attack first? [pcc:unverified]
 
 **Scope.** The assembled corpus (version 2026-11-01: 583 claims, 950 edges, 236 sources,
 including the protocol-layer port of W7 and the Lean results of 2026-11-04),
@@ -68,6 +68,18 @@ the assumption for that family. Candidate route: exhibit, for every n, a degree-
 Macaulay span that provably misses a polynomial the reduced Gröbner basis needs. A
 census of the degree-2 Macaulay rank against n over F₂ would show whether the gap is
 uniform before the proof is attempted.
+
+**Lean (2026-11-04): `THM-SD-DEGREE2-CRITERION`.** The lower-bound step is now
+kernel-checked as a general criterion. Suppose a Gröbner basis lies in the span of
+degree-2 generators (solving degree ≤ 2). Then the degree-2 span must already contain
+as many independent linear polynomials (`r₂`) as the ideal has linear consequences
+(`k`). So any m = 2 instance with `r₂ < k` has solving degree ≥ 3 = D_ff + 1, and
+infinitely many such `n` refute the literal reading. Kosters–Yeo give `r₂ ≥ 1`,
+generically 1.
+
+The remaining step is a finite rank census per instance (`GAP-PQ2-M2-RANK-CENSUS`),
+not a proof. Kousidis–Wiemers' reading (3 + o(1) at m = 2) needs solving degree ≥ 4
+and is not addressed.
 
 **Effect on the baseline.** None directly. This retracts projected IC costs that were
 never the measured baseline. It matters because it removes a whole family of
@@ -151,11 +163,14 @@ repository source for the refutation (`S-IC-NEGATIVE`), still says "under that l
 reading the lemma holds only vacuously". The boundaries section also notes that a final
 publication "still owes a fresh PDF-level transcription of both definitions".
 
-**Actions.** (a) Correct the ic-negative wording to the boundaries table. (b) Record the
-reading as a parameter of `CLAIM-NAGAO-LEMMA4` (refuted in 3 of 4 cells) instead of a
-footnote. (c) Run the existing exact census on the one open cell (literal `≥`, field
-equations inside). (d) Do the PDF transcription, because the refutation is only as good
-as the reading.
+**Actions.** (a) Correct the ic-negative wording to the boundaries table (done
+2026-11-04). (b) Record the reading as a parameter of `CLAIM-NAGAO-LEMMA4` instead of a
+footnote. (c) Settle the open cell (literal `≥`, field equations inside): **done
+2026-11-04, and it is a theorem, not a counterexample** (`THM-NAGAO-LEMMA4-LITERAL-INSIDE`,
+Lean). A fake fall lifts to a true fall at the same degree once its sum is replaced by a
+least-degree representative modulo the field equations, which are generators in this
+placement. The reading axis is now complete: refuted in 3 cells, proved in the 4th. (d) Do
+the PDF transcription, because which cell Nagao meant decides which verdict applies. [pcc:unverified]
 
 ## W5. Eleven unwired dependences understate the top frontier nodes
 
@@ -192,7 +207,7 @@ now reports any new occurrence.
   refuted claim and live siblings (listed in `WEAKNESSES.md` §4).
 - **Model-scope leaps (exact).** All nine are generic-model rho heuristics feeding
   standards or the concrete rho algorithm. That is the honest, well-known generic-to-concrete
-  step, and the repository's matched-rho measurements control it.
+  step, and the repository's matched-rho measurements control it. [pcc:unverified]
 
 ## W7. The protocol-layer corpus, ported and cross-linked
 
@@ -248,15 +263,17 @@ edge whose obstruction rests on an assumed, heuristic or open claim: 16. Read by
 - **Rank-only closures are not reopenings.** The GHS (KMPS) and two-summand closures rest
   on `HEUR-RELATION-RANK`; per W2, removing that heuristic *strengthens* them.
 
-**Derived (strengthens a closure, so it saves effort).** One tempting escape from
-`HEUR-PF-NO-SUBFIELD-OBSTRUCTION` fails. Base-change E/F_p to F_{p^n}, decompose a target
-R in E(F_p) over points whose x-coordinates lie in an F_p-subspace V of F_{p^n}, and pull
-the relation back with the trace: nR = Σ Tr(Pᵢ). The pulled-back factor base Tr(F') has
-about p^{dim V} ≥ p elements, the size of the whole group, while rho needs about √p.
-Any subspace-based factor base therefore fails on prime fields by a dimension count, not by
-heuristic. A prime-field escape needs a factor base that is *not* a subspace image (small
-integers, composed rational maps, random sets), which is where the corpus already places
-PKM and APS.
+**Withdrawn 2026-11-04 (was "derived"): the trace pull-back is not ruled out.** An earlier
+version said one escape from `HEUR-PF-NO-SUBFIELD-OBSTRUCTION` fails by a dimension count.
+The escape: base-change E/F_p to F_{p^n}, decompose a target R ∈ E(F_p) over the points F'
+whose x-coordinates lie in an F_p-subspace V, and pull back with the trace (nR = Σ Tr(Pᵢ)).
+
+The count gives |F'| ≈ p^{dim V} ≥ p. But the factor base used over F_p is Tr(F'), and
+the trace on points is many-to-one, so the count says nothing about |Tr(F')|. Generic V
+is expected to give |Tr(F')| near #E(F_p), and then the route fails. No argument here
+excludes a special V with a small trace image and plentiful decompositions.
+
+The question is now the open lead `GAP-PF-TRACE-PULLBACK-FACTOR-BASE`.
 
 **Attack.** Order the reopenings by how cheaply each support can be tested:
 
@@ -273,7 +290,7 @@ cheap targets.
 ## Lean results, 2026-11-04
 
 Lean project [`research/ecdlp_weakness_lean_20261104/lean`](../../research/ecdlp_weakness_lean_20261104/README.md)
-(Lean v4.34.1, Mathlib v4.34.1). All ten theorems depend only on `propext`,
+(Lean v4.34.1, Mathlib v4.34.1). Every theorem in the project (35 audited after round 3) depends only on `propext`,
 `Classical.choice` and `Quot.sound` (`AxiomAudit.lean`). The repository proof gate
 re-checks them in CI.
 
@@ -309,18 +326,66 @@ This **strengthens** the xedni closure rather than reopening it. The remaining b
 is whether adaptive lift selection can raise a single trial's marginal above the
 one-shot bound.
 
+**Round 3 (same day): protocol-layer countermodels.** `ProtocolCountermodels.lean`
+refutes five of the overbroad claims the ported protocol corpus lists as open:
+
+- "special soundness ⇒ Fiat–Shamir security": a constant-zero challenge accepts
+  (sP, 0, s) for every key;
+- unconditional Pedersen binding: a known H = tG gives a second opening;
+- cofactor clearing as a bijection on the subgroup: 3 annihilates the order-3 subgroup
+  of Z/9, and coprime cofactors are bijective;
+- ambient blinding in random self-reduction: it leaves the subgroup, while subgroup
+  blinding is a bijection;
+- "complete + zero knowledge ⇒ sound": the always-accept protocol.
+
+It also proves that a nondegenerate pairing decides DDH with one evaluation. [pcc:unverified]
+
+## Round 4 (2026-11-04): censuses and four more theorems
+
+Native exact censuses in
+[`research/ecdlp_weakness_census_20261104/`](../../research/ecdlp_weakness_census_20261104/README.md)
+and four Lean modules. Census numbers are unverified assertions (no signed validator
+report) [pcc:unverified]; the Lean results have pcc claim records pending CI signing.
+
+- **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** Census pending at this revision; numbers follow.
+  The criterion behind it is `THM-SD-SUBSPACE-CRITERION` (Lean): a Gröbner basis
+  inside the degree-d Macaulay row space supplies at most dim(rowspace ∩ P₁) linear
+  leading monomials, so `d_lin ≤ sd`. The `|Z| = 1` case of the bridge `k = N` is
+  `THM-BOOLEAN-NSS-UNIQUE` (Lean).
+- **W2, relation rank in the right-kernel regime (`rank_deficit`).** With negation
+  pairs merged, Δ = 10 surplus relations gave full rank in all five samples on 2 of 10
+  curves (p ≤ 16001); deficits of 1–3 persist at Δ = 10 and up to 2 at Δ = 40. PKM's
+  "Δ = 10 suffices" is contradicted at these sizes (`MEAS-RANK-DEFICIT-CENSUS`
+  obstructs `HEUR-PF-PKM-RANK-DELTA`).
+- **W3, decomposition yield (`pf_yield`).** The mean is now a theorem
+  (`THM-MEAN-COUNT-IDENTITY`). With unordered pairs the zero class matches
+  1 − exp(−μ/2) within about 1%; the variance is 1.45× Poisson for every base closed
+  under negation and 0.97–0.99× for a base that is not. The heuristic's shape is
+  right for the zero class and wrong for the variance, for the bases index calculus
+  uses.
+- **W7, trace pull-back (`trace_pullback`).** Over F_{p²}, no one-dimensional
+  subspace gives a trace image below 0.32·#E(F_p); the lead
+  `GAP-PF-TRACE-PULLBACK-FACTOR-BASE` is narrowed to higher degrees and dimensions.
+- **Extension-field 1/n! (`ext_decomp`).** 0.70–0.99 of 1/n! at n = 2, 3 for curves
+  with F_{qⁿ} coefficients; for curves defined over F_q the premise fails (factor base
+  = E(F_q)), a hypothesis the survey node should carry.
+- **Shoup's bound (`TransparentEncoding`).** `CLAIM-SHOUP-ALL-ALGORITHMS` ("every
+  algorithm needs Ω(√r)") is refuted by the identity encoding of Z/r; `LB-SHOUP-DLP`
+  and "BSGS is optimal by Shoup" are qualified as generic-model statements.
+
 ## Recommended order of attack
 
 | # | target | kind of result | cost | what changes if it lands |
 |---|---|---|---|---|
 | 1 | W2: re-wire the rigorous Weil-descent chain to `THM-LEFT-KERNEL-RELATIONS` (Lean core done 2026-11-04) | corpus edit | low | 4 inflation rows resolved; rank heuristic confined to the multi-target regime |
 | 2 | W5: add the 11 missing edges | corpus fix | trivial | true impact of the top frontier nodes becomes visible |
-| 3 | W4: fix the ic-negative wording; census the open cell | correction + exact census | low | the Lemma 4 refutation becomes reading-complete |
+| 3 | W4: transcribe Nagao's Definitions 5–6 from the PDF (wording fixed and open cell proved 2026-11-04) | source reading | low | decides which of the four now-settled cells is Nagao's |
 | 4 | W3: prime-field yield census, full histogram, scaling in p | exact measurement | low–medium | every prime-field yield estimate is checked or corrected |
-| 5 | W1: degree-2 Macaulay rank census, then the lower-bound proof | census, then proof | medium | PQ Assumption 2 refuted for m = 2; the FFDA rows retire |
+| 5 | W1: `r₂` vs `k` rank census on m = 2 descended S₃ instances (criterion kernel-checked 2026-11-04) | exact census | low | literal PQ Assumption 2 refuted for m = 2 if `r₂ < k` persists; the FFDA rows retire |
 | 6 | `RT-SP-SEMAEV-A1-N45` | exact F4 run | low | Semaev 2015 Assumption 1 settled at the measured scale |
 | 7 | W7: YYTK Conjecture 10 past 25 bits | exact census | low–medium | the naive prime-field Semaev closure is confirmed, or the route reopens |
 | 8 | W7: per-trial marginal bound for adaptive xedni lift selection (`ASM-XEDNI-TRIAL-MARGINAL`; the separation and repair are done in Lean) | proof or countermodel | medium | the xedni waiting-time step is closed, or adaptive selection reopens the route |
+| 9 | W7: `GAP-PF-TRACE-PULLBACK-FACTOR-BASE`: trace-image size of subspace factor bases on small p | exact census | low | the withdrawn closure is restored, or a prime-field lead opens |
 
 Items 1, 2, 3 and 8 are corpus and proof work, not experiment runs. Items 4–7 are runs and go
 through the repository's experiment route (protocol, resume checkpoint, native code,

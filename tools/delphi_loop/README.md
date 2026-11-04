@@ -73,7 +73,11 @@ DELPHI=tools/delphi_loop/delphi DELPHI_REAL=delphi \
 
 python3 tools/delphi_loop/loop.py harvest    # lane records -> episodes
 python3 tools/delphi_loop/loop.py push       # traces and verdicts (hashes only)
+python3 tools/delphi_loop/loop.py export -o episodes.delphi.jsonl   # delphi.episode.v1 rows
 ```
+
+When the real Delphi binary has `route`, run `loop.py export | delphi learn -in -`
+and point `DELPHI` at the real binary instead of the shim.
 
 Before promoting a cheaper model, measure it offline on prompts that already
 have accepted replies:

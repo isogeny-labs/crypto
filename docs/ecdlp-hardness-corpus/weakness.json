@@ -2,17 +2,17 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 583,
+    "nodes": 607,
     "status_inflation": 17,
     "model_scope_leaps": 9,
     "contagious_sources": 21,
-    "hidden_assumption_clusters": 18,
+    "hidden_assumption_clusters": 19,
     "unwired_dependences": 11,
     "route_closures_on_weak_support": 16,
-    "live_obstructions": 49,
+    "live_obstructions": 51,
     "author_flagged": 8,
-    "attack_queue": 246,
-    "hygiene_queue": 100
+    "attack_queue": 248,
+    "hygiene_queue": 112
   },
   "status_inflation": [
     {
@@ -894,9 +894,15 @@
       "title": "Lean attacks on two weak points of the ECDLP hardness graph",
       "verification": "repository_read",
       "refuted": [
-        "CLAIM-MARGINAL-IMPLIES-HAZARD"
+        "CLAIM-MARGINAL-IMPLIES-HAZARD",
+        "CLAIM-PA-SS-IMPLIES-FS",
+        "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING",
+        "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP",
+        "CLAIM-PA-AMBIENT-BLINDING",
+        "CLAIM-PA-ZK-IMPLIES-SOUND",
+        "CLAIM-SHOUP-ALL-ALGORITHMS"
       ],
-      "refuted_fraction": 0.2,
+      "refuted_fraction": 0.28,
       "exposed": [
         {
           "id": "ASM-XEDNI-TRIAL-MARGINAL",
@@ -914,7 +920,77 @@
           "impact": 0
         },
         {
+          "id": "CEX-PA-ALWAYS-ACCEPT",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-AMBIENT-BLINDING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-COFACTOR-ZMOD9",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-ZERO-HASH-FORGERY",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-TRANSPARENT-ENCODING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
+          "status": "open",
+          "impact": 0
+        },
+        {
+          "id": "GAP-PQ2-M2-RANK-CENSUS",
+          "status": "open",
+          "impact": 0
+        },
+        {
+          "id": "THM-BOOLEAN-NSS-UNIQUE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
           "id": "THM-LEFT-KERNEL-RELATIONS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-MEAN-COUNT-IDENTITY",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-PA-PAIRING-DECIDES-DDH",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-SD-DEGREE2-CRITERION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-SD-SUBSPACE-CRITERION",
           "status": "proved_internal_unreviewed",
           "impact": 0
         }
@@ -1079,11 +1155,13 @@
         "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
         "CEX-FAKE-GAP-INSIDE-YZ",
         "CEX-INSIDE-GAP-THREE",
-        "CEX-INSIDE-GAP-N1-FAMILY"
+        "CEX-INSIDE-GAP-N1-FAMILY",
+        "THM-NAGAO-LEMMA4-LITERAL-INSIDE"
       ],
       "texts": [
         "Equality reading of Definitions 5 and 6",
-        "Equality reading"
+        "Equality reading",
+        "Literal >= reading of Definitions 5 and 6"
       ],
       "established_users": [],
       "total_impact": 2
@@ -1271,6 +1349,20 @@
         "RED-ISOGENY-DLP-TRANSPORT"
       ],
       "total_impact": 17
+    },
+    {
+      "nodes": [
+        "ATTACK-MOV-PAIRING",
+        "RED-PAIRING-CO-DDH",
+        "THM-PA-PAIRING-DECIDES-DDH"
+      ],
+      "texts": [
+        "A computable nondegenerate pairing",
+        "Efficient nondegenerate pairing",
+        "Nondegenerate symmetric pairing"
+      ],
+      "established_users": [],
+      "total_impact": 6
     },
     {
       "nodes": [
@@ -1768,6 +1860,16 @@
       "statement": "At m = 2, D_ff = 2 and D_reg rises from 4 to 5 between n = 36 and 37, i.e. D_reg - D_ff is not o(1)-close at fixed value and is moving with n."
     },
     {
+      "edge": "R4-009",
+      "relation": "obstructs",
+      "from": "MEAS-RANK-DEFICIT-CENSUS",
+      "from_status": "measured",
+      "to": "HEUR-PF-PKM-RANK-DELTA",
+      "to_status": "heuristic",
+      "impact": 3,
+      "statement": "Delta = 10 left a rank deficit in at least one of 5 samples on 8 of 10 small curves."
+    },
+    {
       "edge": "XL-002",
       "relation": "obstructs",
       "from": "OBS-SP-KY-SEMAEV-N45",
@@ -1876,6 +1978,16 @@
       "to_status": "heuristic",
       "impact": 13,
       "statement": "The measured rate follows the exact count 16 C(|F|,6)/l, not the asymptotic 1/(ng)!; small bases are 3-30% below the asymptotic rate."
+    },
+    {
+      "edge": "R4-008",
+      "relation": "qualifies",
+      "from": "MEAS-PF-YIELD-CENSUS",
+      "from_status": "measured",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "to_status": "heuristic",
+      "impact": 13,
+      "statement": "Zero class matches Poisson once the unordered convention is used; the variance is 1.45x Poisson for negation-closed bases."
     },
     {
       "edge": "E-SP-086",
@@ -2365,6 +2477,20 @@
       "score": 1.858
     },
     {
+      "id": "HEUR-PF-PKM-RANK-DELTA",
+      "label": "PKM: Delta = 10 surplus relations suffice",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 3,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 1,
+      "breakability": 0.5,
+      "cost": "measurement",
+      "action": "measure on a scaling family without censoring",
+      "score": 1.794
+    },
+    {
       "id": "HEUR-XT-NFS-SMOOTHNESS",
       "label": "Classical NFS smoothness heuristic",
       "status": "heuristic",
@@ -2545,20 +2671,6 @@
       "cost": "measurement",
       "action": "measure on a scaling family without censoring",
       "score": 1.23
-    },
-    {
-      "id": "HEUR-PF-PKM-RANK-DELTA",
-      "label": "PKM: Delta = 10 surplus relations suffice",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 3,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.5,
-      "cost": "measurement",
-      "action": "measure on a scaling family without censoring",
-      "score": 1.161
     },
     {
       "id": "HEUR-PF-PKM-SOLUTION-COUNT",
@@ -4759,6 +4871,34 @@
       "score": 0.409
     },
     {
+      "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
+      "label": "Can a trace-pulled-back subspace factor base be small?",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.409
+    },
+    {
+      "id": "GAP-PQ2-M2-RANK-CENSUS",
+      "label": "Does r2 < k hold on m = 2 descended S_3 instances for infinitely many n?",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.409
+    },
+    {
       "id": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
       "label": "No lower bound for target-field DLP cost exists",
       "status": "open",
@@ -6875,8 +7015,106 @@
       "score": 0.702
     },
     {
+      "id": "CEX-PA-ALWAYS-ACCEPT",
+      "label": "Always-accept protocol: complete, simulatable, unsound (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-AMBIENT-BLINDING",
+      "label": "Ambient blinding leaves the subgroup; subgroup blinding is a bijection (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-COFACTOR-ZMOD9",
+      "label": "In Z/9, cofactor 3 kills the order-3 subgroup; coprime cofactors are bijective (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+      "label": "H = tG gives commit(m, r) = commit(m + t, r - 1) (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-PA-ZERO-HASH-FORGERY",
+      "label": "Constant-zero challenge: (sP, 0, s) verifies for every key (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-TRANSPARENT-ENCODING",
+      "label": "Z/r with the identity encoding: the logarithm is the encoding (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
       "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
       "label": "Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-BOOLEAN-NSS-UNIQUE",
+      "label": "Unique F_2-solution puts every X_i - z_i in the ideal (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "algebraic_coordinate",
       "impact": 0,
@@ -6903,10 +7141,80 @@
       "score": 0.702
     },
     {
+      "id": "THM-MEAN-COUNT-IDENTITY",
+      "label": "Mean ordered representation count is exactly |F|^m / |G| (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
+      "label": "Nagao Lemma 4 holds in the literal >=, field-equations-inside cell (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-PA-PAIRING-DECIDES-DDH",
+      "label": "A nondegenerate pairing decides DDH with one evaluation (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
       "id": "THM-RP-ICNEG-YIELD-CONSERVATION",
       "label": "Yield conservation over Finset fibres with coverage bound (IcNegative, unchecked)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-SD-DEGREE2-CRITERION",
+      "label": "Solving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-SD-SUBSPACE-CRITERION",
+      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
       "impact": 0,
       "inflates": 0,
       "contagion": 1,
