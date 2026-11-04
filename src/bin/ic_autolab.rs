@@ -382,6 +382,11 @@ struct Family {
     /// Further `ic.pipeline` parameters every arm of the family carries.
     #[serde(default)]
     params: BTreeMap<String, String>,
+    /// A parent family whose best verified N at a size is this family's
+    /// first N there (a variant of an existing table starts where the
+    /// table is best).
+    #[serde(default)]
+    start_from: Option<String>,
 }
 
 fn default_true() -> bool {
@@ -809,16 +814,40 @@ fn propose_size(
         if explored >= exploration {
             break;
         }
-        let n = ((size.n_a as f64) * fam.default_f).round() as u64;
-        let before = out.len();
-        push(
-            tf.arm(fam, n),
-            format!(
-                "exploration: family {} untried at k = {k}, N = {} x N_a",
-                fam.id, fam.default_f
+        // A family that names a parent starts at the parent's best
+        // verified N at this size (the incumbent's N when the parent is the
+        // incumbent), else at `default_f x N_a`.
+        let parent_n = fam.start_from.as_ref().and_then(|pid| {
+            if inc.arm.family == *pid {
+                return Some(inc.arm.n);
+            }
+            ledger
+                .trials
+                .iter()
+                .filter(|t| t.track == track && t.size == k && t.arm.family == *pid)
+                .filter_map(|t| t.s.map(|s| (s[0], t.arm.n)))
+                .min_by(|a, b| a.0.partial_cmp(&b.0).unwrap())
+                .map(|(_, n)| n)
+        });
+        let (n, why) = match parent_n {
+            Some(n) => (
+                n,
+                format!(
+                    "exploration: family {} untried at k = {k}, at its parent {}'s best N = {n}",
+                    fam.id,
+                    fam.start_from.as_deref().unwrap_or("")
+                ),
             ),
-            &mut out,
-        );
+            None => (
+                ((size.n_a as f64) * fam.default_f).round() as u64,
+                format!(
+                    "exploration: family {} untried at k = {k}, N = {} x N_a",
+                    fam.id, fam.default_f
+                ),
+            ),
+        };
+        let before = out.len();
+        push(tf.arm(fam, n), why, &mut out);
         if out.len() > before {
             explored += 1;
         }
@@ -3203,6 +3232,34 @@ mod tests {
         assert_eq!(
             back, plain,
             "an arm without params round-trips (older ledgers have none)"
+        );
+    }
+
+    #[test]
+    fn a_variant_family_starts_at_its_parents_best_n() {
+        let mut l = ledger();
+        let mut tf = families();
+        let mut f = tf.family("ksum4").unwrap().clone();
+        f.id = "ksum4f".into();
+        f.oracle = "ksum:m=4,free=1".into();
+        f.start_from = Some("ksum4".into());
+        tf.families.push(f);
+        for (n, s0) in [(9u64, 8.7), (8, 8.2), (11, 13.3)] {
+            l.trials.push(Trial {
+                round: 7,
+                stage: "train".into(),
+                size: 20,
+                track: "generic".into(),
+                arm: tf.arm(tf.family("ksum4").unwrap(), n),
+                s: Some([s0, s0, s0]),
+                status: "verified".into(),
+            });
+        }
+        let p = propose_size(&l, &tf, "generic", 20, 20, 9).unwrap();
+        assert!(
+            p.iter().any(|x| x.arm.name == "ksum4f-n8"),
+            "{:?}",
+            p.iter().map(|x| x.arm.name.clone()).collect::<Vec<_>>()
         );
     }
 

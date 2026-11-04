@@ -2282,11 +2282,24 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
 pub struct KSumOracle {
     k: u32,
     table: Option<KSumTable>,
+    /// `free=1`: the build's key collisions are verified and handed to
+    /// the relation loop as target-free rows, once, with the first trial.
+    free: bool,
+    free_pending: bool,
+    free_checked: u64,
+    free_emitted: u64,
 }
 
 impl KSumOracle {
     pub fn new(k: u32) -> Self {
-        Self { k, table: None }
+        Self {
+            k,
+            table: None,
+            free: false,
+            free_pending: false,
+            free_checked: 0,
+            free_emitted: 0,
+        }
     }
 }
 
@@ -2307,17 +2320,22 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[("m", "summands, 3, 4 or 5")]
+        &[
+            ("m", "summands, 3, 4 or 5"),
+            ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
+        ]
     }
 
     fn prepare(
         &mut self,
         ctx: &InstanceCtx<G>,
         fb: &FactorBase<G::Elt>,
-        _params: &Params,
+        params: &Params,
         ops: &mut GroupOps,
     ) -> Result<(), String> {
-        let table = KSumTable::build_negation_folded(ctx.group, fb, self.k)?;
+        self.free = params.flag("free");
+        self.free_pending = self.free;
+        let table = KSumTable::build_negation_folded_with(ctx.group, fb, self.k, self.free)?;
         // The table's construction is part of the pipeline's cost.
         ops.merge(table.build_ops);
         self.table = Some(table);
@@ -2343,6 +2361,46 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Option<Vec<usize>> {
         let table = self.table.as_ref()?;
         table.probe(ctx.group, fb, ops, &mut counters.lookups, point)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        _a: u64,
+        _b: u64,
+    ) -> Vec<Relation> {
+        let mut out = Vec::new();
+        if self.free_pending {
+            self.free_pending = false;
+            if let Some(table) = self.table.as_ref() {
+                let (rows, checked) = table.free_rows(ctx.group, fb, ctx.r, ops);
+                self.free_checked = checked;
+                self.free_emitted = rows.len() as u64;
+                out.extend(rows.into_iter().map(|columns| Relation::Row {
+                    columns,
+                    a: 0,
+                    b: 0,
+                }));
+            }
+        }
+        if let Some(summands) = self.decompose(ctx, fb, ops, counters, point) {
+            out.push(Relation::Summands(summands));
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        let mut m = BTreeMap::new();
+        if self.free {
+            m.insert("free_collisions_checked".to_string(), self.free_checked);
+            m.insert("free_rows_emitted".to_string(), self.free_emitted);
+        }
+        m
     }
 }
 
