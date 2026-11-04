@@ -1066,9 +1066,9 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
     mul_words_hw_body!(a, b, out)
 }
 
-/// **Fused fixed-width multiply and square** for two- to four-word fields
+/// **Fused fixed-width multiply and square** for two- to nine-word fields
 /// whose reduction polynomial `z^m + r(z)` has `deg r < 128`, `m ≥ deg r +
-/// 64` and `m > 2 deg r` (F_2^113, F_2^131, B-163, B-233, …): the product,
+/// 64` and `m > 2 deg r` (F_2^113, F_2^131, B-163 … B-571): the product,
 /// the reduction and the mask in one `pclmulqdq` function on `[u64; N]`
 /// registers, with no slice, scratch buffer or call between them.
 ///
@@ -1086,7 +1086,7 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
 /// the generic path, so even those answers are unchanged.
 #[cfg(target_arch = "x86_64")]
 mod fixed {
-    use super::{has_hw_clmul, F2mElement, IrreduciblePoly};
+    use super::{has_hw_clmul, F2mElement, IrreduciblePoly, INLINE_WORDS};
     use std::arch::x86_64::*;
 
     /// `r = r1·z^64 + r`: one word for most fields, two for B-233's `z^74 + 1`.
@@ -1101,7 +1101,7 @@ mod fixed {
     /// the generic path must run.
     #[inline(always)]
     fn plan(m: u32, words: usize, irreducible: &IrreduciblePoly) -> Option<Plan> {
-        if irreducible.degree != m || !(2..=4).contains(&words) || words != m.div_ceil(64) as usize {
+        if irreducible.degree != m || !(2..=INLINE_WORDS).contains(&words) || words != m.div_ceil(64) as usize {
             return None;
         }
         let terms = &irreducible.low_terms;
@@ -1156,7 +1156,12 @@ mod fixed {
             match x.len() {
                 2 => element(a.m, &mul_n::<2, 4>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
                 3 => element(a.m, &mul_n::<3, 6>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
-                _ => element(a.m, &mul_n::<4, 8>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                4 => element(a.m, &mul_n::<4, 8>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                5 => element(a.m, &mul_n::<5, 10>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                6 => element(a.m, &mul_n::<6, 12>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                7 => element(a.m, &mul_n::<7, 14>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                8 => element(a.m, &mul_n::<8, 16>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
+                _ => element(a.m, &mul_n::<9, 18>(x.try_into().unwrap(), y.try_into().unwrap(), p)),
             }
         };
         Some(out)
@@ -1174,7 +1179,12 @@ mod fixed {
             match x.len() {
                 2 => element(a.m, &square_n::<2, 4>(x.try_into().unwrap(), k, p)),
                 3 => element(a.m, &square_n::<3, 6>(x.try_into().unwrap(), k, p)),
-                _ => element(a.m, &square_n::<4, 8>(x.try_into().unwrap(), k, p)),
+                4 => element(a.m, &square_n::<4, 8>(x.try_into().unwrap(), k, p)),
+                5 => element(a.m, &square_n::<5, 10>(x.try_into().unwrap(), k, p)),
+                6 => element(a.m, &square_n::<6, 12>(x.try_into().unwrap(), k, p)),
+                7 => element(a.m, &square_n::<7, 14>(x.try_into().unwrap(), k, p)),
+                8 => element(a.m, &square_n::<8, 16>(x.try_into().unwrap(), k, p)),
+                _ => element(a.m, &square_n::<9, 18>(x.try_into().unwrap(), k, p)),
             }
         };
         Some(out)
@@ -1267,8 +1277,9 @@ mod fixed {
         let m = p.m;
         let q = m / 64;
         let s = m % 64;
-        // N low words and three of room for the spill.
-        let mut u = [0u64; 7];
+        // N low words and room for the spill: round one writes up to word
+        // N + 1, and W = 2N ≥ N + 2.
+        let mut u = [0u64; W];
         u[..N].copy_from_slice(&v[..N]);
         if s != 0 {
             u[N - 1] &= (1u64 << s) - 1;
@@ -1683,12 +1694,19 @@ mod tests {
             IrreduciblePoly { degree: 200, low_terms: vec![0, 1, 63, 136 - 100] },
             IrreduciblePoly { degree: 130, low_terms: vec![0, 66] },
             IrreduciblePoly::deg_233(),
+            IrreduciblePoly::deg_283(),
+            IrreduciblePoly::deg_409(),
+            IrreduciblePoly::deg_571(),
+            IrreduciblePoly { degree: 320, low_terms: vec![0, 1, 3, 4] },
+            IrreduciblePoly { degree: 576, low_terms: vec![0, 2, 64, 127] },
             IrreduciblePoly { degree: 192, low_terms: vec![0, 5, 64, 90] },
             IrreduciblePoly { degree: 256, low_terms: vec![0, 1, 100, 127] },
         ];
         for irr in &fields {
             let m = irr.degree;
-            for t in 0..2000 {
+            // The bit-serial reference is quadratic in m; fewer draws on wide fields.
+            let draws = if m > 256 { 300 } else { 2000 };
+            for t in 0..draws {
                 let a = random_elem(&mut s, m);
                 let b = if t % 5 == 0 {
                     F2mElement::from_words(&vec![u64::MAX; m.div_ceil(64) as usize], m)
