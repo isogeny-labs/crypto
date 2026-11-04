@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T1213Z-c25519-autolab-r34-k20-32",
+  "latest_record": "20261104T1546Z-c25519-r4i1-walk-seed",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 31,
+    "measured": 32,
     "open": 0
   },
   "repo": "crypto",
@@ -562,6 +562,70 @@
           "spread": null,
           "summary": "ic_autolab round 26, k = 28/32: C = 2 B-grid refinement 45..140 finds no improvement (k = 28 regression 1.066, k = 32 no challenger); method at its model optimum",
           "value": 2.579777912430277
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.969,
+      "latest": 1.969,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.859301
+      },
+      "metric": "s_w0_seed_mean_k28",
+      "points": [
+        {
+          "commit": "047d0d6c531c",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.859301
+          },
+          "n": 16,
+          "record": "20261104T1546Z-c25519-r4i1-walk-seed",
+          "reference": 1.059,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.808,
+            2.131
+          ],
+          "summary": "R4-I1: wwalk g=1 grow=2 seed-averaged S 1.78 (k = 32) and 1.97 (k = 28), 1.82x and 1.86x rho; incumbents' table draw was favourable (1.48, 1.71)",
+          "value": 1.969
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.781,
+      "latest": 1.781,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.822927
+      },
+      "metric": "s_w0_seed_mean_k32",
+      "points": [
+        {
+          "commit": "047d0d6c531c",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.822927
+          },
+          "n": 16,
+          "record": "20261104T1546Z-c25519-r4i1-walk-seed",
+          "reference": 0.977,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.602,
+            1.96
+          ],
+          "summary": "R4-I1: wwalk g=1 grow=2 seed-averaged S 1.78 (k = 32) and 1.97 (k = 28), 1.82x and 1.86x rho; incumbents' table draw was favourable (1.48, 1.71)",
+          "value": 1.781
         }
       ],
       "problem": "ic:curve25519-family-k28-32",
