@@ -1,16 +1,45 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0421Z-c25519-autolab-r6-k28",
+  "latest_record": "20261104T0423Z-c25519-autolab-r7-k20",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 0,
     "invalid": 0,
-    "measured": 4,
+    "measured": 5,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
   "series": [
+    {
+      "better": "lower",
+      "first": 8.34775146090461,
+      "latest": 8.34775146090461,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 4.646848
+      },
+      "metric": "s_w0_incumbent",
+      "points": [
+        {
+          "commit": "62c2fb6bb27e",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 4.646848
+          },
+          "n": 64,
+          "record": "20261104T0423Z-c25519-autolab-r7-k20",
+          "reference": 1.7964329395165954,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 7, k = 20: regression; train leader ksum4-n8 costs 1.026 of the incumbent on the fresh holdout; ksum3-n11 kept",
+          "value": 8.34775146090461
+        }
+      ],
+      "problem": "ic:curve25519-family-k20",
+      "unit": "S"
+    },
     {
       "better": "lower",
       "first": 10.939468556478129,

@@ -222,6 +222,18 @@
       "source": "round-006/holdout",
       "target_seed": 2026116928,
       "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-007/train",
+      "target_seed": 2026117420,
+      "targets": 16
+    },
+    {
+      "size": 20,
+      "source": "round-007/holdout",
+      "target_seed": 2026117920,
+      "targets": 32
     }
   ],
   "family": "curve25519",
@@ -394,6 +406,15 @@
       "round": 6,
       "sizes": [
         28
+      ],
+      "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-007",
+      "round": 7,
+      "sizes": [
+        20
       ],
       "status": "ratcheted",
       "track": "generic"
@@ -1977,7 +1998,197 @@
       "stage": "holdout",
       "status": "null",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=9,scan_cap=144",
+        "family": "ksum3",
+        "n": 9,
+        "name": "ksum3-n9",
+        "oracle": "ksum:m=3"
+      },
+      "round": 7,
+      "s": [
+        11.561876045449734,
+        12.817226575708737,
+        24.115381348039765
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+        "family": "ksum3",
+        "n": 13,
+        "name": "ksum3-n13",
+        "oracle": "ksum:m=3"
+      },
+      "round": 7,
+      "s": [
+        9.70319667222627,
+        10.335720516114367,
+        16.02843511110723
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=9,scan_cap=144",
+        "family": "ksum4",
+        "n": 9,
+        "name": "ksum4-n9",
+        "oracle": "ksum:m=4"
+      },
+      "round": 7,
+      "s": [
+        8.689999004238139,
+        9.117105303211405,
+        12.961061993970809
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+        "family": "ksum4",
+        "n": 8,
+        "name": "ksum4-n8",
+        "oracle": "ksum:m=4"
+      },
+      "round": 7,
+      "s": [
+        8.184435453964767,
+        8.77387424034322,
+        14.078823317749274
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+        "family": "ksum4",
+        "n": 11,
+        "name": "ksum4-n11",
+        "oracle": "ksum:m=4"
+      },
+      "round": 7,
+      "s": [
+        13.319442708618523,
+        13.604542590569611,
+        16.17044152812941
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+        "family": "ksum4",
+        "n": 13,
+        "name": "ksum4-n13",
+        "oracle": "ksum:m=4"
+      },
+      "round": 7,
+      "s": [
+        23.028333441308625,
+        23.274610183733596,
+        25.491100865558384
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+        "family": "ksum4",
+        "n": 18,
+        "name": "ksum4-n18",
+        "oracle": "ksum:m=4"
+      },
+      "round": 7,
+      "s": [
+        81.11361678012285,
+        81.39321240362558,
+        83.90957301515006
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+        "family": "ksum5",
+        "n": 8,
+        "name": "ksum5-n8",
+        "oracle": "ksum:m=5"
+      },
+      "round": 7,
+      "s": [
+        9.929923807058765,
+        10.408224886020463,
+        14.71293459667577
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+        "family": "rfsub2",
+        "n": 32,
+        "name": "rfsub2-n32",
+        "oracle": "rootfind-subtract:m=2"
+      },
+      "round": 7,
+      "s": [
+        236.02242971876623,
+        259.5861428815043,
+        471.6595613461467
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+        "family": "ksum4",
+        "n": 8,
+        "name": "ksum4-n8",
+        "oracle": "ksum:m=4"
+      },
+      "round": 7,
+      "s": [
+        8.563133611631146,
+        9.212122780360481,
+        15.053025298924512
+      ],
+      "size": 20,
+      "stage": "holdout",
+      "status": "regression",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-04T04:22:17Z"
+  "updated": "2026-11-04T04:23:54Z"
 }
