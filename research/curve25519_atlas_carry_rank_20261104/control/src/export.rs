@@ -58,6 +58,14 @@ pub fn write(input: &Path, run: &Path, protocol_path: &Path, out: &Path) -> Resu
     )?;
     let summary = load(&run.join("summary.json"))?;
     let identity = &summary["identity"];
+    check(
+        load(&run.join("identity.json"))? == *identity,
+        "summary and execution identity differ",
+    )?;
+    check(
+        identity["timeout_seconds"] == p["execution"]["placement"]["per_query_timeout_seconds"],
+        "execution deadline differs from protocol",
+    )?;
     unchanged(
         &input.join("queries.tsv"),
         &identity["query_manifest_sha256"],
@@ -129,6 +137,24 @@ pub fn write(input: &Path, run: &Path, protocol_path: &Path, out: &Path) -> Resu
         check(
             pa["parameters"]["p"] == config["p"] && pa["parameters"]["seed"] == config["seed"],
             "protocol field/seed mismatch",
+        )?;
+        check(
+            config["codec"] == "bv" && pa["instrument"]["flags"]["codec"] == "bounded_bv",
+            "protocol solver codec mismatch",
+        )?;
+        let column_arm = if arm == "source-aa-mod" {
+            p["arms"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|a| a["id"] == "source-mod")
+                .ok_or("missing A/A reference")?
+        } else {
+            pa
+        };
+        check(
+            column_arm["parameters"]["columns"] == config["columns"],
+            "protocol base column count mismatch",
         )?;
         let mut artifacts = vec![
             file(&query, &parent)?,
