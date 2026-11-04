@@ -8,6 +8,8 @@ set -euo pipefail
 [[ $# == 1 ]] || { echo 'Usage: launch-remote-command REQUEST.json' >&2; exit 2; }
 here=$(cd "$(dirname "$0")" && pwd)
 : "${ISOLAB_BUCKET:?}" "${ISOLAB_CODEBUILD_PROJECT:?}" "${AWS_REGION:?}"
+# Some AWS CLI builds read only AWS_DEFAULT_REGION; keep both in step.
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-$AWS_REGION}"
 output=${ISOLAB_CLIENT_OUTPUT:-isolab-launch-output}
 mkdir -p "$output"
 schema=$(jq -r .schema "$1")
