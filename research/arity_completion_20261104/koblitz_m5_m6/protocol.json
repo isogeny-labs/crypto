@@ -831,11 +831,11 @@
       "note": "Per-cell exact classification of four fixed queries; K1-K5 are threshold readings of exact cell outcomes, not sampled tests, so no power calculation applies. The one resolution limit: with four queries a cell's seconds per query is a mean over four, and the cap bounds it at cap/4 minus factor-base time for a decided cell. Part B has one query per cell."
     },
     "preflight_runtime": {
-      "fixed_seconds": null,
-      "per_sample_seconds": null,
+      "fixed_seconds": 0.0002,
+      "per_sample_seconds": 600.0,
       "threads": 1,
-      "estimated_total_seconds": null,
-      "measured_on": "To be filled by the preflight: one development smoke of the (m = 5, n = 23 = k0n23, S = 2) public cell, engine chain-s3-orbit with the frozen command, output discarded, labelled not evidence, used only to confirm the command runs and to record preflight_runtime. Worst-case total if every cell hit its cap: 110400 CPU-seconds (Part A 78000, Part B 32400); the stopping rule can only lower it."
+      "estimated_total_seconds": 110400,
+      "measured_on": "Development preflight 2026-11-04T00:52-01:08Z, authoring VM (L0, no isolation, no /usr/bin/time), release binary sha256 in smoke/binary.sha256, frozen command lines, RAYON_NUM_THREADS=1. Factor base union:2 at k0n23: 0.00012 s (fixed cost). Preflight cell (m = 5, k0n23, union:2, chain-s3-orbit, 4 trials): hit the 600 s process cap, no record written, so per_sample_seconds is the cap. Negative-control commands at m = 2 on the same curve and base: chain-s3 complete in 0.44 s, 4/4 proved_unsat, 0.108 s per query, 4727 conflicts; chain-s3-orbit complete in 191.3 s, 4/4 incomplete at the 200000-conflict budget, 47.8 s per query. The chained-S3 engines carry a conflict budget and no wall budget, so a query's wall time is bounded only by the process cap. Estimated total is the worst case with every cell at its cap (Part A 78000 s, Part B 32400 s); the stopping rule can only lower it. Peak RSS not measured here (no /usr/bin/time); the 8 GiB minimum stands as a placeholder."
     }
   },
   "metrics": {
@@ -997,7 +997,7 @@
       "preregistered": true
     },
     {
-      "rule": "Invalidation stop: a failed positive control, a process_error, a binary sha256 different from the frozen one, or a negative control undecided at its cap stops the affected shard for the director's assessment; no cap is changed.",
+      "rule": "Invalidation stop: a failed positive control, a process_error, a binary sha256 different from the frozen one, or a negative-control cell that is process-capped (exit 124 or 137) or in process_error stops the affected shard for the director's assessment; no cap is changed. A negative-control cell that completes (exit 0) with queries the engine leaves undecided (verdict incomplete at its conflict budget) does not stop the shard: invalidation rule 4 applies per engine, and that engine's capped cells at that n are not_evaluable for K2 and K4.",
       "kind": "invalidation",
       "preregistered": true
     }
@@ -1116,7 +1116,23 @@
       "verified_by": "grep on 2026-11-04."
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "AM1-preflight",
+      "filed": "2026-11-04",
+      "filed_before_affected_data": true,
+      "reason": "The development preflight (sample_size.preflight_runtime.measured_on) found that the chain-s3-orbit engine leaves the m = 2 negative control undecided at its conflict budget on k0n23 (complete process, 4/4 incomplete), while chain-s3 decides it (4/4 proved_unsat). Stopping rule 4 read 'a negative control undecided at its cap' and did not say whether an undecided-but-complete control is a shard stop or the per-engine not_evaluable case of invalidation rule 4. Filed before the freeze and before any scientific cell.",
+      "changes": [
+        "sample_size.preflight_runtime filled from the preflight (was null).",
+        "stopping_rules[3] clarified: a shard stop needs a process-capped or process_error negative control; a complete negative control with incomplete verdicts is handled per engine by invalidation rule 4 (not_evaluable), as the claims already state per engine.",
+        "No claim, arm, cap, grid cell, seed or analysis script changed. Preflight expectation recorded here, not as a claim: the orbit engine's Part A m >= 5 cells are expected to cap (K1 falsified for that engine), and the chain-s3 engine is the one whose negative control decides."
+      ],
+      "supersedes_fields": [
+        "sample_size.preflight_runtime",
+        "stopping_rules[3]"
+      ]
+    }
+  ],
   "freeze": {
     "status": "draft",
     "protocol_sha256": null,

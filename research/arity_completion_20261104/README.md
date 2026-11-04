@@ -59,7 +59,8 @@ Their outputs live under `*/smoke/` and are excluded from every analysis.
 |---|---|---|---|---|
 | prime_tower_m5 | t = 2 Kummer cell, `--budget 360` instead of 7200 (allowed by `execution.placement.local_smoke`) | 0 | 2.1 s | two random targets at (m = 5, t = 2, N = 10) finished, `solving_degree_max` 6, not timed out, not oversize, peak 66 MB |
 | koblitz_m5_m6 | preflight cell (m = 5, k0n23, `union:2`, `chain-s3-orbit`, 4 trials, cap 600 s) | 124 | 600.0 s | capped with no record written: the cell prints one JSON line at the end, and the chained-S3 engines carry a conflict budget (200,000) but no wall budget, so the cap is the only bound on a query |
-| koblitz_m5_m6 | negative-control command (m = 2, same curve, base, engine, trials, cap) | see `smoke/negative-k0n23-m2-s2-orbit.meta` | | instrument check: the same binary decides the m = 2 cell |
+| koblitz_m5_m6 | negative-control command, `chain-s3` (m = 2, k0n23, `union:2`, 4 trials, cap 600 s) | 0 | 0.44 s | instrument check passed: 4/4 `proved_unsat`, 0.108 s per query, 4727 conflicts |
+| koblitz_m5_m6 | negative-control command, `chain-s3-orbit` (same cell) | 0 | 191.3 s | complete but 4/4 `incomplete` at the 200,000-conflict budget, 47.8 s per query: the orbit engine does not decide m = 2 at n = 23 within its budget; amendment AM1-preflight clarifies that this is the per-engine not_evaluable case, not a shard stop |
 
 The prime-tower smoke used the protocol seed (0x504B4D54), so its two rows are a
 preview of the frozen t = 2 cell; the frozen cell still runs on the isolab
