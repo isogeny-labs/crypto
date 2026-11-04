@@ -74,3 +74,101 @@ requests requiring 8 GiB must explicitly set the field; old requests remain
 at 4 GiB. This source change does not deploy a controller or publish a runtime.
 
 Validation and limitations are in `validation/20261029-memory-envelope/README.md`.
+
+## Command mode
+
+**Status: implemented and unit-tested only. Command mode has no live CRIU
+qualification.** No command-mode request has been dumped, restored after worker
+loss, or uploaded on EKS. Every qualification above concerns ecbench
+computations and does not transfer to an arbitrary command. A first live run
+is a qualification attempt, not a production run.
+
+An optional `command` object (see `request.command.example.json`) replaces the
+ecbench computation with a trusted native command:
+
+```json
+"command": {
+  "argv": ["/opt/study/launch/job-prime-tower-criu.sh", "main"],
+  "outputs": "/work/compute/out",
+  "threads": 4,
+  "binaries": {"/opt/study/bin/prime-tower": "<sha256>"}
+}
+```
+
+- `argv`: 1..64 strings, each at most 4096 bytes without NUL, CR or LF.
+  `argv[0]` is a normalized absolute path inside the image, not under `/work`,
+  `/request`, `/proc`, `/sys`, `/dev` or `/tmp`. `build.ecbench_sha256` binds
+  the SHA-256 of `argv[0]` (the field keeps its name so the `build` object and
+  every ecbench request stay byte-identical).
+- `binaries`: optional, at most 32 further absolute image paths (not `argv[0]`)
+  with their SHA-256, for example the native program a launcher script runs.
+- `outputs`: a normalized directory under `/work/compute`, not `tmp`,
+  `run.stdout` or `run.stderr`. The supervisor creates it, owned by UID 1000.
+- `threads`: 1..4, default 1; explicit 1 canonicalizes to omission.
+- `spec` must be absent or null. `diagnostic_transport`, `worker_campaign` and
+  `fresh_owner` are rejected, since each binds an ecbench spec or a fresh epoch.
+- `max_restores` may be 1..50 with `command`; ecbench requests keep 1..5.
+
+The supervisor verifies `argv[0]` and every listed binary at admission of each
+attempt, again immediately before the first launch, and again before CRIU
+restore. Generation manifests record the listed hashes as
+`runtime.payload_binaries` (omitted for ecbench, so their manifest bytes are
+unchanged). It then execs `argv` directly instead of `isolab-criu-progress`
+with the same `env_clear`, cwd `/work/compute`, `HOME`, `TMPDIR`, `PATH`,
+`run.stdout`/`run.stderr` files and UID/GID 1000 drop, and adds
+`ISOLAB_OUTPUT_DIR=<outputs>`, `ISOLAB_CRIU=1` and `RAYON_NUM_THREADS=<threads>`.
+Because the progress launcher is bypassed, the supervisor installs the same
+computation-only seccomp filter (perf_event_open returns EPERM) after the
+privilege drop; CRIU 4.2.1 cannot dump perf descriptors and the restore
+credential check requires seccomp filter mode. Checkpoint, generation commit,
+fencing, restore, deadline and restore-budget logic are the ecbench code paths.
+
+When the root process exits, its exit code is recorded whatever its value and
+is never retried. There is no native replay and no fresh L2 benchmark epoch.
+The controller asks the supervisor to `seal`: it kills any remaining member of
+the payload's process group, then hashes every regular file under `outputs`
+plus `run.stdout` and `run.stderr`, without following symlinks. Symlinks,
+special files, unsupported names (control characters, backslash, non-UTF-8)
+and files over 5 GiB are listed as skipped. More than 1,024 files fails the
+run. The seal and `SHA256SUMS` stay in root-only `/work/control/attempt-N/command/`.
+The controller copies each sealed file out with `kubectl exec cat`, checks its
+hash and size against the seal, uploads it with the existing verified private
+S3 put (versioned, AES256, complete readback), and writes:
+
+```text
+s3://isolab-results-104186811093-us-east-2/recovery/runs/<run_name>/
+  computation/<path relative to /work/compute>   e.g. computation/out/result.json
+  computation/run.stdout, computation/run.stderr
+  computation/SHA256SUMS, computation/seal.json
+  command-result.json        isolab.eks.command-result/v1: exit code, keys, versions,
+                             hashes, skipped entries, restores; timing_valid=false, L0
+  state.json                 phase "command_completed", command_exit_code
+```
+
+Only then does the run become terminal `command_completed`; the idle
+supervisor Pod is then deleted (best effort, recorded on failure). The PVC and every EBS snapshot remain, as for ecbench.
+The controller reports success for any recorded exit code; read
+`command_exit_code`. `wait` returns `isolab.eks.command-recovery-result/v1`.
+Command records are L0 computation evidence. Timing is never admitted.
+
+What payloads must satisfy (not checked, and not qualified):
+
+- No network connections, listening sockets or Unix sockets in the payload tree
+  at any checkpoint. CRIU dumps of sockets fail or cannot be restored, and the
+  workload Pod has no route that a restored connection could resume.
+- The workload Pod has no service-account token and no AWS identity. Read
+  inputs only from the image. Write only to the outputs directory (and `tmp`).
+- Every mutable file must be a regular file or directory under
+  `/work/compute`: checkpoints refuse symlinks, FIFOs and sockets there.
+- Stay in the launched process tree: a daemonized or double-forked descendant
+  is reparented to the supervisor, is not dumped, and is lost on restore.
+- No GPU, perf, io_uring or other descriptor CRIU 4.2.1 cannot dump.
+- Fit the 8 GiB PVC: each generation keeps its full CRIU image under
+  `/work/generations` and the supervisor does not prune older generations, so
+  disk use grows with resident memory times the number of checkpoints.
+- Leave enough of the original deadline after the command exits for the
+  sealed files to be copied and uploaded before the Pod's deadline. The
+  deadline still applies to the completion transition.
+
+This is a trusted-workload feature. The privileged supervisor is not a sandbox
+for untrusted code; `argv` and `binaries` must name reviewed programs.
