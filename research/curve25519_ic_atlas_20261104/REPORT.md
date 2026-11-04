@@ -235,10 +235,14 @@ amortised over targets on the same curve they are negligible.
 
 **Distance remaining (T12 targets):** the best algebraic arm is 17.1×
 behind rho-neg at w = 0, **6.06·10⁴× at w = 0.1**, 3.78·10⁵× at w = 1;
-and 2.09× / 7.36·10³× / 4.45·10⁴× behind the generic baseline. Progress
-on this track since 2026-11-02 (best algebraic arm 9.55·10⁵× behind rho
-at w = 0.1, `curve25519_algebraic_ecbench_20261102`): about 16× at
-w = 0.1, from selecting seed, t and G.
+and 2.09× / 7.36·10³× / 4.45·10⁴× behind the generic baseline. For
+comparison, on their own target sets: the 2026-11-02 best algebraic arm
+was 9.55·10⁵× behind rho-neg at w = 0.1
+(`curve25519_algebraic_ecbench_20261102`), T5's seed 1093 6.9·10⁵×, and
+T9's seed 1308 4.73·10⁵× (`wave3/t9_seed_per_column/README.md`). The
+track moved about 16× at w = 0.1 in two days, from selecting seed, t and
+G. Target sets differ between sessions, so these are descriptive, not
+paired.
 
 ## 7. The grid limit, stated plainly
 
