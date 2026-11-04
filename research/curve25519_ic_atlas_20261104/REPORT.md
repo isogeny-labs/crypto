@@ -349,3 +349,101 @@ Ideas considered and not pursued, with the reason:
 - `research/curve25519_edwards_semaev_20261102/`, `curve25519_algebraic_ecbench_20261102/`
 - `research/notes/index-calculus/RESEARCH_EXOTIC_COORDINATES.md`, `src/cryptanalysis/coordinate_search.rs`
 - `src/cryptanalysis/ic_framework/pkm_semaev.rs` (forms, T₀ identity tests, grid engine)
+
+## 11. Wave 4 (2026-11-04): scaling, trace replay, grid limit, digit sets, odd Kummer
+
+Protocols frozen together at `5a800bb3d0` before any data
+(`research/curve25519_leads_wave4_20261104`). Status at the time of
+writing: L10, L12 (engine stage) and L14 independently validated,
+pass_with_errata with errata applied; L12's end-to-end stage and all of
+L13 are queued behind the ecbench lock; L11 is design only.
+
+### 11.1 L10: the exponent (validated)
+
+40 engine cells, k ∈ {16, 18, 20, 22, 24} × t ∈ {4, 5, 6, 7} at
+G = t − 1 with the J/columns seed, plus controls. All seven predictions
+held.
+
+- **mpt is k-invariant to the digit** in every hit-free cell:
+  17,592 (t = 4, G = 3), 52,816 (5, 4), 146,464 (6, 5), about 4.2·10⁵
+  (7, 6). Seed changes it by < 2%.
+- **The optimal t is 4 at every k**, with t = 5 second at 1.7–2.5×.
+  T10 had scanned t ≥ 5 only, so its winner (t = 5, G = 4) is not the
+  optimum. The next end-to-end candidate is **t = 4, G = 3** with the
+  J/columns seed (1193 at k = 20: 8 columns, 52 covered), modelled 2.04×
+  below T12's winner.
+- **E_best(k) ∝ r^1.03** (frozen analysis 1.0297; 1.0315 with the
+  validator's per-target native-work correction). Per step in t the ratio
+  columns × mpt / covered grows 1.6–2.5×, so beating exponent 1 would need
+  coverage to grow 8–19× per step against the measured 2–5×.
+- **The gap to rho grows as r^0.53**: in the F4-phase model, 1.5·10⁴×
+  (k = 16) to 2.8·10⁵× (k = 24) at w = 0.1, with rho's S fixed at 1.5
+  (a conservative bound; T12 measured 1.65 at w = 0.1).
+- Errata: the protocol carried r₁₈ = 32,719 instead of 32,887 (0.5%,
+  no verdict changes); the frozen script priced native work per 100
+  targets instead of per target (b moves 1.0297 → 1.0315).
+
+This is the atlas's main structural result: on this family, m = 2
+algebraic index calculus with F4 scales *worse* than rho by a factor
+that itself grows like √r, whatever frame, seed or guess depth is chosen.
+
+### 11.2 L12: F4 trace replay (engine validated; end-to-end pending)
+
+Learning one refutation trace per branch system and replaying it per
+target cuts the winner's per-target F4 work **0.4717×** (24,912 against
+52,816 mul-adds) with identical verdicts, zero fallbacks, and a learning
+cost of exactly one plain target. At (t = 6, G = 4) the ratio is 0.454
+for both seeds; at (5, 3) it is 0.566, so the frozen "≤ 0.5 in every
+cell" rule failed there. The end-to-end chunked session (8 targets, four
+arms) is running; its modelled effect is S(trace)/S(plain) ≈ 0.47 at
+w ≥ 0.1 and a distance to rho-neg of about 2.9·10⁴× at w = 0.1.
+
+### 11.3 L13: the grid-limit control (queued)
+
+Five arms on the winner's own base: F4 (G = 4), the exhaustive grid
+(`engine=exhaustive`), the pair table (`mitm`), proj-a and rho-neg; 16
+one-target chunks. The frozen model predicts grid/F4 ≈ 0.024 at
+w ≥ 0.1 (the F4 arm about 41× above its own grid limit), mitm below the
+grid at w ≥ 0.1, and the grid arm 2.1× / 181× / 1,081× behind proj-a at
+w = 0 / 0.1 / 1. The validator found a defect in frozen rule P8 (its
+multiplication count ignores the duplicate-target guard), which will be
+reported as a frozen-rule defect, not retuned.
+
+### 11.4 L14: digit-set frames (census validated; lead open)
+
+x = lo + Σ c_j b_j with arbitrary digits c_j keeps the F4 system
+identical to `bits`. Exact census at k = 20:
+
+- Random digit sets and random translation frames have the same
+  coverage distribution (mean ratios 0.985–1.015; the max-ratio rule
+  failed at t = 5 on one outlying translation frame).
+- **A greedy digit choice (B = 2,000 candidates per digit, selected by J)
+  covers 522 points on 22 columns at t = 5 and 1,268 on 43 at t = 6,
+  against 248 and 570 for the best of 2,000 translation frames: 2.1× and
+  2.2×** (rule ≥ 1.3×; the point prediction of 1.1–1.45× failed on the
+  high side).
+- Mechanism (exploratory): the greedy builds an additive tower inside a
+  single cofactor coset (16 of 22 points in coset 0 at t = 5), so
+  covered/column is 2.3–2.5× the best translation frame. Replicates
+  spread 1.19–1.49× depending on the starting lo.
+- Where it lands: the bits form's per-target F4 cost is 17–64× the
+  isogeny form's at equal (t, G), so a digit-set bits arm models about
+  6.9× behind the T10 winner at (5, 3). Engine confirmation needs a
+  `digits@LO:c1;…;ct` membership (same bit variables, per-bit
+  coefficients), being implemented as L15.
+
+### 11.5 L11: odd Kummer base (design only)
+
+p − 1 = 4 × 3³ × 7 × 19 × 73 at k = 20 gives multiplicative subgroups
+μ_d of odd order. A base x ∈ g·μ_d needs odd-degree power rules the
+tower engine lacks. The design specifies the census to run first and a
+go/no-go rule before any engine work; nothing was measured.
+
+### 11.6 What wave 4 changes in the lead list
+
+- **T13 (next end-to-end, protocol frozen):** t = 4, G = 3, seed 1193 at
+  k = 20, plain and with trace replay, against T12's winner. Modelled
+  0.49× the winner at w ≥ 0.1 (0.23× with trace), dearer at w = 0.
+- **L15:** `digits` membership in the engine, then confirm L14.
+- The exponent result bounds all of this: constant-factor gains on a
+  track whose exponent is 1.03 against rho's 0.5.

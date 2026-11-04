@@ -1,0 +1,71 @@
+{
+  "schema": "validator-report/v1",
+  "lead": "research/curve25519_leads_wave4_20261104/l12_f4_trace_replay",
+  "validated_utc": "2026-11-04T06:50:00Z",
+  "validator": "validator (independent; did not produce the lead)",
+  "verdict": "pass_with_errata",
+  "disposition": {
+    "engine_stage_P1_P6": "validated",
+    "end_to_end_stage_P7_P10": "insufficient_evidence (not run at validation time; declared undecided by the producer, no end-to-end number claimed)"
+  },
+  "commits": {
+    "protocol_and_scripts_frozen": "5a800bb3d06c69b32f32195c3aebccdfb3fee31e",
+    "head_at_validation": "1c1175180fabdc9b4a93007022f0d0bdb9b4a33f",
+    "working_tree": "clean (git status --short empty); git diff 5a800bb3 -- <lead dir> is empty, so PROTOCOL.md and scripts/* are byte-identical to the frozen commit",
+    "not_committed": "README.md, data/, ecbench/ are excluded by .git/info/exclude (lines 16,17,20) and exist in no commit; the ecbench spec's freeze rests on mtime 06:07Z and hash identity with data/ecbench/spec.frozen.json (ed9ad013725655601b05e6d824a84bc65b23dc8a479b9ee218345e04bd0fb2a5)"
+  },
+  "artifact_set": {
+    "sha256sums": "data/SHA256SUMS: 42 files, sha256sum -c all OK; file set under data/ identical to the listing; no file newer than SHA256SUMS at 06:41Z",
+    "moving_parts": "scripts/run.sh (pid 14413) and chunked_run.py (pid 14833) are alive; ecbench chunk c00 (pid 14834) has been queued behind /tmp/crypto-bench.lock since 06:33:16Z (T11 c03 held the lock, L13 also waiting). data/ecbench/chunks/ will change when the lock frees; this report covers only the hashed set as of 06:35Z"
+  },
+  "instruments": {
+    "curve25519_family": "ba1e3c0518eae58ae39a9b08e1f757c7e9fe1eb02c86b158b883244bc6a5ecef (recomputed, = frozen = T10)",
+    "ecbench": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b (recomputed, = frozen = T12)",
+    "census_k20": "bc74d8ac5151713c59f6c6d5bf58df1c0bf5e3442c6b50c7d234163c4c807adc (recomputed, = frozen)",
+    "scripts": {
+      "chunked_run.py": "e8edaa81... = T12 copy (verified)",
+      "pooled_compare.py": "061b11b0... = T12 copy (verified)"
+    }
+  },
+  "replication": {
+    "command": "F4COST_PLANTED=16 /home/user/ctarget/release/curve25519_family f4cost 20 <form> <t> <G> 100 <2026111500+t> 3600 2 full 0 - <0|1>",
+    "cells_rerun": 8,
+    "fields_compared_excluding_wall_s": 432,
+    "fields_differing": 0,
+    "binary_hash_before_and_after": "ba1e3c05... unchanged",
+    "outputs": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun/"
+  },
+  "recomputed": {
+    "r": 131203, "sqrt_r": 362.2195, "coverage_winner": 0.001601,
+    "cells": {
+      "t5_g4_s1307": {"cols": 22, "covered": 210, "census_match": true, "mpt_plain": 52816.0, "mpt_trace": 24912.0, "rho": 0.471675, "learn": 52816, "learn_over_mpt": 1.0, "learn_over_E0": 7.275e-05, "E0_plain": 725959944.1, "E0_trace": 342417338.1, "T10_mpt_reldev": 0.0, "replays": 1600, "refuted": 1600, "fallbacks": 0, "untraced": 0, "learned": "16/16", "kept_rows": 768, "rows": "42->27", "nnz": "306->181", "planted_muladds": "255468 vs 175740", "verdict_diffs": {}},
+      "t5_g3_s1307": {"cols": 22, "covered": 210, "census_match": true, "mpt_plain": 177112.0, "mpt_trace": 100208.0, "rho": 0.565789, "learn": 177112, "learn_over_mpt": 1.0, "learn_over_E0": 7.275e-05, "E0_plain": 2434417934.2, "E0_trace": 1377366594.9, "T10_mpt_reldev": 0.0, "replays": 800, "refuted": 800, "fallbacks": 0, "untraced": 0, "learned": "8/8", "kept_rows": 800, "rows": "66->47", "nnz": "817->548", "planted_muladds": "961118 vs 911596", "verdict_diffs": {}},
+      "t6_g4_s1308": {"cols": 36, "covered": 498, "census_match": true, "mpt_plain": 710095.08, "mpt_trace": 322703.82, "rho": 0.454452, "learn": 710096, "learn_over_mpt": 1.0000013, "learn_over_E0": 1.054e-04, "E0_plain": 6734935285.4, "E0_trace": 3060701876.8, "T10_mpt_reldev": 0.0, "replays": 1600, "refuted": 1600, "fallbacks": 0, "untraced": 0, "learned": "16/16", "kept_rows": 2688, "rows": "105->57", "nnz": "1341->662", "planted_muladds": "3002999 vs 2090891", "verdict_diffs": {}},
+      "t6_g4_s0": {"cols": 25, "covered": 172, "census_match": true, "mpt_plain": 710094.0, "mpt_trace": 322701.91, "rho": 0.45445, "learn": 710096, "learn_over_mpt": 1.0000028, "learn_over_E0": 5.244e-05, "E0_plain": 13541637075.9, "E0_trace": 6153991089.8, "T10_mpt_reldev": 0.0, "replays": 1600, "refuted": 1600, "fallbacks": 0, "untraced": 0, "learned": "16/16", "kept_rows": 2688, "rows": "105->57", "nnz": "1341->662", "planted_muladds": "4023741 vs 2554757", "verdict_diffs": {}}
+    },
+    "predictions": {"P1": "held", "P2": "held (rho_win 0.471675 <= 0.5; GATE open)", "P3": "failed (t5 G3 rho 0.5658 > 0.5; seed deviation 2.0e-6 <= 0.02 holds)", "P4": "held", "P5": "held", "P6": "held (also checked against T10's actual cell JSONs: every count field identical; only planted_* (T10: 0) and max_nnz_cap (3e7 vs none) differ)", "point_guess_0.15_0.35": "missed (0.472)", "P7_P10": "undecided (no chunk complete)"},
+    "cost_sums": {"random_target_F4_muladds": 242064281, "planted_F4_muladds": 13976310, "trace_learning_muladds": 1650120},
+    "consistency": "pkm_trace_replay_muladds == f4_muladds in all trace cells (0 fallbacks); amortised_muladds_per_target == mpt_trace + learn/100; learn == 2^G x (mpt_plain/2^G) i.e. exactly one try per branch; kept_rows/branch 48/100/168",
+    "T12_cross_check": {"S_winner_w0_w0.1_w1": [26.404, 100277.2, 1002534.4], "rho_neg": [1.544, 1.654, 2.651], "proj_a": [12.633, 13.625, 22.554], "distances": {"w0_vs_rho_neg": 17.11, "w0.1_vs_rho_neg": 60613, "w0.1_vs_proj_a": 7360}, "c00_round0_winner": {"solver_ops": 612625192, "trials": 12116, "relations": 13, "pkm_system_fp_mults_uncharged": 2598218, "pkm_grid_fp_mults_uncharged": 16224}, "nonF4_unpriced_over_F4": 0.0043},
+    "model_projection": {"README_formula_value": 47314.6, "README_formula_ratio": 0.4718, "protocol_table_model_427.5+100215rho": 47696.4, "protocol_table_model_ratio": 0.4756, "T12_decomposition_model_455.5+99822rho": 47530, "distance_to_rho_neg_w0.1_modelled": "2.86e4 to 2.87e4 (README 2.9e4: consistent)"},
+    "accounting_source_check": "src/cryptanalysis/ecbench/methods.rs:1844 unpriced_of prices only counters ending in _uncharged with v>0; pkm_semaev.rs:1158 records pkm_trace_learn_muladds (no suffix) in trace_setup natives, so the band does not price learning, as PROTOCOL section 2 states. pkm_semaev.rs:1009 accepts trace=0|1 only and requires engine f4 without staircase stop."
+  },
+  "controls": {
+    "null_or_reference_arm_engine_stage": "trace-0 cell of each pair is the unmodified baseline and replicates T10 exactly (P6)",
+    "end_to_end_arms": "rho-neg (reference), proj-a (baseline), plain PKM, trace PKM all in the frozen spec; none measured yet",
+    "boundary_declared_before_run": "yes (PROTOCOL sections 1-2, commit 5a800bb3 at 06:32:32Z, first cell 06:32:56Z)"
+  },
+  "errata": [
+    "README 'Model of the end-to-end effect': the displayed formula 0.4717 x 100,277 + 26.4 x (1 - 0.4717) evaluates to 47,314.6 and a ratio of 0.472, while the README quotes S_trace/S_plain ~ 0.476; 0.476 comes from the protocol section-2 model (427.5 + 100,215 rho), which itself gives 100,642 at rho = 1 instead of S_plain 100,277.2 (0.36% high). Projection only; the modelled distance 2.9e4x is unaffected (2.86e4-2.87e4).",
+    "README states 'load 1.74 at launch'; data/env.txt and data/run.log record loadavg 1.76.",
+    "PROTOCOL section 7 lists ecbench/spec.json and ecbench/plan_design_check.txt as frozen, but they are not in commit 5a800bb3 (excluded by .git/info/exclude); their freeze is attested only by mtime 06:07Z and the launch copy's identical sha256. README.md and data/ are likewise in no commit.",
+    "End-to-end stage (P7-P10) is not validated: no chunk had started executing at validation time (c00 queued behind /tmp/crypto-bench.lock since 06:33:16Z). The README declares this honestly and quotes no end-to-end number; data/SHA256SUMS was hand-written over the partial tree (disclosed) and will be rewritten by the runner.",
+    "Process deviations disclosed by the producer (no isolab-eks route, no resume checkpoint, no Conductor check, no session log, no visual report) are noted; they do not affect the counted-unit engine measurement."
+  ],
+  "scope_and_honesty": "P3 failure and the missed point guess are reported as failed/missed with the numbers retained; nothing retuned; no leaderboard row proposed; rho stated ahead on every track; w = 0 identity and learning charge treated as accounting, not improvement. Scope statement matches the artifacts.",
+  "evidence_paths": {
+    "engine_json": "data/engine/<cell>_tr{0,1}.json", "summary": "data/engine/summary.json", "gate": "data/engine/GATE", "log": "data/run.log", "env": "data/env.txt", "sha": "data/SHA256SUMS",
+    "T10_cells": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/{t5_g4_s1307,t5_g3_s1307,t6_g4_s1308,t6_g4_s0}.json",
+    "T12_band": "research/curve25519_t10_winner_ecbench_20261104/ecbench/band_pooled.json", "T12_c00": "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c00/records.jsonl"
+  }
+}
