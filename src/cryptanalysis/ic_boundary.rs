@@ -7190,6 +7190,12 @@ pub struct KSumTable {
     pub insert_attempts: u64,
     /// `x_index` reads of the build, one per abscissa.
     pub index_lookups: u64,
+    /// When set, colliding inserts are kept: `(kept, new)` packed summand
+    /// sets whose sums share a key, so `±` equal up to the key's sign bit.
+    /// Each is a candidate relation among the base logs that the table
+    /// found for free; [`KSumTable::free_rows`] verifies them.
+    pub keep_collisions: bool,
+    pub collisions: Vec<(u64, u64)>,
 }
 
 impl KSumTable {
@@ -7197,6 +7203,19 @@ impl KSumTable {
         g: &G,
         fb: &FactorBase<G::Elt>,
         k: u32,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_with(g, fb, k, false)
+    }
+
+    /// The same table; with `keep_collisions`, every insert whose key is
+    /// already taken is kept in [`KSumTable::collisions`] instead of
+    /// dropped.  The table itself, its counts and its build cost are
+    /// identical either way.
+    pub fn build_negation_folded_with<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
     ) -> Result<Self, String> {
         if !(3..=KSUM_MAX_K).contains(&k) {
             return Err(format!("a k-sum table needs k = 3, 4 or 5, not {k}"));
@@ -7224,7 +7243,10 @@ impl KSumTable {
             build_wall_ns: 0,
             insert_attempts: 0,
             index_lookups: a,
+            keep_collisions: false,
+            collisions: Vec::new(),
         };
+        t.keep_collisions = keep_collisions;
         let mut idx = [u32::MAX; KSUM_MAX_K as usize];
         t.extend(g, fb, &groups, 0, 0, None, &mut idx);
         t.entries = t.map.len() as u64;
@@ -7260,7 +7282,16 @@ impl KSumTable {
                         .iter()
                         .rev()
                         .fold(0u64, |w, &i| (w << KSUM_INDEX_BITS) | u64::from(i));
-                    self.map.entry(g.key(&s) >> 1).or_insert(packed);
+                    match self.map.entry(g.key(&s) >> 1) {
+                        std::collections::hash_map::Entry::Vacant(v) => {
+                            v.insert(packed);
+                        }
+                        std::collections::hash_map::Entry::Occupied(o) => {
+                            if self.keep_collisions {
+                                self.collisions.push((*o.get(), packed));
+                            }
+                        }
+                    }
                     self.insert_attempts += 1;
                 } else {
                     self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), idx);
@@ -7280,6 +7311,63 @@ impl KSumTable {
             out.insert("lookups".to_string(), self.index_lookups);
         }
         out
+    }
+
+    fn unpack(&self, packed: u64) -> Vec<usize> {
+        let mask = (1u64 << KSUM_INDEX_BITS) - 1;
+        (0..self.k)
+            .map(|d| ((packed >> (d * KSUM_INDEX_BITS)) & mask) as usize)
+            .collect()
+    }
+
+    /// The relations among the base logs hidden in the build's key
+    /// collisions.  For each kept pair of summand sets the two sums are
+    /// recomputed (`2(k − 1)` additions, charged to `ops`); a pair whose
+    /// sums are equal gives `Σ coef(I) − Σ coef(J) = 0`, one whose sums are
+    /// opposite gives `Σ coef(I) + Σ coef(J) = 0`, as `(column, coef)`
+    /// lists modulo `r`.  A key match that is neither, and a row that
+    /// cancels to zero, is dropped.  Returns the rows and the number of
+    /// pairs checked.
+    pub fn free_rows<G: CountedGroup>(
+        &self,
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        ops: &mut GroupOps,
+    ) -> (Vec<Vec<(usize, u64)>>, u64) {
+        let sum = |ops: &mut GroupOps, idx: &[usize]| {
+            let mut s = fb.points[idx[0]];
+            for &i in &idx[1..] {
+                s = g.add(ops, s, fb.points[i]);
+            }
+            s
+        };
+        let mut rows = Vec::new();
+        for &(p1, p2) in &self.collisions {
+            let (i1, i2) = (self.unpack(p1), self.unpack(p2));
+            let (s1, s2) = (sum(ops, &i1), sum(ops, &i2));
+            let sign: u64 = if s1 == s2 {
+                r - 1
+            } else if s1 == g.neg(s2) {
+                1
+            } else {
+                continue;
+            };
+            let mut acc: BTreeMap<usize, u64> = BTreeMap::new();
+            for &i in &i1 {
+                let e = acc.entry(fb.col_of[i]).or_insert(0);
+                *e = (*e + fb.coef_of[i] % r) % r;
+            }
+            for &i in &i2 {
+                let e = acc.entry(fb.col_of[i]).or_insert(0);
+                *e = ((*e as u128 + (fb.coef_of[i] % r) as u128 * sign as u128) % r as u128) as u64;
+            }
+            let row: Vec<(usize, u64)> = acc.into_iter().filter(|&(_, c)| c != 0).collect();
+            if !row.is_empty() {
+                rows.push(row);
+            }
+        }
+        (rows, self.collisions.len() as u64)
     }
 
     /// Signed indices of `k` base points summing to `target`, if the table

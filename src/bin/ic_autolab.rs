@@ -227,14 +227,30 @@ struct ArmConfig {
     n: u64,
     factor_base: String,
     oracle: String,
+    /// Further `ic.pipeline` parameters (for example `targets=stride`);
+    /// empty for the factor-base and oracle families.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    params: BTreeMap<String, String>,
 }
 
 impl ArmConfig {
+    /// The configuration's identity: factor base, and the oracle together
+    /// with any further pipeline parameters.
     fn key(&self) -> (String, String) {
-        (self.factor_base.clone(), self.oracle.clone())
+        let mut o = self.oracle.clone();
+        for (k, v) in &self.params {
+            o += &format!("|{k}={v}");
+        }
+        (self.factor_base.clone(), o)
     }
     fn method(&self) -> Value {
-        json!({"id": "ic.pipeline", "params": {"factor_base": self.factor_base, "oracle": self.oracle}})
+        let mut params = serde_json::Map::new();
+        params.insert("factor_base".into(), json!(self.factor_base));
+        params.insert("oracle".into(), json!(self.oracle));
+        for (k, v) in &self.params {
+            params.insert(k.clone(), json!(v));
+        }
+        json!({"id": "ic.pipeline", "params": params})
     }
 }
 
@@ -363,6 +379,14 @@ struct Family {
     /// than summands); the track's `n_min` applies when absent.
     #[serde(default)]
     n_min: Option<u64>,
+    /// Further `ic.pipeline` parameters every arm of the family carries.
+    #[serde(default)]
+    params: BTreeMap<String, String>,
+    /// A parent family whose best verified N at a size is this family's
+    /// first N there (a variant of an existing table starts where the
+    /// table is best).
+    #[serde(default)]
+    start_from: Option<String>,
 }
 
 fn default_true() -> bool {
@@ -391,6 +415,7 @@ impl TrackFamilies {
                 .replace("{n}", &n.to_string())
                 .replace("{scan}", &(self.scan_factor * n).to_string()),
             oracle: fam.oracle.clone(),
+            params: fam.params.clone(),
         }
     }
     fn family(&self, id: &str) -> Option<&Family> {
@@ -589,13 +614,42 @@ struct Proposal {
     reason: String,
 }
 
+/// Least-squares fit of ln N on log2 r over the sizes (other than `k`) where
+/// `family` is the incumbent: `(intercept, slope, points)`, when there are at
+/// least two such sizes.
+fn family_fit(ledger: &Ledger, track: &str, family: &str, k: u32) -> Option<(f64, f64, usize)> {
+    let pts: Vec<(f64, f64)> = ledger
+        .tracks
+        .get(track)?
+        .iter()
+        .filter_map(|(k2, inc)| {
+            let k2: u32 = k2.parse().ok()?;
+            (k2 != k && inc.arm.family == family)
+                .then(|| Some((ledger.size(k2).ok()?.log2_r, (inc.arm.n as f64).ln())))?
+        })
+        .collect();
+    if pts.len() < 2 {
+        return None;
+    }
+    let n = pts.len() as f64;
+    let mx = pts.iter().map(|p| p.0).sum::<f64>() / n;
+    let my = pts.iter().map(|p| p.1).sum::<f64>() / n;
+    let sxx: f64 = pts.iter().map(|p| (p.0 - mx).powi(2)).sum();
+    if sxx == 0.0 {
+        return None;
+    }
+    let b = pts.iter().map(|p| (p.0 - mx) * (p.1 - my)).sum::<f64>() / sxx;
+    Some((my - b * mx, b, pts.len()))
+}
+
 /// Candidate arms for one size. Order of priority, each skipping anything
 /// already tried at this size (the ledger's trials and the incumbent):
 ///
 /// 1. the incumbent family's base-size neighbourhood, nearest factors first;
 /// 2. cross-size transfer: the incumbent family of every other size (nearest
-///    in log2 r first), when it differs from this size's, at the same
-///    scale-relative base size N / N_a and its grid neighbours (a winner at
+///    in log2 r first), when it differs from this size's, at N extrapolated
+///    along the family's own incumbents when it holds two or more sizes,
+///    else at the same N / N_a, and its grid neighbours (a winner at
 ///    one size is a hypothesis at the next; the knob is scale-relative, as in
 ///    `ic sweep`);
 /// 3. refinement of alternatives: families already tried at this size whose
@@ -658,15 +712,26 @@ fn propose_size(
             };
             let n_a2 = ledger.size(k2)?.n_a as f64;
             let frac = inc2.arm.n as f64 / n_a2;
-            let n0 = (frac * size.n_a as f64).round().max(1.0) as u64;
-            push(
-                tf.arm(fam, n0),
-                format!(
-                    "cross-size transfer: {} is the k = {k2} incumbent at N / N_a = {frac:.3}",
-                    inc2.arm.name
+            // With the family incumbent at two or more sizes, extrapolate N
+            // along its own incumbents (least squares of ln N on log2 r);
+            // otherwise hold N / N_a fixed.
+            let (n0, why) = match family_fit(ledger, track, &inc2.arm.family, k) {
+                Some((a, b, pts)) => (
+                    (a + b * size.log2_r).exp().round().max(1.0) as u64,
+                    format!(
+                        "cross-size transfer: {} is incumbent at {pts} sizes; ln N fitted on log2 r (slope {b:.3}) and extrapolated",
+                        inc2.arm.family
+                    ),
                 ),
-                &mut out,
-            );
+                None => (
+                    (frac * size.n_a as f64).round().max(1.0) as u64,
+                    format!(
+                        "cross-size transfer: {} is the k = {k2} incumbent at N / N_a = {frac:.3}",
+                        inc2.arm.name
+                    ),
+                ),
+            };
+            push(tf.arm(fam, n0), why, &mut out);
             for f in &grid {
                 let n = ((n0 as f64) * f).round() as u64;
                 push(
@@ -749,16 +814,40 @@ fn propose_size(
         if explored >= exploration {
             break;
         }
-        let n = ((size.n_a as f64) * fam.default_f).round() as u64;
-        let before = out.len();
-        push(
-            tf.arm(fam, n),
-            format!(
-                "exploration: family {} untried at k = {k}, N = {} x N_a",
-                fam.id, fam.default_f
+        // A family that names a parent starts at the parent's best
+        // verified N at this size (the incumbent's N when the parent is the
+        // incumbent), else at `default_f x N_a`.
+        let parent_n = fam.start_from.as_ref().and_then(|pid| {
+            if inc.arm.family == *pid {
+                return Some(inc.arm.n);
+            }
+            ledger
+                .trials
+                .iter()
+                .filter(|t| t.track == track && t.size == k && t.arm.family == *pid)
+                .filter_map(|t| t.s.map(|s| (s[0], t.arm.n)))
+                .min_by(|a, b| a.0.partial_cmp(&b.0).unwrap())
+                .map(|(_, n)| n)
+        });
+        let (n, why) = match parent_n {
+            Some(n) => (
+                n,
+                format!(
+                    "exploration: family {} untried at k = {k}, at its parent {}'s best N = {n}",
+                    fam.id,
+                    fam.start_from.as_deref().unwrap_or("")
+                ),
             ),
-            &mut out,
-        );
+            None => (
+                ((size.n_a as f64) * fam.default_f).round() as u64,
+                format!(
+                    "exploration: family {} untried at k = {k}, N = {} x N_a",
+                    fam.id, fam.default_f
+                ),
+            ),
+        };
+        let before = out.len();
+        push(tf.arm(fam, n), why, &mut out);
         if out.len() > before {
             explored += 1;
         }
@@ -3059,6 +3148,119 @@ mod tests {
         let i = names.iter().position(|n| *n == "ksum4-n7").unwrap();
         let j = names.iter().position(|n| n.starts_with("mitm2")).unwrap();
         assert!(i < j, "transfer comes before exploration: {names:?}");
+    }
+
+    #[test]
+    fn a_family_incumbent_at_two_sizes_extrapolates_n_by_its_own_fit() {
+        let mut l = ledger();
+        let tf = families();
+        for (k, r, l2, na, n) in [
+            (24u32, 2097349u64, 21.0, 81u64, 12u64),
+            (28, 33557809, 25.0, 203, 21),
+        ] {
+            l.sizes.insert(
+                k.to_string(),
+                SizeInfo {
+                    k,
+                    r,
+                    log2_r: l2,
+                    n_a: na,
+                    curve: json!({}),
+                },
+            );
+            l.tracks.get_mut("generic").unwrap().insert(
+                k.to_string(),
+                Incumbent {
+                    arm: tf.arm(tf.family("ksum4").unwrap(), n),
+                    s: [1.0; 3],
+                    rho_s: [1.0; 3],
+                    evidence: json!({}),
+                    since_round: 2,
+                },
+            );
+        }
+        l.sizes.insert(
+            "32".into(),
+            SizeInfo {
+                k: 32,
+                r: 536884639,
+                log2_r: 29.0,
+                n_a: 512,
+                curve: json!({}),
+            },
+        );
+        l.tracks.get_mut("generic").unwrap().insert(
+            "32".into(),
+            Incumbent {
+                arm: tf.arm(tf.family("mitm2").unwrap(), 512),
+                s: [24.0; 3],
+                rho_s: [1.0; 3],
+                evidence: json!({}),
+                since_round: 0,
+            },
+        );
+        let (a, b, pts) = family_fit(&l, "generic", "ksum4", 32).unwrap();
+        assert_eq!(pts, 2);
+        let n32 = (a + b * 29.0).exp().round() as u64;
+        assert_eq!(n32, 37, "12 at 21 bits, 21 at 25 bits -> 37 at 29 bits");
+        let p = propose_size(&l, &tf, "generic", 32, 12, 0).unwrap();
+        assert!(
+            p.iter().any(|x| x.arm.name == "ksum4-n37"),
+            "{:?}",
+            p.iter().map(|x| x.arm.name.clone()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn family_params_reach_the_method_and_the_identity() {
+        let mut tf = families();
+        let mut f = tf.family("ksum3").unwrap().clone();
+        f.id = "ksum3s".into();
+        f.params.insert("targets".into(), "stride".into());
+        tf.families.push(f);
+        let plain = tf.arm(tf.family("ksum3").unwrap(), 11);
+        let stride = tf.arm(tf.family("ksum3s").unwrap(), 11);
+        assert_eq!(stride.method()["params"]["targets"], "stride");
+        assert!(plain.method()["params"].get("targets").is_none());
+        assert_ne!(
+            plain.key(),
+            stride.key(),
+            "same base and oracle, different target stream: different configurations"
+        );
+        let back: ArmConfig =
+            serde_json::from_value(serde_json::to_value(&plain).unwrap()).unwrap();
+        assert_eq!(
+            back, plain,
+            "an arm without params round-trips (older ledgers have none)"
+        );
+    }
+
+    #[test]
+    fn a_variant_family_starts_at_its_parents_best_n() {
+        let mut l = ledger();
+        let mut tf = families();
+        let mut f = tf.family("ksum4").unwrap().clone();
+        f.id = "ksum4f".into();
+        f.oracle = "ksum:m=4,free=1".into();
+        f.start_from = Some("ksum4".into());
+        tf.families.push(f);
+        for (n, s0) in [(9u64, 8.7), (8, 8.2), (11, 13.3)] {
+            l.trials.push(Trial {
+                round: 7,
+                stage: "train".into(),
+                size: 20,
+                track: "generic".into(),
+                arm: tf.arm(tf.family("ksum4").unwrap(), n),
+                s: Some([s0, s0, s0]),
+                status: "verified".into(),
+            });
+        }
+        let p = propose_size(&l, &tf, "generic", 20, 20, 9).unwrap();
+        assert!(
+            p.iter().any(|x| x.arm.name == "ksum4f-n8"),
+            "{:?}",
+            p.iter().map(|x| x.arm.name.clone()).collect::<Vec<_>>()
+        );
     }
 
     #[test]

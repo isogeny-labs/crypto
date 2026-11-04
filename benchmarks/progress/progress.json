@@ -1,16 +1,265 @@
 {
   "headline_unit": "S",
-  "latest_record": null,
+  "latest_record": "20261104T0513Z-c25519-autolab-r15-k28",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
-    "censored": 0,
+    "censored": 1,
     "invalid": 0,
-    "measured": 0,
+    "measured": 12,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
-  "series": [],
+  "series": [
+    {
+      "better": "lower",
+      "first": 8.34775146090461,
+      "latest": 8.797582237547164,
+      "latest_derived": {
+        "improvement_vs_first_percent": -5.3886,
+        "improvement_vs_previous_percent": -5.3886,
+        "value_over_reference": 5.556355
+      },
+      "metric": "s_w0_incumbent",
+      "points": [
+        {
+          "commit": "62c2fb6bb27e",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 4.646848
+          },
+          "n": 64,
+          "record": "20261104T0423Z-c25519-autolab-r7-k20",
+          "reference": 1.7964329395165954,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 7, k = 20: regression; train leader ksum4-n8 costs 1.026 of the incumbent on the fresh holdout; ksum3-n11 kept",
+          "value": 8.34775146090461
+        },
+        {
+          "commit": "cbbedb92c5f1",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": -5.3886,
+            "improvement_vs_previous_percent": -5.3886,
+            "value_over_reference": 5.556355
+          },
+          "n": 64,
+          "record": "20261104T0509Z-c25519-autolab-r13-k20",
+          "reference": 1.5833370403399365,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 13, k = 20: null; free-rows ksum4f-n8 0.971 [0.931, 1.012] of the incumbent, band sel < inc, interval spans 1",
+          "value": 8.797582237547164
+        }
+      ],
+      "problem": "ic:curve25519-family-k20",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.607,
+      "latest": 6.857,
+      "latest_derived": {
+        "improvement_vs_first_percent": -3.7839,
+        "improvement_vs_previous_percent": -3.7839,
+        "value_over_reference": 5.538772
+      },
+      "metric": "s_w0_incumbent",
+      "points": [
+        {
+          "commit": "2c0d54ecc8ea",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.760244
+          },
+          "n": 32,
+          "record": "20261104T0437Z-c25519-autolab-r11-k24",
+          "reference": 1.147,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 11, k = 24 train screen: incumbent ksum4-n12 S(w=0) 6.61 vs matched rho 1.15; no candidate below it (ksum4-n10 6.96)",
+          "value": 6.607
+        },
+        {
+          "commit": "fdeed51f64bd",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": -3.7839,
+            "improvement_vs_previous_percent": -3.7839,
+            "value_over_reference": 5.538772
+          },
+          "n": 32,
+          "record": "20261104T0445Z-c25519-autolab-r12-k24",
+          "reference": 1.238,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 12, k = 24: the stride target stream raises the incumbent's cost 1.081x (P1 falsified); no challenger",
+          "value": 6.857
+        }
+      ],
+      "problem": "ic:curve25519-family-k24",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 10.939468556478129,
+      "latest": 7.5644054700205885,
+      "latest_derived": {
+        "improvement_vs_first_percent": 30.8522,
+        "improvement_vs_previous_percent": -3.1979,
+        "value_over_reference": 6.770693
+      },
+      "metric": "s_w0_incumbent",
+      "points": [
+        {
+          "commit": "8cab67b459d2",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 10.77435
+          },
+          "n": 64,
+          "record": "20261104T0411Z-c25519-autolab-r4-k28",
+          "reference": 1.0153251579240001,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 4, k = 28 holdout ECBS1h4fa56ebd629d: ksum:m=4 N = 21 S(w=0) 10.94 vs incumbent 16.74, matched rho 1.02; recorded after the run with a fresh replay audit (the rule arrived mid-round)",
+          "value": 10.939468556478129
+        },
+        {
+          "commit": "3164ea861251",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.1838,
+            "improvement_vs_previous_percent": 0.1838,
+            "value_over_reference": 10.483347
+          },
+          "n": 64,
+          "record": "20261104T0421Z-c25519-autolab-r6-k28",
+          "reference": 1.0415911009140644,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 6, k = 28: null; ksum4-n15 0.616 of the incumbent at w = 0 but 1.092 at w = 1, so the band does not order it; incumbent ksum4-n21 kept",
+          "value": 10.91936046395492
+        },
+        {
+          "commit": "ebe86a2d6dbe",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 31.9458,
+            "improvement_vs_previous_percent": 31.8205,
+            "value_over_reference": 7.784986
+          },
+          "n": 64,
+          "record": "20261104T0425Z-c25519-autolab-r8-k28",
+          "reference": 0.9562982636546874,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 8, k = 28: ksum:m=4 N = 18 S(w=0) 7.44 vs incumbent 10.98, matched rho 0.96 (distance 11.5x -> 7.8x)",
+          "value": 7.444768388348348
+        },
+        {
+          "commit": "f8459a0ea555",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 32.9949,
+            "improvement_vs_previous_percent": 1.5416,
+            "value_over_reference": 6.737132
+          },
+          "n": 32,
+          "record": "20261104T0511Z-c25519-autolab-r14-k28",
+          "reference": 1.088,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 14, k = 28 train screen: no challenger; ksum4f-n18 has no table collisions on this base",
+          "value": 7.33
+        },
+        {
+          "commit": "7d336d597f38",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 30.8522,
+            "improvement_vs_previous_percent": -3.1979,
+            "value_over_reference": 6.770693
+          },
+          "n": 64,
+          "record": "20261104T0513Z-c25519-autolab-r15-k28",
+          "reference": 1.1172277381421791,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 15, k = 28: null; ksum4f-n15 0.964 at w = 0 but 1.340 at w = 1; ksum4f-n22's 90 free rows per run are low-rank (trials barely fall)",
+          "value": 7.5644054700205885
+        }
+      ],
+      "problem": "ic:curve25519-family-k28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 24.137681139442055,
+      "latest": 8.429559999651605,
+      "latest_derived": {
+        "improvement_vs_first_percent": 65.0772,
+        "improvement_vs_previous_percent": -1.6055,
+        "value_over_reference": 8.535218
+      },
+      "metric": "s_w0_incumbent",
+      "points": [
+        {
+          "commit": "8cab67b459d2",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 28.582714
+          },
+          "n": 16,
+          "record": "20261104T0412Z-c25519-autolab-r4-k32",
+          "reference": 0.844485270383535,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 4, k = 32 train screen: incumbent mitm2-n512 S(w=0) 24.14 vs matched rho 0.84; no candidate below it (ksum4 N = 53-106 at 4.4x-72x); recorded after the run with a fresh replay audit",
+          "value": 24.137681139442055
+        },
+        {
+          "commit": "fafd6d1ce992",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 65.629,
+            "improvement_vs_previous_percent": 65.629,
+            "value_over_reference": 9.10209
+          },
+          "n": 64,
+          "record": "20261104T0414Z-c25519-autolab-r5-k32",
+          "reference": 0.9114783469263799,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 5, k = 32 holdout: ksum:m=4 N = 26 S(w=0) 8.30 vs incumbent 23.60, matched rho 0.91 (distance 25.9x -> 9.1x)",
+          "value": 8.296358105096902
+        },
+        {
+          "commit": "bb4c6c0ef164",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 65.0772,
+            "improvement_vs_previous_percent": -1.6055,
+            "value_over_reference": 8.535218
+          },
+          "n": 64,
+          "record": "20261104T0428Z-c25519-autolab-r10-k32",
+          "reference": 0.9876208815504086,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 10, k = 32: null; ksum4-n22 0.889 of the incumbent at w = 0 but 1.202 at w = 1; incumbent ksum4-n26 kept",
+          "value": 8.429559999651605
+        }
+      ],
+      "problem": "ic:curve25519-family-k32",
+      "unit": "S"
+    }
+  ],
   "units": {
     "S": {
       "better": "lower",

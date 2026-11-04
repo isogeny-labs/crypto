@@ -1,6 +1,6 @@
 {
   "schema": "ic_autolab.families/v1",
-  "note": "Candidate families per track. Each family is one ecbench ic.pipeline oracle string on the track's factor-base template; the searched knob is N (the base size, {n}; {scan} = scan_factor x N). Every family here is an existing lab method; a new family that needs code is a source change and gets its own round after the build. default_f sets the first base size as a fraction of N_a = round(0.63 r^(1/3)). Disable a family rather than deleting it, so the history stays readable. A family's own n_min (when set) overrides the track's: a k-sum table needs more base points than summands.",
+  "note": "Candidate families per track. Each family is one ecbench ic.pipeline oracle string on the track's factor-base template; the searched knob is N (the base size, {n}; {scan} = scan_factor x N). Every family here is an existing lab method; a new family that needs code is a source change and gets its own round after the build. default_f sets the first base size as a fraction of N_a = round(0.63 r^(1/3)). Disable a family rather than deleting it, so the history stays readable. A family's own n_min (when set) overrides the track's: a k-sum table needs more base points than summands. The generic n_grid gained 0.85 and 1.2 after round 6 (the optimum sat between grid points).",
   "tracks": {
     "generic": {
       "factor_base": "prime-projected-abscissa:size={n},scan_cap={scan}",
@@ -8,6 +8,8 @@
       "n_grid": [
         0.5,
         0.7,
+        0.85,
+        1.2,
         1.4,
         2.0
       ],
@@ -30,7 +32,8 @@
           "id": "mitm3",
           "oracle": "mitm:m=3,negation_folded=1",
           "default_f": 0.5,
-          "note": "m = 3 meet in the middle; worse than inc at every N in the m = 3 study (kept as an alternative, never re-proposed where tried)"
+          "note": "m = 3 meet in the middle; worse than inc at every N in the m = 3 study (kept as an alternative, never re-proposed where tried) Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "ksum4",
@@ -56,19 +59,22 @@
           "id": "rfpairs3",
           "oracle": "rootfind-pairs:m=3",
           "default_f": 0.35,
-          "note": "root-finding pairs at m = 3"
+          "note": "root-finding pairs at m = 3 Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "rfsub2",
           "oracle": "rootfind-subtract:m=2",
           "default_f": 1.0,
-          "note": "root-finding subtract at m = 2"
+          "note": "root-finding subtract at m = 2 Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "sub2",
           "oracle": "subtract",
           "default_f": 1.0,
-          "note": "plain subtract-and-test oracle"
+          "note": "plain subtract-and-test oracle Disabled after round 9: dominated by 10x or more in every screen (rounds 1-8).",
+          "enabled": false
         },
         {
           "id": "mitmbatch",
@@ -81,6 +87,50 @@
           "oracle": "mitm-prime-blocked:m=2",
           "default_f": 1.0,
           "note": "blocked prime pair table"
+        },
+        {
+          "id": "ksum3s",
+          "oracle": "ksum:m=3",
+          "default_f": 0.344,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "ksum:m=3 with the stride target stream instead of the jump walk (ideas/PROPOSALS.md P1: the walk's 16 jumps cost two scalar multiplications each); default_f is the k = 20 incumbent's N / N_a Disabled after round 12: P1 falsified (stride 1.081x the walk at k = 24).",
+          "enabled": false
+        },
+        {
+          "id": "ksum4s",
+          "oracle": "ksum:m=4",
+          "default_f": 0.148,
+          "n_min": 6,
+          "params": {
+            "targets": "stride"
+          },
+          "note": "ksum:m=4 with the stride target stream (P1); default_f is the k = 24 incumbent's N / N_a Disabled after round 12: P1 falsified (stride 1.081x the walk at k = 24).",
+          "enabled": false
+        },
+        {
+          "id": "ksum3f",
+          "oracle": "ksum:m=3,free=1",
+          "default_f": 0.344,
+          "note": "k-sum table whose build-time key collisions are verified and used as target-free relations (ideas/PROPOSALS.md P2; KSumTable::free_rows)",
+          "start_from": "ksum3"
+        },
+        {
+          "id": "ksum4f",
+          "oracle": "ksum:m=4,free=1",
+          "default_f": 0.148,
+          "note": "k-sum table whose build-time key collisions are verified and used as target-free relations (ideas/PROPOSALS.md P2; KSumTable::free_rows)",
+          "n_min": 6,
+          "start_from": "ksum4"
+        },
+        {
+          "id": "ksum5f",
+          "oracle": "ksum:m=5,free=1",
+          "default_f": 0.08,
+          "note": "k-sum table whose build-time key collisions are verified and used as target-free relations (ideas/PROPOSALS.md P2; KSumTable::free_rows)",
+          "n_min": 8,
+          "start_from": "ksum5"
         }
       ]
     },
