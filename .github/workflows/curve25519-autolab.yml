@@ -42,7 +42,7 @@ jobs:
         run: cargo build --release --locked --bin ecbench --bin ic_autolab
       - name: Unit tests
         run: cargo test --release --locked --bin ic_autolab
-      - name: One round (root: whole-core reservation; the record stays L1 on a shared VM)
+      - name: "One round (root, whole-core reservation; the record stays L1 on a shared VM)"
         run: |
           sudo -E env PATH="$PATH" ./target/release/ic_autolab \
             --home research/curve25519_autolab_20261104 loop --rounds 1 \
