@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T1602Z-c25519-rebaseline-seedrun",
+  "latest_record": "20261104T1609Z-c25519-autolab-r35-k24-32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 33,
+    "measured": 34,
     "open": 0
   },
   "repo": "crypto",
@@ -443,6 +443,36 @@
       ],
       "problem": "ic:curve25519-family-k24-32",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9105573736784134,
+      "latest": 0.9105573736784134,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_w0_k32",
+      "points": [
+        {
+          "commit": "5d102ddc9600",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 64,
+          "record": "20261104T1609Z-c25519-autolab-r35-k24-32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7897292180954749,
+            1.0498721736035508
+          ],
+          "summary": "ic_autolab round 35: seed=run wwalk grid ratchets nothing; S flat in x near 1.8 at k = 28, 32",
+          "value": 0.9105573736784134
+        }
+      ],
+      "problem": "ic:curve25519-family-k24-32",
+      "unit": "ratio"
     },
     {
       "better": "lower",
