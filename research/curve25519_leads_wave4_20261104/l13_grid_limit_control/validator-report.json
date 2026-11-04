@@ -1,0 +1,427 @@
+{
+ "schema": "crypto.validator-report/v1",
+ "lead": "/home/user/crypto/research/curve25519_leads_wave4_20261104/l13_grid_limit_control",
+ "validated_at_utc": "2026-11-04T06:55:39Z",
+ "validator": "independent validator (Claude Mythos 5.1); did not produce any artifact of this lead; no git mutation; no edits to data/",
+ "commit_binding": {
+  "protocol_frozen_commit": "5a800bb3d06c69b32f32195c3aebccdfb3fee31e",
+  "head_at_validation": "1c1175180fabdc9b4a93007022f0d0bdb9b4a33f",
+  "tracked_tree_dirty": false,
+  "frozen_files_identical_to_5a800bb3": {
+   "PROTOCOL.md": "2ca422e8439f878671d7a03c57c7d7135f9c249c644e630283c37d20ddc9ab06",
+   "scripts/run.sh": "bb13be3c62bc1863f2328b1dcf6b46ea992ae4f99190e2b1962b7570f0fef655",
+   "scripts/chunked_run.py": "e8edaa81515b400bcb29e402f6ff0d8548001498aef662c23f47daf3d19aabde",
+   "scripts/cells_from_t12.py": "f91ed77099bf9973fc8cf85a293b1e469860cf26f91aa15271bd1e535375b7d4",
+   "scripts/identity_check.py": "9b6ffb54fe101be1fca0eb02014915bf7e5adf119189e0de3ec04867b633a2b1",
+   "scripts/pooled_compare.py": "2a7e25b48d15a6a957874d6dcac6624662ffe9dc3812d65aac3361756289591a"
+  },
+  "design_files_committed_in": "1c1175180fabdc9b4a93007022f0d0bdb9b4a33f (design/cells.json, cells.out, plan_design_check.txt; design-time, no measurement)",
+  "git_excluded_uncommitted": [
+   "README.md",
+   "analysis/",
+   "data/",
+   "ecbench/",
+   "validator-report.json"
+  ],
+  "git_exclude_source": ".git/info/exclude lines 15-20 ('TEMP: until wave-4 validation finishes')",
+  "instrument_sha256": {
+   "/home/user/ctarget/release/ecbench": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b",
+   "matches_frozen": true
+  },
+  "spec_sha256": {
+   "ecbench/spec.json": "b83a07cc625d75554e54540b3922d6e367e68aa4d7abeb14e66a2cc7dc9b8faf",
+   "data/ecbench/spec.frozen.json": "b83a07cc625d75554e54540b3922d6e367e68aa4d7abeb14e66a2cc7dc9b8faf",
+   "matches_frozen": true
+  }
+ },
+ "state_of_artifact_set_at_validation": {
+  "run_live": true,
+  "live_processes": "pid 16670 scripts/run.sh -> 16687 chunked_run.py -> 16688 ecbench run --wait --allow-busy ... chunks/c00 (queued on /tmp/crypto-bench.lock behind T11 c04 run pid 18900 and a T12 replay-verify pid 18901; L12 c00 also queued)",
+  "data_SHA256SUMS": "absent",
+  "data_ALL_DONE": "absent",
+  "chunk_records": "none (data/ecbench/chunks/ has only c00.log [0 B], driver.log ['c00 start'], specs/c00.json, interrupted/ [empty])",
+  "band_pooled_json": "absent",
+  "pooled_compare_jsonl": "absent",
+  "identity_check_json": "absent",
+  "verify_dir": "absent",
+  "analysis_verdicts_json": "absent",
+  "readme_self_description": "STATUS: RUN IN PROGRESS, NO DATA YET; no prediction decided; no number is a result"
+ },
+ "disposition": "insufficient_evidence",
+ "verdict": "fail",
+ "verdict_meaning": "Not a negative result about the lead. The dispatch's checks (data vs SHA256SUMS, re-run of a measurement cell, recomputation of result numbers and verdicts) cannot be performed because no measurement exists and the data tree is the live output target of a running process; a moving tree is not validated. The design-time content was checked and reproduced; defects found are listed under errata and must be handled by dated addendum, not by retuning.",
+ "requirements": [
+  {
+   "id": "R1",
+   "requirement": "frozen, committed artifact set; commit sha recorded",
+   "status": "pass (design-time files only)",
+   "evidence": "git show 5a800bb3:<file> | sha256sum == working file for PROTOCOL.md and 5 scripts; design/* committed in 1c1175180f; README/analysis/data/ecbench are git-excluded and uncommitted"
+  },
+  {
+   "id": "R2",
+   "requirement": "data vs SHA256SUMS",
+   "status": "fail / not possible",
+   "evidence": "/home/user/crypto/research/curve25519_leads_wave4_20261104/l13_grid_limit_control/data/SHA256SUMS does not exist; no records to hash"
+  },
+  {
+   "id": "R3",
+   "requirement": "re-run >= 1 measurement cell with the same command (verify --replay 1 for ecbench chunks) and compare counts",
+   "status": "not possible for a measurement cell (none exists); the only L13 cell that exists, `ecbench plan --spec ecbench/spec.json`, was re-run and is byte-identical",
+   "evidence": "scratchpad plan.rerun.txt == data/ecbench/plan.txt == design/plan_design_check.txt (160 executions, 16 workloads, grid arm resolves to pkm-semaev:m=2,mode=full,engine=exhaustive, table arm to mitm:negation_folded=1). No ecbench run/verify was launched: one heavy process at a time, and T11's run plus a T12 replay-verify were already in flight with L12 and L13 queued"
+  },
+  {
+   "id": "R4",
+   "requirement": "recompute every README number",
+   "status": "pass with one erratum",
+   "evidence": "README has no result numbers. Checked: ecbench sha (match), spec sha (match), launch 2026-11-04T06:37:02Z (data/env.txt, data/ecbench/chunks/driver.log), plan 160 executions (data/ecbench/plan.txt), frozen script hashes unchanged (R1), lock queue (process list). Erratum: README cites data/run.log, which does not exist (run.sh writes run.log only via log(), not yet called)"
+  },
+  {
+   "id": "R5",
+   "requirement": "recompute PROTOCOL section 2 model cells and the T12-derived inputs with independent code",
+   "status": "pass (all reproduced, max rel. diff ~1e-9 from the producer's 6-decimal sqrt r); two prose errata",
+   "evidence": "scratchpad recompute_cells.py over research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c00..c15 (160/160 records verified; T12 ecbench/SHA256SUMS verifies rc=0); see recomputed"
+  },
+  {
+   "id": "R6",
+   "requirement": "recompute every verdict with own code",
+   "status": "not possible (no verdicts exist); analysis/decide.py reviewed against PROTOCOL section 4",
+   "evidence": "decide.py encodes P1-P8 thresholds verbatim; band verdict strings match src/cryptanalysis/ecbench/band.rs ('unresolved inside the band', '<a> < <b>'); ranks JSON keys a/b/verdict match T12 band_pooled.json. Finding: P8 rule and identity_check.py use 1,248 x trials; the oracle is called only on trials - repeated_targets_skipped (see errata E2)"
+  },
+  {
+   "id": "R7",
+   "requirement": "scope and failed-prediction honesty",
+   "status": "pass at design level",
+   "evidence": "PROTOCOL declares class 'control, not improvement', no leaderboard row, pre-registered thresholds (section 4) and failure handling (section 5); README claims no result. Required at completion: P8 reported as failed (it will fail on bookkeeping, errata E2) with a dated addendum, never retuned"
+  },
+  {
+   "id": "R8",
+   "requirement": "certificate discipline",
+   "status": "not applicable yet (no run); T12 inputs: 160/160 verified, 16 replay receipts present",
+   "evidence": "research/curve25519_t10_winner_ecbench_20261104/ecbench/verify/c00..c15.json; records outcome.status verified and matches_target true for all 160"
+  },
+  {
+   "id": "R9",
+   "requirement": "controls: reference, baseline, cheaper arm priced across the band",
+   "status": "pass at design level",
+   "evidence": "spec arms: rho-neg (reference), proj-a (baseline), F4 candidate, grid and mitm floors on the same base; band weights 0/0.1/1 in run.sh (ecbench band --ranks) and pooled_compare"
+  },
+  {
+   "id": "R10",
+   "requirement": "reporting contract at completion (manifest integrity)",
+   "status": "forward finding",
+   "evidence": "scripts/run.sh finish(): SHA256SUMS is computed BEFORE 'end_utc' is appended to env.txt, ALL_DONE is touched and the final log line goes to run.log/run.out; the manifest will not verify for env.txt, run.log and run.out when the run completes (errata E6)"
+  },
+  {
+   "id": "R11",
+   "requirement": "large files / artifact policy",
+   "status": "forward finding",
+   "evidence": "data/ is git-excluded with no .artifacts.json; at completion the records must be committed or pushed through the store (AGENTS.md section 13) before any citation"
+  }
+ ],
+ "recomputed": {
+  "sqrt_r_exact": 362.2195466840518,
+  "constants": {
+   "grid_fp_mults_per_target_n2_plus_7n_n32": 1248,
+   "grid_source": "src/cryptanalysis/ic_framework/pkm_semaev.rs::grid m=2: 6 mults per outer row + 2 per unordered pair incl. diagonal = n^2 + 7n; exhaustive engine calls grid(.., first_only=false) once per oracle call",
+   "table_additions_sum_2x(22-i)": 506,
+   "table_source": "src/cryptanalysis/ic_boundary.rs::PairTable::build_negation_folded: first point of each abscissa group against every signed point of later-or-equal groups; 22 groups x 2 points -> 506 charged additions (proj-a's 1056 = 2x528 for 32 groups confirms the count)"
+  },
+  "t12_checks": {
+   "records": 160,
+   "all_verified": true,
+   "s_field_consistent": true,
+   "seeds_paired_within_workload_round": true,
+   "pairs": 32,
+   "f4_grid_mults_eq_1248_x_consistent": true,
+   "f4_consistent_eq_relations": true,
+   "f4_solver_ops_eq_phase_solver_ops": true
+  },
+  "t12_arms": {
+   "pkm-iso-t5-g4-s1307": {
+    "runs": 32,
+    "charged_sum": 306055.0,
+    "native_sum": 11620096313,
+    "mean_gae": 9564.21875,
+    "mean_unpriced": 363128009.78125,
+    "mean_S": [
+     26.404479928142717,
+     100277.20902803019,
+     1002534.4499609486
+    ],
+    "mean_trials": 7061.0,
+    "mean_relations": 10.84375,
+    "trials_per_relation": 651.1585014409222,
+    "phase_gae": {
+     "factor_base": 932.0,
+     "oracle_setup": 0.0,
+     "relations": 8610.28125,
+     "verify": 21.9375
+    },
+    "solver_ops_per_trial": 51207.15529404475,
+    "system_mults_per_trial": 217.17522305622433,
+    "unpriced_per_trial_solver_plus_system": 51424.33051710098
+   },
+   "proj-a": {
+    "runs": 32,
+    "charged_sum": 146434.0,
+    "native_sum": 114987,
+    "mean_gae": 4576.0625,
+    "mean_unpriced": 3593.34375,
+    "mean_S": [
+     12.633394696370425,
+     13.625429439634658,
+     22.55374212901275
+    ],
+    "mean_trials": 1553.59375,
+    "mean_relations": 22.25,
+    "trials_per_relation": 69.8244382022472,
+    "phase_gae": {
+     "factor_base": 736.0,
+     "oracle_setup": 1056.0,
+     "relations": 2762.125,
+     "verify": 21.9375
+    }
+   },
+   "rho-neg": {
+    "runs": 32,
+    "charged_sum": 17892.0,
+    "native_sum": 12839,
+    "mean_gae": 559.125,
+    "mean_unpriced": 401.21875,
+    "mean_S": [
+     1.5436080275582151,
+     1.6543747583083823,
+     2.6512753350598874
+    ]
+   }
+  },
+  "modelled_arms_protocol_model": {
+   "grid-iso-t5-s1307": [
+    26.404479928142717,
+    2461.228078140191,
+    24374.640462048625
+   ],
+   "mitm-iso-t5-s1307": [
+    27.80142276193562,
+    31.760347709878353,
+    67.39067224136295
+   ]
+  },
+  "modelled_ratios_protocol_model_b_over_a": {
+   "grid/F4": [
+    1.0,
+    0.024544241926918918,
+    0.024313020328626197
+   ],
+   "mitm/grid": [
+    1.0529055235170148,
+    0.012904268398350887,
+    0.002764786309208966
+   ],
+   "grid/proj-a": [
+    2.0900542223800485,
+    180.63489954898512,
+    1080.7359737741037
+   ],
+   "mitm/proj-a": [
+    2.2006296351940122,
+    2.3309612258892556,
+    2.988004024160263
+   ],
+   "grid/rho-neg": [
+    17.10568969371786,
+    1487.7089158787853,
+    9193.553057173538
+   ],
+   "mitm/rho-neg": [
+    18.01067516208361,
+    19.197795149119468,
+    25.418209625459635
+   ],
+   "F4/grid": [
+    1.0,
+    40.74275355407286,
+    41.13022514206506
+   ],
+   "F4/rho-neg": [
+    17.10568969371786,
+    60613.35771984627,
+    378132.9070970681
+   ],
+   "F4/proj-a": [
+    2.0900542223800485,
+    7359.5631955890085,
+    44450.91392045781
+   ]
+  },
+  "t12_paired_ratios_recomputed_with_t975_15_=_2.131449536": {
+   "pkm-iso-t5-g4-s1307/pkm-iso-t6-g4 w=0.0": {
+    "ratio": 0.8543533484074477,
+    "ci95": [
+     0.7208982127741443,
+     1.012514153872233
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/pkm-iso-t6-g4 w=0.1": {
+    "ratio": 0.05779489993450582,
+    "ci95": [
+     0.046635663856363724,
+     0.07162437890296576
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/pkm-iso-t6-g4 w=1.0": {
+    "ratio": 0.057782129828856874,
+    "ci95": [
+     0.046624945402865776,
+     0.07160918900193833
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/proj-a w=0.0": {
+    "ratio": 2.0900542223800485,
+    "ci95": [
+     1.7820448388175114,
+     2.4513000780537624
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/proj-a w=0.1": {
+    "ratio": 7359.5631955890085,
+    "ci95": [
+     6042.6842139210075,
+     8963.428918739182
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/proj-a w=1.0": {
+    "ratio": 44450.91392045781,
+    "ci95": [
+     36008.238153878716,
+     54873.1026472372
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/rho-neg w=0.0": {
+    "ratio": 17.10568969371786,
+    "ci95": [
+     13.324613007479359,
+     21.959708678482514
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/rho-neg w=0.1": {
+    "ratio": 60613.35771984627,
+    "ci95": [
+     45546.48408232989,
+     80664.38514623781
+    ],
+    "K": 16
+   },
+   "pkm-iso-t5-g4-s1307/rho-neg w=1.0": {
+    "ratio": 378132.9070970681,
+    "ci95": [
+     278736.81295643526,
+     512973.1301477838
+    ],
+    "K": 16
+   }
+  },
+  "agreement_with_design_cells_json": "every mean, S, and ratio agrees to <= 1e-9 relative; every T12 ratio and CI agrees with T12 ecbench/pooled_compare.jsonl to <= 1e-9 relative",
+  "skipped_target_effect": {
+   "proj_a_lookups_eq_trials_minus_skipped_all32": true,
+   "f4_mean_skipped": 207.84375,
+   "f4_mean_trials": 7061.0,
+   "f4_skipped_fraction": 0.029435455317943632,
+   "f4_runs_with_skipped_gt0": 31,
+   "f4_branches_consistent_with_16x(trials-skipped)": true,
+   "grid_S_corrected(trials-skipped)": [
+    26.404479928142717,
+    2389.6170890661383,
+    23658.530571308096
+   ],
+   "mitm_S_corrected(trials-skipped)": [
+    27.80142276193562,
+    31.70296710965876,
+    66.81686623916701
+   ],
+   "ratios_corrected": {
+    "grid/F4": [
+     1.0,
+     0.023830111669723233,
+     0.023598720794312515
+    ],
+    "mitm/grid": [
+     1.0529055235170148,
+     0.013266965345501555,
+     0.002824218775455109
+    ],
+    "grid/proj-a": [
+     2.0900542223800485,
+     175.37921279127124,
+     1048.9847066609034
+    ],
+    "mitm/proj-a": [
+     2.2006296351940122,
+     2.3267499384231387,
+     2.962562303716993
+    ],
+    "grid/rho-neg": [
+     17.10568969371786,
+     1444.4230831408174,
+     8923.452897725423
+    ],
+    "F4/grid": [
+     1.0,
+     41.96371439041663,
+     42.375178244449934
+    ]
+   }
+  },
+  "verify_phase_gae": {
+   "values": [
+    14.0,
+    16.0,
+    18.0,
+    19.0,
+    21.0,
+    22.0,
+    23.0,
+    24.0,
+    25.0,
+    28.0
+   ],
+   "mean": 21.9375
+  },
+  "arithmetic_checks": {
+   "160_executions": "5 arms x 16 targets x 2 rounds = 160",
+   "trials_per_relation_F4": 651.1585014409222,
+   "trials_per_relation_proj_a": 69.8244382022472,
+   "r_over_69.82": 1879.04125515438,
+   "1+506/9564": 1.0529055235170148,
+   "4*C(32,2)": 1984,
+   "protocol_text_2x32^2/2": 1024.0
+  }
+ },
+ "errata": [
+  "E1 (blocking for any citation): no measurement exists. data/SHA256SUMS, data/ALL_DONE, chunk records, band_pooled.json, pooled_compare.jsonl, identity_check.json and verify/ are absent; the run (pids 16670/16687/16688) is queued on /tmp/crypto-bench.lock. The data tree is live and git-excluded; nothing in it can be validated or cited until ALL_DONE and SHA256SUMS exist and the records are committed or stored.",
+  "E2 (frozen-design defect, affects P8 and identity_check.py): the rule 'pkm_grid_fp_mults_uncharged = 1,248 x trials' is wrong by construction. The pipeline skips repeated targets before the oracle is called: in T12, proj-a lookups == trials - repeated_targets_skipped in 32/32 runs, and the F4 arm's branch counts fit 16 x (trials - skipped) calls in 32/32 runs with skipped > 0 in 31/32 runs (mean 208 of 7,061 trials, 2.94%). The exhaustive engine emits exactly 1,248 per oracle call (grid(.., first_only=false)), so the correct identity is 1,248 x (trials - repeated_targets_skipped). P8 as frozen will fail on essentially every pair; under PROTOCOL section 5 it must be reported as failed, with the corrected identity in a dated addendum, not retuned. The same overcount enters the section 2 model cells (grid and mitm per-trial work use trials instead of oracle calls): corrected points grid/F4 = 0.0238 / 0.0236 (protocol 0.0245 / 0.0243), F4/grid = 42.0 / 42.4 (40.7 / 41.1), grid/proj-a = 175 / 1,049 (181 / 1,081), grid/rho-neg = 1,444 / 8,923 (1,488 / 9,194), mitm/proj-a = 2.33 / 2.96 (2.33 / 2.99) at w = 0.1 / 1. No P2/P4/P5/P6 threshold is affected; the exploratory interval [0.020, 0.030] still covers.",
+  "E3 (README): cites data/run.log as evidence of the launch; the file does not exist (run.sh writes it only through log(), which has not been called). env.txt and chunks/driver.log do carry the launch time.",
+  "E4 (PROTOCOL section 2 prose): 'verify 23' for the F4 arm's phase GAE; the T12 mean is 21.94 (per-run values 14-28; design/cells.json says 21.9375).",
+  "E5 (PROTOCOL section 2 model-reason prose): 'approx. 2 x 32^2 / 2 approx. 2,000 signed pair sums' is arithmetically 1,024; the intended count is 4 x C(32,2) = 1,984 (or approx. 2 x 32^2). The measured 69.8 trials/relation = r/1,879 is consistent with approx. 1,900 effective sums. Not load-bearing for any rule.",
+  "E6 (scripts/run.sh, forward): finish() writes SHA256SUMS before appending end_utc to env.txt, touching ALL_DONE and writing the final log line to run.log and run.out; at completion `sha256sum -c SHA256SUMS` will fail on env.txt, run.log and run.out. Regenerating the manifest after finish is a change to the finished tree and must be recorded as such in the report.",
+  "E7 (artifact policy, forward): data/ is excluded from git (.git/info/exclude, 'TEMP') and has no .artifacts.json; the records cannot be a committed artifact set until pushed through the store or committed.",
+  "E8 (scripts/pooled_compare.py, latent): unpriced() does not exempt NON_OPERATION_COUNTERS (band.rs byte counters). None of the five arms emits one (T12 records; same mitm oracle as proj-a), so it does not bite here; the solver_ prefix rule is equivalent to band.rs for these arms and the T12 positive control (ratios and CIs to 1e-9) is confirmed by my independent implementation."
+ ],
+ "not_done": [
+  "No ecbench run or verify --replay was launched (no L13 cell exists; one heavy process at a time; T11 run and a T12 replay-verify in flight).",
+  "T12 itself was not re-validated beyond checking that its 160 records are verified, its SHA256SUMS verifies, and its 16 replay receipts exist; it is the input to the model cells, not the object of this dispatch."
+ ],
+ "redispatch_conditions": [
+  "data/ALL_DONE and data/SHA256SUMS exist and the manifest verifies (or the env.txt/run.log/run.out mismatch of E6 is documented)",
+  "16 complete chunks with 160 verified records, 16 verify --replay 1 receipts with rc=0",
+  "README reports P1-P8 by the frozen rules, P8 reported as failed with the E2 correction in a dated addendum",
+  "records committed or pushed through the store with a manifest; then validate from that frozen set"
+ ]
+}
