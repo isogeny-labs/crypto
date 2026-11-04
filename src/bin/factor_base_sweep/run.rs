@@ -601,7 +601,11 @@ pub fn ranking(items: &[Value]) -> Value {
         .collect();
     rows.sort_by(|a, b| {
         let rank = |v: &Value| advice_of(v).map_or(u8::MAX, forecast::advice_rank);
-        let work = |v: &Value| v["projected_relation_phase_work"].as_f64().unwrap_or(f64::INFINITY);
+        let work = |v: &Value| {
+            v["projected_relation_phase_work"]
+                .as_f64()
+                .unwrap_or(f64::INFINITY)
+        };
         rank(a)
             .cmp(&rank(b))
             .then(degree_key(a).cmp(&degree_key(b)))
@@ -706,9 +710,7 @@ mod tests {
     use super::*;
     #[test]
     fn triage_ranking_orders_promising_low_degree_cheap_first() {
-        let item = |id: &str, advice: &str, degree: &str, work: f64| {
-            json!({"id":id,"label":id,"outcome":"completed","attempt":"a","forecast":{"advice":advice,"degree_bound":8,"predicted_degree_of_regularity":degree,"projected_relation_phase_work":work}})
-        };
+        let item = |id: &str, advice: &str, degree: &str, work: f64| json!({"id":id,"label":id,"outcome":"completed","attempt":"a","forecast":{"advice":advice,"degree_bound":8,"predicted_degree_of_regularity":degree,"projected_relation_phase_work":work}});
         let items = vec![
             item("hopeless", "hopeless_at_bound", ">8", 1.0),
             item("doubtful", "doubtful", "3", 1.0),
@@ -727,10 +729,20 @@ mod tests {
             .collect();
         assert_eq!(
             ids,
-            ["promising-low", "promising-fast", "promising-slow", "undecided", "doubtful", "hopeless"]
+            [
+                "promising-low",
+                "promising-fast",
+                "promising-slow",
+                "undecided",
+                "doubtful",
+                "hopeless"
+            ]
         );
         assert!(out["certified_degree_of_regularity"].is_null());
-        assert!(out["advisory"].as_str().unwrap().contains("no candidate was stopped"));
+        assert!(out["advisory"]
+            .as_str()
+            .unwrap()
+            .contains("no candidate was stopped"));
     }
     #[test]
     fn provisional_comparison_requires_the_same_probe_prefix_and_positive_reference() {

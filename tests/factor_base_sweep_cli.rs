@@ -121,11 +121,23 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert_eq!(forecast["solves"], 6);
         assert!(forecast["certified_degree_of_regularity"].is_null());
         assert!(forecast["all_targets"]["predicted_degree_label"].is_string());
-        assert!(forecast["cost"]["hope_ratio_band"].as_array().unwrap().len() == 3);
+        assert!(
+            forecast["cost"]["hope_ratio_band"]
+                .as_array()
+                .unwrap()
+                .len()
+                == 3
+        );
         assert!(result["trials"][6]["forecast"]["advice"].is_string());
-        assert_eq!(result["trials"][6]["independent_rank"], forecast["cost"]["rank"]);
+        assert_eq!(
+            result["trials"][6]["independent_rank"],
+            forecast["cost"]["rank"]
+        );
         let candidate = &summary["candidates"][0];
-        assert_eq!(candidate["forecast_replay_matches_worker"], true, "{candidate}");
+        assert_eq!(
+            candidate["forecast_replay_matches_worker"], true,
+            "{candidate}"
+        );
         assert_eq!(candidate["forecast"]["solves"], 6);
         assert_eq!(summary["triage"]["rows"].as_array().unwrap().len(), 1);
         assert!(summary["triage"]["certified_degree_of_regularity"].is_null());

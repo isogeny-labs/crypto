@@ -628,7 +628,10 @@ impl Forecaster {
         let (charged, charged_distribution) = if self.observations.is_empty() {
             (&all, "prior (no solve observed yet)")
         } else {
-            (&data_only, "data-only Kaplan–Meier estimate (prior excluded)")
+            (
+                &data_only,
+                "data-only Kaplan–Meier estimate (prior excluded)",
+            )
         };
         let (work_by_degree, expected_work) = self.work_by_degree(charged);
         let relation_phase_solves = self
@@ -675,7 +678,11 @@ impl Forecaster {
             scope: "projection from observed solver work and relation yield at the forecast degree distribution; excludes linear algebra, system construction, inventory and verification; rho floor in group additions priced at 1, 10 and 100 multiplications; provisional, not a §5a comparison or a speedup claim".into(),
         };
         let mut trace = Vec::new();
-        for o in self.observations.iter().filter(|o| o.relation_phase && o.relation) {
+        for o in self
+            .observations
+            .iter()
+            .filter(|o| o.relation_phase && o.relation)
+        {
             if let Some(d) = o.solving_degree {
                 trace.push([trace.len() as u32 + 1, d]);
             }
@@ -757,9 +764,7 @@ pub fn json_approx_eq(a: &serde_json::Value, b: &serde_json::Value, relative: f6
     use serde_json::Value;
     match (a, b) {
         (Value::Number(x), Value::Number(y)) => match (x.as_f64(), y.as_f64()) {
-            (Some(x), Some(y)) => {
-                x == y || (x - y).abs() <= relative * x.abs().max(y.abs())
-            }
+            (Some(x), Some(y)) => x == y || (x - y).abs() <= relative * x.abs().max(y.abs()),
             _ => x == y,
         },
         (Value::Array(x), Value::Array(y)) => {
@@ -767,8 +772,7 @@ pub fn json_approx_eq(a: &serde_json::Value, b: &serde_json::Value, relative: f6
         }
         (Value::Object(x), Value::Object(y)) => {
             x.len() == y.len()
-                && x
-                    .iter()
+                && x.iter()
                     .all(|(k, p)| y.get(k).is_some_and(|q| json_approx_eq(p, q, relative)))
         }
         _ => a == b,
@@ -835,7 +839,10 @@ mod tests {
     fn semi_regular_field_series_matches_the_macaulay_bound_for_regular_systems() {
         // n generic quadrics in n variables: D_reg = n + 1.
         for n in 1..8usize {
-            assert_eq!(semi_regular_degree_field(n, &vec![2; n]), Some(n as u32 + 1));
+            assert_eq!(
+                semi_regular_degree_field(n, &vec![2; n]),
+                Some(n as u32 + 1)
+            );
         }
         // Two quadrics and a cubic in three variables: Macaulay bound 1+1+2+1 = 5.
         assert_eq!(semi_regular_degree_field(3, &[2, 2, 3]), Some(5));
@@ -891,7 +898,11 @@ mod tests {
         assert!((fc.all_targets.p_exceeds_bound - 0.875).abs() < 1e-12);
         assert_eq!(fc.all_targets.predicted_degree, None);
         assert_eq!(fc.all_targets.predicted_degree_label, ">6");
-        assert_eq!(fc.all_targets.band_lower, None, "{:?}", fc.all_targets.survival);
+        assert_eq!(
+            fc.all_targets.band_lower, None,
+            "{:?}",
+            fc.all_targets.survival
+        );
         assert_eq!(fc.all_targets.censored, 14);
         assert_eq!(fc.advice, Advice::HopelessAtBound);
         // A deadline inside degree 6 censors one lower than a completed cap.
@@ -990,9 +1001,17 @@ mod tests {
             .map(|w| w.degree_label.clone())
             .collect();
         assert_eq!(observed, ["3", "4"]);
-        let fitted = c.work_by_degree.iter().find(|w| w.degree_label == "5").unwrap();
+        let fitted = c
+            .work_by_degree
+            .iter()
+            .find(|w| w.degree_label == "5")
+            .unwrap();
         assert_eq!(fitted.source, "log-linear fit");
-        assert!((fitted.mean_work - 10_000.0).abs() < 1e-6, "{}", fitted.mean_work);
+        assert!(
+            (fitted.mean_work - 10_000.0).abs() < 1e-6,
+            "{}",
+            fitted.mean_work
+        );
         assert!(c.work_by_degree.iter().any(|w| w.degree_label == ">6"));
         assert_eq!(fc.semi_regular_degree, Some(5));
         assert_eq!(fc.structural_gain, Some(true));
@@ -1016,7 +1035,10 @@ mod tests {
     fn the_prior_tail_is_not_charged_once_a_solve_was_observed() {
         let mut f = Forecaster::new(8);
         f.set_shape(quadratic_shape(4, true));
-        assert_eq!(f.forecast().cost.charged_distribution, "prior (no solve observed yet)");
+        assert_eq!(
+            f.forecast().cost.charged_distribution,
+            "prior (no solve observed yet)"
+        );
         for _ in 0..16 {
             f.observe(decided(Outcome::Decomposed, 2, 400, true));
         }
@@ -1111,7 +1133,11 @@ mod tests {
         assert_eq!(back.cost.work_by_degree.len(), fc.cost.work_by_degree.len());
         assert!(back.certified_degree_of_regularity.is_none());
         let parsed: serde_json::Value = serde_json::from_str(&text).unwrap();
-        assert!(json_approx_eq(&serde_json::to_value(&fc).unwrap(), &parsed, 1e-12));
+        assert!(json_approx_eq(
+            &serde_json::to_value(&fc).unwrap(),
+            &parsed,
+            1e-12
+        ));
         let mut other = parsed.clone();
         other["degree_bound"] = serde_json::json!(9);
         assert!(!json_approx_eq(&parsed, &other, 1e-12));

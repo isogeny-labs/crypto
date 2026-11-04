@@ -71,12 +71,7 @@ pub fn automorphisms(curve: &CurveSpec) -> f64 {
 }
 
 /// A forecaster for one candidate, before any solve.
-pub fn forecaster(
-    request: &Request,
-    dump: &FactorBaseDump,
-    r: u64,
-    cofactor: u64,
-) -> Forecaster {
+pub fn forecaster(request: &Request, dump: &FactorBaseDump, r: u64, cofactor: u64) -> Forecaster {
     let mut f = Forecaster::new(request.plan.max_degree)
         .with_work_unit("F4 row-reduction field multiplications (f4_fp field_ops)");
     f.set_relation_state(dump.factor_base.columns as usize, 0);
@@ -106,9 +101,7 @@ pub fn observation(record: &Value) -> Option<SolveObservation> {
     let degree_reached = record["degree_processed"].as_u64().unwrap_or(0) as u32;
     Some(SolveObservation {
         outcome,
-        solving_degree: record["observed_solving_degree"]
-            .as_u64()
-            .map(|d| d as u32),
+        solving_degree: record["observed_solving_degree"].as_u64().map(|d| d as u32),
         censored_above: SolveObservation::censor_point(
             degree_reached,
             record["timed_out"].as_bool().unwrap_or(false),
@@ -213,7 +206,11 @@ pub fn from_attempt(dir: &Path) -> Result<Option<(Forecast, Value)>> {
     records.sort_by_key(|(order, index, _)| (*order, *index));
     for (order, index, record) in &records {
         let system = dir.join(format!("{}-{index:04}.system.json", PHASES[*order]));
-        if let Some(shape) = read::<Value>(&system).ok().as_ref().and_then(shape_of_system) {
+        if let Some(shape) = read::<Value>(&system)
+            .ok()
+            .as_ref()
+            .and_then(shape_of_system)
+        {
             f.set_shape(shape);
         }
         if let Some(relation) = record.get("relation").filter(|v| !v.is_null()) {
