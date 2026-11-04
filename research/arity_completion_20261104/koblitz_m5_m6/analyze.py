@@ -113,31 +113,30 @@ def main(argv):
             f.write("\t".join(hdr) + "\n")
             for row in rows: f.write("\t".join(str(x) for x in row) + "\n")
 
+    ENGINES = ("chain-s3-orbit", "chain-s3")
     get = lambda fam, curve, m, S, probes, eng="chain-s3-orbit": cells.get((fam, curve, m, S, eng, probes))
     A_CURVES = ["k0n23", "k1n29", "k0n31", "k0n37", "k0n41"]
-    verdicts = {}
+    allv = {}
     notes = []
 
     # ---- controls -------------------------------------------------------
     print("\n# controls")
-    bad_planted = set()      # (curve, m, S) whose planted control missed
-    n_planted_done = n_planted_ok = 0
-    for fam in ("koblitzA", "liftB"):
-        for c in cells.values():
-            if c["fam"] == fam and c["probes"] == "planted" and c["cls"] not in ("capped", "skipped_stopping_rule", "process_error"):
-                r = c["rec"]; n_planted_done += 1
-                ok = r.get("trials") and r.get("verified_relations") == r.get("trials") and r.get("outcomes", {}).get("witness") == r.get("trials")
-                if ok: n_planted_ok += 1
-                else:
-                    bad_planted.add((c["curve"], c["m"], c["S"]))
-                    print(f"POSITIVE CONTROL MISS {c['curve']} m={c['m']} S={c['S']}: class={c['cls']} outcomes={r.get('outcomes')} verified={r.get('verified_relations')}")
-    print(f"planted cells completed: {n_planted_done}, recovered 4/4: {n_planted_ok}")
-    for fam in ("koblitzA", "liftB"):
-        for c in cells.values():
-            if c["fam"] == fam and c["probes"] == "public" and (c["curve"], c["m"], c["S"]) not in bad_planted:
-                p = get(fam, c["curve"], c["m"], c["S"], "planted")
-                if is_decided(c["cls"]) and (p is None or p["cls"] in ("capped", "skipped_stopping_rule")):
-                    notes.append(f"public cell {c['curve']} m={c['m']} S={c['S']} decided without a completed planted control")
+    bad_planted = set()      # (engine, curve, m, S) whose planted control missed
+    pl = {e: [0, 0] for e in ENGINES}   # engine -> [completed, recovered 4/4 (or trials/trials)]
+    for c in cells.values():
+        if c["fam"] in ("koblitzA", "liftB") and c["probes"] == "planted" and c["cls"] not in ("capped", "skipped_stopping_rule", "process_error"):
+            r = c["rec"]; pl.setdefault(c["eng"], [0, 0])[0] += 1
+            ok = r.get("trials") and r.get("verified_relations") == r.get("trials") and r.get("outcomes", {}).get("witness") == r.get("trials")
+            if ok: pl[c["eng"]][1] += 1
+            else:
+                bad_planted.add((c["eng"], c["curve"], c["m"], c["S"]))
+                print(f"POSITIVE CONTROL MISS {c['eng']} {c['curve']} m={c['m']} S={c['S']}: class={c['cls']} outcomes={r.get('outcomes')} verified={r.get('verified_relations')}")
+    for e, (d, ok) in pl.items(): print(f"planted cells completed ({e}): {d}, all queries recovered and verified: {ok}")
+    for c in cells.values():
+        if c["fam"] in ("koblitzA", "liftB") and c["probes"] == "public" and is_decided(c["cls"]):
+            p = get(c["fam"], c["curve"], c["m"], c["S"], "planted", c["eng"])
+            if p is None or p["cls"] in ("capped", "skipped_stopping_rule"):
+                notes.append(f"public cell {c['eng']} {c['curve']} m={c['m']} S={c['S']} decided without a completed planted control")
 
     aa_bad = 0
     for k, c in sorted(cells.items(), key=lambda kv: order(kv[1])):
@@ -155,100 +154,111 @@ def main(argv):
             tag = "agree" if same else "DISAGREE (invalid pair)"
             if not same: aa_bad += 1
         ratio = (spq(c) / spq(o)) if spq(o) and spq(c) else None
-        print(f"A/A {c['curve']} m={c['m']} S={c['S']}: {o['cls']} vs {c['cls']} {tag}; seconds ratio {fmt(ratio, 3)}")
+        print(f"A/A {c['eng']} {c['curve']} m={c['m']} S={c['S']}: {o['cls']} vs {c['cls']} {tag}; seconds ratio {fmt(ratio, 3)}")
     print(f"A/A pairs with disagreement or noise flag: {aa_bad}")
 
     neg_undecided = {}
     for c in sorted((c for c in cells.values() if c["fam"] == "negative"), key=order):
         print(f"NEG m=2 {c['curve']} {c['eng']}: {c['cls']} sec/query={fmt(spq(c), 3)}")
-        if c["eng"] == "chain-s3-orbit": neg_undecided[c["curve"]] = not is_decided(c["cls"])
+        neg_undecided[(c["curve"], c["eng"])] = not is_decided(c["cls"])
     n83neg = cells.get(("negative", "n83k1", 2, 2, "chain-s3", "public"))
     if n83neg and spq(n83neg): print(f"n = 83 chain-s3 m=2 union:2: {spq(n83neg):.2f} s/query against the n83_msweep record 17.33 s (ratio {spq(n83neg)/17.3292:.2f}; diagnostic, different host)")
 
-    # ---- K1 -------------------------------------------------------------
-    k1 = [get("koblitzA", "k0n23", m, 2, "public") for m in (5, 6)]
-    if any(x is None or x["cls"] in ("skipped_stopping_rule",) for x in k1): v = "not_evaluable"
-    elif all(is_decided(x["cls"]) for x in k1): v = "supported"
-    else: v = "falsified"
-    if v == "supported" and any((("k0n23", m, 2) in bad_planted) for m in (5, 6)): v = "not_evaluable"
-    verdicts["K1"] = (v, ", ".join(f"m={m}: {x['cls'] if x else 'missing'} {fmt(spq(x) if x else None, 2)} s/q" for m, x in zip((5, 6), k1)))
+    for ENG in ENGINES:
+        verdicts = {}
+        gt = lambda fam, curve, m, S, probes: get(fam, curve, m, S, probes, ENG)
+        # ---- K1 ---------------------------------------------------------
+        k1 = [gt("koblitzA", "k0n23", m, 2, "public") for m in (5, 6)]
+        if any(x is None or x["cls"] == "skipped_stopping_rule" for x in k1): v = "not_evaluable"
+        elif all(is_decided(x["cls"]) for x in k1): v = "supported"
+        else: v = "falsified"
+        if v == "supported" and any(((ENG, "k0n23", m, 2) in bad_planted) for m in (5, 6)): v = "not_evaluable"
+        verdicts["K1"] = (v, ", ".join(f"m={m}: {x['cls'] if x else 'missing'} {fmt(spq(x) if x else None, 2)} s/q" for m, x in zip((5, 6), k1)))
+        # ---- K2 ---------------------------------------------------------
+        m6 = {(cv, S): gt("koblitzA", cv, 6, S, "public") for cv in A_CURVES for S in (2, 3)}
+        tail = [m6[(cv, S)] for cv in ("k0n37", "k0n41") for S in (2, 3)]
+        measured = [x for x in tail if x is not None and x["cls"] != "skipped_stopping_rule"]
+        slope_notes, slope_ok = [], True
+        for S in (2, 3):
+            pts = [(N_OF[cv], spq(m6[(cv, S)])) for cv in A_CURVES if m6[(cv, S)] is not None and spq(m6[(cv, S)])]
+            for (n1, s1), (n2, s2) in zip(pts, pts[1:]):
+                sl = (math.log2(s2) - math.log2(s1)) / (n2 - n1)
+                slope_notes.append(f"S={S} n {n1}->{n2}: log2-slope {sl:.3f}/n")
+                if sl <= 0: slope_ok = False
+        if not measured: v = "not_evaluable"
+        elif any(x["cls"] != "capped" for x in measured): v = "falsified"
+        elif not slope_ok: v = "falsified"
+        elif len(measured) < 4: v = "supported_partial"
+        else: v = "supported"
+        if v.startswith("supported") and (neg_undecided.get(("k0n37", ENG)) or neg_undecided.get(("k0n41", ENG))):
+            notes.append(f"K2[{ENG}]: m=2 negative control undecided at n=37/41; capped cells there are uninformative")
+        verdicts["K2"] = (v, f"{len(measured)}/4 tail cells measured, " + ", ".join(f"{x['curve']} S={x['S']}: {x['cls']}" for x in measured) + ("; " + "; ".join(slope_notes) if slope_notes else "; no two decided points for a slope"))
+        # ---- K3 ---------------------------------------------------------
+        d, ok = pl.get(ENG, [0, 0])
+        v = "not_evaluable" if d == 0 else ("falsified" if any(b[0] == ENG for b in bad_planted) else "supported")
+        verdicts["K3"] = (v, f"{ok}/{d} completed planted cells recovered every query; cells that capped are unmeasured")
+        # ---- K4 ---------------------------------------------------------
+        b = [gt("liftB", "n83k1", m, S, "public") for m in (5, 6) for S in (2, 3)]
+        if any(x is None for x in b): v = "not_evaluable"
+        elif any(is_decided(x["cls"]) for x in b): v = "falsified"
+        elif all(x["cls"] in ("capped", "undecided") for x in b): v = "supported"
+        else: v = "not_evaluable"
+        nb = cells.get(("negative", "n83k1", 2, 2, ENG, "public"))
+        if v == "supported" and nb and not is_decided(nb["cls"]):
+            notes.append(f"K4[{ENG}]: the n = 83 m=2 negative control is undecided at 1800 s; K4 is supported but weak (the engine does not decide even m = 2 there)")
+        verdicts["K4"] = (v, ", ".join(f"m={x['m']} S={x['S']}: {x['cls']}" if x else "missing" for x in b))
+        # ---- K5 ---------------------------------------------------------
+        cand = [c for c in cells.values() if c["eng"] == ENG and c["probes"] == "public" and c["fam"] in ("koblitzA", "liftB") and c["n"] and c["n"] >= 31]
+        dec = [c for c in cand if is_decided(c["cls"])]
+        under = [c for c in dec if spq(c) is not None and spq(c) < PARITY_S]
+        v = "not_evaluable" if not cand else ("falsified" if under else "supported")
+        detail = f"{len(dec)} decided public cells at n >= 31 of {len(cand)} recorded"
+        if v == "supported" and not dec: detail += " (vacuous: none decided; capped cells are untested against 188 s)"
+        if under: detail += "; under 188 s: " + ", ".join(f"{c['curve']} m={c['m']} S={c['S']} {spq(c):.1f} s ({spq(c)/PARITY_S:.2f} x parity)" for c in under)
+        if any(c["fam"] == "koblitzA" for c in under): detail += " [Part A: a decided cell is at most 150 s per query by construction of the 4-trial 600 s cap]"
+        verdicts["K5"] = (v, detail)
+        # ---- K6 ---------------------------------------------------------
+        if verdicts["K3"][0] == "falsified": v = "not_evaluable_instrument_invalid"
+        elif verdicts["K4"][0] == "supported" and verdicts["K5"][0] == "supported": v = "kill_high_arity_koblitz_line"
+        elif "not_evaluable" in (verdicts["K4"][0], verdicts["K5"][0]): v = "not_evaluable"
+        else: v = "line_stays_open"
+        verdicts["K6"] = (v, f"K4={verdicts['K4'][0]}, K5={verdicts['K5'][0]}, K3={verdicts['K3'][0]}")
+        allv[ENG] = verdicts
 
-    # ---- K2 -------------------------------------------------------------
-    m6 = {(cv, S): get("koblitzA", cv, 6, S, "public") for cv in A_CURVES for S in (2, 3)}
-    tail = [m6[(cv, S)] for cv in ("k0n37", "k0n41") for S in (2, 3)]
-    measured = [x for x in tail if x is not None and x["cls"] != "skipped_stopping_rule"]
-    slope_notes, slope_ok = [], True
-    for S in (2, 3):
-        pts = [(N_OF[cv], spq(m6[(cv, S)])) for cv in A_CURVES if m6[(cv, S)] is not None and spq(m6[(cv, S)])]
-        for (n1, s1), (n2, s2) in zip(pts, pts[1:]):
-            sl = (math.log2(s2) - math.log2(s1)) / (n2 - n1)
-            slope_notes.append(f"S={S} n {n1}->{n2}: log2-slope {sl:.3f}/n")
-            if sl <= 0: slope_ok = False
-    neg37 = neg_undecided.get("k0n37") or neg_undecided.get("k0n41")
-    if not measured: v = "not_evaluable"
-    elif any(x["cls"] not in ("capped",) for x in measured): v = "falsified"
-    elif not slope_ok: v = "falsified"
-    elif len(measured) < 4: v = "supported_partial"
-    else: v = "supported"
-    if neg37 and v.startswith("supported"): notes.append("K2: m=2 orbit negative control undecided at n=37/41; capped cells there are uninformative")
-    verdicts["K2"] = (v, f"{len(measured)}/4 tail cells measured, " + ", ".join(f"{x['curve']} S={x['S']}: {x['cls']}" for x in measured) + ("; " + "; ".join(slope_notes) if slope_notes else "; no two decided points for a slope"))
-
-    # ---- K3 -------------------------------------------------------------
-    if n_planted_done == 0: v = "not_evaluable"
-    else: v = "falsified" if bad_planted else "supported"
-    verdicts["K3"] = (v, f"{n_planted_ok}/{n_planted_done} completed planted cells recovered 4/4; cells that capped are unmeasured")
-
-    # ---- K4 -------------------------------------------------------------
-    b = [get("liftB", "n83k1", m, S, "public") for m in (5, 6) for S in (2, 3)]
-    if any(x is None for x in b): v = "not_evaluable"
-    elif any(is_decided(x["cls"]) for x in b): v = "falsified"
-    elif all(x["cls"] in ("capped", "undecided") for x in b): v = "supported"
-    else: v = "not_evaluable"
-    if v == "supported" and cells.get(("negative", "n83k1", 2, 2, "chain-s3-orbit", "public")) and not is_decided(cells[("negative", "n83k1", 2, 2, "chain-s3-orbit", "public")]["cls"]):
-        notes.append("K4: the n = 83 m=2 orbit negative control is undecided at 1800 s; K4 is supported but weak (the orbit engine does not decide even m = 2 there)")
-    verdicts["K4"] = (v, ", ".join(f"m={x['m']} S={x['S']}: {x['cls']}" if x else "missing" for x in b))
-
-    # ---- K5 -------------------------------------------------------------
-    cand = [c for c in cells.values() if c["probes"] == "public" and c["fam"] in ("koblitzA", "liftB") and c["n"] and c["n"] >= 31]
-    dec = [c for c in cand if is_decided(c["cls"])]
-    under = [c for c in dec if spq(c) is not None and spq(c) < PARITY_S]
-    if not cand: v = "not_evaluable"
-    elif under: v = "falsified"
-    else: v = "supported"
-    detail = f"{len(dec)} decided public cells at n >= 31 of {len(cand)} recorded"
-    if v == "supported" and not dec: detail += " (vacuous: none decided)"
-    if under: detail += "; under 188 s: " + ", ".join(f"{c['curve']} m={c['m']} S={c['S']} {spq(c):.1f} s ({spq(c)/PARITY_S:.2f} x parity)" for c in under)
-    verdicts["K5"] = (v, detail)
-
-    # ---- K6 kill criterion ---------------------------------------------
-    if verdicts["K3"][0] == "falsified": v = "not_evaluable_instrument_invalid"
-    elif verdicts["K4"][0] == "supported" and verdicts["K5"][0] == "supported": v = "kill_high_arity_koblitz_line"
-    elif "not_evaluable" in (verdicts["K4"][0], verdicts["K5"][0]): v = "not_evaluable"
-    else: v = "line_stays_open"
-    verdicts["K6"] = (v, f"K4={verdicts['K4'][0]}, K5={verdicts['K5'][0]}, K3={verdicts['K3'][0]}")
-
-    print("\n# verdicts")
-    for k in ("K1", "K2", "K3", "K4", "K5", "K6"): print(f"{k}: {verdicts[k][0]} | {verdicts[k][1]}")
+    print("\n# verdicts (per engine; a claim holds only if it holds for both engines)")
+    for k in ("K1", "K2", "K3", "K4", "K5", "K6"):
+        for ENG in ENGINES: print(f"{k}[{ENG}]: {allv[ENG][k][0]} | {allv[ENG][k][1]}")
+    kill = [allv[e]["K6"][0] for e in ENGINES]
+    print("K6 combined:", "kill_high_arity_koblitz_line" if all(x == "kill_high_arity_koblitz_line" for x in kill) else ("line_stays_open" if "line_stays_open" in kill else "not_evaluable"))
+    verdicts = allv
 
     # ---- descriptive comparisons ---------------------------------------
+    print("\n# C-engine (chain-s3 over chain-s3-orbit seconds per decided query; outcomes otherwise)")
+    for fam in ("koblitzA", "liftB"):
+        for c in sorted((c for c in cells.values() if c["fam"] == fam and c["probes"] == "public" and c["eng"] == "chain-s3-orbit"), key=order):
+            o = cells.get((fam, c["curve"], c["m"], c["S"], "chain-s3", "public"))
+            if o is None: continue
+            s1, s2 = spq(c), spq(o)
+            print(f"{c['curve']} m={c['m']} S={c['S']}: orbit={c['cls']} plain={o['cls']}" + (f" ratio {s2/s1:.2f}" if s1 and s2 else ""))
     print("\n# C-m5-vs-m6 (seconds per decided query ratio m6/m5; outcomes otherwise)")
     for cv in A_CURVES:
-        for S in (2, 3):
-            x, y = get("koblitzA", cv, 5, S, "public"), get("koblitzA", cv, 6, S, "public")
+      for S in (2, 3):
+        for eg in ENGINES:
+            x, y = get("koblitzA", cv, 5, S, "public", eg), get("koblitzA", cv, 6, S, "public", eg)
             if x is None and y is None: continue
             s5, s6 = (spq(x) if x else None), (spq(y) if y else None)
-            print(f"{cv} S={S}: m5={x['cls'] if x else 'missing'} m6={y['cls'] if y else 'missing'}" + (f" ratio {s6/s5:.2f}" if s5 and s6 else ""))
+            print(f"{eg} {cv} S={S}: m5={x['cls'] if x else 'missing'} m6={y['cls'] if y else 'missing'}" + (f" ratio {s6/s5:.2f}" if s5 and s6 else ""))
     print("\n# decided cells: distance from the 188 s m = 4 root-table parity point")
     any_dec = False
     for c in sorted(cells.values(), key=order):
         if c["probes"] == "public" and c["fam"] in ("koblitzA", "liftB") and is_decided(c["cls"]):
-            any_dec = True; print(f"{c['curve']} m={c['m']} S={c['S']}: {spq(c):.2f} s/query = {spq(c)/PARITY_S:.3f} x 188 s")
+            any_dec = True; print(f"{c['eng']} {c['curve']} m={c['m']} S={c['S']}: {spq(c):.2f} s/query = {spq(c)/PARITY_S:.3f} x 188 s")
     if not any_dec: print("no decided public cell")
     print("\n# C-lift-n83: the 180 s record is table.tsv of research/n83_msweep_20261024; compare the class column above (capped at 180 s there).")
     for n in notes: print("NOTE:", n)
 
     if jpath:
-        out = {"verdicts": {k: {"verdict": v[0], "detail": v[1]} for k, v in verdicts.items()},
+        out = {"verdicts": {e: {k: {"verdict": v[0], "detail": v[1]} for k, v in vs.items()} for e, vs in verdicts.items()},
                "cells": [{"family": c["fam"], "curve": c["curve"], "m": c["m"], "S": c["S"], "engine": c["eng"], "probes": c["probes"],
                           "class": c["cls"], "seconds_per_decided_query": spq(c), "wall_seconds": c["wall"], "peak_rss_kb": c["rss_kb"],
                           "conflicts": c["rec"].get("engine_work"), "variables": variables(c["m"], c["n"]) if c["n"] else None,

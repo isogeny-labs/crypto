@@ -5,9 +5,9 @@
 #   - the record file name leads with the grid family, so the A/A duplicate
 #     ("aa") of a public cell is a separate file with identical arguments;
 #   - exit 124/137 is a process_cap, any other failure a process_error;
-#   - the stopping rule (PROTOCOL.md): within Part A, a cell at (curve, m)
+#   - the stopping rule (PROTOCOL.md): within Part A, a cell at (curve, m, engine)
 #     is skipped when the public cells (S = 2 and 3) at both of the two
-#     previous Part A curves are capped or themselves skipped;
+#     previous Part A curves are capped or themselves skipped, per engine;
 #   - peak RSS and wall seconds go to a <record>.time sidecar.
 # Usage: run_shard.sh <binary> <out_dir> <m,m,...>
 set -euo pipefail
@@ -15,19 +15,18 @@ bin=$1; out=$2; ms=$3
 here=$(cd "$(dirname "$0")" && pwd)
 mkdir -p "$out"
 seed=8609517
-engine_main=chain-s3-orbit
 curves_order=(k0n23 k1n29 k0n31 k0n37 k0n41)
 
 dead() { # file is a capped or rule-skipped record
   [ -s "$1" ] && grep -Eq '"status":"(process_cap|skipped_stopping_rule)"' "$1"
 }
-stopped() { # curve m -> 0 when the stopping rule skips (curve, m)
-  local c=$1 m=$2 i=-1 k fb ok
+stopped() { # curve m engine -> 0 when the stopping rule skips (curve, m, engine)
+  local c=$1 m=$2 eng=$3 i=-1 k fb ok
   for k in "${!curves_order[@]}"; do [ "${curves_order[$k]}" = "$c" ] && i=$k; done
   [ "$i" -ge 2 ] || return 1
   for back in 1 2; do
     for fb in union-2 union-3; do
-      dead "$out/koblitzA__${curves_order[$((i-back))]}__m${m}__${fb}__${engine_main}__public.json" || return 1
+      dead "$out/koblitzA__${curves_order[$((i-back))]}__m${m}__${fb}__${eng}__public.json" || return 1
     done
   done
   return 0
@@ -41,7 +40,7 @@ grep -v '^#' "$here/grid.tsv" | while IFS=$'\t' read -r family curve engines bas
         f="$out/${family}__${curve}__m${m}__${fb/:/-}__${e}__${probes}.json"
         [ -e "$f" ] && continue
         if [ "$family" = koblitzA ] || [ "$family" = aa ]; then
-          if stopped "$curve" "$m"; then
+          if stopped "$curve" "$m" "$e"; then
             printf '{"schema":"arity-completion-cell/v1","status":"skipped_stopping_rule","m":%d,"factor_base":"%s","engine":"%s","family":"%s","curve_spec":"%s","probes":"%s"}\n' \
               "$m" "$fb" "$e" "$family" "$curve" "$probes" > "$f"
             echo "m=$m $family $curve $fb $e $probes skipped"
