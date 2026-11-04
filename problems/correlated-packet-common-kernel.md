@@ -94,6 +94,16 @@ not a demonstrated runtime or algorithm.
 
 ## Next discriminating step
 
+A [repeated-anchor follow-up](../research/prime_pole_anchor_20261030/repeated/README.md)
+extends the fixed odd-anchor gain to k bits at added degree k, without
+changing the source moment index. It also charges a specific attempt to
+boost every valuation level: guarded scalar anchor products require added
+degree at least g*F_(2a) to gain g in each tested diagonal linear coefficient.
+The general abstract suffix-budget lower bound is Lean-proved; its valuation
+bridge is written, with exact native controls. This is a family-specific
+degree obstruction, not nonexistence of a nonscalar completion or an improved
+ECDLP algorithm. The missing low-density common factorization stays open.
+
 An [anchored-pole completion](../research/prime_pole_anchor_20261030/README.md)
 has now been constructed inside W_base+C H with constant H. Exact checks
 certify one extra odd-level crossing bit, old even-level coarse weights,
