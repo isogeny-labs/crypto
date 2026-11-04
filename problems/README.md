@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Arity-completion runs blocked at the launch gates](arity-completion-launch-gates.md) | open | launching the preregistered m = 5, 6 cells (prime towers, Koblitz chained S3, n = 83 lift) and the dreg v4 execution | a valid AWS identity for account 104186811093 or a checkpoint upload token, plus recorded budget headroom |
 | [Curve25519-family algebraic IC: no usable PKM tower](curve25519-family-algebraic-ic-tower.md) | open | algebraic-track (Semaev + F4) IC and a T₀-closed algebraic base on Curve25519-structured curves | an isogeny-form tower ring behind `pkm-semaev`, grid-cross-checked, run on the k = 20/24 miniatures |
 | [Release suite JV isogeny-walk budget](release-suite-jv-isogeny-walk-budget.md) | investigating | complete release-library validation | diagnose the unchanged case and complete focused/full checks without weakening assertions |
 | [Symmetric PKM complete cost and cold DLP qualification](symmetric-pkm-complete-cost.md) | open | G1–G6 complete-cost improvement decision | checkpoint/artifact access, qualified native panels/counters, external reference and ideal/curve/cost proof bridges |
