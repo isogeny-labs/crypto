@@ -89,3 +89,11 @@ Branch on the quadratic character of each separator, adding X_c = n_j·z_c² wit
 - The big host is blocked: AWS STS rejects the keys, the lab routes run only ecbench specs (≤ 3,600 s), and no other route is authorized.
 - Locally: T at m5 t4 (round 3; cut off at 2,400 s while reducing degree 9, memory not exhausted), rerun alone with TLIMIT = 18,000 s and VLIMIT = 14.5 GiB.
 - Registered reading (from round 3): if the run completes with D = 9 then E(5) = 5 ≤ 5 and P2 holds at m = 5; D ≥ 10 means P2 fails at m = 5; another cut-off is still undecided.
+
+## Round 7d: decisive Riemann–Roch cell (written before the run)
+- RR at m5 t4 (round7_rr/genrr.sing, input in scratchpad rr/logs/m5_t4_k0_RR.ms), alone on the host after the memory-lean F4 run exits: 13 GiB cap, 10,800 s.
+- Reading, from round7_rr's kill criterion:
+  - D_RR ≤ 8 (below T's ≥ 9) with a finished run: RR beats T in D at m = 5.
+  - Improvement only if the widest matrix is also below T's (≥ 999,374 cut off).
+  - D_RR ≥ 9 means no gain at m = 5.
+  - Cut off again: undecided.
