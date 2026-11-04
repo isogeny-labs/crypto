@@ -416,7 +416,7 @@ impl Subspace {
             }
             // keep red sorted by leading bit descending so reduction works
             red.push((x, combo));
-            red.sort_by(|a, b| b.0.leading_zeros().cmp(&a.0.leading_zeros()));
+            red.sort_by(|a, b| a.0.leading_zeros().cmp(&b.0.leading_zeros()));
             // after sort, earlier entries have higher leading bits; re-reduce fully
             // (full reduced echelon not needed for membership+coords; descending order suffices)
         }
@@ -517,7 +517,7 @@ fn rank_of_u64_rows(rows: &[u64]) -> usize {
         }
         if x != 0 {
             basis.push(x);
-            basis.sort_by(|a, b| b.leading_zeros().cmp(&a.leading_zeros()));
+            basis.sort_by(|a, b| a.leading_zeros().cmp(&b.leading_zeros()));
         }
     }
     basis.len()
@@ -750,6 +750,115 @@ fn low_dim(inst: &Instance, d: usize) -> (usize, usize, usize) {
     (rank - rank_h, rank, nrows)
 }
 
+
+/// Iterated degree-d closure (what an F4 run whose steps never exceed degree d
+/// can reach): start from the generators, repeatedly add every multiple of the
+/// newly found polynomials that stays within degree d, row-reduce, until the
+/// rank stops growing. Returns (dim of the degree-<=1 part, rank, rounds).
+fn low_dim_iter(inst: &Instance, d: usize) -> (usize, usize, usize) {
+    let nv = inst.big_n;
+    let mut cols: Vec<u64> = Vec::new();
+    for deg in (2..=d).rev() {
+        cols.extend(monomials_of_degree(nv, deg));
+    }
+    let h_count = cols.len();
+    cols.extend(monomials_of_degree(nv, 1));
+    cols.extend(monomials_of_degree(nv, 0));
+    let index: HashMap<u64, usize> = cols.iter().enumerate().map(|(i, &c)| (c, i)).collect();
+    let words = (cols.len() + 63) / 64;
+    let to_row = |p: &Poly| -> Vec<u64> {
+        let mut row = vec![0u64; words];
+        for &t in p {
+            let ci = index[&t];
+            row[ci / 64] ^= 1u64 << (ci % 64);
+        }
+        row
+    };
+    let to_poly = |row: &Vec<u64>| -> Poly {
+        let mut p = Vec::new();
+        for (w, &word) in row.iter().enumerate() {
+            let mut x = word;
+            while x != 0 {
+                let b = x.trailing_zeros() as usize;
+                p.push(cols[w * 64 + b]);
+                x &= x - 1;
+            }
+        }
+        p
+    };
+    let deg_of = |p: &Poly| p.iter().map(|&m| mono_vars(m).len()).max().unwrap_or(0);
+    let mut gens: Vec<Poly> = inst.eqs.iter().filter(|p| !p.is_empty()).cloned().collect();
+    for v in 0..nv {
+        gens.push(vec![mono_encode(&[v as u8, v as u8]), mono_encode(&[v as u8])]);
+    }
+    let mut basis: Vec<Vec<u64>> = Vec::new(); // reduced rows carried between rounds
+    let mut fresh: Vec<Poly> = gens; // polynomials whose multiples are not yet in the span
+    let mut rank = 0usize;
+    let mut rounds = 0usize;
+    let mut pivots_seen: std::collections::HashSet<usize> = std::collections::HashSet::new();
+    loop {
+        rounds += 1;
+        let mut mat = BitMat::new(words);
+        for r in &basis {
+            mat.push_row(r.clone());
+        }
+        for g in &fresh {
+            let gd = deg_of(g);
+            for mdeg in 0..=(d.saturating_sub(gd)) {
+                for m in monomials_of_degree(nv, mdeg) {
+                    mat.push_row(to_row(&poly_mul_mono(g, m)));
+                }
+            }
+        }
+        let pivots = mat.echelon();
+        let new_rank = pivots.len();
+        // rows with a pivot not seen before are the new polynomials
+        let mut new_fresh: Vec<Poly> = Vec::new();
+        for (i, &pc) in pivots.iter().enumerate() {
+            if !pivots_seen.contains(&pc) {
+                new_fresh.push(to_poly(&mat.rows[i]));
+            }
+        }
+        for &pc in &pivots {
+            pivots_seen.insert(pc);
+        }
+        basis = mat.rows[..new_rank].to_vec();
+        let stable = new_rank == rank;
+        rank = new_rank;
+        if stable || new_fresh.is_empty() {
+            let rank_h = pivots.iter().filter(|&&c| c < h_count).count();
+            return (rank - rank_h, rank, rounds);
+        }
+        fresh = new_fresh;
+    }
+}
+
+/// Debug: plant x1, x2 in V, R = P1 + P2, and check the quadratic solve recovers x2.
+fn debug_plant(g: &Gf, cv: &Curve, sub: &Subspace, solver: &AsSolver, rng: &mut Rng) {
+    let np = sub.basis.len();
+    let pick = |rng: &mut Rng| loop {
+        let c = rng.next() & ((1u64 << np) - 1);
+        let x = sub.element(g, c);
+        let l = cv.lift(x);
+        if let Some(&p) = l.first() { return p; }
+    };
+    let p1 = pick(rng);
+    let p2 = pick(rng);
+    let r = cv.add(p1, p2);
+    let (Pt::A(x1, _), Pt::A(x2, _), Pt::A(x_r, _)) = (p1, p2, r) else { println!("  debug: infinity"); return };
+    println!("  debug n={} x1={} x2={} xR={} S3={} tr(x1)={} coords(x2)={:?}", g.n, hex(x1), hex(x2), hex(x_r), hex(cv.s3(x1, x2, x_r)), g.trace(x1), sub.coords(x2));
+    let aa = g.sq(x1 ^ x_r);
+    let bb = g.mul(x1, x_r);
+    let cc = g.sq(bb) ^ cv.b;
+    println!("  debug A={} B={} C={} A x2^2 + B x2 + C = {}", hex(aa), hex(bb), hex(cc), hex(g.mul(aa, g.sq(x2)) ^ g.mul(bb, x2) ^ cc));
+    if aa != 0 && bb != 0 {
+        let binv = g.inv(bb);
+        let d = g.mul(g.mul(aa, cc), g.sq(binv));
+        let y = solver.solve(d);
+        println!("  debug d={} tr(d)={} y={} y^2+y={} scale*y={} scale*(y+1)={}", hex(d), g.trace(d), hex(y), hex(g.sq(y) ^ y), hex(g.mul(g.mul(bb, g.inv(aa)), y)), hex(g.mul(g.mul(bb, g.inv(aa)), y ^ 1)));
+    }
+}
+
 fn hex(x: u64) -> String {
     format!("0x{x:x}")
 }
@@ -760,15 +869,25 @@ fn main() {
     println!("pq2_rank census; seed {seed:#x}; pclmulqdq: {}", std::is_x86_feature_detected!("pclmulqdq"));
     let mut rng = Rng(seed);
 
-    let ns: Vec<u32> = (8..=48).collect::<Vec<_>>().into_iter().chain([50, 52, 54, 56]).collect();
-    let instances_per_n = 3usize;
-    let d4_max_n = 20u32;
+    // Usage: pq2_rank [n1,n2,...] [instances_per_n] [d4_max_n] [out_prefix]
+    let args: Vec<String> = std::env::args().collect();
+    let ns: Vec<u32> = if args.len() > 1 {
+        args[1].split(',').map(|t| t.trim().parse().expect("n")).collect()
+    } else {
+        (8..=48).collect::<Vec<_>>().into_iter().chain([50, 52, 54, 56]).collect()
+    };
+    let instances_per_n: usize = if args.len() > 2 { args[2].parse().expect("instances") } else { 3 };
+    let d4_max_n: u32 = if args.len() > 3 { args[3].parse().expect("d4_max_n") } else { 20 };
+    let out_prefix: String = if args.len() > 4 { args[4].clone() } else { "results/pq2_rank".into() };
+    let iter3_max_n: u32 = if args.len() > 5 { args[5].parse().expect("iter3_max_n") } else { 28 };
+    let iter4_max_n: u32 = if args.len() > 6 { args[6].parse().expect("iter4_max_n") } else { 16 };
+    println!("ns={ns:?} instances_per_n={instances_per_n} d4_max_n={d4_max_n} out={out_prefix}");
 
     let mut json = String::new();
     json.push_str("{\n  \"schema\": \"pq2_rank.census/v1\",\n");
     let _ = writeln!(json, "  \"seed\": \"{seed:#x}\",");
     json.push_str("  \"rows\": [\n");
-    let mut csv = String::from("n,nprime,N,instance,a,b,x_R,F_size,F_over_V,Z_size,affdim,k,rho,low2,low3,low4,d_lin,ms_z,ms_low3,ms_low4\n");
+    let mut csv = String::from("n,nprime,N,instance,a,b,x_R,F_size,F_over_V,Z_size,affdim,k,rho,low2,low3,low4,d_lin,iter3,iter4,d_iter,ms_z,ms_low3,ms_low4,ms_iter3,ms_iter4\n");
     let mut first = true;
 
     for &n in &ns {
@@ -829,7 +948,10 @@ fn main() {
             }
             // random subspace
             let basis: Vec<u64> = (0..np).map(|_| rng.elem(&g)).collect();
-            let Some(sub) = Subspace::new(basis.clone()) else { continue };
+            let Some(sub) = Subspace::new(basis.clone()) else {
+                if std::env::var("PQ2_VERBOSE").is_ok() { println!("  n={n} try {tries}: dependent basis"); }
+                continue;
+            };
             // random target with a nonempty solution set: x_R from a random point R
             let x_r = loop {
                 let x = rng.elem(&g);
@@ -837,10 +959,14 @@ fn main() {
                     break x;
                 }
             };
+            if std::env::var("PQ2_DEBUG").is_ok() { debug_plant(&g, &cv, &sub, &solver, &mut rng); }
             let t0 = Instant::now();
             let z = enumerate_z(&g, &cv, &sub, x_r, &solver);
             let ms_z = t0.elapsed().as_millis();
             if z.is_empty() {
+                if std::env::var("PQ2_VERBOSE").is_ok() {
+                    println!("  n={n} try {tries}: Z empty (x_R={}, basis ok)", hex(x_r));
+                }
                 continue; // inconsistent system: 1 in the ideal; not an instance for the criterion
             }
             let inst = build_instance(&g, &cv, &sub, x_r);
@@ -886,7 +1012,9 @@ fn main() {
             } else {
                 None
             };
+            let t2 = Instant::now();
             let (low2, _, _) = low_dim(&inst, 2);
+            let ms2 = t2.elapsed().as_millis();
             assert!(low2 + rho <= n as usize, "degree-2 bound violated: low2 + rho > n");
             let t3 = Instant::now();
             let (low3, _, _) = low_dim(&inst, 3);
@@ -898,6 +1026,24 @@ fn main() {
             } else {
                 (None, 0)
             };
+            let (it3, ms_it3, it3_rounds) = if n <= iter3_max_n {
+                let t = Instant::now();
+                let (l, _, r) = low_dim_iter(&inst, 3);
+                (Some(l), t.elapsed().as_millis(), r)
+            } else { (None, 0, 0) };
+            let (it4, ms_it4, it4_rounds) = if n <= iter4_max_n {
+                let t = Instant::now();
+                let (l, _, r) = low_dim_iter(&inst, 4);
+                (Some(l), t.elapsed().as_millis(), r)
+            } else { (None, 0, 0) };
+            if let Some(l) = it3 { assert!(l >= low3); }
+            if let (Some(l4), Some(l3)) = (it4, it3) { assert!(l4 >= l3); }
+            let d_iter: String = if low2 >= k { "2".into() }
+                else if it3.map(|l| l >= k).unwrap_or(false) { "3".into() }
+                else if it4.map(|l| l >= k).unwrap_or(false) { "4".into() }
+                else if it4.is_some() { ">4".into() }
+                else if it3.is_some() { ">3".into() }
+                else { "?".into() };
             assert!(low2 <= low3);
             if let Some(l4) = low4 {
                 assert!(low3 <= l4);
@@ -912,10 +1058,12 @@ fn main() {
                 ">3".into()
             };
             println!(
-                "n={n:2} n'={np:2} N={:2} inst={done} |Z|={:2} affdim={adim} k={k:2} rho={rho:2} low2={low2:2} low3={low3:2} low4={} d_lin={d_lin} ({ms_z} ms Z, {ms3} ms deg3, {ms4} ms deg4)",
+                "n={n:2} n'={np:2} N={:2} inst={done} |Z|={:2} affdim={adim} k={k:2} rho={rho:2} low2={low2:2} low3={low3:2} low4={} d_lin={d_lin} | iter3={} ({it3_rounds} rounds) iter4={} ({it4_rounds} rounds) d_iter={d_iter} ({ms_z} ms Z, {ms2} ms deg2, {ms3} ms deg3, {ms4} ms deg4, {ms_it3} ms iter3, {ms_it4} ms iter4)",
                 inst.big_n,
                 z.len(),
-                low4.map(|v| v.to_string()).unwrap_or("-".into())
+                low4.map(|v| v.to_string()).unwrap_or("-".into()),
+                it3.map(|v| v.to_string()).unwrap_or("-".into()),
+                it4.map(|v| v.to_string()).unwrap_or("-".into())
             );
             if !first {
                 json.push_str(",\n");
@@ -923,7 +1071,7 @@ fn main() {
             first = false;
             let _ = write!(
                 json,
-                "    {{\"n\": {n}, \"nprime\": {np}, \"N\": {}, \"instance\": {done}, \"a\": \"{}\", \"b\": \"{}\", \"modulus\": \"{}\", \"basis\": [{}], \"x_R\": \"{}\", \"F_size\": {}, \"Z_size\": {}, \"affdim\": {adim}, \"k\": {k}, \"rho\": {rho}, \"low2\": {low2}, \"low3\": {low3}, \"low4\": {}, \"d_lin\": \"{d_lin}\", \"ms_z\": {ms_z}, \"ms_low3\": {ms3}, \"ms_low4\": {ms4}}}",
+                "    {{\"n\": {n}, \"nprime\": {np}, \"N\": {}, \"instance\": {done}, \"a\": \"{}\", \"b\": \"{}\", \"modulus\": \"{}\", \"basis\": [{}], \"x_R\": \"{}\", \"F_size\": {}, \"Z_size\": {}, \"affdim\": {adim}, \"k\": {k}, \"rho\": {rho}, \"low2\": {low2}, \"low3\": {low3}, \"low4\": {}, \"d_lin\": \"{d_lin}\", \"iter3\": {}, \"iter3_rounds\": {it3_rounds}, \"iter4\": {}, \"iter4_rounds\": {it4_rounds}, \"d_iter\": \"{d_iter}\", \"ms_z\": {ms_z}, \"ms_low3\": {ms3}, \"ms_low4\": {ms4}, \"ms_iter3\": {ms_it3}, \"ms_iter4\": {ms_it4}}}",
                 inst.big_n,
                 hex(a),
                 hex(b),
@@ -933,10 +1081,12 @@ fn main() {
                 f_size.map(|v| v.to_string()).unwrap_or("null".into()),
                 z.len(),
                 low4.map(|v| v.to_string()).unwrap_or("null".into()),
+                it3.map(|v| v.to_string()).unwrap_or("null".into()),
+                it4.map(|v| v.to_string()).unwrap_or("null".into()),
             );
             let _ = writeln!(
                 csv,
-                "{n},{np},{},{done},{},{},{},{},{},{},{adim},{k},{rho},{low2},{low3},{},{d_lin},{ms_z},{ms3},{ms4}",
+                "{n},{np},{},{done},{},{},{},{},{},{},{adim},{k},{rho},{low2},{low3},{},{d_lin},{},{},{d_iter},{ms_z},{ms3},{ms4},{ms_it3},{ms_it4}",
                 inst.big_n,
                 hex(a),
                 hex(b),
@@ -945,6 +1095,8 @@ fn main() {
                 f_size.map(|v| format!("{:.4}", v as f64 / (1u64 << np) as f64)).unwrap_or_default(),
                 z.len(),
                 low4.map(|v| v.to_string()).unwrap_or_default(),
+                it3.map(|v| v.to_string()).unwrap_or_default(),
+                it4.map(|v| v.to_string()).unwrap_or_default(),
             );
             done += 1;
             let _ = &inst.a;
@@ -956,7 +1108,7 @@ fn main() {
     }
     json.push_str("\n  ]\n}\n");
     std::fs::create_dir_all("results").unwrap();
-    std::fs::write("results/pq2_rank.json", json).unwrap();
-    std::fs::write("results/pq2_rank.csv", csv).unwrap();
-    println!("done in {:.1} s; wrote results/pq2_rank.json and results/pq2_rank.csv", t_all.elapsed().as_secs_f64());
+    std::fs::write(format!("{out_prefix}.json"), json).unwrap();
+    std::fs::write(format!("{out_prefix}.csv"), csv).unwrap();
+    println!("done in {:.1} s; wrote {out_prefix}.json and {out_prefix}.csv", t_all.elapsed().as_secs_f64());
 }

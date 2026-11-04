@@ -14,10 +14,14 @@ argument works for a Gröbner basis lying in **any** finite-dimensional subspace
   leading monomials are `k` distinct variables, then
   `k ≤ dim (S ∩ {totalDegree ≤ 1})`.
 * `no_gb_in_rows_of_low_lt`: for a finite set of rows (e.g. all products
-  monomial × generator of degree at most `d`), if the degree-≤1 part of their
-  span has dimension `< k`, no Gröbner basis of `I` lies in that span. With the
-  Caminata–Gorla definition this says the solving degree exceeds `d`: the
-  quantity `d_lin` computed by the `pq2_rank` census is a lower bound on `sd`.
+  monomial × generator of degree at most `d`, or the iterated degree-`d`
+  closure that an F4 run with max step degree `d` stays inside), if the
+  degree-≤1 part of their span has dimension `< k`, no Gröbner basis of `I`
+  lies in that span. With the Caminata–Gorla definition the one-shot rows give
+  "solving degree exceeds `d`"; with the closure rows, "F4's max step degree
+  exceeds `d`" (the containment of F4's output in the closure is not
+  formalised). These are the quantities `d_lin` and `d_iter` of the
+  `pq2_rank` census.
 -/
 
 open MvPolynomial
