@@ -1,5 +1,6 @@
 use super::forecast;
 use super::model::{digest, read, write_new, Candidate, Plan, Request, Result};
+use crypto_lib::cryptanalysis::dreg_forecast::MIN_SOLVES;
 use crypto_lib::cryptanalysis::dreg_forecast::{json_approx_eq, Advice};
 use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
 use serde_json::{json, Value};
@@ -596,14 +597,16 @@ pub fn ranking(items: &[Value]) -> Value {
         .filter(|item| item["forecast"].is_object())
         .map(|item| {
             let f = &item["forecast"];
-            json!({"id":item["id"],"label":item["label"],"outcome":item["outcome"],"attempt":item["attempt"],"advice":f["advice"],"advice_reasons":f["advice_reasons"],"predicted_degree_of_regularity":f["predicted_degree_of_regularity"],"band_95":f["band_95"],"p_exceeds_bound":f["p_exceeds_bound"],"semi_regular_degree":f["semi_regular_degree"],"structural_gain":f["structural_gain"],"solves":f["solves"],"relations":f["relations"],"relation_yield":f["relation_yield"],"projected_relation_phase_work":f["projected_relation_phase_work"],"hope_ratio_band":f["hope_ratio_band"],"records_read":f["records_read"],"records_unreadable":f["records_unreadable"]})
+            json!({"id":item["id"],"label":item["label"],"outcome":item["outcome"],"attempt":item["attempt"],"advice":f["advice"],"advice_reasons":f["advice_reasons"],"predicted_degree_of_regularity":f["predicted_degree_of_regularity"],"band_95":f["band_95"],"p_exceeds_bound":f["p_exceeds_bound"],"semi_regular_degree":f["semi_regular_degree"],"structural_gain":f["structural_gain"],"solves":f["solves"],"relations":f["relations"],"relation_yield":f["relation_yield"],"projected_relation_phase_work":f["projected_relation_phase_work"],"projected_linear_algebra_work":f["projected_linear_algebra_work"],"projected_relation_phase_work_with_linear_algebra":f["projected_relation_phase_work_with_linear_algebra"],"hope_ratio_band":f["hope_ratio_band"],"hope_ratio_band_with_linear_algebra":f["hope_ratio_band_with_linear_algebra"],"records_read":f["records_read"],"records_unreadable":f["records_unreadable"]})
         })
         .collect();
     rows.sort_by(|a, b| {
         let rank = |v: &Value| advice_of(v).map_or(u8::MAX, forecast::advice_rank);
+        // The combined projection ranks when linear algebra was observed.
         let work = |v: &Value| {
-            v["projected_relation_phase_work"]
+            v["projected_relation_phase_work_with_linear_algebra"]
                 .as_f64()
+                .or_else(|| v["projected_relation_phase_work"].as_f64())
                 .unwrap_or(f64::INFINITY)
         };
         rank(a)
@@ -612,7 +615,7 @@ pub fn ranking(items: &[Value]) -> Value {
             .then(work(a).total_cmp(&work(b)))
             .then_with(|| a["id"].as_str().cmp(&b["id"].as_str()))
     });
-    json!({"schema":"factor_base_sweep.triage/v1","rows":rows,"order":"advice (promising, undecided, doubtful, hopeless at bound), then predicted degree of regularity, then projected relation-phase work","advisory":"forecasts of the observed solving-degree distribution from the solves so far; not certified degrees of regularity; no candidate was stopped, skipped or shortened on this basis","certified_degree_of_regularity":null,"full_pipeline_speedup":null})
+    json!({"schema":"factor_base_sweep.triage/v1","rows":rows,"order":"advice (promising, undecided, doubtful, hopeless at bound), then predicted degree of regularity, then projected relation-phase work (with priced linear algebra where observed)","advisory":"forecasts of the observed solving-degree distribution from the solves so far; not certified degrees of regularity; no candidate was stopped, skipped or shortened on this basis","certified_degree_of_regularity":null,"full_pipeline_speedup":null})
 }
 
 /// Rank every attempt of a run directory from its records on disk.  Takes
@@ -659,9 +662,167 @@ pub fn triage(dir: &Path) -> Result<Value> {
     out["attempts_without_forecast"] = json!(items
         .iter()
         .filter(|i| !i["forecast"].is_object())
-        .map(|i| json!({"id":i["id"],"attempt":i["attempt"],"error":i["forecast_error"]}))
+        .map(|i| json!({"id":i["id"],"label":i["label"],"attempt":i["attempt"],"outcome":i["outcome"],"error":i["forecast_error"]}))
         .collect::<Vec<_>>());
     Ok(out)
+}
+
+/// The label of a candidate without the `-dN-seedS` / `-seedS` suffix the
+/// grid and `refine` append.
+fn base_label(label: &str) -> &str {
+    let mut base = label;
+    if let Some(i) = base.rfind("-seed") {
+        if base.len() > i + 5 && base[i + 5..].chars().all(|c| c.is_ascii_digit()) {
+            base = &base[..i];
+        }
+    }
+    if let Some(i) = base.rfind("-d") {
+        if base.len() > i + 2 && base[i + 2..].chars().all(|c| c.is_ascii_digit()) {
+            base = &base[..i];
+        }
+    }
+    base
+}
+
+/// The next plan's candidates from a plan and its triage rows (one row per
+/// attempt).  A candidate is dropped when its latest attempt is
+/// `inapplicable`, or when its forecast has at least [`MIN_SOLVES`] solves
+/// and an advice named in `drop`; every other candidate is kept and, for
+/// binary shapes, expanded over `seed_count` consecutive seeds and the
+/// `dimensions` given (its own dimension when none).  Pure: nothing runs.
+pub fn refine_candidates(
+    plan: &Plan,
+    rows: &[Value],
+    drop: &[String],
+    seed_count: u32,
+    dimensions: &[u32],
+) -> Result<(Vec<Candidate>, Value)> {
+    let mut latest: BTreeMap<String, &Value> = BTreeMap::new();
+    for row in rows {
+        if let Some(id) = row["id"].as_str() {
+            let newer = latest
+                .get(id)
+                .is_none_or(|old| old["attempt"].as_str() <= row["attempt"].as_str());
+            if newer {
+                latest.insert(id.to_string(), row);
+            }
+        }
+    }
+    let mut kept = Vec::new();
+    let mut dropped = Vec::new();
+    let mut next = Vec::new();
+    let mut ids = std::collections::BTreeSet::new();
+    for c in &plan.candidates {
+        let id = c.id()?;
+        let row = latest.get(&id);
+        let advice = row.and_then(|r| r["advice"].as_str()).map(str::to_owned);
+        let solves = row.and_then(|r| r["solves"].as_u64()).unwrap_or(0);
+        let outcome = row
+            .and_then(|r| r["outcome"].as_str())
+            .unwrap_or("not attempted")
+            .to_string();
+        let reasons = row
+            .map(|r| r["advice_reasons"].clone())
+            .unwrap_or(Value::Null);
+        let verdict = json!({"id":id,"label":c.label,"outcome":outcome,"advice":advice,"solves":solves,"advice_reasons":reasons});
+        if outcome == "inapplicable" {
+            dropped.push(json!({"why":"inapplicable on this curve","candidate":verdict}));
+            continue;
+        }
+        if let Some(a) = &advice {
+            if solves as usize >= MIN_SOLVES && drop.iter().any(|d| d == a) {
+                dropped.push(json!({"why":format!("advice `{a}` after {solves} solves"),"candidate":verdict}));
+                continue;
+            }
+        }
+        kept.push(verdict);
+        let base = base_label(&c.label).to_string();
+        if c.shape.is_some() {
+            let dims: Vec<u32> = if dimensions.is_empty() {
+                vec![c.dimension]
+            } else {
+                dimensions.to_vec()
+            };
+            for offset in 0..seed_count.max(1) {
+                let seed = c
+                    .seed
+                    .checked_add(u64::from(offset))
+                    .ok_or("seed range overflows")?;
+                for &dimension in &dims {
+                    let mut n = c.clone();
+                    n.seed = seed;
+                    n.dimension = dimension;
+                    n.label = format!("{base}-d{dimension}-seed{seed}");
+                    if ids.insert(n.id()?) {
+                        next.push(n);
+                    }
+                }
+            }
+        } else {
+            let isogeny = c
+                .factor_base
+                .as_deref()
+                .is_some_and(|s| s.starts_with("prime-isogeny:"));
+            let seeds = if isogeny { seed_count.max(1) } else { 1 };
+            for offset in 0..seeds {
+                let seed = c
+                    .seed
+                    .checked_add(u64::from(offset))
+                    .ok_or("seed range overflows")?;
+                let mut n = c.clone();
+                n.seed = seed;
+                if isogeny {
+                    n.factor_base = Some(format!("prime-isogeny:t=2,seed={seed}"));
+                    n.label = format!("{base}-seed{seed}");
+                }
+                if ids.insert(n.id()?) {
+                    next.push(n);
+                }
+            }
+        }
+    }
+    if next.is_empty() {
+        return Err(format!(
+            "refine dropped every candidate ({} dropped); widen what is kept, for example --drop hopeless_at_bound",
+            dropped.len()
+        ));
+    }
+    let provenance = json!({"schema":"factor_base_sweep.refine/v1","drop":drop,"seed_count":seed_count.max(1),"dimensions":dimensions,"kept":kept,"dropped":dropped,"next_candidates":next.len(),"rule":"a candidate is dropped when its latest attempt is inapplicable or when its forecast has at least MIN_SOLVES solves and an advice in `drop`; kept candidates are expanded over consecutive seeds and the given dimensions; budgets are inherited unless tuning flags change them","advisory":"the forecast is advisory; this plan is a proposal for the next sweep, not a result, and nothing was run to produce it"});
+    Ok((next, provenance))
+}
+
+/// `refine_candidates` on a run directory: its frozen plan and the live
+/// triage of its attempts.  Launches nothing and takes no lock.
+pub fn refine(
+    dir: &Path,
+    drop: &[String],
+    seed_count: u32,
+    dimensions: &[u32],
+) -> Result<(Plan, Value)> {
+    let manifest: Value = read(&dir.join("manifest.json"))?;
+    let mut plan: Plan =
+        serde_json::from_value(manifest["plan"].clone()).map_err(|e| e.to_string())?;
+    plan.validate()?;
+    let ranking = triage(dir)?;
+    // Attempts without a forecast (no inventory, inapplicable, failed before
+    // a solve) still carry their outcome, which decides inapplicability.
+    let mut rows = ranking["rows"].as_array().cloned().unwrap_or_default();
+    rows.extend(
+        ranking["attempts_without_forecast"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default(),
+    );
+    let (candidates, mut provenance) =
+        refine_candidates(&plan, &rows, drop, seed_count, dimensions)?;
+    plan.candidates = candidates;
+    plan.validate()?;
+    provenance["run"] = json!(dir);
+    provenance["source_plan_sha256"] = json!(sha256_hex(
+        &serde_json::to_vec(&manifest["plan"]).map_err(|e| e.to_string())?
+    ));
+    provenance["triage_rows"] = json!(rows.len());
+    Ok((plan, provenance))
 }
 
 pub fn verify(dir: &Path) -> Result<Value> {
@@ -744,6 +905,51 @@ mod tests {
             .unwrap()
             .contains("no candidate was stopped"));
     }
+    #[test]
+    fn refine_drops_decided_bad_advice_keeps_the_rest_and_expands_seeds() {
+        let plan = Plan::grid("binary", 1, 1, &[3]).unwrap();
+        let ids: Vec<String> = plan.candidates.iter().map(|c| c.id().unwrap()).collect();
+        let row = |id: &str, advice: &str, solves: u64, outcome: &str| json!({"id":id,"attempt":"a/attempt-0001","outcome":outcome,"advice":advice,"solves":solves,"advice_reasons":["r"]});
+        let rows = vec![
+            row(&ids[0], "hopeless_at_bound", 8, "completed"),
+            row(&ids[1], "doubtful", 2, "completed"), // too few solves: kept
+            row(&ids[2], "promising", 8, "completed"),
+            row(&ids[3], "doubtful", 8, "inapplicable"),
+            // A later attempt supersedes an earlier one for the same id.
+            json!({"id":ids[4],"attempt":"a/attempt-0001","outcome":"completed","advice":"doubtful","solves":9}),
+            json!({"id":ids[4],"attempt":"a/attempt-0002","outcome":"completed","advice":"undecided","solves":9}),
+        ];
+        let drop = vec!["hopeless_at_bound".to_string(), "doubtful".to_string()];
+        let (next, prov) = refine_candidates(&plan, &rows, &drop, 2, &[3, 4]).unwrap();
+        let labels: Vec<&str> = next.iter().map(|c| c.label.as_str()).collect();
+        let starts = |k: usize| {
+            let base = format!("{}-", base_label(&plan.candidates[k].label));
+            labels.iter().any(|l| l.starts_with(&base))
+        };
+        assert!(!starts(0), "{labels:?}");
+        assert!(starts(1));
+        assert!(starts(2));
+        assert!(!starts(3));
+        assert!(starts(4));
+        // Every kept shape candidate: 2 seeds × 2 dimensions.
+        let kept = prov["kept"].as_array().unwrap().len();
+        assert_eq!(prov["dropped"].as_array().unwrap().len(), 2);
+        assert_eq!(next.len(), kept * 4);
+        let expanded = format!("{}-d4-seed2", base_label(&plan.candidates[2].label));
+        assert!(labels.contains(&expanded.as_str()), "{labels:?}");
+        let mut plan2 = plan.clone();
+        plan2.candidates = next;
+        plan2.validate().unwrap();
+        assert_eq!(base_label("binary-gp-d3-seed1"), "binary-gp");
+        assert_eq!(base_label("prime-kummer:t=2-seed7"), "prime-kummer:t=2");
+        assert_eq!(base_label("plain"), "plain");
+        // Dropping everything is an error, not an empty plan.
+        let all = vec![row(&ids[0], "doubtful", 8, "completed")];
+        let mut one = plan.clone();
+        one.candidates.truncate(1);
+        assert!(refine_candidates(&one, &all, &drop, 1, &[]).is_err());
+    }
+
     #[test]
     fn provisional_comparison_requires_the_same_probe_prefix_and_positive_reference() {
         let reference = Observation {
