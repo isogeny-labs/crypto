@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0754Z-c25519-autolab-r23-k28",
+  "latest_record": "20261104T0755Z-c25519-autolab-r24-k24",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 20,
+    "measured": 21,
     "open": 0
   },
   "repo": "crypto",
@@ -92,11 +92,11 @@
     {
       "better": "lower",
       "first": 6.607,
-      "latest": 3.6780211605382345,
+      "latest": 3.3181511808673823,
       "latest_derived": {
-        "improvement_vs_first_percent": 44.3314,
-        "improvement_vs_previous_percent": 12.4424,
-        "value_over_reference": 3.041568
+        "improvement_vs_first_percent": 49.7782,
+        "improvement_vs_previous_percent": 9.7843,
+        "value_over_reference": 2.71627
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -162,6 +162,22 @@
           "spread": null,
           "summary": "ic_autolab round 20, k = 24: wsum C = 3, B = 8 S(w=0) 3.68 vs incumbent 4.17, matched rho 1.21 (distance 3.45x -> 3.04x)",
           "value": 3.6780211605382345
+        },
+        {
+          "commit": "d7fa7145f828",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 49.7782,
+            "improvement_vs_previous_percent": 9.7843,
+            "value_over_reference": 2.71627
+          },
+          "n": 64,
+          "record": "20261104T0755Z-c25519-autolab-r24-k24",
+          "reference": 1.2215835280543412,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 24, k = 24: C = 2 box (B = 30) S(w=0) 3.32 vs incumbent 3.69, matched rho 1.22; at the BSGS boundary, classification pending",
+          "value": 3.3181511808673823
         }
       ],
       "problem": "ic:curve25519-family-k24",
