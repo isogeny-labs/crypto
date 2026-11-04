@@ -486,6 +486,51 @@ impl SolverTotals {
         });
     }
 
+    /// Feed the forecaster from an oracle that totals its own degrees: a
+    /// Macaulay solve at a fixed `degree` under a fixed `bound`.  An
+    /// `exhausted` call (a degenerate system that the matrix at this degree
+    /// did not resolve) is right-censored at `degree`; a decided call
+    /// observes `degree` and whether it `found` a decomposition.  Creates
+    /// the forecaster from the recorded shape and unit on first use.
+    pub fn observe_degree(
+        &mut self,
+        bound: u32,
+        degree: u32,
+        work: u64,
+        exhausted: bool,
+        found: bool,
+    ) {
+        use crate::cryptanalysis::dreg_forecast::{Forecaster, Outcome, SolveObservation};
+        if self.forecaster.is_none() {
+            let mut f = Forecaster::new(bound.max(1)).with_work_unit(&self.op_unit);
+            if let Some(shape) = &self.shape {
+                f.set_shape(crate::cryptanalysis::dreg_forecast::SystemShape {
+                    variables: shape.n_vars,
+                    equation_degrees: shape.degrees.iter().copied().filter(|d| *d > 0).collect(),
+                    boolean: false,
+                });
+            }
+            self.forecaster = Some(f);
+            self.forecast_unavailable = None;
+        }
+        if let Some(f) = self.forecaster.as_mut() {
+            f.observe(SolveObservation {
+                outcome: if exhausted {
+                    Outcome::Exhausted
+                } else if found {
+                    Outcome::Decomposed
+                } else {
+                    Outcome::Refuted
+                },
+                solving_degree: Some(degree),
+                censored_above: degree,
+                work,
+                relation_phase: true,
+                relation: found,
+            });
+        }
+    }
+
     pub fn solving_degree_mean(&self) -> Option<f64> {
         (self.calls_with_a_degree > 0)
             .then(|| self.solving_degree_sum as f64 / self.calls_with_a_degree as f64)
@@ -906,6 +951,38 @@ mod tests {
         let mut plain = SolverTotals::default();
         plain.absorb(&shape, Some(&cost(2, false)), false);
         assert!(plain.forecaster.is_none() && plain.forecast_unavailable.is_none());
+    }
+
+    /// A fixed-degree oracle feeds the forecaster directly: decided calls at
+    /// the Macaulay degree, degenerate systems censored there.
+    #[test]
+    fn observe_degree_feeds_fixed_degree_oracles() {
+        use crate::cryptanalysis::dreg_forecast::Outcome;
+        let mut t = SolverTotals {
+            solver: "d4-macaulay".into(),
+            op_unit: "F_p multiplications".into(),
+            shape: Some(SystemShape {
+                n_vars: 5,
+                n_equations: 4,
+                degrees: vec![8; 4],
+                semi_regular_degree: Some(14),
+            }),
+            ..Default::default()
+        };
+        t.observe_degree(14, 14, 1000, false, true);
+        t.observe_degree(14, 14, 1000, false, false);
+        t.observe_degree(14, 14, 400, true, false);
+        let f = t.forecaster.as_ref().unwrap();
+        let obs = f.observations();
+        assert_eq!(obs.len(), 3);
+        assert_eq!(obs[0].outcome, Outcome::Decomposed);
+        assert_eq!(obs[1].outcome, Outcome::Refuted);
+        assert_eq!(obs[2].outcome, Outcome::Exhausted);
+        assert_eq!(obs[2].censored_above, 14);
+        let fc = f.forecast();
+        assert_eq!(fc.degree_bound, 14);
+        assert_eq!(fc.cost.unit, "F_p multiplications");
+        assert_eq!(fc.all_targets.predicted_degree, Some(14));
     }
 
     #[test]

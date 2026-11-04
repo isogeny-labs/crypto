@@ -875,11 +875,16 @@ and the rows still missing, and the rho floor over that work at 1, 10 and
 `matrix-f5`, `inherited-f4`, `max_degree`) is censored at its cap; an
 uncapped full Gröbner basis (`f4-f2`) is bounded by the ring's ceiling, the
 variable count; an engine that reports no degree (`sat-cdcl`, `exhaustive`)
-leaves `forecast_unavailable` saying so. `ecbench` writes the forecast on
+leaves `forecast_unavailable` saying so. The Gaudry quartic (`gaudry-d4`,
+`gaudry-d4-bin`) and line-S4 oracles, which total their degrees by hand,
+observe their fixed Macaulay degree directly (`SolverTotals::observe_degree`),
+a degenerate system censored at that degree. The relation matrix's total
+work is charged beside the solver work. `ecbench` writes the forecast on
 the record's `solver` block as `degree_of_regularity_forecast`, priced at
 the curve's automorphism fold. The same forecaster runs inside
 [the factor-base sweeper](factor-base-sweep/README.md) and the N83 summand
-sweep cell (`examples/n83_msweep_cell.rs`, Gröbner engines). It is
+sweep cell (`examples/n83_msweep_cell.rs`, Gröbner engines); the
+`dreg-triage` skill describes iterating a sweep on it. It is
 advisory everywhere: never priced into `S`, outside the replay comparison,
 never a stopping rule, and `certified_degree_of_regularity` stays null.
 

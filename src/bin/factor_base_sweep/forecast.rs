@@ -75,6 +75,9 @@ pub fn forecaster(request: &Request, dump: &FactorBaseDump, r: u64, cofactor: u6
     let mut f = Forecaster::new(request.plan.max_degree)
         .with_work_unit("F4 row-reduction field multiplications (f4_fp field_ops)");
     f.set_relation_state(dump.factor_base.columns as usize, 0);
+    f.set_linear_algebra_unit(
+        "relation-matrix multiply-subtracts mod r (IncrementalGauss row_ops)",
+    );
     f.set_rho_floor_group_additions(generic_floor_ops(
         r as f64,
         automorphisms(&request.candidate.curve),
@@ -145,6 +148,11 @@ pub fn compact(f: &Forecast) -> Value {
         "projected_relation_phase_work": f.cost.projected_relation_phase_work,
         "work_unit": f.cost.unit,
         "hope_ratio_band": hope,
+        "linear_algebra_observed_work": f.cost.linear_algebra.as_ref().map(|la| la.observed_work),
+        "linear_algebra_unit": f.cost.linear_algebra.as_ref().map(|la| la.unit.clone()),
+        "projected_linear_algebra_work": f.cost.linear_algebra.as_ref().and_then(|la| la.projected_phase_work),
+        "projected_relation_phase_work_with_linear_algebra": f.cost.projected_relation_phase_work_with_linear_algebra,
+        "hope_ratio_band_with_linear_algebra": f.cost.hope_ratio_band_with_linear_algebra.iter().map(|h| json!({"multiplications_per_group_addition":h[0],"rho_floor_over_projected_relation_phase":h[1]})).collect::<Vec<_>>(),
         "relation_degree_pearson_r": f.relation_trend.pearson_r,
         "status": f.status,
         "advisory": f.advisory,
@@ -179,6 +187,7 @@ pub fn from_attempt(dir: &Path) -> Result<Option<(Forecast, Value)>> {
     let mut f = forecaster(&request, &dump, r, cofactor);
     let mut rows = IncrementalGauss::new(dump.factor_base.columns as usize, r);
     let mut records = Vec::new();
+    let mut admitted_rows = 0usize;
     let mut unreadable = 0usize;
     for entry in std::fs::read_dir(dir).map_err(|e| e.to_string())? {
         let path = entry.map_err(|e| e.to_string())?.path();
@@ -218,6 +227,8 @@ pub fn from_attempt(dir: &Path) -> Result<Option<(Forecast, Value)>> {
                 serde_json::from_value(relation["row"].clone()).map_err(|e| e.to_string())?;
             let rhs = relation["rhs"].as_u64().ok_or("relation without rhs")?;
             rows.add_row(row, rhs);
+            admitted_rows += 1;
+            f.observe_linear_algebra(admitted_rows, rows.row_ops);
         }
         f.set_relation_state(rows.columns(), rows.rank());
         if let Some(observation) = observation(record) {
