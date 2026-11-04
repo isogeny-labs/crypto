@@ -1,16 +1,46 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T1114Z-c25519-autolab-r31-k20-32",
+  "latest_record": "20261104T1119Z-c25519-autolab-r32-k20-32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 28,
+    "measured": 29,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
   "series": [
+    {
+      "better": "lower",
+      "first": 0.93749694761621,
+      "latest": 0.93749694761621,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_w0_k24",
+      "points": [
+        {
+          "commit": "e550ab2c1ed1",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 64,
+          "record": "20261104T1119Z-c25519-autolab-r32-k20-32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8192820929497201,
+            1.0727691162214268
+          ],
+          "summary": "ic_autolab round 32: wwalk x refinement 0.5..0.9 ratchets nothing (k = 20 regression, k = 24/28 null, k = 32 no challenger)",
+          "value": 0.93749694761621
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "ratio"
+    },
     {
       "better": "lower",
       "first": 2.5745780660849693,

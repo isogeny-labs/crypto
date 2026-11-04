@@ -130,3 +130,12 @@ An improvement makes `sel` the incumbent of its track and size in `ledger.json`,
 Route: `local`. Counted GAE, deterministic and host-independent; no wall-time claim. Isolation level earned is recorded per session and does not change the counts. This is a development loop: no round reaches the IC leaderboard or `benchmarks/README.md` without the validation gate (replay certificate on a second host class, validator report, matched rho with the band; `docs/VALIDATION_GATE.md`).
 
 Exposures excluded: 94 target seeds already used on this family (ledger exposures); the seeds above are new.
+
+## Amendment: selection (2026-11-04T11:22:28Z, after train, before holdout)
+
+- k = 20: selected `wwalkg-x09-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wwalk:x=0.9`), train mean S = 2.372 / 2.468 / 3.331 against `inc` 2.502 / 2.611 / 3.594; Pareto alternative at w = 1: `wwalkg-x09-n2`. Holdout spec `specs/holdout-k20.json`, `target_seed` 2026142920.
+- k = 24: selected `wwalkg-x09-grow-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wwalk:x=0.9,grow=1`), train mean S = 2.049 / 2.139 / 2.956 against `inc` 2.177 / 2.257 / 2.981; Pareto alternative at w = 1: `wwalkg-x09-grow-n2`. Holdout spec `specs/holdout-k24.json`, `target_seed` 2026142924.
+- k = 28: selected `wwalkg-x09-n2` (`prime-projected-abscissa:size=2,scan_cap=32` + `wwalk:x=0.9`), train mean S = 2.021 / 2.129 / 3.102 against `inc` 2.141 / 2.271 / 3.441; Pareto alternative at w = 1: `wwalkg-x09-n2`. Holdout spec `specs/holdout-k28.json`, `target_seed` 2026142928.
+- k = 32: no candidate below `inc` (1.867 / 2.025 / 3.445) at w = 0 on the train targets; no challenger, no holdout.
+
+Holdout spec sha256: {"holdout-k20":"7fb0a8721ff71ab5de89cfaac85c912c1306a52b2b24d60583a326ebb751bc3b","holdout-k24":"48f78d75199bce5be0289b4bcb04492620b371fb9fd9389fbe9ef68d0a42acf7","holdout-k28":"9c96c8a84c9d4c61c841be900c5063685d9438bda83aa6d045137f6fd8d0db26"}

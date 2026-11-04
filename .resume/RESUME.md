@@ -43,7 +43,7 @@ root-table parity point. Kill: K4 and K5 both supported.
 4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-Round 32 (k = 20..32; wwalk x = 0.5..0.9) running under benchrec record in scratchpad rec32, branch claude/curve25519-autolab-r32 (stacked on PR #3409).
+Round 32 done (null; PCC-20261104-976b76): wwalk at its optimum. Next: P3 (interleaved table and probe growth) or a structure lead.
 Panel: ksum4 at extrapolated N = 37 and neighbours 19/26/52/74; ksum3 transfer N = 176/246; mitm-prime-batch / blocked exploration.
 Branch claude/curve25519-ic-autolab-round4 (PR #3392). After it: add-raw, metric (incumbent S at k = 32, matched rho), close the record, claim, commit.
 
