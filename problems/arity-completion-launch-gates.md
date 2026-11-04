@@ -35,10 +35,32 @@ own terms.
   push: stale or none`; `artifacts.py push` of two report PDFs → `403` on
   `HeadObject` (recorded in cryptanalysis PRs #1384 and #1385 READMEs);
   `research/dreg_high_arity_20261101/README.md` account and budget gates.
+- **Observed (2026-11-04 01:52–01:56Z, fresh container after the owner
+  reported setting AWS credentials):** the container exports
+  `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (no `AWS_SESSION_TOKEN`,
+  no `AWS_REGION`, no `~/.aws/credentials`, no profile); `aws sts
+  get-caller-identity` → `InvalidClientTokenId` at the global, us-east-2,
+  us-east-1 and us-west-2 endpoints; `aws s3 ls
+  s3://isolab-results-104186811093-us-east-2 --region us-east-2` →
+  `InvalidAccessKeyId: The AWS Access Key Id you provided does not exist in our
+  records`. AWS itself answers, so the request reaches it; the key id it sees
+  is not an active key of any account. Remote Control folders of the owner's
+  Mac are listed `not_available` to cloud sessions, so the laptop route is
+  closed from here too.
+- **Observed (route audit, same session):** the GitHub-identity route
+  `isolab-experiment.yml` takes an `ecbench.spec/v1` file and builds an image
+  holding only `ecbench` and `isolab-fresh-owner` (`taskq/deploy/eks-karpenter/build-bundle`);
+  it cannot run `pkm_tower_pilot`, `n83_msweep_cell` or `run_shard.sh`. The
+  arbitrary-command route is `isolab_k8s_run` (EKS MCP, argv array,
+  digest-pinned image with UID 1000 support) and needs both an AWS identity
+  and a custom image carrying the two example binaries, `bash`, `coreutils`
+  (`timeout`, `prlimit`), `bc` and `/usr/bin/time`, pushed to the lab's ECR.
 - **Derived or proved:** not applicable.
-- **Suspected explanation:** the environment's `AWS_ACCESS_KEY_ID` /
-  `AWS_SECRET_ACCESS_KEY` are stale or belong to a principal without the
-  lab's roles; the checkpoint token was never minted for this session.
+- **Suspected explanation:** the key pair the container receives is not an
+  active IAM access key (a temporary `ASIA…` pair set without its
+  `AWS_SESSION_TOKEN` gives exactly these two errors; so does a deleted or
+  mistyped key, or a placeholder that the environment did not resolve). The
+  checkpoint token was never minted for this session.
 - **Missing capability:** a valid AWS identity for account `104186811093`
   with the roles in `taskq/deploy/eks-karpenter/ACCESS.md`, or at minimum an
   upload token from `scripts/checkpoint.sh presign-upload`; budget headroom
@@ -51,7 +73,17 @@ own terms.
 
 - [ ] `aws sts get-caller-identity` in the launching session reports account
   `104186811093`, and `scripts/checkpoint.sh gate` passes for the study
-  branch (or `CHECKPOINT_UPLOAD_TOKEN` is set from `presign-upload`).
+  branch (or `CHECKPOINT_UPLOAD_TOKEN` is set from `presign-upload`). For a
+  Claude Code on the web session that means the environment's settings
+  (Edit → Network secrets, or environment variables) carry
+  `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN` when the
+  key is temporary, and `AWS_REGION=us-east-2`, and a new session is started;
+  the session verifies with STS before anything else.
+- [ ] A digest-pinned image for the study (the two example binaries built
+  at the frozen commits, `bash`, `coreutils`, `bc`, `time`, UID 1000) in the
+  lab's ECR, or an executor host with a repository checkout and `cargo` on
+  which the build cards run as written. Without one of these the eight cards
+  have nowhere to execute even with a valid identity.
 - [ ] Recorded budget headroom for the cells' ceilings (stated in each
   `protocol.json` `execution.placement`), confirmed against the cost controls
   before submission.
@@ -74,9 +106,14 @@ runs are replayed and audited.
   lines on prime towers and Koblitz chained SAT; refuted ones name the cell
   to scale; capped cells stay inconclusive and are reported as such.
 - **Recheck trigger:** a credentialed session, or the owner's note that the
-  environment secrets were refreshed.
+  environment secrets were refreshed (checked 2026-11-04 01:52Z after such a
+  note: still rejected, see Evidence).
 
 ## Resolution and history
 
 - 2026-11-04: opened with the two frozen protocols and the development builds
   in `research/arity_completion_20261104/`.
+- 2026-11-04 01:52Z: owner reported AWS credentials set; a fresh container
+  still fails STS and S3 with the key it holds; route audit added (GitHub
+  route is ecbench-only, arbitrary commands need `isolab_k8s_run` plus a
+  custom image). Still open.
