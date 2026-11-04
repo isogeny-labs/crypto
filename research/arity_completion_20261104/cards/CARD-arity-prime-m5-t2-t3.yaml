@@ -66,9 +66,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.jsonl
-  timeout_seconds: 7500
+  timeout_seconds: 7800
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t2.jsonl
@@ -108,9 +111,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.jsonl
-  timeout_seconds: 7500
+  timeout_seconds: 7800
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t3.jsonl
@@ -150,9 +156,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.jsonl
-  timeout_seconds: 7500
+  timeout_seconds: 7800
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t2.jsonl
@@ -192,9 +201,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.jsonl
-  timeout_seconds: 7500
+  timeout_seconds: 7800
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t3.jsonl
@@ -203,6 +215,6 @@ background: true
 write_scope:
 - research/arity_completion_20261104/prime_tower_m5/
 stop_when:
-- Any command in the card exits with a status other than 0, or times out.
+- Any pilot-cell command exits with a status other than 0, 124, 134 or 137 (124, 134 and 137 are a wall cap or memory abort, recorded as inconclusive_cap, and do not stop the card), or any gate or helper command exits with a status other than 0, or any command times out.
 - The controls-verdict command exits with status 1, meaning a control cell differs from its recorded D or is missing; run no m = 5 cell.
 - 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'

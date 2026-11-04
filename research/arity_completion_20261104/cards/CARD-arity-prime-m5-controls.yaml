@@ -56,9 +56,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/ctl-m4-n8-kummer.jsonl
-  timeout_seconds: 900
+  timeout_seconds: 1200
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/ctl-m4-n8-kummer.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/ctl-m4-n8-kummer.jsonl
@@ -98,9 +101,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/ctl-m3-n15-kummer.jsonl
-  timeout_seconds: 7500
+  timeout_seconds: 7800
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/ctl-m3-n15-kummer.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/ctl-m3-n15-kummer.jsonl
@@ -140,9 +146,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/ctl-m2-n10-kummer.jsonl
-  timeout_seconds: 900
+  timeout_seconds: 1200
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/ctl-m2-n10-kummer.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/ctl-m2-n10-kummer.jsonl
@@ -159,6 +168,6 @@ background: true
 write_scope:
 - research/arity_completion_20261104/prime_tower_m5/
 stop_when:
-- Any command in the card exits with a status other than 0, or times out.
+- Any pilot-cell command exits with a status other than 0, 124, 134 or 137 (124, 134 and 137 are a wall cap or memory abort, recorded as inconclusive_cap, and do not stop the card), or any gate or helper command exits with a status other than 0, or any command times out.
 - The controls-verdict command exits with status 1, meaning a control cell differs from its recorded D (6 for m = 4 N = 8, 7 for m = 3 N = 15, 5 for m = 2 N = 10) or is capped; run no m = 5 cell.
 - 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'

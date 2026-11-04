@@ -86,9 +86,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t4.jsonl
-  timeout_seconds: 86700
+  timeout_seconds: 87000
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t4.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/kummer-m5-t4.jsonl
@@ -128,9 +131,12 @@ commands:
   - --trace
   - --out
   - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t4.jsonl
-  timeout_seconds: 86700
+  timeout_seconds: 87000
   success_exit_codes:
   - 0
+  - 124
+  - 134
+  - 137
   stderr: research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t4.time
   outputs:
   - research/arity_completion_20261104/prime_tower_m5/cells/isogeny-m5-t4.jsonl
@@ -139,7 +145,7 @@ background: true
 write_scope:
 - research/arity_completion_20261104/prime_tower_m5/
 stop_when:
-- Any command in the card exits with a status other than 0, or times out.
+- Any pilot-cell command exits with a status other than 0, 124, 134 or 137 (124, 134 and 137 are a wall cap or memory abort, recorded as inconclusive_cap, and do not stop the card), or any gate or helper command exits with a status other than 0, or any command times out.
 - The host-memory command exits with status 1, meaning the host has less than 120 GiB of memory; run no t = 4 cell.
 - The controls-verdict command exits with status 1, meaning a control cell differs from its recorded D or is missing; run no m = 5 cell.
 - The t3-cap-verdict command exits with status 1, meaning a t = 3 cell exceeded its cap or has no rows; run no t = 4 cell.
