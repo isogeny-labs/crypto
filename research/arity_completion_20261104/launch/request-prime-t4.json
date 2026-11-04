@@ -1,0 +1,24 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "arity-prime-m5-t4-20261104",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:66bf605378977bc6061467c0e988fffc5a09a737bad11b7590e232d28f57bf39",
+    "command": [
+      "/opt/study/launch/job-prime-tower.sh",
+      "t4"
+    ],
+    "cpu": 2,
+    "memory": "120Gi",
+    "seconds": 174600,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-main-session",
+    "source_revision": "6ee6a1df26be86954009d72336a0d54104ae3a0f",
+    "study": "prime_tower_m5",
+    "protocol_sha256": "2b82eecd46c9e9023cb2d5e1ec01a31d28647355decbd39653fffe81c7058a19",
+    "note": "research/arity_completion_20261104/launch/README.md: command Job on Iso Lab EKS; no L2 admission exists for command Jobs, so seconds are diagnostic only"
+  }
+}
