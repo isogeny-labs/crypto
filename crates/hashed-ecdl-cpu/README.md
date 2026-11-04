@@ -51,7 +51,14 @@ Preparation also stores the original bases and four curve parameters and uses
 temporary sum vectors; queries use O(batch) scratch. `peak_table_bytes` counts only retained
 prefix capacity and suffix slot capacity (including empty slots), excluding these
 other allocations. Suffix slots use at most half occupancy; their count is the
-next power of two above twice the suffix tuple count. All counters include
+next power of two above twice the suffix tuple count. A retained prefix sum is
+16 bytes (identity encoded as `x = u64::MAX`, unpacked one query batch at a
+time) and a suffix slot 12 (keys and `u32` tuple IDs in separate arrays; more
+than `u32::MAX` suffix tuples is a limit error). Preparation stores the prefix
+packed as it is formed and builds the index from compressed keys, so neither
+table coexists with a full-size `Vec<Point>` of its sums. On the `scale`
+fixtures this took `peak_table_bytes` from 92.6 MB to 67.3 MB (case 5) with
+byte-identical certificates. All counters include
 discarded trials. `clear()` drops tables without resetting cumulative counters.
 
 This is generic decomposition (bounded by square-root group-order methods;

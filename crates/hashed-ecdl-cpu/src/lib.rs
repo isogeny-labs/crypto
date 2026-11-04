@@ -24,8 +24,23 @@ struct Prepared {
     curve: [u64; 4],
     bases: Vec<Vec<Point>>,
     split: usize,
-    prefix: Vec<Point>,
+    prefix: Vec<Packed>,
     suffix: Suffix,
+}
+
+/// A retained point in 16 bytes rather than `Option<(u64, u64)>`'s 24:
+/// the identity is `x = u64::MAX`, which no coordinate below `p < 2^62`
+/// can be.  Queries unpack one batch at a time into scratch.
+#[derive(Clone, Copy)]
+struct Packed([u64; 2]);
+impl Packed {
+    const IDENTITY: u64 = u64::MAX;
+    fn pack(point: Point) -> Self {
+        Self(point.map_or([Self::IDENTITY, 0], |(x, y)| [x, y]))
+    }
+    fn unpack(self) -> Point {
+        (self.0[0] != Self::IDENTITY).then_some((self.0[0], self.0[1]))
+    }
 }
 
 // Point compression is injective on the validated odd-prime curve. Keep
@@ -40,46 +55,56 @@ fn point_bucket(mut key: u64, mask: usize) -> usize {
     key = key.wrapping_mul(0x94d049bb133111eb);
     ((key ^ (key >> 31)) as usize) & mask
 }
+/// Open-addressed `key -> first tuple ID`, keys and IDs in separate
+/// arrays: 12 bytes a slot instead of a padded `(u64, usize)`'s 16.
 struct Suffix {
-    slots: Vec<(u64, usize)>,
+    keys: Vec<u64>,
+    ids: Vec<u32>,
     rows: usize,
     unique: usize,
 }
 impl Suffix {
-    fn new(points: Vec<Point>) -> Result<Self, Error> {
+    /// From the suffix sums' `point_key`s, in tuple order.
+    fn new(points: Vec<u64>) -> Result<Self, Error> {
         if points.is_empty() {
             return Ok(Self {
-                slots: vec![],
+                keys: vec![],
+                ids: vec![],
                 rows: 0,
                 unique: 0,
             });
+        }
+        if points.len() > u32::MAX as usize {
+            return Err(Error::Limit("CPU suffix tuple IDs"));
         }
         let size = points
             .len()
             .checked_mul(2)
             .and_then(usize::checked_next_power_of_two)
             .ok_or(Error::Limit("CPU suffix index capacity"))?;
-        let mut slots = Vec::new();
-        slots
-            .try_reserve_exact(size)
+        let (mut keys, mut ids) = (Vec::new(), Vec::new());
+        keys.try_reserve_exact(size)
+            .and_then(|_| ids.try_reserve_exact(size))
             .map_err(|_| Error::Limit("CPU suffix index allocation"))?;
-        slots.resize(size, (u64::MAX, 0));
+        keys.resize(size, u64::MAX);
+        ids.resize(size, 0);
         let mut out = Self {
-            slots,
+            keys,
+            ids,
             rows: points.len(),
             unique: 0,
         };
         // Tuple order is lexicographic: retain the first ID on duplicate sums.
-        for (id, point) in points.into_iter().enumerate() {
-            let key = point_key(point);
+        for (id, key) in points.into_iter().enumerate() {
             let mut i = point_bucket(key, size - 1);
             loop {
-                let entry = &mut out.slots[i];
-                if entry.0 == key {
+                let stored = out.keys[i];
+                if stored == key {
                     break;
                 }
-                if entry.0 == u64::MAX {
-                    *entry = (key, id);
+                if stored == u64::MAX {
+                    out.keys[i] = key;
+                    out.ids[i] = id as u32;
                     out.unique += 1;
                     break;
                 }
@@ -89,16 +114,16 @@ impl Suffix {
         Ok(out)
     }
     fn find(&self, point: Point) -> Option<usize> {
-        if self.slots.is_empty() {
+        if self.keys.is_empty() {
             return None;
         }
         let key = point_key(point);
-        let mask = self.slots.len() - 1;
+        let mask = self.keys.len() - 1;
         let mut i = point_bucket(key, mask);
         loop {
-            let (stored, id) = self.slots[i];
+            let stored = self.keys[i];
             if stored == key {
-                return Some(id);
+                return Some(self.ids[i] as usize);
             }
             if stored == u64::MAX {
                 return None;
@@ -176,21 +201,22 @@ impl CachedMitm {
         // Drop the previous trial before allocating its admitted replacement.
         // Rejected inputs cannot reuse it: find checks exact curve/base identity.
         self.prepared = None;
-        let prefix = if total == 0 {
+        let prefix: Vec<Packed> = if total == 0 {
             vec![]
         } else {
-            sums(curve, &bases[..split])?
+            sums_as(curve, &bases[..split], Packed::pack)?
         };
         let suffix = Suffix::new(if total == 0 {
             vec![]
         } else {
-            sums(curve, &bases[split..])?
+            sums_as(curve, &bases[split..], point_key)?
         })?;
         self.stats.preparations += 1;
         self.stats.built_rows += total as u64;
         self.stats.peak_table_bytes = self.stats.peak_table_bytes.max(
-            prefix.capacity() * std::mem::size_of::<Point>()
-                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>(),
+            prefix.capacity() * std::mem::size_of::<Packed>()
+                + suffix.keys.capacity() * std::mem::size_of::<u64>()
+                + suffix.ids.capacity() * std::mem::size_of::<u32>(),
         );
         self.prepared = Some(Prepared {
             curve: curve_key(curve),
@@ -210,17 +236,25 @@ fn curve_key(curve: &Curve) -> [u64; 4] {
     [curve.modulus(), a, b, curve.order()]
 }
 
-fn sums(curve: &Curve, bases: &[Vec<Point>]) -> Result<Vec<Point>, Error> {
+/// Every tuple sum of `bases` in lexicographic tuple order, the last level, the only one of full size, stored through
+/// `store` as it is formed: the packed prefix never coexists with a
+/// full-size `Vec<Point>` copy of itself.
+fn sums_as<T>(curve: &Curve, bases: &[Vec<Point>], store: impl Fn(Point) -> T) -> Result<Vec<T>, Error> {
+    let Some((last, inner)) = bases.split_last() else {
+        return Ok(vec![store(None)]);
+    };
     let mut sums = vec![None];
     let mut scratch = Scratch::default();
-    for base in bases {
+    let negate = |base: &[Point]| -> Vec<Point> {
+        base.iter()
+            .map(|&point| point.map(|(x, y)| (x, sub(0, y, curve.modulus()))))
+            .collect()
+    };
+    for base in inner {
         // Bases have already been validated in prepare. Batch each row of
         // sum+base using the same exceptional-case-aware subtraction kernel.
         // Lexicographic tuple order is unchanged. This setup is fully charged.
-        let negatives: Vec<_> = base
-            .iter()
-            .map(|&point| point.map(|(x, y)| (x, sub(0, y, curve.modulus()))))
-            .collect();
+        let negatives = negate(base);
         let mut next = Vec::with_capacity(sums.len() * base.len());
         for &sum in &sums {
             scratch.subtract(curve, sum, &negatives);
@@ -228,7 +262,13 @@ fn sums(curve: &Curve, bases: &[Vec<Point>]) -> Result<Vec<Point>, Error> {
         }
         sums = next;
     }
-    Ok(sums)
+    let negatives = negate(last);
+    let mut out = Vec::with_capacity(sums.len() * last.len());
+    for &sum in &sums {
+        scratch.subtract(curve, sum, &negatives);
+        out.extend(scratch.output.iter().map(|&point| store(point)));
+    }
+    Ok(out)
 }
 fn decode(bases: &[Vec<Point>], mut id: usize, out: &mut [Point]) {
     for (base, point) in bases.iter().zip(out.iter_mut()).rev() {
@@ -267,8 +307,11 @@ impl DecompositionOracle for CachedMitm {
         let mut batch = if dense { 1 } else { self.batch };
         while start < p.prefix.len() {
             let end = start + batch.min(p.prefix.len() - start);
-            let points = &p.prefix[start..end];
-            self.stats.query_inversions += self.scratch.subtract(curve, target, points);
+            let mut points = std::mem::take(&mut self.scratch.points);
+            points.clear();
+            points.extend(p.prefix[start..end].iter().map(|&q| q.unpack()));
+            self.stats.query_inversions += self.scratch.subtract(curve, target, &points);
+            self.scratch.points = points;
             for (offset, residual) in self.scratch.output.iter().enumerate() {
                 self.stats.probed_rows += 1;
                 if let Some(id) = p.suffix.find(*residual) {
@@ -325,6 +368,8 @@ fn sub(a: u64, b: u64, p: u64) -> u64 {
 }
 #[derive(Default)]
 struct Scratch {
+    /// One query batch of prefix sums, unpacked.
+    points: Vec<Point>,
     prefix: Vec<u64>,
     denominators: Vec<u64>,
     numerators: Vec<u64>,
@@ -439,7 +484,7 @@ mod tests {
         let points: Vec<_> = (0..199).map(|k| c.mul(p, k).unwrap()).collect();
         let mut input = points[..150].to_vec();
         input.extend_from_slice(&points[..50]);
-        let index = Suffix::new(input.clone()).unwrap();
+        let index = Suffix::new(input.iter().map(|&point| point_key(point)).collect()).unwrap();
         assert_eq!(index.rows, input.len());
         assert_eq!(
             index.unique,
@@ -455,7 +500,7 @@ mod tests {
         let mut buckets = std::collections::BTreeSet::new();
         assert!(points[..150]
             .iter()
-            .any(|&point| !buckets.insert(point_bucket(point_key(point), index.slots.len() - 1))));
+            .any(|&point| !buckets.insert(point_bucket(point_key(point), index.keys.len() - 1))));
         assert_eq!(index.find(None), Some(0));
     }
 
