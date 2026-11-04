@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261104T0437Z-c25519-autolab-r11-k24",
+  "latest_record": "20261104T0445Z-c25519-autolab-r12-k24",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 1,
     "invalid": 0,
-    "measured": 8,
+    "measured": 9,
     "open": 0
   },
   "repo": "crypto",
@@ -43,10 +43,11 @@
     {
       "better": "lower",
       "first": 6.607,
-      "latest": 6.607,
+      "latest": 6.857,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 5.760244
+        "improvement_vs_first_percent": -3.7839,
+        "improvement_vs_previous_percent": -3.7839,
+        "value_over_reference": 5.538772
       },
       "metric": "s_w0_incumbent",
       "points": [
@@ -64,6 +65,22 @@
           "spread": null,
           "summary": "ic_autolab round 11, k = 24 train screen: incumbent ksum4-n12 S(w=0) 6.61 vs matched rho 1.15; no candidate below it (ksum4-n10 6.96)",
           "value": 6.607
+        },
+        {
+          "commit": "fdeed51f64bd",
+          "date": "2026-11-04",
+          "derived": {
+            "improvement_vs_first_percent": -3.7839,
+            "improvement_vs_previous_percent": -3.7839,
+            "value_over_reference": 5.538772
+          },
+          "n": 32,
+          "record": "20261104T0445Z-c25519-autolab-r12-k24",
+          "reference": 1.238,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "ic_autolab round 12, k = 24: the stride target stream raises the incumbent's cost 1.081x (P1 falsified); no challenger",
+          "value": 6.857
         }
       ],
       "problem": "ic:curve25519-family-k24",
