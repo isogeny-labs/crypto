@@ -35,8 +35,9 @@ def pq2():
         return
     rows = json.load(open(path))["rows"]
     fig, ax = plt.subplots(figsize=(8, 4.2))
-    for key, label, marker in (("low2", "low_2 (degree-2 rows)", "v"), ("low3", "low_3 (degree-3 rows)", "s"),
-                               ("low4", "low_4 (degree-4 rows, n <= 20)", "^")):
+    for key, label, marker in (("low3", "one-shot degree 3", "s"), ("low4", "one-shot degree 4 (n <= 20)", "^"),
+                               ("iter3", "iterated degree 3 (F4-style closure)", "D"),
+                               ("iter4", "iterated degree 4 (n <= 16)", "P")):
         xs = [r["n"] for r in rows if r[key] is not None]
         ys = [r[key] for r in rows if r[key] is not None]
         ax.scatter(xs, ys, s=18, marker=marker, label=label, alpha=0.8)
@@ -50,14 +51,19 @@ def pq2():
     fig.tight_layout()
     save(fig, "pq2_low_vs_k")
     # d_lin summary
-    fig, ax = plt.subplots(figsize=(8, 3.2))
-    order = {"2": 2, "3": 3, "4": 4, ">3": 3.5, ">4": 4.5}
-    ax.scatter([r["n"] for r in rows], [order[r["d_lin"]] for r in rows], s=20)
+    fig, ax = plt.subplots(figsize=(8, 3.4))
+    order = {"2": 2, "3": 3, "4": 4, ">3": 3.5, ">4": 4.5, "?": float("nan")}
+    xs = [r["n"] for r in rows if r["d_iter"] != "?"]
+    ys = [order[r["d_iter"]] for r in rows if r["d_iter"] != "?"]
+    ax.scatter(xs, ys, s=22, label="d_iter: lower bound on F4's max step degree")
+    ax.scatter([r["n"] for r in rows], [order[r["d_lin"]] + 0.08 for r in rows], s=14, marker="x",
+               color="gray", label="d_lin: lower bound on the one-shot solving degree")
     ax.set_yticks([2, 3, 3.5, 4, 4.5])
     ax.set_yticklabels(["2", "3", ">3 (deg 4 not run)", "4", ">4"])
     ax.set_xlabel("n")
-    ax.set_ylabel("d_lin (lower bound on sd)")
-    ax.set_title("d_lin per instance; first fall degree is 2 at every n")
+    ax.set_ylabel("degree bound")
+    ax.set_title("m = 2 descended S3: degree bounds per instance; first fall degree is 2 at every n")
+    ax.legend(fontsize=8, loc="lower right")
     ax.grid(alpha=0.3)
     fig.tight_layout()
     save(fig, "pq2_dlin")
