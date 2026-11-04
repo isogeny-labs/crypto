@@ -1,0 +1,951 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ARITY-COMPLETION-PRIME-TOWER-M5-20261104",
+  "version": 1,
+  "created": "2026-11-04",
+  "repository": "crypto",
+  "study_dir": "research/arity_completion_20261104/prime_tower_m5",
+  "authors": [
+    "Claude Sonnet 5.5 (draft); frozen by the main session"
+  ],
+  "links": {
+    "source_review": "research/factor_base_arity_review_20261024/README.md",
+    "neighbour_data": [
+      "research/ic_next10_20261014/03-pkm-degree/README.md",
+      "research/ic_next10_20261014/03-pkm-degree/results.csv",
+      "research/pkm_m3_n21_msolve_20261018/RESULTS.md"
+    ],
+    "command_template": "research/pkm_tower_round3_20260925/README.md",
+    "instrument_source": "examples/pkm_tower_pilot.rs",
+    "structural_template": "research/dreg_high_arity_20261101/protocol.json",
+    "atlas_leads": [
+      "LEAD-ICE-descent-closure-degree-at-scale"
+    ]
+  },
+  "question": "What is the F4 closure degree D, and what is the cost, of the PKM prime-field tower factor base at arity m = 5 at N = 10, 15 and 20, for the Kummer and isogeny towers over p1 = 2013265921? This arity was never measured; the arity review has m = 2, 3, 4 only.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "For each of the 12 target rows (m = 5; t = 2, 3, 4; Kummer and isogeny; two random targets) the closure degree D is either measured exactly from the trace or the cell is recorded as stopped at its cap (inconclusive_cap); D(m=5,N=10) in {6,7}, D(m=5,N=15) in {7,8} (P1, P2).",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-m5-t2",
+        "C-m5-t3"
+      ],
+      "if_supported": "m = 5 follows the m = 3, 4 plateau pattern at N <= 15; the arity dimension stays open at N = 20.",
+      "if_not_supported": "D >= 8 at N <= 15 closes the m = 5 line on prime towers as no cheaper than m = 4 at equal N (kill criterion)."
+    },
+    {
+      "id": "C2",
+      "text": "At N = 20 either D >= 8 is measured or the cell stops at its cap (P3); a capped cell is never reported as a degree.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-m5-t4"
+      ],
+      "if_supported": "A degree >= 8 lower bound or exact value at m = 5, N = 20.",
+      "if_not_supported": "D <= 7 at N = 20 would be a new, cheaper-than-m = 4 datum and is reported as such."
+    },
+    {
+      "id": "C3",
+      "text": "D does not differ between the Kummer and isogeny towers at equal (m, N) (P4), extending the 82-cell invariance to m = 5.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-m5-t2",
+        "C-m5-t3",
+        "C-m5-t4"
+      ],
+      "if_supported": "Tower kind is not a variable for the arity question.",
+      "if_not_supported": "A differing D at any equal-N pair refutes the invariance at m = 5 and is reported cell by cell."
+    },
+    {
+      "id": "C4",
+      "text": "The N = 15 cells finish within 7200 s and 8 GiB on the tower engine (P5, cost).",
+      "class": "heuristic_estimate",
+      "decided_by": [
+        "C-m5-t3"
+      ],
+      "if_supported": "N = 15 is a cheap m = 5 datum.",
+      "if_not_supported": "A cap stop at N = 15 is inconclusive_cap and makes the t = 4 cells not run."
+    },
+    {
+      "id": "C5",
+      "text": "D at m = 5 against the recorded m = 4 cells at equal N (C-m5-vs-m4) is reported as a descriptive distance; no wall-clock or ECDLP-scale claim is in scope.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-m5",
+      "statement": "At arity m = 5 the closure degree on the PKM prime tower stays at the m = 3, 4 plateau (6 or 7) up to N = 15 and reaches 8 or more by N = 20.",
+      "mechanism": "Recorded neighbours: m=4 D = 6, 7, 7, >=8 at N = 8, 12, 16, 20; m=3 D = 6, 6, 7, 7 at N = 9..18 and >= 8 at N = 21; D independent of prime and tower kind over 82 cells.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "closure_degree",
+          "direction": "equal_within",
+          "minimum_effect": "D in {6, 7}; falsified by any D outside {6, 7} on either tower or target",
+          "provenance": {
+            "written_at": "2026-11-04",
+            "first_recorded_in": "research/arity_completion_20261104/prime_tower_m5/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/ic_next10_20261014/03-pkm-degree/results.csv",
+                "measured": "m = 2, 3, 4 closure degrees and costs; no m = 5 row exists"
+              },
+              {
+                "path": "research/factor_base_arity_review_20261024/README.md",
+                "measured": "section 1.2: m = 2, 3, 4 only"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "m = 5 cells, never measured"
+          }
+        },
+        {
+          "id": "P2",
+          "metric": "closure_degree",
+          "direction": "equal_within",
+          "minimum_effect": "D in {7, 8}; falsified by any D outside {7, 8}",
+          "provenance": {
+            "written_at": "2026-11-04",
+            "first_recorded_in": "research/arity_completion_20261104/prime_tower_m5/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/ic_next10_20261014/03-pkm-degree/results.csv",
+                "measured": "m = 2, 3, 4 closure degrees and costs; no m = 5 row exists"
+              },
+              {
+                "path": "research/factor_base_arity_review_20261024/README.md",
+                "measured": "section 1.2: m = 2, 3, 4 only"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "m = 5 cells, never measured"
+          }
+        },
+        {
+          "id": "P3",
+          "metric": "closure_degree",
+          "direction": "higher",
+          "minimum_effect": "D >= 8, or the cell stops at its cap; falsified only by a completed cell with D <= 7",
+          "provenance": {
+            "written_at": "2026-11-04",
+            "first_recorded_in": "research/arity_completion_20261104/prime_tower_m5/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/ic_next10_20261014/03-pkm-degree/results.csv",
+                "measured": "m = 2, 3, 4 closure degrees and costs; no m = 5 row exists"
+              },
+              {
+                "path": "research/factor_base_arity_review_20261024/README.md",
+                "measured": "section 1.2: m = 2, 3, 4 only"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "m = 5 cells, never measured"
+          }
+        },
+        {
+          "id": "P4",
+          "metric": "closure_degree",
+          "direction": "equal_within",
+          "minimum_effect": "zero difference; falsified by any pair of completed cells at equal N with different D",
+          "provenance": {
+            "written_at": "2026-11-04",
+            "first_recorded_in": "research/arity_completion_20261104/prime_tower_m5/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/ic_next10_20261014/03-pkm-degree/results.csv",
+                "measured": "m = 2, 3, 4 closure degrees and costs; no m = 5 row exists"
+              },
+              {
+                "path": "research/factor_base_arity_review_20261024/README.md",
+                "measured": "section 1.2: m = 2, 3, 4 only"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "m = 5 cells, never measured"
+          }
+        },
+        {
+          "id": "P5",
+          "metric": "wall_s",
+          "direction": "lower",
+          "minimum_effect": "wall_s < 7200 and peak RSS < 8 GiB on both towers; falsified by a cap stop. Diagnostic only unless run on isolab-eks L2",
+          "provenance": {
+            "written_at": "2026-11-04",
+            "first_recorded_in": "research/arity_completion_20261104/prime_tower_m5/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/ic_next10_20261014/03-pkm-degree/results.csv",
+                "measured": "m = 2, 3, 4 closure degrees and costs; no m = 5 row exists"
+              },
+              {
+                "path": "research/factor_base_arity_review_20261024/README.md",
+                "measured": "section 1.2: m = 2, 3, 4 only"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "m = 5 cells, never measured"
+          }
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "m5-kummer",
+      "role": "candidate",
+      "description": "PKM prime-field Kummer tower at arity m = 5, t = 2, 3, 4 (N = 10, 15, 20), two random targets per cell, f4_fp_tower, p1 = 2013265921.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "pkm_tower_pilot"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "engine": "tower (f4_fp_tower)",
+          "p": "2013265921",
+          "controls": "tower",
+          "planted": "0",
+          "random": "2",
+          "ladder_t": "none",
+          "trace": "on",
+          "max_nnz": "2000000000",
+          "seed": "default 0x504B4D54 (1347112276), not passed on the command line",
+          "kinds": "kummer",
+          "cmd_kummer-m5-t2": "prlimit --as=8589934592 timeout 7500 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 5 --t-min 2 --max-t-m4 2 --budget 7200 --max-nnz 2000000000 --trace --out cells/kummer-m5-t2.jsonl 2> cells/kummer-m5-t2.time",
+          "cmd_kummer-m5-t3": "prlimit --as=8589934592 timeout 7500 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 5 --t-min 3 --max-t-m4 3 --budget 7200 --max-nnz 2000000000 --trace --out cells/kummer-m5-t3.jsonl 2> cells/kummer-m5-t3.time",
+          "cmd_kummer-m5-t4": "prlimit --as=128849018880 timeout 86700 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 5 --t-min 4 --max-t-m4 4 --budget 86400 --max-nnz 2000000000 --trace --out cells/kummer-m5-t4.jsonl 2> cells/kummer-m5-t4.time"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "m": 5,
+        "t": [
+          2,
+          3,
+          4
+        ],
+        "N": [
+          10,
+          15,
+          20
+        ],
+        "targets_per_cell": 2,
+        "kind": "kummer"
+      }
+    },
+    {
+      "id": "m5-isogeny",
+      "role": "candidate",
+      "description": "Same cells for the isogeny tower (--kinds isogeny); the comparison to Kummer at equal N is P4.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "pkm_tower_pilot"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "engine": "tower (f4_fp_tower)",
+          "p": "2013265921",
+          "controls": "tower",
+          "planted": "0",
+          "random": "2",
+          "ladder_t": "none",
+          "trace": "on",
+          "max_nnz": "2000000000",
+          "seed": "default 0x504B4D54 (1347112276), not passed on the command line",
+          "kinds": "isogeny",
+          "cmd_isogeny-m5-t2": "prlimit --as=8589934592 timeout 7500 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds isogeny --controls tower --planted 0 --random 2 --ladder-t none --m 5 --t-min 2 --max-t-m4 2 --budget 7200 --max-nnz 2000000000 --trace --out cells/isogeny-m5-t2.jsonl 2> cells/isogeny-m5-t2.time",
+          "cmd_isogeny-m5-t3": "prlimit --as=8589934592 timeout 7500 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds isogeny --controls tower --planted 0 --random 2 --ladder-t none --m 5 --t-min 3 --max-t-m4 3 --budget 7200 --max-nnz 2000000000 --trace --out cells/isogeny-m5-t3.jsonl 2> cells/isogeny-m5-t3.time",
+          "cmd_isogeny-m5-t4": "prlimit --as=128849018880 timeout 86700 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds isogeny --controls tower --planted 0 --random 2 --ladder-t none --m 5 --t-min 4 --max-t-m4 4 --budget 86400 --max-nnz 2000000000 --trace --out cells/isogeny-m5-t4.jsonl 2> cells/isogeny-m5-t4.time"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "m": 5,
+        "t": [
+          2,
+          3,
+          4
+        ],
+        "N": [
+          10,
+          15,
+          20
+        ],
+        "targets_per_cell": 2,
+        "kind": "isogeny"
+      }
+    },
+    {
+      "id": "ctl-m4-n8",
+      "role": "control_positive",
+      "description": "Re-run of the recorded m = 4, N = 8 Kummer cell (D = 6, 1.5-2.7 s) with the same binary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "pkm_tower_pilot"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "engine": "tower (f4_fp_tower)",
+          "p": "2013265921",
+          "controls": "tower",
+          "planted": "0",
+          "random": "2",
+          "ladder_t": "none",
+          "trace": "on",
+          "max_nnz": "2000000000",
+          "seed": "default 0x504B4D54 (1347112276), not passed on the command line",
+          "kinds": "kummer",
+          "cmd_ctl-m4-n8-kummer": "prlimit --as=8589934592 timeout 900 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 4 --t-min 2 --max-t-m4 2 --budget 600 --max-nnz 2000000000 --trace --out cells/ctl-m4-n8-kummer.jsonl 2> cells/ctl-m4-n8-kummer.time"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "m": 4,
+        "t": 2,
+        "N": 8,
+        "expected_D": 6
+      }
+    },
+    {
+      "id": "ctl-m3-n15",
+      "role": "control_positive",
+      "description": "Re-run of the recorded m = 3, N = 15 Kummer cell (D = 7) with the same binary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "pkm_tower_pilot"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "engine": "tower (f4_fp_tower)",
+          "p": "2013265921",
+          "controls": "tower",
+          "planted": "0",
+          "random": "2",
+          "ladder_t": "none",
+          "trace": "on",
+          "max_nnz": "2000000000",
+          "seed": "default 0x504B4D54 (1347112276), not passed on the command line",
+          "kinds": "kummer",
+          "cmd_ctl-m3-n15-kummer": "prlimit --as=8589934592 timeout 7500 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 3 --t-min 5 --max-t-m3 5 --budget 7200 --max-nnz 2000000000 --trace --out cells/ctl-m3-n15-kummer.jsonl 2> cells/ctl-m3-n15-kummer.time"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "m": 3,
+        "t": 5,
+        "N": 15,
+        "expected_D": 7
+      }
+    },
+    {
+      "id": "ctl-m2-n10",
+      "role": "control_negative",
+      "description": "Null-chain comparison at m = 2, N = 10 (recorded D = 5): the arity-2 chain where the degree is known.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "pkm_tower_pilot"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "engine": "tower (f4_fp_tower)",
+          "p": "2013265921",
+          "controls": "tower",
+          "planted": "0",
+          "random": "2",
+          "ladder_t": "none",
+          "trace": "on",
+          "max_nnz": "2000000000",
+          "seed": "default 0x504B4D54 (1347112276), not passed on the command line",
+          "kinds": "kummer",
+          "cmd_ctl-m2-n10-kummer": "prlimit --as=8589934592 timeout 900 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 2 --t-min 5 --max-t 5 --budget 600 --max-nnz 2000000000 --trace --out cells/ctl-m2-n10-kummer.jsonl 2> cells/ctl-m2-n10-kummer.time"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "m": 2,
+        "t": 5,
+        "N": 10,
+        "expected_D": 5
+      }
+    },
+    {
+      "id": "aa-target0",
+      "role": "control_aa",
+      "description": "A/A: random target 0 of the recorded m = 4, N = 8 Kummer cell (same cell as ctl-m4-n8, independent draw).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "pkm_tower_pilot"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "engine": "tower (f4_fp_tower)",
+          "p": "2013265921",
+          "controls": "tower",
+          "planted": "0",
+          "random": "2",
+          "ladder_t": "none",
+          "trace": "on",
+          "max_nnz": "2000000000",
+          "seed": "default 0x504B4D54 (1347112276), not passed on the command line",
+          "kinds": "kummer",
+          "cmd_ctl-m4-n8-kummer": "prlimit --as=8589934592 timeout 900 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 4 --t-min 2 --max-t-m4 2 --budget 600 --max-nnz 2000000000 --trace --out cells/ctl-m4-n8-kummer.jsonl 2> cells/ctl-m4-n8-kummer.time"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "m": 4,
+        "t": 2,
+        "N": 8,
+        "target_index": 0
+      }
+    },
+    {
+      "id": "aa-target1",
+      "role": "control_aa",
+      "description": "A/A: random target 1 of the same cell; must give the same D as target 0. The identical check is applied to every m = 5 cell by analyze.py.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "pkm_tower_pilot"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "engine": "tower (f4_fp_tower)",
+          "p": "2013265921",
+          "controls": "tower",
+          "planted": "0",
+          "random": "2",
+          "ladder_t": "none",
+          "trace": "on",
+          "max_nnz": "2000000000",
+          "seed": "default 0x504B4D54 (1347112276), not passed on the command line",
+          "kinds": "kummer",
+          "cmd_ctl-m4-n8-kummer": "prlimit --as=8589934592 timeout 900 /usr/bin/time -v target/release/examples/pkm_tower_pilot --engine tower --p 2013265921 --kinds kummer --controls tower --planted 0 --random 2 --ladder-t none --m 4 --t-min 2 --max-t-m4 2 --budget 600 --max-nnz 2000000000 --trace --out cells/ctl-m4-n8-kummer.jsonl 2> cells/ctl-m4-n8-kummer.time"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "m": 4,
+        "t": 2,
+        "N": 8,
+        "target_index": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa-targets",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "ctl-m4-n8",
+      "expected_detection": "The m = 4, N = 8 Kummer cell gives D = 6 and the m = 3, N = 15 Kummer cell gives D = 7 (arm ctl-m3-n15), each with rows identical to the recorded rows in every field except ms and wall_s (curve, tower, x_r, input_degrees, basis_len, max_cols, steps). Any difference voids the binary and every m = 5 row.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "ctl-m2-n10",
+      "null_population": {
+        "description": "The arity-2 null chain at N = 10 (recorded D = 5), the same instrument on a case with known degree.",
+        "generator": "pkm_tower_pilot --kinds kummer --m 2 --t-min 5 --max-t 5 --controls tower, two random targets",
+        "n": 2,
+        "why_n": "Two random targets as in every cell; the degree is exact so one agreeing cell is enough to fail the null gate.",
+        "matched_on": [
+          "engine",
+          "prime",
+          "seed",
+          "binary sha256",
+          "host",
+          "N"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "m",
+        "levels": [
+          5
+        ]
+      },
+      {
+        "name": "t",
+        "levels": [
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "name": "tower_kind",
+        "levels": [
+          "kummer",
+          "isogeny"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "prime",
+        "treatment": "fixed",
+        "value": "2013265921 = 15*2^27+1, v2(p-1) = 27",
+        "how": "--p on every command line."
+      },
+      {
+        "name": "engine",
+        "treatment": "fixed",
+        "value": "tower (f4_fp_tower, in-repo)",
+        "how": "--engine tower on every command line."
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": "0x504B4D54 (pilot default)",
+        "how": "--seed is not passed; the pilot's default is used and recorded in the summary row."
+      },
+      {
+        "name": "binary",
+        "treatment": "fixed",
+        "value": "one release build of examples/pkm_tower_pilot",
+        "how": "Commit and binary sha256 recorded at freeze; every cell and control uses the same file."
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "value": "one isolab-eks Spot executor per memory class (8 GiB class for t = 2, 3 and controls; 120 GiB class for t = 4)",
+        "how": "Host CPU model, memory and kernel recorded with each cell; no cell migrates between hosts."
+      },
+      {
+        "name": "target_index",
+        "treatment": "randomized",
+        "value": "--random 2 (indices 0 and 1)",
+        "how": "Targets are drawn by the pilot from the seed fixed by (seed, kind, m, t, g); the two targets are the within-cell A/A."
+      },
+      {
+        "name": "memory_and_wall_caps",
+        "treatment": "fixed",
+        "value": "8 GiB / 7200 s (t = 2, 3), 120 GiB / 86400 s (t = 4)",
+        "how": "prlimit --as and --budget plus a timeout backstop of budget + 300 s."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-m5-t2",
+        "arms": [
+          "m5-kummer",
+          "m5-isogeny"
+        ],
+        "differs_in": [
+          "tower_kind"
+        ],
+        "design": "one_factor",
+        "threshold": "D(Kummer) = D(isogeny) at N = 10, and D in {6,7}."
+      },
+      {
+        "id": "C-m5-t3",
+        "arms": [
+          "m5-kummer",
+          "m5-isogeny"
+        ],
+        "differs_in": [
+          "tower_kind"
+        ],
+        "design": "one_factor",
+        "threshold": "D(Kummer) = D(isogeny) at N = 15, and D in {7,8}."
+      },
+      {
+        "id": "C-m5-t4",
+        "arms": [
+          "m5-kummer",
+          "m5-isogeny"
+        ],
+        "differs_in": [
+          "tower_kind"
+        ],
+        "design": "one_factor",
+        "threshold": "D(Kummer) = D(isogeny) at N = 20; D >= 8 or cap."
+      },
+      {
+        "id": "C-m5-vs-m4",
+        "arms": [
+          "m5-kummer",
+          "ctl-m4-n8"
+        ],
+        "differs_in": [
+          "m"
+        ],
+        "design": "confounded",
+        "threshold": "Descriptive: D at m = 5 against the recorded m = 4 cells at equal N (recorded m = 4: N = 8, 12, 16, 20; shared with m = 5 only at N = 20).",
+        "reason": "Different m is the question, but the recorded m = 4 cells sit at different N than m = 5 t = 2, 3; read as a descriptive distance, never decisive."
+      },
+      {
+        "id": "C-aa-targets",
+        "arms": [
+          "aa-target0",
+          "aa-target1"
+        ],
+        "differs_in": [
+          "target_index"
+        ],
+        "design": "aa",
+        "threshold": "The two random targets of each cell are independent draws and must give the same D."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "D is an exact algebraic output and wall seconds are diagnostic only, so run order cannot change a decision.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        1347112276
+      ],
+      "nonce": null,
+      "note": "The pilot default 0x504B4D54; each cell derives its tower, curve and targets from (seed, kind, m, t, g)."
+    },
+    "instance_sampling": {
+      "rule": "Two random targets per cell (--random 2, --planted 0); no selection by outcome.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Outcomes are exact and the whole fixed set of 12 target rows is reported; no analyst choice is present."
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 5,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Finite exact classification of 12 registered target rows plus controls; no sampling interval and no population-frequency claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 86400,
+      "measured_on": "Per-job admission budget only: the longest single process (t = 4) is capped at 86400 s; cells run as separate jobs. No preflight measurement taken."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "closure_degree",
+        "name": "Closure degree D",
+        "unit": "degree",
+        "kind": "exact",
+        "definition": "solving_degree_max of the tower engine's trace for a completed cell (timed_out false, oversize false). A cell stopped by wall or memory cap yields no degree.",
+        "source": "cells/*.jsonl field solving_degree_max with timed_out/oversize",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall_s",
+        "name": "Wall seconds",
+        "unit": "s",
+        "kind": "timed",
+        "definition": "Per-process F4 wall time from the row (wall_s) and from /usr/bin/time -v; diagnostic only.",
+        "source": "cells/*.jsonl wall_s; time -v elapsed",
+        "aggregation": "per_row",
+        "resolution": null,
+        "uncertainty": "range"
+      },
+      {
+        "id": "peak_rss",
+        "name": "Peak RSS",
+        "unit": "KiB",
+        "kind": "counted",
+        "definition": "Maximum resident set size reported by /usr/bin/time -v.",
+        "source": "cell .time file Maximum resident set size",
+        "aggregation": "max",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "max_cols",
+        "name": "Widest matrix columns",
+        "unit": "columns",
+        "kind": "exact",
+        "definition": "max_cols from the row.",
+        "source": "cells/*.jsonl max_cols",
+        "aggregation": "max",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "steps",
+        "name": "F4 steps",
+        "unit": "steps",
+        "kind": "exact",
+        "definition": "steps from the row.",
+        "source": "cells/*.jsonl steps",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "solving_degree_max",
+      "max_cols",
+      "steps",
+      "muladds",
+      "max_nnz"
+    ],
+    "record": [
+      "Commit, binary sha256, container image digest, exact command line per cell",
+      "CPU model, logical CPUs, memory, kernel, isolab-eks isolation tier (L2 or not)",
+      "Exit status, /usr/bin/time -v output and prlimit value per cell",
+      "The pilot's summary row and, for a stopped cell, the last completed step of the trace"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab-eks Spot (AGENTS.md section 9a)",
+    "placement": {
+      "t2_t3_and_controls": "8 GiB class",
+      "t4": "host with at least 120 GiB memory, otherwise not run",
+      "local_smoke": "t = 2 Kummer cell may be run locally for development; labelled not evidence"
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 86700,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Each cell has a wall budget of 7200 s (t = 2, 3) or 86400 s (t = 4) and a memory cap by prlimit --as of 8 GiB (t = 2, 3) or 120 GiB (t = 4, only on a host with that memory). A wall or memory stop is inconclusive_cap, not evidence.",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop the t = 4 cells if a t = 3 cell exceeds its cap.",
+      "kind": "preregistered_sequential",
+      "preregistered": true
+    },
+    {
+      "rule": "Run the three controls first. If the m = 4 N = 8 or m = 3 N = 15 control differs from its recorded D or rows, or the m = 2 N = 10 negative control does not give D = 5, stop and run no m = 5 cell.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Run each cell once per process (--t-min T --max-t-m4 T); 12 target rows plus controls, no extra cells.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "A control differing from its recorded degree or rows (outside ms and wall_s) invalidates the binary and all m = 5 rows.",
+    "The two targets of a cell giving different D is reported as a within-cell A/A failure; the cell is reported, not averaged.",
+    "A row from a different binary sha256, prime, seed or engine than the frozen ones is inadmissible."
+  ],
+  "decision_rule": {
+    "text": "Per cell, D is the exact solving_degree_max of a completed trace; no sampling interval. P1 to P5 are evaluated as stated in hypotheses H-m5. Kill criterion: if P1 or P2 show D >= 8 at N <= 15, the m = 5 line is closed on prime towers as no cheaper than m = 4 at equal N. A cell stopped at its cap is inconclusive_cap and is never reported as a degree. No multiple-comparison correction applies because every cell is an exact classification, not a significance test. Gap to the matched rho is not a gate here; this study reports degree and cost only.",
+    "comparison_ids": [
+      "C-m5-t2",
+      "C-m5-t3",
+      "C-m5-t4"
+    ],
+    "threshold": "P1: D in {6,7}; P2: D in {7,8}; P3: D >= 8 or cap; P4: equal D across towers; P5: N = 15 within 7200 s and 8 GiB",
+    "statistic": "Exact closure degree per cell and tower kind",
+    "interval": "No sampling interval; finite exact registered cells only",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Exact D per cell and the difference D(m=5) minus D(m=4) at equal N where recorded",
+    "verdict_vocabulary": [
+      "supported",
+      "refuted",
+      "inconclusive_cap"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/arity_completion_20261104/prime_tower_m5/analyze.py",
+      "sha256": "7909f55246f7a20f080e0a06b9407d1bea5a70e8ab9d20e46a4ceeb13dc1a65e"
+    },
+    "inputs": [
+      "cells/*.jsonl",
+      "cells/*.time"
+    ],
+    "outputs": [
+      "stdout table and P1-P5 verdicts"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "D against N per tower kind with the recorded m = 4 values and caps marked"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Changing the prime, seed, engine or caps after the freeze",
+    "Reporting a capped (wall or memory stopped) cell as a degree",
+    "Using wall seconds for a speed or comparative claim unless the run is on isolab-eks L2",
+    "Treating a local development smoke as evidence",
+    "Generalizing m = 5 toy cells to cryptographic scale or another presentation"
+  ],
+  "literature": [
+    {
+      "ref": "research/factor_base_arity_review_20261024/README.md",
+      "provenance": "internal",
+      "claim": "Section 1.2 records m = 2, 3, 4 only; m = 5 was never measured.",
+      "verified_by": "Task statement from the lab's records, 2026-11-04."
+    },
+    {
+      "ref": "research/ic_next10_20261014/03-pkm-degree/README.md",
+      "provenance": "internal",
+      "claim": "Sections 2.1-2.2 and results.csv give the m = 2, 3, 4 degrees and costs used as predictions and controls; D independent of prime and tower kind over 82 cells.",
+      "verified_by": "Task statement from the lab's records, 2026-11-04."
+    },
+    {
+      "ref": "research/pkm_m3_n21_msolve_20261018/RESULTS.md",
+      "provenance": "internal",
+      "claim": "m = 3, N = 21 died at 99.6 GiB with D >= 8; msolve at m = 4, N = 20 died at a 5 GB cap after 3 degree-8 rounds.",
+      "verified_by": "Task statement from the lab's records, 2026-11-04."
+    },
+    {
+      "ref": "research/pkm_tower_round3_20260925/README.md",
+      "provenance": "internal",
+      "claim": "Source of the command-line flag style for the tower engine.",
+      "verified_by": "Read 2026-11-04."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "2b82eecd46c9e9023cb2d5e1ec01a31d28647355decbd39653fffe81c7058a19",
+    "commit": "1fd6ece55faf55d1a03bcce186f5b830267a2589",
+    "frozen_at": "2026-11-04T00:37:38Z",
+    "filed_before_affected_data": true
+  }
+}

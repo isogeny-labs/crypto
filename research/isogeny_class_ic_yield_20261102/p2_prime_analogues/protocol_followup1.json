@@ -1,0 +1,615 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "P2-FU1-c32A-m3-curve80-replication-20261102",
+  "version": 1,
+  "created": "2026-11-02",
+  "repository": "crypto",
+  "study_dir": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues",
+  "authors": [
+    "experiment-director (FOLLOWUP_c32A_m3.md and this record, filed before any data of follow-up 1)"
+  ],
+  "links": {
+    "note": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/FOLLOWUP_c32A_m3.md is the narrative; this file records it. New protocol, not an amendment of A1 (the pinned P2 cards stay valid). Triggered by PROTOCOL.md section 6 (curve effect suspected, cell c32A m=3, curve 80). Route inherited from A1: local backend, L0, ALLOW_BUSY=1, counted metrics decide. p2tool spec --focus and p2tool analyze-focus do not exist yet (FOLLOWUP section 6); their builder commit and hashes are filed in note F1.1 before the first data point.",
+    "parent_protocol": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/protocol.json",
+    "trigger": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c32A_m3/analysis.json",
+    "design_table": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/followup1_focus.json",
+    "population": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json",
+    "spec_generator": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/spec.rs",
+    "parent_design": "research/isogeny_class_ic_yield_20261102/DESIGN.md",
+    "analysis_definition": "the statistics are defined in research/isogeny_class_ic_yield_20261102/p2_prime_analogues/FOLLOWUP_c32A_m3.md sections 6 to 8 (sha256 4edee7f2379d3c71429415b865374cfa154c01f4bc22ac5d0aedd40ea7c5ff5f at filing); there is no analysis script yet (analysis_plan.script is null): p2tool analyze-focus is written to that text by a builder and its source and binary SHA-256 are bound by the card and filed in note F1.1 before the first data point"
+  },
+  "question": "On fresh seeds, does curve 80 of the c32A isogeny class (D = -84171, h = 128, n = 4127376823) yield at least 5 percent more relations per attempt than 15 other curves of the class under the m=3 prime-abscissa mitm pipeline (|F| = 470, 5964 attempts per run), and if so, does the excess persist in 8 u-scaled isomorphic models of curve 80 (a curve effect) or vanish in them (a factor-base presentation effect)?",
+  "claims": [
+    {
+      "id": "C-rep",
+      "text": "On fresh seeds, the pooled m=3 yield of curve 80 of c32A has ratio r (95 percent interval) to the pooled yield of 15 other curves of the class, and the P2 flag for that cell is classified by the preregistered rule as replicated or not replicated.",
+      "class": "comparative",
+      "decided_by": [
+        "C-curve80"
+      ],
+      "if_supported": "replicated: ratio at least 1.05 with decision p < 0.05; classified further by C-iso",
+      "if_not_supported": "not replicated: chance (winner's curse); the P2 flag stands as a false positive; effects below 5 percent are not excluded and the interval is reported"
+    },
+    {
+      "id": "C-iso",
+      "text": "If replicated, the 8 u-scaled isomorphic models of curve 80 have pooled yield ratio r_I to the comparators; ratio at least 1.05 with p < 0.05 means the excess follows the curve (escalate to the mechanism test), ratio below 1.05 with curve 80 significantly above its models means a factor-base presentation effect.",
+      "class": "comparative",
+      "decided_by": [
+        "C-iso80",
+        "C-diff"
+      ],
+      "if_supported": "curve effect (iso present) or presentation effect (iso absent and T3 significant)",
+      "if_not_supported": "inconclusive, numbers reported"
+    },
+    {
+      "id": "C-scope",
+      "text": "No result states anything about ECCp-131, security, speed, a cross-method cost or an improvement over the index-calculus baseline; no rho reference or section 5a band applies (one method on curves of one class); a curve-effect verdict triggers a mechanism-test protocol, it is not itself a mechanism claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H0",
+      "statement": "The P2 flag on curve 80 (c32A, m=3, ratio 1.0725 to the grand mean, z 4.147) is a selection artefact of the maximum over 128 curves: on fresh seeds its yield equals the comparators' within binomial noise, and the same holds for its isomorphic models.",
+      "mechanism": "Within one class of conductor 1 only transport cost, automorphisms and the model presentation can differ; P2 showed binomial within-cell variance (ratio 1.004), an iso RMS log ratio of 0.023 against 0.025 expected from binomial noise, no excess in m=2 (ratio 1.010) and a non-significant ICC (p 0.079).",
+      "predictions": [
+        {
+          "id": "P-nonrep",
+          "metric": "yield",
+          "direction": "equal_within",
+          "minimum_effect": "ratio of curve 80 to the pooled comparators below 1.05, or decision p >= 0.05 (decision p = max of the binomial-z and the 20000-permutation p-values, two-sided)",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c32A_m3/analysis.json",
+                "measured": "P2 cell c32A m=3: curve 80 pooled yield 0.0353999, ratio 1.0725 to the grand mean 0.033006, max abs z 4.147, perm p 0.0005, ICC perm p 0.079, iso RMS log ratio 0.023; the follow-up uses fresh seeds, so its data are out of sample"
+              },
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c32A_m2/analysis.json",
+                "measured": "descriptive, reported by the main session: curve 80 ratio 1.010, z 0.59, rank 90/128 in c32A m=2"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "comparators",
+      "role": "reference",
+      "description": "15 other curves of c32A (indices 7, 11, 19, 32, 34, 35, 40, 57, 58, 86, 96, 101, 104, 105, 123: the 8 iso bases of classes.json plus 7 by a seeded draw), arm m3-main, 12 targets x 4 rounds each",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ],
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=470",
+        "oracle": "mitm:m=3",
+        "linalg": "incremental-gauss-full-rank",
+        "max_trials": "5964",
+        "arm_name_in_spec": "m3-main",
+        "workloads": "15 comparators"
+      }
+    },
+    {
+      "id": "curve80",
+      "role": "candidate",
+      "description": "curve 80 (j 2659937662), the ellfromj model of classes.json, arm m3-main, 12 targets x 4 rounds",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ],
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=470",
+        "oracle": "mitm:m=3",
+        "linalg": "incremental-gauss-full-rank",
+        "max_trials": "5964",
+        "arm_name_in_spec": "m3-main",
+        "workloads": "curve 80"
+      },
+      "same_instrument_as": "comparators"
+    },
+    {
+      "id": "iso80",
+      "role": "candidate",
+      "description": "8 u-scaled isomorphic models of curve 80 (u_k from Prg p2-followup1-iso-c32A-80), arm m3-main, 12 targets x 4 rounds each; same j, a different smallest-abscissa factor base",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ],
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=470",
+        "oracle": "mitm:m=3",
+        "linalg": "incremental-gauss-full-rank",
+        "max_trials": "5964",
+        "arm_name_in_spec": "m3-main",
+        "workloads": "8 iso models of curve 80"
+      },
+      "same_instrument_as": "comparators"
+    },
+    {
+      "id": "pc80",
+      "role": "control_positive",
+      "description": "arm m3-pc on curve 80: factor base 499 = round(470 x 1.2^(1/3)), expected yield 1.2 times main, a planted 20 percent effect on the same curve and seeds",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ],
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=499",
+        "oracle": "mitm:m=3",
+        "linalg": "incremental-gauss-full-rank",
+        "max_trials": "5964",
+        "arm_name_in_spec": "m3-pc",
+        "workloads": "curve 80"
+      },
+      "same_instrument_as": "comparators"
+    },
+    {
+      "id": "cmp-loo",
+      "role": "control_negative",
+      "description": "null calibration inside the comparators: each of the 15 comparators tested against the other 14 pooled with the same statistic as T1, no extra runs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ],
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=470",
+        "oracle": "mitm:m=3",
+        "linalg": "incremental-gauss-full-rank",
+        "max_trials": "5964",
+        "arm_name_in_spec": "m3-main",
+        "workloads": "15 comparators, leave one out"
+      },
+      "same_instrument_as": "comparators"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "no in-session m3-aa arm: at 32 bits and above it is a deterministic duplicate (PROTOCOL.md section 3, --aa 0); the noise floor for the counted metric is the binomial standard error of T1 (within-cell variance equals binomial, ratio 1.004 in P2) and the comparators leave-one-out calibration (control_negative), and ecbench verify --replay 12 checks reproducibility"
+    },
+    "positive": {
+      "present": true,
+      "arm": "pc80",
+      "not_applicable_reason": null,
+      "expected_detection": "curve 80 pc cells against the comparators main cells: ratio at least 1.10 with p_z < 0.05 (expected 1.2 times curve 80's own factor, SE 1.1 percent); otherwise the run is not informative whatever T1 says"
+    },
+    "negative": {
+      "present": true,
+      "arm": "cmp-loo",
+      "not_applicable_reason": null,
+      "null_population": {
+        "description": "the 15 comparator curves of c32A, each tested against the other 14 pooled with the statistic of T1; reported: count with |z| > 1.96 (expected 0.75 of 15), max |z|, D = mean z^2",
+        "generator": "no new runs: the comparator cells of the same session, leave one curve out",
+        "n": 15,
+        "why_n": "the comparator set is the preregistered 15; informative only if D <= 2.0 (binomial model: mean 1, sd 0.37), else the run is inconclusive, overdispersed",
+        "matched_on": [
+          "class c32A, n and p",
+          "factor base size 470 and 5964 attempts",
+          "targets, rounds and algorithm seeds law",
+          "instrument and binary",
+          "number of cells per curve (48)"
+        ]
+      }
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "curve",
+        "levels": [
+          "curve 80 (ellfromj model)",
+          "15 comparator curves of c32A",
+          "8 u-scaled isomorphic models of curve 80"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one ecbench binary and one p2tool binary, SHA-256 bound by the card and recorded per row (binary_sha256)",
+        "how": "card binds both hashes; ecbench source unchanged, p2tool gains spec --focus and analyze-focus (note F1.1)"
+      },
+      {
+        "name": "host_and_isolation",
+        "treatment": "measured",
+        "how": "L0, ALLOW_BUSY=1 as in A1; isolation level, steal, PSI recorded per row; the counted yield does not depend on the level; wall is not computed"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "crossed",
+        "how": "ecbench order alternate, 4 balanced rounds, 1 warm-up discarded"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "value": "measurement.seed 116 (fresh; P2 used 103)",
+        "how": "one seed per (workload, round) derived by ecbench from measurement.seed and the workload id, shared by the arms of that round"
+      },
+      {
+        "name": "target",
+        "treatment": "randomized",
+        "value": "12 targets per curve, target_seed 363589115 (fresh; P2 used 20261102)",
+        "how": "uniform_scalar_sha256_v1, identical across arms"
+      },
+      {
+        "name": "factor_base_size_and_attempts",
+        "treatment": "fixed",
+        "value": "N = 470, A = 5964 on every workload of the main arm (copied from the executed P2 spec); the pc80 arm differs on purpose (N = 499)",
+        "how": "p2tool spec rule of PROTOCOL.md section 3 without --relations"
+      },
+      {
+        "name": "model_presentation",
+        "treatment": "crossed",
+        "how": "curve 80 in its ellfromj model and in 8 u-scaled models (the control)"
+      },
+      {
+        "name": "comparator_selection",
+        "treatment": "fixed",
+        "how": "the 8 iso bases of classes.json plus 7 drawn by Prg p2-followup1-comparators-c32A-curve80; no yield read to fix the rule"
+      },
+      {
+        "name": "class_size_m",
+        "treatment": "fixed",
+        "value": "c32A, m = 3 only",
+        "how": "m = 2 and other classes are not retested"
+      },
+      {
+        "name": "spot_preemption",
+        "treatment": "fixed",
+        "how": "not applicable on the local route; a session that does not complete is not run, never filled"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-curve80",
+        "arms": [
+          "comparators",
+          "curve80"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-iso80",
+        "arms": [
+          "comparators",
+          "iso80"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-diff",
+        "arms": [
+          "curve80",
+          "iso80"
+        ],
+        "differs_in": [
+          "model_presentation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-pc",
+        "arms": [
+          "curve80",
+          "pc80"
+        ],
+        "differs_in": [
+          "factor_base_size_and_attempts"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": "see controls.aa.not_applicable_reason",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench derives one algorithm seed per (workload, round) from measurement.seed 116 = S mod 1000 + 1 with S = 363589115 (p2tool spec --seed 363589115; target_seed 363589115); S = Prg(p2-followup1-seed-c32A-m3-curve80).next() mod 10^9 (followup1_focus.json); permutation seed 20261102; no seed chosen after a look"
+    },
+    "instance_sampling": {
+      "rule": "curve 80 is fixed by the P2 flag; the 15 comparators are the 8 iso bases of classes.json plus 7 by a seeded draw (Prg p2-followup1-comparators-c32A-curve80); the 8 iso models by Prg p2-followup1-iso-c32A-80; all written in followup1_focus.json before data",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "arm roles are fixed here and the decision is one frozen rule applied by a frozen binary (p2tool analyze-focus); no hand selection of cells",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 24,
+    "replicates": 48,
+    "warmups": 1,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "one pre-specified test T1 (curve 80 against the pooled comparators, two-sided alpha 0.05, no correction because the family is one). 24 workloads, 48 cells per curve (4 rounds x 12 targets), A = 5964, yield 0.033006: K_P = 9449, K_C = 141732, K_I = 75590 expected relations, SE(T1) = 1.06 percent. Power for a true +7 percent: p < 0.05 alone > 0.999 (0.957 already at 4 targets); replicated (ratio >= 1.05 and p < 0.05) 0.962 (0.926 at 8 targets, 0.895 at 6); at true +5 percent 0.50 (the 1.05 floor binds); false replication under H0 2.2e-6. Monte Carlo of the full decision rule in FOLLOWUP_c32A_m3.md section 9. Requirement: power >= 0.9 for 7 percent: met."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.17,
+      "per_sample_seconds": 0.91,
+      "threads": 1,
+      "estimated_total_seconds": 2620,
+      "measured_on": "P2 cell c32A m=3 (receipt CARD-isogeny-ic-yield-p2-c32A-m3-20261102-3): 4949.04 s for 5440 runs = 0.91 s per run on the shared 4-core host at L0; this follow-up has 24 x 12 x 5 x 2 = 2880 runs, 2880 x 0.91 = 2620 s"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "yield",
+        "name": "yield per attempt",
+        "unit": "relations per attempt",
+        "kind": "counted",
+        "definition": "relations_found / targets_tried of one cell (curve, round, target); an attempt is one increment of targets_tried, a relation one increment of relations_found; every run is exactly A attempts",
+        "source": "session records.jsonl counters relations_found and targets_tried",
+        "aggregation": "mean",
+        "resolution": "1 relation per A attempts",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "targets_tried",
+      "relations_found"
+    ],
+    "record": [
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": "The only metric is the counted yield, independent of the isolation level; no timed metric is computed."
+  },
+  "execution": {
+    "backend": "local",
+    "timeout_seconds": 7200,
+    "measurement_class": "measurement",
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: 24 workloads (curve 80, 15 comparators, 8 iso models of curve 80) x 12 targets x (4 rounds + 1 warm-up) x arms m3-main and m3-pc, written by p2tool spec --focus with --targets 12 --rounds 4 --aa 0 --seed 363589115; then stop; no sequential stopping",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "every run ends exhausted after exactly 5964 attempts; a session that does not complete, or fails ecbench verify --replay 12, is reported as not run, never filled; a spec whose target_seed is not 363589115 or measurement.seed is not 116 invalidates the run",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "the spec target_seed is not 363589115 or measurement.seed is not 116",
+    "ecbench verify fails or a workload of followup1_focus.json is missing from the session",
+    "positive control not met (curve 80 pc cells against comparators main cells: ratio < 1.10 or p_z >= 0.05) makes the run not informative",
+    "comparators leave-one-out dispersion D = mean z^2 > 2.0 makes the run inconclusive (overdispersed)"
+  ],
+  "decision_rule": {
+    "text": "Applied in order. 1) positive control not met, or D > 2.0: not informative / inconclusive. 2) not (r_P >= 1.05 and decision p < 0.05), decision p = max(binomial-z p, 20000-permutation p), two-sided: not replicated, chance (winner's curse), the P2 flag stands as a false positive. 3) replicated and iso present (r_I >= 1.05 and p_z < 0.05): curve effect, escalate to the mechanism test (n, smallest-abscissa structure, CM field). 4) replicated, r_I < 1.05, and curve 80 against its iso models p_z < 0.05 with y_P > y_I: factor-base presentation effect. 5) anything else: inconclusive, numbers reported.",
+    "comparison_ids": [
+      "C-curve80",
+      "C-iso80",
+      "C-diff"
+    ],
+    "threshold": "ratio >= 1.05 and p < 0.05 (replicated); controls: pc ratio >= 1.10 with p_z < 0.05, D <= 2.0",
+    "statistic": "ln ratio of pooled yields (relations_found / targets_tried) with binomial delta-method SE sqrt(1/K_a + 1/K_b), plus a 20000-permutation cell-label p-value for T1",
+    "interval": "95 percent: exp(l +- 1.96 SE)",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "ratio of pooled yields (curve 80 over comparators; iso models over comparators; curve 80 over iso models)",
+    "verdict_vocabulary": [
+      "not_replicated",
+      "curve_effect",
+      "presentation_effect",
+      "inconclusive",
+      "not_informative"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "<run>/session/records.jsonl",
+      "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/followup1_focus.json",
+      "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json"
+    ],
+    "outputs": [
+      "<run>/focus_analysis.json",
+      "<run>/audit.json (ecbench verify receipt)"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "pooled yield per curve (curve 80, 15 comparators, 8 iso models) with the binomial 95 percent bars and the 1.05 floor"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "reading any result as a statement about ECCp-131, security or speed",
+    "pooling the P2 cell data into this test, or changing T, N, A, comparators, seeds, the 1.05 floor, alpha or the decision rule after a look",
+    "treating a not-replicated verdict as proof of no effect below 5 percent",
+    "treating a presentation or curve verdict as a mechanism claim",
+    "dropping or filling a cell that did not run"
+  ],
+  "literature": [
+    {
+      "ref": "research/isogeny_class_difficulty_20261008",
+      "provenance": "internal",
+      "claim": "within an isogeny class only transport cost, automorphisms and model presentation can differ",
+      "verified_by": "repository review 2026-11-02"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "f382ee669cf010abf871f18ccc8d8378b01fdfa24f099f78da5bf5912fd1313a",
+    "commit": "d49ad72d6042668c0b23e165e9f4e96cde89d999",
+    "frozen_at": "2026-11-02T09:42:29Z",
+    "filed_before_affected_data": true
+  }
+}

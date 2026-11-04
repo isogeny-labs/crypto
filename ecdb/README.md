@@ -80,6 +80,7 @@ record it refused, with the reason.
 
 | Method and path | Purpose |
 |:--|:--|
+| `GET /viewer` | a browser viewer: catalogue counts, curve search, the curve document and its isogeny graph; paste the read token (kept in that tab only). Browsers opening `/` are redirected here |
 | `GET /v1/meta` | counts, schema version, pinned input files (path, SHA-256, commit) |
 | `GET /v1/schema` | every table and view with column types, comments, foreign keys and CHECKs; enums; functions |
 | `GET /v1/curves` | filter and sort over `ec.v_curve_summary`, by field, genus, model, family, trace, j, CM discriminant, class number, End, subgroup size, cofactor, embedding degree, twist security, anomalous / supersingular, name and more |

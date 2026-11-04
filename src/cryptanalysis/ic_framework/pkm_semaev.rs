@@ -44,6 +44,7 @@
 //! forms) is done once in `prepare` and reported as setup native work.
 
 use std::collections::{BTreeMap, HashSet};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use super::fiber::{cofactor_fiber, CofactorFiber};
@@ -52,7 +53,7 @@ use super::stages::{
     DecompositionOracle, InstanceCtx, Params, SolverCost, SolverTotals, SystemShape,
 };
 use crate::cryptanalysis::f4_fp_tower::{
-    f4_tower, Fp, RPoly, SquareRule, TowerF4Options, TowerRing,
+    f4_tower, F4Trace, Fp, RPoly, SquareRule, TowerF4Options, TowerRing,
 };
 use crate::cryptanalysis::ic_boundary::{
     lift_abscissae, CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimePoint,
@@ -176,6 +177,392 @@ fn s4(x1: &Pol, x2: &Pol, x3: &Pol, x4: &Pol, a: u64, b: u64, p: u64) -> Pol {
     ag.mul(&ag, p).sub(&ab.mul(&bg, p), p)
 }
 
+/// The three coefficients of `S₃(x₁, x₂, U)` in `U` with `x_i = N_i/D_i`,
+/// multiplied by `D₁²D₂²` so that they are polynomials:
+/// `(N₁D₂ − N₂D₁)²`, `−2((N₁D₂ + N₂D₁)(N₁N₂ + aD₁D₂) + 2b(D₁D₂)²)` and
+/// `(N₁N₂ − aD₁D₂)² − 4b(N₁D₂ + N₂D₁)D₁D₂`.  With `D = 1` these are the
+/// coefficients of [`s3_in_u`].
+fn s3_in_u_frac(
+    (n1, d1): (&Pol, &Pol),
+    (n2, d2): (&Pol, &Pol),
+    a: u64,
+    b: u64,
+    p: u64,
+) -> [Pol; 3] {
+    let dd = d1.mul(d2, p);
+    let (n1d2, n2d1) = (n1.mul(d2, p), n2.mul(d1, p));
+    let cd = n1d2.sub(&n2d1, p);
+    let cs = n1d2.add(&n2d1, p);
+    let nn = n1.mul(n2, p);
+    let al = cd.mul(&cd, p);
+    let inner = cs
+        .mul(&nn.add(&dd.scale(a, p), p), p)
+        .add(&dd.mul(&dd, p).scale(mulm(2, b, p), p), p);
+    let be = inner.scale(p - 2, p);
+    let q = nn.sub(&dd.scale(a, p), p);
+    let ga = q.mul(&q, p).sub(&cs.mul(&dd, p).scale(mulm(4, b, p), p), p);
+    [al, be, ga]
+}
+
+/// `Res_U` of two quadratics given by their coefficient triples (the
+/// combination used by [`s4`]).
+fn resultant_of_triples(t1: &[Pol; 3], t2: &[Pol; 3], p: u64) -> Pol {
+    let [al, be, ga] = t1;
+    let [al2, be2, ga2] = t2;
+    let ag = al.mul(ga2, p).sub(&al2.mul(ga, p), p);
+    let ab = al.mul(be2, p).sub(&al2.mul(be, p), p);
+    let bg = be.mul(ga2, p).sub(&be2.mul(ga, p), p);
+    ag.mul(&ag, p).sub(&ab.mul(&bg, p), p)
+}
+
+fn poly_trim(v: &mut Vec<u64>) {
+    while v.last() == Some(&0) {
+        v.pop();
+    }
+}
+
+/// `a mod b` over `F_p` (`b` non-zero, trimmed).
+fn poly_rem(mut a: Vec<u64>, b: &[u64], p: u64) -> Vec<u64> {
+    poly_trim(&mut a);
+    let lead_inv = crate::cryptanalysis::residual_walk::pow_mod(*b.last().unwrap(), p - 2, p);
+    while a.len() >= b.len() {
+        let q = mulm(*a.last().unwrap(), lead_inv, p);
+        let shift = a.len() - b.len();
+        for (i, &c) in b.iter().enumerate() {
+            a[shift + i] = subm(a[shift + i], mulm(q, c, p), p);
+        }
+        poly_trim(&mut a);
+    }
+    a
+}
+
+/// The Montgomery shift `A/3` of a curve `y² = x³ + ax + b` that came from
+/// `y² = x³ + A x² + x`: the abscissa of the 2-torsion point `T₀ = (0, 0)`,
+/// which is the unique root of `x³ + ax + b` in `F_p` when the 2-part of the
+/// group is cyclic.  Exact: `gcd(x³ + ax + b, x^p − x)` by repeated squaring
+/// modulo the cubic; an error unless it has degree one (no root, or three).
+pub fn edwards_shift(curve: &PrimeCurve) -> Result<u64, String> {
+    let p = curve.p;
+    let f = vec![curve.b % p, curve.a % p, 0, 1];
+    let mulmod = |u: &[u64], v: &[u64]| -> Vec<u64> {
+        let mut r = vec![0u64; u.len() + v.len()];
+        for (i, &x) in u.iter().enumerate() {
+            for (j, &y) in v.iter().enumerate() {
+                r[i + j] = addm(r[i + j], mulm(x, y, p), p);
+            }
+        }
+        poly_rem(r, &f, p)
+    };
+    let (mut base, mut acc, mut e) = (vec![0u64, 1], vec![1u64], p);
+    while e > 0 {
+        if e & 1 == 1 {
+            acc = mulmod(&acc, &base);
+        }
+        base = mulmod(&base, &base);
+        e >>= 1;
+    }
+    // h = x^p − x
+    acc.resize(acc.len().max(2), 0);
+    acc[1] = subm(acc[1], 1, p);
+    poly_trim(&mut acc);
+    let (mut g, mut h) = (f, acc);
+    while !h.is_empty() {
+        let r = poly_rem(g, &h, p);
+        g = h;
+        h = r;
+    }
+    if g.len() != 2 {
+        return Err(format!(
+            "pkm-semaev: x³ + ax + b has {} rational roots, not one; pass edwards_shift=A/3",
+            if g.len() == 4 { "three" } else { "no" }
+        ));
+    }
+    let inv = crate::cryptanalysis::residual_walk::pow_mod(g[1], p - 2, p);
+    Ok(mulm(subm(0, g[0], p), inv, p))
+}
+
+/// Weierstrass abscissae `x_W = (1 + y)/(1 − y) + shift` of `y ∈ [0, 2^t) ∖ {1}`
+/// (`y = 1` is `u = ∞`), in the order of `y`.
+pub fn edwards_abscissae(p: u64, t: u32, shift: u64) -> Vec<u64> {
+    (0..(1u64 << t))
+        .filter(|&y| y != 1)
+        .map(|y| {
+            let inv = crate::cryptanalysis::residual_walk::pow_mod(subm(1, y % p, p), p - 2, p);
+            addm(mulm(addm(1, y, p), inv, p), shift, p)
+        })
+        .collect()
+}
+
+/// The harness-side base of an Edwards interval: every point of the curve
+/// whose Edwards `y` lies in `[0, 2^t) ∖ {1}`, laid out like
+/// `prime_factor_base` (one column per abscissa, `P` and `−P` adjacent).
+pub fn edwards_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    t: u32,
+    shift: u64,
+) -> FactorBase<PrimePoint> {
+    let curve = &inst.curve;
+    let mut xs = edwards_abscissae(curve.p, t, shift);
+    xs.sort_unstable();
+    xs.dedup();
+    let mut fb = FactorBase::empty(format!("Edwards y in [0, 2^{t}), shift {shift}"));
+    for x in xs {
+        let rhs = curve.rhs(x);
+        let Some(y) = curve.sqrt(rhs) else { continue };
+        let y = if y == 0 { 0 } else { y.min(curve.p - y) };
+        let pt = PrimePoint::affine(x, y);
+        let q = curve.neg(pt);
+        let col = fb.abscissae;
+        let i = fb.points.len();
+        fb.points.push(pt);
+        fb.col_of.push(col);
+        fb.coef_of.push(1);
+        if q != pt {
+            fb.points.push(q);
+            fb.col_of.push(col);
+            fb.coef_of.push(inst.r - 1);
+            fb.neg_index.push(i + 1);
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i, i + 1]);
+        } else {
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i]);
+        }
+        fb.abscissae += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, pt) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(pt), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb
+}
+
+// ── The T₀-invariant form (`t0-bits`) ────────────────────────────────
+
+/// The quotient of a curve with a rational 2-torsion point `T₀ = (s, 0)` by
+/// `⟨T₀⟩`, seen from the T₀-invariant coordinate.
+///
+/// With `z = x − s` the curve is `y² = z(z² + 3s·z + d)`, `d = 3s² + a`, and
+/// translation by `T₀` is `z ↦ d/z`.  The invariant is `w = z + d/z`.  The
+/// 2-isogeny `φ : E → E/⟨T₀⟩` has x-map `y²/z² = w + 3s` on
+/// `Y² = X(X² − 6s·X + 9s² − 4d)`, i.e. in short Weierstrass form
+/// `y² = x³ + a₂x + b₂` with `x = w + s`, `a₂ = −3s² − 4d`,
+/// `b₂ = 2s³ − 8sd`.  Hence `S₃^{E'}(w₁ + s, w₂ + s, w₃ + s)` — the
+/// ordinary Semaev polynomial of the quotient — is the T₀-symmetrisation of
+/// `S₃`: it equals `S₃(z₁, z₂, z₃)·S₃(d/z₁, z₂, z₃)` up to the monomial
+/// factor derived in `STRUCTURE.md` (unit-tested), and it vanishes on
+/// `(w₁, w₂, w₃)` exactly when `±P₁ ± P₂ ± P₃ ∈ {O, T₀}` for points over
+/// those `w`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct T0Quotient {
+    pub p: u64,
+    /// `x_W(T₀)`.
+    pub s: u64,
+    /// `d = 3s² + a`: translation by `T₀` is `z ↦ d/z`.
+    pub d: u64,
+    /// The quotient curve's short Weierstrass coefficients.
+    pub a2: u64,
+    pub b2: u64,
+}
+
+impl T0Quotient {
+    /// The quotient for `T₀ = (s, 0)` on `y² = x³ + ax + b` (`s` a root of
+    /// the cubic; not checked here, `prepare` and the tests check it).
+    pub fn new(curve: &PrimeCurve, s: u64) -> Self {
+        let p = curve.p;
+        let s = s % p;
+        let s2 = mulm(s, s, p);
+        let d = addm(mulm(3, s2, p), curve.a % p, p);
+        let a2 = subm(0, addm(mulm(3, s2, p), mulm(4, d, p), p), p);
+        let b2 = subm(mulm(2, mulm(s2, s, p), p), mulm(8, mulm(s, d, p), p), p);
+        T0Quotient { p, s, d, a2, b2 }
+    }
+
+    /// `w = z + d/z` of the point with Weierstrass abscissa `x`; `None` for
+    /// `x = s` (`T₀` itself).
+    pub fn w_of(&self, x: u64) -> Option<u64> {
+        let p = self.p;
+        let z = subm(x % p, self.s, p);
+        if z == 0 {
+            return None;
+        }
+        let inv = crate::cryptanalysis::residual_walk::pow_mod(z, p - 2, p);
+        Some(addm(z, mulm(self.d, inv, p), p))
+    }
+
+    /// The Weierstrass abscissae `x = z + s` over `w`: the roots `z` of
+    /// `z² − w z + d` (none, one or two).
+    pub fn abscissae_of(&self, curve: &PrimeCurve, w: u64) -> Vec<u64> {
+        let p = self.p;
+        let disc = subm(mulm(w, w, p), mulm(4, self.d, p), p);
+        let Some(sq) = curve.sqrt(disc) else {
+            return Vec::new();
+        };
+        let i2 = crate::cryptanalysis::residual_walk::pow_mod(2, p - 2, p);
+        let mut out = vec![addm(mulm(addm(w, sq, p), i2, p), self.s, p)];
+        if sq != 0 {
+            out.push(addm(mulm(subm(w, sq, p), i2, p), self.s, p));
+        }
+        out
+    }
+
+    /// `S₃` of the quotient at `(w₁, w₂, w₃)`: the symmetrised polynomial.
+    pub fn sym_s3(&self, w1: u64, w2: u64, w3: u64) -> u64 {
+        let p = self.p;
+        let c = |w: u64| Pol::constant(1, addm(w, self.s, p), p);
+        let v = s3(&c(w1), &c(w2), &c(w3), self.a2, self.b2, p);
+        v.terms.values().next().copied().unwrap_or(0)
+    }
+}
+
+/// `F_p` multiplications of one inversion by Fermat's exponent `p − 2`
+/// (squarings plus multiplications), the count the native ledger uses.
+pub fn t0_inversion_mults(p: u64) -> u64 {
+    let e = p - 2;
+    u64::from(63 - e.leading_zeros()) + u64::from(e.count_ones()) - 1
+}
+
+/// The abscissae of the T₀-closed base over the `w`-interval
+/// `[lo, lo + 2^t)`: both roots `z` of `z² − wz + d`, sorted, deduplicated.
+pub fn t0_abscissae(curve: &PrimeCurve, q: &T0Quotient, t: u32, lo: u64) -> Vec<u64> {
+    let p = curve.p;
+    let mut xs: Vec<u64> = (0..(1u64 << t))
+        .flat_map(|k| q.abscissae_of(curve, (lo + k) % p))
+        .collect();
+    xs.sort_unstable();
+    xs.dedup();
+    xs
+}
+
+/// The harness-side base of a `w`-interval: every point of the curve whose
+/// invariant `w = z + d/z` lies in `[lo, lo + 2^t)`.  It is closed under
+/// `T₀` and `−`: up to four points per `w` (`±P`, `±(P + T₀)`).  Laid out
+/// like `edwards_factor_base`.
+/// The `bits:lo=LO` base: every point whose short-Weierstrass abscissa is in
+/// the frame `[lo, lo + 2^t)` (mod p), one column per abscissa, both signs.
+/// `lo` is a translation frame on the x-line; every degree-2 coordinate is a
+/// Möbius frame of x (`coordinate_search.rs`), and the Semaev system has the
+/// same degree and size in every translation frame, so the frame only
+/// changes which points (and which cofactor cosets) the base holds.
+pub fn bits_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    t: u32,
+    lo: u64,
+) -> FactorBase<PrimePoint> {
+    let p = inst.curve.p;
+    let xs: Vec<u64> = (0..(1u64 << t)).map(|k| (lo % p + k) % p).collect();
+    abscissa_factor_base(inst, xs, format!("x in [{lo}, {lo} + 2^{t})"))
+}
+
+/// `x = w² + s` for `w ∈ [lo, lo + 2^t)` (the `square-bits` grid).
+pub fn square_abscissae(p: u64, t: u32, lo: u64, s: u64) -> Vec<u64> {
+    (0..(1u64 << t))
+        .map(|k| {
+            let w = (lo % p + k) % p;
+            addm(mulm(w, w, p), s % p, p)
+        })
+        .collect()
+}
+
+/// The 2-descent base: every point with `x = w² + A/3`, `w ∈ [lo, lo + 2^t)`.
+pub fn square_bits_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    t: u32,
+    lo: u64,
+    shift: u64,
+) -> FactorBase<PrimePoint> {
+    let xs = square_abscissae(inst.curve.p, t, lo, shift);
+    abscissa_factor_base(inst, xs, format!("x = w² + A/3, w in [{lo}, {lo} + 2^{t})"))
+}
+
+/// One column per abscissa in `xs` that carries a point, both signs.
+fn abscissa_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    mut xs: Vec<u64>,
+    label: String,
+) -> FactorBase<PrimePoint> {
+    let curve = &inst.curve;
+    let p = curve.p;
+    xs.sort_unstable();
+    xs.dedup();
+    let mut fb = FactorBase::empty(label);
+    for x in xs {
+        let rhs = curve.rhs(x);
+        let Some(y) = curve.sqrt(rhs) else { continue };
+        let y = if y == 0 { 0 } else { y.min(p - y) };
+        let pt = PrimePoint::affine(x, y);
+        let qn = curve.neg(pt);
+        let col = fb.abscissae;
+        let i = fb.points.len();
+        fb.points.push(pt);
+        fb.col_of.push(col);
+        fb.coef_of.push(1);
+        if qn != pt {
+            fb.points.push(qn);
+            fb.col_of.push(col);
+            fb.coef_of.push(inst.r - 1);
+            fb.neg_index.push(i + 1);
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i, i + 1]);
+        } else {
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i]);
+        }
+        fb.abscissae += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, pt) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(pt), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb
+}
+
+pub fn t0_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    q: &T0Quotient,
+    t: u32,
+    lo: u64,
+) -> FactorBase<PrimePoint> {
+    let curve = &inst.curve;
+    let xs = t0_abscissae(curve, q, t, lo);
+    let mut fb = FactorBase::empty(format!("T0-invariant w in [{lo}, {lo} + 2^{t})"));
+    for x in xs {
+        let rhs = curve.rhs(x);
+        let Some(y) = curve.sqrt(rhs) else { continue };
+        let y = if y == 0 { 0 } else { y.min(curve.p - y) };
+        let pt = PrimePoint::affine(x, y);
+        let qn = curve.neg(pt);
+        let col = fb.abscissae;
+        let i = fb.points.len();
+        fb.points.push(pt);
+        fb.col_of.push(col);
+        fb.coef_of.push(1);
+        if qn != pt {
+            fb.points.push(qn);
+            fb.col_of.push(col);
+            fb.coef_of.push(inst.r - 1);
+            fb.neg_index.push(i + 1);
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i, i + 1]);
+        } else {
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i]);
+        }
+        fb.abscissae += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, pt) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(pt), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb
+}
+
 // ── The oracle ───────────────────────────────────────────────────────
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -223,6 +610,31 @@ pub enum Membership {
     /// Interval by bits: `x = lo + Σ_j 2^j·b_j`, `b_j² = b_j` (each bit a
     /// top-level tower variable): `V = [lo, lo + 2^t)`.  No condition on `p`.
     Bits { lo: u64 },
+    /// Interval in Ed25519's Edwards coordinate: `y = Σ_j 2^j b_j`,
+    /// `b_j² = b_j`, `y ∈ [0, 2^t) ∖ {1}`, and `x_W = (1 + y)/(1 − y) + s`
+    /// (`s = A/3`, the abscissa of `T₀`; `None` until `prepare` derives it
+    /// with [`edwards_shift`] or reads `edwards_shift=`).  The summands'
+    /// denominators `(1 − y_i)²` are cleared from each `S₃`; `x_R` stays a
+    /// variable.  `y = 1` is not in `V`, but the cleared system admits it
+    /// when `x_R` is itself in `V` (then `S₃ = N²(x₂ − x_R)²` vanishes at
+    /// `D₁ = 0, x₂ = x_R`).
+    EdwardsBits { shift: Option<u64> },
+    /// The T₀-invariant coordinate `w = z + d/z` (`z = x_W − s`, `s = x_W(T₀)`)
+    /// written in bits over `[lo, lo + 2^t)`: `w = lo + Σ 2^j b_j`,
+    /// `b_j² = b_j`.  The equation is the Semaev polynomial of the quotient
+    /// `E/⟨T₀⟩` at `(w_i + s)` ([`T0Quotient`]), i.e. the T₀-symmetrisation
+    /// of `S₃`; `x_R` is replaced by the target's `w_R`.  `q` is derived in
+    /// `prepare`.  A solution `(w_1, …, w_m)` is lifted back to points over
+    /// each `w_i` (the two roots `z`, `d/z`) and re-added.
+    T0Bits { lo: u64, q: Option<T0Quotient> },
+    /// 2-descent-filtered interval: `u = w²`, `w = lo + Σ_j 2^j b_j`,
+    /// `b_j² = b_j`, `x_W = u + s` (`s = x_W(T₀) = A/3`, `None` until
+    /// `prepare`).  On a Montgomery curve whose only rational 2-torsion
+    /// point is `T₀ = (0,0)`, `u(P)` is a square exactly when
+    /// `P ∈ 2E(F_p)`, so every base point lies in an even cofactor coset
+    /// (research/curve25519_torsion_leads_20261103).  Each `x_i` has degree
+    /// 2 in its `w_i`, so `S₃` has degree 4 per summand in the bits.
+    SquareBits { lo: u64, shift: Option<u64> },
 }
 
 /// The oracle.  Built by the harness with the base's `t` and `g`, which it
@@ -246,11 +658,22 @@ pub struct PkmSemaevOracle {
     /// tower levels) of the first summand are enumerated, one F4 system per
     /// assignment.
     guess: u32,
+    /// F4 trace (`trace=1`): learn one refutation trace per branch system at
+    /// `prepare`, replay it per target, fall back to plain F4 when it fails.
+    trace: bool,
+    /// One learned trace per branch system (one entry without guessing).
+    traces: Vec<Option<Arc<F4Trace>>>,
+    /// Learning cost and shape counters, reported as setup native work.
+    trace_setup: BTreeMap<String, u64>,
     /// Cofactor-fiber lifts (`lifts=1`): the rational `h`-torsion `E(F_q)[h]`,
     /// computed once in `prepare`; `decompose` tries the targets `R + K`.
     lifts: bool,
     fiber: Option<CofactorFiber<PrimePoint>>,
     in_lift: bool,
+    /// `t0-bits`: `w ↦` the base abscissae over it (target-independent,
+    /// built in `prepare`), and the native work of the form.
+    t0_map: std::collections::HashMap<u64, Vec<u64>>,
+    t0_setup: BTreeMap<String, u64>,
     branches: Vec<Prepared>,
     prepared: Option<Prepared>,
     totals: SolverTotals,
@@ -278,9 +701,14 @@ impl PkmSemaevOracle {
             budget: None,
             crosscheck: false,
             guess: 0,
+            trace: false,
+            traces: Vec::new(),
+            trace_setup: BTreeMap::new(),
             lifts: false,
             fiber: None,
             in_lift: false,
+            t0_map: std::collections::HashMap::new(),
+            t0_setup: BTreeMap::new(),
             branches: Vec::new(),
             prepared: None,
             totals: SolverTotals {
@@ -308,6 +736,20 @@ impl PkmSemaevOracle {
     pub fn new_bits(m: u32, t: u32, lo: u64) -> Self {
         let mut o = Self::new(m, t, 1);
         o.membership = Membership::Bits { lo };
+        o
+    }
+
+    /// `m` summands with `x = (lo + Σ 2^j b_j)² + A/3` (the 2-descent base).
+    pub fn new_square_bits(m: u32, t: u32, lo: u64) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::SquareBits { lo, shift: None };
+        o
+    }
+
+    /// `m` summands with the T₀-invariant `w ∈ [lo, lo + 2^t)` written in bits.
+    pub fn new_t0_bits(m: u32, t: u32, lo: u64) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::T0Bits { lo, q: None };
         o
     }
 
@@ -347,16 +789,38 @@ impl PkmSemaevOracle {
                 spec.oracle_params.u64("bits")? as u32,
                 spec.oracle_params.u64_or("lo", 0)?,
             ),
+            _ if spec.oracle_params.get("t0_bits").is_some() => Self::new_t0_bits(
+                m,
+                spec.oracle_params.u64("t0_bits")? as u32,
+                spec.oracle_params.u64_or("lo", 0)?,
+            ),
+            _ if spec.oracle_params.get("square_bits").is_some() => Self::new_square_bits(
+                m,
+                spec.oracle_params.u64("square_bits")? as u32,
+                spec.oracle_params.u64_or("lo", 0)?,
+            ),
+            _ if spec.oracle_params.get("edwards_bits").is_some() => {
+                Self::new_edwards_bits(m, spec.oracle_params.u64("edwards_bits")? as u32)
+            }
             other => {
                 return Err(format!(
                     "oracle `pkm-semaev` solves on prime-kummer or prime-isogeny, or on any base \
-                     with `bits=T` (an interval [lo, lo + 2^T) written in bits), not `{other}`"
+                     with `bits=T` (an interval [lo, lo + 2^T) written in bits) or \
+                     `edwards_bits=T` (Edwards y in [0, 2^T)), not `{other}`"
                 ))
             }
         };
         let budget = (spec.solver_budget_seconds > 0)
             .then(|| Duration::from_secs(spec.solver_budget_seconds));
         Ok(oracle.with_budget(budget))
+    }
+
+    /// `m` summands with Edwards `y ∈ [0, 2^t)` written in bits; the shift
+    /// `A/3` is derived from the curve in `prepare` unless `edwards_shift=`.
+    pub fn new_edwards_bits(m: u32, t: u32) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::EdwardsBits { shift: None };
+        o
     }
 
     /// A wall-clock budget per F4 call (the harness's
@@ -440,6 +904,14 @@ impl PkmSemaevOracle {
             .transpose()?;
         self.crosscheck = params.flag("crosscheck");
         self.guess = params.u64_or("guess", 0)? as u32;
+        self.trace = match params.u64_or("trace", 0)? {
+            0 => false,
+            1 => true,
+            o => return Err(format!("pkm-semaev: trace is 0 or 1, not {o}")),
+        };
+        if self.trace && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some()) {
+            return Err("pkm-semaev: trace=1 needs engine=f4 and no staircase stop".into());
+        }
         self.lifts = match params.u64_or("lifts", 0)? {
             0 => false,
             1 => true,
@@ -491,7 +963,103 @@ impl PkmSemaevOracle {
             .map(|a| self.build_system_fixed(curve, Some(a)))
             .collect();
         self.prepared = Some(prep);
+        self.traces.clear();
+        self.trace_setup.clear();
+        if self.trace {
+            self.learn_traces();
+        }
         Ok(())
+    }
+
+    /// The F4 options of a run (the budget clock starts here).
+    fn f4_options(&self) -> TowerF4Options {
+        let mut opts = TowerF4Options::new(self.max_degree);
+        if let Some(b) = self.budget {
+            opts = opts.with_budget(b);
+        }
+        if let Some(n) = self.max_nnz {
+            opts = opts.with_max_nnz(n);
+        }
+        if let Some(s) = self.stop_staircase {
+            opts = opts.stopping_below(s);
+        }
+        opts
+    }
+
+    /// Learn one refutation trace per branch system (one system without
+    /// guessing): plain F4 with recording on `x_R` values drawn from a fixed
+    /// stream, until one refutes (at most 8 tries). Every try's
+    /// multiply-adds are charged to the learning ledger, once per system
+    /// shape; a branch with no refuting try gets no trace and runs plain.
+    fn learn_traces(&mut self) {
+        let n = self.branches.len().max(1);
+        let p = self.prepared.as_ref().expect("prepared").ring.p;
+        let (mut learn, mut runs, mut learned, mut kept, mut spec, mut selfok) =
+            (0u64, 0u64, 0u64, 0u64, 0u64, 0u64);
+        for br in 0..n {
+            let branch = (!self.branches.is_empty()).then_some(br);
+            let mut found = None;
+            for attempt in 0..8u64 {
+                // splitmix64 of a fixed counter: the learning x_R do not
+                // depend on the targets.
+                let mut z = (br as u64 * 16 + attempt + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+                z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+                z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+                let x_r = (z ^ (z >> 31)) % p;
+                let before = self.native.get("pkm_system_fp_mults_uncharged").copied();
+                let sys = self.specialise_branch(branch, x_r);
+                let after = self.native.get("pkm_system_fp_mults_uncharged").copied();
+                spec += after.unwrap_or(0) - before.unwrap_or(0);
+                // Not a per-target cost: take it back off the target ledger.
+                match before {
+                    Some(b) => {
+                        self.native
+                            .insert("pkm_system_fp_mults_uncharged".into(), b);
+                    }
+                    None => {
+                        self.native.remove("pkm_system_fp_mults_uncharged");
+                    }
+                }
+                let ring = match branch {
+                    Some(b) => self.branches[b].ring.clone(),
+                    None => self.prepared.as_ref().expect("prepared").ring.clone(),
+                };
+                let mut opts = self.f4_options();
+                opts.record_trace = true;
+                let rep = f4_tower(&sys, &ring, &opts);
+                learn += rep.muladds;
+                runs += 1;
+                if let (true, Some(tr)) = (rep.inconsistent, rep.learned) {
+                    kept += tr.kept_rows() as u64;
+                    // Diagnostic, not charged: the trace replayed on its own x_R.
+                    let mut ropts = self.f4_options();
+                    ropts.replay = Some(Arc::new(tr.clone()));
+                    let again = f4_tower(&sys, &ring, &ropts);
+                    selfok += u64::from(again.inconsistent);
+                    if let Some(m) = again.replay_mismatch {
+                        self.trace_setup.insert(
+                            format!("pkm_trace_self_mismatch_step{}_got{}_want{}", m.0, m.1, m.2),
+                            1,
+                        );
+                    }
+                    found = Some(Arc::new(tr));
+                    learned += 1;
+                    break;
+                }
+            }
+            self.traces.push(found);
+        }
+        for (k, v) in [
+            ("pkm_trace_branches", n as u64),
+            ("pkm_trace_branches_learned", learned),
+            ("pkm_trace_learn_runs", runs),
+            ("pkm_trace_learn_muladds", learn),
+            ("pkm_trace_kept_rows", kept),
+            ("pkm_trace_selfcheck_refuted", selfok),
+            ("pkm_trace_learn_spec_fp_mults_uncharged", spec),
+        ] {
+            self.trace_setup.insert(k.into(), v);
+        }
     }
 
     /// Isogeny-form guessing: apply the first `t − G` Vélu maps to every
@@ -520,6 +1088,15 @@ impl PkmSemaevOracle {
         groups.into_iter().collect()
     }
 
+    /// The `(a, b)` of the Weierstrass curve whose `S₃` the system uses: the
+    /// curve's own, or the quotient `E/⟨T₀⟩` for the `t0-bits` form.
+    fn s3_coefficients(&self, curve: &PrimeCurve) -> (u64, u64) {
+        match &self.membership {
+            Membership::T0Bits { q: Some(q), .. } => (q.a2, q.b2),
+            _ => (curve.a % curve.p, curve.b % curve.p),
+        }
+    }
+
     fn build_system(&self, curve: &PrimeCurve) -> Prepared {
         self.build_system_fixed(curve, None)
     }
@@ -528,7 +1105,7 @@ impl PkmSemaevOracle {
     /// `fixed` when it is given (bits form; hybrid guessing).
     fn build_system_fixed(&self, curve: &PrimeCurve, fixed: Option<u64>) -> Prepared {
         let p = curve.p;
-        let (a, b) = (curve.a % p, curve.b % p);
+        let (a, b) = self.s3_coefficients(curve);
         let (m, t) = (self.m as usize, self.t as usize);
         let n_t = m * t;
         // Isogeny guessing: the group (sub-tower) summand 1 is restricted to.
@@ -548,7 +1125,18 @@ impl PkmSemaevOracle {
         let x = |i: usize| match &self.membership {
             Membership::Kummer => Pol::var(n, i * t).scale(self.g, p),
             Membership::Isogeny { .. } => Pol::var(n, i * t),
-            Membership::Bits { lo } => {
+            Membership::Bits { .. }
+            | Membership::EdwardsBits { .. }
+            | Membership::T0Bits { .. }
+            | Membership::SquareBits { .. } => {
+                let lo = &match &self.membership {
+                    Membership::Bits { lo } | Membership::SquareBits { lo, .. } => *lo,
+                    // w = lo + Σ 2^j b_j, entered at x = w + s of the quotient
+                    Membership::T0Bits { lo, q } => {
+                        (lo + q.expect("t0 quotient resolved in prepare").s) % p
+                    }
+                    _ => 0,
+                };
                 let g = self.guess as usize;
                 let (base, free_bits) = match fixed {
                     Some(a) if i == 0 => ((lo + (a << (t - g))) % p, t - g),
@@ -558,22 +1146,72 @@ impl PkmSemaevOracle {
                 for j in 0..free_bits {
                     acc = acc.add(&Pol::var(n, i * t + j).scale((1u64 << j) % p, p), p);
                 }
+                if let Membership::SquareBits { shift, .. } = &self.membership {
+                    // x = w² + s, s = x_W(T₀)
+                    let s = shift.expect("square-bits shift resolved in prepare") % p;
+                    acc = acc.mul(&acc, p).add(&Pol::constant(n, s, p), p);
+                }
                 acc
             }
         };
         let xr = Pol::var(n, xr_var);
-        let raw: Vec<Pol> = match (self.mode, m) {
-            (PkmMode::Full, 2) => vec![s3(&x(0), &x(1), &xr, a, b, p)],
-            (PkmMode::Full, 3) => vec![s4(&x(0), &x(1), &x(2), &xr, a, b, p)],
-            (PkmMode::Full, _) => unreachable!("checked in read_params"),
-            (PkmMode::Chain, _) => {
-                let u = |k: usize| Pol::var(n, n_t + k);
-                let mut eqs = vec![s3(&x(0), &x(1), &u(0), a, b, p)];
-                for k in 1..m - 2 {
-                    eqs.push(s3(&u(k - 1), &x(k + 1), &u(k), a, b, p));
+        let raw: Vec<Pol> = if let Membership::EdwardsBits { shift } = &self.membership {
+            // x_i = N_i/D_i with N_i = (1 + s) + (1 − s)·y_i, D_i = 1 − y_i.
+            let s = shift.expect("edwards shift resolved in prepare") % p;
+            let (c1, c2) = (addm(1, s, p), subm(1, s, p));
+            let one = Pol::constant(n, 1, p);
+            let fr: Vec<(Pol, Pol)> = (0..m)
+                .map(|i| {
+                    let y = x(i);
+                    (
+                        Pol::constant(n, c1, p).add(&y.scale(c2, p), p),
+                        one.sub(&y, p),
+                    )
+                })
+                .collect();
+            let tri =
+                |u: &(Pol, Pol), v: &(Pol, Pol)| s3_in_u_frac((&u.0, &u.1), (&v.0, &v.1), a, b, p);
+            let quad = |tr: [Pol; 3], x3: &Pol| {
+                tr[0]
+                    .mul(x3, p)
+                    .mul(x3, p)
+                    .add(&tr[1].mul(x3, p), p)
+                    .add(&tr[2], p)
+            };
+            let plain = |v: Pol| (v, one.clone());
+            let xr_f = plain(xr.clone());
+            match (self.mode, m) {
+                (PkmMode::Full, 2) => vec![quad(tri(&fr[0], &fr[1]), &xr)],
+                (PkmMode::Full, 3) => vec![resultant_of_triples(
+                    &tri(&fr[0], &fr[1]),
+                    &tri(&fr[2], &xr_f),
+                    p,
+                )],
+                (PkmMode::Full, _) => unreachable!("checked in read_params"),
+                (PkmMode::Chain, _) => {
+                    let u = |k: usize| Pol::var(n, n_t + k);
+                    let mut eqs = vec![quad(tri(&fr[0], &fr[1]), &u(0))];
+                    for k in 1..m - 2 {
+                        eqs.push(quad(tri(&plain(u(k - 1)), &fr[k + 1]), &u(k)));
+                    }
+                    eqs.push(quad(tri(&plain(u(m - 3)), &fr[m - 1]), &xr));
+                    eqs
                 }
-                eqs.push(s3(&u(m - 3), &x(m - 1), &xr, a, b, p));
-                eqs
+            }
+        } else {
+            match (self.mode, m) {
+                (PkmMode::Full, 2) => vec![s3(&x(0), &x(1), &xr, a, b, p)],
+                (PkmMode::Full, 3) => vec![s4(&x(0), &x(1), &x(2), &xr, a, b, p)],
+                (PkmMode::Full, _) => unreachable!("checked in read_params"),
+                (PkmMode::Chain, _) => {
+                    let u = |k: usize| Pol::var(n, n_t + k);
+                    let mut eqs = vec![s3(&x(0), &x(1), &u(0), a, b, p)];
+                    for k in 1..m - 2 {
+                        eqs.push(s3(&u(k - 1), &x(k + 1), &u(k), a, b, p));
+                    }
+                    eqs.push(s3(&u(m - 3), &x(m - 1), &xr, a, b, p));
+                    eqs
+                }
             }
         };
         let mut rules = Vec::with_capacity(n_t);
@@ -607,7 +1245,11 @@ impl PkmSemaevOracle {
                     });
                     continue;
                 }
-                if let Membership::Bits { .. } = &self.membership {
+                if let Membership::Bits { .. }
+                | Membership::EdwardsBits { .. }
+                | Membership::T0Bits { .. }
+                | Membership::SquareBits { .. } = &self.membership
+                {
                     rules.push(SquareRule {
                         next: None,
                         a: 0,
@@ -681,6 +1323,16 @@ impl PkmSemaevOracle {
                 None => v.clone(),
             },
             Membership::Bits { lo } => (0..(1u64 << t)).map(|k| (lo + k) % p).collect(),
+            Membership::SquareBits { lo, shift } => {
+                square_abscissae(p, self.t, *lo, shift.expect("resolved in prepare"))
+            }
+            Membership::EdwardsBits { shift } => {
+                edwards_abscissae(p, self.t, shift.expect("resolved in prepare") % p)
+            }
+            Membership::T0Bits { lo, q } => {
+                let s = q.expect("t0 quotient resolved in prepare").s;
+                (0..(1u64 << t)).map(|k| (lo + k + s) % p).collect()
+            }
         };
         Prepared {
             ring,
@@ -726,14 +1378,62 @@ impl PkmSemaevOracle {
             out.push(RPoly::from_terms(fp, terms));
         }
         self.bump("pkm_system_fp_mults_uncharged", mults);
+        let terms = out.iter().map(|q| q.len() as u64).sum::<u64>();
+        self.bump("pkm_system_terms", terms);
+        self.bump("pkm_system_specialisations", 1);
         out
+    }
+
+    /// Lift a solution of the symmetrised system back to base points.  Each
+    /// `w_i` (given as `w_i + s`) has up to two base abscissae over it,
+    /// `x(P)` and `x(P + T₀)`.  Only the parity of the number of `T₀` shifts
+    /// changes the sum, so two choices of abscissae are tried: all first
+    /// roots, then the last summand switched to its other root.  Each choice
+    /// is signed and re-added by [`lift_abscissae`] on the counted ledger; a
+    /// `w` with no base point over it fails the lift.
+    fn t0_lift(
+        &mut self,
+        curve: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        q: &T0Quotient,
+        ws: &[u64],
+        target: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        let p = curve.p;
+        let mut firsts = Vec::with_capacity(ws.len());
+        let mut last_other = None;
+        for (i, &xw) in ws.iter().enumerate() {
+            let w = subm(xw, q.s, p);
+            let Some(over) = self.t0_map.get(&w) else {
+                self.bump("pkm_t0_lift_unrealised_w", 1);
+                return None;
+            };
+            firsts.push(over[0]);
+            if i + 1 == ws.len() {
+                last_other = over.get(1).copied();
+            }
+        }
+        self.bump("pkm_t0_lift_choices_tried", 1);
+        if let Some(idx) = lift_abscissae(curve, fb, ops, &firsts, target) {
+            return Some(idx);
+        }
+        let other = last_other?;
+        let n = firsts.len();
+        firsts[n - 1] = other;
+        self.bump("pkm_t0_lift_choices_tried", 1);
+        let got = lift_abscissae(curve, fb, ops, &firsts, target);
+        if got.is_some() {
+            self.bump("pkm_t0_lift_hits_with_t0_shift", 1);
+        }
+        got
     }
 
     /// Every unordered `(x_1, …, x_m) ∈ V^m` with `S_{m+1}(x, x_R) = 0`,
     /// `F_p` multiplications counted.  `first_only` stops at the first.
     fn grid(&self, curve: &PrimeCurve, x_r: u64, first_only: bool) -> (Vec<Vec<u64>>, u64) {
         let p = curve.p;
-        let (a, b) = (curve.a % p, curve.b % p);
+        let (a, b) = self.s3_coefficients(curve);
         let v = &self.prepared.as_ref().expect("prepared").v;
         let mut mults = 0u64;
         let mut out = Vec::new();
@@ -815,6 +1515,15 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "the base's Vélu 2-isogeny tower (PKM isogeny form)".into()
             }
             Membership::Bits { lo } => format!("bits: x = {lo} + Σ 2^j b_j, b_j² = b_j"),
+            Membership::SquareBits { lo, .. } => format!(
+                "2-descent bits: x = ({lo} + Σ 2^j b_j)² + A/3, b_j² = b_j (base in 2E(F_p))"
+            ),
+            Membership::EdwardsBits { .. } => {
+                "Edwards bits: x = (1 + y)/(1 − y) + A/3, y = Σ 2^j b_j, b_j² = b_j".into()
+            }
+            Membership::T0Bits { lo, .. } => format!(
+                "T0-invariant bits: w = z + d/z = {lo} + Σ 2^j b_j, b_j² = b_j (S₃ of E/⟨T₀⟩)"
+            ),
         };
         format!(
             "Semaev S_(m+1) over F_p with each x_i on {} (PKM), m = {}, t = {}, mode {}, engine {}",
@@ -858,8 +1567,24 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             ),
             ("lo", "left end of the bit interval, default 0"),
             (
+                "edwards_bits",
+                "Edwards y in [0, 2^T) written in bits (x_W = (1+y)/(1-y) + A/3)",
+            ),
+            (
+                "t0_bits",
+                "T0-invariant w = z + d/z (z = x_W − x_W(T₀)) in [lo, lo + 2^T) written in bits; the equation is S₃ of E/⟨T₀⟩, solutions are lifted back to points",
+            ),
+            (
+                "edwards_shift",
+                "A/3 (x_W of T₀); default: the unique rational root of x³ + ax + b",
+            ),
+            (
                 "guess",
                 "bits or isogeny form: enumerate the top G bits (tower levels) of the first summand, one F4 system per assignment (hybrid guessing)",
+            ),
+            (
+                "trace",
+                "1: F4 trace; learn one refutation trace per branch system at prepare (charged once, as setup native work), replay it per target with x_R specialised (only a refutation is accepted), and fall back to plain F4 when the replay does not refute",
             ),
             (
                 "lifts",
@@ -888,8 +1613,80 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             return Err("pkm-semaev: the tower engine needs p < 2^31".into());
         }
         let mut check_mults = 0u64;
+        if let Membership::EdwardsBits { shift } = self.membership {
+            let s = match (params.get("edwards_shift"), shift) {
+                (Some(_), _) => params.u64("edwards_shift")? % p,
+                (None, Some(s)) => s,
+                (None, None) => edwards_shift(curve)?,
+            };
+            self.membership = Membership::EdwardsBits { shift: Some(s) };
+            let set: HashSet<u64> = edwards_abscissae(p, self.t, s).into_iter().collect();
+            if let Some(x) = fb.abscissa_list.iter().find(|x| !set.contains(x)) {
+                return Err(format!(
+                    "pkm-semaev: abscissa {x} of the base has no Edwards y in [0, 2^{})",
+                    self.t
+                ));
+            }
+            return self.finish_prepare(curve, 0);
+        }
+        if let Membership::SquareBits { lo, shift } = self.membership {
+            let s = match shift {
+                Some(s) => s,
+                None => edwards_shift(curve)?,
+            };
+            self.membership = Membership::SquareBits { lo, shift: Some(s) };
+            let set: HashSet<u64> = square_abscissae(p, self.t, lo, s).into_iter().collect();
+            if let Some(x) = fb.abscissa_list.iter().find(|x| !set.contains(x)) {
+                return Err(format!(
+                    "pkm-semaev: abscissa {x} of the base is not (w² + A/3) for w in [{lo}, {lo} + 2^{})",
+                    self.t
+                ));
+            }
+            return self.finish_prepare(curve, 0);
+        }
+        if let Membership::T0Bits { lo, .. } = self.membership {
+            // s = x_W(T₀): the unique rational root of the cubic.  Every base
+            // abscissa must lie over a w in the interval; the map w → the
+            // base abscissae over it is built once (one inversion each,
+            // charged to the set-up native ledger).
+            let s = edwards_shift(curve)?;
+            let q = T0Quotient::new(curve, s);
+            if q.d == 0 {
+                return Err("pkm-semaev: singular curve (d = 0)".into());
+            }
+            self.membership = Membership::T0Bits { lo, q: Some(q) };
+            let span = 1u64 << self.t;
+            self.t0_map.clear();
+            for &x in &fb.abscissa_list {
+                let Some(w) = q.w_of(x) else {
+                    return Err("pkm-semaev: the base contains T₀ (w = ∞)".into());
+                };
+                if (w + p - lo % p) % p >= span {
+                    return Err(format!(
+                        "pkm-semaev: abscissa {x} of the base lies over w = {w}, outside \
+                         [{lo}, {lo} + 2^{})",
+                        self.t
+                    ));
+                }
+                self.t0_map.entry(w).or_default().push(x);
+            }
+            let n = fb.abscissa_list.len() as u64;
+            self.t0_setup.clear();
+            self.t0_setup.insert("pkm_t0_base_inversions".into(), n);
+            self.t0_setup.insert(
+                "pkm_t0_base_map_fp_mults_uncharged".into(),
+                n * (t0_inversion_mults(p) + 1),
+            );
+            self.t0_setup
+                .insert("pkm_t0_base_w_classes".into(), self.t0_map.len() as u64);
+            self.t0_setup.insert("pkm_t0_shift".into(), s);
+            return self.finish_prepare(curve, 0);
+        }
         match &self.membership {
             Membership::Kummer => {}
+            Membership::T0Bits { .. } => unreachable!("handled above"),
+            Membership::EdwardsBits { .. } => unreachable!("handled above"),
+            Membership::SquareBits { .. } => unreachable!("handled above"),
             Membership::Isogeny { v, steps, .. } => {
                 if steps.len() != self.t as usize || v.len() != 1usize << self.t {
                     return Err(
@@ -949,6 +1746,8 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         if self.setup_mults > 0 {
             m.insert("pkm_base_check_fp_mults_uncharged".into(), self.setup_mults);
         }
+        m.extend(self.trace_setup.clone());
+        m.extend(self.t0_setup.clone());
         if let Some(f) = &self.fiber {
             m.insert("pkm_fiber_size".into(), f.size() as u64);
             m.insert("pkm_fiber_cofactor".into(), f.h);
@@ -1014,7 +1813,20 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             return None;
         }
         let curve = ctx.group;
-        let x_r = point.x;
+        let mut x_r = point.x;
+        if let Membership::T0Bits { q: Some(q), .. } = self.membership {
+            // The target enters as its invariant: w_R = z_R + d/z_R, at the
+            // quotient's abscissa w_R + s.  One inversion, counted.
+            let Some(w_r) = q.w_of(point.x) else {
+                return None; // R = T₀: no invariant
+            };
+            x_r = addm(w_r, q.s, curve.p);
+            self.bump("pkm_t0_target_inversions", 1);
+            self.bump(
+                "pkm_t0_target_fp_mults_uncharged",
+                t0_inversion_mults(curve.p) + 1,
+            );
+        }
         if self.dataset_trace {
             self.dataset_artifact = self.prepared_system_artifact();
             if let Some(snapshot) = &mut self.dataset_artifact {
@@ -1072,17 +1884,49 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         Some(b) => self.branches[b].ring.clone(),
                         None => self.prepared.as_ref().expect("prepared").ring.clone(),
                     };
-                    let mut opts = TowerF4Options::new(self.max_degree);
-                    if let Some(b) = self.budget {
-                        opts = opts.with_budget(b);
-                    }
-                    if let Some(n) = self.max_nnz {
-                        opts = opts.with_max_nnz(n);
-                    }
-                    if let Some(s) = self.stop_staircase {
-                        opts = opts.stopping_below(s);
-                    }
-                    let rep = f4_tower(&sys, &ring, &opts);
+                    let opts = self.f4_options();
+                    let mut extra_ops = 0u64;
+                    let mut extra_ms = 0.0f64;
+                    let rep = if self.trace {
+                        let tr = self.traces.get(br).cloned().flatten();
+                        match tr {
+                            None => {
+                                self.bump("pkm_trace_untraced_branch_runs", 1);
+                                f4_tower(&sys, &ring, &opts)
+                            }
+                            Some(tr) => {
+                                let mut ropts = opts.clone();
+                                ropts.replay = Some(tr);
+                                let r = f4_tower(&sys, &ring, &ropts);
+                                self.bump("pkm_trace_replays", 1);
+                                self.bump("pkm_trace_replay_muladds", r.muladds);
+                                if r.inconsistent {
+                                    self.bump("pkm_trace_refuted", 1);
+                                    r
+                                } else {
+                                    let why = r
+                                        .replay_failure
+                                        .unwrap_or("no refutation")
+                                        .replace(' ', "_");
+                                    self.bump(&format!("pkm_trace_failure_{why}"), 1);
+                                    if let Some((s, g, w)) = r.replay_mismatch {
+                                        self.bump(
+                                            &format!("pkm_trace_mismatch_step{s}_got{g}_want{w}"),
+                                            1,
+                                        );
+                                    }
+                                    let plain = f4_tower(&sys, &ring, &opts);
+                                    self.bump("pkm_trace_fallbacks", 1);
+                                    self.bump("pkm_trace_fallback_plain_muladds", plain.muladds);
+                                    extra_ops = r.muladds;
+                                    extra_ms = r.ms;
+                                    plain
+                                }
+                            }
+                        }
+                    } else {
+                        f4_tower(&sys, &ring, &opts)
+                    };
                     if let Some(snapshot) = &mut self.dataset_artifact {
                         snapshot["f4_basis"] = serde_json::json!(rep
                             .basis
@@ -1103,6 +1947,8 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         && (rep.timed_out || rep.oversize || rep.pairs_above_bound > 0);
                     let mut extra = BTreeMap::new();
                     extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
+                    extra.insert("max_rows_max".to_string(), rep.max_rows as u64);
+                    extra.insert("max_nnz_max".to_string(), rep.max_nnz as u64);
                     extra.insert("steps".to_string(), rep.steps as u64);
                     extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
                     extra.insert(
@@ -1110,9 +1956,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         u64::from(rep.staircase_at_stop.is_some()),
                     );
                     let cost = SolverCost {
-                        ops: rep.muladds,
+                        ops: rep.muladds + extra_ops,
                         op_unit: "F_p multiply-adds (elimination only)".into(),
-                        wall_ns: (rep.ms * 1e6) as u64,
+                        wall_ns: ((rep.ms + extra_ms) * 1e6) as u64,
                         peak_bytes: 0,
                         degree_reached: Some(rep.degree_reached),
                         solving_degree: (!undecided).then_some(rep.solving_degree_max),
@@ -1176,6 +2022,13 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         // Lift: every abscissa on the curve, then the signs that sum to R,
         // each try re-added on the counted ledger.
         for xs in &solutions {
+            if let Membership::T0Bits { q: Some(q), .. } = self.membership {
+                if let Some(idx) = self.t0_lift(curve, fb, ops, &q, xs, point) {
+                    return Some(idx);
+                }
+                counters.lift_failures += 1;
+                continue;
+            }
             if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                 if let Some(idx) = lift_abscissae(curve, fb, ops, xs, point) {
                     return Some(idx);
@@ -1394,6 +2247,20 @@ mod tests {
         label: &str,
         extra: &str,
     ) {
+        agrees_with_grid_skipping(inst, fb, make, label, extra, None);
+    }
+
+    /// `agrees_with_grid`, leaving out the targets with abscissa `skip_x`
+    /// (the `t0-bits` form has no invariant for `T₀` itself, which is not in
+    /// the order-`r` subgroup a pipeline targets).
+    fn agrees_with_grid_skipping(
+        inst: &PrimeInstance,
+        fb: &FactorBase<PrimePoint>,
+        make: &dyn Fn() -> PkmSemaevOracle,
+        label: &str,
+        extra: &str,
+        skip_x: Option<u64>,
+    ) {
         let curve = &inst.curve;
         let decomposable = decomposable_points(curve, fb, 2, &mut GroupOps::default());
         let prep = |spec: &str| {
@@ -1415,7 +2282,7 @@ mod tests {
             } else {
                 curve.mul(&mut GroupOps::default(), g, rng.gen_range(1..inst.r))
             };
-            if target.infinity {
+            if target.infinity || skip_x == Some(target.x) {
                 continue;
             }
             let run = |o: &mut PkmSemaevOracle| {
@@ -1484,6 +2351,142 @@ mod tests {
             "isogeny",
             "",
         );
+    }
+
+    /// F4 trace (`trace=1`): the verdicts equal plain F4's and the grid's
+    /// (and the exact decomposable set) on random and planted targets, in
+    /// the isogeny form at `G in {0, 1, 2}` and the bit form at `G = 1`; the
+    /// fallback is exercised on the planted (consistent) targets and is
+    /// charged; the ledger is exactly replay plus fallback work.
+    #[test]
+    fn trace_agrees_with_plain_f4_and_grid() {
+        use crate::cryptanalysis::ic_boundary::prime_factor_base;
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        let inst = instance();
+        let curve = &inst.curve;
+        let t = 4;
+        let b = PrimeIsogenyBase { instance: &inst };
+        let mut params = Params::default();
+        params.set("t", t.to_string());
+        let fb = b
+            .build(&ctx(&inst), &params, &mut GroupOps::default())
+            .expect("isogeny base");
+        let tower = isogeny_tower(curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+        let (v, c) = (tower.v.clone(), tower.c);
+        let bits_fb = prime_factor_base(&inst, 6);
+        let bits_t = 64 - bits_fb.abscissa_list.iter().max().unwrap().leading_zeros();
+        let decomposable = |fb: &FactorBase<PrimePoint>| {
+            decomposable_points(curve, fb, 2, &mut GroupOps::default())
+        };
+        for (label, g, use_bits) in [
+            ("isogeny G=0", 0u32, false),
+            ("isogeny G=1", 1, false),
+            ("isogeny G=2", 2, false),
+            ("bits G=1", 1, true),
+        ] {
+            let fb = if use_bits { &bits_fb } else { &fb };
+            let exact = decomposable(fb);
+            let make = || {
+                if use_bits {
+                    PkmSemaevOracle::new_bits(2, bits_t, 0)
+                } else {
+                    PkmSemaevOracle::new_isogeny(2, t, v.clone(), steps.clone(), c)
+                }
+            };
+            let prep = |spec: &str| {
+                let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+                let mut o = make();
+                o.prepare(&ctx(&inst), fb, &params, &mut GroupOps::default())
+                    .unwrap_or_else(|e| panic!("{label}: prepare: {e}"));
+                o
+            };
+            let gs = if g > 0 {
+                format!(",guess={g}")
+            } else {
+                String::new()
+            };
+            let mut traced = prep(&format!("m=2,crosscheck=1,trace=1{gs}"));
+            let mut plain = prep(&format!("m=2{gs}"));
+            let mut grid = prep("m=2,engine=exhaustive");
+            let setup = traced.setup_native();
+            assert_eq!(setup["pkm_trace_branches"], 1 << g, "{label}");
+            assert!(
+                setup["pkm_trace_learn_muladds"] > 0,
+                "{label}: learning is charged"
+            );
+            assert_eq!(
+                setup["pkm_trace_branches_learned"],
+                1 << g,
+                "{label}: all learned"
+            );
+            let mut rng = StdRng::seed_from_u64(77);
+            let gen = inst.generator_point();
+            let mut hits = 0;
+            for k in 0..32u64 {
+                let target = if k.is_multiple_of(3) {
+                    let idx: Vec<usize> =
+                        (0..2).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                    sum(curve, fb, &idx)
+                } else {
+                    curve.mul(&mut GroupOps::default(), gen, rng.gen_range(1..inst.r))
+                };
+                if target.infinity {
+                    continue;
+                }
+                let run = |o: &mut PkmSemaevOracle| {
+                    let got = o.decompose(
+                        &ctx(&inst),
+                        fb,
+                        &mut GroupOps::default(),
+                        &mut OracleCounters::default(),
+                        target,
+                    );
+                    if let Some(idx) = &got {
+                        assert_eq!(sum(curve, fb, idx), target, "{label}: relation sums to R");
+                    }
+                    got.is_some()
+                };
+                let (a, b, c2) = (run(&mut traced), run(&mut plain), run(&mut grid));
+                assert_eq!(a, b, "{label}: trace against plain F4, target {k}");
+                assert_eq!(a, c2, "{label}: trace against the grid, target {k}");
+                assert_eq!(
+                    c2,
+                    exact.contains(&curve.key(&target)),
+                    "{label}: target {k}"
+                );
+                hits += usize::from(c2);
+            }
+            assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+            let n = traced.relation_counters();
+            let get = |k: &str| n.get(k).copied().unwrap_or(0);
+            assert_eq!(get("pkm_crosscheck_disagreements"), 0, "{label}");
+            assert!(
+                get("pkm_trace_refuted") > 0,
+                "{label}: replays refute {n:?} {setup:?}"
+            );
+            assert!(
+                get("pkm_trace_fallbacks") > 0,
+                "{label}: fallback exercised"
+            );
+            assert!(
+                get("pkm_trace_fallback_plain_muladds") > 0,
+                "{label}: fallback charged"
+            );
+            assert_eq!(get("pkm_trace_untraced_branch_runs"), 0, "{label}");
+            assert_eq!(
+                get("pkm_trace_replays"),
+                get("pkm_trace_refuted") + get("pkm_trace_fallbacks"),
+                "{label}"
+            );
+            // The solver ledger is replay work plus fallback work: nothing
+            // else is charged per target, and the learning is not.
+            assert_eq!(
+                traced.solver_totals().unwrap().ops,
+                get("pkm_trace_replay_muladds") + get("pkm_trace_fallback_plain_muladds"),
+                "{label}: ledger"
+            );
+        }
     }
 
     /// Isogeny-form hybrid guessing: same verdicts as the grid and the exact
@@ -1822,6 +2825,473 @@ mod tests {
             ..Default::default()
         };
         assert!(PkmSemaevOracle::from_spec(2, &spec, &inst).is_err());
+    }
+
+    /// A small Montgomery miniature `y² = x³ + A x² + x` over `p ≡ 5 (8)`
+    /// with `A² − 4` a non-residue (so `T₀ = (0, 0)` is the only rational
+    /// 2-torsion point), in short Weierstrass form `x_W = u + A/3`.
+    /// Returns the instance and `A/3`.
+    fn montgomery_instance() -> (PrimeInstance, u64) {
+        montgomery_instance_from(10_007)
+    }
+
+    /// `montgomery_instance` over the first admissible prime at or above
+    /// `p_min`.
+    fn montgomery_instance_from(p_min: u64) -> (PrimeInstance, u64) {
+        let is_prime = |n: u64| {
+            n > 1
+                && (2..)
+                    .take_while(|d| d * d <= n)
+                    .all(|d| !n.is_multiple_of(d))
+        };
+        let p = (p_min..).find(|&n| n % 8 == 5 && is_prime(n)).unwrap();
+        let leg = |v: u64| crate::cryptanalysis::residual_walk::pow_mod(v % p, (p - 1) / 2, p);
+        let inv = |v: u64| crate::cryptanalysis::residual_walk::pow_mod(v % p, p - 2, p);
+        let am = (3u64..).find(|&am| leg(am * am + p - 4) == p - 1).unwrap();
+        let third = inv(3);
+        let a = subm(1, mulm(mulm(am, am, p), third, p), p);
+        let b = subm(
+            mulm(mulm(2, mulm(am, mulm(am, am, p), p), p), inv(27), p),
+            mulm(am, third, p),
+            p,
+        );
+        let curve = PrimeCurve { p, a, b };
+        let mut n = 1i64; // infinity
+        let mut gen = None;
+        for x in 0..p {
+            let rhs = curve.rhs(x);
+            match curve.legendre(rhs) {
+                0 => n += 1,
+                1 => {
+                    n += 2;
+                    if gen.is_none() && x > 2 {
+                        gen = Some((x, curve.sqrt(rhs).unwrap()));
+                    }
+                }
+                _ => {}
+            }
+        }
+        let inst = PrimeInstance {
+            name: "c25519-toy".into(),
+            curve,
+            group_order: n as u64,
+            r: n as u64,
+            cofactor: 1,
+            generator: gen.unwrap(),
+        };
+        (inst, mulm(am, third, p))
+    }
+
+    fn edwards_oracle(m: u32, t: u32, shift: Option<u64>) -> PkmSemaevOracle {
+        let mut o = PkmSemaevOracle::new_edwards_bits(m, t);
+        o.membership = Membership::EdwardsBits { shift };
+        o
+    }
+
+    /// The shift is the unique rational root of `x³ + ax + b`, i.e. `A/3`.
+    #[test]
+    fn edwards_shift_is_the_two_torsion_abscissa() {
+        let (inst, third) = montgomery_instance();
+        assert_eq!(edwards_shift(&inst.curve).unwrap(), third);
+        let c = &inst.curve;
+        assert_eq!(c.rhs(third), 0, "T₀ is 2-torsion");
+        // A curve with no rational root is refused.
+        let bad = PrimeCurve {
+            p: c.p,
+            a: c.a,
+            b: addm(c.b, 1, c.p),
+        };
+        if (0..c.p).all(|x| bad.rhs(x) != 0) {
+            assert!(edwards_shift(&bad).is_err());
+        }
+    }
+
+    /// Edwards bits, `m = 2`, on the Montgomery miniature with the derived
+    /// shift: F4 against the grid and the exact decomposable set, with and
+    /// without hybrid guessing.
+    #[test]
+    fn edwards_bits_form_agrees_with_grid() {
+        let (inst, third) = montgomery_instance();
+        for t in [4u32, 5] {
+            let fb = edwards_factor_base(&inst, t, third);
+            assert!(fb.columns >= 3, "t = {t} columns = {}", fb.columns);
+            agrees_with_grid(
+                &inst,
+                &fb,
+                &|| edwards_oracle(2, t, None),
+                &format!("edwards t={t}"),
+                "",
+            );
+            for g in 1..t.min(3) {
+                agrees_with_grid(
+                    &inst,
+                    &fb,
+                    &|| edwards_oracle(2, t, None),
+                    &format!("edwards t={t} guess={g}"),
+                    &format!(",guess={g}"),
+                );
+            }
+        }
+        // An explicit shift on a curve that is not Montgomery: the form is
+        // a Möbius change of variable for any shift.
+        let inst = instance();
+        let fb = edwards_factor_base(&inst, 5, 5);
+        agrees_with_grid(
+            &inst,
+            &fb,
+            &|| edwards_oracle(2, 5, Some(5)),
+            "edwards shift=5",
+            "",
+        );
+        // A base outside the interval is refused.
+        let (inst, third) = montgomery_instance();
+        let fb = edwards_factor_base(&inst, 5, third);
+        let (_, params) = Params::parse_spec("pkm-semaev:m=2").unwrap();
+        assert!(edwards_oracle(2, 3, None)
+            .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+            .is_err());
+    }
+
+    /// Edwards bits, `m = 3`: planted sums of three base points decompose
+    /// under the chain, the full S₄ and the grid, and relations sum to the
+    /// target.
+    #[test]
+    fn edwards_bits_m3_planted_decompositions() {
+        let (inst, third) = montgomery_instance();
+        let t = 3;
+        let fb = edwards_factor_base(&inst, t, third);
+        let (curve, mut rng) = (&inst.curve, StdRng::seed_from_u64(11));
+        for spec in [
+            "m=3",
+            "m=3,mode=full",
+            "m=3,engine=exhaustive",
+            "m=3,guess=1",
+        ] {
+            let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+            let mut o = edwards_oracle(3, t, None);
+            o.prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+                .unwrap();
+            let mut found = 0;
+            for _ in 0..6 {
+                let idx: Vec<usize> = (0..3).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                let target = sum(curve, &fb, &idx);
+                if target.infinity {
+                    continue;
+                }
+                let got = o
+                    .decompose(
+                        &ctx(&inst),
+                        &fb,
+                        &mut GroupOps::default(),
+                        &mut OracleCounters::default(),
+                        target,
+                    )
+                    .unwrap_or_else(|| panic!("{spec}: planted target not decomposed"));
+                assert_eq!(sum(curve, &fb, &got), target, "{spec}");
+                found += 1;
+            }
+            assert!(found > 0, "{spec}");
+        }
+    }
+
+    // ── The T₀-invariant form (`t0-bits`) ────────────────────────────
+
+    fn t0_oracle(m: u32, t: u32, lo: u64) -> PkmSemaevOracle {
+        PkmSemaevOracle::new_t0_bits(m, t, lo)
+    }
+
+    /// Every rational point of the curve, `T₀` and `O` excluded.
+    fn finite_points(curve: &PrimeCurve, skip_x: u64) -> Vec<PrimePoint> {
+        let mut pts = Vec::new();
+        for x in 0..curve.p {
+            if x == skip_x {
+                continue;
+            }
+            if let Some(y) = curve.sqrt(curve.rhs(x)) {
+                pts.push(PrimePoint::affine(x, y));
+                if y != 0 {
+                    pts.push(PrimePoint::affine(x, curve.p - y));
+                }
+            }
+        }
+        pts
+    }
+
+    /// The quotient coefficients are those of the 2-isogenous curve: the
+    /// x-map `x ↦ w + s` sends every rational point of `E` to an abscissa
+    /// of a rational point of `y² = x³ + a₂x + b₂`, `T₀` is the only point
+    /// without an invariant, and translation by `T₀` fixes `w`.
+    #[test]
+    fn t0_quotient_is_the_two_isogenous_curve() {
+        let (inst, third) = montgomery_instance_from(211);
+        let curve = &inst.curve;
+        let q = T0Quotient::new(curve, third);
+        assert_eq!(curve.rhs(third), 0, "T₀ is 2-torsion");
+        assert_eq!(q.d, 1, "Montgomery B = 1: translation by T₀ is z ↦ 1/z");
+        let quot = PrimeCurve {
+            p: curve.p,
+            a: q.a2,
+            b: q.b2,
+        };
+        let t0 = PrimePoint::affine(third, 0);
+        let mut seen = 0;
+        for pt in finite_points(curve, third) {
+            let w = q.w_of(pt.x).expect("finite point other than T₀");
+            assert!(
+                quot.sqrt(quot.rhs(addm(w, q.s, curve.p))).is_some(),
+                "w + s is the abscissa of a rational point of E/<T₀>"
+            );
+            let shifted = curve.add(&mut GroupOps::default(), pt, t0);
+            if !shifted.infinity {
+                assert_eq!(q.w_of(shifted.x), Some(w), "w is T₀-invariant");
+            }
+            assert!(q.abscissae_of(curve, w).contains(&pt.x), "w lifts back");
+            seen += 1;
+        }
+        assert!(seen > 100);
+        assert_eq!(q.w_of(third), None);
+    }
+
+    /// The symmetrisation: with `d = 1`, `N(w₁, w₂, w₃) · z₂²z₃² =
+    /// S₃(z₁, z₂, z₃) · S₃(1/z₁, z₂, z₃)` for every `z` (here every triple
+    /// of a sample, including values with no point above them), so `N` is
+    /// `S₃` times its `T₀`-image, a polynomial in the invariants only.
+    /// Together with the baseline's `S₃(1/z₁, 1/z₂, z₃) = S₃/(z₁z₂)²` this
+    /// is the T₀ identity in the invariant variables.
+    #[test]
+    fn t0_symmetrised_polynomial_is_s3_times_its_t0_image() {
+        let (inst, third) = montgomery_instance_from(211);
+        let curve = &inst.curve;
+        let p = curve.p;
+        let q = T0Quotient::new(curve, third);
+        let s3x = |z1: u64, z2: u64, z3: u64| {
+            let c = |z: u64| Pol::constant(1, addm(z, third, p), p);
+            let v = s3(&c(z1), &c(z2), &c(z3), curve.a, curve.b, p);
+            v.terms.values().next().copied().unwrap_or(0)
+        };
+        let inv = |v: u64| crate::cryptanalysis::residual_walk::pow_mod(v, p - 2, p);
+        let mut rng = StdRng::seed_from_u64(5);
+        let mut nonzero = 0;
+        for _ in 0..4000 {
+            let z: Vec<u64> = (0..3).map(|_| rng.gen_range(1..p)).collect();
+            let w: Vec<u64> = z.iter().map(|&z| addm(z, inv(z), p)).collect();
+            let lhs = mulm(
+                q.sym_s3(w[0], w[1], w[2]),
+                mulm(mulm(z[1], z[1], p), mulm(z[2], z[2], p), p),
+                p,
+            );
+            let rhs = mulm(s3x(z[0], z[1], z[2]), s3x(inv(z[0]), z[1], z[2]), p);
+            assert_eq!(lhs, rhs, "z = {z:?}");
+            nonzero += u64::from(rhs != 0);
+            // The baseline's identity, here as a regression of the helper.
+            assert_eq!(
+                mulm(
+                    s3x(inv(z[0]), inv(z[1]), z[2]),
+                    mulm(mulm(z[0], z[0], p), mulm(z[1], z[1], p), p),
+                    p
+                ),
+                s3x(z[0], z[1], z[2])
+            );
+        }
+        assert!(nonzero > 3000);
+    }
+
+    /// The symmetrised polynomial vanishes exactly on the valid `w`-triples:
+    /// `N(w₁, w₂, w₃) = 0` iff there are points `P_i` over the `w_i` (of the
+    /// whole curve, `T₀`-shifts included) with `P₃ = ±P₁ ± P₂`.  Exhaustive
+    /// over all triples of invariants of a 229-element field.
+    #[test]
+    fn t0_symmetrised_polynomial_vanishes_exactly_on_valid_w_triples() {
+        use std::collections::{BTreeMap, BTreeSet};
+        let (inst, third) = montgomery_instance_from(229);
+        let curve = &inst.curve;
+        let q = T0Quotient::new(curve, third);
+        let pts = finite_points(curve, third);
+        let w_of = |pt: &PrimePoint| q.w_of(pt.x).unwrap();
+        let mut ops = GroupOps::default();
+        // valid[(w1, w2)] = the w of every finite P1 ± P2 (not O, not T₀).
+        let mut valid: BTreeMap<(u64, u64), BTreeSet<u64>> = BTreeMap::new();
+        for p1 in &pts {
+            for p2 in &pts {
+                for s in [
+                    curve.add(&mut ops, *p1, *p2),
+                    curve.add(&mut ops, *p1, curve.neg(*p2)),
+                ] {
+                    if s.infinity || s.x == third {
+                        continue;
+                    }
+                    valid
+                        .entry((w_of(p1), w_of(p2)))
+                        .or_default()
+                        .insert(w_of(&s));
+                }
+            }
+        }
+        let ws: BTreeSet<u64> = pts.iter().map(w_of).collect();
+        assert!(ws.len() > 30, "{} invariants", ws.len());
+        let (mut zeros, mut triples) = (0usize, 0usize);
+        for &w1 in &ws {
+            for &w2 in &ws {
+                let ok = valid.get(&(w1, w2));
+                for &w3 in &ws {
+                    let is_valid = ok.is_some_and(|s| s.contains(&w3));
+                    let vanishes = q.sym_s3(w1, w2, w3) == 0;
+                    assert_eq!(vanishes, is_valid, "w = ({w1}, {w2}, {w3})");
+                    zeros += usize::from(vanishes);
+                    triples += 1;
+                }
+            }
+        }
+        assert!(zeros > 100 && zeros < triples / 2, "{zeros} of {triples}");
+    }
+
+    /// The degree claim of the note, as measured on the polynomials the
+    /// oracle builds: the symmetrised `S₃` has degree 2 in each summand and
+    /// total degree 4, exactly like `S₃` itself.
+    #[test]
+    fn t0_symmetrised_degree_equals_plain_degree() {
+        let (inst, third) = montgomery_instance_from(211);
+        let p = inst.curve.p;
+        let q = T0Quotient::new(&inst.curve, third);
+        let n = 3;
+        let v = |i| Pol::var(n, i);
+        let plain = s3(&v(0), &v(1), &v(2), inst.curve.a, inst.curve.b, p);
+        let sym = s3(&v(0), &v(1), &v(2), q.a2, q.b2, p);
+        let deg = |f: &Pol, i: usize| f.terms.keys().map(|e| e[i]).max().unwrap();
+        let tot = |f: &Pol| f.terms.keys().map(|e| e.iter().sum::<u32>()).max().unwrap();
+        for i in 0..3 {
+            assert_eq!(deg(&plain, i), 2);
+            assert_eq!(deg(&sym, i), 2);
+        }
+        assert_eq!((tot(&plain), tot(&sym)), (4, 4));
+    }
+
+    /// `t0-bits`, `m = 2`, on the Montgomery miniature: F4 against the grid
+    /// and the exact decomposable set of the T₀-closed base, with and without
+    /// hybrid guessing, for two intervals, one not starting at 0.  Every
+    /// returned relation is re-summed to the target by `agrees_with_grid`.
+    #[test]
+    fn t0_bits_form_agrees_with_grid() {
+        let (inst, third) = montgomery_instance();
+        let q = T0Quotient::new(&inst.curve, third);
+        for (t, lo) in [(5u32, 0u64), (6, 0), (5, 37)] {
+            let fb = t0_factor_base(&inst, &q, t, lo);
+            assert!(
+                fb.columns >= 8,
+                "t = {t} lo = {lo} columns = {}",
+                fb.columns
+            );
+            agrees_with_grid_skipping(
+                &inst,
+                &fb,
+                &|| t0_oracle(2, t, lo),
+                &format!("t0 t={t} lo={lo}"),
+                "",
+                Some(third),
+            );
+            for g in 1..t.min(3) {
+                agrees_with_grid_skipping(
+                    &inst,
+                    &fb,
+                    &|| t0_oracle(2, t, lo),
+                    &format!("t0 t={t} lo={lo} guess={g}"),
+                    &format!(",guess={g}"),
+                    Some(third),
+                );
+            }
+        }
+        // A base outside the interval is refused.
+        let fb = t0_factor_base(&inst, &q, 5, 0);
+        let (_, params) = Params::parse_spec("pkm-semaev:m=2").unwrap();
+        assert!(t0_oracle(2, 3, 0)
+            .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+            .is_err());
+    }
+
+    /// The lift-back and the native work are on the counters: one target
+    /// inversion per target, the base map in the set-up ledger, and every
+    /// lift re-adds points on the group counter.
+    #[test]
+    fn t0_bits_counts_its_lift_and_native_work() {
+        let (inst, third) = montgomery_instance();
+        let q = T0Quotient::new(&inst.curve, third);
+        let fb = t0_factor_base(&inst, &q, 6, 0);
+        let (_, params) = Params::parse_spec("pkm-semaev:m=2").unwrap();
+        let mut o = t0_oracle(2, 6, 0);
+        o.prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        let setup = o.setup_native();
+        assert_eq!(setup["pkm_t0_base_inversions"], fb.columns as u64);
+        assert_eq!(setup["pkm_t0_shift"], third);
+        let mut rng = StdRng::seed_from_u64(3);
+        let (mut ops, mut targets, mut found) = (GroupOps::default(), 0u64, 0u64);
+        for _ in 0..20 {
+            let idx: Vec<usize> = (0..2).map(|_| rng.gen_range(0..fb.points.len())).collect();
+            let target = sum(&inst.curve, &fb, &idx);
+            if target.infinity || target.x == third {
+                continue;
+            }
+            targets += 1;
+            let got = o.decompose(
+                &ctx(&inst),
+                &fb,
+                &mut ops,
+                &mut OracleCounters::default(),
+                target,
+            );
+            let idx = got.expect("planted sum decomposes");
+            assert_eq!(sum(&inst.curve, &fb, &idx), target);
+            found += 1;
+        }
+        let n = o.relation_counters();
+        assert_eq!(n["pkm_t0_target_inversions"], targets);
+        assert_eq!(found, targets);
+        assert!(n["pkm_t0_lift_choices_tried"] >= found);
+        assert!(ops.adds + ops.doubles > 0, "the lift is charged");
+    }
+
+    /// `t0-bits`, `m = 3`: planted sums of three base points decompose
+    /// under the chain, the full S₄ and the grid, and relations sum to the
+    /// target (the parity of `T₀` shifts is covered by the two lift choices).
+    #[test]
+    fn t0_bits_m3_planted_decompositions() {
+        let (inst, third) = montgomery_instance();
+        let q = T0Quotient::new(&inst.curve, third);
+        let t = 4;
+        let fb = t0_factor_base(&inst, &q, t, 0);
+        assert!(fb.points.len() >= 8, "{} points", fb.points.len());
+        let (curve, mut rng) = (&inst.curve, StdRng::seed_from_u64(11));
+        for spec in [
+            "m=3",
+            "m=3,mode=full",
+            "m=3,engine=exhaustive",
+            "m=3,guess=1",
+        ] {
+            let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+            let mut o = t0_oracle(3, t, 0);
+            o.prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+                .unwrap();
+            let mut found = 0;
+            for _ in 0..6 {
+                let idx: Vec<usize> = (0..3).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                let target = sum(curve, &fb, &idx);
+                if target.infinity || target.x == third {
+                    continue;
+                }
+                let got = o
+                    .decompose(
+                        &ctx(&inst),
+                        &fb,
+                        &mut GroupOps::default(),
+                        &mut OracleCounters::default(),
+                        target,
+                    )
+                    .unwrap_or_else(|| panic!("{spec}: planted target not decomposed"));
+                assert_eq!(sum(curve, &fb, &got), target, "{spec}");
+                found += 1;
+            }
+            assert!(found > 0, "{spec}");
+        }
     }
 
     /// The oracle refuses a base that is not its tower.
