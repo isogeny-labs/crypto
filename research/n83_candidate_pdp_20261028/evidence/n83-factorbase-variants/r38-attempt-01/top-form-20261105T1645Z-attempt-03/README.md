@@ -11,3 +11,6 @@ Static attempt inputs and launcher were published under `attempt-03/capsule-v2/`
 
 
 The exact build completed before scientific launch in 108 seconds. The launch rechecks both binary hashes and pins the entire execution tree to one allowed CPU. The scientific phase has a 12,850-second hard cap plus 45-second termination grace; including the completed build, total planned process time stays below the USD 1.93 compute ceiling. Final static capsule v3 records these execution details; v1/v2 copies remain preserved.
+
+
+AWS CLI uses `AWS_MAX_ATTEMPTS=1` for data fetches and uploads, matching the no-retry rule.

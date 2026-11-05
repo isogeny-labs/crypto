@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export AWS_RETRY_MODE=standard AWS_MAX_ATTEMPTS=1
 HERE=$(cd "$(dirname "$0")" && pwd)
 DEST=s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/results/
 START=$(date -u +%FT%TZ)

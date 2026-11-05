@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export AWS_RETRY_MODE=standard AWS_MAX_ATTEMPTS=1
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=/home/ec2-user/crypto-n83-degree-sweep-20261027

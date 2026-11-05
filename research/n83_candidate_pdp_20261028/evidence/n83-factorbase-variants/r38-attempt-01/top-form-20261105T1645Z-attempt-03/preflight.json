@@ -84,7 +84,9 @@
     "wall_timeout_includes_build_seconds": false,
     "build_completed_before_launch": true,
     "build_wall_seconds": 108,
-    "one_cpu_enforcement": "taskset pins launch and all descendants to the first CPU in the invoking process allowed set"
+    "one_cpu_enforcement": "taskset pins launch and all descendants to the first CPU in the invoking process allowed set",
+    "aws_cli_max_attempts": 1,
+    "aws_cli_retry_mode": "standard"
   },
   "cost": {
     "observed_spot_usd_per_hour": 0.5321,
