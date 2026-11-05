@@ -1642,9 +1642,10 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         ));
         // Re-check the answer here.
         let inst = p.instance(ex.workload);
-        let rec: Option<u128> = r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
-        let target_ok = rec.map(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target));
-        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
+        let rec: Option<super::exact_scalar::ExactScalar> =
+            r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
+        let target_ok = rec.map(|k| inst.mul_generator_exact(k).as_ref() == Some(&w.target));
+        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p.into()));
         if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
             record_problems.push(format!("{tag}: verification does not reproduce"));
         }
