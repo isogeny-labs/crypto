@@ -441,3 +441,26 @@ with mock work only; qualified production supervisor/resume remains open.
 Auto-merge stays paused and unpublished history is preserved.
 
 <!-- Terminal collection above supersedes earlier active-run snapshots. -->
+
+## 2026-11-05T11:44:49.275988+00:00 — Terminal collection, local driver and review-ready delivery
+
+Current local source c468b21a1 adds attempt_driver.rs outside Cargo/Lean inputs;
+11native controls(6new+5record), strict standalone clippy/fmt log0. Source/binary
+capture receipt and official unsigned claim PCC-20261105-8d2c82 retained.
+Newtwo-page1142Zreport/SVGs inspected. Deliveryreceipt checks21priorobjects,
+6nativebinaries, componentblobs and exactformal/gate/Mathlib equivalence.
+PCC-20261105-b058d2 standingunverified. [pcc:unverified]
+
+Allnativejobs terminal;16391wrapper124,6168declared=2166pass+2clockfail+
+45ignored+1PKMsharedliftunfinished+3954notreached. Cargoexitunknown,no summary.
+Finalraw213453bytesSHA698fe35fe1d15a74ccce47535f75a9915d38782472fcf83379d50d4d1b6737db
+NOT_UPLOADED. Missingproctimeinterfaces explain focused2/4clockfailures;
+runnerexactmain. EarlierJVcaps are distinct; no duplicate suite or testwaiver.
+Strictlint2/PCC13/clock2/cap remainfailed. [pcc:unverified]
+
+Normalpublication to sameopenPR3452 follows finalpolicies/liveheadcheck;
+auto stayspaused. No newmainmerge or codechange requires duplicated unchanged
+checks. Future remotechange needs both-parent/source review and affectedchecks.
+G2 next:actualgatednativechild/reaping/deadlines/interruption-resume qualification;
+currentcallbacks never launch/attest. G6Rust/polynomial/costbridges remainopen.
+Originalscientificacceptance unchanged; no panels/funding/access/poolchanges.

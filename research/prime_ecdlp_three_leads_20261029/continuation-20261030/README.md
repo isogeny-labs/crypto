@@ -1,5 +1,14 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+[Latest two-page report](continuation-20261105T1142Z.pdf),
+[editable driver diagram](attempt-driver-flow-20261105.svg) and
+[recorded library status chart](library-status-20261105T1142Z.svg).
+[Delivery object review](validation/main-d30b9e0db-20261105/delivery-review-20261105T1144Z/receipt.json)
+records21unchanged native objects, all6prior binaries and the new standalone
+component source; formal/gate/Mathlib objects remain exact. Both report pages
+were inspected. These are unsigned producer observations. [pcc:unverified]
+
+
 ## New G2 bookkeeping component — 2026-11-05
 
 [Local callback driver](prerequisites/attempt_driver.rs) now records an attempt
