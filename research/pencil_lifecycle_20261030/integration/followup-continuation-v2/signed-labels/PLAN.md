@@ -1,0 +1,7 @@
+# Saved-stream label verification
+
+T-1386, 2026-11-02. Consume the six immutable signed-replay fixtures; do not rerun collectors. First validate each stream with signed-collector-replay. Reconstruct the fixed Scholten source model and transfer from p, and require exact header agreement. Validate canonical source points, curve membership, prime-r torsion and nonzero transferred points. Then reconstruct every candidate/restart as aG'+bQ' using the existing affine Cantor implementation and compare its exact canonical divisor. Verify any terminal scalar on the source curve.
+
+Scope: concrete equations for recorded inputs using the named implementation, not an independent arithmetic implementation or a universal transfer proof. Total source curve order is not independently recounted. PRNG and chosen-priority reconstruction remain separate. Reject wrong transfer/header/labels and demonstrate a coherent label mutation that passes graph-only replay but fails the group equation. This is the necessary distinction under test.
+
+One build job, private existing source-check cache under /var/tmp/signed-stream-20261102, 3GiB virtual memory and180 seconds per command. Source-only offline verification; no scientific worker, collector rerun, cloud experiment, campaign renewal or timing claim. Preserve source bindings and failed attempts. Full1260-target obligation unchanged. Prior sources: signed-replay/REPORT.md, native Scholten/short_curve/tau/Jacobian code and target-stream-reconciliation/SOURCE-MAP.md.

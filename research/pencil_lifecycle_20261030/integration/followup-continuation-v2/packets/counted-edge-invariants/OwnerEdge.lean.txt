@@ -1,0 +1,44 @@
+import CounterUpdate
+import ComponentSizes
+set_option autoImplicit false
+namespace CountedEdge
+open SignedWord
+variable {n : Nat}
+def owners (owner : Fin n → Fin n) (sizes : UnionSize.Sizes n) (ru rv : Fin n) :=
+ if ru=rv then owner else ComponentMap.merged owner (UnionSize.child sizes ru rv) (UnionSize.parent sizes ru rv)
+theorem anchor_graph (r : UInt64) (s : Anchored n) (root : Fin n) (a b : UInt64) :
+ (anchor r s root a b).1.graph=s.graph := by
+ cases h:s.fixed root <;> simp [anchor,h]
+theorem same_graph (r : UInt64) (s : Anchored n) (root : Fin n) (cu cv : Int8) (a b : UInt64) :
+ (sameRoot r s root cu cv a b).1.graph=s.graph := by
+ unfold sameRoot
+ split
+ · rfl
+ · exact anchor_graph _ _ _ _ _
+theorem after_finds_owner (r : UInt64) [Fact r.toNat.Prime] (s : UnionState n) (t w : State n)
+ (sizes : UnionSize.Sizes n) (owner : Fin n → Fin n) (u v ru rv : Fin n)
+ (pu pv : Pot) (su sv : Int8) (a b : UInt64)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s.graph)
+ (h1 : Run r s.graph u t ru pu) (h2 : Run r t v w rv pv)
+ (ho : ComponentMap.Valid (decode r s.graph) owner)
+ (hz : ComponentMap.SizeValid owner sizes) (hn : n<USize.size) :
+ let out := EdgeDispatch.run r s w sizes ru rv pu pv su sv a b
+ ComponentMap.Valid (decode r out.state.graph) (owners owner sizes ru rv) ∧
+ ComponentMap.SizeValid (owners owner sizes ru rv) out.sizes := by
+ obtain ⟨hgt,_,hf1⟩:=run_refines r hp hr s.graph t u ru pu h1 hg
+ obtain ⟨_,_,hf2⟩:=run_refines r hp hr t w v rv pv h2 hgt
+ have ht:=ComponentMap.run_preserves_owner _ _ owner u ru _ hf1 ho
+ have hw:=ComponentMap.run_preserves_owner _ _ owner v rv _ hf2 ht.1
+ have hru : (decode r w).parent ru=ru := (hw.1.2 ru).mp ((ht.1.2 ru).mpr ht.2.2)
+ have hrv : (decode r w).parent rv=rv := hw.2.2
+ by_cases hd:ru=rv
+ · simpa only [EdgeDispatch.run,owners,if_pos hd,after,same_graph] using And.intro hw.1 hz
+ · have hsel:=UnionSize.selected_distinct sizes ru rv hd
+   cases hforward:UnionSize.forward sizes ru rv
+   · have hh:=ComponentMap.attach_preserves_sizes (decode r w) owner sizes rv ru
+       (decPot r (reversePot r (reducedUnionPot r pu pv su sv a b))) hw.1 hz hrv hru (Ne.symm hd) hn
+     simpa [EdgeDispatch.run,owners,hd,UnionSize.child,UnionSize.parent,hforward,branchWord,joinWord,compress_decode] using hh
+   · have hh:=ComponentMap.attach_preserves_sizes (decode r w) owner sizes ru rv
+       (decPot r (reducedUnionPot r pu pv su sv a b)) hw.1 hz hru hrv hd hn
+     simpa [EdgeDispatch.run,owners,hd,UnionSize.child,UnionSize.parent,hforward,branchWord,joinWord,compress_decode] using hh
+end CountedEdge

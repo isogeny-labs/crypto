@@ -1,0 +1,69 @@
+{
+  "status": "passed",
+  "error": null,
+  "commands": [
+    {
+      "module": "Difference",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/point-sieve-lean-x38t1umn/Difference.olean",
+        "/var/tmp/point-sieve-lean-x38t1umn/Difference.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "Readback",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/point-sieve-lean-x38t1umn/Readback.olean",
+        "/var/tmp/point-sieve-lean-x38t1umn/Readback.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "ExpectedFailure",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/point-sieve-lean-x38t1umn/ExpectedFailure.olean",
+        "/var/tmp/point-sieve-lean-x38t1umn/ExpectedFailure.lean"
+      ],
+      "expected_exit": 1,
+      "exit": 1
+    },
+    {
+      "module": "Reviewer",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/point-sieve-lean-x38t1umn/Reviewer.olean",
+        "/var/tmp/point-sieve-lean-x38t1umn/Reviewer.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    }
+  ],
+  "elapsed_seconds": 15.864751351997256,
+  "dependency_count": 28797,
+  "source_revision": "c8db18e2c57e898d8b9a9b5097ada06254b32f08-independent-review",
+  "workspace": "/var/tmp/point-sieve-lean-x38t1umn",
+  "runtime_execution": false,
+  "independent_binary_kernel_rechecker": false,
+  "trust": "Pinned precursor and shared mathlib/toolchain caches; pre/post inventories do not exclude transient concurrent changes."
+}
