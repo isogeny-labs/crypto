@@ -1101,7 +1101,13 @@ fn src_elem(src: Source) -> Option<u32> {
 }
 
 fn mul_elem(ring: &TowerRing, fp: Fp, e: &SElem, t: Mono) -> RPoly {
-    ring.mul_terms_fp(fp, e.terms(), e.pos.len(), t, super::f4_fp_tower::TowerWeights::UNIT)
+    ring.mul_terms_fp(
+        fp,
+        e.terms(),
+        e.pos.len(),
+        t,
+        super::f4_fp_tower::TowerWeights::UNIT,
+    )
 }
 
 /// The leading monomials of the elements that no other leading monomial

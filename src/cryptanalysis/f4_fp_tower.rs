@@ -216,7 +216,10 @@ impl TowerWeights {
         assert!(w.len() <= 64, "f4_fp_tower: at most 64 tower weights");
         let mut planes = [0u64; 3];
         for (j, &x) in w.iter().enumerate() {
-            assert!((1..=8).contains(&x), "f4_fp_tower: weight {x} of y_{j} is not in 1..=8");
+            assert!(
+                (1..=8).contains(&x),
+                "f4_fp_tower: weight {x} of y_{j} is not in 1..=8"
+            );
             let e = x - 1;
             for (b, plane) in planes.iter_mut().enumerate() {
                 if (e >> b) & 1 == 1 {
@@ -231,7 +234,10 @@ impl TowerWeights {
     /// of `t` consecutive levels each (`n = blocks·t`): level `i` of every
     /// tower gets weight `2^(i mod k)`. `k = 1` is the unit grading.
     pub fn radix_blocks(blocks: usize, t: usize, k: u32) -> Self {
-        assert!((1..=4).contains(&k), "f4_fp_tower: radix exponent k must be 1..=4");
+        assert!(
+            (1..=4).contains(&k),
+            "f4_fp_tower: radix exponent k must be 1..=4"
+        );
         let w: Vec<u32> = (0..blocks)
             .flat_map(|_| (0..t).map(move |i| 1u32 << (i as u32 % k)))
             .collect();
@@ -271,7 +277,9 @@ impl TowerWeights {
     /// - `c·y_j` and `d` are always below.
     pub fn check(self, ring: &TowerRing) {
         assert!(
-            self.planes.iter().all(|p| ring.n_tower() == 64 || p >> ring.n_tower() == 0),
+            self.planes
+                .iter()
+                .all(|p| ring.n_tower() == 64 || p >> ring.n_tower() == 0),
             "f4_fp_tower: weights set on variables past the tower"
         );
         for (j, r) in ring.rules.iter().enumerate() {
@@ -2331,7 +2339,7 @@ fn f4_tower_cached(
                 .zip(&p.coefs)
                 .map(|(&m, &c)| (mono_w(mask_of(m), free_of(m), w), c))
                 .collect();
-            t.sort_unstable_by(|a, b| b.0.cmp(&a.0));
+            t.sort_unstable_by_key(|x| std::cmp::Reverse(x.0));
             p.monos = t.iter().map(|x| x.0).collect();
             p.coefs = t.iter().map(|x| x.1).collect();
         }
@@ -3631,7 +3639,12 @@ mod tests {
         assert!(TowerWeights::from_slice(&[1; 64]).is_unit());
         for _ in 0..20_000 {
             let (ma, mb): (u64, u64) = (rng.gen(), rng.gen());
-            let fa = [rng.gen_range(0..9u8), rng.gen_range(0..9), 0, rng.gen_range(0..3)];
+            let fa = [
+                rng.gen_range(0..9u8),
+                rng.gen_range(0..9),
+                0,
+                rng.gen_range(0..3),
+            ];
             let fb = [rng.gen_range(0..9u8), 0, rng.gen_range(0..4), 0];
             let (a, b) = (mono(ma, fa), mono(mb, fb));
             assert_eq!(a, unit_key_reference(ma, fa));
@@ -3661,7 +3674,11 @@ mod tests {
             for _ in 0..20_000 {
                 let n = 24u32;
                 let full = (1u64 << n) - 1;
-                let (ma, mb, mu) = (rng.gen::<u64>() & full, rng.gen::<u64>() & full, rng.gen::<u64>() & full);
+                let (ma, mb, mu) = (
+                    rng.gen::<u64>() & full,
+                    rng.gen::<u64>() & full,
+                    rng.gen::<u64>() & full,
+                );
                 let (ma, mb) = (ma & !mu, mb & !mu);
                 let z = [0u8; MAX_FREE];
                 let (a, b, u) = (mono_w(ma, z, w), mono_w(mb, z, w), mono_w(mu, z, w));
@@ -3673,7 +3690,13 @@ mod tests {
                 // Divisibility implies order, 1 is least, and the degree is
                 // the weighted one.
                 assert!(au >= a && a >= ONE);
-                assert_eq!(degree_of(a), (0..n).filter(|j| ma >> j & 1 == 1).map(|j| w.weight(j)).sum::<u32>());
+                assert_eq!(
+                    degree_of(a),
+                    (0..n)
+                        .filter(|j| ma >> j & 1 == 1)
+                        .map(|j| w.weight(j))
+                        .sum::<u32>()
+                );
                 assert!(divides_ungraded(a, au) && divides(a, au));
                 assert_eq!(quotient(au, a), u);
                 let _ = (b, bu);
@@ -3711,10 +3734,14 @@ mod tests {
                         }
                     }
                 }
-                let unit = f4_tower(&[g.clone()], &ring, &TowerF4Options::new(64));
+                let unit = f4_tower(std::slice::from_ref(&g), &ring, &TowerF4Options::new(64));
                 let rep = f4_tower(&[g], &ring, &TowerF4Options::new(64).with_weights(w));
                 assert!(!rep.timed_out && rep.pairs_above_bound == 0);
-                assert_eq!(rep.inconsistent, zeros.is_empty(), "t {t} k {k} trial {trial}");
+                assert_eq!(
+                    rep.inconsistent,
+                    zeros.is_empty(),
+                    "t {t} k {k} trial {trial}"
+                );
                 assert_eq!(rep.inconsistent, unit.inconsistent);
                 if !rep.inconsistent {
                     for z in &zeros {
@@ -3745,7 +3772,11 @@ mod tests {
     #[should_panic(expected = "is not the leading monomial")]
     fn a_grading_that_unseats_the_square_is_refused() {
         let (rules, _) = kummer_block(97, 2, 0);
-        let ring = TowerRing { p: 97, rules, n_free: 0 };
+        let ring = TowerRing {
+            p: 97,
+            rules,
+            n_free: 0,
+        };
         // w(y_1) = 3 > 2·w(y_0): y_1 would lead y_0² − y_1.
         TowerWeights::from_slice(&[1, 3]).check(&ring);
     }

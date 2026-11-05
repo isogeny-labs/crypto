@@ -1480,7 +1480,10 @@ fn measure_tower(
         .iter()
         .filter(|&&m| {
             f4_fp_tower::mask_of(m).count_ones()
-                + f4_fp_tower::free_of(m).iter().map(|&e| u32::from(e)).sum::<u32>()
+                + f4_fp_tower::free_of(m)
+                    .iter()
+                    .map(|&e| u32::from(e))
+                    .sum::<u32>()
                 == 1
         })
         .count();
@@ -2146,7 +2149,9 @@ fn parse_args() -> Args {
             "--radix grades the f4_fp_tower engine only (--engine tower)"
         );
         assert!(
-            a.kinds.iter().all(|k| matches!(k, Kind::Kummer | Kind::Dickson | Kind::DicksonTorus)),
+            a.kinds
+                .iter()
+                .all(|k| matches!(k, Kind::Kummer | Kind::Dickson | Kind::DicksonTorus)),
             "--radix needs towers without a y_j·y_next term (kummer, dickson, dickson-torus): \
              an isogeny step's leading monomial would change"
         );
