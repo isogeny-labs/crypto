@@ -7,11 +7,11 @@
     "Codex planning lane"
   ],
   "status": "blocked",
-  "status_note": "Launch requested; stopped before paid builds or submission. Native study driver/checker and canonical protocol are incomplete, merged-source qualification is pending, and current account/lane headroom, authenticated checkpoint transport and exact native execution admission are unavailable. See the retained launch-readiness record.",
+  "status_note": "Launch requested, still blocked. The first-study six-arm batch runner and word-arithmetic answer replay adapter are implemented with development controls. Full orchestration, independent audit, complete inventories, frozen canonical protocol/analysis, merged-source qualification and cloud/budget/image admission remain pending. No scientific job or timed batch has run.",
   "blocked_on": [
     "pr:2984 native integration and combined-source qualification",
     "problem:problems/native-ecbench-pcc-ledger-fork.md protected canonical ledger decision",
-    "note:Implement native study driver and independent exact checker before readiness",
+    "note:Finish full native study orchestration, independent audit, complete inventories and canonical frozen protocols",
     "note:Current account/lane budget, exact-source S3 readback and native image/execution admission required"
   ],
   "links": {
@@ -19,7 +19,8 @@
     "notes": [
       "research/hashed_ecdl_ecbench_20261030/README.md",
       "docs/hashed-ecdl-functional-plan.md",
-      "backlog/XP-20261105-native-point-hashing/launch-readiness-20261105.json"
+      "backlog/XP-20261105-native-point-hashing/launch-readiness-20261105.json",
+      "research/native_point_hashing_20261105/README.md"
     ],
     "prs": [
       2984
@@ -35,7 +36,16 @@
     "repo": "isogeny-labs/crypto",
     "commit": null,
     "branch": "codex/hashed-ecdl-ecbench-e2e",
-    "build": []
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study"
+      ]
+    ]
   },
   "resources": {
     "cpus": 4,
@@ -48,9 +58,10 @@
   },
   "run": {
     "argv": [
-      "unimplemented-native-point-hash-study",
-      "--out",
-      "{out}"
+      "native_point_hash_study",
+      "run",
+      "UNFROZEN_BATCH_INPUT.json",
+      "{out}/batch.json"
     ],
     "env": {},
     "timeout_per_shard_s": 1800
@@ -66,8 +77,13 @@
     "resume_flag": null
   },
   "outputs": {
-    "result_schema": "unimplemented-native-point-hash-rows/v1",
-    "verify": [],
+    "result_schema": "native-point-hash.batch-record/v1",
+    "verify": [
+      "native_point_hash_study",
+      "check",
+      "UNFROZEN_BATCH_INPUT.json",
+      "{out}/batch.json"
+    ],
     "land": "research/native_point_hashing_20261105"
   },
   "cairn": {
@@ -79,7 +95,7 @@
     "ttl_s": 3600,
     "env": {
       "name": "unimplemented-digest-pinned-native-study",
-      "recipe": "unimplemented-native-driver-and-replayer"
+      "recipe": "unimplemented-full-orchestrator-and-admitted-image; single-batch example exists"
     },
     "exec": {
       "cpus": 4,

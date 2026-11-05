@@ -3,9 +3,10 @@
 Design date: 2026-11-05. Status: **launch requested; blocked before submission**.
 The [launch-readiness record](launch-readiness-20261105.json) retains the
 read-only admission checks and next actions. The [card](card.json) is unready:
-the driver, independent checker,
-canonical protocols, power analysis and execution admission remain to be built
-or completed. Numbers below specify proposed workloads and limits, not results
+the [first-study batch instrument](../../research/native_point_hashing_20261105/README.md)
+now supplies six native arms and a word-arithmetic answer replay adapter.
+Full study orchestration, independent audit, canonical protocols, power analysis
+and execution admission remain to be built or completed. Numbers below specify proposed workloads and limits, not results
 or runtime predictions. The initial request was experiment design; the later
 launch request authorizes execution once the implementation and admission
 prerequisites are satisfied. No paid build or scientific submission was made.
