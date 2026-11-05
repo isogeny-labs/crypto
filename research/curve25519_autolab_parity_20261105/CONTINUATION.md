@@ -121,3 +121,473 @@ The desktop managed-worktree tool could not resolve the remote checkout;
 native Git created the isolated worktree successfully. Conductor rejected the
 shared daily-log scope; the new study scope passed separately. No permission
 or resource limit was broadened.
+
+## Continuation: target-coordinate recovery, 2026-11-05
+
+### What was done
+
+Current source already supplies `WideInstanceCtx`, `WideGauss`, and a
+`CountedGroup::mul_biguint` hook overridden by `Curve25519Wide`. Reuse those
+interfaces rather than widening the legacy `mul(u64)` entry point itself.
+Added `WideGauss::solve_coordinate`: exact unit-row reduction recovers a
+coordinate only when it lies in the relation row space, even at deficient
+total rank. Added `recover_target`, which additionally checks the recovered
+scalar against the supplied Curve25519 target and charges that group check.
+Tests cover wide coefficients, two undetermined factor-base logarithms with
+a determined target, underdetermined pivot coordinates, inconsistent systems,
+out-of-range coordinates and a mismatched target point. These are development
+tests, not measurements or sampled ECDLP solves.
+
+### Decisions made
+
+Single-target recovery need not wait for every base logarithm. Keep the old
+full-rank `solve` API and add a target-specific API. The matrix API neither
+verifies incoming group-relation witnesses nor accounts for its field work;
+both must be supplied by the complete pipeline before comparative use.
+
+### Open threads
+
+Focused release tests are compiling under tool session 33564 (two build jobs,
+1200-second timeout). Command: `CARGO_TARGET_DIR=/tmp/curve25519-autolab-target
+CARGO_BUILD_JOBS=2 timeout 1200 cargo test --release --lib --offline --locked
+curve25519_wide::tests -- --test-threads=2`. Output:
+`/tmp/curve25519-wide-tests-20261105.log`. Poll that session before any retry.
+Source was updated while dependency compilation was in progress; repeat the
+focused command after the initial build to bind the final bytes, then run the
+required library gate before publishing code. No test pass is recorded yet.
+After validation, integrate verified wide relations and charged elimination
+with this recovery entry point, then the ecbench/Autolab execution path.
+
+### Errors
+
+Sparse dependency materialization temporarily removed the study directory
+because it had been added with `git add --sparse`; adding it to the checkout
+definition restored the committed record. No evidence was deleted. Conductor
+reported the source and study scopes clear before edits.
+
+## Continuation: checked wide relation admission, 2026-11-05
+
+### What was done
+
+Added `WideRelationSystem` around the existing arithmetic and matrix. Its
+constructor requires the canonical group and nonidentity prime-subgroup base
+and target points. Admission requires one canonical coefficient per base
+point and verifies `sum c_i B_i = a G + b Q` before inserting the row
+`[c_0, ..., c_n, -b]` with right-hand side `a`. Invalid relations leave the
+matrix unchanged; group verification work remains in the caller's counters.
+Recovery uses the target-coordinate API and the final group check. Tests use
+public point inputs derived from a greater-than-128-bit known-answer scalar,
+with malformed, tampered, duplicate, identity and torsion controls.
+
+### Decisions made
+
+Keep relation search separate from admission and recovery. The code does not
+pretend to discover the known-answer test relations. Scalar recovery from
+valid relations is the implemented stage; matrix-operation accounting and
+full Autolab execution remain subsequent work.
+
+### Open threads
+
+The initial focused test process (session 33564) exited 101. The compiler
+reported 54 missing embedded-file errors; 45 distinct tracked fixture paths
+are being materialized from HEAD with `git archive`, session 1338. The
+retained path list is `/tmp/curve25519-missing-fixtures.txt`; the failed log
+is `/tmp/curve25519-wide-tests-20261105.log`. Poll materialization before
+retrying the focused build with a fresh log. No test pass is recorded.
+
+### Errors
+
+The initial sparse profile omitted embedded library-test fixtures and curve
+registries. All requested paths were checked with `git ls-files
+--error-unmatch`; hydration restores exact tracked bytes without editing
+frozen evidence or weakening tests. Formatting succeeded; final compilation
+and the required library test gate still need to pass before code publication.
+
+Materialization session 1338 completed successfully (45 paths). The final-source
+focused retry is now session 81671, with the same two-job/1200-second limits,
+and log `/tmp/curve25519-wide-tests-20261105-attempt2.log`. The first failed
+log is preserved. Poll session 81671 rather than submitting another retry.
+
+## Continuation: scalar-field accounting, 2026-11-05
+
+### What was done
+
+Added `WideMatrixWork`, exposed by `WideGauss::work` and
+`WideRelationSystem::matrix_work`. Counters accumulate field API calls for
+row insertion, full solution, and target-coordinate reduction: multiplication,
+addition, subtraction, inversion and conversion. Dependent/inconsistent rows
+and unsuccessful coordinate queries retain their work. Counter overflow fails
+explicitly. Added an exact two-column accounting regression covering a
+dependent row, an unsuccessful query, and subsequent recovery.
+
+### Decisions made
+
+These counters are scalar-field native operations, not GAE. Inversion internals,
+allocation, copying, comparisons and field construction are not silently
+included; whole-process pricing and the remaining setup/admission operations
+must still be bound in the complete measurement protocol. No performance
+advantage is claimed from the added counters.
+
+### Open threads
+
+Session 81671 is still compiling the pre-accounting source snapshot. Current
+`src/cryptanalysis/curve25519_wide.rs` SHA-256 is
+`20ae4700e15f0afca073a83217b3875d28032fab447e27f7cf3d939eb708f28a`.
+After that process terminates, rerun the focused command with a new log to
+test these final bytes, then the required library gate. Do not claim its
+earlier compilation validates these later edits. Code remains unpublished.
+
+### Errors
+
+No new compiler error has appeared in attempt 2 as of this entry. The process
+is confirmed live; the missing-fixture failure from attempt 1 remains retained.
+Formatting and `git diff --check` passed for the current source.
+
+## Continuation: recovery tests passed; final accounting gate running
+
+### What was done
+
+Session 81671 finished with exit 0: 13 focused tests passed, zero failed or
+ignored, 6169 filtered out. Release build took 11m05s and test execution
+reported 0.01s. This is the pre-accounting version, as the 13-test list shows;
+it is not final-source validation. Its retained log SHA-256 is
+`2509cca6dbd52a4c773beb903758fa7a941fbb09d60d367fe11c8e3bdc3d0367`.
+PR 3466 is now merged. Uncommitted code is on the new branch
+`codex/curve25519-wide-relations-20261105` in the same worktree.
+
+### Decisions made
+
+Freeze source SHA-256
+`20ae4700e15f0afca073a83217b3875d28032fab447e27f7cf3d939eb708f28a`
+for final validation. Publish the implementation in its own PR after the
+focused tests and required library gate pass.
+
+### Open threads
+
+Session 13039 runs the final focused command (two build jobs, 1200-second
+timeout) into `/tmp/curve25519-wide-tests-20261105-final.log`, followed only
+on success by `cargo test --release --lib --offline --locked --
+--test-threads=2 --quiet` with a 1800-second timeout into
+`/tmp/curve25519-library-tests-20261105-final.log`. Both use
+`CARGO_TARGET_DIR=/tmp/curve25519-autolab-target`. Poll that same process.
+No final-source test pass or full-library pass is recorded yet.
+
+### Errors
+
+No new compiler errors have appeared in final validation. Preserve the
+original missing-fixture build failure and provisional success separately.
+
+### Additional integration interfaces located during final validation
+
+`ecbench/workload.rs::CurveFacts` stores `r`, `group_order`, and `cofactor`
+as `u128`; `ecbench/methods.rs::SolveReport.recovered` is `Option<u128>`.
+`ecbench/record.rs::Outcome.recovered` is already an optional string. The
+wide pipeline must carry exact subgroup orders and recovered scalars through
+all intermediate types, not only stringify the final outcome. Preserve the
+canonical serialization of historical records. The final accounting source
+remains frozen while session 13039 runs.
+
+## Final focused validation passed; library fixtures being reconciled
+
+### What was done
+
+The final-source focused command passed all 14 tests, zero failed or ignored,
+6169 filtered out. Build duration 9m55s, test duration 0.01s. The source still
+hashes to `20ae4700e15f0afca073a83217b3875d28032fab447e27f7cf3d939eb708f28a`;
+the final focused log hashes to
+`e772bf513744e56323a2fb61f0215acd6745e4896a59fd99f40f647f56087b18`.
+Session 13039 advanced to the full 6183-test library suite.
+
+### Decisions made
+
+Do not publish code until the full gate is resolved. The first library attempt
+has fixture-dependent failures and is retained intact; do not reinterpret the
+focused pass as a full-suite pass. No source edits during this validation.
+
+### Open threads
+
+The library suite is still running under session 13039. Device tests require
+the tracked `gpu/certicom` emulator sources, absent from the sparse checkout;
+hydration session 17465 completed. Additional failures name band, bounds,
+challenge, claim and Koblitz rule-default tests. Session 48244 materializes
+their tracked research fixtures and docs/bounds via `git archive HEAD`.
+Poll both handles, collect final diagnostics, and finish any remaining exact
+fixture hydration before the next full-library attempt. Preserve all logs.
+
+### Errors
+
+At least 17 failures were reported before the library suite reached its end.
+The device test source explicitly requires `gpu/certicom/emulator.cpp`; the
+other affected tests read archived research paths outside the sparse profile.
+Exact final failure messages remain to be collected. No source defect is
+ruled out by this preliminary diagnosis.
+
+## 2026-11-05T16:41:57Z — tracked runtime fixtures restored
+
+### What was done
+
+Reconciled the still-live full-library session 13039 without launching a duplicate. Completed exact HEAD hydration of the r24 planner sessions, ecbench work-v1 test fixtures, all 15 evidence paths declared by the planner, and the archived n37 SOURCE42 input. The earlier Certicom, bounds, claim, challenge and rule-v8 hydration also completed. Each restoration used tracked Git objects; no assertions or historical evidence were edited.
+
+### Decisions made
+
+Retain the first full-suite attempt and its failures. Finish its diagnostics before retrying; restoration during the run does not retroactively change its failed tests. Keep source frozen at SHA-256 20ae4700e15f0afca073a83217b3875d28032fab447e27f7cf3d939eb708f28a.
+
+### Open threads
+
+The full library process remains active; final status and failure details are pending. The final focused 14-test pass remains the verified code result. Publication waits on the library gate; no new scientific or cloud trial was submitted.
+
+### Errors
+
+Two additional fixture-dependent tests failed: planner::every_cited_file_exists and plugins::compact_orbit_scan_matches_archived_n37_source42. Their tracked inputs have now been materialized. Confirm the exact terminal diagnostics before classifying all suite failures as fixture omissions.
+
+## 2026-11-05T16:44:10Z — all 20 fixture rechecks passed
+
+### What was done
+
+Ran the 20 already-failed test names individually against the exact existing release test binary after fixture hydration, with a 120-second per-test and 600-second enclosing bound. All 20 exited zero. The recheck process (session 31688) is terminal. Retained the names, log, three completed focused-build attempt logs, byte counts and SHA-256 hashes in validation-wide-relations/.
+
+### Decisions made
+
+The unchanged binary passes every failure observed so far once its tracked inputs are present. This supports the fixture diagnosis for these 20 tests. It does not replace the full-library gate. The first full-suite attempt is still running under session 13039 and is preserved.
+
+### Open threads
+
+Collect any additional failures and the terminal full-library result, then rerun the required suite after exact fixture reconciliation. Publish source and validation artifacts only after the gate is resolved.
+
+### Errors
+
+No failure in the 20 targeted rechecks. Original full-suite failures remain in the original log and are not rewritten.
+
+## 2026-11-05T16:47:10Z — matched rho width dependency inspected
+
+### What was done
+
+Read ic_wide::rho_negation and koblitz_strong_rho::RhoScalar. The scalar trait requires Copy plus SampleUniform and an unconditional to_u128 conversion; its only implementations are u64 and u128. ic_wide::gen_below invokes to_u128 to choose its one-word compatibility sampling branch. rho_negation also routes its legacy recovered field through to_u128, while returning an Option<S> separately. A nominal new scalar implementation must not silently truncate at either call site.
+
+### Decisions made
+
+Include the matched rho reference in the full-width integration. Preserve exact one-word sampling and existing committed behavior for u64/u128; require checked narrowing and exact wide sampling/serialization for the actual subgroup. BigUint cannot directly implement the current Copy-constrained trait. A fixed-width scalar adapter or an explicit trait refactor must cover these requirements before an actual-curve comparison. No new reference implementation or performance result is claimed.
+
+### Open threads
+
+The original library process remains live with its source frozen. After validation/publication, include full-width reference sampling, collision arithmetic, recovered-result transport and replay in the next implementation scope alongside IC workload dispatch.
+
+### Errors
+
+No new failure observed since the 20 fixture rechecks. The width restriction is a source integration dependency, not a failed experiment.
+
+## 2026-11-05T16:54:43Z — full library attempt 1 terminal
+
+### What was done
+
+Session 13039 exited 101. Full suite: 6026 passed, 27 failed, 130 ignored, 1268.84 seconds. Preserved terminal log and hashed library-attempt1.json. All terminal failure diagnostics report absent tracked inputs. Twenty tests already passed after their fixtures were restored; seven additional failures require the tracked CryptoPro-B frozen chain constants.
+
+### Decisions made
+
+Restore the final tracked input and individually verify the seven remaining failures before one fresh full-suite rerun with unchanged source and the same 1800-second bound. Retain the original manifest as an observation at its creation time; library-attempt1.json supplies terminal status.
+
+### Open threads
+
+Complete final fixture hydration and seven rechecks, then execute the full library gate. Source publication still waits for the gate.
+
+### Errors
+
+The first full-suite attempt failed due to unavailable runtime fixture paths, including seven CryptoPro-B chain-set tests discovered at the end. No assertion was changed.
+
+## 2026-11-05T16:56:05Z — all 27 failed tests rechecked; full gate rerunning
+
+### What was done
+
+Hydration session 13416 completed. All seven CryptoPro-B chain-set tests exited zero in individual rechecks against the unchanged test binary. Retained their exact names/logs and hashes under validation-wide-relations/. Together with the earlier 20 rechecks, all 27 original failures now pass. Reverified the frozen source SHA-256.
+
+### Decisions made
+
+Started one fresh full-library attempt after the previous process was terminal and all known failures had passed. Command: CARGO_TARGET_DIR=/tmp/curve25519-autolab-target CARGO_BUILD_JOBS=2 timeout 1800 cargo test --release --lib --offline --locked -- --test-threads=2 --quiet. No test skips or source changes.
+
+### Open threads
+
+Live session 68390; log /tmp/curve25519-library-tests-20261105-attempt2.log. Poll that handle without duplicating the run. Preserve terminal result and publish only after the required library gate passes.
+
+### Errors
+
+No failure in the final seven rechecks. Attempt 1 stays failed and immutable. Attempt 2 has no result yet.
+
+## 2026-11-05T17:01:10Z — fast-probe coordinate regression reproduced
+
+### What was done
+
+An isolated native Rust diagnostic using the copied current curve implementation and repository Fp256 found a real hit mismatch: base G..64G, Q=-67G gives affine (1,3), fast (0,8), assertion exit101. Subtracting A/3 before the Montgomery recurrence and adding A/3 before the stored Weierstrass-key lookup gives (1,3), exit0. The isolated harness extracts the original ledger/trait definitions and uses a panic-only shim for an unused Fp64 primality path. Preserved logs, minimal regression/fix patches and hashes under validation-wide-relations/probe-regression/.
+
+### Decisions made
+
+Keep the repository source frozen for the ongoing full-suite run; the diagnostic patches are not applied. Before full-width collector integration, reproduce with the actual crate, cover identity crossings and batch boundaries, and integrate the correction with source-level tests. No comparative measurement or speed claim follows from this diagnostic.
+
+### Open threads
+
+Full-suite session68390 remains active. The confirmed coordinate mismatch adds a concrete correctness repair before using probe_hits_fast in the full solver. The checked standalone case does not establish all edge cases.
+
+### Errors
+
+Initial standalone compilation missed the unrelated Fp64 primality module; retained its failed log, then supplied a panic-only unused shim. The original native assertion fails as expected; the corrected copied source passes. Main repository tests for this new regression are not yet run.
+
+## 2026-11-05T17:06:59Z — identity and batch-edge probe prototype checked
+
+### What was done
+
+The coordinate-only diagnostic exposed three further mismatches at Q=O,-G,-2G. A copied-source affine-suffix fallback at exceptional x(G)/identity states passed seven cases and then 18 deterministic identity/doubling/batch-edge/bounded-hit cases. Hit indices and legacy affine-equivalent GroupOps agree with direct enumeration in all 18. Retained original failures, prototype logs, hashes and an unapplied combined fix/regression patch in validation-wide-relations/probe-edges/.
+
+### Decisions made
+
+The combined patch supersedes the coordinate-only proposal. Preserve the frozen source until the active library gate ends. The inherited affine-equivalent ledger excludes actual projective block and exceptional reconstruction overhead, so do not use these counter matches as full-cost measurement.
+
+### Open threads
+
+Poll session68390; then apply the combined repair with actual-crate regressions and the required checks before solver integration. Full-width scalar/reference integration remains separate ongoing work.
+
+### Errors
+
+Coordinate-only seven-case diagnostic exited101 with three mismatches. Extended prototype exited0 for 18 cases. These are standalone native diagnostics, not final repository-test passes.
+
+## 2026-11-05T17:11:06Z — probe correction integrated, validation queued
+
+### What was done
+
+Conductor check reported source/study scopes clear. Saved source-before-probe.patch and its base commit/hash to preserve the running suite snapshot. Integrated Montgomery/Weierstrass conversion, exceptional affine suffix and the 18-case regression in the normal curve25519_wide::tests module. Reused the first affine point, avoided duplicate lookup conversion and saturated the batch bound. Documented the inherited affine-equivalent tally exclusion. Rustfmt and git diff --check passed.
+
+### Decisions made
+
+New source SHA-256: d9671086380789e83ed5cfb518cb054a53d3dfda4d7e2e3d957ad4ac48d6039a. The still-running session68390 validates the prior source, not this repair. Freeze this new source for validation. The prototype patches now describe implemented history; the current source includes minor cleanup and the regression within the test module.
+
+### Open threads
+
+Session51745 waits on confirmed prior PID838376 (maximum1800 seconds), checks the repaired source hash, then runs the focused tests (1200-second limit) and only on success the full library suite (1800-second limit), with two build/test threads. Logs: /tmp/curve25519-wide-tests-20261105-probe-fix.log and /tmp/curve25519-library-tests-20261105-probe-fix.log. Poll those existing handles; do not start another validation chain. Preserve terminal old/new results separately.
+
+### Errors
+
+No new test result yet for the integrated repair. The old focused14 pass and standalone18-case pass remain scoped to their recorded snapshots. Source is not yet published.
+
+## 2026-11-05T17:18:56Z — pre-repair full library gate passed
+
+### What was done
+
+Session68390 exited0: 6053 passed, zero failed, 130 ignored, 1317.01 seconds. Retained the full terminal log and library-attempt2.json hash/size receipt. Separately reconstructed source SHA-256 20ae4700e15f0afca073a83217b3875d28032fab447e27f7cf3d939eb708f28a from the recorded base and source-before-probe.patch; all 23 archived artifact hashes/sizes in the checked manifests matched.
+
+### Decisions made
+
+This is a complete library pass for the relation-recovery/accounting implementation before the later probe repair. Keep that scope explicit. Do not attribute it to the repaired source d9671086380789e83ed5cfb518cb054a53d3dfda4d7e2e3d957ad4ac48d6039a.
+
+### Open threads
+
+Session51745 has moved from waiting to compiling the repaired source. Its focused log now reports Compiling crypto; no focused or full repaired-source result yet. Retain this handle, then capture both results and publish the implementation once its final gate passes.
+
+### Errors
+
+No failures in the pre-repair rerun. The original failed attempt remains preserved with all 27 passing rechecks.
+
+## Reporting clarification and delivery preparation
+
+### What was done
+
+Read the repository's PCC reporting contract and restored its tracked tool/keyring/ledger files from HEAD. Added DELIVERY.md with explicit unsigned producer-observation labels; `pcc lint-prose` returned zero findings. All prior local test, hash, replay and correctness statements in this continuation are producer observations, not signed PCC execution verdicts. [pcc:unverified]
+
+### Decisions made
+
+Preserve historical raw logs and result records. Use explicit `[pcc:unverified]` status in delivery prose until a signed verdict exists. Neither the local artifact manifest nor the successful library process establishes PCC verification. [pcc:unverified]
+
+### Open threads
+
+Conductor denied the claims-directory and ledger scopes because task T-1641 holds them exclusively. Official registration remains pending; do not bypass the reservation. Repaired-source validation continues in session51745 with the source unchanged. [pcc:unverified]
+
+### Errors
+
+The PCC tool was initially absent from the sparse checkout, though tracked; exact hydration resolved that access issue. Official claim creation was not attempted after the ownership conflict. Earlier unqualified uses of verification terminology are superseded by the explicit unsigned scope above. [pcc:unverified]
+
+## 2026-11-05T17:30:23Z — repaired source focused tests passed
+
+### What was done
+
+The focused actual-crate run reports 15 passed, zero failed or ignored, 6169 filtered, 0.13 seconds test runtime. This includes the integrated 18-case identity/batch-edge regression. Source SHA-256 remains d9671086380789e83ed5cfb518cb054a53d3dfda4d7e2e3d957ad4ac48d6039a. Preserved the log and focused-probe-fix.json hash/size receipt and updated DELIVERY.md. [pcc:unverified]
+
+### Decisions made
+
+Keep source frozen. The focused pass is now for the actual repaired repository module; it still does not replace the full-library gate. All results remain unsigned producer observations. [pcc:unverified]
+
+### Open threads
+
+Session51745 proceeds to the full library command with its existing 1800-second timeout. Log /tmp/curve25519-library-tests-20261105-probe-fix.log. Poll that same handle and preserve its terminal result before publication. Official PCC registration still awaits the separate reserved ledger scope. [pcc:unverified]
+
+### Errors
+
+No focused test failures reported. Earlier failed fixture and probe diagnostics remain retained. [pcc:unverified]
+
+## Full-width transport inspection during final validation
+
+### What was done
+
+Inspected the ecbench scalar codec and workload producers/consumers. `compat_u128` already writes values through u64 as JSON numbers and larger values as decimal strings; its parser is limited to u128. `matching_representation` and `parse_hex` narrow both subgroup orders and registry coordinates to u128. `Instance::mul_generator_hex`, `planted_scalar`, the public-target route, and the runner/audit/compare/bounds/work pricing consumers must be included in any widening change. [pcc:unverified]
+
+### Decisions made
+
+Extend the existing number-or-decimal-string serialization convention while preserving historical serialized records and target laws. Use exact internal order/coordinate/scalar representations and checked narrowing into legacy engines. Do not use zero sentinels for orders that exceed u128. Give any new full-width target sampler an explicit law identity rather than changing old seeded inputs. The exact order is greater than 2^252 and below 2^253: its integer bit length is 253, although log2(r) is approximately 252; distinguish this from the 255-bit field. [pcc:unverified]
+
+### Open threads
+
+Implement full-width construction, public target generation, exact registry identity, scalar recovery transport and replay together after this component's delivery. The rho adapter separately needs exact wide sampling and checked result conversion. Final repaired-source library session51745 is still active; no additional run was submitted. [pcc:unverified]
+
+### Errors
+
+No new test failure observed during this inspection. No transport code was changed, and no widened workload is claimed executable yet. [pcc:unverified]
+
+## 2026-11-05T17:40:09Z — exact-scalar codec candidate tested
+
+### What was done
+
+Conductor reported the proposed ecbench/exact_scalar.rs scope clear. Prepared and natively compiled an isolated four-limb unsigned codec, then ran four tests covering exact width boundaries, order/bit comparisons against BigUint, checked narrowing, optional scalars, invalid/oversized JSON, and legacy wire shape. Test output reports four passed and zero failed. Saved source, logs, compiler/dependency hashes and scope in next-integration/exact-scalar/. [pcc:unverified]
+
+### Decisions made
+
+Keep the current library source frozen. This candidate is not registered in ecbench and supplies no arithmetic, target sampler or solver. Next integration must compare against the actual legacy codec and preserve committed record bytes and target laws, then widen consumers rather than introducing truncated/sentinel values. [pcc:unverified]
+
+### Open threads
+
+Final library session51745 continues without a reported failure. Publish the relation/probe implementation after its gate; use this separately tested codec candidate for the subsequent complete width integration. [pcc:unverified]
+
+### Errors
+
+No standalone build or test failure reported. This result is not an integrated full-width workload pass. [pcc:unverified]
+
+## 2026-11-05T17:44:16Z — exact-scalar legacy compatibility checked
+
+### What was done
+
+Compiled a native harness including the actual extracted compat_u128 codec and the unchanged candidate. Test output reports seven passed: four original tests plus three compatibility tests. All 3204 records across four retained fixtures were read; 9612 order/cofactor fields preserved their original JSON values and matched legacy serialization. Constructed boundaries through u128::MAX cross-decoded and compared bytes, including nullable values. Retained sources, logs, fixture hashes and compatibility scope in next-integration/exact-scalar/. [pcc:unverified]
+
+### Decisions made
+
+Historical records checked here contain no above-u64 field. Do not present that cohort as historical u128-record coverage; constructed boundary cases cover the larger old codec domain. This candidate remains unregistered in the library and does not alter the source under the current full suite. [pcc:unverified]
+
+### Open threads
+
+Session51745 remains live with no reported full-suite failure. After its result, complete delivery and integrate exact transport through the workload, identity, target, solver and audit paths. [pcc:unverified]
+
+### Errors
+
+No build or compatibility-test failure reported. No archived fixture was edited. [pcc:unverified]
+
+## 2026-11-05T17:54:19Z — final repaired-source full library pass
+
+### What was done
+
+Session51745 exited0. Final full library output: 6054 passed, zero failed, 130 ignored, 1348.17 seconds. Source SHA-256 remains d9671086380789e83ed5cfb518cb054a53d3dfda4d7e2e3d957ad4ac48d6039a. Retained terminal log and library-probe-fix.json. Updated DELIVERY.md with final results and explicit standalone codec scope. [pcc:unverified]
+
+### Decisions made
+
+Proceed to commit, push and regular PR publication of this validated local component. Keep all scientific results unsigned; current PCC reservation readback names T-1649, replacing the earlier T-1641 observation. No reserved claim/ledger writes are made. [pcc:unverified]
+
+### Open threads
+
+Current-head PR checks and delivery remain, followed by full-width Autolab/ecbench and rho integration. The codec candidate remains outside runtime dispatch. [pcc:unverified]
+
+### Errors
+
+No final focused or library test failures reported. All earlier failed attempts and exact scope boundaries remain preserved. [pcc:unverified]
