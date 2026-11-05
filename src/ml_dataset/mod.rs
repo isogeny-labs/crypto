@@ -1,6 +1,7 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
 pub mod budget;
 pub mod capture;
+mod cost_labels;
 pub mod curves;
 pub mod custody;
 mod execution;
@@ -79,6 +80,11 @@ pub enum DatasetCommand {
     },
     /// Count recorded outcomes without rerunning any solver.
     Status {
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Replay a local run and report fail-closed instruction-to-solve labels.
+    CostLabels {
         #[arg(long)]
         out: PathBuf,
     },
@@ -1056,6 +1062,9 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         }
         DatasetCommand::Status { out } => {
             println!("{}", verify_run(out, false)?);
+        }
+        DatasetCommand::CostLabels { out } => {
+            println!("{}", cost_labels::report_run(out)?);
         }
         DatasetCommand::Report { out, destination } => {
             println!("{}", report::report_run(out, destination)?);
