@@ -440,7 +440,15 @@ fn read_request(path: &str) -> Result<Request, String> {
 }
 
 fn replay(r: &Request, record: &serde_json::Value) -> Result<reference::Certificate, String> {
-    r.validate()?;
+    replay_counted(r, record, &mut reference::CheckWork::new(r))
+}
+
+fn replay_counted(
+    r: &Request,
+    record: &serde_json::Value,
+    work: &mut reference::CheckWork,
+) -> Result<reference::Certificate, String> {
+    r.validate_counted(&mut work.validation)?;
     if record["schema"] != "pkm.oracle-output/v1"
         || record["request_sha256"] != r.digest()
         || record["request"] != serde_json::to_value(r).map_err(|e| e.to_string())?
@@ -496,7 +504,7 @@ fn replay(r: &Request, record: &serde_json::Value) -> Result<reference::Certific
     if sum != number(&ledger["total_ns"])? {
         return Err("exclusive phase ledger does not reconcile".into());
     }
-    reference::check(r, &witnesses, complete)
+    reference::check_counted(r, &witnesses, complete, work)
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

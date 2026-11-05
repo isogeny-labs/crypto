@@ -160,11 +160,58 @@ pub(super) struct Certificate {
     pub scope: &'static str,
 }
 
+/// Disjoint stages; point/inverse diagnostics overlap field children within
+/// each stage. These legacy affine counters have no qualified overflow bound.
+#[derive(Clone, Copy, Default, Debug, PartialEq, Eq, serde::Serialize)]
+pub(super) struct CheckCounts {
+    pub validation: Counts,
+    pub witness_checks: Counts,
+    pub enumeration: Counts,
+}
+
+impl CheckCounts {
+    pub fn merge(&mut self, other: Self) {
+        self.validation.merge(other.validation);
+        self.witness_checks.merge(other.witness_checks);
+        self.enumeration.merge(other.enumeration);
+    }
+}
+
+/// Retained by the caller on every Result-returning refusal path.
+pub(super) struct CheckWork {
+    pub validation: Counts,
+    witnesses: Curve,
+    enumeration: Curve,
+}
+
+impl CheckWork {
+    pub fn new(r: &Request) -> Self {
+        Self {
+            validation: Counts::default(),
+            witnesses: Curve::new(r),
+            enumeration: Curve::new(r),
+        }
+    }
+    pub fn counts(&self) -> CheckCounts {
+        CheckCounts {
+            validation: self.validation,
+            witness_checks: self.witnesses.counts,
+            enumeration: self.enumeration.counts,
+        }
+    }
+}
+
+#[cfg(test)]
 pub(super) fn all(r: &Request) -> Result<(BTreeSet<Witness>, Counts), String> {
+    let mut curve = Curve::new(r);
+    let found = all_counted(r, &mut curve)?;
+    Ok((found, curve.counts))
+}
+
+fn all_counted(r: &Request, curve: &mut Curve) -> Result<BTreeSet<Witness>, String> {
     if r.p > 257 {
         return Err("independent exhaustive control is limited to p<=257".into());
     }
-    let mut curve = Curve::new(r);
     let mut groups = Vec::new();
     for x in 0..r.p {
         // Scan the field independently: no root-of-unity generator or sqrt API.
@@ -184,7 +231,7 @@ pub(super) fn all(r: &Request) -> Result<(BTreeSet<Witness>, Counts), String> {
     }
     let mut combinations = 1u128;
     if groups.len() < r.m {
-        return Ok((BTreeSet::new(), curve.counts));
+        return Ok(BTreeSet::new());
     }
     for i in 0..r.m {
         combinations = combinations * (groups.len() - i) as u128 / (i + 1) as u128;
@@ -222,24 +269,33 @@ pub(super) fn all(r: &Request) -> Result<(BTreeSet<Witness>, Counts), String> {
         }
     }
     let mut found = BTreeSet::new();
-    visit(&mut curve, &groups, r, 0, &mut Vec::new(), None, &mut found);
-    Ok((found, curve.counts))
+    visit(curve, &groups, r, 0, &mut Vec::new(), None, &mut found);
+    Ok(found)
 }
 
+#[cfg(test)]
 pub(super) fn check(
     r: &Request,
     witnesses: &[Witness],
     complete: bool,
 ) -> Result<Certificate, String> {
-    let mut curve = Curve::new(r);
+    check_counted(r, witnesses, complete, &mut CheckWork::new(r))
+}
+
+pub(super) fn check_counted(
+    r: &Request,
+    witnesses: &[Witness],
+    complete: bool,
+    work: &mut CheckWork,
+) -> Result<Certificate, String> {
     let actual: BTreeSet<_> = witnesses.iter().cloned().collect();
     if actual.len() != witnesses.len() {
         return Err("duplicate witness in submitted output".into());
     }
-    if !witnesses.iter().all(|w| curve.verify(r, w)) {
+    if !witnesses.iter().all(|w| work.witnesses.verify(r, w)) {
         return Err("independent original-curve witness verification failed".into());
     }
-    let (expected, counts) = all(r)?;
+    let expected = all_counted(r, &mut work.enumeration)?;
     if !actual.is_subset(&expected) {
         return Err("submitted witness outside exhaustive control".into());
     }
@@ -252,7 +308,88 @@ pub(super) fn check(
         submitted_witnesses: actual.len(),
         independently_valid: true,
         complete_set_match: complete.then_some(actual == expected),
-        reference_counts: counts,
+        // Legacy enumeration-only view, not the total attempted check work.
+        reference_counts: work.enumeration.counts,
         scope: "bounded independent correctness control; no performance comparison",
     })
+}
+
+#[cfg(test)]
+mod accounting_tests {
+    use super::*;
+
+    #[test]
+    fn successful_and_lost_output_checks_keep_disjoint_witness_and_enumeration_work() {
+        let r = crate::tests::fixture();
+        let (all, enumeration) = all(&r).unwrap();
+        let all: Vec<_> = all.into_iter().collect();
+        assert!(all.len() > 1);
+        let mut work = CheckWork::new(&r);
+        let certificate = check_counted(&r, &all, true, &mut work).unwrap();
+        let counts = work.counts();
+        assert_eq!(certificate.reference_counts, enumeration); // legacy view
+        assert_eq!(counts.enumeration, enumeration);
+        let mut witness_control = Curve::new(&r);
+        assert!(all.iter().all(|w| witness_control.verify(&r, w)));
+        assert_eq!(counts.witness_checks, witness_control.counts);
+        assert!(counts.witness_checks.field_multiplications > 0);
+        assert_eq!(counts.validation, Counts::default());
+
+        let mut lost = CheckWork::new(&r);
+        assert!(check_counted(&r, &all[1..], true, &mut lost).is_err());
+        assert_eq!(lost.counts().enumeration, enumeration);
+        assert!(lost.counts().witness_checks.point_tests > 0);
+        let mut aggregate = counts;
+        aggregate.merge(lost.counts());
+        let mut expected_witness = witness_control.counts;
+        expected_witness.merge(lost.counts().witness_checks);
+        assert_eq!(aggregate.witness_checks, expected_witness);
+        let mut twice = enumeration;
+        twice.merge(enumeration);
+        assert_eq!(aggregate.enumeration, twice);
+    }
+
+    #[test]
+    fn corrupt_witness_keeps_checked_prefix_and_duplicate_refusal_starts_no_arithmetic() {
+        let r = crate::tests::fixture();
+        let (all, _) = all(&r).unwrap();
+        let all: Vec<_> = all.into_iter().collect();
+        let mut submitted = vec![all[0].clone(), all[1].clone()];
+        submitted[1][0].y = r.p;
+        let mut work = CheckWork::new(&r);
+        assert!(check_counted(&r, &submitted, false, &mut work).is_err());
+        let mut expected = Curve::new(&r);
+        assert!(expected.verify(&r, &submitted[0]));
+        assert!(!expected.verify(&r, &submitted[1]));
+        assert_eq!(work.counts().witness_checks, expected.counts);
+        assert_eq!(work.counts().enumeration, Counts::default());
+        let mut duplicate = CheckWork::new(&r);
+        assert!(
+            check_counted(&r, &[all[0].clone(), all[0].clone()], true, &mut duplicate).is_err()
+        );
+        assert_eq!(duplicate.counts(), CheckCounts::default());
+    }
+
+    #[test]
+    fn enumeration_budget_refusal_retains_the_completed_field_scan() {
+        let mut r = crate::tests::fixture();
+        r.p = 257;
+        r.a = 2;
+        r.b = 1;
+        r.t = 7;
+        r.g = 1;
+        r.zeta = 9;
+        r.target = Point { x: 0, y: 1 };
+        let mut work = CheckWork::new(&r);
+        r.validate_counted(&mut work.validation).unwrap();
+        let error = check_counted(&r, &[], false, &mut work).unwrap_err();
+        assert!(error.contains("one million"));
+        let counts = work.counts();
+        assert_eq!(counts.validation.point_tests, 1);
+        assert_eq!(counts.witness_checks, Counts::default());
+        assert_eq!(counts.enumeration.membership_tests, 257);
+        assert_eq!(counts.enumeration.point_tests, 128 * 257);
+        assert!(counts.enumeration.field_multiplications > 4 * 128 * 257);
+        assert_eq!(counts.enumeration.signed_tuples, 0);
+    }
 }
