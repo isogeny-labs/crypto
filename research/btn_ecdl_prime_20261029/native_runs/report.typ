@@ -60,35 +60,33 @@ assignments equal $2^(4d)$ in every count:
 )
 
 #if net != none [
-  ECCp-131 (d = 131, published challenge input): #net.map(n => [#n.at("slots") slots: #n.at("edges") edges, max degree #n.at("max_degree")]).join("; ").
+  ECCp-131 (d = 131, published challenge input, certified primes): #net.first().at("slots") slots, #net.first().at("edges") edges, #net.first().at("vertices") vertices, max degree #net.first().at("max_degree"), #net.first().at("interface_bits") interface bits (4 · 131 free coordinate bits plus 2 constant identity flags).
 ] else [
-  ECCp-131 network size: *not recorded* — the `size-json` build did not finish,
-  stuck in AKS primality certification of the 131-bit prime (see "Setup
-  bottleneck"), not in network construction.
+  ECCp-131 network size: *not recorded*.
 ]
 
 #figure(image("native_scaling.svg", width: 100%), caption: [Recorded sizes, per-count assignments and steps, and the derived ECCp-131 comparison. Source: `native_runs/report.json`.])
 
-== Setup bottleneck: primality certification above 64 bits
+== Setup: primality certification above 64 bits (resolved with certificates)
 
-Before the contraction cost matters, there is a harder practical wall:
-`is_prime` (used by `Curve::new` and `FactorBase::new` to certify the field and
-subgroup primes) dispatches to a fast u64 path at <= 64 bits and to *AKS* above.
+`is_prime` (used by `Curve::new` and `FactorBase::new`) dispatches to a fast
+u64 path at <= 64 bits and to *AKS* above.
 
 #let S = R.at("setup_bottleneck")
 #let pu = S.at("is_prime").at("u64_path_max_micros")
 #let pa = S.at("is_prime").at("aks_at_65_bits")
-At <= 64 bits every certification took at most #pu µs. At 65 bits (AKS) it did
-*not finish in #pa.at("did_not_finish_seconds") s*, a jump of more than seven
-orders of magnitude at a single bit. ECCp-131's prime is 131-bit, so the curve
-cannot even be constructed in reasonable time; the 131-bit `size-json` build was
-stuck here, not in the network.
+Without certificates, every certification at <= 64 bits took at most #pu µs,
+while AKS at 65 bits did *not finish in #pa.at("did_not_finish_seconds") s*.
+That is why the first uncertified ECCp-131 build never finished.
 
-By contrast, *network construction is fast at every width*: the Fourier
-integer-multiply builds in
+The crate on `main` now accepts independently checked Pocklington certificates
+(`Curve::with_cofactor_and_certificates`, landed by a separate change). With the
+bundled `eccp131-certified-hash.json` (5 certificates, certified 132-bit hash
+prime) the ECCp-131 curve validates in about 13 ms and its full decomposition
+network builds (below). Network construction itself is fast at every width: the
+Fourier integer-multiply builds in
 #S.at("multiply_construction").at("rows").map(m => [#m.at("width")-bit: #m.at("micros") µs]).join(", ").
-So the blockers, in order, are (1) prime certification above 64 bits (AKS),
-then (2) the recursion crossover below. Neither is close to feasible.
+So setup is no longer the wall; the recursion crossover is.
 
 == The recursion crossover (headline)
 

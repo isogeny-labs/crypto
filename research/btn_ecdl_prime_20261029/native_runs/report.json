@@ -218,14 +218,36 @@
   "eccp131": {
     "derivation": "Functional backend visits 2^(free input bits); measured equal to 2^(4d) at d=3,4; two slots at d=131 give 4*131 = 524 free bits",
     "functional_backend_log2_assignments_per_contraction": 524,
-    "network": null,
+    "network": {
+      "build_steps": 6103,
+      "certificates": 5,
+      "d": 131,
+      "file": "../../crates/hashed-ecdl-tensor/examples/eccp131-certified-hash.json",
+      "hash_prime": "3102808443644027376164572183694178153449",
+      "networks": [
+        {
+          "edges": 1684796,
+          "interface_bits": 526,
+          "max_degree": 1032,
+          "slots": 2,
+          "vertices": 249620
+        },
+        {
+          "edges": 1684796,
+          "interface_bits": 526,
+          "max_degree": 1032,
+          "slots": 2,
+          "vertices": 249620
+        }
+      ]
+    },
     "pollard_rho_log2_group_ops": 65.32574806473616
   },
   "inputs": {
-    "counts": "../native_runs/counts.jsonl",
-    "eccp131_size": "../native_runs/eccp131_size.json",
-    "sizes": "../native_runs/sizes.jsonl",
-    "solves": "../native_runs/solves.jsonl"
+    "counts": "./counts.jsonl",
+    "eccp131_size": "./eccp131_size.json",
+    "sizes": "./sizes.jsonl",
+    "solves": "./solves.jsonl"
   },
   "notes": [
     "steps are hashed-ecdl-tensor Meter charges: deterministic diagnostics, not calibrated time units",
@@ -233,9 +255,9 @@
   ],
   "recursion_crossover": {
     "epsilon_denominator": 131072,
-    "log2_max_edges_built_here": 17.77143788480261,
+    "log2_max_edges_built_here": 20.684142485594474,
     "lower_bound_log2_edges": 131070.0,
-    "max_edges_built_here": 223736,
+    "max_edges_built_here": 1684796,
     "min_lambda_for_recursion": 131072,
     "note": "transcribed from recursive.rs Setup::parameters; recursion engages only above ~2^131070 edges, so no feasible curve reaches it and every count here used the exact fallback",
     "paper_threshold_log2_edges_approx": "2^17 = 131072 (manuscript's 2^(2^17))"

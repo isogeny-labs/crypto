@@ -13,7 +13,7 @@ B=$CARGO_TARGET_DIR/release/btn-prime-scaling
 $B sizes 5 11 17 37 67 131 257 521 1031 2053 4099 8209 16411 32771 65537 > native_runs/sizes.jsonl
 $B counts 5 7 11 13                                                       > native_runs/counts.jsonl
 $B solve 5 1 2; $B solve 5 2 1; $B solve 7 1 3                            > native_runs/solves.jsonl
-$B size-json ../../crates/hashed-ecdl-tensor/examples/eccp131.json        > native_runs/eccp131_size.json
+$B size-json ../../crates/hashed-ecdl-tensor/examples/eccp131-certified-hash.json > native_runs/eccp131_size.json
 $B report native_runs                                                      > native_runs/report.json
 ```
 
@@ -37,16 +37,17 @@ Each line of output is one JSON object. Curves are the first prime-order
   assignments equal 2^(4d) exactly. Recursive backend used: never.
 * **Solves correct.** p = 5 (two seeds) and p = 7 recover the scalar and pass
   `reduction::verify`.
-* **Setup bottleneck (primality).** `is_prime` (called by `Curve::new` and
-  `FactorBase::new`) uses a fast u64 path at <= 64 bits and AKS above. At <= 64
-  bits certification is <= 17 us; at 65 bits (AKS) it did not finish in 180 s.
-  So a curve whose prime exceeds 64 bits (ECCp-131's is 131-bit) cannot even be
-  set up, before any contraction. Network construction, by contrast, is fast at
-  every width (131-bit multiply builds in 2.5 ms). `multtime`/`primetime` modes.
+* **Setup (primality), resolved with certificates.** Uncertified, `is_prime`
+  uses a fast u64 path at <= 64 bits (<= 17 us) and AKS above, which did not
+  finish a 65-bit prime in 180 s. With the Pocklington certificates now on
+  `main` (`Curve::with_cofactor_and_certificates`, separate change), the bundled
+  `eccp131-certified-hash.json` validates in ~13 ms and `size-json` builds the
+  real ECCp-131 decomposition network in ~2.8 s: 1,684,796 edges (2^20.7),
+  249,620 vertices, max degree 1,032, 526 interface bits (4·131 free + 2 flags).
 * **Recursion crossover (headline).** `Counter::count` selects the recursive
   backend only when `lambda / 131072 >= 1` with `lambda = ceil(log2(2·edges))`
   (transcribed from `recursive.rs` `Setup::parameters`), i.e. at least
-  2^131070 edges. The largest network built here is 2^17.8 edges. So the
+  2^131070 edges. The largest network built here is the real ECCp-131 one, 2^20.7 edges. So the
   recursion never engages at any reachable size, matching the manuscript's
   2^(2^17) threshold, and the method shows no sub-exponential behaviour.
 

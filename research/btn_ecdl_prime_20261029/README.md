@@ -6,7 +6,7 @@
 > report PDF in `native_runs/report.pdf`. Headline: the one backend that could
 > beat exponential cost (OpenAI Appendix D recursion) is gated off below about
 > 2^131070 edges, faithful to the manuscript's 2^(2^17) threshold; the largest
-> network built here is 2^17.8 edges, so every exact count used the fallback and
+> network built here is the real ECCp-131 one (2^20.7 edges, with certified primes), so every exact count used the fallback and
 > no sub-exponential behaviour appears at any reachable size.
 >
 > The Python below (`*.py`) is **historical evidence only**: `AGENTS.md` forbids

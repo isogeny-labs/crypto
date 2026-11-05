@@ -265,11 +265,25 @@ fn size_json(path: &str) -> Res<Value> {
     };
     let mut m = meter(u64::MAX / 2);
     let p = big("p")?;
-    let c = Curve::new(p.clone(), big("a")?, big("b")?, big("r")?, pp("generator")?, &mut m).map_err(e)?;
-    let mut s = &p << 1u8;
-    while !is_prime(&s, &mut m).map_err(e)? {
-        s += 1u8;
-    }
+    // Use supplied Pocklington certificates (checked by the crate) when the
+    // problem carries them; otherwise the crate's exact fallback (AKS above
+    // 64 bits) applies, which is impractical at cryptographic sizes.
+    let proofs: Vec<hashed_ecdl_tensor::primality::PrimeCertificate> = match v.get("prime_certificates") {
+        Some(c) => serde_json::from_value(c.clone()).map_err(e)?,
+        None => Vec::new(),
+    };
+    let cofactor = v.get("cofactor").and_then(Value::as_str).unwrap_or("1").parse::<BigUint>().map_err(e)?;
+    let c = Curve::with_cofactor_and_certificates(p.clone(), big("a")?, big("b")?, big("r")?, cofactor, pp("generator")?, &proofs, &mut m).map_err(e)?;
+    let s = match v.get("hash_prime").and_then(Value::as_str) {
+        Some(h) => h.parse::<BigUint>().map_err(e)?,
+        None => {
+            let mut s = &p << 1u8;
+            while !is_prime(&s, &mut m).map_err(e)? {
+                s += 1u8;
+            }
+            s
+        }
+    };
     let mut net_rec = Value::Null;
     for slots in [2usize, Config::for_curve(&c).slots] {
         let fb: Vec<FactorBase> = (0..slots)
@@ -283,7 +297,7 @@ fn size_json(path: &str) -> Res<Value> {
         }
         net_rec.as_array_mut().unwrap().push(rec);
     }
-    Ok(json!({ "file": path, "d": p.bits(), "networks": net_rec, "build_steps": m.used }))
+    Ok(json!({ "file": path, "d": p.bits(), "certificates": proofs.len(), "hash_prime": s.to_string(), "networks": net_rec, "build_steps": m.used }))
 }
 
 /// Time one Fourier integer-multiply network construction at each bit width.
