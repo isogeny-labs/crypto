@@ -1,0 +1,175 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1ha14548fc2b5ce5c3",
+  "statement": {
+    "name": "APS disjoint frontier: three-part cardinality expansion",
+    "source": "research/aps_leads_20261105/README.md L3; first-new-coordinate partition; proposed by this research round",
+    "variables": [
+      "s1",
+      "s2",
+      "s3",
+      "d1",
+      "d2",
+      "d3"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s1"
+                },
+                {
+                  "op": "var",
+                  "args": "d1"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s2"
+                },
+                {
+                  "op": "var",
+                  "args": "d2"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s3"
+                },
+                {
+                  "op": "var",
+                  "args": "d3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "s1"
+              },
+              {
+                "op": "var",
+                "args": "s2"
+              },
+              {
+                "op": "var",
+                "args": "s3"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "d1"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s2"
+                },
+                {
+                  "op": "var",
+                  "args": "d2"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s3"
+                },
+                {
+                  "op": "var",
+                  "args": "d3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "s1"
+            },
+            {
+              "op": "var",
+              "args": "d2"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s3"
+                },
+                {
+                  "op": "var",
+                  "args": "d3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "s1"
+            },
+            {
+              "op": "var",
+              "args": "s2"
+            },
+            {
+              "op": "var",
+              "args": "d3"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2316557771501207553,
+  "value_digest": "51c17bfb44aa7f9bde9b2c590bb26177a4f166113d9eae2a3d27f16897463e7c",
+  "independence": "Producer-issued and producer-replayed with the existing native checker; no independent signer or formal proof",
+  "proof": null
+}
