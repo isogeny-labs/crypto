@@ -1,5 +1,39 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Retained reference-stage work — 2026-11-05
+
+The replay caller now retains setup's affine counts and disjoint oracle request-
+validation, submitted-witness and exhaustive-enumeration stages on success or
+Result-returning refusal. This includes witness checking previously omitted by
+the successful checker. Attempt counts are merged before propagating Err. The
+legacy certificate/completed-oracle fields remain enumeration-only and overlap
+the new attempted-enumeration view; do not charge both. Nested work schema is
+nowv2; outer replay remainsv2 and request/producer outputsv1. [pcc:unverified]
+
+[Final source-c933 receipt](validation/reference-refusal-20261105/final/receipt.json)
+records27oracle tests passed,0failed/ignored:4new ownership/refusal controls plus
+23prior controls. Formatting/CLIbuild and actual checkpoint-refusal message with
+expectedexit1 pass. Final Cargo scopedclippy/supervisor remainFAIL101 on the two
+inherited library errors; final example strict-lint is unqualified. Initialb013
+compilation failed before any test and is preserved separately. No tests or
+assertions were weakened. PCC-20261105-6020c1 is unverified. [pcc:unverified]
+
+[Coverage report](G2_REFERENCE_REFUSAL_20261105.md), [inspected two-page PDF](reference-refusal-20261105.pdf)
+and [editable diagram](reference-refusal-20261105.svg) distinguish retained
+reference work from unpriced parameter guards, constructor/encoder helpers,
+JSON, memory/logical/process/runtime-resume work. The oldf866 producer-prefix
+byteidentity claim does not apply to this setup refactor. No timing/speedup is
+admitted. All22bound objects,2fresh preserved binary copies,8unchanged binary
+hashes, old library raw log and exact formal/gate/Mathlib equivalence are in
+[delivery review](validation/reference-refusal-20261105/final/delivery-review.json).
+No duplicate unchanged library/proof/process-prerequisite run. [pcc:unverified]
+
+Next extend parameter/constructor/shared-encoder helper accounting and a
+nonoverlapping charge frontier. Scientific acceptance and allnull metrics stay
+unchanged; qualified runtime/transport/resume remains open. Frozen PCC history
+still requires a sanctioned contract before resolution. PR3452/2949 maintenance
+stays stopped; publish this continuation only on the current openPR3482.
+
 ## Separate replay-accounting PR3482 — publication
 
 Replay-accounting sourcef866 and reviewed reports were normal-pushed as4488a5a6a
