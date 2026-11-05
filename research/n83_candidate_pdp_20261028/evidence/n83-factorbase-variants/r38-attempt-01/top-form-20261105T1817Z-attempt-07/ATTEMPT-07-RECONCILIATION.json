@@ -39,5 +39,11 @@
   "results_index_sha256": "c59c241a66f5548ee1897fed365d737d64f8f78f6a3f12dc9b37b6a81077dcd9",
   "results_total_bytes": 4962979,
   "results_readback_byte_identical": true,
-  "next_action": "Preserve source shards, add and hash-check the exact S3 shard-index sidecar in the base directory, use strace openat capture, and keep fresh generator output paths absent in attempt08."
+  "next_action": "Preserve source shards, add and hash-check the exact S3 shard-index sidecar in the base directory, use strace openat capture, and keep fresh generator output paths absent in attempt08.",
+  "diagnosis_correction": {
+    "supersedes": "missing local s3-file-index as the primary cause",
+    "correct_cause": "MATCHED was set to the inputs.json file, while pdp::generate appends inputs.json to the argument. Attempt08 openat evidence proves the attempted path ended with inputs.json/inputs.json and ENOTDIR. Attempt07 used the same unchanged MATCHED argument.",
+    "evidence_attempt08_openat_trace_sha256": "a7fa7af71488334e39c892f91b5ca16e04faf37be41871f8c266f148d9559367",
+    "evidence_failed_path": "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/pdp/baseline/inputs.json/inputs.json"
+  }
 }
