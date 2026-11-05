@@ -30,6 +30,9 @@ LFD_SUMMARY = STUDY / "evidence/degree4-propagation/summary.json"
 R29_INPUT_DIR = EVIDENCE / "r29-attempt-02/pdp-inputs/attempt-02/candidate-structure"
 R29_TOP_DIR = EVIDENCE / "r29-attempt-02/top-form/attempt-01"
 R29_BINDING_DIR = EVIDENCE / "r29-attempt-02/source-binding-audit-20261103"
+R29_FIRST_FALL_DIR = EVIDENCE / "r29-attempt-02/first-fall-attempt-03/output-01"
+R29_FIRST_FALL_VALIDATION = R29_FIRST_FALL_DIR / "post-run-analysis/independent-validation.json"
+R29_ARCHIVE_READBACK = R29_FIRST_FALL_DIR / "post-run-analysis/archive-readback.json"
 R38_TOP_DIR = EVIDENCE / "r38-attempt-01/top-form-20261101T2015Z"
 R39_TOP_DIR = EVIDENCE / "r39-attempt-01/top-form-20261101T2045Z"
 EXPECTED_CANDIDATES = [f"spike{i}" for i in range(27, 40)]
@@ -83,6 +86,31 @@ def build() -> dict:
     for row in combined["rows"]:
         rows_by_candidate.setdefault(row["candidate_id"], []).append(row)
 
+    r29_first_fall = load(R29_FIRST_FALL_DIR / "summary.json")
+    r29_validation = load(R29_FIRST_FALL_VALIDATION)
+    r29_archive_readback = load(R29_ARCHIVE_READBACK)
+    r29_preflight = load(R29_FIRST_FALL_DIR / "preflight.json")
+    r29_custody = load(R29_FIRST_FALL_DIR / "custody.json")
+    assert r29_preflight["protocol"]["frozen_sha256"] == EXPECTED_PROTOCOL_SHA256
+    assert r29_first_fall["systems_planned"] == r29_first_fall["systems_attempted"] == 48
+    assert r29_first_fall["certificates"] == r29_first_fall["fresh_replays_verified"] == 48
+    assert r29_first_fall["s3_readbacks_verified"] == 48
+    assert r29_validation["status"] == "pass"
+    assert r29_validation["systems_checked"] == r29_validation["certificates_checked"] == 48
+    assert r29_validation["fresh_replays_verified"] == r29_validation["s3_certificate_readbacks_verified"] == 48
+    assert r29_archive_readback["status"] == "verified"
+    assert r29_archive_readback["sha256"] == r29_custody["archive"]["sha256"]
+    assert r29_archive_readback["bytes"] == r29_custody["archive"]["bytes"]
+    rows_by_candidate["spike29"] = [dict(row, candidate_id="spike29") for row in r29_first_fall["rows"]]
+    sources.extend([
+        source_record(R29_FIRST_FALL_DIR / "preflight.json", 48),
+        source_record(R29_FIRST_FALL_DIR / "source-index.json", 48),
+        source_record(R29_FIRST_FALL_DIR / "summary.json", 48),
+        source_record(R29_FIRST_FALL_DIR / "custody.json", 0),
+        source_record(R29_FIRST_FALL_VALIDATION, 48),
+        source_record(R29_ARCHIVE_READBACK, 0),
+    ])
+
     candidate_records = []
     all_rows = []
     for candidate in sorted(rows_by_candidate):
@@ -118,12 +146,12 @@ def build() -> dict:
         all_rows.extend(rows)
 
     covered = len(all_rows)
-    assert covered == 432
+    assert covered == 480
     assert set(rows_by_candidate) == {"spike27", "spike28", "spike30", "spike31", "spike32", "spike33",
-                                     "spike35", "spike36", "spike37"}
+                                     "spike29", "spike35", "spike36", "spike37"}
     assert len({(r.get("candidate_id"), r["id"]) for r in all_rows}) == covered
     total_ffd = Counter((r["family"], r.get("first_fall_degree"), r.get("first_fall_lower_bound")) for r in all_rows)
-    assert total_ffd == Counter({("koblitz", 2, 2): 144, ("binary", 2, 2): 144, ("prime", None, 5): 144})
+    assert total_ffd == Counter({("koblitz", 2, 2): 160, ("binary", 2, 2): 160, ("prime", None, 5): 160})
 
     custody = load(CUSTODY)
     archive = custody["canonical_archive"]
@@ -160,7 +188,7 @@ def build() -> dict:
     assert r29_top_run["rows"] == r29_top_run["replay_rows"] == 48
     assert r29_top_run["replay_all_verified"] is True
     assert r29_top_replay["all_verified"] is True and len(r29_top_replay["rows"]) == 48
-    assert not (EVIDENCE / "r29-attempt-02/first-fall").exists()
+    assert r29_preflight["candidate_id"] == "spike29"
     r29_binding = load(R29_BINDING_DIR / "audit.json")
     assert r29_binding["schema"] == "n83.r29-pdp-source-binding-audit/v1"
     assert r29_binding["protocol"]["id"] == EXPECTED_PROTOCOL_ID
@@ -215,7 +243,7 @@ def build() -> dict:
             "candidate_groups_covered": sorted(rows_by_candidate),
             "candidate_groups_uncovered": [c for c in EXPECTED_CANDIDATES if c not in rows_by_candidate],
             "uncovered_systems": planned - covered,
-            "known_complete_base_unlabeled_candidates": ["spike29", "spike38", "spike39"],
+            "known_complete_base_unlabeled_candidates": ["spike38", "spike39"],
             "candidate_missing_factor_base": "spike34",
             "source_availability": {
                 "spike29": {
@@ -224,9 +252,12 @@ def build() -> dict:
                     "prior_top_form_certificates_replayed": 48,
                     "frozen_v2_source_binding_audit_sha256": digest(R29_BINDING_DIR / "audit.json"),
                     "frozen_v2_source_hashes_bound_to_top_form_replay": True,
-                    "v2_first_fall_rows": 0,
+                    "v2_first_fall_rows": 48,
+                    "v2_first_fall_certificates_replayed": 48,
+                    "first_fall_summary_sha256": digest(R29_FIRST_FALL_DIR / "summary.json"),
+                    "first_fall_independent_validation_sha256": digest(R29_FIRST_FALL_VALIDATION),
                     "affine_dreg_rows": 0,
-                    "source_binding_note": "All 48 saved PDP source hashes are bound to the frozen V2 spike29 family arms and fresh top-form replay hashes; no V2 first-fall certificates have been produced for these rows.",
+                    "source_binding_note": "All 48 saved PDP source hashes are bound to the frozen V2 spike29 family arms; all 48 first-fall certificates have fresh-process replay and byte-matching S3 readback. No affine Dreg labels are produced.",
                 },
                 "spike38": {
                     "complete_factor_base_index": True,
@@ -257,17 +288,17 @@ def build() -> dict:
             "rows": covered,
             "replay_verified": sum(bool(r.get("replay_verified", r.get("replay", {}).get("verified"))) for r in all_rows),
             "by_family": {
-                "koblitz": {"rows": 144, "exact_degree_2": 144},
-                "binary": {"rows": 144, "exact_degree_2": 144},
-                "prime": {"rows": 144, "exact_degree": 0, "lower_bound_5": 144},
+                "koblitz": {"rows": 160, "exact_degree_2": 160},
+                "binary": {"rows": 160, "exact_degree_2": 160},
+                "prime": {"rows": 160, "exact_degree": 0, "lower_bound_5": 160},
             },
             "candidate_specific_outcome_variation_within_family": False,
-            "interpretation": "The observed FFD labels do not separate the nine covered bases within a family; they cannot train an elite-base model for degree-of-regularity reduction.",
+            "interpretation": "The observed FFD labels do not separate the ten covered bases within a family; they cannot train an elite-base model for degree-of-regularity reduction.",
         },
         "last_fall_degree": {
             "exact_rows": 0,
             "unknown_rows": covered,
-            "candidate_first_fall_panel": "The 432 candidate first-fall certificates do not establish LFD.",
+            "candidate_first_fall_panel": "The 480 candidate first-fall certificates do not establish LFD.",
             "related_restricted_propagation_panel": {
                 "verified_m3_cases": 12,
                 "inherited_strict_lower_bound_4_cases": 12,
@@ -293,14 +324,23 @@ def build() -> dict:
             "source_system_payloads_in_archive": archive["excludes_source_system_payloads"] is False,
             "custody_record": CUSTODY.relative_to(ROOT).as_posix(),
         },
+        "s3_archive_for_spike29_panel": {
+            "key": r29_custody["archive"]["key"],
+            "bytes": r29_custody["archive"]["bytes"],
+            "sha256": r29_custody["archive"]["sha256"],
+            "full_readback_verified": r29_archive_readback["status"] == "verified",
+            "custody_record": (R29_FIRST_FALL_DIR / "custody.json").relative_to(ROOT).as_posix(),
+            "archive_readback_record": R29_ARCHIVE_READBACK.relative_to(ROOT).as_posix(),
+        },
         "candidate_groups": candidate_records,
         "source_files": sources,
         "file_structure": {
             "per_candidate_summaries": "Six 48-row first-fall summaries are linked by source path and hash.",
             "spike35_spike37_panel": "One 144-row combined summary is linked by source path and hash; attempt-01 and attempt-02 records remain preserved separately.",
             "spike35_spike37_raw_case_archive": "The canonical 144-case S3 archive and custody record are referenced without copying raw case files into this coverage index; source system payloads are stored separately.",
+            "spike29_raw_case_archive": "The canonical 48-case S3 archive and custody record are hash-bound; certificate and attempt records are separately available under the same S3 prefix.",
             "other_candidate_archives": "The six earlier candidate summaries retain their own evidence directories and S3 persistence references; this index records each summary's hash instead of flattening those attempts.",
-            "unlabelled_source_availability": "source_availability distinguishes the protocol-bound but still unlabelled spike29 PDP systems, spike38/spike39 bases with failed top-form attempts, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels.",
+            "unlabelled_source_availability": "source_availability distinguishes the now first-fall-labelled but affine-Dreg-unlabelled spike29 systems, spike38/spike39 bases with failed top-form attempts, and the missing spike34 base; linked metadata hashes are in source_files. This inventory does not represent failed or absent runs as measured labels.",
         },
     }
 
