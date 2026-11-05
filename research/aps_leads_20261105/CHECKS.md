@@ -9,8 +9,9 @@ launched [pcc:unverified].
 ## Exact boundaries
 
 - The proposal assertion is `PCC-20261105-aca921`, kind `statement`.
-- `PCC-20261105-6d30f5`, also a statement, records the initial identity
-  issuance/replay. Native standing reports both as **unverified**.
+- `PCC-20261105-ac1e93`, also a statement, records the initial identity
+  issuance/replay with unsigned artifact attestations. Native standing is
+  **unverified**; native proof checking reports `not_covered`.
 - Both records' native ledger additions remain private. The PR includes
   only their scoped claim JSON; publication is not independent verification.
 - Main source pins are in SOURCES.md. Content SHA-256 pins of the wrapper,
@@ -21,7 +22,7 @@ launched [pcc:unverified].
 
 These are producer observations [pcc:unverified].
 The final source, document and wrapper-validation assertion is
-[PCC-20261105-a3310a](../../pcc/claims/PCC-20261105-a3310a.json), also an
+[PCC-20261105-9d5a6d](../../pcc/claims/PCC-20261105-9d5a6d.json), also an
 unverified statement. It does not promote the earlier records.
 
 ## Native identity checks
@@ -116,3 +117,27 @@ curve or measured cost. No benchmark copy or progress metric is added
 
 The earlier APS studies and their source/test boundaries are unchanged.
 No previous full-suite or component result is represented as a new-head run.
+
+
+## PCC gate type repair
+
+The original hosted PCC gate failed on the two incorrectly typed attachments;
+the separate validation gate, size and artifact checks passed on the original
+head. [CORRECTION.md](CORRECTION.md) retains the exact failure, old records and
+replacement map. The current native verifier rejects each old record with
+exit1 and reports each unsigned-attestation replacement `not_covered`, exit2.
+This is a correction to proof attachment types, with identical scientific
+statements, scopes and identity artifact bytes [pcc:unverified].
+
+The original validation statements describe the first published source/report
+boundary. They are not new-head APS tests, a full library pass, or a new
+measurement. The corrected report was rendered and visually inspected
+separately; source-sha256.txt and the original identity receipt remain unchanged.
+
+
+The repair used the unchanged public PCC verifier and its existing tests:
+59/59 sabotage-canary classes and 12 native tool tests passed. Scoped
+`verify-all` over the three live APS statements returned2 (`not_covered`),
+with no failed proof; this is not a full-main claim-set verification or a
+signed verdict. Historical malformed records still return1. The corrected
+four-page PDF was inspected separately [pcc:unverified].

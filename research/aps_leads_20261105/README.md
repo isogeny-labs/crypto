@@ -7,7 +7,7 @@ correctness and cost rejection criteria. None has an APS implementation or a
 performance result in this study [pcc:unverified].
 
 Producer proposal record: [PCC-20261105-aca921](../../pcc/claims/PCC-20261105-aca921.json).
-Identity-record assertion: [PCC-20261105-6d30f5](../../pcc/claims/PCC-20261105-6d30f5.json).
+Identity-record assertion: [PCC-20261105-ac1e93](../../pcc/claims/PCC-20261105-ac1e93.json).
 Both have unverified standing. The public change does not include the private
 native ledger additions or promote either assertion.
 
@@ -222,3 +222,15 @@ Planning completion does not complete T9 or the complete-cost research panel.
 5. Kudo et al., *Acceleration of Index Calculus for Solving ECDLP over Prime
    Fields and Its Limitation* (CANS 2018); bibliography/abstract only.
    <https://doi.org/10.1007/978-3-030-00434-7_19>.
+
+
+## PCC attachment correction
+
+The original PCC records attached `identity.certificate/v1` artifacts using
+PCC's `certificate` type, whose contract requires `pcc.solve-certificate/v1`.
+The PCC gate correctly rejected that mismatch. The current records retain the
+same statements, scopes and artifact pins as unsigned `attestation` subjects;
+they remain unverified and the native verifier reports `not_covered`.
+Byte-identical historical records, the failed check, and the old-to-new map
+are retained in [CORRECTION.md](CORRECTION.md). No polynomial identity,
+research assertion, verifier or test assertion changed [pcc:unverified].

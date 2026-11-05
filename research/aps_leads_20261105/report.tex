@@ -87,7 +87,7 @@ has an APS implementation or a performance result in this study
 Producer proposal record:
 \href{../../pcc/claims/PCC-20261105-aca921.json}{PCC-20261105-aca921}.
 Identity-record assertion:
-\href{../../pcc/claims/PCC-20261105-6d30f5.json}{PCC-20261105-6d30f5}.
+\href{../../pcc/claims/PCC-20261105-ac1e93.json}{PCC-20261105-ac1e93}.
 Both have unverified standing. The public change does not include the
 private native ledger additions or promote either assertion.
 
@@ -351,5 +351,18 @@ panel.
   bibliography/abstract only.
   \url{https://doi.org/10.1007/978-3-030-00434-7_19}.
 \end{enumerate}
+
+\subsection{PCC attachment correction}\label{pcc-attachment-correction}
+
+The original PCC records attached \texttt{identity.certificate/v1}
+artifacts using PCC's \texttt{certificate} type, whose contract requires
+\texttt{pcc.solve-certificate/v1}. The PCC gate correctly rejected that
+mismatch. The current records retain the same statements, scopes and
+artifact pins as unsigned \texttt{attestation} subjects; they remain
+unverified and the native verifier reports \texttt{not\_covered}.
+Byte-identical historical records, the failed check, and the old-to-new
+map are retained in \url{CORRECTION.md}. No polynomial identity,
+research assertion, verifier or test assertion changed
+{[}pcc:unverified{]}.
 
 \end{document}
