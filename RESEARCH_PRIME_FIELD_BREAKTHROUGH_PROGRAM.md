@@ -393,8 +393,10 @@ baseline it is measured against.
   spanned by `rank(E(Q))` unknowns, and the target still has to be written
   as a bounded combination of the generators — an `r`-dimensional
   bounded-coefficient DLP that is generic again. This is Silverman's xedni
-  calculus; Jacobson–Koblitz–Silverman–Stein–Teske (2000) showed it does not
-  beat rho.
+  calculus; under explicit height/discriminant and Lang assumptions,
+  Jacobson–Koblitz–Silverman–Stein–Teske (2000) derive a strong asymptotic
+  obstruction. The unconditional selected-lift and probability interfaces
+  remain separate proof obligations.
 - **Embedding into an extension to buy a subfield.** `E(F_p) ⊂ E(F_{p^n})`
   makes the subfield factor base `x ∈ F_p` algebraic, but Gaudry's cost
   there is `Õ(p^{2−2/n})` against the original `√p`: `p` for `n = 2`,

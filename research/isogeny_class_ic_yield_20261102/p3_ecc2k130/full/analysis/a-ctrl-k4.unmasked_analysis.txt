@@ -1,0 +1,122 @@
+rows: 366  (sha256 a39f173dfc60360afd7d335a005f70199d9848c47cd83c2944065f24363c0bc6)
+
+== per (k, arm): attempts x curves, Dreg (mean, sd, distribution), solutions mean, time medians ==
+k=4       aa  n=20     dreg mean 8.000 sd 0.000 hist {8: 20} sol_mean 0.0000 t_med 14.9430s
+k=4   badapt  n=22     dreg mean 8.000 sd 0.000 hist {8: 22} sol_mean 0.0000 t_med 11.8089s
+k=4  bsparse  n=120    dreg mean 8.000 sd 0.000 hist {8: 120} sol_mean 0.0000 t_med 11.9835s
+k=4      iso  n=20     dreg mean 8.000 sd 0.000 hist {8: 20} sol_mean 0.0000 t_med 15.1802s
+k=4     main  n=20     dreg mean 8.000 sd 0.000 hist {8: 20} sol_mean 0.0000 t_med 14.6936s
+k=4  nbadapt  n=32     dreg mean 8.000 sd 0.000 hist {8: 32} sol_mean 0.0000 t_med 11.9321s
+k=4     null  n=32     dreg mean 8.000 sd 0.000 hist {8: 32} sol_mean 0.0000 t_med 15.6098s
+k=4  planted  n=20     dreg mean 9.000 sd 0.000 hist {9: 20} sol_mean 4.5000 t_med 15.3866s
+k=4     stdv  n=80     dreg mean 8.000 sd 0.000 hist {8: 80} sol_mean 0.0000 t_med 11.9720s
+
+isomorphic-model control (Frobenius conjugate instance): 20/20 identical (dreg, solutions, refuted)
+A/A repeat: 20/20 identical counts; time ratio repeat/first median 1.004, sd 0.046 (noise floor for the time column)
+within-orbit Dreg spread (same V, x_R; curves of one orbit are Galois conjugates but V is NOT conjugated, so this is a between-presentation spread):
+  #distinct dreg values per (k, attempt, orbit): {1: 14}
+
+== main arm mean dreg by (k, orbit) ==
+k=4 orbit=O0 n=6 mean=8.000 sd=0.000
+k=4 orbit=O1 n=2 mean=8.000 sd=0.000
+k=4 orbit=O2 n=2 mean=8.000 sd=0.000
+k=4 orbit=O3 n=4 mean=8.000 sd=0.000
+k=4 orbit=O4 n=2 mean=8.000 sd=0.000
+k=4 orbit=O5 n=2 mean=8.000 sd=0.000
+k=4 orbit=crater n=2 mean=8.000 sd=0.000
+
+== presentation-family minima per (k, arm, curve, attempt): min Dreg over presentations | min time | #pres | sel (w,deg) of b image | mod-weight at min time ==
+k=4   badapt E0     att=0 dreg_min=8 (2/2 pres reach it) t_at_dreg_min=10.972s t_min=10.972s dreg_s_min=10.960s sel(w,deg)=- modw@tmin=21
+k=4   badapt E0     att=1 dreg_min=8 (2/2 pres reach it) t_at_dreg_min=11.409s t_min=11.409s dreg_s_min=11.402s sel(w,deg)=- modw@tmin=21
+k=4   badapt L000   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.389s t_min=12.389s dreg_s_min=12.382s sel(w,deg)=(1,1) modw@tmin=21
+k=4   badapt L000   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.702s t_min=12.702s dreg_s_min=12.694s sel(w,deg)=(1,1) modw@tmin=21
+k=4   badapt L001   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.501s t_min=12.501s dreg_s_min=12.491s sel(w,deg)=(1,1) modw@tmin=21
+k=4   badapt L001   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=13.214s t_min=13.214s dreg_s_min=13.207s sel(w,deg)=(1,1) modw@tmin=21
+k=4   badapt L002   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.593s t_min=11.593s dreg_s_min=11.586s sel(w,deg)=(1,1) modw@tmin=21
+k=4   badapt L002   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.531s t_min=11.531s dreg_s_min=11.518s sel(w,deg)=(1,1) modw@tmin=21
+k=4   badapt L043   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.093s t_min=12.093s dreg_s_min=12.087s sel(w,deg)=(1,1) modw@tmin=19
+k=4   badapt L043   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.721s t_min=11.721s dreg_s_min=11.715s sel(w,deg)=(1,1) modw@tmin=19
+k=4   badapt L086   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=10.744s t_min=10.744s dreg_s_min=10.736s sel(w,deg)=(1,1) modw@tmin=25
+k=4   badapt L086   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.304s t_min=11.304s dreg_s_min=11.294s sel(w,deg)=(1,1) modw@tmin=25
+k=4   badapt L129   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.983s t_min=11.983s dreg_s_min=11.976s sel(w,deg)=(1,1) modw@tmin=19
+k=4   badapt L129   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=10.599s t_min=10.599s dreg_s_min=10.589s sel(w,deg)=(1,1) modw@tmin=19
+k=4   badapt L130   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=10.827s t_min=10.827s dreg_s_min=10.821s sel(w,deg)=(1,1) modw@tmin=19
+k=4   badapt L130   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.436s t_min=11.436s dreg_s_min=11.427s sel(w,deg)=(1,1) modw@tmin=19
+k=4   badapt L214   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.897s t_min=11.897s dreg_s_min=11.889s sel(w,deg)=(1,1) modw@tmin=25
+k=4   badapt L214   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=13.051s t_min=13.051s dreg_s_min=13.044s sel(w,deg)=(1,1) modw@tmin=25
+k=4   badapt L256   att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.529s t_min=11.529s dreg_s_min=11.521s sel(w,deg)=(1,1) modw@tmin=29
+k=4   badapt L256   att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.162s t_min=12.162s dreg_s_min=12.153s sel(w,deg)=(1,1) modw@tmin=29
+k=4  bsparse E0     att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=10.481s t_min=10.481s dreg_s_min=10.476s sel(w,deg)=(1,0) modw@tmin=25
+k=4  bsparse E0     att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.033s t_min=11.033s dreg_s_min=11.024s sel(w,deg)=(1,0) modw@tmin=29
+k=4  bsparse L000   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.064s t_min=11.064s dreg_s_min=11.056s sel(w,deg)=(1,1) modw@tmin=33
+k=4  bsparse L000   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.638s t_min=11.638s dreg_s_min=11.631s sel(w,deg)=(1,1) modw@tmin=27
+k=4  bsparse L001   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=10.588s t_min=10.588s dreg_s_min=10.584s sel(w,deg)=(1,1) modw@tmin=21
+k=4  bsparse L001   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.191s t_min=11.191s dreg_s_min=11.185s sel(w,deg)=(1,1) modw@tmin=23
+k=4  bsparse L002   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.281s t_min=11.281s dreg_s_min=11.274s sel(w,deg)=(1,1) modw@tmin=21
+k=4  bsparse L002   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=10.815s t_min=10.815s dreg_s_min=10.803s sel(w,deg)=(1,1) modw@tmin=21
+k=4  bsparse L043   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.213s t_min=11.213s dreg_s_min=11.207s sel(w,deg)=(1,1) modw@tmin=23
+k=4  bsparse L043   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=12.168s t_min=12.168s dreg_s_min=12.165s sel(w,deg)=(1,1) modw@tmin=19
+k=4  bsparse L086   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=10.200s t_min=10.200s dreg_s_min=10.194s sel(w,deg)=(1,1) modw@tmin=21
+k=4  bsparse L086   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.390s t_min=11.390s dreg_s_min=11.379s sel(w,deg)=(1,1) modw@tmin=25
+k=4  bsparse L129   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.112s t_min=11.112s dreg_s_min=11.108s sel(w,deg)=(1,1) modw@tmin=19
+k=4  bsparse L129   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.200s t_min=11.200s dreg_s_min=11.194s sel(w,deg)=(1,1) modw@tmin=19
+k=4  bsparse L130   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=10.807s t_min=10.807s dreg_s_min=10.797s sel(w,deg)=(1,1) modw@tmin=19
+k=4  bsparse L130   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=10.260s t_min=10.260s dreg_s_min=10.246s sel(w,deg)=(1,1) modw@tmin=19
+k=4  bsparse L214   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.671s t_min=11.671s dreg_s_min=11.658s sel(w,deg)=(1,1) modw@tmin=25
+k=4  bsparse L214   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.547s t_min=11.547s dreg_s_min=11.539s sel(w,deg)=(1,1) modw@tmin=21
+k=4  bsparse L256   att=0 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=10.344s t_min=10.344s dreg_s_min=10.335s sel(w,deg)=(1,1) modw@tmin=29
+k=4  bsparse L256   att=1 dreg_min=8 (6/6 pres reach it) t_at_dreg_min=11.541s t_min=11.541s dreg_s_min=11.534s sel(w,deg)=(1,1) modw@tmin=29
+k=4  nbadapt N00    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=10.740s t_min=10.740s dreg_s_min=10.735s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N00    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.587s t_min=12.587s dreg_s_min=12.580s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N01    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.667s t_min=12.667s dreg_s_min=12.660s sel(w,deg)=(1,1) modw@tmin=27
+k=4  nbadapt N01    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.934s t_min=12.934s dreg_s_min=12.926s sel(w,deg)=(1,1) modw@tmin=27
+k=4  nbadapt N02    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.975s t_min=11.975s dreg_s_min=11.969s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N02    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.005s t_min=12.005s dreg_s_min=11.994s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N03    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.136s t_min=12.136s dreg_s_min=12.128s sel(w,deg)=(1,1) modw@tmin=19
+k=4  nbadapt N03    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.937s t_min=11.937s dreg_s_min=11.930s sel(w,deg)=(1,1) modw@tmin=19
+k=4  nbadapt N04    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.667s t_min=11.667s dreg_s_min=11.654s sel(w,deg)=(1,1) modw@tmin=23
+k=4  nbadapt N04    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.603s t_min=12.603s dreg_s_min=12.591s sel(w,deg)=(1,1) modw@tmin=23
+k=4  nbadapt N05    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.934s t_min=12.934s dreg_s_min=12.927s sel(w,deg)=(1,1) modw@tmin=25
+k=4  nbadapt N05    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.171s t_min=12.171s dreg_s_min=12.164s sel(w,deg)=(1,1) modw@tmin=25
+k=4  nbadapt N06    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.677s t_min=11.677s dreg_s_min=11.671s sel(w,deg)=(1,1) modw@tmin=23
+k=4  nbadapt N06    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.710s t_min=11.710s dreg_s_min=11.704s sel(w,deg)=(1,1) modw@tmin=23
+k=4  nbadapt N07    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.686s t_min=11.686s dreg_s_min=11.679s sel(w,deg)=(1,1) modw@tmin=17
+k=4  nbadapt N07    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.385s t_min=11.385s dreg_s_min=11.378s sel(w,deg)=(1,1) modw@tmin=17
+k=4  nbadapt N08    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.737s t_min=12.737s dreg_s_min=12.726s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N08    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.110s t_min=11.110s dreg_s_min=11.103s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N09    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.400s t_min=11.400s dreg_s_min=11.396s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N09    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.927s t_min=11.927s dreg_s_min=11.923s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N10    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=10.365s t_min=10.365s dreg_s_min=10.357s sel(w,deg)=(1,1) modw@tmin=19
+k=4  nbadapt N10    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.760s t_min=12.760s dreg_s_min=12.754s sel(w,deg)=(1,1) modw@tmin=19
+k=4  nbadapt N11    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.648s t_min=11.648s dreg_s_min=11.640s sel(w,deg)=(1,1) modw@tmin=25
+k=4  nbadapt N11    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.429s t_min=12.429s dreg_s_min=12.422s sel(w,deg)=(1,1) modw@tmin=25
+k=4  nbadapt N12    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.479s t_min=11.479s dreg_s_min=11.473s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N12    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=13.827s t_min=13.827s dreg_s_min=13.818s sel(w,deg)=(1,1) modw@tmin=21
+k=4  nbadapt N13    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.635s t_min=11.635s dreg_s_min=11.629s sel(w,deg)=(1,1) modw@tmin=25
+k=4  nbadapt N13    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=12.710s t_min=12.710s dreg_s_min=12.700s sel(w,deg)=(1,1) modw@tmin=25
+k=4  nbadapt N14    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.578s t_min=11.578s dreg_s_min=11.571s sel(w,deg)=(1,1) modw@tmin=27
+k=4  nbadapt N14    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=10.724s t_min=10.724s dreg_s_min=10.717s sel(w,deg)=(1,1) modw@tmin=27
+k=4  nbadapt N15    att=0 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.966s t_min=11.966s dreg_s_min=11.956s sel(w,deg)=(1,1) modw@tmin=23
+k=4  nbadapt N15    att=1 dreg_min=8 (1/1 pres reach it) t_at_dreg_min=11.249s t_min=11.249s dreg_s_min=11.242s sel(w,deg)=(1,1) modw@tmin=23
+k=4     stdv E0     att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=10.280s t_min=10.280s dreg_s_min=10.278s sel(w,deg)=- modw@tmin=-
+k=4     stdv E0     att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=10.213s t_min=10.213s dreg_s_min=10.211s sel(w,deg)=- modw@tmin=-
+k=4     stdv L000   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=10.556s t_min=10.556s dreg_s_min=10.555s sel(w,deg)=- modw@tmin=-
+k=4     stdv L000   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=12.045s t_min=12.045s dreg_s_min=12.043s sel(w,deg)=- modw@tmin=-
+k=4     stdv L001   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.372s t_min=11.372s dreg_s_min=11.370s sel(w,deg)=- modw@tmin=-
+k=4     stdv L001   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.186s t_min=11.186s dreg_s_min=11.183s sel(w,deg)=- modw@tmin=-
+k=4     stdv L002   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.269s t_min=11.269s dreg_s_min=11.267s sel(w,deg)=- modw@tmin=-
+k=4     stdv L002   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.618s t_min=11.618s dreg_s_min=11.616s sel(w,deg)=- modw@tmin=-
+k=4     stdv L043   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=12.065s t_min=12.065s dreg_s_min=12.063s sel(w,deg)=- modw@tmin=-
+k=4     stdv L043   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.233s t_min=11.233s dreg_s_min=11.231s sel(w,deg)=- modw@tmin=-
+k=4     stdv L086   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=10.918s t_min=10.918s dreg_s_min=10.916s sel(w,deg)=- modw@tmin=-
+k=4     stdv L086   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.018s t_min=11.018s dreg_s_min=11.016s sel(w,deg)=- modw@tmin=-
+k=4     stdv L129   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.808s t_min=11.808s dreg_s_min=11.806s sel(w,deg)=- modw@tmin=-
+k=4     stdv L129   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=10.937s t_min=10.937s dreg_s_min=10.934s sel(w,deg)=- modw@tmin=-
+k=4     stdv L130   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.382s t_min=11.382s dreg_s_min=11.380s sel(w,deg)=- modw@tmin=-
+k=4     stdv L130   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.600s t_min=11.600s dreg_s_min=11.597s sel(w,deg)=- modw@tmin=-
+k=4     stdv L214   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.013s t_min=11.013s dreg_s_min=11.011s sel(w,deg)=- modw@tmin=-
+k=4     stdv L214   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=10.666s t_min=10.666s dreg_s_min=10.664s sel(w,deg)=- modw@tmin=-
+k=4     stdv L256   att=0 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.546s t_min=11.546s dreg_s_min=11.542s sel(w,deg)=- modw@tmin=-
+k=4     stdv L256   att=1 dreg_min=8 (4/4 pres reach it) t_at_dreg_min=11.052s t_min=11.052s dreg_s_min=11.050s sel(w,deg)=- modw@tmin=-
+
+Decision rule, null set and thresholds: PROTOCOL.md section 6.  Masked output hides arm names; rerun with --unmask only after the analysis is frozen.

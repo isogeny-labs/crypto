@@ -1,0 +1,7 @@
+{
+ "nonce": "fceafd16d7ec894272e376c481484aa6",
+ "drawn_at": "2026-11-01T19:12:58Z",
+ "source": "head -c 16 /dev/urandom (validator's container), drawn after the E32 results commit 8afc92781b and before any replay run",
+ "rule": "at each size p the replayed index-calculus curve is seed s_p = 1 + (U mod 3), U = the first 64 bits (big-endian, unsigned) of SHA-256 of the ASCII string '<nonce>:<p>'; selection.txt lists p, the 16 hex digits of U and s_p",
+ "walk_scope": "every curve's walk-(iii) pool (33 pools) is replayed, not sampled"
+}

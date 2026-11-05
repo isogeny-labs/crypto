@@ -1,0 +1,26 @@
+{
+ "schema": "e41-validator-build/v1",
+ "recorded_commit": "b0e307d9b8e4ca8b2f06e2023125b7caeb751105 (registered runs: e41_run, e41_tables); e41_tables also rebuilt with examples/e41_tables.rs at 5d1548296957a76b6dd6ac07535b20cc680eeb3b, as the producer did",
+ "recorded_binary_sha256": {
+  "e41_run": "ce0caf3ff040aae2839ac0cbe9197515e07cb0a44efa4e2bf926cd1ba115b507",
+  "e41_tables (b0e307d9b8)": "a4d0c6f558201f0933ba44f7e3c000e54ecbd77c82150e747f45bac318192c7f",
+  "e41_tables (examples/e41_tables.rs at 5d15482969)": "a8a0326aa00d0174ca2822017866ea03a5e9d597f57f8a45a6abaabe65ac81c1",
+  "e41_stage0 (6115e0ea0a)": "49eeef9f375bda7e8b47faaa9b2c5bf6f9065a2949fb91a646b9e9ea95ac5f9f",
+  "source": "experiments/48_twist24_shortfall/binary_sha256.txt"
+ },
+ "repository_head_at_start": "282ddceafd (branch claude/glv-endomorphism-index-calculus-pe7ige); untracked files of E39 and E40 present in the checkout and E41's three local-only records (main_school.json, main_karatsuba.json, stage0_run.json), none modified; E41's committed records at HEAD equal the records commit b70f356827",
+ "source": "git archive b0e307d9b8 of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, benches/, the six path dependencies (isogeny_algos, crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, research/pencil_large_prime_20261029), every explicit path of Cargo.toml (38) and every literal include_str!/include_bytes! target present at the commit (215 archive paths; 11 targets inside archived snapshot directories of the pencil crate are absent at the commit and are not compiled). Extracted to /dev/shm/e41_src, the producer's recorded source path (binary_sha256.txt): 4,411 files, each equal to its b0e307d9b8 blob (git hash-object --no-filters over the tree against git ls-tree: identical lists). Path list computed by the validator's own commands; no producer script used. /dev/shm/e41_src did not exist before (the producer had deleted it).",
+ "target_dir": "/dev/shm/v41: a fresh, empty target directory on tmpfs (the producer's was /dev/shm/e41); nothing reused from any other target directory",
+ "command": "cd /dev/shm/e41_src && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/v41 nice -n 5 cargo build --release --offline -j 2 --example e41_run --example e41_tables",
+ "build_window": "2026-11-02T19:40:53Z - 2026-11-02T20:11:31Z; `Finished release profile [optimized] target(s) in 30m 37s`, 231 crates compiled, exit 0, no warnings (machine shared with E39 and E40 runs, load average 14-17 on 4 vCPUs; crypto_lib peaked at about 6.7 GB RSS)",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30)",
+ "binaries": [
+  {"name": "e41_run", "sha256": "ce0caf3ff040aae2839ac0cbe9197515e07cb0a44efa4e2bf926cd1ba115b507", "bytes": 5104320, "matches_recorded": true},
+  {"name": "e41_tables (b0e307d9b8)", "sha256": "a4d0c6f558201f0933ba44f7e3c000e54ecbd77c82150e747f45bac318192c7f", "bytes": 807512, "matches_recorded": true},
+  {"name": "e41_tables (examples/e41_tables.rs at 5d15482969, blob 14810aae71175c5abbe9c93349ab9639b288fa6c, the only file changed in the export)", "sha256": "a8a0326aa00d0174ca2822017866ea03a5e9d597f57f8a45a6abaabe65ac81c1", "matches_recorded": true, "command": "same, --example e41_tables (4.58 s)"},
+  {"name": "v41_replay (the validator's driver, research/e41_twist24_shortfall_20261102/replay/v41_replay.rs copied to examples/ of the export; not producer code)", "sha256": "7dd04b6a08cd6e04863f3f7a40eea7f76fcafb5a4df3c90c3e2afc23988ec63a", "command": "same, --example v41_replay (5.67 s; links the crypto_lib built above)"}
+ ],
+ "byte_identity": "All three recorded binaries of the registered runs are reproduced byte for byte from the clean export (same source path, same toolchain; the target directory differs). So the records were produced by code committed after the pre-registration f99a56359e, and E41's dirty-worktree risk (E39 and E40 were editing the same checkout) did not reach the build. e41_stage0 (from 6115e0ea0a) was not rebuilt: a second full crypto_lib build (about 6.7 GB RSS, 30 min on this shared host) was not run; the producer's binary still on disk (/dev/shm/e41bin/e41_stage0) hashes to the recorded 49eeef9f...5f9f, and 32 nonce-drawn Stage 0 walks were replayed through the b0e307d9b8 library instead (every field the Stage 0 record holds).",
+ "host": "Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the local container, shared with E39's and E40's experiment runs; not isolab-eks (no aws CLI or kubectl here). Operation counts only; no wall time is compared or claimed.",
+ "run_command": "two serial lanes from the repository root (RAYON_NUM_THREADS=1, nice 5, not pinned: every core carried another agent's pinned run): lane 1 drv-s0, drv-aa, drv-kar, drv-school, bin-control, bin-identity; lane 2 drv-e34, bin-kar, bin-aa, bin-school (research/e41_twist24_shortfall_20261102/replay/replay.sh parts; times in replay/replay.log)"
+}

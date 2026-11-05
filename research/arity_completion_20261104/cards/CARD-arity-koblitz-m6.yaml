@@ -1,0 +1,61 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-arity-koblitz-m6
+experiment_id: ARITY-COMPLETION-KOBLITZ-M5-M6-20261104
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/arity_completion_20261104/koblitz_m5_m6/receipts/CARD-arity-koblitz-m6.receipt.json
+binds:
+- path: research/arity_completion_20261104/koblitz_m5_m6/protocol.json
+  sha256: 590c74d593ec00c3c18f15244816e2423b43cc30b658c0dbbcc9b031fbed8fba
+- path: research/arity_completion_20261104/koblitz_m5_m6/PROTOCOL.md
+  sha256: 880ba1170fd2c741cc394edbba2b39b140b4a79718dfc1ba432422b4a0ca42c5
+- path: research/arity_completion_20261104/koblitz_m5_m6/grid.tsv
+  sha256: c5ff1c2b070e7521eedd682def823e24ad8fb40e7794e4cd205c1d75517d4b69
+- path: research/arity_completion_20261104/koblitz_m5_m6/run_shard.sh
+  sha256: c25c097f89c0ceed56061781eb5fbd1d0073c9773538ff7539dfbae711db03f3
+- path: research/arity_completion_20261104/koblitz_m5_m6/analyze.py
+  sha256: b556bbeaf9f1bf79a0471380952b15ca533fb9fb4e5d272ae43a158dc6b3bcfe
+must_not_exist: []
+commands:
+- id: m2-precondition
+  argv:
+  - python3
+  - -c
+  - "import glob, json, os, sys\nreceipt = 'research/arity_completion_20261104/koblitz_m5_m6/receipts/CARD-arity-koblitz-m2.receipt.json'\nok = os.path.isfile(receipt)\nprint('m2 receipt', receipt, 'present' if ok else 'MISSING')\nstatus = json.load(open(receipt)).get('status') if ok else None\nprint('m2 receipt status', status)\nbad = []\nfor name in sorted(glob.glob('research/arity_completion_20261104/koblitz_m5_m6/raw/shard2/*.json')):\n    if '\"status\":\"process_error\"' in open(name).read():\n        bad.append(name)\nprint('m2 process_error records', len(bad))\nfor name in bad:\n    print(name)\nsys.exit(0 if (ok and status == 'completed' and not bad) else 1)\n"
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: write-once-m6
+  argv:
+  - python3
+  - -c
+  - "import glob, sys\nfound = sorted(glob.glob('research/arity_completion_20261104/koblitz_m5_m6/raw/shard6/*.json'))\nprint('existing m6 cell records', len(found))\nfor name in found:\n    print(name)\nsys.exit(1 if found else 0)\n"
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: shard-m6
+  argv:
+  - bash
+  - research/arity_completion_20261104/koblitz_m5_m6/run_shard.sh
+  - target/release/examples/n83_msweep_cell
+  - research/arity_completion_20261104/koblitz_m5_m6/raw/shard6
+  - '6'
+  timeout_seconds: 50700
+  success_exit_codes:
+  - 0
+  stdout: research/arity_completion_20261104/koblitz_m5_m6/receipts/CARD-arity-koblitz-m6.run.stdout
+  stderr: research/arity_completion_20261104/koblitz_m5_m6/receipts/CARD-arity-koblitz-m6.run.stderr
+  outputs:
+  - research/arity_completion_20261104/koblitz_m5_m6/raw/shard6/koblitzA__k0n23__m6__union-2__chain-s3-orbit__public.json
+bus_address: executor-mechanical-arity-koblitz-m6
+background: true
+write_scope:
+- research/arity_completion_20261104/koblitz_m5_m6/
+stop_when:
+- Any command in the card exits with a status other than 0, or times out; a failed gate stops the card before the shard.
+- The m2-precondition command exits with a status other than 0, meaning the m = 2 receipt is missing, its status is not completed, or an m = 2 cell record carries "status":"process_error"; run no m = 6 cell.
+- The write-once-m6 command exits with a status other than 0, meaning an m = 6 cell record already exists; run no m = 6 cell.
+- The shard-m6 command exits with a status other than 0 or reaches its timeout; a capped cell is recorded by run_shard.sh itself and does not stop the card.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'
+notes: Report the printed text verbatim. Per-engine evaluability and the K1 to K7 verdicts are the director assessment through research/arity_completion_20261104/koblitz_m5_m6/analyze.py, never the executor reading of the cell records. run_shard.sh records caps and errors and exits 0, so every stop beyond the m2 process_error gate is the director assessment through analyze.py, and /usr/bin/time and the isolab admission are the job of the executing image. The binary is the one built by CARD-arity-koblitz-build; its sha256 is in research/arity_completion_20261104/koblitz_m5_m6/receipts/n83_msweep_cell.sha256.

@@ -478,9 +478,13 @@ and the prime-field case (`secp256k1`, P-256) has no working index calculus at a
   *other IC variants* in the prime-field case — **but not Pollard rho.** Kudo–Yokota (CANS 2018,
   title literally *"…and Its Limitation"*) accelerate it and document that it still doesn't beat
   generic methods.
-- **Refuted/closed historically:** Silverman's **xedni calculus** was decisively refuted
-  (Jacobson–Koblitz–Silverman–Stein–Teske, DCC 2000) — an absolute bound on lifted-relation
-  coefficient size makes it asymptotically almost-certain to fail. Semaev's 2015 subexponential
+- **Conditionally obstructed and strongly negative historically:** for Silverman's **xedni
+  calculus**, Jacobson–Koblitz–Silverman–Stein–Teske (DCC 2000) derive an absolute
+  lifted-relation coefficient bound under explicit uniform height/discriminant and Lang premises,
+  then use an approximate random-relation step for asymptotic failure. The
+  [Lean audit](../../jksst_xedni_audit_20261101/README.md) proves finite replacements and records
+  the remaining algorithm bridges; it does not turn this into evidence that xedni succeeds.
+  Semaev's 2015 subexponential
   claim (eprint 2015/310) was **binary-only and rests on the now-distrusted first-fall-degree
   assumption** (§8.2), not a prime-field result.
 - **Status of the Holy Grail:** *open but unmoved.* No subexponential prime-field algorithm
@@ -523,8 +527,8 @@ lower bound (jmc-2019-0029); Euler–Petit quasi-subfield (FFA 2021, arXiv 1909.
 Joux–Vitse EUROCRYPT 2012 (eprint 2011/020); Vitse–Wallet LATINCRYPT 2015; Tian (J. Cryptology
 2023, arXiv 2012.07173); Fan (Math. Probl. Eng. 2022); Howe–Leprévost–Poonen gluing; Scholten
 construction; Lauter–Stange SAC 2008 (eprint 2008/099); Petit–Kosters–Messeng PKC 2016;
-Amadori–Pintore–Sala FFA 2018; Kudo–Yokota CANS 2018; xedni refutation (Jacobson–Koblitz–
-Silverman–Stein–Teske, DCC 2000).
+Amadori–Pintore–Sala FFA 2018; Kudo–Yokota CANS 2018; conditional xedni obstruction analysis
+(Jacobson–Koblitz–Silverman–Stein–Teske, DCC 2000).
 **Special-case/impl:** SafeCurves (safecurves.cr.yp.to transfer/twist); Smart/SSSA;
 Gaudry–Hess–Smart ePrint 2001/084; Kim–Barbulescu exTNFS (CRYPTO 2016); Minerva
 (minerva.crocs.fi.muni.cz); LadderLeak ePrint 2020/615; Osaki–Kunihiro SAC 2024;

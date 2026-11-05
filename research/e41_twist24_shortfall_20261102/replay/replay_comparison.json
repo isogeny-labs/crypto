@@ -1,0 +1,122 @@
+{
+ "schema": "e41-validator-replay-comparison/v1",
+ "rule": "each replayed record against the committed one: the replay driver's serialized record must equal the committed record's text byte for byte (the committed files are compact; this program re-serializes them verbatim), and every leaf is compared (key order, array lengths, number and string text). Stage 0 records were written by a different example (e41_stage0 at 6115e0ea0a) in another layout: every field they hold is compared against the replay's walk and instrument (native = cmp + hash + modn + neg + table). Whole files written by the rebuilt e41_run binary are compared byte for byte and leaf by leaf.",
+ "sampled_runs": [
+  {
+   "run": "school",
+   "committed": "main_school.json",
+   "selected": 640,
+   "replayed": 640,
+   "byte_identical": 640,
+   "leaves_compared": 33280,
+   "leaves_identical": 33280,
+   "walks_correct": 640,
+   "mismatches": [],
+   "replay_output_sha256": "9fe4f1cf0fee6cc5ab4333ca0d04c809126ca88a13f612bc7b3eacbaa351df45",
+   "selection_sha256": "cc4bcbd6080d51b9901a12a0b391473a88698d5378288a465c7694d84398a610"
+  },
+  {
+   "run": "aa",
+   "committed": "aa_school.json",
+   "selected": 128,
+   "replayed": 128,
+   "byte_identical": 128,
+   "leaves_compared": 6656,
+   "leaves_identical": 6656,
+   "walks_correct": 128,
+   "mismatches": [],
+   "replay_output_sha256": "6525ed717317daa0821a820efd516469467be8fca35bf952b26ac73289303302",
+   "selection_sha256": "dff04d7add4085d15029671506693d0e850d62baebaee7e507f1cc3378fbcbdf"
+  },
+  {
+   "run": "kar",
+   "committed": "main_karatsuba.json",
+   "selected": 320,
+   "replayed": 320,
+   "byte_identical": 320,
+   "leaves_compared": 16640,
+   "leaves_identical": 16640,
+   "walks_correct": 320,
+   "mismatches": [],
+   "replay_output_sha256": "d4ec4917855f32a806d1e99121b34931230b05bcd17400a49c5351d19bf4fb0a",
+   "selection_sha256": "dac0603c09eaccc266a420c3b2c55b57793244c428a58b553f1e08c1edffbe4b"
+  },
+  {
+   "run": "s0",
+   "committed": "stage0_run.json",
+   "selected": 32,
+   "replayed": 32,
+   "byte_identical": 32,
+   "leaves_compared": 1856,
+   "leaves_identical": 1856,
+   "walks_correct": 32,
+   "mismatches": [],
+   "replay_output_sha256": "ac16f8979f276b11effd5b08bbb6b8bc9d5ee5e580be604e05297b464a15953d",
+   "selection_sha256": "3a989ef1bb7d7e47cc11f205f8f8cbd3573cec7671235c16fe92bba78aee6e37"
+  },
+  {
+   "run": "e34",
+   "committed": "experiments/38_twist24_cheap_rep/stage_r_p*.json",
+   "selected": 1280,
+   "replayed": 1280,
+   "byte_identical": 1280,
+   "leaves_compared": 33280,
+   "leaves_identical": 33280,
+   "walks_correct": 1280,
+   "mismatches": [],
+   "replay_output_sha256": "6f55fb3d2dab85dce91a8c945dd050729c3b665041ae426679b5ac4c63a73c48",
+   "selection_sha256": "093de8cdf2e6797bcac1a24c0796ae65b669a55f20a584ff4125280101321aa6"
+  }
+ ],
+ "whole_file_runs": [
+  {
+   "file": "identity.json",
+   "committed_sha256": "e9bc170b5880acbc2c88061482168ce051c0928c30760e03f57b5806b3c0bc8d",
+   "replay_sha256": "e9bc170b5880acbc2c88061482168ce051c0928c30760e03f57b5806b3c0bc8d",
+   "byte_identical": true,
+   "leaves_compared": 4,
+   "leaves_identical": 4,
+   "mismatches": []
+  },
+  {
+   "file": "control.json",
+   "committed_sha256": "7ceb1c1e9c7eecb9047411f241d1bfb2c12fc70b8dc2923a16eb31e7bf933689",
+   "replay_sha256": "7ceb1c1e9c7eecb9047411f241d1bfb2c12fc70b8dc2923a16eb31e7bf933689",
+   "byte_identical": true,
+   "leaves_compared": 1668,
+   "leaves_identical": 1668,
+   "mismatches": []
+  },
+  {
+   "file": "main_karatsuba.json",
+   "committed_sha256": "b379062e191be99ebd983bde13587709b11fb26a10089d7e974f322f1986b3f3",
+   "replay_sha256": "b379062e191be99ebd983bde13587709b11fb26a10089d7e974f322f1986b3f3",
+   "byte_identical": true,
+   "leaves_compared": 66584,
+   "leaves_identical": 66584,
+   "mismatches": []
+  },
+  {
+   "file": "aa_school.json",
+   "committed_sha256": "b0be4806ca721bdb7cc82b8f41f492f894e6dcd2644faa6941ed970198bbf47b",
+   "replay_sha256": "b0be4806ca721bdb7cc82b8f41f492f894e6dcd2644faa6941ed970198bbf47b",
+   "byte_identical": true,
+   "leaves_compared": 53272,
+   "leaves_identical": 53272,
+   "mismatches": []
+  },
+  {
+   "file": "main_school.json",
+   "committed_sha256": "a7e4bd7d576aa1ae3b8b6d7c7ba6df570e9f13bc7b671e979fc0b0775f518037",
+   "replay_sha256": "a7e4bd7d576aa1ae3b8b6d7c7ba6df570e9f13bc7b671e979fc0b0775f518037",
+   "byte_identical": true,
+   "leaves_compared": 266264,
+   "leaves_identical": 266264,
+   "mismatches": []
+  }
+ ],
+ "records_replayed": 2400,
+ "records_byte_identical": 2400,
+ "leaves_compared": 91712,
+ "leaves_identical": 91712
+}
