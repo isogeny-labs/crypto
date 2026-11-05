@@ -1,6 +1,6 @@
 # Next experiment: complete target-chord decomposition
 
-This is the execution-design follow-on to merged [PR3438](https://github.com/isogeny-labs/crypto/pull/3438). It specifies a falsifiable component experiment, including the diagonal branch missing from the initial remainder-only proposal. It is not an experiment result, an implemented solver or a checked theorem. The canonical `protocol.json` is DRAFT, not frozen or launch-ready. [pcc:unverified]
+This is [PR3450](https://github.com/isogeny-labs/crypto/pull/3450), the execution-design follow-on to merged [PR3438](https://github.com/isogeny-labs/crypto/pull/3438). It specifies a falsifiable component experiment, including the diagonal branch missing from the initial remainder-only proposal. It is not an experiment result, an implemented solver or a checked theorem. The canonical `protocol.json` is DRAFT, not frozen or launch-ready. [pcc:unverified]
 
 PCC statement record: `PCC-20261105-7179e4`, with no proof or signed verification. The earlier three ideas remain selected: chord completeness first, a shared collector after admissible rows exist, then the trace-variable encoding. No novelty claim is made. [pcc:unverified]
 
@@ -22,6 +22,6 @@ A complete-or-unknown solver cannot establish strict per-query row complementari
 
 No native scientific/proof command, official checkpoint, upload, scalar study or measurement has run on this branch. Read [LAUNCH_GATES.md](LAUNCH_GATES.md) for the exact new checkpoint-only scope. The previously pending prefix belongs to the now-merged proposal branch and is not reused as a disguise for this branch. Existing local resources only, two workers maximum, 600-second stage caps and one scientific window no longer than 3,600 seconds.
 
-The three existing `XP-20261105-twist-*` backlog cards remain draft; this follow-on does not create a duplicate researcher, automation or task. No lease, funding, reservation or main-ancestry promotion is claimed. The old automation remains disabled following the proposal PR merge. All old research and merged worktrees remain unchanged.
+The three existing `XP-20261105-twist-*` backlog cards remain draft; this follow-on does not create a duplicate researcher, automation or task. No lease, funding, reservation or main-ancestry promotion is claimed. The same single automation, disabled after the proposal PR merged, is now rescheduled to follow this active PR at the spaced cadence. It may review CI and genuinely independent work, but may not launch dependent science or upload without the exact approval. All old research and merged worktrees remain unchanged.
 
 The exact algorithm, query population, controls, invalidation rules and degree/cost distinctions are in [ALGORITHM.md](ALGORITHM.md), [PROTOCOL.md](PROTOCOL.md), and the draft canonical [protocol.json](protocol.json). The [two-page report](reports/design/report.pdf) is a design diagram, with no numerical results. Old quantitative scoreboards, benchmarks and graphs remain unchanged because there is no new measured data. [pcc:unverified]
