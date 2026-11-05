@@ -160,7 +160,12 @@ fn ecbench_trace_line_adapter_retains_transcripts_and_unpriced_work() {
         })
         .unwrap();
         let out = solve(&method, &instance, &workload.curve, &workload.target, 23).unwrap();
-        assert_eq!(out.recovered, workload.planted);
+        assert_eq!(
+            out.recovered,
+            workload
+                .planted
+                .map(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from)
+        );
         assert!(out
             .unpriced
             .iter()

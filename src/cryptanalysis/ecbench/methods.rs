@@ -14,6 +14,7 @@
 //! [`SolveReport::unpriced`]; a report with any unpriced work is a lower
 //! bound and says so.
 
+use super::exact_scalar::ExactScalar;
 use std::collections::BTreeMap;
 use std::time::Instant;
 
@@ -1808,12 +1809,9 @@ impl SolverStats {
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct SolveReport {
     /// The candidate logarithm, unverified.  Wide enough for a subgroup
-    /// order past `2^64`; written as a number while it fits a `u64`.
-    #[serde(
-        default,
-        with = "crate::cryptanalysis::ecbench::canonical::compat_u128::option"
-    )]
-    pub recovered: Option<u128>,
+    /// order through 256 bits; written as a number while it fits a `u64`.
+    #[serde(default)]
+    pub recovered: Option<ExactScalar>,
     /// The budget ran out before an answer.
     pub exhausted: bool,
     pub phases: Vec<PhaseRecord>,
@@ -1911,7 +1909,7 @@ fn generic_report(
             "doubles": out.restarts.doubles, "scalar_mults": out.restarts.scalar_mults}})
     };
     SolveReport {
-        recovered: out.recovered.map(u128::from),
+        recovered: out.recovered.map(ExactScalar::from),
         exhausted: out.exhausted,
         phases: vec![
             ops_phase("setup", out.setup),
@@ -1980,7 +1978,7 @@ fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveRe
     counters.insert("walks".into(), res.walks);
     counters.insert("distinguished_points".into(), res.distinguished_points);
     SolveReport {
-        recovered: res.recovered.map(u128::from),
+        recovered: res.recovered.map(ExactScalar::from),
         exhausted: res.recovered.is_none(),
         total_gae: res.gae,
         automorphisms_used: res.automorphisms,
@@ -2132,7 +2130,7 @@ fn rho_report_v2(
     counters.insert("automorphism_setup_doublings".into(), class_setup.doubles);
     let share = setup_share("rho", &phases, total_gae);
     SolveReport {
-        recovered: res.recovered.map(u128::from),
+        recovered: res.recovered.map(ExactScalar::from),
         exhausted: res.recovered.is_none(),
         total_gae,
         automorphisms_used: res.automorphisms,
@@ -2203,7 +2201,7 @@ fn pooled_report(res: RhoBatchResult, wall: u64, field_ops: Option<FieldOps>) ->
         })
         .collect();
     SolveReport {
-        recovered: recovered.map(u128::from),
+        recovered: recovered.map(ExactScalar::from),
         exhausted: recovered.is_none(),
         total_gae: res.gae,
         automorphisms_used: res.automorphisms,
@@ -2251,7 +2249,7 @@ fn generic_report_v2(
     let total_gae = phases.iter().map(|p| p.gae).sum::<f64>();
     let share = setup_share(family, &phases, total_gae);
     SolveReport {
-        recovered: out.recovered.map(u128::from),
+        recovered: out.recovered.map(ExactScalar::from),
         exhausted: out.exhausted,
         phases,
         total_gae,
@@ -3544,9 +3542,9 @@ fn solve_jacobian_image(
         .recovered
         .as_ref()
         .map(|value| {
-            value
-                .to_u128()
-                .ok_or_else(|| "recovered scalar exceeds ecbench's u128 record width".to_string())
+            ExactScalar::from_biguint(value).ok_or_else(|| {
+                "recovered scalar exceeds ecbench's 256-bit record width".to_string()
+            })
         })
         .transpose()?;
     let native_operations = outcome
@@ -3771,7 +3769,9 @@ fn solve_isogeny_transfer(
         let kg = inst.curve.mul(
             &mut verify,
             inst.generator_point(),
-            (k % u128::from(inst.r)) as u64,
+            (k.to_biguint() % inst.r)
+                .to_u64()
+                .expect("reduced below u64 order"),
         );
         if kg != target {
             rep.recovered = None;
@@ -3908,9 +3908,13 @@ fn solve_quartic_cover(
     let jac_ops = rep.total_gae;
     let mut verify = GroupOps::default();
     if let Some(k) = rep.recovered {
-        let kg = inst
-            .curve
-            .mul(&mut verify, g, (k % u128::from(inst.r)) as u64);
+        let kg = inst.curve.mul(
+            &mut verify,
+            g,
+            (k.to_biguint() % inst.r)
+                .to_u64()
+                .expect("reduced below u64 order"),
+        );
         if kg != target {
             rep.recovered = None;
         }
@@ -4018,7 +4022,13 @@ fn solve_ghs_cover(
     let mut verify = GroupOps::default();
     if let Some(k) = rep.recovered {
         let e = GhsCurveGroup(inst.curve(&f));
-        let kg = e.mul(&mut verify, inst.generator, (k % u128::from(inst.l)) as u64);
+        let kg = e.mul(
+            &mut verify,
+            inst.generator,
+            (k.to_biguint() % inst.l)
+                .to_u64()
+                .expect("reduced below u64 order"),
+        );
         if kg != target {
             rep.recovered = None;
         }
@@ -4099,7 +4109,13 @@ fn solve_ic_hyperelliptic(
     );
     measurement::end_online();
     let wall = t.elapsed().as_nanos() as u64;
-    let recovered = k.and_then(|k| u128::try_from(k).ok());
+    let recovered = k
+        .as_ref()
+        .map(|k| {
+            ExactScalar::from_biguint(k)
+                .ok_or_else(|| "recovered scalar exceeds 256 bits".to_string())
+        })
+        .transpose()?;
     let v2 = m.id == HYPER_GENUS2_V2_ID;
     let setup = GroupOps {
         adds: rep.precompute_ops as u64,
@@ -4385,7 +4401,7 @@ fn solve_hyper_ic(
         "linear_algebra": "Markowitz sparse elimination mod r (the thread's sparse_solve_for_k)",
     });
     Ok(SolveReport {
-        recovered: out.recovered.map(u128::from),
+        recovered: out.recovered.map(ExactScalar::from),
         exhausted: out.exhausted,
         phases,
         total_gae,
@@ -4565,7 +4581,7 @@ fn solve_fp4(
         .collect();
     let total = phases.iter().map(|p| p.gae).sum();
     Ok(SolveReport {
-        recovered: out.recovered.map(u128::from),
+        recovered: out.recovered.map(ExactScalar::from),
         exhausted: out.exhausted,
         phases,
         total_gae: total,
@@ -4787,7 +4803,7 @@ fn solve_large_prime(
         unpriced.extend(line.native.keys().cloned());
     }
     Ok(SolveReport {
-        recovered: report.recovered.map(u128::from),
+        recovered: report.recovered.map(ExactScalar::from),
         exhausted: report.exhausted,
         phases,
         total_gae,
@@ -4985,7 +5001,7 @@ fn claw_report(
         detail["accounting"] = json!("v2");
     }
     SolveReport {
-        recovered: o.recovered,
+        recovered: o.recovered.map(ExactScalar::from),
         exhausted: o.exhausted,
         phases,
         total_gae: total,
@@ -5249,7 +5265,7 @@ fn strong_run_v2<F: RhoField, S: RhoScalar>(
         "scalar_multiplication_charge": "1.5·log2(r) additions each for the two start multiplications and every candidate check (ic_boundary::signed_frobenius_rho's convention); the start multiples j·stride are charged as additions",
     });
     Ok(SolveReport {
-        recovered,
+        recovered: recovered.map(ExactScalar::from),
         exhausted: recovered.is_none(),
         phases,
         total_gae,
@@ -5376,7 +5392,7 @@ fn strong_run<F: RhoField, S: RhoScalar>(
         counters.insert("fruitless_escapes".to_string(), o.escapes);
     }
     Ok(SolveReport {
-        recovered: Some(o.scalar.to_u128()),
+        recovered: Some(ExactScalar::from(o.scalar.to_u128())),
         exhausted: false,
         total_gae: setup.gae + search.gae,
         phases: vec![setup, search],
@@ -5540,7 +5556,7 @@ fn ic_report(
         "framework_total_gae_before_solver_removal": rep.total_gae,
     });
     SolveReport {
-        recovered: rep.recovered.map(u128::from),
+        recovered: rep.recovered.map(ExactScalar::from),
         exhausted: rep.exhausted,
         phases,
         total_gae: total,
@@ -5664,7 +5680,7 @@ fn solve_preprocessing<G: CountedGroup>(
     let phases = vec![setup, precompute, search, verify];
     let short = table.entries < entries;
     Ok(SolveReport {
-        recovered: online.recovered.map(u128::from),
+        recovered: online.recovered.map(ExactScalar::from),
         exhausted: online.recovered.is_none(),
         total_gae: phases.iter().map(|p| p.gae).sum(),
         phases,
@@ -5762,7 +5778,7 @@ fn solve_known_log<G: CountedGroup>(
         |p| group.key(p),
     )?;
     Ok(SolveReport {
-        recovered: recovered.recovered.map(u128::from),
+        recovered: recovered.recovered.map(ExactScalar::from),
         exhausted: recovered.recovered.is_none(),
         total_gae: phases.iter().map(|p| p.gae).sum(),
         phases,
@@ -5904,7 +5920,7 @@ fn solve_tensor_contraction(
         Err(e) => (None, Some(e.to_string())),
     };
     Ok(SolveReport {
-        recovered,
+        recovered: recovered.map(ExactScalar::from),
         exhausted: recovered.is_none(),
         total_gae: phases.iter().map(|p| p.gae).sum(),
         phases,
@@ -6305,7 +6321,7 @@ fn solve_neg_strong(
         },
     });
     Ok(SolveReport {
-        recovered: o.scalar,
+        recovered: o.scalar.map(ExactScalar::from),
         exhausted: o.scalar.is_none(),
         phases,
         total_gae,
@@ -6441,7 +6457,7 @@ fn solve_f2m4_wide(
             measurement::end_online();
             let fops = field_ops_of(&inst.curve, &[res.group_ops]);
             let mut rep = rho_report(res, t.elapsed().as_nanos() as u64, fops);
-            rep.recovered = d;
+            rep.recovered = d.map(ExactScalar::from);
             rep.exhausted = d.is_none();
             Ok(rep)
         }
@@ -6493,7 +6509,7 @@ fn solve_f2m4_wide(
                 |q| CountedGroup::key(c, q),
             )?;
             let mut rep = ic_report(m, run.report, &calib, Some(facts), wall, 2);
-            rep.recovered = run.recovered;
+            rep.recovered = run.recovered.map(ExactScalar::from);
             rep.exhausted = run.recovered.is_none();
             Ok(rep)
         }
@@ -6837,7 +6853,7 @@ fn solve_shared_rank(
         .targets
         .first()
         .ok_or("shared rank returned no target")?;
-    let recovered = row.recovered_log.map(u128::from);
+    let recovered = row.recovered_log.map(ExactScalar::from);
     let phases = vec![
         phase_of("factor_base", &report.rank.base),
         phase_of("oracle_setup", &report.rank.table),
@@ -7108,8 +7124,11 @@ fn solve_koblitz_descent(
         recovered: out
             .recovered
             .as_ref()
-            .and_then(|d| d.to_u64())
-            .map(u128::from),
+            .map(|d| {
+                ExactScalar::from_biguint(d)
+                    .ok_or_else(|| "recovered scalar exceeds 256 bits".to_string())
+            })
+            .transpose()?,
         exhausted: out.recovered.is_none(),
         phases,
         total_gae,
@@ -7241,8 +7260,11 @@ fn solve_koblitz_batched(
         recovered: out
             .recovered
             .as_ref()
-            .and_then(|d| d.to_u64())
-            .map(u128::from),
+            .map(|d| {
+                ExactScalar::from_biguint(d)
+                    .ok_or_else(|| "recovered scalar exceeds 256 bits".to_string())
+            })
+            .transpose()?,
         exhausted: out.recovered.is_none(),
         phases,
         total_gae,
@@ -7315,7 +7337,7 @@ mod koblitz_batched_tests {
     #[test]
     fn the_tournament_cell_recovers_the_scalar_with_every_stage_charged() {
         let rep = solve_at("64", 1_234);
-        assert_eq!(rep.recovered, Some(1_234));
+        assert_eq!(rep.recovered, Some(ExactScalar::from(1_234u128)));
         let names: Vec<&str> = rep.phases.iter().map(|p| p.name.as_str()).collect();
         assert_eq!(names, koblitz_batched::PHASES);
         assert_eq!(rep.total_gae, rep.phases.iter().map(|p| p.gae).sum::<f64>());
@@ -7346,8 +7368,8 @@ mod koblitz_batched_tests {
         // run does, and both recover the same scalar.
         let wide = solve_at("64", 1_234);
         let narrow = solve_at("16", 1_234);
-        assert_eq!(narrow.recovered, Some(1_234));
-        assert_eq!(wide.recovered, Some(1_234));
+        assert_eq!(narrow.recovered, Some(ExactScalar::from(1_234u128)));
+        assert_eq!(wide.recovered, Some(ExactScalar::from(1_234u128)));
         assert!(narrow.counters["collection_trials"] <= wide.counters["collection_trials"]);
         assert_eq!(narrow.counters["collection_trials"] % 16, 0);
     }
@@ -7421,7 +7443,10 @@ mod koblitz_descent_tests {
             3,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(u128::from(777_777 % bi.r)));
+        assert_eq!(
+            rep.recovered,
+            Some(ExactScalar::from(u128::from(777_777 % bi.r)))
+        );
         assert_eq!(rep.automorphisms_used, 46);
         let names: Vec<&str> = rep.phases.iter().map(|p| p.name.as_str()).collect();
         assert_eq!(names, koblitz_descent::PHASES);
@@ -7518,7 +7543,10 @@ mod shared_rank_tests {
             19,
         )
         .unwrap();
-        assert_eq!(report.recovered, Some(u128::from(113 % binary.r)));
+        assert_eq!(
+            report.recovered,
+            Some(ExactScalar::from(u128::from(113 % binary.r)))
+        );
         assert_eq!(report.factor_base.as_ref().unwrap().columns, 4);
         assert!(report
             .unpriced
@@ -7746,6 +7774,54 @@ mod tests {
     use super::*;
 
     #[test]
+    fn solve_report_preserves_full_width_recovery_and_legacy_encoding() {
+        for value in [0u128, u64::MAX as u128, 1u128 << 64, u128::MAX] {
+            let report = SolveReport {
+                recovered: Some(value.into()),
+                ..Default::default()
+            };
+            let encoded = serde_json::to_value(&report).unwrap();
+            let expected = if value <= u64::MAX as u128 {
+                serde_json::json!(value as u64)
+            } else {
+                serde_json::json!(value.to_string())
+            };
+            assert_eq!(encoded["recovered"], expected);
+            assert_eq!(
+                serde_json::from_value::<SolveReport>(encoded)
+                    .unwrap()
+                    .recovered,
+                report.recovered
+            );
+        }
+        let text = "7237005577332262213973186563042994240857116359379907606001950938285454250988";
+        let scalar: ExactScalar = text.parse().unwrap();
+        assert!(scalar.checked_u128().is_none());
+        let report = SolveReport {
+            recovered: Some(scalar),
+            ..Default::default()
+        };
+        let mut encoded = serde_json::to_value(&report).unwrap();
+        assert_eq!(encoded["recovered"], text);
+        assert_eq!(
+            serde_json::from_value::<SolveReport>(encoded.clone())
+                .unwrap()
+                .recovered,
+            Some(scalar)
+        );
+        encoded["recovered"] =
+            serde_json::json!((num_bigint::BigUint::from(1u8) << 256usize).to_string());
+        assert!(serde_json::from_value::<SolveReport>(encoded).is_err());
+        let mut absent = serde_json::to_value(SolveReport::default()).unwrap();
+        assert!(absent["recovered"].is_null());
+        absent.as_object_mut().unwrap().remove("recovered");
+        assert!(serde_json::from_value::<SolveReport>(absent)
+            .unwrap()
+            .recovered
+            .is_none());
+    }
+
+    #[test]
     fn named_jacobian_image_adapters_recover_without_source_gae_conflation() {
         use crate::cryptanalysis::ecbench::workload::CurveSpec;
 
@@ -7770,7 +7846,10 @@ mod tests {
             })
             .unwrap();
             let report = solve(&method, &inst, &facts, &coordinates, 0x83_03).unwrap();
-            assert_eq!(report.recovered, Some(u128::from(scalar)));
+            assert_eq!(
+                report.recovered,
+                Some(ExactScalar::from(u128::from(scalar)))
+            );
             assert!(!report.exhausted);
             assert_eq!(report.total_gae, 0.0);
             assert!(report
@@ -7829,7 +7908,7 @@ mod tests {
                     Workload::build(&spec, 20261027, index, TargetKind::Planted).unwrap();
                 let a = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
                 let b = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
-                assert_eq!(a.recovered, w.planted);
+                assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
                 assert_eq!(a.recovered, b.recovered);
                 assert_eq!(a.counters, b.counters);
                 assert_eq!(a.total_gae, b.total_gae);
@@ -7958,7 +8037,11 @@ mod tests {
             for index in 0..3 {
                 let (w, inst) = Workload::build(&spec, 11, index, TargetKind::Planted).unwrap();
                 let rep = solve(&m, &inst, &w.curve, &w.target, 40 + index).unwrap();
-                assert_eq!(rep.recovered, w.planted, "record target");
+                assert_eq!(
+                    rep.recovered,
+                    w.planted.map(ExactScalar::from),
+                    "record target"
+                );
                 assert_eq!(rep.automorphisms_used, 2);
                 let per = rep.detail["per_target"].as_array().unwrap();
                 assert_eq!(per.len(), batch.parse::<usize>().unwrap());
@@ -8181,7 +8264,7 @@ mod tests {
             3,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(4321));
+        assert_eq!(rep.recovered, Some(ExactScalar::from(4321u128)));
         let phases: f64 = rep.phases.iter().map(|p| p.gae).sum();
         assert_eq!(phases, rep.total_gae, "{:?}", rep.phases);
         let setup = rep.phases.iter().find(|p| p.name == "setup").unwrap();
@@ -8227,7 +8310,7 @@ mod tests {
             5,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(97));
+        assert_eq!(rep.recovered, Some(ExactScalar::from(97u128)));
         let f = rep
             .field_ops
             .expect("a prime curve counts its field operations");
@@ -8261,7 +8344,10 @@ mod tests {
             5,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(u128::from(113 % binary.r)));
+        assert_eq!(
+            rep.recovered,
+            Some(ExactScalar::from(u128::from(113 % binary.r)))
+        );
         assert!(rep.field_ops.is_none(), "unknown is not zero");
         let v = serde_json::to_value(&rep).unwrap();
         assert!(v.get("field_ops").is_none(), "absent, not null");
@@ -8308,7 +8394,7 @@ mod tests {
         };
         let f4 = run("prime-kummer:t=2", "pkm-semaev:m=3,crosscheck=1").unwrap();
         let grid = run("prime-kummer:t=2", "pkm-semaev:m=3,engine=exhaustive").unwrap();
-        assert_eq!(f4.recovered, Some(1234));
+        assert_eq!(f4.recovered, Some(ExactScalar::from(1234u128)));
         assert_eq!(grid.recovered, f4.recovered);
         for key in ["targets_tried", "relations_found", "matrix_rank"] {
             assert_eq!(f4.counters[key], grid.counters[key], "{key}");
@@ -8382,7 +8468,10 @@ mod tests {
         };
         let sub = run("subtract");
         let root = run("rootfind-subtract:m=2");
-        assert_eq!(sub.recovered, Some(4099 % u128::from(prime.r)));
+        assert_eq!(
+            sub.recovered,
+            Some(ExactScalar::from(4099 % u128::from(prime.r)))
+        );
         assert_eq!(root.recovered, sub.recovered);
         for key in ["targets_tried", "relations_found", "matrix_rank"] {
             assert_eq!(sub.counters[key], root.counters[key], "{key}");
@@ -8486,7 +8575,10 @@ mod tests {
         })
         .unwrap();
         let rep = solve(&m, &inst, &facts, &coords, 5).unwrap();
-        assert_eq!(rep.recovered, Some(77_777 % u128::from(prime.r)));
+        assert_eq!(
+            rep.recovered,
+            Some(ExactScalar::from(77_777 % u128::from(prime.r)))
+        );
         let fbp = rep.phases.iter().find(|p| p.name == "factor_base").unwrap();
         let charged = fbp.native["aux_search_gae"] + fbp.native["aux_tower_build_gae"];
         assert!(charged > 0 && fbp.native["aux_curves_tried"] >= 1);
@@ -8716,7 +8808,7 @@ mod accounting_rules_tests {
             ],
         );
         let rep = run(&f4, &inst, &facts, 4242, 6);
-        assert_eq!(rep.recovered, Some(4242 % facts.r));
+        assert_eq!(rep.recovered, Some(ExactScalar::from(4242 % facts.r)));
         let solver = rep.solver.as_ref().expect("solver block");
         let fc = solver
             .degree_of_regularity_forecast
@@ -8814,7 +8906,7 @@ mod accounting_rules_tests {
         for i in 0..runs {
             let k = 12_345 + 40_503 * u128::from(i);
             let rep = run(&m, &inst, &facts, k, 100 + i);
-            assert_eq!(rep.recovered, Some(k % facts.r));
+            assert_eq!(rep.recovered, Some(ExactScalar::from(k % facts.r)));
             assert!(rep.automorphisms_used <= facts.automorphisms_available);
             s += rep.total_gae / (facts.r as f64).sqrt();
         }
@@ -8838,8 +8930,8 @@ mod accounting_rules_tests {
             let k = 4321u128 % facts.r;
             let frozen = run(&method(old, &[]), &inst, &facts, k, 7);
             let v2 = run(&method(new, &[]), &inst, &facts, k, 7);
-            assert_eq!(frozen.recovered, Some(k));
-            assert_eq!(v2.recovered, Some(k));
+            assert_eq!(frozen.recovered, Some(ExactScalar::from(k)));
+            assert_eq!(v2.recovered, Some(ExactScalar::from(k)));
             let kappa = v2
                 .phases
                 .iter()
@@ -8942,7 +9034,12 @@ mod accounting_rules_tests {
                 {
                     let rep = run(&m, inst, facts, k, 40 + j as u64);
                     assert!(!rep.exhausted, "{id} on {} k={k}", facts.slug);
-                    assert_eq!(rep.recovered, Some(k), "{id} on {} k={k}", facts.slug);
+                    assert_eq!(
+                        rep.recovered,
+                        Some(ExactScalar::from(k)),
+                        "{id} on {} k={k}",
+                        facts.slug
+                    );
                     assert_phases_sum(id, &rep);
                     assert!(
                         rep.automorphisms_used <= facts.automorphisms_available,
@@ -9213,7 +9310,7 @@ mod accounting_rules_tests {
                     k,
                     i,
                 );
-                assert_eq!(v.recovered, Some(k % facts.r));
+                assert_eq!(v.recovered, Some(ExactScalar::from(k % facts.r)));
                 assert_phases_sum("strong_v2", &v);
                 old += o.total_gae;
                 new += v.total_gae;
@@ -9350,8 +9447,8 @@ mod accounting_rules_tests {
         for (j, k) in [5u128, 400, 777].into_iter().enumerate() {
             let a = run(&old, &inst, &facts, k, j as u64);
             let b = run(&new, &inst, &facts, k, j as u64);
-            assert_eq!(a.recovered, Some(k));
-            assert_eq!(b.recovered, Some(k));
+            assert_eq!(a.recovered, Some(ExactScalar::from(k)));
+            assert_eq!(b.recovered, Some(ExactScalar::from(k)));
             let v = |r: &SolveReport| {
                 r.phases
                     .iter()
@@ -9428,7 +9525,7 @@ mod accounting_rules_tests {
             let k = 4242u128;
             let target = inst.mul_generator_hex(k).unwrap();
             let measured = solve_measured(&m, &inst, &facts, &target, 5).unwrap();
-            assert_eq!(measured.recovered, Some(k));
+            assert_eq!(measured.recovered, Some(ExactScalar::from(k)));
             let fb = measured
                 .factor_base
                 .clone()
@@ -9558,7 +9655,11 @@ mod accounting_rules_tests {
         let mut covered: Vec<&str> = cases.iter().map(|c| c.0).collect();
         for (id, params, (inst, facts)) in cases {
             let rep = run(&method(id, params), inst, facts, 4242, 6);
-            assert_eq!(rep.recovered, Some(4242 % facts.r), "{id}");
+            assert_eq!(
+                rep.recovered,
+                Some(ExactScalar::from(4242 % facts.r)),
+                "{id}"
+            );
             assert_phases_sum(id, &rep);
         }
         // The frozen `rho.cubic` / `rho.quartic` charge their class set-up
@@ -9572,10 +9673,10 @@ mod accounting_rules_tests {
             let (inst, facts) = built(&spec);
             let k = 4242 % facts.r;
             let rep = run(&method(id, &[]), &inst, &facts, k, 6);
-            assert_eq!(rep.recovered, Some(k), "{id}");
+            assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "{id}");
             assert_phases_sum(id, &rep);
             let rep = run(&method(v2, &[]), &inst, &facts, k, 6);
-            assert_eq!(rep.recovered, Some(k), "{v2}");
+            assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "{v2}");
             assert_phases_sum(v2, &rep);
             covered.extend([id, v2]);
         }
@@ -9719,7 +9820,7 @@ mod accounting_tests {
             applicable(&v2, &inst, &w.curve).unwrap();
             let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 5).unwrap());
             let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 5).unwrap());
-            assert_eq!(a.recovered, w.planted);
+            assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
             assert_eq!(b.recovered, a.recovered);
             // The frozen record keeps its three phases, its counters and its
             // `unpriced`, with no verification and no factor-base tally.
@@ -9763,7 +9864,7 @@ mod accounting_tests {
             assert_eq!(b.unpriced.len(), a.unpriced.len() + 1);
             // The verification: [k]D₁ = D₂ twice on a success, each one
             // doubling per bit and one addition per set bit of k.
-            let k = a.recovered.unwrap() as u64;
+            let k = a.recovered.unwrap().checked_u64().unwrap();
             let one = u64::from(64 - k.leading_zeros()) + u64::from(k.count_ones());
             let v = phase(&b, "verification");
             assert_eq!(v.adds + v.doubles, 2 * one, "k {k}");
@@ -9796,7 +9897,7 @@ mod accounting_tests {
         applicable(&v2, &inst, &w.curve).unwrap();
         let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 7).unwrap());
         let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 7).unwrap());
-        assert_eq!(a.recovered, w.planted);
+        assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
         assert_eq!(b.recovered, a.recovered);
         assert!(a.unpriced.is_empty(), "frozen: {:?}", a.unpriced);
         assert!(!a.counters.contains_key("root_search_field_muls_uncharged"));
@@ -10212,7 +10313,11 @@ mod neg_strong_tests {
                 let target = inst.mul_generator_hex(k).unwrap();
                 let a = solve(&strong, &inst, &facts, &target, seed).unwrap();
                 let b = solve(&plain, &inst, &facts, &target, seed).unwrap();
-                assert_eq!(a.recovered, Some(k), "m = {m}, seed {seed}");
+                assert_eq!(
+                    a.recovered,
+                    Some(ExactScalar::from(k)),
+                    "m = {m}, seed {seed}"
+                );
                 assert_eq!(a.recovered, b.recovered, "m = {m}, seed {seed}");
                 let sum: f64 = a.phases.iter().map(|p| p.gae).sum();
                 assert_eq!(sum, a.total_gae);
@@ -10253,7 +10358,7 @@ mod neg_strong_tests {
         let target = inst.mul_generator_hex(k).unwrap();
         let rep = solve(&strong, &inst, &facts, &target, 3).unwrap();
         assert!(rep.counters["walk_steps"] >= 1_000_000);
-        assert!(rep.recovered.is_none() || rep.recovered == Some(k));
+        assert!(rep.recovered.is_none() || rep.recovered == Some(ExactScalar::from(k)));
         assert!(rep.total_gae > 0.0);
     }
 
@@ -10310,7 +10415,7 @@ mod tensor_contraction_tests {
                 .mul(&mut GroupOps::default(), pi.generator_point(), k);
             let target = [format!("0x{:x}", t.x), format!("0x{:x}", t.y)];
             let rep = solve(&m, &inst, &facts, &target, seed).unwrap();
-            assert_eq!(rep.recovered, Some(u128::from(k)));
+            assert_eq!(rep.recovered, Some(ExactScalar::from(u128::from(k))));
             let names: Vec<&str> = rep.phases.iter().map(|p| p.name.as_str()).collect();
             assert_eq!(names, TENSOR_PHASES);
             assert_eq!(rep.total_gae, rep.phases.iter().map(|p| p.gae).sum::<f64>());

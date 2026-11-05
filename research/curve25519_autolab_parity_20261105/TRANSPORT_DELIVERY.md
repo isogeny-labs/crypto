@@ -1,0 +1,9 @@
+# Exact recovered-scalar transport
+
+SolveReport now carries ExactScalar values through256 bits. The serde codec keeps JSON numbers throughu64 and decimal strings above it, preserving legacy wire encodings. Native solver adapters convert explicitly; BigUint results retain their full width and reject overflow. Runner verification and audit parsing use exact values, reducing modulo each legacy instance order before checked narrowing. [pcc:unverified]
+
+The actual-crate ecbench suite reported517 passed,0 failed,5 ignored. The full-library gate reported6063 passed,0 failed,130 ignored in1493.16s. Both ecbench and ic_autolab entrypoints passed cargo check. New regressions cover above-u128 report serialization, rejection above256 bits, nullable records and high-bit-preserving verification. Seven codec tests include9612 fields across3204 retained records plus constructed width boundaries. Logs, failed compile attempts and source hashes are in transport-integration/. These are unsigned producer observations, not signed PCC verdicts. [pcc:unverified]
+
+Separate unregistered candidates provide bounded deterministic rejection sampling and actual Curve25519 workload construction. Their native harnesses/replays reported32 tests and5 tests passing respectively. The workload harness uses actual Fp256/curve source, an extracted group ledger/trait and an unused panic-only Fp64 shim; it is not actual-crate dispatch. Both failed and successful dependency-selection attempts are retained. [pcc:unverified]
+
+The next branch integrates exact workload orders, Curve25519 target construction and matched solver interfaces. No comparative experiment or speedup claim is included in this delivery. Official PCC claims/ledger were last exclusively reserved by T-1649; no ledger write or signed standing is claimed. [pcc:unverified]
