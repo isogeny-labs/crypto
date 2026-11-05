@@ -1,0 +1,36 @@
+{
+  "schema": "validation-gate/v1",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "2889fbc1b6c88ec3e23f710d4eb7fe39dc1cbc6c27ad80e82c889f2523cf8972"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "edef697cd3c8470e902631d2416741779079f2adcedc1c45961b84aeb5d5641b"
+  },
+  "rho_reference": {
+    "kind": "negation_frobenius",
+    "protocol": "Named by the protocol (note §9.50, registered at 5a0dd20af9 before any V code or run): walk (iii), the matched rho of this line since §9.25/§9.29 and §9.44. On the 20 GLS rows (E25's ten curves, arms A and B) E27's <±psi> walk, psi the GLS endomorphism (psi^2 = -1), class {±P, ±psi P}, Karatsuba F_p4 products with the norm inversions of a 16-walk lockstep pool batched by Montgomery's trick, E25's seeds 1000*seed + k, k < 16 (experiments/32_walk_karatsuba/stage_w.json); on the 12 E24 rows the same walk (iii) with the negation fold on E24's curves (experiments/44_pivot_rules_confirm/walk_e24.json). rho = mean over the 16 walks of their F_p multiplications without the [d]G = Q check (E25/E27 convention), recomputed by the validator from the per-walk records. Strongest available: GLS curves have j in F_p2 but not F_p, Aut(E) = {±1}, so <±psi> is the largest fold (E25 validator); E24 curves have j outside F_p2, so negation is the strongest fold (E24 validator); walk (iii) is the cheapest arithmetic implemented for these folds (E27); the order-24 walks of E34/E41 apply to E18's j = 0 curves only. Unpriced native work (AGENTS.md §5a): the index calculus leaves its Macaulay-matrix cell traffic unpriced in F_p multiplications and emits it as macaulay_entries (A, E25: rows*cols per call, x2 on a chain fallback) or macaulay_stored_entries + profile_offset_ops (V: cells stored from each row's lead plus every use of a row offset); lead-scan reads and per-call structural work are listed and priced only in sensitivities sigma1/sigma4; the walks leave each step's hash lookup/insert and partition hash unpriced, emitted as steps. Band: S(g) = F_p multiplications + g * 97 * native operations, rho(g) = rho + g * 97 * steps, GAE = 97 F_p multiplications (E25's affine addition, the registered primary), g = 0, 0.1, 1. gae_band values: the row the note names as the distance remaining, GLS p = 397 seed 1 arm B (V, chain-profile, Karatsuba), against its walk (iii); per-row values for all 32 rows in validator-report.json gae_band_rows. Rho is below V on all 32 rows at every weight (S_V/rho 6.00e3-1.98e5 at 0, 1.58e4-5.41e5 at 0.1, 6.17e4-2.36e6 at 1 GAE), so the order rho < IC holds across the band. Within the index calculus: V is equal to A at 0 GAE and strictly cheaper at 0.1 and 1 GAE on 32/32 rows (S_A/S_V 1 / 1.2518-1.2618 / 1.3629-1.3807), the registered weak rank; V is cheaper than E25 at all three weights on 32/32 rows.",
+    "unit": "F_p multiplications: every arm counted by the same crypto_lib Fp4 counters with Karatsuba F_p4 products (13 per product), F_p4 inversions as recorded, the solve's F_p multiplications counted directly, the Wiedemann matrix at 16 per multiplication mod n; walk set-up included, the walk's [d]G = Q check excluded; native operations priced at g * 97 per Macaulay cell built or stored, per offset use, per walk step",
+    "binary_or_process": "One crypto_lib build: the validator rebuilt quartic_pipeline_gls / quartic_pipeline_v4 (V and A arms, sha256 487a6740… / 7b5fb06d…, equal to the producer's pinned binaries) and e27_walk / e37_walk_e24 (walk (iii)) from one clean export of 9b2a47238b in one target directory; the rebuilt walk examples reproduce E27's stage_w.json and E37's walk_e24.json raw byte for byte, and the rebuilt pipelines reproduce every replayed V, A, A′, V′ and E25 record leaf for leaf (timing aside), on the same instances (n equal on every row). The IC records' own in-process walks (16 <±psi>/negation/unfolded per row) are bit-identical walks under the costlier arithmetic and are not the reference.",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 15197024347,
+        "rho": 2532750.875
+      },
+      "0.1": {
+        "ic": 43782376170.9,
+        "rho": 2767428.43125
+      },
+      "1": {
+        "ic": 301050542586,
+        "rho": 4879526.4375
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

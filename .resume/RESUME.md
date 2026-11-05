@@ -1,64 +1,107 @@
-# Resume: crypto @ claude/isogeny-class-ic-yield-20261102
+# Resume: crypto @ claude/arity-completion-20261104 (2026-11-04)
 
 ## Goal
-User request (2026-11-02): measure index-calculus relation yield, solve time,
-degree of regularity (Dreg), solving degree and related parameters across the
-isogeny classes of ECC2K-130 and ECCp-131, and report per-curve differences.
+Complete the arity dimension of elliptic-curve index calculus with the
+preregistered cells no record covers: PKM prime towers at m = 5 (N = 10, 15,
+20); chained-S3 SAT with a Frobenius-union base at m = 5 and 6 on Koblitz
+n = 23..41; the same at n = 83 with the cell cap lifted to 1800 s. Study
+directory `research/arity_completion_20261104/` (README there), PR #3378.
 
 ## Lead / hypothesis
-Within an isogeny class only transport cost, Aut and model presentation can
-differ (research/isogeny_class_difficulty_20261008). Prediction: null (no
-curve effect beyond A/A and presentation). Prior ECC2K-130 work:
-cryptanalysis/experiments/ecc2k130-isogeny-class/, research/isogeny_conductor_gap_ic_20261010,
-koblitz-isogeny ICC study, cryptanalysis/ecc2k130/research/volcano-m83/.
-ECCp-131 never measured. A real curve effect larger than the presentation
-control would revive the lead; a null closes it.
+Prime towers: D(m=5, N=10) in {6, 7}, D(m=5, N=15) in {7, 8}, D(m=5, N=20)
+>= 8 or capped; tower kind does not change D; N = 15 finishes in 7200 s and
+8 GiB. Kill: D >= 8 at N <= 15 closes m = 5 on prime towers.
+Koblitz: m = 5, 6 decide at n = 23 within 600 s for S = 2; cost grows so that
+n = 37, 41 cap at m = 6; planted controls always recover; n = 83 stays
+undecided at 1800 s; no decided query at n >= 31 under the 188 s m = 4
+root-table parity point. Kill: K4 and K5 both supported.
 
 ## Spec
-research/isogeny_class_ic_yield_20261102/DESIGN.md (class structure, parts
-P1-P3). Per-part PROTOCOL.md in p1_eccp131/, p2_prime_analogues/,
-p3_ecc2k130/ (written by Sonnet builder agents; to be frozen before runs).
-ECCp-131: p=0x48e1d43f293469e33194c43186b3abc0b, conductor 1, Elkies l<=150:
-5,7,13,17,29,37,61,73,83,89,107,131,149 (x2), 67 (x1).
-ECC2K-130: conductor 263*146505763881528721, ecdb curve id 22.
+- `research/arity_completion_20261104/prime_tower_m5/protocol.json`, frozen at
+  commit 1fd6ece55f (sha 2b82eecd…); commands in arms[*].instrument.flags.
+- `research/arity_completion_20261104/koblitz_m5_m6/protocol.json` + grid.tsv
+  + run_shard.sh (freeze block records its commit once frozen).
+- Cards: `research/arity_completion_20261104/cards/CARD-arity-prime-m5-*.yaml`
+  (lint CARD OK); Koblitz cards follow the same pattern after its freeze.
+- Instruments: `examples/pkm_tower_pilot.rs` (engine tower, p 2013265921),
+  `examples/n83_msweep_cell.rs` (chain-s3 and chain-s3-orbit, union:S base).
 
-## State (updated 2026-11-02 ~10:00Z)
-- P1 tier 1 DONE (card -1 attempt 2, detached), masked analysis frozen (6199f52d57), key opened (26f3758222).
-  Every arm (27 Elkies neighbours, iso, 27 random non-isogenous curves) identical to E0 in D_solve, rank, field_mults,
-  per-degree profile; only AA_perm (variable reorder) moves mults (0.976-1.165). Instrument curve-independent; null
-  uninformative about isogeny specifically. 1008 planted rows not formed (factor base < m abscissae).
-- P2: cells done and committed: c24A_m2 c28A_m3 c24A_m3 c32A_m3 c24B_m2 c32A_m2 c28A_m2. c32A_m3 max|z| flag
-  (curve 80, +7.25%, p=0.0005) -> preregistered follow-up 1 (FOLLOWUP_c32A_m3.md, note F1.1, card p2fu1) gated to run
-  after the P2 queue. Deviation to report: executed specs used R=200 (generator default), protocol text says min(100,0.6N).
-- P3: done and committed: setup, a-ctrl-k3, a-main-k3, a-m2, a-main-k5, a-ctrl-k4-s0/s1, a-main-k4-s0/s1, b-ctrl,
-  b-main-k34. b-badapt -1 timed out (untimed solution count, TIMEOUT_NOTE.md), reissued -2; b-bsparse -2.
-- Report pipeline: report/build.sh (generator gen/gen_report.rs, typst via scratch venv), rerun when all data is in.
-- Infra: executor Bash kills background commands at 30 min -> all runs launched detached (LAUNCH_NOTE.md) via
-  /tmp/.../scratchpad/card_queue.sh (also copied below). Outputs copied into main with gzip >1MiB (repo 10MiB limit).
+## State
+- Protocols validated with crypto-autoresearcher tools/experiment_protocol.py
+  (main commit, files fetched raw); prime-tower frozen before data.
+- No cell has run. Development release builds in /dev/shm only.
+- Launch gates fail in the authoring container: STS InvalidClientTokenId, no
+  checkpoint upload token (problems/arity-completion-launch-gates.md).
 
 ## Next steps
-1. Collect builder outputs; review protocols; freeze them (commit).
-2. experiment-director compiles task cards (route: isolab-eks unless director finds it unavailable).
-3. executor-mechanical runs cards; director assesses; main session analyses.
-4. Report + graphs + PDF (research-visuals), PR ready for review.
+1. From a session with account 104186811093 (or an upload token): push this
+   checkpoint, run the build cards, re-dispatch the director with the binary
+   sha256 for the cell cards, submit through isolab-eks per AGENTS.md §9a.
+2. Run controls first; a failed control voids the study (both protocols).
+3. analyze.py per study; export with experiment_protocol.py from-rows;
+   report, figure, PDF; no leaderboard row (stage diagnostics).
+4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-- PR: isogeny-labs/crypto#3306 (open, ready). Owner instruction 2026-11-02: enable auto-merge ONLY after P2 lands
-  (cells c32B-m2, c28B-m2 and the curve-80 follow-up saved, report rebuilt, PR body updated). Then enable_pr_auto_merge (MERGE).
-Detached queues (logs in /tmp/claude-0/-home-user/fafe457a-a14a-53c5-a937-e53817fc07eb/scratchpad/queue_*.log; card
-outputs in each worktree's cards/<id>.launch.log + receipt; copy finished outputs into main and commit):
-- P2 queue in /home/user/crypto-p2run (pin b2d892912): cells c28B-m3 (running), c24B-m3, c32B-m3, c32B-m2, c28B-m2.
-- P2 follow-up gate (gate_p2fu1.log): runs CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1 in /home/user/crypto-p2fu
-  (pin ef9d986d75) when queue_p2.log prints "queue done".
-- P3 lane A2 in /home/user/crypto-p3run (pin d97f5953b2): b-badapt-2 (running), b-bsparse-2, b-main-k5-s1-1.
-- P3 lane B: b-stdv-s0 (running), b-stdv-s1, b-main-k5-s0.
-If a fresh session finds a queue dead without "queue done": read the last launch.log, have experiment-director assess,
-move partials to _failed/, relaunch the remaining cards with card_queue.sh (detached).
+Round 35 done (null; PCC-20261104-d8bbec): seed=run wwalk flat near 1.8x rho. Generic table-probe track converged; parity needs a structure lever (none found in ideas/STRUCTURE-R4.md).
+Panel: ksum4 at extrapolated N = 37 and neighbours 19/26/52/74; ksum3 transfer N = 176/246; mitm-prime-batch / blocked exploration.
+Branch claude/curve25519-ic-autolab-round4 (PR #3392). After it: add-raw, metric (incumbent S at k = 32, matched rho), close the record, claim, commit.
 
 ## Stop and success conditions
-Budget: about one day of cluster CPU. Success = complete, controlled per-curve
-measurements for P1-P3 with a verdict per metric (curve effect vs A/A and
-presentation bands). Not an IC-baseline improvement claim either way.
+Stop: per-cell caps in the protocols; Part A stops at a given m after two
+consecutive n cap; t = 4 prime cells do not run if t = 3 caps. Success is any
+decided cell with a verified planted control; the preregistered kill criteria
+close the respective m >= 5 lines. No cap is raised after the freezes.
 
-## Open questions
-- Is the isolab-eks route reachable from this cloud session (no kubectl; AWS user `claude` creds present)?
+# Round 5 (2026-11-04, written before any round-5 run): solver side
+
+## Derived first (no runs; awk on recorded logs)
+- Cost model with LA exponent ω from 1.0 to 2.0: beating rho at 2^256 needs ω ≤ ~1.3 and β = 0.
+- Effective sparse-LA exponent of the recorded msolve matrices: 2.41–2.72. Sparsity does not get there.
+
+## Test H: character-hybrid on the separators
+Branch on the quadratic character of each separator, adding X_c = n_j·z_c² with n_j ∈ {1, a non-square}:
+2 branches per separator.
+- Cells: T at m3 t4 (D = 6, 3.7 s), m3 t5 (D = 6, 512 s) and m4 t4 (D = 7, 697 s). Run the planted (true) branch and one false branch each.
+- Prediction (Elekes–Szabó reading): D_H = D_T in the true branch (no degree drop), and the false branch costs about the same time.
+- Win condition: D drops by ≥ 1 per guessed bit, or total time over all branches < T's time.
+- Runs: msolve 1 thread, 1800 s cap, 6 GiB.
+
+## Round 5, test H outcome (recorded before test L)
+- At m3 t4, Htrue and Hfalse match T exactly (D = 6, widest 7,077), each with quotient dimension 6 (z ↦ −z).
+- Reason: over F̄_p every X is c·z²; F_p-rationality is not a low-degree algebraic constraint.
+- m3 t5 was stopped at 42 s, still on T's matrices; m4 t4 was not run.
+
+## Test L (fat-leaf tree, written before any L run)
+- m = 4 as one triple (S4sym in e1, e2, e3 with output X1, degree-3 remainder chain) plus one leaf (Kummer chain), root S3(X1, x4, xR).
+- That is 1 separator against T's 2 separators (X1, X2) with a symmetric root.
+- Prediction (excess ∝ number of separators): D_L(4,4) ≤ 6 < D_T = 7.
+- Falsified if D_L ≥ 7. Cells: m4 at t4 and t5, k0.
+
+## Test Y (function coupling, written before any Y run)
+- m = 3, first cherry by chord: per-root Kummer chains for w1 and w2; y1, y2 with y_i² = f(g·w_i); slope lam with lam·(x2 − x1) = y2 − y1; X1 = lam² − x1 − x2.
+- Then the x-only root S3(X1, g·w3, xR) with leaf 3 on a Kummer chain.
+- The coupling is a function of the inputs (no 2-to-2 correspondence). Solutions are not quotiented: ordered pair × signs.
+- Prediction: D_Y ≥ D_T (6 at t = 4), since lost symmetry and degree-3 curve equations offset the determinism. Win condition: D_Y ≤ 5 at t = 4 or 5.
+- Cells: m3 at t4 and t5, k0.
+
+## Round 6 (2026-11-04): local long run of the P2 cell m5 t4 (written before the run)
+- The big host is blocked: AWS STS rejects the keys, the lab routes run only ecbench specs (≤ 3,600 s), and no other route is authorized.
+- Locally: T at m5 t4 (round 3; cut off at 2,400 s while reducing degree 9, memory not exhausted), rerun alone with TLIMIT = 18,000 s and VLIMIT = 14.5 GiB.
+- Registered reading (from round 3): if the run completes with D = 9 then E(5) = 5 ≤ 5 and P2 holds at m = 5; D ≥ 10 means P2 fails at m = 5; another cut-off is still undecided.
+
+## Round 7d: decisive Riemann–Roch cell (written before the run)
+- RR at m5 t4 (round7_rr/genrr.sing, input in scratchpad rr/logs/m5_t4_k0_RR.ms), alone on the host after the memory-lean F4 run exits: 13 GiB cap, 10,800 s.
+- Reading, from round7_rr's kill criterion:
+  - D_RR ≤ 8 (below T's ≥ 9) with a finished run: RR beats T in D at m = 5.
+  - Improvement only if the widest matrix is also below T's (≥ 999,374 cut off).
+  - D_RR ≥ 9 means no gain at m = 5.
+  - Cut off again: undecided.
+
+## Round 7e: E1Q at m4 t5 (written before the run)
+- Edwards 2-torsion-quotient tree, input round7_edwards m4_t5_E1Q.ms (sha256 5592ad57…f099).
+- Runs alone after RR m5 t4 exits, with a 13 GiB cap and 7,200 s.
+- Reading:
+  - D_E1Q(4,5) finishes ≤ 6 (T and E1 are ≥ 7 there): the excess stays at least 1 below T at m = 4 as t grows.
+  - D = 7: the quotient's gain at m = 4 vanishes at t = 5.
+  - Cut off again: undecided.
