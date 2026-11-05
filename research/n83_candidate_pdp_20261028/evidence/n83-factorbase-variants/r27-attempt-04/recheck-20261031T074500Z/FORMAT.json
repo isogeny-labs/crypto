@@ -1,0 +1,17 @@
+{
+  "schema": "n83.factor-base-attempt-recheck/v1",
+  "captured_utc": "2026-10-31T07:45:00Z",
+  "job_name": "n83-fb-variants-r27-20261031-r4",
+  "job_uid": "52ffebcf-d07b-44b4-a836-8181cc2b8b48",
+  "scope": "Read-only pre-start recheck; no modifications to the Job.",
+  "files": {
+    "status-tool.json": "Job and pod state from the status API.",
+    "results-listing.json": "S3 object listing for the exact Job prefix.",
+    "container.log": "Bounded log payload from the log API.",
+    "scheduler-context.json": "Active/pending capacity context.",
+    "DATA_INDEX.json": "Indexed evidence inventory with hashes, sizes, and roles.",
+    "README.md": "Human-readable package map.",
+    "manifest.sha256": "SHA-256 inventory for evidence and description files."
+  },
+  "interpretation": "Pending and empty logs mean no producer output was observed at capture time; they do not establish the Job's terminal outcome."
+}
