@@ -1,0 +1,53 @@
+{
+  "cost_gate": {
+    "daily_cap_usd": 200,
+    "day_to_date_usd": 77.0045996521,
+    "max_attempt_usd": 3.15,
+    "month_to_date_usd": 582.4529988551,
+    "monthly_cap_usd": 1000,
+    "spot_usd_per_hour": 0.8015,
+    "utc_date": "2026-11-05"
+  },
+  "execution_limits": {
+    "cpu_affinity": [
+      0
+    ],
+    "max_attempts_per_case": 1,
+    "memory_gib": 8,
+    "per_case_seconds": 60,
+    "per_replay_seconds": 60,
+    "retries": 0,
+    "threads": 1,
+    "wall_timeout_seconds": 12850,
+    "wall_valid": false
+  },
+  "launch_command": "bash launch.sh",
+  "lifecycle": "If the gate and capsule readback pass, run exactly once. Preserve timeout/failure artifacts and do not retry. First-fall only; no LFD closure.",
+  "pr": {
+    "pre_gate_head": "0509ecb8138928e5d1e2082b9ff44e0b61ab301f",
+    "url": "https://github.com/isogeny-labs/crypto/pull/3485"
+  },
+  "preflight_observations": {
+    "all_system_and_case_input_hashes_match": true,
+    "available_tmp_bytes": 57000000000,
+    "candidate": "spike38",
+    "cases": 48,
+    "cpu0_allowed": true,
+    "cpu_count": 32,
+    "fall_process_active": false,
+    "fall_selfcheck_exit_code": 0,
+    "host_platform": "Linux-6.18.54-121.166.amzn2023.x86_64-x86_64-with-glibc2.34",
+    "result_data_prefix_empty_at_gate": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike38/attempt-01/data-v1/",
+    "s3_capsule_prefix_empty": true
+  },
+  "recorded_utc": "2026-11-05T19:40:53.150215+00:00",
+  "schema": "n83.first-fall-launch-gate/v1",
+  "static_capsule": {
+    "continuation_binding_sha256": "0c3a3ed74e7c781e8ed98af2644dd6303e701074088dc5a68694d50512169487",
+    "fall_binary_sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+    "input_manifest_sha256": "93b351b181b135c74cff0da0386c704d46eb777b302ed3b440ad18a249d52ca1",
+    "launch_sha256": "1fdcb6726621ab733b764b8b2ad507a9ed31d073a2b17427397b4abe8a6e9a76",
+    "protocol_sha256": "8a9143e9588ce1ec5c204362b734f790696de90569ce1de3c086e4645e605885",
+    "runner_sha256": "64b6467e3c1157b188ce5e21c1d1ff623355338093e16b96a8e3bfb257530908"
+  }
+}
