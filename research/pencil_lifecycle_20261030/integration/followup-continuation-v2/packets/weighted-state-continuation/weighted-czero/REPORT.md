@@ -1,0 +1,13 @@
+# Arbitrary-weight C-zero output bridge
+
+Proved field-value decoding and curve membership for the C-zero weighted payload under four arbitrary nonzero input weights. Native DegreeOne normalization uses x/z^2 and y/(z^5*w), verified at projective_law_gate.rs533-546. The result extends the normalized output theorem; it does not specialize input weights to one.
+
+For Z=z1*z2 and W=w1*w2, crossed degree-two q,r,s,t scale by Z^2,Z^4,Z^3*W,Z^5*W. Literal B,A,C expressions therefore scale by Z^8,Z^9*W,Z^7*W. The native payload at lines1002-1023 has numerator scales Z^18*W^2 for x and Z^45*W^5 for y; its output z is B*Z^9*W and output w is one. Cancelling these nonzero scales yields normalized x=q1+q2+(A/B)^2 and y=-l(x). The full theorem weighted_on_curve derives nonzero output weights and y_decode^2=f(x_decode) from monic degree-five f, coefficient four zero, B nonzero, C zero, and both original input residual divisibilities.
+
+The parameterization by weight(q,r,s,t,z,w) covers every raw degree-two tuple with nonzero z,w: reconstruct proves recovery from q/z^2,r/z^4,s/(z^3*w),t/(z^5*w). Separate b_guard and c_guard establish actual crossed B-nonzero and C-zero equivalence with normalized guards. Thus the arbitrary-weight scope is explicit, not a unit-scale fixture extrapolation.
+
+Fourteen main declarations and seven controls pass, with 21 separate axiom readbacks containing only propext, Classical.choice and Quot.sound. Final weights2,scale1,point2,guards1,controls2,readback1 exit zero with unchanged input bindings. Controls apply the full original-input theorem at weights (2,3),(5,7), recover x=10,y=291, test negative nonunit weights, reconstruct raw inputs, exhibit zero output z under zero weight, and show the incorrect cubic ordinate denominator does not decode to291. These fixed algebraic controls do not assert fixture smoothness.
+
+Retained failures: weights1 supplied reflexivity where simplification had made the goal True; point1 invoked ring after field_simp had closed the goal. Corrected proofs pass. Initial controls1 passed and is retained as superseded after replacing a weak power-boundary observation by the actual incorrect-cubic-decode counterexample. Harmless tactic warnings are retained.
+
+Source scope is mathematical field values. Definitions use powers for native square/cube chains and preserve the displayed output formula; they do not model machine operation scheduling, overflow, counters or allocation. No full dispatcher reachability theorem, native word equivalence, compiled execution, divisor-class sum, cost measurement or scientific execution is claimed. Original normalized modules remain immutable. This producer component awaits independent source-fidelity/proof review.

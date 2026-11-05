@@ -1,0 +1,14 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\begin{document}
+\sloppy
+\section*{Signed graph potential algebra}
+Nine main declarations and nine controls passed with 18 separate axiom readbacks. Only propext and Quot.sound appear. Final algebra3, controls1 and readback1 all exited zero with unchanged bindings. Prior algebra1 and algebra2 failures are retained: simplification reduced the sign reflexivity goal to True; unavailable linear\_combination required an explicit ring calculation; fixed-child evaluation required explicit unfolding. The first correction missed the unavailable tactic because of whitespace and algebra2 retains that failure.\par\medskip
+The source model represents a node as s*root+a+b*k. find composition is (s\_p*s\_q, a\_p+s\_p*a\_q, b\_p+s\_p*b\_q), proved equal to nested evaluation. Compression\_sound substitutes the actual parent equation. Reversal preserves sign and negates signed offsets; it requires s*s=1 and is involutive under that premise.\par\medskip
+edge\_reduction follows native subtraction order after resolving endpoint potentials. union\_forward derives root\_u=(-cu*cv)*root\_v+cu*a+cu*b*k when cu*cu=1. union\_backward uses reverse potential under both involutive signs and matches the source opposite-size branch's signed(-s, offset) expressions. fixed\_child\_transport proves native propagation of a known child anchor to parent.\par\medskip
+Source locations: three\_leads.rs find1580-1596, edge1659-1712, Ring1491-1530. Source values are algebraic scalars in an arbitrary commutative ring; actual native u64, i8 and mutable array semantics are not asserted. Ring constructor primality does not itself prove no overflow for u64 addition: canonical addition needs 2r-2<2\textasciicircum{}64. Ring multiplication uses u128. Actual graph nodes still need a scalar coordinate interpretation, potentially supplied by a group homomorphism; this component does not manufacture that map.\par\medskip
+Controls over ZMod17 check negative and positive reversal, nested and compressed evaluation, both size-dependent union orientations, fixed-child propagation, an invalid sign square, and an incorrect offset sign. No scientific data were generated. Native forest shape, index bounds, recursive termination, counter headroom, same-root cycle branches and final inversion remain separate composition obligations. This is producer-checked evidence pending independent source-fidelity and proof review.\par\medskip
+\paragraph{Artifact references} GraphAlgebra.lean; GraphControls.lean; GraphReadback.lean; status.json. The editable diagram is flow.svg. Exact source snapshot is graph-native.rs.txt.
+\end{document}

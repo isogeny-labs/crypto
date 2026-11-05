@@ -1,0 +1,43 @@
+--- supervisor-v3/supervise.py
++++ supervisor-v4/supervise.py
+@@ -35,7 +35,7 @@
+ 
+ def expiry(x):return datetime.fromisoformat(x.replace('Z','+00:00')).timestamp()
+ def paths(owner,mode="assembly"):
+- need(mode in ("assembly","qualification"),"phase");suffix="a" if mode=="assembly" else "q"
++ need(mode in ("assembly","qualification"),"phase");suffix="a" if mode=="assembly" else "q-"+owner.replace("-","")[:8]
+  need(re.fullmatch(r'[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}',owner) is not None,'owner UUID')
+  root=ROOT/('ppr-'+owner)
+  return {'root':root,'unit':'pencil-private-'+owner+'.service','mount':root/'mnt','socket':root/'mnt'/('d-'+suffix+'.sock'),'disk':root/'storage.ext4','exec':root/'mnt'/('e-'+suffix),'shim':root/'mnt'/('s-'+suffix),'data':root/'mnt'/'data'}
+@@ -161,6 +161,7 @@
+   self.setup_runtime_dirs()
+   (p['mount']/('daemon-'+x['owner']+'.json')).write_text('{}\n')
+  def setup_runtime_dirs(self):
++  need(not self.p['socket'].exists() and not self.p['socket'].is_symlink(),'retained private socket collision')
+   for directory in [self.p['mount']/('client-config-'+self.x['owner']),self.p['exec'],self.p['shim']]:directory.mkdir(mode=0o700,exist_ok=False)
+  def setup_shim_mount(self):
+   self.guard();target=Path('/run/containerd');record=mount_record(target)
+@@ -207,8 +208,13 @@
+   ctx=self.context();iid=self.p['mount']/'runtime.iid';tag='pencil-runtime-private:'+x['owner'];self.docker(['build','--pull=false','--network=none','--platform=linux/amd64','--iidfile',str(iid),'--build-arg','BASE_IMAGE='+BASE,'--label','isolab.private.owner='+x['owner'],'--tag',tag,'--file',str(ctx/'Dockerfile'),str(ctx)],240)
+   image=read_small(iid).decode().strip();need(re.fullmatch('sha256:[0-9a-f]{64}',image) is not None,'IID');built=strict(self.docker(['image','inspect',image]))[0]
+   need(built['Id']==image and built['Os']=='linux' and built['Architecture']=='amd64' and built['Config']['Labels'].get('isolab.private.owner')==x['owner'] and strict(self.docker(['image','inspect',tag]))[0]['Id']==image and built['Config']['User']=='0:0' and not built['Config'].get('Entrypoint') and not built['Config'].get('OnBuild'),'built runtime config');need(built['Config']['Labels'].get('org.opencontainers.image.revision')==x['source_revision'],'source revision');need(built['RootFS']['Layers'][:len(x['base_layers'])]==x['base_layers'] and len(built['RootFS']['Layers'])>len(x['base_layers']),'runtime layers');return image
++ def qualification_paths(self):
++  owner=self.x['owner'];return self.p['mount']/('qualifier-source-'+owner),self.p['mount']/('qualification-receipts-'+owner)
++ def qualification_argv(self,image,source,binding):
++  _,receipts=self.qualification_paths();need(not receipts.exists() and not receipts.is_symlink(),'qualification receipts collision')
++  return [self.x['tools']['python']['path'],'-B',str(source),'--binding',str(binding),'--receipts',str(receipts),'--image-id',image,'--binary-sha256',self.x['binary_sha256'],'--private-endpoint',str(self.p['root']/'endpoint.json'),'--private-endpoint-sha256',sha(read_small(self.p['root']/'endpoint.json'))]
+  def qualification_bundle(self):
+-  q=self.x['qualification'];dest=self.p['mount']/'qualifier-source';dest.mkdir(mode=0o700)
++  q=self.x['qualification'];dest,receipts=self.qualification_paths();need(not receipts.exists() and not receipts.is_symlink(),'qualification receipts collision');dest.mkdir(mode=0o700,exist_ok=False)
+   need(set(q['files'])=={'supervise.py','head_contract.py','private_contract.py','gate.c'},'qualifier source closure')
+   for name,pin in q['files'].items():
+    raw=read_small(pin['path']);need(sha(raw)==pin['sha256'],'qualifier dependency pin');(dest/name).write_bytes(raw);(dest/name).chmod(0o500)
+@@ -235,7 +241,7 @@
+    info=self.ready_info();containerd_pid=self.check_daemon(group);need(info['CgroupDriver']=='cgroupfs' and info['DockerRootDir']==str(self.p['data']),'private daemon config')
+    if x['mode']=='assembly':image=self.build()
+    else:
+-    pred=strict(read_small(x['predecessor']['receipt_path']));need(info['ID']==pred['daemon_id'],'retained private daemon ID');image=pred['image_id'];need(strict(self.docker(['image','inspect',image]))[0]['Id']==image,'qualification image');ep=self.endpoint(group,parent,image,info['ID']);save(self.p['root']/'endpoint.json',ep);qsource,qbinding=self.qualification_bundle();self.call([x['tools']['python']['path'],'-B',str(qsource),'--binding',str(qbinding),'--receipts',str(self.p['mount']/'qualification-receipts'),'--image-id',image,'--binary-sha256',x['binary_sha256'],'--private-endpoint',str(self.p['root']/'endpoint.json'),'--private-endpoint-sha256',sha(read_small(self.p['root']/'endpoint.json'))],240)
++    pred=strict(read_small(x['predecessor']['receipt_path']));need(info['ID']==pred['daemon_id'],'retained private daemon ID');image=pred['image_id'];need(strict(self.docker(['image','inspect',image]))[0]['Id']==image,'qualification image');ep=self.endpoint(group,parent,image,info['ID']);save(self.p['root']/'endpoint.json',ep);qsource,qbinding=self.qualification_bundle();self.call(self.qualification_argv(image,qsource,qbinding),240)
+    self.check_daemon(group);result.update(status='worker_phase_complete',image_id=image,daemon_id=info['ID'],containerd_pid=containerd_pid)
+   except BaseException as e:result['error']=type(e).__name__+': '+str(e)
+   finally:
