@@ -1643,6 +1643,7 @@ pub struct HwCounters {
     #[cfg(target_os = "linux")]
     fds: Vec<(libc::c_int, u64)>,
     error: Option<String>,
+    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
     inherit: bool,
 }
 
