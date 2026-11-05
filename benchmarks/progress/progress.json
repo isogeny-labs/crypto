@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T0828Z-icb-large-prime-n61-s2-archive",
+  "latest_record": "20261105T1526Z-c25519-multicurve-rebaseline",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 38,
+    "measured": 39,
     "open": 0
   },
   "repo": "crypto",
@@ -325,6 +325,122 @@
           "spread": null,
           "summary": "ic_autolab round 33: wwalk g=1 grow=2 ratchets k = 24/28/32 to S 1.67/1.57/1.52 (1.43x/1.49x/1.55x rho)",
           "value": 1.51519557395628
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.601,
+      "latest": 2.601,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.566867
+      },
+      "metric": "s_w0_mean5curves_k20",
+      "points": [
+        {
+          "commit": "74f637d816ba",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.566867
+          },
+          "n": 5,
+          "record": "20261105T1526Z-c25519-multicurve-rebaseline",
+          "reference": 1.66,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Multi-curve re-baseline: incumbents cost 1.57x / 1.78x / 1.80x / 1.91x matched rho over five family curves at k = 20 / 24 / 28 / 32; per-curve spread about 0.2",
+          "value": 2.601
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.111,
+      "latest": 2.111,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.769489
+      },
+      "metric": "s_w0_mean5curves_k24",
+      "points": [
+        {
+          "commit": "74f637d816ba",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.769489
+          },
+          "n": 5,
+          "record": "20261105T1526Z-c25519-multicurve-rebaseline",
+          "reference": 1.193,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Multi-curve re-baseline: incumbents cost 1.57x / 1.78x / 1.80x / 1.91x matched rho over five family curves at k = 20 / 24 / 28 / 32; per-curve spread about 0.2",
+          "value": 2.111
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.869,
+      "latest": 1.869,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.797115
+      },
+      "metric": "s_w0_mean5curves_k28",
+      "points": [
+        {
+          "commit": "74f637d816ba",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.797115
+          },
+          "n": 5,
+          "record": "20261105T1526Z-c25519-multicurve-rebaseline",
+          "reference": 1.04,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Multi-curve re-baseline: incumbents cost 1.57x / 1.78x / 1.80x / 1.91x matched rho over five family curves at k = 20 / 24 / 28 / 32; per-curve spread about 0.2",
+          "value": 1.869
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.93,
+      "latest": 1.93,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.905232
+      },
+      "metric": "s_w0_mean5curves_k32",
+      "points": [
+        {
+          "commit": "74f637d816ba",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.905232
+          },
+          "n": 5,
+          "record": "20261105T1526Z-c25519-multicurve-rebaseline",
+          "reference": 1.013,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Multi-curve re-baseline: incumbents cost 1.57x / 1.78x / 1.80x / 1.91x matched rho over five family curves at k = 20 / 24 / 28 / 32; per-curve spread about 0.2",
+          "value": 1.93
         }
       ],
       "problem": "ic:curve25519-family-k20-32",
