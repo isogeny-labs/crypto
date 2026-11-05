@@ -43,7 +43,7 @@ root-table parity point. Kill: K4 and K5 both supported.
 4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
 
 ## Runs in flight
-Multi-curve re-baseline (k = 20, 24, 28, 32; ledger incumbents and rho-neg on 5 family curves each) under benchrec record in scratchpad recmc, branch claude/curve25519-multicurve.
+Multi-curve re-baseline done (PCC-20261105-37a78d): plateau 1.57-1.91x rho across five family curves per size; next: owner decision or new structural idea.
 Specs: research/curve25519_autolab_20261104/multicurve/spec-k*.json (frozen before data); siblings from `curve25519_family siblings`. Binaries rebuilt from main.
 After it: add-raw, metric per size (mean S/rho over curves and its curve-to-curve spread), close the record, pcc claim, README row, commit, PR. If the incumbents' ratios move materially, update the ledger incumbents and OBSTRUCTION.md.
 
