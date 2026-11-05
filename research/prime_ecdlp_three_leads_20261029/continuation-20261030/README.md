@@ -1,5 +1,13 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+Publication update: sourcef543 and reviewed metadata were normal-pushed in5bd30361f
+to samePR3452; newtitle/body reflects root-child observation scope. At5bd snapshot
+reviewSUCCESS/migrateFAILURE and required3ABSENT, auto paused. Auxiliarymigration
+fails on missing trusted artifact_prefetch helper at d30, with noPR.githubdiff.
+[Exact log and object diagnosis](validation/child-observation-20261105/ci-migrate-5bd30361f.json).
+No newsource/required-check pass is inferred. [pcc:unverified]
+
+
 ## Observed root-child exit prerequisite — 2026-11-05T13:19:48.164235+00:00
 
 [New std-only child wrapper](prerequisites/child_observation.rs) permits local

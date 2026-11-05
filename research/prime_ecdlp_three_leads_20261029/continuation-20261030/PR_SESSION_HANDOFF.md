@@ -517,3 +517,33 @@ interruption-resume/fullcost remainopen. Reportpreserves all originalG1-G6
 acceptance. No scientificpanel/access/resourcechanges. Currentworking entries
 are in SESSION_20261105T1300Z.md, deferred to daily after concurrent resolution;
 old PR3452_REFRESH_REQUEST_SESSION exact665728header also still notappended.
+
+## 2026-11-05T13:30:01.535474+00:00 — Publish reviewed component and diagnose auxiliary migration failure
+
+### What was done (commands, files, features)
+
+Normalpushed5bd30361f; samePRtitle/body updated. Head5bd snapshotOPEN/CONFLICTING,
+autopaused,reviewSUCCESS/migrateFAILURE,required3ABSENT;inlinecomments empty.
+Fetchedfailedrun42035691612 once,retained1429byte log/hash. Trustedprefetchhelper
+missing at eventbase d30; Git treeconfirmsabsent; currentmain3a hashelpera113e5a.
+Our.githubdiffvsd30 empty/workflowblobexactbase. No nativefailureinthis job.
+[pcc:unverified]
+
+### Decisions made (and why)
+
+Treat auxiliarytrusted-tool version mismatch as separate blocker; no PRhelper/
+sharedworkflowpatch to bypass it. Originalnative18leafcontrols retain ownscope;
+no repeatedCargo/proof checks. Additivebodylintcorrection8bfc98 preserves initial
+6e011f mistake/failure and revised actuallint0. No frozen record rewritten.
+
+### Open threads (unfinished, pick up next time)
+
+Sharedworkflowowneraligntrustedhelper/checkoutref; canonicalledgerforkcontract;
+inheritednative/PCC/runtime/fullsuite blockers. LatestmetadataheadCI mustbe
+checkedonitsownSHA atnextboundedfollowup, no foregroundwaiting/fastpolling.
+G2 durableevents/exactlaunchbinding/qualifiedgatedsupervisor-resume next.
+
+### Errors (what went wrong, how it was handled)
+
+Auxmigrateerror2 is missingtrustedscript,not guessedcredentialerror or badRust.
+Requiredgate,size,artifacts remainABSENT,notpass. Auto stayspaused.
