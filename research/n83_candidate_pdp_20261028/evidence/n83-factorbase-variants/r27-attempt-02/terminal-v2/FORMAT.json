@@ -1,0 +1,20 @@
+{
+  "schema": "n83.factor-base-terminal-format/v2",
+  "files": {
+    "job-api.json": "Raw Kubernetes Job object, including immutable spec and terminal conditions.",
+    "pod-api.json": "Raw Pod list query after Job TTL cleanup; empty when the Pod object is no longer retained.",
+    "events-api.json": "Raw Events list query filtered to the retained Pod UID.",
+    "status-tool.json": "Isolab status API response, including Job identity and retained Pod list.",
+    "results-listing.json": "Isolab results API response with each S3 key, byte count, timestamp and checksum metadata.",
+    "container.log": "Exact bounded logs API text; empty string means no retained container logs.",
+    "terminal-receipt.json": "Normalized terminal state and explicit producer-start evidence boundary.",
+    "observed-at.txt": "UTC time when terminal evidence collection ran.",
+    "DATA_INDEX.json": "Map of every evidence payload by path, byte length, SHA-256 and role.",
+    "manifest.sha256": "SHA-256 for all preceding files except this manifest."
+  },
+  "interpretation": {
+    "deadline_failure": "Infrastructure timeout, not a mathematical or enumerator failure.",
+    "source_objects": "Source bundle custody only; it is not factor-base output.",
+    "missing_pod": "Kubernetes retention/TTL visibility limit; prior pending receipts remain preserved."
+  }
+}
