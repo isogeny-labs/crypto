@@ -1,0 +1,12 @@
+{
+ "id":"marked23-r112-x0-y1-blowup-v1", "claim_class":"exact_computation",
+ "inputs_sha256":{
+  "donor51":"7a92cf0f1665b80bef5a38c57ca45136e530bfcf8cd13a430942af75684b7409",
+  "parser105":"4306bbc6a7c5de1b21716a5fc5a1fd1a8030ff1340409c814c39d6217292a3e4",
+  "result111":"e35e271cb6c86fc440676f1884709430eb091482f8531635294bc7dbdf49c4e5"
+ },
+ "substitution":"y=1+x(1+w); divide f by x^3",
+ "decision_rule":"Report exact transformed Newton support and edges; retain repeated roots as unresolved",
+ "controls":["R111 leading w^3 fiber","fresh replay","changed donor","independent substitution"],
+ "backend":"local exact F2 arithmetic","cloud_cost_usd":0
+}
