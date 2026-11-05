@@ -1,0 +1,241 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-input-reference-correction-metadata-v2",
+  "created": "2026-10-29T15:57:12.998Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "f1fc5d4edd0b8b2dc84b61fdd2ab81b38ad1df4ac23f89e8f81a194281431940",
+    "protocol_id": "twist-cold-inputs-reference-v2",
+    "version": 2
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-cold-20261029",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "4a46570f358cf6c8184e4cae6c4fed5b57058fa2",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "../HOST.json",
+    "sha256": "5bc3e6ed7cb2df48cb2c452a315ad01600128447cd50112d9fe3ba95f54ce994",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "kernel": "Linux 4c3fcd62a9ba 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0",
+      "memory_bytes": null
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "f8f34febcd24efb11a1fa520ad02aa4a8c182d24ed08f38a0f4abd4aa95806ed",
+      "commit": "4a46570f358cf6c8184e4cae6c4fed5b57058fa2"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "97d505107f825b26589651dbc366d032dc0210b1"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "v15-native-producer",
+      "arm": "native",
+      "instance_id": "fixed-28-model-input-cohort",
+      "seed": "0",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "fixtures-verified": 28
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact verification or counted diagnostic; no admitted wall time."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Strict process/hash/independent finite verification"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "../runs/producer-transport.json",
+          "sha256": "3c3386562d2072663cf26319a6eab2eed8ced257e3401435014d79595d2a6102",
+          "bytes": 1419,
+          "kind": "receipt"
+        },
+        {
+          "path": "../FIXTURES.json",
+          "sha256": "daff187e0a858843b30d927ef896637d496e08666db968f74f22368167e3a00f",
+          "bytes": 8360,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-10-29T15:29:59.212Z",
+      "finished_at": "2026-10-29T15:30:01.531Z",
+      "worker": "f8f34febcd24efb11a1fa520ad02aa4a8c182d24ed08f38a0f4abd4aa95806ed",
+      "backend_ref": "../runs/inputs-v1"
+    },
+    {
+      "run_id": "v15-corrected-GP",
+      "arm": "pari",
+      "instance_id": "fixed-28-model-input-cohort",
+      "seed": "0",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "fixtures-verified": 28
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact verification or counted diagnostic; no admitted wall time."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Strict independent GP checks28 models; unchanged native input execution reused."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "092467af4cc16c3e67d3b9f002f9e31f889af201a365034fb6382583c14df75c",
+          "bytes": 971,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.stdout",
+          "sha256": "aa1f549487ef3de07835030a1d9296e5d533177274eb3cc56312f02183e676e3",
+          "bytes": 22,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.stderr",
+          "sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+          "bytes": 72,
+          "kind": "raw"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "429ce30004dbf0d4cec58aad5e401b5933532c8441bba095d7111b6be0cf8950",
+          "bytes": 803,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-29T15:57:12.970Z",
+      "finished_at": "2026-10-29T15:57:12.998Z",
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "bb1136a7aa8a418b64415eea0a6cd78697b52aa4b063fa62f81f782ea3a96f54",
+      "bytes": 11186,
+      "kind": "protocol"
+    },
+    {
+      "path": "FROZEN.json",
+      "sha256": "2258c3f82dbd2530561ccd659e1f83b50dbd512c447c00cd85a28891122e1eb3",
+      "bytes": 1596,
+      "kind": "receipt"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../support/reference-correction.mjs",
+      "sha256": "c83eedd3af7a21bc1d606caad1157abeaa480ad57b0f87cdd8c10f74d0d425a3",
+      "bytes": 2669,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "ADMISSION.json",
+        "sha256": "429ce30004dbf0d4cec58aad5e401b5933532c8441bba095d7111b6be0cf8950",
+        "bytes": 803,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "operational export binding",
+      "text": "Native producer record is exactly the original execution, reused, not fresh. Across parent and correction there were3 unique top-level executions/4 compute processes, with no repeated input generation."
+    },
+    {
+      "kind": "observation",
+      "by": "operational metadata correction",
+      "text": "Corrects only the analysis script metadata to the exact script named by the frozen protocol. Original export retained; no computation rerun."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

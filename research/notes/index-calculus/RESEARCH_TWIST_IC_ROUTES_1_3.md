@@ -270,3 +270,8 @@ including ordinary bases; the archived B8 twist base remains ambiguous.
 Rank-deficient systems can still fix the target. Two generic affine-kernel
 Lean theorems pass fresh audit; concrete bridge open. Complete cold costs,
 larger heldouts and original campaigns remain open; no cost row changes.
+
+
+## 2026-11-05 execution update
+
+[Cold costs, matched compression and larger-case requirement map](../../twist_routes_1_3_20261021/REQUIREMENT_STATUS_20261105.md) links all completed profiles and their scope. The [new sparse engineering result](../../twist_routes_1_3_20261021/reports/sparse-compression-20261030/RESULTS.md) lowers complete cold Ir in every eligible compression pair; both ordinary and twist bases benefit. The strict612-profile counter/GP/export checks pass. Original full campaigns and their calibrated/independent-host requirements remain tracked, with no final selector labels opened.

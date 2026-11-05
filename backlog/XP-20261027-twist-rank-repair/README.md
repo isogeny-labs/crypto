@@ -1,5 +1,9 @@
 # Repair target ambiguity in target-blind twist progression bases
 
+**2026-11-05 update:** The rank-repair follow-ups now have complete cold software-Ir, matched dense/sparse/full ablations and frozen larger-case evidence. The sparse confirmation improves each eligible matched pair on both base families.
+
+[Current evidence and scope](../../research/twist_routes_1_3_20261021/REQUIREMENT_STATUS_20261105.md). Historical original acceptance conditions below remain unchanged.
+
 Status: **fixed diagnostic executed and independently verified; PR2380 landing pending**.
 No lease or funding. The original design/acceptance requirements below remain.
 

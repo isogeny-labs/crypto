@@ -1,5 +1,9 @@
 # Complete primitive accounting and a cold one-target replay
 
+**2026-11-05 update:** Bounded complete cold software-Ir intervals now exist in v17/v18 (7,455 profiles), with native counter and independent GP verification. V19 adds612 profiles and a verified sparse implementation improvement. Original full campaign/calibrated acceptance is still open.
+
+[Current evidence and scope](../../research/twist_routes_1_3_20261021/REQUIREMENT_STATUS_20261105.md). Historical original acceptance conditions below remain unchanged.
+
 **2026-10-26: partial / blocked / unfunded.** Cold construction/F4/Fp-root/sign/exception intervals are measured on twenty B8 configurations with exact signed-row and PARI replay. Ordinary group MITM beats every tested polynomial variant. These Ir diagnostics do not supply calibrated primitive/GAE accounting, matched rho, relation algebra or the original 24-arm/1920-attempt cold replay.
 
 [Audited continuation report](../../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) · [Protocols and limits](../../research/twist_routes_1_3_20261021/execution-v3/README.md). Original dated designs and acceptance criteria below are preserved.

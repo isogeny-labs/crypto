@@ -736,6 +736,27 @@ def main():
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
                           "gpu.explicit_relations.affine")
     explicit_gpu_profile(a.ref, a.since)
+    twist_sparse_observations(a.ref, a.since)
+
+
+def twist_sparse_observations(ref, since):
+    """Copy recorded native ratios; do not reconstruct research statistics."""
+    path = "research/twist_routes_1_3_20261021/execution-v19/OBSERVATIONS.json"
+    for date, revision, text in file_history(ref, path, since):
+        record = json.loads(text)
+        source = f"{path}@{revision}"
+        for family in ("ordinary", "twist"):
+            for comparison in ("sparse-over-dense", "sparse-over-full"):
+                entry = (record.get("fresh_target_ratios") or {}).get(
+                    f"{family}-{comparison}", {})
+                median = (entry.get("cold") or {}).get("median")
+                emit(f"twist.sparse.{family}.{comparison}.cold_ir", median,
+                     date=date, problem="twist-affine-substitution", unit="candidate/baseline Ir",
+                     better="lower", label=f"Sparse substitution: {family} {comparison}; cold software Ir",
+                     source=source)
+        emit("twist.sparse.confirmation.profiles", record.get("planned_profiles"),
+             date=date, problem="twist-affine-substitution", unit="count", better="neutral",
+             label="Sparse confirmation: completely counted original profiles", source=source)
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,8 @@
 # Twist routes 1–3: designs and bounded execution
 
+[2026-11-05 completed cold-cost and sparse confirmation](reports/sparse-compression-20261030/RESULTS.md) · [inspected PDF](reports/sparse-compression-20261030/RESULTS.pdf) · [requirements and remaining dependencies](REQUIREMENT_STATUS_20261105.md).
+The recovered sparse run completed all612 profiles. Strict native/GP checks and full export/file binding pass. Sparse affine substitution uses about8.7% fewer cold guest instructions than dense compression, and about0.4% fewer than matched uncompressed augmentation, at the median in each base family. All22 successful fresh-target compression pairs improve. Ordinary controls receive the same benefit. [v17 cold-cost evidence](execution-v17/README.md) and [v18 larger cohort](execution-v18/README.md) preserve the7,455 original profiles and their explicit protocol/admission gaps. Raw archives and measured executable bytes are in the confirmed Setec store.
+
 [2026-10-28 target-blind rank repair](reports/rank-repair-20261028/RESULTS.md)
 · [frozen panel and exact independent replay](execution-v14/README.md).
 42 fixed configurations include29 filled/13 underfilled bases. All174 analyzed

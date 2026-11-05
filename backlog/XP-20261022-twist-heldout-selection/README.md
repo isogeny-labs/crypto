@@ -1,5 +1,9 @@
 # Heldout family selection and an honest solver portfolio
 
+**2026-11-05 update:** A separate frozen larger-model cohort now has60 public points on12 models; v19 confirms sparse substitution on24 fresh public points on the same models. These are distinct from the original E28 final labels32–63, which remain unopened, and no selector/final campaign is represented as completed.
+
+[Current evidence and scope](../../research/twist_routes_1_3_20261021/REQUIREMENT_STATUS_20261105.md). Historical original acceptance conditions below remain unchanged.
+
 **Current status, 2026-10-25: partial / blocked / unfunded.** E26 now has bounded target-label-0 diagnostics only. Final labels 32–63 remain unopened; no selector or final heldout run. Complete E27 counters and a frozen public-feature selector remain missing.
 
 [New bounded E26 results](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). The original full acceptance criteria below are unchanged.

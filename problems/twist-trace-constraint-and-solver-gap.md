@@ -270,3 +270,8 @@ This closes the bounded rank-repair diagnostic, not the complete discovery,
 collection, solving and verification cost interval. Larger heldouts, strongest
 matched cost controls and original campaign criteria remain open. No calibrated
 cost, novelty, NIST conclusion or root-suite/CI completion is promoted.
+
+
+### 2026-11-05: completed cold software costs and sparse substitution
+
+The [new verified sparse report](../research/twist_routes_1_3_20261021/reports/sparse-compression-20261030/RESULTS.md) records612 original profiles, exact counter/full-fiber/source-scalar checks and a passing full canonical export. Sparse/dense cold Ir medians are0.9128141 (ordinary,10 successful fresh pairs) and0.9129475 (twist,12); sparse/uncompressed-map medians are0.9955857/0.9956286. All eligible pairs improve. This is standard sparse linear-algebra engineering shared by ordinary/twist bases. The [requirement map](../research/twist_routes_1_3_20261021/REQUIREMENT_STATUS_20261105.md) separates the completed1–3 software diagnostics from calibrated pricing, original E27/E28 campaigns, concrete formal bridges, external tool comparison and independent-host replay. V17/v18 retain their canonical metadata/reporting correction gaps.
