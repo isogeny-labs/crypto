@@ -133,7 +133,7 @@ Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` n
 
 [Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
 
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file.
+Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study directory: replay certificate, validator report, §5a-banded rho-frob reference).
 
 ## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
 
@@ -417,68 +417,20 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 
 Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.
 
-## Prime-field baseline: relation targets, stride-renew against the walk (2026-10-29, engineering)
+## Component speed-up: membership filter on the packed pair table (2026-10-29, engineering)
 
-Frozen protocol (backlog XP-20261029-stride-renew-prime): one parameter of the prime-field baseline, the relation-target source, from `walk` (16 jumps plus restart offsets, each a charged scalar multiplication) to `stride-renew` (R ← R + S, S renewed per relation, 4 scalar multiplications of set-up); the factor base and the `mitm:negation_folded=1` oracle are the incumbents at each size. Two fresh curves × 24 targets × 6 rounds per size, L2 on isolab-eks. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ srenew ÷ Σ walk with cluster-bootstrap 95% intervals.
+Frozen protocol (backlog XP-20261029-packed-filter); track generic (prime-table; docs/ic/SWEEPER.md, Tracks). Label: whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table, `mitm-prime-blocked:m=2,filter=1` against `mitm-prime-blocked:m=2` at b = 32. It moves no row of tables A–C and is ranked against nothing in them.
 
-| bits | N | mean S walk → srenew (w = 0) | srenew ÷ walk (w = 0 / 0.1 / 1) | IC ÷ rho-neg walk → srenew (w = 0 / 0.1 / 1) | reading |
-|--:|--:|:--|:--|:--|:--|
-| 20 | 45 | 10.41 → 8.76 | 0.842 [0.807, 0.878] / 0.858 [0.821, 0.897] / 0.926 [0.879, 0.975] | 7.92 → 6.67 / 8.19 → 7.03 / 9.51 → 8.80 | improvement: stride-renew becomes the 20-bit target source |
-| 24 | 162 | 13.78 → 13.53 | 0.982 [0.952, 1.012] / 0.986 [0.954, 1.019] / 1.006 [0.961, 1.052] | 12.81 → 12.58 / 12.89 → 12.72 / 13.28 → 13.36 | null at this sample size; walk kept |
-| 28 | 407 | 21.61 → 21.10 | 0.977 [0.961, 0.992] / 0.975 [0.958, 0.993] / 0.968 [0.941, 0.995] | 22.78 → 22.25 / 22.33 → 21.77 / 20.23 → 19.59 | improvement (validated with caveats): stride-renew becomes the 28-bit target source |
-| 32 | 1024 | 32.55 → 32.59 | 1.001 [0.983, 1.021] / 1.002 [0.981, 1.023] / 1.004 [0.973, 1.036] | 34.50 → 34.55 / 34.04 → 34.10 / 31.98 → 32.10 | null at this sample size; walk kept |
+- **Wall:** corrected 0.9601 [0.9569, 0.9633], that is 3.99% less wall per charged GAE (95%: 3.67% to 4.31%), at identical charged GAE.
+- **`bitop/v1`** +0.301%: the rise is build-side only; the probe-side filter test is not counted separately; the build's pass over the empty slots is not counted.
+- **S′ `dgbf / dgb`** 1.0000 / 1.0505 / 1.3586 at w = 0 / 0.1 / 1: `dgbf`'s counted cost exceeds `dgb`'s at w > 0 by that ratio; `table_insert_attempts` is unpriced on every IC arm, identically between `dgb` and `dgbf`, a gap that predates this study; these figures decide nothing.
+- **Distance remaining at 32 bits:** `dgbf / rho-neg` 31.47 / 31.50 / 31.63 and `dgb / rho-neg` 31.47 / 29.99 / 23.28. `rho-neg` is cheaper than both IC arms at every weight on every curve, so the §5a band permits that ranking; `dgbf` is never ranked ahead of `dgb` in the counted unit.
+- **Scope:** c8a.2xlarge (AMD EPYC 9R45) on EKS, L2; two curves at 32 bits; one session, 288 pairs.
+- **Other sizes:** At 24 bits the same comparison read a regression (1.0032 [1.0006, 1.0058]); 28 bits is undecidable (infrastructure); see the README.
 
-Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.
+[README](../../research/ic_packed_filter_20261029/README.md) · [report PDF](../../research/ic_packed_filter_20261029/REPORT.pdf).
 
-[Report](../../research/ic_stride_renew_prime_20261029/README.pdf) · [study](../../research/ic_stride_renew_prime_20261029/).
-
-validated (20 bits pass, 28 bits pass with caveats): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_stride_renew_prime_20261029/VALIDATION.json)
-
-## Prime-field baseline: deferred-guard stride-renew at a smaller factor base (2026-10-29, engineering)
-
-Frozen follow-up protocol on fresh curves (backlog XP-20261029-srenew-deferred-guard-v3): `dg-small` uses `targets = stride-renew-deferred-guard` (the repeat guard probed only on targets that decompose) at a smaller factor base N_b, against the baseline at each size; the `mitm:negation_folded=1` oracle is unchanged. Two fresh curves × 24 targets × 6 rounds per size, isolab-eks, counted units only (no wall time is claimed). S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ dg-small ÷ Σ baseline with cluster-bootstrap 95% intervals. An earlier study on other curves is undecidable (its L2 rule refused sub-millisecond rho solves) and is reported descriptively in the study only.
-
-| bits | baseline (N) → dg-small (N_b) | mean S baseline → dg-small (w = 0) | dg-small ÷ baseline (w = 0 / 0.1 / 1) | IC ÷ rho-neg baseline → dg-small (w = 0 / 0.1 / 1) | reading |
-|--:|:--|:--|:--|:--|:--|
-| 24 | walk (162) → 130 | 13.76 → 12.53 | 0.911 [0.882, 0.940] / 0.888 [0.859, 0.919] / 0.785 [0.752, 0.820] | 12.48 → 11.36 / 12.49 → 11.10 / 12.56 → 9.86 | improvement: dg-small becomes the 24-bit baseline (targets and N) |
-| 28 | srenew (407) → 267 | 20.67 → 19.43 | 0.940 [0.906, 0.976] / 0.927 [0.893, 0.962] / 0.866 [0.832, 0.902] | 20.62 → 19.39 / 20.49 → 19.00 / 19.90 → 17.23 | pooled ratio below 1, band unresolved on one curve; srenew kept |
-| 32 | walk (1024) → 741 | 31.91 → 30.01 | 0.941 [0.914, 0.968] / 0.919 [0.892, 0.947] / 0.819 [0.790, 0.850] | 32.07 → 30.16 / 32.00 → 29.40 / 31.71 → 25.96 | improvement: dg-small becomes the 32-bit baseline (targets and N) |
-
-Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.
-
-[Report](../../research/ic_srenew_deferred_guard_20261029/README.pdf) · [study](../../research/ic_srenew_deferred_guard_20261029/).
-
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
-
-## Component speed-up: the deferred repeat guard in wall time (2026-10-29, engineering)
-
-Frozen protocol (backlog XP-20261029-dg-wall): `dg` (`targets = stride-renew-deferred-guard`, the repeat guard probed only on targets that decompose) against `srenew` (`targets = stride-renew`) at the same factor base N_inc and `mitm:negation_folded=1` oracle. Both charge the same GAE (to within 2e-6: `dg` charges one extra GAE per repeated target its guard catches), so this moves no row of tables A–C and no counted S at w = 0; the gain is native guard work `dg` no longer executes. Two curves × 24 targets × 6 rounds per size, L2 on isolab-eks with native A/A admission. ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation. The corrected ratio is dg ÷ srenew ns/GAE over the srenew-aa ÷ srenew A/A, from the `wall` block of `ecbench compare`.
-
-| bits | N | pairs | ns/GAE srenew → dg | A/A | corrected dg ÷ srenew (wall) | counted dg ÷ srenew (w = 0 / 0.1 / 1) | IC ÷ rho-neg srenew → dg (w = 0 / 0.1 / 1) | reading |
-|--:|--:|--:|:--|:--|:--|:--|:--|:--|
-| 24 | 162 | 288 | 86.10 → 78.58 | 0.9998 [0.9983, 1.0013] | **0.9128 [0.9099, 0.9157]** | 1.0000 / 0.9625 / 0.7802 | 12.53 → 12.53 / 12.48 → 12.01 / 12.23 → 9.55 | component speed-up (wall per GAE); counted S unchanged |
-| 28 | 407 | 288 | 81.93 → 72.60 | 0.9999 [0.9986, 1.0013] | **0.8862 [0.8837, 0.8887]** | 1.0000 / 0.9657 / 0.7897 | 21.20 → 21.20 / 20.79 → 20.07 / 18.87 → 14.90 | component speed-up (wall per GAE); E6 condition 2 fails, srenew stays the 28-bit baseline |
-| 32 | 1024 | 288 | 106.17 → 89.98 | 0.9987 [0.9970, 1.0005] | **0.8486 [0.8451, 0.8521]** | 1.0000 / 0.9607 / 0.7705 | 35.50 → 35.50 / 35.07 → 33.69 / 33.12 → 25.52 | component speed-up (wall per GAE); counted S unchanged |
-
-Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate. Wall time is host-specific (one host class) and cannot be replayed; the validator recomputed it from the records and bounded the run-order confound with the oracle set-up phase as a null.
-
-[Report](../../research/ic_dg_wall_20261029/README.pdf) · [study](../../research/ic_dg_wall_20261029/).
-
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
-
-## Component speed-up: a cache-blocked packed pair table in wall time (2026-10-29, engineering)
-
-Frozen protocol (backlog XP-20261029-dg-blocked): `dgb` (oracle `mitm-prime-blocked:m=2`, the pair table built cache-blocked as a PackedPairTable) against `dg` (oracle `mitm:negation_folded=1`, a scalar FastMap), both `targets = stride-renew-deferred-guard` at N_inc. Charged work is identical record by record, so this moves no row of tables A–C and no counted S; the gain is a cheaper oracle set-up, partly given back by a slower packed probe in the PDP phase. Two curves × 24 targets × 6 rounds, L2 on isolab-eks with native A/A admission. ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation. Only 28 bits decides: 24 and 32 bits are undecidable under the frozen rule (a below-L2 wall execution).
-
-| bits | N | pairs | ns/GAE dg → dgb | A/A | corrected dgb ÷ dg (wall) | counted dgb ÷ dg (w = 0 / 0.1 / 1) | IC ÷ rho-neg dg → dgb (w = 0 / 0.1 / 1) | reading |
-|--:|--:|--:|:--|:--|:--|:--|:--|:--|
-| 28 | 407 | 288 | 73.83 → 68.66 | 1.0001 [0.9991, 1.0012] | **0.9300 [0.9266, 0.9333]** | 1.0000 / 1.0000 / 1.0000 | 21.79 → 21.79 / 20.66 → 20.66 / 15.48 → 15.48 | component speed-up (wall per GAE); counted S identical |
-
-Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate. Wall time is host-specific (one host class) and cannot be replayed.
-
-[Report](../../research/ic_dg_blocked_20261029/README.pdf) · [study](../../research/ic_dg_blocked_20261029/).
-
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_packed_filter_20261029/VALIDATION.json); single session, not replicated. Caveats: the validator re-priced the bitops with its own code rather than re-running `ecbench work`; the image digest is bound through the binary hashes, not pod status
 
 ## Linear-algebra engine, outside tables A–C
 
@@ -909,7 +861,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `06c9e6066c6f22fe…`
+- `docs/ic/progress-timeline.json` — sha256 `f864a80b77f1f5f6…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
@@ -1004,7 +956,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `f6e63f486cbb824f…`
+- `docs/curves/registry.json` — sha256 `1edbd0d717644b04…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

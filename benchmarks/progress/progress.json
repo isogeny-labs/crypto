@@ -5,7 +5,7 @@
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 45,
+    "measured": 42,
     "open": 0
   },
   "repo": "crypto",
@@ -85,235 +85,91 @@
     },
     {
       "better": "lower",
-      "first": 21.050512493167396,
-      "latest": 21.050512493167396,
+      "first": 31.693595555358375,
+      "latest": 31.693595555358375,
       "latest_derived": {
         "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 21.788875
+        "value_over_reference": 31.47185
       },
-      "metric": "s_prime_ic_w0",
+      "metric": "s_prime_dgbf_w0_p32",
       "points": [
         {
-          "commit": "261dcf92de2a",
+          "commit": "827361301c47",
           "date": "2026-11-05",
           "derived": {
             "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 21.788875
+            "value_over_reference": 31.47185
           },
           "n": null,
-          "record": "20261105T1811Z-ic-dg-blocked",
-          "reference": 0.9661128713444103,
+          "record": "20261105T1759Z-ic-packed-filter-p32",
+          "reference": 1.0070458230707695,
           "reference_kind": "matched_rho",
           "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-dg-blocked EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 21.050512493167396
+          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
+          "value": 31.693595555358375
         }
       ],
-      "problem": "archive:ic-dg-blocked",
+      "problem": "archive:ic-packed-filter-p32-20261029",
       "unit": "S"
     },
     {
       "better": "lower",
-      "first": 29.452569901487898,
-      "latest": 29.452569901487898,
+      "first": 63.49613790555689,
+      "latest": 63.49613790555689,
       "latest_derived": {
         "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 15.480851
+        "value_over_reference": 31.625534
       },
-      "metric": "s_prime_ic_w1",
+      "metric": "s_prime_dgbf_w1_p32",
       "points": [
         {
-          "commit": "261dcf92de2a",
+          "commit": "827361301c47",
           "date": "2026-11-05",
           "derived": {
             "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 15.480851
+            "value_over_reference": 31.625534
           },
           "n": null,
-          "record": "20261105T1811Z-ic-dg-blocked",
-          "reference": 1.9025162642496,
+          "record": "20261105T1759Z-ic-packed-filter-p32",
+          "reference": 2.00774912001418,
           "reference_kind": "matched_rho",
           "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-dg-blocked EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 29.452569901487898
+          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
+          "value": 63.49613790555689
         }
       ],
-      "problem": "archive:ic-dg-blocked",
+      "problem": "archive:ic-packed-filter-p32-20261029",
       "unit": "S"
     },
     {
       "better": "lower",
-      "first": 13.58073792337625,
-      "latest": 13.58073792337625,
+      "first": 0.9601,
+      "latest": 0.9601,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 12.301862
+        "improvement_vs_first_percent": 0.0
       },
-      "metric": "s_prime_ic_w0",
+      "metric": "wall_per_gae_filtered_over_unfiltered_p32",
       "points": [
         {
-          "commit": "261dcf92de2a",
+          "commit": "827361301c47",
           "date": "2026-11-05",
           "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 12.301862
+            "improvement_vs_first_percent": 0.0
           },
-          "n": null,
-          "record": "20261105T1811Z-ic-dg-wall",
-          "reference": 1.1039578827871388,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-dg-wall EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 13.58073792337625
+          "n": 288,
+          "record": "20261105T1759Z-ic-packed-filter-p32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9569,
+            0.9633
+          ],
+          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
+          "value": 0.9601
         }
       ],
-      "problem": "archive:ic-dg-wall",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 20.234811517536556,
-      "latest": 20.234811517536556,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 9.609025
-      },
-      "metric": "s_prime_ic_w1",
-      "points": [
-        {
-          "commit": "261dcf92de2a",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 9.609025
-          },
-          "n": null,
-          "record": "20261105T1811Z-ic-dg-wall",
-          "reference": 2.105813217177769,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-dg-wall EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 20.234811517536556
-        }
-      ],
-      "problem": "archive:ic-dg-wall",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 12.442428869357581,
-      "latest": 12.442428869357581,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 11.109757
-      },
-      "metric": "s_prime_ic_w0",
-      "points": [
-        {
-          "commit": "261dcf92de2a",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 11.109757
-          },
-          "n": null,
-          "record": "20261105T1811Z-ic-srenew-deferred-guard",
-          "reference": 1.1199550447376843,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-srenew-deferred-guard EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 12.442428869357581
-        }
-      ],
-      "problem": "archive:ic-srenew-deferred-guard",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 20.616962352845267,
-      "latest": 20.616962352845267,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 9.624793
-      },
-      "metric": "s_prime_ic_w1",
-      "points": [
-        {
-          "commit": "261dcf92de2a",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 9.624793
-          },
-          "n": null,
-          "record": "20261105T1811Z-ic-srenew-deferred-guard",
-          "reference": 2.142068192869672,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-srenew-deferred-guard EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 20.616962352845267
-        }
-      ],
-      "problem": "archive:ic-srenew-deferred-guard",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 8.678134121323644,
-      "latest": 8.678134121323644,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 6.624586
-      },
-      "metric": "s_prime_ic_w0",
-      "points": [
-        {
-          "commit": "261dcf92de2a",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 6.624586
-          },
-          "n": null,
-          "record": "20261105T1811Z-ic-stride-renew-prime",
-          "reference": 1.3099889240544926,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-stride-renew-prime EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 8.678134121323644
-        }
-      ],
-      "problem": "archive:ic-stride-renew-prime",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 20.928015788385263,
-      "latest": 20.928015788385263,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 8.645075
-      },
-      "metric": "s_prime_ic_w1",
-      "points": [
-        {
-          "commit": "261dcf92de2a",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 8.645075
-          },
-          "n": null,
-          "record": "20261105T1811Z-ic-stride-renew-prime",
-          "reference": 2.420802047704712,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 ic-stride-renew-prime EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
-          "value": 20.928015788385263
-        }
-      ],
-      "problem": "archive:ic-stride-renew-prime",
-      "unit": "S"
+      "problem": "archive:ic-packed-filter-p32-20261029",
+      "unit": "ratio"
     },
     {
       "better": "neutral",
@@ -1488,11 +1344,11 @@
       "metric": "raw_pins_reverified",
       "points": [
         {
-          "commit": "e0174b2f511f",
+          "commit": "19b5e74b9af6",
           "date": "2026-11-05",
           "derived": {},
           "n": null,
-          "record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105b",
+          "record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105",
           "reference": null,
           "reference_kind": null,
           "spread": null,

@@ -644,6 +644,28 @@ def ic_stride_renew(ref, since):
                     emit(f"{metric}.ci95_hi", ci[1], date=date, problem=P_IC, unit="ratio of S",
                          better="lower", label=f"{what}: upper end of the 95% cluster-bootstrap interval",
                          source=src)
+def ic_packed_filter(ref, since):
+    """The membership filter on the packed pair table (a wall component, not a whole-pipeline row):
+    at 32 bits, the corrected whole-solve wall per charged GAE dgbf / dgb and its 95% upper end,
+    from the native `ecbench compare` output; beside it the counted distance to the same-session
+    rho.negation at w = 0, copied from the validator's j4.json."""
+    study = "research/ic_packed_filter_20261029"
+    path = f"{study}/P32/wall/analysis/compare-dgb__dgbf-w0.json"
+    for date, commit, text in file_history(ref, path, since):
+        w = json.loads(text).get("wall", {})
+        src = f"{path}@{commit}"
+        emit("ic_component.packed_filter.p32.wall_ratio", w.get("corrected_ratio"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC packed-table filter, corrected wall per charged GAE dgbf / dgb, 32 bits (component)",
+             source=src)
+        emit("ic_component.packed_filter.p32.wall_ratio_ci95_hi", (w.get("corrected_ci95") or [None, None])[1], date=date,
+             problem=P_IC, unit="ratio", better="lower",
+             label="IC packed-table filter, upper end of the corrected 95% interval, 32 bits (component)", source=src)
+    path = f"{study}/validation/code/out/j4.json"
+    for date, commit, text in file_history(ref, path, since):
+        j = json.loads(text).get("P32-counted", {}).get("dgbf/rho-neg", {}).get("0.0", {})
+        emit("ic_component.packed_filter.p32.dgbf_over_rho_neg_w0", j.get("ratio_b_over_a"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC packed-table filter, counted S' dgbf / rho-neg at w = 0, 32 bits (distance remaining)",
+             source=f"{path}@{commit}")
 
 
 def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
@@ -835,6 +857,7 @@ def main():
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
     ic_stride_renew(a.ref, a.since)
+    ic_packed_filter(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
                           "gpu.explicit_relations.affine")
