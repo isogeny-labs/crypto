@@ -1,0 +1,22 @@
+{
+  "schema": "n83.terminal-functional-format/v1",
+  "scope": "Synthetic development fixtures only; no source-bound n83 LFD result",
+  "encoding": {
+    "json": "UTF-8; field elements and targets are canonical decimal strings; counts are JSON integers",
+    "weights": "Local last-block selector order z_0 through z_(ell-1); normalized selector relation z_i^2 = w_i z_i",
+    "pairing": "Coefficient of all last-block selectors in H times the U^2 coefficient, reduced by square-zero relations",
+    "coefficient_sha256": "SHA256 of canonical N83PFF1 bytes for C=A2-2tA1+t^2H; codec is src/prime_terminal_math.rs and documented in PRIME_FIRST_FALL_FORMAT.json"
+  },
+  "files": {
+    "small-pairings.json": "12 fixtures: ell3,5,7 crossed with p101,1009 and a nonzero/zero delta target; direct pairing checked against independent quadratic polynomial product",
+    "top-image-small.json": "All homogeneous last-block monomial multipliers of degree r-1 checked for each ell3,5,7; not a complete filtered-space computation",
+    "n83-synthetic.json": "Four fixtures: two fixed weight lists crossed with target7/exceptional target; no linkage to the 42 original case targets",
+    "test.log": "Release test output including expected caught-panic negative controls and all inherited donor tests",
+    "summary.json": "Development counts, source and executable identity, exact command and claim boundaries",
+    "source/": "Archived Rust sources, Cargo package and lockfile, and the design written before controls",
+    "test-instrument": "Archived exact executable used for native unit tests; replay with a fresh N83_FUNCTIONAL_DEV_OUT directory",
+    "manifest.json": "Archive payload paths, lengths and SHA256 hashes; excludes itself"
+  },
+  "replay": "Run the restored test-instrument with a fresh output directory, then compare the three arithmetic JSON files byte-for-byte. Store replay logs outside the sealed archive.",
+  "limitations": "Source binding, complete filtered closure and the proposed syzygy-to-filtered bridge are not certified by these tests. Zero delta is inconclusive. No new LFD, regularity, solving-degree or elite-base advantage."
+}
