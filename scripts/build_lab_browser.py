@@ -351,22 +351,25 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
     for c in registry["curves"]:
         params = c.get("params", {})
         family = c["family"]
+        try:
+            model = json.loads(c.get("model_json") or "{}")
+        except ValueError:
+            model = {}
         if family == "prime":
             p = params.get("p")
             field = {"characteristic": "p", "p": str(p), "bits": (int_or_none(p) or 0).bit_length(), "degree": 1, "modulus": None}
         elif family == "extension":
             # GF(p^k) = GF(p)[t]/(t^k + low(t)): bits are the field's, p^k's.
-            p, k = params.get("p"), int_or_none(params.get("k"))
-            field = {"characteristic": "p", "p": str(p), "bits": ((int_or_none(p) or 0) ** (k or 0)).bit_length(), "degree": k, "modulus": params.get("modulus")}
+            p = params.get("p", model.get("p"))
+            k = int_or_none(params.get("k", params.get("degree", model.get("k"))))
+            field = {"characteristic": "p", "p": str(p), "bits": ((int_or_none(p) or 0) ** (k or 0)).bit_length(), "degree": k, "modulus": model.get("modulus", params.get("modulus"))}
         else:
             degree = params.get("n") or params.get("m")
             field = {"characteristic": 2, "p": None, "bits": degree, "degree": degree, "modulus": params.get("modulus")}
-        try:
-            model = json.loads(c.get("model_json") or "{}")
-        except ValueError:
-            model = {}
         a = params.get("a") if params.get("a") is not None else model.get("a")
         b = params.get("b") if params.get("b") is not None else model.get("b")
+        if family == "extension":
+            a, b = model.get("a", a), model.get("b", b)
         # An extension coefficient is its list over 1, t, ..., t^(k-1).
         a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
         rep = (c.get("representations") or [None])[0]

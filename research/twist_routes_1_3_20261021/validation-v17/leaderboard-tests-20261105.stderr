@@ -1,0 +1,29 @@
+E.......
+======================================================================
+ERROR: test_all_24_board_curves_resolve (test_build_ic_leaderboard.CurveRecords.test_all_24_board_curves_resolve)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto-twist-runs/scripts/test_build_ic_leaderboard.py", line 100, in test_all_24_board_curves_resolve
+    data = builder.build()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/crypto-twist-runs/scripts/build_ic_leaderboard.py", line 1530, in build
+    frontier_audit = latest_frontier_audit()
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-twist-runs/scripts/build_ic_leaderboard.py", line 1382, in latest_frontier_audit
+    audit = load(SOURCES["frontier_audit"])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-twist-runs/scripts/build_ic_leaderboard.py", line 258, in load
+    return json.loads((REPO / rel).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/crypto-twist-runs/research/ecbench_frontier_20261013/frontier-data.json'
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.241s
+
+FAILED (errors=1)

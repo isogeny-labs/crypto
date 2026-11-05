@@ -842,7 +842,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
+- `docs/curves/registry.json` — sha256 `a3d9eae9839ce3d7…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
@@ -929,3 +929,18 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_aa_v1.json` — sha256 `8f306ff8388bddaf…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_v1.json` — sha256 `0e21b267b9612dcc…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_aa_v1.json` — sha256 `0e21b267b9612dcc…`
+- `research/twist_routes_1_3_20261021/execution-v19/OBSERVATIONS.json` — sha256 `71be25691fc5da5b…`
+
+## Sparse affine substitution: software-Ir diagnostic
+
+A frozen 612-profile confirmation uses 24 fresh public targets and 12 Q2 controls. Cold setup through source-point verification is charged per target. These recorded Ir ratios stay outside the calibrated priced tables.
+
+| Candidate / baseline | Cold Ir median | Observed min–max | Successful fresh pairs |
+|:--|--:|:--|--:|
+| ordinary-sparse-over-dense | 0.9128141 | 0.8674047–0.9288431 | 10 |
+| ordinary-sparse-over-full | 0.9955857 | 0.9883420–0.9969586 | 10 |
+| twist-sparse-over-dense | 0.9129475 | 0.8636211–0.9299975 | 12 |
+| twist-sparse-over-full | 0.9956286 | 0.9887932–0.9980363 | 12 |
+
+All eligible pairs improve with identical equations; ordinary and twist bases benefit. Ranges are observed cases, not confidence intervals. [Source and inspected report](../../research/twist_routes_1_3_20261021/reports/sparse-compression-20261030/RESULTS.md). Benchmark admission still requires ecbench/calibrated pricing and independent-host validation.
+

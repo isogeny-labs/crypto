@@ -258,6 +258,10 @@ def load(rel: str):
     return json.loads((REPO / rel).read_text())
 
 
+SOURCES["twist_sparse_confirmation"] = (
+    "research/twist_routes_1_3_20261021/execution-v19/OBSERVATIONS.json")
+
+
 class Names:
     def __init__(self) -> None:
         self.reg = load(SOURCES["registry"])
@@ -726,6 +730,11 @@ def roster(names: Names, measured: set[str]) -> list[dict]:
         if c["family"] == "prime":
             field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
             coeff = f"a = {p['a']}, b = {p['b']}" if len(p["p"]) < 40 else "standard coefficients"
+        elif c["family"] == "extension":
+            model = json.loads(c.get("model_json") or "{}")
+            degree = p.get("k", p.get("degree", model.get("k")))
+            field = f"GF({p.get('p', model.get('p'))}^{degree})"
+            coeff = f"a = {model.get('a', p.get('a'))}, b = {model.get('b', p.get('b'))}"
         else:
             m = p.get("n", p.get("m"))
             field = f"GF(2^{m})"
@@ -1970,6 +1979,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "s5_c4_component": s5_c4_component(),
         "ghs_weak_n4_component": ghs_weak_n4(),
         "ghs_weak_n4v2_component": ghs_weak_n4v2(),
+        "twist_sparse_confirmation": load(SOURCES["twist_sparse_confirmation"]),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -2946,6 +2956,24 @@ def markdown(doc: dict) -> str:
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
+    sparse = doc.get("twist_sparse_confirmation")
+    if sparse:
+        L += ["", "## Sparse affine substitution: software-Ir diagnostic", "",
+              "A frozen 612-profile confirmation uses 24 fresh public targets and 12 Q2 controls. "
+              "Cold setup through source-point verification is charged per target. "
+              "These recorded Ir ratios stay outside the calibrated priced tables.", "",
+              "| Candidate / baseline | Cold Ir median | Observed min–max | Successful fresh pairs |",
+              "|:--|--:|:--|--:|"]
+        for key, item in sparse["fresh_target_ratios"].items():
+            if "sparse-over-" not in key or not item.get("cold"):
+                continue
+            r = item["cold"]
+            L.append(f"| {key} | {r['median']:.7f} | {r['min']:.7f}–{r['max']:.7f} | {r['n']} |")
+        L += ["", "All eligible pairs improve with identical equations; ordinary and twist "
+              "bases benefit. Ranges are observed cases, not confidence intervals. "
+              "[Source and inspected report](../../research/twist_routes_1_3_20261021/"
+              "reports/sparse-compression-20261030/RESULTS.md). "
+              "Benchmark admission still requires ecbench/calibrated pricing and independent-host validation.", ""]
     return "\n".join(L) + "\n"
 
 
@@ -4177,6 +4205,27 @@ def page(doc: dict, standalone: bool) -> str:
              'remain separate from operation-unit S rankings.</p>' +
              gh(finalist["source"], 'Frozen 132 IC1 rows') + ' · ' +
              gh(finalist["report"], 'Provider-bound result and graph') + '</section>')
+
+    sparse = doc.get("twist_sparse_confirmation")
+    if sparse:
+        P.append('<section class="card" id="twist-sparse-confirmation"><h2>Sparse affine substitution: '
+                 'software-Ir diagnostic, outside the priced tables</h2><p>A frozen 612-profile '
+                 'confirmation uses 24 fresh public targets and 12 Q2 controls. Cold setup through '
+                 'source-point verification is charged per target. Both ordinary and twist bases benefit. '
+                 'The unit is guest instructions Ir; ranges are observed cases, not confidence intervals.</p>'
+                 '<div class="scroll"><table><thead><tr><th>Candidate / baseline</th>'
+                 '<th>Cold Ir median</th><th>Observed min–max</th><th>Successful fresh pairs</th>'
+                 '</tr></thead><tbody>')
+        for key, item in sparse["fresh_target_ratios"].items():
+            if "sparse-over-" not in key or not item.get("cold"):
+                continue
+            r = item["cold"]
+            P.append(f'<tr><td>{esc(key)}</td><td>{r["median"]:.7f}</td>'
+                     f'<td>{r["min"]:.7f}–{r["max"]:.7f}</td><td>{r["n"]}</td></tr>')
+        P.append('</tbody></table></div><p>Every eligible pair improves with identical equations. '
+                 'Benchmark admission still requires ecbench/calibrated pricing and independent-host validation. '
+                 + gh('research/twist_routes_1_3_20261021/reports/sparse-compression-20261030/RESULTS.md',
+                      'Verified diagnostic and inspected report') + '</p></section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '
