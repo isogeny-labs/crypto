@@ -31,3 +31,12 @@ as a proof. The earlier three-lemma audit covered 16 project declarations; it
 does not validate this final five-lemma source. Historical 13-declaration
 receipts remain unchanged. Official module replay is against imports, not a
 `--fresh` replay of all imported Mathlib proofs.
+
+## 2026-11-05 exact statement bindings
+
+The five supporting declarations are now pinned as separate PCC theorem records,
+including their normalized statement hashes and faithful human statements:
+[bindings](validation/main-d30b9e0db-20261105/formal-claim-bindings.json).
+Fresh changed-gate audit/module replay locally exit0; the five PCC verifiers
+locally exit0. Every standing remains unverified without independent signed
+verdicts. Rust/polynomial/cost bridges are unchanged obligations. [pcc:unverified]

@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Inherited main strict-lint failures](pkm-main-strict-lint-inherited.md) | open | integrated PKM strict lint | repair trace visibility/usage and custody boolean style upstream; rerun unchanged warnings-as-errors gate |
+| [Legacy PCC validator relative-path binding](pcc-legacy-validator-relative-path-binding.md) | open | shared PCC gate rejects13unchanged main claims | canonical shared-verifier/evidence-dir review with escape/digest canaries; preserve frozen claim/report/ledger bytes |
 | [Historical Lean coverage and semantic correspondence](https://github.com/aburan28/crypto-autoresearcher/blob/codex/lean-retrospective-20261018/problems/lean-retrospective-historical-coverage.md) | open | Certifying every past claim across the three repositories | Exact claim-to-proof inventory, remaining formal targets and concrete bridges, independent review and empirical replay |
 | [Curve25519 atlas/carry/rank panel admission](curve25519-atlas-panel-admission.md) | open | original 12-cell matched solver/support panel | checkpoint and EKS access, exact custom-image digest, measured preflight, live budget/capacity and independent verification |
 | [Arity-completion runs blocked at the launch gates](arity-completion-launch-gates.md) | open | launching the preregistered m = 5, 6 cells (prime towers, Koblitz chained S3, n = 83 lift) and the dreg v4 execution | a valid AWS identity for account 104186811093 or a checkpoint upload token, plus recorded budget headroom |

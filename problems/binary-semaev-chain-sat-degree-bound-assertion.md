@@ -31,3 +31,11 @@ ignore the failing test. No cost or ECDLP conclusion follows from this failure.
 Unresolved; current PKM changes do not modify this source. Recheck on an upstream
 contract repair or a qualified maintainer diagnosis. No extra scientific run is
 authorized by this problem record.
+
+## Upstream repair integrated2026-11-05
+
+Main d30b9e0db's test now expects Some190568 at m10 and retains m15/m16 plus
+invalid-degree boundaries. Local mergebbf241b7e includes it without a local
+assertion edit. The new example suites log26passes; the library test itself
+still awaits its current-source execution. Status remains open/pending affected
+contract qualification; old failure receipts remain unchanged. [pcc:unverified]

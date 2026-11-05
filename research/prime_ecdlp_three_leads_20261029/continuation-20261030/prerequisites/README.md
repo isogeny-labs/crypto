@@ -3,7 +3,9 @@
 `durable_attempt.rs` is a std-only Rust library primitive, outside the active
 Cargo/Lean source bindings. It launches nothing and is not connected to the
 PKM driver/full-panel card. Caller checkpoint/protocol/runtime gates remain
-mandatory. Unit validation is pending when this source note is introduced.
+mandatory. The local unit log records5passing fault controls and strict clippy, with
+source/binary hashes in [the component receipt](../validation/main-d30b9e0db-20261105/attempt-record-checks/receipt.json).
+These are unsigned producer observations. [pcc:unverified]
 
 The writer creates a unique attempt directory and immutable canonical binding
 record. Explicit file and directory sync errors are propagated. A final outcome

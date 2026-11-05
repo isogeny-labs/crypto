@@ -1,5 +1,33 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Latest local work — 2026-11-05
+
+[Current report](continuation-20261105T0840Z.pdf) and [attempt-record diagram](attempt-record-flow-20261105.svg).
+
+The [main resolution review](validation/main-d30b9e0db-20261105/resolution-review.json)
+records mergebbf241b7e after Copilot's unanswered request/fallback. Only ordinary
+logs/index conflicted; both histories and407older study blobs are retained.
+New native phase receipt records26example passes on merged dependencies;
+remaining phases are in the existing6743job, not qualified by that receipt.
+Fresh changed-gate audit reports18declarations/0trusted and module replay0
+against imports; all are unsigned local observations. [pcc:unverified]
+
+**G2 component:** a new [std-only attempt-record primitive](prerequisites/README.md)
+retains unfinished records, propagates I/O errors and prevents duplicate outcome
+publication. Its5fault controls and strictlint locally pass; it launches nothing
+and is not yet integrated with a qualified supervisor/driver/resume route.
+[Component receipt](validation/main-d30b9e0db-20261105/attempt-record-checks/receipt.json).
+**G6 prerequisite:**5existing contracts now have exact normalized-statement PCC
+bindings; each local verifier exits0, but all standings remain unverified without
+independent signed verdicts. [Bindings](validation/main-d30b9e0db-20261105/formal-claim-bindings.json).
+These are scoped producer observations, not trusted execution evidence. [pcc:unverified]
+
+The [shared PCC legacy-path problem](../../../problems/pcc-legacy-validator-relative-path-binding.md)
+keeps the global policy gate red on13unchanged main claims. Auto-merge remains
+paused. New local commits are unpushed pending native outcomes/review; historical
+receipts do not qualify changed dependencies. Original G1–G6 acceptance remains
+in force with the stage/metric state below. [pcc:unverified]
+
 ## Current continuation — 2026-11-05
 
 PR2949 merged on November 1; its maintenance has stopped. Previously unpublished history is preserved and published on
