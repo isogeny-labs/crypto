@@ -71,6 +71,11 @@ impl Request {
         }
     }
     fn validate(&self) -> Result<(), String> {
+        // Export/replay are unpriced interfaces. Producer paths retain this
+        // separate reference ledger via validate_counted instead.
+        self.validate_counted(&mut reference::Counts::default())
+    }
+    fn validate_counted(&self, counts: &mut reference::Counts) -> Result<(), String> {
         if self.schema != "pkm.oracle-request/v1" {
             return Err("unsupported request schema".into());
         }
@@ -79,7 +84,9 @@ impl Request {
             return Err("output/assignment limits must be positive".into());
         }
         let mut independent = reference::Curve::new(self);
-        if !independent.on_curve(self.target) {
+        let valid = independent.on_curve(self.target);
+        counts.merge(independent.counts);
+        if !valid {
             return Err("noncanonical or off-curve finite target".into());
         }
         Ok(())
@@ -115,6 +122,7 @@ impl Phase {
 #[derive(Default, Debug, Serialize)]
 struct Ledger {
     validation: Phase,
+    validation_reference_counts: reference::Counts,
     construction: Phase,
     solve_excluding_callbacks: Phase,
     root_decode: Phase,
@@ -244,7 +252,7 @@ fn run(r: &Request) -> Result<Report, String> {
     let mut ledger = Ledger::default();
     let before = algebra::counts();
     let validation = Instant::now();
-    r.validate()?;
+    r.validate_counted(&mut ledger.validation_reference_counts)?;
     let curve = FastCurve::new("public-pkm-oracle", r.p, r.a, r.b, 1);
     ledger.validation.finish(validation, before);
     let mut found = BTreeSet::new();
