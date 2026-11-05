@@ -1,0 +1,6 @@
+from pathlib import Path
+import typst
+p=Path(__file__).resolve().parent
+s='<svg xmlns="http://www.w3.org/2000/svg" width="720" height="180"><rect width="720" height="180" fill="white"/><g font-family="sans-serif" font-size="14"><text x="10" y="24">Recorded replay phases</text><text x="10" y="57">Pre-custody</text><rect x="145" y="40" width="467" height="25" fill="#c76a3d"/><text x="145" y="85">280.005 s · work cutoff · outer exit 1</text><text x="10" y="118">Compiler</text><text x="145" y="118">Not started; no elapsed measurement</text><text x="10" y="150">Post-custody</text><text x="145" y="150">Not required; no compiler had started</text></g></svg>'
+(p/'phases.svg').write_text(s)
+typst.compile(str(p/'report.typ'),output=str(p/'report.pdf'))

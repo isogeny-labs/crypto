@@ -40,10 +40,10 @@ gap; pretending the KB was consulted is worse than saying it was down.
 
 | repository | entries | receipts | coverage | unique source IDs |
 |:--|--:|--:|--:|--:|
-| `crypto` | 111 | 2 | 1.8% | 6 |
+| `crypto` | 112 | 2 | 1.8% | 6 |
 | `crypto-autoresearcher` | 4 | 1 | 25.0% | 3 |
 | `cryptanalysis` | 2 | 1 | 50.0% | 3 |
-| **total** | **117** | **4** | **3.4%** | **6** |
+| **total** | **118** | **4** | **3.4%** | **6** |
 
 The first number is intentionally low: the policy landed on 2026-11-05 and the
 logs before it have no receipt. The four receipts are the policy entries
