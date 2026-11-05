@@ -2855,7 +2855,17 @@ pub fn solve_measured(
         solve_wide(m, wi, tx, ty, seed)?
     } else if let Instance::F2m4(i) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
-        if u64::try_from(i.r).is_err() {
+        if m.id == NEG_STRONG {
+            // Two-word orders and 4m-bit packed points (m ≥ 16) included:
+            // the target travels unpacked from its full u128 coordinates.
+            let f = &i.curve.f;
+            let target = PtB {
+                x: f.unpack(tx),
+                y: f.unpack(ty),
+                inf: false,
+            };
+            solve_neg_strong(m, i, target, seed)?
+        } else if u64::try_from(i.r).is_err() {
             // `m ≥ 16` with a small cofactor: the subgroup order needs two
             // words; the u128 implementations (`ic_wide`, `rho_wide`).
             solve_f2m4_wide(m, i, curve, tx, ty, seed)?
@@ -6016,7 +6026,7 @@ fn neg_strong_refusal(curve: &CurveFacts) -> String {
 
 /// `lanes`, `dp_bits` and `step_cap_factor` of a `rho.negation_strong`
 /// method, `dp_bits = auto` resolved on a subgroup of order `r`.
-fn neg_strong_params(m: &ResolvedMethod, r: u64) -> Result<NegStrongParams, String> {
+fn neg_strong_params(m: &ResolvedMethod, r: u128) -> Result<NegStrongParams, String> {
     use super::negation_strong::{auto_dp_bits, ideal_steps};
     let lanes = param_u64(m, "lanes")?;
     if !(1..=4096).contains(&lanes) {
@@ -6049,12 +6059,9 @@ fn solve_neg_strong(
     seed: u64,
 ) -> Result<SolveReport, String> {
     use super::negation_strong::{NegStrongRho, CANON_FQ_MULS, JUMPS};
-    if inst.curve.f.f.m > 16 {
-        return Err("rho.negation_strong requires a one-word packed point key".into());
-    }
-    let r = u64::try_from(inst.r)
-        .map_err(|_| "rho.negation_strong supports subgroup orders through u64".to_string())?;
-    let params = neg_strong_params(m, r)?;
+    // Any m the f2m4_torsion workload builds (4..=20): the exponents and
+    // the table key are two words wide where the curve needs them.
+    let params = neg_strong_params(m, inst.r)?;
     if !inst.curve.on_curve(&target) {
         return Err("the target is not on the curve".into());
     }
@@ -6137,7 +6144,7 @@ fn solve_neg_strong(
         },
     });
     Ok(SolveReport {
-        recovered: o.scalar.map(u128::from),
+        recovered: o.scalar,
         exhausted: o.scalar.is_none(),
         phases,
         total_gae,
@@ -9872,6 +9879,26 @@ mod neg_strong_tests {
                 assert_eq!(a.total_gae, again.total_gae);
             }
         }
+    }
+
+    /// m = 17: a two-word subgroup order and 68-bit packed points run
+    /// through `applicable` and `solve` (a capped walk, the target carried
+    /// in full).
+    #[test]
+    fn runs_past_one_word_on_m17() {
+        let strong = method(
+            NEG_STRONG,
+            &[("lanes", "8"), ("dp_bits", "6"), ("step_cap_factor", "0")],
+        );
+        let (inst, facts) = f2m4(17, 1);
+        assert!(u64::try_from(facts.r).is_err());
+        applicable(&strong, &inst, &facts).unwrap();
+        let k = (u128::MAX / 5) % facts.r;
+        let target = inst.mul_generator_hex(k).unwrap();
+        let rep = solve(&strong, &inst, &facts, &target, 3).unwrap();
+        assert!(rep.counters["walk_steps"] >= 1_000_000);
+        assert!(rep.recovered.is_none() || rep.recovered == Some(k));
+        assert!(rep.total_gae > 0.0);
     }
 
     #[test]

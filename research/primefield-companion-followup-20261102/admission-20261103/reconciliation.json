@@ -1,0 +1,40 @@
+{
+  "schema": "primefield-admission-reconciliation/v1",
+  "recorded_at": "2026-11-03T22:13:11.847800+00:00",
+  "source_commit": "02ed831d898f0fd603a98a48921d32fa65d369a6",
+  "quota": {
+    "namespace": "isolab",
+    "name": "jobs",
+    "operation": "get",
+    "exit_code": 1,
+    "result": "Forbidden",
+    "caller_role": "spot-experiments-WorkerRole-G1FZ84yk3gS6",
+    "observation": "Fresh command output; summary, not raw stderr"
+  },
+  "jobs": {
+    "source": "fresh isolab_k8s_overview tool read",
+    "records": [
+      {
+        "name": "hashed-ecdl-cpu-round24-20261030",
+        "uid": "bbe5d31b-1533-4e07-b26f-f9a8598349c2",
+        "state": "succeeded"
+      },
+      {
+        "name": "sat-hpo-metal-qualification-20261030",
+        "uid": "e83a3ba3-36c4-4958-8d04-20b78c44d3dc",
+        "state": "suspended"
+      }
+    ],
+    "comparison_job_found": false
+  },
+  "admitted": false,
+  "charged_and_reserved_remainder": null,
+  "cloud_submissions": 0,
+  "numerical_trials": 0,
+  "remaining": [
+    "Authoritative quota readback through existing authorized operator path",
+    "Account and lane charged/reserved allowance reconciliation",
+    "Pinned launch delivery, source publication receipt and bounded preflight",
+    "Freeze and publish protocol before comparison data"
+  ]
+}
