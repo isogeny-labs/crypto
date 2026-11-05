@@ -80,7 +80,11 @@ open.
     sign of `-1`, and is usually trapped in closed sets of 6-30 classes.
 - **Missing capability:** explicit `(2,2,2)` or `(l,l,l)` isogenies between
   hyperelliptic genus-3 Jacobians, with their cost. (Native Proposition 2 and 4
-  tests: done 2026-10-14.)
+  tests: done 2026-10-14. Smith's own isogeny `psi: J_H -> J_X` to the plane
+  quartic, on divisor classes: done and verified 2026-10-25, W3b; it is a
+  hyperelliptic-to-quartic map, not the hyperelliptic-to-hyperelliptic step a
+  walk needs. When `X` comes out hyperelliptic, `psi` lands on a
+  hyperelliptic Jacobian, which the W3b code detects but does not yet model.)
 - **What this does not establish:** that the ceiling is reached, or the cost
   of reaching it. It also leaves out walks through non-hyperelliptic members
   of the class.
@@ -214,3 +218,8 @@ open.
   first pass (post hoc; the frozen `o(p)` label is a censoring artifact) and
   are trapped at `p = 1 mod 4`. Unresolved; next step is to measure whether
   weak and passing curves cluster beyond `1/p`.
+- 2026-10-25: W3b ([study](../research/smith_isogeny_divisor_map_20261018/README.md))
+  makes Smith's `psi` explicit on divisor classes (checks T1–T7 pass on two
+  engines, image `= J_H/S` at `q <= 13`). The walk itself is still not built;
+  the case `X` hyperelliptic (seen in the W3b samples) is a candidate source
+  of hyperelliptic-to-hyperelliptic steps, not yet implemented.
