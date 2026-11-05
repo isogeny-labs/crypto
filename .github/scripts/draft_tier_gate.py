@@ -37,6 +37,8 @@ FAST_TIER = {
     "workflow-lint.yml",
     "validation-gate.yml",
     "ci-tier.yml",
+    # PCC must validate the ledger and prose on every PR, including drafts.
+    "pcc-gate.yml",
 }
 # Workflows whose exact bytes are pinned by a sealed evidence record or an
 # exact implementation-version dependency; editing them breaks that record.

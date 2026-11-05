@@ -18,6 +18,8 @@ A PR is merged only when all of these hold on its current head:
   * at least one check run exists, every check run has completed, and each
     concluded success, neutral or skipped (cancelled, timed out, failed,
     action_required and stale are not a pass)
+  * gate, size and artifacts each completed successfully on the head
+  * no unresolved review thread remains (every page is read; errors hold)
   * every legacy commit status is success
   * the full tier ran: the `full-tier` check (ci-tier.yml) succeeded on the
     head. A draft's gated jobs report `skipped`, so without this marker a
@@ -53,6 +55,7 @@ import urllib.request
 
 API = os.environ.get("GITHUB_API_URL", "https://api.github.com")
 PASS = {"success", "neutral", "skipped"}
+REQUIRED_CHECKS = {"gate", "size", "artifacts"}
 FULL_TIER = "full-tier"
 TIER_WORKFLOW = ".github/workflows/ci-tier.yml"
 L_PARKED, L_WAITING, L_BUDGET = "ci:parked", "ci:waiting", "ci:over-budget"
@@ -124,6 +127,52 @@ def blocking_reviews(reviews: list[dict]) -> list[str]:
         if state in {"APPROVED", "CHANGES_REQUESTED", "DISMISSED"}:
             latest[(r.get("user") or {}).get("login", "?")] = state
     return sorted(u for u, s in latest.items() if s == "CHANGES_REQUESTED")
+
+
+def unresolved_threads(repo: str, number: int) -> int:
+    """Read every review-thread page; unavailable review data never means clear."""
+    owner, name = repo.split("/", 1)
+    query = """query($owner: String!, $name: String!, $number: Int!, $cursor: String) {
+      repository(owner: $owner, name: $name) {
+        pullRequest(number: $number) {
+          reviewThreads(first: 100, after: $cursor) {
+            nodes { id isResolved }
+            pageInfo { hasNextPage endCursor }
+          }
+        }
+      }
+    }"""
+    cursor = None
+    seen_cursors: set[str] = set()
+    unresolved: set[str] = set()
+    while True:
+        result = api("POST", "graphql", {
+            "query": query,
+            "variables": {"owner": owner, "name": name, "number": number, "cursor": cursor},
+        })
+        if not isinstance(result, dict) or result.get("errors"):
+            raise RuntimeError("could not read review-thread data")
+        data = result.get("data")
+        repository = data.get("repository") if isinstance(data, dict) else None
+        pull = repository.get("pullRequest") if isinstance(repository, dict) else None
+        page = pull.get("reviewThreads") if isinstance(pull, dict) else None
+        if not isinstance(page, dict) or not isinstance(page.get("nodes"), list):
+            raise RuntimeError("missing review-thread data")
+        for node in page["nodes"]:
+            if (not isinstance(node, dict) or not isinstance(node.get("id"), str)
+                    or type(node.get("isResolved")) is not bool):
+                raise RuntimeError("malformed review-thread data")
+            if not node["isResolved"]:
+                unresolved.add(node["id"])
+        info = page.get("pageInfo")
+        if not isinstance(info, dict) or type(info.get("hasNextPage")) is not bool:
+            raise RuntimeError("missing review-thread pagination")
+        if not info["hasNextPage"]:
+            return len(unresolved)
+        cursor = info.get("endCursor")
+        if not isinstance(cursor, str) or not cursor or cursor in seen_cursors:
+            raise RuntimeError("review-thread pagination did not advance")
+        seen_cursors.add(cursor)
 
 
 def check_verdict(runs: list[dict], statuses: list[dict]) -> tuple[str, list[str]]:
@@ -198,6 +247,11 @@ def assess(repo: str, pr: dict, default_branch: str, *, max_checks: int = 30,
     if verdict != "pass":
         shown = ", ".join(names[:6]) + (" …" if len(names) > 6 else "")
         return verdict, shown
+    missing = sorted(name for name in REQUIRED_CHECKS if not any(
+        r.get("name") == name and r.get("status") == "completed"
+        and r.get("conclusion") == "success" for r in runs))
+    if missing:
+        return "pending", "missing successful required checks: " + ", ".join(missing)
     if full_tier_missing(runs, since):
         return "pending", f"no successful {FULL_TIER} check on the head (mark it ready to run the full tier)"
 
@@ -210,15 +264,20 @@ def assess(repo: str, pr: dict, default_branch: str, *, max_checks: int = 30,
         return "pending", f"mergeable_state {detail.get('mergeable_state')}"
     if blockers := blocking_reviews(paged(f"repos/{repo}/pulls/{pr['number']}/reviews")):
         return "held", "changes requested by " + ", ".join(blockers)
+    if count := unresolved_threads(repo, pr["number"]):
+        return "held", f"{count} unresolved review thread(s)"
     return "ready", ""
 
 
 def merge(repo: str, pr: dict) -> str:
     try:
-        api("PUT", f"repos/{repo}/pulls/{pr['number']}/merge",
+        result = api("PUT", f"repos/{repo}/pulls/{pr['number']}/merge",
             {"merge_method": "merge", "sha": pr["head"]["sha"]})
     except urllib.error.HTTPError as exc:
         return f"refused ({exc.code}): {exc.read().decode(errors='replace')[:200]}"
+    if not isinstance(result, dict) or result.get("merged") is not True:
+        reason = result.get("message", "no merge confirmation") if isinstance(result, dict) else "no merge confirmation"
+        return f"refused: {reason}"
     return "merged"
 
 
@@ -273,7 +332,7 @@ def plan_capacity(prs: list[dict], buckets: dict[int, str], *,
                 actions.append(("park", pr, {"fail": "failing checks", "conflict": "merge conflict",
                                              "over-budget": "too many CI checks",
                                              "needs-human": "labelled needs-human"}[b]))
-        elif b != "held":
+        elif b not in {"held", "error"}:
             if L_PARKED in labels:
                 actions.append(("unpark", pr, "merge blocker cleared"))
             ready.append((pr, labels))
@@ -339,6 +398,8 @@ def main() -> int:
                                     max_checks=args.max_checks, since=since)
         except urllib.error.HTTPError as exc:
             bucket, reason = "error", f"HTTP {exc.code} reading the PR"
+        except RuntimeError as exc:
+            bucket, reason = "error", str(exc)
         line = f"#{pr['number']} {pr['title'][:80]}" + (f" — {reason}" if reason else "")
         if bucket == "ready" and args.apply:
             if merged >= args.max_merges:

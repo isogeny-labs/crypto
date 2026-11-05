@@ -252,10 +252,10 @@ behind 11 EKS runners. The fix is to run less, not to wait longer:
 
 | PR state | What runs on each push |
 | --- | --- |
-| Draft | Fast tier only: `workflows-parse.yml`, `workflow-lint.yml`, `validation-gate.yml`, `ci-tier.yml` (its `full-tier` job skips), and the four byte-pinned workflows below |
+| Draft | Fast tier only: `workflows-parse.yml`, `workflow-lint.yml`, `validation-gate.yml`, `ci-tier.yml` (its `full-tier` job skips), `pcc-gate.yml` (mandatory ledger/prose validation), and the four byte-pinned workflows below |
 | Ready for review | Full tier: every applicable workflow, as before |
 
-- Every other workflow with a `pull_request` trigger gates each job on
+- Apart from the fast tier and byte-pinned exceptions, every workflow with a `pull_request` trigger gates each job on
   `!github.event.pull_request.draft` and lists `ready_for_review` in its PR
   types (label-only triggers are left alone), so marking a PR ready starts the
   full tier on its head. `.github/scripts/draft_tier_gate.py` checks this in
@@ -264,6 +264,10 @@ behind 11 EKS runners. The fix is to run less, not to wait longer:
 - `weak-curve-lean.yml`, `weak-curve-conjectures.yml`, `release.yml` and
   `curve-covers.yml` are excluded: their bytes are pinned by sealed evidence
   or an exact implementation-version dependency.
+- The merge sweeper requires successful `gate`, `size` and `artifacts` checks,
+  every applicable check/status to pass, and no unresolved review threads.
+  Review data is paginated; unavailable data holds the PR. A refused merge is
+  reported as refused and does not clear capacity labels.
 - A gated job on a draft reports `skipped`, so the merge sweeper also requires
   a successful `full-tier` check on the head. Heads whose checks all started
   before `ci-tier.yml` reached `main` predate the tiers and need no marker.

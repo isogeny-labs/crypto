@@ -79,9 +79,47 @@ class BlockingReviews(unittest.TestCase):
         self.assertEqual(ms.blocking_reviews(reviews), ["r"])
 
 
+class ReviewThreads(unittest.TestCase):
+    @staticmethod
+    def page(nodes, more=False, cursor=None):
+        return {"data": {"repository": {"pullRequest": {"reviewThreads": {
+            "nodes": nodes, "pageInfo": {"hasNextPage": more, "endCursor": cursor},
+        }}}}}
+
+    def test_every_page_is_read_and_closed_threads_do_not_block(self):
+        first = self.page([{"id": "closed", "isResolved": True}], True, "next")
+        second = self.page([{"id": "open", "isResolved": False}])
+        with mock.patch.object(ms, "api", side_effect=[first, second]) as api:
+            self.assertEqual(ms.unresolved_threads(REPO, 7), 1)
+        calls = api.call_args_list
+        self.assertEqual([call.args[:2] for call in calls], [("POST", "graphql")] * 2)
+        self.assertEqual([call.args[2]["variables"]["cursor"] for call in calls], [None, "next"])
+        self.assertTrue(all(call.args[2]["variables"]["number"] == 7 for call in calls))
+
+    def test_empty_thread_set_is_clear(self):
+        with mock.patch.object(ms, "api", return_value=self.page([])):
+            self.assertEqual(ms.unresolved_threads(REPO, 7), 0)
+
+    def test_api_errors_and_missing_data_fail_closed(self):
+        responses = [{"errors": [{"message": "denied"}]}, {"data": {"repository": None}},
+                     {"data": []}, {"data": {"repository": {"pullRequest": []}}},
+                     self.page([{"id": "bad", "isResolved": "false"}])]
+        for response in responses:
+            with self.subTest(response=response), mock.patch.object(ms, "api", return_value=response):
+                with self.assertRaises(RuntimeError):
+                    ms.unresolved_threads(REPO, 7)
+
+    def test_repeated_pagination_cursor_fails_closed(self):
+        page = self.page([], True, "stalled")
+        with mock.patch.object(ms, "api", side_effect=[page, page]):
+            with self.assertRaisesRegex(RuntimeError, "did not advance"):
+                ms.unresolved_threads(REPO, 7)
+
+
 class Assess(unittest.TestCase):
     def setUp(self):
-        self.runs, self.statuses, self.reviews = [run("a")], [], []
+        self.runs = [run("gate"), run("size"), run("artifacts")]
+        self.statuses, self.reviews, self.threads = [], [], 0
         self.detail = {"head": {"sha": "abc"}, "mergeable": True,
                        "mergeable_state": "clean"}
 
@@ -95,7 +133,8 @@ class Assess(unittest.TestCase):
             raise AssertionError(path)
 
         patches = [mock.patch.object(ms, "paged", side_effect=paged),
-                   mock.patch.object(ms, "pr_detail", side_effect=lambda *_: self.detail)]
+                   mock.patch.object(ms, "pr_detail", side_effect=lambda *_: self.detail),
+                   mock.patch.object(ms, "unresolved_threads", side_effect=lambda *_: self.threads)]
         for p in patches:
             p.start()
             self.addCleanup(p.stop)
@@ -140,21 +179,51 @@ class Assess(unittest.TestCase):
     def test_check_budget(self):
         self.runs = [run(f"c{i}") for i in range(31)]
         self.assertEqual(self.bucket(), "over-budget")
-        self.runs = [run(f"c{i}") for i in range(30)] + [run("x", conclusion="skipped")]
+        self.runs = [run("gate"), run("size"), run("artifacts")]
+        self.runs += [run(f"c{i}") for i in range(27)] + [run("x", conclusion="skipped")]
         self.assertEqual(self.bucket(), "ready")
         self.runs = [run(f"queued{i}", "queued", None) for i in range(31)]
         self.assertEqual(self.bucket(), "pending")
 
     def test_full_tier_marker_is_required_after_the_tiers_land(self):
         since = T("2026-10-23T06:00:00Z")
-        self.runs = [run("a"), run("full-tier", conclusion="skipped")]
+        required = [run("gate"), run("size"), run("artifacts")]
+        self.runs = required + [run("full-tier", conclusion="skipped")]
         self.assertEqual(ms.assess(REPO, pr(), "main", since=since)[0], "pending")
-        self.runs = [run("a"), run("full-tier")]
+        self.runs = required + [run("full-tier")]
         self.assertEqual(ms.assess(REPO, pr(), "main", since=since)[0], "ready")
-        self.runs = [run("a", started="2026-10-22T00:00:00Z")]
+        self.runs = [run(name, started="2026-10-22T00:00:00Z")
+                     for name in ("gate", "size", "artifacts")]
         self.assertEqual(ms.assess(REPO, pr(), "main", since=since)[0], "ready")
-        self.runs = [run("a")]
+        self.runs = required
         self.assertEqual(ms.assess(REPO, pr(), "main", since=None)[0], "ready")
+
+
+    def test_arbitrary_green_check_does_not_replace_merge_gates(self):
+        self.runs = [run("lint")]
+        self.assertEqual(self.bucket(), "pending")
+
+    def test_each_merge_gate_must_succeed(self):
+        for missing in ("gate", "size", "artifacts"):
+            with self.subTest(missing=missing):
+                self.runs = [run(name) for name in ("gate", "size", "artifacts")
+                             if name != missing]
+                self.assertEqual(self.bucket(), "pending")
+                self.runs.append(run(missing, conclusion="skipped"))
+                self.assertEqual(self.bucket(), "pending")
+
+    def test_duplicate_gate_failure_cannot_be_hidden_by_a_success(self):
+        self.runs.append(run("gate", conclusion="failure"))
+        self.assertEqual(self.bucket(), "fail")
+
+    def test_unresolved_thread_holds_even_when_github_reports_clean(self):
+        self.threads = 1
+        self.assertEqual(self.bucket(), "held")
+
+    def test_review_thread_read_error_never_becomes_ready(self):
+        with mock.patch.object(ms, "unresolved_threads", side_effect=RuntimeError("review unavailable")):
+            with self.assertRaisesRegex(RuntimeError, "review unavailable"):
+                self.bucket()
 
 
 class Capacity(unittest.TestCase):
@@ -195,6 +264,10 @@ class Capacity(unittest.TestCase):
         buckets = {1: "ready", 2: "ready"}
         self.assertEqual(self.plan(prs, buckets), [("unpark", 1), ("resume", 2)])
 
+    def test_api_errors_do_not_clear_existing_capacity_labels(self):
+        prs = [pr(1, labels=["ci:parked"]), pr(2, labels=["ci:waiting"])]
+        self.assertEqual(self.plan(prs, {1: "error", 2: "error"}), [])
+
     def test_applying_capacity_actions_does_not_change_draft_state(self):
         target = pr(number=7)
         with mock.patch.object(ms, "add_label") as add_label, \
@@ -208,10 +281,17 @@ class Capacity(unittest.TestCase):
 
 class Merge(unittest.TestCase):
     def test_merge_pins_the_checked_head_and_uses_a_merge_commit(self):
-        with mock.patch.object(ms, "api") as api:
+        with mock.patch.object(ms, "api", return_value={"merged": True, "sha": "new"}) as api:
             self.assertEqual(ms.merge(REPO, pr(number=7, sha="f00")), "merged")
         api.assert_called_once_with("PUT", f"repos/{REPO}/pulls/7/merge",
                                     {"merge_method": "merge", "sha": "f00"})
+
+
+    def test_merge_requires_an_explicit_success_confirmation(self):
+        for response in (None, {}, {"merged": False, "message": "refused"},
+                         {"merged": "true"}, {"merged": 1}):
+            with self.subTest(response=response), mock.patch.object(ms, "api", return_value=response):
+                self.assertTrue(ms.merge(REPO, pr()).startswith("refused:"))
 
 
 if __name__ == "__main__":
