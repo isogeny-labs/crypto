@@ -276,4 +276,3 @@ Raw221629bytes SHA25641ca32cee963b13adb6b5638abc52191de20f676b038874957a6b06e5e5
 remains NOT_UPLOADED; exact local path and bounded excerpt are in the receipt.
 No scientific acceptance has changed. The next implementation retains validation
 reference counts and explicitly emits query field/reduction counts with ownership.
-
