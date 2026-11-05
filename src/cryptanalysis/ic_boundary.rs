@@ -4994,24 +4994,10 @@ pub fn curve25519_family_instance(k: u32) -> Option<PrimeInstance> {
     // (k, p, a, b, #E, r, gx, gy), short Weierstrass `y² = x³ + ax + b`.
     const MINIATURES: &[(u32, u64, u64, u64, u64, u64, u64, u64)] = &[
         (
-            20,
-            1_048_573,
-            63_700,
-            872_826,
-            1_049_624,
-            131_203,
-            349_837,
-            122,
+            20, 1_048_573, 63_700, 872_826, 1_049_624, 131_203, 349_837, 122,
         ),
         (
-            24,
-            16_777_213,
-            16_743_506,
-            2_381_926,
-            16_778_792,
-            2_097_349,
-            109,
-            3_123_379,
+            24, 16_777_213, 16_743_506, 2_381_926, 16_778_792, 2_097_349, 109, 3_123_379,
         ),
         (
             28,
@@ -5034,8 +5020,7 @@ pub fn curve25519_family_instance(k: u32) -> Option<PrimeInstance> {
             592_057_774,
         ),
     ];
-    let &(_, p, a, b, group_order, r, gx, gy) =
-        MINIATURES.iter().find(|m| m.0 == k)?;
+    let &(_, p, a, b, group_order, r, gx, gy) = MINIATURES.iter().find(|m| m.0 == k)?;
     Some(PrimeInstance {
         name: format!("curve25519-family-k{k}"),
         curve: PrimeCurve { p, a, b },

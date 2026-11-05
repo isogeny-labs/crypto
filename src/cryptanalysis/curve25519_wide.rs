@@ -168,7 +168,7 @@ impl Curve25519Wide {
 
     pub fn double(&self, ops: &mut GroupOps, p: WidePoint) -> WidePoint {
         let f = &self.field;
-        let Some((x, y)) = p else { return None };
+        let (x, y) = p?;
         if f.is_zero(y) {
             return None;
         }

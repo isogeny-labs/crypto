@@ -25,11 +25,10 @@ use serde_json::{json, Value};
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
-    find_prime_order_curve, generic_floor_ops, koblitz_floor_instance, koblitz_instance,
-    curve25519_family_instance, random_binary_instance, rho_reference, rho_reference_negation,
-    roster_prime_instance,
-    signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps,
-    PinOutcome, PrimeInstance, RhoResult,
+    curve25519_family_instance, find_prime_order_curve, generic_floor_ops, koblitz_floor_instance,
+    koblitz_instance, random_binary_instance, rho_reference, rho_reference_negation,
+    roster_prime_instance, signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration,
+    CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
 };
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
@@ -1214,12 +1213,10 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         let profile = match &inst {
             Instance::Prime(i) => CurveProfile::of_prime(i),
             Instance::Binary(i) => CurveProfile::of_binary(i),
-            Instance::Wide255(_) => {
-                return Err(
-                    "--auto has no planner profile for the 255-bit curve; give the stages explicitly"
-                        .into(),
-                )
-            }
+            Instance::Wide255(_) => return Err(
+                "--auto has no planner profile for the 255-bit curve; give the stages explicitly"
+                    .into(),
+            ),
         };
         let plan = planner::plan(
             &profile,

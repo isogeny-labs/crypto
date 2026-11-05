@@ -2074,9 +2074,9 @@ fn main() {
             let seed: u64 = args.get(4).map_or(20_261_104, |v| v.parse().unwrap());
             println!(
                 "{}",
-                serde_json::to_string_pretty(
-                    &crypto_lib::cryptanalysis::curve25519_wide::smoke(base, trials, seed)
-                )
+                serde_json::to_string_pretty(&crypto_lib::cryptanalysis::curve25519_wide::smoke(
+                    base, trials, seed
+                ))
                 .unwrap()
             );
         }
