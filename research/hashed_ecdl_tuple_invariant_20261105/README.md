@@ -176,7 +176,7 @@ parameter for driver-created entries. It ties the incoming coefficient lists
 to the selected rows and gives a row-count condition for the remaining-degree
 sum. The DFS still explores choices at each row, including rejected choices;
 preparation still builds local R-by-C data and incoming coefficient lists.
-No traversal, allocation or arithmetic work is omitted by this audit.
+These source constraints leave traversal, allocation and arithmetic in the cost ledger.
 [pcc:unverified]
 
 Next, instantiate a faithful source refinement of this contract and audit the

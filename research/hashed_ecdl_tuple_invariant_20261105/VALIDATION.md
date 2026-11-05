@@ -22,7 +22,7 @@ constitute a signed verdict or a mathematical proof. [pcc:unverified]
   counting/curve code is executed. [pcc:unverified]
 - `/tmp/hashed-ecdl-tuple-report-venv/bin/python research/hashed_ecdl_tuple_invariant_20261105/render_report.py`:
   exit0 using Typst0.15.0 and Graphviz. Python performs document layout only.
-- `pdfinfo`: three A4 pages,70430bytes, PDF1.7, unencrypted. Rasterized with
+- `pdfinfo`: three A4 pages,70467bytes, PDF1.7, unencrypted. Rasterized with
   `pdftoppm -scale-to1300 -png`; all final pages inspected for readable graph,
   tables, state formulas and source identifiers. Editable Graphviz/Typst and
   the renderer are retained beside the PDF. [pcc:unverified]
@@ -84,3 +84,23 @@ anchors matched. Source pin remainsf96a6d after main advanced to a4dbbd282d;
 its PCC ledger and AGENTS bytes are unchanged. The final PR head and hosted
 checks must be read independently. Prior reports/runtime files are outside
 this scoped diff. [pcc:unverified]
+
+
+## Clean main integration
+
+Merged current main a4dbbd282d86b606c685d584ab0b3fee6cfce3d8 in
+6814de3cf073e2fe2e85addf444fad092e7ecebf. The ordinary merge was conflict-free;
+its tree aede83ea729bb68d421e0588ba47f80b0346e11c matches the read-only preview.
+All30 files across the three assessment directories were identical across
+that merge, and the PCC ledger was byte-identical to this branch's prior
+ledger. Both ordered parent raw-line sequences, including newlines, survive
+for October30 and November5 journals. No ledger event was rewritten or
+re-chained. The existing42-record benchmark gate returned0 afterward.
+[pcc:unverified]
+
+Incoming main's independent primality/arithmetic code and evidence are retained
+as base work; no broader crate-parity or validation claim is made. This audit
+still refers to the pinned f96a6d contraction sources. Final prose clarifies
+that local constraints leave traversal/allocation/arithmetic in the cost ledger;
+the publication PDF is70467bytes, with all three pages re-inspected. The earlier
+70430byte draft remains described above. [pcc:unverified]
