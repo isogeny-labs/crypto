@@ -1,3 +1,4 @@
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::process::Command;
@@ -134,7 +135,7 @@ fn native_ecbench_runs_large_prime_and_matched_rho_on_one_workload() {
     })
     .unwrap();
     let ic = ecbench_solve(&method, &instance, &workload.curve, &workload.target, 7).unwrap();
-    assert_eq!(ic.recovered, workload.planted);
+    assert_eq!(ic.recovered, workload.planted.map(ExactScalar::from));
     assert!(!ic.detail["verification_performed"].as_bool().unwrap());
     assert!(ic.unpriced.contains(&"row_ops_uncharged".to_string()));
 
@@ -144,7 +145,7 @@ fn native_ecbench_runs_large_prime_and_matched_rho_on_one_workload() {
     })
     .unwrap();
     let generic = ecbench_solve(&rho, &instance, &workload.curve, &workload.target, 7).unwrap();
-    assert_eq!(generic.recovered, workload.planted);
+    assert_eq!(generic.recovered, workload.planted.map(ExactScalar::from));
 }
 
 /// The golden file is the normalised `ic --json large-prime` output of the

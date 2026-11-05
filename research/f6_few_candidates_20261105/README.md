@@ -36,7 +36,7 @@ Now, as soon as a summand's assigned bits leave at most `KIC_F6_FEW_CANDIDATES` 
 
 **What this means.** The pair lookups and group additions are the same with and without the closure, so on these cells the algebra was not ruling out any candidate x-coordinate. With the pair index, F6-IC on these cells works as the pair-index meet-in-the-middle scan: the closure removes the algebra around that scan.
 - It is a real reduction in work for the `f6-ic` method: fewer word XORs, the same group operations.
-- It does not beat the meet-in-the-middle oracle the repository already has (ecbench's `mitm`), because in the limit it is that oracle.
+- It does not beat the meet-in-the-middle oracle the repository already has (ecbench's `mitm`), because in the limit it is that oracle [pcc:unverified].
 
 **Accounting.**
 - ecbench sessions now record `f6_ic_tree = 2` in their accounting versions.
@@ -87,6 +87,6 @@ The decomposing cells lose because a sequential solve stops at its first accepte
 
 ## Not claimed
 
-- No end-to-end index-calculus speed-up and no comparison against rho. Item 1 speeds up the `f6-ic` arm, and in the limit that arm is the existing meet-in-the-middle oracle.
+- No end-to-end index-calculus speed-up and no comparison against rho [pcc:unverified]. Item 1 speeds up the `f6-ic` arm, and in the limit that arm is the existing meet-in-the-middle oracle.
 - No `benchmarks/README.md` or leaderboard row: no replay certificate, validator report or rho reference has been produced (validation gate). Copies are in `benchmarks/20261105-f6-few-candidates/`.
 - Local development measurements, not an Iso Lab run.
