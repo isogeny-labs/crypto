@@ -1116,8 +1116,9 @@ method does not take).
   figure. The interval of a bounded ratio is that of the bounded
   statistic, not a coverage statement about the true ratio.
 - **Tail diagnostics.** Each arm reports max/median `S` and the largest
-  run's share of the arm's total (`tail`). Above 25 % the verdict adds
-  `heavy tail; more runs needed`: the mean is carried by one run.
+  run's share of the arm's total (`tail`). Above 25 %, and above twice
+  its equal share (`2/n`, so 50 % with four runs; with two runs never), the
+  verdict adds `heavy tail; more runs needed`: the mean is carried by one run.
 - **The pricing band (AGENTS.md §5a).** Each arm lists every unpriced
   counter with its count (`unpriced_counts`, summed over verified runs;
   `null` is a counter with no count). `ops.band` prices that native work,
