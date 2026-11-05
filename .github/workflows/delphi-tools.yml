@@ -1,0 +1,26 @@
+name: Delphi tools
+on:
+  pull_request:
+    paths:
+      - tools/delphi_tools/**
+      - .github/workflows/delphi-tools.yml
+  push:
+    paths:
+      - tools/delphi_tools/**
+      - .github/workflows/delphi-tools.yml
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install shellcheck and jq
+        run: sudo apt-get update && sudo apt-get install -y shellcheck jq
+      - name: shellcheck
+        run: find tools/delphi_tools -maxdepth 1 -type f ! -name '*.md' -print0 | xargs -0 shellcheck -s bash
+      - name: Tests
+        run: bash tools/delphi_tools/test.sh

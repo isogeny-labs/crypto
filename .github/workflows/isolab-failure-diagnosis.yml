@@ -1,0 +1,69 @@
+name: Diagnose fixed Iso Lab failures
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - workflow_run: '41260778029'
+            job_name: gh-41260778029-1
+            launcher_id: ceff664e-b91d-4cd8-8a86-cbe8faa98083
+            request_sha256: 3732f132b4b04e600270af891435633872358cc3c77890f7aa7729855dd53bcc
+          - workflow_run: '41260778856'
+            job_name: gh-41260778856-1
+            launcher_id: 47bce409-b8ea-4c00-8660-c0bc989ecb02
+            request_sha256: 0fc352b643f362f84fdc69c7d1062a1502dd228ae25b435ad72879c6b254ef55
+    env:
+      AWS_REGION: ${{ vars.ISOLAB_AWS_REGION }}
+      ISOLAB_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
+      SOURCE_REVISION: b4d751706eb2244314ebc9b84ba9545485ba4ac7
+      ECBENCH_SHA256: 0784fe47212d64dd2ee81510d3c28d2f604782086500135a3114c61738f854b7
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Test the fixed-target diagnosis contract
+        run: taskq/deploy/eks-karpenter/remote/test-diagnose-failed-run.sh
+      - name: Obtain temporary read credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: isolab-diagnose-${{ github.run_id }}
+          role-duration-seconds: 1800
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+      - name: Classify the retained failure without exposing measurements
+        env:
+          JOB_NAME: ${{ matrix.job_name }}
+          LAUNCHER_ID: ${{ matrix.launcher_id }}
+          REQUEST_SHA256: ${{ matrix.request_sha256 }}
+          FAILED_WORKFLOW_RUN: ${{ matrix.workflow_run }}
+        run: |
+          set -euo pipefail
+          mkdir -p diagnosis
+          taskq/deploy/eks-karpenter/remote/diagnose-failed-run \
+            "$JOB_NAME" "$LAUNCHER_ID" "$REQUEST_SHA256" \
+            "$SOURCE_REVISION" "$ECBENCH_SHA256" "$FAILED_WORKFLOW_RUN" \
+            "diagnosis/$FAILED_WORKFLOW_RUN.json"
+          jq -r '"Iso Lab failure diagnosis for workflow `\(.workflow_run)`: **\(if (.pods|length)==0 then "no retained pod identity" else (.pods|map(.classification)|join(", ")) end)**.\n\nNo experiment retry occurred. Raw records, timing values and stderr remain private."' \
+            "diagnosis/$FAILED_WORKFLOW_RUN.json" >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain only the allowlisted diagnosis
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: isolab-failure-diagnosis-${{ matrix.workflow_run }}
+          path: diagnosis/${{ matrix.workflow_run }}.json
+          if-no-files-found: error
+          retention-days: 30

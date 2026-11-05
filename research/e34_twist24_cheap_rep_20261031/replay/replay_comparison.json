@@ -1,0 +1,266 @@
+{
+ "schema": "e34-validator-replay-comparison/v1",
+ "rule": "every leaf of every committed record against the replay: numbers by their exact text, strings and booleans exactly, object key order and array lengths too; the records carry no wall-clock field, so nothing is excluded",
+ "runs_total": 10,
+ "runs_matched": 10,
+ "all_matched": true,
+ "fields_compared": 34076,
+ "fields_identical": 34076,
+ "walks_replayed": 1296,
+ "walks_correct": 1296,
+ "runs": [
+  {
+   "run": "identity",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/identity.json",
+    "sha256": "d6479f4aa7c1b82adb17b11f28ae9211dd1553dcdfc9fad3bb4f001abe57d111"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/identity.json",
+    "sha256": "d6479f4aa7c1b82adb17b11f28ae9211dd1553dcdfc9fad3bb4f001abe57d111"
+   },
+   "byte_identical": true,
+   "fields_compared": 344,
+   "fields_identical": 344,
+   "mismatches": [],
+   "matched": true,
+   "walks": 0,
+   "walks_correct": 0,
+   "logarithms": []
+  },
+  {
+   "run": "negative_walks",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/negative_walks.json",
+    "sha256": "05693f924b6fc8302d393f7344de056654891784ef529397e27ab264351621ba"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/negative_walks.json",
+    "sha256": "05693f924b6fc8302d393f7344de056654891784ef529397e27ab264351621ba"
+   },
+   "byte_identical": true,
+   "fields_compared": 420,
+   "fields_identical": 420,
+   "mismatches": [],
+   "matched": true,
+   "walks": 16,
+   "walks_correct": 16,
+   "logarithms": [
+    {
+     "p": 241,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p1069",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p1069.json",
+    "sha256": "65803d2162a9d42387410c1a8d1cfb0fd67d2d91821dcbf2e68ec6f913e3e31f"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p1069.json",
+    "sha256": "65803d2162a9d42387410c1a8d1cfb0fd67d2d91821dcbf2e68ec6f913e3e31f"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 1069,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p241",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p241.json",
+    "sha256": "eeeb357ba97c262cb88bc0ee45d749ebd3dd4d6e95c5afbf5ff5fa7b85a159c1"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p241.json",
+    "sha256": "eeeb357ba97c262cb88bc0ee45d749ebd3dd4d6e95c5afbf5ff5fa7b85a159c1"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 241,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p337",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p337.json",
+    "sha256": "7046ac5dbcb4f2f96ebc296ad11a4acfce3055002d310d36be177c2ea268110d"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p337.json",
+    "sha256": "7046ac5dbcb4f2f96ebc296ad11a4acfce3055002d310d36be177c2ea268110d"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 337,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p541",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p541.json",
+    "sha256": "9157d53db6e2d946590abc930a4a14ff913a666c3b6f172babae89dfb4c43986"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p541.json",
+    "sha256": "9157d53db6e2d946590abc930a4a14ff913a666c3b6f172babae89dfb4c43986"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 541,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p601",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p601.json",
+    "sha256": "0cd28049524dd477171dfbfeedde23ade3cbe23c1e2dea54c3993ea092d3936d"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p601.json",
+    "sha256": "0cd28049524dd477171dfbfeedde23ade3cbe23c1e2dea54c3993ea092d3936d"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 601,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p733",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p733.json",
+    "sha256": "0159a1acda5b8fe5ada1e6568ca8190b6373eb9117d7bdc97115a57519be0153"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p733.json",
+    "sha256": "0159a1acda5b8fe5ada1e6568ca8190b6373eb9117d7bdc97115a57519be0153"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 733,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p769",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p769.json",
+    "sha256": "e57ebd0b2b336541ce87a863b70767618fe04b80efac21ae590b258b19fcf2bd"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p769.json",
+    "sha256": "e57ebd0b2b336541ce87a863b70767618fe04b80efac21ae590b258b19fcf2bd"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 769,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  },
+  {
+   "run": "stage_r_p997",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p997.json",
+    "sha256": "6668ebb33c0f8c8eb7dde73a99e6d1a2168da630e9deb48b9a34f9bbeabd23ab"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p997.json",
+    "sha256": "6668ebb33c0f8c8eb7dde73a99e6d1a2168da630e9deb48b9a34f9bbeabd23ab"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160,
+   "logarithms": [
+    {
+     "p": 997,
+     "recovered_logs_distinct": [
+      "271"
+     ]
+    }
+   ]
+  }
+ ]
+}

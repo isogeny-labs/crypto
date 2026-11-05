@@ -1,0 +1,41 @@
+rows: 82  (sha256 f5b9f57340d60c41be169b72b445bd6ab17f0b4c8d0f90afcdbb0e346ca65cb9)
+
+== per (k, arm): attempts x curves, Dreg (mean, sd, distribution), solutions mean, time medians ==
+k=3   badapt  n=10     dreg mean 6.200 sd 0.422 hist {6: 8, 7: 2} sol_mean 0.0000 t_med 0.0035s
+k=3  bsparse  n=48     dreg mean 6.479 sd 0.505 hist {6: 25, 7: 23} sol_mean 0.0000 t_med 0.0051s
+k=3     stdv  n=24     dreg mean 6.583 sd 0.504 hist {6: 10, 7: 14} sol_mean 0.0000 t_med 0.0307s
+
+isomorphic-model control (Frobenius conjugate instance): 0/0 identical (dreg, solutions, refuted)
+A/A repeat: 0/0 identical counts; time ratio repeat/first median NaN, sd NaN (noise floor for the time column)
+within-orbit Dreg spread (same V, x_R; curves of one orbit are Galois conjugates but V is NOT conjugated, so this is a between-presentation spread):
+  #distinct dreg values per (k, attempt, orbit): {}
+
+== main arm mean dreg by (k, orbit) ==
+
+== presentation-family minima per (k, arm, curve, attempt): min Dreg over presentations | min time | #pres | sel (w,deg) of b image | mod-weight at min time ==
+k=3   badapt E0     att=0 dreg_min=6 (2/2 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=19
+k=3   badapt E0     att=1 dreg_min=6 (2/2 pres reach it) t_at_dreg_min=0.003s t_min=0.003s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=21
+k=3   badapt L000   att=0 dreg_min=6 (1/1 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=21
+k=3   badapt L000   att=1 dreg_min=7 (1/1 pres reach it) t_at_dreg_min=0.053s t_min=0.053s dreg_s_min=0.049s sel(w,deg)=(1,1) modw@tmin=21
+k=3   badapt L043   att=0 dreg_min=7 (1/1 pres reach it) t_at_dreg_min=0.034s t_min=0.034s dreg_s_min=0.032s sel(w,deg)=(1,1) modw@tmin=19
+k=3   badapt L043   att=1 dreg_min=6 (1/1 pres reach it) t_at_dreg_min=0.005s t_min=0.005s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=19
+k=3   badapt L086   att=0 dreg_min=6 (1/1 pres reach it) t_at_dreg_min=0.003s t_min=0.003s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=25
+k=3   badapt L086   att=1 dreg_min=6 (1/1 pres reach it) t_at_dreg_min=0.005s t_min=0.005s dreg_s_min=0.002s sel(w,deg)=(1,1) modw@tmin=25
+k=3  bsparse E0     att=0 dreg_min=6 (5/6 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=(1,0) modw@tmin=5
+k=3  bsparse E0     att=1 dreg_min=6 (5/6 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=(1,0) modw@tmin=25
+k=3  bsparse L000   att=0 dreg_min=6 (4/6 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=21
+k=3  bsparse L000   att=1 dreg_min=6 (2/6 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=27
+k=3  bsparse L043   att=0 dreg_min=6 (2/6 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=19
+k=3  bsparse L043   att=1 dreg_min=6 (2/6 pres reach it) t_at_dreg_min=0.003s t_min=0.003s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=19
+k=3  bsparse L086   att=0 dreg_min=6 (2/6 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=25
+k=3  bsparse L086   att=1 dreg_min=6 (3/6 pres reach it) t_at_dreg_min=0.004s t_min=0.004s dreg_s_min=0.001s sel(w,deg)=(1,1) modw@tmin=25
+k=3     stdv E0     att=0 dreg_min=6 (3/3 pres reach it) t_at_dreg_min=0.001s t_min=0.001s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=-
+k=3     stdv E0     att=1 dreg_min=6 (3/3 pres reach it) t_at_dreg_min=0.001s t_min=0.001s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=-
+k=3     stdv L000   att=0 dreg_min=7 (3/3 pres reach it) t_at_dreg_min=0.027s t_min=0.027s dreg_s_min=0.026s sel(w,deg)=- modw@tmin=-
+k=3     stdv L000   att=1 dreg_min=6 (1/3 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=-
+k=3     stdv L043   att=0 dreg_min=6 (1/3 pres reach it) t_at_dreg_min=0.001s t_min=0.001s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=-
+k=3     stdv L043   att=1 dreg_min=6 (1/3 pres reach it) t_at_dreg_min=0.002s t_min=0.002s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=-
+k=3     stdv L086   att=0 dreg_min=6 (1/3 pres reach it) t_at_dreg_min=0.001s t_min=0.001s dreg_s_min=0.001s sel(w,deg)=- modw@tmin=-
+k=3     stdv L086   att=1 dreg_min=7 (3/3 pres reach it) t_at_dreg_min=0.035s t_min=0.035s dreg_s_min=0.034s sel(w,deg)=- modw@tmin=-
+
+Decision rule, null set and thresholds: PROTOCOL.md section 6.  Masked output hides arm names; rerun with --unmask only after the analysis is frozen.

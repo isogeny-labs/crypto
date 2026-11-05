@@ -1,0 +1,20 @@
+{
+ "idea_id": "MP-comm_alg-3",
+ "skeptic_lens": "prior-art and closure collision",
+ "verdict": "survives_with_fix",
+ "confidence": 0.6,
+ "reason": "PARTIAL COVERAGE. Covered: the single-K-generator + Frobenius-conjugates framing (W_d(F) (x) K = sigma-stable closure of u; d_F <= d_K) is textbook Galois descent (Lang/Speiser) and is already stated in THM_SEMAEV_FALL1 Remark 1 ('descended system is built from a single equation f over K together with its Frobenius conjugates') and Lemma 1/Cor 1 (g^q = g^phi mod field eqs, free fall); Caminata-Ceria-Gorla Weil-restriction results (arXiv 2112.10506, THM_FALLDEG_INVARIANTS1 Prop 4.13/Cor 4.12) already treat the descended system as a function of the single K-system (d_reg(Weil(F)) = n(d_reg(F)-1)+1, sd <= n*reg-n+1; linear-in-n upper bound, no lower bound); Yeo/HKY 1505.02532 give last-fall-degree upper bounds independent of n for the K-system. Not collided: no closure in MAP_closed/atlas covers it; LEAD-ICB-frobenius-search-symmetry (closed_obstructed) is about search symmetry, correctly distinguished by the idea. No 'K-closure'/'semilinear'/'single-generator' hit in MAP_closed, MAP_ideas_corpus, atlas, treatise, frontiers forecloses phrases, or 2 extended web searches. UNCOVERED: the quantity d_K (K-closure of u alone with Boolean field equations a_j^2=a_j) and the gap d_K - d_F, plus K-valued pseudo-expectation lower-bound route. RISK that hypothesis (a) is false: the Frobenius collapse u^2 = u^phi mod field eqs is reached by multiplying u by u (degree up to 2 deg u), not by multiplying by single variables, so it is NOT available inside a degree-d variable-multiplication closure for the one-generator V^K_d(u); cross-conjugate falls therefore need not be bounded by 1, and d_K may exceed d_F by an unbounded amount (single quadratic over K in 2k Boolean vars likely needs d_K ~ k). If so d_K is a poor proxy and a growing lower bound on d_K says nothing about d_F. Also the closure sum_i sigma^i V^K_d(u) is only a subspace of W_d(F)(x)K (cancellation between different conjugates at intermediate degree is exactly what is lost). No B*D^2 effect: theory item, class theory.",
+ "fix": "Drop framing/claim that single-generator descent is new (cite THM_SEMAEV_FALL1 Remark 1, CCG 2112.10506 Prop 4.13, Galois descent). Keep only: measure d_K and gap d_K - d_F on n=9..17 (falsifier as designed). Add control arm: close {u, u^2-reduced=u^phi} (i.e. include the Frobenius-collapse generators explicitly) and {u,...,sigma^j u} for j=0..n-1 to find the minimum number of conjugates needed; predict gap grows if (a) fails. Mark novelty_unverified; only d_K/gap quantity and K-pseudo-expectation lower-bound route are uncovered.",
+ "collisions": [
+  "THM_SEMAEV_FALL1 Remark 1 + Lemma 1 + Corollary 1 (single f over K with Frobenius conjugates; g^q = g^phi mod I_q)",
+  "THM_FALLDEG_INVARIANTS1 / Caminata-Ceria-Gorla arXiv 2112.10506 Prop 4.13, Cor 4.12 (Weil restriction of single K-system; d_reg and sd as functions of K-system)",
+  "Huang-Kosters-Yeo arXiv 1505.02532 (last fall degree of Weil descent bounded independent of n)",
+  "Caminata-Gorla eprint 2021/1611 (sd vs last fall degree); Kousidis-Wiemers arXiv 1906.05594",
+  "treatise falldegree.tex Thm reform (span F = {Tr(delta w)} + l0) = coefficient-wise trace of single K-polynomial",
+  "treatise prog_openproblems.tex line ~149 pseudo-solution proof route (idea's K-valued pseudo-expectation is a K-linear variant)",
+  "LEAD-ICB-frobenius-search-symmetry (closed_obstructed) - adjacent only, scope differs (search symmetry vs proof object)",
+  "Lang/Speiser Galois descent of subspaces (textbook)",
+  "No hit for K-closure/semilinear/single-generator in MAP_closed.json, MAP_ideas_corpus.json, LEAD_ATLAS_DISPOSITIONS.tsv, FRONTIER_KNOWN_RESULTS_IC.txt; web searches (2 extended) found no paper on one-generator K-closure of Weil descent"
+ ],
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-comm_alg-3.collision.json"
+}

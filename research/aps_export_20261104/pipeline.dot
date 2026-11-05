@@ -1,0 +1,17 @@
+digraph aps_export {
+  graph [rankdir=LR, bgcolor="white", pad="0.18", nodesep="0.18", ranksep="0.28"];
+  node [shape=box, style="rounded,filled", fillcolor="#f1f5f9", color="#334155", fontname="Helvetica", fontsize=10];
+  edge [color="#64748b", arrowsize=0.7];
+  protocol [label="Frozen protocol\nplan + analysis pins"];
+  plan [label="Planned execution slots"];
+  raw [label="Literal record lines\nall observed outcomes"];
+  history [label="Explicit attempt /\nrestore sidecar"];
+  match [label="Bind method, target,\nseed, round, warmup", fillcolor="#dbeafe"];
+  audit [label="Separate arithmetic\nroot sets + metric sums", fillcolor="#dcfce7"];
+  export [label="Native canonical export\nall clocks invalid", fillcolor="#dbeafe"];
+  missing [label="Unobserved slots\nkept by identity", fillcolor="#fef3c7"];
+  replay [label="Reopen pinned inputs\nand reconstruct export"];
+  protocol -> match; plan -> match; raw -> match; history -> match;
+  match -> audit; audit -> export; match -> missing; missing -> export;
+  export -> replay;
+}

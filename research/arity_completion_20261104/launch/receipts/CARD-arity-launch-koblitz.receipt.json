@@ -1,0 +1,60 @@
+{
+  "card_id": "CARD-arity-launch-koblitz",
+  "card_path": "research/arity_completion_20261104/cards/CARD-arity-launch-koblitz.yaml",
+  "card_sha256": "3aaa26e749f32e8cca7c92db23bb3eff159fa26e8954d2b740ab7b043227f618",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/arity_completion_20261104/cards/gates/source-identity.py",
+        "research/arity_completion_20261104/launch/request-koblitz.json",
+        "research/arity_completion_20261104/launch/image.json",
+        "4fa25efc0e2392b2e02e4c84253059ebc7c67e02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 0.635,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "source-identity",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.635,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "43818f931d1fedc838b1529b5e9196aff62db96ef27ecba2f689d4a47a7f0d87",
+      "stdout_tail": [
+        "HEAD ae722bb2791a2f72afb23279b7e8da6e570cbefb",
+        "request.provenance.source_revision 4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+        "image.source_revision 4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+        "request.job.image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "image.image_uri 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "git status --porcelain:",
+        " M .resume/RESUME.md",
+        "",
+        "OK   git HEAD is 40 hex",
+        "FAIL git status --porcelain is empty",
+        "OK   request provenance.source_revision == image.json source_revision",
+        "OK   image.json source_revision == frozen commit",
+        "OK   request job.image == image.json image_uri"
+      ],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "ae722bb2791a2f72afb23279b7e8da6e570cbefb",
+  "dirty_after": [
+    "resume/RESUME.md"
+  ],
+  "dirty_before": [
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 1"
+}

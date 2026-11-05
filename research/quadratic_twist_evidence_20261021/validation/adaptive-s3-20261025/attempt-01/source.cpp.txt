@@ -1,0 +1,119 @@
+#include "reduced-s3-prior.hpp"
+
+namespace adaptive {
+using namespace s3yield;
+using Witness=std::array<Polynomial,3>;
+struct Row {Polynomial f; Witness w;};
+bool order(Mono a,Mono b){return std::pair{a[0]+a[1],a[0]}<std::pair{b[0]+b[1],b[0]};}
+Mono lead(const Polynomial&f){require(!f.empty(),"zero lead");Mono m=f.begin()->first;for(auto [n,c]:f){(void)c;if(order(m,n))m=n;}return m;}
+Json poly(const Polynomial&f){auto j=arr();for(auto [m,c]:f)j.items.push_back(nums({m[0],m[1],c}));return j;}
+I expanded(const Row&r,const std::array<Polynomial,3>&original){I d=0;for(I j=0;j<3;++j)if(!r.w[j].empty()&&!original[j].empty())d=std::max(d,degree(r.w[j])+degree(original[j]));return d;}
+Json row_json(const Row&r,const std::array<Polynomial,3>&original){auto ws=arr();for(auto &w:r.w)ws.items.push_back(poly(w));return obj({{"poly",poly(r.f)},{"witness",ws},{"expanded_degree",num(expanded(r,original))}});}
+Row scale(Row r,I c,I p){r.f=times(r.f,constant(c,p),p);for(auto &w:r.w)w=times(w,constant(c,p),p);return r;}
+void subtract(Row&a,const Row&b,I c,I p){a.f=plus(a.f,b.f,p,-c);for(I j=0;j<3;++j)a.w[j]=plus(a.w[j],b.w[j],p,-c);}
+Polynomial shift(const Polynomial&f,Mono s){Polynomial q;for(auto [m,c]:f)q[{m[0]+s[0],m[1]+s[1]}]=c;return q;}
+std::vector<Row> basis(const std::vector<Row>&pool,I D,I p,const std::array<Polynomial,3>&original,I&peak){
+  std::map<Mono,Row> pivots;
+  for(auto &g:pool)if(!g.f.empty()&&degree(g.f)<=D)for(auto m:monomials(D-degree(g.f))){
+    Row r;r.f=shift(g.f,m);for(I j=0;j<3;++j)r.w[j]=shift(g.w[j],m);
+    peak=std::max(peak,expanded(r,original));require(peak<=32,"expanded cap");
+    while(!r.f.empty()){
+      Mono l=lead(r.f);I c=r.f.at(l);auto it=pivots.find(l);
+      if(it==pivots.end()){pivots[l]=scale(r,ipow(c,p-2,p),p);break;}
+      subtract(r,it->second,c,p);
+    }
+  }
+  std::vector<Mono> keys;for(auto &[m,r]:pivots){(void)r;keys.push_back(m);}std::sort(keys.begin(),keys.end(),order);
+  for(auto m:keys)for(auto n:keys)if(order(m,n)&&pivots[n].f.count(m))subtract(pivots[n],pivots[m],pivots[n].f.at(m),p);
+  std::reverse(keys.begin(),keys.end());std::vector<Row> out;for(auto m:keys)out.push_back(pivots[m]);return out;
+}
+bool contains(Polynomial f,const std::vector<Row>&B,I p){for(auto&r:B){auto l=lead(r.f);if(f.count(l))f=plus(f,r.f,p,-f.at(l));}return f.empty();}
+std::vector<Mono> roots(const std::array<Polynomial,3>&f,I p){
+  std::vector<Mono> out;for(I x=0;x<p;++x)if(evaluate(f[1],x,0,p)==0)for(I y=0;y<p;++y)if(evaluate(f[2],0,y,p)==0&&evaluate(f[0],x,y,p)==0)out.push_back({x,y});return out;
+}
+Json solve(const std::array<Polynomial,3>&f,I p){
+  std::vector<Row> pool;I input_max=0;for(I j=0;j<3;++j){Row r;r.f=f[j];r.w[j]=constant(1,p);pool.push_back(r);if(!f[j].empty())input_max=std::max(input_max,degree(f[j]));}
+  auto rr=roots(f,p);auto root_json=arr();for(auto q:rr)root_json.items.push_back(nums({q[0],q[1]}));
+  auto trace=arr();I peak=0;
+  for(I D=0;D<=8;++D)for(I round=0;round<64;++round){
+    I before=I(pool.size());auto B=basis(pool,D,p,f,peak);auto ms=monomials(D);Echelon eval(p);
+    for(auto xy:rr){std::vector<I>v;for(auto m:ms)v.push_back(mod(ipow(xy[0],m[0],p)*ipow(xy[1],m[1],p),p));eval.insert(v);}
+    bool unit=false;for(auto&r:B)unit|=r.f==constant(1,p);
+    bool closure=D>=input_max&&B.size()+eval.pivots.size()==ms.size()&&eval.pivots.size()==rr.size();
+    auto promoted=arr();auto record=[&](){trace.items.push_back(obj({{"degree",num(D)},{"round",num(round)},{"pool_before",num(before)},{"rank",num(I(B.size()))},{"columns",num(I(ms.size()))},{"evaluation_rank",num(I(eval.pivots.size()))},{"promoted",promoted}}));};
+    if(unit||closure){
+      require(unit==rr.empty(),"terminal root status");record();auto cert=arr();I final_exp=0;
+      for(auto&r:B)if(!unit||r.f==constant(1,p)){cert.items.push_back(row_json(r,f));final_exp=std::max(final_exp,expanded(r,f));}
+      return obj({{"status",str(unit?"unit":"closure")},{"matrix_degree",num(D)},{"input_max_degree",num(input_max)},{"expanded_peak",num(peak)},{"certificate_expanded_degree",num(final_exp)},{"roots",root_json},{"certificate",cert},{"trace",trace}});
+    }
+    std::sort(B.begin(),B.end(),[](const Row&a,const Row&b){I da=degree(a.f),db=degree(b.f);return da!=db?da<db:dump(poly(a.f))<dump(poly(b.f));});
+    for(auto&r:B)if(degree(r.f)<D){auto low=basis(pool,degree(r.f),p,f,peak);if(!contains(r.f,low,p)){promoted.items.push_back(row_json(r,f));pool.push_back(r);}}
+    record();if(promoted.items.empty())break;require(round<63,"round cap");
+  }
+  throw std::runtime_error("operational cap");
+}
+std::vector<I> vec(const Json&j){std::vector<I>v;for(auto &x:j.items)v.push_back(x.integer());return v;}
+Point point(const Json&j){auto v=vec(j);return {v.at(0),v.at(1)};}
+Polynomial remainder(const Curve&c,I z,const std::vector<I>&xs){
+  I p=c.f.p,s=xs[0]+xs[1],t=xs[0]*xs[1];Polynomial h;
+  term(h,{1,1},s*s-4*s*z-2*z*z-2*c.a,p);I B=-s*t+2*z*t+s*z*z-2*c.a*z-4*c.b;
+  term(h,{1,0},B,p);term(h,{0,1},B,p);term(h,{0,0},t*t-2*t*z*z+c.a*c.a-4*c.b*z,p);return h;
+}
+Json arm(const Curve&c,const Json&src,I r){
+  auto P=point(src.at("generator"));auto xs=vec(src.at("base_x"));std::vector<Point>bs;for(auto&q:src.at("base_points").items)bs.push_back(point(q));
+  require(xs.size()==2&&bs.size()==2&&xs[0]!=xs[1],"base shape");
+  require(c.f.mul(P.y,P.y)==c.rhs(P.x)&&c.scalar(r,P).infinity(),"generator");
+  std::vector<I>logs;for(I i=0;i<2;++i){require(bs[i].x==xs[i]&&c.f.mul(bs[i].y,bs[i].y)==c.rhs(bs[i].x),"valid base");I n=0;while(n<r&&c.scalar(n,P)!=bs[i])++n;require(n<r,"base subgroup");logs.push_back(n);}
+  auto out=arr();Echelon rank(r);auto gx=base_poly(xs,0,c.f.p),gy=base_poly(xs,1,c.f.p);
+  for(I n=1;n<r;++n){auto R=c.scalar(n,P);auto f=system_s3(c.a,c.b,R.x,c.f.p),h=remainder(c,R.x,xs);
+    auto raw=solve({f,gx,gy},c.f.p),red=solve({h,gx,gy},c.f.p);require(dump(raw.at("roots"))==dump(red.at("roots")),"encoding roots");
+    std::set<std::vector<I>>rows;I before=I(rank.pivots.size());std::vector<Mono>actual_roots;
+    for(I i=0;i<2;++i)for(I j=0;j<2;++j){bool lift=false;for(I si:{-1,1})for(I sj:{-1,1})if(c.add(c.scalar(si,bs[i]),c.scalar(sj,bs[j]))==R){lift=true;std::vector<I>v(2);v[i]=mod(v[i]+si,r);v[j]=mod(v[j]+sj,r);require(mod(v[0]*logs[0]+v[1]*logs[1],r)==n,"row scalar");rows.insert(v);rank.insert(v);}if(lift)actual_roots.push_back({xs[i],xs[j]});}
+    std::sort(actual_roots.begin(),actual_roots.end());auto actual=arr();for(auto xy:actual_roots)actual.items.push_back(nums({xy[0],xy[1]}));require(dump(actual)==dump(red.at("roots")),"actual point roots");auto rj=arr();for(auto&v:rows)rj.items.push_back(nums(v));
+    auto&old=src.at("targets").items.at(size_t(n-1));require(old.at("before").integer()==before&&old.at("after").integer()==I(rank.pivots.size())&&dump(old.at("rows"))==dump(rj),"frozen useful rank");
+    out.items.push_back(obj({{"n",num(n)},{"rows",rj},{"before",num(before)},{"after",num(I(rank.pivots.size()))},{"original",raw},{"reduced",red}}));
+  }
+  return obj({{"targets",out}});
+}
+Json recoveries(){
+  Field k(43);Curve E(k,1,0),T(k,4,0);Point P{31,18},U{24,26};std::vector<Point>base{{15,9},{17,6}};std::vector<I>xs{15,17};Echelon eq(11);
+  for(I i=0;i<2;++i)for(I j=0;j<2;++j)for(I si:{-1,1})for(I sj:{-1,1})if(T.add(T.scalar(si,base[i]),T.scalar(sj,base[j]))==U){std::vector<I>r(3);r[i]=mod(r[i]+si,11);r[j]=mod(r[j]+sj,11);r[2]=1;eq.insert(r);}
+  require(eq.pivots.size()==2&&!eq.pivots.count(2),"base log rank");std::vector<I>logs(2);for(auto it=eq.pivots.rbegin();it!=eq.pivots.rend();++it){I j=it->first,v=it->second[2];for(I m=j+1;m<2;++m)v-=it->second[m]*logs[m];logs[j]=mod(v,11);}
+  for(I i=0;i<2;++i)require(T.scalar(logs[i],U)==base[i],"recovered base logs");
+  auto recover=[&](Point Q){
+    Point mapped=Q.infinity()?Q:Point{mod(41*Q.x,43),mod(11*Q.y,43)};auto attempts=arr();I answer=-1;
+    if(Q.infinity())answer=0;
+    for(I shift=0;answer<0&&shift<11;++shift){auto R=T.add(mapped,T.scalar(shift,U));if(R.infinity())continue;
+      auto h=remainder(T,R.x,xs);auto cert=solve({h,base_poly(xs,0,43),base_poly(xs,1,43)},43);
+      attempts.items.push_back(obj({{"shift",num(shift)},{"matrix_degree",cert.at("matrix_degree")},{"status",cert.at("status")}}));
+      for(auto&root:cert.at("roots").items){auto xy=vec(root);for(I i=0;i<2;++i)for(I j=0;j<2;++j)if(xs[i]==xy[0]&&xs[j]==xy[1])for(I si:{-1,1})for(I sj:{-1,1})if(T.add(T.scalar(si,base[i]),T.scalar(sj,base[j]))==R&&answer<0)answer=mod(si*logs[i]+sj*logs[j]-shift,11);}
+    }
+    require(answer>=0&&E.scalar(answer,P)==Q,"main recovery verification");
+    return obj({{"target",nums({Q.x,Q.y})},{"mapped",nums({mapped.x,mapped.y})},{"recovered",num(answer)},{"attempts",attempts}});
+  };
+  auto out=arr();for(I n=0;n<11;++n)out.items.push_back(recover(E.scalar(n,P)));
+  return obj({{"base_logs",nums(logs)},{"targets",out}});
+}
+void compare(const std::string&l,const std::string&r,const Json&a,const Json&b,Json&out){
+  for(size_t i=0;i<a.at("targets").items.size();++i){auto&x=a.at("targets").items[i];auto&y=b.at("targets").items[i];I dx=x.at("after").integer()-x.at("before").integer(),dy=y.at("after").integer()-y.at("before").integer();
+    auto j=obj({{"main",str(l)},{"twist",str(r)},{"n",x.at("n")},{"main_useful",num(dx)},{"twist_useful",num(dy)}});
+    for(auto mode:{"original","reduced"}){I md=x.at(mode).at("matrix_degree").integer(),td=y.at(mode).at("matrix_degree").integer();j.fields[mode]=obj({{"main_degree",num(md)},{"twist_degree",num(td)},{"joint_gain",truth(dy>dx&&td<md)}});}out.items.push_back(j);
+  }
+}
+} // namespace adaptive
+int main(int argc,char**argv){try{
+  using namespace adaptive;require(argc==3,"usage: adaptive-s3 REDUCED_CASES FRESH_OUTPUT");fs::path input=argv[1],out=argv[2];require(!fs::exists(out),"fresh output");fs::create_directories(out);
+  std::vector<fs::path>files;for(auto&e:fs::directory_iterator(input))if(e.path().extension()==".json"&&e.path().filename()!="index.json")files.push_back(e.path());std::sort(files.begin(),files.end());require(files.size()==98,"source coverage");
+  std::map<std::string,Json>cases;std::vector<std::string>population,fixture;auto pins=arr();
+  for(auto&file:files){auto bytes=read(file);auto src=parse(bytes);I p=src.at("p").integer(),a=src.at("a").integer(),b=src.at("b").integer(),d=src.at("d").integer(),r=src.at("r").integer();Field k(p);Curve E(k,a,b),T(k,mod(d*d*a,p),mod(d*d*d*b,p));
+    auto c=obj({{"p",num(p)},{"a",num(a)},{"b",num(b)},{"d",num(d)},{"r",num(r)},{"source_sha256",str(digest(bytes))}});
+    for(auto role:{"main","twist","matched","pulled_back_twist_base"})if(src.fields.count(role))c.fields[role]=arm(std::string(role)=="twist"||std::string(role)=="matched"?T:E,src.at(role),r);
+    if(c.fields.count("matched"))for(auto pair:{std::pair{"main","matched"},std::pair{"twist","pulled_back_twist_base"}})for(size_t n=0;n<c.at(pair.first).at("targets").items.size();++n)for(auto mode:{"original","reduced"}){
+      auto&x=c.at(pair.first).at("targets").items[n].at(mode);auto&y=c.at(pair.second).at("targets").items[n].at(mode);require(x.at("matrix_degree").integer()==y.at("matrix_degree").integer()&&x.at("status").string()==y.at("status").string(),"matched degree/status");}
+    std::string name=file.filename().string();cases[name]=c;(p==43?fixture:population).push_back(name);auto encoded=dump(c)+'\n';std::ofstream(out/name)<<encoded;pins.items.push_back(obj({{"case",str(name)},{"sha256",str(digest(encoded))}}));
+  }
+  require(population.size()==88&&fixture.size()==10,"population coverage");auto comps=arr();for(auto&s:population)compare(s,s,cases.at(s).at("main"),cases.at(s).at("twist"),comps);for(auto&l:fixture)for(auto&r:fixture)compare(l,r,cases.at(l).at("main"),cases.at(r).at("twist"),comps);
+  I raw=0,red=0;for(auto&c:comps.items){raw+=c.at("original").at("joint_gain").boolean();red+=c.at("reduced").at("joint_gain").boolean();}
+  auto index=obj({{"schema",str("quadratic-twist-adaptive-s3/v1")},{"cases",pins},{"comparisons",comps},{"comparison_count",num(188)},{"target_comparisons",num(I(comps.items.size()))},{"joint_original",num(raw)},{"joint_reduced",num(red)},{"recoveries",recoveries()}});
+  std::ofstream(out/"index.json")<<dump(index)<<'\n';std::cout<<"98 cases / 188 comparisons / "<<comps.items.size()<<" targets; joint raw="<<raw<<", reduced="<<red<<"; eleven actual main-point recoveries\n";
+}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
