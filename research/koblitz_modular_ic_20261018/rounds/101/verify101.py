@@ -44,7 +44,7 @@ def main() -> None:
         raise ValueError("lambda Frobenius factor identity failed")
     if mul(1 << 3, power(3, 4)) != base_specialization:
         raise ValueError("base factor identity failed")
-    if q & 1 == 0 or (q.bit_count() & 1) == 0:
+    if q & 1 == 0 or (bin(q).count("1") & 1) == 0:
         raise ValueError("quadratic has an F2 root")
     if 3 * 8 * 2 != 48 or 4 * 8 * 2 != 64 or 48 + 64 != 112:
         raise ValueError("fiber lengths do not match source degree")
