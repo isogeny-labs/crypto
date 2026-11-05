@@ -1873,6 +1873,26 @@ fn cms_svg(cms: &Replayed, native: Option<&Replayed>) -> String {
     s
 }
 
+/// A native comparison is admitted only after all receipt checks passed.
+fn replay_native_comparison(
+    manifest_text: &str,
+    receipts_text: &str,
+    sealed: Option<&str>,
+) -> Result<Replayed, String> {
+    let rp = replay_full(manifest_text, receipts_text, sealed)?;
+    let defects = rp.json["defects"]
+        .as_array()
+        .ok_or("native comparison is missing its defect list")?;
+    if !defects.is_empty() {
+        return Err(format!(
+            "native comparison has {} defect(s): {}",
+            defects.len(),
+            rp.json["defects"]
+        ));
+    }
+    Ok(rp)
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.len() < 2 {
@@ -1913,7 +1933,7 @@ fn main() {
     let is_cms = rp.json["schema"] == "phase_paired_cms/replay/v1";
     let native_rp = native.map(|p| {
         let nt = fs::read_to_string(p).expect("native receipts");
-        replay_full(&mtext, &nt, stext.as_deref()).unwrap_or_else(|e| {
+        replay_native_comparison(&mtext, &nt, stext.as_deref()).unwrap_or_else(|e| {
             eprintln!("native replay failed: {e}");
             std::process::exit(3);
         })
@@ -2508,5 +2528,39 @@ mod tests {
             a["cms"]["calls"][0]["status_line"] = json!("UNSATISFIABLE");
         })
         .is_empty());
+    }
+
+    #[test]
+    fn native_comparison_accepts_clean_receipts() {
+        let mtext = manifest_text();
+        let w = World::from_manifest(&mtext).unwrap();
+        let rp = replay_native_comparison(&mtext, &synthetic(&w), None).unwrap();
+        assert!(rp.json["defects"].as_array().unwrap().is_empty());
+    }
+
+    #[test]
+    fn native_comparison_rejects_defects_returned_in_a_successful_replay() {
+        let mtext = manifest_text();
+        let w = World::from_manifest(&mtext).unwrap();
+        for field in ["target", "found_points"] {
+            let mut lines: Vec<Value> = synthetic(&w)
+                .lines()
+                .map(|line| serde_json::from_str(line).unwrap())
+                .collect();
+            let receipt = lines
+                .iter_mut()
+                .find(|v| v["type"] == "attempt" && v["status"] == "verified" && v["arm"] == "B")
+                .unwrap();
+            if field == "target" {
+                receipt["target"][0] = json!("0x0");
+            } else {
+                receipt["found_points"][0][1] = json!("0x1");
+            }
+            let text = join(&lines);
+            let replayed = replay_full(&mtext, &text, None).unwrap();
+            assert!(!replayed.json["defects"].as_array().unwrap().is_empty());
+            let error = replay_native_comparison(&mtext, &text, None).err().unwrap();
+            assert!(error.contains("native comparison has"), "{field}: {error}");
+        }
     }
 }
