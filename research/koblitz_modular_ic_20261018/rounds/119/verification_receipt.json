@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/119/verify119.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "y0_e1 independent F4 bit planes match\ny0_e3 independent F4 bit planes match\ny1_e1 independent F4 bit planes match\ny1_e2 independent F4 bit planes match\nTRANSLATE119_INDEPENDENT_PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/119/generate_lean119.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "LEAN119_SOURCE_BINDING_PASS\n"
+    },
+    {
+      "argv": [
+        "lean",
+        "research/koblitz_modular_ic_20261018/rounds/119/lean/F4Newton119.lean"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/119/translate119.py",
+        "/tmp/koblitz-r119-replay2"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "TRANSLATE119_ALL_CHECKS_PASS\n"
+    }
+  ],
+  "files_sha256": {
+    "PROTOCOL.md": "d2d46fd35fba0e9cb2c962cf2f946db34d05b6513346983f4c19cf01b1b59d55",
+    "generate_lean119.py": "1363305647687d43dc64ecaa1fdc8fe7dc0cb6d4faa31854ad4eb22bceb2b62b",
+    "lean/F4Newton119.lean": "b9ebcb61715077b15f8e4db63f7c30c3a1fc780d22b2f4b0b0313cb0e96362ec",
+    "protocol.json": "57d18537500abe1eb5ac24a68fd18cec22bbff1fcdfac56eda28fa3149a6c1ff",
+    "publication/report.pdf": "624b64a31a3808145b19f6a48da08e9a4b9fa55b7a93b20cea6a61c97bd99dee",
+    "result.json": "712278837f84ed1eba630a5aa368a534be7bdd381196ff27ff3fd1a0f52ffa71",
+    "translate119.py": "10c64d48661e300fe5e9bdbefb7a111416cca9bdf1b17a7be7638edbf148f3ff",
+    "verify119.py": "321bff3b9773b7b7e99e0603a4bda1fe66dd7fd4b71a4166aafe567ba3a9ea0d"
+  },
+  "replay_byte_identical": true
+}
