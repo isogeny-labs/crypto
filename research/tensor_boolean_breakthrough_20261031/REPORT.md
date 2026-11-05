@@ -53,6 +53,14 @@ match an independent rational eliminator. See
 [`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md) and the dated
 [lead reconciliation](SEARCH_20261101.md).
 
+The census now emits independently recomputable nonzero-minor certificates.
+A Lean-checked theorem proves that an order-`k` certificate forces every exact
+linear separator factorization to use at least `k` coordinates. A second
+theorem makes the asymptotic gap precise: exponential rank on a linear-width
+family, plus an explicit message-to-work condition, forces exponential work
+for that architecture. The required production family rank lemma is still
+open. See [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md).
+
 This is instrument verification, not an E1 row. Stable production semantic
 cuts, matched rewired nulls, a fresh-process A/A runner, disjoint preflight and
 the final frozen identities remain open. No affected rank data has been taken.

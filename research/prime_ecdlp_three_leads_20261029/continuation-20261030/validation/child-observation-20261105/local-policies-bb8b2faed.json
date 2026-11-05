@@ -1,0 +1,42 @@
+{
+  "recorded_utc": "2026-11-05T13:23:27.219271+00:00",
+  "tested_head": "bb8b2faed894d76ac8714b5631e313cdc35e5be0",
+  "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "wrapper_exit": 0,
+  "passed": [
+    "PRdelta whitespace",
+    "size",
+    "artifacts",
+    "benchrec37current",
+    "localchain/d30prefix117"
+  ],
+  "captures": {
+    "artifacts.log": {
+      "raw_utf8": "artifacts check: no data files committed\n",
+      "raw_bytes": 41,
+      "raw_sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934"
+    },
+    "benchrec.log": {
+      "raw_utf8": "benchrec: OK, 37 record(s), progress report current\n",
+      "raw_bytes": 52,
+      "raw_sha256": "edb93f3fb65973557b2a971cbf34983528e61662e524059d93cf3382b2fedeb8"
+    },
+    "pcc-d30-prefix.log": {
+      "raw_utf8": "ledger: 117 entries, chain ok\n",
+      "raw_bytes": 30,
+      "raw_sha256": "b83bd01fd1aee738c47eacbfb26cbeb164dde2b33d71f96028fb9c6e7262cac7"
+    },
+    "size.log": {
+      "raw_utf8": "check-large-files: no added or modified file over 10485760 bytes\n",
+      "raw_bytes": 65,
+      "raw_sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec"
+    },
+    "whitespace.log": {
+      "raw_utf8": "",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "excludes": "currentmainprefixfork,globalPCC13,inheritedstrictlint2,runtimeclock2,cappedlibrary and GitHubCI; these are not passes",
+  "pcc_standing": "unverified producer observation"
+}

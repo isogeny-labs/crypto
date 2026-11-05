@@ -1,0 +1,237 @@
+{
+  "assessed": "2026-11-04T16:11:20Z",
+  "round": 35,
+  "rule": "improvement = paired sel/inc 95% interval below 1 at w = 0 and band order sel < inc at every weight; regression = interval above 1 or band inc < sel; else null",
+  "schema": "ic_autolab.result/v1",
+  "sizes": {
+    "24": {
+      "class": "no_challenger",
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09-sr",
+        "n": 2,
+        "name": "wwalkGg-x09-sr-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        2.105468649162268,
+        2.1480283586153517,
+        2.5310657436931066
+      ],
+      "why": [
+        "no_challenger"
+      ]
+    },
+    "28": {
+      "band_rho": "rho-neg < sel",
+      "band_verdict": "unresolved inside the band",
+      "class": "null",
+      "distance_to_rho": {
+        "inc": [
+          1.8890460755108196,
+          1.7610304784151518,
+          1.1662732973113588
+        ],
+        "sel": [
+          1.8616763559533327,
+          1.7403883695978486,
+          1.1768874954611228
+        ]
+      },
+      "evidence": {
+        "binary_sha256": "294344544cac9f2701e796bdb298a316b737aec15801948a6489f579c2ae2ca4",
+        "compare_verdict": "ops (ok): sel / inc = 0.9855 [0.888, 1.094] (linearised_t, df 31) over 64 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9855, w=0.1: 0.9883, w=1: 1.0091): unresolved inside the band; wall: admitted ns/GAE sel/inc 0.9172 [0.877, 0.959], bias-corrected 0.8784 [0.825, 0.935] (A/A 1.0441, includes arm A), outside noise; end-to-end wall 0.9039 [0.824, 0.992]; ns/GAE of inc, sel is an upper bound on its cost per operation (GAE is a lower bound)",
+        "levels": {
+          "verified": 480
+        },
+        "session_dir": "research/curve25519_autolab_20261104/round-035/sessions/holdout-k28",
+        "session_id": "ECBS1h96fcdf912133",
+        "spec_sha256": "2011df0e207f38ca043fae534409944d5d7b5dadd2be56997e2fffb84e63722d",
+        "verify_exit": 0,
+        "verify_receipt": "research/curve25519_autolab_20261104/round-035/analysis/verify-holdout-k28.json",
+        "verify_receipt_sha256": "d25d4553ba0d1501b96c791cc8513a0de1c0b7059746cbaa69cbd773f62dfde0"
+      },
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09-sr",
+        "n": 2,
+        "name": "wwalkGg-x09-sr-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": {
+        "aa": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "ratio": 1.0
+        },
+        "w0": {
+          "admissible": true,
+          "ci95": [
+            0.8878382284697746,
+            1.0939297250790054
+          ],
+          "ratio": 0.9855113541631934,
+          "status": "ok"
+        },
+        "w0.1": {
+          "ci95": [
+            0.8872347904788623,
+            1.1008294430262386
+          ],
+          "ratio": 0.9882783920719639
+        },
+        "w1": {
+          "ci95": [
+            0.8740411100486101,
+            1.165030707474531
+          ],
+          "ratio": 1.0091009527305763
+        }
+      },
+      "s": {
+        "inc": [
+          1.9413169792459333,
+          1.9793626770953632,
+          2.321773957740237
+        ],
+        "rho_neg": [
+          1.0276705287460917,
+          1.1239797955551005,
+          1.9907631968361834
+        ],
+        "sel": [
+          1.9131899250766586,
+          1.9561613638470645,
+          2.342904312780714
+        ]
+      },
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x08-sr",
+        "n": 2,
+        "name": "wwalkGg-x08-sr-n2",
+        "oracle": "wwalk:x=0.8,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "why": [
+        "compare ops.status = ok, admissible = true",
+        "sel / inc = 0.9855 [0.888, 1.094] at w = 0",
+        "band: unresolved inside the band",
+        "A/A inc-aa / inc interval [1.000, 1.000] contains 1"
+      ]
+    },
+    "32": {
+      "band_rho": "rho-neg < sel",
+      "band_verdict": "sel < inc",
+      "class": "null",
+      "distance_to_rho": {
+        "inc": [
+          2.2036551248209544,
+          2.1254482371285035,
+          1.7702403150745836
+        ],
+        "sel": [
+          2.0065544229499443,
+          1.8813980166541981,
+          1.3129500407307315
+        ]
+      },
+      "evidence": {
+        "binary_sha256": "294344544cac9f2701e796bdb298a316b737aec15801948a6489f579c2ae2ca4",
+        "compare_verdict": "ops (ok): sel / inc = 0.9106 [0.790, 1.050] (linearised_t, df 31) over 64 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9106, w=0.1: 0.8852, w=1: 0.7417): sel < inc at every weight; wall: admitted ns/GAE sel/inc 0.9493 [0.910, 0.990], bias-corrected 0.9461 [0.896, 0.998] (A/A 1.0034, includes arm A), outside noise; end-to-end wall 0.8644 [0.748, 0.999]; ns/GAE of inc, sel is an upper bound on its cost per operation (GAE is a lower bound)",
+        "levels": {
+          "verified": 480
+        },
+        "session_dir": "research/curve25519_autolab_20261104/round-035/sessions/holdout-k32",
+        "session_id": "ECBS1h054b87722fed",
+        "spec_sha256": "480668e73811036fa2de22f9f14833e592bba88f3767d39370b157ef688343a8",
+        "verify_exit": 0,
+        "verify_receipt": "research/curve25519_autolab_20261104/round-035/analysis/verify-holdout-k32.json",
+        "verify_receipt_sha256": "f6fa596398824a281594d5dbe43119edb9b1aa9f3887fb27ff6306a661fe7b72"
+      },
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06-sr",
+        "n": 2,
+        "name": "wwalkG-x06-sr-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run"
+      },
+      "ratio": {
+        "aa": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "ratio": 1.0
+        },
+        "w0": {
+          "admissible": true,
+          "ci95": [
+            0.7897292180954749,
+            1.0498721736035508
+          ],
+          "ratio": 0.9105573736784134,
+          "status": "ok"
+        },
+        "w0.1": {
+          "ci95": [
+            0.7608101291065024,
+            1.0298738060282837
+          ],
+          "ratio": 0.8851770576149064
+        },
+        "w1": {
+          "ci95": [
+            0.5945850674376667,
+            0.9251623484215638
+          ],
+          "ratio": 0.7416789853616087
+        }
+      },
+      "s": {
+        "inc": [
+          1.9939972080899062,
+          2.112005594015383,
+          3.1740810673446687
+        ],
+        "rho_neg": [
+          0.9048590161093911,
+          0.9936753843832576,
+          1.7930226988480593
+        ],
+        "sel": [
+          1.8156488609204338,
+          1.869498897376759,
+          2.3541492254836855
+        ]
+      },
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x07-sr",
+        "n": 2,
+        "name": "wwalkGg-x07-sr-n2",
+        "oracle": "wwalk:x=0.7,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "why": [
+        "compare ops.status = ok, admissible = true",
+        "sel / inc = 0.9106 [0.790, 1.050] at w = 0",
+        "band: sel < inc",
+        "A/A inc-aa / inc interval [1.000, 1.000] contains 1"
+      ]
+    }
+  },
+  "track": "generic"
+}

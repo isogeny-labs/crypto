@@ -1,0 +1,13 @@
+# Prospective minimal coherent build repair
+
+Status: proposal only, no invocation authorized or executed by this note. Preserve the failed codegen-units=1 build and its partial metadata.
+
+The smallest change preserves all native source and reuses the successfully rebuilt graph rlib eda0cd547d4524c16950245b3821bc185f6571f25ed665acd318006a2106a2e1. Only crypto_lib needs rebuilding, into a fresh output directory with the same exact external/native dependencies. Change -C codegen-units=1 to -C codegen-units=16 and add -C embed-bitcode=no. No LTO is requested. This avoids forcing the entire broad library through one LLVM code-generation unit and avoids embedding unused bitcode. Reduced peak allocation is an inference requiring the next bounded attempt, not a result established by these failures.
+
+Official rustc documentation says16 is the default for nonincremental builds, explains that code-generation units can run in parallel, and recommends embed-bitcode=no for direct non-LTO builds: https://doc.rust-lang.org/rustc/codegen-options/index.html#codegen-units and https://doc.rust-lang.org/rustc/codegen-options/index.html#embed-bitcode .
+
+Parallelism must be separately constrained. The prior recipe used one codegen unit and one compiler; merely setting CARGO_BUILD_JOBS=1 does not constrain a directly invoked rustc with multiple codegen units. The official rustc jobserver chapter documents MAKEFLAGS/CARGO_MAKEFLAGS inheritance and warns about missing descriptors: https://doc.rust-lang.org/rustc/jobserver.html . A reviewed successor wrapper should create a real pipe jobserver, pass both descriptor numbers through pass_fds, and supply no additional tokens beyond the compiler's implicit slot. The parent retains descriptors until confirmed reap. This protocol needs source review; do not claim a one-worker execution from an environment string alone.
+
+Proposed bound, not yet granted: ONE300-second source-build envelope, hard8GiBAS/core0, one compiler,1GiB hard perfile,4GiB aggregate output stop monitor with acknowledged observation overshoot,0.2-second checks, minimum8GiB free at start and4GiB stop free. Internal280-second cutoff and295+5 outer kill reserve. Source/reused artifact hashes before and after; old graph/source/input pins unchanged. No exporter tests, scientific workload, shared-cache write, network dependency resolution, or automatic retry.
+
+A second alternative, extracting the actual preparation/typed validator and native data types into a small library, would require a broader reviewed source refactor. Mirroring validators or supplying fake native types would not satisfy this task. The codegen partition change is the smaller coherent next construction.

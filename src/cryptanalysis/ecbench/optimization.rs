@@ -108,13 +108,13 @@ macro_rules! policy {
 // Deliberately explicit.  A new method must choose a search strategy and a
 // claim/accounting scope; the registry-exhaustiveness test fails otherwise.
 const POLICIES: &[PolicyDecl] = &[
-    policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.prime_orbit_relations_v1",
         NativeGrid,
         SpecializedDomain,
         StandardBand
     ),
+    policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
         NativeGrid,
@@ -214,6 +214,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "rho.multitarget_pooled",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "ic.residual_batch",
         ImplementationAb,
         DiagnosticOnly,
         StandardBand
@@ -492,6 +498,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "ic.koblitz_batched",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
         "rho.negation_v2",
         ImplementationAb,
         FrontierEligible,
@@ -562,7 +574,7 @@ const POLICIES: &[PolicyDecl] = &[
 fn parameter_role(name: &str) -> Option<ParameterRole> {
     use ParameterRole::*;
     Some(match name {
-        "base_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
+        "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
         "batch" => WorkloadScope,
         "backend" => ExternalBinding,
         "backend_sha256" | "c4" => IdentityOrPrice,
@@ -570,9 +582,9 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "budget_ms"
         | "cap_multiple"
         | "matrix_coefficient_cap"
+        | "max_pair_work"
         | "max_descent_ops"
         | "max_ops"
-        | "max_pair_work"
         | "max_restarts"
         | "max_states"
         | "max_sums"
@@ -590,16 +602,60 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "trial_cap"
         | "unit_trials"
         | "units" => ResourceEnvelope,
-        "coordinates" | "orbits" | "relations_per_orbit" => Knob,
-        "baby" | "base" | "base_multiplier" | "base_scale" | "beta" | "branches"
-        | "collection_aim" | "collection_window" | "d" | "d_step_in" | "degree"
-        | "descent_summands" | "dp_bits" | "ell" | "encoding" | "entries"
-        | "envelope_dimension" | "extra_relations" | "factor_base" | "factor_base_points"
-        | "fb_size" | "independent" | "inner" | "jumps" | "k" | "labels" | "lambda" | "lanes"
-        | "large_primes" | "linalg" | "line" | "lp_exponent" | "m" | "mode" | "oracle"
-        | "orbit" | "prune" | "random_base" | "roots" | "size" | "small_denominator"
-        | "small_dimension" | "solver" | "stop" | "subset_size" | "summands" | "table_scale"
-        | "targets" | "unique_relations" | "walks" => Knob,
+        "baby"
+        | "batch_trials"
+        | "base"
+        | "base_multiplier"
+        | "base_scale"
+        | "beta"
+        | "branches"
+        | "collection_aim"
+        | "collection_window"
+        | "coordinates"
+        | "d"
+        | "d_step_in"
+        | "degree"
+        | "descent_summands"
+        | "dp_bits"
+        | "ell"
+        | "encoding"
+        | "entries"
+        | "envelope_dimension"
+        | "extra_relations"
+        | "factor_base"
+        | "factor_base_points"
+        | "fb_size"
+        | "independent"
+        | "inner"
+        | "jumps"
+        | "k"
+        | "labels"
+        | "lambda"
+        | "lanes"
+        | "large_primes"
+        | "linalg"
+        | "line"
+        | "lp_exponent"
+        | "m"
+        | "mode"
+        | "oracle"
+        | "orbit"
+        | "orbits"
+        | "prune"
+        | "random_base"
+        | "relations_per_orbit"
+        | "roots"
+        | "size"
+        | "small_denominator"
+        | "small_dimension"
+        | "solver"
+        | "stop"
+        | "subset_size"
+        | "summands"
+        | "table_scale"
+        | "targets"
+        | "unique_relations"
+        | "walks" => Knob,
         _ => return None,
     })
 }
@@ -1093,6 +1149,26 @@ mod tests {
     }
 
     #[test]
+    fn koblitz_batch_tuning_keeps_seed_and_resource_cap_out_of_the_grid() {
+        let profiles = profiles().unwrap();
+        let profile = profiles
+            .iter()
+            .find(|profile| profile.id == "ic.koblitz_batched")
+            .unwrap();
+        assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
+        assert_eq!(profile.claim_scope, ClaimScope::SpecializedDomain);
+        assert_eq!(profile.accounting_scope, AccountingScope::StandardBand);
+        let roles: BTreeMap<_, _> = profile
+            .parameters
+            .iter()
+            .map(|parameter| (parameter.name, parameter.role))
+            .collect();
+        assert_eq!(roles["batch_trials"], ParameterRole::Knob);
+        assert_eq!(roles["fb_seed"], ParameterRole::Seed);
+        assert_eq!(roles["max_trials"], ParameterRole::ResourceEnvelope);
+    }
+
+    #[test]
     fn every_native_solver_and_nested_engine_is_in_the_inventory() {
         let nested = nested_algorithms();
         let keys: BTreeSet<_> = nested.iter().map(|a| a.key.as_str()).collect();
@@ -1125,6 +1201,8 @@ mod tests {
             "max_trials",
             "trial_cap",
             "solver_budget_seconds",
+            "max_ops",
+            "max_descent_ops",
             "base_seed",
             "rank_seed",
         ] {

@@ -1,0 +1,82 @@
+failures:
+
+---- cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar' (25156) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures' (25157) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic' (25158) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver' (25159) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed stdout ----
+
+thread 'cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed' (25160) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+
+---- cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (27000) panicked at src/cryptanalysis/ecbench/bounds.rs:2435:38:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto/research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/session.json: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars stdout ----
+
+thread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars' (28590) panicked at src/cryptanalysis/ecbench/runner.rs:2733:57:
+called `Result::unwrap()` on an `Err` value: "No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure stdout ----
+
+thread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure' (28591) panicked at src/cryptanalysis/ecbench/runner.rs:2774:57:
+called `Result::unwrap()` on an `Err` value: "No such file or directory (os error 2)"
+
+---- cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm stdout ----
+
+thread 'cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm' (29194) panicked at src/cryptanalysis/gaudry_cubic.rs:4820:9:
+GaudryReport { p: 31, n: 29641, bits: 14.855306500293887, base: 13, residuals: 41, decompositions: 20, relations_verified: 20, relations_independent: 8, rank: 8, solved: true, recovered_scalar: Some(2844), correct: Some(true), group_ops: 32179, oracle_fp_muls: 25959437, torsion_lift_fp_muls: 0, fp_muls_per_add: 63.0, total_ops: 444349.6984126984, s: 2580.943301771887, pair_tests: 27716, fp_muls_per_pair_test: 936.6227810650887, decomposition_rate: 0.4878048780487805, wall_ms: 238.61546, linear_algebra_ms: 0.126131, solver: MeetInTheMiddle, precompute_fp_muls: 0, solve_stats: SolveStats { solves: 0, fp_muls: 0, macaulay_muls: 0, quotient_dim_total: 0, e_solutions: 0, split_cubics: 0, degenerate_eigenspaces: 0, retried_at_degree_11: 0, retried_at_degree_12: 0, retried_at_degree_13: 0, border_unreachable: 0, unsolved: 0, fallback_fp_muls: 0, macaulay_rows: 0, echelon_muls: 0, charpoly_muls: 0, eigenvector_muls: 0, roots_muls: 0, lazy_solves: 0, lazy_fallbacks: 0, lazy_pivots_reduced: 0, lazy_pivots_planned: 0, lazy_verified: 0, lazy_verify_mismatches: 0, lazy_needless_fallbacks: 0 }, cross_checked: 0, cross_check_mismatches: 0, la_mode: "dense", la_ops: 813, lp_abandoned: 0, lp_mean_merge_depth: 4.416666666666667, lp_max_merge_level: 0, lp_merge_ops: 500, la_unknowns: 8, la_rows: 8, la_avg_weight: 0.0, la_attempts: 0, la_filtered_out: 0, la_fp_equiv: 9.0, small_base: 7, max_large_primes: 4, lp_histogram: [1, 6, 11, 2, 0], lp_full_relations: 12 }
+
+---- cryptanalysis::ic_framework::residual::tests::fused_residual_collector_recovers_and_halves_the_additions_per_step stdout ----
+
+thread 'cryptanalysis::ic_framework::residual::tests::fused_residual_collector_recovers_and_halves_the_additions_per_step' (33968) panicked at src/cryptanalysis/ic_framework/residual.rs:739:9:
+fused per-step 4.900233826968043
+
+---- cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline stdout ----
+
+thread 'cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline' (34053) panicked at src/cryptanalysis/ic_wide.rs:920:13:
+assertion `left == right` failed
+  left: 13130
+ right: 3757
+
+---- ml_dataset::solvers::tests::dynamic_original_rejects_unbound_or_different_profile_limits stdout ----
+
+thread 'ml_dataset::solvers::tests::dynamic_original_rejects_unbound_or_different_profile_limits' (58737) panicked at src/ml_dataset/solvers.rs:3658:13:
+assertion failed: dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err()
+
+
+failures:
+    cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar
+    cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures
+    cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic
+    cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver
+    cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed
+    cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version
+    cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars
+    cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure
+    cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm
+    cryptanalysis::ic_framework::residual::tests::fused_residual_collector_recovers_and_halves_the_additions_per_step
+    cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline
+    ml_dataset::solvers::tests::dynamic_original_rejects_unbound_or_different_profile_limits
+
+test result: FAILED. 6006 passed; 12 failed; 130 ignored; 0 measured; 0 filtered out; finished in 2776.57s
+
+error: test failed, to rerun pass `--lib`

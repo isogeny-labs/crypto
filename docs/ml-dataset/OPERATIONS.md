@@ -297,6 +297,13 @@ solving. Native elimination requires p<2^32. For larger moduli, including
 and reports an unsupported native modulus; it does not substitute a smaller
 field or invoke the narrow reducer.
 
+The prime `root` route keeps its m=2 reference and offers an affine
+signed-prefix/final-root search for m=3..15. It sums actual prefix points,
+calls the counted native S3 root finder for the final x, and checks any lift
+in the curve group. The bounded certificate records prefix context, native
+root events, work and censoring; an infinity prefix stops the affine search
+without a completeness claim. See [PRIME-ROOT-CHAIN.md](PRIME-ROOT-CHAIN.md).
+
 The new lane writes `prime-f4-input.json`, a bounded
 `prime-f4-chain-events.jsonl` prefix, and `prime-f4-chain-result.json` termination
 metadata. Events expose recursive systems and fixed-variable bindings, native

@@ -1,5 +1,22 @@
 # Prime-field factor bases: certificates and a secant degree reduction
 
+## Four complete selector presentations, 2026-11-01
+
+The [four-track continuation](four_tracks_20261101/README.md) keeps the same
+`icv1-fp5-tm1-a77cc6af` / `FB1h29cc024e755c` points and proves canonical
+degree **7→6** with seven-variable XOR recoding and **7→5** with nine-variable
+one-hot support. Both bounds include every selector and actual highest form.
+It also proves complete symmetric rational-pivot charts and a unit-pivot
+membership determinant; the expanded determinant has no finite homogeneous
+first vanishing, while Schur elimination returns XOR. The
+[matched presentation dashboard](four_tracks_20261101/README.md#matched-presentation-dashboard)
+counts all variables/equations and separates derived ambient dimensions from
+solver work. Ten new Lean modules and a fixed native21-system exporter are
+included. No new CAS/time/yield experiment was launched; the
+[prospective complete protocol](four_tracks_20261101/PROTOCOL.md) records the
+next EKS/CAS integration. Earlier sealed receipts and measured plots stay fixed.
+
+
 ## Boolean ordinate offsets, 2026-11-01
 
 The [new offset-base search](pencil_search_20261101/README.md) removes the

@@ -218,6 +218,15 @@ pub struct SolverReport {
     /// solver exploited.
     pub degree_over_bound: Option<f64>,
     pub extra: std::collections::BTreeMap<String, u64>,
+    /// The advisory degree-of-regularity forecaster over the run's solver
+    /// calls, with the relation matrix's columns and rank set; the
+    /// consumer (ecbench) prices its hope band with the curve's
+    /// automorphism fold and writes the forecast.  Not serialised here.
+    #[serde(skip)]
+    pub forecaster: Option<crate::cryptanalysis::dreg_forecast::Forecaster>,
+    /// Why no forecaster exists, when the oracle's solver gave none.
+    #[serde(skip)]
+    pub forecast_unavailable: Option<String>,
 }
 
 /// What the relation matrix did.
@@ -515,7 +524,12 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         Targets::StrideRenew => TargetSource::StrideRenew,
         Targets::StrideGenerator => TargetSource::StrideGenerator,
         Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
-        Targets::Walk | Targets::Residual => TargetSource::Walk,
+        Targets::Walk
+        | Targets::Residual
+        | Targets::ResidualFused
+        | Targets::ResidualFusedDp
+        | Targets::ResidualFusedEq
+        | Targets::ResidualFusedEqChain => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
             lanes: 4,
@@ -562,14 +576,32 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     } else {
         CompletionRule::TargetPinned
     };
-    let mut outcome: PipelineOutcome = if spec.targets == Targets::Residual {
+    let mut outcome: PipelineOutcome = if matches!(
+        spec.targets,
+        Targets::Residual
+            | Targets::ResidualFused
+            | Targets::ResidualFusedDp
+            | Targets::ResidualFusedEq
+            | Targets::ResidualFusedEqChain
+    ) {
         if completion != CompletionRule::TargetPinned {
             return Err(
                 "the residual collector stops when the target is pinned; use incremental-gauss"
                     .into(),
             );
         }
-        residual_mod::collect_residual_and_solve(
+        let collect = if spec.targets == Targets::ResidualFusedEqChain {
+            residual_mod::collect_residual_fused_eq_chain_and_solve
+        } else if spec.targets == Targets::ResidualFusedEq {
+            residual_mod::collect_residual_fused_eq_and_solve
+        } else if spec.targets == Targets::ResidualFusedDp {
+            residual_mod::collect_residual_fused_dp_and_solve
+        } else if spec.targets == Targets::ResidualFused {
+            residual_mod::collect_residual_fused_and_solve
+        } else {
+            residual_mod::collect_residual_and_solve
+        };
+        collect(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -752,6 +784,12 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             semi_regular_degree: t.semi_regular_degree(),
             degree_over_bound: t.degree_over_bound(),
             extra: t.extra.clone(),
+            forecaster: t.forecaster.clone().map(|mut f| {
+                f.set_relation_state(fb.columns, outcome.rank as usize);
+                f.set_linear_algebra_total(outcome.relations_found as usize, work, work_unit);
+                f
+            }),
+            forecast_unavailable: t.forecast_unavailable.clone(),
         }
     });
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;

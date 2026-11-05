@@ -930,6 +930,51 @@ pub fn prime_automorphisms(curve: &PrimeCurve, generator: PrimePoint, r: u64) ->
 }
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
+/// The registry's index: one decimal byte offset per line, the offset of
+/// the opening quote of a slug's value in `REGISTRY` (its first
+/// `"slug": "…"` pair in document order), the lines ordered by that slug.
+/// The slugs themselves are read from `REGISTRY` at the offsets, so the
+/// index stays small (offsets only).  Written with the registry by
+/// `scripts/build_curve_registry.py` (`registry_index_text` in
+/// `scripts/curve_id.py`); `check_curve_names.py` and the test below fail
+/// when it is stale, so an index miss means the document has no such
+/// entry.  (A `build.rs` could generate it, but a build script makes Cargo
+/// list every file of the package to fingerprint it, which this
+/// repository's size and CI's partial clones do not bear.)
+const REGISTRY_INDEX: &str = include_str!("registry_index.txt");
+
+/// The slug whose value's opening quote is at byte `at` of `REGISTRY`.
+fn registry_slug_at(at: usize) -> Option<&'static str> {
+    let rest = REGISTRY.get(at..)?.strip_prefix('"')?;
+    Some(&rest[..rest.find('"')?])
+}
+
+/// The byte offset in `REGISTRY` of `slug`'s value, by binary search over
+/// the lines of `REGISTRY_INDEX`; `None` when the index has no such slug.
+fn registry_index_offset(slug: &str) -> Option<usize> {
+    let text = REGISTRY_INDEX.as_bytes();
+    let (mut lo, mut hi) = (0usize, text.len());
+    // Every line that can match starts in [lo, hi), at `lo` or just after
+    // a newline; probe the line that contains the midpoint.
+    while lo < hi {
+        let mid = lo + (hi - lo) / 2;
+        let start = text[lo..mid]
+            .iter()
+            .rposition(|&b| b == b'\n')
+            .map_or(lo, |i| lo + i + 1);
+        let end = text[start..hi]
+            .iter()
+            .position(|&b| b == b'\n')
+            .map_or(hi, |i| start + i);
+        let at: usize = std::str::from_utf8(&text[start..end]).ok()?.parse().ok()?;
+        match registry_slug_at(at)?.cmp(slug) {
+            std::cmp::Ordering::Equal => return Some(at),
+            std::cmp::Ordering::Less => lo = (end + 1).min(hi),
+            std::cmp::Ordering::Greater => hi = start,
+        }
+    }
+    None
+}
 
 /// The registry's curves, parsed once per process, for the lookups that
 /// scan every entry (a wide Koblitz modulus) and as the fallback of
@@ -951,7 +996,7 @@ fn registry_curves() -> &'static [Value] {
 
 /// The registry entry of `slug`, parsed from its own text alone.
 ///
-/// The document is 4.7 MB and every measured execution is a fresh child
+/// The document is 20.8 MB and every measured execution is a fresh child
 /// process, so parsing it whole cost 97% of a toy solve's instructions
 /// (callgrind, 2026-10-18: 147.6M of 153M Ir in `ecbench exec`); a
 /// per-process cache cannot help a child.  A slug is a plain `icv1-…`
@@ -961,7 +1006,22 @@ fn registry_curves() -> &'static [Value] {
 /// extracted object is checked to carry the slug, and anything the fast
 /// path cannot place falls back to the full parse, so the answer is the
 /// one the full parse gives: the first entry with that slug.
+///
+/// The scan itself is now the fallback: `REGISTRY_INDEX` (written with the
+/// document) names the byte offset of every slug's first `"slug": "…"`
+/// pair, so the entry is cut out at that offset and the scan runs only
+/// when the index cannot place it.  A slug without an index entry has no
+/// such pair in the document and so no entry.  Scanning the 20.8 MB
+/// document to an entry deep in it cost 37M of the 39M instructions a
+/// 32-bit `rho.negation` child spent before its solve marker (2026-11-01,
+/// Callgrind), the same for every child of that curve.
 fn registry_entry(slug: &str) -> Option<Value> {
+    let at = registry_index_offset(slug)?;
+    if let Some(entry) = registry_entry_around(at) {
+        if entry.get("slug").and_then(Value::as_str) == Some(slug) {
+            return Some(entry);
+        }
+    }
     let needle = format!("\"{slug}\"");
     let mut from = 0;
     while let Some(pos) = REGISTRY[from..].find(&needle) {
@@ -1992,6 +2052,36 @@ mod tests {
         .is_err());
     }
 
+    /// `registry_index_text` of `scripts/curve_id.py`, restated: the offset
+    /// of the value's opening quote of every `"slug": "…"` pair's first
+    /// occurrence, ordered by slug.
+    fn expected_registry_index(text: &str) -> String {
+        let key = "\"slug\"";
+        let mut pairs: Vec<(&str, usize)> = Vec::new();
+        let mut from = 0;
+        while let Some(pos) = text[from..].find(key) {
+            let after = from + pos + key.len();
+            from = after;
+            let Some(rest) = text[after..].trim_start().strip_prefix(':') else {
+                continue;
+            };
+            let rest = rest.trim_start();
+            let Some(value) = rest.strip_prefix('"') else {
+                continue;
+            };
+            let Some(end) = value.find('"') else {
+                continue;
+            };
+            if value[..end].contains('\\') {
+                continue;
+            }
+            pairs.push((&value[..end], text.len() - rest.len()));
+        }
+        pairs.sort_by(|a, b| a.0.cmp(b.0).then(a.1.cmp(&b.1)));
+        pairs.dedup_by(|later, first| later.0 == first.0);
+        pairs.iter().map(|(_, at)| format!("{at}\n")).collect()
+    }
+
     /// The slug-targeted extraction answers exactly as the full parse:
     /// the first entry carrying the slug, or none.
     #[test]
@@ -2011,6 +2101,28 @@ mod tests {
         // A slug that is a prefix of a real one is not that one.
         let first = all[0].get("slug").and_then(Value::as_str).unwrap();
         assert!(registry_entry(&first[..first.len() - 1]).is_none());
+        // The committed index is the one this registry text yields (so a
+        // stale index fails here as it fails `check_curve_names.py`), it
+        // has one line per entry, and the search finds every line.
+        assert_eq!(
+            REGISTRY_INDEX,
+            expected_registry_index(REGISTRY),
+            "registry_index.txt is stale"
+        );
+        assert_eq!(REGISTRY_INDEX.lines().count(), all.len());
+        let mut previous = "";
+        for (i, line) in REGISTRY_INDEX.lines().enumerate() {
+            let at: usize = line.parse().unwrap();
+            let slug = registry_slug_at(at).unwrap();
+            assert!(previous < slug, "{slug} out of order at line {i}");
+            previous = slug;
+            if i % 97 == 0 {
+                assert_eq!(registry_index_offset(slug), Some(at), "{slug}");
+            }
+        }
+        assert_eq!(registry_index_offset(""), None);
+        assert_eq!(registry_index_offset("icv1-no-such-curve-00000000"), None);
+        assert_eq!(registry_index_offset("zzzz"), None);
         // A string with braces and escaped quotes inside is skipped as text.
         assert_eq!(json_object_end(br#"{"a":"}\"{","b":{}}"#, 0), Some(18));
     }

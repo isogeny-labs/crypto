@@ -1,0 +1,26 @@
+{
+  "schema": "n83.factor-base-run-output-format/v2",
+  "root": "Each EKS attempt writes to ISOLAB_RESULTS_URI/attempt-NN/.",
+  "layout": {
+    "snapshots/<path_sha256>/<content_sha256>": "Immutable payload snapshots. path_sha256 is SHA-256 of the UTF-8 relative path; content_sha256 is SHA-256 of exact bytes.",
+    "index/s3-file-index-<sha256>.json": "Content-addressed final index. It maps each final local relative path and byte count to its exact SHA-256 and immutable S3 snapshot key.",
+    "upload-history.jsonl": "Append-only local record of each successfully uploaded payload snapshot. Each line contains upload time, relative path, byte count, SHA-256 and S3 key. Its final bytes are also uploaded as a snapshot and listed in the index."
+  },
+  "local_files": {
+    "data/index.json": "Top-level factor-base index; binds coordinate-bit candidate, all curve families, complete status, and same-base-for-m reuse.",
+    "data/<family>/manifest.json": "Per-family curve identity, selector map, shard list, counts and content hashes.",
+    "data/<family>/part-NNNN.bin.zst": "Compressed shard payload. N83FB02 header is 32 bytes; each record is selector_index:u32-le followed by y:u128-le.",
+    "data/<family>/part-NNNN.json": "Shard metadata with range, family, coordinate bit, candidate identifier, counts and payload SHA-256.",
+    "run-manifest.json": "Attempt identity, start/end, exit status, instrument/protocol hashes and non-performance boundary.",
+    "manifest.sha256": "SHA-256 checks for final run files except itself, upload-history.jsonl, and s3-file-index.json. The S3 index covers those excluded files.",
+    "protocol.json": "Exact frozen protocol bytes copied into the attempt.",
+    "runner.sh": "Exact runner bytes used by the attempt.",
+    "instrument": "Exact native factor_base executable used by the attempt.",
+    "producer.log": "Producer stdout/stderr; incomplete and failed attempts retain it."
+  },
+  "preservation": {
+    "overwrite_policy": "No sync or mutable stable object key. Every payload version is written to a content-addressed S3 key.",
+    "partial_attempts": "Periodic snapshots remain in the attempt prefix if the process is interrupted. The final index is written only after graceful termination.",
+    "validation": "Recompute each object SHA-256 and byte count; verify manifest.sha256; then check data/index.json and per-family manifests before accepting enumeration."
+  }
+}

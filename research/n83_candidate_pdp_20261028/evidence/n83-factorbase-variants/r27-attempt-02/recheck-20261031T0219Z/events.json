@@ -1,0 +1,44 @@
+{
+  "items": [
+    {
+      "metadata": {
+        "name": "n83-fb-variants-r27-20261031-r2-m8sr2.18e37a72a2cc6ed0",
+        "creationTimestamp": "2026-10-31T01:55:09Z"
+      },
+      "type": "Warning",
+      "reason": "FailedScheduling",
+      "message": "0/3 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 1 No preemption victims found for incoming pod, 2 Preemption is not helpful for scheduling.",
+      "firstTimestamp": "2026-10-31T01:55:09Z",
+      "lastTimestamp": "2026-10-31T02:15:32Z",
+      "count": 5,
+      "involvedObject": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "name": "n83-fb-variants-r27-20261031-r2-m8sr2",
+        "namespace": "isolab",
+        "resourceVersion": "7878880",
+        "uid": "4499aa76-58b9-4657-8967-ff5641dd692f"
+      }
+    },
+    {
+      "metadata": {
+        "name": "n83-fb-variants-r27-20261031-r2-m8sr2.18e37a72f4eb272b",
+        "creationTimestamp": "2026-10-31T01:55:10Z"
+      },
+      "type": "Warning",
+      "reason": "FailedScheduling",
+      "message": "Failed to schedule pod, node limits have been exhausted for nodepool (NodePool=gha-on-demand-extra); node limits have been exhausted for nodepool (NodePool=gha-on-demand); node limits have been exhausted for nodepool (NodePool=gha-gates); node limits have been exhausted for nodepool (NodePool=cpu-spot); node limits have been exhausted for nodepool (NodePool=cpu-l2-spot)",
+      "firstTimestamp": "2026-10-31T01:55:10Z",
+      "lastTimestamp": "2026-10-31T02:15:20Z",
+      "count": 5,
+      "involvedObject": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "name": "n83-fb-variants-r27-20261031-r2-m8sr2",
+        "namespace": "isolab",
+        "resourceVersion": "7878882",
+        "uid": "4499aa76-58b9-4657-8967-ff5641dd692f"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "base_merged": "c4a5f7ed63e5f6943e39b1a4d862b0f9e1ae3246",
+  "previous_head": "d343a183f4b0a704bc63901e982dd1f68e4a82dd",
+  "resolution": "main session journal bytes followed by all branch-only appended bytes; problem index auto-merged with both rows preserved",
+  "native_source_changed_by_merge": false,
+  "package_tests_passed": 94,
+  "records": [
+    {
+      "command": "sha256sum -c research/hashed_ecdl_primality_fast_paths_20261030/delivery-source.sha256",
+      "exit_code": 0,
+      "raw_gzip": "merge-source-check.txt.gz",
+      "uncompressed_sha256": "2b48e5dc0ecbe50f3612cfbcd6cfadafdc8b6a961fd12f905efb755c85753925"
+    },
+    {
+      "command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml",
+      "exit_code": 0,
+      "raw_gzip": "merge-tests.txt.gz",
+      "uncompressed_sha256": "31d27905a100b7ca41accafce559f023212ed9ede7cf52c88a0843dcd411467f"
+    },
+    {
+      "command": "cargo check --locked --all-targets --manifest-path research/hashed_ecdl_primality_fast_paths_20261030/native-setup-check/Cargo.toml",
+      "exit_code": 0,
+      "raw_gzip": "merge-client-check.txt.gz",
+      "uncompressed_sha256": "7992d058c61ee85bb5707a0236a27f128088e044d2fff241c13671e3036d232b"
+    },
+    {
+      "command": "cargo run --locked --release --manifest-path research/hashed_ecdl_primality_fast_paths_20261030/native-setup-check/Cargo.toml",
+      "exit_code": 0,
+      "raw_gzip": "merge-network.txt.gz",
+      "uncompressed_sha256": "904c226c2c962f3efba21bab85fd6fca7a071a6ea21934155e78127d0ed55879"
+    }
+  ],
+  "formatting_exit_code": 0,
+  "task_diff_whitespace_exit_code": 0,
+  "parent_library_validation": "incomplete; isolated replay exit 124 under an explicit 180-second deadline",
+  "auto_merge_enabled": false
+}

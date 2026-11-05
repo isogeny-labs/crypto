@@ -1,0 +1,57 @@
+import OwnerEdge
+import TwoFindCount
+set_option autoImplicit false
+namespace CountedEdge
+open SignedWord
+variable {n : Nat}
+def Invariants (r : UInt64) [Fact r.toNat.Prime] (out : EdgeDispatch.Output n) (owner : Fin n→Fin n)
+ (value : Fin n→F r) (k : F r) : Prop :=
+ Good r out.state.graph ∧ FixedGood r out.state ∧
+ GraphSameRoot.Safe (outDecode r out.result) k ∧
+ (∃ rank',GraphFind.Forest (unionDecode r out.state).graph rank' ∧ GraphUnion.Valid (unionDecode r out.state) value k) ∧
+ ComponentMap.Valid (decode r out.state.graph) owner ∧ ComponentMap.SizeValid owner out.sizes
+
+theorem counted_edge_invariants (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (t w : State n) (sizes : UnionSize.Sizes n)
+ (owner : Fin n→Fin n) (u v ru rv : Fin n) (pu pv : Pot) (ca cb : Nat)
+ (rank : Fin n→Nat) (value : Fin n→F r) (su sv : Int8) (a b : UInt64) (k : F r)
+ (hp : 2<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s.graph) (hgf : FixedGood r s)
+ (hf : GraphFind.Forest (decode r s.graph) rank) (hv : GraphUnion.Valid (unionDecode r s) value k)
+ (h1 : FindCount.Counted r s.graph u t ru pu ca) (h2 : FindCount.Counted r t v w rv pv cb)
+ (hs : Sign su) (ht : Sign sv) (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat)
+ (he : sd r su*value u+sd r sv*value v=wd r a+wd r b*k)
+ (ho : ComponentMap.Valid (decode r s.graph) owner)
+ (hz : ComponentMap.SizeValid owner sizes) (hn : n<USize.size) :
+ let out := BranchCount.run r s w sizes ru rv pu pv su sv a b
+ Invariants r out.1 (owners owner sizes ru rv) value k ∧
+ 2≤ca+cb ∧ ca+cb≤rank u+rank v+2 ∧
+ out.2.cycles≤1 ∧ out.2.negative≤out.2.cycles ∧ out.2.zero≤1 := by
+ have he1:=FindCount.erase h1
+ have he2:=FindCount.erase h2
+ have hsem:=EdgeDispatch.after_finds_contract r s t w sizes u v ru rv pu pv rank value su sv a b k hp hr hg hgf hf hv he1 he2 hs ht ha hb he
+ have hown:=after_finds_owner r s t w sizes owner u v ru rv pu pv su sv a b (by omega) hr hg he1 he2 ho hz hn
+ have hpos1:=FindCount.positive h1
+ have hpos2:=FindCount.positive h2
+ have hbound:=FindCount.two_rank_bound r s.graph t w u v ru rv pu pv ca cb h1 h2 rank value k (by omega) hr hg hf hv.1
+ have hc:=BranchCount.run_bounds r s w sizes ru rv pu pv su sv a b
+ dsimp only
+ refine ⟨?_,by omega,hbound,hc⟩
+ rw [BranchCount.run_projection]
+ exact ⟨hsem.1,hsem.2.1,hsem.2.2.1,hsem.2.2.2,hown⟩
+
+theorem counted_edge_counters (r : UInt64) (s : UnionState n) (w : State n)
+ (sizes : UnionSize.Sizes n) (ru rv : Fin n) (pu pv : Pot) (su sv : Int8)
+ (a b : UInt64) (ca cb : Nat) (c : BranchCount.Counters)
+ (ho : c.operations.toNat+(ca+cb)<UInt64.size)
+ (hc : c.cycles.toNat+1<UInt64.size) (hn : c.negative.toNat+1<UInt64.size)
+ (hz : c.zero.toNat+1<UInt64.size) :
+ let d := (BranchCount.run r s w sizes ru rv pu pv su sv a b).2
+ let out := BranchCount.update c (ca+cb) d
+ out.operations.toNat=c.operations.toNat+ca+cb ∧
+ out.cycles.toNat=c.cycles.toNat+d.cycles ∧
+ out.negative.toNat=c.negative.toNat+d.negative ∧
+ out.zero.toNat=c.zero.toNat+d.zero := by
+ have hb:=BranchCount.run_bounds r s w sizes ru rv pu pv su sv a b
+ have hx:=BranchCount.update_exact c (ca+cb) (BranchCount.run r s w sizes ru rv pu pv su sv a b).2 ho (by omega) (by omega) (by omega)
+ simpa only [Nat.add_assoc] using hx
+end CountedEdge

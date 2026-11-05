@@ -104,3 +104,19 @@ group meet-in-the-middle and a little faster than B² for the S₄ root-finding
 arm. The threshold that would beat rho at m = 3 is e < 0.5. Nothing measured is
 within a factor of four of it in the exponent; the lane stays closed for these
 encodings, with the s = 12 point still to be taken.
+
+## Rerun 2026-11-01: s = 6..12 complete (appended; the sections above are unchanged)
+
+Plan `../rerun_20261101/RERUN_PLAN.md`, report `../rerun_20261101/REPORT.md`, data
+`../rerun_20261101/L2a/`. The full ladder s = 6..12 was rerun with the same seeds on a
+quiet host: every s = 6..11 per-s row reproduces the table above exactly, and all 192
+s = 12 attempts (G and S) completed inside the 20-minute guard. Fit over seven points:
+
+| arm | class | e | interval |
+|---|---|---|---|
+| G | all | 1.97 | [1.95, 2.00] |
+| S | all | 2.19 | [2.16, 2.22] |
+| T | all (s ≤ 8) | 3.21 | [2.99, 3.40] |
+
+**Status:** complete. **Decision:** does not reopen; G closes (interval contains 2);
+S above 2, recorded as observed. The SAT/SMT encodings remain unmeasured.

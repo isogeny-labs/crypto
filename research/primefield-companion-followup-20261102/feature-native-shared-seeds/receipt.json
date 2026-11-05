@@ -1,0 +1,18 @@
+{
+  "schema": "native-shared-seeds-check/v1",
+  "checked_source_commit": "e2b1d8a87e1233fb13f4cce64533d47b7ab6f476",
+  "commit_completed_after_tests": true,
+  "source_binding": "pretest check-lock.sha256 verified after execution",
+  "build_exit": 0,
+  "test_exit": 0,
+  "build_attempts": 1,
+  "test_attempts": 1,
+  "tests_passed": 3,
+  "tests_filtered": 19,
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "binary_sha256": "3759427135a3e0cdd87b5873ec0b8019b63d6401cf924b2cb7ba44450e80cd5d",
+  "build_command": "timeout 120 rustc --edition=2021 --test lib.rs -o unit-tests",
+  "test_command": "timeout 30 ./unit-tests seed_tests:: --test-threads=1 --nocapture",
+  "full_cohort_executed": false,
+  "cloud_jobs": 0
+}

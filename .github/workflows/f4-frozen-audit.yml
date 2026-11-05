@@ -2,6 +2,7 @@ name: f4-frozen-audit
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/f4-frozen-audit.yml'
       - 'research/f4_fp_ic_effect_20261018/native-audit/**'
@@ -23,6 +24,7 @@ concurrency:
 
 jobs:
   native-f4-audit:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
