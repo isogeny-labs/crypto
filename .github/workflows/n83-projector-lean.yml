@@ -2,6 +2,7 @@ name: N83 projector Lean proof
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/n83_jacobian_projector_20261031/**'
       - '.github/workflows/n83-projector-lean.yml'
@@ -16,6 +17,7 @@ concurrency:
 
 jobs:
   proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
