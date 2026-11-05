@@ -1,0 +1,23 @@
+{
+  "schema": "n83.hilbert-storage/v1",
+  "run_prefix": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r2/local/",
+  "archive": {
+    "path": "hilbert-archives/runs.tar.xz",
+    "kind": "raw",
+    "bytes": 279528,
+    "sha256": "af7fa7768900e74e89ea429db6ea6c35f8d7a9a8cfbcdc5db7ca795a1855d0cc"
+  },
+  "object": "s3://setec-astronomy-artifacts/store/sha256/af/af7fa7768900e74e89ea429db6ea6c35f8d7a9a8cfbcdc5db7ca795a1855d0cc",
+  "source_archive_sha256": "d1ee4c7b4770f94554fa30232f8ac2d62318b04c3363f01525e8f4a92413b018",
+  "source_commit": "64e06657f1a2e6df003130fa7f4e9a034d44b826",
+  "raw_file_count": 48,
+  "restoration": "Download archive, extract to fresh directory, sha256sum -c manifest.sha256, instrument replay ROOT ROOT/certificates; all sealed files verified before publication",
+  "remote_verification": {
+    "downloaded_archive_sha256_match": true,
+    "all_48_sealed_file_hashes_match": true,
+    "downloaded_instrument_replay": "all six pass",
+    "post_replay_manifest": "all48 unchanged",
+    "r1_failed_archive": "downloaded, all34 sealed file hashes verified",
+    "source_archive": "downloaded and byte-identical"
+  }
+}
