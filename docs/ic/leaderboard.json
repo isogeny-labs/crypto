@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "fd19ac4eea242e74769757d08a9514cedb618e9839b8bdb2aacae9d4c7b2a690"
+   "sha256": "c0bb857f799cd2a28de3bb608b442c03bd72ee4e572513161cf143b768bc5293"
   },
   "native_tournament26": {
    "path": "research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json",
@@ -315649,6 +315649,45 @@
   "validation": "Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.",
   "validated": true
  },
+ "packed_filter_component": {
+  "study": "research/ic_packed_filter_20261029/",
+  "readme": "research/ic_packed_filter_20261029/README.md",
+  "report": "research/ic_packed_filter_20261029/REPORT.pdf",
+  "class": "engineering",
+  "track": "generic (prime-table; docs/ic/SWEEPER.md, Tracks)",
+  "label": "whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table",
+  "candidate": "mitm-prime-blocked:m=2,filter=1",
+  "incumbent": "mitm-prime-blocked:m=2",
+  "bits": 32,
+  "pairs": 288,
+  "corrected": 0.960107806241,
+  "corrected_ci95": [
+   0.956898183422,
+   0.963328194759
+  ],
+  "bitop_ratio": 1.00301274773,
+  "sprime": {
+   "dgbf/dgb": [
+    1.0,
+    1.05048776126,
+    1.35863256079
+   ],
+   "dgb/rho-neg": [
+    31.4718504653,
+    29.9858047265,
+    23.2774738635
+   ],
+   "dgbf/rho-neg": [
+    31.4718504653,
+    31.4997208769,
+    31.6255339238
+   ]
+  },
+  "host": "c8a.2xlarge (AMD EPYC 9R45) on EKS, L2",
+  "other_sizes": "At 24 bits the same comparison read a regression (1.0032 [1.0006, 1.0058]); 28 bits is undecidable (infrastructure); see the README.",
+  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_packed_filter_20261029/VALIDATION.json); single session, not replicated. Caveats: the validator re-priced the bitops with its own code rather than re-running `ecbench work`; the image digest is bound through the binary hashes, not pod status",
+  "validated": true
+ },
  "lazy_members_component": {
   "rows": [
    {
@@ -316378,8 +316417,8 @@
   "study": "research/ecbench_generator_orbit_20261022/",
   "report": "research/ecbench_generator_orbit_20261022/REPORT.pdf",
   "source": "research/ecbench_generator_orbit_20261022/figures/summary.json",
-  "validated": false,
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file."
+  "validated": true,
+  "validation": "Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study directory: replay certificate, validator report, §5a-banded rho-frob reference)."
  },
  "lazy_columns2_component": {
   "rows": [

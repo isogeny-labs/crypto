@@ -1,4 +1,4 @@
-#set page(paper: "a4", margin: 1.6cm, flipped: false)
+#set page(paper: "a4", margin: 1.6cm)
 #set text(size: 8.5pt)
 #show table: set text(size: 7pt)
 #show link: set text(fill: blue)
@@ -255,9 +255,10 @@ replicated, general or transferable.
 
 #strong[Corrections:]
 
-- `CORR-20261030-1e501e`: VERDICT-P32 printed S′ `dgbf / dgb` at w \=
-  0.1 as 1.0500; the value is 1.0500605, which is #strong[1.0501] at
-  four decimals.
+- `CORR-20261030-1e501e`: VERDICT-P32 printed the per-curve S′
+  `dgbf / dgb` at w \= 0.1 on `icv1-fp32-t89141-95879fe3` as 1.0500; the
+  value is 1.0500605, which is #strong[1.0501] at four decimals. The
+  pooled 1.0505 above is unaffected.
 - `CORR-20261030-1153f8`: the report field `c2_identity_facts` carries a
   mislabelled value from the validator\'s report assembly. It touches no
   joint, headline or gate field.
