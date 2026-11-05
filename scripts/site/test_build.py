@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import os
 import re
 import tempfile
@@ -541,11 +542,62 @@ class BuildTests(unittest.TestCase):
         self.assertNotIn("write", permissions.group(1))
         test_job = re.search(r"^  test:\n((?:    .*\n|\n)*)", workflow, re.M)
         self.assertIsNotNone(test_job)
-        self.assertIn("if: github.event_name == 'pull_request'", test_job.group(1))
         self.assertNotRegex(test_job.group(1), r"actions/(?:deploy-pages|upload-pages-artifact)@")
-        publish = re.search(r"^  publish:\n    if: ([^\n]+)", workflow, re.M)
+        publish = re.search(r"^  publish:\n((?:    .*\n|\n)*)", workflow, re.M)
         self.assertIsNotNone(publish)
-        self.assertEqual(publish.group(1), "(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check")
+
+        def runs(job, context):
+            # YAML folding and optional expression wrappers must not change
+            # what this security boundary tests: PRs validate, never publish.
+            condition = re.search(r"^    if:[ \t]*(.*)$", job, re.M)
+            self.assertIsNotNone(condition, "job has no scheduling condition")
+            expression = condition.group(1).strip()
+            if expression in (">", ">-", "|", "|-"):
+                chunks = []
+                for line in job[condition.end():].splitlines():
+                    if not line.strip():
+                        continue
+                    if not line.startswith("      "):
+                        break
+                    chunks.append(line.strip())
+                expression = " ".join(chunks)
+            if expression.startswith("${{") and expression.endswith("}}"):
+                expression = expression[3:-2].strip()
+            for key, value in context.items():
+                expression = expression.replace(key, repr(value))
+            expression = expression.replace("&&", " and ").replace("||", " or ")
+            expression = re.sub(r"!(?!=)", " not ", expression).strip()
+            tree = ast.parse(expression, mode="eval")
+            allowed = (
+                ast.Expression, ast.BoolOp, ast.UnaryOp, ast.Compare,
+                ast.And, ast.Or, ast.Not, ast.Eq, ast.NotEq, ast.Constant,
+            )
+            self.assertTrue(all(isinstance(node, allowed) for node in ast.walk(tree)))
+            return eval(compile(tree, "<workflow condition>", "eval"), {"__builtins__": {}})
+
+        for event in ("pull_request", "pull_request_target", "push", "schedule",
+                      "release", "workflow_dispatch", "merge_group"):
+            for draft in (False, True):
+                for ref in ("refs/heads/main", "refs/heads/feature"):
+                    for connection_check in (False, True):
+                        context = {
+                            "github.event_name": event,
+                            "github.event.pull_request.draft": draft,
+                            "github.ref": ref,
+                            "inputs.source_connection_check": connection_check,
+                        }
+                        with self.subTest(**context):
+                            self.assertIs(
+                                runs(test_job.group(1), context),
+                                event == "pull_request" and not draft,
+                            )
+                            self.assertIs(
+                                runs(publish.group(1), context),
+                                not draft and not connection_check and (
+                                    event in ("schedule", "workflow_dispatch")
+                                    or (event == "push" and ref == "refs/heads/main")
+                                ),
+                            )
         self.assertRegex(workflow, r"(?m)^  workflow_dispatch:")
         for trigger in ("push", "pull_request"):
             # The trigger's block is everything indented deeper than its key,

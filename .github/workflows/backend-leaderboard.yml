@@ -4,6 +4,7 @@ name: backend-leaderboard
 # This runs no solver or benchmark.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
   push:
     branches: [main]
@@ -14,6 +15,7 @@ permissions:
 
 jobs:
   current:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
