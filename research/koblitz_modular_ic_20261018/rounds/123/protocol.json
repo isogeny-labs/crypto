@@ -1,0 +1,16 @@
+{
+  "id": "marked23-r123-xzero-branch-census-v1",
+  "claim_class": "exact_computation",
+  "input_sha256": {
+    "116": "7b7de659d6a6993ef7fba9d6177ff8f8131e8d341e02f161def8c553360a66e9",
+    "119": "712278837f84ed1eba630a5aa368a534be7bdd381196ff27ff3fd1a0f52ffa71",
+    "120": "97c55481691f06b5b294956842a1d162c7d83d61722db1c5b812d0953146d297",
+    "121": "2baa0323bee345326da7196889598dd752a75ed6f20575a2b3348c856eb44053",
+    "122": "49710620cb89fb763fe13f952f64cfdc725094d87786c991d844a331fdd840fa"
+  },
+  "selected_stage": {"y0_e1": 121, "y0_e3": 122, "y1_e1": 119, "y1_e2": 120},
+  "decision_rule": "Census only if both F4 roots have exact 1+7 positive edges and total x-divisor degree is 112",
+  "controls": ["changed-input rejection", "byte-identical replay", "independent degree total", "Lean finite arithmetic"],
+  "backend": "local exact finite-field arithmetic",
+  "cloud_cost_usd": 0
+}
