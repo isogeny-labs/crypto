@@ -2,12 +2,11 @@
 """Check CI metadata: routine PR jobs must have a proven budget <=25 minutes.
 
 Manual-only, disabled and explicit label experiments keep their full budgets;
-sealed Lean proof jobs and the jobs in NAMED_BUDGET_EXCEPTIONS keep theirs.
+the jobs in NAMED_BUDGET_EXCEPTIONS keep theirs.
 Unknown conditions are treated as applicable; unknown budgets fail closed.
 This reads YAML/expressions only and never executes a workflow command.
 """
 import ast
-import hashlib
 from pathlib import Path
 import re
 import sys
@@ -88,6 +87,13 @@ NAMED_BUDGET_EXCEPTIONS = {
         # The workflow's pull_request budget expression evaluates to 45.
         "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18)",
     },
+    (".github/workflows/ecbench.yml", "evidence_audit_pr"): {
+        "timeout": 40,
+        # Each of the 16 shards spends ~8-10 min listing and pulling sessions
+        # before it audits; shard 8 of run 42063872441 was cancelled at the
+        # 25-minute cap mid-audit and took 24.3 min in run 42055249527.
+        "reason": "ecbench committed-evidence integrity audit shard; cancelled at the 25-minute cap on #2902 (2026-11-05)",
+    },
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,
         # The workflow's pull_request budget expression evaluates to 45.
@@ -105,31 +111,6 @@ def named_budget_exception(label, job_name, budget):
     """Allow the listed jobs exactly their listed timeout on routine PR events."""
     exception = NAMED_BUDGET_EXCEPTIONS.get((Path(label).as_posix(), job_name))
     return exception is not None and budget == exception["timeout"]
-
-
-def frozen_proof_budget_exception(label, job_name, budget, event, root=REPO_ROOT):
-    """Allow only unchanged, sealed Lean proof jobs their pinned 60m cap."""
-    path = Path(label).as_posix()
-    exception = FROZEN_BUDGET_EXCEPTIONS.get(path)
-    if (exception is None
-            or job_name != exception["job"]
-            or budget != exception["timeout"]
-            or event != "pull_request"):
-        return False
-    seal_path = root / exception["seal"]
-    workflow_path = root / path
-    try:
-        seal = seal_path.read_bytes()
-        if hashlib.sha256(seal).hexdigest() != exception["seal_sha256"]:
-            return False
-        pins = [line.split() for line in seal.decode("utf-8").splitlines()]
-        pin_path = exception["pin_path"]
-        pinned_hashes = [parts[0] for parts in pins if len(parts) == 2 and parts[1] == pin_path]
-        if len(pinned_hashes) != 1:
-            return False
-        return hashlib.sha256(workflow_path.read_bytes()).hexdigest() == pinned_hashes[0]
-    except (OSError, UnicodeError, ValueError):
-        return False
 
 
 def expression(value, event, action=None, matrix=None):
@@ -262,8 +243,6 @@ def job_problems(jobs, event, action, label):
         for row in rows:
             budget = expression(job.get("timeout-minutes", UNKNOWN), event, action, row)
             if isinstance(budget, bool) or not isinstance(budget, (int, float)) or not 0 < budget <= 25:
-                if frozen_proof_budget_exception(label, name, budget, event):
-                    continue
                 if named_budget_exception(label, name, budget):
                     continue
                 found.append(f"{label}: {name} can run on {event}/{action} without a proven 1–25 minute timeout")

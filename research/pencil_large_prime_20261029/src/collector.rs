@@ -51,8 +51,10 @@ impl Collector {
             .iter()
             .enumerate()
             .map(|(i, &small)| {
+                crate::meter::collection(1, 0, 1, 1);
                 crate::meter::charge(|c| c.partition_terms += 1);
                 if small {
+                    crate::meter::collection(0, 0, 1, 0);
                     small_columns.push(i);
                     Column::Small(small_columns.len() - 1)
                 } else {
@@ -98,7 +100,10 @@ impl Collector {
         if self.stop.is_some() {
             return Ok(Admission::AlreadyStopped);
         }
-        if terms.iter().any(|&(i, _)| i >= self.columns.len()) {
+        if terms.iter().any(|&(i, _)| {
+            crate::meter::collection(1, 0, 0, 1);
+            i >= self.columns.len()
+        }) {
             return Err(Error::ColumnOutOfRange);
         }
         self.counts.submitted_rows += 1;
@@ -106,6 +111,7 @@ impl Collector {
         let mut small = Vec::new();
         let mut large = Vec::new();
         for &(i, coefficient) in terms {
+            crate::meter::collection(2, 0, 1, 0); // input tuple, column tag, fresh partition tuple
             crate::meter::charge(|c| c.partition_terms += 1);
             match self.columns[i] {
                 Column::Small(j) => small.push((j, coefficient)),
@@ -124,7 +130,13 @@ impl Collector {
             Outcome::Anchored => Admission::Anchored,
             Outcome::Constraint(row) => {
                 self.counts.emitted_constraints += 1;
-                let terms: Vec<_> = row.iter().map(|(&i, &v)| (i, v)).collect();
+                let terms: Vec<_> = row
+                    .iter()
+                    .map(|(&i, &v)| {
+                        crate::meter::collection(0, 1, 0, 0);
+                        (i, v)
+                    })
+                    .collect();
                 match self.basis.insert(&terms)? {
                     residual::Insert::Independent => Admission::Independent,
                     residual::Insert::Dependent => Admission::Dependent,
@@ -149,6 +161,35 @@ impl Collector {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn collection_trace_partition_and_rejected_prefix() {
+        crate::meter::reset();
+        let mut c = Collector::new(
+            7,
+            &[true, false, true],
+            residual::Limits {
+                retained_coefficients: 20,
+                working_coefficients: 20,
+            },
+        )
+        .unwrap();
+        let n = crate::meter::snapshot();
+        assert_eq!(n.collection_entry_visits, 3);
+        assert_eq!(n.collection_elements_initialized, 10); // 3 tags + 2 small ids + 5 forest slots
+        assert_eq!(n.collection_comparisons, 3);
+        assert_eq!(n.partition_terms, 3); // diagnostic, not a second priced scan
+        crate::meter::reset();
+        assert_eq!(
+            c.insert(&[(0, 1), (3, 1), (1, 1)]),
+            Err(Error::ColumnOutOfRange)
+        );
+        let n = crate::meter::snapshot();
+        assert_eq!(n.collection_entry_visits, 2);
+        assert_eq!(n.collection_comparisons, 2);
+        assert_eq!(n.collection_elements_initialized, 0);
+        assert_eq!(n.partition_terms, 0);
+    }
 
     #[test]
     fn working_cap_retains_original_constraint_and_stops() {

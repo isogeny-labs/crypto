@@ -92,6 +92,31 @@ overhead is included in clocks. The standalone CLI does not create a phase
 session and therefore does not export these online times. No qualified host
 measurement, new cohort outcome or revised ratio is reported here.
 \begin{center}\includegraphics[width=\linewidth]{timing-boundaries.pdf}\end{center}
+\section*{Shared boundary and input preparation}
+A new enclosing method-call clock covers dispatch, cold setup, in-child
+verification and report construction for both methods. Workload preparation,
+serialization and the independent parent audit remain outside this clock.
+The parent audit has a separate observation and does not inherit child L2
+qualification. Existing timers retain their original meanings.
+
+The final affected-module suite recorded 287 passes, zero failures and one
+ignored test. An earlier full-library suite recorded 5,154 passes, one GPU
+lock failure and 123 ignored tests; the same compiled test passed on serial
+recheck. The paired-record exporter has 12 passing development tests.
+
+Native plan validation reproduced all 1,260 archived target identities,
+coordinates and first measured algorithm seeds. The prepared three-arm design
+has one warmup and five measured streams: 22,680 planned calls, comprising
+18,900 measured calls and 3,780 warmups. Planning performed zero solver calls.
+The fixed small-base denominator is 8, with no selection from these data.
+
+The exporter retains missing whole workloads and separates cold and online
+observations. Its operational A/A criterion requires all five
+$T_{\mathrm{rho\_AA}}/T_{\mathrm{rho}}$ values in $[0.90,1.10]$, independently
+for each clock. This tolerance is not a confidence interval. Ratios remain
+unqualified pending protocol, isolation and independent evidence review.
+No new cohort costs or security conclusions follow from this packet.
+
 \section*{Next integration gates}
 \begin{tabular}{p{0.61\linewidth}p{0.28\linewidth}}\toprule
 Requirement & Status\\\midrule

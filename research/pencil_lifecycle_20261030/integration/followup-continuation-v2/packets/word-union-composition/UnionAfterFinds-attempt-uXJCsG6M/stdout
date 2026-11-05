@@ -1,0 +1,16 @@
+/var/tmp/pencil-word-union-composition-20261101-v1/UnionAfterFinds.lean:20:1: error: Type mismatch: After simplification, term
+  h.right
+ has type
+  @Eq (SignedGraphAlgebra.Potential (ZMod r.toNat))
+    { s := sd r (unionPot r (su * pu.s) (sv * pv.s) (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)).s,
+      a := ↑(unionPot r (su * pu.s) (sv * pv.s) (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)).a.toNat,
+      b := ↑(unionPot r (su * pu.s) (sv * pv.s) (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)).b.toNat }
+    (SignedGraphAlgebra.unionPotential (sd r su * sd r pu.s) (sd r sv * sd r pv.s)
+      (wd r a - sd r su * wd r pu.a - sd r sv * wd r pv.a) (wd r b - sd r su * wd r pu.b - sd r sv * wd r pv.b))
+but is expected to have type
+  @Eq (SignedGraphAlgebra.Potential (ZMod r.toNat))
+    { s := sd r (unionPot r (su * pu.s) (sv * pv.s) (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)).s,
+      a := ↑(unionPot r (su * pu.s) (sv * pv.s) (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)).a.toNat,
+      b := ↑(unionPot r (su * pu.s) (sv * pv.s) (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)).b.toNat }
+    (SignedGraphAlgebra.unionPotential (sd r su * sd r pu.s) (sd r sv * sd r pv.s)
+      (wd r a - sd r su * ↑pu.a.toNat - sd r sv * ↑pv.a.toNat) (wd r b - sd r su * ↑pu.b.toNat - sd r sv * ↑pv.b.toNat))

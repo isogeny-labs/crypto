@@ -1,0 +1,79 @@
+{
+  "schema": "mathematical-component-report/v1",
+  "created_utc": "2026-10-30T21:26:17Z",
+  "claims": [
+    {
+      "id": "validity_coefficients",
+      "status": "kernel_checked_and_source_reviewed",
+      "source": "evidence/candidate-attempt3b/SameSupport.lean",
+      "source_sha256": "ecb3a5f91f7217d1ab107466c470a491559f7cfe0276ca6d72661fffef66170b",
+      "assumptions": [
+        "Field K",
+        "same polynomial f",
+        "common monic quadratic u",
+        "u divides f-v1^2 and f-v2^2",
+        "s1=s2"
+      ],
+      "conclusion": "(t2-t1)(s1+s2)=0 and (t2-t1)(t2+t1)=0",
+      "compile_exit": 0,
+      "readback_exit": 0,
+      "fidelity": "faithful_scoped",
+      "review": "evidence/same-support-fidelity-review-v1/delta3b-observations.md"
+    },
+    {
+      "id": "valid_inputs_exclude_same_support_error",
+      "status": "kernel_checked_and_source_reviewed",
+      "source": "evidence/candidate-attempt4/SameSupportClassifier.lean",
+      "source_sha256": "7f21fd6153d972309fe5f0d4b7a5b00ff188eb4e6510cbfbd8c33f7a12efa41e",
+      "assumptions": [
+        "Field K",
+        "DecidableEq K",
+        "2 != 0",
+        "same f and common monic quadratic u",
+        "u divides f-v1^2 and f-v2^2"
+      ],
+      "equal_slopes_required": false,
+      "conclusion": "classifySameU22 s1 t1 s2 t2 != sameUMixedZeroSlope",
+      "compile_exit": 0,
+      "readback_exit": 0,
+      "fidelity": "faithful_scoped",
+      "review": "evidence/same-support-fidelity-review-v1/candidate4-observations.md"
+    }
+  ],
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "helper_checks": [
+    {
+      "module": "ProjectiveLawBoundary",
+      "receipt": "evidence/local-replay-attempt2/ProjectiveLawBoundary.receipt.json",
+      "exit": 0
+    },
+    {
+      "module": "RuntimeSemantics",
+      "receipt": "evidence/local-replay-attempt2/RuntimeSemantics.receipt.json",
+      "exit": 0
+    }
+  ],
+  "remaining_bridge": "Prove weighted-coordinate normalization and literal cross-product scaling from valid runtime inputs, then compiled Rust refinement/invariant preservation",
+  "source_fidelity_review_did_not_read_compiler_output": true,
+  "prior_failures_preserved": true,
+  "operational_costs_are_not_performance_comparison": true,
+  "new_experiments": 0,
+  "new_ratios": [],
+  "official_ledger_promotion": false,
+  "independent_machine_replay": {
+    "status": "passed",
+    "native_steps": 5,
+    "all_exit_zero": true,
+    "receipt": "evidence/independent-replay/receipt.json",
+    "receipt_sha256": "4c13752e250cfdb5263ae02ec391aa35c27eff7efa9109a435eb455719b027bc",
+    "audit_sha256": "fac369e511d510f856f9c44a82456b1143f7b3fd29a05659db5f234bcc3ffc3a",
+    "fresh_helper_and_candidate_objects": true,
+    "producer_work_path_excluded": true,
+    "reused_hashed_toolchain_and_dependency_mirror": true,
+    "separate_kernel_rechecker": false
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h3d8ad6e33a2a",
+  "label": "Koblitz n=17 algebraic solver backends 1-2, target block 1/2 — nested registry L0 diagnostic",
+  "spec_id": "ECS1h99c2c5e954c7",
+  "spec_sha256": "99c2c5e954c754195cff6b931f2c4a0788d589d2207e60088aaafa746f32d379",
+  "env_class_id": "ECBENV3h0bb9eb2ab583",
+  "host_sha256": "ec556c0c727bb0e0c2e71e41940b2dba807430d927465543bde9c15c5e48ecd2",
+  "plan_sha256": "01ef07507e9c0fb88ee31fdc22ee2ad3ed1f83b360b2b10c60dd6ee0b6176102",
+  "binary_sha256": "7e1de5126fba7432b07cc5c1929f6f67a510e9e2dfb290700f2325f0f5bbbe52",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 0.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "5fcca52408a68c08609b1aebe24bb4f03f94c8f0ec0e418fdf510c73a93a4e98",
+  "child_env": {
+    "HOME": "/home/agent",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793495953681,
+  "finished_unix_ms": 1793496046210,
+  "status": "complete",
+  "executions_planned": 30,
+  "records_written": 30,
+  "records_sha256": "2a5b9e0e3531dbcfd51c56a3050a54e79a42d6c649e90be2efedd806669769fa",
+  "status_counts": {
+    "timeout": 5,
+    "verified": 25
+  },
+  "last_seq": 29
+}

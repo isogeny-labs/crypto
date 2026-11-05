@@ -1,0 +1,166 @@
+{
+  "card_id": "CARD-BLINDSPOT-01-11",
+  "card_path": "research/blindspots_20261018/01-fp2-gaudry-k2/card-11.yaml",
+  "card_sha256": "22e60af907cffd1ddb63b5d82b5f2a9e8bac5c0b6a1fd79ed31f56ac5c7e1d60",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-01/card-11"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-01/card-11/b01",
+        "examples/blindspots_01_fp2_gaudry.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.254,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 8.254,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-11/b01",
+        "summarize",
+        "--dir",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/summary.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.137,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "summarize",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/summary.json": "435155f90ab720de4e91baa563fb730c95e5805c05ea1198b1288953827173cf"
+      },
+      "seconds": 0.137,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e433c01093f4fbf2e071b0517f5768433222cdabacff687c1de4406d3eceafde",
+      "stdout_tail": [
+        "summary written: 887 rows from 31 files"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-01/card-11/b01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "63bf2070d4e578f89e1b7a260373b4b3e06fb744",
+  "dirty_after": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/summary.json",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-planted.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-planted.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-10.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-10-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-10-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-10.json"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-planted.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-planted.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-10.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-10-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-10-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-10.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,4 +1,9 @@
 //! Phase-scoped native PMU and process counters. Missing counters remain missing.
+pub(crate) mod checked;
+#[cfg(target_os = "linux")]
+pub(crate) mod pmu_containment;
+#[cfg(target_os = "linux")]
+pub(crate) mod whole_worker;
 use serde_json::{json, Value};
 use std::path::Path;
 use std::time::Instant;
@@ -36,6 +41,9 @@ pub fn measured<T>(
     phase: &str,
     op: impl FnOnce() -> Result<T, String>,
 ) -> Result<T, String> {
+    if checked::policy_present(out)? {
+        return checked::measured(out, registry, phase, op);
+    }
     let before = usage();
     registry.push(storage::write_json(out, &format!("telemetry/{phase}-start.json"),
         "phase-start", &json!({"schema":"crypto.ml-dataset.phase-start/v1","phase":phase,

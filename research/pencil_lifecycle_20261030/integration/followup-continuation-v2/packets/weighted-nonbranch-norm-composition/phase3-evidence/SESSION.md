@@ -1,0 +1,1 @@
+Phase3 same-statement check: prehash0, compiler1 withfour concrete elaborationerrors, posthash0unchanged. Exactnative receipts, telemetry, errors retained. PDFvisually inspected. No scientificrun. Source-only correction proposed separately, originalartifact preserved.

@@ -1,0 +1,45 @@
+{
+  "kind": "development-validation",
+  "source": "src/cryptanalysis/curve25519_wide.rs",
+  "source_sha256": "20ae4700e15f0afca073a83217b3875d28032fab447e27f7cf3d939eb708f28a",
+  "focused_final": {
+    "passed": 14,
+    "failed": 0
+  },
+  "fixture_rechecks": {
+    "passed": 20,
+    "failed": 0,
+    "binary": "/tmp/curve25519-autolab-target/release/deps/crypto_lib-0f5740d1cfe22c09",
+    "binary_sha256": "ba80109ae1f7e701fc0974204d2fba9a32b46df7feadc73fddc0b3254f51b645",
+    "command": "timeout 120 BINARY --exact TEST_NAME --test-threads=1",
+    "test_names": "curve25519-fixture-rechecks-20261105.names"
+  },
+  "full_library_status": "running; first attempt has earlier failures; not a passing gate",
+  "artifacts": [
+    {
+      "path": "curve25519-wide-tests-20261105.log",
+      "bytes": 31834,
+      "sha256": "f64bb4b838b9655dc43d64ee03cbd9761b65fb5d7881e7266fc6d0f2958ffdbb"
+    },
+    {
+      "path": "curve25519-wide-tests-20261105-attempt2.log",
+      "bytes": 1646,
+      "sha256": "2509cca6dbd52a4c773beb903758fa7a941fbb09d60d367fe11c8e3bdc3d0367"
+    },
+    {
+      "path": "curve25519-wide-tests-20261105-final.log",
+      "bytes": 1747,
+      "sha256": "e772bf513744e56323a2fb61f0215acd6745e4896a59fd99f40f647f56087b18"
+    },
+    {
+      "path": "curve25519-fixture-rechecks-20261105.names",
+      "bytes": 1908,
+      "sha256": "98a1542f44be0563c61347291269f0cdc57542f23a0164a5c58223c4f05c93cf"
+    },
+    {
+      "path": "curve25519-fixture-rechecks-20261105.log",
+      "bytes": 6656,
+      "sha256": "89e562988e2115f89b5072b0aa9ebf9f490640753515c667b2c2e50eb4f97c25"
+    }
+  ]
+}

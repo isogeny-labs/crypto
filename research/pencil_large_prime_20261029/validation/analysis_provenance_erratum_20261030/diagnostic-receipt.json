@@ -1,0 +1,31 @@
+{
+  "schema": "pencil-plan-only-packaging-diagnostic/v1",
+  "software_only": true,
+  "live_run_records_loaded": 0,
+  "solver_executions": 0,
+  "actual_retained_analysis_binaries_and_sources": true,
+  "expected_workloads": 60,
+  "expected_slots": 1080,
+  "expected_pairs": 300,
+  "observed_slots": 0,
+  "package_exit": 1,
+  "check_exit": 1,
+  "findings": [
+    "export has 0 warmup rows; protocol plans 180",
+    "export has 0 measured rows; protocol plans 900",
+    "arm \"pencil\" instance shortfall",
+    "arm \"rho\" instance shortfall",
+    "arm \"rho_AA\" instance shortfall",
+    "protocol arm \"pencil\" has no run",
+    "protocol arm \"rho\" has no run",
+    "protocol arm \"rho_AA\" has no run"
+  ],
+  "qualification": false,
+  "interpretation": "Actual native packaging and independent entrypoint check reached only expected zero-observation shortfall findings; no provenance/schema/hash errors remain in the corrected software diagnostic metadata. This does not admit a post-data amendment or qualify the live run.",
+  "artifacts": {
+    "export_sha256": "e5bc50471bd9168f14517b5d02914adea926b896635c799d005547ea7866c29f",
+    "request_sha256": "2d2b855429a0244fea517419ddb00fd531142103eb3bb25cafb027334f782ff8",
+    "diagnostic_protocol_sha256": "664d2ff1ea92f26893ba6ebf46bcd97798e2a646a23e1525930278cbc30a9c01"
+  },
+  "development_error": "Initial package request accidentally used JSON protocol object as sha256 because a jq variable name collided; invalid request and stderr retained, corrected before successful diagnostic."
+}

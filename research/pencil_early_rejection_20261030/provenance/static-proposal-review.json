@@ -1,0 +1,37 @@
+{
+ "schema":"pencil-static-proposal-independent-review/v1",
+ "reviewer":"/root/four_lead_state",
+ "status":"scoped_static_argument_checked_no_concrete_formula_defect_found",
+ "proposal":{"path":"/tmp/pencil-root-count-rejection-proposal.patch","sha256":"f5563172f0ce72ef3021c3eb618451629a7aad54e0adb946f99e5f66323a0fd8"},
+ "proof":{"path":"/tmp/pencil-root-count-rejection-proof.md","sha256":"cc1d349ae36b9781a0af1826475fab9313520a03c20a2ed69ede704d66a091d6"},
+ "source_root":"/home/ec2-user/crypto-pencil-signed-graph-20261029",
+ "sources":[
+  {"path":"research/pencil_large_prime_20261029/src/native_solver.rs","sha256":"e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df"},
+  {"path":"research/pencil_large_prime_20261029/src/meter.rs","sha256":"9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a"}
+ ],
+ "checked":{
+  "field_identity":"(v+lambda*u)^2-h=(v^2-h)+u*(2*lambda*v+lambda^2*u)",
+  "prior_validation":"point_sieve_candidates calls complement(d,0,h,p) before candidate construction; same immutable d/h and degree2 caller gate",
+  "exceptional_candidates":"Exceptional and all-lambda additions to buckets complete before candidate verification; guard sees identical final buckets",
+  "accepted_path":"Length3 retains complement and all geometric assertions; no graph mutation before successful points",
+  "rejected_path":"Other lengths return None and increment rejected_candidates once without graph.relation, under valid bounded field arithmetic",
+  "removed_arithmetic":{"base_muls":"12+3D","base_adds":"18+3D","inversions":0},
+  "removed_collection":{"initialized":18,"copied":"D","visits":"33+L+7D+V","comparisons":"6+D+T"},
+  "count_derivation":"w:5visits/3comparisons/3initializations/3M3A; pmul:21visits/5initializations/9M9A plus trim; numerator:6+L visits/6initializations/6A plus trim; division:1visit/1comparison/4initializations, D loops each7visits/1copy/3M3A, D+1 loop predicates and dividend trims; quotient trim and final remainder predicate",
+  "meter_semantics":"src/meter.rs168-184 specifies explicit finite collection primitives, excludes allocator internals/capacity/API surcharge"
+ },
+ "domain":"Degree2 monic u, normalized residues, nonzero quintic leading coefficient, p prime and p<=2^63, unchanged valid inputs; D1..4, L trimmed product length, T all trim predicates and V corresponding nonempty visits from original execution",
+ "corrections_required":[],
+ "limitations":[
+  "Static algebra/source review only; no compilation, fixture, replay, trial or measured resource result.",
+  "Not full observational equivalence: counts, allocations, timings, deadline interruption and resource outcomes can change.",
+  "No unrestricted full-u64 equivalence: solve_one does not enforce p<=2^63; addition/subtraction may overflow outside stated domain.",
+  "Future exact counter fixtures must enable arithmetic and symbolic meters with correct base/scalar modulus bindings.",
+  "Counters from old observations cannot be retrospectively corrected by estimated deltas; any new instrument needs fresh source binding and prospective admission.",
+  "No speedup, complete-cost improvement, or runtime outcome follows from this review."
+ ],
+ "patch_applied":false,
+ "tests_run":0,
+ "solver_executions":0,
+ "cloud_calls":0
+}

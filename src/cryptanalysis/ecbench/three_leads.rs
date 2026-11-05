@@ -10,11 +10,13 @@ use crate::cryptanalysis::three_leads::{
 };
 use num_bigint::BigUint;
 use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::time::Instant;
 
 #[path = "pencil.rs"]
 mod pencil;
+pub(crate) use pencil::ScopedPencilProgress;
 
 fn coefficients(mut x: u64, p: u64, n: usize) -> Vec<u64> {
     (0..n)
@@ -115,9 +117,17 @@ pub fn solve(
     target: Point,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    applicable(m, inst)?;
     if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        if let Some(result) = pencil::with_active_progress(|sink| {
+            pencil::solve_with_progress(m, inst, target, seed, Some(sink))
+        })? {
+            return result;
+        }
         return pencil::solve(m, inst, target, seed);
     }
+    let adapter_start = Instant::now();
+    let geometry_start = engine::geometry_events::snapshot();
     let cap = m
         .params
         .get("trial_cap")
@@ -125,50 +135,6 @@ pub fn solve(
         .parse::<u64>()
         .map_err(|_| "invalid trial_cap")?;
     let start = Instant::now();
-    if (m.id.contains("genus2") || m.id == "rho.three_leads_jacobian_v1")
-        && inst.family != "scholten"
-    {
-        return Err("genus-2 methods require the certified Scholten family".into());
-    }
-    if matches!(
-        m.id.as_str(),
-        "ic.three_leads_genus2_v1" | "ic.three_leads_genus2_v2"
-    ) {
-        for name in ["independent", "unique_relations"] {
-            if !matches!(m.params[name].as_str(), "0" | "1") {
-                return Err(format!("{name} must be 0 or 1"));
-            }
-        }
-    }
-    if matches!(
-        m.id.as_str(),
-        "ic.three_leads_decomposition_v1" | "ic.three_leads_decomposition_v2"
-    ) {
-        if !matches!(
-            inst.family.as_str(),
-            "subfield" | "pkm_kummer" | "pkm_dickson"
-        ) {
-            return Err("decomposition method requires a subfield or tower fixture".into());
-        }
-        let oracle = m.params["oracle"].as_str();
-        if !matches!(
-            oracle,
-            "linearized" | "linearized_filtered" | "semaev" | "subtract"
-        ) {
-            return Err("unknown study oracle".into());
-        }
-        if !matches!(m.params["random_base"].as_str(), "0" | "1") {
-            return Err("random_base must be 0 or 1".into());
-        }
-        if oracle.starts_with("linearized")
-            && (!inst.curve.binary || inst.family != "subfield" || m.params["random_base"] != "0")
-        {
-            return Err("linearized solver requires the structured binary subfield base".into());
-        }
-        if oracle == "semaev" && inst.curve.binary {
-            return Err("the semaev arm uses the odd-characteristic quadratic; choose linearized or subtract for binary".into());
-        }
-    }
     let rho_online = matches!(
         m.id.as_str(),
         "rho.three_leads_plain_v1" | "rho.three_leads_negation_v1" | "rho.three_leads_jacobian_v1"
@@ -245,6 +211,7 @@ pub fn solve(
             ))
         }
     };
+    let geometry_after_solver = engine::geometry_events::snapshot();
     // Independent post-solver verification is part of the charged cold solve.
     // The ecbench parent then verifies the returned scalar a second time.
     if let Some(k) = out.recovered {
@@ -266,11 +233,14 @@ pub fn solve(
     }
     // This is an operation-count conversion, not a host-time calibration.
     // The complete twelve-cell band is derived from the retained primitives.
+    let geometry_after_verification = engine::geometry_events::snapshot();
     let instrument = inst.fresh();
     let twice = instrument.curve.mul(instrument.generator, 2);
+    let calibration_preparation = instrument.curve.f.counts();
     instrument.curve.f.reset();
     let _ = instrument.curve.add(instrument.generator, twice);
     let price = instrument.curve.f.counts();
+    let geometry_after_calibration = engine::geometry_events::snapshot();
     let unit = arithmetic(price);
     if unit <= 0.0 {
         return Err("source addition price is zero".into());
@@ -305,7 +275,7 @@ pub fn solve(
         .map(|(k, _)| k.clone())
         .collect();
     let detail = json!({"engine":out.detail,"study_family":inst.family,"arithmetic_price":{"square_per_multiply":0.75,"inversion_per_multiply":10,"source_addition":price,"meaning":"declared operation-count conversion; not a wall-time price"},"native_phases":out.phases,"verification":"solver has no planted scalar; fresh source kP checked here and again by ecbench parent"});
-    Ok(SolveReport {
+    let mut report = SolveReport {
         recovered: out.recovered.map(u128::from),
         exhausted: out.exhausted,
         phases,
@@ -330,7 +300,95 @@ pub fn solve(
             sqrs: out.counts.s,
             invs: out.counts.i,
         }),
-    })
+    };
+    let geometry_end = engine::geometry_events::snapshot();
+    report.detail["adapter_accounting"] = json!({
+        "schema":"pencil-adapter-accounting/v1-draft",
+        "geometry":engine::geometry_events::partition(geometry_start, &[
+            ("solver_including_cold_setup",geometry_after_solver),
+            ("additional_source_verification",geometry_after_verification),
+            ("source_unit_calibration",geometry_after_calibration),
+            ("report_assembly",geometry_end),
+        ]).ok_or("invalid adapter geometry partition")?,
+        "source_unit_calibration_arithmetic":{
+            "preparation":calibration_preparation,"addition":price,
+            "total":calibration_preparation+price,
+            "included_in_legacy_group_total":false
+        },
+        "adapter_elapsed_ns_before_accounting_attachment":adapter_start.elapsed().as_nanos(),
+        "coverage_complete":false,
+        "report_allocation_and_serialization_counted":false,
+        "partition_policy":"whole geometry is total; named segments partition it and must not be added again",
+        "accounting_attachment_is_observer_overhead":true
+    });
+    let accounting_replay = json!({
+        "geometry":report.detail["adapter_accounting"]["geometry"],
+        "calibration":report.detail["adapter_accounting"]["source_unit_calibration_arithmetic"]
+    });
+    let accounting_hash =
+        Sha256::digest(serde_json::to_vec(&accounting_replay).map_err(|e| e.to_string())?);
+    for i in 0..4 {
+        let word = u64::from_be_bytes(accounting_hash[i * 8..i * 8 + 8].try_into().unwrap());
+        report
+            .counters
+            .insert(format!("adapter_accounting_sha256_word_{i}"), word);
+    }
+    Ok(report)
+}
+
+/// Refusals that are independent of the target and seed. The planner calls
+/// this before a session is admitted, and [`solve`] repeats it as a backstop.
+pub fn applicable(m: &ResolvedMethod, inst: &StudyInstance) -> Result<(), String> {
+    if m.id != "ic.three_leads_genus2_pencil_symbolic_v2" {
+        m.params["trial_cap"]
+            .parse::<u64>()
+            .map_err(|_| "invalid trial_cap")?;
+    }
+    if (m.id.contains("genus2") || m.id == "rho.three_leads_jacobian_v1")
+        && inst.family != "scholten"
+    {
+        return Err("genus-2 methods require the certified Scholten family".into());
+    }
+    if matches!(
+        m.id.as_str(),
+        "ic.three_leads_genus2_v1" | "ic.three_leads_genus2_v2"
+    ) {
+        for name in ["independent", "unique_relations"] {
+            if !matches!(m.params[name].as_str(), "0" | "1") {
+                return Err(format!("{name} must be 0 or 1"));
+            }
+        }
+    }
+    if matches!(
+        m.id.as_str(),
+        "ic.three_leads_decomposition_v1" | "ic.three_leads_decomposition_v2"
+    ) {
+        if !matches!(
+            inst.family.as_str(),
+            "subfield" | "pkm_kummer" | "pkm_dickson"
+        ) {
+            return Err("decomposition method requires a subfield or tower fixture".into());
+        }
+        let oracle = m.params["oracle"].as_str();
+        if !matches!(
+            oracle,
+            "linearized" | "linearized_filtered" | "semaev" | "subtract"
+        ) {
+            return Err("unknown study oracle".into());
+        }
+        if !matches!(m.params["random_base"].as_str(), "0" | "1") {
+            return Err("random_base must be 0 or 1".into());
+        }
+        if oracle.starts_with("linearized")
+            && (!inst.curve.binary || inst.family != "subfield" || m.params["random_base"] != "0")
+        {
+            return Err("linearized solver requires the structured binary subfield base".into());
+        }
+        if oracle == "semaev" && inst.curve.binary {
+            return Err("the semaev arm uses the odd-characteristic quadratic; choose linearized or subtract for binary".into());
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]

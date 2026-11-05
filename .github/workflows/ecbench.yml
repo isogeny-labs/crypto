@@ -228,6 +228,8 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Materialize compile-time inputs without unrelated archives
+        run: node .github/scripts/ci-scope.mjs --materialize
       # Sessions are found by schema, wherever they live: check out every
       # directory holding a session.json (tree only, no blobs needed to
       # list them), then keep those whose session.json is an ecbench
@@ -269,8 +271,6 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
-      - name: Materialize compile-time inputs without unrelated archives
-        run: node .github/scripts/ci-scope.mjs --materialize
       - name: Committed sessions are evidence and are never edited
         if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
         env:
@@ -281,13 +281,15 @@ jobs:
           # Every session directory by schema, plus any session.json or
           # records.jsonl removed or renamed anywhere (a deleted session
           # is no longer listed at HEAD).
+          # Artifact-store ignore rules are generated checkout metadata;
+          # session capsules, pointers and recorded bytes remain frozen.
           changed=$( {
             git diff --name-only --no-renames --diff-filter=MDRT "$BASE" HEAD -- \
               'research/ecbench_*/sessions' \
               'research/ghs_curve_comparison_20261009/sessions' \
               'research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions' \
               'research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions' \
-              "${sessions[@]}"
+              "${sessions[@]}" ':(exclude)**/.gitignore'
             git diff --name-only --no-renames --diff-filter=DR "$BASE" HEAD -- \
               '*/session.json' '*/records.jsonl'
           } | sort -u)
@@ -303,7 +305,7 @@ jobs:
       - name: Unit tests
         run: cargo test --release --lib ecbench
       - name: Integration tests
-        run: cargo test --release --test ecbench
+        run: cargo test --release --test ecbench --test aps_ecbench --test aps_export_bridge
       - name: Exact n-1 and large-prime integration tests
         run: cargo test --release --test ecbench_large_prime
       - name: Build
@@ -573,7 +575,11 @@ jobs:
     if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false' }}
     needs: [scope, harness]
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 40
+    # Setup (session listing and artifact pull) takes ~8-10 min per shard and
+    # the heaviest shard's audit ran past 15 min on 2026-11-05 (shard 8 of
+    # run 42063872441 was cancelled at the old 25-min cap), so the job allows
+    # 40 min and the validation step 30.
     # The whole audit no longer fits one 2-vCPU hosted runner inside the PR
     # cap: a shard of 273 MB of (decompressed) records took 15 min there, and
     # there are ~3.2 GB in all. Sixteen jobs balanced by record bytes audit
@@ -591,6 +597,7 @@ jobs:
           sparse-checkout: |
             /.github/scripts/
             /docs/ecbench/INCOMPLETE_SESSIONS.tsv
+            /docs/ecbench/DEFECTIVE_SESSIONS.tsv
             /research/ecbench_*/
             /research/ghs_curve_comparison_20261009/
             /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
@@ -641,7 +648,7 @@ jobs:
       - name: Validate committed evidence integrity on pull requests
         # Sixteen byte-balanced shards keep per-run audit work within the PR cap;
         # each shard verifies every assigned session and the matrix covers all.
-        timeout-minutes: 20
+        timeout-minutes: 30
         env:
           AUDIT_SHARD: ${{ matrix.shard }}/16
         run: |

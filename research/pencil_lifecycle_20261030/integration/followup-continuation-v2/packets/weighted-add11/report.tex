@@ -1,0 +1,27 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Weighted distinct add11 validity}
+31 October 2026 UTC. Producer field-value proof, pending independent source-fidelity review.
+
+Five Lean declarations compile and pass separate axiom readback. With four nonzero input weights, distinct normalized affine x coordinates and two degree-one Mumford-valid inputs, the weighted source formula produces nonzero output weights and normalized output validity.
+
+\textbf{Literal field expressions.} Put $x_a=a_x/a_z^2$, $y_a=a_y/(a_z^5a_w)$ and likewise for b. Source cross values are
+\[ A=a_xb_z^2,\quad B=b_xa_z^2,\quad Y=a_y(b_z^5b_w),\quad Z=b_y(a_z^5a_w). \]
+The output is
+\[q=-(A+B),\ r=AB,\ s=Y-Z,\ t=AZ-BY,\ z=a_zb_z,\ w=(A-B)(a_wb_w).\]
+The proof derives $A-B=(x_a-x_b)a_z^2b_z^2\ne0$, then
+\[q/z^2=-(x_a+x_b),\qquad r/z^4=x_ax_b,\]
+\[s/(z^3w)=(y_a-y_b)/(x_a-x_b),\]
+\[t/(z^5w)=(x_ay_b-x_by_a)/(x_a-x_b).\]
+These identities are conclusions, not premises. The reviewed interpolation/Bezout theorem then yields quadratic support divisibility of $f-v^2$. Cross inequality also excludes inverse and doubling guards in their actual source order.
+
+\textbf{Controls.} Over Q, $a=(0,0,2,3)$ and $b=(9,486,3,2)$ normalize to $(0,0),(1,1)$ on $f=X^5-X+X^2$. The full theorem applies after explicit input divisibility proofs. Checks give $z=6,w=-216,q/z^2=-1$ and slope1. Additional controls cover unit weights, zero-z failure and different raw x values encoding equal normalized x.
+
+\textbf{Receipts and failures.} Initial source used reserved keyword ``by'' as a local name and failed; its diagnostics remain. Corrected coefficient and full-theorem stages, controls, and separate readback exit0. Final axioms are only propext, Classical.choice and Quot.sound; unused-tactic warnings remain recorded. Existing pinned dependencies were used, with120-second per-command limits.
+
+\textbf{Next machine obligation.} The intended native mapping requires odd prime $5\le p<2^{31}$, eight canonical input words, Field.n=1, tables=None and normal execution/counter headroom. Canonical primitive products are below $2^{62}$ and add/sub intermediates below $2^{32}$. The actual UInt64 pow5 and complete expression/guard correspondence is not proved here. Neither are native validity refinement, counters/compiler behavior, divisor-class addition or whole-walk closure.
+
+Source hashes, exact hypotheses and receipts: sources.json, status.json, PLAN.md, attempts and readback1/. No scientific run, root edit or cost measurement.
+\end{document}

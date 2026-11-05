@@ -1,0 +1,423 @@
+{
+  "schema": "saved-result-analysis.plan/v1",
+  "plan_id": "nist-ecpp-recorded-work-20261027",
+  "version": 1,
+  "date_utc": "2026-10-27T06:15:37.896Z",
+  "question": "Can fixed source-defined work bounds separate the21 recorded historical choices?",
+  "scope": "One native analysis invocation over21 already completed packets; no legacy execution, clock, DLP or new curve sample",
+  "all_labels_visible": true,
+  "example_transcript_seen": "curve-0, for source/output grammar",
+  "feature_count": 10,
+  "feature_names": [
+    "root_catalog_records",
+    "peak_catalog_records",
+    "total_catalog_records",
+    "root_returned_forms",
+    "total_returned_forms",
+    "chain_levels",
+    "elliptic_levels",
+    "factor_records",
+    "factor_parameter_records",
+    "forced_retries"
+  ],
+  "comparisons": [
+    "Each complete feature: global/per-field, upper/lower tight published envelopes",
+    "Joint of all ten global upper bounds",
+    "Joint of all ten per-field upper bounds"
+  ],
+  "unknown_rule": "Keep all21 rows; do not test an incomplete feature; incomplete ten-feature joint is inconclusive",
+  "native_binary_sha256": "ebcf49771292c5410942988755b775b70d371bcd9e9cb9d6ff53206c49b11edc",
+  "binary_bytes": 231824,
+  "build": [
+    "c++",
+    "-std=c++17",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "profiler.cpp"
+  ],
+  "controls": "Exact synthetic counts; unknown catalog preservation; seven rejecting integrity controls; all pass",
+  "backend": "local analysis of existing results under AGENTS9a",
+  "timeout_seconds": 60,
+  "address_space_KiB": 786432,
+  "planned_analysis_invocations": 1,
+  "curve_rows": 21,
+  "inputs": [
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cohort.tsv",
+      "bytes": 2277,
+      "sha256": "671211e6f5374122d7d211f33f0e92f93a59cc1ed953071fa6d8b985ddaedcc4"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/runtime/Data/ecpp.DfD",
+      "bytes": 32228,
+      "sha256": "500703406b709d562855c16304bd578fff1461bf2ebd029328b4299208d7ddec"
+    },
+    {
+      "path": "../period_ecpp_20261026/results/cohort.tsv",
+      "bytes": 1002,
+      "sha256": "10a094d0f57cb5d43607a220e0f4676388181fa7e1442e9972429eb66f27ef4a"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-0/input",
+      "bytes": 59,
+      "sha256": "b85c21b97bdf61b5772d68908940eaa95b264a1a39239c2906486e217c593685"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-0/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-0/prover.stdout",
+      "bytes": 8861,
+      "sha256": "a7aa9d757bdebf1c6400eb91b75596375906e3db2117ccf1965db769cf73607c"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-1/input",
+      "bytes": 59,
+      "sha256": "eba6ca47f5884aca1057263955f43d5202b59dab477543b4172c8f6e91104e32"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-1/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-1/prover.stdout",
+      "bytes": 7898,
+      "sha256": "1130711f3cb2292be50637f957f68e9a6b17e7cb9685e14365e581f28469a6cf"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-2/input",
+      "bytes": 59,
+      "sha256": "5932b6b7d85f52c98e70eeb2e9b64cedc2c07e4b1525e552962198cb1975a96e"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-2/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-2/prover.stdout",
+      "bytes": 9133,
+      "sha256": "1b315e3bd537513a3c573c42ddfce74528e6f6e5e73795d2610aad3ff3bb6569"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-3/input",
+      "bytes": 59,
+      "sha256": "83d75f1abb5d6ad929ed0c3cb6e2fd7544f29898afe858ef6371814a75b6a519"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-3/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-3/prover.stdout",
+      "bytes": 8446,
+      "sha256": "6b02acceaa381b8ff494471dea95679f44e6f426aa4b868082e4716711067c56"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-4/input",
+      "bytes": 59,
+      "sha256": "a7e640e2367471d751d2dff4deb1deae4b0d0084fe482132b385f0139cdb1e10"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-4/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-4/prover.stdout",
+      "bytes": 6864,
+      "sha256": "9fdca5d2f2e64ece63ca73ca80ee476c076b9a35702d32b9832c6314cb104cf0"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-5/input",
+      "bytes": 69,
+      "sha256": "ac4348edb906a32539bab1827bd00629bde613f6b66cabb6667e2e92ef2a8040"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-5/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-5/prover.stdout",
+      "bytes": 7074,
+      "sha256": "c560182a80a07e6b084ca7909ef4cf764ede2aec6ed09de1474f6c3343c87730"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-6/input",
+      "bytes": 69,
+      "sha256": "58dfeaa04f7fa1e04c931694c59cd1a8e1abec6a3f7284f716b73b3c49e0fe94"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-6/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-6/prover.stdout",
+      "bytes": 9897,
+      "sha256": "75f139af7be83a2dd9f671f1771e32489c55aaa5fc92c11db6b09f6be022d78b"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-7/input",
+      "bytes": 69,
+      "sha256": "b6ecfe161e1e622daf1e8f93bb856b0f31c3fee6a970843dfdf89a65bd5dd867"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-7/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-7/prover.stdout",
+      "bytes": 7498,
+      "sha256": "949997f0aa3f42400b62a11799948823dd00e50489b46807841d505098f0189a"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-8/input",
+      "bytes": 69,
+      "sha256": "2e4d95cce9e38bedb2a2f2ff30de0a1ac1db5e5adda75c7f086f4b867b8f821d"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-8/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-8/prover.stdout",
+      "bytes": 11779,
+      "sha256": "39e1e518be8bd17f6d8d5c89a1fb4c24617cda037c51f209fd197e2ff48ed6bc"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-9/input",
+      "bytes": 73,
+      "sha256": "15513d41ca81d1302a1c219c872c943d3f307f1de6b9c61525e91e0a446e51df"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-9/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-9/prover.stdout",
+      "bytes": 12150,
+      "sha256": "f6ce0494493bf81f81d0a7ab3b8f4eeace757b60248f1819e20fe52170081712"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-10/input",
+      "bytes": 73,
+      "sha256": "e6330a5f942d2a3dc60268b1a1746e111ba7da4db272f86fec9ef449f6618e32"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-10/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-10/prover.stdout",
+      "bytes": 8733,
+      "sha256": "e27b8b04294e1b826b92c1ed8b64a3984a831c1fe4aaaef23f7cfbe79722a595"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-11/input",
+      "bytes": 73,
+      "sha256": "39f44b32f8a4ed75a676f832aa00601a86e844fb605d8cb67e638b76fb372f75"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-11/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-11/prover.stdout",
+      "bytes": 12715,
+      "sha256": "0e44ee8dae1d1fc697fad49feb84d7729704b6a322bfbf8074ad3bfa5a753b35"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-12/input",
+      "bytes": 73,
+      "sha256": "ca7635701d72f9b8fc8be3d14d4cffeccc17519bc0bd6b31f277cf1f1a42bd4f"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-12/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-12/prover.stdout",
+      "bytes": 10326,
+      "sha256": "ad17c31bed00e51b5c72d03b3224de5071f2b30829aff1dfe05fb085b67c6ba6"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-13/input",
+      "bytes": 73,
+      "sha256": "30544ca19059c4373c785d8799b1415fc256ac9fe97b49fc934a55ccb5819ee4"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-13/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-13/prover.stdout",
+      "bytes": 12571,
+      "sha256": "3154fc652094728e0e8993ed73fc6c0d29fa39ebd25f1808908f2890e56ade6a"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-14/input",
+      "bytes": 73,
+      "sha256": "c3ad3fd9c8ddd98b2e3ec32bf0642d108d9a5b5304683af7a3d100c012d40bc1"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-14/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-14/prover.stdout",
+      "bytes": 9947,
+      "sha256": "fa2220e1c6310216a42b12dc2073af06adc02aeb66f1fcf12a83681b3cc3471f"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-15/input",
+      "bytes": 73,
+      "sha256": "02d076ef528882675f407c9fc5d97d73b930865a13db7c0568e148ba354d9eca"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-15/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-15/prover.stdout",
+      "bytes": 10564,
+      "sha256": "e9183e2833f447f36f96e621213b7530aaa90cd58198c14abf78b3ee0a577276"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-16/input",
+      "bytes": 73,
+      "sha256": "bf7aba03cbbe40a9d9dcb234da8b61794a4328e7b3d0a22368b23f6f7b681190"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-16/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-16/prover.stdout",
+      "bytes": 16057,
+      "sha256": "ec4d9995b02e48595bbc0978ee0c07a00d812c782523a8d485bbb8f9420cd5cb"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-17/input",
+      "bytes": 79,
+      "sha256": "a1522489b8d41df57fe02af89ff8dda95634ce2cf0c82394250d40862daa5915"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-17/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-17/prover.stdout",
+      "bytes": 13163,
+      "sha256": "5e92e93e58ab2b2bb8604e990c0f579d12ae7cad43cb506c01b15c753e265075"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-18/input",
+      "bytes": 79,
+      "sha256": "4eb35beea34f80ea79cbaab6001bc6442c8e15dafed02fb7078b07850dcb634e"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-18/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-18/prover.stdout",
+      "bytes": 12773,
+      "sha256": "e812775942b74ca9c35bd6dae35f0269239570ef95bf1a203799ffaf915d83c8"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-19/input",
+      "bytes": 117,
+      "sha256": "d0f5f4b178c525774999977fbc3e65f73696fd4dcced0e5752c388d35883d24d"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-19/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-19/prover.stdout",
+      "bytes": 27474,
+      "sha256": "634ec48b393226b037591c04008ffbe478741fd08f505c389f45c9dce97f0093"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-20/input",
+      "bytes": 158,
+      "sha256": "01ffac4ba49589be1da6ccdf43ea6db5ac113db8de1b82c4573e04cb3d72ef6f"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-20/prover.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "../period_ecpp_20261026/runs/replay-004/cases/curve-20/prover.stdout",
+      "bytes": 52267,
+      "sha256": "9922b9edc3a5049c756db4f561b4677c5190b1da650c845210082c470568115f"
+    },
+    {
+      "path": "inputs/cohort.tsv",
+      "bytes": 2277,
+      "sha256": "671211e6f5374122d7d211f33f0e92f93a59cc1ed953071fa6d8b985ddaedcc4"
+    },
+    {
+      "path": "inputs/admission.tsv",
+      "bytes": 1002,
+      "sha256": "10a094d0f57cb5d43607a220e0f4676388181fa7e1442e9972429eb66f27ef4a"
+    },
+    {
+      "path": "profiler.cpp",
+      "bytes": 14409,
+      "sha256": "3be537ce7ac5e60d79a9995bf9e74cb59ffbd58f57d64cf90fac8a5b5ef6ba51"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "bytes": 6185,
+      "sha256": "7803ecfb889a8ac37b78a24ed5d27b9dd722408130cf374dec1ef9557f99dcd4"
+    },
+    {
+      "path": "analyze-saved.sh",
+      "bytes": 1736,
+      "sha256": "23918e2362601ed8daad80d5218e9356bd57b61480ac864c4f5b3eff8b08b336"
+    },
+    {
+      "path": "binary.sha256",
+      "bytes": 75,
+      "sha256": "89512d5c15d93608f0b58126a3f703a76a11607dfa8269a44614cef5df5ebbd1"
+    },
+    {
+      "path": "sources/source-audit.json",
+      "bytes": 1544,
+      "sha256": "78e7e87106dd8554e78c9a7e4464fdba187085b6a61835f5ed45c919b5555419"
+    },
+    {
+      "path": "sources/upstream.json",
+      "bytes": 1692,
+      "sha256": "61ccd1de1de707c8f494c5aa63bff62a993760225e40636af378edb11e7eed5b"
+    }
+  ],
+  "canonical_experiment_protocol_checker_executed": false,
+  "freeze": {
+    "sha256_excluding_freeze": "85a646f6d5e87f90b2b7e96bf7c327fd4969ab2615de0805d7acc08729ce2d77",
+    "status": "frozen before complete-cohort count extraction; visible labels, not blinded preregistration"
+  }
+}

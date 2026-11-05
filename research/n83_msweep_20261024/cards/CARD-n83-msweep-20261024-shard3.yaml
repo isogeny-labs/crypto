@@ -1,0 +1,34 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-n83-msweep-20261024-shard3
+experiment_id: n83_msweep_20261024
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: b654e95b6e7dc7dbd3f16bce3f46e225fb145a1e
+receipt: research/n83_msweep_20261024/cards/CARD-n83-msweep-20261024-shard3.receipt.json
+binds:
+  - {path: research/n83_msweep_20261024/PROTOCOL.md, sha256: 400c2d32efb252a80cab190a6fdbee9c705a1b128d3e3b92c618793b91cb73ed}
+  - {path: research/n83_msweep_20261024/grid.tsv, sha256: 31aa87faacc809d5bd798c16ce62dfdaaa07d1bdf08806dbaf772d86aa6faf89}
+  - {path: research/n83_msweep_20261024/point.jsonl, sha256: 1a553655348acd8ab6cb993c57df589f2cd394f414856fe8a050aa49881f203b}
+  - {path: research/n83_msweep_20261024/rho_config.json, sha256: cf76ebb5372acfc1355b88374f875980be66cdffba1a82cb6e4c2f28bcfa723b}
+  - {path: research/n83_msweep_20261024/run_shard.sh, sha256: bf5bbb067b2e02f2110c7e6f04b048c0e59a3f080ce4d0dad8626985904e49c0}
+  - {path: ./target/release/examples/n83_msweep_cell, sha256: 1921e7b41a1447506261d32916e03bd2875ec20949fd089677f051c2b64e5d0c}
+must_not_exist:
+  - research/n83_msweep_20261024/raw/shard3
+commands:
+  - id: run-shard3
+    argv: [research/n83_msweep_20261024/run_shard.sh, ./target/release/examples/n83_msweep_cell, research/n83_msweep_20261024/raw/shard3, "4,7"]
+    cwd: .
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/n83_msweep_20261024/receipts/shard3.stdout
+    stderr: research/n83_msweep_20261024/receipts/shard3.stderr
+bus_address: executor-mechanical-n83-msweep-shard3
+background: true
+write_scope:
+  - research/n83_msweep_20261024/raw/
+  - research/n83_msweep_20261024/receipts/
+  - research/n83_msweep_20261024/cards/
+stop_when:
+  - Any command in the card exits with a status other than 0.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.

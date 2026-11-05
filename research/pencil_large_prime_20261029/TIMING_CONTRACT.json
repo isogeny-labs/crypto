@@ -1,0 +1,55 @@
+{
+  "schema": "pencil-timing-boundaries/v1",
+  "status": "implementation_contract_not_experiment_protocol",
+  "metrics": [
+    {
+      "field": "time.method_call_wall_ns",
+      "unit": "ns",
+      "start": "immediately before methods::solve invocation",
+      "stop": "immediately after invocation returns, before profiling dump",
+      "includes": [
+        "dispatch and parameter validation",
+        "per-call algorithm setup",
+        "target-dependent algorithm",
+        "in-child mathematical verification",
+        "method report construction"
+      ],
+      "excludes": [
+        "harness workload reconstruction",
+        "harness allocator preparation",
+        "child JSON serialization",
+        "parent mathematical audit"
+      ],
+      "scope": "same enclosing call for every method",
+      "uncertainty": "requires qualified L2 execution and A/A control; no measurements in this change"
+    },
+    {
+      "field": "time.parent_audit_verification_ns",
+      "unit": "ns",
+      "start": "before parent mul_generator_hex and target comparison",
+      "stop": "after comparison",
+      "absent_when": "no accepted recovered scalar, including censored output",
+      "scope": "parent audit overhead only",
+      "uncertainty": "does not inherit child isolation; diagnostic"
+    },
+    {
+      "field": "time.solve_wall_ns",
+      "unit": "ns",
+      "scope": "unchanged legacy method-specific interval; not substituted for common cold-call metric"
+    },
+    {
+      "field": "time.process_wall_ns",
+      "unit": "ns",
+      "scope": "existing child spawn to reap practicality interval; contains shared method-call interval, never sum them"
+    },
+    {
+      "field": "time.max_rss_kib",
+      "unit": "KiB",
+      "scope": "existing per-child process high-water RSS including workload preparation; not allocated bytes and not additive across phases"
+    }
+  ],
+  "aggregation_rule": "No ratio is computed here. Freeze paired target identities, seeds, arm order, controls, admission and aggregation before cohort data.",
+  "compatibility": "New fields default to absent when reading older JSON and are omitted when absent; historical records and legacy fields unchanged.",
+  "validation": "Shared cold-boundary test passed; final ecbench module suite 287 passed,0 failed,1 ignored. Full-library suite5154 passed,1 GPU lock failure,123 ignored; same-binary serial lock recheck passed.",
+  "online_diagnostics": "time.online_clock_diagnostics absent means unknown; object with error:null explicitly records no producer error. Preserve producer errors; censoring omits object. Final ecbench regression suite passed."
+}

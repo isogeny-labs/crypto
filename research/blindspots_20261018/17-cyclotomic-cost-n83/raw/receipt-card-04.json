@@ -1,0 +1,252 @@
+{
+  "card_id": "CARD-BLINDSPOT-17-04",
+  "card_path": "research/blindspots_20261018/17-cyclotomic-cost-n83/card-04.yaml",
+  "card_sha256": "82151e928a6fa1172206c002a655e500c248092f04ca65c2c11d9228e82368f8",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-17/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-17/card-04/b17",
+        "examples/blindspots_17_cyclo_cost.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.316,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 3.316,
+      "stderr_sha256": "e602264c88d41fdec12e633c2b29dfe4d4f14e7555b5855abb7c9cc55479ae74",
+      "stderr_tail": [
+        "   --> examples/blindspots_17_cyclo_cost.rs:792:5",
+        "    |",
+        "791 | struct Cyc {",
+        "    |        --- fields in this struct",
+        "792 |     n: u32,",
+        "    |     ^",
+        "793 |     p: u32,",
+        "    |     ^",
+        "",
+        "warning: variant `Lex` is never constructed",
+        "   --> examples/blindspots_17_cyclo_cost.rs:934:5",
+        "    |",
+        "930 | enum Source<'a> {",
+        "    |      ------ variant in this enum",
+        "...",
+        "934 |     Lex(&'a [u128], usize, Vec<usize>, bool), // lazily enumerated w-subsets of atoms",
+        "    |     ^^^",
+        "",
+        "warning: 10 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-17/card-04/b17",
+        "--mode",
+        "cell",
+        "--n",
+        "83",
+        "--a",
+        "1",
+        "--k",
+        "300",
+        "--cyc-w",
+        "3",
+        "--arms",
+        "cos,cyc",
+        "--pair",
+        "1",
+        "--nulls",
+        "0",
+        "--probes",
+        "100"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 151.416,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "c83a1-k300-cos-cyc",
+      "index": 3,
+      "outputs": {},
+      "seconds": 151.416,
+      "stderr_sha256": "09cd354a2013508fe39e1547b8da58bca10da5ba64fe5e42ba4fd80e21ca6f5a",
+      "stderr_tail": [
+        "cell n=83 a=1 f=z^83+z^7+z^4+z^2+1 #E=9671406556910881928556062 r=8569786107849059 h=1128547018 type2_onb=true"
+      ],
+      "stdout_sha256": "cb14e45bceff9d8e57901039d8d7cbf343f7101d7049b6ffefdb8e94874dedbc",
+      "stdout_tail": [
+        "{\"kind\":\"curve\",\"n\":83,\"a\":1,\"poly\":\"z^83+z^7+z^4+z^2+1\",\"order\":\"9671406556910881928556062\",\"r\":\"8569786107849059\",\"h\":\"1128547018\",\"log2_r\":52.928,\"type2_onb\":true}",
+        "{\"kind\":\"build\",\"n\":83,\"a\":1,\"arm\":\"cos\",\"w\":0,\"k_req\":300,\"k\":300,\"accounting\":\"faithful\",\"visited\":662,\"lifts\":627,\"projected\":627,\"ops\":{\"adds\":20070,\"doubles\":49710,\"scalar_mults\":1227,\"g\":69780},\"nat\":{\"fadd\":0,\"sort\":0,\"inv\":662,\"sqr\":662,\"mul\":314,\"tr\":662,\"ht_sqr\":25748,\"key_sqr\":51414,\"hash\":927,\"frob\":25200,\"neg\":24900,\"total\":155689},\"s0\":69780.0,\"s01\":85348.9,\"s1\":225469.0,\"secs\":0.798}",
+        "{\"kind\":\"build\",\"n\":83,\"a\":1,\"arm\":\"cos\",\"w\":0,\"k_req\":300,\"k\":300,\"accounting\":\"tidy\",\"visited\":662,\"lifts\":300,\"projected\":300,\"ops\":{\"adds\":3000,\"doubles\":9000,\"scalar_mults\":300,\"g\":12000},\"nat\":{\"fadd\":0,\"sort\":0,\"inv\":632,\"sqr\":632,\"mul\":300,\"tr\":632,\"ht_sqr\":24600,\"key_sqr\":78884,\"hash\":1262,\"frob\":24900,\"neg\":24900,\"total\":181642},\"s0\":12000.0,\"s01\":30164.2,\"s1\":193642.0,\"secs\":0.108}",
+        "{\"kind\":\"build\",\"n\":83,\"a\":1,\"arm\":\"cyc\",\"w\":3,\"k_req\":300,\"k\":300,\"accounting\":\"faithful\",\"visited\":658,\"lifts\":647,\"projected\":647,\"ops\":{\"adds\":13670,\"doubles\":35010,\"scalar_mults\":947,\"g\":48680},\"nat\":{\"fadd\":2287065,\"sort\":15247100,\"inv\":658,\"sqr\":658,\"mul\":324,\"tr\":658,\"ht_sqr\":26568,\"key_sqr\":53054,\"hash\":947,\"frob\":24900,\"neg\":24900,\"total\":17691732},\"s0\":48680.0,\"s01\":1817853.2,\"s1\":17740412.0,\"secs\":0.558}",
+        "{\"kind\":\"build\",\"n\":83,\"a\":1,\"arm\":\"cyc\",\"w\":3,\"k_req\":300,\"k\":300,\"accounting\":\"tidy\",\"visited\":635,\"lifts\":300,\"projected\":300,\"ops\":{\"adds\":3000,\"doubles\":9000,\"scalar_mults\":300,\"g\":12000},\"nat\":{\"fadd\":1905,\"sort\":0,\"inv\":609,\"sqr\":609,\"mul\":300,\"tr\":609,\"ht_sqr\":24600,\"key_sqr\":76670,\"hash\":1235,\"frob\":24900,\"neg\":24900,\"total\":181237},\"s0\":12000.0,\"s01\":30123.7,\"s1\":193237.0,\"secs\":0.113}",
+        "{\"kind\":\"pair\",\"n\":83,\"a\":1,\"arm\":\"cos\",\"k\":300,\"adds\":7494900,\"expected_adds\":7494900,\"entries\":7469097,\"reps\":300,\"nat\":{\"fadd\":0,\"sort\":0,\"inv\":0,\"sqr\":0,\"mul\":0,\"tr\":0,\"ht_sqr\":0,\"key_sqr\":614557200,\"hash\":11578200,\"frob\":4083600,\"neg\":0,\"total\":634302600},\"s0\":7494900,\"s01\":70925160.0,\"s1\":641797500.0,\"y_pred\":1.446792e-7,\"secs\":75.408}",
+        "{\"kind\":\"controls\",\"n\":83,\"a\":1,\"arm\":\"cos\",\"k\":300,\"planted_targets\":16,\"planted_found\":16,\"random_targets\":16,\"probes\":1600,\"hits\":0,\"verified_hits\":0,\"expected_hits\":0.0002,\"probe_nat_each\":83.00,\"probe_adds_per_probe\":0.000000,\"stride_adds_per_probe\":1}",
+        "{\"kind\":\"pair\",\"n\":83,\"a\":1,\"arm\":\"cyc\",\"k\":300,\"adds\":7494900,\"expected_adds\":7494900,\"entries\":7469100,\"reps\":300,\"nat\":{\"fadd\":0,\"sort\":0,\"inv\":0,\"sqr\":0,\"mul\":0,\"tr\":0,\"ht_sqr\":0,\"key_sqr\":614557200,\"hash\":11578200,\"frob\":4083600,\"neg\":0,\"total\":634302600},\"s0\":7494900,\"s01\":70925160.0,\"s1\":641797500.0,\"y_pred\":1.446793e-7,\"secs\":74.297}",
+        "{\"kind\":\"controls\",\"n\":83,\"a\":1,\"arm\":\"cyc\",\"k\":300,\"planted_targets\":16,\"planted_found\":16,\"random_targets\":16,\"probes\":1600,\"hits\":0,\"verified_hits\":0,\"expected_hits\":0.0002,\"probe_nat_each\":83.00,\"probe_adds_per_probe\":0.000000,\"stride_adds_per_probe\":1}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-17/card-04/b17"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-17/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "00ed69f5ac7408456bab7bb091d064695fb2da13",
+  "dirty_after": [
+    "examples/blindspots_20_quantum_classical.rs",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/c83a1-k300-cos-cyc.jsonl",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/c83a1-k300-cos-cyc.log"
+  ],
+  "dirty_before": [
+    "examples/blindspots_20_quantum_classical.rs",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-06-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-06-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-07-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-07-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-19-4-3-test-08-16-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-19-4-3-test-08-16-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-19-4-3-test-16-24-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-19-4-3-test-16-24-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3-c06-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3-c06-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3-c07-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3-c07-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2-c06.model",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2-c07.model",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-06-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-07-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-19-r2-build.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-19-r2-build.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-20-r2-build.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-20-r2-build.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-19-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-20-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-b-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-b-b.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n41-b-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n41-b-b.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n37-b.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n41-b.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-09-b20_c3_r2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-09-build.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-09-build.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-09-gate0-b20.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/receipt-card-09.json",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/c83a0-k93.jsonl",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/c83a0-k93.log",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-03-build.stderr.log",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-03-build.stdout.log",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/receipt-card-03.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

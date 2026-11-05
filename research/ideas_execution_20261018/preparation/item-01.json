@@ -1,0 +1,41 @@
+{
+  "item": 1,
+  "title": "F_p2 FourQ / GLS paired ladder",
+  "original_requirement": "Paired ecbench ladder on random F_p2 curves with 2-torsion symmetrisation, Q-curve endomorphism folding, double large primes; extrapolate the gap to p=2^127-1.",
+  "acceptance_criteria": [
+    "Four or more sizes with matched rho, verified same-instance answers, cold and online costs, peak memory.",
+    "Independent torsion/folding/2LP ablations; prove factor-base invariance before folding.",
+    "FourQ extrapolation explicitly family-specific, modeled, and separate from toy measurements."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/ic_framework/prime_tower.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/ecbench/methods.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/gaudry_cubic.rs"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "No exact quadratic-extension IC/ecbench ladder identified in the inspected method registry; GLV example operates on F_p3 and cannot discharge this item.",
+    "Implement F_p2 sampler/oracle, subgroup/curve identities and matched rho registration, transported endomorphism action and base invariance certificates; freeze complete ladder."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [
+    "Existing Q-curve note must be read before asserting folding gains. Absence in inspected paths is not a corpus-wide absence proof."
+  ],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "F_{p²} curves: FourQ and the GLS class. This is the only deployed family where index calculus ties rho asymptotically, since Gaudry's k = 2 attack costs Õ(p) against rho's Õ(p). The program's whole thesis is iterating constants, and FourQ appears only in dashboards. Falsifier: a paired ecbench ladder on random curves over F_{p²} with 2-torsion symmetrisation, Q-curve endomorphism folding and double large primes, then extrapolate the gap row to p = 2¹²⁷ − 1."
+}

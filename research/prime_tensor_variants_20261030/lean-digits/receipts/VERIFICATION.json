@@ -1,0 +1,34 @@
+{
+  "source_sha256": "1919f74b6d919a5727ec2a1f2f1ba3fad4bb7c395305a427db1b3e087eb4c457",
+  "copied_frozen_source_sha256": "a165aabdc3c5c6586722272b35fab805302ef6178f0be00b1a6b594e0ece114b",
+  "lean": "leanprover/lean4:v4.35.0",
+  "shared_revision": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+  "mathlib_revision": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+  "new_reported_theorems": 8,
+  "unchanged_reported_theorems": 20,
+  "total_theorems": 28,
+  "lake_build_exit_code": 0,
+  "explicit_module_build_exit_code": 0,
+  "axiom_audit": {
+    "exit_code": 0,
+    "audited": 28,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms_subset": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "shared_gate": {
+    "exit_code": 0,
+    "status": "PASS",
+    "source_inventory": ["TernaryPacket.lean", "TernaryDigits.lean"]
+  },
+  "module_replay": {
+    "command": "lake env leanchecker --verbose TernaryDigits",
+    "exit_code": 0
+  },
+  "fresh_replay": {
+    "command": "lake env leanchecker --fresh --verbose TernaryDigits",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "formalization_status": "integer valuation-to-digit and bounded Fin a slot-locality bridges checked; full contraction and ECDLP claims remain open"
+}

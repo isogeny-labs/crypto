@@ -1,0 +1,3286 @@
+{
+  "claims_from": [
+    {
+      "note": "as-run claims, 2026-10-29 (unchanged since f072a62bb)",
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+      "sha256": "4be9dd4755ad6bb2024e85505b89b5000851707ef69746deaec4631729c740ee"
+    },
+    {
+      "note": "corrected in 7a1b8112e; the first pass checked the version with sha256 081499dfe93836c7e745f5b0cad7f40678c302ed79291dd9106020c867354669",
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/README.md",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/README.md",
+      "sha256": "14b479eda0c991ff0a3be3cea1cf0b359645e0750bc94c7e49dd7c614df09a91"
+    },
+    {
+      "note": "corrected claims, both sessions",
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "sha256": "6df1dfcc98784b7b0d74b4e09aaaebcf0d8f68ff62dcce364355dd8f4b81fe8c"
+    },
+    {
+      "note": "corrected claims, both sessions",
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+      "sha256": "a10508403869ae7ac15768203ff97db28422363b498d65481327e545e8a472d5"
+    },
+    {
+      "note": "as-run claims, 2026-10-23 (unchanged)",
+      "path": "../../research/ic_aimed_gather_20261023/summary.json",
+      "repo_path": "research/ic_aimed_gather_20261023/summary.json",
+      "sha256": "a3e06802bada65df50d0e5fc8d05fa76c37b756c5a07ba94c9fd082947c8b338"
+    }
+  ],
+  "controls": [
+    {
+      "expected": 0,
+      "name": "contended_processes",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": 0,
+      "name": "nonzero_exit_processes",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "expected": 126,
+      "name": "isolation_record_per_process",
+      "observed": 126,
+      "ok": true
+    },
+    {
+      "detail": "start order within each round from run.before.unix_time equals permutation (r-1) mod 6",
+      "expected": 42,
+      "name": "schedule_rounds_in_declared_permutation",
+      "observed": 42,
+      "ok": true
+    },
+    {
+      "expected": true,
+      "name": "schedule_global_sequence",
+      "observed": true,
+      "ok": true
+    },
+    {
+      "detail": "env RAYON_NUM_THREADS=1, ic-baseline for a and q, ic-candidate for c, the declared params path, --json --out <label>.json.tmp",
+      "expected": 0,
+      "name": "commands_match_protocol",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "detail": "{\"cpu_model\": \"Intel(R) Xeon(R) Processor @ 2.10GHz\", \"kernel\": \"6.18.44-fc-v185\", \"logical_cpus\": 4, \"machine\": \"x86_64\", \"python\": \"3.13.16\"}",
+      "expected": 1,
+      "name": "single_host",
+      "observed": 1,
+      "ok": true
+    },
+    {
+      "expected": [
+        [
+          3
+        ]
+      ],
+      "name": "reserved_cpu",
+      "observed": [
+        [
+          3
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "expected": "(1, True)",
+      "name": "threads",
+      "observed": [
+        "(1, True)"
+      ],
+      "ok": true
+    },
+    {
+      "expected": [
+        3
+      ],
+      "name": "repetitions_per_process",
+      "observed": [
+        3
+      ],
+      "ok": true
+    },
+    {
+      "expected": "a == q != c",
+      "name": "binary_blake3_consistent_per_arm",
+      "observed": {
+        "a": [
+          "5813db982ea605b1c7cdbcd3cc4815861a70af5f99730cdfbc0f82d4e58bebca"
+        ],
+        "c": [
+          "7893f90ca44130f4b5f9f19463c7440b9d059bd1827923a86b59786f3f013646"
+        ],
+        "q": [
+          "5813db982ea605b1c7cdbcd3cc4815861a70af5f99730cdfbc0f82d4e58bebca"
+        ]
+      },
+      "ok": true
+    },
+    {
+      "detail": "after dropping exactly the keys listed in the replay certificate",
+      "expected": 1,
+      "name": "non_timing_fields_identical_all_126_both_arms",
+      "observed": 1,
+      "ok": true
+    },
+    {
+      "detail": "the 42 per_round entries of summary.json equal this recompute bit for bit (ab/aa collect/total, ok)",
+      "expected": true,
+      "name": "summary_json_per_round_bitwise",
+      "observed": true,
+      "ok": true
+    },
+    {
+      "expected": true,
+      "name": "protocol_committed_before_first_measurement",
+      "observed": "5d726412b 14:25:49Z < first start 14:26:31Z",
+      "ok": true
+    },
+    {
+      "expected": 71,
+      "name": "refusals_count_matches_log",
+      "observed": 71,
+      "ok": true
+    },
+    {
+      "detail": "70 isolation records in runs/time/{aa,ab}",
+      "expected": 0,
+      "name": "first_session_contended_or_failed",
+      "observed": 0,
+      "ok": true
+    },
+    {
+      "detail": "all 70 first-session run files",
+      "expected": "complete, true, [518509155375]",
+      "name": "first_session_identity",
+      "observed": [
+        "[\"complete\", true, [\"518509155375\"]]"
+      ],
+      "ok": true
+    },
+    {
+      "detail": "native recompute vs summary-corrected.json v2, every leaf including false booleans (jq paths with a type test)",
+      "expected": 96,
+      "name": "summary_corrected_all_leaves_bitwise",
+      "observed": 96,
+      "ok": true
+    },
+    {
+      "detail": "native: ../summary.json native medians, ci95, n, above_one and established flags equal ci95_as_run of the recompute",
+      "expected": true,
+      "name": "first_session_summary_json_as_run_bitwise",
+      "observed": true,
+      "ok": true
+    },
+    {
+      "detail": "report.pdf, per-round-collect.{svg,png}, sessions-intervals.{svg,png} byte-identical to aa2_20261029/report/",
+      "expected": true,
+      "name": "benchmarks_renders_equal_study_report",
+      "observed": true,
+      "ok": true
+    },
+    {
+      "detail": "git diff --quiet f072a62bb HEAD: both sessions runs/ (except the artifact-store move of aa2 isolation.jsonl, same sha256, F23), both summary.json, both summarise.sh, PROTOCOL.md, registry, params",
+      "expected": true,
+      "name": "records_unchanged_since_first_pass",
+      "observed": true,
+      "ok": true
+    },
+    {
+      "expected": "exit 0, 25 checks",
+      "name": "native_scalar_verifier",
+      "observed": "exit 0, 25 checks, all true",
+      "ok": true
+    },
+    {
+      "expected": "exit 1",
+      "name": "native_scalar_verifier_rejects_tampered_input",
+      "observed": "exit 1 (every_scalar_dG_equals_Q false)",
+      "ok": true
+    },
+    {
+      "expected": "n/2 odd per resample",
+      "name": "stratified_index_balance",
+      "observed": [
+        [
+          21,
+          21
+        ],
+        [
+          15,
+          15
+        ]
+      ],
+      "ok": true
+    },
+    {
+      "expected": "sha256 equal to the f072a62bb blob",
+      "name": "isolation_jsonl_artifact_pin",
+      "observed": "930167b6a133d186aac900eae5865534e9eca70184e4d5db430f38e60ca5eaff",
+      "ok": true
+    }
+  ],
+  "current_registry_source_equivalence": {
+    "changed_raw_bindings": 1,
+    "checked_on": "2026-10-30",
+    "complete_target_record_equal": true,
+    "current_registry_rows": 20844,
+    "current_registry_sha256": "6077a525a6ef0d692856fb02c16c8f8828c4f472a4bafdcdc4e67b0f2d146165",
+    "current_target_matches": 1,
+    "inherited_scientific_fields_equal": true,
+    "old_target_matches": 1,
+    "original_registry_commit": "ddaba2819f4ee96139c4145fbed905db1c1db46e",
+    "original_registry_rows": 20809,
+    "original_registry_sha256": "53fe929b9b971fa2c74ee29fcd5cea7fca969d411ae28e8cbf413c9550f3032e",
+    "original_report_sha256": "505327cf69bf6b6554244ee1214c71c87ee1331ba73dc74e1c36ebaa6388ee57",
+    "other_raw_input_hashes_verified": 211,
+    "schema": "crypto.aimed-gather.registry-source-equivalence/v1",
+    "scope": "The original native report and performance measurements remain historical and unchanged. This successor validates the same unique complete target record and all unchanged raw inputs against the expanded current registry. No benchmark, scalar replay or timing measurement was executed.",
+    "target_slug": "icv1-f2m53-tm56619371-dac20a85"
+  },
+  "date": "2026-10-29",
+  "findings": [
+    "F1 (material: the bootstrap generator). summarise.sh, and ../summarise.sh, step s <- (s*1103515245 + 12345) % 2147483648 in jq, which computes in IEEE-754 doubles. s*1103515245 exceeds 2^53 from the first step and is rounded before '%'. jq 1.7 here gives the states 178439288, 200959840, 962425888, ... where the integer LCG gives 178439290, 260506667, 1677987976, .... The rounded sequence loses low-order bits, enters a cycle of period 10466 after 7066 steps, and is almost always even. Because n = 42 is even, s mod 42 is then almost always even. Over the 84,000 draws, each odd-numbered round is drawn 3728 to 4333 times and each even-numbered round 1 to 40 times; uniform sampling would give about 2000 each. The 'median with a 95% percentile bootstrap over rounds' is therefore in effect a bootstrap over the 21 odd rounds. Those are exactly the rounds on permutations aqc, qac and caq, so it also loses the balance the schedule was built for: over those rounds a runs before c in two permutations of three, against one of three over the even rounds. The claimed numbers reproduce bit for bit under the as-executed semantics (headline rel_diff 0). They do not reproduce under the textbook integer LCG with the same constants and seed, which is the plain reading of 'the same LCG'.",
+    "F2 (the intervals under a correct bootstrap; the same 42 per-round ratios). Unbiased reference, 400,000 Mersenne-Twister resamples: collect A/B [1.0677, 1.1365] (claimed [1.0898, 1.1597]); collect A/A [0.9769, 1.0254] (claimed [0.9771, 1.0297]); whole set-up A/B [1.0204, 1.0824] (claimed [1.0205, 1.1159]); whole set-up A/A [0.9459, 1.0149] (claimed [0.9409, 1.0354]). The integer LCG with the protocol's seed agrees with the reference within resampling noise (collect A/B [1.0677, 1.1358]). The claimed collect A/B interval excludes everything below 1.0898, although the reference lower end is 1.0677.",
+    "F3 (do the decisions survive a correct bootstrap?). Collect phase: established as executed, under the integer LCG, and in 500 of 500 independent Mersenne-Twister seeds × 2000 resamples (A/B lower end 1.0661 to 1.0681 against A/A upper end 1.0251 to 1.0274). The collect-phase claim is robust to F1. Whole set-up: not established as executed, but established under the integer LCG (1.0204 > 1.0156) and in 98.4% of the MT seeds (A/B lower end 1.0204 against A/A upper end 1.0149, a margin of about 0.005). The pre-registered rule as executed says 'not established', and switching generators after seeing the data would be a post-hoc re-analysis, so this report does not turn the whole set-up into a claim. The study's stated reason, '1.021 is below the A/A's 1.035', rests on an A/A upper end that a correct bootstrap puts at 1.015.",
+    "F4 (the README explains the asymmetric A/B interval wrongly). The README says 'The A/B interval is lopsided because the per-round ratios cluster just above the median'. The asymmetry is F1: the odd-round collect A/B median is 1.1371 and the even-round median is 1.0719, and the interval brackets the odd-round median. Under a correct bootstrap the interval is roughly symmetric about 1.093 ([1.068, 1.136]). 'Its lower end still clears the A/A upper end by 0.06' is true only of the as-executed numbers; the reference margin is 1.0677 - 1.0254 = 0.042.",
+    "F5 (first session; the published board section). The same defect affects the first session's 30-round A/B intervals in ../summarise.sh: odd rounds were drawn about 3760 to 4160 times and even rounds 7 to 37. Arm order alternated each round in that session, so its effective resample came from rounds of a single arm order. With my own code and the same generator I reproduce its collect A/B [1.0648, 1.1604] and whole set-up A/B [1.0179, 1.0685]. A correct bootstrap gives [1.0821, 1.1492] and [1.0179, 1.0798]. Its 5-pair A/A (odd n) is not hit by the parity collapse, and its 'not established' verdict is unchanged (A/A upper end 1.087 > 1.082). Commit 5190fd62d, which landed during this validation, adds docs/ic/LEADERBOARD.md section 'Aimed-subset gather in relation collection, outside tables A–C'. It prints both sessions' intervals as 'median [95% bootstrap]'. Per git grep at HEAD over *.sh and *.jq, only these two scripts use this LCG. Recommendation, for the Coordinator to decide: show the intervals labelled as the declared jq-LCG interval (odd rounds only), or publish corrected intervals as an explicitly post-hoc re-analysis, and fix the generator in integer arithmetic before reusing it.",
+    "F6 (A/A design). The A/A ratio a/q and the A/B ratio a/c share the numerator a, so the two intervals the rule compares are correlated, and the rule compares interval endpoints rather than testing a difference. It was pre-registered, and it errs toward not claiming, so this is a note, not a defect. Per-process medians: q's collect, 235.2 ms, is 2.1% above a's, 230.3 ms; the per-round A/A median is 0.9994.",
+    "F7 (route: local, not Iso Lab). The deviation from the EKS default (CLAUDE.md, AGENTS.md §9a) is declared in PROTOCOL.md before measurement, with a concrete reason: the reachable EKS paths run ecbench specs only, the three processes of a round need one host, and isolab_k8s_run needs an MCP this container lacks. The consequence is a single shared session container: 4 logical CPUs, CPU 3 reserved for the process, the agent's own processes (claude, git) on the others. 71 launches were refused for CPU pressure. All 126 admitted processes were uncontended: other_cpu_seconds at most 0.19 s against about 1.6 s of wall time, and 428 to 455 involuntary switches. No SMT-sibling or frequency control is recorded. My replays ran sequentially on the same container class (kernel 6.18.44-fc-v185, the same /tmp binaries) without isolated_bench. They are a process-level replay of counters, not a cross-host or timing replication. The README states the other limits: one host class, one size (n53), one params file.",
+    "F8 (binary provenance). The ic price outputs record commit, software.git_commit and software.git_dirty as null. The binding of ic-baseline to d34b9b390 and ic-candidate to 6bc18857b rests on the study's statement and on arms.sha256, which was written from the first session's binaries (file mtimes 2026-10-23 01:02 and 00:57 UTC, after 6bc18857b at 00:52:04 UTC). I did not rebuild them, because of the disk and CPU limits. What I verified: both files' sha256 equal arms.sha256; each file's BLAKE3, computed with the upstream C reference implementation (blake3 1.8.7, portable build, from the local cargo registry), equals software.binary_blake3 in every recorded and replayed output of its arm (a and q: 5813db98…, c: 7893f90c…); and the two files differ.",
+    "F9 (scope of the identity claim). The README says 'Every counted operation is identical between arms, so GAE records and every IC row's counted columns stand'. Here identity is verified for rule v3 k0n53/T01 only: all counters, relation counts, status and the recovered logarithm agree across 126 recorded and 6 replayed processes, both arms. Other rows are covered only by the code argument (same summands in the same order) and the first session's unit test and n61 identity check, which were not re-run here.",
+    "F10 (timeline and schedule). PROTOCOL.md, run.sh and arms.sha256 were committed at 14:25:49 UTC (5d726412b). The first process started at 14:26:31 UTC, and none of those files changed afterwards. summarise.sh was committed at 14:28:46 UTC (57b9de782), after the first process and before the last (15:00:07). It implements what PROTOCOL.md declared, so this is an ordering note only. All 126 processes started in the declared order: rounds 1 to 42, each in permutation (r-1) mod 6. Every isolation record's command names the declared binary for its label, RAYON_NUM_THREADS=1, the declared params path and its own --out file.",
+    "F11 (independence disclosure). This validator is a subagent launched from the Claude Code session whose URL appears in the trailers of the change commit (6bc18857b) and of every aa2 commit. It wrote its own reduction in Python, did not execute summarise.sh, and imports no repository code. It read the study's files, the params, the registry and the hash-to-curve definition in src/bin/ic/workflow.rs, which it re-implemented with its own BLAKE3, and it did not see the producer's transcript. The independence is in code and context, not organisational; a validator from another session would be stronger.",
+    "F12 (claim class). The change is correctly classed as engineering. It moves no counted cost: S and every IC row's gap to the matched rho are unchanged, and the board's rule v7 row for this curve is not re-priced. The established effect is about 8.5% less collect-phase time (1/1.093) on one host. The gate's matched-rho reference with the §5a band, required in VALIDATION.json, is outside this report.",
+    "F13 (HEAD moved during validation). The worktree was at f072a62bb when validation began and is at 5190fd62d4 now (5190fd62d: leaderboard files and scripts/build_ic_leaderboard.py only). research/ic_aimed_gather_20261023 is byte-identical between the two commits (git diff --quiet), so the validated snapshot is the committed study at either commit.",
+    "F14 (the rendered board is stale). scripts/build_ic_leaderboard.py was changed in 7a1b8112e, but docs/ic/LEADERBOARD.md, docs/ic-leaderboard.html and docs/ic/leaderboard.json were not regenerated. As committed, they show the as-run intervals under the label 'median [95% bootstrap]', and the verdict 'not established' for the whole set-up without the 'marginal' marking. They also show the section as not validated, so no validated display of the wrong intervals exists. Regenerating them is needed before or with VALIDATION.json; the builder derives the standing from that file in any case.",
+    "F15 (the first session's publications are not annotated). research/ic_aimed_gather_20261023/README.md and report/report.typ (and its PDF) still give the as-run 30-round intervals as the result: collect [1.065, 1.160], whole set-up [1.018, 1.068], and '1.065 against 1.087'. The verdict does not change (corrected collect lower end 1.082 < A/A upper end 1.087, margin -0.005), but those intervals are wrong in the same way. A one-line pointer to aa2_20261029/CORRECTION.md would close it. The first session's records and summary.json should stay as they are.",
+    "F16 (what the corrected generator is). Modulo 2^31, the LCG's lowest bit alternates. With n even, every resample of n consecutive draws therefore contains exactly n/2 odd-numbered and n/2 even-numbered rounds: 21/21 in all 2000 resamples at n = 42, and 15/15 at n = 30. The corrected interval is thus a parity-stratified percentile bootstrap, not an iid one. In aa2 the parity strata are the two halves of the schedule. Against an iid Mersenne-Twister reference (400,000 resamples), each bound moves by at most 0.0007 (collect A/B hi 1.1358 vs 1.1365; whole set-up A/A hi 1.0156 vs 1.0149) and no verdict changes. Labelling the corrected intervals '95% bootstrap' is accurate to that precision; this is a note, not a defect.",
+    "F17 (correct_bootstrap.sh does not re-apply the drop rule). It takes every round as kept instead of dropping rounds with a contended or failed process, as PROTOCOL.md and ../PROTOCOL.md require. This is harmless here: 0 of 126 (aa2) and 0 of 70 (first session) isolation records are contended or nonzero-exit. It would matter only if the script were reused.",
+    "F18 (leaderboard text, minor). The section text in both renderers says 'Every arm counts the same operations and recovers the same logarithm'; adding 'on the measured params' would match the corrected README. The verdict logic itself is right: 'established' only when both generators agree, 'marginal (+m), not claimed' when only the corrected one does, otherwise 'not established'.",
+    "F19 (wording checked and accurate). Checked against the recompute and accurate: CORRECTION.md ('confirmed before any result was shown as validated'; the board showed the section as not validated); 'Medians, counts, identity and isolation figures are unaffected: only the intervals are' (and the established flags that follow from them); README 'clears the A/A's 1.016 by 0.005' (+0.0047, rounded); report.typ 'an independent replay matched every non-timing field in both arms'. Also accurate: the 'not claimed' framing of the whole set-up in all three documents.",
+    "F20 (the validator's own tools broke the language rule). The first and second passes recomputed with Python scratch tools and shipped verify_scalars.py, a certificate verifier. AGENTS.md 'Implementation language: no Python' forbids both. This pass re-derives every headline number natively: recompute_bootstrap.rs and seeds.rs (Rust, rustc -O, in the validator's scratch, hashes in native_tools), verify_scalars.rs (Rust, in the evidence directory), and jq/sha256sum for comparisons and assembly. Every Python result reproduces exactly, and the Python files are historical. The scratch tools are not in the repository; if reviewers should be able to rerun the interval recompute, recompute_bootstrap.rs should be committed beside verify_scalars.rs.",
+    "F21 (VALIDATION.json pins). benchmarks/20261029-ic-aimed-gather/VALIDATION.json (cdba249b4a) pins replay-certificate.json bbb768cb… and validator-report.json 9f107b02…. This pass replaces both, so VALIDATION.json must be re-pinned. Until then the gate refuses the directory on a sha256 mismatch and the board standing cannot read 'validated'. The rho_reference block of VALIDATION.json was not assessed here.",
+    "F22 (progress timeline, minor). tools/progress_metrics.py emits the A/A upper end and the A/B lower end from each historical version of summary-corrected.json. The generator change between 7a1b8112e and ddaba2819 will therefore show as a movement of the A/A upper end (1.0254 to 1.0258) that is not a measurement change. Label it, or skip versions older than the current schema, if the timeline is read as progress.",
+    "F23 (isolation.jsonl moved to the artifact store). Bot commit 0484a85b5c moved research/ic_aimed_gather_20261023/aa2_20261029/runs/isolation.jsonl out of git into the artifact store: it is now gitignored and pinned by runs/.artifacts.json (sha256 930167b6…, 297,706 bytes). The working-tree copy used here, the manifest pin and the blob committed at f072a62bb have the same sha256, so the record is unchanged. A checkout must pull it (ad0c22acd1 does so in the gate and leaderboard workflows) before the raw_data entry resolves. runs/.artifacts.json is added to raw_data."
+  ],
+  "findings_reassessment_after_7a1b8112e": [
+    "F1 resolved. The generator defect is stated correctly in CORRECTION.md, the aa2 report and the commit message, including the 99.6% odd-round share (0.99577 and 0.99586 recomputed) and the three-of-six permutations. The as-run summaries stay as records, which is right.",
+    "F2 resolved. The corrected intervals for both sessions equal the validator's exact-integer recompute bit for bit (76 of 76 values), and each bound lies within 0.0007 of an iid Mersenne-Twister reference. Every rounded figure in the CORRECTION.md table, the README, report.typ and report.pdf matches.",
+    "F3 resolved, and the handling is accurate. The collect phase is claimed as established: margin +0.042 under the corrected generator, also established as run, and in 500 of 500 iid seeds. The whole set-up is 'marginal (+0.005), not claimed'. That is right: the margin is +0.0047 under the corrected generator and +0.0054 under the iid reference (98.4% of seeds), the verdict flips with the generator, and the generator was fixed after the data were seen. Nit: the CORRECTION.md table cell 'established by 0.005 (not established)' reads as a whole-set-up verdict of 'established'. 'rule met by 0.005 only after the fix; not claimed' would match the text below it.",
+    "F4 resolved. The wrong 'ratios cluster just above the median' explanation and the '0.06' margin are gone from the README and report.typ. CORRECTION.md gives the right cause (odd-round median 1.137, even-round median 1.072).",
+    "F5 partly resolved. The aa2 README, report.typ and report.pdf, the plots, the benchmarks renders (byte-identical to the report) and the leaderboard builder (aimed_gather_component reads summary-corrected.json; the Markdown and HTML renderers print 'Intervals are corrected …' and mark a corrected-only verdict 'marginal (+m), not claimed') are corrected. Not yet: (a) the rendered board files at HEAD, docs/ic/LEADERBOARD.md, docs/ic-leaderboard.html and docs/ic/leaderboard.json, still show the as-run intervals as 'median [95% bootstrap]' (collect 1.093 [1.090, 1.160]; leaderboard.json has no ci95_as_run). They predate the builder change and need regenerating (F14). (b) The first session's README.md and report (research/ic_aimed_gather_20261023/README.md and report/report.typ) still print 1.111 [1.065, 1.160] and 1.037 [1.018, 1.068] with no pointer to the correction (F15).",
+    "F6 unchanged. This is a design note, not a defect.",
+    "F7 unchanged. The route and its limits are stated in PROTOCOL.md and the README.",
+    "F8 unchanged. It remains a limitation: no rebuild.",
+    "F9 resolved in the README ('On the measured params every counted operation is identical between arms …; identity was checked here on these params only') and in report.typ. Residual nit: the leaderboard builder's section text and docstring still say 'Every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged' without the 'on the measured params' qualifier. The 'every row above is unchanged' half is true because those rows are not re-priced (F18).",
+    "F10 unchanged. The timeline note stands; correct_bootstrap.sh is a post-hoc reduction and is labelled as one.",
+    "F11 unchanged. The correction was also written in the producing session. Its numbers were re-derived here with separate code, which did not run correct_bootstrap.sh.",
+    "F12 unchanged.",
+    "F13 superseded. HEAD is now 2f8676a7ce: 7a1b8112e is the correction, 72dc8a6da the benchmarks renders, 2f8676a7c the first-pass gate files. git diff --quiet f072a62bb HEAD shows the raw records of both sessions, both summary.json files, both summarise.sh scripts and PROTOCOL.md unchanged."
+  ],
+  "findings_reassessment_after_ddaba2819": [
+    "F14 reopened, partly resolved. The board was regenerated in 284ce2179a after the first correction. It shows the corrected intervals, the 'marginal (+0.005), not claimed' verdict and the 'validated' standing that the VALIDATION.json of cdba249b4a gives it. But ddaba2819 changed summary-corrected.json after that regeneration, so the committed renders (docs/ic/LEADERBOARD.md, docs/ic-leaderboard.html, docs/ic/leaderboard.json) carry the stratified intervals of the first correction: collect A/A 0.977–1.025 (now 1.026), whole set-up A/A 0.946–1.016 (now 1.015), and first-session collect A/B 1.082–1.147 (now 1.149). These are third-decimal differences and no verdict differs. Regenerate from the current builder. VALIDATION.json also pins the second-pass files, which this pass replaces (F21).",
+    "F15 resolved, and the wording is accurate. The first session's README.md and report.typ (and report.pdf, whose text was checked) now open with a correction block: corrected collect [1.082, 1.149] and whole set-up [1.018, 1.080], the 5-pair A/A unaffected, and both verdicts standing (1.082 against 1.087; margin −0.0053). All of it equals the recompute. The report body below the block still quotes the as-run '1.065 against 1.087'; the block that precedes it gives the corrected comparison, so this is acceptable.",
+    "F16 resolved by the second correction. My second pass had rated this a note; review treated it as a defect and fixed it. The resample index is now floor(s·n/2^31). Recomputed: each resample draws 11–32 odd rounds at n = 42 (6–24 at n = 30), against exactly n/2 under the stratified index. The corrected intervals of both sessions reproduce bit for bit. For 2026-10-29, seven of the eight bounds equal the 400,000-resample iid reference exactly, and the eighth (collect A/A upper end 1.02577 against 1.02541) lies inside the 500-seed iid spread [1.02506, 1.02736]. The claims 'no bound moved by more than 0.003 between the two, and no verdict changed' (CORRECTION.md) and '0.0027' (commit message) are accurate. The largest shift is 0.00269, at the 2026-10-23 collect A/B upper end; at 2026-10-29 it is 0.00068. All six flags agree between the corrected and stratified rules.",
+    "F17 unchanged. correct_bootstrap.sh still keeps every round instead of applying the drop rule. This is harmless here: 0 of 126 and 0 of 70 isolation records are contended or nonzero-exit.",
+    "F18 resolved. Both renderers in scripts/build_ic_leaderboard.py, and the committed renders, now say 'On these params every arm counts the same operations and recovers the same logarithm'.",
+    "F19 re-checked against the v2 numbers and accurate. aa2 README: table 1.068–1.136 / 0.977–1.026 and 1.020–1.082 / 0.946–1.015, 'clears the A/A's 1.015 by 0.005' (margin +0.0054), 'by 0.042' (+0.04195). CORRECTION.md: every cell of its table, and the reworded whole-set-up cell 'rule met only after the fix; not claimed (not established)', which resolves the F3 nit. report.typ and report.pdf: text extracted and checked. Plots: per-round-collect title '[1.068, 1.136] vs A/A [0.977, 1.026]'. The benchmark renders are byte-identical to the study's. '500 of 500 independent seeds' reproduces natively: SplitMix64 gives 500/500 established for collect and 490/500 for the whole set-up, against 492/500 from the historical Mersenne-Twister run. The 'marginal (+0.005), not claimed' handling of the whole set-up remains accurate and appropriately cautious: the margin is +0.0054 under the corrected rule and 98% of iid seeds clear it, the verdict flips with the generator, and the generator was fixed after the data were seen."
+  ],
+  "headline": [
+    {
+      "claimed": 1.0930878076239279,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns",
+      "name": "collect_ab_median",
+      "recomputed": 1.0930878076239279,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.08982882862411,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "collect_ab_ci95_lo",
+      "recomputed": 1.08982882862411,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        1.066096088743611,
+        1.0681095567903431
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 1.0677202965483465,
+      "unbiased_reference_400k_mersenne_twister": 1.0677202965483465
+    },
+    {
+      "claimed": 1.159729344106197,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "collect_ab_ci95_hi",
+      "recomputed": 1.159729344106197,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        1.1358003284871343,
+        1.137682354623524
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 1.1358003284871343,
+      "unbiased_reference_400k_mersenne_twister": 1.136470650831469
+    },
+    {
+      "claimed": 0.9994237085117715,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns",
+      "name": "collect_aa_median",
+      "recomputed": 0.9994237085117715,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.977119451944687,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "collect_aa_ci95_lo",
+      "recomputed": 0.977119451944687,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        0.9735011506995677,
+        0.977119451944687
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 0.9768797674101188,
+      "unbiased_reference_400k_mersenne_twister": 0.9768797674101188
+    },
+    {
+      "claimed": 1.029653172613389,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "collect_aa_ci95_hi",
+      "recomputed": 1.029653172613389,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        1.0250580013950887,
+        1.027355587004239
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 1.0254125781305254,
+      "unbiased_reference_400k_mersenne_twister": 1.0254125781305254
+    },
+    {
+      "claimed": 1.0416402202042518,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns",
+      "name": "total_ab_median",
+      "recomputed": 1.0416402202042518,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0205226011426607,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "total_ab_ci95_lo",
+      "recomputed": 1.0205226011426607,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        1.0147649588480752,
+        1.0205226011426607
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 1.0203546825625656,
+      "unbiased_reference_400k_mersenne_twister": 1.0203546825625656
+    },
+    {
+      "claimed": 1.1158916983778722,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "total_ab_ci95_hi",
+      "recomputed": 1.1158916983778722,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        1.0786932001218072,
+        1.0861077012845488
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 1.0824004507031781,
+      "unbiased_reference_400k_mersenne_twister": 1.0824004507031781
+    },
+    {
+      "claimed": 0.9845863968143238,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns",
+      "name": "total_aa_median",
+      "recomputed": 0.9845863968143238,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9409078755594028,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "total_aa_ci95_lo",
+      "recomputed": 0.9409078755594028,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        0.9428643920249539,
+        0.9490055565925022
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 0.945934974308728,
+      "unbiased_reference_400k_mersenne_twister": 0.945934974308728
+    },
+    {
+      "claimed": 1.0354154980568127,
+      "method": "native (recompute_bootstrap.rs): median of the 42 per-round ratios (a/c for A/B, a/q for A/A) of per-process medians over the 3 repetitions of phases_ns.collect or total_ns; percentile bootstrap over rounds in ascending round order: s <- (s*1103515245 + 12345) mod 2^31 from s = 20261029 evaluated as jq does (IEEE-754 double product and sum, truncation to integer before mod), index s mod 42, resample b = draws [42b, 42b+42), 2000 resamples, sorted medians [50] and [1949]",
+      "name": "total_aa_ci95_hi",
+      "recomputed": 1.0354154980568127,
+      "rel_diff": 0,
+      "rel_tol": 1e-9,
+      "spread_over_500_mt_seeds_x_2000": [
+        1.0142662843687007,
+        1.0248408912127567
+      ],
+      "textbook_integer_lcg_same_constants_and_seed": 1.0156315954002633,
+      "unbiased_reference_400k_mersenne_twister": 1.014948939884482
+    },
+    {
+      "claimed": 42,
+      "method": "native (recompute_bootstrap.rs): rounds with all three of a, q, c present",
+      "name": "rounds_complete",
+      "recomputed": 42,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 42,
+      "method": "native (recompute_bootstrap.rs): rounds whose three isolation records have contended == false and exit_status == 0 (last record per label)",
+      "name": "rounds_kept",
+      "recomputed": 42,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "method": "native (recompute_bootstrap.rs): count",
+      "name": "rounds_dropped",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 126,
+      "method": "native (recompute_bootstrap.rs): files [aqc]-r<N>.json",
+      "name": "processes",
+      "recomputed": 126,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 126,
+      "method": "native (recompute_bootstrap.rs): lines of isolation.jsonl (126 distinct labels)",
+      "name": "isolation_records",
+      "recomputed": 126,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "method": "native (recompute_bootstrap.rs): isolation.jsonl run.contended != false",
+      "name": "contended_processes",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "method": "native (recompute_bootstrap.rs): isolation.jsonl run.exit_status != 0",
+      "name": "nonzero_exit_processes",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 71,
+      "method": "native (recompute_bootstrap.rs): runs/refusals.count; refusals.log has 71 lines, each 'machine is busy'",
+      "name": "refused_then_retried",
+      "recomputed": 71,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1,
+      "method": "native (recompute_bootstrap.rs): 1 = true: A/B lo > 1 and A/B lo > A/A hi",
+      "name": "established_collect",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "method": "native (recompute_bootstrap.rs): 0 = false",
+      "name": "established_total",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1,
+      "method": "native (recompute_bootstrap.rs): 1 = every process status complete, all_verified true, recovered [518509155375]",
+      "name": "identity_ok",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 126,
+      "method": "native (recompute_bootstrap.rs): count of run files",
+      "name": "processes_recovering_518509155375_all_verified",
+      "recomputed": 126,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 38,
+      "method": "native (recompute_bootstrap.rs): README 'rounds > 1'",
+      "name": "collect_ab_rounds_above_one",
+      "recomputed": 38,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 29,
+      "method": "native (recompute_bootstrap.rs): README 'rounds > 1'",
+      "name": "total_ab_rounds_above_one",
+      "recomputed": 29,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 20,
+      "method": "native (recompute_bootstrap.rs): summary.json",
+      "name": "collect_aa_rounds_above_one",
+      "recomputed": 20,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 20,
+      "method": "native (recompute_bootstrap.rs): summary.json",
+      "name": "total_aa_rounds_above_one",
+      "recomputed": 20,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 230.3337535,
+      "method": "native (recompute_bootstrap.rs): median over the 42 'a' processes of the per-process median collect time, /1e6 (README quotes 230.3/235.2/212.5 ms collect)",
+      "name": "median_ms_collect_a",
+      "recomputed": 230.3337535,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 419.5670235,
+      "method": "native (recompute_bootstrap.rs): median over the 42 'a' processes of the per-process median total time, /1e6 (README quotes 230.3/235.2/212.5 ms collect)",
+      "name": "median_ms_total_a",
+      "recomputed": 419.5670235,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 235.2093155,
+      "method": "native (recompute_bootstrap.rs): median over the 42 'q' processes of the per-process median collect time, /1e6 (README quotes 230.3/235.2/212.5 ms collect)",
+      "name": "median_ms_collect_q",
+      "recomputed": 235.2093155,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 428.2749685,
+      "method": "native (recompute_bootstrap.rs): median over the 42 'q' processes of the per-process median total time, /1e6 (README quotes 230.3/235.2/212.5 ms collect)",
+      "name": "median_ms_total_q",
+      "recomputed": 428.2749685,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 212.4524455,
+      "method": "native (recompute_bootstrap.rs): median over the 42 'c' processes of the per-process median collect time, /1e6 (README quotes 230.3/235.2/212.5 ms collect)",
+      "name": "median_ms_collect_c",
+      "recomputed": 212.4524455,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 398.809739,
+      "method": "native (recompute_bootstrap.rs): median over the 42 'c' processes of the per-process median total time, /1e6 (README quotes 230.3/235.2/212.5 ms collect)",
+      "name": "median_ms_total_c",
+      "recomputed": 398.809739,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1113287936761795,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.ab_collect.median",
+      "recomputed": 1.1113287936761795,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 30,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.ab_collect.n",
+      "recomputed": 30,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 28,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.ab_collect.above_one",
+      "recomputed": 28,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1.0820591396318928,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.ab_collect.ci95.lo",
+      "recomputed": 1.0820591396318928,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.149245063619933,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.ab_collect.ci95.hi",
+      "recomputed": 1.149245063619933,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0820591396318928,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.ab_collect.ci95_stratified.lo",
+      "recomputed": 1.0820591396318928,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1465597428375427,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.ab_collect.ci95_stratified.hi",
+      "recomputed": 1.1465597428375427,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0647831016579432,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.ab_collect.ci95_as_run.lo",
+      "recomputed": 1.0647831016579432,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1603953138001177,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.ab_collect.ci95_as_run.hi",
+      "recomputed": 1.1603953138001177,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9957666666666667,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-23.ab_collect.as_run_odd_round_share",
+      "recomputed": 0.9957666666666667,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9976659804558075,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.aa_collect.median",
+      "recomputed": 0.9976659804558075,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 5,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.aa_collect.n",
+      "recomputed": 5,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 2,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.aa_collect.above_one",
+      "recomputed": 2,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0.9444588298520109,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.aa_collect.ci95.lo",
+      "recomputed": 0.9444588298520109,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0873582038536536,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.aa_collect.ci95.hi",
+      "recomputed": 1.0873582038536536,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9444588298520109,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.aa_collect.ci95_stratified.lo",
+      "recomputed": 0.9444588298520109,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0873582038536536,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.aa_collect.ci95_stratified.hi",
+      "recomputed": 1.0873582038536536,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9444588298520109,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.aa_collect.ci95_as_run.lo",
+      "recomputed": 0.9444588298520109,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0873582038536536,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.aa_collect.ci95_as_run.hi",
+      "recomputed": 1.0873582038536536,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.604,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-23.aa_collect.as_run_odd_round_share",
+      "recomputed": 0.604,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0372200949688133,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.ab_total.median",
+      "recomputed": 1.0372200949688133,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 30,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.ab_total.n",
+      "recomputed": 30,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 26,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.ab_total.above_one",
+      "recomputed": 26,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1.0179062487910673,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.ab_total.ci95.lo",
+      "recomputed": 1.0179062487910673,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0797665853623717,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.ab_total.ci95.hi",
+      "recomputed": 1.0797665853623717,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0179062487910673,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.ab_total.ci95_stratified.lo",
+      "recomputed": 1.0179062487910673,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0797665853623717,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.ab_total.ci95_stratified.hi",
+      "recomputed": 1.0797665853623717,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0179062487910673,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.ab_total.ci95_as_run.lo",
+      "recomputed": 1.0179062487910673,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0684941771115628,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.ab_total.ci95_as_run.hi",
+      "recomputed": 1.0684941771115628,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9957666666666667,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-23.ab_total.as_run_odd_round_share",
+      "recomputed": 0.9957666666666667,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9927136917805259,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.aa_total.median",
+      "recomputed": 0.9927136917805259,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 5,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.aa_total.n",
+      "recomputed": 5,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-23.aa_total.above_one",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0.9525616744947626,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.aa_total.ci95.lo",
+      "recomputed": 0.9525616744947626,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1209627232568113,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-23.aa_total.ci95.hi",
+      "recomputed": 1.1209627232568113,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9525616744947626,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.aa_total.ci95_stratified.lo",
+      "recomputed": 0.9525616744947626,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1209627232568113,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-23.aa_total.ci95_stratified.hi",
+      "recomputed": 1.1209627232568113,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9525616744947626,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.aa_total.ci95_as_run.lo",
+      "recomputed": 0.9525616744947626,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1209627232568113,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-23.aa_total.ci95_as_run.hi",
+      "recomputed": 1.1209627232568113,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.604,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-23.aa_total.as_run_odd_round_share",
+      "recomputed": 0.604,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-23.established_collect",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-23.established_total",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-23.established_collect_as_run",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-23.established_total_as_run",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-23.established_collect_stratified",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-23.established_total_stratified",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": -0.005299064221760741,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi",
+      "name": "corrected.2026-10-23.margin_collect",
+      "recomputed": -0.005299064221760741,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": -0.10305647446574406,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi",
+      "name": "corrected.2026-10-23.margin_total",
+      "recomputed": -0.10305647446574406,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0930878076239279,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.ab_collect.median",
+      "recomputed": 1.0930878076239279,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 42,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.ab_collect.n",
+      "recomputed": 42,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 38,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.ab_collect.above_one",
+      "recomputed": 38,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1.0677202965483465,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.ab_collect.ci95.lo",
+      "recomputed": 1.0677202965483465,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.136470650831469,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.ab_collect.ci95.hi",
+      "recomputed": 1.136470650831469,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0677202965483465,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.ab_collect.ci95_stratified.lo",
+      "recomputed": 1.0677202965483465,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1358003284871343,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.ab_collect.ci95_stratified.hi",
+      "recomputed": 1.1358003284871343,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.08982882862411,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.ab_collect.ci95_as_run.lo",
+      "recomputed": 1.08982882862411,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.159729344106197,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.ab_collect.ci95_as_run.hi",
+      "recomputed": 1.159729344106197,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9958571428571429,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-29.ab_collect.as_run_odd_round_share",
+      "recomputed": 0.9958571428571429,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9994237085117715,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.aa_collect.median",
+      "recomputed": 0.9994237085117715,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 42,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.aa_collect.n",
+      "recomputed": 42,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 20,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.aa_collect.above_one",
+      "recomputed": 20,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0.9768797674101188,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.aa_collect.ci95.lo",
+      "recomputed": 0.9768797674101188,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0257671548659621,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.aa_collect.ci95.hi",
+      "recomputed": 1.0257671548659621,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9768797674101188,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.aa_collect.ci95_stratified.lo",
+      "recomputed": 0.9768797674101188,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0254125781305254,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.aa_collect.ci95_stratified.hi",
+      "recomputed": 1.0254125781305254,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.977119451944687,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.aa_collect.ci95_as_run.lo",
+      "recomputed": 0.977119451944687,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.029653172613389,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.aa_collect.ci95_as_run.hi",
+      "recomputed": 1.029653172613389,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9958571428571429,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-29.aa_collect.as_run_odd_round_share",
+      "recomputed": 0.9958571428571429,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0416402202042518,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.ab_total.median",
+      "recomputed": 1.0416402202042518,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 42,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.ab_total.n",
+      "recomputed": 42,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 29,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.ab_total.above_one",
+      "recomputed": 29,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1.0203546825625656,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.ab_total.ci95.lo",
+      "recomputed": 1.0203546825625656,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0824004507031781,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.ab_total.ci95.hi",
+      "recomputed": 1.0824004507031781,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0203546825625656,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.ab_total.ci95_stratified.lo",
+      "recomputed": 1.0203546825625656,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0824004507031781,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.ab_total.ci95_stratified.hi",
+      "recomputed": 1.0824004507031781,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0205226011426607,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.ab_total.ci95_as_run.lo",
+      "recomputed": 1.0205226011426607,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1158916983778722,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.ab_total.ci95_as_run.hi",
+      "recomputed": 1.1158916983778722,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9958571428571429,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-29.ab_total.as_run_odd_round_share",
+      "recomputed": 0.9958571428571429,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9845863968143238,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.aa_total.median",
+      "recomputed": 0.9845863968143238,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 42,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.aa_total.n",
+      "recomputed": 42,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 20,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "per-round ratios from the raw records",
+      "name": "corrected.2026-10-29.aa_total.above_one",
+      "recomputed": 20,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0.945934974308728,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.aa_total.ci95.lo",
+      "recomputed": 0.945934974308728,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.014948939884482,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected rule: exact integer LCG step, index floor(s n / 2^31)",
+      "name": "corrected.2026-10-29.aa_total.ci95.hi",
+      "recomputed": 1.014948939884482,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.945934974308728,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.aa_total.ci95_stratified.lo",
+      "recomputed": 0.945934974308728,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0156315954002633,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "stratified rule: exact integer LCG step, index s mod n (the first correction)",
+      "name": "corrected.2026-10-29.aa_total.ci95_stratified.hi",
+      "recomputed": 1.0156315954002633,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9409078755594028,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.aa_total.ci95_as_run.lo",
+      "recomputed": 0.9409078755594028,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.0354154980568127,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "as-run rule: the step in IEEE-754 doubles, truncation before mod, index s mod n (as jq ran it)",
+      "name": "corrected.2026-10-29.aa_total.ci95_as_run.hi",
+      "recomputed": 1.0354154980568127,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9958571428571429,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "share of the 2000n as-run draws on odd-numbered rounds",
+      "name": "corrected.2026-10-29.aa_total.as_run_odd_round_share",
+      "recomputed": 0.9958571428571429,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-29.established_collect",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-29.established_total",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-29.established_collect_as_run",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-29.established_total_as_run",
+      "recomputed": 0,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-29.established_collect_stratified",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "1 = A/B lo > 1 and A/B lo > A/A hi under the named rule (corrected unless _stratified or _as_run)",
+      "name": "corrected.2026-10-29.established_total_stratified",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 0.0419531416823844,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi",
+      "name": "corrected.2026-10-29.margin_collect",
+      "recomputed": 0.0419531416823844,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.0054057426780835804,
+      "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi",
+      "name": "corrected.2026-10-29.margin_total",
+      "recomputed": 0.0054057426780835804,
+      "rel_diff": 0,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "aa2_20261029/CORRECTION.md (Second correction); commit ddaba2819 says 0.0027",
+      "method": "largest |ci95 - ci95_stratified| over both sessions, 4 statistics, both ends",
+      "name": "second_correction.no_bound_moved_more_than_0.003",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0,
+      "value": 0.0026853207823902547
+    },
+    {
+      "claimed": 1,
+      "claimed_in": "aa2_20261029/CORRECTION.md",
+      "method": "established_collect/total equal under the corrected and stratified rules, both sessions",
+      "name": "second_correction.no_verdict_changed",
+      "recomputed": 1,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 11,
+      "claimed_in": "aa2_20261029/CORRECTION.md",
+      "method": "fewest odd-numbered rounds in one A/B collect resample, corrected index, n = 42",
+      "name": "second_correction.odd_rounds_per_resample_min_n42",
+      "recomputed": 11,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 32,
+      "claimed_in": "aa2_20261029/CORRECTION.md",
+      "method": "most odd-numbered rounds in one A/B collect resample, corrected index, n = 42",
+      "name": "second_correction.odd_rounds_per_resample_max_n42",
+      "recomputed": 32,
+      "rel_diff": 0,
+      "rel_tol": 0
+    },
+    {
+      "claimed": 500,
+      "claimed_in": "aa2_20261029/README.md, CORRECTION.md, report.typ (\"500 of 500 independent seeds\")",
+      "method": "native seeds.rs: 500 SplitMix64 seeds x 2000 iid resamples, the declared rule per seed",
+      "name": "iid_seeds_collect_established_of_500",
+      "recomputed": 500,
+      "rel_diff": 0,
+      "rel_tol": 0
+    }
+  ],
+  "historical_python_tools": {
+    "agreement": "every number they produced equals the native recompute (the 34 as-run entries, the first correction intervals now in ci95_stratified, the 400k iid reference, the scalar checks)",
+    "status": "historical, superseded by native_tools",
+    "tools": [
+      "verify_scalars.py (evidence directory, unchanged)",
+      "scratch recompute.py, recompute2.py, sensitivity.py, compare.py, build_reports.py, amend_report.py"
+    ]
+  },
+  "independent": true,
+  "kind": "validator-report",
+  "limitations": [
+    "No rebuild of the binaries from d34b9b390 and 6bc18857b (disk and CPU limits); provenance as in F8.",
+    "No timing replication: the replays are sequential and unisolated, and their times are informational only.",
+    "The matched rho reference and the §5a band required by VALIDATION.json are not assessed here.",
+    "The scalar check depends on the registry's G and modulus and on the target derivation documented in src/bin/ic/workflow.rs (re-implemented, not imported); the derived Q equals the independently recorded Q.",
+    "correct_bootstrap.sh and the leaderboard builder were read, not executed.",
+    "This pass's interval and seed recomputes (recompute_bootstrap.rs, seeds.rs) live in the validator's scratch, not in the repository (F20).",
+    "The leaderboard renders were not regenerated and VALIDATION.json was not touched; both are outside this task's write scope."
+  ],
+  "method": "Third pass. All checks in this pass use native tools only (AGENTS.md 'Implementation language: no Python'); the first two passes' Python scratch tools are superseded, and every number they produced reproduces exactly. recompute_bootstrap.rs is a single Rust file in the validator's scratch, compiled with 'rustc -O', standard library only and no repository code. It reads the raw ic price outputs and isolation.jsonl of both sessions and takes per process the median of the 3 repetitions of phases_ns.collect and total_ns. Per-round ratios: 2026-10-23, A/B = baseline-rN / candidate-rN for N = 1..30 and A/A = baseline-r(2k-1) / baseline-r(2k) for k = 1..5, seed 20261023; 2026-10-29, A/B = a/c and A/A = a/q for rounds 1..42, seed 20261029. It reports the median and a percentile bootstrap of 2000 resamples of n consecutive draws from s <- (1103515245 s + 12345) mod 2^31, taking sorted medians [50] and [1949], under three index rules: the corrected rule, the exact integer step with index floor(s n / 2^31); the stratified rule, the exact step with index s mod n (the first correction); and the as-run rule, the step in IEEE-754 doubles with truncation before mod and index s mod n (what jq executed). It also reports the established flags, margins, odd-round shares, the per-resample odd-round count range and the largest bound shift between corrected and stratified, and it re-derives the as-run summary.json of 2026-10-29: the drop rule from isolation.jsonl, counts, identity and per-label medians. seeds.rs, also native, repeats the decision under 500 independent SplitMix64 seeds × 2000 iid resamples plus a 400,000-resample reference. jq 1.7 compares my output with the published files leaf by leaf, including false booleans, and assembles this report.",
+  "native_tools": [
+    {
+      "binary_sha256": "38fab7edce161a978c8ae35d72d0f7d2a0f19a78fc1ceef5fa8207b2e44aa4cf",
+      "build": "rustc -O",
+      "compiler": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+      "location": "validator scratch (not in the repository; F20)",
+      "source_sha256": "0f2023518eb4358acbc422c89a32fd7da926782833bfc311f485b1ae1399f458",
+      "tool": "recompute_bootstrap.rs"
+    },
+    {
+      "binary_sha256": "6ceb1f0f5ff29b181703d8e41ed9c076d6c9159f2e3b0a02ec39e24b2f615eee",
+      "build": "rustc -O",
+      "compiler": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+      "location": "validator scratch (not in the repository; F20)",
+      "source_sha256": "1e705dc8869769309dba03b5eb25c92415722f0bd174eb666d6b067cebad2e0a",
+      "tool": "seeds.rs"
+    },
+    {
+      "build": "rustc -O",
+      "compiler": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+      "location": "benchmarks/20261029-ic-aimed-gather/verify_scalars.rs",
+      "source_sha256": "1b2e924dfabb24567f3d27f085427d38191952299ab94759b017e12d6cde33d6",
+      "tool": "verify_scalars.rs"
+    },
+    {
+      "tool": "jq",
+      "use": "leaf-by-leaf comparison with the published files; stripped-output canonical form (filter sha256 c22d5684d0afbdb3ad95682b5218cee95730c70f739cb1b5b1b7ec66714e6ee7); report assembly",
+      "version": "jq-1.7"
+    }
+  ],
+  "publications_reviewed": [
+    {
+      "repo_path": "benchmarks/20261029-ic-aimed-gather/per-round-collect.svg",
+      "sha256": "628d06dd48528b1a97a6d3c10f7b64384664ab9cee62ab10997e98a47b217310"
+    },
+    {
+      "repo_path": "benchmarks/20261029-ic-aimed-gather/report.pdf",
+      "sha256": "c501e4ae36460bb84e6087192d8268e89bb067d79b0a665be62f3fc946eb9c15"
+    },
+    {
+      "repo_path": "benchmarks/20261029-ic-aimed-gather/sessions-intervals.svg",
+      "sha256": "bd9e3508804a04c1e9de9738b77c42af43b4e6476dcafcd7ddab1cf55e7a6110"
+    },
+    {
+      "repo_path": "docs/ic-leaderboard.html",
+      "sha256": "5dab78f0e4a2b040b6f64b3ce4d93c5122d09a9fcc1044047f259d227782328f"
+    },
+    {
+      "repo_path": "docs/ic/LEADERBOARD.md",
+      "sha256": "911b5fcb9243a3aa75b85ae82eb94ad17c69954ad41c0c25c0c2a672047cef4f"
+    },
+    {
+      "repo_path": "docs/ic/leaderboard.json",
+      "sha256": "f5d9cc81387732d59106c1e8ae69c6dd1c9d75d0a9fa8e5743ac6d61a537c9c3"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/README.md",
+      "sha256": "f7f28b43b7b58485c3becfe4c1519435da4a54071c46e119cddd95185d99153f"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+      "sha256": "a10508403869ae7ac15768203ff97db28422363b498d65481327e545e8a472d5"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/README.md",
+      "sha256": "14b479eda0c991ff0a3be3cea1cf0b359645e0750bc94c7e49dd7c614df09a91"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/per-round-collect.png",
+      "sha256": "e36ed56f6b34580c488b69626ea49991bbbc979a09e70dfe2cc537ec72367abd"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/per-round-collect.svg",
+      "sha256": "628d06dd48528b1a97a6d3c10f7b64384664ab9cee62ab10997e98a47b217310"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/plots.py",
+      "sha256": "5efcc41107cc5238346c6ba8807e75908d0581c0c66f17a0a8197fdb1c532739"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
+      "sha256": "c501e4ae36460bb84e6087192d8268e89bb067d79b0a665be62f3fc946eb9c15"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.typ",
+      "sha256": "9c5b7dbd071a25189e56f4f68ce02a8e1e8f3b6b3825ba09137a5959d543cb16"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/sessions-intervals.png",
+      "sha256": "6d078203e7f80de7b789d5c4bcae364805438fd74d06c3e0e44245f4185c7f3c"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/sessions-intervals.svg",
+      "sha256": "bd9e3508804a04c1e9de9738b77c42af43b4e6476dcafcd7ddab1cf55e7a6110"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/report/report.pdf",
+      "sha256": "cade0591d0a76fc6ee89dc71a9dc8a517a6a79d626326b686053ed3e61a3aa11"
+    },
+    {
+      "repo_path": "research/ic_aimed_gather_20261023/report/report.typ",
+      "sha256": "86f90005a2ae82bbf09b93b27f568d1ff7b3e30899d113de036c01f5a0ff68bd"
+    },
+    {
+      "repo_path": "scripts/build_ic_leaderboard.py",
+      "sha256": "304de3fa44d44096ee2453558f782634ceb99d3d2e7e68b9f9f9c89db74001ca"
+    },
+    {
+      "repo_path": "tools/progress_metrics.py",
+      "sha256": "07f010bd15a96b7839d5922364bbaa483a8d55bb021012578bc86b627cfe2a6f"
+    }
+  ],
+  "raw_data": [
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r1.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r1.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "c84e18e377c67912cf9c905f07fa56f9fe4a820bfb401cde15481727952f942c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r2.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r2.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "da95aeff3564b7edaafa0fc295b9b995d03f94791c92c40a83093f84f2da1aaa"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r3.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r3.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "aa7102d0d2d7065f2b471282cf33f75809d67119bc17ea496589e66e422044a2"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r4.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r4.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "6097df16ecd5aeefbd39a6ed8e954686daec4a70a2a58c072bfa831741cdaed9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r5.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r5.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "52c0bae62ab4854419f909558d85fbdd51d15806119743b15bed7dac16af2a8b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r6.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r6.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "25f4dd61268b44cb40e6bc4061f1c43f526c705503e967fabb71a7b6471bfe08"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r7.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r7.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "b718a4a366e2615d2fd6fe1c76c690613cff9cdb0ea8b3048ff7dd95e6986699"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r8.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r8.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "5611a03c8817b964f42d986ba00f586604ab48be964267d2b1ed6b9e8d213f91"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r9.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r9.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "ad90c9cb0c4585b5f4ec00d4a7aa92380c9f15a07d3465be7bee6ac2329cb2ea"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r10.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r10.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "36914d597c36e96c51d4b4c8d8f65f5eeffa5dbdb716787da919a2853dc1e3a2"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r11.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r11.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "720e1c3e908271178d540524b105e5938261a5610d241cbbf866e0bc97f41300"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r12.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r12.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "df14365efec9ba0fcc60490a6813a51c8b7a5d43a2d9a1eae0a2fe521ae476f9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r13.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r13.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "19f10c81ce942e480dfe583dcbcfa6a69d8ba7d3e3591bf730f260c095d2ffa1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r14.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r14.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "6a1d4596ff6a8ec7b7e76fc42a6883084666117ea081bf8d5e78430456d9b6b4"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r15.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r15.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "f59c2f08e7efe4174a90b8e893031d2a3d5fa61d9a848d68ae11d06e0fc10477"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r16.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r16.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "79ecaf5b6fb741acbe02dcd346901c6c61351cabdf26fc56b3803da4e85b3136"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r17.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r17.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "378e8294a47654171bc5ea5922584e78217cf6348c385d3c66ec31f72bf69add"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r18.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r18.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "9249c61dad49dbe00240ea558690f68c300c6a0417adb8a35b5b02d398e99abe"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r19.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r19.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "79cee58b715e79c545d80508348216c2de7c8d0c0b792f0dbced4d451394a756"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r20.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r20.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "9653020ba4ad529eaac7e501d62709385f9f63b3ffb7b449d9e7a6cc790ab5d1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r21.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r21.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "81c4e2aa3c07a5ff03aa55a7d3e521a823b517644df8c4ed5e327383e0e7c44a"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r22.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r22.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "4bfb727ea51161551bc96c8d1b6f5de9d58a1e106ffafcff712281004d4fb131"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r23.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r23.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "f9744149a868bb9c44a1fda82835fe1811c272804aa280495f018b28334c7ba8"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r24.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r24.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "23bd3f69160334722787a345c848f6b99fb8f3e0c13158c52366fd00c0ea1636"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r25.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r25.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "76c337661df34ed00cf24e258d7e17fde648b137ecfa21fa3cf2cdd6bf004aaf"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r26.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r26.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "508af986bbe90801d5a6d12d4ea2a8dc76a3ebfe29778bf22bb42870697508ac"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r27.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r27.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "fba6e3215d04c3f7278d01bede386cf0f1fb56f7db32b31f748629c44202799e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r28.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r28.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "5148c9367270a8a14399fa04d3149bbeef04e5eb4c6862ffb2fb67df2eca9e4e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r29.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r29.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "8274a7e3a6dec01f5d378e5d804ef5be4bbebe8240e7cb632108ba10dc55fde5"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r30.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r30.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "39340bed8ada399f6900e70e5d4e631213618f9b274252f831a8abf4c5f8c339"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r31.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r31.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "27974f0bc986f754b7668f5faaf281563237092e9e6be7991f44037bb489c31b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r32.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r32.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "5daaf185feaee059907dcc4cc4153011333d6553cd30d16b658a1593687a1043"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r33.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r33.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "01fe38ddea2c90ed8b0fce72ee3999c18abed3f73023093f7d95b026eacad654"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r34.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r34.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "14893eeaf60d3c9c0973febe67f16a53210a0c42d5bd0d5fc93c9cb816fa93ec"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r35.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r35.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "93fe68f38eeb55872d20fc4aecc4387b58cf3eea09f5a9f6f8e866050465a368"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r36.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r36.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "0248dc6a12a4bdacb9647aaf1f57fe0fe99489f5f530ce9de24ba63fe36387a8"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r37.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r37.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "3c06eb7e50e47a4f6385d4a8d55efe1351d894a217b1d2b3c8462549188eb902"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r38.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r38.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "4abe9b2c93df80671dfff9818402bfef60180aad8e4fdc61dbd8cb1efaa29355"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r39.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r39.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "365685797c13cf17ccd4559ee2a289173c844c2d6d54e78800a87bcd84fa2f16"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r40.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r40.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "414fd5d554d02c19fe6c082a4eebef4b1a1bd232afa6244a7761ccf664994a22"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r41.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r41.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "f7b5b81a37fd16622af05d2761f758f94aff7afcbd207614068a3a0e456dd448"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r42.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/a-r42.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "dbf18ebd2f3efd982bda30ed7216dd36e476b76cdefffce125d653976f4d5c49"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r1.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r1.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "f090923ae64213519479197ede6e86a97d41efbaff96f8185bb1f5ed42b80802"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r2.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r2.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "41bfa8baa1e4253a00775519725cd327846d756412fda720cac3479b6627d6d8"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r3.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r3.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "dfa409d211a67332faefcf7414c004154382af3bd2d7bc7f032d3972920f8208"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r4.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r4.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "780ed010600d61ba9b390a3d33770abed0af5273c2da621951796d0dbf51e95e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r5.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r5.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "cc896b2cac469b19fee3aea5e8007c2c24aaad2777069526069a70a43d9b9fc8"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r6.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r6.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "30665c282bddf9e6a4249db5ff3369576a007ea7ce11fdbb8497301ee881425c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r7.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r7.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "5154056636b618262369777c8a1fbcfbd39ffea2c8f770bac717a65654f0ee65"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r8.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r8.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "2f67fefadce4d80370126f5ade8894cf7b1b7abf1183d4280445a5da7cf9afde"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r9.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r9.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "e6a629e1b1f6a2bb6b0899a792f7fe19b78edf5571357b2854e9b79fa40cbde9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r10.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r10.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "5847d5279f6edee8a58752359c24107105b693be9322f0b1d4920e4d0877600e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r11.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r11.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "809035c8b8fd0143e6c0e1da0339a1944411e05ee8a63e1f97e42c11c7519101"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r12.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r12.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "0b4d54c24f75f61f385265dd5255c51258edd1e1da84a2ec341afa82f0921698"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r13.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r13.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "7c18793cd16a8f817d66a07e0bf163c965447856222f87300e5319b414fc2029"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r14.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r14.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "a7d46eef3f2d982a559a8d6d652005f9d24c8892fb44cdd7b13da7f6845fad28"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r15.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r15.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "82a75981b59bb655a877b844fbb3b21fec90fa7313ed2b2e0e1ad7a225d3193f"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r16.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r16.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "587a373bc7464c87370099e06f9de6a224b130709842ff531982a3e33400788b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r17.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r17.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "f1669c4baa9ee12bd5db677959dc93a230bcd8509c1ec8cc4d74cb49aaba70ed"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r18.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r18.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "2052c1be67f91144124b9acf460381c2e537d2f553e647419d1b052da6a40801"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r19.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r19.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "e7a7a12d650a88722830b4fe560d4061a42759149ef01342d3dacdb5b97676f2"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r20.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r20.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "9571454fffdedb1d34071d1b6ff3d7cf6bcb4eac0e00b0d995828620b339b10c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r21.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r21.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "f918fb858dd8bcf975242802cb04ccfa5a7505ba77f5163d1b975af1e5df8456"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r22.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r22.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "3552b1eb6dd04d5b8c72dd6787c969a533367f89d2d20b200e358d4686e1e935"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r23.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r23.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "7605f33400ba48f85f5584190426ab4227e809cdd037fa1564283cad505de4a9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r24.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r24.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "06ddec5284b37dc7cce70e42d2d66ca2795de8799bc1ef48c115385581b9d59d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r25.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r25.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "6468a3b33bea27de0803fa8579bb71b58012b5a61e4abdf38084a28e4e84af16"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r26.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r26.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "559e77d16d175cfd722909d3f0d9c80790cd8d68999587e11ff63f3bb46cc05d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r27.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r27.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "28e44109885bb935f136720d2ce228ac61d117afb265bd467e529ce9b2790702"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r28.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r28.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "e312e8dd3058df071b0f2df3c2c7b72177f5db4fe659aea8bf607806f791ea43"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r29.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r29.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "f22278fea9b5bf3f2486b63f77f61de81458ba5204476876d72cd6c59c6825d3"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r30.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r30.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "5bd81ecb042ffa87e48177cb9ba88ec8b12e68154b8728eec7c09bb53f1910bc"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r31.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r31.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "8a13d1c132f3a1b6c4dd00a681d65490cef94146835514ccfe8fd001124f7c44"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r32.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r32.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "07ed0b45380db60345cdbcacad2a7443029db37624ecd27480e562097c3b74d0"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r33.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r33.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "92a23795dd178729e86379895804bb6af344137fd6af484be1540f38ab824520"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r34.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r34.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "b3a3c3aa457f7c43f366ffef81b59f9e237f33eaf51eaebcdc23099582bad23e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r35.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r35.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "8c89a5c2b822f111afb556adad9d634736a80898891d8a0e86aa6202274e18ec"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r36.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r36.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "95f0ab78171fa8ec5e31c08ed02a4d264ff90c9a93e89bdb32e3d2c18b84656d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r37.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r37.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "1cbd3633687159eb8f6bcae80c8debff435b7fffab80c298f8091b126be45cea"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r38.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r38.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "6617008c5baa009e9609852deb54d7d7351d090f26ec74fea91e8420d3c047b3"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r39.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r39.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "01818dcb06fcc7b77901dfb04740404cbcd06f3c18e62a40cdc12c485fc0c73e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r40.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r40.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "647a045835d8ff1fbcc3e30e1bc6ed23b88f9d751f52f88b01056c89d3782234"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r41.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r41.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "70fd086d0595eff894ce3ee37f116fb18a3ae983378904afd46af85ea3118b4f"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r42.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/c-r42.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "945f752b4da11d1754738ad500fcde0ae6c73007d821819b07bf9bdb7b5b58e1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r1.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r1.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "db2f895424ae89c308c2e0eca11e0e1071f8d888ae386d8467329cc0fc7050ba"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r2.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r2.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "ec93b95ccfb75d9c35927be75d5ae1ab59ca57b8b4fe30413fe4b837289289e6"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r3.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r3.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "df938097486d50f1bcac16e95c3360ea4ff539dedacaeb8cbc51a228d1d31481"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r4.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r4.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "d75304fa6088400dcb1aba6387644f5d775825da13ee4920eda7f5e8bbacfb6b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r5.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r5.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "8aa7f54a57b0192cfa2c9e29e55590cdb0446ef75c8945aefa47fc9834bdb041"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r6.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r6.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "4a8eab934dfd0eb1e01edd9b40dc54efc2755ac4a36bb126e4817cd18e59bc59"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r7.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r7.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "ba03e8a842daaf9e332293fba599431879bc8887a4c3fc7ccaa5d17ace22467c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r8.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r8.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "1398de7c9c5a2fbfaad4db9b80fa1c5b894cf7a068609bf74b84c8da75bd447f"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r9.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r9.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "72c4d988d175fceada78ae00db2112327c08fc62af0e2b865af8817626248bb1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r10.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r10.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "08b9dd3c8c9586ffbcc9ba11e2dbc97cb270ccee03b97db88fb901ab3bd4590b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r11.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r11.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "a399f69b1c995d4de25d0a1b3939f3a4512cb312652c71092a3c5d3dea1ecdc1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r12.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r12.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "7f0b854474484b9ab64a6cc7ae58369ae185058f6d9db0fb64b8a09d4324c856"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r13.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r13.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "82c0cae52fae08a9d2b866de34e49004f902f2e617bb392991bc595020568ef2"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r14.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r14.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "9e1462ee489255ee2d97d21230294a9d4c509e96c5d2ab26d6b6a990f155524d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r15.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r15.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "1e401c2c5330372f3160165de914fb47f2730ba47a68242cf388d582e2126d4d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r16.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r16.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "7a6e2527974d8a1473f5d709947c0c57d8a682cbed89470df780e53afde7f317"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r17.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r17.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "0bbbdc7f8edd04545ac9447b3b686549902c608379d14e57330acb0bde49ec24"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r18.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r18.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "80f6cf07ba3cfff117935805842d8c07ead5316e5c8ca5697eea7942f51918f1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r19.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r19.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "cee4c887d68c1462877f4747cfc8910f522c3b085cfe49446d9295712d69fb1e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r20.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r20.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "1a60215691e81f03332971120dd208f199ebe321a13f25932b325a3142ff2148"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r21.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r21.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "407f4f0041d862e54e96f2f1d8e1b0ce633f5056ba16a3534d3ccec02a6075d7"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r22.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r22.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "c912e8122051c57bb4032abbf463b8da52b38461471e27f76b51b20dd36a02ef"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r23.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r23.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "a8fa8cfa3f604ec32b3ba216a5ebb9b3fca51a3a244abcdf15ea45a9de6d74bb"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r24.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r24.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "548ac746c6313c599ea5aad775cb97e9d4bfb19aa2e289e2383a2acebf5cf32b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r25.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r25.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "ab3de1022a515a4ddff215da8dd163491b6988141dd9d2dc3513c2422b995ba9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r26.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r26.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "70b0c1b5632dd6eeb0f58b54a262f30399601021b8ea8dd1e4175b856b792e5e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r27.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r27.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "bb427312617dc73389150440c9706e59abf852c604273d7fc69a082aa075e63b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r28.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r28.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "729a512080aa9d67106dfa9657a0187ff30add573eae306c234a0734e87d1a8b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r29.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r29.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "a5fddef32d6671713ab9eb6e545c8573e83756f8779c8d58c66227be43e90ba5"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r30.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r30.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "11652cf290bb0fd0b4191b5847714d9faa7ebb0cb2197571af78e693e911e21a"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r31.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r31.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "2f051ebcb54e314e65eccd1367bd19e1b552dcf8a99c4028b499b52580d3b23d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r32.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r32.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "8744598facb417af96d7399258c3386c7733ae7722a586b1c09ef77375cf3468"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r33.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r33.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "49391b55401159ce5d08b60eec3476681d3c863115de3b17f52897c4d6d0eed8"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r34.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r34.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "a72cb12f5569d0c8f65483cb533d27294a4c28cb9a602f9aae51fef276d49d30"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r35.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r35.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "3bf6a9aba6a900c66da2d57f15fb61a38b7f2e1acfb9aabfe095c02af0d4019e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r36.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r36.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "52fe562a549a994db07ba87aa126baa144779f7dbade0d3e9938ac709ae183b9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r37.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r37.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "5349b95eeba86ae2d9e7ad6bb20ae6cf51c94d0bfa13b9dcd3720ef0755eca34"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r38.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r38.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "8c85d91199ee0156878c9fafa2333ca74d12231b4a18c93be7867dde49282004"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r39.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r39.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "e4a7241461493dd9cb4851f64580f013462e3b2ad408d593059330a209ad37f6"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r40.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r40.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "7c57f2c7d9725d3f4ffd84ce04d66023c31c1985e410c2cce0a41d9142799d8e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r41.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r41.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "8979d23494ce33644f47af1e06e2b4f8a7940293090fe7a4826e31d3e0848b8a"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r42.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/q-r42.json",
+      "role": "ic price --json output (one process)",
+      "sha256": "ff051b21995c572b83a15e5f6e51856a541b4c21374327f6e6603dd868bfbab9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/isolation.jsonl",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/isolation.jsonl",
+      "role": "isolated_bench records, one per process",
+      "sha256": "930167b6a133d186aac900eae5865534e9eca70184e4d5db430f38e60ca5eaff"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/arms.sha256",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/arms.sha256",
+      "role": "claimed sha256 of both binaries",
+      "sha256": "1ad524bdd60b6ac0ee1d27d4c85c02f211b4673747ad1ea774d22b1aca0017fa"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/host.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/host.json",
+      "role": "host manifest",
+      "sha256": "4756c3c1cb0d94bb436b7fa35d573a47d3f45afaad27cdf4ea44e227aae3ae8b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/refusals.count",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/refusals.count",
+      "role": "count of launches refused for CPU pressure",
+      "sha256": "826b6832e45ba17d625debc95ae8554e148550b00c05b47fa8f7be1c555bc83c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/refusals.log",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/refusals.log",
+      "role": "the refusal messages",
+      "sha256": "d0e8bd794a4a5f1adeb6e9de345ca1bc253a05439022f94f428070c37e366b51"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/PROTOCOL.md",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/PROTOCOL.md",
+      "role": "declared statistic and decision rule (definitions implemented independently)",
+      "sha256": "7d51e0451ab7daebe0ae5342f6ce3fe04396f418f3f697af2595f64810ee2de2"
+    },
+    {
+      "path": "../../research/ic_tool_program/rule/v3/runs/k0n53/T01.params.json",
+      "repo_path": "research/ic_tool_program/rule/v3/runs/k0n53/T01.params.json",
+      "role": "workload params: n, a, target public_hash_seed",
+      "sha256": "a65d549a056bb6264100d44d7fd273c9ac3e8e420f6adc51a2e0cccb21a50f82"
+    },
+    {
+      "path": "../../research/ic_tool_program/rule/v3/runs/k0n53/T01-R1.price.json",
+      "repo_path": "research/ic_tool_program/rule/v3/runs/k0n53/T01-R1.price.json",
+      "role": "earlier ic price record with the hashed target Q, G and modulus low terms (compared with; Q re-derived)",
+      "sha256": "83f437c9b89a4b187eb33be92089998c0f8cf9b6a87761ba8ecedc6fe5864fca"
+    },
+    {
+      "path": "../../docs/curves/registry.json",
+      "repo_path": "docs/curves/registry.json",
+      "role": "curve registry: modulus, #E, trace, r, cofactor, G",
+      "sha256": "6077a525a6ef0d692856fb02c16c8f8828c4f472a4bafdcdc4e67b0f2d146165"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+      "role": "corrected intervals under test (claims; recomputed independently)",
+      "sha256": "6df1dfcc98784b7b0d74b4e09aaaebcf0d8f68ff62dcce364355dd8f4b81fe8c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/correct_bootstrap.sh",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/correct_bootstrap.sh",
+      "role": "the correction's reduction script (read, not executed)",
+      "sha256": "71123c8c9cd2edeed538a9e14abcfc2107223fd8100f6d5907d64422042c8404"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+      "role": "the correction's statement (claims reviewed)",
+      "sha256": "a10508403869ae7ac15768203ff97db28422363b498d65481327e545e8a472d5"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r1.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r1.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "6baa26bcdf10226a7b70ef9a2597b45263df878920db9f4d9757797aa6d0e654"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r2.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r2.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "638f2ce60b6a8d4cd594a5fd12b11991c0fb09555ef9aeeee46ce086e2d56f0e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r3.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r3.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "5785e0476dd688bedd349c9f4ca94a8d449985104f12ef3fef0e56fd9fad0422"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r4.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r4.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "ddbda53a571af0096d336e2aac91e0b5b18344ad6f09e21c098e046d3eb3b7c9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r5.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r5.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "82b80f41fc15165745968c859d4bdbaf15fcc85c0710ff0011f32ea0b8111ee9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r6.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r6.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "9be90d5d6154a1e5cf5a841fe0033541da0bd1cee17ff5cb97293e9424ecd04d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r7.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r7.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "1b954a08de748aa16f46036bec024864ca7ca3bd9dfc568c956bf8a9aa4080dd"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r8.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r8.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "823532c40c1566b62acc45e70e033deac55cf4e608965e13f0eb5b29a862d2e9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r9.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r9.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "fe5e85ab056c44fbc4f96baff75b6f111234a421579e5042cd3e465dbc9c7e68"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r10.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r10.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "85e15b5d2be16c478c7eb300f7456d37a8066d65508f37a27e4aa1124bf04493"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r1.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r1.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "99c9ae3dc88d2ffa11b72a1243a87050550232cbfd53783a9923818d1888125a"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r2.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r2.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "fb1ae94ab049401a009c869361a31f8ef12387f2ce68b4b3ac642cd4a94df05c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r3.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r3.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "31b8340f6b3ba84fb10a47107d8999ab76472141295d556870130bf858af3b44"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r4.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r4.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "31f92a79bc962f95e4f21c95b39635225b8c7a81991829c3c32948728256e5ee"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r5.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r5.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "97913e0fb1b7f59a6c4f0418df8bebc6a113cc1d9d7c4f6238835a9ef2c74f83"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r6.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r6.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "2adb94ca4ebdf7f7c423e5556b46a06f951f624b892707044efc8df773313dcf"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r7.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r7.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "fd7e5ad9289fdb3b80a4aa183f2cc8dba9826c400dcdefd717807361309376bf"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r8.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r8.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "95a8431a8fb31004837ce16e2f35b1b0648e7da67af62632a4085741b5513cc2"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r9.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r9.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "2a8207c80f42b55ad46d594cb3b19b80f78feedc65eff2f76538a10c0f3eafd7"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r10.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r10.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "cd7528e5784f561aad97d8eb21957592e5a26ab0d05d005a26741d6df7691737"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r11.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r11.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "5a34d86cd66f91665491c350dab39c4fc2f400a6cdf7b3917b584bd49c7ec4de"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r12.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r12.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "7541e2dfd41ec43674aee0d4b4938b2aa8be0765e89e46fc08f01129f05cb65f"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r13.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r13.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "052695d28505ae85c1228b1cb2ce6dbe23dba46c46e4682585218e29cf598a68"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r14.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r14.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "f3a308aff3f713c044cb61ae0a452b23392c00b847bb7dc7c94909f1dcef4e1d"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r15.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r15.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "d424726cc09d2cc21ea7b0f8cc2dd6d98e78891d442ea960fbd9848e53c2e079"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r16.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r16.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "9115db2ad3b6838206409e0a4eaaa40a444eba40a09f20509da1a0b69c86c781"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r17.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r17.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "9b3ab3a98f5d47235f441f19e54532e4db15541b22dd8b06771ee2924862c58b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r18.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r18.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "a7dd1d8bb35228ee2e6faaea4e827adc1e3db5ded641e02f681a9ff29a4b8851"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r19.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r19.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "71299002bb1dd3d9cfb38ecc00dd4655a30753009d910d4f828cff3233b9ad2c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r20.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r20.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "24acc429a17294bfb413d0e461ec314dea46bb9bd866a9582094723cbe035c4e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r21.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r21.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "2fb69d1d12a4feb8869afbeeec3eb5cbb949c2126a0f8246f05a47b606238058"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r22.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r22.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "7107f172c500ce346370f03e33efa77d73f8a053d64caefdc0ad11ef4e45aa75"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r23.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r23.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "eb094476e73d7f9e6f2b6f4d20789408a7c65f47f250a48a55b03750a409009f"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r24.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r24.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "b99d9f7aae7ab5befd72c41f90cf0d62b0a720fabb0d1c4b721d1d78f7218204"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r25.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r25.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "5e004d5b1a4028b45dc5826749233d8bf270df7e344703fc43abfeb4e8ce2608"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r26.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r26.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "0b3fc2656d20a004a8d50b57a56c714f259a3c076163c9b740f0c1cc97e48337"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r27.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r27.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "3eff99ca9edb3d32451fef6f988f03d406ba29745f8d436b29fa028e251f827c"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r28.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r28.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "c6d523b263e81df9e6ef6c6a1ba694ba93db73f453a43e2e5fb031a0bbaf0265"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r29.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r29.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "623ed97ffd6fff28384e613bb39960801b92d4c38b7dc6b9be04dfe5026172cc"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r30.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r30.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "883905c25563207360b19635168b67c959583b513d19767930bde270b5c3b346"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r1.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r1.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "93052b3bb66a224882347df76ebe24bb91cc79714bf5ee74e1e097decda59d60"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r2.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r2.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "1824cf9b951a641577d68558345fabc8e2a100c6a7c7a05b115d32b33ac3a8dc"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r3.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r3.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "85f61826a79428f8e30024d24a70b634740cf5c6d4afc411a79734ffdcba5c83"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r4.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r4.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "e8c707fe6c96af6bd96d4555af9a6f1047240fa9192353d0db94bbba9fe1ff07"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r5.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r5.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "53bc0cc822b7cebf944862151de3b339e8c98eaebec014acbfc95ca3975bee9a"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r6.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r6.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "99c8f3d01d6895d3c9854cee4106510ea16ca585ca08bf197517616d6076bc8e"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r7.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r7.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "8b0a3eee0e2d3527750b97546b8e62ed244af4beaf5833de9ad6fe4bedd9edce"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r8.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r8.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "abca6399a5a67d2a294faedfcbd6866b2b5ba5b323d7987b5b2e7ce54e14d5a4"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r9.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r9.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "a3140ad32d8e5814c8bafb445709f22c5bf18a2877a3cda04151c354c3443d63"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r10.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r10.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "ae9e18f712760f46bab70fb8b98d8eac90563f2faf630cadbc2e7871f471e8d2"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r11.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r11.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "cfa4878cdcf6b8a7dee09c903254321a5a92d988dc2c9b6986bb1550463ad760"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r12.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r12.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "e17cf8671769b41033e81f9297fa6fbc909d9c4af16907fcf09609d1db07ea38"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r13.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r13.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "cf37b20234992cf99e17b5aea338316ac70a9eb3fc9e6be925845a9967ce2d96"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r14.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r14.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "fcea74d5aa871fcca0546c2a6d003068ca8e171320db624d4661ce5a40116e13"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r15.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r15.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "eed618b2bac358a35f8abc1e31e272a7798003b3cd314da6cec1c1b594e541fb"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r16.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r16.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "c95a652a08c6e2855c9d93f8ec9784592975b71da9618bbf65a51a7508c32fb9"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r17.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r17.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "3eb321988ffca40e72339a8ab0c641453f7987fb3dfea545cf4dc0d28f5a70ec"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r18.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r18.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "a2e152e06d0e4bce3787b579b542def0d18d93d201e78855e08977fc42517e89"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r19.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r19.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "3f4098ab640de4f59d877c4f7f5ce1e5f10ab5a3efe975f6771f49db3d5ecf12"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r20.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r20.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "2212f5a291e42f3d1508d1c30f7f90fa6e8a9e5157ed360946d25c733b013e08"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r21.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r21.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "b9c075000a213d1d1100c471662663deadbb482092bf1d969b953c573e70a629"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r22.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r22.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "4f87e11550bdc4911a7672e55426a6f225c81eb49ebed8ca12d0dd5580ca69c0"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r23.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r23.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "5d2823f7f783064f153b306d0dadb7a974848650221ce57eead38a2ea41ac276"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r24.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r24.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "da13d5c5fdcf271a04bb9c7cf25d82aeb3bf20738a3c13062b329948bd143100"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r25.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r25.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "a83f32c994dad4b5777aa9f5056baef7136e743519678d57560a84180972b79b"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r26.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r26.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "bd217aa6be40a8890813e47c16785d088dde18ef8b4fba4fee94ffcdf5726172"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r27.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r27.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "e76568894310949b8f059fa0a24f86fb4e6ad8b763e001565cc19130b8dad0b1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r28.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r28.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "c176820f861fa9fc9226253ea8722e966b8615250e019fc601af433ddaffcba7"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r29.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r29.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "7fa41e46a075171782cd6e6eae058e8841cf21d9dca269731371fac5427898e1"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r30.json",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r30.json",
+      "role": "first session (2026-10-23) ic price --json output (one process)",
+      "sha256": "31833b952a6540aeee18efdea9ef35498723bcd3756dc675e6b9cb0468163258"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/isolation.jsonl",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/isolation.jsonl",
+      "role": "first session isolated_bench records, A/A",
+      "sha256": "547859d8b702b3616954926be6318f24e73d3b17cfd085e42fc818af1454c6f3"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/isolation.jsonl",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/isolation.jsonl",
+      "role": "first session isolated_bench records, A/B",
+      "sha256": "00358cbce428c108b61c536e77aed5e859d87292d71a2d4914c5797ac5dc177a"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/runs/time/refusals.count",
+      "repo_path": "research/ic_aimed_gather_20261023/runs/time/refusals.count",
+      "role": "first session refusal count",
+      "sha256": "a2c6c14110a317833ac8f2fbae7080ee844af7469b2aa702876548dcf4c58077"
+    },
+    {
+      "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/runs/.artifacts.json",
+      "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/runs/.artifacts.json",
+      "role": "artifact-store manifest pinning runs/isolation.jsonl (F23)",
+      "sha256": "0e1918ba138b3be88a3992af446b0d5834905fcfb292aefa3861e83db8c44acc"
+    }
+  ],
+  "revision": {
+    "date": "2026-10-29",
+    "first_pass_sha256": "0235bced1913a180df8cc1cd46c1f951861d9502e348b501e9b38b80f3aa29db",
+    "pass": 3,
+    "previous_sha256": "9f107b02672941d636accd47d25e5ed26de6be92e438e3bd8e6ff34b6f9fb41e",
+    "reason": "second correction (ddaba2819: high-bit resample index, summary-corrected.json v2) and native re-derivation of every number (AGENTS.md: no Python for verifiers)"
+  },
+  "sensitivity": {
+    "double_lcg_cycle": {
+      "distinct_states_in_84000_draws": 17532,
+      "period": 10466,
+      "pre_period_steps": 7066
+    },
+    "double_lcg_draws_per_round": {
+      "1": 3884,
+      "10": 8,
+      "11": 3818,
+      "12": 30,
+      "13": 3872,
+      "14": 14,
+      "15": 4126,
+      "16": 8,
+      "17": 4112,
+      "18": 15,
+      "19": 3745,
+      "2": 1,
+      "20": 16,
+      "21": 4033,
+      "22": 17,
+      "23": 3743,
+      "24": 16,
+      "25": 4028,
+      "26": 8,
+      "27": 3860,
+      "28": 32,
+      "29": 4333,
+      "3": 3978,
+      "30": 1,
+      "31": 3832,
+      "32": 9,
+      "33": 4119,
+      "34": 31,
+      "35": 3728,
+      "36": 17,
+      "37": 3876,
+      "38": 31,
+      "39": 3951,
+      "4": 40,
+      "40": 15,
+      "41": 4075,
+      "42": 14,
+      "5": 4102,
+      "6": 1,
+      "7": 4304,
+      "8": 24,
+      "9": 4133
+    },
+    "exact_lcg_parity_stratification": {
+      "even_index_draws_per_resample": {
+        "n30": "exactly 15 in all 2000 resamples",
+        "n42": "exactly 21 in all 2000 resamples"
+      },
+      "iid_reference_bounds_vs_corrected": {
+        "aa_collect": {
+          "corrected": [
+            0.9768797674101188,
+            1.0254125781305254
+          ],
+          "iid_mt_400k": [
+            0.9768797674101188,
+            1.0254125781305254
+          ]
+        },
+        "aa_total": {
+          "corrected": [
+            0.945934974308728,
+            1.0156315954002633
+          ],
+          "iid_mt_400k": [
+            0.945934974308728,
+            1.014948939884482
+          ]
+        },
+        "ab_collect": {
+          "corrected": [
+            1.0677202965483465,
+            1.1358003284871343
+          ],
+          "iid_mt_400k": [
+            1.0677202965483465,
+            1.136470650831469
+          ]
+        },
+        "ab_total": {
+          "corrected": [
+            1.0203546825625656,
+            1.0824004507031781
+          ],
+          "iid_mt_400k": [
+            1.0203546825625656,
+            1.0824004507031781
+          ]
+        }
+      },
+      "why": "mod 2^31 with odd increment and odd multiplier, the LCG's lowest bit alternates, so s mod n (n even) alternates parity"
+    },
+    "first_session_ab_reproduced": {
+      "collect": {
+        "double_lcg_20261023": [
+          1.0647831016579432,
+          1.1603953138001177
+        ],
+        "unbiased_reference": [
+          1.0820591396318928,
+          1.149245063619933
+        ]
+      },
+      "total": {
+        "double_lcg_20261023": [
+          1.0179062487910673,
+          1.0684941771115628
+        ],
+        "unbiased_reference": [
+          1.0179062487910673,
+          1.0797665853623717
+        ]
+      }
+    },
+    "mt_500_seeds_x_2000": {
+      "aa_collect": {
+        "hi_max": 1.027355587004239,
+        "hi_median": 1.0254125781305254,
+        "hi_min": 1.0250580013950887,
+        "lo_max": 0.977119451944687,
+        "lo_median": 0.9768797674101188,
+        "lo_min": 0.9735011506995677
+      },
+      "aa_total": {
+        "hi_max": 1.0248408912127567,
+        "hi_median": 1.014948939884482,
+        "hi_min": 1.0142662843687007,
+        "lo_max": 0.9490055565925022,
+        "lo_median": 0.945934974308728,
+        "lo_min": 0.9428643920249539
+      },
+      "ab_collect": {
+        "hi_max": 1.137682354623524,
+        "hi_median": 1.136470650831469,
+        "hi_min": 1.1358003284871343,
+        "lo_max": 1.0681095567903431,
+        "lo_median": 1.0677202965483465,
+        "lo_min": 1.066096088743611
+      },
+      "ab_total": {
+        "hi_max": 1.0861077012845488,
+        "hi_median": 1.0824004507031781,
+        "hi_min": 1.0786932001218072,
+        "lo_max": 1.0205226011426607,
+        "lo_median": 1.0203546825625656,
+        "lo_min": 1.0147649588480752
+      },
+      "established_collect_fraction": 1.0,
+      "established_total_fraction": 0.984
+    },
+    "native_iid_splitmix64": {
+      "aa_collect": {
+        "hi_range_500_seeds": [
+          1.0250580013950887,
+          1.027355587004239
+        ],
+        "lo_range_500_seeds": [
+          0.9766400828755508,
+          0.977119451944687
+        ],
+        "reference_400k": [
+          0.9768797674101188,
+          1.0254125781305254
+        ]
+      },
+      "aa_total": {
+        "hi_range_500_seeds": [
+          1.0142662843687007,
+          1.0248408912127567
+        ],
+        "lo_range_500_seeds": [
+          0.9428643920249539,
+          0.9490055565925022
+        ],
+        "reference_400k": [
+          0.945934974308728,
+          1.014948939884482
+        ]
+      },
+      "ab_collect": {
+        "hi_range_500_seeds": [
+          1.1358003284871343,
+          1.137682354623524
+        ],
+        "lo_range_500_seeds": [
+          1.066096088743611,
+          1.0681095567903431
+        ],
+        "reference_400k": [
+          1.0677202965483465,
+          1.136470650831469
+        ]
+      },
+      "ab_total": {
+        "hi_range_500_seeds": [
+          1.0786932001218072,
+          1.0861077012845488
+        ],
+        "lo_range_500_seeds": [
+          1.0135365462794892,
+          1.0205226011426607
+        ],
+        "reference_400k": [
+          1.0203546825625656,
+          1.0824004507031781
+        ]
+      },
+      "established_collect_seeds": 500,
+      "established_total_seeds": 490,
+      "generator": "SplitMix64, iid draws, index floor(u * n)",
+      "resamples": 2000,
+      "seeds": 500
+    },
+    "note": "unbiased_reference_mt_400k and mt_500_seeds_x_2000 came from the historical Python run; native_iid_splitmix64 supersedes them (same 400k reference bounds, 500/500 collect, 490/500 whole set-up)",
+    "per_subset_medians_collect_ab": {
+      "all": 1.0930878076239279,
+      "even_rounds": 1.0719,
+      "odd_rounds": 1.1371
+    },
+    "second_correction": {
+      "2026-10-23": {
+        "ab_n": 30,
+        "max_bound_shift_ci95_vs_stratified": 0.0026853207823902547,
+        "odd_count_per_resample_as_run": [
+          28,
+          30
+        ],
+        "odd_count_per_resample_highbit": [
+          6,
+          24
+        ],
+        "odd_count_per_resample_stratified": [
+          15,
+          15
+        ],
+        "verdicts_same_ci95_vs_stratified": true
+      },
+      "2026-10-29": {
+        "ab_n": 42,
+        "max_bound_shift_ci95_vs_stratified": 0.000682655515781283,
+        "odd_count_per_resample_as_run": [
+          40,
+          42
+        ],
+        "odd_count_per_resample_highbit": [
+          11,
+          32
+        ],
+        "odd_count_per_resample_stratified": [
+          21,
+          21
+        ],
+        "verdicts_same_ci95_vs_stratified": true
+      }
+    },
+    "textbook_integer_lcg": {
+      "aa_collect": {
+        "above_one": 20,
+        "ci95": {
+          "hi": 1.0254125781305254,
+          "lo": 0.9768797674101188
+        },
+        "median": 0.9994237085117715,
+        "n": 42
+      },
+      "aa_total": {
+        "above_one": 20,
+        "ci95": {
+          "hi": 1.0156315954002633,
+          "lo": 0.945934974308728
+        },
+        "median": 0.9845863968143238,
+        "n": 42
+      },
+      "ab_collect": {
+        "above_one": 38,
+        "ci95": {
+          "hi": 1.1358003284871343,
+          "lo": 1.0677202965483465
+        },
+        "median": 1.0930878076239279,
+        "n": 42
+      },
+      "ab_total": {
+        "above_one": 29,
+        "ci95": {
+          "hi": 1.0824004507031781,
+          "lo": 1.0203546825625656
+        },
+        "median": 1.0416402202042518,
+        "n": 42
+      },
+      "established_collect": true,
+      "established_total": true
+    },
+    "unbiased_reference_mt_400k": {
+      "aa_collect": {
+        "hi_97.5pct": 1.0254125781305254,
+        "lo_2.5pct": 0.9768797674101188,
+        "point_median": 0.9994237085117715
+      },
+      "aa_total": {
+        "hi_97.5pct": 1.014948939884482,
+        "lo_2.5pct": 0.945934974308728,
+        "point_median": 0.9845863968143238
+      },
+      "ab_collect": {
+        "hi_97.5pct": 1.136470650831469,
+        "lo_2.5pct": 1.0677202965483465,
+        "point_median": 1.0930878076239279
+      },
+      "ab_total": {
+        "hi_97.5pct": 1.0824004507031781,
+        "lo_2.5pct": 1.0203546825625656,
+        "point_median": 1.0416402202042518
+      }
+    }
+  },
+  "status": "pass",
+  "status_basis": "Third pass. 'pass' means four things. First, every headline number (135 entries) recomputes exactly with native code. Those entries are the 34 as-run values of summary.json, all 96 values of summary-corrected.json v2 for both sessions under the corrected, stratified and as-run rules, and the claims of the second correction: largest bound shift ≤ 0.003, no verdict change, 11–32 odd rounds per resample at n = 42, and 500 of 500 seeds. Second, every control holds. Third, the counters replay identically and the recovered logarithm is verified by a native verifier (replay-certificate.json, third pass). Fourth, the corrected publications read accurately: the aa2 README, CORRECTION.md, report.typ/pdf, plots, benchmark renders, the first session's README and report, and the leaderboard builder. Still open: the committed board renders predate ddaba2819 and show the first correction's stratified intervals (F14), and VALIDATION.json pins the files this pass replaces (F21). Both are to be regenerated or re-pinned; neither changes a verdict. A pass does not admit an ECDLP or rho-gap change: no counted cost moves (F12).",
+  "subject": {
+    "baseline_commit": "d34b9b3908df5d3feafe6189f83b2ce3244d63c3",
+    "change": "per-unit gather of aimed-subset coordinates in IC relation collection (src/cryptanalysis/koblitz_index_calculus.rs: Targets::Subset doubled_x/doubled_y, Scan::Gathered)",
+    "change_commit": "6bc18857bdb779287a956e43d9aa9175c24a057c",
+    "correction_commit": "7a1b8112e6d74be57aee854f24d9c14ed490b9fd",
+    "followup_dir": "research/ic_aimed_gather_20261023/aa2_20261029",
+    "head_at_certification": "ddaba2819f4ee96139c4145fbed905db1c1db46e",
+    "merge_commit_pr_2448": "7cdfbf615bf754fb567a161a190f05731a4160a0",
+    "protocol_commit": "5d726412b86d76eee4cad8968565def4045d552f",
+    "records_commit": "334d3c78acd558e08113cd3d98ab8f8208a0dafc",
+    "research_dir": "research/ic_aimed_gather_20261023",
+    "third_pass_commit": "ddaba2819f4ee96139c4145fbed905db1c1db46e"
+  },
+  "validator": "Validator role (crypto-autoresearcher agents/validator.md), Claude Opus 5.5 subagent. Not the producer of the runs, but launched from the producing Claude Code session (finding F11).",
+  "verdict": "pass (third pass): all 135 headline numbers recompute exactly with native code. These are the as-run summary.json values, every value of summary-corrected.json v2 for both sessions (corrected, stratified and as-run) and the second-correction claims, which hold: largest bound shift 0.0027 <= 0.003, no verdict change, 11-32 odd rounds per resample at n = 42. The scalar is verified by a native verifier. The collect phase is established: 1.093, corrected 95% [1.068, 1.136] against an A/A upper end of 1.026. The whole set-up (+0.005) is correctly marginal and not claimed. Before display: regenerate the board renders, which carry the first correction (F14), and re-pin VALIDATION.json (F21)."
+}

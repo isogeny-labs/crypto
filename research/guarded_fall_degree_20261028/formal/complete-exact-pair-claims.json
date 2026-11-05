@@ -1,0 +1,272 @@
+{
+  "schema": "fall-degree-formalization-progress/v1",
+  "requested": "Complete exact ordinary first/last pair (4,5) under original guarded prime-field hypotheses",
+  "request_complete": true,
+  "central_declaration": "GuardedExactPair.exact_pair_prime",
+  "verified": [
+    {
+      "declaration": "CubicArithmetic.inverseCoeff_normalizes",
+      "source": "CubicArithmetic.lean",
+      "hypotheses": "Field K; three distinct a,b,c; coefficient triple A has nonzero values at a,b,c",
+      "claim": "The explicitly constructed interpolation inverse normalizes A modulo the split monic cubic.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "CubicNormalization.monic_normalization",
+      "source": "CubicNormalization.lean",
+      "hypotheses": "Field K; distinct a,b,c; the leading coefficient is nonzero at all three; t,u have total degree <=1; the split cubic is derivable at degree5 and the quadratic family at degree4",
+      "claim": "The explicitly normalized monic family is derivable at degree5 by staged multiplication/reduction.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridClosure.grid_refutation",
+      "source": "GridClosure.lean",
+      "hypotheses": "Field K; distinct a,b,c; degree<=1 states w,z; both split cubics and scalar reduced grid polynomial are derivable at degree5; its values on the nine-point grid are all nonzero",
+      "claim": "An explicit degree-five derivation of one follows from constructed interpolation and legal scalar-grid shifts.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineGrid.affine_shiftW_derivable",
+      "source": "AffineGrid.lean",
+      "hypotheses": "Field K; degree<=1 states w,z,u; affine coefficient grid F has F(2,2)=0; the affine grid and w cubic are derivable at degree5",
+      "claim": "The reduced w-shift is derivable at degree5, with actual intermediate total-degree bounds.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineGrid.affine_shiftZ_derivable",
+      "source": "AffineGrid.lean",
+      "hypotheses": "Field K; degree<=1 states w,z,u; affine coefficient grid F has F(2,2)=0; the affine grid and z cubic are derivable at degree5",
+      "claim": "The reduced z-shift is derivable at degree5, with actual intermediate total-degree bounds.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "StagedResultant.resultGrid_derivable",
+      "source": "StagedResultant.lean",
+      "hypotheses": "Field K; distinct a,b,c; degree<=1 states w,z,u; both split cubics and the two displayed monic quadratic families are derivable at degree5",
+      "claim": "The scalar result grid, with values -2*quadRes, is derivable at degree5 without a nonvanishing premise.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "StagedResultant.monic_refutation",
+      "source": "StagedResultant.lean",
+      "hypotheses": "The resultGrid_derivable hypotheses; 2!=0; quadRes is nonzero at every pair of base roots",
+      "claim": "The complete algebraic degree-five construction derives one.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedReduction.q1_derivable",
+      "source": "GuardedReduction.lean",
+      "hypotheses": "Arbitrary field K and alpha,beta,a,b,c,r; exactly the original six generators",
+      "claim": "The explicitly reduced first quadratic family is derived at degree4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedReduction.q2_derivable",
+      "source": "GuardedReduction.lean",
+      "hypotheses": "Arbitrary field K and alpha,beta,a,b,c,r; exactly the original six generators",
+      "claim": "The second quadratic family is derived at degree4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "RationalFibers.split_monic",
+      "source": "RationalFibers.lean",
+      "hypotheses": "Field K; x!=y; Y^2=x^3+alpha*x+beta and Z^2=y^3+alpha*y+beta",
+      "claim": "Explicit rational roots split the specialized monic quadratic, including repeated roots and two-torsion.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "RationalFibers.target_outside_base",
+      "source": "RationalFibers.lean",
+      "hypotheses": "Field K; a!=b; rational ordinate lifts for each member of {a,b,c}; NoSolution for the six original generators",
+      "claim": "The target abscissa r is outside the base.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedFibers.scalar_resultant_nonzero",
+      "source": "GuardedFibers.lean",
+      "hypotheses": "Field K; distinct a,b,c; w,z in the base; rational ordinate lifts for each base element; NoSolution for the six original generators",
+      "claim": "The explicit scalar resultant of the normalized families is nonzero at (w,z).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedLastFall.upper_five",
+      "source": "GuardedLastFall.lean",
+      "hypotheses": "Field K with 2!=0; distinct a,b,c; rational base lifts; NoSolution for the original six generators",
+      "claim": "One is derived at degree5; no unit-ideal or resultant-nonzero premise is supplied.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedLastFall.exact_last_five",
+      "source": "GuardedLastFall.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; rational base lifts; NoSolution for the original six generators",
+      "claim": "The ordinary last-fall bound is attained minimally at5; the unit ideal follows from the constructed refutation.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedTops.generator_degrees",
+      "source": "GuardedTops.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the actual indexed original six generators",
+      "claim": "Their actual total degrees are (3,3,3,4,4,2).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedTops.generator_tops",
+      "source": "GuardedTops.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the actual indexed original six generators",
+      "claim": "The actual leading homogeneous components are the displayed cubic, quartic and guard top forms.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "WeightedFirstFall.exact_first_four",
+      "source": "WeightedFirstFall.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the original indexed odd-S3 presentation and explicit graded top-syzygy/Koszul convention",
+      "claim": "The first non-Koszul homogeneous top relation is attained minimally at degree4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "WeightedFirstFall.witness_lift_ne_zero",
+      "source": "WeightedFirstFall.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the displayed homogeneous witness for the actual generators",
+      "claim": "Its lift to the inhomogeneous inputs is nonzero.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "WeightedFirstFall.witness_lift_degree",
+      "source": "WeightedFirstFall.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the displayed homogeneous witness for the actual generators",
+      "claim": "Its lift has ordinary total degree <=3, a genuine degree fall from4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.generator_range",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters",
+      "claim": "The indexed family for first fall has exactly the input set used for last fall.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.exact_pair",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; rational base lifts; NoSolution for the original six generators",
+      "claim": "The exact ordinary homogeneous-top/Koszul first-fall and ordinary last-fall pair is (4,5).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.exact_pair_rational_curve",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; 4*alpha^3+27*beta^2!=0; Y^2=r^3+alpha*r+beta; rational base lifts; NoSolution for the original six generators",
+      "claim": "The exact ordinary pair (4,5) holds under the original nonsingular short-Weierstrass and rational-target hypotheses.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.prime_six_ne_zero",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Natural prime p with p>3",
+      "claim": "6 is nonzero in ZMod p.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.exact_pair_prime",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Every natural prime p>3; alpha,beta,a,b,c,r,Y in ZMod p; distinct a,b,c; nonzero discriminant expression; affine rational target; rational base lifts; NoSolution for the original six generators",
+      "claim": "The complete original prime-field exact-pair theorem: first fall4 and last fall5, both with attainment and minimality.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html><head>
+<title>musl libc Release History</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" href="./musl5.svg" type="image/png">
+<link rel="stylesheet" href="./main.css" type="text/css">
+<link rel="me" href="https://social.treehouse.systems/@musl">
+</head>
+<body>
+<h1><a href=".">musl libc</a> Release History</h1>
+
+<h2>Security Advisories</h2>
+
+<p><strong>Please take notice of the following advisories if you intend to use
+versions other than the latest release.</strong></p>
+
+<p>Versions 0.7.10 through 1.2.6 are affected by
+<a href="https://www.openwall.com/lists/musl/2026/04/10/3">CVE-2026-40200</a>, a
+stack-based overflow affecting <code>qsort</code> with large arrays on 32-bit
+archs. All 32-bit users should
+<a href="https://www.openwall.com/lists/musl/2026/04/10/3/1">patch</a>.</p>
+
+<p>Versions 0.8,0 through 1.2.6 are affected by
+<a href="https://www.openwall.com/lists/oss-security/2026/04/09/19">CVE-2026-6042</a>,
+DoS from pathologically bad performance in the <code>iconv</code> GB18030
+decoder. Users who may be affected should
+<a href="https://www.openwall.com/lists/musl/2026/04/03/2/1">patch</a>.</p>
+
+<p>Versions 0.9.13 through 1.2.5 are affected by
+<a href="https://www.openwall.com/lists/musl/2025/02/13/1">CVE-2025-26519</a>, an
+input-controlled out-of-bounds memory write primitive in <code>iconv</code> when
+the input encoding is EUC-KR and the output encoding is UTF-8, which
+could potentially be used as a vector to achieve arbitrary code
+execution. All users of software which may use <code>iconv</code> should patch
+(<a href="https://www.openwall.com/lists/musl/2025/02/13/1/1">1</a>,
+<a href="https://www.openwall.com/lists/musl/2025/02/13/1/2">2</a>).</p>
+
+<p>All versions prior to 1.2.2 are affected by
+<a href="https://www.openwall.com/lists/musl/2020/11/19/1">CVE-2020-28928</a>, a
+buffer overflow in the input-length-limited <code>wcsnrtombs</code> function,
+potentially affecting any program which uses this function.</p>
+
+<p>On 32-bit x86 ("i386") only, all versions prior to 1.1.23 are affected
+by
+<a href="https://www.openwall.com/lists/musl/2019/08/06/13">CVE-2019-14697</a>.
+Other archs are not affected.</p>
+
+<p>Versions 0.9.15 through 1.0.4 and 1.1.0 through 1.1.7 are affected by
+<a href="https://www.openwall.com/lists/musl/2015/03/30/1">CVE-2015-1817</a> and
+should not be used without patching.</p>
+
+<p>All versions prior to 1.1.16 are affected by
+<a href="https://www.openwall.com/lists/oss-security/2016/10/19/1">CVE-2016-8859</a>
+and should not be used without patching.</p>
+
+<p>Versions 1.1.2 through 1.1.16 are affected by
+<a href="https://www.openwall.com/lists/oss-security/2017/10/20/1">CVE-2017-15650</a>
+and should not be exposed to untrusted nameservers without patching.</p>
+
+<p>Versions 0.9.13 - 1.0.2, 1.1.0, and 1.1.1 are affected by
+<a href="https://www.openwall.com/lists/musl/2014/06/06/5">CVE-2014-3484</a> and
+should not be exposed to untrusted nameservers. Earlier 0.9 series
+releases, and later 1.0 and 1.1 series releases, are available which
+are not affected and which should be used instead if such old versions
+are used at all.</p>
+
+<h2>Verifying integrity</h2>
+
+<p>Since 1.1.7, releases are signed with the <a href="musl.pub">project GPG key</a>.
+Its fingerprint is <code>8364 8929 0BB6 B70F 99FF DA05 56BC DB59 3020 450F</code>.</p>
+
+<h2>Stable 1.2 series</h2>
+
+<p><dt><a href="releases/musl-1.2.6.tar.gz">musl-1.2.6.tar.gz</a>
+(<a href="releases/musl-1.2.6.tar.gz.asc">sig</a>)
+- March 20, 2026</p>
+
+<p><dd></p>
+
+<p>This release includes the fix for
+<a href="https://www.openwall.com/lists/musl/2025/02/13/1">CVE-2025-26519</a>
+affecting <code>iconv</code> that was previously only available as patches, lifts
+the artificial group count limit in <code>initgroups</code>, adds the new
+POSIX-2024 <code>posix_getdents</code> interface and Linux-specific <code>renameat2</code>
+interface, extends TLSDESC and vdso <code>clock_gettime</code> support to more
+archs, and fixes longstanding known wrong behavior of <code>pwrite</code> with
+<code>O_APPEND</code>-mode files, making use of the new <code>RWF_NOAPPEND</code> flag added
+in Linux 6.9, with fallback to report an error rather than silently
+giving wrong behavior on older kernels.</p>
+
+<p>Fixes for a number of other bugs, new/future conformance requirements,
+and compatibility issues are also included. Most of these are minor or
+specific to niche archs or unusual usage of libc interfaces. Some of
+the more notable ones include possible loss or delay of wake events
+under a race condition in <code>sem_post</code>, failure by <code>printf</code> to honor hex
+float precision correctly in some cases, and wrong choice of canonical
+"zero compression" in converting IPv6 addresses to strings.</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.2.5.tar.gz">musl-1.2.5.tar.gz</a>
+(<a href="releases/musl-1.2.5.tar.gz.asc">sig</a>)
+- February 29, 2024</p>
+
+<p><dd></p>
+
+<p>This release adds extension functions <code>statx</code> and
+<code>preadv2</code>/<code>pwritev2</code>, with fallback implementations for older kernels,
+and adds two new ports: <code>loongarch64</code> and <code>riscv32</code>. Minor changes to
+the <code>printf</code> family of functions have been made for conformance to new
+standards interpretations/requirements. TLSDESC support for riscv64
+has also been added.</p>
+
+<p>Bugs fixed include some DNS issues related to new TCP fallback
+functionality, several rare race conditions, potentially incorrect
+return value when <code>glob</code> aborts, and several signifiant arch-specific
+bugs affecting TLSDESC on arm, riscv64 icache flushing, and sh
+<code>sigsetjmp</code> and <code>dlsym</code> <code>RTLD_NEXT</code>.</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.2.4.tar.gz">musl-1.2.4.tar.gz</a>
+(<a href="releases/musl-1.2.4.tar.gz.asc">sig</a>)
+- May 1, 2023</p>
+
+<p><dd></p>
+
+<p>This release adds TCP fallback to the DNS stub resolver, fixing the
+longstanding inability to query large DNS records and incompatibility
+with recursive nameservers that don't give partial results in
+truncated UDP responses. It also makes a number of other bug fixes and
+improvements in DNS and related functionality, including making both
+the modern and legacy API results differentiate between <code>NODATA</code> and
+<code>NxDomain</code> conditions so that the caller can handle them differently.</p>
+
+<p>On the API level, the legacy "LFS64" ("large file support")
+interfaces, which were provided by macros remapping them to their
+standard names (<code>#define stat64 stat</code> and similar) have been
+deprecated and are no longer provided under the <code>_GNU_SOURCE</code> feature
+profile, only under explicit <code>_LARGEFILE64_SOURCE</code>. The latter will
+also be removed in a future version. Builds broken by this change can
+be fixed short-term by adding <code>-D_LARGEFILE64_SOURCE</code> to <code>CFLAGS</code>, but
+should be fixed to use the standard interfaces.</p>
+
+<p>The dynamic linker (and static-PIE entry point code) adds support for
+the new compact "RELR" format for relative relocations which recent
+linkers can generate. Use of this linker feature for dynamic-linked
+programs will make them depend on having musl 1.2.4 or later available
+at runtime. Static-linked PIE binaries using it, as always, are
+self-contained and have no such dependency.</p>
+
+<p>A large number of bugs have been fixed, including many in the wide
+<code>printf</code> family of functions, incorrect ordering of digits vs
+non-digits in <code>strverscmp</code>, and several rare race-condition corner
+cases in thread synchronization logic at thread exit time, in
+multi-threaded <code>fork</code>, <code>pthread_detach</code>, and POSIX semaphores.</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.2.3.tar.gz">musl-1.2.3.tar.gz</a>
+(<a href="releases/musl-1.2.3.tar.gz.asc">sig</a>)
+- April 7, 2022</p>
+
+<p><dd></p>
+
+<p>This release adds the <code>qsort_r</code> function (POSIX future) and several
+minor extension interfaces, and support for the alternative SPE FPU
+present on some PowerPC CPU models.</p>
+
+<p>Notable bugs fixed include an old regression in <code>wcwidth</code> of Hangul
+combining vowels and finals, a 1.2.2 regression breaking <code>duplocale</code>
+when <code>malloc</code> is replaced, null-dereference crash of aligned
+allocation functions on underlying <code>malloc</code> failure, out-of-bounds
+timezone data read when handling distant-past timestamps, longstanding
+incorrect <code>dl_iterate_phdr</code> reporting of module TLS pointers, and
+several math library bugs that resulted in wrong results for some
+inputs, including incorrectly-rounded fmaf on all softfloat archs.</p>
+
+<p>Many non-bugfix compatibility improvements have also been made,
+including having <code>free</code> preserve <code>errno</code> (POSIX future requirement),
+better <code>TZ</code> environment variable handling, and having <code>gettext</code> accept
+null message pointer (returned unchanged).</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.2.2.tar.gz">musl-1.2.2.tar.gz</a>
+(<a href="releases/musl-1.2.2.tar.gz.asc">sig</a>)
+- January 15, 2021</p>
+
+<p><dd></p>
+
+<p>The release adds the <code>_Fork</code> function from the upcoming edition of
+POSIX and takes advantage of the interpretation dropping the
+async-signal-safety requirement from <code>fork</code> to provide a consistent
+execution environment (not restricted to calling only
+async-signal-safe functions) after a multithreaded parent forks. This
+solves deadlocks which would otherwise be effectively unfixable in
+some language runtimes that expose <code>fork</code> as part of their contract
+with applications, as well as various library and application software
+that could and should be fixed, but hasn't been. A number of related
+issues in synchronization between <code>fork</code>, <code>abort</code>, async IO,
+<code>posix_spawn</code>, <code>pthread_exit</code>, and other components have been fixed as
+part of this change.</p>
+
+<p>The <code>realpath</code> function has been rewritten to do its own path
+traversal, rather than depending on procfs magic symlink contents for
+<code>O_PATH</code> file descriptors. This makes it work prior to mount of
+<code>/proc</code> and in container or chroot environments where <code>/proc</code> contents
+may not accurately reflect the pathname as visible to the calling
+process.</p>
+
+<p>The C versions of the square root functions, used on archs without
+a native FPU instruction for square root, have also been rewritten
+with significant improvements to performance, especially on archs that
+lack FPU entirely. This rewrite also fixes the lack of accurate
+<code>sqrtl</code> on archs with quad-precision <code>long double</code>.</p>
+
+<p>New functions added include the aforementioned <code>_Fork</code>, <code>reallocarray</code>
+from OpenBSD, <code>gettid</code> along with <code>SIGEV_THREAD_ID</code> timer notification
+support, and <code>tcgetwinsize</code>/<code>tcsetwinsize</code> from POSIX-future.</p>
+
+<p>A buffer overflow
+(<a href="https://www.openwall.com/lists/musl/2020/11/19/1">CVE-2020-28928</a>)
+in <code>wcsnrtombs</code> has been fixed with the function essentially
+rewritten. This function is not widely used and the bug is not
+relevant to software that does not use it directly (it's not used by
+other libc components), but it may be serious for software that does.
+An assortment of lesser bugs have also been fixed.</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.2.1.tar.gz">musl-1.2.1.tar.gz</a>
+(<a href="releases/musl-1.2.1.tar.gz.asc">sig</a>)
+- August 4, 2020</p>
+
+<p><dd>
+This release features the new "mallocng" malloc implementation,
+replacing musl's original dlmalloc-like allocator that suffered from
+fundamental design problems. Its major user-facing new properties are
+the ability to return freed memory on a much finer granularity and
+avoidance of many catastrophic fragmentation patterns. In addition it
+provides strong hardening against memory usage errors by the caller,
+including detection of overflows, double-free, and use-after-free, and
+does not admit corruption of allocator state via these errors.</p>
+
+<p>Other enhancements in this release include changes to the <code>res_*</code> API
+to report DNSSEC status of the results (needed for correct
+implementation of DANE in applications) and new arch-specific
+optimized string and math functions, especially <code>memcpy</code> and <code>memset</code>
+for AAarch64.</p>
+
+<p>A major logic/synchronization error in lock skipping after a
+multi-threaded process returns to single-threaded state has been
+fixed, along with a number of lesser bugs, including some
+time64-related regressions on 32-bit archs. One of these was actually
+a kernel vdso bug that broke <code>clock_gettime</code> on arm on hardware where
+the vdso should not be used; as a result, arm vdso support has been
+disabled until there is a reliable and inexpensive way to detect
+whether it's safe to use. Bugs and recent regressions affecting all
+mips archs and other arch-specific bugs have also been fixed.</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.2.0.tar.gz">musl-1.2.0.tar.gz</a>
+(<a href="releases/musl-1.2.0.tar.gz.asc">sig</a>)
+- February 20, 2020</p>
+
+<p><dd>
+This release moves all 32-bit archs to 64-bit <code>time_t</code>, enabling them
+to represent times beyond January of 2038.</p>
+
+<p>There are no new requirements on kernel version, and this is not a
+hard ABI break, but the type changes do impact compatibility between
+code built against previous versions of musl and code built against
+musl 1.2. Users upgrading 32-bit systems should read the <a href="time64.html">detailed
+time64 release notes</a>. 64-bit systems are not affected.</p>
+
+<p>In addition, character data has been updated to align with Unicode
+12.1.0, along with fixes for some errors in the data and a replacement
+for inefficient and unmaintainable case-mapping code. Correctness of
+results has been improved in the math library, particularly some
+complex functions and 32-bit x86 asm. Various arch-specific bugs have
+also been fixed.</p>
+
+<p></dd></p>
+
+<h2>End-of-life 1.1 series</h2>
+
+<p><dt><a href="releases/musl-1.1.24.tar.gz">musl-1.1.24.tar.gz</a>
+(<a href="releases/musl-1.1.24.tar.gz.asc">sig</a>)
+- October 13, 2019</p>
+
+<p><dd>
+This version adds the <code>GLOB_TILDE</code> extension for <code>glob</code>, a non-stub
+implementation of the <code>catgets</code> localization API, and <code>posix_spawn</code>
+extensions for <code>chdir</code> in the child. Many arch-specific bugs are
+fixed, some serious, including CVE-2019-14697 affecting several math
+functions only on i386, broken riscv64 atomics, broken <code>lseek</code> with
+large offsets on x32 and mipsn32, and broken <code>setjmp</code>/<code>longjmp</code> on
+mipsr6. Various low-severity, non-arch-specific bugs are also fixed.</p>
+
+<p>In addition, this release cycle sets the internal groundwork for
+moving 32-bit archs to 64-bit <code>time_t,</code> needed for their future
+viability as Y2038 approaches. Most of the changes are not externally
+visible, but some affect which syscalls are used. Notably, mips64
+<code>stat</code>-family functions can now report 64-bit file timestamps
+correctly, and some time-related breakage on x32 is fixed. In
+addition, <code>select</code> no longer stores remaining time back to the timeout
+argument. Previously, whether it did so was arch-dependent and merely
+a consequence of the Linux syscall behavior, which was found to be
+mildly non-conforming.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.23.tar.gz">musl-1.1.23.tar.gz</a>
+(<a href="releases/musl-1.1.23.tar.gz.asc">sig</a>)
+- July 16, 2019</p>
+
+<p><dd>
+This version merges the RISC-V (64-bit) port and new math library
+implementations of <code>log</code>, <code>exp</code>, and <code>pow</code>. Internals of how
+(non-cancellable) syscalls are performed have been overhauled so that
+all code necessary to make the syscall resides in the arch-provided
+header and is inlinable. In the process, bugs in the implementation of
+mips and microblaze syscall mechanisms were found and fixed. Several
+other bugs were fixed as well, including a potentially serious one in
+the layout of static TLS for shared libraries on archs that use "TLS
+variant I" layout.</p>
+
+<p>A couple behaviors that were clearly undesirable but arguably
+mandated by POSIX have been fixed as a result of POSIX intepretations
+rendering them unnecessary.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.22.tar.gz">musl-1.1.22.tar.gz</a>
+(<a href="releases/musl-1.1.22.tar.gz.asc">sig</a>)
+- April 9, 2019</p>
+
+<p><dd>
+This release makes major internal changes to the way threads, dynamic
+thread-local storage, and multi-threaded <code>set*id()</code> work. There is now
+a global thread list that is complete and consistent whenever the lock
+protecting it can be obtained, including at the moment of kernel-level
+task exit, and the lock protocol is async-signal-safe. This allows
+<code>set*id()</code> to safely synchronize privilege change for all live threads
+without a <code>/proc</code> dependency which turned out to have fundamental race
+conditions. Availability of the thread list has also allowed <code>dlopen</code>
+to install new TLS for each thread at library load time, rather than
+deferring installation to first access, which improves global-dynamic
+model performance and eliminates working but theoretically-unsafe
+calls from the TLSDESC asm into C code when the TLSDESC model is used
+to access dynamic TLS.</p>
+
+<p>Major changes have also been made to the dynamic linker's library
+dependency handling, for the purposes of correcting <code>dlsym</code>
+dependency-order resolution of symbols and providing dependency-order
+execution of shared library constructors. Calls to <code>dlopen</code> from
+multiple threads can now run ctors concurrently, serializing only on
+shared dependencies, and recursive calls to <code>dlopen</code> behave more
+correctly (believed to be to the maximum extent possible) with regard
+to non-deadlock and to ensuring that dependencies have been
+constructed.</p>
+
+<p>Support for the priority inheritance mutex type has also been added,
+with the ability to create PI mutexes conditional on a probe for
+support by the kernel.</p>
+
+<p>Notable regressions in <code>sscanf</code> and <code>pthread_key_create</code> introduced in
+1.1.21 have also been fixed, along with various other bugs and minor
+conformance issues.</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.1.21.tar.gz">musl-1.1.21.tar.gz</a>
+(<a href="releases/musl-1.1.21.tar.gz.asc">sig</a>)
+- January 21, 2019</p>
+
+<p><dd>
+This release makes improvements with respect to default thread stack
+size, including increasing the default from 80k to 128k, increasing
+the default guard size from 4k to 8k, and allowing the default to be
+increased via ELF headers so that programs that need larger stacks can
+be build without source-level changes, using just <code>LDFLAGS</code>.
+Insufficient stack size for AIO threads on kernels that don't honor
+the constant <code>MINSIGSTKSZ</code> is also fixed.</p>
+
+<p>The <code>glob</code> core has been rewritten to fix inability to see past
+searchable-but-unreadable path components, and to avoid excessive
+stack usage and unnecessary syscalls. The <code>tsearch</code> AVL tree
+implementation has also been rewritten for better size and
+performance. The math library adds more native single-instruction
+implementations for arm, s390x, powerpc, and x86_64.</p>
+
+<p>Various bugs are fixed, including several possible deadlocks, one of
+which was a new regression in 1.1.20.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.20.tar.gz">musl-1.1.20.tar.gz</a>
+(<a href="releases/musl-1.1.20.tar.gz.asc">sig</a>)
+- September 4, 2018</p>
+
+<p><dd>
+This release introduces the ability to replace/interpose the allocator
+(<code>malloc</code>) subject to certain restrictions, adds an experimental m68k
+port, and makes notable improvements to stdio (application-provided
+buffers), <code>getaddrinfo</code> (<code>AI_ADDRCONFIG</code>, support for IPv4-only kernel
+configurations), the dynamic linker (safety against <code>dlopen</code> of
+libraries using initial-exec TLS model, reclaiming unused memory on
+FDPIC archs, better <code>dladdr</code> results), and handling of default thread
+stack size (<code>pthread_setattr_default_np</code> now works more reliably).</p>
+
+<p>Many bugs have been fixed, including potentially dangerous regressions
+in <code>iconv</code> (only for new conversions to legacy encodings) and visibly
+incorrect behavior in <code>printf</code> on non-x86 archs (<code>%a</code> format with
+precision specifier), in <code>getopt_long_only</code> when short options are a
+prefix for a long option, in complex arc-trig/hyperbolic functions, in
+<code>strftime</code> and <code>mktime</code> (timezone-specific issues), and numerous
+less-obvious places.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.19.tar.gz">musl-1.1.19.tar.gz</a>
+(<a href="releases/musl-1.1.19.tar.gz.asc">sig</a>)
+- February 22, 2018</p>
+
+<p><dd>
+This release features major new <code>iconv</code> functionality including
+support for stateful encodings (so far, ISO-2022-JP and UTF-16/32 with
+BOM-determined endianness), conversion <em>to</em> JIS-based Japanese
+encodings (previously only <em>from</em> direction was supported), EBCDIC
+codesets (so far IBM1047), and DOS Cyrillic (CP866). Character data
+has been updated for alignment with Unicode 10.0. The <code>fopencookie</code>
+stdio extension function and <code>strftime</code> padding extensions have been
+added, and many smaller compatibility improvements and bug fixes have
+been made.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.18.tar.gz">musl-1.1.18.tar.gz</a>
+(<a href="releases/musl-1.1.18.tar.gz.asc">sig</a>)
+- October 31, 2017</p>
+
+<p><dd>
+This release corrects regressions in <code>glob()</code> and armv4t build failure
+introduced in the previous release, and includes an important bug fix
+for <code>posix_spawnp</code> in the presence of a large <code>PATH</code> environment
+variable.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.17.tar.gz">musl-1.1.17.tar.gz</a>
+(<a href="releases/musl-1.1.17.tar.gz.asc">sig</a>)
+- October 19, 2017</p>
+
+<p><dd>
+This release fixes numerous bugs affecting visible behavior and
+safety/internal consistency, including a stack-based buffer overflow
+in dns parsing and multiple sources of invalid memory accesses that
+may lead to crashes. See the release notes in WHATSNEW for details.</p>
+
+<p>Many new features have also been added, including deferred symbol
+binding in the dynamic linker (<code>RTLD_LAZY</code> emulation), an option to
+overrid <code>argv[0]</code> when running ldso to execute a program, support for
+starting new sessions via <code>posix_spawn</code> (<code>POSIX_SPAWN_SETSID</code>,
+accepted for standardization), and ability to query the active
+thread-local locale (via <code>_NL_LOCALE_NAME</code> extension). Improvements in
+compatibility with applications, build tools, and platforms have also
+been made.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.16.tar.gz">musl-1.1.16.tar.gz</a>
+(<a href="releases/musl-1.1.16.tar.gz.asc">sig</a>)
+- December 31, 2016</p>
+
+<p><dd>
+This release fixes a serious under-allocation bug in <code>regexec</code> due to
+integer overflow (CVE-2016-8859) and related issues.
+Implementation-defined regex anchoring behavior in BRE subexpressions
+has also been changed to match other implementations. A bug causing
+all static-pie binaries with initialized TLS to crash at startup has
+been fixed. Overflow handling in <code>printf</code> has been overhauled to
+correctly handle obscure corner cases. Additional noteworthy bugs have
+been fixed in <code>swprintf</code>, <code>strtod</code>, <code>getopt_long_only</code>, and time
+conversion and zone handling. A major MIPS-specific regression in
+1.1.15 that prevented <code>tcsetattr</code> from working at all has also been
+fixed.</p>
+
+<p>A new port to s390x (64-bit S/390), header-level support for Linux
+4.7, 4.8, and 4.9 features, and a facility to increase default thread
+stack size via <code>pthread_setattr_default_np</code> have also been added in
+this release, along with other minor features and compatibility
+improvements.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.15.tar.gz">musl-1.1.15.tar.gz</a>
+(<a href="releases/musl-1.1.15.tar.gz.asc">sig</a>)
+- July 5, 2016</p>
+
+<p><dd>
+This release adds new 64-bit MIPS and PowerPC ports, soft-float ABI
+support for the 32-bit PowerPC arch, and support for revision 6 of the
+MIPS ISA (not backwards compatible with original MIPS). Serious bugs
+in <code>memmem</code>, <code>ungetwc</code>, and <code>putenv</code> have been fixed, as well as bug
+that could break thread-local storage on PowerPC depending on the
+compiler used to build musl, and a number of low-impact bugs in
+various interfaces. The <code>pthread_tryjoin_np</code>, <code>pthread_timedjoin_np</code>,
+and <code>sched_getcpu</code> extension functions, and header-level support for
+new Linux 4.5 and 4.6 features, have also been added, and the
+configure script now honors standard options for cross-compiling more
+correctly.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.14.tar.gz">musl-1.1.14.tar.gz</a>
+(<a href="releases/musl-1.1.14.tar.gz.asc">sig</a>)
+- Feb 22, 2016</p>
+
+<p><dd>
+This release primarily fixes regressions that slipped into 1.1.13,
+including a significant stdio regression causing <code>fputs</code> and <code>puts</code> to
+fail on zero-length strings, ARM hard-float build failure on clang due
+to a compiler bug which is now detected and worked around, a hang at
+the entry point of the dynamic linker on SH/FDPIC, and <code>make
+clean</code>/<code>make distclean</code> no longer working in unconfigured trees. A
+minor longstanding bug in crypt-sha256/512 was also fixed, and further
+improvements to the build system have been made.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.13.tar.gz">musl-1.1.13.tar.gz</a>
+(<a href="releases/musl-1.1.13.tar.gz.asc">sig</a>)
+- Feb 15, 2016</p>
+
+<p><dd>
+This release adds support for out-of-tree builds, search domains in
+<code>resolv.conf</code>, VDSO-accelerated <code>clock_gettime</code> on MIPS, and building
+SMP-safe/ready SH binaries for the open-hardware J2. Performance of
+atomics and synchronization primitives has been greatly improved on
+most "ll/sc model" RISC archs. Regex BRE now supports the widely-used
+extensions <code>\|</code>, <code>\+</code>, and <code>\?</code> and larger regular expressions are now
+supported. A number of minor application and toolchain compatibility
+improvements have also been made, including changes which reduce the
+risk of assembler and linker bugs leading to malfunctioning binaries.</p>
+
+<p>Two potentially dangerous bugs have been fixed: a single-byte heap
+overflow in <code>getdelim</code> and a pointer indexing error in dynamic TLS
+allocation. Other bugs fixed include various issues in parsing and
+error handling for <code>resolv.conf</code> and related files, incorrect error
+return values for some functions, and failures to accept null pointer
+arguments in some functions for which they have defined behavior. Some
+arch-specific bugs affecting ARM, MIPS, and SH/FDPIC have also been
+fixed.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.12.tar.gz">musl-1.1.12.tar.gz</a>
+(<a href="releases/musl-1.1.12.tar.gz.asc">sig</a>)
+- Oct 19, 2015</p>
+
+<p><dd>
+<p>This release features arch-independent support for FDPIC, an ABI
+variant that allows text segment sharing without MMU by relaxing the
+usual ELF requirement that data reside at a fixed displacement
+relative to code, and arch-specific support for FDPIC on SH2. CFI
+(call frame information) generation support has also been added for
+x86_64 asm, improving debugging backtraces, especially when a program
+is stopped during a syscall.</p>
+
+<p><p>Several toolchain and application compatibility improvements have
+been made, most notably in regards to the new byte-based C locale,
+where nl_langinfo(CODESET) now returns "ASCII" rather than
+"UTF-8-CODE-UNITS"; the latter broke many applications which assumed
+the returned string would be a meaningful, well-known character
+encoding name.</p>
+
+<p><p>Bugs fixed include deadlock at exit when stdin or stdout was
+closed, a missing memory barrier in pthread_join, and minor corner
+case bugs in various interfaces.
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.11.tar.gz">musl-1.1.11.tar.gz</a>
+(<a href="releases/musl-1.1.11.tar.gz.asc">sig</a>)
+- Aug 30, 2015</p>
+
+<p><dd>
+<p>This release introduces a new C locale aligned with future POSIX
+requirements, allowing it to be used for applying regex and other
+character-based operations to data which is not necessarily valid
+UTF-8. The C locale is only used when explicitly requested via
+environment variables or the application; default behavior is still
+governed by the C.UTF-8 locale, which operates on whole multibyte
+characters.</p>
+
+<p><p>Support for musl's first NOMMU target, SH-2, is also added in this
+release, along with groundwork for future NOMMU targets. A new
+musl-clang compiler wrapper is provided to reuse a non-musl-targeted
+host clang for building programs against musl, as was already possible
+with gcc. Major performance enhancements have been made to the dynamic
+linker. On ARM systems that support it, the vdso is now used to
+accelerate clock_gettime. And debugger backtraces on i386 are improved
+by a newly-added script to auto-generate call frame information for
+asm source files.</p>
+
+<p><p>The uselocale regression that slipped into the 1.1.10 release, as
+well as many non-critical bugs, have been fixed. Most of these only
+affected rarely-used interfaces or unusual usage cases. One
+significant x86[_64] bug that could lead to soft-deadlock in
+libc-internal locking, and multiple MIPS-, PowerPC-, ARM-, and
+AArch64-specific bugs, were also fixed.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.10.tar.gz">musl-1.1.10.tar.gz</a>
+(<a href="releases/musl-1.1.10.tar.gz.asc">sig</a>)
+- June 4, 2015</p>
+
+<p><dd>
+<p>This release fixes regressions introduced as part of the dynamic
+linker bootstrap overhaul in musl 1.1.9, and adds several new features
+and improvements. Internal cleanup and optimizations have been made to
+the locale system. A fail-safe/allocation-free <code>locale_t</code> object for the
+C locale is now available via <code>newlocale()</code>, and the <code>iconv_open</code> function
+now supports <code>""</code> and <code>"CHAR"</code> as aliases for the native (UTF-8) encoding.
+A new crt start file, <code>rcrt1.o</code>, is provided for producing static-linked
+position independent executables (PIE). Minor PIE-related
+arch-specific bugs, and a bug in the <code>ungetc</code> and <code>ungetwc</code> stdio
+functions which caused them to fail on files in EOF status, have also
+been fixed.</p>
+
+<p><p>A new regression in <code>uselocale</code> made it into this release. To avoid
+breaking programs that call <code>uselocale</code>, all users of musl 1.1.10 should
+apply the following patch:</p>
+
+<p><a href="https://git.musl-libc.org/cgit/musl/patch/?id=63f4b9f18f3674124d8bcb119739fec85e6da005">https://git.musl-libc.org/cgit/musl/patch/?id=63f4b9f18f3674124d8bcb119739fec85e6da005</a>
+</dd></p>
+
+<p><dt><a href="releases/musl-1.1.9.tar.gz">musl-1.1.9.tar.gz</a>
+(<a href="releases/musl-1.1.9.tar.gz.asc">sig</a>)
+- May 12, 2015</p>
+
+<p><dd></p>
+
+<p><p>This release features significant overhauls in dynamic linking that
+now make it possible to build libc.so itself with stack protector
+hardening. Runtime dynamic linker error messages (dlerror) are now
+thread-local, and long path and symbol names in messages are no longer
+truncated. The sigsetjmp/siglongjmp functions have been redesigned to
+restore signal mask after restoring the context, rather than before,
+to prevent the possibility of unbounded stack growth when using
+siglongjmp to return from a signal handler while under heavy signal
+load. Global code size and performance improvements have been made for
+toolchains supporting protected visibility.</p>
+
+<p><p>Various bugs have been fixed, including issues when detached
+threads exit with robust mutexes held, static TLS alignment errors,
+wrongful continuation of several path search operations after
+transient failures, two memory leaks, a crash on OOM, and significant
+malfunction of the duplocale function. Many arch-specific fixes were
+also made, including broken stack protector on powerpc and x32 and
+several issues on mips, sh, aarch64, and x32.</p>
+
+<p></dd></p>
+
+<p><dt><a href="releases/musl-1.1.8.tar.gz">musl-1.1.8.tar.gz</a>
+(<a href="releases/musl-1.1.8.tar.gz.asc">sig</a>)
+- Mar 29, 2015</p>
+
+<p><dd>This release is a high-priority bug fix release correcting a
+stack-based buffer overflow in IPv6 literal parsing (CVE-2015-1817)
+affecting <code>inet_pton</code> and <code>getaddrinfo</code> and several other
+potentially-serious bugs in regular expression parsing. The omission
+of the <code>max_align_t</code> type for the new AArch64 port and a regression in
+the definition of <code>FLT_ROUNDS</code> have also been fixed. All users should
+upgrade or apply at least the following patches:</p>
+
+<ul>
+<li><a href="https://git.musl-libc.org/cgit/musl/patch/?id=fc13acc3dcb5b1f215c007f583a63551f6a71363">https://git.musl-libc.org/cgit/musl/patch/?id=fc13acc3dcb5b1f215c007f583a63551f6a71363</a></li>
+<li><a href="https://git.musl-libc.org/cgit/musl/patch/?id=39dfd58417ef642307d90306e1c7e50aaec5a35c">https://git.musl-libc.org/cgit/musl/patch/?id=39dfd58417ef642307d90306e1c7e50aaec5a35c</a>
+</dd></li>
+</ul>
+
+<p><dt><a href="releases/musl-1.1.7.tar.gz">musl-1.1.7.tar.gz</a>
+(<a href="releases/musl-1.1.7.tar.gz.asc">sig</a>)
+- Mar 18, 2015</p>
+
+<p><dd>This release features support for alternate user/group database
+backends via the nscd protocol, an experimental AArch64 (64-bit ARM)
+port, overhauled POSIX AIO functionality that is cancellable and safe
+against close, and significant memset performance improvements on
+x86[_64]. The <code>set*id()</code> family of functions are now safer (including
+async-signal safety and safety against partial privilege-retention
+issues) in multi-threaded programs. Application compatibility
+improvements in <code>getaddrinfo</code>, <code>getopt_long</code>, and other functions have
+been made, and various additional low-impact bugs have been fixed.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.6.tar.gz">musl-1.1.6.tar.gz</a> -
+Jan 13, 2015</p>
+
+<p><dd>This release features a major overhaul in the handling of atomic
+operations on ARM targets, improving efficiency when built for recent
+(v7+) cpu models and ensuring (via runtime detection) that baseline
+ARM binaries, which traditionally depended on the kernel's
+kuser_helper page for atomic support, work even on newer cpu/kernel
+combinations where it might be disabled for hardening purposes.
+Extensions to the getopt, getopt_long, and fnmatch functions have been
+added for greater compatibility with applications, and various
+low-impact bugs have been fixed.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.5.tar.gz">musl-1.1.5.tar.gz</a> -
+Oct 14, 2014</p>
+
+<p><dd>This release adds full library-level support for C11, including the
+C11 threads API, and features major performance and correctness
+improvements to the implementations of thread synchronization
+primitives, especially condition variables. Several serious bugs have
+been fixed, including a failure to null-terminate certain unexpected
+DNS replies, use of uninitialized memory in caller-provided thread
+stacks, writes past the end of of the buffer when swab() is called
+with an odd length, and missing memory barriers in several places.
+Many other minor bugs have also been fixed.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.4.tar.gz">musl-1.1.4.tar.gz</a> -
+Jul 31, 2014</p>
+
+<p><dd>This release features a new port to the OpenRISC 1000 (or1k)
+architecture, experimental support for locale in the LC<em>MESSAGES and
+LC</em>TIME categories, and a built-in implementation of the gettext
+system for message translations. Numerous bugs have also been fixed,
+including a regression in the dynamic linker that prevented it from
+showing error messages, incorrect memory synchronization/barriers on
+microblaze, mips, powerpc, and sh, problems with the struct stat
+layout on microblaze and big-endian mips, a serious setjmp register
+state corruption bug on microblaze, a dynamic linker regression on
+mips, and various minor issues. In addition, a workaround is provided
+for gcc bug 61144 which prevented building musl with gcc 4.9.x.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.3.tar.gz">musl-1.1.3.tar.gz</a> -
+Jun 25, 2014</p>
+
+<p><dd>This release adds many features including result sorting in the
+DNS/hosts resolver modeled on RFC 3484, default timezone from
+/etc/localtime, gnu2 TLS dialect (TLSDESC) on i386 and x86_64,
+sendmmsg/recvmmsg functions (Linux extensions), fmtmsg function (XSI),
+and optional arguments in getopt (GNU extension). Handling of
+poorly-behaved nameservers (rcode=2 ServFail result) is also improved,
+and setting of the %gs thread register is now supported on pre-2.6
+i386 kernels. Several bugs are fixed including a potentially-important
+issue in memmem.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.2.tar.gz">musl-1.1.2.tar.gz</a> -
+Jun 6, 2014</p>
+
+<p><dd>This release fixes a stack-based buffer overflow in DNS response
+parsing (CVE-2014-3484) found during an overhaul of the resolver
+internals. A number of new features in the forward and reverse name
+lookup functions have been added, particularly in the area of IPv6
+support. VDSO acceleration of clock_gettime and related functions on
+i386 is now available with recent kernels. Support for the %C and %y
+specifiers to strptime has been added. Various low to medium severity
+bugs have also been fixed.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.1.tar.gz">musl-1.1.1.tar.gz</a> -
+May 20, 2014</p>
+
+<p><dd>This release fixes a bug in musl's implementation of the two-way
+algorithm whereby strstr, wcsstr, and memmem fail to match certain
+periodic search strings. Several other minor issues are also fixed.
+New dynamic linker command line features and iconv charsets cp473 and
+cp850 are now available. Several improvements to the configure script
+are also made, including detection of an optimizer bug in GCC 4.9.0
+which produces a broken libc.</dd></p>
+
+<p><dt><a href="releases/musl-1.1.0.tar.gz">musl-1.1.0.tar.gz</a> -
+April 16, 2014</p>
+
+<p><dd>New features include support for RELRO protection in dynamic
+linker, VDSO acceleration for clock functions on x86_64, and
+improvements to malloc that avoid early allocation failures specific
+to PIE binaries. Several important bugs have been fixed, including
+searches past the end of the buffer in memmem and multiple bugs in
+printf floating point formatting, one of which may be able to trigger
+a buffer overflow under certain conditions. Some bugs specific to the
+mips, microblaze, and x32 ports have also been fixed.</dd></p>
+
+<p></dl></p>
+
+<h2>Discontinued 1.0 series</h2>
+
+<dl>
+
+<dt><a href="releases/musl-1.0.5.tar.gz">musl-1.0.5.tar.gz</a>
+(<a href="releases/musl-1.0.5.tar.gz.asc">sig</a>)
+- March 30, 2015
+
+<dd>This maintenance release brings the 1.0 branch up to date with all
+important bug fixes that have been applied to mainline as of 1.1.8,
+including fixes for CVE-2015-1817 and many other bugs, some of which
+may also impact security. All users of earlier 1.0-series releases
+should patch or upgrade. This is the last official release in the 1.0
+series which has been discontinued as of January 2016.</dd>
+
+<dt><a href="releases/musl-1.0.4.tar.gz">musl-1.0.4.tar.gz</a> -
+Aug 1, 2014
+
+<dd>This maintenance release brings the 1.0 branch up to date with all
+important bug fixes that have been applied to mainline as of 1.1.4.
+These include a major logic bug in memmem which yielded both false
+negatives and false positives, numerous issues that were specific to
+mips, powerpc, and microblaze, and various other lower-severity bugs.</dd>
+
+<dt><a href="releases/musl-1.0.3.tar.gz">musl-1.0.3.tar.gz</a> -
+Jun 6, 2014
+
+<dd>This maintenance release for the 1.0 branch fixes a stack-based
+buffer overflow in DNS response parsing (CVE-2014-3484) and various
+other low to medium severity bugs.</dd>
+
+<dt><a href="releases/musl-1.0.2.tar.gz">musl-1.0.2.tar.gz</a> -
+May 20, 2014
+
+<dd>This maintenance release for the 1.0 branch fixes a bug in musl's
+implementation of the two-way algorithm whereby strstr, wcsstr, and
+memmem fail to match certain periodic search strings. Several other
+minor issues are also fixed. Several improvements to the configure
+script are also made, including detection of an optimizer bug in GCC
+4.9.0 which produces a broken libc.</dd>
+
+
+<dt><a href="releases/musl-1.0.1.tar.gz">musl-1.0.1.tar.gz</a> -
+April 16, 2014
+
+<dd>This is the first maintenance release in the 1.0 series and fixes
+several important bugs including searches past the end of the buffer
+in memmem and multiple bugs in printf floating point formatting, one
+of which may be able to trigger a buffer overflow under certain
+conditions. Some bugs specific to the mips and microblaze ports have
+also been fixed.</dd>
+
+
+<dt><a href="releases/musl-1.0.0.tar.gz">musl-1.0.0.tar.gz</a> -
+March 20, 2014
+
+<dd>This release adds support for a soft-float ABI variant on MIPS as
+well as new experimental ports to SuperH and x32 (the new 32-bit ABI
+for x86_64). Two floating point printf bugs have been fixed including
+a rounding error and off-by-one buffer overflow that could occur only
+when printing certain denormal values with thousands of places of
+precision. A second overflow issue was fixed in wcsxfrm where a buffer
+length of zero was misinterpreted. Several other minor bug fixes and
+compatibility improvements have also been made.</dd>
+
+
+</dl>
+
+<h2>0.9 series</h2>
+
+<dl>
+
+<dt><a href="releases/musl-0.9.15.tar.gz">musl-0.9.15.tar.gz</a> -
+January 3, 2014
+
+<dd>Major bug fixes include a buffer overflow in mbsrtowcs, various
+group file handling errors, failure of execle to pass on the new
+environment, and timezone-parsing crashes on 64-bit systems. Also
+fixed are several file descriptor leak (close-on-exec) issues,
+handling of invalid IP address strings, several fnmatch corner cases
+possibly leading to out-of-bound access, and failure of faccessat with
+the AT_EACCESS flag. This release also adds support for mixing IPv4
+and v6 nameservers in resolv.conf, expanded shadow password API, IPv6
+multicast structures, and the ability for libc.so to report the
+version installed.</dd>
+
+
+
+<dt><a href="releases/musl-0.9.14.tar.gz">musl-0.9.14.tar.gz</a> -
+September 23, 2013
+
+<dd>The result of major bug-hunting. Fixes a regression in
+installation of the dynamic linker symlink when DESTDIR is used, rare
+deadlock in libc-internal locking, incorrect dynamic linker fallback
+to built-in search paths in certain error cases, popen failures when
+the caller has closed stdin or stdout, deadlock and memory-corruption
+issues in multi-threaded set*id and setrlimit operations, and multiple
+low-impact bugs in math functions and other components.</dd>
+
+
+<dt><a href="releases/musl-0.9.13.tar.gz">musl-0.9.13.tar.gz</a> -
+August 30, 2013
+
+<dd>Dynamic linker now supports $ORIGIN and recursive rpath
+resolution. Field widths and the %s format have been added to
+strftime. iconv now supports all major non-stateful CJK encodings,
+including EUC-KR and Big5(+HKSCS) which are new in this release. CPU
+affinity interfaces have been added. Many floating point improvements
+have been made, including fenv support on ARM hardfloat targets. Major
+optimizations have been made to memset and memcpy (all archs).
+Numerous low- to medium-impact bugs have been fixed.</dd>
+
+
+<dt><a href="releases/musl-0.9.12.tar.gz">musl-0.9.12.tar.gz</a> -
+July 29, 2013
+
+<dd>Notable new features include zoneinfo timezone support, PIE
+support on all supported targets, simple heap-based buffer overflow
+detection in free/realloc, and mildly improved IPv6 support. Various
+dynamic linker improvements have been made for arch variants and
+non-root installations. The C++ ABI is now stabilized and compatible
+with glibc's C++ ABI. Several major bugs have been fixed including a
+potentially-dangerous regression in scanf introduced in 0.9.11 that
+could pass invalid pointers to free, a flaw in dl_iterate_phdr's
+reporting of library headers that could crash C++ exception-handling,
+and longstanding integer overflows in time conversion code that
+produced incorrect results for certain pre-1935 dates. Other minor
+bugs have also been fixed.</dd>
+
+
+<dt><a href="releases/musl-0.9.11.tar.gz">musl-0.9.11.tar.gz</a> -
+June 29, 2013
+
+<dd>This release adds the support for the scanf %m allocation
+modifier, week-number-related strftime formats, and various legacy
+network-related functions. Major improvements have been made to
+dynamic linker path handling and pseudo-random number generators.
+Major visible bugs/regressions in scanf and mbsrtowcs have been fixed,
+as well as several potentially-serious synchronization and
+resource-leak bugs and x86_64-specific bugs that resulted in crashes
+at startup in some C++ programs or unpredictable signal behavior.</dd>
+
+
+<dt><a href="releases/musl-0.9.10.tar.gz">musl-0.9.10.tar.gz</a> -
+April 14, 2013
+
+<dd>Further significant compatibility improvements, especially with
+garbage collectors. UTF-8 decoding performance had greatly increased,
+and misaligned memory access bugs affecting UTF-8 decoding on some
+archs have been fixed. Improved handling of caller-provided thread
+stacks. Many bugs fixed, including potentially dangerous bugs in
+syslog and in the failure path of pthread_create, and a regression in
+the ARM crt code that caused shared libraries other than libc.so to
+crash on loading.</dd>
+
+
+<dt><a href="releases/musl-0.9.9.tar.gz">musl-0.9.9.tar.gz</a> -
+February 1, 2013
+
+<dd>Major compatibility improvements, including Linux-specific
+features, GNU extension functions, grsec kernel quirks compatibility,
+and workarounds for subtle but dangerous portability errors in some
+programs. Size, performance, and correctness improvements to the math
+library. Numerous low-impact bugs fixed.</dd>
+
+
+
+<dt><a href="releases/musl-0.9.8.tar.gz">musl-0.9.8.tar.gz</a> -
+November 26, 2012
+
+<dd>New PowerPC port and major bug fixes and improvements for the MIPS
+port. Coverage for more optional parts of POSIX including the thread
+priority scheduling option and stubs for unsupported functionality.
+Dynamic linker dl_iterate_phdr support. Various minor bugs and strict
+conformance issues have also been fixed and application compatibility
+improved.
+</dd>
+
+
+<dt><a href="releases/musl-0.9.7.tar.gz">musl-0.9.7.tar.gz</a>
+- October 28, 2012
+
+<dd>Major new features include support for thread-local storage
+(__thread/_Thread_local keyword) and a port to Microblaze. Notable
+quality and conformance improvements have been made in the areas of
+setting the close-on-exec flag for library-internal file descriptors
+to avoid fd leaks, using vfork in posix_spawn, system, and popen to
+make these functions work well even in very large programs, support
+for recursive calls to dlopen (from constructors), and avoiding
+executable stacks. Various low-impact bugs have also been fixed.
+</dd>
+
+
+<dt><a href="releases/musl-0.9.6.tar.gz">musl-0.9.6.tar.gz</a>
+- September 16, 2012
+
+<dd>Bugfix release for subtle but serious breakage that crept in to
+the previous release with the addition of O_SEARCH: the O_ACCMODE
+mask was incorrectly redefined with one bit missing. Support for md5
+crypt hashes and the O_EXEC open mode have also been added.</dd>
+
+
+<dt><a href="releases/musl-0.9.5.tar.gz">musl-0.9.5.tar.gz</a>
+- September 15, 2012
+<dd>
+Default-features mode now makes visible POSIX, X/Open, and BSD
+interfaces when no specific standards-conformance options are
+requested, making it possible to compile most packages without
+special CFLAGS. Major header compatibility improvements. Building
+musl with clang/LLVM is now supported. SHA password hash functions
+have been added. New dynamic linker features including dladdr and GNU
+hash support. Various other minor features and bug fixes.
+</dd>
+
+
+<dt><a href="releases/musl-0.9.4.tar.gz">musl-0.9.4.tar.gz</a>
+- August 18, 2012
+<dd>
+Major improvements to MIPS port, including support for dynamic
+linking. Password hashing (crypt) now supports blowfish hash
+algorithm. Further application compatibility improvements especially
+for BSD and SUSv3-targeted software. Performance improvements in
+printf and memcpy. Various bugfixes: strtod family, wcsstr, err.h
+functions, and many MIPS-specific bugs.
+</dd>
+
+<dt><a href="releases/musl-0.9.3.tar.gz">musl-0.9.3.tar.gz</a>
+- August 2, 2012
+<dd>
+New experimental MIPS port (32-bit, o32 ABI, static-linked-only at
+this point). Various dynamic linker/loader bugs fixed. Network service
+name lookup support from /etc/services. Wrappers for more non-POSIX
+Linux syscalls. Overhauled crypt() with drastic reductions in memory
+usage and run time. Fixes for several important thread bugs including
+internal lock corruption, spurious sem_trywait failure, and race
+conditions on detached-thread exit, as well as various minor bug
+fixes.
+</dd>
+
+<dt><a href="releases/musl-0.9.1.tar.gz">musl-0.9.1.tar.gz</a>
+- June 3, 2012
+<dd>
+Ability to invoke the dynamic linker explicitly to run programs or
+display the resolution of their dependencies when invoked as ldd.
+Significant legacy-compat improvements in header files, including
+_BSD_SOURCE support, and additional interfaces towards basic
+LSB/glibc-linked binary compatibility. Fixed major POSIX BRE regex
+parsing bugs that affected building ncurses with a sed using libc
+regex engine, numerous low-impact bugs, and a few ARM-specific bugs
+that kept many programs from working at all on ARM.
+</dd>
+
+<dt><a href="releases/musl-0.9.0.tar.gz">musl-0.9.0.tar.gz</a>
+- May 6, 2012
+<dd>
+Milestone release covering all interfaces in ISO C99 and POSIX 2008
+base. Relicensed under standard MIT license. New configure script for
+easy build setup. Full stack protector and PIE support on i386 and
+x86_64 targets. Major floating-point math improvements and fixes,
+application compatibility improvements (mostly legacy header details),
+and additional bug fixes in dlerror and several wide character
+functions.
+</dd>
+
+
+</dl>
+
+<h2>Beta series</h2>
+
+<dl>
+
+<dt><a href="releases/musl-0.8.10.tar.gz">musl-0.8.10.tar.gz</a>
+- April 25, 2012
+<dd>
+Character classification functions updated to Unicode 6.1 and greatly
+improved. Over/underflow detection and bugs fixed in strtod/scanf
+float support. Minimal stack protector support. Better debugging
+support for shared libraries. Recent breakage in iconv and sysconf
+fixed. Improved musl-gcc wrapper script.
+</dd>
+
+<dt><a href="releases/musl-0.8.9.tar.gz">musl-0.8.9.tar.gz</a>
+- April 19, 2012
+<dd>
+Bug-fix release for a serious breakage in strtol and related functions
+that made it into the previous release and prevents them from handling
+numbers with initial spaces. A couple other small issues have been
+fixed too.
+</dd>
+
+<dt><a href="releases/musl-0.8.8.tar.gz">musl-0.8.8.tar.gz</a>
+- April 18, 2012
+<dd>
+Fix for critical buffer overflow vulnerability in fprintf with
+unbuffered files. Major math library correctness and performance
+improvements, including x86 assembly. New floating point
+parser/converter with correct rounding, new scanf that corrects many
+corner-case errors, and new wcstod/f/ld (previously missing). Various
+compatibility improvements and small bug fixes.
+</dd>
+
+<dt><a href="releases/musl-0.8.7.tar.gz">musl-0.8.7.tar.gz</a>
+- March 17, 2012
+<dd>
+C++ support with g++/libstdc++ (requires minor fixes for glibc
+dependencies in libstdc++). New C99 math library (float, long double,
+complex, etc.) based on FreeBSD and OpenBSD code. Working floating
+point environment on i386 and x86_64. Many bugfixes and compatibility
+improvements for builting slightly-nonportable programs against musl.
+</dd>
+
+<dt><a href="releases/musl-0.8.6.tar.gz">musl-0.8.6.tar.gz</a>
+- February 28, 2012
+<dd>
+Bug fix release for a serious bug that slipped into the previous
+release: All static linked programs that performed DNS lookups but did
+not use pthreads were crashing due to a logic error in the weak
+linking of pthread cancellation cleanup functions.
+</dd>
+
+<dt><a href="releases/musl-0.8.5.tar.gz">musl-0.8.5.tar.gz</a>
+- February 27, 2012
+<dd>
+Numerous additions of small legacy interfaces and previously-omitted
+standard functions that were determined to be important for building
+real-world programs. Global constructor/destructor support in main
+program and shared libraries/dynamic loader. Thread cancellation
+requests are now able to cancel blocked stdio operations. A bug in GCC
+3 that prevented building shared libc has been worked around. GCC
+wrapper now supports generating shared libraries. Various obscure bugs
+have also been fixed.
+</dd>
+
+<dt><a href="releases/musl-0.8.4.tar.gz">musl-0.8.4.tar.gz</a>
+- January 23, 2012
+<dd>
+Better arm support, including dynamic linking. Many improvements and
+fixes in pthread cond vars, barriers, and rwlocks. Assorted small
+compatibility improvements and bug fixes all around.
+</dd>
+
+<dt><a href="releases/musl-0.8.3.tar.gz">musl-0.8.3.tar.gz</a>
+- September 21, 2011
+<dd>
+New experimental ARM port (armv4l+ w/EABI). Improved musl-gcc wrapper
+now works with pre-4.4 gcc versions (including 3.x) and behaves more
+transparently. The clone syscall is now exported. statfs/statvfs ABI
+issues have been fixed, along with a number of small header file
+errors.
+</dd>
+
+<dt><a href="releases/musl-0.8.2.tar.gz">musl-0.8.2.tar.gz</a>
+- September 17, 2011
+<dd>
+Support for the ptrace syscall (process tracing/debugging) has been
+added, and an error in pointer const-correctness (fortunately treated
+as just a warning by most compilers) has been fixed. Some other small
+portability fixes/improvements have been made in preparation for new
+ports.
+</dd>
+
+<dt><a href="releases/musl-0.8.1.tar.gz">musl-0.8.1.tar.gz</a>
+- September 14, 2011
+<dd>
+This release is purely bug fixes. It addresses a build failure on
+64-bit systems, minor header file prototype errors and
+inconsistencies, and a small omission related to posix_spawn.
+</dd>
+
+<dt><a href="releases/musl-0.8.0.tar.gz">musl-0.8.0.tar.gz</a>
+- September 13, 2011
+<dd>
+First post-alpha release. Major improvements to dynamic linker/loader,
+iconv, stdio, integer formatting/parsing, threads/synchronization, and
+hardening for poorly-written suid programs. New implementations of
+previously-missing functionality including memory streams, time
+parsing, and POSIX AIO. Many unlock/destroy-type race condition bugs
+have been fixed in pthread locks; such races are nearly impossible to
+trigger but persist in other implementations such as glibc/NPTL. A
+number of other bugs have also been fixed, including bugs in stdio,
+clock, iconv, siglongjmp, and various header files.
+</dd>
+
+</dl>
+
+<h2>Alpha series</h2>
+
+<dl>
+
+<dt><a href="releases/musl-0.7.12.tar.gz">musl-0.7.12.tar.gz</a>
+- July 3, 2011
+<dd>
+New improvements to the dynamic linker (TEXTREL and RPATH support)
+increase compatibility with applications, particularly those which
+don't follow best practices for building and installing libraries.
+A bug in dlopen which affected only certain compiler versions (misuse
+of local variables with longjmp) has been fixed. Support has been
+added for the stdio_ext.h family of interfaces, to reduce the effort
+needed to compile buggy gnulib programs that try to poke at stdio FILE
+internals, the random() function has been made thread-safe, mprotect
+now works around a bug in the Linux syscall, and uninitialized long
+double values are now handled safely in printf.
+</dd>
+
+<dt><a href="releases/musl-0.7.11.tar.gz">musl-0.7.11.tar.gz</a>
+- June 28, 2011
+<dd>
+Shared libraries and dynamic loading (dlopen/dlsym) are now supported
+through an integrated dynamic linker with near-zero overhead. Other
+new features include POSIX message queues, posix_spawn, the search.h
+interfaces, the random() PRNG, and floating point environment
+manipulation. Moderately severe bugs in several string and wide string
+interfaces and glob(), as well as various minor bugs, have been fixed.
+</dd>
+
+<dt><a href="releases/musl-0.7.10.tar.gz">musl-0.7.10.tar.gz</a>
+- May 17, 2011
+<dd>
+Support for numeric IPv6 address parsing has been added. Compiling
+musl with PCC should now succeed and result in a working library. The
+heap sort implementation of qsort has been replaced by smooth sort,
+yielding nearly-linear run time on arrays which are already
+mostly-sorted. Various bugs including printf floating point rounding
+and scanf EOF handling have been fixed, as well as minor prototype
+issues in the public headers and an issue where variadic functions
+were incorrectly inlined on i386 with recent gcc versions.
+</dd>
+
+<dt><a href="releases/musl-0.7.9.tar.gz">musl-0.7.9.tar.gz</a>
+- April 23, 2011
+<dd>
+This release features the second wave of major changes to pthread
+cancellation, believed to resolve all possible issues with resource
+leaks, premature cancellation, and late/missed cancellation
+opportunities, all while simplifying and reducing the code size and
+eliminating the cost in applications which do not use cancellation.
+Several major x86_64-specific bugs related to select(), fcntl locking,
+and alignment-related crashes, and many minor bugs affecting all
+platforms, have also been fixed.
+</dd>
+
+<dt><a href="releases/musl-0.7.8.tar.gz">musl-0.7.8.tar.gz</a>
+- April 13, 2011
+<dd>
+Multiple bugs in IPv6 support, x86_64 socket and setjmp handling, byte
+swapping functions, and floating point printf formatting have been
+fixed, and a workaround has been included for a bug in Linux readv()
+with tty devices which caused stdio to block after reading a blank
+line from the terminal. Significant additions have been made to some
+header files for better compatibility with legacy applications.
+</dd>
+
+<dt><a href="releases/musl-0.7.7.tar.gz">musl-0.7.7.tar.gz</a>
+- April 6, 2011
+<dd>
+More bugs have been fixed, including printf floating point formatting
+and rounding, printf positional argument specifiers, a misaligned read
+bug in strchr which could lead to crashes, general failure of
+getmntent_r, broken statvfs on x86_64, and various minor issues. More
+nonstandard and system-level interfaces have also been added,
+increasing application compatibility.
+</dd>
+
+<dt><a href="releases/musl-0.7.6.tar.gz">musl-0.7.6.tar.gz</a>
+- April 4, 2011
+<dd>
+Major bugs have been fixed, including a rare but serious bug in malloc
+for large allocations of particular sizes, failure of strchr when
+searching for high bytes, parsing errors in strtold, and numerous
+smaller issues.
+</dd>
+
+<dt><a href="releases/musl-0.7.5.tar.gz">musl-0.7.5.tar.gz</a>
+- April 2, 2011
+<dd>
+Support for POSIX timers (signal- and thread-based delivery) has been
+added. The stdio buffering implementation now uses readv/writev
+scatter-gather IO to operate on caller-provided and internal FILE
+buffers together in a single syscall, improving performance. Thread
+cancellation has been greatly improved to guarantee no resource leaks
+when a cancellation request is received at a resource-allocating
+syscall (such as open()), giving musl a major robustness advantage
+over other libraries, including glibc. The syscall() interface is now
+available to applications, and various other small improvements have
+been made and bugs fixed.
+</dd>
+
+<dt><a href="releases/musl-0.7.1.tar.gz">musl-0.7.1.tar.gz</a>
+- March 18, 2011
+<dd>
+The previously-missing wide character printf-family functions, and
+manual stdio locking functions (flockfile) have been implemented.
+Robust mutexes are also now supported. Various bugs have been fixed,
+including unconditional, potentially-dangerous stack corruption by the
+times() function and several minor bugs.
+</dd>
+
+<dt><a href="releases/musl-0.7.0.tar.gz">musl-0.7.0.tar.gz</a>
+- March 11, 2011
+<dd>
+This release fills in a number of previously-missing interfaces,
+including POSIX shared memory, semaphores, and all remaining basic
+pthread and POSIX clock functions. In addition, many corrections have
+been made in the semantics of signals, threads, and various other
+interfaces. Significant bugs in the printf %n specifier and
+pthread_once function have been fixed. As of 0.7.0, musl is believed
+to pass all tests in the Open POSIX Test Suite except those that rely
+on not-yet-implemented features or that invoke undefined behavior.
+</dd>
+
+<dt><a href="releases/musl-0.6.0.tar.gz">musl-0.6.0.tar.gz</a> -
+February 17, 2011
+<dd>
+This is the first release of musl to support building native x86_64
+applications, and it features a source/build framework for additional
+ports. Some public header errors introduced in the previous release
+have been fixed, as well as a major bug in the %n specifier for printf
+and several minor bugs.
+</dd>
+
+
+<dt><a href="releases/musl-0.5.9.tar.gz">musl-0.5.9.tar.gz</a> -
+February 14, 2011
+<dd>
+This release fixes a major bug in the intended long-term ABI for
+sigset_t/sigaction. Anyone using musl to build libraries should
+upgrade immediately (and rebuild any libraries which might use
+signals) to avoid running into ABI breakage issues at a later time.
+The public header files have also undergone review and correction for
+conformance to ISO C and POSIX requirements for what they are allowed
+to make visible. Various other minor bugs have been fixed, and
+internal improvements have been made to facilitate upcoming ports to
+x86_64 and possibly ARM.
+</dd>
+
+<dt><a href="releases/musl-0.5.0.tar.gz">musl-0.5.0.tar.gz</a> -
+February 11, 2011
+<dd>
+Initial public release.
+</dd>
+
+</dl>
+</body></html>

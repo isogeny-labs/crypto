@@ -1,4 +1,14 @@
-Current update, 2026-10-29: exact-pair-progress.md records a checked ordinary
+Current update, 2026-10-29: complete-exact-pair.md records the complete
+GuardedExactPair.exact_pair_prime theorem for the original prime-field model.
+The degree-five upper construction, rationality/unit-ideal bridge and actual
+weighted top-syzygy/Koszul first-fall equality are now proved. Exact current
+sources and checks are bound by complete-exact-pair-validation/. The final
+theorem is a default Lake target. Growing-base, binary and Boolean results
+and numerical fixture provenance are separately scoped in PROOF_MAP.json.
+
+The following two updates are historical partial-formalization records.
+
+Historical update, 2026-10-29: exact-pair-progress.md records a checked ordinary
 filtered-closure definition, complete uniform degree-four obstruction for the
 actual six inputs, degree-four divided-difference derivation, and first-fall
 dependencies. The full exact pair (4,5), including the degree-five upper

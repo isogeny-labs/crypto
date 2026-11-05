@@ -1,0 +1,37 @@
+One harness for every ECDLP method: rho, BSGS, kangaroo, index calculus
+
+Usage: ecbench <COMMAND>
+
+Commands:
+  store                Push, pull and index large files (factor bases, tables) in the object store
+  gpu-stage            Run the existing CUDA ECC binary as a separately labelled GPU stage
+  gpu-match            Run CUDA BSGS on a frozen EC Bench workload and verify its scalar here
+  gpu-match-verify     Recheck a GPU receipt, raw streams, workload and scalar without a GPU
+  calibrate            Check A/A interval coverage and false admissions across quiet and contended sessions
+  methods              List every method with its parameters
+  price-units          Measure the full-pricing units (src/cryptanalysis/ecbench/full_prices.json) on this host for Koblitz curves `a:n`, median of `reps` passes each
+  trend                Fit how a paired ratio moves across curves (ln ratio against ln r and ln n) from `compare --save` files; JSON to stdout
+  host                 Print the host capsule
+  plan                 Validate a spec and print what it expands to
+  run                  Run a session
+  profile-input        Export one exact measured-child input from a frozen spec and sequence
+  callgrind-ir         Sum the Callgrind Ir parts inside the solve markers
+  callgrind-online-ir  Split one profiled solve into reusable, one-target online and tail Ir
+  verify               Audit a session from its own files
+  compare              Compare arm B against arm A
+  table                The one-unit table: every arm on every curve, mean S, ratio to the floor and to the reference arm
+  band                 The pricing band of AGENTS.md §5a: every arm's unpriced native work, and any calibration-priced native work, charged alike at each weight (GAE per native operation); pairs ranked only where the order holds at every weight
+  resources            Resource vectors for all measured attempts; no invented SAT/GAE conversion
+  fb                   Build a factor base and write it with its points
+  fbm                  Seal an FBM1 measurement identity (curve × FB1 × oracle × solver × instrument)
+  claim                `vs_rho` claims: one IC run against the strong rho run on one public target, in the report `docs/ic/boundary_targets.json` defines
+  db                   The database
+  isolab-job           An isolab.job/v1 that runs a spec on an independent lab worker
+  bound                Bound records: what a method costs on a domain, fitted across sizes, sealed and re-derivable (`docs/bounds/README.md`)
+  frontier             The frontier of every domain's bounds, and its page
+  challenge            Challenges: the frozen paired spec a candidate runs against an incumbent, and the verdict that moves (or does not move) the frontier
+  help                 Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version

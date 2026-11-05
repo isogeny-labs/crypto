@@ -1,0 +1,45 @@
+{
+  "classification": "exact construction and bounded software correctness checks",
+  "fixture": {
+    "p": 509,
+    "a": 2,
+    "b": 10,
+    "base": [
+      3,
+      68
+    ],
+    "r": 479,
+    "q": 15,
+    "pairs": [
+      [
+        25,
+        173
+      ],
+      [
+        292,
+        440
+      ]
+    ],
+    "extra_offset": 15
+  },
+  "target": "pair means at supplied complete fibers; identity elsewhere",
+  "expected_extra_inputs": [
+    25,
+    173,
+    292,
+    440
+  ],
+  "labels": "target scalars checker-only; supplied public fiber witnesses compile the polynomial",
+  "controls": [
+    "all479 field inputs",
+    "eight existing public-point targets",
+    "invalid pairs and incomplete signature fibers",
+    "asymmetric target parity rejection",
+    "lazy closure panics if needlessly called",
+    "invalid extra sign and source-error propagation",
+    "corrupted coefficient packet"
+  ],
+  "comparative_panel": false,
+  "statistical_sampling": false,
+  "cohort_preserved": 4563
+}

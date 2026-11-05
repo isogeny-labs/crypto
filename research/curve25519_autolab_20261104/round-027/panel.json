@@ -1,0 +1,244 @@
+{
+  "created": "2026-11-04T08:32:31Z",
+  "round": 27,
+  "rules": {
+    "exploration_slots": 6,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f",
+      "wsum-b4",
+      "wsum-b5",
+      "wsum-b12",
+      "wsum-b20",
+      "wsum-b8",
+      "wsum-b16",
+      "wsum-b24",
+      "wsum-b30",
+      "wsum2-b30",
+      "wsum2-b60",
+      "wsum2-b120",
+      "wsum2-b200",
+      "wsum2-b15",
+      "wsum2-b20",
+      "wsum2-b40",
+      "wsum2-b45",
+      "wsum2-b50",
+      "wsum2-b75",
+      "wsum2-b90",
+      "wsum2-b100",
+      "wsum2-b140",
+      "wsum2-b160",
+      "wsum2g-b20",
+      "wsum2g-b30",
+      "wsum2g-b45",
+      "wsum2g-b60",
+      "wsum2g-b90",
+      "wsum2g-b120"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2-b160",
+            "n": 2,
+            "name": "wsum2-b160-n2",
+            "oracle": "wsum:coef=160,free=1"
+          },
+          "reason": "exploration: family wsum2-b160 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b20",
+            "n": 2,
+            "name": "wsum2g-b20-n2",
+            "oracle": "wsum:coef=20,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b20 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b30",
+            "n": 2,
+            "name": "wsum2g-b30-n2",
+            "oracle": "wsum:coef=30,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b30 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b45",
+            "n": 2,
+            "name": "wsum2g-b45-n2",
+            "oracle": "wsum:coef=45,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b45 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b60",
+            "n": 2,
+            "name": "wsum2g-b60-n2",
+            "oracle": "wsum:coef=60,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b60 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b90",
+            "n": 2,
+            "name": "wsum2g-b90-n2",
+            "oracle": "wsum:coef=90,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b90 untried at k = 24, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2-b30",
+        "n": 2,
+        "name": "wsum2-b30-n2",
+        "oracle": "wsum:coef=30,free=1"
+      },
+      "incumbent_s": [
+        3.3181511808673823,
+        3.572653863027712,
+        5.863178002470668
+      ],
+      "tried_before": 46
+    },
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2-b160",
+            "n": 2,
+            "name": "wsum2-b160-n2",
+            "oracle": "wsum:coef=160,free=1"
+          },
+          "reason": "exploration: family wsum2-b160 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b20",
+            "n": 2,
+            "name": "wsum2g-b20-n2",
+            "oracle": "wsum:coef=20,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b20 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b30",
+            "n": 2,
+            "name": "wsum2g-b30-n2",
+            "oracle": "wsum:coef=30,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b30 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b45",
+            "n": 2,
+            "name": "wsum2g-b45-n2",
+            "oracle": "wsum:coef=45,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b45 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b60",
+            "n": 2,
+            "name": "wsum2g-b60-n2",
+            "oracle": "wsum:coef=60,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b60 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2g-b90",
+            "n": 2,
+            "name": "wsum2g-b90-n2",
+            "oracle": "wsum:coef=90,free=1",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wsum2g-b90 untried at k = 28, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2-b60",
+        "n": 2,
+        "name": "wsum2-b60-n2",
+        "oracle": "wsum:coef=60,free=1"
+      },
+      "incumbent_s": [
+        2.5760233229209155,
+        2.793061253567712,
+        4.746402629388886
+      ],
+      "tried_before": 61
+    }
+  },
+  "track": "generic"
+}

@@ -1,0 +1,219 @@
+{
+  "card_id": "CARD-BLINDSPOT-09-24e-r2",
+  "card_path": "research/blindspots_20261018/09-learned-f4-policy/card-24e-r2.yaml",
+  "card_sha256": "48d2034ea8161cc80d077c8eee542bb5d898dfd703db9f674fa99b3704e3280c",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-09/card-24e-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-09/card-24e-r2/b09",
+        "examples/blindspots_09_learned_f4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.512,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 9.512,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-24e-r2/b09",
+        "train",
+        "--n",
+        "13",
+        "--ell",
+        "3",
+        "--m",
+        "4",
+        "--seed",
+        "20261018",
+        "--from",
+        "24",
+        "--to",
+        "32",
+        "--cap",
+        "60000000000",
+        "--out",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 202.746,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "train-13-3-4-24-32",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.samples.24": "a8f6be78c154d0724614903da41e6a8d27246d2d71eebbd4da19f9c56a697498",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.trace.24": "0ef71cdeb381009116a7f67786d94f60aea814f1769d232cc75bbd257612e9e3"
+      },
+      "seconds": 202.746,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5ca2dee2d283018ef335b6cbb65b3830a5d05bcafd69dcbcc1f1b988fc06d29b",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":24,\"arm\":\"a\",\"x_r\":7085,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":19520110253,\"xors\":19387666096,\"mat_words\":132444157,\"rows\":170285,\"steps\":16,\"pairs\":9091,\"field_pairs\":3807,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":71101,\"cols_max\":66301,\"divisor_tests\":41463516,\"label_xors\":21412929525,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3308,\"peak_matrix_mb\":561,\"wall_ms\":18014,\"rss_kb\":261684}",
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":25,\"arm\":\"a\",\"x_r\":1204,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":30813279106,\"xors\":30636187986,\"mat_words\":177091120,\"rows\":205016,\"steps\":18,\"pairs\":12558,\"field_pairs\":4570,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":83569,\"cols_max\":75900,\"divisor_tests\":59945694,\"label_xors\":33776071751,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3445,\"peak_matrix_mb\":756,\"wall_ms\":32125,\"rss_kb\":392612}",
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":26,\"arm\":\"a\",\"x_r\":1100,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":21857134594,\"xors\":21709373851,\"mat_words\":147760743,\"rows\":178026,\"steps\":17,\"pairs\":8674,\"field_pairs\":3794,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":75652,\"cols_max\":70657,\"divisor_tests\":43459600,\"label_xors\":24115800586,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3417,\"peak_matrix_mb\":637,\"wall_ms\":18683,\"rss_kb\":392816}",
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":27,\"arm\":\"a\",\"x_r\":4702,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":26358571099,\"xors\":26205005778,\"mat_words\":153565321,\"rows\":184594,\"steps\":17,\"pairs\":12325,\"field_pairs\":4525,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":78765,\"cols_max\":71412,\"divisor_tests\":50952751,\"label_xors\":28918118689,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3554,\"peak_matrix_mb\":670,\"wall_ms\":28504,\"rss_kb\":397576}",
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":28,\"arm\":\"a\",\"x_r\":4272,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":33301898510,\"xors\":33128363323,\"mat_words\":173535187,\"rows\":203594,\"steps\":18,\"pairs\":12462,\"field_pairs\":4591,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":82949,\"cols_max\":75472,\"divisor_tests\":59514158,\"label_xors\":36632247156,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3545,\"peak_matrix_mb\":746,\"wall_ms\":29602,\"rss_kb\":397576}",
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":29,\"arm\":\"a\",\"x_r\":6212,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":20278231703,\"xors\":20146575562,\"mat_words\":131656141,\"rows\":168548,\"steps\":16,\"pairs\":9267,\"field_pairs\":3800,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":72366,\"cols_max\":67448,\"divisor_tests\":41290474,\"label_xors\":22492732053,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3383,\"peak_matrix_mb\":581,\"wall_ms\":17307,\"rss_kb\":397576}",
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":30,\"arm\":\"a\",\"x_r\":3144,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":27170976448,\"xors\":27021740252,\"mat_words\":149236196,\"rows\":189674,\"steps\":18,\"pairs\":12511,\"field_pairs\":4552,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":76885,\"cols_max\":69296,\"divisor_tests\":56482308,\"label_xors\":29898237707,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3439,\"peak_matrix_mb\":635,\"wall_ms\":27792,\"rss_kb\":397576}",
+        "{\"tool\":\"b09\",\"cell\":\"13-3-4\",\"role\":\"train\",\"idx\":31,\"arm\":\"a\",\"x_r\":6331,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":33162816582,\"xors\":32989394597,\"mat_words\":173421985,\"rows\":206040,\"steps\":18,\"pairs\":12720,\"field_pairs\":4534,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":83111,\"cols_max\":75298,\"divisor_tests\":61716369,\"label_xors\":36657167025,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3504,\"peak_matrix_mb\":746,\"wall_ms\":30556,\"rss_kb\":406624}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-09/card-24e-r2/b09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-09/card-24e-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "7b455a532c6d349d65d3a9b07997da0ce0682aaf",
+  "dirty_after": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-24d-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-24d-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-24e-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-24e-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.samples.16",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.samples.24",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.samples.8",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.trace.16",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.trace.24",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.trace.8",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-24c-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-24d-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-08-16-r2b.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-08-16-r2b.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-16-24-r2b.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-16-24-r2b.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-24-32-r2b.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-24-32-r2b.stderr.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-24d-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-24d-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.samples.16",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.samples.8",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.trace.16",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-13-3-4-r2b.trace.8",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-24c-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-24d-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-08-16-r2b.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-08-16-r2b.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-16-24-r2b.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-13-3-4-16-24-r2b.stderr.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

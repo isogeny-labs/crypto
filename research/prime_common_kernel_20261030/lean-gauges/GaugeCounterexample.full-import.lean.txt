@@ -1,0 +1,40 @@
+module
+
+public import Mathlib
+
+public section
+
+namespace GaugeCounterexample
+
+abbrev PortMatrix := Matrix (Fin 2) (Fin 2) ℤ
+abbrev CubeMatrix := Matrix (Fin 4) (Fin 4) ℤ
+
+def bits : Fin 4 → Fin 2 → ℤ :=
+  ![![0, 0], ![0, 1], ![1, 0], ![1, 1]]
+
+def ell (b z : ℤ) : ℤ := if b = 0 then 1 - z else z
+
+def kernel (w : PortMatrix) : CubeMatrix := fun y x =>
+  ell (bits y 0) ((w 0 0) * (bits x 0) + (w 0 1) * (bits x 1)) *
+  ell (bits y 1) ((w 1 0) * (bits x 0) + (w 1 1) * (bits x 1))
+
+def w : PortMatrix := !![1, 1; 0, 1]
+def v : PortMatrix := !![1, 0; 1, 1]
+
+theorem composed_kernel_entry : (kernel w * kernel v) 3 3 = 4 := by
+  norm_num [kernel, w, v, bits, ell, Matrix.mul_apply, Fin.sum_univ_succ]
+
+theorem kernel_product_entry : kernel (w * v) 3 3 = 6 := by
+  norm_num [kernel, w, v, bits, ell, Matrix.mul_apply, Fin.sum_univ_succ]
+
+theorem kernel_not_multiplicative : kernel (w * v) ≠ kernel w * kernel v := by
+  intro h
+  have hh := congrArg (fun k : CubeMatrix => k 3 3) h
+  rw [kernel_product_entry, composed_kernel_entry] at hh
+  norm_num at hh
+
+#print axioms composed_kernel_entry
+#print axioms kernel_product_entry
+#print axioms kernel_not_multiplicative
+
+end GaugeCounterexample

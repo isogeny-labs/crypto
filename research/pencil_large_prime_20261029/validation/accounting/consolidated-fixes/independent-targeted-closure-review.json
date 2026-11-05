@@ -1,0 +1,98 @@
+{
+  "schema": "software-validation/v1",
+  "observed_utc": "2026-10-29T18:53:47Z",
+  "reviewer": "root/ci_audit",
+  "review_kind": "independent_read_only_targeted_source_review",
+  "worktree_head": "ad958cf57ba011acb85c6d2a01efe12226723644",
+  "working_tree_changes_reviewed": true,
+  "scope": {
+    "source_report": "validation/accounting/finite-coverage-audit.md",
+    "implementation_map": "validation/accounting/consolidated-fixes/SITE_MAPPING.md",
+    "findings": [
+      "actual rho scalar constructor primality",
+      "candidate associative-container entry semantics",
+      "collection predicate coverage"
+    ]
+  },
+  "source_bindings": [
+    {
+      "path": "src/lib.rs",
+      "sha256": "615ba55e378fe2e1b5d086d679abdd63017b227a0d641173d1a541833b86164d"
+    },
+    {
+      "path": "src/residual.rs",
+      "sha256": "21fd29dc330fbbf8ce3c45876584418c55c366876adc85d24888d0693144966f"
+    },
+    {
+      "path": "src/native_solver.rs",
+      "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df"
+    },
+    {
+      "path": "native_price/src/analyzer.rs",
+      "sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8"
+    }
+  ],
+  "disposition": [
+    {
+      "finding": 1,
+      "status": "source_closed",
+      "evidence": "Ring::new invokes one equivalent observed scalar primality check in the original short-circuit position; the geometry partition carries it in solver cold setup; the analyzer maps scalar constructor multiplication, squaring, and standalone reduction only to native logical weight."
+    },
+    {
+      "finding": 2,
+      "status": "source_closed_after_followup",
+      "evidence": "Successful returned-entry visits and fresh-entry initialization follow the finite convention. The two follow-up first_key_value consumers now each charge one copied map-entry tuple after successful borrowed lookup materialization. Iterator consumption, owned moves, and fixed scalar local moves remain outside this copy rule."
+    },
+    {
+      "finding": 3,
+      "status": "source_closed",
+      "evidence": "Engine polynomial and residual cap predicates charge exactly the comparisons reached under their original short-circuit evaluation."
+    }
+  ],
+  "followup_copy_sites": [
+    {
+      "path": "src/lib.rs",
+      "line": 240,
+      "behavior": "one copied tuple after successful roots.first_key_value borrowed lookup",
+      "regression": "tests::anchoring_copies_one_borrowed_lookup_entry"
+    },
+    {
+      "path": "src/residual.rs",
+      "line": 103,
+      "behavior": "one copied tuple per successful row.first_key_value borrowed lookup",
+      "regression": "residual::tests::cap_predicates_charge_only_evaluated_length_checks"
+    }
+  ],
+  "boxed_validation_error": {
+    "receipt_schema_preserved": "pencil-validation-error/v1",
+    "display_json_preserved": true,
+    "serde_field_order_preserved": [
+      "schema",
+      "reason",
+      "outer_primality"
+    ],
+    "in_repo_callers_compatible": true,
+    "evidence": "Box delegates Display and field access to ValidationError. The rejection regression parses error.to_string as JSON and verifies the schema and retained scalar-primality observation. ecbench still converts the error through Display; the cohort binary only expects the valid path.",
+    "api_limit": "The concrete Rust return type is Result<PencilResult, Box<ValidationError>>. This is not source-compatible for an external caller that explicitly annotated the previous unboxed error type; no such in-repository caller was found."
+  },
+  "targeted_validation": {
+    "producer_log": "validation/accounting/consolidated-fixes/final-copy-producer-tests.log",
+    "producer_log_sha256": "e72171fb792abb268262441e81554f47d93d70fe24312a4878d4cbbdce784cdc",
+    "passed": 49,
+    "failed": 0,
+    "ignored": 1,
+    "copy_regressions_passed": true,
+    "root_lib_clippy_log": "validation/accounting/consolidated-fixes/root-lib-clippy-final.log",
+    "root_lib_clippy_log_sha256": "4aaf45398270b6fde822dbd544f3b25918ecfde178a84f5da793afebda0732bd",
+    "root_lib_clippy_exit_code": 0
+  },
+  "claim_limits": {
+    "whole_algorithm_coverage_approved": false,
+    "reviewed_complete_emitted": false,
+    "protocol_or_binary_bound": false,
+    "experiment_or_cohort_run": false,
+    "cost_ratio_verified": false,
+    "final_full_root_suite_after_followup": false
+  },
+  "review_result": "the three reported finite source findings are closed at targeted source and producer-test scope; broader validation remains separate"
+}

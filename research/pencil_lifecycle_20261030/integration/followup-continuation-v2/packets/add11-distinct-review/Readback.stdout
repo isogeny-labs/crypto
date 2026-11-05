@@ -1,0 +1,30 @@
+Add11Distinct.distinct_linear_product_dvd.{u_1} {K : Type u_1} [Field K] (x1 x2 : K) (h : x1 ≠ x2) (P : Polynomial K)
+  (h1 : Polynomial.X - Polynomial.C x1 ∣ P) (h2 : Polynomial.X - Polynomial.C x2 ∣ P) :
+  (Polynomial.X - Polynomial.C x1) * (Polynomial.X - Polynomial.C x2) ∣ P
+Add11Distinct.distinct_preserves_mumford.{u_1} {K : Type u_1} [Field K] (f : Polynomial K) (x1 y1 x2 y2 : K)
+  (hx : x1 ≠ x2) (h1 : Polynomial.X - Polynomial.C x1 ∣ f - Polynomial.C y1 ^ 2)
+  (h2 : Polynomial.X - Polynomial.C x2 ∣ f - Polynomial.C y2 ^ 2) :
+  have q := -(x1 + x2);
+  have r := x1 * x2;
+  have s := y1 - y2;
+  have t := x1 * y2 - x2 * y1;
+  have w := x1 - x2;
+  w ≠ 0 ∧
+    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+      f - (Polynomial.C (s / w) * Polynomial.X + Polynomial.C (t / w)) ^ 2
+Add11Distinct.distinct_guard.{u_1} {K : Type u_1} [Field K] [DecidableEq K] (x1 y1 x2 y2 : K) (hx : x1 ≠ x2) :
+  Add11Distinct.classify x1 y1 x2 y2 = Add11Distinct.Prelude.distinct
+Add11Distinct.distinct_output_invariant.{u_1} {K : Type u_1} [Field K] (f : Polynomial K) (x1 y1 x2 y2 : K)
+  (hx : x1 ≠ x2) (h1 : Polynomial.X - Polynomial.C x1 ∣ f - Polynomial.C y1 ^ 2)
+  (h2 : Polynomial.X - Polynomial.C x2 ∣ f - Polynomial.C y2 ^ 2) :
+  1 ≠ 0 ∧
+    x1 - x2 ≠ 0 ∧
+      Polynomial.X ^ 2 + Polynomial.C (-(x1 + x2) / 1 ^ 2) * Polynomial.X + Polynomial.C (x1 * x2 / 1 ^ 4) ∣
+        f -
+          (Polynomial.C ((y1 - y2) / (1 ^ 3 * (x1 - x2))) * Polynomial.X +
+              Polynomial.C ((x1 * y2 - x2 * y1) / (1 ^ 5 * (x1 - x2)))) ^
+            2
+'Add11Distinct.distinct_linear_product_dvd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Add11Distinct.distinct_preserves_mumford' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Add11Distinct.distinct_guard' depends on axioms: [propext, Quot.sound]
+'Add11Distinct.distinct_output_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]

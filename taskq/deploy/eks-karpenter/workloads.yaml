@@ -61,13 +61,13 @@ metadata:
   namespace: isolab
 spec:
   hard:
-    requests.cpu: '64'
-    limits.cpu: '64'
-    requests.memory: 224Gi
-    limits.memory: 224Gi
-    requests.ephemeral-storage: 400Gi
-    limits.ephemeral-storage: 400Gi
-    pods: '32'
+    requests.cpu: '16'
+    limits.cpu: '16'
+    requests.memory: 128Gi
+    limits.memory: 128Gi
+    requests.ephemeral-storage: 80Gi
+    limits.ephemeral-storage: 80Gi
+    pods: '8'
     count/jobs.batch: '200'
 ---
 apiVersion: storage.k8s.io/v1

@@ -1,0 +1,39 @@
+    Updating crates.io index
+     Locking 11 packages to highest compatible versions
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling syn v3.0.9
+   Compiling serde_derive v1.0.229
+   Compiling complexity-catalog v0.1.0 (/workspace/crypto/tools/complexity-catalog)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.91s
+     Running unittests src/lib.rs (tools/complexity-catalog/target/debug/deps/complexity_catalog-d871e2146e584589)
+
+running 5 tests
+test tests::incomplete_duplicate_and_promoted_records_are_rejected ... ok
+test controls::three_small_degree_generators_are_product_zero_without_a_common_boolean_zero ... ok
+test controls::subspace_retention_is_not_union_retention ... ok
+test tests::frozen_subject_snapshot_covers_every_version_including_cross_lists ... ok
+test tests::integration_pointers_resolve_in_the_owning_repository ... FAILED
+
+failures:
+
+---- tests::integration_pointers_resolve_in_the_owning_repository stdout ----
+
+thread 'tests::integration_pointers_resolve_in_the_owning_repository' (9675) panicked at src/lib.rs:177:17:
+hexagon:2610.00613v1: src/ml_dataset.rs
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::integration_pointers_resolve_in_the_owning_repository
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `--lib`

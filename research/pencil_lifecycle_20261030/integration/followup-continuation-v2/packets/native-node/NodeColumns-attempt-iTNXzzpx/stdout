@@ -1,0 +1,125 @@
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:7:3: error: unexpected token 'at'; expected identifier
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:9:71: error: unexpected token 'at'; expected term
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:14:59: error: unexpected token 'at'; expected term
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:26:42: error: unexpected token 'at'; expected ')', '_', '↑', '↥', '⇑', identifier or term
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:28:7: warning: This simp argument is unused:
+  USize.toNat_ofNat
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Nat.mod_eq_of_lt hn]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:31:7: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce
+
+n : ℕ
+s : Columns n
+hs : Bounded s
+hn : n < USize.size
+⊢ Bounded (append s)
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:36:12: error: unexpected token 'at'; expected ')', '_', '↑', '↥', '⇑', identifier or term
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:43:5: error: unsolved goals
+case hx.hx.refine_1
+n : ℕ
+s : Columns n
+hs : Bounded s
+hn : n < USize.size
+i : Fin (n + 1)
+⊢ sorry () = n
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:45:3: error: unsolved goals
+case hx.hy.refine_1
+n : ℕ
+s : Columns n
+hs : Bounded s
+hn : n < USize.size
+i : Fin (n + 1)
+⊢ sorry () (Fin.last n) = ident
+
+case hx.hy.refine_2
+n : ℕ
+s : Columns n
+hs : Bounded s
+hn : n < USize.size
+i : Fin (n + 1)
+j : Fin n
+⊢ sorry () j.castSucc = sorry () j
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:47:1: error: unsolved goals
+case hy.refine_1
+n : ℕ
+s : Columns n
+hs : Bounded s
+hn : n < USize.size
+i : Fin (n + 1)
+⊢ sorry () (Fin.last n) = none
+
+case hy.refine_2
+n : ℕ
+s : Columns n
+hs : Bounded s
+hn : n < USize.size
+i : Fin (n + 1)
+j : Fin n
+⊢ sorry () j.castSucc = sorry () j
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:43:27: warning: declaration uses `sorry`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:43:34: warning: This simp argument is unused:
+  append
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, insertWord, new_index_exact hn]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:43:41: warning: This simp argument is unused:
+  insertWord
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, append, new_index_exact hn]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:43:52: warning: This simp argument is unused:
+  new_index_exact hn
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, append, insertWord]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:44:34: warning: This simp argument is unused:
+  append
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, insertWord]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:44:41: warning: This simp argument is unused:
+  insertWord
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, append]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:46:62: warning: This simp argument is unused:
+  append
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, insertWord]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:46:69: warning: This simp argument is unused:
+  insertWord
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, append]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:48:60: warning: This simp argument is unused:
+  append
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, insertWord]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeColumns.lean:48:67: warning: This simp argument is unused:
+  insertWord
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [toWord, append]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
