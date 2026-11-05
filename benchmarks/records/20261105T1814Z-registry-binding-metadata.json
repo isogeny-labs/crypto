@@ -1,0 +1,237 @@
+{
+  "branch": "HEAD",
+  "closed_utc": "2026-11-05T18:28:46+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/pr-integration-cover-metadata-20261105-1745/debug/curve_cover_check",
+        "--registry",
+        "/workspace/pr-integration/resume-20261105-1717/cover-baseline-registry-6dce.json",
+        "--output",
+        "docs/curves/covers.json",
+        "--links",
+        "docs/curves/cover-links.yaml",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T18:14:14+00:00",
+      "wall_s": 153.252
+    },
+    {
+      "argv": [
+        "/tmp/pr-integration-cover-metadata-20261105-1745/debug/curve_cover_check",
+        "--registry",
+        "docs/curves/registry.json",
+        "--output",
+        "docs/curves/covers.json",
+        "--links",
+        "docs/curves/cover-links.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T18:16:48+00:00",
+      "wall_s": 180.499
+    },
+    {
+      "argv": [
+        "/tmp/pr-integration-cover-metadata-20261105-1745/debug/curve_cover_check",
+        "--registry",
+        "docs/curves/registry.json",
+        "--output",
+        "docs/curves/covers.json",
+        "--links",
+        "docs/curves/cover-links.yaml",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T18:19:48+00:00",
+      "wall_s": 183.972
+    },
+    {
+      "argv": [
+        "/workspace/pr-integration/resume-20261105-1415/registry-binding-native-checker/target/release/registry-binding-native-checker",
+        "/workspace/pr-integration/resume-20261105-1415/aimed-gather-original-registry-53fe929b.json",
+        "docs/curves/registry.json",
+        "/workspace/pr-integration/work/crypto-3463-cover-metadata-20261105-1745/benchmarks/20261029-ic-aimed-gather/validator-report.json",
+        "/workspace/pr-integration/work/crypto-3463-cover-metadata-20261105-1745/benchmarks/20261029-ic-aimed-gather",
+        "/workspace/pr-integration/work/crypto-3463-cover-metadata-20261105-1745/docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/validator-report.json",
+        "/workspace/pr-integration/work/crypto-3463-cover-metadata-20261105-1745/docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/source-equivalence.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T18:22:53+00:00",
+      "wall_s": 0.658
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "scripts/check_curve_catalog_consistency.py"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T18:22:53+00:00",
+      "wall_s": 1.418
+    }
+  ],
+  "commit": "61abb767e2569d63b512e31dcafb7aeec32d66ba",
+  "commit_dirty": true,
+  "created_utc": "2026-11-05T18:14:14+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261029-ic-aimed-gather"
+  ],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "f23f6a71c405",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261105T1814Z-registry-binding-metadata",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "registry_rows_processed",
+      "note": "Metadata validation count only; no performance or scientific admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 22766.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "old_cover_records_retained",
+      "note": "Metadata validation count only; no performance or scientific admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 20848.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "other_raw_input_pins_verified",
+      "note": "Metadata validation count only; no performance or scientific admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 211.0
+    }
+  ],
+  "problem": "metadata:registry-source-binding",
+  "raw": [
+    {
+      "bytes": 25597550,
+      "path": "docs/curves/covers.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f4/f449e0b5fcf337591ebca5dfb81492ac5f7bd7c146de3f28da4a7852586bfd20",
+      "sha256": "f449e0b5fcf337591ebca5dfb81492ac5f7bd7c146de3f28da4a7852586bfd20",
+      "uploaded": false
+    },
+    {
+      "bytes": 63129906,
+      "path": "docs/curves/cover-links.yaml",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0c/0cef8922bfa69c06f28fe3d4f8cae3d78af1427b8c202653517da3c6c002e468",
+      "sha256": "0cef8922bfa69c06f28fe3d4f8cae3d78af1427b8c202653517da3c6c002e468",
+      "uploaded": false
+    },
+    {
+      "bytes": 146,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/benchmark-source-equivalence.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2c/2c52b453666808d767ea5478af1b23fc2c07a03e1644b03acbe97d21909e8f1f",
+      "sha256": "2c52b453666808d767ea5478af1b23fc2c07a03e1644b03acbe97d21909e8f1f",
+      "uploaded": false
+    },
+    {
+      "bytes": 8020,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/canonical-build.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cd/cded659100bb7aea9c30438ceeb1fabaf9e7980fc749d4aa7e76efd233c243ae",
+      "sha256": "cded659100bb7aea9c30438ceeb1fabaf9e7980fc749d4aa7e76efd233c243ae",
+      "uploaded": false
+    },
+    {
+      "bytes": 97,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/catalog-consistency.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0a/0a824bd69889365df192de1c9ad3010ba73b3cfe03b60d4f2794f7511efaca21",
+      "sha256": "0a824bd69889365df192de1c9ad3010ba73b3cfe03b60d4f2794f7511efaca21",
+      "uploaded": false
+    },
+    {
+      "bytes": 53,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/cover-baseline-byte-replay.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/60/605c9700366ff464c17c8ad4eade966e631deabc962d2de4a44aa9cd28e2bad2",
+      "sha256": "605c9700366ff464c17c8ad4eade966e631deabc962d2de4a44aa9cd28e2bad2",
+      "uploaded": false
+    },
+    {
+      "bytes": 53,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/cover-new-byte-replay.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/72a536d3bcd2a155a09990139249680c89675cc322b8a1354729c30e841a4086",
+      "sha256": "72a536d3bcd2a155a09990139249680c89675cc322b8a1354729c30e841a4086",
+      "uploaded": false
+    },
+    {
+      "bytes": 53,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/cover-regenerate.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/72a536d3bcd2a155a09990139249680c89675cc322b8a1354729c30e841a4086",
+      "sha256": "72a536d3bcd2a155a09990139249680c89675cc322b8a1354729c30e841a4086",
+      "uploaded": false
+    },
+    {
+      "bytes": 1228,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/inputs.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e8/e8f63062e93819eff9500d49667291bd45e5656e5b08287880d20d8df5a922f6",
+      "sha256": "e8f63062e93819eff9500d49667291bd45e5656e5b08287880d20d8df5a922f6",
+      "uploaded": false
+    },
+    {
+      "bytes": 1588,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/preservation.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/27aecc85a8baaa10e86148456bd4a3d4bd834890e9c901042b876ef2ca90fb33",
+      "sha256": "27aecc85a8baaa10e86148456bd4a3d4bd834890e9c901042b876ef2ca90fb33",
+      "uploaded": false
+    },
+    {
+      "bytes": 3015,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/report.pdf",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/90/900057938edb8cf0a107c46249b55998bab9145046c037ad870b30ca13248a70",
+      "sha256": "900057938edb8cf0a107c46249b55998bab9145046c037ad870b30ca13248a70",
+      "uploaded": false
+    },
+    {
+      "bytes": 1225,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/source-equivalence.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/3715aed8e67202e1861c4ff225e44004629712a482ed122e4dec98568d6de490",
+      "sha256": "3715aed8e67202e1861c4ff225e44004629712a482ed122e4dec98568d6de490",
+      "uploaded": false
+    },
+    {
+      "bytes": 171166,
+      "path": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/validator-report.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7b/7b2443b479875b99282f2dc4cafe8f24a87564c80e65cc4d0453c455c4e04453",
+      "sha256": "7b2443b479875b99282f2dc4cafe8f24a87564c80e65cc4d0453c455c4e04453",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "docs/maintenance/pr-3463-catalog-refresh-20261105/metadata-validation/report.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "registry-binding-metadata",
+  "status": "measured",
+  "summary": "Metadata-only validation: 22,766 cover records, all 20,848 old records retained, 211 other raw pins unchanged; no benchmark, timing or scientific promotion. Storage validation remains required in CI.",
+  "validation": "benchmarks/20261029-ic-aimed-gather/VALIDATION.json"
+}

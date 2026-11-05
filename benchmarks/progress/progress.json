@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T1526Z-c25519-multicurve-rebaseline",
+  "latest_record": "20261105T1814Z-registry-binding-metadata",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 39,
+    "measured": 40,
     "open": 0
   },
   "repo": "crypto",
@@ -1175,6 +1175,75 @@
       ],
       "problem": "ic:curve25519-family-k32",
       "unit": "S"
+    },
+    {
+      "better": "neutral",
+      "first": 20848.0,
+      "latest": 20848.0,
+      "latest_derived": {},
+      "metric": "old_cover_records_retained",
+      "points": [
+        {
+          "commit": "61abb767e256",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 1,
+          "record": "20261105T1814Z-registry-binding-metadata",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Metadata-only validation: 22,766 cover records, all 20,848 old records retained, 211 other raw pins unchanged; no benchmark, timing or scientific promotion. Storage validation remains required in CI.",
+          "value": 20848.0
+        }
+      ],
+      "problem": "metadata:registry-source-binding",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 211.0,
+      "latest": 211.0,
+      "latest_derived": {},
+      "metric": "other_raw_input_pins_verified",
+      "points": [
+        {
+          "commit": "61abb767e256",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 1,
+          "record": "20261105T1814Z-registry-binding-metadata",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Metadata-only validation: 22,766 cover records, all 20,848 old records retained, 211 other raw pins unchanged; no benchmark, timing or scientific promotion. Storage validation remains required in CI.",
+          "value": 211.0
+        }
+      ],
+      "problem": "metadata:registry-source-binding",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 22766.0,
+      "latest": 22766.0,
+      "latest_derived": {},
+      "metric": "registry_rows_processed",
+      "points": [
+        {
+          "commit": "61abb767e256",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 1,
+          "record": "20261105T1814Z-registry-binding-metadata",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Metadata-only validation: 22,766 cover records, all 20,848 old records retained, 211 other raw pins unchanged; no benchmark, timing or scientific promotion. Storage validation remains required in CI.",
+          "value": 22766.0
+        }
+      ],
+      "problem": "metadata:registry-source-binding",
+      "unit": "count"
     }
   ],
   "units": {
