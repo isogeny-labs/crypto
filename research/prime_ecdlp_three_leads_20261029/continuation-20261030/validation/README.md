@@ -96,3 +96,25 @@ is NOT_UPLOADED with bounded excerpt. All17bindings/sixbinaryhashes verified.
 Earlier running snapshots and both earlier capped receipts remain unchanged.
 Remote0cc5 integration still needs fresh affected checks, including the
 changed Lean gate. No bound source was edited while the old run was active.
+
+## 2026-11-05 terminal collection and separate continuation
+
+PR2949 merged on2026-11-01 as8b147fd36e71990d9f44eb2cbfa435aa769cefc5.
+Maintenance of that PR has stopped. All unpublished commits are preserved on
+`codex/pkm-certificates-accounting-20261105`; no rebase or force-push.
+
+The existing49719 run is terminal, not restarted. [Final receipt](validation/repaired-main-cc5addeba/final-20261105/receipt.json)
+verifies17 unchanged source objects and all6 actual binaries. Repaired-source
+23examples, strict lint/format, CLIbuild/verified checkpoint refusal,
+backlog and library build pass. Full5848-case execution20:48:46–21:28:46UTC
+on2026-10-30 hit40minutes:2272passes,1failure,48ignored,1JVactive,
+3526not reached. Wrapper/supervisor124; Cargo exit unknown, no final summary.
+A focused existing-binary run reproduces the inherited degree-bound assertion
+(Some190568 versus None) without modifying assertions or tests. The source file
+is identical to maincc5addeba. The delimiter compilation error is repaired;
+the separate assertion and JV limits keep full-suite validation incomplete.
+Raw221629bytes SHA25641ca32cee963b13adb6b5638abc52191de20f676b038874957a6b06e5e5ebebf
+remains NOT_UPLOADED; exact local path and bounded excerpt are in the receipt.
+No scientific acceptance has changed. The next implementation retains validation
+reference counts and explicitly emits query field/reduction counts with ownership.
+

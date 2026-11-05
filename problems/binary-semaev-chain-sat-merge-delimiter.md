@@ -1,6 +1,6 @@
 # Inherited native compilation error blocks PKM integration validation
 
-- **Status:** repair merged locally; fresh native validation pending
+- **Status:** resolved for delimiter compilation; independent assertion blocker remains
 - **Kind:** inherited software build failure and merge conflict
 - **Affected work:** [PKM G1–G6 continuation](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/README.md)
 - **Next action owner:** PR integration lane; native chain-SAT maintainer
@@ -59,3 +59,12 @@ New source-pinned native49719 is compiling,notpassed,with own recipe/bindings
 under continuation validation/repaired-main-cc5addeba. Earlier compilation
 failure101 and all not-reached phases remain immutable. Do not declare this
 build problem resolved until affected compilation/checks qualify actualsource.
+
+## 2026-11-05 verified compilation repair
+
+Sourceb022's23release examples, strict clippy, CLI/backlog and library no-run
+build pass. [Final receipt](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/repaired-main-cc5addeba/final-20261105/receipt.json)
+qualifies repairedblob4e2111e29f64c5fece73f2c52dd9aff9c6e7f69f. This resolves
+the delimiter compilation defect only. The full suite observes a separate
+[degree-bound assertion](binary-semaev-chain-sat-degree-bound-assertion.md)
+and caps at unchangedJV; no full-suite/scientific pass is claimed.

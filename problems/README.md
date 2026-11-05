@@ -152,3 +152,5 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
+
+| [Chain-SAT degree-bound assertion](binary-semaev-chain-sat-degree-bound-assertion.md) | Open | Inherited m10 expectation disagrees with m15-supported bound; focused failure101 retained. |

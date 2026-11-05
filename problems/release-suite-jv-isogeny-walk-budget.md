@@ -80,3 +80,12 @@ and binaries, and retains a bounded excerpt. Older same-size logs with other
 hashes are distinct frozen evidence. No test/assertion/ignore was changed.
 Cause remains unknown and full-library validation remains incomplete; remote
 source/dependency changes require fresh affected validation.
+
+## Repaired-source terminal collection2026-11-05
+
+Sourceb022 declares5848cases:2272passed,1inheritedchain-boundfailure,48ignored,
+one unchangedJV caseactive and3526not reached at40minutes. Wrapper124 is
+not Cargoexit; [new receipt](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/repaired-main-cc5addeba/final-20261105/receipt.json)
+retains raw221629bytes/SHA25641ca32cee963b13adb6b5638abc52191de20f676b038874957a6b06e5e5ebebf
+NOT_UPLOADED. Earlier logs remain distinct and immutable. No duplicate suite
+was launched. Cause ofJV duration remains unknown; full-suite pass absent.
