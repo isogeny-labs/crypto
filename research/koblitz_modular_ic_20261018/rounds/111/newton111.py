@@ -47,7 +47,6 @@ def edges(points,vertices):
  for (z0,x0),(z1,x1) in zip(vertices,vertices[1:]):
   v=Fraction(x0-x1,z1-z0)
   if v<=0:continue
-  on=sorted((z,x) for z,x in points if Fraction(x0-x,z-z0)==v) if False else []
   on=sorted((z,x) for z,x in points if (x-x0)*(z1-z0)==(x1-x0)*(z-z0) and z0<=z<=z1)
   residual=sorted(z-z0 for z,x in on)
   out.append({'endpoints':[[z0,x0],[z1,x1]],'z_valuation':str(v),
@@ -72,7 +71,7 @@ def main():
  special=0
  for ye,exps in fterms:
   if 0 in exps:special^=1<<ye
- assert special==sum(1<<i for i in (3,4,5,6,7))
+ assert special==sum(1<<i for i in (4,5,6,7))
  out={'source_sha256':protocol['inputs_sha256'],'f_term_count':len(fterms),
       'g_term_count':len(gterms),'f_x0_bits':special}
  for name,shift in [('y0',0),('y1',1)]:
