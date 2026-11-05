@@ -131,6 +131,13 @@ lead atlas and repository paths, and mark the KB review as unavailable in the
 handoff. The `research-kb` skill has query recipes, the result fields that
 matter and a worked receipt.
 
+The adoption audit is `scripts/kb_usage_report.py`; it counts dated
+session-log entries carrying a receipt (or an explicit `KB unavailable`). Run
+`python3 scripts/kb_usage_report.py --since 2026-11-05` after a batch of
+sessions and keep `docs/knowledge-base-usage-baseline.json` as the before
+mark. It reports; it is not a quota and never blocks a null or negative
+result.
+
 ## Standing workflow rules (from the owner)
 
 - **Run experiments on EKS Spot by default** (owner, 2026-10-25). For an
