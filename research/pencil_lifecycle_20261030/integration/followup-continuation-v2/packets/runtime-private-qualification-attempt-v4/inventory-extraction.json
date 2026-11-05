@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "sudo",
+    "-n",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=3s",
+    "30s",
+    "prlimit",
+    "--as=536870912",
+    "--fsize=10485760",
+    "/usr/sbin/debugfs",
+    "-R",
+    "cat /qualification-receipts-3f18b4ff-4e50-4f17-8bd8-924fcca3958d/image-file-inventory.json",
+    "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+  ],
+  "exit_code": 0
+}

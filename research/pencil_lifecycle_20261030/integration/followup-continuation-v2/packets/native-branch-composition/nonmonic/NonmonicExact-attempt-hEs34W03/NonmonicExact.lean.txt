@@ -1,0 +1,66 @@
+import NonmonicLoop
+set_option autoImplicit false
+namespace NonmonicDivision
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest NativeDivision PencilWordRefinement
+theorem loop_normal (p a:UInt64) (b:List UInt64) (fuel:Nat)
+ (q qo:(ZMod p.toNat)[X]) (r out:List UInt64)
+ (hn:Normal r) (ho:qloop p a b fuel q r=some (qo,out)) : Normal out := by
+ induction fuel generalizing q qo r out with
+ | zero =>
+   rw [qloop] at ho
+   split_ifs at ho
+   · cases Option.some.inj ho; exact hn
+   · cases Option.some.inj ho; exact hn
+ | succ fuel ih =>
+   rw [qloop] at ho
+   split_ifs at ho
+   · cases Option.some.inj ho; exact hn
+   · exact ih _ qo _ out (trim_finished _ _ le_rfl) ho
+   · cases Option.some.inj ho; exact hn
+
+noncomputable def divide (p a:UInt64) (b input:List UInt64) (fuel:Nat) :=
+ qloop p a b fuel 0 (trimFuel input.length input)
+
+theorem divide_total (p a:UInt64) [Fact p.toNat.Prime] (b input:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0)
+ (hbs:Canon p b) (hi:Canon p input) (hm:b.getLast?=some a) (fuel:Nat) (hf:input.length≤fuel) :
+ ∃q out, divide p a b input fuel=some (q,out) ∧ Canon p out ∧ Normal out ∧
+ wordsPoly p input=q*wordsPoly p b+wordsPoly p out ∧ (out=[] ∨ out.length<b.length) := by
+ obtain ⟨q,out,ho⟩:=success_exists p a b hp hb ha hn hbs hm fuel 0 _ (trim_good p _ input hi) (le_trans (trim_length _ _) hf)
+ have hc:=success_correct p a b hp hb ha hn hbs hm fuel 0 q _ out (trim_good p _ input hi) (zero_fresh b _) ho
+ refine ⟨q,out,ho,hc.1,loop_normal p a b fuel 0 q _ out (trim_finished _ _ le_rfl) ho,?_,hc.2.2.2⟩
+ simpa only [zero_mul,zero_add,trim_preserves] using hc.2.2.1.symm
+
+theorem divisor_degree_lower (p a:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:1<p.toNat) (ha:a.toNat<p.toNat) (hn:a≠0) (hm:b.getLast?=some a) :
+ ((b.length-1:Nat):WithBot Nat)≤(wordsPoly p b).degree := by
+ apply le_degree_of_ne_zero
+ rw [top_coefficient,hm]
+ exact canonical_word_nonzero p a (by omega) ha hn
+
+theorem exact_endpoint (p a:UInt64) [Fact p.toNat.Prime] (b input:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0)
+ (hbs:Canon p b) (hi:Canon p input) (hm:b.getLast?=some a) (fuel:Nat) (hf:input.length≤fuel)
+ (wanted:(ZMod p.toNat)[X]) (hw:wordsPoly p input=wanted*wordsPoly p b) :
+ divide p a b input fuel=some (wanted,[]) := by
+ obtain ⟨q,out,ho,hc,hno,he,ht⟩:=divide_total p a b input hp hb ha hn hbs hi hm fuel hf
+ have hz:out=[] := by
+  rcases ht with h|h
+  · exact h
+  · apply (zero_iff_empty p out hc hno).mp
+    apply eq_zero_of_dvd_of_degree_lt
+    · have h1:wordsPoly p b∣wordsPoly p input:=⟨wanted,by rw [hw,mul_comm]⟩
+      have h2:wordsPoly p b∣q*wordsPoly p b:=dvd_mul_left _ _
+      have hd:=dvd_sub h1 h2
+      simpa [he] using hd
+    · exact lt_of_lt_of_le (degree_lt_length p out)
+        (le_trans (by exact_mod_cast (show out.length≤b.length-1 by omega)) (divisor_degree_lower p a b hp ha hn hm))
+ have hbn:wordsPoly p b≠0 := by
+  intro h
+  have hl:=divisor_degree_lower p a b hp ha hn hm
+  simp [h] at hl
+ have hq:q=wanted:=by
+  apply mul_right_cancel₀ hbn
+  simpa [hz,wordsPoly,listPoly] using he.symm.trans hw
+ simpa [hz,hq] using ho
+end NonmonicDivision
