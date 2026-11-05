@@ -3297,6 +3297,9 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
                         .entry("degenerate_fq_muls".into())
                         .or_insert(0) += cost.total_muls;
                 }
+                let degree = u32::from(self.macaulay);
+                self.totals
+                    .observe_degree(degree, degree, cost.total_muls, true, false);
                 return None;
             }
         };
@@ -3314,14 +3317,17 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
             self.totals.solving_degree_max.max(u32::from(self.macaulay));
         self.totals.calls_with_a_degree += 1;
         self.last_witnesses = sol.witnesses.clone();
-        let w = sol.witness?;
-        let idx: Option<Vec<usize>> = w
-            .iter()
-            .map(|q| fb.index_of_key(CountedGroup::key(c, q)))
-            .collect();
-        if idx.is_none() {
+        let idx: Option<Vec<usize>> = sol.witness.as_ref().and_then(|w| {
+            w.iter()
+                .map(|q| fb.index_of_key(CountedGroup::key(c, q)))
+                .collect()
+        });
+        if sol.witness.is_some() && idx.is_none() {
             counters.lift_failures += 1;
         }
+        let degree = u32::from(self.macaulay);
+        self.totals
+            .observe_degree(degree, degree, sol.solve.total_muls, false, idx.is_some());
         idx
     }
     fn decompose_relations(

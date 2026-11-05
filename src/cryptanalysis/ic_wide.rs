@@ -768,6 +768,8 @@ pub fn run_f2m4<S: RhoScalar>(
             semi_regular_degree: t.semi_regular_degree(),
             degree_over_bound: t.degree_over_bound(),
             extra: t.extra.clone(),
+            forecaster: t.forecaster.clone(),
+            forecast_unavailable: t.forecast_unavailable.clone(),
         }
     });
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;
