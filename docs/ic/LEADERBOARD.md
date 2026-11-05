@@ -432,7 +432,7 @@ Rho stays ahead at every size and weight; the IC ÷ rho column is the distance r
 
 [Report](../../research/ic_stride_renew_prime_20261029/README.pdf) · [study](../../research/ic_stride_renew_prime_20261029/).
 
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+validated (20 bits pass, 28 bits pass with caveats): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_stride_renew_prime_20261029/VALIDATION.json)
 
 ## Prime-field baseline: deferred-guard stride-renew at a smaller factor base (2026-10-29, engineering)
 
@@ -909,7 +909,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `c0bb857f799cd2a2…`
+- `docs/ic/progress-timeline.json` — sha256 `06c9e6066c6f22fe…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`

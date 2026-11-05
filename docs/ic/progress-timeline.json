@@ -663,6 +663,50 @@
      "class": "engineering",
      "anchor": "#prime-ksum-pooled-20261029",
      "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_pooled_20261029/README.md"
+    },
+    {
+     "date": "2026-11-05",
+     "value": 6.668049651073963,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC baseline, relation targets = stride-renew vs rho.negation, 20-bit, 2 fresh curves pooled (icv1-fp20-tm327-45c21191, icv1-fp20-tm1549-7ec9131a)",
+     "detail": "srenew / rho-neg sum S at w = 0 over 288 paired runs (2 curves x 24 targets x 6 rounds, every run verified, L2, replay-all audited): 6.67 [6.21, 7.18]; 7.03 at w = 0.1, 8.80 at w = 1. Was 7.92 (targets = walk, the baseline, same session; 8.19 at w = 0.1, 9.51 at w = 1). srenew / walk 0.842 [0.807, 0.878] at w = 0, 0.858 [0.821, 0.897] at w = 0.1, 0.926 [0.879, 0.975] at w = 1, below 1 at every band weight and on both curves: improvement under the frozen protocol (XP-20261029-stride-renew-prime section 6). Validated (VAL-20261029-4aed57, VALIDATION.json). One parameter of the baseline; rho stays ahead at every weight. Native work unpriced at w = 0.",
+     "class": "engineering",
+     "anchor": "ic-leaderboard.html#stride-renew",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ic_stride_renew_prime_20261029/README.md"
+    },
+    {
+     "date": "2026-11-05",
+     "value": 12.579824311815536,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC baseline, relation targets = stride-renew vs rho.negation, 24-bit, 2 fresh curves pooled (icv1-fp24-tm2059-5a3b6ab8, icv1-fp24-tm5549-c2ef82ac)",
+     "detail": "srenew / rho-neg sum S at w = 0 over 288 paired runs (every run verified, L2, replay-all audited): 12.58 [11.64, 13.64]; 12.72 at w = 0.1, 13.36 at w = 1. Walk (the baseline, same session) 12.81 / 12.89 / 13.28. srenew / walk 0.982 [0.952, 1.012] at w = 0, 0.986 [0.954, 1.019] at w = 0.1, 1.006 [0.961, 1.052] at w = 1, band split (one curve each way): null at this sample size under the frozen protocol (XP-20261029-stride-renew-prime section 6); no figure moves. Producer numbers; the validation (VAL-20261029-4aed57) covers 20 and 28 bits only. Native work unpriced at w = 0.",
+     "class": "engineering",
+     "anchor": "ic-leaderboard.html#stride-renew",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ic_stride_renew_prime_20261029/README.md"
+    },
+    {
+     "date": "2026-11-05",
+     "value": 22.249497018561087,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC baseline, relation targets = stride-renew vs rho.negation, 28-bit, 2 fresh curves pooled (icv1-fp28-t20713-32971d39, icv1-fp28-tm21435-0b5ad955)",
+     "detail": "srenew / rho-neg sum S at w = 0 over 288 paired runs (2 curves x 24 targets x 6 rounds, every run verified, L2, replay-all audited): 22.25 [20.56, 24.15]; 21.77 at w = 0.1, 19.59 at w = 1. Was 22.78 (targets = walk, the baseline, same session; 22.33 at w = 0.1, 20.23 at w = 1). srenew / walk 0.977 [0.961, 0.992] at w = 0, 0.975 [0.958, 0.993] at w = 0.1, 0.968 [0.941, 0.995] at w = 1, below 1 at every band weight and on both curves: improvement under the frozen protocol (XP-20261029-stride-renew-prime section 6). Validated with caveats (VAL-20261029-4aed57): about two thirds of the gain is 4.4% fewer relations, which the protocol did not predict. Rho stays ahead at every weight. Native work unpriced at w = 0.",
+     "class": "engineering",
+     "anchor": "ic-leaderboard.html#stride-renew",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ic_stride_renew_prime_20261029/README.md"
+    },
+    {
+     "date": "2026-11-05",
+     "value": 34.54582899427968,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC baseline, relation targets = stride-renew vs rho.negation, 32-bit, 2 fresh curves pooled (icv1-fp32-t10863-8c68282c, icv1-fp32-tm62163-8ef9adf3)",
+     "detail": "srenew / rho-neg sum S at w = 0 over 288 paired runs (rerun ic-srenew-p32r2-20261029; every run verified, L2, replay-all audited): 34.55 [32.18, 37.22]; 34.10 at w = 0.1, 32.10 at w = 1. Walk (the baseline, same session) 34.50 / 34.04 / 31.98. srenew / walk 1.001 [0.983, 1.021] at w = 0, 1.002 [0.981, 1.023] at w = 0.1, 1.004 [0.973, 1.036] at w = 1, band split (one curve each way): null at this sample size under the frozen protocol (XP-20261029-stride-renew-prime section 6); no figure moves. Run 1 was refused by the L2 gate and is kept as inadmissible. Producer numbers; the validation (VAL-20261029-4aed57) covers 20 and 28 bits only. Native work unpriced at w = 0.",
+     "class": "engineering",
+     "anchor": "ic-leaderboard.html#stride-renew",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ic_stride_renew_prime_20261029/README.md"
     }
    ],
    "role": "context"
@@ -1219,5 +1263,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-11-01"
+ "updated": "2026-11-05"
 }
