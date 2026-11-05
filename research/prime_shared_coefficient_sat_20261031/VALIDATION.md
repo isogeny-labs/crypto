@@ -1,5 +1,10 @@
 # Validation
 
+> Historical note: this receipt describes the original E0 handoff.  The
+> frozen SAT Boolean E1 subgate was subsequently completed on 2026-11-01; the
+> exact result and bounded claim are recorded in
+> [`../prime_ic_elimination_20261101/RANK2_SAT_E1_RESULT.md`](../prime_ic_elimination_20261101/RANK2_SAT_E1_RESULT.md).
+
 ## Completed checks
 
 | Check | Result |
@@ -59,23 +64,37 @@ verify and run the later msolve comparator from its exact launch revision with
 `e1-comparator-inputs.sha256`. Updating the older register to match current
 CLI wiring would silently rewrite a frozen experiment and is not permitted.
 
+## 2026-11-01 SAT E1 follow-up
+
+The frozen CaDiCaL/CNF and CryptoMiniSat/CNF-XOR panel completed with 36/36
+target/backend projected-model-set matches, 42/42 independently checked UNSAT
+proofs, 42/42 rejected empty proof truncations, and all six positive and six
+mutation controls passing.  The write-once raw evidence was archived locally;
+its aggregate SHA-256 is
+`ed74dc6df578a3d03781277c194ed653d6fcea8055c535ad19e49523fc1af04f`.
+No timing was collected.  Missing checkpoint/AWS identity blocks durable raw
+upload, and the msolve comparator remains unrun.  This passes representation
+equivalence only and supplies no solver exponent or index-calculus performance
+evidence.
+
 ## Environment and exclusions
 
 Pinned local development builds now exist for msolve 0.11.0, cvc5 1.4.2,
 CaDiCaL, `lrat-trim`, CryptoMiniSat and `cake_xlrup`. The SAT proof toolchains
 passed a two-clause contradictory proof smoke, msolve passed its upstream
 suite and a semantic base-field smoke, and cvc5's finite-field proof limitation
-was reproduced. None saw a study instance. `perf` access, an authorized
-checkpoint credential and a compatible isolated runner image remain absent.
-Consequently:
+was reproduced.  The frozen SAT Boolean panel later completed as recorded
+above. `perf` access, an authorized checkpoint credential and a compatible
+isolated runner image remain absent. Consequently:
 
 - no solver benchmark or scientific timing run occurred;
-- no SAT or UNSAT result from an external backend on a study instance is reported;
+- exact SAT/UNSAT study results are admitted only at representation-
+  equivalence scope under the later E1 receipt;
 - canonical msolve output was accepted only in non-study semantic smokes; the
   18-target and fixed-control panel remains unrun;
 - QF_FF artifacts remain syntax-shaped and deterministic, while cvc5 1.4.2 is
   proof-ineligible for finite-field UNSAT under the frozen policy;
-- both frozen CNF/CNF-XOR and msolve panels remain E1 obligations;
+- the frozen msolve panel remains an E1 obligation;
 - parent-protocol semantic integration, E2 power, detector and isolation gates
   remain open.
 
