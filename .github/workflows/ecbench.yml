@@ -228,6 +228,8 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Materialize compile-time inputs without unrelated archives
+        run: node .github/scripts/ci-scope.mjs --materialize
       # Sessions are found by schema, wherever they live: check out every
       # directory holding a session.json (tree only, no blobs needed to
       # list them), then keep those whose session.json is an ecbench
@@ -269,8 +271,6 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
-      - name: Materialize compile-time inputs without unrelated archives
-        run: node .github/scripts/ci-scope.mjs --materialize
       - name: Committed sessions are evidence and are never edited
         if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
         env:
