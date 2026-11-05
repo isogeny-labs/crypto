@@ -3353,23 +3353,18 @@ fn run_with_config(
                     .into(),
             )
         }
-        "chain-s3" if chain.is_some() && (5..=6).contains(&m) => DecompositionStrategy::ChainedS3,
+        "chain-s3" if chain.is_some() && (4..=6).contains(&m) => DecompositionStrategy::ChainedS3,
         "chain-s3-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3Karatsuba
         }
         "chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3ShallowKaratsuba
         }
-        "orbit-chain-s3" if chain.is_some() && (5..=6).contains(&m) => {
+        "orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbit
         }
         "orbit-chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
-        }
-        "ordered-orbit-chain-s3" if chain.is_some() && (5..=6).contains(&m) => {
-        "chain-s3" if chain.is_some() && (4..=6).contains(&m) => DecompositionStrategy::ChainedS3,
-        "orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
-            DecompositionStrategy::ChainedS3FrobeniusOrbit
         }
         "ordered-orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
