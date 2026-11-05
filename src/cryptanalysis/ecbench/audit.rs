@@ -57,7 +57,7 @@ use crate::cryptanalysis::ecbench::methods::{
     MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
 };
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, floor_s,
+    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note, floor_s,
     from_str_legacy_floats, grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput,
     Record, CHILD_INPUT_SCHEMA,
 };
@@ -825,11 +825,22 @@ fn compare_replay(
                 .filter(|s| s.op_unit.contains("word XOR"))
                 .filter(|_| diffs.contains(&"phase counts"))
                 .and_then(|_| {
-                    f4_accounting_note(
+                    let f4 = f4_accounting_note(
                         &session.accounting_versions,
                         session.started_unix_ms,
                         has_bmi2,
-                    )
+                    );
+                    let f6 = r
+                        .method
+                        .params
+                        .get("engine")
+                        .is_some_and(|e| e == "f6-ic")
+                        .then(|| f6_tree_note(&session.accounting_versions))
+                        .flatten();
+                    match (f4, f6) {
+                        (Some(a), Some(b)) => Some(format!("{a}; {b}")),
+                        (a, b) => a.or(b),
+                    }
                 });
             match note {
                 Some(n) => format!("differs in {} ({n})", diffs.join(", ")),

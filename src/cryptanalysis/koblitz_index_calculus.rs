@@ -7508,6 +7508,27 @@ fn partial_support_enabled() -> bool {
     *ENABLED.get_or_init(|| std::env::var("KIC_F6_PARTIAL_SUPPORT").as_deref() != Ok("0"))
 }
 
+/// Largest number of base codes a summand's assigned bits may leave for
+/// the gate to close the node exactly (the few-candidate closure in
+/// [`F6GeometricGate::decide`]); default 64, `KIC_F6_FEW_CANDIDATES=0`
+/// turns it off as a same-binary control.  Read once per process.
+///
+/// `research/f6_few_candidates_20261105`: on nine Koblitz cells every
+/// verdict and index is unchanged, the pair lookups and group additions
+/// are identical, and the tree shrinks to the root: 2.6–10× less CPU on
+/// the pair-index arm.  The lookups being identical says the algebra
+/// ruled out no candidate on those cells; this arm is the pair-index
+/// meet-in-the-middle scan once the closure is on.
+fn few_candidate_limit() -> usize {
+    static LIMIT: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *LIMIT.get_or_init(|| {
+        std::env::var("KIC_F6_FEW_CANDIDATES")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(64)
+    })
+}
+
 /// F6-IC's target-specific geometric branch oracle. It may close a branch
 /// only against the exact enumerated base, or return a group-verified
 /// relation; it never treats an x-only Semaev root as a relation.
@@ -7523,6 +7544,13 @@ struct F6GeometricGate<'a> {
     /// partial support test: a summand whose assigned bits match none of
     /// them cannot be a base point whatever its free bits become.
     codes: Vec<u64>,
+    /// The x-coordinate (as a `by_x` key) of each code in `codes`, for the
+    /// few-candidate closure.
+    x_of_code: HashMap<u64, BigUint>,
+    /// Nodes the few-candidate closure decided, and the candidate
+    /// x-coordinates it closed.
+    few_candidate_closures: u64,
+    few_candidate_xs: u64,
     fast: Option<F6FastGeometry>,
     batch_fast: bool,
     pair_index_enabled: bool,
@@ -7565,6 +7593,7 @@ impl<'a> F6GeometricGate<'a> {
         let encoder = F6CoordinateEncoder::new(&fb.subspace_basis)?;
         let mut by_x: HashMap<BigUint, Vec<usize>> = HashMap::new();
         let mut codes: Vec<u64> = Vec::with_capacity(fb.points.len());
+        let mut x_of_code: HashMap<u64, BigUint> = HashMap::new();
         for (index, point) in fb.points.iter().enumerate() {
             if index_of.get(&point_key(point)) != Some(&index) {
                 return None;
@@ -7572,7 +7601,9 @@ impl<'a> F6GeometricGate<'a> {
             let BinaryPoint::Affine { x, .. } = point else {
                 continue;
             };
-            codes.push(encoder.encode(x)?);
+            let code = encoder.encode(x)?;
+            codes.push(code);
+            x_of_code.entry(code).or_insert_with(|| x.to_biguint());
             by_x.entry(x.to_biguint()).or_default().push(index);
         }
         codes.sort_unstable();
@@ -7634,6 +7665,9 @@ impl<'a> F6GeometricGate<'a> {
             encoder,
             by_x,
             codes,
+            x_of_code,
+            few_candidate_closures: 0,
+            few_candidate_xs: 0,
             fast,
             batch_fast: true,
             pair_index_enabled: false,
@@ -8036,6 +8070,9 @@ impl<'a> F6GeometricGate<'a> {
 
     fn decide(&mut self, assignment: &[Option<bool>], defined_mask: Mask) -> NodeOracleDecision {
         let mut fixed = Vec::with_capacity(self.vars.len());
+        // Each incomplete summand's assigned bits, for the few-candidate
+        // closure.
+        let mut partial: Vec<(usize, u64, u64)> = Vec::new();
         for (i, vars) in self.vars.iter().enumerate() {
             let mut x = F2mElement::zero(self.kc.n);
             let mut complete = true;
@@ -8077,6 +8114,9 @@ impl<'a> F6GeometricGate<'a> {
                     return NodeOracleDecision::Refute;
                 }
             }
+            if !complete {
+                partial.push((i, assigned_mask, assigned_code));
+            }
             if complete {
                 self.support_checks += 1;
                 let key = x.to_biguint();
@@ -8090,6 +8130,47 @@ impl<'a> F6GeometricGate<'a> {
         // is capped at 256 points; with a pair index a call is two lookups,
         // and the cap does not apply.
         let indexed = self.pair_index_enabled && self.fast.is_some();
+        // Few-candidate closure: before any summand is complete, a summand
+        // whose assigned bits leave at most `few_candidate_limit()` base
+        // codes is closed exactly, one candidate x-coordinate at a time,
+        // by the same one-fixed closure a complete summand gets.  A
+        // decomposition extending this node has that summand at one of
+        // those x-coordinates, so the subtree holds a decomposition iff
+        // one of the closures finds one: the answer is the subtree's.
+        let limit = few_candidate_limit();
+        if self.vars.len() == 3 && fixed.is_empty() && indexed && limit > 0 {
+            let best = partial
+                .iter()
+                .filter(|&&(_, mask, _)| mask != 0)
+                .map(|&(i, mask, code)| {
+                    let n = self
+                        .codes
+                        .iter()
+                        .filter(|&&c| c & mask == code)
+                        .take(limit + 1)
+                        .count();
+                    (n, i, mask, code)
+                })
+                .min();
+            if let Some((n, i, mask, code)) = best {
+                if n <= limit {
+                    self.few_candidate_closures += 1;
+                    let xs: Vec<BigUint> = self
+                        .codes
+                        .iter()
+                        .filter(|&&c| c & mask == code)
+                        .map(|c| self.x_of_code[c].clone())
+                        .collect();
+                    for x in xs {
+                        self.few_candidate_xs += 1;
+                        if self.close_one_fixed(&(i, x), assignment, defined_mask) {
+                            return NodeOracleDecision::Witness;
+                        }
+                    }
+                    return NodeOracleDecision::Refute;
+                }
+            }
+        }
         if self.vars.len() == 3 && fixed.len() == 1 && (self.fb.points.len() <= 256 || indexed) {
             return if self.close_one_fixed(&fixed[0], assignment, defined_mask) {
                 NodeOracleDecision::Witness
@@ -20883,6 +20964,36 @@ mod tests {
             eliminated > 0,
             "chain control did not exercise affine definitions"
         );
+    }
+
+    /// The few-candidate closure (default on in the pair-index arm) decides
+    /// every target as exhaustive enumeration does, and every witness it
+    /// returns closes the group identity.
+    #[test]
+    fn f6_ic_few_candidate_closure_matches_exact_enumeration() {
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = build_standard_subspace_factor_base(&kc, 4).unwrap();
+        let index_of = fb.index_map();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+        let mut hits = 0usize;
+        for scalar in 1..=40u32 {
+            let target = kc.mul(kc.generator(), &BigUint::from(scalar));
+            let expected = enumerate_decompose(&kc, &fb, &index_of, &target, 3);
+            let (found, stats) = groebner_decompose_f6_ic_pair_index(
+                &kc, &fb, &index_of, &st, &target, 3, engine, 20_000,
+            );
+            assert!(!stats.exhausted, "target={scalar}");
+            assert_eq!(found.is_some(), expected.is_some(), "target={scalar}");
+            if let Some(indices) = found {
+                hits += 1;
+                let sum = indices
+                    .iter()
+                    .fold(BinaryPoint::Infinity, |acc, &i| kc.add(&acc, &fb.points[i]));
+                assert_eq!(sum, target);
+            }
+        }
+        assert!(hits > 0, "no target decomposed");
     }
 
     #[test]
