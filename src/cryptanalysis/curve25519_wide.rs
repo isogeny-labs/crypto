@@ -413,6 +413,97 @@ impl WideGauss {
     }
 }
 
+/// Charge one affine addition's field tally, the unit `GroupOps` uses
+/// whether the implementation is affine or projective.
+fn charge_add(ops: &mut GroupOps) {
+    ops.adds += 1;
+    ops.field_ops.muls += 2;
+    ops.field_ops.sqrs += 1;
+    ops.field_ops.invs += 1;
+}
+
+/// Probe `Q + [t]G` for `t = 0..trials` with an x-only projective
+/// differential chain and block batch inversion, charging the same affine
+/// tally the direct loop charges.
+///
+/// The chain computes `X_{t+1} = (X_t·x_G − Z_t)²·Z_{t−1}` and
+/// `Z_{t+1} = X_{t−1}·(X_t − x_G·Z_t)²` (Montgomery differential addition
+/// with `B = 1`), so no inversion is needed to advance.  A block of `Z`s is
+/// inverted at once and only then is the affine abscissa looked up.  Counts
+/// are unchanged: one `add` per non-hit probe, as in the affine loop.
+fn probe_hits_fast(
+    curve: &Curve25519Wide,
+    q: WidePoint,
+    base: &HashMap<Fp256Elem, usize>,
+    trials: u64,
+    ops: &mut GroupOps,
+) -> (u64, u64) {
+    if trials == 0 {
+        return (0, 0);
+    }
+    let f = &curve.field;
+    let Some((xq, _)) = q else { return (0, 0) };
+    let Some((xg, _)) = curve.generator else {
+        return (0, 0);
+    };
+    if base.contains_key(&xq) {
+        return (1, 0);
+    }
+    charge_add(ops); // t = 0 was not a hit
+    if trials == 1 {
+        return (0, 1);
+    }
+    let mut scratch = GroupOps::default();
+    let Some((x1, _)) = curve.add(&mut scratch, q, curve.generator) else {
+        // Q = −G: the next probe is the identity, which is not in the base.
+        charge_add(ops);
+        return (0, 1);
+    };
+    if base.contains_key(&x1) {
+        return (1, 1);
+    }
+    charge_add(ops); // t = 1 was not a hit
+    let mut prev = (xq, f.one()); // t = 0
+    let mut cur = (x1, f.one()); // t = 1
+    let mut idx = 2u64;
+    const BLOCK: u64 = 4096;
+    while idx < trials {
+        let end = (idx + BLOCK).min(trials);
+        let mut xs = Vec::with_capacity((end - idx) as usize);
+        let mut zs = Vec::with_capacity((end - idx) as usize);
+        let mut t = idx;
+        while t < end {
+            let a = f.sub(f.mul(cur.0, xg), cur.1);
+            let b = f.sub(cur.0, f.mul(xg, cur.1));
+            let next = (f.mul(f.sqr(a), prev.1), f.mul(prev.0, f.sqr(b)));
+            xs.push(next.0);
+            zs.push(next.1);
+            prev = cur;
+            cur = next;
+            t += 1;
+        }
+        let mut scratch = Vec::with_capacity(zs.len());
+        f.batch_inv(&mut zs, &mut scratch);
+        for (j, (&x, &z)) in xs.iter().zip(&zs).enumerate() {
+            let real = idx + j as u64;
+            let hit = if f.is_zero(z) {
+                false
+            } else {
+                base.contains_key(&f.mul(x, z))
+            };
+            if hit {
+                return (1, real);
+            }
+            charge_add(ops);
+            if real + 1 == trials {
+                return (0, trials);
+            }
+        }
+        idx = end;
+    }
+    (0, trials)
+}
+
 /// One `ic bench`-shaped row for a bounded scan on the real 255-bit curve.
 ///
 /// This is what lets the ordinary sweeper (`ic bench` / `ic sweep`) run a
@@ -439,19 +530,7 @@ pub fn scan_row(base: usize, max_trials: u64, seed: u64) -> Value {
     let planted = (seed.wrapping_mul(0x9E37_79B9) | 1) % 1_000_000 + 1;
     let q = curve.mul_u64(&mut ops, g, planted);
 
-    let mut hits = 0u64;
-    let mut r = q;
-    let mut tried = 0u64;
-    while tried < max_trials {
-        if let Some((x, _)) = r {
-            if base_index.contains_key(&x) {
-                hits += 1;
-                break;
-            }
-        }
-        r = curve.add(&mut ops, r, g);
-        tried += 1;
-    }
+    let (hits, tried) = probe_hits_fast(&curve, q, &base_index, max_trials, &mut ops);
     let wall_seconds = started.elapsed().as_secs_f64();
     let gae = (ops.adds + ops.doubles) as f64;
     let r_f64 = curve.r.to_f64().expect("r fits f64");
@@ -521,17 +600,8 @@ pub fn smoke(base: usize, trials: u64, seed: u64) -> Value {
     let planted = (seed.wrapping_mul(0x9E37_79B9) | 1) % 1_000_000 + 1;
     let q = curve.mul_u64(&mut ops, g, planted);
 
-    // Probe stream: R_0 = Q, R_t = R_{t-1} + G.
-    let mut hits = 0u64;
-    let mut r = q;
-    for _ in 0..trials {
-        if let Some((x, _)) = r {
-            if base_index.contains_key(&x) {
-                hits += 1;
-            }
-        }
-        r = curve.add(&mut ops, r, g);
-    }
+    // Probe stream: R_0 = Q, R_t = R_{t-1} + G, projectively.
+    let (hits, _) = probe_hits_fast(&curve, q, &base_index, trials, &mut ops);
     let elapsed = start.elapsed().as_secs_f64();
 
     let gae = (ops.adds + ops.doubles) as f64;
@@ -609,6 +679,45 @@ mod tests {
         let mut ops = GroupOps::default();
         let g8 = curve.mul_u64(&mut ops, curve.generator, curve.cofactor);
         assert!(curve.mul_biguint(&mut ops, g8, &curve.r).is_none());
+    }
+
+    #[test]
+    fn projective_probe_stream_matches_the_affine_loop() {
+        let curve = Curve25519Wide::new();
+        let g = curve.generator;
+        let mut base_ops = GroupOps::default();
+        let mut base = HashMap::new();
+        let mut p = g;
+        for i in 1..=64usize {
+            if let Some((x, _)) = p {
+                base.entry(x).or_insert(i);
+            }
+            p = curve.add(&mut base_ops, p, g);
+        }
+        let q = curve.mul_u64(&mut base_ops, g, 28_978);
+        // Reference: the direct affine loop.
+        let mut affine = GroupOps::default();
+        let mut r = q;
+        let mut a_tried = 0u64;
+        let mut a_hits = 0u64;
+        while a_tried < 512 {
+            if let Some((x, _)) = r {
+                if base.contains_key(&x) {
+                    a_hits += 1;
+                    break;
+                }
+            }
+            r = curve.add(&mut affine, r, g);
+            a_tried += 1;
+        }
+        let mut fast = GroupOps::default();
+        let (f_hits, f_tried) = probe_hits_fast(&curve, q, &base, 512, &mut fast);
+        assert_eq!((f_hits, f_tried), (a_hits, a_tried));
+        assert_eq!(fast.adds, affine.adds);
+        assert_eq!(fast.doubles, affine.doubles);
+        assert_eq!(fast.field_ops.invs, affine.field_ops.invs);
+        assert_eq!(fast.field_ops.muls, affine.field_ops.muls);
+        assert_eq!(fast.field_ops.sqrs, affine.field_ops.sqrs);
     }
 
     #[test]
