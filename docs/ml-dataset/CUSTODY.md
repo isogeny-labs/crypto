@@ -12,6 +12,14 @@ crypto dataset custody create --out RUN --bundle NEW_BUNDLE \
   --include report=REPORT_DIR --include export=EXPORT_DIR
 crypto dataset custody verify --bundle NEW_BUNDLE
 crypto dataset custody restore --bundle NEW_BUNDLE --destination NEW_RESTORE_DIR
+crypto dataset custody publish --out RUN --bundle NEW_BUNDLE \
+  --remote s3://setec-astronomy-artifacts/APPROVED_PREFIX \
+  --budget-policy POLICY.json --budget-grant GRANT.json \
+  --budget-owner OWNER.json --budget-state BUDGET.sqlite
+crypto dataset custody restore-remote --receipt NEW_BUNDLE/publication/full-run-REMOTE-MANIFEST.json \
+  --bundle NEW_DOWNLOAD_DIR --destination NEW_RESTORE_DIR \
+  --budget-policy POLICY.json --budget-grant GRANT.json \
+  --budget-owner OWNER.json --budget-state BUDGET.sqlite
 ```
 
 `create` takes the run writer lock and replays completed cells before copying.
@@ -30,9 +38,24 @@ reconstructs all files, and runs native dataset verification with independent
 known-answer replay on the restored run. A failed restore leaves its partial
 directory for diagnosis; it must not be treated as complete.
 
-This command performs **zero S3 requests**. The existing per-cell `publish`
-and `restore` commands do not publish this full-run bundle. Whole-run S3
-publication and download still require a budgeted, grant-bound, bounded CAS
-transport with fresh HEAD/GET byte-hash checks for every chunk and the
-manifest. Until that path is implemented and the worker grant is active, keep
-restricted bundles local and do not report them as cloud checkpoints.
+The local `create`, `verify`, and `restore` commands perform **zero S3 requests**.
+`publish` requires an active actor-bound budget journal, the run binding, and
+an explicit approved S3 prefix. It verifies that every bundled run member
+matches the locked source run, including the exact file set, and replays the
+native run before publishing every unique 4 MiB chunk and the custody
+manifest through the immutable conditional-write store. A publication binding,
+round-trip completion, and catalog make the exact object set discoverable.
+The command reports the local receipt path; use that exact path for
+`restore-remote`. An interrupted publish is not a completed cloud checkpoint.
+
+`restore-remote` also requires an active budget and fresh download and restore
+directories. It checks the receipt's namespace and object set, then downloads
+and validates the run plan, protocol, and binding against the actor-bound grant.
+It charges and checks a fresh HEAD/GET plus byte hash for the remote completion
+and catalog records before fetching the remaining chunks. It then checks a
+fresh HEAD/GET and byte hash for each remaining object and performs native
+member reconstruction and known-answer replay. The budget journal records
+requests and retains local checkpoints. The actual worker grant and budget
+must be approved and active before either remote command is run. Receipt and
+download directories are restricted artifacts; a failed download may leave a
+partial directory for diagnosis.

@@ -788,8 +788,8 @@ impl Space {
             // Provisional: the reference arm the owner approved (the same
             // system on a pinned msolve, research/prime_ic_program_20261029/
             // reference_arm) is not implemented, and this is not published
-            // index calculus.  It cannot beat rho (KR-IC-401ebf); it is the
-            // incumbent the auxiliary-curve tower has to improve on.
+            // index calculus.  It is the incumbent the auxiliary-curve tower
+            // has to improve on.
             Kind::PrimeAlgebraic => {
                 let t = (i64::from(scale) + 1).div_euclid(2).clamp(2, MAX_TOWER);
                 let (fb, oracle) =

@@ -196,3 +196,136 @@ Seven Python files parse; four complete AST substitution audits cover driver, se
 ### Compact actual-feature diagonal
 
 `feature-diagonal-events/` derives a constant background plus q exceptional diagonal corrections for the original weighted character-feature Gram. Geometrically scaled interval events construct these with O(q^2) field operations and O(q) arithmetic workspace, without an r-point sweep. C nonzero bounds the root zero-column prefix by q-1; diagonal zeros alone do not certify zero columns. A constant-weight diagnostic reports at most q+1 forbidden values without changing inputs. Five Python files parse; original constructor bytes/pattern AST checked; report inspected. Independent direct-character checker implemented but unexecuted. No numerical/corruption/heap/performance trial. Schur-diagonal closure remains a separate construction. Source `0de2baf50632fd07aceca933541334c8526dbd79`.
+
+### Constructor-bound root diagonal pivot
+
+`feature-root-pivot/` adds a public-constructor solve entry. One fixed weight tuple feeds source and diagonal; generator snapshots and independent compression verification bind a root-only scalar proposal. Its queried column must match the predicted nonzero diagonal. All-zero diagonals use the ordinary selector. Separate RootSelection carries an empty zero prefix and unknown first column, avoiding false skipped-column provenance. The binding is consumed before children. Two full static integration audits pass; six Python sources parse; report inspected. Numerical/corruption/heap/performance trials zero. Costs include snapshots/checker/setup; changed pivots require equation-based validation. Source `ad5439372ce969521f19069d5b75e0a6303511c5`.
+
+### Feature-coefficient Schur construction (2026-11-03)
+
+`feature-coefficient-schur/` adds exact supplied-point scalar/pair updates to
+the fixed character-feature coefficient matrix and residual RHS, sparse dual
+lifts, a sufficient pointwise terminal and an independent all-feature certificate
+checker. It uses no r-row array; state is O(m^2)=O(q^6), and no claim that this
+is always smaller than r is made. Derived schedules include evaluations,
+small inverses and lifts; public pivot/terminal selection remains external.
+See `DERIVATION.md` and the inspected `reports/design/report.pdf`. Five Python
+sources parse; source/pattern/power preservation and checker separation are
+static audits. Numerical/corruption/heap/performance trials: zero.
+
+### Character-signature exclusion and sparse selection (2026-11-03)
+
+`feature-signature-selection/` derives the agreement bound K=min(r,2^q+q)
+for every function of q shifted quadratic characters. K<r analytically excludes
+X; otherwise the precheck is inconclusive. A bounded supplied-point stream
+constructs sparse cubic feature-annihilation witnesses by retaining independent
+feature rows. Under independent uniform sampling in the strict regime, expected
+offers are at most (m+1)r/(r-K). No random sampler or field sweep is launched.
+The saved F479 width-15 failure and retained recovery panels are outside the
+strict regime. See the derivation and inspected PDF. Six Python files parse;
+dependency/import checks are static. All numerical trials remain zero.
+
+### Saved character fibers and targeted repair (2026-11-03)
+
+`feature-fiber-repair/` isolates two normalized pair differences from the saved
+F479 width-15 duals. Independent singleton checks prove no function of the old
+characters can represent X, regardless of degree. New shift15 and old shift1
+give a rank-two projected repair with target coefficients [405,0]. Thus
+X-405*chi(X+15) lies in the old cubic span conditional on the preserved rank477
+result. Constructing its old-feature coefficients remains next. Five bounded
+local exact/software test methods passed, including F7 checks for the preceding
+coefficient and signature primitives. No cloud run or performance comparison.
+See the exact packet, independent check, test receipt, derivation and inspected PDF.
+
+### Explicit corrected-span program (2026-11-03)
+
+`feature-consistent-repair/` constructs the missing old-feature coefficients.
+The published polynomial has476 nonzero cubic terms at offsets0..14 plus
+405chi(X+15), and its identity with X passes independent square-set checking
+at all479 points. The representative-only uncorrected fit fails exactly at
+the two omitted mates,173/440. A reusable rectangular reference factor and
+full coefficient program are preserved; no timing or recovery-panel claim.
+See `certificate/program.json`, `check_certificate.py`, the exact receipt and
+inspected PDF. Factor reload solving remains a separate unchecked operation.
+
+## Preserved decoder binding
+
+`feature-decoder-binding/` binds the verified repaired coefficients to the byte-preserved original decoder. Three receipted local test methods cover four recorded sign-oracle fixtures, strict sign validation and mutation isolation, and persisted-factor reload reproducing the full-field verified program. These are recorded API checks; fresh source cases remain zero. See its derivation, report, receipt and complete-cohort validation plan.
+
+This publication preserves the completed standalone Python source snapshot and receipts as historical evidence under the repository language policy. It is not a native execution deliverable. Further algorithm execution-path development must use a native implementation retaining these contracts and fixtures.
+
+## Native sign-mask evaluator
+
+`feature-native-signmask/` replaces coefficient-by-sign multiplication with support-zero and negative-parity masks in dependency-free Rust. All3 native unit methods passed, including the saved polynomial on all479 field inputs against direct multiplication and X. For that477-term program,1291 field multiplications become zero;16 oracle calls and477 terms remain. This is a derived operation count, not a timing claim. Width<=64 and modulus<=u64::MAX/2 are explicit. See its derivation, source locks, native test receipt and inspected report. The constructor does not certify primality or the supplied polynomial identity.
+
+## Native normalization and division core
+
+`feature-native-division/` ports the original public-point division recurrences and invariant-differential jets to dependency-free Rust. One native invocation passed3 methods: saved normalization seeds on all3 original generators,9 saved division values, Ward addition identities in value and derivative, and domain controls. A point-bound cache supports reuse across requests. Value-only requests currently compute derivatives too; no total-cost saving is claimed. The original kernel is preserved as text for review. Geometry and resultant stages remain to port before the full source is executable natively.
+
+## Scalar-only native source values
+
+`feature-native-value-division/` supplies a separate ValueDivision for source calls that already have a normalization seed. Its production path constructs no derivatives; use the prior jet engine when phase/derivatives are needed. Three selected native tests pass, with three historical reference tests filtered out:9 saved values, agreement at original generators and negatives through fixed indices including u64::MAX, parity and domain controls. Six products per new nonbase recurrence value is a derived count excluding setup and map overhead, not timing. Separate caches do not share setup. See its receipt, derivation and inspected report.
+
+## Native prescribed source grid
+
+`feature-native-grid/` ports the original known-multiplier Jacobian grid and one-inversion affine batch. Three unit methods pass: all71 saved slots of the three original public setups match labels/projective/affine/inverse-Z values, independent affine multiplication agrees, and exceptional/invalid cases pass. Conversion uses7N-3 field products and one inversion excluding group/setup work, as in the original. This exposes individual-grid conversion; projective-only and mixed-stride shared-window paths remain next. See its source/input locks, projection script, native receipt and inspected report.
+
+## Native mixed-stride shared window
+
+`feature-native-window/` preserves identity/prepared-P/generated projective initialization and mixed stride updates, then converts all finite lanes once. Four native unit methods pass, including exact agreement with1426 saved slots and64 public shifts across O,P,2P,-P windows. Extra public-prefix validation is charged separately. Prepared state is immutable and curve-borrowed. See source/fixture locks, projection script, receipts and inspected report. The production API currently consumes public shifted points; a next cost-reduction candidate is generating those points projectively and converting them alongside the grid lanes. That candidate is not implemented or measured here.
+
+## Joint conversion of generated shifts and grid lanes
+
+`feature-native-joint-window/` now takes Q and prefix length, generating shifts projectively and co-converting them with the grid. Three native methods pass:64 generated public points and1426 golden slots agree; target product/inversion assertions pass. On O/P/2P/-P, inversions15/16/16/14 become1 each, with296/321/330/298 additional products including new point checks. Setup/additions/native overhead remain outside this arithmetic table; no elapsed-time claim. See its chart, report, original counts and receipts. Shared daily log was reserved by another task; component SESSION.md preserves the handoff.
+
+## Native polynomial engine
+
+[feature-native-polynomial/DERIVATION.md](feature-native-polynomial/DERIVATION.md) ports the original cutoff-12/Karatsuba, Newton division and product/remainder-tree source path. Four bounded Rust methods pass, including three original resultants and partial values, independent schoolbook/long-division controls and ordered multipoint checks. Exact receipts and an editable PDF report accompany the source. Normalized-source integration remains next.
+
+## Native normalized source integration
+
+[feature-native-source/DERIVATION.md](feature-native-source/DERIVATION.md) joins phase, value division, joint geometry and product-tree resultant with exact homogeneous recurrence, partial tails and calibration. Three integration methods pass: three original raw records and three public identity-crossing windows. Phase sharing and retained stride setup are next; complete costs and full cohort remain separate.
+
+## Shared source seeds and retained preparation
+
+[feature-native-shared-seeds/DERIVATION.md](feature-native-shared-seeds/DERIVATION.md) adds borrowed immutable prepared state, four seed anchors and the original outer seed recurrence. Five fixed F509 windows match all 80 signs and 78 finite direct phases; recorded direct calls are 0/0/1/0/2. Reuse on three original curves and two tiny tail-branch fixtures passes. Costs retain recurrence inversions and all downstream work. Decoder binding is next.
+
+## Fresh native verified recovery
+
+[feature-native-recovery/DERIVATION.md](feature-native-recovery/DERIVATION.md) binds shared fresh source signs to the repaired native program and verifies every candidate by independent affine multiplication. Eight fixed public targets, including the four repair-fiber points, recover exactly; deleting the repair term fails verification. Three methods pass once. Complete-cost instrumentation and original full cohort remain next.
+
+## Native stage accounting
+
+[feature-native-accounting/DERIVATION.md](feature-native-accounting/DERIVATION.md) instruments all seven native layers with exact reversible source mapping. Eight receipts match unchanged recovery; three checks pass. Separate setup/preparation/query/verifier records identify polynomial remainder work and allocations as concrete next targets. Unit inversions are distinguished; no timing weights or peak-memory claim.
+
+## Monic remainder specialization
+
+[feature-native-monic/DERIVATION.md](feature-native-monic/DERIVATION.md) preserves Newton/Karatsuba/tree structure while using unit series starts, low remainder reconstruction and Horner leaves. Four correctness methods pass, including84 remainder cases and8 complete recoveries. The cost-comparison protocol is a validated draft, not frozen or executed.
+
+## Matched monic runner construction
+
+[feature-native-matched](feature-native-matched/README.md) adds a compiled single-binary baseline/candidate/A-A runner, seven reversible candidate modules and three new arithmetic hooks. Source mapping and build checks pass; no comparison rows have been collected. Strict analysis, protocol binding/preflight and admission remain next. See the inspected [report](feature-native-matched/report.pdf).
+
+## Strict matched-panel analysis
+
+[feature-native-panel-analysis](feature-native-panel-analysis/README.md) validates complete ordered receipts, numeric and stage contracts, recovery metadata and every A/A counter. Five synthetic test methods plus CLI persistence checks pass. The revised draft binds the published binary and analysis hashes and validates with zero findings; preflight and admission remain before freeze/execution. No cryptographic panel was run.
+
+## Truncated polynomial products
+
+[feature-native-low-product](feature-native-low-product/README.md) adds a low-coefficient Karatsuba product and routes five Newton/quotient/remainder callsites through it. All66 native methods pass, including936 dual-reference low-product cases and8 complete recoveries. Source locks pass; derivation and inspected report retained. No counted comparison or timing panel; previous matched binary/protocol unchanged.
+
+## Isolated low-product accounting
+
+[feature-native-low-matched](feature-native-low-matched/README.md) uses monic baseline/A-A and truncated monic candidate. Six non-polynomial modules are byte-identical; seven reverse transforms and29 dependency hashes pass. Two selected instrument tests pass,85 filtered: triangular leaf hooks and all8 recovery receipts. Separate source/binary/analysis-bound draft validates; no comparison panel or cloud job.
+
+## Division-free sign normalization
+
+[feature-native-ratio-sign](feature-native-ratio-sign/README.md) consumes homogeneous source ratios directly in sign-only APIs while preserving raw-value division. All106 native methods pass, including1944 predicate triples,3888 rescalings and8 complete recoveries;24 prebuild source/data locks pass. The local algebra removes one final inversion and product per finite sign; no complete-cost panel. Proof and inspected report included; old comparison identities unchanged.
+
+## Homogeneous seed propagation
+
+[feature-native-pair-seeds](feature-native-pair-seeds/README.md) retains seed numerator/denominator pairs through recurrence and source evaluation. All148 native tests pass, including20736 independently rescaled recurrence cases,9 scaled-source cases and8 complete recoveries;27 prebuild hashes pass. Raw scalar source and recovery code are unchanged. Derived local update6 products/no inverse versus4 products/1 inverse; consumer denominator work and doubled seed storage remain to be compared. No comparative panel.
+
+## Matched homogeneous-source accounting
+
+[feature-native-pair-matched](feature-native-pair-matched/README.md) instruments scalar ratio-sign and homogeneous sources under one meter.14 maps reverse exactly,6 non-source modules are byte-identical,31 dependencies locked. Native8-target stage/recovery contract passes (1 method,80 filtered);6 synthetic analysis methods pass. New draft reports product/inversion Pareto relations and symbolic break-even weights, not total speed. No comparative rows/cloud job; preflight/admission remain.

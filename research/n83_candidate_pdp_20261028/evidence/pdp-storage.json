@@ -1,0 +1,14 @@
+{
+ "schema":"n83.paired-pdp-storage/v1",
+ "raw_uri":"s3://setec-astronomy-artifacts/runs/n83-candidate-paired-falls-20261028-r1/local/",
+ "archive":"paired-runs.tar.xz",
+ "archive_sha256":"25f88306bde0643f435ffe3db3ab1de9c95952f9e3476242083d4ab551c23845",
+ "archive_contents":"Entire sealed pdp-r1 directory: both arms, all96 original systems,160 producer/replay receipts,96 structural catalogs, explicit certificates, closure rows/operations, exact executables and full989-file manifest",
+ "file_layout":["PDP_FORMAT.json","PDP_COMPONENT_FORMAT.json"],
+ "reconstruction":"Extract into a fresh directory and run sha256sum -c manifest.sha256",
+ "source_uri":"s3://setec-astronomy-artifacts/runs/n83-candidate-paired-falls-20261028-r1/source/frozen-source.tar.xz",
+ "source_sha256":"de1a23cd8ece0b5fb28c54ea62e77d428370a7469095887fd19559ee6489ab0b",
+ "source_commit":"ca3ac5bd0d371a25883cc8e5b05af15fcb7ffdd4",
+ "protocol_sha256":"36a0b990d80dbe2e4660d1910eed3dfa39e23bea4cb4630b4b5eeac2ba4531ab",
+ "retention":"Original raw directory, failed prior tests and baseline data remain intact. No case or earlier result was discarded."
+}

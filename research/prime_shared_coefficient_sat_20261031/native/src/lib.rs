@@ -12,6 +12,7 @@ pub mod boolean;
 pub mod e1;
 pub mod e1_msolve;
 pub mod msolve;
+pub mod trail;
 
 pub const IR_SCHEMA: &str = "prime-shared-coefficient.ir/v1";
 const CONSTRUCTION: &str = "odd-arity-selected-chart-remainder-tower";

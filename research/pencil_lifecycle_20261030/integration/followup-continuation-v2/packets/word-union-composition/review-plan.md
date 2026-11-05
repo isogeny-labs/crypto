@@ -1,0 +1,7 @@
+# Prospective independent review
+
+Use immutable published source packets; reviewer must be separate from the producer and disclose inherited context. Bind original native source, word-find, union, field forest and all adapted modules. Check adaptation-bindings.json against original source bytes and reject changes beyond the recorded declaration/import renames.
+
+Review all four new declarations, seven adapted dependency declarations and six controls. Attack sign orientation in both attachment branches, reduced a/b offsets after two finds, fixed-anchor transfer including both anchors present, prime/overflow boundaries, root distinctness, and the true incoming equation premise. Check that initial and decoded-final validity concern the same vertex values and target. Forest conclusion must support subsequent find termination; native size vectors and relation production are still separate obligations.
+
+Replay combined imports and explicitly named modules with fresh target caches, retained imported-cache boundaries, 17 exact axiom readbacks, false-theorem rejection and malformed readback checks. Add reviewer-owned anchor and sign boundary cases. Preserve the original import failure and all development failures. Record machine outcome separately from source fidelity. No independent binary rechecker or clean dependency rebuild may be claimed without evidence. Publish neutral PDF/SVG/JSON. This plan authorizes no scientific experiment or cloud execution.

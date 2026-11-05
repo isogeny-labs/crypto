@@ -1,0 +1,33 @@
+{
+  "schema": "formal.source-review-plan/v1",
+  "claim": "Counted word edge composition derives owner and root cardinality with existing semantic return invariant, visit bounds and exact bounded counter update.",
+  "reviewer": "assembler_independent_review_v2",
+  "review_pending": true,
+  "prior": "Existing components compile; joins may omit ordered find state, size orientation, or machine bounds.",
+  "joints": [
+    {
+      "owner": "assembler_independent_review_v2",
+      "joint": "Ordered two finds and returned roots",
+      "attack": "Replace second input t by original s or assume returned root preservation instead of deriving it."
+    },
+    {
+      "owner": "assembler_independent_review_v2",
+      "joint": "Owner fibers and root sizes",
+      "attack": "Use stale child size as a surviving-root certificate, invert tie orientation, or smuggle output owner/cardinality assumptions."
+    },
+    {
+      "owner": "assembler_independent_review_v2",
+      "joint": "Counter/semantic projection",
+      "attack": "Treat None as zero counter increment; omit explicit no-overflow; conflate rank bound with measured work."
+    }
+  ],
+  "independence": "Reviewer has disclosed preliminary producer-source familiarity. Formal verdict/replay follows exact publication. Not blind rederivation.",
+  "proves_too_much": "False same-root owner change must fail; reverseSizes orientation control is not a valid cardinality fixture.",
+  "review_bounds": {
+    "seconds_per_lean_call": 120,
+    "memory_mib": 4096,
+    "threads": 1,
+    "maximum_calls": 8
+  },
+  "no_scientific_execution": true
+}
