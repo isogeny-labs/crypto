@@ -20,12 +20,20 @@ allows. A row needs the owner's approval, recorded in its note.
   "research: algebraic-ladder sizing smoke, Q-D stage harness (Amendment 2)").
   It is an interrupted (SIGTERM) one-target timing smoke, with 8 executions
   planned.
-- **Defect:** `session.json` says `records_written: 7`, `last_seq: 6`, status
-  counts `{verified: 4, exhausted: 1, timeout: 1, interrupted: 1}`, and a stop at
-  seq 6. `records.jsonl` holds 4 records, seq 0–3: `rho-neg` verified, `inc`
-  verified, `iso-t3` exhausted and `bits-t3` verified. Verify reports four
-  problems: `record_count`, `status_counts`, `last_seq` and `stop`. Every check
-  on the 4 records themselves passes, and `records_bound` is true.
+- **Defect:** `session.json` claims 7 records and a stop at seq 6, but
+  `records.jsonl` holds only seq 0–3. The raw fields, with record statuses as
+  the runner wrote them:
+
+  ```text
+  session.json   records_written 7, last_seq 6, stop {interrupt, seq 6, signal 15}
+                 status_counts {verified: 4, exhausted: 1, timeout: 1, interrupted: 1}
+  records.jsonl  seq 0 rho-neg verified, seq 1 inc verified,
+                 seq 2 iso-t3 exhausted, seq 3 bits-t3 verified
+  ```
+
+  Verify reports four problems: `record_count`, `status_counts`, `last_seq` and
+  `stop`. Every check on the 4 records themselves passes, and `records_bound`
+  is true.
 - **Cause, as far as the bytes show:** the runner (`runner.rs`) appends and
   syncs each record before it increments `records_written`, so records 4–6 were
   on disk at some point. At finalisation it hashes `records.jsonl` as it then
