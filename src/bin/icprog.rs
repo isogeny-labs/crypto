@@ -34,6 +34,8 @@
 //!   candidate tournament's schema-1 protocol (`tournament.py` 1e5b2774…
 //!   and its `oracle.py`), ported; `verify` re-derives a historical round
 //!   from its committed evidence archive.
+//! - `icprog relation-prune`: risk-controlled relation-yield and full-rank
+//!   checkpoint decisions from a frozen empirical panel.
 #[path = "icprog/autolab.rs"]
 mod autolab;
 #[path = "icprog/b2.rs"]
@@ -68,6 +70,8 @@ mod identity;
 mod oracle;
 #[path = "icprog/ordinary_preparation.rs"]
 mod ordinary_preparation;
+#[path = "icprog/relation_pruning.rs"]
+mod relation_pruning;
 #[path = "icprog/report.rs"]
 mod report;
 // Shared with `isolated_bench`, which uses parts this binary does not.
@@ -152,6 +156,13 @@ enum Comparison {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Analyze a frozen relation-yield checkpoint and emit pruning decisions.
+    RelationPrune {
+        #[arg(long)]
+        input: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Independently audit target-free synthetic n17 preparation data; no solver execution.
     OrdinaryPreparationAudit {
         #[arg(long)]
@@ -1612,6 +1623,7 @@ fn main() -> ExitCode {
             arms,
             isolate,
         }),
+        Command::RelationPrune { input, out } => relation_pruning::run(&input, &out),
         Command::OrdinaryPreparationAudit { input, out } => ordinary_preparation::run(&input, &out),
         Command::Tournament { step } => tournament::main(step),
         Command::F5ControlReplayCustody {

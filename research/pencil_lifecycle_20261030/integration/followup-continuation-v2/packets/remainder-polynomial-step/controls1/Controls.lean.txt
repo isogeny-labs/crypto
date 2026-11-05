@@ -1,0 +1,16 @@
+import Post
+namespace RemainderPolynomialControls
+open CoefficientTraversal ScaleTrim RemainderPolynomial
+ def start : State 3 := ⟨#[16,0,1],by decide⟩
+ def first := RemainderWord.run 17 1 (events (n:=3) 1 [16,1] (by decide)) start
+ theorem first_array : first.val=#[16,1,0] := by decide
+ theorem first_trim : trimFuel first.val.toList.length first.val.toList=[16,1] := by decide
+ def reduced : State 2 := ⟨#[16,1],by decide⟩
+ def second := RemainderWord.run 17 1 (events (n:=2) 0 [16,1] (by decide)) reduced
+ theorem second_array : second.val=#[0,0] := by decide
+ theorem second_trim : trimFuel second.val.toList.length second.val.toList=[] := by decide
+ theorem offset_order : ((events (n:=4) 1 [3,0,4] (by decide)).map fun e=>(e.1.val,e.2))=[(1,3),(2,0),(3,4)] := by decide
+ theorem empty_divisor_events : events (n:=3) 3 [] (by decide)=[] := rfl
+ theorem bad_shift_excluded : ¬(2+[16,1].length≤3) := by decide
+ theorem zero_coefficient : (RemainderWord.run 17 0 (events (n:=3) 1 [16,1] (by decide)) start).val=start.val := by decide
+end RemainderPolynomialControls

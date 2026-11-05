@@ -1,0 +1,81 @@
+import Product
+set_option autoImplicit false
+namespace SignedGraphAlgebra
+variable {K : Type*} [CommRing K]
+structure Potential (K : Type*) where
+ s : K
+ a : K
+ b : K
+
+def eval (p : Potential K) (root k : K) : K := p.s*root+p.a+p.b*k
+
+def compose (p q : Potential K) : Potential K :=
+ ⟨p.s*q.s,p.a+p.s*q.a,p.b+p.s*q.b⟩
+
+theorem compression (p q : Potential K) (root k : K) :
+ eval (compose p q) root k=eval p (eval q root k) k := by
+ simp only [eval,compose]; ring
+
+theorem compression_sound (p q : Potential K) (node parent root k : K)
+ (hn : node=eval p parent k) (hp : parent=eval q root k) :
+ node=eval (compose p q) root k := by rw [compression,←hp,←hn]
+
+def reverse (p : Potential K) : Potential K := ⟨p.s,-p.s*p.a,-p.s*p.b⟩
+
+theorem reversal (p : Potential K) (x y k : K) (hs : p.s*p.s=1)
+ (h : x=eval p y k) : y=eval (reverse p) x k := by
+ rw [h]; simp only [eval,reverse]
+ calc
+  y = (p.s*p.s)*y := by rw [hs,one_mul]
+  _ = p.s*(p.s*y+p.a+p.b*k)+(-p.s*p.a)+(-p.s*p.b)*k := by ring
+
+theorem reverse_involutive (p : Potential K) (hs : p.s*p.s=1) :
+ reverse (reverse p)=p := by
+ cases p with
+ | mk s a b =>
+   simp only [reverse,Potential.mk.injEq] at *
+   refine ⟨rfl,?_,?_⟩
+   · calc -s*(-s*a)=(s*s)*a := by ring
+          _=a := by rw [hs,one_mul]
+   · calc -s*(-s*b)=(s*s)*b := by ring
+          _=b := by rw [hs,one_mul]
+
+theorem edge_reduction (pu pv : Potential K) (su sv u v ru rv a b k : K)
+ (hu : u=eval pu ru k) (hv : v=eval pv rv k)
+ (he : su*u+sv*v=a+b*k) :
+ (su*pu.s)*ru+(sv*pv.s)*rv=
+ (a-su*pu.a-sv*pv.a)+(b-su*pu.b-sv*pv.b)*k := by
+ rw [hu,hv] at he
+ simp only [eval] at he
+ linear_combination he
+
+def unionPotential (cu cv a b : K) : Potential K := ⟨-cu*cv,cu*a,cu*b⟩
+
+theorem union_forward (cu cv ru rv a b k : K) (hs : cu*cu=1)
+ (he : cu*ru+cv*rv=a+b*k) :
+ ru=eval (unionPotential cu cv a b) rv k := by
+ simp only [eval,unionPotential]
+ calc
+  ru=(cu*cu)*ru := by rw [hs,one_mul]
+  _=cu*(cu*ru+cv*rv)-cu*cv*rv := by ring
+  _=cu*(a+b*k)-cu*cv*rv := by rw [he]
+  _=(-cu*cv)*rv+cu*a+cu*b*k := by ring
+
+theorem union_sign (cu cv : K) (hu : cu*cu=1) (hv : cv*cv=1) :
+ (-cu*cv)*(-cu*cv)=1 := by
+ calc
+  (-cu*cv)*(-cu*cv)=(cu*cu)*(cv*cv) := by ring
+  _=1 := by rw [hu,hv,mul_one]
+
+theorem union_backward (cu cv ru rv a b k : K) (hu : cu*cu=1) (hv : cv*cv=1)
+ (he : cu*ru+cv*rv=a+b*k) :
+ rv=eval (reverse (unionPotential cu cv a b)) ru k := by
+ exact reversal _ _ _ _ (union_sign cu cv hu hv) (union_forward cu cv ru rv a b k hu he)
+
+theorem fixed_child_transport (p : Potential K) (child parent x y k : K)
+ (hs : p.s*p.s=1) (he : child=eval p parent k) (hf : child=x+y*k) :
+ parent=p.s*(x-p.a)+(p.s*(y-p.b))*k := by
+ have h:=reversal p child parent k hs he
+ rw [hf] at h
+ simpa only [eval,reverse] using h.trans (by ring)
+end SignedGraphAlgebra

@@ -1,0 +1,123 @@
+{
+  "schema": "secant-group-formalization-receipt/v1",
+  "recorded_date": "2026-10-31",
+  "request": "Formalize the full secant-system equivalence with actual elliptic-curve group addition",
+  "lean_toolchain": "leanprover/lean4:v4.19.0",
+  "mathlib_revision": "c44e0c8ee63ca166450922a373c7409c5d26b00b",
+  "publication_base_sha": "c5d13654d55c9440b32b6a73f0b044295c31f2e0",
+  "prior_proof_pr": 3082,
+  "prior_proof_commit": "68108e608192a6dc972cde9cbbe7176cd0de6fa5",
+  "observed_build": {
+    "status": "passed_before_worker_loss",
+    "exit_code": 0,
+    "command": "env PATH=/workspace/prime-degree-lean/bin:$PATH LEAN_NUM_THREADS=4 /workspace/prime-degree-lean/bin/lake --no-cache build",
+    "layout": "standalone three-module project",
+    "receipt": "build03-output-recovered.txt",
+    "receipt_custody": "Recovered tool-output excerpt; original on-disk log unavailable"
+  },
+  "source_custody": {
+    "publication": "recovered recorded file edits",
+    "original_pre_outage_whole_source_checksum": null,
+    "manifest_change": "Root package name changed; dependency revisions identical; JSON reformatted",
+    "fresh_published_byte_replay": "pending"
+  },
+  "foundations": {
+    "inspection": "12 central #print axioms outputs in successful build",
+    "allowed_observed": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "printed_theorems": [
+      "SecantIdentity.cubic_identity",
+      "SecantIdentity.intersection_factorization",
+      "SecantIdentity.selected_point_on_curve",
+      "SecantGroupLaw.canonical_slope",
+      "SecantGroupLaw.system_implies_add",
+      "SecantGroupLaw.add_implies_system",
+      "SecantGroupLaw.finite_target_iff",
+      "SecantGroupLaw.identity_target_iff",
+      "SplitFactorBase.graph_intersection_iff",
+      "SplitFactorBase.selector_iff_group_relation",
+      "SplitFactorBase.all_four_branches_complete",
+      "SplitFactorBase.identity_signed_iff"
+    ],
+    "whole_module_audit": "not run before environment loss",
+    "native_trust_added": false
+  },
+  "verification_followups": {
+    "repository_proof_gate": "pending unchanged workflow after matching main push",
+    "warning_as_error_replay": "not run",
+    "lean4checker_fresh": "unavailable before outage",
+    "single_f17_degree_group_bundle": "not implemented",
+    "pdf_render_and_inspection": "blocked: no usable native execution environment"
+  },
+  "excluded_claims": [
+    "No new benchmark or cryptographic experiment",
+    "No new degree measurement",
+    "No full-module census pass claimed",
+    "No captured pre-outage source hash claimed"
+  ],
+  "source_files": {
+    ".gitignore": {
+      "sha256": "7180a47b9a15e9ed46f82bc8f7aec4c3259fe5610b39273eb1dd5960c1b2b454",
+      "bytes": 62
+    },
+    "FORMALIZATION.md": {
+      "sha256": "1aca3a524eb55e4b4e2cdaa96ac7e190c7d998931f5752568a11c00f40abbed7",
+      "bytes": 7438
+    },
+    "HANDOFF.md": {
+      "sha256": "36022468824001ce6e722031d898f8d4f8c1d32422a11826c8419e2571c1322b",
+      "bytes": 1840
+    },
+    "README.md": {
+      "sha256": "82e74da051231dda13c3fa23cbcde3375524162b39c6df5c61f2eca5ecd2003e",
+      "bytes": 3584
+    },
+    "SecantGroupLaw.lean": {
+      "sha256": "a0df49a33bd35981a7a60d32138cd25712ed915884997cd5e6799c59cea502b9",
+      "bytes": 7372
+    },
+    "SecantIdentity.lean": {
+      "sha256": "1c70ecba552b1ca5efb1e8168718f236a53887ab2d2a0e62141b9322181446ac",
+      "bytes": 1465
+    },
+    "SplitFactorBase.lean": {
+      "sha256": "99731a627b2686885e943e8960d0926b07f3420704c3d145aa18629cc2635860",
+      "bytes": 6194
+    },
+    "lake-manifest.json": {
+      "sha256": "8b302b6c80ccfe311971ae9abd8fbe7fec241298a4b785c9348b0e47525881cf",
+      "bytes": 3533
+    },
+    "lakefile.toml": {
+      "sha256": "98ebf76eae0c0b326f4f53f9fc6041573766f809dcf6f7bc4258d2fcdb6142f3",
+      "bytes": 352
+    },
+    "lean-toolchain": {
+      "sha256": "55e97be96000b5e9e290c9e74482e5e317861499a5540353ce845471bded8cea",
+      "bytes": 25
+    },
+    "reports/REPORT.md": {
+      "sha256": "42ab8ee607124d6eb6a7a2f968fe22034428c93c5071f8cfe436df48f03e7157",
+      "bytes": 2680
+    },
+    "reports/group-law-bridge.svg": {
+      "sha256": "ff4cef796c0741c8e1155575aa1b48aea5f459d09c9b99aa3d8ca2d52cd7f8ac",
+      "bytes": 2852
+    },
+    "reports/report.typ": {
+      "sha256": "818dbcb75b9741147123fbe0c0f798d9531ebce1376c561a00030aa8b184b72f",
+      "bytes": 2294
+    },
+    "verification/CUSTODY.md": {
+      "sha256": "f714035e8b5f96572054e71017d40c1545ad20293c157f9db7bb4694e0e2f131",
+      "bytes": 3296
+    },
+    "verification/build03-output-recovered.txt": {
+      "sha256": "4fef25900a880b777fee8d4edd2876eda9aa80d45f9bdd800c2a8e3999c91001",
+      "bytes": 1923
+    }
+  }
+}

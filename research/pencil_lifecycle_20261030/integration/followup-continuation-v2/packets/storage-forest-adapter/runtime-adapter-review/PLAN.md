@@ -1,0 +1,5 @@
+# Independent native adapter review
+
+Source-first review after producer publication. Root did not author adapter; prior parser and supervisor familiarity disclosed. Compare exact source to original frozen supervise.py predicates (identity, config, namespaces, resource fields, approved bind/tmpfs mounts, terminal result and successful complete diff transport), and exact published diff language. Test valid diff combined with invalid prerequisites using native Rust controls; compare create/terminal field checks, exact case scope and failure order. Preserve unsupported full-supervisor operations as explicit gaps, including strict JSON parsing and actual daemon/process custody.
+
+Use separate offline build against exact published library bytes. Add independent positive and negative tests, not merely replay producer assertions. Preserve returned errors, compiler failures, source hashes, full output and original v5 failed evidence. No Docker or qualification subprocess, scientific execution, cloud action or new timing. Produce inspected PDF/SVG, standardized review and manifest.

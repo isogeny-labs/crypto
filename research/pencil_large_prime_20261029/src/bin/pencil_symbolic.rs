@@ -2,21 +2,45 @@
 use five_leads_study::three_leads::{solve_rho, Elliptic, Field, Point, StudyInstance};
 use pencil_symbolic_graph::{
     allocation::ObservedSystem,
-    native_solver::{solve_one, Config},
+    native_solver::{solve_one, solve_one_with_trace, Config},
+    relation_stream::{Identity, Trace},
 };
 use serde_json::{json, Value};
 use std::{process::Command, time::Instant};
 #[global_allocator]
 static ALLOCATOR: ObservedSystem = ObservedSystem::new();
+struct TraceOptions {
+    output: std::path::PathBuf,
+    identity: Identity,
+    records: u64,
+    bytes: usize,
+}
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+    if args.len() == 8 && args[1] == "--trace-cohort" {
+        let options = TraceOptions {
+            output: args[4].clone().into(),
+            identity: serde_json::from_slice(
+                &std::fs::read(&args[5]).expect("read explicit trace identity"),
+            )
+            .expect("typed trace identity"),
+            records: args[6].parse().expect("explicit record limit"),
+            bytes: args[7].parse().expect("explicit byte limit"),
+        };
+        cohort_main(
+            args[2].parse().unwrap(),
+            args[3].parse().unwrap(),
+            Some(options),
+        );
+        return;
+    }
     assert!(
         args.len() == 4 && args[1] == "--cohort",
-        "usage: pencil-symbolic --cohort BITS P; freeze protocol before use"
+        "usage: pencil-symbolic --cohort BITS P | --trace-cohort BITS P OUT_JSONL IDENTITY_JSON MAX_RECORDS MAX_BYTES; freeze protocol before use"
     );
-    cohort_main(args[2].parse().unwrap(), args[3].parse().unwrap());
+    cohort_main(args[2].parse().unwrap(), args[3].parse().unwrap(), None);
 }
-fn cohort_main(bits: u64, selected_p: u64) {
+fn cohort_main(bits: u64, selected_p: u64, trace_options: Option<TraceOptions>) {
     assert!([16, 20, 24, 28, 32, 36, 40].contains(&bits));
     let matrix_coefficient_cap: usize = std::env::var("PENCIL_MATRIX_CAP")
         .ok()
@@ -83,6 +107,12 @@ fn cohort_main(bits: u64, selected_p: u64) {
         .map(|value| value.parse().expect("PENCIL_TARGET_START integer"))
         .unwrap_or(0);
     assert!(target_start + target_limit <= 60);
+    if trace_options.is_some() {
+        assert_eq!(
+            target_limit, 1,
+            "trace requires explicit PENCIL_MAX_TARGETS=1"
+        );
+    }
     let denominator: usize = std::env::var("PENCIL_SMALL_DENOMINATOR")
         .expect("explicit frozen small-base denominator required")
         .parse()
@@ -101,6 +131,63 @@ fn cohort_main(bits: u64, selected_p: u64) {
             .unwrap()
             .parse()
             .unwrap();
+        if let Some(options) = &trace_options {
+            assert_eq!(
+                Some(options.identity.workload_id.as_str()),
+                workload["workload_id"].as_str(),
+                "trace workload identity mismatch"
+            );
+            // Incomplete output remains explicitly named .partial. Publication occurs only
+            // after solver success, accepted Terminal, and durable file synchronization.
+            let mut partial_name = options.output.as_os_str().to_os_string();
+            partial_name.push(".partial");
+            let partial = std::path::PathBuf::from(partial_name);
+            assert!(!options.output.exists(), "trace destination already exists");
+            let mut file = std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&partial)
+                .expect("create new incomplete trace");
+            {
+                let mut trace = Trace::new(
+                    &mut file,
+                    options.identity.clone(),
+                    options.records,
+                    options.bytes,
+                )
+                .expect("valid trace limits and identity");
+                let result = solve_one_with_trace(
+                    &inst,
+                    target,
+                    seed,
+                    Config {
+                        denominator,
+                        matrix_coefficient_cap,
+                    },
+                    Some(&ALLOCATOR),
+                    &mut trace,
+                );
+                if let Err(error) = result {
+                    panic!("incomplete trace: {error:?}; sink={:?}", trace.failure());
+                }
+                assert!(
+                    trace.complete(),
+                    "missing successful terminal write and flush"
+                );
+            }
+            file.sync_all()
+                .expect("sync complete trace before publication");
+            drop(file);
+            // Hard-link is atomic and rejects an existing destination; never rename-overwrite.
+            std::fs::hard_link(&partial, &options.output)
+                .expect("publish complete trace without overwrite");
+            std::fs::remove_file(&partial).expect("remove incomplete alias after publication");
+            println!(
+                "{}",
+                json!({"schema":"pencil-trace-publication/v1","path":options.output,"identity":options.identity,"complete":true,"cost_status":"diagnostic_phase_boundaries_exclude_trace_serialization"})
+            );
+            continue;
+        }
         let result = solve_one(
             &inst,
             target,

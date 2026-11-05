@@ -1,0 +1,11 @@
+path_family,namespace,collision_policy
+qualifier-source,full owner UUID,fresh directory; existing source rejected
+qualification-receipts,full owner UUID,absence required including dangling symlink; qualifier creates fresh
+exec and shim state,qualification first8hex owner suffix,mkdir exist_okFalse; prefix collision rejects
+Docker socket,qualification first8hex owner suffix,retained path or symlink rejects before daemon
+data,fixed intentional retained store,exclusive disk custody and lock remain required
+context/base-input/runtime.iid,fixed assembly-only,not reached in qualification
+daemon config/pid/log/client-config,full owner UUID,different owners retain prior evidence
+command stdout/stderr,full owner UUID + sequence,new owner disjoint
+outer root and service cgroup,full owner UUID,fresh outer root; own cgroup
+/run/containerd,private mount namespace mask,per-unit bind to current owned shim directory

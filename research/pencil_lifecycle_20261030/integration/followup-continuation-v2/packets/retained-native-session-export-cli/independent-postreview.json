@@ -1,0 +1,44 @@
+{
+  "decision": "accepted_eight_cli_entrypoint_controls",
+  "reviewer": "assembler_independent_review_v2",
+  "independent": true,
+  "artifact_hashes": {
+    "attempt1/receipt.json": "d1d44adf84d8a87a55b8a41487670df6a82316ef5132b205c25a41bd4baaf447",
+    "attempt1/cleanup-receipt.json": "1065b67705698ac84b63f0f1cef6f3aaf1dc86384b0748a7592a948ee211811c",
+    "attempt1/1.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "attempt1/1.stderr": "56613efa137b825de08062c95977b0d2a185763ea40b996723bff119c05f0f3f",
+    "attempt1/2.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "attempt1/2.stderr": "6a9ce1fc48c4f0709ca0a724dcd6d85fec0b9f2c259e0a9f04db9c16b80f0bff",
+    "attempt1/3.stdout": "10dbd20fdee6cd42afd5487072a5740a10d3a6a09c9a8a65b21f38efd100d50b",
+    "attempt1/3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "execution.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "freeze.json": "ecf1d7193677ac355782749b33eaa642a4f35575016e9f1ac33ea1b888a889cc"
+  },
+  "elapsed_seconds": 35.91177056901506,
+  "command_exits": [
+    0,
+    0,
+    0
+  ],
+  "outer_exit": 0,
+  "children_reaped": true,
+  "owned_groups_empty": true,
+  "pre_post_changes": [],
+  "current_frozen_files_and464aliases_match": true,
+  "cli_binary_sha256": "0adc482456c3bd1c214fadae789cbdb857a6862207a7ab4a3b44e937d32984ee",
+  "test_binary_sha256": "f1ba58724986169168ae0159e04080f38249fa937e10f96469ba5849e346fc87",
+  "both_binaries_independently_rehashed": true,
+  "passed_test_names": [
+    "cli_controls::cli_executable_hash_rejected",
+    "cli_controls::cli_external_pin_mismatch_rejected",
+    "cli_controls::cli_failed_native_validation_retains_partial_output",
+    "cli_controls::cli_output_absolute_and_fresh_required",
+    "cli_controls::cli_positive_request_binary_and_unknown_metrics",
+    "cli_controls::cli_request_hash_rejected",
+    "cli_controls::cli_request_symlink_and_byte_bound_rejected",
+    "cli_controls::cli_unknown_and_duplicate_fields_rejected"
+  ],
+  "inherited_custody_tests_filtered": 4,
+  "scope": "Actual thinCLI subprocess controls on synthetic retained metadata using unchanged native validators. No real-session external custody authentication or scientific execution.",
+  "review_actions": "Read-only receipts/raw output/argv/freeze/alias joins and binary hashes; no executable invocation."
+}

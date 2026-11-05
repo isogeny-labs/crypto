@@ -1,0 +1,83 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "proj-a",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t5-g4-s1307",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=5,seed=1307",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  },
+  {
+   "name": "grid-iso-t5-s1307",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=5,seed=1307",
+     "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "mitm-iso-t5-s1307",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=5,seed=1307",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  }
+ ],
+ "description": "research/curve25519_leads_wave4_20261104/l13_grid_limit_control/PROTOCOL.md (frozen before data). L13: the grid-limit control. On the T10/T12 winner's own base (prime-isogeny t=5 seed 1307, 22 columns, |V|=32) the F4 oracle (pkm-semaev m=2 full guess=4) against the exhaustive V^2 grid engine and the generic negation-folded pair table on the same base, with proj-a and rho-neg, k=20 Curve25519 miniature. Public synthetic curve; no security claim. Run in 16 one-target chunks by scripts/chunked_run.py (chunk c: target_seed 2026110431+c, measurement seed 2026110432+c). [chunk 12 of 16, Addendum C]",
+ "label": "Curve25519 k=20: F4 winner vs its own grid limit and the pair table on the same isogeny base, ecbench counted unit",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate_measured",
+  "rounds": 2,
+  "seed": 2026110444,
+  "timeout_seconds": 1800,
+  "warmup": 0
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 63700,
+    "b": 872826,
+    "group_order": 1049624,
+    "gx": 349837,
+    "gy": 122,
+    "kind": "prime_explicit",
+    "p": 1048573,
+    "r": 131203
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 2026110443,
+  "targets_per_curve": 1
+ }
+}

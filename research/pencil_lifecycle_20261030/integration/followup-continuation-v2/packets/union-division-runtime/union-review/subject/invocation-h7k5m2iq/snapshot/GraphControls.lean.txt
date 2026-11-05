@@ -1,0 +1,18 @@
+import GraphAlgebra
+set_option autoImplicit false
+namespace SignedGraphAlgebra
+abbrev F := ZMod 17
+
+theorem compressed_value : eval (compose (⟨-1,2,3⟩ : Potential F) ⟨-1,5,4⟩) 7 2=2 := by decide
+theorem nested_value : eval (⟨-1,2,3⟩ : Potential F) (eval ⟨-1,5,4⟩ 7 2) 2=2 := by decide
+theorem reversed_negative : eval (reverse (⟨-1,2,3⟩ : Potential F)) 2 2=6 := by decide
+theorem reversed_positive : eval (reverse (⟨1,2,3⟩ : Potential F)) 14 2=6 := by decide
+theorem forward_union_fixture : (4:F)=eval (unionPotential 1 (-1) 8 3) 7 2 := by
+ exact union_forward 1 (-1) 4 7 8 3 2 (by decide) (by decide)
+theorem reverse_union_fixture : (7:F)=eval (reverse (unionPotential 1 (-1) 8 3)) 4 2 := by
+ exact union_backward 1 (-1) 4 7 8 3 2 (by decide) (by decide) (by decide)
+theorem invalid_sign_boundary : (2:F)*2≠1 := by decide
+theorem wrong_reversal_sign : eval (⟨1,2,3⟩ : Potential F) 14 2≠6 := by decide
+theorem anchor_fixture : (6:F)=(-1)*(2-2)+((-1)*(0-3))*2 := by
+ exact fixed_child_transport (⟨-1,2,3⟩ : Potential F) 2 6 2 0 2 (by decide) (by decide) (by decide)
+end SignedGraphAlgebra

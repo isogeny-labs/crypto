@@ -1,0 +1,82 @@
+\pdfobjcompresslevel=0
+\documentclass[10pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,booktabs,graphicx,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,
+pdftitle={Quadratic-twist registry: metadata consistency follow-up},
+pdfsubject={cover-transfer-assessments/v2; catalog\_maps=4493; unique\_cover\_models=4491; geometry\_verified\_maps=4493; ec1\_representations=1004; assessed\_maps=4493; unassessed\_maps=0; assessed\_subgroups=1004; unassessed\_subgroups=0}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Quadratic-twist registry: metadata consistency}\\[5pt]
+2026-10-22 \quad --- \quad bounded correctness and metadata freshness
+\end{center}
+
+At PR head \texttt{3e442fd3310d}, the full native replay, validation gate,
+catalog assessment and this study's Lean target passed CI. The certificate job
+then rejected compact JSON rows at the metadata-only standards join. This
+follow-up fixes the Rust importer's appended-row layout and dependent metadata.
+Every registry value, model, subgroup, map identity and geometry finding is
+unchanged; arbitrary-size integer tokens remain exact.
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+Profile & Models & Same-field construction \\
+\midrule
+Ordinary binary & 165 & genus 3, degree 3 \\
+Direct odd prime & 2,011 & genus 2, degree 2 \\
+Normalized odd prime & 30 & genus 2, degree 2; target normalization \\
+Direct odd extension & 2,287 & genus 2, degree 2 over the declared extension \\
+\midrule
+Total & 4,493 & 4,491 distinct cover models \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The graph still binds 538 declared fields, 4,491 Jacobian contexts, 4,493 maps,
+and 1,004 selected EC1 representations (140 binary, 864 odd-characteristic).
+The 942-model native twist study is separate. Its 434 deterministic comparisons,
+84 IC matrix checks and 18 Lean theorems retain their original finite or
+explicitly conditional scope.
+
+\textbf{Evidence.} All 40 native metadata/backend tests pass. Native identity
+certificates reproduce byte for byte; changed input is rejected before output.
+A fresh import from the original 2,572-model catalog matches the canonical
+4,493-model registry byte for byte. The standards metadata join passes. Odd
+extension roster labels now display the actual characteristic and degree;
+all measured leaderboard values and protocols are preserved. The source-linked
+validation record contains the native cover, Cargo and assessment receipts.
+
+\textbf{Provenance.} The exact catalog blobs at \texttt{a11984a57344} remain
+required predecessor inputs. The active assessment pins a descendant snapshot
+with the layout correction and refreshed registry digests. Every existing
+formula, membership, partition and semantic check remains enabled. Historical
+study runs, earlier reports, failures and source archives remain unchanged.
+
+\textbf{Open gates.} The unrelated SEA project builds, but Lean 4.19 rejects
+the global gate's \texttt{--trusted} argument before the axiom audit. Its sources
+are identical at the declared base, CI base, PR head and CI merge; this PR does
+not patch that target or gate. Cursor's approval agent could not start because
+its usage limit was reached. Current-head CI and review must still satisfy all
+applicable gates. Shared Conductor remains unavailable; no reservation is claimed.
+
+The actual twist embedding's Frobenius-negation property and full eigenspace,
+summation-polynomial, pairing and trace-zero bridges remain open. No general
+hardness, GHS, speedup or invalid-curve-attack claim follows. The unchanged
+diagrams describe the same population and support boundaries. Canonical cost
+graphs are unchanged because no cost comparison was performed.
+
+\newpage
+\begin{center}
+{\large\bfseries Map and subgroup boundaries}\\[8pt]
+\includegraphics[width=\textwidth,height=0.87\textheight,keepaspectratio]{typed_correspondence.pdf}
+\end{center}
+\newpage
+\begin{center}
+{\large\bfseries Typed objects and executable delivery boundaries}\\[8pt]
+\includegraphics[width=\textwidth,height=0.87\textheight,keepaspectratio]{typed_transfer_context.pdf}
+\end{center}
+\end{document}
