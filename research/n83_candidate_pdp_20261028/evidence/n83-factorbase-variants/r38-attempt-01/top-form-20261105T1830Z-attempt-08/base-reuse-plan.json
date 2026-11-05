@@ -1,0 +1,13 @@
+{
+  "schema": "n83.base-reuse-plan/v1",
+  "attempt": "08",
+  "source_attempt": "06",
+  "source_path": "/tmp/n83-candidate-bases/r38-attempt-06/data",
+  "source_shards_report_s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-06/reconciliation/verified-shards.json",
+  "source_shards_report_sha256": "38e0f39bc2f3157eb6b2cb99ca5dc2a40ad48ff67ed2986071b950238af5f8b5",
+  "sidecar_source": "factor-base-metadata/s3-file-index.json",
+  "sidecar_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+  "expected_shards": 384,
+  "expected_bytes": 4576000923,
+  "reuse_policy": "Reuse only existing files whose current size and SHA-256 match the frozen S3 index; preserve and stop on mismatch; download only missing files from immutable S3 keys."
+}
