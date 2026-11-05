@@ -59,7 +59,9 @@ pub struct SpacesArgs {
     /// With `--space`: the Koblitz curve (0 or 1); the default is 0.
     #[arg(long, default_value_t = 0)]
     pub koblitz_a: u8,
-    /// With `--space`: the prime family (`generic`, `j0`, `j1728`, `d7`, `d8`).
+    /// With `--space`: the prime family (`generic`, `j0`, `j1728`, `d7`,
+    /// `d8`, or `curve25519` for the committed Curve25519-family
+    /// miniatures at 20, 24, 28 and 32 bits).
     #[arg(long, default_value = "generic")]
     pub family: String,
 }
@@ -72,7 +74,7 @@ pub struct RunArgs {
     /// `koblitz-*` spaces: 0 for `K_0` (the primary target), 1 for `K_1`.
     #[arg(long, default_value_t = 0)]
     pub koblitz_a: u8,
-    /// `prime-table`: `generic`, `j0`, `j1728`, `d7`, `d8`.
+    /// `prime-*`: `generic`, `j0`, `j1728`, `d7`, `d8`, or `curve25519`.
     #[arg(long, default_value = "generic")]
     pub family: String,
     /// `char2-algebraic`: the largest cofactor a random curve may have.
