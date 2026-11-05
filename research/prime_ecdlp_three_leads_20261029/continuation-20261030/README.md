@@ -1,5 +1,39 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Attempt-bound launch/exit records — 2026-11-05T15:09:19.610982+00:00
+
+[New Unix integration](prerequisites/recorded_child.rs) persists a public
+owned-Command descriptor before the supplied gate, and actual root PID/code/
+signal/stop-request fields before the old outcome label. A persisted reap with
+no final outcome remains unfinished, with counts/time unavailable. Readback
+rejects mismatched IDs/descriptors, inconsistent/torn/transplanted/oversize
+records and collisions. [Final receipt](validation/recorded-child-20261105/final/receipt.json):
+sourcefc09f0f1f passes27controls(9new+18existing),strictwrapper/fixtureclippy and
+format. Initialb9strictlint1 is preserved separately, never reused for the
+changed finalparser. These are unsigned producer observations. [pcc:unverified]
+
+[New two-page report](recorded-child-20261105.pdf) and
+[editable diagram](recorded-child-flow-20261105.svg) were inspected.
+[Delivery review](validation/recorded-child-20261105/delivery-review.json)
+checks25sourceobjects/10binaries and exact unchanged formal/gate/Mathlib objects.
+The changed child success/signal getters receive fresh coverage in this target;
+oldf543receipts remain historical. No Cargo/library/proof rerun was needed for
+unchangedinputs. [pcc:unverified]
+
+This local prototype can spawn an owned Command after a caller/mock gate;
+Permit is not checkpoint/protocol/runtime qualification. Supplied source/binary
+hashes are labels, not attestation; environment/image/argv0/io/preexec/resolution
+remain unbound. No production PKM entrypoint/full-panel card is wired. Next
+qualify these launch identities and genuine gate, process-tree/deadline and
+interruption/resume behavior, plus full counter coverage/pricing.
+
+Exact61f CI metadata confirms a failed prefetch step, but log retrieval returned
+empty/403; its exact error is unavailable. No 5bd log is substituted. Private
+redirect query text is not committed. Main389a522da supplies no new sanctioned
+PCC fork contract; no main merge or frozen-history edit is attempted. Existing
+strictlint/PCC/runtime/fullsuite/currentmainprefix failures remain. [pcc:unverified]
+
+
 Publication update: sourcef543 and reviewed metadata were normal-pushed in5bd30361f
 to samePR3452; newtitle/body reflects root-child observation scope. At5bd snapshot
 reviewSUCCESS/migrateFAILURE and required3ABSENT, auto paused. Auxiliarymigration

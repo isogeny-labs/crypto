@@ -111,3 +111,57 @@ Primary Rust Child docs reviewed before implementation:
 Repository `ReapObservation` in src/cryptanalysis/ecbench/runner.rs and the G2
 accounting audit informed the no-read/no-publish-before-reap boundary. No shared
 library or frozen historical source/test was modified.
+
+## Attempt-bound declared launch and durable reap events
+
+`recorded_child.rs` now composes the local pieces on Unix. `Prepared::begin`
+creates a unique ID directory within the selected root and persists public
+program/argument bytes from the same owned Command later passed to spawn.
+A supplied gate callback runs afterward; refusal never calls spawn, while gate
+and spawn errors retain distinct pre-child-handle records and primary/recording
+errors. After a managed child exists, the Running handle stays owned by the caller
+on poll/record errors; dropping it does not kill/reap the child.
+
+Actual root PID, exit code, signal, success and stop-requested fields come from
+the observed std Child and are published without overwriting before the old
+outcome label. Readback rejects mismatched IDs/descriptors, inconsistent event/
+outcome classes, noncanonical/torn/oversized/symlink records, and copied events
+with a different attempt ID. A published reap without the final label remains
+unfinished with counts/time unavailable. Pending-only records never complete it.
+Successful finalization is cached; no old file is replaced on repeated polls.
+
+[Fresh final receipt](../validation/recorded-child-20261105/final/receipt.json)
+records27native passes (9new integration controls+18existing), strict wrapper/
+fixture clippy and formatting all0 on sourcefc09f0f1f. The initialb9version also
+passed27tests but failed strictlint1; its exact evidence is preserved separately.
+The final recipe guards5committed inputs and tracked cleanliness before every
+phase. The child_observation success/signal getters changed and are covered by
+this fresh integrated target; oldf543receipts apply only to that old source.
+These are unsigned producer observations. [pcc:unverified]
+
+Supplied request/source/binary digests are labels, not execution attestations;
+the field is explicitly `claimed_binary_sha256`. Command::get_program/get_args
+capture configured public bytes, not executable/image resolution, argv0 overrides,
+pre-exec behavior or environment/I/O. These classes are explicitly unbound.
+No environment values are recorded. Public arguments must not contain secrets.
+ID uniqueness is local to the selected root; no global namespace is proved.
+The prototype can spawn its owned Command after a mock/caller gate; Permit is
+not checkpoint/protocol/runtime qualification, and no production PKM entrypoint
+or scientific full-panel card is wired or authorized by it.
+
+File/directory sync requests and nonoverwriting links retain the existing
+filesystem assumptions. Power-loss, hostile-root races, authenticated execution,
+remote persistence and receipt of a sync acknowledgment are not established by
+readback. Root reaping is not descendant cleanup or witness/scalar verification.
+Stop-requested is not proof of a causal signal reason or completion-time bound.
+Work counts and uninterrupted time stay unavailable. Next qualify source/binary/
+image/env/protocol identities, genuine checkpoint gate, process-tree controls and
+interruption/resume before a scientific route; finish counter coverage/pricing.
+
+Sources read before implementation: Rust Command::get_program/get_args/
+get_current_dir/get_envs (inherited environment is not provided by get_envs),
+File::sync_all/Drop, hard_link, the earlier local primitives and G2 audit.
+<https://doc.rust-lang.org/std/process/struct.Command.html>
+<https://doc.rust-lang.org/std/fs/struct.File.html#method.sync_all>
+<https://doc.rust-lang.org/std/fs/fn.hard_link.html>
+No new ECDLP mechanism, cost law or global novelty is asserted.

@@ -547,3 +547,34 @@ G2 durableevents/exactlaunchbinding/qualifiedgatedsupervisor-resume next.
 
 Auxmigrateerror2 is missingtrustedscript,not guessedcredentialerror or badRust.
 Requiredgate,size,artifacts remainABSENT,notpass. Auto stayspaused.
+
+## 2026-11-05T15:09:19.610982+00:00 — Review final records, report and exact source bindings
+
+### What was done (commands, files, features)
+
+FinaltwoPDFpages/SVG inspected after fixing labeloverflow. Deliveryreview binds
+25sourceobjects,6unchangedCargo+4freshtargetbinaries,oldraw6168log preserved and
+exactformal/gate/Mathlib. NewofficialPCCstatement records unsignedobservations.
+No duplicate unchangedCargo/proof runs. [pcc:unverified]
+
+### Decisions made (and why)
+
+New ownedCommand prototype can spawn after suppliedgate, but no scientific
+runtime/genuinecheckpoint qualification follows. Preserve labels-versus-attestation
+and root-versus-tree limits. Workcounts/timeunavailable. Canonicalscientific
+plots unchanged: no admittedmetric/curve/phaseprice/reference.
+
+### Open threads (unfinished, pick up next time)
+
+Final localpolicies/bodylint/liveheadguard andnormalpublication tosameopenPR;
+remainautopaused. Frozenledgercontract/oldernativefailures,launchimage/genuinegate/
+process-tree/interruption-resume/fullcost allremainopen.
+
+### Errors (what went wrong, how it was handled)
+
+Initialnewstrictlint1 correctedwithoutwaiver and ownreceipt preserved. Final
+native27controltarget0. Exact61fworkflowlogunavailable403, cause notguessed.
+
+New working appendix SESSION_20261105T1440Z.md is deferred like earlier1300Z;
+append exact headers once only after concurrent daily-log resolution. Older
+prepared6657280205 request entry remains not appended. No log/index side chosen.
