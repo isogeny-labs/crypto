@@ -48,7 +48,7 @@ def evaluate(gterms, base, old, arithmetic):
         if n is None:
             until = P-d
         else:
-            width = min(P-n, unit_known)
+            width = P-n if den == 0 else min(P-n, unit_known)
             assert width > 0
             q = arithmetic.powers(unit, den)[den] & ((1 << width)-1)
             ratio = arithmetic.mul(a >> n, arithmetic.inverse(q, width), width)
@@ -69,7 +69,7 @@ def evaluate(gterms, base, old, arithmetic):
                's_order_lower_bound': support[0] if support else bounds[j],
                'known_until_exclusive': bounds[j], 'nonzero_support_below_bound': support}
         prior = next(r for r in old['coefficient_rows'] if r['lambda_exponent'] == j)
-        assert row['known_until_exclusive'] >= prior['known_until_exclusive']
+        assert row['known_until_exclusive'] >= prior['known_until_exclusive'], (j, row['known_until_exclusive'], prior['known_until_exclusive'])
         assert [v for v in support if v < prior['known_until_exclusive']] == prior['nonzero_support_below_bound']
         if prior['s_order'] is not None:
             assert row['s_order'] == prior['s_order']
