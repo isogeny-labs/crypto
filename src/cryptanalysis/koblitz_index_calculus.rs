@@ -9407,7 +9407,7 @@ fn sat_decompose_chained_s3_with_domain(
             },
         );
     }
-    sat_decompose_chained_s3_checked(
+    sat_decompose_chained_s3_checked_with_kernel(
         kc,
         fb,
         target,
@@ -9424,6 +9424,7 @@ fn sat_decompose_chained_s3_with_domain(
             tables: ChainS3Tables::default(),
             wall_budget: None,
         },
+        kernel,
     )
 }
 
@@ -10265,6 +10266,26 @@ fn sat_decompose_chained_s3_checked(
     m: usize,
     limits: ChainS3Limits,
     options: ChainS3Options,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_checked_with_kernel(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        options,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+fn sat_decompose_chained_s3_checked_with_kernel(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    options: ChainS3Options,
+    kernel: crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
     let ChainS3Options {
         frobenius_orbits,
@@ -11705,14 +11726,14 @@ fn koblitz_index_calculus_dlp_observed(
             | DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
-    ) && (!(5..=6).contains(&opts.m)
-    ) && (!(4..=6).contains(&opts.m)
-        || !fb.uses_ambient_basis()
-        || opts.chain_s3_limits.max_variables == 0
-        || opts.chain_s3_limits.max_domain_clauses == 0
-        || opts.chain_s3_limits.max_models == 0
-        || opts.chain_s3_limits.conflict_budget == 0
-        || opts.relation_batch_size != 1)
+    ) && (!(5..=6).contains(&opts.m))
+        && (!(4..=6).contains(&opts.m)
+            || !fb.uses_ambient_basis()
+            || opts.chain_s3_limits.max_variables == 0
+            || opts.chain_s3_limits.max_domain_clauses == 0
+            || opts.chain_s3_limits.max_models == 0
+            || opts.chain_s3_limits.conflict_budget == 0
+            || opts.relation_batch_size != 1)
     {
         report.sat_unknowns = 1;
         return Some(report);
