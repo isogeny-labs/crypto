@@ -25,7 +25,8 @@
 //! | [`host`] | the host capsule and its environment class |
 //! | [`isolation`] | CPU reservation, eviction, pinning, NUMA binding, kernel counters |
 //! | [`legacy`] | the accounting of the past under which committed records still replay |
-//! | [`record`] | the record, the child protocol, isolation grading |
+//! | [`measurement`] | shared process observations and frozen isolation grading |
+//! | [`record`] | the record, child protocol and grading compatibility reexports |
 //! | [`runner`] | sessions: interleaved measured children, sealed append-only records |
 //! | [`signals`] | interruption: the host is restored and no child outlives the runner |
 //! | [`compare`] | paired ratios with bootstrap intervals; wall time gated by level |
@@ -87,6 +88,7 @@ pub mod known_log;
 pub mod koblitz_batched;
 pub mod koblitz_descent;
 pub mod legacy;
+pub mod measurement;
 pub mod methods;
 pub mod negation_strong;
 pub mod optimization;

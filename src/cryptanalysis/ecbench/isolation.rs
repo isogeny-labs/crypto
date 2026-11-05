@@ -18,7 +18,37 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+/// The isolation level a wall-clock figure needs (`docs/ecbench/README.md`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum Level {
+    L0,
+    L1,
+    L2,
+    L3,
+}
+
+impl Level {
+    pub fn name(self) -> &'static str {
+        match self {
+            Level::L0 => "L0",
+            Level::L1 => "L1",
+            Level::L2 => "L2",
+            Level::L3 => "L3",
+        }
+    }
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "L0" => Some(Level::L0),
+            "L1" => Some(Level::L1),
+            "L2" => Some(Level::L2),
+            "L3" => Some(Level::L3),
+            _ => None,
+        }
+    }
+}
+
 /// Checked native PMU lifecycle; legacy counters below retain their API.
+#[path = "isolation/checked.rs"]
 pub mod checked;
 
 /// One logical CPU's place in the machine.
