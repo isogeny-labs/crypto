@@ -578,3 +578,29 @@ native27controltarget0. Exact61fworkflowlogunavailable403, cause notguessed.
 New working appendix SESSION_20261105T1440Z.md is deferred like earlier1300Z;
 append exact headers once only after concurrent daily-log resolution. Older
 prepared6657280205 request entry remains not appended. No log/index side chosen.
+
+## 2026-11-05T15:16:36.765608+00:00 — Publish source-bound records and preserve unresolved integration
+
+### What was done (commands, files, features)
+
+Normalpushedf137cdd4e carrying sourcefc09/final27control evidence/inspectedreport;
+PR3452liveopen/headf137confirmed; title/body updated samePR. Localfinalmetadata
+policiespassownscope,allnewhistorypreserved. No force/rebase/mainmerge.
+[pcc:unverified]
+
+### Decisions made (and why)
+
+Activepublicationstate now records deliveredsource ratherthanpendinglocalwork.
+No requirednewheadCIpass asserted; auto remains paused. Frozenledgercontract and
+native/fullsuite blockersheld. Appendthisworkingentrytodailyonlyafterresolution.
+
+### Open threads (unfinished, pick up next time)
+
+NextboundedheadCI/reviewcollection and sanctionedcanonicalledgercontract.
+Continueunblocked completecountercoverage/qualifiedruntime/sourcebinarygate/
+process-tree/resume prerequisites; no scientificpanel withoutqualification.
+
+### Errors (what went wrong, how it was handled)
+
+Initialnewstrictlint1 preserved/fixedwithfresh27target;61flog403 notguessed.
+No newsourceafterfc09, no use of oldreceipts to qualify changedgetters/code.
