@@ -1,0 +1,96 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261105-native-point-hashing",
+  "title": "Native point tables, cache reuse and collision matching: controlled experiments",
+  "created": "2026-11-05",
+  "authors": [
+    "Codex planning lane"
+  ],
+  "status": "draft",
+  "status_note": "Design only. The study driver, independent checker, frozen canonical protocols, current cost estimates and execution admission are not implemented/complete. No funding, lease or job is posted.",
+  "blocked_on": [
+    "pr:2984 native integration and combined-source qualification",
+    "problem:problems/native-ecbench-pcc-ledger-fork.md protected canonical ledger decision",
+    "note:Implement native study driver and independent exact checker before readiness",
+    "note:Current account/lane budget, exact-source S3 readback and native image/execution admission required"
+  ],
+  "links": {
+    "lead": "backlog/XP-20261105-native-point-hashing/README.md",
+    "notes": [
+      "research/hashed_ecdl_ecbench_20261030/README.md",
+      "docs/hashed-ecdl-functional-plan.md"
+    ],
+    "prs": [
+      2984
+    ]
+  },
+  "question": "Which point-index, normalization, cache or labelled-collision changes lower useful native relation cost and then cold verified one-target ECDLP cost?",
+  "decision_value": "Separate point decoding/preparation reuse from membership proof reuse and table lookup itself. Retain an implementation only where its complete setup-plus-query cost justifies its memory and verification costs; confirm one selected implementation on fresh public targets. A warm-only gain, ineffective cache or coordinator bottleneck changes the next implementation choice without becoming a whole-pipeline speed claim.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "isogeny-labs/crypto",
+    "commit": null,
+    "branch": "codex/hashed-ecdl-ecbench-e2e",
+    "build": []
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 4,
+    "disk_gb": 10,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Proposed pilot ceiling only, unapproved and uncalibrated. One native L2 Spot job, concurrency 1, original 1800s absolute deadline. At most 2 reserved vCPU-hours for payload under this ceiling; builders/queue/idle/storage/transfer are additional and must be priced before readiness. Multi-host work needs a separate matched-host protocol within existing authorized caps."
+  },
+  "run": {
+    "argv": [
+      "unimplemented-native-point-hash-study",
+      "--out",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1800
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "unimplemented-native-point-hash-rows/v1",
+    "verify": [],
+    "land": "research/native_point_hashing_20261105"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261105-native-point-hashing"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "unimplemented-digest-pinned-native-study",
+      "recipe": "unimplemented-native-driver-and-replayer"
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 4096,
+      "timeout_s": 1800,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261105-native-point-hashing"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unready design, below funded executable experiments; no spending or priority allocation requested."
+    }
+  },
+  "owner_hint": "native ECC implementation and measurement lane"
+}
