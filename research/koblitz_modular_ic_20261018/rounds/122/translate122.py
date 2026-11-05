@@ -75,7 +75,7 @@ def main():
     result = {'protocol_id': protocol['id'], 'result121_sha256': protocol['result121_sha256'], 'branches': {}}
     for key, m in protocol['place_edge_m'].items():
         entries = [translate(entry, m) for entry in previous['branches'][key]]
-        assert entries[0]['delta'] != entries[1]['delta']
+        assert mul(entries[0]['delta'], entries[0]['delta']) == entries[1]['delta']
         for a, b in zip(entries[0]['translated_rows'], entries[1]['translated_rows']):
             assert a['s_order'] == b['s_order']
             assert a['known_until_exclusive'] == b['known_until_exclusive']
