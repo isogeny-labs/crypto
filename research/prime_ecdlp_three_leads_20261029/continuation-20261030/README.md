@@ -2,13 +2,15 @@
 
 ## Latest local work — 2026-11-05
 
-[Current report](continuation-20261105T0840Z.pdf) and [attempt-record diagram](attempt-record-flow-20261105.svg).
+[Current corrected report](continuation-20261105T0932Z.pdf) and [attempt-record diagram](attempt-record-flow-20261105.svg).
 
 The [main resolution review](validation/main-d30b9e0db-20261105/resolution-review.json)
 records mergebbf241b7e after Copilot's unanswered request/fallback. Only ordinary
 logs/index conflicted; both histories and407older study blobs are retained.
 New native phase receipt records26example passes on merged dependencies;
-remaining phases are in the existing6743job, not qualified by that receipt.
+job6743 then stopped101 at strictlint on2inherited main errors. New11957
+runs only not-reached phases; lint remains failed. Its formatter/CLI/refusal/
+backlog milestones are recorded separately; no library outcome is claimed.
 Fresh changed-gate audit reports18declarations/0trusted and module replay0
 against imports; all are unsigned local observations. [pcc:unverified]
 
