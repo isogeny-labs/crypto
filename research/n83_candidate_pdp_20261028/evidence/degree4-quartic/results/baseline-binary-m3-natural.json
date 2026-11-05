@@ -1,0 +1,716 @@
+{
+  "assignments_checked": 0,
+  "complete_v4_normal_forms": false,
+  "contains_one": false,
+  "exhaustive_affine_completion": null,
+  "independent_review": false,
+  "inherited_last_fall_lower_bound": 4,
+  "input_binding": {
+    "arm": "baseline-binary",
+    "complete_v3_rank": 36159,
+    "dataset": "baseline",
+    "directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/inputs/baseline-binary/binary-m3-natural",
+    "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+    "family": "binary",
+    "id": "binary-m3-natural",
+    "input_json_sha256": "c53dbfdcecfe31b9e70af5a3ba5ad77b78731b5fb58204ab6c8dd27db7665b7b",
+    "key": "baseline-binary-m3-natural",
+    "parent_files": {
+      "basis.rows.u64le": {
+        "bytes": 3011772444,
+        "sha256": "4e1ff59b3b76b8b01ec1382b3407c4f84ce0af4bea9189afd3df0c616b697153"
+      },
+      "closure_state.json": {
+        "bytes": 244,
+        "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+      },
+      "operations.jsonl": {
+        "bytes": 25153207,
+        "sha256": "b95a3684aa7f637a88e2a383af75c4fd1aa348bde0d1224d963cbfd80731eef5"
+      },
+      "result.json": {
+        "bytes": 37951,
+        "sha256": "5ec7c8fa9cc8c3c11008d9c25e1fd6079beace66e507c83f8801aeacafb840c1"
+      }
+    },
+    "parent_state": {
+      "complete": false,
+      "max_operations": 131072,
+      "max_rows": 32768,
+      "next_source": {
+        "parent": 13674,
+        "variable": 2
+      },
+      "pending_candidates": 3442,
+      "processed_candidates": 46416,
+      "rank": 32768,
+      "stop_reason": "row_cap"
+    },
+    "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-natural",
+    "propagation_case": {
+      "arm": "baseline-binary",
+      "complete_v3_rank": 36159,
+      "dataset": "baseline",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/inputs/baseline-binary/binary-m3-natural",
+      "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+      "family": "binary",
+      "id": "binary-m3-natural",
+      "input_json_sha256": "c53dbfdcecfe31b9e70af5a3ba5ad77b78731b5fb58204ab6c8dd27db7665b7b",
+      "key": "baseline-binary-m3-natural",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "4e1ff59b3b76b8b01ec1382b3407c4f84ce0af4bea9189afd3df0c616b697153"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 25153207,
+          "sha256": "b95a3684aa7f637a88e2a383af75c4fd1aa348bde0d1224d963cbfd80731eef5"
+        },
+        "result.json": {
+          "bytes": 37951,
+          "sha256": "5ec7c8fa9cc8c3c11008d9c25e1fd6079beace66e507c83f8801aeacafb840c1"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-natural",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "a0b4048c15858d9d5e9767bca270fbc8d3eb20392f35b24b4506336f4200c3ff"
+        },
+        "result.json": {
+          "bytes": 39062,
+          "sha256": "0d686b8be4a960326704bd78091c3bb962d88dbbd69d93e4541038ad52c31630"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5857196,
+          "sha256": "a9b48099dcb5cbf17e5e8dffa672ea6c723560c2b279591d5b7a51aeaf180432"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "4678e47312b831d3aeaddadd881c4e0295908046624554e03baa37b9851a1dd9"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-natural",
+      "system_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+      "target_kind": "natural",
+      "v2": {
+        "operations_sha256": "bbc33a63e95683c5d480501aa36472d6a71bcb155a597cc1b7bdd9250cfc2993",
+        "result_sha256": "c03f8929385fc7ea56c4c772d101ab03882798d9bb3e47020d908607ad1846dc",
+        "rows_sha256": "e6c98a9c5ff9c21ac272e609de593ea06c76e68b89cb7969cd45f4314f98c02b"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/v2/baseline-binary/binary-m3-natural",
+      "witness_case": {
+        "arm": "baseline-binary",
+        "complete_v3_rank": 36159,
+        "dataset": "baseline",
+        "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/baseline-binary/binary-m3-natural",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "family": "binary",
+        "id": "binary-m3-natural",
+        "input_json_sha256": "c53dbfdcecfe31b9e70af5a3ba5ad77b78731b5fb58204ab6c8dd27db7665b7b",
+        "key": "baseline-binary-m3-natural",
+        "parent_files": {
+          "basis.rows.u64le": {
+            "bytes": 3011772444,
+            "sha256": "4e1ff59b3b76b8b01ec1382b3407c4f84ce0af4bea9189afd3df0c616b697153"
+          },
+          "closure_state.json": {
+            "bytes": 244,
+            "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+          },
+          "operations.jsonl": {
+            "bytes": 25153207,
+            "sha256": "b95a3684aa7f637a88e2a383af75c4fd1aa348bde0d1224d963cbfd80731eef5"
+          },
+          "result.json": {
+            "bytes": 37951,
+            "sha256": "5ec7c8fa9cc8c3c11008d9c25e1fd6079beace66e507c83f8801aeacafb840c1"
+          }
+        },
+        "parent_state": {
+          "complete": false,
+          "max_operations": 131072,
+          "max_rows": 32768,
+          "next_source": {
+            "parent": 13674,
+            "variable": 2
+          },
+          "pending_candidates": 3442,
+          "processed_candidates": 46416,
+          "rank": 32768,
+          "stop_reason": "row_cap"
+        },
+        "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-natural",
+        "suffix_files": {
+          "closure_state.json": {
+            "bytes": 208,
+            "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+          },
+          "continuation.json": {
+            "bytes": 981,
+            "sha256": "a0b4048c15858d9d5e9767bca270fbc8d3eb20392f35b24b4506336f4200c3ff"
+          },
+          "result.json": {
+            "bytes": 39062,
+            "sha256": "0d686b8be4a960326704bd78091c3bb962d88dbbd69d93e4541038ad52c31630"
+          },
+          "suffix.operations.jsonl": {
+            "bytes": 5857196,
+            "sha256": "a9b48099dcb5cbf17e5e8dffa672ea6c723560c2b279591d5b7a51aeaf180432"
+          },
+          "suffix.rows.u64le": {
+            "bytes": 311673636,
+            "sha256": "4678e47312b831d3aeaddadd881c4e0295908046624554e03baa37b9851a1dd9"
+          }
+        },
+        "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-natural",
+        "system_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+        "target_kind": "natural",
+        "v2": {
+          "operations_sha256": "bbc33a63e95683c5d480501aa36472d6a71bcb155a597cc1b7bdd9250cfc2993",
+          "result_sha256": "c03f8929385fc7ea56c4c772d101ab03882798d9bb3e47020d908607ad1846dc",
+          "rows_sha256": "e6c98a9c5ff9c21ac272e609de593ea06c76e68b89cb7969cd45f4314f98c02b"
+        },
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/baseline-binary/binary-m3-natural"
+      },
+      "witness_files": {
+        "U.normal.fieldpoly": {
+          "bytes": 5697139,
+          "sha256": "e538d3cb4099b71870e657728304b8a9c6e260110443dd7989dce7896aefb8ae"
+        },
+        "U.ordinary.fieldpoly": {
+          "bytes": 7235545,
+          "sha256": "750ea1e941cc0543ff7481cc1018d74a6975bd387852f58f5e5d66cc703b1333"
+        },
+        "X0.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "6a69aa91b1eaed817ab7fec6cbcdb5e38c244679bf5a4d115a339febf070fa6b"
+        },
+        "X0.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "7cdf51b4e28944ae3ce8f5d92436da63d31c9203f37a63e6ebff902a8d7f886e"
+        },
+        "X1.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "f1eaddcf958d39ee48bf0975e515c26c435485249900711d4a55d07e34cfbe90"
+        },
+        "X1.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "6e226bdf283899d5bb068bad9dc4840aa4adf3c6d53366086a834513512084f2"
+        },
+        "candidates.jsonl": {
+          "bytes": 95557,
+          "sha256": "31d3899e3f2484dddfd0a87197244ed413eedef2539ebf4c7106df759bde7579"
+        },
+        "candidates.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "33c8773ad963db86418f226a184f95156a90f2acd76191e33db004bd2671bee8"
+        },
+        "family.json": {
+          "bytes": 13368,
+          "sha256": "34168dceed5c19c9d291fd3ab03e3346f18e27c899af5888d72aff4b693c15f7"
+        },
+        "partial-083.json": {
+          "bytes": 91,
+          "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+        },
+        "partial-166.json": {
+          "bytes": 93,
+          "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+        },
+        "partial-249.json": {
+          "bytes": 93,
+          "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+        },
+        "remainders.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "8f1cc3a6c09314f8ace05a2d3c76ccbdd71ae5e0fc957ac7c1cd9f0a9e743571"
+        },
+        "result.json": {
+          "bytes": 19211,
+          "sha256": "10695f75b0ce5eac06347807a4a915860c4bb1811914ab39713bbe92640e0359"
+        },
+        "source.fieldpoly": {
+          "bytes": 1501129,
+          "sha256": "29f2d785a8eb4a51e2456e7c535cf3695ab7f0a61b38132bbf32fafda1a34be5"
+        }
+      },
+      "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/baseline-binary-m3-natural"
+    },
+    "propagation_files": {
+      "added.rows.u64le": {
+        "bytes": 22886132,
+        "sha256": "f08a103659786a1c71ace125fc8c47455ff0862c1f7f6d6183dfb53071914f63"
+      },
+      "affine.json": {
+        "bytes": 1629,
+        "sha256": "7d424c6adbe124b1b25d10df3752c73a8992e7d4034f1801e7232d41cc76ffa9"
+      },
+      "operations.jsonl": {
+        "bytes": 113608,
+        "sha256": "ed567b188e4d97e45239621751e9f9303ff27f646c2949708ee03a2dae3b2f9c"
+      },
+      "pending.json": {
+        "bytes": 3,
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "progress.jsonl": {
+        "bytes": 470,
+        "sha256": "b66c3c38818319cc2b0a2a6fe400362ebd14c2ccd866d46bfbd4c17729233b8a"
+      },
+      "propagation.json": {
+        "bytes": 1045,
+        "sha256": "503262f3593a4e50e81331b580d76b471e2d128ae2b131cf2d695114e800cd09"
+      },
+      "result.json": {
+        "bytes": 9710,
+        "sha256": "7b56f77574e5c230cc4c30a79022a72cb3043dd9fedf4ac8c45f9fc1ca310c46"
+      },
+      "state.json": {
+        "bytes": 453,
+        "sha256": "2613d59c8efc4355fad3e6db1f7ef74d0dd62e749951e2a7ff0849d56c1decad"
+      }
+    },
+    "propagationdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/cases/baseline-binary-m3-natural",
+    "suffix_files": {
+      "closure_state.json": {
+        "bytes": 208,
+        "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+      },
+      "continuation.json": {
+        "bytes": 981,
+        "sha256": "a0b4048c15858d9d5e9767bca270fbc8d3eb20392f35b24b4506336f4200c3ff"
+      },
+      "result.json": {
+        "bytes": 39062,
+        "sha256": "0d686b8be4a960326704bd78091c3bb962d88dbbd69d93e4541038ad52c31630"
+      },
+      "suffix.operations.jsonl": {
+        "bytes": 5857196,
+        "sha256": "a9b48099dcb5cbf17e5e8dffa672ea6c723560c2b279591d5b7a51aeaf180432"
+      },
+      "suffix.rows.u64le": {
+        "bytes": 311673636,
+        "sha256": "4678e47312b831d3aeaddadd881c4e0295908046624554e03baa37b9851a1dd9"
+      }
+    },
+    "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-natural",
+    "system_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+    "target_kind": "natural",
+    "v2": {
+      "operations_sha256": "bbc33a63e95683c5d480501aa36472d6a71bcb155a597cc1b7bdd9250cfc2993",
+      "result_sha256": "c03f8929385fc7ea56c4c772d101ab03882798d9bb3e47020d908607ad1846dc",
+      "rows_sha256": "e6c98a9c5ff9c21ac272e609de593ea06c76e68b89cb7969cd45f4314f98c02b"
+    },
+    "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/v2/baseline-binary/binary-m3-natural",
+    "witness_case": {
+      "arm": "baseline-binary",
+      "complete_v3_rank": 36159,
+      "dataset": "baseline",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/baseline-binary/binary-m3-natural",
+      "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+      "family": "binary",
+      "id": "binary-m3-natural",
+      "input_json_sha256": "c53dbfdcecfe31b9e70af5a3ba5ad77b78731b5fb58204ab6c8dd27db7665b7b",
+      "key": "baseline-binary-m3-natural",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "4e1ff59b3b76b8b01ec1382b3407c4f84ce0af4bea9189afd3df0c616b697153"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 25153207,
+          "sha256": "b95a3684aa7f637a88e2a383af75c4fd1aa348bde0d1224d963cbfd80731eef5"
+        },
+        "result.json": {
+          "bytes": 37951,
+          "sha256": "5ec7c8fa9cc8c3c11008d9c25e1fd6079beace66e507c83f8801aeacafb840c1"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-natural",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "a0b4048c15858d9d5e9767bca270fbc8d3eb20392f35b24b4506336f4200c3ff"
+        },
+        "result.json": {
+          "bytes": 39062,
+          "sha256": "0d686b8be4a960326704bd78091c3bb962d88dbbd69d93e4541038ad52c31630"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5857196,
+          "sha256": "a9b48099dcb5cbf17e5e8dffa672ea6c723560c2b279591d5b7a51aeaf180432"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "4678e47312b831d3aeaddadd881c4e0295908046624554e03baa37b9851a1dd9"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-natural",
+      "system_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+      "target_kind": "natural",
+      "v2": {
+        "operations_sha256": "bbc33a63e95683c5d480501aa36472d6a71bcb155a597cc1b7bdd9250cfc2993",
+        "result_sha256": "c03f8929385fc7ea56c4c772d101ab03882798d9bb3e47020d908607ad1846dc",
+        "rows_sha256": "e6c98a9c5ff9c21ac272e609de593ea06c76e68b89cb7969cd45f4314f98c02b"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/baseline-binary/binary-m3-natural"
+    },
+    "witness_files": {
+      "U.normal.fieldpoly": {
+        "bytes": 5697139,
+        "sha256": "e538d3cb4099b71870e657728304b8a9c6e260110443dd7989dce7896aefb8ae"
+      },
+      "U.ordinary.fieldpoly": {
+        "bytes": 7235545,
+        "sha256": "750ea1e941cc0543ff7481cc1018d74a6975bd387852f58f5e5d66cc703b1333"
+      },
+      "X0.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "6a69aa91b1eaed817ab7fec6cbcdb5e38c244679bf5a4d115a339febf070fa6b"
+      },
+      "X0.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "7cdf51b4e28944ae3ce8f5d92436da63d31c9203f37a63e6ebff902a8d7f886e"
+      },
+      "X1.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "f1eaddcf958d39ee48bf0975e515c26c435485249900711d4a55d07e34cfbe90"
+      },
+      "X1.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "6e226bdf283899d5bb068bad9dc4840aa4adf3c6d53366086a834513512084f2"
+      },
+      "candidates.jsonl": {
+        "bytes": 95557,
+        "sha256": "31d3899e3f2484dddfd0a87197244ed413eedef2539ebf4c7106df759bde7579"
+      },
+      "candidates.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "33c8773ad963db86418f226a184f95156a90f2acd76191e33db004bd2671bee8"
+      },
+      "family.json": {
+        "bytes": 13368,
+        "sha256": "34168dceed5c19c9d291fd3ab03e3346f18e27c899af5888d72aff4b693c15f7"
+      },
+      "partial-083.json": {
+        "bytes": 91,
+        "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+      },
+      "partial-166.json": {
+        "bytes": 93,
+        "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+      },
+      "partial-249.json": {
+        "bytes": 93,
+        "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+      },
+      "remainders.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "8f1cc3a6c09314f8ace05a2d3c76ccbdd71ae5e0fc957ac7c1cd9f0a9e743571"
+      },
+      "result.json": {
+        "bytes": 19211,
+        "sha256": "10695f75b0ce5eac06347807a4a915860c4bb1811914ab39713bbe92640e0359"
+      },
+      "source.fieldpoly": {
+        "bytes": 1501129,
+        "sha256": "29f2d785a8eb4a51e2456e7c535cf3695ab7f0a61b38132bbf32fafda1a34be5"
+      }
+    },
+    "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/baseline-binary-m3-natural"
+  },
+  "key": "baseline-binary-m3-natural",
+  "last_fall_degree": null,
+  "last_fall_lower_bound": 4,
+  "last_fall_upper_bound": null,
+  "linear_rank": 1,
+  "membership_degree_bound": 4,
+  "propagation_parent_result_sha256": "7b56f77574e5c230cc4c30a79022a72cb3043dd9fedf4ac8c45f9fc1ca310c46",
+  "schema": "n83.degree-four-quartic/v1",
+  "state": {
+    "added_rows": 4301,
+    "added_rows_by_degree": [
+      0,
+      0,
+      0,
+      0,
+      4301
+    ],
+    "attempted_products": 4302,
+    "blocked_candidate": {
+      "quartic_nonzeros": 562555,
+      "record_bytes": 2342148,
+      "reduction_complete": true,
+      "remainder_sha256": "496293ed591e71346373dfda10f0ec8d4d3ec4c2e8786a1cf6357412527fbdf4",
+      "source_kind": "initial_added",
+      "source_row": 36227,
+      "stop_reason": "basis_payload_cap",
+      "variable": 17,
+      "xor_basis_rows": [
+        40669,
+        38677,
+        38455,
+        38206,
+        36476,
+        40676,
+        38436,
+        37969,
+        37720,
+        37471,
+        37222,
+        36976,
+        36727,
+        36478,
+        40706,
+        37967,
+        37718,
+        37469,
+        37220,
+        36971,
+        36729,
+        40705,
+        37966,
+        37717,
+        37468,
+        36721,
+        36472,
+        37218,
+        36969,
+        36720,
+        40454,
+        39707,
+        38960,
+        38711,
+        38213,
+        37964,
+        36719,
+        40407,
+        40204,
+        38461,
+        36718,
+        38958,
+        38709,
+        38460,
+        38211,
+        37713,
+        37215,
+        36717,
+        36468,
+        39455,
+        39206,
+        38957,
+        38708,
+        38210,
+        36716,
+        36467,
+        39454,
+        39205,
+        38458,
+        37711,
+        36715,
+        38472,
+        38223,
+        37227,
+        36978,
+        39155,
+        37211,
+        36962,
+        38221,
+        37474,
+        36735,
+        38454,
+        37722,
+        37473,
+        36733,
+        38453,
+        37724,
+        37478,
+        36980,
+        36731,
+        38203,
+        37727,
+        37234,
+        36985,
+        36736,
+        37480,
+        37232,
+        36983,
+        36734,
+        36485,
+        37703,
+        36981,
+        37700,
+        37453,
+        37204,
+        36807,
+        36558,
+        37452,
+        37040,
+        40656,
+        40654,
+        40677,
+        40696,
+        40694,
+        40659,
+        40689,
+        40453,
+        40405,
+        40403,
+        40400,
+        40428,
+        40444,
+        40440,
+        40402,
+        40406,
+        40441,
+        40150,
+        40179,
+        40193,
+        40192,
+        40191,
+        40159,
+        39953,
+        39930,
+        39948,
+        39946,
+        39944,
+        39908,
+        40190,
+        39703,
+        39700,
+        39699,
+        39697,
+        39696,
+        39694,
+        39655,
+        39906,
+        39657,
+        39453,
+        39432,
+        39451,
+        39450,
+        39447,
+        39446,
+        39406,
+        39443,
+        39430,
+        39203,
+        39202,
+        39201,
+        39199,
+        39198,
+        39197,
+        39196,
+        39195,
+        39184,
+        38952,
+        38949,
+        38946,
+        38935,
+        38945,
+        38965,
+        38717,
+        38701,
+        38700,
+        38699,
+        38696,
+        38716,
+        38967,
+        38468,
+        38469,
+        38452,
+        38450,
+        38447,
+        38721,
+        38200,
+        38198,
+        38226,
+        38476,
+        37952,
+        37950,
+        38225,
+        37732,
+        37981,
+        37554,
+        37451,
+        37305,
+        37698,
+        37233,
+        37697,
+        37449,
+        37947,
+        37948,
+        36701,
+        40702,
+        40688,
+        40653,
+        40678,
+        40708
+      ]
+    },
+    "complete_v3_rows": 36159,
+    "complete_v4_normal_forms": false,
+    "completed_products": 4301,
+    "initial_rows": 36408,
+    "max_new_basis_payload_bytes": 2147483648,
+    "max_new_rows": 16384,
+    "max_product_attempts": 131072,
+    "max_quartic_nonzeros": 1048576,
+    "new_basis_payload_bytes": 2147035212,
+    "next_source": [
+      36227,
+      17,
+      "initial_added"
+    ],
+    "peak_quartic_nonzeros": 739766,
+    "pending_products": 5916919,
+    "rank": 40709,
+    "stop_reason": "basis_payload_cap",
+    "zero_remainders": 0
+  },
+  "upper_bound_argument": "No global upper certificate. Neither complete V4 nor a cap implies a global upper or lower5.",
+  "working_degree": 4
+}

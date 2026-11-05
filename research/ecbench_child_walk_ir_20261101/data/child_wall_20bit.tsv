@@ -1,0 +1,5 @@
+binary	input	run1_s	run2_s	run3_s	run4_s	run5_s	note
+baseline main 8a208fa570	000-rho-neg	0.036	0.040	0.032	0.031	0.030	ecbench exec < input, bash time, L0
+baseline main 8a208fa570	001-ic-n32	0.041	0.038	0.034	0.036	0.035	
+A: warm fix (curve_id)	000-rho-neg	0.076	0.004	0.004	0.005	0.004	run1 cold page cache after the rebuild
+A: warm fix (curve_id)	001-ic-n32	0.144	0.006	0.007	0.007	0.007	run1 cold page cache after the rebuild

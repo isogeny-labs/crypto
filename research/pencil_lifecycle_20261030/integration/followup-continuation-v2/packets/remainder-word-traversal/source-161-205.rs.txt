@@ -1,0 +1,45 @@
+    pub fn add(&self, mut a: u64, mut b: u64) -> u64 {
+        self.count(|c| c.field_adds += self.n as u64);
+        if self.p == 2 {
+            return a ^ b;
+        }
+        if self.n == 1 {
+            return (a + b) % self.p;
+        }
+        let (mut r, mut k) = (0, 1);
+        for _ in 0..self.n {
+            r += ((a % self.p + b % self.p) % self.p) * k;
+            a /= self.p;
+            b /= self.p;
+            k *= self.p;
+        }
+        r
+    }
+    pub fn neg(&self, mut a: u64) -> u64 {
+        if self.p == 2 {
+            return a;
+        }
+        self.count(|c| c.field_adds += self.n as u64);
+        let (mut r, mut k) = (0, 1);
+        for _ in 0..self.n {
+            r += ((self.p - a % self.p) % self.p) * k;
+            a /= self.p;
+            k *= self.p;
+        }
+        r
+    }
+    pub fn sub(&self, a: u64, b: u64) -> u64 {
+        self.add(a, self.neg(b))
+    }
+    fn bm(&self, a: u64, b: u64) -> u64 {
+        self.count(|c| c.m += 1);
+        (a * b) % self.p
+    }
+    fn bs(&self, a: u64) -> u64 {
+        self.count(|c| c.s += 1);
+        (a * a) % self.p
+    }
+    fn bi(&self, a: u64) -> u64 {
+        assert_ne!(a, 0);
+        self.count(|c| c.i += 1);
+        modpow(a, self.p - 2, self.p)

@@ -1,0 +1,8 @@
+USize.toNat_add (a b : USize) : (a + b).toNat = (a.toNat + b.toNat) % 2 ^ System.Platform.numBits
+USize.le_iff_toNat_le {a b : USize} : a ≤ b ↔ a.toNat ≤ b.toNat
+USize.size : ℕ
+Finset.card_union_of_disjoint.{u_1} {α : Type u_1} {s t : Finset α} [DecidableEq α] :
+  Disjoint s t → (s ∪ t).card = s.card + t.card
+Finset.card_le_univ.{u_1} {α : Type u_1} [Fintype α] (s : Finset α) : s.card ≤ Fintype.card α
+Array.getElem_set.{u_1} {α : Type u_1} {xs : Array α} {i : ℕ} (h' : i < xs.size) {v : α} {j : ℕ}
+  (h : j < (xs.set i v h').size) : (xs.set i v h')[j] = if i = j then v else xs[j]

@@ -1,0 +1,63 @@
+import Comparator
+set_option autoImplicit false
+namespace WordComparator
+abbrev V := Fin 4 → UInt64
+def canonical (p : UInt64) (x : V) : Prop := ∀ i, (x i).toNat < p.toNat
+def decode (p : UInt64) (x : V) : Fin 4 → ZMod p.toNat := fun i => (x i).toNat
+def mul (p a b : UInt64) := (a*b)%p
+def sameB (p : UInt64) (x y : V) : Bool :=
+ (List.finRange 4).all (fun i => (List.finRange 4).all (fun j => mul p (x i) (y j) == mul p (x j) (y i)))
+def nonzeroB (x : V) : Bool := (List.finRange 4).any (fun i => x i != 0)
+theorem product_bound (p a b : Nat) (hp : p ≤ 2^32) (ha : a<p) (hb : b<p) : a*b<2^64 := by
+ have h := Nat.mul_le_mul (show a ≤ 2^32-1 by omega) (show b ≤ 2^32-1 by omega)
+ norm_num at h ⊢
+ omega
+theorem mul_decode (p a b : UInt64) (hp : p.toNat ≤ 2^32)
+ (ha : a.toNat<p.toNat) (hb : b.toNat<p.toNat) :
+ ((mul p a b).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)*(b.toNat : ZMod p.toNat) := by
+ simp only [mul,UInt64.toNat_mod,UInt64.toNat_mul,Nat.mod_eq_of_lt (product_bound _ _ _ hp ha hb),ZMod.natCast_mod,Nat.cast_mul]
+theorem mul_canonical (p a b : UInt64) (hp : 0<p.toNat) : (mul p a b).toNat<p.toNat := by
+ rw [mul,UInt64.toNat_mod];exact Nat.mod_lt _ hp
+theorem canonical_eq (p a b : UInt64) [Fact p.toNat.Prime]
+ (ha : a.toNat<p.toNat) (hb : b.toNat<p.toNat) :
+ a=b ↔ (a.toNat : ZMod p.toNat)=(b.toNat : ZMod p.toNat) := by
+ constructor
+ · intro h;rw [h]
+ · intro h
+   apply UInt64.toNat_inj.mp
+   have hh := congrArg ZMod.val h
+   simpa only [ZMod.val_natCast_of_lt ha,ZMod.val_natCast_of_lt hb] using hh
+theorem sameB_iff (p : UInt64) [Fact p.toNat.Prime] (x y : V)
+ (hp : p.toNat≤2^32) (hx : canonical p x) (hy : canonical p y) :
+ sameB p x y=true ↔ ProjectiveComparator.same (decode p x) (decode p y) := by
+ have hpos : 0<p.toNat := (Fact.out : p.toNat.Prime).pos
+ simp only [sameB,List.all_eq_true,List.mem_finRange,true_implies,beq_iff_eq]
+ unfold ProjectiveComparator.same decode
+ apply forall_congr'; intro i
+ apply forall_congr'; intro j
+ rw [canonical_eq p _ _ (mul_canonical _ _ _ hpos) (mul_canonical _ _ _ hpos),mul_decode _ _ _ hp (hx i) (hy j),mul_decode _ _ _ hp (hx j) (hy i)]
+theorem nonzeroB_iff (p : UInt64) [Fact p.toNat.Prime] (x : V) (hx : canonical p x) :
+ nonzeroB x=true ↔ ProjectiveComparator.nonzero (decode p x) := by
+ have hz : (0 : UInt64).toNat<p.toNat := (Fact.out : p.toNat.Prime).pos
+ simp only [nonzeroB,List.any_eq_true,List.mem_finRange,true_and,bne_iff_ne]
+ unfold ProjectiveComparator.nonzero decode
+ apply exists_congr;intro i
+ exact not_congr (by simpa using canonical_eq p (x i) 0 (hx i) hz)
+theorem nonzeroB_iff_ne_zero (x : V) : nonzeroB x=true ↔ x≠fun _=>0 := by
+ simp only [nonzeroB,List.any_eq_true,List.mem_finRange,true_and,bne_iff_ne]
+ constructor
+ · rintro ⟨i,hi⟩ h
+   exact hi (congrFun h i)
+ · intro h
+   by_contra hn
+   apply h
+   funext i
+   push_neg at hn
+   exact hn i
+theorem same_nonzero_iff_scale (p : UInt64) [Fact p.toNat.Prime] (x y : V)
+ (hp : p.toNat≤2^32) (hx : canonical p x) (hy : canonical p y)
+ (nx : nonzeroB x=true) (ny : nonzeroB y=true) :
+ sameB p x y=true ↔ ∃ c : ZMod p.toNat, c≠0 ∧ ∀ j, decode p y j=c*decode p x j := by
+ rw [sameB_iff p x y hp hx hy]
+ exact ProjectiveComparator.same_iff_nonzero_scale _ _ ((nonzeroB_iff p x hx).mp nx) ((nonzeroB_iff p y hy).mp ny)
+end WordComparator
