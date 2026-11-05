@@ -8,7 +8,6 @@ modify the crate, whose sources are locked byte-identical across repositories.
 ```sh
 export CARGO_TARGET_DIR=/tmp/btn-target          # keep build artifacts off the repo volume
 cargo build --release --manifest-path native/Cargo.toml
-
 B=$CARGO_TARGET_DIR/release/btn-prime-scaling
 $B sizes 5 11 17 37 67 131 257 521 1031 2053 4099 8209 16411 32771 65537 > native_runs/sizes.jsonl
 $B counts 5 7 11 13                                                       > native_runs/counts.jsonl
@@ -50,13 +49,15 @@ Each line of output is one JSON object. Curves are the first prime-order
   2^131070 edges. The largest network built here is the real ECCp-131 one, 2^20.7 edges. So the
   recursion never engages at any reachable size, matching the manuscript's
   2^(2^17) threshold, and the method shows no sub-exponential behaviour.
+  [pcc:unverified]
 
 ## Units and gates
 
 Step counts are the crate's `Meter` charges: deterministic diagnostics, not
-calibrated time. **No wall-clock time is reported**, so no timing-isolation
-path (`tools/isolated_bench.py`) applies and no `benchmarks/` row is added.
-This is a distance-to-target measurement, not a speed result; the validation
-gate admits no leaderboard or benchmark row without an independent replay
-certificate, validator report and matched rho reference, none of which a
-"no speed-up at any reachable size" finding needs.
+calibrated time. The only wall-clock figures (`multtime`, `primetime`) are
+unisolated diagnostics of where setup stalls, not performance results, so no
+`benchmarks/` row is added. This is a distance-to-target measurement, not a
+speed result; the validation gate admits no leaderboard or benchmark row
+without an independent replay certificate, validator report and matched rho
+reference, none of which a "no speed-up at any reachable size" finding needs.
+[pcc:unverified]

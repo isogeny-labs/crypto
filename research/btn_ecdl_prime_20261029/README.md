@@ -23,11 +23,13 @@ addition as Boolean tensor networks; this directory builds both over F_p for
 bases, Lemma-1 sampling, linear algebra mod r) on small prime-order curves,
 and extrapolates the measured cost to 131 bits.
 
-The contraction here is exact bucket elimination (`gpu_contract.py`, NumPy
-backend), standing in for the paper's assumed OpenAI algorithm, which has no
-code. Modular multiply is schoolbook (O(d^2) edges), not the paper's O(d)
-Fourier multiplier. **No ECCp-131 discrete logarithm is computed or
-attempted, and no speed-up is claimed.**
+The contraction in the historical Python path is exact bucket elimination
+(`gpu_contract.py`, NumPy backend), standing in for the paper's assumed OpenAI
+algorithm; the native path in `native/` uses the `hashed-ecdl-tensor` crate,
+whose recursive backend implements that algorithm but never engages at
+reachable sizes. The Python modular multiply is schoolbook (O(d^2) edges), not
+the paper's O(d) Fourier multiplier. **No ECCp-131 discrete logarithm is
+computed or attempted, and no speed-up is claimed.** [pcc:unverified]
 
 | File | Role |
 |---|---|
