@@ -645,3 +645,18 @@ preserves original histories and records landed maintainer re-chain operations.
 The local original ledger and current-main ledger still diverge; this session
 has not repeated/adopted a re-chain or integrated newer main code. The report
 and receipt validate sourcef866 only. [pcc:unverified]
+
+## Separate replay-accounting PR3482 — publication
+
+Replay-accounting sourcef866 and reviewed reports were normal-pushed as4488a5a6a
+on `codex/pkm-replay-accounting-20261105` in
+[regular PR3482](https://github.com/isogeny-labs/crypto/pull/3482).
+Exact4488snapshot is OPEN/CONFLICTING/autooff: review and migrate SUCCESS,
+required gate/size/artifacts ABSENT, reviews[]. These successes do not qualify
+required checks. Local old-d30 policies pass with131chainentries, while current
+main prefix fails; no frozen reconciliation was performed. Copilot
+[6664459966](https://github.com/isogeny-labs/crypto/pull/3482#issuecomment-6664459966)
+is strictly REPORT-ONLY about a sanctioned canonical contract, not permission
+to edit or re-chain. [Publication receipt](validation/replay-accounting-20261105/publication-4488a5a6a.json).
+All22sourceobjects remain equal to testedf866. Later publication metadata changes
+no tested Rust/formal source. No native job runs. [pcc:unverified]
