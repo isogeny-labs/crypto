@@ -1,0 +1,17 @@
+{
+  "schema": "private.held-gate.pending-controls/v1",
+  "status": "not_executed",
+  "compiled": false,
+  "control_obligations": [
+    "valid token after delayed full write and metadata",
+    "partial bytes then completed exact token",
+    "full bytes before root/mode metadata completion",
+    "persistent wrong nonce times out without exec",
+    "symlink, special file, hardlink, wrong owner/mode never exec",
+    "preexisting token rejects",
+    "signal while waiting exits without exec",
+    "PID limit changes before release reject",
+    "host PID reuse or ancestry/inode mismatch prevents release"
+  ],
+  "gate_source_sha256": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc"
+}

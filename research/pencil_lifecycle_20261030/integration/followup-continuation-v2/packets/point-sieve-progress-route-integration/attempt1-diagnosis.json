@@ -1,0 +1,11 @@
+{
+  "status": "failed_wrapper_before_test_result",
+  "elapsed_seconds": 20.784042432991555,
+  "observed_exception": "FileNotFoundError(2, 'No such file or directory')",
+  "diagnosis": "Inferred output-tree sampling race; original exception repr omitted failing path and traceback, so neither can be reconstructed. Cargo temporary target members may disappear between is_file and stat.",
+  "source_and_tests_unchanged": true,
+  "compiler_exit_before_forced_cleanup": "not recorded",
+  "reaped": true,
+  "group_remaining": [],
+  "successor": "Only tolerate ENOENT in sampled target traversal; retain all other errors, traceback and cleanup return code; preserve exact candidate/controls; no automatic retry"
+}
