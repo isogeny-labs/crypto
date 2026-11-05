@@ -513,33 +513,61 @@ fn scan_rests<T>(
     g: &BinaryGroup<'_>,
     fb: &FactorBase<FastPoint>,
     ops: &mut GroupOps,
+    scratch: &mut RestScratch,
     point: FastPoint,
     start: usize,
     len: usize,
     mut visit: impl FnMut(usize, FastPoint, &mut GroupOps) -> Option<T>,
 ) -> Option<T> {
     let n = fb.points.len();
-    let mut scratch = BatchScratch::default();
-    let mut negated: Vec<FastPoint> = Vec::new();
-    let mut rests: Vec<FastPoint> = Vec::new();
+    debug_assert!(start < n || len == 0);
+    let RestScratch {
+        batch: add_scratch,
+        negated,
+        rests,
+    } = scratch;
+    // `k` walks the base cyclically by compare-and-reset: a `%` per
+    // element costs more than the xor that negates the point.
+    let mut k = start;
     let mut t = 0usize;
     let mut batch = REST_BATCH_FIRST;
     while t < len {
         let take = batch.min(len - t);
+        let batch_start = k;
         negated.clear();
-        negated.extend((t..t + take).map(|u| g.neg(fb.points[(start + u) % n])));
+        negated.extend((0..take).map(|_| {
+            let q = g.neg(fb.points[k]);
+            k += 1;
+            if k == n {
+                k = 0;
+            }
+            q
+        }));
         rests.clear();
-        g.0.add_many(point, &negated, &mut rests, &mut scratch);
-        for (offset, &rest) in rests.iter().enumerate() {
+        g.0.add_many(point, negated, rests, add_scratch);
+        let mut visited = batch_start;
+        for &rest in rests.iter() {
             ops.adds += 1;
-            if let Some(found) = visit((start + t + offset) % n, rest, ops) {
+            if let Some(found) = visit(visited, rest, ops) {
                 return Some(found);
+            }
+            visited += 1;
+            if visited == n {
+                visited = 0;
             }
         }
         t += take;
         batch = (batch * 2).min(REST_BATCH_MAX);
     }
     None
+}
+
+/// Buffers [`scan_rests`] reuses from one target to the next.
+#[derive(Default)]
+struct RestScratch {
+    batch: BatchScratch,
+    negated: Vec<FastPoint>,
+    rests: Vec<FastPoint>,
 }
 
 /// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic|f6-ic-pair,degree=D,node_budget=N[,linear_harvest=H]`,
@@ -576,6 +604,8 @@ pub struct Pdp3KoblitzOracle<'i> {
     /// Divisor for `⌈|F|/div⌉` under `rootfind-window-negfold`; `3` for
     /// the fixed `rootfind-window` engine; `0` otherwise.
     window_div: usize,
+    /// Buffers of the batched `R − P_k` scan, kept across targets.
+    rest_scratch: RestScratch,
     /// Witnesses the solver returned that did not re-lift through the
     /// framework's sign resolution.  Must stay zero.
     pub unliftable: u64,
@@ -605,6 +635,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             pair_table_points: 0,
             scan_window_len: 0,
             window_div: 0,
+            rest_scratch: RestScratch::default(),
             unliftable: 0,
             table_mismatches: 0,
         }
@@ -662,7 +693,8 @@ impl<'i> Pdp3KoblitzOracle<'i> {
                     (0, n)
                 };
                 let table_mismatches = &mut self.table_mismatches;
-                scan_rests(g, fb, ops, point, start, len, |k, rest, ops| {
+                let scratch = &mut self.rest_scratch;
+                scan_rests(g, fb, ops, scratch, point, start, len, |k, rest, ops| {
                     if g.is_identity(&rest) {
                         return None;
                     }
@@ -707,7 +739,8 @@ impl<'i> Pdp3KoblitzOracle<'i> {
         }
         let len = self.scan_window_len.max(1).min(n);
         let start = (point.x as usize) % n;
-        scan_rests(g, fb, ops, point, start, len, |k, rest, ops| {
+        let scratch = &mut self.rest_scratch;
+        scan_rests(g, fb, ops, scratch, point, start, len, |k, rest, ops| {
             if g.is_identity(&rest) {
                 return None;
             }
