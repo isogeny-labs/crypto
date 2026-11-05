@@ -791,3 +791,21 @@ Full-library session91773 is still live with original timeout1800, log /tmp/curv
 ### Errors
 
 No PR-status error. No signed PCC standing inferred from merge or native tests. [pcc:unverified]
+
+## 2026-11-05T19:06:50.887916+00:00 — transport full gate completed
+
+### What was done
+
+Session91773 exited0:6063 passed,0 failed,130 ignored in1493.16s. Rechecked all changed source hashes against the frozen stage2 manifest; retained terminal log and JSON. [pcc:unverified]
+
+### Decisions made
+
+Publish the tested exact-transport branch from this checkout. New workload integration runs separately in /home/ec2-user/crypto-curve25519-workload-20261105, based on51ae0683ef66; its source is not included in this gate. [pcc:unverified]
+
+### Open threads
+
+Commit/push transport evidence and open regular PR with auto-merge. New checkout library type-check session17980, log /tmp/curve25519-workload-orders-check-attempt3.log. It includes exact orders, new Curve25519 workload construction and explicit unsupported-solver guards until those adapters are implemented. [pcc:unverified]
+
+### Errors
+
+No full-library failure. Earlier failed compilation and sparse-input attempts remain recorded. [pcc:unverified]
