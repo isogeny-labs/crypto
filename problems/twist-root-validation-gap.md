@@ -4,7 +4,7 @@
 - **Kind:** existing implementation regressions and operational validation resource limit.
 - **Affected work:** [PR2380](https://github.com/isogeny-labs/crypto/pull/2380), [twist delivery checks](../research/twist_routes_1_3_20261021/DELIVERY_CHECKS_20261027.md).
 - **Next action owner:** unassigned library/validation lane.
-- **Last updated:** 2026-10-27
+- **Last updated:** 2026-11-05
 
 ## Problem
 
@@ -59,3 +59,8 @@ Replay/profile the single unchanged sieve test with phase/resource receipts and
 an explicit budget. A successful bounded replay permits a full-suite rerun; a
 budget exit preserves the resource gap. Fix the independently reproduced four
 regressions in their owning modules. Keep the research PR open for review.
+
+
+### 2026-11-05 recovered-workspace check
+
+The current standalone study workspace passes all nine native test targets, including dense/sparse equality and independent audit controls. Current-head root release attempts did not execute tests: sparse path dependencies were initially absent; exact code hydration then reached the offline registry cache's missing aws-sdk-s3 dependency. Preserve all three attempted command logs in validation-v17/*root-tests*20261105.*. This is the current environment/dependency blocker; the earlier four baseline failures and one-hour suite exit remain historical, without a new verdict. No full current-head root pass is claimed.
