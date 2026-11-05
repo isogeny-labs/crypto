@@ -1,0 +1,44 @@
+import PegcdEndpoint
+import NonmonicWord
+import Residual
+set_option autoImplicit false
+namespace PegcdWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+structure Registers where
+ r0 : List UInt64
+ r1 : List UInt64
+ s0 : List UInt64
+ s1 : List UInt64
+ t0 : List UInt64
+ t1 : List UInt64
+
+def Good (p : UInt64) (z : Registers) : Prop :=
+ Canon p z.r0 ∧ Canon p z.r1 ∧ Canon p z.s0 ∧ Canon p z.s1 ∧ Canon p z.t0 ∧ Canon p z.t1
+noncomputable def decode (p : UInt64) [Fact p.toNat.Prime] (z : Registers) : Pegcd.State (ZMod p.toNat) :=
+ ⟨wordsPoly p z.r0,wordsPoly p z.r1,wordsPoly p z.s0,wordsPoly p z.s1,wordsPoly p z.t0,wordsPoly p z.t1⟩
+def initial (a b : List UInt64) : Registers := ⟨a,b,[1],[],[],[1]⟩
+def advance (p : UInt64) (z : Registers) (q r : List UInt64) : Registers :=
+ ⟨z.r1,r,z.s1,ResidualWord.psub p z.s0 (ProductPolynomial.product p q z.s1),
+ z.t1,ResidualWord.psub p z.t0 (ProductPolynomial.product p q z.t1)⟩
+
+theorem initial_good (p : UInt64) (a b : List UInt64) (hp : 1 < p.toNat)
+ (ha : Canon p a) (hb : Canon p b) : Good p (initial a b) := by
+ simpa [Good,initial,Canon] using And.intro ha (And.intro hb hp)
+
+theorem initial_decode (p : UInt64) [Fact p.toNat.Prime] (a b : List UInt64) :
+ decode p (initial a b) = Pegcd.initial (wordsPoly p a) (wordsPoly p b) := by
+ simp [decode,initial,Pegcd.initial,wordsPoly,listPoly]
+
+theorem advance_correct (p : UInt64) [Fact p.toNat.Prime] (z : Registers) (q r : List UInt64)
+ (hp : 0 < p.toNat) (hb : p.toNat < 2^31) (hg : Good p z)
+ (hq : Canon p q) (hr : Canon p r) :
+ Good p (advance p z q r) ∧
+ decode p (advance p z q r) = Pegcd.step (decode p z) (wordsPoly p q) (wordsPoly p r) := by
+ obtain ⟨h0,h1,hs0,hs1,ht0,ht1⟩ := hg
+ have hms := ProductPolynomial.product_correct p q z.s1 hp hb hq hs1
+ have hmt := ProductPolynomial.product_correct p q z.t1 hp hb hq ht1
+ have hss := ResidualWord.sub_correct p z.s0 _ hp hb hs0 hms.1
+ have htt := ResidualWord.sub_correct p z.t0 _ hp hb ht0 hmt.1
+ refine ⟨⟨h1,hr,hs1,hss.1,ht1,htt.1⟩,?_⟩
+ simp [decode,advance,Pegcd.step,hss.2,htt.2,hms.2,hmt.2]
+end PegcdWord

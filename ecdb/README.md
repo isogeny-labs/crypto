@@ -80,6 +80,7 @@ record it refused, with the reason.
 
 | Method and path | Purpose |
 |:--|:--|
+| `GET /viewer` | a browser viewer: catalogue counts, curve search, the curve document and its isogeny graph; paste the read token (kept in that tab only). Browsers opening `/` are redirected here |
 | `GET /v1/meta` | counts, schema version, pinned input files (path, SHA-256, commit) |
 | `GET /v1/schema` | every table and view with column types, comments, foreign keys and CHECKs; enums; functions |
 | `GET /v1/curves` | filter and sort over `ec.v_curve_summary`, by field, genus, model, family, trace, j, CM discriminant, class number, End, subgroup size, cofactor, embedding degree, twist security, anomalous / supersingular, name and more |
@@ -105,6 +106,8 @@ record it refused, with the reason.
 | `GET /v1/modular-polynomials?level=&coefficients=` | Phi_l over Z, l = 2..19 |
 | `GET /v1/class-polynomials`, `GET /v1/summation-polynomials` | H_D for class number one; Semaev S_2, S_3 |
 | `GET /v1/factor-bases`, `GET /v1/factor-bases/{key}`, `GET /v1/factor-bases/{key}/results?points=` | factor bases of the IC work (FB1, FBM1, archive and FBS1 spec ids) with their sizes, aliases, measurement configurations, results and points |
+| `GET /v1/factor-base-designs`, `GET /v1/factor-bases?design=` | factor-base design grids (the n83 sweep) and their member specs |
+| `GET /v1/ic/claims?summary=&rule_version=&curve=&candidate_id=` | IC tool-program claims: IC online against matched rho per target, with the cold ratio (set-up included) |
 | `POST /v1/sql` | one read-only query |
 | `GET /v1/export`, `GET /v1/export/{table}?offset=&limit=` | bulk export for mirrors: the manifest (tables, copyable columns, primary keys, exact row counts), then gzipped COPY-text pages in primary-key order, at most 4 MiB each (413 asks for a smaller `limit`) |
 | `POST /v1/evidence`, `POST /v1/isogenies` | token-gated agent writes |

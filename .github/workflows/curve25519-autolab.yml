@@ -1,0 +1,87 @@
+name: curve25519-autolab
+# One round of the Curve25519-family index-calculus improvement loop
+# (src/bin/ic_autolab.rs; research/curve25519_autolab_20261104/README.md) on a
+# hosted runner: counted GAE only (deterministic, replayed; never a wall-time
+# claim), the local route as a development screen. The round directory and
+# the updated ledger are uploaded as an artifact; a session lands them in a
+# PR after reading the report (the ratchet is evidence, not a leaderboard row).
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: generic or algebraic
+        default: generic
+      sizes:
+        description: sizes k, comma separated
+        default: "20,24"
+      train_targets:
+        default: "16"
+      holdout_targets:
+        default: "32"
+      timeout_seconds:
+        default: "1800"
+permissions:
+  contents: read
+concurrency:
+  group: curve25519-autolab-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  round:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/curve25519_autolab_20261104
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: curve25519-autolab-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+      - name: Build ecbench and ic_autolab
+        run: cargo build --release --locked --bin ecbench --bin ic_autolab
+      - name: Unit tests
+        run: cargo test --release --locked --bin ic_autolab
+      - name: "One round (root, whole-core reservation; the record stays L1 on a shared VM)"
+        run: |
+          sudo -E env PATH="$PATH" ./target/release/ic_autolab \
+            --home research/curve25519_autolab_20261104 loop --rounds 1 \
+            --track "${{ inputs.track }}" --sizes "${{ inputs.sizes }}" \
+            --train-targets "${{ inputs.train_targets }}" --holdout-targets "${{ inputs.holdout_targets }}" \
+            --timeout-seconds "${{ inputs.timeout_seconds }}" --cpus auto --allow-busy --replay 8
+          sudo chown -R "$(id -u):$(id -g)" research/curve25519_autolab_20261104
+          ./target/release/ic_autolab --home research/curve25519_autolab_20261104 status
+      - name: Render the round's PDF
+        run: |
+          R=$(ls -d research/curve25519_autolab_20261104/round-* | tail -1)
+          sudo apt-get install -y -qq pandoc chromium-browser >/dev/null 2>&1 || sudo apt-get install -y -qq pandoc chromium >/dev/null
+          CHROME=$(command -v chromium || command -v chromium-browser) research/curve25519_autolab_20261104/scripts/render_pdf.sh "$R" || echo "PDF rendering failed; the README and SVG are the report"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: curve25519-autolab-round
+          path: |
+            research/curve25519_autolab_20261104/ledger.json
+            research/curve25519_autolab_20261104/ratchet.svg
+            research/curve25519_autolab_20261104/round-*
+          if-no-files-found: error
