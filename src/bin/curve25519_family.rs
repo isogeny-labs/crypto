@@ -2066,6 +2066,20 @@ fn main() {
                 .unwrap()
             );
         }
+        "wide" => {
+            // wide [base] [trials] [seed]: the real 255-bit curve over Fp256,
+            // with the order checks and a bounded counted probe scan.
+            let base: usize = args.get(2).map_or(1024, |v| v.parse().unwrap());
+            let trials: u64 = args.get(3).map_or(100_000, |v| v.parse().unwrap());
+            let seed: u64 = args.get(4).map_or(20_261_104, |v| v.parse().unwrap());
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&crypto_lib::cryptanalysis::curve25519_wide::smoke(
+                    base, trials, seed
+                ))
+                .unwrap()
+            );
+        }
         "spec" => {
             // spec <k> <targets_per_curve> <seed>: the frozen baseline panel of
             // research/curve25519_ic_baseline_20261102/PROTOCOL.md for one size.
@@ -2174,7 +2188,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: curve25519-family audit | family [k1,k2,...] | spec <k> <targets> <seed>"
+                "usage: curve25519-family audit | family [k1,k2,...] | wide [base] [trials] [seed] | spec <k> <targets> <seed>"
             );
             std::process::exit(2);
         }
