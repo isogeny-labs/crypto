@@ -162,3 +162,125 @@ elim_degree = 65,536, `planted_root_of_eliminant` and `planted_coordinates_recov
 **What may not be said** (adds to §8).
 - An F4 stage improvement is not a pipeline improvement.
 - A U3 or U1P pass at one prime is a screen.
+
+### A2 (2026-11-02, after U3_4111; committed and pushed before any A2 cell)
+
+**What U3_4111 showed** (`results/A1/U3_4111`).
+- Every gate passed: D = 65,536, stab_fail = 0, planted point recovered.
+- F4 CPU was 12,082, the same as A0. The basis has the same shape as W0's: t = 4,920 chains,
+  longest 37, 306M terms.
+- c = 12,291 + 134 + 4,186 = 16,611 CPU-s, against the 11,275 bar. So U3 is no improvement, and
+  under A1 U3 is not run at the larger primes.
+- Reading: the shear gives back the whole F4 gain. U1's gain comes from w² being a leading
+  monomial, and the bw finish needs a variable with long chains.
+
+**A2 arm U4.** The U1 polynomials unchanged, with only the variable order changed to
+s1,s2,s3,s4,w,s5. s5 is last, so it is the eliminating variable.
+- w² stays the leading monomial of the quadric, which is the structure behind U1's F4 gain.
+- The chains are counted in s5.
+- s5 = ∏u_i², and it separates the points if no two solutions share it.
+- **Dev check at m = 3** (order s1,s2,w,s3; p = 4111 and 262231): stab_fail = 0, D = 16,
+  planted point recovered (`dev/m3_*_u4`).
+- **Run.** The bw pipeline exactly as U3 (`run_a2.sh`). The planted point is reordered to
+  match. The gates are those of U3.
+
+**Order change.** The A1 queue is stopped at the end of the cell then running (A0_262231). The
+cell it had started next is moved, unrun, to `results/A1/_aborted_*`. Then U4_4111 runs, then
+the remaining A1 cells in their A1 order.
+
+**Decision rules.** The A1 whole-solve rule applies to U4: c ≤ 11,275, 12,549 and
+15,011 CPU-s at 4111, 262231 and 33554371. If U4_4111 passes, U4_262231 and U4_33554371 run
+(`run_a2.sh`) after the A1 cells. A pipeline improvement, and so a ratchet, needs all three
+primes.
+
+**Prediction.** V1 and V2 showed that the variable order does not move F4 for W0, so U4's F4 is
+predicted within ±25 % of U1's 4,729. With a finish of about 4,300 CPU-s, c is predicted at
+about 9,000–10,500. That passes the 4111 bar by a margin smaller than the ±2,000 A/A spread
+read in the bw study.
+
+### A3 (2026-11-03, after U4_4111 and the U1F replication; committed and pushed before any A3 cell)
+
+**What the A1 and A2 cells showed.**
+- **U4 (s5 eliminating).** F4 12,403 CPU-s, c = 16,679: no improvement. Its basis has W0's
+  shape.
+- **U1F (u-ring, w last, F4 only).** A0/U1F = 2.85× at p = 262231 (5,230 vs 14,888) and 2.72× at
+  33554371 (4,834 vs 13,127), with the generator gates passed. With 2.69× at 4111, this is the A1
+  F4 stage improvement at all three primes.
+- **So the F4 gain exists only in U1's own basis.** Every leading monomial is a pure
+  s-monomial, except w² (from w² − s5). The staircase is S × {1, w}, with |S| = 32,768.
+- **s-stability.** In S, every one of the 2,460 monomials m with s5·m ∉ S has s5·m as a
+  leading monomial. This holds at 262231 and 33554371 (from U1F's `lm.out`, by
+  `stair_u1.py` logic).
+- **So multiplication by w can be read straight off the reduced basis.** w·m = (w m), and
+  w·(w m) = NF(s5 m). That normal form is a chain head (a unit entry) or the negated tail of
+  one of 2,460 basis elements (a dense row). The bw finish's operator had 4,920 dense columns.
+
+**A3 arm U5.** The U1 system unchanged (U1's `gen/` at 4111; regenerated with seed 1 at the
+other primes, generator gates as U1). Whole solve:
+1. `msolve -v 2 -t 4 -g 2` into a FIFO, with the same caps.
+2. `src/hnfsolve_u.cpp --dump-P` checks the structure: every chain is {m, w m}, the element
+   with LM w² is w² − s5, no other LM contains w, and s-stability holds. If any check fails it
+   exits 3. Otherwise it writes the HNFP2 dump.
+3. `src/bwfinish_u.cpp --b 128 --threads 4 --seed 1 --planted`. This is the merged bwfinish
+   with the operator replaced by shift + unit axpys + one (D × 2,460)(2,460 × b) GEMM. Points
+   come from a 2,460 × 2,460 kernel per rational root, using u(s5 m) = w0²·u(m). The generator,
+   determinant and root code is unchanged.
+4. `src/check_points.py`: every reported point satisfies every equation of the system.
+
+**Dev check at m = 3, p = 4111 and 262231** (`dev/m3_*_u5`): structure checks pass (5 unit
+rows, 3 dense rows), D = 16, the planted point is recovered, and all points satisfy the system.
+
+**Measurement.** c = msolve process CPU + hnfsolve_u CPU (parse + staircase + dump) +
+bwfinish_u `total_cpu_s`, as in the bw study.
+
+**Gates.** All exit codes 0, no cap stop, U1's generator gates, elim_degree = D = 65,536,
+planted point recovered, `check_points` all_satisfy.
+
+**Decision rules.**
+- A whole-solve improvement at a prime is c ≤ 11,275, 12,549 or 15,011 CPU-s (bw baseline / 1.5
+  at 4111, 262231 and 33554371).
+- At all three primes with every gate passed, it is a **pipeline improvement and the new
+  per-system baseline (ratchet)**.
+- At one or two primes, it is a screen.
+- G1 is reported for each c, as in the bw study.
+
+**Order.** Run as in A2's order change.
+1. The A1 queue stops at the end of U2_4111.
+2. U5_4111, U5_262231 and U5_33554371 run (`run_a3.sh`).
+3. U1P_4111 runs last, as in A1.
+
+**Predictions.**
+- F4 is as U1/U1F (4,700–5,300 CPU-s).
+- Printing the basis adds under 400 CPU-s, because it has half of W0's 306M terms.
+- The sequence costs about half of the bw finish's (one limb about 1,800 CPU-s, two limbs
+  about 3,300). With the generator, determinant and points, the finish is about 2,300 (one limb)
+  or 3,800 (two limbs).
+- So c ≈ 7,000–8,000 CPU-s at 4111 and 262231, and ≈ 8,500–9,500 at 33554371. That is
+  2.0–2.4× under the ratcheted baseline, and an improvement at all three primes.
+- G1 point estimate about 44.3–44.6 bits, with the band still straddling CLOSE (2^46) on its
+  upper side.
+
+**What may not be said** (adds to §8; A3).
+- U5 changes the factor base to u ∈ F_p. A U5 ratchet is a ratchet of the u presentation of the
+  same decomposition problem on the same curve and prime. It is not a statement about the
+  x-subline system, and it is not an end-to-end ECDLP cost.
+
+### A4 (2026-11-03, after U5_4111; committed and pushed before any A4 cell)
+
+**Why.**
+- A container restart (about 01:14Z) killed the first U5_4111 attempt. The queue was restarted
+  at 01:16Z (`results/a3_restart.*`).
+- Every A3 cell runs after the restart. The host reports the same class (Intel Xeon @ 2.80 GHz,
+  4 vCPU, 15.7 GiB), but the physical machine may differ.
+- U5_4111's F4 was 3,844 CPU-s against U1's 4,729 before the restart (−19 %). That is within
+  the ±25 % A/A tolerance, but large enough to read.
+
+**A4 cells.** These run after the A3 queue (U5 at three primes, then U1P_4111), with `run_a1.sh`
+and the same commands as A1:
+- `A0_4111`: W0's `quot.ms`, F4 only. This is the post-restart A/A against A0 (12,744).
+- `U1F_4111`: the U1 system, F4 only. This is the post-restart A/A against U1 (4,729).
+
+**Use.** A4 changes no decision rule. The A3 bars are absolute: the merged bw baseline / 1.5.
+The report states each A3 c and its ratio to the baseline both as measured and corrected by
+the post-restart drift of A0. If the corrected ratio at any prime falls below 1.5×, the
+report says so.

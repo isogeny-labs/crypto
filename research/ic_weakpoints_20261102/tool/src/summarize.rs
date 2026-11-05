@@ -217,3 +217,121 @@ pub fn run(dir: &str) {
         println!("{{\"summary\":\"model\",\"derived\":true,\"w\":{},\"tau_trials_per_p\":{:.4},\"nnz_per_row\":{:.3},\"c3_mults\":{:.0},\"grid\":[{}]}}", w, tau, rw, c3, lines.join(","));
     }
 }
+
+/// Arm L (large primes): per-cell aggregates, fitted exponents T ~ A p^alpha per (r, variant),
+/// and a derived large-p model built only from those fits and the measured c(3).
+pub fn run_dlp(dir: &str) {
+    let mut lines: Vec<String> = vec![];
+    for e in std::fs::read_dir(dir).unwrap().flatten() {
+        let n = e.file_name().to_string_lossy().to_string();
+        if n.starts_with("dlp_p") && n.ends_with(".jsonl") {
+            lines.extend(std::fs::read_to_string(e.path()).unwrap().lines().map(|s| s.to_string()));
+        }
+    }
+    // key (r*1000, lp) -> p -> list of (reached, T, weight, ops, c3, k_ok, T_square)
+    let mut cells: BTreeMap<(u64, u64), BTreeMap<u64, Vec<(bool, f64, f64, f64, f64, bool, Option<f64>)>>> = BTreeMap::new();
+    for l in &lines {
+        let key = ((num(l, "r").unwrap() * 1000.0).round() as u64, num(l, "lp").unwrap() as u64);
+        let p = num(l, "p").unwrap() as u64;
+        cells.entry(key).or_default().entry(p).or_default().push((
+            l.contains("\"reached\":true"),
+            num(l, "T").unwrap(),
+            num(l, "mean_row_weight").unwrap(),
+            num(l, "merge_ops").unwrap(),
+            num(l, "c3").unwrap(),
+            l.contains("\"k_correct\":true"),
+            num(l, "T_square"),
+        ));
+    }
+    let mut c3_all = vec![];
+    let mut fits: BTreeMap<(u64, u64), (f64, f64, f64, f64)> = BTreeMap::new(); // alpha, logA, weight, ops/T
+    // Amendment 3: fit both T (target = cut + 21 rows) and T_square (cut + 1 rows); the model uses T_square
+    // when every record carries it, since the fixed +20 margin biases the T exponent low at small p.
+    let has_sq = lines.iter().all(|l| l.contains("\"T_square\":"));
+    for metric in ["T", "T_square"] {
+        if metric == "T_square" && !has_sq {
+            continue;
+        }
+        for (&(r, lp), byp) in &cells {
+            let mut xs = vec![];
+            let mut ys = vec![];
+            let mut wts = vec![];
+            let mut opt = vec![];
+            for (&p, v) in byp {
+                if metric == "T" {
+                    c3_all.extend(v.iter().map(|x| x.4));
+                }
+                let vals: Vec<Option<f64>> = v.iter().map(|x| if metric == "T" { if x.0 { Some(x.1) } else { None } } else { x.6 }).collect();
+                let all = vals.iter().all(|x| x.is_some());
+                let kok = v.iter().filter(|x| x.0).all(|x| x.5);
+                let tv: Vec<f64> = v.iter().zip(&vals).map(|(x, y)| y.unwrap_or(x.1)).collect();
+                let lt = tv.iter().map(|x| x.ln()).sum::<f64>() / v.len() as f64;
+                println!(
+                    "{{\"summary\":\"dlp_cell\",\"metric\":\"{}\",\"r\":{:.4},\"lp\":{},\"p\":{},\"curves\":{},\"all_reached\":{},\"T_geomean\":{:.1},\"k_correct_all_reached\":{},\"row_weight\":{:.3}}}",
+                    metric, r as f64 / 1000.0, lp, p, v.len(), all, lt.exp(), kok, mean(&v.iter().map(|x| x.2).collect::<Vec<_>>())
+                );
+                if all {
+                    xs.push((p as f64).ln());
+                    ys.push(lt);
+                    wts.push(mean(&v.iter().map(|x| x.2).collect::<Vec<_>>()));
+                    opt.push(mean(&v.iter().map(|x| x.3 / x.1).collect::<Vec<_>>()));
+                }
+            }
+            if xs.len() >= 3 {
+                let (mx, my) = (mean(&xs), mean(&ys));
+                let sxx: f64 = xs.iter().map(|x| (x - mx).powi(2)).sum();
+                let sxy: f64 = xs.iter().zip(&ys).map(|(x, y)| (x - mx) * (y - my)).sum();
+                let a = sxy / sxx;
+                let res: f64 = xs.iter().zip(&ys).map(|(x, y)| (y - my - a * (x - mx)).powi(2)).sum();
+                let se = (res / (xs.len() as f64 - 2.0).max(1.0) / sxx).sqrt();
+                let w = *wts.last().unwrap();
+                let o = *opt.last().unwrap();
+                if metric == "T_square" || !has_sq {
+                    fits.insert((r, lp), (a, my - a * mx, w, o));
+                }
+                println!(
+                    "{{\"summary\":\"dlp_fit\",\"metric\":\"{}\",\"r\":{:.4},\"lp\":{},\"points\":{},\"p_range\":[{:.0},{:.0}],\"alpha\":{:.4},\"alpha_se\":{:.4},\"zero_lp_law_3_minus_2r\":{:.4},\"row_weight_at_max_p\":{:.3},\"merge_ops_per_trial\":{:.2}}}",
+                    metric, r as f64 / 1000.0, lp, xs.len(), xs[0].exp(), xs.last().unwrap().exp(), a, se, 3.0 - 2.0 * r as f64 / 1000.0, w, o
+                );
+            }
+        }
+    }
+    if fits.is_empty() || c3_all.is_empty() {
+        return;
+    }
+    let c3 = mean(&c3_all);
+    for w in [0.1f64, 1.0] {
+        let mut grid = vec![];
+        let mut crossover: [Option<u32>; 3] = [None; 3];
+        for e in (10..=80).step_by(2) {
+            let lp_ = (e as f64) * std::f64::consts::LN_2;
+            let p = lp_.exp();
+            let rho = (std::f64::consts::PI * p.powi(3) / 4.0).sqrt() * (1.0 + w);
+            let mut best = [(f64::INFINITY, 0.0f64); 3];
+            for (&(r, lp), &(a, la, wt, opt)) in &fits {
+                let rr = r as f64 / 1000.0;
+                let t = (la + a * lp_).exp();
+                let cut = p.powf(rr) / 2.0;
+                let cost = t * (1.0 + w * (c3 + opt)) + w * 3.0 * cut * cut * wt;
+                if cost < best[lp as usize].0 {
+                    best[lp as usize] = (cost, rr);
+                }
+            }
+            let mut parts = vec![];
+            for v in 0..3 {
+                let ratio = best[v].0 / rho;
+                if ratio < 1.0 && crossover[v].is_none() {
+                    crossover[v] = Some(3 * e);
+                }
+                parts.push(format!("{{\"lp\":{},\"r_best\":{:.4},\"ratio\":{:.4e}}}", v, best[v].1, ratio));
+            }
+            grid.push(format!("{{\"log2p\":{},\"log2_group\":{},\"variants\":[{}]}}", e, 3 * e, parts.join(",")));
+        }
+        println!(
+            "{{\"summary\":\"dlp_model\",\"derived\":true,\"w\":{},\"c3\":{:.0},\"crossover_log2_group\":[{}],\"grid\":[{}]}}",
+            w, c3,
+            crossover.iter().map(|c| c.map_or("null".into(), |x| x.to_string())).collect::<Vec<_>>().join(","),
+            grid.join(",")
+        );
+    }
+}

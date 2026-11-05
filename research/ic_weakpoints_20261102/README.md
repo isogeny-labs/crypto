@@ -7,7 +7,7 @@ container. No wall time is reported or claimed. This is **not** an ecbench sessi
 leaderboard row and **not** admitted by the validation gate; it changes no table A–C row.
 Protocol frozen before data: [`PROTOCOL.md`](PROTOCOL.md) (commit `97b0965fa7` adds Amendment 1).
 Report PDF: [`reports/run-20261102T1639Z/REPORT.pdf`](reports/run-20261102T1639Z/REPORT.pdf). Raw records: [`data/`](data/); native summaries:
-[`data/summary.jsonl`](data/summary.jsonl), [`data/summary_y2.jsonl`](data/summary_y2.jsonl).
+[`data/summary.jsonl`](data/summary.jsonl), [`data/summary_y2.jsonl`](data/summary_y2.jsonl), [`data/summary_dlp.jsonl`](data/summary_dlp.jsonl).
 
 ## Results by weak point
 
@@ -28,8 +28,46 @@ With the measured constants τ = 3.50 trials per p, c(3) = 1.06 × 10^6, 3.97 no
 large primes, the best factor-base fraction gives IC / rho → **684 (w = 0.1)** and **3761 (w = 1)**,
 constant for groups ≥ 2^60 (`data/summary.jsonl`, `"summary":"model"`). Reason: without large primes
 n = 3 balances at p^{3/2}, the same exponent as rho, so the gap is a constant ∝ √(w · c(3)). Closing it
-needs both the double-large-prime exponent p^{4/3} (not measured here) and a much cheaper decomposition
-than a dense Macaulay solve.
+needs both the double-large-prime exponent (measured below: 1.27 ± 0.04 at r = 2/3) and a much cheaper
+decomposition than a dense Macaulay solve.
+
+## Large-prime variation (arm L, Amendments 2, 3, 3a)
+
+n = 3, p ∈ {127, 251, 509, 1021, 2039}, 2 curves per p (groups 2^20.0–2^32.9), one walk stream per
+curve feeding 0LP, 1LP and 2LP eliminators at |FB_r| ≈ p^r/2, r ∈ {1, 5/6, 3/4, 2/3, 1/2}; trial cap 40p.
+T_square = trials until the full rows first reach |FB_r| + 1 (Amendment 3: the fixed +20 margin of run 1
+biased every exponent low, e.g. 1.12 instead of 1.27 for 2LP at r = 2/3). Native fits on curve
+geometric means, ± 1 standard error ([`data/summary_dlp.jsonl`](data/summary_dlp.jsonl), `"metric":"T_square"`):
+
+| r | 0LP α (law 3 − 2r) | 1LP α | 2LP α | 2LP row weight (p = 2039) |
+|---|---|---|---|---|
+| 1 | 1.02 ± 0.03 (1) | = 0LP | = 0LP | 4.0 |
+| 5/6 | 1.49 ± 0.12 (1.33; p ≤ 1021) | 1.21 ± 0.03 | 1.11 ± 0.03 | 7.8 |
+| 3/4 | censored (1.5) | 1.30 ± 0.08 | 1.16 ± 0.01 | 10.4 |
+| 2/3 | censored (1.67) | 1.47 ± 0.11 (p ≤ 509) | **1.27 ± 0.04** | 7.8 |
+| 1/2 | censored (2) | censored | 1.35 ± 0.11 | 6.2 |
+
+- **(a)** 0LP follows 3 − 2r where it is measurable (r = 1, 5/6, within 1.2 se).
+- **(b)** 2LP at r = 2/3: 1.27 ± 0.04, prediction ≤ 1.4 holds, falsifier (> 1.5) not triggered; consistent
+  with the theoretical 4/3 (1.4 se) and below rho's 1.5 by 5 se. At 2039, 2LP needs 19 723 trials versus
+  1LP > 62 876 (censored) and 0LP > 81 560 (censored).
+- **(c)** log Q correct in **105/105** reached cells (45 censored, none wrong or undetermined).
+- **(d)** fails narrowly in 1 of 25 2LP cells: mean merged row weight is up to 12.07 at p = 1021, r = 2/3,
+  3.02× the 0LP weight of 4.0; every other cell is ≤ 2.6× (≤ 10.4). Row weight does not grow monotonically
+  in p (7.8 at p = 2039, r = 2/3), so the linear-algebra price of 2LP is a constant factor here, not a trend.
+- Replay: the Amendment-3a rerun reproduces every run-1 T, reached, trial, rank, consistency and k field
+  (150/150 records); only `la_dense_mults` (43) and `merge_ops` (2) differ, from run 1's non-deterministic
+  decomposition order (fixed; two runs are now byte-identical).
+
+**Derived (extrapolation, not measurement).** Plugging the fitted laws, c(3) = 1.06 × 10^6 and the
+measured row weights into IC/rho (negation map) at the best measured r: at w = 0.1, 2LP reaches 58 at
+2^96, 7.7 at 2^132 and crosses 1 at about 2^180; at w = 1 it is 319, 42 and 5.3 at the same sizes and
+does not cross by 2^240. The §5a band therefore does **not** rank IC ahead anywhere up to 2^240 (the
+order flips between w = 0.1 and 1 above 2^180). The fits come from p ≤ 2^11 and are extended by up to
+70 bits; the 2LP slopes at r = 3/4 and 5/6 (1.11–1.16) are below the asymptotic value and probably
+pre-asymptotic, so the crossover is optimistic. The 0LP curve is limited by the r grid (its optimum
+r = 3/4 is censored), so the earlier 0LP plateau (684 / 3761, continuous φ) remains the 0LP reference;
+both models agree at 2^60 (683 / 3750).
 
 ## What this changes in the ranking
 
@@ -40,7 +78,8 @@ than a dense Macaulay solve.
    correct logs on every curve. Their failure modes (subfield targets, duplicate rows, spurious
    solutions) are cheap filters.
 3. The missing row (factor-base size / large primes) is **required**, not optional: without 2LP the
-   exponent equals rho's.
+   exponent equals rho's; with 2LP it is measured at 1.27 ± 0.04 (theory 4/3), but the constant
+   √(w · c(3)) keeps IC behind rho at w = 1 to at least 2^240 in the extrapolated model.
 4. Row 2 is untouched by this family and remains the only route for prime fields.
 
 ## Reproduce
@@ -51,5 +90,7 @@ cd .. && ./run_all.sh                       # frozen arms A2, A3, Y, P -> data/*
 tool/target/release/ic-weakpoints yield --p 251 --curves 4 --targets 6000 --seed 20261103   # Y2 (and p=509)
 gunzip -k data/*.jsonl.gz    # records over 64 KiB are committed gzipped (artifact-store policy)
 tool/target/release/ic-weakpoints summarize data > data/summary.jsonl
+./run_dlp.sh                                # arm L (about 65 min on 4 vCPUs)
+tool/target/release/ic-weakpoints summarize-dlp data > data/summary_dlp.jsonl
 ```
 Graphs: `reports/run-20261102T1639Z/plots.py` lays out the summary JSONL only (no statistics computed in Python).

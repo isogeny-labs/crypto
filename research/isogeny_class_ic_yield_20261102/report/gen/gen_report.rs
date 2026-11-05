@@ -1642,6 +1642,9 @@ fn main() {
 
     // ---------------- 6 P2
     d.h(1, "6. P2: prime analogues of ECCp-131's class");
+    if study.join("p2_prime_analogues/RESULTS.md").exists() {
+        d.p("Main-session reading (p2_prime_analogues/RESULTS.md): all 12 run-scope cells finished and audited. 9 cells support the null (planted 20% power >= 0.99; bootstrap upper bound on the curve share of yield variance <= 0.10 in every cell); 2 m = 3 cells at 24 bits are not informative at 20% (power 0.38, 0.84); the one flag (c32A m = 3, curve 80, max abs z p = 0.0005) was rerun on fresh seeds under the preregistered follow-up 1 (FOLLOWUP_c32A_m3.md) and did not replicate: curve 80 vs 15 comparators 1.0021 (95% 0.9815 to 1.0232), p = 0.84, positive control met (1.19), negative control informative.");
+    }
     let mut rows = Vec::new();
     for bits in [24u32, 28, 32, 36, 40] {
         for cl in ['A', 'B'] {
@@ -1816,7 +1819,7 @@ fn main() {
         "**Not run (deferred), P3a-Y:** n = 43, k = 13 yield line (about 19.4 CPU-hours); claim C3 (yield against the Poisson prediction) is not run, and the `solutions` column of the cells that did run is descriptive.".into(),
         format!("**Pending at generation time, P2:** {}.", if pend2.is_empty() { "none".to_string() } else { pend2.join(", ") }),
         format!("**Pending or partial at generation time, P3:** {}.", { let v: Vec<String> = p3.card_state.iter().filter(|c| !c.3.starts_with("completed")).map(|c| format!("{} ({})", c.0, c.3.split(' ').next().unwrap_or(""))).collect(); if v.is_empty() { "none".to_string() } else { v.join(", ") } }),
-        "Statements about pending cells are not made. In particular the C2 outcome (N or G) is open until the b-adapted and b-sparse arms and the remaining standard-V shards finish.".into(),
+        if pend2.is_empty() && p3.card_state.iter().all(|c| c.3.starts_with("completed")) { "No cell is pending: every run-scope cell of P1, P2 and P3 has a completed receipt.".to_string() } else { "Statements about pending cells are not made. In particular the C2 outcome (N or G) is open until the b-adapted and b-sparse arms and the remaining standard-V shards finish.".to_string() },
     ]);
 
     // ---------------- 9 reproduce

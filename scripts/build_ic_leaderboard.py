@@ -97,6 +97,9 @@ SOURCES = {
     "glv_e32": "experiments/36_handover_ladder/summary.json",
     "glv_e33": "experiments/37_solver_b_pivot_count/summary.json",
     "glv_e34": "experiments/38_twist24_cheap_rep/summary.json",
+    "glv_e40": "experiments/47_macaulay_entries/summary.json",
+    "glv_e41": "experiments/48_twist24_shortfall/summary.json",
+    "glv_e39": "experiments/46_pivot_rules_confirm3/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "generator_orbit": "research/ecbench_generator_orbit_20261022/figures/summary.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
@@ -994,6 +997,30 @@ def k4_v4_component() -> dict:
     e34_val = load(f"{e34_study}/validator-report.json")
     if e34.get("experiment") not in ("e34", "E34") or e34_val.get("status") != "pass":
         raise SystemExit("review the E34 summary and its validator report before updating the leaderboard")
+    e40 = load(SOURCES["glv_e40"])
+    e40_study = "research/e40_macaulay_entries_20261102"
+    v40 = e40.get("verdict", {})
+    if (not v40.get("V_ranked_vs_A_registered_rule") or not v40.get("e2e_identity")
+            or v40.get("G2.208_kill_fired") is not False
+            or gate.check_evidence_dir(REPO / e40_study, REPO)):
+        raise SystemExit("review the E40 Macaulay-entries summary and its VALIDATION.json before updating the leaderboard")
+    e41 = load(SOURCES["glv_e41"])
+    e41_study = "research/e41_twist24_shortfall_20261102"
+    e41_val = load(f"{e41_study}/validator-report.json")
+    if e41.get("experiment") not in ("e41", "E41") or e41_val.get("status") != "pass":
+        raise SystemExit("review the E41 summary and its validator report before updating the leaderboard")
+    b40 = e40["bands"]
+    e39 = load(SOURCES["glv_e39"])
+    e39_study = "research/e39_pivot_rules_confirm3_20261102"
+    if (e39.get("experiment") != "e39" or e39.get("e2e_identity_ok") is not True
+            or not all(ok for _, ok in e39["verdict_checks"]["G2.201_rank_with_gates"])
+            or gate.check_evidence_dir(REPO / e39_study, REPO)):
+        raise SystemExit("review the E39 pivot-rule summary and its VALIDATION.json before updating the leaderboard")
+    rho39 = {}
+    for r in e39["rho_ranges"]:
+        cur = rho39.setdefault(r["x"], [[float("inf"), 0.0] for _ in range(3)])
+        for i in range(3):
+            cur[i] = [min(cur[i][0], r["ranges"][i][0]), max(cur[i][1], r["ranges"][i][1])]
     return {**sm, "source": SOURCES["glv_k4"],
             "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
             "gls": {**gls, "source": SOURCES["glv_gls"],
@@ -1059,7 +1086,26 @@ def k4_v4_component() -> dict:
             "e34": {"source": SOURCES["glv_e34"],
                     "report": f"{e34_study}/REPORT.pdf",
                     "validator_report": f"{e34_study}/validator-report.json",
-                    "certificate": f"{e34_study}/replay-certificate.json"}}
+                    "certificate": f"{e34_study}/replay-certificate.json"},
+            "e40": {"source": SOURCES["glv_e40"],
+                    "report": f"{e40_study}/REPORT.pdf",
+                    "validation": f"{e40_study}/VALIDATION.json",
+                    "rows": len(e40["rows"]),
+                    "bands": {key: b40[key] for key in ("a_over_v", "e25_over_v", "a_over_v_sigma1",
+                                                       "a_over_v_sigma4", "v_over_rho", "a_over_rho")},
+                    "cells_v": [min(z["v_cells_clean"] for z in e40["stage_a"]),
+                                max(z["v_cells_clean"] for z in e40["stage_a"])],
+                    "offset_ops": [min(z["v_ops"] for z in e40["stage_a"]),
+                                   max(z["v_ops"] for z in e40["stage_a"])]},
+            "e41": {"source": SOURCES["glv_e41"],
+                    "report": f"{e41_study}/REPORT.pdf",
+                    "validator_report": f"{e41_study}/validator-report.json"},
+            "e39": {"source": SOURCES["glv_e39"],
+                    "report": f"{e39_study}/REPORT.pdf",
+                    "validation": f"{e39_study}/VALIDATION.json",
+                    "ranks": [{k2: r[k2] for k2 in ("x", "reference", "order", "ranges", "rows", "rows_x_ahead")}
+                              for r in e39["ranks"] if r["set"] == "all"],
+                    "rho": rho39}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -3522,6 +3568,18 @@ def markdown(doc: dict) -> str:
         L.append("")
     L += [t["e34"] + f" Read the [report](../../{k['e34']['report']}), [summary](../../{k['e34']['source']}) and "
           f"[validator report](../../{k['e34']['validator_report']}).", ""]
+    e40 = k["e40"]
+    L += [t["e40"] + f" Read the [report](../../{e40['report']}), [summary](../../{e40['source']}) and "
+          f"[validation](../../{e40['validation']}).", "",
+          "| " + " | ".join(t["e40_head"]) + " |", "|:--|--:|--:|--:|"]
+    L += ["| " + " | ".join(r) + " |" for r in t["e40_rows"]]
+    e39 = k["e39"]
+    L += ["", t["e39"] + f" Read the [report](../../{e39['report']}), [summary](../../{e39['source']}) and "
+          f"[validation](../../{e39['validation']}).", "",
+          "| " + " | ".join(t["e39_head"]) + " |", "|:--|:--|--:|--:|--:|:--|"]
+    L += ["| " + " | ".join(r) + " |" for r in t["e39_rows"]]
+    L += ["", t["e41"] + f" Read the [report](../../{k['e41']['report']}), [summary](../../{k['e41']['source']}) "
+          f"and [validator report](../../{k['e41']['validator_report']}).", ""]
     return "\n".join(L) + "\n"
 
 
@@ -3570,11 +3628,71 @@ def glv_e32_e34_text(k: dict) -> dict:
            "modelled handover moves 2.8, 1.3 and 0.7 bits later. Independently replayed byte for byte from a fresh "
            "build (validator report: pass), but it compares rho walks only and has no index-calculus arm, so like "
            "E29 it cannot pass the validation gate (note §9.38 and §9.39).")
-    return {"e32": e32, "e32_head": ["p", "log₂ n", "curves", "median D (0 GAE)", "median D (0.1)", "median D (1)",
+    v = k["e40"]
+    bd = v["bands"]
+    one = lambda x: f"{x:.4f}" if x < 10 else f"{x:,.0f}"
+    rg = lambda r: one(r[0]) if one(r[0]) == one(r[1]) else f"{one(r[0])}–{one(r[1])}"
+    e40 = ("Macaulay rows stored from their lead (E40, component speed-up of the chain solve's matrix build). "
+           "Solver A builds every Macaulay row over all 448 columns, 176,064 cells per call, and 41.6 % of them lie "
+           "left of each row's lead, where the echelon and the normal forms never read. Variant V stores each row "
+           "from its lead on ({c} cells per call) with exactly A's arithmetic and pays {o} counted offset operations "
+           "per call. Field multiplications are identical, so V equals A at 0 GAE; with the cell traffic priced at "
+           "the band V is cheaper than A by {a1} at 0.1 GAE and {a2} at 1 GAE on all {n} rows, and cheaper than E25 "
+           "at every weight. That is the registered weak rank (equal at 0, strictly ahead at 0.1 and 1); the size "
+           "of the gain depends on pricing one cell at 0.1 or 1 GAE (at 0.01 GAE per cell it would be about 1.06×). "
+           "It moves no row of tables A–C and no 0-GAE S value. Rho is ahead of every row at every weight: on the "
+           "closest row V is {r0:,.0f}×, {r1:,.0f}× and {r2:,.0f}× the matched walk (iii), A {s0:,.0f}×, "
+           "{s1:,.0f}× and {s2:,.0f}×. Class: engineering (a native-work constant), validated (independent "
+           "rebuild and replay, 466 recomputed figures, gate valid; note §9.50 and §9.51)."
+           ).format(c="–".join(f"{x:,.0f}" for x in v["cells_v"]), o="–".join(f"{x:,.0f}" for x in v["offset_ops"]),
+                    a1=rg(bd["a_over_v"][1]) + "×", a2=rg(bd["a_over_v"][2]) + "×", n=v["rows"],
+                    r0=bd["v_over_rho"][0][0], r1=bd["v_over_rho"][1][0], r2=bd["v_over_rho"][2][0],
+                    s0=bd["a_over_rho"][0][0], s1=bd["a_over_rho"][1][0], s2=bd["a_over_rho"][2][0])
+    e40_rows = [[label] + [rg(bd[key][i]) for i in range(3)] for label, key in (
+        ("S_A / S_V", "a_over_v"), ("S_E25 / S_V", "e25_over_v"),
+        ("S_A / S_V, lead scans priced (σ1)", "a_over_v_sigma1"),
+        ("S_A / S_V, structural work priced (σ4)", "a_over_v_sigma4"),
+        ("S_V / rho (distance remaining)", "v_over_rho"), ("S_A / rho", "a_over_rho"))]
+    e41 = ("The order-24 shortfall was noise (E41, reference correction; not shown as a row). E34's apparent step "
+           "shortfall of the order-24 walk is two sampling errors in opposite directions; on 512 fresh walks per arm "
+           "both walks run at their ideal step count, and a 32-jump table fix is not resolved. Re-measured, the "
+           "order-24 reference on E18's j = 0 curves is stronger than E34 reported: 1.761 / 1.418 / 1.275 against "
+           "E29's order-6 walk and 1.696 / 1.320 / 1.162 against the cheap order-6 walk at 0 / 0.1 / 1 GAE (the "
+           "band-ranked order-24 arm), so E18's ψ-row distances to rho lengthen by those factors; the GLS rows above "
+           "are unchanged (order 24 does not apply there). Independently replayed byte for byte (validator report: "
+           "pass, six errata), but like E34 it compares rho walks only and cannot pass the validation gate (note "
+           "§9.52 and §9.53).")
+    g39 = k["e39"]
+    NM = {"chain-fifo": "F (first arrival)", "chain-static": "S (static order)", "chain-fifo-static": "H (F, else S)",
+          "chain-sparsest-est": "B″ (E33)", "chain-lifo": "L (last arrival, negative control)",
+          "chain-counted": "A", "macaulay": "E25"}
+    e39_rows = [[NM[r["x"]], NM[r["reference"]]] + [rg(x) for x in r["ranges"]]
+                + [r["order"].replace("X ", "") + f" ({'/'.join(str(n) for n in r['rows_x_ahead'])} of {r['rows']} rows ahead)"]
+                for r in g39["ranks"] if r["x"] != "chain-sparsest-est" or r["reference"] == "chain-counted"]
+    f_rho, a_rho = g39["rho"]["chain-fifo"], g39["rho"]["chain-counted"]
+    e39 = ("Pivot rules F, S and H in the chain solve (E39, engineering of the echelon; third pre-registered "
+           "confirmation). E31's ranked solver A orders each pivot bucket by a counted rule; F takes the first row to "
+           "arrive (no selection work), S a fixed per-call order from each equation's support, H takes F where an "
+           "untouched row exists and S otherwise. On fresh target streams over E25's 20 GLS rows and E24's 12 rows, "
+           "each of F, S and H is ahead of A and of E25 at 0, 0.1 and 1 GAE on all 32 rows; against B″ the order is "
+           "unresolved, and the negative-control rule L is behind A everywhere. E36 and E37 measured the same effect "
+           "but voided the rank on a failed control, and E38 stopped at its pilot; E39 registered controls that touch "
+           "rows the solve reads, and every gating control passed. The gain is in the solve's own multiplications "
+           "(F: 1.46–1.54× fewer at 0 GAE) and shrinks to about 1.2 % at 1 GAE, where the Macaulay build dominates "
+           "(E40 above attacks that part). Rho is ahead of every row at every weight: F is {f0} rho at 0 GAE and "
+           "{f2} at 1 GAE across the rows, A {a0} and {a2}. Class: engineering, validated (independent rebuild and "
+           "replay of 31 runs, 7,286 summary values recomputed, gate valid; six errata, none changing a verdict; note "
+           "§9.48 and §9.49)."
+           ).format(f0=rg(f_rho[0]) + "×", f2=rg(f_rho[2]) + "×", a0=rg(a_rho[0]) + "×", a2=rg(a_rho[2]) + "×")
+    return {"e39": e39, "e39_head": ["rule X", "against", "0 GAE", "0.1 GAE", "1 GAE", "order across the band"],
+            "e39_rows": e39_rows,
+            "e32": e32, "e32_head": ["p", "log₂ n", "curves", "median D (0 GAE)", "median D (0.1)", "median D (1)",
                                      "D range (0 GAE)"],
             "e32_rows": e32_rows, "e33": e33,
             "e33_head": ["solver", "ratio", "0 GAE", "0.1 GAE", "1 GAE", "rank across the band"],
-            "e33_rows": e33_rows, "e34": e34}
+            "e33_rows": e33_rows, "e34": e34,
+            "e40": e40, "e40_head": ["ratio (32 rows)", "0 GAE", "0.1 GAE", "1 GAE"], "e40_rows": e40_rows,
+            "e41": e41}
 
 
 STYLE = """
@@ -4945,7 +5063,24 @@ def page(doc: dict, standalone: bool) -> str:
                  + gh(src["validation"], 'Validation') + ' · ' + gh(src["report"], 'Report'))
     P.append('<h3>A cheaper order-24 walk (E34, not shown as a row)</h3><p>' + esc(t["e34"]) + '</p>'
              + gh(k["e34"]["source"], 'Frozen study summary') + ' · '
-             + gh(k["e34"]["validator_report"], 'Validator report') + '</section>')
+             + gh(k["e34"]["validator_report"], 'Validator report'))
+    P.append('<h3>Macaulay rows stored from their lead (E40)</h3><p>' + esc(t["e40"]) + '</p>'
+             '<div class="scroll"><table><thead><tr>'
+             + "".join(f"<th>{esc(c)}</th>" for c in t["e40_head"]) + '</tr></thead><tbody>')
+    for r in t["e40_rows"]:
+        P.append("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>")
+    P.append('</tbody></table></div>' + gh(k["e40"]["source"], 'Frozen study summary') + ' · '
+             + gh(k["e40"]["validation"], 'Validation') + ' · ' + gh(k["e40"]["report"], 'Report'))
+    P.append('<h3>Pivot rules F, S and H (E39)</h3><p>' + esc(t["e39"]) + '</p>'
+             '<div class="scroll"><table><thead><tr>'
+             + "".join(f"<th>{esc(c)}</th>" for c in t["e39_head"]) + '</tr></thead><tbody>')
+    for r in t["e39_rows"]:
+        P.append("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>")
+    P.append('</tbody></table></div>' + gh(k["e39"]["source"], 'Frozen study summary') + ' · '
+             + gh(k["e39"]["validation"], 'Validation') + ' · ' + gh(k["e39"]["report"], 'Report'))
+    P.append('<h3>The order-24 shortfall was noise (E41, not shown as a row)</h3><p>' + esc(t["e41"]) + '</p>'
+             + gh(k["e41"]["source"], 'Frozen study summary') + ' · '
+             + gh(k["e41"]["validator_report"], 'Validator report') + '</section>')
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'

@@ -65,6 +65,8 @@ jobs:
         run: node docs/ecdlp-hardness-corpus/validate.mjs
       - name: Attack graph and citation linkage
         run: node docs/ecdlp-hardness-corpus/attack-graph.mjs --check
+      - name: Weakness analysis is current
+        run: node docs/ecdlp-hardness-corpus/weakness.mjs --check
       - name: Generated files are current
         run: |
           node docs/ecdlp-hardness-corpus/render.mjs

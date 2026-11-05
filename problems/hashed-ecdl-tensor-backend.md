@@ -76,6 +76,15 @@ Explicit work policies can terminate a run with an unknown result.
 
 ## Next discriminating step
 
+The [2026-11-04 entry-cost source audit](../research/hashed_ecdl_entry_cost_20261104/README.md)
+and [structured map](../research/hashed_ecdl_entry_cost_20261104/audit-map.json)
+isolate target-row usage, positive incoming exponents, preparation before the
+zero-entry shortcut, coefficient-choice traversal and aggregate retained data.
+These are unverified observations in statement PCC-20261104-1df881; the next
+local task is the usage/row-budget invariant and its bit/space ledger, followed
+by the full path induction. The operation meter is not an independent bit-cost
+or peak-memory certificate. Status stays open. [pcc:unverified]
+
 An independent reviewer should reproduce the direct-versus-recursive controls
 and audit the general invariants above from the pinned manuscript and source.
 Preserve the first disagreement with exact arithmetic as a regression fixture.
