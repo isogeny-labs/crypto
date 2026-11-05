@@ -647,3 +647,11 @@ mod tests {
         );
     }
 }
+
+/// Independently audits affine-domain membership and unchanged chain generators.
+#[path = "checked_affine_domain_audit.rs"]
+pub mod audit;
+
+/// Distinct finite unit-span adapter; requires the independent affine audit.
+#[path = "checked_affine_matrix_rows.rs"]
+pub mod matrix_rows;

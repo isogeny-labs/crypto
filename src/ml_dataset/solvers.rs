@@ -373,6 +373,8 @@ pub(super) struct WorkerResidualCustody {
     sat_report_unavailable: bool,
     boolean_rows: Option<koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt>,
     boolean_rows_report_unavailable: bool,
+    affine_rows: Option<koblitz_m3::sat_original_owner::affine_rows::OwnedAttempt>,
+    affine_rows_report_unavailable: bool,
 }
 pub(super) struct WorkerResidualArtifact {
     path: &'static str,
@@ -391,7 +393,7 @@ impl WorkerResidualCustody {
         items
             .try_reserve_exact(Self::CAPACITY)
             .map_err(|e| e.to_string())?;
-        Ok(Self { items, sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false })
+        Ok(Self { items, sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false })
     }
     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
@@ -400,7 +402,8 @@ impl WorkerResidualCustody {
         self.items.push(item);
         Ok(())
     }
-    pub(super) fn boolean_rows_report_unavailable(&self) -> bool { self.boolean_rows_report_unavailable }
+    pub(super) fn boolean_rows_report_unavailable(&self) -> bool { self.boolean_rows_report_unavailable || self.affine_rows_report_unavailable }
+    pub(super) fn affine_rows_report_unavailable(&self)->bool {self.affine_rows_report_unavailable}
     pub(super) fn sat_report_unavailable(&self) -> bool {
         self.sat_report_unavailable
     }
@@ -423,13 +426,24 @@ impl WorkerSolveOutput {
             residual: WorkerResidualCustody::default(),
         }
     }
+    fn from_original_row_failure(custody:koblitz_m3::sat_original_owner::worker::Custody)->Self {
+        // Reuse the proven detached pre-native ownership transport; no SAT report
+        // is requested and no producer ledger is recreated.
+        Self {data:SolverData{outcome:Value::Null,artifacts:Vec::new()},stored:Vec::new(),
+            residual:WorkerResidualCustody{sat:Some(custody),affine_rows_report_unavailable:true,..Default::default()}}
+    }
+    fn from_original_affine_rows(mut custody:koblitz_m3::sat_original_owner::affine_rows::OwnedAttempt)->Self {
+        let outcome=custody.outcome();let unavailable=outcome.is_none();
+        Self{data:SolverData{outcome:outcome.unwrap_or(Value::Null),artifacts:Vec::new()},stored:Vec::new(),
+            residual:WorkerResidualCustody{affine_rows:Some(custody),affine_rows_report_unavailable:unavailable,..Default::default()}}
+    }
     fn from_original_boolean_rows(mut custody: koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt) -> Self {
         let outcome=custody.outcome();
         let unavailable=outcome.is_none();
         Self { data: SolverData { outcome:outcome.unwrap_or(Value::Null), artifacts:Vec::new() },
             stored:Vec::new(), residual:WorkerResidualCustody {
                 items:Vec::new(),sat:None,sat_report_unavailable:false,
-                boolean_rows:Some(custody),boolean_rows_report_unavailable:unavailable,
+                boolean_rows:Some(custody),boolean_rows_report_unavailable:unavailable, affine_rows:None, affine_rows_report_unavailable:false,
             } }
     }
     fn from_sat_custody(mut custody: koblitz_m3::sat_original_owner::worker::Custody) -> Self {
@@ -441,7 +455,7 @@ impl WorkerSolveOutput {
             data: SolverData { outcome: outcome.unwrap_or(Value::Null), artifacts: Vec::new() },
             stored: Vec::new(),
             residual: WorkerResidualCustody {
-                items: Vec::new(), sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false,
+                items: Vec::new(), sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false,
             },
         }
     }
@@ -647,8 +661,15 @@ pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<V
             reason:if c.schema == "crypto.ml-dataset.channel-requests/v1" {super::types::ChannelDispositionReason::SatCentralWorkerReplayNotIntegrated} else if eligible {super::types::ChannelDispositionReason::RequiresActualSatInitialReplay} else {super::types::ChannelDispositionReason::OutsideSatInitialProfile},
             execution_verified:false,training_export_admitted:false}
     });
+    let affine_boolean_row=c.affine_boolean_row.as_ref().map(|r| {
+        let eligible=koblitz_m3::sat_original_owner::affine_worker::supported(config);
+        super::types::ChannelDisposition {request:r.clone(),
+            status:if eligible {super::types::ChannelDispositionStatus::Requested} else {super::types::ChannelDispositionStatus::Unsupported},
+            reason:if eligible {super::types::ChannelDispositionReason::RequiresActualAffineUnitRow} else {super::types::ChannelDispositionReason::OutsideAffineUnitRowProfile},
+            execution_verified:false,training_export_admitted:false}
+    });
     Ok(Some(serde_json::to_value(super::types::RequestedChannelDispositions {
-        schema:"crypto.ml-dataset.requested-channels/v1".into(),boolean_consequence:boolean,sat_initial:sat,
+        schema:"crypto.ml-dataset.requested-channels/v1".into(),boolean_consequence:boolean,sat_initial:sat,affine_boolean_row,
     }).map_err(|e|e.to_string())?))
 }
 /// Historical replay allowance explicitly supplied by an authorized caller.
@@ -771,6 +792,18 @@ pub(super) fn solve_with_verified_worker_originals(
     original.matches_bound(config, case, directory, &binding)?;
     if context.is_some_and(|c| c.launch.binding != binding) {
         return Err("verified worker originals differ from execution attempt".into());
+    }
+    if config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some()) {
+        config.channels.as_ref().unwrap().validate()?;
+        if !koblitz_m3::sat_original_owner::affine_worker::supported(config) {
+            return Ok(WorkerSolveOutput::legacy(SolverData{outcome:json!({
+                "strategy":"original-affine-unit-row-unsupported","status":"unsupported",
+                "solver_completed":false,"full_span_search":false,"training_export_admitted":false}),artifacts:Vec::new()}));
+        }
+        let context=context.ok_or("original row requires original execution context")?;
+        if LIVE_SINK.with(|slot|slot.borrow().is_some()){return Err("nested live solver sink".into())}
+        let sink=CaptureEmitter::create(directory,binding,limits.clone())?;
+        return Ok(koblitz_m3::sat_original_owner::affine_worker::run(original,case,context,sink,&limits));
     }
     // Optional initial channel owns one original-budget pattern. Once selected,
     // no partial or refused attempt can fall through to the legacy SAT solver.
@@ -6561,6 +6594,11 @@ mod verified_worker_original_tests {
             );
             Self::finish_original_capture_setup(fixture)
         }
+        pub(super) fn with_original_row_shape(n:u32,twist:bool,solver:&str,work:u64)->Self {
+            let channels=serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v3",
+                "affine_boolean_row":{"mode":"affine_unit_row","pattern":1,"row_index":0}})).unwrap();
+            Self::finish_original_capture_setup(Self::with_family_policy_channels(n,twist,4,solver,work,true,false,Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),"binary",3,Some(channels)))
+        }
         pub(super) fn with_sat_initial_shape(n: u32, twist: bool) -> Self {
             Self::with_sat_initial_work(n, twist, 16384)
         }
@@ -7301,3 +7339,57 @@ mod sat_paid_report_telemetry_control;
 #[cfg(test)]
 #[path = "sat_initial_branch_controls.rs"]
 mod sat_initial_branch_controls;
+
+#[cfg(test)]
+mod original_row_dispatch_controls {
+    use super::*;
+    use crate::ml_dataset::{self as dataset,telemetry};
+    #[test]
+    fn genuine_dispatch_both_twists_retains_published_row() {
+        for twist in [false,true] {
+            let f=verified_worker_original_tests::Fixture::with_original_row_shape(23,twist,"f4",16384);
+            dataset::execution::create(&f.root).unwrap();let mut artifacts=Vec::new();
+            let case=telemetry::measured(&f.root,&mut artifacts,"curve-construction",||dataset::curves::generate(&f.config)).unwrap();
+            let original=verify_and_store_worker_originals(&f.config,&case,&f.root,Some(&f.binding),&mut artifacts).unwrap();
+            let ctx=dataset::execution::admit(&f.root).unwrap().unwrap();
+            let (_,limits)=dataset::admit_capture_context(&f.root).unwrap().unwrap();
+            let result=solve_with_verified_worker_originals(&f.config,&case,&f.root.join("live"),f.binding.clone(),limits,Some(&ctx),&original).unwrap();
+            let (data,_,custody)=result.into_parts();
+            assert!(custody.affine_rows.is_some()); assert!(!custody.affine_rows_report_unavailable());
+            assert_eq!(data.outcome["finite_row_receipt_committed"],true);
+            assert_eq!(data.outcome["solver_completed"],false);
+            assert_eq!(data.outcome["full_span_search"],false);
+        }
+    }
+    #[test]
+    fn exhausted_original_admission_moves_real_ledger_without_fallback() {
+        let f=verified_worker_original_tests::Fixture::with_original_row_shape(23,false,"f4",1);
+        dataset::execution::create(&f.root).unwrap();let mut artifacts=Vec::new();
+        let case=telemetry::measured(&f.root,&mut artifacts,"curve-construction",||dataset::curves::generate(&f.config)).unwrap();
+        let original=verify_and_store_worker_originals(&f.config,&case,&f.root,Some(&f.binding),&mut artifacts).unwrap();
+        let ctx=dataset::execution::admit(&f.root).unwrap().unwrap();
+        let (_,limits)=dataset::admit_capture_context(&f.root).unwrap().unwrap();
+        let result=solve_with_verified_worker_originals(&f.config,&case,&f.root.join("live"),f.binding.clone(),limits,Some(&ctx),&original).unwrap();
+        let(data,_,custody)=result.into_parts();assert!(data.outcome.is_null());
+        assert!(custody.affine_rows_report_unavailable());
+        assert!(!custody.sat_report_unavailable());
+        let retained=custody.sat.as_ref().expect("actual detached original admission owner");
+        let ledger=retained.original_ledger_for_control().expect("charged original ledger survives");
+        assert_eq!(ledger.0,1);assert!(ledger.3.is_some());
+        assert!(custody.affine_rows.is_none());
+    }
+    #[test]
+    fn unsupported_request_never_falls_through_to_enumerator() {
+        let f=verified_worker_original_tests::Fixture::with_original_row_shape(23,false,"enumerate",16384);
+        dataset::execution::create(&f.root).unwrap();let mut artifacts=Vec::new();
+        let case=telemetry::measured(&f.root,&mut artifacts,"curve-construction",||dataset::curves::generate(&f.config)).unwrap();
+        let original=verify_and_store_worker_originals(&f.config,&case,&f.root,Some(&f.binding),&mut artifacts).unwrap();
+        let ctx=dataset::execution::admit(&f.root).unwrap().unwrap();
+        let (_,limits)=dataset::admit_capture_context(&f.root).unwrap().unwrap();
+        let result=solve_with_verified_worker_originals(&f.config,&case,&f.root.join("live"),f.binding.clone(),limits,Some(&ctx),&original).unwrap();
+        let(data,_,custody)=result.into_parts();assert_eq!(data.outcome["status"],"unsupported");
+        assert_eq!(data.outcome["strategy"],"original-affine-unit-row-unsupported");
+        assert!(custody.affine_rows.is_none());assert!(custody.sat.is_none());
+        assert!(!f.root.join("live/committed.json").exists());
+    }
+}

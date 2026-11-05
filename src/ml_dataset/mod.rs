@@ -2762,6 +2762,12 @@ fn verify_cell_with_replay_session(dir:&Path,replay:bool,project:bool,sat_sessio
         return Err("cell provenance differs from frozen plan".into());
     }
     solvers::verify_requested_channel_disposition(&manifest.config, &manifest.outcome)?;
+    if manifest.config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some())
+        || manifest.outcome["adapter_id"]=="original-affine-unit-row-v1"
+        || manifest.artifacts.iter().any(|a|a.role=="boolean-original-affine-unit-row"||a.path.contains("boolean-affine-original-pattern-")) {
+        return Err("affine row requires explicit cumulative CLI replay and projection integration".into());
+    }
+
     if solvers::needs_sat_initial_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
         let session=sat_session.ok_or("explicit independently bounded SAT replay policy required")?;
         session.verify(dir,&manifest)?;

@@ -87,6 +87,8 @@ pub struct ChannelRequests {
     pub boolean_consequence: Option<BooleanRequest>,
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_sat")]
     pub sat_initial: Option<SatRequest>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_original_row")]
+    pub affine_boolean_row: Option<AffineBooleanRowRequest>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
@@ -94,6 +96,12 @@ pub enum BooleanRequest { Produce { row_index: u32 } }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
 pub enum SatRequest { CaptureAndCheckInitial {} }
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(tag="mode", rename_all="snake_case", deny_unknown_fields)]
+pub enum AffineBooleanRowRequest { AffineUnitRow { pattern:u32, row_index:u32 } }
+fn present_original_row<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<AffineBooleanRowRequest>,D::Error>{
+    AffineBooleanRowRequest::deserialize(d).map(Some)
+}
 fn present_boolean<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<BooleanRequest>,D::Error>{
     BooleanRequest::deserialize(d).map(Some)
 }
@@ -107,6 +115,13 @@ pub(super) fn present_channels<'de,D:serde::Deserializer<'de>>(d:D)->Result<Opti
 }
 impl ChannelRequests {
     pub fn validate(&self)->Result<(),String>{
+        if self.schema == "crypto.ml-dataset.channel-requests/v3" {
+            if self.affine_boolean_row.is_none() || self.boolean_consequence.is_some() || self.sat_initial.is_some() {
+                return Err("v3 requires only affine_boolean_row".into());
+            }
+            return Ok(());
+        }
+        if self.affine_boolean_row.is_some() {return Err("original row requires explicit v3".into())}
         if !matches!(self.schema.as_str(), "crypto.ml-dataset.channel-requests/v1" | "crypto.ml-dataset.channel-requests/v2") || (self.boolean_consequence.is_none() && self.sat_initial.is_none())
             || (self.schema == "crypto.ml-dataset.channel-requests/v2" && self.sat_initial.is_none()) {
             return Err("unknown or empty channel request".into());
@@ -274,6 +289,7 @@ pub enum ChannelDispositionReason {
     RequiresActualOriginalShapeAndRetainedRow, OutsideOrdinaryN3Profile,
     SatCentralWorkerReplayNotIntegrated,
     RequiresActualSatInitialReplay, OutsideSatInitialProfile,
+    RequiresActualAffineUnitRow, OutsideAffineUnitRowProfile,
 }
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(deny_unknown_fields)]
@@ -287,6 +303,8 @@ pub struct RequestedChannelDispositions {
     pub schema:String,
     pub boolean_consequence:Option<ChannelDisposition<BooleanRequest>>,
     pub sat_initial:Option<ChannelDisposition<SatRequest>>,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub affine_boolean_row:Option<ChannelDisposition<AffineBooleanRowRequest>>,
 }
 #[cfg(test)]
 mod channel_tests {

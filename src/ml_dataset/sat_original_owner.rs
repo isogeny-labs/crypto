@@ -959,3 +959,11 @@ pub(in crate::ml_dataset::solvers) mod worker;
 // Original-ledger finite Boolean row producer; no CLI activation.
 #[path = "original_boolean_rows.rs"]
 pub(in crate::ml_dataset::solvers) mod boolean_rows;
+
+#[path="original_affine_rows.rs"]
+pub(in crate::ml_dataset::solvers) mod affine_rows;
+#[path="affine_row_central.rs"]
+pub(in crate::ml_dataset::solvers) mod affine_central;
+
+#[path="affine_boolean_row_worker.rs"]
+pub(in crate::ml_dataset::solvers) mod affine_worker;
