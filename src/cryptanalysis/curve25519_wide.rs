@@ -33,7 +33,7 @@ use num_traits::{One, ToPrimitive, Zero};
 use serde_json::{json, Value};
 
 use crate::cryptanalysis::fp_backend::{Fp256, PrimeField};
-use crate::cryptanalysis::ic_boundary::GroupOps;
+use crate::cryptanalysis::ic_boundary::{CountedGroup, GroupOps};
 
 /// `p = 2^255 − 19`.
 pub const P25519: &str =
@@ -244,6 +244,46 @@ impl Curve25519Wide {
 impl Default for Curve25519Wide {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl CountedGroup for Curve25519Wide {
+    type Elt = WidePoint;
+
+    fn identity(&self) -> Self::Elt {
+        Curve25519Wide::identity(self)
+    }
+
+    fn is_identity(&self, p: &Self::Elt) -> bool {
+        Curve25519Wide::is_identity(self, p)
+    }
+
+    fn add(&self, ops: &mut GroupOps, p: Self::Elt, q: Self::Elt) -> Self::Elt {
+        Curve25519Wide::add(self, ops, p, q)
+    }
+
+    fn double(&self, ops: &mut GroupOps, p: Self::Elt) -> Self::Elt {
+        Curve25519Wide::double(self, ops, p)
+    }
+
+    fn neg(&self, p: Self::Elt) -> Self::Elt {
+        Curve25519Wide::neg(self, p)
+    }
+
+    fn key(&self, p: &Self::Elt) -> u64 {
+        Curve25519Wide::key(self, p)
+    }
+
+    fn counts_field_ops(&self) -> bool {
+        true
+    }
+
+    fn mul(&self, ops: &mut GroupOps, p: Self::Elt, k: u64) -> Self::Elt {
+        Curve25519Wide::mul_biguint(self, ops, p, &BigUint::from(k))
+    }
+
+    fn mul_biguint(&self, ops: &mut GroupOps, p: Self::Elt, k: &BigUint) -> Self::Elt {
+        Curve25519Wide::mul_biguint(self, ops, p, k)
     }
 }
 
@@ -569,6 +609,20 @@ mod tests {
         let mut ops = GroupOps::default();
         let g8 = curve.mul_u64(&mut ops, curve.generator, curve.cofactor);
         assert!(curve.mul_biguint(&mut ops, g8, &curve.r).is_none());
+    }
+
+    #[test]
+    fn counted_group_scalar_path_reaches_the_wide_order() {
+        let curve = Curve25519Wide::new();
+        let mut ops = GroupOps::default();
+        assert!(
+            CountedGroup::mul_biguint(&curve, &mut ops, curve.generator, &curve.r).is_none(),
+            "the trait's wide scalar path must accept [r]G"
+        );
+        assert!(
+            CountedGroup::mul(&curve, &mut ops, curve.generator, curve.cofactor).is_some(),
+            "[8]G is not the identity"
+        );
     }
 
     #[test]

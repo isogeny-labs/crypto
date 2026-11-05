@@ -1294,6 +1294,16 @@ pub trait CountedGroup {
         }
         acc
     }
+
+    /// `[k]P` for a scalar wider than one word.  The default converts when it
+    /// fits a `u64`; a group whose subgroup order (or cofactor) needs more
+    /// overrides this with its wide multiplication.
+    fn mul_biguint(&self, ops: &mut GroupOps, p: Self::Elt, k: &BigUint) -> Self::Elt {
+        let k = k
+            .to_u64()
+            .expect("this group's scalar multiplication is one word");
+        self.mul(ops, p, k)
+    }
 }
 
 fn mix(v: u64) -> u64 {
