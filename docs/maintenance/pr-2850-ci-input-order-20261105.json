@@ -1,0 +1,92 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 2850,
+  "date": "2026-11-05",
+  "standing": "unverified",
+  "source_parent": "54b1bad61151161b73fb239572bb3aecd2b42c73",
+  "base_main": "d9c228db855c475da6ee11843654d6dca7bd97a3",
+  "workflow": {
+    "path": ".github/workflows/ecbench.yml",
+    "old_blob": "26fb10eb2c491cd34ded98b568c73465adb108bf",
+    "new_blob": "8dc6620907b64bc5005f3a23329d25fa8440c947",
+    "only_change": "Move the exact existing two-line compile-input setup block from line272 to231, before session expansion and hydration.",
+    "proof": "Original and repaired text are identical after removing the moved block."
+  },
+  "observations": [
+    {
+      "job": 127188076089,
+      "stage": "compile-input materialization",
+      "inputs": 208,
+      "seconds": 1401,
+      "result": "Overall harness cancelled at45minutes, stillcompiling."
+    },
+    {
+      "job": 127195704188,
+      "stage": "compile-input materialization",
+      "inputs": 208,
+      "seconds": 20,
+      "result": "Overall APS job later cancelled at25minutes;34scoped library tests passed, not full job."
+    }
+  ],
+  "source_comparison": {
+    "complete_branch_delta_files": 92,
+    "rust_or_cargo_paths_changed": 0,
+    "classifier_blob": "fa6f4ce2f078278333d91020a0a5ddc35a14ced8",
+    "classifier_matches_main": true,
+    "root_entries": [
+      {
+        "path": "Cargo.toml",
+        "branch": "4863d96e15c3fe919e4b744f2a246d55fc1b8104",
+        "main": "4863d96e15c3fe919e4b744f2a246d55fc1b8104"
+      },
+      {
+        "path": "Cargo.lock",
+        "branch": "426a5848aa26aecc9325b763b496c4761f413455",
+        "main": "426a5848aa26aecc9325b763b496c4761f413455"
+      },
+      {
+        "path": "src",
+        "branch": "09a75cc4ada7cc2f838a899247a714161df97feb",
+        "main": "09a75cc4ada7cc2f838a899247a714161df97feb"
+      },
+      {
+        "path": "examples",
+        "branch": "8c0c2f8b84f616115af8224acf66efbafa21e4af",
+        "main": "8c0c2f8b84f616115af8224acf66efbafa21e4af"
+      },
+      {
+        "path": "tests",
+        "branch": "5a5ccad9afd3d9cd1771c00f79900c0359c3dc35",
+        "main": "5a5ccad9afd3d9cd1771c00f79900c0359c3dc35"
+      },
+      {
+        "path": "benches",
+        "branch": "053d1b4f838913e23f07124c0803a4aaae445113",
+        "main": "053d1b4f838913e23f07124c0803a4aaae445113"
+      },
+      {
+        "path": "crates",
+        "branch": "cb0a697e787d418fbeb448a606102b46630528b4",
+        "main": "cb0a697e787d418fbeb448a606102b46630528b4"
+      },
+      {
+        "path": "isogeny_algos",
+        "branch": "8b57bb4a80eac0e2ec1f254fbf82a01aeb2a4baa",
+        "main": "8b57bb4a80eac0e2ec1f254fbf82a01aeb2a4baa"
+      },
+      {
+        "path": "tools",
+        "branch": "9407db659b80e56c03355b01bcde64cdcdaf6bf0",
+        "main": "9407db659b80e56c03355b01bcde64cdcdaf6bf0"
+      }
+    ]
+  },
+  "unchanged": [
+    "all commands/arguments",
+    "all session and artifact checks",
+    "replay/control coverage",
+    "timeouts",
+    "source/evidence/metrics/ledger"
+  ],
+  "validation": "Workflow-state hypothesis pending actual fresh CI; no local execution or performance result asserted."
+}
