@@ -35,3 +35,11 @@ preserved. No access escalation, capacity change, S3 staging or cloud job.
 The current user was asked for the existing shared reservation ledger/operator
 receipt location while preparation continued. Freeze and software readiness
 are complete; publication readback remains to be attached after push.
+
+Exact publication readback passed for all14 listed protocol/source-manifest,
+materialization, command, runner, analyzer and admission files at
+ed24073bf650c2db6f761051d5bd2668ef5d47b6. The operator runbook's
+check-experiment-git verified local/index/committed byte equality and the exact
+GitHub commit; publication-receipt.json retains hashes and byte counts.
+The current rustc -Vv matches rustc.txt. This completes publication readiness,
+not spending or cluster admission. No input file changed after this readback.
