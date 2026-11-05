@@ -1,102 +1,86 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105",
+  "latest_record": "20261105T1854Z-ecbench-statistics-v2",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 41,
+    "measured": 40,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
   "series": [
     {
-      "better": "lower",
-      "first": 31.693595555358375,
-      "latest": 31.693595555358375,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 31.47185
-      },
-      "metric": "s_prime_dgbf_w0_p32",
+      "better": "neutral",
+      "first": 648.2,
+      "latest": 648.2,
+      "latest_derived": {},
+      "metric": "censored_ratio_lower_bound_ic_sub6_mitm",
       "points": [
         {
-          "commit": "827361301c47",
+          "commit": "18bbecb9d758",
           "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 31.47185
-          },
-          "n": null,
-          "record": "20261105T1759Z-ic-packed-filter-p32",
-          "reference": 1.0070458230707695,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
-          "value": 31.693595555358375
-        }
-      ],
-      "problem": "archive:ic-packed-filter-p32-20261029",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 63.49613790555689,
-      "latest": 63.49613790555689,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 31.625534
-      },
-      "metric": "s_prime_dgbf_w1_p32",
-      "points": [
-        {
-          "commit": "827361301c47",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 31.625534
-          },
-          "n": null,
-          "record": "20261105T1759Z-ic-packed-filter-p32",
-          "reference": 2.00774912001418,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
-          "value": 63.49613790555689
-        }
-      ],
-      "problem": "archive:ic-packed-filter-p32-20261029",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 0.9601,
-      "latest": 0.9601,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0
-      },
-      "metric": "wall_per_gae_filtered_over_unfiltered_p32",
-      "points": [
-        {
-          "commit": "827361301c47",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0
-          },
-          "n": 288,
-          "record": "20261105T1759Z-ic-packed-filter-p32",
+          "derived": {},
+          "n": 48,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
           "reference": null,
           "reference_kind": null,
           "spread": [
-            0.9569,
-            0.9633
+            419.6,
+            1001.0
           ],
-          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
-          "value": 0.9601
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 648.2
         }
       ],
-      "problem": "archive:ic-packed-filter-p32-20261029",
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 71.0,
+      "latest": 71.0,
+      "latest_derived": {},
+      "metric": "heavy_tail_rows_flagged_n4_before_fix",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 71,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 71.0
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 13.1,
+      "latest": 13.1,
+      "latest_derived": {},
+      "metric": "ops_interval_width_k2_new_over_old",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 1,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 13.1
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
       "unit": "ratio"
     },
     {
@@ -1263,29 +1247,6 @@
       ],
       "problem": "ic:curve25519-family-k32",
       "unit": "S"
-    },
-    {
-      "better": "neutral",
-      "first": 211.0,
-      "latest": 211.0,
-      "latest_derived": {},
-      "metric": "raw_pins_reverified",
-      "points": [
-        {
-          "commit": "19b5e74b9af6",
-          "date": "2026-11-05",
-          "derived": {},
-          "n": null,
-          "record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Custody rebinding of the historical aimed-gather row to this PR's registry; no measurement was rerun. [pcc:unverified]",
-          "value": 211.0
-        }
-      ],
-      "problem": "registry-rebinding:ic-aimed-gather",
-      "unit": "count"
     }
   ],
   "units": {

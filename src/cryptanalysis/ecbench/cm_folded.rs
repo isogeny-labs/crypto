@@ -421,7 +421,7 @@ pub fn solve(
         &mut counters,
     );
     Ok(SolveReport {
-        recovered,
+        recovered: recovered.map(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from),
         exhausted: recovered.is_none(),
         phases,
         total_gae,

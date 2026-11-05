@@ -72,7 +72,10 @@ fn streaming_and_exhaustive_recover_with_closed_phase_accounts() {
     let (inst, q) = fixture();
     for stop in ["exhaustive", "first_informative"] {
         let rep = solve(&method(&[("stop", stop)]), &inst, q, 20261026).unwrap();
-        assert_eq!(rep.recovered, Some(37));
+        assert_eq!(
+            rep.recovered,
+            Some(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(37u64))
+        );
         assert!(!rep.exhausted);
         assert_accounting(&rep);
         assert!(rep.total_gae > 0.0);
@@ -253,7 +256,10 @@ fn native_method_is_plannable_and_runs_through_ecbench_dispatch() {
         20261026,
     )
     .unwrap();
-    assert_eq!(rep.recovered, Some(37));
+    assert_eq!(
+        rep.recovered,
+        Some(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(37u64))
+    );
     assert_accounting(&rep);
     assert!(matches!(inst, Instance::Prime(_)));
 }
