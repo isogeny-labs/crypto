@@ -1,0 +1,56 @@
+{
+  "schema": "software.independent-runtime-admission-review/v1",
+  "decision": "approve",
+  "scope": "one-private-runtime-qualification",
+  "independent": true,
+  "reviewer": "/root/assembler_independent_review_v2",
+  "execution_allowance_approved": true,
+  "inputs_sha256": "e36c48dcf769a20a8b334ac560ee59fc7314aad39188a3350a2971753350d85f",
+  "owner": "24806e07-13ac-4791-92da-12dd595ae9e4",
+  "reservation_sha256": "9a83a537a9b4772feab546da118abc87f0e678ff8854644839fdc2e511c89d01",
+  "fresh_cost_record_sha256": "aee5bdc54464177acbd38e3e33e5b0460d06be088447f5f4405bb24cecbebc8b",
+  "qualifier_binding_sha256": "c343d69881bdda663bb9b70cafe195cafeb8439406a29d2da409376b992f6a48",
+  "derived_predecessor_sha256": "d49dd09464343a2b19ef3e05e97fa17408826433f1cfe7e58615e116d825de89",
+  "descriptor_source_review_sha256": "8e8db1c98eb214fc34e07473a85afce2f86c5d55286b5310d9635ab1700f8b94",
+  "supervisor_source_sha256": "d6587a8b2d7c169672d2d3dcbdc82a79bd4ee0ba38c324995c0e887a905d96b0",
+  "qualifier_source_sha256": "5679e3dc79ce346f6faec4a1bbb6e9e6e568ae1e622a1ff040faeefaffd440e2",
+  "private_contract_sha256": "d01505611fe558e4bd022db848d8a5b51efda165bbf721253f56f0b7422df41c",
+  "closure_sha256": "ae0b0c22a515755041cd74bc504a792f4f6b9308c5c5968867ceb9a0d0ae7cf5",
+  "limits": {
+    "total_seconds": 300,
+    "reserve_seconds": 30,
+    "cpu_percent": 200,
+    "memory_bytes": 2147483648,
+    "swap_bytes": 0,
+    "tasks": 256,
+    "disk_bytes": 4294967296,
+    "attempts": 1,
+    "stop_seconds": 5
+  },
+  "expires_at": "2026-11-04T06:00:00Z",
+  "accounting": {
+    "additional_worker_seconds_conservative": 600,
+    "remaining_worker_seconds": 22200,
+    "additional_usd": "1.00",
+    "total_reserved_usd": "59.00",
+    "estimated_daily_unreserved_usd": "9.87",
+    "estimated_monthly_unreserved_usd": "590.621",
+    "estimate_not_guarantee": true
+  },
+  "findings": [
+    "Fresh source/tool/gate/fixture/control/receipt hashes and source reviewer bindings verified; newowner root/cgroup absent.",
+    "Derived predecessor carries current8fb3 diskhash/custody and Q0passed-Q1transportfailed status with endpoint/worker/stoppedloop/postreview joins; no priorfailure erased.",
+    "Descriptor publication keeps rootfs readonly and existing16MiB tmpfs, pins PID/proc/work descriptors, checks custody and lifetime, records possiblepublication beforeexclusive rename and rechecks finalboundary. Actual proc-root access is untested and must failclosed without permissionexpansion.",
+    "Fresh cost observations hashverified;59USD carries55shared once+3oldattempts+1new. No guarantee of billingcompleteness; coordinator confirms no newknown competing paidcommitment.",
+    "No source suite or runtime repeated by thisreview; existing independently reviewed controls apply."
+  ],
+  "conditions": [
+    "Publish exact final source/input/review/launch command and preserve GitHub revision readback before launch.",
+    "One300second2CPU2GiB qualification only, same4GiBdisk; no newpaidresource, scientificrun, rebuild or automaticretry.",
+    "Reconcile changed custody/owner/knowncompetingcommitment before launch; worker must rehash currentdisk before mounting.",
+    "Do not add capabilities or relax filesystem/cgroup restrictions to overcome descriptor access failure.",
+    "Preserve possiblepublication uncertainty and cleanup failures; success requires all nativeQ0-Q4 evidence and stoppedcgroup/detachedloop readback.",
+    "Storage allocation remains bounded by2026-11-04T06:00:00Z; laterretention/use needs reviewedallocation."
+  ],
+  "runtime_executed_by_reviewer": false
+}

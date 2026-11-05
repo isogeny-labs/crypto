@@ -20,7 +20,9 @@ jobs:
           persist-credentials: false
       - name: Install shellcheck and jq
         run: sudo apt-get update && sudo apt-get install -y shellcheck jq
-      - name: shellcheck
-        run: find tools/delphi_tools -maxdepth 1 -type f ! -name '*.md' -print0 | xargs -0 shellcheck -s bash
+      - name: shellcheck (bash scripts, by shebang)
+        run: grep -lZ '^#!/usr/bin/env bash' tools/delphi_tools/* | xargs -0 shellcheck -s bash
+      - name: Python helpers compile
+        run: grep -l '^#!/usr/bin/env python3' tools/delphi_tools/* | xargs python3 -m py_compile
       - name: Tests
         run: bash tools/delphi_tools/test.sh
