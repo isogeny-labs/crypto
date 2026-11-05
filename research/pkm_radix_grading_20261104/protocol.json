@@ -89,9 +89,9 @@
           "radix": "2"
         },
         "env": {
-          "RAYON_NUM_THREADS": "2"
+          "RAYON_NUM_THREADS": "4 (amendment A2)"
         },
-        "threads": 2
+        "threads": 4
       }
     },
     {
@@ -439,6 +439,19 @@
         "prune_modules.py"
       ],
       "build_prune_diff_sha256": "a80c0f6800ad87f37f701ce6be704c10da733476c022da9a5f4f634eef4676cc"
+    },
+    {
+      "id": "A2",
+      "date": "2026-11-05",
+      "filed_before_affected_data": false,
+      "affects": "G0 (rerun) and the thread count of every cell; filed before any graded study row",
+      "text": "muladds depends on RAYON_NUM_THREADS (t=9 draw 0: 1 thread 45950147498, 2 threads 45952850022, 4 threads 45957046778 = committed). All cells run at RAYON_NUM_THREADS=4, the committed rows' setting; G0 rerun at 4 threads must match exactly; the 2-thread G0 rows are retained as runs/G0th2-t9-t10.* and are not admissible.",
+      "evidence": [
+        "diag/t9-th1.jsonl",
+        "diag/t9-th2.jsonl",
+        "diag/t9-th4.jsonl",
+        "runs/G0th2-t9-t10.jsonl"
+      ]
     }
   ],
   "freeze": {
