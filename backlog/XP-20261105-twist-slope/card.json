@@ -1,0 +1,92 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261105-twist-slope",
+  "title": "Target-aware chord and membership encoding",
+  "status": "draft",
+  "status_note": "Proposed only; no runner/proof/experiment, lease/funding/task promotion or checkpoint scope approval.",
+  "created": "2026-11-05",
+  "authors": [
+    "research reasoning lane"
+  ],
+  "owner_hint": "Quadratic-twist follow-up",
+  "question": "Proposed construction: parameterize a line through the negative actual target by its slope, divide the factor-base polynomial by the residual intersection quadratic, and develop a complete algebraic collector including distinct, tangent, repeated-root, vertical and identity cases. The quartic/cubic starting formulation is a proof target, not a completed theorem or cost result.",
+  "decision_value": "This proposal separates useful coefficient rank from root multiplicity and tests a different source-preserving encoding or collector. An exact coverage and cost contract will expose blocked setup, failures and representation effects before any gain is claimed. The current deliverable is a reviewable research plan; native code, proof, data and signed verdicts are future prerequisites.",
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/twist-collector-and-slope",
+    "build": []
+  },
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/quadratic_twist_followup_20261105/run-slope.sh",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "scheme": "single",
+    "count": 1,
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Existing local resources only, two workers/600sec stages/3600sec focused window after approved checkpoint and frozen protocol; no paid compute or asset upload."
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261105-twist-slope"
+    ],
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Draft only;local authorized work separate from any Cairn lease. No remote submission or paid provisioning."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261105-twist-slope"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding, paid resource or task reservation requested."
+    },
+    "ttl_s": 86400,
+    "notes": "Draft only; no Cairn lease, run or publication performed."
+  },
+  "outputs": {
+    "result_schema": "Future canonical schema required; no scientific result",
+    "verify": [],
+    "land": "research/quadratic_twist_followup_20261105"
+  },
+  "links": {
+    "prs": [],
+    "lead": "crypto-autoresearcher:LEAD-ICP-isogeny-transported-relation-yield",
+    "notes": [
+      "research/quadratic_twist_followup_20261105/IDEAS.md",
+      "research/quadratic_twist_followup_20261105/PLAN.md"
+    ]
+  },
+  "blocked_on": []
+}

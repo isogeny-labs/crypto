@@ -1,0 +1,92 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261105-twist-collector",
+  "title": "Complementary degree-limited main/twist collector",
+  "status": "draft",
+  "status_note": "Proposed only; no runner/proof/experiment, lease/funding/task promotion or checkpoint scope approval.",
+  "created": "2026-11-05",
+  "authors": [
+    "research reasoning lane"
+  ],
+  "owner_hint": "Quadratic-twist follow-up",
+  "question": "Proposed experiment: transport one factor base through a subgroup isomorphism with an explicit inverse, collect original-valid coefficient rows from both models at bounded degree and equal total work, and test whether joint row-space growth exceeds each standalone model. No gain or execution is asserted.",
+  "decision_value": "This proposal separates useful coefficient rank from root multiplicity and tests a different source-preserving encoding or collector. An exact coverage and cost contract will expose blocked setup, failures and representation effects before any gain is claimed. The current deliverable is a reviewable research plan; native code, proof, data and signed verdicts are future prerequisites.",
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/twist-collector-and-slope",
+    "build": []
+  },
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/quadratic_twist_followup_20261105/run-collector.sh",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "scheme": "single",
+    "count": 1,
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Existing local resources only, two workers/600sec stages/3600sec focused window after approved checkpoint and frozen protocol; no paid compute or asset upload."
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261105-twist-collector"
+    ],
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Draft only;local authorized work separate from any Cairn lease. No remote submission or paid provisioning."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261105-twist-collector"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding, paid resource or task reservation requested."
+    },
+    "ttl_s": 86400,
+    "notes": "Draft only; no Cairn lease, run or publication performed."
+  },
+  "outputs": {
+    "result_schema": "Future canonical schema required; no scientific result",
+    "verify": [],
+    "land": "research/quadratic_twist_followup_20261105"
+  },
+  "links": {
+    "prs": [],
+    "lead": "crypto-autoresearcher:LEAD-ICP-isogeny-transported-relation-yield",
+    "notes": [
+      "research/quadratic_twist_followup_20261105/IDEAS.md",
+      "research/quadratic_twist_followup_20261105/PLAN.md"
+    ]
+  },
+  "blocked_on": []
+}
