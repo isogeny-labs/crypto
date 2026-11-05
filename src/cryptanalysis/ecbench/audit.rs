@@ -57,9 +57,9 @@ use crate::cryptanalysis::ecbench::methods::{
     MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
 };
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, floor_s,
-    from_str_legacy_floats, grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput,
-    Record, CHILD_INPUT_SCHEMA,
+    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note,
+    f6_tree_version, floor_s, from_str_legacy_floats, grade_for_version, json_roundtrip,
+    ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA, F6_TREE_VERSION,
 };
 use crate::cryptanalysis::ecbench::runner::{read_session, PlanDoc, Session};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Execution, Level, Plan, Spec};
@@ -612,6 +612,21 @@ pub fn replay_with_accounting(
     host: &HostCapsule,
     session: &crate::cryptanalysis::ecbench::runner::Session,
 ) -> (bool, String) {
+    // A session recorded before the F6-IC few-candidate closure searched the
+    // older tree; replay it with that tree (every legacy profile predates it).
+    let older_tree = f6_tree_version(&session.accounting_versions) < F6_TREE_VERSION;
+    crate::cryptanalysis::koblitz_index_calculus::set_f6_tree_v1(older_tree);
+    let result = replay_with_accounting_inner(input_json, r, host, session);
+    crate::cryptanalysis::koblitz_index_calculus::set_f6_tree_v1(false);
+    result
+}
+
+fn replay_with_accounting_inner(
+    input_json: &str,
+    r: &Record,
+    host: &HostCapsule,
+    session: &crate::cryptanalysis::ecbench::runner::Session,
+) -> (bool, String) {
     let out = child_main(input_json);
     if r.outcome.status == "error" {
         // The recorded error must be the one the replay hits (the runner
@@ -819,11 +834,22 @@ fn compare_replay(
                 .filter(|s| s.op_unit.contains("word XOR"))
                 .filter(|_| diffs.contains(&"phase counts"))
                 .and_then(|_| {
-                    f4_accounting_note(
+                    let f4 = f4_accounting_note(
                         &session.accounting_versions,
                         session.started_unix_ms,
                         has_bmi2,
-                    )
+                    );
+                    let f6 = r
+                        .method
+                        .params
+                        .get("engine")
+                        .is_some_and(|e| e == "f6-ic")
+                        .then(|| f6_tree_note(&session.accounting_versions))
+                        .flatten();
+                    match (f4, f6) {
+                        (Some(a), Some(b)) => Some(format!("{a}; {b}")),
+                        (a, b) => a.or(b),
+                    }
                 });
             match note {
                 Some(n) => format!("differs in {} ({n})", diffs.join(", ")),
