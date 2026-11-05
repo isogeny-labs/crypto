@@ -250,3 +250,7 @@ impl OwnedExpansion {
     pub fn owner_failure(&self) -> Option<Error> { self.owner_failure }
     pub fn charged(&self) -> Charge { self.attempt.charge }
 }
+
+/// Distinct checked-domain encoding; never substitutes raw-domain generators.
+#[path = "checked_affine_domain.rs"]
+pub mod affine_domain;
