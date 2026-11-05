@@ -4292,7 +4292,7 @@ mod tests {
             o
         };
         let mut one = prep("m=2,mode=full,lifts=1");
-        let mut shared = vec![
+        let mut shared = [
             prep("m=2,mode=full,lifts=2"),
             prep("m=2,mode=full,lifts=2,guess=1"),
             prep("m=2,mode=full,lifts=2,trace=1"),
