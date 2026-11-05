@@ -1,0 +1,88 @@
+{
+  "branch": "claude/ic-stride-renew-prime-20261029",
+  "closed_utc": "2026-11-05T18:26:03+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/rb/target/release/verify_registry_binding",
+        "/tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/rb/old-registry.json",
+        "docs/curves/registry.json",
+        "benchmarks/20261029-ic-aimed-gather/validator-report.json",
+        "benchmarks/20261029-ic-aimed-gather",
+        "benchmarks/20261029-ic-aimed-gather/registry-binding-20261105b/validator-report.json",
+        "benchmarks/20261029-ic-aimed-gather/registry-binding-20261105b/source-equivalence.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T18:26:03+00:00",
+      "wall_s": 0.374
+    }
+  ],
+  "commit": "e0174b2f511f021cf7db4c98c18dec5976e95ffb",
+  "commit_dirty": true,
+  "created_utc": "2026-11-05T18:26:03+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261029-ic-aimed-gather"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39"
+  },
+  "id": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105b",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "raw_pins_reverified",
+      "note": "raw input pins of the historical aimed-gather validator report reverified against the current registry; no benchmark rerun [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 211.0
+    }
+  ],
+  "problem": "registry-rebinding:ic-aimed-gather",
+  "raw": [
+    {
+      "bytes": 1225,
+      "path": "benchmarks/20261029-ic-aimed-gather/registry-binding-20261105b/source-equivalence.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/be6faa83253b21e8bc3885e7ab1e111654448f3363e70021f1f945e71370f843",
+      "sha256": "be6faa83253b21e8bc3885e7ab1e111654448f3363e70021f1f945e71370f843",
+      "uploaded": false
+    },
+    {
+      "bytes": 171166,
+      "path": "benchmarks/20261029-ic-aimed-gather/registry-binding-20261105b/validator-report.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/735e0d4191f756c5d324a1485c2c941ddb7a78a85ce48dcfd70d01fc4f00c083",
+      "sha256": "735e0d4191f756c5d324a1485c2c941ddb7a78a85ce48dcfd70d01fc4f00c083",
+      "uploaded": false
+    },
+    {
+      "bytes": 22391879,
+      "path": "docs/curves/registry.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f6/f6e63f486cbb824f8867f0fdf0d7de228ec9780a6b0384215bc673b37b8f6a7d",
+      "sha256": "f6e63f486cbb824f8867f0fdf0d7de228ec9780a6b0384215bc673b37b8f6a7d",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261029-ic-aimed-gather/report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261029-ic-aimed-gather/sessions-intervals.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-aimed-gather-registry-binding-20261105b",
+  "status": "measured",
+  "summary": "Custody rebinding of the historical aimed-gather row to this PR's registry; no measurement was rerun. [pcc:unverified]",
+  "validation": "benchmarks/20261029-ic-aimed-gather/VALIDATION.json"
+}
