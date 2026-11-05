@@ -40,6 +40,17 @@ wide arithmetic and relation-elimination components must be traced through
 an actual measured solver before claiming that widening a JSON field makes
 the pipeline support Curve25519.
 
+The reusable actual-curve implementation is already present:
+`src/cryptanalysis/curve25519_wide.rs`, `Curve25519Wide`, uses `Fp256`,
+BigUint scalars, an explicit Montgomery-to-Weierstrass transformation and
+counted group operations. Its bounded `smoke` scan is not a complete IC
+pipeline. The remaining shared interfaces are explicit in current source:
+`ic_framework/stages.rs::InstanceCtx.r` is `u64`,
+`ic_boundary.rs::CountedGroup::mul` accepts `u64`, and
+`ecbench/workload.rs::Instance::r` returns `u128`. The existing ecbench
+`Instance::Wide` is a binary Koblitz instance, not this prime-field backend.
+Reuse `Curve25519Wide`; do not build a second Curve25519 arithmetic engine.
+
 ## Next action
 
 Trace and implement the missing full-width path from the Autolab target
