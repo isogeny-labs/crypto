@@ -1,0 +1,1513 @@
+{
+  "evaluation": "leave-one-component-out over the exporter's split_component",
+  "negative_control_within_stratum_permutation": {
+    "components": 5,
+    "folds": [
+      {
+        "held_out_component": "field-size-n23",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 0.9107142857142857,
+            "brier": 0.06335793995240796,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0022440922969465095,
+                "n": 24,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.2-0.4",
+                "mean_pred": 0.32369394109620825,
+                "n": 4,
+                "observed": 1.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.5301114443396562,
+                "n": 16,
+                "observed": 0.75
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6848287895592715,
+                "n": 18,
+                "observed": 0.7222222222222222
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9681811295792132,
+                "n": 106,
+                "observed": 0.9811320754716981
+              }
+            ],
+            "logloss": 0.19512856304691303,
+            "n": 168
+          },
+          "mlp_32": {
+            "accuracy": 0.8869047619047619,
+            "brier": 0.07634829433493177,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.014256993637542459,
+                "n": 24,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.2-0.4",
+                "mean_pred": 0.2538047269957564,
+                "n": 5,
+                "observed": 1.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.4986298026215948,
+                "n": 18,
+                "observed": 0.7222222222222222
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6853093569210919,
+                "n": 15,
+                "observed": 0.8
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9941943140226011,
+                "n": 106,
+                "observed": 0.9716981132075472
+              }
+            ],
+            "logloss": 0.2606955169052846,
+            "n": 168
+          },
+          "stratum_majority": {
+            "accuracy": 0.9345238095238095,
+            "brier": 0.05493094252154023,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0434173669467787,
+                "n": 24,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7043226381461674,
+                "n": 32,
+                "observed": 0.71875
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9558823529411747,
+                "n": 112,
+                "observed": 0.9821428571428571
+              }
+            ],
+            "logloss": 0.18926114471673475,
+            "n": 168
+          }
+        },
+        "test_rows": 168,
+        "test_verified_rate": 0.7916666666666666,
+        "train_rows": 651
+      },
+      {
+        "held_out_component": "field-size-n25",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 0.9281437125748503,
+            "brier": 0.057023929674255416,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.004065687162655335,
+                "n": 23,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7692314584270162,
+                "n": 24,
+                "observed": 0.75
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9676442319619128,
+                "n": 120,
+                "observed": 0.95
+              }
+            ],
+            "logloss": 0.18947461893182518,
+            "n": 167
+          },
+          "mlp_32": {
+            "accuracy": 0.9281437125748503,
+            "brier": 0.05671658552043852,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0012972376827573608,
+                "n": 23,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.5159327094470674,
+                "n": 8,
+                "observed": 0.625
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6962414462992961,
+                "n": 22,
+                "observed": 0.8181818181818182
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.975344981372814,
+                "n": 114,
+                "observed": 0.956140350877193
+              }
+            ],
+            "logloss": 0.21106174142159695,
+            "n": 167
+          },
+          "stratum_majority": {
+            "accuracy": 0.9281437125748503,
+            "brier": 0.056350077733520264,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.04075021312872975,
+                "n": 23,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7040998217468806,
+                "n": 32,
+                "observed": 0.71875
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9579831932773092,
+                "n": 112,
+                "observed": 0.9732142857142857
+              }
+            ],
+            "logloss": 0.19883933455771738,
+            "n": 167
+          }
+        },
+        "test_rows": 167,
+        "test_verified_rate": 0.7904191616766467,
+        "train_rows": 652
+      },
+      {
+        "held_out_component": "field-size-n27",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 0.9259259259259259,
+            "brier": 0.0587295252740713,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.006547220873957069,
+                "n": 18,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.5709991547071858,
+                "n": 4,
+                "observed": 0.5
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7533451867250291,
+                "n": 12,
+                "observed": 0.8333333333333334
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9642005605959766,
+                "n": 128,
+                "observed": 0.9375
+              }
+            ],
+            "logloss": 0.19747818046688645,
+            "n": 162
+          },
+          "mlp_32": {
+            "accuracy": 0.9259259259259259,
+            "brier": 0.06389001762115142,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0007795468305267185,
+                "n": 18,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.2-0.4",
+                "mean_pred": 0.34803126033642273,
+                "n": 2,
+                "observed": 1.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.5149351875351281,
+                "n": 4,
+                "observed": 0.5
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7350856749608897,
+                "n": 14,
+                "observed": 0.7857142857142857
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9749785738680802,
+                "n": 124,
+                "observed": 0.9435483870967742
+              }
+            ],
+            "logloss": 0.23707931670494042,
+            "n": 162
+          },
+          "stratum_majority": {
+            "accuracy": 0.9259259259259259,
+            "brier": 0.05743038101824924,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.031699346405228764,
+                "n": 18,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7038770053475935,
+                "n": 32,
+                "observed": 0.71875
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9579831932773091,
+                "n": 112,
+                "observed": 0.9732142857142857
+              }
+            ],
+            "logloss": 0.20086421299714055,
+            "n": 162
+          }
+        },
+        "test_rows": 162,
+        "test_verified_rate": 0.8148148148148148,
+        "train_rows": 657
+      },
+      {
+        "held_out_component": "field-size-n29",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 0.9506172839506173,
+            "brier": 0.040151188079068326,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.008647941862582782,
+                "n": 19,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.560189171391133,
+                "n": 2,
+                "observed": 1.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7250920962066224,
+                "n": 29,
+                "observed": 0.7586206896551724
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9787865172221124,
+                "n": 112,
+                "observed": 0.9910714285714286
+              }
+            ],
+            "logloss": 0.14397468423146553,
+            "n": 162
+          },
+          "mlp_32": {
+            "accuracy": 0.9629629629629629,
+            "brier": 0.034816027929413906,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.001760290086278023,
+                "n": 19,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.5150529322842498,
+                "n": 4,
+                "observed": 0.25
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.680181492858922,
+                "n": 10,
+                "observed": 0.8
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9734830033676833,
+                "n": 129,
+                "observed": 0.9767441860465116
+              }
+            ],
+            "logloss": 0.14741428316405397,
+            "n": 162
+          },
+          "stratum_majority": {
+            "accuracy": 0.9506172839506173,
+            "brier": 0.04366700119718611,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.03307805116506437,
+                "n": 19,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6907020872865276,
+                "n": 31,
+                "observed": 0.7741935483870968
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9537815126050406,
+                "n": 112,
+                "observed": 0.9910714285714286
+              }
+            ],
+            "logloss": 0.16579406494272078,
+            "n": 162
+          }
+        },
+        "test_rows": 162,
+        "test_verified_rate": 0.8333333333333334,
+        "train_rows": 657
+      },
+      {
+        "held_out_component": "field-size-n31",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 0.93125,
+            "brier": 0.04944333938381941,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.008285066027188712,
+                "n": 16,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7365856133506293,
+                "n": 30,
+                "observed": 0.6666666666666666
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9783068894332753,
+                "n": 114,
+                "observed": 0.9912280701754386
+              }
+            ],
+            "logloss": 0.15230708254121175,
+            "n": 160
+          },
+          "mlp_32": {
+            "accuracy": 0.93125,
+            "brier": 0.055520243580764794,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.016172591096612877,
+                "n": 16,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.2-0.4",
+                "mean_pred": 0.31418216874678334,
+                "n": 2,
+                "observed": 0.5
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.5414094601425523,
+                "n": 2,
+                "observed": 1.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6369058468116581,
+                "n": 4,
+                "observed": 0.25
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9869626322955716,
+                "n": 136,
+                "observed": 0.9485294117647058
+              }
+            ],
+            "logloss": 0.22911739592968736,
+            "n": 160
+          },
+          "stratum_majority": {
+            "accuracy": 0.93125,
+            "brier": 0.05089124573828876,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.029411764705882356,
+                "n": 16,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7190285204991088,
+                "n": 32,
+                "observed": 0.65625
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9516806722689061,
+                "n": 112,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.17490891175789175,
+            "n": 160
+          }
+        },
+        "test_rows": 160,
+        "test_verified_rate": 0.83125,
+        "train_rows": 659
+      }
+    ],
+    "pooled": {
+      "logistic_regression": {
+        "accuracy": 0.9291819291819292,
+        "brier": 0.05384217342152008,
+        "calibration": [
+          {
+            "bin": "0.0-0.2",
+            "mean_pred": 0.0056209094742310835,
+            "n": 100,
+            "observed": 0.0
+          },
+          {
+            "bin": "0.2-0.4",
+            "mean_pred": 0.32369394109620825,
+            "n": 4,
+            "observed": 1.0
+          },
+          {
+            "bin": "0.4-0.6",
+            "mean_pred": 0.5402799123202505,
+            "n": 22,
+            "observed": 0.7272727272727273
+          },
+          {
+            "bin": "0.6-0.8",
+            "mean_pred": 0.7341049083674921,
+            "n": 113,
+            "observed": 0.7345132743362832
+          },
+          {
+            "bin": "0.8-1.0",
+            "mean_pred": 0.971229749398934,
+            "n": 580,
+            "observed": 0.9689655172413794
+          }
+        ],
+        "logloss": 0.17595648014801338,
+        "n": 819
+      },
+      "mlp_32": {
+        "accuracy": 0.9267399267399268,
+        "brier": 0.05759682732881028,
+        "calibration": [
+          {
+            "bin": "0.0-0.2",
+            "mean_pred": 0.006782431261390075,
+            "n": 100,
+            "observed": 0.0
+          },
+          {
+            "bin": "0.2-0.4",
+            "mean_pred": 0.2881611659050216,
+            "n": 9,
+            "observed": 0.8888888888888888
+          },
+          {
+            "bin": "0.4-0.6",
+            "mean_pred": 0.508488042286885,
+            "n": 36,
+            "observed": 0.6388888888888888
+          },
+          {
+            "bin": "0.6-0.8",
+            "mean_pred": 0.6959629221182951,
+            "n": 65,
+            "observed": 0.7692307692307693
+          },
+          {
+            "bin": "0.8-1.0",
+            "mean_pred": 0.9807512212629997,
+            "n": 609,
+            "observed": 0.9589490968801314
+          }
+        ],
+        "logloss": 0.21732711133702248,
+        "n": 819
+      },
+      "stratum_majority": {
+        "accuracy": 0.9340659340659341,
+        "brier": 0.05269748053985753,
+        "calibration": [
+          {
+            "bin": "0.0-0.2",
+            "mean_pred": 0.03648931151407925,
+            "n": 100,
+            "observed": 0.0
+          },
+          {
+            "bin": "0.6-0.8",
+            "mean_pred": 0.7044922028273845,
+            "n": 159,
+            "observed": 0.7169811320754716
+          },
+          {
+            "bin": "0.8-1.0",
+            "mean_pred": 0.9554621848739601,
+            "n": 560,
+            "observed": 0.9839285714285714
+          }
+        ],
+        "logloss": 0.1860636240428211,
+        "n": 819
+      }
+    },
+    "pooled_by_arm": {
+      "bsgs": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 0.9875,
+            "brier": 0.01264735846788415,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9808372744721229,
+                "n": 240,
+                "observed": 0.9875
+              }
+            ],
+            "logloss": 0.07222619067708289,
+            "n": 240
+          },
+          "mlp_32": {
+            "accuracy": 0.9875,
+            "brier": 0.01309015048508465,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9893658949300428,
+                "n": 240,
+                "observed": 0.9875
+              }
+            ],
+            "logloss": 0.10825343717310591,
+            "n": 240
+          },
+          "stratum_majority": {
+            "accuracy": 0.9875,
+            "brier": 0.013667820069204167,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9588235294117627,
+                "n": 240,
+                "observed": 0.9875
+              }
+            ],
+            "logloss": 0.08586797113471364,
+            "n": 240
+          }
+        },
+        "positive_rate": 0.9875
+      },
+      "double-large-prime": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 0.7698744769874477,
+            "brier": 0.17171105251650015,
+            "calibration": [
+              {
+                "bin": "0.2-0.4",
+                "mean_pred": 0.32369394109620825,
+                "n": 4,
+                "observed": 1.0
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.5402799123202505,
+                "n": 22,
+                "observed": 0.7272727272727273
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7341049083674921,
+                "n": 113,
+                "observed": 0.7345132743362832
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.8973814213807465,
+                "n": 100,
+                "observed": 0.85
+              }
+            ],
+            "logloss": 0.5203968116152046,
+            "n": 239
+          },
+          "mlp_32": {
+            "accuracy": 0.7615062761506276,
+            "brier": 0.18410888179277826,
+            "calibration": [
+              {
+                "bin": "0.2-0.4",
+                "mean_pred": 0.2881611659050216,
+                "n": 9,
+                "observed": 0.8888888888888888
+              },
+              {
+                "bin": "0.4-0.6",
+                "mean_pred": 0.508488042286885,
+                "n": 36,
+                "observed": 0.6388888888888888
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6959629221182951,
+                "n": 65,
+                "observed": 0.7692307692307693
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9311557077988895,
+                "n": 129,
+                "observed": 0.8294573643410853
+              }
+            ],
+            "logloss": 0.6319156329278957,
+            "n": 239
+          },
+          "stratum_majority": {
+            "accuracy": 0.7866108786610879,
+            "brier": 0.16534270062589373,
+            "calibration": [
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7044922028273845,
+                "n": 159,
+                "observed": 0.7169811320754716
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9000000000000006,
+                "n": 80,
+                "observed": 0.925
+              }
+            ],
+            "logloss": 0.5057918187473501,
+            "n": 239
+          }
+        },
+        "positive_rate": 0.7866108786610879
+      },
+      "enumerate": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.00007505057519391701,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9923923609999881,
+                "n": 240,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.007645490987270521,
+            "n": 240
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 6.948812019356041e-6,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9987941360829165,
+                "n": 240,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0012093575814886924,
+            "n": 240
+          },
+          "stratum_majority": {
+            "accuracy": 1.0,
+            "brier": 0.0008650519031141919,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9705882352941161,
+                "n": 240,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.029852963149681076,
+            "n": 240
+          }
+        },
+        "positive_rate": 1.0
+      },
+      "root": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.00004420310442700519,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0056209094742310835,
+                "n": 100,
+                "observed": 0.0
+              }
+            ],
+            "logloss": 0.00564315665744342,
+            "n": 100
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 0.00026475002516732695,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.006782431261390075,
+                "n": 100,
+                "observed": 0.0
+              }
+            ],
+            "logloss": 0.006919971741517245,
+            "n": 100
+          },
+          "stratum_majority": {
+            "accuracy": 1.0,
+            "brier": 0.0015444183919833788,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.03648931151407925,
+                "n": 100,
+                "observed": 0.0
+              }
+            ],
+            "logloss": 0.03728839182198863,
+            "n": 100
+          }
+        },
+        "positive_rate": 0.0
+      }
+    }
+  },
+  "note": "Development data may debug the pipeline; it may not select a winner or estimate generalisation (training-protocol-20261101).",
+  "primary": {
+    "components": 5,
+    "folds": [
+      {
+        "held_out_component": "field-size-n23",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.000173538806147608,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.00991719135899724,
+                "n": 38,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.989582423250968,
+                "n": 130,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.01039239629850043,
+            "n": 168
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 0.00004033746027534781,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.007479467690032173,
+                "n": 38,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.998371812780702,
+                "n": 130,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.00297222263325808,
+            "n": 168
+          },
+          "stratum_majority": {
+            "accuracy": 0.9166666666666666,
+            "brier": 0.07530278433880509,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0434173669467787,
+                "n": 24,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6963012477718358,
+                "n": 32,
+                "observed": 0.75
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9642857142857126,
+                "n": 112,
+                "observed": 0.9464285714285714
+              }
+            ],
+            "logloss": 0.27361538614793846,
+            "n": 168
+          }
+        },
+        "test_rows": 168,
+        "test_verified_rate": 0.7738095238095238,
+        "train_rows": 651
+      },
+      {
+        "held_out_component": "field-size-n25",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.000057445707704240496,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0002151525697023874,
+                "n": 23,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.994038818103976,
+                "n": 144,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.005198851663080831,
+            "n": 167
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 1.5129634713109154e-6,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.00145447403750182,
+                "n": 23,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9989275433046131,
+                "n": 144,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0011258271536984676,
+            "n": 167
+          },
+          "stratum_majority": {
+            "accuracy": 1.0,
+            "brier": 0.027957150984427664,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.04075021312872975,
+                "n": 23,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6374777183600712,
+                "n": 32,
+                "observed": 1.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9516806722689065,
+                "n": 112,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.12592051945500032,
+            "n": 167
+          }
+        },
+        "test_rows": 167,
+        "test_verified_rate": 0.8622754491017964,
+        "train_rows": 652
+      },
+      {
+        "held_out_component": "field-size-n27",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.00007855160475841492,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.008786469890350866,
+                "n": 24,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9953042508263248,
+                "n": 138,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.00534173562665584,
+            "n": 162
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 2.3605998468478567e-6,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.002777056555175208,
+                "n": 24,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9990944126971847,
+                "n": 138,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0011840249198072242,
+            "n": 162
+          },
+          "stratum_majority": {
+            "accuracy": 0.9629629629629629,
+            "brier": 0.04124647978430898,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.031699346405228764,
+                "n": 18,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6820409982174686,
+                "n": 32,
+                "observed": 0.8125
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9516806722689063,
+                "n": 112,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.15402442484682427,
+            "n": 162
+          }
+        },
+        "test_rows": 162,
+        "test_verified_rate": 0.8518518518518519,
+        "train_rows": 657
+      },
+      {
+        "held_out_component": "field-size-n29",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.00020758469993426674,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0119081578687202,
+                "n": 29,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9914764408267583,
+                "n": 133,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.009236615482154339,
+            "n": 162
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 0.000010508300670566708,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.003402832175303243,
+                "n": 29,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9990011068415399,
+                "n": 133,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0014345576937340445,
+            "n": 162
+          },
+          "stratum_majority": {
+            "accuracy": 0.9382716049382716,
+            "brier": 0.054042284207993875,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.03307805116506437,
+                "n": 19,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6897533206831116,
+                "n": 31,
+                "observed": 0.7741935483870968
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9579831932773096,
+                "n": 112,
+                "observed": 0.9732142857142857
+              }
+            ],
+            "logloss": 0.20362462686482016,
+            "n": 162
+          }
+        },
+        "test_rows": 162,
+        "test_verified_rate": 0.8209876543209876,
+        "train_rows": 657
+      },
+      {
+        "held_out_component": "field-size-n31",
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.00017622841059957225,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.010822718281224091,
+                "n": 40,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9879314187048096,
+                "n": 120,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.011846202553280605,
+            "n": 160
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 3.301022125026393e-6,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0023194705288985006,
+                "n": 40,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.998664854969833,
+                "n": 120,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0015828798138073509,
+            "n": 160
+          },
+          "stratum_majority": {
+            "accuracy": 0.85,
+            "brier": 0.10414370982552809,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.029411764705882356,
+                "n": 16,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.7941176470588237,
+                "n": 24,
+                "observed": 0.25
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9468211527035043,
+                "n": 120,
+                "observed": 0.95
+              }
+            ],
+            "logloss": 0.3052781698478609,
+            "n": 160
+          }
+        },
+        "test_rows": 160,
+        "test_verified_rate": 0.75,
+        "train_rows": 659
+      }
+    ],
+    "pooled": {
+      "logistic_regression": {
+        "accuracy": 1.0,
+        "brier": 0.00013833770412155342,
+        "calibration": [
+          {
+            "bin": "0.0-0.2",
+            "mean_pred": 0.008902093295813767,
+            "n": 154,
+            "observed": 0.0
+          },
+          {
+            "bin": "0.8-1.0",
+            "mean_pred": 0.9918156816814533,
+            "n": 665,
+            "observed": 1.0
+          }
+        ],
+        "logloss": 0.008389763240579625,
+        "n": 819
+      },
+      "mlp_32": {
+        "accuracy": 1.0,
+        "brier": 0.000011773240109637006,
+        "calibration": [
+          {
+            "bin": "0.0-0.2",
+            "mean_pred": 0.003738850562647426,
+            "n": 154,
+            "observed": 0.0
+          },
+          {
+            "bin": "0.8-1.0",
+            "mean_pred": 0.9988208430915371,
+            "n": 665,
+            "observed": 1.0
+          }
+        ],
+        "logloss": 0.0016664440667373164,
+        "n": 819
+      },
+      "stratum_majority": {
+        "accuracy": 0.9340659340659341,
+        "brier": 0.060341251919604585,
+        "calibration": [
+          {
+            "bin": "0.0-0.2",
+            "mean_pred": 0.03648931151407925,
+            "n": 100,
+            "observed": 0.0
+          },
+          {
+            "bin": "0.6-0.8",
+            "mean_pred": 0.6950159955613787,
+            "n": 151,
+            "observed": 0.7417218543046358
+          },
+          {
+            "bin": "0.8-1.0",
+            "mean_pred": 0.9543822650699313,
+            "n": 568,
+            "observed": 0.9735915492957746
+          }
+        ],
+        "logloss": 0.21218530546371514,
+        "n": 819
+      }
+    },
+    "pooled_by_arm": {
+      "bsgs": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.00014399228725211368,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0744704059890136,
+                "n": 3,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9931955603628657,
+                "n": 237,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0077244904902852235,
+            "n": 240
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 7.667832404358364e-6,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.02179306502406511,
+                "n": 3,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9989435509554139,
+                "n": 237,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0013195421436405482,
+            "n": 240
+          },
+          "stratum_majority": {
+            "accuracy": 0.9875,
+            "brier": 0.01366782006920416,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9588235294117627,
+                "n": 240,
+                "observed": 0.9875
+              }
+            ],
+            "logloss": 0.08586797113471366,
+            "n": 240
+          }
+        },
+        "positive_rate": 0.9875
+      },
+      "double-large-prime": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.0002662655461177766,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.022094895259109012,
+                "n": 51,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9875736875063384,
+                "n": 188,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.014624584565361263,
+            "n": 239
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 0.00003054438792687694,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0076164375645707385,
+                "n": 51,
+                "observed": 0.0
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9984403698584342,
+                "n": 188,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.002867616745953264,
+            "n": 239
+          },
+          "stratum_majority": {
+            "accuracy": 0.7866108786610879,
+            "brier": 0.1915362100820143,
+            "calibration": [
+              {
+                "bin": "0.6-0.8",
+                "mean_pred": 0.6950159955613787,
+                "n": 151,
+                "observed": 0.7417218543046358
+              },
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.8980716253443523,
+                "n": 88,
+                "observed": 0.8636363636363636
+              }
+            ],
+            "logloss": 0.595305028302632,
+            "n": 239
+          }
+        },
+        "positive_rate": 0.7866108786610879
+      },
+      "enumerate": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 0.00006289888880487957,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9937759469207353,
+                "n": 240,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.006255781486995983,
+            "n": 240
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 1.290067416642139e-6,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9989977064418872,
+                "n": 240,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.0010029393240054325,
+            "n": 240
+          },
+          "stratum_majority": {
+            "accuracy": 1.0,
+            "brier": 0.0008650519031141919,
+            "calibration": [
+              {
+                "bin": "0.8-1.0",
+                "mean_pred": 0.9705882352941161,
+                "n": 240,
+                "observed": 1.0
+              }
+            ],
+            "logloss": 0.029852963149681076,
+            "n": 240
+          }
+        },
+        "positive_rate": 1.0
+      },
+      "root": {
+        "models": {
+          "logistic_regression": {
+            "accuracy": 1.0,
+            "brier": 7.231899725283453e-8,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.00020671491373720283,
+                "n": 100,
+                "observed": 0.0
+              }
+            ],
+            "logloss": 0.00020675108365888827,
+            "n": 100
+          },
+          "mlp_32": {
+            "accuracy": 1.0,
+            "brier": 1.9227897822902338e-6,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.0012196547578240033,
+                "n": 100,
+                "observed": 0.0
+              }
+            ],
+            "logloss": 0.0012206173613999827,
+            "n": 100
+          },
+          "stratum_majority": {
+            "accuracy": 1.0,
+            "brier": 0.0015444183919833788,
+            "calibration": [
+              {
+                "bin": "0.0-0.2",
+                "mean_pred": 0.03648931151407925,
+                "n": 100,
+                "observed": 0.0
+              }
+            ],
+            "logloss": 0.03728839182198863,
+            "n": 100
+          }
+        },
+        "positive_rate": 0.0
+      }
+    }
+  },
+  "rows": 819,
+  "schema": "ecdlp-dataset-models.summary/v1",
+  "status": "development-only"
+}

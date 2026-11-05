@@ -1,0 +1,59 @@
+{
+  "schema": "ecbench.frontier-preflight-plans/v1",
+  "date": "2026-10-31",
+  "source_commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+  "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
+  "method_registry_sha256": "85fa142069c6eb9a0ae65d112dac133fc8f6d606c15efe348476659f6b81b157",
+  "command": "ecbench plan --spec SPEC --json",
+  "benchmark_work_executed": false,
+  "specs": [
+    {
+      "spec": "specs/prime-p20.json",
+      "spec_id": "ECS1h3320a6f156a5",
+      "executions": 448
+    },
+    {
+      "spec": "specs/prime-p24.json",
+      "spec_id": "ECS1h8d2f84ff0bd1",
+      "executions": 448
+    },
+    {
+      "spec": "specs/prime-p28.json",
+      "spec_id": "ECS1h280a82a43148",
+      "executions": 448
+    },
+    {
+      "spec": "specs/prime-p32.json",
+      "spec_id": "ECS1h483e365694a1",
+      "executions": 392
+    },
+    {
+      "spec": "specs/koblitz-n13.json",
+      "spec_id": "ECS1hde0d0d8ad3fc",
+      "executions": 560
+    },
+    {
+      "spec": "specs/koblitz-n19.json",
+      "spec_id": "ECS1hdbb67f5b5d3d",
+      "executions": 560
+    },
+    {
+      "spec": "specs/koblitz-n23.json",
+      "spec_id": "ECS1hc29442dd34d4",
+      "executions": 560
+    },
+    {
+      "spec": "specs/koblitz-n31.json",
+      "spec_id": "ECS1h2c0cc8702c66",
+      "executions": 560
+    },
+    {
+      "spec": "specs/solver-backends-k17.json",
+      "spec_id": "ECS1h052a2276d7a5",
+      "executions": 728
+    }
+  ],
+  "total_executions": 4704,
+  "status": "planning_only_not_queue_safe",
+  "reason": "The draft requires candidate/reference/A-A sharding under the 3600-second whole-job limit and expansion to the closed implementation roster before freeze."
+}

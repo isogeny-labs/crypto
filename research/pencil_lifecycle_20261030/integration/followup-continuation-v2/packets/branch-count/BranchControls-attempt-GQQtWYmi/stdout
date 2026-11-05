@@ -1,0 +1,108 @@
+/var/tmp/pencil-branch-count-20261101-v1/BranchControls.lean:25:1: error: Tactic `decide` failed for proposition
+  (if 0 = 1 then
+        ({
+            state :=
+              {
+                graph :=
+                  (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                          (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                          (reduced 7 0 ident.b ident.b 1 (-1))).1.1.graph,
+                fixed :=
+                  (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                          (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                          (reduced 7 0 ident.b ident.b 1 (-1))).1.1.fixed },
+            sizes := ⟨#[1, 1], sizes._proof_1⟩,
+            result :=
+              (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                    (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                    (reduced 7 0 ident.b ident.b 1 (-1))).1.2 },
+          { cycles := 1, negative := if 1 * ident.s + -1 * ident.s = 0 then 0 else 1,
+            zero :=
+              (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                  (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                  (reduced 7 0 ident.b ident.b 1 (-1))).2 })
+      else
+        ({
+            state :=
+              branchWord 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0 1
+                (reducedUnionPot 7 ident ident 1 (-1) 0 0) (decide (#[1, 1][↑0] ≤ #[1, 1][↑1])),
+            sizes :=
+              UnionSize.update ⟨#[1, 1], sizes._proof_1⟩ (UnionSize.child ⟨#[1, 1], sizes._proof_1⟩ 0 1)
+                (UnionSize.parent ⟨#[1, 1], sizes._proof_1⟩ 0 1),
+            result :=
+              (if decide (#[1, 1][↑0] ≤ #[1, 1][↑1]) = true then
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0 1
+                    (reducedUnionPot 7 ident ident 1 (-1) 0 0)
+                else
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 1 0
+                    (reversePot 7 (reducedUnionPot 7 ident ident 1 (-1) 0 0))).1 },
+          { cycles := 0, negative := 0,
+            zero :=
+              (if decide (#[1, 1][↑0] ≤ #[1, 1][↑1]) = true then
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0 1
+                    (reducedUnionPot 7 ident ident 1 (-1) 0 0)
+                else
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 1 0
+                    (reversePot 7 (reducedUnionPot 7 ident ident 1 (-1) 0 0))).2 })).2 =
+    { cycles := 0, negative := 0, zero := 1 }
+because its `Decidable` instance
+  instDecidableEqCounts
+    (if 0 = 1 then
+        ({
+            state :=
+              {
+                graph :=
+                  (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                          (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                          (reduced 7 0 ident.b ident.b 1 (-1))).1.1.graph,
+                fixed :=
+                  (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                          (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                          (reduced 7 0 ident.b ident.b 1 (-1))).1.1.fixed },
+            sizes := ⟨#[1, 1], sizes._proof_1⟩,
+            result :=
+              (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                    (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                    (reduced 7 0 ident.b ident.b 1 (-1))).1.2 },
+          { cycles := 1, negative := if 1 * ident.s + -1 * ident.s = 0 then 0 else 1,
+            zero :=
+              (same 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0
+                  (1 * ident.s) (-1 * ident.s) (reduced 7 0 ident.a ident.a 1 (-1))
+                  (reduced 7 0 ident.b ident.b 1 (-1))).2 })
+      else
+        ({
+            state :=
+              branchWord 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0 1
+                (reducedUnionPot 7 ident ident 1 (-1) 0 0) (decide (#[1, 1][↑0] ≤ #[1, 1][↑1])),
+            sizes :=
+              UnionSize.update ⟨#[1, 1], sizes._proof_1⟩ (UnionSize.child ⟨#[1, 1], sizes._proof_1⟩ 0 1)
+                (UnionSize.parent ⟨#[1, 1], sizes._proof_1⟩ 0 1),
+            result :=
+              (if decide (#[1, 1][↑0] ≤ #[1, 1][↑1]) = true then
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0 1
+                    (reducedUnionPot 7 ident ident 1 (-1) 0 0)
+                else
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 1 0
+                    (reversePot 7 (reducedUnionPot 7 ident ident 1 (-1) 0 0))).1 },
+          { cycles := 0, negative := 0,
+            zero :=
+              (if decide (#[1, 1][↑0] ≤ #[1, 1][↑1]) = true then
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0 1
+                    (reducedUnionPot 7 ident ident 1 (-1) 0 0)
+                else
+                  union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 1 0
+                    (reversePot 7 (reducedUnionPot 7 ident ident 1 (-1) 0 0))).2 })).2
+    { cycles := 0, negative := 0, zero := 1 }
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableLeBitVec`, `Bool.decEq`, `instDecidableEqCounts`, `Nat.decEq`, `Nat.decLe`, `USize.decLe`, `instDecidableEqCounts.decEq`, and `USize.decLe._aux_1`, reduction got stuck at the `Decidable` instance
+  match h :
+    (if decide (#[1, 1][↑0] ≤ #[1, 1][↑1]) = true then
+            union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 0 1
+              (reducedUnionPot 7 ident ident 1 (-1) 0 0)
+          else
+            union 7 { graph := { parent := id, pot := fun x => ident }, fixed := fun x => some (1, 2) } 1 0
+              (reversePot 7 (reducedUnionPot 7 ident ident 1 (-1) 0 0))).2.beq
+      1 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯

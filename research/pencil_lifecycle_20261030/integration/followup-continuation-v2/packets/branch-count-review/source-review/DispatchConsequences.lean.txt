@@ -1,0 +1,42 @@
+import EdgeDispatch
+set_option autoImplicit false
+namespace EdgeDispatch
+open SignedWord
+variable {n : Nat}
+theorem answer_canonical (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b x : UInt64)
+ (hp : 0<r.toNat) (hx : (run r s w sizes ru rv pu pv su sv a b).result=.answer x) : x.toNat<r.toNat := by
+ by_cases hd:ru=rv
+ · have h: (after r ⟨s.graph,s.fixed⟩ w ru pu pv su sv a b).2=.answer x := by simpa [run,hd] using hx
+   exact same_answer_canonical r ⟨w,s.fixed⟩ ru _ _ _ _ x hp h
+ · exact UnionReturn.branch_canonical r ⟨w,s.fixed⟩ ru rv _ _ x hp (by simpa [run,hd] using hx)
+theorem answer_exact (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b x k : UInt64)
+ (hp : 0<r.toNat) (hk : k.toNat<r.toNat)
+ (hsafe : GraphSameRoot.Safe (outDecode r (run r s w sizes ru rv pu pv su sv a b).result) (wd r k))
+ (hx : (run r s w sizes ru rv pu pv su sv a b).result=.answer x) : x=k := by
+ have hxc:=answer_canonical r s w sizes ru rv pu pv su sv a b x hp hx
+ have he:wd r x=wd r k := by simpa [hx,outDecode,GraphSameRoot.Safe] using hsafe
+ apply UInt64.toNat.inj
+ exact (PencilWordRefinement.canonical_equality r.toNat x.toNat k.toNat hxc hk).mp he
+theorem no_assertion (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) (k : F r)
+ (hsafe : GraphSameRoot.Safe (outDecode r (run r s w sizes ru rv pu pv su sv a b).result) k) :
+ (run r s w sizes ru rv pu pv su sv a b).result≠.inconsistent := by
+ intro h;simpa [h,outDecode,GraphSameRoot.Safe] using hsafe
+theorem same_sizes (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (root : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) :
+ (run r s w sizes root root pu pv su sv a b).sizes=sizes := by simp [run]
+theorem distinct_sizes (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) (hd : ru≠rv) :
+ (run r s w sizes ru rv pu pv su sv a b).sizes=
+ UnionSize.update sizes (UnionSize.child sizes ru rv) (UnionSize.parent sizes ru rv) := by simp [run,hd]
+theorem updated_parent_exact (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) (hd : ru≠rv)
+ (A B : Finset (Fin n)) (hAB : Disjoint A B)
+ (hA : (UnionSize.sizeAt sizes ru).toNat=A.card) (hB : (UnionSize.sizeAt sizes rv).toNat=B.card)
+ (hn : n<USize.size) :
+ (UnionSize.sizeAt (run r s w sizes ru rv pu pv su sv a b).sizes (UnionSize.parent sizes ru rv)).toNat=A.card+B.card := by
+ rw [distinct_sizes r s w sizes ru rv pu pv su sv a b hd]
+ exact UnionSize.selected_sum_exact sizes ru rv A B hAB hA hB hn
+end EdgeDispatch

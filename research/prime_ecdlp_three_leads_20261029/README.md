@@ -126,3 +126,16 @@ benchmark ranking or canonical curve graph is changed: there is no new measured
 cost, curve, isogeny or admitted comparison to enter there.
 
 ![Implementation and missing experimental bridges](status.svg)
+
+## 2026-10-30 — Activated G1–G6 goal
+
+The user activated the full PKM improvement goal. The additive
+[execution prerequisites](execution-20261030/README.md) provide complete-set
+collection, an independent bounded reference, explicit accounting gaps and a
+tiny cold relation/LA/recovery control. The new structural chain-order lemma
+raises the scoped project audit to13 declarations with zero trusted exceptions.
+The [goal status](execution-20261030/goal-state.json) keeps all scientific
+acceptance requirements and the [specific obstruction](../../problems/symmetric-pkm-complete-cost.md)
+visible. See the versioned validation receipt for actual native test outcomes.
+No scientific panel or admitted improvement is claimed. Prior inputs, drivers,
+reports and validation receipts remain unchanged.

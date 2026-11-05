@@ -1,0 +1,55 @@
+import FastPayloadWords
+set_option autoImplicit false
+namespace FastPayload
+open FastPrelude Polynomial
+noncomputable def decodedSlope (p : UInt64) (w : Inputs) : (ZMod p.toNat)[X] :=
+ C ((slope0 p w).toNat : ZMod p.toNat)+C ((slope1 p w).toNat : ZMod p.toNat)*X
+
+theorem slope_polynomial_decode (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) :
+ decodedSlope p w=FastCRT.slope (w.qa.toNat : ZMod p.toNat) w.ra.toNat w.sa.toNat w.ta.toNat
+ w.qb.toNat w.rb.toNat w.sb.toNat w.tb.toNat := by
+ obtain ⟨_,_,h0,h1⟩ := slope_words_decode p w hp hb hw hn hs
+ simp only [decodedSlope,h0,h1,FastCRT.slope,FastCRT.numerator,div_eq_mul_inv,map_mul,
+ s0Field,s1Field,normField]
+ ring
+
+theorem literal_scale_monic (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) (q : (ZMod p.toNat)[X])
+ (hql : q.leadingCoeff=-(s1Field p w/normField p w)^2) :
+ (C ((inverseLead p w).toNat : ZMod p.toNat)*q).Monic := by
+ obtain ⟨hnf,hsf,_⟩ := guarded_batch_from_inputs p w hp hb hw hn hs
+ rw [(inverse_lead_decode p w hp hb hw hn hs).2]
+ exact FastCRT.scaled_quotient_monic q _ _ hnf hsf hql
+
+noncomputable def sourceU (p : UInt64) (w : Inputs) : (ZMod p.toNat)[X] :=
+ FastCRT.support (w.qa.toNat : ZMod p.toNat) w.ra.toNat*
+ FastCRT.support (w.qb.toNat : ZMod p.toNat) w.rb.toNat
+noncomputable def decodedV (p : UInt64) (w : Inputs) : (ZMod p.toNat)[X] :=
+ FastCRT.delta (w.sa.toNat : ZMod p.toNat) w.ta.toNat+
+ decodedSlope p w*FastCRT.support (w.qa.toNat : ZMod p.toNat) w.ra.toNat
+
+theorem source_payload_quotient (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) (f : (ZMod p.toNat)[X]) (hf : f.natDegree=5)
+ (ha : FastCRT.support (w.qa.toNat : ZMod p.toNat) w.ra.toNat ∣
+ f-(FastCRT.delta (w.sa.toNat : ZMod p.toNat) w.ta.toNat)^2)
+ (hbv : FastCRT.support (w.qb.toNat : ZMod p.toNat) w.rb.toNat ∣
+ f-(FastCRT.delta (w.sb.toNat : ZMod p.toNat) w.tb.toNat)^2) :
+ ∃ q, f-(decodedV p w)^2=sourceU p w*q ∧ q.natDegree=2 ∧
+ (C ((inverseLead p w).toNat : ZMod p.toNat)*q).Monic := by
+ obtain ⟨hnf,hsf,_⟩ := guarded_batch_from_inputs p w hp hb hw hn hs
+ obtain ⟨q,hq,hqd,hql⟩ := FastCRT.source_quotient_exists
+  (w.qa.toNat : ZMod p.toNat) w.ra.toNat w.sa.toNat w.ta.toNat
+  w.qb.toNat w.rb.toNat w.sb.toNat w.tb.toNat f hnf hsf hf ha hbv
+ have hV : decodedV p w=FastCRT.interpolant
+  (w.qa.toNat : ZMod p.toNat) w.ra.toNat w.sa.toNat w.ta.toNat
+  w.qb.toNat w.rb.toNat w.sb.toNat w.tb.toNat := by
+   unfold decodedV FastCRT.interpolant
+   rw [slope_polynomial_decode p w hp hb hw hn hs]
+ refine ⟨q,?_,hqd,?_⟩
+ · rw [hV];exact hq
+ · exact literal_scale_monic p w hp hb hw hn hs q hql
+end FastPayload

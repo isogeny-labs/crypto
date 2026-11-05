@@ -117,6 +117,7 @@ pub fn solve(
     target: Point,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    applicable(m, inst)?;
     if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
         if let Some(result) = pencil::with_active_progress(|sink| {
             pencil::solve_with_progress(m, inst, target, seed, Some(sink))
@@ -134,50 +135,6 @@ pub fn solve(
         .parse::<u64>()
         .map_err(|_| "invalid trial_cap")?;
     let start = Instant::now();
-    if (m.id.contains("genus2") || m.id == "rho.three_leads_jacobian_v1")
-        && inst.family != "scholten"
-    {
-        return Err("genus-2 methods require the certified Scholten family".into());
-    }
-    if matches!(
-        m.id.as_str(),
-        "ic.three_leads_genus2_v1" | "ic.three_leads_genus2_v2"
-    ) {
-        for name in ["independent", "unique_relations"] {
-            if !matches!(m.params[name].as_str(), "0" | "1") {
-                return Err(format!("{name} must be 0 or 1"));
-            }
-        }
-    }
-    if matches!(
-        m.id.as_str(),
-        "ic.three_leads_decomposition_v1" | "ic.three_leads_decomposition_v2"
-    ) {
-        if !matches!(
-            inst.family.as_str(),
-            "subfield" | "pkm_kummer" | "pkm_dickson"
-        ) {
-            return Err("decomposition method requires a subfield or tower fixture".into());
-        }
-        let oracle = m.params["oracle"].as_str();
-        if !matches!(
-            oracle,
-            "linearized" | "linearized_filtered" | "semaev" | "subtract"
-        ) {
-            return Err("unknown study oracle".into());
-        }
-        if !matches!(m.params["random_base"].as_str(), "0" | "1") {
-            return Err("random_base must be 0 or 1".into());
-        }
-        if oracle.starts_with("linearized")
-            && (!inst.curve.binary || inst.family != "subfield" || m.params["random_base"] != "0")
-        {
-            return Err("linearized solver requires the structured binary subfield base".into());
-        }
-        if oracle == "semaev" && inst.curve.binary {
-            return Err("the semaev arm uses the odd-characteristic quadratic; choose linearized or subtract for binary".into());
-        }
-    }
     let rho_online = matches!(
         m.id.as_str(),
         "rho.three_leads_plain_v1" | "rho.three_leads_negation_v1" | "rho.three_leads_jacobian_v1"
@@ -377,6 +334,61 @@ pub fn solve(
             .insert(format!("adapter_accounting_sha256_word_{i}"), word);
     }
     Ok(report)
+}
+
+/// Refusals that are independent of the target and seed. The planner calls
+/// this before a session is admitted, and [`solve`] repeats it as a backstop.
+pub fn applicable(m: &ResolvedMethod, inst: &StudyInstance) -> Result<(), String> {
+    if m.id != "ic.three_leads_genus2_pencil_symbolic_v2" {
+        m.params["trial_cap"]
+            .parse::<u64>()
+            .map_err(|_| "invalid trial_cap")?;
+    }
+    if (m.id.contains("genus2") || m.id == "rho.three_leads_jacobian_v1")
+        && inst.family != "scholten"
+    {
+        return Err("genus-2 methods require the certified Scholten family".into());
+    }
+    if matches!(
+        m.id.as_str(),
+        "ic.three_leads_genus2_v1" | "ic.three_leads_genus2_v2"
+    ) {
+        for name in ["independent", "unique_relations"] {
+            if !matches!(m.params[name].as_str(), "0" | "1") {
+                return Err(format!("{name} must be 0 or 1"));
+            }
+        }
+    }
+    if matches!(
+        m.id.as_str(),
+        "ic.three_leads_decomposition_v1" | "ic.three_leads_decomposition_v2"
+    ) {
+        if !matches!(
+            inst.family.as_str(),
+            "subfield" | "pkm_kummer" | "pkm_dickson"
+        ) {
+            return Err("decomposition method requires a subfield or tower fixture".into());
+        }
+        let oracle = m.params["oracle"].as_str();
+        if !matches!(
+            oracle,
+            "linearized" | "linearized_filtered" | "semaev" | "subtract"
+        ) {
+            return Err("unknown study oracle".into());
+        }
+        if !matches!(m.params["random_base"].as_str(), "0" | "1") {
+            return Err("random_base must be 0 or 1".into());
+        }
+        if oracle.starts_with("linearized")
+            && (!inst.curve.binary || inst.family != "subfield" || m.params["random_base"] != "0")
+        {
+            return Err("linearized solver requires the structured binary subfield base".into());
+        }
+        if oracle == "semaev" && inst.curve.binary {
+            return Err("the semaev arm uses the odd-characteristic quadratic; choose linearized or subtract for binary".into());
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
