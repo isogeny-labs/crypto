@@ -17,7 +17,7 @@ cd "$here/runs"
 P1=2013265921
 P0=786433
 VMEM_KB=${VMEM_KB:-6500000}
-THREADS=${THREADS:-2}
+THREADS=${THREADS:-4}  # amendment A2: muladds depends on the thread count; committed rows used 4
 f4=(--budget 1800 --max-nnz 2000000000)
 base=(--ladder-t none --random 2 --engine tower --kinds kummer)
 
