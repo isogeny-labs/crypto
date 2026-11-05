@@ -1,0 +1,20 @@
+{
+  "command": [
+    "aws",
+    "ec2",
+    "describe-instances",
+    "--region",
+    "us-east-2",
+    "--filters",
+    "Name=instance-state-name,Values=running,pending,stopping",
+    "--query",
+    "Reservations[].Instances[].{InstanceId:InstanceId,Type:InstanceType,State:State.Name,LaunchTime:LaunchTime,Lifecycle:InstanceLifecycle}",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15"
+  ],
+  "started_utc": "2026-11-03T18:53:44.579709+00:00",
+  "exit": 0,
+  "scope": "us-east-2 running/pending/stopping instances only; not full account resource/financial ledger"
+}

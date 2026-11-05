@@ -1,0 +1,190 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "native hashed ECDLP: bounded end-to-end feasibility, four prime rosters",
+  "description": "Actual crates/hashed-ecdl-tensor source, selector, width and partial backends; all cold stages and unknown outcomes retained. This is separate from the original frozen 60/24 native A/B study. No challenge scalar, full binary pipeline, full arithmetic price or asymptotic/runtime gain is assumed.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_roster",
+        "bits": 10
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 12
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 14
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 16
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 2026103001,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-v2",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "native-source",
+      "role": "baseline",
+      "method": {
+        "id": "ic.hashed_native_v1",
+        "params": {
+          "backend": "source",
+          "m": "2",
+          "trials": "16",
+          "columns": "4096",
+          "steps": "5000000",
+          "vector": "2000000",
+          "bits": "1000000",
+          "threshold": "32",
+          "derive_last": "1",
+          "smallest_first": "1",
+          "cache_entries": "4096",
+          "rank": "16",
+          "slices": "16",
+          "outer_multiplier": "2",
+          "attempts": "4096"
+        }
+      }
+    },
+    {
+      "name": "native-selectors",
+      "role": "candidate",
+      "method": {
+        "id": "ic.hashed_native_v1",
+        "params": {
+          "backend": "selectors",
+          "m": "2",
+          "trials": "16",
+          "columns": "4096",
+          "steps": "5000000",
+          "vector": "2000000",
+          "bits": "1000000",
+          "threshold": "32",
+          "derive_last": "1",
+          "smallest_first": "1",
+          "cache_entries": "4096",
+          "rank": "16",
+          "slices": "16",
+          "outer_multiplier": "2",
+          "attempts": "4096"
+        }
+      }
+    },
+    {
+      "name": "native-selectors-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.hashed_native_v1",
+        "params": {
+          "backend": "selectors",
+          "m": "2",
+          "trials": "16",
+          "columns": "4096",
+          "steps": "5000000",
+          "vector": "2000000",
+          "bits": "1000000",
+          "threshold": "32",
+          "derive_last": "1",
+          "smallest_first": "1",
+          "cache_entries": "4096",
+          "rank": "16",
+          "slices": "16",
+          "outer_multiplier": "2",
+          "attempts": "4096"
+        }
+      }
+    },
+    {
+      "name": "native-width",
+      "role": "candidate",
+      "method": {
+        "id": "ic.hashed_native_v1",
+        "params": {
+          "backend": "width",
+          "m": "2",
+          "trials": "16",
+          "columns": "4096",
+          "steps": "5000000",
+          "vector": "2000000",
+          "bits": "1000000",
+          "threshold": "32",
+          "derive_last": "1",
+          "smallest_first": "1",
+          "cache_entries": "4096",
+          "rank": "16",
+          "slices": "16",
+          "outer_multiplier": "2",
+          "attempts": "4096"
+        }
+      }
+    },
+    {
+      "name": "native-partial",
+      "role": "candidate",
+      "method": {
+        "id": "ic.hashed_native_v1",
+        "params": {
+          "backend": "partial",
+          "m": "2",
+          "trials": "16",
+          "columns": "4096",
+          "steps": "5000000",
+          "vector": "2000000",
+          "bits": "1000000",
+          "threshold": "32",
+          "derive_last": "1",
+          "smallest_first": "1",
+          "cache_entries": "4096",
+          "rank": "16",
+          "slices": "16",
+          "outer_multiplier": "2",
+          "attempts": "4096"
+        }
+      }
+    },
+    {
+      "name": "ic-mitm",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "shuffle",
+    "seed": 2026103002,
+    "isolation_required": "L2",
+    "timeout_seconds": 30
+  }
+}

@@ -1,0 +1,14 @@
+[
+  [
+    "from border_schur import BorderSchur\n",
+    "from border_schur import BorderSchur\nfrom compact import LiftFrame\n"
+  ],
+  [
+    "        schur.release_borders()\n        frames.append((schur, b, row, column))",
+    "        frame = LiftFrame(schur, b, inverse.inverse, row, column)\n        trace.append(dict(kind='compact_lift', dimension=size, profile=frame.profile))\n        schur.release_borders()\n        frames.append(frame)\n        del schur"
+  ],
+  [
+    "    for schur, parent_rhs, row, column in reversed(frames):\n        if kind == 'solution':\n            vector = permute(lift_primal(schur, parent_rhs, vector), 0, column)\n        else:\n            vector = permute(lift_dual(schur, vector), 0, row)",
+    "    for frame in reversed(frames):\n        vector = frame.lift(vector, dual=(kind != 'solution'))"
+  ]
+]

@@ -1,0 +1,41 @@
+{
+  "schema": "private-backstop-mechanism-report/v1",
+  "observations": {
+    "containers_run": 1,
+    "child_signal": 9,
+    "child_pid": 7,
+    "observer_elapsed_ns": 2196991669,
+    "supervisor_exit": 125,
+    "oom_killed": false,
+    "orchestration_exit": 0,
+    "cleanup_exit": 0
+  },
+  "source_sha256": "b7eaf3b0249a7bb630c9a486eb613c48e3ec779c486796c9634c2fdfc61644cb",
+  "fixture_binary_sha256": "7aa53cc278569ca13f1f0d9a860a65de7004b77c854db27f3f56ed819a8dd7f9",
+  "image_id": "sha256:fdee14f586902162cc587d180fa734a9f21e395719e357ac75720345bfeef8df",
+  "build_exit": 0,
+  "administrative_failure": "Unprivileged image-ID-file read denied; owner reconciled with sudo read without rebuild",
+  "independent_review": {
+    "path": "evidence/independent-review.json",
+    "sha256": "92e0a705685dc461dedbf0c7316904ece8f3de3d21a0363f1314ff748cfd5dc8",
+    "outcome": "supports_one_bounded_local_mechanism_observation",
+    "custody_gaps": [
+      "No command receipt binds actual v4 invocation and arguments",
+      "Minimal build receipt omits exact command and toolchain",
+      "Later live no-labelled-container check not saved; retained removal exit0 is available"
+    ],
+    "additive_records": {
+      "commands": "evidence/POST_EXECUTION_COMMAND_RECORD.json",
+      "command_provenance": "Explicitly post-hoc reconstruction, not contemporaneous signed launch receipt",
+      "later_container_query_utc": "2026-10-30T22:22:16Z",
+      "later_container_query_rows": 0,
+      "later_container_query_exit": 0
+    },
+    "remaining_limitation": "Exact build/invocation record is reconstructed after execution; no contemporaneous signed launch receipt"
+  },
+  "scope": "Unchanged cutoff helper in one inspected private container with detached child and blocked main",
+  "production_runtime_qualification": false,
+  "clock_adjustment_test": false,
+  "scientific_execution": false,
+  "cost_ratios": []
+}

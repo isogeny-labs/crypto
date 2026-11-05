@@ -1,0 +1,23 @@
+{
+  "schema": "native-competitor-retention-expectations-v1",
+  "task_id": "TASK-20261026-1525ac",
+  "attempts": 1,
+  "child_instances": 2,
+  "sequential": true,
+  "max_processes_alive": 2,
+  "exit_code": 23,
+  "termination_observation": "waitid P_PID WEXITED|WNOWAIT, EINTR repeats wait only",
+  "old_order": {
+    "generic_waitpid": "exact child, exit23",
+    "dedicated_wait4": "-1 ECHILD, reaped false, CPU unavailable"
+  },
+  "correct_order": {
+    "dedicated_wait4": "exact child, exit23, reaped true, actual user/system available",
+    "receipt_retention": "written and fsync before generic cleanup",
+    "generic_waitpid": "-1 ECHILD"
+  },
+  "cpu_expected": "actual available counters; no fixed value",
+  "science_calls": 0,
+  "supervisor_or_cgroup_invocation": false,
+  "retries": 0
+}

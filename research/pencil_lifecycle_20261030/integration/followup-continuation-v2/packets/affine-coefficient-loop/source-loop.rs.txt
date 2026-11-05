@@ -1,0 +1,56 @@
+//! Check the exact Scholten quintics against the complete projective
+//! genus-2 formula model. No projective addition is implemented here.
+use five_leads_study::three_leads::{Divisor, Field, Jacobian, Point, Scholten};
+use serde_json::{json, Value};
+use std::collections::BTreeSet;
+use std::fs;
+
+fn choose(n: usize, k: usize) -> u64 {
+    let mut x = 1;
+    for i in 0..k {
+        x = x * (n - i) as u64 / (i + 1) as u64;
+    }
+    x
+}
+fn transform(poly: &[u64], alpha: u64, beta: u64, scale: u64, f: &Field) -> Vec<u64> {
+    let mut out = vec![0; poly.len()];
+    let inv = f.inv(scale);
+    for (k, &coefficient) in poly.iter().enumerate() {
+        for (j, slot) in out.iter_mut().enumerate().take(k + 1) {
+            let term = f.mul(
+                coefficient,
+                f.mul(
+                    choose(k, j) % f.p,
+                    f.mul(f.pow(alpha, j as u64), f.pow(beta, (k - j) as u64)),
+                ),
+            );
+            *slot = f.add(*slot, f.mul(term, inv));
+        }
+    }
+    while out.last() == Some(&0) {
+        out.pop();
+    }
+    out
+}
+fn map_divisor(d: Divisor, alpha: u64, beta: u64, f: &Field) -> Divisor {
+    if d.degree == 0 {
+        return d;
+    }
+    let u = transform(
+        &d.u[..=d.degree],
+        alpha,
+        beta,
+        f.pow(alpha, d.degree as u64),
+        f,
+    );
+    let v = transform(&d.v[..d.degree], alpha, beta, f.pow(alpha, 3), f);
+    let mut result = Divisor {
+        degree: d.degree,
+        u: [0; 3],
+        v: [0; 2],
+    };
+    result.u[..u.len()].copy_from_slice(&u);
+    result.v[..v.len()].copy_from_slice(&v);
+    result
+}
+fn main() {

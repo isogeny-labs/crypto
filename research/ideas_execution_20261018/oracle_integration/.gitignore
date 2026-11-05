@@ -1,3 +1,22 @@
 # >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)
 /raw-evidence-20261018.tar.gz
 # <<< artifacts
+
+# The complete 181-file raw tree is preserved in the verified evidence archive.
+# Keep local extraction/replay available without committing duplicate raw bytes.
+/runs/
+
+# Evidence delivery, archive inventory and verification receipts remain visible.
+!/EVIDENCE.md
+!/README.md
+!/status.json
+!/raw-evidence-20261018.tar.gz
+!/raw-evidence.archive.sha256
+!/raw-evidence.archive.members.txt
+!/raw-evidence.files.sha256
+!/raw-evidence.archive.verify.log
+!/raw-evidence.files.verify.log
+!/reports/deliverables.sha256
+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)
+/raw-evidence-20261018.tar.gz
+# <<< artifacts

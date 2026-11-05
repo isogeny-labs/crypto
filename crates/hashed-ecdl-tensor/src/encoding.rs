@@ -1,10 +1,11 @@
 //! Linear-edge arithmetic and curve encodings from Bochum §2–3.
 
 use crate::arithmetic::inverse;
+use crate::canonical::{PredicateProgram, ValueOperation};
 use crate::curve::{Curve, Point};
 use crate::finite::{Domain, PrimeDomain};
 use crate::network::{
-    Bit, FnPredicate, Network, Predicate, Program, Step, ValueFunction, Vertex, Word,
+    Bit, FnPredicate, Network, Predicate, PredicateTag, Program, Step, ValueFunction, Vertex, Word,
 };
 use crate::reduction::FactorBase;
 use crate::{integrity, invalid, overflow, BigUint, Meter, Result};
@@ -164,7 +165,7 @@ impl Encoder {
         )
     }
 
-    fn constraint(
+    pub(crate) fn constraint(
         &mut self,
         words: &[Word],
         function: impl Fn(&[BigUint], &mut Meter) -> Result<bool> + Send + Sync + 'static,
@@ -175,10 +176,39 @@ impl Encoder {
             .flat_map(|w| w.0.iter().copied())
             .filter(|b| matches!(b, Bit::Signal(_)))
             .collect();
+        let widths = words
+            .iter()
+            .map(|word| word.width().to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        let layout = words
+            .iter()
+            .map(|word| {
+                word.0
+                    .iter()
+                    .map(|bit| match bit {
+                        Bit::Constant(false) => '0',
+                        Bit::Constant(true) => '1',
+                        Bit::Signal(_) => 's',
+                    })
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("/");
+        let tag = PredicateTag::new(
+            "encoder.constraint",
+            vec![
+                ("active_ports".into(), active.len().to_string()),
+                ("word_layout".into(), layout),
+                ("word_widths".into(), widths),
+            ],
+        );
         meter.vector(self.vertices.len() + 1, "encoding vertices")?;
         let plan = words.to_vec();
-        let predicate: Arc<dyn Predicate> =
-            Arc::new(FnPredicate::new(active.len(), move |ports, work| {
+        let predicate: Arc<dyn Predicate> = Arc::new(FnPredicate::tagged(
+            active.len(),
+            tag,
+            move |ports, work| {
                 let mut cursor = 0;
                 let mut values = Vec::with_capacity(plan.len());
                 for word in &plan {
@@ -199,7 +229,56 @@ impl Encoder {
                     values.push(value);
                 }
                 function(&values, work)
-            }));
+            },
+        ));
+        let vertex = self.vertices.len();
+        self.vertices.push(Vertex {
+            predicate,
+            edges: vec![usize::MAX; active.len()],
+        });
+        for (port, bit) in active.iter().enumerate() {
+            let Bit::Signal(signal) = *bit else {
+                unreachable!()
+            };
+            self.uses[signal].push((vertex, port));
+        }
+        self.steps.push(Step::Check {
+            vertex,
+            ports: active,
+        });
+        Ok(())
+    }
+
+    fn programmed_constraint(
+        &mut self,
+        words: &[Word],
+        input_words: usize,
+        operation: ValueOperation,
+        meter: &Meter,
+    ) -> Result<()> {
+        let active: Vec<Bit> = words
+            .iter()
+            .flat_map(|word| word.0.iter().copied())
+            .filter(|bit| matches!(bit, Bit::Signal(_)))
+            .collect();
+        let widths = words
+            .iter()
+            .map(|word| word.width().to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        let tag = PredicateTag::new(
+            "encoder.define_relation",
+            vec![
+                ("active_ports".into(), active.len().to_string()),
+                ("input_words".into(), input_words.to_string()),
+                ("operation".into(), operation.name().into()),
+                ("word_widths".into(), widths),
+            ],
+        );
+        let program = PredicateProgram::define(words, input_words, operation)?;
+        meter.vector(self.vertices.len() + 1, "encoding vertices")?;
+        let predicate: Arc<dyn Predicate> =
+            Arc::new(FnPredicate::programmed(active.len(), tag, program));
         let vertex = self.vertices.len();
         self.vertices.push(Vertex {
             predicate,
@@ -223,6 +302,7 @@ impl Encoder {
         inputs: &[Word],
         widths: &[usize],
         function: ValueFunction,
+        canonical_operation: Option<ValueOperation>,
         checked: bool,
         meter: &Meter,
     ) -> Result<Vec<Word>> {
@@ -239,11 +319,15 @@ impl Encoder {
             let mut ports = inputs.to_vec();
             ports.extend(outputs.clone());
             let count = inputs.len();
-            self.constraint(
-                &ports,
-                move |values, work| Ok(function(&values[..count], work)? == values[count..]),
-                meter,
-            )?;
+            if let Some(operation) = canonical_operation {
+                self.programmed_constraint(&ports, count, operation, meter)?;
+            } else {
+                self.constraint(
+                    &ports,
+                    move |values, work| Ok(function(&values[..count], work)? == values[count..]),
+                    meter,
+                )?;
+            }
         }
         Ok(outputs)
     }
@@ -259,6 +343,9 @@ impl Encoder {
                         &[],
                         &[1],
                         Arc::new(move |_, _| Ok(vec![BigUint::from(u8::from(value))])),
+                        Some(ValueOperation::Constant(vec![BigUint::from(u8::from(
+                            value,
+                        ))])),
                         true,
                         meter,
                     )?;
@@ -321,6 +408,7 @@ impl Encoder {
                 std::slice::from_ref(bit),
                 &[1],
                 Arc::new(|v, _| Ok(vec![BigUint::from(u8::from(v[0].is_zero()))])),
+                Some(ValueOperation::Not),
                 true,
                 meter,
             )?
@@ -336,6 +424,7 @@ impl Encoder {
                 &[a.clone(), b.clone()],
                 &[1],
                 Arc::new(|v, _| Ok(vec![&v[0] * &v[1]])),
+                Some(ValueOperation::And),
                 true,
                 meter,
             )?
@@ -355,6 +444,7 @@ impl Encoder {
                         !v[0].is_zero() || !v[1].is_zero(),
                     ))])
                 }),
+                Some(ValueOperation::Or),
                 true,
                 meter,
             )?
@@ -386,6 +476,7 @@ impl Encoder {
                             BigUint::from(u8::from(v[0] < v[1]))
                         }])
                     }),
+                    Some(ValueOperation::LessThanBit),
                     true,
                     meter,
                 )?
@@ -414,6 +505,7 @@ impl Encoder {
                     let sum = v[0].to_u8().unwrap() + v[1].to_u8().unwrap() + v[2].to_u8().unwrap();
                     Ok(vec![BigUint::from(sum & 1), BigUint::from(sum >> 1)])
                 }),
+                Some(ValueOperation::IntegerAddBit),
                 true,
                 meter,
             )?;
@@ -440,6 +532,13 @@ impl Encoder {
                 .map(|j1| input[params.second * j1 + j2].clone())
                 .collect();
             let (omega, modulus, p) = (omega.clone(), modulus.clone(), params.clone());
+            let operation = ValueOperation::FourierColumn {
+                omega: omega.clone(),
+                modulus: modulus.clone(),
+                first: p.first,
+                second: p.second,
+                column: j2,
+            };
             middle[j2] = self.define(
                 &inputs,
                 &vec![width; p.first],
@@ -456,6 +555,7 @@ impl Encoder {
                     }
                     Ok(out)
                 }),
+                Some(operation),
                 true,
                 meter,
             )?;
@@ -470,6 +570,13 @@ impl Encoder {
                 inverse(&BigUint::from(params.length), &modulus)?
             } else {
                 BigUint::one()
+            };
+            let operation = ValueOperation::FourierRow {
+                omega: omega.clone(),
+                modulus: modulus.clone(),
+                first: p.first,
+                second: p.second,
+                scale: scale.clone(),
             };
             let result = self.define(
                 &inputs,
@@ -487,6 +594,7 @@ impl Encoder {
                     }
                     Ok(out)
                 }),
+                Some(operation),
                 true,
                 meter,
             )?;
@@ -524,6 +632,9 @@ impl Encoder {
         let mut products = Vec::with_capacity(p.length);
         for i in 0..p.length {
             let modulus = modulus.clone();
+            let operation = ValueOperation::FourierPointwise {
+                modulus: modulus.clone(),
+            };
             products.push(
                 self.define(
                     &[fa[i].clone(), fb[i].clone()],
@@ -532,6 +643,7 @@ impl Encoder {
                         work.charge(1, "Fourier pointwise product")?;
                         Ok(vec![&v[0] * &v[1] % &modulus])
                     }),
+                    Some(operation),
                     true,
                     meter,
                 )?
@@ -573,6 +685,7 @@ impl Encoder {
                         sum >> k,
                     ])
                 }),
+                Some(ValueOperation::ProductCarry { limb_bits: k }),
                 true,
                 meter,
             )?;
@@ -611,6 +724,7 @@ impl Encoder {
                 &[x.clone(), y.clone()],
                 &[1],
                 Arc::new(move |v, _| Ok(vec![BigUint::from(u8::from(&v[0] + &v[1] >= modulus))])),
+                None,
                 false,
                 meter,
             )?
@@ -641,6 +755,7 @@ impl Encoder {
                 &[x.clone(), y.clone()],
                 &[x.width()],
                 Arc::new(move |v, _| Ok(vec![(&v[0] + &v[1]) % &modulus])),
+                None,
                 false,
                 meter,
             )?
@@ -667,6 +782,7 @@ impl Encoder {
                 &[x.clone(), y.clone()],
                 &[x.width()],
                 Arc::new(move |v, _| Ok(vec![(&v[0] + &modulus - &v[1]) % &modulus])),
+                None,
                 false,
                 meter,
             )?
@@ -696,6 +812,7 @@ impl Encoder {
                 let product = &v[0] * &v[1];
                 Ok(vec![&product % &modulus, product / &modulus])
             }),
+            None,
             false,
             meter,
         )?;
@@ -772,6 +889,7 @@ impl Encoder {
                     _ => vec![BigUint::one(), BigUint::zero(), BigUint::zero()],
                 })
             }),
+            None,
             true,
             meter,
         )?;
@@ -919,6 +1037,7 @@ impl Encoder {
                     Point::Affine { x, y } => Ok(vec![BigUint::zero(), x, y]),
                 }
             }),
+            None,
             false,
             meter,
         )?;
@@ -951,6 +1070,7 @@ impl Encoder {
                     };
                     Ok(vec![num * inverse(&den, p)? % p])
                 }),
+                None,
                 false,
                 meter,
             )?
@@ -1087,8 +1207,16 @@ impl Encoder {
     pub fn finish(mut self, meter: &Meter) -> Result<Network> {
         fn vertex(vertices: &mut Vec<Vertex>, arity: usize, equality: bool) -> usize {
             let id = vertices.len();
+            let tag = PredicateTag::new(
+                if equality {
+                    "encoder.copy_equality"
+                } else {
+                    "encoder.endpoint"
+                },
+                vec![("arity".into(), arity.to_string())],
+            );
             vertices.push(Vertex {
-                predicate: Arc::new(FnPredicate::new(arity, move |bits, _| {
+                predicate: Arc::new(FnPredicate::tagged(arity, tag, move |bits, _| {
                     Ok(!equality || bits.windows(2).all(|w| w[0] == w[1]))
                 })),
                 edges: vec![usize::MAX; arity],

@@ -1,0 +1,43 @@
+{
+  "schema": "research.proof-component/v1",
+  "utc": "2026-10-31T07:38:27.670069+00:00",
+  "branch": "B=0,s!=0 literal UInt64 point/doubling",
+  "prime_bounds": "5 <= p < 2^31",
+  "extension_degree": 1,
+  "lookup_tables": null,
+  "compiled_main": true,
+  "fixed_controls_passed": true,
+  "separate_axiom_readback_passed": true,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "independent_review_complete": false,
+  "field_dependency_independent_review_complete": false,
+  "canonical_integration": false,
+  "scientific_execution": false,
+  "receipts": {
+    "attempt1": {
+      "exit_code": 1,
+      "source_sha256": "2d27d5dcba527bf5ea37333ec30d40b321b0fdc990d3edc8515326a2fb39d2dd"
+    },
+    "attempt2": {
+      "exit_code": 0,
+      "source_sha256": "8af96d25c078b8d3d509303e32e2c8839fd33cc23d993bd10a70734e5449520f"
+    },
+    "controls1": {
+      "exit_code": 0,
+      "source_sha256": "3037d19428a4d6e6269ed14031bf056f9e80b0077fd430568acf4480cd7f4f24"
+    },
+    "field-fixtures1": {
+      "exit_code": 0,
+      "source_sha256": "5c0ac5e98a3ea046d1a7295005544e28a01216c4ac074314146d955d47bb9fa7"
+    },
+    "readback1": {
+      "exit_code": 0,
+      "source_sha256": "338531c8434e74b4eff446904ffb943426845d88ce7567da401395cf0333f14b"
+    }
+  },
+  "restricted_dispatch_None": "marker for outside this branch, not native payload equivalence"
+}

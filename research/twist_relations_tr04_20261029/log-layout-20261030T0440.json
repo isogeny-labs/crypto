@@ -1,0 +1,253 @@
+{
+  "schema": "pr.log-integration/v1",
+  "pr": 2890,
+  "old_head": "0b91d48d6563671c10e551bde7cdc4c56e8c43ce",
+  "pinned_main": "edf3db4457bc286099d08365f12c9b1300949d6c",
+  "normal_merge_commit": "6310e5334e2174a91411b92463681a17e7da36aa",
+  "normal_merge_parents": [
+    "0b91d48d6563671c10e551bde7cdc4c56e8c43ce",
+    "edf3db4457bc286099d08365f12c9b1300949d6c"
+  ],
+  "preservation": {
+    "schema": "pr.log-block-preservation/v1",
+    "pr": 2890,
+    "old_head": "0b91d48d6563671c10e551bde7cdc4c56e8c43ce",
+    "main": "edf3db4457bc286099d08365f12c9b1300949d6c",
+    "base": "f81b1c6c562d10251eae883c8084affddc060f8b",
+    "fallback_comment": 6515157991,
+    "layout": "feature-only blocks before complete unmodified main log; no global merge configuration",
+    "logs": [
+      {
+        "path": "docs/session-logs/2026-10-29.md",
+        "base_bytes": 229138,
+        "main_bytes": 229138,
+        "main_sha256": "88f6c9d41bb50d8ba35687d0b5cd9c6e38f788908208d9f3efbeddce1feec2c4",
+        "feature_bytes": 23779,
+        "feature_sha256": "f3d3fb3ebdb1c5cbe6ba75a12de76dd50db6807b4514ab50c88df56732804e5c",
+        "result_bytes": 252917,
+        "result_sha256": "4ab9024b31c7cf87fe22c5325b0ec64ab4e00473f43e6a47e0e05b534c1e5d8c",
+        "main_contiguous_suffix_preserved": true,
+        "feature_contiguous_prefix_preserved": true
+      },
+      {
+        "path": "docs/session-logs/2026-10-30.md",
+        "base_bytes": 39590,
+        "main_bytes": 50234,
+        "main_sha256": "040a25f453789679693d6d2ffffd77b8c1f2da5434a5a4412500ce9cfcde00d7",
+        "feature_bytes": 9167,
+        "feature_sha256": "113d2b962633ef473fc2f3b973856e7778e7c6d8582231aa9d4d327d79536aa4",
+        "result_bytes": 59401,
+        "result_sha256": "74f34b70a256d8aac62c692818baed9cc45802ff4d215f4bc0e8f89b7848d624",
+        "main_contiguous_suffix_preserved": true,
+        "feature_contiguous_prefix_preserved": true
+      }
+    ],
+    "automatic_combined_tree": "3b5a546eb57ebeabff0da83b672245cf795a606d",
+    "resolved_tree": "5b0fe73b4b089d549660cc7deecdd4f3696864e3",
+    "only_log_files_differ_from_automatic_tree": true,
+    "changed_from_automatic": [
+      "docs/session-logs/2026-10-29.md",
+      "docs/session-logs/2026-10-30.md"
+    ],
+    "unmerged_paths": [
+      "docs/session-logs/2026-10-30.md"
+    ]
+  },
+  "final_staged_logs": [
+    {
+      "path": "docs/session-logs/2026-10-29.md",
+      "main_bytes": 229138,
+      "main_sha256": "88f6c9d41bb50d8ba35687d0b5cd9c6e38f788908208d9f3efbeddce1feec2c4",
+      "original_feature_bytes": 23779,
+      "original_feature_sha256": "f3d3fb3ebdb1c5cbe6ba75a12de76dd50db6807b4514ab50c88df56732804e5c",
+      "current_bytes": 252917,
+      "current_sha256": "4ab9024b31c7cf87fe22c5325b0ec64ab4e00473f43e6a47e0e05b534c1e5d8c",
+      "main_exact_suffix": true,
+      "all_original_feature_bytes_exact_prefix": true,
+      "new_handoff_inserted_before_main": true
+    },
+    {
+      "path": "docs/session-logs/2026-10-30.md",
+      "main_bytes": 50234,
+      "main_sha256": "040a25f453789679693d6d2ffffd77b8c1f2da5434a5a4412500ce9cfcde00d7",
+      "original_feature_bytes": 9167,
+      "original_feature_sha256": "113d2b962633ef473fc2f3b973856e7778e7c6d8582231aa9d4d327d79536aa4",
+      "current_bytes": 61880,
+      "current_sha256": "ac588bb4a5bff061a6a4055d0ef9bf6af1c884be7bbbc47eca068e600a12fa00",
+      "main_exact_suffix": true,
+      "all_original_feature_bytes_exact_prefix": true,
+      "new_handoff_inserted_before_main": true
+    }
+  ],
+  "software_regression": {
+    "schema": "pr.future-log-append-regression/v1",
+    "pr": 2890,
+    "main": "edf3db4457bc286099d08365f12c9b1300949d6c",
+    "actual_parent_head": "6310e5334e2174a91411b92463681a17e7da36aa",
+    "tested_staged_tree": "c955bccddf6660476407abc38620ad7db3f4ce28",
+    "baseline_append_layout_exit": 1,
+    "preserved_prefix_layout_exit": 0,
+    "all_original_and_future_log_bytes_preserved": true,
+    "synthetic_only": true,
+    "refs_updated": false,
+    "unchanged_promisor_main_blob_ids_reused": true,
+    "new_log_blob_bytes_verified": true,
+    "unrelated_blob_availability_checked": false,
+    "write_tree_reference": {
+      "url": "https://github.com/git/git/blob/master/Documentation/git-write-tree.adoc",
+      "reviewed_blob": "4c7100ea1e3aba908dcf960197db6358e08fa184"
+    },
+    "research_or_cloud_run": false,
+    "primary_data_generated": false,
+    "git_version": "git version 2.52.0",
+    "primary_reference": {
+      "url": "https://github.com/git/git/blob/master/Documentation/git-merge-tree.adoc",
+      "reviewed_blob": "c5351f96994668f33e5c59cba1ea59a4ceb4e346"
+    },
+    "logs": [
+      {
+        "path": "docs/session-logs/2026-10-29.md",
+        "main_bytes": 229138,
+        "main_sha256": "88f6c9d41bb50d8ba35687d0b5cd9c6e38f788908208d9f3efbeddce1feec2c4",
+        "feature_bytes": 23779,
+        "feature_sha256": "f3d3fb3ebdb1c5cbe6ba75a12de76dd50db6807b4514ab50c88df56732804e5c",
+        "staged_bytes": 252917,
+        "staged_sha256": "4ab9024b31c7cf87fe22c5325b0ec64ab4e00473f43e6a47e0e05b534c1e5d8c",
+        "future_append_bytes": 66
+      },
+      {
+        "path": "docs/session-logs/2026-10-30.md",
+        "main_bytes": 50234,
+        "main_sha256": "040a25f453789679693d6d2ffffd77b8c1f2da5434a5a4412500ce9cfcde00d7",
+        "feature_bytes": 11646,
+        "feature_sha256": "65a142a8d8bdb6f1f8805a989f0ee3eaf994828018f5bf8e7544d49a4ed3b349",
+        "staged_bytes": 61880,
+        "staged_sha256": "ac588bb4a5bff061a6a4055d0ef9bf6af1c884be7bbbc47eca068e600a12fa00",
+        "future_append_bytes": 66
+      }
+    ],
+    "synthetic_commits": {
+      "future": "aa7541b25643ca7ca36923502eaf668b374414cf",
+      "baseline": "92fe80a04d184f4d0cbabb38cd56712a237e041a",
+      "candidate": "9809301f26f96a60eac6d1a48880a6200a90f0b0"
+    },
+    "limits": "Only a future append to these exact daily logs is tested; no universal conflict-free guarantee, branch policy bypass or scientific claim."
+  },
+  "frozen_report_tree": {
+    "path": "research/twist_relations_tr04_20261029/reports",
+    "old": "f943f344f77bbe7d61c9e65682ab4896812e084b",
+    "after": "f943f344f77bbe7d61c9e65682ab4896812e084b",
+    "unchanged": true
+  },
+  "native_development_validation": {
+    "tests_passed": 40,
+    "tests_failed": 0,
+    "library": 35,
+    "legacy_binary": 2,
+    "cli": 3,
+    "test_exit": 0,
+    "strict_clippy_exit": 0,
+    "fmt_exit": 0,
+    "actionlint_shellcheck_exit": 0,
+    "routing_exit": 0,
+    "native_protocol_exit": 0,
+    "numerical_source_unchanged": true
+  },
+  "full_root_library_rerun": false,
+  "old_full_root_receipt_covers_this_main": false,
+  "primary_research_launched": false,
+  "credential_or_settings_change": false,
+  "review_thread_resolved_by_author": false,
+  "first_regression_attempt": {
+    "status": "stopped",
+    "exit_code": 143,
+    "stage": "temporary index write-tree existence check",
+    "reason": "Partial clone lazily fetched unrelated main blobs before the software regression ran; stopped only identified helper processes, no branch refs or actual worktree index changed",
+    "baseline_or_prefix_verdict": null,
+    "scope": "Local Git software regression, not original science workflow, not a library test"
+  },
+  "sparse_note": null,
+  "limits": "Software log-append fixture only; no scientific result, general conflict-free guarantee or current-main full-library pass.",
+  "archive": {
+    "path": "log-layout-20261030T0440.tar.xz",
+    "bytes": 6436,
+    "sha256": "794f79e2f9c6bbdb32030ad1eebbc0837a5e78aa81c059b57f56e4005692a841",
+    "files": [
+      {
+        "path": "merge-logs.cjs",
+        "bytes": 3312,
+        "sha256": "9de6e4fc9b338473e90bb7d50b31194732955a76a1771aab61b988780d58da8a"
+      },
+      {
+        "path": "check-append.cjs",
+        "bytes": 4019,
+        "sha256": "61e0182ab55cb365cdd79c8f6409eaa75b051ecd517a2cf09755e7342e8ae424"
+      },
+      {
+        "path": "main.sha",
+        "bytes": 41,
+        "sha256": "f0542392c798adde952fbe3b99e208ad47480d315bccd6686417ed9c77698a5e"
+      },
+      {
+        "path": "initial-regression-attempt.json",
+        "bytes": 427,
+        "sha256": "ec26b954e9979338726306d8e4582f3e672b95f79eb0585c0f495fd160c7ca3d"
+      },
+      {
+        "path": "pr2890-merge.log",
+        "bytes": 181,
+        "sha256": "b6e683801f6e9efe3ec3d91fe056cfe193d102ee852c78cf0ae043ec7e6e5f21"
+      },
+      {
+        "path": "pr2890-preservation.json",
+        "bytes": 1837,
+        "sha256": "4fdcc9cbe0f0ba26a95f32e7580e6bffba0090a9e0e457ee0069a99c9922419a"
+      },
+      {
+        "path": "pr2890-append-regression.json",
+        "bytes": 2330,
+        "sha256": "96321505b1794a5b3caae5eac70c4959ddad45e464fd9c1615d444a124f64b19"
+      },
+      {
+        "path": "pr2890-append-baseline.log",
+        "bytes": 764,
+        "sha256": "7a946acf354d593ac4e108192f5a2d239dd8824923a0e4569b2a9d9c866f479f"
+      },
+      {
+        "path": "pr2890-append-fixed.log",
+        "bytes": 41,
+        "sha256": "3f07d92112a09e9ad4b44e19474d5cd1ae23d9074a0ac06e77a335ada23f63ae"
+      },
+      {
+        "path": "pr2890-fmt.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "pr2890-clippy.log",
+        "bytes": 62,
+        "sha256": "92434e198f27984c035c376ec77a7cf9e6ebdde782f8ccb1336ae3329b66ddb7"
+      },
+      {
+        "path": "pr2890-tests.log",
+        "bytes": 4988,
+        "sha256": "84e83a9159cc1759b08a70b1330dc2ae2918fb23f0bcb4adaccfc9e538b43e9f"
+      },
+      {
+        "path": "pr2890-actionlint.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "pr2890-routing.log",
+        "bytes": 665,
+        "sha256": "d1d3a49d5a37f3888f5a0e4bd458d2662dcd84fbdc05c761f72b6888f1bf2673"
+      },
+      {
+        "path": "pr2890-protocol.log",
+        "bytes": 81,
+        "sha256": "23125ab2af37cb33ede8eb585d19b30b55e01790a02cc98176af16a595137a22"
+      }
+    ]
+  }
+}

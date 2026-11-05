@@ -1,0 +1,4210 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "bytes": 525451,
+        "kind": "summary",
+        "path": "evidence/results.json",
+        "sha256": "5a97962a1ccb10b8edfebf344e1cd19408f481d9d507fdb56da0100ee1e515cd"
+      }
+    ],
+    "script": {
+      "bytes": 29366,
+      "kind": "analysis",
+      "path": "src/main.rs",
+      "sha256": "2f1f4e616c9231053c371117651dc90a9a9382930be5134d8085099adaca7bd4"
+    },
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "166a22a8b2bb611d180ce93a3e990c11a97e7861629e7a4c5f79e314c2234415",
+      "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+      "id": "koblitz",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+      "role": "reference"
+    },
+    {
+      "binary_sha256": "166a22a8b2bb611d180ce93a3e990c11a97e7861629e7a4c5f79e314c2234415",
+      "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+      "id": "binary",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "166a22a8b2bb611d180ce93a3e990c11a97e7861629e7a4c5f79e314c2234415",
+      "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+      "id": "prime",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+      "role": "candidate"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-28",
+  "export_id": "N83-FIXED-DEGREE-E27-20261028-R1",
+  "files": [
+    {
+      "bytes": 525451,
+      "kind": "raw",
+      "path": "evidence/results.json",
+      "sha256": "5a97962a1ccb10b8edfebf344e1cd19408f481d9d507fdb56da0100ee1e515cd"
+    },
+    {
+      "bytes": 1330,
+      "kind": "raw",
+      "path": "evidence/factor-base-index.json",
+      "sha256": "9698cd5023a491a8ba239f4e13d9c326eb3509d5010972f21d29a5de56df3b4a"
+    },
+    {
+      "bytes": 211489,
+      "kind": "raw",
+      "path": "evidence/inputs.json",
+      "sha256": "c9e5a0ff7e38e792c2cbfa196e6e6b7d5fc231bdc6d683784de8774f94afad4e"
+    },
+    {
+      "bytes": 44495,
+      "kind": "summary",
+      "path": "evidence/observations.json",
+      "sha256": "1f346988364806f39b5430d63a61739148d60c908385248025548a92a39a5f9b"
+    },
+    {
+      "bytes": 58526,
+      "kind": "other",
+      "path": "evidence/raw-manifest.sha256",
+      "sha256": "6eac1797c975041502c3d3d26c7b5c155c07a74a6991c52c3b0c0710e9aff271"
+    },
+    {
+      "bytes": 4119,
+      "kind": "raw",
+      "path": "evidence/controls.jsonl",
+      "sha256": "21b25e63dd774bf085fbff01e18110d3c76f9c67b378117a6848a8ba992d2309"
+    },
+    {
+      "bytes": 4409,
+      "kind": "other",
+      "path": "evidence/singular-version.txt",
+      "sha256": "efad3f65a575cb465139a6151faec40723428b540c832eb9d9a672dfeb0bb612"
+    },
+    {
+      "bytes": 830,
+      "kind": "receipt",
+      "path": "request.json",
+      "sha256": "c576e372b9ede450bccc6fad88002f18b3fb7352c8395a2bb681dbb8ede3d825"
+    },
+    {
+      "bytes": 397,
+      "kind": "receipt",
+      "path": "terminal.json",
+      "sha256": "b990cad761617ee070e293810f78ec7b2447c0ec0fbdee1b21a89654bb6a7093"
+    },
+    {
+      "bytes": 389,
+      "kind": "receipt",
+      "path": "evidence/storage.json",
+      "sha256": "26c497ee472e4f41ae98340586c40af07aaf2142f7d145f3fd8849de9955716a"
+    },
+    {
+      "bytes": 19134,
+      "kind": "analysis",
+      "path": "src/bin/report.rs",
+      "sha256": "5c56d75af6cd52729f45b5619b6ee8faeb57ac7c2d99f9b1aaf4ad386df8e4a7"
+    }
+  ],
+  "flow": {
+    "attempted": 96,
+    "completed": 33,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 63,
+    "planned": 96,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/host.txt",
+    "sha256": "6a4586ee357ee0e78bbfa6438b5c790164b2427c37e2510814ca1df170990760",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-17-173.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "96 recorded attempts; 4 completed computations, 0 finite top-form degrees and 63 resource limits. Modes are different computations, not independent replicates. Fixed ell27 bases; no adaptive retries."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "producer",
+    "runtime": "codex",
+    "session": "n83-fixed-degree-e27-20261028-r1"
+  },
+  "protocol": {
+    "path": "protocol.json",
+    "protocol_id": "N83-FIXED-DEGREE-E27-20261028",
+    "sha256": "ddca4082af75dc77b990577cc09b4d4751f5407e6adb751abe8bff3526fe1db7",
+    "version": 1
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m2-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.038585827,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m2-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m2-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "basis_max_degree": 2,
+          "basis_size": 54
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 0.28223921,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m2-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m2-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.04071599,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m2-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m2-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "basis_max_degree": 0,
+          "basis_size": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 0.229275281,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m2-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m2-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.042422167,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m2-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m2-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "basis_max_degree": 2,
+          "basis_size": 54
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 0.28436906,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m2-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m2-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.042439987,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m2-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m2-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "basis_max_degree": 0,
+          "basis_size": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 0.22898677,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m2-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m2-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.184891136,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m2-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.123463175,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m2-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m2-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.968578617,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m2-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 37.50862948,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m2-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m3-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.143791707,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m3-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m3-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.193039066,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m3-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m3-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.247495413,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m3-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m3-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.329084046,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m3-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m3-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.080842793,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m3-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m3-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.069376002,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m3-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m3-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.32779252,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m3-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m3-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.080226117,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m3-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m3-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.06087203,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m3-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.059800345,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m3-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m3-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.424641724,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m3-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.49752339,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m3-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m4-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.238748242,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m4-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m4-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.668222382,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m4-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m4-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.366892061,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m4-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m4-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.483054904,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m4-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m4-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.199650035,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m4-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m4-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.925497013,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m4-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m4-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.333869238,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m4-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m4-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.113264205,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m4-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m4-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.031650086,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m4-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.319076104,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m4-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m4-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.966956833,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m4-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.917246124,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m4-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m5-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.205971659,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m5-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m5-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.45568595,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m5-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m5-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 35.688759003,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m5-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m5-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 42.775309844,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m5-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m5-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.149884724,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m5-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m5-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.114151419,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m5-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m5-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 36.549864462,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m5-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m5-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.205491182,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m5-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m5-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.028726867,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m5-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.039562382,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m5-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m5-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.9434074070000005,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m5-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.790715513,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m5-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m6-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.19833572,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m6-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m6-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.941471321,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m6-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m6-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.533524775,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m6-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m6-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.193227274,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m6-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m6-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.182846673,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m6-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m6-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.943729282,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m6-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m6-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.98922894,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m6-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m6-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.486446177,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m6-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m6-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.088979802,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m6-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.853381677,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m6-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m6-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.133447462,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m6-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.75974547,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m6-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m7-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.241535801,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m7-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m7-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.720838684,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m7-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m7-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.200147102,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m7-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m7-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.254403677,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m7-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m7-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.274606334,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m7-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m7-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.163701771,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m7-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m7-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.262841387,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m7-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m7-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.2804001,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m7-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m7-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.265712374,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m7-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.032606879,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m7-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m7-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.2198649,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m7-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 6.988337578,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m7-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m8-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 34.717394359,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m8-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m8-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 33.080375917,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m8-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m8-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.746723795,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m8-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m8-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.258293296,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m8-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m8-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 33.393694068,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m8-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m8-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 32.68514108,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m8-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m8-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.957130673,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m8-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m8-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.271652956,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m8-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m8-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.067793465,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m8-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.039549706,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m8-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m8-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.286531755,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m8-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 6.435018512,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m8-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m9-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 36.433137182,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m9-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m9-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 35.612533567,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m9-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m9-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 41.644504816,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m9-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/koblitz-m9-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 36.313494824,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m9-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m9-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 34.001326425,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m9-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m9-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 35.217425487,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m9-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m9-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 35.091141804,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m9-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/binary-m9-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 34.838103538,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m9-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m9-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.034068279,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m9-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.046255963,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m9-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m9-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.458419309,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-fixed-degree-e27-20261028-r1/local/inputs/prime-m9-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 8.031540478,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m9-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+    "dirty": false,
+    "repo": "crypto"
+  }
+}

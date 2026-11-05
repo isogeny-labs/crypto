@@ -1,0 +1,118 @@
+{
+  "schema": "tr04.development-status/v1",
+  "base_revision": "24def3ae4dfe94bbbee5f30245847b372d02fa70",
+  "implementation": "Published native implementation, P1 routing fix and complete failed-run record; log-maintenance update changes no numerical experiment",
+  "protocol": "frozen",
+  "primary_research_execution": "not_attempted: workflow preflight failed checkpoint upload before fields",
+  "native_development": {
+    "schema": "tr04.development-validation/v1",
+    "started_at": "2026-10-29T18:11:16Z",
+    "finished_at": "2026-10-29T18:11:50Z",
+    "base_revision": "24def3ae4dfe94bbbee5f30245847b372d02fa70",
+    "working_tree": "Uncommitted additive TR04 implementation and draft protocol",
+    "fmt_exit": 0,
+    "strict_clippy_exit": 0,
+    "native_tests_exit": 0,
+    "scope": "Standalone native crate development checks, not research execution or root-library validation",
+    "root_library_status": "incomplete; separate interruption receipt; no repeat broad run"
+  },
+  "native_test_count": 40,
+  "native_test_breakdown": {
+    "library": 35,
+    "legacy_binary": 2,
+    "cli": 3
+  },
+  "root_library": {
+    "status": "completed",
+    "source": "445d84bf7f57750e0e34bd7a65992c36c0da92ec",
+    "started_at": "2026-10-29T22:11:17Z",
+    "log": "/workspace/tr04-root-445d84bf7-validation.log",
+    "exit_code": 0,
+    "signal": null,
+    "ongoing": false,
+    "scope": "Completed exact source445 validation only; later main integrations includingedf3db4 change root-runtime inputs and are not covered by this receipt. No fresh broad-library run.",
+    "finished_at": "2026-10-29T23:23:56Z",
+    "passed": 5389,
+    "failed": 0,
+    "ignored": 123,
+    "measured": 0,
+    "filtered_out": 0,
+    "outer_test_count": 5512,
+    "receipt": "root-validation-445d84bf7.json",
+    "log_sha256": "8014e6a48a0d8903d2221a47085b46620c4cae0cdb1ec1a746234ef2bd261ef9",
+    "raw_archive": {
+      "path": "/workspace/tr04-root-validation-445d84bf7.tar.xz",
+      "bytes": 80316,
+      "sha256": "d87dcae1c1a91d66535b1e14f675d8575ed938bd0d0a871ec71708523518b72b",
+      "tracked": false,
+      "remote_upload": false,
+      "independent_remote_download": false,
+      "status": "Preserved locally; exceeds64KiB and requires configured artifact-store transport before durable publication"
+    }
+  },
+  "archive": {
+    "path": "development-evidence.tar.xz",
+    "sha256": "630a6b558984d0dae5a1973b59b072f6bb0f8215c71aedb56c6f401025133d71",
+    "bytes": 40960,
+    "remote_readback": false
+  },
+  "plan_pdf": {
+    "path": "report.pdf",
+    "sha256": "d22f9c34c8f3c65537015998dd01f8e58ea59855c3f96818057700d40af5b0c4",
+    "pages": 2,
+    "visually_inspected": true,
+    "bytes": 43555
+  },
+  "physical_runtime_admitted": false,
+  "primitive_work_counters_independently_recomputed": false,
+  "remaining": [
+    "checkpoint, store and runner readiness",
+    "actual authorized primary census and collection",
+    "durable artifact-store publication of oversized root-validation archive"
+  ],
+  "protocol_freeze": {
+    "commit": "f270363df37a17b30210a4671cd31c03d3c20b3a",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-29T23:15:13Z",
+    "protocol_sha256": "a142ce49dbc23c78d49b10572aaf6228960f43803472abb9e735536677d2c0ce",
+    "status": "frozen"
+  },
+  "native_source_bytes_unchanged_by_main_integration": true,
+  "transport_development": {
+    "receipt": "development-transport-evidence.tar.xz",
+    "synthetic_cases": 7,
+    "actual_remote_download": false
+  },
+  "protocol_version": 3,
+  "protocol_history": "versions/README.md",
+  "full_schema_preflight_gate": true,
+  "workflow_attempt": {
+    "run_id": 40973940936,
+    "attempt": 1,
+    "source": "85fc870c96a3ea707afe11e06cf884eba6f957ce",
+    "conclusion": "failure",
+    "checkpoint_exit": 1,
+    "primary_field_attempts": 0,
+    "completed_rows": 0,
+    "missing_rows": 27,
+    "report": "reports/run-20261029T233325Z/README.md",
+    "retry_submitted": false
+  },
+  "main_integration": {
+    "main": "f81b1c6c562d10251eae883c8084affddc060f8b",
+    "merge": "3f8c917a16141ee68839c834101a7ed2a6674c52",
+    "frozen_native_and_study_bytes_preserved": true,
+    "log_proof": "merge-preservation-20261030.json",
+    "inherited_root_runtime_paths_changed": 89,
+    "full_root_validation_of_inherited_main": false,
+    "broad_library_rerun": false
+  },
+  "latest_log_integration": {
+    "main": "edf3db4457bc286099d08365f12c9b1300949d6c",
+    "merge": "6310e5334e2174a91411b92463681a17e7da36aa",
+    "proof": "log-layout-20261030T0440.json",
+    "frozen_native_and_reports_unchanged": true,
+    "inherited_root_runtime_paths_changed_since445": 91,
+    "full_root_library_rerun": false
+  }
+}

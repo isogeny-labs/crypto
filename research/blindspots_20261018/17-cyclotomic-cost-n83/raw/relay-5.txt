@@ -1,0 +1,49 @@
+status: completed
+
+Command: `python3 tools/task_card.py run research/blindspots_20261018/17-cyclotomic-cost-n83/card-05.yaml` (exit 0)
+
+```
+card: CARD-BLINDSPOT-17-05 (sha256 29e74ce9d353fabd00f23e1ec0e79149379ce35e30de0d7f1ade9e831572481a)
+commit: 09283c4b497d7b2b86eaa4055febc76fb521db87
+receipt: research/blindspots_20261018/17-cyclotomic-cost-n83/raw/receipt-card-05.json sha256 0c1ca80505fb2ea9f3bbddd499c7be23eeaa141669547f49415f8e88b9f29114
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-17/card-05"] exit 0 (0.004 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "target/blindspots-17/card-05/b17", "examples/blindspots_17_cyclo_cost.rs"] exit 0 (3.455 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 20 lines:
+       --> examples/blindspots_17_cyclo_cost.rs:792:5
+        |
+    791 | struct Cyc {
+        |        --- fields in this struct
+    792 |     n: u32,
+        |     ^
+    793 |     p: u32,
+        |     ^
+    
+    warning: variant `Lex` is never constructed
+       --> examples/blindspots_17_cyclo_cost.rs:934:5
+        |
+    930 | enum Source<'a> {
+        |      ------ variant in this enum
+    ...
+    934 |     Lex(&'a [u128], usize, Vec<usize>, bool), // lazily enumerated w-subsets of atoms
+        |     ^^^
+    
+    warning: 10 warnings emitted
+    
+command 3 (c83a1-k300-onb): ["prlimit", "--as=4294967296", "target/blindspots-17/card-05/b17", "--mode", "cell", "--n", "83", "--a", "1", "--k", "300", "--cyc-w", "3", "--arms", "onb", "--pair", "1", "--nulls", "60", "--probes", "100"] exit 0 (136.242 s) succeeded
+  stdout sha256 f608672191993c5640d572ba08edc056f9f0969e32b8e649c913b557a84e67ac; last 6 lines:
+    {"kind":"curve","n":83,"a":1,"poly":"z^83+z^7+z^4+z^2+1","order":"9671406556910881928556062","r":"8569786107849059","h":"1128547018","log2_r":52.928,"type2_onb":true}
+    {"kind":"build","n":83,"a":1,"arm":"onb","w":3,"k_req":300,"k":300,"accounting":"faithful","visited":880,"lifts":891,"projected":891,"ops":{"adds":16110,"doubles":42330,"scalar_mults":1191,"g":58440},"nat":{"fadd":275643,"sort":1561977,"inv":880,"sqr":880,"mul":446,"tr":880,"ht_sqr":36572,"key_sqr":73062,"hash":1191,"frob":24900,"neg":24900,"total":2026231},"s0":58440.0,"s01":261063.1,"s1":2084671.0,"secs":0.579}
+    {"kind":"build","n":83,"a":1,"arm":"onb","w":3,"k_req":300,"k":300,"accounting":"tidy","visited":827,"lifts":300,"projected":300,"ops":{"adds":3000,"doubles":9000,"scalar_mults":300,"g":12000},"nat":{"fadd":2481,"sort":0,"inv":589,"sqr":589,"mul":300,"tr":589,"ht_sqr":24600,"key_sqr":92414,"hash":1427,"frob":24900,"neg":24900,"total":197689},"s0":12000.0,"s01":31768.9,"s1":209689.0,"secs":0.123}
+    {"kind":"null","n":83,"a":1,"k":300,"draws":60,"faithful_g":[68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660,68660],"faithful_nat":[151936,151987,151921,151990,152008,152071,152038,151870,151960,152044,151936,152059,152065,152017,151906,151969,152074,151936,151945,152104,152038,152047,152047,151951,151999,151945,152089,151993,152035,152077,152020,152095,152095,151933,152002,152086,152080,151954,151984,152056,152014,152041,151948,151999,151933,151900,152026,151945,152128,151936,152011,152014,151942,151966,152050,152065,152023,152017,151891,152023],"tidy_g":[12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000,12000],"tidy_nat":[174078,175540,173648,175626,176142,177948,177002,172186,174766,177174,174078,177604,177776,176400,173218,175024,178034,174078,174336,178894,177002,177260,177260,174508,175884,174336,178464,175712,176916,178120,176486,178636,178636,173992,175970,178378,178206,174594,175454,177518,176314,177088,174422,175884,173992,173046,176658,174336,179582,174078,176228,176314,174250,174938,177346,177776,176572,176400,172788,176572]}
+    {"kind":"pair","n":83,"a":1,"arm":"onb","k":300,"adds":7494900,"expected_adds":7494900,"entries":7469100,"reps":300,"nat":{"fadd":0,"sort":0,"inv":0,"sqr":0,"mul":0,"tr":0,"ht_sqr":0,"key_sqr":614557200,"hash":11578200,"frob":4083600,"neg":0,"total":634302600},"s0":7494900,"s01":70925160.0,"s1":641797500.0,"y_pred":1.446793e-7,"secs":82.186}
+    {"kind":"controls","n":83,"a":1,"arm":"onb","k":300,"planted_targets":16,"planted_found":16,"random_targets":16,"probes":1600,"hits":0,"verified_hits":0,"expected_hits":0.0002,"probe_nat_each":83.00,"probe_adds_per_probe":0.000000,"stride_adds_per_probe":1}
+  stderr last 1 lines:
+    cell n=83 a=1 f=z^83+z^7+z^4+z^2+1 #E=9671406556910881928556062 r=8569786107849059 h=1128547018 type2_onb=true
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-17/card-05/b17"] exit 0 (0.006 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (remove-bin-dir): ["rmdir", "target/blindspots-17/card-05"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```

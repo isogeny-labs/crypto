@@ -1,0 +1,104 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "HASHED-ECDL-CPU-SCALE-queued-timeout",
+  "created": "2026-10-30T04:21:45.151271Z",
+  "protocol": {
+    "path": "../protocol.json",
+    "sha256": "91e3449df0ae301d9d882db910f334a1e4ffa9e93cbd1ba93630f9d3b16f7510",
+    "protocol_id": "HASHED-ECDL-CPU-SCALE-20261030",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "hashed-ecdl-cpu-20261030",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "a09a3b1bf0af88eaed6e9da438e4462c9c0ecca9",
+    "dirty": false
+  },
+  "backend": "isolab-k8s",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "u",
+      "role": "baseline",
+      "binary_sha256": "495821cabad4486ce9fa48706afc9696cd8d50dfbf8a0fc217b504b1f83e0ddd",
+      "commit": "a09a3b1bf0af88eaed6e9da438e4462c9c0ecca9"
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "binary_sha256": "495821cabad4486ce9fa48706afc9696cd8d50dfbf8a0fc217b504b1f83e0ddd",
+      "commit": "a09a3b1bf0af88eaed6e9da438e4462c9c0ecca9"
+    }
+  ],
+  "runs": [],
+  "flow": {
+    "planned": 0,
+    "attempted": 0,
+    "completed": 0,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "build.json",
+      "sha256": "f1bcb81ec6ce06e6c080b251c2b00c2ea07d66bfa1289a52b132fdf31651e1b8",
+      "bytes": 1508,
+      "kind": "raw"
+    },
+    {
+      "path": "status.json",
+      "sha256": "432041cd820019029e9faabaf3727c8dd5de2ec2c470ad632fc59fb8d5269ced",
+      "bytes": 984,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../analyze.rs",
+      "sha256": "e03abd22f720277e1293cb6a9fb556e12d4d1b4739b9b247479a48ab3a1d13c2",
+      "bytes": 3497,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "The single EKS job reached DeadlineExceeded after1500seconds. Last observed pod state was Pending/Unschedulable with exclusive-host anti-affinity and pool capacity occupied. No execution rows, certificates, workload logs or archive were produced.24planned cells have no recorded attempt; no larger-field recovery is established."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "The frozen native analysis script is identified but did not run. The host and per-execution clocks are unknown.1500seconds is the job scheduling deadline, not measured algorithm time. No retry launched; other workload left intact."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "The strict export completeness checker rejects this empty export against24planned protocol cells. This is retained as an incomplete failure record; it is not a validated experiment export. No invented execution rows fill the gap."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

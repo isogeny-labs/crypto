@@ -1,0 +1,486 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-FIRST-FALL-M2-M9-20261027-R3",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/n83_ic_degree_sweep_20261027/fall",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "DESIGN.md"
+  },
+  "question": "Which earliest new degree falls can be certified on all 48 retained balanced n83 S3-chain inputs, and which remain bounded only?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "An exact binary first fall requires an explicit nonzero lower-degree polynomial combination plus exclusion of all lower degrees. Prime degree-four minors establish only a lower bound.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Last fall, regularity, ECDLP recovery and performance claims are out of scope for this certificate stage; exact unresolved prime cells remain part of the active user goal.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "koblitz",
+      "role": "reference",
+      "description": "koblitz public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_ic_degree_sweep_20261027/Cargo.toml",
+            "--bin",
+            "fall"
+          ]
+        ],
+        "binary_sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "floor(83/m)",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "certificate_mode": "binary_degree_2_witness_or_prime_degree_4_exclusion"
+      }
+    },
+    {
+      "id": "binary",
+      "role": "candidate",
+      "description": "binary public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_ic_degree_sweep_20261027/Cargo.toml",
+            "--bin",
+            "fall"
+          ]
+        ],
+        "binary_sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "floor(83/m)",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "certificate_mode": "binary_degree_2_witness_or_prime_degree_4_exclusion"
+      }
+    },
+    {
+      "id": "prime",
+      "role": "candidate",
+      "description": "prime public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_ic_degree_sweep_20261027/Cargo.toml",
+            "--bin",
+            "fall"
+          ]
+        ],
+        "binary_sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "floor(83/m)",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "certificate_mode": "binary_degree_2_witness_or_prime_degree_4_exclusion"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact finite-field computations, two pivot orders and fresh-process witness replay; no timing or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Not a separate target arm. Mandatory same-instrument selfcheck: xy+x and xy+y must yield a nonzero linear first fall at 2; tested before the target grid."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Not a separate target arm. Mandatory selfcheck duplicates, homogeneous quadratics and zero input row must report no fall through 2; malformed inputs and altered witnesses are rejected by unit tests."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "37efbf8170ab4c454443a5e7cbb6514c2819a5abf5c3c4244e77d3b4025792eb",
+        "how": "Native certificate code; original target generator unchanged"
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "67c84280824036652fc47702a5a15ceedf3acfe3511361c7f236198e79957bb3",
+        "how": "Retained 48-input list, each system hash checked"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "crossed",
+        "how": "Binary basis subspace or prime integer interval, ell=floor(83/m)"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential producer and replay; two requested CPUs do not imply two algorithm threads"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "EKS Spot host manifest; clocks invalid for performance"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Retained input list order; all cells processed"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen exact acceptance and no discretionary exclusions"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "900s job; 750s producer plus 10s grace, 8Gi memory, no retries; immediate certificate uploads"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Explicit certificate and fresh-process replay pass; null is retained where only a bound is certified"
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact computations on saved inputs, no timing comparison or target resampling.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "Original generator seed only; no new randomness."
+    },
+    "instance_sampling": {
+      "rule": "All 48 previously generated public synthetic inputs, without selection by fall outcome",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Fixed certificate rules; exact witness reconstruction, no statistical analysis",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "16 inputs per family, one certificate stage each: 48 records. Exact computation, no inferential test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.01,
+      "per_sample_seconds": 15.625,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "Small synthetic controls under 0.01s; target per-sample allowance is 750/48, not a measured n83 runtime."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "first_fall_degree",
+        "name": "Earliest certified new degree fall",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Least d with a nonzero f in V(F,d) of degree less than d not obtainable below d; exact value only with lower-degree exclusion and witness",
+        "source": "certificate first_fall_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "first_fall_lower_bound",
+        "name": "Certified first-fall lower bound",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Excluded lower degrees plus one; does not establish an attained fall",
+        "source": "certificate first_fall_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "first_fall_degree",
+      "first_fall_lower_bound",
+      "quadratic_top_rank",
+      "quadratic_full_rank",
+      "degree_four_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "cpus": 2,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Process all 48 inputs, emit one certificate each and replay each in a fresh process, then stop this stage",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "750s producer plus 10s grace within 900s job, 8Gi memory, no automatic retries",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Input hash mismatch, lower-degree input unsupported by detector, failed controls or replay, malformed presentation or incomplete output prevents exact value admission",
+    "Timeout is not a degree bound",
+    "Prime lower bounds are never printed as attained degrees",
+    "All clocks are diagnostic, wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report exact certificates and explicit lower bounds separately. The full user goal remains active when prime exact values are unresolved.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact witness or exclusion certificate per input",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "certified",
+      "certified_no_fall_through_degree_4",
+      "no_fall_through_degree_2",
+      "unsupported_lower_input_degree",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../src/bin/fall.rs",
+      "sha256": "37efbf8170ab4c454443a5e7cbb6514c2819a5abf5c3c4244e77d3b4025792eb"
+    },
+    "inputs": [
+      "retained inputs/inputs.json",
+      "retained inputs/*/system.sing"
+    ],
+    "outputs": [
+      "certificates/*.json",
+      "producer.jsonl",
+      "replay.jsonl"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "First-fall exact values and explicitly censored lower bounds by m and family"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Rank deficiency or zero reduction called a degree fall",
+    "First fall called regularity or last fall",
+    "Prime lower bound called attained degree",
+    "Timeout used as degree bound",
+    "Full active goal marked complete on unresolved prime cells",
+    "Performance or subgroup claims"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Trace identity giving binary degree-two-to-linear falls",
+      "verified_by": "Primary definitions reviewed and scope documented in DESIGN.md"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "V(F,d), nontrivial syzygies, first and last fall are distinct",
+      "verified_by": "Primary definitions reviewed and scope documented in DESIGN.md"
+    },
+    {
+      "ref": "https://arxiv.org/html/1906.05594",
+      "provenance": "retrieved",
+      "claim": "Boolean filtered-algebra first-fall conventions",
+      "verified_by": "Primary definitions reviewed and scope documented in DESIGN.md"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "ade777d99132049e9f34ad0ade714bf24e052ff675a254a6a31a0a195da1da52",
+    "commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+    "frozen_at": "2026-10-27T16:49:18Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "detailed_design": "DESIGN.md",
+    "ordinary_job_nonresumable": true,
+    "candidate_factor_base_only": true,
+    "input_list_sha256": "67c84280824036652fc47702a5a15ceedf3acfe3511361c7f236198e79957bb3",
+    "input_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/",
+    "immediate_certificate_upload": true,
+    "active_goal_prime_exact_unresolved_after_bounds": true
+  }
+}

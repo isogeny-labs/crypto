@@ -1,0 +1,115 @@
+{
+ "lens": "complexity theory and models of computation",
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/ideas/complexity.json",
+ "searches": [
+  {"query": "definable sets finite fields Chatzidakis van den Dries Macintyre index calculus factor base elliptic curve lower bound", "result": "CDM 1992 (Crelle), Fried 1994 effective version, arXiv 2502.20355, arXiv 2408.00102; no link to index calculus or factor bases found"},
+  {"query": "generic group model with low-degree predicates elliptic curve x-coordinate Weil bound simulation discrete logarithm lower bound", "result": "Structured GGM (CGHW, ePrint 2026/384, EUROCRYPT 2026) covers small-integer, smooth-polynomial and EC-point structure; arXiv 2402.11269; no Weil-bound simulation of degree-d x-predicates found"}
+ ],
+ "ideas": [
+  {
+   "id": "MP-complexity-1",
+   "title": "Definable-factor-base dichotomy: any bounded-complexity first-order factor base over F_p has size O(1) or mu*p+O(sqrt p)",
+   "statement": "Let F_p-factor bases be given by first-order formulas phi(x) in the language of rings (arbitrary quantifiers over F_p, auxiliary variables, polynomial equations of degree <= d). By Chatzidakis-van den Dries-Macintyre, |{x in F_p : phi(x)}| is either <= C(phi) or mu*p + O_phi(sqrt p) with mu in a finite set of positive rationals. So every factor base with uniformly bounded algebraic presentation complexity (not just univariate membership degree) has B = Theta(r) or B = O(1); either way B*D^2 >= N. This answers the brief's question 'is there a theorem that any F_p factor base with low algebraic membership degree is small?': yes, and it generalises from univariate membership degree to existential and quantified presentations. Corollary: a factor base of size p^delta, 0<delta<1, needs presentation complexity growing with p (e.g. degree >= p^delta for the univariate case, or a formula whose length/degree grows with log p, such as bit or interval predicates).",
+   "mechanism": "Model theory of pseudofinite fields (CDM uniform Lang-Weil for definable sets) applied to the factor base as a definable subset of A^1(F_p); combined with rule-5 certificate.",
+   "wall_bypassed": "Not a bypass: sharpens 'No subfield, no low-degree membership' (brief §2), whose stated scope is univariate membership degree only; it closes the existential/auxiliary-variable loophole (e.g. squares, images of low-degree maps, multiplicative-coset unions).",
+   "why_wall_hypotheses_fail": "The existing closure (RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM §2.3) only bounds the degree of a univariate membership polynomial; presentations x = g(u), x = u^2 with side conditions, or formulas with quantifiers are outside its hypotheses. CDM covers all of them uniformly. Its own scope limit: formulas whose complexity grows with p (interval x < p^delta, bit predicates, Hamming weight of the integer lift) are not uniformly definable and escape - this pins the only remaining door to non-uniform/bit-level presentations, consistent with the generic-oracle wall's 'only door'.",
+   "nongenericity_argument": "None: theory/closure. It proves that bounded-complexity algebraic bases can never get B*D^2 below N because B is O(1) or linear in p; it reduces the open door to presentations of complexity omega(1) in log p.",
+   "prior_art": "Chatzidakis, van den Dries, Macintyre, Definable sets over finite fields, J. reine angew. Math. 427 (1992); Fried 1994 effective Galois stratification; Lang-Weil; programme RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM §2.3; KN-OPEN-020 'universal algebraic-factor-base no-go'; corpus GAP card 'Model theory of finite fields'.",
+   "novelty_status": "novelty_unverified (searched as listed; no source links CDM to index-calculus factor bases; likely folklore; fills corpus GAP 'model theory of finite fields' and addresses KN-OPEN-020)",
+   "falsifier": {
+    "design": "Enumerate random existential presentations F = {x : exists u, f(x,u)=0 and chi(g(u)) = s} with deg f,g <= 3 (5000 random pairs), and multiplicative-coset unions, at primes p in {2^13+..., 2^15+..., 2^17+...}; compute |F| exactly by enumeration (numpy). Fit |F| = mu*p + e; record the set of mu values and max |e|/sqrt(p); search for any presentation with C < |F| < p/C for C=64 stable across all three primes. Second arm: for target sizes p^delta (delta=1/3,1/2), compute minimal univariate degree / minimal (deg f) of a 1-aux existential presentation achieving that size (greedy search over subgroup images x = u^e).",
+    "toy_params": "p ~ 8209, 32771, 131101; deg <= 3; 5000 presentations per p; delta in {1/3,1/2}",
+    "tools": "python3 numpy, cypari2 for Legendre/roots",
+    "cpu_minutes": 8,
+    "prediction_if_true": "All |F| lie in [0, C] or within mu*p +- 4*sqrt(p) with mu from a small finite set ({1/2,1/4,3/8,...}); no presentation sits at intermediate size stably across p; minimal presentation degree for |F| ~ p^delta grows like p^(1-delta) (subgroup images) i.e. with p.",
+    "prediction_if_false": "Some fixed-degree presentation yields |F| ~ p^delta (0<delta<1) stably across the three primes, contradicting the claimed uniformity (would indicate a bookkeeping error or a non-definable artefact); this would be a genuine small algebraic base and reopen KN-OPEN-020."
+   },
+   "risk": "Result is near-folklore; value is as a formal closure that the swarm can cite, not a route.",
+   "expected_class": "theory"
+  },
+  {
+   "id": "MP-complexity-2",
+   "title": "Carry-level CDCL/XOR decomposition for interval factor bases over F_p, with resolution-size scaling as the decisive measurement",
+   "statement": "Take the interval base F = {P : x(P) < 2^k} on E/F_p (B ~ 2^k). Encode 'x1,x2 < 2^k and S_3(x1,x2,x_R) = 0 mod p' as a bit-level circuit (schoolbook multiply plus modular reduction with explicit quotient bits), Tseitin-CNF with XOR clauses, and solve with cryptominisat5/kissat. The interval predicate is depth-1 in the bit model but has algebraic degree ~p, so this oracle is outside both the algebraic (Gröbner/Semaev) closures and the GGM (it reads the integer representation). The question is the proof-complexity scaling: does the conflict count / UNSAT refutation size grow like 2^{c k} with c<1 (beating the generic MITM oracle cost 2^k = B), or c>=1?",
+   "mechanism": "Non-black-box field access through the integer/carry structure of x in F_p; propagation over carries can prune both summands jointly, which no group-operation oracle can do. Proof-complexity analogue of lever 9 (digit presentation) but measured by CDCL/resolution rather than Gröbner degree.",
+   "wall_bypassed": "Generic oracle bound (uses the field representation, the only door named in §2) and the lattice-reach wall (no small-root lattice; works for any k, not only k < delta_max * log p).",
+   "why_wall_hypotheses_fail": "Generic oracle bound assumes oracle decides membership by group ops + tables; this oracle never forms group elements. Lattice-reach (Jochemsz-May) bounds Coppersmith-type auxiliary-polynomial methods; CDCL is not an auxiliary-polynomial method. 'No low-degree membership' bounds algebraic degree; interval has trivial Boolean circuit complexity. Programme SAT work (WDSat, Xorcle entries) targets binary Weil-descended systems, not prime-field carry encodings.",
+   "nongenericity_argument": "Prime-field IC with m=2 at B=2^k, online decomposition of a randomised target costs D_SAT; certificate needs B*D_SAT^2 << N. With k = log2(p)/3 and D_SAT = 2^{ck}, need 2^{k(1+2c)} << p, i.e. c < 1. Relation probability for m=2 is B^2/p, so total per-relation cost is D_SAT*p/B^2; end-to-end needs c substantially below 1 (c < 1/2 to beat rho at k=log p/3). A measured c >= 1 kills it outright.",
+   "prior_art": "Lever 9 / LEAD-ICP-digit presentation (Gröbner side); Semaev-type prime-field closures (LEAD-ICE-prime-field-semaev-solving-degree); SAT for factoring (known to scale ~ brute force: Mironov-Zhang style results, 'factoring via SAT' literature); Xorcle arXiv 2605.15002; WDSat (Trimoska et al.) for binary descended systems; Petit-Kosters-Messeng 'algebraic approaches for ECDLP over prime fields' (digit/small-coordinate idea in algebraic form).",
+   "novelty_status": "novelty_unverified (not searched; SAT-for-factoring prior art strongly suggests c>=1)",
+   "falsifier": {
+    "design": "For p ~ 2^20, 2^24, 2^28 and k in {6,8,10,12} (k < log2 p / 2), generate 50 targets R with a planted decomposition (R = P1+P2, x(Pi)<2^k) and 50 random targets (mostly UNSAT). Build CNF+XOR of the bit-level S_3 mod p constraint (python generator, quotient bits explicit), run cryptominisat5 with 60 s cap per instance. Record conflicts and time; fit log2(median conflicts) vs k for SAT and UNSAT separately; compare with generic baseline 2^k (MITM table of B points). Control: same encoding with x1 free (no interval) to calibrate.",
+    "toy_params": "p ~ 2^20, 2^24, 2^28; k = 6..12; 100 instances per cell; cap 60 s",
+    "tools": "python3 (CNF generator), cryptominisat5, kissat, cypari2 for curve/points",
+    "cpu_minutes": 18,
+    "prediction_if_true": "UNSAT conflicts scale as 2^{c k} with fitted c <= 0.6 across all three p, and SAT instances found with < 2^{0.6k} conflicts; slope independent of log p.",
+    "prediction_if_false": "Fitted c >= 1 (likely 1.5-2, as for SAT factoring), conflicts also grow with log p; oracle dominated by MITM; close as 'carry-level CDCL is at least generic', scope: CNF+XOR resolution-based solvers only."
+   },
+   "risk": "High prior probability of c >= 1 (multiplication circuits are hard for resolution). Encoding choices can inflate constants but not slope.",
+   "expected_class": "advance"
+  },
+  {
+   "id": "MP-complexity-3",
+   "title": "Degree-d-predicate GGM: simulation theorem pricing how much algebraic degree a non-generic x-oracle must have",
+   "statement": "Define GGM_d: a generic algorithm that may additionally query, on any handle P it holds, predicates pi(P) = [h(x(P),y(P)) in S] where h has degree <= d and S is a fixed character-defined set (e.g. Legendre symbol, trace bit). Claim: by Weil/Kohel-Shparlinski bounds for sums of products of functions on E along linear forms a_i G + b_i R, the joint law of q predicate answers on T distinct linear-form handles is within O(q * d * sqrt(p) / p)= O(q d / sqrt p) of independent coins with known densities, uniformly over the hidden log. Hence any GGM_d algorithm succeeds with probability <= O(T^2/N) + O(q d / sqrt p). Consequence (formal statement of what a non-generic ECDLP algorithm must use): to run in T = p^{1/2-eps} with q <= T predicate calls and constant success, predicates of degree d >= p^{eps} are required; interval, bit and integer-lift predicates have degree Theta(p) and escape, all fixed-degree x-functionals do not. This gives the theoretical closure of polynomial x-filters (KN-OPEN-91d4f6, polynomial case) as a simulation theorem, complementing the KKS polynomial-approximation template.",
+   "mechanism": "Hybrid argument replacing each degree-d predicate answer by a biased coin, error controlled by character sums over E of degree-O(qd) functions; stated as a model between Shoup GGM and the structured GGM.",
+   "wall_bypassed": "Theory: delimits the boundary of 'GGM-simulable augmented oracles' quantitatively (degree vs time) instead of the current yes/no list; shows which representation-dependent oracles are automatically simulable.",
+   "why_wall_hypotheses_fail": "Existing GGM-simulability results (KN-FIND-002, jets, endomorphism images) are for group-computable maps; low-degree x-predicates are representation-dependent and not covered. The structured GGM (CGHW 2026/384) models EC-point structure differently (by their definition of structure), not by algebraic degree of queried predicates with a Weil-bound error term.",
+   "nongenericity_argument": "None for a route: it proves that degree-d predicates add at most q*d/sqrt(p) advantage, so B*D^2 < N needs predicates of degree p^{Omega(1)}; it is a theory item that redirects lever 8 to high-degree / integer predicates only.",
+   "prior_art": "Shoup 1997; Corrigan-Gibbs-Kogan 2018 (preprocessing); Corrigan-Gibbs-Henzinger-Wu Structured GGM, ePrint 2026/384; Kohel-Shparlinski 2000 exponential sums on elliptic curves; Kopparty-Kothary-Shankar 2026 (arXiv 2610.33452) polynomial approximation of DL; Zhandry-Hhan new generic lower bounds (arXiv 2402.11269); programme THM_JETBARRIER1, THM_INCBARRIER1.",
+   "novelty_status": "novelty_unverified (searched as listed: no Weil-bound simulation of degree-d x-predicates found; CGHW 2026/384 full text not read and may contain an equivalent)",
+   "falsifier": {
+    "design": "Measure the key hypothesis (triple-correlation bound). On E/F_p, for random predicates pi(P) = Legendre(f(x(P))) with deg f = d, compute exact correlation c3 = E_P,Q[pi(P) pi(Q) pi(P+Q)] - product of means, and the conditional bias Pr[pi(P+Q)=1 | pi(P)=pi(Q)=1] - Pr[pi=1], by full enumeration over P with Q drawn from 2^12 random points (numpy). Also the best-of-200 random f per d (search for adversarial predicates). Plot max |bias| * sqrt(p) / d.",
+    "toy_params": "p ~ 2^16, 2^18, 2^20 (prime order curves); d = 1,2,4,8,16; 200 predicates per d",
+    "tools": "python3 numpy, cypari2",
+    "cpu_minutes": 15,
+    "prediction_if_true": "max |bias| * sqrt(p)/d stays bounded (<= ~6) for all p and d, and does not grow with p; best-of-200 search gains only the expected sqrt(log 200) factor.",
+    "prediction_if_false": "Some degree-d family shows bias * sqrt(p)/d growing with p (e.g. bias constant in p), i.e. a fixed-degree x-filter with non-vanishing sum correlation - that would be a live KN-OPEN-91d4f6 filter and refute the simulation theorem."
+   },
+   "risk": "Error term may need d^2 or genus-dependent constants; theorem may already be implicit in CGHW. Low risk as accounting/theory.",
+   "expected_class": "theory"
+  },
+  {
+   "id": "MP-complexity-4",
+   "title": "Boolean-spectrum certificate for bit-level decomposability oracles (Linial-Mansour-Nisan contrapositive on the sumset indicator)",
+   "statement": "For the interval base F = {x(P) < 2^k}, consider the Boolean function Dec(b) on the n = ceil(log2 p) bits of x(R): Dec = 1 iff R or -R is in F+F. If any bit-level oracle of AC0 size s / depth h (or F_2-degree t) decided Dec, LMN forces Fourier mass concentrated on levels <= O(log s)^{h} (resp. low-degree ANF). Measuring the full Walsh spectrum and F_2 algebraic degree of Dec on toy p therefore certifies (on toys) that no shallow bit-circuit oracle exists, or exhibits one. Different from exhausted coordinate-statistic hunts: the object is the exact decomposability indicator of the target (a sumset membership function), and the statistic is a circuit-class invariant, not a coordinate bias.",
+   "mechanism": "Circuit-complexity lens on the 'bit structure of x in F_p' door: the interval/bit structure is the only non-algebraic handle; this measures whether Dec inherits any low-complexity Boolean structure from the carry structure of x(P1+P2) as a rational function of x1,x2.",
+   "wall_bypassed": "Generic oracle bound (bit-level access) and 'no low-degree membership' (Boolean degree, not F_p-algebraic degree).",
+   "why_wall_hypotheses_fail": "Generic bound assumes group-operation access; F_p-degree closure is about algebraic degree over F_p, which says nothing about F_2-degree of the bit function or AC0 complexity. Coordinate-statistic hunts tested biases of single coordinates under the group law, not the spectrum of the sumset indicator.",
+   "nongenericity_argument": "If Dec has F_2-degree t << n or spectrum concentrated at level <= t, one could evaluate it in poly(n^t) time per target, giving D = n^t and B = 2^k, so B*D^2 << N for k < log2 N - 2t log n: an advance. If spectrum is flat (random-like), the result is a toy-scale circuit lower-bound certificate and the item is theory.",
+   "prior_art": "Linial-Mansour-Nisan 1993; programme LEAD-EXO-coordinate-statistic-leakage (exhausted_at_scale); E-ML-6 exact-rule miner (ml_cryptanalysis lane; different vocabulary, no Fourier-level criterion); Boneh-Venkatesan / hidden-number bit-security (LEAD-EXO-hnp-advice-leakage); Mahassni-Shparlinski bit-hardness of DL; additive rigidity of x-coordinates (arXiv 2510.03828).",
+   "novelty_status": "novelty_unverified (not searched)",
+   "falsifier": {
+    "design": "p ~ 2^18 and 2^20 prime-order curves; k = 8,9,10. Enumerate all P1,P2 with x < 2^k (<= 2^20 pairs), mark Dec on x(P1+P2) (and x of negation is same x). Dec as a length-2^n table indexed by x (non-points marked 0; repeat with restriction to x of curve points via a uniform random padding control). Fast Walsh-Hadamard transform (numpy) for spectrum by level; Moebius transform for ANF degree. Null: 50 random functions of same density on the same support. Report W^{<=t} for t=1..6 as z-scores vs null, and ANF degree.",
+    "toy_params": "p ~ 2^18, 2^20; k in {8,9,10}; null n=50",
+    "tools": "python3 numpy, cypari2",
+    "cpu_minutes": 10,
+    "prediction_if_true": "W^{<=4} exceeds null by z > 5 at both p, with a structure (specific low-level characters) that persists when p changes; or ANF degree < n - 3.",
+    "prediction_if_false": "All low-level weights within |z| < 3 of null, ANF degree = n or n-1 as for random functions; certifies no low-degree / shallow bit oracle at toy scale (closure scoped to interval bases and the tested k/log p ratios)."
+   },
+   "risk": "Strong prior for flat spectrum (x(P1+P2) is a high-degree rational map). Must handle the non-point half of F_p by restriction controls to avoid a quadratic-residue artefact (Legendre of x^3+ax+b has its own spectrum).",
+   "expected_class": "theory"
+  },
+  {
+   "id": "MP-complexity-5",
+   "title": "Encoding-orbit invariance criterion: a non-generic IC must break the x -> u^2 x + r model-change symmetry, measured as yield variance over models",
+   "statement": "Every algebraic oracle (Semaev, Gröbner, any F_p-polynomial in x) is equivariant under the ~p^2 changes of Weierstrass model x -> u^2 x + r; generic algorithms are invariant under all p! encodings. Representation-dependent bases (interval, bit) are not invariant under model change, so the model (u,r) becomes a free O(log p)-bit parameter. Complexity claim: choosing the best of M ~ p^2 models can raise the triple count |{(P1,P2,P3) in F^3: P1+P2+P3=0}| only to lambda + O(sqrt(lambda log p)) (Poisson extreme value), i.e. a constant/log factor, unless model choice correlates with additive structure; any super-logarithmic gain would be a genuine non-generic, encoding-exploiting effect. This gives an operational test for 'does the representation carry additive structure at all'.",
+   "mechanism": "Treat the representation as a selectable advice string of 2 log p bits (non-uniform encoding choice) and compare against the extreme-value null; equivalently, a preprocessing (advice) frontier for structured instances where advice = encoding.",
+   "wall_bypassed": "Generic oracle bound (representation-dependent) and Summation-cover monodromy (that wall fixes mean yield for algebraic bases; it says nothing about variance over non-algebraic encodings, which §2 lists as free).",
+   "why_wall_hypotheses_fail": "Monodromy/double-count closure is stated for algebraic factor-base loci; interval bases are not loci of bounded degree (MP-complexity-1). CGK advice bound is for generic advice; advice = model choice is representation-dependent.",
+   "nongenericity_argument": "Only an advance if best-model triple counts exceed the extreme-value null by a factor growing with p (e.g. p^{eps}); then B could shrink by that factor at fixed relation count, moving B*D^2 toward N. Expected: accounting (log factor), which would close 'model selection' for interval bases.",
+   "prior_art": "Transport conservation and summation-cover monodromy closures (brief §2); GLV/Frobenius-invariant bases (GGMP 2020); additive combinatorics of x-coordinates (Shparlinski; arXiv 2510.03828 additive rigidity); KN-OPEN-cc1988 (weakness within isogeny class) - different: isomorphism class, not isogeny class.",
+   "novelty_status": "novelty_unverified (not searched)",
+   "falsifier": {
+    "design": "p ~ 2^20 prime-order curve; interval base F_{u,r} = {P : x_{u,r}(P) < 2^k} with x_{u,r} = u^2 x + r (all reduced mod p), k = 8 (B ~ 2^8). For 20000 random (u,r) count exact triples P1+P2+P3 = 0 within F (and pair sums landing in F) by hashing; compare max and distribution with Poisson(lambda) null fitted per model and with 20000 random subsets of equal size. Repeat at p ~ 2^18 to check scaling of max/lambda.",
+    "toy_params": "p ~ 2^18, 2^20; k = 8; 20000 models; null 20000 random sets",
+    "tools": "python3 numpy, cypari2",
+    "cpu_minutes": 12,
+    "prediction_if_true": "Distribution over models has heavier tail than random subsets (variance ratio > 2) and max/lambda grows from p=2^18 to 2^20.",
+    "prediction_if_false": "Model distribution matches the random-subset null (variance ratio within 0.8-1.25, KS p > 0.01); max/lambda consistent with Poisson extreme value; close model selection for interval bases as accounting."
+   },
+   "risk": "Likely null; scope limited to short/affine model changes and interval bases.",
+   "expected_class": "accounting"
+  }
+ ]
+}

@@ -1,0 +1,100 @@
+<!doctype html><meta charset=utf-8><title>Large primes, multi-target collection, and the byte counter</title>
+<style>body{font:13px/1.45 sans-serif;max-width:880px;margin:auto}table{border-collapse:collapse;margin:6px 0}td,th{border:1px solid #bbb;padding:2px 6px;text-align:left;vertical-align:top}h1{font-size:20px}h2{font-size:16px;margin-top:18px}code{font-size:12px}</style>
+<h1>Triple and quadruple large primes, "outside the box" probes, and the byte-counter decision</h1>
+<p><b>Status: exploratory, not preregistered, no leaderboard or benchmarks row.</b> The goal (index calculus near rho parity on a single target) is <b>not met</b>. What this study found is where the overhead comes from and the one regime in which it disappears.</p>
+
+<h2>1. Triple / quadruple large primes (analysis plus in-repo measurements)</h2>
+<p>A k-large-prime scheme lets a relation contain k unknown "large" group elements; relations are combined through a graph or hypergraph whose cycles cancel the large primes. That reduces how many relations are needed for rank (a hypergraph cycle count, linear in the number of large primes). It does not change what a relation costs. A relation with k large primes drawn from a set of size l is a k-summand coincidence among group elements, and in a prime-order elliptic-curve group there is no homomorphic coordinate, so partial-collision tricks (Wagner's k-tree) do not apply. Detection is a generic k-sum search, so the whole scheme is a generic-group algorithm and Shoup's bound (about sqrt(r) group operations) applies.</p>
+<table><tr><th>summands k</th><th>generic best exponent k/(2k-1)</th><th>measured in-repo (lead atlas, ic.ksum, 40-bit prime curve, w=0)</th></tr>
+<tr><td>2 (double LP / pair table)</td><td>0.667</td><td>not re-quoted here (atlas: pair-table pipelines grow faster than rho)</td></tr>
+<tr><td>3 (triple LP)</td><td>0.600</td><td>not re-quoted here (atlas: mitm decomposition exponents 0.60-0.75 at 12-32 bits, rho 0.50)</td></tr>
+<tr><td>4 (quadruple LP)</td><td>0.571</td><td>0.565 [0.560, 0.571]; S = 11.56</td></tr>
+<tr><td>5</td><td>0.556</td><td>0.547 [0.543, 0.554]; S = 8.51, 9.7x rho-neg</td></tr>
+<tr><td>rho</td><td>0.500</td><td>0.50 [0.48, 0.52]</td></tr></table>
+<p>The exponent only approaches 1/2 from above as k grows, with memory approaching sqrt(r). Triple and quadruple large primes were therefore already measured here as the k-sum tracks, and are worse than rho at every size tested. The numbers in the right-hand column are quoted from the crypto-autoresearcher lead atlas (<code>LEAD-ICP-generic-table-decomposition</code>), not re-run. Constants: Shoup's bound is an asymptotic statement, so what it rules out is a better exponent; any generic variant could at most gain a constant over rho, and none is close to parity today (res1eq = 1.60x).</p>
+
+<h2>2. Where the overhead actually comes from, and the regime where it vanishes</h2>
+<p>The residual collector is a rho-style collision search that needs B+1 independent relations for B unknown factor-base logs plus the target. For one target and B=1 the exact expected cost is Gamma(2.5)/(Gamma(2)Gamma(1.5)) = 1.5 times a single collision, which is the floor res1eq (1.60x rho) sits near. That overhead is an artifact of having one target. With T targets sharing one table, T unknown logs need about T relations either way, so adding B extra unknowns changes the count from T to T+B and the relative overhead falls to about B/(2T).</p>
+<p><b>Prototype (standalone Python, 20-bit prime-order curve, r = 909917, 12 trials per cell, every recovered log checked against the planted value):</b> walks step only by multiples of G, so trails of different targets can merge; every collision is one linear equation over GF(r); counts are group additions.</p>
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="330" font-family="sans-serif" font-size="11">
+<line x1="70" x2="370" y1="250.0" y2="250.0" stroke="#ddd"/><text x="64" y="254.0" text-anchor="end">200</text>
+<line x1="70" x2="370" y1="215.56305535734856" y2="215.56305535734856" stroke="#ddd"/><text x="64" y="219.56305535734856" text-anchor="end">300</text>
+<line x1="70" x2="370" y1="172.17763605516654" y2="172.17763605516654" stroke="#ddd"/><text x="64" y="176.17763605516654" text-anchor="end">500</text>
+<line x1="70" x2="370" y1="113.30729034890899" y2="113.30729034890899" stroke="#ddd"/><text x="64" y="117.30729034890899" text-anchor="end">1000</text>
+<line x1="70" x2="370" y1="54.43694464265141" y2="54.43694464265141" stroke="#ddd"/><text x="64" y="58.43694464265141" text-anchor="end">2000</text>
+<text x="70.0" y="266" text-anchor="middle">1</text>
+<text x="120.0" y="266" text-anchor="middle">2</text>
+<text x="170.0" y="266" text-anchor="middle">4</text>
+<text x="220.0" y="266" text-anchor="middle">8</text>
+<text x="270.0" y="266" text-anchor="middle">16</text>
+<text x="320.0" y="266" text-anchor="middle">32</text>
+<text x="370.0" y="266" text-anchor="middle">64</text>
+<text x="220.0" y="284" text-anchor="middle">targets T sharing one table (r = 909917, sqrt r = 953)</text><text x="70" y="14">group additions per target</text>
+<polyline points="70.0,79.46125813833638 120.0,105.46758919725195 170.0,127.79252893824285 220.0,150.9992619073819 270.0,171.51773707320692 320.0,190.60048151767532 370.0,205.38353903793762" fill="none" stroke="#1f4e9c" stroke-width="2"/>
+<line x1="70.0" x2="70.0" y1="88.00146303143305" y2="71.70188301034483" stroke="#1f4e9c"/><circle cx="70.0" cy="79.46125813833638" r="3" fill="#1f4e9c"/>
+<line x1="120.0" x2="120.0" y1="112.57157806141916" y2="98.91220900248268" stroke="#1f4e9c"/><circle cx="120.0" cy="105.46758919725195" r="3" fill="#1f4e9c"/>
+<line x1="170.0" x2="170.0" y1="134.99963479416047" y2="121.14944946693396" stroke="#1f4e9c"/><circle cx="170.0" cy="127.79252893824285" r="3" fill="#1f4e9c"/>
+<line x1="220.0" x2="220.0" y1="154.7475646025111" y2="147.4094146019182" stroke="#1f4e9c"/><circle cx="220.0" cy="150.9992619073819" r="3" fill="#1f4e9c"/>
+<line x1="270.0" x2="270.0" y1="175.62703557509283" y2="167.59811841826252" stroke="#1f4e9c"/><circle cx="270.0" cy="171.51773707320692" r="3" fill="#1f4e9c"/>
+<line x1="320.0" x2="320.0" y1="195.24059360275066" y2="186.20079544828698" stroke="#1f4e9c"/><circle cx="320.0" cy="190.60048151767532" r="3" fill="#1f4e9c"/>
+<line x1="370.0" x2="370.0" y1="208.7648716466403" y2="202.1316864567799" stroke="#1f4e9c"/><circle cx="370.0" cy="205.38353903793762" r="3" fill="#1f4e9c"/>
+<polyline points="70.0,52.821708211493416 120.0,101.28208353369709 170.0,124.7454932863992 220.0,156.82020322890617 270.0,172.48394277957962 320.0,188.2283912833506 370.0,208.5300005176228" fill="none" stroke="#c0392b" stroke-width="2"/>
+<line x1="70.0" x2="70.0" y1="61.104292414967944" y2="45.27555786711309" stroke="#c0392b"/><circle cx="70.0" cy="52.821708211493416" r="3" fill="#c0392b"/>
+<line x1="120.0" x2="120.0" y1="108.41450368739174" y2="94.70250332436183" stroke="#c0392b"/><circle cx="120.0" cy="101.28208353369709" r="3" fill="#c0392b"/>
+<line x1="170.0" x2="170.0" y1="130.09999409772524" y2="119.70863793420963" stroke="#c0392b"/><circle cx="170.0" cy="124.7454932863992" r="3" fill="#c0392b"/>
+<line x1="220.0" x2="220.0" y1="160.63296123752414" y2="153.17127875152158" stroke="#c0392b"/><circle cx="220.0" cy="156.82020322890617" r="3" fill="#c0392b"/>
+<line x1="270.0" x2="270.0" y1="175.57398073371792" y2="169.5023926565373" stroke="#c0392b"/><circle cx="270.0" cy="172.48394277957962" r="3" fill="#c0392b"/>
+<line x1="320.0" x2="320.0" y1="191.59806937620627" y2="184.98731906061275" stroke="#c0392b"/><circle cx="320.0" cy="188.2283912833506" r="3" fill="#c0392b"/>
+<line x1="370.0" x2="370.0" y1="211.58114071176828" y2="205.5846805311341" stroke="#c0392b"/><circle cx="370.0" cy="208.5300005176228" r="3" fill="#c0392b"/>
+<text x="366" y="181.38353903793762" text-anchor="end" fill="#1f4e9c">B=0 (multi-target rho)</text><text x="366" y="58.821708211493416" text-anchor="end" fill="#c0392b" >B=1 (collector structure)</text>
+<line x1="410" x2="710" y1="224.44444444444443" y2="224.44444444444443" stroke="#ddd"/><text x="404" y="228.44444444444443" text-anchor="end">0.8</text>
+<line x1="410" x2="710" y1="173.33333333333334" y2="173.33333333333334" stroke="#c00"/><text x="404" y="177.33333333333334" text-anchor="end">1.0</text>
+<line x1="410" x2="710" y1="122.22222222222224" y2="122.22222222222224" stroke="#ddd"/><text x="404" y="126.22222222222224" text-anchor="end">1.2</text>
+<line x1="410" x2="710" y1="71.11111111111117" y2="71.11111111111117" stroke="#ddd"/><text x="404" y="75.11111111111117" text-anchor="end">1.4</text>
+<line x1="410" x2="710" y1="20.0" y2="20.0" stroke="#ddd"/><text x="404" y="24.0" text-anchor="end">1.6</text>
+<text x="410.0" y="266" text-anchor="middle">1</text>
+<text x="460.0" y="266" text-anchor="middle">2</text>
+<text x="510.0" y="266" text-anchor="middle">4</text>
+<text x="560.0" y="266" text-anchor="middle">8</text>
+<text x="610.0" y="266" text-anchor="middle">16</text>
+<text x="660.0" y="266" text-anchor="middle">32</text>
+<text x="710.0" y="266" text-anchor="middle">64</text>
+<text x="410" y="14">B=1 / B=0 cost ratio (per target)</text><text x="560.0" y="284" text-anchor="middle">targets T</text>
+<polyline points="410.0,79.18128654970761 460.0,160.4238979564958 510.0,163.99852414083915 560.0,190.2614990302023 610.0,176.22411854203875 660.0,166.0952380952381 710.0,182.62763650699782" fill="none" stroke="#333" stroke-width="2"/>
+<line x1="410.0" x2="410.0" y1="125.81823486326383" y2="32.54433823615136" stroke="#333"/><circle cx="410.0" cy="79.18128654970761" r="3" fill="#333"/>
+<line x1="460.0" x2="460.0" y1="190.947133187123" y2="129.90066272586856" stroke="#333"/><circle cx="460.0" cy="160.4238979564958" r="3" fill="#333"/>
+<line x1="510.0" x2="510.0" y1="190.94964820257553" y2="137.04740007910277" stroke="#333"/><circle cx="510.0" cy="163.99852414083915" r="3" fill="#333"/>
+<line x1="560.0" x2="560.0" y1="204.95419158724727" y2="175.56880647315728" stroke="#333"/><circle cx="560.0" cy="190.2614990302023" r="3" fill="#333"/>
+<line x1="610.0" x2="610.0" y1="191.187671878271" y2="161.26056520580653" stroke="#333"/><circle cx="610.0" cy="176.22411854203875" r="3" fill="#333"/>
+<line x1="660.0" x2="660.0" y1="183.40749875071822" y2="148.78297743975799" stroke="#333"/><circle cx="660.0" cy="166.0952380952381" r="3" fill="#333"/>
+<line x1="710.0" x2="710.0" y1="195.58509422782168" y2="169.670178786174" stroke="#333"/><circle cx="710.0" cy="182.62763650699782" r="3" fill="#333"/>
+</svg>
+<table><tr><th>T</th><th>adds / target, B=0</th><th>adds / target, B=1</th><th>B=1 / B=0</th></tr>
+<tr><td>1</td><td>1490 +- 143</td><td>2038 +- 189</td><td>1.37 +- 0.18</td></tr>
+<tr><td>4</td><td>843 +- 69</td><td>874 +- 53</td><td>1.04 +- 0.11</td></tr>
+<tr><td>16</td><td>504 +- 24</td><td>498 +- 18</td><td>0.99 +- 0.06</td></tr>
+<tr><td>64</td><td>338 +- 13</td><td>326 +- 12</td><td>0.96 +- 0.05</td></tr></table>
+<p>The B=1 overhead is 1.37x at T=1 (consistent with the 1.5 prediction within the noise) and indistinguishable from 1 for T of 8 or more. Per-target cost at T=64 is 4.4x below T=1 (the ideal sqrt(T) would be 8x; the loss is the connectivity cost of the equation graph, roughly sqrt(ln T)).</p>
+<p><b>Honest reading:</b> this is multi-target rho (Kuhn-Struik; Bernstein-Lange), reproduced. The B=0 curve <i>is</i> a multi-target rho. It beats a single-target rho by up to 4.4x here, but a fair reference for a T-target batch is multi-target rho, and against that the collector's ratio goes to 1 (parity), not below. It is not index calculus beating rho, and a batch changes the unit of S, so by the repository's success criterion it is a separate track, not an improvement of the single-target baseline. Caveats: one small curve, no negation map, no distinguished points (the whole table is stored, memory not charged), start-point setup not counted, Python prototype outside ecbench.</p>
+
+<h2>3. Other probes</h2>
+<table><tr><th>idea</th><th>status</th><th>result</th></tr>
+<tr><td>Coordinate-leakage battery: 15 bit/Legendre/size features of x([k]G), y vs 18 bit/residue/size targets of k, p36 curve, N = 60,000, 272 pairs (script <code>scripts/leak.py</code>)</td><td>run</td><td>Null. Largest |z| = 3.26 against a Bonferroni threshold of 3.74 and a null expectation of about 3.35. Planted positive controls: a 2% match-probability bias reads |z| = 8.9, so correlations of about 1.5% or more would have been seen.</td></tr>
+<tr><td>Small-x decomposition by Coppersmith / lattice small roots on S_3 (algebraic, p-adic-free)</td><td>estimate, not run</td><td>Even under the optimistic bound X*Y at most p^(1/2) for the degree-(2,2) polynomial, base size p^(1/4) gives decomposition probability p^(-1/2) per target, so about p^(1/2) lattice calls per relation and p^(3/4) in total, each far more than one group addition. Worse than rho. The atlas lists this lead without a run.</td></tr>
+<tr><td>Isogeny to a curve with more automorphisms (j = 0 or 1728)</td><td>analysis</td><td>Would speed up rho by sqrt(|Aut|/2) on that curve, but only exists in the class for special traces, and it helps the matched rho equally. Not a relation source.</td></tr>
+<tr><td>Endomorphism orbits (GLV)</td><td>analysis</td><td>The equivalence class under a non-unit endomorphism has size ord(lambda), about r for generic lambda, so canonicalisation costs more than the walk. Only units (size 2, 4, 6) are usable, and eq already takes size 2.</td></tr>
+<tr><td>Pairing / MOV transfer</td><td>analysis</td><td>Needs a small embedding degree; for a random prime-order curve the degree is huge. Not applicable to a generic target.</td></tr></table>
+
+<h2>4. The byte counter: assessment and decision</h2>
+<p>The question: should <code>residual_table_bytes_uncharged</code> count as an operation? <b>Current state:</b> AGENTS.md section 5a (owner, 2026-11-01) already adopted option B: the band prices operations, not bytes. <code>NON_OPERATION_COUNTERS</code> in <code>src/cryptanalysis/ecbench/band.rs</code> lists the byte counters, which stay listed with their counts but are not charged <i>w</i>; audit in <code>research/ic_byte_counter_pricing_20261101/</code>. My earlier "owner decision outstanding" notes were stale.</p>
+<p><b>Why charging a byte at w GAE is wrong:</b> a GAE is one group addition, about 86,000 bit operations on these curves (35.4e9 bit operations over 410,591 additions in a res1eq run). Charging one GAE per byte makes 12.2 MB of baseline table cost 12 million GAE, about sixteen times the arm's whole group work (766k GAE), which is what produced the 17-58x figures before option B. The time spent using the table is already counted by its probes (<code>lookups</code>) and inserts.</p>
+<p><b>Why it still counts as an operation, at its true price:</b> writing the table is a word store. The repository already prices the factor-base vector that way in the <code>*_full</code> methods (one word store per eight bytes, <code>full_price.rs</code>). On the same basis (about 64 bit operations per word store, my estimate) the residual table is: res1eq 34 KB, about 4,300 words, about 3 GAE out of about 385,000 (0.001%); the baseline residual arm (res2aa) 12.2 MB per run (978 MB over 80 runs), about 1,140 GAE out of 766,000 (0.15%). No ranking changes under any price from zero up to this one.</p>
+<p><b>Measured effect on my own reported numbers:</b> pricing bytes at one GAE per byte would move res1eq at w=1 from 2.69x to 2.76x rho (+2.6%). The figures I reported (1.60x, 1.80x, 2.70x for w = 0, 0.1, 1) are exclusive of bytes and consistent with option B.</p>
+<p><b>Memory is still a real cost, and belongs on its own axis.</b> Peak table: rho about 440 distinguished points (about 10 KB if 24 bytes each, an assumption); res1eq 34 KB (about 3x that); res2aa 12.2 MB (about 1,200x). The Iso Lab L2 replay measured the real-world price directly: res2aa runs at 1.463x rho's nanoseconds per counted operation (CI [1.442, 1.484]), a cost of memory showing up as time per operation rather than as extra operations.</p>
+<p><b>Decision:</b> (1) Keep option B; do not change the band or any emitter. (2) Treat byte counters as operations only at word-store price, immaterial here, so no price is added to the band. (3) Report peak table bytes and ns/GAE as a separate memory axis next to every IC-versus-rho row. This needs no code change; whether to add the word-store line to the <code>*_full</code> pricing for the residual counter is a small follow-up I did not make.</p>
+
+<h2>5. Decisions on direction</h2>
+<ol><li>Triple and quadruple large primes: closed by the generic bound and by the repository's own k-sum measurements. I will not build them.</li>
+<li>Single-target index calculus on a generic prime-order curve cannot reach parity with the methods known; the floor is the exact 1.5x collision overhead plus whatever constant a perfect generic algorithm still holds over rho.</li>
+<li>The one place the gap closes is the batch regime. I recommend recording it as its own track: a T-target shared-table collector measured in ecbench against <i>multi-target rho</i> as the matched reference, with distinguished points and memory reported, before any claim. That needs an ecbench method and a matched reference; it is not built yet.</li></ol>
+<p>Scripts and logs: <code>scripts/mt.py</code>, <code>scripts/leak.py</code>, <code>logs/</code>. Not covered: negation, distinguished points, larger curves, hardware effects.</p>

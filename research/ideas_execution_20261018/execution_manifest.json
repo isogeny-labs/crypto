@@ -1,0 +1,30 @@
+{
+  "schema":"ideas-execution-record/v1",
+  "recorded_utc":"2026-10-18T03:29:44Z",
+  "host":{"kernel":"Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026","cpu_quota":"400000/100000 (4 cores)","memory_cgroup_bytes":17179869184,"gpu":false,"isolation":"shared session; no comparative timing claims"},
+  "toolchain":{"rust":"stable 1.99.1","cargo_home":"/workspace/toolchains/cargo","rustup_home":"/workspace/toolchains/rustup"},
+  "runs":[
+    {"item":2,"revision":"04c3c012","argv":["cargo","run","--locked","--release","--manifest-path","research/ideas_execution_20261018/native/Cargo.toml","--","research/ideas_execution_20261018/cost_surface.json"],"exit_status":0,"stdout":"wrote 1944 derived conditional rows","output":"cost_surface.json","classification":"derived conditional partial costs"},
+    {"item":2,"revision":"b3a3321c","argv":["cargo","run","--locked","--release","--manifest-path","research/ideas_execution_20261018/native/Cargo.toml","--bin","cost-surface","--","research/ideas_execution_20261018/cost_surface_amendment_01.json"],"exit_status":0,"stdout":"wrote 2592 derived conditional rows","output":"cost_surface_amendment_01.json","classification":"derived conditional partial costs"},
+    {"item":20,"revision":"b3a3321c","argv":["cargo","run","--locked","--release","--manifest-path","research/ideas_execution_20261018/native/Cargo.toml","--bin","quantum-boundary","--","research/ideas_execution_20261018/quantum_boundary.json"],"exit_status":0,"stdout":"wrote 75 resource rows and 18 checked exact-congruence diagnostics","output":"quantum_boundary.json","classification":"partial arithmetic and native classical diagnostic"},
+    {"item":20,"revision":"b7528cb5","argv":["cargo","run","--locked","--release","--manifest-path","research/ideas_execution_20261018/native/Cargo.toml","--bin","fourier-recovery","--","research/ideas_execution_20261018/fourier_recovery.json"],"exit_status":0,"stdout":"wrote 12 normalized Fourier-law fixtures with explicit successful, wrong, and rejected candidate masses","output":"fourier_recovery.json","classification":"classical small cyclic-group Fourier outcome law; no quantum run","source_output_hashes":"runs/extended-native-sources.sha256"}
+  ],
+  "validation":{"command":"cargo test --locked --release --manifest-path research/ideas_execution_20261018/native/Cargo.toml --jobs 1","cost_tests_passed":4,"quantum_boundary_tests_passed":3,"fourier_tests_passed":3,"failed":0},
+  "failed_attempts":[
+    {"action":"Initial direct launch of cost calculator after cargo test","exit_status":127,"reason":"cargo test built test executable but not standalone bin; repaired with cargo run","scientific_trials":0},
+    {"action":"Initial whole-library release build at baseline e063d98475589d9aba7ae265a8cba830927e3156","exit_status":101,"reason":"duplicate Fp4 enum variant, missing constructors/module export/import and pivot-policy function; native modeled calculator was isolated","evidence":"runs/build-baseline.log"}
+  ],
+  "sha256":{
+    "cost_protocol.json":"e7d2546259576ff08da84766d7a1b0a54c3c87227f7e5ffb5d4de2f882b671ab",
+    "cost_protocol_amendment_01.json":"1937a1733b6a74232ecadb9389674035bd347766b1d27f49e9dedd4b588c62a4",
+    "native/cost_surface.rs":"a8b84fec3a3ddc6effd7dcecc26ba7c0018ee48624609e0cb5611a5f968c71fd",
+    "native/quantum_boundary.rs":"46f3efaff23cf3e3e03956b60cd392f3722edb679afd39a8628bb81742944045",
+    "quantum_protocol.json":"6ede6b38050bf09953d41df86404eee09a01fc5e5513cc11259f1f8d92c55ca4",
+    "cost_surface.json":"6dbfbff9c376244523199639b9110ba956ddc14f91838e7bec5783a23d483ae2",
+    "cost_surface_amendment_01.json":"f63c453c561d7b1d3e5aeb82e6b19c4652fab764f0601e69fd25a18724c050cf",
+    "quantum_boundary.json":"84db5ff00f65b0f0e451f6bb6fbe0193142f82b7c4e1cd39a8849de25300db05",
+    "crypto:src/binary_ecc/curve.rs":"ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62"
+  },
+  "timestamp_limits":"Per-process start/end timestamps were not instrumented on the arithmetic runs. This record captures the observed completion and source/output identities, not invented timestamps.",
+  "complete_against_user_request":false
+}

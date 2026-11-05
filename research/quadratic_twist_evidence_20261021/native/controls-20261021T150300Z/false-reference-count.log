@@ -1,0 +1,14 @@
+PASS census p=5: 20 models
+PASS census p=7: 42 models
+PASS census p=11: 110 models
+PASS census p=13: 156 models
+PASS census p=17: 272 models
+PASS census p=19: 342 models
+PASS trace-zero p=5, n=2: kernel=3
+PASS trace-zero p=5, n=3: kernel=12
+PASS trace-zero p=5, n=5: kernel=341
+PASS trace-zero p=7, n=3: kernel=76
+PASS pairing/IC p=43: all 11 logs recovered
+PASS pairing/IC p=67: all 17 logs recovered
+PASS pairing/IC p=211: all 53 logs recovered
+FAIL: parity mismatch at /exhaustive/counts/curve_models: native 942, historical 943

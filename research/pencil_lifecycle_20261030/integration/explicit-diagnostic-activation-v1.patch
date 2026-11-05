@@ -1,0 +1,221 @@
+--- a/src/cryptanalysis/ecbench/runner.rs
++++ b/src/cryptanalysis/ecbench/runner.rs
+@@ -921,6 +921,20 @@
+     Some((m.len(), m.modified().ok()?))
+ }
+ 
++fn validate_diagnostic_launch_before_plan(
++    launch: &super::diagnostic_launch::DiagnosticLaunch,
++    spec: &Spec,
++    executable: &Path,
++) -> Result<(), String> {
++    let (_, spec_digest) = short_id("ECS1", &spec.identity_view())?;
++    // Hash actual configured bytes; a declaration alone cannot activate this
++    // path. The child checks its running inode and execute_session rechecks the
++    // captured parent build plus the full resolved plan before spawning.
++    let (binary_sha256, _) = crate::store::hash_file(executable)
++        .map_err(|error| format!("diagnostic executable identity: {error}"))?;
++    launch.validate_spec(spec, &spec_digest, Some(&binary_sha256))
++}
++
+ /// Run a whole session.  Refuses an existing output directory; refuses
+ /// to start on a busy host unless `allow_busy`.
+ pub fn run_session(
+@@ -945,10 +959,8 @@
+     // A spec that does not parse is refused before waiting for anything.
+     let spec = Spec::from_json(spec_text)?;
+     if let Some(launch) = &opts.diagnostic_launch {
+-        let (_, spec_digest) = short_id("ECS1", &spec.identity_view())?;
+         // Validate before planning can construct even a known-answer workload.
+-        launch.validate_spec(&spec, &spec_digest, None)?;
+-        return Err("diagnostic lifecycle integration is not enabled or admitted".into());
++        validate_diagnostic_launch_before_plan(launch, &spec, &opts.exe)?;
+     }
+     // The lock comes first.  Planning (a prime search can burn minutes of
+     // CPU), the host capture and the choice of CPUs all disturb whatever
+@@ -2843,3 +2855,59 @@
+             .is_none());
+     }
+ }
++
++#[cfg(test)]
++mod diagnostic_activation_tests {
++    use super::super::diagnostic_launch::{DiagnosticLaunch, LAUNCH_SCHEMA, PROFILE_VERSION};
++    use super::*;
++
++    #[test]
++    fn diagnostic_preplan_requires_actual_file_hash_and_exact_spec_without_planning() {
++        let profile = json!({"version":PROFILE_VERSION,"sha256":"a".repeat(64)});
++        let arms: Vec<_> = [
++            (
++                "pencil",
++                "candidate",
++                "ic.three_leads_genus2_pencil_symbolic_v2",
++            ),
++            ("rho", "reference", "rho.three_leads_negation_v1"),
++            ("rho_AA", "control", "rho.three_leads_negation_v1"),
++        ]
++        .iter()
++        .map(|(name, role, method)| {
++            json!({"name":name,"role":role,"method":method,
++            "method_config_sha256":"b".repeat(64),"profile":profile})
++        })
++        .collect();
++        // Deliberately unplannable empty workload: this fixture exercises only
++        // the production pre-plan gate and never generates a target or child.
++        let spec:Spec=serde_json::from_value(json!({"schema":"ecbench.spec/v1","label":"fixture",
++            "workloads":{"curves":[],"targets_per_curve":0,"target_seed":0},
++            "arms":arms.iter().map(|a|json!({"name":a["name"],"role":a["role"],"method":{"id":a["method"]}})).collect::<Vec<_>>(),
++            "measurement":{"rounds":0,"seed":0}})).unwrap();
++        let (_, spec_digest) = short_id("ECS1", &spec.identity_view()).unwrap();
++        let mut value = json!({"schema":LAUNCH_SCHEMA,"expected_spec_sha256":spec_digest,
++            "binary_sha256":sha256_hex(b"fake executable fixture"),"protocol_sha256":"c".repeat(64),
++            "source_receipt":{"scope":"external_manifest_binding_only","receipt_sha256":"d".repeat(64),"source_manifest_sha256":"e".repeat(64)},
++            "scientific_run_id":"synthetic-fixture","attempt":0,"profile":profile,"arms":arms});
++        let root = std::env::temp_dir().join(format!(
++            "diagnostic-preplan-{}-{}",
++            std::process::id(),
++            now_ms()
++        ));
++        std::fs::create_dir(&root).unwrap();
++        let exe = root.join("fake-executable");
++        std::fs::write(&exe, b"fake executable fixture").unwrap();
++        let launch = DiagnosticLaunch::from_bytes(&serde_json::to_vec(&value).unwrap()).unwrap();
++        assert!(validate_diagnostic_launch_before_plan(&launch, &spec, &exe).is_ok());
++        std::fs::write(&exe, b"changed executable fixture").unwrap();
++        assert!(validate_diagnostic_launch_before_plan(&launch, &spec, &exe).is_err());
++        std::fs::write(&exe, b"fake executable fixture").unwrap();
++        value["expected_spec_sha256"] = json!("f".repeat(64));
++        let wrong = DiagnosticLaunch::from_bytes(&serde_json::to_vec(&value).unwrap()).unwrap();
++        assert!(validate_diagnostic_launch_before_plan(&wrong, &spec, &exe).is_err());
++        std::fs::remove_file(&exe).unwrap();
++        assert!(validate_diagnostic_launch_before_plan(&launch, &spec, &exe).is_err());
++        std::fs::remove_dir(root).unwrap();
++    }
++}
+--- a/src/cryptanalysis/ecbench/record.rs
++++ b/src/cryptanalysis/ecbench/record.rs
+@@ -110,7 +110,7 @@
+     /// Reserved explicit diagnostic context; producer execution remains disabled.
+     #[serde(default, skip_serializing_if = "Option::is_none")]
+     pub diagnostics: Option<super::diagnostics::Context>,
+-    /// Separate v2 transport; remains disabled until the complete adapter lands.
++    /// Explicit v2 transport, admitted only after identity and custody checks.
+     #[serde(default, skip_serializing_if = "Option::is_none")]
+     pub diagnostic_lifecycle: Option<DiagnosticChild>,
+     pub schema: String,
+@@ -137,6 +137,18 @@
+ }
+ 
+ pub const MAX_DIAGNOSTIC_CHILD_BYTES: usize = 4 * super::diagnostic_launch::MAX_LAUNCH_BYTES;
++
++/// Hash the running executable rather than trusting an envelope's declaration.
++/// Linux /proc/self/exe pins the exec'd inode even if its pathname is replaced.
++fn diagnostic_running_binary_sha256() -> Result<String, String> {
++    #[cfg(target_os = "linux")]
++    let path = std::path::PathBuf::from("/proc/self/exe");
++    #[cfg(not(target_os = "linux"))]
++    let path = std::env::current_exe().map_err(|error| error.to_string())?;
++    crate::store::hash_file(&path)
++        .map(|(digest, _)| digest)
++        .map_err(|error| format!("diagnostic child executable identity: {error}"))
++}
+ 
+ impl DiagnosticChild {
+     /// Validate metadata and output custody without constructing a workload.
+@@ -609,14 +621,21 @@
+         }
+     }
+     if let Some(diagnostic) = &job.diagnostic_lifecycle {
+-        out.error = Some(match diagnostic.validate(&job) {
+-            Ok(()) => "diagnostic lifecycle adapter is not enabled or admitted".into(),
+-            Err(error) => error,
++        // All checks happen before workload construction or producer installation.
++        // This is software admission, not prospective research/budget approval.
++        let admission = diagnostic.validate(&job).and_then(|()| {
++            let actual = diagnostic_running_binary_sha256()?;
++            if actual != diagnostic.envelope.prefix.identity.binary_sha256 {
++                return Err("diagnostic child running binary binding mismatch".into());
++            }
++            Ok(())
+         });
+-        return out;
+-    }
+-    // Explicit rejection before workload construction: this slice cannot activate
+-    // an unreviewed producer or run an algorithm to test diagnostic plumbing.
++        if let Err(error) = admission {
++            out.error = Some(error);
++            return out;
++        }
++    }
++    // The legacy v1 transport remains reserved and cannot activate a producer.
+     if let Some(context) = &job.diagnostics {
+         out.error = Some(match context.validate() {
+             Ok(()) => "diagnostic producer is not enabled or admitted".into(),
+@@ -2663,7 +2682,7 @@
+     }
+ 
+     #[test]
+-    fn child_v2_roundtrip_and_disabled_boundary() {
++    fn child_v2_roundtrip_and_running_binary_boundary() {
+         let root = Root::new();
+         let job = fixture(&root, false);
+         job.diagnostic_lifecycle
+@@ -2677,7 +2696,7 @@
+         let out = child_main(&text);
+         assert_eq!(
+             out.error.as_deref(),
+-            Some("diagnostic lifecycle adapter is not enabled or admitted")
++            Some("diagnostic child running binary binding mismatch")
+         );
+         assert!(out.report.is_none());
+         assert!(out.workload_id.is_none());
+@@ -2689,6 +2708,48 @@
+             .get("diagnostic_lifecycle")
+             .is_none());
+     }
++    fn bind_fixture_running_binary(job: &mut ChildInput) {
++        let binary = diagnostic_running_binary_sha256().unwrap();
++        let diagnostic = job.diagnostic_lifecycle.as_mut().unwrap();
++        let mut doc = serde_json::to_value(diagnostic.launch.document().unwrap()).unwrap();
++        doc["binary_sha256"] = serde_json::json!(binary);
++        diagnostic.launch =
++            DiagnosticLaunch::from_bytes(&serde_json::to_vec(&doc).unwrap()).unwrap();
++        diagnostic.envelope.launch_sha256 = diagnostic.launch.raw_sha256().into();
++        diagnostic.envelope.prefix.identity.binary_sha256 = binary;
++    }
++
++    #[test]
++    fn child_v2_all_arms_validate_binary_then_reject_wrong_workload_before_callback() {
++        // Known tiny public curve; this fixture builds a workload but never calls
++        // solve_measured, complete, rho, or the pencil collector.
++        let curve: CurveSpec = serde_json::from_str(
++            r#"{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}"#,
++        ).unwrap();
++        let (workload, instance) = Workload::build(&curve, 7, 0, TargetKind::default()).unwrap();
++        for arm in ["pencil", "rho", "rho_AA"] {
++            let root = Root::new();
++            let mut job = fixture_arm(&root, arm);
++            bind_fixture_running_binary(&mut job);
++            job.curve = workload.curve_spec.for_child(&instance);
++            job.target_seed = 7;
++            job.expected_workload_id = workload.workload_id.clone();
++            // Correct normal workload ID; deliberately wrong full serialized
++            // workload digest forces the diagnostic-specific boundary.
++            let text = serde_json::to_string(&job).unwrap();
++            let out = child_main(&text);
++            assert_eq!(
++                out.error.as_deref(),
++                Some("diagnostic child rebuilt workload binding mismatch")
++            );
++            assert!(out.report.is_none());
++            assert!(out.diagnostic_lifecycle.is_none());
++            assert!(out.method_call_wall_ns.is_none());
++            assert!(out.diagnostic_call_wall_ns.is_none());
++            assert!(std::fs::read_dir(&root.0).unwrap().next().is_none());
++        }
++    }
++
+     #[test]
+     fn child_v2_rejects_mixed_seed_method_and_insecure_path() {
+         let root = Root::new();

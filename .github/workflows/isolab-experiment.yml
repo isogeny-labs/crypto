@@ -1,6 +1,7 @@
 name: Iso Lab experiment
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
     paths:
       - taskq/deploy/eks-karpenter/**
@@ -47,6 +48,7 @@ permissions:
   contents: read
 jobs:
   contracts:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
@@ -87,6 +89,9 @@ jobs:
           taskq/deploy/eks-karpenter/remote/test-contract.sh
           taskq/deploy/eks-karpenter/remote/test-build-verification.sh
           taskq/deploy/eks-karpenter/remote/test-publish-image.sh
+          taskq/deploy/eks-karpenter/remote/test-launch-remote.sh
+          taskq/deploy/eks-karpenter/remote/test-launch-remote-command.sh
+          taskq/deploy/eks-karpenter/test-censored-gates.sh
           taskq/deploy/eks-karpenter/test-ic-sweep.sh
           taskq/deploy/eks-karpenter/resume/test-publisher.sh
           cargo +1.99.1 test --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/fixture/Cargo.toml
@@ -97,7 +102,9 @@ jobs:
             1048576 taskq/deploy/eks-karpenter/resume/validation/20261021/progress-before.log
   build:
     needs: contracts
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch')
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_BUILD_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 60
     permissions:
@@ -129,7 +136,7 @@ jobs:
             examples
       - name: Materialize native build inputs
         working-directory: source
-        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path .artifacts
+        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
       - name: Pull store data needed by the tested source
         working-directory: source
         env:
@@ -161,13 +168,16 @@ jobs:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/isolab-build/ecbench
+            ${{ runner.temp }}/isolab-build/isolab-fresh-owner
             ${{ runner.temp }}/isolab-build/build-info.json
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
   experiment:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.ref == 'refs/heads/main')
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 150
     permissions:
