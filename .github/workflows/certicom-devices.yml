@@ -184,6 +184,8 @@ jobs:
           CERTICOM_TEST_BACKEND: metal
           CERTICOM_TEST_PHASE: ${{ matrix.phase }}
           CARGO_BUILD_JOBS: '2'
+          # Untimed correctness build; same parallel code generation as APS CI.
+          CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '256'
         run: bash gpu/certicom/qualify.sh
       - uses: actions/upload-artifact@v4
         if: always()
