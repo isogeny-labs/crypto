@@ -604,7 +604,7 @@
      "reference": "matched",
      "unit": "counted GAE lower-bound diagnostic",
      "label": "Prime-field IC, generic decomposition track, k = 5 sum table (one probe a target), 40-bit a = -3 curve icv1-fp40-tm924137-0ecaaeb9",
-     "detail": "ic-ksum5 / rho-neg mean S at w = 0 on the frontier campaign's 40-bit curve and test targets (16 x 2 runs, every run verified, replay-all audited): 9.67x; 9.74x at w = 0.1, 10.01x at w = 1. Was 13.14x (ic-ksum4, same session, reproducing #2808 run for run). Below ic-ksum4 across the band at 24-48 bits; fitted alpha 0.547 [0.543, 0.554] on 36-48 bits against 0.565 [0.560, 0.571]. 11.0x rho at 48 bits. Track: generic decomposition (bounded by sqrt(r); cannot beat rho); not ranked against Table B (different curves). Still 7.6x BSGS, the family's limit. Lookups unpriced.",
+     "detail": "ic-ksum5 / rho-neg mean S at w = 0 on the frontier campaign's 40-bit curve and test targets (16 x 2 runs, every run verified, replay-all audited): 9.67x; 9.74x at w = 0.1, 10.01x at w = 1. Was 13.14x (ic-ksum4, same session, reproducing #2808 run for run). Below ic-ksum4 across the band at 24-48 bits; fitted alpha 0.547 [0.543, 0.554] on 36-48 bits against 0.565 [0.560, 0.571]. 11.0x rho at 48 bits. Track: generic decomposition; not ranked against Table B (different curves). Still 7.6x BSGS, the family's limit. Lookups unpriced.",
      "class": "engineering",
      "anchor": "#prime-ksum-k5-20261028",
      "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_k5_20261028/README.md"
@@ -615,7 +615,7 @@
      "reference": "matched",
      "unit": "counted GAE lower-bound diagnostic",
      "label": "Prime-field IC, generic decomposition track, k = 4 sum table vs the mitm incumbent on its 20-bit holdout curve icv1-fp20-tm565-6d7d1d32",
-     "detail": "ksum4 / rho-neg mean S at w = 0 on prime_base_oracle_tuning_20261029's 20-bit holdout curve and targets, same session as the incumbent recipe (48 x 2 runs per arm, every run verified, replay-all audited; inc and rho-neg reproduce the incumbent's recorded means exactly): 4.91x. Was 7.75x (mitm negation-folded N 45, the incumbent). ksum5 / inc 0.70 / 0.45 / 0.33 / 0.22 at 20 / 24 / 28 / 32 bits, below 1 at every band weight; ksum4 vs ksum5 unresolved at 20 and 24 bits. Track: generic decomposition (bounded by sqrt(r); cannot beat rho). Same host only (unqualified; second-host replay owed). Lookups unpriced.",
+     "detail": "ksum4 / rho-neg mean S at w = 0 on prime_base_oracle_tuning_20261029's 20-bit holdout curve and targets, same session as the incumbent recipe (48 x 2 runs per arm, every run verified, replay-all audited; inc and rho-neg reproduce the incumbent's recorded means exactly): 4.91x. Was 7.75x (mitm negation-folded N 45, the incumbent). ksum5 / inc 0.70 / 0.45 / 0.33 / 0.22 at 20 / 24 / 28 / 32 bits, below 1 at every band weight; ksum4 vs ksum5 unresolved at 20 and 24 bits. Track: generic decomposition. Same host only (unqualified; second-host replay owed). Lookups unpriced.",
      "class": "engineering",
      "anchor": "#prime-ksum-vs-incumbent-20261029",
      "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_vs_incumbent_20261029/README.md"
@@ -659,7 +659,7 @@
      "reference": "matched",
      "unit": "counted GAE lower-bound diagnostic",
      "label": "Prime-field IC, generic decomposition track, k = 4 sum table vs the tuned mitm incumbent, 20-bit, 4 fresh curves pooled",
-     "detail": "ksum4-sel / rho-neg pooled mean S at w = 0 on 4 fresh 20-bit curves (24 targets x 2 rounds each, every run verified, replay-all audited; incumbent re-tuned on separate train curves by the same rule): 5.42x. Was 8.56x (tuned mitm incumbent, same session and curves). ksum5 / inc-sel 0.700 / 0.446 / 0.324 / 0.217 at 20 / 24 / 28 / 32 bits, on all 16 curves and below 1 at every band weight. Track: generic decomposition (bounded by sqrt(r); cannot beat rho). Same host only (unqualified; second-host replay owed). Pooled over four curves, so not comparable with the single-curve ksum4 point of research/prime_ksum_vs_incumbent_20261029. Lookups unpriced.",
+     "detail": "ksum4-sel / rho-neg pooled mean S at w = 0 on 4 fresh 20-bit curves (24 targets x 2 rounds each, every run verified, replay-all audited; incumbent re-tuned on separate train curves by the same rule): 5.42x. Was 8.56x (tuned mitm incumbent, same session and curves). ksum5 / inc-sel 0.700 / 0.446 / 0.324 / 0.217 at 20 / 24 / 28 / 32 bits, on all 16 curves and below 1 at every band weight. Track: generic decomposition. Same host only (unqualified; second-host replay owed). Pooled over four curves, so not comparable with the single-curve ksum4 point of research/prime_ksum_vs_incumbent_20261029. Lookups unpriced.",
      "class": "engineering",
      "anchor": "#prime-ksum-pooled-20261029",
      "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_pooled_20261029/README.md"
