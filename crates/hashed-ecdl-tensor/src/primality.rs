@@ -330,14 +330,17 @@ fn decimal(value: &str, meter: &Meter) -> Result<BigUint> {
     {
         return Err(invalid("noncanonical certificate integer"));
     }
-    meter.bits(
-        value
-            .len()
-            .checked_mul(4)
-            .ok_or_else(|| overflow("certificate integer width"))?,
-        "certificate decimal width",
-    )?;
-    BigUint::parse_bytes(value.as_bytes(), 10).ok_or_else(|| invalid("certificate integer"))
+    // Since 2^3 < 10, a b-bit integer has at most b/3 + 1 decimal
+    // digits. Bound the allocation before parsing; this deliberately loose
+    // cap must not substitute for the integer's actual bit-width check.
+    if value.len() > meter.limits.bits / 3 + 1 {
+        return Err(crate::Error::Limit("certificate decimal width".into()));
+    }
+    let parsed =
+        BigUint::parse_bytes(value.as_bytes(), 10).ok_or_else(|| invalid("certificate integer"))?;
+    let bits = usize::try_from(parsed.bits()).map_err(|_| overflow("certificate integer width"))?;
+    meter.bits(bits, "certificate integer width")?;
+    Ok(parsed)
 }
 
 /// Verify all supplied proof nodes, then return only their established primes.
@@ -652,6 +655,24 @@ mod tests {
         }
         nodes.reverse();
         assert_eq!(verify_certificates(&nodes, &mut meter).unwrap(), expected);
+    }
+
+    #[test]
+    fn generated_proofs_replay_with_the_candidates_bit_limit() {
+        let n = (BigUint::one() << 127usize) - BigUint::one();
+        let mut meter = Meter::new(Limits {
+            bits: 128,
+            steps: 2_000_000,
+            ..Limits::default()
+        });
+        assert!(crate::arithmetic::is_prime(&n, &mut meter).unwrap());
+
+        let too_wide = (BigUint::one() << 128usize).to_str_radix(10);
+        assert!(matches!(decimal(&too_wide, &meter), Err(Error::Limit(_))));
+        assert!(matches!(
+            decimal(&"9".repeat(10_000), &meter),
+            Err(Error::Limit(_))
+        ));
     }
 
     #[test]
