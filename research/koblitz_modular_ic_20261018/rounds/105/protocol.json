@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R105-MARKED23-X1-HASSE-JETS",
+  "version":1,
+  "goal":"derive source-bound x=1 tangent data for local normalization",
+  "claims":[{"id":"jets105","class":"exact_computation","statement":"the full f51 x=1 expansion and G51 Hasse jets through degree four are bound to the actual R51 donor"}],
+  "arms":{"reference":"R101 exact x=1 fiber","candidate":"R51 source-bound Hasse jet expansion","positive":["f0=y^7+y^3","G0=l^16+l^8+1","28 rational G coefficients"],"negative":["changed donor hash rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R51 SHA-256","F2","t=x+1","G Hasse degree at most 4"],"measured":["full f support around y=0/1","G jet support and q-adic orders"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation"},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":1,"replicates":1,"power":"not applicable"},
+  "metrics":["source coefficient count","f Newton support","G Hasse supports","q-adic orders"],
+  "execution":{"backend":"source-bound Python exact F2 arithmetic","source_gate":"committed script/protocol and R51 hash","queue":"one serial attempt","checkpoint":"retain raw attempt"},
+  "stopping":{"accept":"hash, shape, R101 k0, negative control and independent replay","failure":"retain and amend before rerun"},
+  "analysis":{"method":"generalized binomial parity for (1+t)^n and support recombination","scope":"tangent data for the displayed order, not normalization"}
+}
