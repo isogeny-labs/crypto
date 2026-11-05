@@ -1294,6 +1294,16 @@ pub trait CountedGroup {
         }
         acc
     }
+
+    /// `[k]P` for a scalar wider than one word.  The default converts when it
+    /// fits a `u64`; a group whose subgroup order (or cofactor) needs more
+    /// overrides this with its wide multiplication.
+    fn mul_biguint(&self, ops: &mut GroupOps, p: Self::Elt, k: &BigUint) -> Self::Elt {
+        let k = k
+            .to_u64()
+            .expect("this group's scalar multiplication is one word");
+        self.mul(ops, p, k)
+    }
 }
 
 fn mix(v: u64) -> u64 {
@@ -4967,6 +4977,57 @@ pub fn roster_prime_instance(bits: u32) -> Option<PrimeInstance> {
         r: n,
         cofactor: c.h as u64,
         generator: (c.gx.to_u64()?, c.gy.to_u64()?),
+    })
+}
+
+/// The Curve25519-family miniature at `k` bits, in short Weierstrass form.
+///
+/// These are the curves of `research/curve25519_ic_baseline_20261102`
+/// (`src/bin/curve25519_family.rs`): the largest prime `p ≡ 5 (mod 8)`
+/// below `2^k`, Montgomery `A` the smallest value with `A ≡ 2 (mod 4)` and
+/// `#E = 8r`, `#E' = 4r'` (`r`, `r'` prime, `r > 2^(k−3)`), and the
+/// smallest base point of order `r`.  Every structural property an index
+/// calculus can see on Curve25519 itself is preserved; the field is small
+/// enough for the `u64` engine.  `None` for a `k` without a committed
+/// miniature.
+pub fn curve25519_family_instance(k: u32) -> Option<PrimeInstance> {
+    // (k, p, a, b, #E, r, gx, gy), short Weierstrass `y² = x³ + ax + b`.
+    const MINIATURES: &[(u32, u64, u64, u64, u64, u64, u64, u64)] = &[
+        (
+            20, 1_048_573, 63_700, 872_826, 1_049_624, 131_203, 349_837, 122,
+        ),
+        (
+            24, 16_777_213, 16_743_506, 2_381_926, 16_778_792, 2_097_349, 109, 3_123_379,
+        ),
+        (
+            28,
+            268_435_157,
+            169_487_139,
+            71_222_779,
+            268_462_472,
+            33_557_809,
+            178_958_571,
+            19_523_146,
+        ),
+        (
+            32,
+            4_294_967_197,
+            1_173_263_412,
+            337_904_346,
+            4_295_077_112,
+            536_884_639,
+            1_431_665_017,
+            592_057_774,
+        ),
+    ];
+    let &(_, p, a, b, group_order, r, gx, gy) = MINIATURES.iter().find(|m| m.0 == k)?;
+    Some(PrimeInstance {
+        name: format!("curve25519-family-k{k}"),
+        curve: PrimeCurve { p, a, b },
+        group_order,
+        r,
+        cofactor: group_order / r,
+        generator: (gx, gy),
     })
 }
 
@@ -12515,6 +12576,29 @@ mod tests {
             }
             Some(v as u64)
         }
+    }
+
+    #[test]
+    fn curve25519_family_miniatures_are_consistent() {
+        for k in [20u32, 24, 28, 32] {
+            let inst = curve25519_family_instance(k).unwrap_or_else(|| panic!("no k={k}"));
+            assert_eq!(inst.curve.p % 8, 5, "k={k}: p must be 5 mod 8");
+            assert_eq!(inst.cofactor, 8, "k={k}: #E must be 8r");
+            assert_eq!(inst.group_order, inst.r * inst.cofactor);
+            assert!(inst.r > (1u64 << (k - 3)), "k={k}: r too small");
+            let g = inst.generator_point();
+            assert!(inst.curve.is_on_curve(g), "k={k}: generator off curve");
+            let mut ops = GroupOps::default();
+            assert!(
+                inst.curve.mul(&mut ops, g, inst.r).infinity,
+                "k={k}: [r]G is not the identity"
+            );
+            assert!(
+                !inst.curve.mul(&mut ops, g, inst.r + 1).infinity,
+                "k={k}: [r+1]G is the identity"
+            );
+        }
+        assert!(curve25519_family_instance(22).is_none());
     }
 
     /// Moduli at every edge the fast paths branch on: tiny, either side
