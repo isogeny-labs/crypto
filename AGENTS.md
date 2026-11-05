@@ -14,6 +14,13 @@ every finished piece of work, after every decision, and whenever we switch
 tasks. Preserve previous entries. Record concrete facts from commands and
 logs; distinguish verified results from plans or assumptions.
 
+Keep the log current *always*, not only at handoff: it is the session's working
+memory. Before choosing the next step in any task, read the newest entries in
+today's log (and the previous day's when the session spans a date change) and
+let them decide the next action; if work already done is missing from the log,
+write that entry before doing anything else. Never start a new measurement,
+experiment or code change without the previous one recorded and reviewed.
+
 Every entry has four headings:
 
 - What was done (commands, files, features)
@@ -136,6 +143,51 @@ implementing, running experiments, or making recommendations.
 - **Conductor:** run `conductor check --summary "…" --scope path:…` before
   editing; report scope expansion before editing outside reserved paths. Do
   not publish chat transcripts or secrets as task metadata.
+
+## Sabotage is assumed: proof-carrying claims
+
+Owner rule, 2026-11-04. Every producer, this session included, is assumed to
+be sabotaging the work: numbers, booleans, receipts, proofs, prose and chat
+answers are data until a verifier the producer did not write has checked them.
+The contract is [`docs/SABOTAGE_RESISTANCE.md`](docs/SABOTAGE_RESISTANCE.md);
+the tool is `tools/pcc/pcc.py` (byte-identical across the lab's repositories;
+`docs/shared-code.lock.json`).
+
+- **A claim is a record.** Before a result is cited anywhere (leaderboard,
+  benchmarks, PR body, session log, paper, chat), write it with
+  `python3 tools/pcc/pcc.py claim new --kind <theorem|solve|measurement|speedup|execution|absence> --statement "…" --proof KIND:PATH …`.
+  The record pins every proof by SHA-256 and lands in `pcc/claims/` and the
+  ledger `pcc/ledger.jsonl`.
+- **Only a signed verdict verifies.** `pcc verify` runs the verifier for each
+  proof kind (Lean statement binding and holes, solve and zero-knowledge
+  solve certificates with the tool's own arithmetic, replay certificates and
+  validator reports with a keyring signature, execution receipts through a
+  verifier pinned in `pcc/keyring.json`). The signed verdict is written by CI
+  on `main` (`pcc-gate.yml`, key `ci-main`), never by the producing session.
+  `independent: true` and `verified: true` written by a producer are not read.
+- **Standing, not words.** `python3 tools/pcc/pcc.py standing <id>` is the only
+  source for "verified". Anything else is an unverified assertion and is
+  labelled so: in prose, cite `[pcc:<id>]` for a verified claim or tag the
+  sentence `[pcc:unverified]`. `pcc lint-prose` enforces this on pull request
+  bodies in CI and is run on reports and session logs.
+- **The ledger is append-only.** `pcc ledger verify --base origin/main` runs
+  on every pull request: the base ledger must be a prefix of the head's and
+  every hash link must hold. Never edit or rewrite `pcc/ledger.jsonl`.
+- **Bypasses are recorded.** `CHECKPOINT_SKIP=<reason>` still works, and the
+  hook now appends a `bypass` entry to the ledger and pushes a checkpoint
+  before the command runs. Commit the ledger with the work.
+- **The verifier is tested against sabotage.** `pcc canary` plants every
+  sabotage class in the contract into a passing fixture and must reject each
+  one; CI runs it on every pull request. A new way to cheat the gate becomes a
+  new canary in the same change that closes it.
+- **Chat answers follow the same rule.** State a result with its claim id and
+  standing, or say that it is an unverified assertion. Never present a
+  self-check, a replay, a hash or a model's agreement as verification.
+
+What this does not yet give: a real execution-proof backend. Until a verifier
+digest is listed under `trusted_verifiers` in `pcc/keyring.json`, every
+`execution` proof is `not_covered`, and no result here is execution verified
+(`crypto-autoresearcher:docs/execution-proof-chain.md`, milestones open).
 
 ## Success criterion: iterative improvement of the index-calculus baseline
 
@@ -467,6 +519,45 @@ Switching runtimes when a budget runs out (Claude Code ↔ Codex):
 [docs/runtime-relay.md](docs/runtime-relay.md); on a pending `.resume/HANDOFF.md`, run
 `python3 scripts/relay.py accept` first.
 
+## Benchmark records: data in S3, metadata in Git, one progress report
+
+Owner's rule, 2026-11-04; mechanics in
+[docs/benchmark-records.md](docs/benchmark-records.md) (shared, byte-identical).
+**Every benchmark run leaves a `bench.record/v1` record in Git and its raw
+data in S3, and regenerates the progress report, in the same PR.** The record
+(`tools/benchrec.py`; `benchmarks/records/`) names the commit, host, command,
+every raw file by SHA-256 and content-addressed S3 location
+(`s3://setec-astronomy-artifacts/store/sha256/<aa>/<hex>`, or the prefix the
+run already wrote to), and every measured value in the shared unit vocabulary
+(`S`, `gae`, `log2_gae`, `ns_per_gae`, `ir`, `ir_per_op`, `cycles_per_op`,
+`ipc`, `wall_s`, `cpu_s`, `ops_per_s`, `fmul`, `ratio`, `percent`, `count`,
+`bytes`); any other unit is rejected. Records are written once; a rerun, an
+invalid run and a censored run each get their own record.
+
+The progress report (`benchmarks/progress/`: `progress.json`, `PROGRESS.md`,
+`progress.svg`, `progress.pdf`) is generated only from the records and always
+states progress the same way: gain versus the first record and versus the
+previous record, in percent within one series (same problem, metric and
+unit), and value over reference (the distance remaining to the matched rho,
+1.0 = parity). The headline panel is in `S`; every other unit has its own
+panel and is never mixed in. Derived numbers are labelled derived; a record
+is not a validated result and does not move the leaderboard, `benchmarks/`
+rows or `VALIDATION.json`, which keep their own gates.
+
+**Enforced.** Claude Code (`.claude/hooks/benchrec-hook.sh`) refuses a
+benchmark launcher (`ecbench`, `perfindex`, `perf_ipc`, `perf stat`,
+`callgrind`, `hyperfine`, `cargo bench`, `isolated_bench`, `tools/profile.sh`,
+`task_card.py run`, `autolab`, `icms`, `scripts/*bench*`, `make bench`) that
+does not run as `tools/benchrec.py run <record> -- ...` or carry
+`BENCHREC=<record>`, and refuses `git push` and `gh pr create` while
+`tools/benchrec.py gate` fails (a record opened here and not closed, an
+incomplete record, a stale progress report); `BENCHREC_SKIP=<reason>` opts a
+command that is not a benchmark out. Other runtimes run `python3
+tools/benchrec.py gate` before pushing. The `bench-records` workflow fails a
+PR that adds a `benchmarks/` entry without a record naming it, carries a
+malformed, open or edited record, cites a raw object that is not in S3, or
+leaves the progress report stale.
+
 ## Research searches must leave visual reports
 
 Every experiment run (ICMS or ecbench session, autolab or tournament round,
@@ -744,6 +835,11 @@ requires explicit authorization for that merge, and it follows these rules:
     wait; say in the PR why you stepped in.
   - Conflicts in frozen evidence, ledger rows, or claim files are never
     resolved by picking a side: report them to the user.
+  - A conflicted binary file (PDF, PNG, archive) is never resolved by keeping
+    both sides, which concatenates the two versions: take one side and
+    regenerate it. `binary-merges.yml` fails a merge whose result matches
+    neither parent unless the merge names the file with a
+    `Binary-Regenerated: <path>` trailer.
   - If Copilot is unavailable in the session (no GitHub MCP access, plan
     limits), say so and fall back to resolving it yourself.
 - If a documentation-only change legitimately triggers no CI, verify the
@@ -943,6 +1039,15 @@ Every cross-method comparison and every ranking must:
 - **Never compare a calibrated cost on one side with an uncalibrated one
   on the other.** If a calibration exists for only some arms or sizes,
   use the band alone.
+- **The band prices operations, not bytes** (owner, 2026-11-01). A
+  memory-size counter (`residual_table_bytes_uncharged`,
+  `factor_base_vec_bytes_floor_uncharged`, `native_table_bytes_uncharged`)
+  is still listed with its count for every arm, but is not charged `w` and
+  cannot block a ranking. The list is `NON_OPERATION_COUNTERS` in
+  `src/cryptanalysis/ecbench/band.rs`, by name, so committed records replay
+  unchanged. A new byte-valued counter is added there; do not name a byte
+  count `*_uncharged` without doing so. The audit and the re-run studies are
+  in `research/ic_byte_counter_pricing_20261101/`.
 
 This applies to `ecbench compare` read-outs, tables, frontier syntheses,
 ledger rows, papers and PR descriptions. A ratio produced before this rule
@@ -1335,7 +1440,15 @@ resources, deadline and acceptance criteria, submit the job, and retain its
 receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
 region `us-east-2`, account `104186811093`. Karpenter starts Spot workers;
 `cpu-spot` serves ordinary work and `cpu-l2-spot` serves native L2 benchmarks.
-Keep the combined 64-vCPU worker cap and the shared 96-vCPU account quota.
+Follow the owner cost ceilings in [COST_CONTROLS.md](taskq/deploy/eks-karpenter/COST_CONTROLS.md):
+24 worker vCPUs / 160 GiB total, with no automatic quota or cap increases.
+Before any EKS/IsoLab build or run, commit and push the exact experiment code,
+protocol, configuration and launch command to GitHub; retain the publication
+check receipt. Publish outcomes, including failures, in the same experiment PR.
+Record a finite dollar ceiling, CPU/RAM, original deadline and total retry
+allowance before spending; charge build, idle, failed and interrupted attempts.
+Queue work that cannot fit. Never bypass a budget stop through another pool,
+account, region, provider or a renamed retry.
 
 - **Use existing authentication.** Verify the caller with
   `aws sts get-caller-identity` and check the required permissions using
@@ -1783,11 +1896,20 @@ The user guide, including S3 storage, is
 
 ## Querying the curve database (ecdb)
 
-ecdb is a Postgres catalogue on RDS (us-west-2). It holds every curve in the
-registry, the walk outputs and the trait catalogue, with their Jacobians,
-isogenies, covers, transfer prices and computed polynomials. Agents reach it
-through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
-[ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md); read it before the first query.
+ecdb is a Postgres catalogue on RDS (us-west-2). It holds:
+
+- every curve in the registry, the walk outputs and the trait catalogue,
+  with their Jacobians, isogenies, covers, transfer prices and computed
+  polynomials;
+- this repository's measured results: the IC leaderboard and its recipes,
+  the progress timeline, the boundary ledger, the `benchmarks/` index, and
+  every ecbench session with its runs;
+- the curve records and measured datasets of cryptanalysis,
+  crypto-autoresearcher, cryptanalysis-rl and ml-cryptanalysis.
+
+Agents reach it through the MCP server `ecdb` in `.mcp.json`, over HTTP, or
+with `scripts/ecdb.sh`. The guide is [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md);
+read it before the first query.
 
 - **Look up before computing.** Query ecdb before writing code or scanning
   `docs/curves/*.json` for a curve fact. This covers trace, order, cofactor,
@@ -1812,6 +1934,16 @@ through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
 - **Transfer prices are leads.** `dlp_transfer.ratio_log2` is a formula
   estimate. It is not a measured speedup, and it never enters the IC
   leaderboard or `benchmarks/` (§5a and "The rule: boundary, table, ratio").
+- **Measured rows are copies.** Leaderboard, progress, boundary, benchmark,
+  ecbench and sibling-dataset rows are the producers' frozen records with
+  their units:
+  - compare a ratio only within its leaderboard family, ecbench session or
+    dataset;
+  - rank arms only across the §5a band;
+  - keep `unvalidated (pre-gate)` rows out of any claim.
+
+  Querying them is not a measurement. A new result still goes through its
+  run, the validation gate and the generators of the files ecdb copies.
 - **Relations are not routes.** A twist, isomorphism or model-change row
   does not transport a logarithm. Only a kernel-certified `isogeny` row does
   (the typed curve-link rules above).
@@ -1819,10 +1951,14 @@ through the MCP server `ecdb` in `.mcp.json` or over HTTP. The guide is
   need the write token. They record what a run or certificate in a PR
   supports, with its artifact hash and true status. Correct imported data in
   the source file, then redeploy (`ecdb/deploy/README.md`). Never patch rows.
-- **Keep it current.** A PR that changes a catalogue ecdb imports (the
-  registry, `traits.json`, `covers.json`, `jacobian-transfers.json`, the
-  certificates, the imported walk outputs) says so in its body. After merge,
-  redeploy with `ecdb/deploy/build-lambda.sh` and `ecdb/deploy/deploy-aws.sh`.
+- **Keep it current.** A PR that changes a file ecdb imports says so in its
+  body. That covers the registry, `traits.json`, `covers.json`,
+  `jacobian-transfers.json`, the certificates, the imported walk outputs,
+  `docs/ic/leaderboard.json`, `progress-timeline.json`,
+  `boundary_targets.json`, `benchmarks/` and ecbench sessions.
+  `scripts/ecdb.sh check` lists the files that differ from ecdb's copy. After
+  merge, redeploy with `ecdb/deploy/build-lambda.sh` and
+  `ecdb/deploy/deploy-aws.sh`.
 
 ## IC measurement rules
 

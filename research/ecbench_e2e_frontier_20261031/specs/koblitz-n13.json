@@ -1,7 +1,7 @@
 {
   "schema": "ecbench.spec/v1",
   "label": "E2E frontier refresh: Koblitz E0 n=13",
-  "description": "Cold one-target comparison of accounting-v2 strong rho, tuned signed-Frobenius rho, root finding, inherited F4, F6-IC, the pair claw, and a strong-rho A/A arm. Timeouts and budget exhaustion are retained.",
+  "description": "Cold one-target comparison of accounting-v2 strong rho, fruitless-cycle-escape rho, tuned signed-Frobenius rho, root finding, inherited F4, F6-IC, the pair claw, and a strong-rho A/A arm. Timeouts and budget exhaustion are retained.",
   "workloads": {
     "curves": [
       {
@@ -20,6 +20,13 @@
       "role": "reference",
       "method": {
         "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-escape",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_strong_escape"
       }
     },
     {

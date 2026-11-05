@@ -1,0 +1,81 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-arity-koblitz-build
+experiment_id: ARITY-COMPLETION-KOBLITZ-M5-M6-20261104
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/arity_completion_20261104/koblitz_m5_m6/receipts/CARD-arity-koblitz-build.receipt.json
+binds:
+- path: research/arity_completion_20261104/koblitz_m5_m6/protocol.json
+  sha256: 590c74d593ec00c3c18f15244816e2423b43cc30b658c0dbbcc9b031fbed8fba
+- path: research/arity_completion_20261104/koblitz_m5_m6/PROTOCOL.md
+  sha256: 880ba1170fd2c741cc394edbba2b39b140b4a79718dfc1ba432422b4a0ca42c5
+- path: research/arity_completion_20261104/koblitz_m5_m6/grid.tsv
+  sha256: c5ff1c2b070e7521eedd682def823e24ad8fb40e7794e4cd205c1d75517d4b69
+- path: research/arity_completion_20261104/koblitz_m5_m6/run_shard.sh
+  sha256: c25c097f89c0ceed56061781eb5fbd1d0073c9773538ff7539dfbae711db03f3
+- path: research/arity_completion_20261104/koblitz_m5_m6/analyze.py
+  sha256: b556bbeaf9f1bf79a0471380952b15ca533fb9fb4e5d272ae43a158dc6b3bcfe
+must_not_exist:
+- research/arity_completion_20261104/koblitz_m5_m6/receipts/n83_msweep_cell.sha256
+commands:
+- id: source-identity
+  argv:
+  - python3
+  - -c
+  - 'import subprocess, sys  # exit 0 only if the source tree/porcelain match
+
+    want = ''4fa25efc0e2392b2e02e4c84253059ebc7c67e02''
+
+    head = subprocess.run([''git'', ''rev-parse'', ''HEAD''], capture_output=True, text=True).stdout.strip()
+
+    diff = subprocess.run([''git'', ''diff'', ''--quiet'', want, ''--'', ''examples/n83_msweep_cell.rs'', ''Cargo.toml'', ''Cargo.lock'', ''src'']).returncode
+
+    status = subprocess.run([''git'', ''status'', ''--porcelain''], capture_output=True, text=True).stdout
+
+    print(''freeze commit'', want)
+
+    print(''HEAD/printed'', head)
+
+    print(''git diff --quiet exit'', diff)
+
+    print(''porcelain lines/count'', len(status.splitlines()))
+
+    print(status)
+
+    sys.exit(0 if (diff == 0 and status == '''') else 1)
+
+    '
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: build
+  argv:
+  - cargo
+  - build
+  - --release
+  - --locked
+  - --example
+  - n83_msweep_cell
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+- id: binary-sha256
+  argv:
+  - sha256sum
+  - target/release/examples/n83_msweep_cell
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/arity_completion_20261104/koblitz_m5_m6/receipts/n83_msweep_cell.sha256
+  outputs:
+  - research/arity_completion_20261104/koblitz_m5_m6/receipts/n83_msweep_cell.sha256
+bus_address: executor-mechanical-arity-koblitz-build
+background: true
+write_scope:
+- research/arity_completion_20261104/koblitz_m5_m6/
+stop_when:
+- Any command in the card exits with a status other than 0, or times out.
+- The source-identity command exits with a status other than 0, meaning git diff --quiet 4fa25efc0e2392b2e02e4c84253059ebc7c67e02 -- examples/n83_msweep_cell.rs Cargo.toml Cargo.lock src exits non-zero or git status --porcelain prints a line; run no build.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'
+notes: 'Build card only: no cell runs here. The binary sha256 is recorded in the receipt file named by the last command and is bound by later cards only after that file exists.'

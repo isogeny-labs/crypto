@@ -1,0 +1,186 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h56c52bc79a47",
+  "resample_seed": 20261101,
+  "a": {
+    "session_id": "ECBS1hc5f71aae33c5",
+    "arm": "rho-cubic-legacy",
+    "method_id": "ECM1h390806a2819e",
+    "method": "rho.cubic",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 0.6752478165744656,
+    "mean_ratio_to_floor": 1.3197111173409841,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 0.6916045304040735,
+      "max_s": 0.9237987506374206,
+      "max_over_median": 1.3357326478149099,
+      "top_run_share": 0.3420221169036335,
+      "top_run_id": "ECM1h390806a2819eW97a0d9a18550R3",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 2895
+    }
+  },
+  "b": {
+    "session_id": "ECBS1hc5f71aae33c5",
+    "arm": "rho-cubic-v2",
+    "method_id": "ECM1hdb6174c739b9",
+    "method": "rho.cubic_v2",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 0.6795147853995808,
+    "mean_ratio_to_floor": 1.3280505240856348,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 0.7079612442336813,
+      "max_s": 0.9081531982786653,
+      "max_over_median": 1.2827724761426422,
+      "top_run_share": 0.33411826268969125,
+      "top_run_id": "ECM1hdb6174c739b9W97a0d9a18550R5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 2919,
+      "distinguished_point_table_inserts_uncharged": 89,
+      "distinguished_point_table_queries_uncharged": 93
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "W97a0d9a18550",
+      "slug": "icv1-fp25-t9734-bcfe9f51",
+      "r": 1977259,
+      "floor_s": 0.5116633539732443,
+      "pairs": 4,
+      "a_mean_s": 0.6752478165744656,
+      "b_mean_s": 0.6795147853995808,
+      "ratio_b_over_a": 1.0063191153238547,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-fp25-t9734-bcfe9f51",
+      "log2_r": 20.915070430549058,
+      "workloads": 1,
+      "pairs": 4,
+      "ratio_b_over_a": 1.0063191153238547,
+      "ci95": [
+        0.9380552229151703,
+        1.0795506886248247
+      ],
+      "ci_method": "within_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        0.9808633733867378,
+        1.0456968773800455
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 1.0063191153238547,
+    "ci95": [
+      0.9380552229151703,
+      1.0795506886248247
+    ],
+    "ci_method": "within_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 10000,
+    "workloads": 1,
+    "dof": 3.0,
+    "indicative": true,
+    "interval_scope": "within_workload",
+    "ci95_bootstrap": [
+      0.9808633733867378,
+      1.0456968773800455
+    ],
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 0,
+    "verified_only_ratio": 1.0063191153238547,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        1.0063191153238544,
+        1.0109113149847098,
+        1.034364261168385
+      ],
+      "order": "rho-cubic-v2 > rho-cubic-legacy at every weight",
+      "pairs": 4,
+      "note": "point ratios of totals; rank only where the order holds at every weight"
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "4 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L0",
+    "pairs": 4,
+    "pairs_below_level": 0,
+    "median_ratio": 1.2789134175572987,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 1.3245511457863073,
+    "ns_per_gae_a": 243.58241179568194,
+    "ns_per_gae_b": 322.6373626373626,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-cubic-legacy",
+      "rho-cubic-v2"
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 4,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 4
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": 0.0,
+    "contention_observed_runs": 0,
+    "notes": [
+      "A/A bonus unavailable: the spec permits wall runs below L2",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (ok): rho-cubic-v2 / rho-cubic-legacy = 1.0063 [0.938, 1.080] (within_t, df 3) over 4 pairs on 1 workloads, 1 curve(s), INDICATIVE: one workload, the interval does not generalise to other targets, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0063, w=0.1: 1.0109, w=1: 1.0344): rho-cubic-v2 > rho-cubic-legacy at every weight; heavy tail in rho-cubic-legacy: top run is 34% of the arm's total S (max/median 1.3); more runs needed; heavy tail in rho-cubic-v2: top run is 33% of the arm's total S (max/median 1.3); more runs needed; wall: descriptive (ns/GAE 1.3246, not a result: 4 admitted pairs; at least 5 are needed); ns/GAE of rho-cubic-legacy, rho-cubic-v2 is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1hc979312b5f5a",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

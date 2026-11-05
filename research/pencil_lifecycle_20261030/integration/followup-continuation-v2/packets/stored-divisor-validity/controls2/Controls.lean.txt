@@ -1,0 +1,38 @@
+import Branch
+namespace StoredDivisorControls
+open Polynomial MumfordNormalization MumfordValidity StoredDivisor ScaleTrim
+ theorem identity_any (f : ℚ[X]) : Valid f 1 0 := identity_valid f
+ theorem degree_one : Valid ((X:ℚ[X])^5-X) X 0 := by
+  refine ⟨monic_X,by simp,by simp,?_⟩
+  refine ⟨X^4-1,?_⟩
+  ring
+ theorem degree_two : Valid (((X:ℚ[X])^2-1)*(X^3+2)) (X^2-1) 0 := by
+  refine ⟨?_,?_,?_,?_⟩
+  · change (X^2-1 : ℚ[X]).leadingCoeff = 1
+    rw [leadingCoeff_sub_of_degree_lt (by simp)]
+    simp
+  · simpa using (le_of_eq (natDegree_sub_C (p := (X:ℚ[X])^2) (a := (1:ℚ))))
+  · simp only [degree_zero]
+    exact bot_lt_iff_ne_bot.mpr (degree_ne_bot.mpr (by
+      intro h
+      have hn := congrArg Polynomial.natDegree h
+      have he := natDegree_sub_C (p := (X:ℚ[X])^2) (a := (1:ℚ))
+      norm_num at hn he
+      omega))
+  · exact ⟨X^3+2,by simp⟩
+ theorem nonmonic_excluded : ¬Valid (0:ℚ[X]) (C 2) 0 := by
+  intro h
+  have hm := h.1
+  norm_num [Monic] at hm
+ theorem equal_ordinate_degree_excluded : ¬Valid ((X:ℚ[X])^2) X X := by
+  intro h
+  exact (lt_irrefl _) h.2.2.1
+ theorem degree_metadata_excluded : (X:ℚ[X]).natDegree≠2 := by simp
+ theorem identity_normalized : T 0 (2:ℚ) 3 1=1 ∧ T 3 (2:ℚ) 3 0=0 := identity_normalization 2 3
+ theorem identity_storage : storeU ⟨0,by decide⟩ 17 (fun _=>1) 2 3=[1,0,0] ∧
+  storeV ⟨0,by decide⟩ 17 (fun i=>nomatch i) 2 3=[0,0] := by decide
+ theorem degree_one_storage : storeU ⟨1,by decide⟩ 17 (fun i=>if i.val=0 then 0 else 1) 2 3=[10,1,0] ∧
+  storeV ⟨1,by decide⟩ 17 (fun _=>0) 2 3=[0,0] := by decide
+ theorem degree_two_storage : storeU ⟨2,by decide⟩ 17 (fun i=>if i.val=0 then 16 else if i.val=1 then 0 else 1) 2 3=[2,3,1] ∧
+  storeV ⟨2,by decide⟩ 17 (fun _=>0) 2 3=[0,0] := by decide
+end StoredDivisorControls

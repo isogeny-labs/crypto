@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+kb_root=$(cd "$(dirname "$0")" && pwd)
+repo_root=$(cd "$kb_root/../.." && pwd)
+cd "$repo_root"
+command=${1:-help}
+if [ "$#" -gt 0 ]; then shift; fi
+if [ "$command" = ingest ]; then
+  exec cargo run --quiet --release --locked --manifest-path "$repo_root/tools/finite-field-kb/Cargo.toml" -- ingest "${1:?source path required}" "$kb_root"
+fi
+if [ "$command" != help ] && [ ! -f "$kb_root/inventory.json" ]; then
+  echo 'Missing catalogue. Publication is pending (see PUBLICATION.json). Regenerate with: knowledge/finite-fields/kb ingest PATH_TO_ORIGINAL_TEXT' >&2
+  exit 1
+fi
+exec cargo run --quiet --release --locked --manifest-path "$repo_root/tools/finite-field-kb/Cargo.toml" -- "$command" "$kb_root" "$@"

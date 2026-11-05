@@ -1,0 +1,20 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 64/64 | 11.861 | 12.737 | 20.623 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc-aa | 64/64 | 11.861 | 12.737 | 20.623 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 64/64 | 1.578 | 1.693 | 2.724 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg-aa | 64/64 | 1.578 | 1.693 | 2.724 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | sel | 64/64 | 8.987 | 9.710 | 16.217 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | inc vs inc-aa | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs sel | sel < inc |
+| icv1-fp20-tm1050-4295f05e | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp20-tm1050-4295f05e | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp20-tm1050-4295f05e | inc-aa vs sel | sel < inc-aa |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs sel | rho-neg < sel |
+| icv1-fp20-tm1050-4295f05e | rho-neg-aa vs sel | rho-neg-aa < sel |
