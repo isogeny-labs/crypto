@@ -1,0 +1,79 @@
+{
+  "schema": "replay-certificate/validator-v1",
+  "id": "VAL-20261103-c31c76-replay",
+  "study": "research/jv_sieve_negrho_20261102",
+  "status": "verified",
+  "independent": true,
+  "scalars_verified": true,
+  "scope": "sampled: 1 of the 16 new rho runs, 1 of the 126 #3278 pooled-reference runs and 2 of the 16 cover rows (seed 21 from the primary set 17-24, seed 32) re-executed by the validator with one binary; runs drawn from nonces taken after publication. Also verified by the validator (not re-executed by it): the producer replay control (#3278 p=1451 seed 1 run 0, bit-identical under the study binary) and study A control C1 (all 16 V2 rows at p=1511 reproduced field-by-field by the study-A binary).",
+  "binary": {
+    "path": "/tmp/claude-0/-home-user/e05ef163-36d2-5181-b9b7-869571ded707/scratchpad/jv_cover_round3_frozen",
+    "sha256": "d21002a309374e1a06caf3f93a4c6da212362a72e5987b4e80aa8a96fdc44f2c",
+    "revision": "main aa1c89ab2a (task-card attested; equal to target/release/examples/jv_cover at review time)",
+    "producer_rho_binary_sha256": "2a61a5210ece9e5ca54f671081218e65406ed3703690ed15bd3a209ea8cf253c (jv_cover_rho_frozen, verified present and matching FROZEN.sha)"
+  },
+  "same_binary_both_arms": "one build (d21002a3) reproduces the cover arm (sieve) and the rho arm (rhostrong) records bit-for-bit on the replayed sample",
+  "comparison": "every field except wall_ms equal (serde_json value equality; review/validator/check_output.txt)",
+  "runs": [
+    {
+      "run": "study-B rho p=1511 seed 23 run 0 (negation, batch 16, r 256, dp 16)",
+      "record": "results/runs/rhostrong_p1511_s23_run0.json",
+      "replay": "review/validator/replay/rho_p1511_s23_run0.json",
+      "replay_sha256": "ea7da3b0e9dcc8a0abc6ffe6309c56eb3aa546532baa777e8cb7dd362910c775",
+      "draw": "review/validator/replay/DRAW_rho.txt",
+      "identical_except_wall_ms": true,
+      "correct": true,
+      "capped": false,
+      "steps": 2411015467,
+      "muls_harness": 797881656733.0,
+      "s_harness": 1.3974847893367537,
+      "scalar": "found == Some(d): the recovered logarithm equals the planted d (correct: true)",
+      "wall_ms_replay": 621409.5411439999
+    },
+    {
+      "run": "#3278 reference rho p=1451 seed 1 run 6 (pooled-reference member)",
+      "record": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run6.json",
+      "replay": "review/validator/replay/ref_p1451_s1_run6.json",
+      "replay_sha256": "6fbf10e74a2b30095cf0e4a741d432688acca04b2ed9c9543e0a1cac956e1f1a",
+      "draw": "review/validator/replay/DRAW_ref.txt",
+      "identical_except_wall_ms": true,
+      "correct": true,
+      "capped": false,
+      "steps": 1312650228,
+      "muls_harness": 434406971733.0,
+      "s_harness": 0.8592045161674978,
+      "scalar": "found == Some(d) (correct: true)",
+      "wall_ms_replay": 320011.400094
+    },
+    {
+      "run": "cover: plain sieve route p=1511 seed 21 (V2 ic_1511_sparse row)",
+      "record": "results/inputs/ic_1511_sparse.json",
+      "replay": "review/validator/replay/P_1511_s21.json",
+      "replay_sha256": "2dac2ee76cddfeb268d3d151a41c13075163502ce90e0376aa30041ec37b67ea",
+      "identical_except_wall_ms": true,
+      "solved": true,
+      "correct": true,
+      "exhausted": false,
+      "total_muls": 2869733520,
+      "total_plus": 15211839097,
+      "descent_digest": 1079140702747604967,
+      "scalar": "dd == d and dd*G == Q on E (solved, correct)",
+      "wall_ms_replay": 29231.931614
+    },
+    {
+      "run": "cover: plain sieve route p=1511 seed 32 (V2 ic_1511_sparse row)",
+      "record": "results/inputs/ic_1511_sparse.json",
+      "replay": "review/validator/replay/P_1511_s32.json",
+      "replay_sha256": "5ca3a174ecc4bc93b312a8afcad89d5cbd0b844a24801ed5c5f0888a909d39fa",
+      "identical_except_wall_ms": true,
+      "solved": true,
+      "correct": true,
+      "exhausted": false,
+      "total_muls": 4014620393,
+      "total_plus": 15750759010,
+      "descent_digest": 361116479042323625,
+      "scalar": "dd == d and dd*G == Q on E (solved, correct)",
+      "wall_ms_replay": 42400.06171
+    }
+  ]
+}

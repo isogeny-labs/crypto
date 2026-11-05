@@ -63,6 +63,12 @@ The two pinned files must hash to their `sha256`, and must say:
   `rel_tol` (default 1e-9).
 
 `python3 scripts/validation_gate.py evidence DIR` explains one directory.
+
+The `independent: true` booleans this gate reads are written by the producer.
+Under the sabotage contract (`docs/SABOTAGE_RESISTANCE.md`) a row's claim is
+additionally recorded with `pcc`, and its replay certificate and validator
+report carry a keyring signature, which is what "independent" means there.
+This gate's behaviour is unchanged.
 `scripts/fixtures/validation_gate/` holds a complete toy example (`positive/`) and
 a refused one (`negative-no-rho-reference/`); the numbers in them are not a
 measurement.

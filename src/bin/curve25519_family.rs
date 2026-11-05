@@ -1469,6 +1469,103 @@ fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s
 /// `f4cost` with the number of summands `m` (2 or 3) and the presentation
 /// `mode` (`full` or `chain`; `chain` needs `m = 3`).  `m = 2, full` is the
 /// original measurement, byte for byte in its spec.
+/// `iso-census <k> <t> <seed_lo> <seed_hi>`: for each tower seed, the
+/// isogeny base's columns, its exact m = 2 subgroup coverage and the
+/// log-free coset count J (signed pairs i <= j whose [r]-images cancel,
+/// P + (-P) excluded).  One JSON line per seed.
+fn iso_census(k: u32, t: u32, seed_lo: u64, seed_hi: u64) {
+    use crypto_lib::cryptanalysis::ic_boundary::{
+        CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint,
+    };
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase;
+    use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
+    let m = build_miniature(k);
+    let inst = PrimeInstance {
+        name: format!("c25519-mini-k{k}"),
+        curve: PrimeCurve {
+            p: m.p,
+            a: m.weier.a,
+            b: m.weier.b,
+        },
+        group_order: m.order,
+        r: m.r,
+        cofactor: 8,
+        generator: (m.g.x, m.g.y),
+    };
+    let ctx = InstanceCtx {
+        group: &inst.curve,
+        generator: inst.generator_point(),
+        target: inst.generator_point(),
+        r: inst.r,
+        cofactor: inst.cofactor,
+        group_order: inst.group_order,
+        name: inst.name.clone(),
+        field_degree: None,
+    };
+    for seed in seed_lo..seed_hi {
+        let mut params = Params::default();
+        params.set("t", t.to_string());
+        params.set("seed", seed.to_string());
+        let mut build_ops = GroupOps::default();
+        let builder = PrimeIsogenyBase { instance: &inst };
+        let fb = match builder.build(&ctx, &params, &mut build_ops) {
+            Ok(fb) => fb,
+            Err(e) => {
+                println!("{}", json!({"k": k, "t": t, "seed": seed, "error": e}));
+                continue;
+            }
+        };
+        let curve = &inst.curve;
+        let mut ops = GroupOps::default();
+        // log-free cosets: [r]P for every signed base point
+        let img: Vec<PrimePoint> = fb
+            .points
+            .iter()
+            .map(|&pt| curve.mul(&mut ops, pt, m.r))
+            .collect();
+        let mut j = 0u64;
+        for a in 0..fb.points.len() {
+            for b in a..fb.points.len() {
+                if fb.points[a] == curve.neg(fb.points[b]) {
+                    continue; // P + (-P) = O
+                }
+                if curve.add(&mut ops, img[a], img[b]).infinity {
+                    j += 1;
+                }
+            }
+        }
+        let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
+            curve,
+            &fb,
+            2,
+            &mut GroupOps::default(),
+        );
+        let covered = all
+            .iter()
+            .filter(|&&key| {
+                if key == 0 {
+                    return false;
+                }
+                let x = (key >> 1) - 1;
+                let y = sqrtm(m.weier.rhs(x), m.p).expect("covered point is on the curve");
+                let q = PrimePoint {
+                    x,
+                    y,
+                    infinity: false,
+                };
+                curve.mul(&mut GroupOps::default(), q, m.r).infinity
+            })
+            .count();
+        println!(
+            "{}",
+            json!({"k": k, "t": t, "seed": seed, "columns": fb.columns, "base_points": fb.points.len(),
+                   "covered_points": covered, "coverage_exact": covered as f64 / m.r as f64, "J": j,
+                   "selector_group_ops": ops.adds + ops.doubles,
+                   "build_group_ops": build_ops.adds + build_ops.doubles})
+        );
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn f4cost_m(
     k: u32,
@@ -1516,10 +1613,22 @@ fn f4cost_m(
         field_degree: None,
     };
     let span = 1u64 << t;
-    // `t0-bits@LO`: the T₀-invariant interval [LO, LO + 2^t) (LO default 0).
-    let (form_name, t0_lo) = match form.split_once('@') {
-        Some((f, lo)) => (f, lo.parse::<u64>().expect("form@lo: lo is an integer")),
-        None => (form, 0),
+    // `t0-bits@LO`: the T₀-invariant interval [LO, LO + 2^t) (LO default 0);
+    // `digits@LO:c1;…;ct` carries its digit list after the frame.
+    let (form_name, t0_lo, digits) = match form.split_once('@') {
+        Some((f, rest)) => {
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::parse_digits;
+            let (lo, digits) = match rest.split_once(':') {
+                Some((lo, list)) => (lo, Some(parse_digits(list).expect("digits@LO:c1;...;ct"))),
+                None => (rest, None),
+            };
+            (
+                f,
+                lo.parse::<u64>().expect("form@lo: lo is an integer"),
+                digits,
+            )
+        }
+        None => (form, 0, None),
     };
     let (fb, mut oracle) = match form_name {
         "t0-bits" => {
@@ -1534,13 +1643,53 @@ fn f4cost_m(
             let fb = t0_factor_base(&inst, &q, t, t0_lo);
             (fb, PkmSemaevOracle::new_t0_bits(nsum, t, t0_lo))
         }
+        "square-bits" => {
+            // `square-bits[@LO]`: the 2-descent base x = w² + A/3,
+            // w in [LO, LO + 2^t): every point lies in 2E(F_p).
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::{
+                edwards_shift, square_bits_factor_base,
+            };
+            let shift = edwards_shift(&inst.curve).unwrap();
+            assert_eq!(shift, m.shift);
+            let fb = square_bits_factor_base(&inst, t, t0_lo, shift);
+            (fb, PkmSemaevOracle::new_square_bits(nsum, t, t0_lo))
+        }
+        "digits" => {
+            // `digits@LO:c1;…;ct`: x = LO + Σ c_j b_j over the 2^t subset sums
+            // (L14 digit-set frames); t is the digit count.
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::digits_factor_base;
+            let digits = digits.expect("digits@LO:c1;...;ct names the digits");
+            assert_eq!(
+                digits.len(),
+                t as usize,
+                "digits: t must equal the digit count"
+            );
+            let fb = digits_factor_base(&inst, t0_lo, &digits);
+            (fb, PkmSemaevOracle::new_digits(nsum, t, t0_lo, digits))
+        }
+        "bits" if t0_lo != 0 => {
+            // `bits@LO`: the translation frame x in [LO, LO + 2^t) (mod p).
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::bits_factor_base;
+            let fb = bits_factor_base(&inst, t, t0_lo);
+            (fb, PkmSemaevOracle::new_bits(nsum, t, t0_lo))
+        }
         "bits" => {
             // The prime-abscissa base of every abscissa in [0, 2^t) on the curve.
             let n = (0..span)
                 .filter(|&x| sqrtm(m.weier.rhs(x), m.p).is_some())
                 .count();
-            let fb = prime_factor_base(&inst, n);
+            // `prime_factor_base` scans from x = 1, so when x = 0 carries a
+            // point (b a square) it would take one abscissa past 2^t; build
+            // the interval [0, 2^t) directly then. Otherwise keep the
+            // original builder, so published cells replay byte-identically.
+            let fb = if sqrtm(m.weier.rhs(0), m.p).is_some() {
+                use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::bits_factor_base;
+                bits_factor_base(&inst, t, 0)
+            } else {
+                prime_factor_base(&inst, n)
+            };
             assert!(fb.abscissa_list.iter().all(|&x| x < span));
+            assert_eq!(fb.abscissa_list.len(), n);
             (fb, PkmSemaevOracle::new_bits(nsum, t, 0))
         }
         "edwards-bits" => {
@@ -1555,19 +1704,25 @@ fn f4cost_m(
             (fb, PkmSemaevOracle::new_edwards_bits(nsum, t))
         }
         "isogeny" => {
+            // `isogeny@SEED`: the tower's public seed (auxiliary curve and
+            // coset R' + <Q>); no `@` is seed 0, the original measurement.
             let mut params = Params::default();
             params.set("t", t.to_string());
+            params.set("seed", t0_lo.to_string());
             let fb = PrimeIsogenyBase { instance: &inst }
                 .build(&ctx, &params, &mut GroupOps::default())
                 .expect("isogeny base");
-            let tower = isogeny_tower(m.p, t, 0, &mut GroupOps::default()).expect("tower");
+            let tower = isogeny_tower(m.p, t, t0_lo, &mut GroupOps::default()).expect("tower");
             let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
             (
                 fb,
                 PkmSemaevOracle::new_isogeny(nsum, t, tower.v.clone(), steps, tower.c),
             )
         }
-        o => panic!("form is bits, edwards-bits, t0-bits[@lo] or isogeny, not {o}"),
+        o => panic!(
+            "form is bits[@lo], digits@lo:c1;…;ct, square-bits[@lo], edwards-bits, t0-bits[@lo] or \
+             isogeny, not {o}"
+        ),
     };
     let mut spec = if guess > 0 {
         format!("pkm-semaev:m={nsum},mode={mode},guess={guess}")
@@ -1969,7 +2124,14 @@ fn main() {
                 println!("{}", serde_json::to_string(&row).unwrap());
             }
         }
+        "iso-census" => {
+            // iso-census <k> <t> <seed_lo> <seed_hi>
+            let k: u32 = args[2].parse().unwrap();
+            let t: u32 = args[3].parse().unwrap();
+            iso_census(k, t, args[4].parse().unwrap(), args[5].parse().unwrap());
+        }
         "f4cost" => {
+            // f4cost <k> <bits|digits@LO:c1;..;ct|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz|-] [trace 0|1]
             // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1|2] [max_nnz|-] [trace 0|1]
             let k: u32 = args[2].parse().unwrap();
             let t: u32 = args[4].parse().unwrap();
