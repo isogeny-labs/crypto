@@ -1,0 +1,5 @@
+# R118: exact unit-part precision for x-zero G coefficients
+
+Use the frozen R116 order-640 base series and R117's parsed 29 G51 terms. Correct the conservative R117 precision model by writing x=s^e U, with U known modulo s^(640-e), or U=1 exactly on a monomial branch. For numerator a=s^n A, the term a/x^d is known through Laurent exponent n-ed+min(640-n,640-e), with the second bound omitted when U=1. A zero numerator has lower bound 640-ed. Recombine all terms by lambda exponent, and report an order only when its nonzero coefficient lies below every term's cutoff. Recheck the R117 exact coefficients, perform byte-identical replay and independent schoolbook verification, and reject changed pinned inputs. Lean checks should cover finite arithmetic used in the resulting Newton edges. Preserve nulls and unresolved branch questions. This is local exact F2 arithmetic with zero cloud cost. Commit this protocol and source before producing data.
+
+Inputs are the R51 donor, R105 parser, R98 audit, R116 result, and R117 source/result at the SHA-256 hashes in protocol.json. Claim class: exact computation. The result does not alone identify normalized lambda branches.
