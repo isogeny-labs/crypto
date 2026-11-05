@@ -1,0 +1,9 @@
+# Frozen weighted add11 distinct target
+
+Sources read before approach: reviewed /var/tmp/pencil-add11-distinct-invariant-20261031-v1/{PLAN,AMENDMENT,REPORT}.md and Add11.lean; independent distinct review; exact projective_law_gate.rs511–532 and degree-one/degree-two normalization. Prior source audits of Ozbay Gurler–Hisil sections2–4 supply Mumford representation scope; no new law/novelty claim.
+
+Target field theorem: arbitrary field, weighted degree-one a,b with nonzero z,w; affine-normalized x=a.x/a.z²,y=a.y/(a.z^5*a.w), and similarly b; distinct normalized x; each degree-one support divides f-y². Define the literal Rust add11 expression tree and prove cross-coordinate inequality, output z,w nonzero, all four normalized output coefficients equal the existing distinct interpolation formula, hence output monic quadratic support divides f-v². Derive distinct branch selection from cross inequality. No theorem assumes output coefficient identities.
+
+External machine scope, explicit: odd prime5<=p<2^31, all eight input words canonical (<p), Field.n=1,tables=None, nonzero input weights, ordinary execution/counter headroom. Canonical field operations keep intermediate operands<p, products<2^62 and addition/subtraction intermediates<2^32, hence no UInt64 arithmetic overflow for those primitives; exact compiled word-tree/pow/guard correspondence is a subsequent obligation, not claimed by this field theorem. Counter/compiler/group-law-class-sum/wholewalker semantics remain outside scope.
+
+Controls: full validity with nonunit weights and nonzero slope; unit specialization; zero-weight and equal-normalized-x boundaries; distinct raw x can encode equal normalized x. Compile each command<=120s, pinned existing dependencies, separate axiom readback; preserve failures and source hashes. Private only, no scientific or root work.

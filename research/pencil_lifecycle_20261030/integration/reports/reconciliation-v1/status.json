@@ -1,0 +1,215 @@
+{
+  "schema": "four-lead-reconciliation-status/v1",
+  "snapshot_utc": "2026-10-30T20:19:37Z",
+  "scope": "Derived evidence index; archived counts are not reruns",
+  "new_scientific_executions": 0,
+  "new_cost_ratios": [],
+  "budget": {
+    "cumulative_seconds": 25200,
+    "deadline_utc": "2026-10-30T22:08:40Z",
+    "changed": false
+  },
+  "archive_inventory_utc": "2026-10-30T20:03:02.806755+00:00",
+  "archived_target_groups": [
+    {
+      "lead": "factor_base",
+      "arm": "full_16",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified": 1260
+      }
+    },
+    {
+      "lead": "factor_base",
+      "arm": "full_32",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified": 1260
+      }
+    },
+    {
+      "lead": "factor_base",
+      "arm": "full_8",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified": 1260
+      }
+    },
+    {
+      "lead": "factor_base",
+      "arm": "half_16",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified": 1260
+      }
+    },
+    {
+      "lead": "factor_base",
+      "arm": "quarter_16",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified": 1260
+      }
+    },
+    {
+      "lead": "kummer_walk",
+      "arm": "coordinate_identity_gate",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "coordinate_and_recover_gate_no_dlp_collector": 1260
+      }
+    },
+    {
+      "lead": "kummer_walk",
+      "arm": "differential_uncached",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified_same_process": 1260
+      }
+    },
+    {
+      "lead": "pencil_collector",
+      "arm": "markowitz_priority",
+      "rows": 61,
+      "distinct_workload_ids": 61,
+      "statuses": {
+        "priced_source_verified": 60,
+        "incomplete_cap_unpriced": 1
+      }
+    },
+    {
+      "lead": "pencil_collector",
+      "arm": "online_affine",
+      "rows": 181,
+      "distinct_workload_ids": 181,
+      "statuses": {
+        "priced_source_verified": 181
+      }
+    },
+    {
+      "lead": "pencil_collector",
+      "arm": "online_identity",
+      "rows": 544,
+      "distinct_workload_ids": 544,
+      "statuses": {
+        "priced_source_verified": 543,
+        "incomplete_cap_unpriced": 1
+      }
+    },
+    {
+      "lead": "pencil_collector",
+      "arm": "online_reverse",
+      "rows": 181,
+      "distinct_workload_ids": 181,
+      "statuses": {
+        "priced_source_verified": 181
+      }
+    },
+    {
+      "lead": "pencil_collector",
+      "arm": "peel_identity",
+      "rows": 543,
+      "distinct_workload_ids": 542,
+      "statuses": {
+        "priced_source_verified": 541,
+        "incomplete_cap_unpriced": 2
+      }
+    },
+    {
+      "lead": "projective_law",
+      "arm": "retained_state",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified": 1260
+      }
+    },
+    {
+      "lead": "projective_law",
+      "arm": "wrapper",
+      "rows": 1260,
+      "distinct_workload_ids": 1260,
+      "statuses": {
+        "priced_source_verified": 1260
+      }
+    }
+  ],
+  "rows": [
+    {
+      "id": "factor-base",
+      "status": "archived_evidence_indexed",
+      "count_per_arm": 1260,
+      "arms": 5,
+      "next": "Prospective graph-policy sweep remains separate"
+    },
+    {
+      "id": "weighted-law",
+      "status": "archived_evidence_indexed",
+      "count_per_arm": 1260,
+      "arms": 2,
+      "next": "Compiled-source invariant and exceptional-branch obligations"
+    },
+    {
+      "id": "pencil",
+      "status": "partial_archive_and_terminal_failure_retained",
+      "historical_distinct_verified": 543,
+      "historical_capped_only": 1,
+      "historical_unindexed": 716,
+      "c1_executions": 7,
+      "c1_requested": 18,
+      "c1_measured": 4,
+      "c1_requested_measured": 15,
+      "c1_timeouts": 2,
+      "c1_successful_pairs": 0,
+      "c1_ratio_cells_null": 36
+    },
+    {
+      "id": "kummer",
+      "status": "archived_evidence_indexed",
+      "differential_targets": 1260,
+      "n19_targets": 1260,
+      "n19_observed_fallback_steps": 0,
+      "coordinate_gate_is_collector": false
+    },
+    {
+      "id": "same-support",
+      "status": "written_derivation_with_nonblind_feedback",
+      "formal_candidate": "not_verified",
+      "blocker": "Helper import exceeded 120 seconds in RPC-backed dependency access; candidate not reached; owned processes reaped"
+    },
+    {
+      "id": "library-v8",
+      "status": "passed_earlier_source",
+      "passed": 5660,
+      "failed": 0,
+      "ignored": 124
+    },
+    {
+      "id": "library-v10",
+      "status": "pending_at_snapshot"
+    },
+    {
+      "id": "controller-v5",
+      "status": "software_tests_and_clippy_passed",
+      "tests": 48
+    },
+    {
+      "id": "fresh-owner-v4",
+      "status": "software_tests_and_clippy_passed",
+      "tests": 8
+    },
+    {
+      "id": "static-packages",
+      "status": "offline_static_builds_complete",
+      "binary_execution": false,
+      "image_publication": false
+    }
+  ]
+}

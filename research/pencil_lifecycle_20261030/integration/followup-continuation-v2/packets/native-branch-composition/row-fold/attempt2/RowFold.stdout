@@ -1,0 +1,14 @@
+RowFold.lean:24:7: error: unsolved goals
+case nil
+p : UInt64
+m : Mat
+x : V
+i : Fin 4
+hp : 0 < p.toNat
+hb : p.toNat ≤ 2 ^ 32
+hm : ∀ (i j : Fin 4), (m i j).toNat < p.toNat
+hx : canonical p x
+v : UInt64
+hv : v.toNat < p.toNat
+⊢ v.toNat < p.toNat
+RowFold.lean:43:75: error(lean.unknownIdentifier): Unknown constant `Fin.sum_univ_succ`

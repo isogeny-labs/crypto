@@ -41,7 +41,7 @@ jobs:
           curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
           printf '4bacca9502cb89736fe63d2685abc2947cfbf34dc87673504f1bb4c43eda9264  %s\n' "$RUNNER_TEMP/elan-init.sh" | sha256sum -c -
           export ELAN_HOME="$RUNNER_TEMP/sea-elan"
-          sh "$RUNNER_TEMP/elan-init.sh" -y --no-modify-path --default-toolchain leanprover/lean4:v4.19.0
+          sh "$RUNNER_TEMP/elan-init.sh" -y --no-modify-path --default-toolchain leanprover/lean4:v4.34.1
           echo "ELAN_HOME=$ELAN_HOME" >> "$GITHUB_ENV"
           echo "$ELAN_HOME/bin" >> "$GITHUB_PATH"
       - name: Check TLA+ models, negative controls, and Lean proofs

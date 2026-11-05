@@ -1,0 +1,160 @@
+{
+  "card_id": "CARD-BLINDSPOT-08-10",
+  "card_path": "research/blindspots_20261018/08-learned-sat-branching/card-10.yaml",
+  "card_sha256": "acdb7eba735b6aa1d6c79f178c893fa0989a12fd096643323fe7e6cfca8208b7",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-08/card-10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-08/card-10/b08",
+        "examples/blindspots_08_learned_branching.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.306,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 8.306,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-08/card-10/b08",
+        "summarize",
+        "--files",
+        "research/blindspots_20261018/08-learned-sat-branching/raw/test-n31.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/test-n33.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/test-n35.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/test-n37.jsonl",
+        "--sizes",
+        "31,33,35,37",
+        "--incumbent",
+        "a",
+        "--cands",
+        "b,b2,c",
+        "--controls",
+        "bs,b2s,d,a2",
+        "--threshold",
+        "1.3",
+        "--min-pairs",
+        "100",
+        "--boots",
+        "10000"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 2,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 2,
+      "id": "summary-primary",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "446d18169733928d96d388119b467ad7c426ef01e4a920b7ff239f99ca0061fd",
+      "stderr_tail": [
+        "FAIL: read research/blindspots_20261018/08-learned-sat-branching/raw/test-n31.jsonl: No such file or directory (os error 2)"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 7,
+  "commit": "d4f154d6005d7e8e40dd24891e35bde847404909",
+  "dirty_after": [
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-11-ablation-c15-3-4.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-11-ablation-c15-3-4.stdout.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-12-build.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-12-build.stdout.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/receipt-card-11.json",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/card-10-build.stderr.log",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/card-10-build.stdout.log",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/summary-primary.stderr.log",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/summary-primary.txt",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-05-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-05-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3.samples.24",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3.trace.24",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-05.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-19-4-3-24-32.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-19-4-3-24-32.stderr.log",
+    "xamples/blindspots_10_kernel_search.rs"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-11-ablation-c15-3-4.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-11-ablation-c15-3-4.stdout.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-12-build.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-12-build.stdout.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/receipt-card-11.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-05-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-05-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3.samples.24",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3.trace.24",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-05.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-19-4-3-24-32.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-19-4-3-24-32.stderr.log",
+    "xamples/blindspots_10_kernel_search.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 3"
+}

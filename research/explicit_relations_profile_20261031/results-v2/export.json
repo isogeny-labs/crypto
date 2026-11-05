@@ -1,0 +1,534 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "ER-PROFILE-v2-fmu20lo21ib6gu",
+  "created": "2026-10-31T07:53:05.718598+00:00",
+  "protocol": {
+    "path": "../protocol-v2.json",
+    "sha256": "4dc4c0560a8af2ad967d99c9f1d08526eb676e435b12ef658a174e093eba869e",
+    "protocol_id": "EXPLICIT-RELATIONS-PROFILE-20261031",
+    "version": 2
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "ecbench-profile-v2",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "b50e30d47458881eba10d802b7f972a9f56541bd",
+    "dirty": false
+  },
+  "backend": "runpod",
+  "host": {
+    "path": "gpu-before.txt",
+    "sha256": "1013a11fc6c88ad3a9c3b1c92682e20ae450b4441c154e05fd64f6160430a5d7",
+    "class_id": "runpod-fmu20lo21ib6gu",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "gpu": "RTX 4090"
+    }
+  },
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "binary_sha256": "2c3aa8c27e35065b1bb83913189d54e9dda75e0b649f648a966c31b139ddab92",
+      "commit": "b50e30d47458881eba10d802b7f972a9f56541bd"
+    },
+    {
+      "id": "t",
+      "role": "candidate",
+      "binary_sha256": "2c3aa8c27e35065b1bb83913189d54e9dda75e0b649f648a966c31b139ddab92",
+      "commit": "b50e30d47458881eba10d802b7f972a9f56541bd"
+    },
+    {
+      "id": "c",
+      "role": "candidate",
+      "binary_sha256": "2c3aa8c27e35065b1bb83913189d54e9dda75e0b649f648a966c31b139ddab92",
+      "commit": "b50e30d47458881eba10d802b7f972a9f56541bd"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "fmu20lo21ib6gu-101-b",
+      "arm": "b",
+      "instance_id": "63-101",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "verified_queries": 8
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_exit": 0,
+          "native_status": "exact_replay"
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared host; external profiler perturbs execution"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Byte-exact baseline and traced protocol replies; native profiler manifests"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "101.stdout",
+          "sha256": "5e6cc2d481cdae44aeaa182564a965cbb8494ff7638a8a604f083f2437ccf52e",
+          "bytes": 13581,
+          "kind": "raw"
+        },
+        {
+          "path": "101.stderr",
+          "sha256": "a7b884edd47d5b79da19d4afbe7f8f4b7af60677858e568b4de4329c0de9dac4",
+          "bytes": 811,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "fmu20lo21ib6gu"
+    },
+    {
+      "run_id": "fmu20lo21ib6gu-101-t",
+      "arm": "t",
+      "instance_id": "63-101",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "verified_queries": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_exit": 0,
+          "native_status": "ok"
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared host; external profiler perturbs execution"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Byte-exact baseline and traced protocol replies; native profiler manifests"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "nsys-101/manifest.json",
+          "sha256": "c8fd4569a9ca139e76240b3b641835f1613884a191f2a73ea0f600a1210924fd",
+          "bytes": 1985,
+          "kind": "raw"
+        },
+        {
+          "path": "nsys-101.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "fmu20lo21ib6gu"
+    },
+    {
+      "run_id": "fmu20lo21ib6gu-101-c",
+      "arm": "c",
+      "instance_id": "63-101",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "verified_queries": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_exit": 3,
+          "native_status": "unsupported"
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared host; external profiler perturbs execution"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "ncu-101/manifest.json",
+          "sha256": "edbb83f0a6826603717bdb9b8c7719eba6ade42f001c10aa6a16f326e3a360b8",
+          "bytes": 2598,
+          "kind": "raw"
+        },
+        {
+          "path": "ncu-101.exit",
+          "sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+          "bytes": 2,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "fmu20lo21ib6gu"
+    },
+    {
+      "run_id": "fmu20lo21ib6gu-202-b",
+      "arm": "b",
+      "instance_id": "63-202",
+      "seed": "202",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "verified_queries": 8
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_exit": 0,
+          "native_status": "exact_replay"
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared host; external profiler perturbs execution"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Byte-exact baseline and traced protocol replies; native profiler manifests"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "202.stdout",
+          "sha256": "d8544eefde56e4eaf44211d0006e10b78057b9e457c94552bc4496389f8a2f9b",
+          "bytes": 13814,
+          "kind": "raw"
+        },
+        {
+          "path": "202.stderr",
+          "sha256": "b18f20bb2347cd4db2282b267a4fad1ab7debcd325fb08232c0408341d8ad9c8",
+          "bytes": 813,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "fmu20lo21ib6gu"
+    },
+    {
+      "run_id": "fmu20lo21ib6gu-202-t",
+      "arm": "t",
+      "instance_id": "63-202",
+      "seed": "202",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "verified_queries": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_exit": 0,
+          "native_status": "ok"
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared host; external profiler perturbs execution"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Byte-exact baseline and traced protocol replies; native profiler manifests"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "nsys-202/manifest.json",
+          "sha256": "df0ea0b59ad6d455203e5248bfe6c1de96a016aa9fb3731d0da6c02e40c8de11",
+          "bytes": 1985,
+          "kind": "raw"
+        },
+        {
+          "path": "nsys-202.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "fmu20lo21ib6gu"
+    },
+    {
+      "run_id": "fmu20lo21ib6gu-202-c",
+      "arm": "c",
+      "instance_id": "63-202",
+      "seed": "202",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "verified_queries": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_exit": 3,
+          "native_status": "unsupported"
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared host; external profiler perturbs execution"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "ncu-202/manifest.json",
+          "sha256": "2c81eb6d8bccb1727a5a2071b6dd9039d9d97c5234a0d9d1cb5749297b7803d8",
+          "bytes": 2598,
+          "kind": "raw"
+        },
+        {
+          "path": "ncu-202.exit",
+          "sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+          "bytes": 2,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "fmu20lo21ib6gu"
+    }
+  ],
+  "files": [
+    {
+      "path": "archive-manifest.json",
+      "sha256": "ca396dadacd83bab1cd9a85514a9d024a8140a4681d772c844329485e483a3e8",
+      "bytes": 9207,
+      "kind": "raw"
+    },
+    {
+      "path": "receipt.json",
+      "sha256": "dfe2b5e50db9908cf884ac36c645c1e01b5928ddda34a2cb746048493973db67",
+      "bytes": 416,
+      "kind": "raw"
+    },
+    {
+      "path": "deletion.txt",
+      "sha256": "abc547c0488f7adc11f53ddca4e26420620051a1cf15013dd826d35d8642eecf",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "instruments.sha256",
+      "sha256": "06811f46500d9425f70d24738791388195c81ce9930c5f9bf7a1a2b074708ddd",
+      "bytes": 98,
+      "kind": "raw"
+    },
+    {
+      "path": "source-commit.txt",
+      "sha256": "9c6f46f6eb6c4b4a11e967430b36b8162a673ce7f3236356f4217629359e0328",
+      "bytes": 41,
+      "kind": "raw"
+    },
+    {
+      "path": "packages.txt",
+      "sha256": "002d3b8aea423e0b2f4b0491db1dcd58b83d3d9949e18c376ceea5cbd6623eff",
+      "bytes": 10322,
+      "kind": "raw"
+    },
+    {
+      "path": "probe/probe.json",
+      "sha256": "55937088c1ce4eff51d8f9e5c25a0822fe588ebf172f3bfc44ca8effba208135",
+      "bytes": 2216,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../../tools/profile.sh",
+      "sha256": "42a7c0dee60712fb3a767647043136d154b5c5713cda76930c027c2571ac5375",
+      "bytes": 59862,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "nsys-101/summary.json",
+        "sha256": "2ab358427e8e47a9e12c35f6519c58bbd675c6a6231aad7554299fbec48760c0",
+        "bytes": 18259,
+        "kind": "analysis"
+      },
+      {
+        "path": "nsys-101/summary.md",
+        "sha256": "b8300c79ec273781721a4462c2933221340c1b05dea748fbd68c258011abd9a1",
+        "bytes": 3804,
+        "kind": "analysis"
+      },
+      {
+        "path": "nsys-101/kernels.svg",
+        "sha256": "e88ee651c27477f2385ccf7d1df609b0019fe3cf848f6c8a7b265db11cdb87a9",
+        "bytes": 9586,
+        "kind": "analysis"
+      },
+      {
+        "path": "nsys-202/summary.json",
+        "sha256": "1d3682970b4a07a043d3baf50da842391d4edcf8caeeafa00f673a6ccd08e92f",
+        "bytes": 18268,
+        "kind": "analysis"
+      },
+      {
+        "path": "nsys-202/summary.md",
+        "sha256": "5dd3126744d0e2cc0cb07203ecf1ac8a632a06a4801cd86a605c91d4fb8eb5ce",
+        "bytes": 3806,
+        "kind": "analysis"
+      },
+      {
+        "path": "nsys-202/kernels.svg",
+        "sha256": "8e0cbbcf4d647dfa4b219464419b7224e631691a0892bf14cb941330fe0d267a",
+        "bytes": 9622,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Both baseline replays and both Nsight Systems traced reply streams match v1 exactly. Both Nsight Compute attempts were unsupported with ERR_NVGPUCTRPERM and map to completed failed processes, retaining native status/exit3. No hardware counters are invented. The capability probe independently ran/checked its control kernel and confirmed the same counter-permission restriction. The Nsight manifest hashes the bash launch wrapper; actual GPU service SHA is in instruments.sha256 and the arm identities."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Native summary.md, kernels.svg and report.typ regenerated byte-identically from each recorded Nsight summary JSON. These are profiler diagnostics, not throughput measurements. Raw binary profiler reports and SQLite traces remain in the hashed S3 archive. Owned pod deletion verified."
+    }
+  ],
+  "reviews_dir": "reviews",
+  "flow": {
+    "planned": 6,
+    "attempted": 6,
+    "completed": 6,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  }
+}

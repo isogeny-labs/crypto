@@ -1,0 +1,22 @@
+import Acceptance
+import ResidualControls
+set_option autoImplicit false
+namespace ResidualAcceptanceControls
+open ResidualAcceptance ResidualWord
+theorem identity : accepts 17 0 [1] [] [3,2] 2 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem linear : accepts 17 1 [16,1] [] [16,0,1] 3 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem nondivisible : ¬ accepts 17 1 [16,1] [] [1,0,1] 3 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem quadratic : accepts 17 2 [1,0,1] [1,1] [2,2,2] 3 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem degree_guard : ¬ accepts 17 3 [1] [] [] 0 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem top_guard : ¬ accepts 17 1 [1,2] [] [] 0 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem fuel_reject : ¬ accepts 17 1 [16,1] [] [16,0,1] 1 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem zero_residual : accepts 17 2 [1,0,1] [1,1] [1,2,1] 0 := by
+  simp only [accepts,residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+end ResidualAcceptanceControls

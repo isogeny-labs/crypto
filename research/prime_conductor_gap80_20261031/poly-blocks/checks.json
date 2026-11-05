@@ -1,0 +1,88 @@
+{
+  "schema": "gap80-bounded-polynomial-stage/v1",
+  "status": "correctness_checks_pass",
+  "field_source": "../parameters.json",
+  "root_input_sha256": "56bb2d85e4fb8584eb80b00cb8ead37d192c1055e84c80c6a6fb6c6057892ed2",
+  "roots_in_fixture": 4096,
+  "known_scalar_contexts": 32,
+  "reciprocal_powers_per_context": 6,
+  "scalar_rule": "s=1..32 on the recorded source generator; x-coordinates only",
+  "product_file": "product-000000.bin",
+  "product_bytes": 131148,
+  "product_sha256": "64a4d86f55b265fb37154a6ae282b95836f7ab0cf24cfdf498a30efeea62bc16",
+  "points_sha256": "a8b067ab13a60631c0c8a60b8d281d6ea904dcd1213d628939f165d3ae930edf",
+  "output_sha256": "b092104bb9e4c843f28cc48cd165dde602771724ee8e922560d1546182769ba6",
+  "direct_oracle_agrees": true,
+  "split_blocks_agree": true,
+  "block_order_independent": true,
+  "negative_controls": [
+    {
+      "name": "truncated.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: truncated coordinate/coefficient"
+    },
+    {
+      "name": "magic.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: invalid block header"
+    },
+    {
+      "name": "degree-cap.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: block degree exceeds bound"
+    },
+    {
+      "name": "field.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: block field mismatch"
+    },
+    {
+      "name": "monic.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: nonmonic or extra polynomial data"
+    },
+    {
+      "name": "extra.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: nonmonic or extra polynomial data"
+    },
+    {
+      "name": "collision.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: evaluation point collides with a root"
+    },
+    {
+      "name": "noncanonical.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: noncanonical field value"
+    },
+    {
+      "name": "points-cap.bin",
+      "exit_status": 2,
+      "stderr": "poly_blocks: value count exceeds bound"
+    }
+  ],
+  "source_sha256": "04eb3e0711e2fe48784b101ee92ea15159b4e9f6f7d96bf068a0269722b91adc",
+  "input_provenance": "Hash-matched materialization of the previously independently verified S3 root fixture; transport and arithmetic kept separate",
+  "scope": "Bounded native development tests; no timing, full-kernel polynomial, quotient or isogeny map claim",
+  "s3_product_status_at_creation": "pending trusted artifact-autofix upload and full-byte readback",
+  "actual_giant_contexts": 32,
+  "giant_index_rule": "(4*i+2)*floor(sqrt((ell-1)/4))*K; i=0..31",
+  "giant_direct_oracle_agrees": true,
+  "giant_split_agrees": true,
+  "total_reciprocal_values_checked": 384,
+  "source_files": [
+    {
+      "path": "native/poly_blocks.c",
+      "sha256": "04eb3e0711e2fe48784b101ee92ea15159b4e9f6f7d96bf068a0269722b91adc"
+    },
+    {
+      "path": "native/point_contexts.c",
+      "sha256": "070744e6c4ba7ad1823c9a51d7d4e89ebb8ad15125a34cbd2a4fda061890e31a"
+    },
+    {
+      "path": "native/check_contexts.c",
+      "sha256": "6b2316024c9c19229d94b34183eaa7a208be082250af4504221ba56fdf275136"
+    }
+  ]
+}

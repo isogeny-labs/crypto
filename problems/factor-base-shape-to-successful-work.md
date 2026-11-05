@@ -2,9 +2,9 @@
 
 - **Status:** open
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
-- **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
+- **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md), [Boolean ordinate offsets](../research/prime_factor_base_degree_20261031/pencil_search_20261101/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-01
 
 ## Problem
 
@@ -73,6 +73,32 @@ all phases, matched rho and independent replay under repository rules.
 
 ## Resolution and history
 
+2026-11-01: [Boolean offsets of a quadratic ordinate coordinate](../research/prime_factor_base_degree_20261031/pencil_search_20261101/README.md)
+now have kernel-checked complete two-summand group semantics and exact
+canonical highest-form first-vanishing degree2k+3, including all2k Boolean
+selector variables. The F17 base FB1h29cc024e755c has eight columns/sixteen
+signed points, canonical degree7 versus same-base dense9. This closes the
+specific canonical-degree proof obligation for this presentation; it does
+not close the successful-work condition. Derived full affine column
+envelopes are3432 versus55, not observed F4 widths. Exact one-bit-per-slot
+projection removes two variables, but its canonical degree and solver costs
+remain unproved/unmeasured. The five-module continuation passes the unchanged
+240-declaration dependency audit with zero failures/native trust and13
+native tests; the fixture export replays byte-for-byte.
+
+The [prospective panel](../research/prime_factor_base_degree_20261031/pencil_search_20261101/PROTOCOL.json)
+is not implemented or launched: matched controls/F4 instrumentation and an
+admitted arbitrary-native-command EKS route remain separate implementation
+and tool/access gaps. No EKS MCP or ready AWS identity is configured in that
+session; the inspected GitHub workflow consumes ecbench specs. The earlier
+local exception is specific to a different completed panel and is not reused.
+Next: prove the projected top ideal, implement the frozen complete-reference
+panel, submit it through the proper route and compare actual work including
+construction, all signs, duplicate labels and root recovery. Keep empty
+fibres and failures. Passing those checks could establish a measured
+two-summand stage improvement; the original P-256/17-term gates remain open.
+No mathematical impossibility or novelty conclusion is inferred.
+
 2026-10-30: the [structured predicate reference](../research/prime_ic_zero_filter_20261030/implementation/README.md)
 implements a rational two-isogeny fibre membership circuit with actual subgroup
 constraints, complete signed point-summation charts, exact counts and prefix
@@ -126,3 +152,17 @@ point checks and independent relation rank. Its
 is not a frozen executable protocol, implemented adapter or experiment result.
 No old card was promoted or dispatched. The native successful-work and
 regularity obligations remain open; custody completion does not discharge them.
+
+
+2026-11-01 four-presentation continuation: [same-base recoding study](../research/prime_factor_base_degree_20261031/four_tracks_20261101/README.md)
+checks exact canonical degree6 with seven-variable XOR labels and degree5 with
+nine-variable one-hot support, against the original same-base degree7 on
+`icv1-fp5-tm1-a77cc6af` / `FB1h29cc024e755c`. All variables, support products
+and actual highest forms are included. Complete symmetric charts and the
+expanded determinant's free-ordinate obstruction are also proved. This closes
+these specific two-summand presentation-degree obligations; it does not price
+successful decomposition. The new [protocol](../research/prime_factor_base_degree_20261031/four_tracks_20261101/PROTOCOL.md)
+requires complete branch-summed matched CAS work and replay. No new experiment
+or performance leaderboard promotion occurred. Next action: admit/implement the
+standalone complete EKS/CAS adapter and root decoder, with host/budget frozen;
+keep the original rank, growth and end-to-end obligations open.

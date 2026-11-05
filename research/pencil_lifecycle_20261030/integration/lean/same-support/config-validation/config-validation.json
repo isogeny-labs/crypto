@@ -1,0 +1,39 @@
+{
+  "command": [
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+    "-j1",
+    "-M4096",
+    "-o",
+    "lakefile.config-validation.olean",
+    "lakefile.lean"
+  ],
+  "timeout_seconds": 60,
+  "native_exit": 1,
+  "seconds": 26.11057639698265,
+  "environment": {
+    "LEAN_SYSROOT": "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1",
+    "LEAN_PATH": "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean",
+    "ELAN_TOOLCHAIN": "leanprover/lean4:v4.34.1"
+  },
+  "manifest_json_valid": true,
+  "package": "same_support",
+  "dependency_pins": {
+    "mathlib": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+    "plausible": "118aa17ee84656b8bd727fef7c458ee8c833385c",
+    "LeanSearchClient": "ddf04cf3949fa556442341e87d47f9f6e6074707",
+    "importGraph": "e928b72544873815af278d38681b31c0293588e3",
+    "proofwidgets": "106ff4fafc74ef4ac99d81dbf3ab399118f497a5",
+    "aesop": "355695d523e41d0554926416cba2a2b3544fbbc9",
+    "Qq": "6a489d9af5d0c47e5b259e2e8bcdfc1811b5a259",
+    "batteries": "f2effa3d803fda822b1f97b806c47cf2adfbcbc2",
+    "Cli": "e92c9f15fdfacc8536f31cfb3b7ad26c3c8cd204"
+  },
+  "source_hashes": {
+    "ProjectiveLawBoundary.lean": "0cbdbb636e11f34ad94493353f2fc748a353c89f248f868accbdaaf02fc88e2b",
+    "RuntimeSemantics.lean": "9e015c3c79f465b2b16f6e0dae5c744f9de3400f51646f746c61c54c4722c318",
+    "SameSupport.lean": "ecb3a5f91f7217d1ab107466c470a491559f7cfe0276ca6d72661fffef66170b",
+    "SameSupportClassifier.lean": "7f21fd6153d972309fe5f0d4b7a5b00ff188eb4e6510cbfbd8c33f7a12efa41e",
+    "lakefile.lean": "7ca962ed1202e06039b2ce6a31dfb0e37c7ec29f340d0c691dafe9413c74dde6"
+  },
+  "limits": "No Lake build, update, dependency download, or project compilation. JSON parsing is not Lake manifest interpretation."
+}

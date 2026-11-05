@@ -1,0 +1,220 @@
+{
+ "lens": "lattices and small roots (S_5 at delta ~ 1/5, m=4, prime fields; D4 invariants; unravelled linearisation; structured bases; function-field and capacity routes)",
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/ideas/lattices.json",
+ "generated": "2026-10-31",
+ "lens_summary": {
+  "headline": "Every reparametrisation of the small set (GAP, Farey a/b, digits, elementary-symmetric, D4 invariants) leaves the asymptotic Coppersmith reach for S_5 at 1/80 and the ceiling at 1/32 (W10), and the only coordinate changes that lower the per-variable degree (2-torsion translation, FGHR) either produce full-size semi-invariants on x-small bases or, in FGHR's Y-coordinate, cancel exactly in total-base-size terms. The lattice route to the m=4 oracle at delta=1/5 therefore has three unclosed classes only: non-full-rank sublattices (MP-lattices-2), joint multi-polynomial lattices with full-size internal nodes at multiplicity >= 2 (MP-lattices-3, where W10's dismissal covers only multiplicity 1), and whatever capacity theory leaves open (MP-lattices-6). MP-lattices-1 extends the 1/32 ceiling to Groebner-optimal shifts on arbitrary monomial sets by a leading-monomial argument (pilot data in this session); MP-lattices-4 executes brief lever 3 honestly as a factor-8 dimension device; MP-lattices-5 gives the binary-curve analogue as an exact theorem.",
+  "pilot_data_this_session": {
+   "dimVk_S3_p10007_L6": {
+    "box": {
+     "dimVk": [
+      25,
+      9,
+      1
+     ],
+     "plain_shifts": [
+      25,
+      9,
+      1
+     ],
+     "LM_count": [
+      25,
+      9,
+      1
+     ],
+     "reach_ratio_l3": "35/294 = 0.1190"
+    },
+    "simplex_deg8": {
+     "dimVk": [
+      15,
+      1,
+      0
+     ],
+     "plain_shifts": [
+      15,
+      1,
+      0
+     ],
+     "LM_count": [
+      15,
+      1,
+      0
+     ]
+    },
+    "box_minus_corner": {
+     "dimVk": [
+      21,
+      5,
+      0
+     ],
+     "plain_shifts": [
+      21,
+      5,
+      0
+     ],
+     "LM_count": [
+      21,
+      5,
+      0
+     ]
+    },
+    "box_minus_centre_hole_(3,3)": {
+     "dimVk": [
+      24,
+      8,
+      0
+     ],
+     "plain_shifts": [
+      16,
+      0,
+      0
+     ],
+     "LM_count": [
+      24,
+      9,
+      1
+     ],
+     "reach_ratio_l3": "32/288 = 0.1111 < box"
+    }
+   },
+   "fghr_Y_sign_action": "p=1000003, y^2=x(x^2+5x+49), T=(0,0), c=7: Y(P+T) = -Y(P) and Y(-P) = Y(P) on 200/200 random points",
+   "gap_rank2_univariate_check": "JM-basic count for a total-degree-d bivariate simplex gives X Y < p^{1/d} = the univariate reach: rank-2 GAP substitution is reach-neutral"
+  },
+  "corrections_to_brief": [
+   "Brief section 2 'Lattice reach' and section 3 item 3: the D4-symmetrised S_5 has been run as a Macaulay solve over F_{p^4} (d4_symmetrised_s5_20261015); the D4 LATTICE is unrun but is a factor-8 dimension device under W10's 1/32 ceiling, not a reach lever (MP-lattices-4).",
+   "W10 T5 dismissal ('every monomial containing an internal node exceeds the modulus') covers only multiplicity-1 shifts; at multiplicity >= 2 full-size variables are admissible exactly as Boneh-Durfee's y (MP-lattices-3)."
+  ],
+  "searches_run": [
+   "WebSearch (standard) 2026-10-31: Coppersmith method optimal lattice determinant 'leading monomial' OR 'Hilbert function' bound shift polynomials non-convex monomial set upper bound reach Ryan cuso -> only 2012/108, 1605.08065, textbook material; no leading-monomial ceiling found",
+   "WebSearch (standard) 2026-10-31: 'helpful' vectors sublattice Coppersmith non-full-rank 'geometrically progressive' beyond Boneh-Durfee general criterion multivariate modular polynomial 2025 -> Ryan 2024/1577 graph heuristic for low-rank sublattices (no reach theorem), EC-HNP helpful-vector terminology, 1708.09445 focus groups; no general criterion and no application to summation polynomials"
+  ]
+ },
+ "ideas": [
+  {
+   "id": "MP-lattices-1",
+   "title": "Hilbert-function (leading-monomial) ceiling for every full-rank lattice inside (p,f)^l on ANY monomial set, with exact ideal-intersection dimensions on non-convex sets",
+   "statement": "For f = S_{m+1}(x; z) mod p and any finite monomial set M (convex or not), let L_M = {g in Z[x] : supp g in M, g in (p,f)^l} (the lattice whose short vectors are exactly what Ryan/cuso 'Groebner-optimal shifts' can produce). Claim: det(L_M) >= p^{sum_{k=1}^{l} (|M| - dim V_k)} * prod_beta X^beta with V_k = (f^k) cap F_p[x]_M, and dim V_k <= #{beta in M : x^beta divisible by LM(f)^k} for the monomial order exposing the top vertex a=(d,...,d). Hence the Howgrave-Graham condition forces delta < 1/(m d) = 1/32 for S_5 for the WHOLE class of full-rank lattices on arbitrary monomial sets, not only W10's triangular shift family; and the exact dim V_k decides whether any non-convex M beats the box reach 1/80.",
+   "mechanism": "Over a field, LM(g h) = LM(g) LM(h), so an echelon basis of V_k = (f^k) cap F_p[x]_M has distinct leading monomials all divisible by LM(f)^k. Counting those monomials in M reproduces W10's charging sum sum_beta J_a(beta) <= sum_beta (lambda.beta)/(lambda.a), i.e. the ceiling 1/(m d), but now for every Z-lattice of polynomials supported on M that vanish mod p^l on the small roots, because the p-part of det(L_M) is governed by the F_p-dimensions dim V_k (filtration (p,f)^l superset p^{l-k}(f^k)). The remaining freedom (the gap between the plain-shift count, dim V_k and the LM count) is computable by linear algebra mod p: dim V_k = rank(all shifts of f^k) - rank(their projection on the monomials outside M).",
+   "wall_bypassed": "TREAT-lattice-reach / LEAD-ICP-coppersmith-smallroot-semaev, open class 'non-convex monomial sets and cuso Groebner-optimal shifts' (W10 section 7 class 2). It does not bypass the wall; it extends the wall's ceiling to that class and tests whether the class can exceed the box optimum at all.",
+   "why_wall_hypotheses_fail": "W10's closure LP and charging argument assume each shift polynomial's own support lies in M (triangular basis). Groebner-optimal shifts are linear combinations of shifts whose out-of-M monomials cancel, so W10's count k(beta) is a lower bound and its ceiling proof does not literally cover them. The LM argument replaces 'shift support in M' by 'element of (f^k) with support in M', which is the exact class.",
+   "nongenericity_argument": "Theory/accounting item: it cannot lower B.D^2; it decides whether a Coppersmith oracle of polynomial dimension can exist on any monomial set. If the exact dim V_k ratio stayed <= box for all M, the only remaining Coppersmith routes to delta=1/5 are non-full-rank sublattices (MP-lattices-2) and multi-polynomial lattices (MP-lattices-3). If some M exceeded the box ratio, the asymptotic S_5 reach would have to be recomputed and could in principle approach the 1/32 ceiling (still < 1/5, so even the positive outcome leaves m=4 closed; the ceiling itself is the exponent statement).",
+   "prior_art": "Jochemsz-May 2006 (box/extended strategies); Ryan ePrint 2024/1577 (cuso: optimal shifts for a fixed M via Groebner bases, lattice determinant as p-power of ideal dimensions); Meers-Nowakowski 2023/1409; Feng-Luo-Chen-Nitaj-Pan 2024/1330 (sumset asymptotics); Ding et al. 2026/1027 (LP bounds, remark that a single degree-d congruence does not exceed M^{1/d}); programme W10 (lit2026_w10_s5_coppersmith_20261011: closure LP, charging ceiling 1/(md)); Cohn-Heninger 2010 (ideal forms). The leading-monomial argument for dim V_k is elementary and is probably implicit in Ryan's determinant formula, but I found no statement of a strategy-independent 1/(md) ceiling for arbitrary M.",
+   "novelty_status": "novelty_unverified (WebSearch 2026-10-31: 'Coppersmith optimal lattice determinant leading monomial / Hilbert function bound non-convex monomial set' returned only 2012/108 (optimality of the standard univariate construction), capacity-theory 1605.08065 and textbook material; no source states a leading-monomial ceiling over arbitrary monomial sets; Ryan 2024/1577 full text not re-read here)",
+   "falsifier": {
+    "design": "python3/numpy over F_p, p=10007 (any p<2^31). Build S_3(x1,x2;z) (and S_4 via sympy resultant) with random a,b,z. For monomial sets M in {box [0,L]^2, total-degree simplex, box minus corner, box minus interior holes, random 70%-subsets of the box} and k=1..l, compute dim V_k = rank(span{x^g f^k : g in [0,G]^2}) - rank(projection onto monomials outside M), the plain-shift count, and the LM count #{beta in M : beta >= k a}. Report the reach ratio rho(M,l) = sum_k dim V_k / sum_beta (beta_1+beta_2) (delta per variable) and compare with the box value at the same l (W10: 1/18, 1/10, 0.11905 at l=1,2,3). PILOT ALREADY RUN (this session, S_3, p=10007, L=6, k<=3): box: dim V_k = 25,9,1 = plain shifts = LM count; simplex deg<=8: 15,1,0 = plain = LM; box minus corner: 21,5,0 = plain = LM; box minus centre hole (3,3): dim V_k = 24,8,0 versus plain shifts 16,0,0 and LM count 24,9,1 -> Groebner-optimal shifts recover almost the whole LM count on a punched set, but the ratio 32/288 = 0.111 is below the box 35/294 = 0.1190, and dim V_k <= LM count held in all 12 cells. Full run: all four shapes at L<=10, l<=4, plus S_4 at L<=8, l<=2; also verify det(L_M) = p^{sum(|M|-dim V_k)} by PARI mathnf on the integer lattice for L<=4.",
+    "prediction_if_true": "dim V_k <= LM count in every cell (the ceiling theorem holds), and max over tested M of rho(M,l) equals the box value at each l (no non-convex gain): W10 class 2 is closed, S_5 reach stays 1/80 asymptotically and <= 1/32 for all full-rank lattices.",
+    "prediction_if_false": "Either a cell with dim V_k > LM count (the determinant model is wrong, revisit the whole W10 accounting) or a non-convex M with rho(M,l) exceeding the box value by more than 1e-3 at matched l (class 2 live; recompute S_5 reach with exact V_k; still capped at 1/32 < 1/5).",
+    "toy_params": "S_3: p=10007, L in {4,6,8,10}, l in {1,2,3,4}, G=L+2; S_4 (3 variables, degree 4): p=10007, L in {4,6,8}, l in {1,2}, columns <= 729",
+    "tools": "python3 numpy (rank mod p), sympy (S_4 resultant), PARI mathnf for the integer-lattice determinant check",
+    "cpu_minutes": 10
+   },
+   "expected_class": "theory",
+   "risk": "The p-adic index of L_M might exceed p^{sum(|M|-dim V_k)} when (p,f)^l is strictly smaller than the l-th symbolic power / the set of polynomials vanishing mod p^l on all lifts (which would only strengthen the ceiling); the PARI HNF check at small L settles the direction."
+  },
+  {
+   "id": "MP-lattices-2",
+   "title": "Non-full-rank 'helpful-shift' sublattices and second-reduced-vector scoring: the one Coppersmith class with no ceiling, tested at finite p on S_3 and S_4",
+   "statement": "Take the Jochemsz-May box lattice for S_3 (m=2) at multiplicity l=2..4 over a 40-56-bit prime, delete every shift p^{l-k} x^gamma f^k whose diagonal entry exceeds p^l (lambda.beta > k, the May 'unhelpful' rows), keep all columns, and LLL the resulting rank-deficient basis (Boneh-Durfee 'geometrically progressive' / Herrmann-May unravelled style). Score success on the first m NON-trivial reduced vectors (Gao-Feng-Hu-Pan second-vector rule, excluding the symmetry-induced trivial vectors of the x1<->x2 symmetric S_3 lattice). Hypothesis to falsify: the sublattice's Howgrave-Graham-rigorous reach for S_3 stays <= 1/6 and its heuristic reach <= the measured 0.12-0.16; the same at m=3 stays <= 1/24.",
+   "mechanism": "For full-rank triangular lattices det = product of diagonals and W10's ceiling is a theorem. Removing unhelpful rows makes the Gram determinant of the remaining rank-r sublattice potentially much smaller than any full-rank sublattice spanned by a monomial subset (this is how BD reach 0.284 -> 0.292 and HM beat the full-rank optimum). Nothing in W10, MP-lattices-1 or the capacity argument bounds this class for S_{m+1}; the only evidence is the historical ~0.01 exponent gain in RSA settings (2026/2109: half the dimension, same exponent).",
+   "wall_bypassed": "TREAT-lattice-reach, W10 section 7 class 1 ('non-full-rank and sublattice strategies: we have no general ceiling for this class').",
+   "why_wall_hypotheses_fail": "Both the W10 charging argument and the MP-lattices-1 leading-monomial argument need a full-rank lattice whose determinant is a product over all monomials of M. A rank-deficient sublattice of Z^M has Gram determinant not of that form; Howgrave-Graham applies with det^{1/r}.",
+   "nongenericity_argument": "If the sublattice reach for S_5 could be pushed from 1/80 toward the counting barrier 1/4, the m=4 oracle at delta=1/5 would cost one LLL of polynomial dimension per attempt and B.D^2 ~ p^{1/5}.poly << p (non-generic: the oracle reads x(R) as an integer). Honest expectation from all known instances: gains of order 0.01 in the exponent or dimension halving, i.e. engineering; a measured S_3 reach above 1/6 (rigorous) would be the first counter-example and would justify the S_5 computation.",
+   "prior_art": "Boneh-Durfee 1999 (geometrically progressive matrices); Herrmann-May 2010 (unravelled linearisation); Kalam-Karmakar-Sarkar 2025 (PMC12325772: HM asymptotics corrected, dimension 276760 -> 21353 at same exponent); Ding et al. 2026/2109 (UL for CRT-RSA: half dimension, same exponent); Feng et al. 2026/244 (Ehrhart quasi-polynomial analysis of UL lattices, DimOracle); Gao-Feng-Hu-Pan 2512.19076 (second reduced vector); May 2010 survey ('helpful vectors'); programme probes B/C (RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM section 3.2-3.3: full-rank S_3 reach 0.10 rigorous, 0.12-0.16 heuristic at 40-56 bits) and lit2026_w10 section 5.4.",
+   "novelty_status": "novelty_unverified (WebSearch 2026-10-31 'helpful vectors sublattice Coppersmith non-full-rank geometrically progressive beyond Boneh-Durfee general criterion' found no general criterion; Ryan 2024/1577 has a graph heuristic for low-rank sublattices that 'is guaranteed to contain short vectors' when found but no reach theorem; no application to summation polynomials found)",
+   "falsifier": {
+    "design": "python3 + PARI qflll (or fplll if present) on 40-bit and 56-bit primes with random curves and planted decompositions R = P1 + P2 with x_i <= p^delta (reuse the probe-B protocol). Arms per (bits, l, delta), 8 trials each: (A) full-rank JM box lattice (control, must reproduce probe B: HG holds to 0.10, heuristic to 0.12-0.16); (B) helpful-only sublattice: drop rows with k < lambda.beta (lambda = delta), LLL the rank-r basis, test HG on the first 2 non-trivial rows and 'at least 2 reduced polynomials vanish over Z at the root'; (C) arm B with the 2512.19076 rule: skip reduced vectors that are symmetric-trivial (antisymmetric under x1<->x2) before counting. Sweep delta = 0.08..0.30 step 0.02, l = 2,3,4 (dims 25, 49, 81 before deletion). Repeat the l=1,2 arms for S_4 (m=3) at 40 bits, delta = 0.03..0.10 (dims 125, 729 before deletion; 729 only with fplll/flatter if available, else skip).",
+    "prediction_if_true": "(hypothesis: class gives no exponent) Arm B/C HG-rigorous success never exceeds delta = 0.12 at 56 bits and the heuristic success curve coincides with arm A within one step of 0.02; for S_4 no planted root at any delta >= 0.035 (as in W10 5.4). Then class 1 is empirically closed at m=2,3 and the S_5 extrapolation 1/80 stands.",
+    "prediction_if_false": "Arm B or C recovers planted S_3 roots with HG holding at delta >= 0.18 on >= 6/8 trials at 56 bits (above the box limit 1/6), or recovers S_4 roots at delta >= 0.05; that would be the first evidence of a non-full-rank gain on Semaev lattices and would trigger the S_5 computation with 2026/244's Ehrhart machinery.",
+    "toy_params": "p ~ 2^40 and 2^56 (random primes), curves y^2=x^3+ax+b random with prime-ish order not required; planted x_i <= floor(p^delta); LLL delta 0.99; 8 trials per cell",
+    "tools": "python3 (sympy for S_3/S_4, integer arithmetic), PARI qflll via cypari2 (dimension <= 125), fplll/flatter optional",
+    "cpu_minutes": 15
+   },
+   "expected_class": "accounting",
+   "risk": "Rank-deficient LLL at dimension 81-125 with 56-bit entries is fine in PARI; the deletion criterion needs lambda = log_p X exactly at the tested delta (recompute per cell). A positive heuristic (non-HG) excess could be a finite-p artefact: report HG-rigorous and heuristic columns separately as probe B did."
+  },
+  {
+   "id": "MP-lattices-3",
+   "title": "Joint addition-tree lattice with full-size internal nodes used only at multiplicity >= 2 (W10 class 3 / T5), priced by exact low-multiplicity enumeration",
+   "statement": "Replace the dense degree-8 S_5 by the three sparse equations g1 = S_3(x1,x2,u), g2 = S_3(x3,x4,v), g3 = S_3(u,v,z) (degree 2 per variable, 13 terms each) with |x_i| < p^delta and the internal nodes u, v of full size (lambda_u = lambda_v = 1). W10 dismissed this because 'every monomial containing u, v already exceeds the modulus'; that argument only kills multiplicity-1 use. At multiplicity l >= 2 a shift p^{l-k} x^gamma u^i v^j g1^{k1} g2^{k2} g3^{k3} (k = k1+k2+k3) with top monomial of size p^{i+j+delta|gamma|+...} is helpful whenever i + j + delta.(x-degree) < k, exactly as Boneh-Durfee use y of size e^{1/2}. Hypothesis: the joint lattice's reach delta_l at l = 2,3 exceeds S_5's delta_l (0.0144 at l=2, 0.0063 at l=3 within L=32).",
+   "mechanism": "The resultant S_5 = Res_u,v(g1,g2,g3) multiplies monomial counts (6561 dense) and degrees (8 per variable) because elimination is done before the lattice; keeping u, v as lattice variables keeps every generator quadratic in each variable and lets the lattice choose how much elimination to pay for, in the spirit of Ding et al. 2026/423 (determinant-based elimination inside the lattice). The price is columns for monomials containing u, v with weight >= 1 each, usable only at levels k > i + j.",
+   "wall_bypassed": "TREAT-lattice-reach / LEAD-ICP-coppersmith-smallroot-semaev: scope explicitly excludes 'joint three-block lattices for the (4,2) system' and 'multi-ideal lattices'. Also the W10 T5 dismissal, which is incomplete as stated.",
+   "why_wall_hypotheses_fail": "W10's single-polynomial family F and both ceiling arguments (charging, leading-monomial) are for one f and one ideal (p,f)^l. With three generators the relevant ideal is (p, g1, g2, g3)^l intersected with Z[x,u,v]_M, whose F_p-dimensions dim V_k are not governed by one leading monomial; and monomials with u, v violate 'lambda.c < 1' only at level 1.",
+   "nongenericity_argument": "Same as MP-lattices-2: a polynomial-dimension lattice oracle for S_5 at delta = 1/5 would make m=4 index calculus cost ~p^{2/5}.poly with B.D^2 = p^{1/5}.poly(log p) << p. Honest expectation (accounting): because u, v are determined by (x1,x2) and (x3,x4) up to the 2-torsion-like sign choices, the counting barrier is unchanged (p^{4 delta - 1}), and the elimination theory of 2026/1027 ('hidden variables eliminated by Groebner basis before the LP') suggests the asymptotic optimum returns S_5; the question is only whether finite multiplicities l = 2,3 beat S_5's finite-l values, which would be a constant-factor (dimension) effect unless the asymptotic slope changes.",
+   "prior_art": "W10 section 7 and lattices lane T5 (dismissal); Feng-Nitaj-Pan-Zheng 2025/2044 (symbolic polytope volume with number of equations as parameter); Ding et al. 2026/423 (determinant-based elimination, algebraically dependent shift polynomials); Ding et al. 2026/1027 (hidden-variable elimination before the LP); Boneh-Durfee (full-size y variable in a modular lattice); programme smallroot_optimal_reach_20261026 (per-block reach 0.3293/0.3536 for ONE S_3 block with unequal bounds, margin -0.56 at (m,w)=(4,2) when internal nodes are windowed rather than full-size).",
+   "novelty_status": "novelty_unverified (not searched beyond the lane's queries; the specific observation that W10's full-size-monomial dismissal covers only multiplicity 1 is this session's)",
+   "falsifier": {
+    "design": "python3: enumerate candidate shift polynomials for the system {g1,g2,g3} up to total multiplicity l <= 3 with x-degrees <= L (L <= 8) and u,v-degrees <= 2l, assign each its diagonal size exponent e = (l-k) + lambda.beta with lambda = (delta,delta,delta,delta,1,1) on its leading monomial under a weighted order putting u,v heaviest, keep a maximal set with distinct leading monomials (triangular), and solve the W10-style maximum-weight-closure / helpful-selection LP exactly (networkx min-cut or scipy linprog) for the best delta_l such that sum of exponents < l.dim. Compare with S_5's exact closure values from W10 run.json (delta_1 = 0.005253, delta_2 ~ 0.0144, delta_3 >= 0.006334 within L=32) at matched l. Control: the same code on the single polynomial S_3 must reproduce 1/18, 1/10, 0.11905 at l = 1,2,3; and on BD's f = x(y+A)+1 with lambda_y=1/2 must reproduce 0.2795 at l=32 (or the l<=8 values in W10). Then a finite-p check at 32 bits, l=2, of whichever joint lattice the LP selects (dimension <= 500): planted 4-decompositions with x_i <= p^delta, LLL, HG test.",
+    "prediction_if_true": "(joint lattice helps) delta_l(joint) > delta_l(S_5) at l=2 or 3 by more than 10%; if the slope in l also exceeds S_5's, recompute asymptotics with 2025/2044-style symbolic volumes; otherwise record as dimension saving (engineering).",
+    "prediction_if_false": "The LP never selects a shift containing u or v (their level-k gain k - i - j never beats the loss on the x-monomials they drag in), and the selected lattice is the S_5 box lattice in disguise (same delta_l to 1e-4). Then W10's T5 dismissal is correct for all multiplicities tested and class 3 closes at the accounting level.",
+    "toy_params": "l <= 3, L <= 8 in x-degree, u,v degrees <= 2l, delta grid 0.005..0.05; finite-p check at p ~ 2^32, l=2",
+    "tools": "python3 (sympy S_3, itertools), scipy.optimize.linprog or networkx max-flow, PARI qflll",
+    "cpu_minutes": 15
+   },
+   "expected_class": "accounting",
+   "risk": "Monomial count with 6 variables grows fast; cap L and prune by the helpful criterion first. The triangular-selection step may under-count Groebner-optimal combinations (see MP-lattices-1); report both the triangular LP value and the exact dim V_k value on the selected M at l=2."
+  },
+  {
+   "id": "MP-lattices-4",
+   "title": "FGHR Y-coordinate small-|Y| base on 2-torsion prime-field curves: the only archimedean base compatible with the (Z/2)^3 x S_4 reduction, run as a weighted invariant lattice (brief lever 3) with the reparametrisation-invariance theorem attached",
+   "statement": "On E: y^2 = x(x^2+Ax+B) over F_p with T=(0,0) and f'(x_T) = c^2, FGHR's coordinate Y = (x-x_T-c)/(x-x_T+c) satisfies Y(P+T) = -Y(P), Y(-P) = Y(P) (verified this session at p=1000003, 200/200 points). Hence the base F_Y = {P : |Y(P)| < p^delta} (lift to (-p/2,p/2)) is closed under the even-sign group (Z/2)^3 acting on the four summands' Y_i, the 8 translates of a decomposition are 8 roots in the box, and H = S_5.prod(1-Y_i)^8 is a polynomial in sigma_k = e_k(Y^2) (k=1,2,3) and pi = Y1Y2Y3Y4 of weighted degree 8 on 105 monomials. Claim A (engineering): the Coppersmith lattice on the invariant monomials has dimension 105 at l=1 (vs 6561 for the plain S_5 box) and 1/8 of the box dimension at every multiplicity, with the SAME asymptotic reach 1/80 and ceiling 1/32. Claim B (theory, obstruction): no change of per-point coordinate or small-variable parametrisation can change the asymptotic reach: (i) any bijective polynomial reparametrisation of the small set (GAP, Farey a/b, digits, symmetric or invariant encodings) preserves the JM/closure reach in total-base-size terms (checked symbolically for rank-2 GAP on univariate degree d: X Y < p^{1/d} = univariate), and (ii) any coordinate on which S_{m+1} has per-variable degree < 2^{m-1} identifies points differing by rational torsion translation, whose semi-invariants are full-size on every archimedean small base except the Y-coordinate of FGHR, where they are the Y_i themselves and the degree drop (8 -> weighted 8 in Y^2 of size X^2) is exactly cancelled.",
+   "mechanism": "Translation by T acts on the x-line by a Mobius involution; moving its two fixed points (x of the 4-torsion points above T) to 0 and infinity makes it Y -> -Y, the unique form that maps an archimedean interval to itself. The D4 = (Z/2)^3 x S_4 orbit of a root is then inside the box and the invariant encoding quotients it out; a lattice built on x or Y without the quotient has 8 roots in the box and Howgrave-Graham polynomials must vanish on all of them, which at finite p lowers the measured reach (hypothesis to test). The weighted polytope {2(a+b+c)+d <= 8} is a different convex body from W10's e-encoding polytope, so its closure reach was never computed.",
+   "wall_bypassed": "TREAT-symmetry-inventory ('D4 on S5 computed on paper, never run') and brief section 3 lever 3; the Lattice-reach wall's scope item 'the D4-symmetrised S_5 lattice at m=4 (never run)'.",
+   "why_wall_hypotheses_fail": "The wall is not bypassed: W10's ceiling already covers invariant encodings (pi^8 has size p^{32 delta}). What is new is (a) that lever 3 is only meaningful on prime fields with the Y-coordinate base (x-small bases cannot use 2-torsion reduction at all, an obstruction not recorded), (b) the lever is a factor-8 dimension device plus a possible finite-p multiple-root effect, and (c) the closure reach of the weighted (sigma,pi) polytope is computable exactly and has not been.",
+   "nongenericity_argument": "None: this is a constant-factor device (lattice dimension / 8 at fixed reach) and a theory note closing the 'different lattice-describable base shape' escape of the Lattice-reach wall for all coordinate changes. It cannot move B.D^2 below N by itself.",
+   "prior_art": "Faugere-Gaudry-Huot-Renault 2014 (symmetries, 2-torsion degree reduction, the coordinate Y); programme d4_symmetrised_s5_20261015 (weighted Macaulay solve over F_{p^4}, 4200 columns, 512 solutions; not a lattice) and gaudry_quartic_d4_20261013 (C8); W10 charging ceiling in invariants; RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM 3.3 (symmetric S_3 lattice 'reaches the same delta at 6/15/28 dims'); Jochemsz-May 2006; Coron 2004/2007 bivariate bounds (used for the GAP comparison).",
+   "novelty_status": "novelty_unverified (no search for 'Coppersmith lattice in FGHR invariant coordinates'; the lattices lane found nothing on summation polynomials + Coppersmith since 2019)",
+   "falsifier": {
+    "design": "(1) Build S_5 for y^2 = x(x^2+Ax+B) over F_p (p ~ 2^32, B a square) by PARI polresultant of S_3's (csd.semaev.S3 formulas specialised, or semaev_higher), substitute x = x_T + c(1+Y)/(1-Y), multiply by prod(1-Y_i)^8, and verify the result lies on monomials Y^e with all e_i of equal parity and rewrites to the 105 (sigma,pi) monomials (zero remainder); negative control: wrong c breaks the parity pattern. (2) Closure reach: run the W10-style exact closure (maximum-weight closure, min-cut) on the weighted polytope with bounds sigma_k ~ X^{2k}, pi ~ X^4 at l = 1,2,3 and compare with S_5's x-encoding values 0.005253 / 0.0144 / 0.0063 and the e-encoding 0.004061; also the l -> infinity box-formula extrapolation. (3) Finite-p lattice: 32- and 40-bit curves, planted R = P1+P2+P3+P4 with |Y_i| <= p^delta, l=1 invariant lattice (dim 105) and l=2 (dim ~ 1200, PARI qflll feasible in minutes), LLL, HG test and 'at least 4 vanishing rows'; sweep delta = 0.01..0.06; control: plain Y-box lattice of S_5 at l=1 restricted to parity-class monomials (dim 881) on the same instances to measure the multiple-root penalty. (4) Calibration at m=2: S_3 in (sigma1 = Y1^2+Y2^2, pi = Y1Y2) weighted degree 2, dimension 6 at l=1, versus the x-encoding 9/25 lattices at the probe-B deltas.",
+    "prediction_if_true": "(claims A,B) Parity pattern and 105-monomial rewrite hold; closure reach at l=1..3 is within 5% of S_5's x-encoding value at the same l (<= 1/80 extrapolated), dimension exactly 1/8; finite-p success only for delta <= 0.02 at 40 bits (X <= 2); the plain Y-box lattice does no better than the invariant one at any delta.",
+    "prediction_if_false": "Closure reach of the weighted polytope exceeds S_5's x-encoding value at matched l by > 10% (then the e-encoding comparison in W10 was shape-dependent and the lever is partially a reach lever, bounded by 1/32), or the invariant lattice succeeds at a delta where the parity-class Y lattice fails on >= 6/8 instances (a real finite-p multiple-root effect worth quantifying).",
+    "toy_params": "p ~ 2^32 and 2^40 with A random, B = c^2; l = 1 (dim 105), l = 2 (dim <= 1300); delta grid 0.01..0.06; m=2 calibration at 40 bits delta 0.06..0.20",
+    "tools": "PARI/gp (polresultant, qflll, ellinit/elladd), python3 sympy for the invariant rewrite, python3 min-cut closure (networkx) for the reach",
+    "cpu_minutes": 15
+   },
+   "expected_class": "engineering",
+   "risk": "S_5 via resultants over F_p at 32 bits has 6561 coefficients; use interpolation or polresultant with Mod(1,p) coefficients (instant in PARI). The claim-B 'semi-invariants full-size' statement is a theory note that the experiment does not test; it should be checked by one sympy computation of S_3 on y^2 = x(x^2+Ax+B) in the x-small base: show S_3 = A0(u1,u2) + A1(u1,u2) theta1 theta2 with u = x + B/x, theta = x - B/x and that theta is full-size when x is small."
+  },
+  {
+   "id": "MP-lattices-5",
+   "title": "Function-field Coppersmith over F_2[t] as a RIGOROUS reach certificate for the subspace factor base: exact Popov reduction replaces heuristics and converts 'lattice substitute for Groebner descent' into a theorem",
+   "statement": "Over F_{2^n} = F_2[t]/(f), the Weil-descent base {x : deg_t x < l} is literally the small-root set of a Coppersmith problem in F_2[t]: find x_1..x_m with deg x_i < l and S_{m+1}(x; z) = 0 mod f. Lattice reduction over F_q[t] is exact and polynomial time (Lenstra; Popov/weak-Popov form), the degree analogue of Howgrave-Graham is an identity (a polynomial of degree < n.k that is 0 mod f^k is 0), and Cohn-Heninger's Theorem 1.2 is tight for the univariate case. Claim: for S_3 (m=2) the method succeeds iff l/n <= 1/6 - o(1) and provably fails for l/n > 1/4 (ceiling 1/(m d)); for S_5 the same bookkeeping gives l/n <= 1/80 (l <= 1.6 at n=131). This is a theorem-level statement that a polynomial-time lattice oracle for the descended S_{m+1} has reach 1/(m(m+1)2^{m-2}), with no heuristic.",
+   "mechanism": "Replace Z by F_2[t]: the modulus p by f(t) of degree n, |x| < p^delta by deg x < delta.n, lattice volume by total degree of a reduced basis. All JM/closure counting carries over verbatim with lambda = l/n, and the reduced basis is computed exactly (Mulders-Storjohann weak Popov in python over F_2), so success/failure at each (n, l, multiplicity) is a certificate, not a probability. The determinant-vs-reach accounting (MP-lattices-1's leading-monomial ceiling) becomes an exact dimension count over F_2 at finite n.",
+   "wall_bypassed": "TREAT-first-fall-degree-constant / lever 1 (solving degree of the descended system) from the side: the lattice oracle has no solving degree and is polynomial-time, so it is the only oracle for which the exponent wall can be PROVED rather than measured. It also touches TREAT-no-subfield (the F_2-subspace base is non-invariant; the lattice does not need Frobenius stability).",
+   "why_wall_hypotheses_fail": "The solving-degree wall's hypotheses concern Groebner/F4 on the descended system; a function-field lattice does not run F4. Its own wall is the reach, which is exactly computable here. Nothing else in the atlas treats F_q[t] lattices on summation polynomials (lattices lane T3: two targeted searches found nothing).",
+   "nongenericity_argument": "Theory item. Positive outcome (a theorem) kills a class rigorously; it cannot lower B.D^2. If, against expectation, the exact F_2[t] reduction succeeded at l/n above 1/6 for S_3 at several n (an exact phenomenon, not heuristic), the Z-case analysis would be suspect and the S_5 case (reach 1/80 vs need l/n ~ 1/4 at m=4) would have to be re-derived.",
+   "prior_art": "Cohn-Heninger 2010/2013 arXiv:1008.1284 (ideal forms of Coppersmith, function fields, equivalence with Guruswami-Sudan when f splits, multivariate = Parvaresh-Vardy/Guruswami-Rudra); Lenstra 1985 (F_q[t] lattice reduction); Mulders-Storjohann 2003 (weak Popov); Bagshaw-Kerr 2304.05009 (function-field geometry of numbers for points of curves in low-dimensional subspaces, an upper bound on relation counts); programme ffd_semaev_core.py (binary S_3 formula, subspace systems) and hky_last_fall_degree. The programme's W10 and smallroot analyses are over Z only.",
+   "novelty_status": "novelty_unverified (lattices lane 2026-10-31 queries 'Coppersmith method polynomial ring F_q[t] small roots function field lattice reduction Weil descent summation polynomial binary curve' and 'Coppersmith over finite field extensions / function fields / Galois rings 2024-2026' found no combination of function-field Coppersmith with summation polynomials)",
+   "falsifier": {
+    "design": "python3 (pure, F_2 polynomials as ints; PARI for f(t) irreducible and E over F_{2^n}): for n in {31, 37, 43, 47, 53, 61} and binary curve y^2+xy = x^3+a6 (S_3 = (X1X2+X1X3+X2X3)^2 + X1X2X3 + a6, from ffd_s3_formula_control.py), plant R = P1+P2 with deg x_i < l for l/n in {1/8, 1/6, 1/5, 1/4, 1/3}. Build the F_2[t]-lattice of shift polynomials f^{k-j} x^gamma S_3^j at multiplicity k=1,2,3 in the monomial basis of the box [0,2k]^2 with column weights t^{l.beta} (degree scaling), reduce exactly to weak Popov form, and check: does the reduced basis contain >= 2 polynomials of degree < k.n (over F_2[t], hence exact identities) with the planted root? Record success as exact 0/1 per instance; also compute the exact 'determinant' (sum of row degrees) and compare with the JM prediction. Control: univariate f(x) of degree d mod f(t) with deg x < n/d must succeed and deg x > n/d fail (Cohn-Heninger Thm 1.2 tightness).",
+    "prediction_if_true": "Success exactly when the degree count (sum of row degrees < k.n.dim) holds, i.e. l/n <= 1/18, 1/10, 0.119 at k=1,2,3 and never above 1/6 for any k; zero successes at l/n >= 1/4 at every n (certificate). The univariate control matches 1/d exactly.",
+    "prediction_if_false": "Any exact success at l/n > 1/4 (impossible under the ceiling: would indicate an error in the model) or systematic success strictly above the k-level JM value (would show the degree analogue of HG is not the binding constraint over F_2[t], which Cohn-Heninger's tightness excludes for univariate).",
+    "toy_params": "n in {31,37,43,47,53,61}, l/n in {1/8,1/6,1/5,1/4,1/3}, multiplicity k <= 3 (dims 9, 25, 49), 10 planted instances per cell",
+    "tools": "python3 (F_2[t] arithmetic, weak Popov reduction), PARI ffinit/ellinit/elladd via cypari2 for instances",
+    "cpu_minutes": 10
+   },
+   "expected_class": "theory",
+   "risk": "Writing an exact weak-Popov reduction over F_2[t] for 49 x 49 polynomial matrices is ~150 lines; degree growth is bounded (entries degree <= 3n). Char-2 Semaev formula must be the binary one, not the char-0 csd.semaev module."
+  },
+  {
+   "id": "MP-lattices-6",
+   "title": "Adelic-capacity threshold of the S_3 congruence as the strategy-independent small-root ceiling (Chinburg-Hemenway-Heninger-Scherr route), computed numerically from exact full lattices",
+   "statement": "By Rumely/Cantor capacity theory, auxiliary polynomials small on an adelic set exist iff its (sectional) capacity is < 1; for E = [-X,X]^m (archimedean) x {x in Z_p^m : f(x) = 0 mod p} the capacity is the limit over degree L of det(L_M)^{1/(|M|.L)}-type quantities where L_M is the FULL lattice of integer polynomials with support M = {total degree <= L} vanishing mod p^l on the p-adic set (symbolic power), with the sup norm on the box in place of the coefficient norm (Chebyshev constant of a box, a constant factor per monomial). Claim: the threshold delta_cap at which capacity crosses 1 for S_3 is 1/6 (the JM/closure value), not 1/4 (charging ceiling) or 1/2 (counting), so Coppersmith-type lattices are optimal among ALL auxiliary-polynomial methods for Semaev congruences and the S_5 value 1/80 is final for that whole class (including sublattice tricks, which only find existing short vectors).",
+   "mechanism": "Capacity theory removes the choice of shift family and of coefficient basis: the existence question for a polynomial of any degree that is < p^l on the p-adic set and < 1 in sup norm on the box is decided by the asymptotic Hilbert-type function of the symbolic powers of (p,f) intersected with bounded-degree polynomials, times archimedean transfinite-diameter terms. For a univariate congruence this reproduces Coppersmith's 1/d and proves it optimal (Chinburg et al. 1605.08065); for two-variable LINEAR congruences the 2021 paper gives a dichotomy with both regimes occurring. S_3 is the first non-linear bivariate case; its capacity has never been computed.",
+   "wall_bypassed": "TREAT-lattice-reach: converts the scope limit 'non-Coppersmith small-root solvers / sublattice strategies not covered' into a theorem (if the threshold is 1/6) or exhibits the regime where a finite zero locus exists above 1/6 (if not).",
+   "why_wall_hypotheses_fail": "The wall is a bound on a lattice family; capacity theory bounds every auxiliary-polynomial construction. Its hypotheses (adelic set with p-adic part defined by the congruence, archimedean box) are exactly the small-root setting, so nothing fails; the item sharpens the wall.",
+   "nongenericity_argument": "Theory item; it cannot lower B.D^2. It is the proof route that would let the programme state the lattice closure for S_5 as a theorem over all auxiliary-polynomial methods rather than over W10's family, and it would also decide MP-lattices-2 and -3 without running them.",
+   "prior_art": "Chinburg-Hemenway-Heninger-Scherr 2016 (arXiv 1605.08065, univariate optimality via capacity); Chinburg-Hemenway Falk-Heninger-Scherr 2021 (arXiv 2111.14180, two-variable linear congruences, dichotomy Thm 1.4); Rumely 1989 (capacity theory on algebraic curves), Cantor 1980 (Fekete-Szego); Cohn-Heninger 2010 (ideal forms); programme: atlas holds only the univariate paper (KN-LIT-3299); W10 and smallroot_optimal_reach cover shift families only.",
+   "novelty_status": "novelty_unverified (lattices lane read both capacity papers in full; no capacity computation for a nonlinear bivariate congruence found; not separately searched this session)",
+   "falsifier": {
+    "design": "python3/numpy/PARI at p in {1009, 4093, 10007}: (1) check (p,f)^l = {g : g = 0 mod p^l on all lifts of V(f) mod p} for S_3 at l=2,3 and total degree <= 6 by counting: compute the F_p-dimension of polynomials of degree <= L vanishing mod p^l on the p-adic set via evaluation at all (x1,x2) mod p^l with f = 0 mod p (p=1009, l=2 feasible: ~p^3 points), compare with sum_k dim V_k from MP-lattices-1 (equality expected, so the p-adic part of the capacity is the Hilbert function of (p,f)^l). (2) Archimedean part: the Chebyshev constant of [-X,X]^2 for total-degree-L polynomials is (X/2)^{...} up to subexponential factors; compute the exact sectional determinant exponent E(L,l)/|M_L| for M_L = total degree <= L, l = 1..L/2, with sup-norm correction (use the Chebyshev basis T_i(x1/X)T_j(x2/X) instead of monomials; coefficient norm in that basis is within 2^{deg} of the sup norm), and extrapolate L -> infinity with l/L optimised. (3) Report delta_cap = sup{delta : lim E(L,l)/(|M_L| l) with weights exceeds the archimedean cost}. Control: the univariate f(x) of degree d must give delta_cap = 1/d.",
+    "prediction_if_true": "delta_cap(S_3) = 1/6 within 0.01 after extrapolation (same as the box closure limit, i.e. the archimedean Chebyshev correction and the symbolic-power correction are both subexponential), and the univariate control gives 1/d. Then the lattice closure for S_5 (1/80) is strategy-independent at the capacity level and MP-lattices-2/3 are predicted negative by theorem.",
+    "prediction_if_false": "delta_cap(S_3) > 1/6 by more than 0.02 (e.g. toward the 1/4 ceiling), meaning polynomials small on the adelic set exist beyond what any shift lattice finds; then an explicit construction (via the exact full lattice L_M in Chebyshev basis) would be a new small-root method and the S_5 analogue must be computed before anything is called closed.",
+    "toy_params": "p in {1009, 4093, 10007}; L <= 12 (91 monomials of total degree <= 12 for S_3), l <= 6; p-adic count at p=1009, l=2 only",
+    "tools": "python3 numpy (rank mod p and mod p^2 via integer Smith/HNF on small matrices), sympy, PARI mathnf",
+    "cpu_minutes": 20
+   },
+   "expected_class": "theory",
+   "risk": "Multivariable capacity theory is not fully rigorous (Rumely's sectional capacity exists for products but the Fekete-Szego converse is only known in restricted cases), so the result is a computed threshold with a heuristic 'converse' step; the equality (p,f)^l = symbolic power may fail at singular points of V(f) mod p (S_3 has singular fibres where x_i = x_j), which the p-adic count detects."
+  }
+ ]
+}
