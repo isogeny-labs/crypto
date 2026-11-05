@@ -1,0 +1,74 @@
+[
+  {
+    "name": "systemd-state",
+    "command": [
+      "systemctl",
+      "show",
+      "pencil-private-2d885f49-d570-4a8b-990e-7ea14ee9ea80.service",
+      "--property=LoadState,ActiveState,SubState,Result,CPUUsageNSec,MemoryPeak,ControlGroup"
+    ],
+    "started_utc": "2026-11-03T19:06:18.295662+00:00",
+    "exit": 0,
+    "stdout_sha256": "0df2bd6c8f0e28c1783de755f3cc4a06fe86ab56314c7754161da33061c711cb",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "journal",
+    "command": [
+      "sudo",
+      "-n",
+      "journalctl",
+      "-u",
+      "pencil-private-2d885f49-d570-4a8b-990e-7ea14ee9ea80.service",
+      "--no-pager"
+    ],
+    "started_utc": "2026-11-03T19:06:18.385209+00:00",
+    "exit": 0,
+    "stdout_sha256": "a22885fac24cbdd8658e00b0a18455a63c527c721cce0630096eddb455dcabd6",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "original-loop-query",
+    "command": [
+      "sudo",
+      "-n",
+      "losetup",
+      "--json",
+      "--associated",
+      "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+    ],
+    "started_utc": "2026-11-03T19:06:18.806163+00:00",
+    "exit": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "explicit-list-loop-query",
+    "command": [
+      "sudo",
+      "-n",
+      "losetup",
+      "--json",
+      "--list",
+      "--associated",
+      "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+    ],
+    "started_utc": "2026-11-03T19:06:19.121936+00:00",
+    "exit": 0,
+    "stdout_sha256": "3f1d39e826503300542203478b61c9393220197f672114f5813fa484380802ed",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "findmnt",
+    "command": [
+      "findmnt",
+      "--mountpoint",
+      "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/mnt",
+      "--json"
+    ],
+    "started_utc": "2026-11-03T19:06:19.269964+00:00",
+    "exit": 1,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

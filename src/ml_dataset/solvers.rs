@@ -3433,7 +3433,10 @@ fn verify_prime_root_chain_artifact(
     codes.sort_unstable();
     codes.dedup();
     let limit = config.work_limit.min(TRACE_EVENT_CAP);
-    if artifact["p"] != p.to_string() || artifact["effective_work_limit"] != limit {
+    // The artifact stores p as a decimal string: compare as strings, as before.
+    if artifact["p"].as_str() != Some(p.to_string().as_str())
+        || artifact["effective_work_limit"] != limit
+    {
         return Err("prime root chain modulus or limit differs".into());
     }
     let queries = artifact["queries"]
@@ -3518,7 +3521,7 @@ fn verify_prime_root_chain_artifact(
             }
             let root = roots[j];
             let eval = 2 * coeff.len() as u64;
-            if check["x"] != root.to_string()
+            if check["x"].as_str() != Some(root.to_string().as_str())
                 || check["evaluation_work"] != eval
                 || limit.saturating_sub(used) < eval
             {

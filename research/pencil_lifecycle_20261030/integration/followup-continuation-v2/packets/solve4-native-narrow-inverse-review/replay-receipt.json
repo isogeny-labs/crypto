@@ -1,0 +1,97 @@
+{
+  "status": "passed",
+  "error": null,
+  "commands": [
+    {
+      "module": "Narrow",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/Narrow.olean",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/Narrow.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "Controls",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/Controls.olean",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/Controls.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "Readback",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/Readback.olean",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/Readback.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "OwnControls",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/OwnControls.olean",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/OwnControls.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "OwnReadback",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/OwnReadback.olean",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/OwnReadback.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "ExpectedFailure",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/ExpectedFailure.olean",
+        "/var/tmp/native-narrow-independent-6ubp9r7n/ExpectedFailure.lean"
+      ],
+      "expected_exit": 1,
+      "exit": 1
+    }
+  ],
+  "elapsed_seconds": 17.024424356000964,
+  "dependency_count": 28785,
+  "source_revision": "378d3fcfd5b9dfa22e421322fec7391907fa17d8",
+  "workspace": "/var/tmp/native-narrow-independent-6ubp9r7n",
+  "runtime_execution": false,
+  "independent_binary_kernel_rechecker": false,
+  "trust": "Private graph/comparator snapshots plus pinned shared mathlib/toolchain caches; pre/post inventories do not exclude transient concurrent changes."
+}
