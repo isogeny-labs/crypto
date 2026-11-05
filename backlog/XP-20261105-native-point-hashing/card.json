@@ -55,7 +55,7 @@
     "gpu": null,
     "est_core_hours": null,
     "est_wall_hours": null,
-    "notes": "Proposed pilot ceiling only, unapproved and uncalibrated. One native L2 Spot job, concurrency 1, original 1800s absolute deadline. At most 2 reserved vCPU-hours for payload under this ceiling; builders/queue/idle/storage/transfer are additional and must be priced before readiness. Multi-host work needs a separate matched-host protocol within existing authorized caps."
+    "notes": "User-authorized pilot scope; the reservation ceiling is uncalibrated and not admitted. One native L2 Spot job, concurrency 1, original 1800s absolute deadline. At most 2 reserved vCPU-hours for payload under this ceiling; builders/queue/idle/storage/transfer are additional and require current price/headroom checks. Multi-host work needs a separate matched-host protocol within existing authorized caps."
   },
   "run": {
     "argv": [
@@ -109,7 +109,7 @@
     },
     "funding": {
       "units": 0,
-      "rationale": "Unready design, below funded executable experiments; no spending or priority allocation requested."
+      "rationale": "The user authorized the experiment scope. This unready card has no posted lease or budget reservation; zero priority funding does not establish account/lane headroom or request another execution approval."
     }
   },
   "owner_hint": "native ECC implementation and measurement lane"

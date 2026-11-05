@@ -249,8 +249,9 @@ regressions and null outcomes without promoting them into a speed claim.
    an ambiguous or interrupted job as a fresh attempt. Export planned,
    attempted, completed and excluded counts, including all failures.
 
-Funding is proposed as zero while unready. No allocation, lease, build or job
-is requested by this design. The protected PCC-ledger proposal on PR #2984
+Funding stays zero while unready. The user has authorized the experiment
+scope; this card has posted no allocation, lease, build or job. Current
+headroom and execution admission still need checking. The protected PCC-ledger proposal on PR #2984
 remains a separate decision; this card does not authorize editing that ledger
 or the conflicted 2026-11-04 journal. Profiling and the original frozen matched
 panel retain their pending status and are not discharged by these new studies.
