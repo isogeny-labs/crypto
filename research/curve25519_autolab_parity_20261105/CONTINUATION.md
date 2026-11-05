@@ -1007,3 +1007,39 @@ Autolab terminal result, full library gate and publication; collector dispatch a
 ### Errors
 
 No new failures. [pcc:unverified]
+
+## 2026-11-05T19:55:12.703328+00:00 — Autolab tests passed and full gate fixture diagnosed
+
+### What was done
+
+Autolab session3990 exited0:15passed,0failed. Full-library session62871 is running on checkpoint57f49fa23307. An early claim test failed because the tracked native-wall records were absent; direct recheck reproduced the missing-file error. Hydrated tracked native-wall session inputs from the old checkout after comparing every restored file to its HEAD Git blob. [pcc:unverified]
+
+### Decisions made
+
+Preserve the full gate attempt and recheck the affected claim tests now. Complete the gate before rerunning; an input repair does not erase an earlier failed test. Separate collector checkout creation completed; materialization session18342 remains live in git read-tree. [pcc:unverified]
+
+### Open threads
+
+Full gate terminal result and required successful retry, collector materialization and integration, PR3495 followup20:01Z. [pcc:unverified]
+
+### Errors
+
+Missing research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl caused claim-test failure. No source assertion changed. [pcc:unverified]
+
+## 2026-11-05T19:56:08.650559+00:00 — full gate policy omission isolated
+
+### What was done
+
+Claim fixture repair rechecked9passed/0failed/1ignored. Full gate also exposed a real integration omission: optimization policy inventory lacks rho.curve25519_bounded. Direct optimization recheck reproduced two failures with that exact message. Bounds recheck identifies another missing archive session. Collector checkout materialization session18342 exited0. [pcc:unverified]
+
+### Decisions made
+
+Add the reference policy and classify max_steps as a resource envelope, never a tuning knob. Preserve the running full gate as the old checkpoint attempt; subsequent gate must include this fix. [pcc:unverified]
+
+### Open threads
+
+Restore remaining tracked archive fixtures, integrate collector dispatch in the new checkout, and complete successful required gates before push. [pcc:unverified]
+
+### Errors
+
+Optimization policy/registry mismatch missing rho.curve25519_bounded; bounds input research/ecbench_all_candidates_20261003/sessions/prime/session.json absent. [pcc:unverified]
