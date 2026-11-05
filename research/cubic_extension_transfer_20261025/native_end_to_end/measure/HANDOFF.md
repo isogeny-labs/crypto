@@ -19,6 +19,11 @@ preflight at 2026-11-05T22:15:55Z still records six AccessDenied outcomes.
 PCC-20261105-f3b1ab has unverified standing. No ECDLP benchmark was launched.
 [pcc:unverified]
 
+This draft snapshot is pinned by its claim: preserve its bytes. Prepare a new,
+versioned final protocol file before freezing the instrument/analysis rather
+than rewriting the pinned draft. Publication and follow-up status is recorded
+in [PUBLICATION.md](PUBLICATION.md).
+
 Next steps:
 
 1. Obtain the existing authorized IsoLab operator connection requested earlier;
