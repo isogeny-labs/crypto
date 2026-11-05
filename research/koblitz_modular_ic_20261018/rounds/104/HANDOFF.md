@@ -26,3 +26,5 @@ once its unrelated Conductor reservation is released.
 The old T-1594 lease was released and became cancelled; T-1596 was
 created and claimed for the same R104 scope. No native or replay failure.
 The shared dated log remains reserved by unrelated T-1590.
+The first PDF render had pale text inherited from the diagram fill color;
+the renderer was corrected and the final page visually inspected.

@@ -26,6 +26,7 @@ boxes = [
 ]
 for x, title, sub in boxes:
     content += f"0.88 0.94 1 rg {x} 380 164 126 re f 0.13 0.32 0.53 RG {x} 380 164 126 re S\n"
+    content += "0 0 0 rg\n"
     content += label(x + 9, 465, 11, title)
     content += label(x + 9, 432, 9, sub)
 for i, line in enumerate([

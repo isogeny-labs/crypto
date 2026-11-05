@@ -29,8 +29,9 @@ y=0 point, followed by branch valuations and the other finite supports.
 
 The raw producer/replay archive has SHA-256
 `ac0d2364774167d2a79871484326308fd27d42b5c4b6d6fbd428a2a0aa3c3af4`.
-The report and diagram are in `publication/`. The PDF was structurally
-checked; this host lacks a rasterizer for visual page inspection.
+The report and diagram are in `publication/`. The PDF was rendered with a
+scratch PDFium installation and its single page was visually inspected;
+that inspection caught and corrected pale text in the first render.
 
 Sources: R51 N51 donor, R101 fiber, R102 exact orders, and
 [Stacks monic finite free quotient](https://stacks.math.columbia.edu/tag/00FD).
