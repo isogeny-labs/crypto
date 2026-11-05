@@ -67,6 +67,7 @@ fn inputs(args: &[String]) {
         let input = ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
             diagnostics: None,
+            diagnostic_lifecycle: None,
             curve: w.curve_spec.for_child(p.instance(ex.workload)),
             target_seed: w.target_seed,
             target_index: w.target_index,

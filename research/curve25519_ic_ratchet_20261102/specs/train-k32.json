@@ -1,0 +1,83 @@
+{
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "proj-179",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=179,scan_cap=2864",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "proj-256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=256,scan_cap=4096",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "proj-358",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=358,scan_cap=5728",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "proj-512",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    }
+  ],
+  "description": "research/curve25519_ic_ratchet_20261102/PROTOCOL.md Part 1 (train). Public synthetic curve and targets; no security claim.",
+  "label": "Curve25519-family ratchet 1, train, k = 32",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 2026110442,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1173263412,
+        "b": 337904346,
+        "group_order": 4295077112,
+        "gx": 1431665017,
+        "gy": 592057774,
+        "kind": "prime_explicit",
+        "p": 4294967197,
+        "r": 536884639
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026110432,
+    "targets_per_curve": 16
+  }
+}

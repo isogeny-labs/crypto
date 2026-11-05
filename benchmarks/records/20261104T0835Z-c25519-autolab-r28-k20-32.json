@@ -1,0 +1,149 @@
+{
+  "branch": "claude/curve25519-autolab-r27",
+  "closed_utc": "2026-11-04T08:38:57+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ic_autolab",
+        "--home",
+        "research/curve25519_autolab_20261104",
+        "loop",
+        "--rounds",
+        "1",
+        "--track",
+        "generic",
+        "--sizes",
+        "20,32",
+        "--max-candidates",
+        "9",
+        "--exploration",
+        "6",
+        "--train-targets",
+        "32",
+        "--cpus",
+        "auto",
+        "--allow-busy",
+        "--replay",
+        "8"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T08:36:01+00:00",
+      "wall_s": 149.93
+    }
+  ],
+  "commit": "aeb70e6d36bf02ae6a7e63b657382edff831122c",
+  "commit_dirty": false,
+  "created_utc": "2026-11-04T08:35:42+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T0835Z-c25519-autolab-r28-k20-32",
+  "metrics": [
+    {
+      "baseline": 5.000549781428319,
+      "better": "lower",
+      "n": 64,
+      "name": "s_w0_incumbent_k20",
+      "note": "holdout ECBS1hedb8cab33622, wsum2g-b15-n2 vs wsum2-b15-n2; k = 32 no challenger",
+      "reference": 1.4627264868788148,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.5745780660849693
+    }
+  ],
+  "problem": "ic:curve25519-family-k20-32",
+  "raw": [
+    {
+      "bytes": 4085,
+      "path": "research/curve25519_autolab_20261104/round-028/RESULT.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/67/67be496b92b809292b9c15a97e24a5d3c9efead430bea7df463abc6948c83043",
+      "sha256": "67be496b92b809292b9c15a97e24a5d3c9efead430bea7df463abc6948c83043",
+      "uploaded": false
+    },
+    {
+      "bytes": 9792,
+      "path": "research/curve25519_autolab_20261104/round-028/selection.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/57/57f758c22214f80882603560e9d452a2194ba6d16fca3ab36a0d051b4b70e1e4",
+      "sha256": "57f758c22214f80882603560e9d452a2194ba6d16fca3ab36a0d051b4b70e1e4",
+      "uploaded": false
+    },
+    {
+      "bytes": 3323,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/band-holdout-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c8/c8fa2b3d7dd0737c5d37046b45919c6ed29169ea1bb5c9f9b2676b226daf96a5",
+      "sha256": "c8fa2b3d7dd0737c5d37046b45919c6ed29169ea1bb5c9f9b2676b226daf96a5",
+      "uploaded": false
+    },
+    {
+      "bytes": 10790,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/band-train-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/99/9969116e9b82ef3d55c5e23f71d507bd6d780b83893ed2bb392eb9f511d7c0ce",
+      "sha256": "9969116e9b82ef3d55c5e23f71d507bd6d780b83893ed2bb392eb9f511d7c0ce",
+      "uploaded": false
+    },
+    {
+      "bytes": 10934,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/band-train-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b7f0285974004525b38382bb1032955890f046c5f7b66f2b75f0c706a60e600",
+      "sha256": "1b7f0285974004525b38382bb1032955890f046c5f7b66f2b75f0c706a60e600",
+      "uploaded": false
+    },
+    {
+      "bytes": 1100,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/run-holdout.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/af/afec4c6e6f7eaac97d4e03bb83a9411d694b697088ffbc2f182bea3c4847d84b",
+      "sha256": "afec4c6e6f7eaac97d4e03bb83a9411d694b697088ffbc2f182bea3c4847d84b",
+      "uploaded": false
+    },
+    {
+      "bytes": 1849,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/run-train.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/bed95447b063728626f68b24baf08600669c7282b9c3347ad1a5c7e2d6f7e06d",
+      "sha256": "bed95447b063728626f68b24baf08600669c7282b9c3347ad1a5c7e2d6f7e06d",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/verify-holdout-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d1fb88594a6510e05d9d954c155267d2ddf2d53679834041230a703bb5374c71",
+      "sha256": "d1fb88594a6510e05d9d954c155267d2ddf2d53679834041230a703bb5374c71",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/verify-train-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0d/0d991304e841507cbcf04d7bd9cd62933cdbc2c1c7ea0128628a76f39c657b04",
+      "sha256": "0d991304e841507cbcf04d7bd9cd62933cdbc2c1c7ea0128628a76f39c657b04",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/round-028/analysis/verify-train-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/16/163c7f277f2147025fd2bfc23b00ebe2907dafa5a145a2bc2348a84ace5850d9",
+      "sha256": "163c7f277f2147025fd2bfc23b00ebe2907dafa5a145a2bc2348a84ace5850d9",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/round-028/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/curve25519_autolab_20261104/ratchet.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-autolab-r28-k20-32",
+  "status": "measured",
+  "summary": "ic_autolab round 28, k = 20/32: stride-generator probes ratchet k = 20 (S 2.57 vs 5.00, rho 1.46, 1.76x); k = 32 no challenger",
+  "validation": null
+}

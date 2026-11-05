@@ -1,0 +1,65 @@
+{
+  "schema": "research.formal-component-review/v1",
+  "producer_manifest": "148bb01d714341434a24fee25d586948212c6104e0945d3a587ecdbaf1820c81",
+  "machine": "passed",
+  "fidelity": "faithful_scoped",
+  "outcome": "validated_scoped",
+  "claims": [
+    {
+      "declaration": "cross_word_decode",
+      "machine": "passed",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "declaration": "same_point_decode",
+      "machine": "passed",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "declaration": "same_u_word_preserves",
+      "machine": "passed",
+      "fidelity": "faithful_scoped"
+    }
+  ],
+  "matched_bindings_pre_and_post": 82,
+  "checks": {
+    "independent1": 0,
+    "field1": 0,
+    "controls1": 0,
+    "readback1": 0,
+    "reviewer1": 1,
+    "reviewer2": 0
+  },
+  "extra_controls": 4,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "source_scope": {
+    "field_n": 1,
+    "tables": null,
+    "prime_min": 5,
+    "prime_upper_exclusive": 2147483648,
+    "original_coordinate_words": 12,
+    "curve_words": 4,
+    "global_condition": "IsCoprime f f.derivative",
+    "restricted_none_not_native_payload": true
+  },
+  "scientific_trials": 0,
+  "cost_ratio": null,
+  "independence": {
+    "producer_unchanged": true,
+    "reviewer_prior_authorship": [
+      "SameUComposition",
+      "LocalSmooth",
+      "GlobalSmooth"
+    ],
+    "blind_rederivation": false,
+    "independent_kernel_rechecker": false
+  },
+  "failures_preserved": [
+    "ReviewerControls tag collision before Lean launch",
+    "ReviewerControls first compile missing Fact (Nat.Prime 5) instance"
+  ]
+}

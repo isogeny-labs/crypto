@@ -1,0 +1,48 @@
+import ListGuards
+import Residual
+set_option autoImplicit false
+namespace ResidualAcceptance
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest MumfordValidity ResidualWord
+
+def accepts (p : UInt64) (d : Nat) (u v f : List UInt64) (fuel : Nat) : Prop :=
+ d≤2 ∧ u.getLast?=some 1 ∧ checkedPrem p u (residual p f v) fuel=some []
+
+theorem acceptance_iff_divisibility (p : UInt64) [Fact p.toNat.Prime] (d : Nat) (u v f : List UInt64)
+ (fuel : Nat) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hu : Canon p u) (hv : Canon p v) (hf : Canon p f) (hbudget : (residual p f v).length≤fuel) :
+ accepts p d u v f fuel ↔ d≤2 ∧ u.getLast?=some 1 ∧ wordsPoly p u∣wordsPoly p f-(wordsPoly p v)^2 := by
+ have hs:=residual_correct p f v hp hb hf hv
+ constructor
+ · rintro ⟨hd,hm,ho⟩
+   refine ⟨hd,hm,?_⟩
+   have hh:=(checked_empty_iff p u (residual p f v) hp hb hu hs.1 hm fuel hbudget).mp ho
+   simpa only [hs.2] using hh
+ · rintro ⟨hd,hm,hr⟩
+   refine ⟨hd,hm,?_⟩
+   apply (checked_empty_iff p u (residual p f v) hp hb hu hs.1 hm fuel hbudget).mpr
+   simpa only [hs.2] using hr
+
+theorem accepted_valid (p : UInt64) [Fact p.toNat.Prime] (d : Nat) (u v f : List UInt64)
+ (fuel : Nat) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hu : Canon p u) (hv : Canon p v) (hf : Canon p f)
+ (hul : u.length=d+1) (hvl : v.length≤d) (ha : accepts p d u v f fuel) :
+ Valid (wordsPoly p f) (wordsPoly p u) (wordsPoly p v) := by
+ rcases ha with ⟨hd,hm,ho⟩
+ have hs:=residual_correct p f v hp hb hf hv
+ have hr:=(checked_success_sound p u (residual p f v) fuel hp hb hu hs.1 ho).2.2
+ apply shape_valid p d u v (wordsPoly p f) hd hul hvl hm
+ simpa only [hs.2] using hr
+
+theorem complete_valid_test (p : UInt64) [Fact p.toNat.Prime] (d : Nat) (u v f : List UInt64)
+ (fuel : Nat) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hu : Canon p u) (hv : Canon p v) (hf : Canon p f)
+ (hul : u.length=d+1) (hvl : v.length≤d) (hbudget : (residual p f v).length≤fuel) :
+ accepts p d u v f fuel ↔ d≤2 ∧ u.getLast?=some 1 ∧
+ Valid (wordsPoly p f) (wordsPoly p u) (wordsPoly p v) := by
+ constructor
+ · intro ha
+   exact ⟨ha.1,ha.2.1,accepted_valid p d u v f fuel hp hb hu hv hf hul hvl ha⟩
+ · rintro ⟨hd,hm,hvalid⟩
+   apply (acceptance_iff_divisibility p d u v f fuel hp hb hu hv hf hbudget).mpr
+   exact ⟨hd,hm,hvalid.2.2.2⟩
+end ResidualAcceptance

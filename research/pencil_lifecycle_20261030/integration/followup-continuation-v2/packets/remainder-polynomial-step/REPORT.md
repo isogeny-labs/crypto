@@ -1,0 +1,13 @@
+# Divisor-slice traversal equals polynomial cancellation
+
+T-1193; 2026-10-31. Producer proof packet; independent source-fidelity review pending.
+
+The generated event list visits divisor coefficients in their supplied order at indices j,j+1,... . Its operands are exactly the original coefficient list. Under j+length(divisor)<=array length, every index is in bounds. The event polynomial is C(c)*X^j*wordsPoly(divisor). Combining this identity with the preceding UInt64 traversal theorem proves that the decoded output is the decoded input minus this shifted product. Trailing-zero trimming preserves the same polynomial result.
+
+The complete inner cancellation step is therefore linked from canonical word-array updates through generated divisor events to the polynomial operation used in the remainder-trace invariant. Assumptions remain explicit: prime modulus with 0<p<2^31, canonical input array/multiplier/divisor words and the index bound. Native source interpretation remains limited to the odd prime-field branch with diagnostic tables disabled; instrumentation counts are not modeled.
+
+Eight main declarations and eight controls cover generated operand order, internal zero coefficients, nonzero shift, empty helper event list, invalid offset and zero multiplier. A kernel-evaluated division fixture modulo17 starts with [16,0,1], representing X^2-1. Divisor[16,1] represents X-1. Offset1 and multiplier1 produce[16,1,0], trimming to[16,1]. The next offset0 step produces[0,0], trimming to empty. These manually supplied two steps check the component; they do not establish the native outer loop's choices or termination.
+
+Remaining native obligations: show pdiv's selected j and c meet these premises at every iteration, preserve canonical arrays through the whole outer loop and bind the actual empty-vector return to the finite cancellation trace. Native quotient overwrite correctness is separate. The helper handles empty coefficient lists algebraically; native pdiv explicitly rejects an empty divisor. No claim of full division or compiled-code equivalence is made here.
+
+Sources: native pdiv source retained in the preceding remainder packets; prior Cancel.lean, decodedPoly/sourcePoly coefficient identities, listPoly/wordsPoly and trim_preserves. No new compiled dependencies. Five final native checks passed with unchanged input bindings. All 16 separate readbacks use only standard axioms; one control is axiom-free. Results are in status.json. The initial Events compilation failed because an unspaced comparison was parsed as notation; corrected spelling and the final proofs are retained. Existing compiled dependencies remain within the trust boundary. No scientific execution, timing observation or cost ratio.

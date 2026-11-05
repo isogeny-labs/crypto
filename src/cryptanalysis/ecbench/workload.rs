@@ -13,11 +13,13 @@
 //! (`canonical::derive_u64`), never from an RNG stream, and no solver is
 //! handed it: the runner verifies the solver's answer afterwards.
 
+use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
+use crate::cryptanalysis::ec_index_calculus_curves::CurveKind;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
@@ -38,6 +40,9 @@ use crate::cryptanalysis::ic_boundary::{
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
 use crate::cryptanalysis::koblitz_wide::WideKoblitz;
+use crate::cryptanalysis::prime_orbit_index_calculus::{
+    generate_instance, Coefficient, ScaledShape,
+};
 
 /// How to build the curve.  Each variant is a constructor the repository
 /// already has, so the registry's `generator_call` names the same curve.
@@ -47,6 +52,12 @@ pub enum CurveSpec {
     /// `ic_boundary::find_prime_order_curve(bits, seed)`: prime order,
     /// cofactor 1, `8 ≤ bits ≤ 32`.
     PrimeSearch { bits: u32, seed: u64 },
+    /// `prime_orbit_index_calculus::generate_instance`: a certified
+    /// scaled curve retaining the requested shape (`generic`,
+    /// `generic_a_minus_3`, `j0`, `j0_b7`, or `j1728`).
+    /// The runner converts it to an explicit prime curve before starting
+    /// a measured child, so curve search is never in the timed region.
+    PrimeOrbitShape { shape: String, bits: u32, seed: u64 },
     /// `ic_boundary::roster_prime_instance(bits)`: the bench roster.
     PrimeRoster { bits: u32 },
     /// `ic_boundary::koblitz_instance(a, n)`: `K_a / F_{2^n}`, `n ≤ 62`;
@@ -370,6 +381,59 @@ impl CurveSpec {
                 }
                 Ok(Instance::Prime(find_prime_order_curve(bits, seed)))
             }
+            CurveSpec::PrimeOrbitShape {
+                ref shape,
+                bits,
+                seed,
+            } => {
+                let scaled = match shape.as_str() {
+                    "generic" => ScaledShape::of_kind(CurveKind::Generic),
+                    "generic_a_minus_3" => ScaledShape {
+                        kind: CurveKind::Generic,
+                        a: Coefficient::Fixed(-3),
+                        b: Coefficient::Random,
+                        max_cofactor: 1,
+                    },
+                    "j0" => ScaledShape::of_kind(CurveKind::J0),
+                    "j0_b7" => ScaledShape {
+                        kind: CurveKind::J0,
+                        a: Coefficient::Fixed(0),
+                        b: Coefficient::Fixed(7),
+                        max_cofactor: 1,
+                    },
+                    "j1728" => ScaledShape::of_kind(CurveKind::J1728),
+                    other => {
+                        return Err(format!(
+                            "prime_orbit_shape is generic, generic_a_minus_3, j0, j0_b7 or j1728, not `{other}`"
+                        ))
+                    }
+                };
+                let generated = generate_instance(scaled, bits, Some(1), seed)?;
+                let params = generated.curve.params("ecbench-prime-orbit-shape");
+                let word = |name: &str, value: &num_bigint::BigUint| {
+                    value
+                        .to_u64()
+                        .ok_or_else(|| format!("generated {name} does not fit a word"))
+                };
+                let curve = PrimeCurve {
+                    p: word("prime", &params.p)?,
+                    a: word("a", &params.a)?,
+                    b: word("b", &params.b)?,
+                };
+                let mut instance = PrimeInstance {
+                    name: String::new(),
+                    curve,
+                    group_order: generated.certificate.group_order,
+                    r: generated.certificate.subgroup_order,
+                    cofactor: generated.certificate.cofactor,
+                    generator: (
+                        word("generator x", &params.gx)?,
+                        word("generator y", &params.gy)?,
+                    ),
+                };
+                instance.name = instance.curve_id().slug;
+                Ok(Instance::Prime(instance))
+            }
             CurveSpec::PrimeRoster { bits } => roster_prime_instance(bits)
                 .map(Instance::Prime)
                 .ok_or_else(|| format!("the bench roster has no {bits}-bit curve")),
@@ -475,10 +539,12 @@ impl CurveSpec {
                 seed,
                 max_cofactor,
             } => {
-                // Points pack into 4m ≤ 60 bits; the order search takes
-                // ≈ 2q baby and giant steps per point.
-                if !(4..=15).contains(&m) {
-                    return Err(format!("f2m4_torsion takes m from 4 to 15, not {m}"));
+                // Points pack into 4m ≤ 80 bits (one word while m ≤ 15;
+                // past that the orders are u128 and the methods go
+                // through `ic_wide`); the order search takes ≈ 2q baby
+                // and giant steps per point.
+                if !(4..=20).contains(&m) {
+                    return Err(format!("f2m4_torsion takes m from 4 to 20, not {m}"));
                 }
                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
             }
@@ -640,6 +706,13 @@ impl CurveSpec {
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
+            CurveSpec::PrimeOrbitShape {
+                ref shape,
+                bits,
+                seed,
+            } => format!(
+                "prime_orbit_index_calculus::generate_instance({shape}, {bits}, {seed})"
+            ),
             CurveSpec::PrimeRoster { bits } => format!("roster_prime_instance({bits})"),
             CurveSpec::Koblitz { a, n } if n >= 64 => {
                 format!("WideKoblitz::new({a}, registry modulus for n = {n})")
@@ -857,6 +930,51 @@ pub fn prime_automorphisms(curve: &PrimeCurve, generator: PrimePoint, r: u64) ->
 }
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
+/// The registry's index: one decimal byte offset per line, the offset of
+/// the opening quote of a slug's value in `REGISTRY` (its first
+/// `"slug": "…"` pair in document order), the lines ordered by that slug.
+/// The slugs themselves are read from `REGISTRY` at the offsets, so the
+/// index stays small (offsets only).  Written with the registry by
+/// `scripts/build_curve_registry.py` (`registry_index_text` in
+/// `scripts/curve_id.py`); `check_curve_names.py` and the test below fail
+/// when it is stale, so an index miss means the document has no such
+/// entry.  (A `build.rs` could generate it, but a build script makes Cargo
+/// list every file of the package to fingerprint it, which this
+/// repository's size and CI's partial clones do not bear.)
+const REGISTRY_INDEX: &str = include_str!("registry_index.txt");
+
+/// The slug whose value's opening quote is at byte `at` of `REGISTRY`.
+fn registry_slug_at(at: usize) -> Option<&'static str> {
+    let rest = REGISTRY.get(at..)?.strip_prefix('"')?;
+    Some(&rest[..rest.find('"')?])
+}
+
+/// The byte offset in `REGISTRY` of `slug`'s value, by binary search over
+/// the lines of `REGISTRY_INDEX`; `None` when the index has no such slug.
+fn registry_index_offset(slug: &str) -> Option<usize> {
+    let text = REGISTRY_INDEX.as_bytes();
+    let (mut lo, mut hi) = (0usize, text.len());
+    // Every line that can match starts in [lo, hi), at `lo` or just after
+    // a newline; probe the line that contains the midpoint.
+    while lo < hi {
+        let mid = lo + (hi - lo) / 2;
+        let start = text[lo..mid]
+            .iter()
+            .rposition(|&b| b == b'\n')
+            .map_or(lo, |i| lo + i + 1);
+        let end = text[start..hi]
+            .iter()
+            .position(|&b| b == b'\n')
+            .map_or(hi, |i| start + i);
+        let at: usize = std::str::from_utf8(&text[start..end]).ok()?.parse().ok()?;
+        match registry_slug_at(at)?.cmp(slug) {
+            std::cmp::Ordering::Equal => return Some(at),
+            std::cmp::Ordering::Less => lo = (end + 1).min(hi),
+            std::cmp::Ordering::Greater => hi = start,
+        }
+    }
+    None
+}
 
 /// The registry's curves, parsed once per process, for the lookups that
 /// scan every entry (a wide Koblitz modulus) and as the fallback of
@@ -878,7 +996,7 @@ fn registry_curves() -> &'static [Value] {
 
 /// The registry entry of `slug`, parsed from its own text alone.
 ///
-/// The document is 4.7 MB and every measured execution is a fresh child
+/// The document is 20.8 MB and every measured execution is a fresh child
 /// process, so parsing it whole cost 97% of a toy solve's instructions
 /// (callgrind, 2026-10-18: 147.6M of 153M Ir in `ecbench exec`); a
 /// per-process cache cannot help a child.  A slug is a plain `icv1-…`
@@ -888,7 +1006,22 @@ fn registry_curves() -> &'static [Value] {
 /// extracted object is checked to carry the slug, and anything the fast
 /// path cannot place falls back to the full parse, so the answer is the
 /// one the full parse gives: the first entry with that slug.
+///
+/// The scan itself is now the fallback: `REGISTRY_INDEX` (written with the
+/// document) names the byte offset of every slug's first `"slug": "…"`
+/// pair, so the entry is cut out at that offset and the scan runs only
+/// when the index cannot place it.  A slug without an index entry has no
+/// such pair in the document and so no entry.  Scanning the 20.8 MB
+/// document to an entry deep in it cost 37M of the 39M instructions a
+/// 32-bit `rho.negation` child spent before its solve marker (2026-11-01,
+/// Callgrind), the same for every child of that curve.
 fn registry_entry(slug: &str) -> Option<Value> {
+    let at = registry_index_offset(slug)?;
+    if let Some(entry) = registry_entry_around(at) {
+        if entry.get("slug").and_then(Value::as_str) == Some(slug) {
+            return Some(entry);
+        }
+    }
     let needle = format!("\"{slug}\"");
     let mut from = 0;
     while let Some(pos) = REGISTRY[from..].find(&needle) {
@@ -990,7 +1123,7 @@ impl Instance {
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
-            Instance::F2m4(i) => u128::from(i.r),
+            Instance::F2m4(i) => i.r,
             Instance::Ext(i) => u128::from(i.r()),
             Instance::Genus2(i) => u128::from(i.r),
             Instance::Quartic(i) => u128::from(i.r),
@@ -1216,11 +1349,11 @@ impl Instance {
                     "extension",
                     None,
                     Some(f.f.m),
-                    u128::from(i.group_order),
-                    u128::from(i.r),
-                    u128::from(i.cofactor),
-                    u128::from(f.pack(&i.generator.x)),
-                    u128::from(f.pack(&i.generator.y)),
+                    i.group_order,
+                    i.r,
+                    i.cofactor,
+                    f.pack(&i.generator.x),
+                    f.pack(&i.generator.y),
                     2,
                 )
             }
@@ -1257,6 +1390,18 @@ impl Instance {
                 RawPointG::Affine { x, y } => Some([format!("0x{x:x}"), format!("0x{y:x}")]),
                 RawPointG::Infinity => None,
             };
+        }
+        // A curve over F_{(2^m)^4} may have a two-word order (m ≥ 16);
+        // its own u128 double-and-add gives the same point either way.
+        if let Instance::F2m4(i) = self {
+            let c = &i.curve;
+            let pt = c.mul(&i.generator, k % i.r);
+            return (!pt.inf).then(|| {
+                [
+                    format!("0x{:x}", c.f.pack(&pt.x)),
+                    format!("0x{:x}", c.f.pack(&pt.y)),
+                ]
+            });
         }
         // A one-word instance's subgroup order fits a word, so a reduced
         // scalar does too.
@@ -1450,14 +1595,23 @@ impl Instance {
                 Instance::F2m4(i) => {
                     let c = &i.curve;
                     let bits = 4 * c.f.f.m;
-                    let x = c.f.unpack(h & ((1u64 << bits) - 1));
+                    // One word of hash while 4m < 64 (every committed
+                    // target); past that a second, derived word on top.
+                    let raw = if bits < 64 {
+                        u128::from(h & ((1u64 << bits) - 1))
+                    } else {
+                        let hi = h.rotate_left(32).wrapping_mul(0x9e37_79b9_7f4a_7c15);
+                        (u128::from(h) | (u128::from(hi) << 64)) & ((1u128 << bits) - 1)
+                    };
+                    let x = c.f.unpack(raw);
                     let mut rng = <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(h);
                     let Some(pt) = c.lift_x(&x, &mut rng) else {
                         continue;
                     };
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
-                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, i.cofactor);
+                    let cof = u64::try_from(i.cofactor).expect("a small cofactor");
+                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, cof);
                     if !q.inf {
                         return Some((
                             [
@@ -1768,6 +1922,52 @@ mod tests {
     use super::*;
 
     #[test]
+    fn prime_orbit_shapes_keep_the_requested_coefficients_and_freeze_explicitly() {
+        for (shape, seed) in [
+            ("generic_a_minus_3", 2026110101),
+            ("j0_b7", 2026110103),
+            ("j1728", 2026110105),
+        ] {
+            let spec = CurveSpec::PrimeOrbitShape {
+                shape: shape.into(),
+                bits: 14,
+                seed,
+            };
+            let instance = spec.build().unwrap();
+            let Instance::Prime(prime) = &instance else {
+                panic!("prime orbit shapes build prime instances")
+            };
+            match shape {
+                "generic_a_minus_3" => assert_eq!(prime.curve.a, prime.curve.p - 3),
+                "j0_b7" => assert_eq!((prime.curve.a, prime.curve.b), (0, 7)),
+                "j1728" => assert_eq!(prime.curve.b, 0),
+                _ => unreachable!(),
+            }
+            let frozen = spec.for_child(&instance);
+            assert!(matches!(frozen, CurveSpec::PrimeExplicit { .. }));
+            let Instance::Prime(rebuilt) = frozen.build().unwrap() else {
+                panic!()
+            };
+            assert_eq!(
+                (
+                    rebuilt.curve.p,
+                    rebuilt.curve.a,
+                    rebuilt.curve.b,
+                    rebuilt.r,
+                    rebuilt.generator,
+                ),
+                (
+                    prime.curve.p,
+                    prime.curve.a,
+                    prime.curve.b,
+                    prime.r,
+                    prime.generator,
+                )
+            );
+        }
+    }
+
+    #[test]
     fn extension_variants_have_distinct_constructors_and_subgroup_arithmetic() {
         for spec in [
             CurveSpec::Fp4Torsion {
@@ -1817,12 +2017,20 @@ mod tests {
                     Instance::F2m4(i) => {
                         let c = &i.curve;
                         let point = crate::cryptanalysis::gaudry_quartic_bin::PtB {
-                            x: c.f.unpack(x),
-                            y: c.f.unpack(y),
+                            x: c.f.unpack(u128::from(x)),
+                            y: c.f.unpack(u128::from(y)),
                             inf: false,
                         };
                         assert!(c.on_curve(&point));
-                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
+                        assert!(
+                            CountedGroup::mul(
+                                c,
+                                &mut scratch,
+                                point,
+                                u64::try_from(i.r).expect("small test subgroup order"),
+                            )
+                            .inf
+                        );
                     }
                     _ => unreachable!(),
                 }
@@ -1844,6 +2052,36 @@ mod tests {
         .is_err());
     }
 
+    /// `registry_index_text` of `scripts/curve_id.py`, restated: the offset
+    /// of the value's opening quote of every `"slug": "…"` pair's first
+    /// occurrence, ordered by slug.
+    fn expected_registry_index(text: &str) -> String {
+        let key = "\"slug\"";
+        let mut pairs: Vec<(&str, usize)> = Vec::new();
+        let mut from = 0;
+        while let Some(pos) = text[from..].find(key) {
+            let after = from + pos + key.len();
+            from = after;
+            let Some(rest) = text[after..].trim_start().strip_prefix(':') else {
+                continue;
+            };
+            let rest = rest.trim_start();
+            let Some(value) = rest.strip_prefix('"') else {
+                continue;
+            };
+            let Some(end) = value.find('"') else {
+                continue;
+            };
+            if value[..end].contains('\\') {
+                continue;
+            }
+            pairs.push((&value[..end], text.len() - rest.len()));
+        }
+        pairs.sort_by(|a, b| a.0.cmp(b.0).then(a.1.cmp(&b.1)));
+        pairs.dedup_by(|later, first| later.0 == first.0);
+        pairs.iter().map(|(_, at)| format!("{at}\n")).collect()
+    }
+
     /// The slug-targeted extraction answers exactly as the full parse:
     /// the first entry carrying the slug, or none.
     #[test]
@@ -1863,6 +2101,28 @@ mod tests {
         // A slug that is a prefix of a real one is not that one.
         let first = all[0].get("slug").and_then(Value::as_str).unwrap();
         assert!(registry_entry(&first[..first.len() - 1]).is_none());
+        // The committed index is the one this registry text yields (so a
+        // stale index fails here as it fails `check_curve_names.py`), it
+        // has one line per entry, and the search finds every line.
+        assert_eq!(
+            REGISTRY_INDEX,
+            expected_registry_index(REGISTRY),
+            "registry_index.txt is stale"
+        );
+        assert_eq!(REGISTRY_INDEX.lines().count(), all.len());
+        let mut previous = "";
+        for (i, line) in REGISTRY_INDEX.lines().enumerate() {
+            let at: usize = line.parse().unwrap();
+            let slug = registry_slug_at(at).unwrap();
+            assert!(previous < slug, "{slug} out of order at line {i}");
+            previous = slug;
+            if i % 97 == 0 {
+                assert_eq!(registry_index_offset(slug), Some(at), "{slug}");
+            }
+        }
+        assert_eq!(registry_index_offset(""), None);
+        assert_eq!(registry_index_offset("icv1-no-such-curve-00000000"), None);
+        assert_eq!(registry_index_offset("zzzz"), None);
         // A string with braces and escaped quotes inside is skipped as text.
         assert_eq!(json_object_end(br#"{"a":"}\"{","b":{}}"#, 0), Some(18));
     }

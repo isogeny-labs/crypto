@@ -20,3 +20,10 @@ Message Batches, OpenAI Batch): half price, answered minutes to hours later. It 
 Default model: `claude-mythos-5-1`. Named tiers (`--profile`) and fallback to another model
 when one refuses (`--fallback`) are described in `docs/DELPHI.md` there. Not yet verified
 against the live provider APIs.
+
+## Harness learning loop
+
+[`tools/delphi_loop/`](../delphi_loop/README.md) learns which model each `task_card.py lane`
+step should go to from the lane's own `ingest` verdicts, keeps the traces, verdicts and human
+review in LangSmith, and answers `delphi route` for `lane --route` until Delphi has its own
+capability registry.

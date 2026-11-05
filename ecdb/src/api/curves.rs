@@ -306,3 +306,60 @@ pub async fn traits(State(state): State<Shared>, Path(reference): Path<String>) 
     .await?;
     Ok(Json(json!({ "curve_id": id, "items": rows })))
 }
+
+pub async fn relations(State(state): State<Shared>, Path(reference): Path<String>) -> ApiResult<Json<Value>> {
+    let client = state.read.get().await?;
+    let id = resolve(&client, &reference).await?;
+    let rows = json_rows(
+        &client,
+        "SELECT (to_jsonb(r) || jsonb_build_object(
+                  'other_curve_id', CASE WHEN r.source_curve_id = $1::text::bigint THEN r.target_curve_id ELSE r.source_curve_id END,
+                  'other_slug', (SELECT c.icv1_slug FROM ec.curve c WHERE c.id = CASE WHEN r.source_curve_id = $1::text::bigint
+                                  THEN r.target_curve_id ELSE r.source_curve_id END)))::text
+           FROM ec.curve_relation r
+          WHERE r.source_curve_id = $1::text::bigint OR r.target_curve_id = $1::text::bigint ORDER BY r.kind, r.id",
+        &[id.to_string()],
+    )
+    .await?;
+    Ok(Json(json!({ "curve_id": id, "items": rows })))
+}
+
+pub async fn endomorphisms(State(state): State<Shared>, Path(reference): Path<String>) -> ApiResult<Json<Value>> {
+    let client = state.read.get().await?;
+    let id = resolve(&client, &reference).await?;
+    let endos = json_rows(
+        &client,
+        "SELECT to_jsonb(e)::text FROM ec.endomorphism e WHERE e.curve_id = $1::text::bigint ORDER BY e.kind, e.id",
+        &[id.to_string()],
+    )
+    .await?;
+    let lattices = json_rows(
+        &client,
+        "SELECT to_jsonb(d)::text FROM ec.scalar_decomposition d WHERE d.curve_id = $1::text::bigint ORDER BY d.id",
+        &[id.to_string()],
+    )
+    .await?;
+    Ok(Json(json!({ "curve_id": id, "endomorphisms": endos, "scalar_decompositions": lattices })))
+}
+
+pub async fn division_polynomials(
+    State(state): State<Shared>,
+    Path(reference): Path<String>,
+) -> ApiResult<Json<Value>> {
+    let client = state.read.get().await?;
+    let id = resolve(&client, &reference).await?;
+    let rows = json_rows(
+        &client,
+        "SELECT jsonb_build_object('n', d.n, 'variant', d.variant, 'degree', p.degrees[1], 'sha256', p.sha256,
+                 'coefficients_ascending', p.coefficients, 'factor_degrees', d.factor_degrees, 'status', p.status)::text
+           FROM ec.division_polynomial d JOIN ec.polynomial p ON p.id = d.polynomial_id
+          WHERE d.curve_id = $1::text::bigint ORDER BY d.n",
+        &[id.to_string()],
+    )
+    .await?;
+    Ok(Json(json!({
+        "curve_id": id,
+        "convention": "x-only: n = 2 is psi_2^2 = 4x^3 + b2 x^2 + 2 b4 x + b6; odd n is psi_n; n = 4 is psi_4/psi_2",
+        "items": rows,
+    })))
+}

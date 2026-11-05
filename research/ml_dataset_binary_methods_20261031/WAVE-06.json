@@ -1,0 +1,58 @@
+{
+  "attempted": 4,
+  "first_index": 23,
+  "independent_ecdlp_solves": 1,
+  "last_index": 26,
+  "native_status_counts": {
+    "budget_exhausted": 1,
+    "partial": 2,
+    "verified": 1
+  },
+  "note": "Bounded exact administrative wave; no timing or method comparison.",
+  "planned_total": 48,
+  "restricted_s3_fresh_get": 4,
+  "rows": [
+    {
+      "archive_sha256": "a026da38924f123122482ab74eb7c14987ac210f47284e9b8c8ba92221ad5e79",
+      "checkpoint_sha256": "166c1513076e839f958039fe7a919cc0035f4e97b5c58a16fdb5f78e7a675811",
+      "ecdlp_solve_promoted": true,
+      "index": 23,
+      "method_artifact_verified": true,
+      "native_status": "verified",
+      "solver": "bsgs",
+      "twist": true
+    },
+    {
+      "archive_sha256": "57253fed1a6b9be5df0114a370e54f3d78e3c42a39eeae30e7dbc69cc3a17c3d",
+      "checkpoint_sha256": "19665da9b6f41d779dcab6e0d74790349849d5f6a44062f37f3ed631796b7a52",
+      "ecdlp_solve_promoted": false,
+      "index": 24,
+      "method_artifact_verified": true,
+      "native_status": "budget_exhausted",
+      "solver": "sat",
+      "twist": false
+    },
+    {
+      "archive_sha256": "529ed47224e04d45eab47c4a211d385cc5c1e2cbd6070c03874dffc9f37c229d",
+      "checkpoint_sha256": "8f562f51a2ec7ee91d8ad082b10649e34ead2e7e691d63666ecfc2c6eab4a709",
+      "ecdlp_solve_promoted": false,
+      "index": 25,
+      "method_artifact_verified": true,
+      "native_status": "partial",
+      "solver": "f4",
+      "twist": false
+    },
+    {
+      "archive_sha256": "b4ecf85885babea84e439b046ed2ba719db77260c659652fe29becdf2f5b1018",
+      "checkpoint_sha256": "c8c547c3c257edae0e3e38236caf36c118e7711a8579c83fff20fb588ae61a9a",
+      "ecdlp_solve_promoted": false,
+      "index": 26,
+      "method_artifact_verified": true,
+      "native_status": "partial",
+      "solver": "f5",
+      "twist": false
+    }
+  ],
+  "schema": "ml-dataset.binary-methods-wave/v1",
+  "verified_and_exported": 4
+}

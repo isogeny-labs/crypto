@@ -1,0 +1,13 @@
+# Independent enclosing-evidence v2 closure review
+
+Read-only2026-10-30. Stable patch4cbcfe285a54809b7972fc1ab40c611bcc2eb167fa1fb93795679724545df432; owner helperdf252b648679b8f28e1f39b376ddd1040fa3b5c82479a82dfed86a501faad4ee; native resource source9b69036035fa6c4f8c386265655e9883f46eddeb60c0c441cefae02a29fd4b6c. Includes previously reviewed race-corrected supervisorc075337f5f7dabc49356b64d608d6381ead13174c402731c4e1a5a0aabb64e1e. No application/build/tests/scientific execution/cloud.
+
+The origin-before-owner finding is closed in both producer and native consumer. They enforce owner_begin<=origin<=observed reap, with sync after reap in the same epoch. The mutation fixture reconstructs preparation bytes, derived clock ID, journal and owner hashes consistently before supplying stale origin5 against owner begin10, so its expected temporal error is not masked by an unrelated digest mismatch. Positive origin20/reap30/sync40 yields enclosing20 and reap offset10, with exact exit and active-worker totals null. Fixtures remain unexecuted in this review.
+
+No additional concrete source defect identified within this scoped closure contract. The result is a distinct session-origin-to-owner-evidence-sync wall interval, including owner read/sync overhead. It is not exact runner exit time, CPU, cumulative active worker time, or allocated resource cost. No nested spans are summed; receipt-publication tail remains pending. Existing exact ExternalExit API is not silently relabeled.
+
+Successful native validation still requires authenticated caller custody and expected request/binary arguments; the code does not prove Pod/runtime/transport provenance merely by parsing self-declared JSON. File integrity and same-epoch checks do not supply scientific admission, restored-clock compatibility or valid mathematical outcomes. Full native journal structure is revalidated, but semantic correctness of the underlying observations depends on actual reviewed/deployed producer and retained owner evidence.
+
+The added process fixture executes only shell-to-sleep and exercises both ordinary poll and checkpoint completion through the shared owner. It does not invoke ecbench mathematics. Its short0.05second observation window may be scheduling-sensitive under load; a failed postexec observation must remain unknown rather than weakening production checks. Missing PID and bounded/nofollow/duplicate parsing fixtures are separate software checks. No passing runtime claim is made here.
+
+Base and initial-enclosing reviews remain preserved. CLI consumer wiring, real owner custody validation, publication/deployment and full software results remain subsequent tasks.

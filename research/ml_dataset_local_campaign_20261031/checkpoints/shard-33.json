@@ -1,0 +1,68 @@
+{
+  "custody": {
+    "archive_bytes": 223794,
+    "archive_sha256": "af65e3c607d976ac6beeb78885567e915e56f411b92f7c28c26ea2acd67665ff",
+    "fresh_get_byte_comparison": true,
+    "index": 33,
+    "logical_name": "restricted/ml-dataset-local-campaign-20261031/shard-33.tar.gz",
+    "native_status": {
+      "artifact_hashes_verified": true,
+      "export": 0,
+      "independently_solved_ecdlp_cells": 1,
+      "launcher": {
+        "argv": [
+          "/home/ec2-user/ml-dataset-work-20261028/runtime-preflight-runner-test-01/runner",
+          "/home/ec2-user/ml-dataset-work-20261028/clean-build-02/crypto",
+          "c41bec150e16e4c4f9a00634002b633b821de262",
+          "prime23-bsgs-33",
+          "90",
+          "/var/tmp/ml-dataset-local-campaign-20261031/shard-33/runner",
+          "--",
+          "generate",
+          "--plan",
+          "/home/ec2-user/crypto-ml-factor-base-policy-20261030/research/ml_dataset_local_campaign_20261031/plan.json",
+          "--protocol",
+          "/home/ec2-user/crypto-ml-factor-base-policy-20261030/research/ml_dataset_local_campaign_20261031/protocol.json",
+          "--out",
+          "/var/tmp/ml-dataset-local-campaign-20261031/shard-33/runner/attempt",
+          "--max-cases",
+          "1",
+          "--shard-index",
+          "33",
+          "--shard-count",
+          "64",
+          "--seconds-per-case",
+          "30",
+          "--memory-mib",
+          "2048",
+          "--trace-mib",
+          "64"
+        ],
+        "exit_code": 0,
+        "finished_unix_ns": "1793409011264008269",
+        "started_unix_ns": "1793408998632197065",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "7370971e665d32eb6df1d4596c5a17febfdab760ef1f73d22eef98aa814ea557",
+        "timed_out": false
+      },
+      "report": 0,
+      "runner_receipt_present": true,
+      "verified_and_exported": true,
+      "verify": 0
+    },
+    "plan_file_sha256": "8d2b36b9200cec6c64005f8cdfa5eff99d837538395896f186eaa062fd0fcb1a",
+    "protocol_file_sha256": "1dab5a5381b1b34fa884738e38dfe555eaea912299f2f59cf6b829ba544f70d8",
+    "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/af/af65e3c607d976ac6beeb78885567e915e56f411b92f7c28c26ea2acd67665ff",
+    "schema": "ml-dataset.local-campaign-cell-custody/v1"
+  },
+  "index": 33,
+  "published": {
+    "archive_fresh_get": true,
+    "archive_sha256": "af65e3c607d976ac6beeb78885567e915e56f411b92f7c28c26ea2acd67665ff",
+    "pointer_fresh_get": true,
+    "pointer_sha256": "85b8d268845a9f606c0a8b46a946e6e5cf340b56da07de8faae8bccbebec78fc",
+    "schema": "ml-dataset.local-campaign-published/v1"
+  },
+  "schema": "ml-dataset.local-campaign-git-checkpoint/v1",
+  "store_index_sha256": "f786a315487f9ffd1798be142eebbcf94593497753bb66027a961f2ae5ca371a"
+}

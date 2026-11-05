@@ -1,0 +1,33 @@
+{
+  "schema": "pkm.interrupted-development-validation/v1",
+  "observed_utc": "2026-10-30T08:37:22.974806+00:00",
+  "attempt_head": "7396d55f4f93719e88fae3f81b1a49e3f5e209f5",
+  "source_merge": "4e063aa5bb048bd474c967d7c000aee741d51967",
+  "supervisor_pid14000": "absent",
+  "tool_session49270": "unknown process id",
+  "process_evidence": {
+    "14004": {
+      "state": "Z",
+      "ppid": 1,
+      "linux_wait_status": 9,
+      "observed_signal": "SIGKILL"
+    },
+    "14367": {
+      "state": "Z",
+      "ppid": 1,
+      "linux_wait_status": 9,
+      "observed_signal": "SIGKILL"
+    }
+  },
+  "status": "incomplete during compilation; no test outcome",
+  "cause": "unknown; no compiler diagnostic or assertion failure",
+  "native_log": {
+    "path": "/workspace/pr2949-integration-20261030/native-tests.log",
+    "bytes": 279,
+    "sha256": "e4659349434b08b9c8ef8e2890f718bedc13f7f2080b88dd70226b1373ef157d"
+  },
+  "native_exit_status": null,
+  "steps_after_native_tests": "not reached",
+  "retry_directory": "/workspace/pr2949-integration-20261030/retry-20261030T0838Z",
+  "no_active_cargo_rustc_or_test_process_observed": true
+}

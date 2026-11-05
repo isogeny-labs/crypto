@@ -266,6 +266,274 @@ pub fn ecpm_total_stats(n: usize) -> CircuitStats {
     }
 }
 
+// ── Prime-curve Shor estimates, Ekerå post-processing, windowed arithmetic ──
+//
+// Added for research/blindspots_20261018/20-quantum-classical-processing
+// (PROTOCOL.md).  The estimator above is binary-field only; this module prices
+// ECDLP on an `n`-bit prime curve (P-256, secp256k1) with the closed forms of
+// Roetteler–Naehrig–Svore–Lauter 2017 (arXiv 1706.06752: at most
+// `9n + 2⌈lg n⌉ + 10` qubits and `448 n³ lg n + 4090 n³` Toffoli), and prices
+// the three classical-side changes as multipliers on those figures:
+// Ekerå's padded/shortened exponent registers, tolerance to failed runs, and
+// windowed scalar arithmetic (Häner et al. 2020, arXiv 2001.09580).  It is a
+// resource model, not a circuit; it makes no hardware-timeline claim.  It has
+// no dependencies, so it also compiles on its own (`rustc --test`).
+pub mod prime_shor {
+    /// `⌈lg n⌉` for `n ≥ 1`.
+    pub fn ceil_log2(n: usize) -> usize {
+        let mut k = 0;
+        while (1usize << k) < n {
+            k += 1;
+        }
+        k
+    }
+
+    /// RNSL 2017 qubit bound for an `n`-bit prime curve: `9n + 2⌈lg n⌉ + 10`.
+    pub fn rnsl_qubits(n: usize) -> usize {
+        9 * n + 2 * ceil_log2(n) + 10
+    }
+
+    /// RNSL 2017 Toffoli bound for the whole algorithm (`2n` controlled
+    /// additions): `448 n³ lg n + 4090 n³`.
+    pub fn rnsl_toffoli(n: usize) -> f64 {
+        let nf = n as f64;
+        448.0 * nf.powi(3) * nf.log2() + 4090.0 * nf.powi(3)
+    }
+
+    /// Price of one controlled addition of a classical point: RNSL's total
+    /// divided over its `2n` additions (the identity that makes the baseline
+    /// arm reproduce the closed form exactly).
+    pub fn rnsl_addition_toffoli(n: usize) -> f64 {
+        rnsl_toffoli(n) / (2.0 * n as f64)
+    }
+
+    /// One point of the uncertainty band every windowed verdict must survive.
+    /// `kappa` scales the addition price (uncontrolled quantum–quantum
+    /// addition against RNSL's controlled classical-point one), `mu` is the
+    /// look-up Toffoli per window in units of `2^w` (1: signed, two kept
+    /// registers; 3: signed, six look-ups; 6: unsigned, six look-ups), `f`
+    /// scales every addition price (cheaper arithmetic than RNSL's).
+    #[derive(Clone, Copy, Debug, PartialEq)]
+    pub struct Band {
+        pub kappa: f64,
+        pub mu: f64,
+        pub f: f64,
+    }
+
+    /// The 27 band points: `kappa ∈ {0.75, 1, 1.5}`, `mu ∈ {1, 3, 6}`,
+    /// `f ∈ {1, 1/10, 1/62}`.
+    pub fn band_points() -> Vec<Band> {
+        let mut v = Vec::new();
+        for &f in &[1.0, 0.1, 1.0 / 62.0] {
+            for &mu in &[1.0, 3.0, 6.0] {
+                for &kappa in &[0.75, 1.0, 1.5] {
+                    v.push(Band { kappa, mu, f });
+                }
+            }
+        }
+        v
+    }
+
+    /// Largest window searched (the table of `2^w` points is also built
+    /// classically, so it is capped).
+    pub const MAX_WINDOW: usize = 24;
+
+    /// Resource figures of one run of the circuit.
+    #[derive(Clone, Copy, Debug, PartialEq)]
+    pub struct RunCost {
+        pub qubits: f64,
+        pub toffoli: f64,
+        /// 0 for a plain (bit-controlled) circuit.
+        pub window: usize,
+        /// Classical point additions to build the window tables.
+        pub table_additions: f64,
+    }
+
+    /// `ops_a + ops_b` bit-controlled additions of a classical point, each at
+    /// `f · p(n)`; qubits stay at the RNSL figure.
+    pub fn plain_cost(n: usize, ops_a: usize, ops_b: usize, f: f64) -> RunCost {
+        RunCost {
+            qubits: rnsl_qubits(n) as f64,
+            toffoli: (ops_a + ops_b) as f64 * f * rnsl_addition_toffoli(n),
+            window: 0,
+            table_additions: 0.0,
+        }
+    }
+
+    /// Windowed circuit: `⌈ops_a/w⌉ + ⌈ops_b/w⌉` windows, each one look-up
+    /// (`mu · 2^w` Toffoli) and one quantum–quantum addition
+    /// (`kappa · f · p(n)`); `2w` extra qubits, and `2n` more when `mu = 1`
+    /// (the looked-up point is kept in two registers).
+    pub fn windowed_cost(n: usize, ops_a: usize, ops_b: usize, w: usize, b: Band) -> RunCost {
+        let windows = ops_a.div_ceil(w) + ops_b.div_ceil(w);
+        let per_window = b.kappa * b.f * rnsl_addition_toffoli(n) + b.mu * (1u64 << w) as f64;
+        let extra = 2.0 * w as f64 + if b.mu <= 1.0 { 2.0 * n as f64 } else { 0.0 };
+        RunCost {
+            qubits: rnsl_qubits(n) as f64 + extra,
+            toffoli: windows as f64 * per_window,
+            window: w,
+            table_additions: windows as f64 * (1u64 << w) as f64,
+        }
+    }
+
+    /// The window `1..=MAX_WINDOW` that minimises the Toffoli count at a band
+    /// point (ties to the smaller window).
+    pub fn best_window(n: usize, ops_a: usize, ops_b: usize, b: Band) -> RunCost {
+        let mut best = windowed_cost(n, ops_a, ops_b, 1, b);
+        for w in 2..=MAX_WINDOW {
+            let c = windowed_cost(n, ops_a, ops_b, w, b);
+            if c.toffoli < best.toffoli {
+                best = c;
+            }
+        }
+        best
+    }
+
+    /// Ekerå's two exponent registers for an `m`-bit group order: `(m + σ,
+    /// ℓ)` with `ℓ = ⌈m/s⌉ + ν` (`ν = 0` for the lattice arms; `ν < 0`
+    /// trades quantum work for the classical limited search when `s = 1`).
+    pub fn ekera_registers(m: usize, sigma: usize, s: usize, nu: i64) -> (usize, usize) {
+        let ell = (m.div_ceil(s) as i64 + nu).max(1) as usize;
+        (m + sigma, ell)
+    }
+
+    /// Half-width of the `t` search box, `⌊(B_Δ + ½) r / 2^ℓ⌋`, for a group
+    /// order `r ≈ 2^m` (as `f64`, so that it also serves `m = 256`).
+    pub fn search_half_width(log2_r: f64, ell: usize, b_delta: f64) -> f64 {
+        ((b_delta + 0.5) * (log2_r - ell as f64).exp2()).floor()
+    }
+
+    /// Counted classical work of the single-run limited search: baby-step
+    /// giant-step over `[-Bt, Bt]` for each of `2 B_η + 1` values of `η`, in
+    /// group additions `g` (two scalar multiplications of `1.5 m` additions
+    /// per `η`, the giant steps, the shared baby table, one verification) and
+    /// hash probes/inserts `n_native`.
+    pub fn single_run_search_work(m: usize, bt: f64, b_eta: usize) -> (f64, f64) {
+        let w = 2.0 * bt + 1.0;
+        let q = w.sqrt().ceil();
+        let giants = (w / q).ceil();
+        let etas = (2 * b_eta + 1) as f64;
+        let g = (q - 1.0) + 1.0 + etas * (3.0 * m as f64 + 1.0 + giants) + 1.5 * m as f64;
+        let native = q + etas * giants;
+        (g, native)
+    }
+
+    /// The most negative `ν ≤ 0` (`ℓ = m + ν`) whose single-run search work
+    /// `g + native` (native work at 1 group addition per operation) stays at
+    /// or below `2^tier_log2`.
+    pub fn tier_nu(m: usize, b_delta: f64, b_eta: usize, tier_log2: f64) -> i64 {
+        let mut best = 0i64;
+        let mut nu = 0i64;
+        while nu > -(m as i64) + 2 {
+            let ell = (m as i64 + nu) as usize;
+            let bt = search_half_width(m as f64, ell, b_delta);
+            let (g, nat) = single_run_search_work(m, bt, b_eta);
+            if (g + nat).log2() <= tier_log2 {
+                best = nu;
+            } else {
+                break;
+            }
+            nu -= 1;
+        }
+        best
+    }
+
+    /// `log2` of Pollard rho on a group of `m`-bit order: `½ lg(π r / 4)`.
+    pub fn matched_rho_log2(m: usize) -> f64 {
+        0.5 * (std::f64::consts::PI / 4.0 * (m as f64).exp2()).log2()
+    }
+
+    /// Expected number of runs when runs are added one at a time from `s` to
+    /// `s + k` and post-processing is tried after each; `cum[i]` is the
+    /// probability that d is recovered from the first `s + i` runs (made
+    /// monotone here).  If the last attempt fails the whole cycle restarts.
+    /// Returns `(expected runs, cycle success probability)`.
+    pub fn expected_runs_sequential(s: usize, cum: &[f64]) -> (f64, f64) {
+        let mut c = Vec::with_capacity(cum.len());
+        let mut run_max = 0.0f64;
+        for &x in cum {
+            run_max = run_max.max(x);
+            c.push(run_max);
+        }
+        let last = *c.last().unwrap_or(&0.0);
+        if last <= 0.0 {
+            return (f64::INFINITY, 0.0);
+        }
+        let mut per_cycle = s as f64;
+        for x in c.iter().take(c.len().saturating_sub(1)) {
+            per_cycle += 1.0 - x;
+        }
+        (per_cycle / last, last)
+    }
+
+    #[cfg(test)]
+    mod prime_shor_tests {
+        use super::*;
+
+        #[test]
+        fn rnsl_qubits_at_256_is_2330() {
+            assert_eq!(rnsl_qubits(256), 2330);
+        }
+
+        #[test]
+        fn baseline_arm_reproduces_the_closed_form() {
+            let c = plain_cost(256, 512, 0, 1.0);
+            let rel = (c.toffoli - rnsl_toffoli(256)).abs() / rnsl_toffoli(256);
+            assert!(rel < 1e-12);
+            // The committed table value 1.26e11 is 2.2% below the formula.
+            let ratio = rnsl_toffoli(256) / 1.26e11;
+            assert!(ratio > 1.02 && ratio < 1.03, "{ratio}");
+        }
+
+        #[test]
+        fn window_at_haner_calibration_is_near_19() {
+            let b = Band {
+                kappa: 1.0,
+                mu: 3.0,
+                f: 1.0 / 62.0,
+            };
+            let c = best_window(256, 263, 256, b);
+            assert!((15..=22).contains(&c.window), "{}", c.window);
+        }
+
+        #[test]
+        fn windowing_never_loses_qubit_accounting() {
+            let b = Band {
+                kappa: 1.0,
+                mu: 1.0,
+                f: 1.0,
+            };
+            let c = windowed_cost(256, 512, 0, 16, b);
+            assert!(c.qubits > rnsl_qubits(256) as f64 + 512.0);
+        }
+
+        #[test]
+        fn tiers_are_monotone() {
+            let a = tier_nu(256, 100.0, 0, 30.0);
+            let b = tier_nu(256, 100.0, 0, 40.0);
+            let c = tier_nu(256, 100.0, 0, 58.0);
+            assert!(a >= b && b >= c && c < 0);
+        }
+
+        #[test]
+        fn paper_example_is_inside_the_tier_list() {
+            // Ekerå's example: ν = -57 costs ~2^33 group operations.
+            let ell = 256 - 57;
+            let bt = search_half_width(256.0, ell, 100.0);
+            let (g, n) = single_run_search_work(256, bt, 0);
+            let lg = (g + n).log2();
+            assert!((30.0..40.0).contains(&lg), "{lg}");
+        }
+
+        #[test]
+        fn sequential_runs_formula() {
+            let (e, c) = expected_runs_sequential(2, &[0.5, 0.9, 1.0]);
+            // cycle: 2 + (1-0.5) + (1-0.9) = 2.6, success 1.0
+            assert!((e - 2.6).abs() < 1e-12 && (c - 1.0).abs() < 1e-12);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
