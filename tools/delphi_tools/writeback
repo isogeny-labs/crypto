@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Delphi program write-back tool.
 # Argument: path of a delphi.program-round/v1 JSON record (args: file).
-# Writes knowledge/programs/<pid>/round-<n>.json and LEDGER.md, appends a
+# Writes reports/delphi-programs/<pid>/round-<n>.json and LEDGER.md (a path the
+# lead atlas --delta watches), appends a
 # session-log entry, writes a problem record for a blocked round, then (unless
 # DELPHI_TOOLS_NO_GIT=1) commits on delphi/<pid>-r<n>, pushes and opens a PR.
 # Stdout: one JSON line {program_id, round, files, branch, pr}.
@@ -45,7 +46,7 @@ n=$(jq -r '.round // empty' "$rec")
 date=$(date -u +%F)
 now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 outcome=$(jq -r '.review.outcome // "unknown"' "$rec")
-pdir=knowledge/programs/$pid
+pdir=reports/delphi-programs/$pid
 round_file=$pdir/round-$n.json
 ledger=$pdir/LEDGER.md
 slog=docs/session-logs/$date.md
@@ -73,6 +74,22 @@ if [ -n "$program_dir" ] && [ -d "$program_dir/actions" ]; then
 fi
 cp "$rec" "$round_file"
 
+# 1b. Nearest atlas leads. With DELPHI_TOOLS_ATLAS naming a crypto-autoresearcher
+# checkout, the round file gains atlas_matches: the leads and known results the
+# claim collides with (lead_atlas.py --match), so the atlas review that folds
+# this path in starts from them. Read-only; a failure leaves the key out.
+atlas=${DELPHI_TOOLS_ATLAS:-}
+if [ -n "$atlas" ] && [ -f "$atlas/tools/lead_atlas.py" ]; then
+  claim=$(jq -r '.proposal.claim // empty' "$round_file")
+  if [ -n "$claim" ] && m=$(cd "$atlas" && python3 tools/lead_atlas.py --match "$claim" --json --limit 5 2>/dev/null) &&
+    jq -e 'type == "array"' <<<"$m" >/dev/null 2>&1; then
+    jq --argjson m "$m" '. + {atlas_matches: ($m | map({id: .[1], disposition: .[2], title: .[3], score: .[0]}))}' \
+      "$round_file" >"$round_file.tmp" && mv "$round_file.tmp" "$round_file"
+  else
+    echo "writeback: lead_atlas.py --match gave nothing usable; atlas_matches omitted" >&2
+  fi
+fi
+
 # 2. Ledger, regenerated from every round file in deterministic order.
 mapfile -t rounds < <(printf '%s\n' "$pdir"/round-*.json | sort -V)
 jq -rs --arg pid "$pid" '
@@ -88,7 +105,11 @@ jq -rs --arg pid "$pid" '
     + "|---|---|---|---|---|---|---|\n"
     + ($r | map("| \(.round) | \(.proposal.claim | cell) | \(.goal_status | cell) | \(vcount)/\(ccount) | \(.review.outcome | cell) | \(.review.next | cell) | \(.cost_usd | cell) |") | join("\n"))
     + "\n"
-    + ($r | map("\n## Round \(.round)\n\n**Learned.** \(.review.learned | cell) [pcc:unverified]\n\n**Feedback.** \(.review.feedback | cell) [pcc:unverified]\n") | join(""))
+    + ($r | map("\n## Round \(.round)\n\n**Learned.** \(.review.learned | cell) [pcc:unverified]\n\n**Feedback.** \(.review.feedback | cell) [pcc:unverified]\n"
+      + (if (.atlas_matches // []) | length > 0
+         then "\n**Nearest atlas leads** (lead_atlas.py --match on the claim; advance a matching lead instead of filing a duplicate):\n"
+           + ((.atlas_matches) | map("- \(.id) (\(.disposition)): \(.title | cell)") | join("\n")) + "\n"
+         else "" end)) | join(""))
 ' "${rounds[@]}" >"$ledger"
 
 # 3. Session-log entry.
@@ -108,7 +129,7 @@ entry=$(jq -r --arg now "$now" --arg disc "$disc" '
     + (if (acts | length) == 0 then "none\n"
        else "\n" + (acts | map("  - #\(.index | s) \(.tool | s): status \(.status | s), verdict \(.verdict // "none")") | join("\n")) + "\n" end)
     + "- Cost: round \(.cost_usd // "n/a") USD, spent \(.spent_usd // "n/a") of \(.budget_usd // "n/a") USD\n"
-    + "- Files: knowledge/programs/\(.program_id)/round-\(.round).json and LEDGER.md\n\n"
+    + "- Files: reports/delphi-programs/\(.program_id)/round-\(.round).json and LEDGER.md\n\n"
     + "### Decisions made (and why)\n\n"
     + "- Reviewer-reported learning (proposal): \(.review.learned | s) [pcc:unverified]\n\n"
     + "### Open threads (unfinished, pick up next time)\n\n"
@@ -139,7 +160,7 @@ if [ "$outcome" = blocked ]; then
       "# Delphi program \(.program_id) round \(.round) is blocked\n\n"
       + "- **Status:** `open` (`open`, `investigating`, `resolved`, or `superseded`)\n"
       + "- **Kind:** access/tool limit (reported by a Delphi program round)\n"
-      + "- **Affected work:** knowledge/programs/\(.program_id)/round-\(.round).json and LEDGER.md\n"
+      + "- **Affected work:** reports/delphi-programs/\(.program_id)/round-\(.round).json and LEDGER.md\n"
       + "- **Next action owner:** explicitly unassigned\n"
       + "- **Last updated:** \($date)\n\n"
       + "## Problem\n\n"

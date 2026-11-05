@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Delphi tool: which ECDLP leads and known results an idea collides with.
+# Argument: the idea, as one line. Runs lead_atlas.py --match in the
+# crypto-autoresearcher checkout named by DELPHI_TOOLS_ATLAS and prints its
+# JSON. Read-only; not a verifier (a match is a pointer, not a verdict).
+set -euo pipefail
+[ $# -eq 1 ] || { echo "usage: atlas-match <idea>" >&2; exit 2; }
+atlas=${DELPHI_TOOLS_ATLAS:-}
+if [ -z "$atlas" ] || [ ! -f "$atlas/tools/lead_atlas.py" ]; then
+  echo "atlas-match: DELPHI_TOOLS_ATLAS must name a crypto-autoresearcher checkout" >&2
+  exit 3
+fi
+cd "$atlas"
+exec python3 tools/lead_atlas.py --match "$1" --json --limit 8

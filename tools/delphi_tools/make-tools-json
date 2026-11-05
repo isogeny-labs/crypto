@@ -24,6 +24,8 @@ out=$(jq -n --arg root "$root" '
       "dispatch the Iso Lab workflow; the argument is a 40-hex commit sha optionally followed by ,key=value pairs (spec_path, seconds, instance_type, resumable, size_sweep, checkpoint_seconds, max_restores)"),
     "isolab-status": tool("isolab-status"; "2m"; "one"; "^[0-9]{1,20}$"; ""; true;
       "check an Iso Lab workflow run; the argument is the GitHub run id from isolab-dispatch"),
+    "atlas-match": tool("atlas-match"; "2m"; "one"; "^[A-Za-z0-9][A-Za-z0-9 ,.:;()/+=_'\''-]{2,300}$"; ""; false;
+      "list the ECDLP lead-atlas leads and known results an idea collides with (needs DELPHI_TOOLS_ATLAS); the argument is the idea in one line"),
     "writeback": tool("writeback"; "10m"; "file"; ""; "json"; false;
       "write a program round into the repository and open a PR; the content is the delphi.program-round/v1 JSON record")
   }}')

@@ -147,10 +147,10 @@ today=$(date -u +%F)
 rc=0; out=$(wbrun "$tmp/r1.json" 2>/dev/null) || rc=$?
 t "writeback r1: exit 0" test "$rc" -eq 0
 t "writeback r1: stdout is one JSON line" bash -c 'printf "%s" "$1" | jq -e -s "length == 1 and .[0].round == 1 and .[0].pr == null and (.[0].files | length) == 3"' _ "$out"
-t "writeback r1: round copy identical" cmp "$tmp/r1.json" "$wb/knowledge/programs/abc123def456/round-1.json"
+t "writeback r1: round copy identical" cmp "$tmp/r1.json" "$wb/reports/delphi-programs/abc123def456/round-1.json"
 rc=0; wbrun "$tmp/r2.json" >/dev/null 2>&1 || rc=$?
 t "writeback r2: exit 0" test "$rc" -eq 0
-led=$wb/knowledge/programs/abc123def456/LEDGER.md
+led=$wb/reports/delphi-programs/abc123def456/LEDGER.md
 t "ledger: header table" grep -qF '| round | claim | goal status | claims verified/total | outcome | next | cost USD |' "$led"
 t "ledger: round 1 row" grep -qF '| 1 | Filter F halves the sieve cost | proof_verified | 1/2 | supported | continue | 0.12 |' "$led"
 t "ledger: round 2 row" grep -qF '| 2 | Run on EKS | needs_review | 0/0 | blocked | stop | 0.05 |' "$led"
@@ -186,10 +186,35 @@ if [ -f "$pcc" ]; then
   done
 fi
 
+# ---- atlas ---------------------------------------------------------------
+fa=$tmp/atlas
+mkdir -p "$fa/tools"
+cat >"$fa/tools/lead_atlas.py" <<'PY'
+import json, sys
+q = sys.argv[sys.argv.index("--match") + 1]
+print(json.dumps([[15.0, "LEAD-ICP-prime-ic-constant-engineering", "open_next_step", "Constant-factor engineering"],
+                  [12.0, "KR-IC-401ebf", "known_result", "Naive Semaev index calculus | prime fields"]] if "sieve" in q else []))
+PY
+out=$(DELPHI_TOOLS_ATLAS=$fa "$here/atlas-match" "a cheaper sieve filter" 2>/dev/null)
+t "atlas-match: prints the matches" bash -c 'printf "%s" "$1" | jq -e ".[0][1] == \"LEAD-ICP-prime-ic-constant-engineering\""' _ "$out"
+rc=0; DELPHI_TOOLS_ATLAS='' "$here/atlas-match" "x y z" >/dev/null 2>&1 || rc=$?
+t "atlas-match: no atlas is exit 3" test "$rc" -eq 3
+wa=$tmp/wa
+mkdir -p "$wa"
+rc=0; DELPHI_TOOLS_ATLAS=$fa DELPHI_TOOLS_NO_GIT=1 DELPHI_TOOLS_ROOT=$wa "$here/writeback" "$tmp/r1.json" >/dev/null 2>&1 || rc=$?
+t "writeback+atlas: exit 0" test "$rc" -eq 0
+t "writeback+atlas: round carries atlas_matches" jq -e '.atlas_matches[0].id == "LEAD-ICP-prime-ic-constant-engineering" and .atlas_matches[1].disposition == "known_result"' "$wa/reports/delphi-programs/abc123def456/round-1.json"
+t "writeback+atlas: ledger lists nearest leads" grep -qF -- '- LEAD-ICP-prime-ic-constant-engineering (open_next_step): Constant-factor engineering' "$wa/reports/delphi-programs/abc123def456/LEDGER.md"
+t "writeback+atlas: pipe in a title is escaped" grep -qF 'Naive Semaev index calculus \| prime fields' "$wa/reports/delphi-programs/abc123def456/LEDGER.md"
+t "writeback: ledger is under a path the atlas --delta watches" bash -c 'case "$1" in */reports/delphi-programs/*) exit 0;; *) exit 1;; esac' _ "$led"
+if [ -f "$pcc" ]; then
+  t "pcc lint-prose: LEDGER.md with atlas leads" bash -c 'python3 "$1" lint-prose --stdin <"$2"' _ "$pcc" "$wa/reports/delphi-programs/abc123def456/LEDGER.md"
+fi
+
 # ---- make-tools-json -------------------------------------------------------
 rc=0; tj=$(DELPHI_TOOLS_ROOT=$real_root "$here/make-tools-json" 2>/dev/null) || rc=$?
 t "make-tools-json: exit 0 and valid JSON" bash -c '[ "$1" -eq 0 ] && printf "%s" "$2" | jq . ' _ "$rc" "$tj"
-t "make-tools-json: six tools, max_actions 4" bash -c 'printf "%s" "$1" | jq -e ".max_actions == 4 and (.tools | keys | length) == 6"' _ "$tj"
+t "make-tools-json: seven tools, max_actions 4" bash -c 'printf "%s" "$1" | jq -e ".max_actions == 4 and (.tools | keys | length) == 7"' _ "$tj"
 t "make-tools-json: verifiers" bash -c 'printf "%s" "$1" | jq -e "[.tools | to_entries[] | select(.value.verifier == true) | .key] | sort == [\"card-lint\",\"isolab-status\",\"lean-verify\"]"' _ "$tj"
 t "make-tools-json: argv files are executable" bash -c 'printf "%s" "$1" | jq -r ".tools[].argv[0]" | while read -r f; do test -x "$f"; done' _ "$tj"
 while IFS= read -r pat; do
