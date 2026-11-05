@@ -1,0 +1,91 @@
+name: Verify fixed E2E phase-ledger publication receipt
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Check out the fixed verifier
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: research/e2e_phase_ledger_20261101/diagnostic
+
+      - name: Verify immutable artifact metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/13106247069" \
+            | jq -e '
+                .id == 13106247069 and
+                .name == "isolab-publication-41362392013-1" and
+                .expired == false and
+                .digest == "sha256:48a414ed62769dfff32378747d0e6157662410ad3c1281bb8544424ed23f3de4" and
+                .workflow_run.id == 41362392013 and
+                .workflow_run.head_branch == "main" and
+                .workflow_run.head_sha == "12b14adcb1a86f62fef461030e199343c08ff82f"
+              ' >/dev/null
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/41362392013" \
+            | jq -e '
+                .id == 41362392013 and .event == "workflow_dispatch" and
+                .status == "completed" and .conclusion == "success" and
+                .run_attempt == 1 and .head_branch == "main" and
+                .head_sha == "12b14adcb1a86f62fef461030e199343c08ff82f" and
+                .path == ".github/workflows/isolab-experiment.yml"
+              ' >/dev/null
+
+      - name: Download the immutable publication artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: '13106247069'
+          github-token: ${{ github.token }}
+          repository: isogeny-labs/crypto
+          run-id: '41362392013'
+          path: ${{ runner.temp }}/publication
+
+      - name: Verify and sanitize the publication receipt
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' \
+            '846b699dda2ff157d6eb49c9317de5104233347fcb518738f904371ff9a1be66' \
+            'research/e2e_phase_ledger_20261101/diagnostic/verify-publication-receipt' \
+            | sha256sum -c -
+          research/e2e_phase_ledger_20261101/diagnostic/verify-publication-receipt \
+            "$RUNNER_TEMP/publication/isolab-publication-41362392013-1" \
+            "$RUNNER_TEMP/publication-receipt.json"
+          jq -c . "$RUNNER_TEMP/publication-receipt.json"
+          jq -r '
+            "Fixed publication receipt verified.\n\n" +
+            "Source: `" + .source_revision + "`\n\n" +
+            "Native SHA-256: `" + .ecbench_sha256 + "`\n\n" +
+            "Image digest: `" + .image_digest + "`\n\n" +
+            "No build or experiment was run by this verifier."
+          ' "$RUNNER_TEMP/publication-receipt.json" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Retain only the sanitized receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: e2e-phase-ledger-publication-receipt-${{ github.run_id }}
+          path: ${{ runner.temp }}/publication-receipt.json
+          if-no-files-found: error
+          retention-days: 30

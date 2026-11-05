@@ -1,0 +1,50 @@
+{
+  "schema": "crypto.destination-calculus-screen/v1",
+  "case_id": "n83-genus3-order-r-image",
+  "screened_at_utc": "2026-10-31T05:46:00Z",
+  "source_revision": "3f77530aacb4283ac5b2d48eed013984a6f5f315",
+  "candidate": {
+    "name": "Gaudry-Thome-Theriault-Diem double-large-prime hyperelliptic index calculus",
+    "destination": "full genus-3 hyperelliptic Jacobian over GF(2^83)",
+    "status": "rejected_for_transported_image",
+    "is_impossibility_result": false
+  },
+  "orders": {
+    "field_q_bits": 83,
+    "source_and_image_order": "2417851639230796216685689",
+    "source_and_image_order_bits": 81.00000000000092,
+    "ambient_jacobian_scale_bits": 249
+  },
+  "exponent_ledger": {
+    "candidate_q_exponent": "4/3",
+    "candidate_log2_work": 110.66666666666667,
+    "source_rho_r_exponent": "1/2",
+    "source_rho_log2_work": 40.50000000000046,
+    "candidate_minus_source_log2_work": 70.1666666666662,
+    "scope": "asymptotic exponent screen only; constants and transfer costs would increase the candidate ledger"
+  },
+  "gates": {
+    "ambient_distribution_applies_to_image": "fail",
+    "arbitrary_destination_class_projection_to_image": "missing",
+    "factor_base_closed_in_image": "missing",
+    "relation_collection_to_scalar_recovery": "missing",
+    "destination_and_source_replay": "supported_for_generic_controls_only",
+    "predicted_advantage_over_source_rho": "fail"
+  },
+  "prohibited_shortcut": "Calling a source elliptic solver and re-encoding its answer is a transported-data control, not a destination calculus.",
+  "next_candidate_admission": [
+    "image-domain factor base or search space",
+    "relation probability for cyclic-image samples",
+    "explicit image projection or image-closed relations",
+    "complete relation, linear algebra, individual-log and recovery path",
+    "cost in q and r with memory and transfer",
+    "source, destination-generic, transported-data and A/A controls"
+  ],
+  "evidence": {
+    "exact_certificate_sha256": "911fdab8e1d2978fb995de90b743dd1a3e97719e960515f5668e53dcdb51e819",
+    "gaudry_eprint_postscript_sha256": "4a8a33f429715f065f2988dc1f03f721189635657f9622128171d02e61a82fbd",
+    "gaudry_eprint_url": "https://eprint.iacr.org/2004/073",
+    "gttd_doi": "10.1090/S0025-5718-06-01900-4",
+    "ams_pdf_fetch": "http_403"
+  }
+}

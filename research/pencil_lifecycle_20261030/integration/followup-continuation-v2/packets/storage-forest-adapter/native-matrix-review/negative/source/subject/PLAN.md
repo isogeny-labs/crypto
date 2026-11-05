@@ -1,0 +1,7 @@
+# Retained matrix certificate binding audit
+
+Read only the exact historical theta/model JSONL identified by the N16 summary and content-addressed manifest. Restore existing bytes privately from Git/local cache; no network/cloud/model generation. Verify input digest pins, unique prime keys, exact 21-model membership, five ordered actions each, canonical4x4 coordinates, prime p<=2^32, and each M²=cI with c!=0. Compare c in source order with the retained certificate. Report normalized root using the literal loader formula, preserving order. This is replay of fixed coefficient identities, not curve/class enumeration or a new scientific trial.
+
+The actual walk source loads these paths directly and uses narrow arithmetic; record source bytes and exact loader lines. The N16 checker uses widened multiplication; audit uses widened exact modular arithmetic. Existing word theorem supplies narrow multiplication under the checked bounds; full row-fold and compiled binary/input provenance remain separate.
+
+Fixed controls: identity and doubled permutation accepted; zero matrix and unequal diagonal square rejected; altered digest, wrong matrix shape, out-of-range coefficient and composite modulus rejected. Fail closed. Exact native output and pre/post digests retained. Independent reviewer checks source linkage and identities before any composed claim. No costs, point samples, trajectories or hypothesis promotion.

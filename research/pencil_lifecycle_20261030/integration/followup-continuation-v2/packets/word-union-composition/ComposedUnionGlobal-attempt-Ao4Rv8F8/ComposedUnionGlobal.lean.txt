@@ -1,0 +1,41 @@
+import ComposedUnionState
+set_option autoImplicit false
+namespace SignedWord
+
+theorem sd_square (r : UInt64) (c : Int8) (hc : Sign c) : sd r c*sd r c=1 := by
+ rcases sd_sign r c hc with h|h <;> rw [h] <;> ring
+
+theorem joinWord_preserves {n : Nat} (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (child parent : Fin n) (p : Pot) (v : Fin n → F r) (k : F r)
+ (hp : 0<r.toNat) (hb : r.toNat≤2^63) (hgp : GoodPot r p) (hgf : FixedGood r s)
+ (hvalid : GraphUnion.Valid (unionDecode r s) v k)
+ (he : v child=SignedGraphAlgebra.eval (decPot r p) (v parent) k) :
+ GraphUnion.Valid (unionDecode r (joinWord r s child parent p)) v k := by
+ rw [joinWord_decode r s child parent p hp hb hgp hgf]
+ exact GraphUnion.join_preserves _ child parent _ v k hvalid (sd_square r p.s hgp.1) he
+
+theorem forward_union_preserves {n : Nat} (r a b : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (ru rv : Fin n) (cu cv : Int8) (v : Fin n → F r) (k : F r)
+ (hp : 0<r.toNat) (hb : r.toNat≤2^63) (ha : a.toNat<r.toNat) (hbb : b.toNat<r.toNat)
+ (hcu : Sign cu) (hcv : Sign cv) (hgf : FixedGood r s)
+ (hvalid : GraphUnion.Valid (unionDecode r s) v k)
+ (he : sd r cu*v ru+sd r cv*v rv=wd r a+wd r b*k) :
+ GraphUnion.Valid (unionDecode r (joinWord r s ru rv (unionPot r cu cv a b))) v k := by
+ have hc := unionPot_correct r a b cu cv hp ha hbb hcu hcv
+ apply joinWord_preserves r s ru rv _ v k hp hb hc.1 hgf hvalid
+ rw [hc.2]
+ exact SignedGraphAlgebra.union_forward _ _ _ _ _ _ _ (sd_square r cu hcu) he
+
+theorem backward_union_preserves {n : Nat} (r a b : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (ru rv : Fin n) (cu cv : Int8) (v : Fin n → F r) (k : F r)
+ (hp : 0<r.toNat) (hb : r.toNat≤2^63) (ha : a.toNat<r.toNat) (hbb : b.toNat<r.toNat)
+ (hcu : Sign cu) (hcv : Sign cv) (hgf : FixedGood r s)
+ (hvalid : GraphUnion.Valid (unionDecode r s) v k)
+ (he : sd r cu*v ru+sd r cv*v rv=wd r a+wd r b*k) :
+ GraphUnion.Valid (unionDecode r (joinWord r s rv ru (reversePot r (unionPot r cu cv a b)))) v k := by
+ have hc := unionPot_correct r a b cu cv hp ha hbb hcu hcv
+ have hr := reversePot_correct r _ hp hc.1
+ apply joinWord_preserves r s rv ru _ v k hp hb hr.1 hgf hvalid
+ rw [hr.2,hc.2]
+ exact SignedGraphAlgebra.union_backward _ _ _ _ _ _ _ (sd_square r cu hcu) (sd_square r cv hcv) he
+end SignedWord

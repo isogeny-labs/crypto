@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "sudo",
+    "-n",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=3s",
+    "30s",
+    "prlimit",
+    "--as=536870912",
+    "--fsize=10485760",
+    "/usr/sbin/debugfs",
+    "-R",
+    "cat /qualification-receipts/receipt.json",
+    "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+  ],
+  "exit_code": 0,
+  "bytes": 1073,
+  "debugfs_sha256": "182ed6f9705281473c5d0a10c613b8ee803c09e3cf4b5d10381e74d44ce33afc",
+  "disk_stat_unchanged": true,
+  "disk_content_rehashed": false,
+  "observed_utc": "2026-11-03T19:34:22.900788+00:00",
+  "qualification_receipt_status": "failed",
+  "qualification_cases_passed": 0
+}
