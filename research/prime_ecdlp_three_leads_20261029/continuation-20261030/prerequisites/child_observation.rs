@@ -33,6 +33,16 @@ impl ObservedExit {
         self.status.code()
     }
 
+    pub fn success(&self) -> bool {
+        self.status.success()
+    }
+
+    #[cfg(unix)]
+    pub fn signal(&self) -> Option<i32> {
+        use std::os::unix::process::ExitStatusExt;
+        self.status.signal()
+    }
+
     pub fn deadline_stop_requested(&self) -> bool {
         self.deadline_stop_requested
     }
