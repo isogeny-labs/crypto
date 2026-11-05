@@ -146,16 +146,8 @@ pub fn method_determinism(m: &ResolvedMethod) -> Determinism {
 /// every other session's do.  Session id, and why.
 pub const FAILED_OUTCOME_REPLAY_EXEMPT: &[(&str, &str)] = &[
     (
-        "ECBS1hedc734e1870d",
-        "factor_bases_20261013/koblitz17-algebraic: the two exhausted runs' solver work is pinned now, wall-priced then",
-    ),
-    (
         "ECBS1h4c7b9db8a389",
         "rootfinding_arity_20261013/prime20-b64-m2-vs-m3: `rootfind-subtract` refused prime curves then and runs on them now",
-    ),
-    (
-        "ECBS1h302934ff99ed",
-        "f6_ic_ecbench_ladder_20261005/n7: 48 of the 72 exhausted runs count other phase work under the current code",
     ),
 ];
 
