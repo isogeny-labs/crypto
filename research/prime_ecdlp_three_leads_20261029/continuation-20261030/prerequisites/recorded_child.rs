@@ -46,7 +46,9 @@ fn unhex(text: &str) -> io::Result<String> {
     }
     let bytes: Vec<u8> = text
         .as_bytes()
-        .chunks_exact(2)
+        .as_chunks::<2>()
+        .0
+        .iter()
         .map(|p| {
             u8::from_str_radix(std::str::from_utf8(p).expect("ASCII checked"), 16)
                 .expect("hex checked")
@@ -782,7 +784,15 @@ mod tests {
 
     #[test]
     fn malformed_oversize_symlink_missing_and_pending_launch_fail_closed() {
-        for mode in ["torn", "oversize", "symlink", "pending", "missing-event"] {
+        for mode in [
+            "torn",
+            "oversize",
+            "symlink",
+            "pending",
+            "missing-event",
+            "odd-error-hex",
+            "non-utf8-error",
+        ] {
             let root = Scratch::new();
             let prepared = Prepared::begin(&root.0, identity("one"), command("ok")).unwrap();
             let descriptor = prepared.descriptor().clone();
@@ -808,6 +818,17 @@ mod tests {
                     continue;
                 }
                 "missing-event" => prepared.attempt.finish(Outcome::Completed).unwrap(),
+                "odd-error-hex" | "non-utf8-error" => {
+                    let bad = if mode == "odd-error-hex" { "f" } else { "ff" };
+                    fs::write(
+                        root.0.join("one/before"),
+                        descriptor.record(
+                            "PKM_BEFORE_CHILD_V1",
+                            &format!("kind=gate-error\nmessage_hex={bad}\n"),
+                        ),
+                    )
+                    .unwrap();
+                }
                 _ => unreachable!(),
             }
             assert!(inspect(&root.0, &descriptor).is_err());
