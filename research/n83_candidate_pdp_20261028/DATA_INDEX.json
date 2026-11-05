@@ -1285,6 +1285,99 @@
           "sha256": "65b4ee54a334551e5dca74ac91b5b8235ae48c2f04d14c2160842e156ca10991"
         }
       ]
+    },
+    {
+      "id": "r29-firstfall-attempt-01",
+      "contains": "48 fixed-base spike29 V2 first-fall systems for m=2-9; all certified and fresh-process replayed with S3 certificate readbacks; post-run independent validation and full archive readback; exact FFD 2 for Koblitz/binary, prime FFD lower bound >=5; no exact LFD or affine Dreg",
+      "files": [
+        {
+          "kind": "run_evidence",
+          "path": "evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/summary.json",
+          "bytes": 74671,
+          "sha256": "7598d41a675e4edfaf2f32b7f08456f186116560382720902d6936717a6d0f74"
+        },
+        {
+          "kind": "run_evidence",
+          "path": "evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/custody.json",
+          "bytes": 640,
+          "sha256": "7cb74ea1bf92bb8aa835cf19fe94c46551ff92497c4a91eafa1cd310228fbdc4"
+        },
+        {
+          "kind": "run_evidence",
+          "path": "evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/FILE_LAYOUT.json",
+          "bytes": 69896,
+          "sha256": "8cae22b8b21a767fe81f57707fef6f36a9c36929568cef8ce0ed49f3b1717553"
+        },
+        {
+          "kind": "run_evidence",
+          "path": "evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/post-run-analysis/independent-validation.json",
+          "bytes": 27171,
+          "sha256": "7a6b770cb1398e527802de7c5bda9ff38a563e349a5ddb838e9abd1b16bd051c"
+        },
+        {
+          "kind": "run_evidence",
+          "path": "evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/post-run-analysis/archive-readback.json",
+          "bytes": 534,
+          "sha256": "fc494599ee33fde601e2340db270e45865629e273c0c21cd3395e6fefa78c7b0"
+        },
+        {
+          "kind": "run_evidence",
+          "path": "evidence/n83-factorbase-variants/first-fall-coverage-20261102/coverage.json",
+          "bytes": 22693,
+          "sha256": "d282beca74bc0e215c1be5d43c1fd2271aeac0599bc0abdf109bc2a94f6784ef"
+        },
+        {
+          "kind": "run_report",
+          "path": "reports/run-20261105T1540Z-r29-firstfall/README.md",
+          "bytes": 3038,
+          "sha256": "1b334948dc4d4be74a6fcdd33473137bb47b2439a6a3b9b840f3140ae50b5527"
+        },
+        {
+          "kind": "run_report",
+          "path": "reports/run-20261105T1540Z-r29-firstfall/plot.csv",
+          "bytes": 129,
+          "sha256": "58eb622cf3a358313734c0160f201b5fe5922fb9f40be9912ea04130e4322064"
+        },
+        {
+          "kind": "run_report",
+          "path": "reports/run-20261105T1540Z-r29-firstfall/plot.svg",
+          "bytes": 1631,
+          "sha256": "792a320e9068eac64e5ae5651b71d9c4c87d29cb4ea638dd3dfce805d288a85a"
+        },
+        {
+          "kind": "run_report",
+          "path": "reports/run-20261105T1540Z-r29-firstfall/plot_source.py",
+          "bytes": 1528,
+          "sha256": "b41b7f127cf1e995cdd4e97b215bb8155c732b36f8e7288aef2941edcc3b0604"
+        },
+        {
+          "kind": "run_report",
+          "path": "reports/run-20261105T1540Z-r29-firstfall/report.pdf",
+          "bytes": 20941,
+          "sha256": "98cc63859fb71e69fb9f4bbcfdf32a21e6f110deaf14a826f5b0bbc361ffaa28"
+        },
+        {
+          "kind": "run_report",
+          "path": "reports/run-20261105T1540Z-r29-firstfall/report.tex",
+          "bytes": 1983,
+          "sha256": "542950536e492edf60be7196c05b973e5b78c39e3e89e08c4efae0632c5fd7c3"
+        },
+        {
+          "kind": "run_evidence",
+          "path": "evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/post-run-analysis/FILE_LAYOUT.json",
+          "bytes": 772,
+          "sha256": "d611c2bd1c7efd5226836b10ea33b406c54fd51ae0959e8c6851c71a310a0bec"
+        },
+        {
+          "kind": "s3_addendum_readback",
+          "path": "evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/post-run-analysis/analysis-addendum-readback.json",
+          "bytes": 520,
+          "sha256": "1cfd1636dcdb5342760676153c1ce8cfcdac82acc65f71a3feeab803f051f2ea"
+        }
+      ],
+      "s3_archive": "s3://setec-astronomy-artifacts/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike29/attempt-01/panel-complete.tar.gz",
+      "s3_analysis": "s3://setec-astronomy-artifacts/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike29/attempt-01/analysis/",
+      "protocol_sha256": "50cd6f8213789de2dfd54a3b33a067ed87cc0def761b7c98769be3e19aee47a9"
     }
   ],
   "semantics": [
@@ -1325,5 +1418,6 @@
         "sha256": "ae52848b740f9daa93620a6f6737a628bf78ad8ec1b5dac6233924b909bbd0f2"
       }
     ]
-  }
+  },
+  "latest_first_fall_dataset": "r29-firstfall-attempt-01"
 }
