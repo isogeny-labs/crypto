@@ -1,6 +1,6 @@
 # IC representative selection on ℓ = 2 volcanoes: preregistered, not run
 
-**State (2026-11-05): design frozen, nothing measured.** No job has been
+**State (2026-11-05): design frozen, nothing measured** (`protocol.json` protocol_sha256 `dcee3b0f…a8188`, frozen at commit `c6cd50bcc8`). No job has been
 submitted to Iso Lab, EKS or any cloud host, and Stage 0 (class generation)
 has not run. This directory holds the preregistration and the native tooling
 the run needs. It contains no result.

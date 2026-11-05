@@ -1,1187 +1,1187 @@
 {
- "schema": "experiment.protocol/v1",
- "protocol_id": "CRYPTO-ic-representative-selection-20261105",
- "version": 1,
- "created": "2026-11-05",
- "repository": "crypto",
- "study_dir": "research/ic-representative-selection_20261105",
- "authors": [
-  "IC representative-selection workstream (core tier, design and preregistration)"
- ],
- "links": {
-  "lead": "crypto-autoresearcher:knowledge/leads/ecdlp/structure/LEAD-STR-class-representative-ic-selection.yaml",
-  "narrative": "research/ic-representative-selection_20261105/PROTOCOL.md",
-  "design": "research/ic-representative-selection_20261105/design.json",
-  "comparisons": "research/ic-representative-selection_20261105/comparisons.json",
-  "prior": "research/isogeny-volcano-cost-v2_20261017"
- },
- "question": "On l = 2, depth-3, split-crater volcanoes at 24- and 28-bit p, does carrying a floor-curve ECDLP instance to the crater by verified 2-isogenies (transport charged) lower the charged index-calculus cost S below solving it on the floor, and does solving a crater instance on the best of 16 isomorphic models (chosen on calibration targets) lower S on held-out targets below the default model?",
- "claims": [
-  {
-   "id": "K1",
-   "text": "Every counted run recovers the planted scalar; every transported generator is on its codomain with order r and every edge is additive (repsel verify).",
-   "class": "exact_computation",
-   "decided_by": []
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "CRYPTO-ic-representative-selection-20261105",
+  "version": 1,
+  "created": "2026-11-05",
+  "repository": "crypto",
+  "study_dir": "research/ic-representative-selection_20261105",
+  "authors": [
+    "IC representative-selection workstream (core tier, design and preregistration)"
+  ],
+  "links": {
+    "lead": "crypto-autoresearcher:knowledge/leads/ecdlp/structure/LEAD-STR-class-representative-ic-selection.yaml",
+    "narrative": "research/ic-representative-selection_20261105/PROTOCOL.md",
+    "design": "research/ic-representative-selection_20261105/design.json",
+    "comparisons": "research/ic-representative-selection_20261105/comparisons.json",
+    "prior": "research/isogeny-volcano-cost-v2_20261017"
   },
-  {
-   "id": "K2",
-   "text": "Arm B costs less charged S than arm A at every band weight (0, 0.1, 1 GAE per native op), at 24-bit p.",
-   "class": "comparative",
-   "decided_by": [
-    "C-B24"
-   ],
-   "if_supported": "floor-to-crater transport is a measured constant-factor IC improvement at 24-bit p (scope: these 12 classes, this factor base)",
-   "if_not_supported": "unresolved across the band, vanished within 3%, or inconclusive, per the decision rule"
-  },
-  {
-   "id": "K3",
-   "text": "As K2 at 28-bit p.",
-   "class": "comparative",
-   "decided_by": [
-    "C-B28"
-   ],
-   "if_supported": "the floor deficit survives at 28-bit p net of transport",
-   "if_not_supported": "as K2"
-  },
-  {
-   "id": "K4",
-   "text": "Arm Csel costs less S than Cdef on held-out targets at every band weight, 24-bit p.",
-   "class": "comparative",
-   "decided_by": [
-    "C-C24"
-   ],
-   "if_supported": "model selection is a measured per-target constant-factor improvement after a one-time selection whose cost is reported separately (break-even target count)",
-   "if_not_supported": "the v2 model effect does not survive held-out testing at this resolution"
-  },
-  {
-   "id": "K5",
-   "text": "As K4 at 28-bit p, 6 classes (secondary).",
-   "class": "comparative",
-   "decided_by": [
-    "C-C28"
-   ],
-   "if_supported": "descriptive support at 28 bits",
-   "if_not_supported": "descriptive"
-  },
-  {
-   "id": "K6",
-   "text": "Every IC arm is above matched rho (the distance remaining).",
-   "class": "comparative",
-   "decided_by": [
-    "C-GAP"
-   ],
-   "if_supported": "reported as the distance remaining, not as a gate",
-   "if_not_supported": "a parity crossing would be escalated to the breakthrough reviewers"
-  },
-  {
-   "id": "K7",
-   "text": "Nothing here is a security statement about any curve or about ECDLP at cryptographic sizes.",
-   "class": "out_of_scope",
-   "decided_by": []
-  }
- ],
- "hypotheses": [
-  {
-   "id": "H_B",
-   "statement": "l = 2 floor curves have a lower IC relation yield than their crater (v2 H1), so solving a floor instance on the crater, net of the charged transport, lowers S.",
-   "mechanism": "the prime-abscissa factor base's relation yield is a property of the point set (pair46 03-floor-pullback); its cause on l = 2 floors is open (v2 mechanism contrasts)",
-   "predictions": [
+  "question": "On l = 2, depth-3, split-crater volcanoes at 24- and 28-bit p, does carrying a floor-curve ECDLP instance to the crater by verified 2-isogenies (transport charged) lower the charged index-calculus cost S below solving it on the floor, and does solving a crater instance on the best of 16 isomorphic models (chosen on calibration targets) lower S on held-out targets below the default model?",
+  "claims": [
     {
-     "id": "P-B24",
-     "metric": "s",
-     "direction": "lower",
-     "minimum_effect": "theta(B/A) at w = 0 in [0.93, 0.99] (v2 H5 1.045 => 0.957); the charged transport (1,034-2,125 native ops per run on the 14 v2 l=2 classes, repsel ascend) adds at most about 2.5% of S at w = 1",
-     "provenance": {
-      "written_at": "2026-11-05",
-      "first_recorded_in": "research/ic-representative-selection_20261105/PROTOCOL.md",
-      "data_seen": [
-       {
-        "path": "research/isogeny-volcano-cost-v2_20261017/README.md",
-        "measured": "H1 l=2 IC yield floor/crater 0.942 [0.928, 0.956]; H5 IC S floor/crater 1.045 [1.023, 1.067]; model tau 7.2% (yield, all classes), S model tau 9.8% vs null p95 7.4% (l=2)"
-       },
-       {
-        "path": "research/isogeny-volcano-cost-v2_20261017/analysis/v2.1-H1-l2.json",
-        "measured": "metric S, ic-mitm: vertical 1.0453, model tau_rel 0.0977 (null p95 0.0739), horizontal tau_rel 0.0197"
-       }
+      "id": "K1",
+      "text": "Every counted run recovers the planted scalar; every transported generator is on its codomain with order r and every edge is additive (repsel verify).",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "K2",
+      "text": "Arm B costs less charged S than arm A at every band weight (0, 0.1, 1 GAE per native op), at 24-bit p.",
+      "class": "comparative",
+      "decided_by": [
+        "C-B24"
       ],
-      "sample_status": "out_of_sample"
-     },
-     "role": "decisive"
+      "if_supported": "floor-to-crater transport is a measured constant-factor IC improvement at 24-bit p (scope: these 12 classes, this factor base)",
+      "if_not_supported": "unresolved across the band, vanished within 3%, or inconclusive, per the decision rule"
     },
     {
-     "id": "P-B28",
-     "metric": "s",
-     "direction": "lower",
-     "minimum_effect": "no prior at 28 bits; transport below 0.5% of S at w = 1 (derived: ops ~ log p, S*sqrt(r) ~ p)",
-     "provenance": {
-      "written_at": "2026-11-05",
-      "first_recorded_in": "research/ic-representative-selection_20261105/PROTOCOL.md",
-      "data_seen": [],
-      "sample_status": "out_of_sample"
-     },
-     "role": "decisive"
-    }
-   ]
-  },
-  {
-   "id": "H_C",
-   "statement": "Isomorphic models of one crater curve differ in IC cost (v2 H4: model tau 7.2% yield, 9.8% S against a null p95 of 7.4%), so the model chosen on calibration targets is cheaper on held-out targets.",
-   "mechanism": "which points have small abscissae changes under (x,y)->(u^2x,u^3y); whether that changes yield beyond sampling noise is the question",
-   "predictions": [
-    {
-     "id": "P-C24",
-     "metric": "s",
-     "direction": "lower",
-     "minimum_effect": "held-out theta(Csel/Cdef) about 0.95 if the true model spread sigma_m is 5% (derived in PROTOCOL.md section 5); about 0.98 at sigma_m = 3%; 1.00 if the v2 effect was noise",
-     "provenance": {
-      "written_at": "2026-11-05",
-      "first_recorded_in": "research/ic-representative-selection_20261105/PROTOCOL.md",
-      "data_seen": [
-       {
-        "path": "research/isogeny-volcano-cost-v2_20261017/README.md",
-        "measured": "H1 l=2 IC yield floor/crater 0.942 [0.928, 0.956]; H5 IC S floor/crater 1.045 [1.023, 1.067]; model tau 7.2% (yield, all classes), S model tau 9.8% vs null p95 7.4% (l=2)"
-       },
-       {
-        "path": "research/isogeny-volcano-cost-v2_20261017/analysis/v2.1-H1-l2.json",
-        "measured": "metric S, ic-mitm: vertical 1.0453, model tau_rel 0.0977 (null p95 0.0739), horizontal tau_rel 0.0197"
-       }
+      "id": "K3",
+      "text": "As K2 at 28-bit p.",
+      "class": "comparative",
+      "decided_by": [
+        "C-B28"
       ],
-      "sample_status": "out_of_sample"
-     },
-     "role": "decisive"
+      "if_supported": "the floor deficit survives at 28-bit p net of transport",
+      "if_not_supported": "as K2"
+    },
+    {
+      "id": "K4",
+      "text": "Arm Csel costs less S than Cdef on held-out targets at every band weight, 24-bit p.",
+      "class": "comparative",
+      "decided_by": [
+        "C-C24"
+      ],
+      "if_supported": "model selection is a measured per-target constant-factor improvement after a one-time selection whose cost is reported separately (break-even target count)",
+      "if_not_supported": "the v2 model effect does not survive held-out testing at this resolution"
+    },
+    {
+      "id": "K5",
+      "text": "As K4 at 28-bit p, 6 classes (secondary).",
+      "class": "comparative",
+      "decided_by": [
+        "C-C28"
+      ],
+      "if_supported": "descriptive support at 28 bits",
+      "if_not_supported": "descriptive"
+    },
+    {
+      "id": "K6",
+      "text": "Every IC arm is above matched rho (the distance remaining).",
+      "class": "comparative",
+      "decided_by": [
+        "C-GAP"
+      ],
+      "if_supported": "reported as the distance remaining, not as a gate",
+      "if_not_supported": "a parity crossing would be escalated to the breakthrough reviewers"
+    },
+    {
+      "id": "K7",
+      "text": "Nothing here is a security statement about any curve or about ECDLP at cryptographic sizes.",
+      "class": "out_of_scope",
+      "decided_by": []
     }
-   ]
-  }
- ],
- "arms": [
-  {
-   "id": "rho-neg",
-   "role": "reference",
-   "description": "rho.negation (ecbench arm rho-neg) on every workload; the matched rho of an instance is rho-neg on the instance's source curve (the floor curve for A/B/B0, crater model 0 for C)",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+  ],
+  "hypotheses": [
+    {
+      "id": "H_B",
+      "statement": "l = 2 floor curves have a lower IC relation yield than their crater (v2 H1), so solving a floor instance on the crater, net of the charged transport, lowers S.",
+      "mechanism": "the prime-abscissa factor base's relation yield is a property of the point set (pair46 03-floor-pullback); its cause on l = 2 floors is open (v2 mechanism contrasts)",
+      "predictions": [
+        {
+          "id": "P-B24",
+          "metric": "s",
+          "direction": "lower",
+          "minimum_effect": "theta(B/A) at w = 0 in [0.93, 0.99] (v2 H5 1.045 => 0.957); the charged transport (1,034-2,125 native ops per run on the 14 v2 l=2 classes, repsel ascend) adds at most about 2.5% of S at w = 1",
+          "provenance": {
+            "written_at": "2026-11-05",
+            "first_recorded_in": "research/ic-representative-selection_20261105/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny-volcano-cost-v2_20261017/README.md",
+                "measured": "H1 l=2 IC yield floor/crater 0.942 [0.928, 0.956]; H5 IC S floor/crater 1.045 [1.023, 1.067]; model tau 7.2% (yield, all classes), S model tau 9.8% vs null p95 7.4% (l=2)"
+              },
+              {
+                "path": "research/isogeny-volcano-cost-v2_20261017/analysis/v2.1-H1-l2.json",
+                "measured": "metric S, ic-mitm: vertical 1.0453, model tau_rel 0.0977 (null p95 0.0739), horizontal tau_rel 0.0197"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-B28",
+          "metric": "s",
+          "direction": "lower",
+          "minimum_effect": "no prior at 28 bits; transport below 0.5% of S at w = 1 (derived: ops ~ log p, S*sqrt(r) ~ p)",
+          "provenance": {
+            "written_at": "2026-11-05",
+            "first_recorded_in": "research/ic-representative-selection_20261105/PROTOCOL.md",
+            "data_seen": [],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "rho.negation"
-   }
-  },
-  {
-   "id": "A",
-   "role": "baseline",
-   "description": "floor instance solved on its floor curve (model as walked), ic-mitm",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "H_C",
+      "statement": "Isomorphic models of one crater curve differ in IC cost (v2 H4: model tau 7.2% yield, 9.8% S against a null p95 of 7.4%), so the model chosen on calibration targets is cheaper on held-out targets.",
+      "mechanism": "which points have small abscissae changes under (x,y)->(u^2x,u^3y); whether that changes yield beyond sampling noise is the question",
+      "predictions": [
+        {
+          "id": "P-C24",
+          "metric": "s",
+          "direction": "lower",
+          "minimum_effect": "held-out theta(Csel/Cdef) about 0.95 if the true model spread sigma_m is 5% (derived in PROTOCOL.md section 5); about 0.98 at sigma_m = 3%; 1.00 if the v2 effect was noise",
+          "provenance": {
+            "written_at": "2026-11-05",
+            "first_recorded_in": "research/ic-representative-selection_20261105/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny-volcano-cost-v2_20261017/README.md",
+                "measured": "H1 l=2 IC yield floor/crater 0.942 [0.928, 0.956]; H5 IC S floor/crater 1.045 [1.023, 1.067]; model tau 7.2% (yield, all classes), S model tau 9.8% vs null p95 7.4% (l=2)"
+              },
+              {
+                "path": "research/isogeny-volcano-cost-v2_20261017/analysis/v2.1-H1-l2.json",
+                "measured": "metric S, ic-mitm: vertical 1.0453, model tau_rel 0.0977 (null p95 0.0739), horizontal tau_rel 0.0197"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation (ecbench arm rho-neg) on every workload; the matched rho of an instance is rho-neg on the instance's source curve (the floor curve for A/B/B0, crater model 0 for C)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=32",
-    "oracle": "mitm:negation_folded=1",
-    "workloads": "floor curve, model 0, stage ab"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "B",
-   "role": "candidate",
-   "description": "the same floor instance carried by three verified 2-isogenies to the crater (repsel ascend, every path-finding and point-map field operation charged) and solved there, ic-mitm",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "A",
+      "role": "baseline",
+      "description": "floor instance solved on its floor curve (model as walked), ic-mitm",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "workloads": "floor curve, model 0, stage ab"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=32",
-    "oracle": "mitm:negation_folded=1",
-    "workloads": "ascended crater model, stage b",
-    "extra_ops": "transport.jsonl B.ops_total (largest of the group)"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "B0",
-   "role": "control_negative",
-   "description": "the same floor instance carried two steps to its sibling floor curve (same level, same transport machinery, charged) and solved there: separates re-modelling and transport from the level change",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "B",
+      "role": "candidate",
+      "description": "the same floor instance carried by three verified 2-isogenies to the crater (repsel ascend, every path-finding and point-map field operation charged) and solved there, ic-mitm",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "workloads": "ascended crater model, stage b",
+        "extra_ops": "transport.jsonl B.ops_total (largest of the group)"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=32",
-    "oracle": "mitm:negation_folded=1",
-    "workloads": "sibling floor model, stage ab",
-    "extra_ops": "transport.jsonl B0.ops_total"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "Aaa",
-   "role": "control_aa",
-   "description": "arm A re-measured under an independent measurement seed (stage aa): the IC noise floor of the B-vs-A statistic",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "B0",
+      "role": "control_negative",
+      "description": "the same floor instance carried two steps to its sibling floor curve (same level, same transport machinery, charged) and solved there: separates re-modelling and transport from the level change",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "workloads": "sibling floor model, stage ab",
+        "extra_ops": "transport.jsonl B0.ops_total"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=32",
-    "oracle": "mitm:negation_folded=1",
-    "measurement_seed": "aa"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "Cdef",
-   "role": "baseline",
-   "description": "crater instance on the crater curve's default model (model 0), held-out targets",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "Aaa",
+      "role": "control_aa",
+      "description": "arm A re-measured under an independent measurement seed (stage aa): the IC noise floor of the B-vs-A statistic",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "measurement_seed": "aa"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=32",
-    "oracle": "mitm:negation_folded=1",
-    "workloads": "crater model 0, stage hold"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "Csel",
-   "role": "candidate",
-   "description": "the same crater instance moved by the isomorphism (x,y)->(u^2x,u^3y) to the model with the lowest mean calibration S among 16 (selection.json, frozen before any held-out run), 6 field ops charged",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "Cdef",
+      "role": "baseline",
+      "description": "crater instance on the crater curve's default model (model 0), held-out targets",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "workloads": "crater model 0, stage hold"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=32",
-    "oracle": "mitm:negation_folded=1",
-    "workloads": "selected model, stage hold"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "Cdefaa",
-   "role": "control_aa",
-   "description": "arm Cdef re-measured under an independent measurement seed (stage holdaa)",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "Csel",
+      "role": "candidate",
+      "description": "the same crater instance moved by the isomorphism (x,y)->(u^2x,u^3y) to the model with the lowest mean calibration S among 16 (selection.json, frozen before any held-out run), 6 field ops charged",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "workloads": "selected model, stage hold"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=32",
-    "oracle": "mitm:negation_folded=1",
-    "measurement_seed": "holdaa"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "Crho",
-   "role": "control_negative",
-   "description": "the selection rule applied to rho-neg calibration S (rho has no expected model effect); rho-neg measured on that model with held-out targets",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "Cdefaa",
+      "role": "control_aa",
+      "description": "arm Cdef re-measured under an independent measurement seed (stage holdaa)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "measurement_seed": "holdaa"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "rho.negation",
-    "workloads": "rho-selected model, stage hold"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "rho-neg-aa",
-   "role": "control_aa",
-   "description": "rho.negation under a second arm name with the same seeds in every session: a determinism check (every pair must be identical) and the Iso Lab A/A admission arm",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "Crho",
+      "role": "control_negative",
+      "description": "the selection rule applied to rho-neg calibration S (rho has no expected model effect); rho-neg measured on that model with held-out targets",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "workloads": "rho-selected model, stage hold"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "rho.negation"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "ic-mitm-plus1",
-   "role": "control_positive",
-   "description": "ic.pipeline with a 33-point base on the ctl workloads: planted relation-yield increase (33/32)^2 = 1.0635",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation under a second arm name with the same seeds in every session: a determinism check (every pair must be identical) and the Iso Lab A/A admission arm",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "ic.pipeline",
-    "factor_base": "prime-abscissa:size=33",
-    "oracle": "mitm:negation_folded=1"
-   },
-   "same_instrument_as": "rho-neg"
-  },
-  {
-   "id": "bsgs-neg",
-   "role": "control_positive",
-   "description": "bsgs.negation on the ctl workloads (A, B, B0 of one group, two targets): its cost depends only on the discrete log, so one distinct cost per (group, target) proves the transport and the instance pairing",
-   "instrument": {
-    "repo": "crypto",
-    "commit": null,
-    "build": [
-     [
-      "cargo",
-      "build",
-      "--release",
-      "--locked",
-      "--bin",
-      "ecbench"
-     ]
-    ],
-    "binary_sha256": null,
-    "flags": {},
-    "env": {
-     "RAYON_NUM_THREADS": "1",
-     "OMP_NUM_THREADS": "1"
+    {
+      "id": "ic-mitm-plus1",
+      "role": "control_positive",
+      "description": "ic.pipeline with a 33-point base on the ctl workloads: planted relation-yield increase (33/32)^2 = 1.0635",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=33",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "same_instrument_as": "rho-neg"
     },
-    "threads": 1
-   },
-   "parameters": {
-    "method": "bsgs.negation"
-   },
-   "same_instrument_as": "rho-neg"
-  }
- ],
- "controls": {
-  "aa": {
-   "present": true,
-   "comparison": "C-AA",
-   "not_applicable_reason": null
+    {
+      "id": "bsgs-neg",
+      "role": "control_positive",
+      "description": "bsgs.negation on the ctl workloads (A, B, B0 of one group, two targets): its cost depends only on the discrete log, so one distinct cost per (group, target) proves the transport and the instance pairing",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-AA",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "ic-mitm-plus1",
+      "expected_detection": "relation-yield ratio ic-mitm-plus1 / ic-mitm on the ctl workloads has a 95% CI excluding 1 (predicted 1.0635; v2 measured 1.062 [1.060, 1.064]); bsgs-neg has exactly one distinct cost per (tier, class, group, target); the analysis power controls (A/A data with X scaled by 0.96) reach p_iut < 0.0167",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "Crho",
+      "null_population": {
+        "description": "the selection procedure run on rho.negation, whose expected cost is invariant under isomorphism (v2 H3/H4: rho model effect not beyond its null, p = 0.08); and B0, the same carrier landing on the same level",
+        "generator": "the same calibration and held-out sessions as arm C (rho-neg arm), and the ab-stage sessions (B0)",
+        "n": 144,
+        "why_n": "one unit per crater curve, the same units as H_C, so the null has the same resolution as the test",
+        "matched_on": [
+          "curves",
+          "models",
+          "targets",
+          "seeds",
+          "sessions",
+          "selection rule",
+          "held-out split",
+          "charging"
+        ]
+      },
+      "not_applicable_reason": null
+    }
   },
-  "positive": {
-   "present": true,
-   "arm": "ic-mitm-plus1",
-   "expected_detection": "relation-yield ratio ic-mitm-plus1 / ic-mitm on the ctl workloads has a 95% CI excluding 1 (predicted 1.0635; v2 measured 1.062 [1.060, 1.064]); bsgs-neg has exactly one distinct cost per (tier, class, group, target); the analysis power controls (A/A data with X scaled by 0.96) reach p_iut < 0.0167",
-   "not_applicable_reason": null
-  },
-  "negative": {
-   "present": true,
-   "arm": "Crho",
-   "null_population": {
-    "description": "the selection procedure run on rho.negation, whose expected cost is invariant under isomorphism (v2 H3/H4: rho model effect not beyond its null, p = 0.08); and B0, the same carrier landing on the same level",
-    "generator": "the same calibration and held-out sessions as arm C (rho-neg arm), and the ab-stage sessions (B0)",
-    "n": 144,
-    "why_n": "one unit per crater curve, the same units as H_C, so the null has the same resolution as the test",
-    "matched_on": [
-     "curves",
-     "models",
-     "targets",
-     "seeds",
-     "sessions",
-     "selection rule",
-     "held-out split",
-     "charging"
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "procedure",
+        "levels": [
+          "A: solve on the floor curve",
+          "B: carry to the crater (charged), solve there",
+          "B0: carry to the sibling floor curve (charged), solve there",
+          "Cdef: solve on the default crater model",
+          "Csel: move to the calibration-selected model (charged), solve there",
+          "Crho: move to the rho-selected model"
+        ]
+      },
+      {
+        "name": "level of the solving curve",
+        "levels": [
+          "floor",
+          "crater"
+        ]
+      },
+      {
+        "name": "factor base size",
+        "levels": [
+          32,
+          33
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "ic.pipeline",
+          "rho.negation",
+          "bsgs.negation"
+        ]
+      },
+      {
+        "name": "tier (bits of p)",
+        "levels": [
+          24,
+          28
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "ecbench built at the frozen commit into one digest-pinned Iso Lab image; ecbench_sha256 in every request and receipt",
+        "how": "run/03-launch.sh binds image_uri, source_revision and ecbench_sha256 from inputs/image.json; 04-collect.sh refuses a mismatch"
+      },
+      {
+        "name": "method parameters",
+        "treatment": "fixed",
+        "value": "ic.pipeline prime-abscissa:size=32, mitm:negation_folded=1, defaults (linalg incremental-gauss, targets walk, max_trials 1e8) as in v2",
+        "how": "repsel specs writes the same arm block in every spec"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "c8a.2xlarge Spot on cpu-l2-spot; L2 required per execution",
+        "how": "ecbench isolation per record; run-ecbench l2-gate rejects any job with a sub-L2 execution; counted S does not depend on it"
+      },
+      {
+        "name": "memory layout / environment",
+        "treatment": "randomized",
+        "how": "every execution is a fresh process (ecbench exec per run)"
+      },
+      {
+        "name": "arm and workload order",
+        "treatment": "randomized",
+        "value": "measurement.order alternate",
+        "how": "A, B0 interleave within each ab job; B in its own b job of the same seed; Csel, Cdef, Crho share each hold job; job order is class-major, tier 24 first"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "planted_shared, target seeds in design.json (ab/b, ctl, cal, hold differ)",
+        "how": "the same discrete logs on every curve of a class; held-out targets use a target seed the selection never saw"
+      },
+      {
+        "name": "algorithm seeds",
+        "treatment": "fixed",
+        "value": "ecbench measurement seeds in design.json (main, aa, holdaa)",
+        "how": "harness_drawn from the spec seed, per workload and round"
+      },
+      {
+        "name": "class sample",
+        "treatment": "crossed",
+        "value": "12 classes per tier (6 for C at 28 bits), seeds 2401..., 2801...",
+        "how": "every arm in every class; selection rule fixed before any measurement"
+      },
+      {
+        "name": "spot preemption",
+        "treatment": "measured",
+        "how": "a pre-empted or failed job is kept as evidence and re-submitted once under a new name; counted units of an interrupted session are not pooled"
+      },
+      {
+        "name": "analyst",
+        "treatment": "randomized",
+        "value": "arm labels masked",
+        "how": "repsel mask with a nonce drawn after the inputs freeze; key opened only after analysis-masked.json is hashed"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-B24",
+        "arms": [
+          "B",
+          "A"
+        ],
+        "differs_in": [
+          "procedure"
+        ],
+        "design": "one_factor",
+        "reason": "the procedure is the factor under test; curve level, model and transport change together by construction, and C-MECH separates them"
+      },
+      {
+        "id": "C-B28",
+        "arms": [
+          "B",
+          "A"
+        ],
+        "differs_in": [
+          "procedure"
+        ],
+        "design": "one_factor",
+        "reason": "as C-B24 at 28-bit p"
+      },
+      {
+        "id": "C-C24",
+        "arms": [
+          "Csel",
+          "Cdef"
+        ],
+        "differs_in": [
+          "procedure"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-C28",
+        "arms": [
+          "Csel",
+          "Cdef"
+        ],
+        "differs_in": [
+          "procedure"
+        ],
+        "design": "one_factor",
+        "reason": "secondary: 6 classes"
+      },
+      {
+        "id": "C-MECH",
+        "arms": [
+          "B",
+          "B0"
+        ],
+        "differs_in": [
+          "level of the solving curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-NCB",
+        "arms": [
+          "B0",
+          "A"
+        ],
+        "differs_in": [
+          "procedure"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-AA",
+        "arms": [
+          "Aaa",
+          "A"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-AAC",
+        "arms": [
+          "Cdefaa",
+          "Cdef"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-AARHO",
+        "arms": [
+          "rho-neg-aa",
+          "rho-neg"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "same seeds: determinism"
+      },
+      {
+        "id": "C-NCC",
+        "arms": [
+          "Crho",
+          "Cdef"
+        ],
+        "differs_in": [
+          "procedure"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-PC",
+        "arms": [
+          "ic-mitm-plus1",
+          "A"
+        ],
+        "differs_in": [
+          "factor base size"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-GAP",
+        "arms": [
+          "A",
+          "B",
+          "B0",
+          "Csel",
+          "Cdef",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute",
+        "threshold": "descriptive: IC S / matched rho S at w = 0, 0.1, 1 (the distance remaining; 1.0 = parity)"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "obligation": "every B and B0 workload is produced by repsel ascend from the floor curve's own coordinates; its edges are verified (image on codomain, order r, additivity) and its endpoint height recomputed by BFS (crater = 3, sibling = 0)",
+        "checked_by": "repsel ascend (transport_row/verify)"
+      },
+      {
+        "obligation": "bsgs exactness and equal planted scalars across A/B/B0 of one group (check:transport) bind the transported instance to the floor instance",
+        "checked_by": "repsel analyse check:transport:<tier>"
+      }
     ]
-   },
-   "not_applicable_reason": null
-  }
- },
- "variable_ledger": {
-  "independent": [
-   {
-    "name": "procedure",
-    "levels": [
-     "A: solve on the floor curve",
-     "B: carry to the crater (charged), solve there",
-     "B0: carry to the sibling floor curve (charged), solve there",
-     "Cdef: solve on the default crater model",
-     "Csel: move to the calibration-selected model (charged), solve there",
-     "Crho: move to the rho-selected model"
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        2611052411,
+        2611052412,
+        2611052413,
+        2611052414,
+        2611052421,
+        2611052422,
+        2611052423,
+        2611052811,
+        2611052812,
+        2611052813,
+        2611052814,
+        2611052821,
+        2611052822,
+        2611052823,
+        20261105
+      ],
+      "nonce": null,
+      "note": "design.json: target seeds (ab, ctl, cal, hold) and measurement seeds (main, aa, holdaa) per tier; analysis bootstrap/permutation seed 20261105; class-search seeds 2401.. and 2801.. in order. The masking nonce is drawn after the inputs freeze (external) and recorded in INPUTS.md."
+    },
+    "instance_sampling": {
+      "rule": "classes by the volcano-rho search rule (design.json class_search); units are all floor groups (up to 8) and crater curves (up to 16) the export holds, in BFS order; targets by planted_shared from the frozen target seeds",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "repsel mask replaces every study-arm label with a code K01.. in the labels and comparisons; the analysis runs on codes; repsel unmask applies the key after analysis-masked.json is hashed. Numerical signatures (crater vs floor curves) can still reveal arms; the analysis has no free choices left to bias.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 96,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "holm",
+      "rank_test_n": 10000,
+      "min_attainable_two_sided_p": 0.0002,
+      "passes": true,
+      "note": "Primary family: H_B24, H_B28, H_C24 (Holm, smallest threshold 0.0167); each p is the max over the three weights (intersection-union). Sign-flip permutations 10,000: minimum one-sided p 1e-4 < 0.0167. Test-specific power (PROTOCOL.md section 5, derived from v2.1 variance: per-run CV of IC S within a curve-model 0.37-0.44, S model tau 9.8% raw, null p95 7.4%): H_B at w = 0 (effect 4.4% on the log scale) 0.90 if the curve-model spread is 6%, 0.67 if 10%; at the binding weight w = 1 the 24-bit power falls to about 0.45-0.55, which the decision rule reports as unresolved_across_band, not as vanished; H_B28 about 0.90 if the floor effect persists; H_C24 0.97 if sigma_m = 5%, 0.31 if 3%. instances = 96 floor groups per tier for H_B (8 x 12), 144 expected crater curves for H_C24."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 360,
+      "per_sample_seconds": 0.35,
+      "threads": 1,
+      "estimated_total_seconds": 518400,
+      "measured_on": "derived, not measured on study curves: EKS c8a online medians at 24/28 bits (taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026: IC 23.6 / 436 ms, rho 1.6 / 3.5 ms) and v2 L0 process walls (IC 0.45 s, rho 0.27 s); per-run estimates 24-bit IC 0.15 s, rho 0.10 s; 28-bit IC 0.60 s, rho 0.12 s; replay-all doubles each job; per job 60 s settle + ~300 s provisioning; about 144 job-hours over about 234 jobs"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s",
+        "name": "charged S at weight w",
+        "unit": "GAE / sqrt(r)",
+        "kind": "counted",
+        "definition": "(cost.total_gae + w * (unpriced native operations as ecbench band counts them + the arm's charged transport or isomorphism operations)) / sqrt(r), for w in {0, 0.1, 1}; every phase of the IC pipeline cold, setup included",
+        "source": "records.jsonl cost.total_gae, cost.unpriced + counters/phases.native, workload.curve_spec.r; labels extra_ops",
+        "formula": "theta = exp(mean over classes of ln(mean over units of X / mean over units of Y))",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "yield",
+        "name": "relation yield",
+        "unit": "relations per trial",
+        "kind": "rate",
+        "definition": "counters.relations_found / counters.targets_tried, ratio of sums within a unit",
+        "source": "records.jsonl counters",
+        "aggregation": "paired_ratio",
+        "resolution": "1 relation",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "gap",
+        "name": "IC S over matched rho S",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "theta(IC arm / rho-neg on the instance's source curve) at each weight",
+        "source": "analysis.json comparisons GAP*",
+        "formula": "theta(X = IC arm, Y = rho-neg on the source curve) at w",
+        "aggregation": "paired_ratio",
+        "resolution": null,
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "transport_ops",
+        "name": "charged transport",
+        "unit": "native field operations",
+        "kind": "exact",
+        "definition": "multiplications + inversions repsel ascend spends finding the path and mapping G and Q",
+        "source": "transport.jsonl ops_total",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "selection_gae",
+        "name": "selection precomputation",
+        "unit": "GAE",
+        "kind": "counted",
+        "definition": "sum of total_gae of the cal-stage ic-mitm runs of a crater curve; break-even targets = selection_gae / ((mean S_Cdef - mean S_Csel) * sqrt(r))",
+        "source": "analysis.json summary (cal)",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
     ]
-   },
-   {
-    "name": "level of the solving curve",
-    "levels": [
-     "floor",
-     "crater"
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "cost.total_gae",
+      "cost.unpriced",
+      "counters.relations_found",
+      "counters.targets_tried",
+      "phases[].native",
+      "field_ops"
+    ],
+    "record": [
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "cpu_model",
+      "kernel_release",
+      "run_cpu",
+      "threads",
+      "steal_ticks",
+      "psi"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab (cpu-l2-spot)",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true,
+      "memory": "4Gi",
+      "job_seconds": 3600
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: every job of inputs/jobs.tsv, then every hold/holdaa job of jobs-hold.tsv, then the analysis; no look at any IC cost before the last job is collected (04-collect checks hashes and gates only)",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "budget: USD 150 total (compute, launcher builds, retries); stop new launches when it or the daily allowance is exhausted or unknown and queue the rest",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "a job that fails admission (L2 gate, audit, replay, A/A) or is pre-empted is kept and re-submitted once as <name>-r2; a second failure, or a job over its deadline, is split in half by units (a labelled amendment, filed before its data) and the class is reported incomplete if that fails too",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "a wrong answer, a determinism mismatch or a failed check:transport stops all launches: instrument failure",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a run not verified or not matching its planted scalar is excluded from S and counted per arm; any such IC run is an instrument investigation item",
+    "a record with a pinned calibration or an unpriced counter without a count makes the analysis refuse (no mispriced row)",
+    "a wall-clock value is descriptive only; no timing claim is made"
+  ],
+  "decision_rule": {
+    "text": "For each primary hypothesis: invalid_measurement if a gate fails (determinism, check:transport for H_B, the A/A 95% CI at w = 0 excludes 1, the planted-yield CI includes 1, or for H_C the rho-selection negative control's CI excludes 1); supported_within_scope if Holm rejects at family alpha 0.05 on p_iut (the one-sided sign-flip p, max over w = 0, 0.1, 1); unresolved_across_band if p at w = 0 alone is below its Holm threshold but p_iut is not; vanished_within_margin if the power control passed and the 90% CI lower bound of theta at w = 0 exceeds 0.97 (gain below 3% with 95% confidence); inconclusive otherwise. The lead's discriminator: K2 or K3 supported and K4 supported => representative selection is a measured IC improvement (constant factor); K4 vanished_within_margin => the v2 model effect was sampling noise or selection artefact; both B tiers and C24 vanished => the lead closes as measured.",
+    "comparison_ids": [
+      "C-B24",
+      "C-B28",
+      "C-C24"
+    ],
+    "threshold": "Holm over 3 at alpha 0.05 (0.0167, 0.025, 0.05); vanish margin 3%",
+    "statistic": "theta = exp(mean_c ln(mean_u X / mean_u Y)), X and Y charged S at weight w",
+    "interval": "hierarchical bootstrap (classes, units within class, runs within unit and arm), 4,000 resamples, seed 20261105; 95% and 90% percentile intervals",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "theta and 1 - theta in percent at each weight; gap to matched rho; selection break-even targets",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "unresolved_across_band",
+      "vanished_within_margin",
+      "inconclusive",
+      "invalid_measurement"
     ]
-   },
-   {
-    "name": "factor base size",
-    "levels": [
-     32,
-     33
-    ]
-   },
-   {
-    "name": "method",
-    "levels": [
-     "ic.pipeline",
-     "rho.negation",
-     "bsgs.negation"
-    ]
-   },
-   {
-    "name": "tier (bits of p)",
-    "levels": [
-     24,
-     28
-    ]
-   }
-  ],
-  "factors": [
-   {
-    "name": "instrument",
-    "treatment": "fixed",
-    "value": "ecbench built at the frozen commit into one digest-pinned Iso Lab image; ecbench_sha256 in every request and receipt",
-    "how": "run/03-launch.sh binds image_uri, source_revision and ecbench_sha256 from inputs/image.json; 04-collect.sh refuses a mismatch"
-   },
-   {
-    "name": "method parameters",
-    "treatment": "fixed",
-    "value": "ic.pipeline prime-abscissa:size=32, mitm:negation_folded=1, defaults (linalg incremental-gauss, targets walk, max_trials 1e8) as in v2",
-    "how": "repsel specs writes the same arm block in every spec"
-   },
-   {
-    "name": "host",
-    "treatment": "measured",
-    "value": "c8a.2xlarge Spot on cpu-l2-spot; L2 required per execution",
-    "how": "ecbench isolation per record; run-ecbench l2-gate rejects any job with a sub-L2 execution; counted S does not depend on it"
-   },
-   {
-    "name": "memory layout / environment",
-    "treatment": "randomized",
-    "how": "every execution is a fresh process (ecbench exec per run)"
-   },
-   {
-    "name": "arm and workload order",
-    "treatment": "randomized",
-    "value": "measurement.order alternate",
-    "how": "A, B0 interleave within each ab job; B in its own b job of the same seed; Csel, Cdef, Crho share each hold job; job order is class-major, tier 24 first"
-   },
-   {
-    "name": "targets",
-    "treatment": "fixed",
-    "value": "planted_shared, target seeds in design.json (ab/b, ctl, cal, hold differ)",
-    "how": "the same discrete logs on every curve of a class; held-out targets use a target seed the selection never saw"
-   },
-   {
-    "name": "algorithm seeds",
-    "treatment": "fixed",
-    "value": "ecbench measurement seeds in design.json (main, aa, holdaa)",
-    "how": "harness_drawn from the spec seed, per workload and round"
-   },
-   {
-    "name": "class sample",
-    "treatment": "crossed",
-    "value": "12 classes per tier (6 for C at 28 bits), seeds 2401..., 2801...",
-    "how": "every arm in every class; selection rule fixed before any measurement"
-   },
-   {
-    "name": "spot preemption",
-    "treatment": "measured",
-    "how": "a pre-empted or failed job is kept as evidence and re-submitted once under a new name; counted units of an interrupted session are not pooled"
-   },
-   {
-    "name": "analyst",
-    "treatment": "randomized",
-    "value": "arm labels masked",
-    "how": "repsel mask with a nonce drawn after the inputs freeze; key opened only after analysis-masked.json is hashed"
-   }
-  ],
-  "comparisons": [
-   {
-    "id": "C-B24",
-    "arms": [
-     "B",
-     "A"
-    ],
-    "differs_in": [
-     "procedure"
-    ],
-    "design": "one_factor",
-    "reason": "the procedure is the factor under test; curve level, model and transport change together by construction, and C-MECH separates them"
-   },
-   {
-    "id": "C-B28",
-    "arms": [
-     "B",
-     "A"
-    ],
-    "differs_in": [
-     "procedure"
-    ],
-    "design": "one_factor",
-    "reason": "as C-B24 at 28-bit p"
-   },
-   {
-    "id": "C-C24",
-    "arms": [
-     "Csel",
-     "Cdef"
-    ],
-    "differs_in": [
-     "procedure"
-    ],
-    "design": "one_factor"
-   },
-   {
-    "id": "C-C28",
-    "arms": [
-     "Csel",
-     "Cdef"
-    ],
-    "differs_in": [
-     "procedure"
-    ],
-    "design": "one_factor",
-    "reason": "secondary: 6 classes"
-   },
-   {
-    "id": "C-MECH",
-    "arms": [
-     "B",
-     "B0"
-    ],
-    "differs_in": [
-     "level of the solving curve"
-    ],
-    "design": "one_factor"
-   },
-   {
-    "id": "C-NCB",
-    "arms": [
-     "B0",
-     "A"
-    ],
-    "differs_in": [
-     "procedure"
-    ],
-    "design": "one_factor"
-   },
-   {
-    "id": "C-AA",
-    "arms": [
-     "Aaa",
-     "A"
-    ],
-    "differs_in": [],
-    "design": "aa"
-   },
-   {
-    "id": "C-AAC",
-    "arms": [
-     "Cdefaa",
-     "Cdef"
-    ],
-    "differs_in": [],
-    "design": "aa"
-   },
-   {
-    "id": "C-AARHO",
-    "arms": [
-     "rho-neg-aa",
-     "rho-neg"
-    ],
-    "differs_in": [],
-    "design": "aa",
-    "reason": "same seeds: determinism"
-   },
-   {
-    "id": "C-NCC",
-    "arms": [
-     "Crho",
-     "Cdef"
-    ],
-    "differs_in": [
-     "procedure"
-    ],
-    "design": "one_factor"
-   },
-   {
-    "id": "C-PC",
-    "arms": [
-     "ic-mitm-plus1",
-     "A"
-    ],
-    "differs_in": [
-     "factor base size"
-    ],
-    "design": "one_factor"
-   },
-   {
-    "id": "C-GAP",
-    "arms": [
-     "A",
-     "B",
-     "B0",
-     "Csel",
-     "Cdef",
-     "rho-neg"
-    ],
-    "differs_in": [
-     "method"
-    ],
-    "design": "absolute",
-    "threshold": "descriptive: IC S / matched rho S at w = 0, 0.1, 1 (the distance remaining; 1.0 = parity)"
-   }
-  ],
-  "aa_not_applicable": null,
-  "crosses_map": true,
-  "transfer_obligations": [
-   {
-    "obligation": "every B and B0 workload is produced by repsel ascend from the floor curve's own coordinates; its edges are verified (image on codomain, order r, additivity) and its endpoint height recomputed by BFS (crater = 3, sibling = 0)",
-    "checked_by": "repsel ascend (transport_row/verify)"
-   },
-   {
-    "obligation": "bsgs exactness and equal planted scalars across A/B/B0 of one group (check:transport) bind the transported instance to the floor instance",
-    "checked_by": "repsel analyse check:transport:<tier>"
-   }
-  ]
- },
- "randomization": {
-  "arm_order": "interleaved",
-  "arm_order_reason": null,
-  "seed_derivation": {
-   "method": "explicit_list",
-   "seeds": [
-    2611052411,
-    2611052412,
-    2611052413,
-    2611052414,
-    2611052421,
-    2611052422,
-    2611052423,
-    2611052811,
-    2611052812,
-    2611052813,
-    2611052814,
-    2611052821,
-    2611052822,
-    2611052823,
-    20261105
-   ],
-   "nonce": null,
-   "note": "design.json: target seeds (ab, ctl, cal, hold) and measurement seeds (main, aa, holdaa) per tier; analysis bootstrap/permutation seed 20261105; class-search seeds 2401.. and 2801.. in order. The masking nonce is drawn after the inputs freeze (external) and recorded in INPUTS.md."
   },
-  "instance_sampling": {
-   "rule": "classes by the volcano-rho search rule (design.json class_search); units are all floor groups (up to 8) and crater curves (up to 16) the export holds, in BFS order; targets by planted_shared from the frozen target seeds",
-   "independent_of_arm": true
+  "analysis_plan": {
+    "script": {
+      "path": "research/ic-representative-selection_20261105/native/src/analyse.rs",
+      "sha256": "53e4927d8f92ce5b1ecaff8b597b7ed17fe9b5eff272d623a529e4debb5eff11"
+    },
+    "inputs": [
+      "sessions/<job>/session/records.jsonl",
+      "inputs/specs/<class>/*.labels.jsonl",
+      "comparisons.json",
+      "design.json"
+    ],
+    "outputs": [
+      "analysis/analysis-masked.json",
+      "analysis/analysis.json",
+      "analysis/band-<job>.json"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
   },
-  "blinding": {
-   "analysis_labels_masked": true,
-   "how": "repsel mask replaces every study-arm label with a code K01.. in the labels and comparisons; the analysis runs on codes; repsel unmask applies the key after analysis-masked.json is hashed. Numerical signatures (crater vs floor curves) can still reveal arms; the analysis has no free choices left to bias.",
-   "unmasked_at": null
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "theta by weight with 95% CI per hypothesis and tier (forest)",
+      "per-class B/A and Csel/Cdef ratios",
+      "gap to matched rho per arm across the band",
+      "in-sample vs held-out selection gain per crater curve (winner's curse)"
+    ],
+    "report_dir": "research/ic-representative-selection_20261105/report"
+  },
+  "inadmissible": [
+    "changing classes, units, targets, seeds, K, the held-out split, the selection rule, the charging, the weights, the margin or the correction after any measured IC value is seen",
+    "re-running a job because of its result; dropping a unit, class or run outside the invalidation rules",
+    "selecting on held-out targets or reporting in-sample (calibration) gains as the C result",
+    "omitting the transport or isomorphism charge, or reporting B at w = 0 alone as a ranking",
+    "reading C as a one-target cold improvement without its selection cost and break-even",
+    "any timing claim; any security statement"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:research/isogeny-volcano-cost-v2_20261017/README.md and PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "l=2 floors 5.8% fewer IC relations, S floor/crater 1.045 [1.023, 1.067]; model tau 7.2%; transport not charged there",
+      "verified_by": "read 2026-11-05"
+    },
+    {
+      "ref": "crypto:research/volcano_ecdlp_census_20261017/REPORT.md",
+      "provenance": "internal",
+      "claim": "IC/matched rho 42.4x and 61.5x at 0 GAE",
+      "verified_by": "cited by the lead; not re-read in full"
+    },
+    {
+      "ref": "crypto:research/pair46_factor_bases_20261015/03-floor-pullback/RESULTS.md",
+      "provenance": "internal",
+      "claim": "a pushed crater base gives the crater yield on the floor: yield is a set property",
+      "verified_by": "cited by the lead"
+    },
+    {
+      "ref": "crypto:RESEARCH_ISOGENY_FIBERS_ECDLP.md",
+      "provenance": "internal",
+      "claim": "relation generation is isogeny-equivariant; only the factor base is a lever",
+      "verified_by": "cited by the lead"
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/isogeny.rs (transfer.isogeny)",
+      "provenance": "internal",
+      "claim": "one-step Velu transfer with field work recorded as unpriced native work priced across the band; this study charges a three-step ascent the same way",
+      "verified_by": "read 2026-11-05"
+    },
+    {
+      "ref": "M. Fouquet, F. Morain, Isogeny volcanoes and the SEA algorithm, ANTS-V, LNCS 2369 (2002) 276-291",
+      "provenance": "recalled",
+      "claim": "direction finding on a volcano by the length of non-backtracking walks to the floor",
+      "verified_by": null
+    },
+    {
+      "ref": "A. V. Sutherland, Isogeny volcanoes, ANTS X, Open Book Series 1 (2013) 507-530",
+      "provenance": "recalled",
+      "claim": "structure of l-volcanoes: floor vertices have one rational l-isogeny; ascending, horizontal and descending edges",
+      "verified_by": null
+    },
+    {
+      "ref": "J. Velu, Isogenies entre courbes elliptiques, C. R. Acad. Sci. Paris 273 (1971) 238-241",
+      "provenance": "recalled",
+      "claim": "explicit isogeny formulas (as in Washington, Elliptic Curves, Thm 12.16)",
+      "verified_by": null
+    },
+    {
+      "ref": "G. C. Cawley, N. L. C. Talbot, On over-fitting in model selection and subsequent selection bias in performance evaluation, JMLR 11 (2010) 2079-2107",
+      "provenance": "recalled",
+      "claim": "selection on the evaluation data biases the estimate; hence the frozen held-out split",
+      "verified_by": null
+    },
+    {
+      "ref": "S. Holm, A simple sequentially rejective multiple test procedure, Scand. J. Statist. 6 (1979) 65-70",
+      "provenance": "recalled",
+      "claim": "the family correction",
+      "verified_by": null
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "dcee3b0f731e2f8705b7ee3ce311140338dc1f4cf49bcc0842af4466a4da8188",
+    "commit": "c6cd50bcc8fa382ab89c9cf6fadb0145fef5d1a1",
+    "frozen_at": "2026-11-05T17:23:32Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "crypto": {
+      "native_sources_sha256": {
+        "native/Cargo.toml": "9cba8a71c6c90eb3f16617c1b6d17500224f1004c3fdd1440aeda42d62e81dbf",
+        "native/src/lib.rs": "d0d03d0f8c98cc749ef3b5c63e78c60235fe247f1ca3595410ac2cb0a2b5b914",
+        "native/src/main.rs": "34ff71c8bb4ca4a83991f3a885dd3c67406e83c0b4c086f6e42bcfa054508272",
+        "native/src/fp.rs": "cf3bba658f72d8638fe84a339c09927f9032c51bcec0495986c777c579921409",
+        "native/src/ascend.rs": "4523a70bc8c591d543af53005599c2e8d687962bbfaeea9eaa0cdf653359b4f3",
+        "native/src/specs.rs": "f2574b7894a561dc754767f58b45f392579bd8786a8b7396c398a9edc563587d",
+        "native/src/select.rs": "0af5025afbdfa40a389ab208441a5d82538bade0d40f199fdaf231b86d9fbabc",
+        "native/src/analyse.rs": "53e4927d8f92ce5b1ecaff8b597b7ed17fe9b5eff272d623a529e4debb5eff11"
+      },
+      "design_sha256": "43ba21a96b225c541bea201c1e73226b482a2c7e8446b85a7677127da2be3194",
+      "comparisons_sha256": "856af65fe2429cf3b233538a5eec5c3c880235ca5e1e8e94cd22caa0e589e0ac",
+      "run_scripts_sha256": {
+        "run/00-build.sh": "26dc985fdcd6087203ae5707a79b9af0d68655ac1b6b883c483253b75f935d4f",
+        "run/01-classes.sh": "db605098f92664f36a981af48550b7e5318091955c22ed12bcb557fe6dcc6240",
+        "run/02-specs.sh": "b31cde441a1b948aa14a87d769a6d09554e5891405f10f0e393c37e2db62ce9c",
+        "run/03-launch.sh": "dd93924b48d4513f431bfd7245362b22c62e5f3b240bf6a9c6c08f6b24ec12fb",
+        "run/04-collect.sh": "73f6d0b4ed1085e9ef7e57ade151d0d948f8b700f48b5300b44d6f1e282f2183",
+        "run/05-hold.sh": "9ae753d6b880cc0ad87d88b38682b63e52222764f31aa24a4d9da4fae8337a3f",
+        "run/06-analyse.sh": "91d6f20ba018c888d7f8bd77e55917224de2e3d043b0df57f1bceda7f0fa9403",
+        "run/common.sh": "4593ff898149f7f189ccec6bd7ecd4528a0ee0b02def55ba87e3c5d40eead219"
+      },
+      "inputs_freeze": "Stage 0 (run/00-02) generates the classes, transport and specs deterministically from this commit; their digest (inputs/MANIFEST.sha256) is recorded in INPUTS.md as amendment A1, filed before any measured run; a class-search or spec output that differs on re-run invalidates the freeze",
+      "route": "Iso Lab on EKS Spot, AWS bridge: remote/validate-request + remote/launch-remote with a digest-pinned image from isolab-experiment.yml publish_only=true at the frozen commit (run/03-launch.sh; run/CARD.md)"
+    }
   }
- },
- "sample_size": {
-  "instances": 96,
-  "replicates": 5,
-  "warmups": 1,
-  "power": {
-   "method": "paired_bootstrap",
-   "alpha": 0.05,
-   "tests_in_family": 3,
-   "correction": "holm",
-   "rank_test_n": 10000,
-   "min_attainable_two_sided_p": 0.0002,
-   "passes": true,
-   "note": "Primary family: H_B24, H_B28, H_C24 (Holm, smallest threshold 0.0167); each p is the max over the three weights (intersection-union). Sign-flip permutations 10,000: minimum one-sided p 1e-4 < 0.0167. Test-specific power (PROTOCOL.md section 5, derived from v2.1 variance: per-run CV of IC S within a curve-model 0.37-0.44, S model tau 9.8% raw, null p95 7.4%): H_B at w = 0 (effect 4.4% on the log scale) 0.90 if the curve-model spread is 6%, 0.67 if 10%; at the binding weight w = 1 the 24-bit power falls to about 0.45-0.55, which the decision rule reports as unresolved_across_band, not as vanished; H_B28 about 0.90 if the floor effect persists; H_C24 0.97 if sigma_m = 5%, 0.31 if 3%. instances = 96 floor groups per tier for H_B (8 x 12), 144 expected crater curves for H_C24."
-  },
-  "preflight_runtime": {
-   "fixed_seconds": 360,
-   "per_sample_seconds": 0.35,
-   "threads": 1,
-   "estimated_total_seconds": 518400,
-   "measured_on": "derived, not measured on study curves: EKS c8a online medians at 24/28 bits (taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026: IC 23.6 / 436 ms, rho 1.6 / 3.5 ms) and v2 L0 process walls (IC 0.45 s, rho 0.27 s); per-run estimates 24-bit IC 0.15 s, rho 0.10 s; 28-bit IC 0.60 s, rho 0.12 s; replay-all doubles each job; per job 60 s settle + ~300 s provisioning; about 144 job-hours over about 234 jobs"
-  }
- },
- "metrics": {
-  "primary": [
-   {
-    "id": "s",
-    "name": "charged S at weight w",
-    "unit": "GAE / sqrt(r)",
-    "kind": "counted",
-    "definition": "(cost.total_gae + w * (unpriced native operations as ecbench band counts them + the arm's charged transport or isomorphism operations)) / sqrt(r), for w in {0, 0.1, 1}; every phase of the IC pipeline cold, setup included",
-    "source": "records.jsonl cost.total_gae, cost.unpriced + counters/phases.native, workload.curve_spec.r; labels extra_ops",
-    "formula": "theta = exp(mean over classes of ln(mean over units of X / mean over units of Y))",
-    "aggregation": "paired_ratio",
-    "resolution": "1 GAE / sqrt(r)",
-    "uncertainty": "bootstrap_ci95"
-   }
-  ],
-  "secondary": [
-   {
-    "id": "yield",
-    "name": "relation yield",
-    "unit": "relations per trial",
-    "kind": "rate",
-    "definition": "counters.relations_found / counters.targets_tried, ratio of sums within a unit",
-    "source": "records.jsonl counters",
-    "aggregation": "paired_ratio",
-    "resolution": "1 relation",
-    "uncertainty": "bootstrap_ci95"
-   },
-   {
-    "id": "gap",
-    "name": "IC S over matched rho S",
-    "unit": "ratio",
-    "kind": "derived",
-    "definition": "theta(IC arm / rho-neg on the instance's source curve) at each weight",
-    "source": "analysis.json comparisons GAP*",
-    "formula": "theta(X = IC arm, Y = rho-neg on the source curve) at w",
-    "aggregation": "paired_ratio",
-    "resolution": null,
-    "uncertainty": "bootstrap_ci95"
-   },
-   {
-    "id": "transport_ops",
-    "name": "charged transport",
-    "unit": "native field operations",
-    "kind": "exact",
-    "definition": "multiplications + inversions repsel ascend spends finding the path and mapping G and Q",
-    "source": "transport.jsonl ops_total",
-    "aggregation": "per_row",
-    "resolution": "1",
-    "uncertainty": "none_exact"
-   },
-   {
-    "id": "selection_gae",
-    "name": "selection precomputation",
-    "unit": "GAE",
-    "kind": "counted",
-    "definition": "sum of total_gae of the cal-stage ic-mitm runs of a crater curve; break-even targets = selection_gae / ((mean S_Cdef - mean S_Csel) * sqrt(r))",
-    "source": "analysis.json summary (cal)",
-    "aggregation": "sum",
-    "resolution": "1",
-    "uncertainty": "none_exact"
-   }
-  ]
- },
- "measurement": {
-  "isolation_required": "L2",
-  "warmups": 1,
-  "order": "alternate",
-  "clock": "counted",
-  "counters": [
-   "cost.total_gae",
-   "cost.unpriced",
-   "counters.relations_found",
-   "counters.targets_tried",
-   "phases[].native",
-   "field_ops"
-  ],
-  "record": [
-   "binary_sha256",
-   "env_class_id",
-   "isolation.level",
-   "isolation.blockers",
-   "cpu_model",
-   "kernel_release",
-   "run_cpu",
-   "threads",
-   "steal_ticks",
-   "psi"
-  ],
-  "timed_primary_justification": null
- },
- "execution": {
-  "backend": "isolab-k8s",
-  "queue": "isolab (cpu-l2-spot)",
-  "placement": {
-   "instance_type": "c8a.2xlarge",
-   "cpus": 4,
-   "spot": true,
-   "memory": "4Gi",
-   "job_seconds": 3600
-  },
-  "measurement_class": "measurement",
-  "timeout_seconds": 3600,
-  "checkpoint": {
-   "policy": "none",
-   "interval_seconds": null,
-   "grace_seconds": null,
-   "restore_validation": "none",
-   "after_restore": {
-    "wall_time": "invalid",
-    "counted_units": "valid"
-   }
-  },
-  "retries": {
-   "infrastructure_only": true,
-   "max_attempts": 2
-  }
- },
- "stopping_rules": [
-  {
-   "rule": "fixed design: every job of inputs/jobs.tsv, then every hold/holdaa job of jobs-hold.tsv, then the analysis; no look at any IC cost before the last job is collected (04-collect checks hashes and gates only)",
-   "kind": "fixed_n",
-   "preregistered": true
-  },
-  {
-   "rule": "budget: USD 150 total (compute, launcher builds, retries); stop new launches when it or the daily allowance is exhausted or unknown and queue the rest",
-   "kind": "budget",
-   "preregistered": true
-  },
-  {
-   "rule": "a job that fails admission (L2 gate, audit, replay, A/A) or is pre-empted is kept and re-submitted once as <name>-r2; a second failure, or a job over its deadline, is split in half by units (a labelled amendment, filed before its data) and the class is reported incomplete if that fails too",
-   "kind": "invalidation",
-   "preregistered": true
-  },
-  {
-   "rule": "a wrong answer, a determinism mismatch or a failed check:transport stops all launches: instrument failure",
-   "kind": "invalidation",
-   "preregistered": true
-  }
- ],
- "invalidation_rules": [
-  "a run not verified or not matching its planted scalar is excluded from S and counted per arm; any such IC run is an instrument investigation item",
-  "a record with a pinned calibration or an unpriced counter without a count makes the analysis refuse (no mispriced row)",
-  "a wall-clock value is descriptive only; no timing claim is made"
- ],
- "decision_rule": {
-  "text": "For each primary hypothesis: invalid_measurement if a gate fails (determinism, check:transport for H_B, the A/A 95% CI at w = 0 excludes 1, the planted-yield CI includes 1, or for H_C the rho-selection negative control's CI excludes 1); supported_within_scope if Holm rejects at family alpha 0.05 on p_iut (the one-sided sign-flip p, max over w = 0, 0.1, 1); unresolved_across_band if p at w = 0 alone is below its Holm threshold but p_iut is not; vanished_within_margin if the power control passed and the 90% CI lower bound of theta at w = 0 exceeds 0.97 (gain below 3% with 95% confidence); inconclusive otherwise. The lead's discriminator: K2 or K3 supported and K4 supported => representative selection is a measured IC improvement (constant factor); K4 vanished_within_margin => the v2 model effect was sampling noise or selection artefact; both B tiers and C24 vanished => the lead closes as measured.",
-  "comparison_ids": [
-   "C-B24",
-   "C-B28",
-   "C-C24"
-  ],
-  "threshold": "Holm over 3 at alpha 0.05 (0.0167, 0.025, 0.05); vanish margin 3%",
-  "statistic": "theta = exp(mean_c ln(mean_u X / mean_u Y)), X and Y charged S at weight w",
-  "interval": "hierarchical bootstrap (classes, units within class, runs within unit and arm), 4,000 resamples, seed 20261105; 95% and 90% percentile intervals",
-  "multiple_comparison_correction": "holm",
-  "effect_size_measure": "theta and 1 - theta in percent at each weight; gap to matched rho; selection break-even targets",
-  "verdict_vocabulary": [
-   "supported_within_scope",
-   "unresolved_across_band",
-   "vanished_within_margin",
-   "inconclusive",
-   "invalid_measurement"
-  ]
- },
- "analysis_plan": {
-  "script": {
-   "path": "research/ic-representative-selection_20261105/native/src/analyse.rs",
-   "sha256": "53e4927d8f92ce5b1ecaff8b597b7ed17fe9b5eff272d623a529e4debb5eff11"
-  },
-  "inputs": [
-   "sessions/<job>/session/records.jsonl",
-   "inputs/specs/<class>/*.labels.jsonl",
-   "comparisons.json",
-   "design.json"
-  ],
-  "outputs": [
-   "analysis/analysis-masked.json",
-   "analysis/analysis.json",
-   "analysis/band-<job>.json"
-  ],
-  "blinded": true,
-  "frozen_before_data": true
- },
- "reporting": {
-  "export_schema": "experiment.export/v1",
-  "review_schema": "experiment.review/v1",
-  "graphs": [
-   "theta by weight with 95% CI per hypothesis and tier (forest)",
-   "per-class B/A and Csel/Cdef ratios",
-   "gap to matched rho per arm across the band",
-   "in-sample vs held-out selection gain per crater curve (winner's curse)"
-  ],
-  "report_dir": "research/ic-representative-selection_20261105/report"
- },
- "inadmissible": [
-  "changing classes, units, targets, seeds, K, the held-out split, the selection rule, the charging, the weights, the margin or the correction after any measured IC value is seen",
-  "re-running a job because of its result; dropping a unit, class or run outside the invalidation rules",
-  "selecting on held-out targets or reporting in-sample (calibration) gains as the C result",
-  "omitting the transport or isomorphism charge, or reporting B at w = 0 alone as a ranking",
-  "reading C as a one-target cold improvement without its selection cost and break-even",
-  "any timing claim; any security statement"
- ],
- "literature": [
-  {
-   "ref": "crypto:research/isogeny-volcano-cost-v2_20261017/README.md and PROTOCOL.md",
-   "provenance": "internal",
-   "claim": "l=2 floors 5.8% fewer IC relations, S floor/crater 1.045 [1.023, 1.067]; model tau 7.2%; transport not charged there",
-   "verified_by": "read 2026-11-05"
-  },
-  {
-   "ref": "crypto:research/volcano_ecdlp_census_20261017/REPORT.md",
-   "provenance": "internal",
-   "claim": "IC/matched rho 42.4x and 61.5x at 0 GAE",
-   "verified_by": "cited by the lead; not re-read in full"
-  },
-  {
-   "ref": "crypto:research/pair46_factor_bases_20261015/03-floor-pullback/RESULTS.md",
-   "provenance": "internal",
-   "claim": "a pushed crater base gives the crater yield on the floor: yield is a set property",
-   "verified_by": "cited by the lead"
-  },
-  {
-   "ref": "crypto:RESEARCH_ISOGENY_FIBERS_ECDLP.md",
-   "provenance": "internal",
-   "claim": "relation generation is isogeny-equivariant; only the factor base is a lever",
-   "verified_by": "cited by the lead"
-  },
-  {
-   "ref": "crypto:src/cryptanalysis/ecbench/isogeny.rs (transfer.isogeny)",
-   "provenance": "internal",
-   "claim": "one-step Velu transfer with field work recorded as unpriced native work priced across the band; this study charges a three-step ascent the same way",
-   "verified_by": "read 2026-11-05"
-  },
-  {
-   "ref": "M. Fouquet, F. Morain, Isogeny volcanoes and the SEA algorithm, ANTS-V, LNCS 2369 (2002) 276-291",
-   "provenance": "recalled",
-   "claim": "direction finding on a volcano by the length of non-backtracking walks to the floor",
-   "verified_by": null
-  },
-  {
-   "ref": "A. V. Sutherland, Isogeny volcanoes, ANTS X, Open Book Series 1 (2013) 507-530",
-   "provenance": "recalled",
-   "claim": "structure of l-volcanoes: floor vertices have one rational l-isogeny; ascending, horizontal and descending edges",
-   "verified_by": null
-  },
-  {
-   "ref": "J. Velu, Isogenies entre courbes elliptiques, C. R. Acad. Sci. Paris 273 (1971) 238-241",
-   "provenance": "recalled",
-   "claim": "explicit isogeny formulas (as in Washington, Elliptic Curves, Thm 12.16)",
-   "verified_by": null
-  },
-  {
-   "ref": "G. C. Cawley, N. L. C. Talbot, On over-fitting in model selection and subsequent selection bias in performance evaluation, JMLR 11 (2010) 2079-2107",
-   "provenance": "recalled",
-   "claim": "selection on the evaluation data biases the estimate; hence the frozen held-out split",
-   "verified_by": null
-  },
-  {
-   "ref": "S. Holm, A simple sequentially rejective multiple test procedure, Scand. J. Statist. 6 (1979) 65-70",
-   "provenance": "recalled",
-   "claim": "the family correction",
-   "verified_by": null
-  }
- ],
- "amendments": [],
- "freeze": {
-  "status": "draft",
-  "protocol_sha256": null,
-  "commit": null,
-  "frozen_at": null,
-  "filed_before_affected_data": null
- },
- "extensions": {
-  "crypto": {
-   "native_sources_sha256": {
-    "native/Cargo.toml": "9cba8a71c6c90eb3f16617c1b6d17500224f1004c3fdd1440aeda42d62e81dbf",
-    "native/src/lib.rs": "d0d03d0f8c98cc749ef3b5c63e78c60235fe247f1ca3595410ac2cb0a2b5b914",
-    "native/src/main.rs": "34ff71c8bb4ca4a83991f3a885dd3c67406e83c0b4c086f6e42bcfa054508272",
-    "native/src/fp.rs": "cf3bba658f72d8638fe84a339c09927f9032c51bcec0495986c777c579921409",
-    "native/src/ascend.rs": "4523a70bc8c591d543af53005599c2e8d687962bbfaeea9eaa0cdf653359b4f3",
-    "native/src/specs.rs": "f2574b7894a561dc754767f58b45f392579bd8786a8b7396c398a9edc563587d",
-    "native/src/select.rs": "0af5025afbdfa40a389ab208441a5d82538bade0d40f199fdaf231b86d9fbabc",
-    "native/src/analyse.rs": "53e4927d8f92ce5b1ecaff8b597b7ed17fe9b5eff272d623a529e4debb5eff11"
-   },
-   "design_sha256": "43ba21a96b225c541bea201c1e73226b482a2c7e8446b85a7677127da2be3194",
-   "comparisons_sha256": "856af65fe2429cf3b233538a5eec5c3c880235ca5e1e8e94cd22caa0e589e0ac",
-   "run_scripts_sha256": {
-    "run/00-build.sh": "26dc985fdcd6087203ae5707a79b9af0d68655ac1b6b883c483253b75f935d4f",
-    "run/01-classes.sh": "db605098f92664f36a981af48550b7e5318091955c22ed12bcb557fe6dcc6240",
-    "run/02-specs.sh": "b31cde441a1b948aa14a87d769a6d09554e5891405f10f0e393c37e2db62ce9c",
-    "run/03-launch.sh": "dd93924b48d4513f431bfd7245362b22c62e5f3b240bf6a9c6c08f6b24ec12fb",
-    "run/04-collect.sh": "73f6d0b4ed1085e9ef7e57ade151d0d948f8b700f48b5300b44d6f1e282f2183",
-    "run/05-hold.sh": "9ae753d6b880cc0ad87d88b38682b63e52222764f31aa24a4d9da4fae8337a3f",
-    "run/06-analyse.sh": "91d6f20ba018c888d7f8bd77e55917224de2e3d043b0df57f1bceda7f0fa9403",
-    "run/common.sh": "4593ff898149f7f189ccec6bd7ecd4528a0ee0b02def55ba87e3c5d40eead219"
-   },
-   "inputs_freeze": "Stage 0 (run/00-02) generates the classes, transport and specs deterministically from this commit; their digest (inputs/MANIFEST.sha256) is recorded in INPUTS.md as amendment A1, filed before any measured run; a class-search or spec output that differs on re-run invalidates the freeze",
-   "route": "Iso Lab on EKS Spot, AWS bridge: remote/validate-request + remote/launch-remote with a digest-pinned image from isolab-experiment.yml publish_only=true at the frozen commit (run/03-launch.sh; run/CARD.md)"
-  }
- }
 }
