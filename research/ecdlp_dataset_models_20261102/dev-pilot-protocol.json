@@ -1,0 +1,68 @@
+{
+ "schema": "experiment.protocol/v1",
+ "study": "ecdlp_dataset_models_20261102",
+ "status": "development-only",
+ "purpose": "Generate a local development pilot of the native ECDLP/PDP dataset to build and debug the training and evaluation pipeline of docs/ml-dataset/training-protocol-20261101.md. Per that contract, development data may tune parsers and debug a model; it may not select a winner, estimate generalization, or provide a final test set.",
+ "claims": [
+  {
+   "id": "pipeline",
+   "text": "the export-join-train-evaluate pipeline runs end to end with leakage checks and grouped splits",
+   "class": "exact_computation"
+  },
+  {
+   "id": "dev-metrics",
+   "text": "development metrics under leave-one-field-size-out are reported for pipeline debugging only",
+   "class": "out_of_scope"
+  }
+ ],
+ "population": "natural",
+ "plan_axes": {
+  "n": [
+   23,
+   25,
+   27,
+   29,
+   31
+  ],
+  "m": [
+   2,
+   3
+  ],
+  "families": [
+   "koblitz",
+   "binary",
+   "prime"
+  ],
+  "twists": "both",
+  "curve_seeds": 2,
+  "generators": 1,
+  "keys": 2,
+  "solvers": [
+   "enumerate",
+   "bsgs",
+   "root",
+   "double-large-prime"
+  ],
+  "work_limit": 100000,
+  "planned_cells": 960
+ },
+ "resources": {
+  "seconds_per_case": 20,
+  "memory_mib": 2048,
+  "trace_mib": 64,
+  "host": "session container, 4 vCPU",
+  "remote_publication": "none"
+ },
+ "splits": "exporter split components (field size) used as independent units; evaluation by leave-one-component-out; no row-random split",
+ "controls": {
+  "negative": "within-stratum label permutation (stratum = arm x family x m)",
+  "positive": "a feature-leak canary column equal to the label, run only to show the leakage scan and evaluator detect it, never in a reported model"
+ },
+ "decision_rule": "none: development-only; no winner selected and no generalization estimate claimed",
+ "freeze": {
+  "status": "frozen",
+  "protocol_sha256": "5740dd6d1e93e54ff8fc32c696260b664194e22a89d9d8c5396ab4efd991d71f",
+  "filed_before_affected_data": true,
+  "frozen_at": "2026-11-02T17:30:00Z"
+ }
+}
