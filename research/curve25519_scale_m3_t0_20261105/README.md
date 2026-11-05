@@ -247,3 +247,11 @@ the ratio moves with the column mismatch of each pairing (6 against 7 columns at
    artifacts. One curve and one seed per (k, t); no spread.
 
 Report PDF: [REPORT.pdf](REPORT.pdf).
+
+## Coordinator review note
+
+- **The PDF stays in git.** REPORT.pdf (88 KB) is committed here, not sent to the artifact store. The lab rule keeps PDFs in git; only data files over 64 KiB go to the store.
+- **Binary identity was checked.** sha256 d66b85b0…ca90 before the first cell and after the last, the same frozen binary as S1 and S3.
+- **The factor base was held fixed while k grew.** So per-relation cost rising with k (part 1, isogeny t = 6) comes from falling coverage at fixed t, by construction. It says nothing about the exponent of a parameterisation where t grows with k.
+- **m = 3 is still a regression.** No m = 3 / m = 2 pair is below 1 (smallest ratio 2.7e4). That rests on 11 isogeny t = 6 pairs, one curve and one seed per cell, and capped target counts that depend on load. [pcc:unverified]
+- **Several bits m = 3 cells ran out of memory.** That includes one census cell with 0 targets, so the memory may be spent before any target is solved. This is one cell, not a located cause.
