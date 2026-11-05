@@ -20,6 +20,7 @@ use crypto_lib::cryptanalysis::cheon_counted::{
     cheon_pminus1, cheon_pplus1, distinct_prime_factors, find_shaped_curve, leaked_powers,
     next_prime, scalar_mul_plain, shape_divisor, Side,
 };
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crypto_lib::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
 use crypto_lib::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
 use crypto_lib::cryptanalysis::ic_boundary::{GroupOps, PrimeCurve, PrimePoint};
@@ -439,7 +440,7 @@ fn replay(args: &[String]) {
             let seed: u64 = rec["algorithm_seed"].as_str().unwrap().parse().unwrap();
             let rep = solve(&rho_method, &inst, &w.curve, &w.target, seed).expect("rho solve");
             let recorded = rec["cost"]["total_gae"].as_f64().unwrap();
-            let verified = rep.recovered == w.planted;
+            let verified = rep.recovered == w.planted.map(ExactScalar::from);
             let same_rho = rep.total_gae == recorded && verified;
             all_ok &= same_rho;
             eprintln!(

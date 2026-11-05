@@ -6,6 +6,7 @@ pub use value::*;
 #[path = "../tools/aps-export/src/audit.rs"]
 mod audit;
 
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crypto_lib::cryptanalysis::{
     ecbench::{
         methods::{self, MethodSpec},
@@ -71,7 +72,12 @@ fn produced(encoding: &str, orbit: bool, prune: bool, first: bool) -> Value {
     })
     .unwrap();
     let report = methods::solve(&method, &instance, &facts, &target, 20261026).unwrap();
-    assert_eq!(report.recovered, Some(u128::from(k)), "{}", report.detail);
+    assert_eq!(
+        report.recovered,
+        Some(ExactScalar::from(u128::from(k))),
+        "{}",
+        report.detail
+    );
     let record = json!({"schema":"ecbench.record/v1","record_id":"","workload":{"curve_spec":spec,"curve":facts,"target":target},"method":method,"algorithm_seed":"20261026","outcome":{"status":"verified","recovered":k.to_string()},"detail":report.detail,"phases":report.phases,"online":report.online,"counters":report.counters,"time":{"solve_wall_ns":report.solve_wall_ns,"method_call_wall_ns":null}});
     // This literal seal is an integrity check, not an execution certificate.
     let mut record = record;
