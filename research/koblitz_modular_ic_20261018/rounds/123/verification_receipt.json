@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/123/verify123.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "CENSUS123_INDEPENDENT_DEGREE_PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/123/generate_lean123.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "LEAN123_SOURCE_BINDING_PASS\n"
+    },
+    {
+      "argv": [
+        "lean",
+        "research/koblitz_modular_ic_20261018/rounds/123/lean/BranchCensus123.lean"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/123/census123.py",
+        "/tmp/koblitz-r123-replay"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "CENSUS123_ALL_CHECKS_PASS\n"
+    }
+  ],
+  "files_sha256": {
+    "PROTOCOL.md": "e087a6252c0c21e369f350675e2ff77db114ab96068cfe61d996d7cbe035e1b3",
+    "census123.py": "39c972710a20221beb7b16052b723713ee7eb22617d26c11097e8d8da9c55942",
+    "generate_lean123.py": "bb0079dc5dbff446828d40b7affade78b387a5fee1578269e05fb7c053b9cf77",
+    "lean/BranchCensus123.lean": "d3e9f1da28da0af758c6561ba2fe63f722e9f134504e20800822e064bdd6807e",
+    "protocol.json": "b58660a55855ce9d496402703d7456018ea9cd02680be8dbc860f2f36b9d76e1",
+    "publication/report.pdf": "2b961ba85012c1672580afdd7383df6286c057487efe052dbefe12b353ef2015",
+    "result.json": "1435f4fbc2d1b04d628b5adc326916ed1f3a1406c24271348aaffe857e0b3fe3",
+    "verify123.py": "931e1c89dee20557c340594f1cadcdeee2234537d022d58de523ecd40ebec594"
+  },
+  "replay_byte_identical": true
+}
