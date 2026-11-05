@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
-DEST=s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/
+DEST=s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/results/
 START=$(date -u +%FT%TZ)
 set +e
 timeout --preserve-status --signal=TERM --kill-after=45s 13000s bash "$HERE/execute.sh"
