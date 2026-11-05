@@ -85,6 +85,7 @@ pub(super) struct OriginalOwner<'a> {
     map_ack: Option<capture::CommittedEventPosition>,
     publication_attempted: bool,
     map_published: bool,
+    boolean_attempted: bool,
     capture_limits: capture::CaptureLimits,
 }
 
@@ -364,6 +365,7 @@ impl<'a> OriginalOwner<'a> {
                     map_ack: None,
                     publication_attempted: false,
                     map_published: false,
+                    boolean_attempted: false,
                     capture_limits: capture_limits.clone(),
                 })
             }
@@ -953,3 +955,7 @@ pub(in crate::ml_dataset::solvers) mod central;
 
 #[path = "sat_initial_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod worker;
+
+// Original-ledger finite Boolean row producer; no CLI activation.
+#[path = "original_boolean_rows.rs"]
+pub(in crate::ml_dataset::solvers) mod boolean_rows;

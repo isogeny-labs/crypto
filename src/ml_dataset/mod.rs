@@ -1438,6 +1438,9 @@ fn finish_retained_worker_output(
 ) -> Result<Value, String> {
     let (data, stored, residual) = output.into_parts();
     *retained = residual;
+    if retained.boolean_rows_report_unavailable() {
+        return Err("Boolean finite-row report publication is not admitted".into());
+    }
     if retained.sat_report_unavailable() {
         return Err("SAT initial terminal report was not admitted or already consumed".into());
     }

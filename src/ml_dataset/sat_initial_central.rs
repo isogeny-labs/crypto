@@ -1,6 +1,8 @@
 //! Read-only central initial-prefix verification. No generator, clock renewal,
 //! producer-budget creation, mutable original factory, or exporter callback.
 use super::*;
+use super::boolean_rows::receipt as row_wire;
+use provenance::boolean_equations::{self as row_equations, matrix_rows as row_matrix};
 #[path = "sat_original_math_preflight.rs"]
 mod original_math;
 use crate::ml_dataset::{
@@ -76,6 +78,7 @@ impl Admission for ReplayBudget {
 /// seal survives moving it; the success type below is minted only at the end.
 pub(in crate::ml_dataset::solvers) struct Frame {
     budget: ReplayBudget,
+    row_mode: Option<RowReplay>,
     config: Vec<u8>,
     public: Vec<u8>,
     factor: Vec<u8>,
@@ -404,13 +407,15 @@ fn capture_buffer_owners(head: &capture::CommittedHead, dir: &Path) -> Result<u6
 }
 /// Historical verification uses LaunchContext::validate through execution::verify,
 /// never execution::admit (which would inspect today's clock as producer entry).
-pub(in crate::ml_dataset::solvers) fn verify(
+fn verify_mode(
     dir: &Path,
     config: &CaseConfig,
     artifacts: &[Artifact],
     policy: Policy,
+    row_mode: Option<RowReplay>,
 ) -> Result<Outcome, Failed> {
     let mut frame = Frame {
+        row_mode,
         budget: ReplayBudget {
             policy,
             work: 0,
@@ -673,7 +678,7 @@ fn run(
     {
         return Err("replay stream/payload cap".into());
     }
-    if head.payload_count != 1 {
+    if head.payload_count != if f.row_mode.is_some() {2} else {1} {
         return Err("initial capture requires exactly one original map payload".into());
     }
     f.head = Some(head.clone());
@@ -717,9 +722,18 @@ fn run(
                     ));
                 }
                 capture::OwnedReplayRequest::Payload(_, artifact) => {
-                    if f.payload_check_complete || !f.payload_check_raw.is_empty() {
-                        return Err("payload verifier owner cannot be replaced".into());
+                    if f.payload_check_complete {
+                        let r=f.row_mode.as_mut().ok_or("payload verifier owner cannot be replaced")?;
+                        if r.payload_checked || !r.payload_raw.is_empty(){return Err("row payload owner cannot be replaced".into())}
+                        let path=format!("live/{}",artifact.path);
+                        r.payload_raw=read(dir,&path,artifact.bytes,&mut f.budget,&mut f.pending_read)?;
+                        DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"row payload hash deadline")?;
+                        let verified=capture::verify_replay_payload_bytes(artifact,&r.payload_raw)?;
+                        DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"row payload hash deadline")?;
+                        r.payload_checked=true;
+                        return Ok(capture::OwnedReplayReply::Payload(verified))
                     }
+                    if !f.payload_check_raw.is_empty(){return Err("payload verifier owner cannot be replaced".into())}
                     let path = format!("live/{}", artifact.path);
                     // Actual-length descriptor read enforces declared byte cap plus
                     // a prepaid sentinel; no unbounded hash_file EOF traversal.
@@ -779,7 +793,20 @@ fn run(
                 serde_json::from_slice(line).map_err(|e| e.to_string())?;
             let digest = hex::encode(Sha256::digest(line));
             f.visited.last_hash = Some(digest.clone());
-            if row.event["kind"] == "capture_payload_committed" {
+            if row.event["kind"] == "capture_payload_committed" && row.event["artifact"]["role"] == row_wire::ROLE {
+                let r=f.row_mode.as_mut().ok_or("row receipt in initial-only capture")?;
+                if r.stored.is_some() || f.map.is_none(){return Err("row receipt order".into())}
+                let artifact:Artifact=serde_json::from_value(row.event["artifact"].clone()).map_err(|e|e.to_string())?;
+                if artifact.encoding!="json" || artifact.bytes>f.budget.policy.payload_bytes{return Err("row artifact cap/encoding".into())}
+                f.visited.payload(artifact.bytes,&head).map_err(|_|"row payload exceeds admitted head")?;
+                let path=format!("live/{}",artifact.path);
+                r.raw=read(dir,&path,artifact.bytes,&mut f.budget,&mut f.pending_read)?;
+                if r.raw.len() as u64!=artifact.bytes || hex::encode(Sha256::digest(&r.raw))!=artifact.sha256{return Err("row artifact digest".into())}
+                f.budget.reserve_checking(artifact.bytes.checked_mul(256).ok_or("row decode work overflow")?,artifact.bytes.checked_mul(128).ok_or("row decode memory overflow")?,Instant::now()).map_err(|_|"row decode admission")?;
+                r.stored=Some(serde_json::from_slice(&r.raw).map_err(|e|e.to_string())?);
+                r.receipt=Some((row.sequence,digest));
+                r.artifact=Some(artifact);
+            } else if row.event["kind"] == "capture_payload_committed" {
                 if f.map.is_some() || f.transcript.is_some() {
                     return Err("duplicate/interleaved initial map".into());
                 }
@@ -864,6 +891,10 @@ fn run(
                         }
                     }
                 }
+                if let Some(r)=f.row_mode.as_mut(){
+                    r.map_receipt=Some((row.sequence,digest.clone()));
+                    r.map_artifact=Some(a);
+                } else {
                 f.transcript = Some(
                     transcript::Transcript::new(
                         transcript::Expected {
@@ -886,7 +917,9 @@ fn run(
                     )
                     .map_err(|_| "transcript admission refused")?,
                 );
+                }
             } else if row.event["kind"] == "binary_sat_initial" {
+                if f.row_mode.is_some(){return Err("initial event in row-only capture".into())}
                 if row.event["payload"]["schema"] == ledger::SCHEMA {
                     if f.checkpoint.is_some() || marker.is_none() {
                         return Err("ledger order mismatch".into());
@@ -916,9 +949,13 @@ fn run(
     f.visited
         .exact(&head)
         .map_err(|_| "visited endpoint differs from admitted head")?;
-    if authenticated.payloads.len() != 1 {
+    if authenticated.payloads.len() != if f.row_mode.is_some(){2}else{1} {
         return Err("initial map custody count mismatch".into());
     }
+    let complete = if f.row_mode.is_some() {
+        verify_row_math(f,config,original_binding,&launch_hash,[config.work_limit.checked_mul(1024).ok_or("work overflow")?.min(16_777_216),launch.memory_bytes,launch.trace_bytes,config.work_limit])?;
+        true
+    } else {
     let map = f.map.as_ref().ok_or("no original map")?;
     f.transcript
         .as_ref()
@@ -973,6 +1010,8 @@ fn run(
         true
     } else {
         false
+    };
+    complete
     };
     // Visitor effects remain provisional until every immutable join is repeated.
     f.budget
@@ -1684,4 +1723,107 @@ fn hash_artifact_descriptors(
     serde_json::to_writer(&mut writer, artifacts).map_err(|e| e.to_string())?;
     DecodeBudget::check(budget, Instant::now()).map_err(|_| "artifact fingerprint deadline")?;
     Ok(writer.hash.finalize().into())
+}
+
+pub(in crate::ml_dataset::solvers) struct RowLimits {
+    pub expansion: row_equations::Limits,
+    pub checker: row_matrix::CheckerLimits,
+}
+struct RowReplay {
+    limits:RowLimits,raw:Vec<u8>,stored:Option<row_wire::Stored>,
+    artifact:Option<Artifact>,map_artifact:Option<Artifact>,
+    receipt:Option<(u64,String)>,map_receipt:Option<(u64,String)>,
+    payload_raw:Vec<u8>,payload_checked:bool,
+    arithmetic:Option<row_matrix::OwnedReplay>,
+}
+impl RowReplay {
+    fn new(limits:RowLimits)->Self{Self{limits,raw:Vec::new(),stored:None,artifact:None,map_artifact:None,receipt:None,map_receipt:None,payload_raw:Vec::new(),payload_checked:false,arithmetic:None}}
+}
+pub(in crate::ml_dataset::solvers) struct VerifiedRow {frame:Frame}
+pub(in crate::ml_dataset::solvers) enum RowOutcome {Verified(VerifiedRow),UnknownOriginalMath(Frame),Incomplete(Frame)}
+pub(in crate::ml_dataset::solvers) fn verify(dir:&Path,config:&CaseConfig,artifacts:&[Artifact],policy:Policy)->Result<Outcome,Failed>{verify_mode(dir,config,artifacts,policy,None)}
+pub(in crate::ml_dataset::solvers) fn verify_boolean_row(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:Policy,limits:RowLimits)->Result<RowOutcome,Failed>{
+    match verify_mode(dir,config,artifacts,policy,Some(RowReplay::new(limits)))? {
+        Outcome::Verified(mut verified)=>{
+            if let Err(error)=join_row_terminal(dir,outcome,artifacts,&mut verified.frame){
+                verified.frame.diagnostic=Some(error);
+                let stop=verified.frame.budget.fail::<()>(Stop::InvalidLimits).unwrap_err();
+                return Err(Failed{frame:verified.frame,stop})
+            }
+            Ok(RowOutcome::Verified(VerifiedRow{frame:verified.frame}))
+        },
+        Outcome::UnknownOriginalMath(frame)=>Ok(RowOutcome::UnknownOriginalMath(frame)),
+        Outcome::IncompleteMissingProducerLedger(frame)=>Ok(RowOutcome::Incomplete(frame)),
+    }
+}
+impl VerifiedRow {
+    pub(in crate::ml_dataset::solvers) fn usage(&self)->(u64,u64){self.frame.usage()}
+    pub(in crate::ml_dataset::solvers) fn audit(&self)->&row_matrix::Audit{self.frame.row_mode.as_ref().unwrap().arithmetic.as_ref().unwrap().audit().unwrap()}
+}
+fn verify_row_math(f:&mut Frame,config:&CaseConfig,original_binding:[u8;32],launch_hash:&str,limits:[u64;4])->Result<(),String>{
+    let r=f.row_mode.as_mut().ok_or("row mode missing")?;
+    let stored=r.stored.as_mut().ok_or("row receipt missing")?;
+    let m=&stored.metadata;
+    let map=f.map.as_ref().ok_or("row original map missing")?;
+    let map_artifact=r.map_artifact.as_ref().ok_or("map descriptor missing")?;
+    let map_receipt=r.map_receipt.as_ref().ok_or("map receipt missing")?;
+    let receipt=r.receipt.as_ref().ok_or("row event receipt missing")?;
+    let artifact=r.artifact.as_ref().ok_or("row descriptor missing")?;
+    if stored.schema!=row_wire::SCHEMA || m.original_binding!=original_binding || hex::encode(m.launch_sha256)!=launch_hash
+        || m.pattern!=map.pattern() || m.pattern>=1u32.checked_shl((config.m-2) as u32).ok_or("pattern overflow")?
+        ||m.window!=0||m.variables!=map.variables()||m.limits!=limits||m.phase>=6||m.row>=m.generators
+        ||m.first_stop.is_some()||m.solver_completed||m.full_span_search||m.scalar_recovered
+        ||artifact.path!=format!("payloads/{}",row_wire::path(m.pattern,m.row))
+        ||m.map_sequence!=map_receipt.0||hex::encode(m.map_event_sha256)!=map_receipt.1
+        ||receipt.0!=map_receipt.0.checked_add(1).ok_or("receipt overflow")?
+        ||m.map_bytes!=map_artifact.bytes||hex::encode(m.map_sha256)!=map_artifact.sha256
+        ||m.wire_bytes!=stored.wire.len() as u64||<[u8;32]>::from(Sha256::digest(stored.wire.as_bytes()))!=m.wire_sha256{
+        return Err("row original/map/wire/receipt identity mismatch".into())
+    }
+    let t=m.totals;let l=m.limits;
+    if t[0].checked_add(t[2]).filter(|n|*n<=l[0]).is_none()
+        ||t[1].checked_add(t[4]).filter(|n|*n<=l[1]).is_none()
+        ||t[5]>l[2]||t[6]>l[3]||t[3]>t[2]
+        ||m.phase_native[0]>t[0]||m.phase_native[1]>t[1]
+        ||m.phase_limits[0]>l[0]||m.phase_limits[1]>l[1]
+        ||m.phase_native[0]>m.phase_limits[0]||m.phase_native[1]>m.phase_limits[1]{return Err("row producer ledger range mismatch".into())}
+    // Check the known self-publication minimum, without claiming full native
+    // cost chronology can be independently reconstructed from a checkpoint.
+    let cap=row_wire::cap(stored.wire.as_bytes()).ok_or("row wire alphabet")?;
+    let publication_min=cap.checked_mul(48).and_then(|v|v.checked_add(65536)).ok_or("row quote overflow")?;
+    if t[2]<publication_min{return Err("row ledger omits known publication charge".into())}
+    let map=f.map.take().unwrap();
+    let expanded=row_equations::expand_owned(map,r.limits.expansion,&mut f.budget);
+    let generators=expanded.equations().len() as u64;
+    let complete=expanded.status().is_ok();
+    let raw=std::mem::take(&mut stored.wire).into_bytes();
+    r.arithmetic=Some(row_matrix::replay_owned(expanded,raw,r.limits.checker,f.budget.policy.deadline,&mut f.budget));
+    if !complete||generators!=m.generators{return Err("row ordered generator expansion mismatch".into())}
+    if r.arithmetic.as_ref().unwrap().failure().is_some(){return Err("row source-bound arithmetic refused".into())}
+    Ok(())
+}
+
+fn join_row_terminal(dir:&Path,outcome:&Value,artifacts:&[Artifact],f:&mut Frame)->Result<(),String>{
+    f.budget.reserve_checking(8192,4096,Instant::now()).map_err(|_|"row terminal admission")?;
+    let mut matches=artifacts.iter().filter(|a|a.path=="result.json");
+    let artifact=matches.next().ok_or("row result missing")?;
+    if matches.next().is_some()||artifact.role!="solver-outcome"||artifact.encoding!="json"||artifact.bytes>row_wire::REPORT_CAP{return Err("row result descriptor".into())}
+    f.terminal_raw=read(dir,"result.json",artifact.bytes,&mut f.budget,&mut f.pending_read)?;
+    if f.terminal_raw.len() as u64!=artifact.bytes||hex::encode(Sha256::digest(&f.terminal_raw))!=artifact.sha256{return Err("row result digest".into())}
+    f.budget.reserve_checking(artifact.bytes.checked_mul(256).ok_or("row result quote overflow")?,artifact.bytes.checked_mul(128).ok_or("row result quote overflow")?,Instant::now()).map_err(|_|"row result parse admission")?;
+    f.terminal=Some(serde_json::from_slice(&f.terminal_raw).map_err(|e|e.to_string())?);
+    if f.terminal.as_ref()!=Some(outcome){return Err("row result differs from caller manifest".into())}
+    let row=f.row_mode.as_ref().ok_or("row seal missing")?;
+    let m=&row.stored.as_ref().ok_or("row metadata missing")?.metadata;
+    let receipt=row.receipt.as_ref().ok_or("row receipt missing")?;
+    if outcome["adapter_id"]!="original-unit-boolean-row-v1"||outcome["strategy"]!="original-unit-boolean-row-v1"
+        ||outcome["status"]!="partial"||outcome["finite_row_receipt_committed"]!=true
+        ||outcome["solver_completed"]!=false||outcome["scalar_recovered_without_witness"]!=false
+        ||outcome["ecdlp_pipeline_completed"]!=false||outcome["full_span_search"]!=false
+        ||outcome["initial_checked"]==true||outcome["pattern"].as_u64()!=Some(m.pattern as u64)
+        ||outcome["row"].as_u64()!=Some(m.row)||outcome["receipt_sequence"].as_u64()!=Some(receipt.0)
+        ||outcome["receipt_sha256"].as_str()!=Some(receipt.1.as_str()){return Err("row terminal claim mismatch".into())}
+    f.terminal_head_raw=read(dir,"live/committed.json",65536,&mut f.budget,&mut f.pending_read)?;
+    if f.terminal_head_raw!=f.head_raw{return Err("row head changed during terminal join".into())}
+    DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"row terminal deadline".to_owned())
 }

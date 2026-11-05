@@ -446,6 +446,7 @@ impl<'a> NativeInitial<'a> {
             map_ack,
             publication_attempted,
             map_published,
+            boolean_attempted: _, // original owner is consumed; no row retry authority survives
             capture_limits,
         } = owner;
         let shared = Arc::new(Mutex::new(CaptureState {

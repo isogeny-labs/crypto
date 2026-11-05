@@ -371,6 +371,8 @@ pub(super) struct WorkerResidualCustody {
     // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
     sat: Option<koblitz_m3::sat_original_owner::worker::Custody>,
     sat_report_unavailable: bool,
+    boolean_rows: Option<koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt>,
+    boolean_rows_report_unavailable: bool,
 }
 pub(super) struct WorkerResidualArtifact {
     path: &'static str,
@@ -389,7 +391,7 @@ impl WorkerResidualCustody {
         items
             .try_reserve_exact(Self::CAPACITY)
             .map_err(|e| e.to_string())?;
-        Ok(Self { items, sat: None, sat_report_unavailable: false })
+        Ok(Self { items, sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false })
     }
     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
@@ -398,6 +400,7 @@ impl WorkerResidualCustody {
         self.items.push(item);
         Ok(())
     }
+    pub(super) fn boolean_rows_report_unavailable(&self) -> bool { self.boolean_rows_report_unavailable }
     pub(super) fn sat_report_unavailable(&self) -> bool {
         self.sat_report_unavailable
     }
@@ -420,6 +423,15 @@ impl WorkerSolveOutput {
             residual: WorkerResidualCustody::default(),
         }
     }
+    fn from_original_boolean_rows(mut custody: koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt) -> Self {
+        let outcome=custody.outcome();
+        let unavailable=outcome.is_none();
+        Self { data: SolverData { outcome:outcome.unwrap_or(Value::Null), artifacts:Vec::new() },
+            stored:Vec::new(), residual:WorkerResidualCustody {
+                items:Vec::new(),sat:None,sat_report_unavailable:false,
+                boolean_rows:Some(custody),boolean_rows_report_unavailable:unavailable,
+            } }
+    }
     fn from_sat_custody(mut custody: koblitz_m3::sat_original_owner::worker::Custody) -> Self {
         // None creates no producer reporting allocation. Parent adopts custody
         // before using its own existing error-reporting path.
@@ -429,7 +441,7 @@ impl WorkerSolveOutput {
             data: SolverData { outcome: outcome.unwrap_or(Value::Null), artifacts: Vec::new() },
             stored: Vec::new(),
             residual: WorkerResidualCustody {
-                items: Vec::new(), sat: Some(custody), sat_report_unavailable: unavailable,
+                items: Vec::new(), sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false,
             },
         }
     }
