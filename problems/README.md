@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Ecbench time-namespace runtime](ecbench-time-namespace-runtime.md) | open | two library clock-initialization controls | qualified proc time-namespace support or specified fail-closed unsupported-runtime contract; rerun original controls/full suite |
 | [Inherited main strict-lint failures](pkm-main-strict-lint-inherited.md) | open | integrated PKM strict lint | repair trace visibility/usage and custody boolean style upstream; rerun unchanged warnings-as-errors gate |
 | [Legacy PCC validator relative-path binding](pcc-legacy-validator-relative-path-binding.md) | open | shared PCC gate rejects13unchanged main claims | canonical shared-verifier/evidence-dir review with escape/digest canaries; preserve frozen claim/report/ledger bytes |
 | [Historical Lean coverage and semantic correspondence](https://github.com/aburan28/crypto-autoresearcher/blob/codex/lean-retrospective-20261018/problems/lean-retrospective-historical-coverage.md) | open | Certifying every past claim across the three repositories | Exact claim-to-proof inventory, remaining formal targets and concrete bridges, independent review and empirical replay |

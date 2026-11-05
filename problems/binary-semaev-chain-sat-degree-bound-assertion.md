@@ -39,3 +39,12 @@ invalid-degree boundaries. Local mergebbf241b7e includes it without a local
 assertion edit. The new example suites log26passes; the library test itself
 still awaits its current-source execution. Status remains open/pending affected
 contract qualification; old failure receipts remain unchanged. [pcc:unverified]
+
+## Affected test observed2026-11-05
+
+The current6168-case execution logs source_bound_covers_degree_83_without_constructing_a_model
+ok on integrated main d30. This qualifies that test's observed repair only;
+original exit criteria also require the broader chain-SAT and full-library
+qualification, and the current suite capped with other failures. Preserve the
+historical assertion failure; no local assertion edit. [Final receipt](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/main-d30b9e0db-20261105/library-final-20261105T1134Z/receipt.json).
+Status remains partial qualification. [pcc:unverified]

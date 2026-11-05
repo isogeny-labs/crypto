@@ -1,5 +1,26 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Terminal library collection — 2026-11-05T11:37:33.353524+00:00
+
+The existing16391 job is terminal124, not running or restarted. The6168-case
+serial run (10:14:25–10:54:25UTC) records2166passes,2failures,45ignored,
+1PKM shared-lift case unfinished and3954not reached. Wrapper124 is not a known
+Cargo exit; no final suite summary/full pass. All21source objects remain clean
+and equal; actual binary hash matches. [Final receipt](validation/main-d30b9e0db-20261105/library-final-20261105T1134Z/receipt.json). [pcc:unverified]
+
+Focused same-binary controls reproduce2failures at clock initialization: this
+runtime lacks `/proc/self/ns/time` and `/proc/self/timens_offsets`; runner
+source exactly matches main d30. No test/runtime/proc workaround was introduced.
+The old chain-SAT degree-bound test now logs ok, but the full suite remains
+incomplete. Raw213453bytes SHA256698fe35fe1d15a74ccce47535f75a9915d38782472fcf83379d50d4d1b6737db
+stays outside Git, NOT_UPLOADED. Current aggregate remains FAIL: inherited
+strictlint2, legacyPCC13, clock-control2 and cap. [pcc:unverified]
+
+All local validation jobs are terminal. Continue local G2 driver bookkeeping
+with mock work only; qualified production supervisor/resume remains open.
+Auto-merge stays paused and unpublished history is preserved.
+
+
 ## Library execution milestone — 2026-11-05T10:19:57.252933+00:00
 
 Source21objects remain exact/clean. Existing16391library no-run build exits0;

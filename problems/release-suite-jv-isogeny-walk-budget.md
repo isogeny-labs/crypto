@@ -89,3 +89,13 @@ not Cargoexit; [new receipt](../research/prime_ecdlp_three_leads_20261029/contin
 retains raw221629bytes/SHA25641ca32cee963b13adb6b5638abc52191de20f676b038874957a6b06e5e5ebebf
 NOT_UPLOADED. Earlier logs remain distinct and immutable. No duplicate suite
 was launched. Cause ofJV duration remains unknown; full-suite pass absent.
+
+## Current6168-case collection2026-11-05: different active case
+
+Current bbf/d30 run capped at40minutes with2166passes,2clock-control failures,
+45ignored,1PKM shared_lift_system_matches_lifts_one_and_the_brute_force_fiber
+case unfinished,3954not reached. This is not evidence that the historical JV
+case was active in this run. It had not been reached. Cause of the PKM case's
+duration remains unknown. Wrapper124/Cargoexitunknown, no final summary.
+[Final receipt](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/main-d30b9e0db-20261105/library-final-20261105T1134Z/receipt.json).
+Earlier JV caps remain immutable and unresolved. [pcc:unverified]
