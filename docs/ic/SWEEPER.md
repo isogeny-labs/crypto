@@ -246,6 +246,29 @@ rungs to `log2 r ≈ 252`; read it as a hypothesis (see "The projection amplifie
 noise"). `src/bin/ic_autolab.rs` is the frozen-protocol confirmation on fresh
 public targets for the same miniatures.
 
+### The full 255-bit field
+
+`src/cryptanalysis/curve25519_wide.rs` holds the real curve over the generic
+`Fp256` backend: `p = 2^255 − 19`, `A = 486662`, the short-Weierstrass law,
+scalar multiplication by the 252-bit subgroup order, and a counted bounded
+scan. `curve25519_family wide [base] [trials] [seed]` runs it:
+
+```bash
+cargo build --release --bin curve25519_family
+./target/release/curve25519_family wide 1024 1000000
+```
+
+The report checks `[ℓ]G = O`, `[ℓ+1]G = G` and `G` on the curve, then counts
+the group and field work of the base build and the probe stream. It does
+**not** claim a relation: at any feasible `N` and `T` the expected hits
+`T·N/ℓ` are zero, and the JSON says so.
+
+The index-calculus pipeline is not wired to this curve yet. `InstanceCtx`
+(`ic_framework/stages.rs`) stores `r`, `cofactor` and `group_order` as `u64`,
+`CountedGroup::mul` takes a `u64` scalar, and the relation matrix is modulo a
+`u64`. Those three are the next widening step; until they move to a 256-bit
+scalar, only projection from the miniatures is a measured IC result.
+
 ## Scale-relative knobs
 
 A configuration tuned at one size must say something at the next. Base sizes
