@@ -1,0 +1,4 @@
+import resource,subprocess,json,hashlib
+from pathlib import Path
+p=Path('/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v4');resource.setrlimit(resource.RLIMIT_AS,(2*1024**3,2*1024**3));before={f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in [p/'supervise.py',p/'test_supervise.py']}
+r=subprocess.run(['python3','-B','-m','unittest','-v','test_supervise'],cwd=p,capture_output=True,timeout=110);(p/'test.stdout').write_bytes(r.stdout);(p/'test.stderr').write_bytes(r.stderr);assert before=={n:hashlib.sha256((p/n).read_bytes()).hexdigest() for n in before};(p/'test-result.json').write_text(json.dumps({'exit':r.returncode,'source_hashes':before,'bound_seconds':120,'memory_mib':2048,'live_helper_executed':False},indent=2)+'\n');print(r.stderr.decode());raise SystemExit(r.returncode)

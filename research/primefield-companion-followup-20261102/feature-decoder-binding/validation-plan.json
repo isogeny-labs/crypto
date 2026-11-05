@@ -1,0 +1,64 @@
+{
+  "schema": "repaired-decoder-validation-plan/v1",
+  "status": "specified_not_frozen_or_launched",
+  "purpose": "fresh public source-oracle recovery correctness, not a timing or compiler-cost comparison",
+  "backend": "isolab EKS cpu-spot",
+  "curves": [
+    {
+      "p": 353,
+      "r": 359
+    },
+    {
+      "p": 509,
+      "r": 479
+    },
+    {
+      "p": 701,
+      "r": 683
+    }
+  ],
+  "arms": [
+    "baseline",
+    "candidate",
+    "aa"
+  ],
+  "targets": "every scalar 0 through r-1 on each original curve/arm",
+  "total_targets": 4563,
+  "candidate_change": "r479 program uses checked repaired coefficients; other curve programs and source semantics unchanged",
+  "baseline": "original published target-independent coefficient programs",
+  "aa": "same candidate with original reversed traversal",
+  "public_boundary": "source setup and point oracle receive curve,P,Q,offsets only; checker labels outside guards",
+  "metrics": [
+    "exact scalar and point verification",
+    "all shifted sign checks",
+    "complete fresh source receipts",
+    "decoder operation ledger"
+  ],
+  "performance_claims": false,
+  "compile_from_scratch": false,
+  "cold_setup_cost": "not measured by this correctness plan",
+  "resources": {
+    "cpu": 1,
+    "memory": "2Gi",
+    "seconds": 900,
+    "retries": 0,
+    "dollar_ceiling": 1
+  },
+  "required_before_freeze": [
+    "complete fresh-source dependency manifest",
+    "digest-pinned runtime identity",
+    "exact runner and analysis hashes",
+    "protocol.v1 validation and GitHub publication receipt"
+  ],
+  "admission_blockers": [
+    "live NodePool limits unavailable to configured role",
+    "namespace ResourceQuota read forbidden",
+    "lane cost reservation and pinned-runtime publication not established"
+  ],
+  "must_not_substitute": [
+    "recorded oracle replay for fresh source execution",
+    "four local contract cases for full cohort",
+    "local run to bypass EKS admission"
+  ],
+  "preserve_original_records": true
+}

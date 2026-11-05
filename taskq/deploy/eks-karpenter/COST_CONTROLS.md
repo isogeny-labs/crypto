@@ -4,6 +4,32 @@ Owner instruction, 2026-11-01: check EKS/IsoLab experiments into GitHub,
 budget aggressively, and restrict vCPU/RAM through Karpenter limits. This
 supersedes older advisory/unlimited-spending guidance for cloud execution.
 
+## Current daily allowance (2026-11-03)
+
+The owner authorized **USD 200 per day for IsoLab**, replacing the USD 25
+daily allowance from 2026-11-01. This is one shared daily allowance across
+IsoLab work, including builds, idle capacity, retries, storage and transfer.
+Finite per-attempt budgets and the pre-submission accounting below still apply.
+
+Both existing daily AWS Budgets in account `104186811093` were updated from
+USD 25 to USD 200 and verified through `DescribeBudget` on 2026-11-03:
+
+- `isolab-daily-cost-100` (historical name retained).
+- `spot-experiments-daily-25` (historical name retained).
+
+These thresholds describe the same allowance; they do not authorize USD 400
+combined. Both retain their existing account-wide scope (no cost filters),
+cost settings and notification configuration. The monthly budget
+`isolab-monthly-account-cost` remains USD 1,000. Before submitting work, account
+for committed and reserved spending against both the daily and monthly budgets.
+The CPU/RAM policy below is unchanged; this update does not establish live
+NodePool or ResourceQuota enforcement. AWS Budget alerts remain delayed
+notifications rather than a hard spending stop.
+
+The dated readback is committed in
+[budget-change-20261103.json](budget-change-20261103.json). The November 1
+inspection below is historical; use this section for the current daily allowance.
+
 ## Desired limits
 
 | Control | CPU | RAM |
