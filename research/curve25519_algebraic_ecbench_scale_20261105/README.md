@@ -184,3 +184,9 @@ runner, tables, figure, replay scripts), `sessions/` (14 sessions' records and
 metadata, `NOTES.tsv` start/end/load log), `analysis/` (per-chunk band JSON,
 `perchunk.tsv`, `summary.tsv`, figure + data, verify receipts, load logs).
 `REPORT.pdf`: this file rendered.
+
+## Coordinator review note
+
+- **These are local L0 sessions on a shared, loaded box.** There is no second-host replay, no validator report and no `VALIDATION.json`, so no row here goes to the leaderboard or `benchmarks/`.
+- **The t = 10 arm's figures are bounds, not measurements.** Its k = 24 mean covers the 2 of 6 solves that finished under a wall-clock cap, so it is a lower bound. The k = 28 figure is an F4-only estimate, not a measurement.
+- **The algebraic arms stay behind `proj-a` at every weight measured.** They are about 3–4× behind at w = 0, and over 6e4× at w = 0.1 and w = 1. `proj-a` stays behind `rho-neg`, and that gap widens with k: 11.6×, 16.0× and 24.9× at k = 24, 28 and 32 (w = 0). [pcc:unverified]
