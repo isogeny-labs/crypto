@@ -265,6 +265,17 @@ The bound is attained at $n=17,19$.
   \item Certificate checker: \texttt{verify/cert\_check.py}, which
     rebuilds $F$ from the curve parameters by its own Möbius interpolation
     of $\Sem3$ values.
+  \item Implementation~C: a native Rust closure in this repository,
+    \art{examples/fd_m2_degrees.rs}, sharing no code with A or B. It
+    builds the descent in the repository's Boolean-ring library and runs
+    the full MutantXL closure ($=W_D$) and Boolean F4. In a pilot on a
+    4-core development host, which is not a measurement and has not been
+    independently checked, it reproduced the recorded $d_{\tilde F}$ of
+    eight instances (R11a, R13a, R15a, R19a, P17a, P21a, P21c, U33a) and
+    $1\notin W_4$ on T33a with $\operatorname{rank}W_4=48{,}068$, as
+    recorded. Planted solvable controls were never refuted up to $D=5$.
+    The calibration stage of the frozen protocols below repeats this
+    check before any new row is read.
   \end{itemize}
 \item \emph{Instances.}
   \begin{itemize}
@@ -661,4 +672,15 @@ null). None was observed in $n$ at a fixed base.
   instance at $n\ge41$. The written proofs need expert review. The
   Kummer-tower data must be regenerated
   (\art{research/paper_opportunities_20261029/}).
+\item \emph{Requested data.} The runs that would enlarge the binary sample
+  and add F4 step degrees beside Table~1 of Kousidis and
+  Wiemers~\cite{kousidis2019} are preregistered as two protocols, frozen
+  before any data: \texttt{FD-BINARY-CLOSURE-EXT} and
+  \texttt{FD-F4-STEP-DEGREE}
+  (\art{research/fd_paper_data_request_20261029/}). Both run on
+  Implementation~C. Each must first pass a calibration stage that
+  reproduces every recorded outcome, an A/A check and a negative
+  control. No run has been made yet. New $d_{\tilde F}\ge5$ rows will be
+  marked \emph{closure only} until an independent certificate is
+  checked.
 \end{itemize}
