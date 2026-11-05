@@ -11,7 +11,7 @@
     "prediction": "Running atlas-match on LEAD-ICP-full-width-arity-grid will return a non-empty lead record containing a blocking_reason field and a next_action field that names a specific, tool-verifiable step (e.g., 'measure m=3 summation-polynomial relation yield at 50-bit with fixed factor-base size') rather than a generic research direction.",
     "test": "Run `python3 tools/lead_atlas.py --match \"LEAD-ICP-full-width-arity-grid\"` and verify the output contains a lead object with id LEAD-ICP-full-width-arity-grid, status open_blocked, and non-null blocking_reason and next_action fields.",
     "falsification": "If atlas-match returns an empty array, or the matched lead has status closed_obstructed/known_result/dominated, or blocking_reason/next_action are missing or null, the claim is refuted for this round.",
-    "goal": "Execute atlas-match on LEAD-ICP-full-width-arity-grid to retrieve its blocking_reason and next_action; then lint a task card (card-lint) that specifies the single cheapest discriminating measurement named in next_action (e.g., a single 50-bit subgroup, m=3 summation-polynomial relation harvest with fixed factor-base, wall-clock timed against a negation-map Pollard-rho baseline on identical parameters), including the exact falsification criterion (measured IC exponent ≥ 0.5 or relation yield \u003c linear-algebra threshold)."
+    "goal": "Execute atlas-match on LEAD-ICP-full-width-arity-grid to retrieve its blocking_reason and next_action; then lint a task card (card-lint) that specifies the single cheapest discriminating measurement named in next_action (e.g., a single 50-bit subgroup, m=3 summation-polynomial relation harvest with fixed factor-base, wall-clock timed against a negation-map Pollard-rho baseline on identical parameters), including the exact falsification criterion (measured IC exponent ≥ 0.5 or relation yield < linear-algebra threshold)."
   },
   "goal_dir": "/tmp/claude-0/-home-user/1e979b36-2873-5ff9-8073-7c398df72533/scratchpad/live/prog2/goals/r2",
   "goal_status": "needs_review",
@@ -60,5 +60,37 @@
   "budget_usd": 0,
   "report_path": "/tmp/claude-0/-home-user/1e979b36-2873-5ff9-8073-7c398df72533/scratchpad/live/prog2/report.md",
   "episodes_path": "/tmp/claude-0/-home-user/1e979b36-2873-5ff9-8073-7c398df72533/scratchpad/live/prog2/episodes.jsonl",
-  "finished_at": "2026-11-05T04:32:37Z"
+  "finished_at": "2026-11-05T04:32:37Z",
+  "atlas_matches": [
+    {
+      "id": "LEAD-ICP-full-width-arity-grid",
+      "disposition": "open_blocked",
+      "title": "Full-width complete-solve IC arity grid (m = 2..8) at 50-63-bit subgroups - prime coset/small-x bases, Koblitz orbit and ordinary-binary bases",
+      "score": 30.0
+    },
+    {
+      "id": "LEAD-ICP-generic-table-decomposition",
+      "disposition": "closed_obstructed",
+      "title": "Enumeration, subtraction and meet-in-the-middle pair-table decomposition for prime-field Semaev IC (arity 2 to 7)",
+      "score": 10.0
+    },
+    {
+      "id": "KR-RHO-cd0049",
+      "disposition": "known_result",
+      "title": "Measured (toy, prime): negation-map BSGS at 1.160 [1.068, 1.248] x the generic floor with a 0.50 sqrt(r) table",
+      "score": 9.0
+    },
+    {
+      "id": "LEAD-ICB-large-prime-variants",
+      "disposition": "open_next_step",
+      "title": "Single and double large-prime relation collection for binary and Koblitz IC (free-leg, GTTD on subspace bases)",
+      "score": 9.0
+    },
+    {
+      "id": "LEAD-ICB-nonlinear-frob-stable-bases",
+      "disposition": "open_next_step",
+      "title": "Non-subspace Frobenius-stable factor bases at prime n: trace-spectrum, Hamming ball, multiplicative subgroup, tau-adic, algebraic-group (Couveignes-Lercier) points",
+      "score": 9.0
+    }
+  ]
 }
