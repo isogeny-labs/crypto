@@ -108,7 +108,14 @@ pub fn export(study: &Path, analyzer: &Path, created: &str) -> Result<()> {
     check(
         matches!(
             round,
-            "round18" | "round19" | "round20" | "round21" | "round22" | "round23" | "round24"
+            "round18"
+                | "round19"
+                | "round20"
+                | "round21"
+                | "round22"
+                | "round23"
+                | "round24"
+                | "round25"
         ),
         "unsupported study",
     )?;
