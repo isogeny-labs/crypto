@@ -8,6 +8,7 @@ logarithm. Complete subgroup tables are checker artifacts only.
 From the repository root:
 
 ```sh
+python3 tools/artifacts/artifacts.py pull research/primefield-companion-followup-20261102/feature-native-normalized-transport
 rustc --edition=2021 -O -C overflow-checks=yes --test research/primefield-companion-followup-20261102/feature-native-normalized-transport/lib.rs -o /tmp/normalized-transport-tests
 /tmp/normalized-transport-tests --test-threads=1 --nocapture
 rustc --edition=2021 -O -C overflow-checks=yes research/primefield-companion-followup-20261102/feature-native-normalized-transport/check.rs -o /tmp/normalized-transport-check
