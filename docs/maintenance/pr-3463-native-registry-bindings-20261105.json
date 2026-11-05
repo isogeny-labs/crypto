@@ -1,0 +1,86 @@
+{
+  "schema": "source-bound-native-registry-restoration/v1",
+  "pr": 3463,
+  "parent": "09402c50763e627c0cb1a93e58631323804ceffd",
+  "main": "389a522da37dc9045e438e75597549337785f4ad",
+  "standing": "unverified",
+  "source_catalog": {
+    "path": "docs/curves/sources/quadratic-twist-native-20261021.json",
+    "sha256": "7ad89806a138c0ba91de83d505a98272d2f14f69c4a25cb04b3884d6d15f74c2",
+    "bytes": 2124032
+  },
+  "source_review": [
+    "docs/curves/ICV1.md",
+    "docs/curve-identities.md",
+    "scripts/build_curve_registry.py:harvest_native_quadratic_twists",
+    "research/quadratic_twist_evidence_20261021/native/metadata/main.rs"
+  ],
+  "generation": {
+    "native_producer_unchanged": true,
+    "input": "Archived current-head native audit artifact13415263863, not a new scientific trial",
+    "command": "cargo run --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/metadata/Cargo.toml -- SCRATCH_ROOT ARCHIVED_RESULTS FRESH_OUTPUT --write-registry",
+    "canonical_helpers": [
+      "scripts/curve_id.py:alias_map_text",
+      "scripts/curve_id.py:registry_index_text"
+    ],
+    "all_20848_old_rows_structurally_identical": true,
+    "added_rows_exact_from_existing_catalog": 1918,
+    "all_42711_old_alias_values_unchanged": true,
+    "added_alias_keys": 3836,
+    "no_old_or_new_identity_reassigned": true
+  },
+  "files": {
+    "docs/curves/registry.json": {
+      "bytes": 22282514,
+      "sha256": "6dcbd903602eca7a6973136e86bff1f1e3a595a0ffa3dedc6374d4f1ed0a5ef3"
+    },
+    "src/cryptanalysis/curve_aliases.json": {
+      "bytes": 3884226,
+      "sha256": "f29ecac826deb7ad86a1fc31f24ec6b5f0d24f4fccbe138a0f15a5b243d39402"
+    },
+    "src/cryptanalysis/ecbench/registry_index.txt": {
+      "bytes": 193996,
+      "sha256": "7c8dc63f20346dba544a6e195a9c7bed9cd06b49d8df16b54cbcbbf82ff9a3fa"
+    }
+  },
+  "local_validation": {
+    "metadata_unit_tests": 43,
+    "original_test_metadata_script": "passed, including source-binding rejection",
+    "four_identity_certificates_and_catalog": "byte-identical to committed/hash-bound originals",
+    "registry_update": {
+      "base_aliases_sha256": "f29ecac826deb7ad86a1fc31f24ec6b5f0d24f4fccbe138a0f15a5b243d39402",
+      "base_registry_sha256": "6dcbd903602eca7a6973136e86bff1f1e3a595a0ffa3dedc6374d4f1ed0a5ef3",
+      "existing_rows_preserved": true,
+      "models_counted": 1921,
+      "new_alias_keys": 0,
+      "new_registry_rows": 0,
+      "schema": "quadratic-twist-registry-update/v1",
+      "updated_aliases_sha256": "f29ecac826deb7ad86a1fc31f24ec6b5f0d24f4fccbe138a0f15a5b243d39402",
+      "updated_registry_sha256": "6dcbd903602eca7a6973136e86bff1f1e3a595a0ffa3dedc6374d4f1ed0a5ef3"
+    },
+    "logs": {
+      "native-metadata-unit-final.log": {
+        "bytes": 3200,
+        "sha256": "051893769271fee82a7621b336304fa71877f7ec243dad868e6dc473e416a66f"
+      },
+      "native-test-metadata-final.log": {
+        "bytes": 101,
+        "sha256": "6f3a06609235c3a18ca201e72fc22fdf3f4be052d66102db62d43dea8cb0f124"
+      },
+      "native-registry-generation.log": {
+        "bytes": 713,
+        "sha256": "2c6d6303113c4c0008486f791a7a7b706158761f4b84c1d032379903164c04d4"
+      }
+    }
+  },
+  "remaining": "Fresh exact-head full native/root/applicable CI, gate/size/artifacts, reviews and actual budget<=30; inherited failures are not waived",
+  "external_lookup": "ECDB_TOKEN absent; no ECDB property inference. Import only the already hash-bound catalog metadata.",
+  "preserved": [
+    "all frozen metadata producer/test script/proof/certificate/input bytes",
+    "all scientific assertions and evidence",
+    "entire upstream N83 integration",
+    "portable tally tests and field-source triggers",
+    "all parent journals",
+    "exact upstream PCC tree; no producer signing or ledger rewrite"
+  ]
+}

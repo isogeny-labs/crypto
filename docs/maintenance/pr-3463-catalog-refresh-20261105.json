@@ -1,0 +1,107 @@
+{
+  "current_head_ci_before_fix": {
+    "harness": {
+      "job": 127430667724,
+      "status": "in_progress at 18:31 UTC"
+    },
+    "native_audit": {
+      "conclusion": "success",
+      "job": 127429765903
+    },
+    "records": {
+      "conclusion": "failure",
+      "finding": "modified benchmark entry lacks a naming record",
+      "job": 127429764544
+    },
+    "validation_gate": {
+      "conclusion": "failure",
+      "finding": "covers.json binds a stale registry",
+      "job": 127429764522
+    }
+  },
+  "evidence": "pr-3463-catalog-refresh-20261105/metadata-validation/",
+  "failures": [
+    "initial wrong helper-name lookup failed before compilation; raw log retained",
+    "first full local records gate:423 sparse-checkout missing-path problems; exact397 public files materialized, then43-record gate passed"
+  ],
+  "journal": {
+    "complete_parent_bytes": 222349,
+    "complete_parent_sha256": "80394321a753289a466ec985c79d3d74c2449e430d6bc6d351bbade597f888f7",
+    "complete_public_working_bytes": 210493,
+    "complete_public_working_sha256": "7037dad7c0d465d8372811210542bf446e6d81292ae9eb96366bb354142ff7d5",
+    "earlier_public_complete_bytes_embedded": true,
+    "parent_is_prefix": true
+  },
+  "local_source_commit": "61abb767e2569d63b512e31dcafb7aeec32d66ba",
+  "metadata_counts": {
+    "command_exits": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "commands_executed": 5,
+    "complete_target_records_compared": 1,
+    "graph": {
+      "covers": {
+        "added": 1918,
+        "new_total": 22764,
+        "old_retained": 20846
+      },
+      "maps": {
+        "added": 1918,
+        "new_total": 22766,
+        "old_retained": 20848
+      }
+    },
+    "inherited_scientific_fields_equal": true,
+    "new_cover_records_added": 1918,
+    "new_cover_records_total": 22766,
+    "new_cover_summary": {
+      "invalid_input": 0,
+      "unsupported": 0,
+      "verified": 22766
+    },
+    "old_cover_records_exactly_retained": 20848,
+    "old_cover_summary": {
+      "invalid_input": 0,
+      "unsupported": 0,
+      "verified": 20848
+    },
+    "old_graph_curve_records_exactly_retained": 20848,
+    "other_graph_metadata_unchanged": true,
+    "other_raw_input_pins_verified": 211,
+    "outputs": {
+      "docs/curves/cover-links.yaml": {
+        "bytes": 63129906,
+        "sha256": "0cef8922bfa69c06f28fe3d4f8cae3d78af1427b8c202653517da3c6c002e468"
+      },
+      "docs/curves/covers.json": {
+        "bytes": 25597550,
+        "sha256": "f449e0b5fcf337591ebca5dfb81492ac5f7bd7c146de3f28da4a7852586bfd20"
+      }
+    },
+    "schema": "crypto.catalog-metadata-refresh/v1",
+    "scope": "Deterministic existing native checker and metadata source-binding validation only; no benchmark, scalar replay, timing measurement, DLP advantage, custody or scientific promotion.",
+    "standing": "unverified",
+    "storage": "Local outputs recorded by the canonical benchrec tool. No upload or remote HEAD observed locally. Actual CI storage validation remains required."
+  },
+  "parent": "bf30dc26fd940b820094e6543e8fb2db94466d43",
+  "pr": 3463,
+  "record": "benchmarks/records/20261105T1814Z-registry-binding-metadata.json",
+  "record_preservation": {
+    "added_neutral_count_series": [
+      "old_cover_records_retained",
+      "other_raw_input_pins_verified",
+      "registry_rows_processed"
+    ],
+    "old_closed_records_exact": 42,
+    "old_progress_series_exact": 29
+  },
+  "required": "Fresh every-applicable current-head check, duplicate contexts, actual budget<=30, literal gate/size/artifacts success, no unresolved findings, CLEAN and expected-head MERGE.",
+  "schema": "pr-maintenance/v1",
+  "scope": "Canonical mutable generated cover metadata plus a real metadata/source-binding run record; no historical benchmark rerun, scientific promotion or storage admission.",
+  "standing": "unverified",
+  "storage": "No local AWS credentials/executable. Raw uploaded flags remain false. Require actual canonical CI upload and remote HEAD; never invent custody."
+}

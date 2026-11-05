@@ -1,0 +1,58 @@
+{
+  "branch_paths": 50,
+  "common_base": "07843b3d7733e72309d7b0af48aec514c089668a",
+  "concurrent_paths": [
+    "docs/session-logs/2026-11-05.md"
+  ],
+  "constraint": "No source/frozen/PCC fork choice. New-head CI, real storage validation, reviews and <=30 budget mandatory.",
+  "copilot_request": "https://github.com/isogeny-labs/crypto/pull/3463#issuecomment-6663134225",
+  "head": "bf8ab0621914973ed4d958455cdc1a592032ae1d",
+  "incoming_main": "7cc34f73a5ae8f2f8aed3aac9a74d93dcb9c9d7b",
+  "incoming_paths": 37,
+  "journals": [
+    {
+      "bytes": 659063,
+      "parent": "bf8ab0621914973ed4d958455cdc1a592032ae1d",
+      "retention": "complete prefix",
+      "sha256": "bdf9df8a4122c22838e339beb9c12c975c777e7d15ad68fe02f2a437fdc132e3"
+    },
+    {
+      "bytes": 227217,
+      "parent": "7cc34f73a5ae8f2f8aed3aac9a74d93dcb9c9d7b",
+      "retention": "complete verbatim provenance block",
+      "sha256": "42a53ccc0152eb71fc0d179aab9dbf7b65fdbfc04a43839b7c9943dd559eb496"
+    }
+  ],
+  "nonoverlaps": "All exact source modes and object IDs from their corresponding parent, exhaustively checked.",
+  "pcc": {
+    "branch_equal_common_base": true,
+    "changes": [
+      {
+        "new": "48c26be4108c3c4d1c789f6208c47f1cf3e23f30",
+        "old": "0000000000000000000000000000000000000000",
+        "path": "pcc/claims/PCC-20261105-3d5a49.json",
+        "status": "A"
+      },
+      {
+        "new": "5f59efb928ae9a347a6f3f60507e450b77bcbd3e",
+        "old": "0000000000000000000000000000000000000000",
+        "path": "pcc/claims/PCC-20261105-90e4fe.json",
+        "status": "A"
+      },
+      {
+        "full_old_byte_prefix": true,
+        "new": "6317ec79cf8e6e37f6859ff672fc8f4c46ff61ad",
+        "new_bytes": 59000,
+        "new_sha256": "88bbbf310266ae467aaf312c58d27c2cb50ae36cf6253904eb0b9a35a5a8e210",
+        "old": "8e3ae7da7fc60fbbff34d534dc9e4ee6ea3cb215",
+        "old_bytes": 58194,
+        "old_sha256": "1c07921abcb1038aa47453e44bc92afcc830e042b368a0591dce45bc05960c01",
+        "path": "pcc/ledger.jsonl",
+        "status": "M"
+      }
+    ],
+    "prefixes_preserved": true
+  },
+  "schema": "pr-maintenance/v1",
+  "standing": "unverified"
+}

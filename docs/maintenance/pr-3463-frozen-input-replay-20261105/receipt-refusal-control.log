@@ -1,0 +1,7 @@
+PASS: existing input receipt refused before replay; original receipt and current registry unchanged
+Traceback (most recent call last):
+  File "/workspace/pr-integration/work/crypto-3463-frozen-registry-replay-20261105-1545/.github/scripts/run_frozen_registry_replay.py", line 169, in <module>
+    main()
+  File "/workspace/pr-integration/work/crypto-3463-frozen-registry-replay-20261105-1545/.github/scripts/run_frozen_registry_replay.py", line 149, in main
+    raise ValueError("refusing to replace an earlier input receipt")
+ValueError: refusing to replace an earlier input receipt

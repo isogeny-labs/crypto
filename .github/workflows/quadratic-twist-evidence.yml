@@ -9,6 +9,10 @@ on:
       - 'docs/curves/sources/quadratic-twist-native-20261021.json'
       - 'src/cryptanalysis/identity_certificate.rs'
       - 'src/cryptanalysis/curve_id.rs'
+      - 'src/binary_ecc/f2m.rs'
+      - 'src/binary_ecc/operation_tally.rs'
+      - 'docs/curves/registry.json'
+      - '.github/scripts/run_frozen_registry_replay.py'
   workflow_dispatch:
 
 permissions:
@@ -24,6 +28,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /.github/scripts/run_frozen_registry_replay.py
             /research/quadratic_twist_evidence_20261021/
             /docs/curves/registry.json
             /docs/curves/sources/quadratic-twist-native-20261021.json
@@ -75,18 +80,40 @@ jobs:
         run: cargo test --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/metadata/Cargo.toml
       - name: Reproduce identity certificates and registered models
         run: bash research/quadratic_twist_evidence_20261021/test-metadata.sh "$RUNNER_TEMP/twist-native" "$RUNNER_TEMP/twist-metadata"
+      - name: Report registry admission inputs after a failed replay
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          metadata_dir="$RUNNER_TEMP/twist-metadata"
+          if [[ -f "$metadata_dir/registry-update.json" ]]; then
+            cat "$metadata_dir/registry-update.json"
+            jq -n \
+              --slurpfile catalog "$metadata_dir/curve-models.json" \
+              --slurpfile registry docs/curves/registry.json \
+              --slurpfile aliases src/cryptanalysis/curve_aliases.json '
+              (reduce $registry[0].curves[] as $row ({}; .[$row.slug] = true)) as $registered |
+              [$catalog[0].models[] | select($registered[.slug] != true) | {slug, icv1}] as $missing_models |
+              [$catalog[0].models[] | . as $model |
+                [$model.slug, $model.icv1][] | ascii_downcase | . as $key |
+                select($aliases[0].aliases[$key] == null) |
+                {key: $key, slug: $model.slug}] as $missing_aliases |
+              {missing_registry_rows: ($missing_models | length),
+               missing_alias_keys: ($missing_aliases | length),
+               missing_model_examples: $missing_models[0:20],
+               missing_alias_examples: $missing_aliases[0:20]}'
+          fi
       - name: Replay mixed Frobenius words with independent native arithmetic
-        run: bash research/quadratic_twist_evidence_20261021/run-mixed.sh "$RUNNER_TEMP/twist-mixed"
+        run: python3 .github/scripts/run_frozen_registry_replay.py mixed "$RUNNER_TEMP/twist-mixed"
       - name: Check mixed-audit native identity backend tests
         run: cargo test --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/mixed-audit/Cargo.toml
       - name: Replay source-bound group-map polynomial identities and controls
         run: bash research/quadratic_twist_evidence_20261021/run-group-map.sh "$RUNNER_TEMP/twist-group-map"
       - name: Replay twist-assisted pairing transfers, independent arithmetic and controls
-        run: bash research/quadratic_twist_evidence_20261021/run-pairing.sh "$RUNNER_TEMP/twist-pairing"
+        run: python3 .github/scripts/run_frozen_registry_replay.py pairing "$RUNNER_TEMP/twist-pairing"
       - name: Replay conditional yield-cost polynomial and source controls
         run: bash research/quadratic_twist_evidence_20261021/run-yield.sh "$RUNNER_TEMP/twist-yield"
       - name: Replay actual S3 useful yield, degrees and scalar transfers
-        run: bash research/quadratic_twist_evidence_20261021/run-s3-yield.sh "$RUNNER_TEMP/twist-s3-yield"
+        run: python3 .github/scripts/run_frozen_registry_replay.py s3-yield "$RUNNER_TEMP/twist-s3-yield"
       - name: Upload native audit receipts
         if: always()
         uses: actions/upload-artifact@v4
@@ -94,6 +121,7 @@ jobs:
           name: quadratic-twist-native-audit
           path: |
             research/quadratic_twist_evidence_20261021/audits/
+            ${{ runner.temp }}/twist-registry-inputs/
             ${{ runner.temp }}/twist-native/
             ${{ runner.temp }}/twist-controls/
             ${{ runner.temp }}/twist-metadata/
