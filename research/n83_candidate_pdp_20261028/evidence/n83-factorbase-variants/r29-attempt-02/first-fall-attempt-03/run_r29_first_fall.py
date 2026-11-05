@@ -174,10 +174,35 @@ def preflight(out: Path, publication_sha: str) -> None:
     }
     (out / "preflight.json").write_text(json.dumps(pre, indent=2, sort_keys=True) + "\n")
     (out / "source-index.json").write_text(json.dumps(checks, indent=2, sort_keys=True) + "\n")
+    planned_layout = {
+        "schema": "n83.file-layout/v1",
+        "kind": "pre-run layout; output payloads are appended after execution",
+        "root": str(out.relative_to(REPO)),
+        "entries": [
+            {"path": "preflight.json", "role": "frozen per-run execution plan and cohort"},
+            {"path": "source-index.json", "role": "48 input row and system SHA-256 bindings"},
+            {"path": "script-binding.json", "role": "runner, preflight, and audit hashes"},
+            {"path": "PRE-RUN-FILE-LAYOUT.json", "role": "this expected file-structure map"},
+            {"path": "cases/<case-id>/input/inputs.json", "role": "single-system V2 run input"},
+            {"path": "cases/<case-id>/input/<case-id>/system.sing", "role": "symlink to hash-bound source; not duplicated in archive"},
+            {"path": "cases/<case-id>/output/<case-id>.json", "role": "first-fall certificate, if produced"},
+            {"path": "cases/<case-id>/attempt.json", "role": "command, stdout/stderr, outcome, certificate and replay binding"},
+            {"path": "cases/<case-id>/s3-readback.json", "role": "remote certificate readback, if produced"},
+            {"path": "summary.json", "role": "case counts and derived row index"},
+            {"path": "FILE_LAYOUT.json", "role": "final file list with bytes and hashes"},
+            {"path": "panel-complete.tar.gz", "role": "archive of regular run artifacts and final layout"},
+            {"path": "custody.json", "role": "archive, summary, layout, and S3 readback digests"},
+        ],
+        "source_systems": {"path": str(SOURCE_ROOT.relative_to(REPO)), "count": 48, "payload_policy": "retain original hash-bound source files in their existing Git/content-addressed locations; do not duplicate symlink targets into the result archive"},
+        "s3_root": S3_ROOT,
+    }
+    layout_path = out / "PRE-RUN-FILE-LAYOUT.json"
+    layout_path.write_text(json.dumps(planned_layout, indent=2, sort_keys=True) + "\n")
     binding = {
         "schema": "n83.spike29-first-fall-binding/v1",
         "protocol_sha256": PROTOCOL_FREEZE_SHA256,
         "preflight_sha256": sha256(out / "preflight.json"),
+        "planned_layout_sha256": sha256(layout_path),
         "runner_sha256": sha256(Path(__file__).resolve()),
         "source_binding_audit_sha256": sha256(AUDIT_JSON),
         "filed_before_data": True,
@@ -196,6 +221,8 @@ def execute(out: Path) -> None:
     binding = json.loads(binding_path.read_text())
     if binding["runner_sha256"] != sha256(Path(__file__).resolve()) or binding["preflight_sha256"] != sha256(pre_path):
         raise RuntimeError("published runner/preflight binding mismatch")
+    if binding.get("planned_layout_sha256") != sha256(out / "PRE-RUN-FILE-LAYOUT.json"):
+        raise RuntimeError("planned file layout binding mismatch")
     if pre["protocol"]["frozen_sha256"] != PROTOCOL_FREEZE_SHA256 or pre["s3_root"] != S3_ROOT:
         raise RuntimeError("protocol or output-prefix mismatch")
     if len(rows) != pre["systems_planned"] or len(checks) != len(pre["cases"]):
@@ -205,7 +232,7 @@ def execute(out: Path) -> None:
     assert_s3_prefix_empty()
     (out / "cases").mkdir()
     # Bind and upload the plan before the first measured case.
-    for name in ("preflight.json", "source-index.json", "script-binding.json"):
+    for name in ("preflight.json", "source-index.json", "script-binding.json", "PRE-RUN-FILE-LAYOUT.json"):
         s3_copy(out / name, f"{S3_ROOT}/metadata/{name}")
     s3_copy(Path(__file__).resolve(), f"{S3_ROOT}/metadata/run_r29_first_fall.py")
     s3_copy(AUDIT_JSON, f"{S3_ROOT}/metadata/source-binding-audit.json")
