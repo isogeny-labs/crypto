@@ -31,7 +31,7 @@ The sweep covers 119 instances, n = 8 to 47. All counts are unverified assertion
 The iterated degree-3 closure reaches all k linear consequences for every instance with n ≤ 14
 and at n = 16. At n = 15 and at every n from 17 to 44 (87 instances) it reaches only 1.
 Fresh degree-4 sweeps at n = 17 to 24 reach k on all 24 instances, so the iterated degree
-there is exactly 4. Literal Assumption 2 (degree 2) fails on every instance. The
+there is exactly 4. Literal Assumption 2 (degree 2) fails on all 111 instances with n ≤ 44. The
 Kousidis–Wiemers value 3 is not reached anywhere from n = 17 to 44. An independent Python
 closure agrees with the Rust one, and a same-seed rerun reproduces the log. Details:
 [`pq2_rank/README.md`](pq2_rank/README.md).

@@ -82,7 +82,9 @@ instances. Across both sweeps, d_iter = 4 on 24 of 24 instances from n = 17 to 2
 
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
-on five dumped instances at n = 14 to 18, at degree 3 and at degree 4.
+on five dumped instances at n = 14 to 18 at degree 3. At degree 4 the Python closure reaches k on
+the three instances it was run on; the Rust run on those dumps had degree 4 disabled. The
+independent validator later ran both degrees on all five and found agreement (`validation/`).
 
 **Reproducibility.** A rerun with the same seed and arguments for n = 8 to 40
 (`results/rerun_n8_40/`) reproduces the main log line for line, timings aside. Its
@@ -93,7 +95,9 @@ holds on this range [pcc:unverified].
 **Reading.**
 
 * Literal Assumption 2 says the solver degree equals the first fall degree, which is 2.
-  It fails on all 119 instances: d_iter ≥ 3 everywhere.
+  It fails on the 111 instances with n ≤ 44: there d_iter ≥ 3. On 87 of them iter3 < k already
+  forces this; on the other 24 the independent validator computed the degree-2 closure (iter2 = 1).
+  At n = 45 to 47 no closure was computed, so those 8 instances are open.
 * The Kousidis–Wiemers reading predicts 3 + o(1). Every instance with 17 ≤ n ≤ 44 needs
   an iterated degree above 3, and the 24 instances measured at n = 17 to 24 need exactly 4.
   A finite range cannot refute an o(1) statement. It does show that the asymptotic value 3

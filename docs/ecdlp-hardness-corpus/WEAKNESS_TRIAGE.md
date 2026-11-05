@@ -351,7 +351,7 @@ report) [pcc:unverified]; the Lean results have pcc claim records pending CI sig
   The iterated degree-3 closure reaches all k linear consequences for n ≤ 14 and n = 16,
   and only 1 of them at n = 15 and on all 84 instances from n = 17 to 44. Degree 4 reaches
   k on 24 of 24 fresh instances at n = 17 to 24. The literal reading (degree 2) fails
-  everywhere, and the Kousidis–Wiemers value 3 is not reached from n = 17 to 44
+  on the 111 instances with n ≤ 44, and the Kousidis–Wiemers value 3 is not reached from n = 17 to 44
   (`MEAS-PQ2-DLIN-CENSUS` obstructs `HEUR-GB-PQ-ASSUMPTION-2`). This cuts against the
   subexponential binary-curve heuristics.
   The criterion behind it is `THM-SD-SUBSPACE-CRITERION` (Lean): a Gröbner basis

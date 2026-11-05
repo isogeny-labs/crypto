@@ -24,7 +24,7 @@ remove or sharpen individual supports.
   columns: (auto, auto, auto, auto),
   align: left,
   [\#], [target], [instrument], [outcome],
-  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [literal reading fails on all 119 instances; iterated degree > 3 for n = 15 and 17--44, exactly 4 on 24 fresh instances at n = 17--24],
+  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [literal reading fails on the 111 instances with $n <= 44$; iterated degree > 3 for n = 15 and 17--44, exactly 4 on 24 fresh instances at n = 17--24],
   [2], [degree-2 criterion generalised], [Lean `SubspaceCriterion`], [$d_"lin" <= "sd"$ for any Macaulay degree; kernel-checked],
   [3], [`HEUR-DECOMPOSITION-PROBABILITY` (prime field)], [`pf_yield` census], [zero class = Poisson once unordered; variance 1.45× Poisson for negation-closed bases],
   [4], [mean of the yield heuristic], [Lean `MeanCount`], [mean $|F|^m / |G|$ is a theorem],
@@ -45,7 +45,7 @@ remove or sharpen individual supports.
 119 instances, n = 8 to 47, three per n; the sweep stopped during n = 47. The iterated degree-3
 closure reaches k for every n ≤ 14 and at n = 16, and reaches only 1 at n = 15 and on all
 84 instances from n = 17 to 44. Fresh degree-4 sweeps at n = 17 to 24 reach k on all
-24 instances. So the first fall degree 2 is never the solver degree, and the value 3 of
+24 instances. So the first fall degree 2 is not the solver degree on any instance with $n <= 44$, and the value 3 of
 the Kousidis--Wiemers reading is not reached from n = 17 to 44. An independent naive
 saturation in Python agrees with the Rust closure on five instances, and a same-seed rerun
 reproduces the log. The bound on F4 holds under the unformalised containment property;
