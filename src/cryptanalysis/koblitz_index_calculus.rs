@@ -4711,6 +4711,43 @@ fn radix_sort_entries_by_key(entries: &mut [(u64, u32, u32)]) {
     }
 }
 
+/// Sort table entries into `(key, i, j)` order, the order
+/// `<[(u64, u32, u32)]>::par_sort_unstable` gives.
+///
+/// When the key (`key_bits` wide) and the two row indices (each below
+/// `points`) fit one word together, each entry is packed into a `u64`
+/// whose integer order is that tuple order, the words are sorted, and
+/// the entries are unpacked: a sort of plain integers, which compares in
+/// one instruction where the tuple's derived `lt` compares up to three
+/// fields.  Wider tables keep the tuple sort.  Either way the result is
+/// the same slice.
+fn sort_entries_by_key_then_pair(
+    entries: &mut Vec<(u64, u32, u32)>,
+    key_bits: u32,
+    points: usize,
+) {
+    let index_bits = usize::BITS - points.saturating_sub(1).leading_zeros();
+    if key_bits >= 64
+        || key_bits + 2 * index_bits > 64
+        || entries.iter().any(|e| e.0 >> key_bits != 0)
+    {
+        entries.par_sort_unstable();
+        return;
+    }
+    let mask = (1u64 << index_bits) - 1;
+    let mut words: Vec<u64> = entries
+        .par_iter()
+        .map(|&(key, i, j)| (key << (2 * index_bits)) | ((i as u64) << index_bits) | j as u64)
+        .collect();
+    words.par_sort_unstable();
+    entries
+        .par_iter_mut()
+        .zip(words.par_iter())
+        .for_each(|(entry, &w)| {
+            *entry = (w >> (2 * index_bits), ((w >> index_bits) & mask) as u32, (w & mask) as u32);
+        });
+}
+
 impl PairSumTable {
     /// Entries a table may occupy before [`Self::build`] refuses: 4 GiB,
     /// which is a base of about 16000 points.
@@ -4979,13 +5016,13 @@ impl PairSumTable {
                     .map(move |(offset, sum)| (sum.pack(), i as u32, (i + offset) as u32))
             })
             .collect();
-        entries.par_sort_unstable();
-        if entries.len() > u32::MAX as usize {
-            return None;
-        }
         // Packed sums are `< 2^(n+2)`; about one bucket per entry, at
         // most 2^26 of them.
         let key_bits = curve.n + 2;
+        sort_entries_by_key_then_pair(&mut entries, key_bits, points.len());
+        if entries.len() > u32::MAX as usize {
+            return None;
+        }
         let bucket_bits = (usize::BITS - entries.len().leading_zeros())
             .clamp(1, 26)
             .min(key_bits);
@@ -21545,6 +21582,39 @@ mod tests {
             assert!(stats.exhausted && !stats.unsupported);
             assert_eq!(stats.reductions, 0);
         }
+    }
+
+    #[test]
+    fn packed_entry_sort_is_the_tuple_sort() {
+        let mut state = 0x2545f4914f6cdd1du64;
+        let mut next = move || {
+            state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            state >> 11
+        };
+        // (key_bits, points): packable, packable with 1 point, and two
+        // widths where the key and indices do not fit one word.
+        for &(key_bits, points) in &[(25u32, 275usize), (25, 1), (14, 2), (40, 70_000), (60, 1 << 20)] {
+            for &len in &[0usize, 1, 5, 4000] {
+                let mut v: Vec<(u64, u32, u32)> = (0..len)
+                    .map(|_| {
+                        let i = (next() % points as u64) as u32;
+                        let j = (next() % points as u64) as u32;
+                        // Few distinct keys, as in real pair-sum tables.
+                        ((next() % 40) << (key_bits - 6), i, j)
+                    })
+                    .collect();
+                let mut expected = v.clone();
+                expected.sort_unstable();
+                sort_entries_by_key_then_pair(&mut v, key_bits, points);
+                assert_eq!(v, expected, "key_bits {key_bits}, points {points}, len {len}");
+            }
+        }
+        // A key wider than `key_bits` falls back instead of corrupting.
+        let mut v = vec![(1u64 << 30, 1u32, 2u32), (3, 0, 0), (1 << 30, 0, 9)];
+        let mut expected = v.clone();
+        expected.sort_unstable();
+        sort_entries_by_key_then_pair(&mut v, 25, 10);
+        assert_eq!(v, expected);
     }
 
     #[test]
