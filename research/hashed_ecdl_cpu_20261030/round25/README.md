@@ -18,3 +18,20 @@ Complete freeze and native synthetic-panel tests; publish the exact package. Adm
 
 ## Errors
 The first formatting check requested wrapping the extended exporter allowlist; formatting was corrected. No study execution was attempted.
+
+## Frozen validation and handoff
+Protocol df2d4e9d7415845dfb13d3ca6fe41489b1d43e0e8ec0a18578900a77206fd058
+was frozen before data at 2026-11-05T15:19:01Z against draft commit
+0fd49ee8b45933d5be5a8dd8f169da22e6fb7dfa. Native validation passes. All five
+executable identities and all twelve staged-input manifest entries verify.
+The native suite passes before and after freeze:14 passed,1 ignored; two
+profile-only tests return without work, leaving12 applicable synthetic checks.
+Strict native Clippy, formatting, shell syntax and exporter build pass.
+The candidate's47 library tests are software validation, not timing samples.
+
+The remaining admission gates are captured in admission.json. Direct live
+NodePool and namespace reads failed at role assumption; the exact errors are
+preserved. No access escalation, capacity change, S3 staging or cloud job.
+The current user was asked for the existing shared reservation ledger/operator
+receipt location while preparation continued. Freeze and software readiness
+are complete; publication readback remains to be attached after push.
