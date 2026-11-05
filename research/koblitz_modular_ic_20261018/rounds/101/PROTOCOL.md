@@ -24,3 +24,8 @@ states branch counts belong to the normalization, and
 [Singular manual](https://www.singular.uni-kl.de/index.php/singular.pdf)
 documents polynomial factorization. The live manual PDF fetch timed out;
 the local pinned CAS is validated by exact product checks.
+
+Amendment 02: attempt 01 stopped in Python preparation because the scanner
+expected a `*` monomial suffix after every rational coefficient, while the
+constant term has an empty suffix. The corrected parser accepts the empty
+suffix only as the `(l^0,y^0)` term. See `FAILURE-01.md`.

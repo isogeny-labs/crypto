@@ -67,10 +67,10 @@ def main() -> None:
         if match is None:
             raise ValueError("unrecognized G51 coefficient")
         suffix = match.group(2)
-        if not suffix.startswith("*"):
+        if suffix and not suffix.startswith("*"):
             raise ValueError("missing G51 monomial separator")
         powers = {"l": 0, "y": 0}
-        for atom in suffix[1:].split("*"):
+        for atom in (suffix[1:].split("*") if suffix else []):
             m = re.fullmatch(r"([ly])(?:\^([1-9][0-9]*))?", atom)
             if m is None or powers[m.group(1)]:
                 raise ValueError("unrecognized G51 monomial")
