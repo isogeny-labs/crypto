@@ -38,10 +38,15 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  rust:
+  rust-validation:
+    name: rust (${{ matrix.lane }})
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [library, example]
     env:
       CARGO_BUILD_JOBS: 2
       # Correctness builds of the large library; no timings are measured here.
@@ -69,13 +74,27 @@ jobs:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
       - name: Exact solution sets, informative relations, invalid inputs and deadlines
+        if: matrix.lane == 'library'
         run: cargo test --release --locked --lib aps_single_relation -- --test-threads=2
       - name: Public fixture runner and identity certificate
+        if: matrix.lane == 'example'
         run: cargo test --release --locked --example aps_single_relation_check
       - name: Streaming substitution, exact domains and rational-factor roots
+        if: matrix.lane == 'library'
         run: |
           cargo test --release --locked --lib f4_fp -- --test-threads=2
           cargo test --release --locked --lib glv_invariant_base -- --test-threads=2
+
+  rust:
+    if: ${{ always() && !github.event.pull_request.draft }}
+    needs: rust-validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require both complete Rust correctness lanes
+        env:
+          VALIDATION_RESULT: ${{ needs['rust-validation'].result }}
+        run: test "$VALIDATION_RESULT" = success
 
   lean:
     if: ${{ !github.event.pull_request.draft }}
