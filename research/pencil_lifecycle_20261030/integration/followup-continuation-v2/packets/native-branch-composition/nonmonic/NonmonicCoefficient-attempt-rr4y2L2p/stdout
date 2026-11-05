@@ -1,0 +1,15 @@
+/var/tmp/pencil-nonmonic-division-20261101-v1/NonmonicCoefficient.lean:23:58: error: Tactic `rfl` failed: The left-hand side
+  ↑(UInt64.toNat 1)
+is not definitionally equal to the right-hand side
+  1
+
+p a t : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hp : 1 < p.toNat
+hb : p.toNat < 2 ^ 31
+ha : a.toNat < p.toNat
+hn : a ≠ 0
+ht : t.toNat < p.toNat
+hi : (il p a).toNat < p.toNat ∧ ↑(il p a).toNat = (↑a.toNat)⁻¹
+h : il p a = 1
+⊢ ↑(UInt64.toNat 1) = 1

@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-04T06:25:04Z",
+ "id": "PCC-20261104-5d8fac",
+ "kind": "theorem",
+ "producer": {
+  "commit": "19e565e33bfda1089d8b6337e9aee1798ef22591",
+  "model": "claude-mythos-5-1",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "fcd2d4cfd952791ce38f87d4c0f340395a0156fbe319123067ea6cea39578bac",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "SolvingDegreeBound.no_gb_in_rows_of_low_lt"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; statement fidelity per research/ecdlp_weakness_lean_20261104/README.md",
+ "statement": "If the degree-<=1 part of the span of a finite set of rows has dimension below the number k of ideal elements with distinct linear leading monomials, no Groebner basis (degree-compatible order) of the ideal lies in that span: d_lin is a lower bound on the solving degree."
+}

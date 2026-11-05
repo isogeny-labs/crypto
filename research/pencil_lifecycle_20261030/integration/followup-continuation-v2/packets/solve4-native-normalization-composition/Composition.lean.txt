@@ -1,0 +1,46 @@
+import Narrow
+import Normalization
+set_option autoImplicit false
+namespace Solve4NativeNormalize
+open Solve4Stage Solve4Normalize PencilWordRefinement
+
+def returnedUnit (p : UInt64) (col : Fin 4) (v : WRow) : UInt64 :=
+ RecoverNarrowPow.inverseGenerator p (v col.castSucc)
+def normalize (p : UInt64) (col : Fin 4) (v : WRow) : WRow :=
+ wordScale p col v (returnedUnit p col v)
+
+theorem returned_unit_contract (p : UInt64) [Fact p.toNat.Prime]
+ (col : Fin 4) (v : WRow) (hb:p.toNat≤2^32) (hv:canonical p v)
+ (hn:v col.castSucc≠0) :
+ (returnedUnit p col v).toNat<p.toNat ∧
+ ((returnedUnit p col v).toNat:ZMod p.toNat)=(decode p v col.castSucc)⁻¹ := by
+ have hp:1<p.toNat := (Fact.out:p.toNat.Prime).one_lt
+ exact ⟨(RecoverNarrowPow.generator_product p (v col.castSucc) hp hb (hv _) hn).1,
+   RecoverNarrowPow.generator_decode p (v col.castSucc) hp hb (hv _) hn⟩
+
+theorem normalize_contract (p : UInt64) [Fact p.toNat.Prime]
+ (col : Fin 4) (v : WRow) (hb:p.toNat≤2^32) (hv:canonical p v)
+ (hz:∀ j : Fin 5,j.val<col.val→v j=0) (hn:v col.castSucc≠0) :
+ canonical p (normalize p col v) ∧
+ (∀ j : Fin 5,j.val<col.val→normalize p col v j=0) ∧
+ normalize p col v col.castSucc=1 ∧
+ (∀ x : Vector (ZMod p.toNat), residual (decode p (normalize p col v)) x=0 ↔ residual (decode p v) x=0) := by
+ have hu:=returned_unit_contract p col v hb hv hn
+ have hd:decode p v col.castSucc≠0 :=
+   canonical_word_nonzero p (v col.castSucc) (Fact.out:p.toNat.Prime).pos (hv _) hn
+ exact word_inverse_contract p col v (returnedUnit p col v) hb hv hu.1 hz hd hu.2
+
+theorem normalized_residual (p : UInt64) [Fact p.toNat.Prime]
+ (col : Fin 4) (v : WRow) (hb:p.toNat≤2^32) (hv:canonical p v)
+ (hz:∀ j : Fin 5,j.val<col.val→v j=0) (hn:v col.castSucc≠0)
+ (x : Vector (ZMod p.toNat)) :
+ residual (decode p (normalize p col v)) x =
+ residual (decode p v) x * (decode p v col.castSucc)⁻¹ := by
+ have hu:=returned_unit_contract p col v hb hv hn
+ have hr:=word_refines p col v (returnedUnit p col v) hb hv hu.1
+ have hzD:∀ j : Fin 5,j.val<col.val→decode p v j=0 := by
+  intro j hj;simp [decode,hz j hj]
+ change residual (decode p (wordScale p col v (returnedUnit p col v))) x = _
+ rw [hr.2,hu.2]
+ exact scaled_residual col (decode p v) _ x hzD
+end Solve4NativeNormalize

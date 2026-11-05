@@ -1,0 +1,25 @@
+import Composition
+set_option autoImplicit false
+set_option maxRecDepth 4096
+namespace CompositionControls
+open Solve4Stage Solve4Normalize Solve4NativeNormalize
+instance : Fact (Nat.Prime (7:UInt64).toNat) := ⟨by decide⟩
+def row : WRow := fun j=>(#[0,2,4,0,6]:Array UInt64)[j.val]!
+theorem returned_native_unit : returnedUnit 7 1 row=4 := by decide
+theorem exact_row : normalize 7 1 row=(fun j=>(#[0,1,2,0,3]:Array UInt64)[j.val]!) := by decide
+theorem actual_premises : canonical 7 row ∧ (∀ j:Fin 5,j.val<1→ row j=0) ∧ row 1≠0 := by
+ refine ⟨?_,by decide,by decide⟩
+ unfold canonical;decide
+theorem composed_application :
+ canonical 7 (normalize 7 1 row) ∧
+ (∀ j:Fin 5,j.val<1→normalize 7 1 row j=0) ∧ normalize 7 1 row 1=1 ∧
+ (∀ x:Vector (ZMod ((7:UInt64).toNat)),residual (decode 7 (normalize 7 1 row)) x=0 ↔ residual (decode 7 row) x=0) :=
+ normalize_contract 7 1 row (by decide) actual_premises.1 actual_premises.2.1 actual_premises.2.2
+theorem characteristic_two : normalize 2 0 (fun j=>(#[1,0,1,0,1]:Array UInt64)[j.val]!)=(fun j=>(#[1,0,1,0,1]:Array UInt64)[j.val]!) := by decide
+theorem last_column_rhs : normalize 7 3 (fun j=>(#[0,0,0,3,6]:Array UInt64)[j.val]!)=(fun j=>(#[0,0,0,1,2]:Array UInt64)[j.val]!) := by decide
+theorem zero_pivot_counterexample : normalize 7 1 (fun _=>0) 1≠1 := by decide
+theorem prefix_counterexample :
+ let v:WRow:=fun j=>(#[1,2,0,0,3]:Array UInt64)[j.val]!
+ let x:Vector (ZMod ((7:UInt64).toNat)):=fun j=>(#[1,1,0,0]:Array (ZMod ((7:UInt64).toNat)))[j.val]!
+ residual (decode 7 v) x=0 ∧ residual (decode 7 (normalize 7 1 v)) x≠0 := by decide
+end CompositionControls

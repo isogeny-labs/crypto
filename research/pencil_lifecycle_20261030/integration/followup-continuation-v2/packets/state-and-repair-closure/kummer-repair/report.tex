@@ -1,0 +1,21 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{lmodern,amsmath,hyperref}
+\title{Four-coordinate repair closure}\date{1 November 2026}
+\begin{document}\maketitle
+The field proof establishes that the literal four-coordinate matrix action preserves nonzero vectors when $M^2=cI$ and $c\ne0$. It also establishes double-action projective identity and preservation/reflection of the cross-product comparator for nonzero inputs.
+\section*{Connection to native code}
+\texttt{walk-source.rs.txt:48--50} folds four products into each row, starting at zero. The field definition preserves the indexing and addition grouping. In \texttt{xadd\_repaired} (lines 77--95), a successful repaired branch receives nonzero $z$ from \texttt{xadd} and returns $Mz$ without a second nonzero check. The theorem supplies that field postcondition:
+\[M(Mz)=cz,\qquad c\ne0,\ z\ne0\quad\Longrightarrow\quad Mz\ne0.\]
+The theorem does not imply branch success or correct geometric differential addition. Native word operations and the complete fold's canonicality are separate implementation obligations.
+\section*{Corrected chart basis}
+The copied N16 note distinguishes the degree-two matrix $C_2$ from degree-one matrix $C_1$. The new exact field identity is
+\[C_2(1,-a_1,-a_0,q_3)^T=C_1(1,-a_1,a_0,q_3+\sigma a_0)^T,\]
+assuming the recorded column relation $C_2[:,2]=-C_1[:,2]-\sigma C_1[:,3]$ and equality of other columns. It does not justify using $C_2$ for degree one. A negative control shows that substitution can change the projective point.
+\section*{Checks and evidence boundaries}
+Ten main declarations and nine rational controls are checked, including a doubled permutation with square $4I$, literal coordinates, two repairs, the $c=0$ boundary, zero-vector comparator behavior and wrong-chart substitution. Controls use kernel tactics. Three failed construction attempts are retained. An early control build used an older module binary; the final ordered replay supersedes it and binds inputs before and after.
+
+Historical N16 documents report 105 recorded scalar-square actions and chart certificates. No historical validator or raw-table audit was rerun. Concrete runtime action binding requires the exact modulus, matrix and nonzero scalar plus field/word correspondence. Geometric chart interpretation and xadd correctness remain separate premises.
+
+\texttt{REPORT.md}, \texttt{status.json}, source hashes, native receipts and axiom readbacks provide the review record. This is a producer packet awaiting independent review and publication binding. No scientific execution, new measurements or cost ratios are included.
+\end{document}

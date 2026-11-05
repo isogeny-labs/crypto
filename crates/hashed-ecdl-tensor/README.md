@@ -11,6 +11,16 @@ curves, graph construction, compact arithmetic/point/hash encodings, exact
 contraction, deterministic witness extraction, exact prefix-count sampling, relation collection and
 independent algebraic certificate replay. Resource exhaustion is an error.
 
+The `canonical` module provides strict `BTNIR001` semantic snapshots for
+controlled network experiments. It preserves construction-order vertices,
+edges and ports, interface order, pins and provenance. Predicates through 16
+ports use complete truth tables; larger built-in Fourier/product relations use
+typed serializable evaluators. Arbitrary or selector predicates above that cap
+are rejected until they provide a typed evaluator. Imported snapshots are
+direct semantic replay graphs and intentionally do not reconstruct private
+functional-program hints. This is not graph-isomorphism canonicalization and
+does not itself establish a performance result.
+
 `Counter::sample` implements Lemma 1's random prefix choices using caller
 randomness. It samples interface words uniformly when the encoding is
 parsimonious; otherwise each word is weighted by its number of satisfying

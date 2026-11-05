@@ -1,0 +1,33 @@
+import Stored
+set_option autoImplicit false
+namespace NormalizationInputGuards
+open Polynomial MumfordNormalization MumfordValidity AffineCoefficientLoop TraversalPolynomial
+variable {K : Type*} [Field K]
+theorem prefix_degree_bound (c : ℕ→K) (n : ℕ) : (sourcePoly c n).degree < n := by
+ rw [degree_lt_iff_coeff_zero]
+ intro i hi
+ rw [sourcePoly_coefficient,if_neg (by omega)]
+
+theorem prefix_natDegree (c : ℕ→K) (d : ℕ) (h : c d=1) :
+ (sourcePoly c (d+1)).natDegree=d := by
+ apply natDegree_eq_of_le_of_coeff_ne_zero
+ · rw [natDegree_le_iff_coeff_eq_zero]
+   intro i hi
+   rw [sourcePoly_coefficient,if_neg (by omega)]
+ · rw [sourcePoly_coefficient,if_pos (by omega),h]
+   exact one_ne_zero
+
+theorem prefix_monic (c : ℕ→K) (d : ℕ) (h : c d=1) :
+ (sourcePoly c (d+1)).Monic := by
+ change (sourcePoly c (d+1)).coeff (sourcePoly c (d+1)).natDegree=1
+ rw [prefix_natDegree c d h,sourcePoly_coefficient,if_pos (by omega),h]
+
+theorem prefixes_valid (c v : ℕ→K) (d : ℕ) (hd : d≤2) (hc : c d=1) (f : K[X])
+ (hr : sourcePoly c (d+1)∣f-(sourcePoly v d)^2) :
+ Valid f (sourcePoly c (d+1)) (sourcePoly v d) := by
+ have hm := prefix_monic c d hc
+ refine ⟨hm,?_,?_,hr⟩
+ · rw [prefix_natDegree c d hc]; exact hd
+ · rw [degree_eq_natDegree hm.ne_zero,prefix_natDegree c d hc]
+   exact prefix_degree_bound v d
+end NormalizationInputGuards

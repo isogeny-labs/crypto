@@ -1,0 +1,75 @@
+{
+  "schema": "aps.development-receipt/v1",
+  "source_manifest": "final-source-sha256.txt",
+  "phases": [
+    {
+      "phase": "standalone-release",
+      "exit": 0,
+      "private_log_sha256": "e6cfe77f15c9023a7d4c8dffdac07342c94c60ab14e031edc5c45737f022831a"
+    },
+    {
+      "phase": "standalone-strict-stable",
+      "exit": 0,
+      "private_log_sha256": "20a25c3cd66411a69d91067b901dd17e0d75804b08bb37bdec623a53a4ac0069"
+    },
+    {
+      "phase": "standalone-strict-1.98",
+      "exit": 0,
+      "private_log_sha256": "cf011d0152526a538d061dcd1f3e7bc62f743dbb1c0a0884cba9a7432ddb28bf"
+    },
+    {
+      "phase": "producer-bridge",
+      "exit": 0,
+      "private_log_sha256": "14cc272cee0e1f5cf4eb64462bb581be70e31a3eee36f95f4022bd68616d3a70"
+    },
+    {
+      "phase": "workflow-syntax",
+      "exit": 0,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "standalone_library": {
+    "passed": 41,
+    "failed": 0,
+    "ignored": 0
+  },
+  "native_cli": {
+    "passed": 5,
+    "failed": 0,
+    "ignored": 0
+  },
+  "actual_producer_bridge": {
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "source_base": "2d746d0577ddf797b8706de1f45489fb31ad3d31",
+    "scope": "Six existing encodings, cubic orbit/pruning and first-informative partial output on existing public development fixtures"
+  },
+  "root_library": {
+    "status": "in_progress",
+    "command": "cargo test --release --locked --lib",
+    "new_head_full_suite_pass": false
+  },
+  "failure_boundaries": [
+    {
+      "phase": "initial synthetic fixture",
+      "passed": 28,
+      "failed": 4,
+      "source_snapshot": null,
+      "retained_private_log": "nov4-export-test-1.log"
+    },
+    {
+      "phase": "strict lint first draft",
+      "exit": 101,
+      "reason": "Three standard divisibility predicates and nested visitor argument count; fixed without suppression",
+      "retained_private_log": "nov4-export-lint-1.log"
+    },
+    {
+      "phase": "producer bridge initial compile",
+      "exit": 101,
+      "reason": "Incorrect library crate import; corrected to crypto_lib",
+      "retained_private_log": "nov4-bridge-1.log"
+    }
+  ],
+  "scope": "Producer-reported local correctness and integration checks; no signed execution or performance attestation."
+}
