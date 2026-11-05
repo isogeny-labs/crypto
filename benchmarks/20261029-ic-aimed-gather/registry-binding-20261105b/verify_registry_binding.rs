@@ -90,7 +90,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "complete_target_record_equal": true,
         "other_raw_input_hashes_verified": verified,
         "other_raw_input_hashes_verified_via_store_manifest": via_manifest,
-        "predecessor": "registry-binding-20261101 (registry 20,848 rows)",
+        "predecessor": "registry-binding-20261105 (registry 22,268 rows)",
         "changed_raw_bindings": changed,
         "inherited_scientific_fields_equal": true,
         "scope": "The original native report and performance measurements remain historical and unchanged. This successor validates the same unique complete target record and all unchanged raw inputs against the expanded current registry. No benchmark, scalar replay or timing measurement was executed."
