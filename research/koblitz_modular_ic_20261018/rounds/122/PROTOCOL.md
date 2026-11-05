@@ -1,0 +1,5 @@
+# R122: fourth F4 translation of y0/e3
+
+Exact-computation claim only. Bind R121 result by SHA-256. Follow the remaining y0/e3 repeated positive eight-root edge of slope -1. Determine the F4 leading correction `delta` from the recorded constant; substitute `U=s(delta+V)`, divide by `s^8`, and recombine all five coefficient supports with explicit cutoffs. Report exact orders only below bounds, and a hull only if all orders resolve. Controls: Frobenius conjugacy, byte replay, changed-source rejection, independent F4 table arithmetic, finite Lean polygon checks if resolved. The two conjugate roots are fixed; no sampling, timing, comparison or cloud cost. Commit source and protocol before data.
+
+Prior work: R116–R121 local series and lifts. Sources: [Stacks Henselian lifting](https://stacks.math.columbia.edu/tag/04GE), [Stoll's characteristic-p Newton polygon notes](https://www.mathe2.uni-bayreuth.de/stoll/teaching/pAdicAnalysis-WS2015/Skript-pAdicAnalysis-pub-print.pdf). This local translation does not by itself evaluate N51 or produce a global cover map.
