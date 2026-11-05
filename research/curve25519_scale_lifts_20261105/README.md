@@ -193,3 +193,19 @@ Every outcome below is read off the tables above; none of the falsifiers occurre
 7. Predicted values for S2 in the isogeny t = 4 cell at k = 24 used the base counts seen in the 2-target smoke run (disclosed above).
 
 Report PDF: [REPORT.pdf](REPORT.pdf).
+
+## Coordinator review (main session, 2026-11-05)
+
+- **Fixed base, so per-relation cost scales by construction.** Each cell keeps
+  its (form, t) and so its base size while k grows. Coverage then falls roughly
+  as 1/r, and per-relation cost at exact coverage rises with it. The S1
+  scale-up has the same caveat. What does transfer across k is the cost
+  structure of each arm: per-target cost, solving degree and matrix size are
+  identical at k = 20, 24 and 28. Lead 2's and lead D's k = 20 comparisons
+  (lifts=1 ≈ 8× calls with a per-relation ratio near 1; lifts=2 31–628× lifts=1
+  with degree rises of 2–5) therefore hold unchanged at these sizes [pcc:unverified].
+- **No observed yield.** 0 hits in every arm at k = 24 and 28, against 0.63
+  expected for lifts=1 over all cells. Observed yield needs larger t (more
+  coverage) or many more targets.
+- **REPORT.pdf is kept in git** (the repository keeps PDFs in git), not in the
+  artifact store.
