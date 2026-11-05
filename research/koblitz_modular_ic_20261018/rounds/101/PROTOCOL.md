@@ -29,3 +29,9 @@ Amendment 02: attempt 01 stopped in Python preparation because the scanner
 expected a `*` monomial suffix after every rational coefficient, while the
 constant term has an empty suffix. The corrected parser accepts the empty
 suffix only as the `(l^0,y^0)` term. See `FAILURE-01.md`.
+
+Amendment 03: attempt 02 completed the source parse, then rejected its
+actual result because the protocol expected a nonzero specialized l-linear
+coefficient. At x=1 that coefficient vanishes identically as a polynomial
+in y. The amended source requires this exact degeneration and Singular
+checks the specialized derivative is zero. See `FAILURE-02.md`.

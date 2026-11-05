@@ -4,7 +4,7 @@ execute(read("specialization101.sing"));
 intvec lambdaWeight101=1,0;intvec baseWeight101=0,1;
 require101(f101==y^7+y^3 && deg(f101,baseWeight101)==7,"ACTUAL_BASE_X1");
 require101(deg(G101,lambdaWeight101)==16 && leadcoef(G101)==1,"ACTUAL_LAMBDA_X1_MONIC");
-require101(diff(G101,l)==C101 && C101!=0,"SOURCE_ADDITIVE_DERIVATIVE");
+require101(diff(G101,l)==C101 && C101==0,"SOURCE_ADDITIVE_DERIVATIVE_VANISHES");
 poly g0_101=subst(G101,y,0);poly g1_101=subst(G101,y,1);
 require101(subst(g0_101,y,0)==g0_101 && subst(g1_101,y,0)==g1_101,"FIBERS_UNIVARIATE");
 list fac0_101=factorize(g0_101,2);list fac1_101=factorize(g1_101,2);

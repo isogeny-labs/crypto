@@ -99,8 +99,8 @@ def main() -> None:
     if fterms != {(0, 7), (0, 3)}:
         raise ValueError("f51 x=1 specialization mismatch")
     cterms = {(0, y) for l, y in gterms if l == 1}
-    if not cterms:
-        raise ValueError("lambda derivative vanished identically")
+    if cterms:
+        raise ValueError("expected x=1 lambda derivative degeneration was absent")
     output.mkdir(parents=True, exist_ok=True)
     (output / "specialization101.sing").write_text(f"poly f101={render(fterms)};\npoly G101={render(gterms)};\npoly C101={render(cterms)};\n")
     y1terms = set()
