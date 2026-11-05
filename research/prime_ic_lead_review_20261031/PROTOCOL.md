@@ -172,7 +172,9 @@ lower-bound analysis, but never this decision statistic.
 ## Freeze blockers
 
 - production typed IR/generator beyond the landed development fixture;
-- source-bound prime-field propagator and independent explanation/proof checker;
+- production source-bound prime-field propagator; an independently replayable
+  affine-unit/conflict explanation kernel now exists, but Boolean binding,
+  nonlinear lemma classes and Boolean proof-log composition remain missing;
 - pinned backend builds and QF_FF diagnostic/export decision;
 - exact cold/setup/online/certificate instrumentation and reconciliation;
 - frozen analysis, multiplicity statement, power calculation and resource preflight;

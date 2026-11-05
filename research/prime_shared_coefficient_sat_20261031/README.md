@@ -103,6 +103,23 @@ status is in [experiment-matrix.json](experiment-matrix.json).
 | E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | SAT and msolve subgates frozen, not run; cvc5 proof-ineligible | exhaustive model-set equivalence; independent checked certificates for every accepted UNSAT |
 | E2 | Can this representation be integrated into an admissible fixed-`m=3` complete-cost protocol? | blocked | semantic-object decision, source-bound `F_p` theory, setup/query ledger, power and resource receipts |
 | E3 | At fixed `m=3`, can one proof-eligible CDCL(T)/`F_p` bundle achieve natural-query `e<0.5` and reusable-setup `a<1.5`? | parent protocol is a hardened draft; this subtree is not admitted | complete `s=6..14` natural panel plus separately reported planted/UNSAT controls |
+
+## 2026-11-02 proof-kernel continuation
+
+The native crate now includes a source-bound finite-field unit-explanation
+checker in [`native/src/trail.rs`](native/src/trail.rs). A lemma is accepted
+only when substituting strictly ordered canonical premises into one equation of
+the hash-bound canonical IR leaves either a nonzero constant conflict or one
+affine unknown `a*x+b` with `a!=0`. The independent checker recomputes the
+consequence; changed hashes, values, nonlinear residuals and underassigned
+equations fail closed. Three targeted Rust tests pass, including a corrupted-
+conclusion mutation.
+
+This is a proof-eligible kernel for one lemma class, not the proposed CaDiCaL
+external propagator and not exponent evidence. Boolean-literal binding, proof-
+log composition, guarded inversions, linear-combination certificates, complete
+instrumentation and the held-out freeze remain open. The exact scope and next
+order are recorded in the [six-obligation follow-up](../ic_weak_assumptions_20261102/FOLLOWUP.md).
 | E4 | Does an advancing bundle improve a complete relation-collection pipeline? | conditional | verified relations, matrix rank/log replay and end-to-end cost |
 | E5 | Can an observed mechanism be proved for the family? | conditional | a theorem bounding solver work or a certified structural invariant |
 
