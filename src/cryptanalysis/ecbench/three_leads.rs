@@ -3,6 +3,7 @@
 use super::methods::{PhaseRecord, ResolvedMethod, SolveReport};
 use super::workload::{CurveFacts, CurveSpec};
 use crate::cryptanalysis::curve_id;
+use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ic_boundary::FieldOps;
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::three_leads::{
@@ -276,7 +277,7 @@ pub fn solve(
         .collect();
     let detail = json!({"engine":out.detail,"study_family":inst.family,"arithmetic_price":{"square_per_multiply":0.75,"inversion_per_multiply":10,"source_addition":price,"meaning":"declared operation-count conversion; not a wall-time price"},"native_phases":out.phases,"verification":"solver has no planted scalar; fresh source kP checked here and again by ecbench parent"});
     let mut report = SolveReport {
-        recovered: out.recovered.map(u128::from),
+        recovered: out.recovered.map(ExactScalar::from),
         exhausted: out.exhausted,
         phases,
         total_gae: arithmetic(out.counts) / unit,

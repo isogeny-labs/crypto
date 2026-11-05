@@ -81,6 +81,27 @@ impl Serialize for ExactScalar {
         }
     }
 }
+impl std::str::FromStr for ExactScalar {
+    type Err = &'static str;
+    fn from_str(text: &str) -> Result<Self, Self::Err> {
+        // u128::from_str, used by the old codec, accepts one leading +.
+        let digits = text.strip_prefix('+').unwrap_or(text);
+        if digits.is_empty() || !digits.bytes().all(|c| c.is_ascii_digit()) {
+            return Err("expected unsigned decimal scalar");
+        }
+        let significant = digits.trim_start_matches('0');
+        if significant.len() > 78 {
+            return Err("scalar exceeds 256 bits");
+        }
+        let digits = if significant.is_empty() {
+            "0"
+        } else {
+            significant
+        };
+        let value = BigUint::parse_bytes(digits.as_bytes(), 10).ok_or("invalid decimal scalar")?;
+        Self::from_biguint(&value).ok_or("scalar exceeds 256 bits")
+    }
+}
 impl<'de> Deserialize<'de> for ExactScalar {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         #[derive(Deserialize)]
@@ -91,26 +112,7 @@ impl<'de> Deserialize<'de> for ExactScalar {
         }
         match Wire::deserialize(deserializer)? {
             Wire::Number(value) => Ok(Self::from(value)),
-            Wire::Text(text) => {
-                // u128::from_str, used by the old codec, accepts one leading +.
-                let digits = text.strip_prefix('+').unwrap_or(&text);
-                if digits.is_empty() || !digits.bytes().all(|c| c.is_ascii_digit()) {
-                    return Err(de::Error::custom("expected unsigned decimal scalar"));
-                }
-                let significant = digits.trim_start_matches('0');
-                if significant.len() > 78 {
-                    return Err(de::Error::custom("scalar exceeds 256 bits"));
-                }
-                let digits = if significant.is_empty() {
-                    "0"
-                } else {
-                    significant
-                };
-                let value = BigUint::parse_bytes(digits.as_bytes(), 10)
-                    .ok_or_else(|| de::Error::custom("invalid decimal scalar"))?;
-                Self::from_biguint(&value)
-                    .ok_or_else(|| de::Error::custom("scalar exceeds 256 bits"))
-            }
+            Wire::Text(text) => text.parse().map_err(de::Error::custom),
         }
     }
 }

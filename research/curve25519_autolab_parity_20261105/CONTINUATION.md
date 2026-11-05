@@ -645,3 +645,77 @@ Widen result transport and then actual workload orders/targets and rho. Full new
 ### Errors
 
 No type-check error reported. [pcc:unverified]
+
+## 2026-11-05T18:28Z — recovered scalar transport integration
+
+### What was done
+
+Checkpoint 710a0f9ac14a registered the exact scalar codec locally. Widened SolveReport.recovered to ExactScalar, converted narrow solver adapters explicitly, preserved BigUint results through 256 bits, added exact runner/audit parsing and subgroup-reduced verification. Added report wire-format/full-width and legacy-instance verification regressions; updated existing expected values without weakening assertions. Conductor cleared ecbench and the neighboring ecbench_large_prime/trace_line_tests.rs assertion. [pcc:unverified]
+
+### Decisions made
+
+Preserve existing number-through-u64/string-above encoding and canonical workload target laws. Full-width workload construction and matched rho remain the next integration boundary. Do not push until the complete required library gate passes. [pcc:unverified]
+
+### Open threads
+
+Current focused ecbench build/test command uses CARGO_TARGET_DIR=/tmp/curve25519-autolab-target CARGO_BUILD_JOBS=2 timeout1200 cargo test --release --lib --offline --locked cryptanalysis::ecbench:: -- --test-threads=2. Log /tmp/curve25519-transport-stage2-ecbench-tests.log; terminal result pending. PR3488 next cadence check remains approximately18:51Z. [pcc:unverified]
+
+Read-only cloud reconciliation: IsoLab overview lists no active Curve25519 job; direct NodePool retrieval still fails sts:AssumeRole for the configured launcher role. STS identifies the existing WorkerRole in account104186811093. Budgets API returned monthly USD538.72/1000 updated11:55:08Z and daily USD104.44/200 updated11:47:42Z. These delayed observations exclude a verified reservation balance; remaining usable funds and live cap enforcement remain unconfirmed. No cloud submission. [pcc:unverified]
+
+### Errors
+
+First library type-check found five u128 adapters; corrected. Broad test-target checking first failed on four sparse tracked bin paths, restored exactly from HEAD. Retry exposed expected-value type errors and unrelated missing cover-links.yaml in a bin test. Narrow library test build then exited101 on one incorrect test import; corrected. Retain /tmp/curve25519-transport-stage2-{check,tests-check,tests-check-attempt2,lib-build}.log; the pending focused run is a fresh attempt. [pcc:unverified]
+
+## 2026-11-05T18:29Z — full-width target sampler candidate
+
+### What was done
+
+Developed a bounded deterministic rejection sampler using counter-tagged canonical JSON SHA-256 inputs. The standalone native harness compiled the candidate with the actual hash, canonical codec and exact-scalar modules and reported32 passed/0 failed, including five sampler tests. Retained source/log hashes under next-integration/exact-sampling. [pcc:unverified]
+
+### Decisions made
+
+Keep this candidate outside the currently compiling crate graph. Integration will use a new named law, preserving historical target derivations. Equal-multiplicity checks exhaust one-byte inputs for bounds1..256; no distribution/benchmark claim is made from the seeded checks. [pcc:unverified]
+
+### Open threads
+
+Focused ecbench test session51270 remains compiling at18:28Z; log /tmp/curve25519-transport-stage2-ecbench-tests.log. Integrate sampler with exact workload orders and Curve25519 dispatch after this transport stage. [pcc:unverified]
+
+### Errors
+
+The native harness emitted five unused-code warnings from reused modules, no test failures. [pcc:unverified]
+
+## 2026-11-05T18:35:07.664366+00:00 — sampler replay helper
+
+### What was done
+
+Added replay.py for the standalone sampler: checks pinned source hashes, records dependency hashes/compiler version and build/test exit codes. Its fresh invocation reported32 passed/0 failed; logs and receipt retained. [pcc:unverified]
+
+### Decisions made
+
+Keep observed harness and replay outputs separately. Replay is development evidence only. [pcc:unverified]
+
+### Open threads
+
+Focused ecbench session51270 still compiles; same log and timeout. Workload and rho widening remain next. [pcc:unverified]
+
+### Errors
+
+No replay error reported. [pcc:unverified]
+
+## 2026-11-05T18:39:04.813606+00:00 — recovered-scalar transport tests completed
+
+### What was done
+
+Actual-crate ecbench filtered suite completed:517 passed,0 failed,5 ignored,5671 filtered in106.46s after10m51 compilation. Both new full-width report serialization and subgroup-reduction verification regressions passed. Rechecked all stage2 source hashes against the pending manifest and retained the terminal log and hash manifest. [pcc:unverified]
+
+### Decisions made
+
+Checkpoint completed result transport locally. Do not push before the complete library gate. Continue exact workload-order, target-generation and reference integration. [pcc:unverified]
+
+### Open threads
+
+Session46114 runs cargo check --release --offline --locked --bin ecbench --bin ic_autolab with the same target directory and2 build jobs, timeout900. Log /tmp/curve25519-transport-stage2-entrypoints-check.log; result pending. PR3488 cadence check remains about18:51Z. [pcc:unverified]
+
+### Errors
+
+No test failure in this attempt. Earlier failed attempts remain archived. [pcc:unverified]

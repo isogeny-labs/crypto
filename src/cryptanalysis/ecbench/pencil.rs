@@ -1,5 +1,6 @@
 //! Adapter for the public synthetic Scholten pencil workload.
 //! Full native ledgers are retained; group-only GAE is explicitly a lower bound.
+use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ic_measurement as measurement;
 use crate::cryptanalysis::three_leads as engine;
 use pencil_symbolic_graph as kernel;
@@ -316,7 +317,7 @@ pub(super) fn solve_with_progress(
         counters.insert(format!("pencil_replay_ledger_sha256_word_{i}"), word);
     }
     let mut report = SolveReport {
-        recovered: result.recovered().map(u128::from),
+        recovered: result.recovered().map(ExactScalar::from),
         exhausted: result.recovered().is_none(),
         phases: vec![PhaseRecord {
             name: "counted_group_component_only".into(),
