@@ -670,6 +670,9 @@ def candidate_identities(source: RepositoryInputs) -> list[dict]:
     found = defaultdict(lambda: {"count": 0, "files": Counter()})
     for pattern in IC1_SCAN_GLOBS:
         for path in source.glob_files(pattern):
+            # The canonical leaderboard is required input even after it grows
+            # beyond the cap for incidental text files. Otherwise published
+            # IC1 identities disappear from search without a source change.
             # The core leaderboard is already a required, fully parsed input
             # to build(). Its growth must not hide IDs named only there. Keep
             # the bound for the general research-note/candidate scan.
@@ -707,20 +710,20 @@ def attach_covers(
     report: dict,
     source: RepositoryInputs | None = None,
 ) -> set[str]:
-    """Join the current, complete native-verified cover catalog."""
-    if (
-        report.get("schema_version") != "curve-covers/v1"
-        or report.get("registry_sha256") != sha256_file(REGISTRY, source)
-    ):
-        raise ValueError("cover report schema or registry digest is stale")
+    """Join source-bound cover findings; leave newer registry curves unassessed."""
+    if (report.get("schema_version") != "curve-covers/v1" or
+            not re.fullmatch(r"[a-f0-9]{64}", report.get("registry_sha256", ""))):
+        raise ValueError("cover report schema or source digest is invalid")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
     current_slugs = {c["slug"] for c in curves}
-    if len(by_slug) != len(findings) or set(by_slug) != current_slugs:
-        raise ValueError("cover report must have exactly one finding per catalog model")
+    if len(by_slug) != len(findings) or not set(by_slug).issubset(current_slugs):
+        raise ValueError("cover report has duplicate or unknown catalog models")
+    if report["registry_sha256"] == sha256_file(REGISTRY, source) and set(by_slug) != current_slugs:
+        raise ValueError("current cover report must have one finding per catalog model")
     for curve in curves:
-        finding = by_slug[curve["slug"]]
-        if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
+        finding = by_slug.get(curve["slug"])
+        if finding and finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
     return set(by_slug)

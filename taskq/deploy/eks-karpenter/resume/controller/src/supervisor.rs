@@ -13,6 +13,11 @@ use std::{
     time::Duration,
 };
 
+#[path = "deadline.rs"]
+mod deadline;
+#[path = "owner_observation.rs"]
+mod owner_observation;
+
 const ROOT: &str = "/work";
 const BIN: &str = "/opt/isolab/recovery";
 const ECBENCH: &str = "/usr/local/bin/ecbench";
@@ -220,17 +225,60 @@ fn live(s: &Status) -> Result<i32, String> {
     credentials(pid)?;
     Ok(pid)
 }
-fn continue_tree(s: &Status) -> Result<(), String> {
+fn continue_tree(s: &Status, cutoff: Option<deadline::Deadline>) -> Result<(), String> {
     let pid = live(s)?;
     for p in tree(pid)?.iter().rev() {
         credentials(*p)?;
+        if let Some(cutoff) = cutoff {
+            deadline::check(cutoff)?;
+        }
         if unsafe { libc::kill(*p, libc::SIGCONT) } != 0 {
             return Err(error(std::io::Error::last_os_error()));
         }
     }
     Ok(())
 }
-fn launch(req: &Request, s: &mut Status) -> Result<(), String> {
+// Root-owned transport outside the payload-writable computation tree.
+fn prepare_diagnostic_launch(req: &Request) -> Result<(), String> {
+    use std::io::Write;
+    use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
+    let Some(transport) = &req.diagnostic_transport else {
+        return Ok(());
+    };
+    transport.validate(&req.spec)?;
+    let parent = fs::symlink_metadata("/work").map_err(error)?;
+    if !parent.is_dir()
+        || parent.file_type().is_symlink()
+        || parent.uid() != 0
+        || parent.mode() & 0o022 != 0
+    {
+        return Err(
+            "diagnostic transport parent must be root-owned and not payload-writable".into(),
+        );
+    }
+    let dir = Path::new("/work/diagnostic-input");
+    fs::create_dir(dir).map_err(error)?;
+    fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).map_err(error)?;
+    let path = dir.join("computation-launch.json");
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o400)
+        .open(&path)
+        .map_err(error)?;
+    file.write_all(transport.computation.raw_json.as_bytes())
+        .and_then(|_| file.sync_all())
+        .map_err(error)?;
+    fs::set_permissions(&path, fs::Permissions::from_mode(0o444)).map_err(error)?;
+    file.sync_all().map_err(error)?;
+    fs::set_permissions(dir, fs::Permissions::from_mode(0o555)).map_err(error)?;
+    File::open(dir).and_then(|f| f.sync_all()).map_err(error)?;
+    File::open("/work")
+        .and_then(|f| f.sync_all())
+        .map_err(error)
+}
+
+fn launch(req: &Request, s: &mut Status, cutoff: deadline::Deadline) -> Result<(), String> {
     if s.phase != "waiting" || s.attempt != 0 {
         return Err("fresh launch is permitted once on attempt zero".into());
     }
@@ -240,6 +288,7 @@ fn launch(req: &Request, s: &mut Status) -> Result<(), String> {
     fs::create_dir("/work/compute").map_err(error)?;
     fs::create_dir("/work/compute/tmp").map_err(error)?;
     save(Path::new("/work/compute/original-spec.json"), &req.spec)?;
+    prepare_diagnostic_launch(req)?;
     // Keep payload PIDs away from CRIU and kubectl exec's short-lived helpers on a
     // fresh restore namespace. No restore is allowed if any saved PID is occupied.
     for _ in 0..512 {
@@ -280,7 +329,20 @@ fn launch(req: &Request, s: &mut Status) -> Result<(), String> {
     .stdin(Stdio::null())
     .stdout(stdout)
     .stderr(stderr);
+    if let Some(transport) = &req.diagnostic_transport {
+        cmd.args([
+            "--diagnostic-launch",
+            "/work/diagnostic-input/computation-launch.json",
+            "--diagnostic-launch-sha256",
+            &transport.computation.sha256,
+            "--diagnostic-spec-sha256",
+            &transport.computation.spec_bytes_sha256,
+        ]);
+    }
     drop_payload_privileges(&mut cmd);
+    if req.worker_campaign.is_some() {
+        deadline::check(cutoff)?;
+    }
     let child = cmd.spawn().map_err(error)?;
     s.pid = Some(child.id() as i32);
     s.starttime = Some(starttime(child.id() as i32)?);
@@ -310,7 +372,13 @@ fn drop_payload_privileges(cmd: &mut Command) {
         });
     }
 }
-fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
+fn checkpoint(
+    req: &Request,
+    s: &mut Status,
+    n: u64,
+    owner: &mut owner_observation::Owner,
+    cutoff: deadline::Deadline,
+) -> Result<(), String> {
     // Completion can race the controller's last status read. Preserve the
     // successful computation instead of treating this as a failed checkpoint.
     if s.phase == "completed" && s.exit_code == Some(0) {
@@ -338,10 +406,10 @@ fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
     // epoch, deadline, or logical checkpoint identity is retried/reset.
     let mut captured = None;
     for capture in 1..=8 {
-        if now() >= req.deadline_unix_seconds {
-            return Err("original UTC deadline expired during checkpoint".into());
+        if deadline::check(cutoff).is_err() {
+            return Err("effective computation cutoff expired during checkpoint".into());
         }
-        if checkpoint_completion(s, pid)? {
+        if checkpoint_completion(req, s, pid, owner)? {
             return Ok(());
         }
         let candidate = dir.join(format!("capture-{capture}"));
@@ -350,7 +418,17 @@ fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
         cmd.args(["dump", "--tree", &pid.to_string()]);
         common_criu(&mut cmd, &candidate);
         cmd.args(["--log-file", "dump.log"]);
-        let result = cmd.output().map_err(error)?;
+        let result = if req.worker_campaign.is_some() {
+            deadline::output(
+                &mut cmd,
+                cutoff,
+                &candidate.join("dump.stdout"),
+                &candidate.join("dump.stderr"),
+                false,
+            )?
+        } else {
+            cmd.output().map_err(error)?
+        };
         let receipt = json!({"exit_code":result.status.code(),"stderr":String::from_utf8_lossy(&result.stderr)});
         save(&candidate.join("dump-result.json"), &receipt)?;
         if !result.status.success() {
@@ -380,7 +458,7 @@ fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
             &json!({"reason":"captured zombie; resume same computation to reap before recapturing","capture":capture}),
         )?;
         if !stopped_or_zombie(&payload_status(pid)?)? {
-            if !checkpoint_completion(s, pid)? {
+            if !checkpoint_completion(req, s, pid, owner)? {
                 return Err("captured zombie root was not waitable".into());
             }
             return Ok(());
@@ -391,7 +469,7 @@ fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
                     .into(),
             );
         }
-        continue_tree(s)?;
+        continue_tree(s, req.worker_campaign.as_ref().map(|_| cutoff))?;
         thread::sleep(Duration::from_millis(10));
     }
     let pids = captured.ok_or("checkpoint has no admitted stopped capture")?;
@@ -413,18 +491,24 @@ fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
     s.phase = "stopped".into();
     Ok(())
 }
-fn checkpoint_completion(s: &mut Status, pid: i32) -> Result<bool, String> {
-    let mut status = 0;
-    let got = unsafe { libc::waitpid(pid, &mut status, libc::WNOHANG) };
-    if got == 0 {
-        return Ok(false);
+fn checkpoint_completion(
+    req: &Request,
+    s: &mut Status,
+    pid: i32,
+    owner: &mut owner_observation::Owner,
+) -> Result<bool, String> {
+    if s.pid != Some(pid) {
+        return Err("checkpoint owner PID mismatch".into());
     }
-    if got != pid || !libc::WIFEXITED(status) || libc::WEXITSTATUS(status) != 0 {
-        return Err("computation failed during checkpoint".into());
+    match owner.poll(req, s, None)? {
+        None => Ok(false),
+        Some(0) => {
+            s.exit_code = Some(0);
+            s.phase = "completed".into();
+            Ok(true)
+        }
+        Some(_) => Err("computation failed during checkpoint".into()),
     }
-    s.exit_code = Some(0);
-    s.phase = "completed".into();
-    Ok(true)
 }
 // Only a stopped task is eligible for a committed generation. Zombies are
 // distinguished solely to request an uncommitted recapture; all other states
@@ -440,7 +524,13 @@ fn stopped_or_zombie(s: &str) -> Result<bool, String> {
         state => Err(format!("checkpoint task is not stopped: {state:?}")),
     }
 }
-fn restore(req: &Request, s: &mut Status, n: u64, expected: Option<&str>) -> Result<(), String> {
+fn restore(
+    req: &Request,
+    s: &mut Status,
+    n: u64,
+    expected: Option<&str>,
+    cutoff: deadline::Deadline,
+) -> Result<(), String> {
     if s.phase != "waiting" || s.attempt == 0 {
         return Err("restore requires a fresh replacement attempt".into());
     }
@@ -503,7 +593,17 @@ fn restore(req: &Request, s: &mut Status, n: u64, expected: Option<&str>) -> Res
             Ok(())
         });
     }
-    let result = cmd.output().map_err(error)?;
+    let result = if req.worker_campaign.is_some() {
+        deadline::output(
+            &mut cmd,
+            cutoff,
+            &attempt.join("restore.stdout"),
+            &attempt.join("restore.stderr"),
+            false,
+        )?
+    } else {
+        cmd.output().map_err(error)?
+    };
     save(
         &attempt.join("restore-result.json"),
         &json!({"exit_code":result.status.code(),"stderr":String::from_utf8_lossy(&result.stderr)}),
@@ -527,7 +627,7 @@ fn restore(req: &Request, s: &mut Status, n: u64, expected: Option<&str>) -> Res
     s.phase = "stopped".into();
     Ok(())
 }
-fn verify(s: &mut Status) -> Result<(), String> {
+fn verify(s: &mut Status, cutoff: Option<deadline::Deadline>) -> Result<(), String> {
     if s.phase != "completed" || s.exit_code != Some(0) {
         return Err("successful computation required for native replay".into());
     }
@@ -552,7 +652,17 @@ fn verify(s: &mut Status) -> Result<(), String> {
     // Replay executes the tested binary too; it must not inherit the trusted
     // supervisor's root identity or capabilities.
     drop_payload_privileges(&mut command);
-    let result = command.output().map_err(error)?;
+    let result = if let Some(cutoff) = cutoff {
+        deadline::output(
+            &mut command,
+            cutoff,
+            &dir.join("audit-command.stdout"),
+            &dir.join("audit-command.stderr"),
+            true,
+        )?
+    } else {
+        command.output().map_err(error)?
+    };
     fs::write(dir.join("audit.stdout"), &result.stdout).map_err(error)?;
     fs::write(dir.join("audit.stderr"), &result.stderr).map_err(error)?;
     if !result.status.success() {
@@ -594,9 +704,87 @@ pub fn rpc(attempt: u32, bytes: &[u8]) -> Result<(), String> {
 pub fn status(attempt: u32) -> Result<Status, String> {
     read(&status_path(attempt))
 }
+// Explicit transport from the controller-owned Pod manifest. The digest binds
+// exact bytes; it is not independent attestation of the campaign CAS.
+fn computation_cutoff(
+    req: &Request,
+    attempt: u32,
+    raw: Option<&str>,
+    expected: Option<&str>,
+) -> Result<u64, String> {
+    let Some(binding) = &req.worker_campaign else {
+        return if raw.is_none() && expected.is_none() {
+            Ok(req.deadline_unix_seconds)
+        } else {
+            Err("unexpected reservation for legacy computation".into())
+        };
+    };
+    let raw = raw.ok_or("campaign computation reservation missing")?;
+    let expected = expected.ok_or("campaign reservation digest missing")?;
+    if raw.len() > 4096
+        || !crate::contract::hex(expected, 64)
+        || crate::contract::digest(raw.as_bytes()) != expected
+    {
+        return Err("campaign computation reservation bytes/digest mismatch".into());
+    }
+    let r: crate::campaign::Reservation = serde_json::from_str(raw).map_err(error)?;
+    // Typed deny-unknown parsing also rejects duplicate reservation fields.
+    binding.validate(
+        &crate::contract::digest(&serde_json::to_vec(&req.spec).map_err(error)?),
+        req.deadline_unix_seconds,
+    )?;
+    crate::campaign::Ledger {
+        schema: "isolab.worker-admission-ledger/v1".into(),
+        policy: binding.policy.clone(),
+        reservations: vec![r.clone()],
+    }
+    .validate()?;
+    if r.request_sha256 != req.hash()
+        || r.attempt != attempt
+        || r.epoch != crate::campaign::Epoch::Computation
+        || r.ceiling_seconds != binding.computation_ceiling_seconds
+        || r.shutdown_reserve_seconds != binding.shutdown_reserve_seconds
+        || r.deadline_unix_seconds > req.deadline_unix_seconds
+    {
+        return Err("campaign computation reservation identity/envelope mismatch".into());
+    }
+    Ok(r.deadline_unix_seconds.min(req.deadline_unix_seconds))
+}
+fn cutoff_from_environment(req: &Request, attempt: u32) -> Result<u64, String> {
+    let read = |name: &str| -> Result<Option<String>, String> {
+        match std::env::var(name) {
+            Ok(v) => Ok(Some(v)),
+            Err(std::env::VarError::NotPresent) => Ok(None),
+            Err(e) => Err(error(e)),
+        }
+    };
+    let raw = read("ISOLAB_COMPUTATION_RESERVATION")?;
+    let expected = read("ISOLAB_COMPUTATION_RESERVATION_SHA256")?;
+    let cutoff = computation_cutoff(req, attempt, raw.as_deref(), expected.as_deref())?;
+    if let Some(raw) = raw {
+        let reservation: crate::campaign::Reservation =
+            serde_json::from_str(&raw).map_err(error)?;
+        reservation.remaining_payload_seconds(deadline::now()?)?;
+    }
+    Ok(cutoff)
+}
+
 pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
+    let utc_cutoff = cutoff_from_environment(&req, attempt)?;
+    let cutoff = if req.worker_campaign.is_some() {
+        deadline::Deadline::capture(utc_cutoff)?
+    } else {
+        deadline::Deadline::utc_only(utc_cutoff)
+    };
+    if req.worker_campaign.is_some() && deadline::check(cutoff).is_err() {
+        return Err("effective computation cutoff expired before supervisor admission".into());
+    }
     if unsafe { libc::getpid() } != 1 || unsafe { libc::geteuid() } != 0 {
         return Err("trusted supervisor must be root PID 1 in its own Pod namespace".into());
+    }
+    if req.worker_campaign.is_some() {
+        let namespace = std::env::var("ISOLAB_COMPUTATION_PRIVATE_PID_NAMESPACE").map_err(error)?;
+        deadline::install_namespace_backstop(cutoff, &namespace)?;
     }
     if runtime()?.ecbench_sha256 != req.build.ecbench_sha256 {
         return Err("ecbench binary hash does not match request".into());
@@ -624,29 +812,29 @@ pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
         updated: now(),
     };
     save(&status_path(attempt), &s)?;
+    let mut owner = owner_observation::Owner::begin();
     loop {
-        if now() >= req.deadline_unix_seconds {
+        if deadline::check(cutoff).is_err() {
             if let Some(pid) = s.pid {
                 unsafe { libc::kill(-pid, libc::SIGKILL) };
             }
+            if let Err(error) = owner.poll(&req, &s, Some("effective computation cutoff expired")) {
+                eprintln!("owner receipt: {error}");
+            }
             s.phase = "failed".into();
-            s.error = Some("original UTC deadline expired".into());
+            s.error = Some("effective computation cutoff expired".into());
             save(&status_path(attempt), &s)?;
-            return Err("original UTC deadline expired".into());
+            return Err("effective computation cutoff expired".into());
         }
-        // Reap the native root (including roots reparented to this PID 1 by CRIU).
-        if let Some(pid) = s.pid {
-            let mut status = 0;
-            let got = unsafe { libc::waitpid(pid, &mut status, libc::WNOHANG) };
-            if got == pid {
-                let code = if libc::WIFEXITED(status) {
-                    libc::WEXITSTATUS(status)
-                } else {
-                    128 + libc::WTERMSIG(status)
-                };
+        // The progress launcher execs ecbench in the same PID. Owner observation
+        // distinguishes confirmed post-exec identity from startup failure.
+        match owner.poll(&req, &s, None) {
+            Ok(Some(code)) => {
                 s.exit_code = Some(code);
                 s.phase = if code == 0 { "completed" } else { "failed" }.into();
             }
+            Ok(None) => {}
+            Err(error) => eprintln!("owner observation: {error}"),
         }
         let mut operations: Vec<_> = fs::read_dir(dir.join("requests"))
             .map_err(error)?
@@ -663,23 +851,30 @@ pub fn supervise(req: Request, attempt: u32) -> Result<(), String> {
                 continue;
             }
             let op: Operation = read(&path)?;
-            let result = if op.request_sha256 != req.hash() || op.attempt != attempt {
+            let result = if deadline::check(cutoff).is_err() {
+                Err("effective computation cutoff expired before operation".into())
+            } else if op.request_sha256 != req.hash() || op.attempt != attempt {
                 Err("operation request mismatch".into())
             } else {
                 match op.action.as_str() {
-                    "start" => launch(&req, &mut s),
-                    "checkpoint" => checkpoint(&req, &mut s, op.generation),
+                    "start" => launch(&req, &mut s, cutoff),
+                    "checkpoint" => checkpoint(&req, &mut s, op.generation, &mut owner, cutoff),
                     "continue" => {
                         if s.phase == "stopped" && s.generation == Some(op.generation) {
-                            continue_tree(&s).map(|()| s.phase = "running".into())
+                            continue_tree(&s, req.worker_campaign.as_ref().map(|_| cutoff))
+                                .map(|()| s.phase = "running".into())
                         } else {
                             Err("continue does not match stopped generation".into())
                         }
                     }
-                    "restore" => {
-                        restore(&req, &mut s, op.generation, op.manifest_sha256.as_deref())
-                    }
-                    "verify" => verify(&mut s),
+                    "restore" => restore(
+                        &req,
+                        &mut s,
+                        op.generation,
+                        op.manifest_sha256.as_deref(),
+                        cutoff,
+                    ),
+                    "verify" => verify(&mut s, req.worker_campaign.as_ref().map(|_| cutoff)),
                     "stop" => {
                         if let Some(pid) = s.pid {
                             unsafe { libc::kill(-pid, libc::SIGKILL) };
@@ -742,7 +937,14 @@ mod tests {
             error: None,
             updated: 0,
         };
-        checkpoint(&req, &mut s, 1).unwrap();
+        checkpoint(
+            &req,
+            &mut s,
+            1,
+            &mut owner_observation::Owner::begin(),
+            deadline::Deadline::utc_only(req.deadline_unix_seconds),
+        )
+        .unwrap();
         assert_eq!(s.phase, "completed");
         assert!(s.generation.is_none());
     }
@@ -785,5 +987,85 @@ mod tests {
         assert_eq!(observed, Ok(false));
         assert_eq!(reaped, child);
         assert_eq!(libc::WEXITSTATUS(status), 17);
+    }
+}
+
+#[cfg(test)]
+mod cutoff_transport_tests {
+    use super::*;
+    #[test]
+    fn legacy_cutoff_is_unchanged_and_ambient_transport_rejected() {
+        let req = crate::contract::fixture();
+        assert!(req.worker_campaign.is_none());
+        assert_eq!(
+            computation_cutoff(&req, 0, None, None).unwrap(),
+            req.deadline_unix_seconds
+        );
+        assert!(computation_cutoff(&req, 0, Some("{}"), None).is_err());
+        assert!(computation_cutoff(&req, 0, None, Some(&"a".repeat(64))).is_err());
+    }
+}
+
+#[cfg(test)]
+mod absolute_binding_tests {
+    use super::*;
+    #[test]
+    fn delayed_schedule_does_not_rebase_absolute_reservation() {
+        use crate::campaign::{Binding, Epoch, Policy, Reservation};
+        let mut req = crate::contract::fixture();
+        req.deadline_unix_seconds = 1793396000;
+        let spec = crate::contract::digest(&serde_json::to_vec(&req.spec).unwrap());
+        let mut route: Vec<_> = (0..7).map(|n| format!("{n:064x}")).collect();
+        route.push(spec);
+        let policy = Policy {
+            schema: "isolab.worker-admission-policy/v1".into(),
+            authorization_sha256:
+                "201df07743540ac247e2ae0ec79c82c7b284aa16dd07d468924c87cf2a4b7a2b".into(),
+            cumulative_ceiling_seconds: 25200,
+            absolute_deadline_unix_seconds: 1793398120,
+            latest_scientific_stop_unix_seconds: 1793396320,
+            allocation_unit: "conservative_worker_allocation_seconds".into(),
+            route_spec_sha256: route,
+            prior_charge_seconds: 0,
+            reconciliation_receipt_sha256: "a".repeat(64),
+            owner_enforcement_review_sha256: "b".repeat(64),
+        };
+        req.worker_campaign = Some(Binding {
+            policy: policy.clone(),
+            ledger_uid: "fixture-ledger".into(),
+            computation_ceiling_seconds: 1000,
+            fresh_ceiling_seconds: 1000,
+            shutdown_reserve_seconds: 60,
+        });
+        let r = Reservation {
+            request_sha256: req.hash(),
+            attempt: 2,
+            epoch: Epoch::Computation,
+            policy_sha256: policy.hash().unwrap(),
+            admitted_unix_seconds: 1793390000,
+            deadline_unix_seconds: 1793390940,
+            ceiling_seconds: 1000,
+            shutdown_reserve_seconds: 60,
+        };
+        let raw = serde_json::to_string(&r).unwrap();
+        let sha = crate::contract::digest(raw.as_bytes());
+        let cutoff = computation_cutoff(&req, 2, Some(&raw), Some(&sha)).unwrap();
+        assert_eq!(cutoff, 1793390940);
+        assert_eq!(r.remaining_payload_seconds(1793390900).unwrap(), 40);
+        assert!(r.remaining_payload_seconds(1793390940).is_err());
+        assert!(r.remaining_payload_seconds(1793389999).is_err());
+        assert!(computation_cutoff(&req, 3, Some(&raw), Some(&sha)).is_err());
+        assert!(computation_cutoff(&req, 2, Some(&raw), Some(&"0".repeat(64))).is_err());
+        assert!(computation_cutoff(&req, 2, None, None).is_err());
+        let mut fresh = r;
+        fresh.epoch = Epoch::Fresh;
+        let raw = serde_json::to_string(&fresh).unwrap();
+        assert!(computation_cutoff(
+            &req,
+            2,
+            Some(&raw),
+            Some(&crate::contract::digest(raw.as_bytes()))
+        )
+        .is_err());
     }
 }

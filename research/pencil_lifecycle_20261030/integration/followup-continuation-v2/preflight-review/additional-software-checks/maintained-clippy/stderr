@@ -1,0 +1,35 @@
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029)
+error: large size difference between variants
+  --> src/cryptanalysis/ecbench/diagnostic_file_adapter.rs:45:1
+   |
+45 | /   enum Request {
+46 | |       #[serde(rename = "static_inventory_only")]
+47 | | /     Static {
+48 | | |         schema: String,
+49 | | |         routes: Vec<Route>,
+50 | | |         artifacts: Vec<Artifact>,
+51 | | |     },
+   | | |_____- the second-largest variant contains at least 72 bytes
+52 | |       #[serde(rename = "actual_session_subset_checked")]
+53 | | /     Actual {
+54 | | |         schema: String,
+55 | | |         routes: Vec<Route>,
+56 | | |         artifacts: Vec<Artifact>,
+57 | | |         actual: Actual,
+58 | | |     },
+   | | |_____- the largest variant contains at least 360 bytes
+59 | |   }
+   | |___^ the entire enum is at least 360 bytes
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_enum_variant
+   = note: `-D clippy::large-enum-variant` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::large_enum_variant)]`
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+   |
+57 -         actual: Actual,
+57 +         actual: Box<Actual>,
+   |
+
+error: could not compile `crypto` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `crypto` (lib test) due to 1 previous error

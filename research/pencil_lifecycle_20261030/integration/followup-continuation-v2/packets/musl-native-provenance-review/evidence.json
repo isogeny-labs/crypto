@@ -1,0 +1,222 @@
+{
+  "schema": "software.native-link-provenance/v1",
+  "files": {
+    "receipt.json": {
+      "sha256": "bcdd5b205bcfe22540b6b7ec3d04fb1147530dd2a123a66127f9ecd8e5d94958",
+      "bytes": 5529
+    },
+    "ecbench": {
+      "sha256": "16b6eecd16e4cdc3c56bd733090ae80bb9b558f3f8b5dc449d5b8d3344d880d1",
+      "bytes": 80123632
+    },
+    "ecbench.map": {
+      "sha256": "2110f4cf7abc25f50024c61263d9d3ead3727f13154513e071ad51dcfbb8f009",
+      "bytes": 106125108
+    },
+    "build.stdout": {
+      "sha256": "d8ce48f474109d6bcabf83193efd3f021b3e0e091e2408869dcc44d1ac3775ae",
+      "bytes": 66064
+    },
+    "build.stderr": {
+      "sha256": "709abe4d8c2e5173ed235d05e182672d547a30cda47309c01c0d542838059771",
+      "bytes": 1114891
+    },
+    "crt-libc-candidates.json": {
+      "sha256": "fc6e55034f7f9cd39bddbb1f9a4f6f26b7c896a0435be913e9909463c2844e21",
+      "bytes": 1230
+    },
+    "elf-header.stdout": {
+      "sha256": "32aefdcd55c0dcbdfa704a02e8f125c0d4c38989e00e5451f22a5ddf36620276",
+      "bytes": 983
+    },
+    "elf-programs.stdout": {
+      "sha256": "587732613474d67a16400d758246b0878b18b2e7e4a576fffbbef99b39014cfc",
+      "bytes": 2180
+    },
+    "elf-dynamic.stdout": {
+      "sha256": "4237d54e85c8395cf0b584d77f229d9710375d47e91a4b5a6f23f8ccf987e145",
+      "bytes": 1108
+    },
+    "head-before.stdout": {
+      "sha256": "f1cd438e9612fb89aa608ba539f757235a9f1ff89f1edd030221cf021a2e3c4f",
+      "bytes": 41
+    },
+    "head-after.stdout": {
+      "sha256": "f1cd438e9612fb89aa608ba539f757235a9f1ff89f1edd030221cf021a2e3c4f",
+      "bytes": 41
+    },
+    "tree.stdout": {
+      "sha256": "e07f72bad9e974774f9635b665dc83e27fcebc6087553b4e204c2f2c6dc46123",
+      "bytes": 41
+    }
+  },
+  "receipt_status": "built_static_candidate",
+  "source_commit": "b985ddb30b46abbd9a050e5753c7e301f40b07f6",
+  "source_tree": "895383ebc1fdc304045da79f3edc0d1e8a9979d8",
+  "source_manifest": {
+    "commit": "b985ddb30b46abbd9a050e5753c7e301f40b07f6",
+    "tree": "895383ebc1fdc304045da79f3edc0d1e8a9979d8",
+    "Cargo.toml": "26d916b370a5669ff278cb65e0fb9aad03f3bf7ab2b0b3358a2d5c5b0c2db50c",
+    "Cargo.lock": "b8698075f4e273fb9b3b290d928fbc9fa94092f8ec277e91023ed6974d242093"
+  },
+  "build_exit_code": 0,
+  "actual_link_flags": [
+    "-nostartfiles",
+    "-static-pie",
+    "-nodefaultlibs",
+    "-Wl,-Map=/var/tmp/pencil-musl-build-b985-20261031-v3/ecbench.map"
+  ],
+  "driver": {
+    "printed_driver": "cc",
+    "resolved_now": "/usr/bin/cc",
+    "realpath_now": "/usr/bin/gcc",
+    "sha256_now": "8bffae62fd101725fa713a76b6a5d24efe1dea5d6ab24b902aa2e58e7976eaec"
+  },
+  "crt_libc": [
+    {
+      "path": "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtbeginS.o",
+      "sha256": "297960e338581a38bbfcbee45169a847bcdc5527ccaf68abe95b72b3b0856bed",
+      "in_final_arguments": true,
+      "in_map_loads": true,
+      "archive_members": 0
+    },
+    {
+      "path": "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtendS.o",
+      "sha256": "0d11009c048ae289cdf184d726b767debc2972321e143838d28d7b6802b69c7c",
+      "in_final_arguments": true,
+      "in_map_loads": true,
+      "archive_members": 0
+    },
+    {
+      "path": "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crti.o",
+      "sha256": "5343749d306ea3578a4ae5c796be362100273f3314cec283be621bbe4a8ec720",
+      "in_final_arguments": true,
+      "in_map_loads": true,
+      "archive_members": 0
+    },
+    {
+      "path": "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtn.o",
+      "sha256": "794abd4b28db5de5f993b1445460d90fa3191cc9556a8b8881d5d34a5e8dfa87",
+      "in_final_arguments": true,
+      "in_map_loads": true,
+      "archive_members": 0
+    },
+    {
+      "path": "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a",
+      "sha256": "e699c64b0c6b427d89ad5bf767bf78beb30c19930c5dedff635951636e8f9f70",
+      "in_final_arguments": false,
+      "in_map_loads": true,
+      "archive_members": 362
+    },
+    {
+      "path": "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/rcrt1.o",
+      "sha256": "7998a49f23b463b1bf59aecd8fde59df5d0f0bf819d1272d92c6f00ae81fc429",
+      "in_final_arguments": true,
+      "in_map_loads": true,
+      "archive_members": 0
+    }
+  ],
+  "map_loads": [
+    "LOAD /home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/rcrt1.o",
+    "LOAD /home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crti.o",
+    "LOAD /home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtbeginS.o",
+    "LOAD /home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libunwind.a",
+    "LOAD /home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a",
+    "LOAD /home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtendS.o",
+    "LOAD /home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtn.o"
+  ],
+  "private_prefix_map_references": 0,
+  "private_compiler_bindings": {
+    "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc": {
+      "recorded_sha256": "4f597c5343a03531e174d3a96e7af1ac329d3959966d90f68eb72fd495e8509c",
+      "current_sha256": "4f597c5343a03531e174d3a96e7af1ac329d3959966d90f68eb72fd495e8509c",
+      "match": true
+    },
+    "/var/tmp/pencil-musl-private-20261031/prefix/lib/musl-gcc.specs": {
+      "recorded_sha256": "1ed245252e41a58a2c0024abe78ee87d427a79c08917dc9ee833060977776707",
+      "current_sha256": "1ed245252e41a58a2c0024abe78ee87d427a79c08917dc9ee833060977776707",
+      "match": true
+    },
+    "/var/tmp/pencil-musl-private-20261031/prefix/lib/libc.a": {
+      "recorded_sha256": "41856f80eb65638c52dc25e0f95445da6d306c5313061dd94ae9441be92d45b3",
+      "current_sha256": "41856f80eb65638c52dc25e0f95445da6d306c5313061dd94ae9441be92d45b3",
+      "match": true
+    },
+    "/var/tmp/pencil-musl-private-20261031/manifest.json": {
+      "recorded_sha256": "ffcd561dd262ea234a22278cd314f255946f830179ea2ea63b58dee90c4a58dd",
+      "current_sha256": "ffcd561dd262ea234a22278cd314f255946f830179ea2ea63b58dee90c4a58dd",
+      "match": true
+    },
+    "/usr/bin/gcc": {
+      "recorded_sha256": "8bffae62fd101725fa713a76b6a5d24efe1dea5d6ab24b902aa2e58e7976eaec",
+      "current_sha256": "8bffae62fd101725fa713a76b6a5d24efe1dea5d6ab24b902aa2e58e7976eaec",
+      "match": true
+    }
+  },
+  "c_dependency_compiler_declarations": [
+    "[ring 0.17.14] CC_x86_64_unknown_linux_musl = Some(/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc)",
+    "[ring 0.17.14] CC_x86_64_unknown_linux_musl = Some(/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc)",
+    "[libsqlite3-sys 0.30.1] CC_x86_64_unknown_linux_musl = Some(/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc)",
+    "[blake3 1.8.7] CC_x86_64_unknown_linux_musl = Some(/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc)",
+    "[blake3 1.8.7] CC_x86_64_unknown_linux_musl = Some(/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc)",
+    "[blake3 1.8.7] CC_x86_64_unknown_linux_musl = Some(/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc)",
+    "[blake3 1.8.7] CC_x86_64_unknown_linux_musl = Some(/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc)"
+  ],
+  "native_archive_member_examples": [
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libblake3-0da94db0602a15af.rlib",
+      "b8423798394d5395-blake3_avx2_x86-64_unix.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libblake3-0da94db0602a15af.rlib",
+      "b8423798394d5395-blake3_avx512_x86-64_unix.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libblake3-0da94db0602a15af.rlib",
+      "b8423798394d5395-blake3_sse2_x86-64_unix.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libblake3-0da94db0602a15af.rlib",
+      "b8423798394d5395-blake3_sse41_x86-64_unix.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libblake3-0da94db0602a15af.rlib",
+      "blake3-0da94db0602a15af.blake3.77b4dbb54db62ade-cgu.0.rcgu.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libblake3-0da94db0602a15af.rlib",
+      "blake3-0da94db0602a15af.blake3.77b4dbb54db62ade-cgu.1.rcgu.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libcrypto_lib-fb846a281e6853ab.rlib",
+      "crypto_lib-fb846a281e6853ab.crypto_lib.f4ec5ffe31bf554a-cgu.11.rcgu.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/liblibsqlite3_sys-e9bf292b7ac7c1a4.rlib",
+      "c877a2978823c39d-sqlite3.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/liblibsqlite3_sys-e9bf292b7ac7c1a4.rlib",
+      "libsqlite3_sys-e9bf292b7ac7c1a4.libsqlite3_sys.9d0a97bb79983b07-cgu.0.rcgu.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libring-aeb87b46adf61310.rlib",
+      "25ac62e5b3c53843-curve25519_64_adx.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libring-aeb87b46adf61310.rlib",
+      "a0330e891e733f4e-gfp_p384.o"
+    ],
+    [
+      "/home/ec2-user/pencil-musl-target-b985-20261031/x86_64-unknown-linux-musl/release/deps/libring-aeb87b46adf61310.rlib",
+      "a0330e891e733f4e-p256-nistz.o"
+    ]
+  ],
+  "elf": {
+    "amd64": true,
+    "interpreter_present": false,
+    "needed_present": false,
+    "dynamic_section_present": true
+  },
+  "no_executable_runs": true
+}

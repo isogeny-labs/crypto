@@ -1,0 +1,93 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      },
+      "name": "rho_neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.three_leads_genus2_choice2_v1",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      },
+      "name": "genus_choice2",
+      "role": "candidate"
+    },
+    {
+      "name": "genus_projective",
+      "role": "candidate",
+      "method": {
+        "id": "ic.three_leads_genus2_projective_chart_v1",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      }
+    }
+  ],
+  "description": "Same frozen exact-order targets and cap; paired projective CRT chart, affine two-choice, and source negation rho; L0 operation counts",
+  "label": "five-leads-projective-chart-order-genus-40",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 4255430436932,
+        "b": 1351106155619,
+        "family": "scholten",
+        "group_order": 8805124221808,
+        "gx": 4017562840038,
+        "gy": 8704560266432,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 2967343,
+        "parameter": 0,
+        "r": 550320263863
+      },
+      {
+        "a": 6216410651083,
+        "b": 105219825096,
+        "family": "scholten",
+        "group_order": 8811205326608,
+        "gx": 279976223851,
+        "gy": 475529006606,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 2968367,
+        "parameter": 0,
+        "r": 550700332913
+      },
+      {
+        "a": 8234028488351,
+        "b": 345840987380,
+        "family": "scholten",
+        "group_order": 8834088069232,
+        "gx": 5664750193471,
+        "gy": 3620345648231,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 2972219,
+        "parameter": 0,
+        "r": 552130504327
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 60
+  }
+}

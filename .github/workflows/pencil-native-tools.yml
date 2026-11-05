@@ -1,0 +1,107 @@
+name: Pencil native study tools
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/pencil-native-tools.yml'
+      - 'research/pencil_large_prime_20261029/native_preparation/**'
+      - 'research/pencil_large_prime_20261029/native_canonical_export/**'
+      - 'research/pencil_large_prime_20261029/native_review_report/**'
+      - 'research/pencil_large_prime_20261029/native_price/**'
+      - 'research/pencil_large_prime_20261029/paired_export/**'
+      - 'research/pencil_large_prime_20261029/validation_inputs/**'
+      - 'research/pencil_large_prime_20261029/prepared_specs/**'
+      - 'research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/**'
+      - 'research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/**'
+      - 'research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pencil-native-tools.yml'
+      - 'research/pencil_large_prime_20261029/native_preparation/**'
+      - 'research/pencil_large_prime_20261029/native_canonical_export/**'
+      - 'research/pencil_large_prime_20261029/native_review_report/**'
+      - 'research/pencil_large_prime_20261029/native_price/**'
+      - 'research/pencil_large_prime_20261029/paired_export/**'
+      - 'research/pencil_large_prime_20261029/validation_inputs/**'
+      - 'research/pencil_large_prime_20261029/prepared_specs/**'
+      - 'research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/**'
+      - 'research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/**'
+      - 'research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/**'
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pencil-native-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: native tools (${{ matrix.crate }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: [native_preparation, native_canonical_export, native_review_report]
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/pencil_large_prime_20261029/native_preparation/
+            /research/pencil_large_prime_20261029/native_canonical_export/
+            /research/pencil_large_prime_20261029/native_review_report/
+            /research/pencil_large_prime_20261029/native_price/
+            /research/pencil_large_prime_20261029/paired_export/
+            /research/pencil_large_prime_20261029/validation_inputs/
+            /research/pencil_large_prime_20261029/prepared_specs/
+            /research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/
+            /research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/
+            /research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/pencil_large_prime_20261029
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/pencil_large_prime_20261029/${{ matrix.crate }}
+      - name: Install native PDF renderer
+        if: matrix.crate == 'native_review_report'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y texlive-latex-base texlive-latex-recommended texlive-pictures
+      - name: Test native tooling contracts
+        working-directory: research/pencil_large_prime_20261029/${{ matrix.crate }}
+        run: |
+          cargo fmt --all -- --check
+          cargo test --release --locked
+          cargo clippy --release --locked --all-targets -- -D warnings

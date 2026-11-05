@@ -1,0 +1,14 @@
+{
+  "kind": "software-validation",
+  "source_commit": "113526b577044a6283be81acb1a847c89c96aa4e",
+  "started_utc": "2026-10-30T03:23:15Z",
+  "finished_utc": "2026-10-30T03:23:22Z",
+  "exit_code": 0,
+  "source_readback_matches": true,
+  "command": [
+    "bash",
+    "-c",
+    "set -e; sha256sum -c /home/ec2-user/ml-dataset-work-20261028/prefix-combined-test-binary.sha256; env RAYON_NUM_THREADS=1 target/release/deps/crypto_lib-6aedeb38eb570a69 ml_dataset::solvers::tests::all_adapter_endpoints_return_structured_outcomes --ignored --exact --test-threads=1; sha256sum -c /home/ec2-user/ml-dataset-work-20261028/prefix-combined-test-binary.sha256"
+  ],
+  "verified_cloud_dataset_cells": 0
+}

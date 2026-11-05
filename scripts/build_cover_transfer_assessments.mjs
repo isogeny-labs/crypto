@@ -4,13 +4,14 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { catalogSnapshotBytes } from "./catalog_snapshot.mjs";
+import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "./catalog_snapshot.mjs";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-24";
 const CATALOG_COMMIT = "728304718cb0ab6df70da620a908a5f76f175293";
+const LEGACY_FORMULA_COMMIT = "0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -790,13 +791,17 @@ function freshness(status, scope, rationale, evidenceRefs, obligationId) {
   return result;
 }
 
-async function sourceArtifact(path, role, assessment) {
-  return {
+async function sourceArtifact(path, role, assessment, sourceCommit = undefined) {
+  const artifact = {
     path,
-    sha256: await fileHash(path),
+    sha256: sourceCommit === undefined
+      ? await fileHash(path)
+      : sha256Bytes(legacyFormulaSnapshotBytes(ROOT, path, sourceCommit)),
     role,
     freshness: assessment,
   };
+  if (sourceCommit !== undefined) artifact.source_commit = sourceCommit;
+  return artifact;
 }
 
 function integrityArtifact(path, role) {
@@ -1021,13 +1026,14 @@ async function buildSourceArtifacts() {
       freshness(
         "refuted",
         "claim that this inventory is current for the 15,791-row registry",
-        "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "At source_commit it pins an older registry and omits assessment slugs. This historical finding does not describe the refreshed live inventory; modeled routes remain distinct from exact HC1/CV1 subgroup certificates.",
         [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md",
         ],
         "refresh_formula_inventory",
       ),
+      LEGACY_FORMULA_COMMIT,
     ),
     integrityArtifact(
       "docs/curves/JACOBIAN_TRANSFERS.md",

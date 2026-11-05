@@ -1,0 +1,81 @@
+{
+  "schema": "mathematical-component-report/v1",
+  "status": "checked_and_independently_reviewed",
+  "claim": "weighted_same_support_abstract_classifier_exclusion",
+  "candidate_source_sha256": "459d112522ace37aed602a51294fb9d30357114c47db1916d591ab5b0686e722",
+  "assumptions": [
+    "Field K",
+    "DecidableEq K for classifier",
+    "(2 : K) != 0",
+    "z1,z2,w1,w2 all nonzero",
+    "both normalized validity divisibilities use the same f",
+    "Qc1=Qc2",
+    "Rc1=Rc2"
+  ],
+  "normalization": {
+    "qbar_i": "q_i / z_i^2",
+    "rbar_i": "r_i / z_i^4",
+    "sbar_i": "s_i / (z_i^3*w_i)",
+    "tbar_i": "t_i / (z_i^5*w_i)"
+  },
+  "normalized_validity": "u_i=X^2+qbar_i*X+rbar_i divides f-(sbar_i*X+tbar_i)^2",
+  "literal_cross_products": {
+    "Qc1": "q1*z2^2",
+    "Qc2": "q2*z1^2",
+    "Rc1": "r1*z2^4",
+    "Rc2": "r2*z1^4",
+    "Sc1": "s1*z2^3*w2",
+    "Sc2": "s2*z1^3*w1",
+    "Tc1": "t1*z2^5*w2",
+    "Tc2": "t2*z1^5*w1"
+  },
+  "proposed_identities": {
+    "Z": "z1*z2",
+    "W": "w1*w2",
+    "Qci": "Z^2*qbar_i",
+    "Rci": "Z^4*rbar_i",
+    "Sci": "Z^3*W*sbar_i",
+    "Tci": "Z^5*W*tbar_i"
+  },
+  "equal_slopes_global_premise": false,
+  "proposed_conclusion": "classifySameU22 Sc1 Tc1 Sc2 Tc2 != sameUMixedZeroSlope",
+  "evidence": {
+    "producer_compile": "evidence/producer/WeightedSameSupport.receipt.json",
+    "producer_readback": "evidence/producer/Readback.receipt.json",
+    "blind_derivation": "evidence/blind-review/BLIND.md",
+    "semantic_review": "evidence/source-review/SOURCE_REVIEW.md",
+    "controls": "evidence/blind-review/BLIND.md",
+    "independent_machine_replay": "evidence/independent-replay/outcomes.json",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "final_review": "evidence/independent-replay/FINAL_REVIEW.md",
+    "final_review_sha256": "c9682ecb9853daab4d51b564291ed7444addebe558b117ad66a658e524a2503f"
+  },
+  "next_bridge": "Correspondence of this field-level model to compiled Rust operations and preservation of normalized validity at runtime",
+  "compiled_rust_equivalence_claim": false,
+  "official_promotion": false,
+  "new_experiments": 0,
+  "new_ratios": [],
+  "published_commit": "957dd4c86b2a8b9416e4c62c6ad1f2eb51dcbee5",
+  "theorem": "SameSupportCandidate.weighted_valid_inputs_exclude_same_support_error",
+  "control_scope": "Exact hand derivations; no executed trials; includes unsuccessful characteristic-two counterexample attempt",
+  "machine_checks": {
+    "fresh_project_modules": 5,
+    "separate_axiom_check": true,
+    "all_six_processes_exit_zero": true,
+    "lean_version": "4.34.1",
+    "per_command_threads": 1,
+    "memory_limit_mib": 4096,
+    "external_timeout_seconds": 120,
+    "reused_hashed_dependency_objects": true,
+    "separate_kernel_rechecker": false
+  },
+  "failure_records": [
+    "Hashing driver failed before compiler execution: hashlib.file_digest unavailable; corrected driver retained",
+    "Runtime helper deprecated if_pos/if_neg warnings",
+    "Weighted source unused/unreachable ring warnings"
+  ]
+}

@@ -1,0 +1,9 @@
+digraph spot_gate {
+  graph [rankdir=LR, fontname="Helvetica", label="N83 D18 hosted route: Spot capacity passes, exact input read pending", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fillcolor="#e8f2ff"];
+  small [label="t3.small Spot smoke\nexit 0; output verified\ninstance terminated", fillcolor="#e4f4e8"];
+  large [label="c7i.2xlarge Spot smoke\n8 CPUs; 15 GiB\nexit 0; terminated", fillcolor="#e4f4e8"];
+  input [label="Original D18 S3 read\nrunner role returned 403\nexact grant unapplied", fillcolor="#ffe8de"];
+  run [label="Linux source/binary protocol\nfull positive then natural\nnot launched", fillcolor="#eeeeee"];
+  small -> large -> input -> run;
+}

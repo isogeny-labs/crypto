@@ -24,11 +24,12 @@ use serde_json::{json, Value};
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
-    generic_floor_ops, koblitz_floor_instance, koblitz_instance, random_binary_instance,
-    rho_reference, rho_reference_negation, roster_prime_instance, signed_frobenius_rho,
-    BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps, PinOutcome, PrimeInstance,
-    RhoResult,
+    find_prime_order_curve, generic_floor_ops, koblitz_floor_instance, koblitz_instance,
+    random_binary_instance, rho_reference, rho_reference_negation, roster_prime_instance,
+    signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps,
+    PinOutcome, PrimeInstance, RhoResult,
 };
+use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
@@ -290,6 +291,13 @@ fn listing() -> Value {
                         {"name": "size", "means": "seed abscissae (columns)"},
                         {"name": "norm", "means": "include alpha(P) = [a]P + [b]phi(P) for every alpha = a + b*phi of norm <= this (needs --family j0, j1728, d7 or d8); 0 for the seeds alone"},
                         {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"}]},
+                    {"name": "hashed-affine", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match the oracle"},
+                        {"name": "seed", "means": "SplitMix64 seed for the affine hash seeds; default 1"},
+                        {"name": "tau", "means": "shared threshold; default the Lemma 13 integer ceiling"},
+                        {"name": "s", "means": "shared hash prime in [2p,4p]; default the first prime there"},
+                        {"name": "steps", "means": "enumeration work budget in charged primitive steps"}]},
                     {"name": "gls-line", "regimes": ["gls (examples/glv_invariant_bench.rs)"],
                      "parameters": [
                         {"name": "no_fold", "means": "1 to fold the same points by negation only"}]},
@@ -338,6 +346,14 @@ fn listing() -> Value {
                     {"name": "mitm", "summands": "2 or 3", "regimes": ["prime", "char2", "koblitz"],
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
+                    {"name": "hashed-tensor", "summands": "2..8", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match hashed-affine"},
+                        {"name": "seed", "means": "SplitMix64 seed for the affine hash seeds; default 1"},
+                        {"name": "tau", "means": "shared threshold; must match hashed-affine"},
+                        {"name": "s", "means": "shared hash prime; must match hashed-affine"},
+                        {"name": "steps", "means": "per-target contraction budget in charged primitive steps"}],
+                     "needs": "the hashed-affine factor base with identical slots, seed, tau and s; contraction steps are reported uncalibrated, so do not read its S as a priced end-to-end cost"},
                     {"name": "mitm-frobenius", "summands": "2 or 3", "regimes": ["koblitz"],
                      "parameters": [{"name": "m", "means": "summands, 2 or 3"},
                                     {"name": "large_primes", "means": "0, 1 or 2 residuals outside the base a partial relation may carry (m=3 only); --large-primes sets it for every configuration"},
@@ -597,15 +613,17 @@ fn run_prime(
     let archive = PrimeArchiveBase { instance: inst };
     let known_log = KnownLogBase;
     let multiplier = CmMultiplierBase { instance: inst };
+    let hashed = HashedAffineBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
         "archive" => &archive,
         "prime-abscissa" => &abscissa,
         "glv-orbit" => &orbit,
         "known-log" => &known_log,
         "cm-multiplier" => &multiplier,
+        "hashed-affine" => &hashed,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log or cm-multiplier"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log, cm-multiplier or hashed-affine"
             ))
         }
     };
@@ -633,16 +651,18 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut hashed = HashedTensorOracle::new();
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
+            "hashed-tensor" => &mut hashed,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked or rootfind-subtract"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract or hashed-tensor"
                 ))
             }
         };
@@ -941,6 +961,11 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
         }
         "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
             CmFamily::Generic => roster_prime_instance(degree)
+                .or_else(|| {
+                    (8..=32)
+                        .contains(&degree)
+                        .then(|| find_prime_order_curve(degree, args.seed))
+                })
                 .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
             family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
         }),

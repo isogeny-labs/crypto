@@ -1,0 +1,104 @@
+\documentclass[10pt,a4paper,oneside]{report}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{titlesec}
+
+\hypersetup{colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black,
+            urlcolor=blue!50!black}
+\captionsetup{font=small, labelfont=bf}
+\setlist{nosep, leftmargin=1.4em}
+\sloppy
+\emergencystretch=3em
+\titleformat{\chapter}[hang]{\normalfont\huge\bfseries}{\thechapter}{0.6em}{}
+\titlespacing*{\chapter}{0pt}{-10pt}{18pt}
+
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\Fb}{\mathcal{F}}
+\newcommand{\Sem}[1]{S_{#1}}
+\newcommand{\abs}[1]{\lvert #1 \rvert}
+% A committed artefact in this repository or a sibling (prefix "name:").
+\newcommand{\art}[1]{\path{#1}}
+\newcommand{\cls}[1]{\textsc{#1}}
+
+\title{Index Calculus for the Elliptic-Curve Discrete Logarithm:\\[6pt]
+       {\Large Theory, Algorithms, and a Measured Frontier}\\[10pt]
+       {\large A treatise from a four-month research programme,\\
+       July--October 2026}}
+\author{Anonymous}
+\date{29 October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\tableofcontents
+
+\input{sections/intro}
+
+\part{Foundations}\label{part:foundations}
+\input{sections/prog_background}
+\input{sections/model}
+\input{sections/prog_theory}
+\input{sections/prog_method}
+
+\part{Theory}\label{part:theory}
+\input{sections/cover}
+\input{sections/falldegree}
+\input{sections/obstructions}
+
+\part{Algorithms and measurements}\label{part:algorithms}
+\input{sections/prog_rootfinding}
+\input{sections/prog_groebner}
+\input{sections/prog_koblitz}
+\input{sections/prog_binary}
+\input{sections/prog_prime}
+\input{sections/extension}
+\input{sections/prog_transfer}
+
+\part{The frontier}\label{part:frontier}
+\input{sections/summer}
+\input{sections/prog_frontier}
+\input{sections/distance}
+\input{sections/audit}
+
+\part{Outlook}\label{part:outlook}
+\input{sections/prog_openproblems}
+\input{sections/conclusion}
+
+\appendix
+\input{sections/artefacts}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}

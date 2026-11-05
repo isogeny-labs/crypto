@@ -11,6 +11,10 @@ on:
         description: Full commit SHA to build and test; blank uses this workflow commit
         type: string
         default: ''
+      publish_only:
+        description: Publish pinned image receipts without submitting any experiment
+        type: boolean
+        default: false
       spec_path:
         description: Repository ecbench.spec/v1 JSON file at the tested commit
         type: string
@@ -72,7 +76,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 taskq/deploy/eks-karpenter
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019 research/pencil_large_prime_20261029 taskq/deploy/eks-karpenter
       - name: Verify request, build identity and MCP contracts
         run: |
           set -euo pipefail
@@ -111,6 +115,7 @@ jobs:
           sparse-checkout: |
             scripts
             taskq/deploy/eks-karpenter
+            tools/artifacts
       - name: Check out the tested commit
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -124,7 +129,26 @@ jobs:
             examples
       - name: Materialize native build inputs
         working-directory: source
-        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates
+        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
+      - name: Pull store data needed by the tested source
+        working-directory: source
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 ../control/tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019 research/pencil_large_prime_20261029
       - name: Install the pinned native toolchain
         run: |
           sudo apt-get update -qq
@@ -137,6 +161,7 @@ jobs:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/isolab-build/ecbench
+            ${{ runner.temp }}/isolab-build/isolab-fresh-owner
             ${{ runner.temp }}/isolab-build/build-info.json
           if-no-files-found: error
           retention-days: 7
@@ -183,7 +208,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 taskq/deploy/eks-karpenter
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019 research/pencil_large_prime_20261029 taskq/deploy/eks-karpenter
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
@@ -197,7 +222,7 @@ jobs:
             sudo "$RUNNER_TEMP/awscli-install/aws/install"
           fi
       - name: Read the experiment spec from the tested commit
-        if: '!inputs.size_sweep'
+        if: '!inputs.publish_only && !inputs.size_sweep'
         env:
           GH_TOKEN: ${{ github.token }}
           SPEC_PATH: ${{ inputs.spec_path }}
@@ -223,7 +248,7 @@ jobs:
         if: inputs.resumable
         run: taskq/deploy/eks-karpenter/resume/publish-runtime "$RUNNER_TEMP/isolab-image.json" "$RUNNER_TEMP/isolab-recovery-image.json"
       - name: Run the IC curve-size panel on Spot
-        if: inputs.size_sweep
+        if: inputs.size_sweep && !inputs.publish_only
         env:
           GH_TOKEN: ${{ github.token }}
           ISOLAB_SWEEP_INSTANCE_TYPE: ${{ inputs.instance_type }}
@@ -233,14 +258,14 @@ jobs:
           ISOLAB_SWEEP_MAX_RESTORES: ${{ inputs.max_restores }}
         run: taskq/deploy/eks-karpenter/run-ic-sweep "$SOURCE_REVISION" "$RUNNER_TEMP/isolab-image.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: always() && inputs.size_sweep
+        if: always() && inputs.size_sweep && !inputs.publish_only
         with:
           name: isolab-ic-sweep-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/isolab-sweep
           if-no-files-found: warn
           retention-days: 7
       - name: Prepare the versioned experiment request
-        if: '!inputs.size_sweep'
+        if: '!inputs.publish_only && !inputs.size_sweep'
         env:
           INSTANCE_TYPE: ${{ inputs.instance_type }}
           DEADLINE: ${{ inputs.seconds }}
@@ -270,10 +295,10 @@ jobs:
               provenance:{harness:"github-actions",source_revision:$rev,workflow_revision:$workflow,run_url:$url}}' > "$RUNNER_TEMP/isolab-request.json"
           taskq/deploy/eks-karpenter/remote/validate-request "$RUNNER_TEMP/isolab-request.json" >/dev/null
       - name: Launch, await and verify the EKS experiment
-        if: '!inputs.resumable && !inputs.size_sweep'
+        if: '!inputs.publish_only && !inputs.resumable && !inputs.size_sweep'
         run: taskq/deploy/eks-karpenter/remote/launch-remote "$RUNNER_TEMP/isolab-request.json"
       - name: Submit resumable computation and verify its fresh L2 epoch
-        if: inputs.resumable && !inputs.size_sweep
+        if: '!inputs.publish_only && inputs.resumable && !inputs.size_sweep'
         run: |
           set -euo pipefail
           taskq/deploy/eks-karpenter/resume/fetch-client "$RUNNER_TEMP/isolab-recovery-client"
@@ -281,7 +306,7 @@ jobs:
           "$client" submit "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
           "$client" wait "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
       - name: Report the outcome
-        if: always() && !inputs.size_sweep
+        if: always() && !inputs.publish_only && !inputs.size_sweep
         run: |
           if [[ -f "$ISOLAB_CLIENT_OUTPUT/result.json" ]]; then
             if jq -e '.schema=="isolab.eks.recovery-result/v1"' "$ISOLAB_CLIENT_OUTPUT/result.json" >/dev/null; then
@@ -293,3 +318,17 @@ jobs:
           else
             printf 'No final experiment receipt. Inspect the build, publisher or launcher error.\n' >> "$GITHUB_STEP_SUMMARY"
           fi
+      - name: Retain publication receipts without submitting an experiment
+        if: always() && inputs.publish_only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: isolab-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/isolab-image.json
+            ${{ runner.temp }}/isolab-recovery-image.json
+            ${{ runner.temp }}/isolab-build/build-info.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Report publication-only scope
+        if: always() && inputs.publish_only
+        run: printf 'Publication-only request. No experiment submission was requested; inspect publication receipts and job status.\n' >> "$GITHUB_STEP_SUMMARY"

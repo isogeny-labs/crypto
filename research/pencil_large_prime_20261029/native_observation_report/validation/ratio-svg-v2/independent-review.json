@@ -1,0 +1,63 @@
+{
+  "schema": "pencil-native-observation-ratio-svg-independent-review/v1",
+  "created_utc": "2026-10-30T03:04:25Z",
+  "review_kind": "read-only source, XML geometry, label, exact-authority, and validation review",
+  "source": {
+    "lib_sha256": "dec5ffe7607906d28b7270a48ef275fd33a60fc55cd52e2b4f9b70dbdda51c85"
+  },
+  "producer_validation": {
+    "receipt_sha256": "df16bdccb1185c1099098b3557a1a6e8dfec6263465b75a026619d6649c4012d",
+    "test_log_sha256": "e1f578675e3ede3226ada36e41140c9b0d16a71e94ca3ebf5e9b862f2a64d9d4",
+    "clippy_log_sha256": "75cd17fbde2e7035c080036905765f05a55a7461d6676424fafc7a8ec8f1980b",
+    "fmt_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests_passed": 8,
+    "tests_failed": 0,
+    "solver_executions": 0,
+    "empirical_observations": 0
+  },
+  "artifacts": {
+    "finite_cost_ratios_svg_sha256": "a19462a13d6f09e14f76eef92eb5bc849dd1ee76d64c11227f617456db523857",
+    "coverage_svg_sha256": "70688f8a77b116b9c92da1c45c8a872154fa08bc6a2a0b53fc50458dfbca82c7",
+    "report_json_sha256": "6c6c5fbc691df72ee09e6c45a6d52be7057c16abf3432047d5f64b759e07fb23",
+    "cost_grid_exact_csv_sha256": "fdc57c17d3bc5bc42d4ed3b0739e1142708011d3903fb5827bd6611997780e19"
+  },
+  "observed_structure": {
+    "cell_groups": 36,
+    "algorithm_series_entries": 36,
+    "inclusive_calibration_series_entries": 36,
+    "plotted_points": 4,
+    "explicit_null_labels": 68,
+    "exact_fraction_titles": 4,
+    "common_linear_axis": true,
+    "ratio_one_dashed_guide": true
+  },
+  "reviewed_properties": [
+    "all 36 validated price cells retain stable cell numbers and S2/I/N10 identities",
+    "algorithm-only and calibration-inclusive ratios use one common linear axis",
+    "floating point is confined to approximate SVG coordinates and labels",
+    "each plotted point has the exact source fraction in its SVG title",
+    "JSON and CSV exact fractions are explicitly labeled authoritative",
+    "null ratios have no plotted coordinate and are labeled null unavailable",
+    "coverage.svg remains a distinct count-coverage view",
+    "title states derived finite-model cost ratios to rho and not timing",
+    "legend distinguishes algorithm-only and including-calibration series",
+    "footer warns the 36 price cells share observations and are not independent samples",
+    "no speed, superiority, statistical, uncertainty, or timing verdict is emitted"
+  ],
+  "empty_policy": {
+    "accepted": true,
+    "rule": "fewer than two comparable cells emits no numeric ratio SVG; retained coverage.svg plus exact 36-cell JSON/CSV/PDF present the null or singleton state",
+    "basis": "explicit parent requirement and research-visuals threshold; avoids presenting a numeric plot without at least two comparable observed values"
+  },
+  "visual_review": {
+    "method": "source and complete SVG XML geometry/text inspection; direct SVG rasterization unavailable on host",
+    "coordinate_bounds_reviewed": true,
+    "label_bounds_reviewed": true,
+    "obvious_overlap_or_clipping_found": false
+  },
+  "findings": [],
+  "conclusion": "No concrete defect found in the requested additive finite-model ratio projection. Exact fractions remain authoritative; the SVG is an approximate, descriptive finite-cost view and does not qualify timing or make a performance judgment.",
+  "mutations_performed_by_reviewer": 0,
+  "cloud_actions": 0,
+  "trial_executions": 0
+}

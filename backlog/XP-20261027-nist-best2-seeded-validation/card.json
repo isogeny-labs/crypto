@@ -13,6 +13,6 @@
  "run":{"argv":["target/release/ecbench","run","--spec","research/nist_best2_small_batch_20261027/ecbench-model.json","--out","{out}","--cpus","inherit"],"env":{},"timeout_per_shard_s":1800},
  "shards":{"count":1,"scheme":"single","params":{},"stop":"all"},
  "checkpoint":{"file":null,"resume_flag":null},
- "outputs":{"result_schema":"ecbench.session/v1","verify":["target/release/ecbench","verify","--dir","{artifact}","--replay","12"],"land":"research/nist_best2_small_batch_20261027/seeded-audit-v1"},
+ "outputs":{"result_schema":"ecbench.session/v1","verify":["target/release/ecbench","verify","--dir","{out}","--replay","12"],"land":"research/nist_best2_small_batch_20261027/seeded-audit-v1"},
  "cairn":{"mode":"lab-task","space":"unconfigured","tasks":["XP-20261027-nist-best2-seeded-validation/shard-{k}"],"ttl_s":7200,"env":{"name":"crypto-rust","recipe":"Build from a pinned reviewed commit; use EKS L2 admission and independent-host replay."},"exec":{"cpus":4,"memory_mb":16384,"timeout_s":1800,"sandbox":"auto","publish":"runs/XP-20261027-nist-best2-seeded-validation"},"funding":{"units":0,"rationale":"Blocked card, not published or funded; use only existing authorized infrastructure."},"notes":"No lease, dispatch or running job exists."}
 }

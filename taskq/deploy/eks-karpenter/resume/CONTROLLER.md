@@ -58,3 +58,19 @@ progress, native correctness replay, and the fresh L2/S3 epoch. It also requires
 controller restart, duplicate request, incomplete generation, corrupt archive,
 deadline expiry and nonterminal-old-owner tests. A successful manual qualification
 does not satisfy these controller acceptance criteria.
+
+## Bounded memory envelope
+
+Requests may set `"memory":"8Gi"` when that per-run envelope is authorized.
+Only `4Gi` and `8Gi` are accepted. Omission selects the historical `4Gi`;
+explicit `4Gi` canonicalizes to omission, preserving existing request bytes,
+hashes and persisted state identities. Selecting `8Gi` changes the immutable
+request hash and cannot change the envelope of an existing logical run.
+
+The selected value is used for both requests and limits on the resumable
+computation container and its separate fresh L2 job. CPU, storage, deadlines,
+restore limits, retries, placement and authorization do not change. New pencil
+requests requiring 8 GiB must explicitly set the field; old requests remain
+at 4 GiB. This source change does not deploy a controller or publish a runtime.
+
+Validation and limitations are in `validation/20261029-memory-envelope/README.md`.

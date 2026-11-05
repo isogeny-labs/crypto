@@ -1,0 +1,58 @@
+name: ecdl-tensor-ic correctness
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'crates/ecdl-tensor-ic/**'
+      - '.github/workflows/ecdl-tensor-ic.yml'
+  pull_request:
+    paths:
+      - 'crates/ecdl-tensor-ic/**'
+      - '.github/workflows/ecdl-tensor-ic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecdl-tensor-ic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: crates/ecdl-tensor-ic
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: crates/ecdl-tensor-ic
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/ecdl-tensor-ic
+      - name: Format
+        run: cargo fmt --check
+      - name: Strict lint
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Ported Go tests (exhaustive gadgets, relation counts, solve)
+        run: cargo test --release --locked
+      - name: Gadget shape table matches the Go reference
+        run: |
+          cargo run --release --locked --bin ecdlscale > scale.txt
+          cat scale.txt
+          cat > expected.txt <<'EOF'
+                b     t    n    L |  mul e/b  add e/b point e/b |  maxdeg deg/b^.75
+               64     8    8   16 |     35.2    218.2    217.1 |     352      15.6
+              256    16   16   32 |     31.4    198.4    195.9 |    1248      19.5
+             1024    32   32   64 |     29.1    186.8    183.1 |    2304      12.7
+             4096    64   64  128 |     27.7    180.2    175.6 |    8768      17.1
+            16384   128  128  256 |     27.0    176.5    171.3 |   17024      11.8
+          EOF
+          diff expected.txt scale.txt

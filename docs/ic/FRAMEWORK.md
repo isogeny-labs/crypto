@@ -832,11 +832,27 @@ worse than none:
 
 | stage | trait | plug-ins |
 |:--|:--|:--|
-| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
+| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `hashed-affine`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
 | targets | `Targets` | `random`, `walk` |
-| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
+| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
 | polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
 | relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
+
+### Hashed-affine / hashed-tensor
+
+`hashed-affine` is the union of `slots` independent affine-hashed bases
+(`(α·encode(A) + β) mod s < τ`) and `hashed-tensor` is the exact Boolean
+tensor-contraction oracle over those slots, from the vendored
+`crates/hashed-ecdl-tensor`. Both read `slots`, `seed`, `tau` and `s`; the
+two specifications must agree, and `prepare` refuses the run when the base
+is not the same point list. This is the Bochum v0.2 §3 construction with the
+October 25 manuscript Appendix D.4 contraction; it is a separate arm from
+the summation-polynomial pipeline.
+
+The contraction's work is reported as `hashed_tensor_steps`, an
+**uncalibrated** charged-primitive count, so the `S` column does not yet
+price it. Treat a `hashed-affine + hashed-tensor` row as a stage diagnostic,
+not as a comparable end-to-end `S`, until that step has a calibration.
 
 `ic bench --list` prints this with every parameter each plug-in reads.
 A parameter that takes several values (`divisor` on `koblitz-orbit`,

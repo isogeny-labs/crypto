@@ -343,6 +343,263 @@ fn a_factor_base_dump_carries_its_points() {
 }
 
 #[test]
+fn explicit_binary_basis_dump_matches_the_run_and_replays() {
+    // A non-prefix subspace: ignoring `basis` would include bit 4 instead of
+    // bit 5. Use a tiny public synthetic curve; this checks wiring, not cost.
+    const CURVE: &str = r#"{"kind":"koblitz","a":1,"n":7}"#;
+    const BASIS: &str = "0x1;0x2;0x4;0x8;0x20";
+    let recipe = format!("binary-subspace:dimension=5,basis={BASIS}");
+    let (ok, stdout, err) = ecbench(&["fb", "--curve", CURVE, "--factor-base", &recipe]);
+    assert!(ok, "dump failed: {err}");
+    let dump: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(dump["factor_base"]["params"]["basis"], BASIS);
+    assert_eq!(dump["factor_base"]["dimension"], 5);
+    assert!(dump["factor_base"]["columns"].as_u64().unwrap() > 0);
+    let xs: Vec<u64> = dump["points"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|p| {
+            u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap()
+        })
+        .collect();
+    assert!(xs.iter().all(|&x| x != 0 && x & !0x2f == 0));
+    assert!(
+        xs.iter().any(|&x| x & 0x20 != 0),
+        "must use the supplied subspace"
+    );
+
+    let (ok, stdout, err) = ecbench(&[
+        "fb",
+        "--curve",
+        CURVE,
+        "--factor-base",
+        "binary-subspace:dimension=5",
+    ]);
+    assert!(ok, "prefix dump failed: {err}");
+    let prefix: Value = serde_json::from_str(&stdout).unwrap();
+    assert_ne!(
+        dump["factor_base"]["points_sha256"],
+        prefix["factor_base"]["points_sha256"]
+    );
+
+    let dir = scratch("explicit-basis");
+    let spec = serde_json::json!({
+        "schema": "ecbench.spec/v1",
+        "label": "explicit basis regression",
+        "workloads": {
+            "curves": [serde_json::from_str::<Value>(CURVE).unwrap()],
+            "targets_per_curve": 2, "target_seed": 7
+        },
+        "arms": [
+            {"name": "reference", "role": "reference", "method": {"id": "bsgs.negation"}},
+            {"name": "explicit", "role": "candidate", "method": {
+                "id": "ic.pipeline_counted",
+                "params": {"factor_base": recipe, "oracle": "mitm:m=2", "max_trials": "2000"}
+            }}
+        ],
+        "measurement": {"rounds": 1, "warmup": 0, "seed": 3,
+            "isolation_required": "L0", "timeout_seconds": 60}
+    });
+    let spec_path = dir.join("spec.json");
+    std::fs::write(&spec_path, serde_json::to_string_pretty(&spec).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec_path.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+    let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(records.len(), 4);
+    assert!(records.iter().all(|r| r["outcome"]["status"] == "verified"));
+    let candidates: Vec<_> = records
+        .iter()
+        .filter(|r| r["method"]["family"] == "ic")
+        .collect();
+    assert_eq!(candidates.len(), 2);
+    for record in candidates {
+        assert_eq!(record["factor_base"], dump["factor_base"]);
+    }
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay failed: {err}\n{stdout}");
+    let audit: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(audit["ok"], true);
+    let replays = audit["replays"].as_array().unwrap();
+    assert_eq!(replays.len(), 4);
+    assert!(replays.iter().all(|r| r["reproduced"] == true));
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+#[test]
+fn explicit_binary_basis_cli_rejects_invalid_recipes() {
+    for recipe in [
+        "binary-subspace:dimension=3,basis=1;2;3",
+        "binary-subspace:dimension=3,basis=1;2",
+        "binary-subspace:dimension=3,basis=1;2;128",
+        "binary-subspace:dimension=3,basis=1;2;0",
+        "binary-subspace:dimension=3,basis=1;2;",
+        "binary-subspace:dimension=3,basis=1,2,4",
+        "binary-subspace:dimension=3,basis=1;2;4,select=strict4e",
+        "binary-subspace:dimension=4294967299,basis=1;2;4",
+    ] {
+        let (ok, _, err) = ecbench(&[
+            "fb",
+            "--curve",
+            r#"{"kind":"koblitz","a":1,"n":7}"#,
+            "--factor-base",
+            recipe,
+        ]);
+        assert!(!ok, "accepted invalid recipe: {recipe}");
+        assert!(!err.trim().is_empty(), "missing diagnostic: {recipe}");
+    }
+}
+
+#[test]
+fn explicit_x_lists_preserve_inventory_identity_and_replay() {
+    for (label, curve, source) in [
+        (
+            "prime",
+            r#"{"kind":"prime_search","bits":12,"seed":59297}"#,
+            "prime-abscissa:size=12",
+        ),
+        (
+            "binary",
+            r#"{"kind":"koblitz","a":1,"n":7}"#,
+            "binary-subspace:dimension=5",
+        ),
+    ] {
+        let (ok, stdout, err) = ecbench(&["fb", "--curve", curve, "--factor-base", source]);
+        assert!(ok, "source dump: {err}");
+        let source: Value = serde_json::from_str(&stdout).unwrap();
+        let xs: std::collections::BTreeSet<_> = source["points"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| {
+                u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap()
+            })
+            .collect();
+        // Reverse ordering makes silently sorting/replacing the column list visible.
+        let xs: Vec<_> = xs.into_iter().rev().collect();
+        let list = xs
+            .iter()
+            .map(|x| format!("0x{x:x}"))
+            .collect::<Vec<_>>()
+            .join(";");
+        let recipe = format!("explicit-x:xs={list}");
+        let (ok, stdout, err) = ecbench(&["fb", "--curve", curve, "--factor-base", &recipe]);
+        assert!(ok, "explicit dump: {err}");
+        let dump: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(dump["factor_base"]["params"]["xs"], list);
+        assert!(dump["factor_base"]["dimension"].is_null());
+        assert_eq!(
+            dump["factor_base"]["columns"].as_u64(),
+            Some(xs.len() as u64)
+        );
+        let inventory = |doc: &Value| -> std::collections::BTreeSet<(String, String)> {
+            doc["points"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| {
+                    (
+                        p["x"].as_str().unwrap().to_owned(),
+                        p["y"].as_str().unwrap().to_owned(),
+                    )
+                })
+                .collect()
+        };
+        assert_eq!(inventory(&dump), inventory(&source));
+        for p in dump["points"].as_array().unwrap() {
+            let x =
+                u64::from_str_radix(p["x"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap();
+            assert_eq!(x, xs[p["col"].as_u64().unwrap() as usize]);
+        }
+        for bad in [
+            "explicit-x",
+            "explicit-x:xs=",
+            "explicit-x:xs=1;0x1",
+            "explicit-x:xs=18446744073709551615",
+            "explicit-x:xs=1,size=1",
+        ] {
+            let (ok, _, _) = ecbench(&["fb", "--curve", curve, "--factor-base", bad]);
+            assert!(!ok, "accepted {bad}");
+        }
+        let dir = scratch(&format!("explicit-xs-{label}"));
+        let spec = serde_json::json!({
+            "schema":"ecbench.spec/v1","label":"explicit x list replay",
+            "workloads":{"curves":[serde_json::from_str::<Value>(curve).unwrap()],
+                "targets_per_curve":2,"target_seed":7},
+            "arms":[
+                {"name":"reference","role":"reference","method":{"id":"bsgs.negation"}},
+                {"name":"explicit","role":"candidate","method":{"id":"ic.pipeline_counted",
+                    "params":{"factor_base":recipe,"oracle":"mitm:m=2","max_trials":"20000"}}}],
+            "measurement":{"rounds":1,"warmup":0,"seed":3,"isolation_required":"L0","timeout_seconds":60}
+        });
+        let spec_path = dir.join("spec.json");
+        std::fs::write(&spec_path, serde_json::to_vec_pretty(&spec).unwrap()).unwrap();
+        let out = dir.join("session");
+        let (ok, _, err) = ecbench(&[
+            "run",
+            "--spec",
+            spec_path.to_str().unwrap(),
+            "--out",
+            out.to_str().unwrap(),
+            "--cpus",
+            "none",
+            "--lock",
+            &lock(&dir),
+            "--quiet",
+        ]);
+        assert!(ok, "{label} run: {err}");
+        let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|l| serde_json::from_str(l).unwrap())
+            .collect();
+        assert_eq!(records.len(), 4);
+        for record in &records {
+            assert_eq!(record["outcome"]["status"], "verified");
+            if record["method"]["family"] == "ic" {
+                assert_eq!(record["factor_base"], dump["factor_base"]);
+            }
+        }
+        let (ok, stdout, err) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(ok, "{label} replay: {err}\n{stdout}");
+        let audit: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(audit["ok"], true);
+        let replay = audit["replays"].as_array().unwrap();
+        assert_eq!(replay.len(), 4);
+        assert!(replay.iter().all(|r| r["reproduced"] == true));
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[test]
 fn a_stored_factor_base_loads_into_the_database_by_its_store_name() {
     // The path a stored dump takes: `ecbench fb` writes it, `ecbench store
     // push` moves it to the object store under its curve and FB1 id, and
@@ -1304,10 +1561,11 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
     // because it would change the search without changing the method's
     // identity.  `linear_harvest` puts it in the identity instead.  Omitted
     // it changes nothing; `default` spells out what omission means; `off`
-    // is the engine before #1862.  Same targets, same base: every arm
-    // verifies and finds the same relations, `off` and `default` differ in
-    // counted word XORs (the harvest changes the splitting tree), and the
-    // parameter is refused where it would be ignored or is not understood.
+    // is the engine before #1862. Same targets, same base: every arm verifies
+    // and finds the same relations. The narrowed default rank gate leaves this
+    // below-threshold workload unchanged; explicit `every` demonstrates that
+    // the method parameter changes the splitting tree. The parameter is
+    // refused where it would be ignored or is not understood.
     let dir = scratch("pdp3-harvest");
     let arm = |name: &str, oracle: &str| {
         format!(
@@ -1323,12 +1581,13 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
       "label": "pdp3-koblitz linear_harvest test",
       "workloads": {{"curves": [{{"kind": "koblitz", "a": 0, "n": 13}}],
                     "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"}},
-      "arms": [{}, {}, {}, {}, {}, {}],
+      "arms": [{}, {}, {}, {}, {}, {}, {}],
       "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 600}}
     }}"#,
         arm("omitted", base),
         arm("default", &format!("{base},linear_harvest=default")),
         arm("off", &format!("{base},linear_harvest=off")),
+        arm("every", &format!("{base},linear_harvest=every")),
         arm(
             "bad-root",
             "pdp3-koblitz:m=2,engine=rootfind,linear_harvest=off"
@@ -1376,13 +1635,18 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
         ops["omitted"], ops["default"],
         "spelling out the default must not change a count"
     );
+    assert_eq!(
+        ops["default"], ops["off"],
+        "the default rank gate must leave this below-threshold workload unchanged"
+    );
     assert_eq!(found["omitted"], found["off"], "same relations either way");
     assert_ne!(
-        ops["off"], ops["default"],
-        "the harvest must change the splitting tree on this workload"
+        ops["off"], ops["every"],
+        "the explicit harvest parameter must change the splitting tree"
     );
     assert_ne!(method_ids["omitted"], method_ids["off"]);
     assert_ne!(method_ids["omitted"], method_ids["default"]);
+    assert_ne!(method_ids["off"], method_ids["every"]);
 }
 
 #[test]

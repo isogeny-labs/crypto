@@ -16,6 +16,23 @@ see [POLICY_COMPATIBILITY.md](POLICY_COMPATIBILITY.md). The native consumer
 accepts strict plan/v2 and factor-base/v2 bindings and emits its own static
 routing view/v2. This is not conformance to the producer's v4 training export.
 
+Sealed cells with the exact checked-phase policy also receive an independent
+recorded-contract check. It reconstructs the attempt binding, verifies protocol
+freeze hashes with number-preserving canonicalization, checks the finite native
+syscall lifecycle, and recomputes each recorded counter projection. The new
+`labels.checked_phase_contract` result remains restricted; public feature bytes
+and legacy v1 labels are unchanged. Policy-only, unavailable, operation-error and
+start-only prefixes remain explicit. Successful checks do not establish hardware
+truth, complete execution, whole-worker counts or admitted training cost.
+
+This component uses a conservative32MiB cumulative modeled-storage allowance,
+in addition to strict file/array bounds. `consumer_resource_limit` is a consumer
+refusal, not a producer outcome. Partial snapshots and their lineage are not
+accepted as sealed cells. See the
+[frozen contract](../ml_dataset_consumer_checked_phase_20261029/IMPLEMENTATION_FREEZE.md)
+and [validation record](../ml_dataset_consumer_checked_phase_20261029/VALIDATION.md)
+for exact scope, evidence and remaining interoperability limits.
+
 ## Native commands
 
 ```sh
@@ -72,6 +89,31 @@ count zero. The broad `mathematics_independently_verified` and
 `labels.independently_verified` flags remain false. Positive checks do not turn
 unsupported, timed-out or negative cells into verified mathematical results.
 
+## Independent distinct-root certificates
+
+The native consumer also checks recognized prime/root/m=2 and binary/root/m=2
+certificates with `--arithmetic`. Its separate polynomial implementation computes
+`monic gcd(f, X^q-X)` and compares it with the product of the declared distinct
+linear factors. This checks the complete root set of each completed nonzero
+polynomial without invoking the producer root finder. The zero polynomial has
+an explicit all-field result; only the saved finite factor-base domain is used
+for group-lift checks. Censored calls never establish absence of roots.
+
+The checker binds curve, field, twist, target, configured budget, ordered signed
+factor base, S3 coefficients, query order, finite-domain lift prefix and outcome.
+Binary certificates additionally bind hashes of the complete public/base/config
+objects. Prime v1 certificates have no equivalent full-object hash; their
+mathematical fields are bound, but arbitrary annotations are outside that claim.
+Results appear only in `labels.root_certificate_arithmetic`; static feature
+schemas are unchanged. A positive root-set label is per supplied completed call,
+and does not certify complete execution, every intermediate event identity,
+instruction cost, factor-base construction, subgroup order, UNSAT or fall degree.
+Historical root artifacts remain readable with explicit unverified status.
+See [ROOT_CERTIFICATE_DESIGN.md](ROOT_CERTIFICATE_DESIGN.md) for the bounded
+prime/binary contracts and primary mathematical sources, and
+[ROOT_VALIDATION.md](ROOT_VALIDATION.md) for the 51-cell sealed acceptance,
+retained failures, source reviews and verified S3 readback.
+
 ## Feature and measurement contract
 
 Only `features` is suitable as a model input. It contains typed public curve and
@@ -119,8 +161,10 @@ changing bytes; and bounded S3/producer command handling. They are software
 fixtures, not campaign draws. Historical 19-test and 25-test Python receipts
 remain unchanged, with separate evidence for the Rust replacement.
 
-The first real native-producer-to-S3-to-independent-consumer replay remains
-outstanding. As of the 2026-10-28 06:47 UTC inspection, the dated canonical
+The deployed-worker native-producer-to-S3-to-independent-consumer replay remains
+outstanding. The separate controller archive roundtrip in
+[POLICY_COMPATIBILITY.md](POLICY_COMPATIBILITY.md) checks retained software
+fixtures. As of the 2026-10-28 06:47 UTC inspection, the dated canonical
 catalog had no completed cells. Pilot 002 failed on S3 HEAD permission before
 publication. Broad solver/curve/twist coverage, instruction accounting, factor
 base controls, large-scale generation and scientific label acceptance remain

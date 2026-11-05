@@ -1,0 +1,45 @@
+{
+  "schema": "ml-dataset.startup-integration-status/v1",
+  "created_utc": "2026-10-29T06:49:00.393160+00:00",
+  "runtime_source_commit": "f4249f62df082b401717a03ae2cae1b7b1aeddd3",
+  "fixture_commit": "127ab13b48e1ec70b54fd189a2fe8c3c87430a26",
+  "binary_sha256": "1f4bae481e114bb081acd595722431112610f2253d4b4037cfc1317299d5a5fc",
+  "startup_cli_registered": true,
+  "central_chain_replay_registered": true,
+  "checks": {
+    "full_release_library": {
+      "passed": 5170,
+      "failed": 0,
+      "ignored": 123
+    },
+    "hyperelliptic_catalog": {
+      "passed": 2,
+      "failed": 0
+    },
+    "strict_maintained_clippy": "passed",
+    "release_build": "passed",
+    "actual_cli_checks": 8,
+    "actual_cli_fixture_commands": 10,
+    "independent_fixture_audit": "passed_limited_software_audit"
+  },
+  "source_readback_matches": true,
+  "native_prime_modulus_limit_exclusive": "4294967296",
+  "native_prime_chain_m": [
+    3,
+    15
+  ],
+  "cloud_execution_verified": false,
+  "positive_production_startup_verified": false,
+  "verified_cloud_dataset_cells": 0,
+  "research_corpus_rows_added": 0,
+  "model_trained": false,
+  "exact_first_last_fall_degree_established": false,
+  "remaining_scope": "docs/ml-dataset/REMAINING-COVERAGE.md",
+  "s3_software_archive": {
+    "remote": "s3://setec-astronomy-artifacts/store",
+    "fresh_get_verified_objects": 31,
+    "fresh_get_verified_bytes": 43223799,
+    "receipt": "validation-startup-main-20261029/remote-readback.json"
+  },
+  "historical_focused_validation": "startup-integration-validated-status.json"
+}

@@ -1,0 +1,31 @@
+// Exact characteristic-two unit identity,followed by a universal integer lift.
+ring f=2,(a,n,l),dp;
+poly bb=a+1;
+poly q=a^5+a^3+1;
+poly L=l^4+bb*l+bb^2;
+poly C=n^4+bb^3*n+bb^4*(l+1);
+poly U=n^2+bb*n+bb*l^3+bb^2*l;
+poly aa=a^3*l^2;
+poly ab=a^4+a;
+poly iv=(a^4+a)*n^2+(a^4+a^3+a^2+a+1)*n+(a^4+a^3+a^2+a+1)*l^3+a^3*l+a^3;
+poly residual=aa*L+ab*C+iv*U+1;
+poly multiplier=residual/q;
+print("BEGIN_SS23_UNIT_LIFT");
+print("MINPOLY_MULTIPLIER");multiplier;
+print("CHAR_TWO_UNIT_RESIDUAL");residual-multiplier*q;
+if(residual-multiplier*q!=0){ERROR("no universal unit identity");}
+ring z=0,(a,n,l),dp;
+poly qq=imap(f,multiplier);
+poly bb=a+1;
+poly q=a^5+a^3+1;
+poly L=l^4+bb*l+bb^2;
+poly C=n^4+bb^3*n+bb^4*(l+1);
+poly U=n^2+bb*n+bb*l^3+bb^2*l;
+poly aa=a^3*l^2;
+poly ab=a^4+a;
+poly iv=(a^4+a)*n^2+(a^4+a^3+a^2+a+1)*n+(a^4+a^3+a^2+a+1)*l^3+a^3*l+a^3;
+poly even=(aa*L+ab*C+iv*U+1-qq*q)/2;
+print("INTEGER_EVEN_CORRECTION");even;
+print("INTEGER_LIFT_RESIDUAL");aa*L+ab*C+iv*U+1-qq*q-2*even;
+if(aa*L+ab*C+iv*U+1-qq*q-2*even!=0){ERROR("integer lift mismatch");}
+print("SS23_UNIT_LIFT_ALL_CHECKS_PASS");print("END_SS23_UNIT_LIFT");quit;

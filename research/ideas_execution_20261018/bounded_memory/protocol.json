@@ -1,0 +1,14 @@
+{
+  "schema": "bounded-macaulay-protocol/v1",
+  "frozen_before_trials": true,
+  "items": [7, 9],
+  "workload": "Public synthetic K_1 curves, polynomial-basis subspace, target [17]G; exact ANFs exported with the repository builder",
+  "cells": [{"n":5,"m":4,"ell":2,"D":4},{"n":9,"m":4,"ell":3,"D":4},{"n":15,"m":4,"ell":5,"D":4},{"n":17,"m":4,"ell":6,"D":4}],
+  "semantics": "One degree-bounded Macaulay pass: each nonzero input generator f multiplied by every squarefree monomial t of degree <=D-degree(f). Products cancel duplicate masks. Not iterative MutantXL closure, full F4, a solving-degree measurement, or an attack.",
+  "controls": ["independent in-memory echelon basis on small controls", "exact rank and mutual row-space containment", "zero-byte and bounded pivot cache equality", "first and minimum-weight legal pivot choices", "interrupted checkpoint/restart equality", "malformed-input and metadata/disk/time-budget fail closed"],
+  "order": "degree descending, mask ascending within degree; reverse-variable grevlex optional diagnostic",
+  "budgets": {"cache_bytes":1048576,"metadata_bytes":67108864,"disk_bytes":1073741824,"wall_seconds_per_reduction":120,"cpu_threads":1},
+  "trace_policy": "Record legal same-leading-column pivot choices, feature and decision time, cache/disk counters. No learned-policy efficacy claim; frozen train/calibration/heldout training remains unimplemented.",
+  "timing": "Shared host, isolation tier 0; diagnostic elapsed time only. No speedup or fastest-engine claim; no external matched comparator available.",
+  "original_open_requirements": ["Complete m4 ell6/7 and guess-count ell8/9 frontier closure cells", "Distributed/GPU F4 kernels", "Iterative closure and solver integration", "Frozen heldout learned policy evaluation with charged training/inference", "Real >16GiB avoided-memory frontier comparison"]
+}

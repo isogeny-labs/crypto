@@ -194,7 +194,7 @@ worktree_patch() {
 # ---- run ------------------------------------------------------------------
 
 cmd_run() {
-    local type=c7i.4xlarge spot=true ttl='' disk=100 toolchain=rust setup='' name='' detach=false
+    local type=c7i.4xlarge spot=true market_choice='' ttl='' disk=100 toolchain=rust setup='' name='' detach=false
     local keep=false out='' ami='' ref='' resume='' source=true untracked=true paths=() artifacts=() envs=()
     local cache=true cargo_dir=. spot_flag=false od_flag=false
     while [ $# -gt 0 ]; do
@@ -408,7 +408,7 @@ EOF
     [ -n "$iid" ] || launch_failed "no $($spot && echo Spot || echo On-Demand) capacity for $type in the configured zones; try another type or later"
 
     info "job $id"
-    info "  $type$($spot && echo ' spot') $iid ($ami_ref), ttl $ttl (terminates by $(utc_epoch "$deadline"))"
+    info "  $type $($spot && echo spot || echo on-demand) $iid ($ami_ref), ttl $ttl (terminates by $(utc_epoch "$deadline"))"
     info "  ${commit:+source ${commit:0:12}$($patch && echo ' + local patch'), }command: $display"
     info "  s3://$BUCKET/jobs/$id/"
     if $detach; then

@@ -6,8 +6,10 @@ It is not an experiment timing report or a claimed ECDLP improvement.
 ![Proof dependencies and the open encoding bridge](proof-dependencies.svg)
 
 The solid arrows are dependencies in the written derivations. The dashed
-bridge to growing Boolean lower bounds is unproved. The Lean box covers only
-the identity declarations in the proof map, not the complete degree theorem.
+bridge to growing Boolean lower bounds is unproved. The Lean box now covers
+the complete original prime-field guarded three-abscissa exact pair `(4,5)`,
+including the degree-five construction and graded top-syzygy/Koszul first fall.
+Other presentations retain their separate formalization status.
 
 ## Result
 
@@ -59,20 +61,28 @@ four-degree case and serialized proof replay. No new field/base/target sweep
 was run in this integration. The full library test and native/Lean checks are
 recorded in `../validation/` and the PR.
 
-The partial Lean project checks resultant, guard, missing-root, and related
-identities and a common-root implication. The original twelve lemmas are
-unchanged; eight new local lemmas check quadratic cancellation and explicit
-discriminant/diagonal consequences. Both targets build, and the new module
-passes fresh kernel replay. The complete filtered-closure,
-finite-grid, and curve bridges remain unformalized. See
-[proof map](../formal/PROOF_MAP.json).
+The Lean project now proves the full original prime-field exact pair through
+`GuardedExactPair.exact_pair_prime`. It proves the actual generator degrees
+and leading homogeneous forms, defines the graded top map and classical
+Koszul span, and proves first fall four with a nonzero lower-degree lift.
+For last fall it constructs the degree-five refutation through cubic
+normalization, staged resultant extraction and a nine-point grid inverse.
+Explicit rational quadratic roots prove the scalar nonvanishing condition
+from polynomial UNSAT, and the constructed refutation supplies the unit ideal.
+The earlier checked uniform degree-four obstruction gives sharpness.
+The original curve/point hypotheses and the implication from prime `p>3` to
+nonzero six are included in the final wrapper. See the [complete proof and
+verification](../formal/complete-exact-pair.md), [current proof map](../formal/PROOF_MAP.json)
+and [resolved central problem](../../../problems/guarded-fall-degree-lean-exact-pair.md).
+The old identity and partial-formalization sources/receipts are unchanged.
 
 The repository identity records bind these four checked identities to the
 Lean source hash: odd resultant `IDC1h56e099b3201f45e4`, binary integer lift
 `IDC1h1fcce05743df34d3`, guard cancellation `IDC1h0808f60fce83a05e`, and
 missing root `IDC1h304bc867d3d73267`. See [replay](../identities/replay.json)
 and [serialized recheck](../identities/recheck.json). Their native checker
-does not execute Lean or certify the closure theorem.
+does not execute Lean or certify the closure theorem; the complete universal
+Lean proof is the separately checked source chain above.
 
 ## Relation to existing work and open scope
 

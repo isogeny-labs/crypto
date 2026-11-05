@@ -590,6 +590,43 @@ pub struct StrongRhoOutcomeG<S> {
 /// The one-word outcome.
 pub type StrongRhoOutcome = StrongRhoOutcomeG<u64>;
 
+/// What a solve that reached its step cap without an answer had spent: the
+/// work [`StrongRhoG::solve`] discards by returning `None`.
+#[derive(Clone, Debug)]
+pub struct StrongRhoSpent {
+    /// Group-operation steps taken by all walks.
+    pub walk_steps: u64,
+    /// Walks started.
+    pub walks: u64,
+    /// Walks abandoned in a fruitless cycle.
+    pub fruitless: u64,
+    /// Fruitless cycles escaped by doubling (`escape_fruitless` only).
+    pub escapes: u64,
+    /// Walks abandoned at the length cap.
+    pub capped: u64,
+    /// Collisions with `b = b'` (no information).
+    pub wasted_merges: u64,
+    /// Distinguished points stored when the solve gave up.
+    pub table_entries: usize,
+    /// `√(πr / 2A)`.
+    pub ideal_steps: f64,
+    /// Size `A` of the signed-Frobenius automorphism group on the subgroup.
+    pub automorphisms: usize,
+    /// Operation counts of the whole solve.
+    pub charges: StrongRhoCharges,
+    /// Length of every walk abandoned in a fruitless cycle or at the cap.
+    pub abandoned_trail_lengths: Vec<u32>,
+}
+
+/// Accounting choices of [`StrongRhoG::solve_accounted`].  The default is what
+/// [`StrongRhoG::solve`] does, bit for bit.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct StrongRhoExtras {
+    /// Charge the `lanes − 1` additions that form the start multiples
+    /// `j·stride`; the reference leaves them out of its count.
+    pub charge_start_multiples: bool,
+}
+
 /// `2^n − 1` as a word.
 fn word_mask<E: FieldWord>(n: u32) -> E {
     if n == E::BITS {
@@ -1426,6 +1463,55 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
             .collect()
     }
 
+    /// The jump table of the `_v2` reference: `distinct` jumps `[s]G`
+    /// (`distinct` divides [`JUMPS`]) repeated to fill the table, so a
+    /// partition hash still picks each with equal probability.  All are
+    /// formed from one table of `[2^i]G`, built once, so the set-up costs
+    /// `bits − 1` doublings and about half a bit of additions a jump instead
+    /// of `1.5·log₂ r` a jump; every operation is added to
+    /// `charges.group_additions` (a doubling is one).  The reference's table
+    /// ([`Self::jumps`]) is unchanged.
+    pub fn jumps_fixed_base(
+        &self,
+        jump_seed: u64,
+        distinct: usize,
+        charges: &mut StrongRhoCharges,
+    ) -> Vec<JumpG<F::E, S>> {
+        assert!(
+            distinct > 0 && JUMPS.is_multiple_of(distinct),
+            "distinct jumps must divide JUMPS"
+        );
+        let mut rng = StdRng::seed_from_u64(jump_seed);
+        let bits = self.modulus.bit_len();
+        let mut pow2 = Vec::with_capacity(bits as usize);
+        pow2.push(self.generator);
+        for _ in 1..bits {
+            let last = *pow2.last().expect("nonempty");
+            charges.group_additions += 1;
+            pow2.push(self.add(last, last));
+        }
+        let table: Vec<JumpG<F::E, S>> = (0..distinct)
+            .map(|_| loop {
+                let s = rng.gen_range(S::one()..self.modulus);
+                let mut acc = RawPointG::Infinity;
+                for (i, &p) in pow2.iter().enumerate() {
+                    if s.bit(i as u32) {
+                        if acc == RawPointG::Infinity {
+                            acc = p;
+                        } else {
+                            charges.group_additions += 1;
+                            acc = self.add(acc, p);
+                        }
+                    }
+                }
+                if acc != RawPointG::Infinity {
+                    break JumpG { point: acc, a: s };
+                }
+            })
+            .collect();
+        (0..JUMPS).map(|i| table[i % distinct]).collect()
+    }
+
     /// Solve `[d]G = Q` for one target `q` in the prime subgroup.
     ///
     /// `jumps` is the jump table (see [`StrongRho::jumps`]); walk starts draw
@@ -1439,7 +1525,30 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
         params: &StrongRhoParams,
         charges: StrongRhoCharges,
     ) -> Option<StrongRhoOutcomeG<S>> {
-        self.solve_dispatch::<false>(q, jumps, start_rng, params, charges)
+        self.solve_dispatch::<false>(
+            q,
+            jumps,
+            start_rng,
+            params,
+            charges,
+            StrongRhoExtras::default(),
+        )
+        .ok()
+    }
+
+    /// [`Self::solve`] that keeps what an exhausted solve spent
+    /// ([`StrongRhoSpent`]) and takes the accounting choices of
+    /// [`StrongRhoExtras`].  The walk is the same.
+    pub fn solve_accounted(
+        &self,
+        q: RawPointG<F::E>,
+        jumps: &[JumpG<F::E, S>],
+        start_rng: &mut StdRng,
+        params: &StrongRhoParams,
+        charges: StrongRhoCharges,
+        extras: StrongRhoExtras,
+    ) -> Result<StrongRhoOutcomeG<S>, Box<StrongRhoSpent>> {
+        self.solve_dispatch::<false>(q, jumps, start_rng, params, charges, extras)
     }
 
     /// The same walk through the literal pre-optimization canonicalization.
@@ -1453,7 +1562,15 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
         params: &StrongRhoParams,
         charges: StrongRhoCharges,
     ) -> Option<StrongRhoOutcomeG<S>> {
-        self.solve_dispatch::<true>(q, jumps, start_rng, params, charges)
+        self.solve_dispatch::<true>(
+            q,
+            jumps,
+            start_rng,
+            params,
+            charges,
+            StrongRhoExtras::default(),
+        )
+        .ok()
     }
 
     #[inline(always)]
@@ -1464,14 +1581,17 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
         start_rng: &mut StdRng,
         params: &StrongRhoParams,
         charges: StrongRhoCharges,
-    ) -> Option<StrongRhoOutcomeG<S>> {
+        extras: StrongRhoExtras,
+    ) -> Result<StrongRhoOutcomeG<S>, Box<StrongRhoSpent>> {
         #[cfg(target_arch = "x86_64")]
         if self.gf.clmul_walk() {
             // SAFETY: `clmul_walk` holds only for a field built after
             // `pclmulqdq` was detected.
-            return unsafe { self.solve_clmul::<LEGACY>(q, jumps, start_rng, params, charges) };
+            return unsafe {
+                self.solve_clmul::<LEGACY>(q, jumps, start_rng, params, charges, extras)
+            };
         }
-        self.solve_impl::<LEGACY>(q, jumps, start_rng, params, charges)
+        self.solve_impl::<LEGACY>(q, jumps, start_rng, params, charges, extras)
     }
 
     /// [`Self::solve_impl`] compiled with `pclmulqdq`: the walk inlines into
@@ -1490,8 +1610,9 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
         start_rng: &mut StdRng,
         params: &StrongRhoParams,
         charges: StrongRhoCharges,
-    ) -> Option<StrongRhoOutcomeG<S>> {
-        self.solve_impl::<LEGACY>(q, jumps, start_rng, params, charges)
+        extras: StrongRhoExtras,
+    ) -> Result<StrongRhoOutcomeG<S>, Box<StrongRhoSpent>> {
+        self.solve_impl::<LEGACY>(q, jumps, start_rng, params, charges, extras)
     }
 
     /// The walk, always inlined into [`Self::solve_clmul`] or
@@ -1504,7 +1625,8 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
         start_rng: &mut StdRng,
         params: &StrongRhoParams,
         mut charges: StrongRhoCharges,
-    ) -> Option<StrongRhoOutcomeG<S>> {
+        extras: StrongRhoExtras,
+    ) -> Result<StrongRhoOutcomeG<S>, Box<StrongRhoSpent>> {
         assert_eq!(jumps.len(), JUMPS, "jump table must have JUMPS entries");
         assert!(params.dp_bits < 32, "dp_bits must be below 32");
         let modulus = self.modulus;
@@ -1550,6 +1672,9 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
             std::iter::successors(Some(stride), |&m| Some(self.add(m, stride)))
                 .take(lanes_n)
                 .collect();
+        if extras.charge_start_multiples {
+            charges.group_additions += lanes_n as u64 - 1;
+        }
         let mut ahead = vec![RawPointG::Infinity; lanes_n];
         let mut ahead_inv = vec![zero; lanes_n];
         let mut ahead_used = lanes_n;
@@ -1625,7 +1750,7 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
                     S::mul_mod(S::sub_mod(hit_a, lane.state.a, modulus), inverse, modulus);
                 charges.scalar_multiplications += 1;
                 if self.scalar_mul(self.generator, candidate) == q {
-                    return Some(StrongRhoOutcomeG {
+                    return Ok(StrongRhoOutcomeG {
                         scalar: candidate,
                         walk_steps: steps,
                         walks,
@@ -1733,7 +1858,19 @@ impl<F: RhoField, S: RhoScalar> StrongRhoG<F, S> {
                 lane.state = next;
             }
         }
-        None
+        Err(Box::new(StrongRhoSpent {
+            walk_steps: steps,
+            walks,
+            fruitless,
+            escapes,
+            capped,
+            wasted_merges: wasted,
+            table_entries: table.len(),
+            ideal_steps: ideal,
+            automorphisms: self.automorphisms,
+            charges,
+            abandoned_trail_lengths,
+        }))
     }
 }
 
@@ -2208,6 +2345,103 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn fixed_base_jumps_are_the_scalars_multiples_and_cost_what_they_count() {
+        for curve in curves().into_iter().filter(|c| (13..=23).contains(&c.n)) {
+            let rho = StrongRho::new(&curve);
+            let bits = u64::from(rho.modulus().bit_len());
+            for distinct in [4usize, 8, 32] {
+                let mut charges = StrongRhoCharges::default();
+                let jumps = rho.jumps_fixed_base(0xfeed, distinct, &mut charges);
+                assert_eq!(jumps.len(), JUMPS);
+                for (i, j) in jumps.iter().enumerate() {
+                    assert_eq!(
+                        j.point,
+                        rho.scalar_mul(rho.generator(), j.a),
+                        "n={}",
+                        curve.n
+                    );
+                    // Repeats of the distinct jumps fill the table evenly.
+                    assert_eq!(j.a, jumps[i % distinct].a);
+                }
+                let distinct_scalars: std::collections::BTreeSet<u64> =
+                    jumps.iter().map(|j| j.a).collect();
+                // Draws can repeat in a small subgroup (birthday), never more.
+                assert!(distinct_scalars.len() <= distinct);
+                if bits >= 20 {
+                    assert_eq!(distinct_scalars.len(), distinct, "n={}", curve.n);
+                }
+                // bits − 1 doublings, then at most bits − 1 additions a jump,
+                // about half of them; no scalar multiplication is booked.
+                assert_eq!(charges.scalar_multiplications, 0);
+                let max = (bits - 1) + distinct as u64 * (bits - 1);
+                let min = bits - 1 + distinct as u64;
+                assert!(
+                    (min..=max).contains(&charges.group_additions),
+                    "n={} {distinct}: {}",
+                    curve.n,
+                    charges.group_additions
+                );
+                // The reference's table of 32 full scalar multiplications costs
+                // more than the shared-doubling one.
+                assert!(charges.group_additions < 32 * (bits * 3 / 2));
+            }
+        }
+    }
+
+    /// `solve_accounted` with its defaults is `solve`; asking for the start
+    /// multiples adds exactly the `lanes − 1` additions the reference leaves
+    /// out.  (An exhausted solve's spent work is tested through the method:
+    /// `exhausted_strong_v2_records_the_spent_work`.)
+    #[test]
+    fn accounted_solve_is_the_reference_walk_with_its_spent_work_kept() {
+        let curve = KoblitzCurve::new(0, 13).unwrap();
+        let rho = StrongRho::new(&curve);
+        let params = StrongRhoParams {
+            lanes: 8,
+            dp_bits: 2,
+            ..StrongRhoParams::default()
+        };
+        let mut charges = StrongRhoCharges::default();
+        let jumps = rho.jumps(3, &mut charges);
+        let d = 777 % rho.modulus();
+        let q = rho.scalar_mul(rho.generator(), d);
+        let a = rho
+            .solve(q, &jumps, &mut StdRng::seed_from_u64(9), &params, charges)
+            .unwrap();
+        let b = rho
+            .solve_accounted(
+                q,
+                &jumps,
+                &mut StdRng::seed_from_u64(9),
+                &params,
+                charges,
+                StrongRhoExtras::default(),
+            )
+            .unwrap();
+        assert_eq!(
+            (a.scalar, a.walk_steps, a.charges),
+            (b.scalar, b.walk_steps, b.charges)
+        );
+        let c = rho
+            .solve_accounted(
+                q,
+                &jumps,
+                &mut StdRng::seed_from_u64(9),
+                &params,
+                charges,
+                StrongRhoExtras {
+                    charge_start_multiples: true,
+                },
+            )
+            .unwrap();
+        assert_eq!(c.walk_steps, a.walk_steps, "the same walk");
+        assert_eq!(
+            c.charges.group_additions,
+            a.charges.group_additions + params.lanes as u64 - 1
+        );
     }
 
     #[test]

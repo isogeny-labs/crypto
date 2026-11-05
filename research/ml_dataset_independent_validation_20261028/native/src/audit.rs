@@ -203,7 +203,7 @@ fn validate_plan(plan: &Value) -> Result<u64> {
     Ok(total)
 }
 
-fn canonical_plan(plan: &Value) -> Result<Value> {
+pub(crate) fn canonical_plan(plan: &Value) -> Result<Value> {
     validate_plan(plan)?;
     let mut ordered = Map::new();
     for key in PLAN_FIELDS {
@@ -226,20 +226,34 @@ struct PlanInfo {
     binding: Value,
     run_sha: String,
     total: u64,
+    protocol_preflight_reserved: usize,
 }
 
 fn plan_info(root: &Path) -> Result<PlanInfo> {
     let (plan, _) = document(&contained(root, "plan.json")?)?;
     let total = validate_plan(&plan)?;
-    let (protocol, bytes) = document(&contained(root, "protocol.json")?)?;
+    let bytes = bounded_bytes(&contained(root, "protocol.json")?)?;
     ensure!(
         digest(&bytes) == text(&plan["protocol_sha256"], "protocol hash")?,
         "protocol hash mismatch"
     );
-    ensure!(
-        protocol["schema"] == "experiment.protocol/v1",
-        "protocol schema"
-    );
+    let protocol_preflight_reserved = match read_json_bytes(&bytes) {
+        Ok(protocol) => {
+            ensure!(
+                protocol["schema"] == "experiment.protocol/v1",
+                "protocol schema"
+            );
+            0
+        }
+        Err(error)
+            if error
+                .downcast_ref::<serde_json::Error>()
+                .is_some_and(|e| e.to_string().starts_with("number out of range")) =>
+        {
+            crate::phase::verify_large_protocol(&bytes)?
+        }
+        Err(error) => return Err(error),
+    };
     // Producer DatasetPlan is a struct: JSON field order is part of its digest.
     // serde_json's preserve_order feature is required by the parent crate.
     let plan_sha = digest(&serde_json::to_vec(&canonical_plan(&plan)?)?);
@@ -267,6 +281,7 @@ fn plan_info(root: &Path) -> Result<PlanInfo> {
         binding,
         run_sha: digest(&bytes),
         total,
+        protocol_preflight_reserved,
     })
 }
 
@@ -545,10 +560,16 @@ fn audit_cell(root: &Path, info: &PlanInfo, arithmetic: bool) -> Result<Value> {
         members["protocol.json"]["sha256"] == info.plan["protocol_sha256"],
         "cell protocol mismatch"
     );
-    ensure!(
-        read("protocol.json")?["schema"] == "experiment.protocol/v1",
-        "cell protocol schema"
-    );
+    if info.protocol_preflight_reserved == 0 {
+        ensure!(
+            read("protocol.json")?["schema"] == "experiment.protocol/v1",
+            "cell protocol schema"
+        );
+    } else {
+        // Root preflight verified the strict frozen protocol. Its exact digest
+        // equals this descriptor, and a fresh bounded hash binds cell bytes.
+        check_artifact(root, &members["protocol.json"])?;
+    }
     let outcome = &manifest["outcome"];
     text(&outcome["status"], "outcome status")?;
     let roles: BTreeSet<String> = members
@@ -685,12 +706,125 @@ fn audit_cell(root: &Path, info: &PlanInfo, arithmetic: bool) -> Result<Value> {
             checks.push(json!({"role":role,"artifact_sha256":artifact["sha256"],"checks":result}));
         }
     }
+    let root_checks =
+        root_certificates(root, &members, &public, &base, &config, outcome, arithmetic)?;
+    let filter_checks =
+        crate::large_prime::audit(root, &members, &public, &base, &config, outcome, arithmetic)?;
     let manifest_sha = digest(&manifest_bytes);
-    Ok(
-        json!({"id":manifest_sha,"index":index,"config":config,"public":public,"factor_base":base,
-        "outcome":outcome,"phase_measurements":phase_measurements(root,&members)?,
-        "positive_certificate_arithmetic":checks,"artifact_roles":roles,"manifest_sha256":manifest_sha}),
-    )
+    let checked_phase = crate::phase::audit_sealed(
+        root,
+        &members,
+        index,
+        &info.plan_sha,
+        info.protocol_preflight_reserved,
+    )?;
+    let (measurements, phase_summary) = match checked_phase {
+        Some(checked) => (checked.measurements, Some(checked.summary)),
+        None => (phase_measurements(root, &members)?, None),
+    };
+    let mut row = json!({"id":manifest_sha,"index":index,"config":config,"public":public,"factor_base":base,
+        "outcome":outcome,"phase_measurements":measurements,
+        "positive_certificate_arithmetic":checks,"root_certificate_arithmetic":root_checks,
+        "artifact_roles":roles,"manifest_sha256":manifest_sha});
+    if let Some(summary) = phase_summary {
+        row["checked_phase_contract"] = summary;
+    }
+    if let Some(checks) = filter_checks {
+        row["large_prime_filter_arithmetic"] = checks;
+    }
+    Ok(row)
+}
+
+fn root_certificates(
+    root: &Path,
+    members: &BTreeMap<String, Value>,
+    public: &Value,
+    base: &Value,
+    config: &Value,
+    outcome: &Value,
+    arithmetic: bool,
+) -> Result<Value> {
+    use crate::roots::{BINARY_ROLE, PRIME_ROLE};
+    let certificates: Vec<_> = members
+        .values()
+        .filter(|a| matches!(a["role"].as_str(), Some(PRIME_ROLE | BINARY_ROLE)))
+        .collect();
+    let call_artifacts: Vec<_> = members
+        .values()
+        .filter(|a| {
+            matches!(
+                a["role"].as_str(),
+                Some("native-prime-root-call" | "native-binary-root-call")
+            )
+        })
+        .collect();
+    if certificates.is_empty() {
+        ensure!(
+            [
+                "root_certificate_scope",
+                "root_execution_trace_complete_verified",
+                "root_total_operation_count_verified"
+            ]
+            .iter()
+            .all(|k| outcome.get(*k).is_none())
+                && call_artifacts.is_empty(),
+            "root outcome/call evidence lacks a recognized certificate"
+        );
+        return Ok(
+            json!({"status":if outcome["status"]=="unsupported" {"unsupported_cell"}
+            else if config["solver"]=="root" {"legacy_root_evidence_unverified"} else {"not_applicable"},
+            "completed_root_sets_checked":0,"all_supplied_root_sets_verified":false,
+            "execution_trace_complete_verified":false,"total_operation_count_verified":false,"unsat_verified":false}),
+        );
+    }
+    ensure!(
+        certificates.len() == 1 && !public.is_null() && !base.is_null(),
+        "root certificate lacks unique public/domain context"
+    );
+    let artifact = certificates[0];
+    let role = text(&artifact["role"], "root certificate role")?;
+    ensure!(
+        artifact["encoding"] == "json",
+        "root certificate must be JSON"
+    );
+    let certificate = load_artifact_json(root, artifact)?;
+    let queries = array(&certificate["queries"], "root certificate queries")?;
+    ensure!(
+        call_artifacts.len() == queries.len(),
+        "root call artifacts differ from certificate queries"
+    );
+    for (index, query) in queries.iter().enumerate() {
+        let (path, call_role) = if role == BINARY_ROLE {
+            (
+                format!("binary-root-call-{index:04}.json"),
+                "native-binary-root-call",
+            )
+        } else {
+            (
+                format!("root-call-{index:04}.json"),
+                "native-prime-root-call",
+            )
+        };
+        let member = members.get(&path).context("missing root call artifact")?;
+        ensure!(
+            member["role"] == call_role
+                && member["encoding"] == "json"
+                && load_artifact_json(root, member)? == *query,
+            "root call artifact/certificate mismatch"
+        );
+    }
+    let mut checked = crate::roots::verify_dataset(
+        public,
+        base,
+        config,
+        outcome,
+        &certificate,
+        role,
+        arithmetic,
+    )?;
+    checked["artifact_sha256"] = artifact["sha256"].clone();
+    checked["artifact_role"] = json!(role);
+    Ok(checked)
 }
 
 pub fn audit(root: &Path, expected: Option<&str>, arithmetic: bool) -> Result<(Value, Vec<Value>)> {
@@ -728,6 +862,7 @@ pub fn audit(root: &Path, expected: Option<&str>, arithmetic: bool) -> Result<(V
     }
     let mut counts = BTreeMap::<String, u64>::new();
     let mut checked_certificates = 0u64;
+    let mut checked_root_sets = 0u64;
     for row in &rows {
         let status = text(&row["outcome"]["status"], "outcome status")?.to_owned();
         let count = counts.entry(status).or_default();
@@ -737,16 +872,45 @@ pub fn audit(root: &Path, expected: Option<&str>, arithmetic: bool) -> Result<(V
                 array(&row["positive_certificate_arithmetic"], "arithmetic checks")?.len(),
             )?)
             .context("certificate count overflow")?;
+        checked_root_sets = checked_root_sets
+            .checked_add(uint(
+                &row["root_certificate_arithmetic"]["completed_root_sets_checked"],
+                "checked root set count",
+            )?)
+            .context("root certificate count overflow")?;
     }
-    Ok((
-        json!({"schema":"ml-dataset.consumer-audit/v1","run_sha256":info.run_sha,
+    let mut summary = json!({"schema":"ml-dataset.consumer-audit/v1","run_sha256":info.run_sha,
         "trusted_run_anchor_checked":expected.is_some(),"plan_sha256":info.plan_sha,"planned_cells":info.total,
         "checked_cells":rows.len(),"incomplete_attempts":incomplete,"outcomes":counts,
         "hashes_and_cross_artifact_bindings_verified":true,"mathematics_independently_verified":false,
         "producer_native_replay_passed":false,"independent_arithmetic_requested":arithmetic,
-        "positive_certificates_arithmetic_checked":checked_certificates,"remote_rechecked":false,"full_scope_complete":false}),
-        rows,
-    ))
+        "positive_certificates_arithmetic_checked":checked_certificates,
+        "completed_distinct_root_sets_checked":checked_root_sets,
+        "remote_rechecked":false,"full_scope_complete":false});
+    if rows
+        .iter()
+        .any(|r| r.get("large_prime_filter_arithmetic").is_some())
+    {
+        let mut counts = BTreeMap::new();
+        for field in [
+            "completed_batches_checked",
+            "censored_prefixes_checked",
+            "source_equations_checked",
+            "complete_matrix_ranks_checked",
+        ] {
+            let mut total = 0u64;
+            for row in &rows {
+                if let Some(check) = row.get("large_prime_filter_arithmetic") {
+                    total = total
+                        .checked_add(uint(&check[field], field)?)
+                        .context("filter check count overflow")?;
+                }
+            }
+            counts.insert(field, total);
+        }
+        summary["generic_filter_finite_checks"] = json!(counts);
+    }
+    Ok((summary, rows))
 }
 
 fn decimal_u64(value: &Value) -> Result<u64> {
@@ -961,13 +1125,23 @@ pub fn export_rows(rows: &[Value], path: &Path) -> Result<()> {
                 .cloned()
                 .unwrap_or_else(|| json!([]));
             let versioned = row["config"].get("factor_base_policy").is_some();
+            let root_checks = row.get("root_certificate_arithmetic").cloned().unwrap_or_else(||
+                json!({"status":"not_checked","completed_root_sets_checked":0,"all_supplied_root_sets_verified":false}));
             let features = static_features(row)?;
             let mut record = json!({"schema":if versioned {"ml-dataset.static-routing-view/v2"} else {"ml-dataset.static-routing-view/v1"},"record_id":row["id"],
                 "split":split_for(&component)?,"independent_unit":component,"features":features,
                 "labels":{"producer_reported":row["outcome"],"independently_verified":false,
                     "phase_measurements":row["phase_measurements"],"positive_certificate_arithmetic":checks,
+                    "root_certificate_arithmetic":root_checks,
+                    "root_sets_independently_verified":root_checks["all_supplied_root_sets_verified"]==true,
                     "whole_worker_instruction_count":null},
                 "feature_policy":"allowlisted public static inputs only; no trace/manifest/witness features"});
+            if let Some(checks) = row.get("large_prime_filter_arithmetic") {
+                record["labels"]["large_prime_filter_arithmetic"] = checks.clone();
+            }
+            if let Some(summary) = row.get("checked_phase_contract") {
+                record["labels"]["checked_phase_contract"] = summary.clone();
+            }
             if versioned {
                 record["feature_policy"] = json!("consumer-static-policy-recipes-v2; distinct from producer strict-structural-allowlist-v4-policy-recipes");
                 record["feature_status"] = json!(if row["factor_base"]["construction_status"]
@@ -983,7 +1157,6 @@ pub fn export_rows(rows: &[Value], path: &Path) -> Result<()> {
                     "producer_reported_status":row["factor_base"]["construction_status"],
                     "producer_reported_counters":row["factor_base"]["construction_counters"],
                     "independently_verified":false});
-                record["labels"]["root_sets_independently_verified"] = json!(false);
                 record["producer_training_export_equivalence_verified"] = json!(false);
             }
             serde_json::to_writer(&mut file, &record)?;

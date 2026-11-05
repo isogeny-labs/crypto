@@ -67,6 +67,7 @@ fn one(
         SmallBase::Rule => (base.len() as f64).powf(2.0 / 3.0).ceil() as usize,
     };
     let opts = GaudryOptions {
+        cofactor: 1,
         max_residuals,
         solver,
         cross_check,

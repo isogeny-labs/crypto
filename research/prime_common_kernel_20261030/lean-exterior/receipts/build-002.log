@@ -1,0 +1,16 @@
+✖ [1312/1313] Building ExteriorWitness (2.1s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/exterior-witness-lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/exterior-witness-lean/ExteriorWitness.lean -o /workspace/audit/exterior-witness-lean/.lake/build/lib/lean/ExteriorWitness.olean -i /workspace/audit/exterior-witness-lean/.lake/build/lib/lean/ExteriorWitness.ilean -c /workspace/audit/exterior-witness-lean/.lake/build/ir/ExteriorWitness.c --setup /workspace/audit/exterior-witness-lean/.lake/build/ir/ExteriorWitness.setup.json --json
+error: ExteriorWitness.lean:32:2: Type mismatch: After simplification, term
+  h
+ has type
+  eval 0 (derivative (chart 2)) = 40 / 3
+but is expected to have type
+  (chart 2).coeff 1 = 40 / 3
+info: ExteriorWitness.lean:45:0: 'ExteriorWitness.source_normalizer' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:46:0: 'ExteriorWitness.local_node_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:47:0: 'ExteriorWitness.crossing_linear_coefficient' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:48:0: 'ExteriorWitness.passive_product_coefficient' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:49:0: 'ExteriorWitness.passive_product_nonzero' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- ExteriorWitness
+error: build failed

@@ -127,6 +127,22 @@ e = 4: primes [103] obs-exp = -18.3, sd = 18.6, z = -0.98
 e = 5: primes [113] obs-exp = -38.8, sd = 19.5, z = -1.99
 e >= 4: primes [103,113] obs-exp = -57.1, sd = 27.0, z = -2.12
 ## Decision: pooled one-sided z = -0.51 <= 2.0 -> V2 stands; hypothesis H (excess) not confirmed. (e = 5 and e >= 4 lines above are unregistered, exploratory.)
+## Post-test prediction (predictions_v2.txt, registered 2026-10-23, outside the closed follow-up test)
+p=127 rows=508063 zeros obs=584 exp=568.5 [528.0,609.0] PASS dispersion=0.999 (n=500962) auc=0.9970 weak_total obs=260160770 pred=260160771
+   P(zero) in [1.00e-6,3.48e-6]: exp=0.0 obs=0
+   P(zero) in [3.48e-6,1.49e-5]: exp=0.1 obs=0
+   P(zero) in [1.49e-5,9.31e-5]: exp=0.5 obs=0
+   P(zero) in [9.31e-5,1.27e-3]: exp=5.4 obs=7
+   P(zero) in [1.27e-3,9.53e-1]: exp=562.4 obs=577
+   P(zero) <= 1e-6: obs=0
+## Pooled check including p=127 (iso1_residual_model pool figures/zero_rows.csv), all scored primes, overall and by e = v2(p^2-1)
+all: primes [53,59,61,67,83,101,107,109,71,73,89,103,79,113,97,127] obs-exp = +89.3, sd = 68.6, z = 1.30
+e = 3: primes [53,59,61,67,83,101,107,109] obs-exp = +89.3, sd = 46.6, z = 1.91
+e = 4: primes [71,73,89,103] obs-exp = -29.1, sd = 33.7, z = -0.86
+e = 5: primes [79,113] obs-exp = -19.3, sd = 25.4, z = -0.76
+e = 6: primes [97] obs-exp = +32.9, sd = 18.1, z = 1.82
+e = 8: primes [127] obs-exp = +15.5, sd = 20.7, z = 0.75
+e >= 4: primes [71,73,89,103,79,113,97,127] obs-exp = -0.0, sd = 50.3, z = -0.00
 ## Non-pristine (seen during V1 diagnosis)
 p=37 rows=12321 zeros obs=145 exp=168.8 [146.5,191.1] FAIL dispersion=0.981 (n=9870) auc=0.9590 weak_total obs=1875530 pred=1875531
    P(zero) in [1.02e-6,4.79e-5]: exp=0.0 obs=0

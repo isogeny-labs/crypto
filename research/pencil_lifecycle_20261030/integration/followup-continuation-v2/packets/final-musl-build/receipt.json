@@ -1,0 +1,193 @@
+{
+  "schema": "software.bounded-musl-build/v1",
+  "source_commit_requested": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+  "seconds_cap": 3600,
+  "start": 1793416563.2030687,
+  "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+  "image_qualified": false,
+  "scientific_execution": false,
+  "conflicting_owners": [],
+  "checks": [
+    {
+      "name": "source-top-level",
+      "command": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "source-detached",
+      "command": [
+        "git",
+        "rev-parse",
+        "--abbrev-ref",
+        "HEAD"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "head-before",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "tree",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "tracked-clean-before",
+      "command": [
+        "git",
+        "diff-index",
+        "--quiet",
+        "HEAD",
+        "--"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "untracked-before",
+      "command": [
+        "git",
+        "ls-files",
+        "--others"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "rustc-version",
+      "command": [
+        "rustc",
+        "+1.99.1",
+        "-Vv"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "head-after",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "tracked-clean-after",
+      "command": [
+        "git",
+        "diff-index",
+        "--quiet",
+        "HEAD",
+        "--"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "untracked-after",
+      "command": [
+        "git",
+        "ls-files",
+        "--others"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "elf-header",
+      "command": [
+        "readelf",
+        "-h",
+        "/var/tmp/pencil-musl-build-final-3c592af-20261031-v1/ecbench"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "elf-programs",
+      "command": [
+        "readelf",
+        "-l",
+        "/var/tmp/pencil-musl-build-final-3c592af-20261031-v1/ecbench"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "elf-dynamic",
+      "command": [
+        "readelf",
+        "-d",
+        "/var/tmp/pencil-musl-build-final-3c592af-20261031-v1/ecbench"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_root": "/home/ec2-user/pencil-musl-source-b985-20261031",
+  "source_tree": "703733197d635aea5999c17ec7b99d10ab216c41",
+  "source_manifest": {
+    "commit": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+    "tree": "703733197d635aea5999c17ec7b99d10ab216c41",
+    "Cargo.toml": "26d916b370a5669ff278cb65e0fb9aad03f3bf7ab2b0b3358a2d5c5b0c2db50c",
+    "Cargo.lock": "b8698075f4e273fb9b3b290d928fbc9fa94092f8ec277e91023ed6974d242093"
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "compiler_inputs": {
+    "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc": "4f597c5343a03531e174d3a96e7af1ac329d3959966d90f68eb72fd495e8509c",
+    "/var/tmp/pencil-musl-private-20261031/prefix/lib/musl-gcc.specs": "1ed245252e41a58a2c0024abe78ee87d427a79c08917dc9ee833060977776707",
+    "/var/tmp/pencil-musl-private-20261031/prefix/lib/libc.a": "41856f80eb65638c52dc25e0f95445da6d306c5313061dd94ae9441be92d45b3",
+    "/var/tmp/pencil-musl-private-20261031/manifest.json": "ffcd561dd262ea234a22278cd314f255946f830179ea2ea63b58dee90c4a58dd",
+    "/usr/bin/gcc": "8bffae62fd101725fa713a76b6a5d24efe1dea5d6ab24b902aa2e58e7976eaec"
+  },
+  "command": [
+    "timeout",
+    "-k",
+    "5s",
+    "3600s",
+    "cargo",
+    "+1.99.1",
+    "rustc",
+    "--locked",
+    "--offline",
+    "--release",
+    "--no-default-features",
+    "--target",
+    "x86_64-unknown-linux-musl",
+    "--bin",
+    "ecbench",
+    "-vv",
+    "--",
+    "--print",
+    "link-args",
+    "-Clink-arg=-Wl,-Map=/var/tmp/pencil-musl-build-final-3c592af-20261031-v1/ecbench.map"
+  ],
+  "build_environment": {
+    "PATH": "/var/lib/spot-codex/home/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/codex-path:/home/ec2-user/.bun/bin:/home/ec2-user/.elan/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/home/ec2-user/bin:/var/lib/spot-codex/home/tmp/arg0-linux/codex-arg0Pm8T2B:/var/lib/spot-codex/home/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/codex-path:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin",
+    "HOME": "/home/ec2-user",
+    "LC_ALL": "C",
+    "CARGO_TARGET_DIR": "/home/ec2-user/pencil-musl-target-b985-20261031",
+    "CARGO_BUILD_JOBS": "2",
+    "RUSTFLAGS": "-C target-cpu=x86-64",
+    "REALGCC": "/usr/bin/gcc",
+    "CC_x86_64_unknown_linux_musl": "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+    "CRYPTO_BUILD_GIT_COMMIT": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+    "CRYPTO_BUILD_GIT_DIRTY": "0"
+  },
+  "build_started": 1793416570.6142259,
+  "supervised_process_group": 2466090,
+  "build_exit_code": 0,
+  "build_ended": 1793417032.5076349,
+  "static_elf_checked": true,
+  "link_map_sha256": "a8f40073cd4071ee08ae48d3fa984562e5678023be955883da5a036bca673e8b",
+  "crt_libc_binding_status": "candidate paths extracted; independent map/invocation review required",
+  "status": "built_static_candidate",
+  "end": 1793417105.2230365
+}

@@ -1,0 +1,53 @@
+727: fn double22_weighted_variant(
+728:     a: [u64; 6],
+729:     curve: &[u64],
+730:     f: &Field,
+731:     n6_uses_squared_w: bool,
+732: ) -> (ResultPoint, &'static str) {
+733:     let [q, r, s, t, z, w] = a;
+734:     let n1 = f.sub(f.mul(q, s), t);
+735:     let n2 = f.mul(r, s);
+736:     let b = f.mul(2, f.sub(f.mul(n1, t), f.mul(n2, s)));
+737:     if b == 0 {
+738:         if s == 0 {
+739:             return (ResultPoint::Identity, "b_zero_identity");
+740:         }
+741:         let x = f.neg(f.mul(n1, s));
+742:         let y = f.mul(f.add(f.mul(s, t), x), f.sq(f.sq(s)));
+743:         return (
+744:             dbl(
+745:                 D1 {
+746:                     x,
+747:                     y,
+748:                     z: f.mul(s, z),
+749:                     w,
+750:                 },
+751:                 curve,
+752:                 f,
+753:             ),
+754:             "b_zero_point_double",
+911:     let z2_5 = f.mul(z2_4, z2);
+912:     let q1c = f.mul(q1, z2_2);
+913:     let q2c = f.mul(q2, z1_2);
+914:     let r1c = f.mul(r1, z2_4);
+915:     let r2c = f.mul(r2, z1_4);
+916:     let s1c = f.mul(f.mul(s1, z2_3), w2);
+917:     let s2c = f.mul(f.mul(s2, z1_3), w1);
+918:     let t1c = f.mul(f.mul(t1, z2_5), w2);
+919:     let t2c = f.mul(f.mul(t2, z1_5), w1);
+920:     if q1c == q2c && r1c == r2c {
+921:         if s1c == f.neg(s2c) && t1c == f.neg(t2c) {
+922:             return (Some(ResultPoint::Identity), "same_u_inverse");
+923:         }
+924:         if s1c == s2c && t1c == t2c {
+925:             let (result, branch) = double22_weighted(a, curve, f);
+926:             return (Some(result), branch);
+927:         }
+928:         let k = f.sub(s1c, s2c);
+929:         if k == 0 {
+930:             return (None, "same_u_mixed_zero_slope_delta");
+931:         }
+932:         let x = f.mul(f.sub(t2c, t1c), k);
+933:         let k2 = f.sq(k);
+934:         let k3 = f.mul(k2, k);
+935:         let y = f.mul(

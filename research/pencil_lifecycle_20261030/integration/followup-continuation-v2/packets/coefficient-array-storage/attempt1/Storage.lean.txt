@@ -1,0 +1,61 @@
+import Inversion
+set_option autoImplicit false
+namespace CoefficientStorage
+open WordCoefficient WideModPow
+
+def Canonical (p : UInt64) (xs : Array UInt64) : Prop :=
+ ∀ i (h : i<xs.size), xs[i].toNat<p.toNat
+
+def put (xs : Array UInt64) (j : Nat) (v : UInt64) (h : j<xs.size) : Array UInt64 := xs.set j v h
+
+theorem put_size (xs : Array UInt64) (j : Nat) (v : UInt64) (h : j<xs.size) :
+ (put xs j v h).size=xs.size := by simp [put]
+
+theorem put_slot (xs : Array UInt64) (j : Nat) (v : UInt64) (h : j<xs.size) :
+ (put xs j v h)[j]'(by simpa [put] using h)=v := by simp [put]
+
+theorem put_other (xs : Array UInt64) (i j : Nat) (v : UInt64)
+ (hi : i<xs.size) (hj : j<xs.size) (hne : i≠j) :
+ (put xs j v hj)[i]'(by simpa [put] using hi)=xs[i] := by simp [put,hne,Ne.symm hne]
+
+theorem put_canonical (p : UInt64) (xs : Array UInt64) (j : Nat) (v : UInt64)
+ (hj : j<xs.size) (hc : Canonical p xs) (hv : v.toNat<p.toNat) :
+ Canonical p (put xs j v hj) := by
+ intro i hi
+ have hi' : i<xs.size := by simpa [put] using hi
+ by_cases he : i=j
+ · subst i; simpa [put] using hv
+ · simpa [put,he,Ne.symm he] using hc i hi'
+
+theorem loop_index (n k j : Nat) (hk : k<n) (hj : j≤k) : j<n := by omega
+
+def update (p : UInt64) (xs : Array UInt64) (c a b s : UInt64)
+ (k j : Fin 6) (hj : j.val<xs.size) : Array UInt64 :=
+ put xs j.val (updateWord p xs[j.val] c a b (inverseGenerator p s) k j) hj
+
+theorem update_canonical (p : UInt64) [Fact p.toNat.Prime]
+ (xs : Array UInt64) (c a b s : UInt64) (k j : Fin 6)
+ (hidx : j.val<xs.size) (hj : j.val≤k.val) (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hxs : Canonical p xs) (hc : c.toNat<p.toNat) (ha : a.toNat<p.toNat)
+ (hbeta : b.toNat<p.toNat) (hs : s.toNat<p.toNat) (hn : s≠0) :
+ Canonical p (update p xs c a b s k j hidx) := by
+ apply put_canonical p xs j.val _ hidx hxs
+ exact (generated_update_decode p xs[j.val] c a b s k j hj hp hb
+  (hxs j.val hidx) hc ha hbeta hs hn).1
+
+theorem update_decode (p : UInt64) [Fact p.toNat.Prime]
+ (xs : Array UInt64) (c a b s : UInt64) (k j : Fin 6)
+ (hidx : j.val<xs.size) (hj : j.val≤k.val) (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hxs : Canonical p xs) (hc : c.toNat<p.toNat) (ha : a.toNat<p.toNat)
+ (hbeta : b.toNat<p.toNat) (hs : s.toNat<p.toNat) (hn : s≠0)
+ (i : Nat) (hi : i<xs.size) :
+ (((update p xs c a b s k j hidx)[i]'(by simpa [update,put] using hi)).toNat : ZMod p.toNat)=
+ (xs[i].toNat : ZMod p.toNat)+if i=j.val then
+ (c.toNat : ZMod p.toNat)*((k.val.choose j.val : ZMod p.toNat)*
+ ((a.toNat : ZMod p.toNat)^j.val*(b.toNat : ZMod p.toNat)^(k.val-j.val)))*(s.toNat : ZMod p.toNat)⁻¹ else 0 := by
+ by_cases he : i=j.val
+ · subst i
+   simpa [update,put] using (generated_update_decode p xs[j.val] c a b s k j hj hp hb
+    (hxs j.val hidx) hc ha hbeta hs hn).2
+ · simp [update,put,he,Ne.symm he]
+end CoefficientStorage

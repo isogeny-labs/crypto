@@ -1,0 +1,81 @@
+    Blocking waiting for file lock on package cache
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded cpufeatures v0.2.17
+  Downloaded block-buffer v0.10.4
+  Downloaded crypto-common v0.1.7
+  Downloaded digest v0.10.7
+  Downloaded generic-array v0.14.7
+  Downloaded quote v1.0.47
+  Downloaded proc-macro2 v1.0.107
+  Downloaded serde_derive v1.0.229
+  Downloaded base64 v0.22.1
+  Downloaded sha2 v0.10.9
+  Downloaded typenum v1.20.1
+  Downloaded syn v3.0.9
+  Downloaded version_check v0.9.5
+  Downloaded anyhow v1.0.104
+  Downloaded unicode-ident v1.0.27
+   Compiling proc-macro2 v1.0.107
+   Compiling version_check v0.9.5
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling generic-array v0.14.7
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.9
+   Compiling zmij v1.0.23
+   Compiling serde v1.0.229
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling anyhow v1.0.104
+   Compiling serde_json v1.0.154
+   Compiling digest v0.10.7
+   Compiling memchr v2.8.3
+   Compiling num-integer v0.1.47
+   Compiling itoa v1.0.18
+   Compiling cpufeatures v0.2.17
+   Compiling cfg-if v1.0.5
+   Compiling sha2 v0.10.9
+   Compiling serde_derive v1.0.229
+   Compiling base64 v0.22.1
+   Compiling num-bigint v0.4.8
+   Compiling factor-base v0.1.0 (/workspace/crypto/tools/factor-base)
+error[E0599]: no method named `pow` found for reference `&arithmetic::Field` in the current scope
+   --> src/recipe.rs:337:23
+    |
+337 | ...   ensure!(f.pow(&generator, &n(*order as u64)) == N::one() && order_primes(*order).iter().all(|q| f.pow(&generator, &n((order /...
+    |                 ^^^ method not found in `&arithmetic::Field`
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `pow`, perhaps you need to implement one of them:
+            candidate #1: `PrimInt`
+            candidate #2: `num_traits::Pow`
+
+error[E0599]: no method named `pow` found for reference `&arithmetic::Field` in the current scope
+   --> src/recipe.rs:337:111
+    |
+337 | ... && order_primes(*order).iter().all(|q| f.pow(&generator, &n((order / q) as u64)) != N::one()), "generator does not have the dec...
+    |                                              ^^^ method not found in `&arithmetic::Field`
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `pow`, perhaps you need to implement one of them:
+            candidate #1: `PrimInt`
+            candidate #2: `num_traits::Pow`
+
+error[E0599]: no method named `pow` found for reference `&arithmetic::Field` in the current scope
+   --> src/recipe.rs:353:23
+    |
+353 |             ensure!(f.pow(&nu, &((f.size() - N::one()) >> 1)) == f.size() - N::one(), "quadratic parameter must be a nonsquare");
+    |                       ^^^ method not found in `&arithmetic::Field`
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `pow`, perhaps you need to implement one of them:
+            candidate #1: `PrimInt`
+            candidate #2: `num_traits::Pow`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `factor-base` (lib) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

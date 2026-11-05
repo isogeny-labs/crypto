@@ -1,0 +1,23 @@
+{
+  "changed_sections": [
+    "source_artifacts"
+  ],
+  "unchanged_semantic_sections": 17,
+  "legacy_inventory": {
+    "path": "docs/curves/jacobian-transfers.json",
+    "sha256": "eaf635a2a52cc7f595635bd9f967697de074cae38364bf7c032b254ff615aada",
+    "role": "legacy formula-screen inventory; not a transfer certificate",
+    "freshness": {
+      "status": "refuted",
+      "scope": "claim that this inventory is current for the 15,791-row registry",
+      "rationale": "At source_commit it pins an older registry and omits assessment slugs. This historical finding does not describe the refreshed live inventory; modeled routes remain distinct from exact HC1/CV1 subgroup certificates.",
+      "evidence_refs": [
+        "docs/curves/jacobian-transfers.json",
+        "docs/curves/JACOBIAN_TRANSFERS.md"
+      ],
+      "obligation_id": "refresh_formula_inventory"
+    },
+    "source_commit": "0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5"
+  },
+  "schema_positive_and_negative_controls": "PASS"
+}

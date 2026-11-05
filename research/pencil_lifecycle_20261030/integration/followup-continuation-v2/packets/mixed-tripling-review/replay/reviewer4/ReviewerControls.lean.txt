@@ -1,0 +1,36 @@
+import Tripling
+import Mathlib.Algebra.Field.ZMod
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+instance : Fact (Nat.Prime 3) := ⟨by decide⟩
+instance : Fact (Nat.Prime 5) := ⟨by decide⟩
+open Polynomial MixedCancellation MixedTripling
+example : let a : WeightedAdd11.Input (ZMod 3) := ⟨0,1,1,1⟩
+ let b : D2 (ZMod 3) := ⟨0,0,0,1,1,1⟩
+ classify a b=.positiveCoincidence ∧ (2:ZMod 3)≠0 ∧ a.y≠0 ∧
+ (rawOutput 0 0 0 a).z≠0 ∧ (rawOutput 0 0 0 a).w≠0 ∧
+ validTwo (MixedGeneric.curve 1 0 0 0) (rawOutput 0 0 0 a) := by
+ apply source_repeated_preserves 1 0 0 0
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4,?_⟩; simp [MixedGeneric.curve]; ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3,?_⟩; simp [MixedGeneric.curve]; ring
+ · norm_num [rawK]
+ · norm_num [rawW3,rawY3]
+ · norm_num [other]
+example : let a : WeightedAdd11.Input (ZMod 5) := ⟨0,1,1,1⟩
+ (rawOutput 0 0 0 a).z≠0 ∧ (rawOutput 0 0 0 a).w≠0 ∧
+ validTwo (MixedGeneric.curve 1 0 0 0) (rawOutput 0 0 0 a) := by
+ apply weighted_tripling_preserves 1 0 0 0
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4,?_⟩;simp [MixedGeneric.curve];ring
+example : classify (⟨0,1,1,1⟩:WeightedAdd11.Input (ZMod 2)) (⟨0,0,0,1,1,1⟩:D2 (ZMod 2))=.cancellation := by
+ norm_num [classify,rawK,rawW3,rawY3]
+#print MixedTripling.source_repeated_preserves

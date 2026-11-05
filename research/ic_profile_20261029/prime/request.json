@@ -1,0 +1,71 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "crypto-ic-profile-prime-20261029",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 1800,
+    "memory": "4Gi",
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "IC profile: 20-bit prime field, phase attribution",
+      "description": "Profile-only session: the frozen 20-bit prime-field IC baseline (prime-abscissa:size=45, mitm:negation_folded=1) against matched rho and an A/A control, so every phase (setup, relations, linear algebra, verification) is priced in one unit on one host. Public synthetic curve; no security claim, no new baseline.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 20,
+            "seed": 59297
+          }
+        ],
+        "targets_per_curve": 8,
+        "target_seed": 20261029,
+        "target_kind": "public"
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "ic-n45",
+          "role": "candidate",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=45",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236"
+            }
+          }
+        },
+        {
+          "name": "ic-n45-aa",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=45",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236"
+            }
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 5,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 20261029,
+        "isolation_required": "L2",
+        "timeout_seconds": 1800
+      }
+    }
+  },
+  "provenance": {
+    "harness": "opencode",
+    "source_revision": "bd4c2fe5e6fc5c12cbab17e3cebb8e4c2ba83991"
+  }
+}
