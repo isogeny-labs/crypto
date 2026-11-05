@@ -157,4 +157,3 @@ is separate from producer timing and is not free. Allocation/copy/branch/
 serialization/counter overhead, complete F4/root/logical coverage, process/
 resume accounting and calibration remain open. Complete pricing/admission
 are unchanged, with no scientific panel. [pcc:unverified]
-
