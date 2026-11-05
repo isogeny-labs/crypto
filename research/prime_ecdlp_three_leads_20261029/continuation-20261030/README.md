@@ -1,5 +1,21 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Published continuation and new integration dependency — 2026-11-05
+
+Normal publication20e84c4fb reached PR3452; title/body now describe certificates,
+counters and local attempt bookkeeping. New main d9c228db8 changes src;
+PRisOPEN/CONFLICTING, auto paused. Currenthead snapshot has reviewSUCCESS,
+migrateIN_PROGRESS, gate/size/artifactsABSENT. No CI pass claimed. [pcc:unverified]
+
+[Publication/ledger snapshot](validation/main-d30b9e0db-20261105/publication-20261105T1149Z/receipt.json):
+local and main append-only PCC ledgers fork after95entries, so currentmainprefix
+checkfails. [Named frozen-history blocker](../../../problems/pkm-pcc-ledger-divergence.md)
+requires a sanctioned canonical reconciliation path, never side selection or
+rewriting. A fresh Copilot-first request is prepared. Earlier receipts/report
+remain dated source-qualified observations; no newbase qualification follows.
+[pcc:unverified]
+
+
 [Latest two-page report](continuation-20261105T1142Z.pdf),
 [editable driver diagram](attempt-driver-flow-20261105.svg) and
 [recorded library status chart](library-status-20261105T1142Z.svg).
