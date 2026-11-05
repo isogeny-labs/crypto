@@ -221,3 +221,21 @@ Hits (0 at every k = 28 cell; 2 at each k = 24 cell with t = 8 or 10; 0 at t = 6
 ## Files
 
 `PROTOCOL.md`, `README.md`, `REPORT.pdf`, `analysis/` (`README.tmpl.md`, `build_readme.sh`, `run_cells.sh`, `cells.list`, `cells/`, `stderr/`, `status.txt`, `binary.sha256`, `make_tsv.sh`, `make_tables.sh`, `make_svg.sh`, `cells.tsv`, the `*_rows.md` and `scale_*.md` tables, `scale.svg`).
+
+## Coordinator review (main session, 2026-11-05)
+
+- **The fitted exponent of about 1.0 in r comes from the design, not the method.**
+  Every series holds t, and so the base size N, fixed while k grows. With m = 2
+  the number of decomposable targets is about N², so `coverage_exact` ≈ N²/r
+  falls as 1/r. F4 work per target is flat in k (P1). Per-relation cost at
+  fixed t must therefore grow about as r¹, which is what was measured
+  (0.91, 1.02, 1.00). This is not the asymptotic exponent of the algebraic
+  oracle. That needs t to grow with k (for example N ≈ r^(1/3) balanced
+  against linear algebra), so that the F4 cost per target rises with t (lead B:
+  steps of 2.2–6.9× per added tower level). That run is not done here.
+- **What does transfer across k.** The F4 cost of a fixed system shape is
+  independent of the curve (P1, ratio 1.000–1.019), so the k = 20 measurements
+  of leads 4, B and C predict the F4 term at any k for the same (t, G). The
+  trace saving holds at 0.40–0.49× across k.
+- **No relation to rho.** No claim relative to rho is made here; that is lead A's
+  unit (see the S2 scale-up).
