@@ -193,10 +193,18 @@ cat >"$fa/tools/lead_atlas.py" <<'PY'
 import json, sys
 q = sys.argv[sys.argv.index("--match") + 1]
 print(json.dumps([[15.0, "LEAD-ICP-prime-ic-constant-engineering", "open_next_step", "Constant-factor engineering"],
-                  [12.0, "KR-IC-401ebf", "known_result", "Naive Semaev index calculus | prime fields"]] if "sieve" in q else []))
+                  [12.0, "KR-IC-401ebf", "known_result", "Naive Semaev index calculus | prime fields"]] if "sieve" in q else [], indent=1))
+# The real tool also prints its text table after the JSON (see first-json).
+print("   15  LEAD-ICP-prime-ic-constant-engineering   open_next_step  Constant-factor engineering")
 PY
 out=$(DELPHI_TOOLS_ATLAS=$fa "$here/atlas-match" "a cheaper sieve filter" 2>/dev/null)
 t "atlas-match: prints the matches" bash -c 'printf "%s" "$1" | jq -e ".[0][1] == \"LEAD-ICP-prime-ic-constant-engineering\""' _ "$out"
+mkdir -p "$fa/knowledge/leads/ecdlp/ic-prime" "$fa/knowledge/frontiers/ecdlp/index-calculus"
+printf 'id: LEAD-ICP-full-width-arity-grid\ndisposition: open_blocked\n' >"$fa/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-full-width-arity-grid.yaml"
+out=$(DELPHI_TOOLS_ATLAS=$fa "$here/atlas-match" "LEAD-ICP-full-width-arity-grid" 2>/dev/null)
+t "atlas-match: a lead id prints its record" bash -c 'printf "%s" "$1" | grep -qF "disposition: open_blocked"' _ "$out"
+out=$(DELPHI_TOOLS_ATLAS=$fa "$here/atlas-match" "LEAD-ICP-not-filed" 2>/dev/null)
+t "atlas-match: a missing id says so, not an empty search" bash -c 'printf "%s" "$1" | grep -qF "no record with id LEAD-ICP-not-filed"' _ "$out"
 rc=0; DELPHI_TOOLS_ATLAS='' "$here/atlas-match" "x y z" >/dev/null 2>&1 || rc=$?
 t "atlas-match: no atlas is exit 3" test "$rc" -eq 3
 wa=$tmp/wa

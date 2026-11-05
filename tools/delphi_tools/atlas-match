@@ -1,14 +1,34 @@
 #!/usr/bin/env bash
-# Delphi tool: which ECDLP leads and known results an idea collides with.
-# Argument: the idea, as one line. Runs lead_atlas.py --match in the
-# crypto-autoresearcher checkout named by DELPHI_TOOLS_ATLAS and prints its
-# JSON. Read-only; not a verifier (a match is a pointer, not a verdict).
+# Delphi tool: the ECDLP lead atlas, read-only.
+# Argument: an idea in words, or a lead or known-result id (LEAD-..., KR-...).
+# For an idea, prints lead_atlas.py --match JSON: the leads and known results
+# it collides with. For an id, prints that record, or says plainly that no
+# record has that id. (--match is a text search, so an id given to it finds
+# nothing; the first live program run read that empty answer as "the lead
+# does not exist" and refuted a claim about a lead that does.)
+# Needs DELPHI_TOOLS_ATLAS naming a crypto-autoresearcher checkout. Not a
+# verifier: a match is a pointer, not a verdict.
 set -euo pipefail
-[ $# -eq 1 ] || { echo "usage: atlas-match <idea>" >&2; exit 2; }
+[ $# -eq 1 ] || { echo "usage: atlas-match <idea | LEAD-id | KR-id>" >&2; exit 2; }
 atlas=${DELPHI_TOOLS_ATLAS:-}
 if [ -z "$atlas" ] || [ ! -f "$atlas/tools/lead_atlas.py" ]; then
   echo "atlas-match: DELPHI_TOOLS_ATLAS must name a crypto-autoresearcher checkout" >&2
   exit 3
 fi
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$atlas"
-exec python3 tools/lead_atlas.py --match "$1" --json --limit 8
+if [[ $1 =~ ^(LEAD|KR)-[A-Za-z0-9-]+$ ]]; then
+  case $1 in
+    LEAD-*) roots=(knowledge/leads/ecdlp) ;;
+    *) roots=(knowledge/frontiers/ecdlp) ;;
+  esac
+  file=$(find "${roots[@]}" -name "$1.yaml" -print -quit 2>/dev/null || true)
+  if [ -n "$file" ]; then
+    printf 'record %s (%s):\n' "$1" "$file"
+    cat "$file"
+  else
+    printf 'no record with id %s in %s of this atlas checkout; this says nothing about the idea, only that the id is not filed here\n' "$1" "${roots[*]}"
+  fi
+  exit 0
+fi
+python3 tools/lead_atlas.py --match "$1" --json --limit 8 | "$here/first-json"
