@@ -1,5 +1,37 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Observed root-child exit prerequisite — 2026-11-05T13:19:48.164235+00:00
+
+[New std-only child wrapper](prerequisites/child_observation.rs) permits local
+outcome publication and sidecar callbacks only after actual std::process::Child
+exit observation. Pending or stoprequested state remains nonterminal.18native
+controls (7new child+11existing record/driver), strict standalone clippy and
+formatting log0 on sourcef543e03aa; exact4inputguard/captures/fourbinaryhashes
+are in [the receipt](validation/child-observation-20261105/receipt.json).
+These are unsigned producer observations. [pcc:unverified]
+
+[Two-page report](child-observation-20261105.pdf) and
+[editable state diagram](child-observation-flow-20261105.svg) were inspected.
+[Delivery review](validation/child-observation-20261105/delivery-review.json)
+rechecks24source objects,10binaries and the preserved raw6168-case log; formal/
+gate/Mathlib remain exact, with no redundant proof run. [pcc:unverified]
+
+The wrapper launches nothing and observes only a root child. Persisting actual
+reap/code/signal/stop events, launch identity binding, genuine gates, process-tree
+cleanup/deadlines and qualified interruption/resume remain the next integration.
+The existing attempt record stores outcome labels, not durable reap evidence.
+No price, scientific clock or scientific panel is admitted.
+
+PR3452 still has no Copilot response/head activity at collection. After over1h,
+[comment6658724527](https://github.com/isogeny-labs/crypto/pull/3452#issuecomment-6658724527)
+defers its edit request to report-only: frozen ledger fork prevents an ordinary
+merge. Main snapshot3a7882f5d adds no sanctioned PCC contract since d9c.
+Required3checks are absent on the last6968snapshot; auto paused. Newstandalone
+passes do not waive lint/PCC/runtime/fullsuite/currentmainprefix failures.
+New working session entries are retained separately pending concurrent log
+resolution; prior prepared request entry remains not appended. [pcc:unverified]
+
+
 ## Published continuation and new integration dependency — 2026-11-05
 
 Normal publication20e84c4fb reached PR3452; title/body now describe certificates,

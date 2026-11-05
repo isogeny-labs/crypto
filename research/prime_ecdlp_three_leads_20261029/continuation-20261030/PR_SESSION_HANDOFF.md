@@ -494,3 +494,26 @@ lint/PCC/runtime/fullsuitefailuresremain. ContinueunblockedG2/G6withoutlaunch.
 PCCtoolprintsBROKEN/historyrewrittenagainstnewbase; observedcauseistwoappend-only
 forksafter95,notanalterationofearlier95entries. Priorlocalchain/prefixchecks
 wereagainst d30andremainownscope. No frozen side chosen.
+
+## 2026-11-05T13:19:48.164235+00:00 — New local observed-child component, frozen integration held
+
+Sourcef543e03aa adds child_observation.rs and native child_fixture.rs. Exact4
+input guarded recipe terminal0:18controls(7new+11existing),strictclippy/fmt0.
+Receipt/captures in validation/child-observation-20261105/. Deliveryreview
+rechecks24objects/10binaries,unchangedformal/gate/Mathlib and preserved raw6168
+log; both newPDFpages inspected. PCC-b47218 and deliveryobservation unsigned.
+No Cargo/Lean source change or new proof/fullsuite run. [pcc:unverified]
+
+Request6657280205 had noresponse/headactivity after>1h; branchinprogressActions
+empty. Deferralcomment6658724527 makes edits report-only because frozenledger
+fork blocks ordinarymerge. No side selection/rechain/claimrewrite/verifierpatch.
+Main3a7882f5d has no relevantPCCpolicy/tool/ledgerchange since d9c; no newmain
+qualification. Autopaused; last6968 required3checks absent. [pcc:unverified]
+
+Library wrapper launchesnothing: actual rootexit gates local publish/read,
+stoprequest alone isnotreap. Completed isnot scalarverification; capflagnotcausal
+exitproof. Durableobservations/launchbinding/genuinegate/process-tree/deadlines/
+interruption-resume/fullcost remainopen. Reportpreserves all originalG1-G6
+acceptance. No scientificpanel/access/resourcechanges. Currentworking entries
+are in SESSION_20261105T1300Z.md, deferred to daily after concurrent resolution;
+old PR3452_REFRESH_REQUEST_SESSION exact665728header also still notappended.

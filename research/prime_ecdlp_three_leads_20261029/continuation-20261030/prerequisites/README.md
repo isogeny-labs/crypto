@@ -71,3 +71,43 @@ Normal callback errors use Result; only the unit test catches a mock unwind.
 Next integrate an actual gated native child under a qualified supervisor,
 preserve observed reaping/deadlines and all failed/unfinished work, then qualify
 interruption/resume without claiming one continuous clock.
+
+## Root-child observation before publication
+
+`child_observation.rs` now wraps an already-spawned `std::process::Child` and
+uses the existing local attempt-record types. `poll` must collect an actual
+exit before sidecar callbacks or outcome publication become available. None or
+errors do not authorize them; accepted deadline stop alone is still nonterminal.
+A nonzero observed exit maps to Failed. Deadline stop requested plus observed
+exit maps to Capped, conservatively: successful kill can race a natural exit,
+so this does not prove its causal reason. Cached observed success is not relabeled
+by a later stop request. Exit0 is a process status, not scalar/count validation.
+
+[Source-f543 receipt](../validation/child-observation-20261105/receipt.json)
+records18native passes (7new root-child controls+11existing record/driver tests),
+strict standalone clippy for wrapper/fixture and format check exit0. The exact
+committed recipe checks all4source inputs and tracked cleanliness before every
+phase. Dummyfixture modes are success, exit7 and blocked stdin; no crypto,
+scientific panel or experiment launcher is involved. [pcc:unverified]
+
+The library starts no process. Caller still creates the attempt before genuine
+gates/launch and binds the record to that child; this association is not attested
+here. Root reaping does not establish descendant cleanup, runtime isolation or
+an exit-time bound. Pipe draining is not implemented. Drop does not kill/reap;
+owner retains the handle on errors and must arrange cleanup. Explicit handle
+transfer is for cleanup, not a resume checkpoint; it discards monitor metadata.
+The pre-stop wait rejection control tests a local precondition, not an injected
+OS wait failure. The record primitive persists outcome labels, not durable
+reap/code/signal/stop observations. A publication error can occur after visible
+terminal bytes but before a sync acknowledgment, as in its original contract.
+
+Next connect durable observation events and exact launch identities to the
+qualified native supervisor, including process-tree/deadline/interruption/resume
+controls. Source/binary/command/image admission, actual checkpoint protocol and
+complete costs/pricing remain open. This leaf is not the full-panel entrypoint.
+
+Primary Rust Child docs reviewed before implementation:
+<https://doc.rust-lang.org/std/process/struct.Child.html> (Drop,kill,try_wait,wait).
+Repository `ReapObservation` in src/cryptanalysis/ecbench/runner.rs and the G2
+accounting audit informed the no-read/no-publish-before-reap boundary. No shared
+library or frozen historical source/test was modified.
