@@ -6,11 +6,15 @@ observation and stays an unverified assertion until a CI-signed verdict exists
 
 | file | what it is | status |
 |---|---|---|
-| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`) | **fail**: 2 of 85 items do not match |
+| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), second pass: corrected text at `ea2fde0e` | **fail**: 3 of 120 items do not match, all the same R4-013 sentence (see "Second pass" below) |
 | `replay_certificate.json` | Task B: re-execution and independent closure (`pcc.replay-certificate/v1`) | **verified** (`scalars_verified: true`; 17 run entries, 0 mismatches) |
 | `controls.json` | negative controls for the validator's own checkers | 8 of 8 planted defects caught |
 
-**Disposition.** The five headline claims in the dispatch recompute exactly, and the
+The sections from "Binding" to "Not checked" describe the first pass at `f96f4f4c`. That
+report (2 of 85 items failing) is preserved in git as the blob of `validator_report.json`
+at `ea2fde0e`. The second pass is described at the end.
+
+**Disposition (first pass).** The five headline claims in the dispatch recompute exactly, and the
 replay reproduces them [pcc:unverified]. Two other statements in README "Results" are
 `insufficient_evidence`, so the validator report is `fail`. Neither is a wrong number
 in a results file. Both are sentences the committed artifacts do not support (findings
@@ -194,11 +198,73 @@ with a missing field.
   routing, bench records and research-visuals were not done. The dispatch restricted
   writes to this directory and specified local execution on one core.
 
+## Second pass: the corrected text (commit `ea2fde0e`)
+
+The producer corrected F1 and F2 in `5f12533a`. That commit edits `pq2_rank/README.md`,
+`crosscheck/README.md`, the census `README.md`, `report.typ`, `WEAKNESS_TRIAGE.md`,
+`WEAKNESSES.md`, `weakness.json` and corpus edge R4-013, and re-renders two corpus PDFs.
+The producer then committed this directory as `ea2fde0e`.
+
+The coordinator first asked for a recompute against the uncommitted working tree. The
+validator does not validate a moving working tree, so it ran only a non-binding preview.
+The corrections were committed while the preview ran, and the binding report was then
+made from that commit:
+
+    python3 -I -B validation/recompute.py --commit ea2fde0e4ded41a08ed5d966c96f7383d61ab802 --claims corrected
+
+Checks before binding:
+
+* The two commits contain only the files listed above (plus in-progress `f4/` and
+  `iter4_n25/26` outputs).
+* The committed copies of this directory are byte-identical to what the validator wrote.
+  The 8 deliverables match the hashes reported at handback, and all 39 output hashes
+  recorded in `replay_certificate.json` match the committed files.
+* The producer files the certificate read are unchanged at `ea2fde0e`, so the
+  certificate stands for that commit.
+* In `--claims corrected` mode, every *claimed* number is parsed from the document text
+  itself, so a changed or missing phrase fails its item. The validator's own evidence is
+  read from the commit and pinned: the iter2 values in `closure_replay_n8_20.json` and
+  `closure_replay_n21_24.json`, and `closure_dump_n14_18.json` with its dumps.
+
+| statement (document) | claimed | recomputed |
+|---|---|---|
+| agrees with Rust on five dumps at degree 3 (pq2 README, crosscheck README, report.typ) | 5 | 5 |
+| Python degree 4 reaches k on the three instances it was run on | 3 | 3 |
+| the Rust run on those dumps had degree 4 disabled | 5 | 5 (iter4 = `-`, command ends `18 0`) |
+| validator ran both degrees on all five and found agreement | 5 | 5 (dumps byte-identical to `crosscheck/`) |
+| crosscheck README table, all cells | 5 rows | 5 rows match |
+| validator's Rust degree 4 matches the Python degree-4 column | 3 | 3 |
+| literal Assumption 2 fails on the instances with n ≤ 44 (pq2 README, census README, report.typ, triage) | 111 | 111 (every n ≤ 44 instance) |
+| via iter3 < k / via validator iter2 / iter2 value / open at n = 45..47 | 87 / 24 / 1 / 8 | 87 / 24 / 1 / 8 |
+| census README: n = 15 and 17..44 with iter3 = 1 | 87 | 87 |
+| report.typ, triage, corpus node: 17 ≤ n ≤ 44 with iter3 = 1 | 84 | 84 |
+| degree-4 sweeps reach k; iterated degree exactly 4 (report.typ) | 24 | 24 |
+| corpus node: low2 = 1 on every instance | 119 | 119 |
+| R4-013: solver degree exceeds 2 on the n ≤ 44 instances | 111 | 111 (lower bound, under the containment property) |
+| **R4-013 (also in `WEAKNESSES.md`, `weakness.json`): solver degree "exactly 4 on 24 fresh instances at n = 17 to 24"** | 24 | **0** |
+
+**F3 (new).** R4-013's subject is the solver degree. The census measures the iterated
+closure degree. d_iter = 4 exactly on the 24 fresh instances gives solver degree ≥ 4,
+under the containment property, but no upper bound. No artifact runs a solver on those
+24 instances: `f4/run_msolve.py` ran msolve on the main-sweep dumps (`f4/dumps`), not on
+the degree-4 sweeps, and `f4/` is in progress and was not validated. The clause
+pre-dates the correction, but it sits in the corrected sentence. The census's own scope
+contradicts it: "lower bounds on F4's maximal step degree" (pq2 README, corpus node).
+Supported wording would be "the iterated closure degree is exactly 4 (solver degree ≥ 4
+under the containment property) on 24 fresh instances at n = 17 to 24". The two
+re-rendered corpus PDFs were not checked.
+
+All 120 items match except these three. `replay_certificate.json` and `controls.json` are
+unchanged; re-running the controls against the modified `recompute.py` gives a
+byte-identical `controls.json`.
+
 ## Reproduce
 
 From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one core):
 
-    python3 -I -B validation/recompute.py      # writes validator_report.json
+    python3 -I -B validation/recompute.py      # first pass (f96f4f4c, original claims)
+    python3 -I -B validation/recompute.py --commit ea2fde0e4ded41a08ed5d966c96f7383d61ab802 --claims corrected
+                                               # second pass; writes validator_report.json
     python3 -I -B validation/controls.py       # writes controls.json
     python3 -I -B validation/replay_compare.py # writes replay_certificate.json (needs the run directories)
 

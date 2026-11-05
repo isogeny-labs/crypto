@@ -9,6 +9,12 @@ JSON/CSV/log) row by row against its source, pins every file it reads by
 SHA-256, and writes validation/validator_report.json.
 
 Run from anywhere:  python3 -I validation/recompute.py
+  --commit SHA        read every producer file from this commit (default: the validated f96f4f4c)
+  --claims corrected  check the corrected README/corpus wording instead of the original
+  --worktree          non-binding preview against the uncommitted working tree: every file is
+                      hashed when read and re-hashed at the end; writes
+                      validator_report.worktree_preview.json (status "refused"), never
+                      validator_report.json
 """
 from __future__ import annotations
 
@@ -39,10 +45,16 @@ def rel(p: Path) -> str:
     return p.resolve().relative_to(REPO).as_posix()
 
 
+WORKTREE = False
+
+
 def read_text(p: Path) -> str:
     r = rel(p)
-    data = subprocess.run(["git", "-C", str(REPO), "show", f"{COMMIT}:{r}"], check=True,
-                          capture_output=True).stdout
+    if WORKTREE:
+        data = p.read_bytes()
+    else:
+        data = subprocess.run(["git", "-C", str(REPO), "show", f"{COMMIT}:{r}"], check=True,
+                              capture_output=True).stdout
     h = hashlib.sha256(data).hexdigest()
     READ[r] = h
     if not p.exists() or hashlib.sha256(p.read_bytes()).hexdigest() != h:
@@ -109,13 +121,186 @@ def parse_log(p: Path):
     return header, rows, other
 
 
+
+def read_own(p: Path) -> bytes:
+    """A validator-generated file (validation/): from the commit when it is tracked there and the
+    run is bound to a commit, otherwise from disk; pinned either way."""
+    r = rel(p)
+    data = None
+    if not WORKTREE:
+        g = subprocess.run(["git", "-C", str(REPO), "show", f"{COMMIT}:{r}"], capture_output=True)
+        if g.returncode == 0:
+            data = g.stdout
+            if hashlib.sha256(p.read_bytes()).hexdigest() != hashlib.sha256(data).hexdigest():
+                WORKTREE_DIFFERS.append(r)
+    if data is None:
+        data = p.read_bytes()
+    READ[r] = hashlib.sha256(data).hexdigest()
+    return data
+
+
+def corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_cc, kd, names, sweep_good, detail):
+    """Headline items for the corrected wording. Every 'claimed' value is parsed from the document
+    text (None if the phrase is absent, which fails the item); every 'recomputed' value from data."""
+    key = lambda r: (r["n"], r["inst"])
+    n44 = {key(r) for r in L if r["n"] <= 44}
+    est44 = est & n44
+    own_only = {key(r) for r in by_own} - {key(r) for r in by_mono}
+    iter2_vals = set()
+    for f in ("closure_replay_n8_20.json", "closure_replay_n21_24.json"):
+        for r in json.loads(read_own(HERE / f))["results"]:
+            if (r["n"], r["instance"]) in own_only:
+                iter2_vals.add(r["mine"]["iter2"])
+    detail["corrected.iter2_values_on_the_24"] = sorted(iter2_vals)
+    detail["corrected.all_n_le_44_established"] = est44 == n44
+    t = readme
+    # --- pq2_rank/README.md, cross-check paragraph
+    H("pq2_readme.crosscheck.d3_agree", text_num(t, r"It agrees with Rust on (\w+) dumped instances at n = 14 to 18 at degree 3"),
+      sum(nm in d3 and d3[nm]["low"] == rust_cc[nm]["iter3"] for nm in names))
+    H("pq2_readme.crosscheck.d4_python_reaches_k", text_num(t, r"At degree 4 the Python closure reaches k on the (\w+) instances it was run on"),
+      sum(d4[nm]["low"] == kd.get(nm) for nm in d4))
+    first = read_text(PKG / "crosscheck/rust_same_instances.txt").splitlines()[0]
+    disabled = sum(rust_cc[nm]["iter4"] is None for nm in names) if first.rstrip().endswith(" 18 0") else 0
+    H("pq2_readme.crosscheck.rust_run_had_d4_disabled",
+      5 if "the Rust run on those dumps had degree 4 disabled" in " ".join(t.split()) else None, disabled,
+      note="recomputed: dumped instances whose Rust run has iter4 = '-', given the command ends '18 0' (iter4_max_n = 0)")
+    cl = json.loads(read_own(HERE / "closure_dump_n14_18.json"))
+    agree = 0
+    for r in cl["results"]:
+        nm = f"n{r['n']}_i{r['instance']}"
+        same_dump = read_own(HERE / f"dump_n14_18/inst/{nm}.json").decode() == read_text(PKG / f"crosscheck/{nm}.json")
+        if (same_dump and not r["failed_checks"] and r["rust"]["iter3"] == r["mine"]["iter3"] == rust_cc[nm]["iter3"]
+                and r["rust"]["iter4"] is not None and r["rust"]["iter4"] == r["mine"]["iter4"]):
+            agree += 1
+    H("pq2_readme.crosscheck.validator_both_degrees_agree", text_num(t, r"The independent validator later ran both degrees on all (\w+) and found agreement"),
+      agree, note="recomputed from validation/closure_dump_n14_18.json on dumps byte-identical to crosscheck/: "
+                  "Rust iter3 = validator iter3 = committed Rust iter3, and validator-run Rust iter4 = validator iter4")
+    # --- pq2_rank/README.md, Reading
+    H("pq2_readme.reading.literal_fails_n_le_44", text_num(t, r"It fails on the (\d+) instances with n ≤ 44"), len(est44),
+      note="d_iter >= 3 (iter2 < k) is established on every instance with n <= 44: " + str(est44 == n44))
+    H("pq2_readme.reading.via_iter3_lt_k", text_num(t, r"On (\d+) of them iter3 < k already forces this"), len(by_mono))
+    H("pq2_readme.reading.via_validator_iter2",
+      text_num(t, r"on the other (\d+) the independent validator computed the degree-2 closure"), len(own_only),
+      note="validator evidence: validation/closure_replay_n8_20.json (closure_check.py), pinned in raw_data")
+    H("pq2_readme.reading.validator_iter2_value",
+      text_num(t, r"computed the degree-2 closure \(iter2 = (\d+)\)"),
+      next(iter(iter2_vals)) if len(iter2_vals) == 1 else -1)
+    H("pq2_readme.reading.open_n45_47", text_num(t, r"so those (\d+) instances are open"),
+      len([k for k in open_keys if 45 <= k[0] <= 47]) if all(45 <= k[0] <= 47 for k in open_keys) else -1)
+    # --- crosscheck/README.md
+    c = read_text(PKG / "crosscheck/README.md")
+    H("crosscheck_readme.d3_agree_all", text_num(c, r"Rust and Python agree at degree 3 on all (\w+) instances"),
+      sum(nm in d3 and d3[nm]["low"] == rust_cc[nm]["iter3"] for nm in names))
+    rows = [[x.strip() for x in line.strip().strip("|").split("|")] for line in c.splitlines()
+            if re.match(r"^\|\s*\d+\s*\|", line)]
+    ok_rows, d4_cells, d4_match = 0, 0, 0
+    rust_d4 = {f"n{r['n']}_i{r['instance']}": r["rust"]["iter4"] for r in cl["results"]}
+    for cells in rows:
+        nm = f"n{cells[0]}_i0"
+        good = (nm in rust_cc and cells[1] == str(kd.get(nm)) and cells[2] == str(rust_cc[nm]["iter3"])
+                and cells[3] == str(d3.get(nm, {}).get("low"))
+                and cells[4] == (str(d4[nm]["low"]) if nm in d4 else ""))
+        ok_rows += good
+        if cells[4]:
+            d4_cells += 1
+            d4_match += cells[4] == str(rust_d4.get(nm))
+    H("crosscheck_readme.table_rows_match_data", len(rows), ok_rows)
+    H("crosscheck_readme.validator_rust_d4_matches_column",
+      d4_cells if "re-ran Rust with degree 4 on the same dumps and it matches" in " ".join(c.split()) else None, d4_match)
+    # --- census README, report.typ, triage, corpus
+    sweeps = []
+    for tag in ("iter4_n17_20", "iter4_n21_24"):
+        sweeps += json.loads(read_text(PKG / f"results/{tag}/pq2_rank.json"))["rows"]
+    d4exact = sum(r["d_iter"] == "4" and r["iter3"] < r["k"] and r["iter4"] == r["k"] for r in sweeps)
+    lo1 = sum((r["n"] == 15 or 17 <= r["n"] <= 44) and r["iter3"] == 1 for r in L)
+    lo1_17 = sum(17 <= r["n"] <= 44 and r["iter3"] == 1 for r in L)
+    cen = read_text(PKG.parent / "README.md")
+    H("census_readme.instances", text_num(cen, r"The sweep covers (\d+) instances, n = 8 to 47"), len(L))
+    H("census_readme.iter3_eq_1_n15_and_17_44", text_num(cen, r"from 17 to 44 \((\d+) instances\) it reaches only 1"), lo1)
+    H("census_readme.d4_sweeps_reach_k", text_num(cen, r"Fresh degree-4 sweeps at n = 17 to 24 reach k on all (\d+) instances"), sweep_good)
+    H("census_readme.literal_fails_n_le_44", text_num(cen, r"Literal Assumption 2 \(degree 2\) fails on all (\d+) instances with n ≤ 44"), len(est44))
+    typ = read_text(PKG.parent / "report.typ")
+    H("report_typ.instances", text_num(typ, r"(\d+) instances, n = 8 to 47, three per n"), len(L))
+    H("report_typ.literal_fails_n_le_44", text_num(typ, r"literal reading fails on the (\d+) instances with \$n <= 44\$"), len(est44))
+    H("report_typ.iterated_exactly_4", text_num(typ, r"exactly 4 on (\d+) fresh instances at n = 17--24"), d4exact)
+    H("report_typ.iter3_eq_1_n17_44", text_num(typ, r"reaches only 1 at n = 15 and on all (\d+) instances from n = 17 to 44"), lo1_17)
+    H("report_typ.d4_sweeps_reach_k", text_num(typ, r"Fresh degree-4 sweeps at n = 17 to 24 reach k on all (\d+) instances"), sweep_good)
+    H("report_typ.python_agrees_five", text_num(typ, r"agrees with the Rust closure on (\w+) instances"),
+      sum(nm in d3 and d3[nm]["low"] == rust_cc[nm]["iter3"] for nm in names))
+    H("report_typ.fall_degree_not_solver_degree_n_le_44",
+      len(n44) if "is not the solver degree on any instance with $n <= 44$" in " ".join(typ.split()) else None, len(est44))
+    tri = read_text(REPO / "docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md")
+    H("triage.instances", text_num(tri, r"Assumption 2 \(`pq2_rank`\)\.\*\* (\d+) instances, n = 8 to 47"), len(L))
+    H("triage.iter3_eq_1_n17_44", text_num(tri, r"only 1 of them at n = 15 and on all (\d+) instances from n = 17 to 44"), lo1_17)
+    H("triage.d4_reaches_k", text_num(tri, r"Degree 4 reaches k on (\d+) of \d+ fresh instances at n = 17 to 24"), sweep_good)
+    H("triage.literal_fails_n_le_44", text_num(tri, r"The literal reading \(degree 2\) fails on the (\d+) instances with n ≤ 44"), len(est44))
+    corp = json.loads(read_text(REPO / "docs/ecdlp-hardness-corpus/lean-round4-20261104.json"))
+    flat = []
+
+    def walk(o):
+        if isinstance(o, dict):
+            flat.append(o)
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(corp)
+    e13 = next((o.get("statement", "") for o in flat if o.get("id") == "R4-013"), "")
+    node = next((o.get("statement", "") for o in flat if o.get("id") == "MEAS-PQ2-DLIN-CENSUS"), "")
+    H("corpus.MEAS-PQ2-DLIN-CENSUS.instances", text_num(node, r"(\d+) instances for n = 8 to 47"), len(L))
+    H("corpus.MEAS-PQ2-DLIN-CENSUS.iter3_eq_1_n17_44", text_num(node, r"on all (\d+) instances with 17 <= n <= 44"), lo1_17)
+    H("corpus.MEAS-PQ2-DLIN-CENSUS.d4_reaches_k", text_num(node, r"On (\d+) fresh instances at n = 17 to 24 the degree-4 closure reaches k"), sweep_good)
+    H("corpus.MEAS-PQ2-DLIN-CENSUS.low2_eq_1_every_instance",
+      len(L) if "reaches 1 linear polynomial at degree 2 on every instance" in node else None, sum(r["low2"] == 1 for r in L))
+    for doc in ("docs/ecdlp-hardness-corpus/WEAKNESSES.md", "docs/ecdlp-hardness-corpus/weakness.json"):
+        txt = read_text(REPO / doc)
+        tag = doc.rsplit("/", 1)[1]
+        H(f"{tag}.R4-013.solver_degree_exceeds_2_n_le_44",
+          text_num(txt, r"The solver degree exceeds the first fall degree 2 on the (\d+) instances with n <= 44"), len(est44))
+        H(f"{tag}.R4-013.solver_degree_exactly_4_on_fresh",
+          text_num(txt, r"; exactly 4 on (\d+) fresh instances at n = 17 to 24"), 0,
+          note="same sentence as corpus edge R4-013; see corpus.R4-013.solver_degree_exactly_4_on_fresh")
+    H("corpus.R4-013.solver_degree_exceeds_2_n_le_44",
+      text_num(e13, r"The solver degree exceeds the first fall degree 2 on the (\d+) instances with n <= 44"), len(est44),
+      note="a lower bound on F4's maximal step degree only under the containment property (separate Lean claim, not validated here)")
+    H("corpus.R4-013.solver_degree_exactly_4_on_fresh",
+      text_num(e13, r"; exactly 4 on (\d+) fresh instances at n = 17 to 24"), 0,
+      note=("R4-013's subject is the solver degree. The census establishes the iterated closure degree d_iter = 4 "
+            f"exactly on {d4exact} fresh instances, which gives solver degree >= 4 (under containment) and no upper "
+            "bound. No artifact runs a solver on those 24 instances (f4/run_msolve.py was run on the main-sweep dumps "
+            "f4/dumps, not on the iter4 sweeps; f4/ is in progress and was not validated). Instances where 'exactly 4' "
+            "is established for the solver degree: 0. Supported wording: 'the iterated closure degree is exactly 4 "
+            "(solver degree >= 4 under the containment property) on 24 fresh instances'."))
+
 # ---------------------------------------------------------------------------
 
 def main_by_key(rows):
     return {(r["n"], r["inst"]): r for r in rows}
 
 
+WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8}
+
+
+def text_num(text: str, pattern: str, group: int = 1):
+    """The number a document states, matched on whitespace-normalised text (None if absent)."""
+    m = re.search(pattern, " ".join(text.split()))
+    if not m:
+        return None
+    g = m[group]
+    return int(g) if g.isdigit() else WORDS.get(g.lower())
+
+
 def main() -> int:
+    global COMMIT, WORKTREE
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--commit", default=COMMIT)
+    ap.add_argument("--claims", choices=["original", "corrected"], default="original")
+    ap.add_argument("--worktree", action="store_true")
+    ap.add_argument("--out", default=str(HERE / "validator_report.json"))
+    args = ap.parse_args()
+    COMMIT, WORKTREE = args.commit, args.worktree
     heads: list[dict] = []
     notes: list[str] = []
     detail: dict = {}
@@ -125,7 +310,7 @@ def main() -> int:
         item.update(extra)
         heads.append(item)
 
-    read_text(PKG / "README.md")  # the claims source, pinned
+    readme = read_text(PKG / "README.md")  # the claims source, pinned
 
     # ---- Claim 1: main sweep, from run.log -------------------------------
     hdr, L, other = parse_log(PKG / "results/run.log")
@@ -196,16 +381,15 @@ def main() -> int:
     # in replay_certificate.json): closure_replay_n8_20.json and closure_replay_n21_24.json.
     own = {}
     for f in ("closure_replay_n8_20.json", "closure_replay_n21_24.json"):
-        fp = HERE / f
-        data = fp.read_bytes()
-        READ[rel(fp)] = hashlib.sha256(data).hexdigest()
-        for r in json.loads(data)["results"]:
+        for r in json.loads(read_own(HERE / f))["results"]:
             own[(r["n"], r["instance"])] = r["mine"]
     by_own = [r for r in L if (r["n"], r["inst"]) in own and own[(r["n"], r["inst"])]["iter2"] < r["k"]
               and own[(r["n"], r["inst"])]["k"] == r["k"]]
     est = {(r["n"], r["inst"]) for r in by_mono} | {(r["n"], r["inst"]) for r in by_own}
     open_keys = sorted(k for k in main_by_key(L) if k not in est)
-    H("reading.d_iter_ge_3_established(README closure definition)", 119, len(est),
+    detail["reading_established"] = {"by_iter3_lt_k": len(by_mono), "total": len(est), "open": open_keys}
+    if args.claims == "original":
+      H("reading.d_iter_ge_3_established(README closure definition)", 119, len(est),
       established_by_iter3_lt_k_monotonicity=len(by_mono),
       established_by_validator_iter2=len({(r["n"], r["inst"]) for r in by_own} - {(r["n"], r["inst"]) for r in by_mono}),
       not_established=open_keys,
@@ -386,7 +570,8 @@ def main() -> int:
     H("crosscheck.d4_python_instances", 3, len(d4))
     rust_d4 = sum(1 for nm in names if rust_cc[nm]["iter4"] is not None)
     # README: "It agrees with Rust on five dumped instances at n = 14 to 18, at degree 3 and at degree 4."
-    H("crosscheck.d4_python_eq_rust_iter4_on_same_instances", 5,
+    if args.claims == "original":
+      H("crosscheck.d4_python_eq_rust_iter4_on_same_instances", 5,
       sum(1 for nm in names if nm in d4 and rust_cc[nm]["iter4"] is not None and d4[nm]["low"] == rust_cc[nm]["iter4"]),
       note=("README Results claims agreement with Rust at degree 4 on the five dumped instances. In the committed "
             f"artifacts the Rust run on those instances has iter4 = '-' on all five ({rust_d4} Rust degree-4 values; "
@@ -398,6 +583,9 @@ def main() -> int:
     detail["crosscheck_python_d4_low"] = {nm: d4[nm]["low"] for nm in d4}
     detail["crosscheck_k_from_dump_Z"] = kd
 
+    if args.claims == "corrected":
+        corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_cc, kd, names, both, detail)
+
     # ---------------------------------------------------------------------------
     failed = [h for h in heads if h["claimed"] != h["recomputed"]]
     status = "pass" if not failed else "fail"
@@ -407,6 +595,36 @@ def main() -> int:
                  "checked row by row against their source logs. Rounded claims (F_over_V) are compared at the "
                  "precision stated in the README; exact values are in recomputed_exact.")
     head = subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    if WORKTREE:
+        moved = [r for r, h in READ.items() if hashlib.sha256((REPO / r).read_bytes()).hexdigest() != h]
+        dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", *sorted(READ)],
+                               capture_output=True, text=True).stdout.splitlines()
+        preview = {
+            "schema": "validator.worktree-preview/v1",
+            "status": "refused",
+            "refusal": ("Not a validation verdict. The validator validates only a frozen, committed artifact set; "
+                        "these inputs are uncommitted working-tree files in a tree another session is committing "
+                        "to. Commit them and re-run with --commit <sha> --claims corrected for a binding report."),
+            "preview_all_headlines_match": not failed,
+            "preview_mismatches": [{"name": h["name"], "claimed": h["claimed"], "recomputed": h["recomputed"]}
+                                   for h in failed],
+            "base_head": head,
+            "uncommitted_inputs": dirty,
+            "inputs_moved_during_run": moved,
+            "validator": VALIDATOR,
+            "produced_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "raw_data": [{"path": p, "sha256": h} for p, h in sorted(READ.items())],
+            "headline": heads,
+            "notes": " ".join(notes),
+            "detail": detail,
+        }
+        (HERE / "validator_report.worktree_preview.json").write_text(json.dumps(preview, indent=1) + "\n")
+        for h in heads:
+            flag = "ok " if h["claimed"] == h["recomputed"] else "BAD"
+            print(f"{flag} {h['name']}: claimed {h['claimed']} recomputed {h['recomputed']}")
+        print("preview (refused as a verdict); all headlines match:", not failed, "| moved:", moved,
+              "| uncommitted inputs:", len(dirty))
+        return 2
     notes.append(f"All inputs read from commit {COMMIT} (git object store). Working-tree copies differing from it: "
                  f"{WORKTREE_DIFFERS or 'none'}. Repository HEAD at recompute time: {head}.")
     if WORKTREE_DIFFERS:
@@ -414,6 +632,8 @@ def main() -> int:
     report = {
         "schema": "pcc.validator-report/v1",
         "validated_commit": COMMIT,
+        "claims": args.claims,
+        "recompute_script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "head_at_recompute": head,
         "worktree_differs": WORKTREE_DIFFERS,
         "status": status,
@@ -424,7 +644,7 @@ def main() -> int:
         "notes": " ".join(notes),
         "detail": detail,
     }
-    (HERE / "validator_report.json").write_text(json.dumps(report, indent=1) + "\n")
+    Path(args.out).write_text(json.dumps(report, indent=1) + "\n")
     for h in heads:
         flag = "ok " if h["claimed"] == h["recomputed"] else "BAD"
         print(f"{flag} {h['name']}: claimed {h['claimed']} recomputed {h['recomputed']}")

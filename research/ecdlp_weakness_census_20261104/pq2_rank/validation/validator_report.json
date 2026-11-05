@@ -1,19 +1,41 @@
 {
  "schema": "pcc.validator-report/v1",
- "validated_commit": "f96f4f4c019bc95084b24d9dcb80a10655200cb3",
- "head_at_recompute": "5f6ad81efabcde6d480d68d5c7d4a67d2763715b",
+ "validated_commit": "ea2fde0e4ded41a08ed5d966c96f7383d61ab802",
+ "claims": "corrected",
+ "recompute_script_sha256": "096be45fc5c8a8f95d219aec3366494bb52048f9d4c6feb4483d6b6f607b3d5a",
+ "head_at_recompute": "ea2fde0e4ded41a08ed5d966c96f7383d61ab802",
  "worktree_differs": [],
  "status": "fail",
  "validator": "validator (claude-opus-5-5; Claude Code session 01AXUKfUpk9rEJg4Yyo1QcZQ)",
- "produced_at": "2026-11-05T04:07:21Z",
+ "produced_at": "2026-11-05T04:17:24Z",
  "raw_data": [
   {
+   "path": "docs/ecdlp-hardness-corpus/WEAKNESSES.md",
+   "sha256": "931fb9838483177656dd24827b946c2d497b4bd82738beef18c3442ae3e82592"
+  },
+  {
+   "path": "docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md",
+   "sha256": "f8bbf3de64dd4baad2a1b3f2cb886d9c25a049a8aa30f0d5deedf9d93c57a34c"
+  },
+  {
+   "path": "docs/ecdlp-hardness-corpus/lean-round4-20261104.json",
+   "sha256": "0eac765892389ee54f5fe482508d9cce4fb945c0619ec06f4669e1f51d53fa81"
+  },
+  {
+   "path": "docs/ecdlp-hardness-corpus/weakness.json",
+   "sha256": "a1511cb4e0632e958a0f0d6a5cb7cd0a99140686d76d6129236d9e23b26393ce"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/README.md",
+   "sha256": "84a9c560bac60414a8eaf5d35ba679ea5c4ca4fdd2a5f1548c082663a6572b77"
+  },
+  {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/README.md",
-   "sha256": "44c36b1e2a80570c78044089101b3c816c26c15248c90e8fddba4252c09834f4"
+   "sha256": "56f9bfc4ed64815224baeadd3ffecda8bc5fb07f764bc8718810ff997eeeac9c"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/crosscheck/README.md",
-   "sha256": "f71479a2b877d74aa4f4be3f1447101e524f32a4e05179f7e1cc06922fc3e42a"
+   "sha256": "6e840d2573fdc6d21b49f3f3f1779671d54c1baed46af7ea22317a04ae0b7bbb"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/crosscheck/closure_d3.txt",
@@ -100,12 +122,40 @@
    "sha256": "23b3de9de6b7136369a679bb2f3b1fec5f5c7e4ed637a120a3e79a941f63981a"
   },
   {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_dump_n14_18.json",
+   "sha256": "ab5e1347bb3d39e753726ddc0aa6fee7a294e0ad395a75d8f99218043b1ed411"
+  },
+  {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_replay_n21_24.json",
    "sha256": "4587458f05dd6abad606188e7ff94a489424879d6854ce5b42ca6723f44a5519"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_replay_n8_20.json",
    "sha256": "60323524c96fa6d9c4d24e949a36175e2b3d4e7810995d88bb0afc37c10e2fe0"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/dump_n14_18/inst/n14_i0.json",
+   "sha256": "9c12c3b1d65914477f28ec1bdc5c2ea1057d0d56c0febfcda3bb9594252ac4ce"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/dump_n14_18/inst/n15_i0.json",
+   "sha256": "b63abb81ee1e675900755ceba08fbf2e116df3ccd7d0efbd1359c302a14697fb"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/dump_n14_18/inst/n16_i0.json",
+   "sha256": "13044cf6e8491899b79adf7ad8a2162bab8435e7b484b82be8854d11772bfa5d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/dump_n14_18/inst/n17_i0.json",
+   "sha256": "cbaa808a505a8d08b78317d51e402a7312b06d6a9371c42b708668b9f2c9e06b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/dump_n14_18/inst/n18_i0.json",
+   "sha256": "eb9bc9fe736f71be9397b41850db4e3f738ac80cbaee27b8a9a66f361c63e5d1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/report.typ",
+   "sha256": "54f9058d5ef03604bcf7139f731542f91117e22dab022862f8f9e39c854bf261"
   }
  ],
  "headline": [
@@ -355,49 +405,6 @@
    "recomputed": 27,
    "rel_tol": 0,
    "note": "iter4 present exactly on n <= 16: True"
-  },
-  {
-   "name": "reading.d_iter_ge_3_established(README closure definition)",
-   "claimed": 119,
-   "recomputed": 111,
-   "rel_tol": 0,
-   "established_by_iter3_lt_k_monotonicity": 87,
-   "established_by_validator_iter2": 24,
-   "not_established": [
-    [
-     45,
-     0
-    ],
-    [
-     45,
-     1
-    ],
-    [
-     45,
-     2
-    ],
-    [
-     46,
-     0
-    ],
-    [
-     46,
-     1
-    ],
-    [
-     46,
-     2
-    ],
-    [
-     47,
-     0
-    ],
-    [
-     47,
-     1
-    ]
-   ],
-   "note": "d_iter >= 3 needs the degree-2 closure iter2 < k; the producer computed only the one-shot low2 (low2 < k on all 119). On the open instances iter3 was not computed either and the producer's own log labels them d_iter=?; the README table also shows '-' there. The claim holds on 119 only under the code's convention of testing degree 2 with low2."
   },
   {
    "name": "main.json.rows",
@@ -662,14 +669,237 @@
    "rel_tol": 0
   },
   {
-   "name": "crosscheck.d4_python_eq_rust_iter4_on_same_instances",
+   "name": "pq2_readme.crosscheck.d3_agree",
    "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.crosscheck.d4_python_reaches_k",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.crosscheck.rust_run_had_d4_disabled",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0,
+   "note": "recomputed: dumped instances whose Rust run has iter4 = '-', given the command ends '18 0' (iter4_max_n = 0)"
+  },
+  {
+   "name": "pq2_readme.crosscheck.validator_both_degrees_agree",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0,
+   "note": "recomputed from validation/closure_dump_n14_18.json on dumps byte-identical to crosscheck/: Rust iter3 = validator iter3 = committed Rust iter3, and validator-run Rust iter4 = validator iter4"
+  },
+  {
+   "name": "pq2_readme.reading.literal_fails_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0,
+   "note": "d_iter >= 3 (iter2 < k) is established on every instance with n <= 44: True"
+  },
+  {
+   "name": "pq2_readme.reading.via_iter3_lt_k",
+   "claimed": 87,
+   "recomputed": 87,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.reading.via_validator_iter2",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0,
+   "note": "validator evidence: validation/closure_replay_n8_20.json (closure_check.py), pinned in raw_data"
+  },
+  {
+   "name": "pq2_readme.reading.validator_iter2_value",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.reading.open_n45_47",
+   "claimed": 8,
+   "recomputed": 8,
+   "rel_tol": 0
+  },
+  {
+   "name": "crosscheck_readme.d3_agree_all",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0
+  },
+  {
+   "name": "crosscheck_readme.table_rows_match_data",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0
+  },
+  {
+   "name": "crosscheck_readme.validator_rust_d4_matches_column",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.instances",
+   "claimed": 119,
+   "recomputed": 119,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.iter3_eq_1_n15_and_17_44",
+   "claimed": 87,
+   "recomputed": 87,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.d4_sweeps_reach_k",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.literal_fails_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.instances",
+   "claimed": 119,
+   "recomputed": 119,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.literal_fails_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.iterated_exactly_4",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.iter3_eq_1_n17_44",
+   "claimed": 84,
+   "recomputed": 84,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.d4_sweeps_reach_k",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.python_agrees_five",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.fall_degree_not_solver_degree_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0
+  },
+  {
+   "name": "triage.instances",
+   "claimed": 119,
+   "recomputed": 119,
+   "rel_tol": 0
+  },
+  {
+   "name": "triage.iter3_eq_1_n17_44",
+   "claimed": 84,
+   "recomputed": 84,
+   "rel_tol": 0
+  },
+  {
+   "name": "triage.d4_reaches_k",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0
+  },
+  {
+   "name": "triage.literal_fails_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-DLIN-CENSUS.instances",
+   "claimed": 119,
+   "recomputed": 119,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-DLIN-CENSUS.iter3_eq_1_n17_44",
+   "claimed": 84,
+   "recomputed": 84,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-DLIN-CENSUS.d4_reaches_k",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-DLIN-CENSUS.low2_eq_1_every_instance",
+   "claimed": 119,
+   "recomputed": 119,
+   "rel_tol": 0
+  },
+  {
+   "name": "WEAKNESSES.md.R4-013.solver_degree_exceeds_2_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0
+  },
+  {
+   "name": "WEAKNESSES.md.R4-013.solver_degree_exactly_4_on_fresh",
+   "claimed": 24,
    "recomputed": 0,
    "rel_tol": 0,
-   "note": "README Results claims agreement with Rust at degree 4 on the five dumped instances. In the committed artifacts the Rust run on those instances has iter4 = '-' on all five (0 Rust degree-4 values; its command ends '18 0', iter4_max_n = 0), and Python degree 4 was run on only 3 of the 5 (n15, n17, n18). The degree-4 agreement is therefore not supported by the committed artifacts. See replay_certificate.json for the validator's own Rust degree-4 values on these instances."
+   "note": "same sentence as corpus edge R4-013; see corpus.R4-013.solver_degree_exactly_4_on_fresh"
+  },
+  {
+   "name": "weakness.json.R4-013.solver_degree_exceeds_2_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0
+  },
+  {
+   "name": "weakness.json.R4-013.solver_degree_exactly_4_on_fresh",
+   "claimed": 24,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "note": "same sentence as corpus edge R4-013; see corpus.R4-013.solver_degree_exactly_4_on_fresh"
+  },
+  {
+   "name": "corpus.R4-013.solver_degree_exceeds_2_n_le_44",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0,
+   "note": "a lower bound on F4's maximal step degree only under the containment property (separate Lean claim, not validated here)"
+  },
+  {
+   "name": "corpus.R4-013.solver_degree_exactly_4_on_fresh",
+   "claimed": 24,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "note": "R4-013's subject is the solver degree. The census establishes the iterated closure degree d_iter = 4 exactly on 24 fresh instances, which gives solver degree >= 4 (under containment) and no upper bound. No artifact runs a solver on those 24 instances (f4/run_msolve.py was run on the main-sweep dumps f4/dumps, not on the iter4 sweeps; f4/ is in progress and was not validated). Instances where 'exactly 4' is established for the solver degree: 0. Supported wording: 'the iterated closure degree is exactly 4 (solver degree >= 4 under the containment property) on 24 fresh instances'."
   }
  ],
- "notes": "85 headline items recomputed; 2 do not match: reading.d_iter_ge_3_established(README closure definition) claimed 119 recomputed 111; crosscheck.d4_python_eq_rust_iter4_on_same_instances claimed 5 recomputed 0 Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit f96f4f4c019bc95084b24d9dcb80a10655200cb3 (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: 5f6ad81efabcde6d480d68d5c7d4a67d2763715b.",
+ "notes": "120 headline items recomputed; 3 do not match: WEAKNESSES.md.R4-013.solver_degree_exactly_4_on_fresh claimed 24 recomputed 0; weakness.json.R4-013.solver_degree_exactly_4_on_fresh claimed 24 recomputed 0; corpus.R4-013.solver_degree_exactly_4_on_fresh claimed 24 recomputed 0 Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit ea2fde0e4ded41a08ed5d966c96f7383d61ab802 (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: ea2fde0e4ded41a08ed5d966c96f7383d61ab802.",
  "detail": {
   "main_log_header": [
    "pq2_rank census; seed 0x5eed20261104; pclmulqdq: true",
@@ -680,6 +910,44 @@
    0,
    7
   ],
+  "reading_established": {
+   "by_iter3_lt_k": 87,
+   "total": 111,
+   "open": [
+    [
+     45,
+     0
+    ],
+    [
+     45,
+     1
+    ],
+    [
+     45,
+     2
+    ],
+    [
+     46,
+     0
+    ],
+    [
+     46,
+     1
+    ],
+    [
+     46,
+     2
+    ],
+    [
+     47,
+     0
+    ],
+    [
+     47,
+     1
+    ]
+   ]
+  },
   "main_iter3_present_iff_n_le_44": true,
   "main_low4_present_iff_n_le_20": true,
   "rerun_mismatch_keys": [],
@@ -711,6 +979,10 @@
    "n16_i0": 15,
    "n17_i0": 17,
    "n18_i0": 17
-  }
+  },
+  "corrected.iter2_values_on_the_24": [
+   1
+  ],
+  "corrected.all_n_le_44_established": true
  }
 }
