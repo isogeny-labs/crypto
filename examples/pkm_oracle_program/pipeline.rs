@@ -720,7 +720,9 @@ mod tests {
         let mut request = replay_counter_fixture();
         request.order = 17; // prime, but not this curve's full order19
         let mut accounting = ReplayAccounting::new(&request);
-        let error = replay_counted(&request, &serde_json::json!({}), &mut accounting).unwrap_err();
+        let error = replay_counted(&request, &serde_json::json!({}), &mut accounting)
+            .err()
+            .expect("incorrect full-curve order must fail");
         assert!(error.contains("full-curve order"));
         let report = accounting.report();
         assert_eq!(report["coordinate_reference"]["setup_state"], "rejected");

@@ -1,0 +1,17 @@
+{
+  "example-tests.log": {
+    "bytes": 1277,
+    "sha256": "dad65a86f9e399bec890ef5955e0c280543a58993b4ae7ddf212f360d78c2f31",
+    "raw_utf8": "warning: function `solve_one_with_trace` is never used\n    --> src/cryptanalysis/ecbench/../../../research/pencil_large_prime_20261029/src/native_solver.rs:1351:8\n     |\n1351 | pub fn solve_one_with_trace(\n     |        ^^^^^^^^^^^^^^^^^^^^\n     |\n     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `crypto` (lib) generated 1 warning\n   Compiling crypto v0.1.0 (/workspace/crypto)\nerror[E0277]: `pipeline::Certificate` doesn't implement `Debug`\n   --> examples/pkm_oracle_program/pipeline.rs:723:87\n    |\n723 |         let error = replay_counted(&request, &serde_json::json!({}), &mut accounting).unwrap_err();\n    |                                                                                       ^^^^^^^^^^ the trait `Debug` is not implemented for `pipeline::Certificate`\n    |\nnote: required by a bound in `Result::<T, E>::unwrap_err`\n   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/result.rs:1323:4\nhelp: consider annotating `pipeline::Certificate` with `#[derive(Debug)]`\n    |\n373 + #[derive(Debug)]\n374 | pub(super) struct Certificate {\n    |\n\nFor more information about this error, try `rustc --explain E0277`.\nerror: could not compile `crypto` (example \"pkm_oracle_program\" test) due to 1 previous error\n"
+  },
+  "supervisor.log": {
+    "bytes": 40,
+    "sha256": "befe4f324d301ef0e9c574a075e10ec031c7e87038de1ed58f764ec22f239664",
+    "raw_utf8": "toolchain exit=0\nexample-tests exit=101\n"
+  },
+  "toolchain.log": {
+    "bytes": 36,
+    "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+    "raw_utf8": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n"
+  }
+}
