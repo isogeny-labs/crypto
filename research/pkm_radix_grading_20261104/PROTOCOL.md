@@ -160,3 +160,26 @@ with 2 jobs and 64 codegen units. The study binary is therefore built from a *pr
 
 G0 is unchanged and decides admissibility: the binary must reproduce the committed `R-t9-t10` counts exactly.
 Nothing else in the protocol changes.
+
+**Amendment 2 (2026-11-05, filed after the first G0 run and before any graded study row; it changes the thread
+count of every cell).** G0 at `RAYON_NUM_THREADS=2` matched `D`, `max_cols` and `inconsistent` on all four rows.
+It did not match `muladds`: `t=9` gave 45,952,850,022 against the committed 45,957,046,778; `t=10` gave
+481,961,879,776 against 481,960,954,036. A diagnostic at `t=9`, draw 0 (`diag/`) shows that `muladds` depends on
+the thread count. The parallel echelon's chunk schedule moves the work count while `D`, widths, skipped rows and
+residual rows stay identical:
+
+| threads | 1 | 2 | 4 |
+|:--|--:|--:|--:|
+| `muladds` | 45,950,147,498 | 45,952,850,022 | 45,957,046,778 (the committed value) |
+
+The committed rows ran at `THREADS=4`. So:
+
+- every cell, G0 included, runs at `RAYON_NUM_THREADS=4` (`run_cells.sh` default; threads may exceed this
+  host's 2 vCPU, which slows the run but cannot change a count);
+- G0 is rerun at 4 threads and must match exactly, as before;
+- the 2-thread rows are kept as `runs/G0th2-t9-t10.*`, labelled as not admissible for G0.
+
+`muladds` is a deterministic function of the system *and the thread count*. The effect, at most 0.015% here,
+is about 10⁴ times smaller than the factor-2 bands of §5, so no verdict can turn on it. Every arm still uses
+the same thread count.
+
