@@ -1,0 +1,34 @@
+{
+ "created_at": "2026-11-04T05:42:40Z",
+ "id": "PCC-20261104-34b888",
+ "kind": "measurement",
+ "producer": {
+  "commit": "40dbfbd4810eb47d37acdf10fab7854aba6f1a52",
+  "model": "",
+  "session": "scripts/pcc_leaderboard_claims.py"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/ic_validation_gate_20261024/B/replay-certificate.json",
+   "sha256": "e40c9e79cf6d40cc783d60a20e9d74b064abf0385e67a63bcd2e7f29434f21f8"
+  },
+  {
+   "evidence_dir": "docs/ic/runs",
+   "kind": "recompute",
+   "path": "research/ic_validation_gate_20261024/B/validator-report.docs-ic-runs.json",
+   "sha256": "4479aa845f1b98c517a8d1ea0067ce617e74d927d368064ec73a828d500b416e"
+  }
+ ],
+ "row": {
+  "board_key": "board:icv1-fp22-tm1267-a5acaf6d:docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
+  "row_digest": "2f37670de9974c69a60143894ebe90b9e916227b4182b39b2e8a8d39296dacdc",
+  "slug": "icv1-fp22-tm1267-a5acaf6d",
+  "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
+  "supersedes": null,
+  "table": "B"
+ },
+ "schema": "pcc.claim/v1",
+ "scope": "one leaderboard row as built by scripts/build_ic_leaderboard.py from docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json; validated under docs/VALIDATION_GATE.md by docs/ic/runs/VALIDATION.json (rho reference kind negation, order holds across the 0/0.1/1 GAE band: True)",
+ "statement": "Index-calculus leaderboard Table B, row icv1-fp22-tm1267-a5acaf6d (generated-22bit-3290411, prime regime, log2 r = 21.6504): best recipe mitm_m2_negfold_walk_balanced costs S_IC = 12.7702 GAE per sqrt(r); the matched rho reference (matched rho, negation map (A = 2), one target) costs S_ref = 1.21606; IC/rho = 10.5013, IC/floor = 14.4097. The gap to matched rho is the distance remaining, not a speedup."
+}

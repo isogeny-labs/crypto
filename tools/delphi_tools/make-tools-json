@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Print a complete Delphi tools.json for this checkout on stdout.
+set -euo pipefail
+
+command -v jq >/dev/null || { echo "make-tools-json: jq not on PATH" >&2; exit 3; }
+root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
+root=$(cd "$root" && pwd)
+
+out=$(jq -n --arg root "$root" '
+  def tool($name; $timeout; $args; $pattern; $ext; $verifier; $describe):
+    {argv: [$root + "/tools/delphi_tools/" + $name], dir: $root, timeout: $timeout, args: $args}
+    + (if $pattern != "" then {pattern: $pattern} else {} end)
+    + (if $ext != "" then {ext: $ext} else {} end)
+    + (if $verifier then {verifier: true} else {} end)
+    + {describe: $describe};
+  {max_actions: 4, tools: {
+    "card-lint": tool("card-lint"; "2m"; "one"; "^research/[A-Za-z0-9_./-]+\\.yaml$"; ""; true;
+      "lint a frozen task card; the argument is its repo-relative path research/<dir>/<card>.yaml"),
+    "card-run": tool("card-run"; "3h"; "one"; "^research/[A-Za-z0-9_./-]+\\.yaml$"; ""; false;
+      "run a linted frozen-command task card after the checkpoint gate; the argument is its repo-relative path"),
+    "lean-verify": tool("lean-verify"; "40m"; "one"; "^[A-Za-z0-9_./-]+$"; ""; true;
+      "run the Lean proof gate; the argument is a repo-relative Lean project directory or .lean file"),
+    "isolab-dispatch": tool("isolab-dispatch"; "10m"; "one"; "^[0-9a-f]{40}(,[a-z_]+=[A-Za-z0-9_./-]+)*$"; ""; false;
+      "dispatch the Iso Lab workflow; the argument is a 40-hex commit sha optionally followed by ,key=value pairs (spec_path, seconds, instance_type, resumable, size_sweep, checkpoint_seconds, max_restores)"),
+    "isolab-status": tool("isolab-status"; "2m"; "one"; "^[0-9]{1,20}$"; ""; true;
+      "check an Iso Lab workflow run; the argument is the GitHub run id from isolab-dispatch"),
+    "writeback": tool("writeback"; "10m"; "file"; ""; "json"; false;
+      "write a program round into the repository and open a PR; the content is the delphi.program-round/v1 JSON record")
+  }}')
+printf '%s\n' "$out" | jq . >/dev/null
+printf '%s\n' "$out" | jq .
