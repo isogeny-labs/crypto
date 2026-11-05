@@ -263,11 +263,30 @@ the group and field work of the base build and the probe stream. It does
 **not** claim a relation: at any feasible `N` and `T` the expected hits
 `T·N/ℓ` are zero, and the JSON says so.
 
-The index-calculus pipeline is not wired to this curve yet. `InstanceCtx`
-(`ic_framework/stages.rs`) stores `r`, `cofactor` and `group_order` as `u64`,
-`CountedGroup::mul` takes a `u64` scalar, and the relation matrix is modulo a
-`u64`. Those three are the next widening step; until they move to a 256-bit
-scalar, only projection from the miniatures is a measured IC result.
+The same wide path is reachable through the ordinary bench and sweeper:
+
+```bash
+ic bench --bits 255 --family curve25519 \
+    --factor-base prime-abscissa:size=1024 --oracle mitm:negation_folded=1 \
+    --max-trials 100000
+ic sweep-trial --config-json '{"regime":"prime","degree":255,
+  "family":"curve25519","factor_base":"prime-abscissa:size=1024",
+  "oracle":"mitm:negation_folded=1","max_trials":100000}'
+```
+
+The row is `exhausted` (`0 of 1 repeats recovered the logarithm within
+max_trials`) and the sweep records that class, rather than refusing the curve.
+In a study, the 255-bit baseline rung is dropped for the same reason; a study
+still needs at least two scorable rungs.
+
+The three `u64` scalar paths have wide counterparts in
+`curve25519_wide.rs`: `WideInstanceCtx` (`r`, `cofactor`, `group_order` as
+`BigUint`), `Curve25519Wide::mul_biguint` (the group scalar), and `WideGauss`
+(incremental Gauss modulo the 252-bit `ℓ`). The default `ic_framework`
+pipeline keeps its `u64` types for the toy sizes it measures; the 255-bit
+route uses the wide ones. A complete solve at 255 bits is still not a
+measurement that exists anywhere: relation collection needs
+`T·N ≥ ℓ`, and no LA or descent follows from the zero relations.
 
 ## Scale-relative knobs
 

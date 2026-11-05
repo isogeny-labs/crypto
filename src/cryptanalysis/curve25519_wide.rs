@@ -26,7 +26,7 @@
 //! `run_pipeline` can run on this curve.  This module makes the group side of
 //! that extension real and testable in the meantime.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use num_bigint::BigUint;
 use num_traits::{One, ToPrimitive, Zero};
@@ -247,6 +247,210 @@ impl Default for Curve25519Wide {
     }
 }
 
+/// The widened instance context: the fields `ic_framework::InstanceCtx`
+/// carries as `u64`, here as `BigUint` where the subgroup order needs it.
+///
+/// A future wide pipeline reads this instead of `InstanceCtx`; it exists now
+/// so the three scalar paths (`r`, `cofactor`, `group_order`) have a typed
+/// 255-bit home, alongside [`Curve25519Wide::mul_biguint`] and
+/// [`WideGauss`] for the relation matrix.
+#[derive(Clone, Debug)]
+pub struct WideInstanceCtx<'a> {
+    pub group: &'a Curve25519Wide,
+    pub generator: WidePoint,
+    pub target: WidePoint,
+    pub r: BigUint,
+    pub cofactor: u64,
+    pub group_order: BigUint,
+    pub name: String,
+}
+
+impl<'a> WideInstanceCtx<'a> {
+    pub fn curve25519(group: &'a Curve25519Wide) -> Self {
+        let cofactor = BigUint::from(group.cofactor);
+        Self {
+            group,
+            generator: group.generator,
+            target: group.generator,
+            r: group.r.clone(),
+            cofactor: group.cofactor,
+            group_order: &group.r * cofactor,
+            name: "curve25519".into(),
+        }
+    }
+
+    /// `⌈log₂ r⌉`, the integer the projection/objective columns report.
+    pub fn log2_r(&self) -> f64 {
+        self.r.to_f64().expect("r fits f64").log2()
+    }
+}
+
+/// Relation-matrix elimination modulo `ℓ`, the 252-bit subgroup order.
+///
+/// `ic_framework::linalg` works modulo a `u64`; this is the same
+/// incremental-Gauss shape over [`Fp256`] instantiated at `ℓ`, so a relation
+/// row whose coefficients are 252-bit field elements can be eliminated.
+/// It is a standalone, tested component until a wide `run_pipeline` uses it.
+#[derive(Clone, Debug)]
+pub struct WideGauss {
+    field: Fp256,
+    cols: usize,
+    /// Pivot column → (row, right-hand side), in increasing pivot order.
+    rows: BTreeMap<usize, (Vec<Fp256Elem>, Fp256Elem)>,
+    inconsistent: bool,
+}
+
+impl WideGauss {
+    pub fn new(cols: usize) -> Self {
+        Self {
+            field: Fp256::new(&L25519.parse().expect("a decimal prime")),
+            cols,
+            rows: BTreeMap::new(),
+            inconsistent: false,
+        }
+    }
+
+    pub fn rank(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn inconsistent(&self) -> bool {
+        self.inconsistent
+    }
+
+    /// Add one row `a·x = b` (mod `ℓ`); returns whether the rank grew.
+    pub fn add_row(&mut self, coeffs: &[BigUint], rhs: &BigUint) -> bool {
+        let f = &self.field;
+        let mut row: Vec<Fp256Elem> = (0..self.cols)
+            .map(|i| {
+                coeffs
+                    .get(i)
+                    .map_or_else(|| f.zero(), |c| f.from_biguint(c))
+            })
+            .collect();
+        let mut b = f.from_biguint(rhs);
+        for (&col, (prow, pb)) in &self.rows {
+            if f.is_zero(row[col]) {
+                continue;
+            }
+            let factor = row[col];
+            for j in col..self.cols {
+                row[j] = f.sub(row[j], f.mul(factor, prow[j]));
+            }
+            b = f.sub(b, f.mul(factor, *pb));
+        }
+        let Some(pivot) = (0..self.cols).find(|&j| !f.is_zero(row[j])) else {
+            if !f.is_zero(b) {
+                self.inconsistent = true;
+            }
+            return false;
+        };
+        let inv = f.inv(row[pivot]).expect("pivot is nonzero");
+        for x in row.iter_mut().skip(pivot) {
+            *x = f.mul(*x, inv);
+        }
+        b = f.mul(b, inv);
+        self.rows.insert(pivot, (row, b));
+        true
+    }
+
+    /// The unique solution when the rank is full; `None` otherwise.
+    pub fn solve(&self) -> Option<Vec<BigUint>> {
+        if self.inconsistent || self.rows.len() < self.cols {
+            return None;
+        }
+        let f = &self.field;
+        let mut x = vec![f.zero(); self.cols];
+        // Back substitution from the highest pivot; rows are echelon.
+        for (&col, (row, b)) in self.rows.iter().rev() {
+            let mut acc = *b;
+            for j in col + 1..self.cols {
+                acc = f.sub(acc, f.mul(row[j], x[j]));
+            }
+            x[col] = f.mul(acc, f.inv(row[col]).expect("normalized pivot"));
+        }
+        Some(x.into_iter().map(|v| f.to_biguint(v)).collect())
+    }
+}
+
+/// One `ic bench`-shaped row for a bounded scan on the real 255-bit curve.
+///
+/// This is what lets the ordinary sweeper (`ic bench` / `ic sweep`) run a
+/// configuration at `--bits 255 --family curve25519`: the relation phase
+/// executes and charges its work, and the row is marked `exhausted` because
+/// no relation can be found at `T·N/ℓ ≈ 0`.  The scorer treats that as a
+/// failed measurement, which is the honest classification.
+pub fn scan_row(base: usize, max_trials: u64, seed: u64) -> Value {
+    let curve = Curve25519Wide::new();
+    let mut checks = GroupOps::default();
+    let order_checks = curve.order_checks(&mut checks);
+    let mut ops = GroupOps::default();
+    let started = std::time::Instant::now();
+
+    let g = curve.generator;
+    let mut base_index: HashMap<Fp256Elem, usize> = HashMap::new();
+    let mut p = g;
+    for i in 1..=base.max(1) {
+        if let Some((x, _)) = p {
+            base_index.entry(x).or_insert(i);
+        }
+        p = curve.add(&mut ops, p, g);
+    }
+    let planted = (seed.wrapping_mul(0x9E37_79B9) | 1) % 1_000_000 + 1;
+    let q = curve.mul_u64(&mut ops, g, planted);
+
+    let mut hits = 0u64;
+    let mut r = q;
+    let mut tried = 0u64;
+    while tried < max_trials {
+        if let Some((x, _)) = r {
+            if base_index.contains_key(&x) {
+                hits += 1;
+                break;
+            }
+        }
+        r = curve.add(&mut ops, r, g);
+        tried += 1;
+    }
+    let wall_seconds = started.elapsed().as_secs_f64();
+    let gae = (ops.adds + ops.doubles) as f64;
+    let r_f64 = curve.r.to_f64().expect("r fits f64");
+    let log2_r = r_f64.log2();
+    let n = base.max(1);
+    json!({
+        "instance": "curve25519-wide",
+        "log2_r": log2_r,
+        "r": r_f64,
+        "group_order": r_f64 * curve.cofactor as f64,
+        "label": "curve25519-255",
+        "factor_base": {"columns": n, "signed_points": n},
+        "decomposition": {
+            "targets_tried": tried.max(1),
+            "hit_rate": hits as f64 / tried.max(1) as f64,
+            "solver": Value::Null,
+        },
+        "linear_algebra": {},
+        "verify": {
+            "group_ops": {
+                "adds": ops.adds,
+                "doubles": ops.doubles,
+                "scalar_mults": ops.scalar_mults,
+            },
+            "native": {},
+            "wall_ns": (wall_seconds * 1e9) as u64,
+        },
+        "order_checks": order_checks,
+        "planted_log": planted,
+        "hits": hits,
+        "recovered": Value::Null,
+        "verified": false,
+        "total_gae": gae,
+        "s": gae / 2f64.powf(log2_r / 2.0),
+        "exhausted": true,
+        "wall_seconds": wall_seconds,
+    })
+}
+
 /// A bounded, counted scan on the real 255-bit curve.
 ///
 /// Builds `F = {[1]G, …, [N]G}`, plants `Q = [k]G` for a fixed `k`, and
@@ -365,6 +569,58 @@ mod tests {
         let mut ops = GroupOps::default();
         let g8 = curve.mul_u64(&mut ops, curve.generator, curve.cofactor);
         assert!(curve.mul_biguint(&mut ops, g8, &curve.r).is_none());
+    }
+
+    #[test]
+    fn wide_matrix_solves_a_full_rank_system_mod_ell() {
+        let n = 8usize;
+        let f = Fp256::new(&L25519.parse().unwrap());
+        let x: Vec<BigUint> = (0..n)
+            .map(|i| BigUint::from(1_234_567u64 + 98_765 * i as u64))
+            .collect();
+        let mut g = WideGauss::new(n);
+        for r in 0..n {
+            // Vandermonde rows: powers of the distinct bases 1, 2, …, n.
+            let base = f.from_u64((r + 1) as u64);
+            let coeffs: Vec<BigUint> = (0..n)
+                .map(|c| f.to_biguint(f.pow_u64(base, (c + 1) as u64)))
+                .collect();
+            let mut rhs = f.zero();
+            for c in 0..n {
+                rhs = f.add(
+                    rhs,
+                    f.mul(f.from_biguint(&coeffs[c]), f.from_biguint(&x[c])),
+                );
+            }
+            assert!(g.add_row(&coeffs, &f.to_biguint(rhs)));
+        }
+        assert_eq!(g.rank(), n);
+        assert_eq!(g.solve().expect("full rank"), x);
+    }
+
+    #[test]
+    fn wide_matrix_reports_an_inconsistent_row() {
+        let mut g = WideGauss::new(2);
+        assert!(g.add_row(
+            &[BigUint::from(1u32), BigUint::from(0u32)],
+            &BigUint::from(1u32)
+        ));
+        assert!(!g.add_row(
+            &[BigUint::from(1u32), BigUint::from(0u32)],
+            &BigUint::from(2u32)
+        ));
+        assert!(g.inconsistent());
+        assert_eq!(g.solve(), None);
+    }
+
+    #[test]
+    fn wide_context_carries_the_252_bit_order() {
+        let curve = Curve25519Wide::new();
+        let ctx = WideInstanceCtx::curve25519(&curve);
+        assert_eq!(ctx.r, curve.r);
+        assert_eq!(ctx.group_order, &curve.r * BigUint::from(8u32));
+        assert_eq!(ctx.cofactor, 8);
+        assert!((ctx.log2_r() - 252.0).abs() < 0.01);
     }
 
     #[test]
