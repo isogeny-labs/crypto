@@ -11,8 +11,9 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Chain-SAT degree-bound assertion](binary-semaev-chain-sat-degree-bound-assertion.md) | open | inherited m10 expectation disagrees with m15-supported allocation bound | confirm intended contract, repair with justified native boundary regression, then complete source-qualified validation |
 | [Release suite JV isogeny-walk budget](release-suite-jv-isogeny-walk-budget.md) | investigating | complete release-library validation | diagnose the unchanged case and complete focused/full checks without weakening assertions |
-| [Inherited chain-SAT delimiter blocks native validation](binary-semaev-chain-sat-merge-delimiter.md) | repair merged locally; validation pending | fresh PKM integrated native checks | preserve both merge histories, adopt reviewed repaired source and pass affected checks without waivers |
+| [Inherited chain-SAT delimiter blocks native validation](binary-semaev-chain-sat-merge-delimiter.md) | resolved (delimiter compilation only) | prior unclosed-delimiter compilation failure | repaired source passes scoped checks/library build; separate degree-bound assertion and JV cap stay open |
 | [Symmetric PKM complete cost and cold DLP qualification](symmetric-pkm-complete-cost.md) | open | G1–G6 complete-cost improvement decision | independent scalar replay/proof prerequisites added; checkpoint/artifact access, full accounting, qualified panels/external reference and ideal/curve/cost proof bridges remain |
 | [PQC cross-platform performance and leakage validation](pqc-cross-platform-validation.md) | open | ML-KEM/ML-DSA speed and side-channel claims across platforms | qualified PQC benchmark route, native target correctness, emitted-code audit and target-specific leakage evidence |
 | [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
@@ -152,5 +153,3 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
-
-| [Chain-SAT degree-bound assertion](binary-semaev-chain-sat-degree-bound-assertion.md) | Open | Inherited m10 expectation disagrees with m15-supported bound; focused failure101 retained. |
