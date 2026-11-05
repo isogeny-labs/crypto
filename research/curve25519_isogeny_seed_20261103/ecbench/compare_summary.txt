@@ -1,0 +1,39 @@
+== w=0
+ops (ok): pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4 = 0.8848 [0.570, 1.373] (linearised_t, df 5) over 6 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.8848, w=0.1: 0.6408, w=1: 0.6408): pkm-iso-t6-g4-s1093 < pkm-iso-t6-g4 at every weight; heavy tail in pkm-iso-t6-g4: top run is 26% of the arm's total S (max/median 1.6); more runs needed; wall: admitted ns/GAE pkm-iso-t6-g4-s1093/pkm-iso-t6-g4 0.7317 [0.664, 0.806], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 0.6474 [0.392, 1.070]; ns/GAE of pkm-iso-t6-g4, pkm-iso-t6-g4-s1093 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0 GAE per native operation
+measurement quality: 0 / 100; paired attempts 6, verified 6, admitted 0; levels {"L0": 6}; p95 foreign busy 0.00%, p95 run queue 0.10%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm pkm-iso-t6-g4: verified 6/6 (0 censored); max/median S 1.55, top run 26% of total (heavy tail; more runs needed); unpriced: legendre_symbols_uncharged=438, pkm_grid_fp_mults_uncharged=318080, pkm_system_fp_mults_uncharged=14750154, row_ops_uncharged=627, solver_F_p_multiply-adds_(elimination_only)_uncharged=36368005274, sqrt_solves_uncharged=180, target_guard_probes_uncharged=53265, velu_evaluations_uncharged=72
+arm pkm-iso-t6-g4-s1093: verified 6/6 (0 censored); max/median S 1.41, top run 22% of total; unpriced: legendre_symbols_uncharged=966, pkm_grid_fp_mults_uncharged=554368, pkm_system_fp_mults_uncharged=9452340, row_ops_uncharged=946, solver_F_p_multiply-adds_(elimination_only)_uncharged=23305859376, sqrt_solves_uncharged=588, target_guard_probes_uncharged=33569, velu_evaluations_uncharged=72
+| curve | log2 r | workloads | pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp20-tm1050-4295f05e | 17.00 | 6 | 0.8848 | [0.5703, 1.3727] | linearised_t |
+
+| workload | curve | log2 r | pkm-iso-t6-g4 mean S | pkm-iso-t6-g4-s1093 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+== w=0.1
+ops (ok): pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4 = 0.6408 [0.379, 1.084] (linearised_t, df 5) over 6 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.8848, w=0.1: 0.6408, w=1: 0.6408): pkm-iso-t6-g4-s1093 < pkm-iso-t6-g4 at every weight; heavy tail in pkm-iso-t6-g4: top run is 26% of the arm's total S (max/median 1.6); more runs needed; wall: admitted ns/GAE pkm-iso-t6-g4-s1093/pkm-iso-t6-g4 0.7317 [0.664, 0.806], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 0.6474 [0.392, 1.070]; ns/GAE of pkm-iso-t6-g4, pkm-iso-t6-g4-s1093 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 6, verified 6, admitted 0; levels {"L0": 6}; p95 foreign busy 0.00%, p95 run queue 0.10%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm pkm-iso-t6-g4: verified 6/6 (0 censored); max/median S 1.55, top run 26% of total (heavy tail; more runs needed); unpriced: legendre_symbols_uncharged=438, pkm_grid_fp_mults_uncharged=318080, pkm_system_fp_mults_uncharged=14750154, row_ops_uncharged=627, solver_F_p_multiply-adds_(elimination_only)_uncharged=36368005274, sqrt_solves_uncharged=180, target_guard_probes_uncharged=53265, velu_evaluations_uncharged=72
+arm pkm-iso-t6-g4-s1093: verified 6/6 (0 censored); max/median S 1.41, top run 22% of total; unpriced: legendre_symbols_uncharged=966, pkm_grid_fp_mults_uncharged=554368, pkm_system_fp_mults_uncharged=9452340, row_ops_uncharged=946, solver_F_p_multiply-adds_(elimination_only)_uncharged=23305859376, sqrt_solves_uncharged=588, target_guard_probes_uncharged=33569, velu_evaluations_uncharged=72
+| curve | log2 r | workloads | pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp20-tm1050-4295f05e | 17.00 | 6 | 0.6408 | [0.3788, 1.0843] | linearised_t |
+
+| workload | curve | log2 r | pkm-iso-t6-g4 mean S | pkm-iso-t6-g4-s1093 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+== w=1
+ops (ok): pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4 = 0.6408 [0.379, 1.084] (linearised_t, df 5) over 6 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.8848, w=0.1: 0.6408, w=1: 0.6408): pkm-iso-t6-g4-s1093 < pkm-iso-t6-g4 at every weight; heavy tail in pkm-iso-t6-g4: top run is 26% of the arm's total S (max/median 1.6); more runs needed; wall: admitted ns/GAE pkm-iso-t6-g4-s1093/pkm-iso-t6-g4 0.7317 [0.664, 0.806], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 0.6474 [0.392, 1.070]; ns/GAE of pkm-iso-t6-g4, pkm-iso-t6-g4-s1093 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 6, verified 6, admitted 0; levels {"L0": 6}; p95 foreign busy 0.00%, p95 run queue 0.10%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm pkm-iso-t6-g4: verified 6/6 (0 censored); max/median S 1.55, top run 26% of total (heavy tail; more runs needed); unpriced: legendre_symbols_uncharged=438, pkm_grid_fp_mults_uncharged=318080, pkm_system_fp_mults_uncharged=14750154, row_ops_uncharged=627, solver_F_p_multiply-adds_(elimination_only)_uncharged=36368005274, sqrt_solves_uncharged=180, target_guard_probes_uncharged=53265, velu_evaluations_uncharged=72
+arm pkm-iso-t6-g4-s1093: verified 6/6 (0 censored); max/median S 1.41, top run 22% of total; unpriced: legendre_symbols_uncharged=966, pkm_grid_fp_mults_uncharged=554368, pkm_system_fp_mults_uncharged=9452340, row_ops_uncharged=946, solver_F_p_multiply-adds_(elimination_only)_uncharged=23305859376, sqrt_solves_uncharged=588, target_guard_probes_uncharged=33569, velu_evaluations_uncharged=72
+| curve | log2 r | workloads | pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp20-tm1050-4295f05e | 17.00 | 6 | 0.6408 | [0.3788, 1.0843] | linearised_t |
+
+| workload | curve | log2 r | pkm-iso-t6-g4 mean S | pkm-iso-t6-g4-s1093 mean S | ratio |
+|---|---|---:|---:|---:|---:|

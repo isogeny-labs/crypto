@@ -33,6 +33,11 @@ enum Action {
         #[serde(default)]
         walk_files: Option<Vec<String>>,
     },
+    /// Import one part of a pack too large for the package, sent in the
+    /// event as base64 of the gzipped part (`ecdb pack` writes the parts;
+    /// deploy-aws.sh sends them): `ecbench`, or `generated` (Sage output,
+    /// ecdb/deploy/load-generated.sh).
+    ImportPack { name: String, data: String },
 }
 
 struct Admin {
@@ -85,44 +90,12 @@ async fn handle(admin: &Admin, payload: Value) -> Result<Value> {
             Ok(json!({ "applied": applied, "schema_version": crate::migrate::schema_version() }))
         }
         Action::BootstrapRoles => {
-            let mut done = Vec::new();
-            for (login, group, var) in [
-                ("ecdb_api", "ecdb_reader", "ECDB_API_PASSWORD"),
-                ("ecdb_api_writer", "ecdb_writer", "ECDB_WRITER_PASSWORD"),
-            ] {
+            let mut logins = Vec::new();
+            for (login, group, var) in crate::db::LOGINS {
                 let password = std::env::var(var).with_context(|| format!("{var} is not set"))?;
-                let exists: bool = client
-                    .query_one("SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = $1)", &[&login])
-                    .await?
-                    .get(0);
-                // format() quotes the name and the password; neither is interpolated by hand.
-                let verb = if exists { "ALTER" } else { "CREATE" };
-                let stmt: String = client
-                    .query_one(
-                        &format!("SELECT format('{verb} ROLE %I LOGIN PASSWORD %L', $1::text, $2::text)"),
-                        &[&login, &password],
-                    )
-                    .await?
-                    .get(0);
-                client.batch_execute(&stmt).await?;
-                let grant: String = client
-                    .query_one("SELECT format('GRANT %I TO %I', $1::text, $2::text)", &[&group, &login])
-                    .await?
-                    .get(0);
-                client.batch_execute(&grant).await?;
-                let member_of: Vec<String> = client
-                    .query(
-                        "SELECT g.rolname::text FROM pg_auth_members m JOIN pg_roles g ON g.oid = m.roleid
-                          JOIN pg_roles u ON u.oid = m.member WHERE u.rolname = $1 ORDER BY 1",
-                        &[&login],
-                    )
-                    .await?
-                    .iter()
-                    .map(|r| r.get(0))
-                    .collect();
-                done.push(json!({ "login": login, "created": !exists, "member_of": member_of }));
+                logins.push((*login, *group, password));
             }
-            Ok(json!({ "roles": done }))
+            Ok(json!({ "roles": crate::db::bootstrap_logins(&client, &logins).await? }))
         }
         Action::Import { what, walk_files } => {
             let ctx = Ctx {
@@ -134,6 +107,25 @@ async fn handle(admin: &Admin, payload: Value) -> Result<Value> {
             let started = std::time::Instant::now();
             let reports = import::run(&ctx, what, walk_files).await?;
             Ok(json!({ "seconds": started.elapsed().as_secs(), "reports": reports }))
+        }
+        Action::ImportPack { name, data } => {
+            if name != import::ecbench::PACK && name != import::generated::PACK {
+                return Err(anyhow!("unknown pack {name}"));
+            }
+            let gz = base64::Engine::decode(&base64::engine::general_purpose::STANDARD, data.trim())?;
+            let ctx = Ctx {
+                client: &client,
+                repo_root: admin.repo_root.clone(),
+                repository: admin.repository.clone(),
+                git_commit: admin.commit.clone(),
+            };
+            let started = std::time::Instant::now();
+            let report = if name == import::generated::PACK {
+                import::generated::import_part(&ctx, &gz).await?
+            } else {
+                import::ecbench::import_part(&ctx, &gz).await?
+            };
+            Ok(json!({ "seconds": started.elapsed().as_secs(), "reports": [report] }))
         }
     }
 }

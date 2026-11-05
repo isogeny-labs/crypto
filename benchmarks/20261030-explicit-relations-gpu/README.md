@@ -110,3 +110,35 @@ were estimated. [Seed101 graph](query-profile-v2-kernels-101.svg) and
 [seed202 graph](query-profile-v2-kernels-202.svg), plus corresponding PNGs,
 are byte/hash-bound presentation copies. Raw supplement was pushed as
 `5d4713f59fa3` before rendering; both PDF pages were visually inspected.
+
+The [uninstrumented full-cache comparison](../../research/explicit_relations_fullcache_20261101/RESULTS.md)
+retains33 verified recoveries on one RTX4090: all30 small executions and the
+complete first large matched set. Median paired cold time was16.75%/17.43%
+lower on the small inputs and10.10% lower on the completed large input; its
+baseline controls differed by0.012%. These are descriptive L0 results from
+completed sets. External pod deletion interrupted the second large input;
+one interrupted attempt and two unstarted cells remain explicit. The original
+whole-panel analysis refuses the incomplete coverage; the separate retained-set
+analysis is labelled post-interruption and unblinded. The [two-page PDF](fullcache-v2-report.pdf),
+[SVG](fullcache-v2-scaling.svg) and [PNG](fullcache-v2-scaling.png) preserve that
+scope. Raw evidence was pushed as2ef5d57e0e01 before rendering, and both PDF
+pages were inspected. The second large input's full matched comparison remains
+open; no replacement GPU is running while its external deletion is clarified.
+
+### Full-cache query specialization: second large comparison completed
+
+The version3 continuation completed the original 63-bit seed202 matched set on
+one fresh RTX 4090. Cold times in execution order were 1183.823571s (baseline x),
+1053.896752s (candidate v), and 1185.763838s (baseline b). Candidate/mean-baseline
+ratio 0.8895192034 corresponds to 11.05% lower cold time; A/A spread 0.164%.
+All three recoveries used 344 relations and 13,733 attempts, have identical certificates,
+and passed fresh CPU replay plus corrupted-scalar rejection. One fixed input,
+one round, L0 descriptive clocks; no cross-host timing pooling.
+
+[Report](fullcache-v3-report.pdf), [plot](fullcache-v3-scaling.svg),
+[PNG](fullcache-v3-scaling.png), and
+[raw/export/protocol](../../research/explicit_relations_fullcache_20261101/RESULTS.md).
+The frozen analysis replay and export/schema/file/coverage checks pass. Prior
+interruption and payment-refusal records are retained. The worker was deleted
+and absence verified; request through cleanup took 3780.073 seconds, below the
+9000-second worker / 9300-second controller cap. No GPU remains running.

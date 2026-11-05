@@ -1,0 +1,1 @@
+Restore .lean.txt to .lean, resolve exact dependency paths in check.sh, compile EdgeDispatch, DispatchConsequences, DispatchControls and DispatchReadback sequentially. ExpectedFailure must fail. Run audit-readback.py for retained output; fresh independent review requires new pinned receipts. Render with render-report.py.

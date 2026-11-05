@@ -1,0 +1,46 @@
+import WeightedGuards
+import PointControls
+set_option autoImplicit false
+namespace WeightedControls
+open WeightedCZero CZeroInterpolation Polynomial
+noncomputable def left : D2 ℚ := weight 1 2 4 5 2 3
+noncomputable def right : D2 ℚ := weight 0 1 1 2 5 7
+theorem literal_weights : left.q=4 ∧ left.r=32 ∧ left.s=96 ∧ left.t=480 ∧
+ right.q=0 ∧ right.r=625 ∧ right.s=875 ∧ right.t=43750 := by
+ norm_num [left,right,weight]
+theorem original_input_curve_application :
+ let o:=payload left right
+ o.z≠0 ∧ o.w≠0 ∧ (o.y/(o.z^5*o.w))^2=CZeroPointControls.f.eval (o.x/o.z^2) := by
+ have hm : CZeroPointControls.f.Monic := by
+  change CZeroPointControls.f.coeff CZeroPointControls.f.natDegree=1
+  rw [CZeroPointControls.fixture_degree]; exact CZeroPointControls.fixture_top.1
+ exact weighted_on_curve CZeroPointControls.f 1 2 4 5 0 1 1 2 2 3 5 7
+  (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+  CZeroPointControls.fixture_degree hm CZeroPointControls.fixture_top.2
+  (by norm_num [bnum]) (by norm_num [cnum])
+  CZeroPointControls.input_residual_one CZeroPointControls.input_residual_two
+
+theorem decoded_nonunit :
+ let o:=payload left right
+ o.x/o.z^2=10 ∧ o.y/(o.z^5*o.w)=291 := by
+ have h:=decoded_payload (1:ℚ) 2 4 5 0 1 1 2 2 3 5 7
+  (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num [bnum])
+ norm_num [anum,bnum,ordinate,CZeroInterpolation.support] at h
+ exact h.2.2
+theorem decode_reconstruct :
+ weight (left.q/left.z^2) (left.r/left.z^4) (left.s/(left.z^3*left.w))
+ (left.t/(left.z^5*left.w)) left.z left.w=left :=
+ reconstruct left (by norm_num [left,weight]) (by norm_num [left,weight])
+theorem negative_weights :
+ let o:=payload (weight (1:ℚ) 2 4 5 (-2) 3) (weight 0 1 1 2 5 (-7))
+ o.x/o.z^2=10 ∧ o.y/(o.z^5*o.w)=291 := by
+ have h:=decoded_payload (1:ℚ) 2 4 5 0 1 1 2 (-2) 3 5 (-7)
+  (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num [bnum])
+ norm_num [anum,bnum,ordinate,CZeroInterpolation.support] at h
+ exact h.2.2
+theorem zero_weight_boundary :
+ (payload (weight (1:ℚ) 2 4 5 0 3) right).z=0 := by
+ simp [payload,weight,cross]
+theorem fourth_power_not_decode :
+ (2:ℚ)^4≠2^5 := by norm_num
+end WeightedControls
