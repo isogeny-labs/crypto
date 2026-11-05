@@ -1,0 +1,172 @@
+{
+  "aa_in_session_identical_relation_counts": {
+    "identical": 0,
+    "note": "ecbench derives one algorithm seed per (workload, round) shared by every arm, so the in-session A/A arm reproduces the counts exactly (determinism check) and differs only in wall; the yield A/A is the round-parity split below",
+    "pairs": 0
+  },
+  "aa_online_wall_log_ratio": null,
+  "bootstrap": 2000,
+  "class": "c24B",
+  "class_facts": {
+    "D": -414651,
+    "h": 300,
+    "log2_p": 23.721756009633847,
+    "n": 13826983,
+    "p": 13834393
+  },
+  "isolation_levels_of_rows": {
+    "L1": 24
+  },
+  "m": 2,
+  "metrics": {
+    "online_wall_ns_per_attempt": {
+      "aa_round_halves": {
+        "curves": 6,
+        "max_ratio": 1.531227951329223,
+        "median_abs_log_ratio": 0.12361440165578552,
+        "q95_abs_log_ratio": 0.4260699960752956,
+        "sd_log_ratio": 0.2064887370426663
+      },
+      "cells_per_curve": 2.0,
+      "curve_mean_cv": 0.12911523642455938,
+      "curves": 6,
+      "grand_mean": 400.3014745129437,
+      "icc_bootstrap_median": 0.5651585474568337,
+      "icc_bootstrap_upper95": 0.9828813424579104,
+      "icc_clipped": 0.13086072288861775,
+      "icc_perm_null_q95": 0.7001950605238992,
+      "icc_perm_p": 0.3523238380809595,
+      "icc_raw": 0.13086072288861775,
+      "max_abs_z": 1.6250309600719672,
+      "max_abs_z_perm_null_q95": 4.967423419615382,
+      "max_abs_z_perm_p": 0.3543228385807096,
+      "max_over_min": 1.3443107422510123,
+      "max_over_min_perm_null_q95": 1.506214641014725,
+      "max_over_min_perm_p": 0.38580709645177413,
+      "sigma2_between": 618.2435008586995,
+      "sigma2_within": 4106.195484434987
+    },
+    "rel_gae_per_attempt": {
+      "aa_round_halves": {
+        "curves": 6,
+        "max_ratio": 1.024693520140105,
+        "median_abs_log_ratio": 0.0034237814837163386,
+        "q95_abs_log_ratio": 0.024393563138180138,
+        "sd_log_ratio": 0.012910159022007534
+      },
+      "cells_per_curve": 2.0,
+      "curve_mean_cv": 0.010258635351309164,
+      "curves": 6,
+      "grand_mean": 1.1576010808646917,
+      "icc_bootstrap_median": 0.7197174032164472,
+      "icc_bootstrap_upper95": 0.9994286856914328,
+      "icc_clipped": 0.4305271098745983,
+      "icc_perm_null_q95": 0.6429125519259996,
+      "icc_perm_p": 0.1539230384807596,
+      "icc_raw": 0.4305271098745983,
+      "max_abs_z": 2.5422954113310374,
+      "max_abs_z_perm_null_q95": 3.066568715057452,
+      "max_abs_z_perm_p": 0.12143928035982009,
+      "max_over_min": 1.0254542262792945,
+      "max_over_min_perm_null_q95": 1.0284385148775566,
+      "max_over_min_perm_p": 0.2748625687156422,
+      "sigma2_between": 0.00008488509515912668,
+      "sigma2_within": 0.00011228041013007933
+    },
+    "yield": {
+      "aa_round_halves": {
+        "curves": 6,
+        "max_ratio": 1.1705882352941177,
+        "median_abs_log_ratio": 0.12825433552367896,
+        "q95_abs_log_ratio": 0.15750638767423072,
+        "sd_log_ratio": 0.10717074755601436
+      },
+      "cells_per_curve": 2.0,
+      "curve_mean_cv": 0.05446458532367739,
+      "curves": 6,
+      "grand_mean": 0.020307912997064314,
+      "icc_bootstrap_median": 0.4234372338613524,
+      "icc_bootstrap_upper95": 0.9528610711012178,
+      "icc_clipped": 0.03029663995501133,
+      "icc_perm_null_q95": 0.5426522817127922,
+      "icc_perm_p": 0.5052473763118441,
+      "icc_raw": 0.03029663995501133,
+      "max_abs_z": 1.881617836655078,
+      "max_abs_z_perm_null_q95": 3.2375354023756158,
+      "max_abs_z_perm_p": 0.42328835582208896,
+      "max_over_min": 1.168021680216802,
+      "max_over_min_perm_null_q95": 1.213888888888889,
+      "max_over_min_perm_p": 0.44877561219390305,
+      "positive_control": {
+        "detect_icc_gt_null_q95": 0.62,
+        "detect_max_abs_z_gt_null_q95": 0.62,
+        "detect_max_over_min_gt_null_q95": 0.795,
+        "note": "null thresholds are the 95th percentile of the cell-permutation null of the unplanted data",
+        "planted_curve_trials": 200,
+        "planted_effect_pc_over_main_median": 1.2019704433497536
+      },
+      "sigma2_between": 7.194840473392709e-8,
+      "sigma2_within": 2.3028497524467407e-6
+    }
+  },
+  "outcome_status_of_rows": {
+    "exhausted": 24
+  },
+  "per_curve": [
+    {
+      "attempts": 19984.0,
+      "curve": 0,
+      "j": 19712,
+      "pooled_yield": 0.020316253002401922,
+      "relations": 406.0,
+      "setup_gae_mean": 277140.0
+    },
+    {
+      "attempts": 19984.0,
+      "curve": 1,
+      "j": 26925,
+      "pooled_yield": 0.018464771817453964,
+      "relations": 369.0,
+      "setup_gae_mean": 277140.0
+    },
+    {
+      "attempts": 19984.0,
+      "curve": 2,
+      "j": 72746,
+      "pooled_yield": 0.020666533226581265,
+      "relations": 413.0,
+      "setup_gae_mean": 277140.0
+    },
+    {
+      "attempts": 19984.0,
+      "curve": 3,
+      "j": 155716,
+      "pooled_yield": 0.021567253803042433,
+      "relations": 431.0,
+      "setup_gae_mean": 277140.0
+    },
+    {
+      "attempts": 19984.0,
+      "curve": 4,
+      "j": 237171,
+      "pooled_yield": 0.019715772618094474,
+      "relations": 394.0,
+      "setup_gae_mean": 277140.0
+    },
+    {
+      "attempts": 19984.0,
+      "curve": 5,
+      "j": 307391,
+      "pooled_yield": 0.02111689351481185,
+      "relations": 422.0,
+      "setup_gae_mean": 277140.0
+    }
+  ],
+  "permutations": 2000,
+  "plants": 200,
+  "schema": "p2.analysis/v1",
+  "seed": 20261102,
+  "sessions": [
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/smoke/run_class_test/session"
+  ]
+}

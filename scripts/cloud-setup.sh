@@ -12,8 +12,9 @@
 # docs/cloud-setup.md explains each step and where to set each credential.
 #
 # What it does, in order, each step warning instead of failing:
-#   1. disk     sparse-checkout the attached crypto checkout (harness profile)
-#               so the research archives stay on the server
+#   1. disk     apply the harness sparse profile to the crypto and
+#               crypto-autoresearcher checkouts: their research and run
+#               archives stay in git but off disk (about 11 GB), so SageMath fits
 #   2. tools    scripts/setup-workstation.sh: apt toolchain, Rust, Go, Node,
 #      + repos  uv, Conductor, cairn, codex/opencode/gh, aws, kubectl, the lean
 #               SageMath build (sagelib + maxima) when the disk allows, and the
@@ -49,7 +50,8 @@
 #   CLONE_REPOS       siblings to clone when missing
 #                     (crypto cryptanalysis crypto-autoresearcher cryptanalysis-rl)
 #   CLONE_BLOB_LIMIT  partial-clone blob limit                  (1m)
-#   CRYPTO_SPARSE_PROFILE  harness | minimal | full             (harness)
+#   CRYPTO_SPARSE_PROFILE     crypto: harness | minimal | full  (harness)
+#   CRYPTO_AR_SPARSE_PROFILE  crypto-autoresearcher: harness | full  (harness)
 #   SETUP_SKIP        extra setup-workstation components to skip, comma-separated
 #   WITH_SAGE=0       skip SageMath;  SAGE_MIN_FREE_GB (4) gates the lean build
 #   WITH_LEAN=1       also install elan for cryptanalysis's Lean proofs
@@ -90,22 +92,37 @@ free_mib() { df -Pm "$1" 2>/dev/null | awk 'NR == 2 {print $4}'; }
 log "cloud setup: runtime $CLOUD_RUNTIME, workspace $WORKSPACE, $(free_mib "$WORKSPACE") MiB free"
 
 # ------------------------------------------------------------------ 1. disk ---
-profile="${CRYPTO_SPARSE_PROFILE:-harness}"
-crypto="$WORKSPACE/crypto"
-if [ "$profile" != full ] && [ -x "$crypto/scripts/sparse-checkout.sh" ] &&
-   [ "$(git -C "$crypto" config --bool core.sparseCheckout 2>/dev/null)" != true ] &&
-   [ "$DRY_RUN" = 1 ]; then
-  log "crypto: would apply the $profile sparse profile"
-elif [ "$profile" != full ] && [ -x "$crypto/scripts/sparse-checkout.sh" ] &&
-   [ "$(git -C "$crypto" config --bool core.sparseCheckout 2>/dev/null)" != true ]; then
-  log "crypto: sparse checkout ($profile profile)"
-  before="$(free_mib "$WORKSPACE")"
-  if (cd "$crypto" && scripts/sparse-checkout.sh apply --profile "$profile" >/dev/null); then
-    log "crypto: freed $(( $(free_mib "$WORKSPACE") - before )) MiB (scripts/sparse-checkout.sh add --path P/ brings a path back)"
-  else
-    warn "crypto: sparse checkout not applied; the checkout stays full"
+# Each repository's own sparse profile, applied once on a full checkout. The
+# excluded paths stay in git (skip-worktree) and come back with the tool's
+# `add`. Together the two harness profiles free about 11 GB, which is what
+# leaves room for SageMath next to four attached checkouts.
+sparse() {
+  local name="$1" profile="$2" tool="$3" dir="$WORKSPACE/$1" before
+  shift 3
+  [ "$profile" = full ] && return 0
+  [ -f "$dir/$tool" ] || return 0
+  if [ "$(git -C "$dir" config --bool core.sparseCheckout 2>/dev/null)" = true ]; then
+    log "$name: sparse checkout already applied"; return 0
   fi
-fi
+  if [ "$DRY_RUN" = 1 ]; then log "$name: would apply the $profile sparse profile"; return 0; fi
+  log "$name: sparse checkout ($profile profile)"
+  before="$(free_mib "$WORKSPACE")"
+  if (cd "$dir" && "$@" >/dev/null); then
+    log "$name: freed $(( $(free_mib "$WORKSPACE") - before )) MiB ($tool add --path P/ brings a path back)"
+  else
+    warn "$name: sparse profile $profile not applied; the checkout stays full"
+  fi
+}
+crypto_profile="${CRYPTO_SPARSE_PROFILE:-harness}"
+ar_profile="${CRYPTO_AR_SPARSE_PROFILE:-harness}"
+sparse crypto "$crypto_profile" scripts/sparse-checkout.sh \
+  bash scripts/sparse-checkout.sh apply --profile "$crypto_profile"
+# crypto-autoresearcher's ledger sweeps (validate_ledger, goal_portfolio_health,
+# portfolio_kpis) refuse a sparse checkout; coordination sessions set
+# CRYPTO_AR_SPARSE_PROFILE=full on the setup line, or run
+# `python3 tools/sparse_checkout.py disable` there.
+sparse crypto-autoresearcher "$ar_profile" tools/sparse_checkout.py \
+  python3 tools/sparse_checkout.py apply "$ar_profile"
 
 # ------------------------------------------------------- 2. tools + repos ---
 # The Conductor control plane and the cairn node are processes; the

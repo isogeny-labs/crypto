@@ -1,0 +1,19 @@
+{
+  "schema": "software.runtime-qualification-supervisor/v2",
+  "passed_cases": [],
+  "failure": "FileNotFoundError: [Errno 2] No usable temporary directory found in ['/tmp', '/var/tmp', '/usr/tmp', '/']",
+  "cleanup_complete": true,
+  "elapsed_seconds": 0.13587612597621046,
+  "cap_seconds": 300,
+  "image_id": "sha256:3a2bb98af4743c888d969c9df00f0769a64e3704e57e97e937769d384e3c8409",
+  "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+  "private_endpoint_sha256": "1e675cf5adbc55346d5c5f65d15d4109f46f26e85f4c4801782687d6194114f3",
+  "host_preexec_ancestry": [],
+  "preexec_pids_observations": [],
+  "effective_pids_observed_before_each_tested_exec": false,
+  "effective_before_container_start_proved": false,
+  "qualification_complete": false,
+  "status": "failed",
+  "scientific_execution": false,
+  "note": "Held gate release requires host PID/cgroup ancestry within owned service. Effective pids.max is observed after container startup and before tested exec by a no-fork PID1 gate; no earlier or continuous-enforcement claim."
+}

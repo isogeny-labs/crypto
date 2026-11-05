@@ -13,6 +13,7 @@
 #[macro_use]
 mod serialization;
 
+pub mod admission;
 pub mod arithmetic;
 pub mod binary;
 pub mod canonical;
@@ -28,6 +29,7 @@ pub mod primality;
 pub mod reduction;
 pub mod ring;
 pub mod structured;
+pub mod structured_runner;
 pub mod weighted;
 pub mod width;
 

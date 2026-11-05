@@ -59,11 +59,11 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
-    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, rho_walk_with_policy,
-    signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy, BinaryGroup, BinaryInstance,
-    Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
-    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult,
-    RhoResult, RhoWalk, WalkPolicy,
+    ic_residual_batch_with, price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with,
+    rho_walk_with_policy, signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
+    NegationClasses, PhaseCost, PointClasses, PreprocessingRho, PrimeInstance, PrimePoint,
+    QuarticClasses, RhoBatchResult, RhoResult, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -73,7 +73,7 @@ use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
     CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KSumOracle,
     KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
-    PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
+    PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle, WSumOracle, WWalkOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -207,12 +207,12 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), prime-interval:t=T[,lo=L] (every point with x in [L, L + 2^T), the whole scan charged; pkm-semaev reads bits=T,lo=L from it), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
         },
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae: a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -302,6 +302,10 @@ const POOLED_PARAMS: &[ParamDecl] = &[
 /// public-target law of [`Instance::hash_to_subgroup`] at indices
 /// `POOLED_COMPANION_INDEX + j`, far from any workload's own index.
 const POOLED_COMPANION_INDEX: u64 = 1 << 40;
+
+/// Index of `ic.residual_batch`'s base point `P0` under the same public
+/// law: one point, hashed to `⟨G⟩`, below the companions' range.
+const RESIDUAL_BATCH_BASE_INDEX: u64 = (1 << 40) - 1;
 
 // Keep the defaults of the frozen `ic.pipeline_counted` sessions. The
 // existing `ic.pipeline` declaration below retains main's newer options.
@@ -559,6 +563,16 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "rho",
             summary: "Kuhn–Struik batch: the record's target and L − 1 public companions (hashed to ⟨G⟩, logs unknown to anyone) solved in sequence on {P, −P} (A = 2) with one shared distinguished-point table and jumps in G only; S is the whole batch's operations over √r, expected ≈ Σ_{i<L} C(2i,i)4^{−i}·√(π/4) → √L",
             entry: "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
+            applies: Applies::PrimeOnly,
+            params: POOLED_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.residual_batch",
+            // A rho-style batch solve (one online phase, the rho walker), so
+            // the rho family's online window and pricing describe it.
+            family: "rho",
+            summary: "the residual collector's structure in the Kuhn–Struik batch of rho.multitarget_pooled: the same targets, walker, table and charging, plus one base point P0 of unknown logarithm in every relation (an index-calculus column, B = 1); the first target needs two independent equations (d_1 and log P0), later ones one collision; log P0 and every d_i checked; S is the whole batch's operations over √r",
+            entry: "ic_boundary::ic_residual_batch_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::PrimeOnly,
             params: POOLED_PARAMS,
         },
@@ -1709,9 +1723,41 @@ pub struct SolverStats {
     pub sat_learnt_clauses: Option<u64>,
     /// Every solver-specific counter, verbatim.
     pub extra: BTreeMap<String, u64>,
+    /// Advisory forecast of the cell's degree of regularity from the
+    /// run's solver calls (`dreg_forecast/v1`), with the relation-phase
+    /// projection priced against the rho floor at the curve's automorphism
+    /// fold.  Informational like the rest of the block: not priced into
+    /// `S`, outside the replay comparison, never a stopping rule.  `None`
+    /// when the solver reports no degree cap; `forecast_unavailable` says
+    /// why.  Absent on records written before the field existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_forecast: Option<crate::cryptanalysis::dreg_forecast::Forecast>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forecast_unavailable: Option<String>,
 }
 
 impl SolverStats {
+    /// Attach the run's degree-of-regularity forecast, pricing its hope
+    /// band against the generic floor `√(π r / 2A)` of this curve.
+    pub fn with_forecast(
+        mut self,
+        forecaster: Option<&crate::cryptanalysis::dreg_forecast::Forecaster>,
+        unavailable: Option<&str>,
+        r: u64,
+        automorphisms: u32,
+    ) -> Self {
+        self.degree_of_regularity_forecast = forecaster.map(|f| {
+            let mut f = f.clone();
+            f.set_rho_floor_group_additions(crate::cryptanalysis::ic_boundary::generic_floor_ops(
+                r as f64,
+                f64::from(automorphisms.max(1)),
+            ));
+            f.forecast()
+        });
+        self.forecast_unavailable = unavailable.map(str::to_owned);
+        self
+    }
+
     /// Build the block from the framework's run report.
     pub fn from_report(
         solver: &crate::cryptanalysis::ic_framework::SolverReport,
@@ -1752,6 +1798,8 @@ impl SolverStats {
             sat_restarts: if sat { get(&["restarts"]) } else { None },
             sat_learnt_clauses: if sat { get(&["learnt_clauses"]) } else { None },
             extra: x.clone(),
+            degree_of_regularity_forecast: None,
+            forecast_unavailable: None,
         }
     }
 }
@@ -2273,6 +2321,59 @@ fn solve_pooled(
     Ok(rep)
 }
 
+/// `ic.residual_batch` on a prime curve: the companions of
+/// [`solve_pooled`] (same law, same indices, so the two methods solve the
+/// same batch), the base point `P0` hashed by the same law at
+/// [`RESIDUAL_BATCH_BASE_INDEX`], and one [`ic_residual_batch_with`] run.
+fn solve_residual_batch(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+    i: &PrimeInstance,
+    target: PrimePoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let batch = param_u64(m, "batch")?;
+    if !(1..=65_536).contains(&batch) {
+        return Err(format!("`batch` must be in 1..=65536, not {batch}"));
+    }
+    let cap = rho_cap(i.r, param_u64(m, "cap_multiple")? as f64);
+    let mut targets = Vec::with_capacity(batch as usize);
+    let mut companions = Vec::with_capacity(batch as usize - 1);
+    for j in 0..batch - 1 {
+        let (xy, _) = inst
+            .hash_to_subgroup(curve, seed, POOLED_COMPANION_INDEX + j)
+            .ok_or("no public companion target on this curve")?;
+        targets.push(PrimePoint::affine(parse_hex(&xy[0])?, parse_hex(&xy[1])?));
+        companions.push(xy);
+    }
+    targets.push(target);
+    let (base_xy, _) = inst
+        .hash_to_subgroup(curve, seed, RESIDUAL_BATCH_BASE_INDEX)
+        .ok_or("no public base point on this curve")?;
+    let base = PrimePoint::affine(parse_hex(&base_xy[0])?, parse_hex(&base_xy[1])?);
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let res = ic_residual_batch_with(
+        &i.curve,
+        &NegationClasses { r: i.r },
+        i.generator_point(),
+        base,
+        &targets,
+        i.r,
+        seed,
+        cap,
+        RhoWalk::negation(),
+    );
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let f = field_ops_of(&i.curve, &[res.group_ops]);
+    let mut rep = pooled_report(res, wall, f);
+    rep.detail["companions"] = json!(companions);
+    rep.detail["base_point"] = json!(base_xy);
+    Ok(rep)
+}
+
 /// Run the generic and rho methods on any counted group.
 fn solve_generic<G: CountedGroup>(
     m: &ResolvedMethod,
@@ -2471,7 +2572,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         .unwrap_or(m.id.as_str());
     three_leads_applicable(m, inst, curve)?;
     hyper_ic_variant_guard(m, inst, curve)?;
-    if id == "rho.multitarget_pooled" {
+    if id == "rho.multitarget_pooled" || id == "ic.residual_batch" {
         let batch = param_u64(m, "batch")?;
         if !(1..=65_536).contains(&batch) {
             return Err(format!("`batch` must be in 1..=65536, not {batch}"));
@@ -2754,7 +2855,17 @@ pub fn solve_measured(
         solve_wide(m, wi, tx, ty, seed)?
     } else if let Instance::F2m4(i) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
-        if u64::try_from(i.r).is_err() {
+        if m.id == NEG_STRONG {
+            // Two-word orders and 4m-bit packed points (m ≥ 16) included:
+            // the target travels unpacked from its full u128 coordinates.
+            let f = &i.curve.f;
+            let target = PtB {
+                x: f.unpack(tx),
+                y: f.unpack(ty),
+                inf: false,
+            };
+            solve_neg_strong(m, i, target, seed)?
+        } else if u64::try_from(i.r).is_err() {
             // `m ≥ 16` with a small cofactor: the subgroup order needs two
             // words; the u128 implementations (`ic_wide`, `rho_wide`).
             solve_f2m4_wide(m, i, curve, tx, ty, seed)?
@@ -2872,6 +2983,9 @@ fn solve_inner(
     match (inst, d.family) {
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
+        }
+        (Instance::Prime(i), _) if m.id == "ic.residual_batch" => {
+            solve_residual_batch(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) if m.id == super::aps::ID => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
@@ -5243,11 +5357,14 @@ fn ic_report(
     counters.insert("matrix_rank".into(), rep.linear_algebra.rank);
     counters.insert("matrix_dependent".into(), rep.linear_algebra.dependent);
     counters.insert("matrix_work".into(), rep.linear_algebra.work);
-    let solver = rep
-        .decomposition
-        .solver
-        .as_ref()
-        .map(|sr| SolverStats::from_report(sr, rep.decomposition.system.as_ref()));
+    let solver = rep.decomposition.solver.as_ref().map(|sr| {
+        SolverStats::from_report(sr, rep.decomposition.system.as_ref()).with_forecast(
+            sr.forecaster.as_ref(),
+            sr.forecast_unavailable.as_deref(),
+            rep.r,
+            automorphisms,
+        )
+    });
     let detail = json!({
         "label": rep.label,
         "decomposition": {
@@ -5650,7 +5767,14 @@ fn solve_tensor_contraction(
 
 fn pipeline_spec(m: &ResolvedMethod, seed: u64) -> Result<(PipelineSpec, String, String), String> {
     let (fb_name, fb_params) = Params::parse_spec(&m.params["factor_base"])?;
-    let (or_name, or_params) = Params::parse_spec(&m.params["oracle"])?;
+    let (or_name, mut or_params) = Params::parse_spec(&m.params["oracle"])?;
+    // `seed=run` on an oracle that draws a random table (wwalk) ties the
+    // table to the run's own seed, so a holdout resamples the table as
+    // well as the probes. Explicit numeric seeds, and arms without one,
+    // keep their fixed table and replay unchanged.
+    if or_params.get("seed") == Some("run") {
+        or_params.set("seed", seed.to_string());
+    }
     let solver = m.params["solver"].clone();
     let (solver_name, solver_params) = if solver.is_empty() {
         (None, Params::default())
@@ -5690,6 +5814,9 @@ fn prime_base_for<'a>(
         "cm-multiplier" => Box::new(CmMultiplierBase { instance: inst }),
         "prime-kummer" => Box::new(PrimeKummerBase { instance: inst }),
         "prime-isogeny" => Box::new(PrimeIsogenyBase { instance: inst }),
+        "prime-interval" => Box::new(
+            crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase { instance: inst },
+        ),
         "cm-scalar-orbit" => Box::new(CmOrbitBase { instance: inst }),
         "known-log" => Box::new(crate::cryptanalysis::ic_framework::plugins::KnownLogBase),
         other => match prime_plugins().and_then(|p| (p.base)(other, inst)) {
@@ -5734,6 +5861,8 @@ fn solve_ic_prime(
     let mut subtract = SubtractOracle;
     let mut mitm = MitmOracle::new(ms);
     let mut ksum = KSumOracle::new(ms);
+    let mut wsum = WSumOracle::<PrimePoint>::new();
+    let mut wwalk = WWalkOracle::<PrimePoint>::new();
     let mut prime_batch = PrimeBatchMitmOracle::new();
     let mut prime_blocked = PrimeBatchMitmOracle::blocked();
     let mut mitm_fiber = FiberMitmOracle::new(ms);
@@ -5741,24 +5870,14 @@ fn solve_ic_prime(
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
-    // `pkm-semaev` writes its system on the base's own tower, so it reads
-    // the tower from the `prime-kummer` spec and runs on no other base.
+    // `pkm-semaev` writes its system on the base's own tower; the shared
+    // constructor rebuilds it from the base's spec (`ic bench` uses the same).
     let mut pkm = match or_name.as_str() {
-        "pkm-semaev" => {
-            if fb_name != "prime-kummer" {
-                return Err(format!(
-                    "oracle `pkm-semaev` needs the prime-kummer base, whose tower it solves on, not `{fb_name}`"
-                ));
-            }
-            let t = spec.factor_base_params.u64("t")? as u32;
-            let g = spec.factor_base_params.u64_or("g", 1)?;
-            let budget = (spec.solver_budget_seconds > 0)
-                .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
-            Some(
-                crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::new(ms, t, g)
-                    .with_budget(budget),
-            )
-        }
+        "pkm-semaev" => Some(
+            crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::from_spec(
+                ms, &spec, inst,
+            )?,
+        ),
         _ => None,
     };
     let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {
@@ -5766,6 +5885,8 @@ fn solve_ic_prime(
         "subtract" => &mut subtract,
         "mitm" => &mut mitm,
         "ksum" => &mut ksum,
+        "wsum" => &mut wsum,
+        "wwalk" => &mut wwalk,
         "mitm-prime-batch" => &mut prime_batch,
         "mitm-prime-blocked" => &mut prime_blocked,
         "mitm-fiber" => &mut mitm_fiber,
@@ -5905,7 +6026,7 @@ fn neg_strong_refusal(curve: &CurveFacts) -> String {
 
 /// `lanes`, `dp_bits` and `step_cap_factor` of a `rho.negation_strong`
 /// method, `dp_bits = auto` resolved on a subgroup of order `r`.
-fn neg_strong_params(m: &ResolvedMethod, r: u64) -> Result<NegStrongParams, String> {
+fn neg_strong_params(m: &ResolvedMethod, r: u128) -> Result<NegStrongParams, String> {
     use super::negation_strong::{auto_dp_bits, ideal_steps};
     let lanes = param_u64(m, "lanes")?;
     if !(1..=4096).contains(&lanes) {
@@ -5938,12 +6059,9 @@ fn solve_neg_strong(
     seed: u64,
 ) -> Result<SolveReport, String> {
     use super::negation_strong::{NegStrongRho, CANON_FQ_MULS, JUMPS};
-    if inst.curve.f.f.m > 16 {
-        return Err("rho.negation_strong requires a one-word packed point key".into());
-    }
-    let r = u64::try_from(inst.r)
-        .map_err(|_| "rho.negation_strong supports subgroup orders through u64".to_string())?;
-    let params = neg_strong_params(m, r)?;
+    // Any m the f2m4_torsion workload builds (4..=20): the exponents and
+    // the table key are two words wide where the curve needs them.
+    let params = neg_strong_params(m, inst.r)?;
     if !inst.curve.on_curve(&target) {
         return Err("the target is not on the curve".into());
     }
@@ -6026,7 +6144,7 @@ fn solve_neg_strong(
         },
     });
     Ok(SolveReport {
-        recovered: o.scalar.map(u128::from),
+        recovered: o.scalar,
         exhausted: o.scalar.is_none(),
         phases,
         total_gae,
@@ -7345,6 +7463,8 @@ pub fn dump_factor_base(
             let multiplier = CmMultiplierBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let interval =
+                crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase { instance: i };
             let plugin_base = prime_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "explicit-x" => &explicit,
@@ -7354,6 +7474,7 @@ pub fn dump_factor_base(
                 "cm-multiplier" => &multiplier,
                 "prime-kummer" => &kummer,
                 "prime-isogeny" => &isogeny,
+                "prime-interval" => &interval,
                 other => match plugin_base.as_deref() {
                     Some(b) => b,
                     None => {
@@ -7807,6 +7928,55 @@ mod tests {
         assert_eq!(
             (s.macaulay_rows, s.macaulay_columns, s.macaulay_degree),
             (Some(4096), Some(8192), Some(4))
+        );
+        assert!(s.degree_of_regularity_forecast.is_none());
+
+        // The forecast rides the block, priced at the curve's fold, and
+        // survives the record's JSON; an absent forecaster leaves the reason.
+        use crate::cryptanalysis::dreg_forecast::{Forecaster, Outcome, SolveObservation};
+        let mut forecaster = Forecaster::new(3);
+        forecaster.set_relation_state(40, 10);
+        for k in 0..6 {
+            forecaster.observe(SolveObservation {
+                outcome: if k % 3 == 0 {
+                    Outcome::Decomposed
+                } else {
+                    Outcome::Refuted
+                },
+                solving_degree: Some(2),
+                censored_above: 2,
+                work: 50,
+                relation_phase: true,
+                relation: k % 3 == 0,
+            });
+        }
+        let priced = SolverStats::from_report(&f4, None).with_forecast(
+            Some(&forecaster),
+            None,
+            1_000_003,
+            26,
+        );
+        let fc = priced.degree_of_regularity_forecast.as_ref().unwrap();
+        assert_eq!(fc.solves, 6);
+        assert_eq!(fc.cost.hope_ratio_band.len(), 3);
+        let floor = fc.cost.rho_floor_group_additions.unwrap();
+        let expected = (std::f64::consts::PI * 1_000_003.0 / 52.0).sqrt();
+        assert!((floor - expected).abs() < 1e-9, "{floor} vs {expected}");
+        assert!(fc.certified_degree_of_regularity.is_none());
+        let text = serde_json::to_string(&priced).unwrap();
+        let back: SolverStats = serde_json::from_str(&text).unwrap();
+        assert_eq!(
+            back.degree_of_regularity_forecast
+                .as_ref()
+                .map(|f| f.solves),
+            Some(6)
+        );
+        let unavailable =
+            SolverStats::from_report(&f4, None).with_forecast(None, Some("no degree cap"), 97, 2);
+        assert!(unavailable.degree_of_regularity_forecast.is_none());
+        assert_eq!(
+            unavailable.forecast_unavailable.as_deref(),
+            Some("no degree cap")
         );
         assert_eq!(s.sat_conflicts, None);
         assert_eq!(s.n_vars, None);
@@ -8344,6 +8514,84 @@ mod accounting_rules_tests {
     fn assert_phases_sum(id: &str, rep: &SolveReport) {
         let sum: f64 = rep.phases.iter().map(|p| p.gae).sum();
         assert_eq!(sum, rep.total_gae, "{id}: phases {:?}", rep.phases);
+    }
+
+    /// `ic.pipeline` with the algebraic descent oracle carries the advisory
+    /// degree-of-regularity forecast on its solver block, one observation
+    /// per solver call, priced against the curve's own fold: a capped
+    /// engine's cap is the bound, an uncapped full Gröbner basis gets the
+    /// ring's ceiling, and a SAT solver, which reports no degree, records
+    /// why it has none.
+    #[test]
+    fn algebraic_descent_records_a_degree_of_regularity_forecast() {
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 1, n: 17 });
+        let full = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "koblitz-orbit:divisor=0;1"),
+                ("oracle", "descent-algebraic:m=2"),
+                ("solver", "f4-f2"),
+            ],
+        );
+        let rep = run(&full, &inst, &facts, 4242, 6);
+        let solver = rep.solver.as_ref().expect("solver block");
+        let fc = solver
+            .degree_of_regularity_forecast
+            .as_ref()
+            .expect("forecast on the uncapped solver block");
+        assert_eq!(
+            Some(u64::from(fc.degree_bound)),
+            solver.n_vars,
+            "ring ceiling"
+        );
+        assert_eq!(fc.solves as u64, solver.calls);
+
+        let f4 = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "koblitz-orbit:divisor=0;1"),
+                ("oracle", "descent-algebraic:m=2"),
+                ("solver", "inherited-f4:max_degree=3"),
+            ],
+        );
+        let rep = run(&f4, &inst, &facts, 4242, 6);
+        assert_eq!(rep.recovered, Some(4242 % facts.r));
+        let solver = rep.solver.as_ref().expect("solver block");
+        let fc = solver
+            .degree_of_regularity_forecast
+            .as_ref()
+            .expect("forecast on the solver block");
+        assert_eq!(fc.degree_bound, 3);
+        assert_eq!(fc.solves as u64, solver.calls, "one observation per call");
+        assert!(fc.relations > 0);
+        assert!(fc.cost.columns > 0);
+        assert_eq!(fc.cost.hope_ratio_band.len(), 3);
+        let floor = fc.cost.rho_floor_group_additions.unwrap();
+        let expected = (std::f64::consts::PI * facts.r as f64 / (2.0 * 34.0)).sqrt();
+        assert!((floor - expected).abs() < 1e-6, "{floor} vs {expected}");
+        assert_eq!(fc.semi_regular_degree, solver.semi_regular_degree);
+        assert!(fc.certified_degree_of_regularity.is_none());
+        assert!(solver.forecast_unavailable.is_none());
+        assert_eq!(
+            rep.detail["decomposition"]["solver"]["forecaster"],
+            Value::Null
+        );
+
+        let sat = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "koblitz-orbit:divisor=0;1"),
+                ("oracle", "descent-algebraic:m=2"),
+                ("solver", "sat-cdcl"),
+            ],
+        );
+        let rep = run(&sat, &inst, &facts, 4242, 6);
+        let solver = rep.solver.as_ref().expect("solver block");
+        assert!(solver.degree_of_regularity_forecast.is_none());
+        assert!(solver
+            .forecast_unavailable
+            .as_deref()
+            .is_some_and(|s| s.contains("max_degree")));
     }
 
     #[test]
@@ -9631,6 +9879,26 @@ mod neg_strong_tests {
                 assert_eq!(a.total_gae, again.total_gae);
             }
         }
+    }
+
+    /// m = 17: a two-word subgroup order and 68-bit packed points run
+    /// through `applicable` and `solve` (a capped walk, the target carried
+    /// in full).
+    #[test]
+    fn runs_past_one_word_on_m17() {
+        let strong = method(
+            NEG_STRONG,
+            &[("lanes", "8"), ("dp_bits", "6"), ("step_cap_factor", "0")],
+        );
+        let (inst, facts) = f2m4(17, 1);
+        assert!(u64::try_from(facts.r).is_err());
+        applicable(&strong, &inst, &facts).unwrap();
+        let k = (u128::MAX / 5) % facts.r;
+        let target = inst.mul_generator_hex(k).unwrap();
+        let rep = solve(&strong, &inst, &facts, &target, 3).unwrap();
+        assert!(rep.counters["walk_steps"] >= 1_000_000);
+        assert!(rep.recovered.is_none() || rep.recovered == Some(k));
+        assert!(rep.total_gae > 0.0);
     }
 
     #[test]

@@ -64,6 +64,12 @@ at exact AKS certification before tensor search. See the separate
 
 ## Native implementation
 
+The structured prime-field component also has a [JSON consumer and semantic
+replay interface](structured-prime-ic.md). `tensor-structured` accepts public
+relation queries, reuses local membership/setup, and returns counts and signed
+prefix witnesses under one explicit work budget. Producer check records and
+the implementation scope are linked from that interface. [pcc:unverified]
+
 The source is Akshima et al., *A Subexponential Time Algorithm for Elliptic
 Curve Discrete Logarithm*, v0.2,
 [pinned Bochum revision](https://github.com/bochum-crypto/subexponential-ecdl/tree/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f).

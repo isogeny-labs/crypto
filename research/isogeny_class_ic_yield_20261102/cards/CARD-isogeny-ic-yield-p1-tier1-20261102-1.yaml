@@ -1,0 +1,50 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-isogeny-ic-yield-p1-tier1-20261102-1
+experiment_id: isogeny_class_ic_yield_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: d6153ce46eed4986d63d0a3d6405de7ed1b36101
+receipt: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p1-tier1-20261102-1.receipt.json
+binds:
+  - {path: research/isogeny_class_ic_yield_20261102/DESIGN.md, sha256: f3748782cd1254a0db75dafa85989edfcb297a7d7aac46bf6f51be42d75712f9}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/PROTOCOL.md, sha256: 9ad5104862845bb3d8c2f4dd12bda365336a0dd1bc2aa570a5bc0eaca74184de}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/protocol.json, sha256: 310459117118db0f15ab62f7d1126c48cc4e3d590dfe99caf9fccd54643ade78}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/CROSSCHECK.md, sha256: 8cb4cb0bdb950cfe1065cb676a8f1636b01c48504f6c70124fb7f776f9d21083}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/run_full.sh, sha256: 4f5065b22cf76f2e2edf52cbace37d7520693f96ea9bc57fb70a4e5c5c1c8b89}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/targets.json, sha256: 95a71df2493f7cdc91c64eac12637b58dfaa7af064300875705cc7d369fe05ff}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/tower.json, sha256: b82248b83e987e6b375ea1c15e5cc41b346894097c24e97cb2b6e01ef01a19d9}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/neighbours.json, sha256: 0b654414221c62c88cedbcc63d0e2cca2ab88a12d4aa4cc8f6c6b9084a4dd805}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml, sha256: aa8140508976695d89f5a5c7a2f75179d1e27769ddcd08fce87151b88ba656dc}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.lock, sha256: c55474edc02ab3110539ef3ac72da9df9bc5697053ec2cbaa10998b9b1237a84}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/analyze.rs, sha256: df8a7e93612d88db6900f319a70de184ce1346a8d84a123f4fbc5a01d6352178}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/construct.rs, sha256: 59264d7f6ca35dcc9ac8183f00b2953fb0aacd69d6af54c64471ca1b367b4d79}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/engine.rs, sha256: abb3577cc41f4ad2a7a1c5d152563b664baa5420df0c5c1933ce28f31bbd0f0b}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/fp.rs, sha256: 03e26b01ef151c9406f86ffd9c9c81a5cca2c4ca46d8f2c90907c054eab1b541}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/jsonv.rs, sha256: 660397c1144ac49b0e784960a33ce3b98261b7adf2226e0a1f0572440f53833e}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/main.rs, sha256: 37fbcfafee56dff8a6172cc7d405b398150bdfaec2668795699954efa8702f0c}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/pari.rs, sha256: 428c0c85ac9f82654900e16fd7ee1831bffec287d6e626faa515f901a90483a3}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/poly.rs, sha256: 72a010c19e6d7b3b9ce1a923bf58fe0f0eb877b8d54179b5e226988a5d866784}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/gp/construct.gp, sha256: eadac8a469652864ea097c9c8f6c5ac838bc6f821da573b3898b786a0548d716}
+  - {path: research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/target/release/p1_eccp131, sha256: c230a30013d85bd0bb3bd6a64341c2c15170417bb74eaef74f08bd70c6194d87}
+must_not_exist: [research/isogeny_class_ic_yield_20261102/p1_eccp131/runs]
+commands:
+  - id: tier1
+    argv:
+      - research/isogeny_class_ic_yield_20261102/p1_eccp131/run_full.sh
+      - "tier1"
+    env:
+      BIN: rust/target/release/p1_eccp131
+      OUT: runs
+      WORKERS: "2"
+    timeout_seconds: 21600
+    success_exit_codes: [0]
+    stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p1-tier1-20261102-1.run.stdout
+    stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p1-tier1-20261102-1.run.stderr
+    outputs: [research/isogeny_class_ic_yield_20261102/p1_eccp131/runs/tier1_rows.jsonl, research/isogeny_class_ic_yield_20261102/p1_eccp131/runs/tier1.log]
+bus_address: executor-mechanical-isogeny-ic-yield-p1
+background: true
+write_scope: [research/isogeny_class_ic_yield_20261102/cards/, research/isogeny_class_ic_yield_20261102/p1_eccp131/runs/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the output directory research/isogeny_class_ic_yield_20261102/p1_eccp131/runs.
+notes: "LOCAL ROUTE under protocol amendment A1 (p1_eccp131/protocol.json, PROTOCOL.md section 14): tier 1 only (configs m2t3 and m3t2), isolation L0 on a loaded host, 2 workers, clock descriptive only. Not an EKS card and no ecbench. Tier 2 (m2t4) is deferred and has no card. Run in the worktree /home/user/crypto-p1run (detached at the pinned commit); the binary embeds that path. The run reads the committed targets.json and tower.json only and does not need libpari. The masked analysis is a later step and is not in this card. Concurrent with the P2 ecbench cards in /home/user/crypto-p2run on the same host."

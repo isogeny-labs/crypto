@@ -1,0 +1,19 @@
+{
+  "schema": "software.integration-check/v1",
+  "checked_utc": "2026-11-02T20:15:50.342399+00:00",
+  "reviewer": "root",
+  "source_sha256": "1744fb815d57d4d174b9fe906bf67091bc7738dea2389248b5794f059c1bcf9c",
+  "tests_sha256": "b1569dd87eee267608222927a5f124d326ed3c51603d3bd52a14994a7462bb78",
+  "command": "timeout 30s env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_assemble.py",
+  "exit_code": 0,
+  "tests_passed": 18,
+  "scope": "separate root source inspection and fresh mocked replay after agent-authored v2",
+  "docker_calls": 0,
+  "scientific_workers_launched": 0,
+  "limitations": [
+    "synchronous verifier and final receipt I/O still require outer process containment",
+    "Docker daemon completion is not established by client reaping",
+    "post-check deadline/signal guards certify eligibility at the checks, not atomic completion of subsequent file writes"
+  ],
+  "execution_admission": false
+}

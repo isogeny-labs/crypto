@@ -1,0 +1,123 @@
+{
+  "schema": "research.source-policy-review/v1",
+  "task": "T-1528",
+  "reviewer": "root",
+  "created_utc": "2026-11-03T21:20:30.173517+00:00",
+  "decision": "accepted_scoped_policy_interpretation",
+  "independence": {
+    "candidate_author": false,
+    "inventory_author": false,
+    "prior_producer_context": true,
+    "blind_review": false,
+    "prior_source_reading_disclosed": true
+  },
+  "subject_sha256": "4e45941236040fdd01541922517954fe43df26f9628b610eabbe3ae54ac1057f",
+  "source_bindings": [
+    {
+      "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+      "sha256": "061f4f9f45d261b61af3482509ca5f09e03964abc670765852922d20f946bbd1",
+      "bytes": 74301,
+      "matches": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/meter.rs",
+      "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+      "bytes": 8345,
+      "matches": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+      "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "bytes": 33938,
+      "matches": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/scalar_ledger.rs",
+      "sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba",
+      "bytes": 2862,
+      "matches": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/kernel-primitive-registry.json",
+      "sha256": "a973bf6222125f37a5d37fa25dbaac434ea3c418fae7bbf8abbda67036c15e2f",
+      "bytes": 1899,
+      "matches": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/COST_BOUNDARY.md",
+      "sha256": "186ebceb5281612f62442a3e005fa92b019f80f8309afe2fe5245ef9c0f4d402",
+      "bytes": 3659,
+      "matches": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/coverage-review.json",
+      "sha256": "8936f5d99b49538a35d78729f2450a326801ff9df720ec1f5966166756cfa252",
+      "bytes": 37905,
+      "matches": true
+    }
+  ],
+  "findings": [
+    {
+      "item": "Active coefficient reads",
+      "decision": "accepted",
+      "basis": "Native peval charges one collection visit per consumed coefficient and no separate scalar Copy. New initialization consumes k=2d+1 active entries once; padding consumes no inactive entry."
+    },
+    {
+      "item": "Optional access and bounds",
+      "decision": "accepted within existing finite-event boundary",
+      "basis": "get/first/Option checks are access mechanics rather than new algorithmic predicates on curve or collector values. Registry excludes an instruction census/API surcharge; existing indexing and iterator mechanics are similarly uncharged. This does not price these machine operations at zero."
+    },
+    {
+      "item": "Local scalar assignments",
+      "decision": "accepted",
+      "basis": "No collection element is cloned or initialized by assigning scalar recurrence locals. COST_BOUNDARY excludes fixed record Copy moves; original peval scalar extraction has the same read-only convention."
+    },
+    {
+      "item": "Arithmetic and last update",
+      "decision": "accepted",
+      "basis": "Two calls initialize differences and three calls run per x, before both continues. Final unused update is retained. Baseline uses k*p adds and k*p multiplies."
+    },
+    {
+      "item": "Existing mapper",
+      "decision": "accepted for these affected fields",
+      "basis": "Analyzer counts base_adds and collection_entry_visits and normalizes inverse expansion separately. Removed recurrence multiplies are outside inverse expansion. No new coefficient is introduced."
+    },
+    {
+      "item": "Caller scope",
+      "decision": "degree two caller verified",
+      "basis": "Native producer skips d.degree != 2 before calling point_sieve_candidates. Lower degrees remain component controls; no hidden omission of their addition increases."
+    }
+  ],
+  "counter_delta": [
+    {
+      "degree": 0,
+      "active_reads": 1,
+      "delta_base_muls": "-p",
+      "delta_base_adds": "2*p+2",
+      "delta_visits": "-(p-1)"
+    },
+    {
+      "degree": 1,
+      "active_reads": 3,
+      "delta_base_muls": "-3*p",
+      "delta_base_adds": "2",
+      "delta_visits": "-3*(p-1)"
+    },
+    {
+      "degree": 2,
+      "active_reads": 5,
+      "delta_base_muls": "-5*p",
+      "delta_base_adds": "2-2*p",
+      "delta_visits": "-5*(p-1)"
+    }
+  ],
+  "method": "Read exact native source, existing policy and mapper; verify seven input hashes. Context-informed nonauthor interpretation; not a new experiment or blind derivation. No compiler or replay invoked.",
+  "unresolved": [
+    "Final nine-category integrated-route source/binary/protocol/reference bindings",
+    "Fresh candidate1260-target results and complete matched resource evidence",
+    "Independent mathematical proof review separate from this accounting interpretation"
+  ],
+  "scientific_admission": false,
+  "new_prices_or_ratios": null,
+  "historical_records_changed": false
+}
