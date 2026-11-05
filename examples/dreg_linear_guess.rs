@@ -6,7 +6,13 @@
 //! linear form `x_i + x_j = c`; with `i`, `j` the same coordinate of the two
 //! summands of the first link, it fixes a coordinate of `s = x₁ + x₂`, which
 //! is invariant under swapping them (the first link sees the summands only
-//! through `s` and `p = x₁x₂`).
+//! through `s` and `p = x₁x₂`). `--sum j=i1+i2+…+c` substitutes a sum of
+//! several sources.
+//!
+//! `--link2 k=c` (m = 3) fixes coordinate `k` of `e₁ + x₃`, the invariant of
+//! the second link `S₃(e₁, x₃, x(R))` under swapping its two unknown
+//! arguments: `e₁[k] := c + Σ x₃`'s coordinate-`k` terms, that is
+//! `x_{3ℓ+k} := c + Σ_{t : v_t has bit k} x_{2ℓ+t}`, read from the draw's basis.
 //!
 //! ```sh
 //! cargo run --release --example dreg_linear_guess -- --to 4 --max-cols 140000 \
@@ -57,20 +63,23 @@ fn degree_json(d: &ClosureDegree) -> String {
     )
 }
 
-/// `x_j := x_i + c` for each `(j, i, c)`, then `x_v := b` for each `(v, b)`.
-/// A term containing `x_j` becomes `m·x_i` (+ `m` when `c = 1`); a term
+/// `x_j := c + Σ_i x_i` for each `(j, sources, c)`, then `x_v := b` for each
+/// `(v, b)`. A term `m·x_j` becomes `Σ_i m·x_i` (+ `m` when `c = 1`); a term
 /// containing a fixed `x_v` vanishes (`b = 0`) or loses it (`b = 1`). Equal
 /// terms cancel in pairs ([`F2BoolPoly::from_monos`]).
-fn specialise(p: &F2BoolPoly, sums: &[(u32, u32, bool)], fixes: &[(u32, bool)]) -> F2BoolPoly {
+type Sum = (u32, Vec<u32>, bool);
+
+fn specialise(p: &F2BoolPoly, sums: &[Sum], fixes: &[(u32, bool)]) -> F2BoolPoly {
     let mut masks: Vec<Mask> = p.terms.iter().map(|t| t.mask).collect();
-    for &(j, i, c) in sums {
-        let mut next = Vec::with_capacity(masks.len() * 2);
+    for (j, sources, c) in sums {
+        let (j, c) = (*j, *c);
+        let mut next = Vec::with_capacity(masks.len() * (sources.len() + 1));
         for m in masks {
             if m & bit(j) == 0 {
                 next.push(m);
             } else {
                 let rest = m & !bit(j);
-                next.push(rest | bit(i));
+                next.extend(sources.iter().map(|&i| rest | bit(i)));
                 if c {
                     next.push(rest);
                 }
@@ -94,13 +103,8 @@ fn specialise(p: &F2BoolPoly, sums: &[(u32, u32, bool)], fixes: &[(u32, bool)]) 
 }
 
 /// A random point of the guessed affine subspace: free bits random, each
-/// `x_j = x_i + c`, each fixed `x_v = b`.
-fn guessed_point(
-    state: &mut u64,
-    n_vars: usize,
-    sums: &[(u32, u32, bool)],
-    fixes: &[(u32, bool)],
-) -> Mask {
+/// `x_j = c + Σ_i x_i`, each fixed `x_v = b`.
+fn guessed_point(state: &mut u64, n_vars: usize, sums: &[Sum], fixes: &[(u32, bool)]) -> Mask {
     let mut point: Mask = 0;
     for k in 0..n_vars as u32 {
         // splitmix64
@@ -116,9 +120,11 @@ fn guessed_point(
     for &(v, b) in fixes {
         point = (point & !bit(v)) | if b { bit(v) } else { 0 };
     }
-    for &(j, i, c) in sums {
-        let xi = point & bit(i) != 0;
-        point = (point & !bit(j)) | if xi ^ c { bit(j) } else { 0 };
+    for (j, sources, c) in sums {
+        let value = sources
+            .iter()
+            .fold(*c, |acc, &i| acc ^ (point & bit(i) != 0));
+        point = (point & !bit(*j)) | if value { bit(*j) } else { 0 };
     }
     point
 }
@@ -147,26 +153,24 @@ fn main() {
         let (k, b) = kv.split_once('=').expect("--fix v=b");
         (k.parse().expect("variable"), b == "1")
     });
-    // `--sum j=i+c,…`: x_j := x_i + c.
-    let sums: Vec<(u32, u32, bool)> = parse_list(flag("--sum"), |kv| {
+    // `--sum j=i1+i2+…+c,…`: x_j := x_i1 + x_i2 + … + c.
+    let sums: Vec<Sum> = parse_list(flag("--sum"), |kv| {
         let (j, rhs) = kv.split_once('=').expect("--sum j=i+c");
-        let (i, c) = rhs.split_once('+').expect("--sum j=i+c");
+        let mut parts: Vec<&str> = rhs.split('+').collect();
+        let c = parts.pop().expect("--sum j=i+c") == "1";
+        assert!(!parts.is_empty(), "--sum j=i+c needs a source");
         (
             j.parse().expect("variable"),
-            i.parse().expect("variable"),
-            c == "1",
+            parts.iter().map(|i| i.parse().expect("variable")).collect(),
+            c,
         )
     });
-    // The substituted variables must be distinct and never fixed or used as
-    // a source, or the order of substitution would matter.
-    let targets: Vec<u32> = sums.iter().map(|s| s.0).collect();
-    for &(j, i, _) in &sums {
-        assert!(
-            !targets.contains(&i) && !fixes.iter().any(|f| f.0 == j || f.0 == i),
-            "--sum {j}={i}+c overlaps another guess"
-        );
-    }
-    let valued = ["--max-cols", "--to", "--draw", "--fix", "--sum"];
+    // `--link2 k=c,…`: coordinate k of e₁ + x₃ (resolved per draw).
+    let link2: Vec<(usize, bool)> = parse_list(flag("--link2"), |kv| {
+        let (k, c) = kv.split_once('=').expect("--link2 k=c");
+        (k.parse().expect("coordinate"), c == "1")
+    });
+    let valued = ["--max-cols", "--to", "--draw", "--fix", "--sum", "--link2"];
     let files: Vec<&String> = args
         .iter()
         .enumerate()
@@ -175,18 +179,30 @@ fn main() {
         })
         .map(|(_, a)| a)
         .collect();
-    let guesses_json = format!(
-        r#""fixed":[{}],"sums":[{}]"#,
-        fixes
-            .iter()
-            .map(|(v, b)| format!("[{v},{}]", *b as u8))
-            .collect::<Vec<_>>()
-            .join(","),
-        sums.iter()
-            .map(|(j, i, c)| format!("[{j},{i},{}]", *c as u8))
-            .collect::<Vec<_>>()
-            .join(",")
-    );
+    // A single source is written `[j, i, c]` (the form earlier records use),
+    // several `[j, [i…], c]`.
+    let guesses_json = |sums: &[Sum]| {
+        format!(
+            r#""fixed":[{}],"sums":[{}],"link2":[{}]"#,
+            fixes
+                .iter()
+                .map(|(v, b)| format!("[{v},{}]", *b as u8))
+                .collect::<Vec<_>>()
+                .join(","),
+            sums.iter()
+                .map(|(j, i, c)| match i.as_slice() {
+                    [one] => format!("[{j},{one},{}]", *c as u8),
+                    many => format!("[{j},{many:?},{}]", *c as u8),
+                })
+                .collect::<Vec<_>>()
+                .join(","),
+            link2
+                .iter()
+                .map(|(k, c)| format!("[{k},{}]", *c as u8))
+                .collect::<Vec<_>>()
+                .join(",")
+        )
+    };
     for file in files {
         let text = std::fs::read_to_string(file).unwrap_or_else(|e| panic!("{file}: {e}"));
         for line in text.lines().filter(|l| !l.trim().is_empty()) {
@@ -212,6 +228,30 @@ fn main() {
                 .collect();
             let x_r = F2mElement::from_biguint(&BigUint::from(v["x_r"].as_u64().unwrap()), n);
             let sys = build_decomposition_system(&basis, &x_r, &b, m, &st).expect("system");
+            let mut sums = sums.clone();
+            for &(k, c) in &link2 {
+                assert!(m == 3 && k < n as usize, "--link2 needs m = 3 and k < n");
+                let sources: Vec<u32> = (0..ell)
+                    .filter(|&t| basis[t].raw_bits().first().copied().unwrap_or(0) >> k & 1 == 1)
+                    .map(|t| (2 * ell + t) as u32)
+                    .collect();
+                assert!(
+                    !sources.is_empty(),
+                    "--link2 {k}: no basis vector has bit {k}"
+                );
+                sums.push(((3 * ell + k) as u32, sources, c));
+            }
+            // The substituted variables must be distinct and never fixed or used
+            // as a source, or the order of substitution would matter.
+            let targets: Vec<u32> = sums.iter().map(|s| s.0).collect();
+            for (j, sources, _) in &sums {
+                assert!(
+                    targets.iter().filter(|&&t| t == *j).count() == 1
+                        && sources.iter().all(|i| !targets.contains(i))
+                        && !fixes.iter().any(|f| f.0 == *j || sources.contains(&f.0)),
+                    "--sum/--link2 target {j} overlaps another guess"
+                );
+            }
             assert_eq!(
                 sys.n_vars as u64,
                 v["n_vars"].as_u64().unwrap(),
@@ -258,11 +298,12 @@ fn main() {
             let closure = scan.iter().find(|d| d.closure_refuted).map(|d| d.degree);
             let measured_to = scan.last().map(|d| d.degree).unwrap_or(2);
             println!(
-                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"occurring":{occurring},"committed_outcome":{},{guesses_json},"identity_check":{},"closure_degree":{},"measured_to":{measured_to},"max_cols":{max_cols},"scan":[{}]}}"#,
+                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"occurring":{occurring},"committed_outcome":{},{},"identity_check":{},"closure_degree":{},"measured_to":{measured_to},"max_cols":{max_cols},"scan":[{}]}}"#,
                 v["cell"].as_str().unwrap_or(""),
                 v["draw"],
                 sys.n_vars,
                 v["outcome"],
+                guesses_json(&sums),
                 identity.map_or("null".to_string(), |c| c.to_string()),
                 closure.map_or("null".to_string(), |d| d.to_string()),
                 scan.iter().map(degree_json).collect::<Vec<_>>().join(",")
