@@ -1,0 +1,91 @@
+{
+  "amendment_id": "N83-FACTOR-BASE-PDP-FFD-LFD-20261031-V2-R38-FIRST-FALL-OPS-CONTINUATION-01",
+  "budget_usd": {
+    "artifacts_ceiling": 0.25,
+    "compute_ceiling": 2.9,
+    "cost_observation_before_preparation": {
+      "day_to_date": 77.0045996521,
+      "month_to_date": 582.4529986551,
+      "spot_usd_per_hour": 0.8015
+    },
+    "monthly_cap": 1000,
+    "shared_daily_cap": 200,
+    "total_ceiling": 3.15
+  },
+  "capsule_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike38/attempt-01/capsule-v1/",
+  "claim_boundary": {
+    "LFD_closure": "not implemented by the pinned fall binary and not run here",
+    "degree_of_regularity": null,
+    "last_fall_degree": null,
+    "outputs": "first-fall degree or certified lower bound only",
+    "timing": "not a comparative timing experiment; wall_valid=false"
+  },
+  "execution": {
+    "attempts_per_case": 1,
+    "cpu_affinity": [
+      0
+    ],
+    "memory_limit_gib": 8,
+    "on_failure": "preserve terminal/failure row and partial artifacts; do not retry under this amendment",
+    "outer_wall_seconds": 12850,
+    "per_case_replay_seconds": 60,
+    "per_case_run_seconds": 60,
+    "retries": 0,
+    "threads": 1,
+    "unit": "one case at a time; each run process has exactly one case; fresh separate replay process",
+    "wall_valid": false
+  },
+  "frozen_protocol": {
+    "freeze_sha256": "50cd6f8213789de2dfd54a3b33a067ed87cc0def761b7c98769be3e19aee47a9",
+    "protocol_file_sha256": "8a9143e9588ce1ec5c204362b734f790696de90569ce1de3c086e4645e605885",
+    "protocol_id": "N83-FACTOR-BASE-PDP-FFD-LFD-20261031-V2",
+    "source_commit": "52665c7a6e8308f86201e10c9305afa346fd134b"
+  },
+  "input": {
+    "candidate_id": "spike38",
+    "case_count": 48,
+    "factor_base": "The fixed 2^27 selector domain per curve family is shared across m=2..9. Existing point shards are referenced by the source result index and will not be copied into this attempt.",
+    "input_manifest_sha256": "93b351b181b135c74cff0da0386c704d46eb777b302ed3b440ad18a249d52ca1",
+    "source_root": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-09/results/candidate-inputs/"
+  },
+  "published_files": [
+    {
+      "bytes": 14960,
+      "path": "run-first-fall.py",
+      "sha256": "64b6467e3c1157b188ce5e21c1d1ff623355338093e16b96a8e3bfb257530908"
+    },
+    {
+      "bytes": 716,
+      "path": "launch.sh",
+      "sha256": "1fdcb6726621ab733b764b8b2ad507a9ed31d073a2b17427397b4abe8a6e9a76"
+    },
+    {
+      "bytes": 98820,
+      "path": "protocol-pdp-factorbase-v2.json",
+      "sha256": "8a9143e9588ce1ec5c204362b734f790696de90569ce1de3c086e4645e605885"
+    },
+    {
+      "bytes": 330335,
+      "path": "input-manifest.json",
+      "sha256": "93b351b181b135c74cff0da0386c704d46eb777b302ed3b440ad18a249d52ca1"
+    },
+    {
+      "bytes": 25150,
+      "path": "source-fall.rs",
+      "sha256": "f860a68fcd8c98585082965f3d4c1622d71add204c0afc5bc922ea243153ea85"
+    },
+    {
+      "bytes": 210,
+      "path": "Cargo.toml",
+      "sha256": "67bf2d622a3c3fe35babe46a3e17ae37693dee36a7330300b5fe57e473c71cdf"
+    },
+    {
+      "bytes": 7077,
+      "path": "Cargo.lock",
+      "sha256": "210fabaa277a42007115baea73429d5e68feb35e3b274eab7ef9c311270722c5"
+    }
+  ],
+  "result_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike38/attempt-01/data-v1/",
+  "schema": "n83.ffd-first-fall-continuation/v1",
+  "scope": "Run the frozen V2 first-fall certificate procedure on the 48 already frozen spike38 systems. This is a continuation subset of the 39-arm/624-case cohort; it does not redefine or complete that cohort."
+}
