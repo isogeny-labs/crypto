@@ -43,6 +43,12 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [5 November ecbench statistics v2 before/after study](20261105-ecbench-statistics-v2/)
+(PR #2442's interval, censoring, wall-statistic and flag changes recomputed on five committed sessions with the pre- and
+post-merge binaries) keeps its report PDF and SVG/PNG figures here as documentary evidence. It is a statistics-method
+comparison with no speed result, replay certificate or matched-rho row, so it is not an admitted table row
+(source of truth: [`research/ecbench_statistics_v2_20261105/`](../research/ecbench_statistics_v2_20261105/)).
+
 The [31 October n=83 genus-three image study](20261031-n83-genus3-image/)
 retains its exact transfer certificate, replayed toy panels, reports, and
 figures as documentary evidence. It remains outside the admitted table because

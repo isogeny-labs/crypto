@@ -1,16 +1,88 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105b",
+  "latest_record": "20261105T1854Z-ecbench-statistics-v2",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 44,
+    "measured": 45,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
   "series": [
+    {
+      "better": "neutral",
+      "first": 648.2,
+      "latest": 648.2,
+      "latest_derived": {},
+      "metric": "censored_ratio_lower_bound_ic_sub6_mitm",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 48,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            419.6,
+            1001.0
+          ],
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 648.2
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 71.0,
+      "latest": 71.0,
+      "latest_derived": {},
+      "metric": "heavy_tail_rows_flagged_n4_before_fix",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 71,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 71.0
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 13.1,
+      "latest": 13.1,
+      "latest_derived": {},
+      "metric": "ops_interval_width_k2_new_over_old",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 1,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 13.1
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "ratio"
+    },
     {
       "better": "lower",
       "first": 21.050512493167396,
