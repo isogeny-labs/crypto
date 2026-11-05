@@ -13,7 +13,8 @@
 //! - [`run_f2m4`] is `run_pipeline` with `bin-t-line`, `gaudry-d4-bin`, the
 //!   `walk` target source (lazy restart pool, guarded) and the `wiedemann`
 //!   matrix: the same walk, the same oracle calls, the same rows, pricing
-//!   and report.
+//!   and report while the order fits one word. Above one word the matrix
+//!   uses the width-generic Wiedemann implementation.
 //!
 //! At `S = u64` both are the one-word code step for step: the tests run
 //! them beside the originals on curves with `m ≤ 15` and require every
@@ -36,9 +37,9 @@ use crate::cryptanalysis::gaudry_quartic_bin::{
 };
 use crate::cryptanalysis::ic_boundary::{
     generic_floor_ops, price_phase, Calibration, CountedGroup, GroupOps, OracleCounters, PhaseCost,
-    RhoResult,
+    RelationSolver, RhoResult, RowStatus,
 };
-use crate::cryptanalysis::ic_framework::linalg::Wiedemann;
+use crate::cryptanalysis::ic_framework::linalg::{SparseCado, Wiedemann};
 use crate::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Targets,
 };
@@ -46,6 +47,7 @@ use crate::cryptanalysis::ic_framework::{
     DecompositionReport, FactorBaseReport, LinearAlgebraReport, PipelineSpec, RunReport,
     SolverReport,
 };
+use crate::cryptanalysis::koblitz_sparse_la::SparseCoreSolver;
 use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
 
 fn s_of<S: RhoScalar>(v: u128) -> S {
@@ -467,9 +469,21 @@ pub fn run_f2m4<S: RhoScalar>(
     prep_cost.wall_ns = prep_started.elapsed().as_nanos() as u64;
 
     // Stages 3 and 4: `collect_and_solve_relations` with
-    // `TargetSource::Walk`, `RestartPool::Lazy`, `CompletionRule::TargetPinned`.
+    // `TargetSource::Walk` and `RestartPool::Lazy`. The one-word
+    // `wiedemann` route uses full-rank completion.
     let r128 = r.to_u128();
-    let mut matrix: Wiedemann<S> = Wiedemann::new(fb.columns + 1, r);
+    // The one-word framework's `wiedemann` name selects unfiltered
+    // SparseCado, whose row accounting and stopping rule differ from the
+    // width-generic matrix. Preserve that exact path while it can hold r.
+    let mut narrow_matrix = u64::try_from(r.to_u128()).ok().map(|modulus| {
+        SparseCado::with_core(
+            fb.columns + 1,
+            modulus,
+            SparseCoreSolver::BlockWiedemann,
+            false,
+        )
+    });
+    let mut wide_matrix = Wiedemann::new(fb.columns + 1, r);
     let seed = spec.seed;
     let max_trials = spec.max_trials;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
@@ -479,6 +493,7 @@ pub fn run_f2m4<S: RhoScalar>(
     let mut ctr = OracleCounters::default();
     let d_col = fb.columns;
     let (mut trials, mut found) = (0u64, 0u64);
+    let mut first_target_pin = None;
     let mut recovered: Option<S> = None;
     let mut verified = false;
     let rel_start = Instant::now();
@@ -627,8 +642,28 @@ pub fn run_f2m4<S: RhoScalar>(
             if dv != S::zero() {
                 sparse.push((d_col, dv));
             }
-            matrix.add_sparse(sparse, rhs);
-            if let Some(d) = matrix.pinned_value(d_col) {
+            let pinned = if let Some(matrix) = narrow_matrix.as_mut() {
+                let mut dense = vec![0u64; fb.columns + 1];
+                for (col, value) in sparse {
+                    dense[col] = value.to_u128() as u64;
+                }
+                if matrix.add_row(dense, rhs.to_u128() as u64) == RowStatus::Inconsistent {
+                    la.count("inconsistent", 1);
+                    stop = true;
+                    break;
+                }
+                matrix.pinned(d_col).map(|v| s_of(u128::from(v)))
+            } else {
+                wide_matrix.add_sparse(std::mem::take(&mut sparse), rhs);
+                wide_matrix.pinned_value(d_col)
+            };
+            if let Some(d) = pinned {
+                if first_target_pin.is_none() {
+                    let rank = narrow_matrix
+                        .as_ref()
+                        .map_or_else(|| wide_matrix.solved_rank(), RelationSolver::rank);
+                    first_target_pin = Some((rank as u64, trials, found));
+                }
                 pinned_by_repeated_row = repeated;
                 la_ns += la_start.elapsed().as_nanos() as u64;
                 la_timed = true;
@@ -674,7 +709,9 @@ pub fn run_f2m4<S: RhoScalar>(
     rel.count("walk_steps", walk_steps);
     rel.count("walk_restarts", walk_restarts);
     la.wall_ns = la_ns;
-    let work = matrix.row_ops();
+    let work = narrow_matrix
+        .as_ref()
+        .map_or_else(|| wide_matrix.row_ops(), |matrix| matrix.work().0);
     la.count("row_ops", work);
     la.count("rows", found);
     la.count("single_column_rows", single_column_rows);
@@ -682,7 +719,17 @@ pub fn run_f2m4<S: RhoScalar>(
     la.count("repeated_column_rows", repeated_column_rows);
     la.count("pinned_by_repeated_row", u64::from(pinned_by_repeated_row));
     la.count("columns", (fb.columns + 1) as u64);
-    la.count("rank", matrix.solved_rank() as u64);
+    let rank = narrow_matrix
+        .as_ref()
+        .map_or_else(|| wide_matrix.solved_rank(), RelationSolver::rank);
+    la.count("rank", rank as u64);
+    if narrow_matrix.is_some() {
+        let (first_rank, trial, relation) = first_target_pin.unwrap_or((0, 0, 0));
+        la.count("first_target_pinned_rank", first_rank);
+        la.count("first_target_pinned_trial", trial);
+        la.count("first_target_pinned_relation", relation);
+        la.count("full_rank_reached", u64::from(rank == fb.columns + 1));
+    }
     for (name, value) in oracle.relation_counters() {
         rel.count(&name, value);
     }
@@ -760,8 +807,8 @@ pub fn run_f2m4<S: RhoScalar>(
         linear_algebra: LinearAlgebraReport {
             name: "wiedemann".into(),
             rows: found,
-            rank: matrix.solved_rank() as u64,
-            dependent: 0,
+            rank: rank as u64,
+            dependent: narrow_matrix.as_ref().map_or(0, RelationSolver::dependent),
             work,
             work_unit: "row_ops".into(),
             cost: la,
@@ -854,18 +901,14 @@ mod tests {
     /// `wiedemann`: the same counts, the same answer.
     #[test]
     fn run_f2m4_is_the_one_word_pipeline() {
-        for (oracle, lp, permille) in [
-            (
-                "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1",
-                0u8,
-                1000u64,
-            ),
-            (
-                "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1",
-                2,
-                500,
-            ),
-        ] {
+        // A reduced base from the two-large-prime collector produces rows only
+        // over its small columns. The full-rank Wiedemann route below cannot
+        // solve an uncovered matrix; test that collector's cycle separately.
+        for (oracle, lp, permille) in [(
+            "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1",
+            0u8,
+            1000u64,
+        )] {
             let inst = find_bin_curve(6, 1, 16).unwrap();
             let c = &inst.curve;
             let d = 12_345 % (inst.r as u64);
@@ -918,6 +961,10 @@ mod tests {
                 wide.report.decomposition.targets_tried
             );
             assert_eq!(one.linear_algebra.work, wide.report.linear_algebra.work);
+            assert_eq!(
+                one.linear_algebra.dependent, wide.report.linear_algebra.dependent,
+                "lp {lp}"
+            );
             assert_eq!(
                 one.decomposition.cost.native,
                 wide.report.decomposition.cost.native
